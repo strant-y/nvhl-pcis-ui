@@ -1,0 +1,107 @@
+<template>
+  <el-dialog v-model="dialogVisible" title="" width="80%">
+    <app-free-edit v-model:freeEditConfig="formconfig" ref="freeEditRef" />
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="handleCancel">取消</el-button>
+        <el-button type="primary" @click="handleSave">保存</el-button>
+      </span>
+    </template>
+  </el-dialog>
+</template>
+
+<script setup lang="ts">
+import {
+  AppFreeEditConfig,
+  AppFreeEditMethod,
+  createAppFreeEditConfig,
+  createFromUiConfig,
+} from "@/shared/app-free-edit-config";
+import { ref, reactive } from "vue";
+import { ElMessage } from "element-plus";
+import { saveRiskInfo, saveCvrgRiskRel } from "@/api/prod";
+import { dataOpertaor } from "@/store/modules/data-opertaor";
+const opertaor = dataOpertaor();
+const props = defineProps<{
+  data: Object;
+  type: string;
+}>();
+const dialogVisible = ref(true);
+const freeEditRef = ref<AppFreeEditMethod | null>(null);
+
+const formconfig = reactive<AppFreeEditConfig>(
+  createAppFreeEditConfig({
+    title: "增加责任",
+    endBtnsPosition: "right",
+    fromSchema: [
+      {
+        prop: "cKindNo",
+        inputtype: "rtinput",
+        title: "大类代码",
+      },
+      {
+        prop: "cRiskNo",
+        inputtype: "rtinput",
+        title: "责任代码",
+      },
+      {
+        prop: "cNmeCn",
+        inputtype: "rtinput",
+        title: "中文名称",
+      },
+      {
+        prop: "cNmeEn",
+        inputtype: "rtinput",
+        title: "英文名称",
+      },
+      {
+        prop: "cStatus",
+        inputtype: "rtselect",
+        title: "启用标识",
+        loadData: [
+          {
+            label: "启用",
+            value: "1",
+          },
+          {
+            label: "禁用",
+            value: "0",
+          },
+        ],
+      },
+    ],
+    fromUi: createFromUiConfig({
+      cols: 3,
+    }),
+  })
+);
+
+const handleSave = async () => {
+  const tabref = opertaor.getTableRefByKey("inruranceTypeBasicInfo");
+  const opCde = JSON.parse(sessionStorage.getItem("user")).opCde;
+  const cCvrgNo = tabref.getFromValue().cCvrgNo;
+  const formData = freeEditRef.value?.getFromValue();
+  const param = { ...formData, type: props.type, cRiskCls: "1" };
+  formData.cCrtCde = opCde;
+  formData.cUpdCde = opCde;
+  const objStr = [formData];
+  const params = { rel: objStr, isAdd: props.type, cCvrgNo: cCvrgNo };
+  if (formData) {
+    try {
+      saveRiskInfo(param).then((res) => {
+        ElMessage.success(res.msg);
+      });
+      saveCvrgRiskRel(params);
+      dialogVisible.value = false;
+    } catch (error) {}
+  }
+};
+
+const handleCancel = () => {
+  dialogVisible.value = false;
+};
+</script>
+
+<style scoped>
+/* 确保样式与现有组件一致 */
+</style>

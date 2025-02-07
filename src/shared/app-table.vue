@@ -1,0 +1,117 @@
+<template>
+  <div class="searchbar">
+    <el-card shadow="never" class="table-container">
+      <template #header>
+        <template v-for="(item, index) in tableConfig.titleBtns" :key="index">
+          <rt-button :item="item" />
+        </template>
+      </template>
+      <div class="form-inner">
+        <rttable
+          v-model="dataList"
+          :item="appgrideditConfig"
+          ref="rttableFrom"
+          @selection-change="handleSelectionChange"
+        />
+        <el-pagination
+          v-model:current-page="queryParams.pageNum"
+          v-model:page-size="queryParams.pageSize"
+          layout="prev, pager, next, jumper"
+          :total="pageresult.total"
+          v-if="tableConfig.isPage"
+          @size-change="pageChange"
+          @current-change="pageChange"
+        />
+        <div
+          style="margin-top: 20px"
+          :style="{ textAlign: tableConfig.endBtnsPosition }"
+          v-if="tableConfig.endBtns && tableConfig.endBtns.length > 0"
+        >
+          <template v-for="(item, index) in tableConfig.endBtns" :key="index">
+            <rt-button :item="item" />
+          </template>
+        </div>
+      </div>
+    </el-card>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { AppGridEditConfig } from "./app-grid-edit-config";
+import { AppTableConfig } from "./app-table-config";
+
+defineOptions({
+  name: "AppTable",
+  inheritAttrs: false,
+});
+
+const emits = defineEmits(["pageChange"]); // 父组件监听事件，同步子组件值的变化给父组件
+
+const queryParams = reactive<PageQuery>({
+  pageNum: 1,
+  pageSize: 10,
+});
+
+const appgrideditConfig = reactive<AppGridEditConfig>({
+  editFlag: false, //是否可以编辑
+});
+const dataList = ref<any>([]);
+
+const props = defineProps({
+  tableConfig: {
+    type: Object as () => AppTableConfig,
+    required: true,
+  },
+
+  pageresult: {
+    type: Object as () => Pageresult,
+    required: true,
+  },
+});
+
+watch(
+  () => props.tableConfig,
+  (newTableConfig) => {
+    Object.assign(appgrideditConfig, newTableConfig);
+    appgrideditConfig.editFlag = false;
+  },
+  { deep: true }
+);
+
+watch(
+  () => props.pageresult,
+  (newPageresult) => {
+    dataList.value = newPageresult.list;
+  },
+  { deep: true }
+);
+
+onMounted(() => {
+  Object.assign(appgrideditConfig, props.tableConfig);
+  appgrideditConfig.editFlag = false;
+});
+function handleSelectionChange(selectedRows: any[]) {
+  emits("selection-change", selectedRows);
+}
+function pageChange() {
+  emits("pageChange");
+}
+
+function getPartnerPage(flag = true) {
+  if (flag) {
+    queryParams.pageNum = 1;
+  }
+  return queryParams;
+}
+
+defineExpose({
+  getPartnerPage,
+});
+</script>
+
+<style scoped>
+.searchbar {
+  border: 1px solid #ddd;
+  box-shadow: 0 0 2px rgb(0 0 0 / 30%);
+}
+</style>

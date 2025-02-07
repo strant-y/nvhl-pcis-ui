@@ -1,0 +1,150 @@
+<template>
+  <div v-if="gridEditConfig" class="freeedit">
+    <div class="searchbar">
+      <el-row :gutter="16">
+        <el-col :md="24">
+          <el-card>
+            <template #header>
+              <el-row justify="space-between">
+                <el-col :span="4" v-if="!gridEditConfig.production">
+                  {{ gridEditConfig.title }}
+                </el-col>
+                <el-col :span="4" v-if="gridEditConfig.production">
+                  <el-tooltip :content="gridEditConfig.productionTitle">
+                    {{ gridEditConfig.title }}
+                  </el-tooltip>
+                </el-col>
+                <el-col
+                  :span="20"
+                  style="text-align: right"
+                  v-if="
+                    gridEditConfig.titleBtns &&
+                    gridEditConfig.titleBtns.length > 0
+                  "
+                >
+                  <el-button-group>
+                    <template
+                      v-for="(item, index) in gridEditConfig.titleBtns"
+                      :key="index"
+                    >
+                      <rt-button :item="item" />
+                    </template>
+                  </el-button-group>
+                  <a
+                    style="margin-left: 20px"
+                    @click="showMyfrom = !showMyfrom"
+                    v-if="
+                      gridEditConfig.showMyfromBtm
+                        ? gridEditConfig.showMyfromBtm
+                        : false
+                    "
+                  >
+                    <el-icon v-if="!showMyfrom"><ArrowUpBold /></el-icon>
+                    <el-icon v-if="showMyfrom"><ArrowDownBold /></el-icon>
+                    {{ showMyfrom ? "点击折叠" : "点击展开" }}
+                  </a>
+                </el-col>
+              </el-row>
+            </template>
+            <div class="form-inner" v-if="showMyfrom">
+              <rttable
+                v-model="tableDatas"
+                :item="gridEditConfig"
+                :parentFromUi="gridEditConfig"
+                ref="rttableFrom"
+              />
+              <div
+                style="margin-top: 20px"
+                :style="{ textAlign: gridEditConfig.endBtnsPosition }"
+                v-if="
+                  gridEditConfig.endBtns && gridEditConfig.endBtns.length > 0
+                "
+              >
+                <template
+                  v-for="(item, index) in gridEditConfig.endBtns"
+                  :key="index"
+                >
+                  <rt-button :item="item" />
+                </template>
+              </div>
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { AppGridEditConfig, AppGridEditMethod } from "./app-grid-edit-config";
+defineOptions({
+  name: "AppGridEdit",
+  inheritAttrs: false,
+});
+
+const props = defineProps({
+  gridEditConfig: {
+    type: Object as () => AppGridEditConfig,
+    required: true,
+  },
+});
+
+const { gridEditConfig } = toRefs(props);
+
+const tableDatas = ref<any[] | undefined>([]);
+
+const showMyfrom = ref(true);
+showMyfrom.value = props.gridEditConfig?.showMyfrom
+  ? props.gridEditConfig?.showMyfrom
+  : true;
+
+const rttableFrom = ref<AppGridEditMethod | null>(null);
+
+function getFromValue() {
+  return tableDatas.value;
+}
+
+function setFormValue(data: any) {
+  tableDatas.value = data;
+}
+function validate() {
+  const pro = rttableFrom.value?.tableExvalidate();
+  return pro;
+}
+
+function getTableValue() {
+  return tableDatas.value;
+}
+
+function addRow() {
+  rttableFrom.value?.addRow();
+}
+
+function getSelectRow() {
+  return rttableFrom.value?.getSelectRow();
+}
+
+defineExpose({
+  getFromValue,
+  setFormValue,
+  validate,
+  getTableValue,
+  addRow,
+  getSelectRow,
+});
+</script>
+
+<style scoped>
+:deep(.el-card__header) {
+  background-color: #e5f3fa;
+  padding: 15px 20px;
+}
+
+.searchbar {
+  border: 1px solid #ddd;
+  box-shadow: 0 0 2px rgb(0 0 0 / 30%);
+}
+::v-deep .el-form-item {
+  margin-bottom: 0px !important; /* 使内容显示更近紧促 */
+}
+</style>

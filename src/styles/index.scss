@@ -1,0 +1,101 @@
+@use "./reset";
+
+.app-container {
+  padding: 6px;
+  margin-bottom: 80px
+}
+
+.app-button-margin5 {
+  margin-left: 5px !important;
+}
+
+.table-container > .el-card__header {
+  padding: calc(var(--el-card-padding) - 12px) var(--el-card-padding);
+  background-color: var(--el-card-header-bg-color);
+}
+
+.table-container{
+  margin-bottom: 6px;
+  margin-top: 6px;
+}
+
+
+// 查询组件样式
+.search-container {
+  padding: 25px 20px 15px 10px;
+  background-color: var(--el-bg-color-overlay);
+  border: 1px solid var(--el-border-color-light);
+  border-radius: 5px;
+  //box-shadow: var(--el-box-shadow-light);
+}
+// 任务查询页面 查询表单布局 呈三列
+.search-container > .el-form{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+// 任务查询页面 查询表单元素 label样式
+.search-container > .el-form > .el-form-item > .el-form-item__label{
+  width: 100px;
+}
+// 任务查询页面 搜索按钮位置
+.search-container > .search-button{
+  text-align: end;
+}
+
+
+.link-type,
+.link-type:focus {
+  color: #337ab7;
+  cursor: pointer;
+
+  &:hover {
+    color: rgb(32 160 255);
+  }
+}
+
+//新增样式
+.newForm-place{
+  margin-left: 5% !important;
+}
+.newForm-size1{
+  width: 89.5% !important;
+}
+.newForm-size2{
+  margin-left: 5%;width: 87% !important;
+}
+
+.qryForm-select-size{
+  width: 100%;
+}
+
+/**
+* 弹框表单布局
+**/
+.dialog-form {
+  display: flex;
+  flex-wrap: wrap;
+}
+// 显示两列
+.dialog-form .el-form-item {
+  width: 50%; /* 每个el-form-item占据1/2的宽度 */
+  box-sizing: border-box; /* 让边框和内边距计算在内 */
+  padding: 0 10px; /* 设置内边距 */
+}
+// 增加宽度
+.dialog-form .el-form-item .el-form-item__label {
+  width: 120px !important; /* label增加宽度 */
+}
+
+//
+//.app-container .el-card{
+//  border: 1px solid var(--el-border-color-light);
+//  border-radius: 4px;
+//  box-shadow: var(--el-box-shadow-light);
+//}
+
+
+// 修改 checkbox复选框禁用状态下的 √ 颜色
+.el-checkbox__input.is-disabled.is-checked .el-checkbox__inner:after{
+  border-color: #555 !important;
+}
+
