@@ -67,8 +67,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     fromSchema: [
       {
         prop: "cKindNo",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "大类代码",
+        typeCode: "KIND_LIST_ALL",
+        params: { cStatus: "1" },
       },
       {
         prop: "cCvrgNo",

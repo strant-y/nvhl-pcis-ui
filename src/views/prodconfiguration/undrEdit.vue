@@ -188,7 +188,8 @@ const exRules = {
 /** 查询 */
 function save() {
   const param = getFrom();
-  saveUndrClsInfo(param)
+  const newparam = Object.assign(param, { type: "add" });
+  saveUndrClsInfo(newparam)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {

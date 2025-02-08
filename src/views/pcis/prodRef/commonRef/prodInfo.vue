@@ -249,26 +249,26 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           n: "0",
         },
       },
-      {
-        prop: "cCvrgTypFlag",
-        inputtype: "rtselect",
-        title: " 健康险意外险类型",
-        clearable: true,
-        loadData: [
-          {
-            value: "0",
-            label: "健康险",
-          },
-          {
-            value: "1",
-            label: "意外险",
-          },
-          {
-            value: "3",
-            label: "其他险",
-          },
-        ],
-      },
+      // {
+      //   prop: "cCvrgTypFlag",
+      //   inputtype: "rtselect",
+      //   title: " 健康险意外险类型",
+      //   clearable: true,
+      //   loadData: [
+      //     {
+      //       value: "0",
+      //       label: "健康险",
+      //     },
+      //     {
+      //       value: "1",
+      //       label: "意外险",
+      //     },
+      //     {
+      //       value: "3",
+      //       label: "其他险",
+      //     },
+      //   ],
+      // },
     ],
     fromUi: createFromUiConfig({
       cols: 3,
@@ -311,9 +311,9 @@ function handleQuery() {
       const { code, data, msg } = res;
       if (200 === code) {
         if (pageType.value === "copy") {
-          data.data.cProdNo = null;
+          data.cProdNo = null;
         }
-        freeEditRef?.value?.setFormValue(data.data);
+        freeEditRef?.value?.setFormValue(data);
       } else {
         ElMessage.error(msg);
       }

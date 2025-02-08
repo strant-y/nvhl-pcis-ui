@@ -25,6 +25,8 @@ import {
 import { ref, reactive } from "vue";
 import { savePrdTermInfo } from "@/api/prod"; // api接口
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { useValidator } from "@/typings/useValidator";
+const { getRules } = useValidator();
 const opertaor = dataOpertaor();
 const props = defineProps<{
   data: Object;
@@ -68,13 +70,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         prop: "cNmeCn",
         inputtype: "rtinput",
         title: "条款名称",
-        rules: [
-          {
-            required: true,
-            message: "请输入条款名称",
-            trigger: "blur",
-          },
-        ],
+        rules: [getRules("required", { change: true })],
       },
       {
         prop: "cNmeEn",
@@ -85,51 +81,43 @@ const formconfig = reactive<AppFreeEditConfig>(
         prop: "cFilingNo",
         inputtype: "rtinput",
         title: "备案号",
+        rules: [getRules("required", { blur: true })],
       },
       {
         prop: "cRegisteredNo",
         inputtype: "rtinput",
         title: "注册号",
+        rules: [getRules("required", { blur: true })],
       },
       {
         prop: "cEnableFlag",
         inputtype: "rtselect",
         title: "启用标志",
-        loadData: [
-          {
-            label: "启用",
-            value: "1",
-          },
-          {
-            label: "禁用",
-            value: "0",
-          },
-        ],
+        typeCode: "WEB_SYS_STA_DICT",
+        params: { cParCde: "use_mrk" },
+        rules: [getRules("required", { change: true })],
+        defaultValue: "1",
       },
       {
         prop: "cIsInternet",
         inputtype: "rtselect",
         title: "是否互联网",
-        loadData: [
-          {
-            label: "是",
-            value: "1",
-          },
-          {
-            label: "否",
-            value: "0",
-          },
-        ],
+        typeCode: "WEB_SYS_STA_DICT",
+        params: { cParCde: "yes_no" },
+        rules: [getRules("required", { blur: true })],
+        defaultValue: "2",
       },
       {
         prop: "tFilingTm",
         inputtype: "rtdatepicker",
         title: "备案日期",
+        rules: [getRules("required", { blur: true })],
       },
       {
         prop: "tFeedbackTm",
         inputtype: "rtdatepicker",
         title: "反馈日期",
+        rules: [getRules("required", { blur: true })],
       },
       {
         prop: "nFeeUpper",
@@ -145,16 +133,10 @@ const formconfig = reactive<AppFreeEditConfig>(
         prop: "cIsExist",
         inputtype: "rtselect",
         title: "条款文件是否存在",
-        loadData: [
-          {
-            label: "存在",
-            value: "1",
-          },
-          {
-            label: "不存在",
-            value: "0",
-          },
-        ],
+        typeCode: "WEB_SYS_STA_DICT",
+        params: { cParCde: "yes_no" },
+        rules: [getRules("required", { blur: true })],
+        defaultValue: "1",
       },
       {
         prop: "cUseDpt",
@@ -167,6 +149,8 @@ const formconfig = reactive<AppFreeEditConfig>(
         type: "textarea",
         title: "条款描述",
         rows: 2,
+        btnWidth: 20,
+        itemWidth: 3,
       },
       // {
       //   prop: "termFile",

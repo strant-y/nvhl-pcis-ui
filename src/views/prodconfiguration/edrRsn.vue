@@ -66,6 +66,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cKindNo",
         inputtype: "rtselect",
+        typeCode: "KIND_LIST_CACHE",
+        params: { codeListParam: "" },
         title: "产品大类",
       },
       {
@@ -77,6 +79,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cRsnTyp",
         inputtype: "rtselect",
         title: "批改原因类别",
+        loadData: [
+          { value: "1", label: "一般批改" },
+          { value: "2", label: "注销批改" },
+          { value: "3", label: "退保批改" },
+          { value: "4", label: "变更保险期限" },
+          { value: "5", label: "批改分期" },
+        ],
       },
       {
         prop: "cRsnNme",

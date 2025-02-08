@@ -193,7 +193,7 @@ function handleQuery(flag?: boolean) {
       const { code, data, msg } = res;
       if (200 === code) {
         pageresult.list = [];
-        pageresult.list = data;
+        pageresult.list = data.result;
         pageresult.total = data.total;
       } else {
         ElMessage.error(msg);

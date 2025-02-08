@@ -63,6 +63,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         title: "险别代码",
         rules: [getRules("required", {})],
+        func: (val) => {
+          formconfig1.fromSchema?.forEach((e) => {
+            if (e.prop === "cCvrgNo") {
+              setValue("cDispCde", val);
+            }
+          });
+          // setValue("cCvrgNo", val);
+          // freeEditRef?.value?.setValue("cCvrgNo", val);
+        },
       },
       {
         prop: "cKindNo",
@@ -168,29 +177,30 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           },
         ],
       },
-      {
-        prop: "cHealthType",
-        inputtype: "rtselect",
-        title: "意健险13大类",
-        effect: "light",
-        loadData: [
-          {
-            label: "是",
-            value: "1",
-            type: "success",
-          },
-          {
-            label: "否",
-            value: "2",
-            type: "info",
-          },
-        ],
-      },
+      // {
+      //   prop: "cHealthType",
+      //   inputtype: "rtselect",
+      //   title: "意健险13大类",
+      //   effect: "light",
+      //   loadData: [
+      //     {
+      //       label: "是",
+      //       value: "1",
+      //       type: "success",
+      //     },
+      //     {
+      //       label: "否",
+      //       value: "2",
+      //       type: "info",
+      //     },
+      //   ],
+      // },
       {
         prop: "cStatus",
         inputtype: "rtselect",
         title: "启用标志",
         effect: "light",
+        rules: [getRules("required", { change: true })],
         loadData: [
           {
             label: "是",

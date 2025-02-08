@@ -65,12 +65,12 @@ opertaor.setTableConfig([
     groupId: "",
     showGroupId: false,
     pageInfo: {
-      prodaudit: {
-        pageKey: "prodaudit",
-        pageTtile: "产品审核",
-        pageRef: "prodaudit",
-        isShow: true,
-      },
+      // prodaudit: {
+      //   pageKey: "prodaudit",
+      //   pageTtile: "产品审核",
+      //   pageRef: "prodaudit",
+      //   isShow: true,
+      // },
       prodInfo: {
         pageKey: "prodInfo",
         pageTtile: "产品基本信息",
@@ -161,20 +161,22 @@ function renderComponents() {
   }, 100); // 延迟组件渲染,增加页面响应效率
 }
 function loadAfter() {
-  nextTick(() => {
-    getProdInfos(param)
-      .then((res) => {
-        const { code, data, msg } = res;
-        if (200 === code) {
-          setTimeout(() => {
-            setData(data.data);
-          }, 100);
-        } else {
-          ElMessage.error(msg);
-        }
-      })
-      .finally(() => {});
-  });
+  if (param.editType === "edit") {
+    nextTick(() => {
+      getProdInfos(param)
+        .then((res) => {
+          const { code, data, msg } = res;
+          if (200 === code) {
+            setTimeout(() => {
+              setData(data.data);
+            }, 100);
+          } else {
+            ElMessage.error(msg);
+          }
+        })
+        .finally(() => {});
+    });
+  }
 }
 watch(route, (to, from) => {
   router.go(0);

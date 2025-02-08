@@ -78,16 +78,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cKindNo",
         inputtype: "rtselect",
         title: "大类代码",
-        loadData: [
-          {
-            label: "0101",
-            value: "1",
-          },
-          {
-            label: "0203",
-            value: "2",
-          },
-        ],
+        typeCode: "KIND_LIST_ALL",
+        params: { cStatus: "1" },
       },
       {
         prop: "cRiskNo",

@@ -133,20 +133,19 @@ const formconfig = reactive<AppFreeEditConfig>(
       {
         prop: "cRdrTyp",
         inputtype: "rtselect",
-        title: "主附险标识",
-        // typeCode: "WEB_SYS_STA_DICT",
-        // params: { cParCde: "yes_no" },
+        title: "主险/附加险",
+        typeCode: "WEB_SYS_STA_DICT",
+        params: { cParCde: "RdrTyp" },
         rules: [getRules("required", { change: true })],
       },
       {
         prop: "additionalInsuranceType",
         inputtype: "rtselect",
         title: "附加险类型",
-        // typeCode: "WEB_SYS_STA_DICT",
-        // params: { cParCde: "yes_no" },
+        typeCode: "additional_insurance",
+        params: { cParCde: "add_type" },
         rules: [getRules("required", { change: true })],
       },
-
       {
         prop: "tFilingTm",
         inputtype: "rtdatepicker",

@@ -124,6 +124,7 @@ const tableconfig = reactive<AppTableConfig>(
     //     },
     //   }),
     // ],
+    editList: ["cStatus"],
     tableBtnType: "btn",
     tableBtnWidth: 220,
     tableBtnPosition: "right",
@@ -197,8 +198,18 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "cStatus",
+        inputtype: "rtswitch",
         title: "启用标识",
-        inputtype: "rtselect",
+        keymap: {
+          y: "1",
+          n: "0",
+        },
+        activeText: "启用",
+        inactiveText: "禁用",
+        inlinePrompt: true,
+        change: (val) => {
+          console.log(val);
+        },
       },
       {
         prop: "cAuditStatus",
