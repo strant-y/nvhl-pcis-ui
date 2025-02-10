@@ -21,6 +21,8 @@ import { ref, reactive } from "vue";
 import { ElMessage } from "element-plus";
 import { saveRiskInfo, saveCvrgRiskRel } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { useValidator } from "@/typings/useValidator";
+const { getRules } = useValidator();
 const opertaor = dataOpertaor();
 const props = defineProps<{
   data: Object;
@@ -38,16 +40,19 @@ const formconfig = reactive<AppFreeEditConfig>(
         prop: "cKindNo",
         inputtype: "rtinput",
         title: "大类代码",
+        rules: [getRules("required", { blur: true })],
       },
       {
         prop: "cRiskNo",
         inputtype: "rtinput",
         title: "责任代码",
+        rules: [getRules("required", { blur: true })],
       },
       {
         prop: "cNmeCn",
         inputtype: "rtinput",
         title: "中文名称",
+        rules: [getRules("required", { blur: true })],
       },
       {
         prop: "cNmeEn",
@@ -58,16 +63,9 @@ const formconfig = reactive<AppFreeEditConfig>(
         prop: "cStatus",
         inputtype: "rtselect",
         title: "启用标识",
-        loadData: [
-          {
-            label: "启用",
-            value: "1",
-          },
-          {
-            label: "禁用",
-            value: "0",
-          },
-        ],
+        rules: [getRules("required", { blur: true })],
+        typeCode: "WEB_SYS_STA_DICT",
+        params: { cParCde: "use_mrk" },
       },
     ],
     fromUi: createFromUiConfig({

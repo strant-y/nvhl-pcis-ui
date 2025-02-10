@@ -74,16 +74,25 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "CProdNo",
         inputtype: "rtselect",
         title: "产品代码",
+        typeCode: "PROD_LIST",
+        params: { cParCde: "" },
       },
       {
         prop: "CGrpMrk",
         inputtype: "rtselect",
         title: "是否团单",
+        loadData: [
+          { value: "0", label: "否" },
+          { value: "1", label: "是" },
+          { value: "2", label: "家庭单" },
+        ],
       },
       {
         prop: "CRsnCde",
         inputtype: "rtselect",
         title: "批改原因",
+        typeCode: "EDR_RSN_LIST_KIND",
+        params: { kindNo: "-" },
       },
     ],
     fromUi: createFromUiConfig({

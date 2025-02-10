@@ -239,6 +239,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         type: "textarea",
         title: " 利率描述",
+        itemWidth: 2,
       },
       {
         prop: "cFamilyFlag",

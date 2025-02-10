@@ -144,6 +144,19 @@ const formconfig = reactive<AppFreeEditConfig>(
         title: "适用机构",
       },
       {
+        prop: "cWebsite",
+        inputtype: "rtinput",
+        title: "官网链接",
+        itemWidth: 2,
+      },
+      {
+        prop: "cClassOfClause",
+        inputtype: "rtselect",
+        title: "条款类别",
+        typeCode: "ClassOfClause",
+        // params: { cParCde: "" },
+      },
+      {
         prop: "cDesc",
         inputtype: "rtinput",
         type: "textarea",
@@ -165,6 +178,8 @@ const formconfig = reactive<AppFreeEditConfig>(
 );
 
 const handleSave = async () => {
+  const isValid = await freeEditRef.value?.validate();
+  if (!isValid) return;
   const tabref = opertaor.getTableRefByKey("inruranceTypeBasicInfo");
   const formData = freeEditRef.value?.getFromValue();
   const cCvrgNo = tabref.getFromValue().cCvrgNo;

@@ -49,12 +49,6 @@ const formconfig = reactive<AppFreeEditConfig>(
         rules: [getRules("required", { change: "计算公式不能为空" })],
         typeCode: "ALL_EDRFORMU_SELECT",
         params: { cParCde: "06" },
-        // loadData: [
-        //   {
-        //     label: "7 测试公式 测试公式",
-        //     value: "1",
-        //   },
-        // ],
       },
       {
         prop: "cKindNo",
@@ -73,25 +67,13 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: " 险别代码",
         typeCode: "Cvrg_LIST",
-        // params: { cProdNo: tabref.getFromValue().cProdNo },
-        // loadData: [
-        //   {
-        //     label: "060615 航空旅客意外伤害保险",
-        //     value: "060615",
-        //   },
-        // ],
       },
       {
         prop: "cRsnCde",
         inputtype: "rtselect",
         title: " 批改原因",
         rules: [getRules("required", { change: "批改原因不能为空" })],
-        loadData: [
-          {
-            label: "增加保额",
-            value: "1",
-          },
-        ],
+        typeCode: "EDR_RSN_LIST_KIND",
       },
       {
         prop: "cSpecParam",

@@ -62,6 +62,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cCvrgNo",
         inputtype: "rtinput",
         title: "险别代码",
+        maxlength: 6,
         rules: [getRules("required", {})],
         func: (val) => {
           formconfig1.fromSchema?.forEach((e) => {
@@ -80,16 +81,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
         typeCode: "KIND_LIST_ALL",
         params: { cStatus: "1" },
-        // loadData: [
-        //   {
-        //     label: "财产险",
-        //     value: "04",
-        //   },
-        //   {
-        //     label: "意外险",
-        //     value: "05",
-        //   },
-        // ],
       },
       {
         prop: "cNmeCn",
@@ -101,7 +92,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cNmeEn",
         inputtype: "rtinput",
         title: "英文名称",
-        rules: [getRules("required", {})],
       },
       {
         prop: "cDispCde",
@@ -130,53 +120,35 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "是否计入总保额",
         effect: "light",
-        loadData: [
-          {
-            label: "是",
-            value: "1",
-          },
-          {
-            label: "否",
-            value: "2",
-          },
-        ],
+        typeCode: "WEB_SYS_STA_DICT",
+        params: { cParCde: "yes_no" },
       },
       {
         prop: "cDutyFree",
         inputtype: "rtselect",
         title: "是否免税",
         effect: "light",
-        loadData: [
-          {
-            label: "是",
-            value: "1",
-            type: "success",
-          },
-          {
-            label: "否",
-            value: "2",
-            type: "info",
-          },
-        ],
+        typeCode: "WEB_SYS_STA_DICT",
+        params: { cParCde: "yes_no" },
       },
-      {
-        prop: "cCvrgTypFlag",
-        inputtype: "rtselect",
-        title: "健康险意外险类型",
-        effect: "light",
-        loadData: [
-          {
-            label: "是",
-            value: "1",
-            type: "success",
-          },
-          {
-            label: "否",
-            value: "2",
-            type: "info",
-          },
-        ],
-      },
+      // {
+      //   prop: "cCvrgTypFlag",
+      //   inputtype: "rtselect",
+      //   title: "健康险意外险类型",
+      //   effect: "light",
+      //   loadData: [
+      //     {
+      //       label: "是",
+      //       value: "1",
+      //       type: "success",
+      //     },
+      //     {
+      //       label: "否",
+      //       value: "2",
+      //       type: "info",
+      //     },
+      //   ],
+      // },
       // {
       //   prop: "cHealthType",
       //   inputtype: "rtselect",
@@ -201,18 +173,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "启用标志",
         effect: "light",
         rules: [getRules("required", { change: true })],
-        loadData: [
-          {
-            label: "是",
-            value: "1",
-            type: "success",
-          },
-          {
-            label: "否",
-            value: "2",
-            type: "info",
-          },
-        ],
+        typeCode: "WEB_SYS_STA_DICT",
+        params: { cParCde: "use_mrk" },
       },
       {
         prop: "cSourceTyp",
@@ -224,6 +186,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           { value: "2", label: "仅渠道" },
           { value: "9", label: "通用" },
         ],
+        defaultValue: "9",
       },
       {
         prop: "cCvrgDesc",

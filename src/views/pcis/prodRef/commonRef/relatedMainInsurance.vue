@@ -69,6 +69,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         params: { codeListParam: "" },
       },
       {
+        prop: "cCvrgNo",
+        inputtype: "rtinput",
+        title: "险别代码",
+      },
+      {
         prop: "cNmeCn",
         inputtype: "rtinput",
         title: "险别名称",

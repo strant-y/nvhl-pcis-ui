@@ -85,22 +85,29 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     fromSchema: [
       {
         prop: "cDptCde",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "机构代码",
+        typeCode: "PLYDPT_LIST_1",
+        params: { cIsValid: "1", userOrg: "0200000000000" },
       },
       {
         prop: "cRuleCde",
-        inputtype: "rtselect",
+        inputtype: "rtinput",
         title: "规则名称",
       },
       {
         prop: "cPrd",
         inputtype: "rtselect",
+        typeCode: "KIND_LIST_CACHE",
+        params: { codeListParam: "" },
+        child: "cProdNo",
         title: "产品大类",
       },
       {
         prop: "cProdNo",
         inputtype: "rtselect",
+        typeCode: "PROD_LIST",
+        params: { cParCde: "" },
         title: "产品",
       },
     ],

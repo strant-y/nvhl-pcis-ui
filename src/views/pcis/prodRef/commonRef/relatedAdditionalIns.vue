@@ -72,11 +72,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         typeCode: "KIND_LIST_ALL",
         params: { cStatus: "1" },
       },
-      {
-        prop: "cCvrgNo",
-        inputtype: "rtinput",
-        title: "险别代码",
-      },
+      // {
+      //   prop: "cCvrgNo",
+      //   inputtype: "rtinput",
+      //   title: "险别代码",
+      // },
       {
         prop: "cNmeCn",
         inputtype: "rtinput",

@@ -27,14 +27,7 @@ import { yesOrNo, size, inputtype, typeMap, dateType } from "@/utils/utilKey";
 import { useDzModal } from "@/views/dzmodel/DzModalService";
 import { ref, defineProps } from "vue";
 import { createFreeButtonBase } from "@/shared/button-config";
-import {
-  getButtonByFacKey,
-  getFactorList,
-  getInputGroupList,
-  saveFactor,
-  savePrdFixSpecInfo,
-  saveUndrClsInfo,
-} from "@/api/prod";
+import { getButtonByFacKey, saveUndrClsInfo, getUndrClsInfo } from "@/api/prod";
 import {
   AppFreeEditConfig,
   AppFreeEditMethod,
@@ -115,42 +108,18 @@ onMounted(async () => {
   if (props.type === "edit") {
     const inputType = props.data.cFactorInputtype;
     const showExBtn = props.data.cFactorShowExBtn;
-    // const com = getSuperSchema(inputType);
-    if (showExBtn && showExBtn === "1") {
-      showBtnConfig.value = true;
-      getButtonByFacKey({ cFactorKey: props.data.cPkId })
-        .then((res) => {
-          const { code, data, msg } = res;
-          if (200 === code && data.data?.length > 0) {
-            const dataObj = data.data[0];
-            const edit = {};
-            Object.keys(dataObj).forEach((k) => {
-              if (k.startsWith("cButton")) {
-                let key = k.replace("cButton", "");
-                key = key.charAt(0).toLowerCase() + key.slice(1);
-                edit[key] = dataObj[k];
-              }
-            });
-            freeEditRefBtn.value?.setFormValue(edit);
-          } else {
-            ElMessage.error(msg);
-          }
-        })
-        .finally(() => {});
-    }
-    formconfig1.superFromSchema = com;
-    setTimeout(() => {
-      const edit = {};
-      Object.keys(props.data).forEach((k) => {
-        if (k.startsWith("cFactor")) {
-          let key = k.replace("cFactor", "");
-          key = key.charAt(0).toLowerCase() + key.slice(1);
-          edit[key] = props.data[k];
+    getUndrClsInfo({ cUndrClsCde: props.data.cUndrClsCde })
+      .then((res) => {
+        const { code, data, msg } = res;
+        if (200 === code) {
+          freeEditRef.value?.setFormValue(data);
+        } else {
+          ElMessage.error(msg);
         }
-      });
-      console.log(edit);
-      freeEditRef.value?.setFormValue(edit);
-    }, 50);
+      })
+      .finally(() => {});
+
+    setTimeout(() => {}, 50);
   }
 });
 
@@ -195,6 +164,7 @@ function save() {
       if (200 === code) {
         emits("ok", {});
         ElMessage.success("保存成功");
+        this.dialogVisible = false;
       } else {
         ElMessage.error(msg);
       }

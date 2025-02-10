@@ -23,6 +23,7 @@ import { useValidator } from "@/typings/useValidator";
 import {
   qryProdCvrgRateInfoPage,
   delProdPlanCvrgRateInfoById,
+  deleteCvrgFeeByProdNo,
 } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useDzModal } from "@/views/dzmodel/DzModalService";
@@ -131,7 +132,19 @@ const tableconfig = reactive<AppTableConfig>(
         id: "del-rateconfigruation",
         label: "全量删除",
         type: "success",
-        func: function () {},
+        func: function () {
+          deleteCvrgFeeByProdNo({ cProdNo: tabref.getFromValue().cProdNo })
+            .then((res) => {
+              const { code, data, msg } = res;
+              if (200 === code) {
+                ElMessage.success("删除成功");
+                handleQuery();
+              } else {
+                ElMessage.error(msg);
+              }
+            })
+            .finally(() => {});
+        },
       }),
     ],
     tableBtnType: "btn",
