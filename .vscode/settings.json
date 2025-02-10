@@ -1,0 +1,6 @@
+{
+    "js/ts.implicitProjectConfig.checkJs": false,
+    "scm.countBadge": "all",
+    "scm.autoReveal": true,
+    "typescript.validate.enable": false
+}

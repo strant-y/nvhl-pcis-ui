@@ -1,0 +1,188 @@
+<template>
+  <el-dialog v-model="dialogVisible" width="90%">
+    <div>
+      <rt-mytable :tableConfig="tableconfig" ref="tableRef" />
+      <div
+        style="margin-top: 10px; margin-right: 20px"
+        :style="{ textAlign: 'end' }"
+      >
+        <rt-button :item="saveBtn" />
+      </div>
+    </div>
+  </el-dialog>
+</template>
+
+<script setup lang="ts">
+import {
+  getComponentList,
+  queryPageComponents,
+  savePageComonent,
+} from "@/api/prod";
+import {
+  AppTableConfig,
+  createTableEditConfig,
+} from "@/shared/app-table-config";
+import { createFreeButtonBase } from "@/shared/button-config";
+const emits = defineEmits(["ok", "cancel"]);
+const props = defineProps({
+  data: Object,
+});
+interface MyTableMethod {
+  addRow: (arg: any) => any;
+  getSelectRow: () => any;
+  updateOption: (rowId: string, propKey: string, newOption: Array<any>) => void;
+  getFromValue: () => any;
+  setFormValue: (data: any) => void;
+  getTableValue(): () => any;
+  removeRow: (dataId: string) => any;
+}
+// 定义表格数据
+const tableRef = ref<MyTableMethod | null>(null);
+const tableconfig = reactive<AppTableConfig>(
+  createTableEditConfig({
+    tableBtnType: "btn",
+    tableBtnWidth: 100,
+    tableBtnPosition: "right",
+    title: "组件绑定关系",
+    editFlag: true,
+    tableBtn: [
+      createFreeButtonBase({
+        id: "score",
+        tooltip: "删除",
+        link: true,
+        iconColor: "#FF0000",
+        icon: "DeleteFilled",
+        tableClick: (r) => {
+          tableRef.value?.removeRow(r._dataId);
+        },
+      }),
+      createFreeButtonBase({
+        id: "score",
+        type: "primary",
+        tooltip: "预览",
+        icon: "View",
+        link: true,
+        func: function () {},
+      }),
+    ],
+    titleBtns: [
+      createFreeButtonBase({
+        id: "score",
+        type: "primary",
+        label: "新增",
+        icon: "Plus",
+        func: () => {
+          tableRef.value?.addRow({});
+        },
+      }),
+    ],
+    fromSchema: [
+      {
+        prop: "icon",
+        inputtype: "rtIcon",
+        icon: "Rank",
+        iconSize: "16",
+        dragFlag: true,
+        tableBtnWidth: 50,
+      },
+      {
+        prop: "cComponentTab",
+        inputtype: "rtselect",
+        title: "归属tab",
+        typeCode: "tablist",
+        func: (v) => {
+          const sdata = tableRef.value?.getSelectRow();
+          const params = {
+            cComponentTab: v,
+          };
+          updateOption(params, sdata._dataId, "cComponentKey");
+        },
+      },
+      {
+        prop: "cComponentKey",
+        inputtype: "rtselect",
+        title: "绑定组件",
+      },
+      {
+        prop: "cComponentName",
+        inputtype: "rtinput",
+        title: "组件别名",
+      },
+      {
+        prop: "cComponentIcon",
+        inputtype: "rtinput",
+        title: "组件图标",
+        type: "icon",
+      },
+    ],
+  })
+);
+const dialogVisible = ref(true);
+const saveBtn = createFreeButtonBase({
+  type: "primary",
+  label: "保存",
+  func: () => {
+    const params = Object.assign(props.data, {
+      pageComponents: tableRef.value?.getFromValue(),
+    });
+    savePageComonent(params)
+      .then((res) => {
+        const { code, data, msg } = res;
+        if (200 === code) {
+          ElMessage.success("保存成功");
+        } else {
+          ElMessage.error(msg);
+        }
+      })
+      .finally(() => {});
+  },
+});
+function updateOption(params: any, dataId: string, props: string) {
+  getComponentList(params)
+    .then((res) => {
+      const { code, data, msg } = res;
+      if (200 === code) {
+        let newOption: any[] = [];
+        if (data.data) {
+          Object.keys(data.data).forEach((item) => {
+            newOption.push({
+              label:
+                data.data[item].cComponentKey +
+                " " +
+                data.data[item].cComponentName,
+              value: data.data[item].cComponentKey,
+            });
+          });
+          tableRef.value?.updateOption(dataId, props, newOption);
+        }
+      } else {
+        ElMessage.error(msg);
+      }
+    })
+    .finally(() => {});
+}
+
+onMounted(() => {
+  queryPageComponents(props.data)
+    .then((res) => {
+      const { code, data, msg } = res;
+      if (200 === code) {
+        tableRef.value?.setFormValue(data.data);
+        setTimeout(() => {
+          const tabData = tableRef.value?.getFromValue();
+          Object.keys(tabData).forEach((key) => {
+            console.log(tabData[key]);
+            const sdata = tabData[key];
+            const params = {
+              cComponentTab: sdata.cComponentTab,
+            };
+            updateOption(params, sdata._dataId, "cComponentKey");
+          });
+        }, 100);
+      } else {
+        ElMessage.error(msg);
+      }
+    })
+    .finally(() => {});
+});
+</script>

@@ -1,0 +1,459 @@
+<template>
+  <el-form
+    ref="tableFormfef"
+    :model="tableDatas"
+    :inline-message="true"
+    :label-width="formUi.labelWidth"
+    :size="formUi.size"
+    :label-position="formUi.labelPosition"
+  >
+    <el-table
+      :data="tableDatas"
+      style="width: 100%"
+      :border="item.border ? item.border : true"
+      :fit="item.fit ? item.fit : true"
+      :stripe="item.stripe ? item.stripe : true"
+      :size="item.size ? item.size : 'default'"
+      :show-header="item.showHeader ? item.showHeader : true"
+      @row-click="rowClick"
+      :row-key="(row) => row._dataId"
+      :expand-row-keys="expandRowKeys"
+      @expand-change="expandChange"
+      @selection-change="handleSelectionChange"
+    >
+      <el-table-column
+        type="index"
+        :index="indexMethod"
+        v-if="item.showIndex ? item.showIndex : false"
+        :align="item.align ? item.align : 'center'"
+      />
+      <el-table-column
+        type="expand"
+        :index="indexMethod"
+        v-if="item.showExpand ? item.showExpand : false"
+        :align="item.align ? item.align : 'center'"
+      >
+        <template #default="props">
+          <el-row :gutter="20">
+            <template v-for="(i, index) in getfromSchema()" :key="index">
+              <el-col
+                :span="i.itemWidth ? i.itemWidth * formUi.span : formUi.span"
+              >
+                <el-form-item
+                  :prop="`${props.$index}.${i.prop}`"
+                  :rules="i.rules ? i.rules : undefined"
+                  :label="i.title"
+                  :label-position="
+                    i.inputtype === 'table' ? 'top' : formUi.labelPosition // table 组件,默认标题显示在top上
+                  "
+                  style="margin-bottom: 18px"
+                >
+                  <from-item
+                    v-model="props.row[i.prop]"
+                    :item="i"
+                    :showLabel="editIndex !== props.row._dataId"
+                  />
+                </el-form-item>
+              </el-col>
+            </template>
+          </el-row>
+        </template>
+      </el-table-column>
+      <el-table-column
+        :label="item.tableBtnTitle"
+        v-if="item.tableBtnPosition === 'left'"
+        :width="item.tableBtnWidth ? item.tableBtnWidth : 100"
+        :align="item.align ? item.align : 'center'"
+      >
+        <template #default="scope">
+          <template v-for="(btn, index) in item.tableBtn" :key="index">
+            <template v-if="item.tableBtnType === 'text'">
+              <a @click="item.func ? item.tableClick(scope.row) : () => {}">{{
+                btn.label
+              }}</a>
+            </template>
+            <template v-if="item.tableBtnType === 'btn'">
+              <el-tooltip
+                :disabled="btn.tooltip ? false : true"
+                :content="btn.tooltip"
+                placement="top"
+                effect="light"
+              >
+                <rtButton
+                  @click="btn.tableClick ? btn.tableClick(scope.row) : () => {}"
+                  :item="btn"
+                />
+              </el-tooltip>
+            </template>
+            <template v-if="item.tableBtnType === 'icon'">
+              <el-tooltip
+                :disabled="btn.tooltip ? false : true"
+                :content="btn.tooltip"
+                placement="top"
+                effect="light"
+              >
+                <a>
+                  <rtIcon :item="btn" />
+                </a>
+              </el-tooltip>
+            </template>
+            <template v-if="index !== item.tableBtn.length - 1">
+              <el-divider direction="vertical" />
+            </template>
+          </template>
+        </template>
+      </el-table-column>
+      <el-table-column
+        type="selection"
+        @change="handleSelectionChange"
+        v-if="item.showSelection ? item.showSelection : false"
+        :align="item.align ? item.align : 'center'"
+      />
+      <template v-for="(i, index) in item.fromSchema" :key="index">
+        <el-table-column
+          v-if="!i.expand"
+          :prop="i.prop"
+          :label="i.title"
+          :width="i.width ? i.width : null"
+          :align="item.align ? item.align : 'center'"
+        >
+          <template #default="scope">
+            <template v-if="item.editFlag">
+              <el-form-item
+                :prop="`${scope.$index}.${i.prop}`"
+                :rules="i.rules ? i.rules : undefined"
+              >
+                <from-item
+                  v-model="scope.row[i.prop]"
+                  :item="i"
+                  :showLabel="editIndex !== scope.row._dataId"
+                />
+              </el-form-item>
+            </template>
+            <template v-else>
+              <from-item
+                v-model="scope.row[i.prop]"
+                :item="i"
+                :showLabel="!(props.item.editList &&
+                props.item.editList.length > 0
+                  ? props.item.editList?.includes(i.prop)
+                  : false || editIndex === scope.row._dataId)
+                "
+              />
+            </template>
+          </template>
+        </el-table-column>
+      </template>
+      <el-table-column
+        :label="item.tableBtnTitle"
+        v-if="item.tableBtnPosition === 'right'"
+        :width="item.tableBtnWidth ? item.tableBtnWidth : 100"
+        :align="item.align ? item.align : 'center'"
+      >
+        <template #default="scope">
+          <template v-for="(btn, index) in item.tableBtn" :key="index">
+            <template v-if="item.tableBtnType === 'text'">
+              <a @click="btn.func ? btn.tableClick(scope.row) : () => {}">{{
+                btn.label
+              }}</a>
+            </template>
+            <template v-if="item.tableBtnType === 'btn'">
+              <el-tooltip
+                :disabled="btn.tooltip ? false : true"
+                :content="btn.tooltip"
+                placement="top"
+                effect="light"
+              >
+                <rtButton
+                  @click="btn.tableClick ? btn.tableClick(scope.row) : () => {}"
+                  :item="btn"
+                />
+              </el-tooltip>
+            </template>
+            <template v-if="item.tableBtnType === 'icon'">
+              <el-tooltip
+                :disabled="btn.tooltip ? false : true"
+                :content="btn.tooltip"
+                placement="top"
+                effect="light"
+              >
+                <a
+                  ><rtIcon
+                    @click="
+                      btn.tableClick ? btn.tableClick(scope.row) : () => {}
+                    "
+                    :item="btn"
+                /></a>
+              </el-tooltip>
+            </template>
+            <template v-if="index !== item.tableBtn.length - 1">
+              <el-divider direction="vertical" />
+            </template>
+          </template>
+        </template>
+      </el-table-column>
+    </el-table>
+  </el-form>
+</template>
+
+<script setup lang="ts">
+import { v4 as uuidv4 } from "uuid";
+import Validator from "async-validator";
+import { ref, reactive, watch, onMounted } from "vue";
+
+// 定义要触发的事件
+const emits = defineEmits<{
+  (e: "update:modelValue", value: any[]): void;
+  (e: "selection-change", rows: any[]): void;
+}>();
+
+const expandFromItem = ref<Record<string, any>>({});
+// 编辑行id
+const editIndex = ref(-1);
+const props = defineProps({
+  modelValue: {
+    type: [Array<any>],
+  },
+  item: {
+    type: Object as () => Record<string, any>,
+    required: true,
+  },
+  parentFromUi: {
+    type: Object as () => Record<string, any>,
+    required: false,
+  },
+});
+
+const indexMethod = (index: number) => {
+  return index;
+};
+
+/**
+ *  表单组件,用来写table表格的验证等方法的引用
+ */
+const tableDatas = ref<any[] | undefined>([]);
+const tableFormfef = ref("tableFormfef");
+
+watch([() => props.modelValue], ([newModelValue]) => {
+  tableDatas.value = [];
+  tableDatas.value = newModelValue;
+  tableDatas.value?.forEach((data) => {
+    // 初始化行数字Id
+    data._dataId = getuuid();
+  });
+});
+watch(
+  () => props.parentFromUi,
+  (newFromUi) => {
+    initUI();
+  }
+);
+function handleSelectionChange(selectedRows: any[]) {
+  emits("selection-change", selectedRows);
+}
+function rowClick(row: any, _column: any, _event: Event) {
+  if (props.item.editFlag && props.item.editFlag === true) {
+    if (tableDatas.value) {
+      editIndex.value = row._dataId;
+    }
+  }
+}
+
+// 解决扩展页,由于编辑之后触发数据更新,页面重绘而折叠全部关闭的问题
+const expandRowKeys = ref([]);
+function getuuid() {
+  return uuidv4().replace(/-/g, "");
+}
+function expandChange(_val: any, expandedRows: any) {
+  expandRowKeys.value = [];
+  expandFromItem.value = {};
+  expandedRows.forEach((e) => {
+    expandRowKeys.value.push(e._dataId);
+  });
+}
+
+function getfromSchema() {
+  const expands = props.item.fromSchema.filter((s: any) => s.expand === true);
+  return expands;
+}
+
+const formUi = reactive<Record<string, any>>({});
+
+/**
+ *  样式初始化,对于未设置的参数进行初始化
+ * */
+function initUI() {
+  if (props.item.fromUi) {
+    Object.keys(props.item.fromUi).forEach((key) => {
+      if (key === "cols") {
+        if (props.item.fromUi[key]) {
+          formUi["span"] = 24 / props.item.fromUi[key];
+        } else {
+          formUi["span"] = 8;
+        }
+      } else {
+        formUi[key] = props.item.fromUi[key];
+      }
+    });
+  } else {
+    Object.assign(formUi, props.parentFromUi);
+  }
+  if (!formUi["span"]) {
+    formUi["span"] = 8;
+  }
+  if (!formUi["itemWidth"]) {
+    //默认item宽度为自动
+    formUi["itemWidth"] = "auto";
+  }
+  if (!formUi["labelPosition"]) {
+    formUi["labelPosition"] = "right";
+  }
+  if (!formUi["size"]) {
+    formUi["size"] = "default";
+  }
+}
+
+/**
+ * 表格数据验证函数
+ * 该函数用于验证表格中的数据是否符合规定的规则
+ * 主要通过遍历表格数据和规则，对每行数据进行验证
+ *
+ * @returns {Promise[]} 返回一个包含每个行数据验证结果的Promise数组
+ */
+function validate() {
+  // 存储每个行数据验证结果的数组
+  let proList = [];
+
+  // 检查是否有表格数据需要验证
+  if (tableDatas.value?.length > 0) {
+    // 存储验证规则的对象
+    let rules = <any>{};
+
+    // 遍历表格架构，提取验证规则
+    for (const schama in props.item.fromSchema) {
+      // 如果当前列有验证规则，则将其添加到规则对象中
+      if (props.item.fromSchema[schama].rules) {
+        rules[props.item.fromSchema[schama].prop] =
+          props.item.fromSchema[schama].rules;
+      }
+    }
+
+    // 遍历表格数据，对每行数据进行验证
+    for (const rowNum in tableDatas.value) {
+      // 当前行的数据
+      const rowData = tableDatas.value[rowNum];
+      // 创建验证器实例
+      const validator = new Validator(rules);
+
+      // 创建一个新的Promise用于处理当前行数据的验证
+      const p = new Promise((resolve) => {
+        // 执行验证操作
+        validator.validate(rowData, (data) => {
+          // 根据验证结果进行处理
+          if (data) {
+            // 输出错误信息 进行错误信息内容展示操作
+            expandRowKeys.value.push(rowData._dataId);
+
+            setTimeout(() => {
+              tabValidate();
+            }, 200);
+            resolve(data);
+          } else {
+            // 验证通过
+            resolve(true);
+          }
+        });
+      });
+
+      // 将当前行数据的验证结果Promise添加到结果数组中
+      proList.push(p);
+    }
+  }
+
+  // 返回所有行数据验证结果的Promise数组
+  return proList;
+}
+
+const validateFlag = ref(false);
+function tabValidate() {
+  if (validateFlag.value) {
+    return;
+  }
+  validateFlag.value = true;
+  setTimeout(() => {
+    const t = tableFormfef.value.validate((valid: boolean, fields) => {
+      if (valid) {
+        console.log("tablesubmit!");
+      } else {
+        console.log("tableerror submit!", fields);
+      }
+    });
+    t.then(() => {
+      validateFlag.value = false;
+    });
+  }, 200);
+}
+
+onMounted(() => {
+  tableDatas.value = props.modelValue;
+  tableDatas.value?.forEach((data) => {
+    // 初始化行数字Id
+    data._dataId = getuuid();
+  });
+  if (props.item.fromSchema) {
+    initUI();
+  }
+});
+
+async function tableExvalidate() {
+  tabValidate();
+  const pro = validate();
+  let res: any[] = [];
+  if (pro) {
+    res = await Promise.all(pro);
+  }
+  let reb = true;
+  if (res) {
+    res.forEach((item) => {
+      if (item && item.length > 0) {
+        reb = reb && false;
+      }
+    });
+  }
+  return reb;
+}
+
+// 预留,解决将来处理codelist数据
+function getValue(row: any, item: any) {
+  if (item.inputtype === "rtinput") {
+    return row[item.prop];
+  }
+}
+
+function addRow() {
+  const rowId = getuuid();
+  tableDatas.value?.push({ _dataId: rowId });
+  editIndex.value = rowId;
+}
+
+function getSelectRow() {
+  const sele = tableDatas.value?.find((item) => {
+    if (item._dataId === editIndex.value) {
+      return item;
+    }
+  });
+  return sele;
+}
+
+defineExpose({
+  tableExvalidate,
+  addRow,
+  getSelectRow,
+});
+</script>
+
+<style scoped>
+::v-deep .el-form-item__content {
+  justify-content: center !important;
+}
+</style>
