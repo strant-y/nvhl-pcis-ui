@@ -22,12 +22,13 @@ import {
   createAppFreeEditConfig,
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
-import { ref, reactive } from "vue";
-import { useValidator } from "@/typings/useValidator";
+import {reactive, ref} from "vue";
+import {useValidator} from "@/typings/useValidator";
+import {saveProdTaxRateInfo} from "@/api/prod";
+import {dataOpertaor} from "@/store/modules/data-opertaor";
+
 const { getRules } = useValidator();
-import { saveProdPlanCvrgRateInfo } from "@/api/prod";
 const emits = defineEmits(["ok", "cancel"]);
-import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
 const tabref = opertaor.getTableRefByKey("prodInfo");
 const props = defineProps<{
@@ -87,7 +88,7 @@ const handleSave = async () => {
   };
   if (formData) {
     try {
-      await saveProdPlanCvrgRateInfo(newParam); //保存接口调用
+      await saveProdTaxRateInfo(newParam); //保存接口调用
       emits("ok", {});
       ElMessage.success("保存成功");
       dialogVisible.value = false;

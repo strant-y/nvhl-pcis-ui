@@ -629,25 +629,33 @@ export function saveProdPlanCvrgFeeInfo(queryParams: any): AxiosPromise<any> {
  *
  * @param queryParams
  */
-export function saveProdPlanCvrgRateInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/plan/saveProdPlanCvrgRateInfo`, queryParams);
+export function saveProdTaxRateInfo(queryParams: any): AxiosPromise<any> {
+    return post(`/plan/saveProdTaxRateInfo`, queryParams);
 }
 /**
  * 产品工厂-机构税率信息删除
  *
  * @param queryParams
  */
-export function delProdPlanCvrgRateInfoById(queryParams: any): AxiosPromise<any> {
-    return post(`/plan/delProdPlanCvrgRateInfoById`, queryParams);
+export function delProdTaxRateInfoById(queryParams: any): AxiosPromise<any> {
+    return post(`/plan/delProdTaxRateInfoById`, queryParams);
 }
 
+/**
+ * 产品工厂-机构税率信息删除全部
+ *
+ * @param queryParams
+ */
+export function deleteProdTaxRateByProdNo(queryParams: any): AxiosPromise<any> {
+    return post(`/plan/deleteProdTaxRateByProdNo`, queryParams);
+}
 /**
  * 产品工厂-查询机构税率信息
  *
  * @param queryParams
  */
-export function qryProdCvrgRateInfoPage(queryParams: any): AxiosPromise<any> {
-    return post(`/plan/qryProdCvrgRateInfoPage`, queryParams);
+export function qryProdTaxRateInfoPage(queryParams: any): AxiosPromise<any> {
+    return post(`/plan/qryProdTaxRateInfoPage`, queryParams);
 }
 
 /**

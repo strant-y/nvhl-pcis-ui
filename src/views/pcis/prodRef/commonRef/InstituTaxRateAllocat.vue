@@ -18,30 +18,22 @@ import {
   createAppFreeEditConfig,
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
-import { createFreeButtonBase } from "@/shared/button-config";
-import { useValidator } from "@/typings/useValidator";
-import {
-  qryProdCvrgRateInfoPage,
-  delProdPlanCvrgRateInfoById,
-  deleteCvrgFeeByProdNo,
-} from "@/api/prod";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import {createFreeButtonBase} from "@/shared/button-config";
+import {useValidator} from "@/typings/useValidator";
+import {deleteCvrgFeeByProdNo, delProdTaxRateInfoById, qryProdTaxRateInfoPage,} from "@/api/prod";
+import {dataOpertaor} from "@/store/modules/data-opertaor";
+import {useDzModal} from "@/views/dzmodel/DzModalService";
+import {AppTableConfig, AppTableMethod, createTableEditConfig,} from "@/shared/app-table-config";
+import {onMounted, reactive, ref} from "vue";
+
+import {useRoute} from "vue-router";
+
 const dzmodal = useDzModal();
 const AddInstituTaxRateModal = defineAsyncComponent(
   () => import("./AddInstituTaxRateModal.vue")
 );
 const opertaor = dataOpertaor();
 const tabref = opertaor.getTableRefByKey("prodInfo");
-import {
-  AppTableConfig,
-  AppTableMethod,
-  createTableEditConfig,
-} from "@/shared/app-table-config";
-import { ref, reactive, onMounted } from "vue";
-import { query, getRiskList, saveCvrgRiskRel } from "@/api/prod";
-
-import { useRoute } from "vue-router";
 const route = useRoute();
 const query = ref(route.query);
 const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
@@ -174,7 +166,7 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "Delete",
         link: true,
         tableClick: (row) => {
-          delProdPlanCvrgRateInfoById(row)
+          delProdTaxRateInfoById(row)
             .then((res) => {
               const { code, data, msg } = res;
               if (200 === code) {
@@ -243,7 +235,7 @@ function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r, { cProdNo: tabref.getFromValue().cProdNo });
-  qryProdCvrgRateInfoPage(param)
+  qryProdTaxRateInfoPage(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
