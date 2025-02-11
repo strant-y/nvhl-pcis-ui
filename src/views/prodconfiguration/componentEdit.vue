@@ -181,6 +181,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         typeCode: "tablist",
         rules: [getRules("required", {})],
         func: (index: any) => {
+          const ct = freeEditRef.value?.getValue("componentType");
+          if (ct === "custom") {
+            return;
+          }
           const ck = freeEditRef.value?.getValue("componentKey");
           showFactorList.value = true;
           const param = {
@@ -349,8 +353,10 @@ onMounted(async () => {
           }
           endBtns.value = ends;
         }
-        showFactorList.value = true;
-        querySelector(param);
+        if (data.data.cComponentType !== "custom") {
+          showFactorList.value = true;
+          querySelector(param);
+        }
       }
     });
   }
@@ -379,7 +385,7 @@ const exRules = {
 function save() {
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   let selectList = Array<any>();
-  if (tableRef.value) {
+  if (tableRef.value && s.componentType !== "custom") {
     const all = tableRef.value?.getFromValue();
     all.forEach((item: any) => {
       if (item.isChecked === "1") {
@@ -405,14 +411,17 @@ function save() {
           }
         });
 
-        const ck = freeEditRef.value?.getValue("componentKey");
-        const tb = freeEditRef.value?.getValue("componentTab");
-        showFactorList.value = true;
-        const param = {
-          componentKey: ck,
-          componentTab: tb,
-        };
-        querySelector(param);
+        const ct = freeEditRef.value?.getValue("componentType");
+        if (ct !== "custom") {
+          const ck = freeEditRef.value?.getValue("componentKey");
+          const tb = freeEditRef.value?.getValue("componentTab");
+          showFactorList.value = true;
+          const param = {
+            componentKey: ck,
+            componentTab: tb,
+          };
+          querySelector(param);
+        }
       } else {
         ElMessage.error(msg);
       }

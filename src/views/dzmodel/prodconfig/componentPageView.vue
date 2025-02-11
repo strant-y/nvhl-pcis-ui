@@ -10,7 +10,7 @@
         >
           <component
             v-if="currentIndex >= i"
-            :is="k.pageKey + '-ref'"
+            :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
             :pageSchema="k.pageSchema"
           />
         </div>

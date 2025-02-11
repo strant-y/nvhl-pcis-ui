@@ -142,6 +142,10 @@ const componentType = [
     label: "表格",
     value: "grid",
   },
+  {
+    label: "自定义",
+    value: "custom",
+  },
 ];
 const size = [
   {

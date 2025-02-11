@@ -66,7 +66,7 @@
                       opertaor.addTableRef(k.pageKey, res);
                     }
                   "
-                  :is="k.pageKey + '-ref'"
+                  :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
                   :pageSchema="k.pageSchema"
                 />
               </div>

@@ -5,6 +5,7 @@ import componentView from "./prodconfig/componentView.vue";
 import componentCompare from "./prodconfig/componentCompare.vue";
 import prodCopy from "./prodconfig/prodCopy.vue";
 import componentPageView from "./prodconfig/componentPageView.vue";
+import addtremView from "./prodconfig/addtremView.vue";
 
 /**用于动态组件的映射生成 */
 const componentMap = {
@@ -12,7 +13,8 @@ const componentMap = {
     componentView:componentView,
     componentCompare:componentCompare,
     prodCopy:prodCopy,
-    componentPageView:componentPageView
+    componentPageView:componentPageView,
+	addtremView:addtremView
 
 };
 

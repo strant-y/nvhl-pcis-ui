@@ -1,22 +1,37 @@
 <template>
   <div>
-    <app-free-edit v-if="isFree" v-model:freeEditConfig="freeconfig1" />
-    <app-grid-edit v-else v-model:gridEditConfig="gridconfig1" />
-    <div style="margin-top: 12px;" v-if="isCopy">
+    <app-free-edit
+      v-if="isShowType === '1'"
+      v-model:freeEditConfig="freeconfig1"
+    />
+    <app-grid-edit
+      v-if="isShowType === '0'"
+      v-model:gridEditConfig="gridconfig1"
+    />
+    <component v-if="isShowType === '2'"
+      :is="customRef.pageKey"
+      :pageSchema="customRef"
+    />
+    <div style="margin-top: 12px" v-if="isCopy">
       <el-form :model="newCom" label-width="120px" :rules="rules" ref="fromref">
         <el-row :gutter="20">
           <el-col :span="24">
-            <el-text class="mx-1" size="large" type="primary">是否继续按照以上组件预览继续复制?</el-text>
+            <el-text class="mx-1" size="large" type="primary"
+              >是否继续按照以上组件预览继续复制?</el-text
+            >
           </el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="10">
             <el-form-item label="新组件主键" prop="newComponentKey">
-              <el-input v-model="newCom.newComponentKey" placeholder="请输入新组件主键" clearable />
+              <el-input
+                v-model="newCom.newComponentKey"
+                placeholder="请输入新组件主键"
+                clearable
+              />
             </el-form-item>
           </el-col>
-          <el-col :span="1">
-          </el-col>
+          <el-col :span="1"> </el-col>
           <el-col :span="4">
             <el-button @click="copy" type="primary">复制</el-button>
             <el-button @click="fail">取消</el-button>
@@ -33,27 +48,27 @@ import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 import { ref, defineProps } from "vue";
 const emits = defineEmits(["handleClose"]);
-const isFree = ref(true);
+const isShowType = ref("0"); // 0:表单编辑 1:表格编辑 2:自定义编辑
 const isCopy = ref(false);
-const showMsg = ref('组件预览');
+const showMsg = ref("组件预览");
 const props = defineProps({
   data: {
     type: Object,
-    default: () => ({})
+    default: () => ({}),
   },
-  method:{
+  method: {
     type: Object,
-    default: () => ({})
-  }
+    default: () => ({}),
+  },
 });
 const fromref = ref<FormInstance>();
 const newCom = reactive({
-  newComponentKey: '',
-})
+  newComponentKey: "",
+});
 const rules = reactive<FormRules>({
   newComponentKey: [
-    { required: true, trigger: 'change', message: "请输入新组件主键" },
-],
+    { required: true, trigger: "change", message: "请输入新组件主键" },
+  ],
 });
 import {
   AppFreeEditConfig,
@@ -61,7 +76,11 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
-import { AppGridEditConfig, createAppGridEditConfig, createGridFromUiConfig } from "@/shared/app-grid-edit-config";
+import {
+  AppGridEditConfig,
+  createAppGridEditConfig,
+  createGridFromUiConfig,
+} from "@/shared/app-grid-edit-config";
 import { FormInstance, FormRules } from "element-plus";
 import { copyComponent } from "@/api/prod";
 
@@ -70,8 +89,7 @@ const freeconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "组件预览",
     endBtnsPosition: "right",
-    fromSchema: [
-    ],
+    fromSchema: [],
   })
 );
 const gridconfig1 = reactive<AppGridEditConfig>(
@@ -84,6 +102,7 @@ const gridconfig1 = reactive<AppGridEditConfig>(
     fromSchema: [],
   })
 );
+const customRef = ref<any>({});
 
 // 绑定方法
 const method = {};
@@ -98,27 +117,33 @@ onMounted(async () => {
     exRules
   );
   let config = {};
-  for(var k in formconfig){
+  let confkey = '';
+  for (var k in formconfig) {
+    confkey = k;
     config = formconfig[k];
   }
   const fconfig = JSON.parse(config);
-  if(fconfig.ifFree === 'free'){
-    isFree.value = true;
+  if (fconfig.ifFree === "free") {
+    isShowType.value = "1";
     Object.assign(freeconfig1, fconfig);
-  }else{
-    isFree.value = false;
+  } else if (fconfig.ifFree === "custom") {
+    isShowType.value = "2";
+    customRef.value.pageKey = confkey;
+    Object.assign(customRef.value, fconfig);
+  } else {
+    isShowType.value = "0";
     Object.assign(gridconfig1, fconfig);
   }
-  if(props.data.type === 'copy'){
+  if (props.data.type === "copy") {
     isCopy.value = true;
-    showMsg.value = '复制组件';
-  }else{
+    showMsg.value = "复制组件";
+  } else {
     isCopy.value = false;
-    showMsg.value = '组件预览';
+    showMsg.value = "组件预览";
   }
 });
 
-async function copy(){
+async function copy() {
   await fromref.value?.validate((valid, fields) => {
     if (valid) {
       console.log("submit!");
@@ -127,11 +152,11 @@ async function copy(){
         newComponentKey: newCom.newComponentKey,
       };
       copyComponent(param).then((res: any) => {
-        if (res.code === 200 ) {
+        if (res.code === 200) {
           ElMessage.success("复制成功!");
           props.method.isOk();
           emits("handleClose");
-        }else{
+        } else {
           ElMessage.error(res.msg);
         }
       });
@@ -141,10 +166,9 @@ async function copy(){
   });
 }
 
-function fail(){
+function fail() {
   emits("handleClose");
 }
-
 </script>
 
 <style scoped>

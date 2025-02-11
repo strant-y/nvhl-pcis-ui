@@ -13,6 +13,7 @@ import acctinfoRef from "./acctinfoRef/acctinfo.vue";
 // import ciRef from "./ciRef/ci.vue";
 import tgtRef from "./tgtRef/tgt.vue";
 import cvrgRef from "./cvrgRef/cvrg.vue";
+import plyCvrg04Ref from "./cvrgRef/plyCvrg04.vue";
 import plybaseRef from "./plyBaseRef/plybase.vue";
 import baseafterRef from "./baseafterRef/baseafter.vue";
 import informationRef from "./informationRef/information.vue";
@@ -54,6 +55,7 @@ const componentMap = {
   applicantRef: applicantRef,
   tgtRef: tgtRef,
   cvrgRef: cvrgRef,
+  webPlyCvrg04: plyCvrg04Ref,
   plyBaseRef: plybaseRef,
   insuredRef: insuredRef,
   tgtobjRef: tgtobjRef,

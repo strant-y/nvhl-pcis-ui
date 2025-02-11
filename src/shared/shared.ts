@@ -22,6 +22,9 @@ import RtlTable from "./com-item/rt-table.vue";
 import AppTable from "./app-table.vue";
 import RtMytable from "./com-item/rt-mytable.vue";
 
+// 自定义表单声明
+import MyCard from "./mytemplate/card.vue";
+
 /**用于动态组件的映射生成 */
 const componentMap = {
   AppFreeEdit: AppFreeEdit,
@@ -45,6 +48,8 @@ const componentMap = {
   rtcheckboxgroup: RtCheckboxGroup,
   rttable: RtlTable,
   rtMytable: RtMytable,
+  
+  myCard:MyCard
 };
 
 const install = (Vue) => {
