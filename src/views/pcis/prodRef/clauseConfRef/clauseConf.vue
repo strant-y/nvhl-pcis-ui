@@ -142,7 +142,6 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Edit",
         tableClick: (row) => {
-          console.log(row);
           dzmodal
             .open(clauseConfAdd, { type: "edit", data: row })
             .then((res) => {

@@ -186,7 +186,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           { value: "2", label: "仅渠道" },
           { value: "9", label: "通用" },
         ],
-        defaultValue: "9",
+        // defaultValue: "9",
       },
       {
         prop: "cCvrgDesc",
@@ -194,6 +194,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "textarea",
         title: "险别描述",
         effect: "light",
+        itemWidth: 2,
       },
     ],
     fromUi: createFromUiConfig({
@@ -226,6 +227,11 @@ function handleQuery() {
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
+        const result = data.result[0];
+        // 确保默认值不会被覆盖
+        if (!result.cSourceTyp) {
+          result.cSourceTyp = "9";
+        }
         freeEditRef?.value?.setFormValue(data.result[0]);
       } else {
         ElMessage.error(msg);
@@ -250,9 +256,9 @@ defineExpose({
 onMounted(() => {
   if (param.type === "edit") {
     handleQuery();
-    // setTimeout(() => {
-    //   freeEditRef.value?.setFormValue(param.data);
-    // }, 50);
+  } else {
+    // 如果不是编辑模式，确保默认值生效
+    freeEditRef.value?.setFormValue({ cSourceTyp: "9" });
   }
 });
 </script>

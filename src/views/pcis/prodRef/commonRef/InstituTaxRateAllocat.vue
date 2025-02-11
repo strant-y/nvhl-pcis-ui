@@ -18,15 +18,24 @@ import {
   createAppFreeEditConfig,
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
-import {createFreeButtonBase} from "@/shared/button-config";
-import {useValidator} from "@/typings/useValidator";
-import {deleteCvrgFeeByProdNo, delProdTaxRateInfoById, qryProdTaxRateInfoPage,} from "@/api/prod";
-import {dataOpertaor} from "@/store/modules/data-opertaor";
-import {useDzModal} from "@/views/dzmodel/DzModalService";
-import {AppTableConfig, AppTableMethod, createTableEditConfig,} from "@/shared/app-table-config";
-import {onMounted, reactive, ref} from "vue";
+import { createFreeButtonBase } from "@/shared/button-config";
+import { useValidator } from "@/typings/useValidator";
+import {
+  deleteCvrgFeeByProdNo,
+  delProdTaxRateInfoById,
+  qryProdTaxRateInfoPage,
+  deleteProdTaxRateByProdNo,
+} from "@/api/prod";
+import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { useDzModal } from "@/views/dzmodel/DzModalService";
+import {
+  AppTableConfig,
+  AppTableMethod,
+  createTableEditConfig,
+} from "@/shared/app-table-config";
+import { onMounted, reactive, ref } from "vue";
 
-import {useRoute} from "vue-router";
+import { useRoute } from "vue-router";
 
 const dzmodal = useDzModal();
 const AddInstituTaxRateModal = defineAsyncComponent(
@@ -125,7 +134,7 @@ const tableconfig = reactive<AppTableConfig>(
         label: "全量删除",
         type: "success",
         func: function () {
-          deleteCvrgFeeByProdNo({ cProdNo: tabref.getFromValue().cProdNo })
+          deleteProdTaxRateByProdNo({ cProdNo: tabref.getFromValue().cProdNo })
             .then((res) => {
               const { code, data, msg } = res;
               if (200 === code) {

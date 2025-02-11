@@ -25,7 +25,7 @@
 import { useValidator } from "@/typings/useValidator";
 import { yesOrNo, size, inputtype, typeMap, dateType } from "@/utils/utilKey";
 import { useDzModal } from "@/views/dzmodel/DzModalService";
-import { ref, defineProps, onMounted } from "vue";
+import { ref, defineProps, defineEmits, onMounted } from "vue";
 import { createFreeButtonBase } from "@/shared/button-config";
 import {
   getButtonByFacKey,
@@ -142,9 +142,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 
 onMounted(async () => {
   if (props.type === "edit" && props.data) {
-    console.log(freeEditRef, "=====");
     setTimeout(() => {
-      freeEditRef.value?.setFormValue(props.data);
+      // freeEditRef.value?.setFormValue(props.data);
     }, 50);
   }
 });

@@ -235,7 +235,7 @@ function handleQuery() {
     const param = Object.assign(s, r, {
       cCvrgNo: tabref.getFromValue().cCvrgNo,
     });
-    qryProdRelCvrgList(param)
+    getCvrgRelList(param)
       .then((res) => {
         const { code, data, msg } = res;
         if (200 === code) {

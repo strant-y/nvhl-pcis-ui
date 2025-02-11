@@ -115,16 +115,16 @@ const formconfig = reactive<AppFreeEditConfig>(
         title: "是否高风险项目",
         loadData: yesOrNo,
       },
-      {
-        prop: "cTgtTxtFld18",
-        inputtype: "rtselect",
-        title: "高风险项目",
-        disabled: true,
-        // loadData: [
-        //   { label: "是", value: "1" },
-        //   { label: "否", value: "2" },
-        // ],
-      },
+      // {
+      //   prop: "cTgtTxtFld18",
+      //   inputtype: "rtselect",
+      //   title: "高风险项目",
+      //   disabled: true,
+      // loadData: [
+      //   { label: "是", value: "1" },
+      //   { label: "否", value: "2" },
+      // ],
+      // },
       {
         prop: "nDductAmt",
         inputtype: "rtinput",
@@ -161,6 +161,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "是否有效",
         loadData: yesOrNo,
+        defaultValue: "1",
       },
     ],
     fromUi: createFromUiConfig({
@@ -196,6 +197,10 @@ onMounted(async () => {
     setTimeout(() => {
       freeEditRef.value?.setFormValue(props.data);
     }, 50);
+  } else {
+    setTimeout(() => {
+      freeEditRef.value?.setFormValue({ cStatus: "1" });
+    }, 100);
   }
 });
 const handleCancel = () => {

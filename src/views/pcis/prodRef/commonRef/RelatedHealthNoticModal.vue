@@ -138,12 +138,12 @@ const handleSelectionChange = (rows: any[]) => {
 
 const handleConfirm = () => {
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
-  const param = pageresult.list.map((item) => item.CRelPkId).join(",");
+  const param = pageresult.list.map((item) => item.cRelPkId).join(",");
   const newParam = {
     userId: user.opCde,
     cCrtCde: user.opCde,
     cUpdCde: user.opCde,
-    cRelPkId: [param],
+    cRelPkId: param.split(","),
     cProdNo: tabref.getFromValue().cProdNo,
   };
   saveHealthNotifyRel(newParam)
@@ -159,7 +159,11 @@ const handleConfirm = () => {
     })
     .finally(() => {});
 };
-
+onMounted(() => {
+  setTimeout(() => {
+    handleQuery();
+  }, 200);
+});
 const handleCancel = () => {
   dialogVisible.value = false;
 };

@@ -22,11 +22,12 @@ import {
   createAppFreeEditConfig,
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
-import { ref, reactive } from "vue";
+import { ref, reactive, defineEmits } from "vue";
 import { savePrdTermInfo } from "@/api/prod"; // api接口
 import { TypeComponents } from "element-plus/es/utils";
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
+const emits = defineEmits(["ok", "cancel"]);
 const props = defineProps({
   data: Object,
   type: String,
@@ -204,7 +205,9 @@ const handleSave = async () => {
   if (formData) {
     try {
       await savePrdTermInfo(datas); // 调用保存接口
+      emits("ok", {});
       ElMessage.success("保存成功");
+      this.dialogVisible = false;
     } catch (error) {
       ElMessage.error("保存失败");
     }

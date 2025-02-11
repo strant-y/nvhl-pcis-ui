@@ -98,6 +98,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cChiefFlg",
         inputtype: "rtinput",
         title: "首席标识",
+        defaultValue: "0",
       },
     ],
     showSuperior: true,
@@ -118,8 +119,10 @@ onMounted(async () => {
         }
       })
       .finally(() => {});
-
-    setTimeout(() => {}, 50);
+  } else {
+    setTimeout(() => {
+      freeEditRef.value?.setFormValue({ cChiefFlg: "0" });
+    }, 100);
   }
 });
 
@@ -171,7 +174,6 @@ function save() {
     })
     .finally(() => {});
 }
-
 /* 获取全量表单数据 */
 function getFrom() {
   let s = freeEditRef.value?.getFromValue(); //获取表单数据
@@ -193,11 +195,6 @@ function getFrom() {
       btnjson.initid = uuidv4().replace(/-/g, "");
       param["btn"] = btnjson;
     }
-    // if (tableRef.value) {
-    //   const tabjson = tableRef.value?.getFromValue();
-    //   let selectList = tabjson.filter((item: any) => item.isChecked === "1");
-    //   param["tabjson"] = selectList;
-    // }
     return param;
   }
 }
