@@ -77,7 +77,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       },
       {
         prop: "cDptCde",
-        inputtype: "rtselect",
+        inputtype: "rtinput",
         title: "机构代码",
         // typeCode: "Cvrg_LIST",
         // params: { cProdNo: tabref.getFromValue().cProdNo },

@@ -77,10 +77,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     fromSchema: [
       {
         prop: "cvrgNo",
-        inputtype: "rtselect",
+        inputtype: "rtinput",
         title: "险别代码",
-        // typeCode: "Cvrg_LIST",
-        // params: { cProdNo: tabref.getFromValue().cProdNo },
       },
       {
         prop: "cPlanNo",

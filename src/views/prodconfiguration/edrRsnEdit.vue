@@ -38,7 +38,7 @@ const formconfig = reactive<AppFreeEditConfig>(
     endBtnsPosition: "right",
     fromSchema: [
       {
-        prop: "CKindNo",
+        prop: "cKindNo",
         inputtype: "rtselect",
         typeCode: "KIND_LIST_CACHE",
         params: { codeListParam: "" },
@@ -69,7 +69,7 @@ const formconfig = reactive<AppFreeEditConfig>(
           { value: "4", label: "变更保险期限" },
           { value: "5", label: "批改分期" },
         ],
-        defaultValue: "1",
+        defaultValue: "2",
       },
       {
         prop: "cNmeEn",
@@ -104,7 +104,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         rules: [getRules("required", { change: true })],
       },
       {
-        prop: "cDesc",
+        prop: "cRsnTxt",
         inputtype: "rtinput",
         type: "textarea",
         btnWidth: 20,
