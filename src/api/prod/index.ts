@@ -927,7 +927,7 @@ export function saveProdAudit(queryParams: any): AxiosPromise<any> {
 }
 /* 上传费率表-删除所有 */
 export function deleteCvrgFeeByProdNo(queryParams: any): AxiosPromise<any> {
-    return post(`/plan/deleteCvrgFeeByProdNo`, queryParams);
+    return post(`/plan/deleteFeeRateByProdNo`, queryParams);
 }
 /* 核保级别修改 */
 export function getUndrClsInfo(queryParams: any): AxiosPromise<any> {
