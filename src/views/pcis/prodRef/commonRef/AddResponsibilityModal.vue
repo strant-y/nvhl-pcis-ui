@@ -17,7 +17,7 @@ import {
   createAppFreeEditConfig,
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
-import { ref, reactive } from "vue";
+import { ref, reactive, defineEmits } from "vue";
 import { ElMessage } from "element-plus";
 import { saveRiskInfo, saveCvrgRiskRel } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
@@ -28,6 +28,7 @@ const props = defineProps<{
   data: Object;
   type: string;
 }>();
+const emits = defineEmits(["ok", "cancel"]);
 const dialogVisible = ref(true);
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 
@@ -90,6 +91,7 @@ const handleSave = async () => {
         ElMessage.success(res.msg);
       });
       saveCvrgRiskRel(params);
+      emits("ok", {});
       dialogVisible.value = false;
     } catch (error) {}
   }

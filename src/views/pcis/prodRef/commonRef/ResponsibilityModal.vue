@@ -179,7 +179,11 @@ const handleConfirm = () => {
     })
     .finally(() => {});
 };
-
+onMounted(() => {
+  setTimeout(() => {
+    handleQuery();
+  }, 100);
+});
 const handleCancel = () => {
   dialogVisible.value = false;
 };

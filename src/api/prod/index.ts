@@ -1,5 +1,6 @@
 import {AxiosPromise} from "axios";
 import {post} from "@/utils/http";
+import {del} from "@/utils/http";
 
 /**
  * 获取要素列表

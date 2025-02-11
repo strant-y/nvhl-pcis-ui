@@ -179,7 +179,7 @@ function loadAfter() {
   }
 }
 watch(route, (to, from) => {
-  router.go(0);
+  // router.go(0);
 });
 function setData(datas: any) {
   Object.keys(datas).forEach((k) => {

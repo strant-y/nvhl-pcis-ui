@@ -153,6 +153,11 @@ function handleSelectionChange(rows: any[]) {
 const handleCancel = () => {
   dialogVisible.value = false;
 };
+onMounted(() => {
+  setTimeout(() => {
+    handleQuery();
+  }, 100);
+});
 const handleConfirm = () => {
   if (!selectedRows.value.length) {
     ElMessage.error("请选择要关联的附加险");
