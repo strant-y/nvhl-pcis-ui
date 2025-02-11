@@ -1,10 +1,5 @@
 <template>
-  <el-dialog
-    v-model="dialogVisible"
-    title="关联附加险"
-    width="80%"
-    @update:model-value="handleVisibleUpdate"
-  >
+  <el-dialog v-model="dialogVisible" title="关联附加险" width="80%">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
     <app-table
       :tableConfig="tableConfig"
@@ -38,6 +33,7 @@ import {
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import { ref, reactive, defineEmits, defineProps } from "vue";
+const emits = defineEmits(["ok", "cancel"]);
 import { getCvrgToRelList, saveCvrgRel } from "@/api/prod";
 
 const props = defineProps<{
@@ -82,9 +78,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         params: { cStatus: "1" },
       },
       {
-        prop: "cRiskNo",
+        prop: "cCvrgNo",
         inputtype: "rtinput",
-        title: "责任代码",
+        title: "险别代码",
       },
       {
         prop: "cNmeCn",
@@ -114,8 +110,8 @@ const tableConfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
       },
       {
-        prop: "cRiskNo",
-        title: "责任代码",
+        prop: "cCvrgNo",
+        title: "险别代码",
         inputtype: "rtinput",
       },
       {
@@ -178,6 +174,7 @@ const handleConfirm = () => {
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
+        emits("ok", {});
         ElMessage.success("保存成功");
         dialogVisible.value = false;
       } else {
@@ -185,10 +182,6 @@ const handleConfirm = () => {
       }
     })
     .finally(() => {});
-};
-
-const handleVisibleUpdate = (value: boolean) => {
-  emit("update:visible", value);
 };
 </script>
 

@@ -120,13 +120,18 @@ const tableconfig = reactive<AppTableConfig>(
         label: "增加责任",
         type: "success",
         func: function () {
-          dzmodal
-            .open(AddResponsibilityModal, { type: "add", data: {} })
-            .then((res) => {
-              if (res.type === "ok") {
-                handleQuery();
-              }
-            });
+          if (tabref.getFromValue().cCvrgNo == null) {
+            ElMessage.error("请完善基本信息!");
+            return;
+          } else {
+            dzmodal
+              .open(AddResponsibilityModal, { type: "add", data: {} })
+              .then((res) => {
+                if (res.type === "ok") {
+                  handleQuery();
+                }
+              });
+          }
         },
       }),
     ],

@@ -22,10 +22,14 @@ import {
   createAppFreeEditConfig,
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
-import { ref, reactive } from "vue";
+
+import { ref, reactive, defineEmits, defineProps } from "vue";
+const emits = defineEmits(["ok", "cancel"]);
 import { saveCvrgRelTerm } from "@/api/prod"; // api接口
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
+import { useValidator } from "@/typings/useValidator";
+const { getRules } = useValidator();
 const tabref = opertaor.getTableRefByKey("inruranceTypeBasicInfo");
 const props = defineProps<{
   data: Object;
@@ -48,7 +52,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         itemWidth: 2,
         typeCode: "ALL_CTERMNO_SELECT",
         params: { cParCde: "01" },
-        rules: [{ type: "required" }],
+        rules: [getRules("required", {})],
       },
       {
         prop: "cDptCde",
@@ -56,7 +60,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         title: "承保机构",
         btnWidth: 20,
         itemWidth: 2,
-        rules: [{ type: "required" }],
+        rules: [getRules("required", {})],
         // showExBtn: true,
         // btnItems: {
         //   icon: "Search",
@@ -112,6 +116,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         prop: "cIsValid",
         inputtype: "rtselect",
         title: "有效状态",
+        rules: [getRules("required", {})],
         loadData: [
           {
             label: "有效",
@@ -131,6 +136,8 @@ const formconfig = reactive<AppFreeEditConfig>(
 );
 
 const handleSave = async () => {
+  const isValid = await freeEditRef.value?.validate();
+  if (!isValid) return;
   const formData = freeEditRef.value?.getFromValue();
   const cCvrgNo = tabref.getFromValue().cCvrgNo;
   console.log(cCvrgNo, "cCvrgNo");
@@ -140,6 +147,7 @@ const handleSave = async () => {
   if (formData) {
     try {
       await saveCvrgRelTerm(newParam); // 调用保存接口
+      emits("ok", {});
       ElMessage.success("保存成功");
       dialogVisible.value = false;
     } catch (error) {

@@ -134,7 +134,7 @@ const tableconfig = reactive<AppTableConfig>(
         id: "score",
         link: true,
         tooltip: "删除",
-        type: "success",
+        type: "danger",
         size: "large",
         icon: "Delete",
         tableClick: (row) => {
@@ -175,12 +175,12 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "tDutyStrtTm",
-        inputtype: "rtdatetime",
+        inputtype: "rtdatepicker",
         title: "任职起期",
       },
       {
         prop: "tDutyEndTm",
-        inputtype: "rtdatetime",
+        inputtype: "rtdatepicker",
         title: "任职止期",
       },
     ],

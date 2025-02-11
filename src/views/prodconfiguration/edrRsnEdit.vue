@@ -1,10 +1,5 @@
 <template>
-  <el-dialog
-    v-model="dialogVisible"
-    title=""
-    width="80%"
-    @update:model-value="handleVisibleUpdate"
-  >
+  <el-dialog v-model="dialogVisible" title="" width="80%">
     <app-free-edit v-model:freeEditConfig="formconfig" ref="freeEditRef" />
     <template #footer>
       <span class="dialog-footer">
@@ -25,7 +20,7 @@ import {
 import { ref, reactive } from "vue";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
-import { saveProdEdrRsnInfo } from "@/api/prod"; // api接口
+import { saveProdEdrRsnInfo, getProdEdrRsnInfo } from "@/api/prod"; // api接口
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 const props = defineProps<{
@@ -43,7 +38,7 @@ const formconfig = reactive<AppFreeEditConfig>(
     endBtnsPosition: "right",
     fromSchema: [
       {
-        prop: "CKindNo",
+        prop: "cKindNo",
         inputtype: "rtselect",
         typeCode: "KIND_LIST_CACHE",
         params: { codeListParam: "" },
@@ -74,7 +69,7 @@ const formconfig = reactive<AppFreeEditConfig>(
           { value: "4", label: "变更保险期限" },
           { value: "5", label: "批改分期" },
         ],
-        defaultValue: "1",
+        defaultValue: "2",
       },
       {
         prop: "cNmeEn",
@@ -109,7 +104,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         rules: [getRules("required", { change: true })],
       },
       {
-        prop: "cDesc",
+        prop: "cRsnTxt",
         inputtype: "rtinput",
         type: "textarea",
         btnWidth: 20,
@@ -141,18 +136,21 @@ const handleSave = async () => {
   }
 };
 onMounted(async () => {
-  if (props.type === "edit" && props.data) {
-    setTimeout(() => {
-      freeEditRef.value?.setFormValue(props.data);
-    }, 50);
+  if (props.type === "edit") {
+    getProdEdrRsnInfo({ cPkId: props.data.cPkId })
+      .then((res) => {
+        const { code, data, msg } = res;
+        if (200 === code) {
+          freeEditRef.value?.setFormValue(data);
+        } else {
+          ElMessage.error(msg);
+        }
+      })
+      .finally(() => {});
   }
 });
 const handleCancel = () => {
   dialogVisible.value = false;
-};
-
-const handleVisibleUpdate = (value: boolean) => {
-  emit("update:visible", value);
 };
 </script>
 

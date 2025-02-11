@@ -46,6 +46,8 @@ const formconfig = reactive<AppFreeEditConfig>(
         prop: "CDptCde",
         inputtype: "rtinput",
         title: "机构代码",
+        typeCode: "PLYDPT_LIST_1",
+        params: { cIsValid: "1", userOrg: "0200000000000" },
       },
       {
         prop: "CRuleTyp",
@@ -56,15 +58,20 @@ const formconfig = reactive<AppFreeEditConfig>(
         prop: "CPrd",
         inputtype: "rtselect",
         title: "产品大类",
+        typeCode: "KIND_LIST_CACHE",
+        params: { codeListParam: "" },
+        child: "CProdNo",
       },
       {
         prop: "CProdNo",
         inputtype: "rtselect",
         title: "产品",
+        typeCode: "PROD_LIST",
+        params: { cParCde: "" },
       },
       {
         prop: "CRuleCde",
-        inputtype: "rtselect",
+        inputtype: "rtinput",
         title: "规则名称",
       },
       {

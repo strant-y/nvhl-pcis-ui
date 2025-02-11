@@ -41,7 +41,7 @@ const tabref = opertaor.getTableRefByKey("prodInfo");
 const route = useRoute();
 const query = ref(route.query);
 const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
-
+import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
@@ -68,8 +68,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     fromSchema: [
       {
         prop: "cKindNme",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "大类代码",
+        typeCode: "KIND_LIST_CACHE",
+        params: { codeListParam: "" },
       },
       {
         prop: "cCvrgNo",

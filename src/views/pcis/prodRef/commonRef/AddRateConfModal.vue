@@ -170,6 +170,8 @@ const formconfig = reactive<AppFreeEditConfig>(
 );
 
 const handleSave = async () => {
+  const isValid = await freeEditRef.value?.validate();
+  if (!isValid) return;
   const formData = freeEditRef.value?.getFromValue();
   const user = JSON.parse(sessionStorage.getItem("user"));
   const newParam = {

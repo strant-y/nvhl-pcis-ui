@@ -96,10 +96,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cIsValid",
         inputtype: "rtselect",
         title: "启用标志",
-        loadData: [
-          { label: "启用", value: "1" },
-          { label: "未启用", value: "2" },
-        ],
+        typeCode: "WEB_SYS_STA_DICT",
+        params: { cParCde: "use_mrk" },
+        clearable: true,
       },
     ],
     fromUi: createFromUiConfig({
@@ -130,6 +129,7 @@ const tableconfig = reactive<AppTableConfig>(
         },
       }),
     ],
+    editList: ["cIsValid"],
     tableBtnType: "btn",
     tableBtnWidth: 220,
     tableBtnPosition: "right",
@@ -175,7 +175,14 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cIsValid",
         title: "启用标志",
-        inputtype: "rtselect",
+        inputtype: "rtswitch",
+        keymap: {
+          y: "1",
+          n: "0",
+        },
+        activeText: "启用",
+        inactiveText: "禁用",
+        inlinePrompt: true,
       },
     ],
   })

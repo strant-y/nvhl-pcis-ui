@@ -3,6 +3,7 @@ import { FreeButtonBase } from "./button-config";
 export interface AppFreeEditConfig {
   id?: string; // 表单主键
   title?: string | null | undefined; // 功能标题
+  defaultValue?: any | null;
   production?: boolean; //标题是否显示tooltip
   productionTitle?: string; //标题内容
   fromUi?: any | null; // formUi配置
@@ -34,6 +35,7 @@ export function createAppFreeEditConfig(
   return {
     id: config.id || `ID${new Date().getTime()}`,
     title: config.title || null,
+    defaultValue: config.defaultValue || {},
     showBtn: config.showBtn || true,
     showSuperior: config.showSuperior || false,
     shadow: config.shadow || true,

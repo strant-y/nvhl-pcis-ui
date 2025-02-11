@@ -19,7 +19,11 @@ import {
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
-import { saveProdInfo, qryProdCvrgFeeInfoPage } from "@/api/prod";
+import {
+  saveProdInfo,
+  qryProdCvrgFeeInfoPage,
+  deleteCvrgFeeByProdNo,
+} from "@/api/prod";
 import { useDzModal } from "@/views/dzmodel/DzModalService";
 
 const dzmodal = useDzModal();
@@ -73,10 +77,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     fromSchema: [
       {
         prop: "cvrgNo",
-        inputtype: "rtselect",
+        inputtype: "rtinput",
         title: "险别代码",
-        // typeCode: "Cvrg_LIST",
-        // params: { cProdNo: tabref.getFromValue().cProdNo },
       },
       {
         prop: "cPlanNo",
@@ -133,7 +135,19 @@ const tableconfig = reactive<AppTableConfig>(
         id: "del-rateconfigruation",
         label: "全量删除",
         type: "success",
-        func: function () {},
+        func: function () {
+          deleteCvrgFeeByProdNo({ cProdNo: tabref.getFromValue().cProdNo })
+            .then((res) => {
+              const { code, data, msg } = res;
+              if (200 === code) {
+                ElMessage.success("删除成功");
+                handleQuery();
+              } else {
+                ElMessage.error(msg);
+              }
+            })
+            .finally(() => {});
+        },
       }),
     ],
     tableBtnType: "btn",

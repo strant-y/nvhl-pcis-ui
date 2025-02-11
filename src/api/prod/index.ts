@@ -857,7 +857,7 @@ export function queryReinsuranceData(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function getOrgDptTreeNodeById(queryParams: any): AxiosPromise<any> {
-    return post(`/rolemgr/getOrgDptTreeNodeById`, queryParams);
+    return post(`/role/getOrgDptTreeNodeById`, queryParams);
 }
 
 /**
@@ -915,4 +915,20 @@ export function getUnbindCvrgRefProd(queryParams: any): AxiosPromise<any> {
  */
 export function saveProdAudit(queryParams: any): AxiosPromise<any> {
     return post(`/proddef/saveProdAudit`, queryParams);
+}
+/* 上传费率表-删除所有 */
+export function deleteCvrgFeeByProdNo(queryParams: any): AxiosPromise<any> {
+    return post(`/plan/deleteCvrgFeeByProdNo`, queryParams);
+}
+/* 核保级别修改 */
+export function getUndrClsInfo(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/getUndrClsInfo`, queryParams);
+}
+/* 批改原因配置-编辑-查询详情 */
+export function getProdEdrRsnInfo(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/getProdEdrRsnInfo`, queryParams);
+}
+/* 核保级别配置-删除 */
+export function delUndrClsById(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/delUndrClsById`, queryParams);
 }

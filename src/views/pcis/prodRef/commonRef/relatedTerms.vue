@@ -147,11 +147,18 @@ const tableconfig = reactive<AppTableConfig>(
         label: "增加条款",
         type: "success",
         func: function () {
-          dzmodal.open(AddTermModal, { type: "add", data: {} }).then((res) => {
-            if (res.type === "ok") {
-              handleQuery();
-            }
-          });
+          if (tabref.getFromValue().cCvrgNo == null) {
+            ElMessage.error("请完善基本信息!");
+            return;
+          } else {
+            dzmodal
+              .open(AddTermModal, { type: "add", data: {} })
+              .then((res) => {
+                if (res.type === "ok") {
+                  handleQuery();
+                }
+              });
+          }
         },
       }),
     ],

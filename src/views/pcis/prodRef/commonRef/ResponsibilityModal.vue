@@ -37,6 +37,7 @@ import {
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import { ref, reactive, defineEmits, defineProps } from "vue";
+const emits = defineEmits(["ok", "cancel"]);
 import { ElMessage } from "element-plus";
 import { query, getRiskList, saveCvrgRiskRel } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
@@ -45,10 +46,6 @@ const props = defineProps<{
   visible: boolean;
 }>();
 const dialogVisible = ref(true);
-const emit = defineEmits<{
-  (e: "update:modelValue", value: boolean): void;
-  (e: "save"): void;
-}>();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
@@ -173,6 +170,7 @@ const handleConfirm = () => {
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
+        emits("ok", {});
         ElMessage.success("保存成功");
         dialogVisible.value = false;
       } else {
@@ -184,10 +182,6 @@ const handleConfirm = () => {
 
 const handleCancel = () => {
   dialogVisible.value = false;
-};
-
-const handleVisibleUpdate = (value: boolean) => {
-  emit("update:visible", value);
 };
 </script>
 
