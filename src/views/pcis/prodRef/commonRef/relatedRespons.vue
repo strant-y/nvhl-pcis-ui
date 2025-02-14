@@ -33,6 +33,8 @@ import {
   getCvrgRiskRelList,
   saveCvrgRiskRel,
   delRiskRel,
+  deleteTermRiskRel,
+  queryTermRiskRelList,
 } from "@/api/prod";
 
 import { useDzModal } from "@/views/dzmodel/DzModalService";
@@ -150,7 +152,7 @@ const tableconfig = reactive<AppTableConfig>(
           const params = Object.assign(row, {
             cTermNo: tabref.getFromValue().cTermNo,
           });
-          delRiskRel(params)
+          deleteTermRiskRel(params)
             .then((res) => {
               const { code, data, msg } = res;
               if (200 === code) {
@@ -222,7 +224,7 @@ function handleQuery(flag?: boolean) {
     const param = Object.assign(s, r, {
       cTermNo: tabref.getFromValue().cTermNo,
     });
-    getCvrgRiskRelList(param)
+    queryTermRiskRelList(param)
       .then((res) => {
         const { code, data, msg } = res;
         if (200 === code) {

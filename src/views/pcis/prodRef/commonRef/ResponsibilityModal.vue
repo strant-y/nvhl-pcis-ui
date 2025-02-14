@@ -39,7 +39,12 @@ import {
 import { ref, reactive, defineEmits, defineProps } from "vue";
 const emits = defineEmits(["ok", "cancel"]);
 import { ElMessage } from "element-plus";
-import { query, getRiskList, saveCvrgRiskRel } from "@/api/prod";
+import {
+  query,
+  getRiskList,
+  saveCvrgRiskRel,
+  saveTermRiskRel,
+} from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
 const props = defineProps<{
@@ -49,7 +54,7 @@ const dialogVisible = ref(true);
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
-const tabref = opertaor.getTableRefByKey("inruranceTypeBasicInfo");
+const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
 const { getRules } = useValidator();
 
 const formconfig1 = reactive<AppFreeEditConfig>(
@@ -137,7 +142,7 @@ const selectedRows = ref<any[]>([]);
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(s, r, { cCvrgNo: tabref.getFromValue().cCvrgNo });
+  const param = Object.assign(s, r, { cTermNo: tabref.getFromValue().cTermNo });
   getRiskList(param)
     .then((res) => {
       const { code, data, msg } = res;
@@ -158,15 +163,15 @@ function handleSelectionChange(rows: any[]) {
 
 const handleConfirm = () => {
   const opCde = JSON.parse(sessionStorage.getItem("user")).opCde;
-  const cCvrgNo = tabref.getFromValue().cCvrgNo;
+  const cTermNo = tabref.getFromValue().cTermNo;
   const newArr = selectedRows.value.map((item) => {
     item.cCrtCde = opCde;
     item.cUpdCde = opCde;
-    item.cCvrgNo = cCvrgNo;
+    item.cTermNo = cTermNo;
     return item;
   });
-  const paramData = { cCvrgNo: cCvrgNo, rel: newArr };
-  saveCvrgRiskRel(paramData)
+  const paramData = { cTermNo: cTermNo, rel: newArr };
+  saveTermRiskRel(paramData)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {

@@ -306,6 +306,18 @@ export function saveInruanceTypeBasicInfo(queryParams: any): AxiosPromise<any> {
 export function getCvrgRiskRelList(queryParams: any): AxiosPromise<any> {
     return post(`/cvrgdef/getCvrgRiskRelList`, queryParams);
 }
+/**
+ * 条款配置-关联责任弹框列表
+ * @param queryParams
+ * @returns
+ */
+export function queryTermRiskRelList(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/queryTermRiskRelList`, queryParams);
+}
+/* 条款配置-关联责任列表*/
+export function saveTermRiskRel(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/saveTermRiskRel`, queryParams);
+}
 
 /**
  * 险别配置-删除关联责任列表
@@ -314,6 +326,30 @@ export function getCvrgRiskRelList(queryParams: any): AxiosPromise<any> {
  */
 export function delRiskRel(queryParams: any): AxiosPromise<any> {
     return post(`/cvrgdef/delRiskRel`, queryParams);
+}
+/* 条款配置-删除关联附加险列表*/
+export function deleteTermRel(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/deleteTermRel`, queryParams);
+}
+/* 删除险别配置-关联责任列表*/
+export function deleteTermRiskRel(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/deleteTermRiskRel`, queryParams);
+}
+/* 获取条款配置-条款详情*/
+export function getPrdTermInfo(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/getPrdTermInfo`, queryParams);
+}
+/**
+ * 条款配置-关联附加条款列表
+ * @param queryParams
+ * @returns
+ */
+export function queryTermRelList(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/queryTermRelList`, queryParams);
+}
+/* 条款配置-关联附加条款按钮弹框列表*/
+export function queryTermToRelList(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/queryTermToRelList`, queryParams);
 }
 
 /**

@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="dialogVisible" title="关联附加险" width="80%">
+  <el-dialog v-model="dialogVisible" title="关联附加条款" width="80%">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
     <app-table
       :tableConfig="tableConfig"
@@ -34,7 +34,7 @@ import {
 } from "@/shared/app-table-config";
 import { ref, reactive, defineEmits, defineProps } from "vue";
 const emits = defineEmits(["ok", "cancel"]);
-import { getCvrgToRelList, saveCvrgRel } from "@/api/prod";
+import { getCvrgToRelList, saveCvrgRel, queryTermToRelList } from "@/api/prod";
 
 const props = defineProps<{
   visible: boolean;
@@ -46,7 +46,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
-const tabref = opertaor.getTableRefByKey("inruranceTypeBasicInfo");
+const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
 const { getRules } = useValidator();
 
 const formconfig1 = reactive<AppFreeEditConfig>(
@@ -59,7 +59,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         label: "查询",
         func: async () => {
           handleQuery();
-          console.log("查询条件:");
         },
       }),
       createFreeButtonBase({
@@ -78,9 +77,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         params: { cStatus: "1" },
       },
       {
-        prop: "cCvrgNo",
+        prop: "cTermNo",
         inputtype: "rtinput",
-        title: "险别代码",
+        title: "条款代码",
       },
       {
         prop: "cNmeCn",
@@ -110,8 +109,8 @@ const tableConfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
       },
       {
-        prop: "cCvrgNo",
-        title: "险别代码",
+        prop: "cTermNo",
+        title: "条款代码",
         inputtype: "rtinput",
       },
       {
@@ -130,11 +129,11 @@ const selectedRows = ref<any[]>([]);
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
+  s.cTermNo = tabref.getFromValue().cTermNo;
   const param = Object.assign(s, r, {
-    CRdrTyp: "1",
-    cCvrgNo: tabref.getFromValue().cCvrgNo,
+    cRdrTyp: "1",
   });
-  getCvrgToRelList(param)
+  queryTermToRelList(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
@@ -164,17 +163,16 @@ const handleConfirm = () => {
     return;
   }
   const opCde = JSON.parse(sessionStorage.getItem("user")).opCde;
-  const cCvrgNo = tabref.getFromValue().cCvrgNo;
+  const cTermNo = tabref.getFromValue().cTermNo;
   const newArr = selectedRows.value.map((item) => {
-    console.log(item, "item");
     item.cCrtCde = opCde;
     item.cUpdCde = opCde;
-    item.cCvrgRdrCde = item.cCvrgNo;
-    item.cCvrgNo = cCvrgNo;
+    item.cCvrgRdrCde = item.cTermNo;
+    item.cTermNo = cTermNo;
     item.cRdrTyp = "1";
     return item;
   });
-  const paramData = { cCvrgNo: cCvrgNo, rel: newArr };
+  const paramData = { cTermNo: cTermNo, rel: newArr };
   saveCvrgRel(paramData)
     .then((res) => {
       const { code, data, msg } = res;
