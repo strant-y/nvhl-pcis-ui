@@ -30,47 +30,68 @@
 
       <div v-if="showData">
         <template v-if="showRiskInfo">
-          <div>
+          <!-- <div>
             <a style="margin-right: 5px" @click="foldRiskInfo = !foldRiskInfo">
               <el-icon v-if="!foldRiskInfo"><ArrowUpBold /></el-icon>
               <el-icon v-if="foldRiskInfo"><ArrowDownBold /></el-icon>
             </a>
             <span> 责任限额信息 </span>
           </div>
+           -->
           <div v-if="foldRiskInfo">
             <table style="width: 100%">
               <thead>
                 <tr class="table-title">
-                  <th>责任</th>
-                  <th>限额类型</th>
-                  <th>限额值</th>
-                  <th>保费</th>
+                  <th
+                    v-for="(i, index) in tempConfig?.factorConfig
+                      ?.factorGroupId"
+                    :key="index"
+                    :width="i.width ? i.width : null"
+                  >
+                    {{ i.title }}
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(i, index) in fromRiskSchema" :key="index">
-                  <td
-                    width="150"
-                    :rowspan="fromRiskSchema.length"
-                    v-if="index === 0"
+                <tr
+                  v-for="(i, index) in Array.from(
+                    { length: tempConfig?.factorConfig?.rowNum || 0 },
+                    (_, i) => i
+                  )"
+                  :key="index"
+                >
+                  <template
+                    v-for="(j, jndex) in tempConfig?.factorConfig
+                      ?.factorGroupId"
+                    :key="jndex"
                   >
-                    <el-tag type="warning">{{ formData.rigeNme }}</el-tag>
-                  </td>
-                  <td>{{ i.label }}</td>
-                  <td><rtnumber :item="{ suffix: '元' }" /></td>
-                  <td
-                    width="200"
-                    :rowspan="fromRiskSchema.length"
-                    v-if="index === 0"
-                  >
-                    <rtinput :item="{ append: i.append }" />
-                  </td>
+                    <td
+                      v-if="j?.factorList[i]"
+                      :rowspan="
+                        j?.factorList[i]?.type === 'rowspan'
+                          ? tempConfig?.factorConfig?.rowNum
+                          : null
+                      "
+                    >
+                      <!-- {{ j.factorList[i] }} -->
+                      <template v-if="j?.factorList[i]?.type === 'text'">
+                        <span>{{ j.factorList[i].factoritem.text }} </span>
+                      </template>
+                      <template v-else>
+                        <from-item
+                          v-if="!!j.factorList[i]"
+                          v-model="props.formData[j.factorList[i].factorKey]"
+                          :item="j.factorList[i].factoritem"
+                        />
+                      </template>
+                    </td>
+                  </template>
                 </tr>
               </tbody>
             </table>
           </div>
         </template>
-        <template v-if="showDisclaimer">
+        <!-- <template v-if="showDisclaimer">
           <div>
             <a
               style="margin-right: 5px"
@@ -117,7 +138,7 @@
               </tbody>
             </table>
           </div>
-        </template>
+        </template> -->
       </div>
     </el-card>
   </div>
@@ -130,6 +151,8 @@ const props = defineProps({
     required: true,
   },
 });
+
+const tempConfig = ref({});
 const showData = ref(true);
 const showRiskInfo = ref(true);
 const foldRiskInfo = ref(true);
@@ -151,7 +174,7 @@ const fromRiskSchema = ref([
   },
 ]);
 
-const disclaimer = ref('1');
+const disclaimer = ref("1");
 const fromDisclaimerSchema = ref([
   {
     label: "每次事故医疗基用免赔额",
@@ -167,14 +190,18 @@ const fromDisclaimerSchema = ref([
   },
 ]);
 
-onMounted(() => {
+onMounted(async () => {
   console.log(props.formData);
+  const param = await fetch("/param/plancvrg.json");
+  const str = await param.text();
+  tempConfig.value = JSON.parse(str);
+  console.log(tempConfig);
 });
 </script>
 <style lang="scss" scoped>
 .cvrg-info {
   :deep(.el-card__header) {
-    background-color: #eff3f5 ;
+    background-color: #eff3f5;
     padding: 5px 10px;
   }
   :deep(.el-card__body) {
