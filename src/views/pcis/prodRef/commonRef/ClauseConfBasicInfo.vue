@@ -15,6 +15,7 @@ import {
   saveInruanceTypeBasicInfo,
   getCvrgList,
   savePrdTermInfo,
+  getPrdTermInfo,
 } from "@/api/prod";
 import { ref, reactive, onMounted } from "vue";
 import { useRoute } from "vue-router";
@@ -154,25 +155,24 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cRdrTyp",
         inputtype: "rtselect",
-        title: "主险/附加险",
+        title: "主条款/附加条款",
         typeCode: "WEB_SYS_STA_DICT",
         params: { cParCde: "RdrTyp" },
         rules: [getRules("required", { change: true })],
         func: (val: any) => {
-          const additionalInsuranceTypeField = formconfig.fromSchema.find(
-            (field) => field.prop === "additionalInsuranceType"
-          );
-          console.log(additionalInsuranceTypeField, "===========");
-
-          if (additionalInsuranceTypeField) {
-            additionalInsuranceTypeField.hidden = val === "1";
-          }
+          // const additionalInsuranceTypeField = formconfig.fromSchema.find(
+          //   (field) => field.prop === "additionalInsuranceType"
+          // );
+          // console.log(additionalInsuranceTypeField, "===========");
+          // if (additionalInsuranceTypeField) {
+          //   additionalInsuranceTypeField.hidden = val === "1";
+          // }
         },
       },
       {
         prop: "additionalInsuranceType",
         inputtype: "rtselect",
-        title: "附加险类型",
+        title: "附加条款类型",
         typeCode: "additional_insurance",
         params: { cParCde: "add_type" },
         rules: [getRules("required", { change: true })],
@@ -247,12 +247,12 @@ function getValue(key: string) {
   return freeEditRef?.value?.getValue(key);
 }
 function handleQuery() {
-  const newparam = { cCvrgNo: param.cCvrgNo, pageNum: 1, pageSize: 10 };
-  getCvrgList(newparam)
+  const newparam = { cPkId: param.cPkId, pageNum: 1, pageSize: 10 };
+  getPrdTermInfo(newparam)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
-        freeEditRef?.value?.setFormValue(data.result[0]);
+        freeEditRef?.value?.setFormValue(data);
       } else {
         ElMessage.error(msg);
       }
@@ -275,7 +275,7 @@ defineExpose({
 });
 onMounted(() => {
   if (param.type === "edit") {
-    // handleQuery();
+    handleQuery();
   } else {
     // 如果不是编辑模式，确保默认值生效
     freeEditRef.value?.setFormValue({ cSourceTyp: "9" });

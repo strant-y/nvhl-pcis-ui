@@ -48,7 +48,7 @@ const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    title: "关联附加险",
+    title: "关联附加条款",
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
@@ -82,12 +82,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       },
       {
         prop: "cCvrgNo",
-        title: "险别代码",
+        title: "条款代码",
         inputtype: "rtinput",
       },
       {
         prop: "cNmeCn",
-        title: "险别名称",
+        title: "条款名称",
         inputtype: "rtinput",
       },
     ],
@@ -108,7 +108,7 @@ const tableconfig = reactive<AppTableConfig>(
     titleBtns: [
       createFreeButtonBase({
         id: "score",
-        label: "关联附加险",
+        label: "关联附加条款",
         type: "success",
         func: function () {
           if (tabref.getFromValue().cProdNo == null) {
@@ -160,12 +160,12 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "cCvrgNo",
-        title: "险别代码",
+        title: "条款代码",
         inputtype: "rtinput",
       },
       {
         prop: "cNmeCn",
-        title: "险别名称",
+        title: "条款名称",
         inputtype: "rtinput",
       },
     ],

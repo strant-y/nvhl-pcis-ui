@@ -85,7 +85,7 @@ opertaor.setTableConfig([
       // },
       relatedAdditionalIns: {
         pageKey: "relatedAdditionalIns",
-        pageTtile: "关联附加险",
+        pageTtile: "关联附加条款",
         pageRef: "relatedAdditionalIns",
       },
     },

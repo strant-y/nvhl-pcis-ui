@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="dialogVisible"
-    title="关联主险"
+    title="关联主条款"
     width="80%"
     @update:model-value="handleVisibleUpdate"
   >
@@ -83,12 +83,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cCCvrgNo",
         inputtype: "rtinput",
-        title: "险别代码",
+        title: "条款代码",
       },
       {
         prop: "cNmeCn",
         inputtype: "rtinput",
-        title: "险别名称",
+        title: "条款名称",
       },
     ],
     fromUi: createFromUiConfig({
@@ -109,17 +109,17 @@ const tableConfig = reactive<AppTableConfig>(
     fromSchema: [
       {
         prop: "cKindNme",
-        title: "险类名称",
+        title: "大类名称",
         inputtype: "rtinput",
       },
       {
         prop: "cCvrgNo",
-        title: "险别代码",
+        title: "条款代码",
         inputtype: "rtinput",
       },
       {
         prop: "cNmeCn",
-        title: "险别名称",
+        title: "条款名称",
         inputtype: "rtinput",
       },
     ],
