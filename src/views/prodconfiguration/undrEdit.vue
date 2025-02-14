@@ -76,6 +76,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cUndrClsCde",
         inputtype: "rtinput",
         title: "核保级别代码",
+        maxlength: 6,
         rules: [getRules("required", {})],
       },
       {
@@ -93,12 +94,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "nLevel",
         inputtype: "rtinput",
         title: "级别",
+        maxlength: 4,
       },
       {
         prop: "cChiefFlg",
         inputtype: "rtinput",
         title: "首席标识",
         defaultValue: "0",
+        maxlength: 1,
       },
     ],
     showSuperior: true,

@@ -56,7 +56,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         icon: "RefreshRight",
-        func: () => {},
+        func: () => {
+          freeEditRef.value.setFormValue({
+            cRiskNo: "",
+            cNmeCn: "",
+          });
+          handleQuery();
+        },
       }),
     ],
     fromSchema: [

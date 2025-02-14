@@ -28,6 +28,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 const opertaor = dataOpertaor();
+const tabref = opertaor.getTableRefByKey("inruranceTypeBasicInfo");
 const props = defineProps<{
   data: Object;
   type: String;
@@ -43,7 +44,7 @@ const formconfig = reactive<AppFreeEditConfig>(
     fromSchema: [
       {
         prop: "cKindNo",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "险类代码",
       },
       {
@@ -105,7 +106,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         typeCode: "WEB_SYS_STA_DICT",
         params: { cParCde: "yes_no" },
         rules: [getRules("required", { blur: true })],
-        defaultValue: "2",
+        defaultValue: "0",
       },
       {
         prop: "tFilingTm",
@@ -136,7 +137,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         typeCode: "WEB_SYS_STA_DICT",
         params: { cParCde: "yes_no" },
         rules: [getRules("required", { blur: true })],
-        defaultValue: "1",
+        defaultValue: "0",
       },
       {
         prop: "cUseDpt",
@@ -180,7 +181,7 @@ const formconfig = reactive<AppFreeEditConfig>(
 const handleSave = async () => {
   const isValid = await freeEditRef.value?.validate();
   if (!isValid) return;
-  const tabref = opertaor.getTableRefByKey("inruranceTypeBasicInfo");
+  // const tabref = opertaor.getTableRefByKey("inruranceTypeBasicInfo");
   const formData = freeEditRef.value?.getFromValue();
   const cCvrgNo = tabref.getFromValue().cCvrgNo;
   console.log(cCvrgNo, "cCvrgNo");
@@ -202,6 +203,20 @@ onMounted(async () => {
     setTimeout(() => {
       freeEditRef.value?.setFormValue(props.data);
     }, 50);
+  } else {
+    setTimeout(() => {
+      freeEditRef.value?.setFormValue({
+        cEnableFlag: "1",
+        cIsInternet: "0",
+        cIsExist: "0",
+        cKindNo: tabref.getFromValue().cKindNo,
+      });
+    }, 100);
+    // fromSchema?.forEach((e) => {
+    //   if (e.prop === "cKindNo") {
+    //     e.disabled = true;
+    //   }
+    // });
   }
 });
 const handleCancel = () => {

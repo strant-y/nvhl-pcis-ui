@@ -57,7 +57,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       }),
       createFreeButtonBase({
         label: "重置",
-        func: () => {},
+        func: () => {
+          freeEditRef.value.setFormValue({
+            cKindNo: "",
+            cNmeCn: "",
+            cCvrgNo: "",
+          });
+          handleQuery();
+        },
       }),
     ],
     fromSchema: [

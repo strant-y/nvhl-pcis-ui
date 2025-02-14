@@ -9,6 +9,7 @@ import {
   createAppFreeEditConfig,
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
+import dayjs from "dayjs";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
@@ -324,6 +325,14 @@ function handleQuery() {
 onMounted(() => {
   if (param.editType === "edit") {
     handleQuery(param.prodNo);
+  } else {
+    setTimeout(() => {
+      freeEditRef.value?.setFormValue({
+        cCriterionTimeUnit: "A",
+        tBgnTm: dayjs().format("YYYY-MM-DD"),
+        tAdbTm: dayjs().add(1, "year").format("YYYY-MM-DD"),
+      });
+    }, 50);
   }
 });
 const pageType = ref("add");
