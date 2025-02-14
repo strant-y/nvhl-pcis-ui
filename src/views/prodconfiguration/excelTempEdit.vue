@@ -46,6 +46,8 @@ const formconfig = reactive<AppFreeEditConfig>(
         prop: "CProdNo",
         inputtype: "rtselect",
         title: "产品代码",
+        typeCode: "NVHL_PROD_LIST_CACHE",
+        // params: { cParCde: "" },
       },
       {
         prop: "NSeqNo",

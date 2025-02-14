@@ -36,7 +36,7 @@ const RelatedAdditionalInsModal = defineAsyncComponent(
   () => import("./RelatedAdditionalInsModal.vue")
 );
 import { getCvrgRelList, delCvrgRel } from "@/api/prod";
-const tabref = opertaor.getTableRefByKey("inruranceTypeBasicInfo");
+const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
 const route = useRoute();
 const query = ref(route.query);
 const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
@@ -103,7 +103,7 @@ const tableconfig = reactive<AppTableConfig>(
         label: "关联附加险",
         type: "success",
         func: function () {
-          if (tabref.getFromValue().cCvrgNo == null) {
+          if (tabref.getFromValue().cTermNo == null) {
             ElMessage.error("请完善基本信息后操作!");
             return;
           } else {
@@ -224,16 +224,16 @@ function setDisa() {
   });
 }
 /** 查询 */
-function handleQuery() {
-  const tabref = opertaor.getTableRefByKey("inruranceTypeBasicInfo");
-  if (tabref.getFromValue().cCvrgNo == null) {
+function handleQuery(flag?: boolean) {
+  const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
+  if (tabref.getFromValue().cTermNo == null) {
     ElMessage.error("请完善基本信息后在操作!");
     return;
   } else {
-    const r = tableRef.value?.getPartnerPage(); //获取分页数据
+    const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
     const s = freeEditRef.value?.getFromValue(); //获取表单数据
     const param = Object.assign(s, r, {
-      cCvrgNo: tabref.getFromValue().cCvrgNo,
+      cTermNo: tabref.getFromValue().cTermNo,
     });
     getCvrgRelList(param)
       .then((res) => {

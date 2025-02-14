@@ -1,10 +1,5 @@
 <template>
-  <el-dialog
-    v-model="dialogVisible"
-    title=""
-    width="80%"
-    @update:model-value="handleVisibleUpdate"
-  >
+  <el-dialog v-model="dialogVisible" title="" width="80%">
     <app-free-edit v-model:freeEditConfig="formconfig" ref="freeEditRef" />
     <template #footer>
       <span class="dialog-footer">
@@ -25,15 +20,15 @@ import {
 import { ref, reactive } from "vue";
 import { ElMessage } from "element-plus";
 import { saveHealthNotify } from "@/api/prod";
-
+import { useRoute } from "vue-router";
+const route = useRoute();
+const query = ref(route.query);
+const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
 const props = defineProps<{
-  visible: boolean;
+  data: Object;
+  type: string;
 }>();
 const dialogVisible = ref(true);
-const emit = defineEmits<{
-  (e: "update:modelValue", value: boolean): void;
-  (e: "save"): void;
-}>();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 
@@ -130,13 +125,13 @@ const handleSave = async () => {
     }
   }
 };
-
+onMounted(() => {
+  settimeout(() => {
+    freeEditRef.value?.setFormValue({ CStatus: "1", CParPkId: "1" });
+  }, 50);
+});
 const handleCancel = () => {
   dialogVisible.value = false;
-};
-
-const handleVisibleUpdate = (value: boolean) => {
-  emit("update:visible", value);
 };
 </script>
 

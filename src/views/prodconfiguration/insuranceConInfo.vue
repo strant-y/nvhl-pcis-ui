@@ -63,21 +63,26 @@ opertaor.setTableConfig([
     groupId: "",
     showGroupId: false,
     pageInfo: {
-      inruranceTypeBasicInfo: {
-        pageKey: "inruranceTypeBasicInfo",
-        pageTtile: "险别基本信息",
-        pageRef: "inruranceTypeBasicInfo",
+      clauseConfBasicInfo: {
+        pageKey: "clauseConfBasicInfo",
+        pageTtile: "条款基本信息",
+        pageRef: "clauseConfBasicInfo",
       },
+      // inruranceTypeBasicInfo: {
+      //   pageKey: "inruranceTypeBasicInfo",
+      //   pageTtile: "险别基本信息",
+      //   pageRef: "inruranceTypeBasicInfo",
+      // },
       relatedRespons: {
         pageKey: "relatedRespons",
         pageTtile: "关联责任",
         pageRef: "relatedRespons",
       },
-      relatedTerms: {
-        pageKey: "relatedTerms",
-        pageTtile: "关联条款",
-        pageRef: "relatedTerms",
-      },
+      // relatedTerms: {
+      //   pageKey: "relatedTerms",
+      //   pageTtile: "关联条款",
+      //   pageRef: "relatedTerms",
+      // },
       relatedAdditionalIns: {
         pageKey: "relatedAdditionalIns",
         pageTtile: "关联附加险",

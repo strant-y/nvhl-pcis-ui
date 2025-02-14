@@ -76,6 +76,8 @@ const formconfig = reactive<AppFreeEditConfig>(
 );
 
 const handleSave = async () => {
+  const isValid = await freeEditRef.value?.validate();
+  if (!isValid) return;
   const tabref = opertaor.getTableRefByKey("inruranceTypeBasicInfo");
   const opCde = JSON.parse(sessionStorage.getItem("user")).opCde;
   const cCvrgNo = tabref.getFromValue().cCvrgNo;

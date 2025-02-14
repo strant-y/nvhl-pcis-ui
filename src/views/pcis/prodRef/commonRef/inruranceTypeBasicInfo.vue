@@ -114,6 +114,17 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             value: "2",
           },
         ],
+        func: (value) => {
+          if (value == "1") {
+            freeEditRef.value?.setFormValue({
+              cCalcAmt: "1",
+            });
+          } else {
+            freeEditRef.value?.setFormValue({
+              cCalcAmt: "",
+            });
+          }
+        },
       },
       {
         prop: "cCalcAmt",
@@ -227,11 +238,10 @@ function handleQuery() {
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
-        const result = data.result[0];
-        // 确保默认值不会被覆盖
-        if (!result.cSourceTyp) {
-          result.cSourceTyp = "9";
-        }
+        // const result = data.result[0];
+        // if (!result.cSourceTyp) {
+        //   result.cSourceTyp = "9";
+        // }
         freeEditRef?.value?.setFormValue(data.result[0]);
       } else {
         ElMessage.error(msg);

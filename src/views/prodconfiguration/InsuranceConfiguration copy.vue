@@ -32,7 +32,7 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { getProdList, qryProdTermList } from "@/api/prod";
+import { getProdList, getCvrgList } from "@/api/prod";
 import { clear } from "console";
 
 const pageresult = reactive<Pageresult>({
@@ -78,16 +78,7 @@ const formconfig = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         icon: "RefreshRight",
-        func: () => {
-          freeEditRef.value.setFormValue({
-            cKindNo: "",
-            cNmeCn: "",
-            cCvrgNo: "",
-            cRdrTyp: "",
-            cStatus: "",
-          });
-          handleQuery();
-        },
+        func: () => {},
       }),
     ],
     fromSchema: [
@@ -141,7 +132,7 @@ const tableconfig = reactive<AppTableConfig>(
     titleBtns: [
       createFreeButtonBase({
         id: "score",
-        label: "增加条款",
+        label: "新增",
         type: "success",
         icon: "Plus",
         func: () => {
@@ -189,50 +180,33 @@ const tableconfig = reactive<AppTableConfig>(
     ],
     fromSchema: [
       {
-        prop: "cKindNo",
+        prop: "cCvrgNo",
         inputtype: "rtinput",
-        title: "险类代码",
+        width: 200,
+        title: "险别代码",
       },
       {
-        prop: "cTermNo",
+        prop: "cKindNo",
         inputtype: "rtinput",
-        title: "条款代码",
+        width: 200,
+        title: "大类代码",
       },
       {
         prop: "cNmeCn",
         inputtype: "rtinput",
-        title: "条款名称",
+        width: 200,
+        title: "中文名称",
       },
-      // {
-      //   prop: "orgCode",
-      //   inputtype: "rtinput",
-      //   title: "机构代码",
-      // },
-      // {
-      //   prop: "productCode",
-      //   inputtype: "rtinput",
-      //   title: "产品代码",
-      // },
-      // {
-      //   prop: "effectiveStartDate",
-      //   inputtype: "rtdatetime",
-      //   title: "有效起期",
-      // },
-      // {
-      //   prop: "effectiveEndDate",
-      //   inputtype: "rtdatetime",
-      //   title: "有效止期",
-      // },
-      // {
-      //   prop: "groupIndividualFlag",
-      //   inputtype: "rtselect",
-      //   title: "团个单标识",
-      // },
-      // {
-      //   prop: "validFlag",
-      //   inputtype: "rtselect",
-      //   title: "有效标志",
-      // },
+      {
+        prop: "cRdrTyp",
+        inputtype: "rtinput",
+        title: "主险/附加险",
+      },
+      {
+        prop: "cDispCde",
+        inputtype: "rtinput",
+        title: "险别显示码",
+      },
       {
         prop: "cStatus",
         inputtype: "rtswitch",
@@ -244,6 +218,9 @@ const tableconfig = reactive<AppTableConfig>(
         activeText: "启用",
         inactiveText: "禁用",
         inlinePrompt: true,
+        func: (val) => {
+          const names = formconfig.fromSchema.map((obj) => obj.cCvrgNo);
+        },
       },
     ],
   })
@@ -274,7 +251,7 @@ function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r);
-  qryProdTermList(param)
+  getCvrgList(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {

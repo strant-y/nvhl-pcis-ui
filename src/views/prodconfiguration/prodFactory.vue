@@ -61,8 +61,13 @@ const formconfig = reactive<AppFreeEditConfig>(
         label: "重置",
         icon: "RefreshRight",
         func: () => {
-          freeEditRef.value?.setFormValue({});
-          console.log("After reset:", freeEditRef.value.getFromValue());
+          freeEditRef.value?.setFormValue({
+            cKindNo: "",
+            cProdNo: "",
+            cNmeCn: "",
+            cStatus: "",
+            cAuditStatus: "",
+          });
           handleQuery();
         },
       }),
@@ -206,6 +211,15 @@ const tableconfig = reactive<AppTableConfig>(
         activeText: "启用",
         inactiveText: "禁用",
         inlinePrompt: true,
+        func: async (row) => {
+          const res = await changeStatus({
+            cProdNo: row.cProdNo,
+            cStatus: row.cStatus,
+          });
+          if (res.code == 200) {
+            handleQuery();
+          }
+        },
       },
       {
         prop: "cAuditStatus",
