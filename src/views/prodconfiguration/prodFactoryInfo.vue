@@ -98,7 +98,7 @@ opertaor.setTableConfig([
       },
       relatedInsuranceLiability: {
         pageKey: "relatedInsuranceLiability",
-        pageTtile: "关联险别责任",
+        pageTtile: "关联条款责任",
         pageRef: "relatedInsuranceLiability",
       },
       relatedBusinessRules: {

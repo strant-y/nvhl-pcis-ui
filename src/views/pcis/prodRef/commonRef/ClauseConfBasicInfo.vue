@@ -261,7 +261,7 @@ function handleQuery() {
 }
 function setDisa() {
   formconfig1.fromSchema?.forEach((e) => {
-    if (e.prop === "cCvrgNo" || e.prop === "cKindNo") {
+    if (e.prop === "cTermNo" || e.prop === "cWebsite") {
       e.disabled = true;
     }
   });
@@ -274,6 +274,7 @@ defineExpose({
   getValue,
 });
 onMounted(() => {
+  setDisa();
   if (param.type === "edit") {
     handleQuery();
   } else {

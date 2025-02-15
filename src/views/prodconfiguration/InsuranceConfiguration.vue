@@ -44,7 +44,7 @@ const pageresult = reactive<Pageresult>({
 });
 const formData = ref({
   cKindNo: "",
-  cCvrgNo: "",
+  cTermNo: "",
   cNmeCn: "",
   cRdrTyp: "",
   cStatus: "",
@@ -52,7 +52,7 @@ const formData = ref({
 function resetFields() {
   formData.value = {
     cKindNo: "",
-    cCvrgNo: "",
+    cTermNo: "",
     cNmeCn: "",
     cRdrTyp: "",
     cStatus: "",
@@ -82,7 +82,7 @@ const formconfig = reactive<AppFreeEditConfig>(
           freeEditRef.value.setFormValue({
             cKindNo: "",
             cNmeCn: "",
-            cCvrgNo: "",
+            cTermNo: "",
             cRdrTyp: "",
             cStatus: "",
           });
@@ -101,24 +101,24 @@ const formconfig = reactive<AppFreeEditConfig>(
         clearable: true,
       },
       {
-        prop: "cCvrgNo",
+        prop: "cTermNo",
         inputtype: "rtinput",
         itemWidth: 1,
-        title: "险别代码",
+        title: "条款代码",
         clearable: true,
       },
       {
         prop: "cNmeCn",
         inputtype: "rtinput",
         itemWidth: 1,
-        title: "险别名称",
+        title: "条款名称",
         clearable: true,
       },
       {
         prop: "cRdrTyp",
         inputtype: "rtselect",
-        placeholder: "险别标志",
-        title: "险别标志",
+        placeholder: "条款标志",
+        title: "条款标志",
         typeCode: "WEB_SYS_STA_DICT",
         params: { cParCde: "RdrTyp" },
         clearable: true,
@@ -248,6 +248,13 @@ const tableconfig = reactive<AppTableConfig>(
     ],
   })
 );
+function setDisa() {
+  formconfig.fromSchema?.forEach((e) => {
+    if (e.prop === "cTermNo") {
+      e.disabled = true;
+    }
+  });
+}
 onMounted(() => {});
 
 // 绑定方法

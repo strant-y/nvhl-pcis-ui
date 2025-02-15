@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="dialogVisible"
-    title="关联主条款"
+    title="关联主险"
     width="80%"
     @update:model-value="handleVisibleUpdate"
   >
@@ -31,12 +31,7 @@ import {
 } from "@/shared/app-free-edit-config";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
-import {
-  associationCvrg,
-  associationTerm,
-  getUnbindCvrgRefProd,
-  getUnbindTermRefProd,
-} from "@/api/prod";
+import { associationCvrg, getUnbindCvrgRefProd } from "@/api/prod";
 import {
   AppTableConfig,
   AppTableMethod,
@@ -86,14 +81,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         params: { codeListParam: "" },
       },
       {
-        prop: "cTermNo",
+        prop: "cCCvrgNo",
         inputtype: "rtinput",
-        title: "条款代码",
+        title: "险别代码",
       },
       {
         prop: "cNmeCn",
         inputtype: "rtinput",
-        title: "条款名称",
+        title: "险别名称",
       },
     ],
     fromUi: createFromUiConfig({
@@ -114,17 +109,17 @@ const tableConfig = reactive<AppTableConfig>(
     fromSchema: [
       {
         prop: "cKindNme",
-        title: "大类名称",
+        title: "险类名称",
         inputtype: "rtinput",
       },
       {
-        prop: "cTermNo",
-        title: "条款代码",
+        prop: "cCvrgNo",
+        title: "险别代码",
         inputtype: "rtinput",
       },
       {
         prop: "cNmeCn",
-        title: "条款名称",
+        title: "险别名称",
         inputtype: "rtinput",
       },
     ],
@@ -138,10 +133,10 @@ function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r, {
-    cRdrTyp: "0",
+    CRdrTyp: "0",
     cProdNo: tabref.getFromValue().cProdNo,
   });
-  getUnbindTermRefProd(param)
+  getUnbindCvrgRefProd(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
@@ -168,16 +163,16 @@ const handleConfirm = () => {
     return;
   }
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
-  const param = selectedRows.value.map((item) => item.cTermNo).join(",");
+  const param = selectedRows.value.map((item) => item.cCvrgNo).join(",");
   const newParam = {
     userId: user.opCde,
     cCrtCde: user.opCde,
     cUpdCde: user.opCde,
-    cTermNo: param,
+    cCvrgNo: param,
     cProdNo: tabref.getFromValue().cProdNo,
     cTyp: "0",
   };
-  associationTerm(newParam)
+  associationCvrg(newParam)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
