@@ -42,7 +42,7 @@ const freeEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    title: "关联险别责任",
+    title: "关联条款责任",
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
@@ -135,8 +135,8 @@ const tableconfig = reactive<AppTableConfig>(
     ],
     fromSchema: [
       {
-        prop: "cCvrgNo",
-        title: "险别代码",
+        prop: "cTermNo",
+        title: "条款代码",
         inputtype: "rtinput",
       },
       {

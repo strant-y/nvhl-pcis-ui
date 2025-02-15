@@ -19,7 +19,12 @@ import {
 } from "@/shared/app-free-edit-config";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
-import { qryProdRelCvrgList, unAssociationCvrg } from "@/api/prod";
+import {
+  qryProdRelCvrgList,
+  unAssociationCvrg,
+  qryProdRelTermList,
+  unAssociationTerm,
+} from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useDzModal } from "@/views/dzmodel/DzModalService";
 const dzmodal = useDzModal();
@@ -61,7 +66,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           freeEditRef.value.setFormValue({
             cKindNo: "",
             cNmeCn: "",
-            cCvrgNo: "",
+            cTermNo: "",
+            cKindNme: "",
           });
           handleQuery();
         },
@@ -69,14 +75,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
     fromSchema: [
       {
-        prop: "cKindNo",
+        prop: "cKindNme",
         inputtype: "rtselect",
         title: "业务大类",
         typeCode: "KIND_LIST_CACHE",
         params: { codeListParam: "" },
       },
       {
-        prop: "cCvrgNo",
+        prop: "cTermNo",
         inputtype: "rtinput",
         title: "条款代码",
       },
@@ -101,7 +107,7 @@ const tableconfig = reactive<AppTableConfig>(
     titleBtns: [
       createFreeButtonBase({
         id: "score",
-        label: "关联条款",
+        label: "关联主条款",
         type: "success",
         func: function () {
           if (tabref.getFromValue().cProdNo == null) {
@@ -132,7 +138,7 @@ const tableconfig = reactive<AppTableConfig>(
         tableClick: (row) => {
           const userId = sessionStorage.getItem("user").opCde;
           const delParam = { ...row, cCrtCde: userId, cUpdCde: userId };
-          unAssociationCvrg(delParam)
+          unAssociationTerm(delParam)
             .then((res) => {
               const { code, data, msg } = res;
               if (200 === code) {
@@ -148,12 +154,12 @@ const tableconfig = reactive<AppTableConfig>(
     ],
     fromSchema: [
       {
-        prop: "cKindNo",
+        prop: "cKindNme",
         title: "业务大类",
         inputtype: "rtinput",
       },
       {
-        prop: "cCvrgNo",
+        prop: "cTermNo",
         title: "条款代码",
         inputtype: "rtinput",
       },
@@ -165,6 +171,31 @@ const tableconfig = reactive<AppTableConfig>(
     ],
   })
 );
+
+const handleDelete = (index: number, row: any) => {
+  ElMessageBox.confirm("此操作将永久删除该条款, 是否继续?", "提示", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning",
+  })
+    .then(() => {
+      unAssociationTerm(row)
+        .then((res) => {
+          const { code, data, msg } = res;
+          if (200 === code) {
+            ElMessage.success("删除成功");
+            handleQuery();
+          } else {
+            ElMessage.error(msg);
+          }
+        })
+        .finally(() => {});
+    })
+    .catch(() => {
+      // 取消删除
+    });
+};
+
 function getFromValue() {
   return freeEditRef?.value?.getFromValue();
 }
@@ -204,7 +235,7 @@ function handleQuery(flag?: boolean) {
     const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
     const s = freeEditRef.value?.getFromValue(); //获取表单数据
     const param = Object.assign(s, r, { cProdNo: c, cRdrTyp: "0" });
-    qryProdRelCvrgList(param)
+    qryProdRelTermList(param)
       .then((res) => {
         const { code, data, msg } = res;
         if (200 === code) {

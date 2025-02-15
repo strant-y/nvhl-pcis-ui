@@ -445,6 +445,14 @@ export function getProFactoryList(queryParams: any): AxiosPromise<any> {
     return post(`/proddef/getProdList`, queryParams);
 }
 /**
+ * 产品工厂-产品已关联主条款列表
+ *
+ * @param queryParams
+ */
+export function qryProdRelTermList(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/qryProdRelTermList`, queryParams);
+}
+/**
  * 产品工厂-列表内修改某一行状态
  */
 export function changeStatus(queryParams: any): AxiosPromise<any> {
@@ -485,6 +493,12 @@ export function qryProdRelCvrgList(queryParams: any): AxiosPromise<any> {
  */
 export function associationCvrg(queryParams: any): AxiosPromise<any> {
     return post(`/proddef/associationCvrg`, queryParams);
+}
+export function associationTerm(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/associationTerm`, queryParams);
+}
+export function unAssociationTerm(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/unAssociationTerm`, queryParams);
 }
 /**
  * 产品工厂-关联附加险保存
@@ -952,6 +966,14 @@ export function initMultiCodeList(queryParams: any): AxiosPromise<any> {
  */
 export function getUnbindCvrgRefProd(queryParams: any): AxiosPromise<any> {
     return post(`/proddef/getUnbindCvrgRefProd`, queryParams);
+}
+/**
+ *产品工厂新增-关联主条款-关联主条款弹框列表查询
+ *
+ * @param queryParams
+ */
+export function getUnbindTermRefProd(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/getUnbindTermRefProd`, queryParams);
 }
 /**
  *产品审核-提交审核

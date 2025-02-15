@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="dialogVisible"
-    title="关联主条款"
+    title="关联附加条款"
     width="80%"
     @update:model-value="handleVisibleUpdate"
   >
@@ -13,9 +13,10 @@
       @page-change="handleQuery(false)"
       @selection-change="handleSelectionChange"
     />
+
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="handelCancel">取消</el-button>
+        <el-button @click="handleCancel">取消</el-button>
         <el-button type="primary" @click="handleConfirm">确认</el-button>
       </span>
     </template>
@@ -30,29 +31,29 @@ import {
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
 import { createFreeButtonBase } from "@/shared/button-config";
+const emits = defineEmits(["ok", "cancel"]);
 import { useValidator } from "@/typings/useValidator";
-import {
-  associationCvrg,
-  associationTerm,
-  getUnbindCvrgRefProd,
-  getUnbindTermRefProd,
-} from "@/api/prod";
 import {
   AppTableConfig,
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import { ref, reactive, defineEmits, defineProps } from "vue";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
-const emits = defineEmits(["ok", "cancel"]);
-const opertaor = dataOpertaor();
-const dialogVisible = ref(true);
+import {
+  getCvrgToRelList,
+  associationCvrg,
+  getUnbindCvrgRefProd,
+} from "@/api/prod";
+
 const props = defineProps<{
   data: Object;
-  type: string;
+  type: String;
 }>();
 
-const selectedRows = ref<any[]>([]);
+const dialogVisible = ref(true);
+
+import { dataOpertaor } from "@/store/modules/data-opertaor";
+const opertaor = dataOpertaor();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 const tabref = opertaor.getTableRefByKey("prodInfo");
@@ -68,6 +69,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         label: "查询",
         func: async () => {
           handleQuery();
+          console.log("查询条件:");
         },
       }),
       createFreeButtonBase({
@@ -79,21 +81,19 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
     fromSchema: [
       {
-        prop: "cKindNo",
-        inputtype: "rtselect",
-        title: "业务大类",
-        typeCode: "KIND_LIST_CACHE",
-        params: { codeListParam: "" },
+        prop: "cKindNme",
+        title: "大类名称",
+        inputtype: "rtinput",
       },
       {
-        prop: "cTermNo",
-        inputtype: "rtinput",
+        prop: "cCvrgNo",
         title: "条款代码",
+        inputtype: "rtinput",
       },
       {
         prop: "cNmeCn",
-        inputtype: "rtinput",
         title: "条款名称",
+        inputtype: "rtinput",
       },
     ],
     fromUi: createFromUiConfig({
@@ -118,7 +118,7 @@ const tableConfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
       },
       {
-        prop: "cTermNo",
+        prop: "cCvrgNo",
         title: "条款代码",
         inputtype: "rtinput",
       },
@@ -130,18 +130,19 @@ const tableConfig = reactive<AppTableConfig>(
     ],
   })
 );
+
+const selectedRows = ref<any[]>([]);
 /**
  * 分页查询
  */
 function handleQuery(flag?: boolean) {
-  const tabref = opertaor.getTableRefByKey("prodInfo");
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r, {
-    cRdrTyp: "0",
+    CRdrTyp: "1",
     cProdNo: tabref.getFromValue().cProdNo,
   });
-  getUnbindTermRefProd(param)
+  getUnbindCvrgRefProd(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
@@ -157,27 +158,25 @@ function handleQuery(flag?: boolean) {
 function handleSelectionChange(rows: any[]) {
   selectedRows.value = rows;
 }
-
-const handelCancel = () => {
+const handleCancel = () => {
   dialogVisible.value = false;
 };
-
 const handleConfirm = () => {
-  if (selectedRows.value.length === 0) {
-    ElMessage.warning("请选择至少一项");
+  if (!selectedRows.value.length) {
+    ElMessage.error("请选择要关联的附加条款");
     return;
   }
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
-  const param = selectedRows.value.map((item) => item.cTermNo).join(",");
+  const param = selectedRows.value.map((item) => item.cCvrgNo).join(",");
   const newParam = {
     userId: user.opCde,
     cCrtCde: user.opCde,
     cUpdCde: user.opCde,
-    cTermNo: param,
+    cCvrgNo: param,
     cProdNo: tabref.getFromValue().cProdNo,
-    cTyp: "0",
+    cTyp: "1",
   };
-  associationTerm(newParam)
+  associationCvrg(newParam)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
@@ -193,7 +192,5 @@ const handleConfirm = () => {
 </script>
 
 <style scoped>
-.dialog-footer {
-  text-align: right;
-}
+/* 确保样式与现有组件一致 */
 </style>

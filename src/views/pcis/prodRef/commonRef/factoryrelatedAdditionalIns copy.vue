@@ -35,13 +35,7 @@ const dzmodal = useDzModal();
 const factoryRelatedAdditionalInsModal = defineAsyncComponent(
   () => import("./factoryRelatedAdditionalInsModal.vue")
 );
-import {
-  getCvrgRelList,
-  delCvrgRel,
-  unAssociationCvrg,
-  unAssociationTerm,
-  qryProdRelTermList,
-} from "@/api/prod";
+import { getCvrgRelList, delCvrgRel, unAssociationCvrg } from "@/api/prod";
 // import { setTimeout } from "timers/promises";
 const tabref = opertaor.getTableRefByKey("prodInfo");
 const route = useRoute();
@@ -54,7 +48,7 @@ const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    title: "关联附加条款",
+    title: "关联附加险",
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
@@ -71,7 +65,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         func: () => {
           freeEditRef.value.setFormValue({
             cKindNme: "",
-            cTermNo: "",
+            cCvrgNo: "",
             cNmeCn: "",
           });
           handleQuery();
@@ -82,18 +76,18 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cKindNme",
         inputtype: "rtselect",
-        title: "业务大类",
+        title: "大类代码",
         typeCode: "KIND_LIST_CACHE",
         params: { codeListParam: "" },
       },
       {
-        prop: "cTermNo",
-        title: "条款代码",
+        prop: "cCvrgNo",
+        title: "险别代码",
         inputtype: "rtinput",
       },
       {
         prop: "cNmeCn",
-        title: "条款名称",
+        title: "险别名称",
         inputtype: "rtinput",
       },
     ],
@@ -114,7 +108,7 @@ const tableconfig = reactive<AppTableConfig>(
     titleBtns: [
       createFreeButtonBase({
         id: "score",
-        label: "关联附加条款",
+        label: "关联附加险",
         type: "success",
         func: function () {
           if (tabref.getFromValue().cProdNo == null) {
@@ -165,13 +159,13 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
       },
       {
-        prop: "cTermNo",
-        title: "条款代码",
+        prop: "cCvrgNo",
+        title: "险别代码",
         inputtype: "rtinput",
       },
       {
         prop: "cNmeCn",
-        title: "条款名称",
+        title: "险别名称",
         inputtype: "rtinput",
       },
     ],
@@ -190,7 +184,7 @@ const handleDelete = (index: number, row: any) => {
     type: "warning",
   })
     .then(() => {
-      unAssociationTerm(row)
+      unAssociationCvrg(row)
         .then((res) => {
           const { code, data, msg } = res;
           if (200 === code) {
@@ -201,6 +195,9 @@ const handleDelete = (index: number, row: any) => {
           }
         })
         .finally(() => {});
+    })
+    .catch(() => {
+      // 取消删除
     })
     .catch(() => {
       // 取消删除
@@ -246,7 +243,7 @@ function handleQuery() {
       cProdNo: tabref.getFromValue().cProdNo,
       cRdrTyp: "1",
     });
-    qryProdRelTermList(param)
+    qryProdRelCvrgList(param)
       .then((res) => {
         const { code, data, msg } = res;
         if (200 === code) {
