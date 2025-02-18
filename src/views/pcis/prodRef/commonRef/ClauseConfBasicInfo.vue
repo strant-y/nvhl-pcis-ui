@@ -75,6 +75,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cTermNo",
         inputtype: "rtinput",
         title: "条款代码",
+        disabled: true,
       },
       {
         prop: "cNmeCn",
@@ -211,6 +212,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "官网链接",
         btnWidth: 20,
         itemWidth: 3,
+        disabled: true,
       },
       {
         prop: "cDesc",
@@ -274,7 +276,7 @@ defineExpose({
   getValue,
 });
 onMounted(() => {
-  setDisa();
+  // setDisa();
   if (param.type === "edit") {
     handleQuery();
   } else {

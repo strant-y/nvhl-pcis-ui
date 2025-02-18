@@ -661,10 +661,24 @@ export function qryProdCvrgFeeInfoPage(queryParams: any): AxiosPromise<any> {
     return post(`/plan/qryProdCvrgFeeInfoPage`, queryParams);
 }
 /**
+ * 产品工厂-查询费率表信息
+ *
+ * @param queryParams
+ */
+export function qryProdTermFeeInfoPage(queryParams: any): AxiosPromise<any> {
+    return post(`/plan/qryProdTermFeeInfoPage`, queryParams);
+}
+/**
  * 产品工厂-删除费率表信息
  */
 export function delProdPlanCvrgFeeInfoById(queryParams: any): AxiosPromise<any> {
     return post(`/plan/delProdPlanCvrgFeeInfoById`, queryParams);
+}
+/**
+ * 产品工厂-删除费率表信息
+ */
+export function deleteFeeRateByProdNo(queryParams: any): AxiosPromise<any> {
+    return post(`/plan/deleteFeeRateByProdNo`, queryParams);
 }
 
 /**

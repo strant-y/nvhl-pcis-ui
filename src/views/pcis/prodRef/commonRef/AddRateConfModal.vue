@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="dialogVisible"
-    title="添加产品方案险别费率信息"
+    title="添加产品方案条款费率信息"
     width="80%"
     @update:model-value="handleVisibleUpdate"
   >
@@ -54,10 +54,10 @@ const formconfig = reactive<AppFreeEditConfig>(
         params: { cProdNo: tabref.getFromValue().cProdNo },
       },
       {
-        prop: "cCvrgNo",
+        prop: "cTermNo",
         inputtype: "rtselect",
-        title: "险别代码",
-        rules: [getRules("required", { change: "险别代码不能为空" })],
+        title: "条款代码",
+        rules: [getRules("required", { change: "条款代码不能为空" })],
         typeCode: "Cvrg_LIST",
         params: { cProdNo: tabref.getFromValue().cProdNo },
       },
