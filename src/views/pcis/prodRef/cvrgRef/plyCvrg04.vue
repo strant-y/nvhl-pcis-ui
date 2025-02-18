@@ -56,7 +56,7 @@ const method = {
           formData.value.push({
             termNme: "条款名",
             riskNo: "040001",
-            termNo: "040001",
+            termNo: "00623000031",
             'cvrg.termCde':"001524",
             cvrgType: "1",
             rigeNme: "责任名",

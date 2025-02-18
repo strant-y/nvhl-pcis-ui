@@ -270,7 +270,7 @@ function saveTitleFactor(){
     saveTRFactorList({
         colInfo:colList.value,
         riskNo:props.data.riskObj.cRiskNo,
-        termNo:props.data.termObj.cCvrgNo
+        termNo:props.data.termObj.cTermNo
     }).then((res) => {
         const { code, data, msg } = res;
         if (200 === code) {
@@ -284,7 +284,7 @@ onMounted(() => {
   const param = {
     componentTab: "cvrg",
     riskNo:props.data.riskObj.cRiskNo,
-    termNo:props.data.termObj.cCvrgNo
+    termNo:props.data.termObj.cTermNo,
   };
   getTRFactorList(param).then((res) => {
     const { code, data, msg } = res;

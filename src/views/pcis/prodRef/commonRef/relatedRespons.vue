@@ -175,12 +175,12 @@ const tableconfig = reactive<AppTableConfig>(
         link: true,
         tableClick: (row) => {
           const opertaor = dataOpertaor();
-          const inruranceTypeBasicInfo = opertaor.getTableRefByKey('inruranceTypeBasicInfo');
-          console.log(inruranceTypeBasicInfo.getFromValue());
+          const clauseConfBasicInfo = opertaor.getTableRefByKey('clauseConfBasicInfo');
+          console.log(clauseConfBasicInfo.getFromValue());
           dialog.value?.open(
             "riskFactorConfig",
             {
-              termObj:inruranceTypeBasicInfo.getFromValue(),
+              termObj:clauseConfBasicInfo.getFromValue(),
               riskObj:row
             },
             {},
