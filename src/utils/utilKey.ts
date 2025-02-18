@@ -161,6 +161,20 @@ const size = [
     value: "small",
   },
 ];
+const showtype = [
+  {
+    label: "合并整列",
+    value: "rowspan",
+  },
+  {
+    label: "显示要素名",
+    value: "text",
+  },
+  {
+    label: "显示组件",
+    value: "prop",
+  },
+  ]
 const inputtype = [
   {
     label: "input",
@@ -238,4 +252,5 @@ export {
   freeCol,
   dateType,
   position,
+  showtype,
 };

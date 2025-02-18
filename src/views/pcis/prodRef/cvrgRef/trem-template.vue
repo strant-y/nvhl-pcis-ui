@@ -30,14 +30,6 @@
 
       <div v-if="showData">
         <template v-if="showRiskInfo">
-          <!-- <div>
-            <a style="margin-right: 5px" @click="foldRiskInfo = !foldRiskInfo">
-              <el-icon v-if="!foldRiskInfo"><ArrowUpBold /></el-icon>
-              <el-icon v-if="foldRiskInfo"><ArrowDownBold /></el-icon>
-            </a>
-            <span> 责任限额信息 </span>
-          </div>
-           -->
           <div v-if="foldRiskInfo">
             <table style="width: 100%">
               <thead>
@@ -66,22 +58,21 @@
                     :key="jndex"
                   >
                     <td
-                      v-if="j?.factorList[i]"
+                      v-if="j?.factorlist[i]"
                       :rowspan="
-                        j?.factorList[i]?.type === 'rowspan'
+                        j?.factorlist[i]?.type === 'rowspan'
                           ? tempConfig?.factorConfig?.rowNum
                           : null
                       "
                     >
-                      <!-- {{ j.factorList[i] }} -->
-                      <template v-if="j?.factorList[i]?.type === 'text'">
-                        <span>{{ j.factorList[i].factoritem.text }} </span>
+                      <template v-if="j?.factorlist[i]?.type === 'text'">
+                        <span>{{ j.factorlist[i].factoritem.text }} </span>
                       </template>
                       <template v-else>
                         <from-item
-                          v-if="!!j.factorList[i]"
-                          v-model="props.formData[j.factorList[i].factorKey]"
-                          :item="j.factorList[i].factoritem"
+                          v-if="!!j.factorlist[i]"
+                          v-model="props.formData[j.factorlist[i].factorKey]"
+                          :item="j.factorlist[i].factoritem"
                         />
                       </template>
                     </td>
@@ -91,60 +82,14 @@
             </table>
           </div>
         </template>
-        <!-- <template v-if="showDisclaimer">
-          <div>
-            <a
-              style="margin-right: 5px"
-              @click="foldDisclaimer = !foldDisclaimer"
-            >
-              <el-icon v-if="!foldDisclaimer"><ArrowUpBold /></el-icon>
-              <el-icon v-if="foldDisclaimer"><ArrowDownBold /></el-icon>
-            </a>
-            <span> 免赔信息 </span>
-          </div>
-          <div v-if="foldDisclaimer">
-            <table style="width: 100%">
-              <thead>
-                <tr class="table-title">
-                  <th>责任</th>
-                  <th>免赔方式</th>
-                  <th>免赔类型</th>
-                  <th>免赔额/免赔率</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(i, index) in fromDisclaimerSchema" :key="index">
-                  <td
-                    width="150"
-                    :rowspan="fromDisclaimerSchema.length"
-                    v-if="index === 0"
-                  >
-                    <el-tag type="warning">{{ formData.rigeNme }}</el-tag>
-                  </td>
-                  <td :rowspan="fromDisclaimerSchema.length" v-if="index === 0">
-                    <rtselect
-                    v-model="disclaimer"
-                      :item="{
-                        loadData: [
-                          { value: '1', label: '绝对' },
-                          { value: '2', label: '部分' },
-                        ],
-                      }"
-                    />
-                  </td>
-                  <td>{{ i.label }}</td>
-                  <td><rtnumber :item="{ suffix: i.append }" /></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </template> -->
       </div>
     </el-card>
   </div>
 </template>
 
 <script setup lang="ts">
+import { getTRFactorJson } from "@/api/prod";
+
 const props = defineProps({
   formData: {
     type: Object,
@@ -156,45 +101,22 @@ const tempConfig = ref({});
 const showData = ref(true);
 const showRiskInfo = ref(true);
 const foldRiskInfo = ref(true);
-const showDisclaimer = ref(true);
-const foldDisclaimer = ref(true);
-
-const fromRiskSchema = ref([
-  {
-    label: "累计紧急运输费用责任限额",
-    isEx: "1",
-    prop: "rigeNme",
-    append: "元",
-  },
-  {
-    label: "每次事故赔偿限额",
-    isEx: "0",
-    prop: "rigeNmf",
-    append: "元",
-  },
-]);
-
-const disclaimer = ref("1");
-const fromDisclaimerSchema = ref([
-  {
-    label: "每次事故医疗基用免赔额",
-    isEx: "1",
-    prop: "rigeNme",
-    append: "元",
-  },
-  {
-    label: "每次事鼓医疗费用免赔率",
-    isEx: "0",
-    prop: "rigeNmf",
-    append: "%",
-  },
-]);
 
 onMounted(async () => {
-  console.log(props.formData);
-  const param = await fetch("/param/plancvrg.json");
-  const str = await param.text();
-  tempConfig.value = JSON.parse(str);
+  const param = {
+    riskNo: props.formData.riskNo,
+    termNo: props.formData.termNo,
+  };
+  getTRFactorJson(param).then((res) => {
+    const { code, data, msg } = res;
+    if (200 === code) {
+      console.log(data.data);
+      tempConfig.value = data.data;
+    } else {
+      ElMessage.error(msg);
+    }
+  });
+  // tempConfig.value = JSON.parse(str);
   console.log(tempConfig);
 });
 </script>

@@ -7,6 +7,7 @@
       ref="tableRef"
       @page-change="handleQuery(false)"
     />
+    <comDialog ref="dialog"></comDialog>
   </div>
 </template>
 
@@ -21,6 +22,7 @@ import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { saveProdInfo } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+const dialog = ref<DialogMethod | null>(null);
 const opertaor = dataOpertaor();
 import {
   AppTableConfig,
@@ -29,7 +31,6 @@ import {
 } from "@/shared/app-table-config";
 import { ref, reactive, onMounted } from "vue";
 import {
-  query,
   getCvrgRiskRelList,
   saveCvrgRiskRel,
   delRiskRel,
@@ -46,6 +47,7 @@ const ResponsibilityModal = defineAsyncComponent(
 );
 
 import { useRoute } from "vue-router";
+import { DialogMethod } from "@/views/dzmodel/ComDialogConf";
 const route = useRoute();
 const query = ref(route.query);
 const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
@@ -163,6 +165,27 @@ const tableconfig = reactive<AppTableConfig>(
             .finally(() => {});
         },
       }),
+      createFreeButtonBase({
+        id: "score",
+        type: "success",
+        tooltip: "要素绑定",
+        icon: "SetUp",
+        link: true,
+        tableClick: (row) => {
+          const opertaor = dataOpertaor();
+          const inruranceTypeBasicInfo = opertaor.getTableRefByKey('inruranceTypeBasicInfo');
+          console.log(inruranceTypeBasicInfo.getFromValue());
+          dialog.value?.open(
+            "riskFactorConfig",
+            {
+              termObj:inruranceTypeBasicInfo.getFromValue(),
+              riskObj:row
+            },
+            {},
+            { title: "责任要素绑定", width: "95" }
+           );
+        },
+      }),
     ],
     fromSchema: [
       {
@@ -222,17 +245,23 @@ function handleQuery(flag?: boolean) {
     const param = Object.assign(s, r, {
       cCvrgNo: tabref.getFromValue().cCvrgNo,
     });
-    getCvrgRiskRelList(param)
-      .then((res) => {
-        const { code, data, msg } = res;
-        if (200 === code) {
-          pageresult.list = data.result;
-          pageresult.total = data.total;
-        } else {
-          ElMessage.error(msg);
-        }
-      })
-      .finally(() => {});
+    pageresult.list = [{
+      cRiskNo:'040001',
+      cNmeCn:'测试责任',
+      cNmeEn:'test',
+    }];
+    pageresult.total = 1;
+    // getCvrgRiskRelList(param)
+    //   .then((res) => {
+    //     const { code, data, msg } = res;
+    //     if (200 === code) {
+    //       pageresult.list = data.result;
+    //       pageresult.total = data.total;
+    //     } else {
+    //       ElMessage.error(msg);
+    //     }
+    //   })
+    //   .finally(() => {});
   }
 }
 onMounted(() => {

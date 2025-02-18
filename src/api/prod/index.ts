@@ -1,6 +1,7 @@
 import {AxiosPromise} from "axios";
 import {post} from "@/utils/http";
 import {del} from "@/utils/http";
+import { LocalBaseApi } from "../config";
 
 /**
  * 获取要素列表
@@ -288,6 +289,34 @@ export function savePrdFixSpecInfo(queryParams: any): AxiosPromise<any> {
 export function getCvrgList(queryParams: any): AxiosPromise<any> {
     return post(`/cvrgdef/getCvrgList`, queryParams);
 }
+
+/**
+ * 条款配置信息获取信息
+ *
+ * @param queryParams
+ */
+export function getTRFactorJson(queryParams: any): AxiosPromise<any> {
+    return post(`/cvrgdef/getTRFactorJson`, queryParams);
+}
+
+/**
+ * 条款配置信息获取
+ *
+ * @param queryParams
+ */
+export function getTRFactorList(queryParams: any): AxiosPromise<any> {
+    return post(`/cvrgdef/getTRFactorList`, queryParams);
+}
+
+/**
+ * 保存条则要素关系信息
+ *
+ * @param queryParams
+ */
+export function saveTRFactorList(queryParams: any): AxiosPromise<any> {
+    return post(`/cvrgdef/saveTRFactorList`, queryParams);
+}
+
 
 /**
  * 编辑保存特约配置信息

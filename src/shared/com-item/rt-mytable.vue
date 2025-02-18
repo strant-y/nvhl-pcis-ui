@@ -281,6 +281,8 @@ import { VueDraggable } from "vue-draggable-plus";
 import { AppTableConfig } from "../app-table-config";
 import { AppGridEditConfig } from "../app-grid-edit-config";
 
+const emits = defineEmits(["indexupdate"]); // 告知父类,组件顺序变更
+
 const appgrideditConfig = reactive<AppGridEditConfig>({
   editFlag: false, //是否可以编辑
 });
@@ -334,6 +336,7 @@ function getformRef() {
 const codeListMap = ref<Record<string, any>>({});
 
 function updateOptionAll(e: any) {
+  emits("indexupdate", null);
   setTimeout(() => {
     Object.keys(codeListMap.value).forEach((key) => {
       Object.keys(codeListMap.value[key]).forEach((propKey) => {

@@ -695,6 +695,7 @@ const schemaMap = reactive<Record<string, any>>({
           dzmodal
             .open(jsonArrayEdit, {
               data: ck,
+              inititle: ["label", "value", "color"],
             })
             .then((res) => {
               if (res.type === "ok") {

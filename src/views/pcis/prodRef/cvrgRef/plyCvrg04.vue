@@ -55,7 +55,9 @@ const method = {
         isOk: () => {
           formData.value.push({
             termNme: "条款名",
-            termCde: "001524",
+            riskNo: "040001",
+            termNo: "040001",
+            'cvrg.termCde':"001524",
             cvrgType: "1",
             rigeNme: "责任名",
           });
@@ -63,12 +65,6 @@ const method = {
       },
       { title: "添加条款", width: 70 }
     );
-    // formData.value.push({
-    //   termNme: "条款名",
-    //   termCde: "001524",
-    //   cvrgType: "1",
-    //   rigeNme: "责任名",
-    // });
   },
 };
 

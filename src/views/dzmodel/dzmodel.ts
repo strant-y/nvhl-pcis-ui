@@ -6,15 +6,20 @@ import componentCompare from "./prodconfig/componentCompare.vue";
 import prodCopy from "./prodconfig/prodCopy.vue";
 import componentPageView from "./prodconfig/componentPageView.vue";
 import addtremView from "./prodconfig/addtremView.vue";
+import riskFactorConfig from "./insuranceConInfo/riskFactorConfig.vue";
 
-/**用于动态组件的映射生成 */
+/**用于动态弹窗组件的映射生成 */
 const componentMap = {
     comDialog:ComDialog,
     componentView:componentView,
     componentCompare:componentCompare,
     prodCopy:prodCopy,
     componentPageView:componentPageView,
-	addtremView:addtremView
+	
+  
+    addtremView:addtremView,
+    riskFactorConfig:riskFactorConfig,
+
 
 };
 
