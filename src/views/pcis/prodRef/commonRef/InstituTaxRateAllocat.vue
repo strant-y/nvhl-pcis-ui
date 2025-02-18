@@ -69,7 +69,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         icon: "RefreshRight",
         func: () => {
           freeEditRef.value.setFormValue({
-            cCvrgNo: "",
+            cTermNo: "",
             cDptCde: "",
           });
           handleQuery();
@@ -78,9 +78,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
     fromSchema: [
       {
-        prop: "cCvrgNo",
+        prop: "cTermNo",
         inputtype: "rtinput",
-        title: "险别代码",
+        title: "条款代码",
       },
       {
         prop: "cDptCde",
@@ -202,8 +202,8 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
       },
       {
-        prop: "cCvrgNo",
-        title: "险别代码及名称",
+        prop: "cTermNo",
+        title: "条款代码及名称",
         inputtype: "rtinput",
       },
       {
