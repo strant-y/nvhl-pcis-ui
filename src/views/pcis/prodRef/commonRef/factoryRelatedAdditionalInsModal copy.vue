@@ -1,5 +1,10 @@
 <template>
-  <el-dialog v-model="dialogVisible" title="关联附加条款" width="80%">
+  <el-dialog
+    v-model="dialogVisible"
+    title="关联附加条款"
+    width="80%"
+    @update:model-value="handleVisibleUpdate"
+  >
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
     <app-table
       :tableConfig="tableConfig"
@@ -26,6 +31,7 @@ import {
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
 import { createFreeButtonBase } from "@/shared/button-config";
+const emits = defineEmits(["ok", "cancel"]);
 import { useValidator } from "@/typings/useValidator";
 import {
   AppTableConfig,
@@ -33,11 +39,15 @@ import {
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import { ref, reactive, defineEmits, defineProps } from "vue";
-const emits = defineEmits(["ok", "cancel"]);
-import { getCvrgToRelList, saveCvrgRel, queryTermToRelList } from "@/api/prod";
+import {
+  getCvrgToRelList,
+  associationCvrg,
+  getUnbindCvrgRefProd,
+} from "@/api/prod";
 
 const props = defineProps<{
-  visible: boolean;
+  data: Object;
+  type: String;
 }>();
 
 const dialogVisible = ref(true);
@@ -46,7 +56,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
-const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
+const tabref = opertaor.getTableRefByKey("prodInfo");
 const { getRules } = useValidator();
 
 const formconfig1 = reactive<AppFreeEditConfig>(
@@ -59,6 +69,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         label: "查询",
         func: async () => {
           handleQuery();
+          console.log("查询条件:");
         },
       }),
       createFreeButtonBase({
@@ -70,21 +81,19 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
     fromSchema: [
       {
-        prop: "cKindNo",
-        inputtype: "rtselect",
-        title: "大类代码",
-        typeCode: "KIND_LIST_ALL",
-        params: { cStatus: "1" },
+        prop: "cKindNme",
+        title: "大类名称",
+        inputtype: "rtinput",
       },
       {
-        prop: "cTermNo",
-        inputtype: "rtinput",
+        prop: "cCvrgNo",
         title: "条款代码",
+        inputtype: "rtinput",
       },
       {
         prop: "cNmeCn",
+        title: "条款名称",
         inputtype: "rtinput",
-        title: "中文名称",
       },
     ],
     fromUi: createFromUiConfig({
@@ -104,18 +113,18 @@ const tableConfig = reactive<AppTableConfig>(
     showSelection: true,
     fromSchema: [
       {
-        prop: "cKindNo",
-        title: "大类代码",
+        prop: "cKindNme",
+        title: "大类名称",
         inputtype: "rtinput",
       },
       {
-        prop: "cTermNo",
+        prop: "cCvrgNo",
         title: "条款代码",
         inputtype: "rtinput",
       },
       {
         prop: "cNmeCn",
-        title: "中文名称",
+        title: "条款名称",
         inputtype: "rtinput",
       },
     ],
@@ -129,11 +138,11 @@ const selectedRows = ref<any[]>([]);
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  s.cTermNo = tabref.getFromValue().cTermNo;
   const param = Object.assign(s, r, {
-    cRdrTyp: "1",
+    CRdrTyp: "1",
+    cProdNo: tabref.getFromValue().cProdNo,
   });
-  queryTermToRelList(param)
+  getUnbindCvrgRefProd(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
@@ -152,28 +161,22 @@ function handleSelectionChange(rows: any[]) {
 const handleCancel = () => {
   dialogVisible.value = false;
 };
-onMounted(() => {
-  setTimeout(() => {
-    handleQuery();
-  }, 100);
-});
 const handleConfirm = () => {
   if (!selectedRows.value.length) {
-    ElMessage.error("请选择要关联的附加险");
+    ElMessage.error("请选择要关联的附加条款");
     return;
   }
-  const opCde = JSON.parse(sessionStorage.getItem("user")).opCde;
-  const cTermNo = tabref.getFromValue().cTermNo;
-  const newArr = selectedRows.value.map((item) => {
-    item.cCrtCde = opCde;
-    item.cUpdCde = opCde;
-    item.cCvrgRdrCde = item.cTermNo;
-    item.cTermNo = cTermNo;
-    item.cRdrTyp = "1";
-    return item;
-  });
-  const paramData = { cTermNo: cTermNo, rel: newArr };
-  saveCvrgRel(paramData)
+  const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+  const param = selectedRows.value.map((item) => item.cCvrgNo).join(",");
+  const newParam = {
+    userId: user.opCde,
+    cCrtCde: user.opCde,
+    cUpdCde: user.opCde,
+    cCvrgNo: param,
+    cProdNo: tabref.getFromValue().cProdNo,
+    cTyp: "1",
+  };
+  associationCvrg(newParam)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {

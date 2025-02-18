@@ -23,6 +23,7 @@ import {
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
 import { ref, reactive } from "vue";
+import dayjs from "dayjs";
 const emeit = defineEmits(["ok", "cancel"]);
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
@@ -101,6 +102,14 @@ onMounted(async () => {
   if (props.type === "edit" && props.data) {
     setTimeout(() => {
       freeEditRef.value?.setFormValue(props.data);
+    }, 50);
+  } else {
+    setTimeout(() => {
+      freeEditRef.value?.setFormValue({
+        cVersionNum: "v1",
+        tStrTm: dayjs().format("YYYY-MM-DD"),
+        tEndTm: dayjs().add(1, "year").format("YYYY-MM-DD"),
+      });
     }, 50);
   }
 });

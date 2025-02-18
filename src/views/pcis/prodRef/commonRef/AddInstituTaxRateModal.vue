@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="dialogVisible"
-    title="添加险别机构税率信息"
+    title="添加条款机构税率信息"
     width="80%"
     @update:model-value="handleVisibleUpdate"
   >
@@ -22,10 +22,10 @@ import {
   createAppFreeEditConfig,
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
-import {reactive, ref} from "vue";
-import {useValidator} from "@/typings/useValidator";
-import {saveProdTaxRateInfo} from "@/api/prod";
-import {dataOpertaor} from "@/store/modules/data-opertaor";
+import { reactive, ref } from "vue";
+import { useValidator } from "@/typings/useValidator";
+import { saveProdTaxRateInfo } from "@/api/prod";
+import { dataOpertaor } from "@/store/modules/data-opertaor";
 
 const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
@@ -41,14 +41,14 @@ const freeEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    title: "险别机构税率配置信息",
+    title: "条款机构税率配置信息",
     endBtnsPosition: "right",
     fromSchema: [
       {
         prop: "cCvrgNo",
         inputtype: "rtselect",
-        title: "险别代码及名称",
-        rules: [getRules("required", { change: "险别代码及名称不能为空" })],
+        title: "条款代码及名称",
+        rules: [getRules("required", { change: "条款代码及名称不能为空" })],
         typeCode: "Cvrg_LIST",
         params: { cProdNo: tabref.getFromValue().cProdNo },
         // loadData: [

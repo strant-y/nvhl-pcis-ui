@@ -78,12 +78,12 @@ opertaor.setTableConfig([
       },
       relatedMainInsurance: {
         pageKey: "relatedMainInsurance",
-        pageTtile: "关联主险",
+        pageTtile: "关联主条款",
         pageRef: "relatedMainInsurance",
       },
       factoryrelatedAdditionalIns: {
         pageKey: "factoryrelatedAdditionalIns",
-        pageTtile: "关联附加险",
+        pageTtile: "关联附加条款",
         pageRef: "factoryrelatedAdditionalIns",
       },
       specialAgreement: {
@@ -98,7 +98,7 @@ opertaor.setTableConfig([
       },
       relatedInsuranceLiability: {
         pageKey: "relatedInsuranceLiability",
-        pageTtile: "关联险别责任",
+        pageTtile: "关联条款责任",
         pageRef: "relatedInsuranceLiability",
       },
       relatedBusinessRules: {

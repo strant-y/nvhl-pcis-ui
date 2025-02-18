@@ -98,7 +98,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         rules: [getRules("required", { change: "投保报废计算规则不能为空" })],
         loadData: [
           { value: "0", label: "手工录入保费" },
-          { value: "1", label: "调用规则计算保费" },
+          { value: "1", label: "通用规则计算保费" },
           { value: "2", label: "通过JS管控计算保费" },
         ],
       },
@@ -109,7 +109,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         rules: [getRules("required", { change: "批改保费计算规则不能为空" })],
         loadData: [
           { value: "0", label: "手工录入保费" },
-          { value: "1", label: "调用规则计算保费" },
+          { value: "1", label: "通用规则计算保费" },
           { value: "2", label: "通过JS管控计算保费" },
         ],
       },
@@ -162,6 +162,13 @@ onMounted(async () => {
   if (props.type === "edit" && props.data) {
     setTimeout(() => {
       freeEditRef.value?.setFormValue(props.data);
+    }, 50);
+  } else {
+    setTimeout(() => {
+      freeEditRef.value?.setFormValue({
+        cPlyPrmcalFlg: "1",
+        cEdrPrmcalFlg: "1",
+      });
     }, 50);
   }
 });

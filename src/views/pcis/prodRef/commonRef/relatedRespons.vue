@@ -34,11 +34,13 @@ import {
   getCvrgRiskRelList,
   saveCvrgRiskRel,
   delRiskRel,
+  deleteTermRiskRel,
+  queryTermRiskRelList,
 } from "@/api/prod";
 
 import { useDzModal } from "@/views/dzmodel/DzModalService";
 const dzmodal = useDzModal();
-const tabref = opertaor.getTableRefByKey("inruranceTypeBasicInfo");
+const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
 const AddResponsibilityModal = defineAsyncComponent(
   () => import("./AddResponsibilityModal.vue")
 );
@@ -103,7 +105,7 @@ const tableconfig = reactive<AppTableConfig>(
         label: "关联责任",
         type: "success",
         func: function () {
-          if (tabref.getFromValue().cCvrgNo == null) {
+          if (tabref.getFromValue().cTermNo == null) {
             ElMessage.error("请完善基本信息!");
             return;
           } else {
@@ -122,7 +124,7 @@ const tableconfig = reactive<AppTableConfig>(
         label: "增加责任",
         type: "success",
         func: function () {
-          if (tabref.getFromValue().cCvrgNo == null) {
+          if (tabref.getFromValue().cTermNo == null) {
             ElMessage.error("请完善基本信息!");
             return;
           } else {
@@ -150,9 +152,9 @@ const tableconfig = reactive<AppTableConfig>(
         tableClick: (row) => {
           // const param = Object.assign(cvrgNo: tabref.getFromValue().cCvrgNo, row)
           const params = Object.assign(row, {
-            cCvrgNo: tabref.getFromValue().cCvrgNo,
+            cTermNo: tabref.getFromValue().cTermNo,
           });
-          delRiskRel(params)
+          deleteTermRiskRel(params)
             .then((res) => {
               const { code, data, msg } = res;
               if (200 === code) {
@@ -235,33 +237,27 @@ function setDisa() {
 }
 /** 查询 */
 function handleQuery(flag?: boolean) {
-  const tabref = opertaor.getTableRefByKey("inruranceTypeBasicInfo");
-  if (tabref.getFromValue().cCvrgNo == null) {
+  const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
+  if (tabref.getFromValue().cTermNo == null) {
     ElMessage.error("请完善基本信息!");
     return;
   } else {
-    const r = tableRef.value?.getPartnerPage(); //获取分页数据
+    const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
     const s = freeEditRef.value?.getFromValue(); //获取表单数据
     const param = Object.assign(s, r, {
-      cCvrgNo: tabref.getFromValue().cCvrgNo,
+      cTermNo: tabref.getFromValue().cTermNo,
     });
-    pageresult.list = [{
-      cRiskNo:'040001',
-      cNmeCn:'测试责任',
-      cNmeEn:'test',
-    }];
-    pageresult.total = 1;
-    // getCvrgRiskRelList(param)
-    //   .then((res) => {
-    //     const { code, data, msg } = res;
-    //     if (200 === code) {
-    //       pageresult.list = data.result;
-    //       pageresult.total = data.total;
-    //     } else {
-    //       ElMessage.error(msg);
-    //     }
-    //   })
-    //   .finally(() => {});
+    queryTermRiskRelList(param)
+      .then((res) => {
+        const { code, data, msg } = res;
+        if (200 === code) {
+          pageresult.list = data.result;
+          pageresult.total = data.total;
+        } else {
+          ElMessage.error(msg);
+        }
+      })
+      .finally(() => {});
   }
 }
 onMounted(() => {

@@ -19,11 +19,6 @@ import {
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
-import {
-  saveProdInfo,
-  qryProdCvrgFeeInfoPage,
-  deleteCvrgFeeByProdNo,
-} from "@/api/prod";
 import { useDzModal } from "@/views/dzmodel/DzModalService";
 
 const dzmodal = useDzModal();
@@ -42,10 +37,15 @@ import {
 } from "@/shared/app-table-config";
 import { ref, reactive, onMounted } from "vue";
 import {
+  saveProdInfo,
+  qryProdCvrgFeeInfoPage,
+  deleteCvrgFeeByProdNo,
+  qryProdTermFeeInfoPage,
   query,
   getRiskList,
   saveCvrgRiskRel,
   delProdPlanCvrgFeeInfoById,
+  deleteFeeRateByProdNo,
 } from "@/api/prod";
 
 import { useRoute } from "vue-router";
@@ -71,14 +71,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         icon: "RefreshRight",
-        func: () => {},
+        func: () => {
+          freeEditRef.value.setFormValue({
+            cTermNo: "",
+            cPlanNo: "",
+          });
+          handleQuery();
+        },
       }),
     ],
     fromSchema: [
       {
-        prop: "cvrgNo",
+        prop: "cTermNo",
         inputtype: "rtinput",
-        title: "险别代码",
+        title: "条款代码",
       },
       {
         prop: "cPlanNo",
@@ -136,7 +142,7 @@ const tableconfig = reactive<AppTableConfig>(
         label: "全量删除",
         type: "success",
         func: function () {
-          deleteCvrgFeeByProdNo({ cProdNo: tabref.getFromValue().cProdNo })
+          deleteFeeRateByProdNo({ cProdNo: tabref.getFromValue().cProdNo })
             .then((res) => {
               const { code, data, msg } = res;
               if (200 === code) {
@@ -215,8 +221,8 @@ const tableconfig = reactive<AppTableConfig>(
         width: 120,
       },
       {
-        prop: "cvrgNo",
-        title: "险别代码",
+        prop: "cTermNo",
+        title: "条款代码",
         inputtype: "rtinput",
         width: 120,
       },
@@ -338,7 +344,7 @@ function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r, { cProdNo: tabref.getFromValue().cProdNo });
-  qryProdCvrgFeeInfoPage(param)
+  qryProdTermFeeInfoPage(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {

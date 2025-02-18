@@ -122,12 +122,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           icon: "Search",
           type: "primary",
           func: () => {
-            // const ck = freeEditRef.value?.getValue("componentGroup");
             dzmodal
               .open(departmentTree, { type: "Issuer", data: {} })
               .then((res) => {
                 if (res.type === "ok") {
-                  // freeEditRef.value?.setValue("componentGroup", res.body);
                 }
               });
           },

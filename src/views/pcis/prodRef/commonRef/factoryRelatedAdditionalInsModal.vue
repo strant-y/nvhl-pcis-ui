@@ -42,7 +42,9 @@ import { ref, reactive, defineEmits, defineProps } from "vue";
 import {
   getCvrgToRelList,
   associationCvrg,
+  associationTerm,
   getUnbindCvrgRefProd,
+  getUnbindTermRefProd,
 } from "@/api/prod";
 
 const props = defineProps<{
@@ -82,17 +84,17 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     fromSchema: [
       {
         prop: "cKindNme",
-        title: "险类名称",
+        title: "大类名称",
         inputtype: "rtinput",
       },
       {
-        prop: "cCvrgNo",
-        title: "险别代码",
+        prop: "cTermNo",
+        title: "条款代码",
         inputtype: "rtinput",
       },
       {
         prop: "cNmeCn",
-        title: "险别名称",
+        title: "条款名称",
         inputtype: "rtinput",
       },
     ],
@@ -114,17 +116,17 @@ const tableConfig = reactive<AppTableConfig>(
     fromSchema: [
       {
         prop: "cKindNme",
-        title: "险类名称",
+        title: "大类名称",
         inputtype: "rtinput",
       },
       {
-        prop: "cCvrgNo",
-        title: "险别代码",
+        prop: "cTermNo",
+        title: "条款代码",
         inputtype: "rtinput",
       },
       {
         prop: "cNmeCn",
-        title: "险别名称",
+        title: "条款名称",
         inputtype: "rtinput",
       },
     ],
@@ -139,10 +141,10 @@ function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r, {
-    CRdrTyp: "1",
+    cRdrTyp: "1",
     cProdNo: tabref.getFromValue().cProdNo,
   });
-  getUnbindCvrgRefProd(param)
+  getUnbindTermRefProd(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
@@ -167,16 +169,16 @@ const handleConfirm = () => {
     return;
   }
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
-  const param = selectedRows.value.map((item) => item.cCvrgNo).join(",");
+  const param = selectedRows.value.map((item) => item.cTermNo).join(",");
   const newParam = {
     userId: user.opCde,
     cCrtCde: user.opCde,
     cUpdCde: user.opCde,
-    cCvrgNo: param,
+    cTermNo: param,
     cProdNo: tabref.getFromValue().cProdNo,
     cTyp: "1",
   };
-  associationCvrg(newParam)
+  associationTerm(newParam)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {

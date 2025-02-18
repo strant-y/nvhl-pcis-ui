@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="dialogVisible"
-    title="关联主险"
+    title="关联主条款"
     width="80%"
     @update:model-value="handleVisibleUpdate"
   >
@@ -31,7 +31,12 @@ import {
 } from "@/shared/app-free-edit-config";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
-import { associationCvrg, getUnbindCvrgRefProd } from "@/api/prod";
+import {
+  associationCvrg,
+  associationTerm,
+  getUnbindCvrgRefProd,
+  getUnbindTermRefProd,
+} from "@/api/prod";
 import {
   AppTableConfig,
   AppTableMethod,
@@ -81,14 +86,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         params: { codeListParam: "" },
       },
       {
-        prop: "cCCvrgNo",
+        prop: "cTermNo",
         inputtype: "rtinput",
-        title: "险别代码",
+        title: "条款代码",
+        disabled: true,
+        // readonly: true,
       },
       {
         prop: "cNmeCn",
         inputtype: "rtinput",
-        title: "险别名称",
+        title: "条款名称",
       },
     ],
     fromUi: createFromUiConfig({
@@ -109,17 +116,17 @@ const tableConfig = reactive<AppTableConfig>(
     fromSchema: [
       {
         prop: "cKindNme",
-        title: "险类名称",
+        title: "大类名称",
         inputtype: "rtinput",
       },
       {
-        prop: "cCvrgNo",
-        title: "险别代码",
+        prop: "cTermNo",
+        title: "条款代码",
         inputtype: "rtinput",
       },
       {
         prop: "cNmeCn",
-        title: "险别名称",
+        title: "条款名称",
         inputtype: "rtinput",
       },
     ],
@@ -133,10 +140,10 @@ function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r, {
-    CRdrTyp: "0",
+    cRdrTyp: "0",
     cProdNo: tabref.getFromValue().cProdNo,
   });
-  getUnbindCvrgRefProd(param)
+  getUnbindTermRefProd(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
@@ -163,16 +170,16 @@ const handleConfirm = () => {
     return;
   }
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
-  const param = selectedRows.value.map((item) => item.cCvrgNo).join(",");
+  const param = selectedRows.value.map((item) => item.cTermNo).join(",");
   const newParam = {
     userId: user.opCde,
     cCrtCde: user.opCde,
     cUpdCde: user.opCde,
-    cCvrgNo: param,
+    cTermNo: param,
     cProdNo: tabref.getFromValue().cProdNo,
     cTyp: "0",
   };
-  associationCvrg(newParam)
+  associationTerm(newParam)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {

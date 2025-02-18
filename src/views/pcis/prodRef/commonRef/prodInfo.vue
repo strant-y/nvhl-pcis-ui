@@ -9,6 +9,7 @@ import {
   createAppFreeEditConfig,
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
+import dayjs from "dayjs";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
@@ -211,7 +212,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cSepaCvrgFlag",
         inputtype: "rtcheckbox",
-        title: " 主险和附加险是否分开",
+        title: " 主条款和附加条款是否分开",
         keymap: {
           y: "1",
           n: "0",
@@ -324,6 +325,14 @@ function handleQuery() {
 onMounted(() => {
   if (param.editType === "edit") {
     handleQuery(param.prodNo);
+  } else {
+    setTimeout(() => {
+      freeEditRef.value?.setFormValue({
+        cCriterionTimeUnit: "A",
+        tBgnTm: dayjs().format("YYYY-MM-DD"),
+        tAdbTm: dayjs().add(1, "year").format("YYYY-MM-DD"),
+      });
+    }, 50);
   }
 });
 const pageType = ref("add");

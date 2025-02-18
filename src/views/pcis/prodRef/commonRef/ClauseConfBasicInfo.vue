@@ -1,18 +1,5 @@
 <template>
-  <el-dialog
-    v-model="dialogVisible"
-    title=""
-    width="80%"
-    @update:model-value="handleVisibleUpdate"
-  >
-    <app-free-edit v-model:freeEditConfig="formconfig" ref="freeEditRef" />
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button type="primary" @click="handleSave">保存</el-button>
-        <el-button @click="handleCancel">取消</el-button>
-      </span>
-    </template>
-  </el-dialog>
+  <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
 </template>
 
 <script setup lang="ts">
@@ -22,25 +9,59 @@ import {
   createAppFreeEditConfig,
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
-import { ref, reactive, defineEmits } from "vue";
-import { savePrdTermInfo } from "@/api/prod"; // api接口
-import { TypeComponents } from "element-plus/es/utils";
+import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
+import {
+  saveInruanceTypeBasicInfo,
+  getCvrgList,
+  savePrdTermInfo,
+  getPrdTermInfo,
+} from "@/api/prod";
+import { ref, reactive, onMounted } from "vue";
+import { useRoute } from "vue-router";
+
+const route = useRoute();
+const router = useRouter();
+const query = ref(route.query);
+const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
 const { getRules } = useValidator();
-const emits = defineEmits(["ok", "cancel"]);
-const props = defineProps({
-  data: Object,
-  type: String,
-});
-
-const dialogVisible = ref(true);
-
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 
-const formconfig = reactive<AppFreeEditConfig>(
+const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    title: "增加条款",
+    title: "条款基本信息",
     endBtnsPosition: "right",
+    endBtns: [
+      createFreeButtonBase({
+        type: "primary",
+        label: "保存",
+        func: async () => {
+          const isValid = await freeEditRef.value?.validate();
+          if (isValid) {
+            const s = freeEditRef.value?.getFromValue(); //获取表单数据
+            const datas = Object.assign(s, { type: param.type });
+            savePrdTermInfo(datas)
+              .then((res) => {
+                const { code, data, msg } = res;
+                if (200 === code) {
+                  ElMessage.success("保存成功");
+                } else {
+                  ElMessage.error(msg);
+                }
+              })
+              .finally(() => {});
+          } else {
+            ElMessage.error("请填写必填项");
+          }
+        },
+      }),
+      createFreeButtonBase({
+        label: "返回",
+        func: () => {
+          router.push("/prodconfiguration/insuranceConfiguration");
+        },
+      }),
+    ],
     fromSchema: [
       {
         prop: "cKindNo",
@@ -54,6 +75,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         prop: "cTermNo",
         inputtype: "rtinput",
         title: "条款代码",
+        disabled: true,
       },
       {
         prop: "cNmeCn",
@@ -134,25 +156,24 @@ const formconfig = reactive<AppFreeEditConfig>(
       {
         prop: "cRdrTyp",
         inputtype: "rtselect",
-        title: "主险/附加险",
+        title: "主条款/附加条款",
         typeCode: "WEB_SYS_STA_DICT",
         params: { cParCde: "RdrTyp" },
         rules: [getRules("required", { change: true })],
         func: (val: any) => {
-          const additionalInsuranceTypeField = formconfig.fromSchema.find(
-            (field) => field.prop === "additionalInsuranceType"
-          );
-          console.log(additionalInsuranceTypeField, "===========");
-
-          if (additionalInsuranceTypeField) {
-            additionalInsuranceTypeField.hidden = val === "1";
-          }
+          // const additionalInsuranceTypeField = formconfig.fromSchema.find(
+          //   (field) => field.prop === "additionalInsuranceType"
+          // );
+          // console.log(additionalInsuranceTypeField, "===========");
+          // if (additionalInsuranceTypeField) {
+          //   additionalInsuranceTypeField.hidden = val === "1";
+          // }
         },
       },
       {
         prop: "additionalInsuranceType",
         inputtype: "rtselect",
-        title: "附加险类型",
+        title: "附加条款类型",
         typeCode: "additional_insurance",
         params: { cParCde: "add_type" },
         rules: [getRules("required", { change: true })],
@@ -191,6 +212,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         title: "官网链接",
         btnWidth: 20,
         itemWidth: 3,
+        disabled: true,
       },
       {
         prop: "cDesc",
@@ -207,37 +229,59 @@ const formconfig = reactive<AppFreeEditConfig>(
     }),
   })
 );
+function getFromValue() {
+  return freeEditRef?.value?.getFromValue();
+}
 
-const handleSave = async () => {
-  const isValid = await freeEditRef.value?.validate();
-  if (!isValid) return;
-  const formData = freeEditRef.value?.getFromValue();
-  const datas = { ...formData, type: props.type };
-  if (formData) {
-    try {
-      await savePrdTermInfo(datas); // 调用保存接口
-      emits("ok", {});
-      ElMessage.success("保存成功");
-      this.dialogVisible = false;
-    } catch (error) {
-      ElMessage.error("保存失败");
+function setFormValue(value: any) {
+  freeEditRef?.value?.setFormValue(value);
+}
+
+function validate() {
+  return freeEditRef?.value?.validate();
+}
+
+function setValue(key: string, value: any) {
+  freeEditRef?.value?.setValue(key, value);
+}
+
+function getValue(key: string) {
+  return freeEditRef?.value?.getValue(key);
+}
+function handleQuery() {
+  const newparam = { cPkId: param.cPkId, pageNum: 1, pageSize: 10 };
+  getPrdTermInfo(newparam)
+    .then((res) => {
+      const { code, data, msg } = res;
+      if (200 === code) {
+        freeEditRef?.value?.setFormValue(data);
+      } else {
+        ElMessage.error(msg);
+      }
+    })
+    .finally(() => {});
+}
+function setDisa() {
+  formconfig1.fromSchema?.forEach((e) => {
+    if (e.prop === "cTermNo" || e.prop === "cWebsite") {
+      e.disabled = true;
     }
-  }
-};
-
-const handleCancel = () => {
-  dialogVisible.value = false;
-};
-onMounted(async () => {
-  if (props.type === "edit" && props.data) {
-    setTimeout(() => {
-      freeEditRef.value?.setFormValue(props.data);
-    }, 50);
+  });
+}
+defineExpose({
+  getFromValue,
+  setFormValue,
+  validate,
+  setValue,
+  getValue,
+});
+onMounted(() => {
+  // setDisa();
+  if (param.type === "edit") {
+    handleQuery();
+  } else {
+    // 如果不是编辑模式，确保默认值生效
+    freeEditRef.value?.setFormValue({ cSourceTyp: "9" });
   }
 });
-const handleVisibleUpdate = (value: boolean) => {};
 </script>
-
-<style scoped>
-/* 确保样式与现有组件一致 */
-</style>

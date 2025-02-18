@@ -1,5 +1,10 @@
 <template>
-  <el-dialog v-model="dialogVisible" title="关联附加条款" width="80%">
+  <el-dialog
+    v-model="dialogVisible"
+    title="关联主险"
+    width="80%"
+    @update:model-value="handleVisibleUpdate"
+  >
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
     <app-table
       :tableConfig="tableConfig"
@@ -8,10 +13,9 @@
       @page-change="handleQuery(false)"
       @selection-change="handleSelectionChange"
     />
-
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="handleCancel">取消</el-button>
+        <el-button @click="handelCancel">取消</el-button>
         <el-button type="primary" @click="handleConfirm">确认</el-button>
       </span>
     </template>
@@ -27,26 +31,26 @@ import {
 } from "@/shared/app-free-edit-config";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
+import { associationCvrg, getUnbindCvrgRefProd } from "@/api/prod";
 import {
   AppTableConfig,
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import { ref, reactive, defineEmits, defineProps } from "vue";
+import { dataOpertaor } from "@/store/modules/data-opertaor";
 const emits = defineEmits(["ok", "cancel"]);
-import { getCvrgToRelList, saveCvrgRel, queryTermToRelList } from "@/api/prod";
-
+const opertaor = dataOpertaor();
+const dialogVisible = ref(true);
 const props = defineProps<{
-  visible: boolean;
+  data: Object;
+  type: string;
 }>();
 
-const dialogVisible = ref(true);
-
-import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
+const selectedRows = ref<any[]>([]);
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
-const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
+const tabref = opertaor.getTableRefByKey("prodInfo");
 const { getRules } = useValidator();
 
 const formconfig1 = reactive<AppFreeEditConfig>(
@@ -72,19 +76,19 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cKindNo",
         inputtype: "rtselect",
-        title: "大类代码",
-        typeCode: "KIND_LIST_ALL",
-        params: { cStatus: "1" },
+        title: "业务大类",
+        typeCode: "KIND_LIST_CACHE",
+        params: { codeListParam: "" },
       },
       {
-        prop: "cTermNo",
+        prop: "cCCvrgNo",
         inputtype: "rtinput",
-        title: "条款代码",
+        title: "险别代码",
       },
       {
         prop: "cNmeCn",
         inputtype: "rtinput",
-        title: "中文名称",
+        title: "险别名称",
       },
     ],
     fromUi: createFromUiConfig({
@@ -104,36 +108,35 @@ const tableConfig = reactive<AppTableConfig>(
     showSelection: true,
     fromSchema: [
       {
-        prop: "cKindNo",
-        title: "大类代码",
+        prop: "cKindNme",
+        title: "险类名称",
         inputtype: "rtinput",
       },
       {
-        prop: "cTermNo",
-        title: "条款代码",
+        prop: "cCvrgNo",
+        title: "险别代码",
         inputtype: "rtinput",
       },
       {
         prop: "cNmeCn",
-        title: "中文名称",
+        title: "险别名称",
         inputtype: "rtinput",
       },
     ],
   })
 );
-
-const selectedRows = ref<any[]>([]);
 /**
  * 分页查询
  */
 function handleQuery(flag?: boolean) {
+  const tabref = opertaor.getTableRefByKey("prodInfo");
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  s.cTermNo = tabref.getFromValue().cTermNo;
   const param = Object.assign(s, r, {
-    cRdrTyp: "1",
+    CRdrTyp: "0",
+    cProdNo: tabref.getFromValue().cProdNo,
   });
-  queryTermToRelList(param)
+  getUnbindCvrgRefProd(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
@@ -149,31 +152,27 @@ function handleQuery(flag?: boolean) {
 function handleSelectionChange(rows: any[]) {
   selectedRows.value = rows;
 }
-const handleCancel = () => {
+
+const handelCancel = () => {
   dialogVisible.value = false;
 };
-onMounted(() => {
-  setTimeout(() => {
-    handleQuery();
-  }, 100);
-});
+
 const handleConfirm = () => {
-  if (!selectedRows.value.length) {
-    ElMessage.error("请选择要关联的附加险");
+  if (selectedRows.value.length === 0) {
+    ElMessage.warning("请选择至少一项");
     return;
   }
-  const opCde = JSON.parse(sessionStorage.getItem("user")).opCde;
-  const cTermNo = tabref.getFromValue().cTermNo;
-  const newArr = selectedRows.value.map((item) => {
-    item.cCrtCde = opCde;
-    item.cUpdCde = opCde;
-    item.cCvrgRdrCde = item.cTermNo;
-    item.cTermNo = cTermNo;
-    item.cRdrTyp = "1";
-    return item;
-  });
-  const paramData = { cTermNo: cTermNo, rel: newArr };
-  saveCvrgRel(paramData)
+  const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+  const param = selectedRows.value.map((item) => item.cCvrgNo).join(",");
+  const newParam = {
+    userId: user.opCde,
+    cCrtCde: user.opCde,
+    cUpdCde: user.opCde,
+    cCvrgNo: param,
+    cProdNo: tabref.getFromValue().cProdNo,
+    cTyp: "0",
+  };
+  associationCvrg(newParam)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
@@ -189,5 +188,7 @@ const handleConfirm = () => {
 </script>
 
 <style scoped>
-/* 确保样式与现有组件一致 */
+.dialog-footer {
+  text-align: right;
+}
 </style>

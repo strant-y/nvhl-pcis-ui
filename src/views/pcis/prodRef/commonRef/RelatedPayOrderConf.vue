@@ -66,7 +66,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         icon: "RefreshRight",
-        func: () => {},
+        func: () => {
+          freeEditRef.value.setFormValue({
+            cDptCde: "",
+          });
+          handleQuery();
+        },
       }),
     ],
     fromSchema: [
@@ -182,7 +187,10 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cIsValid",
         title: "是否有效",
-        inputtype: "rtswitch",
+        inputtype: "rtinput",
+        formatter: (row: any) => {
+          return row.cIsValid === 1 ? "是" : "否";
+        },
       },
       {
         prop: "nControlDays",

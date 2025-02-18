@@ -1,7 +1,7 @@
-<!-- 险类配置 -->
+<!-- 用户管理 -->
 <template>
   <div class="app-container">
-    <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
+    <app-free-edit :freeEditConfig="formconfig" ref="freeEditRef" />
     <app-table
       :tableConfig="tableconfig"
       v-model:pageresult="pageresult"
@@ -14,15 +14,17 @@
 <script setup lang="ts">
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
+const router = useRouter();
 
 import { ref } from "vue";
 import {
   AppFreeEditConfig,
-  AppFreeEditMethod,
   createAppFreeEditConfig,
+  AppFreeEditMethod,
 } from "@/shared/app-free-edit-config";
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
+const tableRef = ref<AppTableMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
 import {
@@ -30,60 +32,8 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { deleteFactorBykey, getBasicKindList } from "@/api/prod";
-import { useDzModal } from "@/views/dzmodel/DzModalService";
-const dzmodal = useDzModal();
-const kindEdit = defineAsyncComponent(() => import("./kindEdit.vue"));
-const tableRef = ref<AppTableMethod | null>(null);
-
-const formconfig1 = reactive<AppFreeEditConfig>(
-  createAppFreeEditConfig({
-    title: "险类配置",
-    endBtnsPosition: "right",
-    endBtns: [
-      createFreeButtonBase({
-        type: "primary",
-        label: "查询",
-        func: async () => {
-          handleQuery();
-        },
-      }),
-      createFreeButtonBase({
-        label: "重置",
-        func: () => {
-          freeEditRef.value?.setFormValue({
-            cKindNo: "",
-            cNmeCn: "",
-            cNmeEn: "",
-          });
-          handleQuery();
-          // freeEditRef.value?.resetForm();
-        },
-      }),
-    ],
-    fromSchema: [
-      {
-        prop: "cKindNo",
-        inputtype: "rtinput",
-        title: "大类代码",
-        clearable: true,
-      },
-      {
-        prop: "cNmeCn",
-        inputtype: "rtinput",
-        title: "中文名称",
-        clearable: true,
-        loadData: inputtype,
-      },
-      {
-        prop: "cNmeEn",
-        inputtype: "rtinput",
-        title: "英文名称",
-        clearable: true,
-      },
-    ],
-  })
-);
+import { getProdList, getCvrgList } from "@/api/prod";
+import { clear } from "console";
 
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -92,10 +42,92 @@ const pageresult = reactive<Pageresult>({
   /** 总数 */
   total: 0,
 });
+const formData = ref({
+  cKindNo: "",
+  cCvrgNo: "",
+  cNmeCn: "",
+  cRdrTyp: "",
+  cStatus: "",
+});
+function resetFields() {
+  formData.value = {
+    cKindNo: "",
+    cCvrgNo: "",
+    cNmeCn: "",
+    cRdrTyp: "",
+    cStatus: "",
+  };
+}
+defineExpose({
+  resetFields,
+});
+const formconfig = reactive<AppFreeEditConfig>(
+  createAppFreeEditConfig({
+    editFlag: true,
+    editList: ["cStatus"],
+    endBtnsPosition: "right",
+    endBtns: [
+      createFreeButtonBase({
+        type: "primary",
+        label: "查询",
+        icon: "Search",
+        func: async () => {
+          handleQuery();
+        },
+      }),
+      createFreeButtonBase({
+        label: "重置",
+        icon: "RefreshRight",
+        func: () => {},
+      }),
+    ],
+    fromSchema: [
+      {
+        prop: "cKindNo",
+        inputtype: "rtselect",
+        placeholder: "大类代码",
+        title: "大类代码",
+        typeCode: "KIND_LIST_ALL",
+        params: { cStatus: "1" },
+        clearable: true,
+      },
+      {
+        prop: "cCvrgNo",
+        inputtype: "rtinput",
+        itemWidth: 1,
+        title: "险别代码",
+        clearable: true,
+      },
+      {
+        prop: "cNmeCn",
+        inputtype: "rtinput",
+        itemWidth: 1,
+        title: "险别名称",
+        clearable: true,
+      },
+      {
+        prop: "cRdrTyp",
+        inputtype: "rtselect",
+        placeholder: "险别标志",
+        title: "险别标志",
+        typeCode: "WEB_SYS_STA_DICT",
+        params: { cParCde: "RdrTyp" },
+        clearable: true,
+      },
+      {
+        prop: "cStatus",
+        inputtype: "rtselect",
+        title: "启用标识",
+        typeCode: "WEB_SYS_STA_DICT",
+        params: { cParCde: "use_mrk" },
+        clearable: true,
+      },
+    ],
+  })
+);
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
-    editFlag: true,
     editList: ["cStatus"],
     titleBtns: [
       createFreeButtonBase({
@@ -103,11 +135,14 @@ const tableconfig = reactive<AppTableConfig>(
         label: "新增",
         type: "success",
         icon: "Plus",
-        func: function () {
-          dzmodal.open(kindEdit, { type: "add", data: {} }).then((res) => {
-            if (res.type === "ok") {
-              handleQuery();
-            }
+        func: () => {
+          router.push({
+            path: "/prodconfiguration/insuranceConInfo",
+            query: {
+              param: JSON.stringify({
+                type: "add",
+              }),
+            },
           });
         },
       }),
@@ -118,36 +153,59 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtn: [
       createFreeButtonBase({
         id: "score",
-        link: true,
         tooltip: "编辑",
+        link: true,
         type: "success",
-        size: "large",
         icon: "Edit",
         tableClick: (row) => {
-          console.log(row);
-          dzmodal.open(kindEdit, { type: "edit", data: row }).then((res) => {
-            if (res.type === "ok") {
-              handleQuery();
-            }
+          router.push({
+            path: "/prodconfiguration/insuranceConInfo",
+            query: {
+              param: JSON.stringify({
+                type: "edit",
+                cCvrgNo: row.cCvrgNo,
+              }),
+            },
           });
         },
       }),
+      // createFreeButtonBase({
+      //   id: "score",
+      //   iconColor: "#02D05F",
+      //   tooltip: "复制",
+      //   icon: "DocumentCopy",
+      //   link: true,
+      //   func: function () {},
+      // }),
     ],
     fromSchema: [
       {
+        prop: "cCvrgNo",
+        inputtype: "rtinput",
+        width: 200,
+        title: "险别代码",
+      },
+      {
         prop: "cKindNo",
         inputtype: "rtinput",
+        width: 200,
         title: "大类代码",
       },
       {
         prop: "cNmeCn",
         inputtype: "rtinput",
+        width: 200,
         title: "中文名称",
       },
       {
-        prop: "cNmeEn",
+        prop: "cRdrTyp",
         inputtype: "rtinput",
-        title: "英文名称",
+        title: "主险/附加险",
+      },
+      {
+        prop: "cDispCde",
+        inputtype: "rtinput",
+        title: "险别显示码",
       },
       {
         prop: "cStatus",
@@ -160,15 +218,14 @@ const tableconfig = reactive<AppTableConfig>(
         activeText: "启用",
         inactiveText: "禁用",
         inlinePrompt: true,
-        change: (val) => {
-          console.log(val);
+        func: (val) => {
+          const names = formconfig.fromSchema.map((obj) => obj.cCvrgNo);
         },
       },
     ],
   })
 );
-
-onMounted(async () => {});
+onMounted(() => {});
 
 // 绑定方法
 const method = {
@@ -180,7 +237,7 @@ const method = {
 // 绑定特殊验证器
 const exRules = {
   byrtInput: (rule: any, value: any, callback: any) => {
-    const r = freeEditRef.value?.getFromValue();
+    const r = freeEditRef.value.getFromData();
     if (r["name"]) {
       callback();
     } else {
@@ -194,11 +251,10 @@ function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r);
-  getBasicKindList(param)
+  getCvrgList(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
-        pageresult.list = [];
         pageresult.list = data.result;
         pageresult.total = data.total;
       } else {

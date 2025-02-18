@@ -76,15 +76,17 @@ const formconfig = reactive<AppFreeEditConfig>(
 );
 
 const handleSave = async () => {
-  const tabref = opertaor.getTableRefByKey("inruranceTypeBasicInfo");
+  const isValid = await freeEditRef.value?.validate();
+  if (!isValid) return;
+  const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
   const opCde = JSON.parse(sessionStorage.getItem("user")).opCde;
-  const cCvrgNo = tabref.getFromValue().cCvrgNo;
+  const cTermNo = tabref.getFromValue().cTermNo;
   const formData = freeEditRef.value?.getFromValue();
   const param = { ...formData, type: props.type, cRiskCls: "1" };
   formData.cCrtCde = opCde;
   formData.cUpdCde = opCde;
   const objStr = [formData];
-  const params = { rel: objStr, isAdd: props.type, cCvrgNo: cCvrgNo };
+  const params = { rel: objStr, isAdd: props.type, cTermNo: cTermNo };
   if (formData) {
     try {
       saveRiskInfo(param).then((res) => {

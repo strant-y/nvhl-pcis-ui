@@ -1,4 +1,3 @@
-<!--关联业务规则-->
 <template>
   <div>
     <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
@@ -20,57 +19,49 @@ import {
 } from "@/shared/app-free-edit-config";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
-import { qryRefProdAndRuleList } from "@/api/prod";
+import { qryProdRelCvrgList, unAssociationCvrg } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useDzModal } from "@/views/dzmodel/DzModalService";
 const dzmodal = useDzModal();
-const AddBusinessRulesModal = defineAsyncComponent(
-  () => import("./AddBusinessRulesModal.vue")
+const MaininsuranceModal = defineAsyncComponent(
+  () => import("./MaininsuranceModal.vue")
 );
 const opertaor = dataOpertaor();
-const tabref = opertaor.getTableRefByKey("prodInfo");
 import {
   AppTableConfig,
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import { ref, reactive, onMounted } from "vue";
-import {
-  query,
-  getRiskList,
-  saveCvrgRiskRel,
-  delPrdRuleInfo,
-} from "@/api/prod";
 
 import { useRoute } from "vue-router";
-// import { setTimeout } from "node:timers/promises";
 const route = useRoute();
 const query = ref(route.query);
 const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
 
 const { getRules } = useValidator();
-
+const tableRef = ref<AppTableMethod | null>(null);
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
-
+const tabref = opertaor.getTableRefByKey("prodInfo");
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    title: "关联业务规则",
+    title: "关联主险",
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
         type: "primary",
         label: "查询",
-        icon: "Search",
         func: async () => {
           handleQuery();
         },
       }),
       createFreeButtonBase({
         label: "重置",
-        icon: "RefreshRight",
         func: () => {
           freeEditRef.value.setFormValue({
-            cDptCde: "",
+            cKindNo: "",
+            cNmeCn: "",
+            cCvrgNo: "",
           });
           handleQuery();
         },
@@ -78,11 +69,21 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
     fromSchema: [
       {
-        prop: "cDptCde",
+        prop: "cKindNo",
         inputtype: "rtselect",
-        title: "机构代码",
-        typeCode: "PLYDPT_LIST_1",
-        params: { cIsValid: "1", userOrg: "0200000000000" },
+        title: "业务大类",
+        typeCode: "KIND_LIST_CACHE",
+        params: { codeListParam: "" },
+      },
+      {
+        prop: "cCvrgNo",
+        inputtype: "rtinput",
+        title: "险别代码",
+      },
+      {
+        prop: "cNmeCn",
+        inputtype: "rtinput",
+        title: "险别名称",
       },
     ],
     fromUi: createFromUiConfig({
@@ -90,7 +91,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     }),
   })
 );
-const tableRef = ref<AppTableMethod | null>(null);
 const pageresult = reactive<Pageresult>({
   result: "",
   list: [],
@@ -100,16 +100,16 @@ const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     titleBtns: [
       createFreeButtonBase({
-        id: "add-responsibility",
-        label: "新增",
+        id: "score",
+        label: "关联险别",
         type: "success",
         func: function () {
           if (tabref.getFromValue().cProdNo == null) {
-            ElMessage.error("产品代码为空！请保存后操作");
+            ElMessage.error("产品代码为空,请保存后操作!");
             return;
           } else {
             dzmodal
-              .open(AddBusinessRulesModal, { type: "add", data: {} })
+              .open(MaininsuranceModal, { type: "add", data: {} })
               .then((res) => {
                 if (res.type === "ok") {
                   handleQuery();
@@ -125,29 +125,14 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtn: [
       createFreeButtonBase({
         id: "score",
-        link: true,
-        tooltip: "编辑",
-        type: "success",
-        size: "large",
-        icon: "Edit",
-        tableClick: (row) => {
-          dzmodal
-            .open(AddBusinessRulesModal, { type: "edit", data: row })
-            .then((res) => {
-              if (res.type === "ok") {
-                handleQuery();
-              }
-            });
-        },
-      }),
-      createFreeButtonBase({
-        id: "score",
         type: "danger",
         tooltip: "删除",
         icon: "Delete",
         link: true,
         tableClick: (row) => {
-          delPrdRuleInfo(row)
+          const userId = sessionStorage.getItem("user").opCde;
+          const delParam = { ...row, cCrtCde: userId, cUpdCde: userId };
+          unAssociationCvrg(delParam)
             .then((res) => {
               const { code, data, msg } = res;
               if (200 === code) {
@@ -163,57 +148,23 @@ const tableconfig = reactive<AppTableConfig>(
     ],
     fromSchema: [
       {
-        prop: "cDptNme",
-        title: "机构名称",
+        prop: "cKindNo",
+        title: "业务大类",
         inputtype: "rtinput",
-        width: 200,
       },
       {
-        prop: "cDptCde",
-        title: "机构代码",
+        prop: "cCvrgNo",
+        title: "险别代码",
         inputtype: "rtinput",
-        width: 200,
       },
       {
-        prop: "cInstFlag",
-        title: "允许分期付款",
+        prop: "cNmeCn",
+        title: "险别名称",
         inputtype: "rtinput",
-        width: 150,
-      },
-      {
-        prop: "nDqdDays",
-        title: "倒签天数",
-        inputtype: "rtinput",
-        width: 100,
-      },
-      {
-        prop: "nDpdDays",
-        title: "倒批单",
-        inputtype: "rtinput",
-        width: 150,
-      },
-      {
-        prop: "cAutoUdr",
-        title: "允许自动核保",
-        inputtype: "rtinput",
-        width: 150,
-      },
-      {
-        prop: "cPlyPrmcalFlg",
-        title: "投保保费计算规则",
-        inputtype: "rtinput",
-        width: 200,
-      },
-      {
-        prop: "cEdrPrmcalFlg",
-        title: "批改保费计算规则",
-        inputtype: "rtinput",
-        width: 200,
       },
     ],
   })
 );
-
 function getFromValue() {
   return freeEditRef?.value?.getFromValue();
 }
@@ -233,6 +184,9 @@ function setValue(key: string, value: any) {
 function getValue(key: string) {
   return freeEditRef?.value?.getValue(key);
 }
+function getFormValue() {
+  return freeEditRef?.value?.getFormValue();
+}
 function setDisa() {
   formconfig1.fromSchema?.forEach((e) => {
     if (e.prop === "cProdNo" || e.prop === "cKindNo") {
@@ -242,18 +196,21 @@ function setDisa() {
 }
 /** 查询 */
 function handleQuery(flag?: boolean) {
-  const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
-  const s = freeEditRef.value?.getFromValue(); //获取表单数据
+  // const tabref = opertaor.getTableRefByKey("prodInfo");
   const c = tabref.getFromValue().cProdNo;
-  const param = Object.assign(s, r, { cProdNo: c });
-  if (c == null) {
-    ElMessage.error("产品代码为空！请保存后操作");
+  console.log(c, "=========__________________________________");
+  if (tabref.getFromValue().cProdNo == null) {
+    ElMessage.error("产品代码为空,请保存后操作!");
     return;
   } else {
-    qryRefProdAndRuleList(param)
+    const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
+    const s = freeEditRef.value?.getFromValue(); //获取表单数据
+    const param = Object.assign(s, r, { cProdNo: c, cRdrTyp: "0" });
+    qryProdRelCvrgList(param)
       .then((res) => {
         const { code, data, msg } = res;
         if (200 === code) {
+          pageresult.list = [];
           pageresult.list = data.result;
           pageresult.total = data.total;
         } else {
@@ -264,7 +221,7 @@ function handleQuery(flag?: boolean) {
   }
 }
 onMounted(() => {
-  if (param.editType === "edit") {
+  if (param.editType == "edit") {
     setTimeout(() => {
       handleQuery();
     }, 100);

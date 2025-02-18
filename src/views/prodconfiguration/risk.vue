@@ -52,7 +52,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       }),
       createFreeButtonBase({
         label: "重置",
-        func: () => {},
+        func: () => {
+          freeEditRef.value?.setFormValue({
+            cKindNo: "",
+            cRiskNo: "",
+            cNmeCn: "",
+          });
+          handleQuery();
+        },
       }),
     ],
     fromSchema: [
@@ -162,8 +169,10 @@ const tableconfig = reactive<AppTableConfig>(
         activeText: "启用",
         inactiveText: "禁用",
         inlinePrompt: true,
-        change: (val) => {
-          console.log(val);
+        func: (val, row) => {
+          // const rowData = tableRef.value?.getFormValue();
+          console.log(val, row, "=============000000000000000");
+          // console.log(val,rowData "val");
         },
       },
     ],

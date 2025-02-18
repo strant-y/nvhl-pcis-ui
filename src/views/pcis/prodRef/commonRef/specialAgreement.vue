@@ -70,7 +70,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         icon: "RefreshRight",
-        func: () => {},
+        func: () => {
+          freeEditRef.value.setFormValue({
+            cSpecNo: "",
+            cNmeEn: "",
+            cNmeCn: "",
+          });
+          handleQuery();
+        },
       }),
     ],
     fromSchema: [
@@ -173,12 +180,12 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
       },
       {
-        prop: "cNmeCn",
+        prop: "cNmeEn",
         title: "英文名称",
         inputtype: "rtinput",
       },
       {
-        prop: "cNmeEn",
+        prop: "cNmeCn",
         title: "特约内容",
         inputtype: "rtinput",
       },

@@ -143,7 +143,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 onMounted(async () => {
   if (props.type === "edit" && props.data) {
     setTimeout(() => {
-      // freeEditRef.value?.setFormValue(props.data);
+      freeEditRef.value?.setFormValue(props.data);
     }, 50);
   }
 });

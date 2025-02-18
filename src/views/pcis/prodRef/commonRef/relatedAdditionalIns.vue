@@ -20,7 +20,7 @@ import {
 } from "@/shared/app-free-edit-config";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
-import { qryProdRelCvrgList } from "@/api/prod";
+import { qryProdRelCvrgList, deleteTermRel } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
 import {
@@ -35,8 +35,8 @@ const dzmodal = useDzModal();
 const RelatedAdditionalInsModal = defineAsyncComponent(
   () => import("./RelatedAdditionalInsModal.vue")
 );
-import { getCvrgRelList, delCvrgRel } from "@/api/prod";
-const tabref = opertaor.getTableRefByKey("inruranceTypeBasicInfo");
+import { getCvrgRelList, delCvrgRel, queryTermRelList } from "@/api/prod";
+const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
 const route = useRoute();
 const query = ref(route.query);
 const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
@@ -47,7 +47,7 @@ const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    title: "关联附加险",
+    title: "关联附加条款",
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
@@ -72,11 +72,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         typeCode: "KIND_LIST_ALL",
         params: { cStatus: "1" },
       },
-      // {
-      //   prop: "cCvrgNo",
-      //   inputtype: "rtinput",
-      //   title: "险别代码",
-      // },
+      {
+        prop: "cTermNo",
+        inputtype: "rtinput",
+        title: "条款代码",
+      },
       {
         prop: "cNmeCn",
         inputtype: "rtinput",
@@ -100,10 +100,10 @@ const tableconfig = reactive<AppTableConfig>(
     titleBtns: [
       createFreeButtonBase({
         id: "score",
-        label: "关联附加险",
+        label: "关联附加条款",
         type: "success",
         func: function () {
-          if (tabref.getFromValue().cCvrgNo == null) {
+          if (tabref.getFromValue().cTermNo == null) {
             ElMessage.error("请完善基本信息后操作!");
             return;
           } else {
@@ -130,17 +130,6 @@ const tableconfig = reactive<AppTableConfig>(
         link: true,
         tableClick: (row) => {
           handleDelete(row.index, row);
-          // delCvrgRel(row)
-          //   .then((res) => {
-          //     const { code, data, msg } = res;
-          //     if (200 === code) {
-          //       ElMessage.success("删除成功");
-          //       handleQuery();
-          //     } else {
-          //       ElMessage.error(msg);
-          //     }
-          //   })
-          //   .finally(() => {});
         },
       }),
     ],
@@ -151,8 +140,8 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
       },
       {
-        prop: "cCvrgNo",
-        title: "险别代码",
+        prop: "cTermNo",
+        title: "条款代码",
         inputtype: "rtinput",
       },
       {
@@ -176,7 +165,7 @@ const handleDelete = (index: number, row: any) => {
     type: "warning",
   })
     .then(() => {
-      delCvrgRel(row)
+      deleteTermRel(row)
         .then((res) => {
           const { code, data, msg } = res;
           if (200 === code) {
@@ -224,18 +213,17 @@ function setDisa() {
   });
 }
 /** 查询 */
-function handleQuery() {
-  const tabref = opertaor.getTableRefByKey("inruranceTypeBasicInfo");
-  if (tabref.getFromValue().cCvrgNo == null) {
+function handleQuery(flag?: boolean) {
+  const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
+  if (tabref.getFromValue().cTermNo == null) {
     ElMessage.error("请完善基本信息后在操作!");
     return;
   } else {
-    const r = tableRef.value?.getPartnerPage(); //获取分页数据
+    const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
     const s = freeEditRef.value?.getFromValue(); //获取表单数据
-    const param = Object.assign(s, r, {
-      cCvrgNo: tabref.getFromValue().cCvrgNo,
-    });
-    getCvrgRelList(param)
+    s.cTermNo = tabref.getFromValue().cTermNo;
+    const param = Object.assign(s, r);
+    queryTermRelList(param)
       .then((res) => {
         const { code, data, msg } = res;
         if (200 === code) {
@@ -252,8 +240,8 @@ onMounted(() => {
   if (param.type === "edit") {
     setTimeout(() => {
       handleQuery();
-    }, 200);
-    setDisa();
+    }, 100);
+    // setDisa();
   }
 });
 

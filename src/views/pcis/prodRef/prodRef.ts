@@ -46,6 +46,7 @@ import commonProblem from "./commodityRef/CommonProblem.vue";
 import healthNoticeAdd from "./commodityRef/HealthNoticeAdd.vue";
 import clauseConf from "./clauseConfRef/clauseConf.vue";
 import prodaudit from "./commonRef/prodaudit.vue";
+import clauseConfBasicInfo from "./commonRef/ClauseConfBasicInfo.vue";
 
 
 /**用于动态组件的映射生成 */
@@ -97,6 +98,7 @@ const componentMap = {
   commonProblemRef:commonProblem,
   healthNoticeAddRef:healthNoticeAdd,
   clauseConfRef:clauseConf,
+  clauseConfBasicInfoRef:clauseConfBasicInfo,
 };
 
 const install = (Vue) => {

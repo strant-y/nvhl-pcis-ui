@@ -151,6 +151,13 @@ const handleSave = async () => {
   }
 };
 
+onMounted(() => {
+  if (props.type === "add") {
+    setTimeout(() => {
+      freeEditRef.value?.setFormValue({ cStatus: "1", cLevel: "0" });
+    }, 50);
+  }
+});
 const handleCancel = () => {
   dialogVisible.value = false;
 };
