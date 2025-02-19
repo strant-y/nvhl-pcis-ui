@@ -1,5 +1,10 @@
 <template>
-  <el-dialog v-model="dialogVisible" title="关联附加条款" width="80%">
+  <el-dialog
+    v-model="dialogVisible"
+    title="关联责任"
+    width="80%"
+    @update:model-value="handleVisibleUpdate"
+  >
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
     <app-table
       :tableConfig="tableConfig"
@@ -7,8 +12,8 @@
       ref="tableRef"
       @page-change="handleQuery(false)"
       @selection-change="handleSelectionChange"
+      :defaultSelectedRows="pageresult.list" // 传递默认选中的行数据
     />
-
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="handleCancel">取消</el-button>
@@ -32,18 +37,22 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { ref, reactive, defineEmits, defineProps } from "vue";
+import { ref, reactive, defineEmits, defineProps, onMounted } from "vue";
 const emits = defineEmits(["ok", "cancel"]);
-import { getCvrgToRelList, saveCvrgRel, queryTermToRelList } from "@/api/prod";
-
+import { ElMessage } from "element-plus";
+import {
+  query,
+  getRiskList,
+  saveCvrgRiskRel,
+  saveTermRiskRel,
+} from "@/api/prod";
+import { dataOpertaor } from "@/store/modules/data-opertaor";
+const opertaor = dataOpertaor();
 const props = defineProps<{
   visible: boolean;
 }>();
-
 const dialogVisible = ref(true);
 
-import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
@@ -64,7 +73,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         func: () => {
-          queryFormRef.value?.resetFields();
+          freeEditRef.value?.resetFields();
         },
       }),
     ],
@@ -77,9 +86,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         params: { cStatus: "1" },
       },
       {
-        prop: "cTermNo",
+        prop: "cRiskNo",
         inputtype: "rtinput",
-        title: "条款代码",
+        title: "责任代码",
       },
       {
         prop: "cNmeCn",
@@ -109,8 +118,8 @@ const tableConfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
       },
       {
-        prop: "cTermNo",
-        title: "条款代码",
+        prop: "cRiskNo",
+        title: "责任代码",
         inputtype: "rtinput",
       },
       {
@@ -118,22 +127,25 @@ const tableConfig = reactive<AppTableConfig>(
         title: "中文名称",
         inputtype: "rtinput",
       },
+      {
+        prop: "cNmeEn",
+        title: "英文名称",
+        inputtype: "rtinput",
+      },
     ],
   })
 );
 
 const selectedRows = ref<any[]>([]);
+
 /**
  * 分页查询
  */
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  s.cTermNo = tabref.getFromValue().cTermNo;
-  const param = Object.assign(s, r, {
-    cRdrTyp: "1",
-  });
-  queryTermToRelList(param)
+  const param = Object.assign(s, r, { cTermNo: tabref.getFromValue().cTermNo });
+  getRiskList(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
@@ -146,34 +158,22 @@ function handleQuery(flag?: boolean) {
     })
     .finally(() => {});
 }
+
 function handleSelectionChange(rows: any[]) {
   selectedRows.value = rows;
 }
-const handleCancel = () => {
-  dialogVisible.value = false;
-};
-onMounted(() => {
-  setTimeout(() => {
-    handleQuery();
-  }, 100);
-});
+
 const handleConfirm = () => {
-  if (!selectedRows.value.length) {
-    ElMessage.error("请选择要关联的附加险");
-    return;
-  }
   const opCde = JSON.parse(sessionStorage.getItem("user")).opCde;
   const cTermNo = tabref.getFromValue().cTermNo;
   const newArr = selectedRows.value.map((item) => {
     item.cCrtCde = opCde;
     item.cUpdCde = opCde;
-    item.cCvrgRdrCde = item.cTermNo;
     item.cTermNo = cTermNo;
-    item.cRdrTyp = "1";
     return item;
   });
   const paramData = { cTermNo: cTermNo, rel: newArr };
-  saveCvrgRel(paramData)
+  saveTermRiskRel(paramData)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
@@ -185,6 +185,16 @@ const handleConfirm = () => {
       }
     })
     .finally(() => {});
+};
+
+onMounted(() => {
+  setTimeout(() => {
+    handleQuery();
+  }, 100);
+});
+
+const handleCancel = () => {
+  dialogVisible.value = false;
 };
 </script>
 

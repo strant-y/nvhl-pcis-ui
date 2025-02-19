@@ -32,6 +32,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     title: "条款基本信息",
     endBtnsPosition: "right",
     endBtns: [
+      // createFreeButtonBase({
+      //   label: "上传",
+      //   type: "primary",
+      //   func: () => {},
+      // }),
       createFreeButtonBase({
         type: "primary",
         label: "保存",
@@ -43,7 +48,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             savePrdTermInfo(datas)
               .then((res) => {
                 const { code, data, msg } = res;
+                console.log(data, "data");
                 if (200 === code) {
+                  freeEditRef?.value?.setFormValue({ cTermNo: data });
                   ElMessage.success("保存成功");
                 } else {
                   ElMessage.error(msg);
@@ -138,7 +145,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "平均费用率",
         precision: 8,
         placeholder: "1.00000000",
-        // type: "number",
         rules: [getRules("required", { blur: true })],
       },
       {
@@ -160,14 +166,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         typeCode: "WEB_SYS_STA_DICT",
         params: { cParCde: "RdrTyp" },
         rules: [getRules("required", { change: true })],
+        //主条款是1附加条款是0
         func: (val: any) => {
-          // const additionalInsuranceTypeField = formconfig.fromSchema.find(
-          //   (field) => field.prop === "additionalInsuranceType"
-          // );
-          // console.log(additionalInsuranceTypeField, "===========");
-          // if (additionalInsuranceTypeField) {
-          //   additionalInsuranceTypeField.hidden = val === "1";
-          // }
+          if (val == "1") {
+          } else {
+          }
         },
       },
       {
@@ -177,7 +180,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         typeCode: "additional_insurance",
         params: { cParCde: "add_type" },
         rules: [getRules("required", { change: true })],
-        hidden: true, // 初始状态不隐藏
       },
       {
         prop: "tFilingTm",

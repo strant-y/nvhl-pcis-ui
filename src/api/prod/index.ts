@@ -537,6 +537,9 @@ export function unAssociationTerm(queryParams: any): AxiosPromise<any> {
 export function saveCvrgRel(queryParams: any): AxiosPromise<any> {
     return post(`/cvrgdef/saveCvrgRel`, queryParams);
 }
+export function saveTermRel(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/saveTermRel`, queryParams);
+}
 
 /**
  * 产品工厂-关联特别约定查询

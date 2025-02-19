@@ -238,9 +238,10 @@ function handleQuery(flag?: boolean) {
 }
 onMounted(() => {
   if (param.type === "edit") {
+    console.log("附加条款edit", tabref.getFromValue().cTermNo);
     setTimeout(() => {
       handleQuery();
-    }, 100);
+    }, 300);
     // setDisa();
   }
 });

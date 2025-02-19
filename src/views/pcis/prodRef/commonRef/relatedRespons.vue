@@ -175,17 +175,19 @@ const tableconfig = reactive<AppTableConfig>(
         link: true,
         tableClick: (row) => {
           const opertaor = dataOpertaor();
-          const clauseConfBasicInfo = opertaor.getTableRefByKey('clauseConfBasicInfo');
+          const clauseConfBasicInfo = opertaor.getTableRefByKey(
+            "clauseConfBasicInfo"
+          );
           console.log(clauseConfBasicInfo.getFromValue());
           dialog.value?.open(
             "riskFactorConfig",
             {
-              termObj:clauseConfBasicInfo.getFromValue(),
-              riskObj:row
+              termObj: clauseConfBasicInfo.getFromValue(),
+              riskObj: row,
             },
             {},
             { title: "责任要素绑定", width: "95" }
-           );
+          );
         },
       }),
     ],
@@ -262,9 +264,10 @@ function handleQuery(flag?: boolean) {
 }
 onMounted(() => {
   if (param.type === "edit") {
+    console.log("编辑", tabref.getFromValue().cTermNo);
     setTimeout(() => {
       handleQuery();
-    }, 200);
+    }, 300);
   }
 });
 
