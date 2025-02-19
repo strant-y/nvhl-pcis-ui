@@ -1,10 +1,5 @@
 <template>
-  <el-dialog
-    v-model="dialogVisible"
-    title="关联责任"
-    width="80%"
-    @update:model-value="handleVisibleUpdate"
-  >
+  <el-dialog v-model="dialogVisible" title="关联附加条款" width="80%">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
     <app-table
       :tableConfig="tableConfig"
@@ -12,8 +7,8 @@
       ref="tableRef"
       @page-change="handleQuery(false)"
       @selection-change="handleSelectionChange"
-      :defaultSelectedRows="pageresult.list" // 传递默认选中的行数据
     />
+
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="handleCancel">取消</el-button>
@@ -37,22 +32,23 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { ref, reactive, defineEmits, defineProps, onMounted } from "vue";
+import { ref, reactive, defineEmits, defineProps } from "vue";
 const emits = defineEmits(["ok", "cancel"]);
-import { ElMessage } from "element-plus";
 import {
-  query,
-  getRiskList,
-  saveCvrgRiskRel,
-  saveTermRiskRel,
+  getCvrgToRelList,
+  saveCvrgRel,
+  saveTermRel,
+  queryTermToRelList,
 } from "@/api/prod";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
+
 const props = defineProps<{
   visible: boolean;
 }>();
+
 const dialogVisible = ref(true);
 
+import { dataOpertaor } from "@/store/modules/data-opertaor";
+const opertaor = dataOpertaor();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
@@ -73,7 +69,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         func: () => {
-          freeEditRef.value?.resetFields();
+          freeEditRef.value?.setFormValue({
+            cKindNo: "",
+            cTermNo: "",
+            cNmeCn: "",
+          });
+          // handleQuery();
         },
       }),
     ],
@@ -86,9 +87,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         params: { cStatus: "1" },
       },
       {
-        prop: "cRiskNo",
+        prop: "cTermNo",
         inputtype: "rtinput",
-        title: "责任代码",
+        title: "条款代码",
       },
       {
         prop: "cNmeCn",
@@ -118,8 +119,8 @@ const tableConfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
       },
       {
-        prop: "cRiskNo",
-        title: "责任代码",
+        prop: "cTermNo",
+        title: "条款代码",
         inputtype: "rtinput",
       },
       {
@@ -127,25 +128,21 @@ const tableConfig = reactive<AppTableConfig>(
         title: "中文名称",
         inputtype: "rtinput",
       },
-      {
-        prop: "cNmeEn",
-        title: "英文名称",
-        inputtype: "rtinput",
-      },
     ],
   })
 );
 
 const selectedRows = ref<any[]>([]);
-
 /**
  * 分页查询
  */
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(s, r, { cTermNo: tabref.getFromValue().cTermNo });
-  getRiskList(param)
+  const param = Object.assign(s, r, {
+    cRdrTyp: "1",
+  });
+  queryTermToRelList(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
@@ -158,22 +155,54 @@ function handleQuery(flag?: boolean) {
     })
     .finally(() => {});
 }
-
+function getQueryList(flag?: boolean) {
+  const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
+  const s = freeEditRef.value?.getFromValue(); //获取表单数据
+  const param = Object.assign(s, r, {
+    cRdrTyp: "1",
+    cTermNo: tabref.getFromValue().cTermNo,
+  });
+  queryTermToRelList(param)
+    .then((res) => {
+      const { code, data, msg } = res;
+      if (200 === code) {
+        pageresult.list = [];
+        pageresult.list = data.result;
+        pageresult.total = data.total;
+      } else {
+        ElMessage.error(msg);
+      }
+    })
+    .finally(() => {});
+}
 function handleSelectionChange(rows: any[]) {
   selectedRows.value = rows;
 }
-
+const handleCancel = () => {
+  dialogVisible.value = false;
+};
+onMounted(() => {
+  setTimeout(() => {
+    getQueryList();
+  }, 300);
+});
 const handleConfirm = () => {
+  if (!selectedRows.value.length) {
+    ElMessage.error("请选择要关联的附加险");
+    return;
+  }
   const opCde = JSON.parse(sessionStorage.getItem("user")).opCde;
-  const cTermNo = tabref.getFromValue().cTermNo;
+  // const a = tabref.getFromValue().cTermNo;
   const newArr = selectedRows.value.map((item) => {
     item.cCrtCde = opCde;
     item.cUpdCde = opCde;
-    item.cTermNo = cTermNo;
+    item.cCvrgRdrCde = item.cTermNo;
+    item.cTermNo = tabref.getFromValue().cTermNo;
+    item.cRdrTyp = "1";
     return item;
   });
-  const paramData = { cTermNo: cTermNo, rel: newArr };
-  saveTermRiskRel(paramData)
+  const paramData = { cTermNo: tabref.getFromValue().cTermNo, rel: newArr };
+  saveTermRel(paramData)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
@@ -185,16 +214,6 @@ const handleConfirm = () => {
       }
     })
     .finally(() => {});
-};
-
-onMounted(() => {
-  setTimeout(() => {
-    handleQuery();
-  }, 100);
-});
-
-const handleCancel = () => {
-  dialogVisible.value = false;
 };
 </script>
 
