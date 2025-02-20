@@ -1,5 +1,8 @@
 <template>
-  <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+  <div>
+    <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+    <comDialog ref="dialog"></comDialog>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -19,6 +22,8 @@ import {
 } from "@/api/prod";
 import { ref, reactive, onMounted } from "vue";
 import { useRoute } from "vue-router";
+import { DialogMethod } from "@/views/dzmodel/ComDialogConf";
+const dialog = ref<DialogMethod | null>(null);
 
 const route = useRoute();
 const router = useRouter();
@@ -32,6 +37,28 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     title: "条款基本信息",
     endBtnsPosition: "right",
     endBtns: [
+      createFreeButtonBase({
+        type: "success",
+        label: "标题绑定",
+        func: async () => {
+          const cTermNo = freeEditRef.value?.getValue('cTermNo');
+          
+          dialog.value?.open(
+          "termGroupConfig",
+          {
+            type: "show",
+            data: {
+              cTermNo: cTermNo,
+            },
+          },
+          {
+            isOk: (selectdata: any) => {
+            },
+          },
+          { title: "群组编辑", width: 85 }
+          );
+        },
+      }),
       createFreeButtonBase({
         type: "primary",
         label: "保存",

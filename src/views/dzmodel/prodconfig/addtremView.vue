@@ -38,19 +38,22 @@
         </div>
       </el-col>
       <el-col :span="12">
-        <div style="height: 250px; border: 1px solid #f3f3f3">
+        <div style="height: 250px; border: 1px solid #f3f3f3;overflow-y: auto">
           <el-tree
+            ref="mainRef"
             style="max-width: 600px"
             :props="dataprops"
             node-key="id"
             show-checkbox
             :data="data1"
+            @check-change="selectMainTerm"
           />
         </div>
       </el-col>
       <el-col :span="12">
-        <div style="height: 250px; border: 1px solid #f3f3f3">
+        <div style="height: 250px; border: 1px solid #f3f3f3;overflow-y: auto">
           <el-tree
+            ref="additionalRef"
             style="max-width: 600px"
             :props="dataprops"
             node-key="id"
@@ -65,12 +68,15 @@
         </div>
       </el-col>
       <el-col :span="24">
-        <el-tree
+        <div style="overflow-y: auto; max-height: 150px">
+          <el-tree
           style="max-width: 600px"
           :props="dataprops"
           node-key="id"
           :data="data3"
+          :default-expand-all="true"
         />
+        </div>
       </el-col>
       <el-col :span="24">
         <div style="float: right; margin-right: 20px">
@@ -97,6 +103,7 @@
 </template>
 
 <script setup lang="ts">
+import { qryProdRelTermRiskList } from "@/api/prod";
 import { useValidator } from "@/typings/useValidator";
 
 const { getRules } = useValidator();
@@ -121,102 +128,35 @@ const dataprops = {
   label: "label",
 };
 
-const data1 = ref([
-  {
-    id: 1,
-    label: "保险主条款1(2024款)",
-    children: [
-      {
-        id: 4,
-        label: "保险责任1-1",
-        children: [],
-      },
-    ],
-  },
-  {
-    id: 2,
-    label: "保险主条款2(2024款)",
-    children: [
-      {
-        id: 5,
-        label: "保险责任2-1",
-      },
-      {
-        id: 6,
-        label: "保险责任2-2",
-      },
-    ],
-  },
-  {
-    id: 3,
-    label: "保险主条款3(2024款)",
-    children: [
-      {
-        id: 7,
-        label: "保险责任3-1",
-      },
-      {
-        id: 8,
-        label: "保险责任3-2",
-      },
-    ],
-  },
-]);
-
+const data1 = ref([]);
+const mainRef = ref<InstanceType<typeof ElTree>>();
+const additionalRef = ref<InstanceType<typeof ElTree>>();
 const data2 = ref([
-  {
-    id: 1,
-    label: "保险附加条款1(2024款)",
-    children: [
-      {
-        id: 4,
-        label: "保险附加责任1-1",
-        children: [],
-      },
-    ],
-  },
-  {
-    id: 2,
-    label: "保险附加条款2(2024款)",
-    children: [
-      {
-        id: 5,
-        label: "保险附加责任2-1",
-      },
-      {
-        id: 6,
-        label: "保险附加责任2-2",
-      },
-    ],
-  },
-  {
-    id: 3,
-    label: "保险附加条款3(2024款)",
-    children: [
-      {
-        id: 7,
-        label: "保险附加责任3-1",
-      },
-      {
-        id: 8,
-        label: "保险附加责任3-2",
-      },
-    ],
-  },
+  // {
+  //   id: 1,
+  //   label: "保险附加条款1(2024款)",
+  //   children: [
+  //     {
+  //       id: 4,
+  //       label: "保险附加责任1-1",
+  //       children: [],
+  //     },
+  //   ],
+  // },
 ]);
 
-const data3 = ref([
-  {
-    id: 1,
-    label: "保险附加条款1(2024款)",
-    children: [
-      {
-        id: 4,
-        label: "保险附加责任1-1",
-        children: [],
-      },
-    ],
-  },
+const data3 = ref<any>([
+  // {
+  //   id: 1,
+  //   label: "保险附加条款1(2024款)",
+  //   children: [
+  //     {
+  //       id: 4,
+  //       label: "保险附加责任1-1",
+  //       children: [],
+  //     },
+  //   ],
+  // }
 ]);
 
 // 绑定方法
@@ -225,10 +165,46 @@ const method = {};
 // 绑定特殊验证器
 const exRules = {};
 
-onMounted(async () => {});
+onMounted(async () => {
+  const param = props.data.data;
+  qryProdRelTermRiskList(param).then((res) => {
+    const { code, data, msg } = res;
+    if (200 === code) {
+      data1.value = data;
+    } else {
+      ElMessage.error(msg);
+    }
+  });
+});
+
+function selectMainTerm() {
+  const tree = mainRef.value?.getCheckedNodes(false,true);
+  let selectNode: any[] = [];
+  tree?.forEach((item:any) => {
+    // 获取选中的主条款信息
+    if(item.cTermNo){
+      let seterm = Object.assign({}, item);
+      let childnode: any[] = [];
+
+      item.children?.forEach((child:any) => {
+        const issel = childnode?.filter((node:any)=> node.cRiskNo === child.cRiskNo);
+        if(issel!=null && issel.length>0){
+          return ;
+        }
+        const f = tree?.filter((child2:any) => child2.cRiskNo === child.cRiskNo);
+        if(f!==null && f.length>0){
+          childnode.push(...f);
+        }
+      });
+      seterm.children = childnode;
+      selectNode.push(seterm);
+    }
+  });
+  data3.value = selectNode;
+}
 
 async function selectOne() {
-  props.method.isOk();
+  props.method.isOk(data3.value);
   emits("handleClose");
 }
 

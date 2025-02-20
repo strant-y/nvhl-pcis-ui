@@ -48,22 +48,22 @@ onMounted(async () => {
 // 绑定方法
 const method = {
   funcadd: () => {
+    const param = opertaor.getParam();
     dialog.value?.open(
       "addtremView",
-      { type: "show", data: {} },
       {
-        isOk: () => {
-          formData.value.push({
-            termNme: "条款名",
-            riskNo: "040001",
-            termNo: "00623000031",
-            'cvrg.termCde':"001524",
-            cvrgType: "1",
-            rigeNme: "责任名",
-          });
+        type: "show",
+        data: {
+          cProdNo: param.cProdNo,
         },
       },
-      { title: "添加条款", width: 70 }
+      {
+        isOk: (selectdata: any) => {
+          console.log(selectdata);
+          formData.value.push(selectdata);
+        },
+      },
+      { title: "添加条款", width: 85 }
     );
   },
 };

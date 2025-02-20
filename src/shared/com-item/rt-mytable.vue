@@ -63,7 +63,7 @@
                 <th
                   v-for="(i, index) in appgrideditConfig.fromSchema"
                   :key="index"
-                  :width="i.tableBtnWidth ? i.tableBtnWidth : 100"
+                  :width="i.width ? i.width : 100"
                 >
                   {{ i.title }}
                 </th>
@@ -281,7 +281,7 @@ import { VueDraggable } from "vue-draggable-plus";
 import { AppTableConfig } from "../app-table-config";
 import { AppGridEditConfig } from "../app-grid-edit-config";
 
-const emits = defineEmits(["indexupdate"]); // 告知父类,组件顺序变更
+const emits = defineEmits(["indexupdate","rowselect"]); // 告知父类,组件顺序变更
 
 const appgrideditConfig = reactive<AppGridEditConfig>({
   editFlag: false, //是否可以编辑
@@ -315,6 +315,7 @@ const formUi = reactive<Record<string, any>>({});
 function rowClick(row: any) {
   if (appgrideditConfig.editFlag) {
     editIndex.value = row._dataId;
+    emits("rowselect",row);
   }
 }
 function getuuid() {
@@ -329,6 +330,7 @@ function addRow(data: any = {}) {
   data._dataId = uuid;
   dataList.value.push(data);
   editIndex.value = uuid;
+  emits("rowselect",data);
 }
 function getformRef() {
   return formRefs.value;
@@ -384,13 +386,16 @@ function getFromValue() {
 
 function setFormValue(data: any) {
   dataList.value = data;
-  dataList.value?.forEach((data) => {
-    // 初始化行数字Id
-    data._dataId = getuuid();
-  });
+  if(data){
+      dataList.value?.forEach((data) => {
+      // 初始化行数字Id
+      data._dataId = getuuid();
+    });
+  }
 }
 function removeRow(dataId: string) {
   dataList.value = dataList.value.filter((item) => item._dataId !== dataId);
+  emits("indexupdate", null);
 }
 
 defineExpose({

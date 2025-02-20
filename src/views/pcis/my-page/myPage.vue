@@ -99,7 +99,7 @@ const props = defineProps({
     type: Object,
   },
 });
-
+opertaor.setParam(props.param);
 // 当前加载的组件索引
 const currentIndex = ref(0);
 const NavigaShow = ref(true);
@@ -115,7 +115,6 @@ onBeforeMount(() => {
  * @param data
  */
 const initPage = async () => {
-  console.log(props.param);
   const getProductRes = await getProductPage({
     CProdNo: props.param.cProdNo,
     CGrpMrk: props.param.cGrpMrk,

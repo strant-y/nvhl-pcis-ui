@@ -299,6 +299,18 @@ export function getTRFactorJson(queryParams: any): AxiosPromise<any> {
     return post(`/cvrgdef/getTRFactorJson`, queryParams);
 }
 
+export function qryProdRelTermRiskList(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/qryProdRelTermRiskList`, queryParams);
+}
+
+export function saveGroupInfo(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/saveGroupInfo`, queryParams);
+}
+
+export function getGroupInfo(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/getGroupInfo`, queryParams);
+}
+
 /**
  * 条款配置信息获取
  *
