@@ -34,7 +34,12 @@ import {
 } from "@/shared/app-table-config";
 import { ref, reactive, defineEmits, defineProps } from "vue";
 const emits = defineEmits(["ok", "cancel"]);
-import { getCvrgToRelList, saveCvrgRel, queryTermToRelList } from "@/api/prod";
+import {
+  getCvrgToRelList,
+  saveCvrgRel,
+  saveTermRel,
+  queryTermToRelList,
+} from "@/api/prod";
 
 const props = defineProps<{
   visible: boolean;
@@ -64,7 +69,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         func: () => {
-          queryFormRef.value?.resetFields();
+          freeEditRef.value?.setFormValue({
+            cKindNo: "",
+            cTermNo: "",
+            cNmeCn: "",
+          });
+          // handleQuery();
         },
       }),
     ],
@@ -129,9 +139,28 @@ const selectedRows = ref<any[]>([]);
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  s.cTermNo = tabref.getFromValue().cTermNo;
   const param = Object.assign(s, r, {
     cRdrTyp: "1",
+  });
+  queryTermToRelList(param)
+    .then((res) => {
+      const { code, data, msg } = res;
+      if (200 === code) {
+        pageresult.list = [];
+        pageresult.list = data.result;
+        pageresult.total = data.total;
+      } else {
+        ElMessage.error(msg);
+      }
+    })
+    .finally(() => {});
+}
+function getQueryList(flag?: boolean) {
+  const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
+  const s = freeEditRef.value?.getFromValue(); //获取表单数据
+  const param = Object.assign(s, r, {
+    cRdrTyp: "1",
+    cTermNo: tabref.getFromValue().cTermNo,
   });
   queryTermToRelList(param)
     .then((res) => {
@@ -154,8 +183,8 @@ const handleCancel = () => {
 };
 onMounted(() => {
   setTimeout(() => {
-    handleQuery();
-  }, 100);
+    getQueryList();
+  }, 300);
 });
 const handleConfirm = () => {
   if (!selectedRows.value.length) {
@@ -163,17 +192,17 @@ const handleConfirm = () => {
     return;
   }
   const opCde = JSON.parse(sessionStorage.getItem("user")).opCde;
-  const cTermNo = tabref.getFromValue().cTermNo;
+  // const a = tabref.getFromValue().cTermNo;
   const newArr = selectedRows.value.map((item) => {
     item.cCrtCde = opCde;
     item.cUpdCde = opCde;
     item.cCvrgRdrCde = item.cTermNo;
-    item.cTermNo = cTermNo;
+    item.cTermNo = tabref.getFromValue().cTermNo;
     item.cRdrTyp = "1";
     return item;
   });
-  const paramData = { cTermNo: cTermNo, rel: newArr };
-  saveCvrgRel(paramData)
+  const paramData = { cTermNo: tabref.getFromValue().cTermNo, rel: newArr };
+  saveTermRel(paramData)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {

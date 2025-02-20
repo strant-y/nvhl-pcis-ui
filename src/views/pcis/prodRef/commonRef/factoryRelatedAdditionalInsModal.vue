@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="dialogVisible"
-    title="关联附加险"
+    title="关联附加条款"
     width="80%"
     @update:model-value="handleVisibleUpdate"
   >
@@ -71,7 +71,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         label: "查询",
         func: async () => {
           handleQuery();
-          console.log("查询条件:");
         },
       }),
       createFreeButtonBase({
@@ -165,7 +164,7 @@ const handleCancel = () => {
 };
 const handleConfirm = () => {
   if (!selectedRows.value.length) {
-    ElMessage.error("请选择要关联的附加险");
+    ElMessage.error("请选择要关联的附加条款");
     return;
   }
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");

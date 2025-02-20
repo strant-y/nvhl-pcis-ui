@@ -61,7 +61,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         icon: "RefreshRight",
-        func: () => {},
+        func: () => {
+          freeEditRef.value.setformValue({
+            cKindNo: "",
+            cTermNo: "",
+            cNmeCn: "",
+          });
+          handleQuery();
+        },
       }),
     ],
     fromSchema: [
@@ -221,6 +228,28 @@ function handleQuery(flag?: boolean) {
   } else {
     const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
     const s = freeEditRef.value?.getFromValue(); //获取表单数据
+    const param = Object.assign(s, r);
+    queryTermRelList(param)
+      .then((res) => {
+        const { code, data, msg } = res;
+        if (200 === code) {
+          pageresult.list = data.result;
+          pageresult.total = data.total;
+        } else {
+          ElMessage.error(msg);
+        }
+      })
+      .finally(() => {});
+  }
+}
+function getQueryList(flag?: boolean) {
+  const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
+  if (tabref.getFromValue().cTermNo == null) {
+    ElMessage.error("请完善基本信息后在操作!");
+    return;
+  } else {
+    const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
+    const s = freeEditRef.value?.getFromValue(); //获取表单数据
     s.cTermNo = tabref.getFromValue().cTermNo;
     const param = Object.assign(s, r);
     queryTermRelList(param)
@@ -238,9 +267,10 @@ function handleQuery(flag?: boolean) {
 }
 onMounted(() => {
   if (param.type === "edit") {
+    console.log("附加条款edit", tabref.getFromValue().cTermNo);
     setTimeout(() => {
       handleQuery();
-    }, 100);
+    }, 300);
     // setDisa();
   }
 });

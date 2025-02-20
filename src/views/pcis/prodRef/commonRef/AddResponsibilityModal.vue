@@ -39,8 +39,10 @@ const formconfig = reactive<AppFreeEditConfig>(
     fromSchema: [
       {
         prop: "cKindNo",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "大类代码",
+        typeCode: "KIND_LIST_CACHE",
+        params: { codeListParam: "" },
         rules: [getRules("required", { blur: true })],
       },
       {

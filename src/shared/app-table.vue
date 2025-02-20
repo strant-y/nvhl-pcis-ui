@@ -39,13 +39,14 @@
 <script setup lang="ts">
 import { AppGridEditConfig } from "./app-grid-edit-config";
 import { AppTableConfig } from "./app-table-config";
+import { ref, reactive, defineEmits, defineProps, onMounted, watch } from "vue";
 
 defineOptions({
   name: "AppTable",
   inheritAttrs: false,
 });
 
-const emits = defineEmits(["pageChange"]); // 父组件监听事件，同步子组件值的变化给父组件
+const emits = defineEmits(["pageChange", "selection-change"]); // 父组件监听事件，同步子组件值的变化给父组件
 
 const queryParams = reactive<PageQuery>({
   pageNum: 1,
@@ -56,6 +57,7 @@ const appgrideditConfig = reactive<AppGridEditConfig>({
   editFlag: false, //是否可以编辑
 });
 const dataList = ref<any>([]);
+const rttableFrom = ref<any>(null);
 
 const props = defineProps({
   tableConfig: {
@@ -66,6 +68,11 @@ const props = defineProps({
   pageresult: {
     type: Object as () => Pageresult,
     required: true,
+  },
+  // 新增属性，用于接收默认选中的行数据
+  defaultSelectedRows: {
+    type: Array as () => any[],
+    default: () => [],
   },
 });
 
@@ -82,6 +89,10 @@ watch(
   () => props.pageresult,
   (newPageresult) => {
     dataList.value = newPageresult.list;
+    // 数据更新后，设置默认选中的行
+    if (rttableFrom.value && props.defaultSelectedRows.length > 0) {
+      rttableFrom.value.toggleRowSelection(props.defaultSelectedRows, true);
+    }
   },
   { deep: true }
 );
@@ -89,10 +100,17 @@ watch(
 onMounted(() => {
   Object.assign(appgrideditConfig, props.tableConfig);
   appgrideditConfig.editFlag = false;
+  // 组件挂载后，设置默认选中的行
+  if (rttableFrom.value && props.defaultSelectedRows.length > 0) {
+    console.log("设置默认选中的行", props.defaultSelectedRows);
+    rttableFrom.value.toggleRowSelection(props.defaultSelectedRows, true);
+  }
 });
+
 function handleSelectionChange(selectedRows: any[]) {
   emits("selection-change", selectedRows);
 }
+
 function pageChange() {
   emits("pageChange");
 }

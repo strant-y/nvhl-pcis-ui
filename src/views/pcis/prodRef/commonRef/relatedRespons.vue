@@ -257,9 +257,10 @@ function handleQuery(flag?: boolean) {
 }
 onMounted(() => {
   if (param.type === "edit") {
+    console.log("编辑", tabref.getFromValue().cTermNo);
     setTimeout(() => {
       handleQuery();
-    }, 200);
+    }, 300);
   }
 });
 

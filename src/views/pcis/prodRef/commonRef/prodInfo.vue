@@ -202,6 +202,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtdatepicker",
         title: " 生效日期",
         rules: [getRules("required", { change: "生效日期不能为空" })],
+        // func: (val: any) => {
+        //   freeEditRef.value?.setFormValue({
+        //     cCriterionTimeUnit: "A",
+        //     tBgnTm: dayjs(val).format("YYYY-MM-DD"),
+        //     tAdbTm: dayjs(val).add(3, "day").format("YYYY-MM-DD"),
+        //   });
+        // },
       },
       {
         prop: "tAdbTm",
