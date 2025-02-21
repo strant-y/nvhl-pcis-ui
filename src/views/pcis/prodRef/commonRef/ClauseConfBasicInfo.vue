@@ -1,5 +1,9 @@
 <template>
-  <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+  <app-free-edit
+    v-model:freeEditConfig="formconfig1"
+    :key="formconfig1.fromSchema"
+    ref="freeEditRef"
+  />
 </template>
 
 <script setup lang="ts">
@@ -168,9 +172,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", { change: true })],
         //主条款是1附加条款是0
         func: (val: any) => {
-          if (val == "1") {
-          } else {
-          }
+          formconfig1.fromSchema.forEach((item: any) => {
+            if (item.prop === "cRdrTyp") {
+              if (val === "1") {
+                item.hidden = true;
+              } else {
+                item.hidden = false;
+              }
+            }
+          });
         },
       },
       {
@@ -180,6 +190,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         typeCode: "additional_insurance",
         params: { cParCde: "add_type" },
         rules: [getRules("required", { change: true })],
+        hidden: false, // 初始状态为显示
       },
       {
         prop: "tFilingTm",
@@ -231,6 +242,18 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     }),
   })
 );
+// 监听主条款/附加条款字段的变化
+watch(
+  () => freeEditRef.value?.getValue("cRdrTyp"),
+  (newValue) => {
+    const additionalInsuranceTypeField = formconfig1.fromSchema.find(
+      (field) => field.prop === "additionalInsuranceType"
+    );
+    if (additionalInsuranceTypeField) {
+      additionalInsuranceTypeField.hidden = newValue === "1";
+    }
+  }
+);
 function getFromValue() {
   return freeEditRef?.value?.getFromValue();
 }
@@ -277,6 +300,17 @@ defineExpose({
   setValue,
   getValue,
 });
+
+watch(
+  () => formconfig1.fromSchema,
+  (newVal) => {
+    console.log("深度监听当前表单", newVal);
+  },
+  {
+    deep: true,
+  }
+);
+
 onMounted(() => {
   // setDisa();
   if (param.type === "edit") {
