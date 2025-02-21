@@ -29,58 +29,77 @@
       </template>
 
       <div v-if="showData">
-        <template v-if="showRiskInfo">
-          <div v-if="foldRiskInfo">
+        <template v-for="(ginfo, k) in groupInfo" :key="k">
+          <el-row>
+            <el-col :span="22">
+              <a
+                style="margin-right: 5px"
+                @click="ginfo.hidden = !ginfo.hidden"
+              >
+                <el-icon v-if="!ginfo.hidden"><ArrowUpBold /></el-icon>
+                <el-icon v-if="ginfo.hidden"><ArrowDownBold /></el-icon>
+              </a>
+              <span>
+                {{ ginfo.cGroupTitle }}
+              </span>
+            </el-col>
+          </el-row>
+          <el-row>
             <table style="width: 100%">
               <thead>
                 <tr class="table-title">
                   <th
-                    v-for="(i, index) in tempConfig?.factorConfig
-                      ?.factorGroupId"
-                    :key="index"
-                    :width="i.width ? i.width : null"
+                    v-for="col in getColinfo(ginfo.cGroupId)"
+                    :key="col.cColId"
+                    :width="col.width ? col.width : null"
                   >
-                    {{ i.title }}
+                    {{ col.cColTitle }}
                   </th>
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="(i, index) in Array.from(
-                    { length: tempConfig?.factorConfig?.rowNum || 0 },
-                    (_, i) => i
-                  )"
-                  :key="index"
+                <template
+                  v-for="risk in props.formData.riskList"
+                  :key="risk.cRiskNo"
                 >
                   <template
-                    v-for="(j, jndex) in tempConfig?.factorConfig
-                      ?.factorGroupId"
-                    :key="jndex"
+                    v-if="(colObj = getcolConfig(ginfo.cGroupId, risk.cRiskNo))"
                   >
-                    <td
-                      v-if="j?.factorlist[i]"
-                      :rowspan="
-                        j?.factorlist[i]?.type === 'rowspan'
-                          ? tempConfig?.factorConfig?.rowNum
-                          : null
-                      "
-                    >
-                      <template v-if="j?.factorlist[i]?.type === 'text'">
-                        <span>{{ j.factorlist[i].factoritem.text }} </span>
-                      </template>
-                      <template v-else>
-                        <from-item
-                          v-if="!!j.factorlist[i]"
-                          v-model="props.formData[j.factorlist[i].factorKey]"
-                          :item="j.factorlist[i].factoritem"
-                        />
-                      </template>
-                    </td>
+                    <template v-if="colObj.maxNum > 0">
+                      <tr v-for="n in colObj.maxNum" :key="n">
+                        <template
+                          v-for="colinfo in colObj.col"
+                          :key="colinfo.cColId"
+                        >
+                          <template
+                            v-if="
+                              (factor = colObj.rowConfig[colinfo.cColId][n - 1])
+                            "
+                          >
+                            <td
+                              :rowspan="
+                                factor?.cPorpType === 'rowspan'
+                                  ? colObj.maxNum
+                                  : null
+                              "
+                            >
+                              <template v-if="factor.cPorpType === 'text'">
+                                <span>{{ getText(factor) }} </span>
+                              </template>
+                              <template v-else>
+                                <from-item 
+                                :item="getProp(factor)" />
+                              </template>
+                            </td>
+                          </template>
+                        </template>
+                      </tr>
+                    </template>
                   </template>
-                </tr>
+                </template>
               </tbody>
             </table>
-          </div>
+          </el-row>
         </template>
       </div>
     </el-card>
@@ -97,27 +116,102 @@ const props = defineProps({
   },
 });
 
-const tempConfig = ref({});
+const groupInfo = ref({});
+const colInfo = ref([]);
+const factormap = ref({});
+const collist = ref([]);
+
 const showData = ref(true);
 const showRiskInfo = ref(true);
 const foldRiskInfo = ref(true);
 
+function getColinfo(groupId: string) {
+  return colInfo.value.filter((v: any) => v.cGroupId === groupId);
+}
+
+const getcolConfig = computed(() => {
+  return (groupId: string, riskNo: string) => {
+    const conf = {
+      col: getcol(groupId),
+      maxNum: maxNum(groupId, riskNo),
+      rowConfig: getRowConfig(groupId, riskNo),
+    };
+    return conf;
+  };
+});
+function getcol(groupId: string) {
+  return colInfo.value.filter((v: any) => v.cGroupId === groupId);
+}
+
+function getRowConfig(groupId: string, riskNo: string) {
+  const all = collist.value.filter(
+    (v: any) => v.cGroupId === groupId && v.cRiskNo === riskNo
+  );
+
+  const colMap = all.reduce(
+    (acc, item) => {
+      const key = item["cColId"];
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      acc[key].push(item);
+      return acc;
+    },
+    {} as { [key: string]: any[] }
+  );
+  return colMap;
+}
+
+function maxNum(groupId: string, riskNo: string) {
+  let sumKey: { [key: string]: number } = {};
+  collist.value.forEach((v) => {
+    if (v["cGroupId"] === groupId && v["cRiskNo"] === riskNo) {
+      const colId = v["cColId"];
+      if (sumKey[colId]) {
+        sumKey[colId] += 1;
+      } else {
+        sumKey[colId] = 1;
+      }
+    }
+  });
+  let max = Math.max(...Object.values(sumKey));
+  return max;
+}
+
+const getText = computed(() => {
+  return (col: any) => {
+    const factorId = col["cFactorId"];
+    const fact = factormap.value[factorId];
+    return fact.title;
+  };
+});
+
+const getProp = computed(() => {
+  return (col: any) => {
+    const factorId = col["cFactorId"];
+    const fact = factormap.value[factorId];
+    return fact;
+  };
+});
+
 onMounted(async () => {
+  console.log(props.formData);
   const param = {
-    riskNo: props.formData.riskNo,
-    termNo: props.formData.termNo,
+    cTermNo: props.formData.cTermNo,
+    riskList: props.formData.riskList,
   };
   getTRFactorJson(param).then((res) => {
     const { code, data, msg } = res;
     if (200 === code) {
       console.log(data.data);
-      tempConfig.value = data.data;
+      collist.value = data.data.collist;
+      factormap.value = data.data.factormap;
+      colInfo.value = data.data.colInfo;
+      groupInfo.value = data.data.groupInfo;
     } else {
       ElMessage.error(msg);
     }
   });
-  // tempConfig.value = JSON.parse(str);
-  console.log(tempConfig);
 });
 </script>
 <style lang="scss" scoped>
