@@ -60,10 +60,10 @@
               <tbody>
                 <template
                   v-for="risk in props.formData.riskList"
-                  :key="risk.cRiskNo"
+                  :key="risk"
                 >
                   <template
-                    v-if="(colObj = getcolConfig(ginfo.cGroupId, risk.cRiskNo))"
+                    v-if="(colObj = getcolConfig(ginfo.cGroupId, risk['cvrg.cRiskNo']))"
                   >
                     <template v-if="colObj.maxNum > 0">
                       <tr v-for="n in colObj.maxNum" :key="n">
@@ -87,8 +87,11 @@
                                 <span>{{ getText(factor) }} </span>
                               </template>
                               <template v-else>
-                                <from-item 
-                                :item="getProp(factor)" />
+                                <template v-if="(factorConf = getProp(factor))">
+                                  <from-item 
+                                  v-model="risk[factorConf.prop]"
+                                  :item="getProp(factor)" />
+                                </template>
                               </template>
                             </td>
                           </template>
@@ -195,10 +198,24 @@ const getProp = computed(() => {
 });
 
 onMounted(async () => {
-  console.log(props.formData);
+  let queryList: { [k: string]: any; }[] = [];
+  props.formData.riskList.forEach((item: any) => {
+    let p: { [k: string]: any } = {};
+    Object.keys(item).forEach((key) => {
+      const v = item[key];
+      let newKey  = '';
+      if(key.indexOf('.')){
+        newKey = key.split('.')[1];
+      }else{
+        newKey = key;
+      }
+      p[newKey] = v;
+    });
+    queryList.push(p);
+  });
   const param = {
     cTermNo: props.formData.cTermNo,
-    riskList: props.formData.riskList,
+    riskList: queryList,
   };
   getTRFactorJson(param).then((res) => {
     const { code, data, msg } = res;

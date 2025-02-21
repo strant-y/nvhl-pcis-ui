@@ -61,10 +61,10 @@ const method = {
         isOk: (selectdata: any) => {
           let adddata: any [] = [];
           selectdata.forEach((item: any) => {
-            let riskList: { cRiskNo: any; }[] = [];
+            let riskList: { "cvrg.cRiskNo": any; }[] = [];
             item.children?.forEach((e: any) => {
               riskList.push({
-                cRiskNo: e.cRiskNo,
+                "cvrg.cRiskNo": e.cRiskNo,
               });
             });
             let data = {
