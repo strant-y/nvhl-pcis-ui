@@ -1,6 +1,6 @@
 <!--险别配置--关联附加险弹框-->
 <template>
-  <div>
+  <div class="app-container">
     <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
     <app-table
       :tableConfig="tableconfig"

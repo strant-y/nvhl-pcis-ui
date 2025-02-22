@@ -7,9 +7,9 @@
       <el-col class="logo-text">
         <el-row><span class="text-class">财产保险</span>承保系统</el-row>
         <el-row class="text-en"
-          ><span class="text-class">Property Insurance </span>Underwriting System
-          </el-row
-        >
+          ><span class="text-class">Property Insurance </span>Underwriting
+          System
+        </el-row>
       </el-col>
 
       <el-col class="ewm-img">

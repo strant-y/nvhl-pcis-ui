@@ -27,12 +27,16 @@
                 :id="k.pageKey"
               >
                 <component
+                  v-if="
+                    k.pageKey !== 'relatedAdditionalIns' || isAdditionalClause
+                  "
                   :ref="
                     (res) => {
                       opertaor.addTableRef(k.pageKey, res);
                     }
                   "
                   :is="k.pageRef + '-ref'"
+                  @clause-type-change="handleClauseTypeChange"
                 />
               </div>
             </template>
@@ -91,7 +95,20 @@ opertaor.setTableConfig([
     },
   },
 ]);
+const isAdditionalClause = ref(false);
 
+const handleClauseTypeChange = (val: string) => {
+  console.log("条款类型变化:", val);
+  isAdditionalClause.value = val === "1"; // 0 表示附加条款
+};
+const filteredPageInfo = (pageInfo: any) => {
+  if (isAdditionalClause.value) {
+    return Object.values(pageInfo).filter(
+      (item: any) => item.pageKey !== "relatedAdditionalIns"
+    );
+  }
+  return Object.values(pageInfo);
+};
 const btns = {};
 onMounted(async () => {
   // getProdInfos(param)

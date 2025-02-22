@@ -161,7 +161,6 @@ function getFromValue() {
 }
 
 function setFormValue(data: any) {
-  console.log(data, "=========================");
   if (data === undefined) {
     data = {};
   }
@@ -202,6 +201,17 @@ function setValue(key: any, value: any) {
     superDynamicForm.value?.setValue(key, value);
   }
 }
+watch(
+  () => freeEditConfig,
+  (newVal) => {
+    if (newVal) {
+      console.log("newVal0000000000000", newVal);
+    }
+  },
+  {
+    deep: true,
+  }
+);
 
 defineExpose({
   getFromValue,

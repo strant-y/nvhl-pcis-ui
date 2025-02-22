@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="app-container">
     <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
     <app-table
       :tableConfig="tableconfig"

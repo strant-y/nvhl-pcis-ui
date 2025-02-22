@@ -47,7 +47,7 @@ const formData = ref({
   cTermNo: "",
   cNmeCn: "",
   cRdrTyp: "",
-  cStatus: "",
+  cEnableFlag: "",
 });
 function resetFields() {
   formData.value = {
@@ -55,7 +55,7 @@ function resetFields() {
     cTermNo: "",
     cNmeCn: "",
     cRdrTyp: "",
-    cStatus: "",
+    cEnableFlag: "",
   };
 }
 defineExpose({
@@ -84,7 +84,7 @@ const formconfig = reactive<AppFreeEditConfig>(
             cNmeCn: "",
             cTermNo: "",
             cRdrTyp: "",
-            cStatus: "",
+            cEnableFlag: "",
           });
           handleQuery();
         },
@@ -124,7 +124,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         clearable: true,
       },
       {
-        prop: "cStatus",
+        prop: "cEnableFlag",
         inputtype: "rtselect",
         title: "启用标识",
         typeCode: "WEB_SYS_STA_DICT",
@@ -137,7 +137,7 @@ const formconfig = reactive<AppFreeEditConfig>(
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
-    editList: ["cStatus"],
+    editList: ["cEnableFlag"],
     titleBtns: [
       createFreeButtonBase({
         id: "score",
@@ -234,7 +234,7 @@ const tableconfig = reactive<AppTableConfig>(
       //   title: "有效标志",
       // },
       {
-        prop: "cStatus",
+        prop: "cEnableFlag",
         inputtype: "rtswitch",
         title: "启用标识",
         keymap: {

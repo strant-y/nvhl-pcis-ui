@@ -16,7 +16,7 @@
                 ? item.itemWidth * formUi.span
                 : formUi.span
           "
-          v-if="!item.group"
+          v-if="!item.group && !item.hidden"
         >
           <template v-if="item.inputtype === 'rtinputgroup'">
             <el-form-item>
@@ -165,7 +165,8 @@
             "
             v-if="
               item.group === v.id &&
-              (item.expand ? item.expand && v.disabled : true)
+              (item.expand ? item.expand && v.disabled : true) &&
+              !item.hidden
             "
           >
             <template v-if="item.inputtype === 'rtinputgroup'">
@@ -441,8 +442,17 @@ watch(
   }
 );
 watch(form, (newForm) => {
-  console.log(newForm);
+  console.log(newForm, "5555555555555");
 });
+watch(
+  () => props.fromSchema,
+  (newFromSchema) => {
+    console.log(newFromSchema, "11111111111111111111111111111");
+  },
+  {
+    deep: true,
+  }
+);
 
 onMounted(() => {});
 

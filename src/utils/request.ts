@@ -16,7 +16,6 @@ const service = axios.create({
 // 请求拦截器
 service.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-
     // 调本地处理
     const url = config.url;
     if (url?.includes(LocalBaseApi)) {
@@ -44,6 +43,7 @@ service.interceptors.request.use(
           source: JSON.stringify(param)
         }
       }
+      console.log('请求参数',param);
       config.data = reqParamsEncrypt(param)
     }catch (e){
       ElMessage.error(e);

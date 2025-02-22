@@ -21,6 +21,30 @@
       @expand-change="expandChange"
       @selection-change="handleSelectionChange"
     >
+      <!-- 其他列定义 -->
+      <!-- <el-table-column
+        prop="cStatus"
+        inputtype="rtswitch"
+        label="启用标识"
+        keymap="{
+          y: '1',
+          n: '0',
+        }"
+        activeText="启用"
+        inactiveText="禁用"
+        inline-prompt
+        :formatter="statusFormatter"
+      >
+        <template #default="scope">
+          <el-switch
+            v-model="scope.row.cStatus"
+            activeText="启用"
+            inactiveText="禁用"
+            inline-prompt
+            @change="handleStatusChange(scope.row)"
+          />
+        </template>
+      </el-table-column> -->
       <el-table-column
         type="index"
         :index="indexMethod"
@@ -134,10 +158,10 @@
               <from-item
                 v-model="scope.row[i.prop]"
                 :item="i"
-                :showLabel="!(props.item.editList &&
-                props.item.editList.length > 0
-                  ? props.item.editList?.includes(i.prop)
-                  : false || editIndex === scope.row._dataId)
+                :showLabel="
+                  !(props.item.editList && props.item.editList.length > 0
+                    ? props.item.editList?.includes(i.prop)
+                    : false || editIndex === scope.row._dataId)
                 "
               />
             </template>
@@ -205,6 +229,7 @@ import { ref, reactive, watch, onMounted } from "vue";
 const emits = defineEmits<{
   (e: "update:modelValue", value: any[]): void;
   (e: "selection-change", rows: any[]): void;
+  (e: "status-change", row: any): void;
 }>();
 
 const expandFromItem = ref<Record<string, any>>({});
@@ -443,6 +468,9 @@ function getSelectRow() {
     }
   });
   return sele;
+}
+function handleStatusChange(row: any) {
+  emits("status-change", row); // 触发事件并传递行对象
 }
 
 defineExpose({
