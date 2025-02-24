@@ -1,5 +1,12 @@
 <template>
-  <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+  <div>
+    <app-free-edit
+      v-model:freeEditConfig="formconfig1"
+      :key="formconfig1.fromSchema"
+      ref="freeEditRef"
+    />
+    <comDialog ref="dialog"></comDialog>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -19,6 +26,8 @@ import {
 } from "@/api/prod";
 import { ref, reactive, onMounted } from "vue";
 import { useRoute } from "vue-router";
+import { DialogMethod } from "@/views/dzmodel/ComDialogConf";
+const dialog = ref<DialogMethod | null>(null);
 
 const route = useRoute();
 const router = useRouter();
@@ -37,6 +46,27 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       //   type: "primary",
       //   func: () => {},
       // }),
+      createFreeButtonBase({
+        type: "success",
+        label: "标题绑定",
+        func: async () => {
+          const cTermNo = freeEditRef.value?.getValue("cTermNo");
+
+          dialog.value?.open(
+            "termGroupConfig",
+            {
+              type: "show",
+              data: {
+                cTermNo: cTermNo,
+              },
+            },
+            {
+              isOk: (selectdata: any) => {},
+            },
+            { title: "群组编辑", width: 85 }
+          );
+        },
+      }),
       createFreeButtonBase({
         type: "primary",
         label: "保存",
@@ -319,6 +349,17 @@ defineExpose({
   setValue,
   getValue,
 });
+
+watch(
+  () => formconfig1.fromSchema,
+  (newVal) => {
+    console.log("深度监听当前表单", newVal);
+  },
+  {
+    deep: true,
+  }
+);
+
 onMounted(() => {
   // setAdditionalInsuranceTypeHidden("1");
   if (param.type === "edit") {
