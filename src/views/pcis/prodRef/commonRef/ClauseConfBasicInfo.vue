@@ -1,6 +1,10 @@
 <template>
   <div>
-    <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+    <app-free-edit
+      v-model:freeEditConfig="formconfig1"
+      :key="formconfig1.fromSchema"
+      ref="freeEditRef"
+    />
     <comDialog ref="dialog"></comDialog>
   </div>
 </template>
@@ -216,7 +220,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         typeCode: "additional_insurance",
         params: { cParCde: "add_type" },
         rules: [getRules("required", { change: true })],
-        hidden: false, // 初始状态为显示
+        hidden: true, // 初始状态为显示
       },
       {
         prop: "tFilingTm",
@@ -334,7 +338,6 @@ const emit = defineEmits(["clause-type-change"]);
 watch(
   () => freeEditRef.value?.getValue("cRdrTyp"),
   (newValue) => {
-    console.log("主条款/附加条款字段变化", newValue);
     emit("clause-type-change", newValue);
   }
 );
