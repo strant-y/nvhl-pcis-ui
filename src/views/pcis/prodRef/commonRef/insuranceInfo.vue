@@ -9,11 +9,11 @@ import {
   createAppFreeEditConfig,
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
-import {createFreeButtonBase} from "@/shared/button-config";
-import {useValidator} from "@/typings/useValidator";
-import {saveProdInfo} from "@/api/prod";
-import {dataOpertaor} from "@/store/modules/data-opertaor";
-import {useRoute} from "vue-router";
+import { createFreeButtonBase } from "@/shared/button-config";
+import { useValidator } from "@/typings/useValidator";
+import { saveProdInfo } from "@/api/prod";
+import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { useRoute } from "vue-router";
 
 const opertaor = dataOpertaor();
 
@@ -110,7 +110,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             label: "附加险",
             value: "2",
           },
-        ]
+        ],
       },
       {
         prop: "cProdNme",
@@ -204,9 +204,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       },
       {
         prop: "cProdNme",
-        inputtype: "rttextarea",
+        inputtype: "rtinput",
+        type: "textarea",
         title: "险别描述",
-
       },
     ],
     fromUi: createFromUiConfig({

@@ -71,6 +71,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           if (isValid) {
             const s = freeEditRef.value?.getFromValue(); //获取表单数据
             const datas = Object.assign(s, { type: param.type });
+            // const paramData = datas.map((item: any) => {
+            //   if (item.cRdrTyp == "1") {
+            //   }
+            // });
             savePrdTermInfo(datas)
               .then((res) => {
                 const { code, data, msg } = res;
@@ -302,12 +306,38 @@ function handleQuery() {
       const { code, data, msg } = res;
       if (200 === code) {
         freeEditRef?.value?.setFormValue(data);
+        // 调用 watch 监听器中的逻辑来设置 additionalInsuranceType 字段的 hidden 属性
+        const cRdrTypValue = data.cRdrTyp;
+        setAdditionalInsuranceTypeHidden(cRdrTypValue);
       } else {
         ElMessage.error(msg);
       }
     })
     .finally(() => {});
 }
+// 新增函数来设置 additionalInsuranceType 字段的 hidden 属性
+function setAdditionalInsuranceTypeHidden(cRdrTypValue: string) {
+  const additionalInsuranceTypeField = formconfig1.fromSchema.find(
+    (field) => field.prop === "additionalInsuranceType"
+  );
+  if (additionalInsuranceTypeField) {
+    additionalInsuranceTypeField.hidden = cRdrTypValue === "0";
+    if (cRdrTypValue === "0") {
+      // 隐藏时将值置空
+      freeEditRef.value?.setValue("additionalInsuranceType", null);
+    }
+  }
+}
+const emit = defineEmits(["clause-type-change"]);
+
+// 监听主条款/附加条款字段的变化
+watch(
+  () => freeEditRef.value?.getValue("cRdrTyp"),
+  (newValue) => {
+    console.log("主条款/附加条款字段变化", newValue);
+    emit("clause-type-change", newValue);
+  }
+);
 function setDisa() {
   formconfig1.fromSchema?.forEach((e) => {
     if (e.prop === "cTermNo" || e.prop === "cWebsite") {
@@ -334,10 +364,11 @@ watch(
 );
 
 onMounted(() => {
-  // setDisa();
+  // setAdditionalInsuranceTypeHidden("1");
   if (param.type === "edit") {
     handleQuery();
   } else {
+    setAdditionalInsuranceTypeHidden("1");
     // 如果不是编辑模式，确保默认值生效
     freeEditRef.value?.setFormValue({ cSourceTyp: "9" });
   }

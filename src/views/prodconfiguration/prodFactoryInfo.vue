@@ -65,12 +65,12 @@ opertaor.setTableConfig([
     groupId: "",
     showGroupId: false,
     pageInfo: {
-      // prodaudit: {
-      //   pageKey: "prodaudit",
-      //   pageTtile: "产品审核",
-      //   pageRef: "prodaudit",
-      //   isShow: true,
-      // },
+      prodaudit: {
+        pageKey: "prodaudit",
+        pageTtile: "产品审核",
+        pageRef: "prodaudit",
+        isShow: true,
+      },
       prodInfo: {
         pageKey: "prodInfo",
         pageTtile: "产品基本信息",
@@ -178,9 +178,6 @@ function loadAfter() {
     });
   }
 }
-watch(route, (to, from) => {
-  // router.go(0);
-});
 function setData(datas: any) {
   Object.keys(datas).forEach((k) => {
     const ref = opertaor.getTableRefByKey(k);

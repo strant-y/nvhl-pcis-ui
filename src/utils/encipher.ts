@@ -47,7 +47,7 @@ export const reqParamsEncrypt = (params: any) => {
       for (const i in keys) {
         parameterNew[keys[i]] = params[keys[i]];
       }
-      console.log('请求参数',parameterNew);
+      // console.log('请求参数',parameterNew);
       const encoder = encryptParameter(JSON.stringify(parameterNew));
       reqParams = {
         sourceParameter: encoder,

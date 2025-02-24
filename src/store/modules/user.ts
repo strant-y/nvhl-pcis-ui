@@ -47,6 +47,7 @@ export const useUserStore = defineStore("user", () => {
               sessionStorage.setItem("returntime", res.returntime);
               
               const query: LocationQuery = route.query;
+
               const redirect = (query.redirect as LocationQueryValue) ?? "/";
               const otherQueryParams = Object.keys(query).reduce(
                 (acc: any, cur: string) => {

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="app-container">
     <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
     <app-table
       :tableConfig="tableconfig"
@@ -253,7 +253,7 @@ onMounted(() => {
   if (param.editType == "edit") {
     setTimeout(() => {
       handleQuery();
-    }, 100);
+    }, 200);
   }
 });
 

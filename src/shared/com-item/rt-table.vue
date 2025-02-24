@@ -20,7 +20,9 @@
       :expand-row-keys="expandRowKeys"
       @expand-change="expandChange"
       @selection-change="handleSelectionChange"
+      @status-change="handleStatusChange"
     >
+      <!-- 其他列定义 -->
       <el-table-column
         type="index"
         :index="indexMethod"
@@ -52,6 +54,7 @@
                     v-model="props.row[i.prop]"
                     :item="i"
                     :showLabel="editIndex !== props.row._dataId"
+                    :row="scope.row"
                   />
                 </el-form-item>
               </el-col>
@@ -134,11 +137,12 @@
               <from-item
                 v-model="scope.row[i.prop]"
                 :item="i"
-                :showLabel="!(props.item.editList &&
-                props.item.editList.length > 0
-                  ? props.item.editList?.includes(i.prop)
-                  : false || editIndex === scope.row._dataId)
+                :showLabel="
+                  !(props.item.editList && props.item.editList.length > 0
+                    ? props.item.editList?.includes(i.prop)
+                    : false || editIndex === scope.row._dataId)
                 "
+                :row="scope.row"
               />
             </template>
           </template>
@@ -199,12 +203,13 @@
 <script setup lang="ts">
 import { v4 as uuidv4 } from "uuid";
 import Validator from "async-validator";
-import { ref, reactive, watch, onMounted } from "vue";
+import { ref, reactive, watch, onMounted, handleError } from "vue";
 
 // 定义要触发的事件
 const emits = defineEmits<{
   (e: "update:modelValue", value: any[]): void;
   (e: "selection-change", rows: any[]): void;
+  (e: "status-change", row: any): void;
 }>();
 
 const expandFromItem = ref<Record<string, any>>({});
@@ -443,6 +448,9 @@ function getSelectRow() {
     }
   });
   return sele;
+}
+function handleStatusChange(row: any) {
+  emits("status-change", row); // 触发事件并传递行对象
 }
 
 defineExpose({

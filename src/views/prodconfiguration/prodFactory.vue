@@ -211,14 +211,15 @@ const tableconfig = reactive<AppTableConfig>(
         activeText: "启用",
         inactiveText: "禁用",
         inlinePrompt: true,
-        func: async (row) => {
-          const res = await changeStatus({
+        func: async (val, row) => {
+          await changeStatus({
             cProdNo: row.cProdNo,
-            cStatus: row.cStatus,
+            cStatus: val,
+          }).then((res) => {
+            if (res.code === 200) {
+              handleQuery();
+            }
           });
-          if (res.code == 200) {
-            handleQuery();
-          }
         },
       },
       {
@@ -271,7 +272,6 @@ function copy(cProdNo: string) {
     { title: "产品复制确认" }
   );
 }
-
 /** 查询 */
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据

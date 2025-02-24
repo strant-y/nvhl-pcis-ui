@@ -1,11 +1,13 @@
 <template>
-  <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
-  <app-table
-    :tableConfig="tableconfig"
-    v-model:pageresult="pageresult"
-    ref="tableRef"
-    @page-change="handleQuery(false)"
-  />
+  <div class="app-container">
+    <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+    <app-table
+      :tableConfig="tableconfig"
+      v-model:pageresult="pageresult"
+      ref="tableRef"
+      @page-change="handleQuery(false)"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -59,7 +61,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         icon: "RefreshRight",
-        func: () => {},
+        func: () => {
+          freeEditRef.value.setFormValue({
+            cKindNo: "",
+            cProdNo: "",
+            cNmeCn: "",
+            cStatus: "",
+            cAuditStatus: "",
+          });
+          handleQuery();
+        },
       }),
     ],
 

@@ -307,7 +307,7 @@ function getValue(key: string) {
 
 function setDisa() {
   formconfig1.fromSchema?.forEach((e) => {
-    if (e.prop === "cProdNo" || e.prop === "cKindNo") {
+    if (e.prop === "cProdNo" || e.prop === "descri") {
       e.disabled = true;
     }
   });
@@ -331,6 +331,7 @@ function handleQuery() {
 }
 onMounted(() => {
   if (param.editType === "edit") {
+    setDisa();
     handleQuery(param.prodNo);
   } else {
     setTimeout(() => {

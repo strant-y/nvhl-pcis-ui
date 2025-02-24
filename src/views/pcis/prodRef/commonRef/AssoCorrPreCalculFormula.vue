@@ -1,12 +1,14 @@
 <!--关联批改保费计算公式-->
 <template>
-  <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
-  <app-table
-    :tableConfig="tableconfig"
-    v-model:pageresult="pageresult"
-    ref="tableRef"
-    @page-change="handleQuery(false)"
-  />
+  <div class="app-container">
+    <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+    <app-table
+      :tableConfig="tableconfig"
+      v-model:pageresult="pageresult"
+      ref="tableRef"
+      @page-change="handleQuery(false)"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -232,7 +234,9 @@ function handleQuery() {
 
 onMounted(() => {
   if (param.editType === "edit") {
-    handleQuery();
+    setTimeout(() => {
+      handleQuery();
+    }, 200);
     // setDisa();
   }
 });

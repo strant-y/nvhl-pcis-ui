@@ -7,6 +7,7 @@
     :showLabel="showLabel"
     :parentFromUi="parentFromUi"
     @value-change="handleChange"
+    :row="row"
   />
 </template>
 
@@ -25,6 +26,10 @@ const props = defineProps({
     default: false,
   },
   parentFromUi: {
+    type: Object as () => Record<string, any>,
+    required: false,
+  },
+  row: {
     type: Object as () => Record<string, any>,
     required: false,
   },

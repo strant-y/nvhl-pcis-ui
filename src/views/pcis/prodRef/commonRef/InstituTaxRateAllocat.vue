@@ -1,6 +1,6 @@
 <!--机构税率配置-->
 <template>
-  <div>
+  <div class="app-container">
     <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
     <app-table
       :tableConfig="tableconfig"
@@ -264,7 +264,9 @@ function handleQuery(flag?: boolean) {
 }
 onMounted(() => {
   if (param.editType === "edit") {
-    handleQuery();
+    setTimeout(() => {
+      handleQuery();
+    }, 200);
     // setDisa();
   }
 });

@@ -12,6 +12,7 @@
           :item="appgrideditConfig"
           ref="rttableFrom"
           @selection-change="handleSelectionChange"
+          @status-change="handleStatusChange"
         />
         <el-pagination
           v-model:current-page="queryParams.pageNum"
@@ -46,7 +47,7 @@ defineOptions({
   inheritAttrs: false,
 });
 
-const emits = defineEmits(["pageChange", "selection-change"]); // 父组件监听事件，同步子组件值的变化给父组件
+const emits = defineEmits(["pageChange", "selection-change", "status-change"]); // 父组件监听事件，同步子组件值的变化给父组件
 
 const queryParams = reactive<PageQuery>({
   pageNum: 1,
@@ -109,6 +110,9 @@ onMounted(() => {
 
 function handleSelectionChange(selectedRows: any[]) {
   emits("selection-change", selectedRows);
+}
+function handleStatusChange(val, row) {
+  emits("status-change", val, row); // 传递当前行的数据
 }
 
 function pageChange() {
