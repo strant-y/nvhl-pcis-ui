@@ -111,8 +111,8 @@ onMounted(() => {
 function handleSelectionChange(selectedRows: any[]) {
   emits("selection-change", selectedRows);
 }
-function handleStatusChange(row: any) {
-  emits("status-change", row); // 触发事件并传递行对象
+function handleStatusChange(val, row) {
+  emits("status-change", val, row); // 传递当前行的数据
 }
 
 function pageChange() {

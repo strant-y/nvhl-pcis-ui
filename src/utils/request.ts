@@ -43,7 +43,7 @@ service.interceptors.request.use(
           source: JSON.stringify(param)
         }
       }
-      console.log('请求参数',param);
+      // console.log('请求参数',param);
       config.data = reqParamsEncrypt(param)
     }catch (e){
       ElMessage.error(e);

@@ -32,7 +32,7 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { getProdList, qryProdTermList } from "@/api/prod";
+import { getProdList, qryProdTermList, changeStatus } from "@/api/prod";
 import { clear } from "console";
 
 const pageresult = reactive<Pageresult>({
@@ -244,6 +244,16 @@ const tableconfig = reactive<AppTableConfig>(
         activeText: "启用",
         inactiveText: "禁用",
         inlinePrompt: true,
+        func: async (val, row) => {
+          await changeStatus({
+            cTermNo: row.cTermNo,
+            cStatus: val,
+          }).then((res) => {
+            if (res.code === 200) {
+              handleQuery();
+            }
+          });
+        },
       },
     ],
   })

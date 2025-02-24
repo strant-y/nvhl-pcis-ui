@@ -20,31 +20,9 @@
       :expand-row-keys="expandRowKeys"
       @expand-change="expandChange"
       @selection-change="handleSelectionChange"
+      @status-change="handleStatusChange"
     >
       <!-- 其他列定义 -->
-      <!-- <el-table-column
-        prop="cStatus"
-        inputtype="rtswitch"
-        label="启用标识"
-        keymap="{
-          y: '1',
-          n: '0',
-        }"
-        activeText="启用"
-        inactiveText="禁用"
-        inline-prompt
-        :formatter="statusFormatter"
-      >
-        <template #default="scope">
-          <el-switch
-            v-model="scope.row.cStatus"
-            activeText="启用"
-            inactiveText="禁用"
-            inline-prompt
-            @change="handleStatusChange(scope.row)"
-          />
-        </template>
-      </el-table-column> -->
       <el-table-column
         type="index"
         :index="indexMethod"
@@ -76,6 +54,7 @@
                     v-model="props.row[i.prop]"
                     :item="i"
                     :showLabel="editIndex !== props.row._dataId"
+                    :row="scope.row"
                   />
                 </el-form-item>
               </el-col>
@@ -163,6 +142,7 @@
                     ? props.item.editList?.includes(i.prop)
                     : false || editIndex === scope.row._dataId)
                 "
+                :row="scope.row"
               />
             </template>
           </template>
@@ -223,7 +203,7 @@
 <script setup lang="ts">
 import { v4 as uuidv4 } from "uuid";
 import Validator from "async-validator";
-import { ref, reactive, watch, onMounted } from "vue";
+import { ref, reactive, watch, onMounted, handleError } from "vue";
 
 // 定义要触发的事件
 const emits = defineEmits<{
