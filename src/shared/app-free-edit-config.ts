@@ -60,6 +60,7 @@ export interface FromUiConfig {
   labelWidth?: string | "auto"; //label长度
   labelPosition?: "left" | "right" | "top"; //label位置
   size?: "large" | "default" | "small"; //表单号
+  showMessage?: "1"| "0"; // 是否显示验证异常信息,默认显示需要显示
   groupBy?: any[];
 }
 export function createFromUiConfig(config: FromUiConfig = {}): FromUiConfig {
@@ -68,6 +69,7 @@ export function createFromUiConfig(config: FromUiConfig = {}): FromUiConfig {
     labelWidth: config.labelWidth || "auto",
     labelPosition: config.labelPosition || "right",
     size: config.size || "default",
+    showMessage: config.showMessage || "1",
     groupBy: config.groupBy || [],
   };
 }

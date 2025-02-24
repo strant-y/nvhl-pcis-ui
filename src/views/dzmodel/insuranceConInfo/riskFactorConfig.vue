@@ -1,9 +1,8 @@
 <template>
   <div>
     <el-row>
-      <el-col :span="21"> </el-col>
-      <el-col :span="3">
-        <el-button @click="addTitle" type="primary">新增标题</el-button>
+      <el-col :span="24">
+        <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
       </el-col>
     </el-row>
     <el-row>
@@ -15,87 +14,24 @@
       <el-col :span="16"> </el-col>
     </el-row>
     <el-row :gutter="10">
-      <el-col :span="6">
-        <VueDraggable
-          v-model="colList"
-          :animation="150"
-          target=".el-table"
-          handle=".handle"
-        >
-          <table class="col_table">
-            <thead>
-              <th style="width: 40px">排序</th>
-              <th>标题</th>
-              <th style="width: 80px">宽度</th>
-              <th style="width: 40px">操作</th>
-            </thead>
-            <tbody class="el-table">
-              <tr
-                :class="[
-                  'handle cursor-move',
-                  'col_title',
-                  col.id === selectKey ? 'selected' : '',
-                ]"
-                v-for="col in colList"
-                :key="col.id"
-                @click="select(col)"
-              >
-                <td :class="'handle cursor-move'" style="text-align: center">
-                  <rtIcon
-                    :item="{
-                      icon: 'Rank',
-                    }"
-                  />
-                </td>
-                <template v-if="col.id !== selectKey">
-                  <td>{{ col.title }}</td>
-                  <td>{{ col.width }}</td>
-                  <!-- <td>{{ "" }}</td> -->
-                </template>
-                <template v-else>
-                  <td>
-                    <el-input
-                      v-model:="col.title"
-                      placeholder="请输入标题内容"
-                    />
-                  </td>
-                  <td>
-                    <el-input-number
-                      v-model:="col.width"
-                      :controls="false"
-                      placeholder="输入宽度"
-                    />
-                  </td>
-                </template>
-                <td>
-                  <rtButton
-                    :item="{
-                      type: 'danger',
-                      tooltip: '删除',
-                      icon: 'Delete',
-                      link: true,
-                      func:()=>{
-                        const i = colList.findIndex(  e => e.id === col.id);
-                        colList.splice(i, 1);
-                      }
-                    }"
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </VueDraggable>
-        <!-- <div :class="['col_title', item.id === selectKey ? 'selected' : '' ]" @click="select(item)" v-for="(item, i) in colList" :key="i">
-                    {{ item }}
-                    <template v-if="item.id !== selectKey">
-                        {{ item.title }}
-                    </template>
-                    <template v-else>
-                        <el-input style="width: 60%" v-model:="item.title" placeholder="请输入标题内容" />
-                    </template>
-                </div> -->
+      <el-col :span="3">
+        <table class="col_table">
+          <thead>
+            <th>标题</th>
+          </thead>
+          <tbody class="el-table">
+            <tr
+              :class="['col_title', col.id === selectKey ? 'selected' : '']"
+              v-for="col in colList"
+              :key="col.id"
+              @click="select(col)"
+            >
+            <td style="text-align: center">{{ col.title }}</td>
+            </tr>
+          </tbody>
+        </table>
       </el-col>
-      <el-col :span="18">
+      <el-col :span="21">
         <rt-mytable
           :tableConfig="tableconfig"
           ref="tableRef"
@@ -104,11 +40,10 @@
       </el-col>
     </el-row>
     <el-row>
-        <el-col :span="21"> </el-col>
-        <el-col :span="3">
-            <el-button @click="saveTitleFactor()" type="primary">保存</el-button>
-        </el-col>
-        
+      <el-col :span="21"> </el-col>
+      <el-col :span="3">
+        <el-button @click="saveTitleFactor()" type="primary">保存</el-button>
+      </el-col>
     </el-row>
   </div>
 </template>
@@ -117,7 +52,11 @@
 import { v4 as uuidv4 } from "uuid";
 import { inputtype, showtype } from "@/utils/utilKey";
 import { VueDraggable } from "vue-draggable-plus";
-import { getTRFactorList, querySelectorList, saveTRFactorList } from "@/api/prod";
+import {
+  getTRFactorList,
+  querySelectorList,
+  saveTRFactorList,
+} from "@/api/prod";
 import {
   AppTableConfig,
   createTableEditConfig,
@@ -125,6 +64,17 @@ import {
 } from "@/shared/app-table-config";
 import { iconPropType } from "element-plus/es/utils";
 import { styleType } from "element-plus/es/components/table-v2/src/common";
+import {
+  AppFreeEditConfig,
+  AppFreeEditMethod,
+  createAppFreeEditConfig,
+  createFromUiConfig,
+} from "@/shared/app-free-edit-config";
+import { createFreeButtonBase } from "@/shared/button-config";
+import { useValidator } from "@/typings/useValidator";
+
+const freeEditRef = ref<AppFreeEditMethod | null>(null);
+const { getRules } = useValidator();
 const tableRef = ref<MyTableMethod | null>(null);
 const props = defineProps({
   data: {
@@ -143,15 +93,55 @@ const emits = defineEmits(["handleClose"]);
 
 // 标题列信息
 const colList = ref<any>([]);
+// 缓存条款信息
+const cTermNo = props.data.termObj.cTermNo;
 
 const selectKey = ref<String>("");
 
 const factorList = ref<any>([]);
 
+const formconfig1 = reactive<AppFreeEditConfig>(
+  createAppFreeEditConfig({
+    title: "条款基本信息",
+    fromSchema: [
+      {
+        prop: "cRiskNo",
+        inputtype: "rtselect",
+        title: "责任选择",
+        typeCode: "term_risk_list",
+        rules: [getRules("required", {})],
+        params: {
+          cTermNo: cTermNo,
+        },
+        func: () => {
+          getTitle();
+        },
+      },
+      {
+        prop: "cGroupId",
+        inputtype: "rtselect",
+        title: "分组信息",
+        typeCode: "term_group_list",
+        rules: [getRules("required", {})],
+        params: {
+          cTermNo: cTermNo,
+        },
+        func: () => {
+          getTitle();
+        },
+      },
+    ],
+    fromUi: createFromUiConfig({
+      cols: 3,
+      showMessage: "0",
+    }),
+  })
+);
+
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     editFlag: true,
-    editList: ["c_porp_type","c_porp_required"],
+    editList: ["c_porp_type", "c_porp_required"],
     fromSchema: [
       {
         prop: "icon",
@@ -160,7 +150,7 @@ const tableconfig = reactive<AppTableConfig>(
         iconSize: "16",
         title: "排序",
         dragFlag: true,
-        tableBtnWidth: 40,
+        width: 40,
       },
       {
         prop: "isChecked",
@@ -170,7 +160,7 @@ const tableconfig = reactive<AppTableConfig>(
           y: "1",
           n: "0",
         },
-        tableBtnWidth: 40,
+        width: 40,
         func: (v: any) => {
           getFactorConf();
         },
@@ -185,9 +175,9 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "c_porp_required",
         inputtype: "rtswitch",
         title: "是否必填",
-        keymap:{
-            y: "1",
-            n: "0",
+        keymap: {
+          y: "1",
+          n: "0",
         },
         func: (v: any) => {
           getFactorConf();
@@ -215,6 +205,24 @@ const tableconfig = reactive<AppTableConfig>(
     ],
   })
 );
+
+function getTitle() {
+  const value = freeEditRef.value?.validate();
+  value.then((res) => {
+    if (res) {
+      const param = freeEditRef.value?.getFromValue();
+      getTRFactorList(param).then((res) => {
+        const { code, data, msg } = res;
+        if (200 === code) {
+          colList.value = data.data;
+        } else {
+          ElMessage.error(msg);
+        }
+        tableRef.value?.setFormValue([]);
+      });
+    }
+  });
+}
 function select(item: any) {
   selectKey.value = item.id;
   // 绘制新的list给页面渲染
@@ -235,7 +243,7 @@ function select(item: any) {
     if (!se) {
       element.isChecked = "0";
       element.c_porp_type = null;
-      element.c_porp_required = '0';
+      element.c_porp_required = "0";
       newSelectl.push(element);
     }
   });
@@ -258,43 +266,25 @@ function getFactorConf() {
     }
   });
 }
-function addTitle() {
-  colList.value.push({
-    title: "",
-    width: null,
-    id: getuuid(),
-  });
-}
-function saveTitleFactor(){
-    console.log(colList.value);
-    saveTRFactorList({
-        colInfo:colList.value,
-        riskNo:props.data.riskObj.cRiskNo,
-        termNo:props.data.termObj.cTermNo
-    }).then((res) => {
-        const { code, data, msg } = res;
-        if (200 === code) {
-            ElMessage.success("保存成功");
-        } else {
-            ElMessage.error(msg);
-        }
-    });
-}
-onMounted(() => {
-  const param = {
-    componentTab: "cvrg",
-    riskNo:props.data.riskObj.cRiskNo,
-    termNo:props.data.termObj.cTermNo,
-  };
-  getTRFactorList(param).then((res) => {
+function saveTitleFactor() {
+  const fromValue = freeEditRef.value?.getFromValue();
+  saveTRFactorList({
+    colInfo: colList.value,
+  ...fromValue
+  }).then((res) => {
     const { code, data, msg } = res;
     if (200 === code) {
-      colList.value = data.data;
-      // tableRef.value?.setFormValue(data.data);
+      ElMessage.success("保存成功");
     } else {
       ElMessage.error(msg);
     }
   });
+}
+onMounted(() => {
+  const param = {
+    componentTab: "cvrg",
+  };
+  // 一次性初始化所有险别要素信息,不用多次获取
   querySelectorList(param).then((res) => {
     const { code, data, msg } = res;
     if (200 === code) {
@@ -331,6 +321,6 @@ onMounted(() => {
   border: 1px solid #e2e2e2; /* 设置边框样式 */
 }
 .el-input-number {
-    width: 100% !important;
-  }
+  width: 100% !important;
+}
 </style>

@@ -5,6 +5,9 @@
     :label-width="formUi.labelWidth"
     :size="formUi.size"
     :label-position="formUi.labelPosition"
+    :show-message="
+      formUi.showMessage ? (formUi.showMessage === '1' ? true : false) : true
+    "
   >
     <el-row :gutter="20">
       <template v-for="(item, index) in props.fromSchema" :key="index">

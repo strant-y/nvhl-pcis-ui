@@ -7,6 +7,15 @@ export const dataOpertaor = defineStore(
   () => {
     const tableConfig = reactive<Array<any>>([]);
     const tableRefs = reactive<Record<string, any>>({});
+    const param = reactive<any>({});
+
+    const setParam = (params: any) => {
+      Object.assign(param, params);
+    };
+
+    const getParam = () => {
+      return param;
+    };
     const setTableConfig = (config: any) => {
       Object.assign(tableConfig, config);
     };
@@ -49,6 +58,8 @@ export const dataOpertaor = defineStore(
       init,
       addTableRef,
       setDataAll,
+      setParam,
+      getParam
     };
   },
   {
@@ -57,7 +68,7 @@ export const dataOpertaor = defineStore(
       strategies: [
         {
           storage: localStorage,
-          paths: ["tableConfig", "tableRefs"],
+          paths: ["tableConfig", "tableRefs", "param"],
         },
       ],
     },

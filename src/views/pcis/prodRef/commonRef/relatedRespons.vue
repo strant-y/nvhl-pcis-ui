@@ -138,6 +138,22 @@ const tableconfig = reactive<AppTableConfig>(
           }
         },
       }),
+      createFreeButtonBase({
+        type: "primary",
+        label: "要素绑定",
+        func: () => {
+          const opertaor = dataOpertaor();
+          const clauseConfBasicInfo = opertaor.getTableRefByKey('clauseConfBasicInfo');
+          dialog.value?.open(
+            "riskFactorConfig",
+            {
+              termObj:clauseConfBasicInfo.getFromValue(),
+            },
+            {},
+            { title: "责任要素绑定", width: "95" }
+           );
+        },
+      }),
     ],
     tableBtnType: "btn",
     tableBtnWidth: 220,
@@ -165,29 +181,6 @@ const tableconfig = reactive<AppTableConfig>(
               }
             })
             .finally(() => {});
-        },
-      }),
-      createFreeButtonBase({
-        id: "score",
-        type: "success",
-        tooltip: "要素绑定",
-        icon: "SetUp",
-        link: true,
-        tableClick: (row) => {
-          const opertaor = dataOpertaor();
-          const clauseConfBasicInfo = opertaor.getTableRefByKey(
-            "clauseConfBasicInfo"
-          );
-          console.log(clauseConfBasicInfo.getFromValue());
-          dialog.value?.open(
-            "riskFactorConfig",
-            {
-              termObj: clauseConfBasicInfo.getFromValue(),
-              riskObj: row,
-            },
-            {},
-            { title: "责任要素绑定", width: "95" }
-          );
         },
       }),
     ],
