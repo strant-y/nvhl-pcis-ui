@@ -185,7 +185,7 @@ function save() {
           const { code, data, msg } = res;
           if (200 === code) {
             emits("ok", {});
-            ElMessage.success("保存成功");
+            ElMessage.success(msg);
             dialogVisible.value = false;
           } else {
             ElMessage.error(msg);
