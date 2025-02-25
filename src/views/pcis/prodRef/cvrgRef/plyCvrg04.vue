@@ -59,12 +59,11 @@ const method = {
       },
       {
         isOk: (selectdata: any) => {
-          let adddata: any [] = [];
           selectdata.forEach((item: any) => {
             let riskList: { "cvrg.cRiskNo": any; }[] = [];
             item.children?.forEach((e: any) => {
               riskList.push({
-                "cvrg.cRiskNo": e.cRiskNo,
+                "cvrg.cRiskNo": e.cRiskNo
               });
             });
             let data = {
@@ -84,7 +83,9 @@ const method = {
 // 绑定特殊验证器
 const exRules = {};
 
-function getFromValue() {}
+function getFromValue() {
+  return formData;
+}
 
 function setFormValue(value: any) {}
 
