@@ -202,15 +202,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", { change: true })],
         //主条款是1附加条款是0
         func: (val: any) => {
-          formconfig1.fromSchema.forEach((item: any) => {
-            if (item.prop === "cRdrTyp") {
-              if (val === "1") {
-                item.hidden = true;
-              } else {
-                item.hidden = false;
-              }
-            }
-          });
+          // formconfig1.fromSchema.forEach((item: any) => {
+          //   if (item.prop === "cRdrTyp") {
+          //     if (val === "1") {
+          //       item.hidden = true;
+          //     } else {
+          //       item.hidden = false;
+          //     }
+          //   }
+          // });
         },
       },
       {
