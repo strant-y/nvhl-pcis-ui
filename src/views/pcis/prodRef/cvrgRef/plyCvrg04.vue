@@ -60,8 +60,10 @@ const method = {
       {
         isOk: (selectdata: any) => {
           let adddata: any [] = [];
+          console.log(selectdata)
           selectdata.forEach((item: any) => {
             let riskList: { "cvrg.cRiskNo": any; }[] = [];
+            console.log(item)
             item.children?.forEach((e: any) => {
               riskList.push({
                 "cvrg.cRiskNo": e.cRiskNo,
@@ -84,7 +86,11 @@ const method = {
 // 绑定特殊验证器
 const exRules = {};
 
-function getFromValue() {}
+function getFromValue() {
+    const tableobj={}
+    tableobj['items']=formData.value;
+    return tableobj
+}
 
 function setFormValue(value: any) {}
 
