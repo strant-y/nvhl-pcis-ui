@@ -235,6 +235,33 @@ export function getProductPage(queryParams: any): AxiosPromise<any> {
 export function getBasicKindList(queryParams: any): AxiosPromise<any> {
     return post(`/proddef/getBasicKindList`, queryParams);
 }
+/**
+ * 修改险类状态
+ *
+ * @param queryParams
+ */
+export function changeKindStatus(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/changeKindStatus`, queryParams);
+}
+export function changeSpecStatus(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/changeSpecStatus`, queryParams);
+}
+/**
+ * 修改责任状态
+ *
+ * @param queryParams
+ */
+export function changeRiskStatus(queryParams: any): AxiosPromise<any> {
+    return post(`/cvrgdef/changeRiskStatus`, queryParams);
+}
+/**
+ * 修改条款启用禁用状态
+ *
+ * @param queryParams
+ */
+export function changeTermStatus(queryParams: any): AxiosPromise<any> {
+    return post(`/cvrgdef/changeTermStatus`, queryParams);
+}
 
 /**
  * 保存险类信息
@@ -243,6 +270,14 @@ export function getBasicKindList(queryParams: any): AxiosPromise<any> {
  */
 export function saveKindInfo(queryParams: any): AxiosPromise<any> {
     return post(`/proddef/saveKindInfo`, queryParams);
+}
+/**
+ * 修改批改原因启用禁用状态
+ *
+ * @param queryParams
+ */
+export function changeProdEdrRsnStatus(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/changeProdEdrRsnStatus`, queryParams);
 }
 
 /**
