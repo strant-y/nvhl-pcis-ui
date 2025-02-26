@@ -30,7 +30,7 @@
                   v-if="currentIndex >= index"
                   :ref="
                     (res) => {
-                      opertaor.addTableRef(k.pageCode, res);
+                      opertaor.addTableRef(k.pageKey, res);
                     }
                   "
                   :is="k.pageRef + '-ref'"
@@ -59,6 +59,11 @@ const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
 const formconfig1 = opertaor.getTableConfig();
 // 当前加载的组件索引
 const currentIndex = ref(0);
+const prodauditConfig = {
+  pageKey: "prodaudit",
+  pageTtile: "产品审核",
+  pageRef: "prodaudit",
+};
 
 opertaor.setTableConfig([
   {
@@ -146,6 +151,19 @@ opertaor.setTableConfig([
 
 const btns = {};
 onMounted(() => {
+  if (param.type != "approve") {
+    formconfig1.forEach((ele) => {
+      if (ele.pageInfo.prodaudit.pageKey === "prodaudit") {
+        delete ele.pageInfo.prodaudit;
+      }
+    });
+  } else {
+    formconfig1.forEach((ele) => {
+      if (!ele.pageInfo.prodaudit) {
+        ele.pageInfo.prodaudit = { ...prodauditConfig };
+      }
+    });
+  }
   renderComponents();
 });
 
@@ -177,6 +195,12 @@ function loadAfter() {
     });
   }
 }
+// function fileterAside(val: string) {
+//   pageconfig.forEach((element) => {
+//     if (element.pageKey === "prodaudit") {
+//     }
+//   });
+// }
 function setData(datas: any) {
   Object.keys(datas).forEach((k) => {
     const ref = opertaor.getTableRefByKey(k);

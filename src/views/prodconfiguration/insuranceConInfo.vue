@@ -32,7 +32,7 @@
                   "
                   :ref="
                     (res) => {
-                      opertaor.addTableRef(k.pageCode, res);
+                      opertaor.addTableRef(k.pageKey, res);
                     }
                   "
                   :is="k.pageRef + '-ref'"

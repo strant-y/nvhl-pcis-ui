@@ -110,6 +110,7 @@ const tableconfig = reactive<AppTableConfig>(
         label: "关联附加条款",
         type: "success",
         func: function () {
+          const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
           if (tabref.getFromValue().cTermNo == null) {
             ElMessage.error("请完善基本信息后操作!");
             return;
@@ -267,7 +268,6 @@ function getQueryList(flag?: boolean) {
 }
 onMounted(() => {
   if (param.type === "edit") {
-    console.log("附加条款edit", tabref.getFromValue().cTermNo);
     setTimeout(() => {
       handleQuery();
     }, 300);

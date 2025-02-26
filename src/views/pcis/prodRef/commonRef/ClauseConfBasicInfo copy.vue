@@ -358,9 +358,7 @@ defineExpose({
 
 watch(
   () => formconfig1.fromSchema,
-  (newVal) => {
-    console.log("深度监听当前表单", newVal);
-  },
+  (newVal) => {},
   {
     deep: true,
   }

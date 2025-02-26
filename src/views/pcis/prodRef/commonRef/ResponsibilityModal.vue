@@ -55,6 +55,7 @@ const dialogVisible = ref(true);
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
+console.log(tabref, "===========");
 const { getRules } = useValidator();
 
 const formconfig1 = reactive<AppFreeEditConfig>(
