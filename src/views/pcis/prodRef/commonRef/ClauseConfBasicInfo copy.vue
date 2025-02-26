@@ -1,5 +1,5 @@
 <template>
-  <div class="" style="padding-bottom: 6px">
+  <div>
     <app-free-edit
       v-model:freeEditConfig="formconfig1"
       :key="formconfig1.fromSchema"
@@ -27,7 +27,6 @@ import {
 import { ref, reactive, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { DialogMethod } from "@/views/dzmodel/ComDialogConf";
-import { clear } from "console";
 const dialog = ref<DialogMethod | null>(null);
 
 const route = useRoute();
@@ -83,6 +82,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             savePrdTermInfo(datas)
               .then((res) => {
                 const { code, data, msg } = res;
+                console.log(data, "data");
                 if (200 === code) {
                   freeEditRef?.value?.setFormValue({ cTermNo: data });
                   ElMessage.success("保存成功");
@@ -197,13 +197,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cRdrTyp",
         inputtype: "rtselect",
         title: "主条款/附加条款",
-        typeCode: "WEB_SYS_RdrTyp",
+        typeCode: "WEB_SYS_STA_DICT",
         params: { cParCde: "RdrTyp" },
-        clearable: true,
         rules: [getRules("required", { change: true })],
         //主条款是1附加条款是0
         func: (val: any) => {
-          setAdditionalInsuranceTypeHidden("1");
+          formconfig1.fromSchema.forEach((item: any) => {
+            if (item.prop === "cRdrTyp") {
+              if (val === "1") {
+                item.hidden = true;
+              } else {
+                item.hidden = false;
+              }
+            }
+          });
         },
       },
       {
@@ -273,7 +280,7 @@ watch(
       (field) => field.prop === "additionalInsuranceType"
     );
     if (additionalInsuranceTypeField) {
-      additionalInsuranceTypeField.hidden = newValue === "0";
+      additionalInsuranceTypeField.hidden = newValue === "1";
     }
   }
 );
@@ -318,8 +325,8 @@ function setAdditionalInsuranceTypeHidden(cRdrTypValue: string) {
     (field) => field.prop === "additionalInsuranceType"
   );
   if (additionalInsuranceTypeField) {
-    additionalInsuranceTypeField.hidden = cRdrTypValue === "1";
-    if (cRdrTypValue === "1") {
+    additionalInsuranceTypeField.hidden = cRdrTypValue === "0";
+    if (cRdrTypValue === "0") {
       // 隐藏时将值置空
       freeEditRef.value?.setValue("additionalInsuranceType", null);
     }
@@ -360,7 +367,6 @@ watch(
 );
 
 onMounted(() => {
-  // setAdditionalInsuranceTypeHidden("1");
   if (param.type === "edit") {
     handleQuery();
   } else {

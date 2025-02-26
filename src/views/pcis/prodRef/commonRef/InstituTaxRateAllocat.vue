@@ -1,6 +1,6 @@
 <!--机构税率配置-->
 <template>
-  <div class="app-container">
+  <div class="">
     <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
     <app-table
       :tableConfig="tableconfig"

@@ -209,34 +209,9 @@ const tableconfig = reactive<AppTableConfig>(
         title: "条款名称",
       },
       // {
-      //   prop: "orgCode",
+      //   prop: "cRdrTyp",
       //   inputtype: "rtinput",
-      //   title: "机构代码",
-      // },
-      // {
-      //   prop: "productCode",
-      //   inputtype: "rtinput",
-      //   title: "产品代码",
-      // },
-      // {
-      //   prop: "effectiveStartDate",
-      //   inputtype: "rtdatetime",
-      //   title: "有效起期",
-      // },
-      // {
-      //   prop: "effectiveEndDate",
-      //   inputtype: "rtdatetime",
-      //   title: "有效止期",
-      // },
-      // {
-      //   prop: "groupIndividualFlag",
-      //   inputtype: "rtselect",
-      //   title: "团个单标识",
-      // },
-      // {
-      //   prop: "validFlag",
-      //   inputtype: "rtselect",
-      //   title: "有效标志",
+      //   title: "主附条款标识",
       // },
       {
         prop: "cEnableFlag",

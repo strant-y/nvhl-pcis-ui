@@ -1,6 +1,6 @@
 <!--关联批改保费计算公式-->
 <template>
-  <div class="app-container">
+  <div class="">
     <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
     <app-table
       :tableConfig="tableconfig"

@@ -185,16 +185,13 @@ const tableconfig = reactive<AppTableConfig>(
         activeText: "启用",
         inactiveText: "禁用",
         inlinePrompt: true,
-        func: async (row, val) => {
+        func: async (val, row) => {
           const res = await changeProdEdrRsnStatus({
-            cStatus: val,
-            cRsnCde: row.cRsnCde,
+            cIsValid: val,
+            cPkId: row.cPkId,
           });
           if (res.code === 200) {
-            this.$message({
-              type: "success",
-              message: "操作成功",
-            });
+            ElMessage.success(res.msg);
             handleQuery();
           }
         },
