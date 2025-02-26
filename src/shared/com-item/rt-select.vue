@@ -131,11 +131,6 @@ const props = defineProps({
     type: Object as () => Record<string, any>,
     required: false,
   },
-  row: {
-    // 新增属性，用于接收当前行的数据
-    type: Object as () => Record<string, any>,
-    required: false,
-  },
 });
 
 interface OptionTypeBySelect extends OptionType {
@@ -203,7 +198,7 @@ watch(
       codeListStore.queryCodeList(
           {
             codeListName: props.item.typeCode,
-            codeListParam: props.item.codeParam ? JSON.parse(props.item.codeParam) : undefined
+            codeListParam: props.item.params
           },
           props.unAuthor,
           props.item.cache ? props.item.cache : true
@@ -239,7 +234,7 @@ onMounted(() => {
       codeListStore.queryCodeList(
           {
             codeListName: props.item.typeCode,
-            codeListParam: props.item.codeParam ? JSON.parse(props.item.codeParam) : undefined
+            codeListParam: props.item.params
           },
           props.unAuthor,
           props.item.cache ? props.item.cache : true

@@ -12,6 +12,7 @@
       v-model:pageresult="pageresult"
       ref="tableRef"
       @page-change="handleQuery(false)"
+      @selection-change="handleSelectionChange"
     />
     <template #footer>
       <span class="dialog-footer">
@@ -46,13 +47,16 @@ import {
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
 import { ref, reactive } from "vue";
-import { getCvrgRiskRelList, saveRiskInfo } from "@/api/prod";
+import { saveRiskInfo } from "@/api/prod";
 
 const props = defineProps<{
   visible: boolean;
 }>();
 
-const emits = defineEmits(["updateDatas", "update:modelValue", "save", "update:visible"]);
+const emit = defineEmits<{
+  (e: "update:modelValue", value: boolean): void;
+  (e: "save"): void;
+}>();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 
@@ -118,7 +122,7 @@ const handleSave = async () => {
     try {
       await saveRiskInfo(formData); //保存接口调用
       ElMessage.success("保存成功");
-      emits("save");
+      emit("save");
       // dialogVisible(false);
     } catch (error) {
       ElMessage.error("保存失败");
@@ -131,7 +135,7 @@ const handleCancel = () => {
 };
 
 const handleVisibleUpdate = (value: boolean) => {
-  emits("update:visible", value);
+  emit("update:visible", value);
 };
 
 const tableRef = ref<AppTableMethod | null>(null);
@@ -199,7 +203,7 @@ function handleQuery() {
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r);
   getCvrgRiskRelList(param)
-    .then((res: any) => {
+    .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
         pageresult.list = data.result;
