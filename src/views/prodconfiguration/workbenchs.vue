@@ -40,7 +40,7 @@ const projectList = ref([
   },
 ]);
 
-function handleClick(item) {
+function handleClick(item: any) {
   router.push({
     path: "/prodconfiguration/commodity-main",
     query: {

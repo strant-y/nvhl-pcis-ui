@@ -73,6 +73,11 @@ const props = defineProps({
     type: Object as () => Record<string, any>,
     required: false,
   },
+  row: {
+    // 新增属性，用于接收当前行的数据
+    type: Object as () => Record<string, any>,
+    required: false,
+  },
 });
 
 const emits = defineEmits(["update:item", "update:modelValue", "valueChange"]); // 父组件监听事件，同步子组件值的变化给父组件
@@ -98,7 +103,7 @@ watch(
       codeListStore.queryCodeList(
           {
             codeListName: props.item.typeCode,
-            codeListParam: props.item.params
+            codeListParam: props.item.codeParam ? JSON.parse(props.item.codeParam) : undefined
           },
           false,
           props.item.cache ? props.item.cache : true
@@ -127,7 +132,7 @@ onMounted(() => {
       codeListStore.queryCodeList(
           {
             codeListName: props.item.typeCode,
-            codeListParam: props.item.params
+            codeListParam: props.item.codeParam ? JSON.parse(props.item.codeParam) : undefined
           },
           false,
           props.item.cache ? props.item.cache : true

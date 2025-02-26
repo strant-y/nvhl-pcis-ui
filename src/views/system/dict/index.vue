@@ -47,7 +47,7 @@ const rules = reactive({
 function handleQuery() {
   loading.value = true;
   getDictTypePage(queryParams)
-    .then((res) => {
+    .then((res: any) => {
       const {code,data,msg} = res;
       if(200===code){
         dictTypeList.value = data.result;
@@ -98,7 +98,7 @@ function handleSubmit() {
       const dictTypeId = formData.cPkId;
       if (dictTypeId) {
         updateDictType(formData)
-          .then((res) => {
+          .then((res: any) => {
             const {code, data, msg} = res
             if(200 === code && data) {
               ElMessage.success(msg);
@@ -110,7 +110,7 @@ function handleSubmit() {
           })
           .finally(() => (loading.value = false));
       } else {
-        addDictType(formData).then((res) => {
+        addDictType(formData).then((res: any) => {
           const {code, data, msg} = res;
             if(200 === code && data) {
               ElMessage.success(msg);
@@ -156,7 +156,7 @@ function handleDelete(dictTypeId?: string) {
     cancelButtonText: "取消",
     type: "warning",
   }).then(() => {
-    deleteDictTypes({ids: dictTypeIds}).then((res) => {
+    deleteDictTypes({ids: dictTypeIds}).then((res: any) => {
       const {code,msg,data} = res;
       if(200 === code) {
         if(data) {

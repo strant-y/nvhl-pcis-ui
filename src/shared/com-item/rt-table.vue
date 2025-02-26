@@ -71,7 +71,7 @@
         <template #default="scope">
           <template v-for="(btn, index) in item.tableBtn" :key="index">
             <template v-if="item.tableBtnType === 'text'">
-              <a @click="item.func ? item.tableClick(scope.row) : () => {}">{{
+              <a @click="item.tableClick ? item.tableClick(scope.row) : () => {}">{{
                 btn.label
               }}</a>
             </template>
@@ -157,7 +157,7 @@
         <template #default="scope">
           <template v-for="(btn, index) in item.tableBtn" :key="index">
             <template v-if="item.tableBtnType === 'text'">
-              <a @click="btn.func ? btn.tableClick(scope.row) : () => {}">{{
+              <a @click="btn.tableClick ? btn.tableClick(scope.row) : () => {}">{{
                 btn.label
               }}</a>
             </template>
@@ -224,6 +224,11 @@ const props = defineProps({
     required: true,
   },
   parentFromUi: {
+    type: Object as () => Record<string, any>,
+    required: false,
+  },
+  row: {
+    // 新增属性，用于接收当前行的数据
     type: Object as () => Record<string, any>,
     required: false,
   },
