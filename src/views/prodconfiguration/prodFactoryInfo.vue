@@ -30,7 +30,7 @@
                   v-if="currentIndex >= index"
                   :ref="
                     (res) => {
-                      opertaor.addTableRef(k.pageKey, res);
+                      opertaor.addTableRef(k.pageCode, res);
                     }
                   "
                   :is="k.pageRef + '-ref'"
@@ -65,11 +65,11 @@ opertaor.setTableConfig([
     groupId: "",
     showGroupId: false,
     pageInfo: {
-      // prodaudit: {
-      //   pageKey: "prodaudit",
-      //   pageTtile: "产品审核",
-      //   pageRef: "prodaudit",
-      // },
+      prodaudit: {
+        pageKey: "prodaudit",
+        pageTtile: "产品审核",
+        pageRef: "prodaudit",
+      },
       prodInfo: {
         pageKey: "prodInfo",
         pageTtile: "产品基本信息",

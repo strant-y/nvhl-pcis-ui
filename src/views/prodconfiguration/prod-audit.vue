@@ -32,7 +32,7 @@ import {
 } from "@/shared/app-table-config";
 import { useRoute } from "vue-router";
 import { ref, reactive, onMounted } from "vue";
-import { getProdList } from "@/api/prod";
+import { getProFactoryList } from "@/api/prod";
 import { inputtype } from "@/utils/utilKey";
 
 const route = useRoute();
@@ -102,9 +102,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cAuditStatus",
         inputtype: "rtselect",
+        title: "审核状态",
         typeCode: "WEB_SYS_STA_DICT",
         params: { cParCde: "PROD_AUDIT_STATUS" },
-        title: "审核状态",
+        clearable: true,
       },
     ],
     fromUi: createFromUiConfig({
@@ -152,6 +153,7 @@ const tableconfig = reactive<AppTableConfig>(
             path: "/prodconfiguration/prodFactoryInfo",
             query: {
               param: JSON.stringify({
+                type: "approve",
                 editType: "edit",
                 prod: row,
                 prodNo: row.cProdNo,
@@ -172,6 +174,7 @@ const tableconfig = reactive<AppTableConfig>(
             path: "/prodconfiguration/prodFactoryInfo",
             query: {
               param: JSON.stringify({
+                type: "approve",
                 editType: "view",
                 prodNo: row.cProdNo,
               }),
@@ -203,7 +206,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
       },
       {
-        prop: "cProdNme",
+        prop: "cNmeCn",
         title: "产品名称",
         inputtype: "rtinput",
       },
@@ -224,8 +227,25 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "cAuditStatus",
+        inputtype: "rttag",
         title: "审核状态",
-        inputtype: "rtselect",
+        loadData: [
+          {
+            label: "已提交",
+            value: "submit",
+            color: "#67C23A",
+          },
+          {
+            label: "未提交",
+            value: "unsubmit",
+            color: "#14CCCC",
+          },
+          {
+            label: "已审核",
+            value: "audit",
+            color: "##409EFF",
+          },
+        ],
       },
     ],
   })
@@ -292,11 +312,11 @@ function handleQuery() {
   const r = tableRef.value?.getPartnerPage(); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r);
-  getProdList(param)
+  getProFactoryList(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
-        pageresult.list = data.data;
+        pageresult.list = data.result;
         pageresult.total = data.total;
       } else {
         ElMessage.error(msg);

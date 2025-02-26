@@ -3,7 +3,7 @@
   <el-container>
     <el-main>
       <el-container>
-        <el-aside width="150px">
+        <!-- <el-aside width="150px">
           <template v-for="(pageConfig, v) in formconfig1" :key="v">
             <el-affix :offset="150">
               <el-anchor :bound="120" :offset="80">
@@ -17,7 +17,7 @@
               </el-anchor>
             </el-affix>
           </template>
-        </el-aside>
+        </el-aside> -->
         <el-container>
           <el-main>
             <template v-for="(pageConfig, v) in formconfig1" :key="v">
@@ -32,7 +32,7 @@
                   "
                   :ref="
                     (res) => {
-                      opertaor.addTableRef(k.pageKey, res);
+                      opertaor.addTableRef(k.pageCode, res);
                     }
                   "
                   :is="k.pageRef + '-ref'"
@@ -98,8 +98,7 @@ opertaor.setTableConfig([
 const isAdditionalClause = ref(false);
 
 const handleClauseTypeChange = (val: string) => {
-  console.log("条款类型变化:", val);
-  isAdditionalClause.value = val === "1"; // 0 表示附加条款
+  isAdditionalClause.value = val === "0"; // 0 表示主条款
 };
 const filteredPageInfo = (pageInfo: any) => {
   if (isAdditionalClause.value) {

@@ -196,7 +196,7 @@ const handleConfirm = () => {
   const newArr = selectedRows.value.map((item) => {
     item.cCrtCde = opCde;
     item.cUpdCde = opCde;
-    item.cCvrgRdrCde = item.cTermNo;
+    item.cTermRdrCde = item.cTermNo;
     item.cTermNo = tabref.getFromValue().cTermNo;
     item.cRdrTyp = "1";
     return item;
