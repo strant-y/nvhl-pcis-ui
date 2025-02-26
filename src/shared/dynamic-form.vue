@@ -444,14 +444,10 @@ watch(
     initUI();
   }
 );
-watch(form, (newForm) => {
-  console.log(newForm, "5555555555555");
-});
+watch(form, (newForm) => {});
 watch(
   () => props.fromSchema,
-  (newFromSchema) => {
-    console.log(newFromSchema, "11111111111111111111111111111");
-  },
+  (newFromSchema) => {},
   {
     deep: true,
   }

@@ -33,7 +33,7 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { getProFactoryList, changeStatus } from "@/api/prod";
+import { getProFactoryList, changeStatus, auditSubmit } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "../dzmodel/ComDialogConf";
 
@@ -159,6 +159,25 @@ const tableconfig = reactive<AppTableConfig>(
                 prodNo: row.cProdNo,
               }),
             },
+          });
+        },
+      }),
+      createFreeButtonBase({
+        id: "score",
+        tooltip: "提交审核",
+        link: true,
+        type: "danger",
+        icon: "Check",
+        tableClick: async (row) => {
+          await auditSubmit({
+            cProdNo: row.cProdNo,
+            cStatus: row.cStatus,
+            cAuditStatus: "submit",
+          }).then((res) => {
+            if (res.code === 200) {
+              ElMessage.success(res.msg);
+              handleQuery();
+            }
           });
         },
       }),

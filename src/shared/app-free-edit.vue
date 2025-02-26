@@ -205,7 +205,6 @@ watch(
   () => freeEditConfig,
   (newVal) => {
     if (newVal) {
-      console.log("newVal0000000000000", newVal);
     }
   },
   {

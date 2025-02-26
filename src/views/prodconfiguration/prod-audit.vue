@@ -32,7 +32,7 @@ import {
 } from "@/shared/app-table-config";
 import { useRoute } from "vue-router";
 import { ref, reactive, onMounted } from "vue";
-import { getProFactoryList } from "@/api/prod";
+import { getProFactoryList, changeStatus } from "@/api/prod";
 import { inputtype } from "@/utils/utilKey";
 
 const route = useRoute();
@@ -221,8 +221,15 @@ const tableconfig = reactive<AppTableConfig>(
         activeText: "启用",
         inactiveText: "禁用",
         inlinePrompt: true,
-        change: (val) => {
-          console.log(val);
+        func: async (val, row) => {
+          await changeStatus({
+            cProdNo: row.cProdNo,
+            cStatus: val,
+          }).then((res) => {
+            if (res.code === 200) {
+              handleQuery();
+            }
+          });
         },
       },
       {

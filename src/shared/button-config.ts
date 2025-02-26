@@ -1,3 +1,5 @@
+
+
 export class FreeButtonBase {
   id?: string | undefined | null; // 按钮id
   label?: string | undefined | null; // 按钮名称

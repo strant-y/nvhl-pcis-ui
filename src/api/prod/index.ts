@@ -243,6 +243,14 @@ export function getBasicKindList(queryParams: any): AxiosPromise<any> {
 export function changeKindStatus(queryParams: any): AxiosPromise<any> {
     return post(`/proddef/changeKindStatus`, queryParams);
 }
+/**
+ * 提交审核
+ *
+ * @param queryParams
+ */
+export function auditSubmit(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/auditSubmit`, queryParams);
+}
 export function changeSpecStatus(queryParams: any): AxiosPromise<any> {
     return post(`/proddef/changeSpecStatus`, queryParams);
 }

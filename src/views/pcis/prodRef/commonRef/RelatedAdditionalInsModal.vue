@@ -7,6 +7,7 @@
       ref="tableRef"
       @page-change="handleQuery(false)"
       @selection-change="handleSelectionChange"
+      :defaultSelectedRows="tableConfig.defaultSelectedRows"
     />
 
     <template #footer>
@@ -111,6 +112,7 @@ const pageresult = reactive<Pageresult>({
 
 const tableConfig = reactive<AppTableConfig>(
   createTableEditConfig({
+    defaultSelectedRows: [] as string[],
     showSelection: true,
     fromSchema: [
       {
@@ -169,6 +171,13 @@ function getQueryList(flag?: boolean) {
         pageresult.list = [];
         pageresult.list = data.result;
         pageresult.total = data.total;
+        const selectedcurrentRows = data.result
+          .filter((item) => item.cTermNo)
+          .map((item) => item.id);
+        if (tableConfig.value) {
+          tableConfig.value.defaultSelectedRows = selectedcurrentRows;
+        }
+        tableConfig.value = { ...tableConfig.value };
       } else {
         ElMessage.error(msg);
       }

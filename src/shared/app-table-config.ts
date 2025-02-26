@@ -62,6 +62,7 @@ export function createTableEditConfig(
     isPage: config.isPage || true,
     fromUi: createTableUiConfig(config.fromUi),
     showSelection: config.showSelection || false,
+    
   };
 }
 
