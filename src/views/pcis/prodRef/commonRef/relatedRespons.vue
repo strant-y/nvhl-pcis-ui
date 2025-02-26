@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div class="">
     <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
     <app-table
       :tableConfig="tableconfig"
@@ -143,15 +143,17 @@ const tableconfig = reactive<AppTableConfig>(
         label: "要素绑定",
         func: () => {
           const opertaor = dataOpertaor();
-          const clauseConfBasicInfo = opertaor.getTableRefByKey('clauseConfBasicInfo');
+          const clauseConfBasicInfo = opertaor.getTableRefByKey(
+            "clauseConfBasicInfo"
+          );
           dialog.value?.open(
             "riskFactorConfig",
             {
-              termObj:clauseConfBasicInfo.getFromValue(),
+              termObj: clauseConfBasicInfo.getFromValue(),
             },
             {},
             { title: "责任要素绑定", width: "95" }
-           );
+          );
         },
       }),
     ],

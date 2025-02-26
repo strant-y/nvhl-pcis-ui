@@ -228,14 +228,19 @@ const tableconfig = reactive<AppTableConfig>(
         title: "审核状态",
         loadData: [
           {
-            label: "审核通过",
+            label: "已提交",
             value: "submit",
-            color: "#FF6600",
+            color: "#67C23A",
           },
           {
-            label: "未审核",
+            label: "未提交",
             value: "unsubmit",
             color: "#14CCCC",
+          },
+          {
+            label: "已审核",
+            value: "audit",
+            color: "##409EFF",
           },
         ],
       },
