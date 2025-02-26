@@ -6,7 +6,7 @@
           <tremTemplate
             v-for="(i, index) in formData"
             :key="index"
-            :form-data="i"
+            v-model="formData[index]"
           />
         </el-form>
       </div>
@@ -30,7 +30,6 @@ const props = defineProps({
     required: true,
   },
 });
-
 const cardconfig = ref(creatCardConfig({}));
 
 const cvrgFormfef = ref("cvrgFormfef");

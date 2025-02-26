@@ -176,12 +176,12 @@ const exRules = {
 
 /** 保存 */
 function save() {
-  freeEditRef.value?.validate().then((isValid) => {
+  freeEditRef.value?.validate().then((isValid:any) => {
     if (isValid) {
       const formParam = getFrom();
       const param = Object.assign({ type: props.type }, formParam);
       saveRiskInfo(param)
-        .then((res) => {
+        .then((res:any) => {
           const { code, data, msg } = res;
           if (200 === code) {
             emits("ok", {});

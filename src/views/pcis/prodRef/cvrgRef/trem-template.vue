@@ -81,6 +81,7 @@
                               <template v-else>
                                 <from-item 
                                         v-model="formdata.riskList[riskdata.rowConfig[colinfo.cColId][n - 1].cRiskNo][riskdata.rowConfig[colinfo.cColId][n - 1].factorItem.prop]"
+                                        @update:modelValue="update()"
                                         :item="riskdata.rowConfig[colinfo.cColId][n - 1].factorItem" />
                               </template>
                             </td>
@@ -104,17 +105,28 @@ import { getTRFactorJson } from "@/api/prod";
 import { init } from "echarts";
 
 const props = defineProps({
-  formData: {
+  modelValue: {
     type: Object,
     required: true,
   },
 });
 
+const emit = defineEmits(['update:modelValue']);
+
 const groupconf = ref<{ [key: string]: any }>({}); // 渲染数据分离,解决因为数据变更,导致触发重新渲染
 
 const formdata = ref({});
-formdata.value = initData(props.formData);
+formdata.value = initData(props.modelValue);
 
+function update(){
+  const list = JSON.parse(JSON.stringify(formdata.value));
+  let ril: any[] = [];
+  Object.keys(list.riskList).forEach((k: any) => {
+    ril.push(list.riskList[k])
+  });
+  list.riskList = ril;
+  emit('update:modelValue', list);
+}
 function initData(data: any) {
   const newData = JSON.parse(JSON.stringify(data));
   let riskData : { [key: string]: any } = {};
@@ -219,7 +231,7 @@ function getProp(col: any) {
 
 onMounted(async () => {
   let queryList: { [k: string]: any }[] = [];
-  props.formData.riskList.forEach((item: any) => {
+  props.modelValue.riskList.forEach((item: any) => {
     let p: { [k: string]: any } = {};
     Object.keys(item).forEach((key) => {
       const v = item[key];
@@ -234,7 +246,7 @@ onMounted(async () => {
     queryList.push(p);
   });
   const param = {
-    cTermNo: props.formData.cTermNo,
+    cTermNo: props.modelValue.cTermNo,
     riskList: queryList,
   };
   getTRFactorJson(param).then((res) => {
