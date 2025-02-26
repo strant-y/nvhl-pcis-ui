@@ -194,7 +194,7 @@ watch(
       codeListStore.queryCodeList(
           {
             codeListName: props.item.typeCode,
-            codeListParam: props.item.params
+            codeListParam: props.item.codeParam ? JSON.parse(props.item.codeParam) : undefined
           },
           props.unAuthor,
           props.item.cache ? props.item.cache : true
@@ -229,7 +229,7 @@ onMounted(() => {
       codeListStore.queryCodeList(
           {
             codeListName: props.item.typeCode,
-            codeListParam: props.item.params
+            codeListParam: props.item.codeParam ? JSON.parse(props.item.codeParam) : undefined
           },
           props.unAuthor,
           props.item.cache ? props.item.cache : true
