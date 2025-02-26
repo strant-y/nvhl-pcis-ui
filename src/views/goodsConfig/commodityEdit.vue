@@ -29,7 +29,7 @@
                 <component
                   :ref="
                     (res) => {
-                      opertaor.addTableRef(k.pageKey, res);
+                      opertaor.addTableRef(k.pageCode, res);
                     }
                   "
                   :is="k.pageRef + '-ref'"

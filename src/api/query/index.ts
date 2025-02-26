@@ -19,14 +19,21 @@ export function getProdInfoList(queryParams: any): AxiosPromise<any> {
 export function getPlyInfo(queryParams: any): AxiosPromise<any> {
     return post(`${QUERY}getPlyInfo`, queryParams);
 }
-  
-  
+
+/**
+ * 获取投保单号
+ * @param queryParams
+ */
+export function generatelSingleNo(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/generatelSingleNo`, queryParams);
+}
+
 /**
  * 保存申请单详细信息
  * @param queryParams
  */
 export function saveAppPlyInfo(queryParams: any): AxiosPromise<any> {
-    return post(`${QUERY}saveAppPlyInfo`, queryParams);
+    return post(`policy/save`, queryParams);
 }
   
 /**

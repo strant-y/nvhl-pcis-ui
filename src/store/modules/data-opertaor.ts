@@ -49,6 +49,19 @@ export const dataOpertaor = defineStore(
       });
     };
 
+      const getDataAll = () => {
+          const keys = Object.keys(tableRefs);
+          const res = {};
+          keys.forEach(key => {
+              try {
+                  res[key]=JSON.parse(JSON.stringify(tableRefs[key].getFromValue()));
+              } catch (error) {
+                  console.log('方法不存在或出现错误，跳过执行');
+              }
+          });
+          return res;
+      };
+
     return {
       setTableConfig,
       getTableConfig,
@@ -58,6 +71,7 @@ export const dataOpertaor = defineStore(
       init,
       addTableRef,
       setDataAll,
+      getDataAll,
       setParam,
       getParam
     };

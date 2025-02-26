@@ -48,8 +48,15 @@
           </el-affix>
         </el-aside>
         <el-container>
-          <el-header height="60px">
-            <el-affix :offset="90"> 信息展示预留 </el-affix>
+          <el-header  height="60px">
+            <el-affix :offset="90" style="text-align: center;padding:5px;background:#EBEDFC" >
+                <div class="tp" style="background:#EBEDFC">
+                    产品：<span class="publicStyle">060001旅游观光景点、娱乐场所人身外伤害保险</span>|出单方式：<span class="publicStyle">核心出单</span>| <span class="publicStyle">非共保业务</span>| <span class="publicStyle">个单</span>
+                </div>
+                <div class="btm" style="background:#EBEDFC">
+                  保险期限：<span class="publicStyle">365</span>|保额：<span class="publicStyle">20000.00</span>元|保费： <span class="publicStyle">63.00</span>元
+                </div>
+            </el-affix>
           </el-header>
           <el-main>
             <template v-for="(pageConfig, v) in formconfig1" :key="v">
@@ -63,7 +70,7 @@
                   v-if="currentIndex >= i"
                   :ref="
                     (res) => {
-                      opertaor.addTableRef(k.pageKey, res);
+                      opertaor.addTableRef(k.pageCode, res);
                     }
                   "
                   :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
@@ -88,7 +95,7 @@
 <script setup lang="ts">
 import {createFreeButtonBase, FreeButtonBase} from "@/shared/button-config";
 import {getProductPage} from "../../../api/prod/index";
-import {getAppPlyInfoByAppNo, saveAppPlyInfo,} from "../../../api/query/index";
+import {getAppPlyInfoByAppNo, saveAppPlyInfo, generatelSingleNo} from "../../../api/query/index";
 import {dataOpertaor} from "@/store/modules/data-opertaor";
 
 const opertaor = dataOpertaor();
@@ -121,6 +128,7 @@ const initPage = async () => {
   });
   // 页面初始化
   const formconfig11 = JSON.parse(getProductRes.data);
+  console.log('页面初始化返回数据',formconfig11)
   opertaor.setTableConfig(formconfig11);
   renderComponents();
 };
@@ -146,15 +154,52 @@ async function loadAfter() {
   console.log("setPage");
   console.log(props.param);
   // page.getRefTab("base").setFormValue(lowercaseKeys(props.param));
+  getCAppNoFun()
   if (props.param.pageType === "app") {
     bthList.value.push(
+      createFreeButtonBase({
+          label: "保存模板",
+          type: "primary",
+          func: () => {
+          },
+      }),
+      createFreeButtonBase({
+          label: "复制出单",
+          type: "primary",
+          func: () => {
+          },
+      }),
+      createFreeButtonBase({
+          label: "保费计算",
+          type: "primary",
+          func: () => {
+          },
+      }),
       createFreeButtonBase({
         label: "提交",
         type: "primary",
         func: () => {
           savePlyInfo();
         },
-      })
+      }),
+      createFreeButtonBase({
+          label: "申请核保",
+          type: "primary",
+          func: () => {
+          },
+      }),
+      createFreeButtonBase({
+          label: "发票信息",
+          type: "primary",
+          func: () => {
+          },
+      }),
+      createFreeButtonBase({
+          label: "反洗钱扩展信息",
+          type: "primary",
+          func: () => {
+          },
+      }),
     );
   } else if (props.param.pageType === "readonly") {
     // 查询数据
@@ -190,13 +235,27 @@ async function loadAfter() {
     })
   );
 }
+const getCAppNoFun = () => {
+    const res ={
+        'cProdNo':props.param.cProdNo,
+        'cDptCde':props.param.cDptCde,
+        'icVchTyp':'P_APP'
+    }
+    generatelSingleNo(res).then((res) => {
+        console.log("generatelSingleNo-res", res);
+        if(res['code']=='200'){
+            opertaor.getTableRefByKey('webPlyBaseBasic').setValue('webPlyBase.cAppNo',res['data'])
+        }
+    });
+};
 
 const savePlyInfo = () => {
-  const param = page.getAllValue();
-  saveAppPlyInfo({ data: param }).then((res) => {
+  const res =opertaor.getDataAll()
+  console.log(res)
+  saveAppPlyInfo(res).then((res) => {
     console.log("saveAppPlyInfo-res", res);
-    ElMessage.success(res.msg);
-    history.back();
+    // ElMessage.success(res.msg);
+    // history.back();
   });
 };
 
@@ -242,5 +301,8 @@ function lowercaseKeys<T extends object>(
 }
 :deep(.el-main) {
   padding: 10px 10px 10px 10px;
+}
+.publicStyle {
+  color:red;
 }
 </style>
