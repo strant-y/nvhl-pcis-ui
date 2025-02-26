@@ -110,10 +110,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 );
 onMounted(async () => {
   if (props.type === "edit") {
-    const inputType = props.data.cFactorInputtype;
-    const showExBtn = props.data.cFactorShowExBtn;
-    getUndrClsInfo({ cUndrClsCde: props.data.cUndrClsCde })
-      .then((res) => {
+    const inputType = props.data?.cFactorInputtype;
+    const showExBtn = props.data?.cFactorShowExBtn;
+    getUndrClsInfo({ cUndrClsCde: props.data?.cUndrClsCde })
+      .then((res: any) => {
         const { code, data, msg } = res;
         if (200 === code) {
           freeEditRef.value?.setFormValue(data);
@@ -165,12 +165,12 @@ function save() {
   const param = getFrom();
   const newparam = Object.assign(param, { type: "add" });
   saveUndrClsInfo(newparam)
-    .then((res) => {
+    .then((res: any) => {
       const { code, data, msg } = res;
       if (200 === code) {
         emits("ok", {});
         ElMessage.success("保存成功");
-        this.dialogVisible = false;
+        dialogVisible.value = false;
       } else {
         ElMessage.error(msg);
       }
@@ -191,7 +191,7 @@ function getFrom() {
     const param = Object.assign(s);
     if (props.type === "edit") {
       //编辑状态下,将主键原封不动的送回后端,用于更新
-      param["cPkId"] = props.data.cPkId;
+      param["cPkId"] = props.data?.cPkId;
     }
     if (freeEditRefBtn.value) {
       let btnjson = freeEditRefBtn.value?.getFromValue();

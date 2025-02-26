@@ -95,7 +95,7 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         icon: "Plus",
         func: function () {
-          dzmodal.open(undrEdit, { type: "add", data: {} }).then((res) => {
+          dzmodal.open(undrEdit, { type: "add", data: {} }).then((res: any) => {
             if (res.type === "ok") {
               handleQuery();
             }
@@ -116,7 +116,7 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "Edit",
         tableClick: (row) => {
           console.log(row);
-          dzmodal.open(undrEdit, { type: "edit", data: row }).then((res) => {
+          dzmodal.open(undrEdit, { type: "edit", data: row }).then((res: any) => {
             if (res.type === "ok") {
               handleQuery();
             }
@@ -131,7 +131,7 @@ const tableconfig = reactive<AppTableConfig>(
         link: true,
         tableClick: (row) => {
           delUndrClsById(row)
-            .then((res) => {
+            .then((res: any) => {
               const { code, data, msg } = res;
               if (200 === code) {
                 ElMessage.success("删除成功");
@@ -211,7 +211,7 @@ function handleQuery(flag?: boolean) {
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r);
   qryUndrClsList(param)
-    .then((res) => {
+    .then((res: any) => {
       const { code, data, msg } = res;
       if (200 === code) {
         pageresult.list = [];

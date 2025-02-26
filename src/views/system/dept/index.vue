@@ -243,7 +243,7 @@ const rules = reactive({
 /**
  * 选中机构时触发 回填机构名
  * */
-function dptConfirm(data) {
+function dptConfirm(data: any) {
   queryParams.cDptCnm = data.label;
 }
 
@@ -251,7 +251,7 @@ function dptConfirm(data) {
 function handleQuery() {
   loading.value = true;
   listDepts(queryParams)
-    .then((res) => {
+    .then((res: any) => {
       if (res.code == 200) {
         deptList.value = res.data.list;
         total.value = res.data.total;
