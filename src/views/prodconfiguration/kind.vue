@@ -30,7 +30,12 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { deleteFactorBykey, getBasicKindList } from "@/api/prod";
+import {
+  deleteFactorBykey,
+  getBasicKindList,
+  changeKindStatus,
+  saveKindInfo,
+} from "@/api/prod";
 import { useDzModal } from "@/views/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 const kindEdit = defineAsyncComponent(() => import("./kindEdit.vue"));
@@ -160,8 +165,12 @@ const tableconfig = reactive<AppTableConfig>(
         activeText: "启用",
         inactiveText: "禁用",
         inlinePrompt: true,
-        change: (val) => {
-          console.log(val);
+        func: async (val, row) => {
+          await saveKindInfo(row).then((res) => {
+            if (res.code === 200) {
+              handleQuery();
+            }
+          });
         },
       },
     ],

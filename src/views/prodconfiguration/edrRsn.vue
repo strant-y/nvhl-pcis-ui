@@ -32,7 +32,7 @@ import {
 } from "@/shared/app-table-config";
 import { useRoute } from "vue-router";
 import { ref, reactive, onMounted } from "vue";
-import { qryProdTermList } from "@/api/prod";
+import { qryProdTermList, changeProdEdrRsnStatus } from "@/api/prod";
 import { inputtype } from "@/utils/utilKey";
 
 const route = useRoute();
@@ -185,6 +185,19 @@ const tableconfig = reactive<AppTableConfig>(
         activeText: "启用",
         inactiveText: "禁用",
         inlinePrompt: true,
+        func: async (row, val) => {
+          const res = await changeProdEdrRsnStatus({
+            cStatus: val,
+            cRsnCde: row.cRsnCde,
+          });
+          if (res.code === 200) {
+            this.$message({
+              type: "success",
+              message: "操作成功",
+            });
+            handleQuery();
+          }
+        },
       },
     ],
   })

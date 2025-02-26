@@ -4,17 +4,17 @@
       <template #header>
         <div class="cvrg-hearder">
           <el-row>
-            <el-col :span="2">
+            <el-col :span="10">
               <a style="margin-right: 5px" @click="showData = !showData">
                 <el-icon v-if="!showData"><ArrowUpBold /></el-icon>
                 <el-icon v-if="showData"><ArrowDownBold /></el-icon>
               </a>
               <el-tag type="warning">{{
-                formData.cvrgType === "1" ? "主险" : "附加险"
+                term.cNmeCn
               }}</el-tag>
             </el-col>
-            <el-col :span="20">
-              <span>{{ formData.rigeNme }}</span>
+            <el-col :span="12">
+              <!-- <span>{{ formData.rigeNme }}</span> -->
             </el-col>
             <el-col :span="2">
               <rtButton
@@ -44,7 +44,7 @@
               </span>
             </el-col>
           </el-row>
-          <el-row>
+          <el-row v-if="!ginfo.hidden">
             <table style="width: 100%">
               <thead>
                 <tr class="table-title">
@@ -123,6 +123,7 @@ const groupInfo = ref({});
 const colInfo = ref([]);
 const factormap = ref({});
 const collist = ref([]);
+const term = ref({});
 
 const showData = ref(true);
 const showRiskInfo = ref(true);
@@ -225,6 +226,7 @@ onMounted(async () => {
       factormap.value = data.data.factormap;
       colInfo.value = data.data.colInfo;
       groupInfo.value = data.data.groupInfo;
+      term.value = data.data.term;
     } else {
       ElMessage.error(msg);
     }

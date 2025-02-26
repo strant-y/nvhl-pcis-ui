@@ -65,12 +65,11 @@ opertaor.setTableConfig([
     groupId: "",
     showGroupId: false,
     pageInfo: {
-      prodaudit: {
-        pageKey: "prodaudit",
-        pageTtile: "产品审核",
-        pageRef: "prodaudit",
-        isShow: true,
-      },
+      // prodaudit: {
+      //   pageKey: "prodaudit",
+      //   pageTtile: "产品审核",
+      //   pageRef: "prodaudit",
+      // },
       prodInfo: {
         pageKey: "prodInfo",
         pageTtile: "产品基本信息",

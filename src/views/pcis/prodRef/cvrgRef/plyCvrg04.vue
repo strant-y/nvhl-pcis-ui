@@ -66,7 +66,7 @@ const method = {
             console.log(item)
             item.children?.forEach((e: any) => {
               riskList.push({
-                "cvrg.cRiskNo": e.cRiskNo,
+                "cvrg.cRiskNo": e.cRiskNo
               });
             });
             let data = {

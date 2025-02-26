@@ -31,7 +31,13 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { deleteFactorBykey, getFactorList, getBasicRiskList } from "@/api/prod";
+import {
+  deleteFactorBykey,
+  getFactorList,
+  getBasicRiskList,
+  changeRiskStatus,
+  saveRiskInfo,
+} from "@/api/prod";
 import { template } from "lodash";
 const dzmodal = useDzModal();
 
@@ -169,10 +175,12 @@ const tableconfig = reactive<AppTableConfig>(
         activeText: "启用",
         inactiveText: "禁用",
         inlinePrompt: true,
-        func: (val, row) => {
-          // const rowData = tableRef.value?.getFormValue();
-          console.log(val, row, "=============000000000000000");
-          // console.log(val,rowData "val");
+        func: async (val, row) => {
+          await saveRiskInfo(row).then((res) => {
+            if (res.code === 200) {
+              handleQuery();
+            }
+          });
         },
       },
     ],

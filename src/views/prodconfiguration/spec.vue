@@ -35,6 +35,8 @@ import {
   deleteFactorBykey,
   getFactorList,
   qryProdFixSpecList,
+  changeSpecStatus,
+  savePrdFixSpecInfo,
 } from "@/api/prod";
 const dzmodal = useDzModal();
 
@@ -186,8 +188,12 @@ const tableconfig = reactive<AppTableConfig>(
         activeText: "启用",
         inactiveText: "禁用",
         inlinePrompt: true,
-        change: (val) => {
-          console.log(val);
+        func: async (val, row) => {
+          const res = await savePrdFixSpecInfo(row);
+          if (res.code == 200) {
+            ElMessage.success("修改成功");
+          }
+          hendleQuery();
         },
       },
     ],
