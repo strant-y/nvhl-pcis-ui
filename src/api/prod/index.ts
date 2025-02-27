@@ -345,7 +345,9 @@ export function getTRFactorJson(queryParams: any): AxiosPromise<any> {
 export function qryProdRelTermRiskList(queryParams: any): AxiosPromise<any> {
     return post(`/proddef/qryProdRelTermRiskList`, queryParams);
 }
-
+export function qryRelTermList(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/qryRelTermList`, queryParams);
+}
 export function saveGroupInfo(queryParams: any): AxiosPromise<any> {
     return post(`/proddef/saveGroupInfo`, queryParams);
 }

@@ -59,6 +59,7 @@
             node-key="id"
             show-checkbox
             :data="data2"
+            @check-change="selectAdditionTerm"
           />
         </div>
       </el-col>
@@ -103,7 +104,7 @@
 </template>
 
 <script setup lang="ts">
-import { qryProdRelTermRiskList } from "@/api/prod";
+import { qryProdRelTermRiskList, qryRelTermList } from "@/api/prod";
 import { useValidator } from "@/typings/useValidator";
 
 const { getRules } = useValidator();
@@ -177,15 +178,16 @@ onMounted(async () => {
   });
 });
 
-function selectMainTerm() {
+function selectMainTerm(isselect = true) {
   const tree = mainRef.value?.getCheckedNodes(false,true);
   let selectNode: any[] = [];
+  let selectMainTerm : any[] = [];
   tree?.forEach((item:any) => {
     // 获取选中的主条款信息
     if(item.cTermNo){
       let seterm = Object.assign({}, item);
       let childnode: any[] = [];
-
+      selectMainTerm.push(item.cTermNo);
       item.children?.forEach((child:any) => {
         const issel = childnode?.filter((node:any)=> node.cRiskNo === child.cRiskNo);
         if(issel!=null && issel.length>0){
@@ -200,7 +202,45 @@ function selectMainTerm() {
       selectNode.push(seterm);
     }
   });
+  if(isselect){
+    let additionStr = selectMainTerm.join("@&");
+    qryRelTermList({cTermNo:additionStr}).then((res: any) => {
+      const { code, data, msg } = res;
+      if (200 === code) {
+        data2.value = data;
+      } else {
+        ElMessage.error(msg);
+      }
+    });
+  }
+  
   data3.value = selectNode;
+}
+
+function selectAdditionTerm() {
+  selectMainTerm(false);
+  const tree = additionalRef.value?.getCheckedNodes(false,true);
+  let selectNode: any[] = [];
+  tree?.forEach((item:any) => {
+    // 获取选中的主条款信息
+    if(item.cTermNo){
+      let seterm = Object.assign({}, item);
+      let childnode: any[] = [];
+      item.children?.forEach((child:any) => {
+        const issel = childnode?.filter((node:any)=> node.cRiskNo === child.cRiskNo);
+        if(issel!=null && issel.length>0){
+          return ;
+        }
+        const f = tree?.filter((child2:any) => child2.cRiskNo === child.cRiskNo);
+        if(f!==null && f.length>0){
+          childnode.push(...f);
+        }
+      });
+      seterm.children = childnode;
+      selectNode.push(seterm);
+    }
+  });
+  data3.value.push(...selectNode);
 }
 
 async function selectOne() {
