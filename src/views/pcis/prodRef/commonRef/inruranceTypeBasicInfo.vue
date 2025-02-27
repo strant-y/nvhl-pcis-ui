@@ -80,7 +80,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "大类代码",
         rules: [getRules("required", {})],
         typeCode: "KIND_LIST_ALL",
-        params: { cStatus: "1" },
+        codeParam: { cStatus: "1" },
       },
       {
         prop: "cNmeCn",
@@ -132,7 +132,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "是否计入总保额",
         effect: "light",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "yes_no" },
+        codeParam: { cParCde: "yes_no" },
       },
       {
         prop: "cDutyFree",
@@ -140,7 +140,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "是否免税",
         effect: "light",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "yes_no" },
+        codeParam: { cParCde: "yes_no" },
       },
       // {
       //   prop: "cCvrgTypFlag",
@@ -185,7 +185,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         effect: "light",
         rules: [getRules("required", { change: true })],
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "use_mrk" },
+        codeParam: { cParCde: "use_mrk" },
       },
       {
         prop: "cSourceTyp",

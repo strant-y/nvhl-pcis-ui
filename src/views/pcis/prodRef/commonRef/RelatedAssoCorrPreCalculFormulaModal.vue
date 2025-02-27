@@ -48,7 +48,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         title: "计算公式",
         rules: [getRules("required", { change: "计算公式不能为空" })],
         typeCode: "ALL_EDRFORMU_SELECT",
-        params: { cParCde: "06" },
+        codeParam: { cParCde: "06" },
       },
       {
         prop: "cKindNo",

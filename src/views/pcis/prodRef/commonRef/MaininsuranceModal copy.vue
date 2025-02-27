@@ -78,7 +78,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "业务大类",
         typeCode: "KIND_LIST_CACHE",
-        params: { codeListParam: "" },
+        codeParam: { codeListParam: "" },
       },
       {
         prop: "cCCvrgNo",

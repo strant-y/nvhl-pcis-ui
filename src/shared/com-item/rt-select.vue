@@ -203,7 +203,7 @@ watch(
       codeListStore.queryCodeList(
           {
             codeListName: props.item.typeCode,
-            codeListParam: props.item.params ? props.item.params : undefined
+            codeListParam: getCodeParam(props.item.codeParam)
           },
           props.unAuthor,
           props.item.cache ? props.item.cache : true
@@ -217,6 +217,20 @@ watch(
   },
   { deep: true }
 );
+
+const getCodeParam = (param: any): any => {
+    try{
+        let codeParam = {};
+        if ( !!param && typeof param === 'string' ) {
+            codeParam = JSON.parse(param);
+        }
+        return codeParam;
+    }catch (e) {
+        console.error('codelist参数处理异常！\n' + e)
+        throw e;
+    }
+};
+
 function handleChange(val?: string | number | Array<any> | undefined) {
   const option = options.value.find((item) => item.value === val);
   emits("valueChange", val);
@@ -239,7 +253,7 @@ onMounted(() => {
       codeListStore.queryCodeList(
           {
             codeListName: props.item.typeCode,
-            codeListParam: props.item.params ? props.item.params : undefined
+            codeListParam: getCodeParam(props.item.codeParam)
           },
           props.unAuthor,
           props.item.cache ? props.item.cache : true

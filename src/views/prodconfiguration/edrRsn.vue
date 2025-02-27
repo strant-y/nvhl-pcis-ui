@@ -69,7 +69,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cKindNo",
         inputtype: "rtselect",
         typeCode: "KIND_LIST_CACHE",
-        params: { codeListParam: "" },
+        codeParam: { codeListParam: "" },
         title: "产品大类",
       },
       {
@@ -99,7 +99,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "启用标志",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "use_mrk" },
+        codeParam: { cParCde: "use_mrk" },
         clearable: true,
       },
     ],

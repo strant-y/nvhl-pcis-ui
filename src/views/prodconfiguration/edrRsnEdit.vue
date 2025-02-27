@@ -41,7 +41,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         prop: "cKindNo",
         inputtype: "rtselect",
         typeCode: "KIND_LIST_CACHE",
-        params: { codeListParam: "" },
+        codeParam: { codeListParam: "" },
         title: "产品大类",
         rules: [getRules("required", { change: true })],
       },
@@ -76,7 +76,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "是否计算保费",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "yes_no" },
+        codeParam: { cParCde: "yes_no" },
         rules: [getRules("required", { change: true })],
       },
       {
@@ -84,7 +84,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "是否团单",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "yes_no" },
+        codeParam: { cParCde: "yes_no" },
         rules: [getRules("required", { change: true })],
       },
       {
@@ -92,7 +92,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "是否个单",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "yes_no" },
+        codeParam: { cParCde: "yes_no" },
         rules: [getRules("required", { change: true })],
       },
       {
@@ -100,7 +100,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "启用标志",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "use_mrk" },
+        codeParam: { cParCde: "use_mrk" },
         rules: [getRules("required", { change: true })],
       },
       {

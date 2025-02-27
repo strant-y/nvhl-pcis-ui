@@ -47,7 +47,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         title: "机构代码",
         rules: [getRules("required", { change: "机构代码不能为空" })],
         typeCode: "PLYDPT_LIST_1",
-        params: { cIsValid: "1", userOrg: "0200000000000" },
+        codeParam: { cIsValid: "1", userOrg: "0200000000000" },
       },
       {
         prop: "cInstFlag",

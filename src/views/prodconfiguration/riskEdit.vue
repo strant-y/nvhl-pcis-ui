@@ -108,7 +108,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "大类代码",
         typeCode: "KIND_LIST_ALL",
-        params: { cStatus: "1" },
+        codeParam: { cStatus: "1" },
         clearable: true,
         rules: [getRules("required", {})],
       },
@@ -137,7 +137,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "启用标志",
         rules: [getRules("required", {})],
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "use_mrk" },
+        codeParam: { cParCde: "use_mrk" },
       },
     ],
   })

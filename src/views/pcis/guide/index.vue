@@ -92,7 +92,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [{ type: "required" }],
         typeCode: "KIND_LIST_GRT",
         child: "cProdNo",
-        params: {
+        codeParam: {
           cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
           cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
         },
@@ -122,7 +122,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         //   },
         // ],
         typeCode: "PROD_LIST_IN_GUIDE",
-        params: {
+        codeParam: {
           cParCde: cPard.value,
           cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
           cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,

@@ -64,7 +64,7 @@ const formconfig = reactive<AppFreeEditConfig>(
           },
         ],
         // typeCode: "WEB_PRD_HEALTH_NOTIFY_ROOT",
-        // params: { cProdNo: tabref.getFromValue().cProdNo, value: "ROOT" },
+        // codeParam: { cProdNo: tabref.getFromValue().cProdNo, value: "ROOT" },
       },
 
       {
@@ -72,7 +72,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "上级显示码",
         typeCode: "WEB_PRD_HEALTH_NOTIFY_ROOT",
-        params: { cProdNo: tabref.getFromValue().cProdNo },
+        codeParam: { cProdNo: tabref.getFromValue().cProdNo },
         disabled: true,
       },
       {

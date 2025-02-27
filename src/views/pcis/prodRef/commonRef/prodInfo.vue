@@ -73,7 +73,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "业务大类",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "BsType" },
+        codeParam: { cParCde: "BsType" },
         clearable: true,
         rules: [getRules("required", { change: true })],
       },
@@ -83,7 +83,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "大类代码",
         rules: [getRules("required", {})],
         typeCode: "KIND_LIST_ALL",
-        params: { cStatus: "1" },
+        codeParam: { cStatus: "1" },
         clearable: true,
       },
       {
@@ -143,7 +143,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "标准承保期限单位",
         rules: [getRules("required", { change: "标准承保期限单位不能为空" })],
         typeCode: "WEB_BAS_CODELIST",
-        params: { cParCde: "CriterionUnit" },
+        codeParam: { cParCde: "CriterionUnit" },
         clearable: true,
       },
       {
@@ -161,7 +161,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: " 长短期标志",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "longshortIns" },
+        codeParam: { cParCde: "longshortIns" },
       },
       {
         prop: "cClmedrFlag",
@@ -240,7 +240,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: " 利率类型",
         typeCode: "RECEIVE_BANK_CATEGORY",
         clearable: true,
-        params: { cParCde: "addtype" },
+        codeParam: { cParCde: "addtype" },
       },
       {
         prop: "descri",

@@ -87,7 +87,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         title: "机构代码",
         // typeCode: "Cvrg_LIST",
-        // params: { cProdNo: tabref.getFromValue().cProdNo },
+        // codeParam: { cProdNo: tabref.getFromValue().cProdNo },
       },
     ],
     fromUi: createFromUiConfig({
