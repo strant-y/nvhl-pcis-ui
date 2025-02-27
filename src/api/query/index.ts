@@ -29,6 +29,22 @@ export function generatelSingleNo(queryParams: any): AxiosPromise<any> {
 }
 
 /**
+ * 投保单保费计算
+ * @param queryParams
+ */
+export function appCalc(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/calc`, queryParams);
+}
+
+/**
+ * 投保单申请核保
+ * @param queryParams
+ */
+export function submitToUndr(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/submit`, queryParams);
+}
+
+/**
  * 保存申请单详细信息
  * @param queryParams
  */
