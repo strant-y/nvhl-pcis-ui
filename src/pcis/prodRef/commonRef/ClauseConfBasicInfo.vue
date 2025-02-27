@@ -49,6 +49,27 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       // }),
       createFreeButtonBase({
         type: "success",
+        label: "条款要素绑定",
+        func: async () => {
+          const cTermNo = freeEditRef.value?.getValue("cTermNo");
+
+          dialog.value?.open(
+            "termFactorConfig",
+            {
+              type: "show",
+              data: {
+                cTermNo: cTermNo,
+              },
+            },
+            {
+              isOk: (selectdata: any) => {},
+            },
+            { title: "条款要素绑定", width: 75 }
+          );
+        },
+      }),
+      createFreeButtonBase({
+        type: "success",
         label: "标题绑定",
         func: async () => {
           const cTermNo = freeEditRef.value?.getValue("cTermNo");

@@ -6,7 +6,7 @@
           <tremTemplate
             v-for="(i, index) in formData"
             :key="index"
-            :form-data="i"
+            v-model="formData[index]"
           />
         </el-form>
       </div>
@@ -60,7 +60,6 @@ const method = {
       {
         isOk: (selectdata: any) => {
           let adddata: any [] = [];
-          console.log(selectdata)
           selectdata.forEach((item: any) => {
             let riskList: { "cvrg.cRiskNo": any; }[] = [];
             console.log(item)

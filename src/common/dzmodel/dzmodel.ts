@@ -8,6 +8,7 @@ import componentPageView from "./prodconfig/componentPageView.vue";
 import addtremView from "./prodconfig/addtremView.vue";
 import riskFactorConfig from "./insuranceConInfo/riskFactorConfig.vue";
 import termGroupConfig from "./insuranceConInfo/termGroupConfig.vue";
+import termFactorConfig from "./insuranceConInfo/termFactorConfig.vue";
 
 /**用于动态弹窗组件的映射生成 */
 const componentMap = {
@@ -21,6 +22,7 @@ const componentMap = {
     addtremView:addtremView,
     riskFactorConfig:riskFactorConfig,
     termGroupConfig:termGroupConfig,
+    termFactorConfig:termFactorConfig
 
 
 };
