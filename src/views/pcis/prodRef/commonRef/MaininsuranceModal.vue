@@ -89,8 +89,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cTermNo",
         inputtype: "rtinput",
         title: "条款代码",
-        disabled: true,
-        // readonly: true,
+        // disabled: true,
       },
       {
         prop: "cNmeCn",

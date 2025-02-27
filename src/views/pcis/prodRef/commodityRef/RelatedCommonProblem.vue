@@ -48,8 +48,6 @@ import {
 import { ref, reactive } from "vue";
 import { ElMessage } from "element-plus";
 import { saveRiskInfo } from "@/api/prod";
-import { l } from "vite/dist/node/types.d-jgA8ss1A";
-import { fa } from "element-plus/es/locale";
 
 const props = defineProps<{
   visible: boolean;
