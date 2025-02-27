@@ -15,7 +15,7 @@ import "uno.css";
 import "animate.css";
 import DzModal from "./common/dzmodel/DzModalService";
 import shareds from "./shared/shared"; //公共组件引用
-import prodRef from "./views/pcis/prodRef/prodRef"; //产品组件引用
+import prodRef from "./pcis/prodRef/prodRef"; //产品组件引用
 import popover from "./common/dzpopover/popover"; //弹出框组件引用
 import dzmodel from "./common/dzmodel/dzmodel";  //弹窗公共组件
 
