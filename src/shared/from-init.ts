@@ -36,7 +36,7 @@ export function formInit(
     if (key === "btnItems") {
       return createFreeButtonBase(value);
     }
-    if (key === "loadData" && typeof value === "string") {  //解决部分场景,json字符串为不是对象的问题
+    if( ["loadData","codeParam"].includes(key) && typeof value === "string") {  //解决部分场景,json字符串为不是对象的问题
       return JSON.parse(value);
     }
     // 规则绑定

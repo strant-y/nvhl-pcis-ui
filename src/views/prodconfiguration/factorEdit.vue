@@ -106,8 +106,10 @@ function fromUpdata(newData: any) {
     ) {
       return;
     }
+    if(!!jsonObj.codeParam && typeof jsonObj.codeParam === 'string') {
+        jsonObj.codeParam = JSON.parse(jsonObj.codeParam);
+    }
     jsonObj.func = null; // 方法去掉,不让预览触发事件
-    console.log(jsonObj);
     formconfiglook.fromSchema = [jsonObj];
   }
 }
@@ -220,6 +222,19 @@ const schemaMap = reactive<Record<string, any>>({
       loadData: yesOrNo,
     },
     {
+      prop: "showExBtn",
+      inputtype: "rtselect",
+      title: "是否显示扩展按钮",
+      loadData: yesOrNo,
+      func: (v) => {
+          if (v === "1") {
+              showBtnConfig.value = true;
+          } else {
+              showBtnConfig.value = false;
+          }
+      },
+    },
+    {
       prop: "loadData",
       inputtype: "rtinput",
       type: "textarea",
@@ -246,17 +261,20 @@ const schemaMap = reactive<Record<string, any>>({
       }),
     },
     {
-      prop: "showExBtn",
-      inputtype: "rtselect",
-      title: "是否显示扩展按钮",
-      loadData: yesOrNo,
-      func: (v) => {
-        if (v === "1") {
-          showBtnConfig.value = true;
-        } else {
-          showBtnConfig.value = false;
-        }
-      },
+      prop: "codeParam",
+      inputtype: "rtinput",
+      type: "textarea",
+      itemWidth: 2,
+      title: "code参数",
+      showExBtn: true,
+      btnWidth: 10,
+      readonly: true,
+      btnItems: createFreeButtonBase({
+          icon: "Edit",
+          func: () => {
+              setCodeParam();
+          },
+      }),
     },
   ],
   rtSelectV2: [
@@ -306,6 +324,19 @@ const schemaMap = reactive<Record<string, any>>({
       loadData: yesOrNo,
     },
     {
+      prop: "showExBtn",
+      inputtype: "rtselect",
+      title: "是否显示扩展按钮",
+      loadData: yesOrNo,
+      func: (v) => {
+          if (v === "1") {
+              showBtnConfig.value = true;
+          } else {
+              showBtnConfig.value = false;
+          }
+      },
+    },
+    {
       prop: "loadData",
       inputtype: "rtinput",
       type: "textarea",
@@ -332,17 +363,20 @@ const schemaMap = reactive<Record<string, any>>({
       }),
     },
     {
-      prop: "showExBtn",
-      inputtype: "rtselect",
-      title: "是否显示扩展按钮",
-      loadData: yesOrNo,
-      func: (v) => {
-        if (v === "1") {
-          showBtnConfig.value = true;
-        } else {
-          showBtnConfig.value = false;
-        }
-      },
+      prop: "codeParam",
+      inputtype: "rtinput",
+      type: "textarea",
+      itemWidth: 2,
+      title: "code参数",
+      showExBtn: true,
+      btnWidth: 10,
+      readonly: true,
+      btnItems: createFreeButtonBase({
+          icon: "Edit",
+          func: () => {
+              setCodeParam();
+          },
+      }),
     },
   ],
   rtnumber: [
@@ -641,6 +675,22 @@ const schemaMap = reactive<Record<string, any>>({
         }
       },
     },
+    {
+      prop: "codeParam",
+      inputtype: "rtinput",
+      type: "textarea",
+      itemWidth: 2,
+      title: "code参数",
+      showExBtn: true,
+      btnWidth: 10,
+      readonly: true,
+      btnItems: createFreeButtonBase({
+          icon: "Edit",
+          func: () => {
+              setCodeParam();
+          },
+      }),
+    },
   ],
   rttag: [
     {
@@ -824,6 +874,22 @@ const schemaMap = reactive<Record<string, any>>({
               }
             });
         },
+      }),
+    },
+    {
+      prop: "codeParam",
+      inputtype: "rtinput",
+      type: "textarea",
+      itemWidth: 2,
+      title: "code参数",
+      showExBtn: true,
+      btnWidth: 10,
+      readonly: true,
+      btnItems: createFreeButtonBase({
+          icon: "Edit",
+          func: () => {
+              setCodeParam();
+          },
       }),
     },
   ],
@@ -1184,6 +1250,40 @@ const tableconfig = reactive<AppTableConfig>(
     ],
   })
 );
+
+function setCodeParam() {
+    const convertObjectToArray = (obj: { [key: string]: any }) => {
+        const result: { key: string; value: any }[] = [];
+        for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                result.push({ key: key, value: obj[key] });
+            }
+        }
+        return result.length === 0 ? undefined : result;
+    };
+    const ppp = convertObjectToArray(JSON.parse(freeEditRef.value?.getValue("codeParam")))
+    dzmodal.open(jsonArrayEdit, {
+        data: !ppp || ppp.length === 0 ? undefined : JSON.stringify(ppp),
+        inititle: ["key", "value"],
+    })
+    .then((res) => {
+        if (res.type === "ok") {
+            let s = undefined;
+            const list = JSON.parse(res.body);
+            if(!!list && list.length > 0) {
+                s = list.map(m => {
+                    const r = {};
+                    r[m.key] = m.value;
+                    return r;
+                }).reduce((acc, obj) => {
+                    return {...acc, ...obj};
+                });
+            }
+            freeEditRef.value?.setValue("codeParam", JSON.stringify(s));
+        }
+    });
+}
+
 </script>
 
 <style scoped></style>
