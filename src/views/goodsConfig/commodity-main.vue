@@ -59,7 +59,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "险种大类",
         typeCode: "KIND_LIST_GRT",
-        params: {
+        codeParam: {
           cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
           cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
         },
@@ -70,7 +70,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "险种名称",
         typeCode: "PROD_LIST_GRT",
-        params: {
+        codeParam: {
           cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
           cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
         },
@@ -94,7 +94,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "状态",
         clearable: true,
         typeCode: "BAS_COMM_CODE_OUT_CDE",
-        params: {
+        codeParam: {
           cParCde: "commodity_status",
         },
       },
@@ -104,7 +104,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "商品类型",
         clearable: true,
         typeCode: "BAS_COMM_CODE_OUT_CDE",
-        params: {
+        codeParam: {
           cParCde: "commodity_type",
         },
       },

@@ -51,7 +51,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         title: "方案号",
         rules: [getRules("required", { change: "方案号不能为空" })],
         typeCode: "QryPlanNoByProdNo",
-        params: { cProdNo: tabref.getFromValue().cProdNo },
+        codeParam: { cProdNo: tabref.getFromValue().cProdNo },
       },
       {
         prop: "cTermNo",
@@ -59,7 +59,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         title: "条款代码",
         rules: [getRules("required", { change: "条款代码不能为空" })],
         typeCode: "Cvrg_LIST",
-        params: { cProdNo: tabref.getFromValue().cProdNo },
+        codeParam: { cProdNo: tabref.getFromValue().cProdNo },
       },
       {
         prop: "cSocialSec",
@@ -67,7 +67,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         title: "有无社保",
         loadData: yesOrNo,
         // typeCode: "WEB_SYS_STA_DICT",
-        // params: { cParCde: "yes_no" },
+        // codeParam: { cParCde: "yes_no" },
       },
       {
         prop: "cAgeBegin",

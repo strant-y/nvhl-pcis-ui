@@ -80,7 +80,7 @@
           inputtype: "rtselect",
           title: "申请类型",
           typeCode: "KIND_LIST_ALL",
-          params: { cStatus: "1" },
+          codeParam: { cStatus: "1" },
           clearable: true,
         },
         {
@@ -257,4 +257,3 @@
   </script>
   
   <style scoped></style>
-  

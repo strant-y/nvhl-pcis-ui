@@ -42,7 +42,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "大类代码",
         typeCode: "KIND_LIST_CACHE",
-        params: { codeListParam: "" },
+        codeParam: { codeListParam: "" },
         rules: [getRules("required", { blur: true })],
       },
       {
@@ -68,7 +68,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         title: "启用标识",
         rules: [getRules("required", { blur: true })],
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "use_mrk" },
+        codeParam: { cParCde: "use_mrk" },
       },
     ],
     fromUi: createFromUiConfig({

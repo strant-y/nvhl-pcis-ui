@@ -110,7 +110,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "责任选择",
         typeCode: "term_risk_list",
         rules: [getRules("required", {})],
-        params: {
+        codeParam: {
           cTermNo: cTermNo,
         },
         func: () => {
@@ -123,7 +123,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "分组信息",
         typeCode: "term_group_list",
         rules: [getRules("required", {})],
-        params: {
+        codeParam: {
           cTermNo: cTermNo,
         },
         func: () => {

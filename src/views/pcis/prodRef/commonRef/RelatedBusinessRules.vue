@@ -82,7 +82,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "机构代码",
         typeCode: "PLYDPT_LIST_1",
-        params: { cIsValid: "1", userOrg: "0200000000000" },
+        codeParam: { cIsValid: "1", userOrg: "0200000000000" },
       },
     ],
     fromUi: createFromUiConfig({

@@ -79,7 +79,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         placeholder: "产品大类",
         title: "产品大类",
         typeCode: "KIND_LIST_CACHE",
-        params: { codeListParam: "" },
+        codeParam: { codeListParam: "" },
         clearable: true,
       },
       {
@@ -103,7 +103,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         placeholder: "启用标识",
         title: "启用标识",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "use_mrk" },
+        codeParam: { cParCde: "use_mrk" },
         clearable: true,
       },
       {
@@ -111,7 +111,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "审核状态",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "PROD_AUDIT_STATUS" },
+        codeParam: { cParCde: "PROD_AUDIT_STATUS" },
         clearable: true,
       },
     ],

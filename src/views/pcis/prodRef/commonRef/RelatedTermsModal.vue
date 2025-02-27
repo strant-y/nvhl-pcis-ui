@@ -51,7 +51,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         btnWidth: 20,
         itemWidth: 2,
         typeCode: "ALL_CTERMNO_SELECT",
-        params: { cParCde: "01" },
+        codeParam: { cParCde: "01" },
         rules: [getRules("required", {})],
       },
       {

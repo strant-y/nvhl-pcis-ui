@@ -195,10 +195,11 @@ watch(
       options.value = newValue.loadData;
     }
     if (props.item.typeCode) {
-      codeListStore.queryCodeList(
+      codeListStore
+        .queryCodeList(
           {
             codeListName: props.item.typeCode,
-            codeListParam: props.item.params
+            codeListParam: props.item.codeParam,
           },
           props.unAuthor,
           props.item.cache ? props.item.cache : true
@@ -212,6 +213,7 @@ watch(
   },
   { deep: true }
 );
+
 function handleChange(val?: string | number | Array<any> | undefined) {
   const option = options.value.find((item) => item.value === val);
   emits("valueChange", val);
@@ -231,10 +233,11 @@ onMounted(() => {
   // 初始化组件数据
   if (props.item) {
     if (!props.item.loadData && !!props.item.typeCode) {
-      codeListStore.queryCodeList(
+      codeListStore
+        .queryCodeList(
           {
             codeListName: props.item.typeCode,
-            codeListParam: props.item.params
+            codeListParam: props.item.codeParam,
           },
           props.unAuthor,
           props.item.cache ? props.item.cache : true

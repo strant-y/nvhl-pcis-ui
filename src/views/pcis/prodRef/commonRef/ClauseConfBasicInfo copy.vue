@@ -109,7 +109,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "险类代码",
         typeCode: "KIND_LIST_CACHE",
-        params: { codeListParam: "" },
+        codeParam: { codeListParam: "" },
         rules: [getRules("required", { change: true })],
       },
       {
@@ -146,7 +146,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "启用标志",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "use_mrk" },
+        codeParam: { cParCde: "use_mrk" },
         rules: [getRules("required", { change: true })],
       },
       {
@@ -154,7 +154,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "是否互联网",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "yes_no" },
+        codeParam: { cParCde: "yes_no" },
         rules: [getRules("required", { change: true })],
       },
       {
@@ -198,7 +198,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "主条款/附加条款",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "RdrTyp" },
+        codeParam: { cParCde: "RdrTyp" },
         rules: [getRules("required", { change: true })],
         //主条款是1附加条款是0
         func: (val: any) => {
@@ -218,7 +218,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "附加条款类型",
         typeCode: "additional_insurance",
-        params: { cParCde: "add_type" },
+        codeParam: { cParCde: "add_type" },
         rules: [getRules("required", { change: true })],
         hidden: true, // 初始状态为显示
       },
@@ -239,7 +239,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "条款文件是否存在",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "yes_no" },
+        codeParam: { cParCde: "yes_no" },
         rules: [getRules("required", { change: true })],
       },
       // {
@@ -247,7 +247,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       //   inputtype: "rtselect",
       //   title: "条款类别",
       //   typeCode: "ClassOfClause",
-      //   params: { cParCde: "" },
+      //   codeParam: { cParCde: "" },
       // },
       {
         prop: "cWebsite",

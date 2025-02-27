@@ -127,7 +127,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "启用标志",
         rules: [getRules("required", {})],
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "use_mrk" },
+        codeParam: { cParCde: "use_mrk" },
       },
     ],
     showSuperior: true,

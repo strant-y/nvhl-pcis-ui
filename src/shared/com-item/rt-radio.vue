@@ -103,10 +103,11 @@ watch(
       options.value = newValue.loadData;
     }
     if (props.item.typeCode) {
-      codeListStore.queryCodeList(
+      codeListStore
+        .queryCodeList(
           {
             codeListName: props.item.typeCode,
-            codeListParam: props.item.params
+            codeListParam: props.item.codeParam,
           },
           false,
           props.item.cache ? props.item.cache : true
@@ -133,10 +134,11 @@ onMounted(() => {
   // 初始化组件数据
   if (props.item) {
     if (!props.item.loadData && !!props.item.typeCode) {
-      codeListStore.queryCodeList(
+      codeListStore
+        .queryCodeList(
           {
             codeListName: props.item.typeCode,
-            codeListParam: props.item.params
+            codeListParam: props.item.codeParam,
           },
           false,
           props.item.cache ? props.item.cache : true

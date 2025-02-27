@@ -62,7 +62,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "险种大类",
         rules: [getRules("required", { change: true })],
         typeCode: "KIND_LIST_GRT",
-        params: {
+        codeParam: {
           cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
           cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
         },
@@ -73,7 +73,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "险种名称",
         rules: [getRules("required", {})],
         typeCode: "PROD_LIST_GRT",
-        params: {
+        codeParam: {
           cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
           cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
         },
@@ -101,7 +101,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         title: "保险期间类型",
         typeCode: "RECEIVE_BANK_CATEGORY",
-        params: { cParCde: "CriterionUnit" },
+        codeParam: { cParCde: "CriterionUnit" },
         rules: [getRules("required", {})],
       },
       {
@@ -140,35 +140,35 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: " 是否见费出单",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "yes_no" },
+        codeParam: { cParCde: "yes_no" },
       },
       {
         prop: "cAutoUdr",
         inputtype: "rtselect",
         title: " 是否自动核保",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "yes_no" },
+        codeParam: { cParCde: "yes_no" },
       },
       {
         prop: "cImmeffMrk",
         inputtype: "rtselect",
         title: " 是否实时出单",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "yes_no" },
+        codeParam: { cParCde: "yes_no" },
       },
       {
         prop: "cMailMrk",
         inputtype: "rtselect",
         title: " 是否发送邮件",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "yes_no" },
+        codeParam: { cParCde: "yes_no" },
       },
       {
         prop: "cPdfStyle",
         inputtype: "rtselect",
         title: " PDF电子保单样式",
         typeCode: "BAS_COMM_CODE_OUT_CDE",
-        params: { cParCde: "PdfStyle", cRemark: "" },
+        codeParam: { cParCde: "PdfStyle", cRemark: "" },
       },
       {
         prop: "nOnsaleRate",
@@ -180,14 +180,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "  支付方式",
         typeCode: "BAS_COMM_CODE_OUT_CDE",
-        params: { cParCde: "PayType" },
+        codeParam: { cParCde: "PayType" },
       },
       {
         prop: "cFeeTypeCde",
         inputtype: "rtselect",
         title: "  费用类型",
         typeCode: "BAS_COMM_CODE_OUT_CDE",
-        params: { cParCde: "FeeTypeCde" },
+        codeParam: { cParCde: "FeeTypeCde" },
       },
       {
         prop: "nSentAcount",
@@ -199,7 +199,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "  是否发送短信",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "yes_no" },
+        codeParam: { cParCde: "yes_no" },
       },
       {
         prop: "cGrpCompany",
@@ -223,7 +223,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: " 项目大类",
         typeCode: "CPrjCtgTyp_List",
-        params: { cParCde: "-1", cLev: "1" },
+        codeParam: { cParCde: "-1", cLev: "1" },
       },
       {
         prop: "cPerFlag",
@@ -235,7 +235,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: " 项目中类",
         typeCode: "CPrjCtgTyp_List",
-        params: { cParCde: "-1", cLev: "2" },
+        codeParam: { cParCde: "-1", cLev: "2" },
       },
       {
         prop: "cPrjCtgMidContent",
@@ -247,7 +247,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: " 项目小类",
         typeCode: "CPrjCtgTyp_List",
-        params: { cParCde: "-1", cLev: "3" },
+        codeParam: { cParCde: "-1", cLev: "3" },
       },
       {
         prop: "cPrjCtgSubContent",
@@ -259,7 +259,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: " 是否开具电子发票",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "isInvoice" },
+        codeParam: { cParCde: "isInvoice" },
         // loadData: [
         //   {
         //     label: "是",
@@ -276,14 +276,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "实时起保，是否可当日撤单",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "yes_no" },
+        codeParam: { cParCde: "yes_no" },
       },
       {
         prop: "cIsInternet",
         inputtype: "rtselect",
         title: " 是否互联网业务",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "yes_no" },
+        codeParam: { cParCde: "yes_no" },
       },
       {
         prop: "cInternetShowName",
@@ -305,7 +305,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "是否关联附属信息",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "yes_no" },
+        codeParam: { cParCde: "yes_no" },
       },
       {
         prop: "cCiMrk",
@@ -324,7 +324,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "是否取方案份数配置",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "yes_no" },
+        codeParam: { cParCde: "yes_no" },
       },
       {
         prop: "cSpePlatTyp",
@@ -336,7 +336,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         title: " 是否自动核销",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "yes_no" },
+        codeParam: { cParCde: "yes_no" },
       },
     ],
     fromUi: createFromUiConfig({

@@ -77,7 +77,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "大类代码",
         typeCode: "KIND_LIST_ALL",
-        params: { cStatus: "1" },
+        codeParam: { cStatus: "1" },
       },
       {
         prop: "cTermNo",
