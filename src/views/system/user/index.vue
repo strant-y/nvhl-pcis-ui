@@ -409,7 +409,7 @@ import { v4 as uuidv4 } from "uuid";
 import { UserForm, UserQuery, UserPageVO } from "@/api/user/types";
 import type { UploadInstance } from "element-plus";
 import { genFileId } from "element-plus";
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 import moment from "moment";
 
 const queryFormRef = ref(ElForm); // 查询表单

@@ -20,7 +20,7 @@ import {
 } from "@/shared/app-free-edit-config";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { getPlanBasePage } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();

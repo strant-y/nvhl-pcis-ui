@@ -27,7 +27,7 @@ import {
   deleteProdTaxRateByProdNo,
 } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 import {
   AppTableConfig,
   AppTableMethod,

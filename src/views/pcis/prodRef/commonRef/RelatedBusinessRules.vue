@@ -22,7 +22,7 @@ import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { qryRefProdAndRuleList } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 const AddBusinessRulesModal = defineAsyncComponent(
   () => import("./AddBusinessRulesModal.vue")

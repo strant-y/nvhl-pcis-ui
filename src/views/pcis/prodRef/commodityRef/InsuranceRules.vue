@@ -14,7 +14,7 @@ import { useValidator } from "@/typings/useValidator";
 import { saveProInfo } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 import { useRoute } from "vue-router";
 const route = useRoute();

@@ -30,7 +30,7 @@ import {
 } from "@/shared/app-table-config";
 import { useRoute } from "vue-router";
 import { ref, reactive, onMounted } from "vue";
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 const RelatedAdditionalInsModal = defineAsyncComponent(
   () => import("./RelatedAdditionalInsModal.vue")

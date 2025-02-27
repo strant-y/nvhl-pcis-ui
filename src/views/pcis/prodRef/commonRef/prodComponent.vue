@@ -18,8 +18,8 @@ import {
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
 
-import { useDzModal } from "@/views/dzmodel/DzModalService";
-import { DialogMethod } from "@/views/dzmodel/ComDialogConf";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 const dzmodal = useDzModal();
 const prodPageComponent = defineAsyncComponent(
   () => import("./prodPageComponent.vue")

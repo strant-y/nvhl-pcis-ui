@@ -50,8 +50,8 @@ import {
 import { createFreeButtonBase, FreeButtonBase } from "@/shared/button-config";
 const emits = defineEmits(["ok", "cancel"]);
 import { inputtype } from "@/utils/utilKey";
-import { DialogMethod } from "@/views/dzmodel/ComDialogConf";
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 const prodPageView = defineAsyncComponent(() => import("./prodPageView.vue"));
 const dialog = ref<DialogMethod | null>(null);

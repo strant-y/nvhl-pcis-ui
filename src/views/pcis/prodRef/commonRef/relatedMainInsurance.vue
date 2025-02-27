@@ -26,7 +26,7 @@ import {
   unAssociationTerm,
 } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 const MaininsuranceModal = defineAsyncComponent(
   () => import("./MaininsuranceModal.vue")

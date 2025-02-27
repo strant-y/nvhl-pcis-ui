@@ -26,7 +26,7 @@ import {
 } from "@/api/prod";
 import { ref, reactive, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import { DialogMethod } from "@/views/dzmodel/ComDialogConf";
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { clear } from "console";
 const dialog = ref<DialogMethod | null>(null);
 

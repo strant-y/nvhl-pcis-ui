@@ -21,7 +21,7 @@ import tremTemplate from "./trem-template.vue";
 const dialog = ref<DialogMethod | null>(null);
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-import { DialogMethod } from "@/views/dzmodel/ComDialogConf";
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 const opertaor = dataOpertaor();
 
 const props = defineProps({

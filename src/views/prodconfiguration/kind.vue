@@ -36,7 +36,7 @@ import {
   changeKindStatus,
   saveKindInfo,
 } from "@/api/prod";
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 const kindEdit = defineAsyncComponent(() => import("./kindEdit.vue"));
 const tableRef = ref<AppTableMethod | null>(null);

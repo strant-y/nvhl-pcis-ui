@@ -20,7 +20,7 @@ import { useValidator } from "@/typings/useValidator";
 import { saveProdInfo } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 const clauseConfAdd = defineAsyncComponent(() => import("./ClauseConfAdd.vue"));
 import {

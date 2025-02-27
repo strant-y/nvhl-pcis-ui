@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import { useValidator } from "@/typings/useValidator";
 import { yesOrNo, size, inputtype, typeMap, dateType } from "@/utils/utilKey";
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { ref, defineProps } from "vue";
 import { createFreeButtonBase } from "@/shared/button-config";
 import {
@@ -55,7 +55,7 @@ import { v4 as uuidv4 } from "uuid";
 import { max } from "lodash";
 
 const jsonArrayEdit = defineAsyncComponent(
-  () => import("@/views/dzmodel/jsonArrayEdit.vue")
+  () => import("@/common/dzmodel/jsonArrayEdit.vue")
 );
 
 const showBtnConfig = ref(false);

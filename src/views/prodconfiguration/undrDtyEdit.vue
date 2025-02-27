@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 const showBtnConfig = ref(false);
 const dialogVisible = ref(true);
 const showView = ref(false);

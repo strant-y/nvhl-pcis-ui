@@ -23,7 +23,7 @@ import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 import { qryPaySeemoneyConfigList } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 const AddRelatedPayOrderConfModal = defineAsyncComponent(
   () => import("./AddRelatedPayOrderConfModal.vue")

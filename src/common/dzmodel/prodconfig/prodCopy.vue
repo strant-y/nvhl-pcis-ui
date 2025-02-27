@@ -29,8 +29,8 @@
 <script setup lang="ts">
 import { useValidator } from "@/typings/useValidator";
 
-import prodInfo from "../../pcis/prodRef/commonRef/prodInfo.vue";
-import prodComponent from "../../pcis/prodRef/commonRef/prodComponent.vue";
+import prodInfo from "../../../views/pcis/prodRef/commonRef/prodInfo.vue";
+import prodComponent from "../../../views/pcis/prodRef/commonRef/prodComponent.vue";
 
 const { getRules } = useValidator();
 import { ref, defineProps } from "vue";

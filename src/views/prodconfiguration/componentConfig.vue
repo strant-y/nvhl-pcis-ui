@@ -59,8 +59,8 @@ import {
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
-import { useDzModal } from "@/views/dzmodel/DzModalService";
-import { DialogMethod } from "../dzmodel/ComDialogConf";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
+import { DialogMethod } from "../../common/dzmodel/ComDialogConf";
 import {
   AppTableConfig,
   AppTableMethod,

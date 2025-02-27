@@ -26,7 +26,7 @@
   const freeEditRef = ref<AppFreeEditMethod | null>(null);
   import { createFreeButtonBase } from "@/shared/button-config";
   import { yesOrNo, size, inputtype } from "@/utils/utilKey";
-  import { useDzModal } from "@/views/dzmodel/DzModalService";
+  import { useDzModal } from "@/common/dzmodel/DzModalService";
   import {
     AppTableConfig,
     AppTableMethod,

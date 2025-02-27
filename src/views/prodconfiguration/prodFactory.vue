@@ -35,7 +35,7 @@ import {
 } from "@/shared/app-table-config";
 import { getProFactoryList, changeStatus, auditSubmit } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-import { DialogMethod } from "../dzmodel/ComDialogConf";
+import { DialogMethod } from "../../common/dzmodel/ComDialogConf";
 
 const pageresult = reactive<Pageresult>({
   result: "",

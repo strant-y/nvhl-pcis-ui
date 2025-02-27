@@ -100,12 +100,12 @@ import {
   createTableEditConfig,
   MyTableMethod,
 } from "@/shared/app-table-config";
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { title } from "process";
-import { DialogMethod } from "../dzmodel/ComDialogConf";
+import { DialogMethod } from "../../common/dzmodel/ComDialogConf";
 const dzmodal = useDzModal();
 const jsonArrayEdit = defineAsyncComponent(
-  () => import("@/views/dzmodel/jsonArrayEdit.vue")
+  () => import("@/common/dzmodel/jsonArrayEdit.vue")
 );
 const buttonEdit = defineAsyncComponent(() => import("./buttonEdit.vue"));
 

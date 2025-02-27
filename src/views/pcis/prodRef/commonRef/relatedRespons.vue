@@ -38,7 +38,7 @@ import {
   queryTermRiskRelList,
 } from "@/api/prod";
 
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
 const AddResponsibilityModal = defineAsyncComponent(
@@ -49,7 +49,7 @@ const ResponsibilityModal = defineAsyncComponent(
 );
 
 import { useRoute } from "vue-router";
-import { DialogMethod } from "@/views/dzmodel/ComDialogConf";
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 const route = useRoute();
 const query = ref(route.query);
 const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
