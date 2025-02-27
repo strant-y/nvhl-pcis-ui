@@ -144,7 +144,7 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtnPosition: "right",
     tableBtn: [
       createFreeButtonBase({
-        id: "score",
+        id: "edit",
         tooltip: "编辑",
         link: true,
         type: "success",
@@ -163,7 +163,7 @@ const tableconfig = reactive<AppTableConfig>(
         },
       }),
       createFreeButtonBase({
-        id: "score",
+        id: "submit",
         tooltip: "提交审核",
         link: true,
         type: "danger",
@@ -175,14 +175,15 @@ const tableconfig = reactive<AppTableConfig>(
             cAuditStatus: "submit",
           }).then((res) => {
             if (res.code === 200) {
-              ElMessage.success(res.msg);
+              ElMessage.success(res.data.message);
               handleQuery();
             }
           });
         },
+        // visible: row.cAuditStatus !== "2",
       }),
       createFreeButtonBase({
-        id: "score",
+        id: "copy",
         iconColor: "#02D05F",
         tooltip: "复制",
         icon: "DocumentCopy",

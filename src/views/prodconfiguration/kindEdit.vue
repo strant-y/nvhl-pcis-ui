@@ -121,11 +121,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "英文名称",
         rules: [getRules("required", {})],
       },
-      // {
-      //   prop: "cDispCde",
-      //   inputtype: "rtinput",
-      //   title: "大类显示码",
-      // },
       {
         prop: "cStatus",
         inputtype: "rtselect",

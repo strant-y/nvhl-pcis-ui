@@ -103,39 +103,6 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         title: "主从联标识",
       },
-      // {
-      //   prop: "NComm",
-      //   inputtype: "rtinput",
-      //   title: "代理经纪费",
-      // },
-      // {
-      //   prop: "NFeeLower",
-      //   inputtype: "rtinput",
-      //   title: "代理经纪费变化",
-      // },
-      // {
-      //   prop: "CIsExist",
-      //   inputtype: "rtselect",
-      //   title: "代理(经纪)人",
-      //   tabClick: () => {
-      //     console.log("点击了按钮");
-      //   },
-      // },
-      // {
-      //   prop: "CUseDpt",
-      //   inputtype: "rtselect",
-      //   title: "代理业务员代码",
-      // },
-      // {
-      //   prop: "CUseDpt",
-      //   inputtype: "rtselect",
-      //   title: "业务员代码",
-      // },
-      // {
-      //   prop: "CUseDpt",
-      //   inputtype: "rtselect",
-      //   title: "代理协议号",
-      // },
       {
         prop: "cAcctNo",
         inputtype: "rtinput",

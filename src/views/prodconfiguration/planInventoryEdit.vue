@@ -23,7 +23,6 @@ import {
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
 import { ref, reactive } from "vue";
-// import { ElMessage } from "element-plus";
 import { savePrdTermInfo } from "@/api/prod"; // api接口
 
 const props = defineProps<{

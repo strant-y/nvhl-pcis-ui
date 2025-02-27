@@ -151,19 +151,13 @@ opertaor.setTableConfig([
 
 const btns = {};
 onMounted(() => {
-  if (param.type != "approve") {
-    formconfig1.forEach((ele) => {
-      if (ele.pageInfo.prodaudit.pageKey === "prodaudit") {
-        delete ele.pageInfo.prodaudit;
-      }
-    });
-  } else {
-    formconfig1.forEach((ele) => {
-      if (!ele.pageInfo.prodaudit) {
-        ele.pageInfo.prodaudit = { ...prodauditConfig };
-      }
-    });
-  }
+  formconfig1.forEach((ele) => {
+    if (param.type !== "approve") {
+      delete ele.pageInfo.prodaudit;
+    } else if (!ele.pageInfo.prodaudit) {
+      ele.pageInfo.prodaudit = { ...prodauditConfig };
+    }
+  });
   renderComponents();
 });
 
