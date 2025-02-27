@@ -103,7 +103,7 @@ watch(
       codeListStore.queryCodeList(
           {
             codeListName: props.item.typeCode,
-            codeListParam: getCodeParam(props.item.codeParam)
+            codeListParam: props.item.codeParam
           },
           false,
           props.item.cache ? props.item.cache : true
@@ -132,7 +132,7 @@ onMounted(() => {
       codeListStore.queryCodeList(
           {
             codeListName: props.item.typeCode,
-            codeListParam: getCodeParam(props.item.codeParam)
+            codeListParam: props.item.codeParam
           },
           false,
           props.item.cache ? props.item.cache : true
@@ -147,16 +147,4 @@ onMounted(() => {
     }
   }
 });
-const getCodeParam = (param: any): any => {
-    try{
-        let codeParam = {};
-        if ( !!param && typeof param === 'string' ) {
-            codeParam = JSON.parse(param);
-        }
-        return codeParam;
-    }catch (e) {
-        console.error('codelist参数处理异常！\n' + e)
-        throw e;
-    }
-};
 </script>
