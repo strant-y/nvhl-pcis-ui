@@ -10,7 +10,10 @@
           ref="buttonRef"
           :type="item.type"
           :size="item.size"
-          :disabled="item.disabled"
+          :disabled="
+            item.disabled ||
+            (typeof item.disabled === 'function' ? item.disabled(row) : false)
+          "
           :placeholder="item.placeholder"
           :link="item.link ? item.link : false"
           :circle="item.circle ? item.circle : false"

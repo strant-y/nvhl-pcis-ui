@@ -124,7 +124,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         placeholder: "条款标志",
         title: "条款标志",
-        typeCode: "WEB_SYS_STA_DICT",
+        typeCode: "WEB_SYS_RdrTyp",
         codeParam: { cParCde: "RdrTyp" },
         clearable: true,
       },

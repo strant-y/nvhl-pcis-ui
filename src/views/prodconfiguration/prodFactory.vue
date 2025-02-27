@@ -163,7 +163,7 @@ const tableconfig = reactive<AppTableConfig>(
         },
       }),
       createFreeButtonBase({
-        id: "submit",
+        id: "check",
         tooltip: "提交审核",
         link: true,
         type: "danger",
@@ -180,7 +180,7 @@ const tableconfig = reactive<AppTableConfig>(
             }
           });
         },
-        // visible: row.cAuditStatus !== "2",
+        // disabled: (row) => row.cAuditStatus === "submit",
       }),
       createFreeButtonBase({
         id: "copy",
