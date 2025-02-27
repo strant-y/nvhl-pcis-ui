@@ -32,11 +32,6 @@ const props = defineProps({
     type: Object as () => Record<string, any>,
     required: false,
   },
-  row: {
-    // 新增属性，用于接收当前行的数据
-    type: Object as () => Record<string, any>,
-    required: false,
-  },
 });
 const emits = defineEmits(["click"]); // 父组件监听事件，同步子组件值的变化给父组件
 function handleChange() {

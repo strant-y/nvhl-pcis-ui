@@ -112,7 +112,7 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         icon: "Plus",
         func: function () {
-          dzmodal.open(riskEdit, { type: "add", data: {} }).then((res:any) => {
+          dzmodal.open(riskEdit, { type: "add", data: {} }).then((res) => {
             if (res.type === "ok") {
               handleQuery();
             }
@@ -133,7 +133,7 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "Edit",
         tableClick: (row) => {
           console.log(row);
-          dzmodal.open(riskEdit, { type: "edit", data: row }).then((res:any) => {
+          dzmodal.open(riskEdit, { type: "edit", data: row }).then((res) => {
             if (res.type === "ok") {
               handleQuery();
             }
@@ -175,8 +175,8 @@ const tableconfig = reactive<AppTableConfig>(
         activeText: "启用",
         inactiveText: "禁用",
         inlinePrompt: true,
-        func: async (val:any, row:any) => {
-          await saveRiskInfo(row).then((res:any) => {
+        func: async (val, row) => {
+          await saveRiskInfo(row).then((res) => {
             if (res.code === 200) {
               handleQuery();
             }
@@ -214,7 +214,7 @@ function handleQuery(flag?: boolean) {
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r);
   getBasicRiskList(param)
-    .then((res:any) => {
+    .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
         pageresult.list = [];

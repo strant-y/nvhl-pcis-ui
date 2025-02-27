@@ -131,11 +131,6 @@ const props = defineProps({
     type: Object as () => Record<string, any>,
     required: false,
   },
-  row: {
-    // 新增属性，用于接收当前行的数据
-    type: Object as () => Record<string, any>,
-    required: false,
-  },
 });
 
 interface OptionTypeBySelect extends OptionType {
@@ -200,10 +195,11 @@ watch(
       options.value = newValue.loadData;
     }
     if (props.item.typeCode) {
-      codeListStore.queryCodeList(
+      codeListStore
+        .queryCodeList(
           {
             codeListName: props.item.typeCode,
-            codeListParam: props.item.codeParam
+            codeListParam: props.item.codeParam,
           },
           props.unAuthor,
           props.item.cache ? props.item.cache : true
@@ -217,7 +213,6 @@ watch(
   },
   { deep: true }
 );
-
 
 function handleChange(val?: string | number | Array<any> | undefined) {
   const option = options.value.find((item) => item.value === val);
@@ -238,10 +233,11 @@ onMounted(() => {
   // 初始化组件数据
   if (props.item) {
     if (!props.item.loadData && !!props.item.typeCode) {
-      codeListStore.queryCodeList(
+      codeListStore
+        .queryCodeList(
           {
             codeListName: props.item.typeCode,
-            codeListParam: props.item.codeParam
+            codeListParam: props.item.codeParam,
           },
           props.unAuthor,
           props.item.cache ? props.item.cache : true

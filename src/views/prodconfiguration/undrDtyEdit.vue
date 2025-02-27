@@ -12,11 +12,12 @@
       v-model:pageresult="pageresult"
       ref="tableRef"
       @page-change="handleQuery(false)"
+      @selection-change="handleSelectionChange"
     />
     <template #footer>
       <span class="dialog-footer">
-        <el-button >新增</el-button>
-        <el-button >取消</el-button>
+        <el-button @click="handleAdd">新增</el-button>
+        <el-button @click="handleCancel">取消</el-button>
         <el-button type="primary" @click="handleSave">保存</el-button>
       </span>
     </template>
@@ -47,12 +48,16 @@ import {
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
 import { ref, reactive } from "vue";
-import { getCvrgRiskRelList, saveRiskInfo } from "@/api/prod";
+import { saveRiskInfo } from "@/api/prod";
 
 const props = defineProps<{
   visible: boolean;
 }>();
-const emits = defineEmits(["updateDatas", "update:modelValue", "save", "update:visible"]); // 父组件监听事件，同步子组件值的变化给父组件
+
+const emit = defineEmits<{
+  (e: "update:modelValue", value: boolean): void;
+  (e: "save"): void;
+}>();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 
@@ -65,6 +70,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         type: "primary",
         label: "选择产品",
         func: () => {
+          save();
         },
       }),
     ],
@@ -117,7 +123,7 @@ const handleSave = async () => {
     try {
       await saveRiskInfo(formData); //保存接口调用
       ElMessage.success("保存成功");
-      emits("save");
+      emit("save");
       // dialogVisible(false);
     } catch (error) {
       ElMessage.error("保存失败");
@@ -130,7 +136,7 @@ const handleCancel = () => {
 };
 
 const handleVisibleUpdate = (value: boolean) => {
-  emits("update:visible", value);
+  emit("update:visible", value);
 };
 
 const tableRef = ref<AppTableMethod | null>(null);
@@ -198,7 +204,7 @@ function handleQuery() {
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r);
   getCvrgRiskRelList(param)
-    .then((res: any) => {
+    .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
         pageresult.list = data.data;

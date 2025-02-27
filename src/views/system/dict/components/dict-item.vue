@@ -67,7 +67,7 @@ function handleQuery() {
   if (queryParams.cParentId) {
     loading.value = true;
     getDictPage(queryParams)
-      .then((res: any) => {
+      .then((res) => {
         if(res.data.code == 500){
           ElMessage.error(res.data.message);
         }
@@ -120,7 +120,7 @@ function handleSubmit() {
       const dictId = formData.cPkId;
       if (dictId) {
         updateDict(formData)
-          .then((res: any) => {
+          .then((res) => {
             if (res.code == 200){
                 ElMessage.success(res.msg); 
                 closeDialog();
@@ -132,7 +132,7 @@ function handleSubmit() {
           .finally(() => (loading.value = false));
       } else {
         addDict(formData)
-          .then((res: any) => {
+          .then((res) => {
             if (res.code == 200){
               ElMessage.success(res.msg); 
                closeDialog();
@@ -185,7 +185,7 @@ function handleDelete(dictId?: string) {
     cancelButtonText: "取消",
     type: "warning",
   }).then(() => {
-    deleteDict(dictIds).then((res: any) => {
+    deleteDict(dictIds).then((res) => {
       if (res.code == 200){
           ElMessage.success(res.msg);
           resetQuery();

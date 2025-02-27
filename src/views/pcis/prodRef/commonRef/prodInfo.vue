@@ -1,5 +1,7 @@
 <template>
-  <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+  <div style="padding-top: 6px">
+    <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -16,10 +18,7 @@ const { getRules } = useValidator();
 import { saveProInfo, getProducts } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useRoute } from "vue-router";
-import { cp } from "fs";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
-import { rule } from "postcss";
-import { clear } from "console";
 
 const opertaor = dataOpertaor();
 
@@ -332,7 +331,9 @@ function handleQuery() {
 onMounted(() => {
   if (param.editType === "edit") {
     setDisa();
-    handleQuery(param.prodNo);
+    setTimeout(() => {
+      handleQuery(param.prodNo);
+    }, 100);
   } else {
     setTimeout(() => {
       freeEditRef.value?.setFormValue({
