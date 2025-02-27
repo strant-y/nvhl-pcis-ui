@@ -24,7 +24,7 @@ const opertaor = dataOpertaor();
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 const clauseConfAdd = defineAsyncComponent(
-  () => import("../pcis/prodRef/clauseConfRef/ClauseConfAdd.vue")
+  () => import("@/pcis/prodRef/clauseConfRef/ClauseConfAdd.vue")
 );
 import {
   AppTableConfig,
@@ -147,7 +147,7 @@ const tableconfig = reactive<AppTableConfig>(
         link: true,
         tableClick: (row) => {
           delTermById(row)
-            .then((res) => {
+            .then((res: any) => {
               const { code, data, msg } = res;
               if (200 === code) {
                 ElMessage.success("删除成功");

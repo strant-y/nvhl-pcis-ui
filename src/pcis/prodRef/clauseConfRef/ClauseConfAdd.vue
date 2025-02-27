@@ -139,7 +139,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         codeParam: { cParCde: "RdrTyp" },
         rules: [getRules("required", { change: true })],
         func: (val: any) => {
-          const additionalInsuranceTypeField = formconfig.fromSchema.find(
+          const additionalInsuranceTypeField = formconfig?.fromSchema?.find(
             (field) => field.prop === "additionalInsuranceType"
           );
           console.log(additionalInsuranceTypeField, "===========");
@@ -218,7 +218,7 @@ const handleSave = async () => {
       await savePrdTermInfo(datas); // 调用保存接口
       emits("ok", {});
       ElMessage.success("保存成功");
-      this.dialogVisible = false;
+      dialogVisible.value = false;
     } catch (error) {
       ElMessage.error("保存失败");
     }
