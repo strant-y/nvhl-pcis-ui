@@ -1,5 +1,6 @@
 <template>
   <app-free-edit :freeEditConfig="formconfig1" ref="applicantEditRef" />
+  <comDialog ref="dialog"></comDialog>
 </template>
 
 <script setup lang="ts">
@@ -8,7 +9,8 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
-
+const dialog = ref<DialogMethod | null>(null);
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -21,7 +23,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));
-
+const formData = ref<any[]>([]);
 onMounted(() => {
   console.log(props.pageSchema);
   const formconfig11 = formInit(
@@ -35,10 +37,28 @@ onMounted(() => {
 // 绑定方法
 const method = {
   // func demo
-  functest: () => {
+  funcquery: () => {
     console.log(11111 + "点击了");
-    const tabref = opertaor.getTableRefs();
-    console.log(tabref);
+    // const tabref = opertaor.getTableRefs();
+    // console.log(tabref);
+      const param = opertaor.getParam();
+      console.log(param)
+      console.log(dialog.value)
+      dialog.value?.open(
+          "querycustomerView",
+          {
+              type: "show",
+              data: {
+                  cProdNo: param.cProdNo,
+              },
+          },
+          {
+              isOk: (selectdata: any) => {
+                  console.log('a',selectdata)
+              },
+          },
+          { title: "选择客户信息", width: 85 }
+      );
   },
 };
 
