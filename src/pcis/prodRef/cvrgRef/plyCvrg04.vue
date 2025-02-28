@@ -107,7 +107,24 @@ function getFromValue() {
     return tableobj
 }
 
-function setFormValue(value: any) {}
+function setFormValue(value: any) {
+     value.forEach((item: any) => {
+            item['cTermNo']=item['Term.cClauseNumber'];
+            item['riskList']=item["Term.riskList"]
+            delete item["Term.cClauseNumber"];
+            delete item["Term.riskList"];
+            item['riskList'].forEach((e: any) => {
+                for (let key in e) {
+                    const k='TermRisktgt.'+key
+                    e[k]=e[key]
+                    delete e[key]
+                }
+                e["cvrg.cRiskNo"]=e['TermRisktgt.cLiabCode']
+                delete e["TermRisktgt.cLiabCode"]
+            });
+        });
+    formData.value=value
+}
 
 function validate() {}
 
