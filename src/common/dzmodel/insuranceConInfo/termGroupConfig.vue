@@ -5,7 +5,6 @@
         <rt-mytable
         :tableConfig="groupconfig"
         ref="groupRef"
-        @indexupdate="gruopUpdate"
         @rowselect="groupSelect"
       />
       </el-col>
@@ -13,7 +12,6 @@
         <rt-mytable
         :tableConfig="titleconfig"
         ref="titleRef"
-        @indexupdate="titleUpdate"
       />
       </el-col>
     </el-row>
@@ -29,7 +27,7 @@
 <script setup lang="ts">
 import { v4 as uuidv4 } from "uuid";
 import { VueDraggable } from "vue-draggable-plus";
-import { getGroupInfo, getTRFactorList, querySelectorList, saveGroupInfo, saveTRFactorList } from "@/api/prod";
+import { getGroupInfo, getTitleInfoByGroup, getTRFactorList, querySelectorList, saveGroupInfo, saveTRFactorList } from "@/api/prod";
 import {
   AppTableConfig,
   createTableEditConfig,
@@ -59,39 +57,23 @@ const titleRef = ref<MyTableMethod | null>(null);
 
 const groupData = ref<any []>([]);
 
-function gruopUpdate(){
-  const groupdata = groupRef.value?.getFromValue();
-  groupData.value = groupdata;
-}
-
-function titleUpdate(){
-  const titledata = titleRef.value?.getFromValue();
-  const sel = groupRef.value?.getSelectRow();
-  setTimeout(() => {
-    if(sel){
-      groupData.value.forEach(e => {
-      if(e.cPkId === sel.cPkId){
-        e.titledatas = titledata;
-      }
-    });
-    }else{
-      titleRef.value?.setFormValue([]);
-    }
-  }, 10);
-  
-  
-}
-
 function groupSelect(row: any){
-  if(row.titledatas){
-    titleRef.value?.setFormValue(row.titledatas);
-  }else{
-    titleRef.value?.setFormValue([]);
-  }
+  getTitleInfoByGroup({groupId:row.cPkId}).then((res: any) => {
+    const { code, data, msg } = res;
+    if (200 === code) {
+      titleRef.value?.setFormValue(data);
+    } else {
+        ElMessage.error(msg);
+    }
+  })
 }
 
 function savegroupinfo(){
-  saveGroupInfo({groupinfo:groupData.value,termNo:props.data.data.cTermNo}).then((res) => {
+  const rowSelect = groupRef.value?.getSelectRow();
+  const titlelists = titleRef.value?.getFromValue();
+  console.log(rowSelect);
+  console.log(titlelists);
+  saveGroupInfo({groupinfo:rowSelect,titlelists:titlelists}).then((res: any) => {
     const { code, data, msg } = res;
     if (200 === code) {
         ElMessage.success("保存成功");
@@ -102,7 +84,7 @@ function savegroupinfo(){
 }
 
 onMounted(() => {
-  getGroupInfo({termNo:props.data.data.cTermNo}).then((res) => {
+  getGroupInfo({}).then((res: any) => {
     const { code, data, msg } = res;
     if (200 === code) {
       groupData.value = data;
@@ -122,7 +104,6 @@ const groupconfig = reactive<AppTableConfig>(
         label: "新增分组",
         func: (v: any) => {
           groupRef.value?.addRow({cPkId:getuuid(),cGroupType:'grid'});
-          gruopUpdate();
         },
       })
     ],
@@ -135,21 +116,11 @@ const groupconfig = reactive<AppTableConfig>(
         link: true,
         tableClick: (v: any) => {
           groupRef.value?.removeRow(v._dataId);
-          titleUpdate();
         },
       })
     ],
     editFlag: true,
     fromSchema: [
-      {
-        prop: "icon",
-        inputtype: "rtIcon",
-        icon: "Rank",
-        iconSize: "16",
-        title: "排序",
-        dragFlag: true,
-        width: 40,
-      },
       {
         prop: "cGroupType",
         inputtype: "rtselect",
@@ -166,7 +137,6 @@ const groupconfig = reactive<AppTableConfig>(
           },
         ],
         func: (v: any) => {
-          gruopUpdate();
         },
       },
       {
@@ -175,7 +145,6 @@ const groupconfig = reactive<AppTableConfig>(
         title: "分组名",
         width:80,
         func: (v: any) => {
-          gruopUpdate();
         },
       },
       {
@@ -183,7 +152,6 @@ const groupconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "分组标题",
         func: (v: any) => {
-          gruopUpdate();
         },
       },
     ],
@@ -204,7 +172,6 @@ const titleconfig = reactive<AppTableConfig>(
             return;
           }
           titleRef.value?.addRow({cPkId:getuuid()});
-          titleUpdate();
         },
       })
     ],
@@ -236,7 +203,6 @@ const titleconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "标题",
         func: (v: any) => {
-          titleUpdate();
         },
       },
       {
@@ -244,7 +210,6 @@ const titleconfig = reactive<AppTableConfig>(
         inputtype: "rtnumber",
         title: "宽度",
         func: (v: any) => {
-          titleUpdate();
         },
       },
     ],

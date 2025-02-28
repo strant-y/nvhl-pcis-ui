@@ -67,7 +67,7 @@
                           v-for="colinfo in riskdata.col"
                           :key="`${ginfo.cGroupId}-${k}-${n}-${colinfo.cColId}`"
                         >
-                          <template v-if="riskdata.rowConfig[colinfo.cColId][n - 1]">
+                          <template v-if="riskdata.rowConfig[colinfo.cColId] && riskdata.rowConfig[colinfo.cColId][n - 1]">
                             <td
                               :rowspan="
                               riskdata.rowConfig[colinfo.cColId][n - 1]?.cPorpType === 'rowspan'
@@ -80,7 +80,7 @@
                               </template>
                               <template v-else>
                                 <from-item 
-                                        v-model="formdata.riskList[riskdata.rowConfig[colinfo.cColId][n - 1].cRiskNo][riskdata.rowConfig[colinfo.cColId][n - 1].factorItem.prop]"
+                                        v-model="formdata.riskList[riskdata.rowConfig[colinfo.cColId][n - 1].cRiskNo][riskdata.rowConfig[colinfo.cColId][n - 1].factorItem?.prop]"
                                         @update:modelValue="update()"
                                         :item="riskdata.rowConfig[colinfo.cColId][n - 1].factorItem" />
                               </template>
@@ -277,6 +277,7 @@ function initshowConfig() {
     };
     grouplist[g] = ngdata;
   });
+  console.log(grouplist);
   groupconf.value = grouplist;
 }
 </script>

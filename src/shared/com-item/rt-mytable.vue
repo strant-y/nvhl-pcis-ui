@@ -2,16 +2,16 @@
   <el-card shadow="never" class="table-container">
     <template #header>
       <el-row justify="space-between">
-        <el-col :span="4" v-if="!tableConfig.production">
+        <el-col :span="9" v-if="!tableConfig.production">
           {{ tableConfig.title }}
         </el-col>
-        <el-col :span="4" v-if="tableConfig.production">
+        <el-col :span="9" v-if="tableConfig.production">
           <el-tooltip :content="tableConfig.productionTitle">
             {{ tableConfig.title }}
           </el-tooltip>
         </el-col>
         <el-col
-          :span="20"
+          :span="15"
           style="text-align: right"
           v-if="tableConfig.titleBtns && tableConfig.titleBtns.length > 0"
         >
@@ -85,8 +85,9 @@
               <tr
                 v-for="(i, j) in dataList"
                 :key="j"
-                :class="
-                  appgrideditConfig.dragFlag ? 'handle cursor-move' : null
+                :class="[appgrideditConfig.dragFlag ? 'handle cursor-move' : null,
+                selectIndex === i._dataId ? 'highlight':''
+                ]
                 "
                 :style="{
                   textAlign: 'center',
@@ -314,14 +315,17 @@ watch(
 );
 // 编辑行id
 const editIndex = ref(-1);
+// 选中行id
+const selectIndex = ref(-1);
 
 const formUi = reactive<Record<string, any>>({});
 
 function rowClick(row: any) {
   if (appgrideditConfig.editFlag) {
     editIndex.value = row._dataId;
-    emits("rowselect",row);
   }
+    selectIndex.value = row._dataId;
+    emits("rowselect",row);
 }
 function getuuid() {
   return uuidv4().replace(/-/g, "");
@@ -444,5 +448,9 @@ defineExpose({
   background-color: #f5f7fa; /* 表头背景颜色 */
   color: #303133; /* 表头文字颜色 */
   height: 40px;
+}
+/* 高亮选中行的样式 */
+.highlight {
+  background-color: #e0f7fa; /* 高亮背景颜色 */
 }
 </style>

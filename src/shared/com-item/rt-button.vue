@@ -53,7 +53,7 @@
       @click="handleChange"
     >
       <!-- 将isBtn透传,防止出现icon方法重复执行  -->
-      <rt-icon v-if="item.icon" :item="{ ...item, isBtn: true }" />
+      <rt-icon style="margin-right: 5px " v-if="item.icon" :item="{ ...item, isBtn: true }" />
       {{ item.label }}</el-button
     >
   </template>

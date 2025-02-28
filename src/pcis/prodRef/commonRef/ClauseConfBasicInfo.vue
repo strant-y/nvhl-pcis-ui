@@ -70,12 +70,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       }),
       createFreeButtonBase({
         type: "success",
-        label: "标题绑定",
+        label: "条责分组关联",
         func: async () => {
           const cTermNo = freeEditRef.value?.getValue("cTermNo");
 
           dialog.value?.open(
-            "termGroupConfig",
+            "termRiskGroupConfig",
             {
               type: "show",
               data: {
@@ -85,7 +85,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             {
               isOk: (selectdata: any) => {},
             },
-            { title: "群组编辑", width: 85 }
+            { title: "条款责任分组关联", width: 75 }
           );
         },
       }),

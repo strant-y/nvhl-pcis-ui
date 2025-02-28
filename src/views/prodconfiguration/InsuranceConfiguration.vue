@@ -8,6 +8,7 @@
       ref="tableRef"
       @page-change="handleQuery(false)"
     />
+    <comDialog ref="dialog"></comDialog>
   </div>
 </template>
 
@@ -26,7 +27,6 @@ import {
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
-import { yesOrNo, size, inputtype } from "@/utils/utilKey";
 import {
   AppTableConfig,
   AppTableMethod,
@@ -39,6 +39,8 @@ import {
   savePrdTermInfo,
 } from "@/api/prod";
 import { clear } from "console";
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
+const dialog = ref<DialogMethod | null>(null);
 
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -158,6 +160,25 @@ const tableconfig = reactive<AppTableConfig>(
               }),
             },
           });
+        },
+      }),
+      createFreeButtonBase({
+        type: "success",
+        label: "标题绑定",
+        icon:"table",
+        func: async () => {
+          const cTermNo = freeEditRef.value?.getValue("cTermNo");
+
+          dialog.value?.open(
+            "termGroupConfig",
+            {
+              type: "show"
+            },
+            {
+              isOk: (selectdata: any) => {},
+            },
+            { title: "群组编辑", width: 85 }
+          );
         },
       }),
     ],

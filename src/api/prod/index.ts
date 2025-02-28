@@ -356,6 +356,14 @@ export function getGroupInfo(queryParams: any): AxiosPromise<any> {
     return post(`/proddef/getGroupInfo`, queryParams);
 }
 
+export function getTitleInfoByGroup(queryParams: any): AxiosPromise<any> {
+    return post(`/cvrgdef/getTitleInfoByGroup`, queryParams);
+}
+
+export function saveTermColByTerm(queryParams: any): AxiosPromise<any> {
+    return post(`/cvrgdef/saveTermColByTerm`, queryParams);
+}
+
 /**
  * 条款配置信息获取
  *

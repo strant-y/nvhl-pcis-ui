@@ -121,7 +121,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cGroupId",
         inputtype: "rtselect",
         title: "分组信息",
-        typeCode: "term_group_list",
+        typeCode: "term_group_rel_list",
         rules: [getRules("required", {})],
         codeParam: {
           cTermNo: cTermNo,
@@ -231,10 +231,12 @@ function select(item: any) {
     const se = factorList.value?.find(
       (e: any) => element.c_pk_id === e.c_pk_id
     );
-    se.isChecked = element.isChecked;
-    se.c_porp_type = element.c_porp_type;
-    se.c_porp_required = element.c_porp_required;
-    newSelectl.push(se);
+    if(se){
+      se.isChecked = element.isChecked;
+      se.c_porp_type = element.c_porp_type;
+      se.c_porp_required = element.c_porp_required;
+      newSelectl.push(se);
+    }
   });
   factorList.value.forEach((element: any) => {
     const se = item.selectFactorList?.find(
@@ -268,6 +270,11 @@ function getFactorConf() {
 }
 function saveTitleFactor() {
   const fromValue = freeEditRef.value?.getFromValue();
+
+  const param = {
+    colInfo: colList.value,
+    ...fromValue
+  };
   saveTRFactorList({
     colInfo: colList.value,
   ...fromValue
@@ -282,7 +289,7 @@ function saveTitleFactor() {
 }
 onMounted(() => {
   const param = {
-    componentTab: "cvrg",
+    componentTab: "TermRisktgt",
   };
   // 一次性初始化所有险别要素信息,不用多次获取
   querySelectorList(param).then((res) => {
