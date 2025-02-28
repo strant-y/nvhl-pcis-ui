@@ -9,6 +9,7 @@ import addtremView from "./prodconfig/addtremView.vue";
 import riskFactorConfig from "./insuranceConInfo/riskFactorConfig.vue";
 import termGroupConfig from "./insuranceConInfo/termGroupConfig.vue";
 import termFactorConfig from "./insuranceConInfo/termFactorConfig.vue";
+import querycustomerView from "./prodconfig/querycustomerView.vue";
 import termRiskGroupConfig from "./insuranceConInfo/termRiskGroupConfig.vue";
 
 /**用于动态弹窗组件的映射生成 */
@@ -23,8 +24,9 @@ const componentMap = {
     addtremView:addtremView,
     riskFactorConfig:riskFactorConfig,
     termGroupConfig:termGroupConfig,
+    termRiskGroupConfig:termRiskGroupConfig,
     termFactorConfig:termFactorConfig,
-    termRiskGroupConfig:termRiskGroupConfig
+    querycustomerView:querycustomerView,
 
 };
 

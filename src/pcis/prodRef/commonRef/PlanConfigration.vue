@@ -192,9 +192,7 @@ function getValue(key: string) {
 }
 function setDisa() {
   formconfig1.fromSchema?.forEach((e) => {
-    if (e.prop === "cProdNo" || e.prop === "cKindNo") {
-      e.disabled = true;
-    }
+    e.disabled = true;
   });
 }
 /** 查询 */
@@ -217,7 +215,19 @@ function handleQuery(flag?: boolean) {
 }
 onMounted(() => {
   if (param.editType === "edit") {
+    formconfig1.fromSchema?.forEach((e) => {
+      if (e.prop === "cProdNo" || e.prop === "cKindNo") {
+        e.disabled = true;
+      }
+    });
+  } else if (param.editType === "view") {
     setDisa();
+    tableconfig.titleBtns.forEach((btn) => {
+      btn.disabled = true;
+    });
+    tableconfig.tableBtn.forEach((btn) => {
+      btn.disabled = true;
+    });
   }
 });
 

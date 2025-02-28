@@ -245,7 +245,7 @@ const getCAppNoFun = () => {
     const res ={
         'cProdNo':props.param.cProdNo,
         'cDptCde':props.param.cDptCde,
-        'icVchTyp':'P_APP'
+        'icVchTyp':'POLICY_NUMBER'
     }
     generatelSingleNo(res).then((res) => {
         console.log("generatelSingleNo-res", res);
@@ -304,6 +304,8 @@ const submitToUndrFn= () => {
 const savePlyInfo = () => {
   const res =opertaor.getDataAll()
   res['user']=user
+  res['webPlyBaseBasic']['Base.cDptCde']='0251010013000'
+  res['webPlyBaseBasic']['Base.cProdNo']='042001'
   console.log(res)
   saveAppPlyInfo(res).then((res) => {
     console.log("saveAppPlyInfo-res", res);

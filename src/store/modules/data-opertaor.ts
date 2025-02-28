@@ -62,6 +62,78 @@ export const dataOpertaor = defineStore(
           return res;
       };
 
+      const convertData = (result) => {
+          const res = {};
+          console.log(result['res']['composition'])
+          console.log(tableConfig[0]['pageInfo'])
+          if (!!result['res']['composition'] && !!tableConfig[0]) {
+              const pageInfo=tableConfig[0]['pageInfo']
+              pageInfo.forEach((k) => {
+                  const voNme =k['pageCode']
+                  let srcTab = voNme;
+                  if(voNme=='webPlyBaseBasic' || voNme=='webPlyBase1' || voNme=='webPlyBase'){
+                      srcTab='Base'
+                  }else if(voNme =='webPlyApplicant'){
+                      srcTab='Applicant'
+                  }else if(voNme =='webPlyInsured'){
+                      srcTab='Insured'
+                  }else if(voNme =='plyTgt042001'){
+                      srcTab='EngineeringTgt'
+                  }else if(voNme =='webPlyCvrg04'){
+                      srcTab='Term'
+                  }
+                  // console.log('稍等哈是',srcTab)
+                  if (!!result['res']['composition'][srcTab] && result['res']['composition'][srcTab] instanceof Array && result['res']['composition'][srcTab].length > 0) { // 数组 并且很多行
+                      const tab = k['pageType']; // 根据key获取tab 然后判断是否是GridEdit或FreeEdit
+                      const dataObj = result['res']['composition'][srcTab];
+                      for (const d in dataObj) {
+                          const newArr=[]
+                          if (!!tab && 'free' === tab) {
+                              res[voNme] = dtoListToListObj(srcTab, dataObj[d]);
+                              return res;
+                          }else  if (!!tab && 'grid' === tab){
+                              newArr.push(dtoListToListObj(srcTab, dataObj[d]))
+                              // TODO vo名称对不上的,在此处加单独的逻辑
+                          }else  if (!!tab&&'custom' === tab){
+                              newArr.push(dtoListToListObj(srcTab, dataObj[d]))
+                              res[voNme]=newArr
+                              console.log('cvrgobj', newArr)
+                              return;
+                              // newArr.push(dtoListToListObj(srcTab, dataObj[d]))
+
+                              // TODO vo名称对不上的,在此处加单独的逻辑
+                          }
+                      }
+
+
+                  }
+              });
+          }
+          return res;
+      }
+      const dtoListToListObj = (key: string, map: any) => {
+          if (map == null) {
+              return null;
+          }
+          const listObj = [];
+          if (map == null) {
+              return null;
+          }
+          const data = {};
+          for (const k in map) {
+                      if (!!key) {
+                          data[key + '.' + firstCharLower(k)] = map[k];
+                      } else {
+                          data[firstCharLower(k)] =map[k];
+                      }
+          }
+          return data;
+      }
+      const firstCharLower = (str: string) => {
+          return str.replace(/\b(\w)(\w*)/g, function ($0, $1, $2) {
+              return $1.toLowerCase() + $2;
+          });
+      }
     return {
       setTableConfig,
       getTableConfig,
@@ -73,7 +145,8 @@ export const dataOpertaor = defineStore(
       setDataAll,
       getDataAll,
       setParam,
-      getParam
+      getParam,
+      convertData
     };
   },
   {

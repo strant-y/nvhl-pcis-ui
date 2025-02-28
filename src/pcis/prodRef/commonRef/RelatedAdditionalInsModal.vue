@@ -7,7 +7,6 @@
       ref="tableRef"
       @page-change="handleQuery(false)"
       @selection-change="handleSelectionChange"
-      :defaultSelectedRows="tableConfig.defaultSelectedRows"
     />
 
     <template #footer>
@@ -151,6 +150,10 @@ function handleQuery(flag?: boolean) {
         pageresult.list = [];
         pageresult.list = data.result;
         pageresult.total = data.total;
+        // 设置默认选中的行
+        tableConfig.defaultSelectedRows = pageresult.list
+          .filter((item) => item.cTermNo !== "")
+          .map((item) => item._dataId);
       } else {
         ElMessage.error(msg);
       }
@@ -171,13 +174,11 @@ function getQueryList(flag?: boolean) {
         pageresult.list = [];
         pageresult.list = data.result;
         pageresult.total = data.total;
-        const selectedcurrentRows = data.result
-          .filter((item) => item.cTermNo)
-          .map((item) => item.id);
-        if (tableConfig.value) {
-          tableConfig.value.defaultSelectedRows = selectedcurrentRows;
-        }
-        tableConfig.value = { ...tableConfig.value };
+        // 设置默认选中的行
+        // tableConfig.defaultSelectedRows = pageresult.list
+        //   .filter((item) => item.cTermNo !== "")
+        //   .map((item) => item._dataId);
+        console.log(tableConfig.defaultSelectedRows, "0=0=0=0=0=0=0=0=0=");
       } else {
         ElMessage.error(msg);
       }

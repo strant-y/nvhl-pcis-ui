@@ -166,8 +166,10 @@ const tableconfig = reactive<AppTableConfig>(
         id: "check",
         tooltip: "提交审核",
         link: true,
-        type: "danger",
+        type: "primary",
         icon: "Check",
+        disabled: (row) =>
+          row.cAuditStatus === "audit" || row.cAuditStatus === "submit",
         tableClick: async (row) => {
           await auditSubmit({
             cProdNo: row.cProdNo,
@@ -180,7 +182,6 @@ const tableconfig = reactive<AppTableConfig>(
             }
           });
         },
-        // disabled: (row) => row.cAuditStatus === "submit",
       }),
       createFreeButtonBase({
         id: "copy",

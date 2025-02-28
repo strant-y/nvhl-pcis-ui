@@ -152,7 +152,7 @@ opertaor.setTableConfig([
 const btns = {};
 onMounted(() => {
   formconfig1.forEach((ele) => {
-    if (param.type !== "approve") {
+    if (param.type !== "approve" || param.editType === "view") {
       delete ele.pageInfo.prodaudit;
     } else if (!ele.pageInfo.prodaudit) {
       ele.pageInfo.prodaudit = { ...prodauditConfig };

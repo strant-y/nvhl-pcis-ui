@@ -166,7 +166,7 @@ const tableconfig = reactive<AppTableConfig>(
         id: "view",
         link: true,
         tooltip: "查看",
-        type: "success",
+        type: "primary",
         size: "large",
         icon: "View",
         tableClick: (row) => {

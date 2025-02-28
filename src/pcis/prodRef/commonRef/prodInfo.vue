@@ -345,8 +345,11 @@ onMounted(() => {
     setTimeout(() => {
       freeEditRef.value?.setFormValue({
         cCriterionTimeUnit: "A",
-        tBgnTm: dayjs().format("YYYY-MM-DD"),
-        tAdbTm: dayjs().add(1, "year").format("YYYY-MM-DD"),
+        tBgnTm: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+        tAdbTm: dayjs()
+          .add(1, "year")
+          .endOf("day")
+          .format("YYYY-MM-DD HH:mm:ss"),
       });
     }, 50);
   }
