@@ -6,6 +6,7 @@
       v-model:pageresult="pageresult"
       ref="tableRef"
       @page-change="handleQuery(false)"
+      :disabled="param.editType == 'view'"
     />
   </div>
 </template>
@@ -220,9 +221,7 @@ function getFormValue() {
 }
 function setDisa() {
   formconfig1.fromSchema?.forEach((e) => {
-    if (e.prop === "cProdNo" || e.prop === "cKindNo") {
-      e.disabled = true;
-    }
+    e.disabled = true;
   });
 }
 /** 查询 */
@@ -254,6 +253,14 @@ onMounted(() => {
     setTimeout(() => {
       handleQuery();
     }, 300);
+  } else if (param.editType == "view") {
+    setDisa();
+    tableconfig.titleBtns.forEach((btn) => {
+      btn.disabled = true;
+    });
+    tableconfig.tableBtn.forEach((btn) => {
+      btn.disabled = true;
+    });
   }
 });
 

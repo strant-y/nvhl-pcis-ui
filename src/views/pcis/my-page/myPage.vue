@@ -85,7 +85,7 @@
     <el-footer>
       <el-affix position="bottom" :offset="10">
         <div class="bottom-items">
-          <rt-button v-for="(bth, idx) in bthList" :item="bth" :key="idx" />
+          <rt-button v-for="(bth, idx) in bthList" :item="bth" :key="idx" :loading="bth.loading"/>
         </div>
       </el-affix>
     </el-footer>
@@ -95,7 +95,7 @@
 <script setup lang="ts">
 import {createFreeButtonBase, FreeButtonBase} from "@/shared/button-config";
 import {getProductPage} from "../../../api/prod/index";
-import {getAppPlyInfoByAppNo, saveAppPlyInfo, generatelSingleNo} from "../../../api/query/index";
+import {getAppPlyInfoByAppNo, saveAppPlyInfo, generatelSingleNo,appCalc,submitToUndr} from "../../../api/query/index";
 import {dataOpertaor} from "@/store/modules/data-opertaor";
 
 const opertaor = dataOpertaor();
@@ -112,7 +112,8 @@ const currentIndex = ref(0);
 const NavigaShow = ref(true);
 const formconfig1 = opertaor.getTableConfig();
 const bthList = ref<Array<FreeButtonBase>>([]);
-
+const tempFindBtn= [];
+const user = JSON.parse(sessionStorage.getItem("user"));
 onBeforeMount(() => {
   console.log("路由参数props.param", props.param);
   initPage();
@@ -158,47 +159,52 @@ async function loadAfter() {
   if (props.param.pageType === "app") {
     bthList.value.push(
       createFreeButtonBase({
-          label: "保存模板",
-          type: "primary",
-          func: () => {
-          },
+        label: "保存模板",
+        type: "primary",
+        func: () => {
+        },
       }),
       createFreeButtonBase({
-          label: "复制出单",
-          type: "primary",
-          func: () => {
-          },
+        label: "复制出单",
+        type: "primary",
+        func: () => {
+        },
       }),
       createFreeButtonBase({
-          label: "保费计算",
-          type: "primary",
-          func: () => {
-          },
+        label: "保费计算",
+        type: "primary",
+        id: 'btn010101',
+        func: () => {
+          calcPremium()
+        },
       }),
       createFreeButtonBase({
         label: "提交",
         type: "primary",
+        id: 'btn010102',
         func: () => {
           savePlyInfo();
         },
       }),
       createFreeButtonBase({
-          label: "申请核保",
-          type: "primary",
-          func: () => {
-          },
+        label: "申请核保",
+        type: "primary",
+        id: 'btn010103',
+        func: () => {
+            submitToUndrFn()
+        },
       }),
       createFreeButtonBase({
-          label: "发票信息",
-          type: "primary",
-          func: () => {
-          },
+        label: "发票信息",
+        type: "primary",
+        func: () => {
+        },
       }),
       createFreeButtonBase({
-          label: "反洗钱扩展信息",
-          type: "primary",
-          func: () => {
-          },
+        label: "反洗钱扩展信息",
+        type: "primary",
+        func: () => {
+        },
       }),
     );
   } else if (props.param.pageType === "readonly") {
@@ -244,13 +250,60 @@ const getCAppNoFun = () => {
     generatelSingleNo(res).then((res) => {
         console.log("generatelSingleNo-res", res);
         if(res['code']=='200'){
-            opertaor.getTableRefByKey('webPlyBaseBasic').setValue('webPlyBase.cAppNo',res['data'])
+            opertaor.getTableRefByKey('webPlyBaseBasic').setValue('Base.cAppNo',res['data'])
         }
+    });
+};
+/**
+ * 获取button
+ * @param id
+ */
+const getBtn = (id) =>{
+    if (tempFindBtn.length === 0) {
+        for (const btnArr of bthList.value) {
+            tempFindBtn.push(btnArr);
+        }
+    }
+    return tempFindBtn.find(item => {
+        return id === item.id;
+    });
+};
+/**
+ * 投保保费计算
+ */
+const calcPremium= () => {
+    const btn =getBtn('btn010101')
+    btn.loading=true;
+    const res =opertaor.getDataAll()
+    res['user']=user
+    console.log(res)
+    appCalc(res).then((res) => {
+        btn.loading=false;
+        console.log("appCalc-res", res);
+        // ElMessage.success(res.msg);
+        // history.back();
+    });
+};
+/**
+ * 投保申请核保
+ */
+const submitToUndrFn= () => {
+    const btn =getBtn('btn010103')
+    btn.loading=true;
+    const res =opertaor.getDataAll()
+    res['user']=user
+    console.log(res)
+    submitToUndr(res).then((res) => {
+        btn.loading=false;
+        console.log("submitToUndr-res", res);
+        // ElMessage.success(res.msg);
+        // history.back();
     });
 };
 
 const savePlyInfo = () => {
   const res =opertaor.getDataAll()
+  res['user']=user
   console.log(res)
   saveAppPlyInfo(res).then((res) => {
     console.log("saveAppPlyInfo-res", res);

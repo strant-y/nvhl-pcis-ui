@@ -163,7 +163,7 @@ const tableconfig = reactive<AppTableConfig>(
         },
       }),
       createFreeButtonBase({
-        id: "View-edrItem",
+        id: "view",
         link: true,
         tooltip: "查看",
         type: "success",
@@ -176,6 +176,7 @@ const tableconfig = reactive<AppTableConfig>(
               param: JSON.stringify({
                 type: "approve",
                 editType: "view",
+                prod: row,
                 prodNo: row.cProdNo,
               }),
             },

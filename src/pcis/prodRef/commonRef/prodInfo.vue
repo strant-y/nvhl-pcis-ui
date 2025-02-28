@@ -334,6 +334,13 @@ onMounted(() => {
     setTimeout(() => {
       handleQuery(param.prodNo);
     }, 100);
+  } else if (param.editType === "view") {
+    setTimeout(() => {
+      handleQuery(param.prodNo);
+    }, 100);
+    formconfig1.fromSchema?.forEach((e) => {
+      e.disabled = true;
+    });
   } else {
     setTimeout(() => {
       freeEditRef.value?.setFormValue({

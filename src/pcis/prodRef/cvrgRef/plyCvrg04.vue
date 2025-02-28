@@ -87,7 +87,23 @@ const exRules = {};
 
 function getFromValue() {
     const tableobj={}
-    tableobj['items']=formData.value;
+    const delformData=JSON.parse(JSON.stringify(formData.value))
+    delformData.forEach((item: any) => {
+        item['Term.cClauseNumber']=item['cTermNo'];
+        item["Term.riskList"]=item['riskList']
+        delete item["cTermNo"];
+        delete item["riskList"];
+        item['Term.riskList'].forEach((e: any) => {
+            e['TermRisktgt.cLiabCode']=e["cvrg.cRiskNo"];
+            delete e["cvrg.cRiskNo"]
+            for (let key in e) {
+                const k=key.split('.')[1];
+                e[k]=e[key]
+                delete e[key]
+            }
+        });
+    });
+    tableobj['items']=delformData;
     return tableobj
 }
 
