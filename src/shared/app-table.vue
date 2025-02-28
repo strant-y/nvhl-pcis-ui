@@ -13,6 +13,7 @@
           ref="rttableFrom"
           @selection-change="handleSelectionChange"
           @status-change="handleStatusChange"
+          :default-selected-rows="tableConfig.defaultSelectedRows"
         />
         <el-pagination
           v-model:current-page="queryParams.pageNum"
@@ -70,11 +71,6 @@ const props = defineProps({
     type: Object as () => Pageresult,
     required: true,
   },
-  // 新增属性，用于接收默认选中的行数据
-  defaultSelectedRows: {
-    type: Array as () => any[],
-    default: () => [],
-  },
 });
 
 watch(
@@ -90,10 +86,6 @@ watch(
   () => props.pageresult,
   (newPageresult) => {
     dataList.value = newPageresult.list;
-    // 数据更新后，设置默认选中的行
-    if (rttableFrom.value && props.defaultSelectedRows.length > 0) {
-      rttableFrom.value.toggleRowSelection(props.defaultSelectedRows, true);
-    }
   },
   { deep: true }
 );
@@ -101,11 +93,6 @@ watch(
 onMounted(() => {
   Object.assign(appgrideditConfig, props.tableConfig);
   appgrideditConfig.editFlag = false;
-  // 组件挂载后，设置默认选中的行
-  if (rttableFrom.value && props.defaultSelectedRows.length > 0) {
-    console.log("设置默认选中的行", props.defaultSelectedRows);
-    rttableFrom.value.toggleRowSelection(props.defaultSelectedRows, true);
-  }
 });
 
 function handleSelectionChange(selectedRows: any[]) {

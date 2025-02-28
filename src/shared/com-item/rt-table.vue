@@ -171,6 +171,7 @@
                 <rtButton
                   @click="btn.tableClick ? btn.tableClick(scope.row) : () => {}"
                   :item="btn"
+                  :disabled="btn.disabled ? btn.disabled(scope.row) : false"
                 />
               </el-tooltip>
             </template>

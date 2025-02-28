@@ -10,10 +10,6 @@
           ref="buttonRef"
           :type="item.type"
           :size="item.size"
-          :disabled="
-            item.disabled ||
-            (typeof item.disabled === 'function' ? item.disabled(row) : false)
-          "
           :placeholder="item.placeholder"
           :link="item.link ? item.link : false"
           :circle="item.circle ? item.circle : false"
@@ -41,7 +37,10 @@
       ref="buttonRef"
       :type="item.type"
       :size="item.size"
-      :disabled="item.disabled"
+      :disabled="
+        item.disabled ||
+        (typeof item.disabled === 'function' ? item.disabled(row) : false)
+      "
       :placeholder="item.placeholder"
       :link="item.link ? item.link : false"
       :circle="item.circle ? item.circle : false"
@@ -79,7 +78,8 @@ const props = defineProps({
     required: false,
   },
 });
-
+// console.log(props.row, "props.row");
+const disabled = ref(false);
 const visible = ref(false);
 function closepopover(value: any) {
   visible.value = false;
