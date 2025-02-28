@@ -180,7 +180,7 @@ const tableconfig = reactive<AppTableConfig>(
             }
           });
         },
-        // disabled: (row) => row.cAuditStatus === "submit",
+        disabled: (row) => row.cAuditStatus === "submit",
       }),
       createFreeButtonBase({
         id: "copy",
