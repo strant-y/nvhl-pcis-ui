@@ -5,9 +5,7 @@
         <rt-mytable
           :tableConfig="tableconfig"
           ref="tableRef"
-          @indexupdate="getFactorConf()"
         />
-      />
       </el-col>
     </el-row>
     <el-row>
@@ -22,7 +20,7 @@
 <script setup lang="ts">
 import { v4 as uuidv4 } from "uuid";
 import { VueDraggable } from "vue-draggable-plus";
-import { getGroupInfo, getTRFactorList, querySelectorList, saveGroupInfo, saveTRFactorList } from "@/api/prod";
+import { getGroupInfo, getTermFactorInfo, getTRFactorList, querySelectorList, saveGroupInfo, saveTermFactorInfo, saveTRFactorList } from "@/api/prod";
 import {
   AppTableConfig,
   createTableEditConfig,
@@ -48,69 +46,51 @@ function getuuid() {
 }
 const emits = defineEmits(["handleClose"]);
 
-const groupRef = ref<MyTableMethod | null>(null);
-const titleRef = ref<MyTableMethod | null>(null);
+const factorList = ref<any>([]);
 
-const groupData = ref<any []>([]);
+onMounted(() => {
+  getDictFormData();
+});
 
-function gruopUpdate(){
-  const groupdata = groupRef.value?.getFromValue();
-  groupData.value = groupdata;
-}
-
-function titleUpdate(){
-  const titledata = titleRef.value?.getFromValue();
-  const sel = groupRef.value?.getSelectRow();
-  setTimeout(() => {
-    if(sel){
-      groupData.value.forEach(e => {
-      if(e.cPkId === sel.cPkId){
-        e.titledatas = titledata;
+function getDictFormData(){
+  getTermFactorInfo({termNo:props.data.data.cTermNo,tabKey:'cvrg'}).then((res: any) => {
+    const { code, data, msg } = res;
+    if (200 === code) {
+      if(data){
+        data.forEach((e: any) =>{
+          if(e.cPkId){
+            e.isChecked = '1';
+          }
+        })
       }
-    });
-    }else{
-      titleRef.value?.setFormValue([]);
+      tableRef.value?.setFormValue(data);
+    } else {
+        ElMessage.error(msg);
     }
-  }, 10);
-  
-  
-}
-
-function groupSelect(row: any){
-  if(row.titledatas){
-    titleRef.value?.setFormValue(row.titledatas);
-  }else{
-    titleRef.value?.setFormValue([]);
-  }
+  })
 }
 
 function savegroupinfo(){
-  saveGroupInfo({groupinfo:groupData.value,termNo:props.data.data.cTermNo}).then((res: any) => {
+  const select = tableRef.value?.getFromValue();
+  let selectList = select?.filter((node: any) => node.isChecked === "1");
+  saveTermFactorInfo({
+    termNo:props.data.data.cTermNo,
+    selectList: selectList,
+  }).then((res: any) => {
     const { code, data, msg } = res;
     if (200 === code) {
-        ElMessage.success("保存成功");
+      ElMessage.success("保存成功");
+      getDictFormData();
     } else {
         ElMessage.error(msg);
     }
-  })
+  });
 }
-
-onMounted(() => {
-  getGroupInfo({termNo:props.data.data.cTermNo}).then((res: any) => {
-    const { code, data, msg } = res;
-    if (200 === code) {
-      groupData.value = data;
-    } else {
-        ElMessage.error(msg);
-    }
-    groupRef.value?.setFormValue(groupData.value);
-  })
-});
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     editFlag: true,
-    editList: ["c_porp_type", "c_porp_required"],
+    editList: ["cPorpRequired"],
     fromSchema: [
       {
         prop: "icon",
@@ -134,13 +114,13 @@ const tableconfig = reactive<AppTableConfig>(
         },
       },
       {
-        prop: "c_factor_inputtype",
+        prop: "cFactorInputtype",
         inputtype: "rtselect",
         title: "要素类型",
         loadData: inputtype,
       },
       {
-        prop: "c_porp_required",
+        prop: "cPorpRequired",
         inputtype: "rtswitch",
         title: "是否必填",
         keymap: {
@@ -150,21 +130,21 @@ const tableconfig = reactive<AppTableConfig>(
         func: (v: any) => {
         },
       },
+      // {
+      //   prop: "cPorpType",
+      //   inputtype: "rtselect",
+      //   title: "显示类型",
+      //   loadData: showtype,
+      //   func: (v: any) => {
+      //   },
+      // },
       {
-        prop: "c_porp_type",
-        inputtype: "rtselect",
-        title: "显示类型",
-        loadData: showtype,
-        func: (v: any) => {
-        },
-      },
-      {
-        prop: "c_factor_prop",
+        prop: "cFactorProp",
         inputtype: "rtinput",
         title: "要素key",
       },
       {
-        prop: "c_factor_title",
+        prop: "cFactorTitle",
         inputtype: "rtinput",
         title: "要素名称",
       },

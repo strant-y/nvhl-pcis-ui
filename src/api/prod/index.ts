@@ -365,6 +365,14 @@ export function getTRFactorList(queryParams: any): AxiosPromise<any> {
     return post(`/cvrgdef/getTRFactorList`, queryParams);
 }
 
+export function getTermFactorInfo(queryParams: any): AxiosPromise<any> {
+    return post(`/cvrgdef/getTermFactorInfo`, queryParams);
+}
+
+export function saveTermFactorInfo(queryParams: any): AxiosPromise<any> {
+    return post(`/cvrgdef/saveTermFactorInfo`, queryParams);
+}
+
 /**
  * 保存条则要素关系信息
  *
