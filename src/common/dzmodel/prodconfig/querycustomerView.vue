@@ -221,6 +221,10 @@
         const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
         const s = freeEditRef.value?.getFromValue(); //获取表单数据
         const param = Object.assign(s, r);
+        if(s['cAppNme']==null&&s['cCertfCde']==null){
+            ElMessage.error("客户姓名或证件号码至少一个不为空！");
+            return;
+        }
         console.log(param)
         return;
         // getProFactoryList(param)

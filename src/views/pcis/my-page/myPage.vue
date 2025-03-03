@@ -309,6 +309,8 @@ const savePlyInfo = () => {
   console.log(res)
   saveAppPlyInfo(res).then((res) => {
     console.log("saveAppPlyInfo-res", res);
+      const ops = opertaor.convertData(res)
+      opertaor.setDataAll(ops)
     // ElMessage.success(res.msg);
     // history.back();
   });

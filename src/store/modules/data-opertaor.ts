@@ -61,11 +61,11 @@ export const dataOpertaor = defineStore(
           });
           return res;
       };
-
+      /**
+       * @Title: 转换数据
+       */
       const convertData = (result) => {
           const res = {};
-          console.log(result['res']['composition'])
-          console.log(tableConfig[0]['pageInfo'])
           if (!!result['res']['composition'] && !!tableConfig[0]) {
               const pageInfo=tableConfig[0]['pageInfo']
               pageInfo.forEach((k) => {
@@ -82,7 +82,6 @@ export const dataOpertaor = defineStore(
                   }else if(voNme =='webPlyCvrg04'){
                       srcTab='Term'
                   }
-                  // console.log('稍等哈是',srcTab)
                   if (!!result['res']['composition'][srcTab] && result['res']['composition'][srcTab] instanceof Array && result['res']['composition'][srcTab].length > 0) { // 数组 并且很多行
                       const tab = k['pageType']; // 根据key获取tab 然后判断是否是GridEdit或FreeEdit
                       const dataObj = result['res']['composition'][srcTab];
@@ -99,8 +98,6 @@ export const dataOpertaor = defineStore(
                               res[voNme]=newArr
                               console.log('cvrgobj', newArr)
                               return;
-                              // newArr.push(dtoListToListObj(srcTab, dataObj[d]))
-
                               // TODO vo名称对不上的,在此处加单独的逻辑
                           }
                       }
@@ -129,6 +126,9 @@ export const dataOpertaor = defineStore(
           }
           return data;
       }
+      /**
+       * 首字母转换小写
+       */
       const firstCharLower = (str: string) => {
           return str.replace(/\b(\w)(\w*)/g, function ($0, $1, $2) {
               return $1.toLowerCase() + $2;
