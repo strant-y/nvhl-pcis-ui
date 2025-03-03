@@ -85,19 +85,18 @@ export const dataOpertaor = defineStore(
                   if (!!result['res']['composition'][srcTab] && result['res']['composition'][srcTab] instanceof Array && result['res']['composition'][srcTab].length > 0) { // 数组 并且很多行
                       const tab = k['pageType']; // 根据key获取tab 然后判断是否是GridEdit或FreeEdit
                       const dataObj = result['res']['composition'][srcTab];
+                      const gridArr=[]
                       for (const d in dataObj) {
-                          const newArr=[]
                           if (!!tab && 'free' === tab) {
                               res[voNme] = dtoListToListObj(srcTab, dataObj[d]);
                               return res;
                           }else  if (!!tab && 'grid' === tab){
-                              newArr.push(dtoListToListObj(srcTab, dataObj[d]))
+                              gridArr.push(dtoListToListObj(srcTab, dataObj[d]))
+                              res[voNme]=gridArr
                               // TODO vo名称对不上的,在此处加单独的逻辑
                           }else  if (!!tab&&'custom' === tab){
-                              newArr.push(dtoListToListObj(srcTab, dataObj[d]))
-                              res[voNme]=newArr
-                              console.log('cvrgobj', newArr)
-                              return;
+                              gridArr.push(dtoListToListObj(srcTab, dataObj[d]))
+                              res[voNme]=gridArr
                               // TODO vo名称对不上的,在此处加单独的逻辑
                           }
                       }
