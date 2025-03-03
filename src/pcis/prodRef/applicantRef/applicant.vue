@@ -71,6 +71,14 @@ const method = {
           }
       });
   },
+  funcreset: ()=>{
+      const tabref = opertaor.getTableRefs();
+      const applicantValue=tabref['webPlyApplicant'].getFromValue()
+      console.log(applicantValue)
+      for (const k in applicantValue){
+          applicantValue[k]=null
+      }
+  }
 };
 
 // 绑定特殊验证器

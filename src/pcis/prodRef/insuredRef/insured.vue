@@ -81,6 +81,13 @@ const method = {
           }
       });
   },
+    funcreset: ()=>{
+        const tabref = opertaor.getTableRefs();
+        const InsuredValue=tabref['webPlyInsured'].getFromValue()
+        for (const k in InsuredValue){
+            InsuredValue[k]=null
+        }
+    }
 };
 
 // 绑定特殊验证器
