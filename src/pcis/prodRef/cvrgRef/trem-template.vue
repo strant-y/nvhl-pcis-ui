@@ -95,9 +95,6 @@
             </table>
           </el-row>
         </template>
-        <div>
-          <el-button @click="dataInit">test</el-button>
-        </div>
       </div>
     </el-card>
   </div>
