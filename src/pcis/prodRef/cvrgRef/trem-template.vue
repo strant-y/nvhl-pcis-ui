@@ -15,7 +15,9 @@
             </el-col>
             <el-col :span="2">
               <rtButton
-                @click="() => {}"
+                @click="() => {
+                  emit('delete', null);
+                }"
                 :item="{
                   label: '删除',
                 }"
@@ -113,7 +115,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue','delete']);
 const termRef = ref<AppFreeEditMethod | null>(null);
 const groupconf = ref<{ [key: string]: any }>({}); // 渲染数据分离,解决因为数据变更,导致触发重新渲染
 
@@ -279,7 +281,6 @@ function dataInit() {
   getTRFactorJson(param).then((res: any) => {
     const { code, data, msg } = res;
     if (200 === code) {
-      console.log(data.data);
       collist.value = data.data.collist;
       factormap.value = data.data.factormap;
       colInfo.value = data.data.colInfo;

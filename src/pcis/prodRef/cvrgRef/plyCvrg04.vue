@@ -7,6 +7,7 @@
             v-for="(i, index) in formData"
             :key="index"
             v-model="formData[index]"
+            @delete="deleteData(index)"
           />
         </el-form>
       </div>
@@ -82,6 +83,10 @@ const method = {
 
 // 绑定特殊验证器
 const exRules = {};
+
+function deleteData(index: number) {
+  formData.value.splice(index, 1);
+}
 
 function getFromValue() {
     const tableobj={}
