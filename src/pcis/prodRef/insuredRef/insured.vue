@@ -70,6 +70,17 @@ const method = {
           { title: "选择客户信息", width: 85 }
       );
   },
+  funcconfirm: ()=>{
+      insuredEditRef.value?.validate().then((isValid) => {
+          console.log(isValid)
+          if (isValid) {
+              // handleQuery();
+              ElMessage.success("客户信息已经存在");
+          } else {
+              ElMessage.error("请填写必填项");
+          }
+      });
+  },
 };
 
 // 绑定特殊验证器
