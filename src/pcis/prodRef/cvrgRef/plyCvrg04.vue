@@ -41,17 +41,6 @@
             
           </el-card>
         </div>
-        <!-- <el-form ref="cvrgFormfef" :model="formData" :inline-message="true">
-          <tremTemplate
-            v-for="(i, index) in formData"
-            :key="index"
-            v-model="formData[index]"
-            @delete="deleteData(index)"
-          />
-        </el-form> -->
-      </div>
-      <div>
-        <el-button type="primary" @click="getFromValue">获取数据</el-button>
       </div>
     </myCard>
     <comDialog ref="dialog"></comDialog>
