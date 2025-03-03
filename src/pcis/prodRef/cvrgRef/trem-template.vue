@@ -141,7 +141,7 @@ function initData(data: any) {
   // 缓存条款责任数据
   let riskData : { [key: string]: any } = {};
   newData.riskList.forEach((v: any) => {
-    let cRiskNo = v["cvrg.cRiskNo"];
+    let cRiskNo = v["TermRisktgt.cLiabCode"];
     riskData[cRiskNo] = {
       ...v,
     };
@@ -264,7 +264,11 @@ function dataInit() {
       } else {
         newKey = key;
       }
-      p[newKey] = v;
+      if(newKey === 'cLiabCode'){
+        p['cRiskNo'] = v;
+      }else{
+        p[newKey] = v;
+      }
     });
     queryList.push(p);
   });

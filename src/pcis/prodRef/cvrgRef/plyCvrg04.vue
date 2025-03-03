@@ -61,11 +61,10 @@ const method = {
         isOk: (selectdata: any) => {
           let adddata: any [] = [];
           selectdata.forEach((item: any) => {
-            let riskList: { "cvrg.cRiskNo": any; }[] = [];
-            console.log(item)
+            let riskList: { [key: string]: any; }[] = [];
             item.children?.forEach((e: any) => {
               riskList.push({
-                "cvrg.cRiskNo": e.cRiskNo
+                "TermRisktgt.cLiabCode": e.cRiskNo
               });
             });
             let data = {
@@ -74,7 +73,6 @@ const method = {
             };
             formData.value.push(data);
           });
-          console.log(formData.value);
         },
       },
       { title: "添加条款", width: 85 }
