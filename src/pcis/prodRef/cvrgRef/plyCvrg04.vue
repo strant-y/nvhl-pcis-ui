@@ -2,14 +2,56 @@
   <div>
     <myCard :cardConfig="cardconfig">
       <div>
-        <el-form ref="cvrgFormfef" :model="formData" :inline-message="true">
+        <div v-for="(v,k) in planData" :key="k" class="planInfo">
+          <el-card>
+            <template #header >
+              <el-row :gutter="16">
+                <el-col :span="4">方案号:{{k}}</el-col>
+                <el-col :span="16"></el-col>
+                <el-col :span="4">
+                  <rt-button :item="{
+                    label:'添加条款',
+                    icon:'CirclePlus',
+                    type:'primary',
+                    size:'small',
+                    func:()=>{
+                      addTermData(k);
+                    }
+                  }"/>
+                  <rt-button :item="{
+                    icon:'Delete',
+                    type:'danger',
+                    size:'small',
+                    func:()=>{
+                      deletePlan(k);
+                    }
+                  }"/>
+                </el-col>
+              </el-row>
+            </template>
+            
+            <el-form ref="cvrgFormfef" :model="planData[k]" :inline-message="true">
+              <tremTemplate
+                v-for="(i, index) in planData[k]"
+                :key="index"
+                v-model="planData[k][index]"
+                @delete="deleteData(k,index)"
+              />
+            </el-form>
+            
+          </el-card>
+        </div>
+        <!-- <el-form ref="cvrgFormfef" :model="formData" :inline-message="true">
           <tremTemplate
             v-for="(i, index) in formData"
             :key="index"
             v-model="formData[index]"
             @delete="deleteData(index)"
           />
-        </el-form>
+        </el-form> -->
+      </div>
+      <div>
+        <el-button type="primary" @click="getFromValue">获取数据</el-button>
       </div>
     </myCard>
     <comDialog ref="dialog"></comDialog>
@@ -37,6 +79,9 @@ const cardconfig = ref(creatCardConfig({}));
 const cvrgFormfef = ref("cvrgFormfef");
 const formData = ref<any[]>([]);
 
+const PlanNo = ref(1);
+const planData = ref<{ [key: string] : any[] }>({});
+
 onMounted(async () => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
@@ -49,7 +94,17 @@ onMounted(async () => {
 // 绑定方法
 const method = {
   funcadd: () => {
-    const param = opertaor.getParam();
+    const planKey = 'P'+PlanNo.value;
+    PlanNo.value++;
+    planData.value[planKey] = [];
+  },
+};
+
+// 绑定特殊验证器
+const exRules = {};
+
+function addTermData(PlanNo: string){
+  const param = opertaor.getParam();
     dialog.value?.open(
       "addtremView",
       {
@@ -60,7 +115,6 @@ const method = {
       },
       {
         isOk: (selectdata: any) => {
-          let adddata: any [] = [];
           selectdata.forEach((item: any) => {
             let riskList: { [key: string]: any; }[] = [];
             item.children?.forEach((e: any) => {
@@ -69,64 +123,68 @@ const method = {
               });
             });
             let data = {
-              cTermNo:item.cTermNo,
+              'Term.cClauseNumber':item.cTermNo,
               riskList:riskList,
             };
-            formData.value.push(data);
+            planData.value[PlanNo].push(data);
           });
         },
       },
       { title: "添加条款", width: 85 }
     );
-  },
-};
+}
 
-// 绑定特殊验证器
-const exRules = {};
+function deleteData(plan: string, index: number) {
+  planData.value[plan].splice(index, 1);
+}
 
-function deleteData(index: number) {
-  formData.value.splice(index, 1);
+function deletePlan(plan: string) {
+  delete planData.value[plan];
 }
 
 function getFromValue() {
-    const tableobj={}
-    const delformData=JSON.parse(JSON.stringify(formData.value))
-    delformData.forEach((item: any) => {
-        item['Term.cClauseNumber']=item['cTermNo'];
-        item["Term.riskList"]=item['riskList']
-        delete item["cTermNo"];
-        delete item["riskList"];
-        item['Term.riskList'].forEach((e: any) => {
-            e['TermRisktgt.cLiabCode']=e["cvrg.cRiskNo"];
-            delete e["cvrg.cRiskNo"]
-            for (let key in e) {
+    let tableobj:{[key:string]: any}={};
+    let redata:any[] = [];
+    Object.keys(planData.value).forEach((key) => {
+        planData.value[key].forEach((item: any) => {
+          const i = JSON.parse(JSON.stringify(item));
+          i['Term.cPlanNo']=key;
+          i['riskList'].forEach((e: any) => {
+              for (let key in e) {
                 const k=key.split('.')[1];
                 e[k]=e[key]
                 delete e[key]
-            }
-        });
-    });
-    tableobj['items']=delformData;
+              }
+            });
+            redata.push(i);
+        })
+    })
+    tableobj['items']=redata;
+    console.log(tableobj);
     return tableobj
 }
 
 function setFormValue(value: any) {
-     value.forEach((item: any) => {
-            item['cTermNo']=item['Term.cClauseNumber'];
-            item['riskList']=item["Term.riskList"]
-            delete item["Term.cClauseNumber"];
-            delete item["Term.riskList"];
-            item['riskList'].forEach((e: any) => {
-                for (let key in e) {
-                    const k='TermRisktgt.'+key
-                    e[k]=e[key]
-                    delete e[key]
-                }
-                e["cvrg.cRiskNo"]=e['TermRisktgt.cLiabCode']
-                delete e["TermRisktgt.cLiabCode"]
-            });
-        });
-    formData.value=value
+  value.forEach((item: any) => {
+    const planKey = item['Term.cPlanNo'];
+    let creData = JSON.parse(JSON.stringify(item));
+    creData['riskList']=creData["Term.riskList"]
+    delete creData["Term.riskList"];
+    creData['riskList'].forEach((e: any) => {
+        for (let key in e) {
+            const k='TermRisktgt.'+key
+            e[k]=e[key]
+            delete e[key]
+        }
+    });
+    if(planData.value[planKey]){
+      planData.value[planKey].push(creData);
+    }else{
+      let newrisk:any[]=[];
+      newrisk.push(creData);
+      planData.value[planKey]=newrisk;
+    }
+  });
 }
 
 function validate() {}
@@ -141,4 +199,8 @@ defineExpose({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+::v-deep .planInfo .el-card__header {
+  padding: 2px 15px !important; 
+}
+</style>
