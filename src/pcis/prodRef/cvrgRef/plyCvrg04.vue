@@ -97,8 +97,8 @@ function getFromValue() {
         delete item["cTermNo"];
         delete item["riskList"];
         item['Term.riskList'].forEach((e: any) => {
-            e['TermRisktgt.cLiabCode']=e["cvrg.cRiskNo"];
-            delete e["cvrg.cRiskNo"]
+            // e['TermRisktgt.cLiabCode']=e["cvrg.cRiskNo"];
+            // delete e["cvrg.cRiskNo"]
             for (let key in e) {
                 const k=key.split('.')[1];
                 e[k]=e[key]
@@ -122,8 +122,8 @@ function setFormValue(value: any) {
                     e[k]=e[key]
                     delete e[key]
                 }
-                e["cvrg.cRiskNo"]=e['TermRisktgt.cLiabCode']
-                delete e["TermRisktgt.cLiabCode"]
+                // e["cvrg.cRiskNo"]=e['TermRisktgt.cLiabCode']
+                // delete e["TermRisktgt.cLiabCode"]
             });
         });
     formData.value=value

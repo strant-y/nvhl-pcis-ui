@@ -302,18 +302,27 @@ const submitToUndrFn= () => {
 };
 
 const savePlyInfo = () => {
-  const res =opertaor.getDataAll()
-  res['user']=user
-  res['webPlyBaseBasic']['Base.cDptCde']='0251010013000'
-  res['webPlyBaseBasic']['Base.cProdNo']='042001'
-  console.log(res)
-  saveAppPlyInfo(res).then((res) => {
-    console.log("saveAppPlyInfo-res", res);
-      const ops = opertaor.convertData(res)
-      opertaor.setDataAll(ops)
-    // ElMessage.success(res.msg);
-    // history.back();
-  });
+    const btn =getBtn('btn010102')
+    btn.loading=true
+    const res =opertaor.getDataAll()
+    res['user']=user
+    res['webPlyBaseBasic']['Base.cDptCde']='0251010013000'
+    res['webPlyBaseBasic']['Base.cProdNo']='042001'
+    console.log(res)
+    saveAppPlyInfo(res).then((res) => {
+        console.log("saveAppPlyInfo-res", res);
+        btn.loading=false
+        if(res['code']=='200'){
+            const ops = opertaor.convertData(res)
+            console.log('转换的数据',ops)
+            ElMessage.success(res.msg);
+            opertaor.setDataAll(ops)
+        }else{
+            ElMessage.error(res.msg);
+        }
+        // ElMessage.success(res.msg);
+        // history.back();
+    });
 };
 
 // 将对象的属性首字母转换为小写
