@@ -130,7 +130,7 @@ function update(){
     ril.push(riskList.value[k])
   });
   newData.riskList = ril;
-  emit('update:modelValue', list);
+  emit('update:modelValue', newData);
 }
 function initData(data: any) {
   const newData = JSON.parse(JSON.stringify(data));
