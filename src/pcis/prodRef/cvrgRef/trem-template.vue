@@ -12,7 +12,6 @@
               <el-tag type="warning">{{ term.cNmeCn }}</el-tag>
             </el-col>
             <el-col :span="12">
-              <!-- <span>{{ formData.rigeNme }}</span> -->
             </el-col>
             <el-col :span="2">
               <rtButton
@@ -27,6 +26,7 @@
       </template>
 
       <div v-if="showData">
+        <app-free-edit :freeEditConfig="formconfig1" ref="termRef" @updateDatas="update"/>
         <template v-for="(ginfo, gk) in groupInfo" :key="gk">
           <el-row>
             <el-col :span="22">
@@ -80,7 +80,7 @@
                               </template>
                               <template v-else>
                                 <from-item 
-                                        v-model="formdata.riskList[riskdata.rowConfig[colinfo.cColId][n - 1].cRiskNo][riskdata.rowConfig[colinfo.cColId][n - 1].factorItem?.prop]"
+                                        v-model="riskList[riskdata.rowConfig[colinfo.cColId][n - 1].cRiskNo][riskdata.rowConfig[colinfo.cColId][n - 1].factorItem?.prop]"
                                         @update:modelValue="update()"
                                         :item="riskdata.rowConfig[colinfo.cColId][n - 1].factorItem" />
                               </template>
@@ -95,6 +95,9 @@
             </table>
           </el-row>
         </template>
+        <div>
+          <el-button @click="dataInit">test</el-button>
+        </div>
       </div>
     </el-card>
   </div>
@@ -102,6 +105,8 @@
 
 <script setup lang="ts">
 import { getTRFactorJson } from "@/api/prod";
+import { AppFreeEditMethod, createAppFreeEditConfig } from "@/shared/app-free-edit-config";
+import { formInit } from "@/shared/from-init";
 import { init } from "echarts";
 
 const props = defineProps({
@@ -112,23 +117,31 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update:modelValue']);
-
+const termRef = ref<AppFreeEditMethod | null>(null);
 const groupconf = ref<{ [key: string]: any }>({}); // 渲染数据分离,解决因为数据变更,导致触发重新渲染
 
-const formdata = ref({});
-formdata.value = initData(props.modelValue);
+const termdata = ref({});
+const riskList = ref<{ [key: string]: any }>({});
+
+initData(props.modelValue);
 
 function update(){
-  const list = JSON.parse(JSON.stringify(formdata.value));
+  let newData = termRef.value?.getFromValue();
+  const list = JSON.parse(JSON.stringify(riskList.value));
   let ril: any[] = [];
-  Object.keys(list.riskList).forEach((k: any) => {
-    ril.push(list.riskList[k])
+  Object.keys(riskList.value).forEach((k: any) => {
+    ril.push(riskList.value[k])
   });
-  list.riskList = ril;
+  newData.riskList = ril;
   emit('update:modelValue', list);
 }
 function initData(data: any) {
   const newData = JSON.parse(JSON.stringify(data));
+  // 缓存条款数据
+  const termData = JSON.parse(JSON.stringify(data));
+  termData.riskList = null;
+  termdata.value = termData;
+  // 缓存条款责任数据
   let riskData : { [key: string]: any } = {};
   newData.riskList.forEach((v: any) => {
     let cRiskNo = v["cvrg.cRiskNo"];
@@ -136,15 +149,25 @@ function initData(data: any) {
       ...v,
     };
   });
-  newData.riskList = riskData;
-  return newData;
+  riskList.value = riskData;
+  nextTick(() => {
+    termRef.value?.setFormValue(termdata.value);
+  });
 }
 
 const groupInfo = ref<{ [key: string]: any }>({});
 const colInfo = ref([]);
 const factormap = ref<{ [key: string]: any }>({});
+const termFactormap =ref([]);
 const collist = ref([]);
 const term = ref<{ [key: string]: any }>({});
+
+const formconfig1 = reactive(createAppFreeEditConfig({
+  fromUi:{
+    cols:2,
+    showTitleBar:false,
+  }
+}));
 
 const showData = ref(true);
 const showRiskInfo = ref(true);
@@ -165,9 +188,8 @@ function getcolConfig(groupId: string, riskNo: string) {
 
 function getRisk(groupId: string) {
   let risklist: { [key: string]: any } = {};
-  // 确保 riskList 是 formdata.value 的一个属性
-  const riskList = formdata.value.riskList || {}; // 初始化为一个空对象以防 undefined
-  Object.keys(riskList).forEach((riskNo) => {
+  const risks = riskList.value || {}; // 初始化为一个空对象以防 undefined
+  Object.keys(risks).forEach((riskNo) => {
     risklist[riskNo] = {
       ...getcolConfig(groupId, riskNo),
     };
@@ -230,6 +252,10 @@ function getProp(col: any) {
 }
 
 onMounted(async () => {
+  dataInit();
+});
+
+function dataInit() {
   let queryList: { [k: string]: any }[] = [];
   props.modelValue.riskList.forEach((item: any) => {
     let p: { [k: string]: any } = {};
@@ -249,7 +275,7 @@ onMounted(async () => {
     cTermNo: props.modelValue.cTermNo,
     riskList: queryList,
   };
-  getTRFactorJson(param).then((res) => {
+  getTRFactorJson(param).then((res: any) => {
     const { code, data, msg } = res;
     if (200 === code) {
       console.log(data.data);
@@ -258,12 +284,14 @@ onMounted(async () => {
       colInfo.value = data.data.colInfo;
       groupInfo.value = data.data.groupInfo;
       term.value = data.data.term;
+      termFactormap.value = data.data.termFactormap;
+      formconfig1.fromSchema = data.data.termFactormap;
     } else {
       ElMessage.error(msg);
     }
     initshowConfig();
   });
-});
+}
 
 function initshowConfig() {
   let grouplist: { [k: string]: any } = {};
@@ -277,7 +305,6 @@ function initshowConfig() {
     };
     grouplist[g] = ngdata;
   });
-  console.log(grouplist);
   groupconf.value = grouplist;
 }
 </script>
