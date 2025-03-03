@@ -1,5 +1,6 @@
 <template>
   <app-free-edit :freeEditConfig="formconfig1" ref="insuredEditRef" />
+  <comDialog ref="dialog"></comDialog>
 </template>
 
 <script setup lang="ts">
@@ -9,6 +10,8 @@ import {
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+const dialog = ref<DialogMethod | null>(null);
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 const opertaor = dataOpertaor();
 const props = defineProps({
   pageSchema: {
@@ -33,6 +36,40 @@ onMounted(() => {
 const method = {
   // func demo
   func1: () => {},
+  funccopyvalue:()=>{
+      const tabref = opertaor.getTableRefs();
+      const applicantValue=tabref['webPlyApplicant'].getFromValue()
+      const insuredValue={}
+      for(const k in applicantValue){
+          const key='Insured.'+k.split('.')[1]
+          if(k.split('.')[1]=='cAppNme'){
+              insuredValue['Insured.cInsuredNme']=applicantValue['Applicant.cAppNme']
+          }else{
+              insuredValue[key]=applicantValue[k];
+          }
+      }
+      setFormValue(insuredValue)
+  },
+  funcquery: () => {
+      const param = opertaor.getParam();
+      console.log(param)
+      console.log(dialog.value)
+      dialog.value?.open(
+          "querycustomerView",
+          {
+              type: "show",
+              data: {
+                  cProdNo: param.cProdNo,
+              },
+          },
+          {
+              isOk: (selectdata: any) => {
+                  console.log('a',selectdata)
+              },
+          },
+          { title: "选择客户信息", width: 85 }
+      );
+  },
 };
 
 // 绑定特殊验证器
