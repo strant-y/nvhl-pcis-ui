@@ -276,7 +276,7 @@ const calcPremium= () => {
     btn.loading=true;
     const res =opertaor.getDataAll()
     res['user']=user
-    res['webPlyBaseBasic']['Base.cDptCde']='0251010013000'
+    res['webPlyBaseBasic']['Base.cDptCde']='0200000000000'
     res['webPlyBaseBasic']['Base.cProdNo']='042001'
     console.log(res)
     appCalc(res).then((res) => {

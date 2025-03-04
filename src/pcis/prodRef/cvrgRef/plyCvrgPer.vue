@@ -76,7 +76,7 @@ function addTermData() {
             });
           });
           let data = {
-            "Term.cClauseNumber": item.cTermNo,
+            "Term.cClauseCode": item.cTermNo,
             riskList: riskList,
           };
           formData.value.push(data);
