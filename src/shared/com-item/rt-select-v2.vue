@@ -226,7 +226,10 @@ function getLabel() {
 onMounted(() => {
   // 初始化组件数据
   if (props.item) {
-    if (!props.item.loadData && !!props.item.typeCode) {
+    if (!props.item.loadData && !props.item.typeCode) {
+      options.value = [];
+    }
+    else if (!props.item.loadData && !!props.item.typeCode) {
       codeListStore
         .queryCodeList(
           {
