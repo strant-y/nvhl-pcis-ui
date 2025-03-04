@@ -1,19 +1,17 @@
 <template>
   <div>
-    <div style="margin-bottom: 12px;" >
+    <div style="margin-bottom: 12px">
       <el-form :model="newCom" label-width="120px" :rules="rules" ref="fromref">
         <el-row :gutter="20">
-          <el-col :span="10">
-  
-          </el-col>
+          <el-col :span="10"> </el-col>
           <el-col :span="14">
-            <el-text class="mx-1" size="large" type="primary">请录入新的产品编码并继续复制!</el-text>
+            <el-text class="mx-1" size="large" type="primary"
+              >请录入新的产品编码并继续复制!</el-text
+            >
           </el-col>
         </el-row>
         <el-row :gutter="20">
-          <el-col :span="20">
-  
-          </el-col>
+          <el-col :span="20"> </el-col>
           <el-col :span="4">
             <el-button @click="copy" type="primary">复制</el-button>
             <el-button @click="fail">取消</el-button>
@@ -38,12 +36,12 @@ const emits = defineEmits(["handleClose"]);
 const props = defineProps({
   data: {
     type: Object,
-    default: () => ({})
+    default: () => ({}),
   },
-  method:{
+  method: {
     type: Object,
-    default: () => ({})
-  }
+    default: () => ({}),
+  },
 });
 const fromref = ref<FormInstance>();
 const prodInfoRef = ref("prodInfoRef");
@@ -57,7 +55,6 @@ import { formInit } from "@/shared/from-init";
 import { FormInstance, FormRules } from "element-plus";
 import { copyComponent, copyProInfo, getProdInfos } from "@/api/prod";
 
-
 // 绑定方法
 const method = {};
 
@@ -68,46 +65,45 @@ onMounted(async () => {
   nextTick(() => {
     prodInfoRef.value.copyInitProdNo(props.data.prodNo);
     getProdInfos({ prodNo: props.data.prodNo })
-    .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
-        console.log(data);
-        for(const k in data.data){
-          if(k === 'prodComponent'){
-            compoentRef.value.copyInitProdNo(data.data[k]);
+      .then((res) => {
+        const { code, data, msg } = res;
+        if (200 === code) {
+          console.log(data);
+          for (const k in data) {
+            if (k === "prodComponent") {
+              compoentRef.value.copyInitProdNo(data[k]);
+            }
           }
+        } else {
+          ElMessage.error(msg);
         }
-      } else {
-        ElMessage.error(msg);
-      }
-    })
-    .finally(() => {});
+      })
+      .finally(() => {});
     // compoentRef.value.setFormValue(props.data.prodNo);
   });
 });
 
-async function copy(){
+async function copy() {
   const info = prodInfoRef.value?.getFromValue(); //获取表单数据
   const coms = compoentRef.value?.getFromValue(); //获取表单数据
-  prodInfoRef.value?.validate().then(res=>{
-    if(!res){ 
+  prodInfoRef.value?.validate().then((res) => {
+    if (!res) {
       return;
     }
-    copyProInfo({info:info,coms:coms})
-    .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
-        ElMessage.success("复制成功");
-        setTimeout(() => {
-          emits("handleClose");
-        }, 500);
-      } else {
-        ElMessage.error(msg);
-      }
-    })
-    .finally(() => {});
-  })
-  
+    copyProInfo({ info: info, coms: coms })
+      .then((res) => {
+        const { code, data, msg } = res;
+        if (200 === code) {
+          ElMessage.success("复制成功");
+          setTimeout(() => {
+            emits("handleClose");
+          }, 500);
+        } else {
+          ElMessage.error(msg);
+        }
+      })
+      .finally(() => {});
+  });
 
   // await fromref.value?.validate((valid, fields) => {
   //   if (valid) {
@@ -131,10 +127,9 @@ async function copy(){
   // });
 }
 
-function fail(){
+function fail() {
   emits("handleClose");
 }
-
 </script>
 
 <style scoped>

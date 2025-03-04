@@ -201,7 +201,7 @@ function handleQuery(flag?: boolean) {
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
-        pageresult.list = data.data;
+        pageresult.list = data;
         pageresult.total = data.total;
       } else {
         ElMessage.error(msg);

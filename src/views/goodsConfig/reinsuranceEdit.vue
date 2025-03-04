@@ -144,8 +144,8 @@ onMounted(async () => {
       getButtonByFacKey({ cFactorKey: props.data.cPkId })
         .then((res) => {
           const { code, data, msg } = res;
-          if (200 === code && data.data?.length > 0) {
-            const dataObj = data.data[0];
+          if (200 === code && data.length > 0) {
+            const dataObj = data[0];
             const edit = {};
             Object.keys(dataObj).forEach((k) => {
               if (k.startsWith("cButton")) {

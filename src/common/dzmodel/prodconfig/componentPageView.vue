@@ -51,7 +51,7 @@ const exRules = {};
 onMounted(async () => {
   const res = await getPageViewByPage(props.data.param);
   if (200 === res.code) {
-    formconfig1.value = res.data.data;
+    formconfig1.value = res.data;
     renderComponents();
   } else {
     ElMessage.error("预览加载失败!" + res.msg);

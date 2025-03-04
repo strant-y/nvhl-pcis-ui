@@ -73,6 +73,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             cKindNo: "",
             cTermNo: "",
             cNmeCn: "",
+            cTermNos: "",
           });
           // handleQuery();
         },
@@ -87,7 +88,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         codeParam: { cStatus: "1" },
       },
       {
-        prop: "cTermNo",
+        prop: "cTermNos",
         inputtype: "rtinput",
         title: "条款代码",
       },
@@ -140,8 +141,10 @@ const selectedRows = ref<any[]>([]);
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
+  console.log("s", s);
   const param = Object.assign(s, r, {
     cRdrTyp: "1",
+    cTermNo: s.cTermNos,
   });
   queryTermToRelList(param)
     .then((res) => {
@@ -150,10 +153,6 @@ function handleQuery(flag?: boolean) {
         pageresult.list = [];
         pageresult.list = data.result;
         pageresult.total = data.total;
-        // 设置默认选中的行
-        tableConfig.defaultSelectedRows = pageresult.list
-          .filter((item) => item.cTermNo !== "")
-          .map((item) => item._dataId);
       } else {
         ElMessage.error(msg);
       }
@@ -174,11 +173,6 @@ function getQueryList(flag?: boolean) {
         pageresult.list = [];
         pageresult.list = data.result;
         pageresult.total = data.total;
-        // 设置默认选中的行
-        // tableConfig.defaultSelectedRows = pageresult.list
-        //   .filter((item) => item.cTermNo !== "")
-        //   .map((item) => item._dataId);
-        console.log(tableConfig.defaultSelectedRows, "0=0=0=0=0=0=0=0=0=");
       } else {
         ElMessage.error(msg);
       }
@@ -202,7 +196,6 @@ const handleConfirm = () => {
     return;
   }
   const opCde = JSON.parse(sessionStorage.getItem("user")).opCde;
-  // const a = tabref.getFromValue().cTermNo;
   const newArr = selectedRows.value.map((item) => {
     item.cCrtCde = opCde;
     item.cUpdCde = opCde;

@@ -106,8 +106,8 @@ function fromUpdata(newData: any) {
     ) {
       return;
     }
-    if(!!jsonObj.codeParam && typeof jsonObj.codeParam === 'string') {
-        jsonObj.codeParam = JSON.parse(jsonObj.codeParam);
+    if (!!jsonObj.codeParam && typeof jsonObj.codeParam === "string") {
+      jsonObj.codeParam = JSON.parse(jsonObj.codeParam);
     }
     jsonObj.func = null; // 方法去掉,不让预览触发事件
     formconfiglook.fromSchema = [jsonObj];
@@ -227,11 +227,11 @@ const schemaMap = reactive<Record<string, any>>({
       title: "是否显示扩展按钮",
       loadData: yesOrNo,
       func: (v) => {
-          if (v === "1") {
-              showBtnConfig.value = true;
-          } else {
-              showBtnConfig.value = false;
-          }
+        if (v === "1") {
+          showBtnConfig.value = true;
+        } else {
+          showBtnConfig.value = false;
+        }
       },
     },
     {
@@ -270,10 +270,10 @@ const schemaMap = reactive<Record<string, any>>({
       btnWidth: 10,
       readonly: true,
       btnItems: createFreeButtonBase({
-          icon: "Edit",
-          func: () => {
-              setCodeParam();
-          },
+        icon: "Edit",
+        func: () => {
+          setCodeParam();
+        },
       }),
     },
   ],
@@ -329,11 +329,11 @@ const schemaMap = reactive<Record<string, any>>({
       title: "是否显示扩展按钮",
       loadData: yesOrNo,
       func: (v) => {
-          if (v === "1") {
-              showBtnConfig.value = true;
-          } else {
-              showBtnConfig.value = false;
-          }
+        if (v === "1") {
+          showBtnConfig.value = true;
+        } else {
+          showBtnConfig.value = false;
+        }
       },
     },
     {
@@ -372,10 +372,10 @@ const schemaMap = reactive<Record<string, any>>({
       btnWidth: 10,
       readonly: true,
       btnItems: createFreeButtonBase({
-          icon: "Edit",
-          func: () => {
-              setCodeParam();
-          },
+        icon: "Edit",
+        func: () => {
+          setCodeParam();
+        },
       }),
     },
   ],
@@ -685,10 +685,10 @@ const schemaMap = reactive<Record<string, any>>({
       btnWidth: 10,
       readonly: true,
       btnItems: createFreeButtonBase({
-          icon: "Edit",
-          func: () => {
-              setCodeParam();
-          },
+        icon: "Edit",
+        func: () => {
+          setCodeParam();
+        },
       }),
     },
   ],
@@ -886,10 +886,10 @@ const schemaMap = reactive<Record<string, any>>({
       btnWidth: 10,
       readonly: true,
       btnItems: createFreeButtonBase({
-          icon: "Edit",
-          func: () => {
-              setCodeParam();
-          },
+        icon: "Edit",
+        func: () => {
+          setCodeParam();
+        },
       }),
     },
   ],
@@ -1058,8 +1058,8 @@ onMounted(async () => {
       getButtonByFacKey({ cFactorKey: props.data.cPkId })
         .then((res) => {
           const { code, data, msg } = res;
-          if (200 === code && data.data?.length > 0) {
-            const dataObj = data.data[0];
+          if (200 === code && data.length > 0) {
+            const dataObj = data[0];
             const edit = {};
             Object.keys(dataObj).forEach((k) => {
               if (k.startsWith("cButton")) {
@@ -1128,13 +1128,13 @@ function showFactorList() {
       .then((res) => {
         const { code, data, msg } = res;
         if (200 === code) {
-          if (data.data) {
-            Object.keys(data.data).forEach((i) => {
-              if (data.data[i].cFactorParentKey) {
-                data.data[i].isChecked = "1";
+          if (data) {
+            Object.keys(data).forEach((i) => {
+              if (data[i].cFactorParentKey) {
+                data[i].isChecked = "1";
               }
             });
-            tableRef.value?.setFormValue(data.data);
+            tableRef.value?.setFormValue(data);
           }
         } else {
           ElMessage.error(msg);
@@ -1252,38 +1252,42 @@ const tableconfig = reactive<AppTableConfig>(
 );
 
 function setCodeParam() {
-    const convertObjectToArray = (obj: { [key: string]: any }) => {
-        const result: { key: string; value: any }[] = [];
-        for (const key in obj) {
-            if (obj.hasOwnProperty(key)) {
-                result.push({ key: key, value: obj[key] });
-            }
-        }
-        return result.length === 0 ? undefined : result;
-    };
-    const ppp = convertObjectToArray(JSON.parse(freeEditRef.value?.getValue("codeParam")))
-    dzmodal.open(jsonArrayEdit, {
-        data: !ppp || ppp.length === 0 ? undefined : JSON.stringify(ppp),
-        inititle: ["key", "value"],
+  const convertObjectToArray = (obj: { [key: string]: any }) => {
+    const result: { key: string; value: any }[] = [];
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        result.push({ key: key, value: obj[key] });
+      }
+    }
+    return result.length === 0 ? undefined : result;
+  };
+  const ppp = convertObjectToArray(
+    JSON.parse(freeEditRef.value?.getValue("codeParam"))
+  );
+  dzmodal
+    .open(jsonArrayEdit, {
+      data: !ppp || ppp.length === 0 ? undefined : JSON.stringify(ppp),
+      inititle: ["key", "value"],
     })
     .then((res) => {
-        if (res.type === "ok") {
-            let s = undefined;
-            const list = JSON.parse(res.body);
-            if(!!list && list.length > 0) {
-                s = list.map(m => {
-                    const r = {};
-                    r[m.key] = m.value;
-                    return r;
-                }).reduce((acc, obj) => {
-                    return {...acc, ...obj};
-                });
-            }
-            freeEditRef.value?.setValue("codeParam", JSON.stringify(s));
+      if (res.type === "ok") {
+        let s = undefined;
+        const list = JSON.parse(res.body);
+        if (!!list && list.length > 0) {
+          s = list
+            .map((m) => {
+              const r = {};
+              r[m.key] = m.value;
+              return r;
+            })
+            .reduce((acc, obj) => {
+              return { ...acc, ...obj };
+            });
         }
+        freeEditRef.value?.setValue("codeParam", JSON.stringify(s));
+      }
     });
 }
-
 </script>
 
 <style scoped></style>

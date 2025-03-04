@@ -201,6 +201,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtdatepicker",
         title: " 生效日期",
         rules: [getRules("required", { change: "生效日期不能为空" })],
+        valueFormat: "YYYY-MM-DD HH:mm:ss",
+        format: "YYYY-MM-DD HH:mm:ss",
         // func: (val: any) => {
         //   freeEditRef.value?.setFormValue({
         //     cCriterionTimeUnit: "A",
@@ -214,6 +216,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtdatepicker",
         title: " 失效日期",
         rules: [getRules("required", { change: "失效日期不能为空" })],
+        valueFormat: "YYYY-MM-DD HH:mm:ss",
+        format: "YYYY-MM-DD HH:mm:ss",
       },
       {
         prop: "cSepaCvrgFlag",
@@ -345,7 +349,7 @@ onMounted(() => {
     setTimeout(() => {
       freeEditRef.value?.setFormValue({
         cCriterionTimeUnit: "A",
-        tBgnTm: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+        tBgnTm: dayjs().startOf("day").format("YYYY-MM-DD HH:mm:ss"),
         tAdbTm: dayjs()
           .add(1, "year")
           .endOf("day")

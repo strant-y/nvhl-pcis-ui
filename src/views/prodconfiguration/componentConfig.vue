@@ -2,36 +2,51 @@
 <template>
   <div class="app-container">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
-    
-    <el-affix style="right: 25px; position: fixed;z-index: 1000;" v-if="compareList?.length > 0">
-      <div style="border: 2px dashed var(--el-border-color);width: 150px;background-color: var(--el-border-color-extra-light);">
+
+    <el-affix
+      style="right: 25px; position: fixed; z-index: 1000"
+      v-if="compareList?.length > 0"
+    >
+      <div
+        style="
+          border: 2px dashed var(--el-border-color);
+          width: 150px;
+          background-color: var(--el-border-color-extra-light);
+        "
+      >
         <el-row style="margin: 5px">
           <template v-for="item in compareList" :key="item.cComponentKey">
-              <el-col :span="21">
-                <el-text type="primary">{{item.cComponentName}}</el-text>
-              </el-col>
-              <el-col :span="2" style="align-items: center;">
-                <rtIcon style="margin-top: 4px;" 
-                    :item="{
-                      icon: 'CloseBold',
-                      iconColor: '#8b8b8b',
-                      func: () => {
-                        // 从compareList中删除该元素
-                        compareList = compareList.filter(t => t.cComponentKey !== item.cComponentKey);
-                      }
-                    }"
-                />
-              </el-col>
+            <el-col :span="21">
+              <el-text type="primary">{{ item.cComponentName }}</el-text>
+            </el-col>
+            <el-col :span="2" style="align-items: center">
+              <rtIcon
+                style="margin-top: 4px"
+                :item="{
+                  icon: 'CloseBold',
+                  iconColor: '#8b8b8b',
+                  func: () => {
+                    // 从compareList中删除该元素
+                    compareList = compareList.filter(
+                      (t) => t.cComponentKey !== item.cComponentKey
+                    );
+                  },
+                }"
+              />
+            </el-col>
           </template>
-          <el-col :span="2">
-          </el-col>
+          <el-col :span="2"> </el-col>
           <el-col :span="13">
-            <el-button type="info" size="small" @click=" compareList = [] ">清空</el-button>
+            <el-button type="info" size="small" @click="compareList = []"
+              >清空</el-button
+            >
           </el-col>
           <el-col :span="9">
-            <el-button type="primary" size="small" @click="showCompare">比较</el-button>
+            <el-button type="primary" size="small" @click="showCompare"
+              >比较</el-button
+            >
           </el-col>
-          </el-row>
+        </el-row>
       </div>
     </el-affix>
     <app-table
@@ -42,7 +57,6 @@
     />
 
     <comDialog ref="dialog"></comDialog>
-
   </div>
 </template>
 
@@ -201,16 +215,18 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "menu",
         link: true,
         tableClick: (row: any) => {
-          if(compareList.value.length < 2){
-            const com = compareList.value.find((item: any) => item.cComponentKey === row.cComponentKey);
-            if(!com){
+          if (compareList.value.length < 2) {
+            const com = compareList.value.find(
+              (item: any) => item.cComponentKey === row.cComponentKey
+            );
+            if (!com) {
               compareList.value.push(row);
             }
-          }else{
+          } else {
             ElMessage({
-              message: '仅支持同时两个组件的对比',
-              type: 'warning',
-            })
+              message: "仅支持同时两个组件的对比",
+              type: "warning",
+            });
           }
         },
       }),
@@ -245,7 +261,7 @@ function showView(type: string, cComponentKey: any) {
     if (200 === code) {
       dialog.value?.open(
         "componentView",
-        { type: type, data: data?.data, conKey: cComponentKey },
+        { type: type, data: data, conKey: cComponentKey },
         {
           isOk: () => {
             handleQuery();
@@ -258,12 +274,12 @@ function showView(type: string, cComponentKey: any) {
 }
 
 async function showCompare() {
-  if(compareList.value.length != 2){
+  if (compareList.value.length != 2) {
     ElMessage({
-      message: '2个组件才能进行对比',
-      type: 'warning',
-    })
-    return ;
+      message: "2个组件才能进行对比",
+      type: "warning",
+    });
+    return;
   }
   const comList = compareList.value.map((item: any) => {
     return item.cComponentKey;
@@ -275,17 +291,16 @@ async function showCompare() {
     if (200 === code) {
       dialog.value?.open(
         "componentCompare",
-        { type: 'compare', data: data?.data },
+        { type: "compare", data: data },
         {
           isOk: () => {
             handleQuery();
           },
         },
-        { title: '组件对比', width:'95' }
+        { title: "组件对比", width: "95" }
       );
     }
   });
-  
 }
 
 // 绑定方法
@@ -316,7 +331,7 @@ function handleQuery(type?: boolean) {
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
-        pageresult.list = data.data;
+        pageresult.list = data;
         pageresult.total = data.total;
       } else {
         ElMessage.error(msg);
