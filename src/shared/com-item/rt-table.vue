@@ -441,6 +441,12 @@ function addRow() {
   editIndex.value = rowId;
 }
 
+function addRowByData(data: any) {
+  const rowId = getuuid();
+  tableDatas.value?.push({ _dataId: rowId ,...data});
+  editIndex.value = rowId;
+}
+
 function getSelectRow() {
   const sele = tableDatas.value?.find((item) => {
     if (item._dataId === editIndex.value) {
@@ -456,6 +462,7 @@ function handleStatusChange(row: any) {
 defineExpose({
   tableExvalidate,
   addRow,
+  addRowByData,
   getSelectRow,
 });
 </script>

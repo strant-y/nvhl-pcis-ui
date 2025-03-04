@@ -44,8 +44,7 @@ const gridconfig = reactive<AppGridEditConfig>(
         type: "primary",
         label: "新增",
         func: async function () {
-          console.log(gridEditRef.value);
-          gridEditRef.value?.addRow();
+          gridEditRef.value?.addRowByData({cGrpMrk:'0'});
         },
       }),
       createFreeButtonBase({

@@ -122,6 +122,11 @@ function addRow() {
   rttableFrom.value?.addRow();
 }
 
+function addRowByData(data: any) {
+  rttableFrom.value?.addRowByData(data);
+}
+
+
 function getSelectRow() {
   return rttableFrom.value?.getSelectRow();
 }
@@ -132,6 +137,7 @@ defineExpose({
   validate,
   getTableValue,
   addRow,
+  addRowByData,
   getSelectRow,
 });
 </script>
