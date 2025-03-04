@@ -197,8 +197,8 @@ function selectComponent(item: any) {
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
-        if (data.data && data.data.length > 0) {
-          data.data.forEach((element: any) => {
+        if (data && data.length > 0) {
+          data.forEach((element: any) => {
             if (element.factorPkId) {
               element.isChecked = "1";
             } else {
@@ -218,7 +218,7 @@ onMounted(() => {
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
-        componentList.value = data.data;
+        componentList.value = data;
       } else {
         ElMessage.error(msg);
       }

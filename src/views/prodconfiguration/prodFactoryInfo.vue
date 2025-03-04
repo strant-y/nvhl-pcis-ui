@@ -179,7 +179,7 @@ function loadAfter() {
           const { code, data, msg } = res;
           if (200 === code) {
             setTimeout(() => {
-              setData(data.data);
+              setData(data);
             }, 100);
           } else {
             ElMessage.error(msg);

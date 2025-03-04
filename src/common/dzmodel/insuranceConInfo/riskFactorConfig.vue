@@ -26,7 +26,7 @@
               :key="col.id"
               @click="select(col)"
             >
-            <td style="text-align: center">{{ col.title }}</td>
+              <td style="text-align: center">{{ col.title }}</td>
             </tr>
           </tbody>
         </table>
@@ -231,7 +231,7 @@ function select(item: any) {
     const se = factorList.value?.find(
       (e: any) => element.c_pk_id === e.c_pk_id
     );
-    if(se){
+    if (se) {
       se.isChecked = element.isChecked;
       se.c_porp_type = element.c_porp_type;
       se.c_porp_required = element.c_porp_required;
@@ -273,11 +273,11 @@ function saveTitleFactor() {
 
   const param = {
     colInfo: colList.value,
-    ...fromValue
+    ...fromValue,
   };
   saveTRFactorList({
     colInfo: colList.value,
-  ...fromValue
+    ...fromValue,
   }).then((res) => {
     const { code, data, msg } = res;
     if (200 === code) {
@@ -295,7 +295,7 @@ onMounted(() => {
   querySelectorList(param).then((res) => {
     const { code, data, msg } = res;
     if (200 === code) {
-      factorList.value = data.data;
+      factorList.value = data;
       // tableRef.value?.setFormValue(data.data);
     } else {
       ElMessage.error(msg);
