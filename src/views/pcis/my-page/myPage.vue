@@ -276,10 +276,20 @@ const calcPremium= () => {
     btn.loading=true;
     const res =opertaor.getDataAll()
     res['user']=user
+    res['webPlyBaseBasic']['Base.cDptCde']='0251010013000'
+    res['webPlyBaseBasic']['Base.cProdNo']='042001'
     console.log(res)
     appCalc(res).then((res) => {
         btn.loading=false;
         console.log("appCalc-res", res);
+        if(res['code']=='200'){
+            const ops = opertaor.convertData(res)
+            console.log('保费计算转换的数据',ops)
+            ElMessage.success(res.msg);
+            opertaor.setDataAll(ops)
+        }else{
+            ElMessage.error(res.msg);
+        }
         // ElMessage.success(res.msg);
         // history.back();
     });
