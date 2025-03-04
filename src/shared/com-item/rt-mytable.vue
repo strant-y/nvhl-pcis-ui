@@ -451,6 +451,9 @@ defineExpose({
 }
 /* 高亮选中行的样式 */
 .highlight {
-  background-color: #e0f7fa; /* 高亮背景颜色 */
+  background-color: #dcf9fd; /* 高亮背景颜色 */
+}
+.el-table tr:hover {
+  background-color: #ecfcf3; /* 修改为你想要的颜色 */
 }
 </style>

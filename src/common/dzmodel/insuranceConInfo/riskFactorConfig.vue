@@ -166,22 +166,15 @@ const tableconfig = reactive<AppTableConfig>(
         },
       },
       {
+        prop: "c_factor_title",
+        inputtype: "rtinput",
+        title: "要素名称",
+      },
+      {
         prop: "c_factor_inputtype",
         inputtype: "rtselect",
         title: "要素类型",
         loadData: inputtype,
-      },
-      {
-        prop: "c_porp_required",
-        inputtype: "rtswitch",
-        title: "是否必填",
-        keymap: {
-          y: "1",
-          n: "0",
-        },
-        func: (v: any) => {
-          getFactorConf();
-        },
       },
       {
         prop: "c_porp_type",
@@ -198,9 +191,16 @@ const tableconfig = reactive<AppTableConfig>(
         title: "要素key",
       },
       {
-        prop: "c_factor_title",
-        inputtype: "rtinput",
-        title: "要素名称",
+        prop: "c_porp_required",
+        inputtype: "rtswitch",
+        title: "是否必填",
+        keymap: {
+          y: "1",
+          n: "0",
+        },
+        func: (v: any) => {
+          getFactorConf();
+        },
       },
     ],
   })
