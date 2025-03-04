@@ -9,15 +9,19 @@
                 <el-icon v-if="!showData"><ArrowUpBold /></el-icon>
                 <el-icon v-if="showData"><ArrowDownBold /></el-icon>
               </a>
+              <el-tag type="danger">{{
+                term.cRdrTyp === "0" ? "主" : "附加"
+              }}</el-tag>
               <el-tag type="warning">{{ term.cNmeCn }}</el-tag>
             </el-col>
-            <el-col :span="12">
-            </el-col>
+            <el-col :span="12"> </el-col>
             <el-col :span="2">
               <rtButton
-                @click="() => {
-                  emit('delete', null);
-                }"
+                @click="
+                  () => {
+                    emit('delete', null);
+                  }
+                "
                 :item="{
                   label: '删除',
                 }"
@@ -28,7 +32,11 @@
       </template>
 
       <div v-if="showData">
-        <app-free-edit :freeEditConfig="formconfig1" ref="termRef" @updateDatas="update"/>
+        <app-free-edit
+          :freeEditConfig="formconfig1"
+          ref="termRef"
+          @updateDatas="update"
+        />
         <template v-for="(ginfo, gk) in groupInfo" :key="gk">
           <el-row>
             <el-col :span="22">
@@ -64,27 +72,58 @@
                     :key="k"
                   >
                     <template v-if="riskdata.maxNum > 0">
-                      <tr v-for="n in riskdata.maxNum" :key="`${ginfo.cGroupId}-${k}-${n}`">
+                      <tr
+                        v-for="n in riskdata.maxNum"
+                        :key="`${ginfo.cGroupId}-${k}-${n}`"
+                      >
                         <template
                           v-for="colinfo in riskdata.col"
                           :key="`${ginfo.cGroupId}-${k}-${n}-${colinfo.cColId}`"
                         >
-                          <template v-if="riskdata.rowConfig[colinfo.cColId] && riskdata.rowConfig[colinfo.cColId][n - 1]">
+                          <template
+                            v-if="
+                              riskdata.rowConfig[colinfo.cColId] &&
+                              riskdata.rowConfig[colinfo.cColId][n - 1]
+                            "
+                          >
                             <td
                               :rowspan="
-                              riskdata.rowConfig[colinfo.cColId][n - 1]?.cPorpType === 'rowspan'
+                                riskdata.rowConfig[colinfo.cColId][n - 1]
+                                  ?.cPorpType === 'rowspan'
                                   ? riskdata.maxNum
                                   : null
                               "
                             >
-                              <template v-if="riskdata.rowConfig[colinfo.cColId][n - 1].cPorpType === 'text'">
-                                <span>{{ riskdata.rowConfig[colinfo.cColId][n - 1].factorItem.title }} </span>
+                              <template
+                                v-if="
+                                  riskdata.rowConfig[colinfo.cColId][n - 1]
+                                    .cPorpType === 'text'
+                                "
+                              >
+                                <span
+                                  >{{
+                                    riskdata.rowConfig[colinfo.cColId][n - 1]
+                                      .factorItem.title
+                                  }}
+                                </span>
                               </template>
                               <template v-else>
-                                <from-item 
-                                        v-model="riskList[riskdata.rowConfig[colinfo.cColId][n - 1].cRiskNo][riskdata.rowConfig[colinfo.cColId][n - 1].factorItem?.prop]"
-                                        @update:modelValue="update()"
-                                        :item="riskdata.rowConfig[colinfo.cColId][n - 1].factorItem" />
+                                <from-item
+                                  v-model="
+                                    riskList[
+                                      riskdata.rowConfig[colinfo.cColId][n - 1]
+                                        .cRiskNo
+                                    ][
+                                      riskdata.rowConfig[colinfo.cColId][n - 1]
+                                        .factorItem?.prop
+                                    ]
+                                  "
+                                  @update:modelValue="update()"
+                                  :item="
+                                    riskdata.rowConfig[colinfo.cColId][n - 1]
+                                      .factorItem
+                                  "
+                                />
                               </template>
                             </td>
                           </template>
@@ -104,7 +143,10 @@
 
 <script setup lang="ts">
 import { getTRFactorJson } from "@/api/prod";
-import { AppFreeEditMethod, createAppFreeEditConfig } from "@/shared/app-free-edit-config";
+import {
+  AppFreeEditMethod,
+  createAppFreeEditConfig,
+} from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
 import { init } from "echarts";
 
@@ -115,7 +157,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['update:modelValue','delete']);
+const emit = defineEmits(["update:modelValue", "delete"]);
 const termRef = ref<AppFreeEditMethod | null>(null);
 const groupconf = ref<{ [key: string]: any }>({}); // 渲染数据分离,解决因为数据变更,导致触发重新渲染
 
@@ -124,15 +166,15 @@ const riskList = ref<{ [key: string]: any }>({});
 
 initData(props.modelValue);
 
-function update(){
+function update() {
   let newData = termRef.value?.getFromValue();
   const list = JSON.parse(JSON.stringify(riskList.value));
   let ril: any[] = [];
   Object.keys(riskList.value).forEach((k: any) => {
-    ril.push(riskList.value[k])
+    ril.push(riskList.value[k]);
   });
   newData.riskList = ril;
-  emit('update:modelValue', newData);
+  emit("update:modelValue", newData);
 }
 function initData(data: any) {
   const newData = JSON.parse(JSON.stringify(data));
@@ -141,7 +183,7 @@ function initData(data: any) {
   termData.riskList = null;
   termdata.value = termData;
   // 缓存条款责任数据
-  let riskData : { [key: string]: any } = {};
+  let riskData: { [key: string]: any } = {};
   newData.riskList.forEach((v: any) => {
     let cRiskNo = v["TermRisktgt.cLiabCode"];
     riskData[cRiskNo] = {
@@ -157,16 +199,18 @@ function initData(data: any) {
 const groupInfo = ref<{ [key: string]: any }>({});
 const colInfo = ref([]);
 const factormap = ref<{ [key: string]: any }>({});
-const termFactormap =ref([]);
+const termFactormap = ref([]);
 const collist = ref([]);
 const term = ref<{ [key: string]: any }>({});
 
-const formconfig1 = reactive(createAppFreeEditConfig({
-  fromUi:{
-    cols:2,
-    showTitleBar:false,
-  }
-}));
+const formconfig1 = reactive(
+  createAppFreeEditConfig({
+    fromUi: {
+      cols: 2,
+      showTitleBar: false,
+    },
+  })
+);
 
 const showData = ref(true);
 const showRiskInfo = ref(true);
@@ -205,13 +249,13 @@ function getRowConfig(groupId: string, riskNo: string) {
   );
 
   const colMap = all.reduce(
-    (acc, item :{ [key: string]: any }) => {
+    (acc, item: { [key: string]: any }) => {
       const key = item["cColId"];
       if (!acc[key]) {
         acc[key] = [];
       }
       let colconfig = Object.assign({}, item);
-      colconfig['factorItem'] = getProp(item);
+      colconfig["factorItem"] = getProp(item);
       acc[key].push(colconfig);
       return acc;
     },
@@ -266,16 +310,16 @@ function dataInit() {
       } else {
         newKey = key;
       }
-      if(newKey === 'cLiabCode'){
-        p['cRiskNo'] = v;
-      }else{
+      if (newKey === "cLiabCode") {
+        p["cRiskNo"] = v;
+      } else {
         p[newKey] = v;
       }
     });
     queryList.push(p);
   });
   const param = {
-    cTermNo: props.modelValue['Term.cClauseCode'],
+    cTermNo: props.modelValue["Term.cClauseCode"],
     riskList: queryList,
   };
   getTRFactorJson(param).then((res: any) => {
@@ -297,16 +341,18 @@ function dataInit() {
 
 function initshowConfig() {
   let grouplist: { [k: string]: any } = {};
-  Object.keys(groupInfo.value).forEach((g: any) => {
-    const gt = groupInfo.value[g];
-    let ngdata = {
-      cGroupId: gt.cGroupId,
-      cGroupName: gt.cGroupName,
-      cGroupType: gt.cGroupType,
-      riskList: getRisk(gt.cGroupId),
-    };
-    grouplist[g] = ngdata;
-  });
+  if (groupInfo.value) {
+    Object.keys(groupInfo.value).forEach((g: any) => {
+      const gt = groupInfo.value[g];
+      let ngdata = {
+        cGroupId: gt.cGroupId,
+        cGroupName: gt.cGroupName,
+        cGroupType: gt.cGroupType,
+        riskList: getRisk(gt.cGroupId),
+      };
+      grouplist[g] = ngdata;
+    });
+  }
   groupconf.value = grouplist;
 }
 </script>

@@ -6,7 +6,12 @@
           <el-card>
             <template #header >
               <el-row :gutter="16">
-                <el-col :span="4">方案号:{{k}}</el-col>
+                <el-col :span="4">
+                  <a style="margin-right: 5px" @click="changeHidden(k)">
+                    <el-icon v-if="!isHidden(k)"><ArrowUpBold /></el-icon>
+                    <el-icon v-if="isHidden(k)"><ArrowDownBold /></el-icon>
+                  </a>
+                  {{k}}方案</el-col>
                 <el-col :span="16"></el-col>
                 <el-col :span="4">
                   <rt-button :item="{
@@ -29,16 +34,16 @@
                 </el-col>
               </el-row>
             </template>
-            
-            <el-form ref="cvrgFormfef" :model="planData[k]" :inline-message="true">
-              <tremTemplate
-                v-for="(i, index) in planData[k]"
-                :key="index"
-                v-model="planData[k][index]"
-                @delete="deleteData(k,index)"
-              />
-            </el-form>
-            
+            <template v-if="isHidden(k)">
+              <el-form ref="cvrgFormfef" :model="planData[k]" :inline-message="true">
+                <tremTemplate
+                  v-for="(i, index) in planData[k]"
+                  :key="index"
+                  v-model="planData[k][index]"
+                  @delete="deleteData(k,index)"
+                />
+              </el-form>
+            </template>
           </el-card>
         </div>
       </div>
@@ -67,9 +72,8 @@ const cardconfig = ref(creatCardConfig({}));
 
 const cvrgFormfef = ref("cvrgFormfef");
 const formData = ref<any[]>([]);
-
-const PlanNo = ref(1);
 const planData = ref<{ [key: string] : any[] }>({});
+const hiddenFlag = ref<any[]>([]);;
 
 onMounted(async () => {
   const formconfig11 = formInit(
@@ -83,12 +87,29 @@ onMounted(async () => {
 // 绑定方法
 const method = {
   funcadd: () => {
-    const planKey = 'P'+PlanNo.value;
-    PlanNo.value++;
+    let maxindex = 0;
+    const l = Object.keys(planData.value).forEach((k: any) => {
+      const numberPart = parseInt(k.replace(/\D/g, ''), 10);
+      if(numberPart>maxindex){
+        maxindex = numberPart;
+      }
+});
+    const planKey = 'P'+(maxindex+1);
     planData.value[planKey] = [];
   },
 };
 
+function isHidden(pl: any){
+  return hiddenFlag.value.indexOf(pl)==-1;
+}
+function changeHidden(pl: any){
+  const index = hiddenFlag.value.indexOf(pl);
+  if(index==-1){
+    hiddenFlag.value.push(pl);
+  }else{
+    hiddenFlag.value.splice(index,1);
+  }
+}
 // 绑定特殊验证器
 const exRules = {};
 
