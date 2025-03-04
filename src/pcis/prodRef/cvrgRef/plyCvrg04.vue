@@ -151,11 +151,11 @@ function getFromValue() {
         })
     })
     tableobj['items']=redata;
-    console.log(tableobj);
     return tableobj
 }
 
 function setFormValue(value: any) {
+  planData.value = {};
   value.forEach((item: any) => {
     const planKey = item['Term.cPlanNo'];
     let creData = JSON.parse(JSON.stringify(item));

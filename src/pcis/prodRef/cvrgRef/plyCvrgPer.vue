@@ -110,6 +110,7 @@ function getFromValue() {
 }
 
 function setFormValue(value: any) {
+  formData.value = [];
   value.forEach((item: any) => {
     let creData = JSON.parse(JSON.stringify(item));
     creData["riskList"] = creData["Term.riskList"];
