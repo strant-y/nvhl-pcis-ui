@@ -1,7 +1,5 @@
 <template>
-  <el-dialog v-model="dialogVisible" width="90%">
-    <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
-  </el-dialog>
+  <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
 </template>
 
 <script setup lang="ts">
@@ -9,11 +7,17 @@ import { useValidator } from "@/typings/useValidator";
 
 const { getRules } = useValidator();
 import { ref, defineProps } from "vue";
-const emits = defineEmits(["ok", "cancel"]);
+const emits = defineEmits(["handleClose"]);
 
 const props = defineProps({
-  data: Object,
-  type: String,
+  data: {
+    type: Object,
+    default: () => ({}),
+  },
+  method: {
+    type: Object,
+    default: () => ({}),
+  },
 });
 
 const dialogVisible = ref(true);
@@ -122,17 +126,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 );
 
 onMounted(async () => {
+  console.log(props.data);
   setTimeout(() => {
-    freeEditRef.value?.setFormValue(props.data);
+    freeEditRef.value?.setFormValue(props.data.data);
   }, 30);
 });
 
 /** 保存 */
 function save() {
-  emits("ok", { type: "success", data: freeEditRef.value?.getFromValue() });
+  props.method.isOk( { type: "success", data: freeEditRef.value?.getFromValue() });
+  emits("handleClose");
 }
 function deleteBtn() {
-  emits("ok", { type: "delete" });
+  props.method.isOk( { type: "delete" });
+  emits("handleClose");
 }
 </script>
 

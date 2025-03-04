@@ -12,6 +12,8 @@ import termFactorConfig from "./insuranceConInfo/termFactorConfig.vue";
 import querycustomerView from "./prodconfig/querycustomerView.vue";
 import termRiskGroupConfig from "./insuranceConInfo/termRiskGroupConfig.vue";
 
+import buttonEdit from "./commonutils/buttonEdit.vue";
+
 /**用于动态弹窗组件的映射生成 */
 const componentMap = {
     comDialog:ComDialog,
@@ -27,6 +29,8 @@ const componentMap = {
     termRiskGroupConfig:termRiskGroupConfig,
     termFactorConfig:termFactorConfig,
     querycustomerView:querycustomerView,
+
+    buttonEdit:buttonEdit,
 
 };
 
