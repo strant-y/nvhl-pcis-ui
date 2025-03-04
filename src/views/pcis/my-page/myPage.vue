@@ -55,7 +55,7 @@
                       产品：<span class="publicStyle">060001旅游观光景点、娱乐场所人身外伤害保险</span>|出单方式：<span class="publicStyle">核心出单</span>| <span class="publicStyle">非共保业务</span>| <span class="publicStyle">个单</span>
                   </div>
                   <div class="btm" style="background:#EBEDFC">
-                    保险期限：<span class="publicStyle">365</span>|保额：<span class="publicStyle">20000.00</span>元|保费： <span class="publicStyle">63.00</span>元
+                    保险期限：<span class="publicStyle">365</span>|保额：<span class="publicStyle" ref="namtRef">0.00</span>元|保费： <span class="publicStyle" ref="nprmRef">0.00</span>元
                   </div>
               </el-affix>
             </el-header>
@@ -117,6 +117,8 @@ const formconfig1 = opertaor.getTableConfig();
 const bthList = ref<Array<FreeButtonBase>>([]);
 const tempFindBtn= [];
 const user = JSON.parse(sessionStorage.getItem("user"));
+const namtRef = ref(0);
+const nprmRef = ref(0);
 onBeforeMount(() => {
   console.log("路由参数props.param", props.param);
   initPage();
@@ -290,12 +292,35 @@ const calcPremium= () => {
             console.log('保费计算转换的数据',ops)
             ElMessage.success(res.msg);
             opertaor.setDataAll(ops)
+            namtRef.value.textContent = ops['webPlyBase']['Base.nAmt']
+            nprmRef.value.textContent = ops['webPlyBase']['Base.nPrm']
+            const payInfo= setPayInfo(ops['webPlyBase'],ops['webPlyApplicant'])
+            console.log('生成缴费计划内容',payInfo)
+            opertaor.getTableRefs()['webPlyPay'].setFormValue(payInfo)
         }else{
             ElMessage.error(res.msg);
         }
         // ElMessage.success(res.msg);
         // history.back();
     });
+};
+const setPayInfo=(base,applicant)=>{
+    const payList = [];
+    const pay = {};
+    pay['Pay.nTms'] = 1;
+    if(applicant){
+        pay['Pay.cPayorCde'] = applicant['Applicant.cAppCde'];
+        pay['Pay.cPayNme'] = applicant['Applicant.cAppNme'];
+    }else{
+        pay['Pay.cPayorCde'] = '';
+        pay['Pay.cPayNme'] = '';
+    }
+    pay['Pay.nPayablePrm'] = base['Base.nPrm'];
+    pay['Pay.tPayBgnTm'] = base['Base.tAppTm']
+    pay['Pay.tPayEndTm'] = base['Base.tInsrncBgnTm']
+    pay['Pay.nOwnPrm'] =  base['Base.nPrm'];
+    payList.push(pay);
+    return payList;
 };
 /**
  * 投保申请核保
