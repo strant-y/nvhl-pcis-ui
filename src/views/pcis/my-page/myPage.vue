@@ -1,95 +1,98 @@
 <!-- 用户管理 -->
 <template>
-  <el-container>
-    <el-main>
-      <el-container>
-        <el-aside :width="(NavigaShow ? 200 : 100) + 'px'">
-          <el-affix :offset="150">
-            <div class="navi_container">
-              <div
-                v-for="(pageConfig, v) in formconfig1"
-                :key="v"
-                class="NavigaList_card"
-              >
-                <el-anchor :bound="120" :offset="80">
-                  <el-anchor-link
-                    v-for="(k, i) in pageConfig?.pageInfo"
-                    :key="i"
-                    :href="`#${k.pageKey}`"
-                  >
-                    <rt-icon
-                      style="margin-right: 14px"
-                      :item="{
-                        icon:
-                          k.icon && k.icon !== 'null' && k.icon !== ''
-                            ? k.icon
-                            : 'Tickets',
-                      }"
-                    />
-                    <span style="font-size: 15px" v-if="NavigaShow">
-                      {{ k.pageTtile }}
-                    </span>
-                  </el-anchor-link>
-                </el-anchor>
-              </div>
-              <div class="NavigaList_card" style="margin-left: 5px">
-                <rt-icon
-                  @click="NavigaShow = !NavigaShow"
-                  v-if="!NavigaShow"
-                  :item="{ icon: 'DArrowRight' }"
-                />
-                <rt-icon
-                  @click="NavigaShow = !NavigaShow"
-                  v-if="NavigaShow"
-                  :item="{ icon: 'DArrowLeft' }"
-                />
-              </div>
-            </div>
-          </el-affix>
-        </el-aside>
+  <div>
+    <el-container>
+      <el-main>
         <el-container>
-          <el-header  height="60px">
-            <el-affix :offset="90" style="text-align: center;padding:5px;background:#EBEDFC" >
-                <div class="tp" style="background:#EBEDFC">
-                    产品：<span class="publicStyle">060001旅游观光景点、娱乐场所人身外伤害保险</span>|出单方式：<span class="publicStyle">核心出单</span>| <span class="publicStyle">非共保业务</span>| <span class="publicStyle">个单</span>
+          <el-aside :width="(NavigaShow ? 200 : 100) + 'px'">
+            <el-affix :offset="150">
+              <div class="navi_container">
+                <div
+                  v-for="(pageConfig, v) in formconfig1"
+                  :key="v"
+                  class="NavigaList_card"
+                >
+                  <el-anchor :bound="120" :offset="80">
+                    <el-anchor-link
+                      v-for="(k, i) in pageConfig?.pageInfo"
+                      :key="i"
+                      :href="`#${k.pageKey}`"
+                    >
+                      <rt-icon
+                        style="margin-right: 14px"
+                        :item="{
+                          icon:
+                            k.icon && k.icon !== 'null' && k.icon !== ''
+                              ? k.icon
+                              : 'Tickets',
+                        }"
+                      />
+                      <span style="font-size: 15px" v-if="NavigaShow">
+                        {{ k.pageTtile }}
+                      </span>
+                    </el-anchor-link>
+                  </el-anchor>
                 </div>
-                <div class="btm" style="background:#EBEDFC">
-                  保险期限：<span class="publicStyle">365</span>|保额：<span class="publicStyle">20000.00</span>元|保费： <span class="publicStyle">63.00</span>元
+                <div class="NavigaList_card" style="margin-left: 5px">
+                  <rt-icon
+                    @click="NavigaShow = !NavigaShow"
+                    v-if="!NavigaShow"
+                    :item="{ icon: 'DArrowRight' }"
+                  />
+                  <rt-icon
+                    @click="NavigaShow = !NavigaShow"
+                    v-if="NavigaShow"
+                    :item="{ icon: 'DArrowLeft' }"
+                  />
                 </div>
-            </el-affix>
-          </el-header>
-          <el-main>
-            <template v-for="(pageConfig, v) in formconfig1" :key="v">
-              <div
-                class="card_"
-                v-for="(k, i) in pageConfig?.pageInfo"
-                :key="i"
-                :id="k.pageKey"
-              >
-                <component
-                  v-if="currentIndex >= i"
-                  :ref="
-                    (res) => {
-                      opertaor.addTableRef(k.pageCode, res);
-                    }
-                  "
-                  :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
-                  :pageSchema="k.pageSchema"
-                />
               </div>
-            </template>
-          </el-main>
+            </el-affix>
+          </el-aside>
+          <el-container>
+            <el-header  height="60px">
+              <el-affix :offset="90" style="text-align: center;padding:5px;background:#EBEDFC" >
+                  <div class="tp" style="background:#EBEDFC">
+                      产品：<span class="publicStyle">060001旅游观光景点、娱乐场所人身外伤害保险</span>|出单方式：<span class="publicStyle">核心出单</span>| <span class="publicStyle">非共保业务</span>| <span class="publicStyle">个单</span>
+                  </div>
+                  <div class="btm" style="background:#EBEDFC">
+                    保险期限：<span class="publicStyle">365</span>|保额：<span class="publicStyle">20000.00</span>元|保费： <span class="publicStyle">63.00</span>元
+                  </div>
+              </el-affix>
+            </el-header>
+            <el-main>
+              <template v-for="(pageConfig, v) in formconfig1" :key="v">
+                <div
+                  class="card_"
+                  v-for="(k, i) in pageConfig?.pageInfo"
+                  :key="i"
+                  :id="k.pageKey"
+                >
+                  <component
+                    v-if="currentIndex >= i"
+                    :ref="
+                      (res) => {
+                        opertaor.addTableRef(k.pageCode, res);
+                      }
+                    "
+                    :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
+                    :pageSchema="k.pageSchema"
+                  />
+                </div>
+              </template>
+            </el-main>
+          </el-container>
         </el-container>
-      </el-container>
-    </el-main>
-    <el-footer>
-      <el-affix position="bottom" :offset="10">
-        <div class="bottom-items">
-          <rt-button v-for="(bth, idx) in bthList" :item="bth" :key="idx" :loading="bth.loading"/>
-        </div>
-      </el-affix>
-    </el-footer>
-  </el-container>
+      </el-main>
+      <el-footer>
+        <el-affix position="bottom" :offset="10">
+          <div class="bottom-items">
+            <rt-button v-for="(bth, idx) in bthList" :item="bth" :key="idx" :loading="bth.loading"/>
+          </div>
+        </el-affix>
+      </el-footer>
+    </el-container>
+    <el-backtop :right="100" :bottom="100" />
+  </div>
 </template>
 
 <script setup lang="ts">

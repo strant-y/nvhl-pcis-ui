@@ -1,47 +1,50 @@
 <!-- 用户管理 -->
 <template>
-  <el-container>
-    <el-main>
-      <el-container>
-        <el-aside width="150px">
-          <template v-for="(pageConfig, v) in formconfig1" :key="v">
-            <el-affix :offset="150">
-              <el-anchor :bound="120" :offset="80">
-                <el-anchor-link
-                  v-for="(k, i) in pageConfig?.pageInfo"
-                  :key="i"
-                  :href="`#${k.pageKey}`"
-                >
-                  {{ k.pageTtile }}
-                </el-anchor-link>
-              </el-anchor>
-            </el-affix>
-          </template>
-        </el-aside>
+  <div>
+    <el-container>
+      <el-main>
         <el-container>
-          <el-main>
+          <el-aside width="150px">
             <template v-for="(pageConfig, v) in formconfig1" :key="v">
-              <div
-                v-for="(k, i, index) in pageConfig?.pageInfo"
-                :key="i"
-                :id="k.pageKey"
-              >
-                <component
-                  v-if="currentIndex >= index"
-                  :ref="
-                    (res) => {
-                      opertaor.addTableRef(k.pageKey, res);
-                    }
-                  "
-                  :is="k.pageRef + '-ref'"
-                />
-              </div>
+              <el-affix :offset="150">
+                <el-anchor :bound="120" :offset="80">
+                  <el-anchor-link
+                    v-for="(k, i) in pageConfig?.pageInfo"
+                    :key="i"
+                    :href="`#${k.pageKey}`"
+                  >
+                    {{ k.pageTtile }}
+                  </el-anchor-link>
+                </el-anchor>
+              </el-affix>
             </template>
-          </el-main>
+          </el-aside>
+          <el-container>
+            <el-main>
+              <template v-for="(pageConfig, v) in formconfig1" :key="v">
+                <div
+                  v-for="(k, i, index) in pageConfig?.pageInfo"
+                  :key="i"
+                  :id="k.pageKey"
+                >
+                  <component
+                    v-if="currentIndex >= index"
+                    :ref="
+                      (res) => {
+                        opertaor.addTableRef(k.pageKey, res);
+                      }
+                    "
+                    :is="k.pageRef + '-ref'"
+                  />
+                </div>
+              </template>
+            </el-main>
+          </el-container>
         </el-container>
-      </el-container>
-    </el-main>
-  </el-container>
+      </el-main>
+    </el-container>
+    <el-backtop :right="100" :bottom="100" />
+  </div>
 </template>
 
 <script setup lang="ts">
