@@ -325,7 +325,7 @@ onMounted(async () => {
         freeEditRef.value?.setFormValue(param);
 
         // 初始化显示按钮内容
-        const btns = data.data.btns;
+        const btns = data.btns;
         const titlebtn = btns["title"];
         const endbtn = btns["end"];
         if (titlebtn && titlebtn.length > 0) {
@@ -358,7 +358,7 @@ onMounted(async () => {
           }
           endBtns.value = ends;
         }
-        if (data.data.cComponentType !== "custom") {
+        if (data.cComponentType !== "custom") {
           showFactorList.value = true;
           querySelector(param);
         }
