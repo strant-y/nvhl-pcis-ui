@@ -42,11 +42,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     title: "条款基本信息",
     endBtnsPosition: "right",
     endBtns: [
-      // createFreeButtonBase({
-      //   label: "上传",
-      //   type: "primary",
-      //   func: () => {},
-      // }),
       createFreeButtonBase({
         type: "success",
         label: "条款要素绑定",
@@ -73,7 +68,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         label: "条责分组关联",
         func: async () => {
           const cTermNo = freeEditRef.value?.getValue("cTermNo");
-
           dialog.value?.open(
             "termRiskGroupConfig",
             {
@@ -89,6 +83,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           );
         },
       }),
+      // createFreeButtonBase({
+      //   label: "上传条款文件",
+      //   type: "primary",
+      //   func: async () => {
+      //     handleUpload();
+      //   },
+      // }),
       createFreeButtonBase({
         type: "primary",
         label: "保存",
@@ -286,6 +287,40 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     }),
   })
 );
+// 上传文件处理函数
+const handleUpload = async () => {
+  try {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = ".pdf,.docx";
+    fileInput.onchange = async (event: any) => {
+      const file = event.target.files[0];
+      if (file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const response = await uploadFile(formData);
+        if (response.code === 200) {
+          ElMessage.success("文件上传成功");
+        } else {
+          ElMessage.error(response.msg || "文件上传失败");
+        }
+      }
+    };
+    fileInput.click();
+  } catch (error) {
+    ElMessage.error("文件上传失败");
+  }
+};
+
+//上传文件的 API
+const uploadFile = (formData: FormData) => {
+  // 调用后端 API 进行文件上传
+  // return axios.post('/api/upload', formData, {
+  //   headers: {
+  //     'Content-Type': 'multipart/form-data',
+  //   },
+  // });
+};
 // 监听主条款/附加条款字段的变化
 watch(
   () => freeEditRef.value?.getValue("cRdrTyp"),

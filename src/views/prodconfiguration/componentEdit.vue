@@ -129,7 +129,7 @@ function editBtn(btn: any, index: any, sw: any) {
         }
       },
     },
-    { title:"按钮配置" }
+    { title: "按钮配置" }
   );
 }
 const formconfig1 = reactive<AppFreeEditConfig>(
@@ -237,6 +237,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           },
         }),
       },
+      {
+        prop: "cComponentTable",
+        inputtype: "rtinput",
+        title: "所属table",
+      },
     ],
     superFromShow: "要素详情",
     superFromClose: "要素详情",
@@ -307,14 +312,15 @@ onMounted(async () => {
       const { code, data, msg } = res;
       if (200 === code) {
         const param = {
-          componentKey: data.data.cComponentKey,
-          componentName: data.data.cComponentName,
-          componentTab: data.data.cComponentTab,
-          componentType: data.data.cComponentType,
-          componentCol: data.data.cComponentCol,
-          componentGroup: data.data.cComponentGroup,
-          componentMyFromBtm: data.data.cComponentMyFromBtm,
-          componentPosition: data.data.cComponentPosition,
+          componentKey: data.cComponentKey,
+          componentName: data.cComponentName,
+          componentTab: data.cComponentTab,
+          componentType: data.cComponentType,
+          componentCol: data.cComponentCol,
+          componentGroup: data.cComponentGroup,
+          componentMyFromBtm: data.cComponentMyFromBtm,
+          componentPosition: data.cComponentPosition,
+          componentTable: data.cComponentTable,
         };
         freeEditRef.value?.setFormValue(param);
 
@@ -436,7 +442,7 @@ function showView(cComponentKey: any) {
     if (200 === code) {
       dialog.value?.open(
         "componentView",
-        { type: "show", data: data?.data, conKey: cComponentKey },
+        { type: "show", data: data, conKey: cComponentKey },
         null,
         { title: "组件预览" }
       );
@@ -448,12 +454,12 @@ function querySelector(param: any) {
   querySelectorList(param).then((res) => {
     const { code, data, msg } = res;
     if (200 === code) {
-      Object.keys(data.data).forEach((i) => {
-        if (data.data[i].factorPkId) {
-          data.data[i].isChecked = "1";
+      Object.keys(data).forEach((i) => {
+        if (data[i].factorPkId) {
+          data[i].isChecked = "1";
         }
       });
-      tableRef.value?.setFormValue(data.data);
+      tableRef.value?.setFormValue(data);
     } else {
       ElMessage.error(msg);
     }

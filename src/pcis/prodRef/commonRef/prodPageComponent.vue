@@ -27,6 +27,8 @@ const emits = defineEmits(["ok", "cancel"]);
 const props = defineProps({
   data: Object,
 });
+let dataList = ref<any[]>([]);
+let componentTable = ref();
 interface MyTableMethod {
   addRow: (arg: any) => any;
   getSelectRow: () => any;
@@ -102,6 +104,11 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cComponentKey",
         inputtype: "rtselect",
         title: "绑定组件",
+        func: (v) => {
+          componentTable = dataList?.find(
+            (item) => v === item.cComponentKey
+          ).cComponentTable;
+        },
       },
       {
         prop: "cComponentName",
@@ -122,8 +129,12 @@ const saveBtn = createFreeButtonBase({
   type: "primary",
   label: "保存",
   func: () => {
+    const param = tableRef.value?.getFromValue().map((item) => {
+      item.cComponentTable = componentTable;
+      return item;
+    });
     const params = Object.assign(props.data, {
-      pageComponents: tableRef.value?.getFromValue(),
+      pageComponents: param,
     });
     savePageComonent(params)
       .then((res) => {
@@ -143,14 +154,13 @@ function updateOption(params: any, dataId: string, props: string) {
       const { code, data, msg } = res;
       if (200 === code) {
         let newOption: any[] = [];
-        if (data.data) {
-          Object.keys(data.data).forEach((item) => {
+        if (data) {
+          dataList = data;
+          console.log(dataList, "dataList");
+          Object.keys(data).forEach((item) => {
             newOption.push({
-              label:
-                data.data[item].cComponentKey +
-                " " +
-                data.data[item].cComponentName,
-              value: data.data[item].cComponentKey,
+              label: data[item].cComponentKey + " " + data[item].cComponentName,
+              value: data[item].cComponentKey,
             });
           });
           tableRef.value?.updateOption(dataId, props, newOption);
@@ -167,7 +177,7 @@ onMounted(() => {
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
-        tableRef.value?.setFormValue(data.data);
+        tableRef.value?.setFormValue(data);
         setTimeout(() => {
           const tabData = tableRef.value?.getFromValue();
           Object.keys(tabData).forEach((key) => {

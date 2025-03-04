@@ -271,7 +271,6 @@ onMounted(() => {
     setTimeout(() => {
       handleQuery();
     }, 300);
-    // setDisa();
   }
 });
 

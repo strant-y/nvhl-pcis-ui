@@ -13,7 +13,6 @@
           ref="rttableFrom"
           @selection-change="handleSelectionChange"
           @status-change="handleStatusChange"
-          :default-selected-rows="tableConfig.defaultSelectedRows"
         />
         <el-pagination
           v-model:current-page="queryParams.pageNum"
