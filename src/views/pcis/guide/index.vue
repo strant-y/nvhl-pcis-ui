@@ -121,6 +121,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         //     value: "040002",
         //   },
         // ],
+        filterable:true,
         typeCode: "PROD_LIST_IN_GUIDE",
         codeParam: {
           cParCde: cPard.value,
