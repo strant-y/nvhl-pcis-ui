@@ -14,6 +14,7 @@ import acctinfoRef from "./acctinfoRef/acctinfo.vue";
 import tgtRef from "./tgtRef/tgt.vue";
 import cvrgRef from "./cvrgRef/cvrg.vue";
 import plyCvrg04Ref from "./cvrgRef/plyCvrg04.vue";
+import plyCvrgPer from "./cvrgRef/plyCvrgPer.vue";
 import plybaseRef from "./plyBaseRef/plybase.vue";
 import baseafterRef from "./baseafterRef/baseafter.vue";
 import informationRef from "./informationRef/information.vue";
@@ -57,6 +58,7 @@ const componentMap = {
   tgtRef: tgtRef,
   cvrgRef: cvrgRef,
   webPlyCvrg04: plyCvrg04Ref,
+  webPlyCvrgPer:plyCvrgPer,
   plyBaseRef: plybaseRef,
   insuredRef: insuredRef,
   tgtobjRef: tgtobjRef,
