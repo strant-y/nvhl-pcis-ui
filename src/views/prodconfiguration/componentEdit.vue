@@ -107,10 +107,8 @@ const dzmodal = useDzModal();
 const jsonArrayEdit = defineAsyncComponent(
   () => import("@/common/dzmodel/jsonArrayEdit.vue")
 );
-const buttonEdit = defineAsyncComponent(() => import("./buttonEdit.vue"));
 
 function editBtn(btn: any, index: any, sw: any) {
-  console.log(btn, "=====");
   dialog.value?.open(
     "buttonEdit",
     { data: btn },
@@ -133,27 +131,6 @@ function editBtn(btn: any, index: any, sw: any) {
     },
     { title:"按钮配置" }
   );
-  // dzmodal
-  //   .open(buttonEdit, {
-  //     data: btn,
-  //   })
-  //   .then((res) => {
-  //     if (res.type === "ok") {
-  //       if (sw === "title") {
-  //         if (res.body.type === "success") {
-  //           titleBtns.value[index] = res.body.data;
-  //         } else {
-  //           titleBtns.value.splice(index, 1);
-  //         }
-  //       } else {
-  //         if (res.body.type === "success") {
-  //           endBtns.value[index] = res.body.data;
-  //         } else {
-  //           endBtns.value.splice(index, 1);
-  //         }
-  //       }
-  //     }
-  //   });
 }
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
