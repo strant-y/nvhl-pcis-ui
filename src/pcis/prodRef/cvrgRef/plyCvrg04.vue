@@ -112,7 +112,7 @@ function addTermData(PlanNo: string){
               });
             });
             let data = {
-              'Term.cClauseNumber':item.cTermNo,
+              'Term.cClauseCode':item.cTermNo,
               riskList:riskList,
             };
             planData.value[PlanNo].push(data);

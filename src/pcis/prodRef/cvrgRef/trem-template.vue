@@ -275,7 +275,7 @@ function dataInit() {
     queryList.push(p);
   });
   const param = {
-    cTermNo: props.modelValue['Term.cClauseNumber'],
+    cTermNo: props.modelValue['Term.cClauseCode'],
     riskList: queryList,
   };
   getTRFactorJson(param).then((res: any) => {
