@@ -202,7 +202,7 @@ function handleQuery(flag?: boolean) {
       const { code, data, msg } = res;
       if (200 === code) {
         pageresult.list = data;
-        pageresult.total = data.total;
+        pageresult.total = res.total;
       } else {
         ElMessage.error(msg);
       }
