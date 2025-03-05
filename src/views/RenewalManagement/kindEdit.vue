@@ -57,7 +57,7 @@ const departmentTree = defineAsyncComponent(
   () => import("@/components/common/DepartmentTree.vue")
 );
 const jsonArrayEdit = defineAsyncComponent(
-  () => import("@/views/dzmodel/jsonArrayEdit.vue")
+  () => import("@/common/dzmodel/jsonArrayEdit.vue")
 );
 
 const showBtnConfig = ref(false);
