@@ -244,8 +244,26 @@ function selectAdditionTerm() {
 }
 
 async function selectOne() {
-  props.method.isOk(data3.value);
-  emits("handleClose");
+  const isselectData = props.data.data.isselectData;
+  let Key: any[] = [];
+  let isuse: any[] = [];
+  if(isselectData){
+    isselectData.forEach((item: any) => {
+      Key.push(item['Term.cClauseCode']);
+    });
+    data3.value.forEach((item: any) => {
+      if(Key.includes(item.cTermNo)){
+        isuse.push(item.label);
+      }
+    });
+  }
+  if(isuse && isuse.length > 0){
+    let showMsg = `${isuse.join(",")}条款已存在，请重新选择!`;
+    ElMessage.warning(showMsg);
+  }else{
+    props.method.isOk(data3.value);
+    emits("handleClose");
+  }
 }
 
 function fail() {
