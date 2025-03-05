@@ -111,7 +111,9 @@ const props = defineProps({
     type: Object,
   },
 });
+
 opertaor.setParam(props.param);
+
 // 当前加载的组件索引
 const currentIndex = ref(0);
 const NavigaShow = ref(true);
@@ -126,6 +128,7 @@ onBeforeMount(() => {
   console.log("路由参数props.param", props.param);
   initPage();
 });
+
 /**
  * 数据初始化
  * @param data
@@ -397,6 +400,13 @@ function lowercaseKeys<T extends object>(
   }
   return newObj;
 }
+
+
+opertaor.setFatherPage({
+  currentIndex:currentIndex,
+  lowercaseKeys:lowercaseKeys
+})
+
 </script>
 
 <style scoped>

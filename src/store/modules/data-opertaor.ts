@@ -8,7 +8,15 @@ export const dataOpertaor = defineStore(
     const tableConfig = reactive<Array<any>>([]);
     const tableRefs = reactive<Record<string, any>>({});
     const param = reactive<any>({});
+    const fatherPage = reactive<any>({});
 
+    const setFatherPage = (page: any) => {
+      Object.assign(fatherPage, page);
+    };
+
+    const getFatherPage = () => {
+      return fatherPage;
+    };
     const setParam = (params: any) => {
       Object.assign(param, params);
     };
@@ -148,7 +156,9 @@ export const dataOpertaor = defineStore(
       getDataAll,
       setParam,
       getParam,
-      convertData
+      convertData,
+      setFatherPage,
+      getFatherPage
     };
   },
   {
