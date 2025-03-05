@@ -167,7 +167,7 @@ export const dataOpertaor = defineStore(
       strategies: [
         {
           storage: localStorage,
-          paths: ["tableConfig", "tableRefs", "param", fatherPage],
+          paths: ["tableConfig", "tableRefs", "param", "fatherPage"],
         },
       ],
     },
