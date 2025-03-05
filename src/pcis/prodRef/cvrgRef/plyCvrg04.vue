@@ -12,7 +12,9 @@
                     <el-icon v-if="isHidden(k)"><ArrowDownBold /></el-icon>
                   </a>
                   {{k}}方案</el-col>
-                <el-col :span="16"></el-col>
+                <el-col :span="16">
+                  {{ showTitleMap[k]?showTitleMap[k]:"" }}
+                </el-col>
                 <el-col :span="4">
                   <rt-button :item="{
                     label:'添加条款',
@@ -59,6 +61,8 @@ const dialog = ref<DialogMethod | null>(null);
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
+import { prodTemple } from "./titleTemple";
+
 const opertaor = dataOpertaor();
 
 const props = defineProps({
@@ -73,7 +77,23 @@ const cardconfig = ref(creatCardConfig({}));
 const cvrgFormfef = ref("cvrgFormfef");
 const formData = ref<any[]>([]);
 const planData = ref<{ [key: string] : any[] }>({});
-const hiddenFlag = ref<any[]>([]);;
+const hiddenFlag = ref<any[]>([]);
+
+const showTitleMap = ref<{ [key: string] : string }>({});
+
+function updateTitle(){
+  Object.keys(planData.value).forEach((k: any) => {
+  const str = prodTemple.value.default;
+  const filledString = fillTemplate(str, { sumPrm:0 ,sumObjs:0 });
+  showTitleMap.value[k] = filledString;
+  })
+}
+
+function fillTemplate(template: string, params: { [key: string]: any }): string {
+  return template.replace(/{(\w+)}/g, (match, key) => {
+    return params[key] !== undefined ? params[key] : match;
+  });
+}
 
 onMounted(async () => {
   const formconfig11 = formInit(
@@ -82,6 +102,9 @@ onMounted(async () => {
     exRules
   );
   Object.assign(cardconfig.value, formconfig11);
+  nextTick(() => {
+    updateTitle();
+  });
 });
 
 // 绑定方法
@@ -96,6 +119,7 @@ const method = {
 });
     const planKey = 'P'+(maxindex+1);
     planData.value[planKey] = [];
+    updateTitle();
   },
 };
 
@@ -198,6 +222,7 @@ function setFormValue(value: any) {
       planData.value[planKey]=newrisk;
     }
   });
+  updateTitle();
 }
 
 function validate() {}
@@ -208,7 +233,7 @@ defineExpose({
   getFromValue,
   setFormValue,
   validate,
-  getTableValue,
+  getTableValue
 });
 </script>
 
