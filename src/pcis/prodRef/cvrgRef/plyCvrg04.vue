@@ -121,6 +121,7 @@ function addTermData(PlanNo: string){
         type: "show",
         data: {
           cProdNo: param.cProdNo,
+          isselectData:planData.value[PlanNo]
         },
       },
       {

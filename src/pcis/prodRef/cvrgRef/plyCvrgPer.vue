@@ -64,6 +64,7 @@ function addTermData() {
       type: "show",
       data: {
         cProdNo: param.cProdNo,
+        isselectData:formData.value
       },
     },
     {
