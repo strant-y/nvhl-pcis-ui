@@ -206,7 +206,8 @@ function selectComponent(item: any) {
             }
           });
         }
-        tableRef.value?.setFormValue(data.data);
+        console.log(data);
+        tableRef.value?.setFormValue(data);
       } else {
         ElMessage.error(msg);
       }
