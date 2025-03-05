@@ -29,6 +29,10 @@ onMounted(async () => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
+  nextTick(() => {
+      // DOM 更新后执行
+      initializationBase()
+  });
 });
 
 // 绑定方法
@@ -41,6 +45,13 @@ const method = {
 
 // 绑定特殊验证器
 const exRules = {};
+function initializationBase(){
+    const baseafterobj={}
+    baseafterobj['Base.cRatioTyp']='3'
+    baseafterobj['Base.cInstMrk']='0'
+    baseafterobj['Base.cDisptSttlCde']='D'
+    setFormValue(baseafterobj)
+}
 
 function getFromValue() {
   return baseEditRef?.value?.getFromValue();

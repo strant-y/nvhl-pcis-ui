@@ -29,6 +29,10 @@ onMounted(async () => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
+  nextTick(() => {
+      // DOM 更新后执行
+      initializationPlyBase()
+  });
 });
 
 // 绑定方法
@@ -41,6 +45,11 @@ const method = {
 
 // 绑定特殊验证器
 const exRules = {};
+function initializationPlyBase(){
+    const baseobj={}
+    baseobj['Base.cRenewMrk']='0'
+    setFormValue(baseobj)
+}
 
 function getFromValue() {
   return plyBaseEditRef?.value?.getFromValue();
