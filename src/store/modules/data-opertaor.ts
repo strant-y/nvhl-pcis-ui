@@ -90,7 +90,10 @@ export const dataOpertaor = defineStore(
                           if (!!tab && 'free' === tab) {
                               res[voNme] = dtoListToListObj(srcTab, dataObj[d]);
                               return res;
-                          }else  if (!!tab && 'grid' === tab){
+                          }else if (!!tab && 'grid' === tab && 'Base' == srcTab) {
+                              res[voNme] = dtoListToListObj(srcTab, dataObj[d]);
+                              return res;
+                          }else  if (!!tab && 'grid' === tab && 'Base' !== srcTab){
                               gridArr.push(dtoListToListObj(srcTab, dataObj[d]))
                               res[voNme]=gridArr
                               // TODO vo名称对不上的,在此处加单独的逻辑

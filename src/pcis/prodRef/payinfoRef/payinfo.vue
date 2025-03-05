@@ -34,6 +34,9 @@ onMounted(() => {
 const method = {
   // func demo
   func1: () => {},
+  funcpayadd: () => {
+      payinfoEditRef?.value?.addRow();
+  },
 };
 
 // 绑定特殊验证器

@@ -55,7 +55,7 @@
                       产品：<span class="publicStyle">060001旅游观光景点、娱乐场所人身外伤害保险</span>|出单方式：<span class="publicStyle">核心出单</span>| <span class="publicStyle">非共保业务</span>| <span class="publicStyle">个单</span>
                   </div>
                   <div class="btm" style="background:#EBEDFC">
-                    保险期限：<span class="publicStyle">365</span>|保额：<span class="publicStyle" ref="namtRef">0.00</span>元|保费： <span class="publicStyle" ref="nprmRef">0.00</span>元
+                    保险期限：<span class="publicStyle">{{tmDayvalue}}</span>|保额：<span class="publicStyle" >{{nAmt}}</span>元|保费： <span class="publicStyle">{{nPrm}}</span>元
                   </div>
               </el-affix>
             </el-header>
@@ -76,6 +76,8 @@
                     "
                     :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
                     :pageSchema="k.pageSchema"
+                    :tmDay="tmDayvalue"
+                    @update:tmDay="tmDayvalue = $event"
                   />
                 </div>
               </template>
@@ -117,8 +119,9 @@ const formconfig1 = opertaor.getTableConfig();
 const bthList = ref<Array<FreeButtonBase>>([]);
 const tempFindBtn= [];
 const user = JSON.parse(sessionStorage.getItem("user"));
-const namtRef = ref(0);
-const nprmRef = ref(0);
+const nAmt = ref(0.00);
+const nPrm = ref(0.00);
+const tmDayvalue= ref(0);
 onBeforeMount(() => {
   console.log("路由参数props.param", props.param);
   initPage();
@@ -284,16 +287,23 @@ const calcPremium= () => {
     res['webPlyBaseBasic']['Base.cDptCde']='0200000000000'
     res['webPlyBaseBasic']['Base.cProdNo']='042001'
     console.log(res)
+    if(res['webPlyBaseBasic']['Base.cProdNo']=='042001'){
+        if(res['webPlyCvrg04'].items.length==0){
+            ElMessage.error('请录入条款信息');
+            btn.loading=false;
+            return;
+        }
+    }
     appCalc(res).then((res) => {
         btn.loading=false;
         console.log("appCalc-res", res);
         if(res['code']=='200'){
             const ops = opertaor.convertData(res)
             console.log('保费计算转换的数据',ops)
-            ElMessage.success(res.msg);
+            ElMessage.success(res.msg+ '保费为：' + ops['webPlyBase']['Base.nPrm']);
             opertaor.setDataAll(ops)
-            namtRef.value.textContent = ops['webPlyBase']['Base.nAmt']
-            nprmRef.value.textContent = ops['webPlyBase']['Base.nPrm']
+            nAmt.value=ops['webPlyBase']['Base.nAmt']
+            nPrm.value= ops['webPlyBase']['Base.nPrm']
             const payInfo= setPayInfo(ops['webPlyBase'],ops['webPlyApplicant'])
             console.log('生成缴费计划内容',payInfo)
             opertaor.getTableRefs()['webPlyPay'].setFormValue(payInfo)
@@ -347,6 +357,13 @@ const savePlyInfo = () => {
     res['webPlyBaseBasic']['Base.cDptCde']='0251010013000'
     res['webPlyBaseBasic']['Base.cProdNo']='042001'
     console.log(res)
+    if(res['webPlyBaseBasic']['Base.cProdNo']=='042001'){
+        if(res['webPlyCvrg04'].items.length==0){
+            ElMessage.error('请录入条款信息');
+            btn.loading=false;
+            return;
+        }
+    }
     saveAppPlyInfo(res).then((res) => {
         console.log("saveAppPlyInfo-res", res);
         btn.loading=false
