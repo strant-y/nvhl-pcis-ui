@@ -43,7 +43,7 @@
         </el-container>
       </el-main>
     </el-container>
-    <el-backtop :right="100" :bottom="100" />
+    <el-backtop :right="100" :bottom="100" style="background-color: #dcf9fd" />
   </div>
 </template>
 
