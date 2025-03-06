@@ -176,7 +176,9 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
+import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { init } from "echarts";
+const opertaor = dataOpertaor();
 
 const props = defineProps({
   modelValue: {
@@ -191,6 +193,8 @@ const groupconf = ref<{ [key: string]: any }>({}); // 渲染数据分离,解决�
 
 const termdata = ref({});
 const riskList = ref<{ [key: string]: any }>({});
+
+const pageInit = ref(false);
 
 watch(
   () => props.modelValue,
@@ -343,6 +347,7 @@ onMounted(async () => {
 
 function dataInit() {
   let queryList: { [k: string]: any }[] = [];
+  let queryKey = props.modelValue["Term.cClauseCode"];
   props.modelValue.riskList.forEach((item: any) => {
     let p: { [k: string]: any } = {};
     Object.keys(item).forEach((key) => {
@@ -358,6 +363,7 @@ function dataInit() {
       } else {
         p[newKey] = v;
       }
+      queryKey += v;
     });
     queryList.push(p);
   });
@@ -375,7 +381,9 @@ function dataInit() {
       term.value = data.data.term;
       termFactormap.value = data.data.termFactormap;
       formconfig1.fromSchema = data.data.termFactormap;
-      termTitleConf.value = JSON.parse(data.data.termTitleConf.CCnm);
+      if(data.data.termTitleConf?.CCnm){
+        termTitleConf.value = JSON.parse(data.data.termTitleConf.CCnm);
+      }
     } else {
       ElMessage.error(msg);
     }
