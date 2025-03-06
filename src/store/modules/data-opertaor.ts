@@ -77,17 +77,17 @@ export const dataOpertaor = defineStore(
           if (!!result['res']['composition'] && !!tableConfig[0]) {
               const pageInfo=tableConfig[0]['pageInfo']
               pageInfo.forEach((k) => {
-                  const voNme =k['pageCode']
+                  const voNme =k['pageKey']
                   let srcTab = voNme;
-                  if(voNme=='webPlyBaseBasic' || voNme=='webPlyBase1' || voNme=='webPlyBase'){
+                  if(voNme=='plyBase' || voNme=='insrnc' || voNme=='base'){
                       srcTab='Base'
-                  }else if(voNme =='webPlyApplicant'){
+                  }else if(voNme =='applicant'){
                       srcTab='Applicant'
-                  }else if(voNme =='webPlyInsured'){
+                  }else if(voNme =='insured'){
                       srcTab='Insured'
-                  }else if(voNme =='plyTgt042001'){
+                  }else if(voNme =='tgt'){
                       srcTab='EngineeringTgt'
-                  }else if(voNme =='webPlyCvrg04'){
+                  }else if(voNme =='cvrg'){
                       srcTab='Term'
                   }
                   if (!!result['res']['composition'][srcTab] && result['res']['composition'][srcTab] instanceof Array && result['res']['composition'][srcTab].length > 0) { // 数组 并且很多行
