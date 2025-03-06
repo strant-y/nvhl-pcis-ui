@@ -89,6 +89,10 @@ export const dataOpertaor = defineStore(
                       srcTab='EngineeringTgt'
                   }else if(voNme =='cvrg'){
                       srcTab='Term'
+                  }else if(voNme =='payinfo'){
+                      srcTab='Pay'
+                  }else if(voNme =='dist'){
+                      srcTab='DesignDist'
                   }
                   if (!!result['res']['composition'][srcTab] && result['res']['composition'][srcTab] instanceof Array && result['res']['composition'][srcTab].length > 0) { // 数组 并且很多行
                       const tab = k['pageType']; // 根据key获取tab 然后判断是否是GridEdit或FreeEdit
@@ -158,7 +162,7 @@ export const dataOpertaor = defineStore(
       getParam,
       convertData,
       setFatherPage,
-      getFatherPage
+      getFatherPage,
     };
   },
   {

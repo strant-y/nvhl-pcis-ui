@@ -68,12 +68,15 @@ import {
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import { deleteFactorBykey, getBasicKindList } from "@/api/prod";
+import { getAppPolicyList,qryEndorseList} from "@/api/query";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 import { now } from "lodash";
+import { useRoute } from "vue-router";
 const userStore = useUserStore();
 const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
-
+const route = useRoute();
+const router = useRouter();
 const activeName = ref("1");
 const homeJumpData = ref({}); //接收首页的参数，用于查询条件回显
 
@@ -317,7 +320,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable: true,
       },
       {
-        prop: "appCde",
+        prop: "cAppNo",
         inputtype: "rtinput",
         title: "投保单号",
         clearable: true,
@@ -348,6 +351,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "tm1",
         inputtype: "rtdatepicker",
         title: "签单日期",
+        format: "YYYY-MM-DD HH:mm:ss",
         clearable: true,
         type: "daterange",
       },
@@ -570,125 +574,152 @@ const tableObj = {
         type: "success",
         size: "large",
         icon: "Edit",
-        tableClick: (row) => {
-          console.log(row);
-          dzmodal.open(kindEdit, { type: "edit", data: row }).then((res) => {
-            if (res.type === "ok") {
-              handleQuery();
+        tableClick:  async (row) => {
+            console.log(row)
+            const r = await row;
+            if (r) {
+                const data = row;
+                router.push({
+                    path: "/pcis/my-page",
+                    query: {
+                        param: JSON.stringify({ ...data, ...{ pageType: "edit" } }),
+                    },
+                });
+            } else {
+                ElMessage.warning("请检查表单！");
             }
-          });
         },
       }),
-      createFreeButtonBase({
-        id: "score",
-        link: true,
-        tooltip: "删除",
-        type: "danger",
-        size: "large",
-        icon: "Delete",
-        tableClick: (row) => {},
-      }),
-      createFreeButtonBase({
-        id: "score",
-        link: true,
-        tooltip: "单据打印",
-        type: "danger",
-        size: "large",
-        icon: "Delete",
-        tableClick: (row) => {
-          dzmodal
-            .open(PrintView, { type: "edit", data: modalForm })
-            .then((res) => {
-              if (res.type === "ok") {
-                console.log("res", res);
-                handleQuery(true);
-              }
-            });
-        },
-      }),
-      createFreeButtonBase({
-        id: "score",
-        link: true,
-        tooltip: "团单成员",
-        type: "danger",
-        size: "large",
-        icon: "Delete",
-        tableClick: (row) => {
-          dzmodal
-            .open(EpolicyQueryGrpDialog, { type: "edit", data: modalForm })
-            .then((res) => {
-              if (res.type === "ok") {
-                console.log("res", res);
-                handleQuery(true);
-              }
-            });
-        },
-      }),
-      createFreeButtonBase({
-        id: "score",
-        link: true,
-        tooltip: "历史赔案",
-        type: "danger",
-        size: "large",
-        icon: "Delete",
-        tableClick: (row) => {
-          dzmodal
-            .open(HistoryClaimcaseModel, { type: "edit", data: modalForm })
-            .then((res) => {
-              if (res.type === "ok") {
-                console.log("res", res);
-                handleQuery(true);
-              }
-            });
-        },
-      }),
-      createFreeButtonBase({
-        id: "score",
-        link: true,
-        tooltip: "任务痕迹",
-        type: "danger",
-        size: "large",
-        icon: "Delete",
-        tableClick: (row) => {
-          dzmodal
-            .open(TaskListVestige, { type: "edit", data: modalForm })
-            .then((res) => {
-              if (res.type === "ok") {
-                console.log("res", res);
-                handleQuery(true);
-              }
-            });
-        },
-      }),
-      createFreeButtonBase({
-        id: "score",
-        link: true,
-        tooltip: "核保信息",
-        type: "danger",
-        size: "large",
-        icon: "Delete",
-        tableClick: (row) => {
-          dzmodal
-            .open(UndrOpnList, { type: "edit", data: modalForm })
-            .then((res) => {
-              if (res.type === "ok") {
-                console.log("res", res);
-                handleQuery(true);
-              }
-            });
-        },
-      }),
+      // createFreeButtonBase({
+      //   id: "score",
+      //   link: true,
+      //   tooltip: "删除",
+      //   type: "danger",
+      //   size: "large",
+      //   icon: "Delete",
+      //   tableClick: (row) => {},
+      // }),
+      // createFreeButtonBase({
+      //   id: "score",
+      //   link: true,
+      //   tooltip: "单据打印",
+      //   type: "danger",
+      //   size: "large",
+      //   icon: "Delete",
+      //   tableClick: (row) => {
+      //     dzmodal
+      //       .open(PrintView, { type: "edit", data: modalForm })
+      //       .then((res) => {
+      //         if (res.type === "ok") {
+      //           console.log("res", res);
+      //           handleQuery(true);
+      //         }
+      //       });
+      //   },
+      // }),
+      // createFreeButtonBase({
+      //   id: "score",
+      //   link: true,
+      //   tooltip: "团单成员",
+      //   type: "danger",
+      //   size: "large",
+      //   icon: "Delete",
+      //   tableClick: (row) => {
+      //     dzmodal
+      //       .open(EpolicyQueryGrpDialog, { type: "edit", data: modalForm })
+      //       .then((res) => {
+      //         if (res.type === "ok") {
+      //           console.log("res", res);
+      //           handleQuery(true);
+      //         }
+      //       });
+      //   },
+      // }),
+      // createFreeButtonBase({
+      //   id: "score",
+      //   link: true,
+      //   tooltip: "历史赔案",
+      //   type: "danger",
+      //   size: "large",
+      //   icon: "Delete",
+      //   tableClick: (row) => {
+      //     dzmodal
+      //       .open(HistoryClaimcaseModel, { type: "edit", data: modalForm })
+      //       .then((res) => {
+      //         if (res.type === "ok") {
+      //           console.log("res", res);
+      //           handleQuery(true);
+      //         }
+      //       });
+      //   },
+      // }),
+      // createFreeButtonBase({
+      //   id: "score",
+      //   link: true,
+      //   tooltip: "任务痕迹",
+      //   type: "danger",
+      //   size: "large",
+      //   icon: "Delete",
+      //   tableClick: (row) => {
+      //     dzmodal
+      //       .open(TaskListVestige, { type: "edit", data: modalForm })
+      //       .then((res) => {
+      //         if (res.type === "ok") {
+      //           console.log("res", res);
+      //           handleQuery(true);
+      //         }
+      //       });
+      //   },
+      // }),
+      // createFreeButtonBase({
+      //   id: "score",
+      //   link: true,
+      //   tooltip: "核保信息",
+      //   type: "danger",
+      //   size: "large",
+      //   icon: "Delete",
+      //   tableClick: (row) => {
+      //     dzmodal
+      //       .open(UndrOpnList, { type: "edit", data: modalForm })
+      //       .then((res) => {
+      //         if (res.type === "ok") {
+      //           console.log("res", res);
+      //           handleQuery(true);
+      //         }
+      //       });
+      //   },
+      // }),
     ],
     fromSchema: [
       {
         prop: "cAppNo",
-        inputtype: "table",
-        title: "保额",
+        inputtype: "rtinput",
+        title: "投保单号",
       },
       {
-        prop: "cAppNo",
-        inputtype: "table",
-        title: "保费",
+        prop: "cPlyNo",
+        inputtype: "rtinput",
+        title: "保单号",
+      },
+      {
+          prop: "nAmt",
+          inputtype: "rtinput",
+          title: "保额",
+      },
+      {
+          prop: "nPrm",
+          inputtype: "rtinput",
+          title: "保费",
+      },
+      {
+          prop: "tInsrncBgnTm",
+          inputtype: "rtinput",
+          title: "保险起期",
+      },
+      {
+          prop: "tInsrncEndTm",
+          inputtype: "rtinput",
+          title: "保险止期",
       },
     ],
   },
@@ -710,6 +741,7 @@ const handleTabClick = (tab: any) => {
       createTableEditConfig(tableObj.notWaitObj)
     );
   }
+  pageresult.list = [];
   tabs.value.forEach((item) => {
     if (item.name === tab.props.label) {
       url = item.url;
@@ -718,7 +750,7 @@ const handleTabClick = (tab: any) => {
 };
 
 onMounted(async () => {
-  pageresult.list = [{}];
+  pageresult.list = [];
 
   //首页跳转过来的逻辑 Start
   if (sessionStorage.getItem(AppKey.query.pcis_query_app)) {
@@ -782,24 +814,57 @@ const exRules = {
 function handleQuery(flag?: boolean) {
   // 此处数组ref赋值，获取都有问题，暂时隐藏
   console.log("tableRef", tableRef);
+  console.log("freeEditRef", tableRef.value);
   console.log("freeEditRef", freeEditRef);
-  // const tableRefs = tableRef.value[currentTabKey.value];
-  // const freeEditRefs = freeEditRef.value[currentTabKey.value];
+  const tableRefs = tableRef.value[currentTabKey.value];
+  const freeEditRefs = freeEditRef.value[currentTabKey.value];
   // const r = tableRefs.value?.getPartnerPage(flag); //获取分页数据
-  // const s = freeEditRefs.value?.getFromValue(); //获取表单数据
-  // const param = Object.assign(s, r);
-  // getBasicKindList(param)
-  //   .then((res) => {
-  //     const { code, data, msg } = res;
-  //     if (200 === code) {
-  //       pageresult.list = [];
-  //       pageresult.list = data.result;
-  //       pageresult.total = data.total;
-  //     } else {
-  //       ElMessage.error(msg);
-  //     }
-  //   })
-  //   .finally(() => {});
+  const s = freeEditRefs.value[0].getFromValue(); //获取表单数据
+    if(currentTabKey.value=='1'){
+        const r={
+            "pageNo": 1,
+            "pageSize": 10
+        }
+        const param =Object.assign(s, r);
+        getAppPolicyList(param)
+            .then((res) => {
+                const { code, data, msg } = res;
+                if (200 === code) {
+                    pageresult.list = [];
+                    pageresult.list = data.result;
+                    pageresult.total = data.total;
+                    console.log(pageresult.list)
+                    console.log(pageresult.total)
+                } else {
+                    ElMessage.error(msg);
+                }
+            })
+            .finally(() => {});
+    }else if(currentTabKey.value=='2'){
+        const r={
+            "pageNo":1,
+            "pageSize":10,
+            "TAppTmStart":"2025-01-01 00:00:00",
+            "TAppTmEnd":"2025-03-07 00:00:00"
+        }
+        const param =Object.assign(s, r);
+        param['user']=JSON.parse(sessionStorage.getItem("user"))
+        console.log(param)
+        qryEndorseList(param)
+            .then((res) => {
+                const { code, data, msg } = res;
+                if (200 === code) {
+                    pageresult.list = [];
+                    pageresult.list = data.result;
+                    pageresult.total = data.total;
+                    console.log(pageresult.list)
+                    console.log(pageresult.total)
+                } else {
+                    ElMessage.error(msg);
+                }
+            })
+            .finally(() => {});
+    }
 }
 
 // 多选事件

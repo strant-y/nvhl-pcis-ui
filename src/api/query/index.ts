@@ -45,6 +45,29 @@ export function submitToUndr(queryParams: any): AxiosPromise<any> {
 }
 
 /**
+ * 投保单列表查询
+ * @param queryParams
+ */
+export function getAppPolicyList(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/getAppPolicyList`, queryParams);
+}
+
+/**
+ * 保单列表查询
+ * @param queryParams
+ */
+export function qryEndorseList(queryParams: any): AxiosPromise<any> {
+    return post(`/edr/qryEndorseList`, queryParams);
+}
+
+/**
+ * 投保单详情查询
+ * @param queryParams
+ */
+export function getAppPolicy(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/getAppPolicy`, queryParams);
+}
+/**
  * 保存申请单详细信息
  * @param queryParams
  */

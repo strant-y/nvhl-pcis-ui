@@ -98,7 +98,7 @@
 <script setup lang="ts">
 import {createFreeButtonBase, FreeButtonBase} from "@/shared/button-config";
 import {getProductPage} from "../../../api/prod/index";
-import {getAppPlyInfoByAppNo, saveAppPlyInfo, generatelSingleNo,appCalc,submitToUndr} from "../../../api/query/index";
+import {getAppPlyInfoByAppNo, saveAppPlyInfo, generatelSingleNo,appCalc,submitToUndr,getAppPolicy} from "../../../api/query/index";
 import {dataOpertaor} from "@/store/modules/data-opertaor";
 import moment from "moment";
 import dayjs from "dayjs";
@@ -166,8 +166,9 @@ async function loadAfter() {
   console.log("setPage");
   console.log(props.param);
   // page.getRefTab("base").setFormValue(lowercaseKeys(props.param));
-  getCAppNoFun()
   if (props.param.pageType === "app") {
+    //获取单号
+    getCAppNoFun()
     bthList.value.push(
       createFreeButtonBase({
         label: "保存模板",
@@ -239,7 +240,60 @@ async function loadAfter() {
           baseafterobj['Base.cDisptSttlCde']='D'
           opertaor.getTableRefByKey('base').setFormValue(baseafterobj)
       });
-  } else if (props.param.pageType === "readonly") {
+  } else if (props.param.pageType === "edit") {
+      const cAppNo=props.param.cAppNo
+      loadAppPlyInfo(cAppNo)
+      bthList.value.push(
+          createFreeButtonBase({
+              label: "保存模板",
+              type: "primary",
+              func: () => {
+              },
+          }),
+          createFreeButtonBase({
+              label: "复制出单",
+              type: "primary",
+              func: () => {
+              },
+          }),
+          createFreeButtonBase({
+              label: "保费计算",
+              type: "primary",
+              id: 'btn010101',
+              func: () => {
+                  calcPremium()
+              },
+          }),
+          createFreeButtonBase({
+              label: "提交",
+              type: "primary",
+              id: 'btn010102',
+              func: () => {
+                  savePlyInfo();
+              },
+          }),
+          createFreeButtonBase({
+              label: "申请核保",
+              type: "primary",
+              id: 'btn010103',
+              func: () => {
+                  submitToUndrFn()
+              },
+          }),
+          createFreeButtonBase({
+              label: "发票信息",
+              type: "primary",
+              func: () => {
+              },
+          }),
+          createFreeButtonBase({
+              label: "反洗钱扩展信息",
+              type: "primary",
+              func: () => {
+              },
+          }),
+      );
+  }else if (props.param.pageType === "readonly") {
     // 查询数据
     const getAppPlyInfoRes = await getAppPlyInfoByAppNo({
       CAppNo: props.param.cAppNo,
@@ -286,6 +340,21 @@ const getCAppNoFun = () => {
         }
     });
 };
+/**
+ * 加载投保单明细
+ */
+const loadAppPlyInfo=(CAppNo)=>{
+    const res={'CAppNo':CAppNo}
+    getAppPolicy(res).then((res) => {
+        console.log("投保单明细getAppPolicy-res", res);
+        if(res['code']=='200'){
+            const ops = opertaor.convertData(res)
+            console.log('转换的数据',ops)
+            ElMessage.success(res.msg);
+            opertaor.setDataAll(ops)
+        }
+    });
+}
 /**
  * 获取button
  * @param id
