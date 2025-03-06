@@ -104,6 +104,8 @@ function getFromValue() {
         delete e[key];
       }
     });
+    i['Term.riskList']=i["riskList"]
+    delete i["riskList"];
     redata.push(i);
   });
   tableobj["items"] = redata;

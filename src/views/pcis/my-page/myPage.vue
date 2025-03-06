@@ -71,7 +71,7 @@
                     v-if="currentIndex >= i"
                     :ref="
                       (res) => {
-                        opertaor.addTableRef(k.pageCode, res);
+                        opertaor.addTableRef(k.pageKey, res);
                       }
                     "
                     :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
@@ -227,17 +227,17 @@ async function loadAfter() {
           const tm=moment(baseBefore['Base.tInsrncEndTm']).diff(moment(baseBefore['Base.tInsrncBgnTm']), 'days')
           baseBefore['Base.cTmSysCde']=tm
           tmDay.value=tm
-          opertaor.getTableRefByKey('webPlyBase1').setFormValue(baseBefore)
+          opertaor.getTableRefByKey('insrnc').setFormValue(baseBefore)
           //保单基本信息初始化
           const baseobj={}
           baseobj['Base.cRenewMrk']='0'
-          opertaor.getTableRefByKey('webPlyBaseBasic').setFormValue(baseobj)
+          opertaor.getTableRefByKey('plyBase').setFormValue(baseobj)
           //承保信息初始化
           const baseafterobj={}
           baseafterobj['Base.cRatioTyp']='3'
           baseafterobj['Base.cInstMrk']='0'
           baseafterobj['Base.cDisptSttlCde']='D'
-          opertaor.getTableRefByKey('webPlyBase').setFormValue(baseafterobj)
+          opertaor.getTableRefByKey('base').setFormValue(baseafterobj)
       });
   } else if (props.param.pageType === "readonly") {
     // 查询数据
@@ -282,7 +282,7 @@ const getCAppNoFun = () => {
     generatelSingleNo(res).then((res) => {
         console.log("generatelSingleNo-res", res);
         if(res['code']=='200'){
-            opertaor.getTableRefByKey('webPlyBaseBasic').setValue('Base.cAppNo',res['data'])
+            opertaor.getTableRefByKey('plyBase').setValue('Base.cAppNo',res['data'])
         }
     });
 };
@@ -308,11 +308,11 @@ const calcPremium= () => {
     btn.loading=true;
     const res =opertaor.getDataAll()
     res['user']=user
-    res['webPlyBaseBasic']['Base.cDptCde']='0200000000000'
-    res['webPlyBaseBasic']['Base.cProdNo']='042001'
+    res['plyBase']['Base.cDptCde']='0200000000000'
+    res['plyBase']['Base.cProdNo']='042001'
     console.log(res)
-    if(res['webPlyBaseBasic']['Base.cProdNo']=='042001'){
-        if(res['webPlyCvrg04'].items.length==0){
+    if(res['plyBase']['Base.cProdNo']=='042001'){
+        if(res['cvrg'].items.length==0){
             ElMessage.error('请录入条款信息');
             btn.loading=false;
             return;
@@ -324,14 +324,14 @@ const calcPremium= () => {
         if(res['code']=='200'){
             const ops = opertaor.convertData(res)
             console.log('保费计算转换的数据',ops)
-            ElMessage.success(res.msg+ '保费为：' + ops['webPlyBase']['Base.nPrm']);
+            ElMessage.success(res.msg+ '保费为：' + ops['base']['Base.nPrm']);
             opertaor.setDataAll(ops)
-            nAmt.value=ops['webPlyBase']['Base.nAmt']
-            nPrm.value= ops['webPlyBase']['Base.nPrm']
-            tmDay.value= ops['webPlyBase']['Base.cTmSysCde']
-            const payInfo= setPayInfo(ops['webPlyBase'],ops['webPlyApplicant'])
+            nAmt.value=ops['base']['Base.nAmt']
+            nPrm.value= ops['base']['Base.nPrm']
+            tmDay.value= ops['base']['Base.cTmSysCde']
+            const payInfo= setPayInfo(ops['base'],ops['applicant'])
             console.log('生成缴费计划内容',payInfo)
-            opertaor.getTableRefs()['webPlyPay'].setFormValue(payInfo)
+            opertaor.getTableRefs()['payinfo'].setFormValue(payInfo)
         }else{
             ElMessage.error(res.msg);
         }
@@ -363,27 +363,35 @@ const setPayInfo=(base,applicant)=>{
 const submitToUndrFn= () => {
     const btn =getBtn('btn010103')
     btn.loading=true;
-    const res =opertaor.getDataAll()
+    const res ={}
+    console.log(opertaor.getTableRefByKey('plyBase').getFromValue())
+    const base=opertaor.getTableRefByKey('plyBase').getFromValue()
     res['user']=user
+    res['appNo']=base['Base.cAppNo']
     console.log(res)
     submitToUndr(res).then((res) => {
         btn.loading=false;
         console.log("submitToUndr-res", res);
         // ElMessage.success(res.msg);
         // history.back();
+        if(res['code']=='200'){
+            ElMessage.success(res.msg);
+        }else{
+            ElMessage.error(res.msg);
+        }
     });
 };
 
 const savePlyInfo = () => {
     const btn =getBtn('btn010102')
-    btn.loading=true
+    btn.loading=true;
     const res =opertaor.getDataAll()
     res['user']=user
-    res['webPlyBaseBasic']['Base.cDptCde']='0251010013000'
-    res['webPlyBaseBasic']['Base.cProdNo']='042001'
+    res['plyBase']['Base.cDptCde']='0251010013000'
+    res['plyBase']['Base.cProdNo']='042001'
     console.log(res)
-    if(res['webPlyBaseBasic']['Base.cProdNo']=='042001'){
-        if(res['webPlyCvrg04'].items.length==0){
+    if(res['plyBase']['Base.cProdNo']=='042001'){
+        if(res['cvrg'].items.length==0){
             ElMessage.error('请录入条款信息');
             btn.loading=false;
             return;

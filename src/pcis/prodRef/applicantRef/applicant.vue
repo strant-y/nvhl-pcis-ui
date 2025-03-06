@@ -73,7 +73,7 @@ const method = {
   },
   funcreset: ()=>{
       const tabref = opertaor.getTableRefs();
-      const applicantValue=tabref['webPlyApplicant'].getFromValue()
+      const applicantValue=tabref['applicant'].getFromValue()
       console.log(applicantValue)
       for (const k in applicantValue){
           applicantValue[k]=null

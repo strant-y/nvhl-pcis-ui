@@ -38,7 +38,7 @@ const method = {
   func1: () => {},
   funccopyvalue:()=>{
       const tabref = opertaor.getTableRefs();
-      const applicantValue=tabref['webPlyApplicant'].getFromValue()
+      const applicantValue=tabref['applicant'].getFromValue()
       const insuredValue={}
       for(const k in applicantValue){
           const key='Insured.'+k.split('.')[1]
@@ -83,7 +83,7 @@ const method = {
   },
     funcreset: ()=>{
         const tabref = opertaor.getTableRefs();
-        const InsuredValue=tabref['webPlyInsured'].getFromValue()
+        const InsuredValue=tabref['insured'].getFromValue()
         for (const k in InsuredValue){
             InsuredValue[k]=null
         }
