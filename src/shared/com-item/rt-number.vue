@@ -82,7 +82,7 @@ watch([() => props.modelValue], ([newModelValue]) => {
 function handleChange(val?: string | number | undefined) {
   emits("update:modelValue", val);
   emits("valueChange", val);
-  props.item.func ? props.item.func(val) : null;
+  // props.item.func ? props.item.func(val) : null;
 }
 
 onMounted(() => {

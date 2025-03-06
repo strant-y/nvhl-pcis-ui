@@ -91,7 +91,7 @@ function handleChange(val?: string | number | boolean) {
   emits("update:modelValue", res);
   console.log("rt-switch", res, props);
   // props.item.func ? props.item.func(res) : null;
-  props.item.func ? props.item.func(res, props.row) : null; // 传递当前行的数据
+  // props.item.func ? props.item.func(res, props.row) : null; // 传递当前行的数据
 }
 
 onMounted(() => {});

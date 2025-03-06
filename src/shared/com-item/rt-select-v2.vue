@@ -213,7 +213,7 @@ function handleChange(val?: string | number | Array<any> | undefined) {
   const option = options.value.find((item) => item.value === val);
   emits("valueChange", val);
   emits("update:modelValue", val);
-  props.item.func ? props.item.func(val, option) : null;
+  // props.item.func ? props.item.func(val, option) : null;
 }
 function getLabel() {
   if (options.value && options.value.length > 0) {

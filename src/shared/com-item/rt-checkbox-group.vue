@@ -122,7 +122,7 @@ function handleChange(val?: string | number | Array<any> | undefined) {
   emits("valueChange", val, option);
   emits("update:modelValue", val, option);
   emits("update:item", val, option);
-  props.item.func ? props.item.func(val, option) : null;
+  // props.item.func ? props.item.func(val, option) : null;
 }
 const codeListStore = codeListViewStore();
 

@@ -80,7 +80,7 @@ function handleChange(val?: string | number | boolean) {
   }
   emits("valueChange", res);
   emits("update:modelValue", res);
-  props.item.func ? props.item.func(res) : null;
+  // props.item.func ? props.item.func(res) : null;
 }
 onMounted(() => {
   // 初始化组件数据

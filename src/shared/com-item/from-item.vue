@@ -41,10 +41,12 @@ const emits = defineEmits(["update:modelValue", "updateMethod"]); // 父组件�
 function handleChange(val?: any) {
   emits("update:modelValue", val);
   emits("updateMethod");
+  props.item.func ? props.item.func(val,props.row) : null;
 }
 
 watch([() => props.modelValue], ([newModelValue]) => {
   value.value = newModelValue;
+  props.item.func ? props.item.func(newModelValue,props.row) : null;
 });
 function tableExvalidate() {
   if (typeof itemRef.value.tableExvalidate === "function") {
@@ -71,5 +73,9 @@ defineExpose({
 
 onMounted(() => {
   value.value = props.modelValue;
+  
+  if(props.item.defaultValue){
+    value.value = props.item.defaultValue;
+  }
 });
 </script>
