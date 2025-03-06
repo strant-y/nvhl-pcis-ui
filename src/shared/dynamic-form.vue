@@ -11,153 +11,7 @@
   >
     <el-row :gutter="20">
       <template v-for="(item, index) in props.fromSchema" :key="index">
-        <el-col
-          :span="
-            item.inputtype === 'rttable' // table 组件单独占满一行
-              ? 24
-              : item.itemWidth
-                ? item.itemWidth * formUi.span
-                : formUi.span
-          "
-          v-if="!item.group && !item.hidden"
-        >
-          <template v-if="item.inputtype === 'rtinputgroup'">
-            <el-form-item>
-              <template #label>
-                <template v-if="item.title?.length > 8">
-                  <el-tooltip
-                    effect="dark"
-                    :content="item.title"
-                    placement="top-start"
-                  >
-                    {{ item.title.substring(0, 8) + "..." }}
-                  </el-tooltip>
-                </template>
-                <template v-else>
-                  {{ item.title }}
-                </template>
-              </template>
-              <div
-                :style="{
-                  width: '100%',
-                }"
-              >
-                <el-row :gutter="1" v-if="item.groupList.length > 0">
-                  <el-col
-                    :span="getspan(item, gitem)"
-                    v-for="(gitem, index) in item.groupList"
-                    :key="index"
-                  >
-                    <el-form-item
-                      :rules="gitem.rules ? gitem.rules : undefined"
-                      :prop="gitem.prop"
-                    >
-                      <from-item
-                        ref="fromListRef"
-                        v-model="form[gitem.prop]"
-                        :item="gitem"
-                        :parentFromUi="formUi"
-                        @update-method="formsDataUpdate"
-                      />
-                    </el-form-item>
-                  </el-col>
-                </el-row>
-              </div>
-            </el-form-item>
-          </template>
-          <template v-else>
-            <el-form-item
-              :rules="item.rules ? item.rules : undefined"
-              :prop="item.prop"
-              :label-position="
-                item.inputtype === 'rttable' ? 'top' : undefined // table 组件,默认标题显示在top上
-              "
-            >
-              <template #label>
-                <template v-if="item.title?.length > 8">
-                  <el-tooltip
-                    effect="dark"
-                    :content="item.title"
-                    placement="top-start"
-                  >
-                    {{ item.title.substring(0, 8) + "..." }}
-                  </el-tooltip>
-                </template>
-                <template v-else>
-                  {{ item.title }}
-                </template>
-              </template>
-              <div
-                :style="{
-                  width:
-                    item.showExBtn && item.inputtype !== 'rttable' // 显示组件尾部按钮 table 组件不显示尾部按钮
-                      ? (item.btnWidth ? 100 - item.btnWidth : 75) + '%'
-                      : '100%',
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                }"
-              >
-                <from-item
-                  ref="fromListRef"
-                  v-model="form[item.prop]"
-                  :item="item"
-                  :parentFromUi="formUi"
-                  @update-method="formsDataUpdate"
-                />
-              </div>
-
-              <!---       显示组件尾部按钮       --->
-              <template v-if="item.showExBtn">
-                <rt-button
-                  v-if="item.inputtype !== 'rttable'"
-                  :style="{
-                    width: (item.btnWidth ? item.btnWidth : 25) + '%',
-                    height: '100%',
-                  }"
-                  :item="item.btnItems"
-                  @closepopover="(rev) => setPopover(rev, item)"
-                />
-              </template>
-            </el-form-item>
-          </template>
-        </el-col>
-      </template>
-    </el-row>
-    <!------- 折叠筐内 表单 需要单独来显示  上面是未分组公共部分内容,下面为折叠筐内内容 -------->
-    <div v-for="(v, k) in groupByList" :key="k">
-      <div class="rt_group">
-        <span class="rt_group_title">{{ v.title }} </span>
-        <template v-if="checkNeadGroup(v)">
-          <a
-            v-if="v.disabled"
-            class="rt_group_icon"
-            @click="v.disabled = !v.disabled"
-          >
-            <rt-icon
-              :item="{
-                icon: 'ArrowUp',
-                iconSize: '16',
-              }"
-            />
-            <el-text class="mx-1">折叠</el-text>
-          </a>
-          <a
-            v-if="!v.disabled"
-            class="rt_group_icon"
-            @click="v.disabled = !v.disabled"
-          >
-            <rt-icon
-              :item="{
-                icon: 'ArrowDown',
-                iconSize: '16',
-              }"
-            />
-            <el-text class="mx-1">展开</el-text>
-          </a>
-        </template>
-      </div>
-      <el-row :gutter="20">
-        <template v-for="(item, index) in props.fromSchema" :key="index">
+        <template v-if="!item.hidden">
           <el-col
             :span="
               item.inputtype === 'rttable' // table 组件单独占满一行
@@ -166,11 +20,7 @@
                   ? item.itemWidth * formUi.span
                   : formUi.span
             "
-            v-if="
-              item.group === v.id &&
-              (item.expand ? item.expand && v.disabled : true) &&
-              !item.hidden
-            "
+            v-if="!item.group"
           >
             <template v-if="item.inputtype === 'rtinputgroup'">
               <el-form-item>
@@ -220,6 +70,9 @@
               <el-form-item
                 :rules="item.rules ? item.rules : undefined"
                 :prop="item.prop"
+                :label-position="
+                  item.inputtype === 'rttable' ? 'top' : undefined // table 组件,默认标题显示在top上
+                "
               >
                 <template #label>
                   <template v-if="item.title?.length > 8">
@@ -238,9 +91,11 @@
                 <div
                   :style="{
                     width:
-                      item.showExBtn && item.inputtype !== 'rttable'
+                      item.showExBtn && item.inputtype !== 'rttable' // 显示组件尾部按钮 table 组件不显示尾部按钮
                         ? (item.btnWidth ? 100 - item.btnWidth : 75) + '%'
                         : '100%',
+                    display: 'flex',
+                    alignItems: 'flex-start',
                   }"
                 >
                   <from-item
@@ -253,16 +108,164 @@
                 </div>
 
                 <!---       显示组件尾部按钮       --->
-                <rt-button
-                  v-if="item.showExBtn && item.inputtype !== 'rttable'"
-                  :style="{
-                    width: (item.btnWidth ? item.btnWidth : 25) + '%',
-                  }"
-                  :item="item.btnItems"
-                />
+                <template v-if="item.showExBtn">
+                  <rt-button
+                    v-if="item.inputtype !== 'rttable'"
+                    :style="{
+                      width: (item.btnWidth ? item.btnWidth : 25) + '%',
+                      height: '100%',
+                    }"
+                    :item="item.btnItems"
+                    @closepopover="(rev) => setPopover(rev, item)"
+                  />
+                </template>
               </el-form-item>
             </template>
           </el-col>
+        </template>
+      </template>
+    </el-row>
+    <!------- 折叠筐内 表单 需要单独来显示  上面是未分组公共部分内容,下面为折叠筐内内容 -------->
+    <div v-for="(v, k) in groupByList" :key="k">
+      <div class="rt_group">
+        <span class="rt_group_title">{{ v.title }} </span>
+        <template v-if="checkNeadGroup(v)">
+          <a
+            v-if="v.disabled"
+            class="rt_group_icon"
+            @click="v.disabled = !v.disabled"
+          >
+            <rt-icon
+              :item="{
+                icon: 'ArrowUp',
+                iconSize: '16',
+              }"
+            />
+            <el-text class="mx-1">折叠</el-text>
+          </a>
+          <a
+            v-if="!v.disabled"
+            class="rt_group_icon"
+            @click="v.disabled = !v.disabled"
+          >
+            <rt-icon
+              :item="{
+                icon: 'ArrowDown',
+                iconSize: '16',
+              }"
+            />
+            <el-text class="mx-1">展开</el-text>
+          </a>
+        </template>
+      </div>
+      <el-row :gutter="20">
+        <template v-for="(item, index) in props.fromSchema" :key="index">
+          <template v-if="!item.hidden">
+            <el-col
+              :span="
+                item.inputtype === 'rttable' // table 组件单独占满一行
+                  ? 24
+                  : item.itemWidth
+                    ? item.itemWidth * formUi.span
+                    : formUi.span
+              "
+              v-if="
+                item.group === v.id &&
+                (item.expand ? item.expand && v.disabled : true)
+              "
+            >
+              <template v-if="item.inputtype === 'rtinputgroup'">
+                <el-form-item>
+                  <template #label>
+                    <template v-if="item.title?.length > 8">
+                      <el-tooltip
+                        effect="dark"
+                        :content="item.title"
+                        placement="top-start"
+                      >
+                        {{ item.title.substring(0, 8) + "..." }}
+                      </el-tooltip>
+                    </template>
+                    <template v-else>
+                      {{ item.title }}
+                    </template>
+                  </template>
+                  <div
+                    :style="{
+                      width: '100%',
+                    }"
+                  >
+                    <el-row :gutter="1" v-if="item.groupList.length > 0">
+                      <el-col
+                        :span="getspan(item, gitem)"
+                        v-for="(gitem, index) in item.groupList"
+                        :key="index"
+                      >
+                        <el-form-item
+                          :rules="gitem.rules ? gitem.rules : undefined"
+                          :prop="gitem.prop"
+                        >
+                          <from-item
+                            ref="fromListRef"
+                            v-model="form[gitem.prop]"
+                            :item="gitem"
+                            :parentFromUi="formUi"
+                            @update-method="formsDataUpdate"
+                          />
+                        </el-form-item>
+                      </el-col>
+                    </el-row>
+                  </div>
+                </el-form-item>
+              </template>
+              <template v-else>
+                <el-form-item
+                  :rules="item.rules ? item.rules : undefined"
+                  :prop="item.prop"
+                >
+                  <template #label>
+                    <template v-if="item.title?.length > 8">
+                      <el-tooltip
+                        effect="dark"
+                        :content="item.title"
+                        placement="top-start"
+                      >
+                        {{ item.title.substring(0, 8) + "..." }}
+                      </el-tooltip>
+                    </template>
+                    <template v-else>
+                      {{ item.title }}
+                    </template>
+                  </template>
+                  <div
+                    :style="{
+                      width:
+                        item.showExBtn && item.inputtype !== 'rttable'
+                          ? (item.btnWidth ? 100 - item.btnWidth : 75) + '%'
+                          : '100%',
+                    }"
+                  >
+                    <from-item
+                      ref="fromListRef"
+                      v-model="form[item.prop]"
+                      :item="item"
+                      :parentFromUi="formUi"
+                      @update-method="formsDataUpdate"
+                    />
+                  </div>
+
+                  <!---       显示组件尾部按钮       --->
+                  <rt-button
+                    v-if="item.showExBtn && item.inputtype !== 'rttable'"
+                    :style="{
+                      width: (item.btnWidth ? item.btnWidth : 25) + '%',
+                    }"
+                    :item="item.btnItems"
+                  />
+                </el-form-item>
+              </template>
+            </el-col>
+          </template>
         </template>
       </el-row>
     </div>
