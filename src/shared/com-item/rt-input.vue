@@ -112,7 +112,7 @@ import * as ElementPlusIconsVue from "@element-plus/icons-vue";
 type IconNames = keyof typeof ElementPlusIconsVue;
 const props = defineProps({
   modelValue: {
-    type: [String],
+    type: [String,Number],
   },
   item: {
     type: Object as () => Record<string, any>,
@@ -134,7 +134,7 @@ const props = defineProps({
 });
 
 const emits = defineEmits(["update:modelValue", "valueChange"]); // 父组件监听事件，同步子组件值的变化给父组件
-const vInput = ref<string | undefined>();
+const vInput = ref<string | Number | undefined>();
 watch([() => props.modelValue], ([newModelValue]) => {
   vInput.value = newModelValue;
 });
