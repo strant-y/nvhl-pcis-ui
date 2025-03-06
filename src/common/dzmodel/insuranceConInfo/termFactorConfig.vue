@@ -2,25 +2,33 @@
   <div>
     <el-row>
       <el-col :span="24">
-        <rt-mytable
-          :tableConfig="tableconfig"
-          ref="tableRef"
-        />
+        <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
+      </el-col>
+      <el-col :span="24">
+        <rt-mytable :tableConfig="tableconfig" ref="tableRef" />
       </el-col>
     </el-row>
     <el-row>
       <el-col :span="21"> </el-col>
       <el-col :span="3">
-          <el-button @click="savegroupinfo" type="primary">保存</el-button>
+        <el-button @click="savegroupinfo" type="primary">保存</el-button>
       </el-col>
-  </el-row>
+    </el-row>
   </div>
 </template>
 
 <script setup lang="ts">
 import { v4 as uuidv4 } from "uuid";
 import { VueDraggable } from "vue-draggable-plus";
-import { getGroupInfo, getTermFactorInfo, getTRFactorList, querySelectorList, saveGroupInfo, saveTermFactorInfo, saveTRFactorList } from "@/api/prod";
+import {
+  getGroupInfo,
+  getTermFactorInfo,
+  getTRFactorList,
+  querySelectorList,
+  saveGroupInfo,
+  saveTermFactorInfo,
+  saveTRFactorList,
+} from "@/api/prod";
 import {
   AppTableConfig,
   createTableEditConfig,
@@ -29,7 +37,16 @@ import {
 import { iconPropType } from "element-plus/es/utils";
 import { inputtype, showtype } from "@/utils/utilKey";
 import { styleType } from "element-plus/es/components/table-v2/src/common";
+import { useValidator } from "@/typings/useValidator";
 import { createFreeButtonBase } from "@/shared/button-config";
+import {
+  AppFreeEditConfig,
+  AppFreeEditMethod,
+  createAppFreeEditConfig,
+} from "@/shared/app-free-edit-config";
+
+const { getRules } = useValidator();
+
 const tableRef = ref<MyTableMethod | null>(null);
 const props = defineProps({
   data: {
@@ -50,39 +67,105 @@ const factorList = ref<any>([]);
 
 onMounted(() => {
   getDictFormData();
+  freeEditRef.value?.setFormValue({ cFactorTabType: "free" });
 });
 
-function getDictFormData(){
-  getTermFactorInfo({termNo:props.data.data.cTermNo,tabKey:'cvrg'}).then((res: any) => {
-    const { code, data, msg } = res;
-    if (200 === code) {
-      if(data){
-        data.forEach((e: any) =>{
-          if(e.cPkId){
-            e.isChecked = '1';
+const formconfig1 = reactive<AppFreeEditConfig>(
+  createAppFreeEditConfig({
+    fromSchema: [
+      {
+        prop: "cFactorTabType",
+        inputtype: "rtselect",
+        title: "数据样式",
+        loadData: [
+          {
+            label: "表单",
+            value: "free",
+          },
+          {
+            label: "表格",
+            value: "grid",
+          },
+        ],
+        func: (val: any) => {
+          let h = false;
+          if (val === "free") {
+            h = true;
           }
-        })
-      }
-      tableRef.value?.setFormValue(data);
-    } else {
-        ElMessage.error(msg);
-    }
+          formconfig1.fromSchema?.forEach((item) => {
+            if (
+              item.prop === "cFactorTabTitle" ||
+              item.prop === "cFactorTabValue"
+            ) {
+              item.hidden = h;
+            }
+          });
+        },
+      },
+      {
+        prop: "cFactorTabTitle",
+        inputtype: "rtinput",
+        title: "组件标题",
+        rules: [getRules("required", {})],
+        hidden: true,
+      },
+      {
+        prop: "cFactorTabValue",
+        inputtype: "rtinput",
+        title: "组件值列",
+        rules: [getRules("required", {})],
+        hidden: true,
+      },
+    ],
   })
+);
+
+const freeEditRef = ref<AppFreeEditMethod | null>(null);
+function getDictFormData() {
+  getTermFactorInfo({ termNo: props.data.data.cTermNo, tabKey: "cvrg" }).then(
+    (res: any) => {
+      const { code, data, msg } = res;
+      if (200 === code) {
+        if (data.datalist) {
+          data.datalist.forEach((e: any) => {
+            if (e.cPkId) {
+              e.isChecked = "1";
+            }
+          });
+        }
+        tableRef.value?.setFormValue(data.datalist);
+        if (data.confs) {
+          const conf = data.confs;
+          const c = JSON.parse(conf.CCnm);
+          freeEditRef.value?.setFormValue(c);
+        }
+        console.log(data);
+      } else {
+        ElMessage.error(msg);
+      }
+    }
+  );
 }
 
-function savegroupinfo(){
+function savegroupinfo() {
   const select = tableRef.value?.getFromValue();
   let selectList = select?.filter((node: any) => node.isChecked === "1");
-  saveTermFactorInfo({
-    termNo:props.data.data.cTermNo,
-    selectList: selectList,
-  }).then((res: any) => {
-    const { code, data, msg } = res;
-    if (200 === code) {
-      ElMessage.success("保存成功");
-      getDictFormData();
-    } else {
-        ElMessage.error(msg);
+  freeEditRef.value?.validate().then((res: any) => {
+    if (res) {
+      const t = freeEditRef.value?.getFromValue();
+      saveTermFactorInfo({
+        termNo: props.data.data.cTermNo,
+        selectList: selectList,
+        titleConf:t
+      }).then((res: any) => {
+        const { code, data, msg } = res;
+        if (200 === code) {
+          ElMessage.success("保存成功");
+          getDictFormData();
+        } else {
+          ElMessage.error(msg);
+        }
+      });
     }
   });
 }
@@ -110,8 +193,7 @@ const tableconfig = reactive<AppTableConfig>(
           n: "0",
         },
         width: 40,
-        func: (v: any) => {
-        },
+        func: (v: any) => {},
       },
       {
         prop: "cFactorInputtype",
@@ -127,8 +209,7 @@ const tableconfig = reactive<AppTableConfig>(
           y: "1",
           n: "0",
         },
-        func: (v: any) => {
-        },
+        func: (v: any) => {},
       },
       // {
       //   prop: "cPorpType",
@@ -151,9 +232,6 @@ const tableconfig = reactive<AppTableConfig>(
     ],
   })
 );
-
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
