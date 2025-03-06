@@ -166,6 +166,13 @@ const riskList = ref<{ [key: string]: any }>({});
 
 initData(props.modelValue);
 
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    dataInit();
+    initData(props.modelValue);
+  }
+);
 function update() {
   let newData = termRef.value?.getFromValue();
   const list = JSON.parse(JSON.stringify(riskList.value));

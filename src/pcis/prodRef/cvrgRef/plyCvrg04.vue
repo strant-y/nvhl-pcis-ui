@@ -76,13 +76,13 @@ const cardconfig = ref(creatCardConfig({}));
 
 const cvrgFormfef = ref("cvrgFormfef");
 const formData = ref<any[]>([]);
-const planData = ref<{ [key: string] : any[] }>({});
+let planData = reactive<{ [key: string] : any[] }>({});
 const hiddenFlag = ref<any[]>([]);
 
 const showTitleMap = ref<{ [key: string] : string }>({});
 
 function updateTitle(){
-  Object.keys(planData.value).forEach((k: any) => {
+  Object.keys(planData).forEach((k: any) => {
   const str = prodTemple.value.default;
   const filledString = fillTemplate(str, { sumPrm:0 ,sumObjs:0 });
   showTitleMap.value[k] = filledString;
@@ -111,14 +111,14 @@ onMounted(async () => {
 const method = {
   funcadd: () => {
     let maxindex = 0;
-    const l = Object.keys(planData.value).forEach((k: any) => {
+    const l = Object.keys(planData).forEach((k: any) => {
       const numberPart = parseInt(k.replace(/\D/g, ''), 10);
       if(numberPart>maxindex){
         maxindex = numberPart;
       }
 });
     const planKey = 'P'+(maxindex+1);
-    planData.value[planKey] = [];
+    planData[planKey] = [];
     updateTitle();
   },
 };
@@ -145,7 +145,7 @@ function addTermData(PlanNo: string){
         type: "show",
         data: {
           cProdNo: param.cProdNo,
-          isselectData:planData.value[PlanNo]
+          isselectData:planData[PlanNo]
         },
       },
       {
@@ -161,7 +161,7 @@ function addTermData(PlanNo: string){
               'Term.cClauseCode':item.cTermNo,
               riskList:riskList,
             };
-            planData.value[PlanNo].push(data);
+            planData[PlanNo].push(data);
           });
         },
       },
@@ -170,18 +170,18 @@ function addTermData(PlanNo: string){
 }
 
 function deleteData(plan: string, index: number) {
-  planData.value[plan].splice(index, 1);
+  planData[plan].splice(index, 1);
 }
 
 function deletePlan(plan: string) {
-  delete planData.value[plan];
+  delete planData[plan];
 }
 
 function getFromValue() {
     let tableobj:{[key:string]: any}={};
     let redata:any[] = [];
-    Object.keys(planData.value).forEach((key) => {
-        planData.value[key].forEach((item: any) => {
+    Object.keys(planData).forEach((key) => {
+        planData[key].forEach((item: any) => {
           const i = JSON.parse(JSON.stringify(item));
           i['Term.cPlanNo']=key;
           i['riskList'].forEach((e: any) => {
@@ -201,7 +201,7 @@ function getFromValue() {
 }
 
 function setFormValue(value: any) {
-  planData.value = {};
+  planData = {};
   value.forEach((item: any) => {
     const planKey = item['Term.cPlanNo'];
     let creData = JSON.parse(JSON.stringify(item));
@@ -214,12 +214,12 @@ function setFormValue(value: any) {
             delete e[key]
         }
     });
-    if(planData.value[planKey]){
-      planData.value[planKey].push(creData);
+    if(planData[planKey]){
+      planData[planKey].push(creData);
     }else{
       let newrisk:any[]=[];
       newrisk.push(creData);
-      planData.value[planKey]=newrisk;
+      planData[planKey]=newrisk;
     }
   });
   updateTitle();
