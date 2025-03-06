@@ -32,11 +32,39 @@
       </template>
 
       <div v-if="showData">
-        <app-free-edit
-          :freeEditConfig="formconfig1"
-          ref="termRef"
-          @updateDatas="update"
-        />
+        <template v-if="termTitleConf.cFactorTabType === 'grid'">
+          <table style="width: 100%">
+            <thead>
+              <tr class="table-title">
+                <th>{{ termTitleConf.cFactorTabTitle }}</th>
+                <th>{{ termTitleConf.cFactorTabValue }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template v-for="(item, k) in termFactormap" :key="k">
+                <tr>
+                  <td>
+                    <span>{{ item.title }}</span>
+                  </td>
+                  <td>
+                    <from-item
+                      v-model="termdata[item.prop]"
+                      @update:modelValue="update()"
+                      :item="item"
+                    />
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </template>
+        <template v-else>
+          <app-free-edit
+            :freeEditConfig="formconfig1"
+            ref="termRef"
+            @updateDatas="update"
+          />
+        </template>
         <template v-for="(ginfo, gk) in groupInfo" :key="gk">
           <el-row>
             <el-col :span="22">
@@ -164,8 +192,6 @@ const groupconf = ref<{ [key: string]: any }>({}); // 渲染数据分离,解决�
 const termdata = ref({});
 const riskList = ref<{ [key: string]: any }>({});
 
-initData(props.modelValue);
-
 watch(
   () => props.modelValue,
   (newVal) => {
@@ -174,7 +200,13 @@ watch(
   }
 );
 function update() {
-  let newData = termRef.value?.getFromValue();
+  let newData;
+
+  if (termTitleConf.value.cFactorTabType === "grid") {
+    newData = termdata.value;
+  } else {
+    newData = termRef.value?.getFromValue();
+  }
   const list = JSON.parse(JSON.stringify(riskList.value));
   let ril: any[] = [];
   Object.keys(riskList.value).forEach((k: any) => {
@@ -199,7 +231,9 @@ function initData(data: any) {
   });
   riskList.value = riskData;
   nextTick(() => {
-    termRef.value?.setFormValue(termdata.value);
+    if (termTitleConf.value.cFactorTabType !== "grid") {
+      termRef.value?.setFormValue(termdata.value);
+    }
   });
 }
 
@@ -209,6 +243,7 @@ const factormap = ref<{ [key: string]: any }>({});
 const termFactormap = ref([]);
 const collist = ref([]);
 const term = ref<{ [key: string]: any }>({});
+const termTitleConf = ref<{ [key: string]: any }>({});
 
 const formconfig1 = reactive(
   createAppFreeEditConfig({
@@ -303,6 +338,7 @@ function getProp(col: any) {
 
 onMounted(async () => {
   dataInit();
+  initData(props.modelValue);
 });
 
 function dataInit() {
@@ -339,6 +375,7 @@ function dataInit() {
       term.value = data.data.term;
       termFactormap.value = data.data.termFactormap;
       formconfig1.fromSchema = data.data.termFactormap;
+      termTitleConf.value = JSON.parse(data.data.termTitleConf.CCnm);
     } else {
       ElMessage.error(msg);
     }

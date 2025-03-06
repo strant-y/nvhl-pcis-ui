@@ -60,8 +60,11 @@ watch(
     }
     if (props.item.typeCode) {
       codeListStore
-        .queryCodeListByCode(
-          newValue.typeCode,
+        .queryCodeList(
+          {
+            codeListName: props.item.typeCode,
+            codeListParam: props.item.codeParam,
+          },
           false,
           props.item.cache ? props.item.cache : true
         )
@@ -108,7 +111,7 @@ onMounted(() => {
       codeListStore.queryCodeList(
           {
             codeListName: props.item.typeCode,
-            codeListParam: props.item.params
+            codeListParam: props.item.codeParam,
           },
           false,
           props.item.cache ? props.item.cache : true
