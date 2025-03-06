@@ -17,15 +17,10 @@ const props = defineProps({
     type: [Object],
     required: true,
   },
-  tmDay: {
-      type: Number,
-      required: false,
-  },
 });
 
 const insrncEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
-const emit = defineEmits(['update:tmDay']);
 onMounted(() => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
@@ -33,11 +28,6 @@ onMounted(() => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
-
-  nextTick(() => {
-      // DOM 更新后执行
-      initInsrncDate()
-  });
 });
 
 // 绑定方法
@@ -49,7 +39,6 @@ const method = {
       const baseBefore=tabref['webPlyBase1'].getFromValue()
       const tm=moment(baseBefore['Base.tInsrncEndTm']).diff(moment(v), 'days')
       baseBefore['Base.cTmSysCde']=tm
-      emit('update:tmDay', tm);
       setFormValue(baseBefore)
   },
   endTmFn:(v)=>{
@@ -57,7 +46,6 @@ const method = {
       const baseBefore=tabref['webPlyBase1'].getFromValue()
       const tm=moment(v).diff(moment(baseBefore['Base.tInsrncBgnTm']), 'days')
       baseBefore['Base.cTmSysCde']=tm
-      emit('update:tmDay', tm);
       setFormValue(baseBefore)
   },
 };
@@ -65,16 +53,6 @@ const method = {
 // 绑定特殊验证器
 const exRules = {};
 
-function initInsrncDate(){
-    const baseBefore={}
-    baseBefore['Base.tAppTm']=moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
-    baseBefore['Base.tInsrncBgnTm']=moment(new Date(Date.now() + 1 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00");
-    baseBefore['Base.tInsrncEndTm']=dayjs(baseBefore['Base.tInsrncBgnTm']).add(1, "year").format("YYYY-MM-DD 23:59:59");
-    const tm=moment(baseBefore['Base.tInsrncEndTm']).diff(moment(baseBefore['Base.tInsrncBgnTm']), 'days')
-    baseBefore['Base.cTmSysCde']=tm
-    emit('update:tmDay', tm);
-    setFormValue(baseBefore)
-}
 function getFromValue() {
   return insrncEditRef?.value?.getFromValue();
 }

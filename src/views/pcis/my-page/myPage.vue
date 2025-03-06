@@ -55,7 +55,7 @@
                       产品：<span class="publicStyle">060001旅游观光景点、娱乐场所人身外伤害保险</span>|出单方式：<span class="publicStyle">核心出单</span>| <span class="publicStyle">非共保业务</span>| <span class="publicStyle">个单</span>
                   </div>
                   <div class="btm" style="background:#EBEDFC">
-                    保险期限：<span class="publicStyle">{{tmDayvalue}}</span>|保额：<span class="publicStyle" >{{nAmt}}</span>元|保费： <span class="publicStyle">{{nPrm}}</span>元
+                    保险期限：<span class="publicStyle">{{tmDay}}</span>|保额：<span class="publicStyle" >{{nAmt}}</span>元|保费： <span class="publicStyle">{{nPrm}}</span>元
                   </div>
               </el-affix>
             </el-header>
@@ -76,8 +76,6 @@
                     "
                     :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
                     :pageSchema="k.pageSchema"
-                    :tmDay="tmDayvalue"
-                    @update:tmDay="tmDayvalue = $event"
                   />
                 </div>
               </template>
@@ -102,6 +100,8 @@ import {createFreeButtonBase, FreeButtonBase} from "@/shared/button-config";
 import {getProductPage} from "../../../api/prod/index";
 import {getAppPlyInfoByAppNo, saveAppPlyInfo, generatelSingleNo,appCalc,submitToUndr} from "../../../api/query/index";
 import {dataOpertaor} from "@/store/modules/data-opertaor";
+import moment from "moment";
+import dayjs from "dayjs";
 
 const opertaor = dataOpertaor();
 opertaor.init();
@@ -123,7 +123,7 @@ const tempFindBtn= [];
 const user = JSON.parse(sessionStorage.getItem("user"));
 const nAmt = ref(0.00);
 const nPrm = ref(0.00);
-const tmDayvalue= ref(0);
+const tmDay= ref(0);
 onBeforeMount(() => {
   console.log("路由参数props.param", props.param);
   initPage();
@@ -218,6 +218,27 @@ async function loadAfter() {
         },
       }),
     );
+      nextTick(() => {
+          //保险期间初始化
+          const baseBefore={}
+          baseBefore['Base.tAppTm']=moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
+          baseBefore['Base.tInsrncBgnTm']=moment(new Date(Date.now() + 1 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00");
+          baseBefore['Base.tInsrncEndTm']=dayjs(baseBefore['Base.tInsrncBgnTm']).add(1, "year").format("YYYY-MM-DD 23:59:59");
+          const tm=moment(baseBefore['Base.tInsrncEndTm']).diff(moment(baseBefore['Base.tInsrncBgnTm']), 'days')
+          baseBefore['Base.cTmSysCde']=tm
+          tmDay.value=tm
+          opertaor.getTableRefByKey('webPlyBase1').setFormValue(baseBefore)
+          //保单基本信息初始化
+          const baseobj={}
+          baseobj['Base.cRenewMrk']='0'
+          opertaor.getTableRefByKey('webPlyBaseBasic').setFormValue(baseobj)
+          //承保信息初始化
+          const baseafterobj={}
+          baseafterobj['Base.cRatioTyp']='3'
+          baseafterobj['Base.cInstMrk']='0'
+          baseafterobj['Base.cDisptSttlCde']='D'
+          opertaor.getTableRefByKey('webPlyBase').setFormValue(baseafterobj)
+      });
   } else if (props.param.pageType === "readonly") {
     // 查询数据
     const getAppPlyInfoRes = await getAppPlyInfoByAppNo({
@@ -307,6 +328,7 @@ const calcPremium= () => {
             opertaor.setDataAll(ops)
             nAmt.value=ops['webPlyBase']['Base.nAmt']
             nPrm.value= ops['webPlyBase']['Base.nPrm']
+            tmDay.value= ops['webPlyBase']['Base.cTmSysCde']
             const payInfo= setPayInfo(ops['webPlyBase'],ops['webPlyApplicant'])
             console.log('生成缴费计划内容',payInfo)
             opertaor.getTableRefs()['webPlyPay'].setFormValue(payInfo)
