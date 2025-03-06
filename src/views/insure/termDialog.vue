@@ -82,9 +82,8 @@ import {
 } from "@/shared/app-table-config";
 import { getBasicKindList } from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
-import { CustomRecordingService } from "./custom-recording.service";
+import { getProdEnableList } from "./custom-recording.service";
 const emits = defineEmits(["ok", "cancel"]);
-const customRecordingService = new CustomRecordingService();
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
 const dialogVisible = ref(true);
@@ -158,10 +157,10 @@ const method = {
 // 获取条款列表
 function loadTree() {
   nodes.value = [];
-  const q = {
+  const param = {
     name: formconfig1.value.name,
   };
-  customRecordingService.getProdEnableList(q).then((res: any) => {
+  getProdEnableList(param).then((res: any) => {
     if (res.code === 200) {
       nodes.value = res.data;
     } else {
@@ -175,6 +174,7 @@ const onEvent = (data: any, node: any) => {
   if (data.list.length == 0) {
     listShow.value = true;
     datas.value = [data];
+    emits("ok", data, node);
   }
 };
 

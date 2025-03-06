@@ -14,31 +14,26 @@
         <h4 style="margin: 10px 20px">投保向导</h4>
         <el-form-item
           label="归属机构"
-          prop="companyId"
+          prop="cDptCde"
           style="width: 800px"
           :rules="[getRules('required', {})]"
         >
-          <dept v-model="formconfig1.companyId" />
+          <dept v-model="formconfig1.cDptCde" />
         </el-form-item>
 
         <h4 style="margin: 10px 20px">投保信息</h4>
         <el-form-item
           label="投保标识"
-          prop="b"
+          prop="cRenewMrk"
           :rules="[getRules('required', {})]"
         >
-          <el-radio-group v-model="formconfig1.b">
+          <el-radio-group v-model="formconfig1.cRenewMrk">
             <el-radio value="0">新保</el-radio>
             <el-radio value="1">续保</el-radio>
           </el-radio-group>
-          <!-- <el-input v-if="formconfig1.b=='1'" 
-            style="width: 300px;margin-left: 20px;" 
-            placeholder="请输入续保保单号" 
-            v-model="formconfig1.d">
-          </el-input> -->
         </el-form-item>
         <el-form-item
-          v-if="formconfig1.b == '1'"
+          v-if="formconfig1.cRenewMrk == '1'"
           label=""
           prop="d"
           :rules="[getRules('required', {})]"
@@ -54,10 +49,10 @@
         <h4 style="margin: 10px 20px">选择条款</h4>
         <el-form-item
           label="团个属性"
-          prop="c"
+          prop="cGrpMrk"
           :rules="[getRules('required', {})]"
         >
-          <el-radio-group v-model="formconfig1.c">
+          <el-radio-group v-model="formconfig1.cGrpMrk">
             <el-radio value="0">个单</el-radio>
             <el-radio value="1">团单</el-radio>
           </el-radio-group>
@@ -99,12 +94,12 @@
           <el-col :span="24">
             <el-form-item
               label="条款名称"
-              prop="e"
+              prop="cNmeCn"
               :rules="[getRules('required', {})]"
             >
               <el-select
                 style="width: 600px"
-                v-model="formconfig1.e"
+                v-model="formconfig1.cNmeCn"
                 placeholder="请选择"
                 @change="handleChange"
                 @clear="handleClear"
@@ -112,8 +107,8 @@
               >
                 <el-option
                   v-for="item in options"
-                  :label="item.value"
-                  :value="item.code"
+                  :label="item.cNmeCn"
+                  :value="item.cTermNo"
                 />
               </el-select>
               <el-button
@@ -129,7 +124,7 @@
 
     <div v-if="step == '1'">内容</div>
     <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
-      <rt-button
+      <!-- <rt-button
         :item="{
           type: 'primary',
           label: '取消',
@@ -137,7 +132,7 @@
             dialogVisible = false;
           },
         }"
-      />
+      /> -->
 
       <rt-button
         :item="{
@@ -153,14 +148,14 @@
         }"
       />
 
-      <rt-button
+      <!-- <rt-button
         v-if="step == '1'"
         :item="{
           type: 'primary',
           label: '确定',
           func: () => {},
         }"
-      />
+      /> -->
     </div>
   </div>
 </template>
@@ -177,7 +172,7 @@ import {
   AppFreeEditMethod,
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
-
+import { getProdEnableList } from "./custom-recording.service";
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
@@ -189,8 +184,9 @@ import {
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { b, i } from "vite/dist/node/types.d-jgA8ss1A";
 import { getListByCode } from "@/api/code-list-service";
-import { CustomRecordingService } from "./custom-recording.service";
-const customRecordingService = new CustomRecordingService();
+// import { CustomRecordingService } from "./custom-recording.service";
+const router = useRouter();
+// const customRecordingService = new CustomRecordingService();
 const dialogVisible = ref(true);
 const step = ref("");
 const dzmodal = useDzModal();
@@ -211,20 +207,22 @@ const datas = ref<string>("");
 const departmentTree = defineAsyncComponent(
   () => import("@/components/common/DepartmentTree.vue")
 );
-const kindEdit = defineAsyncComponent(() => import("./kindEdit.vue"));
+const termDialog = defineAsyncComponent(() => import("./termDialog.vue"));
 const formconfig1 = ref({
-  companyId: "",
-  b: "0",
-  c: "0",
+  cDptCde: "",
+  cRenewMrk: "0",
+  cGrpMrk: "0",
+  cNmeCn: "",
+  cTermNo: "",
   d: "",
-  e: "",
 });
 
 // 条款下拉数据
 function loadOptions() {
-  customRecordingService.getProdEnableList({}).then((res: any) => {
+  const param = { pageNo: 1, pageSize: 9999, CEnableFlag: "1" };
+  getProdEnableList(param).then((res) => {
     if (res.code === 200) {
-      options.value = res.data;
+      options.value = res.data.result;
     } else {
       ElMessage.error(res.msg);
     }
@@ -262,48 +260,21 @@ onMounted(async () => {
 });
 
 // 绑定方法
-const method = {
-  func1: () => {
-    console.log(getRules);
-  },
-};
-
-// 懒加载函数
-const getChildren = (node, resolve) => {
-  if (node.level === 0) return resolve([]);
-  // sysOperatorMgrService.getOrgDptTreeListByPid({
-  //   cDptCde: node.data['id']
-  // })
-  // .then(result => {
-  //     const dto = [];
-  //     if (200 !== result['code']) {
-  //       ElMessage.error(result['msg']);
-  //     } else {
-  //       ElMessage.success(result['msg']);
-  //     }
-  //     if (Array.isArray(result['data']) && result['data'].length > 0) {
-  //         for (const row of result['data']) {
-  //             dto.push({
-  //                 id: row['id'],
-  //                 name: row['id'] + '-' + row['name'],
-  //                 parentId: row['parentId'],
-  //                 hasChildren: true
-  //             });
-  //         }
-  //     }
-  //     resolve(dto);
-  // }, error => {
-  //     console.log('出错了', error);
-  //     ElMessage.error('后台服务异常,请联系管理员');
-  // });
-};
-
+const method = {};
 // 下一步
 function next() {
-  console.log(formconfig1.value);
+  // console.log(formconfig1.value);
   freeEditRef.value?.validate().then((isValid: boolean) => {
     if (!isValid) {
       return false;
+    } else {
+      const data = formconfig1.value;
+      router.push({
+        path: "/pcis/my-page",
+        query: {
+          param: JSON.stringify({ ...data, ...{ pageType: "app" } }),
+        },
+      });
     }
     step.value = step.value == "0" ? "1" : "0";
     title.value = step.value == "0" ? "自定义录单" : "选择条款";
@@ -328,19 +299,19 @@ function handleClick(item: any, index: number) {
     list.value.forEach((item: any, index: any) => (item.checked = false));
   }
   item.checked = !item.checked;
-  formconfig1.value.e = item.checked ? item.code : "";
+  formconfig1.value.cNmeCn = item.checked ? item.value : "";
 }
 
 // 条款列表选中
 function handleChange() {
   // 如果下拉数据不存在list中，则清除list所有选中数据
-  if (!list.value.some((item: any) => item.code == formconfig1.value.e)) {
+  if (!list.value.some((item: any) => item.code == formconfig1.value.cTermNo)) {
     list.value.forEach((item: any, index: any) => (item.checked = false));
   }
   // 如果下拉数据存在list中，则选中list中对应数据
-  if (list.value.some((item: any) => item.code == formconfig1.value.e)) {
+  if (list.value.some((item: any) => item.code == formconfig1.value.cTermNo)) {
     list.value.forEach((item: any, index: any) => {
-      if (item.code == formconfig1.value.e) {
+      if (item.code == formconfig1.value.cTermNo) {
         item.checked = true;
       } else {
         item.checked = false;
@@ -352,7 +323,7 @@ function handleChange() {
 // 条款列表清除
 function handleClear() {
   list.value.forEach((item: any, index: any) => (item.checked = false));
-  formconfig1.value.e = "";
+  formconfig1.value.cTermNo = "";
 }
 
 // 条款列表拖拽后操作
@@ -362,9 +333,11 @@ function updateOptionAll(e: any) {
 
 // 选择条款弹框
 function showModal() {
-  dzmodal.open(kindEdit, { type: "Issuer", data: {} }).then((res: any) => {
+  dzmodal.open(termDialog, { type: "Issuer", data: {} }).then((res: any) => {
     if (res.type === "ok") {
-      console.log("获取弹框的数据，或者更新接口", res.body);
+      const selectedTerm = res.body;
+      formconfig1.value.cTermNo = selectedTerm.code;
+      formconfig1.value.cNmeCn = selectedTerm.value;
     }
   });
 }
@@ -405,7 +378,7 @@ function showModal() {
   cursor: pointer;
 }
 .checked {
-  border: 2px solid rgb(143, 46, 57);
+  border: 3px solid rgb(178, 31, 41);
   background: rgb(255, 232, 230);
 }
 .el-card.eachItems >>> .el-card__body,
