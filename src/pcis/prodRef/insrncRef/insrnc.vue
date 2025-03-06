@@ -36,14 +36,14 @@ const method = {
   func1: () => {},
   bgnTmFn:(v)=>{
       const tabref = opertaor.getTableRefs();
-      const baseBefore=tabref['webPlyBase1'].getFromValue()
+      const baseBefore=tabref['insrnc'].getFromValue()
       const tm=moment(baseBefore['Base.tInsrncEndTm']).diff(moment(v), 'days')
       baseBefore['Base.cTmSysCde']=tm
       setFormValue(baseBefore)
   },
   endTmFn:(v)=>{
       const tabref = opertaor.getTableRefs();
-      const baseBefore=tabref['webPlyBase1'].getFromValue()
+      const baseBefore=tabref['insrnc'].getFromValue()
       const tm=moment(v).diff(moment(baseBefore['Base.tInsrncBgnTm']), 'days')
       baseBefore['Base.cTmSysCde']=tm
       setFormValue(baseBefore)
