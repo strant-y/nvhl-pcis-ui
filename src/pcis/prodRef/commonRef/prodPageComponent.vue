@@ -104,11 +104,11 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cComponentKey",
         inputtype: "rtselect",
         title: "绑定组件",
-        func: (v) => {
-          componentTable = dataList?.find(
-            (item) => v === item.cComponentKey
-          ).cComponentTable;
-        },
+        // func: (v) => {
+        //   componentTable = dataList?.find(
+        //     (item) => v === item.cComponentKey
+        //   ).cComponentTable;
+        // },
       },
       {
         prop: "cComponentName",
