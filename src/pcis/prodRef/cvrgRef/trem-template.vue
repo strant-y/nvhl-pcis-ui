@@ -176,9 +176,9 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { terConfig } from "@/store/modules/term-config";
 import { init } from "echarts";
-const opertaor = dataOpertaor();
+const terconfig = terConfig();
 
 const props = defineProps({
   modelValue: {
@@ -371,24 +371,40 @@ function dataInit() {
     cTermNo: props.modelValue["Term.cClauseCode"],
     riskList: queryList,
   };
-  getTRFactorJson(param).then((res: any) => {
-    const { code, data, msg } = res;
-    if (200 === code) {
-      collist.value = data.data.collist;
-      factormap.value = data.data.factormap;
-      colInfo.value = data.data.colInfo;
-      groupInfo.value = data.data.groupInfo;
-      term.value = data.data.term;
-      termFactormap.value = data.data.termFactormap;
-      formconfig1.fromSchema = data.data.termFactormap;
-      if(data.data.termTitleConf?.CCnm){
-        termTitleConf.value = JSON.parse(data.data.termTitleConf.CCnm);
-      }
-    } else {
-      ElMessage.error(msg);
+  const d = terconfig.getConfig(queryKey);
+  if (d) {
+    collist.value = d.collist;
+    factormap.value = d.factormap;
+    colInfo.value = d.colInfo;
+    groupInfo.value = d.groupInfo;
+    term.value = d.term;
+    termFactormap.value = d.termFactormap;
+    formconfig1.fromSchema = d.termFactormap;
+    if (d.termTitleConf?.CCnm) {
+      termTitleConf.value = JSON.parse(d.termTitleConf.CCnm);
     }
     initshowConfig();
-  });
+  } else {
+    getTRFactorJson(param).then((res: any) => {
+      const { code, data, msg } = res;
+      if (200 === code) {
+        collist.value = data.data.collist;
+        factormap.value = data.data.factormap;
+        colInfo.value = data.data.colInfo;
+        groupInfo.value = data.data.groupInfo;
+        term.value = data.data.term;
+        termFactormap.value = data.data.termFactormap;
+        formconfig1.fromSchema = data.data.termFactormap;
+        if (data.data.termTitleConf?.CCnm) {
+          termTitleConf.value = JSON.parse(data.data.termTitleConf.CCnm);
+        }
+        terconfig.addConfig(queryKey, data.data);
+        initshowConfig();
+      } else {
+        ElMessage.error(msg);
+      }
+    });
+  }
 }
 
 function initshowConfig() {

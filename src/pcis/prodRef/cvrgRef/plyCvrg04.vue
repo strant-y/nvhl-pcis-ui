@@ -60,10 +60,13 @@ import tremTemplate from "./trem-template.vue";
 const dialog = ref<DialogMethod | null>(null);
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { terConfig } from "@/store/modules/term-config";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { prodTemple } from "./titleTemple";
 
 const opertaor = dataOpertaor();
+const terconfig = terConfig();
+terconfig.configInit(); // 条款配置数据初始化
 
 const props = defineProps({
   pageSchema: {
