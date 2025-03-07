@@ -224,6 +224,10 @@ const inputtype = [
     label: "table",
     value: "rttable",
   },
+  {
+    label: "cascaderarea",
+    value: "rtcascaderarea",
+  },
 ];
 const dateType = [
   {

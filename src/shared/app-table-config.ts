@@ -20,7 +20,7 @@ export interface AppTableConfig {
   endBtnsPosition?: "left" | "right" | "center"; // 结尾处按钮位置
   dragFlag?: boolean;
   editFlag?: boolean;
-  isPage?: boolean; //是否分页
+  isPage?: boolean | string; //是否分页
   editList?: Array<any>; //指定可编辑列
   showSelection?:boolean; //行多选
 }
