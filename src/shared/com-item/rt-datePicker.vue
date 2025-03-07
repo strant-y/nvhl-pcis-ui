@@ -26,7 +26,7 @@
     :disabledDate="item.disabledDate"
     :shortcuts="item.shortcuts"
     :size="item.size"
-    :format="item.format ? item.format : 'YYYY-MM-DD'"
+    :format="item.format ? item.format : getValueFormat()"
     :clearable="
       item.clearable
         ? typeof item.clearable === 'boolean'
@@ -45,8 +45,8 @@
             : false
         : false
     "
-    :dateFormat="item.dateFormat ? item.format : 'YYYY-MM-DD'"
-    :timeFormat="item.timeFormat ? item.format : 'YYYY-MM-DD'"
+    :dateFormat="'YYYY-MM-DD'"
+    :timeFormat="'HH:mm:ss'"
     :valueFormat="item.valueFormat ? item.valueFormat : getValueFormat()"
     @change="handleChange"
   />
