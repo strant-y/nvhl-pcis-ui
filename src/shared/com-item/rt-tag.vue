@@ -47,23 +47,30 @@ interface OptionTypeBySelect extends OptionType {
 
 const options: Ref<OptionTypeBySelect[]> = ref([]); // 字典下拉数据源
 
-watch([options, () => props.modelValue], ([newOptions, newModelValue]) => {
-  if (newOptions == null || newOptions.length === 0) return; // 下拉数据源加载未完成不回显
+watch([() => props.modelValue], ([newModelValue]) => {
   selectedValue.value = newModelValue;
+  getOptions();
 });
 
 watch(
   () => props.item,
   (newValue, oldValue) => {
-    if (props.item.loadData) {
-      options.value = newValue.loadData;
+    if(!selectedValue.value){
+      return ;
+    }
+  }
+);
+
+function getOptions(){
+  if (props.item.loadData) {
+      options.value = props.item.loadData;
     }
     if (props.item.typeCode) {
       codeListStore
         .queryCodeList(
           {
             codeListName: props.item.typeCode,
-            codeListParam: props.item.codeParam,
+            codeListParam: {value:selectedValue.value ,...props.item.codeParam},
           },
           false,
           props.item.cache ? props.item.cache : true
@@ -74,8 +81,7 @@ watch(
           options.value = [];
         });
     }
-  }
-);
+}
 
 function getValueLabel() {
   const option = options.value.find(
@@ -106,24 +112,24 @@ function getColor() {
 
 onMounted(() => {
   // 初始化组件数据
-  if (props.item) {
-    if (!props.item.loadData && !!props.item.typeCode) {
-      codeListStore.queryCodeList(
-          {
-            codeListName: props.item.typeCode,
-            codeListParam: props.item.codeParam,
-          },
-          false,
-          props.item.cache ? props.item.cache : true
-        )
-        .then((res) => (options.value = res))
-        .catch((err) => {
-          console.error(err);
-          options.value = [];
-        });
-    } else {
-      options.value = props.item.loadData;
-    }
-  }
+  // if (props.item) {
+  //   if (!props.item.loadData && !!props.item.typeCode) {
+  //     codeListStore.queryCodeList(
+  //         {
+  //           codeListName: props.item.typeCode,
+  //           codeListParam: props.item.codeParam,
+  //         },
+  //         false,
+  //         props.item.cache ? props.item.cache : true
+  //       )
+  //       .then((res) => (options.value = res))
+  //       .catch((err) => {
+  //         console.error(err);
+  //         options.value = [];
+  //       });
+  //   } else {
+  //     options.value = props.item.loadData;
+  //   }
+  // }
 });
 </script>
