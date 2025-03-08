@@ -50,6 +50,8 @@ import clauseConf from "./clauseConfRef/clauseConf.vue";
 import prodaudit from "./commonRef/prodaudit.vue";
 import clauseConfBasicInfo from "./commonRef/ClauseConfBasicInfo.vue";
 
+import agentPre from "./commodityRef/agentPer.vue" //代理(经济)人
+
 
 /**用于动态组件的映射生成 */
 const componentMap = {
@@ -103,6 +105,8 @@ const componentMap = {
   healthNoticeAddRef:healthNoticeAdd,
   clauseConfRef:clauseConf,
   clauseConfBasicInfoRef:clauseConfBasicInfo,
+
+  agentPre: agentPre,
 };
 
 const install = (Vue) => {
