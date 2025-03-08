@@ -38,47 +38,58 @@ onMounted(() => {
 const method = {
   // func demo
   funcquery: () => {
-    console.log(11111 + "点击了");
-    // const tabref = opertaor.getTableRefs();
-    // console.log(tabref);
-      const param = opertaor.getParam();
-      console.log(param)
-      console.log(dialog.value)
-      dialog.value?.open(
-          "querycustomerView",
-          {
-              type: "show",
-              data: {
-                  cProdNo: param.cProdNo,
-              },
-          },
-          {
-              isOk: (selectdata: any) => {
-                  console.log('a',selectdata)
-              },
-          },
-          { title: "选择客户信息", width: 85 }
-      );
+    const param = opertaor.getParam();
+    dialog.value?.open(
+      "querycustomerView",
+      {
+        type: "show",
+        data: {
+          cProdNo: param.cProdNo,
+        },
+      },
+      {
+        isOk: (selectdata: any) => {
+          console.log("a", selectdata);
+        },
+      },
+      { title: "选择客户信息", width: 70 }
+    );
   },
-  funcconfirm: ()=>{
-      applicantEditRef.value?.validate().then((isValid) => {
-          console.log(isValid)
-          if (isValid) {
-              // handleQuery();
-              ElMessage.success("客户信息已经存在");
-          } else {
-              ElMessage.error("请填写必填项");
-          }
-      });
-  },
-  funcreset: ()=>{
-      const tabref = opertaor.getTableRefs();
-      const applicantValue=tabref['applicant'].getFromValue()
-      console.log(applicantValue)
-      for (const k in applicantValue){
-          applicantValue[k]=null
+  funcconfirm: () => {
+    applicantEditRef.value?.validate().then((isValid) => {
+      console.log(isValid);
+      if (isValid) {
+        // handleQuery();
+        ElMessage.success("客户信息已经存在");
+      } else {
+        ElMessage.error("请填写必填项");
       }
-  }
+    });
+  },
+  funcreset: () => {
+    const tabref = opertaor.getTableRefs();
+    const applicantValue = tabref["applicant"].getFromValue();
+    console.log(applicantValue);
+    for (const k in applicantValue) {
+      applicantValue[k] = null;
+    }
+  },
+  func: () => {
+    const param = opertaor.getParam();
+    dialog.value?.open(
+      "ndustryCateModal",
+      {
+        type: "show",
+        data: {},
+      },
+      {
+        isOk: (selectdata: any) => {
+          console.log("a", selectdata);
+        },
+      },
+      { title: "国民经济行业分类", width: 85 }
+    );
+  },
 };
 
 // 绑定特殊验证器

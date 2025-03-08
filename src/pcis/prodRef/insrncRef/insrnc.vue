@@ -34,19 +34,19 @@ onMounted(() => {
 const method = {
   // func demo
   func1: () => {},
-  bgnTmFn:(v)=>{
-      const tabref = opertaor.getTableRefs();
-      const baseBefore=tabref['insrnc'].getFromValue()
-      const tm=moment(baseBefore['Base.tInsrncEndTm']).diff(moment(v), 'days')
-      baseBefore['Base.cTmSysCde']=tm
-      setFormValue(baseBefore)
+  bgnTmFn: (v) => {
+    const tabref = opertaor.getTableRefs();
+    const baseBefore = tabref["insrnc"].getFromValue();
+    const tm = moment(baseBefore["Base.tInsrncEndTm"]).diff(moment(v), "days");
+    baseBefore["Base.cTmSysCde"] = tm;
+    setFormValue(baseBefore);
   },
-  endTmFn:(v)=>{
-      const tabref = opertaor.getTableRefs();
-      const baseBefore=tabref['insrnc'].getFromValue()
-      const tm=moment(v).diff(moment(baseBefore['Base.tInsrncBgnTm']), 'days')
-      baseBefore['Base.cTmSysCde']=tm
-      setFormValue(baseBefore)
+  endTmFn: (v) => {
+    const tabref = opertaor.getTableRefs();
+    const baseBefore = tabref["insrnc"].getFromValue();
+    const tm = moment(v).diff(moment(baseBefore["Base.tInsrncBgnTm"]), "days");
+    baseBefore["Base.cTmSysCde"] = tm;
+    setFormValue(baseBefore);
   },
 };
 

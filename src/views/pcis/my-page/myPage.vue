@@ -273,7 +273,13 @@ async function loadAfter() {
       baseafterobj["Base.cRatioTyp"] = "3";
       baseafterobj["Base.cInstMrk"] = "0";
       baseafterobj["Base.cDisptSttlCde"] = "D";
+      baseafterobj["Applicant.cStkMrk"] = "0";
+      baseafterobj["Applicant.cCustRiskRank"] = "925104";
+      baseafterobj["Insured.cStkMrk"] = "0";
+      baseafterobj["Insured.cCustRiskRank"] = "925104";
       opertaor.getTableRefByKey("base").setFormValue(baseafterobj);
+      opertaor.getTableRefByKey("applicant").setFormValue(baseafterobj);
+      opertaor.getTableRefByKey("insured").setFormValue(baseafterobj);
     });
   } else if (props.param.pageType === "edit") {
     const cAppNo = props.param.cAppNo;
