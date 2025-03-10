@@ -41,7 +41,7 @@ const emits = defineEmits(["update:modelValue", "updateMethod"]); // 父组件�
 function handleChange(val?: any) {
   emits("update:modelValue", val);
   emits("updateMethod");
-  props.item.func ? props.item.func(val,props.row) : null;
+  // props.item.func ? props.item.func(val,props.row) : null;
 }
 
 watch([() => props.modelValue], ([newModelValue]) => {

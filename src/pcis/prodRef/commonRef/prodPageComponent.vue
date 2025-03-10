@@ -23,10 +23,12 @@ import {
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import { createFreeButtonBase } from "@/shared/button-config";
+import { codeListViewStore } from "@/store";
 const emits = defineEmits(["ok", "cancel"]);
 const props = defineProps({
   data: Object,
 });
+const codeListStore = codeListViewStore();
 let dataList = ref<any[]>([]);
 let componentTable = ref();
 interface MyTableMethod {
@@ -37,6 +39,7 @@ interface MyTableMethod {
   setFormValue: (data: any) => void;
   getTableValue(): () => any;
   removeRow: (dataId: string) => any;
+  setValueByRowKey: (props: string, dataId: string, value: any) => void;
 }
 // 定义表格数据
 const tableRef = ref<MyTableMethod | null>(null);
@@ -104,11 +107,30 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cComponentKey",
         inputtype: "rtselect",
         title: "绑定组件",
-        // func: (v) => {
-        //   componentTable = dataList?.find(
-        //     (item) => v === item.cComponentKey
-        //   ).cComponentTable;
-        // },
+        func: (v) => {
+          const sdata = tableRef.value?.getSelectRow();
+
+          codeListStore
+            .queryCodeList(
+              {
+                codeListName: "getComponentByKey",
+                codeListParam: { value: v },
+              },
+              false,
+              false
+            )
+            .then((res) => {
+              if (res.length > 0) {
+                const label = res[0]["label"];
+                tableRef.value?.setValueByRowKey(
+                  "cComponentTable",
+                  sdata._dataId,
+                  label
+                );
+              }
+            })
+            .catch((err) => {});
+        },
       },
       {
         prop: "cComponentName",
@@ -121,6 +143,11 @@ const tableconfig = reactive<AppTableConfig>(
         title: "组件图标",
         type: "icon",
       },
+      {
+        prop: "cComponentTable",
+        inputtype: "rtinput",
+        title: "组件目标VO",
+      },
     ],
   })
 );
@@ -129,10 +156,7 @@ const saveBtn = createFreeButtonBase({
   type: "primary",
   label: "保存",
   func: () => {
-    const param = tableRef.value?.getFromValue().map((item) => {
-      item.cComponentTable = componentTable;
-      return item;
-    });
+    const param = tableRef.value?.getFromValue();
     const params = Object.assign(props.data, {
       pageComponents: param,
     });
@@ -156,11 +180,11 @@ function updateOption(params: any, dataId: string, props: string) {
         let newOption: any[] = [];
         if (data) {
           dataList = data;
-          console.log(dataList, "dataList");
           Object.keys(data).forEach((item) => {
             newOption.push({
               label: data[item].cComponentKey + " " + data[item].cComponentName,
               value: data[item].cComponentKey,
+              data: data[item],
             });
           });
           tableRef.value?.updateOption(dataId, props, newOption);

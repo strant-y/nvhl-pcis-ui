@@ -238,9 +238,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         }),
       },
       {
-        prop: "cComponentTable",
+        prop: "componentTable",
         inputtype: "rtinput",
-        title: "所属table",
+        title: "所属表VO",
       },
     ],
     superFromShow: "要素详情",

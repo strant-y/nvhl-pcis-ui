@@ -392,6 +392,14 @@ function setPopover(v: any, i: any, item: any) {
 function getFromValue() {
   return dataList.value;
 }
+function setValueByRowKey(props:string , rowId: any, value:any){
+  dataList.value?.forEach((data) => {
+      // 初始化行数字Id
+      if (data._dataId === rowId) {
+        data[props] = value;
+      }
+    });
+}
 
 function setFormValue(data: any) {
   dataList.value = data;
@@ -415,6 +423,7 @@ defineExpose({
   getFromValue,
   setFormValue,
   removeRow,
+  setValueByRowKey,
 });
 </script>
 
