@@ -47,8 +47,11 @@ import InsuranceRules from "./commodityRef/InsuranceRules.vue";
 import commonProblem from "./commodityRef/CommonProblem.vue";
 import healthNoticeAdd from "./commodityRef/HealthNoticeAdd.vue";
 import clauseConf from "./clauseConfRef/clauseConf.vue";
-import prodaudit from "./commonRef/prodaudit.vue";
+// import prodaudit from "./commonRef/prodaudit.vue";
 import clauseConfBasicInfo from "./commonRef/ClauseConfBasicInfo.vue";
+import  ndustryCateModal  from "./commodityRef/ndustryCateModal.vue";
+
+import agentPre from "./commodityRef/agentPer.vue" //代理(经济)人
 
 
 /**用于动态组件的映射生成 */
@@ -75,7 +78,7 @@ const componentMap = {
 
 
   prodInfoRef: prodInfo,
-  prodauditRef: prodaudit,
+  // prodauditRef: prodaudit,
   relatedMainInsuranceRef: relatedMainInsurance,
   prodComponentRef: prodComponent,
   InruranceTypeBasicInfoRef:InruranceTypeBasicInfo,
@@ -103,6 +106,9 @@ const componentMap = {
   healthNoticeAddRef:healthNoticeAdd,
   clauseConfRef:clauseConf,
   clauseConfBasicInfoRef:clauseConfBasicInfo,
+
+  agentPre: agentPre,
+  ndustryCateModal:ndustryCateModal,
 };
 
 const install = (Vue) => {

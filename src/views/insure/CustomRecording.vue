@@ -210,6 +210,7 @@ const departmentTree = defineAsyncComponent(
 const termDialog = defineAsyncComponent(() => import("./termDialog.vue"));
 const formconfig1 = ref({
   cDptCde: "",
+  cDptNme: "",
   cRenewMrk: "0",
   cGrpMrk: "0",
   cNmeCn: "",
@@ -275,12 +276,12 @@ function next() {
           param: JSON.stringify({ ...data, ...{ pageType: "app" } }),
         },
       });
+      sessionStorage.setItem('toMyPageData', JSON.stringify({ ...data, ...{ pageType: "app" } }))
     }
     step.value = step.value == "0" ? "1" : "0";
     title.value = step.value == "0" ? "自定义录单" : "选择条款";
   });
 }
-
 // 上一步
 function prev() {
   step.value = "0";

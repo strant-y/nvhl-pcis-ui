@@ -252,7 +252,7 @@ onMounted(() => {
   if (param.editType == "edit") {
     setTimeout(() => {
       handleQuery();
-    }, 300);
+    }, 600);
   } else if (param.editType == "view") {
     setDisa();
     tableconfig.titleBtns.forEach((btn) => {

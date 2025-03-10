@@ -10,6 +10,7 @@ import RtIcon from "./com-item/rt-icon.vue";
 import RtInput from "./com-item/rt-input.vue";
 import RtSelect from "./com-item/rt-select.vue";
 import RtCascader from "./com-item/rt-cascader.vue";
+import RtCascaderArea from "./com-item/rt-cascader-area.vue";
 import RtSelectV2 from "./com-item/rt-select-v2.vue";
 import RtNumber from "./com-item/rt-number.vue";
 import RtDatePicker from "./com-item/rt-datePicker.vue";
@@ -39,6 +40,7 @@ const componentMap = {
   rtselect: RtSelect,
   rtSelectV2: RtSelectV2,
   rtcascader: RtCascader,
+  rtcascaderarea: RtCascaderArea,
   rtnumber: RtNumber,
   rtdatepicker: RtDatePicker,
   rtswitch: RtSwitch,

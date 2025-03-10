@@ -58,6 +58,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 param: JSON.stringify({ ...data, ...{ pageType: "app" } }),
               },
             });
+            sessionStorage.setItem('toMyPageData', JSON.stringify({ ...data, ...{ pageType: "app" } }))
           } else {
             ElMessage.warning("请检查表单！");
           }

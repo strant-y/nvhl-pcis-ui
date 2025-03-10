@@ -19,7 +19,7 @@
           v-model:page-size="queryParams.pageSize"
           layout="prev, pager, next, jumper"
           :total="pageresult.total"
-          v-if="tableConfig.isPage"
+          v-if="tableConfig.isPage === true"
           @size-change="pageChange"
           @current-change="pageChange"
         />

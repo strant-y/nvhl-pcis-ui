@@ -36,58 +36,67 @@ onMounted(() => {
 const method = {
   // func demo
   func1: () => {},
-  funccopyvalue:()=>{
-      const tabref = opertaor.getTableRefs();
-      const applicantValue=tabref['applicant'].getFromValue()
-      const insuredValue={}
-      for(const k in applicantValue){
-          const key='Insured.'+k.split('.')[1]
-          if(k.split('.')[1]=='cAppNme'){
-              insuredValue['Insured.cInsuredNme']=applicantValue['Applicant.cAppNme']
-          }else{
-              insuredValue[key]=applicantValue[k];
-          }
+  funccopyvalue: () => {
+    const tabref = opertaor.getTableRefs();
+    const applicantValue = tabref["applicant"].getFromValue();
+    const insuredValue = {};
+    for (const k in applicantValue) {
+      const key = "Insured." + k.split(".")[1];
+      if (k.split(".")[1] == "cAppNme") {
+        insuredValue["Insured.cInsuredNme"] =
+          applicantValue["Applicant.cAppNme"];
+      } else {
+        insuredValue[key] = applicantValue[k];
       }
-      setFormValue(insuredValue)
+    }
+    setFormValue(insuredValue);
   },
   funcquery: () => {
-      const param = opertaor.getParam();
-      console.log(param)
-      console.log(dialog.value)
-      dialog.value?.open(
-          "querycustomerView",
-          {
-              type: "show",
-              data: {
-                  cProdNo: param.cProdNo,
-              },
-          },
-          {
-              isOk: (selectdata: any) => {
-                  console.log('a',selectdata)
-              },
-          },
-          { title: "选择客户信息", width: 85 }
-      );
+    const param = opertaor.getParam();
+    console.log(param);
+    console.log(dialog.value);
+    dialog.value?.open(
+      "querycustomerView",
+      {
+        type: "show",
+        data: {
+          cProdNo: param.cProdNo,
+        },
+      },
+      {
+        isOk: (selectdata: any) => {
+          console.log("a", selectdata);
+        },
+      },
+      { title: "选择客户信息", width: 85 }
+    );
   },
-  funcconfirm: ()=>{
-      insuredEditRef.value?.validate().then((isValid) => {
-          console.log(isValid)
-          if (isValid) {
-              // handleQuery();
-              ElMessage.success("客户信息已经存在");
-          } else {
-              ElMessage.error("请填写必填项");
-          }
-      });
+  funcconfirm: () => {
+    insuredEditRef.value?.validate().then((isValid) => {
+      console.log(isValid);
+      if (isValid) {
+        // handleQuery();
+        ElMessage.success("客户信息已经存在");
+      } else {
+        ElMessage.error("请填写必填项");
+      }
+    });
   },
-    funcreset: ()=>{
-        const tabref = opertaor.getTableRefs();
-        const InsuredValue=tabref['insured'].getFromValue()
-        for (const k in InsuredValue){
-            InsuredValue[k]=null
-        }
+  funcreset: () => {
+    const tabref = opertaor.getTableRefs();
+    const InsuredValue = tabref["insured"].getFromValue();
+    for (const k in InsuredValue) {
+      InsuredValue[k] = null;
     }
+  },
+  func: () => {
+    dialog.value?.open(
+      "ndustryCateModal",
+      {},
+      {},
+      { title: "国民经济行业分类", width: "70" }
+    );
+  },
 };
 
 // 绑定特殊验证器
