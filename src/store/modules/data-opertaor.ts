@@ -51,7 +51,7 @@ export const dataOpertaor = defineStore(
 
     const setDataAll = (alldata: any) => {
       Object.keys(alldata).forEach((key) => {
-        if (tableRefs[key]) {
+        if (tableRefs[key] && tableRefs[key].setFormValue) {
           tableRefs[key].setFormValue(alldata[key]);
         }
       });
