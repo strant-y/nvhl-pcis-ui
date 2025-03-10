@@ -3,7 +3,7 @@
     v-model="dialogVisible"
     title="机构部门"
     custom-class="custom-dialog"
-    width="80%"
+    width="85%"
   >
     <el-divider></el-divider>
     <el-input
@@ -15,10 +15,10 @@
       ref="treeRef"
       style="max-width: 500px"
       class="filter-tree"
-      :data="data"
-      :default-expand-all="true"
+      :data="_nodes"
+      lazy
+      :load="loadNode"
       :props="defaultProps"
-      default-expand-all
       :filter-node-method="filterNode"
       @node-click="handleNodeClick"
       :highlight-current="true"
@@ -37,9 +37,14 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue";
 import { ElTree } from "element-plus";
+import { useUserStore } from "@/store/modules/user";
+import { SysOperatorMgrService } from '@/views/sys-right-basic/service/sys-operator-mgr.service';
+const sysOperatorMgrService = new SysOperatorMgrService();
 interface Tree {
   [key: string]: any;
 }
+const user = ref<any>(useUserStore.user);
+const _nodes = ref([])
 const dialogVisible = ref(true);
 const filterText = ref("");
 const treeRef = ref<InstanceType<typeof ElTree>>();
@@ -47,8 +52,11 @@ const selectedNode = ref<Tree | null>();
 
 const defaultProps = {
   children: "children",
-  label: "label",
+  label: "name",
+  isLeaf: 'leaf',
 };
+
+const emits = defineEmits(['ok'])
 
 watch(filterText, (val) => {
   treeRef.value!.filter(val);
@@ -56,7 +64,7 @@ watch(filterText, (val) => {
 
 const filterNode = (value: string, data: Tree) => {
   if (!value) return true;
-  return data.label.includes(value);
+  return data.name.includes(value);
 };
 const handleNodeClick = (data: Tree) => {
   selectedNode.value = data;
@@ -67,65 +75,70 @@ const handleCancel = () => {
 const handleSave = () => {
   if (selectedNode.value) {
     console.log("选中的节点", selectedNode.value);
+    emits('ok', selectedNode.value)
   }
   dialogVisible.value = false;
 };
-const data: Tree[] = [
-  {
-    id: 1,
-    label: "软通动力总公司",
-    children: [
-      {
-        id: 4,
-        label: "湖北分公司",
-        children: [
-          {
-            id: 9,
-            label: "十堰中支公司",
-            children: [
-              {
-                id: 11,
-                label: "软通动力十堰中支公司车商团队1",
-              },
-            ],
-          },
-          {
-            id: 10,
-            label: "分公司销售团队15",
-          },
-          {
-            id: 12,
-            label: "分公司销售团队16",
-          },
-        ],
-      },
-      {
-        id: 5,
-        label: "河北分公司",
-        children: [
-          {
-            id: 10,
-            label: "软通动力石家庄中心支公司",
-            children: [
-              {
-                id: 12,
-                label: "软通动力石家庄团队管理部",
-              },
-            ],
-          },
-          {
-            id: 11,
-            label: "软通动力廊坊中心支公司",
-          },
-          {
-            id: 13,
-            label: "软通动力邯郸中心支公司",
-          },
-        ],
-      },
-    ],
-  },
-];
+
+const initDptTreeList = () => {
+  let root = '0200000000000';
+  if (user.value && user.value.companyId) {
+    root = user.value.companyId;
+  }
+  const params = {
+    pId: root,
+  };
+  sysOperatorMgrService.getOrgDptTreeNodeById(params).then((res) => {
+    if (res && res['data']) {
+      if (_nodes.value.length === 0) {
+        _nodes.value = [];
+      }
+      const data = res['data'];
+      if (res['data']) {
+        _nodes.value.push({
+          id: root,
+          name: res['data']['name'],
+          leaf: false,
+        });
+      }
+    }
+  }).catch((error) => {
+    ElMessage.error('后台服务异常,请联系管理员');
+  });
+};
+
+const loadNode = (node, resolve) => {
+  if (node.level === 0) {
+    return resolve([]);
+  }
+  const params = {
+    cDptCde: node.data.id,
+  };
+  sysOperatorMgrService.getOrgDptTreeListByPid(params).then((result) => {
+    const dto = [];
+    if (200 !== result['code']) {
+      ElMessage.error(result['msg']);
+    } else {
+      ElMessage.success(result['msg']);
+    }
+    if (result['data'] && result['data'].length > 0) {
+      result['data'].forEach(item => {
+        dto.push({
+          id: item['id'],
+          name: item['name'],
+          leaf: !item.hasChildren,
+        });
+      })
+    }
+    resolve(dto);
+  }).catch((error) => {
+    console.log('出错了', error);
+    ElMessage.error('后台服务异常,请联系管理员');
+  });
+};
+onMounted(() => {
+  initDptTreeList();
+});
 </script>
 <style scoped>
 filter-tree {

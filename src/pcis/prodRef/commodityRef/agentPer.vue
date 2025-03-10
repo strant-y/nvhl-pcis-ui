@@ -1,225 +1,341 @@
 <template>
-  <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
-  <app-table
-          :tableConfig="tableconfig"
-          v-model:pageresult="pageresult"
-          ref="tableRef"
-          @page-change="handleQuery(false)"
-  />
+    <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+    <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
+        @page-change="handleQuery(false)" @row-click="handleRowClick"/>
 </template>
 
 <script setup lang="ts">
-    import {
-        AppFreeEditConfig,
-        AppFreeEditMethod,
-        createAppFreeEditConfig,
-        createFromUiConfig,
-    } from "@/shared/app-free-edit-config";
-    import {
-        AppTableConfig,
-        AppTableMethod,
-        createTableEditConfig,
-    } from "@/shared/app-table-config";
-    import { createFreeButtonBase } from "@/shared/button-config";
-    import { useValidator } from "@/typings/useValidator";
-    import { dataOpertaor } from "@/store/modules/data-opertaor";
-    const opertaor = dataOpertaor();
-    const { getRules } = useValidator();
-    const props = defineProps({
-        data: {
-            type: Object,
-            default: () => ({}),
-        },
-        method: {
-            type: Object,
-            default: () => ({}),
-        },
-    });
-    const emits = defineEmits(["handleClose"]);
-    const freeEditRef = ref<AppFreeEditMethod | null>(null);
-    const tableRef = ref<AppTableMethod | null>(null);
-    const pageresult = reactive<Pageresult>({
-        result: "",
-        /** 数据列表 */
-        list: [],
-        /** 总数 */
-        total: 0,
-    });
-    const formconfig1 = reactive<AppFreeEditConfig>(
-        createAppFreeEditConfig({
-            title: "",
-            endBtnsPosition: "right",
-            endBtns: [
-                createFreeButtonBase({
-                    type: "primary",
-                    label: "查询",
-                    func: async () => {
-                        freeEditRef.value?.validate().then((isValid) => {
-                            if (isValid) {
-                                handleQuery();
-                            } else {
-                                ElMessage.error("请填写必填项");
-                            }
-                        });
-                    },
-                }),
-            ],
-            fromSchema: [
-                {
-                    prop: "CDptCde",
-                    inputtype: "rtinput",
-                    title: "机构部门",
+import {
+    AppFreeEditConfig,
+    AppFreeEditMethod,
+    createAppFreeEditConfig,
+    createFromUiConfig,
+} from "@/shared/app-free-edit-config";
+import {
+    AppTableConfig,
+    AppTableMethod,
+    createTableEditConfig,
+} from "@/shared/app-table-config";
+import { createFreeButtonBase } from "@/shared/button-config";
+import { useValidator } from "@/typings/useValidator";
+import { getBsnsTypList, getChaTypeList, getChaSubtypList, getPageList } from "@/api/code-list-service";
+import { dataOpertaor } from "@/store/modules/data-opertaor";
+const opertaor = dataOpertaor();
+const { getRules } = useValidator();
+const props = defineProps({
+    data: {
+        type: Object,
+        default: () => ({}),
+    },
+    method: {
+        type: Object,
+        default: () => ({}),
+    },
+});
+const emits = defineEmits(["handleClose"]);
+const freeEditRef = ref<AppFreeEditMethod | null>(null);
+const tableRef = ref<AppTableMethod | null>(null);
+const pageresult = reactive<Pageresult>({
+    result: "",
+    /** 数据列表 */
+    list: [],
+    /** 总数 */
+    total: 0,
+});
+const formconfig1 = reactive<AppFreeEditConfig>(
+    createAppFreeEditConfig({
+        title: "",
+        endBtnsPosition: "right",
+        endBtns: [
+            createFreeButtonBase({
+                type: "primary",
+                label: "查询",
+                func: async () => {
+                    freeEditRef.value?.validate().then((isValid) => {
+                        if (isValid) {
+                            handleQuery();
+                        } else {
+                            ElMessage.error("请填写必填项");
+                        }
+                    });
                 },
-                {
-                    prop: "CChaMrk",
-                    inputtype: "rtselect",
-                    title: "业务类型",
-                    // itemWidth: 2,
-                    loadData: [{value: '0', label: '机构'}, {value: '1', label: '个人'}],
-                },
-                {
-                    prop: "CBsnsTyp",
-                    inputtype: "rtselect",
-                    title: "业务来源大类",
-                    loadData: [],
-                    rules: [getRules("required", {})],
-                },
-                {
-                    prop: "CChaType",
-                    inputtype: "rtselect",
-                    title: "业务来源中类",
-                    loadData: [],
-                    rules: [getRules("required", {})],
-                },
-                {
-                    prop: "CChaSubtype",
-                    inputtype: "rtselect",
-                    title: "业务来源子类",
-                    loadData: [],
-                    rules: [getRules("required", {})],
-                },
-                {
-                    prop: "CChaCde",
-                    inputtype: "rtinput",
-                    title: "编码",
-                },
-                {
-                    prop: "CChaNme",
-                    inputtype: "rtinput",
-                    title: "代理(经纪)名称",
-                },
-            ],
-            fromUi: createFromUiConfig({
-                cols: 3,
             }),
+        ],
+        fromSchema: [
+            {
+                prop: "CDptCde",
+                inputtype: "rtinput",
+                title: "机构部门",
+                disabled: true,
+            },
+            {
+                prop: "CChaMrk",
+                inputtype: "rtselect",
+                title: "业务类型",
+                loadData: [{ value: '0', label: '机构' }, { value: '1', label: '个人' }],
+            },
+            {
+                prop: "CBsnsTyp",
+                inputtype: "rtselect",
+                title: "业务来源大类",
+                loadData: [],
+                rules: [getRules("required", {})],
+                func: (val) => {
+                    setValue('CChaType', '')
+                    setValue('CChaSubtype', '')
+                    getChaTypeList({ 'BsnsTyp': val }).then(res => {
+                        if (null != res && null != res['code']) {
+                            if (res['code'] === 200) {
+                                const obj = {
+                                    loadData: res.data
+                                }
+                                setFormItem('CChaType', obj)
+                            }
+                        }
+
+                    })
+                }
+            },
+            {
+                prop: "CChaType",
+                inputtype: "rtselect",
+                title: "业务来源中类",
+                loadData: [],
+                rules: [getRules("required", {})],
+                func: (val) => {
+                    setValue('CChaSubtype', '')
+                    const params = {
+                        'CChaType': val,
+                        'flag': 1
+                    }
+                    getChaSubtypList(params).then(res => {
+                        if (null != res && null != res['code']) {
+                            if (res['code'] === 200) {
+                                const obj = {
+                                    loadData: res.data
+                                }
+                                setFormItem('CChaSubtype', obj)
+                            }
+                        }
+
+                    })
+                }
+            },
+            {
+                prop: "CChaSubtype",
+                inputtype: "rtselect",
+                title: "业务来源子类",
+                loadData: [],
+                rules: [getRules("required", {})],
+            },
+            {
+                prop: "CChaCde",
+                inputtype: "rtinput",
+                title: "编码",
+            },
+            {
+                prop: "CChaNme",
+                inputtype: "rtinput",
+                title: "代理(经纪)名称",
+            },
+        ],
+        fromUi: createFromUiConfig({
+            cols: 3,
+        }),
+    })
+);
+const tableconfig = reactive<AppTableConfig>(
+    createTableEditConfig({
+        fromSchema: [
+            {
+                prop: "CBsnsTyp",
+                inputtype: "rtselect",
+                title: "业务来源大类",
+                loadData: [],
+            },
+            {
+                prop: "CChaType",
+                inputtype: "rtselect",
+                title: "业务来源中类",
+                loadData: [],
+            },
+            {
+                prop: "CChaSubtype",
+                inputtype: "rtselect",
+                title: "业务来源子类",
+                loadData: [],
+            },
+            {
+                prop: "CChaCde",
+                inputtype: "rtinput",
+                title: "代理编码",
+            },
+            {
+                prop: "CChaNme",
+                inputtype: "rtinput",
+                title: "代理(经纪)名称",
+            },
+            {
+                prop: "CAgtAgrItemCde",
+                inputtype: "rtinput",
+                title: "代理机构",
+            },
+            {
+                prop: "CAgtAgrNo",
+                inputtype: "rtinput",
+                title: "代理(经纪)协议",
+            },
+            {
+                prop: "CAgtAgrName",
+                inputtype: "rtinput",
+                title: "协议名称",
+            },
+        ],
+    })
+);
+
+function getFromValue() {
+    return freeEditRef?.value?.getFromValue();
+}
+
+function setFormValue(value: any) {
+    freeEditRef?.value?.setFormValue(value);
+}
+
+function validate() {
+    return freeEditRef?.value?.validate();
+}
+
+function setValue(key: string, value: any) {
+    freeEditRef?.value?.setValue(key, value);
+}
+
+function getValue(key: string) {
+    return freeEditRef?.value?.getValue(key);
+}
+function setDisa() {
+}
+
+//给表单下拉项赋值
+function setFormItem(key, obj) {
+    if (obj && Object.keys(obj).length) {
+        formconfig1.fromSchema?.forEach(item => {
+            if (item.prop === key) {
+                Object.assign(item, obj)
+            }
         })
-    );
-    const tableconfig = reactive<AppTableConfig>(
-        createTableEditConfig({
-            fromSchema: [
-                {
-                    prop: "cClntMrk",
-                    inputtype: "rttag",
-                    title: "客户类型",
-                    loadData: [
-                        {
-                            label: "法人",
-                            value: "0",
-                        },
-                        {
-                            label: "个人",
-                            value: "1",
-                        },
-                    ],
-                },
-                {
-                    prop: "cKindNme",
-                    inputtype: "rtinput",
-                    title: "客户名称",
-                },
-                {
-                    prop: "cProdNo",
-                    inputtype: "rtinput",
-                    title: "客户层级",
-                },
-                {
-                    prop: "cDispCde",
-                    inputtype: "rtinput",
-                    title: "证件类型",
-                },
-                {
-                    prop: "cNmeCn",
-                    inputtype: "rtinput",
-                    title: "证件号码",
-                },
-                {
-                    prop: "cAuditStatus",
-                    inputtype: "rtinput",
-                    title: "通讯地址",
-                },
-                {
-                    prop: "cAuditStatus",
-                    inputtype: "rtinput",
-                    title: "邮编",
-                },
-            ],
-        })
-    );
-
-    function getFromValue() {
-        return freeEditRef?.value?.getFromValue();
     }
+}
 
-    function setFormValue(value: any) {
-        freeEditRef?.value?.setFormValue(value);
+/** 查询 */
+function handleQuery(flag?: boolean) {
+    const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
+    const s = freeEditRef.value?.getFromValue(); //获取表单数据
+    const param = Object.assign(s, r);
+    param.CProdNo = props.data.data.CProdNo
+    getAgencyBusinessList(param)
+}
+/**
+ * 调用api获取代理信息
+ */
+function getAgencyBusinessList(param?: any) {
+    // 获取数据
+    if (param.CChaSubtype === '030503') {
+        getPageList('PERSONAL_AGENCY_LIST', param).then(res => {
+            if (!!res && !!res['data']) {
+                pageresult.total = res['totalCount'];
+                pageresult.list = res['data'];
+            }
+        }, error => {
+            console.log('出错了', error);
+            ElMessage.error('后台服务异常,请联系管理员');
+        });
+    } else if (param.CChaSubtype === '030504') {
+        getPageList('INDEPENDENT_GENERATION_LIST', param).then(res => {
+            if (!!res && !!res['data']) {
+                pageresult.total = res['totalCount'];
+                pageresult.list = res['data'];
+            }
+        }, error => {
+            console.log('出错了', error);
+            ElMessage.error('后台服务异常,请联系管理员');
+        });
+    } else {
+        getPageList('AGENCY_BUSINESS_LIST', param).then(res => {
+            if (!!res && !!res['data']) {
+                pageresult.total = res['totalCount'];
+                pageresult.list = res['data'];
+            }
+        }, error => {
+            console.log('出错了', error);
+            ElMessage.error('后台服务异常,请联系管理员');
+        });
     }
+}
 
-    function validate() {
-        return freeEditRef?.value?.validate();
-    }
+function handleRowClick(val) {
+    console.error(val)
+}
 
-    function setValue(key: string, value: any) {
-        freeEditRef?.value?.setValue(key, value);
-    }
-
-    function getValue(key: string) {
-        return freeEditRef?.value?.getValue(key);
-    }
-    function setDisa() {
-    }
-
-    /** 查询 */
-    function handleQuery(flag?: boolean) {
-        const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
-        const s = freeEditRef.value?.getFromValue(); //获取表单数据
-        const param = Object.assign(s, r);
-        if(s['cAppNme']==null&&s['cCertfCde']==null){
-            ElMessage.error("客户姓名或证件号码至少一个不为空！");
-            return;
+onMounted(() => {
+    if (sessionStorage.getItem('toMyPageData')) {
+        const data = JSON.parse(sessionStorage.getItem('toMyPageData'))
+        //业务来源大类下拉数据
+        const params = {
+            CDptCde: data['cDptCde'],
+            CKindNo: data['cKindNo']
         }
-        console.log(param)
-        return;
-        // getProFactoryList(param)
-        //     .then((res) => {
-        //         const { code, data, msg } = res;
-        //         if (200 === code) {
-        //             pageresult.list = data.result;
-        //             pageresult.total = data.total;
-        //         } else {
-        //             ElMessage.error(msg);
-        //         }
-        //     })
-        //     .finally(() => {});
+        //查询大类数据，用于默认回显
+        getBsnsTypList(params).then(res => {
+          if (null != res && null != res['code']) {
+            if (res['code'] === 200) {
+              const obj = {
+                  loadData: res.data
+              }
+              setFormItem('CBsnsTyp', obj)
+              setValue('CBsnsTyp', props.data.data.cBsnsTyp)
+            }
+          }
+        })
+        //查询中类数据，用于默认回显
+        getChaTypeList({ 'BsnsTyp': props.data.data.cBsnsTyp }).then(res => {
+          if (null != res && null != res['code']) {
+            if (res['code'] === 200) {
+              const obj = {
+                  loadData: res.data
+              }
+              setFormItem('CChaType', obj)
+              setValue('CChaType', props.data.data.cChaType)
+            }
+          }
+        })
+        //查询子类数据，用于默认回显
+        const paramSub = {
+            'CChaType': props.data.data.cChaType,
+            'flag': 1
+        }
+        getChaSubtypList(paramSub).then(res => {
+          if (null != res && null != res['code']) {
+            if (res['code'] === 200) {
+              const obj = {
+                  loadData: res.data
+              }
+              setFormItem('CChaSubtype', obj)
+              setValue('CChaSubtype', props.data.data.cChaSubtype)
+            }
+          }
+        })
     }
+    nextTick(() => {
+        setValue('CDptCde', props.data.data.CDptCde)
+    })
+});
 
-    onMounted(() => {
-    });
-
-    defineExpose({
-        getFromValue,
-        setFormValue,
-        validate,
-        setValue,
-        getValue,
-    });
+defineExpose({
+    getFromValue,
+    setFormValue,
+    validate,
+    setValue,
+    getValue,
+});
 </script>

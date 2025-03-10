@@ -48,7 +48,7 @@ const props = defineProps({
 });
 
 const codeListStore =  codeListViewStore();
-const emits = defineEmits(["update:modelValue"]); // 父组件监听事件，同步子组件值的变化给父组件
+const emits = defineEmits(["update:modelValue", "selectedItem"]); // 父组件监听事件，同步子组件值的变化给父组件
 
 const selectedValue = ref<string | number | Array<any> | undefined>();
 
@@ -136,8 +136,39 @@ const dpetData ={
   }
 }
 
+//根据value获取item，用于录单页回显机构部门
+function findItemInTree(tree, value) {
+    // 遍历树的每一个节点
+    for (let i = 0; i < tree.length; i++) {
+        const item = tree[i];
+        // 检查当前节点的值是否等于目标值
+        if (item.value === value) {
+            return {
+              label: item.label,
+              value: item.value
+            };
+        }
+        // 如果当前节点有子节点
+        if (item.children && item.children.length > 0) {
+            // 递归调用 findItemInTree 函数在子节点中查找
+            const found = findItemInTree(item.children, value);
+            if (found) {
+                return {
+                  label: found.label,
+                  value: found.value
+                };
+            }
+        }
+    }
+    // 如果没有找到匹配的节点，返回 null
+    return null;
+}
+
 function instChange(val){
   emits("update:modelValue", val);
+  const currentItem = findItemInTree(options.value, val)
+  console.log('currentItem', currentItem)
+  emits("selectedItem", currentItem)
   if(!props.multiple){
     refCascader.value.togglePopperVisible(false);
   }

@@ -18,7 +18,7 @@
           style="width: 800px"
           :rules="[getRules('required', {})]"
         >
-          <dept v-model="formconfig1.cDptCde" />
+          <dept v-model="formconfig1.cDptCde" @selected-item="selectedItem" />
         </el-form-item>
 
         <h4 style="margin: 10px 20px">投保信息</h4>
@@ -218,6 +218,8 @@ const formconfig1 = ref({
   d: "",
 });
 
+const selectTreeItem = ref({})
+
 // 条款下拉数据
 function loadOptions() {
   const param = { pageNo: 1, pageSize: 9999, CEnableFlag: "1" };
@@ -262,6 +264,12 @@ onMounted(async () => {
 
 // 绑定方法
 const method = {};
+
+//当前选中的机构item
+function selectedItem(item) {
+  selectTreeItem.value = item
+}
+
 // 下一步
 function next() {
   // console.log(formconfig1.value);
@@ -276,7 +284,7 @@ function next() {
           param: JSON.stringify({ ...data, ...{ pageType: "app" } }),
         },
       });
-      sessionStorage.setItem('toMyPageData', JSON.stringify({ ...data, ...{ pageType: "app" } }))
+      sessionStorage.setItem('toMyPageData', JSON.stringify({ ...data, ...{ pageType: "app" }, ...{dptItem: selectTreeItem.value} }))
     }
     step.value = step.value == "0" ? "1" : "0";
     title.value = step.value == "0" ? "自定义录单" : "选择条款";
