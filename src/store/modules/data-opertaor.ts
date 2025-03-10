@@ -51,103 +51,96 @@ export const dataOpertaor = defineStore(
 
     const setDataAll = (alldata: any) => {
       Object.keys(alldata).forEach((key) => {
-        if (tableRefs[key]) {
+        if (tableRefs[key] && tableRefs[key].setFormValue) {
           tableRefs[key].setFormValue(alldata[key]);
         }
       });
     };
 
-      const getDataAll = () => {
-          const keys = Object.keys(tableRefs);
-          const res = {};
-          keys.forEach(key => {
-              try {
-                  res[key]=JSON.parse(JSON.stringify(tableRefs[key].getFromValue()));
-              } catch (error) {
-                  console.log('方法不存在或出现错误，跳过执行');
+    const getDataAll = () => {
+      const keys = Object.keys(tableRefs);
+      const res = {};
+      keys.forEach(key => {
+        try {
+          res[key] = JSON.parse(JSON.stringify(tableRefs[key].getFromValue()));
+        } catch (error) {
+          console.log('方法不存在或出现错误，跳过执行');
+        }
+      });
+      return res;
+    };
+    /**
+     * @Title: 转换数据
+     */
+    const convertData = (result) => {
+      const res = {};
+      const data = result['res']['composition'];
+      const res1 = {};  //临时存放抽离数据
+      const pageInfo = tableConfig[0]['pageInfo'];
+      const schema = {};
+      pageInfo.forEach((k) => {
+        const pageKey = k['pageKey'];
+        if (!data[pageKey]) {
+          res1[pageKey] = {};
+          schema[pageKey] = k['pageSchema'];
+        }
+      });
+      Object.keys(res1)?.forEach(k => {
+        const sc = schema[k];
+        if (sc['fromSchema'] && sc['fromSchema'].length > 0) {
+          const fromSchema = sc['fromSchema'];
+          fromSchema.forEach(f => {
+            const prop = f['prop']; // 抽离需要的数据
+            const d = getDataByKey(prop, data);
+            if (d) {
+              res1[k][prop] = d;
+            }
+          });
+        }
+      });
+      pageInfo.forEach((k) => {
+        const tab = k['pageType']; // 根据key获取tab 然后判断是否是GridEdit或FreeEdit
+        const voNme = k['pageKey'];
+        let da = {};
+        if (res1[voNme]) {
+          da = res1[voNme];
+        } else {
+          if (!!tab && 'free' === tab) {
+            da = (data[voNme] instanceof Array && data[voNme].length > 0) ? data[voNme][0] : data[voNme];
+          } else
+            if (!!tab && 'grid' === tab) {
+              da = data[voNme];
+            } else
+              if (!!tab && 'custom' === tab) {
+                da = data[voNme];
               }
+        }
+        res[voNme] = da;
+      });
+      return res;
+    }
+    const getDataByKey = (key: string, data: any) => {
+      let r = null;
+      Object.keys(data).forEach((k) => {
+        if (data[k] && data[k].length > 0) {
+          Object.keys(data[k][0]).forEach((d) => {
+            if (d === key) {
+              r = data[k][0][d];
+              delete data[k][0][d];
+            }
           });
-          return res;
-      };
-      /**
-       * @Title: 转换数据
-       */
-      const convertData = (result) => {
-          const res = {};
-          if (!!result['res']['composition'] && !!tableConfig[0]) {
-              const pageInfo=tableConfig[0]['pageInfo']
-              pageInfo.forEach((k) => {
-                  const voNme =k['pageKey']
-                  let srcTab = voNme;
-                  if(voNme=='plyBase' || voNme=='insrnc' || voNme=='base'){
-                      srcTab='Base'
-                  }else if(voNme =='applicant'){
-                      srcTab='Applicant'
-                  }else if(voNme =='insured'){
-                      srcTab='Insured'
-                  }else if(voNme =='tgt'){
-                      srcTab='EngineeringTgt'
-                  }else if(voNme =='cvrg'){
-                      srcTab='Term'
-                  }else if(voNme =='payinfo'){
-                      srcTab='Pay'
-                  }else if(voNme =='dist'){
-                      srcTab='DesignDist'
-                  }
-                  if (!!result['res']['composition'][srcTab] && result['res']['composition'][srcTab] instanceof Array && result['res']['composition'][srcTab].length > 0) { // 数组 并且很多行
-                      const tab = k['pageType']; // 根据key获取tab 然后判断是否是GridEdit或FreeEdit
-                      const dataObj = result['res']['composition'][srcTab];
-                      const gridArr=[]
-                      for (const d in dataObj) {
-                          if (!!tab && 'free' === tab) {
-                              res[voNme] = dtoListToListObj(srcTab, dataObj[d]);
-                              return res;
-                          }else if (!!tab && 'grid' === tab && 'Base' == srcTab) {
-                              res[voNme] = dtoListToListObj(srcTab, dataObj[d]);
-                              return res;
-                          }else  if (!!tab && 'grid' === tab && 'Base' !== srcTab){
-                              gridArr.push(dtoListToListObj(srcTab, dataObj[d]))
-                              res[voNme]=gridArr
-                              // TODO vo名称对不上的,在此处加单独的逻辑
-                          }else  if (!!tab&&'custom' === tab){
-                              gridArr.push(dtoListToListObj(srcTab, dataObj[d]))
-                              res[voNme]=gridArr
-                              // TODO vo名称对不上的,在此处加单独的逻辑
-                          }
-                      }
-
-
-                  }
-              });
-          }
-          return res;
-      }
-      const dtoListToListObj = (key: string, map: any) => {
-          if (map == null) {
-              return null;
-          }
-          const listObj = [];
-          if (map == null) {
-              return null;
-          }
-          const data = {};
-          for (const k in map) {
-                      if (!!key) {
-                          data[key + '.' + firstCharLower(k)] = map[k];
-                      } else {
-                          data[firstCharLower(k)] =map[k];
-                      }
-          }
-          return data;
-      }
-      /**
-       * 首字母转换小写
-       */
-      const firstCharLower = (str: string) => {
-          return str.replace(/\b(\w)(\w*)/g, function ($0, $1, $2) {
-              return $1.toLowerCase() + $2;
-          });
-      }
+        }
+      });
+      return r;
+    }
+    /**
+     * 首字母转换小写
+     */
+    const firstCharLower = (str: string) => {
+      return str.replace(/\b(\w)(\w*)/g, function ($0, $1, $2) {
+        return $1.toLowerCase() + $2;
+      });
+    }
     return {
       setTableConfig,
       getTableConfig,

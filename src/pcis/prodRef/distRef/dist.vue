@@ -28,7 +28,7 @@ onMounted(async () => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
-  addFakeData();
+  // addFakeData();
 });
 
 // 绑定方法
@@ -36,7 +36,7 @@ const method = {
   // func demo
   func1: () => {},
   funcadd: () => {
-    distEditRef?.value?.addRow();
+    addFakeData();
   },
 };
 
@@ -60,15 +60,13 @@ function getTableValue(rowId: number, key: string) {
 }
 function addFakeData() {
   if (distEditRef.value) {
-    distEditRef.value.addRow(); // 添加新行
-    const rowId = distEditRef.value.getRowCount() - 1; // 获取最后一行的ID
     const fakeData = {
       // 假数据示例
       NSeqNo: "示例数据1",
       CCoinsurerCde: "示例数据2",
       cCiSubComp: "示例数据3",
     };
-    distEditRef.value.setRowData(rowId, fakeData); // 设置新行的数据
+    distEditRef.value.addRowByData(fakeData); // 设置新行的数据
   }
 }
 onMounted(() => {});
