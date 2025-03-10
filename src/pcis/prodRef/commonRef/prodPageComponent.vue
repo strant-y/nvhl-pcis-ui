@@ -108,28 +108,28 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtselect",
         title: "绑定组件",
         func: (v) => {
-          const sdata = tableRef.value?.getSelectRow();
+          // const sdata = tableRef.value?.getSelectRow();
 
-          codeListStore
-            .queryCodeList(
-              {
-                codeListName: "getComponentByKey",
-                codeListParam: { value: v },
-              },
-              false,
-              false
-            )
-            .then((res) => {
-              if (res.length > 0) {
-                const label = res[0]["label"];
-                tableRef.value?.setValueByRowKey(
-                  "cComponentTable",
-                  sdata._dataId,
-                  label
-                );
-              }
-            })
-            .catch((err) => {});
+          // codeListStore
+          //   .queryCodeList(
+          //     {
+          //       codeListName: "getComponentByKey",
+          //       codeListParam: { value: v },
+          //     },
+          //     false,
+          //     false
+          //   )
+          //   .then((res) => {
+          //     if (res.length > 0) {
+          //       const label = res[0]["label"];
+          //       tableRef.value?.setValueByRowKey(
+          //         "cComponentTable",
+          //         sdata._dataId,
+          //         label
+          //       );
+          //     }
+          //   })
+          //   .catch((err) => {});
         },
       },
       {
