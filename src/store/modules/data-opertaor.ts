@@ -57,91 +57,90 @@ export const dataOpertaor = defineStore(
       });
     };
 
-      const getDataAll = () => {
-          const keys = Object.keys(tableRefs);
-          const res = {};
-          keys.forEach(key => {
-              try {
-                  res[key]=JSON.parse(JSON.stringify(tableRefs[key].getFromValue()));
-              } catch (error) {
-                  console.log('方法不存在或出现错误，跳过执行');
-              }
-          });
-          return res;
-      };
-      /**
-       * @Title: 转换数据
-       */
-      const convertData = (result) => {
-          const res = {};
-          const data = result['res']['composition'];
-          const res1 = {};  //临时存放抽离数据
-          const pageInfo=tableConfig[0]['pageInfo'];
-          const schema = {};
-          pageInfo.forEach((k) => {
-            const pageKey =k['pageKey'];
-            if(!data[pageKey]){
-              res1[pageKey]={};
-              schema[pageKey] = k['pageSchema'];
+    const getDataAll = () => {
+      const keys = Object.keys(tableRefs);
+      const res = {};
+      keys.forEach(key => {
+        try {
+          res[key] = JSON.parse(JSON.stringify(tableRefs[key].getFromValue()));
+        } catch (error) {
+          console.log('方法不存在或出现错误，跳过执行');
+        }
+      });
+      return res;
+    };
+    /**
+     * @Title: 转换数据
+     */
+    const convertData = (result) => {
+      const res = {};
+      const data = result['res']['composition'];
+      const res1 = {};  //临时存放抽离数据
+      const pageInfo = tableConfig[0]['pageInfo'];
+      const schema = {};
+      pageInfo.forEach((k) => {
+        const pageKey = k['pageKey'];
+        if (!data[pageKey]) {
+          res1[pageKey] = {};
+          schema[pageKey] = k['pageSchema'];
+        }
+      });
+      Object.keys(res1)?.forEach(k => {
+        const sc = schema[k];
+        if (sc['fromSchema'] && sc['fromSchema'].length > 0) {
+          const fromSchema = sc['fromSchema'];
+          fromSchema.forEach(f => {
+            const prop = f['prop']; // 抽离需要的数据
+            const d = getDataByKey(prop, data);
+            if (d) {
+              res1[k][prop] = d;
             }
           });
-          Object.keys(res1)?.forEach(k => {
-              const sc = schema[k];
-              if(sc['fromSchema'] && sc['fromSchema'].length > 0){
-                  const fromSchema = sc['fromSchema'];
-                  console.log(fromSchema);
-                  fromSchema.forEach(f => {
-                    const prop = f['prop']; // 抽离需要的数据
-                    const d = getDataByKey(prop,data);
-                    if(d){
-                      res1[k][prop]=d;
-                    }
-                  });
-                }
-          });
-          pageInfo.forEach((k) => {
-            const tab = k['pageType']; // 根据key获取tab 然后判断是否是GridEdit或FreeEdit
-            const voNme =k['pageKey'];
-            let da = {};
-            if(res1[voNme]){
-              da = res1[voNme];
-            }else{
-              if (!!tab && 'free' === tab) {
-                da = (data[voNme] instanceof Array && data[voNme].length > 0) ? data[voNme][0] : data[voNme];
-              } else
-              if (!!tab && 'grid' === tab) {
-                da = data[voNme] ;
-              } else
+        }
+      });
+      pageInfo.forEach((k) => {
+        const tab = k['pageType']; // 根据key获取tab 然后判断是否是GridEdit或FreeEdit
+        const voNme = k['pageKey'];
+        let da = {};
+        if (res1[voNme]) {
+          da = res1[voNme];
+        } else {
+          if (!!tab && 'free' === tab) {
+            da = (data[voNme] instanceof Array && data[voNme].length > 0) ? data[voNme][0] : data[voNme];
+          } else
+            if (!!tab && 'grid' === tab) {
+              da = data[voNme];
+            } else
               if (!!tab && 'custom' === tab) {
-                da = data[voNme] ;
+                da = data[voNme];
               }
+        }
+        res[voNme] = da;
+      });
+      return res;
+    }
+    const getDataByKey = (key: string, data: any) => {
+      let r = null;
+      Object.keys(data).forEach((k) => {
+        if (data[k] && data[k].length > 0) {
+          Object.keys(data[k][0]).forEach((d) => {
+            if (d === key) {
+              r = data[k][0][d];
+              delete data[k][0][d];
             }
-            res[voNme] = da;
           });
-          return res;
-      }
-      const getDataByKey = (key: string, data: any) => {
-        let r = null;
-        Object.keys(data).forEach((k) => {
-          if(data[k] && data[k].length > 0){
-            Object.keys(data[k][0]).forEach((d) => {
-              if(d === key){
-                r = data[k][0][d];
-                delete data[k][0][d];
-              }
-            });
-          }
-        });
-        return r;
-      }
-      /**
-       * 首字母转换小写
-       */
-      const firstCharLower = (str: string) => {
-          return str.replace(/\b(\w)(\w*)/g, function ($0, $1, $2) {
-              return $1.toLowerCase() + $2;
-          });
-      }
+        }
+      });
+      return r;
+    }
+    /**
+     * 首字母转换小写
+     */
+    const firstCharLower = (str: string) => {
+      return str.replace(/\b(\w)(\w*)/g, function ($0, $1, $2) {
+        return $1.toLowerCase() + $2;
+      });
+    }
     return {
       setTableConfig,
       getTableConfig,
