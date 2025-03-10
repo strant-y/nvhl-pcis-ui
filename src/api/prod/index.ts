@@ -1118,3 +1118,7 @@ export function getProdEdrRsnInfo(queryParams: any): AxiosPromise<any> {
 export function delUndrClsById(queryParams: any): AxiosPromise<any> {
     return post(`/proddef/delUndrClsById`, queryParams);
 }
+/* 国民经济行业分类 */
+export function getPageList(queryParams: any): AxiosPromise<any> {
+    return post(`/codelist/queryPage`, queryParams);
+}

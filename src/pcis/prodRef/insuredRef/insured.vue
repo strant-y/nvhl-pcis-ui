@@ -31,7 +31,15 @@ onMounted(() => {
   );
   Object.assign(formconfig1, formconfig11);
 });
-
+function setFormItem(key, obj) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        Object.assign(item, obj);
+      }
+    });
+  }
+}
 // 绑定方法
 const method = {
   // func demo
@@ -82,6 +90,17 @@ const method = {
       }
     });
   },
+  cardTypeChange: (val) => {
+    if (val == "120001") {
+      setFormItem("Insured.cCertfCde", {
+        rules: [getRules("required", {}), getRules("idCard", {})],
+      });
+    } else {
+      setFormItem("Insured.cCertfCde", {
+        rules: [getRules("required", {})],
+      });
+    }
+  },
   funcreset: () => {
     const tabref = opertaor.getTableRefs();
     const InsuredValue = tabref["insured"].getFromValue();
@@ -89,13 +108,24 @@ const method = {
       InsuredValue[k] = null;
     }
   },
-  func: () => {
+  funcNdustryCate: () => {
     dialog.value?.open(
       "ndustryCateModal",
       {},
       {},
       { title: "国民经济行业分类", width: "70" }
     );
+  },
+  tCertMrkChecked: (val) => {
+    if (val === "1") {
+      setValue("Insured.tCertfBgnDate", "2099-12-31");
+      setValue("Insured.tCertfEndDate", "2099-12-31");
+    }
+  },
+  mobileChange: (val) => {
+    if (val) {
+      setFormItem("Insured.cMobile", { rules: [getRules("phoneNo", {})] });
+    }
   },
 };
 
