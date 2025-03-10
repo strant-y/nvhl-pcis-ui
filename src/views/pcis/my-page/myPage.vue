@@ -451,10 +451,10 @@ const setPayInfo = (base, applicant) => {
   pay["Pay.nTms"] = 1;
   if (applicant) {
     pay["Pay.cPayorCde"] = applicant["Applicant.cAppCde"];
-    pay["Pay.cPayNme"] = applicant["Applicant.cAppNme"];
+    pay["Pay.cPayorNme"] = applicant["Applicant.cAppNme"];
   } else {
     pay["Pay.cPayorCde"] = "";
-    pay["Pay.cPayNme"] = "";
+    pay["Pay.cPayorNme"] = "";
   }
   pay["Pay.nPayablePrm"] = base["Base.nPrm"];
   pay["Pay.tPayBgnTm"] = base["Base.tAppTm"];
