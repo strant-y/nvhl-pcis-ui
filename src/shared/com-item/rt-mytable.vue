@@ -93,6 +93,7 @@
                   textAlign: 'center',
                 }"
                 @click="rowClick(i)"
+                @dblclick="dblclick(i)"
               >
                 <td v-if="appgrideditConfig.tableBtnPosition === 'left'">
                   <template
@@ -326,6 +327,9 @@ function rowClick(row: any) {
   }
     selectIndex.value = row._dataId;
     emits("rowselect",row);
+}
+function dblclick(row: any) {
+   appgrideditConfig.rowDbClickFun?.(row);
 }
 function getuuid() {
   return uuidv4().replace(/-/g, "");

@@ -23,6 +23,8 @@ export interface AppTableConfig {
   isPage?: boolean | string; //是否分页
   editList?: Array<any>; //指定可编辑列
   showSelection?:boolean; //行多选
+
+  rowDbClickFun?: (rowData) => void;
 }
 
 export interface AppTableMethod {
@@ -62,7 +64,8 @@ export function createTableEditConfig(
     isPage: config.isPage || true,
     fromUi: createTableUiConfig(config.fromUi),
     showSelection: config.showSelection || false,
-    
+
+    rowDbClickFun: config.rowDbClickFun || {},
   };
 }
 

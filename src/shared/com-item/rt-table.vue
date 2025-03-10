@@ -16,6 +16,7 @@
       :size="item.size ? item.size : 'default'"
       :show-header="item.showHeader ? item.showHeader : true"
       @row-click="rowClick"
+      @row-dblclick="rowDblclick"
       :row-key="(row) => row._dataId"
       :expand-row-keys="expandRowKeys"
       @expand-change="expandChange"
@@ -263,6 +264,10 @@ function rowClick(row: any, _column: any, _event: Event) {
       editIndex.value = row._dataId;
     }
   }
+}
+
+function rowDblclick(row: any){
+  props.item.rowDbClickFun?.(row);
 }
 
 // 解决扩展页,由于编辑之后触发数据更新,页面重绘而折叠全部关闭的问题

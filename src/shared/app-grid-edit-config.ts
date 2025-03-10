@@ -25,6 +25,7 @@ export interface AppGridEditConfig {
   showSelection?: boolean; //是否显示多选列
 
   dragFlag?: boolean; // mytable模式下,是否可以拖动
+  rowDbClickFun?: (rowData) => void;
 }
 
 export interface AppGridEditMethod {
@@ -65,6 +66,7 @@ export function createAppGridEditConfig(
     showSelection: config.showSelection || false,
     fromUi: createGridFromUiConfig(config.fromUi),
     dragFlag: config.dragFlag || false,
+    rowDbClickFun: config.rowDbClickFun || {},
   };
 }
 
