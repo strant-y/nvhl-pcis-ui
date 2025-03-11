@@ -174,7 +174,7 @@ const showtype = [
     label: "显示组件",
     value: "prop",
   },
-  ]
+]
 const inputtype = [
   {
     label: "input",

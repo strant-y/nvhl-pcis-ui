@@ -66,7 +66,7 @@ export function createAppGridEditConfig(
     showSelection: config.showSelection || false,
     fromUi: createGridFromUiConfig(config.fromUi),
     dragFlag: config.dragFlag || false,
-    rowDbClickFun: config.rowDbClickFun || {},
+    rowDbClickFun: config.rowDbClickFun || null,
   };
 }
 

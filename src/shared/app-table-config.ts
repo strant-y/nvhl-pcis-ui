@@ -38,6 +38,7 @@ export interface MyTableMethod {
   setFormValue: (data: any) => void;
   getTableValue(): () => any;
   removeRow: (dataId: string) => any;
+  setValueByRowKey:(props:string ,rowId: any, value:any) => void;
 }
 export function createTableEditConfig(
   config: AppTableConfig = {}
@@ -64,8 +65,7 @@ export function createTableEditConfig(
     isPage: config.isPage || true,
     fromUi: createTableUiConfig(config.fromUi),
     showSelection: config.showSelection || false,
-
-    rowDbClickFun: config.rowDbClickFun || {},
+    rowDbClickFun: config.rowDbClickFun || null,
   };
 }
 

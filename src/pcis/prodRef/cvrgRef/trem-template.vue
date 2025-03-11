@@ -14,7 +14,21 @@
               }}</el-tag>
               <el-tag type="warning">{{ term.cNmeCn }}</el-tag>
             </el-col>
-            <el-col :span="12"> </el-col>
+            <el-col :span="12">
+              <el-row :gutter="20">
+                <template v-for="(item, k) in termFactormap" :key="k">
+                  <el-col :span="11" v-if="item.cPorpShowtitle === '1'">
+                    <el-form-item :label="item.title" class="show_title">
+                      <from-item
+                        v-model="termdata[item.prop]"
+                        @update:modelValue="update()"
+                        :item="item"
+                      />
+                    </el-form-item>
+                  </el-col>
+                </template>
+              </el-row>
+            </el-col>
             <el-col :span="2">
               <rtButton
                 @click="
@@ -42,7 +56,7 @@
             </thead>
             <tbody>
               <template v-for="(item, k) in termFactormap" :key="k">
-                <tr>
+                <tr v-if="item.cPorpShowtitle !== '1'">
                   <td>
                     <span>{{ item.title }}</span>
                   </td>
@@ -63,7 +77,7 @@
             <thead>
               <tr class="table-title">
                 <template v-for="(item, k) in termFactormap" :key="k">
-                  <th>
+                  <th v-if="item.cPorpShowtitle !== '1'">
                     {{ item.title }}
                   </th>
                 </template>
@@ -72,7 +86,7 @@
             <tbody>
               <tr>
                 <template v-for="(item, k) in termFactormap" :key="k">
-                  <td>
+                  <td v-if="item.cPorpShowtitle !== '1'">
                     <from-item
                       v-model="termdata[item.prop]"
                       @update:modelValue="update()"
@@ -217,7 +231,7 @@ const emit = defineEmits(["update:modelValue", "delete"]);
 const termRef = ref<AppFreeEditMethod | null>(null);
 const groupconf = ref<{ [key: string]: any }>({}); // 渲染数据分离,解决因为数据变更,导致触发重新渲染
 
-const termdata = ref({});
+const termdata = ref<{ [key: string]: any }>({});
 const riskList = ref<{ [key: string]: any }>({});
 
 const pageInit = ref(false);
@@ -240,7 +254,15 @@ function update() {
   } else {
     newData = termRef.value?.getFromValue();
   }
-  const list = JSON.parse(JSON.stringify(riskList.value));
+  const fromc = termFactormap.value?.filter(
+    (v: any) => v.cPorpShowtitle === "1"
+  );
+  if(fromc && fromc.length > 0){    // 将标题数据,回填到数据组中
+    fromc.forEach((v: any) => {
+      newData[v.prop] = termdata.value[v.prop];
+    });
+  }
+  // const list = JSON.parse(JSON.stringify(riskList.value));
   let ril: any[] = [];
   Object.keys(riskList.value).forEach((k: any) => {
     ril.push(riskList.value[k]);
@@ -264,7 +286,7 @@ function initData(data: any) {
   });
   riskList.value = riskData;
   nextTick(() => {
-    if (termTitleConf.value.cFactorTabType !== "grid") {
+    if (termTitleConf.value.cFactorTabType !== "grid" && termTitleConf.value.cFactorTabType !== "table") {
       termRef.value?.setFormValue(termdata.value);
     }
   });
@@ -408,7 +430,10 @@ function dataInit() {
     groupInfo.value = d.groupInfo;
     term.value = d.term;
     termFactormap.value = d.termFactormap;
-    formconfig1.fromSchema = d.termFactormap;
+    const fromc = termFactormap.value?.filter(
+      (v: any) => v.cPorpShowtitle !== "1"
+    );
+    formconfig1.fromSchema = fromc;
     if (d.termTitleConf?.CCnm) {
       termTitleConf.value = JSON.parse(d.termTitleConf.CCnm);
     }
@@ -423,7 +448,10 @@ function dataInit() {
         groupInfo.value = data.data.groupInfo;
         term.value = data.data.term;
         termFactormap.value = data.data.termFactormap;
-        formconfig1.fromSchema = data.data.termFactormap;
+        const fromc = termFactormap.value?.filter(
+          (v: any) => v.cPorpShowtitle !== "1"
+        );
+        formconfig1.fromSchema = fromc;
         if (data.data.termTitleConf?.CCnm) {
           termTitleConf.value = JSON.parse(data.data.termTitleConf.CCnm);
         }
@@ -470,7 +498,9 @@ table {
   border-collapse: collapse; /* 合并边框 */
   width: 100%;
 }
-
+.show_title {
+  margin-bottom: 0px;
+}
 table,
 th,
 td {

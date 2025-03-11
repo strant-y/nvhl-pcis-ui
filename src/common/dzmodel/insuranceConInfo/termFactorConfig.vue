@@ -35,7 +35,7 @@ import {
   MyTableMethod,
 } from "@/shared/app-table-config";
 import { iconPropType } from "element-plus/es/utils";
-import { inputtype, showtype } from "@/utils/utilKey";
+import { inputtype, showtype, yesOrNo } from "@/utils/utilKey";
 import { styleType } from "element-plus/es/components/table-v2/src/common";
 import { useValidator } from "@/typings/useValidator";
 import { createFreeButtonBase } from "@/shared/button-config";
@@ -177,7 +177,7 @@ function savegroupinfo() {
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     editFlag: true,
-    editList: ["cPorpRequired"],
+    editList: ["cPorpRequired","cFactorShowtitle"],
     fromSchema: [
       {
         prop: "icon",
@@ -197,7 +197,13 @@ const tableconfig = reactive<AppTableConfig>(
           n: "0",
         },
         width: 40,
-        func: (v: any) => {},
+        func: (v: any,row: any) => {
+          if (v !== "1") {
+            if(row.cFactorShowtitle === '1'){
+              tableRef.value?.setValueByRowKey("cFactorShowtitle", row._dataId, '0');
+            }
+         }
+        },
       },
       {
         prop: "cFactorInputtype",
@@ -215,14 +221,29 @@ const tableconfig = reactive<AppTableConfig>(
         },
         func: (v: any) => {},
       },
-      // {
-      //   prop: "cPorpType",
-      //   inputtype: "rtselect",
-      //   title: "显示类型",
-      //   loadData: showtype,
-      //   func: (v: any) => {
-      //   },
-      // },
+      {
+        prop: "cPorpShowtitle",
+        inputtype: "rtcheckbox",
+        title: "显示在标题栏",
+        keymap: {
+          y: "1",
+          n: "0",
+        },
+        func: (v: any,row: any) => {
+          if(v === '1'){
+            if(row.isChecked !== '1'){
+              ElMessage.warning("该数据未选中,不能加入标题栏!");
+              tableRef.value?.setValueByRowKey("cFactorShowtitle", row._dataId, '0');
+            }
+            const t = tableRef.value?.getFromValue();
+            const f = t.filter((node: any) => node.cFactorShowtitle === '1');
+            if(f.length > 2){
+              ElMessage.warning("最多只允许2个要素加入标题栏!");
+              tableRef.value?.setValueByRowKey("cFactorShowtitle", row._dataId, '0');
+            }
+          }
+        },
+      },
       {
         prop: "cFactorProp",
         inputtype: "rtinput",

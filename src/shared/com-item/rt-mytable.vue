@@ -169,6 +169,7 @@
                       <from-item
                         v-model="i[t.prop]"
                         :item="t"
+                        :row="i"
                         :showLabel="
                           editIndex !== i._dataId ||
                           (appgrideditConfig.editList &&
@@ -329,7 +330,7 @@ function rowClick(row: any) {
     emits("rowselect",row);
 }
 function dblclick(row: any) {
-   appgrideditConfig.rowDbClickFun?.(row);
+  appgrideditConfig.rowDbClickFun?.(row);
 }
 function getuuid() {
   return uuidv4().replace(/-/g, "");
