@@ -36,6 +36,23 @@ const method = {
   func1: () => {},
   funcpayadd: () => {
       payinfoEditRef?.value?.addRow();
+      const val=getFromValue()
+      val.items.forEach((key,index) => {
+          key['Pay.nTms']=index+1
+      });
+  },
+  funcpaydel: () => {
+      const selData=payinfoEditRef?.value?.getSelectRow()
+      if (!selData) {
+          ElMessage.error("请选择要删除的数据!");
+          return;
+      }
+      const editIndex=selData['_dataId']
+      payinfoEditRef?.value?.delRow(editIndex);
+      const val=getFromValue()
+      val.items.forEach((key,index) => {
+          key['Pay.nTms']=index+1
+      });
   },
 };
 

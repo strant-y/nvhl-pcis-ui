@@ -448,6 +448,15 @@ function addRow() {
   editIndex.value = rowId;
 }
 
+function delRow(editIndex) {
+    for (let i = tableDatas.value.length - 1; i >= 0; i--) {
+        const element = tableDatas.value[i];
+        if(element['_dataId']==editIndex){
+            tableDatas.value.splice(i, 1)
+        }
+    }
+}
+
 function addRowByData(data: any) {
   const rowId = getuuid();
   tableDatas.value?.push({ _dataId: rowId ,...data});
@@ -469,6 +478,7 @@ function handleStatusChange(row: any) {
 defineExpose({
   tableExvalidate,
   addRow,
+  delRow,
   addRowByData,
   getSelectRow,
 });
