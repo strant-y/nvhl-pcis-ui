@@ -120,6 +120,7 @@
           :label="i.title"
           :width="i.width ? i.width : null"
           :align="item.align ? item.align : 'center'"
+          :min-width="i.minWidth"
         >
           <template #default="scope">
             <template v-if="item.editFlag">
