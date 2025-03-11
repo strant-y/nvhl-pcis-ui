@@ -122,6 +122,10 @@ function addRow() {
   rttableFrom.value?.addRow();
 }
 
+function delRow(editIndex) {
+  rttableFrom.value?.delRow(editIndex);
+}
+
 function addRowByData(data: any) {
   rttableFrom.value?.addRowByData(data);
 }
@@ -137,6 +141,7 @@ defineExpose({
   validate,
   getTableValue,
   addRow,
+  delRow,
   addRowByData,
   getSelectRow,
 });

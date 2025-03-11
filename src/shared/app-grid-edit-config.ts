@@ -34,6 +34,7 @@ export interface AppGridEditMethod {
   validate: () => any;
   getTableValue: () => any;
   addRow: () => any;
+  delRow: (editIndex) => any;
   addRowByData: (rowData) => any;
   getSelectRow: () => any;
   tableExvalidate: () => any;
