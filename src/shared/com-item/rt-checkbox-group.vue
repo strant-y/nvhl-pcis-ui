@@ -36,6 +36,7 @@
         v-for="option in options"
         :value="option.value"
         :key="option.value"
+        :checked="option.checked"
         :label="option.label"
         :border="
           item.border

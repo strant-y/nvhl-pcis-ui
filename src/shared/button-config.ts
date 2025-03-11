@@ -42,6 +42,7 @@ export function createFreeButtonBase(
     iconSize: config.iconSize || "16",
     span: config.span || 2,
     func: typeof config.func === "function" ? config.func : () => {},
+    hideBtns: typeof config.hideBtns === "function" ? config.hideBtns : () => {},
     tableClick:
       typeof config.tableClick === "function" ? config.tableClick : () => {},
     loading: config.loading || false,
