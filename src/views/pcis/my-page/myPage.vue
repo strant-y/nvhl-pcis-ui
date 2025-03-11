@@ -414,10 +414,10 @@ const calcPremium = () => {
   btn.loading = true;
   const res = opertaor.getDataAll();
   res["user"] = user;
-  res["plyBase"]["Base.cDptCde"] = "0200000000000";
-  res["plyBase"]["Base.cProdNo"] = "042001";
+  res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
+  res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
   console.log(res);
-  if (res["plyBase"]["Base.cProdNo"] == "042001") {
+  if (res["plyBase"]["Base.cProdNo"] == props.param.cProdNo) {
     if (res["cvrg"].items.length == 0) {
       ElMessage.error("请录入条款信息");
       btn.loading = false;
@@ -493,10 +493,10 @@ const savePlyInfo = () => {
   btn.loading = true;
   const res = opertaor.getDataAll();
   res["user"] = user;
-  res["plyBase"]["Base.cDptCde"] = "0251010013000";
-  res["plyBase"]["Base.cProdNo"] = "042001";
+  res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
+  res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
   console.log(res);
-  if (res["plyBase"]["Base.cProdNo"] == "042001") {
+  if (res["plyBase"]["Base.cProdNo"] == props.param.cProdNo) {
     if (res["cvrg"].items.length == 0) {
       ElMessage.error("请录入条款信息");
       btn.loading = false;
