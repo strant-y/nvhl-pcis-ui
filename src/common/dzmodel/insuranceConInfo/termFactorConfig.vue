@@ -83,13 +83,17 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             value: "free",
           },
           {
+            label: "平铺表格",
+            value: "table",
+          },
+          {
             label: "表格",
             value: "grid",
           },
         ],
         func: (val: any) => {
           let h = false;
-          if (val === "free") {
+          if (val === "free" || val === "table") {
             h = true;
           }
           formconfig1.fromSchema?.forEach((item) => {

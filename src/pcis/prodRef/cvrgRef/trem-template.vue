@@ -58,6 +58,32 @@
             </tbody>
           </table>
         </template>
+        <template v-else-if="termTitleConf.cFactorTabType === 'table'">
+          <table style="width: 100%">
+            <thead>
+              <tr class="table-title">
+                <template v-for="(item, k) in termFactormap" :key="k">
+                  <th>
+                    {{ item.title }}
+                  </th>
+                </template>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <template v-for="(item, k) in termFactormap" :key="k">
+                  <td>
+                    <from-item
+                      v-model="termdata[item.prop]"
+                      @update:modelValue="update()"
+                      :item="item"
+                    />
+                  </td>
+                </template>
+              </tr>
+            </tbody>
+          </table>
+        </template>
         <template v-else>
           <app-free-edit
             :freeEditConfig="formconfig1"
@@ -206,7 +232,10 @@ watch(
 function update() {
   let newData;
 
-  if (termTitleConf.value.cFactorTabType === "grid") {
+  if (
+    termTitleConf.value.cFactorTabType === "grid" ||
+    termTitleConf.value.cFactorTabType === "table"
+  ) {
     newData = termdata.value;
   } else {
     newData = termRef.value?.getFromValue();
