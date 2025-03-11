@@ -51,7 +51,7 @@ const pageresult = reactive<Pageresult>({
 });
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    title: "国民经济行业分类",
+    title: "",
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
@@ -71,49 +71,25 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
     fromSchema: [
       {
-        prop: "cSuperCde",
+        prop: "cMaxCde",
         inputtype: "rtselect",
+        title: "行业大类",
         rules: [getRules("required", {})],
-        title: "一级分类",
-        typeCode: "Industry_Category_List2",
-        codeParam: { cParCde: "hangyefenlei2" },
+        typeCode: "Job_Description_List",
+        codeParam: { cParCde: "JobDescription" },
         func: (val) => {
-          setValue("cMaxCde", "");
           setValue("cMidCde", "");
           if (val) {
             codeListStore
               .queryCodeList({
-                codeListName: "Industry_Category_List2",
+                codeListName: "Job_Description_List",
                 codeListParam: { cParCde: val },
               })
               .then((res) => {
                 const objData = {
                   loadData: res,
                 };
-                setFormItem("cMaxCde", objData);
-              });
-          }
-        },
-      },
-      {
-        prop: "cMaxCde",
-        inputtype: "rtselect",
-        title: "二级分类",
-        rules: [getRules("required", {})],
-        loadData: [],
-        func: (val) => {
-          setValue("cMidCde", "");
-          if (val) {
-            codeListStore
-              .queryCodeList({
-                codeListName: "Industry_Category_List2",
-                codeListParam: { cParCde: val },
-              })
-              .then((res) => {
-                const objDate = {
-                  loadData: res,
-                };
-                setFormItem("cMidCde", objDate);
+                setFormItem("cMidCde", objData);
               });
           }
         },
@@ -121,19 +97,36 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cMidCde",
         inputtype: "rtselect",
+        title: "行业中类",
         rules: [getRules("required", {})],
-        title: "三级分类",
         loadData: [],
+        // func: (val) => {
+        //   setValue("cMidCde", "");
+        //   if (val) {
+        //     codeListStore
+        //       .queryCodeList({
+        //         codeListName: "Industry_Category_List2",
+        //         codeListParam: { cParCde: val },
+        //       })
+        //       .then((res) => {
+        //         const objDate = {
+        //           loadData: res,
+        //         };
+        //         setFormItem("cMidCde", objDate);
+        //       });
+        //   }
+        // },
       },
+
       {
         prop: "cCde",
         inputtype: "rtinput",
-        title: "行业编码",
+        title: "工种代码",
       },
       {
         prop: "cCnm",
         inputtype: "rtinput",
-        title: "行业名称",
+        title: "工种名称",
       },
     ],
     fromUi: createFromUiConfig({
@@ -162,17 +155,17 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cCde",
         inputtype: "rtinput",
-        title: "子行业代码",
+        title: "工种代码",
       },
       {
         prop: "cCnm",
         inputtype: "rtinput",
-        title: "子行业名称",
+        title: "工种名称",
       },
       {
-        prop: "cParCnm",
+        prop: "cCnm",
         inputtype: "rtinput",
-        title: "父行业名称",
+        title: "父级名称",
       },
     ],
   })
@@ -224,8 +217,7 @@ function setDisa() {}
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const c = { codeListName: "Industry_Category_List2" };
-  const param = Object.assign(c, { codeListParam: s, r });
+  const param = Object.assign(s, r);
   getPageList(param)
     .then((res) => {
       const { code, data, msg } = res;

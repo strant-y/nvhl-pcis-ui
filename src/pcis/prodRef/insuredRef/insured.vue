@@ -51,8 +51,7 @@ const method = {
     for (const k in applicantValue) {
       const key = "Insured." + k.split(".")[1];
       if (k.split(".")[1] == "cAppNme") {
-        insuredValue["Insured.cInsuredNme"] =
-          applicantValue["Applicant.cAppNme"];
+        insuredValue["Insured.cInsuredNme"] = applicantValue["Insured.cAppNme"];
       } else {
         insuredValue[key] = applicantValue[k];
       }
@@ -95,10 +94,72 @@ const method = {
       setFormItem("Insured.cCertfCde", {
         rules: [getRules("required", {}), getRules("idCard", {})],
       });
+      setFormItem("Insured.tCertfBgnDate", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.tCertfEndDate", {
+        rules: [getRules("required", {})],
+      });
+    } else if (val == "110002" || val == "110007") {
+      setFormItem("Insured.tCertfBgnDate", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.tCertfEndDate", {
+        rules: [getRules("required", {})],
+      });
     } else {
       setFormItem("Insured.cCertfCde", {
         rules: [getRules("required", {})],
       });
+      setFormItem("Insured.tCertfBgnDate", null);
+      setFormItem("Insured.tCertfEndDate", null);
+    }
+  },
+  InsureChange: (val) => {
+    if (val == "0") {
+      setValue("Insured.cCertfCls", "");
+      setFormItem("Insured.cCntrNme", { rules: [getRules("required", {})] });
+      setFormItem("Insured.cCntrCertfCde", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.cIsMicro", {
+        disabled: true,
+      });
+      setFormItem("Insured.cIsIndvduBiz", {
+        disabled: true,
+      });
+      codeListStore
+        .queryCodeList({
+          codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
+          codeListParam: {},
+        })
+        .then((res) => {
+          setFormItem("Insured.cCertfCls", {
+            loadData: res,
+            rules: [getRules("required", {})],
+          });
+        });
+    } else {
+      setFormItem("Insured.cIsMicro", {
+        disabled: false,
+      });
+      setFormItem("Insured.cIsIndvduBiz", {
+        disabled: false,
+      });
+      setValue("Insured.cCertfCls", "");
+      setFormItem("Insured.cCntrNme", { rules: null });
+      setFormItem("Insured.cCntrCertfCde", { rules: null });
+      codeListStore
+        .queryCodeList({
+          codeListName: "NATURAL_CERTIFICATE_CACHE",
+          codeListParam: {},
+        })
+        .then((res) => {
+          setFormItem("Insured.cCertfCls", {
+            loadData: res,
+            rules: [getRules("required", {})],
+          });
+        });
     }
   },
   funcreset: () => {
@@ -114,6 +175,22 @@ const method = {
       {},
       {},
       { title: "国民经济行业分类", width: "70" }
+    );
+  },
+  cOccupCdeChange: () => {
+    const param = opertaor.getParam();
+    dialog.value?.open(
+      "cOccupCdeModal",
+      {
+        type: "show",
+        data: {},
+      },
+      {
+        isOk: (selectdata: any) => {
+          console.log("a", selectdata);
+        },
+      },
+      { title: "职业", width: 85 }
     );
   },
   tCertMrkChecked: (val) => {

@@ -50,6 +50,7 @@ import clauseConf from "./clauseConfRef/clauseConf.vue";
 // import prodaudit from "./commonRef/prodaudit.vue";
 import clauseConfBasicInfo from "./commonRef/ClauseConfBasicInfo.vue";
 import  ndustryCateModal  from "./commodityRef/ndustryCateModal.vue";
+import  cOccupCdeModal  from "./commodityRef/cOccupCdeModal.vue";
 
 import agentPre from "./commodityRef/agentPer.vue" //代理(经济)人
 import agentWorker from "./commodityRef/agentWorker.vue" //代理业务员
@@ -111,6 +112,7 @@ const componentMap = {
   agentPre: agentPre,
   agentWorker: agentWorker,
   ndustryCateModal:ndustryCateModal,
+  cOccupCdeModal:cOccupCdeModal,
 };
 
 const install = (Vue) => {
