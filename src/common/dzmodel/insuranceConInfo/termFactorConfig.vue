@@ -177,7 +177,7 @@ function savegroupinfo() {
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     editFlag: true,
-    editList: ["cPorpRequired","cFactorShowtitle"],
+    editList: ["cPorpRequired","cPorpShowtitle"],
     fromSchema: [
       {
         prop: "icon",
@@ -199,8 +199,8 @@ const tableconfig = reactive<AppTableConfig>(
         width: 40,
         func: (v: any,row: any) => {
           if (v !== "1") {
-            if(row.cFactorShowtitle === '1'){
-              tableRef.value?.setValueByRowKey("cFactorShowtitle", row._dataId, '0');
+            if(row.cPorpShowtitle === '1'){
+              tableRef.value?.setValueByRowKey("cPorpShowtitle", row._dataId, '0');
             }
          }
         },
@@ -233,13 +233,13 @@ const tableconfig = reactive<AppTableConfig>(
           if(v === '1'){
             if(row.isChecked !== '1'){
               ElMessage.warning("该数据未选中,不能加入标题栏!");
-              tableRef.value?.setValueByRowKey("cFactorShowtitle", row._dataId, '0');
+              tableRef.value?.setValueByRowKey("cPorpShowtitle", row._dataId, '0');
             }
             const t = tableRef.value?.getFromValue();
-            const f = t.filter((node: any) => node.cFactorShowtitle === '1');
+            const f = t.filter((node: any) => node.cPorpShowtitle === '1');
             if(f.length > 2){
               ElMessage.warning("最多只允许2个要素加入标题栏!");
-              tableRef.value?.setValueByRowKey("cFactorShowtitle", row._dataId, '0');
+              tableRef.value?.setValueByRowKey("cPorpShowtitle", row._dataId, '0');
             }
           }
         },
