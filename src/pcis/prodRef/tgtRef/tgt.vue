@@ -9,7 +9,12 @@ import {
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { useProductStore } from "@/store/modules/prod";
+import { rule } from "postcss";
+import { useValidator } from "@/typings/useValidator";
+const { getRules } = useValidator();
 const opertaor = dataOpertaor();
+const productStore = useProductStore()
 
 const props = defineProps({
   pageSchema: {
@@ -21,7 +26,6 @@ const props = defineProps({
 const tgtEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));
-
 onMounted(async () => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
@@ -29,6 +33,10 @@ onMounted(async () => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
+  nextTick(() => {
+    //设置是否单项工程默认值：是
+    setValue("Tgt.cIsSingle", '1')
+  })
 });
 
 // 绑定方法
@@ -37,7 +45,38 @@ const method = {
   func1: () => {
     console.log(getRules);
   },
+  //是否单项工程change事件
+  cIsSingleFunc: (val) => {
+    if(val == '1') {
+      let obj = {
+        rules: [getRules("required", {})],
+        hidden: false
+      }
+      singChange(obj)
+    } else {
+      let obj = {
+        rules: null,
+        hidden: true
+      }
+      singChange(obj)
+    }
+    //把数据存在store，清单信息组件的是否必填根据这个来
+    productStore.setCIsSingle(val)
+  }
 };
+
+function singChange(obj) {
+  setFormItem("Tgt.cProjectName", obj) //工程名称
+  setFormItem("Tgt.nTotalCost", obj) //工程总造价 （元）
+  setFormItem("Tgt.nTotalDesign", obj) //设计总价（元）
+  setFormItem("Tgt.cProjectAddress", obj) //工程地址
+  setFormValue({
+    'Tgt.cProjectName': '',
+    'Tgt.nTotalCost': '',
+    'Tgt.nTotalDesign': '',
+    'Tgt.cProjectAddress': '',
+  })
+}
 
 // 绑定特殊验证器
 const exRules = {};
@@ -60,6 +99,17 @@ function setValue(key: string, value: any) {
 
 function getValue(key: string) {
   return tgtEditRef?.value?.getValue(key);
+}
+
+//给表单下拉项赋值
+function setFormItem(key, obj) {
+    if (obj && Object.keys(obj).length) {
+        formconfig1.fromSchema?.forEach(item => {
+            if (item.prop === key) {
+                Object.assign(item, obj)
+            }
+        })
+    }
 }
 
 defineExpose({

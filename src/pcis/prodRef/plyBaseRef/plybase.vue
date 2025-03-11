@@ -44,6 +44,7 @@ onMounted(async () => {
   );
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
+    setForSelectFilterable() //给下拉框设置可搜索
     // 录单日期、签单日期默认值
     setValue('Base.tOprTm', moment(new Date()).format("YYYY-MM-DD"))
     setValue('Base.tIssueTm', moment(new Date()).format("YYYY-MM-DD"))
@@ -53,6 +54,8 @@ onMounted(async () => {
     setValue('Base.cSusBusiness', '0')
     //录单人 默认系统操作员
     setValue('Base.cOprCde', user.companyCnm)
+    //录单人联系方式  默认操作员的
+    setValue('Base.cCiOprRel', user.phoneNO)
   })
   if(sessionStorage.getItem('toMyPageData')) {
     const data = JSON.parse(sessionStorage.getItem('toMyPageData'))
@@ -376,6 +379,15 @@ function setFormItem(key, obj) {
       }
     })
   }
+}
+
+//设置select的可搜索
+function setForSelectFilterable() {
+    formconfig1.fromSchema?.forEach(item => {
+      if(item.inputtype == 'rtSelectV2' || item.inputtype == 'rtSelect') {
+        item.filterable = true
+      }
+    })
 }
 
 defineExpose({
