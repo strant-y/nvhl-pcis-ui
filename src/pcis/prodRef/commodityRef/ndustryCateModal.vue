@@ -20,6 +20,7 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
+import { getPageList } from "@/api/prod";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
@@ -54,39 +55,47 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "primary",
         label: "查询",
         func: async () => {
-          freeEditRef.value?.validate().then((isValid) => {
-            if (isValid) {
-              handleQuery();
-            } else {
-              ElMessage.error("请填写必填项");
-            }
-          });
+          handleQuery();
+          // freeEditRef.value?.validate().then((isValid) => {
+          //   if (isValid) {
+          //     handleQuery();
+          //   } else {
+          //     ElMessage.error("请填写必填项");
+          //   }
+          // });
         },
       }),
     ],
     fromSchema: [
       {
-        prop: "cClntMrk",
+        prop: "cSuperCde",
         inputtype: "rtselect",
         title: "一级分类",
+        typeCode: "Industry_Category_List2",
+        codeParam: { cParCde: "hangyefenlei2" },
+        func: () => {},
       },
       {
-        prop: "cAppNme",
+        prop: "cMaxCde",
         inputtype: "rtselect",
         title: "二级分类",
+        typeCode: "Industry_Category_List2",
+        codeParam: { cParCde: "A" },
       },
       {
-        prop: "cCertfCls",
+        prop: "cMidCde",
         inputtype: "rtselect",
         title: "三级分类",
+        typeCode: "Industry_Category_List2",
+        codeParam: { cParCde: "A01" },
       },
       {
-        prop: "cCertfCde",
+        prop: "cCde",
         inputtype: "rtinput",
         title: "行业编码",
       },
       {
-        prop: "cCertfCde",
+        prop: "cCnm",
         inputtype: "rtinput",
         title: "行业名称",
       },
@@ -115,17 +124,17 @@ const tableconfig = reactive<AppTableConfig>(
 
     fromSchema: [
       {
-        prop: "cKindNme",
+        prop: "cCde",
         inputtype: "rtinput",
         title: "子行业代码",
       },
       {
-        prop: "cProdNo",
+        prop: "cCnm",
         inputtype: "rtinput",
         title: "子行业名称",
       },
       {
-        prop: "cDispCde",
+        prop: "cParCnm",
         inputtype: "rtinput",
         title: "父行业名称",
       },
@@ -159,11 +168,17 @@ function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r);
-  if (s["cAppNme"] == null && s["cCertfCde"] == null) {
-    ElMessage.error("客户姓名或证件号码至少一个不为空！");
-    return;
-  }
-  return;
+  getPageList(param)
+    .then((res) => {
+      const { code, data, msg } = res;
+      if (200 === code) {
+        pageresult.list = data;
+        pageresult.total = data.totalCount;
+      } else {
+        ElMessage.error(msg);
+      }
+    })
+    .finally(() => {});
 }
 
 onMounted(() => {});

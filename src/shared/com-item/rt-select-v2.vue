@@ -189,8 +189,7 @@ watch(
   (newValue, oldValue) => {
     if (props.item.loadData) {
       options.value = newValue.loadData;
-    }
-    if (props.item.typeCode) {
+    } else if (props.item.typeCode) {
       codeListStore
         .queryCodeList(
           {
@@ -228,8 +227,7 @@ onMounted(() => {
   if (props.item) {
     if (!props.item.loadData && !props.item.typeCode) {
       options.value = [];
-    }
-    else if (!props.item.loadData && !!props.item.typeCode) {
+    } else if (!props.item.loadData && !!props.item.typeCode) {
       codeListStore
         .queryCodeList(
           {

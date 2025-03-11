@@ -16,7 +16,7 @@
           <app-table
             :tableConfig="tableconfig"
             v-model:pageresult="pageresult"
-            :ref="'tableRef' + currentTabKey"
+            :ref="tableRef[Number(tab.key) - 1]"
             @selection-change="handleSelectionChange"
             @page-change="handleQuery(false)"
           />
@@ -79,6 +79,7 @@ const route = useRoute();
 const router = useRouter();
 const activeName = ref("1");
 const homeJumpData = ref({}); //接收首页的参数，用于查询条件回显
+let addrowArr=[]
 
 // 变更列
 const colChange = defineAsyncComponent(() => import("../modal/colChange.vue"));
@@ -211,17 +212,65 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "变更列",
         func: () => {
+          modalForm[0].loadData.forEach((i: any) => {
+              tableObj.notWaitObj.fromSchema.forEach((s: any) => {
+                  if(i.value==s.prop){
+                      i.checked=true
+                  }
+              })
+          })
           dzmodal
             .open(colChange, { type: "edit", data: modalForm })
             .then((res) => {
               if (res.type === "ok") {
-                tableCol.value.map((item) => {
-                  res.body.arr.forEach((e: any) => {
-                    if (item.prop == e) {
-                      tableObj.notWaitObj.fromSchema.push(item);
+                const propArr=[];
+                tableObj.notWaitObj.fromSchema.forEach((s: any) => {
+                    propArr.push(s.prop)
+                })
+                const delrowArr=[]
+                if (addrowArr.length === 0) {
+                    addrowArr = [...res.body];
+                } else {
+                    for (let i = addrowArr.length - 1; i >= 0; i--) {
+                        const element = addrowArr[i];
+                        if (!res.body.includes(element)) {
+                            delrowArr.push(element);
+                            addrowArr.splice(i, 1); // 从后往前删除，避免索引偏移
+                        }
                     }
-                  });
-                });
+                    addrowArr = [...new Set([...addrowArr, ...res.body])];
+                    modalForm[0].loadData.forEach((i: any) => {
+                        delrowArr.forEach((s: any) => {
+                            if(i.value==s){
+                                i.checked=false
+                            }
+                        })
+                    })
+                }
+                if(delrowArr.length=='0'){
+                    tableCol.value.map((item) => {
+                        res.body.forEach((e: any) => {
+                            if (item.prop == e && propArr.indexOf(e)<0) {
+                                tableObj.notWaitObj.fromSchema.push(item);
+                            }
+                        });
+                    });
+                }else{
+                    for (let i = tableObj.notWaitObj.fromSchema.length - 1; i >= 0; i--) {
+                        const element = tableObj.notWaitObj.fromSchema[i].prop;
+                        if (delrowArr.includes(element)) {
+                            tableObj.notWaitObj.fromSchema.splice(i, 1); // 从后往前删除，避免索引偏移
+                        }
+                    }
+                    tableCol.value.map((item) => {
+                        res.body.forEach((e: any) => {
+                            if (item.prop == e && propArr.indexOf(e)<0) {
+                                tableObj.notWaitObj.fromSchema.push(item);
+                            }
+                        });
+                    });
+                }
+
                 handleQuery(true);
               }
             });
@@ -230,19 +279,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
     fromSchema: [
       {
-        prop: "CPlyNo",
-        inputtype: "rtinput",
-        title: "查询条件",
-        clearable: true,
-      },
-      {
-        prop: "orgCde",
+        prop: "cDptCde",
         inputtype: "rtselect",
         title: "核保机构",
         btnWidth: 10,
         itemWidth: 2,
         rules: [{ type: "required" }],
         showExBtn: true,
+        rules: [getRules("required", {})],
         btnItems: {
           icon: "Search",
           type: "primary",
@@ -257,7 +301,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
       },
       {
-        prop: "cStatus",
+        prop: "cLoadSub",
         inputtype: "rtradio",
         title: "包含下级机构",
         loadData: [
@@ -267,85 +311,107 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       },
       {
         prop: "CPlyNo",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "二级分公司",
         clearable: true,
       },
       {
-        prop: "CPlyNo",
+        prop: "cDataTyp",
         inputtype: "rtselect",
         title: "列表类型",
         clearable: true,
+        rules: [getRules("required", {})],
         loadData: [
           { label: "全部", value: "app" },
           { label: "最新", value: "ply" },
         ],
       },
       {
-        prop: "CProdCatCde",
+        prop: "CPlyNo",
         inputtype: "rtselect",
-        title: "产品大类",
-        typeCode: "KIND_LIST_GRT",
-        params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
+        title: "单据状态",
         clearable: true,
-      },
-      {
-        prop: "CProdCatCde",
-        inputtype: "rtselect",
-        title: "产品大类",
-        typeCode: "KIND_LIST_GRT",
-        params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
-        clearable: true,
-      },
-      {
-        prop: "bsType",
-        inputtype: "rtselect",
-        title: "状态",
+        rules: [getRules("required", {})],
         loadData: [
-          { label: "投保单", value: "A" },
-          { label: "批改申请单", value: "E" },
-          { label: "方案", value: "P" },
+          { label: "投保待撤回任务", value: "1" },
+          { label: "待修改单查询", value: "2" },
+          { label: "保单到期查询", value: "3" },
+          { label: "批量导入查询", value: "4" },
+          { label: "产品组合出单", value: "5" },
         ],
       },
       {
-        prop: "appCde",
+        prop: "cKindNo",
+        inputtype: "rtselect",
+        title: "产品大类",
+        typeCode: "KIND_LIST_GRT",
+        rules: [getRules("required", {})],
+        params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
+        clearable: true,
+      },
+      {
+        prop: "cProdNo",
+        inputtype: "rtselect",
+        title: "条款",
+        typeCode: "KIND_LIST_GRT",
+        params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
+        clearable: true,
+      },
+      {
+        prop: "cAppStatus",
+        inputtype: "rtselect",
+        title: "状态",
+        rules: [getRules("required", {})],
+        loadData: [
+          { label: "暂存", value: "1" },
+          { label: "已提核", value: "2" },
+          { label: "核保退回/撤回", value: "3" },
+          { label: "核保通过", value: "4" },
+          { label: "已出保单", value: "5" },
+          { label: "已做失效操作", value: "6" },
+          { label: "已提交未接收", value: "7" },
+          { label: "见费出单退回", value: "8" },
+        ],
+      },
+        {
+            prop: "cAppNo",
+            inputtype: "rtinput",
+            title: "投保单号",
+            clearable: true,
+        },
+        {
+            prop: "cPlyNo",
+            inputtype: "rtinput",
+            title: "保单号/批单号",
+            clearable: true,
+        },
+      {
+        prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
         clearable: true,
       },
       {
-        prop: "appCde",
-        inputtype: "rtinput",
-        title: "询价单号",
-        clearable: true,
+          prop: "appCde",
+          inputtype: "rtinput",
+          title: "被保人名称",
+          clearable: true,
       },
+      // {
+      //   prop: "appCde",
+      //   inputtype: "rtinput",
+      //   title: "询价单号",
+      //   clearable: true,
+      // },
       {
-        prop: "cAppNo",
-        inputtype: "rtinput",
-        title: "投保单号",
-        clearable: true,
-      },
-      {
-        prop: "appCde",
-        inputtype: "rtinput",
-        title: "保单号/批单号",
-        clearable: true,
-      },
-      {
-        prop: "bsType",
+        prop: "cAppTyp",
         inputtype: "rtselect",
         title: "申请单类型",
         minWidth: 180,
         loadData: [
-          { label: "投保单", value: "A" },
-          { label: "批改申请单", value: "E" },
+          { label: "投保", value: "A" },
+          { label: "批改", value: "E" },
         ],
-      },
-      {
-        prop: "appCde",
-        inputtype: "rtinput",
-        title: "被保人名称",
-        clearable: true,
       },
       {
         prop: "tm1",
@@ -354,6 +420,38 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         format: "YYYY-MM-DD HH:mm:ss",
         clearable: true,
         type: "daterange",
+          shortcuts: [
+              {
+                  text: "今天",
+                  value: new Date(),
+              },
+              {
+                  text: "昨天",
+                  value: () => {
+                      const date = new Date();
+                      date.setTime(date.getTime() - 3600 * 1000 * 24);
+                      return date;
+                  },
+              },
+              {
+                  text: "一周前",
+                  value: () => {
+                      const date = new Date();
+                      date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+                      return date;
+                  },
+              },
+          ],
+      },
+      {
+          prop: "bsType",
+          inputtype: "rtselect",
+          title: "是否见费出单",
+          minWidth: 180,
+          loadData: [
+              { label: "是", value: "A" },
+              { label: "否", value: "E" },
+          ],
       },
     ],
     showSuperior: true,
@@ -361,7 +459,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "CAppNme",
         inputtype: "rtinput",
-        title: "人员姓名",
+        title: "雇员名称",
         clearable: true,
       },
       {
@@ -380,12 +478,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "CPlyNo",
         inputtype: "rtinput",
         title: "发动机号",
-        clearable: true,
-      },
-      {
-        prop: "CPlyNo",
-        inputtype: "rtinput",
-        title: "工程类型",
         clearable: true,
       },
       {
@@ -428,6 +520,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "CPlyNo",
         inputtype: "rtinput",
         title: "项目子类",
+        clearable: true,
+      },
+      {
+        prop: "CPlyNo",
+        inputtype: "rtinput",
+        title: "人员姓名",
         clearable: true,
       },
     ],
@@ -493,16 +591,15 @@ const modalForm = [
     title: "",
     itemWidth: 3,
     loadData: [
-      { label: "保单", value: "a" },
-      { label: "批单", value: "b" },
+      { label: "批单", value: "cEdrNo" },
       { label: "批改序号", value: "c" },
       { label: "机构", value: "d" },
       { label: "二级分公司", value: "e" },
       { label: "产品", value: "f" },
       { label: "条款", value: "g" },
       { label: "核保人", value: "h" },
-      { label: "核保通过日期", value: "i" },
-      { label: "状态", value: "j" },
+      { label: "核保通过日期", value: "tUdrTm" },
+      { label: "状态", value: "cAppStatus" },
       { label: "项目大类", value: "k" },
       { label: "项目中类", value: "l" },
       { label: "项目子类", value: "m" },
@@ -513,8 +610,7 @@ const modalForm = [
 
 // 变更列数据
 const tableCol = ref<Array<any>>([
-  { title: "保单", prop: "a", inputtype: "rtinput", minWidth: 180 },
-  { title: "批单", prop: "b", inputtype: "rtinput", minWidth: 180 },
+  { title: "批单", prop: "cEdrNo", inputtype: "rtinput", minWidth: 180 },
   { title: "批改序号", prop: "c", inputtype: "rtinput", minWidth: 180 },
   { title: "机构", prop: "d", inputtype: "rtinput", minWidth: 180 },
   { title: "二级分公司", prop: "e", inputtype: "rtinput", minWidth: 180 },
@@ -523,11 +619,11 @@ const tableCol = ref<Array<any>>([
   { title: "核保人", prop: "h", inputtype: "rtinput", minWidth: 180 },
   {
     title: "核保通过日期",
-    prop: "i",
+    prop: "tUdrTm",
     inputtype: "rtdatepicker",
     minWidth: 180,
   },
-  { title: "状态", prop: "j", inputtype: "rtinput", minWidth: 180 },
+  { title: "状态", prop: "cAppStatus", inputtype: "rtinput", minWidth: 180 },
   { title: "项目大类", prop: "k", inputtype: "rtinput", minWidth: 180 },
   { title: "项目中类", prop: "l", inputtype: "rtinput", minWidth: 180 },
   { title: "项目子类", prop: "m", inputtype: "rtinput", minWidth: 180 },
@@ -565,7 +661,29 @@ const tableObj = {
         type: "danger",
         size: "large",
         icon: "View",
-        tableClick: (row) => {},
+        hideBtns: (row: any) => {
+            if (row.cAppStatus != '1'&&row.cAppStatus != '3'&&row.cAppStatus != '8'){
+                return false;
+            }else{
+                return true;
+            }
+
+        },
+        tableClick: async (row) => {
+            console.log(row)
+            const r = await row;
+            if (r) {
+                const data = row;
+                router.push({
+                    path: "/pcis/my-page",
+                    query: {
+                        param: JSON.stringify({ ...data, ...{ pageType: "edit" } }),
+                    },
+                });
+            } else {
+                ElMessage.warning("请检查表单！");
+            }
+        },
       }),
       createFreeButtonBase({
         id: "score",
@@ -574,6 +692,13 @@ const tableObj = {
         type: "success",
         size: "large",
         icon: "Edit",
+        hideBtns: (row: any) => {
+            if (row.cAppStatus == '1'||row.cAppStatus == '3'||row.cAppStatus == '8'){
+                return false;
+            }else{
+                return true;
+            }
+        },
         tableClick:  async (row) => {
             console.log(row)
             const r = await row;
@@ -590,15 +715,22 @@ const tableObj = {
             }
         },
       }),
-      // createFreeButtonBase({
-      //   id: "score",
-      //   link: true,
-      //   tooltip: "删除",
-      //   type: "danger",
-      //   size: "large",
-      //   icon: "Delete",
-      //   tableClick: (row) => {},
-      // }),
+      createFreeButtonBase({
+        id: "score",
+        link: true,
+        tooltip: "删除",
+        type: "danger",
+        size: "large",
+        icon: "Delete",
+        hideBtns: (row: any) => {
+            if (row.cAppStatus == '1'||row.cAppStatus == '3'||row.cAppStatus == '8'){
+                return false;
+            }else{
+                return true;
+            }
+        },
+        tableClick: (row) => {},
+      }),
       // createFreeButtonBase({
       //   id: "score",
       //   link: true,
@@ -695,31 +827,37 @@ const tableObj = {
         prop: "cAppNo",
         inputtype: "rtinput",
         title: "投保单号",
+        minWidth: 180,
       },
       {
         prop: "cPlyNo",
         inputtype: "rtinput",
         title: "保单号",
+        minWidth: 180,
       },
       {
-          prop: "nAmt",
-          inputtype: "rtinput",
-          title: "保额",
+        prop: "nAmt",
+        inputtype: "rtinput",
+        title: "保额",
+        minWidth: 100,
       },
       {
-          prop: "nPrm",
-          inputtype: "rtinput",
-          title: "保费",
+        prop: "nPrm",
+        inputtype: "rtinput",
+        title: "保费",
+        minWidth: 100,
       },
       {
-          prop: "tInsrncBgnTm",
-          inputtype: "rtinput",
-          title: "保险起期",
+        prop: "tInsrncBgnTm",
+        inputtype: "rtinput",
+        title: "保险起期",
+        minWidth: 120,
       },
       {
-          prop: "tInsrncEndTm",
-          inputtype: "rtinput",
-          title: "保险止期",
+        prop: "tInsrncEndTm",
+        inputtype: "rtinput",
+        title: "保险止期",
+        minWidth: 120,
       },
     ],
   },
@@ -814,18 +952,15 @@ const exRules = {
 function handleQuery(flag?: boolean) {
   // 此处数组ref赋值，获取都有问题，暂时隐藏
   console.log("tableRef", tableRef);
-  console.log("freeEditRef", tableRef.value);
   console.log("freeEditRef", freeEditRef);
   const tableRefs = tableRef.value[currentTabKey.value];
   const freeEditRefs = freeEditRef.value[currentTabKey.value];
-  // const r = tableRefs.value?.getPartnerPage(flag); //获取分页数据
+  const r = tableRefs.value[0]?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRefs.value[0].getFromValue(); //获取表单数据
+  pageresult.list = [];
     if(currentTabKey.value=='1'){
-        const r={
-            "pageNo": 1,
-            "pageSize": 10
-        }
         const param =Object.assign(s, r);
+        param['pageNo']=param['pageNum']
         getAppPolicyList(param)
             .then((res) => {
                 const { code, data, msg } = res;
@@ -874,4 +1009,11 @@ function handleSelectionChange(selection: any) {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+  .app-container{
+    padding: 6px 30px;
+  }
+  /deep/ .el-form{
+    padding: 5px 30px;
+  }
+</style>

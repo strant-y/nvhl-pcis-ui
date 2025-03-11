@@ -9,6 +9,11 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
+import { useValidator } from "@/typings/useValidator";
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
+import moment from "moment";
+const { getRules } = useValidator();
 const dialog = ref<DialogMethod | null>(null);
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 const props = defineProps({
@@ -20,6 +25,7 @@ const props = defineProps({
 
 const applicantEditRef = ref<AppFreeEditMethod | null>(null);
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { debug } from "console";
 const opertaor = dataOpertaor();
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));
@@ -29,11 +35,39 @@ onMounted(() => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
     method,
-    exRules
+    getRules
   );
   Object.assign(formconfig1, formconfig11);
 });
-
+//给表单下拉项赋值
+// function setFormItem(key, obj) {
+//   if (obj && Object.keys(obj).length) {
+//     formconfig1.fromSchema?.forEach((item) => {
+//       if (item.prop === key) {
+//         Object.assign(item, obj);
+//       }
+//     });
+//   }
+// }
+function setFormItem(key, obj) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      console.log("000", item);
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.loadData && obj.loadData) {
+          let newBtnItems = null;
+          for (let key in obj.loadData) {
+            item.loadData[key] = obj.loadData[key];
+          }
+          newBtnItems = item.loadData;
+          newBtnItems && (obj.loadData = newBtnItems);
+        }
+        Object.assign(item, obj);
+      }
+    });
+  }
+}
 // 绑定方法
 const method = {
   // func demo
@@ -69,12 +103,52 @@ const method = {
   funcreset: () => {
     const tabref = opertaor.getTableRefs();
     const applicantValue = tabref["applicant"].getFromValue();
-    console.log(applicantValue);
     for (const k in applicantValue) {
       applicantValue[k] = null;
     }
   },
-  func: () => {
+  cardTypeChange: (val) => {
+    if (val == "120001") {
+      setFormItem("Applicant.cCertfCde", {
+        rules: [getRules("required", {}), getRules("idCard", {})],
+      });
+    } else {
+      setFormItem("Applicant.cCertfCde", {
+        rules: [getRules("required", {})],
+      });
+    }
+  },
+  InsureChange: (val) => {
+    if (val == "0") {
+      setValue("Applicant.cCertfCls", "");
+      setFormItem("Insured.cCntrNme", { hidden: true });
+      codeListStore
+        .queryCodeList({
+          codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
+          codeListParam: {},
+        })
+        .then((res) => {
+          setFormItem("Applicant.cCertfCls", {
+            loadData: res,
+            rules: [getRules("required", {})],
+          });
+        });
+    } else {
+      setValue("Applicant.cCertfCls", "");
+      codeListStore
+        .queryCodeList({
+          codeListName: "NATURAL_CERTIFICATE_CACHE",
+          codeListParam: {},
+        })
+        .then((res) => {
+          setFormItem("Applicant.cCertfCls", {
+            loadData: res,
+            rules: [getRules("required", {})],
+          });
+        });
+    }
+  },
+  funcNdustryCate: () => {
     const param = opertaor.getParam();
     dialog.value?.open(
       "ndustryCateModal",
@@ -90,10 +164,28 @@ const method = {
       { title: "国民经济行业分类", width: 85 }
     );
   },
+  tCertMrkChecked: (val) => {
+    if (val == "1") {
+      setValue(
+        "Applicant.tCertfBgnDate",
+        moment(new Date("2099-12-31")).format("YYYY-MM-DD HH:mm:ss")
+      );
+      setValue(
+        "Applicant.tCertfEndDate",
+        moment(new Date("2099-12-31")).format("YYYY-MM-DD HH:mm:ss")
+      );
+    } else {
+      setValue("Applicant.tCertfBgnDate", "");
+      setValue("Applicant.tCertfEndDate", "");
+    }
+  },
+  mobileChange: (val) => {
+    if (val) {
+      setFormItem("Applicant.cMobile", { rules: [getRules("phoneNo", {})] });
+    }
+  },
+  // change: () => {},
 };
-
-// 绑定特殊验证器
-const exRules = {};
 
 function getFromValue() {
   return applicantEditRef?.value?.getFromValue();

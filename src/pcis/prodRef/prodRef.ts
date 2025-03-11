@@ -52,6 +52,7 @@ import clauseConfBasicInfo from "./commonRef/ClauseConfBasicInfo.vue";
 import  ndustryCateModal  from "./commodityRef/ndustryCateModal.vue";
 
 import agentPre from "./commodityRef/agentPer.vue" //代理(经济)人
+import agentWorker from "./commodityRef/agentWorker.vue" //代理业务员
 
 
 /**用于动态组件的映射生成 */
@@ -108,6 +109,7 @@ const componentMap = {
   clauseConfBasicInfoRef:clauseConfBasicInfo,
 
   agentPre: agentPre,
+  agentWorker: agentWorker,
   ndustryCateModal:ndustryCateModal,
 };
 

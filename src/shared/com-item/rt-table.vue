@@ -120,6 +120,7 @@
           :label="i.title"
           :width="i.width ? i.width : null"
           :align="item.align ? item.align : 'center'"
+          :min-width="i.minWidth"
         >
           <template #default="scope">
             <template v-if="item.editFlag">
@@ -173,6 +174,7 @@
                   @click="btn.tableClick ? btn.tableClick(scope.row) : () => {}"
                   :item="btn"
                   :disabled="btn.disabled ? btn.disabled(scope.row) : false"
+                  v-if="!btn.hideBtns?.(scope.row) ?? false"
                 />
               </el-tooltip>
             </template>
@@ -192,7 +194,7 @@
                 /></a>
               </el-tooltip>
             </template>
-            <template v-if="index !== item.tableBtn.length - 1">
+            <template v-if="index !== item.tableBtn.length - 1&& !btn.hideBtns?.(scope.row) && index !=0"">
               <el-divider direction="vertical" />
             </template>
           </template>
