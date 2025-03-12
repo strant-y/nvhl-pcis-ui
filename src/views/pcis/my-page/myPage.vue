@@ -417,12 +417,10 @@ const calcPremium = () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
   console.log(res);
-  if (res["plyBase"]["Base.cProdNo"] == props.param.cProdNo) {
-    if (res["cvrg"].items.length == 0) {
-      ElMessage.error("请录入条款信息");
-      btn.loading = false;
-      return;
-    }
+  if (res["cvrg"].items.length == 0) {
+    ElMessage.error("请录入条款信息");
+    btn.loading = false;
+    return;
   }
   appCalc(res).then((res) => {
     btn.loading = false;
@@ -496,12 +494,10 @@ const savePlyInfo = () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
   console.log(res);
-  if (res["plyBase"]["Base.cProdNo"] == props.param.cProdNo) {
-    if (res["cvrg"].items.length == 0) {
-      ElMessage.error("请录入条款信息");
-      btn.loading = false;
-      return;
-    }
+  if (res["cvrg"].items.length == 0) {
+    ElMessage.error("请录入条款信息");
+    btn.loading = false;
+    return;
   }
   saveAppPlyInfo(res).then((res) => {
     console.log("saveAppPlyInfo-res", res);
