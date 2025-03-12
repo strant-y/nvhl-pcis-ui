@@ -8,4 +8,5 @@ export interface DialogMethod {
      * @returns 
      */
     open: (c: any, d: any, m :any, t: any) => any;
+    handleClose: () => void
 }

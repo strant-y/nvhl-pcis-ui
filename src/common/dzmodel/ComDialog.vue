@@ -46,6 +46,7 @@ const open = (c, d, m, t) => {
 };
 
 defineExpose({
-  open
+  open,
+  handleClose
 });
 </script>
