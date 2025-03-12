@@ -223,9 +223,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         codeParam: { cParCde: "RdrTyp" },
         clearable: true,
         rules: [getRules("required", { change: true })],
-        //主条款是1附加条款是0
+        //主条款是0附加条款是1
         func: (val: any) => {
-          setAdditionalInsuranceTypeHidden("1");
+          setFormItem("additionalInsuranceType", {
+            hidden: val === "1" ? 0 : 1,
+          });
         },
       },
       {
@@ -235,7 +237,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         typeCode: "additional_insurance",
         codeParam: { cParCde: "add_type" },
         rules: [getRules("required", { change: true })],
-        hidden: true, // 初始状态为显示
+        hidden: false, // 初始状态为显示
       },
       {
         prop: "tFilingTm",
@@ -321,18 +323,16 @@ const uploadFile = (formData: FormData) => {
   //   },
   // });
 };
-// 监听主条款/附加条款字段的变化
-watch(
-  () => freeEditRef.value?.getValue("cRdrTyp"),
-  (newValue) => {
-    const additionalInsuranceTypeField = formconfig1.fromSchema.find(
-      (field) => field.prop === "additionalInsuranceType"
-    );
-    if (additionalInsuranceTypeField) {
-      additionalInsuranceTypeField.hidden = newValue === "0";
-    }
+
+function setFormItem(key, obj) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        Object.assign(item, obj);
+      }
+    });
   }
-);
+}
 function getFromValue() {
   return freeEditRef?.value?.getFromValue();
 }
@@ -360,8 +360,8 @@ function handleQuery() {
       if (200 === code) {
         freeEditRef?.value?.setFormValue(data);
         // 调用 watch 监听器中的逻辑来设置 additionalInsuranceType 字段的 hidden 属性
-        const cRdrTypValue = data.cRdrTyp;
-        setAdditionalInsuranceTypeHidden(cRdrTypValue);
+        // const cRdrTypValue = data.cRdrTyp;
+        // setAdditionalInsuranceTypeHidden(cRdrTypValue);
       } else {
         ElMessage.error(msg);
       }
@@ -369,18 +369,19 @@ function handleQuery() {
     .finally(() => {});
 }
 // 新增函数来设置 additionalInsuranceType 字段的 hidden 属性
-function setAdditionalInsuranceTypeHidden(cRdrTypValue: string) {
-  const additionalInsuranceTypeField = formconfig1.fromSchema.find(
-    (field) => field.prop === "additionalInsuranceType"
-  );
-  if (additionalInsuranceTypeField) {
-    additionalInsuranceTypeField.hidden = cRdrTypValue === "1";
-    if (cRdrTypValue === "1") {
-      // 隐藏时将值置空
-      freeEditRef.value?.setValue("additionalInsuranceType", null);
-    }
-  }
-}
+// function setAdditionalInsuranceTypeHidden(cRdrTypValue: string) {
+//   const additionalInsuranceTypeField = formconfig1.fromSchema.find(
+//     (field) => field.prop === "additionalInsuranceType"
+//   );
+//   console.log("additionalInsuranceTypeField", additionalInsuranceTypeField);
+//   if (additionalInsuranceTypeField) {
+//     additionalInsuranceTypeField.hidden = cRdrTypValue === "1";
+//     if (cRdrTypValue === "1") {
+//       // 隐藏时将值置空
+//       freeEditRef.value?.setValue("additionalInsuranceType", null);
+//     }
+//   }
+// }
 const emit = defineEmits(["clause-type-change"]);
 
 // 监听主条款/附加条款字段的变化
