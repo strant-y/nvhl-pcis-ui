@@ -38,13 +38,13 @@
 import { ref, watch } from "vue";
 import { ElTree } from "element-plus";
 import { useUserStore } from "@/store/modules/user";
-import { SysOperatorMgrService } from '@/views/sys-right-basic/service/sys-operator-mgr.service';
+import { SysOperatorMgrService } from "@/views/sys-right-basic/service/sys-operator-mgr.service";
 const sysOperatorMgrService = new SysOperatorMgrService();
 interface Tree {
   [key: string]: any;
 }
 const user = ref<any>(useUserStore.user);
-const _nodes = ref([])
+const _nodes = ref([]);
 const dialogVisible = ref(true);
 const filterText = ref("");
 const treeRef = ref<InstanceType<typeof ElTree>>();
@@ -53,10 +53,10 @@ const selectedNode = ref<Tree | null>();
 const defaultProps = {
   children: "children",
   label: "name",
-  isLeaf: 'leaf',
+  isLeaf: "leaf",
 };
 
-const emits = defineEmits(['ok'])
+const emits = defineEmits(["ok"]);
 
 watch(filterText, (val) => {
   treeRef.value!.filter(val);
@@ -75,36 +75,39 @@ const handleCancel = () => {
 const handleSave = () => {
   if (selectedNode.value) {
     console.log("选中的节点", selectedNode.value);
-    emits('ok', selectedNode.value)
+    emits("ok", selectedNode.value);
   }
   dialogVisible.value = false;
 };
 
 const initDptTreeList = () => {
-  let root = '0200000000000';
+  let root = "0200000000000";
   if (user.value && user.value.companyId) {
     root = user.value.companyId;
   }
   const params = {
     pId: root,
   };
-  sysOperatorMgrService.getOrgDptTreeNodeById(params).then((res) => {
-    if (res && res['data']) {
-      if (_nodes.value.length === 0) {
-        _nodes.value = [];
+  sysOperatorMgrService
+    .getOrgDptTreeNodeById(params)
+    .then((res) => {
+      if (res && res["data"]) {
+        if (_nodes.value.length === 0) {
+          _nodes.value = [];
+        }
+        const data = res["data"];
+        if (res["data"]) {
+          _nodes.value.push({
+            id: root,
+            name: res["data"]["name"],
+            leaf: false,
+          });
+        }
       }
-      const data = res['data'];
-      if (res['data']) {
-        _nodes.value.push({
-          id: root,
-          name: res['data']['name'],
-          leaf: false,
-        });
-      }
-    }
-  }).catch((error) => {
-    ElMessage.error('后台服务异常,请联系管理员');
-  });
+    })
+    .catch((error) => {
+      ElMessage.error("后台服务异常,请联系管理员");
+    });
 };
 
 const loadNode = (node, resolve) => {
@@ -114,27 +117,30 @@ const loadNode = (node, resolve) => {
   const params = {
     cDptCde: node.data.id,
   };
-  sysOperatorMgrService.getOrgDptTreeListByPid(params).then((result) => {
-    const dto = [];
-    if (200 !== result['code']) {
-      ElMessage.error(result['msg']);
-    } else {
-      ElMessage.success(result['msg']);
-    }
-    if (result['data'] && result['data'].length > 0) {
-      result['data'].forEach(item => {
-        dto.push({
-          id: item['id'],
-          name: item['name'],
-          leaf: !item.hasChildren,
+  sysOperatorMgrService
+    .getOrgDptTreeListByPid(params)
+    .then((result) => {
+      const dto = [];
+      if (200 !== result["code"]) {
+        ElMessage.error(result["msg"]);
+      } else {
+        ElMessage.success(result["msg"]);
+      }
+      if (result["data"] && result["data"].length > 0) {
+        result["data"].forEach((item) => {
+          dto.push({
+            id: item["id"],
+            name: item["name"],
+            leaf: !item.hasChildren,
+          });
         });
-      })
-    }
-    resolve(dto);
-  }).catch((error) => {
-    console.log('出错了', error);
-    ElMessage.error('后台服务异常,请联系管理员');
-  });
+      }
+      resolve(dto);
+    })
+    .catch((error) => {
+      console.log("出错了", error);
+      ElMessage.error("后台服务异常,请联系管理员");
+    });
 };
 onMounted(() => {
   initDptTreeList();

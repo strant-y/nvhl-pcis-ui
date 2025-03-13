@@ -407,4 +407,10 @@ onMounted(() => {
     display: block;
   }
 }
+.app-container{
+  padding: 6px 30px;
+}
+::v-deep(.el-form){
+  padding: 5px 30px;
+}
 </style>

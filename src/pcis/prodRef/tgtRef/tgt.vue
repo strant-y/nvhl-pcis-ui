@@ -62,6 +62,12 @@ const method = {
     }
     //把数据存在store，清单信息组件的是否必填根据这个来
     productStore.setCIsSingle(val)
+  },
+  funcInsuranceChange: ()=>{
+    const cvrgref = opertaor.getTableRefByKey("cvrg");
+    if(cvrgref.showFlush){
+      cvrgref.showFlush();
+    }
   }
 };
 

@@ -9,8 +9,10 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
+import { useValidator } from "@/typings/useValidator";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const dialog = ref<DialogMethod | null>(null);
+const { getRules } = useValidator();
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { useValidator } from "@/typings/useValidator";
 import { codeListViewStore } from "@/store";
@@ -30,7 +32,8 @@ onMounted(() => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
     method,
-    exRules
+    exRules,
+    getRules
   );
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
@@ -269,7 +272,12 @@ const method = {
         rules: null,
       })
     }
-  }
+  },
+  emailChange: (val) => {
+    if (val) {
+      setFormItem("Insured.cEmail", { rules: [getRules("email", {})] });
+    }
+  },
 };
 
 // 绑定特殊验证器
