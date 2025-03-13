@@ -1,6 +1,6 @@
 <template>
   <app-free-edit :freeEditConfig="formconfig1" ref="plyBaseEditRef" />
-  <comDialog ref="agent"></comDialog>
+  <comDialog ref="dialogRef"></comDialog>
 </template>
 
 <script setup lang="ts">
@@ -11,14 +11,17 @@ import {
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { getBsnsTypList, getChaTypeList, getChaSubtypList } from "@/api/code-list-service";
+import { checkCdeptByCdptCde } from "@/api/prod/index"
 import moment from "moment";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { useValidator } from "@/typings/useValidator";
 import DepartmentTree from "../commodityRef/DepartmentTree.vue";
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
 const { getRules } = useValidator();
 const dzmodal = useDzModal();
-const agent = ref<DialogMethod | null>(null);
+const dialogRef = ref<DialogMethod | null>(null);
 const opertaor = dataOpertaor();
 
 const sessionData = ref(null)
@@ -35,6 +38,7 @@ const plyBaseEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 
 const user = JSON.parse(sessionStorage.getItem("user"))
+const subDptCde = ref() //所属分公司
 
 onMounted(async () => {
   const formconfig11 = formInit(
@@ -56,6 +60,8 @@ onMounted(async () => {
     setValue('Base.cOprCde', user.companyCnm)
     //录单人联系方式  默认操作员的
     setValue('Base.cCiOprRel', user.phoneNO)
+    // 查询承保机构所属分公司和项目类别大类数据
+    getCheckCdeptByCdptCde()
   })
   if(sessionStorage.getItem('toMyPageData')) {
     const data = JSON.parse(sessionStorage.getItem('toMyPageData'))
@@ -194,7 +200,7 @@ const method = {
   //代理(经纪)人icon事件 
   agentFunc: () => {
     if(getValue('Base.cBsnsTyp') && getValue('Base.cBsnsTyp') !== '19001') {
-      agent.value?.open(
+      dialogRef.value?.open(
           "agentPre",
           {
               type: "show",
@@ -204,6 +210,12 @@ const method = {
                 cBsnsTyp: getValue('Base.cBsnsTyp'), //业务来源大类
                 cChaType: getValue('Base.cChaType'), //业务来源中类
                 cChaSubtype: getValue('Base.cChaSubtype'), //业务来源子类
+              },
+              method: {
+                getSelected: (params) => {
+                  console.error('22222222222', params)
+                  dialogRef.value?.handleClose()
+                }
               },
           },
           {
@@ -229,7 +241,7 @@ const method = {
     } else if (getValue('Base.cBsnsTyp') !== '19001' && getValue('Base.cChaType') !== '1900201') {	// 非直销且非个人代理
         cslstyp = '020004';
     }
-    agent.value?.open(
+    dialogRef.value?.open(
         "agentWorker",
         {
             type: "show",
@@ -261,7 +273,7 @@ const method = {
     } else if (getValue('Base.cBsnsTyp') !== '19001' && getValue('Base.cChaType') !== '1900201') {	// 非直销且非个人代理
         cslstyp = '020004';
     }
-    agent.value?.open(
+    dialogRef.value?.open(
         "agentWorker",
         {
             type: "show",
@@ -310,7 +322,7 @@ const method = {
   },
   // 服务机构业务员ICON事件
   dptSaleNoFunc: () => {
-    agent.value?.open(
+    dialogRef.value?.open(
         "agentWorker",
         {
             type: "show",
@@ -340,6 +352,45 @@ const method = {
 
 // 绑定特殊验证器
 const exRules = {};
+
+function getCheckCdeptByCdptCde () {
+  // const CDptCde = getValue("Base.cDptCde")
+  const CDptCde = '0261010410270'  //先写死，实际要用上面那行
+  if(CDptCde) {
+    // 查询承保机构所属分公司
+    checkCdeptByCdptCde({"dptCde": CDptCde}).then(res => {
+      if(res['code'] === 200) {
+        if(res.data) {
+          subDptCde.value = res.data
+          //查询项目类别大类数据
+          codeListStore.queryCodeList(
+            {
+              codeListName: "CPrjCtgTyp_List",
+              codeListParam: {
+                  'CRangeCde': ['0200000000000', subDptCde.value],
+                  'CParCde': '-1',
+                  'cLev': '1'
+              },
+            },
+            false,
+            false
+          )
+          .then((result) => {
+            setFormItem('Base.cPrjCtgTyp', {loadData: result.data})
+          })
+          .catch((err) => {
+            setFormItem('Base.cPrjCtgTyp', {loadData: []})
+          });
+        }
+      } else {
+        ElMessage.error('根据机构编码查询分公司出现异常！')
+      }
+    }, error => {
+      ElMessage.error('根据机构编码查询分公司出现异常！')
+    })
+  }
+}
+
 
 function getFromValue() {
   return plyBaseEditRef?.value?.getFromValue();

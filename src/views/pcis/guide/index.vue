@@ -81,7 +81,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         loadData: [
           {
             label: "营总销售团队1",
-            value: "0251010013000",
+            value: "0200000000010",
           },
         ],
       },

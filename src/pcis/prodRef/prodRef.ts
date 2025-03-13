@@ -54,7 +54,7 @@ import  cOccupCdeModal  from "./commodityRef/cOccupCdeModal.vue";
 
 import agentPre from "./commodityRef/agentPer.vue" //代理(经济)人
 import agentWorker from "./commodityRef/agentWorker.vue" //代理业务员
-
+import prdFixSpec from "./commodityRef/prd-fix-spec.vue" //特别约定
 
 /**用于动态组件的映射生成 */
 const componentMap = {
@@ -113,6 +113,7 @@ const componentMap = {
   agentWorker: agentWorker,
   ndustryCateModal:ndustryCateModal,
   cOccupCdeModal:cOccupCdeModal,
+  prdFixSpec: prdFixSpec,
 };
 
 const install = (Vue) => {
