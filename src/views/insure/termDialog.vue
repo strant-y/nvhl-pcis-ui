@@ -3,7 +3,7 @@
   <el-dialog v-model="dialogVisible" width="75%" title="选择条款">
     <el-row gutter="10">
       <el-col :span="12" class="col-md-12">
-        <el-form ref="freeEditRef" :model="formconfig1">
+        <!-- <el-form ref="freeEditRef" :model="formconfig1">
           <el-form-item label="条款列表" prop="name">
             <el-input
               v-model="formconfig1.name"
@@ -15,7 +15,7 @@
               </template>
             </el-input>
           </el-form-item>
-        </el-form>
+        </el-form> -->
         <el-card :bordered="false" class="index-blk">
           <div
             style="
@@ -25,11 +25,21 @@
               overflow-x: scroll;
             "
           >
+            <!-- <el-divider></el-divider> -->
+            <el-input
+              v-model="filterText"
+              style="width: 500px"
+              placeholder="请输入条款名称"
+            />
             <el-tree
+              rer="treeRef"
               class="custom-re-tree"
               :data="nodes"
               :props="defaultProps"
+              @current-change="getCurrentNode"
               :show-line="true"
+              :highlight-current="true"
+              :filter-node-method="filterNode"
               @node-click="onEvent"
             >
               <template #default="{ node, data }">
@@ -64,7 +74,7 @@
 <script setup lang="ts">
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
-
+const filterText = ref("");
 import { ref } from "vue";
 import {
   AppFreeEditConfig,
@@ -87,6 +97,7 @@ const emits = defineEmits(["ok", "cancel"]);
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
 const dialogVisible = ref(true);
+const treeRef = ref<InstanceType<typeof ElTree>>();
 const formconfig1 = ref({
   name: "",
 });
@@ -95,6 +106,7 @@ const nodes = ref<Array<any>>([]);
 const defaultProps = {
   children: "list",
   isLeaf: "leaf",
+  label: "value",
 };
 const datas = ref<any>([]);
 const listShow = ref(false);
@@ -138,15 +150,16 @@ onMounted(async () => {
 
 watch(
   () => props.data,
-  (newTableConfig) => {
-    pageresult.list = [
-      { names: "张三", text: "核保意见" },
-      { names: "李四", text: "核保意见" },
-    ];
-    pageresult.total = 2;
-  },
+  (newTableConfig) => {},
   { deep: true }
 );
+watch(filterText, (val) => {
+  treeRef.value.filter(val);
+});
+const filterNode = (value: string, data: Tree) => {
+  if (!value) return true;
+  return data.value.includes(value);
+};
 // 绑定方法
 const method = {
   func1: () => {
@@ -168,7 +181,13 @@ function loadTree() {
     }
   });
 }
-
+const getCurrentNode = (data: any, node: any) => {
+  console.log("====", data, node);
+  if (data.list.length !== 0) {
+    listShow.value = true;
+    datas.value = [];
+  }
+};
 const onEvent = (data: any, node: any) => {
   // listShow.value = false;
   if (data.list.length == 0) {

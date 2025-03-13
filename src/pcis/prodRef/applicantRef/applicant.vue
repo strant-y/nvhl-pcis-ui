@@ -27,6 +27,7 @@ const applicantEditRef = ref<AppFreeEditMethod | null>(null);
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { debug } from "console";
 import { ru } from "element-plus/es/locale";
+import { emit } from "process";
 const opertaor = dataOpertaor();
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));
@@ -227,6 +228,11 @@ const method = {
   mobileChange: (val) => {
     if (val) {
       setFormItem("Applicant.cMobile", { rules: [getRules("phoneNo", {})] });
+    }
+  },
+  emailChange: (val) => {
+    if (val) {
+      setFormItem("Applicant.cEmail", { rules: [getRules("email", {})] });
     }
   },
   handleClose: (val) => {},

@@ -9,8 +9,10 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
+import { useValidator } from "@/typings/useValidator";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const dialog = ref<DialogMethod | null>(null);
+const { getRules } = useValidator();
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 const opertaor = dataOpertaor();
 const props = defineProps({
@@ -27,7 +29,8 @@ onMounted(() => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
     method,
-    exRules
+    exRules,
+    getRules
   );
   Object.assign(formconfig1, formconfig11);
 });
@@ -213,6 +216,11 @@ const method = {
   mobileChange: (val) => {
     if (val) {
       setFormItem("Insured.cMobile", { rules: [getRules("phoneNo", {})] });
+    }
+  },
+  emailChange: (val) => {
+    if (val) {
+      setFormItem("Insured.cEmail", { rules: [getRules("email", {})] });
     }
   },
 };
