@@ -172,7 +172,18 @@ const method = {
   funcNdustryCate: () => {
     dialog.value?.open(
       "ndustryCateModal",
-      {},
+      {
+        type: "show",
+        method: {
+          getdbClickData: (data) => {
+            setFormItem("Insured.cTrdCde", {
+              loadData: [{ label: data.cnm, value: data.cde }],
+            });
+            setValue("Insured.cTrdCde", data.cnm);
+            dialog.value?.handleClose();
+          },
+        },
+      },
       {},
       { title: "国民经济行业分类", width: "70" }
     );

@@ -35,8 +35,26 @@ onMounted(async () => {
 const method = {
   // func demo
   func1: () => {},
-  funcadd: () => {
-    addFakeData();
+  funcdistadd: () => {
+    debugger;
+    distEditRef?.value?.addRow();
+    const val = getFromValue();
+    val.items.forEach((key, index) => {
+      key["Dist.ids"] = index + 1;
+    });
+  },
+  funcdistdel: () => {
+    const selData = distEditRef?.value?.getSelectRow();
+    if (!selData) {
+      ElMessage.error("请选择要删除的数据!");
+      return;
+    }
+    const editIndex = selData["_dataId"];
+    distEditRef?.value?.delRow(editIndex);
+    const val = getFromValue();
+    val.items.forEach((key, index) => {
+      key["Dist.ids"] = index + 1;
+    });
   },
 };
 

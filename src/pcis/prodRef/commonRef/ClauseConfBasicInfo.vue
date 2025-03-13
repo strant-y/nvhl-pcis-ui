@@ -358,30 +358,16 @@ function handleQuery() {
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
-        freeEditRef?.value?.setFormValue(data);
-        // 调用 watch 监听器中的逻辑来设置 additionalInsuranceType 字段的 hidden 属性
-        // const cRdrTypValue = data.cRdrTyp;
-        // setAdditionalInsuranceTypeHidden(cRdrTypValue);
+        setTimeout(() => {
+          freeEditRef?.value?.setFormValue(data);
+        }, 1000);
       } else {
         ElMessage.error(msg);
       }
     })
     .finally(() => {});
 }
-// 新增函数来设置 additionalInsuranceType 字段的 hidden 属性
-// function setAdditionalInsuranceTypeHidden(cRdrTypValue: string) {
-//   const additionalInsuranceTypeField = formconfig1.fromSchema.find(
-//     (field) => field.prop === "additionalInsuranceType"
-//   );
-//   console.log("additionalInsuranceTypeField", additionalInsuranceTypeField);
-//   if (additionalInsuranceTypeField) {
-//     additionalInsuranceTypeField.hidden = cRdrTypValue === "1";
-//     if (cRdrTypValue === "1") {
-//       // 隐藏时将值置空
-//       freeEditRef.value?.setValue("additionalInsuranceType", null);
-//     }
-//   }
-// }
+
 const emit = defineEmits(["clause-type-change"]);
 
 // 监听主条款/附加条款字段的变化

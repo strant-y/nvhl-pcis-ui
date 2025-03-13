@@ -41,15 +41,6 @@ onMounted(() => {
   Object.assign(formconfig1, formconfig11);
 });
 //给表单下拉项赋值
-// function setFormItem(key, obj) {
-//   if (obj && Object.keys(obj).length) {
-//     formconfig1.fromSchema?.forEach((item) => {
-//       if (item.prop === key) {
-//         Object.assign(item, obj);
-//       }
-//     });
-//   }
-// }
 function setFormItem(key, obj) {
   if (obj && Object.keys(obj).length) {
     formconfig1.fromSchema?.forEach((item) => {
@@ -190,13 +181,17 @@ const method = {
       "ndustryCateModal",
       {
         type: "show",
-        data: {},
-      },
-      {
-        isOk: (selectdata: any) => {
-          console.log("a", selectdata);
+        method: {
+          getdbClickData: (data) => {
+            setFormItem("Applicant.cTrdCde", {
+              loadData: [{ label: data.cnm, value: data.cde }],
+            });
+            setValue("Applicant.cTrdCde", data.cnm);
+            dialog.value?.handleClose();
+          },
         },
       },
+      {},
       { title: "国民经济行业分类", width: 85 }
     );
   },
@@ -209,9 +204,7 @@ const method = {
         data: {},
       },
       {
-        isOk: (selectdata: any) => {
-          console.log("a", selectdata);
-        },
+        isOk: (selectdata: any) => {},
       },
       { title: "职业", width: 85 }
     );
@@ -236,7 +229,7 @@ const method = {
       setFormItem("Applicant.cMobile", { rules: [getRules("phoneNo", {})] });
     }
   },
-  // change: () => {},
+  handleClose: (val) => {},
 };
 
 function getFromValue() {
