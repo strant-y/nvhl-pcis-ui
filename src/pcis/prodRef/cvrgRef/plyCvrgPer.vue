@@ -8,6 +8,7 @@
             :key="index"
             v-model="formData[index]"
             @delete="deleteData(k, index)"
+            :ref="(res)=>{ tremTemplateRefs[index] = res } "
           />
         </el-form>
       </div>
@@ -33,7 +34,7 @@ const props = defineProps({
 });
 
 const cardconfig = ref(creatCardConfig({}));
-
+const tremTemplateRefs = ref<any[]>([]);
 const cvrgFormfef = ref("cvrgFormfef");
 const formData = ref<any[]>([]);
 
@@ -131,6 +132,12 @@ function setFormValue(value: any) {
 
 function validate() {}
 
+function showFlush(){
+  tremTemplateRefs.value.forEach((item)=>{
+    item.dataInit();
+  })
+}
+
 function getTableValue(rowId: number, key: string) {}
 
 defineExpose({
@@ -138,6 +145,7 @@ defineExpose({
   setFormValue,
   validate,
   getTableValue,
+  showFlush
 });
 </script>
 

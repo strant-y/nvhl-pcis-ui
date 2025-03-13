@@ -131,12 +131,15 @@
                   >
                     {{ col.cColTitle }}
                   </th>
+                  <th v-for="v in extermConf" :key="v.c_pk_id">
+                    {{ v.title }}
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 <template v-if="groupconf[ginfo.cGroupId]">
                   <template
-                    v-for="(riskdata, k) in groupconf[ginfo.cGroupId].riskList"
+                    v-for="(riskdata, k, ri) in groupconf[ginfo.cGroupId].riskList"
                     :key="k"
                   >
                     <template v-if="riskdata.maxNum > 0">
@@ -196,6 +199,17 @@
                             </td>
                           </template>
                         </template>
+                        <template v-if="n === 1 && ri === 0">
+                          <template v-for="v in extermConf" :key="v.c_pk_id">
+                            <td :rowspan="groupconf[ginfo.cGroupId].sumMax">
+                              <from-item
+                                v-model="termdata[v.prop]"
+                                @update:modelValue="update()"
+                                :item="v"
+                              />
+                            </td>
+                          </template>
+                        </template>
                       </tr>
                     </template>
                   </template>
@@ -216,8 +230,10 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
+import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { terConfig } from "@/store/modules/term-config";
-import { init } from "echarts";
+const opertaor = dataOpertaor();
+
 const terconfig = terConfig();
 
 const props = defineProps({
@@ -257,7 +273,8 @@ function update() {
   const fromc = termFactormap.value?.filter(
     (v: any) => v.cPorpShowtitle === "1"
   );
-  if(fromc && fromc.length > 0){    // 将标题数据,回填到数据组中
+  if (fromc && fromc.length > 0) {
+    // 将标题数据,回填到数据组中
     fromc.forEach((v: any) => {
       newData[v.prop] = termdata.value[v.prop];
     });
@@ -286,7 +303,10 @@ function initData(data: any) {
   });
   riskList.value = riskData;
   nextTick(() => {
-    if (termTitleConf.value.cFactorTabType !== "grid" && termTitleConf.value.cFactorTabType !== "table") {
+    if (
+      termTitleConf.value.cFactorTabType !== "grid" &&
+      termTitleConf.value.cFactorTabType !== "table"
+    ) {
       termRef.value?.setFormValue(termdata.value);
     }
   });
@@ -299,6 +319,7 @@ const termFactormap = ref([]);
 const collist = ref([]);
 const term = ref<{ [key: string]: any }>({});
 const termTitleConf = ref<{ [key: string]: any }>({});
+const extermConf = ref<any>([]); // 个性化扩展槽
 
 const formconfig1 = reactive(
   createAppFreeEditConfig({
@@ -430,6 +451,7 @@ function dataInit() {
     groupInfo.value = d.groupInfo;
     term.value = d.term;
     termFactormap.value = d.termFactormap;
+    initshowConfig();
     const fromc = termFactormap.value?.filter(
       (v: any) => v.cPorpShowtitle !== "1"
     );
@@ -437,7 +459,6 @@ function dataInit() {
     if (d.termTitleConf?.CCnm) {
       termTitleConf.value = JSON.parse(d.termTitleConf.CCnm);
     }
-    initshowConfig();
   } else {
     getTRFactorJson(param).then((res: any) => {
       const { code, data, msg } = res;
@@ -448,6 +469,7 @@ function dataInit() {
         groupInfo.value = data.data.groupInfo;
         term.value = data.data.term;
         termFactormap.value = data.data.termFactormap;
+        initshowConfig();
         const fromc = termFactormap.value?.filter(
           (v: any) => v.cPorpShowtitle !== "1"
         );
@@ -456,7 +478,6 @@ function dataInit() {
           termTitleConf.value = JSON.parse(data.data.termTitleConf.CCnm);
         }
         terconfig.addConfig(queryKey, data.data);
-        initshowConfig();
       } else {
         ElMessage.error(msg);
       }
@@ -467,19 +488,80 @@ function dataInit() {
 function initshowConfig() {
   let grouplist: { [k: string]: any } = {};
   if (groupInfo.value) {
+    exChangeFunc();
     Object.keys(groupInfo.value).forEach((g: any) => {
       const gt = groupInfo.value[g];
-      let ngdata = {
+      let ngdata: { [key: string]: any } = {
         cGroupId: gt.cGroupId,
         cGroupName: gt.cGroupName,
         cGroupType: gt.cGroupType,
         riskList: getRisk(gt.cGroupId),
       };
+      let sumMax = 0;
+      Object.keys(ngdata.riskList).forEach((r: any) => {
+        sumMax += ngdata.riskList[r].maxNum;
+      });
+      ngdata["sumMax"] = sumMax;
       grouplist[g] = ngdata;
     });
   }
   groupconf.value = grouplist;
+
+  console.log(groupconf.value);
+  console.log(extermConf.value);
 }
+
+/**
+ * 个性化处理,对一些特殊化的信息内容展示
+ * @returns
+ */
+function exChangeFunc() {
+  const param = opertaor.getParam();
+  const data: { [key: string]: any } = opertaor.getDataAll();
+  extermConf.value = Object.assign({});
+  if (param.cProdNo === "043009") {
+    if (data["tgt"]["Tgt.cInsuranceMethod"]) {
+      if (data["tgt"]["Tgt.cInsuranceMethod"] !== "613001") {
+        if (colInfo.value && colInfo.value.length > 0) {
+          const r = colInfo.value.filter(
+            (r) => r["cColTitle"] !== "费率" && r["cColTitle"] !== "总保费"
+          );
+          colInfo.value = r;
+        }
+
+        const ex = termFactormap.value.filter(
+          (r) =>
+            r["prop"] === "Term.nInsuredCount" ||
+            r["prop"] === "Term.nAccidentLimit"
+        );
+
+        extermConf.value = ex;
+      }
+      const term = termFactormap.value.filter(
+        (r) =>
+          r["prop"] !== "Term.nInsuredCount" &&
+          r["prop"] !== "Term.nAccidentLimit"
+      );
+      termFactormap.value = term;
+    } else {
+      const r = colInfo.value.filter(
+        (r) => r["cColTitle"] !== "费率" && r["cColTitle"] !== "总保费"
+      );
+      colInfo.value = r;
+
+      const term = termFactormap.value.filter(
+        (r) =>
+          r["prop"] !== "Term.nInsuredCount" &&
+          r["prop"] !== "Term.nAccidentLimit"
+      );
+      termFactormap.value = term;
+    }
+  }
+}
+
+defineExpose({
+  dataInit,
+});
 </script>
 <style lang="scss" scoped>
 .cvrg-info {

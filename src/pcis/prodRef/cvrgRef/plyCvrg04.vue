@@ -43,6 +43,7 @@
                   :key="index"
                   v-model="planData[k][index]"
                   @delete="deleteData(k,index)"
+                  :ref="(res)=>{ tremTemplateRefs[index] = res } "
                 />
               </el-form>
             </template>
@@ -67,6 +68,8 @@ import { prodTemple } from "./titleTemple";
 const opertaor = dataOpertaor();
 const terconfig = terConfig();
 terconfig.configInit(); // 条款配置数据初始化
+
+const tremTemplateRefs = ref<any[]>([]);
 
 const props = defineProps({
   pageSchema: {
@@ -229,14 +232,19 @@ function setFormValue(value: any) {
 }
 
 function validate() {}
-
+function showFlush(){
+  tremTemplateRefs.value.forEach((item)=>{
+    item.dataInit()
+  })
+}
 function getTableValue(rowId: number, key: string) {}
 
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
-  getTableValue
+  getTableValue,
+  showFlush
 });
 </script>
 
