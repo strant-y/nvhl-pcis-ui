@@ -79,8 +79,7 @@ const route = useRoute();
 const router = useRouter();
 const activeName = ref("1");
 const homeJumpData = ref({}); //接收首页的参数，用于查询条件回显
-let addrowArr=[]
-
+let addrowArr=['cAppNo','cPlyNo','cEdrNo','cDptcde','cKindNo','cProdNo','Underwriter','tUdrTm']
 // 变更列
 const colChange = defineAsyncComponent(() => import("../modal/colChange.vue"));
 // tab操作按钮
@@ -141,7 +140,6 @@ const CombinationQuery = defineAsyncComponent(
   // 产品组合出单查询
   () => import("../common/CombinationQuery.vue")
 );
-
 const tabs = ref<Array<any>>([
   {
     name: "询价单",
@@ -182,7 +180,7 @@ const tabs = ref<Array<any>>([
 ]); //tabs数组
 const currentTabName = ref("暂存任务"); //tabs默认值
 const currentTabKey = ref(0); //tabs默认值
-
+const cPard = ref(null);
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -197,17 +195,91 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         func: () => {
-          freeEditRef.value?.setFormValue({
-            cKindNo: "",
-            cStatus: "",
-          });
-          handleQuery(true);
+            const freeEditRefs = freeEditRef.value[currentTabKey.value];
+            const s = freeEditRefs.value[0].getFromValue(); //获取表单数据
+            for (const k in s) {
+                s[k] = null;
+            }
+          // handleQuery(true);
           // freeEditRef.value?.resetForm();
         },
       }),
       createFreeButtonBase({
         label: "导出",
         func: () => {},
+      }),
+      createFreeButtonBase({
+          label: "展开",
+          func: () => {
+              const freeEditRefs = freeEditRef.value[currentTabKey.value];
+              const s = freeEditRefs.value[0].getFromValue(); //获取表单数据
+              if(s['cKindNo']=='09'){
+                  formconfig1.fromSchema?.forEach((item) => {
+                      if (
+                          item.prop === "projectNme" ||
+                          item.prop === "projectAddress" ||
+                          item.prop === "cPrjCtgTyp" ||
+                          item.prop === "cPrjCtgMidTyp" ||
+                          item.prop === "cPrjCtgSubTyp"
+                      ) {
+                          item.hidden = false;
+                      }
+                  });
+              }else if(s['cKindNo']=='08'){
+                  formconfig1.fromSchema?.forEach((item) => {
+                      if (
+                          item.prop === "familyAddress" ||
+                          item.prop === "cPrjCtgTyp" ||
+                          item.prop === "cPrjCtgMidTyp" ||
+                          item.prop === "cPrjCtgSubTyp"
+                      ) {
+                          item.hidden = false;
+                      }
+                  });
+              }else if(s['cKindNo']=='04'){
+                  if(s['cProdNo']=='040002'){
+                      formconfig1.fromSchema?.forEach((item) => {
+                          if (
+                              item.prop === "CAppNme" ||
+                              item.prop === "cCertfNo" ||
+                              item.prop === "cLcnNo" ||
+                              item.prop === "cEngNo" ||
+                              item.prop === "cPrjCtgTyp" ||
+                              item.prop === "cPrjCtgMidTyp" ||
+                              item.prop === "cPrjCtgSubTyp"
+                          ) {
+                              item.hidden = false;
+                          }
+                      });
+                  }else if(s['cProdNo']=='043009'){
+                      formconfig1.fromSchema?.forEach((item) => {
+                          if (
+                              item.prop === "induType" ||
+                              item.prop === "projectType" ||
+                              item.prop === "projectNme" ||
+                              item.prop === "projectAddress" ||
+                              item.prop === "OpAddress" ||
+                              item.prop === "cCntrNme" ||
+                              item.prop === "cCertfNo" ||
+                              item.prop === "cPrjCtgTyp" ||
+                              item.prop === "cPrjCtgMidTyp" ||
+                              item.prop === "cPrjCtgSubTyp"
+                          ) {
+                              item.hidden = false;
+                          }
+                      });
+                  }else{
+                      formconfig1.fromSchema?.forEach((item) => {
+                          if ( item.prop === "cPrjCtgTyp" ||
+                              item.prop === "cPrjCtgMidTyp" ||
+                              item.prop === "cPrjCtgSubTyp"
+                          ) {
+                              item.hidden = false;
+                          }
+                      });
+                  }
+              }
+          },
       }),
       createFreeButtonBase({
         label: "变更列",
@@ -341,22 +413,78 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         ],
       },
       {
-        prop: "cKindNo",
-        inputtype: "rtselect",
-        title: "产品大类",
-        typeCode: "KIND_LIST_GRT",
-        rules: [getRules("required", {})],
-        params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
-        clearable: true,
+          prop: "cKindNo",
+          inputtype: "rtselect",
+          title: "产品大类",
+          itemWidth: 1,
+          rules: [{ type: "required" }],
+          typeCode: "KIND_LIST_GRT",
+          child: "cProdNo",
+          filterable:true,
+          codeParam: {
+              cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+              cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+          },
+          func: (val) => {
+              cPard.value=val
+              formconfig1.fromSchema?.forEach((item) => {
+                  if (
+                      item.prop === "CAppNme" ||
+                      item.prop === "cCntrNme" ||
+                      item.prop === "cCertfNo" ||
+                      item.prop === "cLcnNo" ||
+                      item.prop === "cEngNo" ||
+                      item.prop === "induType" ||
+                      item.prop === "projectNme" ||
+                      item.prop === "projectAddress" ||
+                      item.prop === "projectType" ||
+                      item.prop === "OpAddress" ||
+                      item.prop === "familyAddress" ||
+                      item.prop === "cPrjCtgTyp" ||
+                      item.prop === "cPrjCtgMidTyp" ||
+                      item.prop === "cPrjCtgSubTyp"
+                  ) {
+                      item.hidden = true;
+                  }
+              })
+          },
       },
-      {
-        prop: "cProdNo",
-        inputtype: "rtselect",
-        title: "条款",
-        typeCode: "KIND_LIST_GRT",
-        params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
-        clearable: true,
-      },
+        {
+            prop: "cProdNo",
+            inputtype: "rtselect",
+            title: "产品",
+            itemWidth: 1,
+            rules: [{ type: "required" }],
+            filterable:true,
+            typeCode: "PROD_LIST_IN_GUIDE",
+            codeParam: {
+                cParCde: cPard.value,
+                cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+                cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+            },
+            func: (val) => {
+                formconfig1.fromSchema?.forEach((item) => {
+                    if (
+                        item.prop === "CAppNme" ||
+                        item.prop === "cCntrNme" ||
+                        item.prop === "cCertfNo" ||
+                        item.prop === "cLcnNo" ||
+                        item.prop === "cEngNo" ||
+                        item.prop === "induType" ||
+                        item.prop === "projectNme" ||
+                        item.prop === "projectAddress" ||
+                        item.prop === "projectType" ||
+                        item.prop === "OpAddress" ||
+                        item.prop === "familyAddress" ||
+                        item.prop === "cPrjCtgTyp" ||
+                        item.prop === "cPrjCtgMidTyp" ||
+                        item.prop === "cPrjCtgSubTyp"
+                    ) {
+                        item.hidden = true;
+                    }
+                })
+            },
+        },
       {
         prop: "cAppStatus",
         inputtype: "rtselect",
@@ -419,29 +547,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "签单日期",
         format: "YYYY-MM-DD HH:mm:ss",
         clearable: true,
-        type: "daterange",
-          shortcuts: [
-              {
-                  text: "今天",
-                  value: new Date(),
-              },
-              {
-                  text: "昨天",
-                  value: () => {
-                      const date = new Date();
-                      date.setTime(date.getTime() - 3600 * 1000 * 24);
-                      return date;
-                  },
-              },
-              {
-                  text: "一周前",
-                  value: () => {
-                      const date = new Date();
-                      date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
-                      return date;
-                  },
-              },
-          ],
+        type: "datetimerange",
       },
       {
           prop: "bsType",
@@ -453,82 +559,108 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               { label: "否", value: "E" },
           ],
       },
+        {
+            prop: "CAppNme",
+            inputtype: "rtinput",
+            title: "雇员名称",
+            clearable: true,
+            hidden: true,
+        },
+        {
+            prop: "cCntrNme",
+            inputtype: "rtinput",
+            title: "人员姓名",
+            clearable: true,
+            hidden: true,
+        },
+        {
+            prop: "cCertfNo",
+            inputtype: "rtinput",
+            title: "证件号",
+            clearable: true,
+            hidden: true,
+        },
+        {
+            prop: "cLcnNo",
+            inputtype: "rtinput",
+            title: "车牌号",
+            clearable: true,
+            hidden: true,
+        },
+        {
+            prop: "cEngNo",
+            inputtype: "rtinput",
+            title: "发动机号",
+            clearable: true,
+            hidden: true,
+        },
+        {
+            prop: "induType",
+            inputtype: "rtinput",
+            title: "行业类型",
+            clearable: true,
+            hidden: true,
+        },
+        {
+            prop: "projectNme",
+            inputtype: "rtinput",
+            title: "工程名称",
+            clearable: true,
+            hidden: true,
+        },
+        {
+            prop: "projectAddress",
+            inputtype: "rtinput",
+            title: "工程地址",
+            clearable: true,
+            hidden: true,
+        },
+        {
+            prop: "projectType",
+            inputtype: "rtinput",
+            title: "工程类型",
+            clearable: true,
+            hidden: true,
+        },
+        {
+            prop: "OpAddress",
+            inputtype: "rtinput",
+            title: "经营地址",
+            clearable: true,
+            hidden: true,
+        },
+        {
+            prop: "familyAddress",
+            inputtype: "rtinput",
+            title: "家财地址查询",
+            clearable: true,
+            hidden: true,
+        },
+        {
+            prop: "cPrjCtgTyp",
+            inputtype: "rtinput",
+            title: "项目大类",
+            clearable: true,
+            hidden: true,
+        },
+        {
+            prop: "cPrjCtgMidTyp",
+            inputtype: "rtinput",
+            title: "项目中类",
+            clearable: true,
+            hidden: true,
+        },
+        {
+            prop: "cPrjCtgSubTyp",
+            inputtype: "rtinput",
+            title: "项目子类",
+            clearable: true,
+            hidden: true,
+        },
+
     ],
-    showSuperior: true,
-    superFromSchema: [
-      {
-        prop: "CAppNme",
-        inputtype: "rtinput",
-        title: "雇员名称",
-        clearable: true,
-      },
-      {
-        prop: "cCertfNo",
-        inputtype: "rtinput",
-        title: "证件号",
-        clearable: true,
-      },
-      {
-        prop: "cLcnNo",
-        inputtype: "rtinput",
-        title: "车牌号",
-        clearable: true,
-      },
-      {
-        prop: "cEngNo",
-        inputtype: "rtinput",
-        title: "发动机号",
-        clearable: true,
-      },
-      {
-        prop: "CPlyNo",
-        inputtype: "rtinput",
-        title: "工程名称",
-        clearable: true,
-      },
-      {
-        prop: "CPlyNo",
-        inputtype: "rtinput",
-        title: "工程地址",
-        clearable: true,
-      },
-      {
-        prop: "CPlyNo",
-        inputtype: "rtinput",
-        title: "行业类型",
-        clearable: true,
-      },
-      {
-        prop: "CPlyNo",
-        inputtype: "rtinput",
-        title: "经营地址",
-        clearable: true,
-      },
-      {
-        prop: "cPrjCtgTyp",
-        inputtype: "rtinput",
-        title: "项目大类",
-        clearable: true,
-      },
-      {
-        prop: "cPrjCtgMidTyp",
-        inputtype: "rtinput",
-        title: "项目中类",
-        clearable: true,
-      },
-      {
-        prop: "cPrjCtgSubTyp",
-        inputtype: "rtinput",
-        title: "项目子类",
-        clearable: true,
-      },
-      {
-        prop: "cCntrNme",
-        inputtype: "rtinput",
-        title: "人员姓名",
-        clearable: true,
-      },
-    ],
+    showSuperior: false,
+    superFromSchema: []
   })
 );
 
@@ -591,13 +723,15 @@ const modalForm = [
     title: "",
     itemWidth: 3,
     loadData: [
+      { label: "投保单", value: "cAppNo" },
+      { label: "保单", value: "cPlyNo" },
       { label: "批单", value: "cEdrNo" },
       { label: "批改序号", value: "c" },
-      { label: "机构", value: "d" },
-      { label: "二级分公司", value: "e" },
-      { label: "产品", value: "f" },
-      { label: "条款", value: "g" },
-      { label: "核保人", value: "h" },
+      { label: "机构", value: "cDptCde" },
+      { label: "二级分公司", value: "cDptCdet" },
+      { label: "产品", value: "cKindNo" },
+      { label: "条款", value: "cProdNo" },
+      { label: "核保人", value: "Underwriter" },
       { label: "核保通过日期", value: "tUdrTm" },
       { label: "状态", value: "cAppStatus" },
       { label: "项目大类", value: "k" },
@@ -610,13 +744,15 @@ const modalForm = [
 
 // 变更列数据
 const tableCol = ref<Array<any>>([
+  { title: "投保单", prop: "cAppNo", inputtype: "rtinput", minWidth: 180 },
+  { title: "保单", prop: "cPlyNo", inputtype: "rtinput", minWidth: 180 },
   { title: "批单", prop: "cEdrNo", inputtype: "rtinput", minWidth: 180 },
   { title: "批改序号", prop: "c", inputtype: "rtinput", minWidth: 180 },
-  { title: "机构", prop: "d", inputtype: "rtinput", minWidth: 180 },
-  { title: "二级分公司", prop: "e", inputtype: "rtinput", minWidth: 180 },
-  { title: "产品", prop: "f", inputtype: "rtinput", minWidth: 180 },
-  { title: "条款", prop: "g", inputtype: "rtinput", minWidth: 180 },
-  { title: "核保人", prop: "h", inputtype: "rtinput", minWidth: 180 },
+  { title: "机构", prop: "cDptCde", inputtype: "rtinput", minWidth: 180 },
+  { title: "二级分公司", prop: "cDptCdet", inputtype: "rtinput", minWidth: 180 },
+  { title: "产品", prop: "cKindNo", inputtype: "rtinput", minWidth: 180 },
+  { title: "条款", prop: "cProdNo", inputtype: "rtinput", minWidth: 180 },
+  { title: "核保人", prop: "Underwriter", inputtype: "rtinput", minWidth: 180 },
   {
     title: "核保通过日期",
     prop: "tUdrTm",
@@ -826,15 +962,57 @@ const tableObj = {
       {
         prop: "cAppNo",
         inputtype: "rtinput",
-        title: "投保单号",
+        title: "投保单",
         minWidth: 180,
       },
       {
         prop: "cPlyNo",
         inputtype: "rtinput",
-        title: "保单号",
+        title: "保单",
         minWidth: 180,
       },
+      {
+        prop: "cEdrNo",
+        inputtype: "rtinput",
+        title: "批单",
+        minWidth: 180,
+      },
+      {
+          prop: "cDptcde",
+          inputtype: "rtinput",
+          title: "机构",
+          minWidth: 180,
+      },
+        {
+            prop: "cDptcdet",
+            inputtype: "rtinput",
+            title: "二级分公司",
+            minWidth: 180,
+        },
+        {
+            prop: "cKindNo",
+            inputtype: "rtinput",
+            title: "产品",
+            minWidth: 180,
+        },
+        {
+            prop: "cProdNo",
+            inputtype: "rtinput",
+            title: "条款",
+            minWidth: 180,
+        },
+        {
+            prop: "Underwriter",
+            inputtype: "rtinput",
+            title: "核保人",
+            minWidth: 180,
+        },
+        {
+            prop: "tUdrTm",
+            inputtype: "rtinput",
+            title: "核保通过日期",
+            minWidth: 180,
+        },
       {
         prop: "nAmt",
         inputtype: "rtinput",
@@ -846,19 +1024,7 @@ const tableObj = {
         inputtype: "rtinput",
         title: "保费",
         minWidth: 100,
-      },
-      {
-        prop: "tInsrncBgnTm",
-        inputtype: "rtinput",
-        title: "保险起期",
-        minWidth: 120,
-      },
-      {
-        prop: "tInsrncEndTm",
-        inputtype: "rtinput",
-        title: "保险止期",
-        minWidth: 120,
-      },
+      }
     ],
   },
 };
@@ -878,6 +1044,26 @@ const handleTabClick = (tab: any) => {
     tableconfig = reactive<AppTableConfig>(
       createTableEditConfig(tableObj.notWaitObj)
     );
+      formconfig1.fromSchema?.forEach((item) => {
+          if (
+              item.prop === "CAppNme" ||
+              item.prop === "cCntrNme" ||
+              item.prop === "cCertfNo" ||
+              item.prop === "cLcnNo" ||
+              item.prop === "cEngNo" ||
+              item.prop === "induType" ||
+              item.prop === "projectNme" ||
+              item.prop === "projectAddress" ||
+              item.prop === "projectType" ||
+              item.prop === "OpAddress" ||
+              item.prop === "familyAddress" ||
+              item.prop === "cPrjCtgTyp" ||
+              item.prop === "cPrjCtgMidTyp" ||
+              item.prop === "cPrjCtgSubTyp"
+          ) {
+              item.hidden = true;
+          }
+      })
   }
   pageresult.list = [];
   tabs.value.forEach((item) => {
@@ -919,7 +1105,7 @@ onMounted(async () => {
     );
     activeName.value = "6";
   }
-  //首页跳转过来的逻辑 End
+    //首页跳转过来的逻辑 End
 });
 onUnmounted(() => {
   //组件销毁，清除sessionStorage数据
@@ -958,6 +1144,26 @@ function handleQuery(flag?: boolean) {
   const r = tableRefs.value[0]?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRefs.value[0].getFromValue(); //获取表单数据
   pageresult.list = [];
+  const startTemp = s.tm1 && s.tm1.length > 1 ? s.tm1[0] : null;
+  if (null == startTemp || undefined === startTemp) {
+    ElMessage.warning("签单日期不能为空");
+    return;
+  }
+  const start = Date.parse(startTemp);
+  const endTemp =s.tm1 && s.tm1.length > 1 ? s.tm1[1] : null;
+  if (null == endTemp || undefined === endTemp) {
+    ElMessage.warning("签单日期不能为空");
+    return;
+  }
+  const end = Date.parse(endTemp);
+  if (start - end > 0) {
+    ElMessage.warning("签单日期起期不能大于签单日期止期");
+    return;
+  }
+  if (end - start >= 90 * 1000 * 60 * 60 * 24) {
+    ElMessage.warning("签单日期时间范围请控制在3个月以内");
+    return;
+  }
     if(currentTabKey.value=='1'){
         const param =Object.assign(s, r);
         param['pageNo']=param['pageNum']
