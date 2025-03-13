@@ -401,11 +401,9 @@ watch(
 );
 
 onMounted(() => {
-  // setAdditionalInsuranceTypeHidden("1");
   if (param.type === "edit") {
     handleQuery();
   } else {
-    setAdditionalInsuranceTypeHidden("1");
     // 如果不是编辑模式，确保默认值生效
     freeEditRef.value?.setFormValue({ cSourceTyp: "9" });
   }
