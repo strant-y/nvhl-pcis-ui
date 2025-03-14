@@ -73,6 +73,8 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 import { now } from "lodash";
 import { useRoute } from "vue-router";
+import moment from "moment";
+import dayjs from "dayjs";
 const userStore = useUserStore();
 const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
 const route = useRoute();
@@ -351,6 +353,22 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
     fromSchema: [
       {
+          prop: "cQueryStr",
+          inputtype: "rtinput",
+          title: "查询条件",
+          placeholder: "申请单号 保单号 批单号 产品名称 被保人名称 被保人证件号码 手机号码 被保人地址 投保人名称",
+          btnWidth: 10,
+          itemWidth: 2,
+          showExBtn: true,
+          btnItems: {
+              icon: "Search",
+              type: "primary",
+              func: () => {
+                  handleQuery(true);
+              },
+          },
+      },
+      {
         prop: "cDptCde",
         inputtype: "rtselect",
         title: "核保机构",
@@ -520,7 +538,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable: true,
       },
       {
-          prop: "appCde",
+          prop: "cInsuredNme",
           inputtype: "rtinput",
           title: "被保人名称",
           clearable: true,
@@ -632,7 +650,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         {
             prop: "familyAddress",
             inputtype: "rtinput",
-            title: "家财地址查询",
+            title: "家财地址",
             clearable: true,
             hidden: true,
         },
@@ -1064,6 +1082,15 @@ const handleTabClick = (tab: any) => {
               item.hidden = true;
           }
       })
+      freeEditRef.value[i].value[0].setValue("tm1", [
+          dayjs(new Date())
+              .subtract(3, 'month').format(
+              "YYYY-MM-DD 00:00:00"
+          ),
+          moment(new Date()).format(
+              "YYYY-MM-DD 23:59:59"
+          ),
+      ]);
   }
   pageresult.list = [];
   tabs.value.forEach((item) => {
@@ -1092,7 +1119,7 @@ onMounted(async () => {
     if (homeJumpData.value.hasOwnProperty("CAppNo")) {
       //投保单号
       freeEditRef.value[1].value[0].setValue(
-        "appCde",
+        "cAppNo",
         homeJumpData.value.CAppNo
       );
     }
@@ -1104,6 +1131,16 @@ onMounted(async () => {
       sessionStorage.getItem(AppKey.query.pcis_query_returnudrlist)
     );
     activeName.value = "6";
+  }else{
+      freeEditRef.value[0].value[0].setValue("tm1", [
+          dayjs(new Date())
+              .subtract(3, 'month').format(
+              "YYYY-MM-DD 00:00:00"
+          ),
+          moment(new Date()).format(
+              "YYYY-MM-DD 23:59:59"
+          )
+      ]);
   }
     //首页跳转过来的逻辑 End
 });
@@ -1144,25 +1181,27 @@ function handleQuery(flag?: boolean) {
   const r = tableRefs.value[0]?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRefs.value[0].getFromValue(); //获取表单数据
   pageresult.list = [];
-  const startTemp = s.tm1 && s.tm1.length > 1 ? s.tm1[0] : null;
-  if (null == startTemp || undefined === startTemp) {
-    ElMessage.warning("签单日期不能为空");
-    return;
-  }
-  const start = Date.parse(startTemp);
-  const endTemp =s.tm1 && s.tm1.length > 1 ? s.tm1[1] : null;
-  if (null == endTemp || undefined === endTemp) {
-    ElMessage.warning("签单日期不能为空");
-    return;
-  }
-  const end = Date.parse(endTemp);
-  if (start - end > 0) {
-    ElMessage.warning("签单日期起期不能大于签单日期止期");
-    return;
-  }
-  if (end - start >= 90 * 1000 * 60 * 60 * 24) {
-    ElMessage.warning("签单日期时间范围请控制在3个月以内");
-    return;
+  if((s['cAppNo']==null||s['cAppNo']=='')&&(s['cPlyNo']==null||s['cPlyNo']=='')&&(s['cAppNme']==null||s['cAppNme']=='')){
+      const startTemp = s.tm1 && s.tm1.length > 1 ? s.tm1[0] : null;
+      if (null == startTemp || undefined === startTemp) {
+          ElMessage.warning("签单日期不能为空");
+          return;
+      }
+      const start = dayjs(startTemp);
+      const endTemp =s.tm1 && s.tm1.length > 1 ? s.tm1[1] : null;
+      if (null == endTemp || undefined === endTemp) {
+          ElMessage.warning("签单日期不能为空");
+          return;
+      }
+      const end = dayjs(endTemp);
+      if (end.isBefore(start)) {
+          ElMessage.warning("签单日期起期不能大于签单日期止期");
+          return;
+      }
+      if (end.diff(start, 'year', true) > 2) {
+          ElMessage.warning("签单日期时间范围请控制在两年内");
+          return;
+      }
   }
     if(currentTabKey.value=='1'){
         const param =Object.assign(s, r);

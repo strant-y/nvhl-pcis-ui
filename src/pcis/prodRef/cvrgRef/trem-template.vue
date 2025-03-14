@@ -33,7 +33,7 @@
               <rtButton
                 @click="
                   () => {
-                    emit('delete', null);
+                    emit('delete', term);
                   }
                 "
                 :item="{
@@ -127,7 +127,7 @@
                   <th
                     v-for="col in getColinfo(ginfo.cGroupId)"
                     :key="col.cColId"
-                    :width="col.width ? col.width : null"
+                    :width="col.cColWidth ? col.cColWidth : null"
                   >
                     {{ col.cColTitle }}
                   </th>
@@ -506,9 +506,6 @@ function initshowConfig() {
     });
   }
   groupconf.value = grouplist;
-
-  console.log(groupconf.value);
-  console.log(extermConf.value);
 }
 
 /**
@@ -556,6 +553,9 @@ function exChangeFunc() {
       );
       termFactormap.value = term;
     }
+  }
+  if (param.cProdNo === "043009") {
+
   }
 }
 
