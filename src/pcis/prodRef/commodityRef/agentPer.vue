@@ -191,6 +191,10 @@ const tableconfig = reactive<AppTableConfig>(
                 title: "协议名称",
             },
         ],
+        rowDbClickFun(rowData) {
+            console.log(props.data)
+            props.data.method?.getSelected(rowData)
+        }
     })
 );
 
@@ -234,6 +238,11 @@ function handleQuery(flag?: boolean) {
     const param = Object.assign(s, r);
     param.CProdNo = props.data.data.CProdNo
     getAgencyBusinessList(param)
+    pageresult.list = [
+        {
+            CChaCde: 123
+        }
+    ];
 }
 /**
  * 调用api获取代理信息

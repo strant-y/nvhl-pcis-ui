@@ -64,12 +64,12 @@
             <div>
               <VueDraggable
                 class="eachCon"
-                v-model="list"
+                v-model="termList"
                 :animation="150"
                 @update="updateOptionAll"
               >
                 <el-card
-                  v-for="(item, index) in list"
+                  v-for="(item, index) in termList"
                   :key="index"
                   :class="item.checked ? 'checked eachItems' : 'eachItems'"
                   shadow="hover"
@@ -79,14 +79,14 @@
                     <el-icon size="20" style="vertical-align: middle"
                       ><Fold
                     /></el-icon>
-                    <span :title="item.title" class="text-ellipsis">
-                      {{ item.title }}
+                    <span :title="item.prodCnm" class="text-ellipsis">
+                      {{ item.prodCnm }}
                     </span>
                     <el-icon :size="25" style="color: rgb(250, 219, 20)"
                       ><StarFilled
                     /></el-icon>
                   </p>
-                  <p class="txt">{{ item.code }} - {{ item.value }}</p>
+                  <p class="txt">{{ item.termNo }} - {{ item.termCnm }}</p>
                 </el-card>
               </VueDraggable>
             </div>
@@ -121,7 +121,6 @@
         </el-row>
       </el-form>
     </div>
-
     <div v-if="step == '1'">内容</div>
     <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
       <!-- <rt-button
@@ -133,7 +132,6 @@
           },
         }"
       /> -->
-
       <rt-button
         :item="{
           type: 'primary',
@@ -147,7 +145,6 @@
           },
         }"
       />
-
       <!-- <rt-button
         v-if="step == '1'"
         :item="{
@@ -172,7 +169,10 @@ import {
   AppFreeEditMethod,
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
-import { getProdEnableList } from "./custom-recording.service";
+import {
+  getProdEnableList,
+  qryUserCommonTerm,
+} from "./custom-recording.service";
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
@@ -195,7 +195,7 @@ const title = ref("自定义录单");
 // 条款名称列表
 const options = ref<any>([]);
 // 常用条款列表
-const list = ref<any>([]);
+const termList = ref<any>([]);
 // 条款树
 const nodes = ref<Array<any>>([]);
 const defaultProps = {
@@ -217,9 +217,7 @@ const formconfig1 = ref({
   cTermNo: "",
   d: "",
 });
-
-const selectTreeItem = ref({})
-
+const selectTreeItem = ref({});
 // 条款下拉数据
 function loadOptions() {
   const param = { pageNo: 1, pageSize: 9999, CEnableFlag: "1" };
@@ -233,30 +231,8 @@ function loadOptions() {
 }
 
 onMounted(async () => {
+  handleQuery();
   loadOptions();
-  list.value = [
-    {
-      title: "1111111111111111111111111111111111111",
-      value: "货物运输险",
-      code: "02",
-    },
-    { title: "22222222222222222222222222222", value: "保证保险", code: "05" },
-    {
-      title: "333333333333333333333333333333333",
-      value: "保证保险",
-      code: "05",
-    },
-    {
-      title: "444444444444444444444444444444444444",
-      value: "保证保险",
-      code: "05",
-    },
-    {
-      title: "55555555555555555555555555555555555555555",
-      value: "保证保险",
-      code: "05",
-    },
-  ];
   nextTick(() => {
     step.value = "0";
   });
@@ -267,7 +243,7 @@ const method = {};
 
 //当前选中的机构item
 function selectedItem(item) {
-  selectTreeItem.value = item
+  selectTreeItem.value = item;
 }
 
 // 下一步
@@ -284,7 +260,14 @@ function next() {
           param: JSON.stringify({ ...data, ...{ pageType: "app" } }),
         },
       });
-      sessionStorage.setItem('toMyPageData', JSON.stringify({ ...data, ...{ pageType: "app" }, ...{dptItem: selectTreeItem.value} }))
+      sessionStorage.setItem(
+        "toMyPageData",
+        JSON.stringify({
+          ...data,
+          ...{ pageType: "app" },
+          ...{ dptItem: selectTreeItem.value },
+        })
+      );
     }
     step.value = step.value == "0" ? "1" : "0";
     title.value = step.value == "0" ? "自定义录单" : "选择条款";
@@ -299,28 +282,44 @@ function prev() {
 function handleClick(item: any, index: number) {
   // 每次只能选择一个数据,如果是选中状态,则取消选中
   if (item.checked) {
-    list.value.map((item: any, index: any) => {
+    termList.value.map((item: any, index: any) => {
       if (index != index) {
         item.checked = false;
       }
     });
   } else {
-    list.value.forEach((item: any, index: any) => (item.checked = false));
+    termList.value.forEach((item: any, index: any) => (item.checked = false));
   }
   item.checked = !item.checked;
-  formconfig1.value.cNmeCn = item.checked ? item.value : "";
+  formconfig1.value.cNmeCn = item.checked ? item.termCnm : "";
 }
-
+function handleQuery() {
+  qryUserCommonTerm({
+    pageNum: 1,
+    pageSize: 10,
+    userId: JSON.parse(sessionStorage.getItem("user")).opCde,
+  }).then((res: any) => {
+    if (res.code == "1") {
+      termList.value = res.result;
+    }
+  });
+}
 // 条款列表选中
 function handleChange() {
   // 如果下拉数据不存在list中，则清除list所有选中数据
-  if (!list.value.some((item: any) => item.code == formconfig1.value.cTermNo)) {
-    list.value.forEach((item: any, index: any) => (item.checked = false));
+  if (
+    !termList.value.some(
+      (item: any) => item.termNo == formconfig1.value.cTermNo
+    )
+  ) {
+    termList.value.forEach((item: any, index: any) => (item.checked = false));
   }
   // 如果下拉数据存在list中，则选中list中对应数据
-  if (list.value.some((item: any) => item.code == formconfig1.value.cTermNo)) {
-    list.value.forEach((item: any, index: any) => {
-      if (item.code == formconfig1.value.cTermNo) {
+  if (
+    termList.value.some((item: any) => item.termNo == formconfig1.value.cTermNo)
+  ) {
+    termList.value.forEach((item: any, index: any) => {
+      if (item.termNo == formconfig1.value.cTermNo) {
         item.checked = true;
       } else {
         item.checked = false;
@@ -331,13 +330,13 @@ function handleChange() {
 
 // 条款列表清除
 function handleClear() {
-  list.value.forEach((item: any, index: any) => (item.checked = false));
+  termList.value.forEach((item: any, index: any) => (item.checked = false));
   formconfig1.value.cTermNo = "";
 }
 
 // 条款列表拖拽后操作
 function updateOptionAll(e: any) {
-  console.log(list.value);
+  console.log(termList.value);
 }
 
 // 选择条款弹框

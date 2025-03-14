@@ -1122,3 +1122,9 @@ export function delUndrClsById(queryParams: any): AxiosPromise<any> {
 export function getPageList(queryParams: any): AxiosPromise<any> {
     return post(`/codelist/queryPage`, queryParams);
 }
+/**
+ * 得当前承保机构的分公司编码。如：北京02、天津27、重庆15
+ */
+export function checkCdeptByCdptCde(queryParams: any): AxiosPromise<any>  {
+    return post('/policy/checkCdeptByCdptCde',  queryParams);
+}

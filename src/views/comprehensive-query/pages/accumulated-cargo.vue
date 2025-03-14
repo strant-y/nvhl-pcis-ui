@@ -45,7 +45,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
     fromUi: {
-      cols: 2
+      cols: 3
     },
     endBtns: [
       createFreeButtonBase({
@@ -242,5 +242,10 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-
+  .app-container{
+    padding: 6px 30px;
+  }
+  ::v-deep(.el-form){
+    padding: 5px 30px;
+  }
 </style>

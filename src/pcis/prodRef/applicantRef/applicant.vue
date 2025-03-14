@@ -27,6 +27,7 @@ const applicantEditRef = ref<AppFreeEditMethod | null>(null);
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { debug } from "console";
 import { ru } from "element-plus/es/locale";
+import { emit } from "process";
 const opertaor = dataOpertaor();
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));
@@ -39,6 +40,13 @@ onMounted(() => {
     getRules
   );
   Object.assign(formconfig1, formconfig11);
+  nextTick(() => {
+    //是否小微企业，默认非必填、只读
+    setFormItem("Applicant.cIsMicro", {
+      rules: null,
+      disabled: true,
+    });
+  })
 });
 //给表单下拉项赋值
 function setFormItem(key, obj) {
@@ -120,12 +128,22 @@ const method = {
       setFormItem("Applicant.tCertfEndDate", {
         rules: [getRules("required", {})],
       });
+      if(val == '110002') { //证件类型是“营业执照”，参加社会统筹标志变化为必填
+        // 参加社会统筹标志
+        setFormItem("Applicant.cParticTyp", {
+          rules: [getRules("required", {})],
+        })
+      }
     } else {
       setFormItem("Applicant.cCertfCde", {
         rules: [getRules("required", {})],
       });
       setFormItem("Applicant.tCertfBgnDate", null);
       setFormItem("Applicant.tCertfEndDate", null);
+      // 参加社会统筹标志
+      setFormItem("Applicant.cParticTyp", {
+        rules: null,
+      })
     }
   },
   InsureChange: (val) => {
@@ -136,11 +154,20 @@ const method = {
         rules: [getRules("required", {})],
       });
       setFormItem("Applicant.cIsMicro", {
-        disabled: true,
+        disabled: false,
       });
       setFormItem("Applicant.cIsIndvduBiz", {
         disabled: true,
       });
+      // 是否绿色产业客户
+      setFormItem("Applicant.isGreen", {
+        rules: [getRules("required", {})],
+        disabled: false,
+      })
+      // 参加社会统筹标志
+      setFormItem("Applicant.cParticTyp", {
+        rules: [getRules("required", {})],
+      })
       codeListStore
         .queryCodeList({
           codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
@@ -154,11 +181,22 @@ const method = {
         });
     } else {
       setFormItem("Applicant.cIsMicro", {
-        disabled: false,
+        disabled: true,
       });
       setFormItem("Applicant.cIsIndvduBiz", {
         disabled: false,
       });
+      // 是否绿色产业客户
+      setFormItem("Applicant.isGreen", {
+        rules: null,
+        disabled: true,
+      })
+      // 参加社会统筹标志
+      setFormItem("Applicant.cParticTyp", {
+        rules: null,
+      })
+      setValue("Applicant.isGreen", "")
+      setValue("Applicant.cIsMicro", "");
       setValue("Applicant.cCertfCls", "");
       setFormItem("Applicant.cCntrNme", { rules: null });
       setFormItem("Applicant.cCntrCertfCde", { rules: null });
@@ -229,7 +267,21 @@ const method = {
       setFormItem("Applicant.cMobile", { rules: [getRules("phoneNo", {})] });
     }
   },
+  emailChange: (val) => {
+    if (val) {
+      setFormItem("Applicant.cEmail", { rules: [getRules("email", {})] });
+    }
+  },
   handleClose: (val) => {},
+  // 是否绿色产业客户change
+  ApplicantIsGreen: (val) => {
+    // 控制绿色产业细分列表是否必填
+    if(val == '1') {
+      setFormItem("Applicant.greenTyp", { rules: [getRules("required", {})] })
+    } else {
+      setFormItem("Applicant.greenTyp", { rules: null })
+    }
+  },
 };
 
 function getFromValue() {

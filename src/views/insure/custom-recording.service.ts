@@ -13,6 +13,15 @@ import { LocalBaseApi } from "../config";
 export function getProdEnableList(queryParams: any): AxiosPromise<any> {
     return get(`/proddef/getProdEnableList`, queryParams);
 }
+export function qryUserCommonTerm(queryParams: any): AxiosPromise<any> {
+    return post(`/userTerm/qryUserCommonTerm`, queryParams);
+}
+export function userUnionTerm(queryParams: any): AxiosPromise<any> {
+    return post(`/userTerm/userUnionTerm`, queryParams);
+}
+export function unUserUnUntionTerm(queryParams: any): AxiosPromise<any> {
+    return post(`//userTerm/unUserUnUntionTerm`, queryParams);
+}
 
 /*
  * 投保	自定义录单
