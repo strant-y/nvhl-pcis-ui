@@ -8,6 +8,7 @@
       ref="tableRef"
       @page-change="handleQuery(false)"
     />
+    <comDialog ref="dialog"></comDialog>
   </div>
 </template>
 
@@ -35,7 +36,10 @@ const dzmodal = useDzModal();
 const RelatedAdditionalInsModal = defineAsyncComponent(
   () => import("./RelatedAdditionalInsModal.vue")
 );
+const dialog = ref<DialogMethod | null>(null);
 import { getCvrgRelList, delCvrgRel, queryTermRelList } from "@/api/prod";
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
+import { RefSymbol } from "@vue/reactivity";
 const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
 const route = useRoute();
 const query = ref(route.query);
@@ -62,7 +66,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         label: "重置",
         icon: "RefreshRight",
         func: () => {
-          freeEditRef.value.setformValue({
+          freeEditRef.value?.setFormValue({
             cKindNo: "",
             cTermNo: "",
             cNmeCn: "",
@@ -80,7 +84,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         codeParam: { cStatus: "1" },
       },
       {
-        prop: "cTermNo",
+        prop: "cTermRdrCde",
         inputtype: "rtinput",
         title: "条款代码",
       },
@@ -115,13 +119,25 @@ const tableconfig = reactive<AppTableConfig>(
             ElMessage.error("请完善基本信息后操作!");
             return;
           } else {
-            dzmodal
-              .open(RelatedAdditionalInsModal, { type: "add", data: {} })
-              .then((res) => {
-                if (res.type === "ok") {
-                  handleQuery();
-                }
-              });
+            dialog.value?.open(
+            "relatedAdditionalInsModal",
+            {
+              termInfo: tabref.getFromValue(),
+            },
+            {
+              isOk: () => {
+                handleQuery();
+              },
+            },
+            { title: "选择条款", width: 70 }
+          );
+            // dzmodal
+            //   .open(RelatedAdditionalInsModal, { type: "add", data: {} })
+            //   .then((res) => {
+            //     if (res.type === "ok") {
+            //       handleQuery();
+            //     }
+            //   });
           }
         },
       }),
@@ -174,7 +190,7 @@ const handleDelete = (index: number, row: any) => {
   })
     .then(() => {
       deleteTermRel(row)
-        .then((res) => {
+        .then((res: any) => {
           const { code, data, msg } = res;
           if (200 === code) {
             ElMessage.success("删除成功");
@@ -229,7 +245,8 @@ function handleQuery(flag?: boolean) {
   } else {
     const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
     const s = freeEditRef.value?.getFromValue(); //获取表单数据
-    const param = Object.assign(s, r);
+    const termInfo = tabref.getFromValue();
+    const param = Object.assign(s, r, {cTermNo: termInfo['cTermNo']});
     queryTermRelList(param)
       .then((res) => {
         const { code, data, msg } = res;
@@ -251,8 +268,8 @@ function getQueryList(flag?: boolean) {
   } else {
     const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
     const s = freeEditRef.value?.getFromValue(); //获取表单数据
-    s.cTermNo = tabref.getFromValue().cTermNo;
-    const param = Object.assign(s, r);
+    const termInfo = tabref.getFromValue();
+    const param = Object.assign(s, r, {cTermNo: termInfo['cTermNo']});
     queryTermRelList(param)
       .then((res) => {
         const { code, data, msg } = res;
