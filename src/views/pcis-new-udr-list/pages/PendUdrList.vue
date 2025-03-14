@@ -804,7 +804,7 @@ watch(
     }
     if (n !== "5") {
       tableBtn.value.map((item: any, index: number) => {
-        const isVal = item.showKey.findIndex((vals: any) => vals == n);
+        const isVal = item.showKey && item.showKey.findIndex((vals: any) => vals == n) || -1;
         if (isVal !== -1) tableObj.notWaitObj.tableBtn.value.push(item);
       });
     } else {
