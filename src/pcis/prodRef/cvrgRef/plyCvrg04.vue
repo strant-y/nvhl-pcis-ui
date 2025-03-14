@@ -42,7 +42,7 @@
                   v-for="(i, index) in planData[k]"
                   :key="index"
                   v-model="planData[k][index]"
-                  @delete="deleteData(k,index)"
+                  @delete="(data)=>{ deleteData(k, index, data)}"
                   :ref="(res)=>{ tremTemplateRefs[index] = res } "
                 />
               </el-form>
@@ -64,6 +64,8 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { terConfig } from "@/store/modules/term-config";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { prodTemple } from "./titleTemple";
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
 
 const opertaor = dataOpertaor();
 const terconfig = terConfig();
@@ -175,12 +177,40 @@ function addTermData(PlanNo: string){
     );
 }
 
-function deleteData(plan: string, index: number) {
+function deleteData(plan: string, index: number, term: any) {
   planData[plan].splice(index, 1);
+  if(term.cRdrTyp === '0'){
+    codeListStore.queryCodeList(
+          {
+            codeListName: 'MainTermlist',
+            codeListParam: { cTermNo:term.cTermNo },
+          },
+          false,
+          false
+        )
+        .then((res) => {
+          if(res && res.length>0){
+            res.forEach(r=>{
+              deleteTermByNo(plan,r);
+            })
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+  }
 }
 
-function deletePlan(plan: string) {
-  delete planData[plan];
+function deleteTermByNo(plan:any, t:any){
+  let deleindex = null;
+  planData[plan].forEach((item: any,index :any) => {
+    if(item['Term.cClauseCode'] === t['RdrTerm']){
+      deleindex = index;
+    }
+  });
+  if(deleindex !== null ){
+    planData[plan].splice(deleindex, 1);
+  }
 }
 
 function getFromValue() {

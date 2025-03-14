@@ -33,7 +33,7 @@
               <rtButton
                 @click="
                   () => {
-                    emit('delete', null);
+                    emit('delete', term);
                   }
                 "
                 :item="{
@@ -506,9 +506,6 @@ function initshowConfig() {
     });
   }
   groupconf.value = grouplist;
-
-  console.log(groupconf.value);
-  console.log(extermConf.value);
 }
 
 /**

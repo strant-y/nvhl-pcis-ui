@@ -7,7 +7,7 @@
             v-for="(i, index) in formData"
             :key="index"
             v-model="formData[index]"
-            @delete="deleteData(k, index)"
+            @delete="(r)=>{deleteData(index,r) }"
             :ref="(res)=>{ tremTemplateRefs[index] = res } "
           />
         </el-form>
@@ -24,6 +24,8 @@ const dialog = ref<DialogMethod | null>(null);
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
 const opertaor = dataOpertaor();
 
 const props = defineProps({
@@ -89,9 +91,43 @@ function addTermData() {
   );
 }
 
-function deleteData(plan: string, index: number) {
+function deleteData(index: number,term :any) {
   formData.value.splice(index, 1);
+
+  if(term.cRdrTyp === '0'){
+    codeListStore.queryCodeList(
+          {
+            codeListName: 'MainTermlist',
+            codeListParam: { cTermNo:term.cTermNo },
+          },
+          false,
+          false
+        )
+        .then((res) => {
+          if(res && res.length>0){
+            res.forEach(r=>{
+              deleteTermByNo(r);
+            })
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+  }
 }
+
+function deleteTermByNo(t:any){
+  let deleindex = null;
+  formData.value.forEach((item: any,index :any) => {
+    if(item['Term.cClauseCode'] === t['RdrTerm']){
+      deleindex = index;
+    }
+  });
+  if(deleindex !== null ){
+    formData.value.splice(deleindex, 1);
+  }
+}
+
 
 function getFromValue() {
   let tableobj: { [key: string]: any } = {};
