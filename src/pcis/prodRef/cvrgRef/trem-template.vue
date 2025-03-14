@@ -127,7 +127,7 @@
                   <th
                     v-for="col in getColinfo(ginfo.cGroupId)"
                     :key="col.cColId"
-                    :width="col.width ? col.width : null"
+                    :width="col.cColWidth ? col.cColWidth : null"
                   >
                     {{ col.cColTitle }}
                   </th>
@@ -556,6 +556,9 @@ function exChangeFunc() {
       );
       termFactormap.value = term;
     }
+  }
+  if (param.cProdNo === "043009") {
+
   }
 }
 
