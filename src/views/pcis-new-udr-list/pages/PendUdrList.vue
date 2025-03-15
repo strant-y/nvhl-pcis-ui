@@ -241,7 +241,7 @@ const allForm = ref<Array<any>>([
     inputtype: "rtdatepicker",
     title: "投保日期",
     rules: [],
-    itemWidth: 2,
+    itemWidth: 1,
     showKey: [1, 2, 3, 4, 5],
     clearable: true,
     type: "datetimerange",
@@ -253,7 +253,7 @@ const allForm = ref<Array<any>>([
     inputtype: "rtdatepicker",
     title: "提核日期",
     rules: [],
-    itemWidth: 2,
+    itemWidth: 1,
     showKey: [1, 2],
     clearable: true,
     type: "datetimerange",
@@ -770,7 +770,7 @@ watch(
     }
     if (n !== '5') {
       tableBtn.value.map((item: any, index: number) => {
-        const isVal = item.showKey.findIndex((vals: any) => vals == n);
+        const isVal = item.showKey && item.showKey.findIndex((vals: any) => vals == n) || -1;
         if (isVal !== -1) tableObj.notWaitObj.tableBtn.value.push(item);
       })
     } else {
