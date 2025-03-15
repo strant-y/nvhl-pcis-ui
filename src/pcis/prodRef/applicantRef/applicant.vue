@@ -14,6 +14,8 @@ import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
 import moment from "moment";
 const { getRules } = useValidator();
+import { useProductStore } from "@/store/modules/prod";
+const productStore = useProductStore();
 const dialog = ref<DialogMethod | null>(null);
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 const props = defineProps({
@@ -46,7 +48,7 @@ onMounted(() => {
       rules: null,
       disabled: true,
     });
-  })
+  });
 });
 //给表单下拉项赋值
 function setFormItem(key, obj) {
@@ -128,11 +130,12 @@ const method = {
       setFormItem("Applicant.tCertfEndDate", {
         rules: [getRules("required", {})],
       });
-      if(val == '110002') { //证件类型是“营业执照”，参加社会统筹标志变化为必填
+      if (val == "110002") {
+        //证件类型是“营业执照”，参加社会统筹标志变化为必填
         // 参加社会统筹标志
         setFormItem("Applicant.cParticTyp", {
           rules: [getRules("required", {})],
-        })
+        });
       }
     } else {
       setFormItem("Applicant.cCertfCde", {
@@ -143,11 +146,14 @@ const method = {
       // 参加社会统筹标志
       setFormItem("Applicant.cParticTyp", {
         rules: null,
-      })
+      });
     }
   },
+  //投保人性质(0是法人1是个人)
   InsureChange: (val) => {
     if (val == "0") {
+      productStore.setcClntMrk(val);
+      console.log("000000000", productStore.$state.cClntMrk);
       setValue("Applicant.cCertfCls", "");
       setFormItem("Applicant.cCntrNme", { rules: [getRules("required", {})] });
       setFormItem("Applicant.cCntrCertfCde", {
@@ -160,14 +166,14 @@ const method = {
         disabled: true,
       });
       // 是否绿色产业客户
-      setFormItem("Applicant.isGreen", {
+      setFormItem("Applicant.cGreenIndustryCustomers", {
         rules: [getRules("required", {})],
         disabled: false,
-      })
+      });
       // 参加社会统筹标志
       setFormItem("Applicant.cParticTyp", {
         rules: [getRules("required", {})],
-      })
+      });
       codeListStore
         .queryCodeList({
           codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
@@ -187,15 +193,15 @@ const method = {
         disabled: false,
       });
       // 是否绿色产业客户
-      setFormItem("Applicant.isGreen", {
+      setFormItem("Applicant.cGreenIndustryCustomers", {
         rules: null,
         disabled: true,
-      })
+      });
       // 参加社会统筹标志
       setFormItem("Applicant.cParticTyp", {
         rules: null,
-      })
-      setValue("Applicant.isGreen", "")
+      });
+      setValue("Applicant.cGreenIndustryCustomers", "");
       setValue("Applicant.cIsMicro", "");
       setValue("Applicant.cCertfCls", "");
       setFormItem("Applicant.cCntrNme", { rules: null });
@@ -272,14 +278,65 @@ const method = {
       setFormItem("Applicant.cEmail", { rules: [getRules("email", {})] });
     }
   },
+  cCountryChange: (val) => {
+    setValue("Applicant.cCity", "");
+    setValue("Applicant.cProvince", "");
+    setValue("Applicant.cCounty", "");
+    if (val) {
+      codeListStore
+        .queryCodeList({
+          codeListName: "WEB_BAS_AREA",
+          codeListParam: { cParCde: val, cType: "1" },
+        })
+        .then((res) => {
+          const objData = {
+            loadData: res,
+          };
+          setFormItem("Applicant.cProvince", objData);
+        });
+    }
+  },
+  cProvinceChange: (val) => {
+    setValue("Applicant.cCity", "");
+    setValue("Applicant.cCounty", "");
+    if (val) {
+      codeListStore
+        .queryCodeList({
+          codeListName: "WEB_BAS_AREA",
+          codeListParam: { cParCde: val, cType: "2" },
+        })
+        .then((res) => {
+          const objData = {
+            loadData: res,
+          };
+          setFormItem("Applicant.cCity", objData);
+        });
+    }
+  },
+  cCityChange: (val) => {
+    setValue("Applicant.cCounty", "");
+    codeListStore
+      .queryCodeList({
+        codeListName: "WEB_BAS_AREA",
+        codeListParam: { cParCde: val, cType: "3" },
+      })
+      .then((res) => {
+        const objData = {
+          loadData: res,
+        };
+        setFormItem("Applicant.cCounty", objData);
+      });
+  },
   handleClose: (val) => {},
   // 是否绿色产业客户change
   ApplicantIsGreen: (val) => {
     // 控制绿色产业细分列表是否必填
-    if(val == '1') {
-      setFormItem("Applicant.greenTyp", { rules: [getRules("required", {})] })
+    if (val == "1") {
+      setFormItem("Applicant.cGreenIndustryList", {
+        rules: [getRules("required", {})],
+      });
     } else {
-      setFormItem("Applicant.greenTyp", { rules: null })
+      setFormItem("Applicant.cGreenIndustryList", { rules: null });
     }
   },
 };

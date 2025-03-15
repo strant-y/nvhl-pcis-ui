@@ -20,7 +20,7 @@ export function userUnionTerm(queryParams: any): AxiosPromise<any> {
     return post(`/userTerm/userUnionTerm`, queryParams);
 }
 export function unUserUnUntionTerm(queryParams: any): AxiosPromise<any> {
-    return post(`//userTerm/unUserUnUntionTerm`, queryParams);
+    return post(`/userTerm/unUserUnUntionTerm`, queryParams);
 }
 
 /*

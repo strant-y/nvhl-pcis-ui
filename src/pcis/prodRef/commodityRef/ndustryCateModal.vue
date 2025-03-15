@@ -25,8 +25,8 @@ import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
-import { codeListViewStore } from "@/store";
 import { rsaEncoder } from "@/utils/encipher";
+import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
 const { getRules } = useValidator();
 const props = defineProps({

@@ -14,6 +14,8 @@ const dialog = ref<DialogMethod | null>(null);
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { useValidator } from "@/typings/useValidator";
 import { codeListViewStore } from "@/store";
+import { useProductStore } from "@/store/modules/prod";
+const productStore = useProductStore();
 const opertaor = dataOpertaor();
 const props = defineProps({
   pageSchema: {
@@ -40,7 +42,7 @@ onMounted(() => {
       rules: null,
       disabled: true,
     });
-  })
+  });
 });
 function setFormItem(key, obj) {
   if (obj && Object.keys(obj).length) {
@@ -142,14 +144,14 @@ const method = {
         disabled: true,
       });
       // 是否绿色产业客户
-      setFormItem("Insured.isGreen", {
+      setFormItem("Insured.cGreenIndustryCustomers", {
         rules: [getRules("required", {})],
         disabled: false,
-      })
+      });
       // 参加社会统筹标志
       setFormItem("Insured.cParticTyp", {
         rules: [getRules("required", {})],
-      })
+      });
       codeListStore
         .queryCodeList({
           codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
@@ -169,15 +171,15 @@ const method = {
         disabled: false,
       });
       // 是否绿色产业客户
-      setFormItem("Insured.isGreen", {
+      setFormItem("Insured.cGreenIndustryCustomers", {
         rules: null,
         disabled: true,
-      })
+      });
       // 参加社会统筹标志
       setFormItem("Insured.cParticTyp", {
         rules: null,
-      })
-      setValue("Insured.isGreen", "");
+      });
+      setValue("Insured.cGreenIndustryCustomers", "");
       setValue("Insured.cIsMicro", "");
       setValue("Insured.cCertfCls", "");
       setFormItem("Insured.cCntrNme", { rules: null });
@@ -251,30 +253,87 @@ const method = {
   // 是否绿色产业客户change
   InsuredIsGreen: (val) => {
     // 控制绿色产业细分列表是否必填
-    if(val == '1') {
-      setFormItem("Insured.greenTyp", { rules: [getRules("required", {})] })
+    if (val == "1") {
+      setFormItem("Insured.cGreenIndustryList", {
+        rules: [getRules("required", {})],
+      });
     } else {
-      setFormItem("Insured.greenTyp", { rules: null })
+      setFormItem("Insured.cGreenIndustryList", { rules: null });
     }
   },
   //证件类型change
   InsuredCCertfCls: (val) => {
-    if (val == "110002") { //证件类型是“营业执照”，参加社会统筹标志变化为必填
+    if (val == "110002") {
+      //证件类型是“营业执照”，参加社会统筹标志变化为必填
       // 参加社会统筹标志
       setFormItem("Insured.cParticTyp", {
         rules: [getRules("required", {})],
-      })
+      });
     } else {
       // 参加社会统筹标志
       setFormItem("Insured.cParticTyp", {
         rules: null,
-      })
+      });
     }
   },
   emailChange: (val) => {
     if (val) {
       setFormItem("Insured.cEmail", { rules: [getRules("email", {})] });
     }
+  },
+  cCountryChange: (val) => {
+    setValue("Insured.cCity", "");
+    setValue("Insured.cProvince", "");
+    setValue("Insured.cCounty", "");
+    if (val) {
+      codeListStore
+        .queryCodeList({
+          codeListName: "WEB_BAS_AREA",
+          codeListParam: { cParCde: val, cType: "1" },
+        })
+        .then((res) => {
+          const objData = {
+            loadData: res,
+          };
+          setFormItem("Insured.cProvince", objData);
+        });
+    }
+  },
+  cProvinceChange: (val) => {
+    setValue("Insured.cCity", "");
+    setValue("Insured.cCounty", "");
+    if (val) {
+      codeListStore
+        .queryCodeList({
+          codeListName: "WEB_BAS_AREA",
+          codeListParam: { cParCde: val, cType: "2" },
+        })
+        .then((res) => {
+          const objData = {
+            loadData: res,
+          };
+          setFormItem("Insured.cCity", objData);
+        });
+    }
+  },
+  cCityChange: (val) => {
+    setValue("Insured.cCounty", "");
+    codeListStore
+      .queryCodeList({
+        codeListName: "WEB_BAS_AREA",
+        codeListParam: { cParCde: val, cType: "3" },
+      })
+      .then((res) => {
+        const objData = {
+          loadData: res,
+        };
+        setFormItem("Insured.cCounty", objData);
+      });
+  },
+  hidPerson: () => {
+    console.log(productStore.$state.cClntMrk, "00000000000000000000");
+    // productStore.$state.cClntMrk == "0";
+    // setFormItem("Insured.cCntrNme", { hidden: false });
   },
 };
 

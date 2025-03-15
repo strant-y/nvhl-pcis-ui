@@ -327,7 +327,6 @@ function handleChange() {
     });
   }
 }
-
 // 条款列表清除
 function handleClear() {
   termList.value.forEach((item: any, index: any) => (item.checked = false));
@@ -341,13 +340,16 @@ function updateOptionAll(e: any) {
 
 // 选择条款弹框
 function showModal() {
-  dzmodal.open(termDialog, { type: "Issuer", data: {} }).then((res: any) => {
-    if (res.type === "ok") {
-      const selectedTerm = res.body;
-      formconfig1.value.cTermNo = selectedTerm.code;
-      formconfig1.value.cNmeCn = selectedTerm.value;
-    }
-  });
+  dzmodal
+    .open(termDialog, { type: "Issuer", data: {}, termList: termList.value })
+    .then((res: any) => {
+      if (res.type === "ok") {
+        const selectedTerm = res.body;
+        formconfig1.value.cTermNo = selectedTerm.code;
+        formconfig1.value.cNmeCn = selectedTerm.value;
+        handleQuery();
+      }
+    });
 }
 </script>
 

@@ -3,19 +3,6 @@
   <el-dialog v-model="dialogVisible" width="75%" title="选择条款">
     <el-row gutter="10">
       <el-col :span="12" class="col-md-12">
-        <!-- <el-form ref="freeEditRef" :model="formconfig1">
-          <el-form-item label="条款列表" prop="name">
-            <el-input
-              v-model="formconfig1.name"
-              placeholder="请输入条款名称"
-              clearable=""
-            >
-              <template #append>
-                <el-button icon="Search" @click="loadTree()" />
-              </template>
-            </el-input>
-          </el-form-item>
-        </el-form> -->
         <el-card :bordered="false" class="index-blk">
           <div
             style="
@@ -25,14 +12,13 @@
               overflow-x: scroll;
             "
           >
-            <!-- <el-divider></el-divider> -->
             <el-input
               v-model="filterText"
               style="width: 500px"
               placeholder="请输入条款名称"
             />
             <el-tree
-              rer="treeRef"
+              ref="treeRef"
               class="custom-re-tree"
               :data="nodes"
               :props="defaultProps"
@@ -53,10 +39,14 @@
         </el-card>
       </el-col>
       <el-col :span="12" class="col-md-12">
-        <CustomRecordingInfo v-if="listShow" :datas="datas" />
+        <CustomRecordingInfo
+          v-if="listShow"
+          :datas="datas"
+          :pNode="pNode"
+          @updateTerm="updateTermlist"
+        />
       </el-col>
     </el-row>
-
     <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
       <rt-button
         :item="{
@@ -109,6 +99,7 @@ const defaultProps = {
   label: "value",
 };
 const datas = ref<any>([]);
+const pNode = ref<any>([]);
 const listShow = ref(false);
 const CustomRecordingInfo = defineAsyncComponent(
   () => import("./CustomRecordingInfo.vue")
@@ -117,6 +108,10 @@ const props = defineProps({
   data: {
     type: Object,
     default: () => ({}),
+  },
+  termList: {
+    type: Array,
+    required: true,
   },
 });
 
@@ -153,12 +148,13 @@ watch(
   (newTableConfig) => {},
   { deep: true }
 );
+
 watch(filterText, (val) => {
   treeRef.value.filter(val);
 });
 const filterNode = (value: string, data: Tree) => {
   if (!value) return true;
-  return data.value.includes(value);
+  return data.value?.includes(value);
 };
 // 绑定方法
 const method = {
@@ -181,8 +177,7 @@ function loadTree() {
     }
   });
 }
-const getCurrentNode = (data: any, node: any) => {
-  console.log("====", data, node);
+const getCurrentNode = (data: any) => {
   if (data.list.length !== 0) {
     listShow.value = true;
     datas.value = [];
@@ -193,6 +188,7 @@ const onEvent = (data: any, node: any) => {
   if (data.list.length == 0) {
     listShow.value = true;
     datas.value = [data];
+    pNode.value = node;
     emits("ok", data, node);
   }
 };
@@ -200,6 +196,9 @@ const onEvent = (data: any, node: any) => {
 // 保存
 function confirm() {
   dialogVisible.value = false;
+  emits("ok", {});
+}
+function updateTermlist() {
   emits("ok", {});
 }
 </script>

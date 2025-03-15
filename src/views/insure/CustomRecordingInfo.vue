@@ -29,14 +29,12 @@
 <script setup lang="ts">
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
-
 import { ref } from "vue";
 import {
   AppFreeEditConfig,
   AppFreeEditMethod,
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
-
 const freeEditRef = ref(null);
 import { createFreeButtonBase } from "@/shared/button-config";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
@@ -49,9 +47,13 @@ import { userUnionTerm, unUserUnUntionTerm } from "./custom-recording.service";
 import { SysOpMgrService } from "@/views/sys-right-basic/service/sys-op-mgr.service";
 import { max } from "lodash";
 import func from "vue-temp/vue-editor-bridge";
-const emits = defineEmits(["rowClick"]);
+const emits = defineEmits(["rowClick", "updateTerm"]);
 const props = defineProps({
   datas: {
+    type: Array,
+    default: () => [],
+  },
+  pNode: {
     type: Array,
     default: () => [],
   },
@@ -60,6 +62,7 @@ const sysOpMgrService = new SysOpMgrService();
 const formconfig1 = reactive({
   name: "",
 });
+const params = ref<any>({});
 const checkedIcon = ref("rgb(170, 170, 170)");
 const tableRef = ref<AppTableMethod | null>(null);
 
@@ -93,10 +96,16 @@ const tableconfig = reactive<AppTableConfig>(
             checkedIcon.value === "rgb(250, 219, 20)"
               ? "rgb(170, 170, 170)"
               : "rgb(250, 219, 20)";
-          if ((row.flag = !row.flag)) {
-            userUnionTerm({ termNo: row.code }).then((res) => {
+          if (checkedIcon.value === "rgb(170, 170, 170)") {
+            const params = {
+              termNo: row.code,
+              termCnm: row.value,
+              prodCnm: props.pNode.parent.data.value,
+            };
+            userUnionTerm(params).then((res) => {
               if (res.code == "1") {
-                ElMessage.success("操作成功");
+                ElMessage.success(res.message);
+                emits("updateTerm");
               } else {
                 ElMessage.error(res.msg);
               }
@@ -104,18 +113,13 @@ const tableconfig = reactive<AppTableConfig>(
           } else {
             unUserUnUntionTerm({ termNo: row.code }).then((res) => {
               if (res.code == "1") {
-                ElMessage.success("操作成功");
+                ElMessage.success(res.message);
+                emits("updateTerm");
               } else {
                 ElMessage.error(res.msg);
               }
             });
           }
-
-          console.log(
-            "取消常用，请求更新当前列表",
-            row,
-            (row.flag = !row.flag)
-          );
         },
       }),
     ],
@@ -147,7 +151,6 @@ watch(
   (newVal: any) => {
     if (newVal) {
       init();
-      // handleQuery(true);
     }
   }
 );
@@ -155,9 +158,9 @@ watch(
 function init() {
   formconfig1.name = "";
   pageresult.list = props.datas;
+  console.log("props.datas", props.datas, props.pNode);
   pageresult.total = props.datas.length;
 }
-// function checkedIcon(false){
 
 // }
 /** 查询 */
