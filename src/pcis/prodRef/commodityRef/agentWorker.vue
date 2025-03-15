@@ -125,6 +125,9 @@ const tableconfig = reactive<AppTableConfig>(
                 title: "邮箱",
             },
         ],
+        rowDbClickFun(row) {
+            props.data.method.getSelected(row)
+        }
     })
 );
 

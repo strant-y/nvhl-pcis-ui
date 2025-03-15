@@ -1128,3 +1128,9 @@ export function getPageList(queryParams: any): AxiosPromise<any> {
 export function checkCdeptByCdptCde(queryParams: any): AxiosPromise<any>  {
     return post('/policy/checkCdeptByCdptCde',  queryParams);
 }
+
+// 根据code和val解析字典值
+export function getNmeByCde(ops: any): AxiosPromise<any>  {
+    // 发送POST请求以根据code和val解析字典值
+    return post(`/edr/getNmeByCde`, ops);
+}

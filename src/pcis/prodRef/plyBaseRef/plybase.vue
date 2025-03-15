@@ -11,7 +11,7 @@ import {
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { getBsnsTypList, getChaTypeList, getChaSubtypList } from "@/api/code-list-service";
-import { checkCdeptByCdptCde } from "@/api/prod/index"
+import { checkCdeptByCdptCde, getNmeByCde } from "@/api/prod/index"
 import moment from "moment";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
@@ -256,11 +256,16 @@ const method = {
               CSlsTyp: cslstyp,
               leading: 'CBrkSlsCde'
             },
-        },
-        {
-            isOk: (selectdata: any) => {
-                console.log('a',selectdata)
-            },
+            method: {
+              getSelected: (params) => {
+                setFormValue({
+                  "Base.cBrkSlsCde": params.CSlsCde, //代理业务员
+                  "Base.cCertfNo": params.CCtfctNo, //代理业务执业证号
+                  "Base.cBrkrDptCde": params.CDptCde, //代理业务员机构代码
+                })
+                dialogRef.value?.handleClose()
+              }
+            }
         },
         { title: "业务员", width: 85 }
     );
@@ -287,6 +292,62 @@ const method = {
               CDptAttr: getValue('Base.CDptAttr'), //投保单业务归属部门的部门类型(angular上被hidden的,逻辑赋值angular：guide.component.ts【324行】)
               CSlsTyp: cslstyp,
               leading: 'CSlsId'
+            },
+            method: {
+              getSelected: (params) => {
+                console.error('3333333', params)
+                setFormValue({
+                  "Base.cSlsId": params.CSlsCde, //业务员员工号
+                  "Base.cSlsNme": params.CSlsNme, //业务员名称
+                  "Base.cSlsCde": params.CCtfctNo, //业务员执业证号
+                  "Base.cSlsTel": params.CMobile, //业务员电话
+                  "Base.cSlsDptcde": params.CDptCde, //业务员机构代码
+                  "Base.cIntroDptCde": "" //清空服务机构值
+                })
+                const ops = {
+                    code: 'orgDpt',
+                    val: params['CDptCde']
+                };
+                getNmeByCde(ops).then(res=> {
+                  if(res && res.code == 200) {
+                    const codeValData = res.data;
+                    if (codeValData) {
+                      setFormItem("Base.cIntroDptCde", {
+                        loadData: [
+                          {
+                            value:params['CDptCde'],
+                            label: codeValData["data"]
+                          }
+                        ]
+                      })
+                      setValue("Base.cIntroDptCde", params.CDptCde)
+                    }
+                  }
+                })
+                codeListStore.queryCodeList(
+                  {
+                    codeListName: "CSaleCde_List",
+                    codeListParam: {
+                      'CSlsCde': params['CSlsCde']
+                    },
+                  },
+                  false,
+                  false
+                )
+                .then(res => {
+                  if(res && res.code == 200) {
+                    const codeValData = res.data;
+                    if (codeValData) {
+                      setFormItem("Base.cIntroSalecde", {
+                        loadData: codeValData
+                      })
+                      // 当选择了业务员时，服务机构业务员默认为业务员
+                      setValue("Base.cIntroSalecde", params.CSlsCde)
+                    }
+                  }
+                })
+                dialogRef.value?.handleClose()
+              }
             },
         },
         {
@@ -329,6 +390,32 @@ const method = {
             data: {
               CDptCde: getValue('Base.CIntroDptcde'), //服务机构
             },
+            method: {
+              getSelected: (params) => {
+                codeListStore.queryCodeList(
+                  {
+                    codeListName: "CSaleCde_List",
+                    codeListParam: {
+                      'CSlsCde': params['CSlsCde']
+                    },
+                  },
+                  false,
+                  false
+                )
+                .then(res => {
+                  if(res && res.code == 200) {
+                    const codeValData = res.data;
+                    if (codeValData) {
+                      // 服务机构业务员下拉和显示的值
+                      setFormItem("Base.cIntroSalecde", {
+                        loadData: codeValData
+                      })
+                      setValue("Base.cIntroSalecde", params.CSlsCde)
+                    }
+                  }
+                })
+              }
+            }
         },
         {
             isOk: (selectdata: any) => {
@@ -354,8 +441,8 @@ const method = {
 const exRules = {};
 
 function getCheckCdeptByCdptCde () {
-  // const CDptCde = getValue("Base.cDptCde")
-  const CDptCde = '0261010410270'  //先写死，实际要用上面那行
+  const CDptCde = getValue("Base.cDptCde")
+  // const CDptCde = '0261010410270'  //先写死，实际要用上面那行
   if(CDptCde) {
     // 查询承保机构所属分公司
     checkCdeptByCdptCde({"dptCde": CDptCde}).then(res => {
@@ -376,7 +463,9 @@ function getCheckCdeptByCdptCde () {
             false
           )
           .then((result) => {
-            setFormItem('Base.cPrjCtgTyp', {loadData: result.data})
+            if(result.data) {
+              setFormItem('Base.cPrjCtgTyp', {loadData: result.data})
+            }
           })
           .catch((err) => {
             setFormItem('Base.cPrjCtgTyp', {loadData: []})
