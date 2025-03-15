@@ -1,19 +1,18 @@
+<!-- 生成电子保单 -->
 <template>
   <el-dialog v-model="dialogVisible" width="90%" title="生成电子保单">
     <div>
       <app-free-edit
         v-model:freeEditConfig="formconfig1"
         ref="freeEditRef"
-        @update-datas="fromUpdata"
       />
       <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
         <rt-button
           :item="{
             type: 'primary',
-            label: '保存',
-            disabled: true,
+            label: '确认',
             func: () => {
-              save();
+              createEPolicy();
             },
           }"
         />
@@ -22,7 +21,6 @@
           :item="{
             type: 'primary',
             label: '返回',
-            disabled: true,
             func: () => {
               dialogVisible = false;
             },
@@ -39,7 +37,6 @@ import { yesOrNo, size, inputtype, typeMap, dateType } from "@/utils/utilKey";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { ref, defineProps, defineEmits, onMounted } from "vue";
 import { createFreeButtonBase } from "@/shared/button-config";
-import { saveKindInfo } from "@/api/prod";
 import {
   AppFreeEditConfig,
   AppFreeEditMethod,
@@ -50,10 +47,13 @@ import {
   createTableEditConfig,
   MyTableMethod,
 } from "@/shared/app-table-config";
-
+import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
+const policyService = new PolicyService();
 const props = defineProps({
   data: Object,
   type: String,
+  cAppNo: String,
+  plyTy: String,
 });
 const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
@@ -110,7 +110,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         type: "primary",
         label: "预览打印",
-        func: async () => {},
+        func: async () => {
+          
+        },
       }),
     ],
     fromSchema: [
@@ -119,39 +121,69 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "是否发送短信",
         rules: [getRules("required", {})],
-        loadData: [
-          { label: "是", value: "1" },
-          { label: "否", value: "0" },
+        loadData:[
+          { label: "是",value: "1" },
+          { label: "否",value: "0" },
         ],
+        func: (val) => {
+          // 清除报错信息
+          freeEditRef.value?.clearValidate('phoneNo');
+          freeEditRef.value?.clearValidate('msgData');
+          const items1 = freeEditRef.value?.getFromSchemaItem('phoneNo');
+          const items2 = freeEditRef.value?.getFromSchemaItem('msgData');
+          if (val === '1') {
+            items1.rules = [
+              getRules("required", {}),
+              getRules("phoneNo", {})
+            ];
+            items2.rules = [getRules("required", {})]
+          } else {
+            freeEditRef.value?.setValue('phoneNo', '');
+            freeEditRef.value?.setValue('msgData', '');
+            items1.rules = []
+            items2.rules = []
+          }
+        }
       },
       {
         prop: "eMail",
         inputtype: "rtselect",
         title: "是否发送邮件",
         rules: [getRules("required", {})],
-        loadData: [
-          { label: "是", value: "1" },
-          { label: "否", value: "0" },
+        loadData:[
+          { label: "是",value: "1" },
+          { label: "否",value: "0" },
         ],
+        func: (val) => {
+          // 清除报错信息
+          freeEditRef.value?.clearValidate('eMailMsg');
+          const items = freeEditRef.value?.getFromSchemaItem('eMailMsg');
+          if (val === '1') {
+            items.rules = [
+              getRules("required", {}),
+              getRules("email", {})
+            ]
+          } else {
+            freeEditRef.value?.setValue('eMailMsg', '');
+            items.rules = []
+          }
+        }
       },
       {
         prop: "phoneNo",
         inputtype: "rtinput",
         title: "手机号",
         maxlength: 11,
-        rules: [getRules("required", {}), getRules("phoneNo", {})],
       },
       {
         prop: "eMailMsg",
         inputtype: "rtinput",
         title: "邮箱",
-        rules: [getRules("required", {}), getRules("email", {})],
       },
       {
         prop: "msgData",
         inputtype: "rtinput",
         title: "短信内容",
-        rules: [getRules("required", {})],
       },
     ],
     showSuperior: true,
@@ -187,23 +219,27 @@ const exRules = {
 };
 
 /** 查询 */
-function save() {
+function createEPolicy() {
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
-      const formParam = getFrom();
-      const param = Object.assign({ type: props.type }, formParam);
-      saveKindInfo(param)
-        .then((res) => {
-          const { code, data, msg } = res;
-          if (200 === code) {
-            emits("ok", {});
-            ElMessage.success("保存成功");
-            dialogVisible.value = false;
-          } else {
-            ElMessage.error(msg);
-          }
-        })
-        .finally(() => {});
+      const formData = freeEditRef.value?.getFromValue();
+      const param = {
+        cAppNo: props.cAppNo,
+        plyTy: props.plyTy,
+        ...formData,
+      };
+      policyService.generatingEPolicy(param).then((res: any) => {
+        if (res.code === 200) {
+          ElMessage.success({ message: res.msg, duration: 3000 });
+        } else {
+          ElMessage.warning({ message: res.msg, duration: 3000 });
+        }
+        emits('ok');
+      }).catch((err: any) => {
+        ElMessage.error({ message: err.msg, duration: 3000 });
+        console.log('出错啦', err.msg);
+        emits('ok');
+      });
     } else {
       ElMessage.error("请填写必填项");
     }

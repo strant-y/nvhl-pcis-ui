@@ -1,4 +1,4 @@
-<!-- 配置 -->
+<!-- 风险累积 -->
 <template>
   <div class="app-container">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef1" />
@@ -164,7 +164,7 @@ const tableconfig1 = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "保单号",
         minWidth: 180,
-        fixed: "left",
+        fixed: 'left',
       },
       {
         prop: "b",
@@ -228,7 +228,7 @@ const tableconfig2 = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "保单号",
         minWidth: 180,
-        fixed: "left",
+        fixed: 'left',
       },
       {
         prop: "b",
@@ -296,16 +296,16 @@ const tableconfig2 = reactive<AppTableConfig>(
 
 onMounted(async () => {
   // 船货累积保额 = 船舶险累积保额/赔偿限额+货运险累计保额
-  freeEditRef1.value?.setValue("a", "测试");
-  freeEditRef1.value?.setValue("b", 12.56);
-  freeEditRef1.value?.setValue("c", 1231);
-  const b = freeEditRef1.value?.getValue("b") || 0;
-  const c = freeEditRef1.value?.getValue("c") || 0;
-
-  console.log(b, c);
+  freeEditRef1.value?.setValue('a', '测试');
+  freeEditRef1.value?.setValue('b', 12.56);
+  freeEditRef1.value?.setValue('c', 1231);
+  const b = freeEditRef1.value?.getValue('b') || 0;
+  const c = freeEditRef1.value?.getValue('c') || 0;
+   
+  console.log(b,c)
   freeEditRef2.value?.setFormValue({
-    c: b + c,
-  });
+    c: b + c
+  })
 });
 
 // 绑定方法
@@ -365,12 +365,12 @@ function handleQuery2(flag?: boolean) {
 
 // 多选事件
 function handleSelectionChange1(selection: any) {
-  console.log("selection", selection);
+  console.log('selection',selection)
   removeIds1.value = selection.map((item: any) => item.cPkId);
 }
 
 function handleSelectionChange2(selection: any) {
-  console.log("selection", selection);
+  console.log('selection',selection)
   removeIds2.value = selection.map((item: any) => item.cPkId);
 }
 </script>

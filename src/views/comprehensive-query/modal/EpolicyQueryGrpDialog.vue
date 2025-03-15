@@ -1,3 +1,4 @@
+<!-- 团单成员 -->
 <template>
   <el-dialog v-model="dialogVisible" width="90%" title="团单成员">
     <div>
@@ -17,7 +18,9 @@
           :item="{
             type: 'primary',
             label: '生成电子保单',
-            func: () => {},
+            func: () => {
+              
+            },
           }"
         />
 
@@ -25,7 +28,9 @@
           :item="{
             type: 'primary',
             label: '电子保单下载',
-            func: () => {},
+            func: () => {
+              
+            },
           }"
         />
       </div>
@@ -135,7 +140,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       }),
     ],
     fromSchema: [
-      {
+    {
         prop: "CPlyNo",
         inputtype: "rtinput",
         title: "保单号",
@@ -177,7 +182,9 @@ const tableconfig = reactive<AppTableConfig>(
         type: "danger",
         size: "large",
         icon: "Delete",
-        tableClick: (row) => {},
+        tableClick: (row) => {
+          
+        },
       }),
     ],
     fromSchema: [
@@ -208,6 +215,7 @@ const tableconfig = reactive<AppTableConfig>(
     ],
   })
 );
+
 
 onMounted(async () => {
   if (props.type === "edit" && props.data) {
@@ -305,6 +313,7 @@ function handleQuery(flag?: boolean) {
     })
     .finally(() => {});
 }
+
 </script>
 
 <style scoped></style>

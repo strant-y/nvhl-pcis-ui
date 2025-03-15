@@ -31,11 +31,6 @@ import {
   AppFreeEditMethod,
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
-import {
-  AppTableConfig,
-  createTableEditConfig,
-  MyTableMethod,
-} from "@/shared/app-table-config";
 const sysRolechatsMgrService = new SysRolechatsMgrService();
 import { useUserStore } from "@/store/modules/user";
 const props = defineProps({
@@ -64,13 +59,17 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         typeCode: "ROLE_LIST",
         title: "角色代码",
-        rules: [getRules("required", {})]
+        rules: [getRules("required", {
+          trigger: 'change'
+        })]
       },
       {
         prop: "cCharts",
         inputtype: "rtselect",
         title: "图表代码",
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {
+          trigger: 'change'
+        })],
         typeCode: "CHATS_LIST",
         func: (val)=>{
           if(val) {
@@ -136,7 +135,8 @@ function save() {
       const formParam = getFrom();
       const param = Object.assign(formParam,
       {
-        cChartsCde: cChartsCde.value
+        cChartsCde: cChartsCde.value,
+        type: props.type
       },
         {
           cCrtCde: user.opCde,

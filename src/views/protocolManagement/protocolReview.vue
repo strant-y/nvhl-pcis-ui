@@ -1,4 +1,4 @@
-<!-- 配置 -->
+<!-- 协议审核 -->
 <template>
   <div class="app-container">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
@@ -90,10 +90,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cStatus",
         inputtype: "rtradio",
         title: "包含下级机构",
-        loadData: [
-          { label: "是", value: 1 },
-          { label: "否", value: 0 },
-        ],
+        loadData :[
+          { label:'是',value:1 },
+          { label:'否',value:0 },
+        ]
       },
       {
         prop: "cKindNo",
@@ -140,11 +140,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtradio",
         title: "核保状态",
         clearable: true,
-        loadData: [
-          { label: "核保待处理", value: 1 },
-          { label: "暂存", value: 2 },
-          { label: "核保通过", value: 3 },
-        ],
+        loadData :[
+          { label:'核保待处理',value:1 },
+          { label:'暂存',value:2 },
+          { label:'核保通过',value:3 },
+        ]
       },
     ],
   })
@@ -162,13 +162,15 @@ const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     editFlag: true,
     editList: ["cStatus"],
-    showSelection: true,
+    showSelection:true,
     titleBtns: [
       createFreeButtonBase({
         id: "score",
         label: "批量返回修改",
         type: "primary",
-        func: function () {},
+        func: function () {
+           
+        },
       }),
       createFreeButtonBase({
         id: "score",
@@ -237,7 +239,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "业务归属机构",
         minWidth: 180,
-        fixed: "left",
+        fixed: 'left',
       },
       {
         prop: "b",
@@ -310,7 +312,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "保费",
         minWidth: 180,
-      },
+      }
     ],
   })
 );
@@ -357,7 +359,7 @@ function handleQuery(flag?: boolean) {
 
 // 多选事件
 function handleSelectionChange(selection: any) {
-  console.log("selection", selection);
+  console.log('selection',selection)
   removeIds.value = selection.map((item: any) => item.cPkId);
 }
 
@@ -373,7 +375,9 @@ function handleDelete(id?: string) {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning",
-  }).then(function () {});
+  }).then(function () {
+    
+  });
 }
 </script>
 

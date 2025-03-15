@@ -65,7 +65,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       }),
       createFreeButtonBase({
         label: "导出",
-        func: () => {},
+        func: () => {
+          
+        },
       }),
     ],
     fromSchema: [
@@ -94,10 +96,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cStatus",
         inputtype: "rtradio",
         title: "包含下级机构",
-        loadData: [
-          { label: "是", value: 1 },
-          { label: "否", value: 0 },
-        ],
+        loadData :[
+          { label:'是',value:1 },
+          { label:'否',value:0 },
+        ]
       },
       {
         prop: "cStatus",
@@ -180,7 +182,9 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         size: "large",
         icon: "Edit",
-        tableClick: (row) => {},
+        tableClick: (row) => {
+           
+        },
       }),
       createFreeButtonBase({
         id: "score",
@@ -189,7 +193,9 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         size: "large",
         icon: "Edit",
-        tableClick: (row) => {},
+        tableClick: (row) => {
+           
+        },
       }),
     ],
 
@@ -199,7 +205,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "二级机构",
         minWidth: 180,
-        fixed: "left",
+        fixed: 'left',
       },
       {
         prop: "b",
@@ -289,9 +295,10 @@ function handleQuery(flag?: boolean) {
 
 // 多选事件
 function handleSelectionChange(selection: any) {
-  console.log("selection", selection);
+  console.log('selection',selection)
   removeIds.value = selection.map((item: any) => item.cPkId);
 }
+
 </script>
 
 <style scoped></style>

@@ -1,4 +1,4 @@
-<!-- 配置 -->
+<!-- 核保任务查询 历次批单 -->
 <template>
   <el-dialog v-model="dialogVisible" width="90%" title="历次批单">
     <div>
@@ -54,8 +54,8 @@ import {
 } from "@/shared/app-table-config";
 import { getBasicKindList } from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
-import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
-import { PcisEdrQueryService } from "@/views/edr-qry-endorse-list/service/pcis-edr-query-service";
+import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
+import { PcisEdrQueryService } from '@/views/edr-qry-endorse-list/service/pcis-edr-query-service';
 // import { saveAs } from 'file-saver';
 const policyService = new PolicyService();
 const pcisEdrQueryService = new PcisEdrQueryService();
@@ -64,19 +64,18 @@ const tableRef = ref<AppTableMethod | null>(null);
 const removeIds = ref([]); // 删除用户ID集合 用于批量删除
 const dialogVisible = ref(true);
 const userStore = useUserStore();
-const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
+const user = ref(userStore.user) || ref({ companyId: '',opCde: '' });
 
 const props = defineProps({
-  objId: {
-    // 申请单号
+  objId: {// 申请单号
     type: String,
     required: true,
   },
-  prodNo: {
-    // 产品代码
+  prodNo: {// 产品代码
     type: String,
     required: true,
   },
+   
 });
 
 const pageresult = reactive<Pageresult>({
@@ -112,7 +111,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "保单号",
         minWidth: 180,
-        fixed: "left",
+        fixed: 'left',
       },
       {
         prop: "cEdrNo",
@@ -157,12 +156,12 @@ onMounted(async () => {
       nPrmVar: "保费变化",
       cAppNme: "投保人",
       tNextEdrBgnTm: "批改生效日期",
-    },
+    }
   ];
   pageresult.total = 1;
-  console.log("pageresult.list", pageresult.list);
+  console.log('pageresult.list',pageresult.list)
 
-  handleQuery(true);
+  handleQuery(true)
 });
 
 // 绑定方法
@@ -172,19 +171,16 @@ const method = {
   },
 };
 
+
 /** 查询 */
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(
-    {
-      CPlyNo: props.objId,
-      CDataTyp: "claim",
-    },
-    r
-  );
-  pcisEdrQueryService
-    .qryEndorseList(param)
+  const param = Object.assign({
+    CPlyNo: props.objId,
+    CDataTyp: 'claim',
+  }, r);
+  pcisEdrQueryService.qryEndorseList(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
@@ -204,26 +200,23 @@ function handleExport() {
     pageNo: 1,
     pageSize: 1000,
     CPlyNo: props.objId,
-    CDataTyp: "claim",
-    CAppTyp: "E",
+    CDataTyp: 'claim',
+    CAppTyp: 'E',
     prodNo: props.prodNo,
     CurrentUser: user.value.opCde,
     CurrentUserOrg: user.value.companyId,
-    CType: "edrHistory",
+    CType: 'edrHistory',
   };
-  policyService
-    .excelDown(params)
-    .then((res: any) => {
-      if (res.size <= 0) {
-        ElMessage.error({ message: "下载出错", duration: 3000 });
-        return;
-      }
-      const fileName = `${props.objId}历次批单.xls`;
-      // saveAs(res, decodeURI(fileName));
-    })
-    .catch((err: any) => {
-      ElMessage.error({ message: err, duration: 3000 });
-    });
+  policyService.excelDown(params).then((res: any) => {
+    if (res.size <= 0) {
+      ElMessage.error({ message: '下载出错', duration: 3000 });
+      return;
+    }
+    const fileName = `${props.objId}历次批单.xls`;
+    // saveAs(res, decodeURI(fileName));
+  }).catch((err: any) => {
+    ElMessage.error({ message: err, duration: 3000 });
+  });
 }
 </script>
 

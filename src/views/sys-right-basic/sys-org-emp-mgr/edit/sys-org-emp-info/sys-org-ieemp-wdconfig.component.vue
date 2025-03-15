@@ -1,7 +1,10 @@
 <template>
   <el-dialog v-model="dialogVisible" width="90%">
     <div>
-      <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+      <app-free-edit
+        v-model:freeEditConfig="formconfig1"
+        ref="freeEditRef"
+      />
       <app-table
         :tableConfig="tableconfig"
         v-model:pageresult="pageresult"
@@ -29,7 +32,9 @@ import { yesOrNo, size, inputtype, typeMap, dateType } from "@/utils/utilKey";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { ref, defineProps, defineEmits, onMounted } from "vue";
 import { createFreeButtonBase } from "@/shared/button-config";
-import { saveKindInfo } from "@/api/prod";
+import {
+  saveKindInfo,
+} from "@/api/prod";
 import {
   AppFreeEditConfig,
   AppFreeEditMethod,
@@ -51,9 +56,7 @@ import { v4 as uuidv4 } from "uuid";
 const showBtnConfig = ref(false);
 const dialogVisible = ref(true);
 const showView = ref(false);
-const SysOrgIeempWdconfigAddComponent = defineAsyncComponent(
-  () => import("./sys-org-ieemp-wdconfig-add.component.vue")
-);
+const SysOrgIeempWdconfigAddComponent = defineAsyncComponent(() => import("./sys-org-ieemp-wdconfig-add.component.vue"));
 const dzmodal = useDzModal();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
@@ -68,39 +71,39 @@ const schemaMap = reactive<Record<string, any>>({
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    title: "网点管理",
+    title: '网点管理',
     fromUi: {
-      cols: 2,
+      cols: 2
     },
-    endBtnsPosition: "center",
-    endBtns: [
-      createFreeButtonBase({
-        type: "primary",
-        label: "新增",
-        position: "btn-left",
-        func: async () => {
-          dzmodal.open(SysOrgIeempWdconfigAddComponent).then(() => {});
-        },
-      }),
-      createFreeButtonBase({
-        type: "primary",
-        label: "查询",
-        position: "btn-left",
-        func: async () => {
-          save();
-        },
-      }),
-    ],
+		endBtnsPosition: "center",
+		endBtns: [
+			createFreeButtonBase({
+				type: "primary",
+				label: "新增",
+        position: 'btn-left',
+				func: async () => {
+					dzmodal.open(SysOrgIeempWdconfigAddComponent).then(() => {});
+				},
+			}),
+			createFreeButtonBase({
+				type: "primary",
+				label: "查询",
+        position: 'btn-left',
+				func: async () => {
+					save()
+				},
+			})
+		],
     fromSchema: [
       {
-        prop: "CCde",
-        title: "网点编码",
-        inputtype: "rtinput",
+        prop: 'CCde',
+        title: '网点编码',
+        inputtype: "rtinput"
       },
       {
-        prop: "CInfo",
-        title: "网点名称",
-        inputtype: "rtinput",
+        prop: 'CInfo',
+        title: '网点名称',
+        inputtype: "rtinput"
       },
 
       // {
@@ -118,30 +121,30 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       //     console.log(val);
       //   },
       // }
-    ],
+    ]
   })
 );
 const pageresult = reactive<Pageresult>({
-  result: "",
-  /** 数据列表 */
-  list: [],
-  /** 总数 */
-  total: 0,
+	result: "",
+	/** 数据列表 */
+	list: [],
+	/** 总数 */
+	total: 0,
 });
 const tableconfig = reactive<AppTableConfig>(
-  createTableEditConfig({
-    editFlag: true,
-    editList: ["cStatus"],
-    fromSchema: [
-      {
-        prop: "CCde",
-        title: "网点编码",
-        inputtype: "rtinput",
+	createTableEditConfig({
+		editFlag: true,
+		editList: ["cStatus"],
+		fromSchema: [
+    {
+        prop: 'CCde',
+        title: '网点编码',
+        inputtype: "rtinput"
       },
       {
-        prop: "CInfo",
-        title: "网点名称",
-        inputtype: "rtinput",
+        prop: 'CInfo',
+        title: '网点名称',
+        inputtype: "rtinput"
       },
       {
         prop: "CIsValid",
@@ -151,15 +154,15 @@ const tableconfig = reactive<AppTableConfig>(
           y: "1",
           n: "0",
         },
-        activeText: "有效",
-        inactiveText: "无效",
+        activeText: '有效',
+        inactiveText: '无效',
         inlinePrompt: true,
         func: (val) => {
           console.log(val);
         },
-      },
-    ],
-  })
+      }
+		],
+	})
 );
 onMounted(async () => {
   if (props.type === "edit" && props.data) {
@@ -227,31 +230,28 @@ function getFrom() {
 }
 /** 查询 */
 function handleQuery(flag?: boolean) {
-  //模拟数据
-  pageresult.list = [
-    {
-      cOpgrpCnm: "角色名称",
-      cName: "图表名称",
-      cType: "1",
-      cCode: "1",
-    },
-  ];
-  const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
-  const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(s, r);
-  sysRolechatsMgrService
-    .searchPlan(param)
-    .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
-        pageresult.list = [];
-        pageresult.list = data.result;
-        pageresult.total = data.total;
-      } else {
-        //ElMessage.error(msg);
-      }
-    })
-    .finally(() => {});
+	//模拟数据
+	pageresult.list = [{
+		cOpgrpCnm: '角色名称',
+		cName: '图表名称',
+		cType: '1',
+		cCode: '1',
+	}];
+	const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
+	const s = freeEditRef.value?.getFromValue(); //获取表单数据
+	const param = Object.assign(s, r);	
+	sysRolechatsMgrService.searchPlan(param)
+		.then((res) => {
+			const { code, data, msg } = res;
+			if (200 === code) {
+				pageresult.list = [];
+				pageresult.list = data.result;
+				pageresult.total = data.total;
+			} else {
+				//ElMessage.error(msg);
+			}
+		})
+		.finally(() => {});
 }
 </script>
 

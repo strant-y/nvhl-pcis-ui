@@ -10,25 +10,12 @@
 </template>
 
 <script setup lang="ts">
-import { defineComponent, onMounted, reactive, ref } from "vue";
-import {
-  ElForm,
-  ElFormItem,
-  ElInput,
-  ElSelect,
-  ElOption,
-  ElButton,
-  ElTable,
-  ElTableColumn,
-  ElPagination,
-  ElDialog,
-  ElMessage,
-  ElMessageBox,
-} from "element-plus";
-import { SysOperatorMgrService } from "@/views/sys-right-basic/service/sys-operator-mgr.service";
+import { defineComponent, onMounted, reactive, ref } from 'vue';
+import { ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElButton, ElTable, ElTableColumn, ElPagination, ElDialog, ElMessage, ElMessageBox } from 'element-plus';
+import { SysOperatorMgrService } from '@/views/sys-right-basic/service/sys-operator-mgr.service';
 import { useUserStore } from "@/store/modules/user";
-import { AppKey } from "@/constants/api";
-import SysUsrProdTree from "./sys-usr-prod-edit/sys-usr-prod-tree/sys-usr-prod-tree.vue";
+import { AppKey } from '@/constants/api';
+import SysUsrProdTree from './sys-usr-prod-edit/sys-usr-prod-tree/sys-usr-prod-tree.vue';
 import {
   AppFreeEditConfig,
   AppFreeEditMethod,
@@ -51,12 +38,12 @@ const props = defineProps({
   },
 });
 const userStore = useUserStore();
-const sysOperatorMgrService = new SysOperatorMgrService();
+const sysOperatorMgrService = new SysOperatorMgrService()
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 const multipleSelection = ref([]);
 const treeData = ref([]);
-const treeRef = ref(null);
+const treeRef = ref(null)
 const user = userStore.user;
 
 const formconfig1 = reactive<AppFreeEditConfig>(
@@ -73,7 +60,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         func: () => {
-          freeEditRef.value?.resetFields();
+          freeEditRef.value?.resetFields()
         },
       }),
     ],
@@ -89,8 +76,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "产品类型",
         loadData: [
-          { value: "0", label: "产品" },
-          { value: "1", label: "产品大类" },
+          { value: '0', label: '产品' },
+          { value: '1', label: '产品大类' }
         ],
         clearable: true,
       },
@@ -99,8 +86,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 );
 
 const handleQuery = (flag = true) => {
-  refreshData(flag);
-};
+  refreshData(flag)
+}
 
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -121,7 +108,7 @@ const tableconfig = reactive<AppTableConfig>(
         label: "配置",
         type: "primary",
         func: function () {
-          addGrtProd();
+          addGrtProd()
         },
       }),
       createFreeButtonBase({
@@ -129,7 +116,7 @@ const tableconfig = reactive<AppTableConfig>(
         label: "批量删除",
         type: "danger",
         func: function () {
-          delMultiGrtProd();
+          delMultiGrtProd()
         },
       }),
     ],
@@ -145,7 +132,7 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Delete",
         tableClick: (row) => {
-          delGrtProd(row.cProdNo);
+          delGrtProd(row.cProdNo)
         },
       }),
     ],
@@ -165,14 +152,14 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cProdCat",
         inputtype: "rtinput",
         title: "产品类型",
-      },
-    ],
+      }
+    ]
   })
 );
 
 const search = () => {
-  refreshData(true);
-};
+  refreshData(true)
+}
 
 const refreshData = (reset = false) => {
   const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
@@ -181,108 +168,96 @@ const refreshData = (reset = false) => {
     COperId: props.getOperator._value.cOperId,
     CDptCde: props.getOperator._value.cOwnDptCde,
   });
-  sysOperatorMgrService.getUsrProdList(param).then(
-    (res: any) => {
-      if (res && res.code === 200) {
-        const pageData = res.data;
-        if (pageData) {
-          pageData.result.forEach((item) => {
-            item.cProdCat = item.cProdCat == "1" ? "产品大类" : "产品";
-          });
-          pageresult.total = pageData.total;
-          pageresult.list = pageData.result;
-        }
+  sysOperatorMgrService.getUsrProdList(param).then((res: any) => {
+    if (res && res.code === 200) {
+      const pageData = res.data;
+      if (pageData) {
+        pageData.result.forEach(item => {
+          item.cProdCat = item.cProdCat == '1' ? '产品大类' : '产品'
+        })
+        pageresult.total = pageData.total;
+        pageresult.list = pageData.result;
       }
-    },
-    (error: any) => {
-      console.log("出错了", error);
-      ElMessage.error("后台服务异常,请联系管理员");
     }
-  );
+  }, (error: any) => {
+    console.log('出错了', error);
+    ElMessage.error('后台服务异常,请联系管理员');
+  });
 };
 
 const handleSelectionChange = (val: any[]) => {
   multipleSelection.value = val;
 };
 
-const addGrtProd = () => {
-  sysOperatorMgrService
-    .getUsrProdByUsrAndDpt({
-      COperId: props.getOperator._value.cOperId,
-      CDptCde: props.getOperator._value.cOwnDptCde,
-    })
-    .then((res: any) => {
-      if (res && res.data) {
-        treeData.value = [res.data];
-        console.log("treeData.value", treeData.value);
 
-        //打开配置弹框
-        dzmodal
-          .open(SysUsrProdTree, {
-            data: treeData.value,
-            getOperator: props.getOperator._value,
-          })
-          .then((res) => {
-            if (res.type === "ok") {
-              refreshData(true);
-            }
-          });
-      }
-    });
+const addGrtProd = () => {
+  sysOperatorMgrService.getUsrProdByUsrAndDpt({
+    COperId: props.getOperator._value.cOperId,
+    CDptCde: props.getOperator._value.cOwnDptCde,
+  }).then((res: any) => {
+    if (res && res.data) {
+      treeData.value = [res.data];
+      console.log('treeData.value', treeData.value);
+      
+      //打开配置弹框
+      dzmodal.open(SysUsrProdTree, { data: treeData.value, getOperator: props.getOperator._value}).then((res) => {
+        if (res.type === "ok") {
+          refreshData(true);
+        }
+      });
+    }
+  });
 };
 
 const delGrtProd = (id: string) => {
-  ElMessageBox.confirm("确认要删除吗？该数据删除之后将无法恢复。", "提示", {
-    confirmButtonText: "删除",
-    cancelButtonText: "取消",
-    type: "warning",
+  ElMessageBox.confirm('确认要删除吗？该数据删除之后将无法恢复。', '提示', {
+    confirmButtonText: '删除',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(() => {
+    const param = {
+      CProdNo: id,
+      COperId: props.getOperator._value.cOperId,
+      CDptCde: props.getOperator._value.cOwnDptCde,
+    };
+    sysOperatorMgrService.delUsrProdInfo(param).then((res: any) => {
+      if (res && res.code === 200) {
+        ElMessage.success(res.data.message);
+        refreshData(true);
+      }
+    });
+  }).catch(() => {
+    //防止报错
   })
-    .then(() => {
-      const param = {
-        CProdNo: id,
+};
+
+const delMultiGrtProd = () => {
+  if (multipleSelection.value.length > 0) {
+    ElMessageBox.confirm('确认要删除吗？该数据删除之后将无法恢复。', '提示', {
+      confirmButtonText: '删除',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }).then(() => {
+      const items = multipleSelection.value.map((item: any) => ({
+        ...item,
+        CCrtCde: user.value ? user.value.opCde : '',
         COperId: props.getOperator._value.cOperId,
         CDptCde: props.getOperator._value.cOwnDptCde,
-      };
-      sysOperatorMgrService.delUsrProdInfo(param).then((res: any) => {
+      }));
+      sysOperatorMgrService.delUsrProdList({ items }).then((res: any) => {
         if (res && res.code === 200) {
           ElMessage.success(res.data.message);
           refreshData(true);
         }
       });
-    })
-    .catch(() => {
+    }).catch(() => {
       //防止报错
-    });
-};
-
-const delMultiGrtProd = () => {
-  if (multipleSelection.value.length > 0) {
-    ElMessageBox.confirm("确认要删除吗？该数据删除之后将无法恢复。", "提示", {
-      confirmButtonText: "删除",
-      cancelButtonText: "取消",
-      type: "warning",
     })
-      .then(() => {
-        const items = multipleSelection.value.map((item: any) => ({
-          ...item,
-          CCrtCde: user.value ? user.value.opCde : "",
-          COperId: props.getOperator._value.cOperId,
-          CDptCde: props.getOperator._value.cOwnDptCde,
-        }));
-        sysOperatorMgrService.delUsrProdList({ items }).then((res: any) => {
-          if (res && res.code === 200) {
-            ElMessage.success(res.data.message);
-            refreshData(true);
-          }
-        });
-      })
-      .catch(() => {
-        //防止报错
-      });
   } else {
-    ElMessage.warning("请先选择要删除的产品权限列表");
+    ElMessage.warning('请先选择要删除的产品权限列表');
   }
 };
+
 
 //dialog弹框确定事件
 // const confirmDialog = () => {
@@ -308,6 +283,7 @@ const delMultiGrtProd = () => {
 onMounted(() => {
   refreshData(true);
 });
+
 </script>
 
 <style scoped>

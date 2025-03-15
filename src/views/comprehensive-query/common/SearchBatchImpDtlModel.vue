@@ -1,4 +1,4 @@
-<!-- 配置 -->
+<!-- 批量导入查询 -->
 <template>
   <div class="app-container">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
@@ -14,8 +14,10 @@
 <script setup lang="ts">
 import { useUserStore } from "@/store";
 import { useValidator } from "@/typings/useValidator";
+import { useRoute, useRouter, RouteRecordRaw } from "vue-router";
 const { getRules } = useValidator();
-
+const router = useRouter();
+const route = useRoute();
 import { ref } from "vue";
 import {
   AppFreeEditConfig,
@@ -33,13 +35,24 @@ import {
 } from "@/shared/app-table-config";
 import { getBasicKindList } from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
+import {SCENE_PLY_APP_READ} from '@/constants/tab-constants';
+import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
+const { getBaseInfoByAppNo } = NewUdrListService();
+import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
+const policyService = new PolicyService();
 const userStore = useUserStore();
-const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
+const user = ref(userStore.user) || ref({ companyId:'', opCde:'' })
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
-// const TaskListVestige = defineAsyncComponent(
-//   () => import("@/views/pcis-new-udr-list/common/TaskListVestige.vue")
-// );
+const TaskListVestige = defineAsyncComponent(
+  () => import("@/views/pcis-new-udr-list/common/TaskListVestige.vue")
+);
+const props = defineProps({
+  refreshData: {
+    type: Boolean,
+    default: false
+  }
+})
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -54,52 +67,49 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         func: () => {
-          freeEditRef.value?.setFormValue({
-            cKindNo: "",
-            cStatus: "",
-          });
-          handleQuery();
+          freeEditRef.value?.resetFields();
+          handleQuery(true);
           // freeEditRef.value?.resetForm();
         },
       }),
     ],
     fromSchema: [
       {
-        prop: "cBatchNo",
+        prop: "CBatchNo",
         inputtype: "rtinput",
         title: "批次号",
         clearable: true,
       },
       {
-        prop: "cStatus",
-        inputtype: "rtinput",
+        prop: "CStatus",
+        inputtype: "rtselect",
         title: "状态",
         clearable: true,
-        loadData: [
-          { label: "失败", value: 1 },
-          { label: "成功", value: 0 },
-        ],
+        loadData :[
+          { label:'失败',value:'0' },
+          { label:'成功',value:'1' },
+        ]
       },
       {
-        prop: "cApplicantNme",
+        prop: "CApplicantNme",
         inputtype: "rtinput",
         title: "投保人名称",
         clearable: true,
       },
       {
-        prop: "cAppNo",
+        prop: "CAppNo",
         inputtype: "rtinput",
         title: "申请单号",
         clearable: true,
       },
       {
-        prop: "cPlyNo",
+        prop: "CPlyNo",
         inputtype: "rtinput",
         title: "保单号",
         clearable: true,
       },
       {
-        prop: "cInsuredNme",
+        prop: "CInsuredNme",
         inputtype: "rtinput",
         title: "被保人名称",
         clearable: true,
@@ -120,7 +130,7 @@ const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     editFlag: true,
     tableBtnType: "btn",
-    tableBtnWidth: 220,
+    tableBtnWidth: 90,
     tableBtnPosition: "right",
     tableBtn: [
       createFreeButtonBase({
@@ -130,13 +140,12 @@ const tableconfig = reactive<AppTableConfig>(
         type: "danger",
         size: "large",
         icon: "View",
+        hideBtns: (row) => {
+          console.log(row.cPlyNo,!!row.cPlyNo)
+          if(!!row.cPlyNo) return false;
+        },
         tableClick: (row) => {
-          // dzmodal
-          //     .open('组件', { type: "Issuer", data: {} })
-          //     .then((res) => {
-          //       if (res.type === "ok") {
-          //       }
-          //     });
+          showDetails(row)
         },
       }),
     ],
@@ -176,14 +185,42 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cStatus",
         inputtype: "rtinput",
         title: "状态",
+        formatter: (val) => {
+					const CStatusList = [{value: '0', label: '失败'}, {value: '1', label: '成功'}]
+          const result = CStatusList.find(item => item.value === val);
+          return result ? result.label : val;
+				}
       },
     ],
   })
 );
 
-onMounted(async () => {
-  pageresult.list = [{}, {}];
-});
+onMounted(async () => {});
+
+watch(
+  () => props.refreshData,
+  (n,o) => {
+    // 自动刷新列表获取数据
+    pageresult.list = [
+      {
+        cPlyNo: "保单号",
+      },
+      {
+        cPlyNo: null,
+      }
+    ]
+    pageresult.total = 2;
+    // 上面代码是仅用于本地调试
+    if(n) {
+      console.log(n,'批量导入查询')
+      // handleQuery(true);
+    }
+  },
+  { 
+    deep: true,
+    immediate: true
+  },
+);
 
 // 绑定方法
 const method = {
@@ -208,8 +245,13 @@ const exRules = {
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(s, r);
-  getBasicKindList(param)
+  const param = Object.assign({
+    pageNo: r.pageNo,
+    pageSize: r.pageSize,
+    // sortOrder
+    CCrtCde: user.value.opCde
+  },s, r);
+  policyService.searchBatch(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
@@ -221,6 +263,26 @@ function handleQuery(flag?: boolean) {
       }
     })
     .finally(() => {});
+}
+
+// 打开详情
+function showDetails(row: any) {
+  getBaseInfoByAppNo({ appNo: row.cAppNo }).then((r) => {
+    if(r.code !== 200) {
+      ElMessage.error({ message: r.msg, duration: 6000 });
+    }else{
+      const en = JSON.stringify({
+        scene: SCENE_PLY_APP_READ,
+        CAppNo: row.cAppNo,
+        CProdNo: row.cProdNo,
+        CAppTyp: row.cAppTyp,
+        CDptCde: row.cDptCde,
+        CCiMrk: row.cCiMrk,
+        CGrpMrk: row.cGrpMrk,
+      });
+      router.push({ path: '/index/pcis-query/detail', query: { data: en } });
+    }
+  })
 }
 </script>
 

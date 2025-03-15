@@ -1,7 +1,10 @@
 <template>
   <el-dialog v-model="dialogVisible" width="90%">
     <div>
-      <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+      <app-free-edit
+        v-model:freeEditConfig="formconfig1"
+        ref="freeEditRef"
+      />
       <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
         <rt-button
           :item="{
@@ -45,7 +48,7 @@ const props = defineProps({
   data: Object,
   type: String,
   title: String,
-  cDptCde: String,
+  cDptCde: String
 });
 const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
@@ -53,7 +56,7 @@ import { v4 as uuidv4 } from "uuid";
 const showBtnConfig = ref(false);
 const dialogVisible = ref(true);
 const showView = ref(false);
-const title = ref("");
+const title = ref('');
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const freeLookRef = ref<AppFreeEditMethod | null>(null);
@@ -67,21 +70,21 @@ const schemaMap = reactive<Record<string, any>>({
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    title: "新增网点配置信息",
+    title: '新增网点配置信息',
     fromSchema: [
       {
-        prop: "CWdCde",
-        title: "网点编码",
+        prop: 'CWdCde',
+        title: '网点编码',
         inputtype: "rtinput",
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {})]
       },
       {
-        prop: "CWdNme",
-        title: "网点名称",
+        prop: 'CWdNme',
+        title: '网点名称',
         inputtype: "rtinput",
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {})]
       },
-    ],
+    ]
   })
 );
 

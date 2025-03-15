@@ -1,4 +1,4 @@
-<!-- 配置 -->
+<!-- 待修改单查询 -->
 <template>
   <div class="app-container">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
@@ -14,12 +14,17 @@
 <script setup lang="ts">
 import { useUserStore } from "@/store";
 import { useValidator } from "@/typings/useValidator";
+import { useRoute, useRouter, RouteRecordRaw } from "vue-router";
 const { getRules } = useValidator();
 const props = defineProps({
   homeJumpData: {
-    type: Object,
+    type: Object
   },
-});
+  refreshData: {
+    type: Boolean,
+    default: false
+  }
+})
 import { ref } from "vue";
 import {
   AppFreeEditConfig,
@@ -35,16 +40,27 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { deleteFactorBykey, getBasicKindList } from "@/api/prod";
+import {
+    SCENE_EDR_APP_MODIFY_BOUNCED,
+    SCENE_EDR_APP_MODIFY_BOUNCEDBEARER,
+    SCENE_PLY_APP_MODIFY_BOUNCED
+} from '@/constants/tab-constants';
 import { useDzModal } from "@/common/dzmodel/DzModalService";
+import moment from 'moment';
+import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
+const { hasReceived, getBaseInfoByAppNo, delTmpPolicy, getBackUdrList, getReturnUdrList, getWithdrawUdrList, getNewUdrList } = NewUdrListService();
 const userStore = useUserStore();
-const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
+const user = ref(userStore.user) || ref({ companyId:'', opCde:'' })
+const roles = userStore.user.roles || [];
+const router = useRouter();
+const route = useRoute();
 const removeIds = ref([]); // 删除用户ID集合 用于批量删除
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
-// const TaskListVestige = defineAsyncComponent(
-//   () => import("@/views/pcis-new-udr-list/common/TaskListVestige.vue")
-// );
+const TaskListVestige = defineAsyncComponent(
+  () => import("@/views/pcis-new-udr-list/common/TaskListVestige.vue")
+);
+const udrType = ref('4');
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -59,18 +75,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         func: () => {
-          freeEditRef.value?.setFormValue({
-            cKindNo: "",
-            cStatus: "",
-          });
-          handleQuery();
+          freeEditRef.value?.resetFields()
+          handleQuery(true);
           // freeEditRef.value?.resetForm();
         },
       }),
     ],
     fromSchema: [
       {
-        prop: "cStatus",
+        prop: "CProdCatCde",
         inputtype: "rtselect",
         title: "产品大类",
         typeCode: "KIND_LIST_GRT",
@@ -78,15 +91,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable: true,
       },
       {
-        prop: "cStatus",
+        prop: "prodNo",
         inputtype: "rtselect",
-        title: "产品",
+        title: "条款",
         typeCode: "PROD_LIST_GRT",
-        params: {
-          cParCde: "",
-          cOperId: user.value.opCde,
-          cDptCde: user.value.companyId,
-        },
+        params: { cParCde:'', cOperId: user.value.opCde, cDptCde: user.value.companyId },
         clearable: true,
       },
       {
@@ -110,6 +119,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "datetimerange",
         format: "YYYY-MM-DD HH:mm:ss",
         valueFormat: "YYYY-MM-DD HH:mm:ss",
+        defaultValue: [
+          moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format('YYYY-MM-DD 00:00:00'),
+          moment(new Date()).format('YYYY-MM-DD 23:59:59')
+        ],
       },
     ],
   })
@@ -128,8 +141,9 @@ const tableconfig = reactive<AppTableConfig>(
     editFlag: true,
     editList: ["cStatus"],
     tableBtnType: "btn",
-    tableBtnWidth: 220,
+    tableBtnWidth: 120,
     tableBtnPosition: "right",
+    tableBtnFixed: "right",
     tableBtn: [
       createFreeButtonBase({
         id: "score",
@@ -138,7 +152,9 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         size: "large",
         icon: "Edit",
-        tableClick: (row) => {},
+        tableClick: (row) => {
+          handleWorkFlow(row);
+        },
       }),
       createFreeButtonBase({
         id: "score",
@@ -148,7 +164,7 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Delete",
         tableClick: (row) => {
-          handleDelete(row.id);
+          handleDelete(row.objId, row.id);
         },
       }),
     ],
@@ -188,7 +204,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "preDptName",
         inputtype: "rtinput",
         title: "任务提交部门",
-        minWidth: 220,
+        minWidth:220,
       },
       {
         prop: "crtTm",
@@ -205,23 +221,15 @@ const tableconfig = reactive<AppTableConfig>(
 );
 
 onMounted(async () => {
-  pageresult.list = [{}];
-  if (props.homeJumpData && Object.keys(props.homeJumpData).length) {
-    await nextTick();
+  if(props.homeJumpData && Object.keys(props.homeJumpData).length) {
+    await nextTick()
     // 给投保日期赋值
-    freeEditRef.value.setValue("dateRange", [
-      props.homeJumpData.startBsTm1,
-      props.homeJumpData.endBsTm1,
-    ]);
-    if (props.homeJumpData.value.hasOwnProperty("objId")) {
-      //申请单号
-      freeEditRef.value[1].value[0].setValue(
-        "objId",
-        props.homeJumpData.value.objId
-      );
+    freeEditRef.value.setValue('dateRange', [props.homeJumpData.startBsTm1, props.homeJumpData.endBsTm1])
+    if(props.homeJumpData.value.hasOwnProperty('objId')) { //申请单号
+      freeEditRef.value[1].value[0].setValue('objId', props.homeJumpData.value.objId)
     }
-    await nextTick();
-    handleQuery(true); //跳转过来自动查数据
+    await nextTick()
+    handleQuery(true) //跳转过来自动查数据
   }
 });
 
@@ -231,6 +239,27 @@ const method = {
     console.log(getRules);
   },
 };
+
+watch(
+  () => props.refreshData,
+  (n,o) => {
+    // 自动刷新列表获取数据
+    pageresult.list = [
+      {},{}
+    ]
+    pageresult.total = 2;
+    // 上面代码是仅用于本地调试
+    if(n) {
+      console.log(n,'待修改单查询')
+      // handleQuery(true);
+    }
+  },
+  { 
+    deep: true,
+    immediate: true
+  },
+);
+
 
 // 绑定特殊验证器
 const exRules = {
@@ -246,42 +275,151 @@ const exRules = {
 
 /** 查询 */
 function handleQuery(flag?: boolean) {
+  let roleCde = '';
+  roles.forEach((res: any) => {
+    roleCde = roleCde === '' ? res.COpgrpCde : roleCde + ',' + res.COpgrpCde;
+  });
+
+  const tmArr = freeEditRef.value?.getValue("dateRange");
+  const issueStartTemp = tmArr[0];
+  const issueEndTemp = tmArr[1];
+  const issueStart = Date.parse(issueStartTemp);
+  // if (!issueStartTemp) {
+  //   ElMessage.warning('投保起期不能为空');
+  //   return;
+  // }
+  // if (!issueEndTemp) {
+  //   ElMessage.warning('投保止期不能为空');
+  //   return;
+  // }
+  const issueEnd = Date.parse(issueEndTemp);
+  // if (issueStart - issueEnd > 0) {
+  //   ElMessage.warning('投保起期不能大于投保止期');
+  //   return;
+  // }
+  if (issueEnd - issueStart >= 7 * 1000 * 60 * 60 * 24) {
+    ElMessage.warning('投保时间范围请控制在7天以内');
+    return;
+  }
+
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(s, r);
-  getBasicKindList(param)
-    .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
-        pageresult.list = [];
-        pageresult.list = data.result;
-        pageresult.total = data.total;
-      } else {
-        ElMessage.error(msg);
-      }
-    })
-    .finally(() => {});
+
+  const params = Object.assign({
+    startBsTm1: issueStartTemp,
+    endBsTm1: issueEndTemp,
+    orgCde: user.value.companyId,
+    roleCde: roleCde,
+    operId: user.value.opCde,
+  }, s, r);
+  delete params.dateRange;
+  let udrData;
+  if ('3' === udrType.value) {
+    udrData = getBackUdrList(params);
+  } else if ('4' === udrType.value) {
+    udrData = getReturnUdrList(params);
+  } else if ('5' === udrType.value) {
+    udrData = getWithdrawUdrList(params);
+  } else {
+    udrData = getNewUdrList(params);
+  }
+  udrData.then((res) => {
+    const { code, data, msg } = res;
+    if (200 === code) {
+      pageresult.list = [];
+      pageresult.list = data.result;
+      pageresult.total = data.total;
+    } else {
+      ElMessage.error(msg);
+    }
+  })
+  .finally(() => {});
 }
 
 // 多选事件
 function handleSelectionChange(selection: any) {
-  console.log("selection", selection);
+  console.log('selection',selection)
   removeIds.value = selection.map((item: any) => item.cPkId);
 }
 
-/** 删除用户 */
-function handleDelete(id?: string) {
-  const userIds = [id || removeIds.value].join(",");
-  if (!userIds) {
-    ElMessage.warning("请勾选删除项");
+// 工作流处理
+function handleWorkFlow(row: any) {
+  const { objId, taskId, state, prodNo, bsType } = row;
+  const param = {
+    taskId: taskId,
+    user: user.value,
+  };
+  hasReceived(param).then((result: any) => {
+    if (result.code !== 200) {
+      ElMessage.error({ message: result.msg, duration: 6000 });
+    } else {
+      if (result.msg === '成功') {
+        getBaseInfoByAppNo({ appNo: objId }).then((r) => {
+          if(r.code !== 200) {
+            ElMessage.error({ message: r.msg, duration: 6000 });
+          }else{
+            if(bsType === 'A') {
+              const en = JSON.stringify({
+                scene: SCENE_PLY_APP_MODIFY_BOUNCED,
+                CAppNo: objId,
+                CProdNo: prodNo,
+                TaskId: taskId,
+                CAppTyp: bsType,
+                CCiMrk: r.data.cCiMrk,
+                CGrpMrk: r.data.cGrpMrk,
+                CDptCde: r.data.cDptCde,
+                isPlan: r.data.cCardPlanNo ? 'Y' : null,
+              });
+              router.push({ path: '/index/pcis-query/detail', query: { data: en } });
+            }else{
+              const en = JSON.stringify({
+                scene: SCENE_EDR_APP_MODIFY_BOUNCED,
+                CAppNo: objId,
+                CProdNo: prodNo,
+                TaskId: taskId,
+                CAppTyp: bsType,
+                CCiMrk: r.data.cCiMrk,
+                CRsnCde: r.data.cEdrRsnBundleCde,
+                CEdrType: r.data.cEdrType,
+                CGrpMrk: r.data.cGrpMrk,
+                CDptCde: r.data.cDptCde,
+                isPlan: r.data.cCardPlanNo ? 'Y' : null,
+              });
+              router.push({ path: '/index/endorse/edit', query: { data: en } });
+            }
+          }
+        })
+      } else {
+        ElMessage.warning({ message: result.msg, duration: 6000 });
+      }
+    }
+  }).catch((error: any) => {
+    console.log('出错了', error);
+    ElMessage.error({ message: '后台服务异常,请联系管理员', duration: 3000 });
+  });
+}
+
+/** 删除 */
+function handleDelete(objId: any,id: any) {
+  if (null == objId || null == id) {
+    ElMessage.error({ message: '必需参数为空', duration: 3000 });
     return;
   }
 
-  ElMessageBox.confirm("确认删除数据?", "警告", {
+  ElMessageBox.confirm("该数据删除之后将无法恢复。", "确认要删除吗？", {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning",
-  }).then(function () {});
+  }).then(function () {
+    delTmpPolicy({ appNo: objId, id: id }).then((result: any) => {
+      if(result.code == 200){
+        ElMessage.success({ message: result.msg, duration: 3000 });
+        handleQuery(true);
+      }else{
+        ElMessage.error({ message: result.msg, duration: 6000 });
+      }
+    })
+  });
 }
 </script>
 

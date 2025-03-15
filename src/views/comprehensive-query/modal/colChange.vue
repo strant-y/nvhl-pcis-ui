@@ -28,13 +28,6 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { ref, defineProps, defineEmits, onMounted } from "vue";
 import { createFreeButtonBase } from "@/shared/button-config";
 import {
-  getButtonByFacKey,
-  getFactorList,
-  getInputGroupList,
-  saveFactor,
-  saveKindInfo,
-} from "@/api/prod";
-import {
   AppFreeEditConfig,
   AppFreeEditMethod,
   createAppFreeEditConfig,
@@ -102,7 +95,7 @@ const schemaMap = reactive<Record<string, any>>({
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    fromSchema: (props.data as any[]) || [],
+    fromSchema: props.data as any [] || [],
     showSuperior: true,
     superFromSchema: [],
   })
@@ -140,22 +133,8 @@ function save() {
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
       let s = freeEditRef.value?.getFromValue(); //获取表单数据
-      console.log("formParam", s, s["bsType"]);
       emits("ok", s["bsType"]);
       dialogVisible.value = false;
-      // const param = Object.assign({ type: props.type }, formParam);
-      // saveKindInfo(param)
-      //   .then((res) => {
-      //     const { code, data, msg } = res;
-      //     if (200 === code) {
-      //       emits("ok", {});
-      //       ElMessage.success("保存成功");
-      //       dialogVisible.value = false;
-      //     } else {
-      //       ElMessage.error(msg);
-      //     }
-      //   })
-      //   .finally(() => {});
     } else {
       ElMessage.error("请填写必填项");
     }
@@ -165,7 +144,6 @@ function save() {
 /* 获取全量表单数据 */
 function getFrom() {
   let s = freeEditRef.value?.getFromValue(); //获取表单数据
-  console.log("s", s);
   if (showBtnConfig.value) {
     s["bsType"] = "1";
   } else {

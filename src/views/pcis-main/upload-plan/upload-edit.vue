@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="dialogVisible" width="90%">
+  <el-dialog v-model="dialogVisible" width="90%" title="批量导入">
     <div>
       <app-free-edit
         v-model:freeEditConfig="formconfig1"
@@ -11,6 +11,7 @@
         v-model:pageresult="pageresult"
         ref="tableRef"
         @page-change="handleQuery(false)"
+        @selection-change="handleSelectionChange"
       />
     </div>
   </el-dialog>
@@ -23,13 +24,6 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { ref, defineProps, defineEmits, onMounted } from "vue";
 import { createFreeButtonBase } from "@/shared/button-config";
 import {
-  getButtonByFacKey,
-  getFactorList,
-  getInputGroupList,
-  saveFactor,
-  saveKindInfo,
-} from "@/api/prod";
-import {
   AppFreeEditConfig,
   AppFreeEditMethod,
   createAppFreeEditConfig,
@@ -39,18 +33,20 @@ import {
   createTableEditConfig,
   MyTableMethod,
 } from "@/shared/app-table-config";
-
+import { cloneDeep } from "lodash-es";
+import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
+import { useUserStore } from "@/store/modules/user";
+const policyService = new PolicyService();
+const userStore = useUserStore();
+const user = ref(userStore.user);
 const props = defineProps({
   data: Object,
   type: String,
 });
+const multipleSelection = ref([]);
 const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
-import { v4 as uuidv4 } from "uuid";
-
-const showBtnConfig = ref(false);
 const dialogVisible = ref(true);
-const showView = ref(false);
 const dzmodal = useDzModal();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
@@ -59,111 +55,107 @@ const freeEditRefBtn = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<MyTableMethod | null>(null);
 const appTableShow = ref(false);
 
-function fromUpdata(newData: any) {
-  const jsonObj = getFrom();
-  if (jsonObj) {
-    jsonObj.func = null;
-    if (jsonObj.loadData) {
-      jsonObj.loadData = JSON.parse(jsonObj.loadData);
-    }
-    if (jsonObj.showExBtn === "1") {
-      jsonObj.showExBtn = true;
-      jsonObj.btnItems = createFreeButtonBase(jsonObj.btn);
-      jsonObj.btnWidth = jsonObj.btn?.btnWidth;
-    } else {
-      jsonObj.showExBtn = false;
-    }
-    if (jsonObj.required === "1") {
-      jsonObj.rules = [getRules("required", {})];
-    }
-    if (
-      jsonObj.inputtype === "rtinputgroup" ||
-      jsonObj.inputtype === "rttable"
-    ) {
-      return;
-    }
-    jsonObj.func = null; // 方法去掉,不让预览触发事件
-  }
-}
 const schemaMap = reactive<Record<string, any>>({
   rtinputgroup: [],
 });
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    title: "批量导入",
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
         type: "primary",
+        label: "查询",
+        func: async () => {
+          handleQuery();
+        },
+      }),
+    ],
+    fromSchema: [
+      {
+        prop: "cPlanNme",
+        inputtype: "rtinput",
+        title: "方案名称",
+      },
+      {
+        prop: "cKindNo",
+        inputtype: "rtselect",
+        title: "产品大类",
+        typeCode: "KIND_LIST_GRT",
+        params: {'cOperId': user.value['opCde'], 'cDptCde': user.value['companyId']},
+        //rules: [getRules("required", {})],
+      },
+      {
+        prop: "cProdNo",
+        inputtype: "rtselect",
+        title: "产品",
+        typeCode: "WEB_SYS_STA_DICT",
+        params: {'cParCde': '', 'cOperId': user.value['opCde'], 'cDptCde': user.value['companyId']},
+      }
+    ],
+  })
+);
+const pageresult = reactive<Pageresult>({
+	result: "",
+	/** 数据列表 */
+	list: [],
+	/** 总数 */
+	total: 0,
+});
+const tableconfig = reactive<AppTableConfig>(
+	createTableEditConfig({
+    isPage: 'false',
+    showSelection: true,
+    isRadio: true,
+    titleBtns: [
+      createFreeButtonBase({
+        type: "primary",
         label: "导入",
         func: async () => {
-          console.log("导入");
+          if (multipleSelection.value.length < 1 ) {
+            ElMessage.warning('请选择一条方案');
+            return ;
+          }
+          //待补充
         },
       }),
       createFreeButtonBase({
         type: "primary",
         label: "下载模板",
         func: async () => {
-          console.log("下载模板");
-        },
+          if (multipleSelection.value.length < 1 ) {
+            ElMessage.warning('请先选择方案');
+            return ;
+          }
+          const planName = multipleSelection.value[0].cPlanNme;
+          const cPlanNo = multipleSelection.value[0].cPlanNo;
+          const param = {planName: planName, CPlanNo: cPlanNo, CType: 'planList'};
+          policyService.excelDown(param)
+            .then((res) => {
+              const { code, data, msg } = res;
+              if (200 === code) {
+                console.log("qqqqq", data)
+              } else {
+                ElMessage.error(msg);
+              }
+            })
+            .finally(() => { });
+          },
       }),
-      createFreeButtonBase({
-        type: "primary",
-        label: "查询",
-        func: async () => {
-          console.log("查询");
-        },
-      }),
     ],
-    fromSchema: [
-      {
-        prop: "",
+		fromSchema: [
+			{
+				prop: "cPlanNme",
         inputtype: "rtinput",
-        title: "方案名称",
-      },
-      {
-        prop: "",
-        inputtype: "rtselect",
-        title: "产品大类",
-        typeCode: "KIND_LIST_GRT",
-        params: {},
-      },
-      {
-        prop: "",
-        inputtype: "rtselect",
-        title: "产品",
-        typeCode: "WEB_SYS_STA_DICT",
-      },
-    ],
-    showSuperior: true,
-    superFromSchema: [],
-  })
-);
-const pageresult = reactive<Pageresult>({
-  result: "",
-  /** 数据列表 */
-  list: [],
-  /** 总数 */
-  total: 0,
-});
-const tableconfig = reactive<AppTableConfig>(
-  createTableEditConfig({
-    isPage: "false",
-    showSelection: true,
-    fromSchema: [
-      {
-        prop: "CPlanNme",
+				title: "方案名称",
+			},
+			{
+				prop: "cDesc",
         inputtype: "rtinput",
-        title: "方案名称",
-      },
-      {
-        prop: "CDesc",
-        inputtype: "rtinput",
-        title: "方案说明",
-      },
-    ],
-  })
+				title: "方案说明",
+			}
+		],
+	})
 );
 onMounted(async () => {
   if (props.type === "edit" && props.data) {
@@ -179,44 +171,43 @@ const method = {
     console.log(getRules);
   },
 };
-
-// 绑定特殊验证器
-const exRules = {
-  byrtInput: (rule: any, value: any, callback: any) => {
-    const r = freeEditRef.value?.getFromValue();
-    if (r["name"]) {
-      callback();
-    } else {
-      callback("姓名");
-    }
-  },
+const handleSelectionChange = (val: any[]) => {
+  multipleSelection.value = val;
 };
-
-/* 获取全量表单数据 */
-function getFrom() {
-  let s = freeEditRef.value?.getFromValue(); //获取表单数据
-  if (showBtnConfig.value) {
-    s["showExBtn"] = "1";
-  } else {
-    s["showExBtn"] = "0";
-  }
-  if (s) {
-    const param = Object.assign(s);
-    if (props.type === "edit") {
-      param["cPkId"] = props.data.cPkId;
+/** 查询 */
+function handleQuery(flag = true) {
+  freeEditRef.value?.validate().then((isValid) => {
+    if (!isValid) {
+      return false;
+    } else {
+      pageresult.list = [{
+        cPlanNme: 'cPlanNme',
+        cDesc: 'cDesc',
+        cPlanNo: 'cPlanNo'
+      },{
+        cPlanNme: 'cPlanNme2',
+        cDesc: 'cDesc2',
+        cPlanNo: 'cPlanNo2'        
+      }]
+      const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
+      const s = cloneDeep(freeEditRef.value?.getFromValue()); //获取表单数据
+      const param = Object.assign(s, r, {
+        companyId: user.value['companyId']
+      });
+      policyService.searchPlanPolicy(param)
+        .then((res) => {
+          const { code, data, msg } = res;
+          if (200 === code) {
+            pageresult.list = [];
+            pageresult.list = data.data;
+            pageresult.total = data.total;
+          } else {
+            ElMessage.error(msg);
+          }
+        })
+        .finally(() => { });
     }
-    if (freeEditRefBtn.value) {
-      let btnjson = freeEditRefBtn.value?.getFromValue();
-      btnjson.initid = uuidv4().replace(/-/g, "");
-      param["btn"] = btnjson;
-    }
-    if (tableRef.value) {
-      const tabjson = tableRef.value?.getFromValue();
-      let selectList = tabjson.filter((item: any) => item.isChecked === "1");
-      param["tabjson"] = selectList;
-    }
-    return param;
-  }
+  });
 }
 </script>
 

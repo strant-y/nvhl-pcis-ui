@@ -1,3 +1,4 @@
+<!-- 综合查询-单据打印 -->
 <template>
   <el-dialog v-model="dialogVisible" width="90%" title="单据打印">
     <div>
@@ -105,7 +106,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         type: "primary",
         label: "预览打印",
-        func: async () => {},
+        func: async () => {
+          
+        },
       }),
     ],
     fromSchema: [
@@ -147,25 +150,27 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "打印目的",
         loadData: [
-          { value: 0, label: "打印正本" },
-          { value: 1, label: "打印副本" },
-          { value: 2, label: "打印抄件" },
-        ],
+          { value: 0, label: '打印正本' },
+          { value: 1, label: '打印副本' },
+          { value: 2, label: '打印抄件' },
+        ]
       },
       {
         prop: "CLanguage",
         inputtype: "rtradio",
         title: "打印格式",
-        loadData: [{ label: "中文", value: "C" }],
+        loadData :[
+          { label:'中文',value:'C' },
+        ]
       },
       {
         prop: "CPlyType",
         inputtype: "rtradio",
         title: "保单类型",
-        loadData: [
-          { label: "原始保单", value: "0" },
-          { label: "最新保单", value: "1" },
-        ],
+        loadData :[
+          { label:'原始保单',value:'0' },
+          { label:'最新保单',value:'1' },
+        ]
       },
     ],
     showSuperior: true,

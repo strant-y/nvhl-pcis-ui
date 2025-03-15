@@ -1,4 +1,4 @@
-<!-- 配置 -->
+<!-- 核保信息 -->
 <template>
   <el-dialog v-model="dialogVisible" width="90%" title="核保信息">
     <div>
@@ -11,16 +11,16 @@
       />
     </div>
     <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
-      <rt-button
-        :item="{
-          type: 'primary',
-          label: '返回',
-          func: () => {
-            dialogVisible = false;
-          },
-        }"
-      />
-    </div>
+        <rt-button
+          :item="{
+            type: 'primary',
+            label: '返回',
+            func: () => {
+              dialogVisible = false;
+            },
+          }"
+        />
+      </div>
   </el-dialog>
 </template>
 
@@ -52,12 +52,11 @@ const tableRef = ref<AppTableMethod | null>(null);
 const removeIds = ref([]); // 删除用户ID集合 用于批量删除
 const dialogVisible = ref(true);
 const props = defineProps({
-  CAppNo: {
-    // 申请单号
+  CAppNo: {// 申请单号
     type: String,
     default: "",
-  },
-});
+  }
+})
 const pageresult = reactive<Pageresult>({
   result: "",
   /** 数据列表 */
@@ -74,7 +73,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "核保人名称",
         minWidth: 180,
-        fixed: "left",
+        fixed: 'left',
       },
       {
         prop: "CUndrMrk",
@@ -87,11 +86,11 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtselect",
         title: "反洗钱风险",
         minWidth: 180,
-        loadData: [
-          { value: "0", label: "低" },
-          { value: "1", label: "中" },
-          { value: "2", label: "高" },
-        ],
+        loadData:[
+          {value: '0', label: '低'},
+          {value: '1', label: '中'},
+          {value: '2', label: '高'}
+        ]
       },
       {
         prop: "TUpdTm",
@@ -120,19 +119,15 @@ const method = {
   },
 };
 
+
 /** 查询 */
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(
-    {
-      appNo: props.CAppNo,
-    },
-    s,
-    r
-  );
-  pcisQueryService
-    .getUndrOpnList(param)
+  const param = Object.assign({
+    appNo: props.CAppNo
+  },s, r);
+  pcisQueryService.getUndrOpnList(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
@@ -145,6 +140,7 @@ function handleQuery(flag?: boolean) {
     })
     .finally(() => {});
 }
+
 </script>
 
 <style scoped></style>

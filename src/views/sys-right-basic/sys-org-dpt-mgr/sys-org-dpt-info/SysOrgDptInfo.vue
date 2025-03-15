@@ -2,23 +2,19 @@
 <template>
   <div class="app-container">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
-    <app-table
-      :tableConfig="tableconfig"
-      v-model:pageresult="pageresult"
-      ref="tableRef"
-      @page-change="handleQuery(false)"
-    />
+    <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
+      @page-change="handleQuery(false)" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { defineProps } from "vue";
+import { defineProps } from 'vue';
 
 const props = defineProps({
   getDptCde: {
     type: String,
-    required: true,
-  },
+    required: true
+  }
 });
 
 import { useValidator } from "@/typings/useValidator";
@@ -38,28 +34,20 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { SysOrgDptMgrService } from "@/views/sys-right-basic/service/sys-org-dpt-mgr.service";
+import { SysOrgDptMgrService } from '@/views/sys-right-basic/service/sys-org-dpt-mgr.service';
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { log } from "console";
 import { cloneDeep, filter } from "lodash-es";
-import { getListByCode } from "@/api/code-list-service";
+import {getListByCode} from '@/api/code-list-service';
 import { codeListViewStore } from "@/store";
-const emits = defineEmits(["ok", "refreshDptTree", "cleanCheck"]);
+const emits = defineEmits(['ok', 'refreshDptTree', 'cleanCheck'])
 const sysOrgDptMgrService = new SysOrgDptMgrService();
 const dzmodal = useDzModal();
-const SysOrgDptEdit = defineAsyncComponent(
-  () => import("./sys-org-dpt-edit/SysOrgDptEdit.vue")
-);
-const amlExtendInfo = defineAsyncComponent(
-  () => import("@/views/pcis-main/prodDef/common/aml-extend-info/index.vue")
-);
+const SysOrgDptEdit = defineAsyncComponent(() => import("./sys-org-dpt-edit/SysOrgDptEdit.vue"));
+const amlExtendInfo = defineAsyncComponent(() => import("@/views/pcis-main/prodDef/common/aml-extend-info/index.vue"));
 const tableRef = ref<AppTableMethod | null>(null);
-let CSnrDptOption = [];
-let CDptClsOption = [
-  { value: "1", label: "机构" },
-  { value: "2", label: "部门" },
-  { value: "3", label: "室" },
-];
+let CSnrDptOption = []
+let CDptClsOption = [{ value: '1', label: '机构' }, { value: '2', label: '部门' }, { value: '3', label: '室' }]
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "机构部门",
@@ -72,7 +60,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         func: async () => {
           dzmodal.open(amlExtendInfo, {}).then((res) => {
             if (res.type === "ok") {
-              console.log("qqqq", "反洗钱扩展信息");
+              console.log("qqqq", '反洗钱扩展信息')
             }
           });
         },
@@ -87,8 +75,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         func: () => {
-          freeEditRef.value?.resetFields();
-          emits("cleanCheck");
+          freeEditRef.value?.resetFields()
+          emits('cleanCheck')
         },
       }),
     ],
@@ -99,7 +87,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
         title: "机构代码",
         readOnly: true,
-        disabled: true,
+        disabled: true
       },
       {
         prop: "cLoadSub",
@@ -114,23 +102,23 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cDptDispCde",
         inputtype: "rtinput",
-        title: "机构显示码",
+        title: "机构显示码"
       },
       {
         prop: "cDptAbr",
         inputtype: "rtinput",
-        title: "机构简称",
+        title: "机构简称"
       },
       {
         prop: "cDptFnm",
         inputtype: "rtinput",
-        title: "机构全称",
+        title: "机构全称"
       },
       {
         prop: "nDptLevl",
         inputtype: "rtinput",
-        title: "机构级别",
-      },
+        title: "机构级别"
+      }
     ],
   })
 );
@@ -153,17 +141,15 @@ const tableconfig = reactive<AppTableConfig>(
         label: "新增",
         type: "success",
         func: function () {
-          if (props.getDptCde) {
-            dzmodal
-              .open(SysOrgDptEdit, { type: "add", getDptCde: props.getDptCde })
-              .then((res) => {
-                if (res.type === "ok") {
-                  emits("refreshDptTree", 1);
-                  handleQuery();
-                }
-              });
+          if(props.getDptCde) {
+            dzmodal.open(SysOrgDptEdit, { type: "add", getDptCde: props.getDptCde}).then((res) => {
+              if (res.type === "ok") {
+                emits('refreshDptTree', 1);
+                handleQuery();
+              }
+            });
           } else {
-            ElMessage.warning("请先选定上级机构,再进行操作！");
+            ElMessage.warning('请先选定上级机构,再进行操作！');
           }
         },
       }),
@@ -181,22 +167,20 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Edit",
         tableClick: (row) => {
-          dzmodal
-            .open(SysOrgDptEdit, { type: "update", data: row })
-            .then((res) => {
-              if (res.type === "ok") {
-                emits("refreshDptTree", 1);
-                handleQuery();
-              }
-            });
+          dzmodal.open(SysOrgDptEdit, { type: "update", data: row }).then((res) => {
+            if (res.type === "ok") {
+              emits('refreshDptTree', 1);
+              handleQuery();
+            }
+          });
         },
-      }),
+      })
     ],
     fromSchema: [
       {
         prop: "cDptCde",
         inputtype: "rtinput",
-        title: "机构代码",
+        title: "机构代码"
       },
       {
         prop: "cDptDispCde",
@@ -222,25 +206,25 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cDptCls",
         inputtype: "rtinput",
         title: "机构类型",
-        formatter: (val) => {
-          const CDptClsOptionArr = filter(CDptClsOption, (item) => {
-            return val === item.value;
-          });
-          return CDptClsOptionArr.length ? CDptClsOptionArr[0].label : val;
-        },
+        formatter: (val)=>{
+          const CDptClsOptionArr = filter(CDptClsOption, (item )=>{
+            return val === item.value
+          })
+          return CDptClsOptionArr.length ? CDptClsOptionArr[0].label : val
+        }
       },
       {
         prop: "cSnrDpt",
         inputtype: "rtinput",
         title: "上级机构",
-        formatter: (val) => {
-          if (CSnrDptOption && CSnrDptOption.length > 0) {
-            const CSnrDptOptionArr = filter(CSnrDptOption, (item) => {
-              return val === item.value;
-            });
-            return CSnrDptOptionArr.length ? CSnrDptOptionArr[0].label : val;
+        formatter: (val)=>{
+          if(CSnrDptOption && CSnrDptOption.length> 0) {
+            const CSnrDptOptionArr = filter(CSnrDptOption, (item )=>{
+              return val === item.value
+            })
+            return CSnrDptOptionArr.length ? CSnrDptOptionArr[0].label : val
           }
-        },
+        }
       },
       {
         prop: "tFndTm",
@@ -255,22 +239,21 @@ const tableconfig = reactive<AppTableConfig>(
           y: "1",
           n: "0",
         },
-        activeText: "启用",
-        inactiveText: "撤销",
+        activeText: '启用',
+        inactiveText: '撤销',
         inlinePrompt: true,
         func: (val, row) => {
-          const newStatus = val === "1" ? "1" : "0";
+          const newStatus = val === '1' ? '1' : '0';
           const param = {
-            CDptCde: row.cDptCde ? row.cDptCde : "",
-            CIsValid: newStatus,
+            CDptCde: row.cDptCde ? row.cDptCde : '',
+            CIsValid: newStatus
           };
           sysOrgDptMgrService.changeOrgDptStatus(param).then((res: any) => {
             if (res.code === 200) {
               const data = res.data;
-              if (data.code === "1") {
-                // 保存成功
+              if (data.code === '1') { // 保存成功
                 console.log(data.message);
-                emits("refreshDptTree", 1);
+                emits('refreshDptTree', 1);
                 handleQuery();
               } else {
                 console.error(data.message);
@@ -278,11 +261,11 @@ const tableconfig = reactive<AppTableConfig>(
             }
           });
         },
-      },
+      }
     ],
   })
 );
-onMounted(async () => {
+onMounted(async () => { 
   // const codeListStore =  codeListViewStore();
   // codeListStore.queryCodeListByCode('EMP_DPT_LIST_CACHE',false,true)
   // .then((res) => {
@@ -290,27 +273,25 @@ onMounted(async () => {
   // })
   // .finally(() => { });
 
-  getListByCode("EMP_DPT_LIST_CACHE").then(
-    (res) => {
-      if (!!res && !!res["data"]) {
-        CSnrDptOption = res["data"];
+
+  getListByCode('EMP_DPT_LIST_CACHE').then(res => {
+      if (!!res && !!res['data']) {
+          CSnrDptOption = res['data'];
       }
-    },
-    (error) => {
-      console.log("出错了", error);
-      ElMessage.error("后台服务异常,请联系管理员");
-    }
-  );
+  }, error => {
+      console.log('出错了', error);
+      ElMessage.error('后台服务异常,请联系管理员');
+  });
+
+
+
 });
-watch(
-  () => props.getDptCde,
-  (newVal) => {
-    if (newVal) {
-      freeEditRef.value?.setValue("cDptCde", newVal);
-      handleQuery(true);
-    }
+watch(() => props.getDptCde, (newVal) => {
+  if (newVal) {
+    freeEditRef.value?.setValue('cDptCde', newVal)
+    handleQuery(true);
   }
-);
+})
 // 绑定方法
 const method = {
   func1: () => {
@@ -338,8 +319,7 @@ function handleQuery(flag = true) {
       const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
       const s = cloneDeep(freeEditRef.value?.getFromValue()); //获取表单数据
       const param = Object.assign(s, r);
-      sysOrgDptMgrService
-        .qryOrgDptList(param)
+      sysOrgDptMgrService.qryOrgDptList(param)
         .then((res) => {
           const { code, data, msg } = res;
           if (200 === code) {
@@ -350,8 +330,8 @@ function handleQuery(flag = true) {
             ElMessage.error(msg);
           }
         })
-        .finally(() => {});
-    }
+        .finally(() => { });
+        }
   });
 }
 </script>

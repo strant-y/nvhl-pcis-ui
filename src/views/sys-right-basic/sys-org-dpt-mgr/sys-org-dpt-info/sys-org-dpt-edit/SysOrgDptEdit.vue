@@ -455,7 +455,7 @@ function save() {
       const param = Object.assign({ 
         cCrtCde: user.opCde,
         cUpdCde: user.opCde,
-        cOperateTyp:  props.type      
+        type:  props.type      
        }, formParam);
       sysOrgDptMgrService.saveOrgDptInfo(param)
         .then((res) => {

@@ -27,6 +27,9 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
+import { cloneDeep } from 'lodash-es';
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const userStore = useUserStore();
 
@@ -38,35 +41,58 @@ const props = defineProps({
   actionType: { // add 新增； update 修改
     type: String,
     required: true
+  },
+  cPkId: { //编辑时有值
+    type: String
   }
 })
 const emits = defineEmits(['ok'])
 const { getRules } = useValidator();
 const dialogVisible = ref(true)
 const user = ref(userStore.user)
-const CCertfClsType = ref('INSURE_NATURE_CACHE') //客户证件类型字段请求数据字典的type值
-const CCertfClsType2 = ref('INSURE_NATURE_CACHE') //股东证件类型字段请求数据字典的type值
-const CCertfCdeRules = ref([getRules("required", {})])
+const CCertfClsType = ref('') //客户证件类型字段请求数据字典的type值
+const CCertfClsType2 = ref('') //股东证件类型字段请求数据字典的type值
+const CCertfCdeRules = ref([])
+const CCertfCdeRules2 = ref([])
 const settingOne = ref([])
+const chooseProdName = ref('') //选中的条款名称
 const insuranceLimit = new InsuranceLimit();
+const codeListMap = reactive({
+  persionType: [],
+  companyType: []
+})
+
 
 if (props.pageType === 'one') {
   settingOne.value = [
     {
-      prop: "CClntMrk",
+      prop: "productCategories",
       inputtype: "rtcascader",
       title: "产品大类",
       clearable: true,
-      typeCode: "KIND_LIST_GRT",
-      param: { cOperId: user.value['opCde'], cDptCde: user.value['companyId'] },
+      typeCode: "KIND_LIST_CACHE",
+      params: { cOperId: user.value['opCde'], cDptCde: user.value['companyId'] },
+      func: (val) => {
+        const item = freeEditRef.value.getFromSchemaItem('clauseCode')
+        if(val) { //选择了产品大类作为参数上送
+          item.params = {'cKindNo': val}
+        } else {
+          item.params = {}
+        }
+      },
+      rules: [getRules("required", {})]
     },
     {
-      prop: "CClntMrk",
+      prop: "clauseCode",
       inputtype: "rtcascader",
       title: "条款",
       clearable: true,
-      typeCode: "PROD_LIST_GRT",
-      param: { cParCde: '', cOperId: user.value['opCde'], cDptCde: user.value['companyId'] },
+      typeCode: "PROD_LIST",
+      params: {},
+      func: (val, option) => {
+        chooseProdName.value = option ? option.label : ''
+      },
+      rules: [getRules("required", {})]
     },
   ]
 } else {
@@ -97,133 +123,114 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     fromSchema: [
       ...settingOne.value,
       {
-        prop: "CCertfCde",
+        prop: "nAmt",
         inputtype: "rtinput",
         title: "保额/限额",
         clearable: true,
+        rules: [getRules("required", {}), getRules("validateAmout", {maxIntegerLength: 12, maxDecimalLength: 8})]
       },
       {
-        prop: "CClntMrk",
+        prop: "customerNature",
         inputtype: "rtselect",
         title: "客户性质",
         clearable: true,
         typeCode: "INSURE_NATURE_CACHE",
-        param: {},
+        params: {},
         func: (val) => {
           handleNatureChange(val)
-        }
+        },
+        rules: [getRules("required", {})]
       },
       {
-        prop: "CCertfCls",
+        prop: "customerIdType",
         inputtype: "rtselect",
         title: "客户证件类型",
         clearable: true,
         typeCode: CCertfClsType,
-        param: {},
+        params: {},
         func: (val) => {
           handleCertificateChange(val)
-        }
+        },
+        rules: [getRules("required", {})],
+        loadData: null //回显时给这个loadData赋值
       },
       {
-        prop: "CCertfCde",
+        prop: "customerIdNumber",
         inputtype: "rtinput",
         title: "客户证件号码",
         clearable: true,
-        rules: CCertfCdeRules
+        rules: CCertfCdeRules,
       },
       {
-        prop: "CAppNme",
+        prop: "customerName",
         inputtype: "rtinput",
         title: "客户名称",
         clearable: true,
+        rules: [getRules("required", {})]
       },
       {
-        prop: "CClntMrk",
+        prop: "shareholderNature",
         inputtype: "rtselect",
         title: "股东性质",
         clearable: true,
         typeCode: "INSURE_NATURE_CACHE",
-        param: {},
+        params: {},
         func: (val) => {
           handleNatureChange2(val)
-        }
+        },
+        rules: [getRules("required", {})]
       },
       {
-        prop: "CCertfCls",
+        prop: "shareholderIdType",
         inputtype: "rtselect",
         title: "股东证件类型",
         clearable: true,
         typeCode: CCertfClsType2,
-        param: {},
+        params: {},
+        rules: [getRules("required", {})],
+        func: (val) => {
+          handleCertificateChange2(val)
+        },
+        loadData: null //回显时给这个loadData赋值
       },
       {
-        prop: "CCertfCde",
+        prop: "shareholderIdNumber",
         inputtype: "rtinput",
         title: "股东证件号码",
         clearable: true,
+        rules: CCertfCdeRules2,
       },
       {
-        prop: "CAppNme",
+        prop: "shareholderName",
         inputtype: "rtinput",
         title: "股东名称",
         clearable: true,
+        rules: [getRules("required", {})]
       },
     ],
   })
 );
 
-
-// 证件号码
-// const idCard = (rule: any, value: any, callback: any) => {
-//   return BaseCheck.idCard(value) ? callback(BaseCheck.idCard(value)) : callback();
-// }
-// //统一社会信用代码校验
-// const socialCode = (rule: any, value: any, callback: any) => {
-//   return BaseCheck.socialCode(value) ? callback(BaseCheck.socialCode(value)) : callback();
-// }
-// //组织机构校验
-// const orgCode = (rule: any, value: any, callback: any) => {
-//   return BaseCheck.orgCode(value) ? callback(BaseCheck.orgCode(value)) : callback();
-// }
-// /**
-//  *自然人姓名
-//  */
-// const perName = (rule: any, value: any, callback: any) => {
-//   return BaseCheck.perName(value) ? callback(BaseCheck.perName(value)) : callback();
-// }
-const rules = reactive({
-  limit: [
-    { required: true, message: '不能为空!', trigger: 'change' },
-  ],
-  CClntMrk: [
-    { required: true, message: '不能为空!', trigger: 'change' },
-  ],
-  CCertfCls: [
-    { required: true, message: '不能为空!', trigger: 'change' },
-  ],
-  CCertfCde: [
-    { required: true, message: '不能为空!', trigger: 'blur' },
-    // { validator: idCard, trigger: 'blur' },
-    { max: 20, message: '长度不能超过 20 个字符', trigger: 'blur' },
-  ],
-  CAppNme: [
-    { required: true, message: '不能为空!', trigger: 'blur' },
-    // { validator: perName, trigger: 'blur' },
-    { max: 50, message: '长度不能超过 50 个字符', trigger: 'blur' },
-  ],
-});
-
-
-
 const submitForm = () => {
   const r = freeEditRef.value?.getFromValue();
-  const params = Object.assign({}, r);
+  const tempData = Object.assign({}, r);
+  if(props.pageType == 'one') { //单一产品配置
+    tempData.scenarioType = '0'
+  } else { //全部产品配置
+    tempData.scenarioType = '1'
+  }
+  if(chooseProdName.value) {
+    tempData.clauseName = String(chooseProdName.value)
+  }
+  const params = {
+    type: props.actionType,
+    webCustShareCoverageList: [tempData]
+  }
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
-      //新增和编辑是否要区分接口 actionType
       insuranceLimit.saveData(params).then((res: any) => {
-        if (res.code === 200) {
-          ElMessage.success('保存成功');
+        if (res.code === '1') {
+          ElMessage.success(res.message);
           closeDialog()
         }
       });
@@ -235,46 +242,142 @@ const submitForm = () => {
 };
 //通知父组件更新列表
 const closeDialog = () => {
+  dialogVisible.value = false
   emits('ok')
 };
 
 
 //客户性质  根据个人/法人选择 展示不同的证件类型投标人性质
 const handleNatureChange = (value: string) => {
+  const item = freeEditRef.value.getFromSchemaItem('customerIdType')
+  item['loadData'] = null
   if (value === '1') {
     CCertfClsType.value = 'NATURAL_CERTIFICATE_CACHE';
   } else if (value === '0') {
     CCertfClsType.value = 'UN_NATURAL_CERTIFICATE_CACHE';
   }
+  freeEditRef.value?.setValue('customerIdType', null) //清空客户证件类型
+  freeEditRef.value?.clearValidate('customerIdType')
+  freeEditRef.value?.setValue('customerIdNumber', null) //清空客户证件号码值
+  freeEditRef.value?.clearValidate('customerIdNumber')
+  freeEditRef.value?.setValue('customerName', null) //清空客户证件号码值
+  freeEditRef.value?.clearValidate('customerName')
 }
 
 //股东性质  根据个人/法人选择 展示不同的证件类型投标人性质
 const handleNatureChange2 = (value: string) => {
+  const item = freeEditRef.value.getFromSchemaItem('shareholderIdType')
+  item['loadData'] = null
   if (value === '1') {
     CCertfClsType2.value = 'NATURAL_CERTIFICATE_CACHE';
   } else if (value === '0') {
     CCertfClsType2.value = 'UN_NATURAL_CERTIFICATE_CACHE';
   }
+  freeEditRef.value?.setValue('shareholderIdType', null) //清空股东证件类型
+  freeEditRef.value?.clearValidate('shareholderIdType')
+  freeEditRef.value?.setValue('shareholderIdNumber', null) //清空股东证件号码值
+  freeEditRef.value?.clearValidate('shareholderIdNumber')
+  freeEditRef.value?.setValue('shareholderName', null) //清空股东证件号码值
+  freeEditRef.value?.clearValidate('shareholderName')
 }
 
 //证件类型change
 const handleCertificateChange = (value: string) => {
-  freeEditRef.value?.setValue('CCertfCde', '') //清空客户证件号码值
-  freeEditRef.value?.clearValidate('CCertfCde') //客户证件号码
-  if (value == '120001') {
-    CCertfCdeRules.value = [getRules("idCard", {}), getRules("required", {})]
-  } else if (value == '110005') {
+  freeEditRef.value?.setValue('customerIdNumber', null) //清空客户证件号码值
+  freeEditRef.value?.clearValidate('customerIdNumber')
+  freeEditRef.value?.setValue('customerName', null) //清空客户证件号码值
+  freeEditRef.value?.clearValidate('customerName')
+  console.log('value111', value)
+  if (value == '120001') { // 身份证号
+    CCertfCdeRules.value = [getRules("required", {}), getRules("idCard", {})]
+  } else if (value == '110007') { // 统一社会信用代码
     CCertfCdeRules.value = [getRules("required", {}), getRules("socialCode", {})]
-  } else if (value == '110001') {
+  } else if (value == '110001') { // 组织机构
     CCertfCdeRules.value = [getRules("required", {}), getRules("orgCode", {})]
+  } else if(value == '120002') { // 护照
+    CCertfCdeRules.value = [getRules("required", {}), getRules("passPort", {})]
+  } else if(value == '19') { //外国人永久居留身份证
+    CCertfCdeRules.value = [getRules("required", {}), getRules("ariCard", {})]
+  } else if ('110002' === value) {  // 营业执照
+    CCertfCdeRules.value = [getRules("required", {}), getRules("businessLicense", {})]
   } else {
-    CCertfCdeRules.value = [getRules("required", {}),]
+    CCertfCdeRules.value = [getRules("required", {}), getRules("maxLength", {len: 20})]
+  }
+};
+
+//股东证件类型change
+const handleCertificateChange2 = (value: string) => {
+  freeEditRef.value?.setValue('shareholderIdNumber', null) //清空股东证件号码值
+  freeEditRef.value?.clearValidate('shareholderIdNumber')
+  freeEditRef.value?.setValue('shareholderName', null) //清空股东证件号码值
+  freeEditRef.value?.clearValidate('shareholderName')
+  if (value == '120001') { // 身份证号
+    CCertfCdeRules2.value = [getRules("required", {}), getRules("idCard", {})]
+  } else if (value == '110007') { // 统一社会信用代码
+    CCertfCdeRules2.value = [getRules("required", {}), getRules("socialCode", {})]
+  } else if (value == '110001') { // 组织机构
+    CCertfCdeRules2.value = [getRules("required", {}), getRules("orgCode", {})]
+  } else if(value == '120002') { // 护照
+    CCertfCdeRules2.value = [getRules("required", {}), getRules("passPort", {})]
+  } else if(value == '19') { //外国人永久居留身份证
+    CCertfCdeRules2.value = [getRules("required", {}), getRules("ariCard", {})]
+  } else if ('110002' === value) {  // 营业执照
+    CCertfCdeRules2.value = [getRules("required", {}), getRules("businessLicense", {})]
+  } else {
+    CCertfCdeRules2.value = [getRules("required", {}), getRules("maxLength", {len: 20})]
   }
 };
 
 
 onMounted(() => {
-  
+  if(props.cPkId) { //编辑时查询详情
+    // 证件类型 - 个人
+    codeListStore.queryCodeList({
+      codeListName: 'NATURAL_CERTIFICATE_CACHE',
+      codeListParam: { }
+    }, false, true).then(res => {
+      if (res) {
+        codeListMap['persionType'] = res;
+      }
+    }, () => {
+      ElMessage.error('后台服务异常,请联系管理员');
+    });
+    // 证件类型 - 法人
+    codeListStore.queryCodeList({
+      codeListName: 'UN_NATURAL_CERTIFICATE_CACHE',
+      codeListParam: { }
+    }, false, true).then(res => {
+      if (res) {
+        codeListMap['companyType'] = res;
+      }
+    }, () => {
+      ElMessage.error('后台服务异常,请联系管理员');
+    });
+    const params = {
+      cPkId: props.cPkId
+    }
+    insuranceLimit.getDetail(params).then((res: any) => {
+      if (res.code == '1') {
+        res.data.nAmt = res.data.stringNAmt
+        freeEditRef.value?.setFormValue(res.data)
+        
+        nextTick(() => {
+          const item = freeEditRef.value.getFromSchemaItem('customerIdType')
+          const item2 = freeEditRef.value.getFromSchemaItem('shareholderIdType')
+          if(res.data.customerNature == '1') {
+            item.loadData = codeListMap['persionType']
+          } else {
+            item.loadData = codeListMap['companyType']
+          }
+          if(res.data.shareholderNature == '1') {
+            item2.loadData = codeListMap['persionType']
+          } else {
+            item2.loadData = codeListMap['companyType']
+          }
+        })
+      }
+    })
+  }
 });
 
 </script>

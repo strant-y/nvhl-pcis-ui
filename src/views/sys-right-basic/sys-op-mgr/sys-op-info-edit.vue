@@ -1,28 +1,22 @@
 <template>
-  <el-dialog
-    :title="props.type == 'add' ? '新增权限菜单信息' : '修改权限菜单信息'"
-    v-model="dialogVisible"
-    width="90%"
-  >
+  <el-dialog :title="props.type == 'add' ? '新增权限菜单信息' : '修改权限菜单信息'" v-model="dialogVisible" width="90%">
     <div>
       <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
       <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
-        <rt-button
-          :item="{
-            type: 'primary',
-            label: '保存',
-            func: () => {
-              save();
-            },
-          }"
-        />
+        <rt-button :item="{
+          type: 'primary',
+          label: '保存',
+          func: () => {
+            save();
+          },
+        }" />
       </div>
     </div>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { SysOpMgrService } from "@/views/sys-right-basic/service/sys-op-mgr.service";
+import { SysOpMgrService } from '@/views/sys-right-basic/service/sys-op-mgr.service'
 import { useValidator } from "@/typings/useValidator";
 import { yesOrNo, size, inputtype, typeMap, dateType } from "@/utils/utilKey";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
@@ -40,18 +34,18 @@ const userStore = useUserStore();
 const user = ref<any>(userStore.user);
 const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
-const sysOpMgrService = new SysOpMgrService();
+const sysOpMgrService = new SysOpMgrService()
 const dialogVisible = ref(true);
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const props = defineProps({
   COpCde: {
     type: String,
-    required: true,
+    required: true
   },
   COperateTyp: {
     type: String,
-    required: true,
-  },
+    required: true
+  }
 });
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -63,7 +57,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cOpCde",
         inputtype: "rtinput",
         title: "菜单代码",
-        rules: [getRules("required", {}), getRules("signlessInt", {})],
+        rules: [getRules("required", {}), getRules("signlessInt", {})]
       },
       {
         prop: "cParentCde",
@@ -76,72 +70,72 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cOpCnm",
         inputtype: "rtinput",
         title: "菜单名称",
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {})]
       },
       {
         prop: "nOpOrder",
         inputtype: "rtinput",
         title: "菜单排列顺序",
-        rules: [getRules("required", {}), getRules("signlessInt", {})],
+        rules: [getRules("required", {}), getRules("signlessInt", {})]
       },
       {
         prop: "cOpImg",
         inputtype: "rtinput",
-        title: "菜单图标",
+        title: "菜单图标"
       },
       {
         prop: "cOpType",
         inputtype: "rtselect",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "op_typ" },
+        params: { 'cParCde': 'op_typ' },
         title: "菜单类型",
-        defaultValue: "0",
+        defaultValue: '0',
         func: (val) => {
-          COpTypeChange(val);
+          COpTypeChange(val)
         },
       },
       {
         prop: "cOpAct",
         inputtype: "rtinput",
-        title: "菜单路由",
-      },
+        title: "菜单路由"
+      }
       // {
       //   inputtype: "rtinput",
       //   type: 'hidden',
       //   defaultValue: 'PCIS'
       // },
-    ],
+    ]
   })
 );
 
 const COpTypeChange = (val) => {
-  freeEditRef.value?.setValue("CTarget", "");
-  freeEditRef.value?.setValue("COpAct", "");
-  freeEditRef.value?.setValue("COpMemo", "");
+  freeEditRef.value?.setValue('CTarget', '');
+  freeEditRef.value?.setValue('COpAct', '');
+  freeEditRef.value?.setValue('COpMemo', '');
   // 移除最后一个表单项
   formconfig1.fromSchema.pop();
 
   // 根据 val 添加新的表单项
-  if (val === "0") {
+  if (val === '0') {
     formconfig1.fromSchema.push({
       prop: "COpAct",
       inputtype: "rtinput",
-      title: "菜单路由",
+      title: "菜单路由"
     });
-  } else if (val === "1") {
+  } else if (val === '1') {
     formconfig1.fromSchema.push({
       prop: "CTarget",
       inputtype: "rtinput",
-      title: "菜单目标窗口",
+      title: "菜单目标窗口"
     });
-  } else if (val === "2") {
+  } else if (val === '2') {
     formconfig1.fromSchema.push({
       prop: "COpMemo",
       inputtype: "rtinput",
-      title: "菜单按钮权限",
+      title: "菜单按钮权限"
     });
   }
-};
+}
 
 const initParam = (data: any) => {
   if (data) {
@@ -155,35 +149,33 @@ const initParam = (data: any) => {
     }
     freeEditRef.value?.setFormValue(data);
   }
-};
+}
 onMounted(() => {
-  if (props.COperateTyp === "update" && props.COpCde) {
-    //编辑
+  if (props.COperateTyp === "update" && props.COpCde) { //编辑
     nextTick(() => {
-      let item = freeEditRef.value.getFromSchemaItem("COpCde");
-      item.disabled = true;
+      let item = freeEditRef.value.getFromSchemaItem('COpCde')
+      item.disabled = true
       const param = {
-        COpCde: props.COpCde,
+        COpCde: props.COpCde
       };
       sysOpMgrService.loadSysOpInfo(param).then((res: any) => {
-        if (null != res && null != res["code"]) {
-          if (res["code"] === 200) {
+        if (null != res && null != res['code']) {
+          if (res['code'] === 200) {
             const data = res.data?.data ? res.data?.data[0] : [];
             initParam(data);
           } else {
-            ElMessage.error(res["message"]);
+            ElMessage.error(res['message']);
           }
         }
       });
-    });
-  } else {
-    //新增
+    })
+  } else { //新增
     nextTick(() => {
-      freeEditRef.value?.setValue("cOpType", "0");
-    });
+      freeEditRef.value?.setValue('cOpType', '0')
+    })
     nextTick(() => {
-      freeEditRef.value?.setValue("CParentCde", props.COpCde);
-    });
+      freeEditRef.value?.setValue('CParentCde', props.COpCde)
+    })
   }
 });
 
@@ -195,29 +187,28 @@ function save() {
       const param = Object.assign({}, s, {
         CCrtCde: user.opCde,
         CUpdCde: user.opCde,
-        COperateTyp: props.COperateTyp,
-      });
-      if (param.Children) {
-        delete param.Children;
+        COperateTyp: props.COperateTyp
+      })
+      if(param.Children) {
+        delete param.Children
       }
-      sysOpMgrService
-        .saveSysOpInfo(param)
-        .then((res) => {
-          const { code, data, msg } = res;
-          if (200 === code) {
-            emits("ok", {});
-            ElMessage.success(data.message);
-            dialogVisible.value = false;
-          } else {
-            ElMessage.error(msg);
-          }
-        })
-        .finally(() => {});
+      sysOpMgrService.saveSysOpInfo(param).then((res) => {
+        const { code, data, msg } = res;
+        if (200 === code) {
+          emits("ok", {});
+          ElMessage.success(data.message);
+          dialogVisible.value = false;
+        } else {
+          ElMessage.error(msg);
+        }
+      })
+        .finally(() => { });
     } else {
       ElMessage.error("请填写必填项");
     }
   });
 }
+
 </script>
 
 <style scoped></style>

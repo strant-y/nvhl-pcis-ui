@@ -1,7 +1,6 @@
 import {AxiosPromise} from "axios";
 import {post} from "@/utils/http";
 import {del} from "@/utils/http";
-
 /**
  * 查询服务
  */
@@ -42,7 +41,7 @@ export class PcisQueryService {
     dealTerminationDataUrl = 'oa/dealTerminationData';
     createClaimLinkUrl = 'policy/createClaimLink';
     updateFundInfoStateURL = 'policy/updateFundInfoState';
-
+    qryPayFaildListUrl = 'cash/qryPayFaildList'; // 获取支付失败的异常账户列表
     qryAppCustomerPolicyUrl = 'policy/getAppPolicyListByCustomerInfo';
     qryCustomerEquityPolicyUrl = 'policy/getCustomerEquityInfo';
 
@@ -142,7 +141,7 @@ export class PcisQueryService {
                                 cCheckSts:"cCheckSts",
                                 tBgnTm:"tBgnTm",
                                 cUniqueNo:"cUniqueNo",
-                                cBatchNo:"cBatchNo",
+                                cBatchNo:"",
                                 cPayStatus:"cPayStatus",
                                 tUdrTm:"tUdrTm",
                                 cChargeCde:"cChargeCde"
@@ -154,7 +153,20 @@ export class PcisQueryService {
                 resolve(mockResponse);
             }, 1000);
         });
-    }    
+    }  
+    /**
+     * 查询保费接口表
+     */
+    qryPrmDueList(ops: any): AxiosPromise<any> {
+      return post(`${this.qryPayFaildListUrl}`, ops)
+    }  
+    /**
+     * 账户信息上传
+     * @param ops
+     */
+    accountExDispose(ops: any): AxiosPromise<any> {
+      return post(`cash/accountExDispose`, ops)
+    }
     /**
      * 根据组合产品单号获取基本申请单号
      */
@@ -402,18 +414,7 @@ export class PcisQueryService {
      * 缴费类型转换前的验证
      */
     befChangeSts(param) {
-        //return post('policy/befChangeSts', { source: JSON.stringify(param) });
-        return new Promise((resolve) => {
-            // 模拟异步操作，延迟 1 秒后返回结果
-            setTimeout(() => {
-                // 模拟返回的数据，你可以根据实际情况修改数据结构
-                const mockResponse = {
-                    code: 200,
-                    msg:'OK'
-                };
-                resolve(mockResponse);
-            }, 1000);
-        });
+        return post('policy/befChangeSts', { source: JSON.stringify(param) });
     }
 
     /**

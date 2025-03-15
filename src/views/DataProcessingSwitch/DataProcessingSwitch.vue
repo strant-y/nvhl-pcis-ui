@@ -1,4 +1,4 @@
-<!-- 配置 -->
+<!-- 数据处理开关 -->
 <template>
   <div class="app-container">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
@@ -72,13 +72,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         labelWidth: 200,
         clearable: true,
         loadData: [
-          { value: "1", label: "终保后批改" },
-          { value: "2", label: "一般退保倒签" },
-          { value: "3", label: "注销倒签" },
-          { value: "4", label: "一般退保手动修改退保总保费" },
-          { value: "5", label: "投保手动修改保费" },
-          { value: "6", label: "一般批改手动修改险别保费" },
-          { value: "7", label: "取消免费延期校验" },
+          { value: '1', label: '终保后批改' },
+          { value: '2', label: '一般退保倒签' },
+          { value: '3', label: '注销倒签' },
+          { value: '4', label: '一般退保手动修改退保总保费' },
+          { value: '5', label: '投保手动修改保费' },
+          { value: '6', label: '一般批改手动修改险别保费' },
+          { value: '7', label: '取消免费延期校验' },
         ],
       },
       {
@@ -131,19 +131,23 @@ const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     editFlag: true,
     editList: ["cStatus"],
-    showSelection: true,
+    showSelection:true,
     titleBtns: [
       createFreeButtonBase({
         id: "score",
         label: "打开开关",
         type: "primary",
-        func: function () {},
+        func: function () {
+           
+        },
       }),
       createFreeButtonBase({
         id: "score",
         label: "关闭开关",
         type: "primary",
-        func: function () {},
+        func: function () {
+           
+        },
       }),
     ],
     tableBtnType: "btn",
@@ -175,7 +179,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "单据单号",
         minWidth: 180,
-        fixed: "left",
+        fixed: 'left',
       },
       {
         prop: "b",
@@ -256,9 +260,10 @@ function handleQuery(flag?: boolean) {
 
 // 多选事件
 function handleSelectionChange(selection: any) {
-  console.log("selection", selection);
+  console.log('selection',selection)
   removeIds.value = selection.map((item: any) => item.cPkId);
 }
+
 </script>
 
 <style scoped></style>

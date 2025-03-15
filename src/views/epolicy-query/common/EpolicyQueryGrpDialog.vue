@@ -1,5 +1,6 @@
+<!-- 团单个打 -->
 <template>
-  <el-dialog v-model="dialogVisible" width="90%" title="清单查询">
+  <el-dialog v-model="dialogVisible" width="90%" title="团单个打">
     <div>
       <app-free-edit
         v-model:freeEditConfig="formconfig1"
@@ -17,23 +18,21 @@
         <rt-button
           :item="{
             type: 'primary',
-            label: '电子保单下载',
+            label: '生成电子保单',
             func: () => {
-              showDown();
+              groupSingleFight();
             },
           }"
         />
-
         <rt-button
           :item="{
             type: 'primary',
-            label: '生成电子保单',
+            label: '电子保单下载',
             func: () => {
-              save();
+              downloadXLS();
             },
           }"
         />
-
         <rt-button
           :item="{
             type: 'primary',
@@ -49,6 +48,7 @@
 </template>
 
 <script setup lang="ts">
+import { useUserStore } from "@/store";
 import { useValidator } from "@/typings/useValidator";
 import { yesOrNo, size, inputtype, typeMap, dateType } from "@/utils/utilKey";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
@@ -71,7 +71,10 @@ import {
   createTableEditConfig,
   MyTableMethod,
 } from "@/shared/app-table-config";
-
+import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
+const userStore = useUserStore();
+const user = ref(userStore.user) || ref({ companyId:'', opCde:'' })
+const policyService = new PolicyService();
 const props = defineProps({
   data: Object,
   type: String,
@@ -87,9 +90,7 @@ const showBtnConfig = ref(false);
 const dialogVisible = ref(true);
 const showView = ref(false);
 const dzmodal = useDzModal();
-const EpolicyGrpDialog = defineAsyncComponent(
-  () => import("./EpolicyGrpDialog.vue")
-);
+const EpolicyGrpDialog = defineAsyncComponent(() => import("./EpolicyGrpDialog.vue"));
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const freeLookRef = ref<AppFreeEditMethod | null>(null);
 const freeEditRefBtn = ref<AppFreeEditMethod | null>(null);
@@ -130,7 +131,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
     endBtns: [
-      createFreeButtonBase({
+    createFreeButtonBase({
         type: "primary",
         label: "查询",
         func: async () => {
@@ -154,16 +155,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "CPlyNo",
         inputtype: "rtinput",
         title: "保单号",
+        clearable: true,
+        rules: [getRules("required", {})],
       },
       {
         prop: "NSeqNo",
         inputtype: "rtinput",
         title: "被保人序号",
+        clearable: true,
       },
       {
         prop: "CNme",
         inputtype: "rtinput",
         title: "被保人名称",
+        clearable: true,
       },
     ],
     showSuperior: true,
@@ -194,7 +199,7 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Printer",
         tableClick: (row) => {
-          console.log("单据打印");
+         console.log('单据打印')
         },
       }),
     ],
@@ -204,6 +209,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cPlyNo",
         inputtype: "rtinput",
         title: "保单号",
+        defaultValue: props.data?.cPlyNo,
       },
       {
         prop: "nSeqNo",
@@ -225,6 +231,7 @@ const tableconfig = reactive<AppTableConfig>(
 );
 
 onMounted(async () => {
+  handleQuery(true)
   if (props.type === "edit" && props.data) {
     setTimeout(() => {
       freeEditRef.value?.setFormValue(props.data);
@@ -251,38 +258,36 @@ const exRules = {
   },
 };
 
-function showDown() {
-  if (selectedRows.value.length == 0) {
-    ElMessage.warning("请选择一条记录");
+// 生成电子保单
+function groupSingleFight() {
+  if(selectedRows.value.length==0) {
+    ElMessage.warning('请选择一条记录');
     return;
   }
-  dzmodal.open(EpolicyGrpDialog, { type: "Issuer", data: {} }).then((res) => {
-    if (res.type === "ok") {
-    }
-  });
 }
 
-/** 查询 */
-function save() {
-  freeEditRef.value?.validate().then((isValid) => {
-    if (isValid) {
-      const formParam = getFrom();
-      const param = Object.assign({ type: props.type }, formParam);
-      saveKindInfo(param)
-        .then((res) => {
-          const { code, data, msg } = res;
-          if (200 === code) {
-            emits("ok", {});
-            ElMessage.success("保存成功");
-            dialogVisible.value = false;
-          } else {
-            ElMessage.error(msg);
-          }
-        })
-        .finally(() => {});
-    } else {
-      ElMessage.error("请填写必填项");
+// 下载电子保单
+function downloadXLS() {
+  if(selectedRows.value.length==0) {
+    ElMessage.warning('请选择一条记录');
+    return;
+  }
+  const data = {
+    CPlyNo: selectedRows.value[0].cPlyNo,
+    CEdrNo: selectedRows.value[0].cEdrNo,
+    cTgtObjTxtFld29: selectedRows.value[0].cTgtObjTxtFld29,
+    plyTy: props.data.plyTy,
+  };
+
+  policyService.downloadElePolicy(data).then((res: any) => {
+    if (res.size <= 0) {
+      ElMessage.warning({ message: '个人电子保单未生成', duration: 3000 });
+      return;
     }
+    const fileName = `${selectedRows.value[0].cTgtObjTxtFld29}.pdf`;
+    // saveAs(res, decodeURI(fileName));
+  }).catch((err: any) => {
+    ElMessage.error({ message: '下载出错', duration: 3000 });
   });
 }
 
@@ -314,30 +319,35 @@ function getFrom() {
 }
 
 const handleSelectionChange = (rows: any[]) => {
-  selectedRows.value = rows;
-};
+  selectedRows.value = rows
+}
 
 /** 查询 */
 function handleQuery(flag?: boolean) {
-  const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
-  const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  console.log(r, s);
-  const param = Object.assign(s, r);
-  pageresult.list = [{}];
-  pageresult.total = 1;
-  // 获取接口
-  // getBasicKindList(param)
-  //   .then((res) => {
-  //     const { code, data, msg } = res;
-  //     if (200 === code) {
-  //       pageresult.list = [];
-  //       pageresult.list = data.result;
-  //       pageresult.total = data.total;
-  //     } else {
-  //       ElMessage.error(msg);
-  //     }
-  //   })
-  //   .finally(() => {});
+  freeEditRef.value?.validate().then((isValid) => {
+		if (isValid) {
+      const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
+      const s = freeEditRef.value?.getFromValue(); //获取表单数据
+      const param = Object.assign({
+        sortField: 'name',
+        // sortOrder: sortValue.value,
+        CurrentUser: user.value.opCde,
+        CurrentUserOrg: user.value.companyId,
+      },s, r);
+      // 获取接口
+      policyService.queryTgtObjectList(param).then((res: any) => {
+        if (res.code === 200) {
+          const pageData = res.data;
+          if (pageData) {
+            pageresult.list = pageData.list;
+            pageresult.total = pageData.total;
+          }
+        }
+      }).catch((error: any) => {
+        ElMessage.error({ message: '后台服务异常,查询失败', duration: 3000 });
+      });
+    }
+  });
 }
 </script>
 

@@ -9,7 +9,7 @@
 <script setup lang="ts">
 import { defineComponent, ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { ElForm, ElFormItem, ElInput, ElButton, ElTable, ElTableColumn, ElPagination, ElMessage } from 'element-plus';
+import { ElMessage } from 'element-plus';
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
 import {
   AppFreeEditConfig,
@@ -58,6 +58,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         params: { cStatus: '1' },
         clearable: true,
         func: (val) => {
+          const item = freeEditRef.value.getFromSchemaItem('PrdProdPlan.CProdNo')
+          if(val) {
+            item['params'] = {'cKindNo': val}
+          } else {
+            item['params'] = {}
+          }
         }
       },
       {
@@ -117,7 +123,7 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Edit",
         tableClick: (row) => {
-          showDetails(row)
+          openEdit('update', row)
         },
       }),
       createFreeButtonBase({
@@ -128,48 +134,48 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Delete",
         tableClick: (row) => {
-          openEdit('update', row)
+          showDetails(row)
         },
       }),
     ],
     fromSchema: [
       {
-        prop: "PrdProdPlan.CPlanNo",
+        prop: "PrdProdPlan.cKindNme",
         inputtype: 'rtinput',
         title: "产品大类",
       },
       {
-        prop: "PrdProdPlan.CPlanNme",
+        prop: "PrdProdPlan.cProdNme",
         inputtype: 'rtinput',
         title: "条款",
       },
       {
-        prop: "PrdProdPlan.CDesc",
+        prop: "PrdProdPlan.CPlanNo",
         inputtype: 'rtinput',
         title: "方案编号",
       },
       {
-        prop: "PrdProdPlan.CDesc",
+        prop: "PrdProdPlan.cPlanCn",
         inputtype: 'rtinput',
         title: "方案名称",
       },
       {
-        prop: "PrdProdPlan.CDesc",
+        prop: "PrdProdPlan.cUndrStatus",
         inputtype: 'rtinput',
         title: "审核状态",
       },
       {
-        prop: "PrdProdPlan.CDesc",
+        prop: "PrdProdPlan.cEnableStatus",
         inputtype: 'rtinput',
         title: "启用状态",
       },
       {
-        prop: "PrdProdPlan.CDesc",
+        prop: "PrdProdPlan.cAccessType",
         inputtype: 'rtinput',
         title: "访问类型",
       },
       {
-        prop: "PrdProdPlan.CDesc",
+        prop: "PrdProdPlan.cTyp",
         inputtype: 'rtinput',
         title: "方案类型",
       },
@@ -179,6 +185,7 @@ const tableconfig = reactive<AppTableConfig>(
 
 //新增and编辑
 const openEdit = (type: string, row) => {
+  console.log(111111, type, row)
   router.push({
     path: '/plan-config/plan-info',
     query: { data: JSON.stringify({ type, rowData: row }) }

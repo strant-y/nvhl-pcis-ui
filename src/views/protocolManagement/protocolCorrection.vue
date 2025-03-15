@@ -1,4 +1,4 @@
-<!-- 配置 -->
+<!-- 协议批改 -->
 <template>
   <div class="app-container">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
@@ -63,7 +63,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       }),
     ],
     fromSchema: [
-      {
+    {
         prop: "cDptCde",
         inputtype: "rtselect",
         title: "归属机构",
@@ -88,10 +88,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cStatus",
         inputtype: "rtradio",
         title: "包含下级机构",
-        loadData: [
-          { label: "是", value: 1 },
-          { label: "否", value: 0 },
-        ],
+        loadData :[
+          { label:'是',value:1 },
+          { label:'否',value:0 },
+        ]
       },
       {
         prop: "cKindNo",

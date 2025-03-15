@@ -1,14 +1,17 @@
 <template>
-  <el-dialog v-model="dialogVisible" width="90%">
+  <el-dialog v-model="dialogVisible" width="90%" title="缴费信息详情查看">
     <div>
-      <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+      <app-free-edit
+        v-model:freeEditConfig="formconfig1"
+        ref="freeEditRef"
+      />
       <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
         <rt-button
           :item="{
             type: 'primary',
             label: '返回',
             func: () => {
-              dialogVisible = false;
+              dialogVisible = false
             },
           }"
         />
@@ -23,23 +26,16 @@ import { yesOrNo, size, inputtype, typeMap, dateType } from "@/utils/utilKey";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { ref, defineProps, defineEmits, onMounted } from "vue";
 import { createFreeButtonBase } from "@/shared/button-config";
-import {
-  getButtonByFacKey,
-  getFactorList,
-  getInputGroupList,
-  saveFactor,
-  saveKindInfo,
-} from "@/api/prod";
+import { useUserStore } from "@/store/modules/user";
+import { PcisQueryService } from '../service/pcis-query-service';
 import {
   AppFreeEditConfig,
   AppFreeEditMethod,
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
-import {
-  AppTableConfig,
-  createTableEditConfig,
-  MyTableMethod,
-} from "@/shared/app-table-config";
+const userStore = useUserStore();
+const user = ref(userStore.user);
+const pcisQueryService = new PcisQueryService();
 
 const props = defineProps({
   data: Object,
@@ -47,16 +43,9 @@ const props = defineProps({
 });
 const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
-import { v4 as uuidv4 } from "uuid";
 const showBtnConfig = ref(false);
 const dialogVisible = ref(true);
-const showView = ref(false);
-
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
-const freeLookRef = ref<AppFreeEditMethod | null>(null);
-const freeEditRefBtn = ref<AppFreeEditMethod | null>(null);
-const tableRef = ref<MyTableMethod | null>(null);
-const appTableShow = ref(false);
 
 const schemaMap = reactive<Record<string, any>>({
   rtinputgroup: [],
@@ -69,147 +58,169 @@ const method = {
 };
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    title: "缴费信息详情查看",
+    title: '',
     fromSchema: [
       {
-        prop: "CDptCde",
-        inputtype: "rtselect",
-        title: "机构",
+				prop: "CRegDptCde",
+				inputtype: "rtselect",
+				title: "机构",
         typeCode: "PLYDPT_LIST",
-        param: { cIsValid: "1", userOrg: "" }, //待添加
-      },
+        disabled: true,
+				params: { 'CDptCde': user.value['companyId'] }, 
+        func: (val) =>{
+          console.log("qqqqqqqqqq", val)
+          let s = freeEditRef.value?.getFromSchemaItem('cProdNo')
+          s['params'] = {'CRegDptCde': val, 'cStatus': '1'};          
+          s['typeCode'] = 'PROD_LIST';          
+        }
+			},
       {
         prop: "CProdNo",
         inputtype: "rtselect",
         title: "产品",
-        typeCode: "PROD_LIST",
-        param: { cStatus: "1" },
+        // typeCode: "PROD_LIST",
+        // params: {'cStatus': '1'},
       },
       {
         prop: "CAppTyp",
         inputtype: "rtselect",
         title: "申请类型",
-        loadData: [
-          { label: "投保", value: "A" },
-          { label: "批改", value: "E" },
-        ],
+        disabled: true,
+        loadData :[
+          { label:'投保',value:"A" },
+          { label:'批改',value:"E" },
+        ]
       },
       {
-        prop: "CAppNo",
-        title: "投保单号",
+        prop: 'CAppNo',
+        title: '投保单号',
         inputtype: "rtinput",
+        disabled: true,
       },
       {
-        prop: "CPlyNo",
-        title: "生成保批单号",
+        prop: 'CPlyNo',
+        title: '生成保批单号',
         inputtype: "rtinput",
+        disabled: true,
       },
       {
-        prop: "CUniqueNo",
-        title: "收据流水号",
+        prop: 'CUniqueNo',
+        title: '收据流水号',
         inputtype: "rtinput",
+        disabled: true,
       },
       {
-        prop: "CCardNo",
-        title: "卡号",
+        prop: 'CCardNo',
+        title: '卡号',
         inputtype: "rtinput",
+        disabled: true,
       },
       {
-        prop: "CChqueNo",
-        title: "支票号",
+        prop: 'CChqueNo',
+        title: '支票号',
         inputtype: "rtinput",
+        disabled: true,
       },
       {
-        prop: "TBgnTm",
-        title: "保险起期",
+        prop: 'TBgnTm',
+        title: '保险起期',
         inputtype: "rtdatepicker",
         type: "daterange",
+
+        
       },
       {
-        prop: "TEndTm",
-        title: "保险止期",
+        prop: 'TEndTm',
+        title: '保险止期',
         inputtype: "rtdatepicker",
         type: "daterange",
+        
       },
       {
-        prop: "TUdrTm",
-        title: "核保时间",
+        prop: 'TUdrTm',
+        title: '核保时间',
         inputtype: "rtdatepicker",
+        format: 'YYYY-MM-DD HH:mm:ss',
         type: "daterange",
+        disabled: true,
+        
       },
       {
-        prop: "TPlEdrMakeTm",
-        title: "保批单生成时间",
+        prop: 'TPlEdrMakeTm',
+        title: '保批单生成时间',
         inputtype: "rtdatepicker",
+        format: 'YYYY-MM-DD HH:mm:ss',
         type: "daterange",
+        disabled: true,
+        
       },
       {
-        prop: "TPlyedrPrnTm",
-        title: "打印时间",
+        prop: 'TPlyedrPrnTm',
+        title: '打印时间',
         inputtype: "rtdatepicker",
+        format: 'YYYY-MM-DD HH:mm:ss',
         type: "daterange",
+        disabled: true,
+        
       },
       {
-        prop: "NPayAmt",
-        title: "实收金额",
+        prop: 'NPayAmt',
+        title: '实收金额',
         inputtype: "rtinput",
+        disabled: true,
       },
       {
-        prop: "NTax",
-        title: "车船税",
+        prop: 'NTax',
+        title: '车船税',
         inputtype: "rtinput",
+        disabled: true,
       },
       {
-        prop: "NPrm",
-        title: "实收保费",
+        prop: 'NPrm',
+        title: '实收保费',
         inputtype: "rtinput",
+        disabled: true,
       },
       {
-        prop: "TPayConfTm",
-        title: "缴费确认时间",
+        prop: 'TPayConfTm',
+        title: '缴费确认时间',
         inputtype: "rtdatepicker",
+        format: 'YYYY-MM-DD HH:mm:ss',
         type: "daterange",
+        disabled: true,
       },
       {
-        prop: "NStampTax",
-        title: "印花税",
+        prop: 'NStampTax',
+        title: '印花税',
         inputtype: "rtinput",
-      },
-    ],
+        disabled: true,
+      }
+    ]
   })
 );
 onMounted(async () => {
-  if (props.type === "edit" && props.data) {
-    setTimeout(() => {
+  if (props.type === "view" && props.data) {
+    nextTick(()=>{
       freeEditRef.value?.setFormValue(props.data);
-    }, 50);
+      const param = {
+        'CUniqueNo': props.data.CUniqueNo,
+        'CurrentUser': user.value['opCde']
+      };  
+      loadPayConfirmInfo(param); 
+    })
   }
 });
-/* 获取全量表单数据 */
-function getFrom() {
-  let s = freeEditRef.value?.getFromValue(); //获取表单数据
-  if (showBtnConfig.value) {
-    s["showExBtn"] = "1";
-  } else {
-    s["showExBtn"] = "0";
-  }
-  if (s) {
-    const param = Object.assign(s);
-    if (props.type === "edit") {
-      param["cPkId"] = props.data.cPkId;
-    }
-    if (freeEditRefBtn.value) {
-      let btnjson = freeEditRefBtn.value?.getFromValue();
-      btnjson.initid = uuidv4().replace(/-/g, "");
-      param["btn"] = btnjson;
-    }
-    if (tableRef.value) {
-      const tabjson = tableRef.value?.getFromValue();
-      let selectList = tabjson.filter((item: any) => item.isChecked === "1");
-      param["tabjson"] = selectList;
-    }
-    return param;
-  }
+function loadPayConfirmInfo(param: any) {
+  pcisQueryService.loadPayConfirmInfo(param).then((res: any) => {
+      if (null != res && null != res['code']) {
+          if (res['code'] === 200) {
+              const data = res['data']['result'];
+              console.log("eeeeeeee", data)
+          }
+      }
+  }, error => {
+      ElMessage.error('连接失败！' + error);
+  });  
 }
 </script>
 

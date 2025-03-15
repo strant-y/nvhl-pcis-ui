@@ -162,8 +162,7 @@ const tableconfig = reactive<AppTableConfig>(
 
 //产品大类change
 const handleKindNoChange = (value: any[]) => {
-  // if (value === '02') {
-    if (value === '04') {
+  if (value === '02') {
     console.log('模板val', value)
     nextTick(() => {
       let item = freeEditRef.value.getFromSchemaItem('CKindNoSub')

@@ -18,7 +18,12 @@
   margin-bottom: 6px;
   margin-top: 6px;
 }
-
+// 文字过多省略
+.text-ellipsis {
+  text-align: center; /* 文本居中 */
+  overflow: hidden; /* 防止内容溢出 */
+  text-overflow: ellipsis; /* 超出部分用省略号表示 */
+}
 
 // 查询组件样式
 .search-container {

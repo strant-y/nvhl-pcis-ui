@@ -1,10 +1,6 @@
 <template>
   <div class="app-container">
-    <app-free-edit
-      v-model:freeEditConfig="formconfig1"
-      ref="freeEditRef"
-      @update-datas="fromUpdata"
-    />
+    <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef"/>
     <app-table
       :tableConfig="tableconfig"
       v-model:pageresult="pageresult"
@@ -15,13 +11,13 @@
 </template>
 
 <script setup lang="ts">
-import { defineComponent, ref, reactive, onMounted } from "vue";
-import { ElMessage } from "element-plus";
-import { InsuranceLimit } from "./service/index";
-import { getListByCode } from "@/api/code-list-service";
+import { defineComponent, ref, reactive, onMounted } from 'vue';
+import { ElMessage } from 'element-plus';
+import { InsuranceLimit } from './service/index';
+import { getListByCode } from '@/api/code-list-service';
 import { AppKey } from "@/constants/api";
-// import { BaseCheck } from '@/utils/base-check';
-import AddOrEdit from "./components/addOrEdit.vue";
+import AddOrEdit from './components/addOrEdit.vue';
+
 
 import { useUserStore } from "@/store/modules/user";
 import { useValidator } from "@/typings/useValidator";
@@ -39,21 +35,29 @@ import {
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
+import { cloneDeep } from 'lodash-es';
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
 const dzmodal = useDzModal();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 const userStore = useUserStore();
 const { getRules } = useValidator();
-const CCertfClsType = ref("INSURE_NATURE_CACHE"); //客户证件类型字段请求数据字典的type值
-const CCertfClsType2 = ref("INSURE_NATURE_CACHE"); //股东证件类型字段请求数据字典的type值
-const CCertfCdeRules = ref([getRules("required", {})]);
+const CCertfClsType = ref('') //客户证件类型字段请求数据字典的type值
+const CCertfClsType2 = ref('') //股东证件类型字段请求数据字典的type值
+const CCertfCdeRules = ref([])  
+const CCertfCdeRules2 = ref([])  
 
-const selected = ref<string | number>("");
 const user = ref<any>({});
 user.value = userStore.user || {};
 const insuranceLimit = new InsuranceLimit();
-const currentAction = ref("新增"); // add  update
+
+const codeListMap = reactive<any>({
+	Nature: [],
+  persionType: [], //性质选择个人时，证件类型下拉值
+  companyType: [],  //性质选择法人时，证件类型下拉值
+})
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -69,77 +73,75 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         func: () => {
-          freeEditRef.value?.setFormValue({
-            COperId: "",
-            CDptCde: "",
-          });
-          handleQuery();
+          CCertfCdeRules.value = []
+          CCertfCdeRules2.value = []
+          freeEditRef.value?.resetFields()
         },
       }),
     ],
     fromSchema: [
       {
-        prop: "CClntMrk",
+        prop: "customerNature",
         inputtype: "rtselect",
         title: "客户性质",
         clearable: true,
-        typeCode: "INSURE_NATURE_CACHE",
-        param: {},
+        loadData: [],
         func: (val) => {
-          handleNatureChange(val);
-        },
+          handleNatureChange(val)
+        }
       },
       {
-        prop: "CCertfCls",
+        prop: "customerIdType",
         inputtype: "rtselect",
         title: "客户证件类型",
         clearable: true,
-        typeCode: CCertfClsType,
-        param: {},
+        loadData: [],
         func: (val) => {
-          handleCertificateChange(val);
-        },
+          handleCertificateChange(val)
+        }
       },
       {
-        prop: "CCertfCde",
+        prop: "customerIdNumber",
         inputtype: "rtinput",
         title: "客户证件号码",
         clearable: true,
-        rules: CCertfCdeRules,
+        rules: CCertfCdeRules
       },
       {
-        prop: "CAppNme",
+        prop: "customerName",
         inputtype: "rtinput",
         title: "客户名称",
         clearable: true,
       },
       {
-        prop: "CClntMrk",
+        prop: "shareholderNature",
         inputtype: "rtselect",
         title: "股东性质",
         clearable: true,
-        typeCode: "INSURE_NATURE_CACHE",
-        param: {},
+        loadData: [],
         func: (val) => {
-          handleNatureChange2(val);
-        },
+          handleNatureChange2(val)
+        }
       },
       {
-        prop: "CCertfCls",
+        prop: "shareholderIdType",
         inputtype: "rtselect",
         title: "股东证件类型",
         clearable: true,
-        typeCode: CCertfClsType2,
-        param: {},
+        loadData: [],
+        func: (val) => {
+          handleCertificateChange2(val)
+        },
       },
       {
-        prop: "CCertfCde",
+        prop: "shareholderIdNumber",
         inputtype: "rtinput",
         title: "股东证件号码",
         clearable: true,
+        rules: CCertfCdeRules2,
       },
       {
-        prop: "CAppNme",
+        prop: "shareholderName",
         inputtype: "rtinput",
         title: "股东名称",
         clearable: true,
@@ -165,7 +167,7 @@ const tableconfig = reactive<AppTableConfig>(
         label: "新增",
         type: "success",
         func: function () {
-          openEdit("新增");
+          openEdit('save')
         },
       }),
     ],
@@ -181,120 +183,123 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Edit",
         tableClick: (row) => {
-          openEdit("修改", row.cOpgrpCde);
+          openEdit('update', row.cPkId)
+        },
+      }),
+      createFreeButtonBase({
+        id: "score",
+        link: true,
+        tooltip: "删除",
+        type: "danger",
+        size: "large",
+        icon: "Delete",
+        tableClick: (row) => {
+          deleteData(row.cPkId)
         },
       }),
     ],
 
     fromSchema: [
       {
-        prop: "cOpgrpMemo",
-        inputtype: "rtinput",
-        title: "序号",
-      },
-      {
-        prop: "cOpgrpMemo",
+        prop: "customerNature",
         inputtype: "rtinput",
         title: "客户性质",
+        formatter: (val) => {
+          const item = codeListMap['Nature'].find((item: any) => item.value === val);
+          return item ? item.label : val
+        }
       },
       {
-        prop: "cOpgrpMemo",
+        prop: "customerIdType",
         inputtype: "rtinput",
         title: "客户证件类型",
+        formatter: (val, row) => {
+          let tempData = []
+          if(row.customerNature == '1') { //个人
+            tempData = codeListMap['persionType']
+          } else {
+            tempData = codeListMap['companyType']
+          }
+          const item = tempData.find((item: any) => item.value === val);
+          return item ? item.label : val
+        }
       },
       {
-        prop: "cOpgrpMemo",
+        prop: "customerIdNumber",
         inputtype: "rtinput",
         title: "客户证件号码",
       },
       {
-        prop: "cOpgrpMemo",
+        prop: "customerName",
         inputtype: "rtinput",
         title: "客户名称",
       },
       {
-        prop: "cOpgrpMemo",
+        prop: "shareholderNature",
         inputtype: "rtinput",
         title: "股东性质",
+        formatter: (val) => {
+          const item = codeListMap['Nature'].find((item: any) => item.value === val);
+          return item ? item.label : val
+        }
       },
       {
-        prop: "cOpgrpMemo",
+        prop: "shareholderIdType",
         inputtype: "rtinput",
         title: "股东证件类型",
+        formatter: (val, row) => {
+          let tempData = []
+          if(row.shareholderNature == '1') { //个人
+            tempData = codeListMap['persionType']
+          } else {
+            tempData = codeListMap['companyType']
+          }
+          const item = tempData.find((item: any) => item.value === val);
+          return item ? item.label : val
+        }
       },
       {
-        prop: "cOpgrpMemo",
+        prop: "shareholderIdNumber",
         inputtype: "rtinput",
         title: "股东证件号码",
       },
       {
-        prop: "cOpgrpMemo",
+        prop: "shareholderName",
         inputtype: "rtinput",
         title: "股东名称",
       },
       {
-        prop: "cOpgrpMemo",
+        prop: "stringNAmt",
         inputtype: "rtinput",
         title: "保额/限额",
       },
-    ],
+    ]
   })
 );
 
-// // 证件号码
-// const idCard = (rule: any, value: any, callback: any) => {
-//   return BaseCheck.idCard(value) ? callback(BaseCheck.idCard(value)): callback();
-// }
-// //统一社会信用代码校验
-// const socialCode = (rule: any, value: any, callback: any) => {
-//   return BaseCheck.socialCode(value)?callback(BaseCheck.socialCode(value)):callback();
-// }
-// //组织机构校验
-// const orgCode = (rule: any, value: any, callback: any) => {
-//   return BaseCheck.orgCode(value)?callback(BaseCheck.orgCode(value)):callback();
-// }
-// /**
-//  *自然人姓名
-//  */
-//  const perName = (rule: any, value: any, callback: any) => {
-//   return BaseCheck.perName(value)?callback(BaseCheck.perName(value)):callback();
-// }
-const rules = reactive({
-  CClntMrk: [{ required: true, message: "不能为空!", trigger: "change" }],
-  CCertfCls: [{ required: true, message: "不能为空!", trigger: "change" }],
-  CCertfCde: [
-    { required: true, message: "不能为空!", trigger: "blur" },
-    // { validator: idCard, trigger: 'blur' },
-    { max: 20, message: "长度不能超过 20 个字符", trigger: "blur" },
-  ],
-  CAppNme: [
-    { required: true, message: "不能为空!", trigger: "blur" },
-    // { validator: perName, trigger: 'blur' },
-    { max: 50, message: "长度不能超过 50 个字符", trigger: "blur" },
-  ],
-});
-
 const handleQuery = (flag = true) => {
-  submitForm(flag);
-};
+  submitForm(flag)
+}
 const submitForm = (flag) => {
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
       refreshData(flag);
     } else {
-      console.log("error submit!!");
+      console.log('error submit!!');
       return false;
     }
   });
 };
 
+
 const refreshData = (reset = true) => {
   const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
-  const s = freeEditRef.value?.getFromValue();
-  const params = Object.assign(s, r);
+  const s = freeEditRef.value?.getFromValue()
+  const params = Object.assign(s, r)
+  params.scenarioType = '1'
   insuranceLimit.qryList(params).then((res: any) => {
-    if (res.code === 200) {
-      const pageData = res.data;
+    if (res.code == '1') {
+      const pageData = res;
       if (pageData) {
         pageresult.total = pageData.total;
         pageresult.list = pageData.result;
@@ -305,59 +310,139 @@ const refreshData = (reset = true) => {
 
 //客户性质  根据个人/法人选择 展示不同的证件类型投标人性质
 const handleNatureChange = (value: string) => {
-  if (value === "1") {
-    CCertfClsType.value = "NATURAL_CERTIFICATE_CACHE";
-  } else if (value === "0") {
-    CCertfClsType.value = "UN_NATURAL_CERTIFICATE_CACHE";
+  const item = freeEditRef.value?.getFromSchemaItem('customerIdType')
+  if (value === '1') {
+    item['loadData'] = codeListMap['persionType']
+  } else if (value === '0') {
+    item['loadData'] = codeListMap['companyType']
   }
-};
+}
 
 //股东性质  根据个人/法人选择 展示不同的证件类型投标人性质
 const handleNatureChange2 = (value: string) => {
-  if (value === "1") {
-    CCertfClsType.value2 = "NATURAL_CERTIFICATE_CACHE";
-  } else if (value === "0") {
-    CCertfClsType.value2 = "UN_NATURAL_CERTIFICATE_CACHE";
+  const item = freeEditRef.value?.getFromSchemaItem('shareholderIdType')
+  if (value === '1') {
+    item['loadData'] = codeListMap['persionType']
+  } else if (value === '0') {
+    item['loadData'] = codeListMap['companyType']
   }
-};
+}
 
 //证件类型change
 const handleCertificateChange = (value: string) => {
-  freeEditRef.value?.setValue("CCertfCde", ""); //清空客户证件号码值
-  freeEditRef.value.clearValidate("CCertfCde"); //客户证件号码
-  if (value == "120001") {
-    CCertfCdeRules.value = [getRules("idCard", {}), getRules("required", {})];
-  } else if (value == "110005") {
-    CCertfCdeRules.value = [
-      getRules("required", {}),
-      getRules("socialCode", {}),
-    ];
-  } else if (value == "110001") {
-    CCertfCdeRules.value = [getRules("required", {}), getRules("orgCode", {})];
+  freeEditRef.value?.setValue('customerIdNumber', null) //清空客户证件号码值
+  freeEditRef.value.clearValidate('customerIdNumber') //
+  freeEditRef.value?.setValue('customerName', null) //清空客户名称值
+  freeEditRef.value.clearValidate('customerName')
+  if (value == '120001') { // 身份证号
+    CCertfCdeRules.value = [getRules("idCard", {})]
+  } else if (value == '110007') { // 统一社会信用代码
+    CCertfCdeRules.value = [getRules("socialCode", {})]
+  } else if (value == '110001') { // 组织机构
+    CCertfCdeRules.value = [getRules("orgCode", {})]
+  } else if(value == '120002') { // 护照
+    CCertfCdeRules.value = [getRules("passPort", {})]
+  } else if(value == '19') { //外国人永久居留身份证
+    CCertfCdeRules.value = [getRules("ariCard", {})]
+  } else if ('110002' === value) {  // 营业执照
+    CCertfCdeRules.value = [getRules("businessLicense", {})]
   } else {
-    CCertfCdeRules.value = [getRules("required", {})];
+    CCertfCdeRules.value = [getRules("maxLength", {len: 20})]
+  }
+};
+
+//股东证件类型change
+const handleCertificateChange2 = (value: string) => {
+  freeEditRef.value?.setValue('shareholderIdNumber', '') //清空股东证件号码值
+  freeEditRef.value?.clearValidate('shareholderIdNumber')
+  freeEditRef.value?.setValue('shareholderName', '') //清空股东证件号码值
+  freeEditRef.value?.clearValidate('shareholderName')
+  if (value == '120001') { // 身份证号
+    CCertfCdeRules2.value = [getRules("idCard", {})]
+  } else if (value == '110007') { // 统一社会信用代码
+    CCertfCdeRules2.value = [getRules("socialCode", {})]
+  } else if (value == '110001') { // 组织机构
+    CCertfCdeRules2.value = [getRules("orgCode", {})]
+  } else if(value == '120002') { // 护照
+    CCertfCdeRules2.value = [getRules("passPort", {})]
+  } else if(value == '19') { //外国人永久居留身份证
+    CCertfCdeRules2.value = [getRules("ariCard", {})]
+  } else if ('110002' === value) {  // 营业执照
+    CCertfCdeRules2.value = [getRules("businessLicense", {})]
+  } else {
+    CCertfCdeRules2.value = [getRules("maxLength", {len: 20})]
   }
 };
 
 const openEdit = (type: string, id?: string) => {
-  if (type === "修改" && !id) {
-    ElMessage.warning("请选择一条记录");
-    return;
-  }
-  currentAction.value = type;
-  selected.value = id;
-  dzmodal
-    .open(AddOrEdit, { actionType: currentAction, pageType: "all" })
-    .then((res) => {
-      if (res.type === "ok") {
-        console.log("dzmodel", res.body);
-      }
-    });
+  dzmodal.open(AddOrEdit, { actionType: type, pageType: 'all', cPkId: id}).then((res) => {
+    if (res.type === "ok") {
+      handleQuery();
+    }
+  });
 };
 
+const deleteData = (id) => {
+  ElMessageBox.confirm('确认要删除吗？该数据删除之后将无法恢复。', '提示', {
+    confirmButtonText: '删除',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    insuranceLimit.delData({ cPkId: id }).then((res: any) => {
+      if (res.code == '1') {
+        ElMessage.success(res.msg);
+        handleQuery();
+      } else {
+        ElMessage.error(res.msg);
+      }
+    });
+  }).catch(() => {
+    //防止报错
+  })
+}
+
 onMounted(() => {
-  refreshData();
+  // 客户性质/股东性质
+	codeListStore.queryCodeList({
+		codeListName: 'INSURE_NATURE_CACHE',
+		codeListParam: { }
+	}, false, true).then(res => {
+		if (res) {
+      nextTick(() => {
+        const item = freeEditRef.value.getFromSchemaItem('customerNature')
+        const item2 = freeEditRef.value.getFromSchemaItem('shareholderNature')
+        item.loadData = res
+        item2.loadData = res
+      })
+			codeListMap['Nature'] = res;
+		}
+	}, () => {
+		ElMessage.error('后台服务异常,请联系管理员');
+	});
+  // 证件类型 - 个人
+	codeListStore.queryCodeList({
+		codeListName: 'NATURAL_CERTIFICATE_CACHE',
+		codeListParam: { }
+	}, false, true).then(res => {
+		if (res) {
+			codeListMap['persionType'] = res;
+		}
+	}, () => {
+		ElMessage.error('后台服务异常,请联系管理员');
+	});
+  // 证件类型 - 法人
+	codeListStore.queryCodeList({
+		codeListName: 'UN_NATURAL_CERTIFICATE_CACHE',
+		codeListParam: { }
+	}, false, true).then(res => {
+		if (res) {
+			codeListMap['companyType'] = res;
+		}
+	}, () => {
+		ElMessage.error('后台服务异常,请联系管理员');
+	});
 });
+
 </script>
 
 <style scoped lang="scss">
@@ -389,12 +474,13 @@ onMounted(() => {
 
 .col-button {
   flex: 0 0 100%;
+
 }
 </style>
 <style lang="scss">
 .addRoleConfirmPop {
   .el-message-box__container {
-    display: block;
+    display: block
   }
 }
 </style>

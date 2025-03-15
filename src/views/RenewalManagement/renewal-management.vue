@@ -1,4 +1,4 @@
-<!-- 配置 -->
+<!-- 续保管理 -->
 <template>
   <div class="app-container">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
@@ -65,7 +65,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       }),
       createFreeButtonBase({
         label: "导出",
-        func: () => {},
+        func: () => {
+          
+        },
       }),
     ],
     fromSchema: [
@@ -94,10 +96,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cStatus",
         inputtype: "rtradio",
         title: "包含下级机构",
-        loadData: [
-          { label: "是", value: 1 },
-          { label: "否", value: 0 },
-        ],
+        loadData :[
+          { label:'是',value:1 },
+          { label:'否',value:0 },
+        ]
       },
       {
         prop: "tm",
@@ -188,7 +190,9 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         size: "large",
         icon: "Document",
-        tableClick: (row) => {},
+        tableClick: (row) => {
+           
+        },
       }),
       createFreeButtonBase({
         id: "score",
@@ -197,7 +201,9 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         size: "large",
         icon: "Document",
-        tableClick: (row) => {},
+        tableClick: (row) => {
+           
+        },
       }),
     ],
 
@@ -207,7 +213,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "二级机构",
         minWidth: 180,
-        fixed: "left",
+        fixed: 'left',
       },
       {
         prop: "b",
@@ -257,26 +263,21 @@ const tableconfig = reactive<AppTableConfig>(
 
 onMounted(async () => {
   //首页跳转过来的逻辑 Start
-  if (sessionStorage.getItem("renewPolicy")) {
+  if(sessionStorage.getItem('renewPolicy')) {
     //首页 暂存任务跳转过来的,选中投保单
-    const homeJumpData = JSON.parse(sessionStorage.getItem("renewPolicy"));
-    await nextTick();
-    freeEditRef.value.setValue("tm", [
-      homeJumpData.startBsTm1,
-      homeJumpData.endBsTm1,
-    ]);
-    if (homeJumpData.hasOwnProperty("objId")) {
-      //投保单号
-      freeEditRef.value.setValue("appCde", homeJumpData.objId);
+    const homeJumpData = JSON.parse(sessionStorage.getItem('renewPolicy'))
+    await nextTick()
+    freeEditRef.value.setValue('tm', [homeJumpData.startBsTm1, homeJumpData.endBsTm1])
+    if(homeJumpData.hasOwnProperty('objId')) { //投保单号
+      freeEditRef.value.setValue('appCde', homeJumpData.objId)
     }
-  }
+  } 
   //首页跳转过来的逻辑 End
 });
 onUnmounted(() => {
   //组件销毁，清除sessionStorage数据
-  sessionStorage.getItem("renewPolicy") &&
-    sessionStorage.removeItem("renewPolicy");
-});
+  sessionStorage.getItem('renewPolicy') && sessionStorage.removeItem('renewPolicy')
+})
 
 // 绑定方法
 const method = {
@@ -299,13 +300,13 @@ const exRules = {
 
 const handleQuery = (flag = true) => {
   freeEditRef.value?.validate().then((isValid) => {
-    if (isValid) {
-      refreshData(flag);
+    if(isValid) {
+      refreshData(flag)
     } else {
       ElMessage.error("请填写必填项");
     }
-  });
-};
+  })
+}
 
 /** 查询 */
 function refreshData(flag?: boolean) {
@@ -328,9 +329,10 @@ function refreshData(flag?: boolean) {
 
 // 多选事件
 function handleSelectionChange(selection: any) {
-  console.log("selection", selection);
+  console.log('selection',selection)
   removeIds.value = selection.map((item: any) => item.cPkId);
 }
+
 </script>
 
 <style scoped></style>

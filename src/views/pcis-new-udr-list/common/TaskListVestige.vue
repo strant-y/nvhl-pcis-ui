@@ -1,4 +1,4 @@
-<!-- 配置 -->
+<!-- 核保任务查询 任务痕迹 -->
 <template>
   <el-dialog
     v-model="dialogVisible"
@@ -52,13 +52,11 @@ const removeIds = ref([]); // 删除用户ID集合 用于批量删除
 const dialogVisible = ref(true);
 
 const props = defineProps({
-  sysType: {
-    // 系统类型
+  sysType: {// 系统类型
     type: String,
     required: true,
   },
-  objId: {
-    // 申请单号
+  objId: {// 申请单号
     type: String,
     required: true,
   },
@@ -87,7 +85,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "任务名称",
         minWidth: 180,
-        fixed: "left",
+        fixed: 'left',
       },
       {
         prop: "type",
@@ -170,16 +168,14 @@ const method = {
   },
 };
 
+
 /** 查询 */
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
-  const param = Object.assign(
-    {
-      objId: props.objId,
-      sysType: props.sysType,
-    },
-    r
-  );
+  const param = Object.assign({
+    objId: props.objId,
+    sysType: props.sysType,
+  }, r);
   getTaskVestige(param)
     .then((res) => {
       const { code, data, msg } = res;
@@ -192,6 +188,7 @@ function handleQuery(flag?: boolean) {
     })
     .finally(() => {});
 }
+
 </script>
 
 <style scoped></style>

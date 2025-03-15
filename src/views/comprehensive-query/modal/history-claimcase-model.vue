@@ -1,3 +1,4 @@
+<!-- 综合查询-历史赔案 -->
 <template>
   <div >
     <el-dialog  v-model="maindialogVisible" width="90%" title="历史赔案">

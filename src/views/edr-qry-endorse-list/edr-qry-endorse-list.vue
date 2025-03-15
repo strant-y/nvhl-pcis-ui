@@ -1,49 +1,25 @@
 <template>
   <div class="app-container">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
-    <app-table
-      :tableConfig="tableconfig"
-      v-model:pageresult="pageresult"
-      ref="tableRef"
-      @page-change="handleQuery(false)"
-      @row-click="handleRowClick"
-      @row-dblclick="handleRowDoubleClick"
-      @sort-change="sortChange"
-    />
+    <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
+      @page-change="handleQuery(false)" @row-click="handleRowClick" @row-dblclick="handleRowDoubleClick"
+      @sort-change="sortChange" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { defineComponent, ref, reactive, onMounted, watch } from "vue";
-import {
-  ElForm,
-  ElFormItem,
-  ElSelect,
-  ElOption,
-  ElSwitch,
-  ElCascader,
-  ElInput,
-  ElDatePicker,
-  ElButton,
-  ElTable,
-  ElTableColumn,
-  ElPagination,
-  ElDialog,
-} from "element-plus";
-import { useRouter, useRoute } from "vue-router";
-import { ElMessage, ElMessageBox } from "element-plus";
-import moment from "moment";
-import OrgDptModel from "@/components/common/DepartmentTree.vue";
-import ChangeImageUploadModeComponent from "./change-image-upload-mode.vue";
-import { PcisEdrQueryService } from "./service/pcis-edr-query-service";
-import { getListByCode } from "@/api/code-list-service";
+import { defineComponent, ref, reactive, onMounted, watch } from 'vue';
+import { ElForm, ElFormItem, ElSelect, ElOption, ElSwitch, ElCascader, ElInput, ElDatePicker, ElButton, ElTable, ElTableColumn, ElPagination, ElDialog } from 'element-plus';
+import { useRouter, useRoute } from 'vue-router';
+import { ElMessage, ElMessageBox } from 'element-plus';
+import moment from 'moment';
+import OrgDptModel from '@/components/common/DepartmentTree.vue';
+import ChangeImageUploadModeComponent from './change-image-upload-mode.vue';
+import { PcisEdrQueryService } from './service/pcis-edr-query-service';
+import { getListByCode } from '@/api/code-list-service';
 import { useUserStore } from "@/store/modules/user";
-import { AppKey } from "@/constants/api";
-import {
-  DEFERRED_CORRECTION,
-  SCENE_EDR_APP_NEW,
-  SCENE_PLY_APP_READ,
-} from "@/constants/tab-constants";
+import { AppKey } from '@/constants/api';
+import { DEFERRED_CORRECTION, SCENE_EDR_APP_NEW, SCENE_PLY_APP_READ } from '@/constants/tab-constants';
 
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import {
@@ -65,37 +41,24 @@ const dzmodal = useDzModal();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<MyTableMethod | null>(null);
 const userStore = useUserStore();
-const user = ref(userStore.user);
+const user = ref(userStore.user)
 
 const props = defineProps({
   activeName: {
     type: String,
-    required: true,
-  },
-});
+    required: true
+  }
+})
 const router = useRouter();
 const route = useRoute();
 const pcisEdrQueryService = new PcisEdrQueryService();
 
-const CIESence = ref(false);
 const routeData = route.query || route.params;
 //todo 假数据，为了让按钮展示出来
-routeData.rsnTyp = "1";
+routeData.rsnTyp = '1'
 
-if (routeData["CIESence"]) {
-  CIESence.value = true;
-}
 
 const form = reactive(freeEditRef.value?.getFromValue()); //获取表单数据
-
-const rules = reactive({
-  CDptCde: [
-    { required: !CIESence.value, message: "请选择机构部门", trigger: "change" },
-  ],
-  CCommodityNo: [
-    { required: CIESence.value, message: "请选择商品", trigger: "change" },
-  ],
-});
 
 const sortField = ref(null);
 const sortOrder = ref(null);
@@ -104,14 +67,15 @@ const rsnCde = ref({});
 const rsnDetail = ref({});
 const codeListMap = ref({});
 const dialogVisible = ref(false);
-const dialogTitle = ref("");
+const dialogTitle = ref('');
 const dialogComponent = ref(null);
 const dialogData = ref({});
 
-const orgDptOptions = ref<any>([]);
-const commodityOptions = ref<any>([]);
-const kindOptions = ref<any>([]);
-const prodOptions = ref<any>([]);
+
+const orgDptOptions = ref<any>([])
+const commodityOptions = ref<any>([])
+const kindOptions = ref<any>([])
+const prodOptions = ref<any>([])
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -127,7 +91,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         func: () => {
-          freeEditRef.value?.resetFields();
+          freeEditRef.value?.resetFields()
         },
       }),
     ],
@@ -138,6 +102,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "归属机构名称",
         showExBtn: true,
         disabled: true,
+        rules: [getRules("required", {})],
         btnItems: {
           icon: "Search",
           type: "primary",
@@ -146,44 +111,37 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               if (res.type === "ok") {
                 if (results && results.body) {
                   const cde = results.body.id;
-                  freeEditRef.value?.setValue("CDptCde", cde); //获取表单数据
+                  freeEditRef.value?.setValue('CDptCde', cde); //获取表单数据
                 }
               }
             });
-          },
-        },
+          }
+        }
       },
       {
         prop: "CLoadSub",
         inputtype: "rtradio",
         title: "是否包含下级",
         loadData: [
-          { label: "是", value: 1 },
-          { label: "否", value: 0 },
-        ],
+          { label: '是', value: 1 },
+          { label: '否', value: 0 },
+        ]
       },
       {
         prop: "CKindNo",
         inputtype: "rtcascader",
         title: "产品大类",
         clearable: true,
-        typeCode: "KIND_LIST_GRT",
-        param: {
-          cOperId: user.value["opCde"],
-          cDptCde: user.value["companyId"],
-        },
+        typeCode: "KIND_LIST_CACHE",
+        param: { cOperId: user.value['opCde'], cDptCde: user.value['companyId'] },
       },
       {
         prop: "CProdNo",
         inputtype: "rtcascader",
         title: "条款",
         clearable: true,
-        typeCode: "PROD_LIST_GRT",
-        param: {
-          cParCde: "",
-          cOperId: user.value["opCde"],
-          cDptCde: user.value["companyId"],
-        },
+        typeCode: "PROD_LIST",
+        param: { cParCde: '', cOperId: user.value['opCde'], cDptCde: user.value['companyId'] },
       },
       {
         prop: "CInsuredNme",
@@ -210,9 +168,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "datetimerange",
         format: "YYYY-MM-DD HH:mm:ss",
         valueFormat: "YYYY-MM-DD HH:mm:ss",
+        rules: [getRules("required", {})],
         func: (val) => {
-          handleDateChange(val);
-        },
+          handleDateChange(val)
+        }
       },
     ],
   })
@@ -226,32 +185,11 @@ const pageresult = reactive<Pageresult>({
   total: 0,
 });
 
-const editList = ref([]);
-const editListData = ref([]);
-if (!CIESence.value) {
-  editList.value = ["id", "iddetail"];
-  editListData.value = [
-    {
-      prop: "id",
-      inputtype: "rtinput",
-      title: "批改原因",
-    },
-    {
-      prop: "iddetail",
-      inputtype: "rtinput",
-      title: "批改原因详细",
-    },
-  ];
-} else {
-  editList.value = [];
-  editListData.value = [];
-}
-
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     showSelection: false,
     editFlag: true,
-    editList: editList.value,
+    editList: ["id", "iddetail"],
     tableBtnType: "btn",
     tableBtnWidth: 220,
     tableBtnPosition: "right",
@@ -264,7 +202,7 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Edit",
         tableClick: (row) => {
-          openEdr(row.cAppNo, row.cPlyNo, row.cProdNo, row.cKindNo, row);
+          openEdr(row.cAppNo, row.cPlyNo, row.cProdNo, row.cKindNo, row)
         },
       }),
       createFreeButtonBase({
@@ -275,122 +213,128 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "View",
         tableClick: (row) => {
-          showDetails(row.cAppNo, row.cPlyNo, row.cProdNo, row.cKindNo, row);
+          showDetails(row.cAppNo, row.cPlyNo, row.cProdNo, row.cKindNo, row)
         },
       }),
     ],
     fromSchema: [
       {
         prop: "cAppNo",
-        inputtype: "rtinput",
+        inputtype: 'rtinput',
         title: "申请单号",
       },
       {
         prop: "cPlyNo",
-        inputtype: "rtinput",
+        inputtype: 'rtinput',
         title: "保单号",
       },
       {
         prop: "cEdrNo",
-        inputtype: "rtinput",
+        inputtype: 'rtinput',
         title: "批单号",
       },
       {
         prop: "cAppNme",
-        inputtype: "rtinput",
+        inputtype: 'rtinput',
         title: "投保人",
       },
       {
         prop: "tAppTm",
-        inputtype: "rtinput",
+        inputtype: 'rtinput',
         title: "投保日期",
         sortable: "custom",
       },
       {
         prop: "cProdNmeCn",
-        inputtype: "rtinput",
+        inputtype: 'rtinput',
         title: "产品",
       },
       {
         prop: "cGrpMrk",
-        inputtype: "rtinput",
+        inputtype: 'rtinput',
         title: "是否团单",
       },
-      ...editListData.value,
+      {
+        prop: "id",
+        inputtype: 'rtinput',
+        title: "批改原因",
+      },
+      {
+        prop: "iddetail",
+        inputtype: 'rtinput',
+        title: "批改原因详细",
+      },
     ],
   })
 );
 
+
 const handleDateChange = (value) => {
-  let startDate,
-    endDate = "";
-  startDate = moment(new Date(value[0])).format("YYYY-MM-DD");
-  endDate = moment(new Date(value[1])).format("YYYY-MM-DD");
-  console.log("时间", startDate, endDate);
-};
+  let startDate, endDate = ''
+  startDate = moment(new Date(value[0])).format('YYYY-MM-DD')
+  endDate = moment(new Date(value[1])).format('YYYY-MM-DD')
+  console.log('时间', startDate, endDate)
+}
 
 const handleQuery = (flag = true) => {
-  submitForm(flag);
-};
+  submitForm(flag)
+}
 
 const submitForm = (flag) => {
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
       refreshData(flag);
-    } else {
-      ElMessage.warning("表单验证不通过，请检查！");
     }
   });
 };
 
+
 const refreshData = (reset = true) => {
-  const formData = freeEditRef.value?.getFromValue();
+  const formData = freeEditRef.value?.getFromValue()
   if (!formData.CPlyNo) {
-    const startTemp =
-      formData.TAppTm && formData.TAppTm.length > 1 ? formData.TAppTm[0] : null;
+    const startTemp = formData.TAppTm && formData.TAppTm.length > 1 ? formData.TAppTm[0] : null
     if (null == startTemp || undefined === startTemp) {
-      ElMessage.warning("投保起期不能为空");
+      ElMessage.warning('投保起期不能为空');
       return;
     }
     const start = Date.parse(startTemp);
-    const endTemp =
-      formData.TAppTm && formData.TAppTm.length > 1 ? formData.TAppTm[1] : null;
+    const endTemp = formData.TAppTm && formData.TAppTm.length > 1 ? formData.TAppTm[1] : null
     if (null == endTemp || undefined === endTemp) {
-      ElMessage.warning("投保止期不能为空");
+      ElMessage.warning('投保止期不能为空');
       return;
     }
     const end = Date.parse(endTemp);
     if (start - end > 0) {
-      ElMessage.warning("投保起期不能大于投保止期");
+      ElMessage.warning('投保起期不能大于投保止期');
       return;
     }
     if (end - start >= 7 * 1000 * 60 * 60 * 24) {
-      ElMessage.warning("投保时间范围请控制在7天以内");
+      ElMessage.warning('投保时间范围请控制在7天以内');
       return;
     }
   }
   const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   if (s.CLoadSub) {
-    s.CLoadSub = "1";
+    s.CLoadSub = '1';
   }
   const obj = {
     sortField: sortField.value,
     sortOrder: sortOrder.value,
-    CurrentUser: user["opCde"],
-    CurrentUserOrg: user["companyId"],
-    CCommodityType: CIESence.value ? "3" : null,
+    CurrentUser: user['opCde'],
+    CurrentUserOrg: user['companyId'],
+    CCommodityType: null,
   };
-  const params = Object.assign(s, r, obj);
+  const params = Object.assign(s, r, obj)
   sessionStorage.setItem(AppKey.query.pcis_query_endorse, params);
 
   pcisEdrQueryService.qryEndorseList(params).then((res: any) => {
-    if (null != res && null != res["code"]) {
-      if (res["code"] === 200) {
+    if (null != res && null != res['code']) {
+      if (res['code'] === 200) {
         const pageData = res.data;
         if (pageData) {
           pageresult.total = pageData.total;
-          pageData.result.forEach((item) => {
+          pageData.result.forEach(item => {
             changeRsnValue(item);
           });
           pageresult.list = pageData.result;
@@ -400,18 +344,22 @@ const refreshData = (reset = true) => {
   });
 };
 
+//table的单击事件，这个需要调整，看是否还需要保留这个！！！
 const handleRowClick = (row) => {
   selected.value = row;
 };
 
+// table表格的双击事件
 const handleRowDoubleClick = (row) => {
   openEdr(row.cAppNo, row.cPlyNo, row.cProdNo, row.cKindNo, row);
 };
-
+//投保日期的排序事件
 const sortChange = (column, prop, order) => {
   console.log(column, prop, order);
-};
 
+}
+
+// 缓存批改原因
 const changeRsn = (rsnCde, appNo, rsnDetail) => {
   if (appNo) {
     rsnCde.value[appNo] = rsnCde;
@@ -419,128 +367,121 @@ const changeRsn = (rsnCde, appNo, rsnDetail) => {
   }
 };
 
+// 处理批改原因详细
 const getDetailRsn = (item) => {
-  const grpMrk = item["cGrpMrk"].toString();
-  const prodNo = item["cProdNo"];
-  const isGrp = grpMrk !== "0" ? "1" : null;
-  const isPer = grpMrk === "0" ? "1" : null;
-  const rsnTyp = routeData["rsnTyp"];
+  const grpMrk = item['cGrpMrk'].toString();
+  const prodNo = item['cProdNo'];
+  const isGrp = grpMrk !== '0' ? '1' : null;
+  const isPer = grpMrk === '0' ? '1' : null;
+  const rsnTyp = routeData['rsnTyp'];
   const detail = [];
-  if (item["id"] === "FZ") {
-    getListByCode("EDR_RSN_LIST", {
-      prodNo: prodNo,
-      rsnTyp: rsnTyp,
-      isGrp: isGrp,
-      isPer: isPer,
-      calcMrk: "0",
-      ZH: "ZH",
-      FZ: "FZ",
-    }).then(
-      (cde2Res) => {
-        if (!codeListMap.value[prodNo + item["id"] + grpMrk]) {
-          codeListMap.value[prodNo + item["id"] + grpMrk] = cde2Res["data"];
-        }
-        detail.push(cde2Res["data"][0]["value"]);
-        setTimeout(() => {
-          item["iddetail"] = detail;
-          changeRsn(item["id"], item["cPlyNo"], item["iddetail"]);
-        }, 5);
-      },
-      (error) => {
-        console.log("出错了", error);
-        ElMessage.error("后台服务异常,请联系管理员");
+  if (item['id'] === 'FZ') { // 如果是非涉费批改
+    getListByCode('EDR_RSN_LIST', {
+      'prodNo': prodNo,
+      'rsnTyp': rsnTyp,
+      'isGrp': isGrp,
+      'isPer': isPer,
+      'calcMrk': '0',
+      'ZH': 'ZH',
+      'FZ': 'FZ'
+    }).then(cde2Res => {
+      if (!codeListMap.value[prodNo + item['id'] + grpMrk]) {
+        codeListMap.value[prodNo + item['id'] + grpMrk] = cde2Res['data'];
       }
-    );
+      detail.push(cde2Res['data'][0]['value']);
+      setTimeout(() => {
+        item['iddetail'] = detail;
+        // 缓存批改原因
+        changeRsn(item['id'], item['cPlyNo'], item['iddetail']);
+      }, 5);
+    }, error => {
+      console.log('出错了', error);
+      ElMessage.error('后台服务异常,请联系管理员');
+    });
   } else {
-    if (!codeListMap.value[prodNo + item["id"] + grpMrk]) {
-      codeListMap.value[prodNo + item["id"] + grpMrk] =
-        codeListMap.value[prodNo + grpMrk];
+    if (!codeListMap.value[prodNo + item['id'] + grpMrk]) {
+      codeListMap.value[prodNo + item['id'] + grpMrk] = codeListMap.value[prodNo + grpMrk];
     }
-    detail.push(item["id"]);
+    detail.push(item['id']);
     setTimeout(() => {
-      item["iddetail"] = detail;
-      changeRsn(item["id"], item["cPlyNo"], item["iddetail"]);
+      item['iddetail'] = detail;
+      // 缓存批改原因
+      changeRsn(item['id'], item['cPlyNo'], item['iddetail']);
     }, 5);
   }
 };
 
+// 批改原因处理
 const changeRsnValue = (item) => {
   const detail = [];
-  const rsnTyp = routeData["rsnTyp"];
+  const rsnTyp = routeData['rsnTyp'];
   selected.value = item;
-  const grpMrk = item["cGrpMrk"].toString();
-  const prodNo = item["cProdNo"];
-  const isGrp = grpMrk !== "0" ? "1" : null;
-  const isPer = grpMrk === "0" ? "1" : null;
-  if (
-    undefined === codeListMap.value[prodNo + grpMrk] ||
-    null === codeListMap.value[prodNo + grpMrk]
-  ) {
-    if (rsnTyp === "1") {
-      getListByCode("EDR_RSN_LIST", {
-        prodNo: prodNo,
-        kindNo: prodNo.substring(0, 2),
-        rsnTyp: rsnTyp,
-        isGrp: isGrp,
-        isPer: isPer,
-      }).then(
-        (cdeRes) => {
-          if (cdeRes && cdeRes["data"] && cdeRes["data"].length > 0) {
-            if (!codeListMap.value[prodNo + grpMrk]) {
-              codeListMap.value[prodNo + grpMrk] = cdeRes["data"];
-            }
-            item["id"] = cdeRes["data"][0]["value"];
-            getDetailRsn(item);
+  const grpMrk = item['cGrpMrk'].toString();
+  const prodNo = item['cProdNo'];
+  const isGrp = grpMrk !== '0' ? '1' : null;
+  const isPer = grpMrk === '0' ? '1' : null;
+  if (undefined === codeListMap.value[prodNo + grpMrk] || null === codeListMap.value[prodNo + grpMrk]) {
+    // 当缓存中无该产品的批改原因时
+    if (rsnTyp === '1') { // 一般批改
+      getListByCode('EDR_RSN_LIST', {
+        'prodNo': prodNo,
+        'kindNo': prodNo.substring(0, 2),
+        'rsnTyp': rsnTyp,
+        'isGrp': isGrp,
+        'isPer': isPer
+      }).then(cdeRes => {
+        if (cdeRes && cdeRes['data'] && cdeRes['data'].length > 0) {
+          if (!codeListMap.value[prodNo + grpMrk]) {
+            codeListMap.value[prodNo + grpMrk] = cdeRes['data'];
           }
-        },
-        (error) => {
-          console.log("出错了", error);
-          ElMessage.error("后台服务异常,请联系管理员");
+          item['id'] = cdeRes['data'][0]['value'];
+          // 处理批改原因详细
+          getDetailRsn(item);
         }
-      );
-    } else {
-      getListByCode("EDR_RSN_LIST_KIND", {
-        kindNo: prodNo.substring(0, 2),
-        rsnTyp: rsnTyp,
-      }).then(
-        (cdeRes) => {
-          if (!!cdeRes && !!cdeRes["data"] && cdeRes["data"].length > 0) {
-            if (!codeListMap.value[prodNo + grpMrk]) {
-              codeListMap.value[prodNo + grpMrk] = cdeRes["data"];
-            }
-            item["id"] = cdeRes["data"][0]["value"];
-            getDetailRsn(item);
+      }, error => {
+        console.log('出错了', error);
+        ElMessage.error('后台服务异常,请联系管理员');
+      });
+    } else { // 退保注销
+      getListByCode('EDR_RSN_LIST_KIND', {
+        'kindNo': prodNo.substring(0, 2),
+        'rsnTyp': rsnTyp
+      }).then(cdeRes => {
+        if (!!cdeRes && !!cdeRes['data'] && cdeRes['data'].length > 0) {
+          if (!codeListMap.value[prodNo + grpMrk]) {
+            codeListMap.value[prodNo + grpMrk] = cdeRes['data'];
           }
-        },
-        (error) => {
-          console.log("出错了", error);
-          ElMessage.error("后台服务异常,请联系管理员");
+          item['id'] = cdeRes['data'][0]['value'];
+          // 处理批改原因详细
+          getDetailRsn(item);
         }
-      );
+      }, error => {
+        console.log('出错了', error);
+        ElMessage.error('后台服务异常,请联系管理员');
+      });
     }
   } else {
-    item["id"] = item["id"]
-      ? item["id"]
-      : codeListMap.value[prodNo + grpMrk][0]["value"];
-    if (
-      undefined === codeListMap.value[prodNo + item["id"] + grpMrk] ||
-      null === codeListMap.value[prodNo + item["id"] + grpMrk]
-    ) {
+    // 当缓存中有该产品的批改原因时
+    item['id'] = item['id'] ? item['id'] : codeListMap.value[prodNo + grpMrk][0]['value'];
+    if (undefined === codeListMap.value[prodNo + item['id'] + grpMrk] || null === codeListMap.value[prodNo + item['id'] + grpMrk]) {
+      // 当缓存中无该产品批改原因详细时
+      // 处理批改原因详细
       getDetailRsn(item);
     } else {
-      if (item["id"] === "FZ") {
-        detail.push(
-          codeListMap.value[prodNo + item["id"] + grpMrk][0]["value"]
-        );
+      // 当缓存中有该产品批改原因详细时
+      if (item['id'] === 'FZ') {
+        detail.push(codeListMap.value[prodNo + item['id'] + grpMrk][0]['value']);
         setTimeout(() => {
-          item["iddetail"] = detail;
-          changeRsn(item["id"], item["cPlyNo"], item["iddetail"]);
+          item['iddetail'] = detail;
+          // 缓存批改原因
+          changeRsn(item['id'], item['cPlyNo'], item['iddetail']);
         }, 5);
       } else {
-        detail.push(item["id"]);
+        detail.push(item['id']);
         setTimeout(() => {
-          item["iddetail"] = detail;
-          changeRsn(item["id"], item["cPlyNo"], item["iddetail"]);
+          item['iddetail'] = detail;
+          // 缓存批改原因
+          changeRsn(item['id'], item['cPlyNo'], item['iddetail']);
         }, 5);
       }
     }
@@ -548,216 +489,150 @@ const changeRsnValue = (item) => {
 };
 
 const showDetails = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
-  if (null == selected.value[cPlyNo] || "" === selected.value[cPlyNo]) {
-    ElMessage.warning("请选择一条记录");
+  if (null == selected.value[cPlyNo] || '' === selected.value[cPlyNo]) {
+    ElMessage.warning('请选择一条记录');
     return;
   }
-  if (!selected.value[cPlyNo]) return;
+  if (!(selected.value[cPlyNo])) return
   const en = JSON.stringify({
     scene: SCENE_PLY_APP_READ,
-    CAppNo: selected.value["cAppNo"],
+    CAppNo: selected.value['cAppNo'],
     COrgAppNo: cAppNo,
-    CCiMrk: selected.value["cCiMrk"],
-    CProdNo: selected.value["cProdNo"],
-    CAppTyp: selected.value["cAppTyp"],
-    CGrpMrk: selected.value["cGrpMrk"],
-    CDptCde: selected.value["cDptCde"],
+    CCiMrk: selected.value['cCiMrk'],
+    CProdNo: selected.value['cProdNo'],
+    CAppTyp: selected.value['cAppTyp'],
+    CGrpMrk: selected.value['cGrpMrk'],
+    CDptCde: selected.value['cDptCde']
   });
 
   router.push({
-    path: "/index/endorse/detail",
+    path: '/index/endorse/detail',
     query: {
-      data: en,
-    },
+      data: en
+    }
   });
 };
 
 const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
   handleRowClick(data);
-  if (null == selected.value[cPlyNo] || "" === selected.value[cPlyNo]) {
-    ElMessage.warning("请选择一条记录");
+  if (null == selected.value[cPlyNo] || '' === selected.value[cPlyNo]) {
+    ElMessage.warning('请选择一条记录');
     return;
   }
-  if (
-    null == rsnCde.value[selected.value[cPlyNo]] ||
-    "" === rsnCde.value[selected.value[cPlyNo]]
-  ) {
-    ElMessage.warning("请选择批改原因");
+  if (null == rsnCde.value[selected.value[cPlyNo]] || '' === rsnCde.value[selected.value[cPlyNo]]) {
+    ElMessage.warning('请选择批改原因');
     return;
   }
-  if (
-    DEFERRED_CORRECTION === rsnCde.value[selected.value[cPlyNo]] &&
-    "020027" === cProdNo
-  ) {
-    ElMessage.warning("此产品暂不支持延期批改，请选择通用批改");
+  if (DEFERRED_CORRECTION === rsnCde.value[selected.value[cPlyNo]] && '020027' === cProdNo) {
+    ElMessage.warning('此产品暂不支持延期批改，请选择通用批改');
     return;
   }
-  if (CIESence.value) {
-    const en = JSON.stringify({
-      scene: SCENE_EDR_APP_NEW,
-      CAppNo: selected.value[cPlyNo],
-      COrgAppNo: cAppNo,
-      CRsnCde: rsnCde.value[selected.value[cPlyNo]],
-      CRsnDetailCde: transferRsnDetail(rsnDetail.value[selected.value[cPlyNo]]),
-      CProdNo: selected.value["cProdNo"],
-      CCiMrk: selected.value["cCiMrk"],
-      CGrpMrk: selected.value["cGrpMrk"],
-      CDptCde: selected.value["cDptCde"],
-      CEdrType: routeData["rsnTyp"],
-      CIESence: CIESence.value,
-    });
-    router.push({
-      path: "/index/endorse/surrenderEdit",
-      query: {
-        data: en,
-      },
-    });
-  } else {
-    const param = {
-      plyNo: cPlyNo,
-      edrType: routeData["rsnTyp"],
-      prodNo: cProdNo,
-      edrRsnCde: rsnCde.value[selected.value[cPlyNo]],
-    };
-    pcisEdrQueryService.validEndorse(param).then(
-      async (result) => {
-        if (200 !== result["code"]) {
-          ElMessage.error(result["msg"]);
-        } else {
-          if (result["data"]) {
-            if ("DZ" === rsnCde.value[selected.value[cPlyNo]]) {
-              modifyImageUploadMode(cPlyNo);
-              return;
-            } else if ("2" === routeData["rsnTyp"]) {
-              const en = JSON.stringify({
-                scene: SCENE_EDR_APP_NEW,
-                CAppNo: selected.value[cPlyNo],
-                COrgAppNo: cAppNo,
-                CRsnCde: rsnCde.value[selected.value[cPlyNo]],
-                CRsnDetailCde: transferRsnDetail(
-                  rsnDetail.value[selected.value[cPlyNo]]
-                ),
-                CProdNo: selected.value["cProdNo"],
-                CCiMrk: selected.value["cCiMrk"],
-                CGrpMrk: selected.value["cGrpMrk"],
-                CDptCde: selected.value["cDptCde"],
-                CEdrType: routeData["rsnTyp"],
-              });
-              router.push({
-                path: "/index/endorse/cancelEdit",
-                query: {
-                  data: en,
-                },
-              });
-            } else if ("3" === routeData["rsnTyp"]) {
-              const en = JSON.stringify({
-                scene: SCENE_EDR_APP_NEW,
-                CAppNo: selected.value[cPlyNo],
-                COrgAppNo: cAppNo,
-                CRsnCde: rsnCde.value[selected.value[cPlyNo]],
-                CRsnDetailCde: transferRsnDetail(
-                  rsnDetail.value[selected.value[cPlyNo]]
-                ),
-                CProdNo: selected.value["cProdNo"],
-                CCiMrk: selected.value["cCiMrk"],
-                CGrpMrk: selected.value["cGrpMrk"],
-                CDptCde: selected.value["cDptCde"],
-                CEdrType: routeData["rsnTyp"],
-                CIESence: CIESence.value,
-              });
-              router.push({
-                path: "/index/endorse/surrenderEdit",
-                query: {
-                  data: en,
-                },
-              });
-            } else if ("1" === routeData["rsnTyp"]) {
-              const en = JSON.stringify({
-                scene: SCENE_EDR_APP_NEW,
-                CAppNo: selected.value[cPlyNo],
-                COrgAppNo: cAppNo,
-                CRsnCde: rsnCde.value[selected.value[cPlyNo]],
-                CRsnDetailCde: transferRsnDetail(
-                  rsnDetail.value[selected.value[cPlyNo]]
-                ),
-                CProdNo: selected.value["cProdNo"],
-                CCiMrk: selected.value["cCiMrk"],
-                CGrpMrk: selected.value["cGrpMrk"],
-                CJiMrk: selected.value["cJiMrk"],
-                CDptCde: selected.value["cDptCde"],
-                CEdrType: routeData["rsnTyp"],
-              });
-              router.push({
-                path: "/index/endorse/edit",
-                query: {
-                  data: en,
-                },
-              });
+  const param = {
+    plyNo: cPlyNo,
+    edrType: routeData['rsnTyp'],
+    prodNo: cProdNo,
+    edrRsnCde: rsnCde.value[selected.value[cPlyNo]]
+  };
+  pcisEdrQueryService.validEndorse(param).then(async result => {
+    if (200 !== result['code']) {
+      ElMessage.error(result['msg']);
+    } else {
+      if (result['data']) {
+        // 如果选的批改原因是变更影像上传方式
+        if ('DZ' === rsnCde.value[selected.value[cPlyNo]]) {
+          modifyImageUploadMode(cPlyNo);
+          return;
+        } else if ('2' === routeData['rsnTyp']) {
+          const en = JSON.stringify({
+            scene: SCENE_EDR_APP_NEW,
+            CAppNo: selected.value[cPlyNo],
+            COrgAppNo: cAppNo,
+            CRsnCde: rsnCde.value[selected.value[cPlyNo]],
+            CRsnDetailCde: transferRsnDetail(rsnDetail.value[selected.value[cPlyNo]]),
+            CProdNo: selected.value['cProdNo'],
+            CCiMrk: selected.value['cCiMrk'],
+            CGrpMrk: selected.value['cGrpMrk'],
+            CDptCde: selected.value['cDptCde'],
+            CEdrType: routeData['rsnTyp']
+          });
+          //预留跳转路径
+          router.push({
+            path: '/index/endorse/cancelEdit',
+            query: {
+              data: en
             }
-          } else {
-            ElMessage.success(result["msg"]);
-          }
+          });
+        } else if ('3' === routeData['rsnTyp']) {
+          const en = JSON.stringify({
+            scene: SCENE_EDR_APP_NEW,
+            CAppNo: selected.value[cPlyNo],
+            COrgAppNo: cAppNo,
+            CRsnCde: rsnCde.value[selected.value[cPlyNo]],
+            CRsnDetailCde: transferRsnDetail(rsnDetail.value[selected.value[cPlyNo]]),
+            CProdNo: selected.value['cProdNo'],
+            CCiMrk: selected.value['cCiMrk'],
+            CGrpMrk: selected.value['cGrpMrk'],
+            CDptCde: selected.value['cDptCde'],
+            CEdrType: routeData['rsnTyp'],
+            CIESence: null
+          });
+          //预留跳转路径
+          router.push({
+            path: '/index/endorse/surrenderEdit',
+            query: {
+              data: en
+            }
+          });
+        } else if ('1' === routeData['rsnTyp']) {
+          const en = JSON.stringify({
+            scene: SCENE_EDR_APP_NEW,
+            CAppNo: selected.value[cPlyNo],
+            COrgAppNo: cAppNo,
+            CRsnCde: rsnCde.value[selected.value[cPlyNo]],
+            CRsnDetailCde: transferRsnDetail(rsnDetail.value[selected.value[cPlyNo]]),
+            CProdNo: selected.value['cProdNo'],
+            CCiMrk: selected.value['cCiMrk'],
+            CGrpMrk: selected.value['cGrpMrk'],
+            CJiMrk: selected.value['cJiMrk'],
+            CDptCde: selected.value['cDptCde'],
+            CEdrType: routeData['rsnTyp']
+          });
+          router.push({
+            path: '/index/endorse/edit',
+            query: {
+              data: en
+            }
+          });
         }
-      },
-      (error) => {
-        console.log("err: ", error);
-        ElMessage.error("连接失败！" + error);
+      } else {
+        ElMessage.success(result['msg']);
       }
-    );
-  }
+    }
+  }, error => {
+    console.log('err: ', error);
+    ElMessage.error('连接失败！' + error);
+  });
 };
 
+//变更影像上传方式
 const modifyImageUploadMode = (plyNo) => {
-  dzmodal
-    .open(ChangeImageUploadModeComponent, { parameter: { plyNo } })
-    .then((res) => {
-      if (res.type === "ok") {
-      }
-    });
+  dzmodal.open(ChangeImageUploadModeComponent, { parameter: { plyNo } }).then((res) => {
+    if (res.type === "ok") {
+
+    }
+  });
 };
 
 const transferRsnDetail = (rsnDetail) => {
-  let str = "";
-  rsnDetail.forEach((item) => {
-    str = str ? str + "," + item : item;
+  let str = '';
+  rsnDetail.forEach(item => {
+    str = str ? str + ',' + item : item;
   });
   return str;
 };
 
-const openModel = (info) => {
-  return new Promise((resolve) => {
-    ElMessageBox.confirm(info, "提示", {
-      confirmButtonText: "确认",
-      cancelButtonText: "取消",
-      type: "warning",
-    })
-      .then(() => {
-        resolve(true);
-      })
-      .catch(() => {
-        resolve(false);
-      });
-  });
-};
-
-const myCode = (value, args) => {
-  if (null == value || null == args) {
-    return null;
-  }
-
-  const res = args.filter((val) => {
-    return null !== val["value"] && value === val["value"];
-  });
-
-  return null != res && res.length > 0 ? res[0]["label"] : value;
-};
-
 onMounted(() => {
-  // const param = sessionStorage.getItem(AppKey.query.pcis_query_endorse);
-  // if (param) {
-  //   Object.assign(form, param);
-  // }
-  handleQuery();
+  
 });
 
 watch(dialogVisible, (newValue) => {
@@ -766,6 +641,7 @@ watch(dialogVisible, (newValue) => {
     dialogData.value = {};
   }
 });
+
 </script>
 
 <style scoped lang="scss">

@@ -36,6 +36,7 @@ const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
 const removeIds = ref([]); // 删除用户ID集合 用于批量删除
 
+
 const pageresult = reactive<Pageresult>({
   result: "",
   /** 数据列表 */
@@ -53,7 +54,7 @@ const tableconfig = reactive<AppTableConfig>(
         label: "导出",
         type: "primary",
         func: function () {
-          console.log("导出操作");
+          console.log('导出操作')
         },
       }),
     ],
@@ -69,7 +70,9 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         size: "large",
         icon: "View",
-        tableClick: (row) => {},
+        tableClick: (row) => {
+          
+        },
       }),
     ],
     fromSchema: [
@@ -78,7 +81,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "保单号",
         minWidth: 180,
-        fixed: "left",
+        fixed: 'left',
       },
       {
         prop: "cEdrNo",
@@ -123,6 +126,7 @@ const method = {
   },
 };
 
+
 /** 查询 */
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
@@ -141,6 +145,7 @@ function handleQuery(flag?: boolean) {
     })
     .finally(() => {});
 }
+
 </script>
 
 <style scoped></style>

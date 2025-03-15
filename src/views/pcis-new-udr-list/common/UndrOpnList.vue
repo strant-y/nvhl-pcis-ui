@@ -66,7 +66,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "核保人名称",
         minWidth: 180,
-        fixed: "left",
+        fixed: 'left',
       },
       {
         prop: "CUndrMrk",
@@ -105,6 +105,7 @@ const method = {
   },
 };
 
+
 /** 查询 */
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
@@ -123,6 +124,7 @@ function handleQuery(flag?: boolean) {
     })
     .finally(() => {});
 }
+
 </script>
 
 <style scoped></style>

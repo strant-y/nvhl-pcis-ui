@@ -143,17 +143,19 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         title: "手机号",
         maxlength: 11,
-        rules: [getRules("phoneNo", {})],
+        rules: [
+          getRules("phoneNo", {})
+        ],
       },
       {
         prop: "note",
         inputtype: "rtselect",
         title: "是否发送短信",
         rules: [getRules("required", {})],
-        loadData: [
-          { label: "是", value: "1" },
-          { label: "否", value: "0" },
-        ],
+        loadData:[
+          { label: "是",value: "1" },
+          { label: "否",value: "0" },
+        ]
       },
       {
         prop: "msgData",
@@ -164,32 +166,34 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "eMail",
         inputtype: "rtselect",
         title: "是否发送邮件",
-        loadData: [
-          { label: "是", value: "1" },
-          { label: "否", value: "0" },
+        loadData:[
+          { label: "是",value: "1" },
+          { label: "否",value: "0" },
         ],
         func: (val: any) => {
-          if (val == "1") {
+          if(val=='1') {
             const obj = {
               prop: "eMailMsg",
               inputtype: "rtinput",
               title: "邮箱",
-              rules: [getRules("required", {}), getRules("email", {})],
+              rules: [
+                getRules("required", {}),
+                getRules("email", {})
+              ],
             };
-            formconfig1.fromSchema?.push(obj);
-          } else {
-            const index = formconfig1.fromSchema?.findIndex(
-              (item: any) => item.prop === "eMailMsg"
-            );
-            if (index !== -1) {
+            formconfig1.fromSchema?.push(obj)
+          }else{
+            const index = formconfig1.fromSchema?.findIndex((item: any) => item.prop === "eMailMsg");
+            if(index !== -1) {
               freeEditRef.value?.setFormValue({
-                eMailMsg: "",
+                eMailMsg: ""
               });
               formconfig1.fromSchema?.splice(index, 1);
             }
+             
           }
-          console.log(formEmail.value.length);
-        },
+          console.log(formEmail.value.length)
+        }
       },
     ],
     showSuperior: true,
@@ -201,7 +205,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 //   () => freeEditRef.value?.getValue("eMail"),
 //   (n,o) => {
 //     statusValue.value = n;
-
+     
 //   },
 //   { deep: true }
 // );
@@ -288,7 +292,7 @@ function getFrom() {
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  console.log(r, s);
+  console.log(r,s)
   const param = Object.assign(s, r);
   // 获取接口
   // getBasicKindList(param)

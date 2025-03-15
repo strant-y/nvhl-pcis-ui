@@ -1,4 +1,4 @@
-<!-- 配置 -->
+<!-- 投保待撤回任务 -->
 <template>
   <div class="app-container">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
@@ -33,13 +33,26 @@ import {
 } from "@/shared/app-table-config";
 import { deleteFactorBykey, getBasicKindList } from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
-const userStore = useUserStore();
-const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
+import moment from 'moment';
+import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
+const { withdraw, getBackUdrList, getReturnUdrList, getWithdrawUdrList, getNewUdrList } = NewUdrListService();
+const userStore = useUserStore() || ref({});
+const user = ref(userStore.user) || ref({ companyId:'', opCde:'' })
+const roles = userStore.user.roles || [];
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
-// const TaskListVestige = defineAsyncComponent(
-//   () => import("@/views/pcis-new-udr-list/common/TaskListVestige.vue")
-// );
+const TaskListVestige = defineAsyncComponent(
+  () => import("@/views/pcis-new-udr-list/common/TaskListVestige.vue")
+);
+const udrType = ref('5');
+
+const props = defineProps({
+  refreshData: {
+    type: Boolean,
+    default: false
+  }
+})
+
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -54,18 +67,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         func: () => {
-          freeEditRef.value?.setFormValue({
-            cKindNo: "",
-            cStatus: "",
-          });
-          handleQuery();
+          freeEditRef.value?.resetFields()
+          handleQuery(true);
           // freeEditRef.value?.resetForm();
         },
       }),
     ],
     fromSchema: [
       {
-        prop: "cStatus",
+        prop: "CProdCatCde",
         inputtype: "rtselect",
         title: "产品大类",
         typeCode: "KIND_LIST_GRT",
@@ -73,15 +83,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable: true,
       },
       {
-        prop: "cStatus",
+        prop: "prodNo",
         inputtype: "rtselect",
-        title: "产品",
+        title: "条款",
         typeCode: "PROD_LIST_GRT",
-        params: {
-          cParCde: "",
-          cOperId: user.value.opCde,
-          cDptCde: user.value.companyId,
-        },
+        params: { cParCde:'', cOperId: user.value.opCde, cDptCde: user.value.companyId },
         clearable: true,
       },
       {
@@ -105,6 +111,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "datetimerange",
         format: "YYYY-MM-DD HH:mm:ss",
         valueFormat: "YYYY-MM-DD HH:mm:ss",
+        defaultValue: [
+          moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format('YYYY-MM-DD 00:00:00'),
+          moment(new Date()).format('YYYY-MM-DD 23:59:59')
+        ],
       },
     ],
   })
@@ -123,8 +133,9 @@ const tableconfig = reactive<AppTableConfig>(
     editFlag: true,
     editList: ["cStatus"],
     tableBtnType: "btn",
-    tableBtnWidth: 220,
+    tableBtnWidth: 120,
     tableBtnPosition: "right",
+    tableBtnFixed: "right",
     tableBtn: [
       createFreeButtonBase({
         id: "score",
@@ -133,7 +144,9 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         size: "large",
         icon: "Edit",
-        tableClick: (row) => {},
+        tableClick: (row: any) => {
+          handleWorkFlow(row);
+        },
       }),
       createFreeButtonBase({
         id: "score",
@@ -143,10 +156,15 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "View",
         tableClick: (row) => {
+          const data = {
+            sysType: row.objExt,
+            objId: row.objId,
+          }
           dzmodal
-            .open(TaskListVestige, { type: "Issuer", data: {} })
+            .open(TaskListVestige, { type: "Issuer", data: data })
             .then((res) => {
               if (res.type === "ok") {
+                handleQuery(true);
               }
             });
         },
@@ -188,7 +206,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "preDptName",
         inputtype: "rtinput",
         title: "任务提交部门",
-        minWidth: 220,
+        minWidth:220,
       },
       {
         prop: "crtTm",
@@ -209,9 +227,28 @@ const tableconfig = reactive<AppTableConfig>(
   })
 );
 
-onMounted(async () => {
-  pageresult.list = [{}];
-});
+onMounted(async () => {});
+
+watch(
+  () => props.refreshData,
+  (n,o) => {
+    // 自动刷新列表获取数据
+    pageresult.list = [
+      {},{}
+    ]
+    pageresult.total = 2;
+    // 上面代码是仅用于本地调试
+    if(n) {
+      console.log(n,'投保待撤回任务')
+      // handleQuery(true);
+    }
+  },
+  { 
+    deep: true,
+    immediate: true
+  },
+);
+
 
 // 绑定方法
 const method = {
@@ -234,21 +271,90 @@ const exRules = {
 
 /** 查询 */
 function handleQuery(flag?: boolean) {
+  let roleCde = '';
+  roles.forEach((res: any) => {
+    roleCde = roleCde === '' ? res.COpgrpCde : roleCde + ',' + res.COpgrpCde;
+  });
+
+  const tmArr = freeEditRef.value?.getValue("dateRange");
+  const issueStartTemp = tmArr[0];
+  const issueEndTemp = tmArr[1];
+  const issueStart = Date.parse(issueStartTemp);
+  // if (!issueStartTemp) {
+  //   ElMessage.warning('投保起期不能为空');
+  //   return;
+  // }
+  // if (!issueEndTemp) {
+  //   ElMessage.warning('投保止期不能为空');
+  //   return;
+  // }
+  const issueEnd = Date.parse(issueEndTemp);
+  // if (issueStart - issueEnd > 0) {
+  //   ElMessage.warning('投保起期不能大于投保止期');
+  //   return;
+  // }
+  if (issueEnd - issueStart >= 7 * 1000 * 60 * 60 * 24) {
+    ElMessage.warning('投保时间范围请控制在7天以内');
+    return;
+  }
+
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(s, r);
-  getBasicKindList(param)
-    .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
-        pageresult.list = [];
-        pageresult.list = data.result;
-        pageresult.total = data.total;
+
+  const params = Object.assign({
+    startBsTm1: issueStartTemp,
+    endBsTm1: issueEndTemp,
+    orgCde: user.value.companyId,
+    roleCde: roleCde,
+    operId: user.value.opCde,
+  }, s, r);
+  delete params.dateRange;
+  let udrData;
+  if ('3' === udrType.value) {
+    udrData = getBackUdrList(params);
+  } else if ('4' === udrType.value) {
+    udrData = getReturnUdrList(params);
+  } else if ('5' === udrType.value) {
+    udrData = getWithdrawUdrList(params);
+  } else {
+    udrData = getNewUdrList(params);
+  }
+  udrData.then((res) => {
+    const { code, data, msg } = res;
+    if (200 === code) {
+      pageresult.list = [];
+      pageresult.list = data.result;
+      pageresult.total = data.total;
+    } else {
+      ElMessage.error(msg);
+    }
+  })
+  .finally(() => {});
+}
+
+// 工作流处理
+function handleWorkFlow(row: any) {
+  const { objId, curtTask } = row;
+  const param = {
+      taskId: curtTask,
+      appNo: objId,
+      user: user.value,
+  };
+  withdraw(param).then((result: any) => {
+    if (result.code !== 200) {
+      ElMessage.error({ message: result.msg, duration: 3000 });
+    } else {
+      if (result.msg === '撤回成功!') {
+        ElMessage.success({ message: result.msg, duration: 6000 });
       } else {
-        ElMessage.error(msg);
+        ElMessage.warning({ message: result.msg, duration: 6000 });
       }
-    })
-    .finally(() => {});
+      handleQuery(true);
+    }
+  }).catch((error: any) => {
+    console.log('出错了', error);
+    ElMessage.error({ message: '后台服务异常,请联系管理员', duration: 3000 });
+  });
 }
 </script>
 

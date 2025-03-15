@@ -1,20 +1,16 @@
 <template>
-  <app-table
-    :tableConfig="tableconfig"
-    v-model:pageresult="pageresult"
-    ref="tableRef"
-  />
+  <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef" />
 </template>
 
 <script setup lang="ts">
-import { defineComponent, ref, reactive, onMounted } from "vue";
-import { ElMessage } from "element-plus";
-import { getListByCode } from "@/api/code-list-service";
-import { Search } from "@element-plus/icons-vue";
-import { SessionStoreService } from "@/api/session-store.service";
-import { AppKey } from "@/constants/api";
+import { defineComponent, ref, reactive, onMounted } from 'vue';
+import { ElMessage } from 'element-plus';
+import { getListByCode } from '@/api/code-list-service';
+import { Search } from '@element-plus/icons-vue'
+import { SessionStoreService } from '@/api/session-store.service';
+import { AppKey } from '@/constants/api';
 
-import selectRiskType from "./select-risk-type.vue";
+import selectRiskType from './select-risk-type.vue';
 
 import { createFreeButtonBase } from "@/shared/button-config";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
@@ -28,13 +24,13 @@ const dzmodal = useDzModal();
 const props = defineProps({
   someProp: {
     type: String,
-    required: false,
+    required: false
   },
   isAdd: {
     type: Boolean,
-    required: true,
-  },
-});
+    required: true
+  }
+})
 const pageresult = reactive<Pageresult>({
   result: "",
   /** 数据列表 */
@@ -43,18 +39,12 @@ const pageresult = reactive<Pageresult>({
   total: 0,
 });
 
+
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
-    title: "选择险别",
+    title: '选择险别',
     editFlag: true,
-    editList: [
-      "code",
-      "cOperCnm",
-      "cDptCnm",
-      "tPwdStrtTm",
-      "tPwdEndTm",
-      "tPwdEndTm2",
-    ],
+    editList: ["code", "cOperCnm", "cDptCnm", "tPwdStrtTm", "tPwdEndTm", "tPwdEndTm2"],
     titleBtns: [
       createFreeButtonBase({
         id: "score",
@@ -62,13 +52,10 @@ const tableconfig = reactive<AppTableConfig>(
         disabled: props.isAdd,
         type: "success",
         func: function () {
-          dzmodal.open(selectRiskType, {}).then((res) => {
+          dzmodal.open(selectRiskType, { }).then((res) => {
             if (res.type === "ok") {
-              const seenIds = new Set(pageresult.list.map((item) => item.code));
-              pageresult.list = [
-                ...pageresult.list,
-                ...res.body.filter((item) => !seenIds.has(item.code)),
-              ];
+              const seenIds = new Set(pageresult.list.map(item => item.code));
+              pageresult.list = [...pageresult.list, ...res.body.filter(item => !seenIds.has(item.code))]
             }
           });
         },
@@ -79,14 +66,14 @@ const tableconfig = reactive<AppTableConfig>(
         disabled: props.isAdd,
         type: "danger",
         func: function () {
-          resetTableData();
+          resetTableData()
         },
       }),
     ],
-    tableBtnPosition: "left",
-    tableBtnFixed: "left",
+    tableBtnPosition: 'left',
+    tableBtnFixed: 'left',
     tableBtn: [
-      createFreeButtonBase({
+    createFreeButtonBase({
         id: "score",
         link: true,
         tooltip: "新增",
@@ -96,7 +83,7 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "Plus",
         tableClick: (row) => {
           console.log(row);
-          add(row);
+          add(row)
         },
       }),
       createFreeButtonBase({
@@ -108,51 +95,51 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Delete",
         tableClick: (row) => {
-          handlerDelete(row);
+          handlerDelete(row)
         },
       }),
     ],
     fromSchema: [
       {
         prop: "type",
-        inputtype: "rtinput",
+        inputtype: 'rtinput',
         title: "险别类型",
-        width: "55",
+        width: '55',
         showIndex: true,
       },
       {
         prop: "code",
-        inputtype: "rtinput",
+        inputtype: 'rtinput',
         title: "产品代码",
         disabled: props.isAdd,
       },
       {
         prop: "cOperCnm",
-        inputtype: "rtinput",
+        inputtype: 'rtinput',
         title: "险别代码",
         disabled: props.isAdd,
       },
       {
         prop: "cDptCnm",
-        inputtype: "rtinput",
+        inputtype: 'rtinput',
         title: "责任",
         disabled: props.isAdd,
       },
       {
         prop: "tPwdStrtTm",
-        inputtype: "rtinput",
+        inputtype: 'rtinput',
         title: "保额(每人保额)",
         disabled: props.isAdd,
       },
       {
         prop: "tPwdEndTm",
-        inputtype: "rtinput",
+        inputtype: 'rtinput',
         title: "费率(%)",
         disabled: props.isAdd,
       },
       {
         prop: "tPwdEndTm2",
-        inputtype: "rtinput",
+        inputtype: 'rtinput',
         title: "保费(每人保费)",
         disabled: props.isAdd,
       },
@@ -162,26 +149,29 @@ const tableconfig = reactive<AppTableConfig>(
 
 //删除所有
 const resetTableData = () => {
-  pageresult.list = [];
-};
+  pageresult.list = []
+}
 
 //table操作列add
 const add = (row) => {
   //add逻辑
-};
+}
 
 //删除单行
 const handlerDelete = (row) => {
-  let index = null;
+  let index = null
   pageresult.list.forEach((item, i) => {
-    if (item.code == row.code) {
-      index = i;
+    if(item.code == row.code) {
+      index = i
     }
   });
-  index !== null && pageresult.list.splice(index, 1);
-};
+  index !== null && pageresult.list.splice(index, 1)
+}
 
-onMounted(() => {});
+onMounted(() => {
+  
+});
+
 </script>
 
 <style scoped lang="scss">

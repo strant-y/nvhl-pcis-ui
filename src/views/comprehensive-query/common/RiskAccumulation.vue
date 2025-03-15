@@ -117,7 +117,7 @@ const formconfig2 = reactive<AppFreeEditConfig>(
       }),
     ],
     fromSchema: [
-      {
+    {
         prop: "a",
         inputtype: "rtinput",
         title: "船名",
@@ -158,7 +158,7 @@ const tableconfig1 = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "保单号",
         minWidth: 180,
-        fixed: "left",
+        fixed: 'left',
       },
       {
         prop: "b",
@@ -284,7 +284,7 @@ const tableconfig2 = reactive<AppTableConfig>(
         inputtype: "rtnumber",
         title: "保额/赔偿限额",
         minWidth: 180,
-      },
+      }
     ],
   })
 );
@@ -328,6 +328,7 @@ function handleQuery(flag?: boolean) {
     })
     .finally(() => {});
 }
+
 </script>
 
 <style scoped></style>

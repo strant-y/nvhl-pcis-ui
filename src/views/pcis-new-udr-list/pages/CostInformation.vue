@@ -1,4 +1,4 @@
-<!-- 配置 -->
+<!-- 核保任务查询 费用信息 -->
 <template>
   <div class="app-container">
     <app-table
@@ -13,7 +13,9 @@
         :item="{
           type: 'primary',
           label: '保存',
-          func: () => {},
+          func: () => {
+             
+          },
         }"
       />
     </div>
@@ -140,7 +142,7 @@ const pageresult = reactive<Pageresult>({
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
-    title: "费用信息",
+    title:'费用信息',
     editFlag: true,
     editList: ["NFeeProp"],
     // showSelection:true,
@@ -180,10 +182,10 @@ const tableconfig = reactive<AppTableConfig>(
 onMounted(async () => {
   formconfig1.value?.setFormValue({
     ilog_c1: 12,
-    max_value: 0.0,
-    min_value: 0.0,
-    NFeePropSum: 0.0,
-    NPrmSum: 0.0,
+    max_value: 0.00,
+    min_value: 0.00,
+    NFeePropSum: 0.00,
+    NPrmSum: 0.00,
   });
   pageresult.list = [
     {
@@ -195,10 +197,10 @@ onMounted(async () => {
     {
       CTypCde: "费用类型22",
       NFeeProp: 12.78,
-      NUpdFee: 1231.0,
+      NUpdFee: 1231.00,
       CFeeFlag: "ILOG系统费信息",
-    },
-  ];
+    }
+  ]
 });
 
 // 绑定方法
@@ -243,6 +245,7 @@ function handleQuery(flag?: boolean) {
     })
     .finally(() => {});
 }
+
 </script>
 
 <style scoped></style>

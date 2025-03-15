@@ -2,28 +2,29 @@
   <div class="app-container">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
     <app-table
-      :tableConfig="tableconfig"
-      v-model:pageresult="pageresult"
-      ref="tableRef"
-      @page-change="handleQuery(false)"
-    />
+        :tableConfig="tableconfig"
+        v-model:pageresult="pageresult"
+        ref="tableRef"
+        @page-change="handleQuery(false)"
+      />
   </div>
 </template>
 
 <script setup lang="ts">
-import { defineComponent, ref, onMounted, reactive, h } from "vue";
-import { ElMessage, ElMessageBox } from "element-plus";
+import { defineComponent, ref, onMounted, reactive, h } from 'vue';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import { useUserStore } from "@/store/modules/user";
-import { AppKey } from "@/constants/api";
-import { getListByCode } from "@/api/code-list-service";
-import { BulletinService } from "../service/bulletin.service";
-import BulletinEditComponent from "./bulletin-edit.vue";
+import { AppKey } from '@/constants/api';
+import { getListByCode } from '@/api/code-list-service';
+import { BulletinService } from '../service/bulletin.service';
+import BulletinEditComponent from './bulletin-edit.vue';
 
 import {
   AppFreeEditConfig,
   AppFreeEditMethod,
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
+
 
 import { createFreeButtonBase } from "@/shared/button-config";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
@@ -37,15 +38,15 @@ const dzmodal = useDzModal();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 const userStore = useUserStore();
-const bulletinService = new BulletinService();
+const bulletinService = new BulletinService()
 const user = userStore.user || {};
 
 const codeListMap = ref({
   CStatus: [],
-  CReceive: [],
+  CReceive: []
 });
-const addOrEdit = ref("公共信息新增");
-const current_pkId = ref("");
+const addOrEdit = ref('公共信息新增')
+const current_pkId = ref('')
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -76,7 +77,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "发布状态",
         typeCode: "Comm_Code_LIST",
-        params: { CParCde: "pub_status" },
+        params: { CParCde: 'pub_status' },
         clearable: true,
       },
       {
@@ -90,6 +91,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
   })
 );
+
 
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -110,7 +112,7 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         icon: "Plus",
         func: function () {
-          openEdit("");
+          openEdit('')
         },
       }),
     ],
@@ -126,11 +128,11 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Edit",
         tableClick: (row) => {
-          openEdit(row.cPkId);
+          openEdit(row.cPkId)
         },
-        hideBtns: (row: any) => {
-          if (row.cStatus === "pub2") return false;
-        },
+        hideBtns: ((row: any) => {
+          if (row.cStatus === 'pub2') return false;
+        }),
       }),
       createFreeButtonBase({
         id: "score",
@@ -140,11 +142,11 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Delete",
         tableClick: (row) => {
-          deleteBulletin(row.cPkId);
+          deleteBulletin(row.cPkId)
         },
-        hideBtns: (row: any) => {
-          if (row.cStatus === "pub2") return false;
-        },
+        hideBtns: ((row: any) => {
+          if (row.cStatus === 'pub2') return false;
+        }),
       }),
     ],
 
@@ -166,8 +168,8 @@ const tableconfig = reactive<AppTableConfig>(
         inactiveText: "暂存",
         inlinePrompt: true,
         func: (val, row) => {
-          console.log("改变状态的row", row);
-          changeStatus(val, row.cPkId);
+          console.log('改变状态的row', row);
+          changeStatus(val, row.cPkId)
         },
       },
       {
@@ -189,9 +191,10 @@ const tableconfig = reactive<AppTableConfig>(
   })
 );
 
+
 const handleQuery = (flag = true) => {
-  refreshData(flag);
-};
+  refreshData(flag)
+}
 
 const refreshData = (reset = false) => {
   const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
@@ -209,55 +212,49 @@ const refreshData = (reset = false) => {
   });
 };
 
+
 const openEdit = (pkId: string | null) => {
   if (!pkId) {
-    addOrEdit.value = "公共信息新增";
+    addOrEdit.value = '公共信息新增'
   } else {
-    addOrEdit.value = "公共信息修改";
+    addOrEdit.value = '公共信息修改'
   }
-  current_pkId.value = pkId;
-  dzmodal
-    .open(BulletinEditComponent, {
-      pkId: current_pkId.value,
-      addOrEdit: addOrEdit.value,
-    })
-    .then((res) => {
-      if (res.type === "ok") {
-        handleQuery(true);
-      }
-    });
+  current_pkId.value = pkId
+  dzmodal.open(BulletinEditComponent, { pkId: current_pkId.value, addOrEdit: addOrEdit.value }).then((res) => {
+    if (res.type === "ok") {
+      handleQuery(true)
+    }
+  });
 };
 
 const closeDialog = () => {
-  refreshData();
-};
+  refreshData()
+}
 
 const deleteBulletin = (id: string) => {
-  ElMessageBox.confirm("确认要删除吗？该数据删除之后将无法恢复。", "提示", {
-    confirmButtonText: "删除",
-    cancelButtonText: "取消",
-    type: "warning",
-  })
-    .then(() => {
-      bulletinService.deleteBulletin({ id }).then((res: any) => {
-        if (res.code === 200) {
-          ElMessage.success(res.msg);
-          refreshData();
-        } else {
-          ElMessage.error(res.msg);
-        }
-      });
-    })
-    .catch(() => {
-      //防止报错
+  ElMessageBox.confirm('确认要删除吗？该数据删除之后将无法恢复。', '提示', {
+    confirmButtonText: '删除',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    bulletinService.deleteBulletin({ id }).then((res: any) => {
+      if (res.code === 200) {
+        ElMessage.success(res.msg);
+        refreshData();
+      } else {
+        ElMessage.error(res.msg);
+      }
     });
+  }).catch(() => {
+    //防止报错
+  })
 };
 
 const changeStatus = (val, id) => {
   const param = {
     id: id,
     CUpdCde: user.opCde,
-    newStatus: val,
+    newStatus: val
   };
   bulletinService.changeBulletinStatus(param).then((res: any) => {
     if (res.code === 200) {
@@ -272,12 +269,13 @@ const changeStatus = (val, id) => {
 const getReceiveName = (code: string) => {
   const receiveList = codeListMap.value.CReceive;
   const item = receiveList.find((item: any) => item.value === code);
-  return item ? item.label : "全部";
+  return item ? item.label : '全部';
 };
 
 onMounted(() => {
   refreshData(true);
 });
+
 </script>
 
 <style scoped lang="scss">

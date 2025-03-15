@@ -1,4 +1,4 @@
-<!-- 配置 -->
+<!-- 保单到期查询 -->
 <template>
   <div class="app-container">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
@@ -14,8 +14,10 @@
 <script setup lang="ts">
 import { useUserStore } from "@/store";
 import { useValidator } from "@/typings/useValidator";
+import { useRouter, useRoute } from 'vue-router';
 const { getRules } = useValidator();
-
+const router = useRouter();
+const route = useRoute();
 import { ref } from "vue";
 import {
   AppFreeEditConfig,
@@ -31,18 +33,26 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { deleteFactorBykey, getBasicKindList } from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
+import {SCENE_PLY_APP_READ} from '@/constants/tab-constants';
+import { PcisQueryService } from "@/views/payinfo/service/pcis-query-service";
+const pcisQueryService = new PcisQueryService();
 const userStore = useUserStore();
-const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
+const user = ref(userStore.user) || ref({ companyId:'', opCde:'' })
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
-const departmentTree = defineAsyncComponent(
+  const departmentTree = defineAsyncComponent(
   () => import("@/components/common/DepartmentTree.vue")
 );
-// const TaskListVestige = defineAsyncComponent(
-//   () => import("@/views/pcis-new-udr-list/common/TaskListVestige.vue")
-// );
+const TaskListVestige = defineAsyncComponent(
+  () => import("@/views/pcis-new-udr-list/common/TaskListVestige.vue")
+);
+const props = defineProps({
+  refreshData: {
+    type: Boolean,
+    default: false
+  }
+})
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -58,10 +68,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         label: "重置",
         func: () => {
           freeEditRef.value?.setFormValue({
-            cKindNo: "",
-            cStatus: "",
+            NExpirationDays: 30,
+            CDptCde: user.value.companyId,
+            CLoadSub: 1,
           });
-          handleQuery();
+          handleQuery(true);
           // freeEditRef.value?.resetForm();
         },
       }),
@@ -73,6 +84,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "核保机构",
         btnWidth: 10,
         itemWidth: 2,
+        defaultValue: user.value.companyId,
         rules: [{ type: "required" }],
         showExBtn: true,
         btnItems: {
@@ -89,25 +101,28 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
       },
       {
-        prop: "cStatus",
-        inputtype: "rtradio",
+        prop: "CLoadSub",
+        inputtype: "rtcheckbox",
         title: "包含下级机构",
-        isShow: false,
-        loadData: [
-          { label: "是", value: 1 },
-          { label: "否", value: 0 },
-        ],
+        showKey: [5],
+        defaultValue: 1,
+        keymap: {
+          y: 1, n: 0
+        }
       },
       {
         prop: "objday",
         inputtype: "rtnumber",
+        step: 1,
+        max: 7,
         min: 0,
+        defaultValue: 3,
         title: "保单到期剩余天数",
         rules: [getRules("required", {})],
         clearable: true,
       },
       {
-        prop: "cStatus",
+        prop: "CKindNo",
         inputtype: "rtselect",
         title: "产品大类",
         typeCode: "KIND_LIST_GRT",
@@ -115,19 +130,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable: true,
       },
       {
-        prop: "cStatus",
+        prop: "CProdNo",
         inputtype: "rtselect",
-        title: "产品",
+        title: "条款",
         typeCode: "PROD_LIST_GRT",
-        params: {
-          cParCde: "",
-          cOperId: user.value.opCde,
-          cDptCde: user.value.companyId,
-        },
+        params: { cParCde:'', cOperId: user.value.opCde, cDptCde: user.value.companyId },
         clearable: true,
       },
       {
-        prop: "objId",
+        prop: "CPlyNo",
         inputtype: "rtinput",
         title: "保单号",
         clearable: true,
@@ -149,7 +160,7 @@ const tableconfig = reactive<AppTableConfig>(
     editFlag: true,
     editList: ["cStatus"],
     tableBtnType: "btn",
-    tableBtnWidth: 220,
+    tableBtnWidth: 90,
     tableBtnPosition: "right",
     tableBtn: [
       createFreeButtonBase({
@@ -160,12 +171,7 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "View",
         tableClick: (row) => {
-          // dzmodal
-          //     .open(TaskListVestige, { type: "Issuer", data: {} })
-          //     .then((res) => {
-          //       if (res.type === "ok") {
-          //       }
-          //     });
+          showDetails(row)
         },
       }),
     ],
@@ -184,7 +190,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cProdNmeCn",
         inputtype: "rtinput",
-        title: "产品",
+        title: "条款",
       },
       {
         prop: "nExpirationDays",
@@ -195,9 +201,7 @@ const tableconfig = reactive<AppTableConfig>(
   })
 );
 
-onMounted(async () => {
-  pageresult.list = [{}];
-});
+onMounted(async () => {});
 
 // 绑定方法
 const method = {
@@ -205,6 +209,26 @@ const method = {
     console.log(getRules);
   },
 };
+
+watch(
+  () => props.refreshData,
+  (n,o) => {
+    // 自动刷新列表获取数据
+    pageresult.list = [
+      {},{}
+    ]
+    pageresult.total = 2;
+    // 上面代码是仅用于本地调试
+    if(n) {
+      console.log(n,'保单到期查询')
+      // handleQuery(true);
+    }
+  },
+  { 
+    deep: true,
+    immediate: true
+  },
+);
 
 // 绑定特殊验证器
 const exRules = {
@@ -220,21 +244,40 @@ const exRules = {
 
 /** 查询 */
 function handleQuery(flag?: boolean) {
-  const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
-  const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(s, r);
-  getBasicKindList(param)
-    .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
-        pageresult.list = [];
-        pageresult.list = data.result;
-        pageresult.total = data.total;
-      } else {
-        ElMessage.error(msg);
+  freeEditRef.value?.validate().then((isValid) => {
+		if (isValid) {
+      const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
+      const s = freeEditRef.value?.getFromValue(); //获取表单数据
+      const param = Object.assign({
+        CurrentUser: user.value.opCde,
+        CurrentUserOrg: user.value.companyId
+      },s, r);
+      pcisQueryService.getExpirationPolicyList(param)
+        .then((res) => {
+          const { code, data, msg } = res;
+          if (200 === code) {
+            pageresult.list = [];
+            pageresult.list = data.result;
+            pageresult.total = data.total;
+          }
+        })
+        .finally(() => {});
       }
     })
-    .finally(() => {});
+}
+
+// 打开详情
+function showDetails(row: any) {
+  const en = JSON.stringify({
+    scene: SCENE_PLY_APP_READ,
+    CAppNo: row.cAppNo,
+    CCiMrk: row.cCiMrk,
+    CProdNo: row.cProdNo,
+  });
+  router.push({
+    path: '/index/pcis-query/plyDetails',
+    query: { data: en }
+  });
 }
 </script>
 

@@ -1,4 +1,4 @@
-<!-- 配置 -->
+<!-- 综合查询-任务痕迹 -->
 <template>
   <el-dialog
     v-model="dialogVisible"
@@ -72,7 +72,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "任务名称",
         minWidth: 180,
-        fixed: "left",
+        fixed: 'left',
       },
       {
         prop: "type",
@@ -155,6 +155,7 @@ const method = {
   },
 };
 
+
 /** 查询 */
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
@@ -173,6 +174,7 @@ function handleQuery(flag?: boolean) {
     })
     .finally(() => {});
 }
+
 </script>
 
 <style scoped></style>

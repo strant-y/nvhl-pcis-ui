@@ -1,4 +1,4 @@
-<!-- 配置 -->
+<!-- 合约明细 -->
 <template>
   <el-dialog v-model="dialogVisible" width="90%" title="合约明细">
     <div>
@@ -47,7 +47,7 @@ import {
 import { deleteFactorBykey, getBasicKindList } from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 const userStore = useUserStore();
-const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
+const user = ref(userStore.user) || ref({ companyId:'', opCde:'' })
 const dialogVisible = ref(true);
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
@@ -101,15 +101,17 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable: true,
       },
       {
+        prop: "CRiskLvlCde",
+        inputtype: "rtselect",
+        title: "再保险类",
+        clearable: true,
+      },
+      {
         prop: "CProdNo",
         inputtype: "rtcascader",
         title: "产品/险种",
         typeCode: "PROD_LIST_IN_GUIDE",
-        params: {
-          cParCde: "",
-          cOperId: user.value.opCde,
-          cDptCde: user.value.companyId,
-        },
+        params: { cParCde:'', cOperId: user.value.opCde, cDptCde: user.value.companyId },
         clearable: true,
       },
       {
@@ -117,14 +119,18 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "风险等级",
         clearable: true,
-        lodaData: [],
+        lodaData: [
+
+        ]
       },
       {
         prop: "CRiCom",
         inputtype: "rtselect",
         title: "再保公司",
         clearable: true,
-        lodaData: [],
+        lodaData: [
+
+        ]
       },
     ],
   })
@@ -140,47 +146,177 @@ const pageresult = reactive<Pageresult>({
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
+    title:'',
+    titleBtns: [
+      createFreeButtonBase({
+        id: "score",
+        label: "EXCEL导出",
+        type: "success",
+        func: () => {
+        },
+      }),
+      createFreeButtonBase({
+        id: "score",
+        label: "调整手续费率",
+        type: "warning",
+        func: () => {
+        },
+      }),
+      createFreeButtonBase({
+        id: "score",
+        label: "批量调整手缭费率",
+        type: "warning",
+        func: () => {
+        },
+      }),
+    ],
     fromSchema: [
       {
         prop: "CContId",
         inputtype: "rtinput",
-        title: "合约标识号",
+        title: "产品代码",
       },
       {
-        prop: "CContCde",
-        inputtype: "rtinput",
-        title: "合约名称",
-      },
-      {
-        prop: "TContBgnTm",
-        inputtype: "rtdatepicker",
-        title: "起始日期",
-      },
-      {
-        prop: "TContEndTm",
-        inputtype: "rtdatepicker",
-        title: "终止日期",
-      },
-      {
-        prop: "CRikindNo",
-        inputtype: "rtinput",
-        title: "险种大类",
-      },
-      {
-        prop: "CProdNo",
-        inputtype: "rtinput",
-        title: "产品/险种",
-      },
-      {
-        prop: "CRiskLvlCde",
+        prop: "CContId",
         inputtype: "rtinput",
         title: "风险等级",
       },
       {
-        prop: "CRiCom",
+        prop: "CContId",
+        inputtype: "rtinput",
+        title: "合约分出机构",
+        minWidth: 120,
+      },
+      {
+        prop: "CContId",
+        inputtype: "rtinput",
+        title: "主共溢额系数(%)",
+        minWidth: 150,
+      },
+      {
+        prop: "CContId",
+        inputtype: "rtinput",
+        title: "从共溢额系数(%)",
+        minWidth: 150,
+      },
+      {
+        prop: "CContId",
+        inputtype: "rtinput",
+        title: "主共股东溢额系数(%)",
+        minWidth: 180,
+      },
+      {
+        prop: "CContId",
+        inputtype: "rtinput",
+        title: "从共股东溢额系数(%)",
+        minWidth: 180,
+      },
+      {
+        prop: "CContId",
         inputtype: "rtinput",
         title: "再保公司",
+        minWidth: 300,
       },
+      {
+        prop: "CContId",
+        inputtype: "rtinput",
+        title: "自留额(人民市)",
+        minWidth: 150,
+      },{
+        prop: "CContId",
+        inputtype: "rtinput",
+        title: "线数",
+      },
+      {
+        prop: "CContId",
+        inputtype: "rtinput",
+        title: "股东自留额",
+      },
+      {
+        prop: "CContId",
+        inputtype: "rtinput",
+        title: "股东线数",
+      },
+      {
+        prop: "CContId",
+        inputtype: "rtinput",
+        title: "合约成数比例(%)",
+        minWidth: 180,
+      },{
+        prop: "CContId",
+        inputtype: "rtinput",
+        title: "再保公司比例(%)",
+        minWidth: 180,
+      },
+      {
+        prop: "CContId",
+        inputtype: "rtinput",
+        title: "合约限额",
+      },
+      {
+        prop: "CContId",
+        inputtype: "rtinput",
+        title: "手续费率(%)",
+        minWidth: 150,
+      },
+      {
+        prop: "CContId",
+        inputtype: "rtinput",
+        title: "溢额手续费率(%)",
+        minWidth: 150,
+      },
+      {
+        prop: "CContId",
+        inputtype: "rtinput",
+        title: "税率(%)",
+      },
+      {
+        prop: "CContId",
+        inputtype: "rtinput",
+        title: "手续费是否含税",
+        minWidth: 150,
+      },
+      
+      // {
+      //   prop: "CContId",
+      //   inputtype: "rtinput",
+      //   title: "合约标识号",
+      // },
+      // {
+      //   prop: "CContCde",
+      //   inputtype: "rtinput",
+      //   title: "合约名称",
+      // },
+      // {
+      //   prop: "TContBgnTm",
+      //   inputtype: "rtdatepicker",
+      //   title: "起始日期",
+      // },
+      // {
+      //   prop: "TContEndTm",
+      //   inputtype: "rtdatepicker",
+      //   title: "终止日期",
+      // },
+      // {
+      //   prop: "CRikindNo",
+      //   inputtype: "rtinput",
+      //   title: "险种大类",
+      // },
+      // {
+      //   prop: "CProdNo",
+      //   inputtype: "rtinput",
+      //   title: "产品/险种",
+      // },
+      // {
+      //   prop: "CRiskLvlCde",
+      //   inputtype: "rtinput",
+      //   title: "风险等级",
+      // },
+      // {
+      //   prop: "CRiCom",
+      //   inputtype: "rtinput",
+      //   title: "再保公司",
+      // },
     ],
   })
 );

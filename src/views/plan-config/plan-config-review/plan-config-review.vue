@@ -72,6 +72,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         params: { cStatus: '1' },
         clearable: true,
         func: (val) => {
+          const item = freeEditRef.value.getFromSchemaItem('PrdProdPlan.CProdNo')
+          if(val) { //选择了产品大类作为参数上送
+            item.params = {'cKindNo': val}
+          } else {
+            item.params = {}
+          }
         }
       },
       {
@@ -105,14 +111,6 @@ const pageresult = reactive<Pageresult>({
   /** 总数 */
   total: 0,
 });
-
-setTimeout(() => {
-  pageresult.list = [
-    {
-      "PrdProdPlan.CPlanNo": '11'
-    }
-  ]
-}, 2000)
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({

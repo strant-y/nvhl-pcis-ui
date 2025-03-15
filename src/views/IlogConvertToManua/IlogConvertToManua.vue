@@ -1,4 +1,4 @@
-<!-- 配置 -->
+<!-- ILOG强制转人工 -->
 <template>
   <div class="app-container">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef1" />
@@ -57,10 +57,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "转人工状态",
         clearable: true,
-        loadData: [
-          { label: "是", value: 1 },
-          { label: "否", value: 0 },
-        ],
+        loadData :[
+          { label:'是',value:1 },
+          { label:'否',value:0 },
+        ]
       },
     ],
   })
@@ -70,7 +70,7 @@ const formconfig2 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "ILOG强制转人工核保查询",
     fromSchema: [
-      {
+    {
         prop: "cDptCde",
         inputtype: "rtselect",
         title: "机构部门",
@@ -95,10 +95,10 @@ const formconfig2 = reactive<AppFreeEditConfig>(
         prop: "cStatus",
         inputtype: "rtradio",
         title: "包含下级机构",
-        loadData: [
-          { label: "是", value: 1 },
-          { label: "否", value: 0 },
-        ],
+        loadData :[
+          { label:'是',value:1 },
+          { label:'否',value:0 },
+        ]
       },
       {
         prop: "tm",
@@ -140,7 +140,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "单据类型",
         minWidth: 180,
-        fixed: "left",
+        fixed: 'left',
       },
       {
         prop: "b",
@@ -202,6 +202,7 @@ const exRules = {
     }
   },
 };
+
 </script>
 
 <style scoped></style>

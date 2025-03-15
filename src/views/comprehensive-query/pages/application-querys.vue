@@ -23,19 +23,19 @@
         </div>
 
         <template v-if="Number(tab.key) == 5">
-          <withdraw-udrList></withdraw-udrList>
+          <withdraw-udrList :refreshData="nowTab === 4?true:false"></withdraw-udrList>
         </template>
         <template v-if="Number(tab.key) == 6">
-          <return-udrList :homeJumpData="homeJumpData"></return-udrList>
+          <return-udrList :refreshData="nowTab === 5?true:false" :homeJumpData="homeJumpData"></return-udrList>
         </template>
         <template v-if="Number(tab.key) == 7">
-          <policy-expirationQuery></policy-expirationQuery>
+          <policy-expirationQuery :refreshData="nowTab === 6?true:false"></policy-expirationQuery>
         </template>
         <template v-if="Number(tab.key) == 8">
-          <search-batchImpDtl-model></search-batchImpDtl-model>
+          <search-batchImpDtl-model :refreshData="nowTab === 7?true:false"></search-batchImpDtl-model>
         </template>
         <template v-if="Number(tab.key) == 9">
-          <combination-query></combination-query>
+          <combination-query  :refreshData="nowTab === 8?true:false"></combination-query>
         </template>
       </el-tab-pane>
     </el-tabs>
@@ -1056,6 +1056,7 @@ const handleTabClick = (tab: any) => {
   currentTabName.value = tab.props.label;
   const i = tabs.value.findIndex((item) => item.name === tab.props.label);
   currentTabKey.value = i;
+  nowTab.value = i;
   console.log("keys", currentTabKey.value);
   let url = "";
   if (Number(i) <= 3) {

@@ -1,3 +1,4 @@
+<!-- 开具电子发票 -->
 <template>
   <el-dialog v-model="dialogVisible" width="90%" title="开具电子发票">
     <div>
@@ -12,7 +13,7 @@
             type: 'primary',
             label: '下载',
             func: () => {
-              down();
+              downloadInvoice();
             },
           }"
         />
@@ -38,13 +39,6 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { ref, defineProps, defineEmits, onMounted } from "vue";
 import { createFreeButtonBase } from "@/shared/button-config";
 import {
-  getButtonByFacKey,
-  getFactorList,
-  getInputGroupList,
-  saveFactor,
-  saveKindInfo,
-} from "@/api/prod";
-import {
   AppFreeEditConfig,
   AppFreeEditMethod,
   createAppFreeEditConfig,
@@ -54,7 +48,8 @@ import {
   createTableEditConfig,
   MyTableMethod,
 } from "@/shared/app-table-config";
-
+import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
+const policyService = new PolicyService();
 const props = defineProps({
   data: Object,
   cDptCde: String,
@@ -107,160 +102,170 @@ const schemaMap = reactive<Record<string, any>>({
   rtinputgroup: [],
 });
 
-const allForm = ref<Array<any>>([
-  {
-    prop: "cPlyNo",
-    inputtype: "rtinput",
-    title: "保单号",
-    showKey: [0, 1, 2],
-  },
-  {
-    prop: "phoneNo",
-    inputtype: "rtinput",
-    title: "手机号",
-    maxlength: 11,
-    showKey: [0, 1, 2],
-    rules: [getRules("required", {}), getRules("phoneNo", {})],
-  },
-  {
-    prop: "eMailMsg",
-    inputtype: "rtinput",
-    title: "电子邮箱",
-    showKey: [0, 1, 2],
-    rules: [getRules("required", {}), getRules("email", {})],
-  },
-  {
-    prop: "draweetypeValue",
-    inputtype: "rtselect",
-    title: "受票方类型",
-    showKey: [0, 1, 2],
-    rules: [getRules("required", {})],
-    loadData: [
-      { label: "个人", value: "1" },
-      { label: "企业", value: "2" },
-    ],
-    func: (val: any) => {
-      formObj.notWaitObj.fromSchema.value = [];
-      // 开票类型 开票类型 0 时需要显示 原发票号码YFPHM 原发票代码YFPDM
-      allForm.value.map((item: any, index: number) => {
-        const isVal = item.showKey.findIndex(
-          (vals: any) =>
-            vals == val ||
-            (freeEditRef?.value?.getValue("FPLX") == 0 &&
-              (item.prop == "YFPHM" || item.prop == "YFPDM"))
-        );
-        if (isVal !== -1) formObj.notWaitObj.fromSchema.value.push(item);
-      });
-    },
-  },
-  {
-    prop: "spfmc",
-    inputtype: "rtinput",
-    title: "受票方名称",
-    showKey: [0, 1, 2],
-  },
-  {
-    prop: "spfsbh",
-    inputtype: "rtinput",
-    title: "受票方识别号",
-    showKey: [2],
-  },
-  {
-    prop: "spfyhzh",
-    inputtype: "rtinput",
-    title: "受票方银行账号",
-    showKey: [2],
-  },
-  {
-    prop: "spfyhdzdh",
-    inputtype: "rtinput",
-    title: "受票方地址/电话",
-    showKey: [2],
-  },
-  {
-    prop: "kpry",
-    inputtype: "rtselect",
-    title: "开票人员",
-    showKey: [0, 1, 2],
-    rules: [getRules("required", {})],
-    typeCode: "KPRY_CNM_BY_DPTCDE",
-    params: { CDptCde: props.cDptCde },
-    clearable: true,
-  },
-  {
-    prop: "skry",
-    inputtype: "rtinput",
-    title: "收款人员",
-    showKey: [0, 1, 2],
-    rules: [getRules("required", {})],
-  },
-  {
-    prop: "fhry",
-    inputtype: "rtinput",
-    title: "复核人员",
-    showKey: [0, 1, 2],
-    rules: [getRules("required", {})],
-  },
-  {
-    prop: "FPLX",
-    inputtype: "rtselect",
-    title: "开票类型",
-    showKey: [0, 1, 2],
-    rules: [getRules("required", {})],
-    loadData: [
-      { label: "发票红冲", value: "0" },
-      { label: "开具发票", value: "1" },
-    ],
-    func: (val: any) => {
-      console.log("val", val);
-      formObj.notWaitObj.fromSchema.value = [];
-      allForm.value.map((item: any, index: number) => {
-        const isVal = item.showKey.findIndex((vals: any) => vals == val);
-        if (isVal !== -1) formObj.notWaitObj.fromSchema.value.push(item);
-      });
-
-      console.log(formObj.notWaitObj.fromSchema);
-    },
-  },
-  {
-    prop: "YFPHM",
-    inputtype: "rtinput",
-    title: "原发票号码",
-    showKey: [0],
-  },
-  {
-    prop: "YFPDM",
-    inputtype: "rtinput",
-    title: "原发票代码",
-    showKey: [0],
-  },
-]);
-
-const formObj = {
-  notWaitObj: {
+const formconfig1 = reactive<AppFreeEditConfig>(
+  createAppFreeEditConfig({
     endBtnsPosition: "right",
     endBtns: [],
-    fromSchema: ref<any>([]),
+    fromSchema: [
+      {
+        prop: "cPlyNo",
+        inputtype: "rtinput",
+        title: "保单号",
+        defaultValue: props.data.cPlyNo,
+      },
+      {
+        prop: "phoneNo",
+        inputtype: "rtinput",
+        title: "手机号",
+        maxlength: 11,
+        rules: [
+          getRules("required", {}),
+          getRules("phoneNo", {})
+        ],
+        defaultValue: props.data.cMobile,
+      },
+      {
+        prop: "eMailMsg",
+        inputtype: "rtinput",
+        title: "电子邮箱",
+        rules: [
+          getRules("required", {}),
+          getRules("email", {})
+        ],
+        defaultValue: props.data.cEmail,
+      },
+      {
+        prop: "draweetypeValue",
+        inputtype: "rtselect",
+        title: "受票方类型",
+        rules: [getRules("required", {})],
+        loadData:[
+          { label: "个人",value: "1" },
+          { label: "企业",value: "2" },
+        ],
+        defaultValue: '1',
+        func: (val: any) => {
+          freeEditRef.value?.clearValidate('spfsbh');
+          freeEditRef.value?.clearValidate('spfyhzh');
+          freeEditRef.value?.clearValidate('spfyhdzdh');
+          const items1 = freeEditRef.value?.getFromSchemaItem('spfsbh');
+          const items2 = freeEditRef.value?.getFromSchemaItem('spfyhzh');
+          const items3 = freeEditRef.value?.getFromSchemaItem('spfyhdzdh');
+          if (val === '2') {
+            items1.type = 'show';
+            items2.type = 'show';
+            items3.type = 'show';
+            items1.rules = [getRules("required", {})];
+            items2.rules = [getRules("required", {})];
+            items3.rules = [getRules("required", {})];
+          }else{
+            items1.type = 'hidden';
+            items2.type = 'hidden';
+            items3.type = 'hidden';
+            items1.rules = [];
+            items2.rules = [];
+            items3.rules = [];
+            freeEditRef.value?.setValue('spfsbh', '');
+            freeEditRef.value?.setValue('spfyhzh', '');
+            freeEditRef.value?.setValue('spfyhdzdh', '');
+          }
+        }
+      },
+      {
+        prop: "spfmc",
+        inputtype: "rtinput",
+        title: "受票方名称",
+        defaultValue: props.data.CAppName
+      },
+      {
+        type: "hidden",
+        prop: "spfsbh",
+        inputtype: "rtinput",
+        title: "受票方识别号",
+      },
+      {
+        type: "hidden",
+        prop: "spfyhzh",
+        inputtype: "rtinput",
+        title: "受票方银行账号",
+      },
+      {
+        type: "hidden",
+        prop: "spfyhdzdh",
+        inputtype: "rtinput",
+        title: "受票方地址/电话",
+      },
+      {
+        prop: "kpry",
+        inputtype: "rtselect",
+        title: "开票人员",
+        rules: [getRules("required", {})],
+        typeCode: "KPRY_CNM_BY_DPTCDE",
+        params: { CDptCde: props.cDptCde },
+        clearable: true,
+      },
+      {
+        prop: "skry",
+        inputtype: "rtinput",
+        title: "收款人员",
+        rules: [getRules("required", {})],
+      },
+      {
+        prop: "fhry",
+        inputtype: "rtinput",
+        title: "复核人员",
+        rules: [getRules("required", {})],
+      },
+      {
+        prop: "FPLX",
+        inputtype: "rtselect",
+        title: "开票类型",
+        rules: [getRules("required", {})],
+        loadData:[
+          { label: "发票红冲",value: "0" },
+          { label: "开具发票",value: "1" },
+        ],
+        defaultValue: '1',
+        func: (val: any) => {
+          freeEditRef.value?.clearValidate('YFPHM');
+          freeEditRef.value?.clearValidate('YFPDM');
+          const items1 = freeEditRef.value?.getFromSchemaItem('YFPHM');
+          const items2 = freeEditRef.value?.getFromSchemaItem('YFPDM');
+          if (val === '0') {
+            items1.type = 'show';
+            items2.type = 'show';
+            items1.rules = [getRules("required", {})];
+            items2.rules = [getRules("required", {})];
+          }else{
+            items1.type = 'hidden';
+            items2.type = 'hidden';
+            items1.rules = [];
+            items2.rules  = [];
+            freeEditRef.value?.setValue('YFPHM', '');
+            freeEditRef.value?.setValue('YFPDM', '');
+          }
+        }
+      },
+      {
+        type: "hidden",
+        prop: "YFPHM",
+        inputtype: "rtinput",
+        title: "原发票号码",
+      },
+      {
+        type: "hidden",
+        prop: "YFPDM",
+        inputtype: "rtinput",
+        title: "原发票代码",
+      }
+    ],
     showSuperior: true,
     superFromSchema: [],
-  },
-};
-
-let formconfig1 = reactive<AppFreeEditConfig>(
-  createAppFreeEditConfig(formObj.notWaitObj)
+  })
 );
 
 onMounted(async () => {
-  // 初始化表单
-  allForm.value.map((item: any, index: number) => {
-    const isVal = item.showKey.findIndex((vals: any) => vals == 1);
-    if (isVal !== -1) formObj.notWaitObj.fromSchema.value.push(item);
-  });
-  if (props.type === "edit" && props.data) {
-    setTimeout(() => {
-      freeEditRef.value?.setFormValue(props.data);
-    }, 50);
-  }
+  
 });
 
 // 绑定方法
@@ -283,23 +288,25 @@ const exRules = {
 };
 
 /** 下载 */
-function down() {
+function downloadInvoice() {
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
-      const formParam = getFrom();
-      // const param = Object.assign({ type: props.type }, formParam);
-      // saveKindInfo(param)
-      //   .then((res) => {
-      //     const { code, data, msg } = res;
-      //     if (200 === code) {
-      //       emits("ok", {});
-      //       ElMessage.success("保存成功");
-      //       dialogVisible.value = false;
-      //     } else {
-      //       ElMessage.error(msg);
-      //     }
-      //   })
-      //   .finally(() => {});
+      const formData = freeEditRef.value?.getFromValue();
+      const param = {
+        ...formData,
+      };
+      policyService.validEleInvoiceFile(param).then((res: any) => {
+        if (res.code === 200) {
+          window.open(res.data, '_blank');
+        } else {
+          ElMessage.warning({ message: res.msg, duration: 3000 });
+        }
+        emits('ok');
+      }).catch((err: any) => {
+        ElMessage.error({ message: err.msg, duration: 3000 });
+        console.log('出错啦', err.msg);
+        emits('ok');
+      });
     } else {
       ElMessage.error("请填写必填项");
     }

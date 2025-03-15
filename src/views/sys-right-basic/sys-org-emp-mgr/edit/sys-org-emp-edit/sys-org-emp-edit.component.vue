@@ -1,12 +1,11 @@
 <template>
   <el-dialog v-model="dialogVisible" width="90%" :title="props.title">
     <div>
-      <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
-      <div
-        style="margin-top: 20px"
-        :style="{ textAlign: 'right' }"
-        v-if="!(props.type === 'view')"
-      >
+      <app-free-edit
+        v-model:freeEditConfig="formconfig1"
+        ref="freeEditRef"
+      />
+      <div style="margin-top: 20px" :style="{ textAlign: 'right' }" v-if=" !(props.type === 'view')">
         <rt-button
           :item="{
             type: 'primary',
@@ -25,7 +24,7 @@
 import { useValidator } from "@/typings/useValidator";
 import { yesOrNo, size, inputtype, typeMap, dateType } from "@/utils/utilKey";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
-import { ref, defineProps, defineEmits, onMounted, computed } from "vue";
+import { ref, defineProps, defineEmits, onMounted, computed  } from "vue";
 import {
   AppFreeEditConfig,
   AppFreeEditMethod,
@@ -36,7 +35,7 @@ import {
   createTableEditConfig,
   MyTableMethod,
 } from "@/shared/app-table-config";
-import { SysOrgEmpMgrService } from "@/views/sys-right-basic/service/sys-org-emp-mgr.service";
+import { SysOrgEmpMgrService } from '@/views/sys-right-basic/service/sys-org-emp-mgr.service';
 
 const props = defineProps({
   data: Object,
@@ -44,6 +43,7 @@ const props = defineProps({
   title: String,
   cDptCde: String, //机构代码
   cEmpCde: String, //员工代码
+
 });
 const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
@@ -60,7 +60,7 @@ const tableRef = ref<MyTableMethod | null>(null);
 const appTableShow = ref(false);
 // 定义一个计算属性
 const isDisabled = computed(() => {
-  return props.type === "view" ? true : false;
+  return props.type === "view" ? true : false
 });
 const schemaMap = reactive<Record<string, any>>({
   rtinputgroup: [],
@@ -70,105 +70,107 @@ const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     fromSchema: [
       {
-        prop: "cEmpCde",
-        title: "员工编码",
+        prop: 'cEmpCde',
+        title: '员工编码',
         inputtype: "rtinput",
         rules: [getRules("required", {})],
         disabled: isDisabled,
       },
       {
-        prop: "cHrCde",
-        title: "人事员工编码",
+        prop: 'cHrCde',
+        title: '人事员工编码',
         inputtype: "rtinput",
         disabled: isDisabled,
       },
       {
-        prop: "cEmpCnm",
-        title: "员工名称",
+        prop: 'cEmpCnm',
+        title: '员工名称',
         inputtype: "rtinput",
         rules: [getRules("required", {})],
         disabled: isDisabled,
       },
       {
-        prop: "cEmpEnm",
-        title: "英文名称",
+        prop: 'cEmpEnm',
+        title: '英文名称',
         inputtype: "rtinput",
         disabled: isDisabled,
       },
       {
-        prop: "cDptCde",
-        title: "机构名称",
+        prop: 'cDptCde',
+        title: '机构名称',
         inputtype: "rtselect",
         typeCode: "EMP_DPT_LIST_NOCACHE",
         disabled: isDisabled,
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {
+          trigger: 'change'
+        })]
       },
       {
-        prop: "cSex",
-        title: "性别",
+        prop: 'cSex',
+        title: '性别',
         inputtype: "rtselect",
         typeCode: "Sex_List",
         disabled: isDisabled,
       },
       {
-        prop: "tBirthday",
-        title: "出生日期",
+        prop: 'tBirthday',
+        title: '出生日期',
         inputtype: "rtdatepicker",
         type: "date",
         disabled: isDisabled,
       },
       {
-        prop: "cPrtyTyp",
-        title: "党派",
+        prop: 'cPrtyTyp',
+        title: '党派',
         inputtype: "rtselect",
         typeCode: "PARTISAN_LIST_CACHE",
         disabled: isDisabled,
       },
       {
-        prop: "cMajorCde",
-        title: "专业",
+        prop: 'cMajorCde',
+        title: '专业',
         inputtype: "rtselect",
         typeCode: "MAJOR_LIST_CACHE",
         disabled: isDisabled,
       },
       {
-        prop: "cMrgCde",
-        title: "婚姻状况",
+        prop: 'cMrgCde',
+        title: '婚姻状况',
         inputtype: "rtselect",
         typeCode: "MARITAL_STATUS_LIST_CACHE",
         disabled: isDisabled,
       },
       {
-        prop: "cNtnCde",
-        title: "民族",
+        prop: 'cNtnCde',
+        title: '民族',
         inputtype: "rtselect",
         typeCode: "NATION_LIST_CACHE",
         disabled: isDisabled,
       },
       {
-        prop: "cTitleCde",
-        title: "职称",
+        prop: 'cTitleCde',
+        title: '职称',
         inputtype: "rtselect",
         typeCode: "TITLE_LIST_CACHE",
         disabled: isDisabled,
       },
       {
-        prop: "cTitleCde",
-        title: "学历",
+        prop: 'cTitleCde',
+        title: '学历',
         inputtype: "rtselect",
         typeCode: "EDUCATION_LIST_CACHE",
         disabled: isDisabled,
       },
       {
-        prop: "cDreCde",
-        title: "学位",
+        prop: 'cDreCde',
+        title: '学位',
         inputtype: "rtselect",
         typeCode: "DEGREE_LIST_CACHE",
         disabled: isDisabled,
       },
       {
-        prop: "cCtfctTyp",
-        title: "证件类型",
+        prop: 'cCtfctTyp',
+        title: '证件类型',
         inputtype: "rtselect",
         typeCode: "NATURAL_CERTIFICATE_CACHE",
         disabled: isDisabled,
@@ -177,135 +179,131 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         // }
       },
       {
-        prop: "cCtfctNo",
-        title: "证件号码",
+        prop: 'cCtfctNo',
+        title: '证件号码',
         inputtype: "rtinput",
         rules: [getRules("required", {})],
         disabled: isDisabled,
       },
       {
-        prop: "cHobby",
-        title: "爱好特长",
+        prop: 'cHobby',
+        title: '爱好特长',
         inputtype: "rtinput",
         disabled: isDisabled,
       },
       {
-        prop: "cTel",
-        title: "联系电话",
+        prop: 'cTel',
+        title: '联系电话',
         inputtype: "rtinput",
         rules: [getRules("phone", {})],
         disabled: isDisabled,
       },
       {
-        prop: "cMobile",
-        title: "手机",
+        prop: 'cMobile',
+        title: '手机',
         inputtype: "rtinput",
         rules: [getRules("phoneNo", {})],
         disabled: isDisabled,
       },
       {
-        prop: "cEmail",
-        title: "邮箱",
+        prop: 'cEmail',
+        title: '邮箱',
         inputtype: "rtinput",
         disabled: isDisabled,
       },
       {
-        prop: "cZipCde",
-        title: "邮编",
+        prop: 'cZipCde',
+        title: '邮编',
         inputtype: "rtinput",
-        rules: [
-          getRules("required", {}),
-          getRules("signlessInt", {}),
-          getRules("specifyLength", { len: 6 }),
-        ],
+        rules: [getRules("required", {}), getRules("signlessInt", {}), getRules("specifyLength", {len: 6})],
         disabled: isDisabled,
       },
       {
-        prop: "tEntTm",
-        title: "入司时间",
+        prop: 'tEntTm',
+        title: '入司时间',
         inputtype: "rtdatepicker",
         type: "date",
         disabled: isDisabled,
       },
       {
-        prop: "tRegTm",
-        title: "转正时间",
+        prop: 'tRegTm',
+        title: '转正时间',
         inputtype: "rtdatepicker",
         type: "date",
         disabled: isDisabled,
       },
       {
-        prop: "tLevTm",
-        title: "离司时间",
+        prop: 'tLevTm',
+        title: '离司时间',
         inputtype: "rtdatepicker",
         type: "date",
         disabled: isDisabled,
       },
       {
-        prop: "cEmpDoc",
-        title: "个人档案",
+        prop: 'cEmpDoc',
+        title: '个人档案',
         inputtype: "rtinput",
         disabled: isDisabled,
       },
       {
-        prop: "cGrntCde1",
-        title: "担保人代码",
+        prop: 'cGrntCde1',
+        title: '担保人代码',
         inputtype: "rtinput",
         disabled: isDisabled,
       },
       {
-        prop: "cGrntCde2",
-        title: "工作经历",
+        prop: 'cGrntCde2',
+        title: '工作经历',
         inputtype: "rtinput",
         disabled: isDisabled,
       },
       {
-        prop: "cRegist",
-        title: "户口所在地",
+        prop: 'cRegist',
+        title: '户口所在地',
         inputtype: "rtinput",
         disabled: isDisabled,
       },
       {
-        prop: "cHomeAddr",
-        title: "住址",
+        prop: 'cHomeAddr',
+        title: '住址',
         inputtype: "rtinput",
         disabled: isDisabled,
       },
       {
-        prop: "cRemark",
-        title: "备注",
+        prop: 'cRemark',
+        title: '备注',
         inputtype: "rtinput",
-        type: "textarea",
-        rows: "3",
+        type: 'textarea',
+        rows: '3',
         disabled: isDisabled,
       },
-      {
-        prop: "cIsValid",
-        inputtype: "rtinput",
-        type: "hidden",
-        defaultValue: "1",
-      },
-    ],
+      // {
+      //   prop: 'cIsValid',
+      //   inputtype: "rtinput",
+      //   type: "hidden",
+      //   defaultValue: '1'
+      // },
+    ]
   })
 );
 
 onMounted(async () => {
   if (props.type === "update") {
-    nextTick(() => {
+    nextTick(()=>{
       freeEditRef.value?.setFormValue(props.data);
-    });
+    })
   }
-  if (props.type === "view") {
-    nextTick(() => {
+  if(props.type === "view"){
+    nextTick(()=>{
       freeEditRef.value?.setFormValue(props.data);
-    });
+    })
   }
-  if (props.type === "add") {
-    nextTick(() => {
-      let s = freeEditRef.value?.getFromSchemaItem("CDptCde");
-      freeEditRef.value?.setValue("CDptCde", props.cDptCde);
-      s["disabled"] = true;
-    });
+  if(props.type === "add"){
+    nextTick(()=>{
+      let s = freeEditRef.value?.getFromSchemaItem('CDptCde')
+      freeEditRef.value?.setValue('CDptCde', props.cDptCde);
+      s['disabled'] = true
+    })
   }
 });
 
@@ -319,10 +317,10 @@ const method = {
 function save() {
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
-      const formParam = getFrom();
-      const param = Object.assign({ type: props.type }, formParam);
-      sysOrgEmpMgrService
-        .saveOrgEmpInfo(param)
+      //const formParam = getFrom();
+      let s = freeEditRef.value?.getFromValue(); 
+      const param = Object.assign({ type: props.type, cIsValid: '1' }, s);
+      sysOrgEmpMgrService.saveOrgEmpInfo(param)
         .then((res) => {
           const { code, data, msg } = res;
           if (200 === code) {
@@ -366,6 +364,7 @@ function getFrom() {
     return param;
   }
 }
+
 </script>
 
 <style scoped></style>
