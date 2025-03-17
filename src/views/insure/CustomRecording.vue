@@ -215,12 +215,12 @@ const formconfig1 = ref({
   cGrpMrk: "0",
   cNmeCn: "",
   cTermNo: "",
-  d: "",
+  cProdNo: "",
 });
 const selectTreeItem = ref({});
 // 条款下拉数据
 function loadOptions() {
-  const param = { pageNo: 1, pageSize: 9999, CEnableFlag: "1" };
+  const param = { pageNo: 1, pageSize: 999, CEnableFlag: "1" };
   getProdEnableList(param).then((res) => {
     if (res.code === 200) {
       options.value = res.data.result;
@@ -244,6 +244,7 @@ const method = {};
 //当前选中的机构item
 function selectedItem(item) {
   selectTreeItem.value = item;
+  formconfig1.value.cDptNme = item.label;
 }
 
 // 下一步
@@ -265,7 +266,7 @@ function next() {
         JSON.stringify({
           ...data,
           ...{ pageType: "app" },
-          ...{ dptItem: selectTreeItem.value },
+          // ...{ dptItem: selectTreeItem.value },
         })
       );
     }
@@ -345,8 +346,10 @@ function showModal() {
     .then((res: any) => {
       if (res.type === "ok") {
         const selectedTerm = res.body;
-        formconfig1.value.cTermNo = selectedTerm.code;
-        formconfig1.value.cNmeCn = selectedTerm.value;
+        console.log("000000", selectedTerm);
+        formconfig1.value.cTermNo = selectedTerm.data.code;
+        formconfig1.value.cNmeCn = selectedTerm.data.value;
+        formconfig1.value.cProdNo = selectedTerm.parent.data.code;
         handleQuery();
       }
     });
