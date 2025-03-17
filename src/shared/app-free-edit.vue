@@ -139,6 +139,8 @@ interface dynamicFormMethod {
   setValue: (key: any, value: any) => void;
   getValue: (key: any) => any;
   checkKey: (key: any) => boolean;
+  clearValidate: () => any;
+  resetFields: () => any;
 }
 const dynamicForm = ref<dynamicFormMethod | null>(null);
 const superDynamicForm = ref<dynamicFormMethod | null>(null);
@@ -185,6 +187,16 @@ function setFormValue(data: any) {
 function validate() {
   return dynamicForm.value?.validate();
 }
+
+//只清空报错信息
+function clearValidate(key = null) {
+  dynamicForm.value?.clearValidate(key);
+}
+// 初始化值和清空报错信息
+function resetFields() {
+  dynamicForm.value?.resetFields();
+}
+
 function getValue(key: any) {
   if (dynamicForm.value?.checkKey(key)) {
     return dynamicForm.value?.getValue(key);
@@ -218,6 +230,8 @@ defineExpose({
   validate,
   setValue,
   getValue,
+  clearValidate,
+  resetFields,
 });
 </script>
 

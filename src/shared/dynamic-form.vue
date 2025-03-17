@@ -396,6 +396,16 @@ async function validate() {
   return fromListbl;
 }
 
+//只清空报错信息
+function clearValidate(key) {
+  key ? fromRef.value.clearValidate(key) : fromRef.value.clearValidate()
+}
+
+//初始化值和清空报错信息
+function resetFields() {
+ fromRef.value.resetFields()
+}
+
 function getFromValue() {
   return form;
 }
@@ -465,6 +475,8 @@ defineExpose({
   setValue,
   getValue,
   checkKey,
+  clearValidate,
+  resetFields,
 });
 </script>
 
