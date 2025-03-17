@@ -49,26 +49,32 @@
       v-model="vInput"
       @change="handleChange"
     >
-      <template #suffix v-if="item.suffixIcon">
+      <template #suffix v-if="item.suffix">
+        {{ item.suffix }}
+      </template>
+      <template #suffix v-else-if="item.suffixIcon">
         <el-icon>
           <component :is="renderIcon(item.suffixIcon)" />
         </el-icon>
       </template>
-      <template #prefix v-if="item.prefixIcon">
+      <template #prefix v-if="item.prefix">
+        {{ item.prefix }}
+      </template>
+      <template #prefix v-else-if="item.prefixIcon">
         <el-icon>
           <component :is="renderIcon(item.prefixIcon)" />
         </el-icon>
       </template>
-      <template #prepend v-if="item.prefix">
-        {{ item.prefix }}
+      <template #prepend v-if="item.prepend">
+        {{ item.prepend }}
       </template>
       <template #prepend v-else-if="item.prependIcon">
         <el-icon>
           <component :is="renderIcon(item.prependIcon)" />
         </el-icon>
       </template>
-      <template #append v-else-if="item.suffix">
-        {{ item.suffix }}
+      <template #append v-else-if="item.append">
+        {{ item.append }}
       </template>
       <template #append v-else-if="item.appendIcon">
         <el-icon>
