@@ -3,8 +3,8 @@
     <table style="width: 100%">
       <thead>
         <tr class="table-title">
-          <th>序号</th>
-          <th>附加条款名称</th>
+          <th style="width:80px">序号</th>
+          <th style="width:300px">附加条款名称</th>
           <th>费率(主险费率的百分比)</th>
           <th>保费</th>
           <th>备注</th>

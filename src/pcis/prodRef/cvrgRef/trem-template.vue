@@ -112,8 +112,8 @@
                 style="margin-right: 5px"
                 @click="ginfo.hidden = !ginfo.hidden"
               >
-                <el-icon v-if="!ginfo.hidden"><ArrowUpBold /></el-icon>
-                <el-icon v-if="ginfo.hidden"><ArrowDownBold /></el-icon>
+                <el-icon v-if="ginfo.hidden"><ArrowUpBold /></el-icon>
+                <el-icon v-if="!ginfo.hidden"><ArrowDownBold /></el-icon>
               </a>
               <span>
                 {{ ginfo.cGroupTitle }}
