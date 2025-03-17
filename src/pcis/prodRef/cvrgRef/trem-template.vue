@@ -33,7 +33,7 @@
               <rtButton
                 @click="
                   () => {
-                    emit('delete', term);
+                    emit('delete', termdata);
                   }
                 "
                 :item="{
@@ -295,7 +295,7 @@ function initData(data: any) {
   termdata.value = termData;
   // 缓存条款责任数据
   let riskData: { [key: string]: any } = {};
-  newData.riskList.forEach((v: any) => {
+  newData.riskList?.forEach((v: any) => {
     let cRiskNo = v["TermRisktgt.cLiabCode"];
     riskData[cRiskNo] = {
       ...v,

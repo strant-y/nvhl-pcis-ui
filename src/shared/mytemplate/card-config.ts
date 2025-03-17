@@ -7,6 +7,7 @@ export interface CardConfig {
   superFromShow?: string | null; // 高级查询显示
   superFromClose?: string | null; // 高级查询关闭
   showMyfrom?: boolean; //是否隐藏信息
+  showInTitle?: boolean; //是否显示折叠切换按钮
   showMyfromBtm?: boolean; //是否显示折叠切换按钮
   titleBtns?: Array<FreeButtonBase>; //标题处按钮
   endBtns?: Array<FreeButtonBase>; //结尾处按钮
@@ -22,6 +23,7 @@ export function creatCardConfig(
     shadow: config.shadow || true,
     showMyfrom: config.showMyfrom || true,
     showMyfromBtm: config.showMyfromBtm || false,
+    showInTitle: config.showInTitle || false,
     production: config.production || false,
     productionTitle: config.productionTitle || "",
     superFromShow: config.superFromShow || "点击打开",

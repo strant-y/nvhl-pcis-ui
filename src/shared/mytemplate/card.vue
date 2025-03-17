@@ -5,9 +5,25 @@
         <template #header>
           <el-row justify="space-between">
             <el-col :span="4" v-if="!cardConfig.production">
+              <a
+                style="margin-left: 20px"
+                @click="showMyfrom = !showMyfrom"
+                v-if="cardConfig.showInTitle ? cardConfig.showInTitle : false"
+              >
+                <el-icon v-if="!showMyfrom"><ArrowUpBold /></el-icon>
+                <el-icon v-if="showMyfrom"><ArrowDownBold /></el-icon>
+              </a>
               {{ cardConfig.title }}
             </el-col>
             <el-col :span="4" v-if="cardConfig.production">
+              <a
+                style="margin-left: 20px"
+                @click="showMyfrom = !showMyfrom"
+                v-if="cardConfig.showInTitle ? cardConfig.showInTitle : false"
+              >
+                <el-icon v-if="!showMyfrom"><ArrowUpBold /></el-icon>
+                <el-icon v-if="showMyfrom"><ArrowDownBold /></el-icon>
+              </a>
               <el-tooltip :content="cardConfig.productionTitle">
                 {{ cardConfig.title }}
               </el-tooltip>
@@ -79,7 +95,6 @@ const props = defineProps({
 watch(
   () => props.cardConfig,
   (o, n) => {
-    console.log(n);
     showMyfrom.value = n?.showMyfrom ? n?.showMyfrom : true;
   },
   { deep: true }

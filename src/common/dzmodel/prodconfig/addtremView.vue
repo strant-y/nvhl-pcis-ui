@@ -198,6 +198,7 @@ function selectMainTerm(isselect = true) {
           childnode.push(...f);
         }
       });
+      seterm.cRdrTyp = '0';
       seterm.children = childnode;
       selectNode.push(seterm);
     }
@@ -236,6 +237,7 @@ function selectAdditionTerm() {
           childnode.push(...f);
         }
       });
+      seterm.cRdrTyp = '1';
       seterm.children = childnode;
       selectNode.push(seterm);
     }
