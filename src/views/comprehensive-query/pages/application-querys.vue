@@ -81,6 +81,7 @@ const route = useRoute();
 const router = useRouter();
 const activeName = ref("1");
 const homeJumpData = ref({}); //接收首页的参数，用于查询条件回显
+const nowTab = ref(1)
 let addrowArr=['cAppNo','cPlyNo','cEdrNo','cDptcde','cKindNo','cProdNo','Underwriter','tUdrTm']
 // 变更列
 const colChange = defineAsyncComponent(() => import("../modal/colChange.vue"));
