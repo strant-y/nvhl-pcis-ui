@@ -11,6 +11,7 @@
 import { useUserStore } from "@/store";
 import { useValidator } from "@/typings/useValidator";
 import { useRoute, useRouter, RouteRecordRaw } from "vue-router";
+import { cloneDeep } from "lodash-es";
 import {
   SCENE_EDR_APP_MODIFY_UNSUBMIT, SCENE_PLAN_READ,
   SCENE_PLY_APP_MODIFY_UNSUBMIT,
@@ -43,6 +44,8 @@ import { getListByCode } from "@/api/code-list-service";
 import { PcisQueryService } from "@/views/payinfo/service/pcis-query-service";
 import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
 const pcisQueryService = new PcisQueryService();
 const policyService = new PolicyService();
 const { getBaseInfoByAppNo, getBackUdrList, getNewUdrList, removeReceived, checkEdrPocly, hasReceived } = NewUdrListService();
@@ -58,7 +61,7 @@ const kindEdit = defineAsyncComponent(() => import("./kindEdit.vue"));
 const tableRef = ref<AppTableMethod | null>(null);
 const removeIds = ref([]); // 删除用户ID集合 用于批量删除
 const departmentTree = defineAsyncComponent(
-  () => import("@/components/common/DepartmentTree.vue")
+  () => import("@/pcis/prodRef/commodityRef/DepartmentTree.vue")
 );
 // 任务痕迹列表 弹框页面
 const TaskListVestige = defineAsyncComponent(
@@ -79,7 +82,7 @@ const undrClsListOptions = ref<Array<any>>([]); // 核保级别 下拉数据
 const allForm = ref<Array<any>>([
   {
     prop: "udrType",
-    inputtype: "rtselect",
+    inputtype: "rtSelectV2",
     title: "单据状态",
     showKey: [1, 2, 3, 4, 5],
     minWidth: 180,
@@ -97,7 +100,7 @@ const allForm = ref<Array<any>>([
   },
   {
     prop: "orgCde",
-    inputtype: "rtselect",
+    inputtype: "rtSelectV2",
     title: "核保机构",
     rules: [getRules("required", {})],
     showKey: [1, 2, 5],
@@ -112,6 +115,17 @@ const allForm = ref<Array<any>>([
           .open(departmentTree, { type: "Issuer", data: {} })
           .then((res) => {
             if (res.type === "ok") {
+              if(res.body) {
+                freeEditRef.value?.setValue('orgCde', res.body.id)
+                setFormItem('orgCde', {
+                  loadData: [
+                    {
+                      label: res.body.name,
+                      value: res.body.id
+                    }
+                  ]
+                })
+              }
             }
           });
       },
@@ -124,7 +138,7 @@ const allForm = ref<Array<any>>([
     showKey: [1, 2],
     defaultValue: 1,
     keymap: {
-      y: 1, n: 0
+      y: '1', n: '0'
     }
   },
   {
@@ -157,7 +171,7 @@ const allForm = ref<Array<any>>([
   },
   {
     prop: "bsType",
-    inputtype: "rtselect",
+    inputtype: "rtSelectV2",
     title: "申请单类型",
     showKey: [2, 4],
     minWidth: 180,
@@ -169,7 +183,7 @@ const allForm = ref<Array<any>>([
   },
   {
     prop: "cAppTyp",
-    inputtype: "rtselect",
+    inputtype: "rtSelectV2",
     title: "申请单类型",
     showKey: [5],
     minWidth: 180,
@@ -181,13 +195,38 @@ const allForm = ref<Array<any>>([
   },
   {
     prop: "CProdCatCde",
-    inputtype: "rtcascader",
+    inputtype: "rtSelectV2",
     title: "产品大类",
     showKey: [1, 2, 3, 4, 5],
-    typeCode: "KIND_LIST_GRT",
+    typeCode: "KIND_LIST_CACHE", 
     params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
     clearable: true,
     func: (val: any) => {
+      //根据产品大类再次请求条款接口
+      codeListStore.queryCodeList(
+        {
+          codeListName: "PROD_LIST",
+          codeListParam: {
+            'cParCde': val,
+            cOperId: user.value.opCde,
+            cDptCde: user.value.companyId
+          },
+        },
+        false,
+        false
+      )
+      .then(res => {
+        if(res && res.code == 200) {
+          const codeValData = res.data;
+          if (codeValData) {
+            //清空条款显示值，重置条款下拉值
+            freeEditRef.value?.setValue('prodNo', '')
+            setFormItem("prodNo", {
+              loadData: codeValData
+            })
+          }
+        }
+      })
       freeEditRef.value?.setValue("prodNo", []); // 清空条款
       freeEditRef.value?.setValue("undrClsCde", ''); // 清空核保级别
       loadUndrClsListOptions(val[val.length - 1]) // 加载核保级别列表
@@ -197,17 +236,17 @@ const allForm = ref<Array<any>>([
   },
   {
     prop: "prodNo",
-    inputtype: "rtcascader",
+    inputtype: "rtSelectV2",
     title: "条款",
     showKey: [1, 2, 3, 4, 5],
-    typeCode: "PROD_LIST_GRT",
+    typeCode: "PROD_LIST",
     params: { cParCde: '',cOperId: user.value.opCde, cDptCde: user.value.companyId },
     labelWidth: 200,
     clearable: true,
   },
   {
     prop: "undrClsCde",
-    inputtype: "rtselect",
+    inputtype: "rtSelectV2",
     title: "核保级别",
     showKey: [1, 2],
     typeCode: "WEB_SYS_STA_DICT",
@@ -279,7 +318,6 @@ const formObj = {
         func: () => {
           // 循环重置每一项表单数据
           resetForm();
-          handleQuery(true);
         },
       }),
       createFreeButtonBase({
@@ -375,7 +413,7 @@ const allTable = ref<Array<any>>([
   },
   {
     prop: "bsType",
-    inputtype: "rtselect",
+    inputtype: "rtSelectV2",
     title: "业务类型",
     showKey: [1, 2],
     minWidth: 180,
@@ -473,7 +511,7 @@ const table5 = ref<any>([
   },
   {
     prop: "cAppTyp",
-    inputtype: "rtselect",
+    inputtype: "rtSelectV2",
     title: "申请单类型",
     minWidth: 180,
     loadData: [
@@ -728,11 +766,11 @@ const loadUndrClsListOptions = async (cProdNo: string) => {
 const changeForm = (val: any) => {
   freeEditRef.value?.resetFields();
   // resetForm();
+  freeEditRef.value?.setFormValue({
+    udrType: val,
+  })
   nextTick(() => {
     formObj.notWaitObj.fromSchema.value = [];
-    freeEditRef.value?.setFormValue({
-      udrType: val,
-    })
     allForm.value.map((item: any, index: number) => {
       const isVal = item.showKey.findIndex((vals: any) => vals == val);
       if (isVal !== -1) {
@@ -770,7 +808,7 @@ watch(
     }
     if (n !== '5') {
       tableBtn.value.map((item: any, index: number) => {
-        const isVal = item.showKey && item.showKey.findIndex((vals: any) => vals == n) || -1;
+        const isVal = item.showKey.findIndex((vals: any) => vals == n);
         if (isVal !== -1) tableObj.notWaitObj.tableBtn.value.push(item);
       })
     } else {
@@ -806,7 +844,7 @@ const resetForm = () => {
   nextTick(() => {
     if(udrTypeValue.value=='1' || udrTypeValue.value=='2' || udrTypeValue.value=='5') {
       if(udrTypeValue.value=='1' || udrTypeValue.value=='2'){
-        freeEditRef.value?.setValue('inNextDpt', 1);
+        freeEditRef.value?.setValue('inNextDpt', '1');
         freeEditRef.value?.setValue('tm2', [
           moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format('YYYY-MM-DD 00:00:00'),
           moment(new Date()).format('YYYY-MM-DD 23:59:59')
@@ -822,7 +860,7 @@ const resetForm = () => {
 onMounted(async () => {
   freeEditRef.value?.setFormValue({
     udrType: "1",
-    inNextDpt: 1,
+    inNextDpt: '1',
     tm2: [
       moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format('YYYY-MM-DD 00:00:00'),
       moment(new Date()).format('YYYY-MM-DD 23:59:59')
@@ -993,13 +1031,11 @@ function refreshData(flag?: boolean) {
         return;
       }
     } else {
-      // if (!date2) {
-      //   // loading.value = false;
-      //   ElMessage.warning('提核日期不能为空');
-      //   return;
-      // }
+      if (!date2) {
+        ElMessage.warning('提核日期不能为空');
+        return;
+      }
       if (new Date(date2[1]).getTime() - new Date(date2[0]).getTime() >= 7 * 1000 * 60 * 60 * 24) {
-        // loading.value = false;
         ElMessage.warning('提核日期范围请控制在7天以内');
         return;
       }
@@ -1042,16 +1078,17 @@ function refreshData(flag?: boolean) {
   delete params.tm1;
   delete params.tm2;
   const querys = Object.assign(params, r);
-
+  const requestParam = cloneDeep(querys)
+  requestParam.udrType = String(requestParam.udrType - 1)
   let udrData;
   if (udrType !== '5') {
     if (udrType === '4') {
-      udrData = getBackUdrList(querys);
+      udrData = getBackUdrList(requestParam);
     } else {
-      udrData = getNewUdrList(querys);
+      udrData = getNewUdrList(requestParam);
     }
   } else {
-    udrData = pcisQueryService.getAppPolicyList(querys);
+    udrData = pcisQueryService.getAppPolicyList(requestParam);
   }
 
   udrData.then((res: any) => {
@@ -1368,6 +1405,17 @@ function handleDelete(id?: string) {
       }
     });
   });
+}
+
+//给表单下拉项赋值
+function setFormItem(key, obj) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach(item => {
+      if (item.prop === key) {
+        Object.assign(item, obj)
+      }
+    })
+  }
 }
 </script>
 

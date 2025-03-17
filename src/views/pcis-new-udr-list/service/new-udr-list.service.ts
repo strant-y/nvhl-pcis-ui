@@ -2,6 +2,9 @@
 import axios from 'axios';
 // import { AppBaseUrl } from '@/constants/api';
 
+import {AxiosPromise} from "axios";
+import {post} from "@/utils/http";
+
 /**
  * 核保查询相关服务
  */
@@ -68,8 +71,7 @@ export const NewUdrListService = () => {
   // 查询（待核保、暂存、上报）
   const getNewUdrList = async (ops: any) => {
     try {
-      const response = await axios.post(`${qryNewUdrListUrl}`, { params: ops });
-      return response.data;
+      return post(`${qryNewUdrListUrl}`, ops);
     } catch (error) {
       return handleError(error);
     }
@@ -78,8 +80,7 @@ export const NewUdrListService = () => {
   // 查询 （退回）
   const getBackUdrList = async (ops: any) => {
     try {
-      const response = await axios.post(`${qryBackUdrListUrl}`, { params: ops })
-      return response.data;
+      return post(`${qryBackUdrListUrl}`, ops)
     } catch (error) {
       return handleError(error);
     }
@@ -88,8 +89,7 @@ export const NewUdrListService = () => {
   // 查询 （待修改）
   const getReturnUdrList = async (ops: any) => {
     try {
-      const response = await axios.post(`${qryReturnUdrListUrl}`, { params: ops })
-      return response.data;
+      return post(`${qryReturnUdrListUrl}`, ops)
     } catch (error) {
       return handleError(error);
     }
@@ -98,8 +98,7 @@ export const NewUdrListService = () => {
   // 查询 （撤回）
   const getWithdrawUdrList = async (ops: any) => {
     try {
-      const response = await axios.post(`${qryWithdrawUdrListUrl}`, { params: ops })
-      return response.data;
+      return post(`${qryWithdrawUdrListUrl}`, ops)
     } catch (error) {
       return handleError(error);
     }
@@ -108,8 +107,7 @@ export const NewUdrListService = () => {
   // 查询 （任务轨迹）
   const getTaskVestige = async (ops: any) => {
     try {
-      const response = await axios.post(`${qryTaskVestigeUrl}`, { params: ops })
-      return response.data;
+      return post(`${qryTaskVestigeUrl}`, ops)
     } catch (error) {
       return handleError(error);
     }
@@ -118,8 +116,7 @@ export const NewUdrListService = () => {
   // 接收
   const hasReceived = async (ops: any) => {
     try {
-      const response = await axios.post(`${hasReceivedUrl}`, { source: JSON.stringify(ops) });
-      return response.data;
+      return post(`${hasReceivedUrl}`, ops);
     } catch (error) {
       return handleError(error);
     }
@@ -128,8 +125,7 @@ export const NewUdrListService = () => {
   // 一般批改，核保前校验
   const checkEdrPocly = async (ops: any) => {
     try {
-      const response = await axios.post(`${checkEdrPoclyUrl}`, { source: JSON.stringify(ops) });
-      return response.data;
+      return post(`${checkEdrPoclyUrl}`, ops);
     } catch (error) {
       return handleError(error);
     }
@@ -137,8 +133,7 @@ export const NewUdrListService = () => {
   // 获取核保选项
   const getCUndrMrk = async (ops: any) => {
     try {
-      const response = await axios.post(`${getCUndrMrkUrl}`, { source: JSON.stringify(ops) });
-      return response.data;
+      return post(`${getCUndrMrkUrl}`, ops);
     } catch (error) {
       return handleError(error);
     }
@@ -146,8 +141,7 @@ export const NewUdrListService = () => {
   // 获取退回到指定核保级别人员
   const getBackClsList = async (ops: any) => {
     try {
-      const response = await axios.post(`${getBackClsListUrl}`, { source: JSON.stringify(ops) });
-      return response.data;
+      return post(`${getBackClsListUrl}`, ops);
     } catch (error) {
       return handleError(error);
     }
@@ -156,8 +150,7 @@ export const NewUdrListService = () => {
   // 解除接收
   const removeReceived = async (ops: any) => {
     try {
-      const response = await axios.post(`${removeReceivedUrl}`, { source: JSON.stringify(ops) });
-      return response.data;
+      return post(`${removeReceivedUrl}`, ops);
     } catch (error) {
       return handleError(error);
     }
@@ -166,8 +159,7 @@ export const NewUdrListService = () => {
   // 撤回任务
   const withdraw = async (ops: any) => {
     try {
-      const response = await axios.post(`${withdrawUrl}`, { source: JSON.stringify(ops) });
-      return response.data;
+      return post(`${withdrawUrl}`, ops);
     } catch (error) {
       return handleError(error);
     }
@@ -182,8 +174,7 @@ export const NewUdrListService = () => {
    */
   const delTmpPolicy = async (ops: any) => {
     try {
-      const response = await axios.post(`${delTmpPolicyUrl}`, { source: JSON.stringify(ops) })
-      return response.data;
+      return post(`${delTmpPolicyUrl}`, ops)
     } catch (error) {
       return handleError(error);
     }
@@ -196,8 +187,7 @@ export const NewUdrListService = () => {
    */
   const getBaseInfoByAppNo = async (ops: any) => {
     try {
-      const response = await axios.post(`${getBaseInfoByAppNoUrl}`, { source: JSON.stringify(ops) })
-      return response.data;
+      return post(`${getBaseInfoByAppNoUrl}`, ops)
     } catch (error) {
       return handleError(error);
     }
@@ -205,8 +195,7 @@ export const NewUdrListService = () => {
 
   const facIntoRI = async (ops: any) => {
     try {
-      const response = await axios.post(`${facIntoRIUrl}`, { source: JSON.stringify(ops) })
-      return response.data;
+      return post(`${facIntoRIUrl}`, ops)
     } catch (error) {
       return handleError(error);
     }
@@ -214,8 +203,7 @@ export const NewUdrListService = () => {
   // 查看比例合约
   const viewContInfo1 = async (ops: any) => {
     try {
-      const response = await axios.post(`${viewContInfoUrl}`, { source: JSON.stringify(ops) });
-      return response.data;
+      return post(`${viewContInfoUrl}`, ops);
     } catch (error) {
       return handleError(error);
     }
@@ -226,8 +214,7 @@ export const NewUdrListService = () => {
    */
   const facPlyQuery = async (ops: any) => {
     try {
-      const response = await axios.post(`${facPlyQueryUrl}`, { source: JSON.stringify(ops) })
-      return response.data;
+      return post(`${facPlyQueryUrl}`, ops)
     } catch (error) {
       return handleError(error);
     }
@@ -236,8 +223,7 @@ export const NewUdrListService = () => {
   // 点击划分风险单位按钮调用再保接口
   const riskUnitQuery = async (ops: any) => {
     try {
-      const response = await axios.post(`${riskUnitQueryUrl}`, { source: JSON.stringify(ops) });
-      return response.data;
+      return post(`${riskUnitQueryUrl}`, ops);
     } catch (error) {
       return handleError(error);
     }
@@ -245,8 +231,7 @@ export const NewUdrListService = () => {
   // 保存风险单位
   const saveData = async (ops: any) => {
     try {
-      const response = await axios.post(`${saveDataUrl}`, { source: JSON.stringify(ops) });
-      return response.data;
+      return post(`${saveDataUrl}`, ops);
     } catch (error) {
       return handleError(error);
     }
@@ -255,8 +240,7 @@ export const NewUdrListService = () => {
   // 价税分离查看
   const taxQuery = async (ops: any) => {
     try {
-      const response = await axios.post(`${taxQueryUrl}`, { source: JSON.stringify(ops) });
-      return response.data;
+      return post(`${taxQueryUrl}`, ops);
     } catch (error) {
       return handleError(error);
     }
@@ -265,8 +249,7 @@ export const NewUdrListService = () => {
   // 分保试算
   const tryCountInFoRI = async (ops: any) => {
     try {
-      const response = await axios.post(`${tryCountInFoRIUrl}`, { source: JSON.stringify(ops) });
-      return response.data;
+      return post(`${tryCountInFoRIUrl}`, ops);
     } catch (error) {
       return handleError(error);
     }
@@ -275,8 +258,7 @@ export const NewUdrListService = () => {
   // 风险累积查询
   const queryRiskAddInfo = async (ops: any) => {
     try {
-      const response = await axios.post(`${queryRiskAddInfoUrl}`, { source: JSON.stringify(ops) });
-      return response.data;
+      return post(`${queryRiskAddInfoUrl}`, ops);
     } catch (error) {
       return handleError(error);
     }
@@ -285,8 +267,7 @@ export const NewUdrListService = () => {
   // 查看合约价税分离
   const checkedContractTax = async (ops: any) => {
     try {
-      const response = await axios.post(`${checkedContractTaxUrl}`, { source: JSON.stringify(ops) });
-      return response.data;
+      return post(`${checkedContractTaxUrl}`, ops);
     } catch (error) {
       return handleError(error);
     }
@@ -295,8 +276,7 @@ export const NewUdrListService = () => {
   // 查看比例合约
   const viewContInfo = async (ops: any) => {
     try {
-      const response = await axios.post(`${viewContInfoUrl}`, { source: JSON.stringify(ops) });
-      return response.data;
+      return post(`${viewContInfoUrl}`, ops);
     } catch (error) {
       return handleError(error);
     }
@@ -304,8 +284,7 @@ export const NewUdrListService = () => {
 
   const queryContDtl = async (ops: any) => {
     try {
-      const response = await axios.post(`${queryContDtlUrl}`, { source: JSON.stringify(ops) })
-      return response.data;
+      return post(`${queryContDtlUrl}`, ops)
     } catch (error) {
       return handleError(error);
     }
@@ -313,8 +292,7 @@ export const NewUdrListService = () => {
 
   const getOilOCConts = async (ops: any) => {
     try {
-      const response = await axios.post(`${getOilOCContsUrl}`, { source: JSON.stringify(ops) })
-      return response.data;
+      return post(`${getOilOCContsUrl}`, ops)
     } catch (error) {
       return handleError(error);
     }
@@ -322,8 +300,7 @@ export const NewUdrListService = () => {
 
   const saveOCConts = async (ops: any) => {
     try {
-      const response = await axios.post(`${saveOCContsUrl}`, { source: JSON.stringify(ops) })
-      return response.data;
+      return post(`${saveOCContsUrl}`, ops)
     } catch (error) {
       return handleError(error);
     }
@@ -331,8 +308,7 @@ export const NewUdrListService = () => {
 
   const deleteOCConts = async (ops: any) => {
     try {
-      const response = await axios.post(`${deleteOCContsUrl}`, { source: JSON.stringify(ops) })
-      return response.data;
+      return post(`${deleteOCContsUrl}`, ops)
     } catch (error) {
       return handleError(error);
     }
@@ -340,8 +316,7 @@ export const NewUdrListService = () => {
 
   const checkLiberty = async (ops: any) => {
     try {
-      const response = await axios.post(`${checkLibertyUrl}`, { source: JSON.stringify(ops) })
-      return response.data;
+      return post(`${checkLibertyUrl}`, ops)
     } catch (error) {
       return handleError(error);
     }
@@ -349,8 +324,7 @@ export const NewUdrListService = () => {
 
   const getRelateBus = async (ops: any) => {
     try {
-      const response = await axios.post(`${getRelateBusUrl}`, { source: JSON.stringify(ops) })
-      return response.data;
+      return post(`${getRelateBusUrl}`, ops)
     } catch (error) {
       return handleError(error);
     }
@@ -359,8 +333,7 @@ export const NewUdrListService = () => {
   // 获取历史核保信息
   const getUdrOpn = async (ops: any) => {
     try {
-      const response = await axios.post(`${getUdrOpnInfo}`, { source: JSON.stringify(ops) });
-      return response.data;
+      return post(`${getUdrOpnInfo}`, ops);
     } catch (error) {
       return handleError(error);
     }

@@ -19,6 +19,7 @@ import plyCvrgPer from "./cvrgRef/plyCvrgPer.vue";
 import plybaseRef from "./plyBaseRef/plybase.vue";
 import baseafterRef from "./baseafterRef/baseafter.vue";
 import informationRef from "./informationRef/information.vue";
+import specialAgr from "./specialAgrRef/SpecialAgreement.vue"
 
 import prodInfo from "./commonRef/prodInfo.vue";
 import relatedMainInsurance from "./commonRef/relatedMainInsurance.vue";
@@ -77,6 +78,7 @@ const componentMap = {
   insrncRef: insrncRef,
   baseafterRef: baseafterRef,
   informationRef: informationRef,
+  SpecialAgreement: specialAgr, //录单页面中的特约信息组件
 
 
   prodInfoRef: prodInfo,
