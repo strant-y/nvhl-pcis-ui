@@ -59,16 +59,16 @@
           <component :is="renderIcon(item.prefixIcon)" />
         </el-icon>
       </template>
-      <template #prepend v-if="item.prepend">
-        {{ item.prepend }}
+      <template #prepend v-if="item.prefix">
+        {{ item.prefix }}
       </template>
       <template #prepend v-else-if="item.prependIcon">
         <el-icon>
           <component :is="renderIcon(item.prependIcon)" />
         </el-icon>
       </template>
-      <template #append v-else-if="item.append">
-        {{ item.append }}
+      <template #append v-else-if="item.suffix">
+        {{ item.suffix }}
       </template>
       <template #append v-else-if="item.appendIcon">
         <el-icon>

@@ -144,6 +144,16 @@ const schemaMap = reactive<Record<string, any>>({
       loadData: yesOrNo,
     },
     {
+      prop: "prefix",
+      inputtype: "rtinput",
+      title: "前缀符号",
+    },
+    {
+      prop: "suffix",
+      inputtype: "rtinput",
+      title: "后缀符号",
+    },
+    {
       prop: "required",
       inputtype: "rtselect",
       title: "是否必填",
