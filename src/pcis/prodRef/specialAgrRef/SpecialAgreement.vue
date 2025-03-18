@@ -47,6 +47,9 @@ const tableRef = ref<MyTableMethod | null>(null);
 const departmentTree = defineAsyncComponent(
   () => import("@/components/common/DepartmentTree.vue")
 );
+const specEdit = defineAsyncComponent(
+  () => import("@/pcis/prodRef/commodityRef/prd-fix-spec-edit.vue")
+)
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -81,10 +84,15 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Edit",
         hideBtns: (row) => {
-          if(!row.b.includes('****')) return true
+          if(!row.cNmeCn.includes('****')) return true
         },
         tableClick: (row) => {
           console.log(row);
+          dzmodal.open(specEdit, { type: "view", data: row }).then((res) => {
+            if (res.type === "ok") {
+              
+            }
+          });
         },
       }),
       createFreeButtonBase({
@@ -96,7 +104,7 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "Delete",
         tableClick: (row) => {
           const list = formData.value;
-          const i = list.findIndex((item) => item.id === row.id);
+          const i = list.findIndex((item) => item.cSpecNo === row.cSpecNo);
           if (i !== -1) list.splice(i, 1);
         },
       }),
@@ -137,29 +145,33 @@ const tableconfig = reactive<AppTableConfig>(
         width: 100,
       },
       {
-        prop: "c",
+        prop: "cIfMust",
         inputtype: "rttag",
         title: "Tag",
         width: 110,
         loadData: [
             {
-              label: "必选",
+              label: "可选",
               value: "0",
             },
             {
-              label: "自定义录入",
+              label: "必选",
               value: "1",
+            },
+            {
+              label: "自定义",
+              value: "2",
             },
         ],
       },
       {
-        prop: "d",
+        prop: "cSpecNo",
         inputtype: "rtinput",
-        title: "特约名称",
+        title: "特约代码",
         width: 180,
       },
       {
-        prop: "b",
+        prop: "cNmeCn",
         inputtype: "rtinput",
         title: "特约内容",
       },
@@ -177,9 +189,9 @@ onMounted(async () => {
   // 获取列表数据
   handleQuery(true);
   formData.value = [
-    { id: 12, index: "ss", b: "包含可编辑****的内容",c: "",d: 'test' },
-    { id: 11, index: "asdas", b: "43", c: '1',d: 'test' },
-    { id: 11, index: "asdas", b: "43242323", c: '',d: 'test' },
+    { index: "ss", cNmeCn: "包含可编辑****的内容",cIfMust: "0",cSpecNo: 'test' },
+    { index: "asdas", cNmeCn: "43", cIfMust: '1',cSpecNo: 'test' },
+    { index: "asdas", cNmeCn: "43242323", cIfMust: '2',cSpecNo: 'test' },
   ]
   formData.value.forEach((item, index) => {
     item.index = index+1
@@ -200,15 +212,17 @@ const method = {
       type: "show",
       data: {
         cProdNo: param.cProdNo,
-        selectedData:formData.value
+        selectedData: formData.value //需要把自定义的过滤掉，只传过去从模板中选择的
       },
-    },
-    {
-      isOk: (selectdata: any) => {
-        selectdata.forEach((item: any) => {
-          formData.value.push(item);
-        });
-      },
+      method: {
+        getSelected(selectdata: any) {
+          selectdata.forEach((item: any) => {
+            formData.value.push(item);
+          });
+          console.log('formData.value', formData.value)
+          dialog.value?.handleClose()
+        }
+      }
     },
     { title: "添加特约", width: 85 }
   );

@@ -1,7 +1,51 @@
 <template>
   <div>
-    <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
-      @selection-change="handleSelectionChange" />
+    <el-tabs
+      v-model="activeName"
+      type="card"
+      class="demo-tabs">
+      <el-tab-pane label="添加特约" name="first">
+        <div class="totalBox">
+          已选择 {{ selected.length }} 项
+        </div>
+        <el-table
+          ref="multipleTableRef"
+          :data="pageresult.list"
+          style="width: 100%"
+          :row-class-name="tableRowClassName"
+          @selection-change="handleSelectionChange"
+        >
+          <el-table-column type="selection" :selectable="selectable" width="55" />
+          <el-table-column type="index" label="序号" width="55" />
+          <el-table-column label="cIfMust" width="100">
+            <template #default="scope">
+              <el-tag type="primary">{{ scope.row['cIfMust'] == '1' ? '必选' : '可选' }}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column property="cSpecNo" label="特约代码" width="160" />
+          <el-table-column property="cNmeCn" label="特别约定内容" />
+        </el-table>
+      </el-tab-pane>
+      <el-tab-pane label="添加其他特约" name="second">
+        <el-table
+          ref="multipleTableRef"
+          :data="addTableData"
+          style="width: 100%">
+          <el-table-column property="addIndex" label="序号" width="55" />
+          <el-table-column property="cSpecNo" label="特约代码" width="300">
+            <template #default="scope">
+              <el-input v-model="scope.row['cSpecNo']"></el-input>
+            </template>
+          </el-table-column>
+          <el-table-column property="cNmeCn" label="特别约定内容">
+            <template #default="scope">
+              <el-input v-model="scope.row['cNmeCn']"></el-input>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-button @click="add" class="addSty" :icon="Plus">新增一行</el-button>
+      </el-tab-pane>
+    </el-tabs>
       <div class="btnSty">
         <el-button @click="close">取消</el-button>
         <el-button type="primary" @click="returnData">确定</el-button>
@@ -12,7 +56,7 @@
 <script setup lang="ts">
 import { defineComponent, ref, reactive, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
-
+import { Plus } from '@element-plus/icons-vue'
 import { createFreeButtonBase } from "@/shared/button-config";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
 import {
@@ -35,49 +79,25 @@ const props = defineProps({
   }
 })
 const emits = defineEmits(['handleClose'])
-const tableRef = ref<MyTableMethod | null>(null);
+const multipleTableRef = ref<MyTableMethod | null>(null);
 const selected = ref([])
 const pageresult = reactive<Pageresult>({
-  result: "",
   /** 数据列表 */
   list: [],
-  /** 总数 */
-  total: 0,
 });
-
-const tableconfig = reactive<AppTableConfig>(
-  createTableEditConfig({
-    isPage: 'false',
-    // showSelection: true,
-    fromSchema: [
-      {
-        prop: "PrdFixSpec.checked",
-        inputtype: 'rtcheckbox',
-        title: "是否选中",
-        width: 130,
-      },
-      {
-        prop: "PrdFixSpec.CSpecNo",
-        inputtype: 'rtinput',
-        title: "特别约定代码",
-        width: 150,
-      },
-      {
-        prop: "PrdFixSpec.CNmeCn",
-        inputtype: 'rtinput',
-        title: "特约内容",
-      },
-      {
-        prop: "PrdFixSpec.CNmeEn",
-        inputtype: 'rtinput',
-        title: "英文名",
-      },
-    ],
+const addTableData = reactive([]) //添加其他特约
+const activeName = ref('first')
+const selectable = (row) => row['cIfMust'] != '1' //这里调用是把必选的置灰
+const tableRowClassName = ({row,rowIndex,}) => {
+  let sty = ''
+  selected.value.forEach(item => {
+    if(item['cSpecNo'] == row['cSpecNo']) {
+      sty = 'checkedSty'
+    }
   })
-);
-
+  return sty
+}
 const handleSelectionChange = (selection) => {
-  
   selected.value = selection
 }
 
@@ -91,42 +111,67 @@ const refreshData = () => {
   }, false, true).then(res => {
     if (res) {
       pageresult.list = []
-      res.forEach(item => {
+      res.forEach((item, index) => {
         pageresult.list.push({
-          'PrdFixSpec.CSpecNo': item.cSpecNo,
-          'PrdFixSpec.CNmeCn': item.cNmeCn,
-          'PrdFixSpec.CNmeEn': item.cNmeEn,
-          "PrdFixSpec.checked": false
+          'cSpecNo': item.cSpecNo,
+          'cNmeCn': item.cNmeCn,
+          'cNmeEn': item.cNmeEn,
+          'cIfMust': item.cIfMust, //是否必选
+          'cIfEdit': item.cIfEdit, //是否可修改
+          'cIfFix': '1' //是否固定特约，接口查出来的1，自定义添加的为0
         })
       })
       nextTick(() => {
+        toggleSpecificRow() //这里调用是把必选的选中
         setSelected()
       })
     }
   });
 };
 
+// 切换指定行的选中状态
+const toggleSpecificRow = () => {
+  if (multipleTableRef.value) {
+    // 假设要切换 id 为 2 的行的选中状态
+    const targetRow = pageresult.list.find(row => row['cIfMust'] == '1');
+    if (targetRow) {
+      multipleTableRef.value.toggleRowSelection(targetRow);
+    }
+  }
+};
+
+function add() {
+  addTableData.push({
+    "addIndex": addTableData.length + 1, //序号
+    "cSpecNo": '',
+    "cNmeCn": '',
+    'cIfMust': '2', //是否必选
+    'cIfEdit': '0', //是否可修改
+    'cIfFix': '0' //是否固定特约，查寻特约模板接口查出来的1，自定义添加的为0
+  })
+}
+
 //点击确定按钮时把选中的数据派发给父组件
 const returnData = () => {
-  let tempData = []
-  pageresult.list.forEach(item => {
-    if(item['PrdFixSpec.checked']) {
-      tempData.push(item)
-    }
-  })
-  props.data.method.getSelected(tempData)
+  if(activeName.value == 'first') {
+    let tempData = multipleTableRef.value.getSelectionRows()
+    props.data.method.getSelected(tempData)
+  } else {
+    props.data.method.getSelected(addTableData)
+  }
+
 }
 const close = () => {
   emits('handleClose')
 }
 
 function setSelected() {
-  const lastSelected = props.data.data.fixSpecData
+  const lastSelected = props.data.data.selectedData
   if(lastSelected && lastSelected.length) {
     lastSelected.forEach(item => {
       pageresult.list.forEach(item2 => {
-        if(item['PrdFixSpec.CSpecNo'] === item2['PrdFixSpec.CSpecNo']) {
-          item2['PrdFixSpec.checked'] = true
+        if(item['cSpecNo'] === item2['cSpecNo']) {
+          item2['checked'] = true
         }
       })
     })
@@ -141,6 +186,23 @@ onMounted(() => {
 <style scoped lang="scss">
 .btnSty {
   text-align: right;
+  margin-top: 10px;
+}
+.totalBox {
+  width: 100%;
+  height: 40px;
+  line-height: 40px;
+  padding-left: 20px;
+  background: #fefce7;
+  border: 1px solid #f3e4b9;
+  margin-bottom: 10px;
+}
+:deep .el-table .checkedSty {
+  background-color: #ffe8e6;
+}
+.addSty {
+  border: 1px dashed #ccc;
+  width: 100%;
   margin-top: 10px;
 }
 </style>
