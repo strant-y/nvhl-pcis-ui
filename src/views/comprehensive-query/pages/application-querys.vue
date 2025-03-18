@@ -382,7 +382,7 @@
                     title: "承保机构",
                     btnWidth: 10,
                     itemWidth: 2,
-                    rules: [{ type: "required" }],
+                    // rules: [{ type: "required" }],
                     showExBtn: true,
                     rules: [getRules("required", {})],
                     btnItems: {
@@ -479,12 +479,12 @@
                 {
                     prop: "cProdNo",
                     inputtype: "rtselect",
-                    title: "产品",
+                    title: "条款",
                     itemWidth: 1,
                     rules: [{ type: "required" }],
                     filterable:true,
                     clearable: true,
-                    typeCode: "PROD_LIST_IN_GUIDE",
+                    typeCode: "TERM_LIST_IN_GUIDE_NEW",
                     codeParam: {
                         cParCde: cPard.value,
                         cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
@@ -1104,7 +1104,21 @@
                         item.title='签单日期'
                     }
                 }
-
+                if(Number(i)==2){
+                    if(item.prop ==='cAppTyp'){
+                        item.disabled=true
+                        freeEditRef.value[i].value[0].setValue("cAppTyp", "A");
+                    }
+                }else if(Number(i)==3){
+                    if(item.prop ==='cAppTyp'){
+                        item.disabled=true
+                        freeEditRef.value[i].value[0].setValue("cAppTyp", "E");
+                    }
+                }else{
+                    if(item.prop ==='cAppTyp'){
+                        item.disabled=false
+                    }
+                }
             })
             freeEditRef.value[i].value[0].setValue("tms", [
                 dayjs(new Date())
@@ -1246,13 +1260,8 @@
                 })
                 .finally(() => {});
         }else if(currentTabKey.value=='2'){
-            const r={
-                "pageNo":1,
-                "pageSize":10,
-                "TAppTmStart":"2025-01-01 00:00:00",
-                "TAppTmEnd":"2025-03-07 00:00:00"
-            }
             const param =Object.assign(s, r);
+            param['pageNo']=param['pageNum']
             param['user']=JSON.parse(sessionStorage.getItem("user"))
             console.log(param)
             qryEndorseList(param)
