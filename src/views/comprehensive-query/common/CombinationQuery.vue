@@ -144,7 +144,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "状态",
         typeCode: "RECEIVE_BANK_CATEGORY",
-        params: { cParCde:'shenqingdanzhuangtai' },
+        codeParam: { cParCde:'shenqingdanzhuangtai' },
         clearable: true,
       },
     ],
