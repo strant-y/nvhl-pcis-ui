@@ -88,7 +88,31 @@ const method = {
       },
       {
         isOk: (selectdata: any) => {
-          console.log("a", selectdata);
+          if(selectdata?.sel){
+              const selobj=JSON.parse(JSON.stringify(selectdata?.sel))
+              const newobj={}
+              Object.keys(selobj).forEach((key)=>{
+                  if(key!='_dataId'){
+                      const k=opertaor.firstCharLower(key)
+                      newobj['Applicant.'+k]=selobj[key]
+                  }
+              })
+              console.log(newobj)
+              newobj['Applicant.cAppNme']=newobj['Applicant.cClntNme']
+              setFormValue(newobj)
+              setFormItem("Applicant.cAppNme", {
+                  disabled: true,
+              });
+              setFormItem("Applicant.cClntMrk", {
+                  disabled: true,
+              });
+              setFormItem("Applicant.cCertfCls", {
+                  disabled: true,
+              });
+              setFormItem("Applicant.cCertfCde", {
+                  disabled: true,
+              });
+          }
         },
       },
       { title: "选择客户信息", width: 70 }
@@ -111,6 +135,18 @@ const method = {
     for (const k in applicantValue) {
       applicantValue[k] = null;
     }
+    setFormItem("Applicant.cAppNme", {
+        disabled: false,
+    });
+    setFormItem("Applicant.cClntMrk", {
+        disabled: false,
+    });
+    setFormItem("Applicant.cCertfCls", {
+        disabled: false,
+    });
+    setFormItem("Applicant.cCertfCde", {
+        disabled: false,
+    });
   },
   cardTypeChange: (val) => {
     if (val == "120001") {

@@ -91,5 +91,11 @@ export function getAppPlyInfoByAppNo(queryParams: any): AxiosPromise<any> {
     return post(`${QUERY}getAppPlyInfoByAppNo`, queryParams);
 }
 
-  
+/**
+ * 查询客户信息
+ * @param queryParams
+ */
+export function genCusConInfoBusinessList(queryParams: any): AxiosPromise<any> {
+    return post(`policy/genCusConInfoBusinessList`, queryParams);
+}
 

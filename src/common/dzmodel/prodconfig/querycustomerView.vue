@@ -23,6 +23,7 @@
     import { createFreeButtonBase } from "@/shared/button-config";
     import { useValidator } from "@/typings/useValidator";
     import { dataOpertaor } from "@/store/modules/data-opertaor";
+    import {genCusConInfoBusinessList,} from "../../../api/query/index";
     const opertaor = dataOpertaor();
     const { getRules } = useValidator();
     const props = defineProps({
@@ -45,6 +46,7 @@
         /** 总数 */
         total: 0,
     });
+    const user=JSON.parse(sessionStorage.getItem("user"))
     const formconfig1 = reactive<AppFreeEditConfig>(
         createAppFreeEditConfig({
             title: "客户信息",
@@ -84,29 +86,29 @@
             ],
             fromSchema: [
                 {
-                    prop: "cClntMrk",
+                    prop: "CClntMrk",
                     inputtype: "rtselect",
                     title: "客户类型",
                     rules: [{ type: "required" }],
                     loadData: [
-                        { value: "0", label: "个人" },
-                        { value: "1", label: "法人" },
+                        { value: "0", label: "法人" },
+                        { value: "1", label: "个人" },
                     ],
                     rules: [getRules("required", {})],
                 },
                 {
-                    prop: "cAppNme",
+                    prop: "CClntNme",
                     inputtype: "rtinput",
                     title: "客户名称",
                 },
                 {
-                    prop: "cCertfCls",
+                    prop: "CCertfCls",
                     inputtype: "rtselect",
                     title: "证件类型",
                     typeCode: 'CERTIFICATE_TYPE_CACHE',
                 },
                 {
-                    prop: "cCertfCde",
+                    prop: "CCertfCde",
                     inputtype: "rtinput",
                     title: "证件号码",
                 },
@@ -130,24 +132,17 @@
                     type: "danger",
                     icon: "Check",
                     tableClick: async (row) => {
-                        // await auditSubmit({
-                        //     cProdNo: row.cProdNo,
-                        //     cStatus: row.cStatus,
-                        //     cAuditStatus: "submit",
-                        // }).then((res) => {
-                        //     if (res.code === 200) {
-                        //         ElMessage.success(res.data.message);
-                        //         handleQuery();
-                        //     }
-                        // });
+                        console.log(row)
+                        props.method.isOk({'sel':row});
+                        emits("handleClose");
                     },
                 }),
             ],
 
             fromSchema: [
                 {
-                    prop: "cClntMrk",
-                    inputtype: "rttag",
+                    prop: "CClntMrk",
+                    inputtype: "rtselect",
                     title: "客户类型",
                     loadData: [
                         {
@@ -161,32 +156,33 @@
                     ],
                 },
                 {
-                    prop: "cKindNme",
+                    prop: "CClntNme",
                     inputtype: "rtinput",
                     title: "客户名称",
                 },
                 {
-                    prop: "cProdNo",
+                    prop: "CCusLvl",
                     inputtype: "rtinput",
                     title: "客户层级",
                 },
                 {
-                    prop: "cDispCde",
-                    inputtype: "rtinput",
+                    prop: "CCertfCls",
+                    inputtype: "rtselect",
                     title: "证件类型",
+                    typeCode: 'CERTIFICATE_TYPE_CACHE',
                 },
                 {
-                    prop: "cNmeCn",
+                    prop: "CCertfCde",
                     inputtype: "rtinput",
                     title: "证件号码",
                 },
                 {
-                    prop: "cAuditStatus",
+                    prop: "CClntAddr",
                     inputtype: "rtinput",
                     title: "通讯地址",
                 },
                 {
-                    prop: "cAuditStatus",
+                    prop: "CZipCde",
                     inputtype: "rtinput",
                     title: "邮编",
                 },
@@ -221,23 +217,25 @@
         const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
         const s = freeEditRef.value?.getFromValue(); //获取表单数据
         const param = Object.assign(s, r);
-        if(s['cAppNme']==null&&s['cCertfCde']==null){
+        if(s['CClntNme']==null&&s['CCertfCde']==null){
             ElMessage.error("客户姓名或证件号码至少一个不为空！");
             return;
         }
+        param['CurrentUser']=user['companyId']
+        param['CurrentUserOrg']=user['opCde']
+        param['pageNo']=param['pageNum']
         console.log(param)
-        return;
-        // getProFactoryList(param)
-        //     .then((res) => {
-        //         const { code, data, msg } = res;
-        //         if (200 === code) {
-        //             pageresult.list = data.result;
-        //             pageresult.total = data.total;
-        //         } else {
-        //             ElMessage.error(msg);
-        //         }
-        //     })
-        //     .finally(() => {});
+        genCusConInfoBusinessList(param)
+            .then((res) => {
+                const { code, data, msg } = res;
+                if (200 === code) {
+                    pageresult.list = data.result;
+                    pageresult.total = data.total;
+                } else {
+                    ElMessage.error(msg);
+                }
+            })
+            .finally(() => {});
     }
 
     onMounted(() => {

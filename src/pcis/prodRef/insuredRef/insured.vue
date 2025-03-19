@@ -64,7 +64,9 @@ const method = {
     for (const k in applicantValue) {
       const key = "Insured." + k.split(".")[1];
       if (k.split(".")[1] == "cAppNme") {
-        insuredValue["Insured.cInsuredNme"] = applicantValue["Insured.cAppNme"];
+        insuredValue["Insured.cInsuredNme"] = applicantValue["Applicant.cAppNme"];
+      }else if (k.split(".")[1] == "cAppCde") {
+        insuredValue["Insured.cInsuredCde"] = applicantValue["Applicant.cAppCde"];
       } else {
         insuredValue[key] = applicantValue[k];
       }
@@ -85,7 +87,32 @@ const method = {
       },
       {
         isOk: (selectdata: any) => {
-          console.log("a", selectdata);
+            if(selectdata?.sel){
+                const selobj=JSON.parse(JSON.stringify(selectdata?.sel))
+                const newobj={}
+                Object.keys(selobj).forEach((key)=>{
+                    if(key!='_dataId'){
+                        const k=opertaor.firstCharLower(key)
+                        newobj['Insured.'+k]=selobj[key]
+                    }
+                })
+                console.log(newobj)
+                newobj['Insured.cInsuredNme']=newobj['Insured.cClntNme']
+                newobj['Insured.cInsuredCde']=newobj['Insured.cAppCde']
+                setFormValue(newobj)
+                setFormItem("Insured.cInsuredNme", {
+                    disabled: true,
+                });
+                setFormItem("Insured.cClntMrk", {
+                    disabled: true,
+                });
+                setFormItem("Insured.cCertfCls", {
+                    disabled: true,
+                });
+                setFormItem("Insured.cCertfCde", {
+                    disabled: true,
+                });
+            }
         },
       },
       { title: "选择客户信息", width: 85 }
@@ -203,6 +230,18 @@ const method = {
     for (const k in InsuredValue) {
       InsuredValue[k] = null;
     }
+      setFormItem("Insured.cInsuredNme", {
+          disabled: false,
+      });
+      setFormItem("Insured.cClntMrk", {
+          disabled: false,
+      });
+      setFormItem("Insured.cCertfCls", {
+          disabled: false,
+      });
+      setFormItem("Insured.cCertfCde", {
+          disabled: false,
+      });
   },
   funcNdustryCate: () => {
     dialog.value?.open(

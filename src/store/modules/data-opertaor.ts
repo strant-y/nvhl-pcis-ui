@@ -156,6 +156,7 @@ export const dataOpertaor = defineStore(
       convertData,
       setFatherPage,
       getFatherPage,
+      firstCharLower,
     };
   },
   {
