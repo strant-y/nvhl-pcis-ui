@@ -53,6 +53,7 @@ const props = defineProps({
     default: false
   }
 })
+const cPard = ref(null);
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -111,7 +112,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         }
       },
       {
-        prop: "objday",
+        prop: "NExpirationDays",
         inputtype: "rtnumber",
         step: 1,
         max: 7,
@@ -121,22 +122,57 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
         clearable: true,
       },
-      {
-        prop: "CKindNo",
-        inputtype: "rtselect",
-        title: "产品大类",
-        typeCode: "KIND_LIST_GRT",
-        params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
-        clearable: true,
-      },
-      {
-        prop: "CProdNo",
-        inputtype: "rtselect",
-        title: "条款",
-        typeCode: "PROD_LIST_GRT",
-        params: { cParCde:'', cOperId: user.value.opCde, cDptCde: user.value.companyId },
-        clearable: true,
-      },
+      // {
+      //   prop: "CKindNo",
+      //   inputtype: "rtselect",
+      //   title: "产品大类",
+      //   typeCode: "KIND_LIST_GRT",
+      //   params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
+      //   clearable: true,
+      // },
+      // {
+      //   prop: "CProdNo",
+      //   inputtype: "rtselect",
+      //   title: "条款",
+      //   typeCode: "PROD_LIST_GRT",
+      //   params: { cParCde:'', cOperId: user.value.opCde, cDptCde: user.value.companyId },
+      //   clearable: true,
+      // },
+        {
+            prop: "cKindNo",
+            inputtype: "rtselect",
+            title: "产品大类",
+            itemWidth: 1,
+            rules: [{ type: "required" }],
+            typeCode: "KIND_LIST_GRT",
+            child: "cProdNo",
+            filterable:true,
+            clearable: true,
+            codeParam: {
+                cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+                cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+            },
+            func: (val) => {
+                cPard.value=val
+            },
+        },
+        {
+            prop: "cProdNo",
+            inputtype: "rtselect",
+            title: "条款",
+            itemWidth: 1,
+            rules: [{ type: "required" }],
+            filterable:true,
+            clearable: true,
+            typeCode: "TERM_LIST_IN_GUIDE_NEW",
+            codeParam: {
+                cParCde: cPard.value,
+                cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+                cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+            },
+            func: (val) => {
+            },
+        },
       {
         prop: "CPlyNo",
         inputtype: "rtinput",
@@ -188,7 +224,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "机构",
       },
       {
-        prop: "cProdNmeCn",
+        prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款",
       },
@@ -268,16 +304,23 @@ function handleQuery(flag?: boolean) {
 
 // 打开详情
 function showDetails(row: any) {
-  const en = JSON.stringify({
-    scene: SCENE_PLY_APP_READ,
-    CAppNo: row.cAppNo,
-    CCiMrk: row.cCiMrk,
-    CProdNo: row.cProdNo,
-  });
-  router.push({
-    path: '/index/pcis-query/plyDetails',
-    query: { data: en }
-  });
+  // const en = JSON.stringify({
+  //   scene: SCENE_PLY_APP_READ,
+  //   CAppNo: row.cAppNo,
+  //   CCiMrk: row.cCiMrk,
+  //   CProdNo: row.cProdNo,
+  // });
+  // router.push({
+  //   path: '/index/pcis-query/plyDetails',
+  //   query: { data: en }
+  // });
+    const data = row;
+    router.push({
+        path: "/pcis/my-page",
+        query: {
+            param: JSON.stringify({ ...data, ...{ pageType: "edit" } }),
+        },
+    });
 }
 </script>
 
