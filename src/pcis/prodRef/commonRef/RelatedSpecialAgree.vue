@@ -108,22 +108,53 @@ const pageresult = reactive<Pageresult>({
 
 const tableConfig = reactive<AppTableConfig>(
   createTableEditConfig({
-    showSelection: true,
+    // showSelection: true,
+    // isPage: true,
     fromSchema: [
+      {
+        prop: "checked",
+        title: "是否选中",
+        inputtype: "rtcheckbox",
+        width: "100",
+        func: (val) => {
+          selectedRows.value = val;
+        },
+      },
       {
         prop: "cSpecNo",
         title: "特别约定代码",
+        width: "200",
         inputtype: "rtinput",
       },
       {
         prop: "cNmeEn",
         title: "英文名",
+        width: "200",
         inputtype: "rtinput",
       },
       {
         prop: "cNmeCn",
         title: "特约内容",
         inputtype: "rtinput",
+      },
+      {
+        prop: "cIfEdit",
+        title: "是否可编辑",
+        inputtype: "rtcheckbox",
+        width: "100",
+        func: (val) => {
+          return val === "1" ? true : false;
+        },
+      },
+      {
+        prop: "cIfMust",
+        title: "是否必选",
+        inputtype: "rtcheckbox",
+        width: "100",
+        func: (val, row) => {
+          console.log("改变状态的row", row);
+          return val === "1" ? true : false;
+        },
       },
     ],
   })
@@ -146,6 +177,9 @@ function handleQuery(flag?: boolean) {
         pageresult.list = [];
         pageresult.list = data.result;
         pageresult.total = data.total;
+        pageresult.list.forEach((item) => {
+          item.checked = false;
+        });
       } else {
         ElMessage.error(msg);
       }
@@ -153,16 +187,19 @@ function handleQuery(flag?: boolean) {
     .finally(() => {});
 }
 function handleSelectionChange(rows: any[]) {
-  selectedRows.value = rows;
+  // selectedRows.value = rows;
 }
 
 const handleConfirm = () => {
-  if (selectedRows.value.length === 0) {
-    ElMessage.warning("请选择至少一项");
-    return;
-  }
+  // if (selectedRows.value.length === 0) {
+  //   ElMessage.warning("请选择至少一项");
+  //   return;
+  // }
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
-  const param = selectedRows.value.map((item) => item.cSpecNo).join(",");
+  const paramData = pageresult.list.filter((item) => item.checked == true);
+  const param = paramData.map((items) => items.cSpecNo).join(",");
+  console.log("0000", param);
+  // const param = selectedRows.value.map((item) => item.cSpecNo).join(",");
   const newParam = {
     userId: user.opCde,
     cCrtCde: user.opCde,

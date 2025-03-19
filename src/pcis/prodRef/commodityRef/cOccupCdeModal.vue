@@ -82,8 +82,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           if (val) {
             codeListStore
               .queryCodeList({
-                codeListName: "Job_Description_List",
-                codeListParam: { cParCde: val },
+                codeListName: "INDUSTRY_CATEGORY",
+                codeListParam: { cCde: val },
               })
               .then((res) => {
                 const objData = {
@@ -105,7 +105,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         //   if (val) {
         //     codeListStore
         //       .queryCodeList({
-        //         codeListName: "Industry_Category_List2",
+        //         codeListName: "INDUSTRY_CATEGORY",
         //         codeListParam: { cParCde: val },
         //       })
         //       .then((res) => {
@@ -119,7 +119,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       },
 
       {
-        prop: "cCde",
+        prop: "cConcat",
         inputtype: "rtinput",
         title: "工种代码",
       },
@@ -215,9 +215,17 @@ function setDisa() {}
 
 /** 查询 */
 function handleQuery(flag?: boolean) {
+  // const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
+  // const s = freeEditRef.value?.getFromValue(); //获取表单数据
+  // const param = Object.assign(s, r);
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(s, r);
+  const c = { codeListName: "INDUSTRY_INQUIRY" };
+  const param = Object.assign(c, {
+    codeListParam: s,
+    r,
+    parCde: s.cMidCde,
+  });
   getPageList(param)
     .then((res) => {
       const { code, data, msg } = res;

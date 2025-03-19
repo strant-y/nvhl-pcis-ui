@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
-import { ref } from "vue";
+import { ref, toRefs } from "vue";
 import {
   AppFreeEditConfig,
   AppFreeEditMethod,
@@ -48,6 +48,7 @@ import { SysOpMgrService } from "@/views/sys-right-basic/service/sys-op-mgr.serv
 import { max } from "lodash";
 import func from "vue-temp/vue-editor-bridge";
 const emits = defineEmits(["rowClick", "updateTerm"]);
+
 const props = defineProps({
   datas: {
     type: Array,
@@ -57,7 +58,12 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  termList: {
+    type: Array,
+    default: () => [],
+  },
 });
+const { datas } = toRefs(props);
 const sysOpMgrService = new SysOpMgrService();
 const formconfig1 = reactive({
   name: "",
@@ -93,10 +99,10 @@ const tableconfig = reactive<AppTableConfig>(
         iconColor: checkedIcon,
         tableClick: (row) => {
           checkedIcon.value =
-            checkedIcon.value === "rgb(250, 219, 20)"
-              ? "rgb(170, 170, 170)"
-              : "rgb(250, 219, 20)";
-          if (checkedIcon.value === "rgb(170, 170, 170)") {
+            checkedIcon.value === "rgb(170, 170, 170)"
+              ? "rgb(250, 219, 20)"
+              : "rgb(170, 170, 170)";
+          if (checkedIcon.value === "rgb(250, 219, 20)") {
             const params = {
               termNo: row.code,
               termCnm: row.value,
@@ -105,7 +111,7 @@ const tableconfig = reactive<AppTableConfig>(
             userUnionTerm(params).then((res) => {
               if (res.code == "1") {
                 ElMessage.success(res.message);
-                emits("updateTerm");
+                emits("updateTerm", {});
               } else {
                 ElMessage.error(res.msg);
               }
@@ -114,7 +120,7 @@ const tableconfig = reactive<AppTableConfig>(
             unUserUnUntionTerm({ termNo: row.code }).then((res) => {
               if (res.code == "1") {
                 ElMessage.success(res.message);
-                emits("updateTerm");
+                emits("updateTerm", {});
               } else {
                 ElMessage.error(res.msg);
               }
@@ -134,15 +140,11 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "条款名称",
       },
-      // {
-      // 	prop: "cOpType",
-      // 	inputtype: "rtinput",
-      // 	title: "主附险标识",
-      // }
     ],
   })
 );
 onMounted(async () => {
+  console.log("props.datas", props.termList);
   init();
 });
 
@@ -158,8 +160,14 @@ watch(
 function init() {
   formconfig1.name = "";
   pageresult.list = props.datas;
-  console.log("props.datas", props.datas, props.pNode);
-  pageresult.total = props.datas.length;
+
+  checkedIcon.value = "rgb(170, 170, 170)";
+  props.termList.forEach((item: any, index: any) => {
+    if (datas.value.length && item.termNo == datas.value[0].code) {
+      checkedIcon.value = "rgb(250, 219, 20)";
+    }
+  });
+  console.log("props.datas", checkedIcon.value);
 }
 
 // }

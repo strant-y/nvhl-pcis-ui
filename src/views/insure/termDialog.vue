@@ -43,6 +43,7 @@
           v-if="listShow"
           :datas="datas"
           :pNode="pNode"
+          :termList="props.termList"
           @updateTerm="updateTermlist"
         />
       </el-col>
@@ -83,11 +84,13 @@ import {
 import { getBasicKindList } from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { getProdEnableList } from "./custom-recording.service";
+import { terConfig } from "@/store/modules/term-config";
 const emits = defineEmits(["ok", "cancel"]);
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
 const dialogVisible = ref(true);
 const treeRef = ref<InstanceType<typeof ElTree>>();
+const termList = ref<any>([]);
 const formconfig1 = ref({
   name: "",
 });
@@ -200,7 +203,7 @@ function confirm() {
   emits("ok", {});
 }
 function updateTermlist() {
-  emits("ok", {});
+  props.data.updateQuery();
 }
 </script>
 

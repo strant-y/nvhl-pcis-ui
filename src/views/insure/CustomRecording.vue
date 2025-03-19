@@ -15,7 +15,7 @@
         <el-form-item
           label="归属机构"
           prop="cDptCde"
-          style="width: 800px"
+          style="width: 600px"
           :rules="[getRules('required', {})]"
         >
           <dept v-model="formconfig1.cDptCde" @selected-item="selectedItem" />
@@ -79,10 +79,13 @@
                     <el-icon size="20" style="vertical-align: middle"
                       ><Fold
                     /></el-icon>
-                    <span :title="item.prodCnm" class="text-ellipsis">
+                    <span :title="item.prodCnm" class="">
                       {{ item.prodCnm }}
                     </span>
-                    <el-icon :size="25" style="color: rgb(250, 219, 20)"
+                    <el-icon
+                      :size="25"
+                      style="color: rgb(250, 219, 20)"
+                      @click.stop="handleStarClick(item)"
                       ><StarFilled
                     /></el-icon>
                   </p>
@@ -98,7 +101,7 @@
               :rules="[getRules('required', {})]"
             >
               <el-select
-                style="width: 600px"
+                style="width: 500px"
                 v-model="formconfig1.cNmeCn"
                 placeholder="请选择"
                 @change="handleChange"
@@ -172,6 +175,7 @@ import {
 import {
   getProdEnableList,
   qryUserCommonTerm,
+  unUserUnUntionTerm,
 } from "./custom-recording.service";
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
@@ -229,7 +233,6 @@ function loadOptions() {
     }
   });
 }
-
 onMounted(async () => {
   handleQuery();
   loadOptions();
@@ -294,6 +297,17 @@ function handleClick(item: any, index: number) {
   item.checked = !item.checked;
   formconfig1.value.cNmeCn = item.checked ? item.termCnm : "";
 }
+//取消常用条款
+function handleStarClick(item: any) {
+  unUserUnUntionTerm({ termNo: item.termNo }).then((res) => {
+    if (res.code == "1") {
+      ElMessage.success(res.message);
+      handleQuery();
+    } else {
+      ElMessage.error(res.msg);
+    }
+  });
+}
 function handleQuery() {
   qryUserCommonTerm({
     pageNum: 1,
@@ -342,17 +356,24 @@ function updateOptionAll(e: any) {
 // 选择条款弹框
 function showModal() {
   dzmodal
-    .open(termDialog, { type: "Issuer", data: {}, termList: termList.value })
+    .open(termDialog, {
+      type: "Issuer",
+      data: { updateQuery },
+      termList: termList.value,
+    })
+
     .then((res: any) => {
       if (res.type === "ok") {
         const selectedTerm = res.body;
-        console.log("000000", selectedTerm);
         formconfig1.value.cTermNo = selectedTerm.data.code;
         formconfig1.value.cNmeCn = selectedTerm.data.value;
         formconfig1.value.cProdNo = selectedTerm.parent.data.code;
         handleQuery();
       }
     });
+}
+function updateQuery() {
+  handleQuery();
 }
 </script>
 
@@ -363,7 +384,7 @@ function showModal() {
 .searchbar.el-card .el-card__header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  /* align-items: center; */
   /* padding: 10px 20px; */
   background-color: var(--el-card-header-bg-color);
   border-bottom: 1px solid #ebeef5;

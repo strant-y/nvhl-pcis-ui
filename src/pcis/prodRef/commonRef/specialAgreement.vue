@@ -191,6 +191,25 @@ const tableconfig = reactive<AppTableConfig>(
         title: "特约内容",
         inputtype: "rtinput",
       },
+      {
+        prop: "cIfEdit",
+        title: "是否可编辑",
+        inputtype: "rtcheckbox",
+        width: "100",
+        func: (val) => {
+          return val === "1" ? true : false;
+        },
+      },
+      {
+        prop: "cIfMust",
+        title: "是否必选",
+        inputtype: "rtcheckbox",
+        width: "100",
+        func: (val, row) => {
+          console.log("改变状态的row", row);
+          return val === "1" ? true : false;
+        },
+      },
     ],
   })
 );
@@ -219,8 +238,8 @@ function setDisa() {
   });
 }
 /** 查询 */
-function handleQuery() {
-  const r = tableRef.value?.getPartnerPage(); //获取分页数据
+function handleQuery(flag?: boolean) {
+  const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const c = tabref.getFromValue().cProdNo;
   const param = Object.assign(s, r, { cProdNo: c });
