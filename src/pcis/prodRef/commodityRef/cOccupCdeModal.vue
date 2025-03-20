@@ -153,21 +153,24 @@ const tableconfig = reactive<AppTableConfig>(
 
     fromSchema: [
       {
-        prop: "cCde",
+        prop: "cde",
         inputtype: "rtinput",
         title: "工种代码",
       },
       {
-        prop: "cCnm",
+        prop: "cnm",
         inputtype: "rtinput",
         title: "工种名称",
       },
       {
-        prop: "cCnm",
+        prop: "parCnm",
         inputtype: "rtinput",
         title: "父级名称",
       },
     ],
+    rowDbClickFun(rowData) {
+      props.data.method?.getdbClickData(rowData);
+    },
   })
 );
 function setFormItem(key, obj) {
@@ -221,11 +224,8 @@ function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const c = { codeListName: "INDUSTRY_INQUIRY" };
-  const param = Object.assign(c, {
-    codeListParam: s,
-    r,
-    parCde: s.cMidCde,
-  });
+  s.cCde = s.cMidCde;
+  const param = Object.assign(c, { codeListParam: s }, r);
   getPageList(param)
     .then((res) => {
       const { code, data, msg } = res;

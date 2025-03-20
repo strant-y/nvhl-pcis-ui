@@ -27,13 +27,11 @@ const props = defineProps({
 
 const applicantEditRef = ref<AppFreeEditMethod | null>(null);
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-import { debug } from "console";
-import { ru } from "element-plus/es/locale";
-import { emit } from "process";
 const opertaor = dataOpertaor();
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 const formData = ref<any[]>([]);
+const cClntAddr = ref<any>(null);
 onMounted(() => {
   console.log(props.pageSchema);
   const formconfig11 = formInit(
@@ -88,30 +86,30 @@ const method = {
       },
       {
         isOk: (selectdata: any) => {
-          if(selectdata?.sel){
-              const selobj=JSON.parse(JSON.stringify(selectdata?.sel))
-              const newobj={}
-              Object.keys(selobj).forEach((key)=>{
-                  if(key!='_dataId'){
-                      const k=opertaor.firstCharLower(key)
-                      newobj['Applicant.'+k]=selobj[key]
-                  }
-              })
-              console.log(newobj)
-              newobj['Applicant.cAppNme']=newobj['Applicant.cClntNme']
-              setFormValue(newobj)
-              setFormItem("Applicant.cAppNme", {
-                  disabled: true,
-              });
-              setFormItem("Applicant.cClntMrk", {
-                  disabled: true,
-              });
-              setFormItem("Applicant.cCertfCls", {
-                  disabled: true,
-              });
-              setFormItem("Applicant.cCertfCde", {
-                  disabled: true,
-              });
+          if (selectdata?.sel) {
+            const selobj = JSON.parse(JSON.stringify(selectdata?.sel));
+            const newobj = {};
+            Object.keys(selobj).forEach((key) => {
+              if (key != "_dataId") {
+                const k = opertaor.firstCharLower(key);
+                newobj["Applicant." + k] = selobj[key];
+              }
+            });
+            console.log(newobj);
+            newobj["Applicant.cAppNme"] = newobj["Applicant.cClntNme"];
+            setFormValue(newobj);
+            setFormItem("Applicant.cAppNme", {
+              disabled: true,
+            });
+            setFormItem("Applicant.cClntMrk", {
+              disabled: true,
+            });
+            setFormItem("Applicant.cCertfCls", {
+              disabled: true,
+            });
+            setFormItem("Applicant.cCertfCde", {
+              disabled: true,
+            });
           }
         },
       },
@@ -136,16 +134,16 @@ const method = {
       applicantValue[k] = null;
     }
     setFormItem("Applicant.cAppNme", {
-        disabled: false,
+      disabled: false,
     });
     setFormItem("Applicant.cClntMrk", {
-        disabled: false,
+      disabled: false,
     });
     setFormItem("Applicant.cCertfCls", {
-        disabled: false,
+      disabled: false,
     });
     setFormItem("Applicant.cCertfCde", {
-        disabled: false,
+      disabled: false,
     });
   },
   cardTypeChange: (val) => {
@@ -281,7 +279,15 @@ const method = {
       "cOccupCdeModal",
       {
         type: "show",
-        data: {},
+        method: {
+          getdbClickData: (data) => {
+            setFormItem("Applicant.cOccupCde", {
+              loadData: [{ label: data.cnm, value: data.cde }],
+            });
+            setValue("Applicant.cOccupCde", data.cnm);
+            dialog.value?.handleClose();
+          },
+        },
       },
       {
         isOk: (selectdata: any) => {},

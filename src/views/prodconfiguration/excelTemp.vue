@@ -72,12 +72,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         // codeParam: { cParCde: "" },
       },
       {
-        prop: "CTermNo",
+        prop: "cTermNo",
         inputtype: "rtinput",
         title: "列代码",
       },
       {
-        prop: "CNmeCn",
+        prop: "cNmeCn",
         inputtype: "rtinput",
         title: "列标题",
       },
@@ -249,12 +249,13 @@ function handleQuery(flag?: boolean) {
   const param = Object.assign(s, r);
   excelList(param)
     .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
-        pageresult.list = data.result;
-        pageresult.total = data.total;
+      // const { code, data, msg } = res;
+      if (res.code == "200") {
+        debugger;
+        pageresult.list = res.data.result;
+        pageresult.total = res.data.total;
       } else {
-        ElMessage.error(msg);
+        ElMessage.error(res.data.msg);
       }
     })
     .finally(() => {});
