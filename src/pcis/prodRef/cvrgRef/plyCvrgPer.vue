@@ -263,6 +263,7 @@ function getFromValue() {
 }
 
 function setFormValue(value: any) {
+  Object.assign(formData, {});
   let plandata: any[] = [];
   value.forEach((item: any) => {
     let creData = JSON.parse(JSON.stringify(item));
