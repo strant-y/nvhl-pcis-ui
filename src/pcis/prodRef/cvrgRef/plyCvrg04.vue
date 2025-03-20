@@ -371,7 +371,6 @@ function setFormValue(value: any) {
       plandata[planKey] = newrisk;
     }
   });
-  planData = {};
   Object.keys(plandata).forEach((planNo: any) => {
     refushData(planNo, plandata[planNo]);
   });
