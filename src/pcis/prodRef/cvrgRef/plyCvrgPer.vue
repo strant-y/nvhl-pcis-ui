@@ -130,7 +130,7 @@ const props = defineProps({
 const cardconfig = ref(creatCardConfig({}));
 const tremTemplateRefs = ref<any[]>([]);
 const cvrgFormfef = ref("cvrgFormfef");
-const formData = reactive<{ [key: string]: { [key: string]: any } }>({});
+const formData = ref<{ [key: string]: { [key: string]: any } }>({});
 
 onMounted(async () => {
   const formconfig11 = formInit(
@@ -219,13 +219,13 @@ function deleteTermByNo(t: any) {
   let deleindex = null;
   Object.keys(formData).forEach((item) => {
     let deleindex = null;
-    for (let i = 0; i < formData[item].length; i++) {
-      if (formData[item][i]["Term.cClauseCode"] === t) {
+    for (let i = 0; i < formData.value[item].length; i++) {
+      if (formData.value[item][i]["Term.cClauseCode"] === t) {
         deleindex = i;
       }
     }
     if (deleindex != null) {
-      formData[item].splice(deleindex, 1);
+      formData.value[item].splice(deleindex, 1);
     }
   });
 }
@@ -242,14 +242,14 @@ function refushData(datas: any) {
     }
     pd[key].push(item);
   });
-  Object.assign(formData, pd);
+  formData.value = pd;
 }
 
 function getFromValue() {
   let tableobj: { [key: string]: any } = {};
   let redata: any[] = [];
-  Object.keys(formData).forEach((item) => {
-    formData[item].forEach((d: any) => {
+  Object.keys(formData.value).forEach((item) => {
+    formData.value[item].forEach((d: any) => {
       const i = JSON.parse(JSON.stringify(d));
       if (i["riskList"]) {
         i["Term.riskList"] = i["riskList"];
@@ -263,7 +263,7 @@ function getFromValue() {
 }
 
 function setFormValue(value: any) {
-  Object.assign(formData, {});
+  Object.assign(formData.value, {});
   let plandata: any[] = [];
   value.forEach((item: any) => {
     let creData = JSON.parse(JSON.stringify(item));

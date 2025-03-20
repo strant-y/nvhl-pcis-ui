@@ -171,12 +171,12 @@ const props = defineProps({
 
 const cardconfig = ref(creatCardConfig({}));
 const cvrgFormfef = ref("cvrgFormfef");
-let planData = reactive<{ [key: string]: { [key: string]: any } }>({});
+let planData = ref<{ [key: string]: { [key: string]: any } }>({});
 const hiddenFlag = ref<any[]>([]);
 const showTitleMap = ref<{ [key: string]: string }>({});
 
 function updateTitle() {
-  Object.keys(planData).forEach((k: any) => {
+  Object.keys(planData.value).forEach((k: any) => {
     const str = prodTemple.value.default;
     const filledString = fillTemplate(str, { sumPrm: 0, sumObjs: 0 });
     showTitleMap.value[k] = filledString;
@@ -208,14 +208,14 @@ onMounted(async () => {
 const method = {
   funcadd: () => {
     let maxindex = 0;
-    const l = Object.keys(planData).forEach((k: any) => {
+    const l = Object.keys(planData.value).forEach((k: any) => {
       const numberPart = parseInt(k.replace(/\D/g, ""), 10);
       if (numberPart > maxindex) {
         maxindex = numberPart;
       }
     });
     const planKey = "P" + (maxindex + 1);
-    planData[planKey] = [];
+    planData.value[planKey] = [];
     updateTitle();
   },
 };
@@ -242,7 +242,7 @@ function addTermData(PlanNo: string) {
       type: "show",
       data: {
         cProdNo: param.cProdNo,
-        isselectData: planData[PlanNo],
+        isselectData: planData.value[PlanNo],
       },
     },
     {
@@ -283,10 +283,10 @@ function refushData(planNo: string, datas: any) {
     }
     pd[key].push(item);
   });
-  planData[planNo] = pd;
+  planData.value[planNo] = pd;
 }
 function deletePlan(plan: string) {
-  delete planData[plan];
+  delete planData.value[plan];
 }
 function deleteData(plan: string, term: any) {
   deleteTermByNo(plan, term["Term.cClauseCode"]);
@@ -315,15 +315,15 @@ function deleteData(plan: string, term: any) {
 
 function deleteTermByNo(plan: any, t: any) {
   console.log(t);
-  Object.keys(planData[plan]).forEach((item) => {
+  Object.keys(planData.value[plan]).forEach((item) => {
     let deleindex = null;
-    for (let i = 0; i < planData[plan][item].length; i++) {
-      if (planData[plan][item][i]["Term.cClauseCode"] === t) {
+    for (let i = 0; i < planData.value[plan][item].length; i++) {
+      if (planData.value[plan][item][i]["Term.cClauseCode"] === t) {
         deleindex = i;
       }
     }
     if (deleindex != null) {
-      planData[plan][item].splice(deleindex, 1);
+      planData.value[plan][item].splice(deleindex, 1);
     }
   });
 }
@@ -331,9 +331,9 @@ function deleteTermByNo(plan: any, t: any) {
 function getFromValue() {
   let tableobj: { [key: string]: any } = {};
   let redata: any[] = [];
-  Object.keys(planData).forEach((plan) => {
-    Object.keys(planData[plan]).forEach((item) => {
-      planData[plan][item].forEach((d: any) => {
+  Object.keys(planData.value).forEach((plan) => {
+    Object.keys(planData.value[plan]).forEach((item) => {
+      planData.value[plan][item].forEach((d: any) => {
         const i = JSON.parse(JSON.stringify(d));
         i["Term.cPlanNo"] = plan;
         if (i["riskList"]) {
@@ -349,7 +349,7 @@ function getFromValue() {
 }
 
 function setFormValue(value: any) {
-  Object.assign(planData,{});
+  Object.assign(planData.value,{});
   let plandata: { [key: string]: any } = {};
   value.forEach((item: any) => {
     const planKey = item["Term.cPlanNo"];

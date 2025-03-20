@@ -249,9 +249,9 @@ async function selectOne() {
   const isselectData = props.data.data.isselectData;
   let Key: any[] = [];
   let isuse: any[] = [];
-  if(isselectData){
-    isselectData.forEach((item: any) => {
-      Key.push(item['Term.cClauseCode']);
+  if(isselectData && r.length > 0){
+    r.forEach((item: any) => {
+      Key.push(isselectData[item]['Term.cClauseCode']);
     });
     data3.value.forEach((item: any) => {
       if(Key.includes(item.cTermNo)){
