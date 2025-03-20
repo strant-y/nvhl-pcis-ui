@@ -60,7 +60,18 @@ export function getComponentList(queryParams: any): AxiosPromise<any> {
 export function queryPageComponents(queryParams: any): AxiosPromise<any> {
     return post(`/prod/queryPageComponents`, queryParams);
 }
-
+/**
+ * 配置批改比较项
+ * **/
+export function initProdEdrRsnItemList(queryParams: any): AxiosPromise<any> {
+    return post(`proddef/initProdEdrRsnItemList`, queryParams);
+}
+/**
+ * 配置批改比较项保存
+ * **/
+export function saveProdEdrRsnItemList(queryParams: any): AxiosPromise<any> {
+    return post(`proddef/saveProdEdrRsnItemList`, queryParams);
+}
 /**
  * 获取全部组件信息
  *
