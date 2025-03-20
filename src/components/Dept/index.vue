@@ -17,8 +17,7 @@
 <script setup lang="ts">
 import { listDepts, listChrDepts, deptLists } from "@/api/dept";
 import { DeptQuery } from "@/api/dept/types";
-import {codeListViewStore} from "@/store";
-
+import { codeListViewStore } from "@/store";
 
 const props = defineProps({
   modelValue: {
@@ -44,20 +43,22 @@ const props = defineProps({
   collapseTags: {
     type: Boolean,
     default: false,
-  }
+  },
 });
 
-const codeListStore =  codeListViewStore();
+const codeListStore = codeListViewStore();
 const emits = defineEmits(["update:modelValue", "selectedItem"]); // 父组件监听事件，同步子组件值的变化给父组件
 
 const selectedValue = ref<string | number | Array<any> | undefined>();
 
 // 默认获取机构1级的数据
-const options = computed(()=>codeListStore.getCacheCodeListByCode('QueryFormDeptType'));
+const options = computed(() =>
+  codeListStore.getCacheCodeListByCode("QueryFormDeptType")
+);
 
 const listDeptsParams = reactive<DeptQuery>({});
 
-const refCascader = ref<any>('');
+const refCascader = ref<any>("");
 
 watch([options, () => props.modelValue], ([newOptions, newModelValue]) => {
   if (newOptions.length === 0) return; // 下拉数据源加载未完成不回显
@@ -68,46 +69,57 @@ watch([options, () => props.modelValue], ([newOptions, newModelValue]) => {
   selectedValue.value = newModelValue;
 });
 
-onMounted(async ()=>{
-  if( props.modelValue  && '0200000000000'!= props.modelValue ){
+onMounted(async () => {
+  console.log(
+    "当前登录用户信息",
+    JSON.parse(sessionStorage.getItem("user")).companyId
+  );
+
+  if (
+    props.modelValue &&
+    JSON.parse(sessionStorage.getItem("user")).companyId != props.modelValue
+  ) {
     getDownLists(props.modelValue);
   }
   selectedValue.value = props.modelValue;
-})
+});
 
-async function getDownLists(dpt: string){
-  const {data,code} = await deptLists(dpt);
-  if(code === 200){
+async function getDownLists(dpt: string) {
+  const { data, code } = await deptLists(dpt);
+  if (code === 200) {
     const dpts = data.cDptRelCde;
-    const d = dpts.split(';');
-    let dmap = []; let dstr = '';
-    for(let i = d.length - 1; i >= 0; i--){
+    const d = dpts.split(";");
+    let dmap = [];
+    let dstr = "";
+    for (let i = d.length - 1; i >= 0; i--) {
       const t = d[i];
       let l = await setDpt(t);
-      l.forEach(e => {
-        if(e.value === dstr) e.children = dmap;
+      l.forEach((e) => {
+        if (e.value === dstr) e.children = dmap;
       });
-      dmap = l; dstr = t;
+      dmap = l;
+      dstr = t;
     }
-    options.value.forEach(e => {
-      if(e.value === '0200000000000') e.children = dmap;
+    options.value.forEach((e) => {
+      if (e.value === JSON.parse(sessionStorage.getItem("user")).companyId)
+        e.children = dmap;
     });
   }
 }
 
-async function setDpt(t){
-  const {data,code} = await listChrDepts(t);
-  if(code == 200){
-    let newLsit=data.map(item => ({  
-      value: item.cDptCde,  
-      label: item.cDptCnm,  
+async function setDpt(t) {
+  const { data, code } = await listChrDepts(t);
+  if (code == 200) {
+    let newLsit = data.map((item) => ({
+      value: item.cDptCde,
+      label: item.cDptCnm,
       children: [], // 初始时，所有项都没有子项
-    })); 
+    }));
     return newLsit;
   }
 }
 
-const dpetData ={
+const dpetData = {
   checkStrictly: true,
   emitPath: false,
   lazy: true,
@@ -116,62 +128,61 @@ const dpetData ={
     let result = node.data;
     if (result) {
       if (node.level != 4) {
-         listChrDepts(result.value).then((res) => {
-          if(res.code == 200){
-            let newLsit=res.data.map(item => ({  
-              value: item.cDptCde,  
-              label: item.cDptCnm,  
+        listChrDepts(result.value).then((res) => {
+          if (res.code == 200) {
+            let newLsit = res.data.map((item) => ({
+              value: item.cDptCde,
+              label: item.cDptCnm,
               children: [],
-              leaf:item.leaf
-            })); 
+              leaf: item.leaf,
+            }));
             resolve(newLsit);
-          }else{
+          } else {
             ElMessage.error(res.msg);
           }
-      });
-      }else{
+        });
+      } else {
         resolve(null);
       }
     }
-  }
-}
+  },
+};
 
 //根据value获取item，用于录单页回显机构部门
 function findItemInTree(tree, value) {
-    // 遍历树的每一个节点
-    for (let i = 0; i < tree.length; i++) {
-        const item = tree[i];
-        // 检查当前节点的值是否等于目标值
-        if (item.value === value) {
-            return {
-              label: item.label,
-              value: item.value
-            };
-        }
-        // 如果当前节点有子节点
-        if (item.children && item.children.length > 0) {
-            // 递归调用 findItemInTree 函数在子节点中查找
-            const found = findItemInTree(item.children, value);
-            if (found) {
-                return {
-                  label: found.label,
-                  value: found.value
-                };
-            }
-        }
+  // 遍历树的每一个节点
+  for (let i = 0; i < tree.length; i++) {
+    const item = tree[i];
+    // 检查当前节点的值是否等于目标值
+    if (item.value === value) {
+      return {
+        label: item.label,
+        value: item.value,
+      };
     }
-    // 如果没有找到匹配的节点，返回 null
-    return null;
+    // 如果当前节点有子节点
+    if (item.children && item.children.length > 0) {
+      // 递归调用 findItemInTree 函数在子节点中查找
+      const found = findItemInTree(item.children, value);
+      if (found) {
+        return {
+          label: found.label,
+          value: found.value,
+        };
+      }
+    }
+  }
+  // 如果没有找到匹配的节点，返回 null
+  return null;
 }
 
-function instChange(val){
+function instChange(val) {
   emits("update:modelValue", val);
-  const currentItem = findItemInTree(options.value, val)
-  console.log('currentItem', currentItem)
-  emits("selectedItem", currentItem)
-  if(!props.multiple){
+  const currentItem = findItemInTree(options.value, val);
+  console.log("currentItem", currentItem);
+  emits("selectedItem", currentItem);
+  if (!props.multiple) {
     refCascader.value.togglePopperVisible(false);
   }
 }
-
 </script>

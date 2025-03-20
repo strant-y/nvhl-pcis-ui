@@ -107,6 +107,7 @@ const tableconfig = reactive<AppTableConfig>(
               termNo: row.code,
               termCnm: row.value,
               prodCnm: props.pNode.parent.data.value,
+              prodNo: props.pNode.parent.data.code,
             };
             userUnionTerm(params).then((res) => {
               if (res.code == "1") {

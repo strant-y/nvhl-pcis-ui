@@ -1,14 +1,36 @@
 <template>
-  <el-dialog
-    v-model="dialogVisible"
-    title="编辑特约"
-    width="80%"
-  >
-    <el-input
-      v-model="filterText"
-      style="width: 500px"
-      placeholder="输入机构代码或者机构名称查询，机构名称查询不得少于5个字符"
-    />
+  <el-dialog v-model="dialogVisible" title="编辑特约" width="80%">
+    <!-- 特别约定代码 -->
+    <div class="form-item">
+      <span>特别约定代码：</span>
+      <span>{{ rowData.cSpecNo }}</span>
+    </div>
+    <!-- 特别约定名称 -->
+    <div class="form-item">
+      <span>特别约定名称：</span>
+      <span>{{ rowData.cSpecNme }}</span>
+    </div>
+    <el-divider></el-divider>
+    <!-- 约定内容 -->
+    <div class="form-item">
+      <span>约定内容:</span>
+      <div class="content-container">
+        <div
+          v-for="(item, index) in cNmeCnArray"
+          :key="index"
+          class="content-item"
+        >
+          <el-input
+            v-if="item === '**'"
+            v-model="inputValues[index]"
+            @input="updateCNmeCn(index, $event)"
+            :class="`input-${index}`"
+            placeholder="请输入"
+          ></el-input>
+          <span v-else>{{ item }}</span>
+        </div>
+      </div>
+    </div>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="handleCancel" class="custom-button">取消</el-button>
@@ -21,25 +43,87 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onMounted } from "vue";
+import { ref, watch, onMounted, computed } from "vue";
 const dialogVisible = ref(true);
-const props = defineProps(['data'])
-const rowData = ref(props.data)
+const props = defineProps(["data"]);
+const rowData = ref(props.data);
 //rowData当前行数据
 /**
  * 拿到特约内容字段，通过***分割为数组，然后在html部分直接循环该数组，
  * 如果数组项为***则特换为input输入框，等用户输入完成后，再把数组join合并为实际的特约内容，回显到特约组件
- * 
- * 
+ *
+ *
  */
-console.log('rowData', rowData)
+console.log("rowData", rowData);
+onMounted(() => {
+  console.log("cNmeCnArray", cNmeCnArray.value);
+});
+
+// 使用正则表达式分割字符串，保留分隔符 ** 作为单独的数组项
+const cNmeCnArray = computed(() => rowData.value.cNmeCn.split(/(\*+)/));
+// const inputValues = ref<string[]>([]);
+const inputValues = ref(
+  cNmeCnArray.value.map((item) => (item === "**" ? "" : item))
+);
+
+const updateCNmeCn = (index: number, value: string) => {
+  inputValues.value[index] = value;
+};
 const handleCancel = () => {
   dialogVisible.value = false;
 };
 const handleSave = () => {
   dialogVisible.value = false;
+  const parts = cNmeCnArray.value.map((item, idx) =>
+    item === "**" ? inputValues.value[idx] : item
+  );
+  rowData.value.cNmeCn = parts.join("");
+  console.log("提交的数据:", rowData.value);
 };
-
 </script>
 <style scoped>
+.form-item {
+  margin-bottom: 20px;
+  font-size: 16px; /* 统一字体大小 */
+}
+
+.el-row {
+  display: flex;
+  align-items: center;
+}
+
+.el-col {
+  display: flex;
+  align-items: center;
+}
+
+.el-input {
+  font-size: 16px; /* 统一字体大小 */
+}
+
+.dialog-footer {
+  text-align: right;
+  margin-top: 20px;
+}
+
+.custom-button {
+  font-size: 16px; /* 统一按钮字体大小 */
+}
+/* 为每个输入框添加不同的边框样式 */
+.input-0 .el-input__inner {
+  border-color: red; /* 示例颜色 */
+}
+
+.input-1 .el-input__inner {
+  border-color: blue; /* 示例颜色 */
+}
+.content-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.content-item {
+  display: inline-block;
+  margin-right: 5px; /* 调整间距 */
+}
 </style>
