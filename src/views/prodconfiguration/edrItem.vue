@@ -43,7 +43,8 @@ const { getRules } = useValidator();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
-
+const cPard = ref(null);
+const selectedKindNo = ref<string | null>(null);
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "批改原因配置",
@@ -65,20 +66,51 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
 
     fromSchema: [
-      {
-        prop: "CKindNo",
-        inputtype: "rtselect",
-        typeCode: "KIND_LIST_CACHE",
-        codeParam: { codeListParam: "" },
-        title: "产品大类",
-      },
-      {
-        prop: "CProdNo",
-        inputtype: "rtselect",
-        title: "产品代码",
-        typeCode: "PROD_LIST",
-        codeParam: { cParCde: "" },
-      },
+        {
+            prop: "CKindNo",
+            inputtype: "rtselect",
+            title: "产品大类",
+            itemWidth: 1,
+            rules: [{ type: "required" }],
+            typeCode: "KIND_LIST_GRT",
+            child: "cProdNo",
+            codeParam: {
+                cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+                cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+            },
+            func: (row) => {
+                cPard.value = row;
+                selectedKindNo.value = row.value; // 更新选中的产品大类
+                loadProducts(row.value).then((products) => {
+                    const cProdNoItem = formconfig1.fromSchema.find(
+                        (item) => item.prop === "cProdNo"
+                    );
+                    if (cProdNoItem) {
+                        cProdNoItem.loadData = products;
+                    }
+                });
+            },
+        },
+        {
+            prop: "CProdNo",
+            inputtype: "rtselect",
+            title: "产品",
+            itemWidth: 1,
+            rules: [{ type: "required" }],
+            // loadData: [
+            //   {
+            //     label: "雇主责任保险",
+            //     value: "040002",
+            //   },
+            // ],
+            filterable:true,
+            typeCode: "PROD_LIST_IN_GUIDE",
+            codeParam: {
+                cParCde: cPard.value,
+                cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+                cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+            },
+        },
       {
         prop: "CGrpMrk",
         inputtype: "rtselect",
@@ -93,8 +125,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "CRsnCde",
         inputtype: "rtselect",
         title: "批改原因",
-        typeCode: "EDR_RSN_LIST_KIND",
-        codeParam: { kindNo: "-" },
+        // typeCode: "EDR_RSN_LIST_KIND",
+        // codeParam: { kindNo: "-" },
+        loadData: [
+            { value: "01", label: "变更投保人信息" },
+            { value: "02", label: "变更被保人信息" },
+        ],
       },
     ],
     fromUi: createFromUiConfig({
@@ -117,7 +153,16 @@ const tableconfig = reactive<AppTableConfig>(
         label: "配置",
         type: "success",
         func: function () {
-          dzmodal.open(edrItemEdit, { type: "add", data: {} }).then((res) => {
+            const s=freeEditRef.value?.getFromValue()
+            const cRsnCde=s['CRsnCde']
+            const cProdNo=s['CProdNo']
+            const cGrpMrk=s['CGrpMrk']
+            console.log(cRsnCde)
+            if((cRsnCde==null||cRsnCde=='') && (cProdNo==null||cProdNo=='')){
+                ElMessage.error('请先选择险种和批改原因');
+                return;
+            }
+          dzmodal.open(edrItemEdit, { type: "add", data: {cRsnCde:cRsnCde,cProdNo:cProdNo,cGrpMrk:cGrpMrk}}).then((res) => {
             if (res.type === "ok") {
               handleQuery();
             }
@@ -271,4 +316,10 @@ defineExpose({
 
 <style scoped>
 /* 确保样式与现有组件一致 */
+.app-container{
+  padding: 6px 30px;
+}
+/deep/ .el-form{
+  padding: 5px 30px;
+}
 </style>
