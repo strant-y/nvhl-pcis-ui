@@ -249,6 +249,7 @@ async function selectOne() {
   const isselectData = props.data.data.isselectData;
   let Key: any[] = [];
   let isuse: any[] = [];
+  const r = Object.keys(isselectData);
   if(isselectData && r.length > 0){
     r.forEach((item: any) => {
       Key.push(isselectData[item]['Term.cClauseCode']);
