@@ -173,7 +173,7 @@ const allForm = ref<Array<any>>([
     prop: "bsType",
     inputtype: "rtSelectV2",
     title: "申请单类型",
-    showKey: [2, 4],
+    showKey: [2, 4, 5],
     minWidth: 180,
     loadData: [
       { label: "投保单", value: "A" },
@@ -181,24 +181,24 @@ const allForm = ref<Array<any>>([
       { label: "方案", value: "P" },
     ],
   },
-  {
-    prop: "cAppTyp",
-    inputtype: "rtSelectV2",
-    title: "申请单类型",
-    showKey: [5],
-    minWidth: 180,
-    loadData: [
-      { label: "投保", value: "A" },
-      { label: "批改", value: "E" },
-      { label: "方案", value: "P" },
-    ],
-  },
+  // {
+  //   prop: "cAppTyp",
+  //   inputtype: "rtSelectV2",
+  //   title: "申请单类型",
+  //   showKey: [5],
+  //   minWidth: 180,
+  //   loadData: [
+  //     { label: "投保", value: "A" },
+  //     { label: "批改", value: "E" },
+  //     { label: "方案", value: "P" },
+  //   ],
+  // },
   {
     prop: "CProdCatCde",
     inputtype: "rtSelectV2",
     title: "产品大类",
     showKey: [1, 2, 3, 4, 5],
-    typeCode: "KIND_LIST_CACHE", 
+    typeCode: "KIND_LIST_GRT",
     params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
     clearable: true,
     func: (val: any) => {
@@ -239,7 +239,7 @@ const allForm = ref<Array<any>>([
     inputtype: "rtSelectV2",
     title: "条款",
     showKey: [1, 2, 3, 4, 5],
-    typeCode: "PROD_LIST",
+    typeCode: "TERM_LIST_IN_GUIDE_NEW",
     params: { cParCde: '',cOperId: user.value.opCde, cDptCde: user.value.companyId },
     labelWidth: 200,
     clearable: true,
@@ -481,10 +481,24 @@ const allTable = ref<Array<any>>([
   },
   {
     prop: "state",
-    inputtype: "rtinput",
+    inputtype: "rtselect",
     title: "任务状态",
     showKey: [1, 2, 3, 4],
     minWidth: 180,
+    loadData: [
+        { label: "未接收",value: "0" },
+        { label: "已接收",value: "1" },
+        { label: "暂存",value: "2" },
+        { label: "已完成",value: "3" },
+        { label: "已撤回",value: "4" },
+        { label: "已解除接收",value: "5" },
+        { label: "已退回",value: "6" },
+        { label: "已申请改派",value: "7" },
+        { label: "已改派",value: "8" },
+        { label: "已委托",value: "9" },
+        { label: "已重做",value: "10" },
+        { label: "已上报",value: "11" },
+    ]
   },
   {
     prop: "newUndrCls",
@@ -509,17 +523,17 @@ const table5 = ref<any>([
     title: "保单号",
     minWidth: 180,
   },
-  {
-    prop: "cAppTyp",
-    inputtype: "rtSelectV2",
-    title: "申请单类型",
-    minWidth: 180,
-    loadData: [
-      { label: "投保",value: "A" },
-      { label: "批改",value: "E" },
-      { label: "方案",value: "P" },
-    ],
-  },
+  // {
+  //   prop: "cAppTyp",
+  //   inputtype: "rtSelectV2",
+  //   title: "申请单类型",
+  //   minWidth: 180,
+  //   loadData: [
+  //     { label: "投保",value: "A" },
+  //     { label: "批改",value: "E" },
+  //     { label: "方案",value: "P" },
+  //   ],
+  // },
   {
     prop: "cDptCnm",
     inputtype: "rtinput",
@@ -561,10 +575,25 @@ const tableBtn = ref<Array<any>>([
     type: "info",
     size: "large",
     icon: "Message",
-    tableClick: (row) => {
-      //待核保任务 接收
-      handle_hasReceived(row);
-    },
+    // tableClick: (row) => {
+    //   //待核保任务 接收
+    //   handle_hasReceived(row);
+    // },
+      tableClick: async (row) => {
+          console.log(row)
+          const r = await row;
+          if (r) {
+              const data = row;
+              router.push({
+                  path: "/pcis/my-page",
+                  query: {
+                      param: JSON.stringify({ ...data, ...{ pageType: "edit" } }),
+                  },
+              });
+          } else {
+              ElMessage.warning("请检查表单！");
+          }
+      },
   }),
   createFreeButtonBase({
     id: "score",
@@ -617,7 +646,7 @@ const tableBtn = ref<Array<any>>([
       } else {
         data = {
           objId: row.cAppNo,
-          sysType: !!row['cAppTyp'] && ('A' === row['cAppTyp'] || 'P' === row['cAppTyp']) ? 'U' : 'E',
+          sysType: !!row['bsType'] && ('A' === row['bsType'] || 'P' === row['bsType']) ? 'U' : 'E',
         }
       }
       dzmodal
@@ -691,7 +720,7 @@ const tableBtn5 = ref<Array<any>>([
       } else {
         data = {
           objId: row.cAppNo,
-          sysType: !!row['cAppTyp'] && ('A' === row['cAppTyp'] || 'P' === row['cAppTyp']) ? 'U' : 'E',
+          sysType: !!row['bsType'] && ('A' === row['bsType'] || 'P' === row['bsType']) ? 'U' : 'E',
         }
       }
       dzmodal
@@ -898,17 +927,17 @@ onMounted(async () => {
   
   // handleQuery(true);
   // 下面是测试数据
-  pageresult.list = [
-    { CAppNo: 1, cAppStatus: 1, },
-    { CAppNo: 2, cAppStatus: 2, },
-    { CAppNo: 3, cAppStatus: 3, },
-    { CAppNo: 4, cAppStatus: 4 },
-    { CAppNo: 5, cAppStatus: 5, },
-    { CAppNo: 6, cAppStatus: 6, },
-    { CAppNo: 7, cAppStatus: 7, },
-    { CAppNo: 8, cAppStatus: 8, },
-  ];
-  pageresult.total = 1;
+  // pageresult.list = [
+  //   { CAppNo: 1, cAppStatus: 1, },
+  //   { CAppNo: 2, cAppStatus: 2, },
+  //   { CAppNo: 3, cAppStatus: 3, },
+  //   { CAppNo: 4, cAppStatus: 4 },
+  //   { CAppNo: 5, cAppStatus: 5, },
+  //   { CAppNo: 6, cAppStatus: 6, },
+  //   { CAppNo: 7, cAppStatus: 7, },
+  //   { CAppNo: 8, cAppStatus: 8, },
+  // ];
+  // pageresult.total = 1;
 });
 
 onUnmounted(() => {
@@ -974,7 +1003,7 @@ const exportDown = () => {
     pageNo: 1,
     pageSize: 2000,
     sortField: 'name',
-    CAppTyp: 'A',
+    bsType: 'A',
     CAppStatus: '4',
     // CUdrCde: this.user.opCde, // 已核保查询去掉人员限制
     // sortOrder: this._sortValue,
@@ -1017,6 +1046,7 @@ function refreshData(flag?: boolean) {
   roles.value?.length && roles.value.forEach(role => {
     roleCde = roleCde === '' ? role : `${roleCde},${role}`;
   });
+    roleCde="ROLE_00000152"
   if (!objId) {
     // 查询时间段验证
     if (udrType == '3' || udrType == '4' || udrType == '5') {
@@ -1063,7 +1093,7 @@ function refreshData(flag?: boolean) {
   } else {
     params = Object.assign({
       sortField: 'name',
-      CAppTyp: 'A',
+      bsType: 'A',
       CAppStatus: '4',
       // CUdrCde: this.user.opCde, // 已核保查询去掉人员限制
       sortOrder: null, // 存在问题_sortValue需要确认5个页面，每个tale具体哪些字段需要排序
@@ -1095,8 +1125,8 @@ function refreshData(flag?: boolean) {
     // loading.value = false;
     if (res && res.code === 200 && res.data) {
       ElMessage.success({ message: '查询完毕！', duration: 3000 });
-      pageresult.list = res.data.result;
-      pageresult.total = res.data.total;
+      pageresult.list = res.data;
+      pageresult.total = res.total;
     } else {
       ElMessage.error({ message: res.msg, duration: 3000 });
     }
@@ -1109,14 +1139,14 @@ function refreshData(flag?: boolean) {
 // 修改 暂存任务
 function updateUdr(row: any) {
   const { objId, curtTask, bsType, prodNo, cRelateBusi, cEdrRsnBundleCde, plyNo } = row;
-  if (row.cAppTyp === 'P') { // 方案不校验倒签
+  if (row.bsType === 'P') { // 方案不校验倒签
     if (row.prodNo === '000000') {
       const data = {
         CPlanNo: row.objId,
         TaskId: row.curtTask,
         scene: SCENE_PLAN_UW_PROCESS,
         CProdNo: '000000',
-        CAppTyp: row.cAppTyp,
+          bsType: row.bsType,
       };
       const en = JSON.stringify(data);
       router.push({
@@ -1129,7 +1159,7 @@ function updateUdr(row: any) {
         TaskId: row.curtTask,
         'Base.CProdNo': row.prodNo,
         scene: SCENE_PLAN_UW_PROCESS,
-        CAppTyp: row.cAppTyp,
+          bsType: row.bsType,
       });
       router.push({
         path: '/index/sys-right-basic/configPlan/detail',
@@ -1144,7 +1174,7 @@ function updateUdr(row: any) {
       });
     }
     // 批改核保调用理赔接口校验团单在途赔案
-    if (row.cAppTyp === 'E' && row.plyNo) {
+    if (row.bsType === 'E' && row.plyNo) {
       // 暂时注销  保证批改可核保
       checkEdrPocly({ CPlyNo: row.plyNo }).then(async (res: any) => {
         if (res && res.code === 200 && res.msg.indexOf('出险时间') > 0) {
@@ -1171,24 +1201,32 @@ function updateUdrDetail(row: any) {
     if (r.code !== 200) {
       ElMessage.error({ message: r.msg, duration: 6000 });
     } else {
-      if (row.cAppTyp === 'A') {
+        console.log('zzb',row.bsType)
+      if (row.bsType === 'A') {
         const en = JSON.stringify({
           scene: SCENE_PLY_UW_PROCESS,
           CAppNo: row.objId,
           TaskId: row.curtTask,
-          CAppTyp: row.cAppTyp,
+          bsType: row.bsType,
           CProdNo: row.prodNo,
           CCiMrk: r.data.cCiMrk,
           CGrpMrk: r.data.cGrpMrk,
           CDptCde: r.data.cDptCde,
+          pageType: "PLY_UW"
         });
-        router.push({ path: '/index/new-udr-list/detail', query: { data: en } });
+          router.push({
+              path: "/pcis/my-page",
+              query: {
+                  param: en,
+              },
+          });
+        // router.push({ path: '/index/new-udr-list/detail', query: { data: en } });
       } else {
         const en = JSON.stringify({
           scene: r.data.cEdrRsnBundleCde === 'BL' ? SCENE_PLY_UW_PROCESSBEARER : SCENE_PLY_UW_PROCESS,
           CAppNo: row.objId,
           TaskId: row.curtTask,
-          CAppTyp: row.cAppTyp,
+          bsType: row.bsType,
           CProdNo: row.prodNo,
           CCiMrk: r.data.cCiMrk,
           CRsnCde: r.data.cEdrRsnBundleCde,
@@ -1219,13 +1257,13 @@ function handleWorkFlow(row: any, type: any) {
       ElMessage.error({ message: result.msg, duration: 3000 });
     } else {
       if (type === 'handleReceived') {
-        if (row.cAppTyp === 'P') {
+        if (row.bsType === 'P') {
           const en = JSON.stringify({
             CPlanNo: row.objId,
             TaskId: row.curtTask,
             'Base.CProdNo': row.prodNo,
             scene: SCENE_PLAN_UW_PROCESS,
-            CAppTyp: row.cAppTyp,
+            bsType: row.bsType,
           });
           router.push({ path: '/index/sys-right-basic/configPlan/detail', query: { data: en } });
         } else {
@@ -1278,7 +1316,7 @@ function handle_hasReceived(row: any) {
             TaskId: curtTask,
             scene: SCENE_PLAN_UW_PROCESS,
             CProdNo: '000000',
-            CAppTyp: row.cAppTyp,
+            bsType: row.bsType,
           };
           const en = JSON.stringify(data);
           router.push({ path: '/index/pcis-combination/new-udr-list/combination-main', query: { data: en } });
@@ -1316,7 +1354,7 @@ function handleSelectionChange(selection: any) {
 
 // 详情 核保通过任务
 function showDetails(row: any) {
-  if (row.cAppTyp === 'P') {
+  if (row.bsType === 'P') {
     if (row.cProdNo === '000000') {
       const param = {
         CPlanNo: row.cAppNo,
@@ -1348,7 +1386,7 @@ function showDetails(row: any) {
       scene: row.cEdrRsnBundleCde === 'BL' ? SCENE_PLY_APP_READBEARER : SCENE_PLY_APP_READ,
       CAppNo: row.objId,
       CProdNo: row.prodNo,
-      CAppTyp: row.CAppTyp,
+      bsType: row.bsType,
       CJiMrk: row.cJiMrk,
       CDptCde: row.cDptCde,
       CCiMrk: row.cCiMrk,
@@ -1364,16 +1402,16 @@ function showDetails(row: any) {
 
 // 编辑 核保通过任务
 function handleEdit(row: any) {
-  const CAppTyp = row.cAppTyp;
+  const bsType = row.bsType;
   let scene = SCENE_PLY_APP_MODIFY_UNSUBMIT;
-  if (!!CAppTyp && CAppTyp === 'E') {
+  if (!!bsType && bsType === 'E') {
     scene = row.cEdrRsnBundleCde === 'BL' ? SCENE_TEMPORARY_DEPOSITBEARER : SCENE_EDR_APP_MODIFY_UNSUBMIT;
   }
   const en = JSON.stringify({
     scene: scene,
     CAppNo: row.objId,
     CProdNo: row.prodNo,
-    CAppTyp: row.CAppTyp,
+    bsType: row.bsType,
     CJiMrk: row.cJiMrk,
     CDptCde: row.cDptCde,
     CCiMrk: row.cCiMrk,
