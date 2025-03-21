@@ -44,6 +44,7 @@ const { getRules } = useValidator();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 const cPard = ref(null);
+
 const selectedKindNo = ref<string | null>(null);
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -81,14 +82,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             func: (row) => {
                 cPard.value = row;
                 selectedKindNo.value = row.value; // 更新选中的产品大类
-                loadProducts(row.value).then((products) => {
-                    const cProdNoItem = formconfig1.fromSchema.find(
-                        (item) => item.prop === "cProdNo"
-                    );
-                    if (cProdNoItem) {
-                        cProdNoItem.loadData = products;
-                    }
-                });
+                // loadProducts(row.value).then((products) => {
+                //     const cProdNoItem = formconfig1.fromSchema.find(
+                //         (item) => item.prop === "cProdNo"
+                //     );
+                //     if (cProdNoItem) {
+                //         cProdNoItem.loadData = products;
+                //     }
+                // });
             },
         },
         {
@@ -158,7 +159,8 @@ const tableconfig = reactive<AppTableConfig>(
             const cProdNo=s['CProdNo']
             const cGrpMrk=s['CGrpMrk']
             console.log(cRsnCde)
-            if((cRsnCde==null||cRsnCde=='') && (cProdNo==null||cProdNo=='')){
+            console.log(cProdNo)
+            if((cRsnCde==null||cRsnCde=='') || (cProdNo==null||cProdNo=='')){
                 ElMessage.error('请先选择险种和批改原因');
                 return;
             }
