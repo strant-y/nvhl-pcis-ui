@@ -301,7 +301,8 @@ function handleClick(item: any, index: number) {
   formconfig1.value.cProdNo = item.prodNo;
   formconfig1.value.cProdNme = item.prodCnm;
   formconfig1.value.cDptCde = item.dptCde;
-  formconfig1.value.cDptNme = item.dptNme;
+  formconfig1.value.cDptNme = item.dptCnm;
+  console.log("000", item, formconfig1.value);
 }
 //取消常用条款
 function handleStarClick(item: any) {
