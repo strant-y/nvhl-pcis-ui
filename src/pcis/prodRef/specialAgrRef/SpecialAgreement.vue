@@ -3,14 +3,10 @@
   <div>
     <myCard :cardConfig="cardconfig">
       <el-form ref="specialAgr" :model="formData" :inline-message="true">
-        <rttable
-            v-model="formData"
-            :item="tableconfig"
-            ref="rttableFrom"
-          />
+        <rttable v-model="formData" :item="tableconfig" ref="rttableFrom" />
       </el-form>
-  </myCard>
-  <comDialog ref="dialog"></comDialog>
+    </myCard>
+    <comDialog ref="dialog"></comDialog>
   </div>
 </template>
 
@@ -49,7 +45,7 @@ const departmentTree = defineAsyncComponent(
 );
 const specEdit = defineAsyncComponent(
   () => import("@/pcis/prodRef/commodityRef/prd-fix-spec-edit.vue")
-)
+);
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -58,8 +54,8 @@ const props = defineProps({
 });
 
 const cardconfig = ref(creatCardConfig({}));
-const moveUpTimer = ref(null)
-const moveDownTimer = ref(null)
+const moveUpTimer = ref(null);
+const moveDownTimer = ref(null);
 const pageresult = reactive<Pageresult>({
   result: "",
   /** 数据列表 */
@@ -74,7 +70,7 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtnType: "btn",
     tableBtnWidth: 220,
     tableBtnPosition: "right",
-    align: 'left',
+    align: "left",
     tableBtn: [
       createFreeButtonBase({
         id: "score",
@@ -84,13 +80,12 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Edit",
         hideBtns: (row) => {
-          if(!row.cNmeCn.includes('****')) return true
+          if (!row.cNmeCn.includes("**")) return true;
         },
         tableClick: (row) => {
           console.log(row);
           dzmodal.open(specEdit, { type: "view", data: row }).then((res) => {
             if (res.type === "ok") {
-              
             }
           });
         },
@@ -116,10 +111,10 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Top",
         hideBtns: (row) => {
-          if(row.index == 1) return true
+          if (row.index == 1) return true;
         },
         tableClick: (row) => {
-          moveUp(row.index - 1)
+          moveUp(row.index - 1);
         },
       }),
       createFreeButtonBase({
@@ -130,10 +125,10 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Bottom",
         hideBtns: (row) => {
-          if(row.index == formData.value.length) return true
+          if (row.index == formData.value.length) return true;
         },
         tableClick: (row) => {
-          moveDown(row.index -1)
+          moveDown(row.index - 1);
         },
       }),
     ],
@@ -150,18 +145,18 @@ const tableconfig = reactive<AppTableConfig>(
         title: "Tag",
         width: 110,
         loadData: [
-            {
-              label: "可选",
-              value: "0",
-            },
-            {
-              label: "必选",
-              value: "1",
-            },
-            {
-              label: "自定义",
-              value: "2",
-            },
+          {
+            label: "可选",
+            value: "0",
+          },
+          {
+            label: "必选",
+            value: "1",
+          },
+          {
+            label: "自定义",
+            value: "2",
+          },
         ],
       },
       {
@@ -187,15 +182,20 @@ onMounted(async () => {
   );
   Object.assign(cardconfig.value, formconfig11);
   // 获取列表数据
-  handleQuery(true);
+  // handleQuery(true);
   formData.value = [
-    { index: "ss", cNmeCn: "包含可编辑****的内容",cIfMust: "0",cSpecNo: 'test' },
-    { index: "asdas", cNmeCn: "43", cIfMust: '1',cSpecNo: 'test' },
-    { index: "asdas", cNmeCn: "43242323", cIfMust: '2',cSpecNo: 'test' },
-  ]
+    // {
+    //   index: "ss",
+    //   cNmeCn: "包含可编辑****的内容****倒点水",
+    //   cIfMust: "0",
+    //   cSpecNo: "test",
+    // },
+    // { index: "asdas", cNmeCn: "43", cIfMust: "1", cSpecNo: "test" },
+    // { index: "asdas", cNmeCn: "43242323", cIfMust: "2", cSpecNo: "test" },
+  ];
   formData.value.forEach((item, index) => {
-    item.index = index+1
-  })
+    item.index = index + 1;
+  });
 });
 
 // 绑定方法
@@ -207,62 +207,71 @@ const method = {
   getSpecialAgree: () => {
     const param = opertaor.getParam();
     dialog.value?.open(
-    "prdFixSpec",
-    {
-      type: "show",
-      data: {
-        cProdNo: param.cProdNo,
-        selectedData: formData.value //需要把自定义的过滤掉，只传过去从模板中选择的
+      "prdFixSpec",
+      {
+        type: "show",
+        data: {
+          cProdNo: param.cProdNo,
+          selectedData: formData.value, //需要把自定义的过滤掉，只传过去从模板中选择的
+        },
+        method: {
+          getSelected(selectdata: any) {
+            selectdata.forEach((item: any) => {
+              formData.value.push(item);
+            });
+            formData.value.forEach((item, index) => {
+              item.index = index + 1;
+            });
+            console.log("formData.value", formData.value);
+            dialog.value?.handleClose();
+          },
+        },
       },
-      method: {
-        getSelected(selectdata: any) {
-          selectdata.forEach((item: any) => {
-            formData.value.push(item);
-          });
-          console.log('formData.value', formData.value)
-          dialog.value?.handleClose()
-        }
-      }
-    },
-    { title: "添加特约", width: 85 }
-  );
-  }
+      { title: "添加特约", width: 85 }
+    );
+  },
 };
 // 绑定特殊验证器
 const exRules = {};
 
 // 上移一行
-const moveUp = async(index) => {
-  const tableData = formData.value
+const moveUp = async (index) => {
+  const tableData = formData.value;
   if (index > 0) {
-    [tableData[index], tableData[index - 1]] = [tableData[index - 1], tableData[index]];
+    [tableData[index], tableData[index - 1]] = [
+      tableData[index - 1],
+      tableData[index],
+    ];
   }
   // 异步操作，解决tooltip卡住不消失问题
-  if(moveUpTimer.value) {
-    clearTimeout(moveUpTimer.value)
+  if (moveUpTimer.value) {
+    clearTimeout(moveUpTimer.value);
   }
   moveUpTimer.value = setTimeout(() => {
     tableData.forEach((item, index) => {
-      item.index = index + 1
-    })
-  }, 0)
+      item.index = index + 1;
+    });
+  }, 0);
 };
 
 // 下移一行
 const moveDown = (index) => {
-  const tableData = formData.value
+  const tableData = formData.value;
   if (index < tableData.length - 1) {
-    [tableData[index], tableData[index + 1]] = [tableData[index + 1], tableData[index]];
+    [tableData[index], tableData[index + 1]] = [
+      tableData[index + 1],
+      tableData[index],
+    ];
   }
   // 异步操作，解决tooltip卡住不消失问题
-  if(moveDownTimer.value) {
-    clearTimeout(moveDownTimer.value)
+  if (moveDownTimer.value) {
+    clearTimeout(moveDownTimer.value);
   }
   moveDownTimer.value = setTimeout(() => {
     tableData.forEach((item, index) => {
-      item.index = index + 1
-    })
-  }, 0)
+      item.index = index + 1;
+    });
+  }, 0);
 };
 /** 查询 */
 function handleQuery(flag?: boolean) {
@@ -281,7 +290,7 @@ function handleQuery(flag?: boolean) {
   //   })
   //   .finally(() => {});
 }
-function getFromValue () {
+function getFromValue() {
   return formData.value;
 }
 function setFormValue(value: any) {

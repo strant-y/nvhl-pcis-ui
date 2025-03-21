@@ -1145,3 +1145,11 @@ export function getNmeByCde(ops: any): AxiosPromise<any>  {
     // 发送POST请求以根据code和val解析字典值
     return post(`/edr/getNmeByCde`, ops);
 }
+/**
+ * 获取特约
+ * @param queryParams 
+ * @returns 
+ */
+export function getpSpecialAgreement(queryParams: any): AxiosPromise<any>  {
+    return post('/proddef/getpSpecialAgreement',  queryParams);
+}

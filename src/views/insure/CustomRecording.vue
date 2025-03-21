@@ -220,6 +220,7 @@ const formconfig1 = ref({
   cNmeCn: "",
   cTermNo: "",
   cProdNo: "",
+  cProdNme: "",
 });
 const selectTreeItem = ref({});
 // 条款下拉数据
@@ -296,6 +297,12 @@ function handleClick(item: any, index: number) {
   }
   item.checked = !item.checked;
   formconfig1.value.cNmeCn = item.checked ? item.termCnm : "";
+  formconfig1.value.cTermNo = item.termNo;
+  formconfig1.value.cProdNo = item.prodNo;
+  formconfig1.value.cProdNme = item.prodCnm;
+  formconfig1.value.cDptCde = item.dptCde;
+  formconfig1.value.cDptNme = item.dptCnm;
+  console.log("000", item, formconfig1.value);
 }
 //取消常用条款
 function handleStarClick(item: any) {

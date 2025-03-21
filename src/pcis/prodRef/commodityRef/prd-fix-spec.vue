@@ -1,13 +1,8 @@
 <template>
   <div>
-    <el-tabs
-      v-model="activeName"
-      type="card"
-      class="demo-tabs">
+    <el-tabs v-model="activeName" type="card" class="demo-tabs">
       <el-tab-pane label="添加特约" name="first">
-        <div class="totalBox">
-          已选择 {{ selected.length }} 项
-        </div>
+        <div class="totalBox">已选择 {{ selected.length }} 项</div>
         <el-table
           ref="multipleTableRef"
           :data="pageresult.list"
@@ -15,11 +10,17 @@
           :row-class-name="tableRowClassName"
           @selection-change="handleSelectionChange"
         >
-          <el-table-column type="selection" :selectable="selectable" width="55" />
+          <el-table-column
+            type="selection"
+            :selectable="selectable"
+            width="55"
+          />
           <el-table-column type="index" label="序号" width="55" />
           <el-table-column label="cIfMust" width="100">
             <template #default="scope">
-              <el-tag type="primary">{{ scope.row['cIfMust'] == '1' ? '必选' : '可选' }}</el-tag>
+              <el-tag type="primary">{{
+                scope.row["cIfMust"] == "1" ? "必选" : "可选"
+              }}</el-tag>
             </template>
           </el-table-column>
           <el-table-column property="cSpecNo" label="特约代码" width="160" />
@@ -30,7 +31,8 @@
         <el-table
           ref="multipleTableRef"
           :data="addTableData"
-          style="width: 100%">
+          style="width: 100%"
+        >
           <el-table-column property="addIndex" label="序号" width="55" />
           <el-table-column property="cSpecNo" label="特约代码" width="300">
             <template #default="scope">
@@ -46,17 +48,16 @@
         <el-button @click="add" class="addSty" :icon="Plus">新增一行</el-button>
       </el-tab-pane>
     </el-tabs>
-      <div class="btnSty">
-        <el-button @click="close">取消</el-button>
-        <el-button type="primary" @click="returnData">确定</el-button>
-      </div>
+    <div class="btnSty">
+      <el-button @click="close">取消</el-button>
+      <el-button type="primary" @click="returnData">确定</el-button>
     </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { defineComponent, ref, reactive, onMounted } from 'vue';
-import { ElMessage } from 'element-plus';
-import { Plus } from '@element-plus/icons-vue'
+import { defineComponent, ref, reactive, onMounted } from "vue";
+import { Plus } from "@element-plus/icons-vue";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
 import {
@@ -65,6 +66,7 @@ import {
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import { codeListViewStore } from "@/store";
+import { getpSpecialAgreement } from "@/api/prod";
 const codeListStore = codeListViewStore();
 const props = defineProps({
   data: {
@@ -74,57 +76,57 @@ const props = defineProps({
   method: {
     type: Object,
     default: () => {
-      return {}
-    }
-  }
-})
-const emits = defineEmits(['handleClose'])
+      return {};
+    },
+  },
+});
+const emits = defineEmits(["handleClose"]);
 const multipleTableRef = ref<MyTableMethod | null>(null);
-const selected = ref([])
+const selected = ref([]);
 const pageresult = reactive<Pageresult>({
   /** 数据列表 */
   list: [],
 });
-const addTableData = reactive([]) //添加其他特约
-const activeName = ref('first')
-const selectable = (row) => row['cIfMust'] != '1' //这里调用是把必选的置灰
-const tableRowClassName = ({row,rowIndex,}) => {
-  let sty = ''
-  selected.value.forEach(item => {
-    if(item['cSpecNo'] == row['cSpecNo']) {
-      sty = 'checkedSty'
+const addTableData = reactive([]); //添加其他特约
+const activeName = ref("first");
+const selectable = (row) => row["cIfMust"] != "1"; //这里调用是把必选的置灰
+const tableRowClassName = ({ row, rowIndex }) => {
+  let sty = "";
+  selected.value.forEach((item) => {
+    if (item["cSpecNo"] == row["cSpecNo"]) {
+      sty = "checkedSty";
     }
-  })
-  return sty
-}
+  });
+  return sty;
+};
 const handleSelectionChange = (selection) => {
-  selected.value = selection
-}
+  selected.value = selection;
+};
 
 const refreshData = () => {
+  const cProdNo = props.data.data.cProdNo;
   // 查询列表数据
-  codeListStore.queryCodeList({
-    codeListName: 'FIX_SPEC_LIST',
-    codeListParam: {
-      'cProdNo': props.data.data.cProdNo
-    }
-  }, false, true).then(res => {
-    if (res) {
-      pageresult.list = []
-      res.forEach((item, index) => {
+  getpSpecialAgreement({
+    cProdNo: cProdNo,
+    pageNum: 1,
+    pageSize: 999,
+  }).then((res) => {
+    if (res.data.result) {
+      pageresult.list = [];
+      res.data.result.forEach((item, index) => {
         pageresult.list.push({
-          'cSpecNo': item.cSpecNo,
-          'cNmeCn': item.cNmeCn,
-          'cNmeEn': item.cNmeEn,
-          'cIfMust': item.cIfMust, //是否必选
-          'cIfEdit': item.cIfEdit, //是否可修改
-          'cIfFix': '1' //是否固定特约，接口查出来的1，自定义添加的为0
-        })
-      })
+          cSpecNo: item.cSpecialCode,
+          cNmeCn: item.cSpecialName,
+          cNmeEn: item.cNmeEn,
+          cIfMust: item.cIfMust, //是否必选
+          cIfEdit: item.cIfEdit, //是否可修改
+          cIfFix: "1", //是否固定特约，接口查出来的1，自定义添加的为0
+        });
+      });
       nextTick(() => {
-        toggleSpecificRow() //这里调用是把必选的选中
-        setSelected()
-      })
+        toggleSpecificRow(); //这里调用是把必选的选中
+        setSelected();
+      });
     }
   });
 };
@@ -133,7 +135,7 @@ const refreshData = () => {
 const toggleSpecificRow = () => {
   if (multipleTableRef.value) {
     // 假设要切换 id 为 2 的行的选中状态
-    const targetRow = pageresult.list.find(row => row['cIfMust'] == '1');
+    const targetRow = pageresult.list.find((row) => row["cIfMust"] == "1");
     if (targetRow) {
       multipleTableRef.value.toggleRowSelection(targetRow);
     }
@@ -142,44 +144,43 @@ const toggleSpecificRow = () => {
 
 function add() {
   addTableData.push({
-    "addIndex": addTableData.length + 1, //序号
-    "cSpecNo": '',
-    "cNmeCn": '',
-    'cIfMust': '2', //是否必选
-    'cIfEdit': '0', //是否可修改
-    'cIfFix': '0' //是否固定特约，查寻特约模板接口查出来的1，自定义添加的为0
-  })
+    addIndex: addTableData.length + 1, //序号
+    cSpecNo: "",
+    cNmeCn: "",
+    cIfMust: "2", //是否必选
+    cIfEdit: "0", //是否可修改
+    cIfFix: "0", //是否固定特约，查寻特约模板接口查出来的1，自定义添加的为0
+  });
 }
 
 //点击确定按钮时把选中的数据派发给父组件
 const returnData = () => {
-  if(activeName.value == 'first') {
-    let tempData = multipleTableRef.value.getSelectionRows()
-    props.data.method.getSelected(tempData)
+  if (activeName.value == "first") {
+    let tempData = multipleTableRef.value.getSelectionRows();
+    props.data.method.getSelected(tempData);
   } else {
-    props.data.method.getSelected(addTableData)
+    props.data.method.getSelected(addTableData);
   }
-
-}
+};
 const close = () => {
-  emits('handleClose')
-}
+  emits("handleClose");
+};
 
 function setSelected() {
-  const lastSelected = props.data.data.selectedData
-  if(lastSelected && lastSelected.length) {
-    lastSelected.forEach(item => {
-      pageresult.list.forEach(item2 => {
-        if(item['cSpecNo'] === item2['cSpecNo']) {
-          item2['checked'] = true
+  const lastSelected = props.data.data.selectedData;
+  if (lastSelected && lastSelected.length) {
+    lastSelected.forEach((item) => {
+      pageresult.list.forEach((item2) => {
+        if (item["cSpecNo"] === item2["cSpecNo"]) {
+          item2["checked"] = true;
         }
-      })
-    })
+      });
+    });
   }
 }
 
 onMounted(() => {
-  refreshData()
+  refreshData();
 });
 </script>
 
