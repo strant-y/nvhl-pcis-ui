@@ -182,7 +182,8 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Delete",
         tableClick: (row) => {
-          delProdEdrRsnItem(row)
+          const param={'CPkId':row.cPkId}
+          delProdEdrRsnItem(param)
             .then((res) => {
               const { code, data, msg } = res;
               if (200 === code) {
@@ -287,6 +288,7 @@ function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r);
+  param['pageNo']=param['pageNum']
   qryProdEdrRsnItemList(param)
     .then((res) => {
       const { code, data, msg } = res;
