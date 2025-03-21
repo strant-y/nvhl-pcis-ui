@@ -249,6 +249,7 @@ const method = {};
 function selectedItem(item) {
   selectTreeItem.value = item;
   formconfig1.value.cDptNme = item.label;
+  formconfig1.value.cDptCde = item.value;
 }
 
 // 下一步
@@ -300,8 +301,8 @@ function handleClick(item: any, index: number) {
   formconfig1.value.cTermNo = item.termNo;
   formconfig1.value.cProdNo = item.prodNo;
   formconfig1.value.cProdNme = item.prodCnm;
-  formconfig1.value.cDptCde = item.dptCde;
-  formconfig1.value.cDptNme = item.dptCnm;
+  // formconfig1.value.cDptCde = item.dptCde;
+  // formconfig1.value.cDptNme = item.dptCnm;
   console.log("000", item, formconfig1.value);
 }
 //取消常用条款
