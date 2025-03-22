@@ -42,7 +42,7 @@ onMounted(() => {
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
     //是否小微企业，默认非必填、只读
-    setFormItem("Applicant.cIsMicro", {
+    setFormItem("Applicant.cIsMicroEntpris", {
       rules: null,
       disabled: true,
     });
@@ -167,7 +167,7 @@ const method = {
       if (val == "110002") {
         //证件类型是“营业执照”，参加社会统筹标志变化为必填
         // 参加社会统筹标志
-        setFormItem("Applicant.cParticTyp", {
+        setFormItem("Applicant.cParticiinsocTyp", {
           rules: [getRules("required", {})],
         });
       }
@@ -178,7 +178,7 @@ const method = {
       setFormItem("Applicant.tCertfBgnDate", null);
       setFormItem("Applicant.tCertfEndDate", null);
       // 参加社会统筹标志
-      setFormItem("Applicant.cParticTyp", {
+      setFormItem("Applicant.cParticiinsocTyp", {
         rules: null,
       });
     }
@@ -190,12 +190,21 @@ const method = {
       console.log("000000000", productStore.$state.cClntMrk);
       setValue("Applicant.cCertfCls", "");
       setFormItem("Applicant.cCntrNme", { rules: [getRules("required", {})] });
+      setFormItem("Applicant.cParticiinsocTyp", {
+        rules: [getRules("required", {})],
+      });
       setFormItem("Applicant.cCntrCertfCde", {
         rules: [getRules("required", {})],
       });
-      setFormItem("Applicant.cIsMicro", {
+      setFormItem("Applicant.cWorkDpt", {
+        disabled: false,
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.cIsMicroEntpris", {
         disabled: false,
       });
+      //是否个体工商户
+      setValue("Applicant.cIsIndvduBiz", "");
       setFormItem("Applicant.cIsIndvduBiz", {
         disabled: true,
       });
@@ -205,7 +214,11 @@ const method = {
         disabled: false,
       });
       // 参加社会统筹标志
-      setFormItem("Applicant.cParticTyp", {
+      setFormItem("Applicant.cParticiinsocTyp", {
+        rules: [getRules("required", {})],
+      });
+      //注册地址
+      setFormItem("Applicant.cRegisteredcapDre", {
         rules: [getRules("required", {})],
       });
       codeListStore
@@ -220,9 +233,17 @@ const method = {
           });
         });
     } else {
-      setFormItem("Applicant.cIsMicro", {
+      setFormItem("Applicant.cWorkDpt", { disabled: true, rules: null });
+      setFormItem("Applicant.cIsMicroEntpris", {
         disabled: true,
       });
+      //参加社会统筹标志
+      setFormItem("Applicant.cParticiinsocTyp", {
+        rules: null,
+      });
+      //注册地址
+      setFormItem("Applicant.cRegisteredcapDre", { rules: null });
+      //是否个体工商户
       setFormItem("Applicant.cIsIndvduBiz", {
         disabled: false,
       });
@@ -231,12 +252,8 @@ const method = {
         rules: null,
         disabled: true,
       });
-      // 参加社会统筹标志
-      setFormItem("Applicant.cParticTyp", {
-        rules: null,
-      });
       setValue("Applicant.cGreenIndustryCustomers", "");
-      setValue("Applicant.cIsMicro", "");
+      setValue("Applicant.cIsMicroEntpris", "");
       setValue("Applicant.cCertfCls", "");
       setFormItem("Applicant.cCntrNme", { rules: null });
       setFormItem("Applicant.cCntrCertfCde", { rules: null });

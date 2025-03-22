@@ -13,6 +13,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 const dialog = ref<DialogMethod | null>(null);
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { useValidator } from "@/typings/useValidator";
+import moment from "moment";
 import { codeListViewStore } from "@/store";
 import { useProductStore } from "@/store/modules/prod";
 const productStore = useProductStore();
@@ -38,7 +39,7 @@ onMounted(() => {
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
     //是否小微企业，默认非必填、只读
-    setFormItem("Insured.cIsMicro", {
+    setFormItem("Insured.cIsMicroEntpris", {
       rules: null,
       disabled: true,
     });
@@ -64,9 +65,11 @@ const method = {
     for (const k in applicantValue) {
       const key = "Insured." + k.split(".")[1];
       if (k.split(".")[1] == "cAppNme") {
-        insuredValue["Insured.cInsuredNme"] = applicantValue["Applicant.cAppNme"];
-      }else if (k.split(".")[1] == "cAppCde") {
-        insuredValue["Insured.cInsuredCde"] = applicantValue["Applicant.cAppCde"];
+        insuredValue["Insured.cInsuredNme"] =
+          applicantValue["Applicant.cAppNme"];
+      } else if (k.split(".")[1] == "cAppCde") {
+        insuredValue["Insured.cInsuredCde"] =
+          applicantValue["Applicant.cAppCde"];
       } else {
         insuredValue[key] = applicantValue[k];
       }
@@ -87,32 +90,32 @@ const method = {
       },
       {
         isOk: (selectdata: any) => {
-            if(selectdata?.sel){
-                const selobj=JSON.parse(JSON.stringify(selectdata?.sel))
-                const newobj={}
-                Object.keys(selobj).forEach((key)=>{
-                    if(key!='_dataId'){
-                        const k=opertaor.firstCharLower(key)
-                        newobj['Insured.'+k]=selobj[key]
-                    }
-                })
-                console.log(newobj)
-                newobj['Insured.cInsuredNme']=newobj['Insured.cClntNme']
-                newobj['Insured.cInsuredCde']=newobj['Insured.cAppCde']
-                setFormValue(newobj)
-                setFormItem("Insured.cInsuredNme", {
-                    disabled: true,
-                });
-                setFormItem("Insured.cClntMrk", {
-                    disabled: true,
-                });
-                setFormItem("Insured.cCertfCls", {
-                    disabled: true,
-                });
-                setFormItem("Insured.cCertfCde", {
-                    disabled: true,
-                });
-            }
+          if (selectdata?.sel) {
+            const selobj = JSON.parse(JSON.stringify(selectdata?.sel));
+            const newobj = {};
+            Object.keys(selobj).forEach((key) => {
+              if (key != "_dataId") {
+                const k = opertaor.firstCharLower(key);
+                newobj["Insured." + k] = selobj[key];
+              }
+            });
+            console.log(newobj);
+            newobj["Insured.cInsuredNme"] = newobj["Insured.cClntNme"];
+            newobj["Insured.cInsuredCde"] = newobj["Insured.cAppCde"];
+            setFormValue(newobj);
+            setFormItem("Insured.cInsuredNme", {
+              disabled: true,
+            });
+            setFormItem("Insured.cClntMrk", {
+              disabled: true,
+            });
+            setFormItem("Insured.cCertfCls", {
+              disabled: true,
+            });
+            setFormItem("Insured.cCertfCde", {
+              disabled: true,
+            });
+          }
         },
       },
       { title: "选择客户信息", width: 85 }
@@ -164,9 +167,11 @@ const method = {
       setFormItem("Insured.cCntrCertfCde", {
         rules: [getRules("required", {})],
       });
-      setFormItem("Insured.cIsMicro", {
+      setFormItem("Insured.cIsMicroEntpris", {
         disabled: false,
       });
+      //是否个体工商户
+      setValue("Insured.cIsIndvduBiz", "");
       setFormItem("Insured.cIsIndvduBiz", {
         disabled: true,
       });
@@ -176,7 +181,11 @@ const method = {
         disabled: false,
       });
       // 参加社会统筹标志
-      setFormItem("Insured.cParticTyp", {
+      setFormItem("Insured.cParticiinsocTyp", {
+        rules: [getRules("required", {})],
+      });
+      //注册地址
+      setFormItem("Insured.cRegisteredcapDre", {
         rules: [getRules("required", {})],
       });
       codeListStore
@@ -191,10 +200,17 @@ const method = {
           });
         });
     } else {
-      setFormItem("Insured.cIsMicro", {
+      setFormItem("Insured.cIsMicroEntpris", {
         disabled: true,
       });
+      //是否个体工商户
       setFormItem("Insured.cIsIndvduBiz", {
+        disabled: false,
+      });
+      setFormItem("Applicant.cWorkDpt", { disabled: true, rules: null });
+      //注册地址
+      setFormItem("Applicant.cRegisteredcapDre", { rules: null });
+      setFormItem("Applicant.cIsIndvduBiz", {
         disabled: false,
       });
       // 是否绿色产业客户
@@ -203,11 +219,12 @@ const method = {
         disabled: true,
       });
       // 参加社会统筹标志
-      setFormItem("Insured.cParticTyp", {
+      setFormItem("Insured.cParticiinsocTyp", {
         rules: null,
       });
+
       setValue("Insured.cGreenIndustryCustomers", "");
-      setValue("Insured.cIsMicro", "");
+      setValue("Insured.cIsMicroEntpris", "");
       setValue("Insured.cCertfCls", "");
       setFormItem("Insured.cCntrNme", { rules: null });
       setFormItem("Insured.cCntrCertfCde", { rules: null });
@@ -230,18 +247,18 @@ const method = {
     for (const k in InsuredValue) {
       InsuredValue[k] = null;
     }
-      setFormItem("Insured.cInsuredNme", {
-          disabled: false,
-      });
-      setFormItem("Insured.cClntMrk", {
-          disabled: false,
-      });
-      setFormItem("Insured.cCertfCls", {
-          disabled: false,
-      });
-      setFormItem("Insured.cCertfCde", {
-          disabled: false,
-      });
+    setFormItem("Insured.cInsuredNme", {
+      disabled: false,
+    });
+    setFormItem("Insured.cClntMrk", {
+      disabled: false,
+    });
+    setFormItem("Insured.cCertfCls", {
+      disabled: false,
+    });
+    setFormItem("Insured.cCertfCde", {
+      disabled: false,
+    });
   },
   funcNdustryCate: () => {
     dialog.value?.open(
@@ -279,9 +296,18 @@ const method = {
     );
   },
   tCertMrkChecked: (val) => {
-    if (val === "1") {
-      setValue("Insured.tCertfBgnDate", "2099-12-31");
-      setValue("Insured.tCertfEndDate", "2099-12-31");
+    if (val == "1") {
+      setValue(
+        "Insured.tCertfBgnDate",
+        moment(new Date("2099-12-31")).format("YYYY-MM-DD HH:mm:ss")
+      );
+      setValue(
+        "Insured.tCertfEndDate",
+        moment(new Date("2099-12-31")).format("YYYY-MM-DD HH:mm:ss")
+      );
+    } else {
+      setValue("Insured.tCertfBgnDate", "");
+      setValue("Insured.tCertfEndDate", "");
     }
   },
   mobileChange: (val) => {
@@ -305,12 +331,12 @@ const method = {
     if (val == "110002") {
       //证件类型是“营业执照”，参加社会统筹标志变化为必填
       // 参加社会统筹标志
-      setFormItem("Insured.cParticTyp", {
+      setFormItem("Insured.cParticiinsocTyp", {
         rules: [getRules("required", {})],
       });
     } else {
       // 参加社会统筹标志
-      setFormItem("Insured.cParticTyp", {
+      setFormItem("Insured.cParticiinsocTyp", {
         rules: null,
       });
     }

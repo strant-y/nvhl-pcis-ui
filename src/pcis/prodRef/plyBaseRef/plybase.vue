@@ -46,6 +46,7 @@ const plyBaseEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 
 const user = JSON.parse(sessionStorage.getItem("user"));
+console.log("user", user);
 const subDptCde = ref(); //所属分公司
 
 onMounted(async () => {
@@ -65,7 +66,7 @@ onMounted(async () => {
     //是否可疑交易，默认否
     setValue("Base.cSusBusiness", "0");
     //录单人 默认系统操作员
-    setValue("Base.cOprCde", user.companyCnm);
+    setValue("Base.cOprCde", user.userName);
     //录单人联系方式  默认操作员的
     setValue("Base.cCiOprRel", user.phoneNO);
     // 查询承保机构所属分公司和项目类别大类数据
@@ -76,6 +77,7 @@ onMounted(async () => {
         { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptNme}` },
       ],
     });
+    console.log(param, "param.cDptCde");
     setValue("Base.cDptCde", param.cDptCde);
     // 服务机构默认值
     setFormItem("Base.cIntroDptCde", {

@@ -80,6 +80,7 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Edit",
         hideBtns: (row) => {
+          console.log("改变状态的row", row);
           if (!row.cNmeCn.includes("**")) return true;
         },
         tableClick: (row) => {
@@ -139,6 +140,22 @@ const tableconfig = reactive<AppTableConfig>(
         title: "序号",
         width: 100,
       },
+      // {
+      //   prop: "cIfEdit",
+      //   inputtype: "rttag",
+      //   title: "是否可编辑",
+      //   width: 100,
+      //   loadData: [
+      //     {
+      //       label: "可编辑",
+      //       value: "0",
+      //     },
+      //     {
+      //       label: "不可编辑",
+      //       value: "1",
+      //     },
+      //   ],
+      // },
       {
         prop: "cIfMust",
         inputtype: "rttag",

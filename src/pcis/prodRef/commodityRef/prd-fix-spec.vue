@@ -36,7 +36,10 @@
           <el-table-column property="addIndex" label="序号" width="55" />
           <el-table-column property="cSpecNo" label="特约代码" width="300">
             <template #default="scope">
-              <el-input v-model="scope.row['cSpecNo']"></el-input>
+              <el-input
+                v-model="scope.row['cSpecNo']"
+                disabled="true"
+              ></el-input>
             </template>
           </el-table-column>
           <el-table-column property="cNmeCn" label="特别约定内容">
@@ -135,10 +138,11 @@ const refreshData = () => {
 const toggleSpecificRow = () => {
   if (multipleTableRef.value) {
     // 假设要切换 id 为 2 的行的选中状态
-    const targetRow = pageresult.list.find((row) => row["cIfMust"] == "1");
-    if (targetRow) {
-      multipleTableRef.value.toggleRowSelection(targetRow);
-    }
+    pageresult.list.forEach((row) => {
+      if (row["cIfMust"] == "1") {
+        multipleTableRef.value.toggleRowSelection(row, true);
+      }
+    });
   }
 };
 
