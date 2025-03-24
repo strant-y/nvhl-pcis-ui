@@ -42,7 +42,7 @@ const emits = defineEmits(["handleClose"]);
 
 const formconfig1 = ref<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    title: "条款基本信息",
+    title: "新增信息",
     fromSchema: [],
     fromUi: createFromUiConfig({
       cols: 2,
