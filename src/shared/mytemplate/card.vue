@@ -60,6 +60,9 @@
         </template>
 
         <div class="form-inner" v-if="showMyfrom">
+          <div v-if="cardConfig.showEdit">
+            <app-free-edit :freeEditConfig="formconfig" ref="EditRef" />
+          </div>
           <slot />
           <div
             style="margin-top: 20px"
@@ -77,8 +80,11 @@
 </template>
 
 <script setup lang="ts">
+import { createAppGridEditConfig } from "../app-grid-edit-config";
 import { CardConfig } from "./card-config";
 const showMyfrom = ref(true);
+
+const formconfig = ref(createAppGridEditConfig({}));
 
 defineOptions({
   name: "MyCard",
@@ -96,15 +102,22 @@ watch(
   () => props.cardConfig,
   (o, n) => {
     showMyfrom.value = n?.showMyfrom ? n?.showMyfrom : true;
+    initEditConfig();
   },
   { deep: true }
 );
+
+function initEditConfig(){
+  if(props.cardConfig.formconfig){
+    formconfig.value = props.cardConfig.formconfig;
+  }
+}
 </script>
 
 <style scoped>
-:deep(.el-card__header) {
-  background-color: #e5f3fa;
-  padding: 15px 20px;
+.searchbar ::v-deep .el-card__header {
+  background-color: #e5f3fa ;
+  padding: 15px 20px ; 
 }
 
 .searchbar {

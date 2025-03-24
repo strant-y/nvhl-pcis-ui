@@ -23,6 +23,8 @@ export interface AppTableConfig {
   isPage?: boolean | string; //是否分页
   editList?: Array<any>; //指定可编辑列
   showSelection?:boolean; //行多选
+  showEdit?: boolean; //是否显示查询表单
+  formconfig?:AppGridEditConfig | null;  //表单配置
 
   rowDbClickFun?: (rowData) => void;
 }
@@ -65,6 +67,8 @@ export function createTableEditConfig(
     isPage: config.isPage,
     fromUi: createTableUiConfig(config.fromUi),
     showSelection: config.showSelection || false,
+    showEdit: config.showEdit || false,
+    formconfig: config.formconfig || null,
     rowDbClickFun: config.rowDbClickFun || null,
   };
 }

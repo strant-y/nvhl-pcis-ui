@@ -138,6 +138,29 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
+        id: "DistFactorBtn",
+        type: "primary",
+        label: "编辑清单表单要素",
+        hidden: true,
+        func: () => {
+          formconfig1.fromSchema?.forEach((e) => {
+            if (e.prop === "componentKey") {
+              if (!e.disabled) {
+                ElMessage.warning("请先保存组件,再绑定表单要素!");
+                return;
+              }
+              const ck = freeEditRef.value?.getValue("componentKey");
+              dialog.value?.open(
+                "distFactorMap",
+                { componentKey:ck },
+                null,
+                { title: "表单信息关联" }
+              );
+            }
+          });
+        },
+      }),
+      createFreeButtonBase({
         type: "primary",
         label: "保存",
         func: () => {
@@ -191,6 +214,17 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             componentTab: index,
           };
           querySelector(param);
+
+          formconfig1.endBtns?.forEach((e: any) => {
+            if (e.id === "DistFactorBtn") {
+              if (index === "dist") {
+                // 清单信息时,可以额外录入清单编辑按钮
+                e.hidden = false;
+              } else {
+                e.hidden = true;
+              }
+            }
+          });
         },
       },
       {

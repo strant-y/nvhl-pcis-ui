@@ -6,12 +6,14 @@ export interface CardConfig {
   shadow?: boolean; // 显示边框阴影 默认true
   superFromShow?: string | null; // 高级查询显示
   superFromClose?: string | null; // 高级查询关闭
+  showEdit?: boolean; //是否显示表单
   showMyfrom?: boolean; //是否隐藏信息
   showInTitle?: boolean; //是否显示折叠切换按钮
   showMyfromBtm?: boolean; //是否显示折叠切换按钮
   titleBtns?: Array<FreeButtonBase>; //标题处按钮
   endBtns?: Array<FreeButtonBase>; //结尾处按钮
   endBtnsPosition?: "left" | "right" | "center"; // 结尾处按钮位置
+  formconfig?:AppGridEditConfig | null;  //表单配置
 }
 
 export function creatCardConfig(
@@ -21,6 +23,7 @@ export function creatCardConfig(
     title: config.title || null,
     showBtn: config.showBtn || true,
     shadow: config.shadow || true,
+    showEdit: config.showEdit || false,
     showMyfrom: config.showMyfrom || true,
     showMyfromBtm: config.showMyfromBtm || false,
     showInTitle: config.showInTitle || false,
@@ -31,5 +34,6 @@ export function creatCardConfig(
     titleBtns: config.titleBtns || [],
     endBtns: config.endBtns || [],
     endBtnsPosition: config.endBtnsPosition || "center",
+    formconfig: config.formconfig || null,
   };
 }

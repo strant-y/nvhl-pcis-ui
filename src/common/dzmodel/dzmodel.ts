@@ -5,6 +5,7 @@ import componentView from "./prodconfig/componentView.vue";
 import componentCompare from "./prodconfig/componentCompare.vue";
 import prodCopy from "./prodconfig/prodCopy.vue";
 import componentPageView from "./prodconfig/componentPageView.vue";
+import DistFactorMap from "./prodconfig/DistFactorMap.vue";
 import addtremView from "./prodconfig/addtremView.vue";
 import riskFactorConfig from "./insuranceConInfo/riskFactorConfig.vue";
 import termGroupConfig from "./insuranceConInfo/termGroupConfig.vue";
@@ -22,6 +23,7 @@ const componentMap = {
     componentCompare:componentCompare,
     prodCopy:prodCopy,
     componentPageView:componentPageView,
+    distFactorMap:DistFactorMap,
 	
   
     addtremView:addtremView,

@@ -1,5 +1,9 @@
 <template>
-  <app-grid-edit :gridEditConfig="formconfig1" ref="distEditRef" />
+  <div>
+    <myCard :cardConfig="cardconfig">
+      <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef" />
+    </myCard>
+   </div>
 </template>
 
 <script setup lang="ts">
@@ -7,10 +11,11 @@ import {
   AppGridEditMethod,
   createAppGridEditConfig,
 } from "@/shared/app-grid-edit-config";
+import { AppTableConfig, createTableEditConfig } from "@/shared/app-table-config";
 import { formInit } from "@/shared/from-init";
+import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
-
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -18,8 +23,17 @@ const props = defineProps({
   },
 });
 
+const pageresult = reactive<Pageresult>({
+	result: "",
+	/** 数据列表 */
+	list: [],
+	/** 总数 */
+	total: 0,
+});
 const distEditRef = ref<AppGridEditMethod | null>(null);
-const formconfig1 = reactive(createAppGridEditConfig({}));
+const cardconfig = ref<CardConfig>(creatCardConfig({}));
+const formconfig1 = ref<Record<string, any>>({});
+const tableconfig = ref<AppTableConfig>(createTableEditConfig());
 
 onMounted(async () => {
   const formconfig11 = formInit(
@@ -27,7 +41,14 @@ onMounted(async () => {
     method,
     exRules
   );
-  Object.assign(formconfig1, formconfig11);
+  Object.assign(formconfig1.value, formconfig11);
+  cardconfig.value.title = formconfig1.value.title;
+  tableconfig.value.showEdit = true;
+  tableconfig.value.fromSchema = formconfig1.value.fromSchema;
+  tableconfig.value.formconfig = createAppGridEditConfig({
+    titleBtns:formconfig1.value.titleBtns,
+    fromSchema:formconfig1.value.distSchema,
+  });
   // addFakeData();
 });
 
@@ -38,10 +59,10 @@ const method = {
   funcdistadd: () => {
     debugger;
     distEditRef?.value?.addRow();
-    const val = getFromValue();
-    val.items.forEach((key, index) => {
-      key["Dist.ids"] = index + 1;
-    });
+    // const val = getFromValue();
+    // val.items.forEach((key, index) => {
+    //   key["Dist.ids"] = index + 1;
+    // });
   },
   funcdistdel: () => {
     const selData = distEditRef?.value?.getSelectRow();
@@ -51,31 +72,20 @@ const method = {
     }
     const editIndex = selData["_dataId"];
     distEditRef?.value?.delRow(editIndex);
-    const val = getFromValue();
-    val.items.forEach((key, index) => {
-      key["Dist.ids"] = index + 1;
-    });
+    // const val = getFromValue();
+    // val.items.forEach((key, index) => {
+    //   key["Dist.ids"] = index + 1;
+    // });
   },
 };
 
 // 绑定特殊验证器
 const exRules = {};
 
-function getFromValue() {
+function getData() {
   return distEditRef?.value?.getFromValue();
 }
 
-function setFormValue(value: any) {
-  distEditRef?.value?.setFormValue(value);
-}
-
-function validate() {
-  return distEditRef?.value?.validate();
-}
-
-function getTableValue(rowId: number, key: string) {
-  distEditRef?.value?.getTableValue(rowId, key);
-}
 function addFakeData() {
   if (distEditRef.value) {
     const fakeData = {
@@ -89,10 +99,7 @@ function addFakeData() {
 }
 onMounted(() => {});
 defineExpose({
-  getFromValue,
-  setFormValue,
-  validate,
-  getTableValue,
+  getData,
 });
 </script>
 

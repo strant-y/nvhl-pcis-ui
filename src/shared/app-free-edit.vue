@@ -96,7 +96,9 @@
                   v-for="(item, index) in freeEditConfig.endBtns"
                   :key="index"
                 >
+                <template v-if="!item.hidden">
                   <rt-button :item="item" />
+                </template>
                 </template>
               </div>
             </div>

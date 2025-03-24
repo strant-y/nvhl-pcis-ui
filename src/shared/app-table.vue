@@ -1,10 +1,46 @@
 <template>
   <div class="searchbar">
     <el-card shadow="never" class="table-container">
-      <template #header>
-        <template v-for="(item, index) in tableConfig.titleBtns" :key="index">
-          <rt-button :item="item" />
-        </template>
+      <template
+        #header
+        v-if="
+          tableConfig.showEdit ||
+          tableConfig.formconfig?.titleBtns.length > 0 ||
+          tableConfig.titleBtns.length > 0
+        "
+      >
+        <el-row justify="space-between" v-if="tableConfig.showEdit">
+          <el-col :span="24">
+            <dynamic-forms
+                :fromSchema="tableConfig.formconfig.fromSchema"
+                :fromUi="tableConfig.formconfig.fromUi"
+                ref="dynamicForm"
+              />
+          </el-col>
+        </el-row>
+        <el-row
+          justify="space-between"
+          v-if="tableConfig.formconfig?.titleBtns.length > 0"
+        >
+          <el-col :span="24" style="text-align: right">
+            <template
+              v-for="(item, index) in tableConfig.formconfig?.titleBtns"
+              :key="index"
+            >
+              <rt-button :item="item" />
+            </template>
+          </el-col>
+        </el-row>
+        <el-row justify="space-between" v-if="tableConfig.titleBtns.length > 0">
+          <el-col :span="24">
+            <template
+              v-for="(item, index) in tableConfig.titleBtns"
+              :key="index"
+            >
+              <rt-button :item="item" />
+            </template>
+          </el-col>
+        </el-row>
       </template>
       <div class="form-inner">
         <rttable
@@ -19,7 +55,7 @@
           v-model:page-size="queryParams.pageSize"
           layout="prev, pager, next, jumper"
           :total="pageresult.total"
-          v-if="!tableConfig.isPage"
+          v-if="!tableConfig.isPage && pageresult.total > 0"
           @size-change="pageChange"
           @current-change="pageChange"
         />
@@ -117,9 +153,16 @@ defineExpose({
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .searchbar {
   border: 1px solid #ddd;
   box-shadow: 0 0 2px rgb(0 0 0 / 30%);
+}
+.table-container ::v-deep .el-card__header {
+  background-color: #d0f3fc4d !important;
+}
+.table-container {
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 </style>

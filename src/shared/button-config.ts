@@ -27,6 +27,7 @@ export class FreeButtonBase {
   popover?: string | undefined | null; //弹出框映射
   popoverWidth?: number | undefined | null; //弹出框宽度
   showKey?: Array; //显示数组合集，需要与数据匹配是否包含 findIndex方法
+  hidden?: boolean;
   beginLoading?: () => void;
   endLoading?: () => void;
 }
@@ -56,6 +57,7 @@ export function createFreeButtonBase(
     popoverWidth: config.popoverWidth || null,
     iconColor: config.iconColor || null,
     showKey: config.showKey || [],
+    hidden: config.hidden || false,
     beginLoading: () => {
       button.loading = true;
     },
