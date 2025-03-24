@@ -3,6 +3,8 @@
     <myCard :cardConfig="cardconfig">
       <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef" />
     </myCard>
+    
+    <comDialog ref="dialog"></comDialog>
    </div>
 </template>
 
@@ -15,6 +17,8 @@ import { AppTableConfig, createTableEditConfig } from "@/shared/app-table-config
 import { formInit } from "@/shared/from-init";
 import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
+const dialog = ref<DialogMethod | null>(null);
 const opertaor = dataOpertaor();
 const props = defineProps({
   pageSchema: {
@@ -57,12 +61,16 @@ const method = {
   // func demo
   func1: () => {},
   funcdistadd: () => {
-    debugger;
-    distEditRef?.value?.addRow();
-    // const val = getFromValue();
-    // val.items.forEach((key, index) => {
-    //   key["Dist.ids"] = index + 1;
-    // });
+    dialog.value?.open(
+    "distAdd",
+    { fromSchema: tableconfig.value.fromSchema },
+    {
+      isOk: (res: any) => {
+        console.log();
+      },
+    },
+    { title: "新增",width:'60' }
+  );
   },
   funcdistdel: () => {
     const selData = distEditRef?.value?.getSelectRow();

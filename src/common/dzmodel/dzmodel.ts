@@ -8,6 +8,8 @@ import componentPageView from "./prodconfig/componentPageView.vue";
 import DistFactorMap from "./prodconfig/DistFactorMap.vue";
 import addtremView from "./prodconfig/addtremView.vue";
 import riskFactorConfig from "./insuranceConInfo/riskFactorConfig.vue";
+import distAdd from "./distmodel/distAdd.vue";
+
 import termGroupConfig from "./insuranceConInfo/termGroupConfig.vue";
 import termFactorConfig from "./insuranceConInfo/termFactorConfig.vue";
 import querycustomerView from "./prodconfig/querycustomerView.vue";
@@ -24,6 +26,9 @@ const componentMap = {
     prodCopy:prodCopy,
     componentPageView:componentPageView,
     distFactorMap:DistFactorMap,
+
+    distAdd: distAdd,
+
 	
   
     addtremView:addtremView,
