@@ -43,6 +43,10 @@ export function saveFactor(queryParams: any): AxiosPromise<any> {
     return post(`/prod/saveFactor`, queryParams);
 }
 
+export function saveDistfrom(queryParams: any): AxiosPromise<any> {
+    return post(`/prod/saveDistfrom`, queryParams);
+}
+
 /**
  * 获取组件信息列表
  *
@@ -217,7 +221,7 @@ export function SaveComponentFactors(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function releasePage(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/releasePage`, queryParams);
+    return post(LocalBaseApi + `/prod/releasePage`, queryParams);
 }
 
 /**
