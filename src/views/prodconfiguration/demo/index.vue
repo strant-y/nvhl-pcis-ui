@@ -187,7 +187,12 @@ const formconfig = reactive<AppFreeEditConfig>(
         btnItems: createFreeButtonBase({
           label: "测试塞值",
           func: function () {
-            // freeEditRef.value?.setValue('cascaderarea',['1', '120000', '120102', '120102']);
+            freeEditRef.value?.setFormValue({
+              'Contry':'1',
+              'Prod':'120000',
+              'City':'120102',
+              'Town':'120102'
+            });
             const t = freeEditRef.value?.getFromValue();
             console.log(t);
           },
