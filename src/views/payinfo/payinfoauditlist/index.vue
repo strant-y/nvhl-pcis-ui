@@ -31,9 +31,10 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { log } from "console";
 const pcisQueryService = new PcisQueryService();
 const dzmodal = useDzModal();
-const departmentTree = defineAsyncComponent(
-	() => import("@/components/common/DepartmentTree.vue")
-);
+// const departmentTree = defineAsyncComponent(
+// 	() => import("@/components/common/DepartmentTree.vue")
+// );
+import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 import moment from 'moment';
 import { useUserStore } from "@/store/modules/user";
 const userStore = useUserStore();
@@ -94,19 +95,28 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				btnWidth: 10,
 				itemWidth: 2,
 				// rules: [getRules("required", {
-        //   trigger: 'change'
-        // })],
-				params: { 'CDptCde': user.value['companyId'] }, 
+                //   trigger: 'change'
+                // })],
 				showExBtn: true,
 				btnItems: {
 					icon: "Search",
 					type: "primary",
 					func: () => {
 						dzmodal
-							.open(departmentTree, { type: "Issuer", data: {} })
+							.open(DepartmentTree, { type: "Issuer", data: {} })
 							.then((res) => {
-								if (res.type === "ok") {
-								}
+                                if (res.body) {
+                                    const selectObj = res.body;
+                                    freeEditRef.value?.setValue("AccDpt", selectObj.id);
+                                    setFormItem("AccDpt", {
+                                        loadData: [
+                                            {
+                                                label: selectObj.name,
+                                                value: selectObj.id,
+                                            },
+                                        ],
+                                    });
+                                }
 							});
 					},
 				},
@@ -523,6 +533,16 @@ function gotoChangeSts() {
         }
       });
     });
+}
+//给表单下拉项赋值
+function setFormItem(key, obj) {
+    if (obj && Object.keys(obj).length) {
+        formconfig1.fromSchema?.forEach(item => {
+            if (item.prop === key) {
+                Object.assign(item, obj)
+            }
+        })
+    }
 }
 </script>
 
