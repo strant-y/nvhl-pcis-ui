@@ -68,23 +68,23 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 		title: "缴费信息查询",
 		endBtnsPosition: "right",
 		endBtns: [
-      createFreeButtonBase({
-				type: "primary",
-				label: "查询",
-				func: async () => {
-					handleQuery();
-				},
-			}),
-			createFreeButtonBase({
-				label: "重置",
-				func: () => {
-          freeEditRef.value?.resetFields()
-          nextTick(()=>{
-            freeEditRef.value?.setValue('TUnTmStart', startTm)
-            freeEditRef.value?.setValue('TUnTmEnd', endTm)
-          })
-				},
-			}),
+		  		createFreeButtonBase({
+					type: "primary",
+					label: "查询",
+					func: async () => {
+						handleQuery();
+					},
+				}),
+				createFreeButtonBase({
+					label: "重置",
+					func: () => {
+					  freeEditRef.value?.resetFields()
+					  nextTick(()=>{
+						freeEditRef.value?.setValue('TUnTmStart', startTm)
+						freeEditRef.value?.setValue('TUnTmEnd', endTm)
+					  })
+					},
+				}),
 		],
 		fromSchema: [
 			{
@@ -115,35 +115,34 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				prop: "LoadSub",
 				inputtype: "rtcheckbox",
 				title: "是否包含下级",
-        defaultValue: 1,
-        keymap: {
-          y: 1,
-          n: 0,
-        },
+				defaultValue: 1,
+				keymap: {
+				  y: 1,
+				  n: 0,
+				},
 			},
 			{
 				prop: "CPayStatus",
 				inputtype: "rtselect",
 				rules: [getRules("required", {trigger: 'change'})],
-        typeCode: "WEB_BAS_CODELIST",
-        params: {'cParCde': 'DY1'},
+        		typeCode: "WEB_BAS_CODELIST",
+                codeParam: {'cParCde': 'DY1'},
 				title: "缴费状态",
-        defaultValue: '0'
+        		// defaultValue: '0'
 			},
 			{
 				prop: "CKindNo",
 				inputtype: "rtselect",
 				title: "产品大类",
-        typeCode: "KIND_LIST_GRT",
-        params: {'cOperId': user.value['opCde'], 'cDptCde': user.value['companyId']},
-
+				typeCode: "KIND_LIST_GRT",
+				params: {'cOperId': user.value['opCde'], 'cDptCde': user.value['companyId']},
 			},
 			{
 				prop: "CProdNo",
 				inputtype: "rtselect",
 				title: "产品",
-        typeCode: "PROD_LIST_GRT",
-        params: {'cParCde': '', 'cOperId': user.value['opCde'], 'cDptCde': user.value['companyId']},
+				typeCode: "PROD_LIST_GRT",
+				params: {'cParCde': '', 'cOperId': user.value['opCde'], 'cDptCde': user.value['companyId']},
 			},
 			{
 				prop: "CAppNmeInvest",
@@ -154,8 +153,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				prop: "CPayTyp",
 				inputtype: "rtselect",
 				title: "缴费类型",
-        typeCode: "CHARGE_TYPE_CACHE",
-        param: {'cCde': [ '2', '3', '5',  '99']},
+				typeCode: "CHARGE_TYPE_CACHE",
+				param: {'cCde': [ '2', '3', '5',  '99']},
 			},
 			{
 				prop: "CCombinationNo",
@@ -166,13 +165,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				prop: "CBillTyp",
 				inputtype: "rtselect",
 				title: "单据类型",
-        loadData :[{value: '1', label: '投保单号'},
-          {value: '3', label: '支票号'},
-          {value: '4', label: '保单号'},
-          {value: '5', label: '交易号'},
-          {value: '6', label: '支付号'}
-        ],
-        defaultValue: '1',
+				loadData :[{value: '1', label: '投保单号'},
+				  {value: '3', label: '支票号'},
+				  {value: '4', label: '保单号'},
+				  {value: '5', label: '交易号'},
+				  {value: '6', label: '支付号'}
+				],
+        		defaultValue: '1',
 			},
 			{
 				prop: "CBillNoStart",
@@ -188,41 +187,41 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				prop: "CDateTyp",
 				inputtype: "rtselect",
 				title: "日期类型",
-        loadData :[{value: '1', label: '核保日期'},
-          {value: '2', label: '起保日期'},
-          {value: '3', label: '缴费处理日期'}
-        ],
-        defaultValue: '1',
+				loadData :[{value: '1', label: '核保日期'},
+				  {value: '2', label: '起保日期'},
+				  {value: '3', label: '缴费处理日期'}
+				],
+				// defaultValue: '1',
 				rules: [getRules("required", {
-          trigger: 'change'
-        })],
+				  trigger: 'change'
+				})],
 			},
 			{
 				prop: "TUnTmStart",
 				inputtype: "rtdatepicker",
 				title: "日期起期",
-        type: 'date',
-        rules: [getRules("required", {trigger: 'change'})],
-        format: "YYYY-MM-DD 00:00:00",
-        valueFormat: "YYYY-MM-DD 00:00:00",
-        defaultValue: new Date(Date.now() - 6 * 1000 * 60 * 60 * 24),
-        func: (val) => {
-          if (!!val) {
-            const dates = moment(new Date(Date.parse(val))).format('YYYY-MM-DD 23:59:59');
-            const endDates = moment(dates).add(6, 'day').format('YYYY-MM-DD 23:59:59');
-            freeEditRef.value?.setValue('TUnTmEnd', endDates)
-          }
-        }
+				type: 'date',
+				rules: [getRules("required", {trigger: 'change'})],
+				format: "YYYY-MM-DD 00:00:00",
+				valueFormat: "YYYY-MM-DD 00:00:00",
+				defaultValue: new Date(Date.now() - 6 * 1000 * 60 * 60 * 24),
+				func: (val) => {
+				  if (!!val) {
+					const dates = moment(new Date(Date.parse(val))).format('YYYY-MM-DD 23:59:59');
+					const endDates = moment(dates).add(6, 'day').format('YYYY-MM-DD 23:59:59');
+					freeEditRef.value?.setValue('TUnTmEnd', endDates)
+				  }
+				}
 			},
 			{
 				prop: "TUnTmEnd",
 				inputtype: "rtdatepicker",
 				title: "日期止期",
-        type: 'date',
-        rules: [getRules("required", {trigger: 'change'})],
-        format: "YYYY-MM-DD 00:00:00",
-        valueFormat: "YYYY-MM-DD 00:00:00",
-        defaultValue: new Date(Date.now())
+				type: 'date',
+				rules: [getRules("required", {trigger: 'change'})],
+				format: "YYYY-MM-DD 00:00:00",
+				valueFormat: "YYYY-MM-DD 00:00:00",
+				defaultValue: new Date(Date.now())
 			},
 			{
 				prop: "CSlsNme",
@@ -248,15 +247,15 @@ const tableconfig = reactive<AppTableConfig>(
 				type: "primary",
 				label: "缴费类型转换",
 				func: async () => {
-          if (multipleSelection.value.length < 1 ) {
-            ElMessage.warning('所选记录为空！');
-            return ;
-          }
-          // if (multipleSelection.value.length > 30 ) {
-          //   ElMessage.warning('获取支付号 数量最大为30单！');
-          //   return ;
-          // }
-          gotoChangeSts()
+					  if (multipleSelection.value.length < 1 ) {
+						ElMessage.warning('所选记录为空！');
+						return ;
+					  }
+					  // if (multipleSelection.value.length > 30 ) {
+					  //   ElMessage.warning('获取支付号 数量最大为30单！');
+					  //   return ;
+					  // }
+					  gotoChangeSts()
 				},
 			}),
 			createFreeButtonBase({
@@ -287,36 +286,36 @@ const tableconfig = reactive<AppTableConfig>(
 		],
 		tableBtnType: "btn",
 		tableBtnWidth: 150,
-		tableBtnPosition: "right",
+		// tableBtnPosition: "right",
 		tableBtnFixed: "right",
-		tableBtn: [
-			createFreeButtonBase({
-				id: "score",
-				link: true,
-				tooltip: "详情",
-				type: "success",
-				size: "large",
-				icon: "View",
-				tableClick: (row) => {
-					dzmodal.open(payConfirmInfoDetailRead, { type: "view", data: row }).then((res) => {
-						if (res.type === "ok") {
-							console.log("详情")
-						}
-					});
-				},
-			}),
-			createFreeButtonBase({
-				id: "score",
-				link: true,
-				tooltip: "文档",
-				type: "success",
-				size: "large",
-				icon: "Document",
-				tableClick: (row) => {
-          console.log("编辑")
-				},
-			}),      
-		],
+		// tableBtn: [
+			// createFreeButtonBase({
+			// 	id: "score",
+			// 	link: true,
+			// 	tooltip: "详情",
+			// 	type: "success",
+			// 	size: "large",
+			// 	icon: "View",
+			// 	tableClick: (row) => {
+			// 		dzmodal.open(payConfirmInfoDetailRead, { type: "view", data: row }).then((res) => {
+			// 			if (res.type === "ok") {
+			// 				console.log("详情")
+			// 			}
+			// 		});
+			// 	},
+			// }),
+			// createFreeButtonBase({
+			// 	id: "score",
+			// 	link: true,
+			// 	tooltip: "文档",
+			// 	type: "success",
+			// 	size: "large",
+			// 	icon: "Document",
+			// 	tableClick: (row) => {
+          	// 		console.log("编辑")
+			// 	},
+			// }),
+		// ],
 		fromSchema: [
 			{
 				prop: "cAppNo",
@@ -337,10 +336,10 @@ const tableconfig = reactive<AppTableConfig>(
 				prop: "cPayTyp",
 				inputtype: "rtinput",
 				title: "缴费类型",
-        formatter: (val)=>{
-          const result = cPayTypList.value.find(item => item.value === val);
-          return result ? result.label : val;
-        }
+				formatter: (val)=>{
+				  const result = cPayTypList.value.find(item => item.value === val);
+				  return result ? result.label : val;
+				}
 			},
 			{
 				prop: "cPaySequence",
@@ -361,10 +360,10 @@ const tableconfig = reactive<AppTableConfig>(
 				prop: "cCheckSts",
 				inputtype: "rtinput",
 				title: "处理状态",
-        formatter: (val)=>{
-          const result = cCheckStsList.find(item => item.value === val);
-          return result ? result.label : val;
-        }
+				formatter: (val)=>{
+				  const result = cCheckStsList.find(item => item.value === val);
+				  return result ? result.label : val;
+				}
 			},
 			{
 				prop: "tBgnTm",
@@ -385,10 +384,10 @@ const tableconfig = reactive<AppTableConfig>(
 				prop: "cPayStatus",
 				inputtype: "rtinput",
 				title: "缴费状态",
-        formatter: (val)=>{
-          const result = cPayStatusList.find(item => item.value === val);
-          return result ? result.label : val;
-        }
+				formatter: (val)=>{
+				  const result = cPayStatusList.find(item => item.value === val);
+				  return result ? result.label : val;
+				}
 			},
 			{
 				prop: "tUdrTm",
@@ -405,6 +404,8 @@ const tableconfig = reactive<AppTableConfig>(
 );
 onMounted(async () => {
   nextTick(()=>{
+    freeEditRef.value?.setValue('CPayStatus', '0')
+    freeEditRef.value?.setValue('CDateTyp', '1')
     freeEditRef.value?.setValue('TUnTmStart', startTm)
     freeEditRef.value?.setValue('TUnTmEnd', endTm)
   })  
@@ -438,6 +439,8 @@ function handleQuery(flag?: boolean) {
     } else {
       const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
       const s = freeEditRef.value?.getFromValue(); //获取表单数据
+		console.log(r)
+		console.log(s)
       const start = Date.parse(s.cTimeStart);
       const end = Date.parse(s.cTimeEnd);
       if (start - end > 0) {
@@ -455,6 +458,7 @@ function handleQuery(flag?: boolean) {
         CurrentUserOrg: user.value['companyId'],
         //codeListMap: this.codeListMap
       });
+      console.log(param)
       pcisQueryService.getPayConfirmInfoList(param)
         .then((res) => {
           const { code, data, msg } = res;
@@ -512,7 +516,7 @@ function gotoChangeSts() {
     .finally(() => { 
       dzmodal.open(payConfirmInfoChange, { type: "check" , data:{
         CUniqueNos: CUniqueNos,
-        CRelAppNos: CRelAppNos        
+        CRelAppNos: CRelAppNos
       }}).then((res) => {
         if (res.type === "ok") {
           console.log("审核")
