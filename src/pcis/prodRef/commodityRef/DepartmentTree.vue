@@ -68,6 +68,8 @@ const filterNode = (value: string, data: Tree) => {
 };
 const handleNodeClick = (data: Tree) => {
   selectedNode.value = data;
+    emits("ok", selectedNode.value);
+    dialogVisible.value = false;
 };
 const handleCancel = () => {
   dialogVisible.value = false;
@@ -121,11 +123,11 @@ const loadNode = (node, resolve) => {
     .getOrgDptTreeListByPid(params)
     .then((result) => {
       const dto = [];
-      if (200 !== result["code"]) {
-        ElMessage.error(result["msg"]);
-      } else {
-        ElMessage.success(result["msg"]);
-      }
+      // if (200 !== result["code"]) {
+      //   ElMessage.error(result["msg"]);
+      // } else {
+      //   ElMessage.success(result["msg"]);
+      // }
       if (result["data"] && result["data"].length > 0) {
         result["data"].forEach((item) => {
           dto.push({

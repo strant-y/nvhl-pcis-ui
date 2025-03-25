@@ -1,6 +1,7 @@
 import { AxiosPromise } from "axios";
 import { post } from "@/utils/http";
 import { LocalBaseApi } from "../config";
+import request from "@/utils/request";
 
 const QUERY = "/query/";
 
@@ -99,3 +100,16 @@ export function genCusConInfoBusinessList(queryParams: any): AxiosPromise<any> {
     return post(`policy/genCusConInfoBusinessList`, queryParams);
 }
 
+/**
+ * 投保单核保信息 提交
+ */
+export function submitUnderwriting(queryParams: any) {
+    return request.post('/policy/undr', queryParams);
+}
+
+/**
+ * 批单核保信息 提交
+ */
+export function submitUnderwritingEdr(queryParams: any) {
+    return request.post('/policy/undrEdr', queryParams);
+}

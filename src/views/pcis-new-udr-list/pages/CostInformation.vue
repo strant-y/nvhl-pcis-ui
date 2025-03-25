@@ -1,6 +1,6 @@
 <!-- 核保任务查询 费用信息 -->
 <template>
-  <div class="app-container">
+  <el-dialog   v-model="dialogVisible" width="90%" title="费用信息">
     <app-table
       :tableConfig="tableconfig"
       v-model:pageresult="pageresult"
@@ -14,12 +14,20 @@
           type: 'primary',
           label: '保存',
           func: () => {
-             
+
+          },
+        }"
+      />
+      <rt-button
+              :item="{
+          label: '返回',
+          func: () => {
+            dialogVisible = false;
           },
         }"
       />
     </div>
-  </div>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
@@ -47,6 +55,7 @@ import { useFormLabelWidth } from "element-plus/es/components/form/src/utils";
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
 const isDisabled = ref(true); //判断表单是否可编辑
+const dialogVisible = ref(true);
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "投保单费用信息",

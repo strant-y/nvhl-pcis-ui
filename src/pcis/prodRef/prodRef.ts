@@ -58,6 +58,7 @@ import  cOccupCdeModal  from "./commodityRef/cOccupCdeModal.vue";
 import agentPre from "./commodityRef/agentPer.vue" //代理(经济)人
 import agentWorker from "./commodityRef/agentWorker.vue" //代理业务员
 import prdFixSpec from "./commodityRef/prd-fix-spec.vue" //特别约定
+import underwriteRef from "./underwriteRef/underwrite.vue"
 
 /**用于动态组件的映射生成 */
 const componentMap = {
@@ -83,6 +84,7 @@ const componentMap = {
   baseafterRef: baseafterRef,
   informationRef: informationRef,
   SpecialAgreement: specialAgr, //录单页面中的特约信息组件
+  underwriteRef: underwriteRef, //录单页面中的核保组件
 
 
   prodInfoRef: prodInfo,

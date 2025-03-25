@@ -246,7 +246,6 @@ function refushData(datas: any) {
 }
 
 function getFromValue() {
-  let tableobj: { [key: string]: any } = {};
   let redata: any[] = [];
   Object.keys(formData.value).forEach((item) => {
     formData.value[item].forEach((d: any) => {
@@ -258,8 +257,7 @@ function getFromValue() {
       redata.push(i);
     });
   });
-  tableobj["items"] = redata;
-  return tableobj;
+  return redata;
 }
 
 function setFormValue(value: any) {
@@ -269,13 +267,6 @@ function setFormValue(value: any) {
     let creData = JSON.parse(JSON.stringify(item));
     creData["riskList"] = creData["Term.riskList"];
     delete creData["Term.riskList"];
-    creData["riskList"].forEach((e: any) => {
-      for (let key in e) {
-        const k = "TermRisktgt." + key;
-        e[k] = e[key];
-        delete e[key];
-      }
-    });
     plandata.push(creData);
   });
   refushData(plandata);

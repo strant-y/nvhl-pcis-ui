@@ -52,14 +52,7 @@ const removeIds = ref([]); // 删除用户ID集合 用于批量删除
 const dialogVisible = ref(true);
 
 const props = defineProps({
-  sysType: {// 系统类型
-    type: String,
-    required: true,
-  },
-  objId: {// 申请单号
-    type: String,
-    required: true,
-  },
+  data: Object,
 });
 
 const handleCancel = () => {
@@ -158,7 +151,10 @@ const tableconfig = reactive<AppTableConfig>(
 );
 
 onMounted(async () => {
-  handleQuery(true);
+
+    nextTick(() => {
+        handleQuery(true);
+    })
 });
 
 // 绑定方法
@@ -173,15 +169,16 @@ const method = {
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const param = Object.assign({
-    objId: props.objId,
-    sysType: props.sysType,
+    objId: props.data.objId,
+    sysType: props.data.sysType,
   }, r);
   getTaskVestige(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
-        pageresult.list = data.result;
-        pageresult.total = data.total;
+          console.log(data)
+        pageresult.list = data;
+        pageresult.total = res.totalCount;
       } else {
         ElMessage.error(msg);
       }
