@@ -329,7 +329,6 @@ function deleteTermByNo(plan: any, t: any) {
 }
 
 function getFromValue() {
-  let tableobj: { [key: string]: any } = {};
   let redata: any[] = [];
   Object.keys(planData.value).forEach((plan) => {
     Object.keys(planData.value[plan]).forEach((item) => {
@@ -344,8 +343,7 @@ function getFromValue() {
       });
     });
   });
-  tableobj["items"] = redata;
-  return tableobj;
+  return redata;
 }
 
 function setFormValue(value: any) {

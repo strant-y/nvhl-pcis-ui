@@ -246,7 +246,6 @@ function refushData(datas: any) {
 }
 
 function getFromValue() {
-  let tableobj: { [key: string]: any } = {};
   let redata: any[] = [];
   Object.keys(formData.value).forEach((item) => {
     formData.value[item].forEach((d: any) => {
@@ -258,8 +257,7 @@ function getFromValue() {
       redata.push(i);
     });
   });
-  tableobj["items"] = redata;
-  return tableobj;
+  return redata;
 }
 
 function setFormValue(value: any) {
