@@ -1,10 +1,15 @@
+<!-- 多级的级联选择器，如省市区 -->
 <template>
   <!-- 下拉选择框-->
   <el-cascader
     v-if="!showLabel"
     ref="cascaderRef"
+    style="width: 100%"
     v-model="selectedValue"
+    :props="cascprops"
     :placeholder="item.placeholder ? item.placeholder : '请选择'"
+    :options="options"
+    :show-all-levels="false"
     :disabled="
       (item.readonly
         ? typeof item.readonly === 'boolean'
@@ -19,7 +24,8 @@
           : item.disabled === 1 || item.disabled === '1'
             ? true
             : false
-        : false)
+        : false) ||
+      showLabel
     "
     :clearable="
       item.clearable
@@ -44,31 +50,16 @@
     "
     @change="handleChange"
   >
-    <template
-      #label="{ label, value }"
-      v-if="
-        item.tag
-          ? typeof item.tag === 'boolean'
-            ? item.tag
-            : item.tag === 1 || item.tag === '1'
-              ? true
-              : false
-          : false
-      "
-    >
-      <el-tag :color="getColor(value)" effect="dark">{{ label }}</el-tag>
-    </template>
     <template #empty>
       {{ "暂无数据" }}
     </template>
   </el-cascader>
-  <span v-else>
-    {{ getLabel() }}
-  </span>
 </template>
 
 <script setup lang="ts">
 import { codeListViewStore } from "@/store";
+import { CascaderProps } from "element-plus";
+
 const codeListStore = codeListViewStore();
 const props = defineProps({
   modelValue: {
@@ -90,11 +81,6 @@ const props = defineProps({
     type: Object as () => Record<string, any>,
     required: false,
   },
-  row: {
-    // 新增属性，用于接收当前行的数据
-    type: Object as () => Record<string, any>,
-    required: false,
-  },
 });
 
 interface OptionTypeBySelect extends OptionType {
@@ -104,38 +90,42 @@ interface OptionTypeBySelect extends OptionType {
 
 const options: Ref<OptionTypeBySelect[]> = ref([]); // 字典下拉数据源
 
-const selectRef = ref({});
+const cascaderRef = ref();
 
 const emits = defineEmits(["update:item", "update:modelValue", "valueChange"]); // 父组件监听事件，同步子组件值的变化给父组件
 
 const selectedValue = ref<string | number | Array<any> | undefined>();
 
-function getValues() {
-  // if (typeof selectedValue.value === "object" && props.item.multiple) {
-  //   const se = options.value.filter((item) => {
-  //     if (selectedValue.value?.includes(item.value)) {
-  //       return item.value;
-  //     }
-  //   });
-  //   return se;
-  // } else {
-  //   const se = options.value.find((item) => item.value === selectedValue.value);
-  //   if (se) {
-  //     return [se];
-  //   } else {
-  //     return [];
-  //   }
-  // }
-}
-
-function getColor(v) {
-  // const se = options.value.find((item) => item.value === v);
-  // if (se) {
-  //   return se.color;
-  // } else {
-  //   return undefined;
-  // }
-}
+const cascprops: CascaderProps = {
+  lazy: true,
+  lazyLoad(node, resolve) {
+    const { level, value } = node;
+    if (level !== 0) {
+      codeListStore
+        .queryCodeList(
+          {
+            codeListName: props.item.typeCode,
+            codeListParam: { cParCde: value },
+          },
+          props.unAuthor,
+          props.item.cache ? props.item.cache : true
+        )
+        .then((res: any) => {
+          const l = (typeof props.item.cascaderprops === 'string')? JSON.parse(props.item.cascaderprops) : props.item.cascaderprops ;
+          res.forEach((e: any) => {
+            e.leaf = level >= ((l && l.length > 0 ) ? (l.length-1) : 5);
+          });
+          resolve(res);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    } else {
+      // 初始化不在这里懒加载
+      resolve([]);
+    }
+  },
+};
 
 watch([options, () => props.modelValue], ([newOptions, newModelValue]) => {
   // if (newOptions == null || newOptions.length === 0) {
@@ -157,11 +147,13 @@ watch(
   (newValue, oldValue) => {
     if (props.item.loadData) {
       options.value = newValue.loadData;
-    }
-    if (props.item.typeCode) {
+    }else if (props.item.typeCode) {
       codeListStore
-        .queryCodeListByCode(
-          newValue.typeCode,
+        .queryCodeList(
+          {
+            codeListName: newValue.typeCode,
+            codeListParam: newValue.codeParam,
+          },
           props.unAuthor,
           props.item.cache ? props.item.cache : true
         )
@@ -175,37 +167,33 @@ watch(
   { deep: true }
 );
 function handleChange(val?: string | number | Array<any> | undefined) {
-  const option = options.value.find((item) => item.value === val);
   emits("valueChange", val);
   emits("update:modelValue", val);
-  // props.item.func ? props.item.func(val, option) : null;
-}
-function getLabel() {
-  if (options.value && options.value.length > 0) {
-    const se = options.value.find((item) => item.value === selectedValue.value);
-    if (se) {
-      return se.label;
-    }
-  }
+  props.item.func ? props.item.func(val) : null;
 }
 
 onMounted(() => {
   // 初始化组件数据
   if (props.item) {
-    if (!props.item.loadData && !!props.item.typeCode) {
+    if (props.item.loadData) {
+      options.value = props.item.loadData;
+    } else if (props.item.typeCode) {
       codeListStore
-        .queryCodeListByCode(
-          props.item.typeCode,
+        .queryCodeList(
+          {
+            codeListName: props.item.typeCode,
+            codeListParam: props.item.codeParam,
+          },
           props.unAuthor,
           props.item.cache ? props.item.cache : true
         )
-        .then((res) => (options.value = res))
+        .then((res) => {
+          options.value = res;
+        })
         .catch((err) => {
           console.error(err);
           options.value = [];
         });
-    } else {
-      options.value = props.item.loadData;
     }
   }
 });

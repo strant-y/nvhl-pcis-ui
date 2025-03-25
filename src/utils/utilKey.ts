@@ -189,6 +189,10 @@ const inputtype = [
     value: "rtSelectV2",
   },
   {
+    label: "cascader",
+    value: "rtcascader",
+  },
+  {
     label: "number",
     value: "rtnumber",
   },
@@ -223,10 +227,6 @@ const inputtype = [
   {
     label: "table",
     value: "rttable",
-  },
-  {
-    label: "cascaderarea",
-    value: "rtcascaderarea",
   },
 ];
 const dateType = [

@@ -389,6 +389,155 @@ const schemaMap = reactive<Record<string, any>>({
       }),
     },
   ],
+  rtcascader: [
+    {
+      prop: "size",
+      inputtype: "rtselect",
+      title: "要素尺寸",
+      loadData: size,
+    },
+    {
+      prop: "placeholder",
+      inputtype: "rtinput",
+      title: "输入框占位文本",
+    },
+    {
+      prop: "func",
+      inputtype: "rtinput",
+      title: "绑定方法名",
+    },
+    {
+      prop: "typeCode",
+      inputtype: "rtinput",
+      title: "codeKey",
+    },
+    {
+      prop: "clearable",
+      inputtype: "rtselect",
+      title: "是否显示清除按钮",
+      loadData: yesOrNo,
+    },
+    {
+      prop: "required",
+      inputtype: "rtselect",
+      title: "是否必填",
+      loadData: yesOrNo,
+    },
+    {
+      prop: "tag",
+      inputtype: "rtselect",
+      title: "是否tag模式",
+      loadData: yesOrNo,
+    },
+    {
+      prop: "disabled",
+      inputtype: "rtselect",
+      title: "初始化disabled",
+      loadData: yesOrNo,
+    },
+    {
+      prop: "showExBtn",
+      inputtype: "rtselect",
+      title: "是否显示扩展按钮",
+      loadData: yesOrNo,
+      func: (v) => {
+        if (v === "1") {
+          showBtnConfig.value = true;
+        } else {
+          showBtnConfig.value = false;
+        }
+      },
+    },
+    {
+      prop: "loadData",
+      inputtype: "rtinput",
+      type: "textarea",
+      itemWidth: 2,
+      title: "初始化数据",
+      showExBtn: true,
+      btnWidth: 10,
+      readonly: true,
+      btnItems: createFreeButtonBase({
+        icon: "Edit",
+        func: () => {
+          const ck = freeEditRef.value?.getValue("loadData");
+          dzmodal
+            .open(jsonArrayEdit, {
+              data: ck,
+              inititle: ["label", "value"],
+            })
+            .then((res) => {
+              if (res.type === "ok") {
+                freeEditRef.value?.setValue("loadData", res.body);
+              }
+            });
+        },
+      }),
+    },
+    {
+      prop: "codeParam",
+      inputtype: "rtinput",
+      type: "textarea",
+      itemWidth: 2,
+      title: "code参数",
+      showExBtn: true,
+      btnWidth: 10,
+      readonly: true,
+      btnItems: createFreeButtonBase({
+        icon: "Edit",
+        func: () => {
+          setCodeParam();
+        },
+      }),
+    },
+    {
+      prop: "cascaderprops",
+      inputtype: "rtinput",
+      type: "textarea",
+      itemWidth: 2,
+      title: "参数映射",
+      showExBtn: true,
+      btnWidth: 10,
+      readonly: true,
+      btnItems: createFreeButtonBase({
+        icon: "Edit",
+        func: () => {
+          const ck = freeEditRef.value?.getValue("cascaderprops");
+          let newData: any = [];
+          if (ck && ck.length > 0) {
+            ck.forEach((e: any) => {
+              newData.push({
+                label: e,
+              });
+            });
+          }
+          dzmodal
+            .open(jsonArrayEdit, {
+              data:
+                newData && newData.length > 0
+                  ? JSON.stringify(newData)
+                  : undefined,
+              inititle: ["label"],
+            })
+            .then((res) => {
+              if (res.type === "ok") {
+                let bodys: any[] = [];
+                const list = JSON.parse(res.body);
+                if (list && list.length > 0) {
+                  list.forEach((e: any) => {
+                    bodys.push(e.label);
+                  });
+                }
+                freeEditRef.value?.setValue(
+                  "cascaderprops",
+                  JSON.stringify(bodys)
+                );
+              }
+            });
+        },
+      }),
+    },
+  ],
   rtnumber: [
     {
       prop: "size",

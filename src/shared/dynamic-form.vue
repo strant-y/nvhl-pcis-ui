@@ -398,19 +398,49 @@ async function validate() {
 
 //只清空报错信息
 function clearValidate(key) {
-  key ? fromRef.value.clearValidate(key) : fromRef.value.clearValidate()
+  key ? fromRef.value.clearValidate(key) : fromRef.value.clearValidate();
 }
 
 //初始化值和清空报错信息
 function resetFields() {
- fromRef.value.resetFields()
+  fromRef.value.resetFields();
 }
 
 function getFromValue() {
-  return form;
+  const redata = JSON.parse(JSON.stringify(form));
+  if (props.fromSchema) {
+    props.fromSchema.forEach((key: any) => {
+      if (key.inputtype === "rtcascader") {
+        const props = key.cascaderprops;
+        const v = redata[key.prop];
+        if(props && props.length > 0 ){
+          for(var i = 0; i < props.length; i++){
+            redata[props[i]] = v[i];
+          }
+          delete redata[key.prop];
+        }
+      }
+    });
+  }
+  return redata;
 }
 function setFormValue(data: any) {
-  Object.assign(form, data);
+  let setdata = data;
+  if (props.fromSchema) {
+    props.fromSchema.forEach((key: any) => {
+      if (key.inputtype === "rtcascader") {
+        const props = key.cascaderprops;
+        const v = setdata[key.prop];
+        if(props && props.length > 0 ){
+          for(var i = 0; i < props.length; i++){
+            setdata[props[i]] = v[i];
+          }
+          delete setdata[key.prop];
+        }
+      }
+    });
+  }
+  Object.assign(form, setdata);
   emits("formsDataUpdate", form);
 }
 
