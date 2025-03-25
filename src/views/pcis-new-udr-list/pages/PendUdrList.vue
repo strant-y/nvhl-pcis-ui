@@ -344,6 +344,12 @@ const formObj = {
         },
       }),
       createFreeButtonBase({
+          label: "批量退回",
+          func: () => {
+              console.log(removeIds.value)
+          },
+      }),
+      createFreeButtonBase({
         label: "导出",
         func: () => {
           // 只有5有
@@ -356,28 +362,28 @@ const formObj = {
           });
         },
       }),
-      createFreeButtonBase({
-        label: "费用信息按钮",
-        func: () => {
-          dzmodal
-            .open(CostInformation, { type: "Issuer", data: {} })
-            .then((res: any) => {
-              if (res.type === "ok") {
-              }
-            });
-        },
-      }),
-      createFreeButtonBase({
-        label: "历次批单按钮",
-        func: () => {
-          dzmodal
-            .open(PreviousdrOpnList, { type: "Issuer", data: {} })
-            .then((res: any) => {
-              if (res.type === "ok") {
-              }
-            });
-        },
-      }),
+      // createFreeButtonBase({
+      //   label: "费用信息按钮",
+      //   func: () => {
+      //     dzmodal
+      //       .open(CostInformation, { type: "Issuer", data: {} })
+      //       .then((res: any) => {
+      //         if (res.type === "ok") {
+      //         }
+      //       });
+      //   },
+      // }),
+      // createFreeButtonBase({
+      //   label: "历次批单按钮",
+      //   func: () => {
+      //     dzmodal
+      //       .open(PreviousdrOpnList, { type: "Issuer", data: {} })
+      //       .then((res: any) => {
+      //         if (res.type === "ok") {
+      //         }
+      //       });
+      //   },
+      // }),
     ],
     fromSchema: ref<any>([]),
     // fromSchema: [...allForm.value],
@@ -534,14 +540,14 @@ const allTable = ref<Array<any>>([
 // 下拉 核保通过任务
 const table5 = ref<any>([
   {
-    prop: "CAppNo",
+    prop: "cAppNo",
     inputtype: "rtinput",
     title: "申请单号",
     minWidth: 180,
     fixed: "left",
   },
   {
-    prop: "CPlyNo",
+    prop: "cPlyNo",
     inputtype: "rtinput",
     title: "保单号",
     minWidth: 180,
@@ -598,30 +604,9 @@ const tableBtn = ref<Array<any>>([
     type: "info",
     size: "large",
     icon: "Message",
-    // tableClick: (row) => {
-    //   //待核保任务 接收
-    //   handle_hasReceived(row);
-    // },
-    tableClick: async (row) => {
-      console.log(row);
-      router.push({
-        path: "/pcis/my-page",
-        query: {
-          param: JSON.stringify({ ...row, ...{ pageType: "edit" } }),
-        },
-      });
-      // const r = await row;
-      // if (r) {
-      //     const data = row;
-      //     router.push({
-      //         path: "/pcis/my-page",
-      //         query: {
-      //             param: JSON.stringify({ ...data, ...{ pageType: "edit" } }),
-      //         },
-      //     });
-      // } else {
-      //     ElMessage.warning("请检查表单！");
-      // }
+    tableClick: (row) => {
+      //待核保任务 接收
+      handle_hasReceived(row);
     },
   }),
   createFreeButtonBase({
@@ -648,18 +633,18 @@ const tableBtn = ref<Array<any>>([
       handleWorkFlow(row, "removeReceived");
     },
   }),
-  // createFreeButtonBase({
-  //   id: "score",
-  //   link: true,
-  //   tooltip: "查看",
-  //   showKey:[5],
-  //   type: "danger",
-  //   size: "large",
-  //   icon: "View",
-  //   tableClick: (row) => {
-  //     showDetails(row)
-  //   },
-  // }),
+  createFreeButtonBase({
+    id: "score",
+    link: true,
+    tooltip: "查看",
+    showKey:[3],
+    type: "danger",
+    size: "large",
+    icon: "View",
+    tableClick: (row) => {
+      showDetails(row)
+    },
+  }),
   createFreeButtonBase({
     id: "score",
     link: true,
@@ -667,7 +652,7 @@ const tableBtn = ref<Array<any>>([
     showKey: [3],
     type: "danger",
     size: "large",
-    icon: "View",
+    icon: "Refresh",
     tableClick: (row) => {
       let data;
       if (udrTypeValue.value == "3") {
@@ -744,7 +729,7 @@ const tableBtn5 = ref<Array<any>>([
     },
     type: "danger",
     size: "large",
-    icon: "View",
+    icon: "Refresh",
     tableClick: (row) => {
       let data;
       if (udrTypeValue.value == "3") {
@@ -765,42 +750,40 @@ const tableBtn5 = ref<Array<any>>([
       });
     },
   }),
-  createFreeButtonBase({
-    id: "score",
-    link: true,
-    tooltip: "编辑",
-    hideBtns: (row: any) => {
-      if (row.cAppStatus != 1 && row.cAppStatus != 3 && row.cAppStatus != 8)
-        return false;
-    },
-    type: "success",
-    size: "large",
-    icon: "Edit",
-    tableClick: (row) => {
-      handleEdit(row);
-      // 是跳转页面  or 弹框？
-      // dzmodal.open(kindEdit, { type: "edit", data: row }).then((res) => {
-      //   if (res.type === "ok") {
-      //     handleQuery();
-      //   }
-      // });
-    },
-  }),
-  createFreeButtonBase({
-    id: "score",
-    link: true,
-    tooltip: "删除",
-    hideBtns: (row: any) => {
-      if (row.cAppStatus != 1 && row.cAppStatus != 3 && row.cAppStatus != 8)
-        return false;
-    },
-    type: "danger",
-    size: "large",
-    icon: "Delete",
-    tableClick: (row) => {
-      handleDelete(row.cAppNo);
-    },
-  }),
+  // createFreeButtonBase({
+  //   id: "score",
+  //   link: true,
+  //   tooltip: "编辑",
+  //   hideBtns: (row: any) => {
+  //       if (row.cAppStatus != 1 && row.cAppStatus != 3 && row.cAppStatus != 8) return false;
+  //   },
+  //   type: "success",
+  //   size: "large",
+  //   icon: "Edit",
+  //   tableClick: (row) => {
+  //       handleEdit(row);
+  //       // 是跳转页面  or 弹框？
+  //       // dzmodal.open(kindEdit, { type: "edit", data: row }).then((res) => {
+  //       //   if (res.type === "ok") {
+  //       //     handleQuery();
+  //       //   }
+  //       // });
+  //   },
+  // }),
+  // createFreeButtonBase({
+  //   id: "score",
+  //   link: true,
+  //   tooltip: "删除",
+  //   hideBtns: (row: any) => {
+  //       if (row.cAppStatus != 1 && row.cAppStatus != 3 && row.cAppStatus != 8) return false;
+  //   },
+  //   type: "danger",
+  //   size: "large",
+  //   icon: "Delete",
+  //   tableClick: (row) => {
+  //       handleDelete(row.cAppNo);
+  //   },
+  // }),
 ]);
 
 let tableconfig = reactive<AppTableConfig>(
@@ -1204,8 +1187,13 @@ function refreshData(flag?: boolean) {
       // loading.value = false;
       if (res && res.code === 200 && res.data) {
         ElMessage.success({ message: "查询完毕！", duration: 3000 });
-        pageresult.list = res.data;
-        pageresult.total = res.total;
+        if (udrType !== '5') {
+          pageresult.list = res.data;
+          pageresult.total = res.total;
+        } else {
+          pageresult.list = res.data.data;
+          pageresult.total = res.data.total;
+        }
       } else {
         ElMessage.error({ message: res.msg, duration: 3000 });
       }
@@ -1303,18 +1291,17 @@ function updateUdrDetail(row: any) {
     if (r.code !== 200) {
       ElMessage.error({ message: r.msg, duration: 6000 });
     } else {
-      console.log("zzb", row.bsType);
       if (row.bsType === "A") {
         const en = JSON.stringify({
-          scene: SCENE_PLY_UW_PROCESS,
-          CAppNo: row.objId,
-          TaskId: row.curtTask,
+          // scene: SCENE_PLY_UW_PROCESS,
+          cAppNo: row.objId,
+          taskId: row.curtTask,
           bsType: row.bsType,
-          CProdNo: row.prodNo,
-          CCiMrk: r.data.cCiMrk,
-          CGrpMrk: r.data.cGrpMrk,
-          CDptCde: r.data.cDptCde,
-          pageType: "PLY_UW",
+          cProdNo: row.prodNo,
+          cCiMrk: r.data.cCiMrk,
+          cGrpMrk: r.data.cGrpMrk,
+          cDptCde: r.data.cDptCde,
+          pageType: "PLY_UW"
         });
         router.push({
           path: "/pcis/my-page",
@@ -1322,289 +1309,251 @@ function updateUdrDetail(row: any) {
             param: en,
           },
         });
-        // router.push({ path: '/index/new-udr-list/detail', query: { data: en } });
       } else {
         const en = JSON.stringify({
-          scene:
-            r.data.cEdrRsnBundleCde === "BL"
-              ? SCENE_PLY_UW_PROCESSBEARER
-              : SCENE_PLY_UW_PROCESS,
-          CAppNo: row.objId,
-          TaskId: row.curtTask,
+          scene: r.data.cEdrRsnBundleCde === 'BL' ? SCENE_PLY_UW_PROCESSBEARER : SCENE_PLY_UW_PROCESS,
+          cAppNo: row.objId,
+          taskId: row.curtTask,
           bsType: row.bsType,
-          CProdNo: row.prodNo,
-          CCiMrk: r.data.cCiMrk,
-          CRsnCde: r.data.cEdrRsnBundleCde,
-          CEdrType: r.data.cEdrType,
-          CGrpMrk: r.data.cGrpMrk,
-          CDptCde: r.data.cDptCde,
+          cProdNo: row.prodNo,
+          cCiMrk: r.data.cCiMrk,
+          cRsnCde: r.data.cEdrRsnBundleCde,
+          cEdrType: r.data.cEdrType,
+          cGrpMrk: r.data.cGrpMrk,
+          cDptCde: r.data.cDptCde,
+          pageType: "PLY_UW"
         });
         router.push({
-          path: "/index/new-udr-list/detail",
-          query: { data: en },
+            path: "/pcis/my-page",
+            query: {
+                param: en,
+            },
         });
       }
+  }
     }
-  });
+  );
 }
 
 // 工作流处理
 function handleWorkFlow(row: any, type: any) {
-  const param = {
-    taskId: row.curtTask,
-    user: user.value,
-  };
+    const param = {
+        taskId: row.curtTask,
+        user: user.value,
+    };
 
-  let udrData;
-  // 接收 / 取消接收
-  if (type === "handleReceived") {
-    udrData = hasReceived(param);
-  }
-  if (type === "removeReceived") udrData = removeReceived(param);
-  udrData &&
-    udrData
-      .then((result: any) => {
+    let udrData;
+    // 接收 / 取消接收
+    if (type === 'handleReceived') { udrData = hasReceived(param); }
+    if (type === 'removeReceived') udrData = removeReceived(param);
+    udrData && udrData.then((result: any) => {
         if (result.code !== 200) {
-          ElMessage.error({ message: result.msg, duration: 3000 });
+            ElMessage.error({ message: result.msg, duration: 3000 });
         } else {
-          if (type === "handleReceived") {
-            if (row.bsType === "P") {
-              const en = JSON.stringify({
-                CPlanNo: row.objId,
-                TaskId: row.curtTask,
-                "Base.CProdNo": row.prodNo,
-                scene: SCENE_PLAN_UW_PROCESS,
-                bsType: row.bsType,
-              });
-              router.push({
-                path: "/index/sys-right-basic/configPlan/detail",
-                query: { data: en },
-              });
-            } else {
-              // 详情
-              updateUdrDetail(row);
+            if (type === 'handleReceived') {
+                if (row.bsType === 'P') {
+                    const en = JSON.stringify({
+                        CPlanNo: row.objId,
+                        TaskId: row.curtTask,
+                        'Base.CProdNo': row.prodNo,
+                        scene: SCENE_PLAN_UW_PROCESS,
+                        bsType: row.bsType,
+                    });
+                    router.push({ path: '/index/sys-right-basic/configPlan/detail', query: { data: en } });
+                } else {
+                    // 详情
+                    updateUdrDetail(row);
+                }
             }
-          }
-          if (type === "removeReceived") {
-            if (result.msg === "解除接收成功!") {
-              ElMessage.success({ message: result.msg, duration: 3000 });
-            } else {
-              ElMessage.warning({ message: result.msg, duration: 3000 });
+            if (type === 'removeReceived') {
+                if (result.msg === '解除接收成功!') {
+                    ElMessage.success({ message: result.msg, duration: 3000 });
+                } else {
+                    ElMessage.warning({ message: result.msg, duration: 3000 });
+                }
+                refreshData(true);
             }
-            refreshData(true);
-          }
         }
-      })
-      .catch((error: any) => {
-        console.log("出错了", error);
-        ElMessage.error({
-          message: "后台服务异常,请联系管理员",
-          duration: 3000,
-        });
-      });
+    }).catch((error: any) => {
+        console.log('出错了', error);
+        ElMessage.error({ message: '后台服务异常,请联系管理员', duration: 3000 });
+    });
 }
 
 // 接收按钮 待核保任务
 function handle_hasReceived(row: any) {
-  const {
-    objId,
-    curtTask,
-    bsType,
-    prodNo,
-    cRelateBusi,
-    cEdrRsnBundleCde,
-    plyNo,
-  } = row;
-  // 关联交易业务，接收时给出提示
-  if (
-    cRelateBusi === "true" &&
-    cEdrRsnBundleCde !== "s1" &&
-    cEdrRsnBundleCde !== "s2" &&
-    cEdrRsnBundleCde !== "c1"
-  ) {
-    ElMessageBox.confirm(
-      "该笔业务为关联交易业务，请检查是否已上传【关联交易审批单】！",
-      "提示",
-      {
-        confirmButtonText: "确认",
-        cancelButtonText: "取消",
-        type: "info",
-      }
-    )
-      .then(() => {
-        console.log("确定");
-      })
-      .catch(() => false);
-  }
-
-  if (bsType === "P") {
-    // 方案不校验倒签
-    if ("000000" === prodNo) {
-      const param = {
-        taskId: curtTask,
-        user: user.value,
-      };
-      const flag = hasReceived(param);
-      flag.then((result) => {
-        if (200 !== result["code"]) {
-          ElMessage.error({ message: result.msg, duration: 3000 });
-        } else {
-          const data = {
-            CPlanNo: objId,
-            TaskId: curtTask,
-            scene: SCENE_PLAN_UW_PROCESS,
-            CProdNo: "000000",
-            bsType: row.bsType,
-          };
-          const en = JSON.stringify(data);
-          router.push({
-            path: "/index/pcis-combination/new-udr-list/combination-main",
-            query: { data: en },
-          });
-        }
-      });
-    } else {
-      handleWorkFlow(row, "handleReceived");
+    const { objId, curtTask, bsType, prodNo, cRelateBusi, cEdrRsnBundleCde, plyNo } = row;
+    // 关联交易业务，接收时给出提示
+    if (cRelateBusi === 'true' && (cEdrRsnBundleCde !== 's1' && cEdrRsnBundleCde !== 's2' && cEdrRsnBundleCde !== 'c1')) {
+        ElMessageBox.confirm('该笔业务为关联交易业务，请检查是否已上传【关联交易审批单】！', '提示', {
+            confirmButtonText: '确认',
+            cancelButtonText: '取消',
+            type: 'info',
+        }).then(() => {
+            console.log('确定')
+        }).catch(() => false);
     }
-  } else if (bsType === "E" && !!plyNo) {
-    checkEdrPocly({ CPlyNo: plyNo }).then(async (res) => {
-      if (!!res && !!res["code"]) {
-        if (res["code"] === 200 && res["msg"].indexOf("出险时间") > 0) {
-          const confirmRes = await ElMessageBox.confirm(
-            res.msg + "\n是否继续核保？",
-            "提示",
-            {
-              confirmButtonText: "确认",
-              cancelButtonText: "取消",
-              type: "info",
-            }
-          ).catch(() => false);
-          if (!confirmRes) {
-            return;
-          }
+
+    if (bsType === 'P') { // 方案不校验倒签
+        if ('000000' === prodNo) {
+            const param = {
+                taskId: curtTask,
+                user: user.value,
+            };
+            const flag = hasReceived(param);
+            flag.then(result => {
+                if (200 !== result['code']) {
+                    ElMessage.error({ message: result.msg, duration: 3000 });
+                } else {
+                    const data = {
+                        CPlanNo: objId,
+                        TaskId: curtTask,
+                        scene: SCENE_PLAN_UW_PROCESS,
+                        CProdNo: '000000',
+                        bsType: row.bsType,
+                    };
+                    const en = JSON.stringify(data);
+                    router.push({ path: '/index/pcis-combination/new-udr-list/combination-main', query: { data: en } });
+                }
+            });
+        } else {
+            handleWorkFlow(row, 'handleReceived');
         }
-        handleWorkFlow(row, "handleReceived");
-      }
-    });
-  } else {
-    handleWorkFlow(row, "handleReceived");
-  }
+    } else if (bsType === 'E' && !!plyNo) {
+        checkEdrPocly({ CPlyNo: plyNo }).then(async res => {
+            if (!!res && !!res['code']) {
+                if (res['code'] === 200 && res['msg'].indexOf('出险时间') > 0) {
+                    const confirmRes = await ElMessageBox.confirm(res.msg + '\n是否继续核保？', '提示', {
+                        confirmButtonText: '确认',
+                        cancelButtonText: '取消',
+                        type: 'info',
+                    }).catch(() => false);
+                    if (!confirmRes) {
+                        return;
+                    }
+                }
+                handleWorkFlow(row, 'handleReceived');
+            }
+        });
+    } else {
+        handleWorkFlow(row, 'handleReceived');
+    }
 }
 
 // 多选事件
 function handleSelectionChange(selection: any) {
-  console.log("selection", selection);
-  removeIds.value = selection.map((item: any) => item.cPkId);
+    console.log('selection', selection)
+    removeIds.value = selection.map((item: any) => item.cPkId);
 }
 
 // 详情 核保通过任务
 function showDetails(row: any) {
-  if (row.bsType === "P") {
-    if (row.cProdNo === "000000") {
-      const param = {
-        CPlanNo: row.cAppNo,
-        CPlanMrk: row.cPlanMrk,
-        scene: SCENE_PLAN_READ,
-      };
-      const en = JSON.stringify(param);
-      router.push({
-        path: "/index/pcis-combination/configPlan/combination-main",
-        query: { data: en },
-      });
+    if (row.bsType === 'P') {
+        if (row.cProdNo === '000000') {
+            const param = {
+                CPlanNo: row.cAppNo,
+                CPlanMrk: row.cPlanMrk,
+                scene: SCENE_PLAN_READ
+            };
+            const en = JSON.stringify(param);
+            router.push({
+                path: '/index/pcis-combination/configPlan/combination-main',
+                query: { data: en }
+            });
+        } else {
+            const en = JSON.stringify({
+                CPlanNo: row.cAppNo,
+                // 'Base.CProdNo': plan['PrdProdPlan.CProdNo'],
+                // 'Base.CGrpMrk': plan['PrdProdPlan.CGrpMrk'],
+                CPlanMrk: row.cPlanMrk,
+                'Base.CProdNo': row.cProdNo,
+                'Base.CGrpMrk': row.cGrpMrk,
+                scene: SCENE_PLAN_READ
+            });
+            router.push({
+                path: '/index/sys-right-basic/configPlan/detail',
+                query: { data: en }
+            });
+        }
     } else {
-      const en = JSON.stringify({
-        CPlanNo: row.cAppNo,
-        // 'Base.CProdNo': plan['PrdProdPlan.CProdNo'],
-        // 'Base.CGrpMrk': plan['PrdProdPlan.CGrpMrk'],
-        CPlanMrk: row.cPlanMrk,
-        "Base.CProdNo": row.cProdNo,
-        "Base.CGrpMrk": row.cGrpMrk,
-        scene: SCENE_PLAN_READ,
-      });
-      router.push({
-        path: "/index/sys-right-basic/configPlan/detail",
-        query: { data: en },
-      });
+        const en = JSON.stringify({
+            scene: row.cEdrRsnBundleCde === 'BL' ? SCENE_PLY_APP_READBEARER : SCENE_PLY_APP_READ,
+            cAppNo: row.objId?row.prodNo:row.cProdNo,
+            cProdNo: row.prodNo?row.prodNo:row.cProdNo,
+            bsType: row.bsType,
+            cJiMrk: row.cJiMrk,
+            cDptCde: row.cDptCde,
+            cCiMrk: row.cCiMrk,
+            cGrpMrk: row.cGrpMrk,
+            cRsnCde: row.cEdrRsnBundleCde,
+            pageType: "readonly"
+        });
+        router.push({
+            path: "/pcis/my-page",
+            query: {
+                param: en,
+            },
+        });
     }
-  } else {
-    const en = JSON.stringify({
-      scene:
-        row.cEdrRsnBundleCde === "BL"
-          ? SCENE_PLY_APP_READBEARER
-          : SCENE_PLY_APP_READ,
-      CAppNo: row.objId,
-      CProdNo: row.prodNo,
-      bsType: row.bsType,
-      CJiMrk: row.cJiMrk,
-      CDptCde: row.cDptCde,
-      CCiMrk: row.cCiMrk,
-      CGrpMrk: row.cGrpMrk,
-      CRsnCde: row.cEdrRsnBundleCde,
-    });
-    router.push({
-      path: "/index/pcis-query/detail",
-      query: { data: en },
-    });
-  }
 }
 
 // 编辑 核保通过任务
 function handleEdit(row: any) {
-  const bsType = row.bsType;
-  let scene = SCENE_PLY_APP_MODIFY_UNSUBMIT;
-  if (!!bsType && bsType === "E") {
-    scene =
-      row.cEdrRsnBundleCde === "BL"
-        ? SCENE_TEMPORARY_DEPOSITBEARER
-        : SCENE_EDR_APP_MODIFY_UNSUBMIT;
-  }
-  const en = JSON.stringify({
-    scene: scene,
-    CAppNo: row.objId,
-    CProdNo: row.prodNo,
-    bsType: row.bsType,
-    CJiMrk: row.cJiMrk,
-    CDptCde: row.cDptCde,
-    CCiMrk: row.cCiMrk,
-    CGrpMrk: row.cGrpMrk,
-    CRsnCde: row.cEdrRsnBundleCde,
-  });
-  router.push({
-    path: "/index/pcis-query/detail",
-    query: { data: en },
-  });
+    const bsType = row.bsType;
+    let scene = SCENE_PLY_APP_MODIFY_UNSUBMIT;
+    if (!!bsType && bsType === 'E') {
+        scene = row.cEdrRsnBundleCde === 'BL' ? SCENE_TEMPORARY_DEPOSITBEARER : SCENE_EDR_APP_MODIFY_UNSUBMIT;
+    }
+    const en = JSON.stringify({
+        scene: scene,
+        cAppNo: row.objId,
+        cProdNo: row.prodNo,
+        csType: row.bsType,
+        cJiMrk: row.cJiMrk,
+        cDptCde: row.cDptCde,
+        cCiMrk: row.cCiMrk,
+        cGrpMrk: row.cGrpMrk,
+        cRsnCde: row.cEdrRsnBundleCde,
+        pageType: "PLY_UW"
+    });
+    router.push({
+        path: "/pcis/my-page",
+        query: {
+            param: en,
+        },
+    });
 }
 
 // 删除  核保通过任务
 function handleDelete(id?: string) {
-  ElMessageBox.confirm("确认删除数据?", "警告", {
-    confirmButtonText: "确定",
-    cancelButtonText: "取消",
-    type: "warning",
-  }).then(function () {
-    const delResult = pcisQueryService.delTmpPolicy({ appNo: id });
-    delResult.then((res: any) => {
-      if (null != res && null != res["code"]) {
-        if (res["code"] === 200) {
-          ElMessage.info({ message: res.msg, duration: 3000 });
-          refreshData(true);
-        } else {
-          ElMessage.error({ message: res.msg, duration: 3000 });
-        }
-      }
+    ElMessageBox.confirm("确认删除数据?", "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+    }).then(function () {
+        const delResult = pcisQueryService.delTmpPolicy({ appNo: id });
+        delResult.then((res: any) => {
+            if (null != res && null != res['code']) {
+                if (res['code'] === 200) {
+                    ElMessage.info({ message: res.msg, duration: 3000 });
+                    refreshData(true);
+                } else {
+                    ElMessage.error({ message: res.msg, duration: 3000 });
+                }
+            }
+        });
     });
-  });
 }
 
 //给表单下拉项赋值
 function setFormItem(key, obj) {
-  if (obj && Object.keys(obj).length) {
-    formconfig1.fromSchema?.forEach((item) => {
-      if (item.prop === key) {
-        Object.assign(item, obj);
-      }
-    });
-  }
+    if (obj && Object.keys(obj).length) {
+        formconfig1.fromSchema?.forEach(item => {
+            if (item.prop === key) {
+                Object.assign(item, obj)
+            }
+        })
+    }
 }
 </script>
 
