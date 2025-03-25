@@ -1286,7 +1286,7 @@ function handleQuery(flag?: boolean) {
         const { code, data, msg } = res;
         if (200 === code) {
           pageresult.list = [];
-          pageresult.list = data.data;
+          pageresult.list = data.result;
           pageresult.total = data.total;
           console.log(pageresult.list);
           console.log(pageresult.total);
@@ -1305,7 +1305,7 @@ function handleQuery(flag?: boolean) {
         const { code, data, msg } = res;
         if (200 === code) {
           pageresult.list = [];
-          pageresult.list = data.data;
+          pageresult.list = data.result;
           pageresult.total = data.total;
           console.log(pageresult.list);
           console.log(pageresult.total);
