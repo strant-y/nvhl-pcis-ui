@@ -634,6 +634,18 @@ const tableBtn = ref<Array<any>>([
     },
   }),
   createFreeButtonBase({
+      id: "score",
+      link: true,
+      tooltip: "撤回",
+      showKey:[3],
+      type: "danger",
+      size: "large",
+      icon: "RefreshLeft",
+      tableClick: (row) => {
+          // showDetails(row)
+      },
+    }),
+  createFreeButtonBase({
     id: "score",
     link: true,
     tooltip: "查看",
@@ -822,6 +834,19 @@ const changeForm = (val: any) => {
   });
   nextTick(() => {
     formObj.notWaitObj.fromSchema.value = [];
+    if(val == '1' ||val == '2'){
+        formObj.notWaitObj.endBtns.forEach((key)=>{
+            if(key.label=='批量退回'){
+                key.hidden=false;
+            }
+        })
+    }else{
+        formObj.notWaitObj.endBtns.forEach((key)=>{
+            if(key.label=='批量退回'){
+                key.hidden=true;
+            }
+        })
+    }
     allForm.value.map((item: any, index: number) => {
       const isVal = item.showKey.findIndex((vals: any) => vals == val);
       if (isVal !== -1) {
@@ -1189,10 +1214,10 @@ function refreshData(flag?: boolean) {
         ElMessage.success({ message: "查询完毕！", duration: 3000 });
         if (udrType !== '5') {
           pageresult.list = res.data;
-          pageresult.total = res.total;
+          pageresult.total = res.totalCount;
         } else {
           pageresult.list = res.data.data;
-          pageresult.total = res.data.total;
+          pageresult.total = res.totalCount;
         }
       } else {
         ElMessage.error({ message: res.msg, duration: 3000 });
@@ -1359,7 +1384,12 @@ function handleWorkFlow(row: any, type: any) {
                         scene: SCENE_PLAN_UW_PROCESS,
                         bsType: row.bsType,
                     });
-                    router.push({ path: '/index/sys-right-basic/configPlan/detail', query: { data: en } });
+                    router.push({
+                        path: "/pcis/my-page",
+                        query: {
+                            param: en,
+                        },
+                    });
                 } else {
                     // 详情
                     updateUdrDetail(row);
@@ -1413,7 +1443,12 @@ function handle_hasReceived(row: any) {
                         bsType: row.bsType,
                     };
                     const en = JSON.stringify(data);
-                    router.push({ path: '/index/pcis-combination/new-udr-list/combination-main', query: { data: en } });
+                    router.push({
+                        path: "/pcis/my-page",
+                        query: {
+                            param: en,
+                        },
+                    });
                 }
             });
         } else {
