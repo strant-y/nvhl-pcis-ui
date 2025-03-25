@@ -46,13 +46,22 @@ const formconfig1 = ref<AppFreeEditConfig>(
     fromSchema: [],
     fromUi: createFromUiConfig({
       cols: 2,
-      showMessage: "0",
     }),
+    titleBtns:[
+      createFreeButtonBase({
+        type:'primary',
+        label: "确定",
+      }),
+      createFreeButtonBase({
+        label: "取消",
+      })
+    ]
   })
 );
 
 onMounted(() => {
     formconfig1.value.fromSchema = props.data.fromSchema;
+    formconfig1.value.title = props.data.title;
 });
 </script>
 

@@ -63,13 +63,14 @@ const method = {
   funcdistadd: () => {
     dialog.value?.open(
     "distAdd",
-    { fromSchema: tableconfig.value.fromSchema },
+    { fromSchema: tableconfig.value.fromSchema,
+      title:"新增"
+     },
     {
       isOk: (res: any) => {
-        console.log();
       },
     },
-    { title: "新增",width:'60' }
+    { width:'60' }
   );
   },
   funcdistdel: () => {
