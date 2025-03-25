@@ -495,7 +495,7 @@ const calcPremium = () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
   console.log(res);
-  if (res["cvrg"].items.length == 0) {
+  if (res["cvrg"].length == 0) {
     ElMessage.error("请录入条款信息");
     btn.loading = false;
     return;
@@ -572,7 +572,7 @@ const savePlyInfo = () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
   console.log(res);
-  if (res["cvrg"].items.length == 0) {
+  if (res["cvrg"].length == 0) {
     ElMessage.error("请录入条款信息");
     btn.loading = false;
     return;

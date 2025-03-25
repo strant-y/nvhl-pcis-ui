@@ -101,9 +101,7 @@ showMyfrom.value = props.gridEditConfig?.showMyfrom
 const rttableFrom = ref<AppGridEditMethod | null>(null);
 
 function getFromValue() {
-    const tableobj={}
-    tableobj['items']=tableDatas.value;
-    return tableobj
+    return tableDatas.value
 }
 
 function setFormValue(data: any) {

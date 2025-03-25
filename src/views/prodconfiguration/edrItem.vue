@@ -79,6 +79,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
                 cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
             },
+            filterable: true,
+            clearable: true,
             func: (row) => {
                 cPard.value = row;
                 selectedKindNo.value = row.value; // 更新选中的产品大类
@@ -105,6 +107,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             //   },
             // ],
             filterable:true,
+            clearable: true,
             typeCode: "PROD_LIST_IN_GUIDE",
             codeParam: {
                 cParCde: cPard.value,
@@ -128,6 +131,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "批改原因",
         // typeCode: "EDR_RSN_LIST_KIND",
         // codeParam: { kindNo: "-" },
+        filterable: true,
+        clearable: true,
         loadData: [
             { value: "01", label: "变更投保人信息" },
             { value: "02", label: "变更被保人信息" },
