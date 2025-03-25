@@ -138,9 +138,11 @@ const tableRef = ref([
   ref<AppTableMethod | null>(null),
 ]);
 const removeIds = ref([]); // 删除用户ID集合 用于批量删除
-const departmentTree = defineAsyncComponent(
-  () => import("@/components/common/DepartmentTree.vue")
-);
+// const departmentTree = defineAsyncComponent(
+//   () => import("@/components/common/DepartmentTree.vue")
+// );
+// import DepartmentTree from "../commodityRef/DepartmentTree.vue";
+import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 
 // tab 页面切换 5-9
 const WithdrawUdrList = defineAsyncComponent(
@@ -241,75 +243,93 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "展开",
         func: () => {
-          const freeEditRefs = freeEditRef.value[currentTabKey.value];
-          const s = freeEditRefs.value[0].getFromValue(); //获取表单数据
-          if (s["cKindNo"] == "09") {
-            formconfig1.fromSchema?.forEach((item) => {
-              if (
-                item.prop === "projectNme" ||
-                item.prop === "projectAddress" ||
-                item.prop === "cPrjCtgTyp" ||
-                item.prop === "cPrjCtgMidTyp" ||
-                item.prop === "cPrjCtgSubTyp"
-              ) {
-                item.hidden = false;
-              }
-            });
-          } else if (s["cKindNo"] == "08") {
-            formconfig1.fromSchema?.forEach((item) => {
-              if (
-                item.prop === "familyAddress" ||
-                item.prop === "cPrjCtgTyp" ||
-                item.prop === "cPrjCtgMidTyp" ||
-                item.prop === "cPrjCtgSubTyp"
-              ) {
-                item.hidden = false;
-              }
-            });
-          } else if (s["cKindNo"] == "04") {
-            if (s["cProdNo"] == "040002") {
-              formconfig1.fromSchema?.forEach((item) => {
-                if (
-                  item.prop === "CAppNme" ||
-                  item.prop === "cCertfNo" ||
-                  item.prop === "cLcnNo" ||
-                  item.prop === "cEngNo" ||
-                  item.prop === "cPrjCtgTyp" ||
-                  item.prop === "cPrjCtgMidTyp" ||
-                  item.prop === "cPrjCtgSubTyp"
-                ) {
-                  item.hidden = false;
+            const freeEditRefs = freeEditRef.value[currentTabKey.value];
+            const s = freeEditRefs.value[0].getFromValue(); //获取表单数据
+            if(s['cKindNo']=='09'){
+                formconfig1.fromSchema?.forEach((item) => {
+                    if (
+                        item.prop === "CProjectName" ||
+                        item.prop === "CDetailedAddress" ||
+                        item.prop === "cPrjCtgTyp" ||
+                        item.prop === "cPrjCtgMidTyp" ||
+                        item.prop === "cPrjCtgSubTyp"
+                    ) {
+                        item.hidden = false;
+                    }
+                    if (
+                        item.prop === "CDetailedAddress"
+                    ) {
+                        item.title = '工程地址';
+                    }
+
+                });
+            }else if(s['cKindNo']=='08'){
+                formconfig1.fromSchema?.forEach((item) => {
+                    if (
+                        item.prop === "CDetailedAddress" ||
+                        item.prop === "cPrjCtgTyp" ||
+                        item.prop === "cPrjCtgMidTyp" ||
+                        item.prop === "cPrjCtgSubTyp"
+                    ) {
+                        item.hidden = false;
+                    }
+                    if (
+                        item.prop === "CDetailedAddress"
+                    ) {
+                        item.title = '家庭坐落地址';
+                    }
+                });
+            }else if(s['cKindNo']=='04'){
+                if(s['cProdNo']=='040002'){
+                    formconfig1.fromSchema?.forEach((item) => {
+                        if (
+                            item.prop === "CEmployeeName" ||
+                            item.prop === "CIdentificationNumber" ||
+                            item.prop === "CPlateNo" ||
+                            item.prop === "CEngineNo" ||
+                            item.prop === "cPrjCtgTyp" ||
+                            item.prop === "cPrjCtgMidTyp" ||
+                            item.prop === "cPrjCtgSubTyp"
+                        ) {
+                            item.hidden = false;
+                        }
+                        if (item.prop === "CEmployeeName" ) {
+                            item.title = '雇员名称';
+                        }
+                    });
+                }else if(s['cProdNo']=='043009'){
+                    formconfig1.fromSchema?.forEach((item) => {
+                        if (
+                            item.prop === "CEmployeeName" ||
+                            item.prop === "CIndustryType" ||
+                            item.prop === "CProjectType" ||
+                            item.prop === "CProjectName" ||
+                            item.prop === "CDetailedAddress" ||
+                            item.prop === "CIdentificationNumber" ||
+                            item.prop === "cPrjCtgTyp" ||
+                            item.prop === "cPrjCtgMidTyp" ||
+                            item.prop === "cPrjCtgSubTyp"
+                        ) {
+                            item.hidden = false;
+                        }
+                        if (item.prop === "CEmployeeName" ) {
+                            item.title = '人员姓名';
+                        }
+                        if (item.prop === "CDetailedAddress" ) {
+                            item.title = '经营地址';
+                        }
+                    });
+                }else{
+                    formconfig1.fromSchema?.forEach((item) => {
+                        if ( item.prop === "cPrjCtgTyp" ||
+                            item.prop === "cPrjCtgMidTyp" ||
+                            item.prop === "cPrjCtgSubTyp"
+                        ) {
+                            item.hidden = false;
+                        }
+                    });
                 }
-              });
-            } else if (s["cProdNo"] == "043009") {
-              formconfig1.fromSchema?.forEach((item) => {
-                if (
-                  item.prop === "induType" ||
-                  item.prop === "projectType" ||
-                  item.prop === "projectNme" ||
-                  item.prop === "projectAddress" ||
-                  item.prop === "OpAddress" ||
-                  item.prop === "cCntrNme" ||
-                  item.prop === "cCertfNo" ||
-                  item.prop === "cPrjCtgTyp" ||
-                  item.prop === "cPrjCtgMidTyp" ||
-                  item.prop === "cPrjCtgSubTyp"
-                ) {
-                  item.hidden = false;
-                }
-              });
-            } else {
-              formconfig1.fromSchema?.forEach((item) => {
-                if (
-                  item.prop === "cPrjCtgTyp" ||
-                  item.prop === "cPrjCtgMidTyp" ||
-                  item.prop === "cPrjCtgSubTyp"
-                ) {
-                  item.hidden = false;
-                }
-              });
             }
-          }
         },
       }),
       createFreeButtonBase({
@@ -417,9 +437,25 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           type: "primary",
           func: () => {
             dzmodal
-              .open(departmentTree, { type: "Issuer", data: {} })
+              .open(DepartmentTree, { type: "Issuer", data: {} })
               .then((res) => {
-                if (res.type === "ok") {
+                if (res.body) {
+                  const selectObj = res.body;
+                  let obj = {
+                    loadData: [
+                      {
+                        label: selectObj.name,
+                        value: selectObj.id,
+                      },
+                    ],
+                  };
+                  freeEditRef.value[currentTabKey.value].value[0].setValue(
+                    "cDptCde",
+                    selectObj.name
+                  );
+                  // setValue("cDptCde", selectObj.id);
+                  // setFormItem("Base.cIntroDptcde", obj);
+                  // setValue("Base.cIntroDptcde", selectObj.id);
                 }
               });
           },
@@ -482,25 +518,22 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         func: (val) => {
           cPard.value = val;
           formconfig1.fromSchema?.forEach((item) => {
-            if (
-              item.prop === "CAppNme" ||
-              item.prop === "cCntrNme" ||
-              item.prop === "cCertfNo" ||
-              item.prop === "cLcnNo" ||
-              item.prop === "cEngNo" ||
-              item.prop === "induType" ||
-              item.prop === "projectNme" ||
-              item.prop === "projectAddress" ||
-              item.prop === "projectType" ||
-              item.prop === "OpAddress" ||
-              item.prop === "familyAddress" ||
-              item.prop === "cPrjCtgTyp" ||
-              item.prop === "cPrjCtgMidTyp" ||
-              item.prop === "cPrjCtgSubTyp"
-            ) {
-              item.hidden = true;
-            }
-          });
+              if (
+                  item.prop === "CEmployeeName" ||
+                  item.prop === "CIdentificationNumber" ||
+                  item.prop === "CPlateNo" ||
+                  item.prop === "CEngineNo" ||
+                  item.prop === "CIndustryType" ||
+                  item.prop === "CProjectName" ||
+                  item.prop === "CDetailedAddress" ||
+                  item.prop === "CProjectType" ||
+                  item.prop === "cPrjCtgTyp" ||
+                  item.prop === "cPrjCtgMidTyp" ||
+                  item.prop === "cPrjCtgSubTyp"
+              ) {
+                  item.hidden = true;
+              }
+          })
         },
       },
       {
@@ -518,26 +551,23 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
         },
         func: (val) => {
-          formconfig1.fromSchema?.forEach((item) => {
-            if (
-              item.prop === "CAppNme" ||
-              item.prop === "cCntrNme" ||
-              item.prop === "cCertfNo" ||
-              item.prop === "cLcnNo" ||
-              item.prop === "cEngNo" ||
-              item.prop === "induType" ||
-              item.prop === "projectNme" ||
-              item.prop === "projectAddress" ||
-              item.prop === "projectType" ||
-              item.prop === "OpAddress" ||
-              item.prop === "familyAddress" ||
-              item.prop === "cPrjCtgTyp" ||
-              item.prop === "cPrjCtgMidTyp" ||
-              item.prop === "cPrjCtgSubTyp"
-            ) {
-              item.hidden = true;
-            }
-          });
+            formconfig1.fromSchema?.forEach((item) => {
+                if (
+                    item.prop === "CEmployeeName" ||
+                    item.prop === "CIdentificationNumber" ||
+                    item.prop === "CPlateNo" ||
+                    item.prop === "CEngineNo" ||
+                    item.prop === "CIndustryType" ||
+                    item.prop === "CProjectName" ||
+                    item.prop === "CDetailedAddress" ||
+                    item.prop === "CProjectType" ||
+                    item.prop === "cPrjCtgTyp" ||
+                    item.prop === "cPrjCtgMidTyp" ||
+                    item.prop === "cPrjCtgSubTyp"
+                ) {
+                    item.hidden = true;
+                }
+            })
         },
       },
       {
@@ -618,104 +648,90 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           { label: "否", value: "E" },
         ],
       },
-      {
-        prop: "CAppNme",
-        inputtype: "rtinput",
-        title: "雇员名称",
-        clearable: true,
-        hidden: true,
-      },
-      {
-        prop: "cCntrNme",
-        inputtype: "rtinput",
-        title: "人员姓名",
-        clearable: true,
-        hidden: true,
-      },
-      {
-        prop: "cCertfNo",
-        inputtype: "rtinput",
-        title: "证件号",
-        clearable: true,
-        hidden: true,
-      },
-      {
-        prop: "cLcnNo",
-        inputtype: "rtinput",
-        title: "车牌号",
-        clearable: true,
-        hidden: true,
-      },
-      {
-        prop: "cEngNo",
-        inputtype: "rtinput",
-        title: "发动机号",
-        clearable: true,
-        hidden: true,
-      },
-      {
-        prop: "induType",
-        inputtype: "rtinput",
-        title: "行业类型",
-        clearable: true,
-        hidden: true,
-      },
-      {
-        prop: "projectNme",
-        inputtype: "rtinput",
-        title: "工程名称",
-        clearable: true,
-        hidden: true,
-      },
-      {
-        prop: "projectAddress",
-        inputtype: "rtinput",
-        title: "工程地址",
-        clearable: true,
-        hidden: true,
-      },
-      {
-        prop: "projectType",
-        inputtype: "rtinput",
-        title: "工程类型",
-        clearable: true,
-        hidden: true,
-      },
-      {
-        prop: "OpAddress",
-        inputtype: "rtinput",
-        title: "经营地址",
-        clearable: true,
-        hidden: true,
-      },
-      {
-        prop: "familyAddress",
-        inputtype: "rtinput",
-        title: "家财地址",
-        clearable: true,
-        hidden: true,
-      },
-      {
-        prop: "cPrjCtgTyp",
-        inputtype: "rtinput",
-        title: "项目大类",
-        clearable: true,
-        hidden: true,
-      },
-      {
-        prop: "cPrjCtgMidTyp",
-        inputtype: "rtinput",
-        title: "项目中类",
-        clearable: true,
-        hidden: true,
-      },
-      {
-        prop: "cPrjCtgSubTyp",
-        inputtype: "rtinput",
-        title: "项目子类",
-        clearable: true,
-        hidden: true,
-      },
+        {
+            prop: "CEmployeeName",
+            inputtype: "rtinput",
+            title: "雇员名称",
+            clearable: true,
+            hidden: true,
+        },
+        // {
+        //     prop: "cCntrNme",
+        //     inputtype: "rtinput",
+        //     title: "人员姓名",
+        //     clearable: true,
+        //     hidden: true,
+        // },
+        {
+            prop: "CIdentificationNumber",
+            inputtype: "rtinput",
+            title: "证件号",
+            clearable: true,
+            hidden: true,
+        },
+        {
+            prop: "CPlateNo",
+            inputtype: "rtinput",
+            title: "车牌号",
+            clearable: true,
+            hidden: true,
+        },
+        {
+            prop: "CEngineNo",
+            inputtype: "rtinput",
+            title: "发动机号",
+            clearable: true,
+            hidden: true,
+        },
+        {
+            prop: "CIndustryType",
+            inputtype: "rtinput",
+            title: "行业类型",
+            clearable: true,
+            hidden: true,
+        },
+        {
+            prop: "CProjectName",
+            inputtype: "rtinput",
+            title: "工程名称",
+            clearable: true,
+            hidden: true,
+        },
+        {
+            prop: "CProjectType",
+            inputtype: "rtinput",
+            title: "工程类型",
+            clearable: true,
+            hidden: true,
+        },
+        {
+            prop: "CDetailedAddress",
+            inputtype: "rtinput",
+            title: "家财地址",
+            clearable: true,
+            hidden: true,
+        },
+        {
+            prop: "cPrjCtgTyp",
+            inputtype: "rtinput",
+            title: "项目大类",
+            clearable: true,
+            hidden: true,
+        },
+        {
+            prop: "cPrjCtgMidTyp",
+            inputtype: "rtinput",
+            title: "项目中类",
+            clearable: true,
+            hidden: true,
+        },
+        {
+            prop: "cPrjCtgSubTyp",
+            inputtype: "rtinput",
+            title: "项目子类",
+            clearable: true,
+            hidden: true,
+        },
     ],
     showSuperior: false,
     superFromSchema: [],
@@ -1119,24 +1135,21 @@ const handleTabClick = (tab: any) => {
       createTableEditConfig(tableObj.notWaitObj)
     );
     formconfig1.fromSchema?.forEach((item) => {
-      if (
-        item.prop === "CAppNme" ||
-        item.prop === "cCntrNme" ||
-        item.prop === "cCertfNo" ||
-        item.prop === "cLcnNo" ||
-        item.prop === "cEngNo" ||
-        item.prop === "induType" ||
-        item.prop === "projectNme" ||
-        item.prop === "projectAddress" ||
-        item.prop === "projectType" ||
-        item.prop === "OpAddress" ||
-        item.prop === "familyAddress" ||
-        item.prop === "cPrjCtgTyp" ||
-        item.prop === "cPrjCtgMidTyp" ||
-        item.prop === "cPrjCtgSubTyp"
-      ) {
-        item.hidden = true;
-      }
+        if (
+            item.prop === "CEmployeeName" ||
+            item.prop === "CIdentificationNumber" ||
+            item.prop === "CPlateNo" ||
+            item.prop === "CEngineNo" ||
+            item.prop === "CIndustryType" ||
+            item.prop === "CProjectName" ||
+            item.prop === "CDetailedAddress" ||
+            item.prop === "CProjectType" ||
+            item.prop === "cPrjCtgTyp" ||
+            item.prop === "cPrjCtgMidTyp" ||
+            item.prop === "cPrjCtgSubTyp"
+        ) {
+            item.hidden = true;
+        }
       if (Number(i) == 1) {
         if (item.prop === "tms") {
           item.title = "投保日期";
@@ -1322,13 +1335,32 @@ function handleSelectionChange(selection: any) {
   console.log("selection", selection);
   removeIds.value = selection.map((item: any) => item.cPkId);
 }
+// function getFromValue() {
+//   return freeEditRef?.value?.getFromValue();
+// }
+
+// function setFormValue(value: any) {
+//   freeEditRef?.value?.setFormValue(value);
+// }
+
+// function validate() {
+//   return freeEditRef?.value?.validate();
+// }
+
+// function setValue(key: string, value: any) {
+//   freeEditRef?.value?.setValue(key, value);
+// }
+
+// function getValue(key: string) {
+//   return freeEditRef?.value?.getValue(key);
+// }
 </script>
 
 <style scoped>
 .app-container {
   padding: 6px 30px;
 }
-/deep/ .el-form {
+/* /deep/ .el-form {
   padding: 5px 30px;
-}
+} */
 </style>

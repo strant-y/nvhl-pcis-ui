@@ -1,43 +1,27 @@
-<!--核保人批量配置--->
 <template>
-  <el-dialog
-    v-model="dialogVisible"
-    title=""
-    width="80%"
-    @update:model-value="handleVisibleUpdate"
-  >
-    <app-free-edit v-model:freeEditConfig="formconfig" ref="freeEditRef" />
-    <app-table
-      :tableConfig="tableconfig"
-      v-model:pageresult="pageresult"
-      ref="tableRef"
-      @page-change="handleQuery(false)"
-      @selection-change="handleSelectionChange"
-    />
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="handleAdd">新增</el-button>
-        <el-button @click="handleCancel">取消</el-button>
-        <el-button type="primary" @click="handleSave">保存</el-button>
-      </span>
-    </template>
-  </el-dialog>
+  <div>
+    <el-dialog v-model="dialogVisible" title="" width="80%">
+      <app-free-edit v-model:freeEditConfig="formconfig" ref="freeEditRef" />
+      <app-grid-edit v-model:gridEditConfig="gridconfig" ref="gridEditRef" />
+    </el-dialog>
+    <comDialog ref="dialog"></comDialog>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { useDzModal } from "@/common/dzmodel/DzModalService";
-const showBtnConfig = ref(false);
-const dialogVisible = ref(true);
-const showView = ref(false);
-const dzmodal = useDzModal();
-import {
-  AppTableConfig,
-  AppTableMethod,
-  createTableEditConfig,
-} from "@/shared/app-table-config";
-import { useRoute } from "vue-router";
 import { createFreeButtonBase } from "@/shared/button-config";
-// const publicProblem = defineAsyncComponent(() => import("./PublicProblem.vue"));
+import { useRoute } from "vue-router";
+import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
+import BusinessCvrgTree from "@/pcis/prodRef/commodityRef/BusinessCvrgTree.vue";
+import undrDtyBussiness from "./undrDtyBussiness.vue";
+import { useValidator } from "@/typings/useValidator";
+import { getPageViewByPage, getProdList, saveProdPages } from "@/api/prod";
+import {
+  AppGridEditConfig,
+  AppGridEditMethod,
+  createAppGridEditConfig,
+  createGridFromUiConfig,
+} from "@/shared/app-grid-edit-config";
 const route = useRoute();
 const query = ref(route.query);
 const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
@@ -47,62 +31,113 @@ import {
   createAppFreeEditConfig,
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
-import { ref, reactive } from "vue";
-import { saveRiskInfo } from "@/api/prod";
+import { dataOpertaor } from "@/store/modules/data-opertaor";
+const opertaor = dataOpertaor();
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
+const dzmodal = useDzModal();
 
-const props = defineProps<{
-  visible: boolean;
-}>();
-
-const emit = defineEmits<{
-  (e: "update:modelValue", value: boolean): void;
-  (e: "save"): void;
-}>();
-
+const dialog = ref<DialogMethod | null>(null);
+const { getRules } = useValidator();
+const dialogVisible = ref(true);
+const gridEditRef = ref<AppGridEditMethod | null>(null);
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    title: "代理查询",
+    title: "配置核保人任职信息",
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
         type: "primary",
         label: "选择产品",
         func: () => {
-          save();
+          dzmodal.open(BusinessCvrgTree, {}).then((res) => {
+            if (res) {
+              console.log("子组件传过来的值", res);
+            }
+          });
         },
       }),
     ],
     fromSchema: [
       {
         prop: "cDptCde",
-        inputtype: "rtselect",
+        inputtype: "rtinput",
         title: "员工代码",
       },
       {
         prop: "cPlanCn",
-        inputtype: "rtselect",
+        inputtype: "rtinput",
         title: "员工名称",
+        showExBtn: true,
+        btnItems: {
+          icon: "Search",
+          type: "primary",
+          func: () => {
+            // dialog.value?.open(
+            //   "undrDtyBussiness",
+            //   {
+            //     type: "show",
+            //     method: {
+            //       getdbClickData: (data) => {
+            //         dialog.value?.handleClose();
+            //       },
+            //     },
+            //   },
+            //   {
+            //     isOk: (selectdata: any) => {},
+            //   },
+            //   { title: "员工列表", width: 85 }
+            // );
+            dzmodal.open(undrDtyBussiness, {}).then((res) => {
+              if (res) {
+              }
+            });
+          },
+        },
       },
       {
-        prop: "cPlanCn",
+        prop: "cDptCde",
         inputtype: "rtselect",
         title: "核保任职机构",
+        showExBtn: true,
+        btnItems: {
+          icon: "Search",
+          type: "primary",
+          func: () => {
+            dzmodal.open(DepartmentTree, {}).then((res) => {
+              if (res.body) {
+                const selectObj = res.body;
+                let obj = {
+                  loadData: [
+                    {
+                      label: selectObj.name,
+                      value: selectObj.id,
+                    },
+                  ],
+                };
+                freeEditRef.value?.setValue("cDptCde", selectObj.name);
+              }
+            });
+          },
+        },
       },
       {
         prop: "cPlanCn",
         inputtype: "rtselect",
         title: "核保任职级别",
+        codeParam: { cParCde: "06" },
+        typeCode: "UNDR_CLS_CDE_FOR_KIND",
       },
       {
         prop: "cPlanCn",
-        inputtype: "rtdatetimepicker",
+        inputtype: "rtdatepicker",
         title: "任职起期",
       },
       {
         prop: "cPlanCn",
-        inputtype: "rtdatetimepicker",
+        inputtype: "rtdatepicker",
         title: "任职止期",
       },
       {
@@ -116,107 +151,113 @@ const formconfig = reactive<AppFreeEditConfig>(
     }),
   })
 );
-
-const handleSave = async () => {
-  const formData = freeEditRef.value?.getFromValue();
-  if (formData) {
-    try {
-      await saveRiskInfo(formData); //保存接口调用
-      ElMessage.success("保存成功");
-      emit("save");
-      // dialogVisible(false);
-    } catch (error) {
-      ElMessage.error("保存失败");
-    }
-  }
-};
-
-const handleCancel = () => {
-  dialogVisible.value = false;
-};
-
-const handleVisibleUpdate = (value: boolean) => {
-  emit("update:visible", value);
-};
-
-const tableRef = ref<AppTableMethod | null>(null);
-const pageresult = reactive<Pageresult>({
-  result: "",
-  list: [],
-  total: 0,
-});
-const tableconfig = reactive<AppTableConfig>(
-  createTableEditConfig({
-    // titleBtns: [
-    //   createFreeButtonBase({
-    //     id: "add-responsibility",
-    //     label: "公共问题新增",
-    //     type: "success",
-    //     func: function () {
-    //       dzmodal.open(publicProblem, { type: "add", data: {} }).then((res) => {
-    //         if (res.type === "ok") {
-    //           handleQuery();
-    //         }
-    //       });
-    //     },
-    //   }),
-    // ],
-    tableBtnType: "btn",
-    tableBtnWidth: 220,
-    tableBtnPosition: "right",
-    tableBtn: [
+const gridconfig = reactive<AppGridEditConfig>(
+  createAppGridEditConfig({
+    title: "页面配置",
+    // showSelection: true,  // 是否显示多选框
+    editFlag: true, //是否可以编辑
+    tableBtnWidth: "200",
+    endBtns: [
       createFreeButtonBase({
-        id: "score",
-        type: "danger",
-        tooltip: "删除",
-        icon: "Delete",
-        link: true,
-        tableClick: (row) => {},
+        type: "primary",
+        label: "新增",
+        func: async function () {
+          gridEditRef.value?.addRowByData({ cGrpMrk: "0" });
+        },
+      }),
+      createFreeButtonBase({
+        label: "保存",
+        type: "primary",
+        func: function () {
+          const prodInfo = opertaor?.getTableRefByKey("prodInfo");
+          const prodInfoData = prodInfo.getFromValue();
+          const pages = gridEditRef.value?.getTableValue();
+          const params = Object.assign(prodInfoData, { pages: pages });
+          saveProdPages(params)
+            .then((res) => {
+              const { code, data, msg } = res;
+              if (200 === code) {
+                ElMessage.success("保存成功");
+              } else {
+                ElMessage.error(msg);
+              }
+            })
+            .finally(() => {});
+        },
       }),
     ],
     fromSchema: [
       {
-        prop: "cBsnsTyp",
-        title: "序号",
-      },
-      {
-        prop: "cChaType",
+        prop: "cKindNo",
+        inputtype: "rtselect",
         title: "产品大类",
       },
       {
-        prop: "cChaSubtype",
+        prop: "cProdNo",
+        inputtype: "rtselect",
         title: "产品",
+        loadData: [
+          {
+            label: "是",
+            value: "1",
+          },
+          {
+            label: "否",
+            value: "0",
+          },
+        ],
       },
       {
-        prop: "cChaCde",
+        prop: "cGrpMrk",
+        inputtype: "rtselect",
         title: "核保人级别",
+        loadData: [
+          {
+            label: "是",
+            value: "1",
+          },
+          {
+            label: "否",
+            value: "0",
+          },
+        ],
       },
       {
-        prop: "cChaNme",
+        prop: "cGrpMrk",
+        inputtype: "rtselect",
         title: "是否启用",
+        loadData: [
+          {
+            label: "是",
+            value: "1",
+          },
+          {
+            label: "否",
+            value: "0",
+          },
+        ],
       },
     ],
+    fromUi: createGridFromUiConfig({
+      cols: 3,
+    }),
   })
 );
-/** 查询 */
-function handleQuery() {
-  const r = tableRef.value?.getPartnerPage(); //获取分页数据
-  const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(s, r);
-  getCvrgRiskRelList(param)
-    .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
-        pageresult.list = data.data;
-        pageresult.total = data.total;
-      } else {
-        ElMessage.error(msg);
-      }
-    })
-    .finally(() => {});
-}
-</script>
 
-<style scoped>
-/* 确保样式与现有组件一致 */
-</style>
+function copyInitProdNo(v: any) {
+  gridconfig.endBtns = [];
+  gridEditRef?.value?.setFormValue(v);
+}
+
+function setFormValue(value: any) {
+  gridEditRef?.value?.setFormValue(value);
+}
+function getFromValue() {
+  return gridEditRef?.value?.getFromValue();
+}
+defineExpose({
+  setFormValue,
+  getFromValue,
+  copyInitProdNo,
+});
+</script>

@@ -1,12 +1,7 @@
 <!--核保人批量配置-业务员-员工信息--->
 <template>
-  <el-dialog
-    v-model="dialogVisible"
-    title=""
-    width="80%"
-    @update:model-value="handleVisibleUpdate"
-  >
-    <app-free-edit v-model:freeEditConfig="formconfig" ref="freeEditRef" />
+  <div>
+    <!-- <app-free-edit v-model:freeEditConfig="formconfig" ref="freeEditRef" />
     <app-table
       :tableConfig="tableconfig"
       v-model:pageresult="pageresult"
@@ -14,13 +9,25 @@
       @page-change="handleQuery(false)"
       @selection-change="handleSelectionChange"
     />
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="handleCancel">取消</el-button>
-        <el-button type="primary" @click="handleSave">保存</el-button>
-      </span>
-    </template>
-  </el-dialog>
+    <comDialog ref="dialog"></comDialog> -->
+
+    <el-dialog v-model="dialogVisible" title="" width="80%">
+      <app-free-edit v-model:freeEditConfig="formconfig" ref="freeEditRef" />
+      <app-table
+        :tableConfig="tableconfig"
+        v-model:pageresult="pageresult"
+        ref="tableRef"
+        @page-change="handleQuery(false)"
+        @selection-change="handleSelectionChange"
+      />
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="handleCancel">取消</el-button>
+          <el-button type="primary" @click="handleSave">保存</el-button>
+        </span>
+      </template>
+    </el-dialog>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -29,6 +36,8 @@ const showBtnConfig = ref(false);
 const dialogVisible = ref(true);
 const showView = ref(false);
 const dzmodal = useDzModal();
+const dialog = ref<DialogMethod | null>(null);
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import {
   AppTableConfig,
   AppTableMethod,
@@ -36,7 +45,7 @@ import {
 } from "@/shared/app-table-config";
 import { useRoute } from "vue-router";
 import { createFreeButtonBase } from "@/shared/button-config";
-// const publicProblem = defineAsyncComponent(() => import("./PublicProblem.vue"));
+import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 const route = useRoute();
 const query = ref(route.query);
 const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
@@ -64,15 +73,19 @@ const formconfig = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "业务员-员工信息",
     endBtnsPosition: "right",
-    // endBtns: [
-    //   createFreeButtonBase({
-    //     type: "primary",
-    //     label: "选择产品",
-    //     func: () => {
-    //       save();
-    //     },
-    //   }),
-    // ],
+    endBtns: [
+      createFreeButtonBase({
+        type: "primary",
+        label: "查询",
+        func: async () => {
+          handleQuery();
+        },
+      }),
+      createFreeButtonBase({
+        label: "重置",
+        func: () => {},
+      }),
+    ],
     fromSchema: [
       {
         prop: "CDptCde",
@@ -88,27 +101,29 @@ const formconfig = reactive<AppFreeEditConfig>(
         prop: "cPlanCn",
         inputtype: "rtselect",
         title: "员工所属机构",
+        showExBtn: true,
+        btnItems: {
+          icon: "Search",
+          type: "primary",
+          func: () => {
+            dzmodal.open(DepartmentTree, {}).then((res) => {
+              if (res.body) {
+                const selectObj = res.body;
+                let obj = {
+                  loadData: [
+                    {
+                      label: selectObj.name,
+                      value: selectObj.id,
+                    },
+                  ],
+                };
+                freeEditRef.value?.setValue("cDptCde", selectObj.name);
+              }
+            });
+          },
+        },
+        clearable: true,
       },
-      // {
-      //   prop: "cPlanCn",
-      //   inputtype: "rtselect",
-      //   title: "核保任职级别",
-      // },
-      // {
-      //   prop: "cPlanCn",
-      //   inputtype: "rtdatetimepicker",
-      //   title: "任职起期",
-      // },
-      // {
-      //   prop: "cPlanCn",
-      //   inputtype: "rtdatetimepicker",
-      //   title: "任职止期",
-      // },
-      // {
-      //   prop: "cPlanCn",
-      //   inputtype: "rtcheckbox",
-      //   title: "核保提醒",
-      // },
     ],
     fromUi: createFromUiConfig({
       cols: 3,

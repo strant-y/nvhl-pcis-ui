@@ -55,19 +55,19 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     title: '',
     fromSchema: [
     {
-				prop: "CRegDptCde",
-				inputtype: "rtselect",
-				title: "机构",
-        typeCode: "PLYDPT_LIST",
-        disabled: true,
-				params: { 'CDptCde': user.value['companyId'] }, 
-        func: (val) =>{
-          console.log("qqqqqqqqqq", val)
-          let s = freeEditRef.value?.getFromSchemaItem('cProdNo')
-          s['params'] = {'CRegDptCde': val, 'cStatus': '1'};          
-          s['typeCode'] = 'PROD_LIST';          
-        }
-			},
+          prop: "CRegDptCde",
+          inputtype: "rtselect",
+          title: "机构",
+          // typeCode: "PLYDPT_LIST",
+          disabled: true,
+          // codeParam: { 'CDptCde': user.value['companyId'] },
+          func: (val) =>{
+            console.log("qqqqqqqqqq", val)
+            let s = freeEditRef.value?.getFromSchemaItem('cProdNo')
+            s['params'] = {'CRegDptCde': val, 'cStatus': '1'};
+            s['typeCode'] = 'PROD_LIST';
+          }
+      },
       {
         prop: "CProdNo",
         inputtype: "rtselect",

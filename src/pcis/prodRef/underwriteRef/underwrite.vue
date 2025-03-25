@@ -74,8 +74,15 @@
                                 hidden: false,
                                 rules: [getRules("required", {})],
                             })
-                            const param={}
-                            // getBackClsListUrlFn(param)
+                            const param={
+                                "usrDptCde": user['companyId'],
+                                "operId": user['opCde'],
+                                "prodNo": props.param.cProdNo,
+                                "appNo": props.param.cAppNo,
+                                "dptCde": props.param.cDptCde
+                            }
+                            console.log(param)
+                            getBackClsListUrlFn(param)
                         }else {
                             setFormItem("cBckOp", {
                                 hidden: true,
@@ -204,9 +211,11 @@
         getBackClsList(prarm).then((r: any) => {
             console.log(prarm)
             if (r.code !== 200) {
-                // ElMessage.error({ message: r.msg, duration: 6000 });
+                ElMessage.error({ message: r.msg, duration: 6000 });
             } else {
-
+                setFormItem("cBckOp", {
+                    loadData: r['data']
+                })
             }
         })
     }

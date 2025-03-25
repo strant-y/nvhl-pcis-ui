@@ -115,45 +115,10 @@ export class PcisQueryService {
     /**
      * 缴费信息处理列表
      */
-    // getPayConfirmInfoList(ops: any): AxiosPromise<any> {
-    //     return post(`${this.qryPayConfirmInfoUrl}`, ops);
-    // }
-    //模拟
     getPayConfirmInfoList(ops: any): AxiosPromise<any> {
-        return new Promise((resolve) => {
-            // 模拟异步操作，延迟 1 秒后返回结果
-            setTimeout(() => {
-                // 模拟返回的数据，你可以根据实际情况修改数据结构
-                const mockResponse = {
-                    code: 200,
-                    data:{
-                        total: 1,
-                        result:[
-                            {
-                                cAppNo:"cAppNo",
-                                nTms:"nTms",
-                                cAppNmeInvest:"cAppNmeInvest",
-                                cPayTyp:"cPayTyp",
-                                CParamIn:"CParamIn",
-                                cPaySequence:"cPaySequence",
-                                nPayAmt:10000.00,
-                                nPrm:10000.00,
-                                cCheckSts:"cCheckSts",
-                                tBgnTm:"tBgnTm",
-                                cUniqueNo:"cUniqueNo",
-                                cBatchNo:"",
-                                cPayStatus:"cPayStatus",
-                                tUdrTm:"tUdrTm",
-                                cChargeCde:"cChargeCde"
-                            }
-                        ]
-                                                   
-                    }
-                };
-                resolve(mockResponse);
-            }, 1000);
-        });
-    }  
+        return post(`${this.qryPayConfirmInfoUrl}`, ops);
+    }
+
     /**
      * 查询保费接口表
      */

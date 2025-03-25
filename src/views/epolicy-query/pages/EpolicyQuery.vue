@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { useUserStore } from "@/store";
 import { useValidator } from "@/typings/useValidator";
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter, useRoute } from "vue-router";
 const { getRules } = useValidator();
 const route = useRoute();
 import { ref } from "vue";
@@ -35,15 +35,15 @@ import {
 } from "@/shared/app-table-config";
 import { deleteFactorBykey, getBasicKindList } from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
-import moment from 'moment';
-import { initMultiCodeList } from '@/api/code-list-service'; // 代码列表服务
-import { getListByCode } from '@/api/code-list-service';
-import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
+import moment from "moment";
+import { initMultiCodeList } from "@/api/code-list-service"; // 代码列表服务
+import { getListByCode } from "@/api/code-list-service";
+import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 const policyService = new PolicyService();
-import { PcisQueryService } from '@/views/payinfo/service/pcis-query-service';
+import { PcisQueryService } from "@/views/payinfo/service/pcis-query-service";
 const pcisQueryService = new PcisQueryService();
 const userStore = useUserStore();
-const user = ref(userStore.user) || ref({ companyId:'', opCde:'' })
+const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
 const dzmodal = useDzModal();
 // const kindEdit = defineAsyncComponent(() => import("./kindEdit.vue"));
 const tableRef = ref<AppTableMethod | null>(null);
@@ -63,15 +63,12 @@ const EpolicyGeneratElecInvoice = defineAsyncComponent(
   () => import("../common/EpolicyGeneratElecInvoice.vue")
 );
 
-const params = route.query.data ? JSON.parse(route.query.data) : {}
+const params = route.query.data ? JSON.parse(route.query.data) : {};
 const dataSet = ref<any>([]); // 数据集合
 const planSet = ref<any>([]); //结果集
- 
+
 const selectedRows = ref<any[]>([]);
-const btnTitle = ref<any>([
-  { label: "" },
-  { label: ""},
-])
+const btnTitle = ref<any>([{ label: "" }, { label: "" }]);
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -86,31 +83,33 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       }),
       createFreeButtonBase({
         id: "generatingEPolicy",
-        label: '生成电子保单',
+        label: "生成电子保单",
         type: "primary",
         func: () => {
-          if(!freeEditRef.value?.getValue('CPlyTyp')){
-            ElMessage.warning('请选择单证类型');
-            return
+          if (!freeEditRef.value?.getValue("CPlyTyp")) {
+            ElMessage.warning("请选择单证类型");
+            return;
           }
           if (selectedRows.value.length == 0) {
-            ElMessage.warning({ message: '请选择一条记录！', duration: 3000 });
+            ElMessage.warning({ message: "请选择一条记录！", duration: 3000 });
             return;
           }
           const data = {
             // cAppNo: planSet.value[0]['cAppNo'],
-            plyTy: freeEditRef.value?.getValue('CPlyTyp'),
-          }
-          dzmodal.open(ElectronicInsurancePolicy, { type: "edit", ...data }).then((res) => {
-            if (res.type === "ok") {
-              handleQuery(true);
-            }
-          });
+            plyTy: freeEditRef.value?.getValue("CPlyTyp"),
+          };
+          dzmodal
+            .open(ElectronicInsurancePolicy, { type: "edit", ...data })
+            .then((res) => {
+              if (res.type === "ok") {
+                handleQuery(true);
+              }
+            });
         },
       }),
       createFreeButtonBase({
         id: "downloadBLEPolicy",
-        label: '电子保单下载',
+        label: "电子保单下载",
         type: "primary",
         func: () => {
           downloadXLS();
@@ -121,7 +120,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         label: "电子保单获取",
         type: "warning",
         func: () => {
-          downElectronicPolicy()
+          downElectronicPolicy();
         },
       }),
       createFreeButtonBase({
@@ -181,27 +180,28 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "是否包含下级",
         defaultValue: 1,
         keymap: {
-          y: 1, n: 0
-        }
+          y: 1,
+          n: 0,
+        },
       },
       {
         prop: "CPlyTyp",
         inputtype: "rtselect",
         title: "单证类型",
-        defaultValue: 'PLY',
+        defaultValue: "PLY",
         clearable: true,
-        loadData :[
-          { label:'电子保单',value:'PLY' },
-          { label:'电子批单',value:'EDR' },
+        loadData: [
+          { label: "电子保单", value: "PLY" },
+          { label: "电子批单", value: "EDR" },
         ],
         func: (val: any) => {
-          if(val == 'PLY') {
-            formconfig1.endBtns[1].title = '生成电子保单'
-            formconfig1.endBtns[2].title = '电子保单下载'
+          if (val == "PLY") {
+            formconfig1.endBtns[1].title = "生成电子保单";
+            formconfig1.endBtns[2].title = "电子保单下载";
           }
-          if(val == 'EDR') {
-            formconfig1.endBtns[1].title = '生成电子批单'
-            formconfig1.endBtns[2].title = '电子批单下载'
+          if (val == "EDR") {
+            formconfig1.endBtns[1].title = "生成电子批单";
+            formconfig1.endBtns[2].title = "电子批单下载";
           }
         },
       },
@@ -218,8 +218,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "产品",
         typeCode: "PROD_LIST_GRT",
-        params: { cParCde:'', cOperId: user.value.opCde, cDptCde: user.value.companyId },
-        loadData:[],
+        params: {
+          cParCde: "",
+          cOperId: user.value.opCde,
+          cDptCde: user.value.companyId,
+        },
+        loadData: [],
         clearable: true,
       },
       {
@@ -275,8 +279,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         format: "YYYY-MM-DD HH:mm:ss",
         valueFormat: "YYYY-MM-DD HH:mm:ss",
         defaultValue: [
-          moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format('YYYY-MM-DD 00:00:00'),
-          moment(new Date()).format('YYYY-MM-DD 23:59:59')
+          moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
+            "YYYY-MM-DD 00:00:00"
+          ),
+          moment(new Date()).format("YYYY-MM-DD 23:59:59"),
         ],
       },
       {
@@ -395,25 +401,26 @@ const tableconfig = reactive<AppTableConfig>(
 onMounted(async () => {
   const codeParams = [
     {
-      source: 'cAppTyp',
-      codeListName: 'WEB_SYS_STA_DICT_CACHE',
-      codeListParam: { cParCde: 'cAppTyp' },
+      source: "cAppTyp",
+      codeListName: "WEB_SYS_STA_DICT_CACHE",
+      codeListParam: { cParCde: "cAppTyp" },
     },
     {
-      source: 'cAppStatus',
-      codeListName: 'RECEIVE_BANK_CATEGORY',
-      codeListParam: { cParCde: 'shenqingdanzhuangtai' },
+      source: "cAppStatus",
+      codeListName: "RECEIVE_BANK_CATEGORY",
+      codeListParam: { cParCde: "shenqingdanzhuangtai" },
     },
   ];
-  initMultiCodeList({ params: codeParams }).then((res: any) => {
-    if (res && res.code === 200 && res.data) {
-      console.log('res.data',res.data)
-
-    }
-  }).catch((error) => {
-    console.log('出错了', error);
-    ElMessage.error('后台服务异常,请联系管理员'); // 显示错误消息
-  });
+  initMultiCodeList({ params: codeParams })
+    .then((res: any) => {
+      if (res && res.code === 200 && res.data) {
+        console.log("res.data", res.data);
+      }
+    })
+    .catch((error) => {
+      console.log("出错了", error);
+      ElMessage.error("后台服务异常,请联系管理员"); // 显示错误消息
+    });
 
   if (params && params.plyNo) {
     freeEditRef.value?.setValue("CDataTyp", params.ply);
@@ -443,7 +450,7 @@ const exRules = {
 /** 查询 */
 function handleQuery(flag?: boolean) {
   freeEditRef.value?.validate().then((isValid) => {
-		if (isValid) {
+    if (isValid) {
       const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
       const s = freeEditRef.value?.getFromValue(); //获取表单数据
       const tmArr = freeEditRef.value?.getValue("tm");
@@ -464,34 +471,43 @@ function handleQuery(flag?: boolean) {
       //   return;
       // }
       if (issueEnd - issueStart >= 31 * 1000 * 60 * 60 * 24) {
-        ElMessage.warning('签单时间范围请控制在31天以内');
+        ElMessage.warning("签单时间范围请控制在31天以内");
         return;
       }
       const cplyTyp = freeEditRef.value?.getValue("cplyTyp");
-      const param = Object.assign({
-        sortField: 'name',
-        CAppTyp: cplyTyp === 'EDR' ? 'E' : 'A',
-        SysCode: 'POLY_CASU',
-        // sortOrder: _sortValue.value,
-        TIssueBgnTm: issueStartTemp,
-        TIssueEndTm: issueEndTemp,
-        CurrentUser: user.value?.opCde,
-        CurrentUserOrg: user.value?.companyId,
-        CTgtObjTxtFld4: freeEditRef.value?.getValue("CResvTxt5"),
-      },r,s);
-      param['CAppNo'] = param['CAppNo'] || null;
-      policyService.getEpolicyPolicyList(param).then((res: any) => {
-        if (res && res.code === 200) {
-          const pageData = res.data;
-          if (pageData) {
-            pageresult.list = pageData.list;
-            pageresult.total = pageData.total;
+      const param = Object.assign(
+        {
+          sortField: "name",
+          CAppTyp: cplyTyp === "EDR" ? "E" : "A",
+          SysCode: "POLY_CASU",
+          // sortOrder: _sortValue.value,
+          TIssueBgnTm: issueStartTemp,
+          TIssueEndTm: issueEndTemp,
+          CurrentUser: user.value?.opCde,
+          CurrentUserOrg: user.value?.companyId,
+          CTgtObjTxtFld4: freeEditRef.value?.getValue("CResvTxt5"),
+        },
+        r,
+        s
+      );
+      param["CAppNo"] = param["CAppNo"] || null;
+      policyService
+        .getEpolicyPolicyList(param)
+        .then((res: any) => {
+          if (res && res.code === 200) {
+            const pageData = res.data;
+            if (pageData) {
+              pageresult.list = pageData.list;
+              pageresult.total = pageData.total;
+            }
           }
-        }
-      }).catch((err: any) => {
-        ElMessage.error({ message: '后台服务异常,请联系管理员', duration: 3000 });
-      });
-
+        })
+        .catch((err: any) => {
+          ElMessage.error({
+            message: "后台服务异常,请联系管理员",
+            duration: 3000,
+          });
+        });
     }
   });
 }
@@ -501,88 +517,101 @@ function handleSelectionChange(rows: any) {
   selectedRows.value = rows;
 }
 
-
 // 团单个打
 function createEPolicy() {
-  const CPlyTyp = freeEditRef.value?.getValue('CPlyTyp')
-  if (!!CPlyTyp && 'EDR' === CPlyTyp) {
-    ElMessage.warning({ message: '批单不支持团单个打，请切换单证类型！', duration: 3000 });
+  const CPlyTyp = freeEditRef.value?.getValue("CPlyTyp");
+  if (!!CPlyTyp && "EDR" === CPlyTyp) {
+    ElMessage.warning({
+      message: "批单不支持团单个打，请切换单证类型！",
+      duration: 3000,
+    });
     return;
   }
   if (selectedRows.value.length == 0) {
-    ElMessage.warning({ message: '请选择一条记录！', duration: 3000 });
+    ElMessage.warning({ message: "请选择一条记录！", duration: 3000 });
     return;
   }
-  getListByCode('PROD_LIST_IN_GUIDE', {'cParCde': '02', 'subProd': '1'}).then(res => {
-    if(!!res && !!res.data){
-      // 设置产品下拉列表数据 为res.data
-      formconfig1.fromSchema[4].typeCode = ''
-      formconfig1.fromSchema[4].loadData = res.data;
-      let flag = false;
-      for (let i = 0; i<res['data'].length;i++){
-        if (res.data[i].value === selectedRows.value[0]['cProdNo'] ) {
-          flag = true;
-          break;
+  getListByCode("PROD_LIST_IN_GUIDE", { cParCde: "02", subProd: "1" }).then(
+    (res) => {
+      if (!!res && !!res.data) {
+        // 设置产品下拉列表数据 为res.data
+        formconfig1.fromSchema[4].typeCode = "";
+        formconfig1.fromSchema[4].loadData = res.data;
+        let flag = false;
+        for (let i = 0; i < res["data"].length; i++) {
+          if (res.data[i].value === selectedRows.value[0]["cProdNo"]) {
+            flag = true;
+            break;
+          }
         }
-      }
-      if ('040056' !== selectedRows.value[0]['cProdNo'] && !flag) {
-        ElMessage.warning({ message: '此产品暂未开发团单个打功能！', duration: 3000 });
-        return;
-      }
+        if ("040056" !== selectedRows.value[0]["cProdNo"] && !flag) {
+          ElMessage.warning({
+            message: "此产品暂未开发团单个打功能！",
+            duration: 3000,
+          });
+          return;
+        }
 
-      const data = {
-        // cAppNo: planSet.value[0]['cAppNo'],
-        // cPlyNo: planSet.value[0]['cPlyNo'],
-        // plyTy: freeEditRef.value?.getValue('CPlyTyp'),
-        // cProdNo: planSet.value[0]['cProdNo'],
+        const data = {
+          // cAppNo: planSet.value[0]['cAppNo'],
+          // cPlyNo: planSet.value[0]['cPlyNo'],
+          // plyTy: freeEditRef.value?.getValue('CPlyTyp'),
+          // cProdNo: planSet.value[0]['cProdNo'],
+        };
+        dzmodal
+          .open(EpolicyQueryGrpDialog, { type: "edit", data: data })
+          .then((res) => {
+            if (res.type === "ok") {
+              handleQuery(true);
+            }
+          });
       }
-      dzmodal.open(EpolicyQueryGrpDialog, { type: "edit", data: data }).then((res) => {
-        if (res.type === "ok") {
-          handleQuery(true);
-        }
-      });
     }
-     
-  })
+  );
 }
 // 电子保单下载
-function downloadXLS(){
-  const CPlyTyp = freeEditRef.value?.getValue('CPlyTyp')
-  if ( CPlyTyp == null) {
-    ElMessage.warning('请选择单证类型');
-    return
+function downloadXLS() {
+  const CPlyTyp = freeEditRef.value?.getValue("CPlyTyp");
+  if (CPlyTyp == null) {
+    ElMessage.warning("请选择单证类型");
+    return;
   }
   if (selectedRows.value.length == 0) {
-    ElMessage.warning({ message: '请选择一条记录！', duration: 3000 });
+    ElMessage.warning({ message: "请选择一条记录！", duration: 3000 });
     return;
   }
 
   const data = {
-      CPlyNo: selectedRows.value[0]['cPlyNo'],
-      CEdrNo: selectedRows.value[0]['cEdrNo'],
-      plyTy: CPlyTyp
+    CPlyNo: selectedRows.value[0]["cPlyNo"],
+    CEdrNo: selectedRows.value[0]["cEdrNo"],
+    plyTy: CPlyTyp,
   };
-  policyService.downloadElePolicy(data).then((res: any) => {
-    if (res.size <= 0) {
-      if (CPlyTyp === 'PLY') {
-        ElMessage.warning({ message: '电子保单未生成', duration: 3000 });
-      } else if (CPlyTyp === 'EDR') {
-        ElMessage.warning({ message: '电子批单未生成', duration: 3000 });
+  policyService
+    .downloadElePolicy(data)
+    .then((res: any) => {
+      if (res.size <= 0) {
+        if (CPlyTyp === "PLY") {
+          ElMessage.warning({ message: "电子保单未生成", duration: 3000 });
+        } else if (CPlyTyp === "EDR") {
+          ElMessage.warning({ message: "电子批单未生成", duration: 3000 });
+        }
+        return;
       }
-      return;
-    }
-    let fileName = CPlyTyp === 'EDR'?
-    `${selectedRows.value[0].cEdrNo}.pdf` : `${selectedRows.value[0].cPlyNo}.pdf`;
-    // saveAs(res, decodeURI(fileName));
-  }).catch((err: any) => {
-    ElMessage.error('下载出错', err);
-  });
+      let fileName =
+        CPlyTyp === "EDR"
+          ? `${selectedRows.value[0].cEdrNo}.pdf`
+          : `${selectedRows.value[0].cPlyNo}.pdf`;
+      // saveAs(res, decodeURI(fileName));
+    })
+    .catch((err: any) => {
+      ElMessage.error("下载出错", err);
+    });
 }
 
 // 电子保单获取
 function downElectronicPolicy() {
   if (selectedRows.value.length == 0) {
-    ElMessage.warning({ message: '请选择一条记录！', duration: 3000 });
+    ElMessage.warning({ message: "请选择一条记录！", duration: 3000 });
     return;
   }
   const data = {
@@ -592,18 +621,23 @@ function downElectronicPolicy() {
   policyService.downElectronicPolicy(data).then((res: any) => {
     if (res.code === 200) {
       if (res.data !== null) {
-        if (res.msg !== null && res.msg.indexOf('http') !== -1) {
-          ElMessageBox.confirm('电子单证获取成功！是否下载到本地？', '提示', {
-            confirmButtonText: '删除',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).then(() => {
-            const downUrl = res.msg.substring(res.msg.indexOf('http'), res.msg.length);
-            window.open(downUrl);
-          }).catch(() => {
-            // 取消操作
-            ElMessage.success({ message: res.msg, duration: 3000 });
-          });
+        if (res.msg !== null && res.msg.indexOf("http") !== -1) {
+          ElMessageBox.confirm("电子单证获取成功！是否下载到本地？", "提示", {
+            confirmButtonText: "删除",
+            cancelButtonText: "取消",
+            type: "warning",
+          })
+            .then(() => {
+              const downUrl = res.msg.substring(
+                res.msg.indexOf("http"),
+                res.msg.length
+              );
+              window.open(downUrl);
+            })
+            .catch(() => {
+              // 取消操作
+              ElMessage.success({ message: res.msg, duration: 3000 });
+            });
         }
       } else {
         ElMessage.warning({ message: res.msg, duration: 3000 });
@@ -617,15 +651,13 @@ function downElectronicPolicy() {
 // 开具电子发票
 function generatElecInvoice() {
   if (selectedRows.value.length == 0) {
-    ElMessage.warning({ message: '请选择一条记录！', duration: 3000 });
+    ElMessage.warning({ message: "请选择一条记录！", duration: 3000 });
     return;
   }
   pcisQueryService.getlatestPlyInfo(selectedRows.value[0]).then((res: any) => {
-    let data = {
-      
-    }
-    if(res != null && res.data !== null){
-      if(res.code === 200){
+    let data = {};
+    if (res != null && res.data !== null) {
+      if (res.code === 200) {
         data = {
           // cAppNo: planSet.value[0]['cAppNo'],
           // cPlyNo: planSet.value[0]['cPlyNo'],
@@ -635,8 +667,8 @@ function generatElecInvoice() {
           // cEmail: planSet.value[0]['cEmail'],
           // plyTy: freeEditRef.value?.getValue('CPlyTyp'),
           // cEdrNo: planSet.value['0']['cEdrNo']
-        }
-      }else{
+        };
+      } else {
         data = {
           // cAppNo: planSet.value[0]['cAppNo'],
           // cPlyNo: planSet.value[0]['cPlyNo'],
@@ -646,9 +678,9 @@ function generatElecInvoice() {
           // cEmail: planSet.value[0]['cEmail'],
           // plyTy: freeEditRef.value?.getValue('CPlyTyp'),
           // cEdrNo: planSet.value['0']['cEdrNo']
-        }
+        };
       }
-    }else{
+    } else {
       data = {
         // cAppNo: planSet.value[0]['cAppNo'],
         // cPlyNo: planSet.value[0]['cPlyNo'],
@@ -658,13 +690,15 @@ function generatElecInvoice() {
         // cEmail: planSet.value[0]['cEmail'],
         // plyTy: freeEditRef.value?.getValue('CPlyTyp'),
         // cEdrNo: planSet.value['0']['cEdrNo']
-      }
+      };
     }
-    dzmodal.open(EpolicyGeneratElecInvoice, { type: "edit", data: data }).then((res) => {
-      if (res.type === "ok") {
-        handleQuery(true);
-      }
-    });
+    dzmodal
+      .open(EpolicyGeneratElecInvoice, { type: "edit", data: data })
+      .then((res) => {
+        if (res.type === "ok") {
+          handleQuery(true);
+        }
+      });
   });
 }
 </script>
