@@ -62,7 +62,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         icon: "RefreshRight",
-        func: () => {},
+        func: () => {
+            const val = freeEditRef.value?.getFromValue();
+            for (const k in val) {
+                val[k] = null;
+            }
+        },
       }),
     ],
 
@@ -133,10 +138,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         codeParam: { kindNo: "-" },
         filterable: true,
         clearable: true,
-        // loadData: [
-        //   { value: "01", label: "变更投保人信息" },
-        //   { value: "02", label: "变更被保人信息" },
-        // ],
       },
     ],
     fromUi: createFromUiConfig({
