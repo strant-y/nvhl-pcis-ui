@@ -9,6 +9,8 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 const opertaor = dataOpertaor();
@@ -23,8 +25,8 @@ const props = defineProps({
 const baseEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));
-const sessionData = ref()
-const fixSpecData = ref([]) //存储已选择的特别约定数据
+const sessionData = ref();
+const fixSpecData = ref([]); //存储已选择的特别约定数据
 
 onMounted(async () => {
   const formconfig11 = formInit(
@@ -34,10 +36,13 @@ onMounted(async () => {
   );
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
-    setValue('Base.cJuriCde', '本保单受中华人民共和国司法管辖（港、澳、台除外）')
-  })
-  if(sessionStorage.getItem('toMyPageData')) {
-    sessionData.value = JSON.parse(sessionStorage.getItem('toMyPageData'))
+    setValue(
+      "Base.cJuriCde",
+      "本保单受中华人民共和国司法管辖（港、澳、台除外）"
+    );
+  });
+  if (sessionStorage.getItem("toMyPageData")) {
+    sessionData.value = JSON.parse(sessionStorage.getItem("toMyPageData"));
   }
 });
 
@@ -47,42 +52,76 @@ const method = {
   func1: () => {
     console.log(getRules);
   },
+  //总保费下拉事件
+  cPrmCurChange: (val: any) => {
+    if (val !== "CNY") {
+      codeListStore
+        .queryCodeList({
+          codeListName: "WEB_BAS_CHGRATE",
+          codeListParam: { value: val },
+        })
+        .then((res) => {
+          setValue("Base.nPrmRmbExch", res[0].currency_rate);
+        });
+    } else {
+      setValue("Base.nPrmRmbExch", "1.000000");
+    }
+  },
+  //总保额币种下拉事件
+  cAmtCurChange(val: any) {
+    if (val !== "CNY") {
+      codeListStore
+        .queryCodeList({
+          codeListName: "WEB_BAS_CHGRATE",
+          codeListParam: { value: val },
+        })
+        .then((res) => {
+          console.log("0000000", res);
+          setValue("Base.nAmtRmbExch", res[0].currency_rate);
+        });
+    } else {
+      setValue("Base.nAmtRmbExch", "1.000000");
+    }
+  },
   // 特别约定ICON事件
   selectCUnfixSpc: () => {
     dialogRef.value?.open(
-        "prdFixSpec",
-        {
-            type: "show",
-            data: {
-              cProdNo: sessionData.value?.cProdNo,
-              fixSpecData: fixSpecData.value //之前选中的数据数组
-            },
-            method: {
-              getSelected: (params) => {
-                if(params && params.length) {
-                  fixSpecData.value = params
-                  let i = 1;
-                  // let cSpecNo = '';
-                  let cUnfixSpc = '';
-                  params.forEach(value => {
-                      // cSpecNo = '' === cSpecNo ? value['PrdFixSpec.CSpecNo'] : cSpecNo + '$$' + value['PrdFixSpec.CSpecNo'];
-                      cUnfixSpc = '' === cUnfixSpc ? i + '.' + value['PrdFixSpec.CNmeCn'] : cUnfixSpc + '\n' + i + '.' + value['PrdFixSpec.CNmeCn'];
-                      setValue('Base.cUnfixSpc', cUnfixSpc)
-                      i++;
-                  });
-                }
-                dialogRef.value?.handleClose()
-              }
-            },
+      "prdFixSpec",
+      {
+        type: "show",
+        data: {
+          cProdNo: sessionData.value?.cProdNo,
+          fixSpecData: fixSpecData.value, //之前选中的数据数组
         },
-        {
-            isOk: (selectdata: any) => {
-                console.log('a',selectdata)
-            },
+        method: {
+          getSelected: (params) => {
+            if (params && params.length) {
+              fixSpecData.value = params;
+              let i = 1;
+              // let cSpecNo = '';
+              let cUnfixSpc = "";
+              params.forEach((value) => {
+                // cSpecNo = '' === cSpecNo ? value['PrdFixSpec.CSpecNo'] : cSpecNo + '$$' + value['PrdFixSpec.CSpecNo'];
+                cUnfixSpc =
+                  "" === cUnfixSpc
+                    ? i + "." + value["PrdFixSpec.CNmeCn"]
+                    : cUnfixSpc + "\n" + i + "." + value["PrdFixSpec.CNmeCn"];
+                setValue("Base.cUnfixSpc", cUnfixSpc);
+                i++;
+              });
+            }
+            dialogRef.value?.handleClose();
+          },
         },
-        { title: "特别约定", width: 85 }
+      },
+      {
+        isOk: (selectdata: any) => {
+          console.log("a", selectdata);
+        },
+      },
+      { title: "特别约定", width: 85 }
     );
-  }
+  },
 };
 
 // 绑定特殊验证器
@@ -108,15 +147,15 @@ function getValue(key: string) {
   return baseEditRef?.value?.getValue(key);
 }
 
-//给表单下拉项赋值
+//给表单赋值
 function setFormItem(key, obj) {
-    if (obj && Object.keys(obj).length) {
-        formconfig1.fromSchema?.forEach(item => {
-            if (item.prop === key) {
-                Object.assign(item, obj)
-            }
-        })
-    }
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        Object.assign(item, obj);
+      }
+    });
+  }
 }
 
 defineExpose({

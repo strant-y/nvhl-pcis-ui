@@ -272,7 +272,9 @@ async function loadAfter() {
       const baseafterobj = {};
       baseafterobj["Base.cRatioTyp"] = "3";
       baseafterobj["Base.cInstMrk"] = "0";
-      baseafterobj["Base.cDisptSttlCde"] = "D";
+      baseafterobj["Base.cDisptSttlCde"] = "B";
+      baseafterobj["Base.cPrmCur"] = "CNY";
+      baseafterobj["Base.cAmtCur"] = "CNY";
       baseafterobj["Applicant.cStkMrk"] = "0";
       baseafterobj["Applicant.cCustRiskRank"] = "925104";
       baseafterobj["Insured.cStkMrk"] = "0";
