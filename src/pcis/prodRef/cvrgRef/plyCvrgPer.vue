@@ -269,13 +269,6 @@ function setFormValue(value: any) {
     let creData = JSON.parse(JSON.stringify(item));
     creData["riskList"] = creData["Term.riskList"];
     delete creData["Term.riskList"];
-    creData["riskList"].forEach((e: any) => {
-      for (let key in e) {
-        const k = "TermRisktgt." + key;
-        e[k] = e[key];
-        delete e[key];
-      }
-    });
     plandata.push(creData);
   });
   refushData(plandata);
