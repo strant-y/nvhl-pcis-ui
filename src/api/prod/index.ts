@@ -221,7 +221,7 @@ export function SaveComponentFactors(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function releasePage(queryParams: any): AxiosPromise<any> {
-    return post(LocalBaseApi + `/prod/releasePage`, queryParams);
+    return post(`/prod/releasePage`, queryParams);
 }
 
 /**
