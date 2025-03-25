@@ -13,6 +13,11 @@
                   class="NavigaList_card"
                 >
                   <el-anchor :bound="120" :offset="80">
+                    <el-anchor-link :href="`#underwrite`" v-if="underwriteFlag">
+                      <span style="font-size: 15px" >
+                       核保处理
+                      </span>
+                    </el-anchor-link>
                     <el-anchor-link
                       v-for="(k, i) in pageConfig?.pageInfo"
                       :key="i"
@@ -76,6 +81,9 @@
               </el-affix>
             </el-header>
             <el-main>
+              <div :id="underwrite" v-if="underwriteFlag" style="margin-bottom: 10px">
+                <underwriteRef :param="props.param"  ref="underwrite"></underwriteRef>
+              </div>
               <template v-for="(pageConfig, v) in formconfig1" :key="v">
                 <div
                   class="card_"
@@ -127,15 +135,22 @@ import {
   generatelSingleNo,
   appCalc,
   submitToUndr,
-  getAppPolicy,
+  getAppPolicy,submitUnderwriting,submitUnderwritingEdr
 } from "../../../api/query/index";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import moment from "moment";
 import dayjs from "dayjs";
-
+import { useDzModal } from "@/common/dzmodel/DzModalService";
+const CostInformation = defineAsyncComponent(
+    () => import("@/views/pcis-new-udr-list/pages/CostInformation.vue")
+);
+// 历次批单 弹框页面
+const PreviousdrOpnList = defineAsyncComponent(
+    () => import("@/views/pcis-new-udr-list/common/PreviousdrOpnList.vue")
+);
 const opertaor = dataOpertaor();
 opertaor.init();
-
+const underwrite = ref(null)
 const props = defineProps({
   param: {
     type: Object,
@@ -150,10 +165,12 @@ const NavigaShow = ref(true);
 const formconfig1 = opertaor.getTableConfig();
 const bthList = ref<Array<FreeButtonBase>>([]);
 const tempFindBtn = [];
+let underwriteFlag=false
 const user = JSON.parse(sessionStorage.getItem("user"));
 const nAmt = ref(0.0);
 const nPrm = ref(0.0);
 const tmDay = ref(0);
+const dzmodal = useDzModal();
 onBeforeMount(() => {
   console.log("路由参数props.param", props.param);
   initPage();
@@ -168,6 +185,11 @@ const initPage = async () => {
     CProdNo: props.param.cProdNo,
     CGrpMrk: props.param.cGrpMrk,
   });
+  if (props.param.pageType === "PLY_UW") {
+      underwriteFlag=true
+  }else{
+      underwriteFlag=false
+  }
   // 页面初始化
   const formconfig11 = JSON.parse(getProductRes.data);
   console.log("页面初始化返回数据", formconfig11);
@@ -330,7 +352,63 @@ async function loadAfter() {
         func: () => {},
       })
     );
-  } else if (props.param.pageType === "readonly") {
+  } else if (props.param.pageType === "PLY_UW") {
+      const cAppNo = props.param.cAppNo;
+      loadAppPlyInfo(cAppNo);
+      bthList.value.push(
+          createFreeButtonBase({
+              label: "提交",
+              type: "primary",
+              id: 'btnUdr',
+              func: () => {
+                  underwrite.value?.validate().then((isValid) => {
+                      if (isValid) {
+                          submitUnderwritingFn()
+                      } else {
+                          ElMessage.error("请填写必填项");
+                      }
+                  });
+              },
+          }),
+          createFreeButtonBase({
+              label: "费用信息",
+              type: "primary",
+              id: "modFee",
+              func: () => {
+                  dzmodal
+                      .open(CostInformation, { type: "Issuer", data: {} })
+                      .then((res: any) => {
+                          if (res.type === "ok") {
+                          }
+                      });
+              },
+          }),
+          createFreeButtonBase({
+              label: "历次批单",
+              type: "primary",
+              id: 'preOrder',
+              func: () => {
+                  dzmodal
+                      .open(PreviousdrOpnList, { type: "Issuer", data: {} })
+                      .then((res: any) => {
+                          if (res.type === "ok") {
+                          }
+                      });
+              },
+          }),
+          createFreeButtonBase({
+              label: "任务痕迹",
+              func: () => {
+                  dzmodal
+                      .open(CostInformation, { type: "Issuer", data: {} })
+                      .then((res: any) => {
+                          if (res.type === "ok") {
+                          }
+                      });
+              },
+          }),
+      );
+  }else if (props.param.pageType === "readonly") {
     // 查询数据
     const getAppPlyInfoRes = await getAppPlyInfoByAppNo({
       CAppNo: props.param.cAppNo,
@@ -512,6 +590,45 @@ const savePlyInfo = () => {
     }
     // ElMessage.success(res.msg);
     // history.back();
+  });
+};
+/**
+ * 核保信息 提交
+ */
+const submitUnderwritingFn = () => {
+  // const btn = getBtn("btnUdr");
+  // btn.loading = true;
+  const res = underwrite.value.getFromValue();
+  res["user"] = user;
+  res["user"]['opRelCde'] = '10030892';
+  res["appNo"] = props.param.cAppNo;
+  res["taskId"] = props.param.taskId;
+  res["appTyp"] = props.param.bsType;
+  res["undrMrk"] = res["cUndrMrk"];
+  res["cAntiLnderRisk"] ='0';//关联交易确认
+  res["cIsTransaction"] ='0';//反洗钱风险
+  res["CRiBesprakMrk"] ='0'; // 预约分保标志
+  res["backUndrDptCde"] =null;// 退回指定核保级别机构编码
+  res["backUndrClsCde"] =null;// 退回指定核保级别编码
+  res["backUndrDptCnm"] =null;// 退回指定核保人员名称
+  console.log(res);
+  let submitUnder;
+    if (props.param.bsType === 'A') { submitUnder = submitUnderwriting(res); }
+    if (props.param.bsType === 'E') submitUnder = submitUnderwritingEdr(res);
+
+    submitUnder.then((res) => {
+    console.log("submitUnderwriting-res", res);
+    // btn.loading = false;
+    if (res["code"] == "200") {
+      // const ops = opertaor.convertData(res);
+      // console.log("转换的数据", ops);
+      ElMessage.success(res.msg);
+      // opertaor.setDataAll(ops);
+    } else {
+      ElMessage.error(res.msg);
+    }
+      // ElMessage.success(res.msg);
+      // history.back();
   });
 };
 
