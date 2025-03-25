@@ -1,0 +1,159 @@
+<template>
+  <el-dialog
+    v-model="dialogVisible"
+    title="机构部门"
+    custom-class="custom-dialog"
+    width="85%"
+  >
+    <el-divider></el-divider>
+    <el-tree
+      ref="treeRef"
+      :data="_nodes"
+      show-checkbox
+      lazy
+      :load="loadNode"
+      :props="defaultProps"
+      node-key="id"
+      :check-strictly="false"
+      :check-on-click-node="true"
+      @check-change="handleCheckChange"
+    ></el-tree>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="handleCancel" class="custom-button">取消</el-button>
+        <el-button type="primary" @click="handleSave" class="custom-button"
+          >保存</el-button
+        >
+      </span>
+    </template>
+  </el-dialog>
+</template>
+
+<script lang="ts" setup>
+import { ref, watch } from "vue";
+import { ElTree } from "element-plus";
+import { useUserStore } from "@/store/modules/user";
+import { SysOperatorMgrService } from "@/views/sys-right-basic/service/sys-operator-mgr.service";
+const sysOperatorMgrService = new SysOperatorMgrService();
+interface Tree {
+  [key: string]: any;
+}
+
+const user = ref<any>(useUserStore.user);
+const _nodes = ref([]);
+const dialogVisible = ref(true);
+const filterText = ref("");
+const treeRef = ref<InstanceType<typeof ElTree>>();
+const selectedNode = ref<Tree | null>();
+const arrData = ref<Tree[]>([]);
+
+const defaultProps = {
+  children: "children",
+  label: "name",
+  isLeaf: "leaf",
+};
+
+const emits = defineEmits(["ok"]);
+
+watch(filterText, (val) => {
+  treeRef.value!.filter(val);
+});
+
+const filterNode = (value: string, data: Tree) => {
+  if (!value) return true;
+  return data.name.includes(value);
+};
+const handleNodeClick = (data: Tree) => {
+  selectedNode.value = data;
+};
+const handleCancel = () => {
+  dialogVisible.value = false;
+};
+const handleCheckChange = (
+  data: any,
+  checked: boolean,
+  indeterminate: boolean
+) => {
+  arrData.value = treeRef.value!.getCheckedNodes();
+  console.log("arr", arrData);
+};
+const handleSave = () => {
+  if (arrData.value.length) {
+    console.log("选中的节点", arrData.value);
+    emits("ok", arrData.value);
+  }
+  dialogVisible.value = false;
+};
+
+const initDptTreeList = () => {
+  let root = "0200000000000";
+  if (user.value && user.value.companyId) {
+    root = user.value.companyId;
+  }
+  const params = {
+    pId: root,
+  };
+  sysOperatorMgrService
+    .getOrgDptTreeNodeById(params)
+    .then((res) => {
+      if (res && res["data"]) {
+        if (_nodes.value.length === 0) {
+          _nodes.value = [];
+        }
+        const data = res["data"];
+        if (res["data"]) {
+          _nodes.value.push({
+            id: root,
+            name: res["data"]["name"],
+            leaf: false,
+          });
+        }
+      }
+    })
+    .catch((error) => {
+      ElMessage.error("后台服务异常,请联系管理员");
+    });
+};
+
+const loadNode = (node, resolve) => {
+  if (node.level === 0) {
+    return resolve([]);
+  }
+  const params = {
+    cDptCde: node.data.id,
+  };
+  sysOperatorMgrService
+    .getOrgDptTreeListByPid(params)
+    .then((result) => {
+      const dto = [];
+      if (200 !== result["code"]) {
+        ElMessage.error(result["msg"]);
+      } else {
+        ElMessage.success(result["msg"]);
+      }
+      if (result["data"] && result["data"].length > 0) {
+        result["data"].forEach((item) => {
+          dto.push({
+            id: item["id"],
+            name: item["name"],
+            leaf: !item.hasChildren,
+          });
+        });
+      }
+      resolve(dto);
+    })
+    .catch((error) => {
+      console.log("出错了", error);
+      ElMessage.error("后台服务异常,请联系管理员");
+    });
+};
+onMounted(() => {
+  initDptTreeList();
+});
+</script>
+<style scoped>
+filter-tree {
+  padding: 10px;
+  border-right: 1px solid #ccc;
+}
+</style>

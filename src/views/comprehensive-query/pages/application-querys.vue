@@ -138,9 +138,11 @@ const tableRef = ref([
   ref<AppTableMethod | null>(null),
 ]);
 const removeIds = ref([]); // 删除用户ID集合 用于批量删除
-const departmentTree = defineAsyncComponent(
-  () => import("@/components/common/DepartmentTree.vue")
-);
+// const departmentTree = defineAsyncComponent(
+//   () => import("@/components/common/DepartmentTree.vue")
+// );
+// import DepartmentTree from "../commodityRef/DepartmentTree.vue";
+import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 
 // tab 页面切换 5-9
 const WithdrawUdrList = defineAsyncComponent(
@@ -417,9 +419,25 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           type: "primary",
           func: () => {
             dzmodal
-              .open(departmentTree, { type: "Issuer", data: {} })
+              .open(DepartmentTree, { type: "Issuer", data: {} })
               .then((res) => {
-                if (res.type === "ok") {
+                if (res.body) {
+                  const selectObj = res.body;
+                  let obj = {
+                    loadData: [
+                      {
+                        label: selectObj.name,
+                        value: selectObj.id,
+                      },
+                    ],
+                  };
+                  freeEditRef.value[currentTabKey.value].value[0].setValue(
+                    "cDptCde",
+                    selectObj.name
+                  );
+                  // setValue("cDptCde", selectObj.id);
+                  // setFormItem("Base.cIntroDptcde", obj);
+                  // setValue("Base.cIntroDptcde", selectObj.id);
                 }
               });
           },
@@ -1322,13 +1340,32 @@ function handleSelectionChange(selection: any) {
   console.log("selection", selection);
   removeIds.value = selection.map((item: any) => item.cPkId);
 }
+// function getFromValue() {
+//   return freeEditRef?.value?.getFromValue();
+// }
+
+// function setFormValue(value: any) {
+//   freeEditRef?.value?.setFormValue(value);
+// }
+
+// function validate() {
+//   return freeEditRef?.value?.validate();
+// }
+
+// function setValue(key: string, value: any) {
+//   freeEditRef?.value?.setValue(key, value);
+// }
+
+// function getValue(key: string) {
+//   return freeEditRef?.value?.getValue(key);
+// }
 </script>
 
 <style scoped>
 .app-container {
   padding: 6px 30px;
 }
-/deep/ .el-form {
+/* /deep/ .el-form {
   padding: 5px 30px;
-}
+} */
 </style>

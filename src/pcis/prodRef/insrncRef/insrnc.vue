@@ -52,41 +52,49 @@ const method = {
   },
   // 索赔基础名称change事件
   suopeiFunc: (val) => {
-    setFormItem("Base.tRunBgnTm", {rules: null, disabled: false}) //追溯/日落起期
-    setFormItem("Base.tRunEndTm", {rules: null, disabled: false}) //追溯/日落止期
-    setFormItem("Base.reportBgnTm", {rules: null}) //追溯/日落起期
-    setFormItem("Base.reportEndTm", {rules: null}) //追溯/日落止期
-    if(val == '0') { //内索赔制 时，追溯/日落起止期必填
-      setFormItem("Base.tRunBgnTm", {rules: [getRules("required", {})]}) //追溯/日落起期
-      setFormItem("Base.tRunEndTm", {rules: [getRules("required", {})]}) //追溯/日落止期
-    } else if(val == '1') { //期内发生制时，报告起始、终止日期必填
-      setFormItem("Base.reportBgnTm", {rules: [getRules("required", {})]}) //延长报告期起始日期
-      setFormItem("Base.reportEndTm", {rules: [getRules("required", {})]}) //延长报告期终止日期
+    setFormItem("Base.tRunBgnTm", { rules: null, disabled: false }); //追溯/日落起期
+    setFormItem("Base.tRunEndTm", { rules: null, disabled: false }); //追溯/日落止期
+    setFormItem("Base.reportBgnTm", { rules: null }); //追溯/日落起期
+    setFormItem("Base.reportEndTm", { rules: null }); //追溯/日落止期
+    if (val == "0") {
+      //内索赔制 时，追溯/日落起止期必填
+      setFormItem("Base.tRunBgnTm", { rules: [getRules("required", {})] }); //追溯/日落起期
+      setFormItem("Base.tRunEndTm", { rules: [getRules("required", {})] }); //追溯/日落止期
+    } else if (val == "1") {
+      //期内发生制时，报告起始、终止日期必填
+      setFormItem("Base.reportBgnTm", { rules: [getRules("required", {})] }); //延长报告期起始日期
+      setFormItem("Base.reportEndTm", { rules: [getRules("required", {})] }); //延长报告期终止日期
     }
-    setValue('Base.isRetroSpect', '')
-    
+    setValue("Base.isRetroSpect", "");
   },
   // 是否有追溯期/日落期 change事件
   isTermFunc: (val) => {
-    if(val == '1') { //选择 是 且索赔基础名称为内索赔制 时，追溯/日落起止期必填
-      setFormItem("Base.tRunBgnTm", {rules: [getRules("required", {})], disabled: false}) //追溯/日落起期
-      setFormItem("Base.tRunEndTm", {rules: [getRules("required", {})], disabled: false}) //追溯/日落止期
-    } else if(val == '0'){
-      setFormItem("Base.tRunBgnTm", {rules: null, disabled: true}) //追溯/日落起期
-      setFormItem("Base.tRunEndTm", {rules: null, disabled: true}) //追溯/日落止期
+    if (val == "1") {
+      //选择 是 且索赔基础名称为内索赔制 时，追溯/日落起止期必填
+      setFormItem("Base.tRunBgnTm", {
+        rules: [getRules("required", {})],
+        disabled: false,
+      }); //追溯/日落起期
+      setFormItem("Base.tRunEndTm", {
+        rules: [getRules("required", {})],
+        disabled: false,
+      }); //追溯/日落止期
+    } else if (val == "0") {
+      setFormItem("Base.tRunBgnTm", { rules: null, disabled: true }); //追溯/日落起期
+      setFormItem("Base.tRunEndTm", { rules: null, disabled: true }); //追溯/日落止期
       setFormValue({
-        "Base.tRunBgnTm": '',
-        "Base.tRunEndTm": '',
-        "Base.tracingDays": '',
-      })
+        "Base.tRunBgnTm": "",
+        "Base.tRunEndTm": "",
+        "Base.tracingDays": "",
+      });
     } else {
       //是否有追溯期/日落期没有值时, 且索赔基础名称为内索赔制 时，追溯/日落起止期必填
-      if(getValue("Base.claimName") == '0') {
-        setFormItem("Base.tRunBgnTm", {rules: [getRules("required", {})]}) //追溯/日落起期
-        setFormItem("Base.tRunEndTm", {rules: [getRules("required", {})]}) //追溯/日落止期
+      if (getValue("Base.claimName") == "0") {
+        setFormItem("Base.tRunBgnTm", { rules: [getRules("required", {})] }); //追溯/日落起期
+        setFormItem("Base.tRunEndTm", { rules: [getRules("required", {})] }); //追溯/日落止期
       } else {
-        setFormItem("Base.tRunBgnTm", {rules: null}) //追溯/日落起期
-        setFormItem("Base.tRunEndTm", {rules: null}) //追溯/日落止期
+        setFormItem("Base.tRunBgnTm", { rules: null }); //追溯/日落起期
+        setFormItem("Base.tRunEndTm", { rules: null }); //追溯/日落止期
       }
     }
   },
@@ -94,76 +102,76 @@ const method = {
   tRunBgnTmFn: (v) => {
     const start = getValue("Base.tRunBgnTm");
     const end = getValue("Base.tRunEndTm");
-    if(!end || !v) {
-      return
+    if (!end || !v) {
+      return;
     }
     const tm = moment(end).diff(moment(v), "days");
-    if(tm < 0) {
-      ElMessage.warning('追溯/日落止期不能小于追溯起期')
+    if (tm < 0) {
+      ElMessage.warning("追溯/日落止期不能小于追溯起期");
       setFormValue({
-        "Base.tRunBgnTm": null
+        "Base.tRunBgnTm": null,
       });
-      return
+      return;
     }
     setFormValue({
-      "Base.tracingDays": tm
+      "Base.tracingDays": tm,
     });
   },
   // 追溯止期
   tRunEndTmFn: (v) => {
     const start = getValue("Base.tRunBgnTm");
     const end = getValue("Base.tRunEndTm");
-    if(!start || !v) {
-      return
+    if (!start || !v) {
+      return;
     }
     const tm = moment(v).diff(moment(start), "days");
-    if(tm < 0) {
-      ElMessage.warning('追溯/日落止期不能小于追溯起期')
+    if (tm < 0) {
+      ElMessage.warning("追溯/日落止期不能小于追溯起期");
       setFormValue({
-        "Base.tRunEndTm": null
+        "Base.tRunEndTm": null,
       });
-      return
+      return;
     }
     setFormValue({
-      "Base.tracingDays": tm
+      "Base.tracingDays": tm,
     });
   },
   // 延长报告期起期
   reportBgnTmFn: (v) => {
     const start = getValue("Base.reportBgnTm");
     const end = getValue("Base.reportEndTm");
-    if(!end || !v) {
-      return
+    if (!end || !v) {
+      return;
     }
     const tm = moment(end).diff(moment(v), "days");
-    if(tm < 0) {
-      ElMessage.warning('终止日期不能小于起始日期')
+    if (tm < 0) {
+      ElMessage.warning("终止日期不能小于起始日期");
       setFormValue({
-        "Base.reportBgnTm": null
+        "Base.reportBgnTm": null,
       });
-      return
+      return;
     }
     setFormValue({
-      "Base.reportDays": tm
+      "Base.reportDays": tm,
     });
   },
   // 延长报告期止期
   reportEndTmFn: (v) => {
     const start = getValue("Base.reportBgnTm");
     const end = getValue("Base.reportEndTm");
-    if(!start || !v) {
-      return
+    if (!start || !v) {
+      return;
     }
     const tm = moment(v).diff(moment(start), "days");
-    if(tm < 0) {
-      ElMessage.warning('终止日期不能小于起始日期')
+    if (tm < 0) {
+      ElMessage.warning("终止日期不能小于起始日期");
       setFormValue({
-        "Base.reportBgnTm": null
+        "Base.reportBgnTm": null,
       });
-      return
+      return;
     }
     setFormValue({
-      "Base.reportDays": tm
+      "Base.reportDays": tm,
     });
   },
 };
@@ -191,15 +199,15 @@ function getValue(key: string) {
   return insrncEditRef?.value?.getValue(key);
 }
 
-//给表单下拉项赋值
+//给表单赋值
 function setFormItem(key, obj) {
-    if (obj && Object.keys(obj).length) {
-        formconfig1.fromSchema?.forEach(item => {
-            if (item.prop === key) {
-                Object.assign(item, obj)
-            }
-        })
-    }
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        Object.assign(item, obj);
+      }
+    });
+  }
 }
 
 defineExpose({

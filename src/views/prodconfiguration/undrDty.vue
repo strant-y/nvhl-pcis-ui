@@ -26,6 +26,7 @@ const freeEditRef = ref<AppFreeEditMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
+import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 import {
   AppTableConfig,
   AppTableMethod,
@@ -34,8 +35,11 @@ import {
 import { qryBatchUndrDtyList, delBatchUndrDtyInfo } from "@/api/prod";
 import { template } from "lodash";
 const dzmodal = useDzModal();
+import { useUserStore } from "@/store";
+const userStore = useUserStore();
+const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
 
-const undrEdit = defineAsyncComponent(() => import("./undrEdit.vue"));
+const undrDtyEdit = defineAsyncComponent(() => import("./undrDtyEdit.vue"));
 const tableRef = ref<AppTableMethod | null>(null);
 
 const formconfig1 = reactive<AppFreeEditConfig>(
@@ -56,6 +60,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       }),
       createFreeButtonBase({
         type: "primary",
+        label: "批量作废",
+        func: () => {},
+      }),
+      createFreeButtonBase({
+        type: "primary",
         label: "删除所有",
         func: () => {},
       }),
@@ -63,8 +72,29 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     fromSchema: [
       {
         prop: "cDptCde",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "核保任职机构",
+        showExBtn: true,
+        btnItems: {
+          icon: "Search",
+          type: "primary",
+          func: () => {
+            dzmodal.open(DepartmentTree, {}).then((res) => {
+              if (res.body) {
+                const selectObj = res.body;
+                let obj = {
+                  loadData: [
+                    {
+                      label: selectObj.name,
+                      value: selectObj.id,
+                    },
+                  ],
+                };
+                freeEditRef.value?.setValue("cDptCde", selectObj.name);
+              }
+            });
+          },
+        },
         clearable: true,
       },
       {
@@ -77,23 +107,34 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cUndrClsCde",
         inputtype: "rtselect",
         title: "核保人级别",
+        typeCode: "UNDR_CLS_CDE",
+        codeParam: {},
         clearable: true,
       },
       {
-        prop: "cProdNo",
+        prop: "CKindNo",
         inputtype: "rtselect",
         title: "产品大类",
+        typeCode: "WEB_SYS_STA_DICT",
+        params: { cParCde: "use_mrk" },
         clearable: true,
       },
       {
-        prop: "cProdNo",
+        prop: "CProdNo",
         inputtype: "rtselect",
         title: "产品",
+        typeCode: "PROD_LIST_GRT",
+        params: {
+          cParCde: "",
+          cOperId: user.value.opCde,
+          cDptCde: user.value.companyId,
+        },
+        loadData: [],
         clearable: true,
       },
       {
         prop: "cUndrClsCnm",
-        inputtype: "rtdatetime",
+        inputtype: "rtdatepicker",
         title: "任职起止期",
         clearable: true,
       },
@@ -118,12 +159,30 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         // icon: "Plus",
         func: function () {
-          dzmodal.open(undrEdit, { type: "add", data: {} }).then((res) => {
+          dzmodal.open(undrDtyEdit, { type: "add", data: {} }).then((res) => {
             if (res.type === "ok") {
               handleQuery();
             }
           });
         },
+      }),
+      createFreeButtonBase({
+        id: "score",
+        label: "导出",
+        type: "primary",
+        func: function () {},
+      }),
+      createFreeButtonBase({
+        id: "score",
+        label: "Excel导入",
+        type: "primary",
+        func: function () {},
+      }),
+      createFreeButtonBase({
+        id: "score",
+        label: "模板下载",
+        type: "primary",
+        func: function () {},
       }),
     ],
     tableBtnType: "btn",
@@ -160,7 +219,7 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "cDptCde",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "核保任职机构",
       },
       {
