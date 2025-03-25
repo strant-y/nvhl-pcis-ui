@@ -430,12 +430,14 @@ function setFormValue(data: any) {
     props.fromSchema.forEach((key: any) => {
       if (key.inputtype === "rtcascader") {
         const props = key.cascaderprops;
-        const v = setdata[key.prop];
+        // const v = setdata[key.prop];
         if(props && props.length > 0 ){
+          let cascd = [];
           for(var i = 0; i < props.length; i++){
-            setdata[props[i]] = v[i];
+            cascd.push(setdata[props[i]]);
+            delete setdata[props[i]];
           }
-          delete setdata[key.prop];
+          setdata[key.prop] = cascd;
         }
       }
     });
