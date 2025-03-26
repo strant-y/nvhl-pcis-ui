@@ -232,7 +232,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
       },
       {
-        prop: "cTabNme",
+        prop: "cFactorTitle",
         title: "元素名称",
         inputtype: "rtinput",
       },

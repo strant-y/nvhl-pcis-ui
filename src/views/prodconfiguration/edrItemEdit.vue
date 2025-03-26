@@ -176,12 +176,13 @@ const clickBtn = ref<Array<FreeButtonBase>>([
             newparam['CComponentKey']=sel['cComponentKey']
             newparam['items']=[]
             console.log(sel)
-            sel['selectFactor'].forEach((v)=>{
+            sel['selectFactor'].forEach((v,key)=>{
                 const obj={}
                 obj['CGroup']=v.cGroup
                 obj['CFactorKey']=v['c_pk_id']
                 obj['CEdrItem']=v['c_factor_prop']
                 obj['COperTyp']='M'
+                obj['CSortingNo']=key+1
                 obj['CRsnCde']=props.data.cRsnCde
                 newparam['items'].push(obj)
             })
