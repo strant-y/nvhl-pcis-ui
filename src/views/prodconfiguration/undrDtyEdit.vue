@@ -1,10 +1,14 @@
 <template>
   <div>
     <el-dialog v-model="dialogVisible" title="" width="80%">
-      <app-free-edit v-model:freeEditConfig="formconfig" ref="freeEditRef" />
+      <app-free-edit
+        v-model:freeEditConfig="formconfig"
+        ref="freeEditRef"
+        @row-click="handleRowClick"
+      />
       <app-grid-edit v-model:gridEditConfig="gridconfig" ref="gridEditRef" />
     </el-dialog>
-    <comDialog ref="dialog"></comDialog>
+    <!-- <comDialog ref="dialog"></comDialog> -->
   </div>
 </template>
 
@@ -14,7 +18,6 @@ import { useRoute } from "vue-router";
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 import BusinessCvrgTree from "@/pcis/prodRef/commodityRef/BusinessCvrgTree.vue";
 import undrDtyBussiness from "./undrDtyBussiness.vue";
-import { useValidator } from "@/typings/useValidator";
 import { getPageViewByPage, getProdList, saveProdPages } from "@/api/prod";
 import {
   AppGridEditConfig,
@@ -38,6 +41,7 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 
 const dialog = ref<DialogMethod | null>(null);
+import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 const dialogVisible = ref(true);
 const gridEditRef = ref<AppGridEditMethod | null>(null);
@@ -51,9 +55,12 @@ const formconfig = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         type: "primary",
         label: "选择产品",
-        func: () => {
+        func: async () => {
+          const isValid = await freeEditRef.value?.validate();
+          if (!isValid) return false;
           dzmodal.open(BusinessCvrgTree, {}).then((res) => {
-            if (res) {
+            if (res.type == "ok") {
+              const selectObj = res.body;
               console.log("子组件传过来的值", res);
             }
           });
@@ -62,38 +69,38 @@ const formconfig = reactive<AppFreeEditConfig>(
     ],
     fromSchema: [
       {
-        prop: "cDptCde",
+        prop: "cEmpCde",
         inputtype: "rtinput",
         title: "员工代码",
+        rules: [getRules("required", { change: true })],
       },
       {
-        prop: "cPlanCn",
+        prop: "CEmpCnm",
         inputtype: "rtinput",
         title: "员工名称",
         showExBtn: true,
+        rules: [getRules("required", { change: true })],
         btnItems: {
           icon: "Search",
           type: "primary",
           func: () => {
-            // dialog.value?.open(
-            //   "undrDtyBussiness",
-            //   {
-            //     type: "show",
-            //     method: {
-            //       getdbClickData: (data) => {
-            //         dialog.value?.handleClose();
-            //       },
-            //     },
-            //   },
-            //   {
-            //     isOk: (selectdata: any) => {},
-            //   },
-            //   { title: "员工列表", width: 85 }
-            // );
-            dzmodal.open(undrDtyBussiness, {}).then((res) => {
-              if (res) {
-              }
-            });
+            dzmodal
+              .open(undrDtyBussiness, { onRowClick: handleRowClick })
+              .then((res) => {
+                if (res.type == "ok") {
+                  const selectObj = res.body;
+                  let obj = {
+                    loadData: [
+                      {
+                        label: selectObj.cEmpCnm,
+                        value: selectObj.cEmpCde,
+                      },
+                    ],
+                  };
+                  freeEditRef.value?.setValue("CEmpCnm", selectObj.cEmpCnm);
+                  freeEditRef.value?.setValue("cEmpCde", selectObj.cEmpCde);
+                }
+              });
           },
         },
       },
@@ -101,6 +108,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         prop: "cDptCde",
         inputtype: "rtselect",
         title: "核保任职机构",
+        rules: [getRules("required", { change: true })],
         showExBtn: true,
         btnItems: {
           icon: "Search",
@@ -124,24 +132,27 @@ const formconfig = reactive<AppFreeEditConfig>(
         },
       },
       {
-        prop: "cPlanCn",
+        prop: "cUndrClsCde",
         inputtype: "rtselect",
         title: "核保任职级别",
-        codeParam: { cParCde: "06" },
+        codeParam: {},
         typeCode: "UNDR_CLS_CDE_FOR_KIND",
+        rules: [getRules("required", { change: true })],
       },
       {
-        prop: "cPlanCn",
+        prop: "tDutyStrtTm",
         inputtype: "rtdatepicker",
         title: "任职起期",
+        rules: [getRules("required", { change: true })],
       },
       {
-        prop: "cPlanCn",
+        prop: "tDutyEndTm",
         inputtype: "rtdatepicker",
         title: "任职止期",
+        rules: [getRules("required", { change: true })],
       },
       {
-        prop: "cPlanCn",
+        prop: "isWechatPrompt",
         inputtype: "rtcheckbox",
         title: "核保提醒",
       },
@@ -169,10 +180,9 @@ const gridconfig = reactive<AppGridEditConfig>(
         label: "保存",
         type: "primary",
         func: function () {
-          const prodInfo = opertaor?.getTableRefByKey("prodInfo");
-          const prodInfoData = prodInfo.getFromValue();
+          let s = freeEditRef.value?.getFromValue();
           const pages = gridEditRef.value?.getTableValue();
-          const params = Object.assign(prodInfoData, { pages: pages });
+          const params = Object.assign(s, { pages: pages });
           saveProdPages(params)
             .then((res) => {
               const { code, data, msg } = res;
@@ -191,51 +201,32 @@ const gridconfig = reactive<AppGridEditConfig>(
         prop: "cKindNo",
         inputtype: "rtselect",
         title: "产品大类",
+        typeCode: "Query_Kind_List",
+        codeParam: {},
+        // codeParam: { kindNo: "06", cStatus: "1" },
       },
       {
         prop: "cProdNo",
         inputtype: "rtselect",
         title: "产品",
-        loadData: [
-          {
-            label: "是",
-            value: "1",
-          },
-          {
-            label: "否",
-            value: "0",
-          },
-        ],
+        typeCode: "PROD_LIST",
+        codeParam: {},
+        // codeParam: { cParCde: "06" },
       },
       {
-        prop: "cGrpMrk",
+        prop: "cUndrClsCde",
         inputtype: "rtselect",
         title: "核保人级别",
-        loadData: [
-          {
-            label: "是",
-            value: "1",
-          },
-          {
-            label: "否",
-            value: "0",
-          },
-        ],
+        typeCode: "UNDR_CLS_CDE_FOR_KIND",
+        codeParam: {},
+        // codeParam: { cParCde: "06" },
       },
       {
-        prop: "cGrpMrk",
+        prop: "cStatus",
         inputtype: "rtselect",
         title: "是否启用",
-        loadData: [
-          {
-            label: "是",
-            value: "1",
-          },
-          {
-            label: "否",
-            value: "0",
-          },
-        ],
+        typeCode: "WEB_SYS_STA_DICT",
+        codeParam: { cParCde: "yes_no" },
       },
     ],
     fromUi: createGridFromUiConfig({
@@ -243,7 +234,11 @@ const gridconfig = reactive<AppGridEditConfig>(
     }),
   })
 );
-
+const handleRowClick = (rowData: any) => {
+  // if (rowData.CEmpCnm) {
+  //   freeEditRef.value?.setValue("CEmpCnm", rowData.CEmpCnm);
+  // }
+};
 function copyInitProdNo(v: any) {
   gridconfig.endBtns = [];
   gridEditRef?.value?.setFormValue(v);

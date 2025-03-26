@@ -1,23 +1,28 @@
 <template>
   <el-dialog
     v-model="dialogVisible"
-    title="机构部门"
+    title="操作机构"
     custom-class="custom-dialog"
     width="85%"
   >
     <el-divider></el-divider>
     <el-tree
       ref="treeRef"
-      :data="_nodes"
+      :data="nodes"
       show-checkbox
-      lazy
-      :load="loadNode"
       :props="defaultProps"
       node-key="id"
       :check-strictly="false"
       :check-on-click-node="true"
       @check-change="handleCheckChange"
-    ></el-tree>
+    >
+      <template #default="{ node, data }">
+        <span>
+          <el-icon><icon-name /></el-icon>
+          {{ data.value }} ( {{ data.code }} )
+        </span>
+      </template>
+    </el-tree>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="handleCancel" class="custom-button">取消</el-button>
@@ -30,10 +35,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from "vue";
-import { ElTree } from "element-plus";
+import { getProdEnableList } from "@/api/prod";
 import { useUserStore } from "@/store/modules/user";
 import { SysOperatorMgrService } from "@/views/sys-right-basic/service/sys-operator-mgr.service";
+import { debug } from "console";
 const sysOperatorMgrService = new SysOperatorMgrService();
 interface Tree {
   [key: string]: any;
@@ -45,13 +50,21 @@ const dialogVisible = ref(true);
 const filterText = ref("");
 const treeRef = ref<InstanceType<typeof ElTree>>();
 const selectedNode = ref<Tree | null>();
+const formconfig1 = ref({
+  name: "",
+});
 const arrData = ref<Tree[]>([]);
-
+const nodes = ref<Array<any>>([]);
 const defaultProps = {
-  children: "children",
-  label: "name",
+  children: "list",
   isLeaf: "leaf",
+  label: "value",
 };
+// const defaultProps = {
+//   children: "children",
+//   label: "name",
+//   isLeaf: "leaf",
+// };
 
 const emits = defineEmits(["ok"]);
 
@@ -84,36 +97,50 @@ const handleSave = () => {
   }
   dialogVisible.value = false;
 };
-
-const initDptTreeList = () => {
-  let root = "0200000000000";
-  if (user.value && user.value.companyId) {
-    root = user.value.companyId;
-  }
-  const params = {
-    pId: root,
+// 获取条款列表
+function loadTree() {
+  nodes.value = [];
+  const param = {
+    name: formconfig1.value.name,
+    level: 1,
   };
-  sysOperatorMgrService
-    .getOrgDptTreeNodeById(params)
-    .then((res) => {
-      if (res && res["data"]) {
-        if (_nodes.value.length === 0) {
-          _nodes.value = [];
-        }
-        const data = res["data"];
-        if (res["data"]) {
-          _nodes.value.push({
-            id: root,
-            name: res["data"]["name"],
-            leaf: false,
-          });
-        }
-      }
-    })
-    .catch((error) => {
-      ElMessage.error("后台服务异常,请联系管理员");
-    });
-};
+  getProdEnableList(param).then((res: any) => {
+    if (res.code === 200) {
+      nodes.value = res.data;
+    } else {
+      ElMessage.error(res.msg);
+    }
+  });
+}
+// const initDptTreeList = () => {
+//   let root = "0200000000000";
+//   if (user.value && user.value.companyId) {
+//     root = user.value.companyId;
+//   }
+//   const params = {
+//     pId: root,
+//   };
+//   sysOperatorMgrService
+//     .getOrgDptTreeNodeById(params)
+//     .then((res) => {
+//       if (res && res["data"]) {
+//         if (_nodes.value.length === 0) {
+//           _nodes.value = [];
+//         }
+//         const data = res["data"];
+//         if (res["data"]) {
+//           _nodes.value.push({
+//             id: root,
+//             name: res["data"]["name"],
+//             leaf: false,
+//           });
+//         }
+//       }
+//     })
+//     .catch((error) => {
+//       ElMessage.error("后台服务异常,请联系管理员");
+//     });
+// };
 
 const loadNode = (node, resolve) => {
   if (node.level === 0) {
@@ -122,33 +149,34 @@ const loadNode = (node, resolve) => {
   const params = {
     cDptCde: node.data.id,
   };
-  sysOperatorMgrService
-    .getOrgDptTreeListByPid(params)
-    .then((result) => {
-      const dto = [];
-      if (200 !== result["code"]) {
-        ElMessage.error(result["msg"]);
-      } else {
-        ElMessage.success(result["msg"]);
-      }
-      if (result["data"] && result["data"].length > 0) {
-        result["data"].forEach((item) => {
-          dto.push({
-            id: item["id"],
-            name: item["name"],
-            leaf: !item.hasChildren,
-          });
-        });
-      }
-      resolve(dto);
-    })
-    .catch((error) => {
-      console.log("出错了", error);
-      ElMessage.error("后台服务异常,请联系管理员");
-    });
+  // sysOperatorMgrService
+  //   .getOrgDptTreeListByPid(params)
+  //   .then((result) => {
+  //     const dto = [];
+  //     if (200 !== result["code"]) {
+  //       ElMessage.error(result["msg"]);
+  //     } else {
+  //       ElMessage.success(result["msg"]);
+  //     }
+  //     if (result["data"] && result["data"].length > 0) {
+  //       result["data"].forEach((item) => {
+  //         dto.push({
+  //           id: item["id"],
+  //           name: item["name"],
+  //           leaf: !item.hasChildren,
+  //         });
+  //       });
+  //     }
+  //     resolve(dto);
+  //   })
+  //   .catch((error) => {
+  //     console.log("出错了", error);
+  //     ElMessage.error("后台服务异常,请联系管理员");
+  //   });
 };
 onMounted(() => {
-  initDptTreeList();
+  loadTree();
+  // initDptTreeList();
 });
 </script>
 <style scoped>

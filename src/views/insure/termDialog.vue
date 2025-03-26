@@ -171,6 +171,7 @@ function loadTree() {
   nodes.value = [];
   const param = {
     name: formconfig1.value.name,
+    level: 2,
   };
   getProdEnableList(param).then((res: any) => {
     if (res.code === 200) {

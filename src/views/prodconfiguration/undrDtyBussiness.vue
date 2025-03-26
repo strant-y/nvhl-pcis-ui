@@ -1,16 +1,6 @@
 <!--核保人批量配置-业务员-员工信息--->
 <template>
   <div>
-    <!-- <app-free-edit v-model:freeEditConfig="formconfig" ref="freeEditRef" />
-    <app-table
-      :tableConfig="tableconfig"
-      v-model:pageresult="pageresult"
-      ref="tableRef"
-      @page-change="handleQuery(false)"
-      @selection-change="handleSelectionChange"
-    />
-    <comDialog ref="dialog"></comDialog> -->
-
     <el-dialog v-model="dialogVisible" title="" width="80%">
       <app-free-edit v-model:freeEditConfig="formconfig" ref="freeEditRef" />
       <app-table
@@ -18,14 +8,7 @@
         v-model:pageresult="pageresult"
         ref="tableRef"
         @page-change="handleQuery(false)"
-        @selection-change="handleSelectionChange"
       />
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="handleCancel">取消</el-button>
-          <el-button type="primary" @click="handleSave">保存</el-button>
-        </span>
-      </template>
     </el-dialog>
   </div>
 </template>
@@ -35,6 +18,8 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 const showBtnConfig = ref(false);
 const dialogVisible = ref(true);
 const showView = ref(false);
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
 const dzmodal = useDzModal();
 const dialog = ref<DialogMethod | null>(null);
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
@@ -59,13 +44,12 @@ import { ref, reactive } from "vue";
 import { saveRiskInfo } from "@/api/prod";
 
 const props = defineProps<{
-  visible: boolean;
+  data: {
+    type: Object;
+    default: () => {};
+  };
 }>();
-
-const emit = defineEmits<{
-  (e: "update:modelValue", value: boolean): void;
-  (e: "save"): void;
-}>();
+const emit = defineEmits(["row-click"]);
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 
@@ -83,22 +67,24 @@ const formconfig = reactive<AppFreeEditConfig>(
       }),
       createFreeButtonBase({
         label: "重置",
-        func: () => {},
+        func: () => {
+          freeEditRef.value?.resetFields();
+        },
       }),
     ],
     fromSchema: [
       {
-        prop: "CDptCde",
+        prop: "cEmpCde",
         inputtype: "rtselect",
         title: "员工代码",
       },
       {
-        prop: "cPlanCn",
+        prop: "cEmpCnm",
         inputtype: "rtselect",
         title: "员工名称",
       },
       {
-        prop: "cPlanCn",
+        prop: "dptCde",
         inputtype: "rtselect",
         title: "员工所属机构",
         showExBtn: true,
@@ -117,7 +103,7 @@ const formconfig = reactive<AppFreeEditConfig>(
                     },
                   ],
                 };
-                freeEditRef.value?.setValue("cDptCde", selectObj.name);
+                freeEditRef.value?.setValue("dptCde", selectObj.id);
               }
             });
           },
@@ -147,10 +133,6 @@ const handleSave = async () => {
 
 const handleCancel = () => {
   dialogVisible.value = false;
-};
-
-const handleVisibleUpdate = (value: boolean) => {
-  emit("update:visible", value);
 };
 
 const tableRef = ref<AppTableMethod | null>(null);
@@ -189,27 +171,32 @@ const tableconfig = reactive<AppTableConfig>(
     //   }),
     // ],
     fromSchema: [
+      // {
+      //   prop: "cBsnsTyp",
+      //   title: "编号",
+      //   inputtype: "rtinput",
+      // },
       {
-        prop: "cBsnsTyp",
-        title: "编号",
-        inputtype: "rtinput",
-      },
-      {
-        prop: "cChaType",
+        prop: "cEmpCde",
         title: "员工代码",
         inputtype: "rtinput",
       },
       {
-        prop: "cChaSubtype",
+        prop: "cEmpCnm",
         title: "员工名称",
         inputtype: "rtinput",
       },
       {
-        prop: "cChaCde",
+        prop: "cDptCde",
         title: "所属机构",
         inputtype: "rtselect",
       },
     ],
+    rowDbClickFun(rowData) {
+      emit("ok", rowData);
+      dialogVisible.value = false;
+      // props.data.method?.getdbClickData(rowData);
+    },
   })
 );
 /** 查询 */
@@ -217,17 +204,16 @@ function handleQuery() {
   const r = tableRef.value?.getPartnerPage(); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r);
-  getCvrgRiskRelList(param)
-    .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
-        pageresult.list = data.result;
-        pageresult.total = data.total;
-      } else {
-        ElMessage.error(msg);
-      }
+  codeListStore
+    .queryCodeList({
+      codeListName: "Sales_Emp_Qry_List",
+      codeListParam: param,
     })
-    .finally(() => {});
+    .then((res) => {
+      if (res.length) {
+        pageresult.list = res;
+      }
+    });
 }
 </script>
 
