@@ -685,8 +685,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
         {
             prop: "CIndustryType",
-            inputtype: "rtinput",
+            inputtype: "rtselect",
             title: "行业类型",
+            typeCode: "HANGYE_TYPE",
             clearable: true,
             hidden: true,
         },
@@ -713,23 +714,51 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
         {
             prop: "cPrjCtgTyp",
-            inputtype: "rtinput",
+            inputtype: "rtselect",
             title: "项目大类",
             clearable: true,
+            filterable: true,
             hidden: true,
+            typeCode: "CPrjCtgTyp_List",
+            codeParam:{'CRangeCde':user.value.companyId,'cLev':1},
+            func:(v)=>{
+                formconfig1.fromSchema?.forEach((item) => {
+                    if (
+                        item.prop === "cPrjCtgMidTyp"
+                    ) {
+                        freeEditRef.value[currentTabKey.value].value[0].setValue("cPrjCtgMidTyp", "");
+                        freeEditRef.value[currentTabKey.value].value[0].setValue("cPrjCtgSubTyp", "");
+                        item.typeCode = 'CPrjCtgTyp_List';
+                        item.codeParam ={'CRangeCde':user.value.companyId,'cLev':2,'CParCde':v}
+                    }
+                })
+            }
         },
         {
             prop: "cPrjCtgMidTyp",
-            inputtype: "rtinput",
+            inputtype: "rtselect",
             title: "项目中类",
             clearable: true,
+            filterable: true,
             hidden: true,
+            func:(v)=>{
+                formconfig1.fromSchema?.forEach((item) => {
+                    if (
+                        item.prop === "cPrjCtgSubTyp"
+                    ) {
+                        freeEditRef.value[currentTabKey.value].value[0].setValue("cPrjCtgSubTyp", "");
+                        item.typeCode = 'CPrjCtgTyp_List';
+                        item.codeParam ={'CRangeCde':user.value.companyId,'cLev':3,'CParCde':v}
+                    }
+                })
+            }
         },
         {
             prop: "cPrjCtgSubTyp",
-            inputtype: "rtinput",
+            inputtype: "rtselect",
             title: "项目子类",
             clearable: true,
+            filterable: true,
             hidden: true,
         },
     ],
