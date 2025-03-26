@@ -56,11 +56,16 @@ const formconfig = reactive<AppFreeEditConfig>(
         type: "primary",
         label: "选择产品",
         func: async () => {
-          const isValid = await freeEditRef.value?.validate();
-          if (!isValid) return false;
+          // const isValid = await freeEditRef.value?.validate();
+          // if (!isValid) return false;
           dzmodal.open(BusinessCvrgTree, {}).then((res) => {
             if (res.type == "ok") {
               const selectObj = res.body;
+              selectObj.forEach((item, index) => {
+                gridEditRef.value?.addRowByData({
+                  cProdNme: item.value,
+                });
+              });
               console.log("子组件传过来的值", res);
             }
           });
@@ -206,7 +211,7 @@ const gridconfig = reactive<AppGridEditConfig>(
         // codeParam: { kindNo: "06", cStatus: "1" },
       },
       {
-        prop: "cProdNo",
+        prop: "cProdNme",
         inputtype: "rtselect",
         title: "产品",
         typeCode: "PROD_LIST",
