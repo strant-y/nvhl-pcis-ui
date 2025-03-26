@@ -502,7 +502,7 @@ const schemaMap = reactive<Record<string, any>>({
       btnItems: createFreeButtonBase({
         icon: "Edit",
         func: () => {
-          const ck = freeEditRef.value?.getValue("cascaderprops");
+          const ck = JSON.parse(freeEditRef.value?.getValue("cascaderprops"));
           let newData: any = [];
           if (ck && ck.length > 0) {
             ck.forEach((e: any) => {
