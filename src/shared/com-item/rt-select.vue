@@ -31,7 +31,7 @@
         : false
     "
     :size="item.size"
-    :filterable="item.filterable"
+    :filterable="item.filterable != null ? item.filterable : true"
     :multiple="
       item.multiple
         ? typeof item.multiple === 'boolean'
