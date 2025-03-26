@@ -24,7 +24,7 @@ export interface AppFreeEditConfig {
 
 export interface AppFreeEditMethod {
   getFromValue: () => any;
-  setFormValue: (data: any) => void;
+  setFormValue: (data: any,noupdate?: boolean) => void;
   validate: () => any;
   setValue: (key: any, value: any) => void;
   getValue: (key: any) => any;

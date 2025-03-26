@@ -136,7 +136,7 @@ showMyfrom.value = props.freeEditConfig?.showMyfrom
 
 interface dynamicFormMethod {
   getFromValue: () => any;
-  setFormValue: (data: any) => void;
+  setFormValue: (data: any,noupdate?: boolean) => void;
   validate: () => any;
   setValue: (key: any, value: any) => void;
   getValue: (key: any) => any;
@@ -164,7 +164,7 @@ function getFromValue() {
   }
 }
 
-function setFormValue(data: any) {
+function setFormValue(data: any,noupdate = false) {
   if (data === undefined) {
     data = {};
   }
@@ -180,10 +180,10 @@ function setFormValue(data: any) {
         }
       }
     });
-    dynamicForm.value?.setFormValue(dy);
-    superDynamicForm.value?.setFormValue(sp);
+    dynamicForm.value?.setFormValue(dy,noupdate);
+    superDynamicForm.value?.setFormValue(sp,noupdate);
   } else {
-    dynamicForm.value?.setFormValue(data);
+    dynamicForm.value?.setFormValue(data,noupdate);
   }
 }
 function validate() {

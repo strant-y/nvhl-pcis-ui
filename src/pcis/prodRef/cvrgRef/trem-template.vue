@@ -307,7 +307,7 @@ function initData(data: any) {
       termTitleConf.value.cFactorTabType !== "grid" &&
       termTitleConf.value.cFactorTabType !== "table"
     ) {
-      termRef.value?.setFormValue(termdata.value);
+      termRef.value?.setFormValue(termdata.value,true);
     }
   });
 }

@@ -424,7 +424,7 @@ function getFromValue() {
   }
   return redata;
 }
-function setFormValue(data: any) {
+function setFormValue(data: any,noupdate = false) {
   let setdata = data;
   if (props.fromSchema) {
     props.fromSchema.forEach((key: any) => {
@@ -443,7 +443,9 @@ function setFormValue(data: any) {
     });
   }
   Object.assign(form, setdata);
-  emits("formsDataUpdate", form);
+  if(!noupdate){
+    emits("formsDataUpdate", form);
+  }
 }
 
 function formsDataUpdate() {
