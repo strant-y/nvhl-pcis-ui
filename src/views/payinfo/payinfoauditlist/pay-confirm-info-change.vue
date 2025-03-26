@@ -72,7 +72,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "CProdNo",
         inputtype: "rtselect",
         title: "产品",
-        // typeCode: "PROD_LIST",
+        typeCode: "PROD_LIST_IN_GUIDE",
         // params: {'cStatus': '1'},
       },
       {
@@ -218,13 +218,8 @@ onMounted(async () => {
   //}
   if (props.type === "check" && props.data) {
     nextTick(()=>{
-      freeEditRef.value?.setFormValue(props.data);
       const param = {
         'CUniqueNo': props.data.CUniqueNos,
-        'CurrentUser': user.value['opCde'],
-        'CurrentUserOrg': user.value['companyId'],
-        pageNo: 1,
-        pageSize: 10,
       };  
       loadPayConfirmInfo(param);    
     })
@@ -232,11 +227,17 @@ onMounted(async () => {
 });
 
 function loadPayConfirmInfo(param: any) {
-  pcisQueryService.getPayConfirmInfoList(param).then((res: any) => {
+  pcisQueryService.loadPayConfirmInfo(param).then((res: any) => {
       if (null != res && null != res['code']) {
           if (res['code'] === 200) {
-              const data = res['data']['result'];
+              const data = res['data'];
               console.log("eeeeeeee", data)
+              const newdata = {};
+              Object.keys(data).forEach((key) => {
+                  const k = firstCharUpper(key);
+                  newdata[k] = data[key];
+              });
+              freeEditRef.value?.setFormValue(newdata);
           }
       }
   }, error => {
@@ -250,13 +251,19 @@ function save() {
       if (this.CRelAppNos) {
         ElMessage.warning('所选单据包含联合单，必须联合进行缴费类型转换，是否合并转换？')
       }
-      //let s = freeEditRef.value?.getFromValue(); //获取表单数据
+      let s = freeEditRef.value?.getFromValue(); //获取表单数据
       //const param = Object.assign({ type: props.type }, s);
-      const typeandno = [];
+      const typeandno = [
+          {
+              CPayTyp:s.CPayTyp,
+              CUniqueNo:props.data.CUniqueNos
+          }
+      ];
       const param = {
         typeandno: typeandno,
         UserId: user.value['opCde']   
       };
+      console.log(param)
       pcisQueryService.changePayType(param)
         .then((res) => {
           const { code, data, msg } = res;
@@ -274,7 +281,16 @@ function save() {
     }
   });
 }
-
+/**
+ * 首字母转换大写
+ * @param {string} str
+ * @returns {string}
+ */
+function  firstCharUpper(str: string) {
+    return str.replace(/\b(\w)(\w*)/g, function ($0, $1, $2) {
+        return $1.toUpperCase() + $2;
+    });
+}
 </script>
 
 <style scoped></style>

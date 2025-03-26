@@ -252,33 +252,236 @@ const pageresult = reactive<Pageresult>({
 const tableconfig = reactive<AppTableConfig>(
 	createTableEditConfig({
     showSelection: true,
-		titleBtns: [
-      createFreeButtonBase({
-				type: "primary",
-				label: "缴费类型转换",
-				func: async () => {
-					  if (multipleSelection.value.length < 1 ) {
-						ElMessage.warning('所选记录为空！');
-						return ;
-					  }
-					  // if (multipleSelection.value.length > 30 ) {
-					  //   ElMessage.warning('获取支付号 数量最大为30单！');
-					  //   return ;
-					  // }
-					  gotoChangeSts()
-				},
-			}),
-			createFreeButtonBase({
-				type: "primary",
-				label: "支票登记",
-				func: async () => {
-					dzmodal.open(payConfirmInfoRegister, { type: "" }).then((res) => {
-						if (res.type === "ok") {
-							console.log("审核")
+	titleBtns: [
+				createFreeButtonBase({
+					type: "primary",
+					label: "获取支付号",
+					func: async () => {
+						if (multipleSelection.value.length < 1 ) {
+							ElMessage.warning('所选记录为空！');
+							return ;
 						}
-					});
-				},
-			}),
+                        ElMessageBox.confirm("确认要获取支付号吗？", "提示", {
+                            confirmButtonText: "确定",
+                            cancelButtonText: "取消",
+                            type: "warning",
+                            lockScroll: false,
+                        }).then(() => {
+                            let CUniqueNos = ''; // 所选项的流水号组合
+                            multipleSelection.value.forEach(item => {
+                                CUniqueNos = CUniqueNos === '' ? item['cUniqueNo'] : CUniqueNos + ',' + item['cUniqueNo'];
+                            });
+                            const param = {
+                                "UserId": user.value['opCde'],
+                                "CompanyId": user.value['companyId'],
+                                "OpRelCde": user.value['opCde'],
+                                "CUniqueNo": CUniqueNos
+                            };
+                            console.log(param)
+                            pcisQueryService.getPaymentNo(param)
+                                .then((res) => {
+                                    const { code, data, msg } = res;
+                                    if (200 === code) {
+                                        ElMessage.success(msg);
+                                        handleQuery();
+                                    } else {
+                                        ElMessage.error(msg);
+                                    }
+                                })
+                                .finally(() => { });
+                        });
+					},
+				}),
+				createFreeButtonBase({
+					type: "primary",
+					label: "作废支付号",
+					func: async () => {
+						if (multipleSelection.value.length < 1 ) {
+							ElMessage.warning('所选记录为空！');
+							return ;
+						}
+                        ElMessageBox.confirm("确认要作废支付号吗？", "提示", {
+                            confirmButtonText: "确定",
+                            cancelButtonText: "取消",
+                            type: "warning",
+                            lockScroll: false,
+                        }).then(() => {
+                            let CUniqueNos = ''; // 所选项的流水号组合
+                            let CPaySequences = ''; // 所选项的流水号组合
+                            multipleSelection.value.forEach(item => {
+                                CPaySequences = CPaySequences === '' ? item['cPaySequence'] : CPaySequences + ',' + item['cPaySequence'];
+                                CUniqueNos = CUniqueNos === '' ? item['cUniqueNo'] : CUniqueNos + ',' + item['cUniqueNo'];
+                            });
+                            const param = {
+                                "CPaySequence": CPaySequences,
+                                "CUniqueNo": CUniqueNos
+                            };
+                            console.log(param)
+                            pcisQueryService.cancelPaymentNo(param)
+                                .then((res) => {
+                                    const { code, data, msg } = res;
+                                    if (200 === code) {
+                                        ElMessage.success(msg);
+                                        handleQuery();
+                                    } else {
+                                        ElMessage.error(msg);
+                                    }
+                                })
+                                .finally(() => { });
+                        });
+					},
+				}),
+				createFreeButtonBase({
+					type: "primary",
+					label: "查询支付状态",
+					func: async () => {
+						if (multipleSelection.value.length < 1 ) {
+							ElMessage.warning('所选记录为空！');
+							return ;
+						}
+                        let CUniqueNos = ''; // 所选项的流水号组合
+                        let CPaySequences = ''; // 所选项的流水号组合
+                        let isOpen =  false;
+                        let message = '';
+                        multipleSelection.value.forEach(item => {
+                            if (item['cPaySequence']==''||item['cPaySequence']==null) {
+                                isOpen = true;
+                                message='查询支付号状态的操作，支付号不能为空!【申请单号='+item['cAppNo']+'】'
+                                return;
+                            }
+                            CUniqueNos = CUniqueNos === '' ? item['cUniqueNo'] : CUniqueNos + ',' + item['cUniqueNo'];
+                            CPaySequences = CPaySequences === '' ? item['cPaySequence'] : CPaySequences + ',' + item['cPaySequence'];
+                        });
+                        if (isOpen) {
+                            ElMessage.warning(message);
+                            return;
+                        }
+                        const param = {
+                            "UserId": user.value['opCde'],
+                            "CompanyId":  user.value['companyId'],
+                            "OpRelCde": user.value['opCde'],
+                            "CUniqueNo": CUniqueNos,
+                            "CPaySequence":CPaySequences
+                        };
+                        console.log(param)
+                        pcisQueryService.queryPaymentNo(param)
+                            .then((res) => {
+                                const { code, data, msg } = res;
+                                if (200 === code) {
+                                    ElMessage.success(msg);
+                                } else {
+                                    ElMessage.error(msg);
+                                }
+                            })
+                            .finally(() => { });
+					},
+				}),
+				createFreeButtonBase({
+					type: "primary",
+					label: "缴费类型转换",
+					func: async () => {
+						  if (multipleSelection.value.length < 1 ) {
+							ElMessage.warning('所选记录为空！');
+							return ;
+						  }
+						  // if (multipleSelection.value.length > 30 ) {
+						  //   ElMessage.warning('获取支付号 数量最大为30单！');
+						  //   return ;
+						  // }
+						  gotoChangeSts()
+					},
+				}),
+				createFreeButtonBase({
+					type: "primary",
+					label: "见费出单退回",
+					func: async () => {
+						if (multipleSelection.value.length < 1 ) {
+							ElMessage.warning('所选记录为空！');
+							return ;
+						}
+                        let CAppNos = '';
+                        let CUniqueNos = ''; // 所选项的流水号组合
+                        let CRelAppNos = '';
+                        let isOpen =  false;
+                        let message = '';
+                        multipleSelection.value.forEach(item => {
+                            CUniqueNos = CUniqueNos === '' ? item['cUniqueNo'] : CUniqueNos + ',' + item['cUniqueNo'];
+                            let cRelAppNo = '';
+                            if (!!item['cRelAppNo']) {
+                                cRelAppNo = item['cRelAppNo'];
+                            }
+                            CRelAppNos = CRelAppNos === '' ? cRelAppNo : CRelAppNos + '#' + cRelAppNo;
+                            if (!!item['cPaySequence']) {
+                                isOpen = true;
+                                message = '该单存在支付号，不允许退回！\n【申请单号=' + item['cAppNo'] + '】';
+                                return;
+                            }
+                            if ('00' === item['cCheckSts'] && '0' === item['cPayStatus']) {
+                                CAppNos = CAppNos === '' ? item['cAppNo'] : CAppNos + '#' + item['cAppNo'];
+                            } else if ('6' === item['cCheckSts'] && '0' === item['cPayStatus']) {
+                                CAppNos = CAppNos === '' ? item['cAppNo'] : CAppNos + '#' + item['cAppNo'];
+                            } else {
+                                isOpen = true;
+                                const cPayTypArry = [{"label": "刷卡缴费", "value": "1"},{ "label": "在线支付","value": "18"},{"label": "支票缴费","value": "2"}].filter(x => x.value === item['cPayTyp']);
+                                const cPayTypCnm = cPayTypArry[0]['label'];
+                                const cCheckStsArry = cCheckStsList.filter(x => x.value === item['cCheckSts']);
+                                const cCheckStsCnm = cCheckStsArry[0]['label'];
+                                const cPayStatusArry = cPayStatusList.filter(x => x.value === item['cPayStatus']);
+                                const cPayStatusCnm = cPayStatusArry[0]['label'];
+
+                                message = '该单缴费类型:' + cPayTypCnm + ',处理状态:' + cCheckStsCnm + ',缴费状态:' + cPayStatusCnm + '，不允许退回！\n【申请单号=' + item['cAppNo'] + ',期次=' + item['nTms'] + '】';
+                                return;
+                            }
+                            // if (!!CRelAppNos) {
+                            //     if (item['cProdNo'] === '060038') {
+                            //         isOpen = true;
+                            //         message = '所选记录包含联合单中的关联人身险单，不允许退回！\n联合单退回请操作087001财产险单【关联单号：' + item['cRelAppNo'] + '】';
+                            //         return;
+                            //     }
+                            // }
+                            // if (item['cRiFacMrk'] === '1' && item['cAppTyp'] === 'A') {
+                            //     isOpen = true;
+                            //     message = '申请单已进入再保流程，不允许进行‘见费出单退回’操作，如需退回，请线下联系再保部告知投保单号!！\n【申请单号=' + item['cAppNo'] + '】';
+                            //     return;
+                            // }
+                        });
+                        if (isOpen) {
+                            ElMessage.warning(message);
+                            return;
+                        }
+					},
+				}),
+				createFreeButtonBase({
+					type: "primary",
+					label: "支票登记",
+					func: async () => {
+                        let CUniqueNos = ''; // 所选项的流水号组合
+                        let isOpen =  false;
+                        let message = '';
+                        multipleSelection.value.forEach(item => {
+                            if ('2' !== item['cPayTyp']) {
+								isOpen = true;
+                                message='该单缴费类型错误，只能对支票缴费的单进行支票登记！ 【申请单号='+item['cAppNo']+'】'
+								return;
+						  	}
+						  	if ('1' == item['cCheckSts']) {
+								isOpen = true;
+                                message='该单处理状态为待审核状态！ 【申请单号='+item['cAppNo']+'】'
+								return;
+						  	}
+                            CUniqueNos = CUniqueNos === '' ? item['cUniqueNo'] : CUniqueNos + ',' + item['cUniqueNo'];
+                        });
+                        if (isOpen) {
+                            ElMessage.warning(message);
+                            return;
+                        }
+						dzmodal.open(payConfirmInfoRegister, { type: "edit",data:{CUniqueNos: CUniqueNos} }).then((res) => {
+							if (res.type === "ok") {
+								console.log("审核")
+							}
+						});
+					},
+				}),
 			// createFreeButtonBase({
 			// 	type: "primary",
 			// 	label: "导出Excel",
@@ -344,8 +547,10 @@ const tableconfig = reactive<AppTableConfig>(
 			},
 			{
 				prop: "cPayTyp",
-				inputtype: "rtinput",
+				inputtype: "rtselect",
 				title: "缴费类型",
+                typeCode: "CHARGE_TYPE_CACHE",
+                param: {'cCde': [ '2', '3', '5',  '99']},
 				formatter: (val)=>{
 				  const result = cPayTypList.value.find(item => item.value === val);
 				  return result ? result.label : val;
@@ -354,7 +559,7 @@ const tableconfig = reactive<AppTableConfig>(
 			{
 				prop: "cPaySequence",
 				inputtype: "rtinput",
-				title: "无线pos缴费序号",
+				title: "支付号",
 			},
 			{
 				prop: "nPrm",
@@ -368,8 +573,9 @@ const tableconfig = reactive<AppTableConfig>(
 			},
 			{
 				prop: "cCheckSts",
-				inputtype: "rtinput",
+				inputtype: "rtselect",
 				title: "处理状态",
+				loadData:cCheckStsList,
 				formatter: (val)=>{
 				  const result = cCheckStsList.find(item => item.value === val);
 				  return result ? result.label : val;
@@ -392,8 +598,10 @@ const tableconfig = reactive<AppTableConfig>(
 			},
 			{
 				prop: "cPayStatus",
-				inputtype: "rtinput",
+				inputtype: "rtselect",
 				title: "缴费状态",
+                typeCode: "WEB_BAS_CODELIST",
+                codeParam: {'cParCde': 'DY1'},
 				formatter: (val)=>{
 				  const result = cPayStatusList.find(item => item.value === val);
 				  return result ? result.label : val;
@@ -485,6 +693,7 @@ function handleQuery(flag?: boolean) {
 }
 function gotoChangeSts() {
   let CUniqueNos = ''; // 所选项的流水号组合
+  let CAppNos = ''; // 所选项的流水号组合
   let CRelAppNos = ''; // 所选项的联合单号组合
   let cBatchNos = false; // 判断是否存在批号
   multipleSelection.value.forEach(item => {
@@ -496,7 +705,8 @@ function gotoChangeSts() {
         cBatchNos = true;
     }
     CUniqueNos = CUniqueNos === '' ? item['cUniqueNo'] : CUniqueNos + ',' + item['cUniqueNo'];
-    CRelAppNos = CRelAppNos === '' ? cRelAppNo : CRelAppNos + ',' + cRelAppNo;   
+    CAppNos = CAppNos === '' ? item['cAppNo'] : CAppNos + ',' + item['cAppNo'];
+    CRelAppNos = CRelAppNos === '' ? cRelAppNo : CRelAppNos + ',' + cRelAppNo;
   });
   if (cBatchNos) {
       ElMessage.warning('该单存在批号，不能进行缴费类型转换，请先清空批号！');
@@ -505,34 +715,43 @@ function gotoChangeSts() {
   const param = { 
     CUniqueNo: CUniqueNos
   };
-  pcisQueryService.befChangeSts(param)
-    .then((res) => {
-      // const { code, data, msg } = res;
-      // if (200 === code) {
-      //   if(msg === 'OK') {
-      //     dzmodal.open(payConfirmInfoChange, { type: "check" , data:{
-      //       CUniqueNos: CUniqueNos,
-      //       CRelAppNos: CRelAppNos        
-      //     }}).then((res) => {
-      //       if (res.type === "ok") {
-      //         console.log("审核")
-      //       }
-      //     });
-      //   }
-      // } else {
-      //   ElMessage.error(msg);
-      // }
-    })
-    .finally(() => { 
-      dzmodal.open(payConfirmInfoChange, { type: "check" , data:{
-        CUniqueNos: CUniqueNos,
-        CRelAppNos: CRelAppNos
-      }}).then((res) => {
+  dzmodal.open(payConfirmInfoChange, { type: "check" , data:{
+            CUniqueNos: CUniqueNos,
+            CAppNos: CAppNos,
+            CRelAppNos: CRelAppNos
+        }}).then((res) => {
         if (res.type === "ok") {
-          console.log("审核")
+            handleQuery();
         }
-      });
     });
+  // pcisQueryService.befChangeSts(param)
+  //   .then((res) => {
+  //     // const { code, data, msg } = res;
+  //     // if (200 === code) {
+  //     //   if(msg === 'OK') {
+  //     //     dzmodal.open(payConfirmInfoChange, { type: "check" , data:{
+  //     //       CUniqueNos: CUniqueNos,
+  //     //       CRelAppNos: CRelAppNos
+  //     //     }}).then((res) => {
+  //     //       if (res.type === "ok") {
+  //     //         console.log("审核")
+  //     //       }
+  //     //     });
+  //     //   }
+  //     // } else {
+  //     //   ElMessage.error(msg);
+  //     // }
+  //   })
+  //   .finally(() => {
+  //     dzmodal.open(payConfirmInfoChange, { type: "check" , data:{
+  //       CUniqueNos: CUniqueNos,
+  //       CRelAppNos: CRelAppNos
+  //     }}).then((res) => {
+  //       if (res.type === "ok") {
+  //         console.log("审核")
+  //       }
+  //     });
+  //   });
 }
 //给表单下拉项赋值
 function setFormItem(key, obj) {

@@ -32,7 +32,8 @@ import {
   createTableEditConfig,
   MyTableMethod,
 } from "@/shared/app-table-config";
-
+import { PcisQueryService } from '../service/pcis-query-service';
+const pcisQueryService = new PcisQueryService();
 const props = defineProps({
   data: Object,
   type: String,
@@ -68,45 +69,81 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "primary",
         label: "登记",
         func: async () => {
-          console.log("登记")
+            freeEditRef.value?.validate().then((isValid) => {
+                if (isValid) {
+                    let param = freeEditRef.value?.getFromValue(); //获取表单数据
+                    console.log(param)
+                    pcisQueryService.payConfirmInfoReistster(param)
+                        .then((res) => {
+                            const { code, data, msg } = res;
+                            if (200 === code) {
+                                emits("ok", {});
+                                ElMessage.success(msg);
+                                // dialogVisible.value = false;
+                            } else {
+                                ElMessage.error(msg);
+                            }
+                        })
+                        .finally(() => {});
+                } else {
+                    ElMessage.error("请填写必填项");
+                }
+            });
         },
       }),
       createFreeButtonBase({
         type: "primary",
         label: "提交审核",
         func: async () => {
-          console.log("提交审核")
+            freeEditRef.value?.validate().then((isValid) => {
+                if (isValid) {
+                    let param = freeEditRef.value?.getFromValue(); //获取表单数据
+                    console.log(param)
+                    pcisQueryService.payConfirmInfoSubmit(param)
+                        .then((res) => {
+                            const { code, data, msg } = res;
+                            if (200 === code) {
+                                emits("ok", {});
+                                ElMessage.success(msg);
+                                // dialogVisible.value = false;
+                            } else {
+                                ElMessage.error(msg);
+                            }
+                        })
+                        .finally(() => {});
+                } else {
+                    ElMessage.error("请填写必填项");
+                }
+            });
         },
       }),
     ],
     fromSchema: [
-    {
-				prop: "CDptCde",
-				inputtype: "rtselect",
-				title: "业务机构",
-        typeCode: "PLYDPT_LIST",
-				
-				param: { 'CDptCde': '' }, //待添加
-			},
+      {
+        prop: "CDptCde",
+        inputtype: "rtselect",
+        title: "业务机构",
+        // typeCode: "PLYDPT_LIST",
+        // param: { 'CDptCde': '' }, //待添加
+      },
       {
         prop: "CProdNo",
         inputtype: "rtselect",
         title: "产品",
-        typeCode: "PROD_LIST",
+        typeCode: "PROD_LIST_IN_GUIDE",
         
       },
       {
         prop: "CAppTyp",
         inputtype: "rtselect",
         title: "申请类型",
-        
         loadData :[
           { label:'投保',value:"A" },
           { label:'批改',value:"E" },
         ]
       },
       {
-        prop: "CCurrency",
+        prop: "CCurNo",
         inputtype: "rtselect",
         title: "币种",
         typeCode: "CURRENCY_LIST"
@@ -122,19 +159,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
       },
       {
-        prop: 'NPayAmt',
+        prop: 'NPrm',
         title: '实收金额',
         inputtype: "rtinput",
       },
       {
-        prop: '',
+        prop: 'CChargeCde',
         title: '支票(票据)收款人',
         inputtype: "rtinput",
       },
       {
-        prop: '',
+        prop: 'CSeqNo',
         title: '出票人账号',
         inputtype: "rtinput",
+        rules: [getRules("required", {})],
       },
       {
         prop: 'TBgnTm',
@@ -172,7 +210,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         
       },
       {
-        prop: '',
+        prop: 'NPayAmt',
         title: '支票（收据）金额',
         inputtype: "rtinput",
       },
@@ -192,14 +230,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
       },
       {
-        prop: 'CChqueNo',
-        title: '支票号',
+        prop: 'CPayNme',
+        title: '出票人',
         inputtype: "rtinput",
       },
       {
-        prop: 'NPrm',
-        title: '实收保费',
+        prop: 'CChequeNo',
+        title: '支票号',
         inputtype: "rtinput",
+        rules: [getRules("required", {})],
       },
       {
         prop: 'TPayConfTm',
@@ -216,12 +255,35 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 );
 onMounted(async () => {
   if (props.type === "edit" && props.data) {
-    setTimeout(() => {
-      freeEditRef.value?.setFormValue(props.data);
-    }, 50);
+    // setTimeout(() => {
+    //   freeEditRef.value?.setFormValue(props.data);
+    // }, 50);
+      nextTick(()=>{
+          const param = {
+              'CUniqueNo': props.data.CUniqueNos,
+          };
+          loadPayConfirmInfo(param);
+      })
   }
 });
-
+function loadPayConfirmInfo(param: any) {
+    pcisQueryService.loadPayConfirmInfo(param).then((res: any) => {
+        if (null != res && null != res['code']) {
+            if (res['code'] === 200) {
+                const data = res['data'];
+                console.log("eeeeeeee", data)
+                const newdata = {};
+                Object.keys(data).forEach((key) => {
+                    const k = firstCharUpper(key);
+                    newdata[k] = data[key];
+                });
+                freeEditRef.value?.setFormValue(newdata);
+            }
+        }
+    }, error => {
+        this.msg.error('连接失败！' + error, {nzDuration: 5000});
+    });
+}
 /* 获取全量表单数据 */
 function getFrom() {
   let s = freeEditRef.value?.getFromValue(); //获取表单数据
@@ -247,6 +309,16 @@ function getFrom() {
     }
     return param;
   }
+}
+/**
+ * 首字母转换大写
+ * @param {string} str
+ * @returns {string}
+ */
+function  firstCharUpper(str: string) {
+    return str.replace(/\b(\w)(\w*)/g, function ($0, $1, $2) {
+        return $1.toUpperCase() + $2;
+    });
 }
 </script>
 

@@ -358,7 +358,7 @@ export class PcisQueryService {
      * 获取支付号
      */
     getPaymentNo(param) {
-        return post('policy/getPaymentNoZL', { source: JSON.stringify(param) });
+        return post('policy/getPaymentNo', { source: JSON.stringify(param) });
     }
 
     /**
