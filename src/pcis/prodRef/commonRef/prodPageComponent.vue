@@ -95,8 +95,8 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtselect",
         title: "归属tab",
         typeCode: "tablist",
-        func: (v) => {
-          const sdata = tableRef.value?.getSelectRow();
+        func: (v: any,r: any) => {
+          const sdata = r;
           const params = {
             cComponentTab: v,
           };
