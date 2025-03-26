@@ -1,5 +1,6 @@
 import {AxiosPromise} from "axios";
 import {post} from "@/utils/http";
+import {get} from "@/utils/http";
 import {del} from "@/utils/http";
 import { LocalBaseApi } from "../config";
 
@@ -899,6 +900,9 @@ export function qryBatchUndrDtyList(queryParams: any): AxiosPromise<any> {
 export function delBatchUndrDtyInfo(queryParams: any): AxiosPromise<any> {
     return post(`/proddef/delBatchUndrDtyInfo`, queryParams);
 }
+export function delSelectedUndrDtyInfo(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/delSelectedUndrDtyInfo`, queryParams);
+}
 
 /**
  * 商品配置列表查询
@@ -1156,4 +1160,15 @@ export function getNmeByCde(ops: any): AxiosPromise<any>  {
  */
 export function getpSpecialAgreement(queryParams: any): AxiosPromise<any>  {
     return post('/proddef/getpSpecialAgreement',  queryParams);
+}
+/**
+ * 获取产品列表
+ * @param queryParams 
+ * @returns 
+ */
+export function getProdEnableList(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/getProdEnableList`, queryParams);
+}
+export function expExcelUndrDty(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/expExcelUndrDty`, queryParams);
 }

@@ -11,7 +11,7 @@ import { LocalBaseApi } from "../config";
  * @param queryParams
  */
 export function getProdEnableList(queryParams: any): AxiosPromise<any> {
-    return get(`/proddef/getProdEnableList`, queryParams);
+    return post(`/proddef/getProdEnableList`, queryParams);
 }
 export function qryUserCommonTerm(queryParams: any): AxiosPromise<any> {
     return post(`/userTerm/qryUserCommonTerm`, queryParams);
