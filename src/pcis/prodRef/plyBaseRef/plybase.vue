@@ -472,14 +472,55 @@ const method = {
       setValue("Base.cCanclfeersnCde", "");
     }
   },
+  //项目类别大类change事件
+  cPrjCtgTypChange: (val) => {
+    setValue("Base.cPrjCtgMidTyp", "");
+    setValue("Base.cPrjCtgSubTyp", "");
+    if (val) {
+      codeListStore
+        .queryCodeList({
+          codeListName: "CPrjCtgTyp_List",
+          codeListParam: {
+            CRangeCde: subDptCde.value,
+            CParCde: val,
+            cLev: "2",
+          },
+        })
+        .then((res) => {
+          if (res) {
+            setFormItem("Base.cPrjCtgMidTyp", { loadData: res });
+          }
+        });
+    }
+  },
+  //项目类别中类change事件
+  cPrjCtgMidTypChange: (val) => {
+    setValue("Base.cPrjCtgSubTyp", "");
+    if (val) {
+      codeListStore
+        .queryCodeList({
+          codeListName: "CPrjCtgTyp_List",
+          codeListParam: {
+            CRangeCde: subDptCde.value,
+            CParCde: val,
+            cLev: "3",
+          },
+        })
+        .then((res) => {
+          if (res) {
+            setFormItem("Base.cPrjCtgSubTyp", { loadData: res });
+          }
+        });
+    }
+  },
 };
 
 // 绑定特殊验证器
 const exRules = {};
 
 function getCheckCdeptByCdptCde() {
-  const CDptCde = getValue("Base.cDptCde");
-  // const CDptCde = '0261010410270'  //先写死，实际要用上面那行
+  // const CDptCde = getValue("Base.cDptCde");
+  const CDptCde = JSON.parse(sessionStorage.getItem("user")).companyId;
   if (CDptCde) {
     // 查询承保机构所属分公司
     checkCdeptByCdptCde({ dptCde: CDptCde }).then(
@@ -493,17 +534,17 @@ function getCheckCdeptByCdptCde() {
                 {
                   codeListName: "CPrjCtgTyp_List",
                   codeListParam: {
-                    CRangeCde: ["0200000000000", subDptCde.value],
-                    CParCde: "-1",
+                    CRangeCde: subDptCde.value,
+                    // CParCde: "",
                     cLev: "1",
                   },
                 },
                 false,
                 false
               )
-              .then((result) => {
-                if (result.data) {
-                  setFormItem("Base.cPrjCtgTyp", { loadData: result.data });
+              .then((res) => {
+                if (res) {
+                  setFormItem("Base.cPrjCtgTyp", { loadData: res });
                 }
               })
               .catch((err) => {

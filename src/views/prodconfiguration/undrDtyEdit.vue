@@ -64,6 +64,8 @@ const formconfig = reactive<AppFreeEditConfig>(
               selectObj.forEach((item, index) => {
                 gridEditRef.value?.addRowByData({
                   cProdNme: item.value,
+                  cUndrClsCde: freeEditRef.value?.getValue("cUndrClsCde"),
+                  // cStatus: "0",
                 });
               });
               console.log("子组件传过来的值", res);
@@ -179,6 +181,19 @@ const gridconfig = reactive<AppGridEditConfig>(
         label: "新增",
         func: async function () {
           gridEditRef.value?.addRowByData({ cGrpMrk: "0" });
+        },
+      }),
+      createFreeButtonBase({
+        type: "primary",
+        label: "删除",
+        func: async function () {
+          const selData = gridEditRef?.value?.getSelectRow();
+          if (!selData) {
+            ElMessage.error("请选择要删除的数据!");
+            return;
+          }
+          const editIndex = selData["_dataId"];
+          gridEditRef?.value?.delRow(editIndex);
         },
       }),
       createFreeButtonBase({

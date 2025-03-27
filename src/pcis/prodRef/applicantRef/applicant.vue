@@ -9,10 +9,11 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
-import { useValidator } from "@/typings/useValidator";
+
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
 import moment from "moment";
+import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 import { useProductStore } from "@/store/modules/prod";
 const productStore = useProductStore();

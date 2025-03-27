@@ -78,8 +78,6 @@ const method = {
   },
   funcquery: () => {
     const param = opertaor.getParam();
-    console.log(param);
-    console.log(dialog.value);
     dialog.value?.open(
       "querycustomerView",
       {

@@ -87,12 +87,10 @@ const handleCheckChange = (
   checked: boolean,
   indeterminate: boolean
 ) => {
-  arrData.value = treeRef.value!.getCheckedNodes();
-  console.log("arr", arrData);
+  arrData.value = treeRef.value.getCheckedNodes();
 };
 const handleSave = () => {
   if (arrData.value.length) {
-    console.log("选中的节点", arrData.value);
     emits("ok", arrData.value);
   }
   dialogVisible.value = false;
