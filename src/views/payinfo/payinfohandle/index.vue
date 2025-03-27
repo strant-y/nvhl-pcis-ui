@@ -27,9 +27,12 @@ import {
 	createTableEditConfig,
 } from "@/shared/app-table-config";
 import { PcisQueryService } from '../service/pcis-query-service';
+import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { log } from "console";
+import { saveAs } from 'file-saver';
 const pcisQueryService = new PcisQueryService();
+const policyService = new PolicyService();
 const dzmodal = useDzModal();
 // const departmentTree = defineAsyncComponent(
 // 	() => import("@/components/common/DepartmentTree.vue")
@@ -84,6 +87,70 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 						freeEditRef.value?.setValue('TUnTmStart', startTm)
 						freeEditRef.value?.setValue('TUnTmEnd', endTm)
 					  })
+					},
+				}),
+				createFreeButtonBase({
+					label: "导出Excel",
+					func: () => {
+						const r = tableRef.value?.getPartnerPage(); //获取分页数据
+						const s = freeEditRef.value?.getFromValue(); //获取表单数据
+						const param = Object.assign(s, r, {
+							sortField: 'name',
+							_allow_anonymous: true,
+							CurrentUser: user.value['opCde'],
+							CurrentUserOrg: user.value['companyId'],
+							CType:'queryPayConfrimList',
+						});
+						console.log(param)
+                        param['pageSize']=1000
+						policyService.excelDown(param).then((res: any) => {
+							if (res.size <= 0) {
+								ElMessage.error({ message: '下载出错', duration: 3000 });
+								return;
+							}
+							const fileName = `缴费信息.xls`;
+                            const blob = new Blob([res.data], { type: 'application/vnd.ms-excel' });
+                            saveAs(blob, fileName);
+						}).catch((err: any) => {
+							ElMessage.error({ message: err, duration: 3000 });
+						});
+					},
+				}),
+				createFreeButtonBase({
+					label: "打印缴费通知书",
+					func: () => {
+                        if (multipleSelection.value.length < 1 ) {
+                            ElMessage.warning('所选记录为空！');
+                            return ;
+                        }
+                        if (multipleSelection.value.length > 1 ) {
+                            ElMessage.warning('所选记录为只能为一条！');
+                            return ;
+                        }
+                        let CAppNos = ''; // 所选项的流水号组合
+                        let CProdNos = ''; // 所选项的流水号组合
+                        multipleSelection.value.forEach(item => {
+                            CAppNos = CAppNos === '' ? item['cAppNo'] : CAppNos + ',' + item['cAppNo'];
+                            CProdNos = CProdNos === '' ? item['cProdNo'] : CProdNos + ',' + item['cProdNo'];
+                        });
+                        const param = {
+                            "CLanguage": 'C',
+                            "CProdNo": CProdNos,
+                            "CAppNoMulti": CAppNos,
+                            "CPrnType": 'W'
+                        };
+                        console.log(param)
+                        pcisQueryService.smartbipreview(param)
+                            .then((res) => {
+                                const { code, data, msg } = res;
+                                if (200 === code) {
+                                    ElMessage.success(msg);
+                                    handleQuery();
+                                } else {
+                                    ElMessage.error(msg);
+                                }
+                            })
+                            .finally(() => { });
 					},
 				}),
 		],
@@ -400,12 +467,14 @@ const tableconfig = reactive<AppTableConfig>(
 							return ;
 						}
                         let CAppNos = '';
+                        let CProdNos = '';
                         let CUniqueNos = ''; // 所选项的流水号组合
                         let CRelAppNos = '';
                         let isOpen =  false;
                         let message = '';
                         multipleSelection.value.forEach(item => {
                             CUniqueNos = CUniqueNos === '' ? item['cUniqueNo'] : CUniqueNos + ',' + item['cUniqueNo'];
+                            CProdNos = CProdNos === '' ? item['cProdNo'] : CProdNos + ',' + item['cProdNo'];
                             let cRelAppNo = '';
                             if (!!item['cRelAppNo']) {
                                 cRelAppNo = item['cRelAppNo'];
@@ -449,6 +518,22 @@ const tableconfig = reactive<AppTableConfig>(
                             ElMessage.warning(message);
                             return;
                         }
+                        const param = {
+                            "CAppNos": CAppNos,
+                            "CUniqueNos": CUniqueNos,
+                        };
+                        console.log(param)
+                        pcisQueryService.needFeeToBack(param)
+                            .then((res) => {
+                                const { code, data, msg } = res;
+                                if (200 === code) {
+                                    ElMessage.success(msg);
+                                    handleQuery();
+                                } else {
+                                    ElMessage.error(msg);
+                                }
+                            })
+                            .finally(() => { });
 					},
 				}),
 				createFreeButtonBase({

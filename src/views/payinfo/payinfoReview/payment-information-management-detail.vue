@@ -126,8 +126,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "CRegDptCde",
         inputtype: "rtselect",
-        typeCode: "PLYDPT_LIST",
-        param: { cIsValid: '1', userOrg: user.value.companyId },
+        // typeCode: "PLYDPT_LIST",
+        // param: { cIsValid: '1', userOrg: user.value.companyId },
         title: "业务机构",
         itemWidth: 2,
       },
@@ -189,37 +189,62 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "印花税",
         // rules: [getRules("required", {})],
       },
-      {
-        prop: "CProvinces",
-        inputtype: "rtcascader",
-        typeCode: "WEB_BAS_AREA",
-        param: { cParCde: '1', cType: '1' },
-        title: "开户行省",
-        // rules: [getRules("required", {})],
-      },
-      {
-        prop: "CCity",
-        inputtype: "rtcascader",
-        typeCode: "WEB_BAS_AREA",
-        param: { cParCde: '0', cType: '2' },
-        title: "开户行市",
-        // rules: [getRules("required", {})],
-      },
-      {
-        prop: "CBankCounty",
-        inputtype: "rtcascader",
-        typeCode: "WEB_BAS_AREA",
-        param: { cParCde: '0', cType: '3' },
-        title: "开户行县",
-        // rules: [getRules("required", {})],
-      },
+      // {
+      //   prop: "CProvinces",
+      //   inputtype: "rtcascader",
+      //   typeCode: "WEB_BAS_AREA",
+      //   param: { cParCde: '1', cType: '1' },
+      //   title: "开户行省",
+      //   // rules: [getRules("required", {})],
+      // },
+      // {
+      //   prop: "CCity",
+      //   inputtype: "rtcascader",
+      //   // typeCode: "WEB_BAS_AREA",
+      //   // param: { cParCde: '0', cType: '2' },
+      //   title: "开户行市",
+      //   // rules: [getRules("required", {})],
+      // },
+      // {
+      //   prop: "CBankCounty",
+      //   inputtype: "rtcascader",
+      //   // typeCode: "WEB_BAS_AREA",
+      //   // param: { cParCde: '0', cType: '3' },
+      //   title: "开户行县",
+      //   // rules: [getRules("required", {})],
+      // },
+        {
+            prop: "cascaderarea",
+            inputtype: "rtcascader",
+            title: "开户行",
+            // rules: [required()],
+            typeCode:'getarealist',
+             codeParam:{cParCde:'1'},
+            // loadData:[{"label":"中国","value":"1"}],
+            cascaderprops:['CProvinces','CCity','CBankCounty'],
+            showExBtn: true,
+            maxlevel:3,
+            btnWidth: 30,
+            // btnItems: createFreeButtonBase({
+            //     label: "测试塞值",
+            //     func: function () {
+            //         freeEditRef.value?.setFormValue({
+            //             'CProvinces':'120000',
+            //             'CCity':'120102',
+            //             'CBankCounty':'120102'
+            //         });
+            //         const t = freeEditRef.value?.getFromValue();
+            //         console.log(t);
+            //     },
+            // }),
+        },
       {
         prop: "CBankNme",
         inputtype: "rtselect",
         title: "收款银行大类",
         // rules: [getRules("required", {})],
         typeCode: "SELECT_CBANKRELTYP",
-        //  params: {'cParCde': ['0', '1', '2', '3', '4', '5', '6', '7', '9']},
+         params: {'cParCde': ['0', '1', '2', '3', '4', '5', '6', '7', '9']},
       },
       {
         prop: "CBankcode",
@@ -266,9 +291,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       },
       {
         prop: "CBankCde",
-        inputtype: "rtselect",
-        typeCode: "BANK_QUERY",
-        param: { CdptCde: user.value.companyId },
+        inputtype: "rtinput",
+        // typeCode: "BANK_QUERY",
+        // param: { CdptCde: user.value.companyId },
         title: "收款人账号",
         rules: [getRules("required", {})],
       },
@@ -314,23 +339,23 @@ function numberFormat(value: any, precision: number) {
 };
 
 // 加载缴费信息明细
-function loadPayConfirmInfo(CChqueNo: string) {
-  if (CChqueNo) {
-    const param = { CChqueNo:CChqueNo, CurrentUser: user.value.opCde };
+function loadPayConfirmInfo(param) {
+    console.log(param)
     pcisQueryService.loadPayConfirmInfo(param).then((res: any) => {
       const { code, data, msg } = res;
       if (res.code === 200) {
-        // 之前代码貌似，执行数字小数点设置
-        const NPayAmt = numberFormat(Number(data.NPayAmt), 2);
-        const NPrm = numberFormat(Number(data.NPrm), 2);
-        freeEditRef.value?.setFormValue(data);
-        freeEditRef.value?.setValue("NPayAmt", NPayAmt);
-        freeEditRef.value?.setValue("NPrm", NPrm);
+          const data = res['data'];
+          console.log("eeeeeeee", data)
+          const newdata = {};
+          Object.keys(data).forEach((key) => {
+              const k = firstCharUpper(key);
+              newdata[k] = data[key];
+          });
+          freeEditRef.value?.setFormValue(newdata);
       }
     }).catch((error: any) => {
       ElMessage.error({ message: '连接失败！' + error, duration: 3000 });
     });
-  }
 };
 
 // 支票通过
@@ -378,7 +403,12 @@ function backInfo() {
 
 
 onMounted(async () => {
-  loadPayConfirmInfo(props.CChqueNo);
+  nextTick(()=>{
+      const param = {
+          'CUniqueNo': props.data.cUniqueNo,
+      };
+      loadPayConfirmInfo(param);
+  })
 });
 
 // 绑定方法
@@ -425,6 +455,16 @@ function getFrom() {
     }
     return param;
   }
+}
+/**
+ * 首字母转换大写
+ * @param {string} str
+ * @returns {string}
+ */
+function  firstCharUpper(str: string) {
+    return str.replace(/\b(\w)(\w*)/g, function ($0, $1, $2) {
+        return $1.toUpperCase() + $2;
+    });
 }
 </script>
 

@@ -538,6 +538,7 @@ const setPayInfo = (base, applicant) => {
   pay["Pay.tPayBgnTm"] = base["Base.tAppTm"];
   pay["Pay.tPayEndTm"] = base["Base.tInsrncBgnTm"];
   pay["Pay.nOwnPrm"] = base["Base.nPrm"];
+  pay['Pay.nPrmVar'] = !!base['Base.nPrm'] ? base['Base.nPrm'] : 0;
   payList.push(pay);
   return payList;
 };

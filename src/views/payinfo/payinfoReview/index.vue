@@ -41,9 +41,10 @@ const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
 const removeIds = ref([]); // 删除用户ID集合 用于批量删除
-const departmentTree = defineAsyncComponent(
-  () => import("@/components/common/DepartmentTree.vue")
-);
+// const departmentTree = defineAsyncComponent(
+//   () => import("@/components/common/DepartmentTree.vue")
+// );
+import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 // 缴费信息审核-详情
 const detail = defineAsyncComponent(
   () => import("./payment-information-management-detail.vue")
@@ -71,28 +72,39 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       }),
     ],
     fromSchema: [
-      {
-        prop: "AccDpt",
-        inputtype: "rtselect",
-        title: "核保机构",
-        btnWidth: 10,
-        itemWidth: 2,
-        defaultValue: user.value.companyId,
-        rules: [getRules("required", {})],
-        showExBtn: true,
-        btnItems: {
-          icon: "Search",
-          type: "primary",
-          func: () => {
-            dzmodal
-              .open(departmentTree, { type: "Issuer", data: {} })
-              .then((res) => {
-                if (res.type === "ok") {
-                }
-              });
-          },
+        {
+            prop: "AccDpt",
+            inputtype: "rtselect",
+            title: "机构部门",
+            btnWidth: 10,
+            itemWidth: 2,
+            // rules: [getRules("required", {
+            //   trigger: 'change'
+            // })],
+            showExBtn: true,
+            btnItems: {
+                icon: "Search",
+                type: "primary",
+                func: () => {
+                    dzmodal
+                        .open(DepartmentTree, { type: "Issuer", data: {} })
+                        .then((res) => {
+                            if (res.body) {
+                                const selectObj = res.body;
+                                freeEditRef.value?.setValue("AccDpt", selectObj.id);
+                                setFormItem("AccDpt", {
+                                    loadData: [
+                                        {
+                                            label: selectObj.name,
+                                            value: selectObj.id,
+                                        },
+                                    ],
+                                });
+                            }
+                        });
+                },
+            },
         },
-      },
       {
         prop: "LoadSub",
         inputtype: "rtcheckbox",
@@ -113,7 +125,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           { label: "起保日期", value: "2" },
           { label: "缴费处理日期", value: "3" },
         ],
-        defaultValue: "1",
         rules: [getRules("required", {})],
       },
       {
@@ -126,12 +137,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "datetimerange",
         format: "YYYY-MM-DD HH:mm:ss",
         valueFormat: "YYYY-MM-DD HH:mm:ss",
-        defaultValue: [
-          moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
-            "YYYY-MM-DD 00:00:00"
-          ),
-          moment(new Date()).format("YYYY-MM-DD 23:59:59"),
-        ],
+        // defaultValue: [
+        //   moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
+        //     "YYYY-MM-DD 00:00:00"
+        //   ),
+        //   moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+        // ],
       },
       {
         prop: "CBillTyp",
@@ -205,7 +216,7 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "Edit",
         tableClick: (row) => {
           dzmodal
-            .open(detail, { type: "edit", data: { CChqueNo: row.cChqueNo } })
+            .open(detail, { type: "edit", data: { cUniqueNo: row.cUniqueNo } })
             .then((res) => {
               if (res.type === "ok") {
                 handleQuery(true);
@@ -218,18 +229,20 @@ const tableconfig = reactive<AppTableConfig>(
     fromSchema: [
       {
         prop: "cPayTyp",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "缴费类型",
         minWidth: 180,
         fixed: "left",
-        formatter: (val) => {
-          const CStatusList = [
-            { value: "2", label: "支票缴费" },
-            { value: "5", label: "转账" },
-          ];
-          const result = CStatusList.find((item) => item.value === val);
-          return result ? result.label : val;
-        },
+        typeCode: "CHARGE_TYPE_CACHE",
+        param: {'cCde': [ '2', '3', '5',  '99']},
+        // formatter: (val) => {
+        //   const CStatusList = [
+        //     { value: "2", label: "支票缴费" },
+        //     { value: "5", label: "转账" },
+        //   ];
+        //   const result = CStatusList.find((item) => item.value === val);
+        //   return result ? result.label : val;
+        // },
       },
       {
         prop: "cChqueNo",
@@ -278,8 +291,15 @@ const tableconfig = reactive<AppTableConfig>(
 );
 
 onMounted(async () => {
-  pageresult.list = [{}];
-  pageresult.total = 1;
+  nextTick(()=>{
+      freeEditRef.value?.setValue('CDateTyp', '1')
+      freeEditRef.value?.setValue("dateRange", [
+          moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
+              "YYYY-MM-DD 00:00:00"
+          ),
+          moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+      ]);
+  })
   // handleQuery(true);
 });
 
@@ -347,6 +367,16 @@ function handleQuery(flag?: boolean) {
       });
     }
   });
+}
+//给表单下拉项赋值
+function setFormItem(key, obj) {
+    if (obj && Object.keys(obj).length) {
+        formconfig1.fromSchema?.forEach(item => {
+            if (item.prop === key) {
+                Object.assign(item, obj)
+            }
+        })
+    }
 }
 </script>
 
