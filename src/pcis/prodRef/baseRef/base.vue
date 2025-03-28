@@ -83,6 +83,22 @@ const method = {
       setValue("Base.nAmtRmbExch", "1.000000");
     }
   },
+  //保额汇率标识change事件
+  cInsExchCdeChange(val: any) {
+    if (val == "0") {
+      setFormItem("Base.nAmtRmbExch", { disabled: false });
+    } else {
+      setFormItem("Base.nAmtRmbExch", { disabled: true });
+    }
+  },
+  //保费汇率标识change事件
+  cPremExchCdeChange(val: any) {
+    if (val == "0") {
+      setFormItem("Base.nPrmRmbExch", { disabled: false });
+    } else {
+      setFormItem("Base.nPrmRmbExch", { disabled: true });
+    }
+  },
   // 特别约定ICON事件
   selectCUnfixSpc: () => {
     dialogRef.value?.open(
@@ -152,6 +168,7 @@ function setFormItem(key, obj) {
   if (obj && Object.keys(obj).length) {
     formconfig1.fromSchema?.forEach((item) => {
       if (item.prop === key) {
+        //控制尾部按钮的
         Object.assign(item, obj);
       }
     });

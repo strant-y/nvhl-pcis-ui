@@ -302,6 +302,8 @@ async function loadAfter() {
       baseafterobj["Base.cRatioTyp"] = "3";
       baseafterobj["Base.cInstMrk"] = "0";
       baseafterobj["Base.cDisptSttlCde"] = "B";
+      baseafterobj["Base.cInsExchCde"] = "1";
+      baseafterobj["Base.cPremExchCde"] = "1";
       baseafterobj["Base.cPrmCur"] = "CNY";
       baseafterobj["Base.cAmtCur"] = "CNY";
       baseafterobj["Applicant.cStkMrk"] = "0";

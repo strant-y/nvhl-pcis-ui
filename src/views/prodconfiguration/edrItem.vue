@@ -48,7 +48,7 @@ const cPard = ref(null);
 const selectedKindNo = ref<string | null>(null);
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    title: "批改原因配置",
+    title: "批改项配置",
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
@@ -63,10 +63,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         label: "重置",
         icon: "RefreshRight",
         func: () => {
-            const val = freeEditRef.value?.getFromValue();
-            for (const k in val) {
-                val[k] = null;
-            }
+          const val = freeEditRef.value?.getFromValue();
+          for (const k in val) {
+            val[k] = null;
+          }
         },
       }),
     ],

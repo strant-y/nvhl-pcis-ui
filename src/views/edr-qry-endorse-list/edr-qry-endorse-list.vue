@@ -16,7 +16,6 @@
 <script setup lang="ts">
 import { defineComponent, ref, reactive, onMounted, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { ElMessage, ElMessageBox } from "element-plus";
 import moment from "moment";
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 import ChangeImageUploadModeComponent from "./change-image-upload-mode.vue";
@@ -24,6 +23,7 @@ import { PcisEdrQueryService } from "./service/pcis-edr-query-service";
 import { getListByCode } from "@/api/code-list-service";
 import { useUserStore } from "@/store/modules/user";
 import { AppKey } from "@/constants/api";
+import { getProdEnableList } from "@/api/prod/";
 import {
   DEFERRED_CORRECTION,
   SCENE_EDR_APP_NEW,
@@ -44,6 +44,8 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
 const { getRules } = useValidator();
 const dzmodal = useDzModal();
 
@@ -83,6 +85,7 @@ const orgDptOptions = ref<any>([]);
 const commodityOptions = ref<any>([]);
 const kindOptions = ref<any>([]);
 const prodOptions = ref<any>([]);
+const treeNodes = ref<any>([]);
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -132,7 +135,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
       },
       {
-        prop: "CLoadSub",
+        prop: "cLoadSub",
         inputtype: "rtradio",
         title: "是否包含下级",
         loadData: [
@@ -142,19 +145,21 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         defaultValue: 1,
       },
       {
-        prop: "CKindNo",
+        prop: "cKindNo",
         inputtype: "rtcascader",
         title: "产品大类",
         clearable: true,
-        typeCode: "KIND_LIST_CACHE",
-        param: {
-          cOperId: user.value["opCde"],
-          cDptCde: user.value["companyId"],
-        },
+        loadData: treeNodes.value,
+        func: (val) => {},
+        // typeCode: "KIND_LIST_CACHE",
+        // param: {
+        //   cOperId: user.value["opCde"],
+        //   cDptCde: user.value["companyId"],
+        // },
       },
       {
-        prop: "CProdNo",
-        inputtype: "rtcascader",
+        prop: "cProdNo",
+        inputtype: "rtselect",
         title: "条款",
         clearable: true,
         typeCode: "PROD_LIST",
@@ -165,25 +170,25 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
       },
       {
-        prop: "CInsuredNme",
+        prop: "cInsuredNme",
         inputtype: "rtinput",
         title: "被保人名称",
         clearable: true,
       },
       {
-        prop: "CAppNme",
+        prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
         clearable: true,
       },
       {
-        prop: "CPlyNo",
+        prop: "cPlyNo",
         inputtype: "rtinput",
         title: "保单号",
         clearable: true,
       },
       {
-        prop: "TAppTm",
+        prop: "tAppTm",
         inputtype: "rtdatepicker",
         title: "投保日期",
         type: "datetimerange",
@@ -311,30 +316,30 @@ const submitForm = (flag) => {
 
 const refreshData = (reset = true) => {
   const formData = freeEditRef.value?.getFromValue();
-  if (!formData.CPlyNo) {
-    const startTemp =
-      formData.TAppTm && formData.TAppTm.length > 1 ? formData.TAppTm[0] : null;
-    if (null == startTemp || undefined === startTemp) {
-      ElMessage.warning("投保起期不能为空");
-      return;
-    }
-    const start = Date.parse(startTemp);
-    const endTemp =
-      formData.TAppTm && formData.TAppTm.length > 1 ? formData.TAppTm[1] : null;
-    if (null == endTemp || undefined === endTemp) {
-      ElMessage.warning("投保止期不能为空");
-      return;
-    }
-    const end = Date.parse(endTemp);
-    if (start - end > 0) {
-      ElMessage.warning("投保起期不能大于投保止期");
-      return;
-    }
-    if (end - start >= 7 * 1000 * 60 * 60 * 24) {
-      ElMessage.warning("投保时间范围请控制在7天以内");
-      return;
-    }
-  }
+  // if (!formData.CPlyNo) {
+  //   const startTemp =
+  //     formData.TAppTm && formData.TAppTm.length > 1 ? formData.TAppTm[0] : null;
+  //   if (null == startTemp || undefined === startTemp) {
+  //     ElMessage.warning("投保起期不能为空");
+  //     return;
+  //   }
+  //   const start = Date.parse(startTemp);
+  //   const endTemp =
+  //     formData.TAppTm && formData.TAppTm.length > 1 ? formData.TAppTm[1] : null;
+  //   if (null == endTemp || undefined === endTemp) {
+  //     ElMessage.warning("投保止期不能为空");
+  //     return;
+  //   }
+  //   const end = Date.parse(endTemp);
+  //   if (start - end > 0) {
+  //     ElMessage.warning("投保起期不能大于投保止期");
+  //     return;
+  //   }
+  //   if (end - start >= 7 * 1000 * 60 * 60 * 24) {
+  //     ElMessage.warning("投保时间范围请控制在7天以内");
+  //     return;
+  //   }
+  // }
   const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   if (s.CLoadSub) {
@@ -345,7 +350,7 @@ const refreshData = (reset = true) => {
     sortOrder: sortOrder.value,
     CurrentUser: user["opCde"],
     CurrentUserOrg: user["companyId"],
-    CCommodityType: null,
+    cCommodityType: null,
   };
   const params = Object.assign(s, r, obj);
   sessionStorage.setItem(AppKey.query.pcis_query_endorse, params);
@@ -691,7 +696,22 @@ const transferRsnDetail = (rsnDetail) => {
   return str;
 };
 
-onMounted(() => {});
+onMounted(() => {
+  // function loadTree() {
+  // nodes.value = [];
+  const param = {
+    // name: formconfig1.value.name,
+    level: 2,
+  };
+  getProdEnableList(param).then((res: any) => {
+    if (res.code === 200) {
+      treeNodes.value = res.data;
+    } else {
+      ElMessage.error(res.msg);
+    }
+  });
+  // }
+});
 
 watch(dialogVisible, (newValue) => {
   if (!newValue) {
