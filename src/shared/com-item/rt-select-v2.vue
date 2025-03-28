@@ -194,7 +194,7 @@ watch(
         .queryCodeList(
           {
             codeListName: props.item.typeCode,
-            codeListParam: props.item.codeParam,
+            codeListParam: getParam(),
           },
           props.unAuthor,
           props.item.cache ? props.item.cache : true
@@ -223,6 +223,7 @@ function getLabel() {
   }
 }
 onMounted(() => {
+  console.log();
   // 初始化组件数据
   if (props.item) {
     if (!props.item.loadData && !props.item.typeCode) {
@@ -232,7 +233,7 @@ onMounted(() => {
         .queryCodeList(
           {
             codeListName: props.item.typeCode,
-            codeListParam: props.item.codeParam,
+            codeListParam: getParam(),
           },
           props.unAuthor,
           props.item.cache ? props.item.cache : true
@@ -247,4 +248,12 @@ onMounted(() => {
     }
   }
 });
+
+function getParam() {
+  if (props.item.codeParam && typeof props.item.codeParam === "string") {
+    return JSON.parse(props.item.codeParam);
+  }else{
+    return props.item.codeParam;
+  }
+}
 </script>

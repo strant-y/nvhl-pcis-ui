@@ -105,7 +105,7 @@ watch(
         .queryCodeList(
           {
             codeListName: props.item.typeCode,
-            codeListParam: props.item.codeParam,
+            codeListParam: getParam(),
           },
           false,
           props.item.cache ? props.item.cache : true
@@ -135,7 +135,7 @@ onMounted(() => {
         .queryCodeList(
           {
             codeListName: props.item.typeCode,
-            codeListParam: props.item.codeParam,
+            codeListParam: getParam(),
           },
           false,
           props.item.cache ? props.item.cache : true
@@ -150,4 +150,12 @@ onMounted(() => {
     }
   }
 });
+
+function getParam() {
+  if (props.item.codeParam && typeof props.item.codeParam === "string") {
+    return JSON.parse(props.item.codeParam);
+  }else{
+    return props.item.codeParam;
+  }
+}
 </script>
