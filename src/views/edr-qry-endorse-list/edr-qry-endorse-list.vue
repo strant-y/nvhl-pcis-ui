@@ -107,8 +107,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
     fromSchema: [
       {
-        prop: "CDptCde",
-        inputtype: "rtselect",
+        prop: "cDptCde",
+        inputtype: "rtSelectV2",
         title: "归属机构名称",
         showExBtn: true,
         disabled: true,
@@ -117,21 +117,40 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           icon: "Search",
           type: "primary",
           func: () => {
-            dzmodal.open(DepartmentTree, {}).then((res) => {
-              if (res.body) {
-                const selectObj = res.body;
-                let obj = {
-                  loadData: [
-                    {
-                      label: selectObj.name,
-                      value: selectObj.id,
-                    },
-                  ],
-                };
-                freeEditRef.value?.setValue("CDptCde", selectObj.name);
-              }
-            });
+            dzmodal
+              .open(DepartmentTree, { type: "Issuer", data: {} })
+              .then((res) => {
+                if (res.type === "ok") {
+                  if (res.body) {
+                    freeEditRef.value?.setValue("cDptCde", res.body.id);
+                    setFormItem("cDptCde", {
+                      loadData: [
+                        {
+                          label: res.body.name,
+                          value: res.body.id,
+                        },
+                      ],
+                    });
+                  }
+                }
+              });
           },
+          // func: () => {
+          //   dzmodal.open(DepartmentTree, {}).then((res) => {
+          //     if (res.body) {
+          //       const selectObj = res.body;
+          //       let obj = {
+          //         loadData: [
+          //           {
+          //             label: selectObj.name,
+          //             value: selectObj.id,
+          //           },
+          //         ],
+          //       };
+          //       freeEditRef.value?.setValue("CDptCde", selectObj.name);
+          //     }
+          //   });
+          // },
         },
       },
       {
@@ -146,28 +165,60 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       },
       {
         prop: "cKindNo",
-        inputtype: "rtcascader",
+        inputtype: "rtSelectV2",
         title: "产品大类",
         clearable: true,
-        loadData: treeNodes.value,
-        func: (val) => {},
-        // typeCode: "KIND_LIST_CACHE",
-        // param: {
-        //   cOperId: user.value["opCde"],
-        //   cDptCde: user.value["companyId"],
-        // },
+        typeCode: "KIND_LIST_CACHE",
+        params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
+        func: (val: any) => {
+          //根据产品大类再次请求条款接口
+          codeListStore
+            .queryCodeList(
+              {
+                codeListName: "PROD_LIST",
+                codeListParam: {
+                  cParCde: val,
+                  cOperId: user.value.opCde,
+                  cDptCde: user.value.companyId,
+                },
+              },
+              false,
+              false
+            )
+            .then((res) => {
+              if (res && res.code == 200) {
+                const codeValData = res.data;
+                if (codeValData) {
+                  //清空条款显示值，重置条款下拉值
+                  freeEditRef.value?.setValue("prodNo", "");
+                  setFormItem("prodNo", {
+                    loadData: codeValData,
+                  });
+                }
+              }
+            });
+          freeEditRef.value?.setValue("prodNo", []); // 清空条款
+          freeEditRef.value?.setValue("undrClsCde", ""); // 清空核保级别
+          // loadUndrClsListOptions(val[val.length - 1]); // 加载核保级别列表
+        },
       },
       {
         prop: "cProdNo",
         inputtype: "rtselect",
         title: "条款",
         clearable: true,
-        typeCode: "PROD_LIST",
-        param: {
+        typeCode: "TERM_LIST_IN_GUIDE_NEW",
+        params: {
           cParCde: "",
-          cOperId: user.value["opCde"],
-          cDptCde: user.value["companyId"],
+          cOperId: user.value.opCde,
+          cDptCde: user.value.companyId,
         },
+        // typeCode: "PROD_LIST",
+        // param: {
+        //   cParCde: "",
+        //   cOperId: user.value["opCde"],
+        //   cDptCde: user.value["companyId"],
+        // },
       },
       {
         prop: "cInsuredNme",
@@ -202,7 +253,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
   })
 );
-
+//给表单下拉项赋值
+function setFormItem(key, obj) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        Object.assign(item, obj);
+      }
+    });
+  }
+}
 const pageresult = reactive<Pageresult>({
   result: "",
   /** 数据列表 */
@@ -282,8 +342,18 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "id",
-        inputtype: "rtinput",
+        inputtype: "rtSelectV2",
         title: "批改原因",
+        loadData: [
+          { label: "新业务", value: "s1" },
+          { label: "新业务-团单", value: "s2" },
+          { label: "新业务-团单-团单在途", value: "s3" },
+          { label: "新业务-团单-团单在途-团单在途在保", value: "s4" },
+        ],
+        // func: (val) => {
+        //   if (val) {
+        //   }
+        // },
       },
       {
         prop: "iddetail",

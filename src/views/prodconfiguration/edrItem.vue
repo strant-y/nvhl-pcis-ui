@@ -178,7 +178,11 @@ const tableconfig = reactive<AppTableConfig>(
           dzmodal
             .open(edrItemEdit, {
               type: "add",
-              data: { cRsnCde: cRsnCde, cProdNo: cProdNo, cGrpMrk: cGrpMrk },
+              data: {
+                cRsnCde: cRsnCde,
+                cProdNo: cProdNo,
+                cGrpMrk: cGrpMrk,
+              },
             })
             .then((res) => {
               if (res.type === "ok") {

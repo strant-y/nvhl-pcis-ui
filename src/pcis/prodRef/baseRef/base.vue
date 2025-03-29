@@ -89,6 +89,7 @@ const method = {
       setFormItem("Base.nAmtRmbExch", { disabled: false });
     } else {
       setFormItem("Base.nAmtRmbExch", { disabled: true });
+      setValue("Base.nAmtRmbExch", "1.000000");
     }
   },
   //保费汇率标识change事件
@@ -97,6 +98,7 @@ const method = {
       setFormItem("Base.nPrmRmbExch", { disabled: false });
     } else {
       setFormItem("Base.nPrmRmbExch", { disabled: true });
+      setValue("Base.nPrmRmbExch", "1.000000");
     }
   },
   // 特别约定ICON事件

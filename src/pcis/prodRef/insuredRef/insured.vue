@@ -283,12 +283,18 @@ const method = {
       "cOccupCdeModal",
       {
         type: "show",
-        data: {},
+        method: {
+          getdbClickData: (data) => {
+            setFormItem("Insured.cOccupCde", {
+              loadData: [{ label: data.cnm, value: data.cde }],
+            });
+            setValue("Insured.cOccupCde", data.cnm);
+            dialog.value?.handleClose();
+          },
+        },
       },
       {
-        isOk: (selectdata: any) => {
-          console.log("a", selectdata);
-        },
+        isOk: (selectdata: any) => {},
       },
       { title: "职业", width: 85 }
     );
