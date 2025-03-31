@@ -63,9 +63,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           // codeParam: { 'CDptCde': user.value['companyId'] },
           func: (val) =>{
             console.log("qqqqqqqqqq", val)
-            let s = freeEditRef.value?.getFromSchemaItem('cProdNo')
-            s['params'] = {'CRegDptCde': val, 'cStatus': '1'};
-            s['typeCode'] = 'PROD_LIST';
+            // let s = freeEditRef.value?.getFromSchemaItem('cProdNo')
+            // s['params'] = {'CRegDptCde': val, 'cStatus': '1'};
+            // s['typeCode'] = 'PROD_LIST';
           }
       },
       {
