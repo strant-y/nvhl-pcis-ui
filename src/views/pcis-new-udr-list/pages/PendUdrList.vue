@@ -354,6 +354,7 @@ const formObj = {
               ElMessage.warning('所选记录为空！');
               return ;
           }
+
             if (selectData.value.length > 5 ) {
                 ElMessage.warning('所选数据最多为5条！');
                 return ;
@@ -364,7 +365,7 @@ const formObj = {
           });
           console.log(obj)
             const res={}
-            res["user"] = user;
+            res["user"] = JSON.parse(sessionStorage.getItem("user"));
             res["user"]["opRelCde"] = "10030892";
             res["appNoAndTaskIdMap"] = obj;
             res["cUndrMrk"] = "BB";
@@ -686,7 +687,7 @@ const tableBtn = ref<Array<any>>([
         const res={}
         res["cUndrMrk"] = "W";
         res["undrMrk"] = "W";
-        res["user"] = user;
+        res["user"] = JSON.parse(sessionStorage.getItem("user"));
         res["user"]["opRelCde"] = "10030892";
         res["appNo"] = row.objId;
         res["taskId"] = row.curtTask;
