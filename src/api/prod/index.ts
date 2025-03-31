@@ -1172,3 +1172,9 @@ export function getProdEnableList(queryParams: any): AxiosPromise<any> {
 export function expExcelUndrDty(queryParams: any): AxiosPromise<any> {
     return post(`/proddef/expExcelUndrDty`, queryParams);
 }
+//费用信息
+export function getAppFeeInfoNewUrl(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/getAppFeeInfoNew`, queryParams);
+}
+
+

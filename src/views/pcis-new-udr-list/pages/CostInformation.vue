@@ -1,6 +1,6 @@
 <!-- 核保任务查询 费用信息 -->
 <template>
-  <el-dialog   v-model="dialogVisible" width="90%" title="费用信息">
+  <el-dialog v-model="dialogVisible" width="90%" title="费用信息">
     <app-table
       :tableConfig="tableconfig"
       v-model:pageresult="pageresult"
@@ -13,13 +13,11 @@
         :item="{
           type: 'primary',
           label: '保存',
-          func: () => {
-
-          },
+          func: () => {},
         }"
       />
       <rt-button
-              :item="{
+        :item="{
           label: '返回',
           func: () => {
             dialogVisible = false;
@@ -49,13 +47,21 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { deleteFactorBykey, getBasicKindList } from "@/api/prod";
+import {
+  deleteFactorBykey,
+  getBasicKindList,
+  getAppFeeInfoNewUrl,
+} from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { useFormLabelWidth } from "element-plus/es/components/form/src/utils";
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
 const isDisabled = ref(true); //判断表单是否可编辑
 const dialogVisible = ref(true);
+const props = defineProps({
+  data: Object,
+  type: String,
+});
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "投保单费用信息",
@@ -99,7 +105,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable: true,
       },
       {
-        prop: "NFeePropSum",
+        prop: "nFeePropSum",
         inputtype: "rtnumber",
         title: "比例合计",
         min: 0,
@@ -110,7 +116,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable: true,
       },
       {
-        prop: "NPrmSum",
+        prop: "nPrmSum",
         inputtype: "rtnumber",
         title: "金额合计",
         min: 0,
@@ -151,7 +157,7 @@ const pageresult = reactive<Pageresult>({
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
-    title:'费用信息',
+    title: "费用信息",
     editFlag: true,
     editList: ["NFeeProp"],
     // showSelection:true,
@@ -191,70 +197,44 @@ const tableconfig = reactive<AppTableConfig>(
 onMounted(async () => {
   formconfig1.value?.setFormValue({
     ilog_c1: 12,
-    max_value: 0.00,
-    min_value: 0.00,
-    NFeePropSum: 0.00,
-    NPrmSum: 0.00,
+    max_value: 0.0,
+    min_value: 0.0,
+    nFeePropSum: 0.0,
+    nPrmSum: 0.0,
   });
-  pageresult.list = [
-    {
-      CTypCde: "费用类型11",
-      NFeeProp: 12,
-      NUpdFee: 33,
-      CFeeFlag: "ILOG系统费用计算提示",
-    },
-    {
-      CTypCde: "费用类型22",
-      NFeeProp: 12.78,
-      NUpdFee: 1231.00,
-      CFeeFlag: "ILOG系统费信息",
-    }
-  ]
+  handleQuery();
 });
-
-// 绑定方法
-const method = {
-  func1: () => {
-    console.log(getRules);
-  },
-};
-
-// 绑定特殊验证器
-const exRules = {
-  byrtInput: (rule: any, value: any, callback: any) => {
-    const r = freeEditRef.value?.getFromValue();
-    if (r["name"]) {
-      callback();
-    } else {
-      callback("姓名");
-    }
-  },
-};
-
-// 判断是否可编辑
-function checkDisabled(key: string) {
-  return true;
-}
 
 /** 查询 */
 function handleQuery(flag?: boolean) {
-  const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
-  const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(s, r);
-  getBasicKindList(param)
+  // const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
+  // const s = freeEditRef.value?.getFromValue(); //获取表单数据
+  // const s = props.data;
+  // const param = Object.assign(s, r);
+  console.log("999999999", props.data);
+  getAppFeeInfoNewUrl({ appNo: "211012504000000056" })
     .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
+      if (res.code == 200) {
+        let result = JSON.parse(res.data);
+        console.log("000000", result);
         pageresult.list = [];
-        pageresult.list = data.result;
-        pageresult.total = data.total;
+        pageresult.list = result.FeeInfoList;
+        pageresult.total = result.FeeInfoList.length;
       } else {
-        ElMessage.error(msg);
+        ElMessage.error(res.msg);
       }
+      // const { code, data, msg } = res;
+
+      // if (200 === code) {
+      //   pageresult.list = [];
+      //   pageresult.list = data.result;
+      //   pageresult.total = data.total;
+      // } else {
+      //   ElMessage.error(msg);
+      // }
     })
     .finally(() => {});
 }
-
 </script>
 
 <style scoped></style>

@@ -135,22 +135,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 }
               });
           },
-          // func: () => {
-          //   dzmodal.open(DepartmentTree, {}).then((res) => {
-          //     if (res.body) {
-          //       const selectObj = res.body;
-          //       let obj = {
-          //         loadData: [
-          //           {
-          //             label: selectObj.name,
-          //             value: selectObj.id,
-          //           },
-          //         ],
-          //       };
-          //       freeEditRef.value?.setValue("CDptCde", selectObj.name);
-          //     }
-          //   });
-          // },
         },
       },
       {
@@ -198,8 +182,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               }
             });
           freeEditRef.value?.setValue("prodNo", []); // 清空条款
-          freeEditRef.value?.setValue("undrClsCde", ""); // 清空核保级别
-          // loadUndrClsListOptions(val[val.length - 1]); // 加载核保级别列表
         },
       },
       {
@@ -213,12 +195,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           cOperId: user.value.opCde,
           cDptCde: user.value.companyId,
         },
-        // typeCode: "PROD_LIST",
-        // param: {
-        //   cParCde: "",
-        //   cOperId: user.value["opCde"],
-        //   cDptCde: user.value["companyId"],
-        // },
       },
       {
         prop: "cInsuredNme",
@@ -339,26 +315,24 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cGrpMrk",
         inputtype: "rtinput",
         title: "是否团单",
+        loadData: [
+          { label: "是", value: "1" },
+          { label: "否", value: "0" },
+        ],
       },
       {
         prop: "id",
         inputtype: "rtSelectV2",
         title: "批改原因",
-        loadData: [
-          { label: "新业务", value: "s1" },
-          { label: "新业务-团单", value: "s2" },
-          { label: "新业务-团单-团单在途", value: "s3" },
-          { label: "新业务-团单-团单在途-团单在途在保", value: "s4" },
-        ],
-        // func: (val) => {
-        //   if (val) {
-        //   }
-        // },
+        func: (val, row) => {
+          handleRsnChange(val, row);
+        },
       },
       {
         prop: "iddetail",
         inputtype: "rtinput",
         title: "批改原因详细",
+        disabled: true,
       },
     ],
   })
@@ -367,9 +341,10 @@ const tableconfig = reactive<AppTableConfig>(
 const handleDateChange = (value) => {
   let startDate,
     endDate = "";
-  startDate = moment(new Date(value[0])).format("YYYY-MM-DD");
-  endDate = moment(new Date(value[1])).format("YYYY-MM-DD");
-  console.log("时间", startDate, endDate);
+  startDate = moment(new Date(value[0])).format("YYYY-MM-DD 00:00:00");
+  endDate = moment(new Date(value[1]))
+    .endOf("day")
+    .format("YYYY-MM-DD HH:mm:ss");
 };
 
 const handleQuery = (flag = true) => {
@@ -386,34 +361,35 @@ const submitForm = (flag) => {
 
 const refreshData = (reset = true) => {
   const formData = freeEditRef.value?.getFromValue();
-  // if (!formData.CPlyNo) {
-  //   const startTemp =
-  //     formData.TAppTm && formData.TAppTm.length > 1 ? formData.TAppTm[0] : null;
-  //   if (null == startTemp || undefined === startTemp) {
-  //     ElMessage.warning("投保起期不能为空");
-  //     return;
-  //   }
-  //   const start = Date.parse(startTemp);
-  //   const endTemp =
-  //     formData.TAppTm && formData.TAppTm.length > 1 ? formData.TAppTm[1] : null;
-  //   if (null == endTemp || undefined === endTemp) {
-  //     ElMessage.warning("投保止期不能为空");
-  //     return;
-  //   }
-  //   const end = Date.parse(endTemp);
-  //   if (start - end > 0) {
-  //     ElMessage.warning("投保起期不能大于投保止期");
-  //     return;
-  //   }
-  //   if (end - start >= 7 * 1000 * 60 * 60 * 24) {
-  //     ElMessage.warning("投保时间范围请控制在7天以内");
-  //     return;
-  //   }
-  // }
+  if (!formData.cPlyNo) {
+    const startTemp =
+      formData.tAppTm && formData.tAppTm.length > 1 ? formData.tAppTm[0] : null;
+    if (null == startTemp || undefined === startTemp) {
+      ElMessage.warning("投保起期不能为空");
+      return;
+    }
+    const start = Date.parse(startTemp);
+    const endTemp =
+      formData.tAppTm && formData.tAppTm.length > 1 ? formData.tAppTm[1] : null;
+    if (null == endTemp || undefined === endTemp) {
+      ElMessage.warning("投保止期不能为空");
+      return;
+    }
+    const end = Date.parse(endTemp);
+    if (start - end > 0) {
+      ElMessage.warning("投保起期不能大于投保止期");
+      return;
+    }
+    if (end - start >= 7 * 1000 * 60 * 60 * 24) {
+      ElMessage.warning("投保时间范围请控制在7天以内");
+      return;
+    }
+  }
   const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  if (s.CLoadSub) {
-    s.CLoadSub = "1";
+  console.log("formData", s);
+  if (s.cLoadSub == null) {
+    s.cLoadSub = "1";
   }
   const obj = {
     sortField: sortField.value,
@@ -440,7 +416,55 @@ const refreshData = (reset = true) => {
     }
   });
 };
+function handleRsnChange(val, row) {
+  const grpMrk = row["cGrpMrk"].toString();
+  const prodNo = row["cProdNo"];
+  const isGrp = grpMrk !== "0" ? "1" : null;
+  const isPer = grpMrk === "0" ? "1" : null;
+  const rsnTyp = routeData["rsnTyp"];
 
+  if (val === "FZ") {
+    // 如果是非涉费批改
+    getListByCode("EDR_RSN_LIST", {
+      prodNo: prodNo,
+      rsnTyp: rsnTyp,
+      isGrp: isGrp,
+      isPer: isPer,
+      calcMrk: "0",
+      ZH: "ZH",
+      FZ: "FZ",
+    }).then(
+      (cde2Res) => {
+        if (!codeListMap.value[prodNo + val + grpMrk]) {
+          codeListMap.value[prodNo + val + grpMrk] = cde2Res["data"];
+        }
+        const detailOption = cde2Res["data"].find(
+          (option) => option.value === val
+        );
+        if (detailOption) {
+          row["iddetail"] = detailOption.label; // 显示 label 而不是 value
+          changeRsn({ value: val }, row["cPlyNo"], { value: row["iddetail"] });
+        }
+        // row["iddetail"] = cde2Res["data"][0]["value"];
+        // changeRsn({ value: val }, row["cPlyNo"], { value: row["iddetail"] });
+      },
+      (error) => {
+        console.log("出错了", error);
+        ElMessage.error("后台服务异常,请联系管理员");
+      }
+    );
+  } else {
+    const detailOption = codeListMap.value[prodNo + grpMrk].find(
+      (option) => option.value === val
+    );
+    if (detailOption) {
+      row["iddetail"] = detailOption.label; // 显示 label 而不是 value
+      changeRsn({ value: val }, row["cPlyNo"], { value: row["iddetail"] });
+    }
+    // row["iddetail"] = val;
+    // changeRsn({ value: val }, row["cPlyNo"], { value: row["iddetail"] });
+  }
+}
 //table的单击事件，这个需要调整，看是否还需要保留这个！！！
 const handleRowClick = (row) => {
   selected.value = row;
@@ -456,10 +480,18 @@ const sortChange = (column, prop, order) => {
 };
 
 // 缓存批改原因
-const changeRsn = (rsnCde, appNo, rsnDetail) => {
+const changeRsn = (rsnCdeObj, appNo, rsnDetailObj) => {
   if (appNo) {
-    rsnCde.value[appNo] = rsnCde;
-    rsnDetail.value[appNo] = rsnDetail;
+    if (!rsnCde.value) {
+      rsnCde.value = {};
+    }
+    if (!rsnDetail.value) {
+      rsnDetail.value = {};
+    }
+    // rsnCde.value[appNo] = rsnCde;
+    // rsnDetail.value[appNo] = rsnDetail;
+    rsnCde.value[appNo] = rsnCdeObj.value;
+    rsnDetail.value[appNo] = rsnDetailObj.value;
   }
 };
 
@@ -486,12 +518,25 @@ const getDetailRsn = (item) => {
         if (!codeListMap.value[prodNo + item["id"] + grpMrk]) {
           codeListMap.value[prodNo + item["id"] + grpMrk] = cde2Res["data"];
         }
-        detail.push(cde2Res["data"][0]["value"]);
-        setTimeout(() => {
-          item["iddetail"] = detail;
-          // 缓存批改原因
-          changeRsn(item["id"], item["cPlyNo"], item["iddetail"]);
-        }, 5);
+        // detail.push(cde2Res["data"][0]["value"]);
+        // setTimeout(() => {
+        //   item["iddetail"] = detail;
+        //   changeRsn({ value: item["id"] }, item["cPlyNo"], {
+        //     value: item["iddetail"],
+        //   });
+        // }, 5);
+        const detailOption = cde2Res["data"].find(
+          (option) => option.value === item["id"]
+        );
+        if (detailOption) {
+          detail.push(detailOption.label); // 显示 label 而不是 value
+          setTimeout(() => {
+            item["iddetail"] = detail;
+            changeRsn({ value: item["id"] }, item["cPlyNo"], {
+              value: item["iddetail"],
+            });
+          }, 5);
+        }
       },
       (error) => {
         console.log("出错了", error);
@@ -499,16 +544,18 @@ const getDetailRsn = (item) => {
       }
     );
   } else {
-    if (!codeListMap.value[prodNo + item["id"] + grpMrk]) {
-      codeListMap.value[prodNo + item["id"] + grpMrk] =
-        codeListMap.value[prodNo + grpMrk];
+    const detailOption = codeListMap.value[prodNo + grpMrk].find(
+      (option) => option.value === item["id"]
+    );
+    if (detailOption) {
+      detail.push(detailOption.label); // 显示 label 而不是 value
+      setTimeout(() => {
+        item["iddetail"] = detail;
+        changeRsn({ value: item["id"] }, item["cPlyNo"], {
+          value: item["iddetail"],
+        });
+      }, 5);
     }
-    detail.push(item["id"]);
-    setTimeout(() => {
-      item["iddetail"] = detail;
-      // 缓存批改原因
-      changeRsn(item["id"], item["cPlyNo"], item["iddetail"]);
-    }, 5);
   }
 };
 
@@ -543,6 +590,10 @@ const changeRsnValue = (item) => {
             item["id"] = cdeRes["data"][0]["value"];
             // 处理批改原因详细
             getDetailRsn(item);
+            // 将批改原因赋值给表格行的下拉选项
+            setTableFormItem("id", {
+              loadData: cdeRes["data"],
+            });
           }
         },
         (error) => {
@@ -564,6 +615,10 @@ const changeRsnValue = (item) => {
             item["id"] = cdeRes["data"][0]["value"];
             // 处理批改原因详细
             getDetailRsn(item);
+            // 将批改原因赋值给表格行的下拉选项
+            setTableFormItem("id", {
+              loadData: cdeRes["data"],
+            });
           }
         },
         (error) => {
@@ -606,6 +661,16 @@ const changeRsnValue = (item) => {
     }
   }
 };
+//给表格表单项赋值
+function setTableFormItem(key, obj) {
+  if (obj && Object.keys(obj).length) {
+    tableconfig.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        Object.assign(item, obj);
+      }
+    });
+  }
+}
 
 const showDetails = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
   if (null == selected.value[cPlyNo] || "" === selected.value[cPlyNo]) {
