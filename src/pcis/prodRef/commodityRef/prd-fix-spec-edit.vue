@@ -3,12 +3,12 @@
     <!-- 特别约定代码 -->
     <div class="form-item">
       <span>特别约定代码：</span>
-      <span>{{ rowData.cSpecNo }}</span>
+      <span>{{ rowData.cSpecialCode }}</span>
     </div>
     <!-- 特别约定名称 -->
     <div class="form-item">
       <span>特别约定名称：</span>
-      <span>{{ rowData.cSpecNme }}</span>
+      <span>{{ rowData.cSpecialName }}</span>
     </div>
     <el-divider></el-divider>
     <!-- 约定内容 -->
@@ -60,7 +60,7 @@ onMounted(() => {
 });
 
 // 使用正则表达式分割字符串，保留分隔符 ** 作为单独的数组项
-const cNmeCnArray = computed(() => rowData.value.cNmeCn.split(/(\*+)/));
+const cNmeCnArray = computed(() => rowData.value.cSpecialName.split(/(\*+)/));
 // const inputValues = ref<string[]>([]);
 const inputValues = ref(
   cNmeCnArray.value.map((item) => (item === "**" ? "" : item))
@@ -77,7 +77,7 @@ const handleSave = () => {
   const parts = cNmeCnArray.value.map((item, idx) =>
     item === "**" ? inputValues.value[idx] : item
   );
-  rowData.value.cNmeCn = parts.join("");
+  rowData.value.cSpecialName = parts.join("");
   console.log("提交的数据:", rowData.value);
 };
 </script>

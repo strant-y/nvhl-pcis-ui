@@ -157,7 +157,9 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cKindNo",
         title: "险类",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
+        typeCode: "KIND_LIST_CACHE",
+        codeParam: { codeListParam: "" },
       },
       {
         prop: "cRsnCde",
@@ -172,7 +174,14 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cRsnTyp",
         title: "批改原因类别",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
+        loadData: [
+          { value: "1", label: "一般批改" },
+          { value: "2", label: "注销批改" },
+          { value: "3", label: "退保批改" },
+          { value: "4", label: "变更保险期限" },
+          { value: "5", label: "批改分期" },
+        ],
       },
       {
         prop: "cIsValid",
@@ -277,7 +286,13 @@ onMounted(() => {
     setDisa();
   }
 });
-
+const rsnTypMap = {
+  "1": "一般批改",
+  "2": "注销批改",
+  "3": "退保批改",
+  "4": "变更保险期限",
+  "5": "批改分期",
+};
 defineExpose({
   getFromValue,
   setFormValue,

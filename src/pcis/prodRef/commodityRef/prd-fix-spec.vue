@@ -23,8 +23,12 @@
               }}</el-tag>
             </template>
           </el-table-column>
-          <el-table-column property="cSpecNo" label="特约代码" width="160" />
-          <el-table-column property="cNmeCn" label="特别约定内容" />
+          <el-table-column
+            property="cSpecialCode"
+            label="特约代码"
+            width="160"
+          />
+          <el-table-column property="cSpecialName" label="特别约定内容" />
         </el-table>
       </el-tab-pane>
       <el-tab-pane label="添加其他特约" name="second">
@@ -34,17 +38,17 @@
           style="width: 100%"
         >
           <el-table-column property="addIndex" label="序号" width="55" />
-          <el-table-column property="cSpecNo" label="特约代码" width="300">
+          <el-table-column property="cSpecialCode" label="特约代码" width="300">
             <template #default="scope">
               <el-input
-                v-model="scope.row['cSpecNo']"
+                v-model="scope.row['cSpecialCode']"
                 disabled="true"
               ></el-input>
             </template>
           </el-table-column>
-          <el-table-column property="cNmeCn" label="特别约定内容">
+          <el-table-column property="cSpecialName" label="特别约定内容">
             <template #default="scope">
-              <el-input v-model="scope.row['cNmeCn']"></el-input>
+              <el-input v-model="scope.row['cSpecialName']"></el-input>
             </template>
           </el-table-column>
         </el-table>
@@ -62,7 +66,6 @@
 import { defineComponent, ref, reactive, onMounted } from "vue";
 import { Plus } from "@element-plus/icons-vue";
 import { createFreeButtonBase } from "@/shared/button-config";
-import { yesOrNo, size, inputtype } from "@/utils/utilKey";
 import {
   AppTableConfig,
   AppTableMethod,
@@ -96,7 +99,7 @@ const selectable = (row) => row["cIfMust"] != "1"; //这里调用是把必选的
 const tableRowClassName = ({ row, rowIndex }) => {
   let sty = "";
   selected.value.forEach((item) => {
-    if (item["cSpecNo"] == row["cSpecNo"]) {
+    if (item["cSpecialCode"] == row["cSpecialCode"]) {
       sty = "checkedSty";
     }
   });
@@ -118,8 +121,8 @@ const refreshData = () => {
       pageresult.list = [];
       res.data.result.forEach((item, index) => {
         pageresult.list.push({
-          cSpecNo: item.cSpecialCode,
-          cNmeCn: item.cSpecialName,
+          cSpecialCode: item.cSpecialCode,
+          cSpecialName: item.cSpecialName,
           cNmeEn: item.cNmeEn,
           cIfMust: item.cIfMust, //是否必选
           cIfEdit: item.cIfEdit, //是否可修改
@@ -149,10 +152,10 @@ const toggleSpecificRow = () => {
 function add() {
   addTableData.push({
     addIndex: addTableData.length + 1, //序号
-    cSpecNo: "",
-    cNmeCn: "",
-    cIfMust: "2", //是否必选
-    cIfEdit: "0", //是否可修改
+    cSpecialCode: "",
+    cSpecialName: "",
+    cIfMust: "1", //是否必选
+    cIfEdit: "1", //是否可修改
     cIfFix: "0", //是否固定特约，查寻特约模板接口查出来的1，自定义添加的为0
   });
 }
@@ -175,7 +178,7 @@ function setSelected() {
   if (lastSelected && lastSelected.length) {
     lastSelected.forEach((item) => {
       pageresult.list.forEach((item2) => {
-        if (item["cSpecNo"] === item2["cSpecNo"]) {
+        if (item["cSpecialCode"] === item2["cSpecialCode"]) {
           item2["checked"] = true;
         }
       });

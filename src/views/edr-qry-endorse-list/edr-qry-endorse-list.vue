@@ -126,7 +126,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     setFormItem("cDptCde", {
                       loadData: [
                         {
-                          label: res.body.name,
+                          label: `${res.body.id}${res.body.name}`,
                           value: res.body.id,
                         },
                       ],
@@ -239,6 +239,19 @@ function setFormItem(key, obj) {
     });
   }
 }
+// 在其他地方使用 codeListMap 时，确保其存在并且是有效的
+// if (
+//   codeListMap.value[prodNo + grpMrk] &&
+//   Array.isArray(codeListMap.value[prodNo + grpMrk])
+// ) {
+//   const detailOption = codeListMap.value[prodNo + grpMrk].find(
+//     (option) => option.value === val
+//   );
+//   if (detailOption) {
+//     row["iddetail"] = detailOption.label;
+//     changeRsn({ value: val }, row["cPlyNo"], { value: row["iddetail"] });
+//   }
+// }
 const pageresult = reactive<Pageresult>({
   result: "",
   /** 数据列表 */
@@ -313,7 +326,7 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "cGrpMrk",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "是否团单",
         loadData: [
           { label: "是", value: "1" },
@@ -438,15 +451,16 @@ function handleRsnChange(val, row) {
         if (!codeListMap.value[prodNo + val + grpMrk]) {
           codeListMap.value[prodNo + val + grpMrk] = cde2Res["data"];
         }
-        const detailOption = cde2Res["data"].find(
+        // const detailOption = cde2Res["data"].find(
+        //   (option) => option.value === val
+        // );
+        const detailOption = codeListMap.value[prodNo + val + grpMrk]?.find(
           (option) => option.value === val
         );
         if (detailOption) {
-          row["iddetail"] = detailOption.label; // 显示 label 而不是 value
+          row["iddetail"] = detailOption.label;
           changeRsn({ value: val }, row["cPlyNo"], { value: row["iddetail"] });
         }
-        // row["iddetail"] = cde2Res["data"][0]["value"];
-        // changeRsn({ value: val }, row["cPlyNo"], { value: row["iddetail"] });
       },
       (error) => {
         console.log("出错了", error);
@@ -454,15 +468,13 @@ function handleRsnChange(val, row) {
       }
     );
   } else {
-    const detailOption = codeListMap.value[prodNo + grpMrk].find(
+    const detailOption = codeListMap.value[prodNo + grpMrk]?.find(
       (option) => option.value === val
     );
     if (detailOption) {
-      row["iddetail"] = detailOption.label; // 显示 label 而不是 value
+      row["iddetail"] = detailOption.label;
       changeRsn({ value: val }, row["cPlyNo"], { value: row["iddetail"] });
     }
-    // row["iddetail"] = val;
-    // changeRsn({ value: val }, row["cPlyNo"], { value: row["iddetail"] });
   }
 }
 //table的单击事件，这个需要调整，看是否还需要保留这个！！！
@@ -518,18 +530,11 @@ const getDetailRsn = (item) => {
         if (!codeListMap.value[prodNo + item["id"] + grpMrk]) {
           codeListMap.value[prodNo + item["id"] + grpMrk] = cde2Res["data"];
         }
-        // detail.push(cde2Res["data"][0]["value"]);
-        // setTimeout(() => {
-        //   item["iddetail"] = detail;
-        //   changeRsn({ value: item["id"] }, item["cPlyNo"], {
-        //     value: item["iddetail"],
-        //   });
-        // }, 5);
-        const detailOption = cde2Res["data"].find(
-          (option) => option.value === item["id"]
-        );
+        const detailOption = codeListMap.value[
+          prodNo + item["id"] + grpMrk
+        ]?.find((option) => option.value === item["id"]);
         if (detailOption) {
-          detail.push(detailOption.label); // 显示 label 而不是 value
+          detail.push(detailOption.label);
           setTimeout(() => {
             item["iddetail"] = detail;
             changeRsn({ value: item["id"] }, item["cPlyNo"], {
@@ -544,11 +549,11 @@ const getDetailRsn = (item) => {
       }
     );
   } else {
-    const detailOption = codeListMap.value[prodNo + grpMrk].find(
+    const detailOption = codeListMap.value[prodNo + grpMrk]?.find(
       (option) => option.value === item["id"]
     );
     if (detailOption) {
-      detail.push(detailOption.label); // 显示 label 而不是 value
+      detail.push(detailOption.label);
       setTimeout(() => {
         item["iddetail"] = detail;
         changeRsn({ value: item["id"] }, item["cPlyNo"], {
@@ -832,10 +837,24 @@ const transferRsnDetail = (rsnDetail) => {
 };
 
 onMounted(() => {
-  // function loadTree() {
-  // nodes.value = [];
+  freeEditRef.value?.setFormValue({
+    tAppTm: [
+      moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
+        "YYYY-MM-DD 00:00:00"
+      ),
+      moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+    ],
+    cDptCde: "0200000000000",
+  });
+  setFormItem("cDptCde", {
+    loadData: [
+      {
+        label: "0200000000000永安保险公总司",
+        value: "0200000000000",
+      },
+    ],
+  });
   const param = {
-    // name: formconfig1.value.name,
     level: 2,
   };
   getProdEnableList(param).then((res: any) => {
@@ -845,7 +864,6 @@ onMounted(() => {
       ElMessage.error(res.msg);
     }
   });
-  // }
 });
 
 watch(dialogVisible, (newValue) => {

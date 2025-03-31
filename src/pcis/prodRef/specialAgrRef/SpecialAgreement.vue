@@ -81,7 +81,7 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "Edit",
         hideBtns: (row) => {
           console.log("改变状态的row", row);
-          if (!row.cNmeCn.includes("**")) return true;
+          if (!row.cSpecialName.includes("**")) return true;
         },
         tableClick: (row) => {
           console.log(row);
@@ -102,6 +102,9 @@ const tableconfig = reactive<AppTableConfig>(
           const list = formData.value;
           const i = list.findIndex((item) => item.cSpecNo === row.cSpecNo);
           if (i !== -1) list.splice(i, 1);
+          formData.value.forEach((item, index) => {
+            item.index = index + 1;
+          });
         },
       }),
       createFreeButtonBase({
@@ -177,13 +180,13 @@ const tableconfig = reactive<AppTableConfig>(
         ],
       },
       {
-        prop: "cSpecNo",
+        prop: "cSpecialCode",
         inputtype: "rtinput",
         title: "特约代码",
         width: 180,
       },
       {
-        prop: "cNmeCn",
+        prop: "cSpecialName",
         inputtype: "rtinput",
         title: "特约内容",
       },
@@ -198,18 +201,7 @@ onMounted(async () => {
     exRules
   );
   Object.assign(cardconfig.value, formconfig11);
-  // 获取列表数据
-  // handleQuery(true);
-  formData.value = [
-    // {
-    //   index: "ss",
-    //   cNmeCn: "包含可编辑****的内容****倒点水",
-    //   cIfMust: "0",
-    //   cSpecNo: "test",
-    // },
-    // { index: "asdas", cNmeCn: "43", cIfMust: "1", cSpecNo: "test" },
-    // { index: "asdas", cNmeCn: "43242323", cIfMust: "2", cSpecNo: "test" },
-  ];
+  formData.value = [];
   formData.value.forEach((item, index) => {
     item.index = index + 1;
   });
@@ -239,7 +231,6 @@ const method = {
             formData.value.forEach((item, index) => {
               item.index = index + 1;
             });
-            console.log("formData.value", formData.value);
             dialog.value?.handleClose();
           },
         },
@@ -308,8 +299,19 @@ function handleQuery(flag?: boolean) {
   //   .finally(() => {});
 }
 function getFromValue() {
-  return formData.value;
+  return formData.value.map((item) => {
+    const prefixedItem: { [key: string]: any } = {};
+    for (const key in item) {
+      if (item.hasOwnProperty(key)) {
+        prefixedItem[`SpecialAgreement.${key}`] = item[key];
+      }
+    }
+    return prefixedItem;
+  });
 }
+// function getFromValue() {
+//   return formData.value;
+// }
 function setFormValue(value: any) {
   Object.assign(formData.value, value);
 }
