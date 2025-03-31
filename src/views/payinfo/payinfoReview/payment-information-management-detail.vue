@@ -222,7 +222,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
              codeParam:{cParCde:'1'},
             // loadData:[{"label":"中国","value":"1"}],
             cascaderprops:['CProvinces','CCity','CBankCounty'],
-            showExBtn: true,
+            showExBtn: false,
             maxlevel:3,
             btnWidth: 30,
             // btnItems: createFreeButtonBase({
@@ -318,7 +318,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "textarea",
         rows: 4,
         itemWidth: 3,
-        defaultValue: '同意',
+        // defaultValue: '同意',
         rules: [getRules("required", {})],
       },
     ],
@@ -352,6 +352,7 @@ function loadPayConfirmInfo(param) {
               newdata[k] = data[key];
           });
           freeEditRef.value?.setFormValue(newdata);
+          freeEditRef.value?.setValue("CCheckOpn", '同意')
       }
     }).catch((error: any) => {
       ElMessage.error({ message: '连接失败！' + error, duration: 3000 });
