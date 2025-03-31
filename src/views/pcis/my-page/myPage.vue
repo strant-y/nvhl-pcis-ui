@@ -387,7 +387,7 @@ async function loadAfter() {
         id: "modFee",
         func: () => {
           dzmodal
-            .open(CostInformation, { type: "Issuer", data: {props.param} })
+            .open(CostInformation, { type: "Issuer", data: props.param })
             .then((res: any) => {
               if (res.type === "ok") {
               }
