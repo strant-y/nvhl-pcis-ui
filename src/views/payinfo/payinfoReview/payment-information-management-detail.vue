@@ -124,7 +124,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     title: "缴费信息审核",
     fromSchema: [
       {
-        prop: "CRegDptCde",
+        prop: "cRegDptCde",
         inputtype: "rtselect",
         // typeCode: "PLYDPT_LIST",
         // param: { cIsValid: '1', userOrg: user.value.companyId },
@@ -132,59 +132,59 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         itemWidth: 2,
       },
       {
-        prop: "CAppNum",
+        prop: "cAppNum",
         inputtype: "rtinput",
         title: "选择单数",
       },
       {
-        prop: "CAppNo",
+        prop: "cAppNo",
         inputtype: "rtinput",
         title: "投保单号",
         rules: [getRules("required", {})],
       },
       {
-        prop: "CPayNme",
+        prop: "cPayNme",
         inputtype: "rtinput",
         title: "付款人",
       },
       {
-        prop: "CChqueNo",
+        prop: "cChqueNo",
         inputtype: "rtinput",
         title: "交易号",
         defaultValue: props.CChqueNo,
       },
       {
-        prop: "NPayAmt",
+        prop: "nPayAmt",
         inputtype: "rtnumber",
         title: "(收据)金额",
       },
       {
-        prop: "NTax",
+        prop: "nTax",
         inputtype: "rtnumber",
         title: "车船税",
       },
       {
-        prop: "NPrm",
+        prop: "nPrm",
         inputtype: "rtnumber",
         title: "实收金额",
       },
       {
-        prop: "CChargeCde",
+        prop: "cChargeCde",
         inputtype: "rtinput",
         title: "(收据)收款人",
       },
       {
-        prop: "CSeqNo",
+        prop: "cSeqNo",
         inputtype: "rtinput",
         title: "付款人账号",
       },
       {
-        prop: "CCHeckPsn",
+        prop: "cCHeckPsn",
         inputtype: "rtinput",
         title: "审核人",
       },
       {
-        prop: "NStampTax",
+        prop: "nStampTax",
         inputtype: "rtnumber",
         title: "印花税",
         // rules: [getRules("required", {})],
@@ -221,7 +221,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             typeCode:'getarealist',
              codeParam:{cParCde:'1'},
             // loadData:[{"label":"中国","value":"1"}],
-            cascaderprops:['CProvinces','CCity','CBankCounty'],
+            cascaderprops:['cProvinces','cCity','cBankCounty'],
             showExBtn: false,
             maxlevel:3,
             btnWidth: 30,
@@ -239,7 +239,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             // }),
         },
       {
-        prop: "CBankNme",
+        prop: "cBankNme",
         inputtype: "rtselect",
         title: "收款银行大类",
         // rules: [getRules("required", {})],
@@ -247,7 +247,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
          params: {'cParCde': ['0', '1', '2', '3', '4', '5', '6', '7', '9']},
       },
       {
-        prop: "CBankcode",
+        prop: "cBankcode",
         inputtype: "rtinput",
         title: "开户行",
         // rules: [getRules("required", {})],
@@ -270,17 +270,17 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
       },
       {
-        prop: "CBankCnaps",
+        prop: "cBankCnaps",
         inputtype: "rtinput",
         title: "CNAPS号",
       },
       {
-        prop: "CBankAddr",
+        prop: "cBankAddr",
         inputtype: "rtinput",
         title: "开户行地址",
       },
       {
-        prop: "CPubPri",
+        prop: "cPubPri",
         inputtype: "rtselect",
         title: "对公对私",
         rules: [getRules("required", {})],
@@ -290,7 +290,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         ],
       },
       {
-        prop: "CBankCde",
+        prop: "cBankCde",
         inputtype: "rtinput",
         // typeCode: "BANK_QUERY",
         // param: { CdptCde: user.value.companyId },
@@ -298,7 +298,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
       },
       {
-        prop: "TChargeTm",
+        prop: "tChargeTm",
         inputtype: "rtdatepicker",
         title: "到账时间",
         format: "YYYY-MM-DD HH:mm:ss",
@@ -306,13 +306,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
       },
       {
-        prop: "CCurtainNo",
+        prop: "cCurtainNo",
         inputtype: "rtinput",
         title: "银行到账通知单号",
       },
       // CUniqueNo TUpdTm CAppTyp 这三个需要询问，因为原文件是隐藏的字段
       {
-        prop: "CCheckOpn",
+        prop: "cCheckOpn",
         inputtype: "rtinput",
         title: "审核意见",
         type: "textarea",
@@ -346,12 +346,12 @@ function loadPayConfirmInfo(param) {
       if (res.code === 200) {
           const data = res['data'];
           console.log("eeeeeeee", data)
-          const newdata = {};
-          Object.keys(data).forEach((key) => {
-              const k = firstCharUpper(key);
-              newdata[k] = data[key];
-          });
-          freeEditRef.value?.setFormValue(newdata);
+          // const newdata = {};
+          // Object.keys(data).forEach((key) => {
+          //     const k = firstCharUpper(key);
+          //     newdata[k] = data[key];
+          // });
+          freeEditRef.value?.setFormValue(data);
           freeEditRef.value?.setValue("CCheckOpn", '同意')
       }
     }).catch((error: any) => {
