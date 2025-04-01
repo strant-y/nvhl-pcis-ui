@@ -180,12 +180,13 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cSpecNo",
         title: "特约代码",
         inputtype: "rtinput",
+        width: 200,
       },
-      {
-        prop: "cNmeEn",
-        title: "英文名称",
-        inputtype: "rtinput",
-      },
+      // {
+      //   prop: "cNmeEn",
+      //   title: "英文名称",
+      //   inputtype: "rtinput",
+      // },
       {
         prop: "cNmeCn",
         title: "特约内容",

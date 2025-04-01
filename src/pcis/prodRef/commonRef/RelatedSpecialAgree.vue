@@ -126,12 +126,12 @@ const tableConfig = reactive<AppTableConfig>(
         width: "200",
         inputtype: "rtinput",
       },
-      {
-        prop: "cNmeEn",
-        title: "英文名",
-        width: "200",
-        inputtype: "rtinput",
-      },
+      // {
+      //   prop: "cNmeEn",
+      //   title: "英文名",
+      //   width: "200",
+      //   inputtype: "rtinput",
+      // },
       {
         prop: "cNmeCn",
         title: "特约内容",

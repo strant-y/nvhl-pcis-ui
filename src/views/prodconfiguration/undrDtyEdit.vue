@@ -7,6 +7,13 @@
         @row-click="handleRowClick"
       />
       <app-grid-edit v-model:gridEditConfig="gridconfig" ref="gridEditRef" />
+      <!-- <app-table
+        :tableConfig="tableconfig"
+        v-model:pageresult="pageresult"
+        ref="tableRef"
+        @page-change="handleQuery(false)"
+        @refreshParent="handleQuery(false)"
+      /> -->
     </el-dialog>
     <!-- <comDialog ref="dialog"></comDialog> -->
   </div>

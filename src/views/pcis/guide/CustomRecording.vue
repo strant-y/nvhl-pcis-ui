@@ -34,7 +34,7 @@
         </el-form-item>
         <el-form-item
           v-if="formconfig1.cRenewMrk == '1'"
-          label=""
+          label="上年保单号"
           prop="d"
           :rules="[getRules('required', {})]"
         >
@@ -58,8 +58,21 @@
           </el-radio-group>
         </el-form-item>
 
-        <h4 style="margin: 10px 20px">常用条款</h4>
-        <el-row>
+        <el-tooltip placement="top">
+          <template #content>
+            可用鼠标左键，按住常用条款卡片<br />自由拖动常用条款排序<br />
+          </template>
+          <h4
+            style="margin: 10px 20px; width: 200px"
+            v-if="formconfig1.cRenewMrk !== '1'"
+          >
+            常用条款
+            <el-icon size="20" style="vertical-align: middle; color: red"
+              ><InfoFilled
+            /></el-icon>
+          </h4>
+        </el-tooltip>
+        <el-row v-if="formconfig1.cRenewMrk !== '1'">
           <el-col :span="24">
             <div>
               <VueDraggable
@@ -107,6 +120,7 @@
                 @change="handleChange"
                 @clear="handleClear"
                 clearable
+                :disabled="true"
               >
                 <el-option
                   v-for="item in options"
@@ -303,7 +317,6 @@ function handleClick(item: any, index: number) {
   formconfig1.value.cProdNme = item.prodCnm;
   // formconfig1.value.cDptCde = item.dptCde;
   // formconfig1.value.cDptNme = item.dptCnm;
-  console.log("000", item, formconfig1.value);
 }
 //取消常用条款
 function handleStarClick(item: any) {
@@ -369,7 +382,6 @@ function showModal() {
       data: { updateQuery },
       termList: termList.value,
     })
-
     .then((res: any) => {
       if (res.type === "ok") {
         const selectedTerm = res.body;
@@ -438,5 +450,11 @@ function updateQuery() {
 }
 .eachCon .eachItems .txt {
   color: #838a90;
+}
+.info-filled-custom {
+  background-color: white;
+  border: 1px solid red;
+  border-radius: 50%;
+  padding: 2px;
 }
 </style>
