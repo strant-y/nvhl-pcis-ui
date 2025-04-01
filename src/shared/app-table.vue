@@ -42,6 +42,18 @@
           </el-col>
         </el-row>
       </template>
+      <template #header v-if="tableConfig.fromUi.showTitleBar?tableConfig.fromUi.showTitleBar: true">
+        <el-row justify="space-between">
+          <el-col :span="4" v-if="!tableConfig.production">
+            {{ tableConfig.title }}
+          </el-col>
+          <el-col :span="4" v-if="tableConfig.production">
+            <el-tooltip :content="tableConfig.productionTitle">
+              {{ tableConfig.title }}
+            </el-tooltip>
+          </el-col>
+        </el-row>
+      </template>
       <div class="form-inner">
         <rttable
           v-model="dataList"

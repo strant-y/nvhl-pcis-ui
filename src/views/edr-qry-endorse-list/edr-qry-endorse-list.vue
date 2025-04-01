@@ -704,19 +704,19 @@ const showDetails = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
 
 const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
   handleRowClick(data);
-  if (null == selected.value[cPlyNo] || "" === selected.value[cPlyNo]) {
+  if (null == selected.value['cPlyNo'] || "" === selected.value['cPlyNo']) {
     ElMessage.warning("请选择一条记录");
     return;
   }
   if (
-    null == rsnCde.value[selected.value[cPlyNo]] ||
-    "" === rsnCde.value[selected.value[cPlyNo]]
+    null == rsnCde.value[selected.value['cPlyNo']] ||
+    "" === rsnCde.value[selected.value['cPlyNo']]
   ) {
     ElMessage.warning("请选择批改原因");
     return;
   }
   if (
-    DEFERRED_CORRECTION === rsnCde.value[selected.value[cPlyNo]] &&
+    DEFERRED_CORRECTION === rsnCde.value[selected.value['cPlyNo']] &&
     "020027" === cProdNo
   ) {
     ElMessage.warning("此产品暂不支持延期批改，请选择通用批改");
@@ -726,7 +726,7 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
     plyNo: cPlyNo,
     edrType: routeData["rsnTyp"],
     prodNo: cProdNo,
-    edrRsnCde: rsnCde.value[selected.value[cPlyNo]],
+    edrRsnCde: rsnCde.value[selected.value['cPlyNo']],
   };
   pcisEdrQueryService.validEndorse(param).then(
     async (result) => {
@@ -735,23 +735,23 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
       } else {
         if (result["data"]) {
           // 如果选的批改原因是变更影像上传方式
-          if ("DZ" === rsnCde.value[selected.value[cPlyNo]]) {
+          if ("DZ" === rsnCde.value[selected.value['cPlyNo']]) {
             modifyImageUploadMode(cPlyNo);
             return;
           } else if ("2" === routeData["rsnTyp"]) {
             const en = JSON.stringify({
               scene: SCENE_EDR_APP_NEW,
-              CAppNo: selected.value[cPlyNo],
-              COrgAppNo: cAppNo,
-              CRsnCde: rsnCde.value[selected.value[cPlyNo]],
-              CRsnDetailCde: transferRsnDetail(
-                rsnDetail.value[selected.value[cPlyNo]]
+              cAppNo: selected.value['cPlyNo'],
+              cOrgAppNo: cAppNo,
+              cRsnCde: rsnCde.value[selected.value['cPlyNo']],
+              cRsnDetailCde: transferRsnDetail(
+                rsnDetail.value[selected.value['cPlyNo']]
               ),
-              CProdNo: selected.value["cProdNo"],
-              CCiMrk: selected.value["cCiMrk"],
-              CGrpMrk: selected.value["cGrpMrk"],
-              CDptCde: selected.value["cDptCde"],
-              CEdrType: routeData["rsnTyp"],
+              cProdNo: selected.value["cProdNo"],
+              cCiMrk: selected.value["cCiMrk"],
+              cGrpMrk: selected.value["cGrpMrk"],
+              cDptCde: selected.value["cDptCde"],
+              cEdrType: routeData["rsnTyp"],
             });
             //预留跳转路径
             router.push({
@@ -763,18 +763,18 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
           } else if ("3" === routeData["rsnTyp"]) {
             const en = JSON.stringify({
               scene: SCENE_EDR_APP_NEW,
-              CAppNo: selected.value[cPlyNo],
-              COrgAppNo: cAppNo,
-              CRsnCde: rsnCde.value[selected.value[cPlyNo]],
-              CRsnDetailCde: transferRsnDetail(
-                rsnDetail.value[selected.value[cPlyNo]]
+              cAppNo: selected.value['cPlyNo'],
+              cOrgAppNo: cAppNo,
+              cRsnCde: rsnCde.value[selected.value['cPlyNo']],
+              cRsnDetailCde: transferRsnDetail(
+                rsnDetail.value[selected.value['cPlyNo']]
               ),
-              CProdNo: selected.value["cProdNo"],
-              CCiMrk: selected.value["cCiMrk"],
-              CGrpMrk: selected.value["cGrpMrk"],
-              CDptCde: selected.value["cDptCde"],
-              CEdrType: routeData["rsnTyp"],
-              CIESence: null,
+              cProdNo: selected.value["cProdNo"],
+              cCiMrk: selected.value["cCiMrk"],
+              cGrpMrk: selected.value["cGrpMrk"],
+              cDptCde: selected.value["cDptCde"],
+              cEdrType: routeData["rsnTyp"],
+              cIESence: null,
             });
             //预留跳转路径
             router.push({
@@ -785,26 +785,28 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
             });
           } else if ("1" === routeData["rsnTyp"]) {
             const en = JSON.stringify({
-              scene: SCENE_EDR_APP_NEW,
-              CAppNo: selected.value[cPlyNo],
-              COrgAppNo: cAppNo,
-              CRsnCde: rsnCde.value[selected.value[cPlyNo]],
-              CRsnDetailCde: transferRsnDetail(
-                rsnDetail.value[selected.value[cPlyNo]]
+              // scene: SCENE_EDR_APP_NEW,
+              cAppNo: selected.value['cPlyNo'],
+              cOrgAppNo: cAppNo,
+              cRsnCde: rsnCde.value[selected.value['cPlyNo']],
+              cRsnDetailCde: transferRsnDetail(
+                rsnDetail.value[selected.value['cPlyNo']]
               ),
-              CProdNo: selected.value["cProdNo"],
-              CCiMrk: selected.value["cCiMrk"],
-              CGrpMrk: selected.value["cGrpMrk"],
-              CJiMrk: selected.value["cJiMrk"],
-              CDptCde: selected.value["cDptCde"],
-              CEdrType: routeData["rsnTyp"],
+              cProdNo: selected.value["cProdNo"],
+              cCiMrk: selected.value["cCiMrk"],
+              cGrpMrk: selected.value["cGrpMrk"],
+              cJiMrk: selected.value["cJiMrk"],
+              cDptCde: selected.value["cDptCde"],
+              cEdrType: routeData["rsnTyp"],
+              pageType: "EDR_APP_NEW_SCENE",
             });
-            router.push({
-              path: "/index/endorse/edit",
-              query: {
-                data: en,
-              },
-            });
+            console.log(en)
+              router.push({
+                  path: "/pcis/my-page",
+                  query: {
+                      param: en,
+                  },
+              });
           }
         } else {
           ElMessage.success(result["msg"]);
