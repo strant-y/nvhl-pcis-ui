@@ -32,7 +32,7 @@
     "
     :size="item.size"
     value-key="label"
-    :filterable="item.filterable !=null ? item.filterable : true"
+    :filterable="item.filterable != null ? item.filterable : true"
     :multiple="
       item.multiple
         ? typeof item.multiple === 'boolean'
@@ -171,14 +171,14 @@ function getColor(v) {
   }
 }
 
-watch([options, () => props.modelValue], ([newOptions, newModelValue]) => {
-  if (newOptions == null || newOptions.length === 0) return; // 下拉数据源加载未完成不回显
+watch([() => props.modelValue], ([newModelValue]) => {
+  // if (options.value == null || options.value.length === 0) return; // 下拉数据源加载未完成不回显
   if (newModelValue == undefined) {
     selectedValue.value = undefined;
     return;
   }
   selectedValue.value = newModelValue;
-  // }
+  uploadOption();
 });
 
 /**
@@ -190,24 +190,27 @@ watch(
     if (props.item.loadData) {
       options.value = newValue.loadData;
     } else if (props.item.typeCode) {
-      codeListStore
-        .queryCodeList(
-          {
-            codeListName: props.item.typeCode,
-            codeListParam: getParam(),
-          },
-          props.unAuthor,
-          props.item.cache ? props.item.cache : true
-        )
-        .then((res) => (options.value = res))
-        .catch((err) => {
-          console.error(err);
-          options.value = [];
-        });
+      uploadOption();
     }
   },
   { deep: true }
 );
+function uploadOption() {
+  codeListStore
+    .queryCodeList(
+      {
+        codeListName: props.item.typeCode,
+        codeListParam: getParam(),
+      },
+      props.unAuthor,
+      props.item.cache ? props.item.cache : true
+    )
+    .then((res) => (options.value = res))
+    .catch((err) => {
+      console.error(err);
+      options.value = [];
+    });
+}
 function handleChange(val?: string | number | Array<any> | undefined) {
   const option = options.value.find((item) => item.value === val);
   emits("valueChange", val);
@@ -223,26 +226,16 @@ function getLabel() {
   }
 }
 onMounted(() => {
-  console.log();
   // 初始化组件数据
   if (props.item) {
     if (!props.item.loadData && !props.item.typeCode) {
       options.value = [];
     } else if (!props.item.loadData && !!props.item.typeCode) {
-      codeListStore
-        .queryCodeList(
-          {
-            codeListName: props.item.typeCode,
-            codeListParam: getParam(),
-          },
-          props.unAuthor,
-          props.item.cache ? props.item.cache : true
-        )
-        .then((res) => (options.value = res))
-        .catch((err) => {
-          console.error(err);
-          options.value = [];
-        });
+      if (props.item.disabled) {
+        //如果属性被标记为不可读,则初始化不自动加载下拉选,但是值变更的时候,再额外触发下拉选
+        return;
+      }
+      uploadOption();
     } else {
       options.value = props.item.loadData;
     }
@@ -250,10 +243,20 @@ onMounted(() => {
 });
 
 function getParam() {
+  let p: any = {};
   if (props.item.codeParam && typeof props.item.codeParam === "string") {
-    return JSON.parse(props.item.codeParam);
-  }else{
-    return props.item.codeParam;
+    p = JSON.parse(props.item.codeParam);
+  } else {
+    p = props.item.codeParam;
   }
+
+  if (props.item.disabled) {
+    if(!p){
+      p = {value: selectedValue.value};
+    }else{
+      p.value = selectedValue.value;
+    }
+  }
+  return p;
 }
 </script>

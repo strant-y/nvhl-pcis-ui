@@ -93,6 +93,17 @@ const queryParams = reactive<PageQuery>({
 const appgrideditConfig = reactive<AppGridEditConfig>({
   editFlag: false, //是否可以编辑
 });
+interface dynamicFormMethod {
+  getFromValue: () => any;
+  setFormValue: (data: any,noupdate?: boolean) => void;
+  validate: () => any;
+  setValue: (key: any, value: any) => void;
+  getValue: (key: any) => any;
+  checkKey: (key: any) => boolean;
+  clearValidate: () => any;
+  resetFields: () => any;
+}
+const dynamicForm = ref<dynamicFormMethod | null>(null);
 const dataList = ref<any>([]);
 const rttableFrom = ref<any>(null);
 
@@ -133,7 +144,7 @@ onMounted(() => {
 function handleSelectionChange(selectedRows: any[]) {
   emits("selection-change", selectedRows);
 }
-function handleStatusChange(val, row) {
+function handleStatusChange(val: any, row: any) {
   emits("status-change", val, row); // 传递当前行的数据
 }
 
@@ -147,9 +158,17 @@ function getPartnerPage(flag = true) {
   }
   return queryParams;
 }
+function getFromValue() {
+  if(dynamicForm.value){
+    return dynamicForm?.value.getFromValue();
+  }else{
+    return null;
+  }
+}
 
 defineExpose({
   getPartnerPage,
+  getFromValue,
 });
 </script>
 

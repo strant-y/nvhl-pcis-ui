@@ -234,7 +234,7 @@ function setDisa() {
 }
 /** 查询 */
 function handleQuery(flag?: boolean) {
-  const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
+  const tabref = opertaor.getTableRefByKey("clauseModeConfInfo");
   if (tabref.getFromValue().cTermNo == null) {
     ElMessage.error("请完善基本信息!");
     return;

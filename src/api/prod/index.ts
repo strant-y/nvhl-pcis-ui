@@ -509,6 +509,10 @@ export function qryProdTermList(queryParams: any): AxiosPromise<any> {
     return post(`/proddef/qryProdTermList`, queryParams);
 }
 
+export function qryProdTermInfoList(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/qryProdTermInfoList`, queryParams);
+}
+
 /**
  * 险别配置-修改关联条款弹框中内容保存
  * @param queryParams
@@ -519,11 +523,20 @@ export function saveCvrgRelTerm(queryParams: any): AxiosPromise<any> {
 }
 
 /**
- * 险别配置-增加条款弹框中内容保存
+ * 保存条款模版信息
  *
  * @param queryParams
  */
 export function savePrdTermInfo(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/savePrdTermMode`, queryParams);
+}
+
+/**
+ * 保存条款详情信息
+ *
+ * @param queryParams
+ */
+export function savePrdTerm(queryParams: any): AxiosPromise<any> {
     return post(`/proddef/savePrdTermInfo`, queryParams);
 }
 

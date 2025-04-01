@@ -21,8 +21,8 @@ import { useValidator } from "@/typings/useValidator";
 import {
   saveInruanceTypeBasicInfo,
   getCvrgList,
+  savePrdTermInfo,
   getPrdTermInfo,
-  savePrdTerm,
 } from "@/api/prod";
 import { ref, reactive, onMounted } from "vue";
 import { useRoute } from "vue-router";
@@ -39,9 +39,57 @@ const freeEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    title: "条款基本信息",
+    title: "条款模版信息",
     endBtnsPosition: "right",
     endBtns: [
+      createFreeButtonBase({
+        type: "success",
+        label: "模版要素绑定",
+        func: async () => {
+          const cTermNo = freeEditRef.value?.getValue("cTermNo");
+
+          dialog.value?.open(
+            "termFactorConfig",
+            {
+              type: "show",
+              data: {
+                cTermNo: cTermNo,
+              },
+            },
+            {
+              isOk: (selectdata: any) => {},
+            },
+            { title: "模版要素绑定", width: 75 }
+          );
+        },
+      }),
+      createFreeButtonBase({
+        type: "success",
+        label: "条责分组关联",
+        func: async () => {
+          const cTermNo = freeEditRef.value?.getValue("cTermNo");
+          dialog.value?.open(
+            "termRiskGroupConfig",
+            {
+              type: "show",
+              data: {
+                cTermNo: cTermNo,
+              },
+            },
+            {
+              isOk: (selectdata: any) => {},
+            },
+            { title: "条款责任分组关联", width: 75 }
+          );
+        },
+      }),
+      // createFreeButtonBase({
+      //   label: "上传条款文件",
+      //   type: "primary",
+      //   func: async () => {
+      //     handleUpload();
+      //   },
+      // }),
       createFreeButtonBase({
         type: "primary",
         label: "保存",
@@ -50,11 +98,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           if (isValid) {
             const s = freeEditRef.value?.getFromValue(); //获取表单数据
             const datas = Object.assign(s, { type: param.type });
-            savePrdTerm(datas)
+            // const paramData = datas.map((item: any) => {
+            //   if (item.cRdrTyp == "1") {
+            //   }
+            // });
+            savePrdTermInfo(datas)
               .then((res) => {
                 const { code, data, msg } = res;
                 if (200 === code) {
-                   freeEditRef?.value?.setValue('cTermNo',data );
+                  freeEditRef?.value?.setFormValue({ cTermNo: data });
                   ElMessage.success("保存成功");
                 } else {
                   ElMessage.error(msg);
@@ -69,7 +121,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "返回",
         func: () => {
-          router.push("/prodconfiguration/InsuranceInfo");
+          router.push("/prodconfiguration/insuranceConfiguration");
         },
       }),
     ],
@@ -85,31 +137,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cTermNo",
         inputtype: "rtinput",
-        title: "条款代码",
+        title: "条款模版编码",
         disabled: true,
       },
       {
         prop: "cNmeCn",
         inputtype: "rtinput",
-        title: "条款名称",
+        title: "条款模版名称",
         rules: [getRules("required", { change: true })],
-      },
-      {
-        prop: "cNmeEn",
-        inputtype: "rtinput",
-        title: "英文名称",
-      },
-      {
-        prop: "cFilingNo",
-        inputtype: "rtinput",
-        title: "备案号",
-        rules: [getRules("required", { blur: true })],
-      },
-      {
-        prop: "cRegisteredNo",
-        inputtype: "rtinput",
-        title: "注册号",
-        rules: [getRules("required", { blur: true })],
       },
       {
         prop: "cEnableFlag",
@@ -120,82 +155,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", { change: true })],
       },
       {
-        prop: "cIsInternet",
-        inputtype: "rtselect",
-        title: "是否互联网",
-        typeCode: "WEB_SYS_STA_DICT",
-        codeParam: { cParCde: "yes_no" },
-        rules: [getRules("required", { change: true })],
-      },
-      {
-        prop: "termRateLower",
-        inputtype: "rtnumber",
-        title: "费率上限",
-        precision: 8,
-        placeholder: "1.00000000",
-        rules: [getRules("required", { blur: true })],
-      },
-      {
-        prop: "termRateUpper",
-        inputtype: "rtnumber",
-        title: "费率下限",
-        precision: 8,
-        placeholder: "1.00000000",
-        rules: [getRules("required", { blur: true })],
-      },
-      {
-        prop: "averageCostRate",
-        inputtype: "rtnumber",
-        title: "平均费用率",
-        precision: 8,
-        placeholder: "1.00000000",
-        rules: [getRules("required", { blur: true })],
-      },
-      {
-        prop: "costRateUpper",
-        inputtype: "rtnumber",
-        precision: 8,
-        placeholder: "1.00000000",
-        step: 0.01,
-        max: 999999,
-        stepStrictly: true,
-        min: 0,
-        title: "费用率上限",
-        rules: [getRules("required", { blur: true })],
-      },
-      {
-        prop: "cTermMode",
-        inputtype: "rtselect",
-        title: "关联条款模版",
-        typeCode: "TermCodeTag",
-        rules: [getRules("required", { change: true })],
-        showExBtn: true,
-        disabled: true,
-        btnItems: createFreeButtonBase({
-          type: "primary",
-          label: "选择条款模版",
-          func: () => {
-            dialog.value?.open(
-              "queryUtils",
-              null,
-              {
-                isOk: (res: any) => {
-                  freeEditRef.value?.setValue("cTermMode", res.cTermNo);
-                  freeEditRef.value?.setValue("cRdrTyp", res.cRdrTyp);
-                  freeEditRef.value?.setValue("additionalInsuranceType", res.additionalInsuranceType);
-                },
-              },
-              { width: "70" }
-            );
-          },
-        }),
-      },
-      {
         prop: "cRdrTyp",
         inputtype: "rtselect",
         title: "主条款/附加条款",
         typeCode: "WEB_SYS_RdrTyp",
-        disabled: true,
         codeParam: { cParCde: "RdrTyp" },
         clearable: true,
         rules: [getRules("required", { change: true })],
@@ -213,45 +176,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         typeCode: "additional_insurance",
         codeParam: { cParCde: "add_type" },
         rules: [getRules("required", { change: true })],
-        hidden: true, // 初始状态为显示
-        disabled: true,
-      },
-      {
-        prop: "tFilingTm",
-        inputtype: "rtdatepicker",
-        title: "备案日期",
-        rules: [getRules("required", { change: true })],
-      },
-      {
-        prop: "tFeedbackTm",
-        inputtype: "rtdatepicker",
-        title: "反馈日期",
-        rules: [getRules("required", { change: true })],
-      },
-      {
-        prop: "cIsExist",
-        inputtype: "rtselect",
-        title: "条款文件是否存在",
-        typeCode: "WEB_SYS_STA_DICT",
-        codeParam: { cParCde: "yes_no" },
-        rules: [getRules("required", { change: true })],
-      },
-      {
-        prop: "cWebsite",
-        inputtype: "rtinput",
-        title: "官网链接",
-        btnWidth: 20,
-        itemWidth: 3,
-        disabled: true,
-      },
-      {
-        prop: "cDesc",
-        inputtype: "rtinput",
-        type: "textarea",
-        btnWidth: 20,
-        itemWidth: 3,
-        rows: 4,
-        title: "条款描述",
+        hidden: false, // 初始状态为显示
       },
     ],
     fromUi: createFromUiConfig({

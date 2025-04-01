@@ -14,6 +14,7 @@ import termGroupConfig from "./insuranceConInfo/termGroupConfig.vue";
 import termFactorConfig from "./insuranceConInfo/termFactorConfig.vue";
 import querycustomerView from "./prodconfig/querycustomerView.vue";
 import termRiskGroupConfig from "./insuranceConInfo/termRiskGroupConfig.vue";
+import queryUtils from "./insuranceConInfo/queryUtils.vue";
 import relatedAdditionalInsModal from "./insuranceConInfo/relatedAdditionalInsModal.vue";
 
 import buttonEdit from "./commonutils/buttonEdit.vue";
@@ -38,6 +39,7 @@ const componentMap = {
     termFactorConfig:termFactorConfig,
     querycustomerView:querycustomerView,
     relatedAdditionalInsModal:relatedAdditionalInsModal,
+    queryUtils:queryUtils,
 
     buttonEdit:buttonEdit,
 

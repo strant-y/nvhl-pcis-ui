@@ -68,19 +68,9 @@ opertaor.setTableConfig([
     showGroupId: false,
     pageInfo: {
       clauseConfBasicInfo: {
-        pageKey: "clauseModeConfInfo",
+        pageKey: "clauseConfBasicInfo",
         pageTtile: "条款模版基本信息",
-        pageRef: "clauseModeConfInfo",
-      },
-      relatedRespons: {
-        pageKey: "relatedRespons",
-        pageTtile: "关联责任",
-        pageRef: "relatedRespons",
-      },
-      relatedAdditionalIns: {
-        pageKey: "relatedAdditionalIns",
-        pageTtile: "关联附加条款模版",
-        pageRef: "relatedAdditionalIns",
+        pageRef: "clauseConfBasicInfo",
       },
     },
   },

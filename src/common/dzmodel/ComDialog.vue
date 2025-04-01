@@ -7,6 +7,7 @@
       :data="data"
       :method="method"
       @handleClose="handleClose"
+      ref="contentRef"
     />
   </el-dialog>
 </template>
@@ -20,6 +21,7 @@ const contentComponent = ref(null); //组件映射
 const data = ref({});         //数据映射
 const method = ref({});       // 方法映射
 const componentKey = ref(0);    // 添加 key 属性
+const contentRef = ref('contentRef');
 
 const handleClose = () => {
   contentComponent.value = null;
@@ -47,6 +49,7 @@ const open = (c, d, m, t) => {
 
 defineExpose({
   open,
-  handleClose
+  handleClose,
+  contentRef
 });
 </script>

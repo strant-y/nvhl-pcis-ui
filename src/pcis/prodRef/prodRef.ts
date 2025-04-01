@@ -52,6 +52,7 @@ import healthNoticeAdd from "./commodityRef/HealthNoticeAdd.vue";
 import clauseConf from "./clauseConfRef/clauseConf.vue";
 // import prodaudit from "./commonRef/prodaudit.vue";
 import clauseConfBasicInfo from "./commonRef/ClauseConfBasicInfo.vue";
+import ClauseModeConfInfo from "./commonRef/ClauseModeConfInfo.vue";
 import  ndustryCateModal  from "./commodityRef/ndustryCateModal.vue";
 import  cOccupCdeModal  from "./commodityRef/cOccupCdeModal.vue";
 
@@ -116,6 +117,7 @@ const componentMap = {
   healthNoticeAddRef:healthNoticeAdd,
   clauseConfRef:clauseConf,
   clauseConfBasicInfoRef:clauseConfBasicInfo,
+  clauseModeConfInfoRef:ClauseModeConfInfo,
 
   agentPre: agentPre,
   agentWorker: agentWorker,
