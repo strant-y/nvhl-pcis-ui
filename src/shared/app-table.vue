@@ -1,14 +1,17 @@
 <template>
   <div class="searchbar">
     <el-card shadow="never" class="table-container">
+      
+      {{ console.log(tableConfig.showEdit ||
+        tableConfig.formconfig?.titleBtns.length > 0 ||
+        tableConfig.titleBtns.length > 0) }}
       <template
         #header
         v-if="
           tableConfig.showEdit ||
           tableConfig.formconfig?.titleBtns.length > 0 ||
           tableConfig.titleBtns.length > 0
-        "
-      >
+        " >
         <el-row justify="space-between" v-if="tableConfig.showEdit">
           <el-col :span="24">
             <dynamic-forms
@@ -42,7 +45,7 @@
           </el-col>
         </el-row>
       </template>
-      <template #header v-if="tableConfig.fromUi.showTitleBar?tableConfig.fromUi.showTitleBar: true">
+      <template #header v-else-if="tableConfig.fromUi.showTitleBar?tableConfig.fromUi.showTitleBar: true">
         <el-row justify="space-between">
           <el-col :span="4" v-if="!tableConfig.production">
             {{ tableConfig.title }}
