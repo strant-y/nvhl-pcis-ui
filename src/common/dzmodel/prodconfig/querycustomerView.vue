@@ -106,6 +106,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               })
               .then((res) => {
                 setFormItem("CCertfCls", { loadData: res });
+                setTableFormItem("CCertfCls", { loadData: res });
               });
           } else {
             codeListStore
@@ -115,6 +116,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               })
               .then((res) => {
                 setFormItem("CCertfCls", { loadData: res });
+                setTableFormItem("CCertfCls", { loadData: res });
               });
           }
         },
@@ -234,6 +236,16 @@ function setFormItem(key, obj) {
       }
     });
   }
+}
+//给表格表单项赋值
+function setTableFormItem(key, obj) {
+    if (obj && Object.keys(obj).length) {
+        tableconfig.fromSchema?.forEach((item) => {
+            if (item.prop === key) {
+                Object.assign(item, obj);
+            }
+        });
+    }
 }
 function getFromValue() {
   return freeEditRef?.value?.getFromValue();

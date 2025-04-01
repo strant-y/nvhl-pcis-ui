@@ -13,8 +13,14 @@
                   class="NavigaList_card"
                 >
                   <el-anchor :bound="120" :offset="80">
-                    <el-anchor-link :href="`#underwrite`" v-if="underwriteFlag">
-                      <span style="font-size: 15px"> 核保处理 </span>
+                    <el-anchor-link :href="`#underwriteurl`" v-if="underwriteFlag">
+                      <span style="font-size: 15px">核保处理</span>
+                    </el-anchor-link>
+                    <el-anchor-link :href="`#edrbaseurl`"    v-if="edrbaseFlag">
+                      <span style="font-size: 15px">批改信息</span>
+                    </el-anchor-link>
+                    <el-anchor-link :href="`#edritemurl`"    v-if="edritemFlag">
+                      <span style="font-size: 15px">批改比较项</span>
                     </el-anchor-link>
                     <el-anchor-link
                       v-for="(k, i) in pageConfig?.pageInfo"
@@ -80,7 +86,7 @@
             </el-header>
             <el-main>
               <div
-                :id="underwrite"
+                id="underwriteurl"
                 v-if="underwriteFlag"
                 style="margin-bottom: 10px"
               >
@@ -88,6 +94,26 @@
                   :param="props.param"
                   ref="underwrite"
                 ></underwriteRef>
+              </div>
+              <div
+                id="edrbaseurl"
+                v-if="edrbaseFlag"
+                style="margin-bottom: 10px"
+              >
+                <edrbaseRef
+                  :param="props.param"
+                  ref="edrbase"
+                ></edrbaseRef>
+              </div>
+              <div
+                id="edritemurl"
+                v-if="edritemFlag"
+                style="margin-bottom: 10px"
+              >
+                <edritemRef
+                  :param="props.param"
+                  ref="edritem"
+                ></edritemRef>
               </div>
               <template v-for="(pageConfig, v) in formconfig1" :key="v">
                 <div
@@ -141,6 +167,7 @@ import {
   appCalc,
   submitToUndr,
   getAppPolicy,
+  saveEdrAppPlyInfo,
   submitUnderwriting,
   submitUnderwritingEdr,
 } from "../../../api/query/index";
@@ -158,6 +185,8 @@ const PreviousdrOpnList = defineAsyncComponent(
 const opertaor = dataOpertaor();
 opertaor.init();
 const underwrite = ref(null);
+const edrbase = ref(null);
+const edritem = ref(null);
 const props = defineProps({
   param: {
     type: Object,
@@ -173,6 +202,8 @@ const formconfig1 = opertaor.getTableConfig();
 const bthList = ref<Array<FreeButtonBase>>([]);
 const tempFindBtn = [];
 let underwriteFlag = false;
+let edrbaseFlag = false;
+let edritemFlag = false;
 const user = JSON.parse(sessionStorage.getItem("user"));
 const nAmt = ref(0.0);
 const nPrm = ref(0.0);
@@ -196,6 +227,13 @@ const initPage = async () => {
     underwriteFlag = true;
   } else {
     underwriteFlag = false;
+  }
+  if (props.param.pageType === "EDR_APP_NEW_SCENE") {
+    edrbaseFlag = true;
+    edritemFlag = true;
+  } else {
+    edrbaseFlag = false;
+    edritemFlag = false;
   }
   // 页面初始化
   const formconfig11 = JSON.parse(getProductRes.data);
@@ -419,7 +457,43 @@ async function loadAfter() {
         },
       })
     );
-  } else if (props.param.pageType === "readonly") {
+  } else if (props.param.pageType === "EDR_APP_NEW_SCENE") {
+      const cAppNo = props.param.cAppNo;
+      loadAppPlyInfo(cAppNo);
+      bthList.value.push(
+          createFreeButtonBase({
+              label: "保费计算",
+              type: "primary",
+              id: "btnUdr",
+              func: () => {
+
+              },
+          }),
+          createFreeButtonBase({
+              label: "保存",
+              type: "primary",
+              id: "saveEdr",
+              func: () => {
+                  saveEdrPlyInfo();
+              },
+          }),
+          createFreeButtonBase({
+              label: "比较/生成批文",
+              type: "primary",
+              id: "preOrder",
+              func: () => {
+
+              },
+          }),
+          createFreeButtonBase({
+              label: "申请核保",
+              type: "primary",
+              func: () => {
+
+              },
+          })
+      );
+  }else if (props.param.pageType === "readonly") {
     // 查询数据
     const getAppPlyInfoRes = await getAppPlyInfoByAppNo({
       CAppNo: props.param.cAppNo,
@@ -470,12 +544,24 @@ const getCAppNoFun = () => {
  * 加载投保单明细
  */
 const loadAppPlyInfo = (CAppNo) => {
-  const res = { CAppNo: CAppNo };
-  getAppPolicy(res).then((res) => {
-    console.log("投保单明细getAppPolicy-res", res);
+   const param = {
+    scene: props.param.pageType,
+   };
+    if ('EDR_APP_NEW_SCENE' === props.param.pageType) {
+        param['CPlyNo'] = CAppNo;
+    } else {
+        param['CAppNo'] = CAppNo;
+    }
+  getAppPolicy(param).then((res) => {
+    console.log("投保单明细", res);
     if (res["code"] == "200") {
       const ops = opertaor.convertData(res);
       console.log("转换的数据", ops);
+      if(res['res']['composition']['EdrBase']){
+         const EdrBaseData= res['res']['composition']['EdrBase'][0]
+          console.log(EdrBaseData)
+          edrbase.value?.setFormValue(EdrBaseData)
+      }
       ElMessage.success(res.msg);
       opertaor.setDataAll(ops);
     }
@@ -575,7 +661,9 @@ const submitToUndrFn = () => {
     }
   });
 };
-
+/**
+ * 投保单保存
+ * **/
 const savePlyInfo = () => {
   const btn = getBtn("btn010102");
   btn.loading = true;
@@ -603,6 +691,33 @@ const savePlyInfo = () => {
     // ElMessage.success(res.msg);
     // history.back();
   });
+};
+/**
+ * 批改单保存
+ * **/
+const saveEdrPlyInfo = () => {
+    const btn = getBtn("saveEdr");
+    btn.loading = true;
+    const res = opertaor.getDataAll();
+    res["user"] = user;
+    res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
+    res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
+    res['EdrBase']=edrbase.value?.getFromValue()
+    console.log(res);
+    saveEdrAppPlyInfo(res).then((res) => {
+        console.log("saveAppPlyInfo-res", res);
+        btn.loading = false;
+        if (res["code"] == "200") {
+            const ops = opertaor.convertData(res);
+            console.log("转换的数据", ops);
+            ElMessage.success(res.msg);
+            opertaor.setDataAll(ops);
+        } else {
+            ElMessage.error(res.msg);
+        }
+        // ElMessage.success(res.msg);
+        // history.back();
+    });
 };
 /**
  * 核保信息 提交

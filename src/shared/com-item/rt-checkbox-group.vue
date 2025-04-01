@@ -116,7 +116,8 @@ watch(
           options.value = [];
         });
     }
-  }
+  },
+    { deep: true }
 );
 function handleChange(val?: string | number | Array<any> | undefined) {
   const option = options.value.find((item) => item.value === val);

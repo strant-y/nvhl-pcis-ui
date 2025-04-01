@@ -66,7 +66,13 @@ export function qryEndorseList(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function getAppPolicy(queryParams: any): AxiosPromise<any> {
-    return post(`/policy/getAppPolicy`, queryParams);
+    let url = '';
+    if (!!queryParams['scene'] && 'EDR_APP_NEW_SCENE' === queryParams['scene']) {
+        url = `/policy/getPolicy`;
+    } else {
+        url = `/policy/getAppPolicy`;
+    }
+    return post(url, queryParams);
 }
 /**
  * 保存申请单详细信息
@@ -74,6 +80,14 @@ export function getAppPolicy(queryParams: any): AxiosPromise<any> {
  */
 export function saveAppPlyInfo(queryParams: any): AxiosPromise<any> {
     return post(`policy/save`, queryParams);
+}
+
+/**
+ * 保存批改单详细信息
+ * @param queryParams
+ */
+export function saveEdrAppPlyInfo(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/saveEdr`, queryParams);
 }
   
 /**

@@ -24,6 +24,8 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
 const edrItemEdit = defineAsyncComponent(() => import("./edrItemEdit.vue"));
 import {
   AppTableConfig,
@@ -70,7 +72,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
       }),
     ],
-
     fromSchema: [
       {
         prop: "CKindNo",
@@ -89,14 +90,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         func: (row) => {
           cPard.value = row;
           selectedKindNo.value = row.value; // 更新选中的产品大类
-          // loadProducts(row.value).then((products) => {
-          //     const cProdNoItem = formconfig1.fromSchema.find(
-          //         (item) => item.prop === "cProdNo"
-          //     );
-          //     if (cProdNoItem) {
-          //         cProdNoItem.loadData = products;
-          //     }
-          // });
+          codeListStore
+            .queryCodeList({
+              codeListName: "EDR_RSN_LIST_KIND",
+              codeListParam: { kindno: row },
+            })
+            .then((res) => {
+              setFormItem("CRsnCde", {
+                loadData: res,
+              });
+            });
         },
       },
       {
@@ -105,12 +108,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "产品",
         itemWidth: 1,
         rules: [{ type: "required" }],
-        // loadData: [
-        //   {
-        //     label: "雇主责任保险",
-        //     value: "040002",
-        //   },
-        // ],
         filterable: true,
         clearable: true,
         typeCode: "PROD_LIST_IN_GUIDE",
@@ -134,8 +131,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "CRsnCde",
         inputtype: "rtselect",
         title: "批改原因",
-        typeCode: "EDR_RSN_LIST_KIND",
-        codeParam: { kindNo: "-" },
         filterable: true,
         clearable: true,
       },
@@ -328,6 +323,13 @@ onMounted(() => {
     setDisa();
   }
 });
+function setFormItem(prop: string, config: any) {
+  formconfig1.fromSchema?.forEach((item) => {
+    if (item.prop === prop) {
+      Object.assign(item, config);
+    }
+  });
+}
 
 defineExpose({
   getFromValue,

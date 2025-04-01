@@ -143,7 +143,8 @@ const tableConfig = reactive<AppTableConfig>(
         inputtype: "rtcheckbox",
         width: "100",
         func: (val) => {
-          return val === "1" ? true : false;
+          return val == "true" ? "1" : "0";
+          console.log("改变状态的row", val);
         },
       },
       {
@@ -152,8 +153,7 @@ const tableConfig = reactive<AppTableConfig>(
         inputtype: "rtcheckbox",
         width: "100",
         func: (val, row) => {
-          console.log("改变状态的row", row);
-          return val === "1" ? true : false;
+          return val == "true" ? "1" : "0";
         },
       },
     ],
@@ -196,15 +196,22 @@ const handleConfirm = () => {
   //   return;
   // }
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
-  const paramData = pageresult.list.filter((item) => item.checked == true);
-  const param = paramData.map((items) => items.cSpecNo).join(",");
-  console.log("0000", param);
-  // const param = selectedRows.value.map((item) => item.cSpecNo).join(",");
+  const webPrdProdSpecRelDTOList = pageresult.list.filter(
+    (item) => item.checked == true
+  );
+  webPrdProdSpecRelDTOList.forEach((item) => {
+    item.cIfEdit = item.cIfEdit == true ? "1" : "0";
+    item.cIfMust = item.cIfMust == true ? "1" : "0";
+  });
+  const param = webPrdProdSpecRelDTOList
+    .map((items) => items.cSpecNo)
+    .join(",");
   const newParam = {
     userId: user.opCde,
     cCrtCde: user.opCde,
     cUpdCde: user.opCde,
-    cSpecNo: param,
+    webPrdProdSpecRelDTOList,
+    // cSpecNo: param,
     cProdNo: tabref.getFromValue().cProdNo,
   };
   associationSpec(newParam)

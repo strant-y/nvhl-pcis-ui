@@ -248,9 +248,9 @@ function loadPayConfirmInfo(param: any) {
 function save() {
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
-      if (this.CRelAppNos) {
-        ElMessage.warning('所选单据包含联合单，必须联合进行缴费类型转换，是否合并转换？')
-      }
+      // if (this.CRelAppNos) {
+      //   ElMessage.warning('所选单据包含联合单，必须联合进行缴费类型转换，是否合并转换？')
+      // }
       let s = freeEditRef.value?.getFromValue(); //获取表单数据
       //const param = Object.assign({ type: props.type }, s);
       const typeandno = [
