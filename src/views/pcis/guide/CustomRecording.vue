@@ -210,7 +210,7 @@ const departmentTree = defineAsyncComponent(
 const termDialog = defineAsyncComponent(() => import("./termDialog.vue"));
 const formconfig1 = ref({
   cDptCde: "",
-  cDptNme: "",
+  cDptCnm: "",
   cRenewMrk: "0",
   cGrpMrk: "0",
   cNmeCn: "",
@@ -245,7 +245,7 @@ const method = {};
 //当前选中的机构item
 function selectedItem(item) {
   selectTreeItem.value = item;
-  formconfig1.value.cDptNme = item.label;
+  formconfig1.value.cDptCnm = item.label;
   formconfig1.value.cDptCde = item.value;
 }
 

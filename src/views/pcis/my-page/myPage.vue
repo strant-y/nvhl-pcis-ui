@@ -214,88 +214,84 @@ onBeforeMount(() => {
 /**
  * 投保需要的按钮
  */
-const basicBtn=[
-    createFreeButtonBase({
-        label: "保存模板",
-        type: "primary",
-        func: () => {},
-    }),
-    createFreeButtonBase({
-        label: "复制出单",
-        type: "primary",
-        func: () => {},
-    }),
-    createFreeButtonBase({
-        label: "保费计算",
-        type: "primary",
-        id: "btn010101",
-        func: () => {
-            calcPremium();
-        },
-    }),
-    createFreeButtonBase({
-        label: "保存",
-        type: "primary",
-        id: "btn010102",
-        func: () => {
-            savePlyInfo();
-        },
-    }),
-    createFreeButtonBase({
-        label: "申请核保",
-        type: "primary",
-        id: "btn010103",
-        func: () => {
-            submitToUndrFn();
-        },
-    }),
-    createFreeButtonBase({
-        label: "发票信息",
-        type: "primary",
-        func: () => {},
-    }),
-    createFreeButtonBase({
-        label: "反洗钱扩展信息",
-        type: "primary",
-        func: () => {},
-    })
-]
+const basicBtn = [
+  createFreeButtonBase({
+    label: "保存模板",
+    type: "primary",
+    func: () => {},
+  }),
+  createFreeButtonBase({
+    label: "复制出单",
+    type: "primary",
+    func: () => {},
+  }),
+  createFreeButtonBase({
+    label: "保费计算",
+    type: "primary",
+    id: "btn010101",
+    func: () => {
+      calcPremium();
+    },
+  }),
+  createFreeButtonBase({
+    label: "保存",
+    type: "primary",
+    id: "btn010102",
+    func: () => {
+      savePlyInfo();
+    },
+  }),
+  createFreeButtonBase({
+    label: "申请核保",
+    type: "primary",
+    id: "btn010103",
+    func: () => {
+      submitToUndrFn();
+    },
+  }),
+  createFreeButtonBase({
+    label: "发票信息",
+    type: "primary",
+    func: () => {},
+  }),
+  createFreeButtonBase({
+    label: "反洗钱扩展信息",
+    type: "primary",
+    func: () => {},
+  }),
+];
 /**
  * 一般批改按钮
  */
-const edrBtn=[
-    createFreeButtonBase({
-        label: "保费计算",
-        type: "primary",
-        id: "btnUdr",
-        func: () => {
-
-        },
-    }),
-    createFreeButtonBase({
-        label: "保存",
-        type: "primary",
-        id: "saveEdr",
-        func: () => {
-            saveEdrPlyInfo();
-        },
-    }),
-    createFreeButtonBase({
-        label: "比较/生成批文",
-        type: "primary",
-        id: "btnCompare",
-        func: () => {
-            generateEndorse()
-        },
-    }),
-    createFreeButtonBase({
-        label: "申请核保",
-        type: "primary",
-        func: () => {
-
-        },
-    })
-]
+const edrBtn = [
+  createFreeButtonBase({
+    label: "保费计算",
+    type: "primary",
+    id: "btnUdr",
+    func: () => {},
+  }),
+  createFreeButtonBase({
+    label: "保存",
+    type: "primary",
+    id: "saveEdr",
+    func: () => {
+      saveEdrPlyInfo();
+    },
+  }),
+  createFreeButtonBase({
+    label: "比较/生成批文",
+    type: "primary",
+    id: "btnCompare",
+    func: () => {
+      generateEndorse();
+    },
+  }),
+  createFreeButtonBase({
+    label: "申请核保",
+    type: "primary",
+    func: () => {},
+  }),
+];
 /**
  * 数据初始化
  * @param data
@@ -315,22 +311,15 @@ const initPage = async () => {
   } else {
     underwriteFlag = false;
   }
-  if (props.param.pageType === "EDR_APP_NEW_SCENE"||(props.param.pageType=='TEMPORARY_DEPOSIT'&&props.param.cAppTyp=='E')) {
+  if (
+    props.param.pageType === "EDR_APP_NEW_SCENE" ||
+    (props.param.pageType == "TEMPORARY_DEPOSIT" && props.param.cAppTyp == "E")
+  ) {
     edrbaseFlag = true;
     edritemFlag = true;
   } else {
     edrbaseFlag = false;
     edritemFlag = false;
-  }
-  if (props.param.queryTyp == "orig") {
-    const formconfig11 = getRenewalAppPolicyres.res.composition;
-    console.log("续保页面初始化返回数据", formconfig11);
-    opertaor.setTableConfig(formconfig11);
-  } else {
-    // 页面初始化
-    const formconfig11 = JSON.parse(getProductRes.data);
-    console.log("页面初始化返回数据", formconfig11);
-    opertaor.setTableConfig(formconfig11);
   }
   // 页面初始化
   const formconfig11 = JSON.parse(getProductRes.data);
@@ -363,7 +352,7 @@ async function loadAfter() {
   if (props.param.pageType === "app") {
     //获取单号
     getCAppNoFun();
-    bthList.value=basicBtn
+    bthList.value = basicBtn;
     nextTick(() => {
       //保险期间初始化
       const baseBefore = {};
@@ -407,11 +396,11 @@ async function loadAfter() {
   } else if (props.param.pageType === "TEMPORARY_DEPOSIT") {
     const cAppNo = props.param.cAppNo;
     loadAppPlyInfo(cAppNo);
-      if(props.param.cAppTyp=='E'){
-          bthList.value=edrBtn
-      }else if(props.param.cAppTyp=='A'){
-          bthList.value=basicBtn
-      }
+    if (props.param.cAppTyp == "E") {
+      bthList.value = edrBtn;
+    } else if (props.param.cAppTyp == "A") {
+      bthList.value = basicBtn;
+    }
   } else if (props.param.pageType === "PLY_UW") {
     opertaor.setDisabledAll();
     const cAppNo = props.param.cAppNo;
@@ -473,7 +462,7 @@ async function loadAfter() {
     opertaor.setDisabledAll();
     const cAppNo = props.param.cAppNo;
     loadAppPlyInfo(cAppNo);
-      bthList.value=edrBtn
+    bthList.value = edrBtn;
   } else if (props.param.pageType === "readonly") {
     opertaor.setDisabledAll();
     // 查询数据
@@ -499,7 +488,6 @@ async function loadAfter() {
       //   .setFormValue(lowercaseKeys(data["applicant"]));
     });
   } else if (props.param.cPlyNo === "orig") {
-    getCAppNoFun();
     bthList.value.push(
       createFreeButtonBase({
         label: "保存模板",
@@ -508,6 +496,57 @@ async function loadAfter() {
       }),
       createFreeButtonBase({
         label: "复制出单",
+        type: "primary",
+        func: () => {},
+      }),
+      createFreeButtonBase({
+        label: "保费计算",
+        type: "primary",
+        id: "btn010101",
+        func: () => {
+          calcPremium();
+        },
+      }),
+      createFreeButtonBase({
+        label: "保存",
+        type: "primary",
+        id: "btn010102",
+        func: () => {
+          savePlyInfo();
+        },
+      }),
+      createFreeButtonBase({
+        label: "申请核保",
+        type: "primary",
+        id: "btn010103",
+        func: () => {
+          submitToUndrFn();
+        },
+      }),
+      createFreeButtonBase({
+        label: "发票信息",
+        type: "primary",
+        func: () => {},
+      }),
+      createFreeButtonBase({
+        label: "反洗钱扩展信息",
+        type: "primary",
+        func: () => {},
+      })
+    );
+  } else if (props.param.pageType === "copy") {
+    getAppPolicy({
+      cAppNo: props.param.cAppNo,
+      queryTyp: props.param.pageType,
+    }).then((res) => {
+      if (res) {
+        const ops = opertaor.convertData(res);
+        opertaor.setDataAll(ops);
+      }
+    });
+    bthList.value.push(
+      createFreeButtonBase({
+        label: "保存模板",
         type: "primary",
         func: () => {},
       }),
@@ -588,7 +627,7 @@ const loadAppPlyInfo = (CAppNo) => {
       console.log("转换的数据", ops);
       if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
-        console.log(EdrBaseData);
+        console.log("EdrBaseData", EdrBaseData);
         edrbase.value?.setFormValue(EdrBaseData);
       }
       ElMessage.success(res.msg);
@@ -752,31 +791,31 @@ const saveEdrPlyInfo = () => {
  * 生成批文
  * **/
 const generateEndorse = () => {
-    const btn = getBtn("btnCompare");
-    // btn.loading = true;
-    //edritem.value?.setTableValue(2)
-    const res = opertaor.getDataAll();
-    res["user"] = user;
-    res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
-    res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
-    res['EdrBase']=edrbase.value?.getFromValue()
-    console.log(res);
-    getEndorseChange(res).then((res) => {
-        btn.loading = false;
-        if (res["code"] == "200") {
-            const ops = opertaor.convertData(res);
-            console.log("转换的数据", ops);
-            ElMessage.success(res.msg);
-            opertaor.setDataAll(ops);
-            if(res['res']['composition']['EdrBase']){
-                const EdrBaseData= res['res']['composition']['EdrBase'][0]
-                console.log(EdrBaseData)
-                edrbase.value?.setFormValue(EdrBaseData)
-            }
-        } else {
-            ElMessage.error(res.msg);
-        }
-    });
+  const btn = getBtn("btnCompare");
+  // btn.loading = true;
+  //edritem.value?.setTableValue(2)
+  const res = opertaor.getDataAll();
+  res["user"] = user;
+  res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
+  res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
+  res["EdrBase"] = edrbase.value?.getFromValue();
+  console.log(res);
+  getEndorseChange(res).then((res) => {
+    btn.loading = false;
+    if (res["code"] == "200") {
+      const ops = opertaor.convertData(res);
+      console.log("转换的数据", ops);
+      ElMessage.success(res.msg);
+      opertaor.setDataAll(ops);
+      if (res["res"]["composition"]["EdrBase"]) {
+        const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
+        console.log(EdrBaseData);
+        edrbase.value?.setFormValue(EdrBaseData);
+      }
+    } else {
+      ElMessage.error(res.msg);
+    }
+  });
 };
 /**
  * 核保信息 提交
