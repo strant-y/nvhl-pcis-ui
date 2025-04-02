@@ -1026,7 +1026,7 @@ const tableObj = {
             router.push({
               path: "/pcis/my-page",
               query: {
-                param: JSON.stringify({ ...data, ...{ pageType: "edit" } }),
+                param: JSON.stringify({ ...data, ...{ pageType: "TEMPORARY_DEPOSIT" } }),
               },
             });
           } else {

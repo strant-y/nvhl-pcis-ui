@@ -89,6 +89,14 @@ export function saveAppPlyInfo(queryParams: any): AxiosPromise<any> {
 export function saveEdrAppPlyInfo(queryParams: any): AxiosPromise<any> {
     return post(`/policy/saveEdr`, queryParams);
 }
+
+/**
+ * 生成批文
+ * @param queryParams
+ */
+export function getEndorseChange(queryParams: any): AxiosPromise<any> {
+    return post(`/edr/getEndorseChange`, queryParams);
+}
   
 /**
  * 查询申请单列表
