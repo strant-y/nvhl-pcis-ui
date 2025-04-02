@@ -425,7 +425,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "承保机构",
         btnWidth: 10,
         itemWidth: 2,
-        // rules: [{ type: "required" }],
         showExBtn: true,
         rules: [getRules("required", {})],
         btnItems: {
@@ -447,11 +446,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   };
                   freeEditRef.value[currentTabKey.value].value[0].setValue(
                     "cDptCde",
-                    selectObj.name
+                    selectObj.id
                   );
-                  // setValue("cDptCde", selectObj.id);
-                  // setFormItem("Base.cIntroDptcde", obj);
-                  // setValue("Base.cIntroDptcde", selectObj.id);
+                  setFormItem("cDptCde", {
+                    loadData: [
+                      {
+                        label: `${selectObj.id}${selectObj.name}`,
+                        value: selectObj.id,
+                      },
+                    ],
+                  });
                 }
               });
           },
@@ -465,6 +469,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           { label: "是", value: 1 },
           { label: "否", value: 0 },
         ],
+        defaultValue: 1,
       },
       {
         prop: "cSecondDptCde",
@@ -483,20 +488,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           { label: "最新", value: "ply" },
         ],
       },
-      {
-        prop: "cPlyNo",
-        inputtype: "rtselect",
-        title: "单据状态",
-        clearable: true,
-        rules: [getRules("required", {})],
-        loadData: [
-          { label: "投保待撤回任务", value: "1" },
-          { label: "待修改单查询", value: "2" },
-          { label: "保单到期查询", value: "3" },
-          { label: "批量导入查询", value: "4" },
-          { label: "产品组合出单", value: "5" },
-        ],
-      },
+      // {
+      //   prop: "cPlyNo",
+      //   inputtype: "rtselect",
+      //   title: "单据状态",
+      //   clearable: true,
+      //   rules: [getRules("required", {})],
+      //   loadData: [
+      //     { label: "投保待撤回任务", value: "1" },
+      //     { label: "待修改单查询", value: "2" },
+      //     { label: "保单到期查询", value: "3" },
+      //     { label: "批量导入查询", value: "4" },
+      //     { label: "产品组合出单", value: "5" },
+      //   ],
+      // },
       {
         prop: "cKindNo",
         inputtype: "rtselect",
@@ -623,9 +628,34 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           { label: "投保", value: "A" },
           { label: "批改", value: "E" },
         ],
+        func: (val) => {
+          if (val === "A") {
+            // 投保
+            formconfig1.fromSchema?.forEach((item) => {
+              if (item.prop === "tAppTm") {
+                item.hidden = false; // 显示投保日期
+                item.rules = [getRules("required", {})]; // 设置必填规则
+              } else if (item.prop == "tIssueTm" || item.prop == "tEdrAppTm") {
+                item.hidden = true;
+              }
+            });
+          } else if (val === "E") {
+            // 批改
+            formconfig1.fromSchema?.forEach((item) => {
+              if (item.prop === "tEdrAppTm") {
+                item.hidden = false; // 显示批改申请日期
+                item.rules = [getRules("required", {})]; // 设置必填规则
+              } else if (item.prop == "tAppTm") {
+                item.hidden = true;
+              } else if (item.prop == "tIssueTm") {
+                item.hidden = true;
+              }
+            });
+          }
+        },
       },
       {
-        prop: "tms",
+        prop: "tIssueTm",
         inputtype: "rtdatepicker",
         title: "签单日期",
         format: "YYYY-MM-DD HH:mm:ss",
@@ -634,14 +664,32 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "datetimerange",
       },
       {
-        prop: "bsType",
+        prop: "tAppTm",
+        inputtype: "rtdatepicker",
+        title: "投保日期",
+        format: "YYYY-MM-DD HH:mm:ss",
+        valueFormat: "YYYY-MM-DD HH:mm:ss",
+        clearable: true,
+        type: "datetimerange",
+      },
+      {
+        prop: "tEdrAppTm",
+        inputtype: "rtdatepicker",
+        title: "批改申请日期",
+        format: "YYYY-MM-DD HH:mm:ss",
+        valueFormat: "YYYY-MM-DD HH:mm:ss",
+        clearable: true,
+        type: "datetimerange",
+      },
+      {
+        prop: "seeBilling",
         inputtype: "rtselect",
         title: "是否见费出单",
         minWidth: 180,
         clearable: true,
         loadData: [
-          { label: "是", value: "A" },
-          { label: "否", value: "E" },
+          { label: "是", value: "1" },
+          { label: "否", value: "0" },
         ],
       },
       {
@@ -820,6 +868,17 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 //         clearable: true,
 //         type: "daterange",
 //       },
+
+//给表单下拉项赋值
+function setFormItem(key, obj) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        Object.assign(item, obj);
+      }
+    });
+  }
+}
 const pageresult = reactive<Pageresult>({
   result: "",
   /** 数据列表 */
@@ -1158,7 +1217,7 @@ const tableObj = {
         minWidth: 180,
       },
       {
-        prop: "cTermNme",
+        prop: "cTermNo",
         inputtype: "rtinput",
         title: "条款",
         minWidth: 180,
@@ -1222,32 +1281,40 @@ const handleTabClick = (tab: any) => {
       ) {
         item.hidden = true;
       }
-      if (Number(i) == 1) {
-        if (item.prop === "tms") {
-          item.title = "投保日期";
-        }
-      } else {
-        if (item.prop === "tms") {
-          item.title = "签单日期";
-        }
-      }
-      if (Number(i) == 2) {
-        if (item.prop === "cAppTyp") {
-          item.disabled = true;
-          freeEditRef.value[i].value[0].setValue("cAppTyp", "A");
-        }
-      } else if (Number(i) == 3) {
-        if (item.prop === "cAppTyp") {
-          item.disabled = true;
-          freeEditRef.value[i].value[0].setValue("cAppTyp", "E");
-        }
-      } else {
-        if (item.prop === "cAppTyp") {
-          item.disabled = false;
-        }
-      }
+      // if (Number(i) == 1) {
+      //   if (item.prop === "tIssueTm") {
+      //     item.title = "投保日期";
+      //   }
+      // } else {
+      //   if (item.prop === "tIssueTm") {
+      //     item.title = "签单日期";
+      //   }
+      // }
+      // if (Number(i) == 2) {
+      //   if (item.prop === "cAppTyp") {
+      //     item.disabled = true;
+      //     freeEditRef.value[i].value[0].setValue("cAppTyp", "A");
+      //   }
+      // } else if (Number(i) == 3) {
+      //   if (item.prop === "cAppTyp") {
+      //     item.disabled = true;
+      //     freeEditRef.value[i].value[0].setValue("cAppTyp", "E");
+      //   }
+      // } else {
+      //   if (item.prop === "cAppTyp") {
+      //     item.disabled = false;
+      //   }
+      // }
     });
-    freeEditRef.value[i].value[0].setValue("tms", [
+    freeEditRef.value[i].value[0].setValue("tIssueTm", [
+      dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
+      moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+    ]);
+    freeEditRef.value[i].value[0].setValue("tAppTm", [
+      dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
+      moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+    ]);
+    freeEditRef.value[i].value[0].setValue("tEdrAppTm", [
       dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
       moment(new Date()).format("YYYY-MM-DD 23:59:59"),
     ]);
@@ -1261,6 +1328,28 @@ const handleTabClick = (tab: any) => {
 };
 
 onMounted(async () => {
+  formconfig1.fromSchema?.forEach((item) => {
+    if (
+      // item.prop === "tIssueTm"
+      item.prop === "tAppTm" ||
+      item.prop === "tEdrAppTm"
+    ) {
+      item.hidden = true; // 隐藏所有日期字段
+      item.rules = []; // 清除必填规则
+    }
+  });
+  freeEditRef.value[0].value[0].setValue("cDptCde", "0200000000000");
+  freeEditRef.value[1].value[0].setValue("cDptCde", "0200000000000");
+  freeEditRef.value[2].value[0].setValue("cDptCde", "0200000000000");
+  freeEditRef.value[3].value[0].setValue("cDptCde", "0200000000000");
+  setFormItem("cDptCde", {
+    loadData: [
+      {
+        label: "0200000000000永安保险公总司",
+        value: "0200000000000",
+      },
+    ],
+  });
   pageresult.list = [];
 
   //首页跳转过来的逻辑 Start
@@ -1271,8 +1360,8 @@ onMounted(async () => {
     );
     activeName.value = "2";
     await nextTick();
-    freeEditRef.value[1].value[0].setValue("bsType", "A");
-    freeEditRef.value[1].value[0].setValue("tms", [
+    freeEditRef.value[1].value[0].setValue("seeBilling", "A");
+    freeEditRef.value[1].value[0].setValue("tIssueTm", [
       homeJumpData.value.TIssueTmStart,
       homeJumpData.value.TIssueTmEnd,
     ]);
@@ -1292,10 +1381,18 @@ onMounted(async () => {
     );
     activeName.value = "6";
   } else {
-    freeEditRef.value[0].value[0].setValue("tms", [
+    freeEditRef.value[0].value[0].setValue("tIssueTm", [
       dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
       moment(new Date()).format("YYYY-MM-DD 23:59:59"),
     ]);
+    // freeEditRef.value[0].value[0].setValue("tAppTm", [
+    //   dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
+    //   moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+    // ]);
+    // freeEditRef.value[0].value[0].setValue("tEdrAppTm", [
+    //   dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
+    //   moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+    // ]);
   }
   //首页跳转过来的逻辑 End
 });
@@ -1314,41 +1411,30 @@ const method = {
   },
 };
 
-// 绑定特殊验证器
-const exRules = {
-  byrtInput: (rule: any, value: any, callback: any) => {
-    const r = freeEditRef.value?.getFromValue();
-    if (r["name"]) {
-      callback();
-    } else {
-      callback("姓名");
-    }
-  },
-};
-
 /** 查询 */
 function handleQuery(flag?: boolean) {
   // 此处数组ref赋值，获取都有问题，暂时隐藏
-  console.log("tableRef", tableRef);
-  console.log("freeEditRef", freeEditRef);
   const tableRefs = tableRef.value[currentTabKey.value];
   const freeEditRefs = freeEditRef.value[currentTabKey.value];
   const r = tableRefs.value[0]?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRefs.value[0].getFromValue(); //获取表单数据
-  console.log(s);
+  if (s.cLoadSub == null) {
+    s.cLoadSub = "1";
+  }
   pageresult.list = [];
   if (
     (s["cAppNo"] == null || s["cAppNo"] == "") &&
     (s["cPlyNo"] == null || s["cPlyNo"] == "") &&
     (s["cAppNme"] == null || s["cAppNme"] == "")
   ) {
-    const startTemp = s.tms && s.tms.length > 1 ? s.tms[0] : null;
+    const startTemp =
+      s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[0] : null;
     if (null == startTemp || undefined === startTemp) {
       ElMessage.warning("签单日期不能为空");
       return;
     }
     const start = dayjs(startTemp);
-    const endTemp = s.tms && s.tms.length > 1 ? s.tms[1] : null;
+    const endTemp = s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[1] : null;
     if (null == endTemp || undefined === endTemp) {
       ElMessage.warning("签单日期不能为空");
       return;
@@ -1363,43 +1449,62 @@ function handleQuery(flag?: boolean) {
       return;
     }
   }
-  if (currentTabKey.value == "1") {
-    const param = Object.assign(s, r);
-    param["pageNo"] = param["pageNum"];
-    getAppPolicyList(param)
-      .then((res) => {
-        const { code, data, msg } = res;
-        if (200 === code) {
-          pageresult.list = [];
-          pageresult.list = data.result;
-          pageresult.total = data.total;
-          console.log(pageresult.list);
-          console.log(pageresult.total);
-        } else {
-          ElMessage.error(msg);
-        }
-      })
-      .finally(() => {});
-  } else if (currentTabKey.value == "2") {
-    const param = Object.assign(s, r);
-    param["pageNo"] = param["pageNum"];
-    param["user"] = JSON.parse(sessionStorage.getItem("user"));
-    console.log(param);
-    qryEndorseList(param)
-      .then((res) => {
-        const { code, data, msg } = res;
-        if (200 === code) {
-          pageresult.list = [];
-          pageresult.list = data.result;
-          pageresult.total = data.total;
-          console.log(pageresult.list);
-          console.log(pageresult.total);
-        } else {
-          ElMessage.error(msg);
-        }
-      })
-      .finally(() => {});
-  }
+  // 提取投保日期的开始时间和结束时间
+  const tAppTmStart = s.tAppTm && s.tAppTm.length > 1 ? s.tAppTm[0] : null;
+  const tAppTmEnd = s.tAppTm && s.tAppTm.length > 1 ? s.tAppTm[1] : null;
+  // 提取批改申请日期的开始时间和结束时间
+  const tEdrAppTmStart =
+    s.tEdrAppTm && s.tEdrAppTm.length > 1 ? s.tEdrAppTm[0] : null;
+  const tEdrAppTmEnd =
+    s.tEdrAppTm && s.tEdrAppTm.length > 1 ? s.tEdrAppTm[1] : null;
+  // 提取签单日期的开始时间和结束时间
+  const tIssueTmStart =
+    s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[0] : null;
+  const tIssueTmEnd =
+    s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[1] : null;
+
+  // if (currentTabKey.value == "0") {
+  const param = Object.assign(s, r);
+  param["pageNo"] = param["pageNum"];
+  param["tAppTmStart"] = tAppTmStart; // 添加投保开始时间
+  param["tAppTmEnd"] = tAppTmEnd; // 添加投保结束时间
+  param["tEdrAppTmStart"] = tEdrAppTmStart; // 添加批改开始时间
+  param["tEdrAppTmEnd"] = tEdrAppTmEnd; // 添加批改结束时间
+  param["tIssueTmStart"] = tIssueTmStart; // 添加签单开始时间
+  param["tIssueTmEnd"] = tIssueTmEnd; // 添加签单结束时间
+  getAppPolicyList(param)
+    .then((res) => {
+      const { code, data, msg } = res;
+      if (200 === code) {
+        pageresult.list = [];
+        pageresult.list = data.result;
+        pageresult.total = data.total;
+      } else {
+        ElMessage.error(msg);
+      }
+    })
+    .finally(() => {});
+  // }
+  // else if (currentTabKey.value == "1") {
+  //   const param = Object.assign(s, r);
+  //   param["pageNo"] = param["pageNum"];
+  //   param["user"] = JSON.parse(sessionStorage.getItem("user"));
+  //   console.log(param);
+  //   qryEndorseList(param)
+  //     .then((res) => {
+  //       const { code, data, msg } = res;
+  //       if (200 === code) {
+  //         pageresult.list = [];
+  //         pageresult.list = data.result;
+  //         pageresult.total = data.total;
+  //         console.log(pageresult.list);
+  //         console.log(pageresult.total);
+  //       } else {
+  //         ElMessage.error(msg);
+  //       }
+  //     })
+  //     .finally(() => {});
+  // }
 }
 
 // 多选事件

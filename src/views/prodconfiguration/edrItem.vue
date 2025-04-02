@@ -65,16 +65,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         label: "重置",
         icon: "RefreshRight",
         func: () => {
-          const val = freeEditRef.value?.getFromValue();
-          for (const k in val) {
-            val[k] = null;
-          }
+          freeEditRef.value?.resetFields();
         },
       }),
     ],
     fromSchema: [
       {
-        prop: "CKindNo",
+        prop: "cKindNo",
         inputtype: "rtselect",
         title: "产品大类",
         itemWidth: 1,
@@ -159,8 +156,6 @@ const tableconfig = reactive<AppTableConfig>(
           const cRsnCde = s["CRsnCde"];
           const cProdNo = s["CProdNo"];
           const cGrpMrk = s["CGrpMrk"];
-          console.log(cRsnCde);
-          console.log(cProdNo);
           if (
             cRsnCde == null ||
             cRsnCde == "" ||
@@ -218,7 +213,8 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cProdNo",
         title: "产品",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
+        typeCode: "PROD_LIST_IN_GUIDE",
       },
       {
         prop: "cRsnCde",
@@ -275,6 +271,9 @@ const handleDelete = (index: number, row: any) => {
 
 function getFromValue() {
   return freeEditRef?.value?.getFromValue();
+}
+function resetFields() {
+  return freeEditRef?.value?.resetFields();
 }
 
 function setFormValue(value: any) {

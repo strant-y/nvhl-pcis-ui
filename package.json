@@ -54,6 +54,7 @@
     "echarts": "^5.5.0",
     "element-china-area-data": "^6.1.0",
     "element-plus": "^2.8.6",
+    "file-saver": "^2.0.5",
     "js-base64": "^2.4.0",
     "jsencrypt": "^3.0.0-rc.1",
     "lodash-es": "^4.17.21",
