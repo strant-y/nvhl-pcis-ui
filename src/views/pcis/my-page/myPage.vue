@@ -13,13 +13,16 @@
                   class="NavigaList_card"
                 >
                   <el-anchor :bound="120" :offset="80">
-                    <el-anchor-link :href="`#underwriteurl`" v-if="underwriteFlag">
+                    <el-anchor-link
+                      :href="`#underwriteurl`"
+                      v-if="underwriteFlag"
+                    >
                       <span style="font-size: 15px">核保处理</span>
                     </el-anchor-link>
-                    <el-anchor-link :href="`#edrbaseurl`"    v-if="edrbaseFlag">
+                    <el-anchor-link :href="`#edrbaseurl`" v-if="edrbaseFlag">
                       <span style="font-size: 15px">批改信息</span>
                     </el-anchor-link>
-                    <el-anchor-link :href="`#edritemurl`"    v-if="edritemFlag">
+                    <el-anchor-link :href="`#edritemurl`" v-if="edritemFlag">
                       <span style="font-size: 15px">批改比较项</span>
                     </el-anchor-link>
                     <el-anchor-link
@@ -100,20 +103,14 @@
                 v-if="edrbaseFlag"
                 style="margin-bottom: 10px"
               >
-                <edrbaseRef
-                  :param="props.param"
-                  ref="edrbase"
-                ></edrbaseRef>
+                <edrbaseRef :param="props.param" ref="edrbase"></edrbaseRef>
               </div>
               <div
                 id="edritemurl"
                 v-if="edritemFlag"
                 style="margin-bottom: 10px"
               >
-                <edritemRef
-                  :param="props.param"
-                  ref="edritem"
-                ></edritemRef>
+                <edritemRef :param="props.param" ref="edritem"></edritemRef>
               </div>
               <template v-for="(pageConfig, v) in formconfig1" :key="v">
                 <div
@@ -159,7 +156,7 @@
 
 <script setup lang="ts">
 import { createFreeButtonBase, FreeButtonBase } from "@/shared/button-config";
-import { getProductPage } from "../../../api/prod/index";
+import { getProductPage, getRenewalAppPolicy } from "../../../api/prod/index";
 import {
   getAppPlyInfoByAppNo,
   saveAppPlyInfo,
@@ -223,6 +220,11 @@ const initPage = async () => {
     CProdNo: props.param.cProdNo,
     CGrpMrk: props.param.cGrpMrk,
   });
+  const getRenewalAppPolicyres = await getRenewalAppPolicy({
+    cPlyNo: props.param.cPlyNo,
+    queryTyp: props.param.queryTyp,
+  });
+
   if (props.param.pageType === "PLY_UW") {
     underwriteFlag = true;
   } else {
@@ -234,6 +236,16 @@ const initPage = async () => {
   } else {
     edrbaseFlag = false;
     edritemFlag = false;
+  }
+  if (props.param.queryTyp == "orig") {
+    const formconfig11 = getRenewalAppPolicyres.res.composition;
+    console.log("续保页面初始化返回数据", formconfig11);
+    opertaor.setTableConfig(formconfig11);
+  } else {
+    // 页面初始化
+    const formconfig11 = JSON.parse(getProductRes.data);
+    console.log("页面初始化返回数据", formconfig11);
+    opertaor.setTableConfig(formconfig11);
   }
   // 页面初始化
   const formconfig11 = JSON.parse(getProductRes.data);
@@ -459,43 +471,37 @@ async function loadAfter() {
       })
     );
   } else if (props.param.pageType === "EDR_APP_NEW_SCENE") {
-      opertaor.setDisabledAll();
-      const cAppNo = props.param.cAppNo;
-      loadAppPlyInfo(cAppNo);
-      bthList.value.push(
-          createFreeButtonBase({
-              label: "保费计算",
-              type: "primary",
-              id: "btnUdr",
-              func: () => {
-
-              },
-          }),
-          createFreeButtonBase({
-              label: "保存",
-              type: "primary",
-              id: "saveEdr",
-              func: () => {
-                  saveEdrPlyInfo();
-              },
-          }),
-          createFreeButtonBase({
-              label: "比较/生成批文",
-              type: "primary",
-              id: "preOrder",
-              func: () => {
-
-              },
-          }),
-          createFreeButtonBase({
-              label: "申请核保",
-              type: "primary",
-              func: () => {
-
-              },
-          })
-      );
-  }else if (props.param.pageType === "readonly") {
+    opertaor.setDisabledAll();
+    const cAppNo = props.param.cAppNo;
+    loadAppPlyInfo(cAppNo);
+    bthList.value.push(
+      createFreeButtonBase({
+        label: "保费计算",
+        type: "primary",
+        id: "btnUdr",
+        func: () => {},
+      }),
+      createFreeButtonBase({
+        label: "保存",
+        type: "primary",
+        id: "saveEdr",
+        func: () => {
+          saveEdrPlyInfo();
+        },
+      }),
+      createFreeButtonBase({
+        label: "比较/生成批文",
+        type: "primary",
+        id: "preOrder",
+        func: () => {},
+      }),
+      createFreeButtonBase({
+        label: "申请核保",
+        type: "primary",
+        func: () => {},
+      })
+    );
+  } else if (props.param.pageType === "readonly") {
     opertaor.setDisabledAll();
     // 查询数据
     const getAppPlyInfoRes = await getAppPlyInfoByAppNo({
@@ -519,8 +525,55 @@ async function loadAfter() {
       //   .getRefTab("applicant")
       //   .setFormValue(lowercaseKeys(data["applicant"]));
     });
+  } else if (props.param.cPlyNo === "orig") {
+    getCAppNoFun();
+    bthList.value.push(
+      createFreeButtonBase({
+        label: "保存模板",
+        type: "primary",
+        func: () => {},
+      }),
+      createFreeButtonBase({
+        label: "复制出单",
+        type: "primary",
+        func: () => {},
+      }),
+      createFreeButtonBase({
+        label: "保费计算",
+        type: "primary",
+        id: "btn010101",
+        func: () => {
+          calcPremium();
+        },
+      }),
+      createFreeButtonBase({
+        label: "保存",
+        type: "primary",
+        id: "btn010102",
+        func: () => {
+          savePlyInfo();
+        },
+      }),
+      createFreeButtonBase({
+        label: "申请核保",
+        type: "primary",
+        id: "btn010103",
+        func: () => {
+          submitToUndrFn();
+        },
+      }),
+      createFreeButtonBase({
+        label: "发票信息",
+        type: "primary",
+        func: () => {},
+      }),
+      createFreeButtonBase({
+        label: "反洗钱扩展信息",
+        type: "primary",
+        func: () => {},
+      })
+    );
   }
-
   bthList.value.push(
     createFreeButtonBase({
       label: "返回",
@@ -547,23 +600,23 @@ const getCAppNoFun = () => {
  * 加载投保单明细
  */
 const loadAppPlyInfo = (CAppNo) => {
-   const param = {
+  const param = {
     scene: props.param.pageType,
-   };
-    if ('EDR_APP_NEW_SCENE' === props.param.pageType) {
-        param['CPlyNo'] = CAppNo;
-    } else {
-        param['CAppNo'] = CAppNo;
-    }
+  };
+  if ("EDR_APP_NEW_SCENE" === props.param.pageType) {
+    param["CPlyNo"] = CAppNo;
+  } else {
+    param["CAppNo"] = CAppNo;
+  }
   getAppPolicy(param).then((res) => {
     console.log("投保单明细", res);
     if (res["code"] == "200") {
       const ops = opertaor.convertData(res);
       console.log("转换的数据", ops);
-      if(res['res']['composition']['EdrBase']){
-         const EdrBaseData= res['res']['composition']['EdrBase'][0]
-          console.log(EdrBaseData)
-          edrbase.value?.setFormValue(EdrBaseData)
+      if (res["res"]["composition"]["EdrBase"]) {
+        const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
+        console.log(EdrBaseData);
+        edrbase.value?.setFormValue(EdrBaseData);
       }
       ElMessage.success(res.msg);
       opertaor.setDataAll(ops);
@@ -699,28 +752,28 @@ const savePlyInfo = () => {
  * 批改单保存
  * **/
 const saveEdrPlyInfo = () => {
-    const btn = getBtn("saveEdr");
-    btn.loading = true;
-    const res = opertaor.getDataAll();
-    res["user"] = user;
-    res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
-    res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
-    res['EdrBase']=edrbase.value?.getFromValue()
-    console.log(res);
-    saveEdrAppPlyInfo(res).then((res) => {
-        console.log("saveAppPlyInfo-res", res);
-        btn.loading = false;
-        if (res["code"] == "200") {
-            const ops = opertaor.convertData(res);
-            console.log("转换的数据", ops);
-            ElMessage.success(res.msg);
-            opertaor.setDataAll(ops);
-        } else {
-            ElMessage.error(res.msg);
-        }
-        // ElMessage.success(res.msg);
-        // history.back();
-    });
+  const btn = getBtn("saveEdr");
+  btn.loading = true;
+  const res = opertaor.getDataAll();
+  res["user"] = user;
+  res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
+  res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
+  res["EdrBase"] = edrbase.value?.getFromValue();
+  console.log(res);
+  saveEdrAppPlyInfo(res).then((res) => {
+    console.log("saveAppPlyInfo-res", res);
+    btn.loading = false;
+    if (res["code"] == "200") {
+      const ops = opertaor.convertData(res);
+      console.log("转换的数据", ops);
+      ElMessage.success(res.msg);
+      opertaor.setDataAll(ops);
+    } else {
+      ElMessage.error(res.msg);
+    }
+    // ElMessage.success(res.msg);
+    // history.back();
+  });
 };
 /**
  * 核保信息 提交
