@@ -411,39 +411,75 @@ function getFromValue() {
   if (props.fromSchema) {
     props.fromSchema.forEach((key: any) => {
       if (key.inputtype === "rtcascader") {
-        const props = key.cascaderprops;
+        const props =
+          typeof key.cascaderprops === "string"
+            ? JSON.parse(key.cascaderprops)
+            : key.cascaderprops;
         const v = redata[key.prop];
-        if(props && props.length > 0 ){
-          for(var i = 0; i < props.length; i++){
+        if (props && props.length > 0 && v) {
+          for (var i = 0; i < props.length; i++) {
             redata[props[i]] = v[i];
           }
-          delete redata[key.prop];
+        }
+        delete redata[key.prop];
+      } else if (key.inputtype === "rtinputgroup") {
+        if (key.groupList && key.groupList.length > 0) {
+          key.groupList.forEach((gkey: any) => {
+            if (gkey.inputtype === "rtcascader") {
+              const gprops =
+                typeof gkey.cascaderprops === "string"
+                  ? JSON.parse(gkey.cascaderprops)
+                  : gkey.cascaderprops;
+              const gv = redata[gkey.prop];
+              if (gprops && gprops.length > 0 && gv) {
+                for (var i = 0; i < gprops.length; i++) {
+                  redata[gprops[i]] = gv[i];
+                }
+              }
+              delete redata[gkey.prop];
+            }
+          });
         }
       }
     });
   }
   return redata;
 }
-function setFormValue(data: any,noupdate = false) {
+function setFormValue(data: any, noupdate = false) {
   let setdata = data;
   if (props.fromSchema) {
     props.fromSchema.forEach((key: any) => {
       if (key.inputtype === "rtcascader") {
         const props = key.cascaderprops;
-        // const v = setdata[key.prop];
-        if(props && props.length > 0 ){
+        if (props && props.length > 0) {
           let cascd = [];
-          for(var i = 0; i < props.length; i++){
+          for (var i = 0; i < props.length; i++) {
             cascd.push(setdata[props[i]]);
             delete setdata[props[i]];
           }
           setdata[key.prop] = cascd;
         }
+      } else if (key.inputtype === "rtinputgroup") {
+        if (key.groupList && key.groupList.length > 0) {
+          key.groupList.forEach((gkey: any) => {
+            if (gkey.inputtype === "rtcascader") {
+              const gprops = gkey.cascaderprops;
+              if (gprops && gprops.length > 0) {
+                let cascd = [];
+                for (var i = 0; i < gprops.length; i++) {
+                  cascd.push(setdata[gprops[i]]);
+                  delete setdata[gprops[i]];
+                }
+                setdata[key.prop] = cascd;
+              }
+            }
+          });
+        }
       }
     });
   }
   Object.assign(form, setdata);
-  if(!noupdate){
+  if (!noupdate) {
     emits("formsDataUpdate", form);
   }
 }
@@ -460,17 +496,17 @@ function setValue(key: any, value: any) {
   form[key] = value;
   emits("formsDataUpdate", form);
 }
-function setDisabledAll(){
+function setDisabledAll() {
   if (props.fromSchema) {
     props.fromSchema.forEach((key: any) => {
-      if(key.inputtype === "rtinputgroup"){
+      if (key.inputtype === "rtinputgroup") {
         key.groupList.forEach((gkey: any) => {
           gkey.disabled = true;
         });
-      }else{
+      } else {
         key.disabled = true;
       }
-      if(key.btnItems){
+      if (key.btnItems) {
         key.btnItems.disabled = true;
       }
     });
