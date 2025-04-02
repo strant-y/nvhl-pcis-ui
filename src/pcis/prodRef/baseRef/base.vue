@@ -177,8 +177,8 @@ function setFormItem(key, obj) {
   }
 }
 
-function setDisabledAll() {
-  baseEditRef?.value?.setDisabledAll();
+function getFormconfig(){
+  return formconfig1;
 }
 
 defineExpose({
@@ -187,7 +187,7 @@ defineExpose({
   validate,
   setValue,
   getValue,
-  setDisabledAll,
+  getFormconfig
 });
 </script>
 

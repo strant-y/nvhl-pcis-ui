@@ -1,6 +1,7 @@
 import { FreeButtonBase } from "./button-config";
 
 export interface AppFreeEditConfig {
+  fromType?: "grid" | "free" | "custom" | null | undefined;
   id?: string; // 表单主键
   title?: string | null | undefined; // 功能标题
   defaultValue?: any | null;
@@ -34,6 +35,7 @@ export function createAppFreeEditConfig(
   config: AppFreeEditConfig = {}
 ): AppFreeEditConfig {
   return {
+    fromType:'free',
     id: config.id || `ID${new Date().getTime()}`,
     title: config.title || null,
     defaultValue: config.defaultValue || {},

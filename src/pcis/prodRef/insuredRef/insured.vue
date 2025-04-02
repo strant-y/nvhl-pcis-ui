@@ -428,8 +428,8 @@ function setValue(key: string, value: any) {
 function getValue(key: string) {
   return insuredEditRef?.value?.getValue(key);
 }
-function setDisabledAll() {
-  insuredEditRef?.value?.setDisabledAll();
+function getFormconfig(){
+  return formconfig1;
 }
 
 defineExpose({
@@ -438,7 +438,7 @@ defineExpose({
   validate,
   setValue,
   getValue,
-  setDisabledAll,
+  getFormconfig,
 });
 </script>
 

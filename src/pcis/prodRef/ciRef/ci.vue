@@ -72,8 +72,8 @@ function addFakeData() {
   }
 }
 
-function setDisabledAll() {
-  formconfig1.dragFlag = false;
+function getFormconfig(){
+  return formconfig1;
 }
 onMounted(() => {});
 defineExpose({
@@ -81,7 +81,7 @@ defineExpose({
   setFormValue,
   validate,
   getTableValue,
-  setDisabledAll,
+  getFormconfig,
 });
 </script>
 

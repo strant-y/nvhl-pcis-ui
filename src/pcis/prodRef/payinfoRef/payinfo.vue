@@ -74,8 +74,9 @@ function validate() {
 function getTableValue(rowId: number, key: string) {
   payinfoEditRef?.value?.getTableValue(rowId, key);
 }
-function setDisabledAll() {
-  payinfoEditRef?.value?.setDisabledAll();
+
+function getFormconfig(){
+  return formconfig1;
 }
 
 defineExpose({
@@ -83,7 +84,7 @@ defineExpose({
   setFormValue,
   validate,
   getTableValue,
-  setDisabledAll,
+  getFormconfig
 });
 </script>
 

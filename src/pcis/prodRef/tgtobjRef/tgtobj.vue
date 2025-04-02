@@ -27,6 +27,7 @@ onMounted(() => {
     method,
     exRules
   );
+  
   Object.assign(formconfig1, formconfig11);
 });
 
@@ -54,8 +55,8 @@ function validate() {
 function getTableValue(rowId: number, key: string) {
   acctinfoEditRef?.value?.getTableValue(rowId, key);
 }
-function setDisabledAll() {
-  acctinfoEditRef?.value?.setDisabledAll();
+function getFormconfig(){
+  return formconfig1;
 }
 
 defineExpose({
@@ -63,7 +64,7 @@ defineExpose({
   setFormValue,
   validate,
   getTableValue,
-  setDisabledAll,
+  formconfig1
 });
 </script>
 

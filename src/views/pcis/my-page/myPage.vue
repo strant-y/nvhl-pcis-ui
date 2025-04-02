@@ -402,6 +402,7 @@ async function loadAfter() {
       })
     );
   } else if (props.param.pageType === "PLY_UW") {
+    opertaor.setDisabledAll();
     const cAppNo = props.param.cAppNo;
     loadAppPlyInfo(cAppNo);
     bthList.value.push(
@@ -458,6 +459,7 @@ async function loadAfter() {
       })
     );
   } else if (props.param.pageType === "EDR_APP_NEW_SCENE") {
+      opertaor.setDisabledAll();
       const cAppNo = props.param.cAppNo;
       loadAppPlyInfo(cAppNo);
       bthList.value.push(
@@ -494,6 +496,7 @@ async function loadAfter() {
           })
       );
   }else if (props.param.pageType === "readonly") {
+    opertaor.setDisabledAll();
     // 查询数据
     const getAppPlyInfoRes = await getAppPlyInfoByAppNo({
       CAppNo: props.param.cAppNo,

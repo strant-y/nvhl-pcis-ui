@@ -23,6 +23,7 @@ import { useValidator } from "@/typings/useValidator";
 import DepartmentTree from "../commodityRef/DepartmentTree.vue";
 import { codeListViewStore } from "@/store";
 import { useRoute } from "vue-router";
+import { get } from "lodash";
 const route = useRoute();
 const query = ref(route.query);
 const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
@@ -611,8 +612,8 @@ function setForSelectFilterable() {
   });
 }
 
-function setDisabledAll() {
-  plyBaseEditRef.value?.setDisabledAll();
+function getFormconfig(){
+  return formconfig1;
 }
 defineExpose({
   getFromValue,
@@ -620,7 +621,7 @@ defineExpose({
   validate,
   setValue,
   getValue,
-  setDisabledAll,
+  getFormconfig
 });
 </script>
 

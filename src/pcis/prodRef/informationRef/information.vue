@@ -60,8 +60,8 @@ function setValue(key: string, value: any) {
 function getValue(key: string) {
   return informationEditRef?.value?.getValue(key);
 }
-function setDisabledAll() {
-  informationEditRef?.value?.setDisabledAll();
+function getFormconfig(){
+  return formconfig1;
 }
 
 defineExpose({
@@ -70,7 +70,7 @@ defineExpose({
   validate,
   setValue,
   getValue,
-  setDisabledAll,
+  getFormconfig
 });
 </script>
 

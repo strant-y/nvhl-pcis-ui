@@ -1,6 +1,7 @@
 import { FreeButtonBase } from "./button-config";
 
 export interface AppGridEditConfig {
+  fromType?: "grid" | "free" | "custom" | null | undefined;
   id?: string; // 表单主键
   title?: string | null | undefined; // 功能标题
   production?: boolean; //标题是否显示tooltip
@@ -45,6 +46,7 @@ export function createAppGridEditConfig(
   config: AppGridEditConfig = {}
 ): AppGridEditConfig {
   return {
+    fromType:'grid',
     id: config.id || `ID${new Date().getTime()}`,
     title: config.title || null,
     showBtn: config.showBtn || true,

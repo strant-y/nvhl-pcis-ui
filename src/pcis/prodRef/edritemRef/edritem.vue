@@ -110,10 +110,10 @@ function handleQuery(flag?: boolean) {
 
 onMounted(() => {});
 
-function setDisabledAll() {
-  tableconfig.editFlag = false;
+function getFormconfig(){
+  return tableconfig;
 }
 defineExpose({
-  setDisabledAll,
+    getFormconfig
 });
 </script>

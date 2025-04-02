@@ -51,7 +51,7 @@ export const dataOpertaor = defineStore(
 
     const setDataAll = (alldata: any) => {
       Object.keys(alldata).forEach((key) => {
-        if (tableRefs[key] && tableRefs[key].setFormValue && Object.keys(alldata[key]).length!=0) {
+        if (tableRefs[key] && tableRefs[key].setFormValue && Object.keys(alldata[key]).length != 0) {
           tableRefs[key].setFormValue(alldata[key]);
         }
       });
@@ -69,11 +69,43 @@ export const dataOpertaor = defineStore(
       });
       return res;
     };
-
-    const setDisabledAll =() =>{
+    const setDisabledAll = () => {
       Object.keys(tableRefs).forEach(key => {
-        if (tableRefs[key] && tableRefs[key].setDisabledAll) {
-          tableRefs[key].setDisabledAll();
+        if (tableRefs[key] && tableRefs[key].getFormconfig) {
+          const f = tableRefs[key].getFormconfig();
+          console.log(f);
+          if (f.fromType === 'free') {  // 表单模式时,修改表单disabled实现只读
+            if (f.fromSchema && f.fromSchema.length > 0) {
+              f.fromSchema.forEach(f => {
+                if (f.inputtype === 'rtinputgroup') {
+                  f.groupList.forEach((gkey: any) => {
+                    gkey.disabled = true;
+                  });
+                } else {
+                  f.disabled = true;
+                }
+                if (f.btnItems) {
+                  f.btnItems.disabled = true;
+                }
+
+              });
+            }
+          } else if (f.fromType === 'grid') { // 表格模式时,修改表格属性,实现只读
+            f.editFlag = false;
+          }
+          if (
+            f.titleBtns &&
+            f.titleBtns.length > 0
+          ) {
+            f.titleBtns.forEach((item) => {
+              item.hidden = true;
+            });
+          }
+          if (f.endBtns && f.endBtns.length > 0) {
+            f.endBtns.forEach((item) => {
+              item.hidden = true;
+            });
+          }
         }
       });
     }
