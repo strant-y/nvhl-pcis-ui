@@ -73,7 +73,6 @@ export const dataOpertaor = defineStore(
       Object.keys(tableRefs).forEach(key => {
         if (tableRefs[key] && tableRefs[key].getFormconfig) {
           const f = tableRefs[key].getFormconfig();
-          console.log(f);
           if (f.fromType === 'free') {  // 表单模式时,修改表单disabled实现只读
             if (f.fromSchema && f.fromSchema.length > 0) {
               f.fromSchema.forEach(f => {
@@ -108,6 +107,43 @@ export const dataOpertaor = defineStore(
           }
         }
       });
+    }
+    const setUnDisabledByKeyList = (list: any[]) => {
+      if (list && list.length > 0) {
+        list.forEach(item => {
+          Object.keys(tableRefs).forEach(key => {
+            if (tableRefs[key] && tableRefs[key].getFormconfig) {
+              const conf = tableRefs[key].getFormconfig();
+
+              if (conf.fromType === 'free') {  // 表单模式时,修改表单disabled实现只读
+                if (conf.fromSchema && conf.fromSchema.length > 0) {
+                  conf.fromSchema.forEach(f => {
+                    if (f.inputtype === 'rtinputgroup') {
+                      f.groupList.forEach((gkey: any) => {
+                        if(gkey.prop === item){
+                          gkey.disabled = false;
+                        }
+                      });
+                    } else {
+                      if(f.prop === item){
+                        f.disabled = false;
+                      }
+                    }
+                  });
+                }
+              } else if (conf.fromType === 'grid') { // 表格模式时,修改表格属性,实现只读
+                if (conf.fromSchema && conf.fromSchema.length > 0) {
+                  conf.fromSchema.forEach(gf => {
+                    if(gf.prop === item){
+                      conf.editList.push(gf.prop);
+                    }
+                  });
+                }
+              }
+            }
+          })
+        })
+      }
     }
     /**
      * @Title: 转换数据
@@ -198,6 +234,7 @@ export const dataOpertaor = defineStore(
       getFatherPage,
       firstCharLower,
       setDisabledAll,
+      setUnDisabledByKeyList,
     };
   },
   {
