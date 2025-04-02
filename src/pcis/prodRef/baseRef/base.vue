@@ -177,12 +177,17 @@ function setFormItem(key, obj) {
   }
 }
 
+function setDisabledAll() {
+  baseEditRef?.value?.setDisabledAll();
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   setValue,
   getValue,
+  setDisabledAll,
 });
 </script>
 

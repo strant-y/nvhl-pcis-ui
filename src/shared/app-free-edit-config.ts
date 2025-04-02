@@ -28,6 +28,7 @@ export interface AppFreeEditMethod {
   validate: () => any;
   setValue: (key: any, value: any) => void;
   getValue: (key: any) => any;
+  setDisabledAll: () => void;
 }
 export function createAppFreeEditConfig(
   config: AppFreeEditConfig = {}

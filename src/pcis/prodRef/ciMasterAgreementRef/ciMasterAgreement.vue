@@ -60,12 +60,17 @@ function getValue(key: string) {
   return tgtobjEditRef?.value?.getValue(key);
 }
 
+function setDisabledAll() {
+  tgtobjEditRef?.value?.setDisabledAll();
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   setValue,
   getValue,
+  setDisabledAll,
 });
 </script>
 

@@ -143,6 +143,7 @@ interface dynamicFormMethod {
   checkKey: (key: any) => boolean;
   clearValidate: () => any;
   resetFields: () => any;
+  setDisabledAll: () => void;
 }
 const dynamicForm = ref<dynamicFormMethod | null>(null);
 const superDynamicForm = ref<dynamicFormMethod | null>(null);
@@ -215,6 +216,9 @@ function setValue(key: any, value: any) {
     superDynamicForm.value?.setValue(key, value);
   }
 }
+function setDisabledAll() {
+  dynamicForm.value?.setDisabledAll();
+}
 watch(
   () => freeEditConfig,
   (newVal) => {
@@ -234,6 +238,7 @@ defineExpose({
   getValue,
   clearValidate,
   resetFields,
+  setDisabledAll,
 });
 </script>
 

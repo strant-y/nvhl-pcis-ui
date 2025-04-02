@@ -71,12 +71,17 @@ function addFakeData() {
     cvrgEditRef.value.setRowData(rowId, fakeData); // 设置新行的数据
   }
 }
+
+function setDisabledAll() {
+  formconfig1.dragFlag = false;
+}
 onMounted(() => {});
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   getTableValue,
+  setDisabledAll,
 });
 </script>
 

@@ -428,6 +428,9 @@ function setValue(key: string, value: any) {
 function getValue(key: string) {
   return insuredEditRef?.value?.getValue(key);
 }
+function setDisabledAll() {
+  insuredEditRef?.value?.setDisabledAll();
+}
 
 defineExpose({
   getFromValue,
@@ -435,6 +438,7 @@ defineExpose({
   validate,
   setValue,
   getValue,
+  setDisabledAll,
 });
 </script>
 

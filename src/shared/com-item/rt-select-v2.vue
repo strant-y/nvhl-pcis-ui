@@ -185,11 +185,12 @@ watch([() => props.modelValue], ([newModelValue]) => {
  * 页面数据监听
  */
 watch(
-  () => props.item,
-  (newValue, oldValue) => {
-    if (props.item.loadData) {
-      options.value = newValue.loadData;
-    } else if (props.item.typeCode) {
+  [() => props.item.loadData, () => props.item.typeCode],
+  ([newloadData, newtypeCode]) => {
+    if (newloadData) {
+      options.value = newloadData;
+    }
+    if (newtypeCode) {
       uploadOption();
     }
   },
@@ -251,9 +252,9 @@ function getParam() {
   }
 
   if (props.item.disabled) {
-    if(!p){
-      p = {value: selectedValue.value};
-    }else{
+    if (!p) {
+      p = { value: selectedValue.value };
+    } else {
       p.value = selectedValue.value;
     }
   }

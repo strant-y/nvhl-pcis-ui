@@ -62,12 +62,17 @@ function getValue(key: string) {
   return baseafterEditRef?.value?.getValue(key);
 }
 
+function setDisabledAll() {
+  baseafterEditRef?.value?.setDisabledAll();
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   setValue,
   getValue,
+  setDisabledAll,
 });
 </script>
 

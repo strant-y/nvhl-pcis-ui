@@ -69,6 +69,14 @@ export const dataOpertaor = defineStore(
       });
       return res;
     };
+
+    const setDisabledAll =() =>{
+      Object.keys(tableRefs).forEach(key => {
+        if (tableRefs[key] && tableRefs[key].setDisabledAll) {
+          tableRefs[key].setDisabledAll();
+        }
+      });
+    }
     /**
      * @Title: 转换数据
      */
@@ -157,6 +165,7 @@ export const dataOpertaor = defineStore(
       setFatherPage,
       getFatherPage,
       firstCharLower,
+      setDisabledAll,
     };
   },
   {

@@ -142,7 +142,7 @@
                 :showLabel="
                   !(props.item.editList && props.item.editList.length > 0
                     ? props.item.editList?.includes(i.prop)
-                    : false || editIndex === scope.row._dataId)
+                    : false )
                 "
                 :row="scope.row"
               />
@@ -261,6 +261,7 @@ function handleSelectionChange(selectedRows: any[]) {
   emits("selection-change", selectedRows);
 }
 function rowClick(row: any, _column: any, _event: Event) {
+  console.log(props.item.editFlag);
   if (props.item.editFlag && props.item.editFlag === true) {
     if (tableDatas.value) {
       editIndex.value = row._dataId;

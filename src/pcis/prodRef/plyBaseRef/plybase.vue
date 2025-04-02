@@ -611,12 +611,16 @@ function setForSelectFilterable() {
   });
 }
 
+function setDisabledAll() {
+  plyBaseEditRef.value?.setDisabledAll();
+}
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   setValue,
   getValue,
+  setDisabledAll,
 });
 </script>
 

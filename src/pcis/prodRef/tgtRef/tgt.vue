@@ -118,12 +118,17 @@ function setFormItem(key, obj) {
     }
 }
 
+function setDisabledAll() {
+  tgtEditRef?.value?.setDisabledAll();
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   setValue,
   getValue,
+  setDisabledAll,
 });
 </script>
 

@@ -74,12 +74,16 @@ function validate() {
 function getTableValue(rowId: number, key: string) {
   payinfoEditRef?.value?.getTableValue(rowId, key);
 }
+function setDisabledAll() {
+  formconfig1.editFlag = false;
+}
 
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   getTableValue,
+  setDisabledAll,
 });
 </script>
 

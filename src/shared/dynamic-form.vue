@@ -460,6 +460,23 @@ function setValue(key: any, value: any) {
   form[key] = value;
   emits("formsDataUpdate", form);
 }
+function setDisabledAll(){
+  if (props.fromSchema) {
+    props.fromSchema.forEach((key: any) => {
+      if(key.inputtype === "rtinputgroup"){
+        key.groupList.forEach((gkey: any) => {
+          gkey.disabled = true;
+        });
+      }else{
+        key.disabled = true;
+      }
+      if(key.btnItems){
+        key.btnItems.disabled = true;
+      }
+    });
+  }
+}
+
 function checkKey(k: any) {
   let r = false;
   props.fromSchema?.forEach((key: any) => {
@@ -511,6 +528,7 @@ defineExpose({
   checkKey,
   clearValidate,
   resetFields,
+  setDisabledAll,
 });
 </script>
 

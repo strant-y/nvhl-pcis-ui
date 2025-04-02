@@ -210,12 +210,17 @@ function setFormItem(key, obj) {
   }
 }
 
+function setDisabledAll() {
+  insrncEditRef?.value?.setDisabledAll();
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   setValue,
   getValue,
+  setDisabledAll,
 });
 </script>
 

@@ -60,6 +60,9 @@ function setValue(key: string, value: any) {
 function getValue(key: string) {
   return informationEditRef?.value?.getValue(key);
 }
+function setDisabledAll() {
+  informationEditRef?.value?.setDisabledAll();
+}
 
 defineExpose({
   getFromValue,
@@ -67,6 +70,7 @@ defineExpose({
   validate,
   setValue,
   getValue,
+  setDisabledAll,
 });
 </script>
 

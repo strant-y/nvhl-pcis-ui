@@ -420,6 +420,9 @@ function setValue(key: string, value: any) {
 function getValue(key: string) {
   return applicantEditRef?.value?.getValue(key);
 }
+function setDisabledAll(){
+  applicantEditRef?.value?.setDisabledAll();
+}
 
 defineExpose({
   getFromValue,
@@ -427,6 +430,7 @@ defineExpose({
   validate,
   setValue,
   getValue,
+  setDisabledAll,
 });
 </script>
 

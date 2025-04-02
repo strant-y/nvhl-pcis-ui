@@ -13,6 +13,7 @@
     import { dataOpertaor } from "@/store/modules/data-opertaor";
     import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
     import { codeListViewStore } from "@/store";
+import func from "vue-temp/vue-editor-bridge";
     const codeListStore = codeListViewStore();
     const opertaor = dataOpertaor();
     const { getRules } = useValidator();
@@ -253,11 +254,16 @@
         });
     });
 
+    function setDisabledAll() {
+        edrbaseEditRef?.value?.setDisabledAll();
+    }
+
     defineExpose({
         getFromValue,
         setFormValue,
         validate,
         setValue,
         getValue,
+        setDisabledAll,
     });
 </script>

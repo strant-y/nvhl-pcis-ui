@@ -59,6 +59,10 @@ function setValue(key: string, value: any) {
 function getValue(key: string) {
   return tgtobjEditRef?.value?.getValue(key);
 }
+function setDisabledAll() {
+  tgtobjEditRef?.value?.setDisabledAll();
+}
+
 
 defineExpose({
   getFromValue,
@@ -66,6 +70,7 @@ defineExpose({
   validate,
   setValue,
   getValue,
+  setDisabledAll,
 });
 </script>
 

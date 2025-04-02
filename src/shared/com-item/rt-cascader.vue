@@ -111,9 +111,12 @@ const cascprops: CascaderProps = {
           props.item.cache ? props.item.cache : true
         )
         .then((res: any) => {
-          const l = (typeof props.item.cascaderprops === 'string')? JSON.parse(props.item.cascaderprops) : props.item.cascaderprops ;
+          const l =
+            typeof props.item.cascaderprops === "string"
+              ? JSON.parse(props.item.cascaderprops)
+              : props.item.cascaderprops;
           res.forEach((e: any) => {
-            e.leaf = level >= ((l && l.length > 0 ) ? (l.length-1) : 5);
+            e.leaf = level >= (l && l.length > 0 ? l.length - 1 : 5);
           });
           resolve(res);
         })
@@ -143,25 +146,13 @@ watch([options, () => props.modelValue], ([newOptions, newModelValue]) => {
  * 页面数据监听
  */
 watch(
-  () => props.item,
-  (newValue, oldValue) => {
-    if (props.item.loadData) {
-      options.value = newValue.loadData;
-    }else if (props.item.typeCode) {
-      codeListStore
-        .queryCodeList(
-          {
-            codeListName: newValue.typeCode,
-            codeListParam: getParam(),
-          },
-          props.unAuthor,
-          props.item.cache ? props.item.cache : true
-        )
-        .then((res) => (options.value = res))
-        .catch((err) => {
-          console.error(err);
-          options.value = [];
-        });
+  [() => props.item.loadData, () => props.item.typeCode],
+  ([newloadData, newtypeCode]) => {
+    if (newloadData) {
+      options.value = newloadData;
+    }
+    if (newtypeCode) {
+      uploadOption();
     }
   },
   { deep: true }
@@ -170,6 +161,23 @@ function handleChange(val?: string | number | Array<any> | undefined) {
   emits("valueChange", val);
   emits("update:modelValue", val);
   props.item.func ? props.item.func(val) : null;
+}
+
+function uploadOption() {
+  codeListStore
+    .queryCodeList(
+      {
+        codeListName: props.item.typeCode,
+        codeListParam: getParam(),
+      },
+      props.unAuthor,
+      props.item.cache ? props.item.cache : true
+    )
+    .then((res) => (options.value = res))
+    .catch((err) => {
+      console.error(err);
+      options.value = [];
+    });
 }
 
 onMounted(() => {
@@ -203,11 +211,21 @@ function updateOption(newOption: any) {
 }
 
 function getParam() {
+  let p: any = {};
   if (props.item.codeParam && typeof props.item.codeParam === "string") {
-    return JSON.parse(props.item.codeParam);
-  }else{
-    return props.item.codeParam;
+    p = JSON.parse(props.item.codeParam);
+  } else {
+    p = props.item.codeParam;
   }
+
+  if (props.item.disabled) {
+    if (!p) {
+      p = { value: selectedValue.value };
+    } else {
+      p.value = selectedValue.value;
+    }
+  }
+  return p;
 }
 
 defineExpose({
