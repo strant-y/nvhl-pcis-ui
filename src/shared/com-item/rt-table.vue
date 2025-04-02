@@ -261,7 +261,6 @@ function handleSelectionChange(selectedRows: any[]) {
   emits("selection-change", selectedRows);
 }
 function rowClick(row: any, _column: any, _event: Event) {
-  console.log(props.item.editFlag);
   if (props.item.editFlag && props.item.editFlag === true) {
     if (tableDatas.value) {
       editIndex.value = row._dataId;

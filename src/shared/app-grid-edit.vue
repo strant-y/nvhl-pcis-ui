@@ -128,6 +128,19 @@ function addRowByData(data: any) {
   rttableFrom.value?.addRowByData(data);
 }
 
+function setDisabledAll() {
+  if(props.gridEditConfig.titleBtns && props.gridEditConfig.titleBtns.length > 0){
+    props.gridEditConfig.titleBtns.forEach((item) => {
+      item.disabled = true;
+    });
+  }
+  if(props.gridEditConfig.endBtns && props.gridEditConfig.endBtns.length > 0){
+    props.gridEditConfig.endBtns.forEach((item) => {
+      item.disabled = true;
+    });
+  }
+  gridEditConfig.value.editFlag = false;
+}
 
 function getSelectRow() {
   return rttableFrom.value?.getSelectRow();
@@ -142,6 +155,7 @@ defineExpose({
   delRow,
   addRowByData,
   getSelectRow,
+  setDisabledAll,
 });
 </script>
 

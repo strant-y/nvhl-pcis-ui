@@ -217,6 +217,16 @@ function setValue(key: any, value: any) {
   }
 }
 function setDisabledAll() {
+  if(props.freeEditConfig.titleBtns && props.freeEditConfig.titleBtns.length > 0){
+    props.freeEditConfig.titleBtns.forEach((item) => {
+      item.disabled = true;
+    });
+  }
+  if(props.freeEditConfig.endBtns && props.freeEditConfig.endBtns.length > 0){
+    props.freeEditConfig.endBtns.forEach((item) => {
+      item.disabled = true;
+    });
+  }
   dynamicForm.value?.setDisabledAll();
 }
 watch(

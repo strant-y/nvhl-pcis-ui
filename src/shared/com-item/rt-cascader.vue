@@ -211,21 +211,11 @@ function updateOption(newOption: any) {
 }
 
 function getParam() {
-  let p: any = {};
   if (props.item.codeParam && typeof props.item.codeParam === "string") {
-    p = JSON.parse(props.item.codeParam);
+    return JSON.parse(props.item.codeParam);
   } else {
-    p = props.item.codeParam;
+    return props.item.codeParam;
   }
-
-  if (props.item.disabled) {
-    if (!p) {
-      p = { value: selectedValue.value };
-    } else {
-      p.value = selectedValue.value;
-    }
-  }
-  return p;
 }
 
 defineExpose({

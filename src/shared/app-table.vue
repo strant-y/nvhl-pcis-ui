@@ -1,10 +1,6 @@
 <template>
   <div class="searchbar">
     <el-card shadow="never" class="table-container">
-      
-      {{ console.log(tableConfig.showEdit ||
-        tableConfig.formconfig?.titleBtns.length > 0 ||
-        tableConfig.titleBtns.length > 0) }}
       <template
         #header
         v-if="

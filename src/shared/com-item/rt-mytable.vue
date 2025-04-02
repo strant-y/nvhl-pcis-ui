@@ -1,282 +1,284 @@
 <template>
-  <el-card shadow="never" class="table-container">
-    <template #header>
-      <el-row justify="space-between">
-        <el-col :span="9" v-if="!tableConfig.production">
-          {{ tableConfig.title }}
-        </el-col>
-        <el-col :span="9" v-if="tableConfig.production">
-          <el-tooltip :content="tableConfig.productionTitle">
+  <div>
+    <el-card shadow="never" class="table-container">
+      <template #header>
+        <el-row justify="space-between">
+          <el-col :span="9" v-if="!tableConfig.production">
             {{ tableConfig.title }}
-          </el-tooltip>
-        </el-col>
-        <el-col
-          :span="15"
-          style="text-align: right"
-          v-if="tableConfig.titleBtns && tableConfig.titleBtns.length > 0"
-        >
-          <el-button-group>
-            <template
-              v-for="(item, index) in tableConfig.titleBtns"
-              :key="index"
-            >
-              <rt-button :item="item" />
-            </template>
-          </el-button-group>
-        </el-col>
-      </el-row>
-      <!-- <template v-for="(item, index) in tableConfig.titleBtns" :key="index">
-        <rt-button :item="item" />
-      </template> -->
-    </template>
-    <div class="form-inner">
-      <VueDraggable
-        v-model="dataList"
-        :animation="150"
-        target=".el-table"
-        handle=".handle"
-        @update="updateOptionAll"
-      >
-        <el-form
-          ref="tableFormfef"
-          :model="dataList"
-          :inline-message="true"
-          :label-width="formUi.labelWidth"
-          :size="formUi.size"
-          :label-position="formUi.labelPosition"
-        >
-          <table style="width: 100%">
-            <thead>
-              <tr>
-                <th
-                  v-if="appgrideditConfig.tableBtnPosition === 'left'"
-                  :style="{
-                    width:
-                      (appgrideditConfig.tableBtnWidth
-                        ? appgrideditConfig.tableBtnWidth
-                        : 150) + 'px',
-                    textAlign: 'center',
-                  }"
-                >
-                  {{ appgrideditConfig.tableBtnTitle }}
-                </th>
-                <th
-                  v-for="(i, index) in appgrideditConfig.fromSchema"
-                  :key="index"
-                  :width="i.width ? i.width : 100"
-                >
-                  {{ i.title }}
-                </th>
-                <th
-                  v-if="appgrideditConfig.tableBtnPosition === 'right'"
-                  :style="{
-                    width:
-                      (appgrideditConfig.tableBtnWidth
-                        ? appgrideditConfig.tableBtnWidth
-                        : 150) + 'px',
-                    textAlign: 'center',
-                  }"
-                >
-                  {{ appgrideditConfig.tableBtnTitle }}
-                </th>
-              </tr>
-            </thead>
-            <tbody class="el-table">
-              <tr
-                v-for="(i, j) in dataList"
-                :key="j"
-                :class="[appgrideditConfig.dragFlag ? 'handle cursor-move' : null,
-                selectIndex === i._dataId ? 'highlight':''
-                ]
-                "
-                :style="{
-                  textAlign: 'center',
-                }"
-                @click="rowClick(i)"
-                @dblclick="dblclick(i)"
+          </el-col>
+          <el-col :span="9" v-if="tableConfig.production">
+            <el-tooltip :content="tableConfig.productionTitle">
+              {{ tableConfig.title }}
+            </el-tooltip>
+          </el-col>
+          <el-col
+            :span="15"
+            style="text-align: right"
+            v-if="tableConfig.titleBtns && tableConfig.titleBtns.length > 0"
+          >
+            <el-button-group>
+              <template
+                v-for="(item, index) in tableConfig.titleBtns"
+                :key="index"
               >
-                <td v-if="appgrideditConfig.tableBtnPosition === 'left'">
-                  <template
-                    v-for="(btn, index) in appgrideditConfig.tableBtn"
-                    :key="index"
+                <rt-button :item="item" />
+              </template>
+            </el-button-group>
+          </el-col>
+        </el-row>
+        <!-- <template v-for="(item, index) in tableConfig.titleBtns" :key="index">
+          <rt-button :item="item" />
+        </template> -->
+      </template>
+      <div class="form-inner">
+        <VueDraggable
+          v-model="dataList"
+          :animation="150"
+          target=".el-table"
+          handle=".handle"
+          @update="updateOptionAll"
+        >
+          <el-form
+            ref="tableFormfef"
+            :model="dataList"
+            :inline-message="true"
+            :label-width="formUi.labelWidth"
+            :size="formUi.size"
+            :label-position="formUi.labelPosition"
+          >
+            <table style="width: 100%">
+              <thead>
+                <tr>
+                  <th
+                    v-if="appgrideditConfig.tableBtnPosition === 'left'"
+                    :style="{
+                      width:
+                        (appgrideditConfig.tableBtnWidth
+                          ? appgrideditConfig.tableBtnWidth
+                          : 150) + 'px',
+                      textAlign: 'center',
+                    }"
                   >
-                    <template v-if="appgrideditConfig.tableBtnType === 'text'">
-                      <a
-                        @click="btn.tableClick ? btn.tableClick(i) : () => {}"
-                        >{{ btn.label }}</a
-                      >
-                    </template>
-                    <template v-if="appgrideditConfig.tableBtnType === 'btn'">
-                      <el-tooltip
-                        :disabled="btn.tooltip ? false : true"
-                        :content="btn.tooltip ? btn.tooltip : undefined"
-                        placement="top"
-                        effect="light"
-                      >
-                        <rtButton
-                          @click="btn.tableClick ? btn.tableClick(i) : () => {}"
-                          :item="btn"
-                        />
-                      </el-tooltip>
-                    </template>
-                    <template v-if="appgrideditConfig.tableBtnType === 'icon'">
-                      <el-tooltip
-                        :disabled="btn.tooltip ? false : true"
-                        :content="btn.tooltip ? btn.tooltip : undefined"
-                        placement="top"
-                        effect="light"
-                      >
-                        <a
-                          ><rtIcon
-                            @click="
-                              btn.tableClick ? btn.tableClick(i) : () => {}
-                            "
-                            :item="btn"
-                        /></a>
-                      </el-tooltip>
-                    </template>
-                    <template
-                      v-if="index !== appgrideditConfig.tableBtn.length - 1"
-                    >
-                      <el-divider direction="vertical" />
-                    </template>
-                  </template>
-                </td>
-                <td
-                  v-for="(t, ts) in appgrideditConfig.fromSchema"
-                  :key="ts"
-                  :class="
-                    !appgrideditConfig.dragFlag && t.dragFlag
-                      ? 'handle cursor-move'
-                      : null
+                    {{ appgrideditConfig.tableBtnTitle }}
+                  </th>
+                  <th
+                    v-for="(i, index) in appgrideditConfig.fromSchema"
+                    :key="index"
+                    :width="i.width ? i.width : 100"
+                  >
+                    {{ i.title }}
+                  </th>
+                  <th
+                    v-if="appgrideditConfig.tableBtnPosition === 'right'"
+                    :style="{
+                      width:
+                        (appgrideditConfig.tableBtnWidth
+                          ? appgrideditConfig.tableBtnWidth
+                          : 150) + 'px',
+                      textAlign: 'center',
+                    }"
+                  >
+                    {{ appgrideditConfig.tableBtnTitle }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="el-table">
+                <tr
+                  v-for="(i, j) in dataList"
+                  :key="j"
+                  :class="[appgrideditConfig.dragFlag ? 'handle cursor-move' : null,
+                  selectIndex === i._dataId ? 'highlight':''
+                  ]
                   "
                   :style="{
                     textAlign: 'center',
                   }"
+                  @click="rowClick(i)"
+                  @dblclick="dblclick(i)"
                 >
-                  <el-form-item
-                    :prop="`${j}.${t.prop}`"
-                    :rules="t.rules ? t.rules : undefined"
-                  >
-                    <div
-                      :style="{
-                        width:
-                          t.showExBtn && t.inputtype !== 'rttable' // 显示组件尾部按钮 table 组件不显示尾部按钮
-                            ? (t.btnWidth ? 100 - t.btnWidth : 75) + '%'
-                            : '100%',
-                      }"
-                    >
-                      <from-item
-                        v-model="i[t.prop]"
-                        :item="t"
-                        :row="i"
-                        :showLabel="
-                          editIndex !== i._dataId ||
-                          (appgrideditConfig.editList &&
-                          appgrideditConfig.editList.length > 0
-                            ? !appgrideditConfig.editList?.includes(t.prop)
-                            : false)
-                        "
-                        :ref="
-                          (re) => {
-                            if (formRefs[i._dataId]) {
-                              formRefs[i._dataId][t.prop] = re;
-                            } else {
-                              formRefs[i._dataId] = {};
-                              formRefs[i._dataId][t.prop] = re;
-                            }
-                          }
-                        "
-                      />
-                    </div>
-                    <!---       显示组件尾部按钮       --->
+                  <td v-if="appgrideditConfig.tableBtnPosition === 'left'">
                     <template
-                      v-if="
-                        t.showExBtn &&
-                        !(
-                          editIndex !== i._dataId ||
-                          (appgrideditConfig.editList &&
-                          appgrideditConfig.editList.length > 0
-                            ? !appgrideditConfig.editList?.includes(t.prop)
-                            : false)
-                        )
-                      "
+                      v-for="(btn, index) in appgrideditConfig.tableBtn"
+                      :key="index"
                     >
-                      <rt-button
-                        v-if="t.inputtype !== 'rttable'"
-                        :style="{
-                          width: (t.btnWidth ? t.btnWidth : 25) + '%',
-                          height: '100%',
-                        }"
-                        :item="t.btnItems"
-                        @closepopover="(rev) => setPopover(rev, i, t)"
-                      />
-                    </template>
-                  </el-form-item>
-                </td>
-                <td v-if="appgrideditConfig.tableBtnPosition === 'right'">
-                  <template
-                    v-for="(btn, index) in appgrideditConfig.tableBtn"
-                    :key="index"
-                  >
-                    <template v-if="appgrideditConfig.tableBtnType === 'text'">
-                      <a
-                        @click="btn.tableClick ? btn.tableClick(i) : () => {}"
-                        >{{ btn.label }}</a
-                      >
-                    </template>
-                    <template v-if="appgrideditConfig.tableBtnType === 'btn'">
-                      <el-tooltip
-                        :disabled="btn.tooltip ? false : true"
-                        :content="btn.tooltip ? btn.tooltip : undefined"
-                        placement="top"
-                        effect="light"
-                      >
-                        <rtButton
-                          @click="btn.tableClick ? btn.tableClick(i) : () => {}"
-                          :item="btn"
-                        />
-                      </el-tooltip>
-                    </template>
-                    <template v-if="appgrideditConfig.tableBtnType === 'icon'">
-                      <el-tooltip
-                        :disabled="btn.tooltip ? false : true"
-                        :content="btn.tooltip ? btn.tooltip : undefined"
-                        placement="top"
-                        effect="light"
-                      >
+                      <template v-if="appgrideditConfig.tableBtnType === 'text'">
                         <a
-                          ><rtIcon
-                            @click="
-                              btn.tableClick ? btn.tableClick(i) : () => {}
-                            "
+                          @click="btn.tableClick ? btn.tableClick(i) : () => {}"
+                          >{{ btn.label }}</a
+                        >
+                      </template>
+                      <template v-if="appgrideditConfig.tableBtnType === 'btn'">
+                        <el-tooltip
+                          :disabled="btn.tooltip ? false : true"
+                          :content="btn.tooltip ? btn.tooltip : undefined"
+                          placement="top"
+                          effect="light"
+                        >
+                          <rtButton
+                            @click="btn.tableClick ? btn.tableClick(i) : () => {}"
                             :item="btn"
-                        /></a>
-                      </el-tooltip>
+                          />
+                        </el-tooltip>
+                      </template>
+                      <template v-if="appgrideditConfig.tableBtnType === 'icon'">
+                        <el-tooltip
+                          :disabled="btn.tooltip ? false : true"
+                          :content="btn.tooltip ? btn.tooltip : undefined"
+                          placement="top"
+                          effect="light"
+                        >
+                          <a
+                            ><rtIcon
+                              @click="
+                                btn.tableClick ? btn.tableClick(i) : () => {}
+                              "
+                              :item="btn"
+                          /></a>
+                        </el-tooltip>
+                      </template>
+                      <template
+                        v-if="index !== appgrideditConfig.tableBtn.length - 1"
+                      >
+                        <el-divider direction="vertical" />
+                      </template>
                     </template>
-                    <template
-                      v-if="index !== appgrideditConfig.tableBtn?.length - 1"
+                  </td>
+                  <td
+                    v-for="(t, ts) in appgrideditConfig.fromSchema"
+                    :key="ts"
+                    :class="
+                      !appgrideditConfig.dragFlag && t.dragFlag
+                        ? 'handle cursor-move'
+                        : null
+                    "
+                    :style="{
+                      textAlign: 'center',
+                    }"
+                  >
+                    <el-form-item
+                      :prop="`${j}.${t.prop}`"
+                      :rules="t.rules ? t.rules : undefined"
                     >
-                      <el-divider direction="vertical" />
+                      <div
+                        :style="{
+                          width:
+                            t.showExBtn && t.inputtype !== 'rttable' // 显示组件尾部按钮 table 组件不显示尾部按钮
+                              ? (t.btnWidth ? 100 - t.btnWidth : 75) + '%'
+                              : '100%',
+                        }"
+                      >
+                        <from-item
+                          v-model="i[t.prop]"
+                          :item="t"
+                          :row="i"
+                          :showLabel="
+                            editIndex !== i._dataId ||
+                            (appgrideditConfig.editList &&
+                            appgrideditConfig.editList.length > 0
+                              ? !appgrideditConfig.editList?.includes(t.prop)
+                              : false)
+                          "
+                          :ref="
+                            (re) => {
+                              if (formRefs[i._dataId]) {
+                                formRefs[i._dataId][t.prop] = re;
+                              } else {
+                                formRefs[i._dataId] = {};
+                                formRefs[i._dataId][t.prop] = re;
+                              }
+                            }
+                          "
+                        />
+                      </div>
+                      <!---       显示组件尾部按钮       --->
+                      <template
+                        v-if="
+                          t.showExBtn &&
+                          !(
+                            editIndex !== i._dataId ||
+                            (appgrideditConfig.editList &&
+                            appgrideditConfig.editList.length > 0
+                              ? !appgrideditConfig.editList?.includes(t.prop)
+                              : false)
+                          )
+                        "
+                      >
+                        <rt-button
+                          v-if="t.inputtype !== 'rttable'"
+                          :style="{
+                            width: (t.btnWidth ? t.btnWidth : 25) + '%',
+                            height: '100%',
+                          }"
+                          :item="t.btnItems"
+                          @closepopover="(rev) => setPopover(rev, i, t)"
+                        />
+                      </template>
+                    </el-form-item>
+                  </td>
+                  <td v-if="appgrideditConfig.tableBtnPosition === 'right'">
+                    <template
+                      v-for="(btn, index) in appgrideditConfig.tableBtn"
+                      :key="index"
+                    >
+                      <template v-if="appgrideditConfig.tableBtnType === 'text'">
+                        <a
+                          @click="btn.tableClick ? btn.tableClick(i) : () => {}"
+                          >{{ btn.label }}</a
+                        >
+                      </template>
+                      <template v-if="appgrideditConfig.tableBtnType === 'btn'">
+                        <el-tooltip
+                          :disabled="btn.tooltip ? false : true"
+                          :content="btn.tooltip ? btn.tooltip : undefined"
+                          placement="top"
+                          effect="light"
+                        >
+                          <rtButton
+                            @click="btn.tableClick ? btn.tableClick(i) : () => {}"
+                            :item="btn"
+                          />
+                        </el-tooltip>
+                      </template>
+                      <template v-if="appgrideditConfig.tableBtnType === 'icon'">
+                        <el-tooltip
+                          :disabled="btn.tooltip ? false : true"
+                          :content="btn.tooltip ? btn.tooltip : undefined"
+                          placement="top"
+                          effect="light"
+                        >
+                          <a
+                            ><rtIcon
+                              @click="
+                                btn.tableClick ? btn.tableClick(i) : () => {}
+                              "
+                              :item="btn"
+                          /></a>
+                        </el-tooltip>
+                      </template>
+                      <template
+                        v-if="index !== appgrideditConfig.tableBtn?.length - 1"
+                      >
+                        <el-divider direction="vertical" />
+                      </template>
                     </template>
-                  </template>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </el-form>
-      </VueDraggable>
-      <div
-        style="margin-top: 20px"
-        :style="{ textAlign: tableConfig.endBtnsPosition }"
-        v-if="tableConfig.endBtns && tableConfig.endBtns.length > 0"
-      >
-        <template v-for="(item, index) in tableConfig.endBtns" :key="index">
-          <rt-button :item="item" />
-        </template>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </el-form>
+        </VueDraggable>
+        <div
+          style="margin-top: 20px"
+          :style="{ textAlign: tableConfig.endBtnsPosition }"
+          v-if="tableConfig.endBtns && tableConfig.endBtns.length > 0"
+        >
+          <template v-for="(item, index) in tableConfig.endBtns" :key="index">
+            <rt-button :item="item" />
+          </template>
+        </div>
       </div>
-    </div>
-  </el-card>
+    </el-card>
+  </div>
 </template>
 <script setup lang="ts">
 import { v4 as uuidv4 } from "uuid";

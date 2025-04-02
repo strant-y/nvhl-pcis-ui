@@ -38,6 +38,7 @@ export interface AppGridEditMethod {
   addRowByData: (rowData) => any;
   getSelectRow: () => any;
   tableExvalidate: () => any;
+  setDisabledAll: () => void;
 }
 
 export function createAppGridEditConfig(
