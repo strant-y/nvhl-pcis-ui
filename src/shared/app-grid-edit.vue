@@ -27,7 +27,9 @@
                       v-for="(item, index) in gridEditConfig.titleBtns"
                       :key="index"
                     >
-                      <rt-button :item="item" />
+                      <template v-if="!item.hidden">
+                        <rt-button :item="item" />
+                      </template>
                     </template>
                   </el-button-group>
                   <a
@@ -64,7 +66,9 @@
                   v-for="(item, index) in gridEditConfig.endBtns"
                   :key="index"
                 >
-                  <rt-button :item="item" />
+                  <template v-if="!item.hidden">
+                    <rt-button :item="item" />
+                  </template>
                 </template>
               </div>
             </div>
@@ -101,7 +105,7 @@ showMyfrom.value = props.gridEditConfig?.showMyfrom
 const rttableFrom = ref<AppGridEditMethod | null>(null);
 
 function getFromValue() {
-    return tableDatas.value
+  return tableDatas.value;
 }
 
 function setFormValue(data: any) {
@@ -129,14 +133,17 @@ function addRowByData(data: any) {
 }
 
 function setDisabledAll() {
-  if(props.gridEditConfig.titleBtns && props.gridEditConfig.titleBtns.length > 0){
+  if (
+    props.gridEditConfig.titleBtns &&
+    props.gridEditConfig.titleBtns.length > 0
+  ) {
     props.gridEditConfig.titleBtns.forEach((item) => {
-      item.disabled = true;
+      item.hidden = true;
     });
   }
-  if(props.gridEditConfig.endBtns && props.gridEditConfig.endBtns.length > 0){
+  if (props.gridEditConfig.endBtns && props.gridEditConfig.endBtns.length > 0) {
     props.gridEditConfig.endBtns.forEach((item) => {
-      item.disabled = true;
+      item.hidden = true;
     });
   }
   gridEditConfig.value.editFlag = false;

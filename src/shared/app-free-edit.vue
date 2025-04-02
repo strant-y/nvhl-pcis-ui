@@ -4,7 +4,14 @@
       <el-row :gutter="16">
         <el-col :md="24">
           <el-card>
-            <template #header v-if="freeEditConfig.fromUi.showTitleBar?freeEditConfig.fromUi.showTitleBar: true">
+            <template
+              #header
+              v-if="
+                freeEditConfig.fromUi.showTitleBar
+                  ? freeEditConfig.fromUi.showTitleBar
+                  : true
+              "
+            >
               <el-row justify="space-between">
                 <el-col :span="4" v-if="!freeEditConfig.production">
                   {{ freeEditConfig.title }}
@@ -30,7 +37,9 @@
                       v-for="(item, index) in freeEditConfig.titleBtns"
                       :key="index"
                     >
-                      <rt-button :item="item" />
+                      <template v-if="!item.hidden">
+                        <rt-button :item="item" />
+                      </template>
                     </template>
                   </el-button-group>
                   <a
@@ -96,9 +105,9 @@
                   v-for="(item, index) in freeEditConfig.endBtns"
                   :key="index"
                 >
-                <template v-if="!item.hidden">
-                  <rt-button :item="item" />
-                </template>
+                  <template v-if="!item.hidden">
+                    <rt-button :item="item" />
+                  </template>
                 </template>
               </div>
             </div>
@@ -136,7 +145,7 @@ showMyfrom.value = props.freeEditConfig?.showMyfrom
 
 interface dynamicFormMethod {
   getFromValue: () => any;
-  setFormValue: (data: any,noupdate?: boolean) => void;
+  setFormValue: (data: any, noupdate?: boolean) => void;
   validate: () => any;
   setValue: (key: any, value: any) => void;
   getValue: (key: any) => any;
@@ -165,7 +174,7 @@ function getFromValue() {
   }
 }
 
-function setFormValue(data: any,noupdate = false) {
+function setFormValue(data: any, noupdate = false) {
   if (data === undefined) {
     data = {};
   }
@@ -181,10 +190,10 @@ function setFormValue(data: any,noupdate = false) {
         }
       }
     });
-    dynamicForm.value?.setFormValue(dy,noupdate);
-    superDynamicForm.value?.setFormValue(sp,noupdate);
+    dynamicForm.value?.setFormValue(dy, noupdate);
+    superDynamicForm.value?.setFormValue(sp, noupdate);
   } else {
-    dynamicForm.value?.setFormValue(data,noupdate);
+    dynamicForm.value?.setFormValue(data, noupdate);
   }
 }
 function validate() {
@@ -217,14 +226,17 @@ function setValue(key: any, value: any) {
   }
 }
 function setDisabledAll() {
-  if(props.freeEditConfig.titleBtns && props.freeEditConfig.titleBtns.length > 0){
+  if (
+    props.freeEditConfig.titleBtns &&
+    props.freeEditConfig.titleBtns.length > 0
+  ) {
     props.freeEditConfig.titleBtns.forEach((item) => {
-      item.disabled = true;
+      item.hidden = true;
     });
   }
-  if(props.freeEditConfig.endBtns && props.freeEditConfig.endBtns.length > 0){
+  if (props.freeEditConfig.endBtns && props.freeEditConfig.endBtns.length > 0) {
     props.freeEditConfig.endBtns.forEach((item) => {
-      item.disabled = true;
+      item.hidden = true;
     });
   }
   dynamicForm.value?.setDisabledAll();

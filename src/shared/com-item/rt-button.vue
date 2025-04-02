@@ -1,62 +1,60 @@
 <template>
-  <template v-if="!item.disabled">
-    <template v-if="item.popover">
-      <el-popover
-        :visible="visible"
-        :width="item.popoverWidth ? item.popoverWidth : 200"
-        :placement="item.position ? item.position : 'bottom'"
-      >
-        <template #reference>
-          <el-button
-            ref="buttonRef"
-            :type="item.type"
-            :size="item.size"
-            :placeholder="item.placeholder"
-            :link="item.link ? item.link : false"
-            :circle="item.circle ? item.circle : false"
-            :style="{
-              backgroundColor: item.buttonColor,
-              borderColor: item.buttonColor,
-              ...style,
-            }"
-            @click="visible = !visible"
-          >
-            <!-- 将isBtn透传,防止出现icon方法重复执行  -->
-            <rt-icon v-if="item.icon" :item="{ ...item, isBtn: true }" />
-            {{ item.label }}</el-button
-          >
-        </template>
-        <component
-          :is="item.popover"
-          :param="item"
-          @closepopover="closepopover"
-        />
-      </el-popover>
-    </template>
-    <template v-else>
-      <el-button
-        ref="buttonRef"
-        :type="item.type"
-        :size="item.size"
-        :disabled="
-          item.disabled ||
-          (typeof item.disabled === 'function' ? item.disabled(row) : false)
-        "
-        :placeholder="item.placeholder"
-        :link="item.link ? item.link : false"
-        :circle="item.circle ? item.circle : false"
-        :style="{
-          backgroundColor: item.buttonColor,
-          borderColor: item.buttonColor,
-          ...style,
-        }"
-        @click="handleChange"
-      >
-        <!-- 将isBtn透传,防止出现icon方法重复执行  -->
-        <rt-icon :style="{marginRight: (item.label)?'5px':null }" v-if="item.icon" :item="{ ...item, isBtn: true }" />
-        {{ item.label }}</el-button
-      >
-    </template>
+  <template v-if="item.popover">
+    <el-popover
+      :visible="visible"
+      :width="item.popoverWidth ? item.popoverWidth : 200"
+      :placement="item.position ? item.position : 'bottom'"
+    >
+      <template #reference>
+        <el-button
+          ref="buttonRef"
+          :type="item.type"
+          :size="item.size"
+          :placeholder="item.placeholder"
+          :link="item.link ? item.link : false"
+          :circle="item.circle ? item.circle : false"
+          :style="{
+            backgroundColor: item.buttonColor,
+            borderColor: item.buttonColor,
+            ...style,
+          }"
+          @click="visible = !visible"
+        >
+          <!-- 将isBtn透传,防止出现icon方法重复执行  -->
+          <rt-icon v-if="item.icon" :item="{ ...item, isBtn: true }" />
+          {{ item.label }}</el-button
+        >
+      </template>
+      <component
+        :is="item.popover"
+        :param="item"
+        @closepopover="closepopover"
+      />
+    </el-popover>
+  </template>
+  <template v-else>
+    <el-button
+      ref="buttonRef"
+      :type="item.type"
+      :size="item.size"
+      :disabled="
+        item.disabled ||
+        (typeof item.disabled === 'function' ? item.disabled(row) : false)
+      "
+      :placeholder="item.placeholder"
+      :link="item.link ? item.link : false"
+      :circle="item.circle ? item.circle : false"
+      :style="{
+        backgroundColor: item.buttonColor,
+        borderColor: item.buttonColor,
+        ...style,
+      }"
+      @click="handleChange"
+    >
+      <!-- 将isBtn透传,防止出现icon方法重复执行  -->
+      <rt-icon :style="{marginRight: (item.label)?'5px':null }" v-if="item.icon" :item="{ ...item, isBtn: true }" />
+      {{ item.label }}</el-button
+    >
   </template>
 </template>
 
