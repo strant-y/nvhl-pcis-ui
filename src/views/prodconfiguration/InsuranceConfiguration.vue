@@ -111,21 +111,21 @@ const formconfig = reactive<AppFreeEditConfig>(
         prop: "cTermNo",
         inputtype: "rtinput",
         itemWidth: 1,
-        title: "条款模版代码",
+        title: "条款代码",
         clearable: true,
       },
       {
         prop: "cNmeCn",
         inputtype: "rtinput",
         itemWidth: 1,
-        title: "条款模版名称",
+        title: "条款名称",
         clearable: true,
       },
       {
         prop: "cRdrTyp",
         inputtype: "rtselect",
-        placeholder: "条款模版标志",
-        title: "条款模版标志",
+        placeholder: "条款标志",
+        title: "条款标志",
         typeCode: "WEB_SYS_RdrTyp",
         codeParam: { cParCde: "RdrTyp" },
         clearable: true,
@@ -148,7 +148,7 @@ const tableconfig = reactive<AppTableConfig>(
     titleBtns: [
       createFreeButtonBase({
         id: "score",
-        label: "增加条款模版",
+        label: "增加条款",
         type: "success",
         icon: "Plus",
         func: () => {
@@ -222,12 +222,12 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cTermNo",
         inputtype: "rtinput",
-        title: "模版代码",
+        title: "条款代码",
       },
       {
         prop: "cNmeCn",
         inputtype: "rtinput",
-        title: "模版名称",
+        title: "条款名称",
       },
       // {
       //   prop: "cRdrTyp",

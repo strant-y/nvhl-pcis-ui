@@ -68,18 +68,28 @@ opertaor.setTableConfig([
     showGroupId: false,
     pageInfo: {
       clauseConfBasicInfo: {
-        pageKey: "clauseModeConfInfo",
-        pageTtile: "条款模版基本信息",
-        pageRef: "clauseModeConfInfo",
+        pageKey: "clauseConfBasicInfo",
+        pageTtile: "条款基本信息",
+        pageRef: "clauseConfBasicInfo",
       },
+      // inruranceTypeBasicInfo: {
+      //   pageKey: "inruranceTypeBasicInfo",
+      //   pageTtile: "险别基本信息",
+      //   pageRef: "inruranceTypeBasicInfo",
+      // },
       relatedRespons: {
         pageKey: "relatedRespons",
         pageTtile: "关联责任",
         pageRef: "relatedRespons",
       },
+      // relatedTerms: {
+      //   pageKey: "relatedTerms",
+      //   pageTtile: "关联条款",
+      //   pageRef: "relatedTerms",
+      // },
       relatedAdditionalIns: {
         pageKey: "relatedAdditionalIns",
-        pageTtile: "关联附加条款模版",
+        pageTtile: "关联附加条款",
         pageRef: "relatedAdditionalIns",
       },
     },

@@ -51,7 +51,7 @@ const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    title: "关联附加条款模版",
+    title: "关联附加条款",
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
@@ -86,12 +86,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cTermRdrCde",
         inputtype: "rtinput",
-        title: "模版代码",
+        title: "条款代码",
       },
       {
         prop: "cNmeCn",
         inputtype: "rtinput",
-        title: "模版名称",
+        title: "中文名称",
       },
     ],
     fromUi: createFromUiConfig({
@@ -111,10 +111,10 @@ const tableconfig = reactive<AppTableConfig>(
     titleBtns: [
       createFreeButtonBase({
         id: "score",
-        label: "关联附加条款模版",
+        label: "关联附加条款",
         type: "success",
         func: function () {
-          const tabref = opertaor.getTableRefByKey("clauseModeConfInfo");
+          const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
           if (tabref.getFromValue().cTermNo == null) {
             ElMessage.error("请完善基本信息后操作!");
             return;
@@ -165,12 +165,12 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "cTermNo",
-        title: "模版代码",
+        title: "条款代码",
         inputtype: "rtinput",
       },
       {
         prop: "cNmeCn",
-        title: "模版名称",
+        title: "中文名称",
         inputtype: "rtinput",
       },
     ],
@@ -238,7 +238,7 @@ function setDisa() {
 }
 /** 查询 */
 function handleQuery(flag?: boolean) {
-  const tabref = opertaor.getTableRefByKey("clauseModeConfInfo");
+  const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
   if (tabref.getFromValue().cTermNo == null) {
     ElMessage.error("请完善基本信息后在操作!");
     return;
@@ -261,7 +261,7 @@ function handleQuery(flag?: boolean) {
   }
 }
 function getQueryList(flag?: boolean) {
-  const tabref = opertaor.getTableRefByKey("clauseModeConfInfo");
+  const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
   if (tabref.getFromValue().cTermNo == null) {
     ElMessage.error("请完善基本信息后在操作!");
     return;

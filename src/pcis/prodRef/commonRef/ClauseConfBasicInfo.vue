@@ -21,8 +21,8 @@ import { useValidator } from "@/typings/useValidator";
 import {
   saveInruanceTypeBasicInfo,
   getCvrgList,
+  savePrdTermInfo,
   getPrdTermInfo,
-  savePrdTerm,
 } from "@/api/prod";
 import { ref, reactive, onMounted } from "vue";
 import { useRoute } from "vue-router";
@@ -43,6 +43,54 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
+        type: "success",
+        label: "条款要素绑定",
+        func: async () => {
+          const cTermNo = freeEditRef.value?.getValue("cTermNo");
+
+          dialog.value?.open(
+            "termFactorConfig",
+            {
+              type: "show",
+              data: {
+                cTermNo: cTermNo,
+              },
+            },
+            {
+              isOk: (selectdata: any) => {},
+            },
+            { title: "条款要素绑定", width: 75 }
+          );
+        },
+      }),
+      createFreeButtonBase({
+        type: "success",
+        label: "条责分组关联",
+        func: async () => {
+          const cTermNo = freeEditRef.value?.getValue("cTermNo");
+          dialog.value?.open(
+            "termRiskGroupConfig",
+            {
+              type: "show",
+              data: {
+                cTermNo: cTermNo,
+              },
+            },
+            {
+              isOk: (selectdata: any) => {},
+            },
+            { title: "条款责任分组关联", width: 75 }
+          );
+        },
+      }),
+      // createFreeButtonBase({
+      //   label: "上传条款文件",
+      //   type: "primary",
+      //   func: async () => {
+      //     handleUpload();
+      //   },
+      // }),
+      createFreeButtonBase({
         type: "primary",
         label: "保存",
         func: async () => {
@@ -50,11 +98,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           if (isValid) {
             const s = freeEditRef.value?.getFromValue(); //获取表单数据
             const datas = Object.assign(s, { type: param.type });
-            savePrdTerm(datas)
+            // const paramData = datas.map((item: any) => {
+            //   if (item.cRdrTyp == "1") {
+            //   }
+            // });
+            savePrdTermInfo(datas)
               .then((res) => {
                 const { code, data, msg } = res;
                 if (200 === code) {
-                   freeEditRef?.value?.setValue('cTermNo',data );
+                  freeEditRef?.value?.setFormValue({ cTermNo: data });
                   ElMessage.success("保存成功");
                 } else {
                   ElMessage.error(msg);
@@ -69,7 +121,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "返回",
         func: () => {
-          router.push("/prodconfiguration/InsuranceInfo");
+          router.push("/prodconfiguration/insuranceConfiguration");
         },
       }),
     ],
@@ -164,38 +216,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", { blur: true })],
       },
       {
-        prop: "cTermMode",
-        inputtype: "rtselect",
-        title: "关联条款模版",
-        typeCode: "TermCodeTag",
-        rules: [getRules("required", { change: true })],
-        showExBtn: true,
-        disabled: true,
-        btnItems: createFreeButtonBase({
-          type: "primary",
-          label: "选择条款模版",
-          func: () => {
-            dialog.value?.open(
-              "queryUtils",
-              null,
-              {
-                isOk: (res: any) => {
-                  freeEditRef.value?.setValue("cTermMode", res.cTermNo);
-                  freeEditRef.value?.setValue("cRdrTyp", res.cRdrTyp);
-                  freeEditRef.value?.setValue("additionalInsuranceType", res.additionalInsuranceType);
-                },
-              },
-              { width: "70" }
-            );
-          },
-        }),
-      },
-      {
         prop: "cRdrTyp",
         inputtype: "rtselect",
         title: "主条款/附加条款",
         typeCode: "WEB_SYS_RdrTyp",
-        disabled: true,
         codeParam: { cParCde: "RdrTyp" },
         clearable: true,
         rules: [getRules("required", { change: true })],
@@ -213,8 +237,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         typeCode: "additional_insurance",
         codeParam: { cParCde: "add_type" },
         rules: [getRules("required", { change: true })],
-        hidden: true, // 初始状态为显示
-        disabled: true,
+        hidden: false, // 初始状态为显示
       },
       {
         prop: "tFilingTm",
@@ -236,6 +259,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         codeParam: { cParCde: "yes_no" },
         rules: [getRules("required", { change: true })],
       },
+      // {
+      //   prop: "cClassOfClause",
+      //   inputtype: "rtselect",
+      //   title: "条款类别",
+      //   typeCode: "ClassOfClause",
+      //   codeParam: { cParCde: "" },
+      // },
       {
         prop: "cWebsite",
         inputtype: "rtinput",
