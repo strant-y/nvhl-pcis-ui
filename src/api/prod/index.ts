@@ -1176,5 +1176,9 @@ export function expExcelUndrDty(queryParams: any): AxiosPromise<any> {
 export function getAppFeeInfoNewUrl(queryParams: any): AxiosPromise<any> {
     return post(`/policy/getAppFeeInfoNew`, queryParams);
 }
+//
+export function getRenewalAppPolicy(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/getPolicy`, queryParams);
+}
 
 

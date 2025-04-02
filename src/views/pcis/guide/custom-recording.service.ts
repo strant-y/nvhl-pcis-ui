@@ -22,6 +22,10 @@ export function userUnionTerm(queryParams: any): AxiosPromise<any> {
 export function unUserUnUntionTerm(queryParams: any): AxiosPromise<any> {
     return post(`/userTerm/unUserUnUntionTerm`, queryParams);
 }
+//根据续保单号查询
+export function getPolicy(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/getPolicy`, queryParams);
+}
 
 /*
  * 投保	自定义录单

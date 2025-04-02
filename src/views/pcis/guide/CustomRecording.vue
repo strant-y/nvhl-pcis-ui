@@ -35,13 +35,13 @@
         <el-form-item
           v-if="formconfig1.cRenewMrk == '1'"
           label="上年保单号"
-          prop="d"
+          prop="cPlyNo"
           :rules="[getRules('required', {})]"
         >
           <el-input
             style="width: 300px"
             placeholder="请输入续保保单号"
-            v-model="formconfig1.d"
+            v-model="formconfig1.cPlyNo"
           >
           </el-input>
         </el-form-item>
@@ -140,15 +140,6 @@
     </div>
     <div v-if="step == '1'">内容</div>
     <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
-      <!-- <rt-button
-        :item="{
-          type: 'primary',
-          label: '取消',
-          func: () => {
-            dialogVisible = false;
-          },
-        }"
-      /> -->
       <rt-button
         :item="{
           type: 'primary',
@@ -162,14 +153,6 @@
           },
         }"
       />
-      <!-- <rt-button
-        v-if="step == '1'"
-        :item="{
-          type: 'primary',
-          label: '确定',
-          func: () => {},
-        }"
-      /> -->
     </div>
   </div>
 </template>
@@ -190,6 +173,7 @@ import {
   getProdEnableList,
   qryUserCommonTerm,
   unUserUnUntionTerm,
+  getPolicy,
 } from "./custom-recording.service";
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
@@ -202,9 +186,7 @@ import {
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { b, i } from "vite/dist/node/types.d-jgA8ss1A";
 import { getListByCode } from "@/api/code-list-service";
-// import { CustomRecordingService } from "./custom-recording.service";
 const router = useRouter();
-// const customRecordingService = new CustomRecordingService();
 const dialogVisible = ref(true);
 const step = ref("");
 const dzmodal = useDzModal();
@@ -235,6 +217,7 @@ const formconfig1 = ref({
   cTermNo: "",
   cProdNo: "",
   cProdNme: "",
+  cPlyNo: "",
 });
 const selectTreeItem = ref({});
 // 条款下拉数据
@@ -274,12 +257,29 @@ function next() {
       return false;
     } else {
       const data = formconfig1.value;
-      router.push({
-        path: "/pcis/my-page",
-        query: {
-          param: JSON.stringify({ ...data, ...{ pageType: "app" } }),
-        },
-      });
+      if (formconfig1.value.cRenewMrk == "1") {
+        getPolicy({ cPlyNo: formconfig1.value.cPlyNo, queryTyp: "orig" }).then(
+          (res: any) => {
+            if (res.code == "200") {
+              router.push({
+                path: "/pcis/my-page",
+                query: {
+                  param: JSON.stringify({ ...data, ...{ queryTyp: "orig" } }),
+                },
+              });
+            } else {
+              ElMessage.error(res.msg);
+            }
+          }
+        );
+      } else {
+        router.push({
+          path: "/pcis/my-page",
+          query: {
+            param: JSON.stringify({ ...data, ...{ pageType: "app" } }),
+          },
+        });
+      }
       sessionStorage.setItem(
         "toMyPageData",
         JSON.stringify({
@@ -315,8 +315,6 @@ function handleClick(item: any, index: number) {
   formconfig1.value.cTermNo = item.termNo;
   formconfig1.value.cProdNo = item.prodNo;
   formconfig1.value.cProdNme = item.prodCnm;
-  // formconfig1.value.cDptCde = item.dptCde;
-  // formconfig1.value.cDptNme = item.dptCnm;
 }
 //取消常用条款
 function handleStarClick(item: any) {
