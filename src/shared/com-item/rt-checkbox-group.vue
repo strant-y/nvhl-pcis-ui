@@ -92,7 +92,9 @@ watch([options, () => props.modelValue], ([newOptions, newModelValue]) => {
     return;
   }
   selectedValue.value = newModelValue;
-  uploadOption();
+  if(props.item.typeCode && options.value.length === 0){
+    uploadOption();
+  }
 });
 watch(
   [() => props.item.loadData, () => props.item.typeCode],

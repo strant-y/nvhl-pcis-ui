@@ -95,6 +95,9 @@ watch([options, () => props.modelValue], ([newOptions, newModelValue]) => {
     return;
   }
   selectedValue.value = newModelValue;
+  if(props.item.typeCode && options.value.length === 0){
+    uploadOption();
+  }
   // }
 });
 
@@ -102,28 +105,15 @@ watch([options, () => props.modelValue], ([newOptions, newModelValue]) => {
  * 页面数据监听
  */
 watch(
-  () => props.item,
-  (newValue, oldValue) => {
-    if (props.item.loadData) {
-      options.value = newValue.loadData;
+  [() => props.item.loadData, () => props.item.typeCode],
+  ([newloadData, newtypeCode]) => {
+    if (newloadData) {
+      options.value = newloadData;
     }
-    if (props.item.typeCode) {
-      codeListStore
-        .queryCodeList(
-          {
-            codeListName: props.item.typeCode,
-            codeListParam: props.item.codeParam,
-          },
-          false,
-          props.item.cache ? props.item.cache : true
-        )
-        .then((res) => (options.value = res))
-        .catch((err) => {
-          console.error(err);
-          options.value = [];
-        });
+    if (newtypeCode) {
+      uploadOption();
     }
-  }
+  },
 );
 function handleChange(val?: string | number | boolean | undefined) {
   const option = options.value.find((item) => item.value === val);
@@ -134,6 +124,23 @@ function handleChange(val?: string | number | boolean | undefined) {
 }
 
 const codeListStore = codeListViewStore();
+
+function uploadOption() {
+  codeListStore
+    .queryCodeList(
+      {
+        codeListName: props.item.typeCode,
+        codeListParam: getParam(),
+      },
+      false,
+      props.item.cache ? props.item.cache : true
+    )
+    .then((res) => (options.value = res))
+    .catch((err) => {
+      console.error(err);
+      options.value = [];
+    });
+}
 
 onMounted(() => {
   // 初始化组件数据
@@ -158,4 +165,22 @@ onMounted(() => {
     }
   }
 });
+
+function getParam() {
+  let p: any = {};
+  if (props.item.codeParam && typeof props.item.codeParam === "string") {
+    p = JSON.parse(props.item.codeParam);
+  } else {
+    p = props.item.codeParam;
+  }
+
+  if (props.item.disabled) {
+    if (!p) {
+      p = { value: selectedValue.value };
+    } else {
+      p.value = selectedValue.value;
+    }
+  }
+  return p;
+}
 </script>
