@@ -399,6 +399,24 @@ const method = {
       setFormItem("Applicant.cGreenIndustryList", { rules: null });
     }
   },
+  // 证件号码change
+  cCertfCdeChange: (val) => {
+    if (val) {
+      const certfCde = applicantEditRef.value?.getValue("Applicant.cCertfCde");
+      if (certfCde && certfCde.length === 18) {
+        const birthYear = parseInt(certfCde.substring(6, 10), 10);
+        const birthMonth = parseInt(certfCde.substring(10, 12), 10);
+        const birthDay = parseInt(certfCde.substring(12, 14), 10);
+        const birthday = `${birthYear}-${birthMonth.toString().padStart(2, "0")}-${birthDay.toString().padStart(2, "0")}`;
+        const sexCode = parseInt(certfCde.substring(16, 17), 10);
+        const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
+        const age = new Date().getFullYear() - birthYear;
+        setValue("Applicant.tBirthday", birthday);
+        setValue("Applicant.nAge", age);
+        setValue("Applicant.cSex", sex);
+      }
+    }
+  },
 };
 
 function getFromValue() {
@@ -420,7 +438,7 @@ function setValue(key: string, value: any) {
 function getValue(key: string) {
   return applicantEditRef?.value?.getValue(key);
 }
-function getFormconfig(){
+function getFormconfig() {
   return formconfig1;
 }
 
