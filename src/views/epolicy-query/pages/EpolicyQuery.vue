@@ -40,7 +40,7 @@ import { initMultiCodeList } from "@/api/code-list-service"; // 代码列表服�
 import { getListByCode } from "@/api/code-list-service";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 const policyService = new PolicyService();
-import { PcisQueryService } from "@/views/payinfo/service/pcis-query-service";
+import { PcisQueryService } from "@/views/payinfoManagement/service/pcis-query-service";
 const pcisQueryService = new PcisQueryService();
 const userStore = useUserStore();
 const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });

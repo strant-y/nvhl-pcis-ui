@@ -50,7 +50,7 @@ import {
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { now } from "lodash";
 import { getListByCode } from "@/api/code-list-service";
-import { PcisQueryService } from "@/views/payinfo/service/pcis-query-service";
+import { PcisQueryService } from "@/views/payinfoManagement/service/pcis-query-service";
 import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 import { codeListViewStore } from "@/store";
@@ -67,9 +67,7 @@ const {
 } = NewUdrListService();
 import moment from "moment";
 import { Row } from "element-plus/es/components/table-v2/src/components";
-import {
-    submitUnderwriting,
-} from "../../../api/query/index";
+import { submitUnderwriting } from "../../../api/query/index";
 // import { saveAs } from 'file-saver';
 const userStore = useUserStore();
 const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
@@ -250,7 +248,7 @@ const allForm = ref<Array<any>>([
             }
           }
         });
-      freeEditRef.value?.setValue("prodNo", ''); // 清空条款
+      freeEditRef.value?.setValue("prodNo", ""); // 清空条款
       freeEditRef.value?.setValue("undrClsCde", ""); // 清空核保级别
       // loadUndrClsListOptions(val[val.length - 1]); // 加载核保级别列表
       // getListByCode('undrClsList', { cDptCde: user.value.companyId, cEmpCde: user.value.opCde, cProdNo });
@@ -350,44 +348,44 @@ const formObj = {
       createFreeButtonBase({
         label: "批量退回",
         func: () => {
-          if (selectData.value.length < 1 ) {
-              ElMessage.warning('所选记录为空！');
-              return ;
+          if (selectData.value.length < 1) {
+            ElMessage.warning("所选记录为空！");
+            return;
           }
 
-            if (selectData.value.length > 5 ) {
-                ElMessage.warning('所选数据最多为5条！');
-                return ;
-            }
-          let obj={}
+          if (selectData.value.length > 5) {
+            ElMessage.warning("所选数据最多为5条！");
+            return;
+          }
+          let obj = {};
           Object.keys(selectData.value).forEach((k) => {
-              obj[selectData.value[k]['objId']]=selectData.value[k]['curtTask']
+            obj[selectData.value[k]["objId"]] = selectData.value[k]["curtTask"];
           });
-          console.log(obj)
-            const res={}
-            res["user"] = JSON.parse(sessionStorage.getItem("user"));
-            res["user"]["opRelCde"] = "10030892";
-            res["appNoAndTaskIdMap"] = obj;
-            res["cUndrMrk"] = "BB";
-            res["undrMrk"] = "BB";
-            res["cAntiLnderRisk"] = "0"; //关联交易确认
-            res["cIsTransaction"] = "0"; //反洗钱风险
-            res["CRiBesprakMrk"] = "0"; // 预约分保标志
-            res["backUndrDptCde"] = null; // 退回指定核保级别机构编码
-            res["backUndrClsCde"] = null; // 退回指定核保级别编码
-            res["backUndrDptCnm"] = null; // 退回指定核保人员名称
-            console.log(res);
-            let submitUnder;
-            submitUnder = submitUnderwriting(res);
-            submitUnder.then((res) => {
-                console.log("submitUnderwriting-res", res);
-                if (res["code"] == "200") {
-                    ElMessage.success(res.msg);
-                    handleQuery();
-                } else {
-                    ElMessage.error(res.msg);
-                }
-            });
+          console.log(obj);
+          const res = {};
+          res["user"] = JSON.parse(sessionStorage.getItem("user"));
+          res["user"]["opRelCde"] = "10030892";
+          res["appNoAndTaskIdMap"] = obj;
+          res["cUndrMrk"] = "BB";
+          res["undrMrk"] = "BB";
+          res["cAntiLnderRisk"] = "0"; //关联交易确认
+          res["cIsTransaction"] = "0"; //反洗钱风险
+          res["CRiBesprakMrk"] = "0"; // 预约分保标志
+          res["backUndrDptCde"] = null; // 退回指定核保级别机构编码
+          res["backUndrClsCde"] = null; // 退回指定核保级别编码
+          res["backUndrDptCnm"] = null; // 退回指定核保人员名称
+          console.log(res);
+          let submitUnder;
+          submitUnder = submitUnderwriting(res);
+          submitUnder.then((res) => {
+            console.log("submitUnderwriting-res", res);
+            if (res["code"] == "200") {
+              ElMessage.success(res.msg);
+              handleQuery();
+            } else {
+              ElMessage.error(res.msg);
+            }
+          });
         },
       }),
       createFreeButtonBase({
@@ -684,32 +682,34 @@ const tableBtn = ref<Array<any>>([
     icon: "RefreshLeft",
     tableClick: (row) => {
       // showDetails(row)
-        const res={}
-        res["cUndrMrk"] = "W";
-        res["undrMrk"] = "W";
-        res["user"] = JSON.parse(sessionStorage.getItem("user"));
-        res["user"]["opRelCde"] = "10030892";
-        res["appNo"] = row.objId;
-        res["taskId"] = row.curtTask;
-        res["appTyp"] = row.bsType;
-        res["cAntiLnderRisk"] = "0"; //关联交易确认
-        res["cIsTransaction"] = "0"; //反洗钱风险
-        res["CRiBesprakMrk"] = "0"; // 预约分保标志
-        res["backUndrDptCde"] = row.dptCde; // 退回指定核保级别机构编码
-        res["backUndrClsCde"] = row.level; // 退回指定核保级别编码
-        res["backUndrDptCnm"] = JSON.parse(sessionStorage.getItem("user"))['userName']; // 退回指定核保人员名称
-        console.log(res);
-        let submitUnder;
-        submitUnder = submitUnderwriting(res);
-        submitUnder.then((res) => {
-            console.log("submitUnderwriting-res", res);
-            if (res["code"] == "200") {
-                ElMessage.success(res.msg);
-                handleQuery();
-            } else {
-                ElMessage.error(res.msg);
-            }
-        });
+      const res = {};
+      res["cUndrMrk"] = "W";
+      res["undrMrk"] = "W";
+      res["user"] = JSON.parse(sessionStorage.getItem("user"));
+      res["user"]["opRelCde"] = "10030892";
+      res["appNo"] = row.objId;
+      res["taskId"] = row.curtTask;
+      res["appTyp"] = row.bsType;
+      res["cAntiLnderRisk"] = "0"; //关联交易确认
+      res["cIsTransaction"] = "0"; //反洗钱风险
+      res["CRiBesprakMrk"] = "0"; // 预约分保标志
+      res["backUndrDptCde"] = row.dptCde; // 退回指定核保级别机构编码
+      res["backUndrClsCde"] = row.level; // 退回指定核保级别编码
+      res["backUndrDptCnm"] = JSON.parse(sessionStorage.getItem("user"))[
+        "userName"
+      ]; // 退回指定核保人员名称
+      console.log(res);
+      let submitUnder;
+      submitUnder = submitUnderwriting(res);
+      submitUnder.then((res) => {
+        console.log("submitUnderwriting-res", res);
+        if (res["code"] == "200") {
+          ElMessage.success(res.msg);
+          handleQuery();
+        } else {
+          ElMessage.error(res.msg);
+        }
+      });
     },
   }),
   createFreeButtonBase({
@@ -916,7 +916,7 @@ const changeForm = (val: any) => {
     }
     allForm.value.map((item: any, index: number) => {
       const isVal = item.showKey.findIndex((vals: any) => vals == val);
-      console.log(isVal)
+      console.log(isVal);
       if (isVal !== -1) {
         if (item.prop == "tm1") {
           item.rules =
@@ -1580,7 +1580,7 @@ function handle_hasReceived(row: any) {
 // 多选事件
 function handleSelectionChange(selection: any) {
   console.log("selection", selection);
-  selectData.value=selection
+  selectData.value = selection;
   removeIds.value = selection.map((item: any) => item.cPkId);
 }
 

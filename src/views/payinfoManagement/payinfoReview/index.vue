@@ -33,19 +33,22 @@ import {
 } from "@/shared/app-table-config";
 import { deleteFactorBykey, getBasicKindList } from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
-import moment from 'moment';
-import { PcisQueryService } from "@/views/payinfo/service/pcis-query-service";
+import moment from "moment";
+import { PcisQueryService } from "@/views/payinfoManagement/service/pcis-query-service";
 const pcisQueryService = new PcisQueryService();
 const userStore = useUserStore();
-const user = ref(userStore.user) || ref({ companyId:'', opCde:'' })
+const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
 const removeIds = ref([]); // 删除用户ID集合 用于批量删除
-const departmentTree = defineAsyncComponent(
-  () => import("@/components/common/DepartmentTree.vue")
-);
+// const departmentTree = defineAsyncComponent(
+//   () => import("@/components/common/DepartmentTree.vue")
+// );
+import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 // 缴费信息审核-详情
-const detail = defineAsyncComponent(() => import("./payment-information-management-detail.vue"));
+const detail = defineAsyncComponent(
+  () => import("./payment-information-management-detail.vue")
+);
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -62,7 +65,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         func: () => {
-          freeEditRef.value?.resetFields()
+          freeEditRef.value?.resetFields();
           handleQuery(true);
           // freeEditRef.value?.resetForm();
         },
@@ -72,20 +75,31 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "AccDpt",
         inputtype: "rtselect",
-        title: "核保机构",
+        title: "机构部门",
         btnWidth: 10,
         itemWidth: 2,
-        defaultValue: user.value.companyId,
-        rules: [getRules("required", {})],
+        // rules: [getRules("required", {
+        //   trigger: 'change'
+        // })],
         showExBtn: true,
         btnItems: {
           icon: "Search",
           type: "primary",
           func: () => {
             dzmodal
-              .open(departmentTree, { type: "Issuer", data: {} })
+              .open(DepartmentTree, { type: "Issuer", data: {} })
               .then((res) => {
-                if (res.type === "ok") {
+                if (res.body) {
+                  const selectObj = res.body;
+                  freeEditRef.value?.setValue("AccDpt", selectObj.id);
+                  setFormItem("AccDpt", {
+                    loadData: [
+                      {
+                        label: selectObj.name,
+                        value: selectObj.id,
+                      },
+                    ],
+                  });
                 }
               });
           },
@@ -98,19 +112,19 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         showKey: [5],
         defaultValue: 1,
         keymap: {
-          y: 1, n: 0
-        }
+          y: 1,
+          n: 0,
+        },
       },
       {
         prop: "CDateTyp",
         inputtype: "rtselect",
         title: "日期类型",
-        loadData :[
-          { label:'核保日期',value:'1' },
-          { label:'起保日期',value:'2' },
-          { label:'缴费处理日期',value:'3' },
+        loadData: [
+          { label: "核保日期", value: "1" },
+          { label: "起保日期", value: "2" },
+          { label: "缴费处理日期", value: "3" },
         ],
-        defaultValue: '1',
         rules: [getRules("required", {})],
       },
       {
@@ -123,20 +137,22 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "datetimerange",
         format: "YYYY-MM-DD HH:mm:ss",
         valueFormat: "YYYY-MM-DD HH:mm:ss",
-        defaultValue: [
-          moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format('YYYY-MM-DD 00:00:00'),
-          moment(new Date()).format('YYYY-MM-DD 23:59:59')
-        ],
+        // defaultValue: [
+        //   moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
+        //     "YYYY-MM-DD 00:00:00"
+        //   ),
+        //   moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+        // ],
       },
       {
         prop: "CBillTyp",
         inputtype: "rtselect",
         title: "单据类型",
-        loadData :[
-          { label:'投保单号',value:'1' },
-          { label:'交易号',value:'3' },
+        loadData: [
+          { label: "投保单号", value: "1" },
+          { label: "交易号", value: "3" },
         ],
-        defaultValue: '3',
+        defaultValue: "3",
       },
       {
         prop: "CBillNoStart",
@@ -163,7 +179,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "产品",
         typeCode: "PROD_LIST_GRT",
-        params: { cParCde: '', cOperId: user.value.opCde, cDptCde: user.value.companyId },
+        params: {
+          cParCde: "",
+          cOperId: user.value.opCde,
+          cDptCde: user.value.companyId,
+        },
         clearable: true,
       },
     ],
@@ -195,11 +215,13 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Edit",
         tableClick: (row) => {
-          dzmodal.open(detail, { type: "edit", data: {CChqueNo:row.cChqueNo} }).then((res) => {
-            if (res.type === "ok") {
-              handleQuery(true);
-            }
-          });
+          dzmodal
+            .open(detail, { type: "edit", data: { cUniqueNo: row.cUniqueNo } })
+            .then((res) => {
+              if (res.type === "ok") {
+                handleQuery(true);
+              }
+            });
         },
       }),
     ],
@@ -207,15 +229,20 @@ const tableconfig = reactive<AppTableConfig>(
     fromSchema: [
       {
         prop: "cPayTyp",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "缴费类型",
         minWidth: 180,
-        fixed: 'left',
-        formatter: (val) => {
-          const CStatusList = [{value: '2', label: '支票缴费'}, {value: '5', label: '转账'}]
-          const result = CStatusList.find(item => item.value === val);
-          return result ? result.label : val;
-        }
+        fixed: "left",
+        typeCode: "CHARGE_TYPE_CACHE",
+        param: { cCde: ["2", "3", "5", "99"] },
+        // formatter: (val) => {
+        //   const CStatusList = [
+        //     { value: "2", label: "支票缴费" },
+        //     { value: "5", label: "转账" },
+        //   ];
+        //   const result = CStatusList.find((item) => item.value === val);
+        //   return result ? result.label : val;
+        // },
       },
       {
         prop: "cChqueNo",
@@ -264,10 +291,15 @@ const tableconfig = reactive<AppTableConfig>(
 );
 
 onMounted(async () => {
-  pageresult.list = [
-    {}
-  ];
-  pageresult.total = 1;
+  nextTick(() => {
+    freeEditRef.value?.setValue("CDateTyp", "1");
+    freeEditRef.value?.setValue("dateRange", [
+      moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
+        "YYYY-MM-DD 00:00:00"
+      ),
+      moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+    ]);
+  });
   // handleQuery(true);
 });
 
@@ -293,7 +325,7 @@ const exRules = {
 /** 查询 */
 function handleQuery(flag?: boolean) {
   freeEditRef.value?.validate().then((isValid) => {
-		if (isValid) {
+    if (isValid) {
       const tmArr = freeEditRef.value?.getValue("dateRange");
       const startDate = Date.parse(tmArr[0]);
       const endDate = Date.parse(tmArr[1]);
@@ -302,20 +334,24 @@ function handleQuery(flag?: boolean) {
       //   return;
       // }
       if (endDate - startDate >= 7 * 1000 * 60 * 60 * 24) {
-        ElMessage.warning('日期时间范围请控制在7天以内');
+        ElMessage.warning("日期时间范围请控制在7天以内");
         return;
       }
 
       const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
       const s = freeEditRef.value?.getFromValue(); //获取表单数据
 
-      const param = Object.assign({
-        // sortField: 'name', // 涉及排序
-        // sortOrder: sortValue, // 涉及排序
-        allow_anonymous: true,
-        CurrentUser: user.value.opCde,
-        CurrentUserOrg: user.value.companyId,
-      }, s, r);
+      const param = Object.assign(
+        {
+          // sortField: 'name', // 涉及排序
+          // sortOrder: sortValue, // 涉及排序
+          allow_anonymous: true,
+          CurrentUser: user.value.opCde,
+          CurrentUserOrg: user.value.companyId,
+        },
+        s,
+        r
+      );
       pcisQueryService.getPayConfirmInfoAuditList(param).then((res: any) => {
         const { code, data, msg } = res;
         if (res.code === 200) {
@@ -326,13 +362,22 @@ function handleQuery(flag?: boolean) {
             pageresult.total = data.total;
           }
         } else {
-          ElMessage.error('后台服务异常,请联系管理员');
+          ElMessage.error("后台服务异常,请联系管理员");
         }
       });
     }
-  })
+  });
 }
-
+//给表单下拉项赋值
+function setFormItem(key, obj) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        Object.assign(item, obj);
+      }
+    });
+  }
+}
 </script>
 
 <style scoped></style>

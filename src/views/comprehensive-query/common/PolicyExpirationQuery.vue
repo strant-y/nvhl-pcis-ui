@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { useUserStore } from "@/store";
 import { useValidator } from "@/typings/useValidator";
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter, useRoute } from "vue-router";
 const { getRules } = useValidator();
 const router = useRouter();
 const route = useRoute();
@@ -34,14 +34,14 @@ import {
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
-import {SCENE_PLY_APP_READ} from '@/constants/tab-constants';
-import { PcisQueryService } from "@/views/payinfo/service/pcis-query-service";
+import { SCENE_PLY_APP_READ } from "@/constants/tab-constants";
+import { PcisQueryService } from "@/views/payinfoManagement/service/pcis-query-service";
 const pcisQueryService = new PcisQueryService();
 const userStore = useUserStore();
-const user = ref(userStore.user) || ref({ companyId:'', opCde:'' })
+const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
-  const departmentTree = defineAsyncComponent(
+const departmentTree = defineAsyncComponent(
   () => import("@/components/common/DepartmentTree.vue")
 );
 const TaskListVestige = defineAsyncComponent(
@@ -50,9 +50,9 @@ const TaskListVestige = defineAsyncComponent(
 const props = defineProps({
   refreshData: {
     type: Boolean,
-    default: false
-  }
-})
+    default: false,
+  },
+});
 const cPard = ref(null);
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -108,8 +108,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         showKey: [5],
         defaultValue: 1,
         keymap: {
-          y: 1, n: 0
-        }
+          y: 1,
+          n: 0,
+        },
       },
       {
         prop: "NExpirationDays",
@@ -138,41 +139,40 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       //   params: { cParCde:'', cOperId: user.value.opCde, cDptCde: user.value.companyId },
       //   clearable: true,
       // },
-        {
-            prop: "cKindNo",
-            inputtype: "rtselect",
-            title: "产品大类",
-            itemWidth: 1,
-            rules: [{ type: "required" }],
-            typeCode: "KIND_LIST_GRT",
-            child: "cProdNo",
-            filterable:true,
-            clearable: true,
-            codeParam: {
-                cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
-                cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
-            },
-            func: (val) => {
-                cPard.value=val
-            },
+      {
+        prop: "cKindNo",
+        inputtype: "rtselect",
+        title: "产品大类",
+        itemWidth: 1,
+        rules: [{ type: "required" }],
+        typeCode: "KIND_LIST_GRT",
+        child: "cProdNo",
+        filterable: true,
+        clearable: true,
+        codeParam: {
+          cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+          cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
         },
-        {
-            prop: "cProdNo",
-            inputtype: "rtselect",
-            title: "条款",
-            itemWidth: 1,
-            rules: [{ type: "required" }],
-            filterable:true,
-            clearable: true,
-            typeCode: "TERM_LIST_IN_GUIDE_NEW",
-            codeParam: {
-                cParCde: cPard.value,
-                cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
-                cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
-            },
-            func: (val) => {
-            },
+        func: (val) => {
+          cPard.value = val;
         },
+      },
+      {
+        prop: "cProdNo",
+        inputtype: "rtselect",
+        title: "条款",
+        itemWidth: 1,
+        rules: [{ type: "required" }],
+        filterable: true,
+        clearable: true,
+        typeCode: "TERM_LIST_IN_GUIDE_NEW",
+        codeParam: {
+          cParCde: cPard.value,
+          cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+          cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+        },
+        func: (val) => {},
+      },
       {
         prop: "CPlyNo",
         inputtype: "rtinput",
@@ -207,7 +207,7 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "View",
         tableClick: (row) => {
-          showDetails(row)
+          showDetails(row);
         },
       }),
     ],
@@ -248,22 +248,20 @@ const method = {
 
 watch(
   () => props.refreshData,
-  (n,o) => {
+  (n, o) => {
     // 自动刷新列表获取数据
-    pageresult.list = [
-      {},{}
-    ]
+    pageresult.list = [{}, {}];
     pageresult.total = 2;
     // 上面代码是仅用于本地调试
-    if(n) {
-      console.log(n,'保单到期查询')
+    if (n) {
+      console.log(n, "保单到期查询");
       // handleQuery(true);
     }
   },
-  { 
+  {
     deep: true,
-    immediate: true
-  },
+    immediate: true,
+  }
 );
 
 // 绑定特殊验证器
@@ -281,14 +279,19 @@ const exRules = {
 /** 查询 */
 function handleQuery(flag?: boolean) {
   freeEditRef.value?.validate().then((isValid) => {
-		if (isValid) {
+    if (isValid) {
       const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
       const s = freeEditRef.value?.getFromValue(); //获取表单数据
-      const param = Object.assign({
-        CurrentUser: user.value.opCde,
-        CurrentUserOrg: user.value.companyId
-      },s, r);
-      pcisQueryService.getExpirationPolicyList(param)
+      const param = Object.assign(
+        {
+          CurrentUser: user.value.opCde,
+          CurrentUserOrg: user.value.companyId,
+        },
+        s,
+        r
+      );
+      pcisQueryService
+        .getExpirationPolicyList(param)
         .then((res) => {
           const { code, data, msg } = res;
           if (200 === code) {
@@ -298,8 +301,8 @@ function handleQuery(flag?: boolean) {
           }
         })
         .finally(() => {});
-      }
-    })
+    }
+  });
 }
 
 // 打开详情
@@ -314,13 +317,13 @@ function showDetails(row: any) {
   //   path: '/index/pcis-query/plyDetails',
   //   query: { data: en }
   // });
-    const data = row;
-    router.push({
-        path: "/pcis/my-page",
-        query: {
-            param: JSON.stringify({ ...data, ...{ pageType: "edit" } }),
-        },
-    });
+  const data = row;
+  router.push({
+    path: "/pcis/my-page",
+    query: {
+      param: JSON.stringify({ ...data, ...{ pageType: "edit" } }),
+    },
+  });
 }
 </script>
 
