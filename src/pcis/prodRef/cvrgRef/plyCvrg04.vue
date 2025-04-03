@@ -154,9 +154,11 @@ import { terConfig } from "@/store/modules/term-config";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { prodTemple } from "./titleTemple";
 import { codeListViewStore } from "@/store";
+import { qryProdRelTermRiskList } from "@/api/prod";
 const codeListStore = codeListViewStore();
 
 const opertaor = dataOpertaor();
+const parparam = opertaor.getParam();
 const terconfig = terConfig();
 terconfig.configInit(); // 条款配置数据初始化
 
@@ -199,6 +201,39 @@ onMounted(async () => {
     exRules
   );
   Object.assign(cardconfig.value, formconfig11);
+  if (parparam.pageType === "app") {
+    method.funcadd();
+    const param = {
+      cProdNo: parparam.cProdNo,
+      cTermNo: parparam.cTermNo,
+    };
+    qryProdRelTermRiskList(param).then((res) => {
+      const { code, data, msg } = res;
+      if (200 === code) {
+        let plans: any[] = [];
+        data.forEach((item: any) => {
+          let riskList: { [key: string]: any }[] = [];
+          item.children?.forEach((e: any) => {
+            riskList.push({
+              "TermRisktgt.cLiabCode": e.cRiskNo,
+            });
+          });
+          let data: { [key: string]: any } = {
+            "Term.cClauseCode": item.cTermNo,
+            "Term.cRdrTyp": item.cRdrTyp,
+            riskList: riskList,
+          };
+          if (item.cRdrTyp === "1") {
+            data["Term.cClauseCategory"] = item.cClauseCategory;
+          }
+          plans.push(data);
+        });
+        refushData('P1', plans);
+      } else {
+        ElMessage.error(msg);
+      }
+    });
+  }
   nextTick(() => {
     updateTitle();
   });
@@ -347,7 +382,7 @@ function getFromValue() {
 }
 
 function setFormValue(value: any) {
-  Object.assign(planData.value,{});
+  Object.assign(planData.value, {});
   let plandata: { [key: string]: any } = {};
   value.forEach((item: any) => {
     const planKey = item["Term.cPlanNo"];

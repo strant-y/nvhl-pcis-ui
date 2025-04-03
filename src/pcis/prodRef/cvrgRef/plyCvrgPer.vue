@@ -117,9 +117,10 @@ import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { codeListViewStore } from "@/store";
+import { qryProdRelTermRiskList } from "@/api/prod";
 const codeListStore = codeListViewStore();
 const opertaor = dataOpertaor();
-
+const parparam = opertaor.getParam();
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -139,6 +140,38 @@ onMounted(async () => {
     exRules
   );
   Object.assign(cardconfig.value, formconfig11);
+  if (parparam.pageType === "app") {  // 新建保单时,初始化条款信息
+    const param = {
+      cProdNo: parparam.cProdNo,
+      cTermNo: parparam.cTermNo,
+    };
+    qryProdRelTermRiskList(param).then((res: any) => {
+      const { code, data, msg } = res;
+      if (200 === code) {
+        let plans: any[] = [];
+        data.forEach((item: any) => {
+          let riskList: { [key: string]: any }[] = [];
+          item.children?.forEach((e: any) => {
+            riskList.push({
+              "TermRisktgt.cLiabCode": e.cRiskNo,
+            });
+          });
+          let data: { [key: string]: any } = {
+            "Term.cClauseCode": item.cTermNo,
+            "Term.cRdrTyp": item.cRdrTyp,
+            riskList: riskList,
+          };
+          if (item.cRdrTyp === "1") {
+            data["Term.cClauseCategory"] = item.cClauseCategory;
+          }
+          plans.push(data);
+        });
+        refushData(plans);
+      } else {
+        ElMessage.error(msg);
+      }
+    });
+  }
 });
 
 // 绑定方法
