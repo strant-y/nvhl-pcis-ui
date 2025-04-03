@@ -166,6 +166,7 @@ import {
   getAppPolicy,
   saveEdrAppPlyInfo,
   getEndorseChange,
+  getEdrRsnItem,
   submitUnderwriting,
   submitUnderwritingEdr,
 } from "../../../api/query/index";
@@ -399,6 +400,7 @@ async function loadAfter() {
     loadAppPlyInfo(cAppNo);
     if (props.param.cAppTyp == "E") {
       bthList.value = edrBtn;
+     // opertaor.setDisabledAll();
     } else if (props.param.cAppTyp == "A") {
       bthList.value = basicBtn;
     }
@@ -460,8 +462,15 @@ async function loadAfter() {
       })
     );
   } else if (props.param.pageType === "EDR_APP_NEW_SCENE") {
-    opertaor.setDisabledAll();
     const cAppNo = props.param.cAppNo;
+    edrbase.value?.setValue("EdrBase.cRatioTyp", "1");
+    edrbase.value?.setValue("EdrBase.cEdrRsnBundleCde", props.param["cRsnCde"]);
+    edrbase.value?.setValue("EdrBase.cEdrType", props.param["cEdrType"]);
+    if(props.param["cEdrType"]!='FZ'){
+        // opertaor.setDisabledAll();
+        getEdrRsnItemFun(props.param["cProdNo"],props.param["cDptCde"],props.param["cRsnCde"],props.param["cRsnCde"],props.param["cEdrType"],props.param["cGrpMrk"])
+        edrbase.value?.setValue("EdrBase.CEdrRsnDetail",[props.param["cRsnCde"]]);
+    }
     loadAppPlyInfo(cAppNo);
     bthList.value = edrBtn;
   } else if (props.param.pageType === "readonly") {
@@ -702,6 +711,7 @@ const setPayInfo = (base, applicant) => {
   pay["Pay.tPayBgnTm"] = base["Base.tAppTm"];
   pay["Pay.tPayEndTm"] = base["Base.tInsrncBgnTm"];
   pay["Pay.nOwnPrm"] = base["Base.nPrm"];
+  pay["Pay.cProdNo"] = base["Base.cProdNo"];
   pay["Pay.nPrmVar"] = !!base["Base.nPrm"] ? base["Base.nPrm"] : 0;
   payList.push(pay);
   return payList;
@@ -761,6 +771,26 @@ const savePlyInfo = () => {
     // history.back();
   });
 };
+/**
+ * 获取批改项
+ * **/
+const getEdrRsnItemFun=(cProdNo,cDptCde,cRsnCde,cRsnDetailCde,cEdrType,cGrpMrk)=>{
+    const res={"CProdNo":cProdNo,
+                "CDptCde":cDptCde,
+                "CRsnCde":cRsnCde,
+                "CRsnDetailCde":cRsnDetailCde,
+                "CEdrType":cEdrType,
+                "CGrpMrk":cGrpMrk
+            }
+    getEdrRsnItem(res).then((res) => {
+        console.log('zzb',res)
+        if (res["code"] == "200") {
+            ElMessage.success(res.msg);
+        } else {
+            ElMessage.error(res.msg);
+        }
+    });
+}
 /**
  * 批改单保存
  * **/

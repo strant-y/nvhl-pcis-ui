@@ -472,7 +472,7 @@ function handleRsnChange(val, row) {
       (option) => option.value === val
     );
     if (detailOption) {
-      row["iddetail"] = detailOption.label;
+      row["iddetail"] = [detailOption.label];
       changeRsn({ value: val }, row["cPlyNo"], { value: row["iddetail"] });
     }
   }
@@ -728,6 +728,7 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
     prodNo: cProdNo,
     edrRsnCde: rsnCde.value[selected.value['cPlyNo']],
   };
+  console.log(rsnDetail.value)
   pcisEdrQueryService.validEndorse(param).then(
     async (result) => {
       if (200 !== result["code"]) {

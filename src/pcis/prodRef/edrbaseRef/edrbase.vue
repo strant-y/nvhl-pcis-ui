@@ -223,9 +223,6 @@ function setFormItem(key, obj) {
 }
 onMounted(() => {
   nextTick(() => {
-    setValue("EdrBase.cRatioTyp", "1");
-    setValue("EdrBase.cEdrRsnBundleCde", props.param["cRsnCde"]);
-    setValue("EdrBase.cEdrType", props.param["cEdrType"]);
     console.log(props.param);
     const isGrp = props.param["cGrpMrk"] === "1" ? "1" : null;
     const isPer = props.param["CGrpMrk"] === "1" ? "1" : null;
@@ -243,11 +240,6 @@ onMounted(() => {
         codeListParam: param,
       })
       .then((res) => {
-        res.forEach((k) => {
-          if (k.value == props.param["cRsnCde"]) {
-            k.checked = true;
-          }
-        });
         setFormItem("EdrBase.CEdrRsnDetail", { loadData: res });
       });
   });
