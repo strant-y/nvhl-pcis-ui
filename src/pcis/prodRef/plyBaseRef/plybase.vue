@@ -75,7 +75,7 @@ onMounted(async () => {
     //回显机构部门数据
     setFormItem("Base.cDptCde", {
       loadData: [
-        { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptNme}` },
+        { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm}` },
       ],
     });
     console.log(param, "param.cDptCde");
@@ -83,7 +83,7 @@ onMounted(async () => {
     // 服务机构默认值
     setFormItem("Base.cIntroDptCde", {
       loadData: [
-        { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptNme}` },
+        { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm}` },
       ],
     });
     setValue("Base.cIntroDptCde", param.cDptCde);
@@ -291,7 +291,7 @@ const method = {
             setFormValue({
               "Base.cBrkSlsCde": params.CSlsCde, //代理业务员
               "Base.cCertfNo": params.CCtfctNo, //代理业务执业证号
-              "Base.cBrkrDptCde": params.CDptCde, //代理业务员机构代码
+              "Base.cBrkrDptcde": params.CDptCde, //代理业务员机构代码
             });
             dialogRef.value?.handleClose();
           },
@@ -612,7 +612,7 @@ function setForSelectFilterable() {
   });
 }
 
-function getFormconfig(){
+function getFormconfig() {
   return formconfig1;
 }
 defineExpose({
@@ -621,7 +621,7 @@ defineExpose({
   validate,
   setValue,
   getValue,
-  getFormconfig
+  getFormconfig,
 });
 </script>
 

@@ -163,7 +163,7 @@ const tableconfig = reactive<AppTableConfig>(
     ],
     fromSchema: [
       {
-        prop: "cDptNme",
+        prop: "cDptCnm",
         title: "机构名称",
         inputtype: "rtinput",
         width: 200,
