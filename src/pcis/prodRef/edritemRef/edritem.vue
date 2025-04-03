@@ -15,6 +15,9 @@ import {
 } from "@/shared/app-table-config";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
+import {
+    getedrcmpitembyedrappnoorcachekey
+} from "../../../api/query/index";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const props = defineProps({
   // data: {
@@ -29,6 +32,7 @@ const props = defineProps({
     type: [Object],
   },
 });
+const opertaor = dataOpertaor();
 const edritemEditRef = ref<AppTableMethod | null>(null);
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -48,32 +52,32 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtn: [],
     fromSchema: [
       {
-        prop: "EdrCmpItem.NSeqNo",
+        prop: "nSeqNo",
         inputtype: "rtinput",
         title: "序号",
       },
       {
-        prop: "EdrCmpItem.CTabNme",
+        prop: "cTabNme",
         inputtype: "rtinput",
         title: "批改对象",
       },
       {
-        prop: "EdrCmpItem.CFldNme",
+        prop: "cFldNme",
         inputtype: "rtinput",
         title: "批改项目",
       },
       {
-        prop: "EdrCmpItem.COldVal",
+        prop: "cOldVal",
         inputtype: "rtinput",
         title: "原值",
       },
       {
-        prop: "EdrCmpItem.CChgVal",
+        prop: "cChgVal",
         inputtype: "rtinput",
         title: "变化值",
       },
       {
-        prop: "EdrCmpItem.CNewVal",
+        prop: "cNewVal",
         inputtype: "rtinput",
         title: "新值",
       },
@@ -94,18 +98,21 @@ function setDisa() {}
 
 /** 查询 */
 function handleQuery(flag?: boolean) {
-  // const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
-  // genCusConInfoBusinessList(param)
-  //     .then((res) => {
-  //         const { code, data, msg } = res;
-  //         if (200 === code) {
-  //             pageresult.list = data.result;
-  //             pageresult.total = data.total;
-  //         } else {
-  //             ElMessage.error(msg);
-  //         }
-  //     })
-  //     .finally(() => {});
+  const cacheKey=opertaor.getFatherPage().getcacheKey()
+  const r = edritemEditRef.value?.getPartnerPage(flag); //获取分页数据
+  const param = Object.assign({pageNo:r['pageNum'],CurrentUser:user.opCde,CurrentUserOrg:user.companyId,cacheKey:cacheKey}, r);
+  console.log(param)
+  getedrcmpitembyedrappnoorcachekey(param)
+      .then((res) => {
+          const { code, data, msg } = res;
+          if (200 === code) {
+              pageresult.list = data.result;
+              pageresult.total = data.total;
+          } else {
+              ElMessage.error(msg);
+          }
+      })
+      .finally(() => {});
 }
 
 onMounted(() => {});
@@ -114,6 +121,7 @@ function getFormconfig(){
   return tableconfig;
 }
 defineExpose({
-    getFormconfig
+    getFormconfig,
+    handleQuery
 });
 </script>

@@ -207,6 +207,7 @@ const nAmt = ref(0.0);
 const nPrm = ref(0.0);
 const tmDay = ref(0);
 const dzmodal = useDzModal();
+const cacheKey =ref();
 onBeforeMount(() => {
   console.log("路由参数props.param", props.param);
   initPage();
@@ -791,31 +792,27 @@ const saveEdrPlyInfo = () => {
  * 生成批文
  * **/
 const generateEndorse = () => {
-  const btn = getBtn("btnCompare");
-  // btn.loading = true;
-  //edritem.value?.setTableValue(2)
-  const res = opertaor.getDataAll();
-  res["user"] = user;
-  res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
-  res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
-  res["EdrBase"] = edrbase.value?.getFromValue();
-  console.log(res);
-  getEndorseChange(res).then((res) => {
-    btn.loading = false;
-    if (res["code"] == "200") {
-      const ops = opertaor.convertData(res);
-      console.log("转换的数据", ops);
-      ElMessage.success(res.msg);
-      opertaor.setDataAll(ops);
-      if (res["res"]["composition"]["EdrBase"]) {
-        const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
-        console.log(EdrBaseData);
-        edrbase.value?.setFormValue(EdrBaseData);
-      }
-    } else {
-      ElMessage.error(res.msg);
-    }
-  });
+    const btn = getBtn("btnCompare");
+    btn.loading = true;
+    const res = opertaor.getDataAll();
+    res["user"] = user;
+    res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
+    res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
+    res['EdrBase']=edrbase.value?.getFromValue()
+    console.log(res);
+    getEndorseChange(res).then((res) => {
+        btn.loading = false;
+        if (res["code"] == "200") {
+            const cEdrCtnt=res['data']['data']['cEdrCtnt'] //批文
+            cacheKey.value=res['data']['data']['cacheKey']
+            edrbase.value?.setValue('EdrBase.cEdrCtnt',cEdrCtnt)
+            edrbase.value?.setValue('EdrBase.cacheKey',cacheKey.value)
+            edritem.value?.handleQuery()
+            ElMessage.success(res.msg);
+        } else {
+            ElMessage.error(res.msg);
+        }
+    });
 };
 /**
  * 核保信息 提交
@@ -877,9 +874,14 @@ function lowercaseKeys<T extends object>(
   return newObj;
 }
 
+function getcacheKey(){
+    return cacheKey.value
+}
+
 opertaor.setFatherPage({
   currentIndex: currentIndex,
   lowercaseKeys: lowercaseKeys,
+  getcacheKey: getcacheKey,
 });
 </script>
 

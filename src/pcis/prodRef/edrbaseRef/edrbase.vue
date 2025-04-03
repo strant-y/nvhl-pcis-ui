@@ -175,6 +175,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rows: 6,
         itemWidth: 2,
       },
+      {
+          prop: "EdrBase.cEdrType",
+          inputtype: "rtinput",
+          hidden:true,
+      },
+      {
+          prop: "EdrBase.cacheKey",
+          inputtype: "rtinput",
+          hidden:true,
+      },
     ],
     fromUi: createFromUiConfig({
       cols: 2,
@@ -215,6 +225,7 @@ onMounted(() => {
   nextTick(() => {
     setValue("EdrBase.cRatioTyp", "1");
     setValue("EdrBase.cEdrRsnBundleCde", props.param["cRsnCde"]);
+    setValue("EdrBase.cEdrType", props.param["cEdrType"]);
     console.log(props.param);
     const isGrp = props.param["cGrpMrk"] === "1" ? "1" : null;
     const isPer = props.param["CGrpMrk"] === "1" ? "1" : null;

@@ -97,6 +97,22 @@ export function saveEdrAppPlyInfo(queryParams: any): AxiosPromise<any> {
 export function getEndorseChange(queryParams: any): AxiosPromise<any> {
     return post(`/edr/getEndorseChange`, queryParams);
 }
+
+/**
+ * 获取批改项
+ * @param queryParams
+ */
+export function getEdrRsnItem(queryParams: any): AxiosPromise<any> {
+    return post(`/edr/getEdrRsnItem`, queryParams);
+}
+
+/**
+ * 获取批改比较项
+ * @param queryParams
+ */
+export function getedrcmpitembyedrappnoorcachekey(queryParams: any): AxiosPromise<any> {
+    return post(`/edr/get-edr-cmp-item-by-edr-appno-or-cachekey`, queryParams);
+}
   
 /**
  * 查询申请单列表
