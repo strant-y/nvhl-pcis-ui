@@ -234,6 +234,9 @@ function selectMainTerm(isselect = true) {
       const { code, data, msg } = res;
       if (200 === code) {
         data2.value = data;
+        setTimeout(() => {
+        setAdditionNode();
+      }, 50);
       } else {
         ElMessage.error(msg);
       }
@@ -241,6 +244,26 @@ function selectMainTerm(isselect = true) {
   }
 
   data3.value = selectNode;
+}
+
+function setAdditionNode() {
+  const addMainKey: any[] = [];
+  console.log(props.data.data.isselectData);
+  if (props.data.data.isselectData && props.data.data.isselectData.length > 0) {
+    props.data.data.isselectData.forEach((item: any) => {
+      if (item["Term.cRdrTyp"] === "1") {
+        if (item["riskList"] && item["riskList"].length > 0) {
+          item["riskList"].forEach((risk: any) => {
+            const k = item['Term.cClauseCode']+risk['TermRisktgt.cLiabCode'];
+            addMainKey.push(k);
+          });
+        }else{
+          addMainKey.push(item['Term.cClauseCode']);
+        }
+      }
+    });
+  }
+  additionalRef.value?.setCheckedKeys(addMainKey,false);
 }
 
 function selectAdditionTerm() {
