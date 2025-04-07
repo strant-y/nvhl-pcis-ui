@@ -131,7 +131,7 @@ const props = defineProps({
 const cardconfig = ref(creatCardConfig({}));
 const tremTemplateRefs = ref<any[]>([]);
 const cvrgFormfef = ref("cvrgFormfef");
-const formData = ref<{ [key: string]: { [key: string]: any } }>({});
+const formData = ref<{ [key: string]: [] }>({});
 
 onMounted(async () => {
   const formconfig11 = formInit(
@@ -186,13 +186,19 @@ const exRules = {};
 
 function addTermData() {
   const param = opertaor.getParam();
+  const iss :any[] = [];
+  if(formData.value){
+    Object.keys(formData.value).forEach((k: any) => {
+      iss.push(...formData.value[k]);
+    });
+  }
   dialog.value?.open(
     "addtremView",
     {
       type: "show",
       data: {
         cProdNo: param.cProdNo,
-        isselectData: formData.value,
+        isselectData: iss,
       },
     },
     {

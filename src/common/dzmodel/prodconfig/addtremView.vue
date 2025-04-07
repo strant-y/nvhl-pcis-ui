@@ -38,7 +38,7 @@
         </div>
       </el-col>
       <el-col :span="12">
-        <div style="height: 250px; border: 1px solid #f3f3f3;overflow-y: auto">
+        <div style="height: 250px; border: 1px solid #f3f3f3; overflow-y: auto">
           <el-tree
             ref="mainRef"
             style="max-width: 600px"
@@ -51,7 +51,7 @@
         </div>
       </el-col>
       <el-col :span="12">
-        <div style="height: 250px; border: 1px solid #f3f3f3;overflow-y: auto">
+        <div style="height: 250px; border: 1px solid #f3f3f3; overflow-y: auto">
           <el-tree
             ref="additionalRef"
             style="max-width: 600px"
@@ -71,12 +71,12 @@
       <el-col :span="24">
         <div style="overflow-y: auto; max-height: 150px">
           <el-tree
-          style="max-width: 600px"
-          :props="dataprops"
-          node-key="id"
-          :data="data3"
-          :default-expand-all="true"
-        />
+            style="max-width: 600px"
+            :props="dataprops"
+            node-key="id"
+            :data="data3"
+            :default-expand-all="true"
+          />
         </div>
       </el-col>
       <el-col :span="24">
@@ -90,11 +90,11 @@
           <rtButton
             :item="{
               icon: 'Pointer',
-              label:'确定',
-              type:'primary',
-              func:() => {
+              label: '确定',
+              type: 'primary',
+              func: () => {
                 selectOne();
-              }
+              },
             }"
           />
         </div>
@@ -168,44 +168,69 @@ const exRules = {};
 
 onMounted(async () => {
   const param = props.data.data;
-  qryProdRelTermRiskList(param).then((res) => {
+  qryProdRelTermRiskList(param).then((res: any) => {
     const { code, data, msg } = res;
     if (200 === code) {
       data1.value = data;
+      setTimeout(() => {
+        setNode();
+      }, 50);
     } else {
       ElMessage.error(msg);
     }
   });
 });
 
+function setNode() {
+  const addMainKey: any[] = [];
+  if (props.data.data.isselectData && props.data.data.isselectData.length > 0) {
+    props.data.data.isselectData.forEach((item: any) => {
+      if (item["Term.cRdrTyp"] === "0") {
+        if (item["riskList"] && item["riskList"].length > 0) {
+          item["riskList"].forEach((risk: any) => {
+            const k = item['Term.cClauseCode']+risk['TermRisktgt.cLiabCode'];
+            addMainKey.push(k);
+          });
+        }else{
+          addMainKey.push(item['Term.cClauseCode']);
+        }
+      }
+    });
+  }
+  mainRef.value?.setCheckedKeys(addMainKey,false);
+}
 function selectMainTerm(isselect = true) {
-  const tree = mainRef.value?.getCheckedNodes(false,true);
+  const tree = mainRef.value?.getCheckedNodes(false, true);
   let selectNode: any[] = [];
-  let selectMainTerm : any[] = [];
-  tree?.forEach((item:any) => {
+  let selectMainTerm: any[] = [];
+  tree?.forEach((item: any) => {
     // 获取选中的主条款信息
-    if(item.cTermNo){
+    if (item.cTermNo) {
       let seterm = Object.assign({}, item);
       let childnode: any[] = [];
       selectMainTerm.push(item.cTermNo);
-      item.children?.forEach((child:any) => {
-        const issel = childnode?.filter((node:any)=> node.cRiskNo === child.cRiskNo);
-        if(issel!=null && issel.length>0){
-          return ;
+      item.children?.forEach((child: any) => {
+        const issel = childnode?.filter(
+          (node: any) => node.cRiskNo === child.cRiskNo
+        );
+        if (issel != null && issel.length > 0) {
+          return;
         }
-        const f = tree?.filter((child2:any) => child2.cRiskNo === child.cRiskNo);
-        if(f!==null && f.length>0){
+        const f = tree?.filter(
+          (child2: any) => child2.cRiskNo === child.cRiskNo
+        );
+        if (f !== null && f.length > 0) {
           childnode.push(...f);
         }
       });
-      seterm.cRdrTyp = '0';
+      seterm.cRdrTyp = "0";
       seterm.children = childnode;
       selectNode.push(seterm);
     }
   });
-  if(isselect){
+  if (isselect) {
     let additionStr = selectMainTerm.join("@&");
-    qryRelTermList({cTermNo:additionStr}).then((res: any) => {
+    qryRelTermList({ cTermNo: additionStr }).then((res: any) => {
       const { code, data, msg } = res;
       if (200 === code) {
         data2.value = data;
@@ -214,30 +239,34 @@ function selectMainTerm(isselect = true) {
       }
     });
   }
-  
+
   data3.value = selectNode;
 }
 
 function selectAdditionTerm() {
   selectMainTerm(false);
-  const tree = additionalRef.value?.getCheckedNodes(false,true);
+  const tree = additionalRef.value?.getCheckedNodes(false, true);
   let selectNode: any[] = [];
-  tree?.forEach((item:any) => {
+  tree?.forEach((item: any) => {
     // 获取选中的主条款信息
-    if(item.cTermNo){
+    if (item.cTermNo) {
       let seterm = Object.assign({}, item);
       let childnode: any[] = [];
-      item.children?.forEach((child:any) => {
-        const issel = childnode?.filter((node:any)=> node.cRiskNo === child.cRiskNo);
-        if(issel!=null && issel.length>0){
-          return ;
+      item.children?.forEach((child: any) => {
+        const issel = childnode?.filter(
+          (node: any) => node.cRiskNo === child.cRiskNo
+        );
+        if (issel != null && issel.length > 0) {
+          return;
         }
-        const f = tree?.filter((child2:any) => child2.cRiskNo === child.cRiskNo);
-        if(f!==null && f.length>0){
+        const f = tree?.filter(
+          (child2: any) => child2.cRiskNo === child.cRiskNo
+        );
+        if (f !== null && f.length > 0) {
           childnode.push(...f);
         }
       });
-      seterm.cRdrTyp = '1';
+      seterm.cRdrTyp = "1";
       seterm.children = childnode;
       selectNode.push(seterm);
     }
@@ -250,20 +279,20 @@ async function selectOne() {
   let Key: any[] = [];
   let isuse: any[] = [];
   const r = Object.keys(isselectData);
-  if(isselectData && r.length > 0){
+  if (isselectData && r.length > 0) {
     r.forEach((item: any) => {
-      Key.push(isselectData[item]['Term.cClauseCode']);
+      Key.push(isselectData[item]["Term.cClauseCode"]);
     });
     data3.value.forEach((item: any) => {
-      if(Key.includes(item.cTermNo)){
+      if (Key.includes(item.cTermNo)) {
         isuse.push(item.label);
       }
     });
   }
-  if(isuse && isuse.length > 0){
+  if (isuse && isuse.length > 0) {
     let showMsg = `${isuse.join(",")}条款已存在，请重新选择!`;
     ElMessage.warning(showMsg);
-  }else{
+  } else {
     props.method.isOk(data3.value);
     emits("handleClose");
   }
