@@ -140,7 +140,8 @@ onMounted(async () => {
     exRules
   );
   Object.assign(cardconfig.value, formconfig11);
-  if (parparam.pageType === "app") {  // 新建保单时,初始化条款信息
+  if (parparam.pageType === "app") {
+    // 新建保单时,初始化条款信息
     const param = {
       cProdNo: parparam.cProdNo,
       cTermNo: parparam.cTermNo,
@@ -186,8 +187,8 @@ const exRules = {};
 
 function addTermData() {
   const param = opertaor.getParam();
-  const iss :any[] = [];
-  if(formData.value){
+  const iss: any[] = [];
+  if (formData.value) {
     Object.keys(formData.value).forEach((k: any) => {
       iss.push(...formData.value[k]);
     });
@@ -206,22 +207,43 @@ function addTermData() {
         let plans: any[] = [];
         selectdata.forEach((item: any) => {
           let riskList: { [key: string]: any }[] = [];
+          const se = iss.filter(
+            (em) => em["Term.cClauseCode"] === item.cTermNo
+          );
           item.children?.forEach((e: any) => {
-            riskList.push({
-              "TermRisktgt.cLiabCode": e.cRiskNo,
-            });
+            if (se.length > 0) {
+              const seri = se[0].riskList.filter(
+                (er: { [x: string]: any }) =>
+                  er["TermRisktgt.cLiabCode"] === e.cRiskNo
+              );
+              if (seri.length > 0) {
+                riskList.push(seri[0]);
+              } else {
+                riskList.push({
+                  "TermRisktgt.cLiabCode": e.cRiskNo,
+                });
+              }
+            } else {
+              riskList.push({
+                "TermRisktgt.cLiabCode": e.cRiskNo,
+              });
+            }
           });
-          let data: { [key: string]: any } = {
-            "Term.cClauseCode": item.cTermNo,
-            "Term.cRdrTyp": item.cRdrTyp,
-            riskList: riskList,
-          };
+          let data: { [key: string]: any } = {};
+          if (se.length > 0) {
+            data = se[0];
+          } else {
+            data = {
+              "Term.cClauseCode": item.cTermNo,
+              "Term.cRdrTyp": item.cRdrTyp,
+            };
+          }
           if (item.cRdrTyp === "1") {
             data["Term.cClauseCategory"] = item.cClauseCategory;
           }
+          data.riskList = riskList;
           plans.push(data);
         });
-        
         refushData(plans);
       },
     },
@@ -281,7 +303,11 @@ function refushData(datas: any) {
     }
     pd[key].push(item);
   });
-  formData.value = pd;
+  // 强制刷新组件,对数据进行更新
+  formData.value = {};
+  setTimeout(() => {
+    formData.value = pd;
+  }, 50);
 }
 
 function getFromValue() {

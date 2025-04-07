@@ -188,16 +188,16 @@ function setNode() {
       if (item["Term.cRdrTyp"] === "0") {
         if (item["riskList"] && item["riskList"].length > 0) {
           item["riskList"].forEach((risk: any) => {
-            const k = item['Term.cClauseCode']+risk['TermRisktgt.cLiabCode'];
+            const k = item["Term.cClauseCode"] + risk["TermRisktgt.cLiabCode"];
             addMainKey.push(k);
           });
-        }else{
-          addMainKey.push(item['Term.cClauseCode']);
+        } else {
+          addMainKey.push(item["Term.cClauseCode"]);
         }
       }
     });
   }
-  mainRef.value?.setCheckedKeys(addMainKey,false);
+  mainRef.value?.setCheckedKeys(addMainKey, false);
 }
 function selectMainTerm(isselect = true) {
   const tree = mainRef.value?.getCheckedNodes(false, true);
@@ -235,8 +235,8 @@ function selectMainTerm(isselect = true) {
       if (200 === code) {
         data2.value = data;
         setTimeout(() => {
-        setAdditionNode();
-      }, 50);
+          setAdditionNode();
+        }, 50);
       } else {
         ElMessage.error(msg);
       }
@@ -248,22 +248,21 @@ function selectMainTerm(isselect = true) {
 
 function setAdditionNode() {
   const addMainKey: any[] = [];
-  console.log(props.data.data.isselectData);
   if (props.data.data.isselectData && props.data.data.isselectData.length > 0) {
     props.data.data.isselectData.forEach((item: any) => {
       if (item["Term.cRdrTyp"] === "1") {
         if (item["riskList"] && item["riskList"].length > 0) {
           item["riskList"].forEach((risk: any) => {
-            const k = item['Term.cClauseCode']+risk['TermRisktgt.cLiabCode'];
+            const k = item["Term.cClauseCode"] + risk["TermRisktgt.cLiabCode"];
             addMainKey.push(k);
           });
-        }else{
-          addMainKey.push(item['Term.cClauseCode']);
+        } else {
+          addMainKey.push(item["Term.cClauseCode"]);
         }
       }
     });
   }
-  additionalRef.value?.setCheckedKeys(addMainKey,false);
+  additionalRef.value?.setCheckedKeys(addMainKey, false);
 }
 
 function selectAdditionTerm() {
@@ -298,27 +297,28 @@ function selectAdditionTerm() {
 }
 
 async function selectOne() {
-  const isselectData = props.data.data.isselectData;
-  let Key: any[] = [];
-  let isuse: any[] = [];
-  const r = Object.keys(isselectData);
-  if (isselectData && r.length > 0) {
-    r.forEach((item: any) => {
-      Key.push(isselectData[item]["Term.cClauseCode"]);
-    });
-    data3.value.forEach((item: any) => {
-      if (Key.includes(item.cTermNo)) {
-        isuse.push(item.label);
-      }
-    });
-  }
-  if (isuse && isuse.length > 0) {
-    let showMsg = `${isuse.join(",")}条款已存在，请重新选择!`;
-    ElMessage.warning(showMsg);
-  } else {
-    props.method.isOk(data3.value);
-    emits("handleClose");
-  }
+  // const isselectData = props.data.data.isselectData;
+  // let Key: any[] = [];
+  // let isuse: any[] = [];
+  // const r = Object.keys(isselectData);
+  // if (isselectData && r.length > 0) {
+  //   r.forEach((item: any) => {
+  //     Key.push(isselectData[item]["Term.cClauseCode"]);
+  //   });
+  //   data3.value.forEach((item: any) => {
+  //     if (Key.includes(item.cTermNo)) {
+  //       isuse.push(item.label);
+  //     }
+  //   });
+  // }
+  // if (isuse && isuse.length > 0) {
+  //   let showMsg = `${isuse.join(",")}条款已存在，请重新选择!`;
+  //   ElMessage.warning(showMsg);
+  // } else {
+
+  // }
+  props.method.isOk(data3.value);
+  emits("handleClose");
 }
 
 function fail() {

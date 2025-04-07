@@ -228,7 +228,7 @@ onMounted(async () => {
           }
           plans.push(data);
         });
-        refushData('P1', plans);
+        refushData("P1", plans);
       } else {
         ElMessage.error(msg);
       }
@@ -272,7 +272,7 @@ const exRules = {};
 function addTermData(PlanNo: string) {
   const param = opertaor.getParam();
   const sp = planData.value[PlanNo];
-  let seld : any[] = [];
+  let seld: any[] = [];
   Object.keys(sp).forEach((k: any) => {
     seld.push(...sp[k]);
   });
@@ -290,16 +290,36 @@ function addTermData(PlanNo: string) {
         let plans: any[] = [];
         selectdata.forEach((item: any) => {
           let riskList: { [key: string]: any }[] = [];
+          const se = seld.filter((em) => (em['Term.cClauseCode'] === item.cTermNo));
+
           item.children?.forEach((e: any) => {
-            riskList.push({
-              "TermRisktgt.cLiabCode": e.cRiskNo,
-            });
+            if (se.length > 0) {
+              const seri = se[0].riskList.filter(
+                (er: { [x: string]: any; }) => (er["TermRisktgt.cLiabCode"] === e.cRiskNo)
+              );
+              if (seri.length > 0) {
+                riskList.push(seri[0]);
+              } else {
+                riskList.push({
+                  "TermRisktgt.cLiabCode": e.cRiskNo,
+                });
+              }
+            } else {
+              riskList.push({
+                "TermRisktgt.cLiabCode": e.cRiskNo,
+              });
+            }
           });
-          let data: { [key: string]: any } = {
-            "Term.cClauseCode": item.cTermNo,
-            "Term.cRdrTyp": item.cRdrTyp,
-            riskList: riskList,
-          };
+          let data: { [key: string]: any } = {};
+          if (se.length > 0) {
+            data = se[0];
+          } else {
+            data = {
+              "Term.cClauseCode": item.cTermNo,
+              "Term.cRdrTyp": item.cRdrTyp,
+            };
+          }
+          data.riskList = riskList;
           if (item.cRdrTyp === "1") {
             data["Term.cClauseCategory"] = item.cClauseCategory;
           }
@@ -323,7 +343,12 @@ function refushData(planNo: string, datas: any) {
     }
     pd[key].push(item);
   });
-  planData.value[planNo] = pd;
+  // 强制刷新组件,对数据进行更新
+  planData.value[planNo] = {};
+  setTimeout(() => {
+    planData.value[planNo] = pd;
+  }, 50);
+  
 }
 function deletePlan(plan: string) {
   delete planData.value[plan];
