@@ -481,14 +481,16 @@ async function loadAfter() {
   } else if (props.param.pageType === "readonly") {
     opertaor.setDisabledAll();
     // 查询数据
-    const getAppPlyInfoRes = await getAppPlyInfoByAppNo({
-      CAppNo: props.param.cAppNo,
-    });
-    console.log("getAppPlyInfoRes", getAppPlyInfoRes);
-    const data = getAppPlyInfoRes.data;
+    // const getAppPlyInfoRes = await getAppPlyInfoByAppNo({
+    //   CAppNo: props.param.cAppNo,
+    // });
+    // console.log("getAppPlyInfoRes", getAppPlyInfoRes);
+    // const data = getAppPlyInfoRes.data;
+    const cAppNo = props.param.cAppNo;
+    loadAppPlyInfo(cAppNo);
     nextTick(() => {
-      console.log(data);
-      opertaor.setDataAll(data);
+      // console.log(data);
+      // opertaor.setDataAll(data);
       // set
       // page.getRefTab("base").setFormValue(lowercaseKeys(data["base"]));
       // let cvrgList = data["cvrg"];
