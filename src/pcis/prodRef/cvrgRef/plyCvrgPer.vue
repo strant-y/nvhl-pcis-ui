@@ -30,7 +30,7 @@
               "
               :ref="
                 (res) => {
-                  tremTemplateRefs[index] = res;
+                  tremTemplateRefs['m'+index] = res;
                 }
               "
             />
@@ -60,7 +60,7 @@
                 "
                 :ref="
                   (res) => {
-                    tremTemplateRefs[index] = res;
+                    tremTemplateRefs['a1'+index] = res;
                   }
                 "
               />
@@ -81,6 +81,11 @@
                   deleteData(r);
                 }
               "
+              :ref="
+                (res) => {
+                  tremTemplateRefs['a2'+index] = res;
+                }
+              "
             />
           </myCard>
         </template>
@@ -96,6 +101,11 @@
               @delete="
                 (r) => {
                   deleteData(r);
+                }
+              "
+              :ref="
+                (res) => {
+                  tremTemplateRefs['a3'+index] = res;
                 }
               "
             />
@@ -129,7 +139,7 @@ const props = defineProps({
 });
 
 const cardconfig = ref(creatCardConfig({}));
-const tremTemplateRefs = ref<any[]>([]);
+const tremTemplateRefs = ref<any>({});
 const cvrgFormfef = ref("cvrgFormfef");
 const formData = ref<{ [key: string]: [] }>({});
 
@@ -307,6 +317,9 @@ function refushData(datas: any) {
   formData.value = {};
   setTimeout(() => {
     formData.value = pd;
+    nextTick(()=>{
+      showFlush();
+    })
   }, 50);
 }
 
@@ -340,7 +353,7 @@ function setFormValue(value: any) {
 function validate() {}
 
 function showFlush() {
-  tremTemplateRefs.value.forEach((item) => {
+  tremTemplateRefs.value.forEach((item: any) => {
     item.dataInit();
   });
 }

@@ -58,6 +58,11 @@
                         deleteData(k, r);
                       }
                     "
+                    :ref="
+                      (res) => {
+                        tremTemplateRefs[k + 'm' + index] = res;
+                      }
+                    "
                   />
                 </myCard>
               </template>
@@ -87,7 +92,7 @@
                       "
                       :ref="
                         (res) => {
-                          tremTemplateRefs[index] = res;
+                          tremTemplateRefs[k + 'a1' + index] = res;
                         }
                       "
                     />
@@ -110,6 +115,11 @@
                         deleteData(k, r);
                       }
                     "
+                    :ref="
+                      (res) => {
+                        tremTemplateRefs[k + 'a2' + index] = res;
+                      }
+                    "
                   />
                 </myCard>
               </template>
@@ -127,6 +137,11 @@
                     @delete="
                       (r) => {
                         deleteData(k, r);
+                      }
+                    "
+                    :ref="
+                      (res) => {
+                        tremTemplateRefs[k + 'a3' + index] = res;
                       }
                     "
                   />
@@ -162,7 +177,7 @@ const parparam = opertaor.getParam();
 const terconfig = terConfig();
 terconfig.configInit(); // 条款配置数据初始化
 
-const tremTemplateRefs = ref<any[]>([]);
+const tremTemplateRefs = ref<any>({});
 
 const props = defineProps({
   pageSchema: {
@@ -207,7 +222,7 @@ onMounted(async () => {
       cProdNo: parparam.cProdNo,
       cTermNo: parparam.cTermNo,
     };
-    qryProdRelTermRiskList(param).then((res) => {
+    qryProdRelTermRiskList(param).then((res: any) => {
       const { code, data, msg } = res;
       if (200 === code) {
         let plans: any[] = [];
@@ -290,12 +305,15 @@ function addTermData(PlanNo: string) {
         let plans: any[] = [];
         selectdata.forEach((item: any) => {
           let riskList: { [key: string]: any }[] = [];
-          const se = seld.filter((em) => (em['Term.cClauseCode'] === item.cTermNo));
+          const se = seld.filter(
+            (em) => em["Term.cClauseCode"] === item.cTermNo
+          );
 
           item.children?.forEach((e: any) => {
             if (se.length > 0) {
               const seri = se[0].riskList.filter(
-                (er: { [x: string]: any; }) => (er["TermRisktgt.cLiabCode"] === e.cRiskNo)
+                (er: { [x: string]: any }) =>
+                  er["TermRisktgt.cLiabCode"] === e.cRiskNo
               );
               if (seri.length > 0) {
                 riskList.push(seri[0]);
@@ -344,11 +362,14 @@ function refushData(planNo: string, datas: any) {
     pd[key].push(item);
   });
   // 强制刷新组件,对数据进行更新
-  planData.value[planNo] = {};
+  delete planData.value[planNo];
+
   setTimeout(() => {
     planData.value[planNo] = pd;
-  }, 50);
-  
+    nextTick(()=>{
+      showFlush();
+    })
+  }, 100);
 }
 function deletePlan(plan: string) {
   delete planData.value[plan];
@@ -379,7 +400,6 @@ function deleteData(plan: string, term: any) {
 }
 
 function deleteTermByNo(plan: any, t: any) {
-  console.log(t);
   Object.keys(planData.value[plan]).forEach((item) => {
     let deleindex = null;
     for (let i = 0; i < planData.value[plan][item].length; i++) {
@@ -435,8 +455,8 @@ function setFormValue(value: any) {
 
 function validate() {}
 function showFlush() {
-  tremTemplateRefs.value.forEach((item) => {
-    item.dataInit();
+  Object.keys(tremTemplateRefs.value).forEach((item) => {
+    tremTemplateRefs.value[item].dataInit();
   });
 }
 function getTableValue(rowId: number, key: string) {}
