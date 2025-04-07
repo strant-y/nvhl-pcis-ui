@@ -337,6 +337,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "id",
         inputtype: "rtSelectV2",
         title: "批改原因",
+        minWidth:180,
         func: (val, row) => {
           handleRsnChange(val, row);
         },
@@ -678,28 +679,29 @@ function setTableFormItem(key, obj) {
 }
 
 const showDetails = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
-  if (null == selected.value[cPlyNo] || "" === selected.value[cPlyNo]) {
+  if (null == selected.value['cPlyNo'] || "" === selected.value['cPlyNo']) {
     ElMessage.warning("请选择一条记录");
     return;
   }
-  if (!selected.value[cPlyNo]) return;
+  if (!selected.value['cPlyNo']) return;
   const en = JSON.stringify({
-    scene: SCENE_PLY_APP_READ,
-    CAppNo: selected.value["cAppNo"],
-    COrgAppNo: cAppNo,
-    CCiMrk: selected.value["cCiMrk"],
-    CProdNo: selected.value["cProdNo"],
-    CAppTyp: selected.value["cAppTyp"],
-    CGrpMrk: selected.value["cGrpMrk"],
-    CDptCde: selected.value["cDptCde"],
+    // scene: SCENE_PLY_APP_READ,
+    cAppNo: selected.value["cAppNo"],
+    cOrgAppNo: cAppNo,
+    cCiMrk: selected.value["cCiMrk"],
+    cProdNo: selected.value["cProdNo"],
+    cAppTyp: selected.value["cAppTyp"],
+    cGrpMrk: selected.value["cGrpMrk"],
+    cDptCde: selected.value["cDptCde"],
+    cDptCnm: selected.value["cDptCnm"],
+    pageType: "readonly",
   });
-
-  router.push({
-    path: "/index/endorse/detail",
-    query: {
-      data: en,
-    },
-  });
+    router.push({
+        path: "/pcis/my-page",
+        query: {
+            param: en,
+        },
+    });
 };
 
 const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
