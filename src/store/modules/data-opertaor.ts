@@ -91,6 +91,8 @@ export const dataOpertaor = defineStore(
             }
           } else if (f.fromType === 'grid') { // 表格模式时,修改表格属性,实现只读
             f.editFlag = false;
+          } else if (f.fromType === 'custom') {
+            tableRefs[key].setDisabledAll();
           }
           if (
             f.titleBtns &&
@@ -216,8 +218,6 @@ export const dataOpertaor = defineStore(
 
       // 2. 等待所有Promise完成并关联结果与key
       const results = await Promise.all(validationPromises);
-
-      console.log(entries);
       // 3. 关联每个结果与对应的key
       const resultMapping = entries.map(([key, ref], index) => (
         {
@@ -226,7 +226,6 @@ export const dataOpertaor = defineStore(
         refs:ref
       }));
 
-      console.log(resultMapping);
       // 4. 汇总结果（示例：收集所有失败的key）
       const failedKeys = resultMapping
         .filter(item => item.result !== true)

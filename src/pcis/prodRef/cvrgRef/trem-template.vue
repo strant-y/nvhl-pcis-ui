@@ -31,14 +31,13 @@
             </el-col>
             <el-col :span="2">
               <rtButton
+                v-if="!btnItem.delete.hidden"
                 @click="
                   () => {
                     emit('delete', termdata);
                   }
                 "
-                :item="{
-                  label: '删除',
-                }"
+                :item="btnItem.delete"
               />
             </el-col>
           </el-row>
@@ -139,7 +138,8 @@
               <tbody>
                 <template v-if="groupconf[ginfo.cGroupId]">
                   <template
-                    v-for="(riskdata, k, ri) in groupconf[ginfo.cGroupId].riskList"
+                    v-for="(riskdata, k, ri) in groupconf[ginfo.cGroupId]
+                      .riskList"
                     :key="k"
                   >
                     <template v-if="riskdata.maxNum > 0">
@@ -252,6 +252,12 @@ const riskList = ref<{ [key: string]: any }>({});
 
 const pageInit = ref(false);
 
+const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
+  delete: {
+    label: "删除",
+  },
+});
+
 watch(
   () => props.modelValue,
   (newVal) => {
@@ -307,7 +313,7 @@ function initData(data: any) {
       termTitleConf.value.cFactorTabType !== "grid" &&
       termTitleConf.value.cFactorTabType !== "table"
     ) {
-      termRef.value?.setFormValue(termdata.value,true);
+      termRef.value?.setFormValue(termdata.value, true);
     }
   });
 }
@@ -555,12 +561,54 @@ function exChangeFunc() {
     }
   }
   if (param.cProdNo === "043009") {
-
   }
+}
+function setDisabledAll() {
+  // 禁用表单信息列
+  if (
+    termTitleConf.value.cFactorTabType !== "grid" &&
+    termTitleConf.value.cFactorTabType !== "table"
+  ) {
+    if (formconfig1.fromSchema && formconfig1.fromSchema.length > 0) {
+      formconfig1.fromSchema.forEach((item: any) => {
+        item.disabled = true;
+      });
+    }
+  }
+  if (termFactormap && termFactormap.value.length > 0) {
+    termFactormap.value.forEach((item: any) => {
+      item.disabled = true;
+    });
+  }
+  // 禁用扩展表单信息列
+  if (extermConf && extermConf.value.length > 0) {
+    extermConf.value.forEach((item: any) => {
+      item.disabled = true;
+    });
+  }
+  Object.keys(btnItem.value).forEach((k: any) => {
+    btnItem.value[k].hidden = true;
+  });
+  // 禁用责任表单项
+  Object.keys(groupconf.value).forEach((g: any) => {
+    const gt = groupconf.value[g];
+    Object.keys(gt.riskList).forEach((r: any) => {
+      const rowconfig = gt.riskList[r].rowConfig;
+      Object.keys(rowconfig).forEach((rc: any) => {
+        const row = rowconfig[rc];
+        if (row && row.length > 0) {
+          row.forEach((ri: any) => {
+            ri.factorItem.disabled = true;
+          });
+        }
+      });
+    });
+  });
 }
 
 defineExpose({
   dataInit,
+  setDisabledAll,
 });
 </script>
 <style lang="scss" scoped>

@@ -18,25 +18,14 @@
                 </el-col>
                 <el-col :span="4">
                   <rt-button
-                    :item="{
-                      label: '添加条款',
-                      icon: 'CirclePlus',
-                      type: 'primary',
-                      size: 'small',
-                      func: () => {
-                        addTermData(k);
-                      },
-                    }"
+                    v-if="!btnItem.addPlan.hidden"
+                    @click="addTermData(k)"
+                    :item="btnItem.addPlan"
                   />
                   <rt-button
-                    :item="{
-                      icon: 'Delete',
-                      type: 'danger',
-                      size: 'small',
-                      func: () => {
-                        deletePlan(k);
-                      },
-                    }"
+                    v-if="!btnItem.addPlan.hidden"
+                    @click="deletePlan(k)"
+                    :item="btnItem.delPlan"
                   />
                 </el-col>
               </el-row>
@@ -183,6 +172,20 @@ const props = defineProps({
   pageSchema: {
     type: [Object],
     required: true,
+  },
+});
+
+const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
+  addPlan: {
+    label: "添加条款",
+    icon: "CirclePlus",
+    type: "primary",
+    size: "small",
+  },
+  delPlan: {
+    icon: "Delete",
+    type: "danger",
+    size: "small",
   },
 });
 
@@ -366,9 +369,9 @@ function refushData(planNo: string, datas: any) {
 
   setTimeout(() => {
     planData.value[planNo] = pd;
-    nextTick(()=>{
+    nextTick(() => {
       showFlush();
-    })
+    });
   }, 100);
 }
 function deletePlan(plan: string) {
@@ -461,12 +464,39 @@ function showFlush() {
 }
 function getTableValue(rowId: number, key: string) {}
 
+function getFormconfig() {
+  return {
+    fromType: "custom",
+  };
+}
+
+function setDisabledAll() {
+  if (cardconfig.value.titleBtns && cardconfig.value.titleBtns.length > 0) {
+    cardconfig.value.titleBtns.forEach((item: any) => {
+      item.hidden = true;
+    });
+  }
+  if (cardconfig.value.endBtns && cardconfig.value.endBtns.length > 0) {
+    cardconfig.value.endBtns.forEach((item: any) => {
+      item.hidden = true;
+    });
+  }
+  Object.keys(btnItem.value).forEach((k: any) => {
+    btnItem.value[k].hidden = true;
+  });
+  Object.keys(tremTemplateRefs.value).forEach((item) => {
+    tremTemplateRefs.value[item].setDisabledAll();
+  });
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   getTableValue,
   showFlush,
+  getFormconfig,
+  setDisabledAll,
 });
 </script>
 
