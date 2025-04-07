@@ -170,6 +170,7 @@ import {
   submitUnderwriting,
   calcEdr,
   submitUnderwritingEdr,
+  submitEdrToUndr,
 } from "../../../api/query/index";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import moment from "moment";
@@ -294,7 +295,10 @@ const edrBtn = [
   createFreeButtonBase({
     label: "申请核保",
     type: "primary",
-    func: () => {},
+    id: "btnSubmitEdr",
+    func: () => {
+        submitEdrToUndrFun();
+    },
   }),
 ];
 /**
@@ -471,11 +475,11 @@ async function loadAfter() {
     edrbase.value?.setValue("EdrBase.cRatioTyp", "1");
     edrbase.value?.setValue("EdrBase.cEdrRsnBundleCde", props.param["cRsnCde"]);
     edrbase.value?.setValue("EdrBase.cEdrType", props.param["cEdrType"]);
-    if(props.param["cEdrType"]!='FZ'){
-        opertaor.setDisabledAll();
-        getEdrRsnItemFun(props.param["cProdNo"],props.param["cDptCde"],props.param["cRsnCde"],props.param["cRsnCde"],props.param["cEdrType"],props.param["cGrpMrk"])
+    if(props.param["cRsnCde"]!='FZ'){
         edrbase.value?.setValue("EdrBase.cEdrRsnDetail",[props.param["cRsnCde"]]);
     }
+    opertaor.setDisabledAll();
+    getEdrRsnItemFun(props.param["cProdNo"],props.param["cDptCde"],props.param["cRsnCde"],props.param["cRsnCde"],props.param["cEdrType"],props.param["cGrpMrk"])
     loadAppPlyInfo(cAppNo);
     bthList.value = edrBtn;
   } else if (props.param.pageType === "readonly") {
@@ -644,7 +648,9 @@ const loadAppPlyInfo = (CAppNo) => {
       console.log("转换的数据", ops);
       if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
-        res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail']=[res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail']]
+        if(res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail']!=''&&res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail']!=null){
+            res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail']=res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail'].split(',')
+        }
         console.log("EdrBaseData", EdrBaseData);
         edrbase.value?.setFormValue(EdrBaseData);
       }
@@ -853,6 +859,7 @@ const saveEdrPlyInfo = () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
   res["EdrBase"] = edrbase.value?.getFromValue();
+  res["EdrBase"]['EdrBase.cEdrRsnDetail']= res["EdrBase"]['EdrBase.cEdrRsnDetail'].join()
   console.log(res);
   saveEdrAppPlyInfo(res).then((res) => {
     console.log("saveAppPlyInfo-res", res);
@@ -862,11 +869,9 @@ const saveEdrPlyInfo = () => {
       console.log("转换的数据", ops);
       ElMessage.success(res.msg);
       opertaor.setDataAll(ops);
-    if (res["res"]["composition"]["EdrBase"]) {
-        const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
-        res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail']=JSON.parse(res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail'])
-        edrbase.value?.setFormValue(EdrBaseData);
-    }
+      const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
+      res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail']=res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail'].split(',')
+      edrbase.value?.setFormValue(EdrBaseData)
     } else {
       ElMessage.error(res.msg);
     }
@@ -890,10 +895,36 @@ const generateEndorse = () => {
         btn.loading = false;
         if (res["code"] == "200") {
             const cEdrCtnt=res['data']['data']['cEdrCtnt'] //批文
+            const edrRsn=res['data']['data']['edrRsn'] //批文
             cacheKey.value=res['data']['data']['cacheKey']
             edrbase.value?.setValue('EdrBase.cEdrCtnt',cEdrCtnt)
             edrbase.value?.setValue('EdrBase.cacheKey',cacheKey.value)
+            edrbase.value?.setValue('EdrBase.cEdrRsnDetail',edrRsn)
             edritem.value?.handleQuery()
+            ElMessage.success(res.msg);
+        } else {
+            ElMessage.error(res.msg);
+        }
+    });
+};
+/**
+ * 批单申请核保
+ */
+const submitEdrToUndrFun = () => {
+    const btn = getBtn("btnSubmitEdr");
+    btn.loading = true;
+    const res = {};
+    const base = opertaor.getTableRefByKey("plyBase").getFromValue();
+    res["user"] = user;
+    res["appNo"] = base["Base.cAppNo"];
+    res["plyNo"] = base["Base.cPlyNo"];
+    console.log(res);
+    submitEdrToUndr(res).then((res) => {
+        btn.loading = false;
+        console.log("批改申请核保", res);
+        // ElMessage.success(res.msg);
+        // history.back();
+        if (res["code"] == "200") {
             ElMessage.success(res.msg);
         } else {
             ElMessage.error(res.msg);
