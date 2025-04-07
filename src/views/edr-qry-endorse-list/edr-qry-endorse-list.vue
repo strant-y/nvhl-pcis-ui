@@ -798,6 +798,7 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
               cGrpMrk: selected.value["cGrpMrk"],
               cJiMrk: selected.value["cJiMrk"],
               cDptCde: selected.value["cDptCde"],
+              cDptCnm: selected.value["cDptCnm"],
               cEdrType: routeData["rsnTyp"],
               pageType: "EDR_APP_NEW_SCENE",
             });

@@ -100,7 +100,12 @@ function setDisa() {}
 function handleQuery(flag?: boolean) {
   const cacheKey=opertaor.getFatherPage().getcacheKey()
   const r = edritemEditRef.value?.getPartnerPage(flag); //获取分页数据
-  const param = Object.assign({pageNo:r['pageNum'],CurrentUser:user.opCde,CurrentUserOrg:user.companyId,cacheKey:cacheKey}, r);
+  let param;
+  if(cacheKey){
+      param = Object.assign({pageNo:r['pageNum'],CurrentUser:user.opCde,CurrentUserOrg:user.companyId,cacheKey:cacheKey}, r);
+  }else{
+      param = Object.assign({pageNo:r['pageNum'],CurrentUser:user.opCde,CurrentUserOrg:user.companyId,appNo:props.param.cAppNo}, r);
+  }
   console.log(param)
   getedrcmpitembyedrappnoorcachekey(param)
       .then((res) => {

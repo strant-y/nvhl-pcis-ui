@@ -53,56 +53,69 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         itemWidth: 1,
         valueSpan: 10,
         clearable: true,
+        disabled:true
       },
-      {
+     {
         prop: "EdrBase.cProdNo",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "产品",
-      },
+        typeCode: "PROD_LIST_IN_GUIDE",
+        clearable: true,
+        disabled:true
+     },
       {
         prop: "EdrBase.cPlyNo",
         inputtype: "rtinput",
         title: "保单号",
+       disabled:true
       },
       {
         prop: "EdrBase.cAppNo",
         inputtype: "rtinput",
         title: "申请单号",
+        disabled:true
       },
       {
         prop: "EdrBase.cEdrNo",
         inputtype: "rtinput",
         title: "批单号",
+        disabled:true
       },
       {
         prop: "EdrBase.nBefEdrAmt",
         inputtype: "rtinput",
         title: "原保额",
+        disabled:true
       },
       {
         prop: "EdrBase.nAmt",
         inputtype: "rtinput",
         title: "现保额",
+        disabled:true
       },
       {
         prop: "EdrBase.nAmtVar",
         inputtype: "rtinput",
         title: "保额变化",
+        disabled:true
       },
       {
         prop: "EdrBase.nBefEdrPrm",
         inputtype: "rtinput",
         title: "原保费",
+        disabled:true
       },
       {
         prop: "EdrBase.nPrm",
         inputtype: "rtinput",
         title: "现保费",
+        disabled:true
       },
       {
         prop: "EdrBase.nPrmVar",
         inputtype: "rtinput",
         title: "保费变化",
+        disabled:true
       },
       {
         prop: "EdrBase.cAppPrsnNme",
@@ -135,7 +148,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         func: (v) => {},
       },
       {
-        prop: "EdrBase.CEdrRsnDetail",
+        prop: "EdrBase.cEdrRsnDetail",
         inputtype: "rtcheckboxgroup",
         title: "批改原因详细",
         itemWidth: 2,
@@ -223,7 +236,11 @@ function setFormItem(key, obj) {
 }
 onMounted(() => {
   nextTick(() => {
-    console.log(props.param);
+      setFormItem("EdrBase.cDptCde", {
+          loadData: [
+              { value: props.param.cDptCde, label: `${props.param.cDptCde} ${props.param.cDptCnm}` },
+          ],
+      });
     const isGrp = props.param["cGrpMrk"] === "1" ? "1" : null;
     const isPer = props.param["CGrpMrk"] === "1" ? "1" : null;
     const param = {
@@ -240,7 +257,7 @@ onMounted(() => {
         codeListParam: param,
       })
       .then((res) => {
-        setFormItem("EdrBase.CEdrRsnDetail", { loadData: res });
+        setFormItem("EdrBase.cEdrRsnDetail", { loadData: res });
       });
   });
 });
