@@ -65,7 +65,11 @@
                                 loadData: [{label: '缺少必要信息', value: '1'},
                                     {label: '修改承保条件', value: '2'},
                                     {label: '费用超标', value: '3'},
-                                    {label: '拒绝承保', value: '4'},]
+                                    {label: '拒绝承保', value: '4'},
+                                    {label: '录入错误', value: '7'},
+                                    {label: '资料不全', value: '8'},
+                                    {label: '其他', value: '9'},
+                                ]
                             })
                         }
                         if ('T' === v) {

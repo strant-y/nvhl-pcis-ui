@@ -1284,8 +1284,8 @@ function refreshData(flag?: boolean) {
           pageresult.list = res.data;
           pageresult.total = res.totalCount;
         } else {
-          pageresult.list = res.data.data;
-          pageresult.total = res.totalCount;
+          pageresult.list = res.data.result;
+          pageresult.total = res.data.total;
         }
       } else {
         ElMessage.error({ message: res.msg, duration: 3000 });
@@ -1588,7 +1588,8 @@ function handleSelectionChange(selection: any) {
 
 // 详情 核保通过任务
 function showDetails(row: any) {
-  if (row.bsType === "P") {
+  let cAppTyp= row.bsType? row.bsType: row.cAppTyp;
+  if (cAppTyp === "P") {
     if (row.cProdNo === "000000") {
       const param = {
         CPlanNo: row.cAppNo,
@@ -1616,21 +1617,21 @@ function showDetails(row: any) {
       });
     }
   } else {
-      getBaseInfoByAppNo({ appNo: row.objId }).then((r: any) => {
+      getBaseInfoByAppNo({ appNo: row.objId ? row.objId : row.cAppNo }).then((r: any) => {
           if (r.code !== 200) {
               ElMessage.error({ message: r.msg, duration: 6000 });
           } else {
-              if (row.bsType === "A") {
+              if (cAppTyp === "A") {
                   const en = JSON.stringify({
                       // scene: SCENE_PLY_UW_PROCESS,
-                      cAppNo: row.objId,
+                      cAppNo: row.objId ? row.objId : row.cAppNo,
                       taskId: row.curtTask,
-                      cAppTyp: row.bsType,
-                      cProdNo: row.prodNo,
+                      cAppTyp: row.bsType? row.bsType: row.cAppTyp,
+                      cProdNo: row.prodNo? row.prodNo: row.cProdNo,
                       cCiMrk: r.data.cCiMrk,
                       cGrpMrk: r.data.cGrpMrk,
                       cDptCde: r.data.cDptCde,
-                      cDptCnm:row.uwDptName,
+                      cDptCnm:row.uwDptName?row.uwDptName:row.cDptCnm,
                       pageType: "UW_READ_SCENE",
                   });
                   router.push({
@@ -1641,16 +1642,16 @@ function showDetails(row: any) {
                   });
               } else {
                   const en = JSON.stringify({
-                      cAppNo: row.objId,
+                      cAppNo: row.objId ? row.objId : row.cAppNo,
                       taskId: row.curtTask,
-                      cAppTyp: row.bsType,
-                      cProdNo: row.prodNo,
+                      cAppTyp: row.bsType? row.bsType: row.cAppTyp,
+                      cProdNo: row.prodNo? row.prodNo: row.cProdNo,
                       cCiMrk: r.data.cCiMrk,
                       cRsnCde: r.data.cEdrRsnBundleCde,
                       cEdrType: r.data.cEdrType,
                       cGrpMrk: r.data.cGrpMrk,
                       cDptCde: r.data.cDptCde,
-                      cDptCnm:row.uwDptName,
+                      cDptCnm:row.uwDptName?row.uwDptName:row.cDptCnm,
                       pageType: "UW_READ_SCENE",
                   });
                   router.push({
