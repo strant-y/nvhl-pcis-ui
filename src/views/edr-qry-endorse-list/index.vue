@@ -15,21 +15,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue';
-import EdrQryEndorseList from './edr-qry-endorse-list.vue';
+import { defineComponent, onMounted, ref } from "vue";
+import EdrQryEndorseList from "./edr-qry-endorse-list.vue";
 
 export default defineComponent({
   name: "edr_index",
   components: {
-    EdrQryEndorseList
+    EdrQryEndorseList,
   },
   setup() {
-    
-    const activeName = ref('first')
+    const activeName = ref("first");
 
     const handleClick = (tab, event) => {
-      console.log(tab, event);
-    }
+      console.log(tab, event, "00000");
+    };
 
     onMounted(() => {
       //todo
@@ -37,9 +36,9 @@ export default defineComponent({
 
     return {
       activeName,
-      handleClick
+      handleClick,
     };
-  }
+  },
 });
 </script>
 
