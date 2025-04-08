@@ -612,7 +612,7 @@ const changeRsnValue = (item) => {
     // 当缓存中无该产品的批改原因时
     if (rsnTyp === "1") {
       // 一般批改
-      getListByCode("EDR_RSN_LIST", {
+      getListByCode("EDR_RSN_LIST_KIND", {
         prodNo: prodNo,
         kindNo: prodNo.substring(0, 2),
         rsnTyp: rsnTyp,
