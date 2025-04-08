@@ -12,6 +12,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import moment from "moment";
 import dayjs from "dayjs";
 import { useValidator } from "@/typings/useValidator";
+import { formatDate } from "@/utils/date";
 const { getRules } = useValidator();
 const opertaor = dataOpertaor();
 const props = defineProps({
@@ -30,17 +31,46 @@ onMounted(() => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
-});
+})
 
 // 绑定方法
 const method = {
   // func demo
   func1: () => {},
-  bgnTmFn: (v) => {
+  tInsrncBgnTmDisabled:(data)=>{
+    const baseBefore = tabref["insrnc"].getFromValue();
+    // moment(baseBefore["Base.tInsrncEndTm"])
+
+    const today = new Date(baseBefore["Base.tInsrncBgnTm"])   // 开始时间
+    const endData = new Date(baseBefore["Base.tInsrncEndTm"]) // 结束时间
+
+    const maxDate = new Date(today);  // 创建开始时间副本
+    maxDate.setDate(today.getDate() + 365);  // 设置为今天起365天后的日期
+    baseBefore["Base.tInsrncEndTm"] = maxDate
+  // return date > maxDate; 
+
+    console.log(223,maxDate)
+    console.log(224, )
+    console.log(225, today)
+
+
+    return endData > maxDate; 
+  },
+  bgnTmFn: (v) => {   
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["insrnc"].getFromValue();
     const tm = moment(baseBefore["Base.tInsrncEndTm"]).diff(moment(v), "days");
+
     baseBefore["Base.cTmSysCde"] = tm;
+
+    // 选开始时间自动默认选择一年
+    let today = new Date(baseBefore["Base.tInsrncBgnTm"])   // 开始时间
+    let maxDate = new Date(today);  // 创建开始时间副本
+    maxDate.setDate(today.getDate() + 365);  // 设置为今天起365天后的日期
+    baseBefore["Base.tInsrncEndTm"] = formatDate(maxDate,'yyyy-MM-dd HH:mm:ss')
+
+
+    opertaor.getFatherPage().setTmDay(tm)
     setFormValue(baseBefore);
   },
   endTmFn: (v) => {
@@ -48,6 +78,7 @@ const method = {
     const baseBefore = tabref["insrnc"].getFromValue();
     const tm = moment(v).diff(moment(baseBefore["Base.tInsrncBgnTm"]), "days");
     baseBefore["Base.cTmSysCde"] = tm;
+    opertaor.getFatherPage().setTmDay(tm)
     setFormValue(baseBefore);
   },
   // 索赔基础名称change事件

@@ -63,7 +63,7 @@
           <el-container>
             <el-header height="60px">
               <el-affix
-                :offset="90"
+                :offset="95"
                 style="text-align: center; padding: 5px; background: #ebedfc"
               >
                 <div class="tp" style="background: #ebedfc">
@@ -130,6 +130,7 @@
                       k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'
                     "
                     :pageSchema="k.pageSchema"
+                   
                   />
                 </div>
               </template>
@@ -212,6 +213,8 @@ onBeforeMount(() => {
   console.log("路由参数props.param", props.param);
   initPage();
 });
+
+  
 /**
  * 投保需要的按钮
  */
@@ -878,11 +881,21 @@ function getcacheKey(){
     return cacheKey.value
 }
 
+
+function setTmDay(tmday:any){ 
+  tmDay.value = tmday
+}
+
 opertaor.setFatherPage({
   currentIndex: currentIndex,
   lowercaseKeys: lowercaseKeys,
   getcacheKey: getcacheKey,
+  setTmDay: setTmDay
+
+ 
 });
+
+
 </script>
 
 <style scoped>
