@@ -4,7 +4,6 @@
       <app-free-edit
         v-model:freeEditConfig="formconfig1"
         ref="freeEditRef"
-        @update-datas="fromUpdata"
       />
       <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
         <rt-button
@@ -63,32 +62,6 @@ const freeEditRefBtn = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<MyTableMethod | null>(null);
 const appTableShow = ref(false);
 
-function fromUpdata(newData: any) {
-  const jsonObj = getFrom();
-  if (jsonObj) {
-    jsonObj.func = null;
-    if (jsonObj.loadData) {
-      jsonObj.loadData = JSON.parse(jsonObj.loadData);
-    }
-    if (jsonObj.showExBtn === "1") {
-      jsonObj.showExBtn = true;
-      jsonObj.btnItems = createFreeButtonBase(jsonObj.btn);
-      jsonObj.btnWidth = jsonObj.btn?.btnWidth;
-    } else {
-      jsonObj.showExBtn = false;
-    }
-    if (jsonObj.required === "1") {
-      jsonObj.rules = [getRules("required", {})];
-    }
-    if (
-      jsonObj.inputtype === "rtinputgroup" ||
-      jsonObj.inputtype === "rttable"
-    ) {
-      return;
-    }
-    jsonObj.func = null; // 方法去掉,不让预览触发事件
-  }
-}
 const schemaMap = reactive<Record<string, any>>({
   rtinputgroup: [],
 });

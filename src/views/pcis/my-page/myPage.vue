@@ -167,8 +167,11 @@ import {
   getAppPolicy,
   saveEdrAppPlyInfo,
   getEndorseChange,
+  getEdrRsnItem,
   submitUnderwriting,
+  calcEdr,
   submitUnderwritingEdr,
+  submitEdrToUndr,
 } from "../../../api/query/index";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import moment from "moment";
@@ -271,8 +274,10 @@ const edrBtn = [
   createFreeButtonBase({
     label: "保费计算",
     type: "primary",
-    id: "btnUdr",
-    func: () => {},
+    id: "btnCalEdr",
+    func: () => {
+        calcPremiumEdr();
+    },
   }),
   createFreeButtonBase({
     label: "保存",
@@ -293,9 +298,69 @@ const edrBtn = [
   createFreeButtonBase({
     label: "申请核保",
     type: "primary",
-    func: () => {},
+    id: "btnSubmitEdr",
+    func: () => {
+        submitEdrToUndrFun();
+    },
   }),
 ];
+/**
+ * 核保按钮
+ * @type {FormButton[]}
+ */
+const uwBtn = [
+    createFreeButtonBase({
+        label: "保存",
+        type: "primary",
+        id: "btnUdr",
+        func: () => {
+            underwrite.value?.validate().then((isValid) => {
+                if (isValid) {
+                    submitUnderwritingFn();
+                } else {
+                    ElMessage.error("请填写必填项");
+                }
+            });
+        },
+    }),
+    createFreeButtonBase({
+        label: "费用信息",
+        type: "primary",
+        id: "modFee",
+        func: () => {
+            dzmodal
+                .open(CostInformation, { type: "Issuer", data: props.param })
+                .then((res: any) => {
+                    if (res.type === "ok") {
+                    }
+                });
+        },
+    }),
+    createFreeButtonBase({
+        label: "历次批单",
+        type: "primary",
+        id: "preOrder",
+        func: () => {
+            dzmodal
+                .open(PreviousdrOpnList, { type: "Issuer", data: {} })
+                .then((res: any) => {
+                    if (res.type === "ok") {
+                    }
+                });
+        },
+    }),
+    createFreeButtonBase({
+        label: "任务痕迹",
+        func: () => {
+            dzmodal
+                .open(CostInformation, { type: "Issuer", data: {} })
+                .then((res: any) => {
+                    if (res.type === "ok") {
+                    }
+                });
+        },
+    })
+]
 /**
  * 数据初始化
  * @param data
@@ -310,14 +375,17 @@ const initPage = async () => {
     queryTyp: props.param.queryTyp,
   });
 
-  if (props.param.pageType === "PLY_UW") {
+  if (props.param.pageType === "PLY_UW_PROCESS_SCENE") {
     underwriteFlag = true;
   } else {
     underwriteFlag = false;
   }
   if (
     props.param.pageType === "EDR_APP_NEW_SCENE" ||
-    (props.param.pageType == "TEMPORARY_DEPOSIT" && props.param.cAppTyp == "E")
+    (props.param.pageType == "TEMPORARY_DEPOSIT" && props.param.cAppTyp == "E")||
+    (props.param.pageType == "PLY_UW_PROCESS_SCENE" && props.param.cAppTyp == "E")||
+    (props.param.pageType == "UW_READ_SCENE" && props.param.cAppTyp == "E")||
+    (props.param.pageType == "readonly" && props.param.cAppTyp == "E")
   ) {
     edrbaseFlag = true;
     edritemFlag = true;
@@ -398,86 +466,63 @@ async function loadAfter() {
       opertaor.getTableRefByKey("insured").setFormValue(baseafterobj);
     });
   } else if (props.param.pageType === "TEMPORARY_DEPOSIT") {
+    // 暂存单
     const cAppNo = props.param.cAppNo;
     loadAppPlyInfo(cAppNo);
     if (props.param.cAppTyp == "E") {
       bthList.value = edrBtn;
+      opertaor.setDisabledAll();
+      getEdrRsnItemFun(props.param["cProdNo"],props.param["cDptCde"],props.param["cEdrRsnBundleCde"],props.param["cEdrRsnBundleCde"],props.param["cEdrType"],props.param["cGrpMrk"])
+      edritem.value?.handleQuery()
     } else if (props.param.cAppTyp == "A") {
       bthList.value = basicBtn;
     }
-  } else if (props.param.pageType === "PLY_UW") {
+  } else if (props.param.pageType === "PLY_UW_PROCESS_SCENE") {
+    //核保处理
     opertaor.setDisabledAll();
     const cAppNo = props.param.cAppNo;
     loadAppPlyInfo(cAppNo);
-    bthList.value.push(
-      createFreeButtonBase({
-        label: "保存",
-        type: "primary",
-        id: "btnUdr",
-        func: () => {
-          underwrite.value?.validate().then((isValid) => {
-            if (isValid) {
-              submitUnderwritingFn();
-            } else {
-              ElMessage.error("请填写必填项");
-            }
-          });
-        },
-      }),
-      createFreeButtonBase({
-        label: "费用信息",
-        type: "primary",
-        id: "modFee",
-        func: () => {
-          dzmodal
-            .open(CostInformation, { type: "Issuer", data: props.param })
-            .then((res: any) => {
-              if (res.type === "ok") {
-              }
-            });
-        },
-      }),
-      createFreeButtonBase({
-        label: "历次批单",
-        type: "primary",
-        id: "preOrder",
-        func: () => {
-          dzmodal
-            .open(PreviousdrOpnList, { type: "Issuer", data: {} })
-            .then((res: any) => {
-              if (res.type === "ok") {
-              }
-            });
-        },
-      }),
-      createFreeButtonBase({
-        label: "任务痕迹",
-        func: () => {
-          dzmodal
-            .open(CostInformation, { type: "Issuer", data: {} })
-            .then((res: any) => {
-              if (res.type === "ok") {
-              }
-            });
-        },
-      })
-    );
+    if (props.param.cAppTyp == "E") {
+        edritem.value?.handleQuery()
+        const getFormconfig=edrbase.value?.getFormconfig()
+        getFormconfig.fromSchema?.forEach((item) => {
+            item.disabled = true;
+        });
+    }
+    bthList.value = uwBtn;
   } else if (props.param.pageType === "EDR_APP_NEW_SCENE") {
-    opertaor.setDisabledAll();
+    // 批改申请-新增
     const cAppNo = props.param.cAppNo;
+    edrbase.value?.setValue("EdrBase.cRatioTyp", "1");
+    edrbase.value?.setValue("EdrBase.cEdrRsnBundleCde", props.param["cRsnCde"]);
+    edrbase.value?.setValue("EdrBase.cEdrType", props.param["cEdrType"]);
+    if(props.param["cRsnCde"]!='FZ'){
+        edrbase.value?.setValue("EdrBase.cEdrRsnDetail",[props.param["cRsnCde"]]);
+    }
+    opertaor.setDisabledAll();
+    getEdrRsnItemFun(props.param["cProdNo"],props.param["cDptCde"],props.param["cRsnCde"],props.param["cRsnCde"],props.param["cEdrType"],props.param["cGrpMrk"])
     loadAppPlyInfo(cAppNo);
     bthList.value = edrBtn;
   } else if (props.param.pageType === "readonly") {
     opertaor.setDisabledAll();
     // 查询数据
-    const getAppPlyInfoRes = await getAppPlyInfoByAppNo({
-      CAppNo: props.param.cAppNo,
-    });
-    console.log("getAppPlyInfoRes", getAppPlyInfoRes);
-    const data = getAppPlyInfoRes.data;
+    // const getAppPlyInfoRes = await getAppPlyInfoByAppNo({
+    //   CAppNo: props.param.cAppNo,
+    // });
+    // console.log("getAppPlyInfoRes", getAppPlyInfoRes);
+    // const data = getAppPlyInfoRes.data;
+    const cAppNo = props.param.cAppNo;
+    loadAppPlyInfo(cAppNo);
+      if (props.param.cAppTyp == "E") {
+          edritem.value?.handleQuery()
+          const getFormconfig=edrbase.value?.getFormconfig()
+          getFormconfig.fromSchema?.forEach((item) => {
+              item.disabled = true;
+          });
+      }
     nextTick(() => {
-      console.log(data);
-      opertaor.setDataAll(data);
+      // console.log(data);
+      // opertaor.setDataAll(data);
       // set
       // page.getRefTab("base").setFormValue(lowercaseKeys(data["base"]));
       // let cvrgList = data["cvrg"];
@@ -491,6 +536,18 @@ async function loadAfter() {
       //   .getRefTab("applicant")
       //   .setFormValue(lowercaseKeys(data["applicant"]));
     });
+  }else if (props.param.pageType === "UW_READ_SCENE") {
+    //核保查看
+    opertaor.setDisabledAll();
+    const cAppNo = props.param.cAppNo;
+    loadAppPlyInfo(cAppNo);
+    if (props.param.cAppTyp == "E") {
+        edritem.value?.handleQuery()
+        const getFormconfig=edrbase.value?.getFormconfig()
+        getFormconfig.fromSchema?.forEach((item) => {
+            item.disabled = true;
+        });
+    }
   } else if (props.param.cPlyNo === "orig") {
     bthList.value.push(
       createFreeButtonBase({
@@ -631,6 +688,9 @@ const loadAppPlyInfo = (CAppNo) => {
       console.log("转换的数据", ops);
       if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
+        if(res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail']!=''&&res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail']!=null){
+            res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail']=res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail'].split(',')
+        }
         console.log("EdrBaseData", EdrBaseData);
         edrbase.value?.setFormValue(EdrBaseData);
       }
@@ -705,6 +765,7 @@ const setPayInfo = (base, applicant) => {
   pay["Pay.tPayBgnTm"] = base["Base.tAppTm"];
   pay["Pay.tPayEndTm"] = base["Base.tInsrncBgnTm"];
   pay["Pay.nOwnPrm"] = base["Base.nPrm"];
+  pay["Pay.cProdNo"] = base["Base.cProdNo"];
   pay["Pay.nPrmVar"] = !!base["Base.nPrm"] ? base["Base.nPrm"] : 0;
   payList.push(pay);
   return payList;
@@ -765,6 +826,69 @@ const savePlyInfo = () => {
   });
 };
 /**
+ * 获取批改项
+ * **/
+const getEdrRsnItemFun=(cProdNo,cDptCde,cRsnCde,cRsnDetailCde,cEdrType,cGrpMrk)=>{
+    const res={"CProdNo":cProdNo,
+                "CDptCde":cDptCde,
+                "CRsnCde":cRsnCde,
+                "CRsnDetailCde":cRsnDetailCde,
+                "CEdrType":cEdrType,
+                "CGrpMrk":cGrpMrk
+            }
+    getEdrRsnItem(res).then((res) => {
+        if (res["code"] == "200") {
+            const result = res['data']['result']
+            const edrList=[]
+            result.forEach((key)=>{
+                edrList.push(key['cEdrItem'])
+            })
+            opertaor.setUnDisabledByKeyList(edrList);// 根据list集合,放开需要的要素
+            ElMessage.success(res.msg);
+        } else {
+            ElMessage.error(res.msg);
+        }
+    });
+}
+/**
+ *批改单保费计算
+ ***/
+const calcPremiumEdr=()=>{
+    const btn = getBtn("btnCalEdr");
+    btn.loading = true;
+    const res = opertaor.getDataAll();
+    res["user"] = user;
+    res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
+    res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
+    res["EdrBase"] = edrbase.value?.getFromValue();
+    console.log(res);
+    calcEdr(res).then((res) => {
+        btn.loading = false;
+        console.log("批改计算", res);
+        if (res["code"] == "200") {
+            const ops = opertaor.convertData(res);
+            console.log("保费计算转换的数据", ops);
+            ElMessage.success(res.msg + "保费为：" + ops["base"]["Base.nPrm"]);
+            opertaor.setDataAll(ops);
+            nAmt.value = ops["base"]["Base.nAmt"];
+            nPrm.value = ops["base"]["Base.nPrm"];
+            tmDay.value = ops["base"]["Base.cTmSysCde"];
+            if (res["res"]["composition"]["EdrBase"]) {
+                const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
+                res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail']=JSON.parse(res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail'])
+                edrbase.value?.setFormValue(EdrBaseData);
+            }
+            const payInfo = setPayInfo(ops["base"], ops["applicant"]);
+            console.log("生成缴费计划内容", payInfo);
+            opertaor.getTableRefs()["payinfo"].setFormValue(payInfo);
+        } else {
+            ElMessage.error(res.msg);
+        }
+        // ElMessage.success(res.msg);
+        // history.back();
+    });
+}
+/**
  * 批改单保存
  * **/
 const saveEdrPlyInfo = () => {
@@ -775,6 +899,7 @@ const saveEdrPlyInfo = () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
   res["EdrBase"] = edrbase.value?.getFromValue();
+  res["EdrBase"]['EdrBase.cEdrRsnDetail']= res["EdrBase"]['EdrBase.cEdrRsnDetail'].join()
   console.log(res);
   saveEdrAppPlyInfo(res).then((res) => {
     console.log("saveAppPlyInfo-res", res);
@@ -784,6 +909,9 @@ const saveEdrPlyInfo = () => {
       console.log("转换的数据", ops);
       ElMessage.success(res.msg);
       opertaor.setDataAll(ops);
+      const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
+      res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail']=res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail'].split(',')
+      edrbase.value?.setFormValue(EdrBaseData)
     } else {
       ElMessage.error(res.msg);
     }
@@ -807,10 +935,36 @@ const generateEndorse = () => {
         btn.loading = false;
         if (res["code"] == "200") {
             const cEdrCtnt=res['data']['data']['cEdrCtnt'] //批文
+            const edrRsn=res['data']['data']['edrRsn'] //批文
             cacheKey.value=res['data']['data']['cacheKey']
             edrbase.value?.setValue('EdrBase.cEdrCtnt',cEdrCtnt)
             edrbase.value?.setValue('EdrBase.cacheKey',cacheKey.value)
+            edrbase.value?.setValue('EdrBase.cEdrRsnDetail',edrRsn)
             edritem.value?.handleQuery()
+            ElMessage.success(res.msg);
+        } else {
+            ElMessage.error(res.msg);
+        }
+    });
+};
+/**
+ * 批单申请核保
+ */
+const submitEdrToUndrFun = () => {
+    const btn = getBtn("btnSubmitEdr");
+    btn.loading = true;
+    const res = {};
+    const base = opertaor.getTableRefByKey("plyBase").getFromValue();
+    res["user"] = user;
+    res["appNo"] = base["Base.cAppNo"];
+    res["plyNo"] = base["Base.cPlyNo"];
+    console.log(res);
+    submitEdrToUndr(res).then((res) => {
+        btn.loading = false;
+        console.log("批改申请核保", res);
+        // ElMessage.success(res.msg);
+        // history.back();
+        if (res["code"] == "200") {
             ElMessage.success(res.msg);
         } else {
             ElMessage.error(res.msg);
@@ -828,7 +982,7 @@ const submitUnderwritingFn = () => {
   res["user"]["opRelCde"] = "10030892";
   res["appNo"] = props.param.cAppNo;
   res["taskId"] = props.param.taskId;
-  res["appTyp"] = props.param.bsType;
+  res["appTyp"] = props.param.cAppTyp;
   res["undrMrk"] = res["cUndrMrk"];
   res["cAntiLnderRisk"] = "0"; //关联交易确认
   res["cIsTransaction"] = "0"; //反洗钱风险
@@ -838,10 +992,10 @@ const submitUnderwritingFn = () => {
   res["backUndrDptCnm"] = null; // 退回指定核保人员名称
   console.log(res);
   let submitUnder;
-  if (props.param.bsType === "A") {
+  if (props.param.cAppTyp === "A") {
     submitUnder = submitUnderwriting(res);
   }
-  if (props.param.bsType === "E") submitUnder = submitUnderwritingEdr(res);
+  if (props.param.cAppTyp === "E") submitUnder = submitUnderwritingEdr(res);
 
   submitUnder.then((res) => {
     console.log("submitUnderwriting-res", res);

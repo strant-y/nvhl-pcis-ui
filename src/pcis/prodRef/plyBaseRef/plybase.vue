@@ -79,14 +79,15 @@ onMounted(async () => {
       ],
     });
     console.log(param, "param.cDptCde");
+
     setValue("Base.cDptCde", param.cDptCde);
     // 服务机构默认值
-    setFormItem("Base.cIntroDptCde", {
+    setFormItem("Base.cIntroDptcde", {
       loadData: [
         { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm}` },
       ],
     });
-    setValue("Base.cIntroDptCde", param.cDptCde);
+    setValue("Base.cIntroDptcde", param.cDptCde);
   });
 
   if (sessionStorage.getItem("toMyPageData")) {
@@ -131,16 +132,18 @@ const method = {
     setValue("Base.cChaType", "");
     setValue("Base.cChaSubtype", "");
     if (val) {
-      getChaTypeList({ BsnsTyp: val }).then((res) => {
-        if (null != res && null != res["code"]) {
-          if (res["code"] === 200) {
-            const obj = {
-              loadData: res.data,
-            };
-            setFormItem("Base.cChaType", obj);
+      getChaTypeList({ BsnsTyp: val, scene: "PLY_APP_NEW_SCENE" }).then(
+        (res) => {
+          if (null != res && null != res["code"]) {
+            if (res["code"] === 200) {
+              const obj = {
+                loadData: res.data,
+              };
+              setFormItem("Base.cChaType", obj);
+            }
           }
         }
-      });
+      );
       nextTick(() => {
         if (val === "19002" || val === "19003") {
           //代理业务 | 经纪业务
@@ -177,6 +180,7 @@ const method = {
       const params = {
         CChaType: val,
         flag: 1,
+        scene: "PLY_APP_NEW_SCENE",
       };
       getChaSubtypList(params).then((res) => {
         if (null != res && null != res["code"]) {
@@ -330,14 +334,13 @@ const method = {
         },
         method: {
           getSelected: (params) => {
-            console.error("3333333", params);
             setFormValue({
               "Base.cSlsId": params.CSlsCde, //业务员员工号
               "Base.cSlsNme": params.CSlsNme, //业务员名称
               "Base.cSlsCde": params.CCtfctNo, //业务员执业证号
               "Base.cSlsTel": params.CMobile, //业务员电话
               "Base.cSlsDptcde": params.CDptCde, //业务员机构代码
-              "Base.cIntroDptCde": "", //清空服务机构值
+              "Base.cIntroDptcde": "", //清空服务机构值
             });
             const ops = {
               code: "orgDpt",
@@ -347,7 +350,7 @@ const method = {
               if (res && res.code == 200) {
                 const codeValData = res.data;
                 if (codeValData) {
-                  setFormItem("Base.cIntroDptCde", {
+                  setFormItem("Base.cIntroDptcde", {
                     loadData: [
                       {
                         value: params["CDptCde"],
@@ -355,7 +358,7 @@ const method = {
                       },
                     ],
                   });
-                  setValue("Base.cIntroDptCde", params.CDptCde);
+                  setValue("Base.cIntroDptcde", params.CDptCde);
                 }
               }
             });

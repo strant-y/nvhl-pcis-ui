@@ -18,25 +18,14 @@
                 </el-col>
                 <el-col :span="4">
                   <rt-button
-                    :item="{
-                      label: '添加条款',
-                      icon: 'CirclePlus',
-                      type: 'primary',
-                      size: 'small',
-                      func: () => {
-                        addTermData(k);
-                      },
-                    }"
+                    v-if="!btnItem.addPlan.hidden"
+                    @click="addTermData(k)"
+                    :item="btnItem.addPlan"
                   />
                   <rt-button
-                    :item="{
-                      icon: 'Delete',
-                      type: 'danger',
-                      size: 'small',
-                      func: () => {
-                        deletePlan(k);
-                      },
-                    }"
+                    v-if="!btnItem.addPlan.hidden"
+                    @click="deletePlan(k)"
+                    :item="btnItem.delPlan"
                   />
                 </el-col>
               </el-row>
@@ -56,6 +45,11 @@
                     @delete="
                       (r) => {
                         deleteData(k, r);
+                      }
+                    "
+                    :ref="
+                      (res) => {
+                        tremTemplateRefs[k + 'm' + index] = res;
                       }
                     "
                   />
@@ -87,7 +81,7 @@
                       "
                       :ref="
                         (res) => {
-                          tremTemplateRefs[index] = res;
+                          tremTemplateRefs[k + 'a1' + index] = res;
                         }
                       "
                     />
@@ -110,6 +104,11 @@
                         deleteData(k, r);
                       }
                     "
+                    :ref="
+                      (res) => {
+                        tremTemplateRefs[k + 'a2' + index] = res;
+                      }
+                    "
                   />
                 </myCard>
               </template>
@@ -127,6 +126,11 @@
                     @delete="
                       (r) => {
                         deleteData(k, r);
+                      }
+                    "
+                    :ref="
+                      (res) => {
+                        tremTemplateRefs[k + 'a3' + index] = res;
                       }
                     "
                   />
@@ -154,18 +158,34 @@ import { terConfig } from "@/store/modules/term-config";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { prodTemple } from "./titleTemple";
 import { codeListViewStore } from "@/store";
+import { qryProdRelTermRiskList } from "@/api/prod";
 const codeListStore = codeListViewStore();
 
 const opertaor = dataOpertaor();
+const parparam = opertaor.getParam();
 const terconfig = terConfig();
 terconfig.configInit(); // 条款配置数据初始化
 
-const tremTemplateRefs = ref<any[]>([]);
+const tremTemplateRefs = ref<any>({});
 
 const props = defineProps({
   pageSchema: {
     type: [Object],
     required: true,
+  },
+});
+
+const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
+  addPlan: {
+    label: "添加条款",
+    icon: "CirclePlus",
+    type: "primary",
+    size: "small",
+  },
+  delPlan: {
+    icon: "Delete",
+    type: "danger",
+    size: "small",
   },
 });
 
@@ -199,6 +219,39 @@ onMounted(async () => {
     exRules
   );
   Object.assign(cardconfig.value, formconfig11);
+  if (parparam.pageType === "app") {
+    method.funcadd();
+    const param = {
+      cProdNo: parparam.cProdNo,
+      cTermNo: parparam.cTermNo,
+    };
+    qryProdRelTermRiskList(param).then((res: any) => {
+      const { code, data, msg } = res;
+      if (200 === code) {
+        let plans: any[] = [];
+        data.forEach((item: any) => {
+          let riskList: { [key: string]: any }[] = [];
+          item.children?.forEach((e: any) => {
+            riskList.push({
+              "TermRisktgt.cLiabCode": e.cRiskNo,
+            });
+          });
+          let data: { [key: string]: any } = {
+            "Term.cClauseCode": item.cTermNo,
+            "Term.cRdrTyp": item.cRdrTyp,
+            riskList: riskList,
+          };
+          if (item.cRdrTyp === "1") {
+            data["Term.cClauseCategory"] = item.cClauseCategory;
+          }
+          plans.push(data);
+        });
+        refushData("P1", plans);
+      } else {
+        ElMessage.error(msg);
+      }
+    });
+  }
   nextTick(() => {
     updateTitle();
   });
@@ -236,13 +289,18 @@ const exRules = {};
 
 function addTermData(PlanNo: string) {
   const param = opertaor.getParam();
+  const sp = planData.value[PlanNo];
+  let seld: any[] = [];
+  Object.keys(sp).forEach((k: any) => {
+    seld.push(...sp[k]);
+  });
   dialog.value?.open(
     "addtremView",
     {
       type: "show",
       data: {
         cProdNo: param.cProdNo,
-        isselectData: planData.value[PlanNo],
+        isselectData: seld,
       },
     },
     {
@@ -250,16 +308,39 @@ function addTermData(PlanNo: string) {
         let plans: any[] = [];
         selectdata.forEach((item: any) => {
           let riskList: { [key: string]: any }[] = [];
+          const se = seld.filter(
+            (em) => em["Term.cClauseCode"] === item.cTermNo
+          );
+
           item.children?.forEach((e: any) => {
-            riskList.push({
-              "TermRisktgt.cLiabCode": e.cRiskNo,
-            });
+            if (se.length > 0) {
+              const seri = se[0].riskList.filter(
+                (er: { [x: string]: any }) =>
+                  er["TermRisktgt.cLiabCode"] === e.cRiskNo
+              );
+              if (seri.length > 0) {
+                riskList.push(seri[0]);
+              } else {
+                riskList.push({
+                  "TermRisktgt.cLiabCode": e.cRiskNo,
+                });
+              }
+            } else {
+              riskList.push({
+                "TermRisktgt.cLiabCode": e.cRiskNo,
+              });
+            }
           });
-          let data: { [key: string]: any } = {
-            "Term.cClauseCode": item.cTermNo,
-            "Term.cRdrTyp": item.cRdrTyp,
-            riskList: riskList,
-          };
+          let data: { [key: string]: any } = {};
+          if (se.length > 0) {
+            data = se[0];
+          } else {
+            data = {
+              "Term.cClauseCode": item.cTermNo,
+              "Term.cRdrTyp": item.cRdrTyp,
+            };
+          }
+          data.riskList = riskList;
           if (item.cRdrTyp === "1") {
             data["Term.cClauseCategory"] = item.cClauseCategory;
           }
@@ -283,7 +364,15 @@ function refushData(planNo: string, datas: any) {
     }
     pd[key].push(item);
   });
-  planData.value[planNo] = pd;
+  // 强制刷新组件,对数据进行更新
+  delete planData.value[planNo];
+
+  setTimeout(() => {
+    planData.value[planNo] = pd;
+    nextTick(() => {
+      showFlush();
+    });
+  }, 100);
 }
 function deletePlan(plan: string) {
   delete planData.value[plan];
@@ -314,7 +403,6 @@ function deleteData(plan: string, term: any) {
 }
 
 function deleteTermByNo(plan: any, t: any) {
-  console.log(t);
   Object.keys(planData.value[plan]).forEach((item) => {
     let deleindex = null;
     for (let i = 0; i < planData.value[plan][item].length; i++) {
@@ -347,7 +435,7 @@ function getFromValue() {
 }
 
 function setFormValue(value: any) {
-  Object.assign(planData.value,{});
+  Object.assign(planData.value, {});
   let plandata: { [key: string]: any } = {};
   value.forEach((item: any) => {
     const planKey = item["Term.cPlanNo"];
@@ -370,11 +458,36 @@ function setFormValue(value: any) {
 
 function validate() {}
 function showFlush() {
-  tremTemplateRefs.value.forEach((item) => {
-    item.dataInit();
+  Object.keys(tremTemplateRefs.value).forEach((item) => {
+    tremTemplateRefs.value[item].dataInit();
   });
 }
 function getTableValue(rowId: number, key: string) {}
+
+function getFormconfig() {
+  return {
+    fromType: "custom",
+  };
+}
+
+function setDisabledAll() {
+  if (cardconfig.value.titleBtns && cardconfig.value.titleBtns.length > 0) {
+    cardconfig.value.titleBtns.forEach((item: any) => {
+      item.hidden = true;
+    });
+  }
+  if (cardconfig.value.endBtns && cardconfig.value.endBtns.length > 0) {
+    cardconfig.value.endBtns.forEach((item: any) => {
+      item.hidden = true;
+    });
+  }
+  Object.keys(btnItem.value).forEach((k: any) => {
+    btnItem.value[k].hidden = true;
+  });
+  Object.keys(tremTemplateRefs.value).forEach((item) => {
+    tremTemplateRefs.value[item].setDisabledAll();
+  });
+}
 
 defineExpose({
   getFromValue,
@@ -382,6 +495,8 @@ defineExpose({
   validate,
   getTableValue,
   showFlush,
+  getFormconfig,
+  setDisabledAll,
 });
 </script>
 

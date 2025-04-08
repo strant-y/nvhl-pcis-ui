@@ -30,7 +30,7 @@
               "
               :ref="
                 (res) => {
-                  tremTemplateRefs[index] = res;
+                  tremTemplateRefs['m'+index] = res;
                 }
               "
             />
@@ -60,7 +60,7 @@
                 "
                 :ref="
                   (res) => {
-                    tremTemplateRefs[index] = res;
+                    tremTemplateRefs['a1'+index] = res;
                   }
                 "
               />
@@ -81,6 +81,11 @@
                   deleteData(r);
                 }
               "
+              :ref="
+                (res) => {
+                  tremTemplateRefs['a2'+index] = res;
+                }
+              "
             />
           </myCard>
         </template>
@@ -96,6 +101,11 @@
               @delete="
                 (r) => {
                   deleteData(r);
+                }
+              "
+              :ref="
+                (res) => {
+                  tremTemplateRefs['a3'+index] = res;
                 }
               "
             />
@@ -117,9 +127,10 @@ import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { codeListViewStore } from "@/store";
+import { qryProdRelTermRiskList } from "@/api/prod";
 const codeListStore = codeListViewStore();
 const opertaor = dataOpertaor();
-
+const parparam = opertaor.getParam();
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -128,9 +139,9 @@ const props = defineProps({
 });
 
 const cardconfig = ref(creatCardConfig({}));
-const tremTemplateRefs = ref<any[]>([]);
+const tremTemplateRefs = ref<any>({});
 const cvrgFormfef = ref("cvrgFormfef");
-const formData = ref<{ [key: string]: { [key: string]: any } }>({});
+const formData = ref<{ [key: string]: [] }>({});
 
 onMounted(async () => {
   const formconfig11 = formInit(
@@ -139,33 +150,17 @@ onMounted(async () => {
     exRules
   );
   Object.assign(cardconfig.value, formconfig11);
-});
-
-// 绑定方法
-const method = {
-  funcadd: () => {
-    addTermData();
-  },
-};
-
-// 绑定特殊验证器
-const exRules = {};
-
-function addTermData() {
-  const param = opertaor.getParam();
-  dialog.value?.open(
-    "addtremView",
-    {
-      type: "show",
-      data: {
-        cProdNo: param.cProdNo,
-        isselectData: formData.value,
-      },
-    },
-    {
-      isOk: (selectdata: any) => {
+  if (parparam.pageType === "app") {
+    // 新建保单时,初始化条款信息
+    const param = {
+      cProdNo: parparam.cProdNo,
+      cTermNo: parparam.cTermNo,
+    };
+    qryProdRelTermRiskList(param).then((res: any) => {
+      const { code, data, msg } = res;
+      if (200 === code) {
         let plans: any[] = [];
-        selectdata.forEach((item: any) => {
+        data.forEach((item: any) => {
           let riskList: { [key: string]: any }[] = [];
           item.children?.forEach((e: any) => {
             riskList.push({
@@ -182,7 +177,83 @@ function addTermData() {
           }
           plans.push(data);
         });
-        
+        refushData(plans);
+      } else {
+        ElMessage.error(msg);
+      }
+    });
+  }
+});
+
+// 绑定方法
+const method = {
+  funcadd: () => {
+    addTermData();
+  },
+};
+
+// 绑定特殊验证器
+const exRules = {};
+
+function addTermData() {
+  const param = opertaor.getParam();
+  const iss: any[] = [];
+  if (formData.value) {
+    Object.keys(formData.value).forEach((k: any) => {
+      iss.push(...formData.value[k]);
+    });
+  }
+  dialog.value?.open(
+    "addtremView",
+    {
+      type: "show",
+      data: {
+        cProdNo: param.cProdNo,
+        isselectData: iss,
+      },
+    },
+    {
+      isOk: (selectdata: any) => {
+        let plans: any[] = [];
+        selectdata.forEach((item: any) => {
+          let riskList: { [key: string]: any }[] = [];
+          const se = iss.filter(
+            (em) => em["Term.cClauseCode"] === item.cTermNo
+          );
+          item.children?.forEach((e: any) => {
+            if (se.length > 0) {
+              const seri = se[0].riskList.filter(
+                (er: { [x: string]: any }) =>
+                  er["TermRisktgt.cLiabCode"] === e.cRiskNo
+              );
+              if (seri.length > 0) {
+                riskList.push(seri[0]);
+              } else {
+                riskList.push({
+                  "TermRisktgt.cLiabCode": e.cRiskNo,
+                });
+              }
+            } else {
+              riskList.push({
+                "TermRisktgt.cLiabCode": e.cRiskNo,
+              });
+            }
+          });
+          let data: { [key: string]: any } = {};
+          if (se.length > 0) {
+            data = se[0];
+          } else {
+            data = {
+              "Term.cClauseCode": item.cTermNo,
+              "Term.cRdrTyp": item.cRdrTyp,
+            };
+          }
+          if (item.cRdrTyp === "1") {
+            data["Term.cClauseCategory"] = item.cClauseCategory;
+          }
+          data.riskList = riskList;
+          plans.push(data);
+        });
         refushData(plans);
       },
     },
@@ -242,7 +313,14 @@ function refushData(datas: any) {
     }
     pd[key].push(item);
   });
-  formData.value = pd;
+  // 强制刷新组件,对数据进行更新
+  formData.value = {};
+  setTimeout(() => {
+    formData.value = pd;
+    nextTick(()=>{
+      showFlush();
+    })
+  }, 50);
 }
 
 function getFromValue() {
@@ -275,19 +353,41 @@ function setFormValue(value: any) {
 function validate() {}
 
 function showFlush() {
-  tremTemplateRefs.value.forEach((item) => {
+  tremTemplateRefs.value.forEach((item: any) => {
     item.dataInit();
   });
 }
 
 function getTableValue(rowId: number, key: string) {}
 
+function getFormconfig(){
+  return {
+    fromType:'custom'
+  };
+}
+function setDisabledAll(){
+  if(cardconfig.value.titleBtns && cardconfig.value.titleBtns.length>0){
+    cardconfig.value.titleBtns.forEach((item:any)=>{
+      item.hidden = true;
+    })
+  };
+  if(cardconfig.value.endBtns && cardconfig.value.endBtns.length>0){
+    cardconfig.value.endBtns.forEach((item:any)=>{
+      item.hidden = true;
+    })
+  }
+  Object.keys(tremTemplateRefs.value).forEach((item: any) => {
+    tremTemplateRefs.value[item].setDisabledAll();
+  });
+}
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   getTableValue,
   showFlush,
+  getFormconfig,
+  setDisabledAll
 });
 </script>
 

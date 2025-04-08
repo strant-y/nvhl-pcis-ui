@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { useUserStore } from "@/store";
 import { useValidator } from "@/typings/useValidator";
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter, useRoute } from "vue-router";
 const { getRules } = useValidator();
 const router = useRouter();
 const route = useRoute();
@@ -35,31 +35,32 @@ import {
 } from "@/shared/app-table-config";
 import { getBasicKindList } from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
-import moment from 'moment';
-import { SCENE_PLY_APP_MODIFY_UNSUBMIT,
+import moment from "moment";
+import {
+  SCENE_PLY_APP_MODIFY_UNSUBMIT,
   SCENE_TEMPORARY_DEPOSITBEARER,
-  SCENE_EDR_APP_MODIFY_UNSUBMIT 
-} from '@/constants/tab-constants';
-import { PcisQueryService } from "@/views/payinfo/service/pcis-query-service";
+  SCENE_EDR_APP_MODIFY_UNSUBMIT,
+} from "@/constants/tab-constants";
+import { PcisQueryService } from "@/views/payinfoManagement/service/pcis-query-service";
 const pcisQueryService = new PcisQueryService();
 const userStore = useUserStore();
-const user = ref(userStore.user) || ref({ companyId:'', opCde:'' })
+const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
 const removeIds = ref([]); // 删除用户ID集合 用于批量删除
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
-  const departmentTree = defineAsyncComponent(
+const departmentTree = defineAsyncComponent(
   () => import("@/components/common/DepartmentTree.vue")
 );
 const TaskListVestige = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/TaskListVestige.vue")
 );
-const params = route.query.data ? JSON.parse(route.query.data) : {}
+const params = route.query.data ? JSON.parse(route.query.data) : {};
 const props = defineProps({
   refreshData: {
     type: Boolean,
-    default: false
-  }
-})
+    default: false,
+  },
+});
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -123,8 +124,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         format: "YYYY-MM-DD HH:mm:ss",
         valueFormat: "YYYY-MM-DD HH:mm:ss",
         defaultValue: [
-          moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format('YYYY-MM-DD 00:00:00'),
-          moment(new Date()).format('YYYY-MM-DD 23:59:59')
+          moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
+            "YYYY-MM-DD 00:00:00"
+          ),
+          moment(new Date()).format("YYYY-MM-DD 23:59:59"),
         ],
       },
       {
@@ -144,7 +147,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "状态",
         typeCode: "RECEIVE_BANK_CATEGORY",
-        codeParam: { cParCde:'shenqingdanzhuangtai' },
+        codeParam: { cParCde: "shenqingdanzhuangtai" },
         clearable: true,
       },
     ],
@@ -175,21 +178,26 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "View",
         hideBtns: (row) => {
-          if(row.cAppStatus==3 || row.cAppStatus==8) return false;
+          if (row.cAppStatus == 3 || row.cAppStatus == 8) return false;
         },
         tableClick: (row) => {
-          handleDetail(row)
+          handleDetail(row);
         },
       }),
       createFreeButtonBase({
         id: "score",
         link: true,
         tooltip: "编辑",
-        type: 'success',
+        type: "success",
         size: "large",
         icon: "Edit",
         hideBtns: (row) => {
-          if(row.cAppStatus!==1 && row.cAppStatus!==3 && row.cAppStatus!==8) return false;
+          if (
+            row.cAppStatus !== 1 &&
+            row.cAppStatus !== 3 &&
+            row.cAppStatus !== 8
+          )
+            return false;
         },
         tableClick: (row) => {
           handleEdit(row);
@@ -203,7 +211,12 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Delete",
         hideBtns: (row) => {
-          if(row.cAppStatus!==1 && row.cAppStatus!==3 && row.cAppStatus!==8) return false;
+          if (
+            row.cAppStatus !== 1 &&
+            row.cAppStatus !== 3 &&
+            row.cAppStatus !== 8
+          )
+            return false;
         },
         tableClick: (row) => {
           handleDelete(row);
@@ -250,29 +263,93 @@ onMounted(async () => {});
 
 watch(
   () => props.refreshData,
-  (n,o) => {
+  (n, o) => {
     // 自动刷新列表获取数据
     pageresult.list = [
-      {cAppStatus:1, cCombinationNo: "组合产品单号", cDptCnm: "机构", cAppNme: "投保人名称", tAppTm: "2022-01-01", nAmt: "10000", nPrm: "1000"},
-      {cAppStatus:2, cCombinationNo: "组合产品单号", cDptCnm: "机构", cAppNme: "投保人名称", tAppTm: "2022-01-01", nAmt: "10000", nPrm: "1000"},
-      {cAppStatus:3, cCombinationNo: "组合产品单号", cDptCnm: "机构", cAppNme: "投保人名称", tAppTm: "2022-01-01", nAmt: "10000", nPrm: "1000"},
-      {cAppStatus:4, cCombinationNo: "组合产品单号", cDptCnm: "机构", cAppNme: "投保人名称", tAppTm: "2022-01-01", nAmt: "10000", nPrm: "1000"},
-      {cAppStatus:5, cCombinationNo: "组合产品单号", cDptCnm: "机构", cAppNme: "投保人名称", tAppTm: "2022-01-01", nAmt: "10000", nPrm: "1000"},
-      {cAppStatus:6, cCombinationNo: "组合产品单号", cDptCnm: "机构", cAppNme: "投保人名称", tAppTm: "2022-01-01", nAmt: "10000", nPrm: "1000"},
-      {cAppStatus:7, cCombinationNo: "组合产品单号", cDptCnm: "机构", cAppNme: "投保人名称", tAppTm: "2022-01-01", nAmt: "10000", nPrm: "1000"},
-      {cAppStatus:8, cCombinationNo: "组合产品单号", cDptCnm: "机构", cAppNme: "投保人名称", tAppTm: "2022-01-01", nAmt: "10000", nPrm: "1000"},
-    ]
+      {
+        cAppStatus: 1,
+        cCombinationNo: "组合产品单号",
+        cDptCnm: "机构",
+        cAppNme: "投保人名称",
+        tAppTm: "2022-01-01",
+        nAmt: "10000",
+        nPrm: "1000",
+      },
+      {
+        cAppStatus: 2,
+        cCombinationNo: "组合产品单号",
+        cDptCnm: "机构",
+        cAppNme: "投保人名称",
+        tAppTm: "2022-01-01",
+        nAmt: "10000",
+        nPrm: "1000",
+      },
+      {
+        cAppStatus: 3,
+        cCombinationNo: "组合产品单号",
+        cDptCnm: "机构",
+        cAppNme: "投保人名称",
+        tAppTm: "2022-01-01",
+        nAmt: "10000",
+        nPrm: "1000",
+      },
+      {
+        cAppStatus: 4,
+        cCombinationNo: "组合产品单号",
+        cDptCnm: "机构",
+        cAppNme: "投保人名称",
+        tAppTm: "2022-01-01",
+        nAmt: "10000",
+        nPrm: "1000",
+      },
+      {
+        cAppStatus: 5,
+        cCombinationNo: "组合产品单号",
+        cDptCnm: "机构",
+        cAppNme: "投保人名称",
+        tAppTm: "2022-01-01",
+        nAmt: "10000",
+        nPrm: "1000",
+      },
+      {
+        cAppStatus: 6,
+        cCombinationNo: "组合产品单号",
+        cDptCnm: "机构",
+        cAppNme: "投保人名称",
+        tAppTm: "2022-01-01",
+        nAmt: "10000",
+        nPrm: "1000",
+      },
+      {
+        cAppStatus: 7,
+        cCombinationNo: "组合产品单号",
+        cDptCnm: "机构",
+        cAppNme: "投保人名称",
+        tAppTm: "2022-01-01",
+        nAmt: "10000",
+        nPrm: "1000",
+      },
+      {
+        cAppStatus: 8,
+        cCombinationNo: "组合产品单号",
+        cDptCnm: "机构",
+        cAppNme: "投保人名称",
+        tAppTm: "2022-01-01",
+        nAmt: "10000",
+        nPrm: "1000",
+      },
+    ];
     pageresult.total = 8;
     // 上面代码是仅用于本地调试
-    if(n) {
-      console.log(n,'产品组合出单查询')
+    if (n) {
+      console.log(n, "产品组合出单查询");
       // handleQuery(true);
     }
   },
-  { 
+  {
     deep: true,
-    immediate: true
-  },
+    immediate: true,
+  }
 );
 
 // 绑定方法
@@ -297,8 +374,7 @@ const exRules = {
 /** 查询 */
 function handleQuery(flag?: boolean) {
   freeEditRef.value?.validate().then((isValid) => {
-		if (isValid) {
-
+    if (isValid) {
       const tmArr = freeEditRef.value?.getValue("dateRange");
       const issueStartTemp = tmArr[0];
       const issueEndTemp = tmArr[1];
@@ -317,22 +393,27 @@ function handleQuery(flag?: boolean) {
       //   return;
       // }
       if (issueEnd - issueStart >= 7 * 1000 * 60 * 60 * 24) {
-        ElMessage.warning('投保时间范围请控制在7天以内');
+        ElMessage.warning("投保时间范围请控制在7天以内");
         return;
       }
 
       const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
       const s = freeEditRef.value?.getFromValue(); //获取表单数据
-      const param = Object.assign({
-        TAppTmStart: issueStartTemp,
-        TAppTmEnd: issueEndTemp,
-        sortField: 'name',
-        CAppTyp: 'A',
-        // sortOrder: sortValue, //排序？
-        CurrentUser: user.value.opCde,
-        CurrentUserOrg: user.value.companyId
-      },s, r);
-      pcisQueryService.getExpirationPolicyList(param)
+      const param = Object.assign(
+        {
+          TAppTmStart: issueStartTemp,
+          TAppTmEnd: issueEndTemp,
+          sortField: "name",
+          CAppTyp: "A",
+          // sortOrder: sortValue, //排序？
+          CurrentUser: user.value.opCde,
+          CurrentUserOrg: user.value.companyId,
+        },
+        s,
+        r
+      );
+      pcisQueryService
+        .getExpirationPolicyList(param)
         .then((res) => {
           const { code, data, msg } = res;
           if (200 === code) {
@@ -342,26 +423,26 @@ function handleQuery(flag?: boolean) {
           }
         })
         .finally(() => {});
-      }
-    })
+    }
+  });
 }
 
 // 多选事件
 function handleSelectionChange(selection: any) {
-  console.log('selection',selection)
+  console.log("selection", selection);
   removeIds.value = selection.map((item: any) => item.cPkId);
 }
 
 // 查看详情
 function handleDetail(row: any) {
   const src = {
-    scene: 'SCENE_PLY_APP_MODIFY_UNSUBMIT',
+    scene: "SCENE_PLY_APP_MODIFY_UNSUBMIT",
     CCombiNo: row.cCombinationNo,
-    CAppTyp: row.cAppTyp
+    CAppTyp: row.cAppTyp,
   };
   const en = JSON.stringify(src);
   router.push({
-    path: '/index/pcis-combination-query/detail',
+    path: "/index/pcis-combination-query/detail",
     query: {
       data: en,
     },
@@ -372,17 +453,20 @@ function handleDetail(row: any) {
 function handleEdit(row: any) {
   const CAppTyp = row.cAppTyp;
   let scene = SCENE_PLY_APP_MODIFY_UNSUBMIT;
-  if (CAppTyp === 'E') {
-    scene = row.cEdrRsnBundleCde === 'BL' ? SCENE_TEMPORARY_DEPOSITBEARER : SCENE_EDR_APP_MODIFY_UNSUBMIT;
+  if (CAppTyp === "E") {
+    scene =
+      row.cEdrRsnBundleCde === "BL"
+        ? SCENE_TEMPORARY_DEPOSITBEARER
+        : SCENE_EDR_APP_MODIFY_UNSUBMIT;
   }
   const src = {
     scene: scene,
     CCombiNo: row.cCombinationNo,
-    CAppTyp: CAppTyp
+    CAppTyp: CAppTyp,
   };
   const en = JSON.stringify(src);
   router.push({
-    path: '/index/pcis-combination-application/edit',
+    path: "/index/pcis-combination-application/edit",
     query: {
       data: en,
     },
@@ -391,22 +475,26 @@ function handleEdit(row: any) {
 
 // 删除
 function handleDelete(row: any) {
-  ElMessageBox.confirm('该数据删除之后将无法恢复。', '确认要删除吗？', {
-    confirmButtonText: '删除',
-    cancelButtonText: '取消',
-    type: 'warning',
-  }).then(() => {
-    pcisQueryService.delTmpCombinaton({ combinationNo: row.cCombinationNo }).then((res: any) => {
-      if (res.code === 200) {
-        ElMessage.info({ message: res.msg, duration: 3000 });
-        handleQuery(true);
-      } else {
-        ElMessage.error({ message: res.msg, duration: 3000 });
-      }
+  ElMessageBox.confirm("该数据删除之后将无法恢复。", "确认要删除吗？", {
+    confirmButtonText: "删除",
+    cancelButtonText: "取消",
+    type: "warning",
+  })
+    .then(() => {
+      pcisQueryService
+        .delTmpCombinaton({ combinationNo: row.cCombinationNo })
+        .then((res: any) => {
+          if (res.code === 200) {
+            ElMessage.info({ message: res.msg, duration: 3000 });
+            handleQuery(true);
+          } else {
+            ElMessage.error({ message: res.msg, duration: 3000 });
+          }
+        });
+    })
+    .catch((err) => {
+      console.log(err);
     });
-  }).catch((err) => {
-    console.log(err)
-  });
 }
 </script>
 

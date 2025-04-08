@@ -64,8 +64,8 @@ import { v4 as uuidv4 } from "uuid";
 import { useRoute, useRouter, RouteRecordRaw } from "vue-router";
 const router = useRouter();
 const route = useRoute();
-import { SCENE_PAY_CONFIRM_INFO_REGISTER } from '@/constants/tab-constants';
-import { PcisQueryService } from "@/views/payinfo/service/pcis-query-service";
+import { SCENE_PAY_CONFIRM_INFO_REGISTER } from "@/constants/tab-constants";
+import { PcisQueryService } from "@/views/payinfoManagement/service/pcis-query-service";
 const pcisQueryService = new PcisQueryService();
 
 const departmentTree = defineAsyncComponent(
@@ -76,7 +76,7 @@ const jsonArrayEdit = defineAsyncComponent(
   () => import("@/common/dzmodel/jsonArrayEdit.vue")
 );
 const userStore = useUserStore();
-const user = ref(userStore.user) || ref({ companyId:'', opCde:'' })
+const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
 
 const showBtnConfig = ref(false);
 const dialogVisible = ref(true);
@@ -213,38 +213,38 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       //   title: "开户行县",
       //   // rules: [getRules("required", {})],
       // },
-        {
-            prop: "cascaderarea",
-            inputtype: "rtcascader",
-            title: "开户行",
-            // rules: [required()],
-            typeCode:'getarealist',
-             codeParam:{cParCde:'1'},
-            // loadData:[{"label":"中国","value":"1"}],
-            cascaderprops:['cProvinces','cCity','cBankCounty'],
-            showExBtn: false,
-            maxlevel:3,
-            btnWidth: 30,
-            // btnItems: createFreeButtonBase({
-            //     label: "测试塞值",
-            //     func: function () {
-            //         freeEditRef.value?.setFormValue({
-            //             'CProvinces':'120000',
-            //             'CCity':'120102',
-            //             'CBankCounty':'120102'
-            //         });
-            //         const t = freeEditRef.value?.getFromValue();
-            //         console.log(t);
-            //     },
-            // }),
-        },
+      {
+        prop: "cascaderarea",
+        inputtype: "rtcascader",
+        title: "开户行",
+        // rules: [required()],
+        typeCode: "getarealist",
+        codeParam: { cParCde: "1" },
+        // loadData:[{"label":"中国","value":"1"}],
+        cascaderprops: ["cProvinces", "cCity", "cBankCounty"],
+        showExBtn: false,
+        maxlevel: 3,
+        btnWidth: 30,
+        // btnItems: createFreeButtonBase({
+        //     label: "测试塞值",
+        //     func: function () {
+        //         freeEditRef.value?.setFormValue({
+        //             'CProvinces':'120000',
+        //             'CCity':'120102',
+        //             'CBankCounty':'120102'
+        //         });
+        //         const t = freeEditRef.value?.getFromValue();
+        //         console.log(t);
+        //     },
+        // }),
+      },
       {
         prop: "cBankNme",
         inputtype: "rtselect",
         title: "收款银行大类",
         // rules: [getRules("required", {})],
         typeCode: "SELECT_CBANKRELTYP",
-         params: {'cParCde': ['0', '1', '2', '3', '4', '5', '6', '7', '9']},
+        params: { cParCde: ["0", "1", "2", "3", "4", "5", "6", "7", "9"] },
       },
       {
         prop: "cBankcode",
@@ -257,11 +257,17 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           type: "primary",
           func: () => {
             dzmodal
-              .open(bankList, { type: "Issuer", data: { CBankNme: freeEditRef.value?.getValue("CBankNme")} })
+              .open(bankList, {
+                type: "Issuer",
+                data: { CBankNme: freeEditRef.value?.getValue("CBankNme") },
+              })
               .then((res) => {
                 if (res.type === "ok") {
                   // res.data 为返回的数据
-                  freeEditRef.value?.setValue("CBankcode", res.data.bankCde + '_' + res.data.bankName);
+                  freeEditRef.value?.setValue(
+                    "CBankcode",
+                    res.data.bankCde + "_" + res.data.bankName
+                  );
                   freeEditRef.value?.setValue("CBankAddr", res.data.bankName);
                   freeEditRef.value?.setValue("CBankCnaps", res.data.bankCde);
                 }
@@ -329,52 +335,64 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 
 // 小数点格式化
 function numberFormat(value: any, precision: number) {
-  let res = '0.00';
+  let res = "0.00";
   if (value) {
     res = `${Number(value).toFixed(precision)}`;
   } else {
     res = `${Number(res).toFixed(precision)}`;
   }
   return res;
-};
+}
 
 // 加载缴费信息明细
 function loadPayConfirmInfo(param) {
-    console.log(param)
-    pcisQueryService.loadPayConfirmInfo(param).then((res: any) => {
+  console.log(param);
+  pcisQueryService
+    .loadPayConfirmInfo(param)
+    .then((res: any) => {
       const { code, data, msg } = res;
       if (res.code === 200) {
-          const data = res['data'];
-          console.log("eeeeeeee", data)
-          // const newdata = {};
-          // Object.keys(data).forEach((key) => {
-          //     const k = firstCharUpper(key);
-          //     newdata[k] = data[key];
-          // });
-          freeEditRef.value?.setFormValue(data);
-          freeEditRef.value?.setValue("CCheckOpn", '同意')
+        const data = res["data"];
+        console.log("eeeeeeee", data);
+        // const newdata = {};
+        // Object.keys(data).forEach((key) => {
+        //     const k = firstCharUpper(key);
+        //     newdata[k] = data[key];
+        // });
+        freeEditRef.value?.setFormValue(data);
+        freeEditRef.value?.setValue("CCheckOpn", "同意");
       }
-    }).catch((error: any) => {
-      ElMessage.error({ message: '连接失败！' + error, duration: 3000 });
+    })
+    .catch((error: any) => {
+      ElMessage.error({ message: "连接失败！" + error, duration: 3000 });
     });
-};
+}
 
 // 支票通过
 function passInfo() {
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
       const s = freeEditRef.value?.getFromValue(); //获取表单数据
-      pcisQueryService.payConfirmInfoAudit(s).then((res: any) => {
-        if (res.code !== 200) {
-          ElMessage.error({ message: res.msg, duration: 3000 });
-        } else {
-          ElMessage.success({ message: '审核通过，' + res.msg, duration: 3000 });
-          emits("ok", {});
-        }
-      }).catch((error: any) => {
-        console.log('出错了', error);
-        ElMessage.error({ message: '后台服务异常,请联系管理员', duration: 3000 });
-      });
+      pcisQueryService
+        .payConfirmInfoAudit(s)
+        .then((res: any) => {
+          if (res.code !== 200) {
+            ElMessage.error({ message: res.msg, duration: 3000 });
+          } else {
+            ElMessage.success({
+              message: "审核通过，" + res.msg,
+              duration: 3000,
+            });
+            emits("ok", {});
+          }
+        })
+        .catch((error: any) => {
+          console.log("出错了", error);
+          ElMessage.error({
+            message: "后台服务异常,请联系管理员",
+            duration: 3000,
+          });
+        });
     } else {
       ElMessage.error("请填写必填项");
     }
@@ -385,31 +403,36 @@ function backInfo() {
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
       const s = freeEditRef.value?.getFromValue(); //获取表单数据
-      pcisQueryService.payConfirmInfoBack(s).then((res: any) => {
-        if (res.code !== 200) {
-          ElMessage.error({ message: res.msg, duration: 3000 });
-        } else {
-          ElMessage.success({ message: '支票退回成功', duration: 3000 });
-          emits("ok", {});
-        }
-      }).catch((error: any) => {
-        console.log('出错了', error);
-        ElMessage.error({ message: '后台服务异常,请联系管理员', duration: 3000 });
-      });
+      pcisQueryService
+        .payConfirmInfoBack(s)
+        .then((res: any) => {
+          if (res.code !== 200) {
+            ElMessage.error({ message: res.msg, duration: 3000 });
+          } else {
+            ElMessage.success({ message: "支票退回成功", duration: 3000 });
+            emits("ok", {});
+          }
+        })
+        .catch((error: any) => {
+          console.log("出错了", error);
+          ElMessage.error({
+            message: "后台服务异常,请联系管理员",
+            duration: 3000,
+          });
+        });
     } else {
       ElMessage.error("请填写必填项");
     }
   });
 }
 
-
 onMounted(async () => {
-  nextTick(()=>{
-      const param = {
-          'CUniqueNo': props.data.cUniqueNo,
-      };
-      loadPayConfirmInfo(param);
-  })
+  nextTick(() => {
+    const param = {
+      CUniqueNo: props.data.cUniqueNo,
+    };
+    loadPayConfirmInfo(param);
+  });
 });
 
 // 绑定方法
@@ -462,10 +485,10 @@ function getFrom() {
  * @param {string} str
  * @returns {string}
  */
-function  firstCharUpper(str: string) {
-    return str.replace(/\b(\w)(\w*)/g, function ($0, $1, $2) {
-        return $1.toUpperCase() + $2;
-    });
+function firstCharUpper(str: string) {
+  return str.replace(/\b(\w)(\w*)/g, function ($0, $1, $2) {
+    return $1.toUpperCase() + $2;
+  });
 }
 </script>
 
