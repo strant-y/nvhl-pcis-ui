@@ -401,7 +401,7 @@ const method = {
   },
   cCertfCdeChange: (val) => {
     if (val) {
-      const certfCde = applicantEditRef.value?.getValue("Insured.cCertfCde");
+      const certfCde = insuredEditRef.value?.getValue("Insured.cCertfCde");
       if (certfCde && certfCde.length === 18) {
         const birthYear = parseInt(certfCde.substring(6, 10), 10);
         const birthMonth = parseInt(certfCde.substring(10, 12), 10);

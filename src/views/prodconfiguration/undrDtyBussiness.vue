@@ -75,12 +75,12 @@ const formconfig = reactive<AppFreeEditConfig>(
     fromSchema: [
       {
         prop: "cEmpCde",
-        inputtype: "rtselect",
+        inputtype: "rtinput",
         title: "员工代码",
       },
       {
         prop: "cEmpCnm",
-        inputtype: "rtselect",
+        inputtype: "rtinput",
         title: "员工名称",
       },
       {
@@ -103,6 +103,7 @@ const formconfig = reactive<AppFreeEditConfig>(
                     },
                   ],
                 };
+                setFormItem("dptCde", obj);
                 freeEditRef.value?.setValue("dptCde", selectObj.id);
               }
             });
@@ -214,6 +215,25 @@ function handleQuery() {
         pageresult.list = res;
       }
     });
+}
+//给表单下拉项赋值
+function setFormItem(key, obj) {
+  if (obj && Object.keys(obj).length) {
+    formconfig.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.btnItems && obj.btnItems) {
+          let newBtnItems = null;
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
+          }
+          newBtnItems = item.btnItems;
+          newBtnItems && (obj.btnItems = newBtnItems);
+        }
+        Object.assign(item, obj);
+      }
+    });
+  }
 }
 </script>
 

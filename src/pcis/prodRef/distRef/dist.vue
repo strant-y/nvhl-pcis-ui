@@ -1,11 +1,15 @@
 <template>
   <div>
     <myCard :cardConfig="cardconfig">
-      <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef" />
+      <app-table
+        :tableConfig="tableconfig"
+        v-model:pageresult="pageresult"
+        ref="tableRef"
+      />
     </myCard>
-    
+
     <comDialog ref="dialog"></comDialog>
-   </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -13,7 +17,10 @@ import {
   AppGridEditMethod,
   createAppGridEditConfig,
 } from "@/shared/app-grid-edit-config";
-import { AppTableConfig, createTableEditConfig } from "@/shared/app-table-config";
+import {
+  AppTableConfig,
+  createTableEditConfig,
+} from "@/shared/app-table-config";
 import { formInit } from "@/shared/from-init";
 import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
@@ -28,11 +35,11 @@ const props = defineProps({
 });
 
 const pageresult = reactive<Pageresult>({
-	result: "",
-	/** 数据列表 */
-	list: [],
-	/** 总数 */
-	total: 0,
+  result: "",
+  /** 数据列表 */
+  list: [],
+  /** 总数 */
+  total: 0,
 });
 const distEditRef = ref<AppGridEditMethod | null>(null);
 const cardconfig = ref<CardConfig>(creatCardConfig({}));
@@ -50,8 +57,8 @@ onMounted(async () => {
   tableconfig.value.showEdit = true;
   tableconfig.value.fromSchema = formconfig1.value.fromSchema;
   tableconfig.value.formconfig = createAppGridEditConfig({
-    titleBtns:formconfig1.value.titleBtns,
-    fromSchema:formconfig1.value.distSchema,
+    titleBtns: formconfig1.value.titleBtns,
+    fromSchema: formconfig1.value.distSchema,
   });
   // addFakeData();
 });
@@ -62,16 +69,13 @@ const method = {
   func1: () => {},
   funcdistadd: () => {
     dialog.value?.open(
-    "distAdd",
-    { fromSchema: tableconfig.value.fromSchema,
-      title:"新增"
-     },
-    {
-      isOk: (res: any) => {
+      "distAdd",
+      { fromSchema: tableconfig.value.fromSchema, title: "新增" },
+      {
+        isOk: (res: any) => {},
       },
-    },
-    { width:'60' }
-  );
+      { width: "60" }
+    );
   },
   funcdistdel: () => {
     const selData = distEditRef?.value?.getSelectRow();

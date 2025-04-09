@@ -22,6 +22,7 @@ import plybaseRef from "./plyBaseRef/plybase.vue";
 import baseafterRef from "./baseafterRef/baseafter.vue";
 import informationRef from "./informationRef/information.vue";
 import specialAgr from "./specialAgrRef/SpecialAgreement.vue"
+import deDuctibleRef from "./deDuctibleRef/deDuctibleDist.vue"
 
 import prodInfo from "./commonRef/prodInfo.vue";
 import relatedMainInsurance from "./commonRef/relatedMainInsurance.vue";
@@ -79,6 +80,7 @@ const componentMap = {
   payinfoRef: payinfoRef,
   acctinfoRef: acctinfoRef,
   distRef: distRef,
+  deDuctibleRef: deDuctibleRef,
   // ciRef: ciRef,
   // ciMasterAgreementRef: ciMasterAgreementRef,
   // ourCompanyCiShareRef: ourCompanyCiShareRef,
@@ -89,7 +91,6 @@ const componentMap = {
   underwriteRef: underwriteRef, //录单页面中的核保组件
   edrbaseRef: edrbaseRef, //录单页面中的批改信息组件
   edritemRef: edritemRef, //录单页面中的批改比较项组件
-
 
   prodInfoRef: prodInfo,
   // prodauditRef: prodaudit,
@@ -126,6 +127,7 @@ const componentMap = {
   ndustryCateModal:ndustryCateModal,
   cOccupCdeModal:cOccupCdeModal,
   prdFixSpec: prdFixSpec,
+  
 };
 
 const install = (Vue) => {

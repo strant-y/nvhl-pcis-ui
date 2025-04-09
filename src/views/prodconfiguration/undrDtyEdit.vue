@@ -25,7 +25,11 @@ import { useRoute } from "vue-router";
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 import BusinessCvrgTree from "@/pcis/prodRef/commodityRef/BusinessCvrgTree.vue";
 import undrDtyBussiness from "./undrDtyBussiness.vue";
-import { getPageViewByPage, getProdList, saveProdPages } from "@/api/prod";
+import {
+  getPageViewByPage,
+  getProdList,
+  saveBatchUndrDtyInfo,
+} from "@/api/prod";
 import {
   AppGridEditConfig,
   AppGridEditMethod,
@@ -49,6 +53,7 @@ const dzmodal = useDzModal();
 
 const dialog = ref<DialogMethod | null>(null);
 import { useValidator } from "@/typings/useValidator";
+import { read } from "fs";
 const { getRules } = useValidator();
 const dialogVisible = ref(true);
 const gridEditRef = ref<AppGridEditMethod | null>(null);
@@ -86,11 +91,13 @@ const formconfig = reactive<AppFreeEditConfig>(
         prop: "cEmpCde",
         inputtype: "rtinput",
         title: "员工代码",
+        readonly: true,
         rules: [getRules("required", { change: true })],
       },
       {
         prop: "CEmpCnm",
         inputtype: "rtinput",
+        readonly: true,
         title: "员工名称",
         showExBtn: true,
         rules: [getRules("required", { change: true })],
@@ -139,7 +146,8 @@ const formconfig = reactive<AppFreeEditConfig>(
                     },
                   ],
                 };
-                freeEditRef.value?.setValue("cDptCde", selectObj.name);
+                setFormItem("cDptCde", obj);
+                freeEditRef.value?.setValue("cDptCde", selectObj.id);
               }
             });
           },
@@ -209,12 +217,13 @@ const gridconfig = reactive<AppGridEditConfig>(
         func: function () {
           let s = freeEditRef.value?.getFromValue();
           const pages = gridEditRef.value?.getTableValue();
-          const params = Object.assign(s, { pages: pages });
-          saveProdPages(params)
+          const params = Object.assign(s, { items: pages, preItems: pages });
+          saveBatchUndrDtyInfo(params)
             .then((res) => {
               const { code, data, msg } = res;
               if (200 === code) {
-                ElMessage.success("保存成功");
+                ElMessage.success(msg);
+                handleQuery();
               } else {
                 ElMessage.error(msg);
               }
@@ -233,7 +242,7 @@ const gridconfig = reactive<AppGridEditConfig>(
         // codeParam: { kindNo: "06", cStatus: "1" },
       },
       {
-        prop: "cProdNme",
+        prop: "cProdNo",
         inputtype: "rtselect",
         title: "产品",
         typeCode: "PROD_LIST",
@@ -266,6 +275,25 @@ const handleRowClick = (rowData: any) => {
   //   freeEditRef.value?.setValue("CEmpCnm", rowData.CEmpCnm);
   // }
 };
+//给表单下拉项赋值
+function setFormItem(key, obj) {
+  if (obj && Object.keys(obj).length) {
+    formconfig.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.btnItems && obj.btnItems) {
+          let newBtnItems = null;
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
+          }
+          newBtnItems = item.btnItems;
+          newBtnItems && (obj.btnItems = newBtnItems);
+        }
+        Object.assign(item, obj);
+      }
+    });
+  }
+}
 function copyInitProdNo(v: any) {
   gridconfig.endBtns = [];
   gridEditRef?.value?.setFormValue(v);

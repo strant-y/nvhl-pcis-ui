@@ -47,21 +47,30 @@ const formconfig1 = ref<AppFreeEditConfig>(
     fromUi: createFromUiConfig({
       cols: 2,
     }),
-    titleBtns:[
+    titleBtns: [
       createFreeButtonBase({
-        type:'primary',
+        type: "primary",
         label: "确定",
+        func: () => {
+          freeEditRef.value?.validate().then(() => {
+            props.method.addRow(freeEditRef.value?.getFromValue());
+            emits("handleClose");
+          });
+        },
       }),
       createFreeButtonBase({
         label: "取消",
-      })
-    ]
+        func: () => {
+          emits("handleClose");
+        },
+      }),
+    ],
   })
 );
 
 onMounted(() => {
-    formconfig1.value.fromSchema = props.data.fromSchema;
-    formconfig1.value.title = props.data.title;
+  formconfig1.value.fromSchema = props.data.fromSchema;
+  formconfig1.value.title = props.data.title;
 });
 </script>
 

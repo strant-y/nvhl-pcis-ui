@@ -157,6 +157,14 @@ export function getCommodityBase(queryParams: any): AxiosPromise<any> {
 export function saveProdPages(queryParams: any): AxiosPromise<any> {
     return post(`/prod/saveProdPages`, queryParams);
 }
+/**
+ * 核保人批量任职保存
+ * @param queryParams 
+ * @returns 
+ */
+export function saveBatchUndrDtyInfo(queryParams: any): AxiosPromise<any> {
+    return post(`/proddef/saveBatchUndrDtyInfo`, queryParams);
+}
 
 /**
  * 获取组件要素列表,绑定组件要素
