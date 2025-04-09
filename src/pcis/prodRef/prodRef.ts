@@ -1,5 +1,3 @@
-import Vue from "vue";
-
 import commonRef from "./commonRef/common.vue";
 import baseRef from "./baseRef/base.vue";
 import applicantRef from "./applicantRef/applicant.vue";
@@ -22,7 +20,7 @@ import plybaseRef from "./plyBaseRef/plybase.vue";
 import baseafterRef from "./baseafterRef/baseafter.vue";
 import informationRef from "./informationRef/information.vue";
 import specialAgr from "./specialAgrRef/SpecialAgreement.vue"
-import deDuctibledist from "./deDuctibleRef/deductibleDist.vue"
+import deDuctibledist from "./deDuctibleRef/deDuctibleDist.vue"
 
 import prodInfo from "./commonRef/prodInfo.vue";
 import relatedMainInsurance from "./commonRef/relatedMainInsurance.vue";
@@ -53,8 +51,8 @@ import healthNoticeAdd from "./commodityRef/HealthNoticeAdd.vue";
 import clauseConf from "./clauseConfRef/clauseConf.vue";
 // import prodaudit from "./commonRef/prodaudit.vue";
 import clauseConfBasicInfo from "./commonRef/ClauseConfBasicInfo.vue";
-import  ndustryCateModal  from "./commodityRef/ndustryCateModal.vue";
-import  cOccupCdeModal  from "./commodityRef/cOccupCdeModal.vue";
+import ndustryCateModal from "./commodityRef/ndustryCateModal.vue";
+import cOccupCdeModal from "./commodityRef/cOccupCdeModal.vue";
 
 import agentPre from "./commodityRef/agentPer.vue" //代理(经济)人
 import agentWorker from "./commodityRef/agentWorker.vue" //代理业务员
