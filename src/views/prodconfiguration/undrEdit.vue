@@ -163,7 +163,7 @@ const exRules = {
 /** 查询 */
 function save() {
   const param = getFrom();
-  const newparam = Object.assign(param, { type: "add" });
+  const newparam = Object.assign(param, { type: "edit" });
   saveUndrClsInfo(newparam)
     .then((res) => {
       const { code, data, msg } = res;

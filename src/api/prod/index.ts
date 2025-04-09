@@ -1188,5 +1188,9 @@ export function getAppFeeInfoNewUrl(queryParams: any): AxiosPromise<any> {
 export function getRenewalAppPolicy(queryParams: any): AxiosPromise<any> {
     return post(`/policy/getPolicy`, queryParams);
 }
+//新增清单保存
+export function saveDist(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/saveDist`, queryParams);
+}
 
 

@@ -1261,6 +1261,7 @@ let tableconfig = reactive<AppTableConfig>(
 
 //tabs切换
 const handleTabClick = (tab: any) => {
+  queryType.value = tab.props.name;
   currentTabName.value = tab.props.label;
   const i = tabs.value.findIndex((item) => item.name === tab.props.label);
   currentTabKey.value = i;
@@ -1477,6 +1478,7 @@ function handleQuery(flag?: boolean) {
   param["tEdrAppTmEnd"] = tEdrAppTmEnd; // 添加批改结束时间
   param["tIssueTmStart"] = tIssueTmStart; // 添加签单开始时间
   param["tIssueTmEnd"] = tIssueTmEnd; // 添加签单结束时间
+  param["queryType"] = queryType.value;
   getAppPolicyList(param)
     .then((res) => {
       const { code, data, msg } = res;
