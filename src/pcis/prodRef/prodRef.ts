@@ -22,7 +22,7 @@ import plybaseRef from "./plyBaseRef/plybase.vue";
 import baseafterRef from "./baseafterRef/baseafter.vue";
 import informationRef from "./informationRef/information.vue";
 import specialAgr from "./specialAgrRef/SpecialAgreement.vue"
-import deDuctibledist from "./deDuctibleRef/DeductibleDist.vue"
+import deDuctibledist from "./deDuctibleRef/DeDuctibleDist.vue"
 
 import prodInfo from "./commonRef/prodInfo.vue";
 import relatedMainInsurance from "./commonRef/relatedMainInsurance.vue";
@@ -80,7 +80,7 @@ const componentMap = {
   payinfoRef: payinfoRef,
   acctinfoRef: acctinfoRef,
   distRef: distRef,
-  DeductibleDistRef: deDuctibledist,
+  deductibleDistRef: deDuctibledist,
   // ciRef: ciRef,
   // ciMasterAgreementRef: ciMasterAgreementRef,
   // ourCompanyCiShareRef: ourCompanyCiShareRef,

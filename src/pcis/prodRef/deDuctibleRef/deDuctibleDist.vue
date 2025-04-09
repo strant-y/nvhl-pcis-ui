@@ -34,7 +34,7 @@ onMounted(() => {
 const method = {
   // func demo
   func1: () => {},
-  funcdeDuctibleadd: () => {
+  funcdeDuctiadd: () => {
     deDuctibleEditRef?.value?.addRow();
     const val = getFromValue();
     val.items.forEach((key, index) => {

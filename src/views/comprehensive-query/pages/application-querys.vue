@@ -91,6 +91,8 @@ const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
 const route = useRoute();
 const router = useRouter();
 const activeName = ref("1");
+const queryType = ref("");
+
 const homeJumpData = ref({}); //接收首页的参数，用于查询条件回显
 let addrowArr = [
   "cAppNo",
