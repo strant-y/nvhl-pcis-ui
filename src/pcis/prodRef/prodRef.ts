@@ -20,7 +20,6 @@ import plybaseRef from "./plyBaseRef/plybase.vue";
 import baseafterRef from "./baseafterRef/baseafter.vue";
 import informationRef from "./informationRef/information.vue";
 import specialAgr from "./specialAgrRef/SpecialAgreement.vue"
-import deDuctibledist from "./deDuctibleRef/deDuctibleDist.vue"
 
 import prodInfo from "./commonRef/prodInfo.vue";
 import relatedMainInsurance from "./commonRef/relatedMainInsurance.vue";
@@ -60,6 +59,7 @@ import prdFixSpec from "./commodityRef/prd-fix-spec.vue" //特别约定
 import underwriteRef from "./underwriteRef/underwrite.vue"
 import edrbaseRef from "./edrbaseRef/edrbase.vue"
 import edritemRef from "./edritemRef/edritem.vue"
+import deductibleDist from "./deDuctibleRef/deductibleDist.vue"
 
 /**用于动态组件的映射生成 */
 const componentMap = {
@@ -78,7 +78,7 @@ const componentMap = {
   payinfoRef: payinfoRef,
   acctinfoRef: acctinfoRef,
   distRef: distRef,
-  deductibleDistRef: deDuctibledist,
+  deductibleDistRef: deductibleDist,
   // ciRef: ciRef,
   // ciMasterAgreementRef: ciMasterAgreementRef,
   // ourCompanyCiShareRef: ourCompanyCiShareRef,
