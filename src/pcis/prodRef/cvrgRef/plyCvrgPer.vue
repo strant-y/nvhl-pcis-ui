@@ -353,9 +353,9 @@ function setFormValue(value: any) {
 function validate() {}
 
 function showFlush() {
-  tremTemplateRefs.value.forEach((item: any) => {
-    item.dataInit();
-  });
+    Object.keys(tremTemplateRefs.value).forEach((item: any) => {
+        tremTemplateRefs.value[item].dataInit();
+    });
 }
 
 function getTableValue(rowId: number, key: string) {}
@@ -376,9 +376,11 @@ function setDisabledAll(){
       item.hidden = true;
     })
   }
-  Object.keys(tremTemplateRefs.value).forEach((item: any) => {
-    tremTemplateRefs.value[item].setDisabledAll();
-  });
+  if( Object.keys(tremTemplateRefs.value).length > 0){
+      Object.keys(tremTemplateRefs.value).forEach((item: any) => {
+          tremTemplateRefs.value[item].setDisabledAll();
+      });
+  }
 }
 defineExpose({
   getFromValue,
