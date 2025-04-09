@@ -77,7 +77,7 @@ const formconfig = reactive<AppFreeEditConfig>(
                 gridEditRef.value?.addRowByData({
                   cProdNme: item.value,
                   cUndrClsCde: freeEditRef.value?.getValue("cUndrClsCde"),
-                  // cStatus: "0",
+                  cStatus: "0",
                 });
               });
               console.log("子组件传过来的值", res);
@@ -264,6 +264,8 @@ const gridconfig = reactive<AppGridEditConfig>(
         title: "是否启用",
         typeCode: "WEB_SYS_STA_DICT",
         codeParam: { cParCde: "yes_no" },
+        defaultValue: "1",
+        disabled: true,
       },
     ],
     fromUi: createGridFromUiConfig({

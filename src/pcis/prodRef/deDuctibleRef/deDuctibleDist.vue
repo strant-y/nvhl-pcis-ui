@@ -34,11 +34,11 @@ onMounted(() => {
 const method = {
   // func demo
   func1: () => {},
-  funcpayadd: () => {
+  funcdeDuctibleadd: () => {
     deDuctibleEditRef?.value?.addRow();
     const val = getFromValue();
     val.items.forEach((key, index) => {
-      key["Pay.nTms"] = index + 1;
+      key["deducti.nTms"] = index + 1;
     });
   },
   funcpaydel: () => {
@@ -51,7 +51,7 @@ const method = {
     deDuctibleEditRef?.value?.delRow(editIndex);
     const val = getFromValue();
     val.items.forEach((key, index) => {
-      key["Pay.nTms"] = index + 1;
+      key["deducti.nTms"] = index + 1;
     });
   },
 };
