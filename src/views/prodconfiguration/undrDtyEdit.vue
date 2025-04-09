@@ -68,8 +68,8 @@ const formconfig = reactive<AppFreeEditConfig>(
         type: "primary",
         label: "选择产品",
         func: async () => {
-          // const isValid = await freeEditRef.value?.validate();
-          // if (!isValid) return false;
+          const isValid = await freeEditRef.value?.validate();
+          if (!isValid) return false;
           dzmodal.open(BusinessCvrgTree, {}).then((res) => {
             if (res.type == "ok") {
               const selectObj = res.body;
@@ -223,6 +223,7 @@ const gridconfig = reactive<AppGridEditConfig>(
               const { code, data, msg } = res;
               if (200 === code) {
                 ElMessage.success(msg);
+                dialogVisible.value = false;
                 handleQuery();
               } else {
                 ElMessage.error(msg);
