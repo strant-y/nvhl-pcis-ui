@@ -70,7 +70,7 @@ const method = {
       let val= {}
       let valArr=[]
       for (let i = 0; i < Number(getValue("Base.nPayNumber")); i++) {
-           val= { "_dataId": "", "Pay.nTms": , "Pay.cPayorCde": "", "Pay.tPayBgnTm": "2025-04-09 00:00:00", "Pay.tPayEndTm": "2025-04-09 00:00:00", "Pay.nOwnPrm": , "Pay.cPayorNme": "", "Pay.nPayablePrm": result.value[i] }
+           val= { "_dataId": "", "Pay.nTms":"" , "Pay.cPayorCde": "", "Pay.tPayBgnTm": "2025-04-09 00:00:00", "Pay.tPayEndTm": "2025-04-09 00:00:00", "Pay.nOwnPrm": "", "Pay.cPayorNme": "", "Pay.nPayablePrm": result.value[i] }
           valArr.push(val)
       }
       //console.log(valArr)
