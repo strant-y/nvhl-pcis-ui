@@ -1,5 +1,4 @@
 <template>
-{{formconfig1}}
   <app-free-edit :freeEditConfig="formconfig1" ref="baseEditRef" />
   <comDialog ref="dialogRef"></comDialog>
 </template>
@@ -71,10 +70,10 @@ const method = {
       let val= {}
       let valArr=[]
       for (let i = 0; i < Number(getValue("Base.nPayNumber")); i++) {
-           val= { "_dataId": "feb5eb4df9f54e2b9df3bbc32808e4cd", "Pay.nTms": 123123, "Pay.cPayorCde": "12312", "Pay.tPayBgnTm": "2025-04-09 00:00:00", "Pay.tPayEndTm": "2025-04-09 00:00:00", "Pay.nOwnPrm": 12321, "Pay.cPayorNme": "阿斯顿", "Pay.nPayablePrm": result.value[i] }
+           val= { "_dataId": "", "Pay.nTms": , "Pay.cPayorCde": "", "Pay.tPayBgnTm": "2025-04-09 00:00:00", "Pay.tPayEndTm": "2025-04-09 00:00:00", "Pay.nOwnPrm": , "Pay.cPayorNme": "", "Pay.nPayablePrm": result.value[i] }
           valArr.push(val)
       }
-      console.log(valArr)
+      //console.log(valArr)
       opertaor.getTableRefs()["payinfo"].setFormValue(valArr);
   }
 },

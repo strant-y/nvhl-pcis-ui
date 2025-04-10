@@ -305,6 +305,63 @@ const edrBtn = [
   }),
 ];
 /**
+ * 核保按钮
+ * @type {FormButton[]}
+ */
+const uwBtn = [
+    createFreeButtonBase({
+        label: "保存",
+        type: "primary",
+        id: "btnUdr",
+        func: () => {
+            underwrite.value?.validate().then((isValid) => {
+                if (isValid) {
+                    submitUnderwritingFn();
+                } else {
+                    ElMessage.error("请填写必填项");
+                }
+            });
+        },
+    }),
+    createFreeButtonBase({
+        label: "费用信息",
+        type: "primary",
+        id: "modFee",
+        func: () => {
+            dzmodal
+                .open(CostInformation, { type: "Issuer", data: props.param })
+                .then((res: any) => {
+                    if (res.type === "ok") {
+                    }
+                });
+        },
+    }),
+    createFreeButtonBase({
+        label: "历次批单",
+        type: "primary",
+        id: "preOrder",
+        func: () => {
+            dzmodal
+                .open(PreviousdrOpnList, { type: "Issuer", data: {} })
+                .then((res: any) => {
+                    if (res.type === "ok") {
+                    }
+                });
+        },
+    }),
+    createFreeButtonBase({
+        label: "任务痕迹",
+        func: () => {
+            dzmodal
+                .open(CostInformation, { type: "Issuer", data: {} })
+                .then((res: any) => {
+                    if (res.type === "ok") {
+                    }
+                });
+        },
+    })
+]
+/**
  * 数据初始化
  * @param data
  */
@@ -318,14 +375,17 @@ const initPage = async () => {
     queryTyp: props.param.queryTyp,
   });
 
-  if (props.param.pageType === "PLY_UW") {
+  if (props.param.pageType === "PLY_UW_PROCESS_SCENE") {
     underwriteFlag = true;
   } else {
     underwriteFlag = false;
   }
   if (
     props.param.pageType === "EDR_APP_NEW_SCENE" ||
-    (props.param.pageType == "TEMPORARY_DEPOSIT" && props.param.cAppTyp == "E")
+    (props.param.pageType == "TEMPORARY_DEPOSIT" && props.param.cAppTyp == "E")||
+    (props.param.pageType == "PLY_UW_PROCESS_SCENE" && props.param.cAppTyp == "E")||
+    (props.param.pageType == "UW_READ_SCENE" && props.param.cAppTyp == "E")||
+    (props.param.pageType == "readonly" && props.param.cAppTyp == "E")
   ) {
     edrbaseFlag = true;
     edritemFlag = true;
@@ -408,6 +468,7 @@ async function loadAfter() {
       opertaor.getTableRefByKey("insured").setFormValue(baseafterobj);
     });
   } else if (props.param.pageType === "TEMPORARY_DEPOSIT") {
+    // 暂存单
     const cAppNo = props.param.cAppNo;
     loadAppPlyInfo(cAppNo);
     if (props.param.cAppTyp == "E") {
@@ -418,64 +479,21 @@ async function loadAfter() {
     } else if (props.param.cAppTyp == "A") {
       bthList.value = basicBtn;
     }
-  } else if (props.param.pageType === "PLY_UW") {
+  } else if (props.param.pageType === "PLY_UW_PROCESS_SCENE") {
+    //核保处理
     opertaor.setDisabledAll();
     const cAppNo = props.param.cAppNo;
     loadAppPlyInfo(cAppNo);
-    bthList.value.push(
-      createFreeButtonBase({
-        label: "保存",
-        type: "primary",
-        id: "btnUdr",
-        func: () => {
-          underwrite.value?.validate().then((isValid) => {
-            if (isValid) {
-              submitUnderwritingFn();
-            } else {
-              ElMessage.error("请填写必填项");
-            }
-          });
-        },
-      }),
-      createFreeButtonBase({
-        label: "费用信息",
-        type: "primary",
-        id: "modFee",
-        func: () => {
-          dzmodal
-            .open(CostInformation, { type: "Issuer", data: props.param })
-            .then((res: any) => {
-              if (res.type === "ok") {
-              }
-            });
-        },
-      }),
-      createFreeButtonBase({
-        label: "历次批单",
-        type: "primary",
-        id: "preOrder",
-        func: () => {
-          dzmodal
-            .open(PreviousdrOpnList, { type: "Issuer", data: {} })
-            .then((res: any) => {
-              if (res.type === "ok") {
-              }
-            });
-        },
-      }),
-      createFreeButtonBase({
-        label: "任务痕迹",
-        func: () => {
-          dzmodal
-            .open(CostInformation, { type: "Issuer", data: {} })
-            .then((res: any) => {
-              if (res.type === "ok") {
-              }
-            });
-        },
-      })
-    );
+    if (props.param.cAppTyp == "E") {
+        edritem.value?.handleQuery()
+        const getFormconfig=edrbase.value?.getFormconfig()
+        getFormconfig.fromSchema?.forEach((item) => {
+            item.disabled = true;
+        });
+    }
+    bthList.value = uwBtn;
   } else if (props.param.pageType === "EDR_APP_NEW_SCENE") {
+    // 批改申请-新增
     const cAppNo = props.param.cAppNo;
     edrbase.value?.setValue("EdrBase.cRatioTyp", "1");
     edrbase.value?.setValue("EdrBase.cEdrRsnBundleCde", props.param["cRsnCde"]);
@@ -497,6 +515,13 @@ async function loadAfter() {
     // const data = getAppPlyInfoRes.data;
     const cAppNo = props.param.cAppNo;
     loadAppPlyInfo(cAppNo);
+      if (props.param.cAppTyp == "E") {
+          edritem.value?.handleQuery()
+          const getFormconfig=edrbase.value?.getFormconfig()
+          getFormconfig.fromSchema?.forEach((item) => {
+              item.disabled = true;
+          });
+      }
     nextTick(() => {
       // console.log(data);
       // opertaor.setDataAll(data);
@@ -513,6 +538,18 @@ async function loadAfter() {
       //   .getRefTab("applicant")
       //   .setFormValue(lowercaseKeys(data["applicant"]));
     });
+  }else if (props.param.pageType === "UW_READ_SCENE") {
+    //核保查看
+    opertaor.setDisabledAll();
+    const cAppNo = props.param.cAppNo;
+    loadAppPlyInfo(cAppNo);
+    if (props.param.cAppTyp == "E") {
+        edritem.value?.handleQuery()
+        const getFormconfig=edrbase.value?.getFormconfig()
+        getFormconfig.fromSchema?.forEach((item) => {
+            item.disabled = true;
+        });
+    }
   } else if (props.param.cPlyNo === "orig") {
     bthList.value.push(
       createFreeButtonBase({
@@ -936,7 +973,7 @@ const submitUnderwritingFn = () => {
   res["user"]["opRelCde"] = "10030892";
   res["appNo"] = props.param.cAppNo;
   res["taskId"] = props.param.taskId;
-  res["appTyp"] = props.param.bsType;
+  res["appTyp"] = props.param.cAppTyp;
   res["undrMrk"] = res["cUndrMrk"];
   res["cAntiLnderRisk"] = "0"; //关联交易确认
   res["cIsTransaction"] = "0"; //反洗钱风险
@@ -946,10 +983,10 @@ const submitUnderwritingFn = () => {
   res["backUndrDptCnm"] = null; // 退回指定核保人员名称
   console.log(res);
   let submitUnder;
-  if (props.param.bsType === "A") {
+  if (props.param.cAppTyp === "A") {
     submitUnder = submitUnderwriting(res);
   }
-  if (props.param.bsType === "E") submitUnder = submitUnderwritingEdr(res);
+  if (props.param.cAppTyp === "E") submitUnder = submitUnderwritingEdr(res);
 
   submitUnder.then((res) => {
     console.log("submitUnderwriting-res", res);
