@@ -41,7 +41,7 @@
                   v-for="(item, index) in cardConfig.titleBtns"
                   :key="index"
                 >
-                  <rt-button v-if="!item.hidden" :item="item" />
+                  <rt-button :item="item" />
                 </template>
               </el-button-group>
               <a
@@ -70,7 +70,7 @@
             v-if="cardConfig.endBtns && cardConfig.endBtns.length > 0"
           >
             <template v-for="(item, index) in cardConfig.endBtns" :key="index">
-              <rt-button v-if="!item.hidden" :item="item" />
+              <rt-button :item="item" />
             </template>
           </div>
         </div>

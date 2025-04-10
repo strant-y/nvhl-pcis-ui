@@ -99,14 +99,6 @@ export function calcEdr(queryParams: any): AxiosPromise<any> {
 }
 
 /**
- * 批改申请核保
- * **/
-
-export function submitEdrToUndr(queryParams: any): AxiosPromise<any> {
-    return post(`/policy/submitEdr`, queryParams);
-}
-
-/**
  * 生成批文
  * @param queryParams
  */

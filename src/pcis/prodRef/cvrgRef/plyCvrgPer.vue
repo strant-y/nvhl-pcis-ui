@@ -360,34 +360,12 @@ function showFlush() {
 
 function getTableValue(rowId: number, key: string) {}
 
-function getFormconfig(){
-  return {
-    fromType:'custom'
-  };
-}
-function setDisabledAll(){
-  if(cardconfig.value.titleBtns && cardconfig.value.titleBtns.length>0){
-    cardconfig.value.titleBtns.forEach((item:any)=>{
-      item.hidden = true;
-    })
-  };
-  if(cardconfig.value.endBtns && cardconfig.value.endBtns.length>0){
-    cardconfig.value.endBtns.forEach((item:any)=>{
-      item.hidden = true;
-    })
-  }
-  Object.keys(tremTemplateRefs.value).forEach((item: any) => {
-    tremTemplateRefs.value[item].setDisabledAll();
-  });
-}
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   getTableValue,
   showFlush,
-  getFormconfig,
-  setDisabledAll
 });
 </script>
 

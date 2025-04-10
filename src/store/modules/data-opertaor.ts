@@ -91,8 +91,6 @@ export const dataOpertaor = defineStore(
             }
           } else if (f.fromType === 'grid') { // 表格模式时,修改表格属性,实现只读
             f.editFlag = false;
-          } else if (f.fromType === 'custom') {
-            tableRefs[key].setDisabledAll();
           }
           if (
             f.titleBtns &&
@@ -122,12 +120,12 @@ export const dataOpertaor = defineStore(
                   conf.fromSchema.forEach(f => {
                     if (f.inputtype === 'rtinputgroup') {
                       f.groupList.forEach((gkey: any) => {
-                        if (gkey.prop === item) {
+                        if(gkey.prop === item){
                           gkey.disabled = false;
                         }
                       });
                     } else {
-                      if (f.prop === item) {
+                      if(f.prop === item){
                         f.disabled = false;
                       }
                     }
@@ -136,7 +134,7 @@ export const dataOpertaor = defineStore(
               } else if (conf.fromType === 'grid') { // 表格模式时,修改表格属性,实现只读
                 if (conf.fromSchema && conf.fromSchema.length > 0) {
                   conf.fromSchema.forEach(gf => {
-                    if (gf.prop === item) {
+                    if(gf.prop === item){
                       conf.editList.push(gf.prop);
                     }
                   });
@@ -211,34 +209,6 @@ export const dataOpertaor = defineStore(
       });
       return r;
     }
-    const validateAll = async (): Promise<boolean> => {
-      // 1. 收集所有验证Promise并保留对应key
-      const entries = Object.entries(tableRefs); // 保留[key, ref]的映射关系
-      const validationPromises = entries.map(([key, ref]) => ref?.validate?.());
-
-      // 2. 等待所有Promise完成并关联结果与key
-      const results = await Promise.all(validationPromises);
-      // 3. 关联每个结果与对应的key
-      const resultMapping = entries.map(([key, ref], index) => (
-        {
-        key,
-        result: results[index],
-        refs:ref
-      }));
-
-      // 4. 汇总结果（示例：收集所有失败的key）
-      const failedKeys = resultMapping
-        .filter(item => item.result !== true)
-        .map(item => {
-          console.log("失败的表单key:"+ item.key);
-          return item.key
-        });
-
-      // 5. 返回验证结果和失败详情
-      const isValid = failedKeys.length === 0;
-
-      return isValid;
-    }
     /**
      * 首字母转换小写
      */
@@ -265,7 +235,6 @@ export const dataOpertaor = defineStore(
       firstCharLower,
       setDisabledAll,
       setUnDisabledByKeyList,
-      validateAll,
     };
   },
   {

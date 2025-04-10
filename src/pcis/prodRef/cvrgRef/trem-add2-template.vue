@@ -3,8 +3,8 @@
     <table style="width: 100%">
       <thead>
         <tr class="table-title">
-          <th style="width: 80px">序号</th>
-          <th style="width: 300px">附加条款名称</th>
+          <th style="width:80px">序号</th>
+          <th style="width:300px">附加条款名称</th>
           <th>费率(主险费率的百分比)</th>
           <th>保费</th>
           <th>备注</th>
@@ -19,36 +19,48 @@
           <td>
             <from-item
               v-model="item['Term.cClauseCode']"
-              :item="formcof.cClauseCode"
+              :item="{
+                inputtype: 'rttag',
+                typeCode: 'TermCodeTag',
+              }"
             />
           </td>
           <td>
             <from-item
               v-model="item['Term.nMainRate']"
-              :item="formcof.nMainRate"
+              :item="{
+                inputtype: 'rtnumber',
+                suffix: '‰',
+              }"
             />
           </td>
           <td>
             <from-item
               v-model="item['Term.nInsuranceFee']"
-              :item="formcof.nInsuranceFee"
+              :item="{
+                inputtype: 'rtnumber',
+                suffix: '元',
+              }"
             />
           </td>
           <td>
             <from-item
               v-model="item['Term.cRemarkInfo']"
-              :item="formcof.cRemarkInfo"
+              :item="{
+                inputtype: 'rtinput',
+              }"
             />
           </td>
           <td>
             <rtButton
-              v-if="!btnConf.delete.hidden"
               @click="
                 () => {
                   emit('delete', item);
                 }
               "
-              :item="btnConf.delete"
+              :item="{
+                label: '删除',
+              }"
             />
           </td>
         </tr>
@@ -71,51 +83,16 @@ const props = defineProps({
     required: true,
   },
 });
-onMounted(() => {});
-
-const btnConf = ref<{ [key: string]: { [key: string]: any } }>({
-  delete: {
-    label: "删除",
-  },
+onMounted(() => {
 });
 
-const formcof = ref<{ [key: string]: { [key: string]: any } }>({
-  cClauseCode: {
-    inputtype: "rttag",
-    typeCode: "TermCodeTag",
-  },
-  nMainRate: {
-    inputtype: "rtnumber",
-    suffix: "‰",
-  },
-  nInsuranceFee: {
-    inputtype: "rtnumber",
-    suffix: "元",
-  },
-  cRemarkInfo: {
-    inputtype: "rtinput",
-  },
-});
-
-function setDisabledAll() {
-  Object.keys(formcof.value).forEach((k: any) => {
-    formcof.value[k].disabled = true;
-  });
-  Object.keys(btnConf.value).forEach((k: any) => {
-    btnConf.value[k].hidden = true;
-  });
-}
-function dataInit(){}
-
-defineExpose({
-  dataInit,
-  setDisabledAll,
-});
+defineExpose({});
 
 defineOptions({
   name: "tremAddTemplate2",
-  inheritAttrs: false,
+  inheritAttrs: false
 });
+
 </script>
 <style lang="scss" scoped>
 table {

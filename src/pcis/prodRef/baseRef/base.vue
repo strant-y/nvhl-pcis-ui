@@ -44,6 +44,9 @@ onMounted(async () => {
   if (sessionStorage.getItem("toMyPageData")) {
     sessionData.value = JSON.parse(sessionStorage.getItem("toMyPageData"));
   }
+  const value = getValue('Base.nAmt');
+  console.log("测试Base.nAmt得值");
+  console.log(value);
 });
 
 // 绑定方法
@@ -51,6 +54,49 @@ const method = {
   // func demo
   func1: () => {
     console.log(getRules);
+  },
+  //缴费拆分按钮事件
+  splitPayNumber(){
+    if(getValue("Base.nPayNumber")!=''){
+      const totalAmount = Number(getValue("Base.nPrm"));
+      const splitCount = Number(getValue("Base.nPayNumber"));
+      const result = ref<number[]>([]);
+      const quotient = Math.floor(totalAmount / splitCount);
+      const remainder = totalAmount % splitCount;
+      result.value = Array(splitCount).fill(quotient);
+      if (remainder > 0) {
+        result.value[0] += remainder;
+      }
+      let val= {}
+      let valArr=[]
+      for (let i = 0; i < Number(getValue("Base.nPayNumber")); i++) {
+           val= { "_dataId": "", "Pay.nTms":"" , "Pay.cPayorCde": "", "Pay.tPayBgnTm": "2025-04-09 00:00:00", "Pay.tPayEndTm": "2025-04-09 00:00:00", "Pay.nOwnPrm": "", "Pay.cPayorNme": "", "Pay.nPayablePrm": result.value[i] }
+          valArr.push(val)
+      }
+      //console.log(valArr)
+      opertaor.getTableRefs()["payinfo"].setFormValue(valArr);
+  }
+},
+  //付费约定下拉事件
+  cInstMrkChange(val: any) {
+    setValue("Base.nPayNumber", '1');
+    if(val=='5'){
+      setFormItem("Base.nPayNumber", { disabled: false });
+    }else{
+      setFormItem("Base.nPayNumber", { disabled: true });
+    }
+  },
+  //争议处理选择事件
+  cDisptSttlCdeChange(val){
+    if(val=='A'){
+      setFormItem("Base.cDisptSttlOrg", { disabled: false });
+      setValue("Base.cDisptSttlOrg", "提交____仲裁委员会");
+    }else{
+      setFormItem("Base.cDisptSttlOrg", { disabled: true });
+      setValue("Base.cDisptSttlOrg", "");
+      
+    }
+    
   },
   //总保费下拉事件
   cPrmCurChange: (val: any) => {

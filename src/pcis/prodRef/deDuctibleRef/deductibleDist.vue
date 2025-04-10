@@ -1,5 +1,5 @@
 <template>
-  <app-grid-edit :gridEditConfig="formconfig1" ref="payinfoEditRef" />
+  <app-grid-edit :gridEditConfig="formconfig1" ref="deDuctibleEditRef" />
 </template>
 
 <script setup lang="ts">
@@ -18,7 +18,7 @@ const props = defineProps({
   },
 });
 
-const payinfoEditRef = ref<AppGridEditMethod | null>(null);
+const deDuctibleEditRef = ref<AppGridEditMethod | null>(null);
 const formconfig1 = reactive(createAppGridEditConfig({}));
 
 onMounted(() => {
@@ -28,32 +28,31 @@ onMounted(() => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
-  
 });
 
 // 绑定方法
 const method = {
   // func demo
   func1: () => {},
-  funcpayadd: () => {
-      payinfoEditRef?.value?.addRow();
-      const val=getFromValue()
-      val.items.forEach((key,index) => {
-          key['Pay.nTms']=index+1
-      });
+  funcdeDuctiadd: () => {
+    deDuctibleEditRef?.value?.addRow();
+    const val = getFromValue();
+    val.items.forEach((key, index) => {
+      key["deducti.nTms"] = index + 1;
+    });
   },
   funcpaydel: () => {
-      const selData=payinfoEditRef?.value?.getSelectRow()
-      if (!selData) {
-          ElMessage.error("请选择要删除的数据!");
-          return;
-      }
-      const editIndex=selData['_dataId']
-      payinfoEditRef?.value?.delRow(editIndex);
-      const val=getFromValue()
-      val.items.forEach((key,index) => {
-          key['Pay.nTms']=index+1
-      });
+    const selData = deDuctibleEditRef?.value?.getSelectRow();
+    if (!selData) {
+      ElMessage.error("请选择要删除的数据!");
+      return;
+    }
+    const editIndex = selData["_dataId"];
+    deDuctibleEditRef?.value?.delRow(editIndex);
+    const val = getFromValue();
+    val.items.forEach((key, index) => {
+      key["deducti.nTms"] = index + 1;
+    });
   },
 };
 
@@ -61,22 +60,22 @@ const method = {
 const exRules = {};
 
 function getFromValue() {
-  return payinfoEditRef?.value?.getFromValue();
+  return deDuctibleEditRef?.value?.getFromValue();
 }
 
 function setFormValue(value: any) {
-  payinfoEditRef?.value?.setFormValue(value);
+  deDuctibleEditRef?.value?.setFormValue(value);
 }
 
 function validate() {
-  return payinfoEditRef?.value?.validate();
+  return deDuctibleEditRef?.value?.validate();
 }
 
 function getTableValue(rowId: number, key: string) {
-  payinfoEditRef?.value?.getTableValue(rowId, key);
+  deDuctibleEditRef?.value?.getTableValue(rowId, key);
 }
 
-function getFormconfig(){
+function getFormconfig() {
   return formconfig1;
 }
 
@@ -85,7 +84,7 @@ defineExpose({
   setFormValue,
   validate,
   getTableValue,
-  getFormconfig
+  getFormconfig,
 });
 </script>
 

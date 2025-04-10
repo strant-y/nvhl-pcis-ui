@@ -45,7 +45,7 @@
                     func:(v)=>{
                         if ('A' === v) {
                             setValue('cUndrOpnList', '')
-                            if ('E' === props.param['cAppTyp']){
+                            if ('E' === props.param['bsType']){
                                 setFormItem("cUndrOpnList", {
                                     loadData: [{label: '审核通过', value: '6'}]
                                 })

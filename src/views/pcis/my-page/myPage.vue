@@ -63,7 +63,7 @@
           <el-container>
             <el-header height="60px">
               <el-affix
-                :offset="95"
+                :offset="90"
                 style="text-align: center; padding: 5px; background: #ebedfc"
               >
                 <div class="tp" style="background: #ebedfc">
@@ -133,7 +133,7 @@
                       k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'
                     "
                     :pageSchema="k.pageSchema"
-                   
+                    :edrAll="edrAll"
                   />
                 </div>
               </template>
@@ -175,7 +175,6 @@ import {
   submitUnderwriting,
   calcEdr,
   submitUnderwritingEdr,
-  submitEdrToUndr,
 } from "../../../api/query/index";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import moment from "moment";
@@ -216,6 +215,7 @@ const tempFindBtn = [];
 let underwriteFlag = false;
 let edrbaseFlag = false;
 let edritemFlag = false;
+let edrAll = false;//判断是否为批改场景
 const user = JSON.parse(sessionStorage.getItem("user"));
 const nAmt = ref(0.0);
 const nPrm = ref(0.0);
@@ -226,8 +226,6 @@ onBeforeMount(() => {
   console.log("路由参数props.param", props.param);
   initPage();
 });
-
-  
 /**
  * 投保需要的按钮
  */
@@ -283,6 +281,11 @@ const basicBtn = [
 
     },
   }),
+  createFreeButtonBase({
+    label: "额度明细",
+    type: "primary",
+    func: () => {},
+  })
 ];
 /**
  * 一般批改按钮
@@ -315,10 +318,7 @@ const edrBtn = [
   createFreeButtonBase({
     label: "申请核保",
     type: "primary",
-    id: "btnSubmitEdr",
-    func: () => {
-        submitEdrToUndrFun();
-    },
+    func: () => {},
   }),
 ];
 /**
@@ -406,13 +406,15 @@ const initPage = async () => {
   ) {
     edrbaseFlag = true;
     edritemFlag = true;
+    edrAll=true;
   } else {
     edrbaseFlag = false;
     edritemFlag = false;
+    edrAll=false;
   }
   // 页面初始化
   const formconfig11 = JSON.parse(getProductRes.data);
-  console.log("页面初始化返回数据", formconfig11);
+  //console.log("页面初始化返回数据", formconfig11);
   opertaor.setTableConfig(formconfig11);
   renderComponents();
 };
@@ -513,11 +515,11 @@ async function loadAfter() {
     edrbase.value?.setValue("EdrBase.cRatioTyp", "1");
     edrbase.value?.setValue("EdrBase.cEdrRsnBundleCde", props.param["cRsnCde"]);
     edrbase.value?.setValue("EdrBase.cEdrType", props.param["cEdrType"]);
-    if(props.param["cRsnCde"]!='FZ'){
+    if(props.param["cEdrType"]!='FZ'){
+        opertaor.setDisabledAll();
+        getEdrRsnItemFun(props.param["cProdNo"],props.param["cDptCde"],props.param["cRsnCde"],props.param["cRsnCde"],props.param["cEdrType"],props.param["cGrpMrk"])
         edrbase.value?.setValue("EdrBase.cEdrRsnDetail",[props.param["cRsnCde"]]);
     }
-    opertaor.setDisabledAll();
-    getEdrRsnItemFun(props.param["cProdNo"],props.param["cDptCde"],props.param["cRsnCde"],props.param["cRsnCde"],props.param["cEdrType"],props.param["cGrpMrk"])
     loadAppPlyInfo(cAppNo);
     bthList.value = edrBtn;
   } else if (props.param.pageType === "readonly") {
@@ -610,6 +612,11 @@ async function loadAfter() {
         label: "反洗钱扩展信息",
         type: "primary",
         func: () => {},
+      }),
+      createFreeButtonBase({
+        label: "额度明细",
+        type: "primary",
+        func: () => {},
       })
     );
   } else if (props.param.pageType === "copy") {
@@ -661,6 +668,11 @@ async function loadAfter() {
         label: "反洗钱扩展信息",
         type: "primary",
         func: () => {},
+      }),
+      createFreeButtonBase({
+        label: "额度明细",
+        type: "primary",
+        func: () => {},
       })
     );
   }
@@ -705,9 +717,7 @@ const loadAppPlyInfo = (CAppNo) => {
       console.log("转换的数据", ops);
       if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
-        if(res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail']!=''&&res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail']!=null){
-            res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail']=res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail'].split(',')
-        }
+        res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail']=[res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail']]
         console.log("EdrBaseData", EdrBaseData);
         edrbase.value?.setFormValue(EdrBaseData);
       }
@@ -811,6 +821,12 @@ const submitToUndrFn = () => {
     }
   });
 };
+
+/**
+ * 额度明细弹窗
+ */
+
+
 /**
  * 投保单保存
  * **/
@@ -916,7 +932,6 @@ const saveEdrPlyInfo = () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
   res["EdrBase"] = edrbase.value?.getFromValue();
-  res["EdrBase"]['EdrBase.cEdrRsnDetail']= res["EdrBase"]['EdrBase.cEdrRsnDetail'].join()
   console.log(res);
   saveEdrAppPlyInfo(res).then((res) => {
     console.log("saveAppPlyInfo-res", res);
@@ -926,9 +941,11 @@ const saveEdrPlyInfo = () => {
       console.log("转换的数据", ops);
       ElMessage.success(res.msg);
       opertaor.setDataAll(ops);
-      const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
-      res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail']=res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail'].split(',')
-      edrbase.value?.setFormValue(EdrBaseData)
+    if (res["res"]["composition"]["EdrBase"]) {
+        const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
+        res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail']=JSON.parse(res["res"]["composition"]["EdrBase"][0]['EdrBase.cEdrRsnDetail'])
+        edrbase.value?.setFormValue(EdrBaseData);
+    }
     } else {
       ElMessage.error(res.msg);
     }
@@ -952,36 +969,10 @@ const generateEndorse = () => {
         btn.loading = false;
         if (res["code"] == "200") {
             const cEdrCtnt=res['data']['data']['cEdrCtnt'] //批文
-            const edrRsn=res['data']['data']['edrRsn'] //批文
             cacheKey.value=res['data']['data']['cacheKey']
             edrbase.value?.setValue('EdrBase.cEdrCtnt',cEdrCtnt)
             edrbase.value?.setValue('EdrBase.cacheKey',cacheKey.value)
-            edrbase.value?.setValue('EdrBase.cEdrRsnDetail',edrRsn)
             edritem.value?.handleQuery()
-            ElMessage.success(res.msg);
-        } else {
-            ElMessage.error(res.msg);
-        }
-    });
-};
-/**
- * 批单申请核保
- */
-const submitEdrToUndrFun = () => {
-    const btn = getBtn("btnSubmitEdr");
-    btn.loading = true;
-    const res = {};
-    const base = opertaor.getTableRefByKey("plyBase").getFromValue();
-    res["user"] = user;
-    res["appNo"] = base["Base.cAppNo"];
-    res["plyNo"] = base["Base.cPlyNo"];
-    console.log(res);
-    submitEdrToUndr(res).then((res) => {
-        btn.loading = false;
-        console.log("批改申请核保", res);
-        // ElMessage.success(res.msg);
-        // history.back();
-        if (res["code"] == "200") {
             ElMessage.success(res.msg);
         } else {
             ElMessage.error(res.msg);
@@ -1052,21 +1043,11 @@ function getcacheKey(){
     return cacheKey.value
 }
 
-
-function setTmDay(tmday:any){ 
-  tmDay.value = tmday
-}
-
 opertaor.setFatherPage({
   currentIndex: currentIndex,
   lowercaseKeys: lowercaseKeys,
   getcacheKey: getcacheKey,
-  setTmDay: setTmDay
-
- 
 });
-
-
 </script>
 
 <style scoped>

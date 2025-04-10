@@ -194,7 +194,7 @@
                 /></a>
               </el-tooltip>
             </template>
-            <template v-if="index !== item.tableBtn.length - 1&& !btn.hideBtns?.(scope.row)">
+            <template v-if="index !== item.tableBtn.length - 1&& !btn.hideBtns?.(scope.row) && index !=0"">
               <el-divider direction="vertical" />
             </template>
           </template>

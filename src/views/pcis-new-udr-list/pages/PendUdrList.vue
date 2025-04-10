@@ -1316,7 +1316,7 @@ function updateUdr(row: any) {
         TaskId: row.curtTask,
         scene: SCENE_PLAN_UW_PROCESS,
         CProdNo: "000000",
-        cAppTyp: row.bsType,
+        bsType: row.bsType,
       };
       const en = JSON.stringify(data);
       router.push({
@@ -1329,7 +1329,7 @@ function updateUdr(row: any) {
         TaskId: row.curtTask,
         "Base.CProdNo": row.prodNo,
         scene: SCENE_PLAN_UW_PROCESS,
-        cAppTyp: row.bsType,
+        bsType: row.bsType,
       });
       router.push({
         path: "/index/sys-right-basic/configPlan/detail",
@@ -1389,13 +1389,12 @@ function updateUdrDetail(row: any) {
           // scene: SCENE_PLY_UW_PROCESS,
           cAppNo: row.objId,
           taskId: row.curtTask,
-          cAppTyp: row.bsType,
+          bsType: row.bsType,
           cProdNo: row.prodNo,
           cCiMrk: r.data.cCiMrk,
           cGrpMrk: r.data.cGrpMrk,
           cDptCde: r.data.cDptCde,
-          cDptCnm:row.uwDptName,
-          pageType: "PLY_UW_PROCESS_SCENE",
+          pageType: "PLY_UW",
         });
         router.push({
           path: "/pcis/my-page",
@@ -1411,15 +1410,14 @@ function updateUdrDetail(row: any) {
               : SCENE_PLY_UW_PROCESS,
           cAppNo: row.objId,
           taskId: row.curtTask,
-          cAppTyp: row.bsType,
+          bsType: row.bsType,
           cProdNo: row.prodNo,
           cCiMrk: r.data.cCiMrk,
           cRsnCde: r.data.cEdrRsnBundleCde,
           cEdrType: r.data.cEdrType,
           cGrpMrk: r.data.cGrpMrk,
           cDptCde: r.data.cDptCde,
-          cDptCnm:row.uwDptName,
-          pageType: "PLY_UW_PROCESS_SCENE",
+          pageType: "PLY_UW",
         });
         router.push({
           path: "/pcis/my-page",
@@ -1458,7 +1456,7 @@ function handleWorkFlow(row: any, type: any) {
                 TaskId: row.curtTask,
                 "Base.CProdNo": row.prodNo,
                 scene: SCENE_PLAN_UW_PROCESS,
-                cAppTyp: row.bsType,
+                bsType: row.bsType,
               });
               router.push({
                 path: "/pcis/my-page",
@@ -1540,7 +1538,7 @@ function handle_hasReceived(row: any) {
             TaskId: curtTask,
             scene: SCENE_PLAN_UW_PROCESS,
             CProdNo: "000000",
-            cAppTyp: row.bsType,
+            bsType: row.bsType,
           };
           const en = JSON.stringify(data);
           router.push({
@@ -1616,52 +1614,27 @@ function showDetails(row: any) {
       });
     }
   } else {
-      getBaseInfoByAppNo({ appNo: row.objId }).then((r: any) => {
-          if (r.code !== 200) {
-              ElMessage.error({ message: r.msg, duration: 6000 });
-          } else {
-              if (row.bsType === "A") {
-                  const en = JSON.stringify({
-                      // scene: SCENE_PLY_UW_PROCESS,
-                      cAppNo: row.objId,
-                      taskId: row.curtTask,
-                      cAppTyp: row.bsType,
-                      cProdNo: row.prodNo,
-                      cCiMrk: r.data.cCiMrk,
-                      cGrpMrk: r.data.cGrpMrk,
-                      cDptCde: r.data.cDptCde,
-                      cDptCnm:row.uwDptName,
-                      pageType: "UW_READ_SCENE",
-                  });
-                  router.push({
-                      path: "/pcis/my-page",
-                      query: {
-                          param: en,
-                      },
-                  });
-              } else {
-                  const en = JSON.stringify({
-                      cAppNo: row.objId,
-                      taskId: row.curtTask,
-                      cAppTyp: row.bsType,
-                      cProdNo: row.prodNo,
-                      cCiMrk: r.data.cCiMrk,
-                      cRsnCde: r.data.cEdrRsnBundleCde,
-                      cEdrType: r.data.cEdrType,
-                      cGrpMrk: r.data.cGrpMrk,
-                      cDptCde: r.data.cDptCde,
-                      cDptCnm:row.uwDptName,
-                      pageType: "UW_READ_SCENE",
-                  });
-                  router.push({
-                      path: "/pcis/my-page",
-                      query: {
-                          param: en,
-                      },
-                  });
-              }
-          }
-      });
+    const en = JSON.stringify({
+      scene:
+        row.cEdrRsnBundleCde === "BL"
+          ? SCENE_PLY_APP_READBEARER
+          : SCENE_PLY_APP_READ,
+      cAppNo: row.objId ? row.prodNo : row.cProdNo,
+      cProdNo: row.prodNo ? row.prodNo : row.cProdNo,
+      bsType: row.bsType,
+      cJiMrk: row.cJiMrk,
+      cDptCde: row.cDptCde,
+      cCiMrk: row.cCiMrk,
+      cGrpMrk: row.cGrpMrk,
+      cRsnCde: row.cEdrRsnBundleCde,
+      pageType: "readonly",
+    });
+    router.push({
+      path: "/pcis/my-page",
+      query: {
+        param: en,
+      },
+    });
   }
 }
 
@@ -1679,14 +1652,13 @@ function handleEdit(row: any) {
     scene: scene,
     cAppNo: row.objId,
     cProdNo: row.prodNo,
-    cAppTyp: row.bsType,
+    csType: row.bsType,
     cJiMrk: row.cJiMrk,
     cDptCde: row.cDptCde,
-    cDptCnm:row.uwDptName,
     cCiMrk: row.cCiMrk,
     cGrpMrk: row.cGrpMrk,
     cRsnCde: row.cEdrRsnBundleCde,
-    pageType: "PLY_UW_PROCESS_SCENE",
+    pageType: "PLY_UW",
   });
   router.push({
     path: "/pcis/my-page",
