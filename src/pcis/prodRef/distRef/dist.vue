@@ -1,11 +1,15 @@
 <template>
   <div>
     <myCard :cardConfig="cardconfig">
-      <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef" />
+      <app-table
+        :tableConfig="tableconfig"
+        v-model:pageresult="pageresult"
+        ref="tableRef"
+      />
     </myCard>
-    
+
     <comDialog ref="dialog"></comDialog>
-   </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -13,7 +17,12 @@ import {
   AppGridEditMethod,
   createAppGridEditConfig,
 } from "@/shared/app-grid-edit-config";
-import { AppTableConfig, AppTableMethod, createTableEditConfig } from "@/shared/app-table-config";
+import {
+  AppTableConfig,
+  AppTableMethod,
+  createTableEditConfig,
+} from "@/shared/app-table-config";
+import { selectDist, checkAppBase } from "@/api/prod/index";
 import { formInit } from "@/shared/from-init";
 import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
@@ -28,11 +37,11 @@ const props = defineProps({
 });
 
 const pageresult = reactive<Pageresult>({
-	result: "",
-	/** 数据列表 */
-	list: [],
-	/** 总数 */
-	total: 0,
+  result: "",
+  /** 数据列表 */
+  list: [],
+  /** 总数 */
+  total: 0,
 });
 const tableRef = ref<AppTableMethod | null>(null);
 const cardconfig = ref<CardConfig>(creatCardConfig({}));
@@ -50,8 +59,8 @@ onMounted(async () => {
   tableconfig.value.showEdit = true;
   tableconfig.value.fromSchema = formconfig1.value.fromSchema;
   tableconfig.value.formconfig = createAppGridEditConfig({
-    titleBtns:formconfig1.value.titleBtns,
-    fromSchema:formconfig1.value.distSchema,
+    titleBtns: formconfig1.value.titleBtns,
+    fromSchema: formconfig1.value.distSchema,
   });
   // addFakeData();
 });
@@ -61,31 +70,29 @@ const method = {
   // func demo
   func1: () => {},
   funcdistadd: () => {
-    dialog.value?.open(
-    "distAdd",
-    { fromSchema: tableconfig.value.fromSchema,
-      title:"新增"
-     },
-    {
-      isOk: (res: any) => {
-      },
-    },
-    { width:'60' }
-  );
+    let baseFlag = opertaor.getDataAll().plyBase["Base.cAppNo"];
+    checkAppBase({ cAppNo: baseFlag }).then((res) => {
+      if (res.code === 200) {
+        dialog.value?.open(
+          "distAdd",
+          { fromSchema: tableconfig.value.fromSchema, title: "新增" },
+          {
+            isOk: (res: any) => {},
+          },
+          { width: "60" }
+        );
+      } else {
+        ElMessage.error("请先保存申请单!");
+      }
+    });
   },
   handleQuery: () => {
     const selData = tableRef?.value?.getFromValue();
-    console.log(selData);
-    // if (!selData) {
-    //   ElMessage.error("请选择要删除的数据!");
-    //   return;
-    // }
-    // const editIndex = selData["_dataId"];
-    // distEditRef?.value?.delRow(editIndex);
-    // const val = getFromValue();
-    // val.items.forEach((key, index) => {
-    //   key["Dist.ids"] = index + 1;
-    // });
+    selectDist(selData).then((res) => {
+      console.log(res, "=========");
+      // if (res.code === 0) {
+      // }
+    });
   },
 };
 
