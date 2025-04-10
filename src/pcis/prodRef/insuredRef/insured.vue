@@ -54,27 +54,267 @@ function setFormItem(key, obj) {
     });
   }
 }
+//  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
+const checkUser = ()=>{
+  let obj = {};
+  const tabref = opertaor.getTableRefs(); 
+  const applicantValue = tabref["insured"].getFromValue();
+//  只要4个有值 去请求客户信息
+  if((applicantValue['Insured.cClntMrk'] !==null && applicantValue['Insured.cClntMrk'] !==undefined && applicantValue['Insured.cClntMrk'] !=='') &&applicantValue['Insured.cAppNme']&&
+  applicantValue['Insured.cCertfCde']&&applicantValue['Insured.cCertfCls'] ){
+     console.log('根据4个选项 请求客户代码')
+ 
+    //  obj = {'Insured.cCertfCde':'9000000504'}
+    // obj['Insured.cInsuredCde'] = '0008'
+    // obj['Insured.cAppCde'] = '0009'
+
+    //  tabref ['insured'].setFormValue(obj);
+
+  }
+
+  //  cClntMrk  被保人性质 
+  //  cAppNme  客户名称
+  //  cCertfCde    身份号码
+  //  cCertfCls   身份证类型
+  console.log('checkUser', applicantValue)
+}
+
 // 绑定方法
 const method = {
-  // func demo
-  func1: () => {},
+  func: ()=>{
+ 
+  },
+  func1: () => {
+    
+  },
+  funCheckUser: ()=>{
+    checkUser()    // 根据名称  被保人性质 证件类型 证件号码查询用户信息 
+
+  },
   funccopyvalue: () => {
-    const tabref = opertaor.getTableRefs();
+    const tabref = opertaor.getTableRefs(); 
     const applicantValue = tabref["applicant"].getFromValue();
-    const insuredValue = {};
+    // const applicantValue2 = tabref["insured"].getFromValue();
+    let insuredValue ={};  
+    console.log('applicant---data',applicantValue) 
+    console.log('insured----data',insuredValue)
+ 
     for (const k in applicantValue) {
-      const key = "Insured." + k.split(".")[1];
-      if (k.split(".")[1] == "cAppNme") {
-        insuredValue["Insured.cInsuredNme"] =
-          applicantValue["Applicant.cAppNme"];
-      } else if (k.split(".")[1] == "cAppCde") {
-        insuredValue["Insured.cInsuredCde"] =
-          applicantValue["Applicant.cAppCde"];
-      } else {
-        insuredValue[key] = applicantValue[k];
+      switch(k){
+        case 'Applicant.cAppNme':
+        insuredValue['Insured.cAppNme'] = applicantValue[k]
+          break;
+        case 'Applicant.cCertfCde':
+        insuredValue['Insured.cCertfCde'] =  applicantValue[k]
+        break;
+        case 'Applicant.cCertfCls':
+        insuredValue['Insured.cCertfCls'] =  applicantValue[k]
+        break;
+        case 'Applicant.nAge':
+        insuredValue['Insured.nAge'] =  applicantValue[k]
+        break;
+        case 'Applicant.cSex':
+        insuredValue['Insured.cSex'] =  applicantValue[k]
+        break;
+        case 'Applicant.cStkMrk':
+        insuredValue['Insured.cStkMrk'] =  applicantValue[k]
+        break;
+        case 'Applicant.tBirthday':
+        insuredValue['Insured.tBirthday'] =  applicantValue[k]
+        break;
+        case 'Applicant.cCertfCls':
+        insuredValue['Insured.cCertfCls'] =  applicantValue[k]
+        break;
+        case 'Applicant.cClntMrk':
+        insuredValue['Insured.cClntMrk'] =  applicantValue[k]
+        break;
+        case 'Applicant.tCertfBgnDate':
+        insuredValue['Insured.tCertfBgnDate'] =  applicantValue[k]
+        break;
+        case 'Applicant.tCertfEndDate':
+        insuredValue['Insured.tCertfEndDate'] =  applicantValue[k]
+        break;
+        case 'Applicant.cLongendTyp':
+        insuredValue['Insured.cLongendTyp'] =  applicantValue[k]
+        break;
+
+        case 'Applicant.cIsBranch':
+        insuredValue['Insured.cIsBranch'] =  applicantValue[k]
+        break;
+        case 'Applicant.tBirthday':
+        insuredValue['Insured.tBirthday'] =  applicantValue[k]
+        break;
+        case 'Applicant.cSex':
+        insuredValue['Insured.cSex'] =  applicantValue[k]
+        break;
+        case 'Applicant.cNation':
+        insuredValue['Insured.cNation'] =  applicantValue[k]
+        break;
+
+        case 'Applicant.cOccupTyp':
+        insuredValue['Insured.cOccupTyp'] =  applicantValue[k]
+        break;
+        // case 'Applicant.cClntMrk':
+        // insuredValue['Insured.cClntMrk'] =  applicantValue[k]
+        // break;
+        case 'Applicant.cMrg':
+        insuredValue['Insured.cMrg'] =  applicantValue[k]
+        break;
+        case 'Applicant.cCity':
+        insuredValue['Insured.cCity'] =  applicantValue[k]
+        break;
+        case 'Applicant.cCountry':
+        insuredValue['Insured.cCountry'] =  applicantValue[k]
+        break;
+        case 'Applicant.cCounty':
+        insuredValue['Insured.cCounty'] =  applicantValue[k]
+        break;
+        case 'Applicant.cProvince':
+        insuredValue['Insured.cProvince'] =  applicantValue[k]
+        break;
+        case 'Applicant.cRegisterSuffixAddr':
+        insuredValue['Insured.cRegisterSuffixAddr'] =  applicantValue[k]
+        break;
+        case 'Applicant.cRegisteredcapDre':
+        insuredValue['Insured.cRegisteredcapDre'] =  applicantValue[k]
+        break;
+        case 'Applicant.cZipCde':
+        insuredValue['Insured.cZipCde'] =  applicantValue[k]
+        break;
+        case 'Applicant.cFax':
+        insuredValue['Insured.cFax'] =  applicantValue[k]
+        break;
+        case 'Applicant.cEmail':
+        insuredValue['Insured.cEmail'] =  applicantValue[k]
+        break;
+        case 'Applicant.cTrdCde':
+        insuredValue['Insured.cTrdCde'] =  applicantValue[k]
+        break;
+        case 'Applicant.nEntprisPeopTtl':
+        insuredValue['Insured.nEntprisPeopTtl'] =  applicantValue[k]
+        break;
+        case 'Applicant.cIsIndvduBiz':
+        insuredValue['Insured.cIsIndvduBiz'] =  applicantValue[k]
+        break;
+        case 'Applicant.cTel':
+        insuredValue['Insured.cTel'] =  applicantValue[k]
+        break;
+        case 'Applicant.cMobile':
+        insuredValue['Insured.cMobile'] =  applicantValue[k]
+        break;
+        case 'Applicant.cWorkDpt':
+        insuredValue['Insured.cWorkDpt'] =  applicantValue[k]
+        break;
+        case 'Applicant.cCntrNme':
+        insuredValue['Insured.cCntrNme'] =  applicantValue[k]
+        break;
+        case 'Applicant.cOperaterCertfTyp':
+        insuredValue['Insured.cOperaterCertfTyp'] =  applicantValue[k]
+        break;
+        case 'Applicant.tOperaterCertfEndTm':
+        insuredValue['Insured.tOperaterCertfEndTm'] =  applicantValue[k]
+        break;
+        case 'Applicant.cGreenIndustryCustomers':
+        insuredValue['Insured.cGreenIndustryCustomers'] =  applicantValue[k]
+        break;
+        case 'Applicant.cRelateNo':
+        insuredValue['Insured.cRelateNo'] =  applicantValue[k]
+        break;
+        case 'Applicant.cEdubackgroudTyp':
+        insuredValue['Insured.cEdubackgroudTyp'] =  applicantValue[k]
+        break;
+        case 'Applicant.cGreenIndustryList':
+        insuredValue['Insured.cGreenIndustryList'] =  applicantValue[k]
+        break;
+        case 'Applicant.nYearincomeNum':
+        insuredValue['Insured.nYearincomeNum'] =  applicantValue[k]
+        break;
+        case 'Applicant.cFirmscaleTyp':
+        insuredValue['Insured.cFirmscaleTyp'] =  applicantValue[k]
+        break;
+        case 'Applicant.cGridCode':
+        insuredValue['Insured.cGridCode'] =  applicantValue[k]
+        break;
+        case 'Applicant.tEstablishingDate':
+        insuredValue['Insured.tEstablishingDate'] =  applicantValue[k]
+        break;
+        case 'Applicant.cParticiinsocTyp':
+        insuredValue['Insured.cParticiinsocTyp'] =  applicantValue[k]
+        break;
+        case 'Applicant.cRealnameAuthFlag':
+        insuredValue['Insured.cRealnameAuthFlag'] =  applicantValue[k]
+        break;
+        case 'Applicant.nRegisteredCapital':
+        insuredValue['Insured.nRegisteredCapital'] =  applicantValue[k]
+        break;
+        case 'Applicant.cRatioTyp':
+        insuredValue['Insured.cRatioTyp'] =  applicantValue[k]
+        break;
+        case 'Applicant.cConpersonNme':
+        insuredValue['Insured.cConpersonNme'] =  applicantValue[k]
+        break;
+        case 'Applicant.cLegalNme':
+        insuredValue['Insured.cLegalNme'] =  applicantValue[k]
+        break;
+        case 'Applicant.cLegalCertfCde':
+        insuredValue['Insured.cLegalCertfCde'] =  applicantValue[k]
+        break;
+        case 'Applicant.tLegalCertfEndTm':
+        insuredValue['Insured.tLegalCertfEndTm'] =  applicantValue[k]
+        break;
+        case 'Applicant.cOrganizationCode':
+        insuredValue['Insured.cOrganizationCode'] =  applicantValue[k]
+        break;
+        case 'Applicant.cTaxRegistrationNo':
+        insuredValue['Insured.cTaxRegistrationNo'] =  applicantValue[k]
+        break;
+        case 'Applicant.cBuslicenceNo':
+        insuredValue['Insured.cBuslicenceNo'] =  applicantValue[k]
+        break;
+        case 'Applicant.cShareholderName':
+        insuredValue['Insured.cShareholderName'] =  applicantValue[k]
+        break;
+        case 'Applicant.cShareholderCode':
+        insuredValue['Insured.cShareholderCode'] =  applicantValue[k]
+        break;
+        case 'Applicant.cBusinessScope':
+        insuredValue['Insured.cBusinessScope'] =  applicantValue[k]
+        break;
+        default:
+        insuredValue[k] = applicantValue[k]
+        
+        
+
+       
       }
+
+
     }
-    setFormValue(insuredValue);
+
+
+
+    // console.log(355,InsuredValue)
+
+    // const insuredValue =applicantValue;
+
+   
+    // for (const k in applicantValue) {
+    //   const key = "Insured." + k.split(".")[1];
+    //   if (k.split(".")[1] == "cAppNme") {
+    //     insuredValue["Insured.cInsuredNme"] =
+    //       applicantValue["Applicant.cAppNme"];
+    //   } else if (k.split(".")[1] == "cAppCde") {
+    //     insuredValue["Insured.cInsuredCde"] =
+    //       applicantValue["Applicant.cAppCde"];
+    //   } else {
+    //     insuredValue[key] = applicantValue[k];
+    //   }
+    // }
+    // setFormValue(insuredValue);
+
+    // console.log(555,insuredValue)
+
+    tabref ['insured'].setFormValue(insuredValue);
   },
   funcquery: () => {
     const param = opertaor.getParam();
@@ -119,6 +359,7 @@ const method = {
       { title: "选择客户信息", width: 85 }
     );
   },
+  
   funcconfirm: () => {
     insuredEditRef.value?.validate().then((isValid) => {
       console.log(isValid);
@@ -131,6 +372,7 @@ const method = {
     });
   },
   cardTypeChange: (val) => {
+    // console.log('btn3')
     if (val == "120001") {
       setFormItem("Insured.cCertfCde", {
         rules: [getRules("required", {}), getRules("idCard", {})],
@@ -158,6 +400,7 @@ const method = {
   },
   //被保人性质change事件
   cClntMrkFunc: (val) => {
+    checkUser() 
     // val  0法人 1个人
     if (val == "0") {
       setValue("Insured.cCertfCls", "");
@@ -240,8 +483,12 @@ const method = {
     }
   },
   funcreset: () => {
+    console.log('重置')
     const tabref = opertaor.getTableRefs();
     const InsuredValue = tabref["insured"].getFromValue();
+
+    console.log(111,InsuredValue)
+    // return false
     for (const k in InsuredValue) {
       InsuredValue[k] = null;
     }
@@ -257,6 +504,8 @@ const method = {
     setFormItem("Insured.cCertfCde", {
       disabled: false,
     });
+
+    tabref ['insured'].setFormValue(InsuredValue);
   },
   funcNdustryCate: () => {
     dialog.value?.open(
@@ -278,6 +527,7 @@ const method = {
     );
   },
   cOccupCdeChange: () => {
+
     const param = opertaor.getParam();
     dialog.value?.open(
       "cOccupCdeModal",
@@ -300,6 +550,7 @@ const method = {
     );
   },
   tCertMrkChecked: (val) => {
+    console.log(1123)
     if (val == "1") {
       setValue(
         "Insured.tCertfBgnDate",
@@ -332,6 +583,8 @@ const method = {
   },
   //证件类型change
   InsuredCCertfCls: (val) => {
+
+    checkUser()
     if (val == "110002") {
       //证件类型是“营业执照”，参加社会统筹标志变化为必填
       // 参加社会统筹标志
@@ -400,8 +653,12 @@ const method = {
       });
   },
   cCertfCdeChange: (val) => {
+    checkUser() 
+   const tabref = opertaor.getTableRefs();
+
     if (val) {
-      const certfCde = applicantEditRef.value?.getValue("Insured.cCertfCde");
+      // const certfCde = applicantEditRef.value?.getValue("Insured.cCertfCde");
+      const certfCde = tabref["insured"].getFromValue()['Insured.cCertfCde'];
       if (certfCde && certfCde.length === 18) {
         const birthYear = parseInt(certfCde.substring(6, 10), 10);
         const birthMonth = parseInt(certfCde.substring(10, 12), 10);

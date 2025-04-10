@@ -1,5 +1,5 @@
 <template>
-  <app-free-edit :freeEditConfig="formconfig1" ref="insrncEditRef" />
+  <app-free-edit :freeEditConfig="formconfig1" ref="insrncEditRef" /> 
 </template>
 
 <script setup lang="ts">
@@ -36,7 +36,9 @@ onMounted(() => {
 // 绑定方法
 const method = {
   // func demo
-  func1: () => {},
+  func1: () => {
+  
+  },
   tInsrncBgnTmDisabled:(data)=>{
     const baseBefore = tabref["insrnc"].getFromValue();
     // moment(baseBefore["Base.tInsrncEndTm"])

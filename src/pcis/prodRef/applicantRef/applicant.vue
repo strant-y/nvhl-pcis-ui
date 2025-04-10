@@ -129,6 +129,7 @@ const method = {
     });
   },
   funcreset: () => {
+    console.log(332)
     const tabref = opertaor.getTableRefs();
     const applicantValue = tabref["applicant"].getFromValue();
     for (const k in applicantValue) {
@@ -146,6 +147,8 @@ const method = {
     setFormItem("Applicant.cCertfCde", {
       disabled: false,
     });
+
+    tabref ['applicant'].setFormValue(applicantValue);
   },
   cardTypeChange: (val) => {
     if (val == "120001") {

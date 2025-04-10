@@ -1,3 +1,4 @@
+<!-- 发票弹框 -->
 <template>
   <el-dialog v-model="dialogVisible" width="90%">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
@@ -55,6 +56,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         label: "同投保人",
         disabled: (props.queryParam?.CGrpMrk != 1),
         func: async () => {
+
+ 
           copyApplicant()
         },
       }),

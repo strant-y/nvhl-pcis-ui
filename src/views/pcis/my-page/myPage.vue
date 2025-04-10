@@ -88,6 +88,7 @@
               </el-affix>
             </el-header>
             <el-main>
+       
               <div
                 id="underwriteurl"
                 v-if="underwriteFlag"
@@ -112,6 +113,8 @@
               >
                 <edritemRef :param="props.param" ref="edritem"></edritemRef>
               </div>
+
+   
               <template v-for="(pageConfig, v) in formconfig1" :key="v">
                 <div
                   class="card_"
@@ -152,6 +155,7 @@
       </el-footer>
     </el-container>
     <el-backtop :right="100" :bottom="100" />
+    <!-- <amlExtendInfo ></amlExtendInfo> -->
   </div>
 </template>
 
@@ -177,6 +181,12 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import moment from "moment";
 import dayjs from "dayjs";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
+
+// 发票信息
+import invoiceInfoModel from "@/views/pcis-new-udr-list/common/invoice-info-model.vue"
+//  反洗钱
+import amlExtendInfo from "@/views/pcis-main/prodDef/common/aml-extend-info/index.vue"
+
 const CostInformation = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/pages/CostInformation.vue")
 );
@@ -259,12 +269,19 @@ const basicBtn = [
   createFreeButtonBase({
     label: "发票信息",
     type: "primary",
-    func: () => {},
+    func: () => {
+    },
   }),
   createFreeButtonBase({
     label: "反洗钱扩展信息",
     type: "primary",
-    func: () => {},
+    func: () => {
+        console.log('反洗钱扩展信息');
+
+        router.push({ path: '/about', query: { name: 'Vue 3' } });
+        // src\views\pcis-main\prodDef\common\aml-extend-info\index.vue
+
+    },
   }),
 ];
 /**
