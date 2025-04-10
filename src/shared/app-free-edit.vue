@@ -138,10 +138,10 @@ const emits = defineEmits(["updateDatas"]); // 父组件监听事件，同步子
 function updateDatas(newDatas: any) {
   emits("updateDatas", newDatas);
 }
-const showMyfrom = ref(true);
+const showMyfrom = ref(false);
 showMyfrom.value = props.freeEditConfig?.showMyfrom
   ? props.freeEditConfig?.showMyfrom
-  : true;
+  : false;
 
 interface dynamicFormMethod {
   getFromValue: () => any;
