@@ -130,6 +130,7 @@
                       k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'
                     "
                     :pageSchema="k.pageSchema"
+                    :edrAll="edrAll"
                   />
                 </div>
               </template>
@@ -204,6 +205,7 @@ const tempFindBtn = [];
 let underwriteFlag = false;
 let edrbaseFlag = false;
 let edritemFlag = false;
+let edrAll = false;//判断是否为批改场景
 const user = JSON.parse(sessionStorage.getItem("user"));
 const nAmt = ref(0.0);
 const nPrm = ref(0.0);
@@ -262,6 +264,11 @@ const basicBtn = [
     type: "primary",
     func: () => {},
   }),
+  createFreeButtonBase({
+    label: "额度明细",
+    type: "primary",
+    func: () => {},
+  })
 ];
 /**
  * 一般批改按钮
@@ -322,13 +329,15 @@ const initPage = async () => {
   ) {
     edrbaseFlag = true;
     edritemFlag = true;
+    edrAll=true;
   } else {
     edrbaseFlag = false;
     edritemFlag = false;
+    edrAll=false;
   }
   // 页面初始化
   const formconfig11 = JSON.parse(getProductRes.data);
-  console.log("页面初始化返回数据", formconfig11);
+  //console.log("页面初始化返回数据", formconfig11);
   opertaor.setTableConfig(formconfig11);
   renderComponents();
 };
@@ -549,6 +558,11 @@ async function loadAfter() {
         label: "反洗钱扩展信息",
         type: "primary",
         func: () => {},
+      }),
+      createFreeButtonBase({
+        label: "额度明细",
+        type: "primary",
+        func: () => {},
       })
     );
   } else if (props.param.pageType === "copy") {
@@ -598,6 +612,11 @@ async function loadAfter() {
       }),
       createFreeButtonBase({
         label: "反洗钱扩展信息",
+        type: "primary",
+        func: () => {},
+      }),
+      createFreeButtonBase({
+        label: "额度明细",
         type: "primary",
         func: () => {},
       })
@@ -748,6 +767,12 @@ const submitToUndrFn = () => {
     }
   });
 };
+
+/**
+ * 额度明细弹窗
+ */
+
+
 /**
  * 投保单保存
  * **/
