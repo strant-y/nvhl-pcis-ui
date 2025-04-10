@@ -70,10 +70,9 @@ const method = {
       let val= {}
       let valArr=[]
       for (let i = 0; i < Number(getValue("Base.nPayNumber")); i++) {
-           val= { "_dataId": "", "Pay.nTms":"" , "Pay.cPayorCde": "", "Pay.tPayBgnTm": "2025-04-09 00:00:00", "Pay.tPayEndTm": "2025-04-09 00:00:00", "Pay.nOwnPrm": "", "Pay.cPayorNme": "", "Pay.nPayablePrm": result.value[i] }
+           val= { "_dataId": "", "Pay.nTms":i+1 , "Pay.cPayorCde": opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppCde"), "Pay.tPayBgnTm": opertaor.getTableRefs()["insrnc"].getValue("Base.tInsrncBgnTm"), "Pay.tPayEndTm": opertaor.getTableRefs()["insrnc"].getValue("Base.tInsrncEndTm"), "Pay.nOwnPrm": result.value[i], "Pay.cPayorNme":opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppNme"), "Pay.nPayablePrm": result.value[i] }
           valArr.push(val)
       }
-      //console.log(valArr)
       opertaor.getTableRefs()["payinfo"].setFormValue(valArr);
   }
 },
