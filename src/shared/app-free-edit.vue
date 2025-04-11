@@ -56,7 +56,7 @@
                     {{ showMyfrom ? "点击折叠" : "点击展开" }}
                   </a>
                 </el-col>
-              </el-row>
+              </el-row> 
             </template>
             <div class="form-inner" v-if="showMyfrom">
               <dynamic-forms
