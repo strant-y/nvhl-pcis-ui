@@ -28,11 +28,9 @@ const props = defineProps({
   //     type: Object,
   //     default: () => ({}),
   // },
-  param: {
-    type: [Object],
-  },
 });
 const opertaor = dataOpertaor();
+const params=opertaor.getParam()
 const edritemEditRef = ref<AppTableMethod | null>(null);
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -104,7 +102,7 @@ function handleQuery(flag?: boolean) {
   if(cacheKey){
       param = Object.assign({pageNo:r['pageNum'],CurrentUser:user.opCde,CurrentUserOrg:user.companyId,cacheKey:cacheKey}, r);
   }else{
-      param = Object.assign({pageNo:r['pageNum'],CurrentUser:user.opCde,CurrentUserOrg:user.companyId,appNo:props.param.cAppNo}, r);
+      param = Object.assign({pageNo:r['pageNum'],CurrentUser:user.opCde,CurrentUserOrg:user.companyId,appNo:params.cAppNo}, r);
   }
   console.log(param)
   getedrcmpitembyedrappnoorcachekey(param)

@@ -15,9 +15,9 @@
     const opertaor = dataOpertaor();
     const { getRules } = useValidator();
     const props = defineProps({
-        param: {
-            type: [Object],
-        },
+        // param: {
+        //     type: [Object],
+        // },
     });
     const {
         getCUndrMrk,
@@ -25,6 +25,7 @@
     } = NewUdrListService();
     const underwriteEditRef = ref<AppFreeEditMethod | null>(null);
     const user=JSON.parse(sessionStorage.getItem("user"))
+    const params=opertaor.getParam()
     const formconfig1 = reactive<AppFreeEditConfig>(
         createAppFreeEditConfig({
             title: "核保信息",
@@ -45,7 +46,7 @@
                     func:(v)=>{
                         if ('A' === v) {
                             setValue('cUndrOpnList', '')
-                            if ('E' === props.param['bsType']){
+                            if ('E' === params['cAppTyp']){
                                 setFormItem("cUndrOpnList", {
                                     loadData: [{label: '审核通过', value: '6'}]
                                 })
@@ -65,7 +66,11 @@
                                 loadData: [{label: '缺少必要信息', value: '1'},
                                     {label: '修改承保条件', value: '2'},
                                     {label: '费用超标', value: '3'},
-                                    {label: '拒绝承保', value: '4'},]
+                                    {label: '拒绝承保', value: '4'},
+                                    {label: '录入错误', value: '7'},
+                                    {label: '资料不全', value: '8'},
+                                    {label: '其他', value: '9'},
+                                ]
                             })
                         }
                         if ('T' === v) {
@@ -77,9 +82,9 @@
                             const param={
                                 "usrDptCde": user['companyId'],
                                 "operId": user['opCde'],
-                                "prodNo": props.param.cProdNo,
-                                "appNo": props.param.cAppNo,
-                                "dptCde": props.param.cDptCde
+                                "prodNo": params.cProdNo,
+                                "appNo": params.cAppNo,
+                                "dptCde": params.cDptCde
                             }
                             console.log(param)
                             getBackClsListUrlFn(param)
@@ -237,7 +242,7 @@
                     {value: 'B', label: '退回给出单员'},
                     {value: 'T', label: '退回至指定核保级别人员'}]
             })
-            const param={'cProdNo':props.param.cProdNo,'opCde':user.opCde,'companyId':user.companyId,'cAppNo':props.param.cAppNo,'cPlanNo':props.param.cPlanNo}
+            const param={'cProdNo':params.cProdNo,'opCde':user.opCde,'companyId':user.companyId,'cAppNo':params.cAppNo,'cPlanNo':params.cPlanNo}
             getCUndrMrkUrlFn(param);
         });
     });

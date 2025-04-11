@@ -110,24 +110,21 @@
                 v-if="underwriteFlag"
                 style="margin-bottom: 10px"
               >
-                <underwriteRef
-                  :param="props.param"
-                  ref="underwrite"
-                ></underwriteRef>
+                <underwriteRef ref="underwrite"></underwriteRef>
               </div>
               <div
                 id="edrbaseurl"
                 v-if="edrbaseFlag"
                 style="margin-bottom: 10px"
               >
-                <edrbaseRef :param="props.param" ref="edrbase"></edrbaseRef>
+                <edrbaseRef  ref="edrbase"></edrbaseRef>
               </div>
               <div
                 id="edritemurl"
                 v-if="edritemFlag"
                 style="margin-bottom: 10px"
               >
-                <edritemRef :param="props.param" ref="edritem"></edritemRef>
+                <edritemRef ref="edritem"></edritemRef>
               </div>
 
    
