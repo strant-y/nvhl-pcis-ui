@@ -107,6 +107,14 @@ export function calcSurrenEdr(queryParams: any): AxiosPromise<any> {
 }
 
 /**
+ * 退保保存
+ * **/
+
+export function saveSurrenEdr(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/saveSurrenEdr`, queryParams);
+}
+
+/**
  * 批改申请核保
  * **/
 
