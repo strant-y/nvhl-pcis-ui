@@ -149,7 +149,6 @@
                       k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'
                     "
                     :pageSchema="k.pageSchema"
-                    :edrAll="edrAll"
                   />
                 </div>
               </template>
@@ -236,7 +235,6 @@ const tempFindBtn = [];
 let underwriteFlag = ref(false);
 let edrbaseFlag = ref(false);
 let edritemFlag = ref(false);
-let edrAll = false;//判断是否为批改场景
 const user = JSON.parse(sessionStorage.getItem("user"));
 const nAmt = ref("0.00");
 const nPrm = ref("0.00");
@@ -499,14 +497,12 @@ const initPage = async () => {
   ) {
     edrbaseFlag.value = true;
     edritemFlag.value = true;
-    edrAll=true;
     if(props.param.pageType === "EDR_APP_NEW_SCENE"&&props.param.cEdrType=='3'){
         edritemFlag.value = false;
     }
   } else {
     edrbaseFlag.value = false;
     edritemFlag.value = false;
-    edrAll=false;
   }
   if(props.param.pageType === 'EDR_APP_NEW_SCENE'&&props.param.cEdrType=='3'){
       //退保不显示产品组件信息
