@@ -172,7 +172,8 @@
     </el-container>
     <el-backtop :right="100" :bottom="100" />
     <!-- <amlExtendInfo ></amlExtendInfo> -->
-  </div>
+    <invoiceInfoModel  v-if="invoiceShow"  @ok="close" ></invoiceInfoModel>
+</div>
 </template>
 
 <script setup lang="ts">
@@ -240,10 +241,39 @@ const nPrm = ref("0.00");
 const tmDay = ref(0);
 const dzmodal = useDzModal();
 const cacheKey =ref();
+
+
+// 发票显示
+let invoiceShow = ref(false);
+
+//关闭
+const close = ()=>{
+  invoiceShow.value = false;
+}
+ 
 onBeforeMount(() => {
   console.log("路由参数props.param", props.param);
   initPage();
 });
+
+ /**
+  * 发票信息
+  */
+const setTaxInfo = ()=>{
+  console.log('发票信息',opertaor.getTableRefs());
+    const tabref = opertaor.getTableRefs();
+    const appLicantValue =tabref["applicant"].getFromValue()['Applicant.cAppNo'];  // 单据编号     
+        if (!!appLicantValue) {
+          invoiceShow.value = true;
+        } else {
+
+            ElMessage.error('请先保存单据')
+            return;
+        }      
+}
+  
+
+
 /**
  * 投保需要的按钮
  */
@@ -286,6 +316,8 @@ const basicBtn = [
     label: "发票信息",
     type: "primary",
     func: () => {
+      setTaxInfo();
+
     },
   }),
   createFreeButtonBase({
@@ -294,7 +326,7 @@ const basicBtn = [
     func: () => {
         console.log('反洗钱扩展信息');
 
-        router.push({ path: '/about', query: { name: 'Vue 3' } });
+        // router.push({ path: '/about', query: { name: 'Vue 3' } });
         // src\views\pcis-main\prodDef\common\aml-extend-info\index.vue
 
     },
@@ -707,7 +739,10 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "发票信息",
         type: "primary",
-        func: () => {},
+        func: () => {
+          console.log(2)
+          setTaxInfo();
+        },
       }),
       createFreeButtonBase({
         label: "反洗钱扩展信息",
@@ -763,7 +798,10 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "发票信息",
         type: "primary",
-        func: () => {},
+        func: () => {
+          console.log(3)
+          setTaxInfo();
+        },
       }),
       createFreeButtonBase({
         label: "反洗钱扩展信息",
