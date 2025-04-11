@@ -37,14 +37,18 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
+  handleQuery: {
+    type: Function,
+    required: false,
+  }, // 新增：接收 handleQuery 方法
 });
+
 const dataParams = ref({});
 const appNo = ref("");
 function getuuid() {
   return uuidv4().replace(/-/g, "");
 }
 const emits = defineEmits(["handleClose"]);
-
 const formconfig1 = ref<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "新增信息",
@@ -80,12 +84,14 @@ const formconfig1 = ref<AppFreeEditConfig>(
               if (res.code === 200) {
                 ElMessage.success(res.msg);
                 emits("handleClose");
+                // 新增：调用 handleQuery 方法
+                if (props.handleQuery) {
+                  props.handleQuery();
+                }
               } else {
                 ElMessage.error(res.msg);
               }
             });
-            // props.method.addRow(freeEditRef.value?.getFromValue());
-            emits("handleClose");
           });
         },
       }),

@@ -49,8 +49,22 @@ const formconfig1 = ref<Record<string, any>>({});
 const tableconfig = ref<AppTableConfig>(createTableEditConfig());
 
 onMounted(async () => {
+  console.log("9999999999", props.pageSchema);
+  const processedFromSchema = props.pageSchema.fromSchema.map((item) => {
+    return Object.keys(item).reduce(
+      (acc, key) => {
+        if (typeof item[key] === "string" && item[key].startsWith("Dist.")) {
+          acc[key] = item[key].replace(/^Dist\./, "");
+        } else {
+          acc[key] = item[key];
+        }
+        return acc;
+      },
+      {} as Record<string, any>
+    );
+  });
   const formconfig11 = formInit(
-    JSON.stringify(props.pageSchema),
+    JSON.stringify({ ...props.pageSchema, fromSchema: processedFromSchema }),
     method,
     exRules
   );
@@ -67,8 +81,8 @@ onMounted(async () => {
 
 // 绑定方法
 const method = {
-  // func demo
   func1: () => {},
+  handleClose: (val) => {},
   funcdistadd: () => {
     let baseFlag = opertaor.getDataAll().plyBase["Base.cAppNo"];
     checkAppBase({ cAppNo: baseFlag }).then((res) => {
@@ -78,6 +92,7 @@ const method = {
           { fromSchema: tableconfig.value.fromSchema, title: "新增" },
           {
             isOk: (res: any) => {},
+            handleQuery: method.handleQuery, // 新增：将 handleQuery 方法传递给 distAdd 组件
           },
           { width: "60" }
         );
@@ -87,18 +102,22 @@ const method = {
     });
   },
   handleQuery: () => {
-    const selData = tableRef?.value?.getFromValue();
+    const selData = {
+      cComponentTable: "AddressDist",
+      cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
+    };
     selectDist(selData).then((res) => {
-      console.log(res, "=========");
-      // if (res.code === 0) {
-      // }
+      if (res.code === 200) {
+        pageresult.list = [];
+        pageresult.list = res.data;
+        // pageresult.total = data.total;
+      }
     });
   },
 };
 
 // 绑定特殊验证器
 const exRules = {};
-
 function getData() {
   // return distEditRef?.value?.getFromValue();
 }
