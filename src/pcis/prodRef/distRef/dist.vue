@@ -76,6 +76,28 @@ onMounted(async () => {
     titleBtns: formconfig1.value.titleBtns,
     fromSchema: formconfig1.value.distSchema,
   });
+  tableconfig.value.tableBtnType = "btn";
+  tableconfig.value.tableBtnWidth = 220;
+  tableconfig.value.tableBtnPosition = "right";
+  tableconfig.value.tableBtn = [
+    {
+      id: "score",
+      link: true,
+      tooltip: "编辑",
+      type: "success",
+      size: "large",
+      icon: "Edit",
+      tableClick: (row) => {},
+    },
+    {
+      id: "score",
+      type: "danger",
+      tooltip: "删除",
+      icon: "Delete",
+      link: true,
+      tableClick: (row) => {},
+    },
+  ];
   // addFakeData();
 });
 
