@@ -1013,6 +1013,7 @@ const calcPremiumEdr = () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
   res["EdrBase"] = edrbase.value?.getFromValue();
+  res["EdrBase"]["EdrBase.cEdrRsnDetail"] =res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   console.log(res);
   calcEdr(res).then((res) => {
     btn.loading = false;
@@ -1031,14 +1032,9 @@ const calcPremiumEdr = () => {
       nAmt.value = ops["base"]["Base.nAmt"];
       nPrm.value = ops["base"]["Base.nPrm"];
       tmDay.value = ops["base"]["Base.cTmSysCde"];
-      if (res["res"]["composition"]["EdrBase"]) {
-        const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
-        res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
-          JSON.parse(
-            res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"]
-          );
-        edrbase.value?.setFormValue(EdrBaseData);
-      }
+      const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
+      res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"].split( "," );
+      edrbase.value?.setFormValue(EdrBaseData);
       const nPrmVar = ops["plyBase"]["Base.nPrmVar"];
       const payInfo = setPayInfoEdr(
         ops["payinfo"],
@@ -1090,42 +1086,23 @@ const calcPremiumEdrSurrender = () => {
     const res = {};
     res["user"] = user;
     res["EdrBase"] = edrbase.value?.getFromValue();
-    console.log(res);
     calcSurrenEdr(res).then((res) => {
         btn.loading = false;
         console.log("批改计算", res);
         if (res["code"] == "200") {
             const ops = opertaor.convertData(res);
-            console.log("保费计算转换的数据", ops);
             ElMessage.success(
-                res.msg +
-                "保费为：" +
-                ops["base"]["Base.nPrm"] +
-                "; 保费变化量为：" +
-                ops["plyBase"]["Base.nPrmVar"]
+                res.msg +"保费为：" + res['res']['composition']['plyBase'][0]['Base.nPrm'] +
+                "; 保费变化量为：" +res['res']['composition']['plyBase'][0]["Base.nPrmVar"]
             );
             opertaor.setDataAll(ops);
-            nAmt.value = ops["base"]["Base.nAmt"];
-            nPrm.value = ops["base"]["Base.nPrm"];
-            tmDay.value = ops["base"]["Base.cTmSysCde"];
+            nAmt.value = res['res']['composition']['plyBase'][0]["Base.nAmt"];
+            nPrm.value = res['res']['composition']['plyBase'][0]["Base.nPrm"];
+            tmDay.value = res['res']['composition']['plyBase'][0]["Base.cTmSysCde"];
             if (res["res"]["composition"]["EdrBase"]) {
                 const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
-                res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
-                    JSON.parse(
-                        res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"]
-                    );
                 edrbase.value?.setFormValue(EdrBaseData);
             }
-            const nPrmVar = ops["plyBase"]["Base.nPrmVar"];
-            const payInfo = setPayInfoEdr(
-                ops["payinfo"],
-                ops["base"],
-                ops["applicant"],
-                nPrmVar,
-                ops["plyBase"]
-            );
-            console.log("生成缴费计划内容", payInfo);
-            opertaor.getTableRefs()["payinfo"].setFormValue(payInfo);
         } else {
             ElMessage.error(res.msg);
         }
@@ -1175,8 +1152,7 @@ const saveEdrPlyInfo = () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
   res["EdrBase"] = edrbase.value?.getFromValue();
-  res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
-    res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+  res["EdrBase"]["EdrBase.cEdrRsnDetail"] =res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   console.log(res);
   saveEdrAppPlyInfo(res).then((res) => {
     console.log("saveAppPlyInfo-res", res);
@@ -1187,10 +1163,7 @@ const saveEdrPlyInfo = () => {
       ElMessage.success(res.msg);
       opertaor.setDataAll(ops);
       const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
-      res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
-        res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"].split(
-          ","
-        );
+      res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"].split( "," );
       edrbase.value?.setFormValue(EdrBaseData);
     } else {
       ElMessage.error(res.msg);
@@ -1238,6 +1211,7 @@ const submitEdrToUndrFun = () => {
   res["user"] = user;
   res["appNo"] = base["Base.cAppNo"];
   res["plyNo"] = base["Base.cPlyNo"];
+  res["taskId"] = props.param.taskId?props.param.taskId:null;
   console.log(res);
   submitEdrToUndr(res).then((res) => {
     btn.loading = false;
