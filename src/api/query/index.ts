@@ -123,11 +123,19 @@ export function submitEdrToUndr(queryParams: any): AxiosPromise<any> {
 }
 
 /**
- * 生成批文
+ * 一般批改生成批文
  * @param queryParams
  */
 export function getEndorseChange(queryParams: any): AxiosPromise<any> {
     return post(`/edr/getEndorseChange`, queryParams);
+}
+
+/**
+ * 退保生成批文
+ * @param queryParams
+ */
+export function getSurrenderPrecis(queryParams: any): AxiosPromise<any> {
+    return post(`edr/getSurrenderPrecis`, queryParams);
 }
 
 /**

@@ -195,6 +195,7 @@ import {
   submitEdrToUndr,
   calcSurrenEdr,
   saveSurrenEdr,
+  getSurrenderPrecis,
 } from "../../../api/query/index";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import moment from "moment";
@@ -401,7 +402,7 @@ const edrSurrenderBtn = [
         label: '比较/生成批文',
         type: 'primary',
         func: () => {
-            // getSurrenderPrecis();
+            getSurrenderPrecisFun();
         },
     }),
     createFreeButtonBase({
@@ -1179,6 +1180,30 @@ const saveApplicationEdr=()=>{
         // history.back();
     });
 }
+
+/**
+ * 退保生成批文
+ * **/
+const getSurrenderPrecisFun = () => {
+    const btn = getBtn("btnCompare");
+    btn.loading = true;
+    const res = {};
+    res["user"] = user;
+    res["EdrBase"] = edrbase.value?.getFromValue();
+    res["Acctinfo"]={"Acctinfo.cAcctNo":null,"Acctinfo.cAcctNme":"","Acctinfo.cBankRelTyp":null,"Acctinfo.cBankPro":null,"Acctinfo.cBankArea":null,"Acctinfo.cAppNo":null}
+    console.log(res);
+    getSurrenderPrecis(res).then((res) => {
+        btn.loading = false;
+        if (res["code"] == "200") {
+            const cEdrCtnt = res["data"]["data"]["cEdrCtnt"]; //批文
+            edrbase.value?.setValue("EdrBase.cEdrCtnt", cEdrCtnt);
+            ElMessage.success(res.msg);
+        } else {
+            ElMessage.error(res.msg);
+        }
+    });
+};
+
 /**
  * 批改单保存
  * **/
