@@ -1188,6 +1188,10 @@ export function saveDist(queryParams: any): AxiosPromise<any> {
 export function selectDist(queryParams: any): AxiosPromise<any> {
     return post(`/policy/selectDist`, queryParams);
 }
+//删除清单
+export function deleteDist(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/deleteDist`, queryParams);
+}
 //
 export function checkAppBase(queryParams: any): AxiosPromise<any> {
     return post(`/policy/checkAppBase`, queryParams);

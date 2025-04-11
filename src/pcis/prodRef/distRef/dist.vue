@@ -22,11 +22,13 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { selectDist, checkAppBase } from "@/api/prod/index";
+import { selectDist, checkAppBase, deleteDist } from "@/api/prod/index";
 import { formInit } from "@/shared/from-init";
 import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
+import { useRoute } from "vue-router";
+const route = useRoute();
 const dialog = ref<DialogMethod | null>(null);
 const opertaor = dataOpertaor();
 const props = defineProps({
@@ -49,7 +51,7 @@ const formconfig1 = ref<Record<string, any>>({});
 const tableconfig = ref<AppTableConfig>(createTableEditConfig());
 
 onMounted(async () => {
-  console.log("9999999999", props.pageSchema);
+  console.log("9999999999", route);
   const processedFromSchema = props.pageSchema.fromSchema.map((item) => {
     return Object.keys(item).reduce(
       (acc, key) => {
@@ -77,7 +79,7 @@ onMounted(async () => {
     fromSchema: formconfig1.value.distSchema,
   });
   tableconfig.value.tableBtnType = "btn";
-  tableconfig.value.tableBtnWidth = 220;
+  tableconfig.value.tableBtnWidth = 150;
   tableconfig.value.tableBtnPosition = "right";
   tableconfig.value.tableBtn = [
     {
@@ -87,7 +89,21 @@ onMounted(async () => {
       type: "success",
       size: "large",
       icon: "Edit",
-      tableClick: (row) => {},
+      tableClick: (row) => {
+        dialog.value?.open(
+          "distAdd",
+          {
+            fromSchema: tableconfig.value.fromSchema,
+            title: "编辑",
+            rowData: row,
+          },
+          {
+            isOk: (res: any) => {},
+            handleQuery: method.handleQuery, // 新增：将 handleQuery 方法传递给 distAdd 组件
+          },
+          { width: "60" }
+        );
+      },
     },
     {
       id: "score",
@@ -95,7 +111,17 @@ onMounted(async () => {
       tooltip: "删除",
       icon: "Delete",
       link: true,
-      tableClick: (row) => {},
+      tableClick: (row) => {
+        deleteDist({
+          cComponentTable: "AddressDist",
+          cPkId: [row.cPkId],
+        }).then((res) => {
+          if (res.code === 200) {
+            ElMessage.success("删除成功");
+            method.handleQuery();
+          }
+        });
+      },
     },
   ];
   // addFakeData();

@@ -5,7 +5,6 @@
 </template>
 
 <script setup lang="ts">
-import { v4 as uuidv4 } from "uuid";
 import {
   AppTableConfig,
   createTableEditConfig,
@@ -40,14 +39,15 @@ const props = defineProps({
   handleQuery: {
     type: Function,
     required: false,
-  }, // 新增：接收 handleQuery 方法
+  },
+  rowData: {
+    type: Object,
+    default: () => ({}),
+  },
 });
 
 const dataParams = ref({});
 const appNo = ref("");
-function getuuid() {
-  return uuidv4().replace(/-/g, "");
-}
 const emits = defineEmits(["handleClose"]);
 const formconfig1 = ref<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -73,7 +73,7 @@ const formconfig1 = ref<AppFreeEditConfig>(
             );
             const params = Object.assign(
               {
-                cProdNo: route.params.cProdNo,
+                cProdNo: route.params.param.cProdNo,
                 // cComponentCode: "AddressDist040001",
                 cComponentTable: "AddressDist",
                 cAppNo: appNo.value,
@@ -84,10 +84,7 @@ const formconfig1 = ref<AppFreeEditConfig>(
               if (res.code === 200) {
                 ElMessage.success(res.msg);
                 emits("handleClose");
-                // 新增：调用 handleQuery 方法
-                if (props.handleQuery) {
-                  props.handleQuery();
-                }
+                props.method.handleQuery();
               } else {
                 ElMessage.error(res.msg);
               }
@@ -110,6 +107,10 @@ onMounted(() => {
   appNo.value = dataParams.value.plyBase["Base.cAppNo"];
   formconfig1.value.fromSchema = props.data.fromSchema;
   formconfig1.value.title = props.data.title;
+  if (props.data.title == "编辑") {
+    freeEditRef.value?.setFormValue(props.data.rowData);
+  } else {
+  }
 });
 </script>
 
