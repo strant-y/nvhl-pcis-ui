@@ -49,6 +49,7 @@ const props = defineProps({
 const dataParams = ref({});
 const appNo = ref("");
 const emits = defineEmits(["handleClose"]);
+const formconfigdist = ref<Record<string, any>>({});
 const formconfig1 = ref<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "新增信息",
@@ -74,8 +75,14 @@ const formconfig1 = ref<AppFreeEditConfig>(
             const params = Object.assign(
               {
                 cProdNo: route.params.param.cProdNo,
-                // cComponentCode: "AddressDist040001",
-                cComponentTable: "AddressDist",
+                cComponentTable:
+                  route.params.param.cProdNo == "040001"
+                    ? "AddressDist"
+                    : route.params.param.cProdNo == "043002"
+                      ? "VehicleDist"
+                      : route.params.param.cProdNo == "043009"
+                        ? "ProjectDist"
+                        : "EmployeeDist",
                 cAppNo: appNo.value,
               },
               { dist: processedData }
@@ -103,6 +110,7 @@ const formconfig1 = ref<AppFreeEditConfig>(
 );
 
 onMounted(() => {
+  console.log("98888888", props.data);
   dataParams.value = opertaor.getDataAll();
   appNo.value = dataParams.value.plyBase["Base.cAppNo"];
   formconfig1.value.fromSchema = props.data.fromSchema;

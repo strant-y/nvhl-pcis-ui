@@ -98,7 +98,9 @@
                   }}</span
                   >&nbsp;|&nbsp;<span style="font-weight: bold"
                     >是否互联网出单:</span
-                  >&nbsp;<span class="publicStyle">是</span>
+                  >&nbsp;<span class="publicStyle">{{
+                    props.param.cIsNet == "0" ? "是" : "否"
+                  }}</span>
                 </div>
                 <div class="btm" style="background: #ebedfc">
                   <span style="font-weight: bold">保险期限：</span
@@ -572,7 +574,7 @@ async function loadAfter() {
       //保单基本信息初始化
       const baseobj = {};
       baseobj["Base.cRenewMrk"] = "0";
-      baseobj["Base.cIsNet"] = "1";
+      baseobj["Base.cIsNet"] = "0";
       // baseobj["Base.cPolicySource"] = "1";
       opertaor.getTableRefByKey("plyBase").setFormValue(baseobj);
       //承保信息初始化
