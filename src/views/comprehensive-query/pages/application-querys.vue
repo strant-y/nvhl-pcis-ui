@@ -78,7 +78,7 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { deleteFactorBykey, getBasicKindList } from "@/api/prod";
+import { deleteFactorBykey, getBasicKindList, query } from "@/api/prod";
 import { getAppPolicyList, qryEndorseList } from "@/api/query";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
@@ -91,6 +91,7 @@ const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
 const route = useRoute();
 const router = useRouter();
 const activeName = ref("1");
+const queryType = ref("1");
 const homeJumpData = ref({}); //接收首页的参数，用于查询条件回显
 let addrowArr = [
   "cAppNo",
@@ -1259,6 +1260,7 @@ let tableconfig = reactive<AppTableConfig>(
 
 //tabs切换
 const handleTabClick = (tab: any) => {
+  queryType.value = tab.props.name;
   currentTabName.value = tab.props.label;
   const i = tabs.value.findIndex((item) => item.name === tab.props.label);
   currentTabKey.value = i;
@@ -1475,6 +1477,7 @@ function handleQuery(flag?: boolean) {
   param["tEdrAppTmEnd"] = tEdrAppTmEnd; // 添加批改结束时间
   param["tIssueTmStart"] = tIssueTmStart; // 添加签单开始时间
   param["tIssueTmEnd"] = tIssueTmEnd; // 添加签单结束时间
+  param["queryType"] = queryType.value;
   getAppPolicyList(param)
     .then((res) => {
       const { code, data, msg } = res;
