@@ -79,7 +79,7 @@ import {
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import { deleteFactorBykey, getBasicKindList, query } from "@/api/prod";
-import { getAppPolicyList, qryEndorseList } from "@/api/query";
+import { getAppPolicyList, qryEndorseList, delTmpPolicy } from "@/api/query";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 import { now } from "lodash";
@@ -1090,7 +1090,25 @@ const tableObj = {
             return true;
           }
         },
-        tableClick: (row) => {},
+        tableClick: (row) => {
+            ElMessageBox.confirm("确认删除数据?", "警告", {
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                type: "warning",
+            }).then(function () {
+                const delResult = delTmpPolicy({ appNo: row.cAppNo });
+                delResult.then((res: any) => {
+                    if (null != res && null != res["code"]) {
+                        if (res["code"] === 200) {
+                            ElMessage.success({ message: res.msg, duration: 3000 });
+                            handleQuery(true);
+                        } else {
+                            ElMessage.error({ message: res.msg, duration: 3000 });
+                        }
+                    }
+                });
+            });
+        },
       }),
       // createFreeButtonBase({
       //   id: "score",

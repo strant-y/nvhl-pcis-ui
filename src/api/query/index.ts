@@ -191,3 +191,10 @@ export function submitUnderwriting(queryParams: any) {
 export function submitUnderwritingEdr(queryParams: any) {
     return request.post('/policy/undrEdr', queryParams);
 }
+
+/**
+ * 综合查询删除暂存单
+ */
+export function delTmpPolicy(queryParams: any) {
+    return request.post('/policy/delTmpPolicy', queryParams);
+}
