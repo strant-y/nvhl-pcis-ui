@@ -633,9 +633,7 @@ async function loadAfter() {
   } else if (props.param.pageType === "EDR_APP_NEW_SCENE") {
     // 批改申请-新增
     const cAppNo = props.param.cAppNo;
-    edrbase.value?.setValue("EdrBase.cRatioTyp", "1");
-    edrbase.value?.setValue("EdrBase.cEdrRsnBundleCde", props.param["cRsnCde"]);
-    edrbase.value?.setValue("EdrBase.cEdrType", props.param["cEdrType"]);
+    loadAppPlyInfo(cAppNo);
     if (props.param.cEdrType == "1") {
       if (props.param["cRsnCde"] != "FZ") {
         edrbase.value?.setValue("EdrBase.cEdrRsnDetail", [
@@ -657,7 +655,6 @@ async function loadAfter() {
     } else {
       bthList.value = edrSurrenderBtn;
     }
-    loadAppPlyInfo(cAppNo);
   } else if (props.param.pageType === "readonly") {
     setTimeout(() => {
       opertaor.setDisabledAll();
@@ -864,10 +861,8 @@ const loadAppPlyInfo = (CAppNo) => {
       if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
         if (
-          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] !=
-            "" &&
-          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] !=
-            null
+          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] !="" &&
+          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] != null
         ) {
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
             res["res"]["composition"]["EdrBase"][0][
@@ -875,6 +870,12 @@ const loadAppPlyInfo = (CAppNo) => {
             ].split(",");
         }
         console.log("EdrBaseData", EdrBaseData);
+        if("EDR_APP_NEW_SCENE" === props.param.pageType){
+            res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"]= '1';
+            res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrType"]= props.param["cEdrType"];
+            res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnBundleCde"]= props.param["cRsnCde"];
+            res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"]=[]
+        }
         edrbase.value?.setFormValue(EdrBaseData);
       }
       ElMessage.success(res.msg);
