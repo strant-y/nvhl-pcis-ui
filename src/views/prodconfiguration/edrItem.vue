@@ -233,7 +233,11 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cOperTyp",
         title: "操作类型",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
+        loadData: [
+          { value: "M", label: "元素修改" },
+          { value: "B", label: "按钮" },
+        ],
       },
       {
         prop: "cFactorTitle",
