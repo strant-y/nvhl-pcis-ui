@@ -112,32 +112,51 @@ export const dataOpertaor = defineStore(
         }
         const setUnDisabledByKeyList = (list: any[]) => {
             if (list && list.length > 0) {
-                list.forEach(item => {
+                list.forEach((item: string) => {
                     Object.keys(tableRefs).forEach(key => {
                         if (tableRefs[key] && tableRefs[key].getFormconfig) {
                             const conf = tableRefs[key].getFormconfig();
-
-                            if (conf.fromType === 'free') {  // 表单模式时,修改表单disabled实现只读
-                                if (conf.fromSchema && conf.fromSchema.length > 0) {
-                                    conf.fromSchema.forEach(f => {
-                                        if (f.inputtype === 'rtinputgroup') {
-                                            f.groupList.forEach((gkey: any) => {
-                                                if (gkey.prop === item) {
-                                                    gkey.disabled = false;
+                            if (!item.startsWith('Btn_')) { // 非按钮控制
+                                if (conf.fromType === 'free') {  // 表单模式时,修改表单disabled实现只读
+                                    if (conf.fromSchema && conf.fromSchema.length > 0) {
+                                        conf.fromSchema.forEach(f => {
+                                            if (f.inputtype === 'rtinputgroup') {
+                                                f.groupList.forEach((gkey: any) => {
+                                                    if (gkey.prop === item) {
+                                                        gkey.disabled = false;
+                                                    }
+                                                });
+                                            } else {
+                                                if (f.prop === item) {
+                                                    f.disabled = false;
                                                 }
-                                            });
-                                        } else {
-                                            if (f.prop === item) {
-                                                f.disabled = false;
                                             }
+                                        });
+                                    }
+                                } else if (conf.fromType === 'grid') { // 表格模式时,修改表格属性,实现只读
+                                    if (conf.fromSchema && conf.fromSchema.length > 0) {
+                                        conf.fromSchema.forEach(gf => {
+                                            if (gf.prop === item) {
+                                                conf.editList.push(gf.prop);
+                                            }
+                                        });
+                                    }
+                                }
+                            } else {// 按钮控制
+                                if (
+                                    conf.titleBtns &&
+                                    conf.titleBtns.length > 0
+                                ) {
+                                    conf.titleBtns.forEach((t) => {
+                                        if ('Btn_' + t.id === item) {
+                                            t.hidden = false;
                                         }
                                     });
                                 }
-                            } else if (conf.fromType === 'grid') { // 表格模式时,修改表格属性,实现只读
-                                if (conf.fromSchema && conf.fromSchema.length > 0) {
-                                    conf.fromSchema.forEach(gf => {
-                                        if (gf.prop === item) {
-                                            conf.editList.push(gf.prop);
+                                if (conf.endBtns && conf.endBtns.length > 0) {
+                                    conf.endBtns.forEach((t) => {
+                                        if ('Btn_' + t.id === item) {
+                                            t.hidden = false;
                                         }
                                     });
                                 }
@@ -186,12 +205,12 @@ export const dataOpertaor = defineStore(
                     if (!!tab && 'free' === tab) {
                         da = (data[voNme] instanceof Array && data[voNme].length > 0) ? data[voNme][0] : data[voNme];
                     } else
-                    if (!!tab && 'grid' === tab) {
-                        da = data[voNme];
-                    } else
-                    if (!!tab && 'custom' === tab) {
-                        da = data[voNme];
-                    }
+                        if (!!tab && 'grid' === tab) {
+                            da = data[voNme];
+                        } else
+                            if (!!tab && 'custom' === tab) {
+                                da = data[voNme];
+                            }
                 }
                 res[voNme] = da;
             });
@@ -223,14 +242,14 @@ export const dataOpertaor = defineStore(
                 {
                     key,
                     result: results[index],
-                    refs:ref
+                    refs: ref
                 }));
 
             // 4. 汇总结果（示例：收集所有失败的key）
             const failedKeys = resultMapping
                 .filter(item => item.result !== true)
                 .map(item => {
-                    console.log("失败的表单key:"+ item.key);
+                    console.log("失败的表单key:" + item.key);
                     return item.key
                 });
 

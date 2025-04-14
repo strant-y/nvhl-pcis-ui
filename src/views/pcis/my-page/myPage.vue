@@ -1021,12 +1021,12 @@ const savePlyInfo = () => {
  * 获取批改项
  * **/
 const getEdrRsnItemFun = (
-  cProdNo,
-  cDptCde,
-  cRsnCde,
-  cRsnDetailCde,
-  cEdrType,
-  cGrpMrk
+  cProdNo: any,
+  cDptCde: any,
+  cRsnCde: any,
+  cRsnDetailCde: any,
+  cEdrType: any,
+  cGrpMrk: any
 ) => {
   const res = {
     CProdNo: cProdNo,
@@ -1036,12 +1036,16 @@ const getEdrRsnItemFun = (
     CEdrType: cEdrType,
     CGrpMrk: cGrpMrk,
   };
-  getEdrRsnItem(res).then((res) => {
+  getEdrRsnItem(res).then((res: any) => {
     if (res["code"] == "200") {
       const result = res["data"]["result"];
-      const edrList = [];
-      result.forEach((key) => {
-        edrList.push(key["cEdrItem"]);
+      const edrList: any[] = [];
+      result.forEach((key: any) => {
+        if(key['cOperTyp'] === 'M'){
+          edrList.push(key["cEdrItem"]);
+        }else if(key['cOperTyp'] === 'B'){
+          edrList.push("Btn_"+key["cEdrItem"]);
+        }
       });
       opertaor.setUnDisabledByKeyList(edrList); // 根据list集合,放开需要的要素
       ElMessage.success(res.msg);
