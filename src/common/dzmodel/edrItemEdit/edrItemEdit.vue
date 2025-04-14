@@ -165,7 +165,6 @@ const tableconfig = reactive<AppTableConfig>(
 const selectConItem = ref({});
 function selectComponent(item: any) {
   selectConItem.value = item;
-  selecrCon
   const param = {
     CComponentKey: item.cComponentKey,
     cComponentTab: item.cComponentTab,
