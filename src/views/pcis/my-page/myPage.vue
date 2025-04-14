@@ -201,6 +201,7 @@ import {
   calcSurrenEdr,
   saveSurrenEdr,
   getSurrenderPrecis,
+  submitEdrSurrender,
 } from "../../../api/query/index";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import moment from "moment";
@@ -375,7 +376,7 @@ const edrBtn = [
   }),
 ];
 /**
- * 退保按钮
+ * （退保/注销） 按钮
  * @type {FormButton[]}
  */
 const edrSurrenderBtn = [
@@ -408,7 +409,7 @@ const edrSurrenderBtn = [
     label: "申请核保",
     type: "primary",
     func: () => {
-      // submitEdrToUndrSurrender();
+      submitEdrToUndrSurrender();
     },
   }),
 ];
@@ -490,18 +491,16 @@ const initPage = async () => {
   }
   if (
     props.param.pageType === "EDR_APP_NEW_SCENE" ||
-    (props.param.pageType == "TEMPORARY_DEPOSIT" &&
-      props.param.cAppTyp == "E") ||
-    (props.param.pageType == "PLY_UW_PROCESS_SCENE" &&
-      props.param.cAppTyp == "E") ||
+    (props.param.pageType == "TEMPORARY_DEPOSIT" && props.param.cAppTyp == "E") ||
+    (props.param.pageType == "PLY_UW_PROCESS_SCENE" && props.param.cAppTyp == "E") ||
     (props.param.pageType == "UW_READ_SCENE" && props.param.cAppTyp == "E") ||
     (props.param.pageType == "readonly" && props.param.cAppTyp == "E")
   ) {
     edrbaseFlag.value = true;
     edritemFlag.value = true;
     if (
-      props.param.pageType === "EDR_APP_NEW_SCENE" &&
-      props.param.cEdrType == "3"
+        (props.param.pageType === "EDR_APP_NEW_SCENE" &&(props.param.cEdrType == "3"||props.param.cEdrType == "2"))||
+        (props.param.pageType === "TEMPORARY_DEPOSIT" &&(props.param.cEdrType == "3"||props.param.cEdrType == "2"))
     ) {
       edritemFlag.value = false;
     }
@@ -510,8 +509,8 @@ const initPage = async () => {
     edritemFlag.value = false;
   }
   if (
-    props.param.pageType === "EDR_APP_NEW_SCENE" &&
-    props.param.cEdrType == "3"
+      (props.param.pageType === "EDR_APP_NEW_SCENE" &&(props.param.cEdrType == "3"||props.param.cEdrType == "2"))||
+      (props.param.pageType === "TEMPORARY_DEPOSIT" &&(props.param.cEdrType == "3"||props.param.cEdrType == "2"))
   ) {
     //退保不显示产品组件信息
     const formconfig11 = [{ groupId: "", pageInfo: [] }];
@@ -599,19 +598,23 @@ async function loadAfter() {
     const cAppNo = props.param.cAppNo;
     loadAppPlyInfo(cAppNo);
     if (props.param.cAppTyp == "E") {
-      bthList.value = edrBtn;
-      setTimeout(() => {
-        opertaor.setDisabledAll();
-        getEdrRsnItemFun(
-          props.param["cProdNo"],
-          props.param["cDptCde"],
-          props.param["cEdrRsnBundleCde"],
-          props.param["cEdrRsnBundleCde"],
-          props.param["cEdrType"],
-          props.param["cGrpMrk"]
-        );
-      }, 3000);
-      edritem.value?.handleQuery();
+        if(props.param.cEdrType == "1"){
+            bthList.value = edrBtn;
+            setTimeout(() => {
+                opertaor.setDisabledAll();
+                getEdrRsnItemFun(
+                    props.param["cProdNo"],
+                    props.param["cDptCde"],
+                    props.param["cEdrRsnBundleCde"],
+                    props.param["cEdrRsnBundleCde"],
+                    props.param["cEdrType"],
+                    props.param["cGrpMrk"]
+                );
+            }, 3000);
+            edritem.value?.handleQuery();
+        }else{
+            bthList.value = edrSurrenderBtn;
+        }
     } else if (props.param.cAppTyp == "A") {
       bthList.value = basicBtn;
     }
@@ -874,7 +877,7 @@ const loadAppPlyInfo = (CAppNo) => {
             res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"]= '1';
             res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrType"]= props.param["cEdrType"];
             res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnBundleCde"]= props.param["cRsnCde"];
-            res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"]=[]
+            res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"]=''
         }
         edrbase.value?.setFormValue(EdrBaseData);
       }
@@ -1167,7 +1170,7 @@ const calcPremiumEdrSurrender = () => {
  * **/
 const saveApplicationEdr = () => {
   const btn = getBtn("btn010102");
-  btn.loading = false;
+  btn.loading = true;
   const res = {};
   res["user"] = user;
   res["appNo"] = edrbase.value?.getFromValue()["EdrBase.cAppNo"]
@@ -1188,6 +1191,7 @@ const saveApplicationEdr = () => {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
         edrbase.value?.setFormValue(EdrBaseData);
       }
+      ElMessage.success(res.msg);
     } else {
       ElMessage.error(res.msg);
     }
@@ -1226,6 +1230,48 @@ const getSurrenderPrecisFun = () => {
   });
 };
 
+/**
+ * 批改单申请核保(退保、注销)
+ */
+const submitEdrToUndrSurrender = () => {
+    const btn = getBtn("btn010103");
+    btn.loading = true;
+    const res = {};
+    res["user"] = user;
+    res["appNo"] = edrbase.value?.getFromValue()["EdrBase.cAppNo"]
+        ? edrbase.value?.getFromValue()["EdrBase.cAppNo"]
+        : null;
+    res["plyNo"] = edrbase.value?.getFromValue()["EdrBase.cPlyNo"];
+    res["taskId"] = props.param.taskId ? props.param.taskId : null;
+    res["data"] = {};
+    res["data"]["EdrBase"] = edrbase.value?.getFromValue();
+    res["data"]["Acctinfo"] = {
+        "Acctinfo.cAcctNo": null,
+        "Acctinfo.cAcctNme": "",
+        "Acctinfo.cBankRelTyp": null,
+        "Acctinfo.cBankPro": null,
+        "Acctinfo.cBankArea": null,
+        "Acctinfo.cAppNo": null,
+    };
+    console.log(res);
+    submitEdrSurrender(res).then((res) => {
+        btn.loading = false;
+        console.log("申请核保(退保、注销)", res);
+        if (res["code"] == "200") {
+            const ops = opertaor.convertData(res);
+            opertaor.setDataAll(ops);
+            if (res["res"]["composition"]["EdrBase"]) {
+                const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
+                edrbase.value?.setFormValue(EdrBaseData);
+            }
+            ElMessage.success(res.msg);
+        } else {
+            ElMessage.error(res.msg);
+        }
+        // ElMessage.success(res.msg);
+        // history.back();
+    });
+}
 /**
  * 批改单保存
  * **/

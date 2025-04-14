@@ -262,7 +262,7 @@ onMounted(() => {
       });
     if(params["cEdrType"]!='1'){
         setFormItem("EdrBase.cEdrRsnDetail", { hidden: true });
-        setFormItem("EdrBase.cEdrRsnBundleCde", {typeCode:'', codeParam:'',loadData: [{value:'s1',label:'全单退保'},{value:'s2',label:'一般退保'}] });
+        setFormItem("EdrBase.cEdrRsnBundleCde", {typeCode:'', codeParam:'',loadData: [{value:'s1',label:'全单退保'},{value:'s2',label:'一般退保'},{value:'c1',label:'全单注销'}] });
     }
   });
 });

@@ -780,7 +780,6 @@
                         } else if ("2" === routeData["rsnTyp"]) {
                             //注销
                             const en = JSON.stringify({
-                                scene: SCENE_EDR_APP_NEW,
                                 cAppNo: selected.value["cPlyNo"],
                                 cOrgAppNo: cAppNo,
                                 cRsnCde: rsnCde.value[selected.value["cPlyNo"]],
@@ -790,14 +789,17 @@
                                 cProdNo: selected.value["cProdNo"],
                                 cCiMrk: selected.value["cCiMrk"],
                                 cGrpMrk: selected.value["cGrpMrk"],
+                                cJiMrk: selected.value["cJiMrk"],
                                 cDptCde: selected.value["cDptCde"],
+                                cDptCnm: selected.value["cDptCnm"],
                                 cEdrType: routeData["rsnTyp"],
+                                pageType: "EDR_APP_NEW_SCENE",
                             });
                             //预留跳转路径
                             router.push({
-                                path: "/index/endorse/cancelEdit",
+                                path: "/pcis/my-page",
                                 query: {
-                                    data: en,
+                                    param: en,
                                 },
                             });
                         } else if ("3" === routeData["rsnTyp"]) {
