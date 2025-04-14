@@ -9,8 +9,11 @@
             :key="index"
             @click="selectComponent(item)"
             class="component-item"
+            :class=" selectConItem.cComponentKey === item.cComponentKey ? 'com_active' : '' "
           >
-            <template #title>{{ item.cComponentName }}</template>
+            <template #title>
+              {{ item.cComponentName }}
+            </template>
           </el-menu-item>
         </el-menu>
       </el-col>
@@ -162,6 +165,7 @@ const tableconfig = reactive<AppTableConfig>(
 const selectConItem = ref({});
 function selectComponent(item: any) {
   selectConItem.value = item;
+  selecrCon
   const param = {
     CComponentKey: item.cComponentKey,
     cComponentTab: item.cComponentTab,
@@ -223,5 +227,8 @@ const handleVisibleUpdate = (value: boolean) => {
 /* 确保样式与现有组件一致 */
 .component-item {
   height: 30px;
+}
+.com_active {
+  background-color: #72ffff;
 }
 </style>
