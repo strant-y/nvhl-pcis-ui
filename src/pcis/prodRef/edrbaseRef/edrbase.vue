@@ -119,6 +119,21 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         disabled:true
       },
       {
+        prop: "EdrBase.tEdrAppTm",
+        inputtype: "rtdatepicker",
+        format:"YYYY-MM-DD HH:mm:ss",
+        type :"datetime",
+        title: "批改申请日期",
+        disabled:true
+      },
+      {
+        prop: "EdrBase.tEdrBgnTm",
+        inputtype: "rtdatepicker",
+        format:"YYYY-MM-DD HH:mm:ss",
+        type :"datetime",
+        title: "批单生效起期",
+      },
+      {
         prop: "EdrBase.cAppPrsnNme",
         inputtype: "rtinput",
         title: "申请人",

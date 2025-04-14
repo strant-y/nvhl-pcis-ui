@@ -50,6 +50,7 @@ import InsuranceRules from "./commodityRef/InsuranceRules.vue";
 import commonProblem from "./commodityRef/CommonProblem.vue";
 import healthNoticeAdd from "./commodityRef/HealthNoticeAdd.vue";
 import clauseConf from "./clauseConfRef/clauseConf.vue";
+import deductibleDist from "./deDuctibleRef/deductibleDist.vue"
 // import prodaudit from "./commonRef/prodaudit.vue";
 import clauseConfBasicInfo from "./commonRef/ClauseConfBasicInfo.vue";
 import  ndustryCateModal  from "./commodityRef/ndustryCateModal.vue";
@@ -79,6 +80,7 @@ const componentMap = {
   payinfoRef: payinfoRef,
   acctinfoRef: acctinfoRef,
   distRef: distRef,
+  deductibleDistRef:deductibleDist,
   // ciRef: ciRef,
   // ciMasterAgreementRef: ciMasterAgreementRef,
   // ourCompanyCiShareRef: ourCompanyCiShareRef,
