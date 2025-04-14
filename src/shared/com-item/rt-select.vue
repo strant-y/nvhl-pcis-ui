@@ -185,7 +185,7 @@ watch([() => props.modelValue], ([newModelValue]) => {
     return;
   }
   selectedValue.value = newModelValue;
-  if(props.item.typeCode && options.value.length === 0){
+  if (props.item.typeCode && options.value.length === 0) {
     uploadOption();
   }
 });
@@ -194,17 +194,35 @@ watch([() => props.modelValue], ([newModelValue]) => {
  * 页面数据监听
  */
 watch(
-  [() => props.item.loadData,() => props.item.typeCode],
-  ([newloadData, newtypeCode]) => {
+  [() => props.item.loadData],
+  ([newloadData]) => {
     if (newloadData) {
       options.value = newloadData;
     }
+  },
+  { deep: true }
+);
+
+watch(
+  [() => props.item.typeCode],
+  ([newtypeCode]) => {
     if (newtypeCode) {
       uploadOption();
     }
   },
   { deep: true }
 );
+
+watch(
+  [() => props.item.codeParam],
+  ([newCodeParam]) => {
+    if (newCodeParam) {
+      uploadOption();
+    }
+  },
+  { deep: true }
+);
+
 function uploadOption() {
   codeListStore
     .queryCodeList(
@@ -267,9 +285,9 @@ function getParam() {
   }
 
   if (props.item.disabled) {
-    if(!p){
-      p = {value: selectedValue.value};
-    }else{
+    if (!p) {
+      p = { value: selectedValue.value };
+    } else {
       p.value = selectedValue.value;
     }
   }

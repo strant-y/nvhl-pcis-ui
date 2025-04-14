@@ -7,6 +7,7 @@
       ref="tableRef"
       @page-change="handleQuery(false)"
     />
+    <comDialog ref="dialog"></comDialog>
   </div>
 </template>
 
@@ -21,12 +22,12 @@ import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { saveProdInfo } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { DialogMethod } from "../../common/dzmodel/ComDialogConf";
+
 const opertaor = dataOpertaor();
-import { useDzModal } from "@/common/dzmodel/DzModalService";
-const dzmodal = useDzModal();
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
-const edrItemEdit = defineAsyncComponent(() => import("./edrItemEdit.vue"));
+
 import {
   AppTableConfig,
   AppTableMethod,
@@ -41,10 +42,14 @@ const route = useRoute();
 const query = ref(route.query);
 const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
 
+const userStr = sessionStorage.getItem("user");
+const user: any = typeof userStr === "string" ? JSON.parse(userStr) : null;
+
 const { getRules } = useValidator();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
+const dialog = ref<DialogMethod | null>(null);
 const cPard = ref(null);
 
 const selectedKindNo = ref<string | null>(null);
@@ -75,28 +80,32 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "产品大类",
         itemWidth: 1,
-        rules: [{ type: "required" }],
+        rules: [getRules("required", {})],
         typeCode: "KIND_LIST_GRT",
         child: "cProdNo",
         codeParam: {
-          cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
-          cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+          cOperId: user?.opCde,
+          cDptCde: user?.companyId,
         },
         filterable: true,
         clearable: true,
-        func: (row) => {
-          cPard.value = row;
-          selectedKindNo.value = row.value; // 更新选中的产品大类
-          codeListStore
-            .queryCodeList({
-              codeListName: "EDR_RSN_LIST_KIND",
-              codeListParam: { kindno: row },
-            })
-            .then((res) => {
-              setFormItem("CRsnCde", {
-                loadData: res,
-              });
-            });
+        func: (row: any) => {
+          // 更新产品下拉选
+          setFormItem("CProdNo", {
+            codeParam: {
+              cParCde: row,
+              cOperId: user?.opCde,
+              cDptCde: user?.companyId,
+            },
+          });
+          freeEditRef.value?.setValue("CProdNo", null);
+          // 更新批改项下拉选
+          setFormItem("CRsnCde", {
+            codeParam: {
+              kindNo: row,
+            },
+          });
+          freeEditRef.value?.setValue("CRsnCde", null);
         },
       },
       {
@@ -104,19 +113,18 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "产品",
         itemWidth: 1,
-        rules: [{ type: "required" }],
+        rules: [getRules("required", {})],
         filterable: true,
         clearable: true,
         typeCode: "PROD_LIST_IN_GUIDE",
         codeParam: {
-          cParCde: cPard.value,
-          cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
-          cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+          cParCde: "999",
         },
       },
       {
         prop: "CGrpMrk",
         inputtype: "rtselect",
+        rules: [getRules("required", {})],
         title: "是否团单",
         loadData: [
           { value: "0", label: "否" },
@@ -127,7 +135,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "CRsnCde",
         inputtype: "rtselect",
+        rules: [getRules("required", {})],
         title: "批改原因",
+        typeCode: "EDR_RSN_LIST_KIND",
+        codeParam: {
+          kindNo: "999",
+        },
         filterable: true,
         clearable: true,
       },
@@ -165,20 +178,16 @@ const tableconfig = reactive<AppTableConfig>(
             ElMessage.error("请先选择险种和批改原因");
             return;
           }
-          dzmodal
-            .open(edrItemEdit, {
-              type: "add",
-              data: {
-                cRsnCde: cRsnCde,
-                cProdNo: cProdNo,
-                cGrpMrk: cGrpMrk,
-              },
-            })
-            .then((res) => {
-              if (res.type === "ok") {
+          dialog.value?.open(
+            "edrItemEdit",
+            { cRsnCde: cRsnCde, cProdNo: cProdNo, cGrpMrk: cGrpMrk },
+            {
+              isOk: () => {
                 handleQuery();
-              }
-            });
+              },
+            },
+            { title: "要素绑定" }
+          );
         },
       }),
     ],
@@ -196,7 +205,7 @@ const tableconfig = reactive<AppTableConfig>(
         tableClick: (row) => {
           const param = { CPkId: row.cPkId };
           delProdEdrRsnItem(param)
-            .then((res) => {
+            .then((res: any) => {
               const { code, data, msg } = res;
               if (200 === code) {
                 ElMessage.success("删除成功");
@@ -306,7 +315,7 @@ function handleQuery(flag?: boolean) {
   const param = Object.assign(s, r);
   param["pageNo"] = param["pageNum"];
   qryProdEdrRsnItemList(param)
-    .then((res) => {
+    .then((res: any) => {
       const { code, data, msg } = res;
       if (200 === code) {
         pageresult.list = data.result;
@@ -318,6 +327,9 @@ function handleQuery(flag?: boolean) {
     .finally(() => {});
 }
 onMounted(() => {
+  nextTick(() => {
+    freeEditRef.value?.setValue("CGrpMrk", "0");
+  });
   if (param.editType === "edit") {
     setDisa();
   }
@@ -343,8 +355,5 @@ defineExpose({
 /* 确保样式与现有组件一致 */
 .app-container {
   padding: 6px 30px;
-}
-/deep/ .el-form {
-  padding: 5px 30px;
 }
 </style>
