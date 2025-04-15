@@ -1196,5 +1196,7 @@ export function deleteDist(queryParams: any): AxiosPromise<any> {
 export function checkAppBase(queryParams: any): AxiosPromise<any> {
     return post(`/policy/checkAppBase`, queryParams);
 }
-
+export function downloadDistTemplate(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/downloadDistTemplate`, queryParams);
+}
 

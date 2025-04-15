@@ -110,12 +110,12 @@
           <el-col :span="24">
             <el-form-item
               label="条款名称"
-              prop="cNmeCn"
+              prop="cTermNme"
               :rules="[getRules('required', {})]"
             >
               <el-select
                 style="width: 500px"
-                v-model="formconfig1.cNmeCn"
+                v-model="formconfig1.cTermNme"
                 placeholder="请选择"
                 @change="handleChange"
                 @clear="handleClear"
@@ -213,7 +213,8 @@ const formconfig1 = ref({
   cDptCnm: "",
   cRenewMrk: "0",
   cGrpMrk: "0",
-  cNmeCn: "",
+  // cNmeCn: "",
+  cTermNme: "",
   cTermNo: "",
   cProdNo: "",
   cProdNme: "",
@@ -311,7 +312,7 @@ function handleClick(item: any, index: number) {
     termList.value.forEach((item: any, index: any) => (item.checked = false));
   }
   item.checked = !item.checked;
-  formconfig1.value.cNmeCn = item.checked ? item.termCnm : "";
+  formconfig1.value.cTermNme = item.checked ? item.termCnm : "";
   formconfig1.value.cTermNo = item.termNo;
   formconfig1.value.cProdNo = item.prodNo;
   formconfig1.value.cProdNme = item.prodCnm;
@@ -384,7 +385,7 @@ function showModal() {
       if (res.type === "ok") {
         const selectedTerm = res.body;
         formconfig1.value.cTermNo = selectedTerm.data.code;
-        formconfig1.value.cNmeCn = selectedTerm.data.value;
+        formconfig1.value.cTermNme = selectedTerm.data.value;
         formconfig1.value.cProdNo = selectedTerm.parent.data.code;
         handleQuery();
       }
