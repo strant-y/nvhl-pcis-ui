@@ -71,9 +71,9 @@ export const dataOpertaor = defineStore(
         };
         const setReadOnly = (formconfig: any) => {
             formconfig.forEach(page => {
-                if(page.pageInfo && page.pageInfo.length > 0){
+                if (page.pageInfo && page.pageInfo.length > 0) {
                     page.pageInfo.forEach(info => {
-                        const fsch =info.pageSchema;
+                        const fsch = info.pageSchema;
                         fsch.editFlag = false;
                         if (fsch.fromSchema && fsch.fromSchema.length > 0) {
                             fsch.fromSchema.forEach(f => {
@@ -184,23 +184,28 @@ export const dataOpertaor = defineStore(
                                     }
                                 }
                             } else {// 按钮控制
-                                if (
-                                    conf.titleBtns &&
-                                    conf.titleBtns.length > 0
-                                ) {
-                                    conf.titleBtns.forEach((t) => {
-                                        if ('Btn_' + t.id === item) {
-                                            t.hidden = false;
-                                        }
-                                    });
+                                if (conf.fromType !== 'custom') {
+                                    if (
+                                        conf.titleBtns &&
+                                        conf.titleBtns.length > 0
+                                    ) {
+                                        conf.titleBtns.forEach((t) => {
+                                            if ('Btn_' + t.id === item) {
+                                                t.hidden = false;
+                                            }
+                                        });
+                                    }
+                                    if (conf.endBtns && conf.endBtns.length > 0) {
+                                        conf.endBtns.forEach((t) => {
+                                            if ('Btn_' + t.id === item) {
+                                                t.hidden = false;
+                                            }
+                                        });
+                                    }
+                                } else {
+                                    tableRefs[key].setUnDisabledByKeyList(item);
                                 }
-                                if (conf.endBtns && conf.endBtns.length > 0) {
-                                    conf.endBtns.forEach((t) => {
-                                        if ('Btn_' + t.id === item) {
-                                            t.hidden = false;
-                                        }
-                                    });
-                                }
+
                             }
                         }
                     })

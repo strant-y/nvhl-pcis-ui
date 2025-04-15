@@ -23,6 +23,7 @@
               v-for="(i, index) in formData['m']"
               :key="index"
               v-model="formData['m'][index]"
+                :disabled-flag="disAbledFlag"
               @delete="
                 (r) => {
                   deleteData(r);
@@ -53,6 +54,7 @@
                 v-for="(i, index) in formData['a1']"
                 :key="index"
                 v-model="formData['a1'][index]"
+                :disabled-flag="disAbledFlag"
                 @delete="
                   (r) => {
                     deleteData(r);
@@ -76,6 +78,7 @@
           >
             <tremAddTemplate2
               :planData="formData['a2']"
+              :disabled-flag="disAbledFlag"
               @delete="
                 (r) => {
                   deleteData(r);
@@ -98,6 +101,7 @@
           >
             <tremAddTemplate3
               :planData="formData['a3']"
+              :disabled-flag="disAbledFlag"
               @delete="
                 (r) => {
                   deleteData(r);
@@ -142,6 +146,7 @@ const cardconfig = ref(creatCardConfig({}));
 const tremTemplateRefs = ref<any>({});
 const cvrgFormfef = ref("cvrgFormfef");
 const formData = ref<{ [key: string]: [] }>({});
+const disAbledFlag = ref(false);
 
 onMounted(async () => {
   const formconfig11 = formInit(
@@ -366,6 +371,7 @@ function getFormconfig() {
   };
 }
 function setDisabledAll() {
+    disAbledFlag.value = true;
   if (cardconfig.value.titleBtns && cardconfig.value.titleBtns.length > 0) {
     cardconfig.value.titleBtns.forEach((item: any) => {
       item.hidden = true;
@@ -382,6 +388,19 @@ function setDisabledAll() {
     });
   }
 }
+function setUnDisabledByKeyList(key: any) {
+    cardconfig.value.endBtns?.forEach((item: any) => {
+      if(item.id = key){
+        item.hidden = false;
+      }
+    });
+    cardconfig.value.titleBtns?.forEach((item: any) => {
+      if(item.id = key){
+        item.hidden = false;
+      }
+    });
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
@@ -390,6 +409,7 @@ defineExpose({
   showFlush,
   getFormconfig,
   setDisabledAll,
+  setUnDisabledByKeyList,
 });
 </script>
 

@@ -494,6 +494,18 @@ function setDisabledAll() {
     tremTemplateRefs.value[item].setDisabledAll();
   });
 }
+function setUnDisabledByKeyList(key: any) {
+    cardconfig.value.endBtns?.forEach((item: any) => {
+      if(item.id = key){
+        item.hidden = false;
+      }
+    });
+    cardconfig.value.titleBtns?.forEach((item: any) => {
+      if(item.id = key){
+        item.hidden = false;
+      }
+    });
+}
 
 defineExpose({
   getFromValue,
@@ -503,6 +515,7 @@ defineExpose({
   showFlush,
   getFormconfig,
   setDisabledAll,
+  setUnDisabledByKeyList,
 });
 </script>
 
