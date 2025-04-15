@@ -7,14 +7,15 @@
           tableConfig.showEdit ||
           tableConfig.formconfig?.titleBtns.length > 0 ||
           tableConfig.titleBtns.length > 0
-        " >
+        "
+      >
         <el-row justify="space-between" v-if="tableConfig.showEdit">
           <el-col :span="24">
             <dynamic-forms
-                :fromSchema="tableConfig.formconfig.fromSchema"
-                :fromUi="tableConfig.formconfig.fromUi"
-                ref="dynamicForm"
-              />
+              :fromSchema="tableConfig.formconfig.fromSchema"
+              :fromUi="tableConfig.formconfig.fromUi"
+              ref="dynamicForm"
+            />
           </el-col>
         </el-row>
         <el-row
@@ -26,7 +27,9 @@
               v-for="(item, index) in tableConfig.formconfig?.titleBtns"
               :key="index"
             >
-              <rt-button :item="item" />
+              <template v-if="!item.hidden">
+                <rt-button :item="item" />
+              </template>
             </template>
           </el-col>
         </el-row>
@@ -36,12 +39,21 @@
               v-for="(item, index) in tableConfig.titleBtns"
               :key="index"
             >
-              <rt-button :item="item" />
+              <template v-if="!item.hidden">
+                <rt-button :item="item" />
+              </template>
             </template>
           </el-col>
         </el-row>
       </template>
-      <template #header v-else-if="tableConfig.fromUi.showTitleBar?tableConfig.fromUi.showTitleBar: true">
+      <template
+        #header
+        v-else-if="
+          tableConfig.fromUi.showTitleBar
+            ? tableConfig.fromUi.showTitleBar
+            : true
+        "
+      >
         <el-row justify="space-between">
           <el-col :span="4" v-if="!tableConfig.production">
             {{ tableConfig.title }}
@@ -106,7 +118,7 @@ const appgrideditConfig = reactive<AppGridEditConfig>({
 });
 interface dynamicFormMethod {
   getFromValue: () => any;
-  setFormValue: (data: any,noupdate?: boolean) => void;
+  setFormValue: (data: any, noupdate?: boolean) => void;
   validate: () => any;
   setValue: (key: any, value: any) => void;
   getValue: (key: any) => any;
@@ -170,9 +182,9 @@ function getPartnerPage(flag = true) {
   return queryParams;
 }
 function getFromValue() {
-  if(dynamicForm.value){
+  if (dynamicForm.value) {
     return dynamicForm?.value.getFromValue();
-  }else{
+  } else {
     return null;
   }
 }
