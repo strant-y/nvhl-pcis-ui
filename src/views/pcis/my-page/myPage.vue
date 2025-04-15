@@ -899,15 +899,14 @@ const loadAppPlyInfo = (CAppNo) => {
             ].split(",");
         }
         console.log("EdrBaseData", EdrBaseData);
-        res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"] = "1";
-        res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrType"] =
-          props.param["cEdrType"];
-        res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnBundleCde"] =
-          props.param["cRsnCde"];
-        props.param["cEdrType"];
-        if (props.param.cEdrType != "1") {
-          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] = "";
-        }
+      if("EDR_APP_NEW_SCENE" === props.param.pageType){
+          res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"]= '1';
+          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrType"]= props.param["cEdrType"];
+          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnBundleCde"]= props.param["cRsnCde"];
+          if (props.param.cEdrType != "1") {
+              res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"]=''
+          }
+      }
         edrbase.value?.setFormValue(EdrBaseData);
       }
       ElMessage.success(res.msg);
