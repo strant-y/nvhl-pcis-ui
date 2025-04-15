@@ -88,7 +88,7 @@
                   <span style="font-weight: bold">条款：</span
                   ><span class="publicStyle"
                     >{{ props.param.cTermNo }}&nbsp;&nbsp;{{
-                      props.param.cNmeCn
+                      props.param.cTermNme
                     }}</span
                   >&nbsp;|&nbsp;<span style="font-weight: bold">出单方式：</span
                   ><span class="publicStyle">核心页面出单</span>&nbsp;|
