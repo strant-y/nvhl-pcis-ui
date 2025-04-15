@@ -504,9 +504,9 @@ const initPage = async () => {
       (props.param.pageType === "EDR_APP_NEW_SCENE" &&
         (props.param.cEdrType == "3" || props.param.cEdrType == "2")) ||
       (props.param.pageType === "TEMPORARY_DEPOSIT" &&
-        (props.param.cEdrType == "3" || props.param.cEdrType == "2"))||
+        (props.param.cEdrType == "3" || props.param.cEdrType == "2")) ||
       (props.param.pageType === "PLY_UW_PROCESS_SCENE" &&
-          (props.param.cEdrType == "3" || props.param.cEdrType == "2"))
+        (props.param.cEdrType == "3" || props.param.cEdrType == "2"))
     ) {
       edritemFlag.value = false;
     }
@@ -792,6 +792,8 @@ async function loadAfter() {
       if (res) {
         const ops = opertaor.convertData(res);
         opertaor.setDataAll(ops);
+        //获取单号
+        getCAppNoFun();
       }
     });
     bthList.value.push(
