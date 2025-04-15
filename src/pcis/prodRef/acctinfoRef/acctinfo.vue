@@ -16,10 +16,6 @@ const props = defineProps({
     type: [Object],
     required: true,
   },
-  edrAll: {
-    type: Boolean,
-    default: false
-  }
 });
 
 
@@ -28,22 +24,12 @@ const tgtobjEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 
 onMounted(() => {
-  //console.log("合并之前：")
-  //console.log(props.pageSchema)
-  //处理不为批改场景默认收缩
-  if (!props.edrAll) {
-    props.pageSchema.showMyfrom=false
-  }
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
     method,
     exRules
   );
-  //console.log("获取formconfig11：")
-  //console.log(formconfig11)
   Object.assign(formconfig1, formconfig11);
-  //console.log("最终数据：")
-  //console.log(formconfig1)
 });
 
 // 绑定方法

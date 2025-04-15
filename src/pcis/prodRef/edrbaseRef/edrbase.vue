@@ -18,10 +18,11 @@ const codeListStore = codeListViewStore();
 const opertaor = dataOpertaor();
 const { getRules } = useValidator();
 const props = defineProps({
-  param: {
-    type: [Object],
-  },
+  // param: {
+  //   type: [Object],
+  // },
 });
+const params=opertaor.getParam()
 const { getCUndrMrk, getBackClsList } = NewUdrListService();
 const edrbaseEditRef = ref<AppFreeEditMethod | null>(null);
 const user = JSON.parse(sessionStorage.getItem("user"));
@@ -118,6 +119,21 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         disabled:true
       },
       {
+        prop: "EdrBase.tEdrAppTm",
+        inputtype: "rtdatepicker",
+        format:"YYYY-MM-DD HH:mm:ss",
+        type :"datetime",
+        title: "批改申请日期",
+        disabled:true
+      },
+      {
+        prop: "EdrBase.tEdrBgnTm",
+        inputtype: "rtdatepicker",
+        format:"YYYY-MM-DD HH:mm:ss",
+        type :"datetime",
+        title: "批单生效起期",
+      },
+      {
         prop: "EdrBase.cAppPrsnNme",
         inputtype: "rtinput",
         title: "申请人",
@@ -141,7 +157,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "批改原因",
         typeCode: "EDR_RSN_LIST",
-        codeParam: { prodNo: props.param["cProdNo"] },
+        codeParam: { prodNo: params["cProdNo"] },
         rules: [getRules("required", {})],
         clearable: true,
         disabled: true,
@@ -238,14 +254,14 @@ onMounted(() => {
   nextTick(() => {
       setFormItem("EdrBase.cDptCde", {
           loadData: [
-              { value: props.param.cDptCde, label: `${props.param.cDptCde} ${props.param.cDptCnm}` },
+              { value: params.cDptCde, label: `${params.cDptCde} ${params.cDptCnm}` },
           ],
       });
-    const isGrp = props.param["cGrpMrk"] === "1" ? "1" : null;
-    const isPer = props.param["CGrpMrk"] === "1" ? "1" : null;
+    const isGrp = params["cGrpMrk"] === "1" ? "1" : null;
+    const isPer = params["CGrpMrk"] === "1" ? "1" : null;
     const param = {
-      prodNo: props.param["cProdNo"],
-      rsnTyp: props.param["cEdrType"],
+      prodNo: params["cProdNo"],
+      rsnTyp: params["cEdrType"],
       isGrp: isGrp,
       isPer: isPer,
       ZH: "ZH",
@@ -259,9 +275,9 @@ onMounted(() => {
       .then((res) => {
         setFormItem("EdrBase.cEdrRsnDetail", { loadData: res });
       });
-    if(props.param["cEdrType"]!='1'){
+    if(params["cEdrType"]!='1'){
         setFormItem("EdrBase.cEdrRsnDetail", { hidden: true });
-        setFormItem("EdrBase.cEdrRsnBundleCde", { loadData: [{value:'s1',label:'全单退保'},{value:'s2',label:'一般退保'}] });
+        setFormItem("EdrBase.cEdrRsnBundleCde", {typeCode:'', codeParam:'',loadData: [{value:'s1',label:'全单退保'},{value:'s2',label:'一般退保'},{value:'c1',label:'全单注销'}] });
     }
   });
 });

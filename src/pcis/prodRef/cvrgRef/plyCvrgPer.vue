@@ -23,6 +23,7 @@
               v-for="(i, index) in formData['m']"
               :key="index"
               v-model="formData['m'][index]"
+                :disabled-flag="disAbledFlag"
               @delete="
                 (r) => {
                   deleteData(r);
@@ -30,7 +31,7 @@
               "
               :ref="
                 (res) => {
-                  tremTemplateRefs['m'+index] = res;
+                  tremTemplateRefs['m' + index] = res;
                 }
               "
             />
@@ -53,6 +54,7 @@
                 v-for="(i, index) in formData['a1']"
                 :key="index"
                 v-model="formData['a1'][index]"
+                :disabled-flag="disAbledFlag"
                 @delete="
                   (r) => {
                     deleteData(r);
@@ -60,7 +62,7 @@
                 "
                 :ref="
                   (res) => {
-                    tremTemplateRefs['a1'+index] = res;
+                    tremTemplateRefs['a1' + index] = res;
                   }
                 "
               />
@@ -76,6 +78,7 @@
           >
             <tremAddTemplate2
               :planData="formData['a2']"
+              :disabled-flag="disAbledFlag"
               @delete="
                 (r) => {
                   deleteData(r);
@@ -83,7 +86,7 @@
               "
               :ref="
                 (res) => {
-                  tremTemplateRefs['a2'+index] = res;
+                  tremTemplateRefs['a2' + index] = res;
                 }
               "
             />
@@ -98,6 +101,7 @@
           >
             <tremAddTemplate3
               :planData="formData['a3']"
+              :disabled-flag="disAbledFlag"
               @delete="
                 (r) => {
                   deleteData(r);
@@ -105,7 +109,7 @@
               "
               :ref="
                 (res) => {
-                  tremTemplateRefs['a3'+index] = res;
+                  tremTemplateRefs['a3' + index] = res;
                 }
               "
             />
@@ -142,6 +146,7 @@ const cardconfig = ref(creatCardConfig({}));
 const tremTemplateRefs = ref<any>({});
 const cvrgFormfef = ref("cvrgFormfef");
 const formData = ref<{ [key: string]: [] }>({});
+const disAbledFlag = ref(false);
 
 onMounted(async () => {
   const formconfig11 = formInit(
@@ -317,9 +322,9 @@ function refushData(datas: any) {
   formData.value = {};
   setTimeout(() => {
     formData.value = pd;
-    nextTick(()=>{
+    nextTick(() => {
       showFlush();
-    })
+    });
   }, 50);
 }
 
@@ -353,12 +358,48 @@ function setFormValue(value: any) {
 function validate() {}
 
 function showFlush() {
-  tremTemplateRefs.value.forEach((item: any) => {
-    item.dataInit();
+  Object.keys(tremTemplateRefs.value).forEach((item: any) => {
+    tremTemplateRefs.value[item].dataInit();
   });
 }
 
 function getTableValue(rowId: number, key: string) {}
+
+function getFormconfig() {
+  return {
+    fromType: "custom",
+  };
+}
+function setDisabledAll() {
+    disAbledFlag.value = true;
+  if (cardconfig.value.titleBtns && cardconfig.value.titleBtns.length > 0) {
+    cardconfig.value.titleBtns.forEach((item: any) => {
+      item.hidden = true;
+    });
+  }
+  if (cardconfig.value.endBtns && cardconfig.value.endBtns.length > 0) {
+    cardconfig.value.endBtns.forEach((item: any) => {
+      item.hidden = true;
+    });
+  }
+  if (Object.keys(tremTemplateRefs.value).length > 0) {
+    Object.keys(tremTemplateRefs.value).forEach((item: any) => {
+      tremTemplateRefs.value[item].setDisabledAll();
+    });
+  }
+}
+function setUnDisabledByKeyList(key: any) {
+    cardconfig.value.endBtns?.forEach((item: any) => {
+      if(item.id = key){
+        item.hidden = false;
+      }
+    });
+    cardconfig.value.titleBtns?.forEach((item: any) => {
+      if(item.id = key){
+        item.hidden = false;
+      }
+    });
+}
 
 defineExpose({
   getFromValue,
@@ -366,6 +407,9 @@ defineExpose({
   validate,
   getTableValue,
   showFlush,
+  getFormconfig,
+  setDisabledAll,
+  setUnDisabledByKeyList,
 });
 </script>
 

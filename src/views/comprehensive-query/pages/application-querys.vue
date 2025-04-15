@@ -78,8 +78,8 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { deleteFactorBykey, getBasicKindList } from "@/api/prod";
-import { getAppPolicyList, qryEndorseList } from "@/api/query";
+import { deleteFactorBykey, getBasicKindList, query } from "@/api/prod";
+import { getAppPolicyList, qryEndorseList, delTmpPolicy } from "@/api/query";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 import { now } from "lodash";
@@ -91,6 +91,7 @@ const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
 const route = useRoute();
 const router = useRouter();
 const activeName = ref("1");
+const queryType = ref("1");
 const homeJumpData = ref({}); //接收首页的参数，用于查询条件回显
 let addrowArr = [
   "cAppNo",
@@ -215,13 +216,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "primary",
         label: "查询",
         func: async () => {
-          // const freeEditRefs = freeEditRef.value[currentTabKey.value];
-          // freeEditRefs.value[0].validate().then((isValid) => {
-          //     if (isValid) {
-          //         handleQuery();
-          //     }
-          // });
-          handleQuery();
+          const freeEditRefs = freeEditRef.value[currentTabKey.value];
+          freeEditRefs.value[0].validate().then((isValid) => {
+            if (isValid) {
+              handleQuery();
+            }
+          });
         },
       }),
       createFreeButtonBase({
@@ -574,7 +574,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cAppStatus",
         inputtype: "rtselect",
         title: "状态",
-        rules: [getRules("required", {})],
+        // rules: [getRules("required", {})],
         clearable: true,
         loadData: [
           { label: "暂存", value: "1" },
@@ -1089,7 +1089,25 @@ const tableObj = {
             return true;
           }
         },
-        tableClick: (row) => {},
+        tableClick: (row) => {
+          ElMessageBox.confirm("确认删除数据?", "警告", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+          }).then(function () {
+            const delResult = delTmpPolicy({ appNo: row.cAppNo });
+            delResult.then((res: any) => {
+              if (null != res && null != res["code"]) {
+                if (res["code"] === 200) {
+                  ElMessage.success({ message: res.msg, duration: 3000 });
+                  handleQuery(true);
+                } else {
+                  ElMessage.error({ message: res.msg, duration: 3000 });
+                }
+              }
+            });
+          });
+        },
       }),
       // createFreeButtonBase({
       //   id: "score",
@@ -1249,6 +1267,23 @@ const tableObj = {
         title: "保费",
         minWidth: 100,
       },
+      {
+        prop: "cAppStatus",
+        inputtype: "rtinput",
+        title: "状态",
+        minWidth: 100,
+        hideBtns: (row: any) => {
+          if (
+            queryType.value == "2" ||
+            queryType.value == "3" ||
+            queryType.value == "4"
+          ) {
+            return false;
+          } else {
+            return true;
+          }
+        },
+      },
     ],
   },
 };
@@ -1259,6 +1294,7 @@ let tableconfig = reactive<AppTableConfig>(
 
 //tabs切换
 const handleTabClick = (tab: any) => {
+  queryType.value = tab.props.name;
   currentTabName.value = tab.props.label;
   const i = tabs.value.findIndex((item) => item.name === tab.props.label);
   currentTabKey.value = i;
@@ -1309,6 +1345,7 @@ const handleTabClick = (tab: any) => {
       //   }
       // }
     });
+
     freeEditRef.value[i].value[0].setValue("tIssueTm", [
       dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
       moment(new Date()).format("YYYY-MM-DD 23:59:59"),
@@ -1322,6 +1359,12 @@ const handleTabClick = (tab: any) => {
       moment(new Date()).format("YYYY-MM-DD 23:59:59"),
     ]);
   }
+  // 控制申请单类型字段的显示和隐藏
+  formconfig1.fromSchema?.forEach((item) => {
+    if (item.prop === "cAppTyp") {
+      item.disabled = queryType.value === "3" || queryType.value === "4";
+    }
+  });
   pageresult.list = [];
   tabs.value.forEach((item) => {
     if (item.name === tab.props.label) {
@@ -1475,6 +1518,7 @@ function handleQuery(flag?: boolean) {
   param["tEdrAppTmEnd"] = tEdrAppTmEnd; // 添加批改结束时间
   param["tIssueTmStart"] = tIssueTmStart; // 添加签单开始时间
   param["tIssueTmEnd"] = tIssueTmEnd; // 添加签单结束时间
+  param["queryType"] = queryType.value;
   getAppPolicyList(param)
     .then((res) => {
       const { code, data, msg } = res;

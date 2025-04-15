@@ -17,6 +17,7 @@ import termRiskGroupConfig from "./insuranceConInfo/termRiskGroupConfig.vue";
 import queryUtils from "./insuranceConInfo/queryUtils.vue";
 import relatedAdditionalInsModal from "./insuranceConInfo/relatedAdditionalInsModal.vue";
 
+import edrItemEdit from "./edrItemEdit/edrItemEdit.vue";
 import buttonEdit from "./commonutils/buttonEdit.vue";
 
 /**用于动态弹窗组件的映射生成 */
@@ -42,6 +43,7 @@ const componentMap = {
     queryUtils:queryUtils,
 
     buttonEdit:buttonEdit,
+    edrItemEdit:edrItemEdit
 
 };
 

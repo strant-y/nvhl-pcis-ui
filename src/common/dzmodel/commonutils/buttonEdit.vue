@@ -53,6 +53,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
     fromSchema: [
       {
+        prop: "id",
+        inputtype: "rtinput",
+        title: "按钮ID",
+      },
+      {
         prop: "label",
         inputtype: "rtinput",
         title: "按钮内容",

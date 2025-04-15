@@ -115,6 +115,14 @@ export function saveSurrenEdr(queryParams: any): AxiosPromise<any> {
 }
 
 /**
+ * 批改单申请核保(退保、注销)
+ * **/
+
+export function submitEdrSurrender(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/submitEdrSurrender`, queryParams);
+}
+
+/**
  * 批改申请核保
  * **/
 
@@ -190,4 +198,11 @@ export function submitUnderwriting(queryParams: any) {
  */
 export function submitUnderwritingEdr(queryParams: any) {
     return request.post('/policy/undrEdr', queryParams);
+}
+
+/**
+ * 综合查询删除暂存单
+ */
+export function delTmpPolicy(queryParams: any) {
+    return request.post('/policy/delTmpPolicy', queryParams);
 }

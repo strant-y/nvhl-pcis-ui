@@ -22,11 +22,13 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { selectDist, checkAppBase } from "@/api/prod/index";
+import { selectDist, checkAppBase, deleteDist } from "@/api/prod/index";
 import { formInit } from "@/shared/from-init";
 import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
+import { useRoute } from "vue-router";
+const route = useRoute();
 const dialog = ref<DialogMethod | null>(null);
 const opertaor = dataOpertaor();
 const props = defineProps({
@@ -43,13 +45,44 @@ const pageresult = reactive<Pageresult>({
   /** 总数 */
   total: 0,
 });
+
 const tableRef = ref<AppTableMethod | null>(null);
 const cardconfig = ref<CardConfig>(creatCardConfig({}));
 const formconfig1 = ref<Record<string, any>>({});
 const tableconfig = ref<AppTableConfig>(createTableEditConfig());
 
+// 声明全局变量
+let cComponentTableValue: string;
+
+// 封装获取 cComponentTableValue 的逻辑
+const getCComponentTableValue = (cProdNo: string, title: string): string => {
+  if (cProdNo == "040001") {
+    return "AddressDist";
+  } else if (cProdNo == "043002") {
+    return "VehicleDist";
+  } else if (cProdNo == "043009") {
+    if (title == "实际用工地址/工程项目地址清单") {
+      return "ProjectDist";
+    } else if (title == "从业人员清单") {
+      return "EmployeeDist";
+    } else if (title == "从业人员清单汇总") {
+      return "DistSummary";
+    }
+  } else if (cProdNo == "040002") {
+    if (title == "雇员清单") {
+      return "EmployeeDist";
+    } else if (title == "雇员清单汇总") {
+      return "DistSummary";
+    } else if (title == "车辆清单") {
+      return "VehicleDist";
+    } else if (title == "车辆清单汇总") {
+      return "DistSummary";
+    }
+  }
+  return "";
+};
+
 onMounted(async () => {
-  console.log("9999999999", props.pageSchema);
   const processedFromSchema = props.pageSchema.fromSchema.map((item) => {
     return Object.keys(item).reduce(
       (acc, key) => {
@@ -76,7 +109,57 @@ onMounted(async () => {
     titleBtns: formconfig1.value.titleBtns,
     fromSchema: formconfig1.value.distSchema,
   });
-  // addFakeData();
+  tableconfig.value.tableBtnType = "btn";
+  tableconfig.value.tableBtnWidth = 150;
+  tableconfig.value.tableBtnPosition = "right";
+  tableconfig.value.tableBtn = [
+    {
+      id: "score",
+      link: true,
+      tooltip: "编辑",
+      type: "success",
+      size: "large",
+      icon: "Edit",
+      tableClick: (row) => {
+        dialog.value?.open(
+          "distAdd",
+          {
+            fromSchema: tableconfig.value.fromSchema,
+            title: "编辑",
+            rowData: row,
+          },
+          {
+            isOk: (res: any) => {},
+            handleQuery: method.handleQuery, // 新增：将 handleQuery 方法传递给 distAdd 组件
+          },
+          { width: "60" }
+        );
+      },
+    },
+    {
+      id: "score",
+      type: "danger",
+      tooltip: "删除",
+      icon: "Delete",
+      link: true,
+      tableClick: (row) => {
+        deleteDist({
+          cComponentTable: cComponentTableValue,
+          cPkId: [row.cPkId],
+        }).then((res) => {
+          if (res.code === 200) {
+            ElMessage.success("删除成功");
+            method.handleQuery();
+          }
+        });
+      },
+    },
+  ];
+  // 初始化 cComponentTableValue
+  cComponentTableValue = getCComponentTableValue(
+    route.params.param.cProdNo,
+    formconfig1.value.title
+  );
 });
 
 // 绑定方法
@@ -89,7 +172,11 @@ const method = {
       if (res.code === 200) {
         dialog.value?.open(
           "distAdd",
-          { fromSchema: tableconfig.value.fromSchema, title: "新增" },
+          {
+            fromSchema: tableconfig.value.fromSchema,
+            title: "新增",
+            tab: formconfig1.value.title,
+          },
           {
             isOk: (res: any) => {},
             handleQuery: method.handleQuery, // 新增：将 handleQuery 方法传递给 distAdd 组件
@@ -103,14 +190,34 @@ const method = {
   },
   handleQuery: () => {
     const selData = {
-      cComponentTable: "AddressDist",
+      cComponentTable: cComponentTableValue,
       cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
     };
     selectDist(selData).then((res) => {
       if (res.code === 200) {
         pageresult.list = [];
         pageresult.list = res.data;
-        // pageresult.total = data.total;
+      }
+    });
+  },
+  carInfoAdd: () => {
+    let baseFlag = opertaor.getDataAll().plyBase["Base.cAppNo"];
+    checkAppBase({ cAppNo: baseFlag }).then((res) => {
+      if (res.code === 200) {
+        dialog.value?.open(
+          "distAdd",
+          {
+            fromSchema: tableconfig.value.fromSchema,
+            title: "新增",
+          },
+          {
+            isOk: (res: any) => {},
+            handleQuery: method.handleQuery, //将 handleQuery 方法传递给 distAdd 组件
+          },
+          { width: "60" }
+        );
+      } else {
+        ElMessage.error("请先保存申请单!");
       }
     });
   },
@@ -118,25 +225,6 @@ const method = {
 
 // 绑定特殊验证器
 const exRules = {};
-function getData() {
-  // return distEditRef?.value?.getFromValue();
-}
-
-function addFakeData() {
-  // if (distEditRef.value) {
-  //   const fakeData = {
-  //     // 假数据示例
-  //     NSeqNo: "示例数据1",
-  //     CCoinsurerCde: "示例数据2",
-  //     cCiSubComp: "示例数据3",
-  //   };
-  //   distEditRef.value.addRowByData(fakeData); // 设置新行的数据
-  // }
-}
-onMounted(() => {});
-defineExpose({
-  getData,
-});
 </script>
 
 <style scoped></style>

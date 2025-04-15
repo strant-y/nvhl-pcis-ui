@@ -30,6 +30,7 @@ export interface AppFreeEditMethod {
   setValue: (key: any, value: any) => void;
   getValue: (key: any) => any;
   setDisabledAll: () => void;
+  resetFields: () => void;
 }
 export function createAppFreeEditConfig(
   config: AppFreeEditConfig = {}

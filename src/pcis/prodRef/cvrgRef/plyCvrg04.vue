@@ -18,25 +18,14 @@
                 </el-col>
                 <el-col :span="4">
                   <rt-button
-                    :item="{
-                      label: '添加条款',
-                      icon: 'CirclePlus',
-                      type: 'primary',
-                      size: 'small',
-                      func: () => {
-                        addTermData(k);
-                      },
-                    }"
+                    v-if="!btnItem.addPlan.hidden"
+                    @click="addTermData(k)"
+                    :item="btnItem.addPlan"
                   />
                   <rt-button
-                    :item="{
-                      icon: 'Delete',
-                      type: 'danger',
-                      size: 'small',
-                      func: () => {
-                        deletePlan(k);
-                      },
-                    }"
+                    v-if="!btnItem.delPlan.hidden"
+                    @click="deletePlan(k)"
+                    :item="btnItem.delPlan"
                   />
                 </el-col>
               </el-row>
@@ -53,6 +42,7 @@
                     v-for="(i, index) in planData[k]['m']"
                     :key="index"
                     v-model="planData[k]['m'][index]"
+                    :disabled-flag="disAbledFlag"
                     @delete="
                       (r) => {
                         deleteData(k, r);
@@ -85,6 +75,7 @@
                       v-for="(i, index) in planData[k]['a1']"
                       :key="index"
                       v-model="planData[k]['a1'][index]"
+                      :disabled-flag="disAbledFlag"
                       @delete="
                         (r) => {
                           deleteData(k, r);
@@ -110,6 +101,7 @@
                 >
                   <tremAddTemplate2
                     :planData="planData[k]['a2']"
+                    :disabled-flag="disAbledFlag"
                     @delete="
                       (r) => {
                         deleteData(k, r);
@@ -134,6 +126,7 @@
                 >
                   <tremAddTemplate3
                     :planData="planData[k]['a3']"
+                    :disabled-flag="disAbledFlag"
                     @delete="
                       (r) => {
                         deleteData(k, r);
@@ -171,6 +164,7 @@ import { prodTemple } from "./titleTemple";
 import { codeListViewStore } from "@/store";
 import { qryProdRelTermRiskList } from "@/api/prod";
 const codeListStore = codeListViewStore();
+const disAbledFlag = ref(false);
 
 const opertaor = dataOpertaor();
 const parparam = opertaor.getParam();
@@ -183,6 +177,20 @@ const props = defineProps({
   pageSchema: {
     type: [Object],
     required: true,
+  },
+});
+
+const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
+  addPlan: {
+    label: "添加条款",
+    icon: "CirclePlus",
+    type: "primary",
+    size: "small",
+  },
+  delPlan: {
+    icon: "Delete",
+    type: "danger",
+    size: "small",
   },
 });
 
@@ -366,9 +374,9 @@ function refushData(planNo: string, datas: any) {
 
   setTimeout(() => {
     planData.value[planNo] = pd;
-    nextTick(()=>{
+    nextTick(() => {
       showFlush();
-    })
+    });
   }, 100);
 }
 function deletePlan(plan: string) {
@@ -461,12 +469,53 @@ function showFlush() {
 }
 function getTableValue(rowId: number, key: string) {}
 
+function getFormconfig() {
+  return {
+    fromType: "custom",
+  };
+}
+
+function setDisabledAll() {
+  disAbledFlag.value = true;
+  if (cardconfig.value.titleBtns && cardconfig.value.titleBtns.length > 0) {
+    cardconfig.value.titleBtns.forEach((item: any) => {
+      item.hidden = true;
+    });
+  }
+  if (cardconfig.value.endBtns && cardconfig.value.endBtns.length > 0) {
+    cardconfig.value.endBtns.forEach((item: any) => {
+      item.hidden = true;
+    });
+  }
+  Object.keys(btnItem.value).forEach((k: any) => {
+    btnItem.value[k].hidden = true;
+  });
+  Object.keys(tremTemplateRefs.value).forEach((item) => {
+    tremTemplateRefs.value[item].setDisabledAll();
+  });
+}
+function setUnDisabledByKeyList(key: any) {
+    cardconfig.value.endBtns?.forEach((item: any) => {
+      if(item.id = key){
+        item.hidden = false;
+      }
+    });
+    cardconfig.value.titleBtns?.forEach((item: any) => {
+      if(item.id = key){
+        item.hidden = false;
+      }
+    });
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   getTableValue,
   showFlush,
+  getFormconfig,
+  setDisabledAll,
+  setUnDisabledByKeyList,
 });
 </script>
 
