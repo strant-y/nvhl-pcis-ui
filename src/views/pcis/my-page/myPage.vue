@@ -504,7 +504,9 @@ const initPage = async () => {
       (props.param.pageType === "EDR_APP_NEW_SCENE" &&
         (props.param.cEdrType == "3" || props.param.cEdrType == "2")) ||
       (props.param.pageType === "TEMPORARY_DEPOSIT" &&
-        (props.param.cEdrType == "3" || props.param.cEdrType == "2"))
+        (props.param.cEdrType == "3" || props.param.cEdrType == "2"))||
+      (props.param.pageType === "PLY_UW_PROCESS_SCENE" &&
+          (props.param.cEdrType == "3" || props.param.cEdrType == "2"))
     ) {
       edritemFlag.value = false;
     }
@@ -1292,12 +1294,6 @@ const submitEdrToUndrSurrender = () => {
     btn.loading = false;
     console.log("申请核保(退保、注销)", res);
     if (res["code"] == "200") {
-      const ops = opertaor.convertData(res);
-      opertaor.setDataAll(ops);
-      if (res["res"]["composition"]["EdrBase"]) {
-        const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
-        edrbase.value?.setFormValue(EdrBaseData);
-      }
       ElMessage.success(res.msg);
     } else {
       ElMessage.error(res.msg);
