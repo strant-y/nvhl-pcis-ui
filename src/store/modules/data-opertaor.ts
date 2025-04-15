@@ -132,7 +132,6 @@ export const dataOpertaor = defineStore(
                     // } else if (f.fromType === 'grid') { // 表格模式时,修改表格属性,实现只读
                     //     f.editFlag = false;
                     // } else 
-                    console.log(f);
                     if (f.fromType === 'custom') {
                         tableRefs[key].setDisabledAll();
                     }
