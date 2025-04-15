@@ -1193,3 +1193,4 @@ export function checkAppBase(queryParams: any): AxiosPromise<any> {
     return post(`/policy/checkAppBase`, queryParams);
 }
 
+

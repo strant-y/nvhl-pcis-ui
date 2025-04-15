@@ -39,7 +39,9 @@ const method = {
   func1: () => {
   
   },
-  tInsrncBgnTmDisabled:(data)=>{ 
+  tInsrncBgnTmDisabled:(data:any)=>{ 
+    console.log('禁用方法')
+    const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["insrnc"].getFromValue();
     // moment(baseBefore["Base.tInsrncEndTm"])
     const today = new Date(baseBefore["Base.tInsrncBgnTm"])   // 开始时间

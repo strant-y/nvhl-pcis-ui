@@ -1,8 +1,9 @@
 <template>
-	<app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
-		@page-change="handleQuery(false)" />
+	<!-- <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
+		@page-change="handleQuery(false)" /> -->
+		<app-grid-edit v-model:gridEditConfig="tableconfig" ref="tableRef" />
 	<my-card v-model:cardConfig="cardConfig">
-		<app-free-edit style="margin-top: 20px" v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+		<app-free-edit style="margin-top: 20px" v-model:freeEditConfig="formconfig1" ref="freeEditRef1" />
 		<app-free-edit style="margin-top: 20px" v-model:freeEditConfig="formconfig2" ref="freeEditRef2" />
 		<app-free-edit style="margin-top: 20px" v-model:freeEditConfig="formconfig3" ref="freeEditRef3" />
 		<app-free-edit style="margin-top: 20px" v-model:freeEditConfig="formconfig4" ref="freeEditRef4" />
@@ -15,6 +16,7 @@ import { yesOrNo, size, inputtype, typeMap, dateType, position } from "@/utils/u
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { ref, defineProps, defineEmits, onMounted } from "vue";
 import { createFreeButtonBase } from "@/shared/button-config";
+import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
 import {
 	getButtonByFacKey,
 	getFactorList,
@@ -35,6 +37,12 @@ import {
 	createTableEditConfig,
 	MyTableMethod,
 } from "@/shared/app-table-config";
+import {
+  AppGridEditConfig,
+  AppGridEditMethod,
+  createAppGridEditConfig,
+  createGridFromUiConfig,
+} from "@/shared/app-grid-edit-config";
 
 const props = defineProps({
 	data: Object,
@@ -45,74 +53,202 @@ const emits = defineEmits(["ok", "cancel"]);
 import { v4 as uuidv4 } from "uuid";
 const showBtnConfig = ref(false);
 const showView = ref(false);
+import { dataOpertaor } from "@/store/modules/data-opertaor";
+const opertaor = dataOpertaor();
+opertaor.init();
 
-const freeEditRef = ref<AppFreeEditMethod | null>(null);
+
+const freeEditRef1 = ref<AppFreeEditMethod | null>(null);
 const freeEditRef2 = ref<AppFreeEditMethod | null>(null);
 const freeEditRef3 = ref<AppFreeEditMethod | null>(null);
 const freeEditRef4 = ref<AppFreeEditMethod | null>(null);
 const freeEditRefBtn = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<MyTableMethod | null>(null);
 const appTableShow = ref(false);
+const policyService = new PolicyService();
+
 
 const schemaMap = reactive<Record<string, any>>({
 	rtinputgroup: [],
 });
 const cardConfig = reactive<CardConfig>(
 	creatCardConfig({
-		title: '投保人-法人扩展信息',
+		title: '被保人-法人扩展信息',
 		showMyfromBtm: true
 	})
 )
-const formconfig = {
+
+const formconfigData = {
 	fromUi: {
 		cols: 2
 	},
 	shadow: false,
 	fromSchema: [
 		{
-			prop: '',
+			prop: 'CCusNme_A',
 			title: '姓名',
-			inputtype: "rtinput"
+			inputtype: "rtinput",
+			// clearable: true,
+			// rules: [getRules("required", {})],
 		},
 		{
-			prop: '',
+			prop: 'CCertfCls_A',
 			title: '证件类型',
-			inputtype: "rtinput"
+			inputtype: "rtselect",
+			typeCode: "NATURAL_CERTIFICATE_ALL",
+			// clearable: true,
+			
 		},
 		{
-			prop: '',
+			prop: 'CCertfCde_A',
 			title: '证件号码',
-			inputtype: "rtinput"
+			inputtype: "rtinput",
+			rules: [getRules("idCard", {})],
 		},
 		{
-			prop: '',
+			prop: 'TCertfBgnTm_A',
 			title: '认证有效起期',
 			inputtype: "rtdatepicker"
 		},
 		{
-			prop: '',
+			prop: 'TCertfEndTm_A',
 			title: '认证有效止期',
 			inputtype: "rtdatepicker"
 		}
 	]
 }
+const formconfigData2 = {
+	fromUi: {
+		cols: 2
+	},
+	shadow: false,
+	fromSchema: [
+		{
+			prop: 'CCusNme_B',
+			title: '姓名',
+			inputtype: "rtinput",
+
+			// clearable: true,
+			// rules: [getRules("required", {})],
+		},
+		{
+			prop: 'CCertfCls_B',
+			title: '证件类型',
+			inputtype: "rtselect",
+			typeCode: "NATURAL_CERTIFICATE_ALL",
+			// clearable: true,
+		},
+		{
+			prop: 'CCertfCde_B',
+			title: '证件号码',
+			rules: [getRules("idCard", {})],
+			inputtype: "rtinput"
+		},
+		{
+			prop: 'TCertfBgnTm_B',
+			title: '认证有效起期',
+			inputtype: "rtdatepicker"
+		},
+		{
+			prop: 'TCertfEndTm_B',
+			title: '认证有效止期',
+			inputtype: "rtdatepicker"
+		}
+	]
+}
+const formconfigData3 = {
+	fromUi: {
+		cols: 2
+	},
+	shadow: false,
+	fromSchema: [
+		{
+			prop: 'CCusNme_C',
+			title: '姓名',
+			inputtype: "rtinput",
+			// clearable: true,
+		},
+		{
+			prop: 'CCertfCls_C',
+			title: '证件类型',
+			inputtype: "rtselect",
+			typeCode: "NATURAL_CERTIFICATE_ALL",
+			// clearable: true,
+		},
+		{
+			prop: 'CCertfCde_C',
+			title: '证件号码',
+			rules: [getRules("idCard", {})],
+			inputtype: "rtinput"
+		},
+		{
+			prop: 'TCertfBgnTm_C',
+			title: '认证有效起期',
+			inputtype: "rtdatepicker"
+		},
+		{
+			prop: 'TCertfEndTm_C',
+			title: '认证有效止期',
+			inputtype: "rtdatepicker"
+		}
+	]
+}
+const formconfigData4 = {
+	fromUi: {
+		cols: 2
+	},
+	shadow: false,
+	fromSchema: [
+		{
+			prop: 'CCusNme_D',
+			title: '姓名',
+			inputtype: "rtinput",
+			// clearable: true,
+		},
+		{
+			prop: 'CCertfCls_D',
+			title: '证件类型',
+			inputtype: "rtselect",
+			typeCode: "NATURAL_CERTIFICATE_ALL",
+			// clearable: true,
+		},
+		{
+			prop: 'CCertfCde_D',
+			title: '证件号码',
+			rules: [getRules("idCard", {})],
+			inputtype: "rtinput"
+		},
+		{
+			prop: 'TCertfBgnTm_D',
+			title: '认证有效起期',
+			inputtype: "rtdatepicker"
+		},
+		{
+			prop: 'TCertfEndTm_D',
+			title: '认证有效止期',
+			inputtype: "rtdatepicker"
+		}
+	]
+}
+
+
 const formconfig1 = reactive<AppFreeEditConfig>(
-	createAppFreeEditConfig(Object.assign(formconfig, {
+	createAppFreeEditConfig(Object.assign(formconfigData, {
 		title: '控股股东或实际控制人：',
 	}))
 );
 const formconfig2 = reactive<AppFreeEditConfig>(
-	createAppFreeEditConfig(Object.assign(formconfig, {
+	createAppFreeEditConfig(Object.assign(formconfigData2, {
 		title: '法定代表人：',
 	}))
 );
 const formconfig3 = reactive<AppFreeEditConfig>(
-	createAppFreeEditConfig(Object.assign(formconfig, {
+	createAppFreeEditConfig(Object.assign(formconfigData3, {
 		title: '负责人：',
 	}))
 );
 const formconfig4 = reactive<AppFreeEditConfig>(
-	createAppFreeEditConfig(Object.assign(formconfig, {
+	createAppFreeEditConfig(Object.assign(formconfigData4, {
 		title: '授权代理人：',
 	}))
 );
@@ -123,110 +259,198 @@ const pageresult = reactive<Pageresult>({
 	/** 总数 */
 	total: 0,
 });
-const tableconfig = reactive<AppTableConfig>(
-	createTableEditConfig({
-		title: '投保人-客户受益所有人',
-		isPage: 'false',
+
+const tableconfig = reactive<AppGridEditConfig>(
+	createAppGridEditConfig({
+		title: '被保人-客户受益所有人',
+ 
+    // showSelection: true,  // 是否显示多选框
+   		editFlag: true, //是否可以编辑
+		// editList:['cOpgrpCnm','cName'],
 		titleBtns: [
 			createFreeButtonBase({
 				type: "primary",
 				label: "新增",
 				func: async () => {
-					console.log('新增')
+					tableRef.value?.addRowByData({ cGrpMrk: "0" });
 				},
 			}),
 			createFreeButtonBase({
 				type: "primary",
 				label: "删除",
 				func: async () => {
-					console.log('删除')
+
+					const selData = tableRef?.value?.getSelectRow();
+					if (!selData) {
+						ElMessage.error("请选择要删除的数据!");
+						return;
+					}
+					const editIndex = selData["_dataId"];
+
+					tableRef?.value?.delRow(editIndex);
 				},
 			})
 		],
 		fromSchema: [
+			// {
+			// 	prop: "cSeqNo",
+			// 	inputtype: "rtinput",
+			// 	title: "序号",
+			// 	disabled: true,
+			// },
 			{
-				prop: "",
-				inputtype: "rtinput",
-				title: "序号",
-			},
-			{
-				prop: "",
+				prop: "cCusLnme",
 				inputtype: "rtinput",
 				title: "姓",
 			},
 			{
-				prop: "",
+				prop: "cCusFnme",
 				inputtype: "rtinput",
 				title: "名",
 			},
 			{
-				prop: "",
-				inputtype: "rtinput",
+				prop: "cCerftCls",
+				inputtype: "rtselect",
+				typeCode: "NATURAL_CERTIFICATE_ALL",
 				title: "证件类型",
+				params: { },
+				// clearable: true,
 			},
 			{
-				prop: "",
+				prop: "cCerftCde",
 				inputtype: "rtinput",
 				title: "证件号码",
+				
+				rules: [getRules("idCard", {})],
 			},
 			{
-				prop: "",
-				inputtype: "rtinput",
+				prop: "tCerftBgnTm",
+				inputtype: "rtdatepicker",
 				title: "证件有效起期",
 			},
 			{
-				prop: "",
-				inputtype: "rtinput",
+				prop: "tCerftEndTm",
+				inputtype: "rtdatepicker",
 				title: "证件有效止期",
+			
 			},
 			{
-				prop: "",
+				prop: "cCusAddr",
 				inputtype: "rtinput",
 				title: "地址",
 			}
 		],
 	})
 );
+
 onMounted(async () => {
-	if (props.type === "edit" && props.data) {
-		setTimeout(() => {
-			freeEditRef.value?.setFormValue(props.data);
-		}, 50);
-	}
+	getTableFun();
+	getAmlExtInfo();
 });
+
+// 受益所有人table信息
+const getTableFun = async ()=>{
+	let CAppNo = opertaor.getDataAll()['insured']['Insured.cAppNo'];   // 投保单号
+	policyService.getAMLCusBnfcInfoByAppNo(CAppNo,'insured').then((response) => {
+    if (response.code === 200) {
+      if (response.data) {
+		tableRef.value?.setFormValue(response.data)
+      }
+    } else {
+      ElMessage.error('根据申请单号获取发票信息出现异常！');
+    }
+  }).catch(() => {
+    ElMessage.error('根据申请单号获取发票信息出现异常！');
+  });
+}
+
+//  法人扩展信息 初始化查询
+const getAmlExtInfo = async ()=>{
+	let CAppNo = opertaor.getDataAll()['insured']['Insured.cAppNo'];   // 投保单号
+	policyService.getAMLExtendInfoByAppNo(CAppNo,'insured').then((response) => {
+		let {code, data} = response
+    if (code === 200) {
+      if (response.data) {
+		// 法人代表  1       B
+		// 法定负责人 2   C
+		// 授权代理人 3  D
+		// 控股股东或实际控制人  4  A      4123
+	
+		freeEditRef1.value?.setValue('CCusNme_A', data[3].cCusNme);
+		freeEditRef1.value?.setValue('CCertfCls_A', data[3].cCertfCls);
+		freeEditRef1.value?.setValue('CCertfCde_A', data[3].cCertfCde);
+		freeEditRef1.value?.setValue('TCertfBgnTm_A', data[3].tCertfBgnTm);
+		freeEditRef1.value?.setValue('TCertfEndTm_A', data[3].tCertfEndTm);
+
+		freeEditRef2.value?.setValue('CCusNme_B', data[0].cCusNme);
+		freeEditRef2.value?.setValue('CCertfCls_B', data[0].cCertfCls);
+		freeEditRef2.value?.setValue('CCertfCde_B', data[0].cCertfCde);
+		freeEditRef2.value?.setValue('TCertfBgnTm_B', data[0].tCertfBgnTm);
+		freeEditRef2.value?.setValue('TCertfEndTm_B', data[0].tCertfEndTm);
+
+		freeEditRef3.value?.setValue('CCusNme_C', data[1].cCusNme);
+		freeEditRef3.value?.setValue('CCertfCls_C', data[1].cCertfCls);
+		freeEditRef3.value?.setValue('CCertfCde_C', data[1].cCertfCde);
+		freeEditRef3.value?.setValue('TCertfBgnTm_C', data[1].tCertfBgnTm);
+		freeEditRef3.value?.setValue('TCertfEndTm_C', data[1].tCertfEndTm);
+
+		freeEditRef4.value?.setValue('CCusNme_D', data[2].cCusNme);
+		freeEditRef4.value?.setValue('CCertfCls_D', data[2].cCertfCls);
+		freeEditRef4.value?.setValue('CCertfCde_D', data[2].cCertfCde);
+		freeEditRef4.value?.setValue('TCertfBgnTm_D', data[2].tCertfBgnTm);
+		freeEditRef4.value?.setValue('TCertfEndTm_D', data[2].tCertfEndTm);
+	  }
+    } else {
+      ElMessage.error('根据申请单号获取发票信息出现异常！');
+    }
+  }).catch(() => {
+    ElMessage.error('根据申请单号获取发票信息出现异常！');
+  });
+}
+
 
 // 绑定方法
 const method = {
 	func1: () => {
-		console.log(getRules);
+ 
 	},
 };
+ 
+const validateForms = async () => {
+	let validationPromises  = [
+		freeEditRef1.value?.validate(),
+		freeEditRef2.value?.validate(),
+		freeEditRef3.value?.validate(),
+		freeEditRef4.value?.validate(),
+	]
+  return Promise.all(validationPromises);
+};
+
+const getMergedData = () => {
+	let fromData1 = freeEditRef1.value?.getFromValue(); //获取表单数据
+	let fromData2 = freeEditRef2.value?.getFromValue(); //获取表单数据
+	let fromData3 = freeEditRef3.value?.getFromValue(); //获取表单数据
+	let fromData4 = freeEditRef4.value?.getFromValue(); //获取表单数据
+	let insInfo = {
+		insFreeEdit:{...fromData1,...fromData2,...fromData3,...fromData4,},
+		insGridEdit:{
+			items: tableRef.value?.getFromValue()
+		}
+	}
+	return insInfo;
+};
+
 /* 获取全量表单数据 */
-function getFrom() {
-	let s = freeEditRef.value?.getFromValue(); //获取表单数据
-	if (showBtnConfig.value) {
-		s["showExBtn"] = "1";
-	} else {
-		s["showExBtn"] = "0";
-	}
-	if (s) {
-		const param = Object.assign(s);
-		if (props.type === "edit") {
-			param["cPkId"] = props.data.cPkId;
-		}
-		if (freeEditRefBtn.value) {
-			let btnjson = freeEditRefBtn.value?.getFromValue();
-			btnjson.initid = uuidv4().replace(/-/g, "");
-			param["btn"] = btnjson;
-		}
-		if (tableRef.value) {
-			const tabjson = tableRef.value?.getFromValue();
-			let selectList = tabjson.filter((item: any) => item.isChecked === "1");
-			param["tabjson"] = selectList;
-		}
-		return param;
-	}
-}
+const getFrom = async () => {
+	const results = await validateForms();
+	const allValid = results.every(isValid => isValid);
+	if (!allValid) {
+		ElMessage.warning('请补全信息');
+		return
+  	}
+  return   getMergedData(); // 返回合并的数据
+};
+
 /** 查询 */
 function handleQuery(flag?: boolean) {
 	//模拟数据
@@ -237,7 +461,7 @@ function handleQuery(flag?: boolean) {
 		cCode: '1',
 	}];
 	const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
-	const s = freeEditRef.value?.getFromValue(); //获取表单数据
+	const s = freeEditRef1.value?.getFromValue(); //获取表单数据
 	const param = Object.assign(s, r);
 	sysRolechatsMgrService.searchPlan(param)
 		.then((res) => {
@@ -252,6 +476,8 @@ function handleQuery(flag?: boolean) {
 		})
 		.finally(() => { });
 }
+
+defineExpose({getFrom });
 </script>
 
 <style scoped></style>

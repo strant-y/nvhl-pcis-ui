@@ -130,7 +130,7 @@
                 <edritemRef :param="props.param" ref="edritem"></edritemRef>
               </div>
 
-   
+
               <template v-for="(pageConfig, v) in formconfig1" :key="v">
                 <div
                   class="card_"
@@ -138,6 +138,7 @@
                   :key="i"
                   :id="k.pageKey"
                 >
+          
                   <component
                     v-if="currentIndex >= i"
                     :ref="
@@ -171,8 +172,13 @@
       </el-footer>
     </el-container>
     <el-backtop :right="100" :bottom="100" />
-    <!-- <amlExtendInfo ></amlExtendInfo> -->
+    
+    <!-- 发票弹框 -->
     <invoiceInfoModel  v-if="invoiceShow"  @ok="close" ></invoiceInfoModel>
+    
+    <!-- 反洗钱 -->
+     <amlExtendInfo ref="amlInfoRef" v-if="amlInfoShow" :controlFlag="controlFlag" @ok="close"  ></amlExtendInfo>
+     <!-- v-if="amlInfoShow" -->
 </div>
 </template>
 
@@ -219,6 +225,8 @@ opertaor.init();
 const underwrite = ref(null);
 const edrbase = ref(null);
 const edritem = ref(null);
+const amlInfoRef = ref(null);
+
 const props = defineProps({
   param: {
     type: Object,
@@ -245,12 +253,14 @@ const dzmodal = useDzModal();
 const cacheKey =ref();
 
 
-// 发票显示
-let invoiceShow = ref(false);
+let invoiceShow = ref(false); // 发票显示
+let amlInfoShow = ref(false); // 反洗钱显示
+let controlFlag = '';    // 用来处理反洗钱 页面窜窜以及显示
 
 //关闭
 const close = ()=>{
   invoiceShow.value = false;
+  amlInfoShow.value = false;
 }
  
 onBeforeMount(() => {
@@ -274,6 +284,52 @@ const setTaxInfo = ()=>{
         }      
 }
   
+
+    /**
+     * 反洗钱扩展信息hide
+     */
+const  setCusBenefitInfo = ()=> {
+    const tabref = opertaor.getTableRefs();
+    const appNo =tabref["applicant"].getFromValue()['Applicant.cAppNo'];  // 单据编号   
+    const AppcClntMrk =tabref["applicant"].getFromValue()['Applicant.cClntMrk'];  // 投保人 法人01
+    const InscClntMrk =tabref["insured"].getFromValue()['Insured.cClntMrk'];   // 被保人  法人01
+
+console.log('数据',opertaor.getDataAll())
+console.log('数据',props.param)
+      // amlInfoShow.value = true; 
+      //  单据保存才有 单据编号
+      if (!appNo) {
+         ElMessage.error('请先保存单据')
+         return;
+     }
+    
+     //  投被保人性质 没有填写或者都为个人 提示
+     if(AppcClntMrk == undefined || AppcClntMrk == null ) {
+        // ElMessage.error('投保人"投保人性质"不能为空！')
+        ElMessage.error('投保人性质或被保人性质为[法人]时，才允许录入反洗钱扩展信息！')
+      return
+     }else  if(InscClntMrk==undefined || InscClntMrk === null ){
+        // ElMessage.error('被保人 "被保人性质" 不能为空！')
+        ElMessage.error('投保人性质或被保人性质为[法人]时，才允许录入反洗钱扩展信息！')
+      return
+     }else if (AppcClntMrk ==="1" && InscClntMrk === "1" ) {
+      ElMessage.error('投保人性质或被保人性质为[法人]时，才允许录入反洗钱扩展信息！')
+      return;
+     }
+ 
+
+    //  显示标志   1：投保人 2：被保人  3：都展示
+      if(AppcClntMrk == '0'&& InscClntMrk =='0'){
+          amlInfoShow.value = true;     
+          controlFlag = '3';
+      } else if(AppcClntMrk == '0' &&  InscClntMrk =='1') { 
+          amlInfoShow.value = true;     
+          controlFlag = '1';
+      } else if(AppcClntMrk == '1' &&  InscClntMrk =='0') { 
+          amlInfoShow.value = true;     
+          controlFlag = '2';
+      }
+}
 
 
 /**
@@ -326,11 +382,7 @@ const basicBtn = [
     label: "反洗钱扩展信息",
     type: "primary",
     func: () => {
-        console.log('反洗钱扩展信息');
-
-        // router.push({ path: '/about', query: { name: 'Vue 3' } });
-        // src\views\pcis-main\prodDef\common\aml-extend-info\index.vue
-
+        setCusBenefitInfo()
     },
   }),
   createFreeButtonBase({
@@ -511,13 +563,13 @@ const initPage = async () => {
   if(props.param.pageType === 'EDR_APP_NEW_SCENE'&&props.param.cEdrType=='3'){
       //退保不显示产品组件信息
       const formconfig11 = [{groupId: "",pageInfo:[]}];
-      console.log("页面初始化返回数据", formconfig11);
+  
       opertaor.setTableConfig(formconfig11);
       renderComponents();
   }else{
       // 页面初始化
       const formconfig11 = JSON.parse(getProductRes.data);
-      console.log("页面初始化返回数据", formconfig11);
+
       opertaor.setTableConfig(formconfig11);
       renderComponents();
   }
@@ -541,8 +593,6 @@ function renderComponents() {
  * 页面加载后
  */
 async function loadAfter() {
-  console.log("setPage");
-  console.log(props.param);
   // page.getRefTab("base").setFormValue(lowercaseKeys(props.param));
   if (props.param.pageType === "app") {
     //获取单号
@@ -741,14 +791,15 @@ async function loadAfter() {
         label: "发票信息",
         type: "primary",
         func: () => {
-          console.log(2)
           setTaxInfo();
         },
       }),
       createFreeButtonBase({
         label: "反洗钱扩展信息",
         type: "primary",
-        func: () => {},
+        func: () => {
+          setCusBenefitInfo()
+        },
       }),
       createFreeButtonBase({
         label: "额度明细",
@@ -800,14 +851,15 @@ async function loadAfter() {
         label: "发票信息",
         type: "primary",
         func: () => {
-          console.log(3)
           setTaxInfo();
         },
       }),
       createFreeButtonBase({
         label: "反洗钱扩展信息",
         type: "primary",
-        func: () => {},
+        func: () => {
+          setCusBenefitInfo()
+        },
       }),
       createFreeButtonBase({
         label: "额度明细",

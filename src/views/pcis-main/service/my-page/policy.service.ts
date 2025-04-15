@@ -974,7 +974,7 @@ export class PolicyService {
         return request.post('/policy/getTaxInfoByAppNo', {
             'CAppNo': appNo
     });
-}
+    }
 
 /**
  * 根据投保单号获取发票信息数量
@@ -1001,26 +1001,21 @@ saveAMLExtendInfo(data) {
     console.log('保存反洗钱扩展信息' + data);
     return request.post('/policy/saveAMLExtendInfo', data);
 }
+ 
 
-/**
- * 获取反洗钱法人扩展信息(被保人)
- * @param appNo 投保单号
- */
-getAMLInsInfoByAppNo(appNo: string, flag: boolean) {
-    return request.post('/policy/getAMLInsInfoByAppNo', {
+// 反洗钱扩展信息查询  投保人 被保人通用
+getAMLExtendInfoByAppNo(appNo: string, CCusFlag: string) {
+    return request.post('/policy/getAMLExtendInfoByAppNo', {
         'CAppNo': appNo,
-        'flag': flag
+        'CCusFlag': CCusFlag
     });
 }
 
-/**
- * 获取反洗钱法人扩展信息(投保人)
- * @param appNo 投保单号
- */
-getAMLAppInfoByAppNo(appNo: string, flag: boolean) {
-    return request.post('/policy/getAMLAppInfoByAppNo', {
-        'CAppNo': appNo,
-        'flag': flag
+// 反洗钱受益人所有人信息 table
+getAMLCusBnfcInfoByAppNo(CAppNo: string, CCusFlag: string) {
+    return request.post('/policy/getAMLCusBnfcInfoByAppNo', {
+        'CAppNo': CAppNo,
+        'CCusFlag': CCusFlag
     });
 }
 

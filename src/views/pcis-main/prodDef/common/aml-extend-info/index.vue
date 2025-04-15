@@ -1,7 +1,7 @@
 <template>
-  <el-dialog v-model="dialogVisible" width="90%" title="反洗钱扩展信息">
-		<appExtendInfo/>
-		<insExtendInfo/>
+  <el-dialog :close-on-click-modal="false"  v-model="dialogVisible"  @close="close" width="90%" title="反洗钱扩展信息">
+		<appExtendInfo  v-if="controlFlag=='1' || controlFlag == 3" ref="appExtendInfoRef"/>
+		<insExtendInfo  v-if="controlFlag=='2' || controlFlag == 3" ref="inextendRef"/>
 		<div style="margin-top: 20px" :style="{ textAlign: 'right' }">
         <rt-button
           :item="{
@@ -12,7 +12,7 @@
             },
           }"
         />
-      </div>
+      </div> 
   </el-dialog>
 </template>
 
@@ -24,6 +24,7 @@ import { ref, defineProps, defineEmits, onMounted } from "vue";
 import { createFreeButtonBase } from "@/shared/button-config";
 const appExtendInfo = defineAsyncComponent(() => import("./app-extend-info/app-extend-info.vue"));
 const insExtendInfo = defineAsyncComponent(() => import("./ins-extend-info/ins-extend-info.vue"));
+import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
 import {
   getButtonByFacKey,
   getFactorList,
@@ -44,25 +45,30 @@ import {
   createTableEditConfig,
   MyTableMethod,
 } from "@/shared/app-table-config";
+import { dataOpertaor } from "@/store/modules/data-opertaor";
+const opertaor = dataOpertaor();
 
 const props = defineProps({
+  controlFlag:{
+    type:String,
+    required: true, 
+  },
   data: Object,
-  type: String,
+  type:String
 });
+
 const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
 import { v4 as uuidv4 } from "uuid";
 const showBtnConfig = ref(false);
 const dialogVisible = ref(true);
 const showView = ref(false);
-
-const freeEditRef = ref<AppFreeEditMethod | null>(null);
-const freeEditRef2 = ref<AppFreeEditMethod | null>(null);
-const freeEditRef3 = ref<AppFreeEditMethod | null>(null);
-const freeEditRef4 = ref<AppFreeEditMethod | null>(null);
-const freeEditRefBtn = ref<AppFreeEditMethod | null>(null);
+ 
 const tableRef = ref<MyTableMethod | null>(null);
 const appTableShow = ref(false);
+const appExtendInfoRef=ref(null);
+const inextendRef=ref(null);
+const policyService = new PolicyService();
 
 const schemaMap = reactive<Record<string, any>>({
   rtinputgroup: [],
@@ -72,123 +78,27 @@ const cardConfig = reactive<CardConfig>(
 		title: '投保人-法人扩展信息',
 		showMyfromBtm: true
 	})
-)
-const formconfig = {
-    fromUi: {
-      cols: 2
-    },
-		shadow:false,
-    fromSchema: [
-      {
-        prop: 'CPlanNo',
-        title: '方案号',
-        inputtype: "rtinput"
-      },
-      {
-        prop: 'CPlanNme',
-        title: '方案名称',
-        inputtype: "rtinput"
-      }
-    ]
-}
-const formconfig1 = reactive<AppFreeEditConfig>(
-  createAppFreeEditConfig(Object.assign(formconfig, {
-    title: '控股股东或实际控制人：',
-	}))
-);
-const formconfig2 = reactive<AppFreeEditConfig>(
-  createAppFreeEditConfig(Object.assign(formconfig, {
-    title: '法定代表人：',
-	}))
-);
-const formconfig3 = reactive<AppFreeEditConfig>(
-  createAppFreeEditConfig(Object.assign(formconfig, {
-    title: '负责人：',
-	}))
-);
-const formconfig4 = reactive<AppFreeEditConfig>(
-  createAppFreeEditConfig(Object.assign(formconfig, {
-    title: '授权代理人：',
-	}))
-);
-const pageresult = reactive<Pageresult>({
-	result: "",
-	/** 数据列表 */
-	list: [],
-	/** 总数 */
-	total: 0,
-});
-const tableconfig = reactive<AppTableConfig>(
-	createTableEditConfig({
-		title:'投保人-客户受益所有人',
-		isPage: 'false',
-		titleBtns: [
-			createFreeButtonBase({
-				type: "primary",
-				label: "新增",
-				func: async () => {
-					console.log('新增')
-				},
-			}),
-			createFreeButtonBase({
-				type: "primary",
-				label: "删除",
-				func: async () => {
-					console.log('删除')
-				},
-			})			
-		],
-		fromSchema: [
-			{
-				prop: "",
-        inputtype: "rtinput",
-				title: "序号",
-			},
-			{
-				prop: "",
-        inputtype: "rtinput",
-				title: "姓",
-			},
-			{
-				prop: "",
-        inputtype: "rtinput",
-				title: "名",
-			},
-			{
-				prop: "",
-        inputtype: "rtinput",
-				title: "证件类型",				
-			},
-			{
-				prop: "",
-        inputtype: "rtinput",
-				title: "证件号码",				
-			},
-			{
-				prop: "",
-        inputtype: "rtinput",
-				title: "证件有效起期",				
-			},
-			{
-				prop: "",
-        inputtype: "rtinput",
-				title: "证件有效止期",				
-			},
-			{
-				prop: "",
-        inputtype: "rtinput",
-				title: "地址",				
-			}
-		],
-	})
 );
 onMounted(async () => {
+
+  
   if (props.type === "edit" && props.data) {
     setTimeout(() => {
+      console.log(989,props.data)
       freeEditRef.value?.setFormValue(props.data);
     }, 50);
   }
 });
+
+const close = (type) => {
+ 
+ emits('ok', type)
+};
+
+const showDialog = ()=>{
+ 
+  dialogVisible.value = true
+}
 
 // 绑定方法
 const method = {
@@ -196,28 +106,66 @@ const method = {
     console.log(getRules);
   },
 };
-/** 查询 */
-function save() {
-  freeEditRef.value?.validate().then((isValid) => {
-    if (isValid) {
-      const formParam = getFrom();
-      const param = Object.assign({ type: props.type }, formParam);
-      saveKindInfo(param)
-        .then((res) => {
-          const { code, data, msg } = res;
-          if (200 === code) {
+/** 保存 */
+const save = async () => {
+  let CAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];   // 投保单号
+  let CAppTyp =  props.data?.CAppTyp ?  props.data.CAppTyp: 'A'; // CAppTyp：投保单是A,批单是E
+  let opCde = JSON.parse(sessionStorage.getItem("user")).opCde;
+  let controlFlag = props.controlFlag; 
+  let params = {
+    CAppNo,
+    CAppTyp,
+    opCde,
+    controlFlag,
+    appInfo:{
+    //   "appFreeEdit ":appfromData,
+    //   "appGridEdit ":{
+    //     items:[]
+    //   }
+    },
+    insInfo:{
+      // "insFreeEdit ":{},
+      // "insGridEdit ":{
+      //   items:[]
+      // }
+    }
+ 
+  }
+
+  
+  // 投保人  获取投保人参数和数据
+  let appInfo = null
+  if ('1' === controlFlag || '3' === controlFlag) {
+    appInfo = await appExtendInfoRef?.value?.getFrom()
+    params.appInfo = appInfo
+    if(!appInfo){
+      return false
+    }
+  }
+
+ // 投保人 被保人
+  let insInfo = null
+  if(controlFlag  ==='2' ||controlFlag === '3'){
+    insInfo = await inextendRef?.value?.getFrom()  
+    params.insInfo = insInfo
+    if(!insInfo){
+      return false
+    }
+  }
+
+  console.log('保存参数',params)
+
+
+  policyService.saveAMLExtendInfo(params).then((res) => {
+    const { code, data, msg } = res;
+        if (200 === code) {
             emits("ok", {});
             ElMessage.success("保存成功");
             dialogVisible.value = false;
           } else {
             ElMessage.error(msg);
           }
-        })
-        .finally(() => {});
-    } else {
-      ElMessage.error("请填写必填项");
-    }
-  });
+  })
 }
 
 /* 获取全量表单数据 */
@@ -271,6 +219,8 @@ function handleQuery(flag?: boolean) {
 		})
 		.finally(() => {});
 }
+
+defineExpose({ showDialog });
 </script>
 
 <style scoped></style>

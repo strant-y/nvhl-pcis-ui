@@ -1,8 +1,6 @@
 <!-- 发票弹框 -->
 <template>
   <el-dialog v-model="dialogVisible"   width="90%">
-   
-  <!-- <el-dialog  :visible.sync="visible"  @close="close" width="90%"> -->
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
   </el-dialog>
 </template>
