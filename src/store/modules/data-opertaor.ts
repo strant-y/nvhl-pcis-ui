@@ -69,13 +69,14 @@ export const dataOpertaor = defineStore(
             });
             return res;
         };
-        const setDisabledAll = () => {
-            Object.keys(tableRefs).forEach(key => {
-                if (tableRefs[key] && tableRefs[key].getFormconfig) {
-                    const f = tableRefs[key].getFormconfig();
-                    if (f.fromType === 'free') {  // 表单模式时,修改表单disabled实现只读
-                        if (f.fromSchema && f.fromSchema.length > 0) {
-                            f.fromSchema.forEach(f => {
+        const setReadOnly = (formconfig: any) => {
+            formconfig.forEach(page => {
+                if(page.pageInfo && page.pageInfo.length > 0){
+                    page.pageInfo.forEach(info => {
+                        const fsch =info.pageSchema;
+                        fsch.editFlag = false;
+                        if (fsch.fromSchema && fsch.fromSchema.length > 0) {
+                            fsch.fromSchema.forEach(f => {
                                 if (f.inputtype === 'rtinputgroup') {
                                     f.groupList.forEach((gkey: any) => {
                                         gkey.disabled = true;
@@ -89,24 +90,65 @@ export const dataOpertaor = defineStore(
 
                             });
                         }
-                    } else if (f.fromType === 'grid') { // 表格模式时,修改表格属性,实现只读
-                        f.editFlag = false;
-                    } else if (f.fromType === 'custom') {
+                        if (
+                            fsch.titleBtns &&
+                            fsch.titleBtns.length > 0
+                        ) {
+                            fsch.titleBtns.forEach((item) => {
+                                item.hidden = true;
+                            });
+                        }
+                        if (fsch.endBtns && fsch.endBtns.length > 0) {
+                            fsch.endBtns.forEach((item) => {
+                                item.hidden = true;
+                            });
+                        }
+                    })
+                }
+            });
+            console.log(formconfig);
+        }
+        const setDisabledAll = () => {
+            Object.keys(tableRefs).forEach(key => {
+                if (tableRefs[key] && tableRefs[key].getFormconfig) {
+                    // 配置层面已经实现只读,这里不再实现
+                    const f = tableRefs[key].getFormconfig();
+                    // if (f.fromType === 'free') {  // 表单模式时,修改表单disabled实现只读
+                    //     if (f.fromSchema && f.fromSchema.length > 0) {
+                    //         f.fromSchema.forEach(f => {
+                    //             if (f.inputtype === 'rtinputgroup') {
+                    //                 f.groupList.forEach((gkey: any) => {
+                    //                     gkey.disabled = true;
+                    //                 });
+                    //             } else {
+                    //                 f.disabled = true;
+                    //             }
+                    //             if (f.btnItems) {
+                    //                 f.btnItems.disabled = true;
+                    //             }
+
+                    //         });
+                    //     }
+                    // } else if (f.fromType === 'grid') { // 表格模式时,修改表格属性,实现只读
+                    //     f.editFlag = false;
+                    // } else 
+                    console.log(f);
+                    if (f.fromType === 'custom') {
                         tableRefs[key].setDisabledAll();
                     }
-                    if (
-                        f.titleBtns &&
-                        f.titleBtns.length > 0
-                    ) {
-                        f.titleBtns.forEach((item) => {
-                            item.hidden = true;
-                        });
-                    }
-                    if (f.endBtns && f.endBtns.length > 0) {
-                        f.endBtns.forEach((item) => {
-                            item.hidden = true;
-                        });
-                    }
+                    // if (
+                    //     f.titleBtns &&
+                    //     f.titleBtns.length > 0
+                    // ) {
+                    //     f.titleBtns.forEach((item) => {
+                    //         item.hidden = true;
+                    //     });
+                    // }
+                    // if (f.endBtns && f.endBtns.length > 0) {
+                    //     f.endBtns.forEach((item) => {
+                    //         item.hidden = true;
+                    //     });
+                    // }
                 }
             });
         }
@@ -285,6 +327,7 @@ export const dataOpertaor = defineStore(
             setDisabledAll,
             setUnDisabledByKeyList,
             validateAll,
+            setReadOnly,
         };
     },
     {

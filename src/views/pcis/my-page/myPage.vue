@@ -491,16 +491,20 @@ const initPage = async () => {
   }
   if (
     props.param.pageType === "EDR_APP_NEW_SCENE" ||
-    (props.param.pageType == "TEMPORARY_DEPOSIT" && props.param.cAppTyp == "E") ||
-    (props.param.pageType == "PLY_UW_PROCESS_SCENE" && props.param.cAppTyp == "E") ||
+    (props.param.pageType == "TEMPORARY_DEPOSIT" &&
+      props.param.cAppTyp == "E") ||
+    (props.param.pageType == "PLY_UW_PROCESS_SCENE" &&
+      props.param.cAppTyp == "E") ||
     (props.param.pageType == "UW_READ_SCENE" && props.param.cAppTyp == "E") ||
     (props.param.pageType == "readonly" && props.param.cAppTyp == "E")
   ) {
     edrbaseFlag.value = true;
     edritemFlag.value = true;
     if (
-        (props.param.pageType === "EDR_APP_NEW_SCENE" &&(props.param.cEdrType == "3"||props.param.cEdrType == "2"))||
-        (props.param.pageType === "TEMPORARY_DEPOSIT" &&(props.param.cEdrType == "3"||props.param.cEdrType == "2"))
+      (props.param.pageType === "EDR_APP_NEW_SCENE" &&
+        (props.param.cEdrType == "3" || props.param.cEdrType == "2")) ||
+      (props.param.pageType === "TEMPORARY_DEPOSIT" &&
+        (props.param.cEdrType == "3" || props.param.cEdrType == "2"))
     ) {
       edritemFlag.value = false;
     }
@@ -509,8 +513,10 @@ const initPage = async () => {
     edritemFlag.value = false;
   }
   if (
-      (props.param.pageType === "EDR_APP_NEW_SCENE" &&(props.param.cEdrType == "3"||props.param.cEdrType == "2"))||
-      (props.param.pageType === "TEMPORARY_DEPOSIT" &&(props.param.cEdrType == "3"||props.param.cEdrType == "2"))
+    (props.param.pageType === "EDR_APP_NEW_SCENE" &&
+      (props.param.cEdrType == "3" || props.param.cEdrType == "2")) ||
+    (props.param.pageType === "TEMPORARY_DEPOSIT" &&
+      (props.param.cEdrType == "3" || props.param.cEdrType == "2"))
   ) {
     //退保不显示产品组件信息
     const formconfig11 = [{ groupId: "", pageInfo: [] }];
@@ -521,6 +527,20 @@ const initPage = async () => {
     // 页面初始化
     const formconfig11 = JSON.parse(getProductRes.data);
     console.log("页面初始化返回数据", formconfig11);
+    if (props.param?.cAppTyp == "E") {
+      if (props.param.cEdrType == "1") {
+        opertaor.setReadOnly(formconfig11);
+      }
+    }
+    // 只读场景,提前将配置设置为只读
+    if (
+      props.param?.pageType === "PLY_UW_PROCESS_SCENE" ||
+      props.param?.pageType === "EDR_APP_NEW_SCENE" ||
+      props.param?.pageType === "readonly" ||
+      props.param?.pageType === "UW_READ_SCENE"
+    ) {
+      opertaor.setReadOnly(formconfig11);
+    }
     opertaor.setTableConfig(formconfig11);
     renderComponents();
   }
@@ -598,31 +618,31 @@ async function loadAfter() {
     const cAppNo = props.param.cAppNo;
     loadAppPlyInfo(cAppNo);
     if (props.param.cAppTyp == "E") {
-        if(props.param.cEdrType == "1"){
-            bthList.value = edrBtn;
-            setTimeout(() => {
-                opertaor.setDisabledAll();
-                getEdrRsnItemFun(
-                    props.param["cProdNo"],
-                    props.param["cDptCde"],
-                    props.param["cEdrRsnBundleCde"],
-                    props.param["cEdrRsnBundleCde"],
-                    props.param["cEdrType"],
-                    props.param["cGrpMrk"]
-                );
-            }, 3000);
-            edritem.value?.handleQuery();
-        }else{
-            bthList.value = edrSurrenderBtn;
-        }
+      if (props.param.cEdrType == "1") {
+        bthList.value = edrBtn;
+        nextTick(() => {
+          opertaor.setDisabledAll();
+          getEdrRsnItemFun(
+            props.param["cProdNo"],
+            props.param["cDptCde"],
+            props.param["cEdrRsnBundleCde"],
+            props.param["cEdrRsnBundleCde"],
+            props.param["cEdrType"],
+            props.param["cGrpMrk"]
+          );
+        });
+        edritem.value?.handleQuery();
+      } else {
+        bthList.value = edrSurrenderBtn;
+      }
     } else if (props.param.cAppTyp == "A") {
       bthList.value = basicBtn;
     }
   } else if (props.param.pageType === "PLY_UW_PROCESS_SCENE") {
     //核保处理
-    setTimeout(() => {
+    nextTick(() => {
       opertaor.setDisabledAll();
-    }, 3000);
+    });
     const cAppNo = props.param.cAppNo;
     loadAppPlyInfo(cAppNo);
     if (props.param.cAppTyp == "E") {
@@ -695,9 +715,9 @@ async function loadAfter() {
     });
   } else if (props.param.pageType === "UW_READ_SCENE") {
     //核保查看
-    setTimeout(() => {
+    nextTick(() => {
       opertaor.setDisabledAll();
-    }, 3000);
+    });
     const cAppNo = props.param.cAppNo;
     loadAppPlyInfo(cAppNo);
     if (props.param.cAppTyp == "E") {
@@ -864,8 +884,10 @@ const loadAppPlyInfo = (CAppNo) => {
       if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
         if (
-          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] !="" &&
-          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] != null
+          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] !=
+            "" &&
+          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] !=
+            null
         ) {
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
             res["res"]["composition"]["EdrBase"][0][
@@ -873,11 +895,13 @@ const loadAppPlyInfo = (CAppNo) => {
             ].split(",");
         }
         console.log("EdrBaseData", EdrBaseData);
-        if("EDR_APP_NEW_SCENE" === props.param.pageType){
-            res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"]= '1';
-            res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrType"]= props.param["cEdrType"];
-            res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnBundleCde"]= props.param["cRsnCde"];
-            res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"]=''
+        if ("EDR_APP_NEW_SCENE" === props.param.pageType) {
+          res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"] = "1";
+          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrType"] =
+            props.param["cEdrType"];
+          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnBundleCde"] =
+            props.param["cRsnCde"];
+          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] = "";
         }
         edrbase.value?.setFormValue(EdrBaseData);
       }
@@ -1041,10 +1065,10 @@ const getEdrRsnItemFun = (
       const result = res["data"]["result"];
       const edrList: any[] = [];
       result.forEach((key: any) => {
-        if(key['cOperTyp'] === 'M'){
+        if (key["cOperTyp"] === "M") {
           edrList.push(key["cEdrItem"]);
-        }else if(key['cOperTyp'] === 'B'){
-          edrList.push("Btn_"+key["cEdrItem"]);
+        } else if (key["cOperTyp"] === "B") {
+          edrList.push("Btn_" + key["cEdrItem"]);
         }
       });
       opertaor.setUnDisabledByKeyList(edrList); // 根据list集合,放开需要的要素
@@ -1238,44 +1262,44 @@ const getSurrenderPrecisFun = () => {
  * 批改单申请核保(退保、注销)
  */
 const submitEdrToUndrSurrender = () => {
-    const btn = getBtn("btn010103");
-    btn.loading = true;
-    const res = {};
-    res["user"] = user;
-    res["appNo"] = edrbase.value?.getFromValue()["EdrBase.cAppNo"]
-        ? edrbase.value?.getFromValue()["EdrBase.cAppNo"]
-        : null;
-    res["plyNo"] = edrbase.value?.getFromValue()["EdrBase.cPlyNo"];
-    res["taskId"] = props.param.taskId ? props.param.taskId : null;
-    res["data"] = {};
-    res["data"]["EdrBase"] = edrbase.value?.getFromValue();
-    res["data"]["Acctinfo"] = {
-        "Acctinfo.cAcctNo": null,
-        "Acctinfo.cAcctNme": "",
-        "Acctinfo.cBankRelTyp": null,
-        "Acctinfo.cBankPro": null,
-        "Acctinfo.cBankArea": null,
-        "Acctinfo.cAppNo": null,
-    };
-    console.log(res);
-    submitEdrSurrender(res).then((res) => {
-        btn.loading = false;
-        console.log("申请核保(退保、注销)", res);
-        if (res["code"] == "200") {
-            const ops = opertaor.convertData(res);
-            opertaor.setDataAll(ops);
-            if (res["res"]["composition"]["EdrBase"]) {
-                const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
-                edrbase.value?.setFormValue(EdrBaseData);
-            }
-            ElMessage.success(res.msg);
-        } else {
-            ElMessage.error(res.msg);
-        }
-        // ElMessage.success(res.msg);
-        // history.back();
-    });
-}
+  const btn = getBtn("btn010103");
+  btn.loading = true;
+  const res = {};
+  res["user"] = user;
+  res["appNo"] = edrbase.value?.getFromValue()["EdrBase.cAppNo"]
+    ? edrbase.value?.getFromValue()["EdrBase.cAppNo"]
+    : null;
+  res["plyNo"] = edrbase.value?.getFromValue()["EdrBase.cPlyNo"];
+  res["taskId"] = props.param.taskId ? props.param.taskId : null;
+  res["data"] = {};
+  res["data"]["EdrBase"] = edrbase.value?.getFromValue();
+  res["data"]["Acctinfo"] = {
+    "Acctinfo.cAcctNo": null,
+    "Acctinfo.cAcctNme": "",
+    "Acctinfo.cBankRelTyp": null,
+    "Acctinfo.cBankPro": null,
+    "Acctinfo.cBankArea": null,
+    "Acctinfo.cAppNo": null,
+  };
+  console.log(res);
+  submitEdrSurrender(res).then((res) => {
+    btn.loading = false;
+    console.log("申请核保(退保、注销)", res);
+    if (res["code"] == "200") {
+      const ops = opertaor.convertData(res);
+      opertaor.setDataAll(ops);
+      if (res["res"]["composition"]["EdrBase"]) {
+        const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
+        edrbase.value?.setFormValue(EdrBaseData);
+      }
+      ElMessage.success(res.msg);
+    } else {
+      ElMessage.error(res.msg);
+    }
+    // ElMessage.success(res.msg);
+    // history.back();
+  });
+};
 /**
  * 批改单保存
  * **/

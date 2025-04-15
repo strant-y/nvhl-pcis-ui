@@ -23,7 +23,7 @@
                           :item="btnItem.addPlan"
                   />
                   <rt-button
-                          v-if="!btnItem.addPlan.hidden"
+                          v-if="!btnItem.delPlan.hidden"
                           @click="deletePlan(k)"
                           :item="btnItem.delPlan"
                   />
