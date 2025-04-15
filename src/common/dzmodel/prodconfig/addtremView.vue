@@ -45,6 +45,7 @@
             :props="dataprops"
             node-key="id"
             show-checkbox
+            :check-strictly="true"
             :data="data1"
             @check-change="selectMainTerm"
           />
@@ -59,6 +60,7 @@
             node-key="id"
             show-checkbox
             :data="data2"
+            :check-strictly="true"
             @check-change="selectAdditionTerm"
           />
         </div>
