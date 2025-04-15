@@ -574,7 +574,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cAppStatus",
         inputtype: "rtselect",
         title: "状态",
-        rules: [getRules("required", {})],
+        // rules: [getRules("required", {})],
         clearable: true,
         loadData: [
           { label: "暂存", value: "1" },
@@ -1266,6 +1266,23 @@ const tableObj = {
         inputtype: "rtinput",
         title: "保费",
         minWidth: 100,
+      },
+      {
+        prop: "cAppStatus",
+        inputtype: "rtinput",
+        title: "状态",
+        minWidth: 100,
+        hideBtns: (row: any) => {
+          if (
+            queryType.value == "2" ||
+            queryType.value == "3" ||
+            queryType.value == "4"
+          ) {
+            return false;
+          } else {
+            return true;
+          }
+        },
       },
     ],
   },
