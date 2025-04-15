@@ -18,14 +18,14 @@
                 </el-col>
                 <el-col :span="4">
                   <rt-button
-                          v-if="!btnItem.addPlan.hidden"
-                          @click="addTermData(k)"
-                          :item="btnItem.addPlan"
+                    v-if="!btnItem.addPlan.hidden"
+                    @click="addTermData(k)"
+                    :item="btnItem.addPlan"
                   />
                   <rt-button
-                          v-if="!btnItem.delPlan.hidden"
-                          @click="deletePlan(k)"
-                          :item="btnItem.delPlan"
+                    v-if="!btnItem.delPlan.hidden"
+                    @click="deletePlan(k)"
+                    :item="btnItem.delPlan"
                   />
                 </el-col>
               </el-row>
@@ -33,21 +33,22 @@
             <template v-if="isHidden(k)">
               <template v-if="planData[k]['m'] && planData[k]['m'].length > 0">
                 <myCard
-                        :cardConfig="{
+                  :cardConfig="{
                     title: '主条款信息',
                     showInTitle: true,
                   }"
                 >
                   <tremTemplate
-                          v-for="(i, index) in planData[k]['m']"
-                          :key="index"
-                          v-model="planData[k]['m'][index]"
-                          @delete="
+                    v-for="(i, index) in planData[k]['m']"
+                    :key="index"
+                    v-model="planData[k]['m'][index]"
+                    :disabled-flag="disAbledFlag"
+                    @delete="
                       (r) => {
                         deleteData(k, r);
                       }
                     "
-                          :ref="
+                    :ref="
                       (res) => {
                         tremTemplateRefs[k + 'm' + index] = res;
                       }
@@ -57,29 +58,30 @@
               </template>
 
               <template
-                      v-if="planData[k]['a1'] && planData[k]['a1'].length > 0"
+                v-if="planData[k]['a1'] && planData[k]['a1'].length > 0"
               >
                 <myCard
-                        :cardConfig="{
+                  :cardConfig="{
                     title: '扩展类附加条款信息',
                     showInTitle: true,
                   }"
                 >
                   <el-form
-                          ref="cvrgFormfef"
-                          :model="planData[k]['a1']"
-                          :inline-message="true"
+                    ref="cvrgFormfef"
+                    :model="planData[k]['a1']"
+                    :inline-message="true"
                   >
                     <tremTemplate
-                            v-for="(i, index) in planData[k]['a1']"
-                            :key="index"
-                            v-model="planData[k]['a1'][index]"
-                            @delete="
+                      v-for="(i, index) in planData[k]['a1']"
+                      :key="index"
+                      v-model="planData[k]['a1'][index]"
+                      :disabled-flag="disAbledFlag"
+                      @delete="
                         (r) => {
                           deleteData(k, r);
                         }
                       "
-                            :ref="
+                      :ref="
                         (res) => {
                           tremTemplateRefs[k + 'a1' + index] = res;
                         }
@@ -89,22 +91,23 @@
                 </myCard>
               </template>
               <template
-                      v-if="planData[k]['a2'] && planData[k]['a2'].length > 0"
+                v-if="planData[k]['a2'] && planData[k]['a2'].length > 0"
               >
                 <myCard
-                        :cardConfig="{
+                  :cardConfig="{
                     title: '限制类附加条款信息',
                     showInTitle: true,
                   }"
                 >
                   <tremAddTemplate2
-                          :planData="planData[k]['a2']"
-                          @delete="
+                    :planData="planData[k]['a2']"
+                    :disabled-flag="disAbledFlag"
+                    @delete="
                       (r) => {
                         deleteData(k, r);
                       }
                     "
-                          :ref="
+                    :ref="
                       (res) => {
                         tremTemplateRefs[k + 'a2' + index] = res;
                       }
@@ -113,22 +116,23 @@
                 </myCard>
               </template>
               <template
-                      v-if="planData[k]['a3'] && planData[k]['a3'].length > 0"
+                v-if="planData[k]['a3'] && planData[k]['a3'].length > 0"
               >
                 <myCard
-                        :cardConfig="{
+                  :cardConfig="{
                     title: '规范类附加条款信息',
                     showInTitle: true,
                   }"
                 >
                   <tremAddTemplate3
-                          :planData="planData[k]['a3']"
-                          @delete="
+                    :planData="planData[k]['a3']"
+                    :disabled-flag="disAbledFlag"
+                    @delete="
                       (r) => {
                         deleteData(k, r);
                       }
                     "
-                          :ref="
+                    :ref="
                       (res) => {
                         tremTemplateRefs[k + 'a3' + index] = res;
                       }
@@ -146,362 +150,364 @@
 </template>
 
 <script setup lang="ts">
-    import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
-    import tremTemplate from "./trem-template.vue";
-    import tremAddTemplate2 from "./trem-add2-template.vue";
-    import tremAddTemplate3 from "./trem-add3-template.vue";
+import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
+import tremTemplate from "./trem-template.vue";
+import tremAddTemplate2 from "./trem-add2-template.vue";
+import tremAddTemplate3 from "./trem-add3-template.vue";
 
-    const dialog = ref<DialogMethod | null>(null);
-    import { formInit } from "@/shared/from-init";
-    import { dataOpertaor } from "@/store/modules/data-opertaor";
-    import { terConfig } from "@/store/modules/term-config";
-    import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
-    import { prodTemple } from "./titleTemple";
-    import { codeListViewStore } from "@/store";
-    import { qryProdRelTermRiskList } from "@/api/prod";
-    const codeListStore = codeListViewStore();
+const dialog = ref<DialogMethod | null>(null);
+import { formInit } from "@/shared/from-init";
+import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { terConfig } from "@/store/modules/term-config";
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
+import { prodTemple } from "./titleTemple";
+import { codeListViewStore } from "@/store";
+import { qryProdRelTermRiskList } from "@/api/prod";
+const codeListStore = codeListViewStore();
+const disAbledFlag = ref(false);
 
-    const opertaor = dataOpertaor();
-    const parparam = opertaor.getParam();
-    const terconfig = terConfig();
-    terconfig.configInit(); // 条款配置数据初始化
+const opertaor = dataOpertaor();
+const parparam = opertaor.getParam();
+const terconfig = terConfig();
+terconfig.configInit(); // 条款配置数据初始化
 
-    const tremTemplateRefs = ref<any>({});
+const tremTemplateRefs = ref<any>({});
 
-    const props = defineProps({
-        pageSchema: {
-            type: [Object],
-            required: true,
-        },
-    });
+const props = defineProps({
+  pageSchema: {
+    type: [Object],
+    required: true,
+  },
+});
 
-    const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
-        addPlan: {
-            label: "添加条款",
-            icon: "CirclePlus",
-            type: "primary",
-            size: "small",
-        },
-        delPlan: {
-            icon: "Delete",
-            type: "danger",
-            size: "small",
-        },
-    });
+const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
+  addPlan: {
+    label: "添加条款",
+    icon: "CirclePlus",
+    type: "primary",
+    size: "small",
+  },
+  delPlan: {
+    icon: "Delete",
+    type: "danger",
+    size: "small",
+  },
+});
 
-    const cardconfig = ref(creatCardConfig({}));
-    const cvrgFormfef = ref("cvrgFormfef");
-    let planData = ref<{ [key: string]: { [key: string]: any } }>({});
-    const hiddenFlag = ref<any[]>([]);
-    const showTitleMap = ref<{ [key: string]: string }>({});
+const cardconfig = ref(creatCardConfig({}));
+const cvrgFormfef = ref("cvrgFormfef");
+let planData = ref<{ [key: string]: { [key: string]: any } }>({});
+const hiddenFlag = ref<any[]>([]);
+const showTitleMap = ref<{ [key: string]: string }>({});
 
-    function updateTitle() {
-        Object.keys(planData.value).forEach((k: any) => {
-            const str = prodTemple.value.default;
-            const filledString = fillTemplate(str, { sumPrm: 0, sumObjs: 0 });
-            showTitleMap.value[k] = filledString;
-        });
-    }
+function updateTitle() {
+  Object.keys(planData.value).forEach((k: any) => {
+    const str = prodTemple.value.default;
+    const filledString = fillTemplate(str, { sumPrm: 0, sumObjs: 0 });
+    showTitleMap.value[k] = filledString;
+  });
+}
 
-    function fillTemplate(
-        template: string,
-        params: { [key: string]: any }
-    ): string {
-        return template.replace(/{(\w+)}/g, (match, key) => {
-            return params[key] !== undefined ? params[key] : match;
-        });
-    }
+function fillTemplate(
+  template: string,
+  params: { [key: string]: any }
+): string {
+  return template.replace(/{(\w+)}/g, (match, key) => {
+    return params[key] !== undefined ? params[key] : match;
+  });
+}
 
-    onMounted(async () => {
-        const formconfig11 = formInit(
-            JSON.stringify(props.pageSchema),
-            method,
-            exRules
-        );
-        Object.assign(cardconfig.value, formconfig11);
-        if (parparam.pageType === "app") {
-            method.funcadd();
-            const param = {
-                cProdNo: parparam.cProdNo,
-                cTermNo: parparam.cTermNo,
-            };
-            qryProdRelTermRiskList(param).then((res: any) => {
-                const { code, data, msg } = res;
-                if (200 === code) {
-                    let plans: any[] = [];
-                    data.forEach((item: any) => {
-                        let riskList: { [key: string]: any }[] = [];
-                        item.children?.forEach((e: any) => {
-                            riskList.push({
-                                "TermRisktgt.cLiabCode": e.cRiskNo,
-                            });
-                        });
-                        let data: { [key: string]: any } = {
-                            "Term.cClauseCode": item.cTermNo,
-                            "Term.cRdrTyp": item.cRdrTyp,
-                            riskList: riskList,
-                        };
-                        if (item.cRdrTyp === "1") {
-                            data["Term.cClauseCategory"] = item.cClauseCategory;
-                        }
-                        plans.push(data);
-                    });
-                    refushData("P1", plans);
-                } else {
-                    ElMessage.error(msg);
-                }
-            });
-        }
-        nextTick(() => {
-            updateTitle();
-        });
-    });
-
-    // 绑定方法
-    const method = {
-        funcadd: () => {
-            let maxindex = 0;
-            const l = Object.keys(planData.value).forEach((k: any) => {
-                const numberPart = parseInt(k.replace(/\D/g, ""), 10);
-                if (numberPart > maxindex) {
-                    maxindex = numberPart;
-                }
-            });
-            const planKey = "P" + (maxindex + 1);
-            planData.value[planKey] = [];
-            updateTitle();
-        },
+onMounted(async () => {
+  const formconfig11 = formInit(
+    JSON.stringify(props.pageSchema),
+    method,
+    exRules
+  );
+  Object.assign(cardconfig.value, formconfig11);
+  if (parparam.pageType === "app") {
+    method.funcadd();
+    const param = {
+      cProdNo: parparam.cProdNo,
+      cTermNo: parparam.cTermNo,
     };
-
-    function isHidden(pl: any) {
-        return hiddenFlag.value.indexOf(pl) == -1;
-    }
-    function changeHidden(pl: any) {
-        const index = hiddenFlag.value.indexOf(pl);
-        if (index == -1) {
-            hiddenFlag.value.push(pl);
-        } else {
-            hiddenFlag.value.splice(index, 1);
-        }
-    }
-    // 绑定特殊验证器
-    const exRules = {};
-
-    function addTermData(PlanNo: string) {
-        const param = opertaor.getParam();
-        const sp = planData.value[PlanNo];
-        let seld: any[] = [];
-        Object.keys(sp).forEach((k: any) => {
-            seld.push(...sp[k]);
-        });
-        dialog.value?.open(
-            "addtremView",
-            {
-                type: "show",
-                data: {
-                    cProdNo: param.cProdNo,
-                    isselectData: seld,
-                },
-            },
-            {
-                isOk: (selectdata: any) => {
-                    let plans: any[] = [];
-                    selectdata.forEach((item: any) => {
-                        let riskList: { [key: string]: any }[] = [];
-                        const se = seld.filter(
-                            (em) => em["Term.cClauseCode"] === item.cTermNo
-                        );
-
-                        item.children?.forEach((e: any) => {
-                            if (se.length > 0) {
-                                const seri = se[0].riskList.filter(
-                                    (er: { [x: string]: any }) =>
-                                        er["TermRisktgt.cLiabCode"] === e.cRiskNo
-                                );
-                                if (seri.length > 0) {
-                                    riskList.push(seri[0]);
-                                } else {
-                                    riskList.push({
-                                        "TermRisktgt.cLiabCode": e.cRiskNo,
-                                    });
-                                }
-                            } else {
-                                riskList.push({
-                                    "TermRisktgt.cLiabCode": e.cRiskNo,
-                                });
-                            }
-                        });
-                        let data: { [key: string]: any } = {};
-                        if (se.length > 0) {
-                            data = se[0];
-                        } else {
-                            data = {
-                                "Term.cClauseCode": item.cTermNo,
-                                "Term.cRdrTyp": item.cRdrTyp,
-                            };
-                        }
-                        data.riskList = riskList;
-                        if (item.cRdrTyp === "1") {
-                            data["Term.cClauseCategory"] = item.cClauseCategory;
-                        }
-                        plans.push(data);
-                    });
-                    refushData(PlanNo, plans);
-                },
-            },
-            { title: "添加条款", width: 85 }
-        );
-    }
-    function refushData(planNo: string, datas: any) {
-        let pd: { [key: string]: any } = {};
-        datas?.forEach((item: any) => {
-            let key = "m";
-            if (item["Term.cRdrTyp"] !== "0") {
-                key = "a" + item["Term.cClauseCategory"];
-            }
-            if (!pd[key]) {
-                pd[key] = [];
-            }
-            pd[key].push(item);
-        });
-        // 强制刷新组件,对数据进行更新
-        delete planData.value[planNo];
-
-        setTimeout(() => {
-            planData.value[planNo] = pd;
-            nextTick(() => {
-                showFlush();
+    qryProdRelTermRiskList(param).then((res: any) => {
+      const { code, data, msg } = res;
+      if (200 === code) {
+        let plans: any[] = [];
+        data.forEach((item: any) => {
+          let riskList: { [key: string]: any }[] = [];
+          item.children?.forEach((e: any) => {
+            riskList.push({
+              "TermRisktgt.cLiabCode": e.cRiskNo,
             });
-        }, 100);
-    }
-    function deletePlan(plan: string) {
-        delete planData.value[plan];
-    }
-    function deleteData(plan: string, term: any) {
-        deleteTermByNo(plan, term["Term.cClauseCode"]);
-        if (term["Term.cRdrTyp"] === "0") {
-            codeListStore
-                .queryCodeList(
-                    {
-                        codeListName: "MainTermlist",
-                        codeListParam: { cTermNo: term["Term.cClauseCode"] },
-                    },
-                    false,
-                    false
-                )
-                .then((res) => {
-                    if (res && res.length > 0) {
-                        res.forEach((r: any) => {
-                            deleteTermByNo(plan, r["RdrTerm"]);
-                        });
-                    }
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
-        }
-    }
-
-    function deleteTermByNo(plan: any, t: any) {
-        Object.keys(planData.value[plan]).forEach((item) => {
-            let deleindex = null;
-            for (let i = 0; i < planData.value[plan][item].length; i++) {
-                if (planData.value[plan][item][i]["Term.cClauseCode"] === t) {
-                    deleindex = i;
-                }
-            }
-            if (deleindex != null) {
-                planData.value[plan][item].splice(deleindex, 1);
-            }
+          });
+          let data: { [key: string]: any } = {
+            "Term.cClauseCode": item.cTermNo,
+            "Term.cRdrTyp": item.cRdrTyp,
+            riskList: riskList,
+          };
+          if (item.cRdrTyp === "1") {
+            data["Term.cClauseCategory"] = item.cClauseCategory;
+          }
+          plans.push(data);
         });
-    }
-
-    function getFromValue() {
-        let redata: any[] = [];
-        Object.keys(planData.value).forEach((plan) => {
-            Object.keys(planData.value[plan]).forEach((item) => {
-                planData.value[plan][item].forEach((d: any) => {
-                    const i = JSON.parse(JSON.stringify(d));
-                    i["Term.cPlanNo"] = plan;
-                    if (i["riskList"]) {
-                        i["Term.riskList"] = i["riskList"];
-                        delete i["riskList"];
-                    }
-                    redata.push(i);
-                });
-            });
-        });
-        return redata;
-    }
-
-    function setFormValue(value: any) {
-        Object.assign(planData.value, {});
-        let plandata: { [key: string]: any } = {};
-        value.forEach((item: any) => {
-            const planKey = item["Term.cPlanNo"];
-            let creData = JSON.parse(JSON.stringify(item));
-            creData["riskList"] = creData["Term.riskList"];
-            delete creData["Term.riskList"];
-            if (plandata[planKey]) {
-                plandata[planKey].push(creData);
-            } else {
-                let newrisk: any[] = [];
-                newrisk.push(creData);
-                plandata[planKey] = newrisk;
-            }
-        });
-        Object.keys(plandata).forEach((planNo: any) => {
-            refushData(planNo, plandata[planNo]);
-        });
-        updateTitle();
-    }
-
-    function validate() {}
-    function showFlush() {
-        Object.keys(tremTemplateRefs.value).forEach((item) => {
-            tremTemplateRefs.value[item].dataInit();
-        });
-    }
-    function getTableValue(rowId: number, key: string) {}
-
-    function getFormconfig() {
-        return {
-            fromType: "custom",
-        };
-    }
-
-    function setDisabledAll() {
-        if (cardconfig.value.titleBtns && cardconfig.value.titleBtns.length > 0) {
-            cardconfig.value.titleBtns.forEach((item: any) => {
-                item.hidden = true;
-            });
-        }
-        if (cardconfig.value.endBtns && cardconfig.value.endBtns.length > 0) {
-            cardconfig.value.endBtns.forEach((item: any) => {
-                item.hidden = true;
-            });
-        }
-        Object.keys(btnItem.value).forEach((k: any) => {
-            btnItem.value[k].hidden = true;
-        });
-        Object.keys(tremTemplateRefs.value).forEach((item) => {
-            tremTemplateRefs.value[item].setDisabledAll();
-        });
-    }
-
-    defineExpose({
-        getFromValue,
-        setFormValue,
-        validate,
-        getTableValue,
-        showFlush,
-        getFormconfig,
-        setDisabledAll,
+        refushData("P1", plans);
+      } else {
+        ElMessage.error(msg);
+      }
     });
+  }
+  nextTick(() => {
+    updateTitle();
+  });
+});
+
+// 绑定方法
+const method = {
+  funcadd: () => {
+    let maxindex = 0;
+    const l = Object.keys(planData.value).forEach((k: any) => {
+      const numberPart = parseInt(k.replace(/\D/g, ""), 10);
+      if (numberPart > maxindex) {
+        maxindex = numberPart;
+      }
+    });
+    const planKey = "P" + (maxindex + 1);
+    planData.value[planKey] = [];
+    updateTitle();
+  },
+};
+
+function isHidden(pl: any) {
+  return hiddenFlag.value.indexOf(pl) == -1;
+}
+function changeHidden(pl: any) {
+  const index = hiddenFlag.value.indexOf(pl);
+  if (index == -1) {
+    hiddenFlag.value.push(pl);
+  } else {
+    hiddenFlag.value.splice(index, 1);
+  }
+}
+// 绑定特殊验证器
+const exRules = {};
+
+function addTermData(PlanNo: string) {
+  const param = opertaor.getParam();
+  const sp = planData.value[PlanNo];
+  let seld: any[] = [];
+  Object.keys(sp).forEach((k: any) => {
+    seld.push(...sp[k]);
+  });
+  dialog.value?.open(
+    "addtremView",
+    {
+      type: "show",
+      data: {
+        cProdNo: param.cProdNo,
+        isselectData: seld,
+      },
+    },
+    {
+      isOk: (selectdata: any) => {
+        let plans: any[] = [];
+        selectdata.forEach((item: any) => {
+          let riskList: { [key: string]: any }[] = [];
+          const se = seld.filter(
+            (em) => em["Term.cClauseCode"] === item.cTermNo
+          );
+
+          item.children?.forEach((e: any) => {
+            if (se.length > 0) {
+              const seri = se[0].riskList.filter(
+                (er: { [x: string]: any }) =>
+                  er["TermRisktgt.cLiabCode"] === e.cRiskNo
+              );
+              if (seri.length > 0) {
+                riskList.push(seri[0]);
+              } else {
+                riskList.push({
+                  "TermRisktgt.cLiabCode": e.cRiskNo,
+                });
+              }
+            } else {
+              riskList.push({
+                "TermRisktgt.cLiabCode": e.cRiskNo,
+              });
+            }
+          });
+          let data: { [key: string]: any } = {};
+          if (se.length > 0) {
+            data = se[0];
+          } else {
+            data = {
+              "Term.cClauseCode": item.cTermNo,
+              "Term.cRdrTyp": item.cRdrTyp,
+            };
+          }
+          data.riskList = riskList;
+          if (item.cRdrTyp === "1") {
+            data["Term.cClauseCategory"] = item.cClauseCategory;
+          }
+          plans.push(data);
+        });
+        refushData(PlanNo, plans);
+      },
+    },
+    { title: "添加条款", width: 85 }
+  );
+}
+function refushData(planNo: string, datas: any) {
+  let pd: { [key: string]: any } = {};
+  datas?.forEach((item: any) => {
+    let key = "m";
+    if (item["Term.cRdrTyp"] !== "0") {
+      key = "a" + item["Term.cClauseCategory"];
+    }
+    if (!pd[key]) {
+      pd[key] = [];
+    }
+    pd[key].push(item);
+  });
+  // 强制刷新组件,对数据进行更新
+  delete planData.value[planNo];
+
+  setTimeout(() => {
+    planData.value[planNo] = pd;
+    nextTick(() => {
+      showFlush();
+    });
+  }, 100);
+}
+function deletePlan(plan: string) {
+  delete planData.value[plan];
+}
+function deleteData(plan: string, term: any) {
+  deleteTermByNo(plan, term["Term.cClauseCode"]);
+  if (term["Term.cRdrTyp"] === "0") {
+    codeListStore
+      .queryCodeList(
+        {
+          codeListName: "MainTermlist",
+          codeListParam: { cTermNo: term["Term.cClauseCode"] },
+        },
+        false,
+        false
+      )
+      .then((res) => {
+        if (res && res.length > 0) {
+          res.forEach((r: any) => {
+            deleteTermByNo(plan, r["RdrTerm"]);
+          });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+}
+
+function deleteTermByNo(plan: any, t: any) {
+  Object.keys(planData.value[plan]).forEach((item) => {
+    let deleindex = null;
+    for (let i = 0; i < planData.value[plan][item].length; i++) {
+      if (planData.value[plan][item][i]["Term.cClauseCode"] === t) {
+        deleindex = i;
+      }
+    }
+    if (deleindex != null) {
+      planData.value[plan][item].splice(deleindex, 1);
+    }
+  });
+}
+
+function getFromValue() {
+  let redata: any[] = [];
+  Object.keys(planData.value).forEach((plan) => {
+    Object.keys(planData.value[plan]).forEach((item) => {
+      planData.value[plan][item].forEach((d: any) => {
+        const i = JSON.parse(JSON.stringify(d));
+        i["Term.cPlanNo"] = plan;
+        if (i["riskList"]) {
+          i["Term.riskList"] = i["riskList"];
+          delete i["riskList"];
+        }
+        redata.push(i);
+      });
+    });
+  });
+  return redata;
+}
+
+function setFormValue(value: any) {
+  Object.assign(planData.value, {});
+  let plandata: { [key: string]: any } = {};
+  value.forEach((item: any) => {
+    const planKey = item["Term.cPlanNo"];
+    let creData = JSON.parse(JSON.stringify(item));
+    creData["riskList"] = creData["Term.riskList"];
+    delete creData["Term.riskList"];
+    if (plandata[planKey]) {
+      plandata[planKey].push(creData);
+    } else {
+      let newrisk: any[] = [];
+      newrisk.push(creData);
+      plandata[planKey] = newrisk;
+    }
+  });
+  Object.keys(plandata).forEach((planNo: any) => {
+    refushData(planNo, plandata[planNo]);
+  });
+  updateTitle();
+}
+
+function validate() {}
+function showFlush() {
+  Object.keys(tremTemplateRefs.value).forEach((item) => {
+    tremTemplateRefs.value[item].dataInit();
+  });
+}
+function getTableValue(rowId: number, key: string) {}
+
+function getFormconfig() {
+  return {
+    fromType: "custom",
+  };
+}
+
+function setDisabledAll() {
+  disAbledFlag.value = true;
+  if (cardconfig.value.titleBtns && cardconfig.value.titleBtns.length > 0) {
+    cardconfig.value.titleBtns.forEach((item: any) => {
+      item.hidden = true;
+    });
+  }
+  if (cardconfig.value.endBtns && cardconfig.value.endBtns.length > 0) {
+    cardconfig.value.endBtns.forEach((item: any) => {
+      item.hidden = true;
+    });
+  }
+  Object.keys(btnItem.value).forEach((k: any) => {
+    btnItem.value[k].hidden = true;
+  });
+  Object.keys(tremTemplateRefs.value).forEach((item) => {
+    tremTemplateRefs.value[item].setDisabledAll();
+  });
+}
+
+defineExpose({
+  getFromValue,
+  setFormValue,
+  validate,
+  getTableValue,
+  showFlush,
+  getFormconfig,
+  setDisabledAll,
+});
 </script>
 
 <style scoped>
-  ::v-deep .planInfo .el-card__header {
-    padding: 2px 15px !important;
-  }
+::v-deep .planInfo .el-card__header {
+  padding: 2px 15px !important;
+}
 </style>
