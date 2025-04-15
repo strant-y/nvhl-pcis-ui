@@ -504,6 +504,8 @@ const initPage = async () => {
       (props.param.pageType === "EDR_APP_NEW_SCENE" &&
         (props.param.cEdrType == "3" || props.param.cEdrType == "2")) ||
       (props.param.pageType === "TEMPORARY_DEPOSIT" &&
+        (props.param.cEdrType == "3" || props.param.cEdrType == "2")) ||
+      (props.param.pageType === "PLY_UW_PROCESS_SCENE" &&
         (props.param.cEdrType == "3" || props.param.cEdrType == "2"))
     ) {
       edritemFlag.value = false;
@@ -790,6 +792,8 @@ async function loadAfter() {
       if (res) {
         const ops = opertaor.convertData(res);
         opertaor.setDataAll(ops);
+        //获取单号
+        getCAppNoFun();
       }
     });
     bthList.value.push(
@@ -895,15 +899,14 @@ const loadAppPlyInfo = (CAppNo) => {
             ].split(",");
         }
         console.log("EdrBaseData", EdrBaseData);
-        res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"] = "1";
-        res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrType"] =
-          props.param["cEdrType"];
-        res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnBundleCde"] =
-          props.param["cRsnCde"];
-        props.param["cEdrType"];
-        if (props.param.cEdrType != "1") {
-          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] = "";
-        }
+      if("EDR_APP_NEW_SCENE" === props.param.pageType){
+          res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"]= '1';
+          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrType"]= props.param["cEdrType"];
+          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnBundleCde"]= props.param["cRsnCde"];
+          if (props.param.cEdrType != "1") {
+              res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"]=''
+          }
+      }
         edrbase.value?.setFormValue(EdrBaseData);
       }
       ElMessage.success(res.msg);
@@ -1292,12 +1295,6 @@ const submitEdrToUndrSurrender = () => {
     btn.loading = false;
     console.log("申请核保(退保、注销)", res);
     if (res["code"] == "200") {
-      const ops = opertaor.convertData(res);
-      opertaor.setDataAll(ops);
-      if (res["res"]["composition"]["EdrBase"]) {
-        const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
-        edrbase.value?.setFormValue(EdrBaseData);
-      }
       ElMessage.success(res.msg);
     } else {
       ElMessage.error(res.msg);
