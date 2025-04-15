@@ -144,7 +144,6 @@
                   :key="i"
                   :id="k.pageKey"
                 >
-          
                   <component
                     v-if="currentIndex >= i"
                     :ref="
@@ -177,14 +176,19 @@
       </el-footer>
     </el-container>
     <el-backtop :right="100" :bottom="100" />
-    
+
     <!-- 发票弹框 -->
-    <invoiceInfoModel  v-if="invoiceShow"  @ok="close" ></invoiceInfoModel>
-    
+    <invoiceInfoModel v-if="invoiceShow" @ok="close"></invoiceInfoModel>
+
     <!-- 反洗钱 -->
-     <amlExtendInfo ref="amlInfoRef" v-if="amlInfoShow" :controlFlag="controlFlag" @ok="close"  ></amlExtendInfo>
-     <!-- v-if="amlInfoShow" -->
-</div>
+    <amlExtendInfo
+      ref="amlInfoRef"
+      v-if="amlInfoShow"
+      :controlFlag="controlFlag"
+      @ok="close"
+    ></amlExtendInfo>
+    <!-- v-if="amlInfoShow" -->
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -259,82 +263,84 @@ const cacheKey = ref();
 
 let invoiceShow = ref(false); // 发票显示
 let amlInfoShow = ref(false); // 反洗钱显示
-let controlFlag = '';    // 用来处理反洗钱 页面窜窜以及显示
+let controlFlag = ""; // 用来处理反洗钱 页面窜窜以及显示
 
 //关闭
 const close = () => {
   invoiceShow.value = false;
   amlInfoShow.value = false;
-}
- 
+};
+
 onBeforeMount(() => {
   console.log("路由参数props.param", props.param);
   initPage();
 });
 
- /**
-  * 发票信息
-  */
-const setTaxInfo = ()=>{
-  console.log('发票信息',opertaor.getTableRefs());
-    const tabref = opertaor.getTableRefs();
-    const appLicantValue =tabref["applicant"].getFromValue()['Applicant.cAppNo'];  // 单据编号     
-        if (!!appLicantValue) {
-          invoiceShow.value = true;
-        } else {
+/**
+ * 发票信息
+ */
+const setTaxInfo = () => {
+  console.log("发票信息", opertaor.getTableRefs());
+  const tabref = opertaor.getTableRefs();
+  const appLicantValue = tabref["applicant"].getFromValue()["Applicant.cAppNo"]; // 单据编号
+  if (!!appLicantValue) {
+    invoiceShow.value = true;
+  } else {
+    ElMessage.error("请先保存单据");
+    return;
+  }
+};
 
-            ElMessage.error('请先保存单据')
-            return;
-        }      
-}
-  
+/**
+ * 反洗钱扩展信息hide
+ */
+const setCusBenefitInfo = () => {
+  const tabref = opertaor.getTableRefs();
+  const appNo = tabref["applicant"].getFromValue()["Applicant.cAppNo"]; // 单据编号
+  const AppcClntMrk = tabref["applicant"].getFromValue()["Applicant.cClntMrk"]; // 投保人 法人01
+  const InscClntMrk = tabref["insured"].getFromValue()["Insured.cClntMrk"]; // 被保人  法人01
 
-    /**
-     * 反洗钱扩展信息hide
-     */
-const  setCusBenefitInfo = ()=> {
-    const tabref = opertaor.getTableRefs();
-    const appNo =tabref["applicant"].getFromValue()['Applicant.cAppNo'];  // 单据编号   
-    const AppcClntMrk =tabref["applicant"].getFromValue()['Applicant.cClntMrk'];  // 投保人 法人01
-    const InscClntMrk =tabref["insured"].getFromValue()['Insured.cClntMrk'];   // 被保人  法人01
+  console.log("数据", opertaor.getDataAll());
+  console.log("数据", props.param);
+  // amlInfoShow.value = true;
+  //  单据保存才有 单据编号
+  if (!appNo) {
+    ElMessage.error("请先保存单据");
+    return;
+  }
 
-console.log('数据',opertaor.getDataAll())
-console.log('数据',props.param)
-      // amlInfoShow.value = true; 
-      //  单据保存才有 单据编号
-      if (!appNo) {
-         ElMessage.error('请先保存单据')
-         return;
-     }
-    
-     //  投被保人性质 没有填写或者都为个人 提示
-     if(AppcClntMrk == undefined || AppcClntMrk == null ) {
-        // ElMessage.error('投保人"投保人性质"不能为空！')
-        ElMessage.error('投保人性质或被保人性质为[法人]时，才允许录入反洗钱扩展信息！')
-      return
-     }else  if(InscClntMrk==undefined || InscClntMrk === null ){
-        // ElMessage.error('被保人 "被保人性质" 不能为空！')
-        ElMessage.error('投保人性质或被保人性质为[法人]时，才允许录入反洗钱扩展信息！')
-      return
-     }else if (AppcClntMrk ==="1" && InscClntMrk === "1" ) {
-      ElMessage.error('投保人性质或被保人性质为[法人]时，才允许录入反洗钱扩展信息！')
-      return;
-     }
- 
+  //  投被保人性质 没有填写或者都为个人 提示
+  if (AppcClntMrk == undefined || AppcClntMrk == null) {
+    // ElMessage.error('投保人"投保人性质"不能为空！')
+    ElMessage.error(
+      "投保人性质或被保人性质为[法人]时，才允许录入反洗钱扩展信息！"
+    );
+    return;
+  } else if (InscClntMrk == undefined || InscClntMrk === null) {
+    // ElMessage.error('被保人 "被保人性质" 不能为空！')
+    ElMessage.error(
+      "投保人性质或被保人性质为[法人]时，才允许录入反洗钱扩展信息！"
+    );
+    return;
+  } else if (AppcClntMrk === "1" && InscClntMrk === "1") {
+    ElMessage.error(
+      "投保人性质或被保人性质为[法人]时，才允许录入反洗钱扩展信息！"
+    );
+    return;
+  }
 
-    //  显示标志   1：投保人 2：被保人  3：都展示
-      if(AppcClntMrk == '0'&& InscClntMrk =='0'){
-          amlInfoShow.value = true;     
-          controlFlag = '3';
-      } else if(AppcClntMrk == '0' &&  InscClntMrk =='1') { 
-          amlInfoShow.value = true;     
-          controlFlag = '1';
-      } else if(AppcClntMrk == '1' &&  InscClntMrk =='0') { 
-          amlInfoShow.value = true;     
-          controlFlag = '2';
-      }
-}
-
+  //  显示标志   1：投保人 2：被保人  3：都展示
+  if (AppcClntMrk == "0" && InscClntMrk == "0") {
+    amlInfoShow.value = true;
+    controlFlag = "3";
+  } else if (AppcClntMrk == "0" && InscClntMrk == "1") {
+    amlInfoShow.value = true;
+    controlFlag = "1";
+  } else if (AppcClntMrk == "1" && InscClntMrk == "0") {
+    amlInfoShow.value = true;
+    controlFlag = "2";
+  }
+};
 
 /**
  * 投保需要的按钮
@@ -385,7 +391,7 @@ const basicBtn = [
     label: "反洗钱扩展信息",
     type: "primary",
     func: () => {
-        setCusBenefitInfo()
+      setCusBenefitInfo();
     },
   }),
   createFreeButtonBase({
@@ -650,7 +656,7 @@ async function loadAfter() {
       const baseobj = {};
       baseobj["Base.cRenewMrk"] = "0";
       baseobj["Base.cIsNet"] = "0";
-      // baseobj["Base.cPolicySource"] = "1";
+      baseobj["Base.cPolicySource"] = "1";
       opertaor.getTableRefByKey("plyBase").setFormValue(baseobj);
       //承保信息初始化
       const baseafterobj = {};
@@ -830,7 +836,7 @@ async function loadAfter() {
         label: "反洗钱扩展信息",
         type: "primary",
         func: () => {
-          setCusBenefitInfo()
+          setCusBenefitInfo();
         },
       }),
       createFreeButtonBase({
@@ -892,7 +898,7 @@ async function loadAfter() {
         label: "反洗钱扩展信息",
         type: "primary",
         func: () => {
-          setCusBenefitInfo()
+          setCusBenefitInfo();
         },
       }),
       createFreeButtonBase({
@@ -955,14 +961,17 @@ const loadAppPlyInfo = (CAppNo) => {
             ].split(",");
         }
         console.log("EdrBaseData", EdrBaseData);
-      if("EDR_APP_NEW_SCENE" === props.param.pageType){
-          res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"]= '1';
-          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrType"]= props.param["cEdrType"];
-          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnBundleCde"]= props.param["cRsnCde"];
+        if ("EDR_APP_NEW_SCENE" === props.param.pageType) {
+          res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"] = "1";
+          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrType"] =
+            props.param["cEdrType"];
+          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnBundleCde"] =
+            props.param["cRsnCde"];
           if (props.param.cEdrType != "1") {
-              res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"]=''
+            res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
+              "";
           }
-      }
+        }
         edrbase.value?.setFormValue(EdrBaseData);
       }
       ElMessage.success(res.msg);
