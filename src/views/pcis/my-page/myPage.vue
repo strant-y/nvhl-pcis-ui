@@ -895,12 +895,13 @@ const loadAppPlyInfo = (CAppNo) => {
             ].split(",");
         }
         console.log("EdrBaseData", EdrBaseData);
-        if ("EDR_APP_NEW_SCENE" === props.param.pageType) {
-          res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"] = "1";
-          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrType"] =
-            props.param["cEdrType"];
-          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnBundleCde"] =
-            props.param["cRsnCde"];
+        res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"] = "1";
+        res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrType"] =
+          props.param["cEdrType"];
+        res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnBundleCde"] =
+          props.param["cRsnCde"];
+        props.param["cEdrType"];
+        if (props.param.cEdrType != "1") {
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] = "";
         }
         edrbase.value?.setFormValue(EdrBaseData);
@@ -1089,8 +1090,13 @@ const calcPremiumEdr = () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
   res["EdrBase"] = edrbase.value?.getFromValue();
-  res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
-    res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+  if (
+    res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
+    res["EdrBase"]["EdrBase.cEdrRsnDetail"] != ""
+  ) {
+    res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+  }
   console.log(res);
   calcEdr(res).then((res) => {
     btn.loading = false;

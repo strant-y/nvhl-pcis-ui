@@ -216,13 +216,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "primary",
         label: "查询",
         func: async () => {
-          // const freeEditRefs = freeEditRef.value[currentTabKey.value];
-          // freeEditRefs.value[0].validate().then((isValid) => {
-          //     if (isValid) {
-          //         handleQuery();
-          //     }
-          // });
-          handleQuery();
+          const freeEditRefs = freeEditRef.value[currentTabKey.value];
+          freeEditRefs.value[0].validate().then((isValid) => {
+            if (isValid) {
+              handleQuery();
+            }
+          });
         },
       }),
       createFreeButtonBase({
@@ -575,7 +574,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cAppStatus",
         inputtype: "rtselect",
         title: "状态",
-        rules: [getRules("required", {})],
+        // rules: [getRules("required", {})],
         clearable: true,
         loadData: [
           { label: "暂存", value: "1" },
@@ -1091,23 +1090,23 @@ const tableObj = {
           }
         },
         tableClick: (row) => {
-            ElMessageBox.confirm("确认删除数据?", "警告", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
-                type: "warning",
-            }).then(function () {
-                const delResult = delTmpPolicy({ appNo: row.cAppNo });
-                delResult.then((res: any) => {
-                    if (null != res && null != res["code"]) {
-                        if (res["code"] === 200) {
-                            ElMessage.success({ message: res.msg, duration: 3000 });
-                            handleQuery(true);
-                        } else {
-                            ElMessage.error({ message: res.msg, duration: 3000 });
-                        }
-                    }
-                });
+          ElMessageBox.confirm("确认删除数据?", "警告", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+          }).then(function () {
+            const delResult = delTmpPolicy({ appNo: row.cAppNo });
+            delResult.then((res: any) => {
+              if (null != res && null != res["code"]) {
+                if (res["code"] === 200) {
+                  ElMessage.success({ message: res.msg, duration: 3000 });
+                  handleQuery(true);
+                } else {
+                  ElMessage.error({ message: res.msg, duration: 3000 });
+                }
+              }
             });
+          });
         },
       }),
       // createFreeButtonBase({
@@ -1268,6 +1267,23 @@ const tableObj = {
         title: "保费",
         minWidth: 100,
       },
+      {
+        prop: "cAppStatus",
+        inputtype: "rtinput",
+        title: "状态",
+        minWidth: 100,
+        hideBtns: (row: any) => {
+          if (
+            queryType.value == "2" ||
+            queryType.value == "3" ||
+            queryType.value == "4"
+          ) {
+            return false;
+          } else {
+            return true;
+          }
+        },
+      },
     ],
   },
 };
@@ -1329,6 +1345,7 @@ const handleTabClick = (tab: any) => {
       //   }
       // }
     });
+
     freeEditRef.value[i].value[0].setValue("tIssueTm", [
       dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
       moment(new Date()).format("YYYY-MM-DD 23:59:59"),
@@ -1342,6 +1359,12 @@ const handleTabClick = (tab: any) => {
       moment(new Date()).format("YYYY-MM-DD 23:59:59"),
     ]);
   }
+  // 控制申请单类型字段的显示和隐藏
+  formconfig1.fromSchema?.forEach((item) => {
+    if (item.prop === "cAppTyp") {
+      item.disabled = queryType.value === "3" || queryType.value === "4";
+    }
+  });
   pageresult.list = [];
   tabs.value.forEach((item) => {
     if (item.name === tab.props.label) {
