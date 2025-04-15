@@ -663,7 +663,7 @@ async function loadAfter() {
           props.param["cRsnCde"],
         ]);
       }
-      setTimeout(() => {
+      nextTick(() => {
         opertaor.setDisabledAll();
         getEdrRsnItemFun(
           props.param["cProdNo"],
@@ -673,15 +673,15 @@ async function loadAfter() {
           props.param["cEdrType"],
           props.param["cGrpMrk"]
         );
-      }, 3000);
+      });
       bthList.value = edrBtn;
     } else {
       bthList.value = edrSurrenderBtn;
     }
   } else if (props.param.pageType === "readonly") {
-    setTimeout(() => {
+    nextTick(() => {
       opertaor.setDisabledAll();
-    }, 3000);
+    });
     // 查询数据
     // const getAppPlyInfoRes = await getAppPlyInfoByAppNo({
     //   CAppNo: props.param.cAppNo,
