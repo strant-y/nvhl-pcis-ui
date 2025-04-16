@@ -23,7 +23,11 @@
         : false
     "
     :placeholder="item.placeholder"
-    :disabledDate="item.disabledDate"
+    :disabledDate="
+      item.disabledDate && typeof item.disabledDate === 'function'
+        ? item.disabledDate
+        : (data) => false
+    "
     :shortcuts="item.shortcuts"
     :size="item.size"
     :format="item.format ? item.format : getValueFormat()"
