@@ -92,28 +92,33 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				createFreeButtonBase({
 					label: "导出Excel",
 					func: () => {
-						const r = tableRef.value?.getPartnerPage(); //获取分页数据
-						const s = freeEditRef.value?.getFromValue(); //获取表单数据
-						const param = Object.assign(s, r, {
-							sortField: 'name',
-							_allow_anonymous: true,
-							CurrentUser: user.value['opCde'],
-							CurrentUserOrg: user.value['companyId'],
-							CType:'queryPayConfrimList',
-						});
-						console.log(param)
-                        param['pageSize']=1000
-						policyService.excelDown(param).then((res: any) => {
-							if (res.size <= 0) {
-								ElMessage.error({ message: '下载出错', duration: 3000 });
-								return;
-							}
-							const fileName = `缴费信息.xls`;
-                            const blob = new Blob([res.data], { type: 'application/vnd.ms-excel' });
-                            saveAs(blob, fileName);
-						}).catch((err: any) => {
-							ElMessage.error({ message: err, duration: 3000 });
-						});
+                        freeEditRef.value?.validate().then((isValid) => {
+                            if (!isValid) {
+                                return false;
+                            } else {
+                                const r = tableRef.value?.getPartnerPage(); //获取分页数据
+                                const s = freeEditRef.value?.getFromValue(); //获取表单数据
+                                const param = Object.assign(s, r, {
+                                    sortField: 'name',
+                                    _allow_anonymous: true,
+                                    CurrentUser: user.value['opCde'],
+                                    CurrentUserOrg: user.value['companyId'],
+                                    CType:'queryPayConfrimList',
+                                });
+                                console.log(param)
+                                param['pageSize']=1000
+                                policyService.excelDown(param).then((res: any) => {
+                                    if (res.size <= 0) {
+                                        ElMessage.error({ message: '下载出错', duration: 3000 });
+                                        return;
+                                    }
+                                    const fileName = `缴费信息.xls`;
+                                    const blob = new Blob([res.data], { type: 'application/vnd.ms-excel' });
+                                    saveAs(blob, fileName);
+                                }).catch((err: any) => {
+                                    ElMessage.error({ message: err, duration: 3000 });
+                                });
+                            }});
 					},
 				}),
 				createFreeButtonBase({
@@ -165,6 +170,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 //   trigger: 'change'
                 // })],
 				showExBtn: true,
+                rules: [getRules("required", {trigger: 'change'})],
 				btnItems: {
 					icon: "Search",
 					type: "primary",
@@ -192,7 +198,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				prop: "LoadSub",
 				inputtype: "rtcheckbox",
 				title: "是否包含下级",
-				defaultValue: 1,
 				keymap: {
 				  y: 1,
 				  n: 0,
@@ -709,6 +714,7 @@ onMounted(async () => {
   nextTick(()=>{
     freeEditRef.value?.setValue('CPayStatus', '0')
     freeEditRef.value?.setValue('CDateTyp', '1')
+    freeEditRef.value?.setValue('LoadSub', 1)
     freeEditRef.value?.setValue('TUnTmStart', startTm)
     freeEditRef.value?.setValue('TUnTmEnd', endTm)
   })  
