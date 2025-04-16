@@ -243,17 +243,13 @@ const indexMethod = (index: number) => {
 const tableDatas = ref<any[]>([]);
 const formItems = ref<{[key:string] : any }>({});
 const schamaconf = ref<{[key:string] : any }>({});
-
+creatSchama();
 const tableFormfef = ref("tableFormfef");
 watch([() => props.item], ([newitemValue]) => {
-  if(props.item.fromSchema && props.item.fromSchema.length > 0){
-    props.item.fromSchema.forEach((item: any) => {
-      schamaconf.value[item.prop] = item;
-    });
-  }
+  creatSchama();
   formItems.value = {};
   tableDatas.value?.forEach((data) => {
-    formItems.value[data._dataId] = JSON.parse(JSON.stringify(schamaconf.value));
+    formItems.value[data._dataId] = creatItem(schamaconf.value);
   });
 },{deep:true});
 watch([() => props.modelValue], ([newModelValue]) => {
@@ -263,8 +259,9 @@ watch([() => props.modelValue], ([newModelValue]) => {
   tableDatas.value?.forEach((data) => {
     // 初始化行数字Id
     data._dataId = getuuid();
-    formItems.value[data._dataId] = JSON.parse(JSON.stringify(schamaconf.value));
+    formItems.value[data._dataId] = creatItem(schamaconf.value);
   });
+  console.log(formItems.value);
 });
 watch(
   () => props.parentFromUi,
@@ -272,6 +269,27 @@ watch(
     initUI();
   }
 );
+
+function creatSchama() {
+  if(props.item.fromSchema && props.item.fromSchema.length > 0){
+    props.item.fromSchema.forEach((item: any) => {
+      schamaconf.value[item.prop] = item;
+    });
+  }
+}
+function creatItem(d: any){
+  let sc: any = JSON.parse(JSON.stringify(schamaconf.value));
+  // 将方法回填到item中
+  Object.keys(schamaconf.value).forEach((k: any) => {
+    if(schamaconf.value[k]['func']){
+      sc[k]['func'] = schamaconf.value[k]['func']
+    }
+    if(schamaconf.value[k]['tableClick']){
+      sc[k]['tableClick'] = schamaconf.value[k]['tableClick']
+    }
+  });
+  return sc;
+}
 function handleSelectionChange(selectedRows: any[]) {
   emits("selection-change", selectedRows);
 }
@@ -426,7 +444,7 @@ onMounted(() => {
   tableDatas.value?.forEach((data) => {
     // 初始化行数字Id
     data._dataId = getuuid();
-    formItems.value[data._dataId] = JSON.parse(JSON.stringify(schamaconf.value));
+    formItems.value[data._dataId] = creatItem(schamaconf.value);
   });
   if (props.item.fromSchema) {
     initUI();
@@ -461,7 +479,7 @@ function getValue(row: any, item: any) {
 function addRow() {
   const rowId = getuuid();
   tableDatas.value?.push({ _dataId: rowId });
-  formItems.value[rowId] = JSON.parse(JSON.stringify(schamaconf.value));
+  formItems.value[rowId] = creatItem(schamaconf.value);
   editIndex.value = rowId;
 }
 
@@ -477,7 +495,7 @@ function delRow(editIndex: any) {
 function addRowByData(data: any) {
   const rowId = getuuid();
   tableDatas.value?.push({ _dataId: rowId ,...data});
-  formItems.value[rowId] = JSON.parse(JSON.stringify(schamaconf.value));
+  formItems.value[rowId] = creatItem(schamaconf.value);
   editIndex.value = rowId;
 }
 

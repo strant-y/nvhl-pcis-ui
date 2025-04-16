@@ -24,8 +24,7 @@ export function formInit(
     if (
       key === "titleBtns" ||
       key === "endBtns" ||
-      key === "tableBtn" ||
-      key === "disabledDate"
+      key === "tableBtn"
     ) {
       const btns: FreeButtonBase[] = [];
       for (let i = 0; i < value.length; i++) {
@@ -65,7 +64,7 @@ export function formInit(
       return fromUi;
     }
     // 方法绑定
-    if (key === "func") {
+    if (key === "func"  || key === "disabledDate") {
       // 确保 value 是 method 对象的键之一
       const funcKey = value as keyof typeof method;
       return method[funcKey];
