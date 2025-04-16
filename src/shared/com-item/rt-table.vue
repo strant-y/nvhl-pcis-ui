@@ -261,7 +261,6 @@ watch([() => props.modelValue], ([newModelValue]) => {
     data._dataId = getuuid();
     formItems.value[data._dataId] = creatItem(schamaconf.value);
   });
-  console.log(formItems.value);
 });
 watch(
   () => props.parentFromUi,
