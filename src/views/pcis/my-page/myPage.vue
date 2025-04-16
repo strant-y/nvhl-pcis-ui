@@ -223,6 +223,11 @@ import invoiceInfoModel from "@/views/pcis-new-udr-list/common/invoice-info-mode
 //  反洗钱
 import amlExtendInfo from "@/views/pcis-main/prodDef/common/aml-extend-info/index.vue";
 
+//额度明细弹窗
+const limitDetails = defineAsyncComponent(
+  () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
+);
+
 const CostInformation = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/pages/CostInformation.vue")
 );
@@ -397,7 +402,9 @@ const basicBtn = [
   createFreeButtonBase({
     label: "额度明细",
     type: "primary",
-    func: () => {},
+    func: () => {
+      openLimit();
+    },
   }),
 ];
 /**
@@ -842,7 +849,9 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "额度明细",
         type: "primary",
-        func: () => {},
+        func: () => {
+          openLimit();
+        },
       })
     );
   } else if (props.param.pageType === "copy") {
@@ -904,7 +913,9 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "额度明细",
         type: "primary",
-        func: () => {},
+        func: () => {
+          openLimit();
+        },
       })
     );
   }
@@ -1078,7 +1089,40 @@ const submitToUndrFn = () => {
 /**
  * 额度明细弹窗
  */
-
+const openLimit = () => {
+  //获取投保人信息
+    let operAppDatas = opertaor.getDataAll()['applicant'];
+  //缴费明细非空逻辑校验
+      if (operAppDatas["Applicant.cAppNme"] == null || operAppDatas["Applicant.cAppNme"] === '') {
+          ElMessage.error("投保人信息客户名称不能为空！");
+          return;
+      }
+      if (operAppDatas["Applicant.cClntMrk"] == null || operAppDatas["Applicant.cClntMrk"] === '') {
+          ElMessage.error("投保人信息投保人性质不能为空！");
+          return;
+      }
+      if (operAppDatas["Applicant.cCertfCde"] == null || operAppDatas["Applicant.cCertfCde"] === '') {
+          ElMessage.error("投保人信息证件号码不能为空！");
+          return;
+      }
+      if (operAppDatas["Applicant.cRelateNo"] == null || operAppDatas["Applicant.cRelateNo"] === '') {
+          ElMessage.error("投保人信息关联交易审批单编号不能为空！");
+          return;
+      }
+    //额度明细功能参数
+    const limitParam = {
+      CRelateNo:operAppDatas["Applicant.cRelateNo"],//关联交易审批单编号
+      CClntMrk:operAppDatas["Applicant.cClntMrk"],//投保人性质
+      CAppNme:operAppDatas["Applicant.cAppNme"],//客户名称
+      CCertfCde:operAppDatas["Applicant.cCertfCde"],//身份证号
+    };
+    dzmodal
+    .open(limitDetails, { type: "Issuer", data: limitParam })
+    .then((res: any) => {
+    if (res.type === "ok") {
+    }
+    });
+  }
 /**
  * 投保单保存
  * **/
