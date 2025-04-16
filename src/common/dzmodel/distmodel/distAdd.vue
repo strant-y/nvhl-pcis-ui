@@ -45,6 +45,39 @@ const props = defineProps({
     default: () => ({}),
   },
 });
+const getCComponentTable = () => {
+  const cProdNo = route.params.param.cProdNo;
+  if (cProdNo === "040001") return "AddressDist";
+  if (cProdNo === "043002") return "VehicleDist";
+  if (cProdNo === "043009") {
+    switch (props.data.tab) {
+      case "实际用工地址/工程项目地址清单":
+        return "ProjectDist";
+      case "从业人员清单":
+        return "EmployeeDist";
+      case "从业人员清单汇总":
+        return "DistSummary";
+      default:
+        return "";
+    }
+  }
+  if (cProdNo === "040002") {
+    switch (props.data.tab) {
+      case "雇员清单":
+        return "EmployeeDist";
+      case "雇员清单汇总":
+        return "DistSummary";
+      case "车辆清单":
+        return "VehicleDist";
+      case "车辆清单汇总":
+        return "DistSummary";
+      default:
+        return "";
+    }
+  }
+  return "";
+};
+const cComponentTable = getCComponentTable();
 
 const dataParams = ref({});
 const appNo = ref("");
@@ -75,14 +108,7 @@ const formconfig1 = ref<AppFreeEditConfig>(
             const params = Object.assign(
               {
                 cProdNo: route.params.param.cProdNo,
-                cComponentTable:
-                  route.params.param.cProdNo == "040001"
-                    ? "AddressDist"
-                    : route.params.param.cProdNo == "043002"
-                      ? "VehicleDist"
-                      : route.params.param.cProdNo == "043009"
-                        ? "ProjectDist"
-                        : "EmployeeDist",
+                cComponentTable: cComponentTable,
                 cAppNo: appNo.value,
               },
               { dist: processedData }

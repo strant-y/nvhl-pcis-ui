@@ -84,7 +84,7 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 import { now } from "lodash";
 import { useRoute } from "vue-router";
-import moment from "moment";
+import moment, { localeData } from "moment";
 import dayjs from "dayjs";
 const userStore = useUserStore();
 const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
@@ -1269,9 +1269,19 @@ const tableObj = {
       },
       {
         prop: "cAppStatus",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "状态",
         minWidth: 100,
+        loadData: [
+          { label: "暂存", value: "1" },
+          { label: "已提核", value: "2" },
+          { label: "核保退回/撤回", value: "3" },
+          { label: "核保通过", value: "4" },
+          { label: "已出保单", value: "5" },
+          { label: "已做失效操作", value: "6" },
+          { label: "已提交未接收", value: "7" },
+          { label: "见费出单退回", value: "8" },
+        ],
         hideBtns: (row: any) => {
           if (
             queryType.value == "2" ||

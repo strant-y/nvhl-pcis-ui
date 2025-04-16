@@ -38,7 +38,7 @@ const method = {
   funcpayadd: () => {
       payinfoEditRef?.value?.addRow();
       const val=getFromValue()
-      val.items.forEach((key,index) => {
+      val.items.forEach((key,index) => { 
           key['Pay.nTms']=index+1
       });
   },

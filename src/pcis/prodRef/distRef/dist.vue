@@ -22,7 +22,12 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { selectDist, checkAppBase, deleteDist } from "@/api/prod/index";
+import {
+  selectDist,
+  checkAppBase,
+  deleteDist,
+  downloadDistTemplate,
+} from "@/api/prod/index";
 import { formInit } from "@/shared/from-init";
 import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
@@ -197,6 +202,9 @@ const method = {
       if (res.code === 200) {
         pageresult.list = [];
         pageresult.list = res.data;
+        pageresult.list.forEach((item, index) => {
+          item.nSeqNo = index + 1;
+        });
       }
     });
   },
@@ -209,6 +217,7 @@ const method = {
           {
             fromSchema: tableconfig.value.fromSchema,
             title: "新增",
+            tab: formconfig1.value.title,
           },
           {
             isOk: (res: any) => {},
@@ -220,6 +229,25 @@ const method = {
         ElMessage.error("请先保存申请单!");
       }
     });
+  },
+  //模板下载
+  downloadTemp: () => {
+    console.log(formconfig1.value.fromSchema, "00000");
+    downloadDistTemplate(formconfig1.value)
+      .then((res) => {
+        const url = window.URL.createObjectURL(new Blob([res.data]));
+        console.log(url, "------=====");
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "营业场所地址清单模板.xlsx"); // 设置下载的文件名
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      })
+      .catch(() => {
+        ElMessage.error("模板下载失败");
+      });
   },
 };
 
