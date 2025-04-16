@@ -28,6 +28,7 @@ import {
   deleteDist,
   downloadDistTemplate,
 } from "@/api/prod/index";
+import { saveAs } from "file-saver";
 import { formInit } from "@/shared/from-init";
 import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
@@ -232,18 +233,15 @@ const method = {
   },
   //模板下载
   downloadTemp: () => {
-    console.log(formconfig1.value.fromSchema, "00000");
     downloadDistTemplate(formconfig1.value)
       .then((res) => {
-        const url = window.URL.createObjectURL(new Blob([res.data]));
-        console.log(url, "------=====");
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", "营业场所地址清单模板.xlsx"); // 设置下载的文件名
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
+        if (res.size <= 0) {
+          ElMessage.error({ message: "下载出错", duration: 3000 });
+          return;
+        }
+        const fileName = `模板地址清单.xls`;
+        const blob = new Blob([res], { type: "application/vnd.ms-excel" });
+        saveAs(blob, fileName);
       })
       .catch(() => {
         ElMessage.error("模板下载失败");

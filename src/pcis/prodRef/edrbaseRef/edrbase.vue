@@ -157,7 +157,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "批改原因",
         typeCode: "EDR_RSN_LIST",
-        codeParam: { prodNo: params["cProdNo"] },
+        codeParam: { prodNo: params["cProdNo"] ,rsnTyp: params["cEdrType"],isGrp:params["cGrpMrk"] === "1" ? "1" : null,isPer: params["CGrpMrk"] === "1" ? "1" : null},
         rules: [getRules("required", {})],
         clearable: true,
         disabled: true,
@@ -252,32 +252,40 @@ function setFormItem(key, obj) {
 }
 onMounted(() => {
   nextTick(() => {
-      setFormItem("EdrBase.cDptCde", {
-          loadData: [
-              { value: params.cDptCde, label: `${params.cDptCde} ${params.cDptCnm}` },
-          ],
-      });
-    const isGrp = params["cGrpMrk"] === "1" ? "1" : null;
-    const isPer = params["CGrpMrk"] === "1" ? "1" : null;
-    const param = {
-      prodNo: params["cProdNo"],
-      rsnTyp: params["cEdrType"],
-      isGrp: isGrp,
-      isPer: isPer,
-      ZH: "ZH",
-      FZ: "FZ",
-    };
-    codeListStore
-      .queryCodeList({
-        codeListName: "EDR_RSN_LIST",
-        codeListParam: param,
-      })
-      .then((res) => {
-        setFormItem("EdrBase.cEdrRsnDetail", { loadData: res });
-      });
+    setFormItem("EdrBase.cDptCde", {
+        loadData: [
+            { value: params.cDptCde, label: `${params.cDptCde} ${params.cDptCnm}` },
+        ],
+    });
     if(params["cEdrType"]!='1'){
-        setFormItem("EdrBase.cEdrRsnDetail", { hidden: true });
+        if(params["cEdrType"]=='3'){
+            setFormItem("EdrBase.cEdrRsnDetail", { loadData: [{value:'s1',label:'全单退保'},{value:'s2',label:'一般退保'}] });
+        }else if(params["cEdrType"]=='2'){
+            setFormItem("EdrBase.cEdrRsnDetail", { loadData: [{value:'c1',label:'全单注销'}] });
+        }
         setFormItem("EdrBase.cEdrRsnBundleCde", {typeCode:'', codeParam:'',loadData: [{value:'s1',label:'全单退保'},{value:'s2',label:'一般退保'},{value:'c1',label:'全单注销'}] });
+    }else{
+        const isGrp = params["cGrpMrk"] === "1" ? "1" : null;
+        const isPer = params["CGrpMrk"] === "1" ? "1" : null;
+        const param = {
+            prodNo: params["cProdNo"],
+            rsnTyp: params["cEdrType"],
+            isGrp: isGrp,
+            isPer: isPer,
+            ZH: "ZH",
+            FZ: "FZ",
+        };
+        if(params.cRsncde=='FZ'){
+            param["calcMrk"] = '0'
+        }
+        codeListStore
+            .queryCodeList({
+                codeListName: "EDR_RSN_LIST",
+                codeListParam: param,
+            })
+            .then((res) => {
+                setFormItem("EdrBase.cEdrRsnDetail", { loadData: res });
+            });
     }
   });
 });
