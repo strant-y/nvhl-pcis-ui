@@ -969,7 +969,7 @@ const loadAppPlyInfo = (CAppNo) => {
             props.param["cRsnCde"];
           if (props.param.cEdrType != "1") {
             res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
-              "";
+                [props.param["cRsnCde"]];
           }
         }
         edrbase.value?.setFormValue(EdrBaseData);
@@ -1240,6 +1240,13 @@ const calcPremiumEdrSurrender = () => {
   const res = {};
   res["user"] = user;
   res["EdrBase"] = edrbase.value?.getFromValue();
+  if (
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"] != ""
+  ) {
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
+          res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+  }
   calcSurrenEdr(res).then((res) => {
     btn.loading = false;
     console.log("批改计算", res);
@@ -1258,6 +1265,17 @@ const calcPremiumEdrSurrender = () => {
       tmDay.value = res["res"]["composition"]["plyBase"][0]["Base.cTmSysCde"];
       if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
+          if (
+              res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] !=
+              "" &&
+              res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] !=
+              null
+          ) {
+              res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
+                  res["res"]["composition"]["EdrBase"][0][
+                      "EdrBase.cEdrRsnDetail"
+                      ].split(",");
+          }
         edrbase.value?.setFormValue(EdrBaseData);
       }
     } else {
@@ -1282,6 +1300,8 @@ const saveApplicationEdr = () => {
   res["taskId"] = props.param.taskId ? props.param.taskId : null;
   res["data"] = {};
   res["data"]["EdrBase"] = edrbase.value?.getFromValue();
+  res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"] =
+      res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   console.log(res);
   saveSurrenEdr(res).then((res) => {
     btn.loading = false;
@@ -1291,6 +1311,10 @@ const saveApplicationEdr = () => {
       opertaor.setDataAll(ops);
       if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
+        res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
+            res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"].split(
+                ","
+            );
         edrbase.value?.setFormValue(EdrBaseData);
       }
       ElMessage.success(res.msg);
@@ -1379,9 +1403,13 @@ const saveEdrPlyInfo = () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
   res["EdrBase"] = edrbase.value?.getFromValue();
-  res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
-    res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
-  console.log(res);
+  if (
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"] != ""
+  ) {
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
+          res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+  }
   saveEdrAppPlyInfo(res).then((res) => {
     console.log("saveAppPlyInfo-res", res);
     btn.loading = false;
