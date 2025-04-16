@@ -1,7 +1,7 @@
-import {AxiosPromise} from "axios";
-import {post} from "@/utils/http";
-import {get} from "@/utils/http";
-import {del} from "@/utils/http";
+import { AxiosPromise } from "axios";
+import { post } from "@/utils/http";
+import { get } from "@/utils/http";
+import { del } from "@/utils/http";
 import { LocalBaseApi } from "../config";
 
 /**
@@ -10,11 +10,11 @@ import { LocalBaseApi } from "../config";
  * @param queryParams
  */
 export function getFactorList(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/getFactorList`, queryParams);
+  return post(`/prod/getFactorList`, queryParams);
 }
 
 export function getInputGroupList(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/getInputGroupList`, queryParams);
+  return post(`/prod/getInputGroupList`, queryParams);
 }
 
 /**
@@ -23,7 +23,7 @@ export function getInputGroupList(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function getButtonByFacKey(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/getButtonByFacKey`, queryParams);
+  return post(`/prod/getButtonByFacKey`, queryParams);
 }
 
 /**
@@ -32,7 +32,7 @@ export function getButtonByFacKey(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function deleteFactorBykey(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/deleteFactorBykey`, queryParams);
+  return post(`/prod/deleteFactorBykey`, queryParams);
 }
 
 /**
@@ -41,11 +41,11 @@ export function deleteFactorBykey(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function saveFactor(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/saveFactor`, queryParams);
+  return post(`/prod/saveFactor`, queryParams);
 }
 
 export function saveDistfrom(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/saveDistfrom`, queryParams);
+  return post(`/prod/saveDistfrom`, queryParams);
 }
 
 /**
@@ -54,7 +54,7 @@ export function saveDistfrom(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function getComponentList(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/getComponentList`, queryParams);
+  return post(`/prod/getComponentList`, queryParams);
 }
 
 /**
@@ -63,19 +63,19 @@ export function getComponentList(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function queryPageComponents(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/queryPageComponents`, queryParams);
+  return post(`/prod/queryPageComponents`, queryParams);
 }
 /**
  * 配置批改比较项
  * **/
 export function initProdEdrRsnItemList(queryParams: any): AxiosPromise<any> {
-    return post(`proddef/initProdEdrRsnItemList`, queryParams);
+  return post(`proddef/initProdEdrRsnItemList`, queryParams);
 }
 /**
  * 配置批改比较项保存
  * **/
 export function saveProdEdrRsnItemList(queryParams: any): AxiosPromise<any> {
-    return post(`proddef/saveProdEdrRsnItemList`, queryParams);
+  return post(`proddef/saveProdEdrRsnItemList`, queryParams);
 }
 /**
  * 获取全部组件信息
@@ -83,11 +83,11 @@ export function saveProdEdrRsnItemList(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function queryPageComponentList(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/queryPageComponentList`, queryParams);
+  return post(`/prod/queryPageComponentList`, queryParams);
 }
 
 export function queryFactorListByComCode(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/queryFactorListByComCode`, queryParams);
+  return post(`/prod/queryFactorListByComCode`, queryParams);
 }
 
 /**
@@ -96,7 +96,7 @@ export function queryFactorListByComCode(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function getProdList(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/getProdList`, queryParams);
+  return post(`/prod/getProdList`, queryParams);
 }
 
 /**
@@ -105,7 +105,7 @@ export function getProdList(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function savePageComonent(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/savePageComonent`, queryParams);
+  return post(`/prod/savePageComonent`, queryParams);
 }
 
 /**
@@ -114,7 +114,7 @@ export function savePageComonent(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function saveProdInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/saveProdInfo`, queryParams);
+  return post(`/prod/saveProdInfo`, queryParams);
 }
 /**
  * 获取产品信息大对象
@@ -122,7 +122,7 @@ export function saveProdInfo(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function getProdInfos(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/getProdInfos`, queryParams);
+  return post(`/prod/getProdInfos`, queryParams);
 }
 /**
  * 获取产品信息详情
@@ -130,7 +130,7 @@ export function getProdInfos(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function getProducts(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/get`, queryParams);
+  return post(`/proddef/get`, queryParams);
 }
 /**
  * 获取商品计划列表
@@ -138,7 +138,7 @@ export function getProducts(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function queryCommodityPlanList(queryParams: any): AxiosPromise<any> {
-    return post(`/commodity/queryCommodityPlanList`, queryParams);
+  return post(`/commodity/queryCommodityPlanList`, queryParams);
 }
 /**
  * 获取商品详情
@@ -146,7 +146,7 @@ export function queryCommodityPlanList(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function getCommodityBase(queryParams: any): AxiosPromise<any> {
-    return post(`/commodity/getCommodityBase`, queryParams);
+  return post(`/commodity/getCommodityBase`, queryParams);
 }
 
 /**
@@ -155,7 +155,7 @@ export function getCommodityBase(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function saveProdPages(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/saveProdPages`, queryParams);
+  return post(`/prod/saveProdPages`, queryParams);
 }
 
 /**
@@ -164,7 +164,7 @@ export function saveProdPages(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function querySelectorList(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/querySelectorList`, queryParams);
+  return post(`/prod/querySelectorList`, queryParams);
 }
 
 /**
@@ -173,7 +173,7 @@ export function querySelectorList(queryParams: any): AxiosPromise<any> {
  * @returns
  */
 export function getComponentByKey(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/getComponentByKey`, queryParams);
+  return post(`/prod/getComponentByKey`, queryParams);
 }
 
 /**
@@ -182,7 +182,7 @@ export function getComponentByKey(queryParams: any): AxiosPromise<any> {
  * @returns
  */
 export function getComponentViewByKey(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/getComponentViewByKey`, queryParams);
+  return post(`/prod/getComponentViewByKey`, queryParams);
 }
 
 /**
@@ -191,11 +191,11 @@ export function getComponentViewByKey(queryParams: any): AxiosPromise<any> {
  * @returns
  */
 export function getPageViewByPage(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/getPageViewByPage`, queryParams);
+  return post(`/prod/getPageViewByPage`, queryParams);
 }
 
 export function copyComponent(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/copyComponent`, queryParams);
+  return post(`/prod/copyComponent`, queryParams);
 }
 
 /**
@@ -204,7 +204,7 @@ export function copyComponent(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function saveComponent(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/saveComponent`, queryParams);
+  return post(`/prod/saveComponent`, queryParams);
 }
 
 /**
@@ -213,7 +213,7 @@ export function saveComponent(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function SaveComponentFactors(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/SaveComponentFactors`, queryParams);
+  return post(`/prod/SaveComponentFactors`, queryParams);
 }
 
 /**
@@ -222,7 +222,7 @@ export function SaveComponentFactors(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function releasePage(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/releasePage`, queryParams);
+  return post(`/prod/releasePage`, queryParams);
 }
 
 /**
@@ -231,7 +231,7 @@ export function releasePage(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function saveAll(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/saveAll`, queryParams);
+  return post(`/prod/saveAll`, queryParams);
 }
 
 /**
@@ -240,7 +240,7 @@ export function saveAll(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function getProductPage(queryParams: any): AxiosPromise<any> {
-    return post(`/prod/getProductPage`, queryParams);
+  return post(`/prod/getProductPage`, queryParams);
 }
 
 /**
@@ -249,7 +249,7 @@ export function getProductPage(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function getBasicKindList(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/getBasicKindList`, queryParams);
+  return post(`/proddef/getBasicKindList`, queryParams);
 }
 /**
  * 修改险类状态
@@ -257,7 +257,7 @@ export function getBasicKindList(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function changeKindStatus(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/changeKindStatus`, queryParams);
+  return post(`/proddef/changeKindStatus`, queryParams);
 }
 /**
  * 提交审核
@@ -265,10 +265,10 @@ export function changeKindStatus(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function auditSubmit(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/auditSubmit`, queryParams);
+  return post(`/proddef/auditSubmit`, queryParams);
 }
 export function changeSpecStatus(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/changeSpecStatus`, queryParams);
+  return post(`/proddef/changeSpecStatus`, queryParams);
 }
 /**
  * 修改责任状态
@@ -276,7 +276,7 @@ export function changeSpecStatus(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function changeRiskStatus(queryParams: any): AxiosPromise<any> {
-    return post(`/cvrgdef/changeRiskStatus`, queryParams);
+  return post(`/cvrgdef/changeRiskStatus`, queryParams);
 }
 /**
  * 修改条款启用禁用状态
@@ -284,7 +284,7 @@ export function changeRiskStatus(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function changeTermStatus(queryParams: any): AxiosPromise<any> {
-    return post(`/cvrgdef/changeTermStatus`, queryParams);
+  return post(`/cvrgdef/changeTermStatus`, queryParams);
 }
 
 /**
@@ -293,7 +293,7 @@ export function changeTermStatus(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function saveKindInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/saveKindInfo`, queryParams);
+  return post(`/proddef/saveKindInfo`, queryParams);
 }
 /**
  * 修改批改原因启用禁用状态
@@ -301,7 +301,7 @@ export function saveKindInfo(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function changeProdEdrRsnStatus(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/changeProdEdrRsnStatus`, queryParams);
+  return post(`/proddef/changeProdEdrRsnStatus`, queryParams);
 }
 
 /**
@@ -310,7 +310,7 @@ export function changeProdEdrRsnStatus(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function getBasicRiskList(queryParams: any): AxiosPromise<any> {
-    return post(`/cvrgdef/getBasicRiskList`, queryParams);
+  return post(`/cvrgdef/getBasicRiskList`, queryParams);
 }
 
 /**
@@ -319,7 +319,7 @@ export function getBasicRiskList(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function saveRiskInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/cvrgdef/saveRiskInfo`, queryParams);
+  return post(`/cvrgdef/saveRiskInfo`, queryParams);
 }
 
 /**
@@ -328,7 +328,7 @@ export function saveRiskInfo(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function qryProdFixSpecList(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/qryProdFixSpecList`, queryParams);
+  return post(`/proddef/qryProdFixSpecList`, queryParams);
 }
 
 /**
@@ -337,7 +337,7 @@ export function qryProdFixSpecList(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function savePrdFixSpecInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/savePrdFixSpecInfo`, queryParams);
+  return post(`/proddef/savePrdFixSpecInfo`, queryParams);
 }
 
 /**
@@ -346,7 +346,7 @@ export function savePrdFixSpecInfo(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function getCvrgList(queryParams: any): AxiosPromise<any> {
-    return post(`/cvrgdef/getCvrgList`, queryParams);
+  return post(`/cvrgdef/getCvrgList`, queryParams);
 }
 
 /**
@@ -355,29 +355,29 @@ export function getCvrgList(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function getTRFactorJson(queryParams: any): AxiosPromise<any> {
-    return post(`/cvrgdef/getTRFactorJson`, queryParams);
+  return post(`/cvrgdef/getTRFactorJson`, queryParams);
 }
 
 export function qryProdRelTermRiskList(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/qryProdRelTermRiskList`, queryParams);
+  return post(`/proddef/qryProdRelTermRiskList`, queryParams);
 }
 export function qryRelTermList(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/qryRelTermList`, queryParams);
+  return post(`/proddef/qryRelTermList`, queryParams);
 }
 export function saveGroupInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/saveGroupInfo`, queryParams);
+  return post(`/proddef/saveGroupInfo`, queryParams);
 }
 
 export function getGroupInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/getGroupInfo`, queryParams);
+  return post(`/proddef/getGroupInfo`, queryParams);
 }
 
 export function getTitleInfoByGroup(queryParams: any): AxiosPromise<any> {
-    return post(`/cvrgdef/getTitleInfoByGroup`, queryParams);
+  return post(`/cvrgdef/getTitleInfoByGroup`, queryParams);
 }
 
 export function saveTermColByTerm(queryParams: any): AxiosPromise<any> {
-    return post(`/cvrgdef/saveTermColByTerm`, queryParams);
+  return post(`/cvrgdef/saveTermColByTerm`, queryParams);
 }
 
 /**
@@ -386,15 +386,15 @@ export function saveTermColByTerm(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function getTRFactorList(queryParams: any): AxiosPromise<any> {
-    return post(`/cvrgdef/getTRFactorList`, queryParams);
+  return post(`/cvrgdef/getTRFactorList`, queryParams);
 }
 
 export function getTermFactorInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/cvrgdef/getTermFactorInfo`, queryParams);
+  return post(`/cvrgdef/getTermFactorInfo`, queryParams);
 }
 
 export function saveTermFactorInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/cvrgdef/saveTermFactorInfo`, queryParams);
+  return post(`/cvrgdef/saveTermFactorInfo`, queryParams);
 }
 
 /**
@@ -403,7 +403,7 @@ export function saveTermFactorInfo(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function saveTRFactorList(queryParams: any): AxiosPromise<any> {
-    return post(`/cvrgdef/saveTRFactorList`, queryParams);
+  return post(`/cvrgdef/saveTRFactorList`, queryParams);
 }
 
 
@@ -413,7 +413,7 @@ export function saveTRFactorList(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function saveInruanceTypeBasicInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/cvrgdef/save`, queryParams);
+  return post(`/cvrgdef/save`, queryParams);
 }
 
 /**
@@ -422,7 +422,7 @@ export function saveInruanceTypeBasicInfo(queryParams: any): AxiosPromise<any> {
  * @returns
  */
 export function getCvrgRiskRelList(queryParams: any): AxiosPromise<any> {
-    return post(`/cvrgdef/getCvrgRiskRelList`, queryParams);
+  return post(`/cvrgdef/getCvrgRiskRelList`, queryParams);
 }
 /**
  * 条款配置-关联责任弹框列表
@@ -430,11 +430,11 @@ export function getCvrgRiskRelList(queryParams: any): AxiosPromise<any> {
  * @returns
  */
 export function queryTermRiskRelList(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/queryTermRiskRelList`, queryParams);
+  return post(`/proddef/queryTermRiskRelList`, queryParams);
 }
 /* 条款配置-关联责任列表*/
 export function saveTermRiskRel(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/saveTermRiskRel`, queryParams);
+  return post(`/proddef/saveTermRiskRel`, queryParams);
 }
 
 /**
@@ -443,19 +443,19 @@ export function saveTermRiskRel(queryParams: any): AxiosPromise<any> {
  * @returns
  */
 export function delRiskRel(queryParams: any): AxiosPromise<any> {
-    return post(`/cvrgdef/delRiskRel`, queryParams);
+  return post(`/cvrgdef/delRiskRel`, queryParams);
 }
 /* 条款配置-删除关联附加险列表*/
 export function deleteTermRel(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/deleteTermRel`, queryParams);
+  return post(`/proddef/deleteTermRel`, queryParams);
 }
 /* 删除险别配置-关联责任列表*/
 export function deleteTermRiskRel(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/deleteTermRiskRel`, queryParams);
+  return post(`/proddef/deleteTermRiskRel`, queryParams);
 }
 /* 获取条款配置-条款详情*/
 export function getPrdTermInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/getPrdTermInfo`, queryParams);
+  return post(`/proddef/getPrdTermInfo`, queryParams);
 }
 /**
  * 条款配置-关联附加条款列表
@@ -463,11 +463,11 @@ export function getPrdTermInfo(queryParams: any): AxiosPromise<any> {
  * @returns
  */
 export function queryTermRelList(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/queryTermRelList`, queryParams);
+  return post(`/proddef/queryTermRelList`, queryParams);
 }
 /* 条款配置-关联附加条款按钮弹框列表*/
 export function queryTermToRelList(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/queryTermToRelList`, queryParams);
+  return post(`/proddef/queryTermToRelList`, queryParams);
 }
 
 /**
@@ -476,7 +476,7 @@ export function queryTermToRelList(queryParams: any): AxiosPromise<any> {
  * @returns
  */
 export function getRiskList(queryParams: any): AxiosPromise<any> {
-    return post(`/cvrgdef/getRiskList`, queryParams);
+  return post(`/cvrgdef/getRiskList`, queryParams);
 }
 
 /**
@@ -485,10 +485,10 @@ export function getRiskList(queryParams: any): AxiosPromise<any> {
  * @returns
  */
 export function query(queryParams: any): AxiosPromise<any> {
-    return post(`/codelist/query`, queryParams);
+  return post(`/codelist/query`, queryParams);
 }
 export function queryPlan(queryParams: any): AxiosPromise<any> {
-    return post(`/codelist/query`, queryParams);
+  return post(`/codelist/query`, queryParams);
 }
 
 /**
@@ -497,7 +497,7 @@ export function queryPlan(queryParams: any): AxiosPromise<any> {
  * @returns
  */
 export function saveCvrgRiskRel(queryParams: any): AxiosPromise<any> {
-    return post(`/cvrgdef/saveCvrgRiskRel`, queryParams);
+  return post(`/cvrgdef/saveCvrgRiskRel`, queryParams);
 }
 
 /**
@@ -506,7 +506,7 @@ export function saveCvrgRiskRel(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function qryProdTermList(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/qryProdTermList`, queryParams);
+  return post(`/proddef/qryProdTermList`, queryParams);
 }
 
 /**
@@ -515,7 +515,7 @@ export function qryProdTermList(queryParams: any): AxiosPromise<any> {
  * @returns
  */
 export function saveCvrgRelTerm(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/saveCvrgRelTerm`, queryParams);
+  return post(`/proddef/saveCvrgRelTerm`, queryParams);
 }
 
 /**
@@ -524,7 +524,7 @@ export function saveCvrgRelTerm(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function savePrdTermInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/savePrdTermInfo`, queryParams);
+  return post(`/proddef/savePrdTermInfo`, queryParams);
 }
 
 /**
@@ -533,16 +533,16 @@ export function savePrdTermInfo(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function delTermById(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/delTermById`, queryParams);
+  return post(`/proddef/delTermById`, queryParams);
 }
 
- /**
- * 险别配置-附加险列表
- *
- * @param queryParams
- */
+/**
+* 险别配置-附加险列表
+*
+* @param queryParams
+*/
 export function getCvrgRelList(queryParams: any): AxiosPromise<any> {
-    return post(`/cvrgdef/getCvrgRelList`, queryParams);
+  return post(`/cvrgdef/getCvrgRelList`, queryParams);
 }
 
 /**
@@ -551,7 +551,7 @@ export function getCvrgRelList(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function getCvrgToRelList(queryParams: any): AxiosPromise<any> {
-    return post(`/cvrgdef/getCvrgToRelList`, queryParams);
+  return post(`/cvrgdef/getCvrgToRelList`, queryParams);
 }
 
 /**
@@ -560,7 +560,7 @@ export function getCvrgToRelList(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function getProFactoryList(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/getProdList`, queryParams);
+  return post(`/proddef/getProdList`, queryParams);
 }
 /**
  * 产品工厂-产品已关联主条款列表
@@ -568,13 +568,13 @@ export function getProFactoryList(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function qryProdRelTermList(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/qryProdRelTermList`, queryParams);
+  return post(`/proddef/qryProdRelTermList`, queryParams);
 }
 /**
  * 产品工厂-列表内修改某一行状态
  */
 export function changeStatus(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/changeStatus`, queryParams);
+  return post(`/proddef/changeStatus`, queryParams);
 }
 
 /**
@@ -583,7 +583,7 @@ export function changeStatus(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function saveProInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/save`, queryParams);
+  return post(`/proddef/save`, queryParams);
 }
 
 /**
@@ -592,7 +592,7 @@ export function saveProInfo(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function copyProInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/copy`, queryParams);
+  return post(`/proddef/copy`, queryParams);
 }
 
 /**
@@ -601,7 +601,7 @@ export function copyProInfo(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function qryProdRelCvrgList(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/qryProdRelCvrgList`, queryParams);
+  return post(`/proddef/qryProdRelCvrgList`, queryParams);
 }
 
 /**
@@ -610,13 +610,13 @@ export function qryProdRelCvrgList(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function associationCvrg(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/associationCvrg`, queryParams);
+  return post(`/proddef/associationCvrg`, queryParams);
 }
 export function associationTerm(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/associationTerm`, queryParams);
+  return post(`/proddef/associationTerm`, queryParams);
 }
 export function unAssociationTerm(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/unAssociationTerm`, queryParams);
+  return post(`/proddef/unAssociationTerm`, queryParams);
 }
 /**
  * 产品工厂-关联附加险保存
@@ -624,10 +624,10 @@ export function unAssociationTerm(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function saveCvrgRel(queryParams: any): AxiosPromise<any> {
-    return post(`/cvrgdef/saveCvrgRel`, queryParams);
+  return post(`/cvrgdef/saveCvrgRel`, queryParams);
 }
 export function saveTermRel(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/saveTermRel`, queryParams);
+  return post(`/proddef/saveTermRel`, queryParams);
 }
 
 /**
@@ -636,10 +636,10 @@ export function saveTermRel(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function qryRefProdAndSpecList(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/qryRefProdAndSpecList`, queryParams);
+  return post(`/proddef/qryRefProdAndSpecList`, queryParams);
 }
 export function unAssociationSpec(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/unAssociationSpec`, queryParams);
+  return post(`/proddef/unAssociationSpec`, queryParams);
 }
 
 /**
@@ -648,7 +648,7 @@ export function unAssociationSpec(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function getUnbindSpecRefProd(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/getUnbindSpecRefProd`, queryParams);
+  return post(`/proddef/getUnbindSpecRefProd`, queryParams);
 }
 
 /**
@@ -657,7 +657,7 @@ export function getUnbindSpecRefProd(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function associationSpec(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/associationSpec`, queryParams);
+  return post(`/proddef/associationSpec`, queryParams);
 }
 
 /**
@@ -666,7 +666,7 @@ export function associationSpec(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function saveAssociationSpec(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/saveAssociationSpec`, queryParams);
+  return post(`/proddef/saveAssociationSpec`, queryParams);
 }
 
 /**
@@ -675,7 +675,7 @@ export function saveAssociationSpec(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function getUnbindHealthNotify(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/getUnbindHealthNotify`, queryParams);
+  return post(`/proddef/getUnbindHealthNotify`, queryParams);
 }
 
 /**
@@ -684,7 +684,7 @@ export function getUnbindHealthNotify(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function saveHealthNotifyRel(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/saveHealthNotifyRel`, queryParams);
+  return post(`/proddef/saveHealthNotifyRel`, queryParams);
 }
 /**
  * 产品工厂-删除关联健康告知
@@ -692,7 +692,7 @@ export function saveHealthNotifyRel(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function delHealthNotify(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/delHealthNotify`, queryParams);
+  return post(`/proddef/delHealthNotify`, queryParams);
 }
 
 /**
@@ -701,7 +701,7 @@ export function delHealthNotify(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function saveHealthNotify(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/saveHealthNotify`, queryParams);
+  return post(`/proddef/saveHealthNotify`, queryParams);
 }
 
 /**
@@ -710,7 +710,7 @@ export function saveHealthNotify(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function qryRefProdAndRuleList(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/qryRefProdAndRuleList`, queryParams);
+  return post(`/proddef/qryRefProdAndRuleList`, queryParams);
 }
 
 /**
@@ -719,7 +719,7 @@ export function qryRefProdAndRuleList(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function savePrdRuleInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/savePrdRuleInfo`, queryParams);
+  return post(`/proddef/savePrdRuleInfo`, queryParams);
 }
 
 /**
@@ -728,7 +728,7 @@ export function savePrdRuleInfo(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function delPrdRuleInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/delPrdRuleInfo`, queryParams);
+  return post(`/proddef/delPrdRuleInfo`, queryParams);
 }
 
 /**
@@ -737,7 +737,7 @@ export function delPrdRuleInfo(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function qryVersionInfoList(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/qryVersionInfoList`, queryParams);
+  return post(`/proddef/qryVersionInfoList`, queryParams);
 }
 
 /**
@@ -746,10 +746,10 @@ export function qryVersionInfoList(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function saveVersionInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/saveVersionInfo`, queryParams);
+  return post(`/proddef/saveVersionInfo`, queryParams);
 }
 export function delVersionById(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/delVersionById`, queryParams);
+  return post(`/proddef/delVersionById`, queryParams);
 }
 
 /**
@@ -758,10 +758,10 @@ export function delVersionById(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function qryPaySeemoneyConfigList(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/qryPaySeemoneyConfigList`, queryParams);
+  return post(`/proddef/qryPaySeemoneyConfigList`, queryParams);
 }
 export function delPaySeemoneyConfigById(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/delPaySeemoneyConfigById`, queryParams);
+  return post(`/proddef/delPaySeemoneyConfigById`, queryParams);
 }
 
 /**
@@ -770,7 +770,7 @@ export function delPaySeemoneyConfigById(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function savePaySeemoneyConfigInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/savePaySeemoneyConfigInfo`, queryParams);
+  return post(`/proddef/savePaySeemoneyConfigInfo`, queryParams);
 }
 
 /**
@@ -779,7 +779,7 @@ export function savePaySeemoneyConfigInfo(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function qryProdCvrgFeeInfoPage(queryParams: any): AxiosPromise<any> {
-    return post(`/plan/qryProdCvrgFeeInfoPage`, queryParams);
+  return post(`/plan/qryProdCvrgFeeInfoPage`, queryParams);
 }
 /**
  * 产品工厂-查询费率表信息
@@ -787,19 +787,19 @@ export function qryProdCvrgFeeInfoPage(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function qryProdTermFeeInfoPage(queryParams: any): AxiosPromise<any> {
-    return post(`/plan/qryProdTermFeeInfoPage`, queryParams);
+  return post(`/plan/qryProdTermFeeInfoPage`, queryParams);
 }
 /**
  * 产品工厂-删除费率表信息
  */
 export function delProdPlanCvrgFeeInfoById(queryParams: any): AxiosPromise<any> {
-    return post(`/plan/delProdPlanCvrgFeeInfoById`, queryParams);
+  return post(`/plan/delProdPlanCvrgFeeInfoById`, queryParams);
 }
 /**
  * 产品工厂-删除费率表信息
  */
 export function deleteFeeRateByProdNo(queryParams: any): AxiosPromise<any> {
-    return post(`/plan/deleteFeeRateByProdNo`, queryParams);
+  return post(`/plan/deleteFeeRateByProdNo`, queryParams);
 }
 
 /**
@@ -808,7 +808,7 @@ export function deleteFeeRateByProdNo(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function saveProdPlanCvrgFeeInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/plan/saveProdPlanCvrgFeeInfo`, queryParams);
+  return post(`/plan/saveProdPlanCvrgFeeInfo`, queryParams);
 }
 /**
  * 产品工厂-机构税率信息保存
@@ -816,7 +816,7 @@ export function saveProdPlanCvrgFeeInfo(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function saveProdTaxRateInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/plan/saveProdTaxRateInfo`, queryParams);
+  return post(`/plan/saveProdTaxRateInfo`, queryParams);
 }
 /**
  * 产品工厂-机构税率信息删除
@@ -824,7 +824,7 @@ export function saveProdTaxRateInfo(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function delProdTaxRateInfoById(queryParams: any): AxiosPromise<any> {
-    return post(`/plan/delProdTaxRateInfoById`, queryParams);
+  return post(`/plan/delProdTaxRateInfoById`, queryParams);
 }
 
 /**
@@ -833,7 +833,7 @@ export function delProdTaxRateInfoById(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function deleteProdTaxRateByProdNo(queryParams: any): AxiosPromise<any> {
-    return post(`/plan/deleteProdTaxRateByProdNo`, queryParams);
+  return post(`/plan/deleteProdTaxRateByProdNo`, queryParams);
 }
 /**
  * 产品工厂-查询机构税率信息
@@ -841,7 +841,7 @@ export function deleteProdTaxRateByProdNo(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function qryProdTaxRateInfoPage(queryParams: any): AxiosPromise<any> {
-    return post(`/plan/qryProdTaxRateInfoPage`, queryParams);
+  return post(`/plan/qryProdTaxRateInfoPage`, queryParams);
 }
 
 /**
@@ -850,7 +850,7 @@ export function qryProdTaxRateInfoPage(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function getEdrFormulaRel(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/getEdrFormulaRel`, queryParams);
+  return post(`/proddef/getEdrFormulaRel`, queryParams);
 }
 /**
  * 产品工厂-删除批改保费计算公式
@@ -858,7 +858,7 @@ export function getEdrFormulaRel(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function delEdrFormulaRel(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/delEdrFormulaRel`, queryParams);
+  return post(`/proddef/delEdrFormulaRel`, queryParams);
 }
 
 /**
@@ -867,7 +867,7 @@ export function delEdrFormulaRel(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function saveEdrFormula(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/saveEdrFormula`, queryParams);
+  return post(`/proddef/saveEdrFormula`, queryParams);
 }
 
 /**
@@ -876,7 +876,7 @@ export function saveEdrFormula(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function saveEdrFormulaRel(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/saveEdrFormulaRel`, queryParams);
+  return post(`/proddef/saveEdrFormulaRel`, queryParams);
 }
 
 /**
@@ -885,7 +885,7 @@ export function saveEdrFormulaRel(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function getPlanBasePage(queryParams: any): AxiosPromise<any> {
-    return post(`/plan/getPlanBasePage`, queryParams);
+  return post(`/plan/getPlanBasePage`, queryParams);
 }
 
 /**
@@ -894,14 +894,14 @@ export function getPlanBasePage(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function qryBatchUndrDtyList(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/qryBatchUndrDtyList`, queryParams);
+  return post(`/proddef/qryBatchUndrDtyList`, queryParams);
 }
 
 export function delBatchUndrDtyInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/delBatchUndrDtyInfo`, queryParams);
+  return post(`/proddef/delBatchUndrDtyInfo`, queryParams);
 }
 export function delSelectedUndrDtyInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/delSelectedUndrDtyInfo`, queryParams);
+  return post(`/proddef/delSelectedUndrDtyInfo`, queryParams);
 }
 
 /**
@@ -910,7 +910,7 @@ export function delSelectedUndrDtyInfo(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function qryCommodityBasePage(queryParams: any): AxiosPromise<any> {
-    return post(`/commodity/qryCommodityBasePage`, queryParams);
+  return post(`/commodity/qryCommodityBasePage`, queryParams);
 }
 
 /**
@@ -919,7 +919,7 @@ export function qryCommodityBasePage(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function queryCommodityUndrList(queryParams: any): AxiosPromise<any> {
-    return post(`/commodity/queryCommodityUndrList`, queryParams);
+  return post(`/commodity/queryCommodityUndrList`, queryParams);
 }
 
 /**
@@ -928,7 +928,7 @@ export function queryCommodityUndrList(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function qryUndrClsList(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/qryUndrClsList`, queryParams);
+  return post(`/proddef/qryUndrClsList`, queryParams);
 }
 
 /**
@@ -937,7 +937,7 @@ export function qryUndrClsList(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function qryProdEdrRsnItemList(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/qryProdEdrRsnItemList`, queryParams);
+  return post(`/proddef/qryProdEdrRsnItemList`, queryParams);
 }
 
 /**
@@ -946,7 +946,7 @@ export function qryProdEdrRsnItemList(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function delProdEdrRsnItem(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/delProdEdrRsnItem`, queryParams);
+  return post(`/proddef/delProdEdrRsnItem`, queryParams);
 }
 
 /**
@@ -955,7 +955,7 @@ export function delProdEdrRsnItem(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function qryProdEdrRsnList(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/qryProdEdrRsnList`, queryParams);
+  return post(`/proddef/qryProdEdrRsnList`, queryParams);
 }
 
 /**
@@ -964,7 +964,7 @@ export function qryProdEdrRsnList(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function saveProdEdrRsnInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/saveProdEdrRsnInfo`, queryParams);
+  return post(`/proddef/saveProdEdrRsnInfo`, queryParams);
 }
 
 /**
@@ -973,7 +973,7 @@ export function saveProdEdrRsnInfo(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function saveUndrClsInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/saveUndrClsInfo`, queryParams);
+  return post(`/proddef/saveUndrClsInfo`, queryParams);
 }
 
 /**
@@ -982,7 +982,7 @@ export function saveUndrClsInfo(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function excelList(queryParams: any): AxiosPromise<any> {
-    return post(`/excelTemplateConfig/list`, queryParams);
+  return post(`/excelTemplateConfig/list`, queryParams);
 }
 
 /**
@@ -991,7 +991,7 @@ export function excelList(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function exceldelete(queryParams: any): AxiosPromise<any> {
-    return post(`/excelTemplateConfig/delete`, queryParams);
+  return post(`/excelTemplateConfig/delete`, queryParams);
 }
 
 /**
@@ -1000,7 +1000,7 @@ export function exceldelete(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function delCvrgRel(queryParams: any): AxiosPromise<any> {
-    return post(`/cvrgdef/delCvrgRel`, queryParams);
+  return post(`/cvrgdef/delCvrgRel`, queryParams);
 }
 
 /**
@@ -1009,7 +1009,7 @@ export function delCvrgRel(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function excelsave(queryParams: any): AxiosPromise<any> {
-    return post(`/excelTemplateConfig/save`, queryParams);
+  return post(`/excelTemplateConfig/save`, queryParams);
 }
 
 /**
@@ -1018,7 +1018,7 @@ export function excelsave(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function qryProdRuleList(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/qryProdRuleList`, queryParams);
+  return post(`/proddef/qryProdRuleList`, queryParams);
 }
 
 /**
@@ -1027,7 +1027,7 @@ export function qryProdRuleList(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function pageFindPlanCiSNLBByParams(queryParams: any): AxiosPromise<any> {
-    return post(`/plan/pageFindPlanCiSNLBByParams`, queryParams);
+  return post(`/plan/pageFindPlanCiSNLBByParams`, queryParams);
 }
 
 /**
@@ -1036,7 +1036,7 @@ export function pageFindPlanCiSNLBByParams(queryParams: any): AxiosPromise<any> 
  * @param queryParams
  */
 export function getOrgDptTreeListByPid(queryParams: any): AxiosPromise<any> {
-    return post(`/rolemgr/getOrgDptTreeListByPid`, queryParams);
+  return post(`/rolemgr/getOrgDptTreeListByPid`, queryParams);
 }
 
 /**
@@ -1045,7 +1045,7 @@ export function getOrgDptTreeListByPid(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function queryReinsuranceData(queryParams: any): AxiosPromise<any> {
-    return post(`/reinsurance/queryReinsuranceData`, queryParams);
+  return post(`/reinsurance/queryReinsuranceData`, queryParams);
 }
 
 /**
@@ -1054,7 +1054,7 @@ export function queryReinsuranceData(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function getOrgDptTreeNodeById(queryParams: any): AxiosPromise<any> {
-    return post(`/role/getOrgDptTreeNodeById`, queryParams);
+  return post(`/role/getOrgDptTreeNodeById`, queryParams);
 }
 
 /**
@@ -1063,7 +1063,7 @@ export function getOrgDptTreeNodeById(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function getListByCommodityNoPlanNo(queryParams: any): AxiosPromise<any> {
-    return post(`/reinsurance/getListByCommodityNoPlanNo`, queryParams);
+  return post(`/reinsurance/getListByCommodityNoPlanNo`, queryParams);
 }
 
 /**
@@ -1072,7 +1072,7 @@ export function getListByCommodityNoPlanNo(queryParams: any): AxiosPromise<any> 
  * @param queryParams
  */
 export function saveCommodityBase(queryParams: any): AxiosPromise<any> {
-    return post(`/commodity/saveCommodityBase`, queryParams);
+  return post(`/commodity/saveCommodityBase`, queryParams);
 }
 
 /**
@@ -1081,7 +1081,7 @@ export function saveCommodityBase(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function unAssociationCvrg(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/unAssociationCvrg`, queryParams);
+  return post(`/proddef/unAssociationCvrg`, queryParams);
 }
 
 /**
@@ -1090,11 +1090,11 @@ export function unAssociationCvrg(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function delProdRuleById(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/delProdRuleById`, queryParams);
+  return post(`/proddef/delProdRuleById`, queryParams);
 }
 
 export function initMultiCodeList(queryParams: any): AxiosPromise<any> {
-    return post(`/codelist/initMultiCodeList`, queryParams);
+  return post(`/codelist/initMultiCodeList`, queryParams);
 }
 
 /**
@@ -1103,7 +1103,7 @@ export function initMultiCodeList(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function getUnbindCvrgRefProd(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/getUnbindCvrgRefProd`, queryParams);
+  return post(`/proddef/getUnbindCvrgRefProd`, queryParams);
 }
 /**
  *产品工厂新增-关联主条款-关联主条款弹框列表查询
@@ -1111,7 +1111,7 @@ export function getUnbindCvrgRefProd(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function getUnbindTermRefProd(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/getUnbindTermRefProd`, queryParams);
+  return post(`/proddef/getUnbindTermRefProd`, queryParams);
 }
 /**
  *产品审核-提交审核
@@ -1119,47 +1119,47 @@ export function getUnbindTermRefProd(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function saveProdAudit(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/saveProdAudit`, queryParams);
+  return post(`/proddef/saveProdAudit`, queryParams);
 }
 /* 上传费率表-删除所有 */
 export function deleteCvrgFeeByProdNo(queryParams: any): AxiosPromise<any> {
-    return post(`/plan/deleteFeeRateByProdNo`, queryParams);
+  return post(`/plan/deleteFeeRateByProdNo`, queryParams);
 }
 /* 核保级别修改 */
 export function getUndrClsInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/getUndrClsInfo`, queryParams);
+  return post(`/proddef/getUndrClsInfo`, queryParams);
 }
 /* 批改原因配置-编辑-查询详情 */
 export function getProdEdrRsnInfo(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/getProdEdrRsnInfo`, queryParams);
+  return post(`/proddef/getProdEdrRsnInfo`, queryParams);
 }
 /* 核保级别配置-删除 */
 export function delUndrClsById(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/delUndrClsById`, queryParams);
+  return post(`/proddef/delUndrClsById`, queryParams);
 }
 /* 国民经济行业分类 */
 export function getPageList(queryParams: any): AxiosPromise<any> {
-    return post(`/codelist/queryPage`, queryParams);
+  return post(`/codelist/queryPage`, queryParams);
 }
 /**
  * 得当前承保机构的分公司编码。如：北京02、天津27、重庆15
  */
-export function checkCdeptByCdptCde(queryParams: any): AxiosPromise<any>  {
-    return post('/policy/checkCdeptByCdptCde',  queryParams);
+export function checkCdeptByCdptCde(queryParams: any): AxiosPromise<any> {
+  return post('/policy/checkCdeptByCdptCde', queryParams);
 }
 
 // 根据code和val解析字典值
-export function getNmeByCde(ops: any): AxiosPromise<any>  {
-    // 发送POST请求以根据code和val解析字典值
-    return post(`/edr/getNmeByCde`, ops);
+export function getNmeByCde(ops: any): AxiosPromise<any> {
+  // 发送POST请求以根据code和val解析字典值
+  return post(`/edr/getNmeByCde`, ops);
 }
 /**
  * 获取特约
  * @param queryParams 
  * @returns 
  */
-export function getpSpecialAgreement(queryParams: any): AxiosPromise<any>  {
-    return post('/proddef/getpSpecialAgreement',  queryParams);
+export function getpSpecialAgreement(queryParams: any): AxiosPromise<any> {
+  return post('/proddef/getpSpecialAgreement', queryParams);
 }
 /**
  * 获取产品列表
@@ -1167,36 +1167,64 @@ export function getpSpecialAgreement(queryParams: any): AxiosPromise<any>  {
  * @returns 
  */
 export function getProdEnableList(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/getProdEnableList`, queryParams);
+  return post(`/proddef/getProdEnableList`, queryParams);
 }
 export function expExcelUndrDty(queryParams: any): AxiosPromise<any> {
-    return post(`/proddef/expExcelUndrDty`, queryParams);
+  return post(`/proddef/expExcelUndrDty`, queryParams);
 }
 //费用信息
 export function getAppFeeInfoNewUrl(queryParams: any): AxiosPromise<any> {
-    return post(`/policy/getAppFeeInfoNew`, queryParams);
+  return post(`/policy/getAppFeeInfoNew`, queryParams);
+}
+//查询费用信息中的费率上下限
+export function getAppFeeBetwNew(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/getAppFeeBetwNew`, queryParams);
+}
+//根据申请单号获取获取ilog原始C1 
+export function getIlogC1(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/getIlogC1`, queryParams);
+}
+//判断费用窗口类型
+export function checkFeeWindowType(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/checkFeeWindowType`, queryParams);
+}
+//根据申请单号获取费用信息
+export function getAppFee(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/getAppFee`, queryParams);
+}
+//保存投保费用信息修改
+export function saveAppFeeInfo_new(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/saveAppFeeInfo_new`, queryParams);
+}
+//保存投保费用信息修改
+export function updateIIogFee(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/updateIIogFee`, queryParams);
+}
+
+export function gettypflag(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/gettypflag`, queryParams);
 }
 //
 export function getRenewalAppPolicy(queryParams: any): AxiosPromise<any> {
-    return post(`/policy/getPolicy`, queryParams);
+  return post(`/policy/getPolicy`, queryParams);
 }
 //新增清单保存
 export function saveDist(queryParams: any): AxiosPromise<any> {
-    return post(`/policy/saveDist`, queryParams);
+  return post(`/policy/saveDist`, queryParams);
 }
 //查询清单
 export function selectDist(queryParams: any): AxiosPromise<any> {
-    return post(`/policy/selectDist`, queryParams);
+  return post(`/policy/selectDist`, queryParams);
 }
 //删除清单
 export function deleteDist(queryParams: any): AxiosPromise<any> {
-    return post(`/policy/deleteDist`, queryParams);
+  return post(`/policy/deleteDist`, queryParams);
 }
 //
 export function checkAppBase(queryParams: any): AxiosPromise<any> {
-    return post(`/policy/checkAppBase`, queryParams);
+  return post(`/policy/checkAppBase`, queryParams);
 }
 export function downloadDistTemplate(queryParams: any): AxiosPromise<any> {
-    return post(`/policy/downloadDistTemplate`, queryParams);
+  return post(`/policy/downloadDistTemplate`, queryParams);
 }
 
