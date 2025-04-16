@@ -53,9 +53,9 @@
                 >
                   <from-item
                     v-model="props.row[i.prop]"
-                    :item="i"
+                    :item="formItems[props.row._dataId][i.prop]"
                     :showLabel="editIndex !== props.row._dataId"
-                    :row="scope.row"
+                    :row="props.row"
                   />
                 </el-form-item>
               </el-col>
@@ -130,7 +130,7 @@
               >
                 <from-item
                   v-model="scope.row[i.prop]"
-                  :item="i"
+                  :item="formItems[scope.row._dataId][i.prop]"
                   :showLabel="editIndex !== scope.row._dataId"
                 />
               </el-form-item>
@@ -138,7 +138,7 @@
             <template v-else>
               <from-item
                 v-model="scope.row[i.prop]"
-                :item="i"
+                :item="formItems[scope.row._dataId][i.prop]"
                 :showLabel="
                   !(props.item.editList && props.item.editList.length > 0
                     ? props.item.editList?.includes(i.prop)
@@ -218,7 +218,7 @@ const emits = defineEmits<{
 
 const expandFromItem = ref<Record<string, any>>({});
 // 编辑行id
-const editIndex = ref(-1);
+const editIndex = ref('');
 const props = defineProps({
   modelValue: {
     type: [Array<any>],
@@ -240,15 +240,30 @@ const indexMethod = (index: number) => {
 /**
  *  表单组件,用来写table表格的验证等方法的引用
  */
-const tableDatas = ref<any[] | undefined>([]);
-const tableFormfef = ref("tableFormfef");
+const tableDatas = ref<any[]>([]);
+const formItems = ref<{[key:string] : any }>({});
+const schamaconf = ref<{[key:string] : any }>({});
 
+const tableFormfef = ref("tableFormfef");
+watch([() => props.item], ([newitemValue]) => {
+  if(props.item.fromSchema && props.item.fromSchema.length > 0){
+    props.item.fromSchema.forEach((item: any) => {
+      schamaconf.value[item.prop] = item;
+    });
+  }
+  formItems.value = {};
+  tableDatas.value?.forEach((data) => {
+    formItems.value[data._dataId] = JSON.parse(JSON.stringify(schamaconf.value));
+  });
+},{deep:true});
 watch([() => props.modelValue], ([newModelValue]) => {
   tableDatas.value = [];
-  tableDatas.value = newModelValue;
+  formItems.value = {};
+  tableDatas.value = newModelValue ? newModelValue : [];
   tableDatas.value?.forEach((data) => {
     // 初始化行数字Id
     data._dataId = getuuid();
+    formItems.value[data._dataId] = JSON.parse(JSON.stringify(schamaconf.value));
   });
 });
 watch(
@@ -280,7 +295,7 @@ function getuuid() {
 function expandChange(_val: any, expandedRows: any) {
   expandRowKeys.value = [];
   expandFromItem.value = {};
-  expandedRows.forEach((e) => {
+  expandedRows.forEach((e: any) => {
     expandRowKeys.value.push(e._dataId);
   });
 }
@@ -360,7 +375,7 @@ function validate() {
       // 创建一个新的Promise用于处理当前行数据的验证
       const p = new Promise((resolve) => {
         // 执行验证操作
-        validator.validate(rowData, (data) => {
+        validator.validate(rowData, (data: any) => {
           // 根据验证结果进行处理
           if (data) {
             // 输出错误信息 进行错误信息内容展示操作
@@ -407,10 +422,11 @@ function tabValidate() {
 }
 
 onMounted(() => {
-  tableDatas.value = props.modelValue;
+  tableDatas.value = props.modelValue ? props.modelValue : [];
   tableDatas.value?.forEach((data) => {
     // 初始化行数字Id
     data._dataId = getuuid();
+    formItems.value[data._dataId] = JSON.parse(JSON.stringify(schamaconf.value));
   });
   if (props.item.fromSchema) {
     initUI();
@@ -445,10 +461,11 @@ function getValue(row: any, item: any) {
 function addRow() {
   const rowId = getuuid();
   tableDatas.value?.push({ _dataId: rowId });
+  formItems.value[rowId] = JSON.parse(JSON.stringify(schamaconf.value));
   editIndex.value = rowId;
 }
 
-function delRow(editIndex) {
+function delRow(editIndex: any) {
     for (let i = tableDatas.value.length - 1; i >= 0; i--) {
         const element = tableDatas.value[i];
         if(element['_dataId']==editIndex){
@@ -460,6 +477,7 @@ function delRow(editIndex) {
 function addRowByData(data: any) {
   const rowId = getuuid();
   tableDatas.value?.push({ _dataId: rowId ,...data});
+  formItems.value[rowId] = JSON.parse(JSON.stringify(schamaconf.value));
   editIndex.value = rowId;
 }
 
@@ -475,12 +493,18 @@ function handleStatusChange(row: any) {
   emits("status-change", row); // 触发事件并传递行对象
 }
 
+function setFormSchema(rowId: string,props:any,schama:any,value:any){
+  formItems.value[rowId][props][schama] = value ;
+}
+
 defineExpose({
   tableExvalidate,
   addRow,
   delRow,
   addRowByData,
   getSelectRow,
+  setFormSchema,
+  
 });
 </script>
 

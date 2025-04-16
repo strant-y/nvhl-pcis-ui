@@ -152,6 +152,9 @@ function setDisabledAll() {
 function getSelectRow() {
   return rttableFrom.value?.getSelectRow();
 }
+function setFormSchema(rowId: string,props:any,schama:any,value:any){
+  return rttableFrom.value?.setFormSchema(rowId,props,schama,value);
+}
 
 defineExpose({
   getFromValue,
@@ -163,6 +166,7 @@ defineExpose({
   addRowByData,
   getSelectRow,
   setDisabledAll,
+  setFormSchema,
 });
 </script>
 

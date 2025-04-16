@@ -32,6 +32,7 @@ export interface AppTableConfig {
 export interface AppTableMethod {
   getPartnerPage: (flag?: boolean) => any;
   getFromValue: () => any;
+  setFormSchema: (rowId: string, props: any, schama: any, value: any) => void;
 }
 export interface MyTableMethod {
   addRow: (arg: any) => any;

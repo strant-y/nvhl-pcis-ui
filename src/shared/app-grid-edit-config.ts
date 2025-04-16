@@ -40,13 +40,14 @@ export interface AppGridEditMethod {
   getSelectRow: () => any;
   tableExvalidate: () => any;
   setDisabledAll: () => void;
+  setFormSchema: (rowId: string, props: any, schama: any, value: any) => void;
 }
 
 export function createAppGridEditConfig(
   config: AppGridEditConfig = {}
 ): AppGridEditConfig {
   return {
-    fromType:'grid',
+    fromType: 'grid',
     id: config.id || `ID${new Date().getTime()}`,
     title: config.title || null,
     showBtn: config.showBtn || true,
