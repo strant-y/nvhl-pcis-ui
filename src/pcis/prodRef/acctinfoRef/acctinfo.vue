@@ -1,6 +1,6 @@
 <template>
-  <!--  -->
-  <app-free-edit  v-if="iscRsnDetailCde"   :freeEditConfig="formconfig1" ref="tgtobjEditRef" /> 
+  <!-- v-if="iscRsnDetailCde"  -->
+  <app-free-edit    :freeEditConfig="formconfig1" ref="tgtobjEditRef" /> 
 </template>
 
 <script setup lang="ts">

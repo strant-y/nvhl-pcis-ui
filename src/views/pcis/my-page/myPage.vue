@@ -47,6 +47,7 @@
                       v-for="(k, i) in pageConfig?.pageInfo"
                       :key="i"
                       :href="`#${k.pageKey}`"
+                      
                       v-show="k.pageKey !== 'acctinfo' ? acctinfoFlag : true"
                     >
                       <rt-icon
@@ -272,6 +273,14 @@ const cacheKey = ref();
 let invoiceShow = ref(false); // 发票显示
 let amlInfoShow = ref(false); // 反洗钱显示
 let controlFlag = ""; // 用来处理反洗钱 页面窜窜以及显示
+
+// 存所有可显示账户信息场景
+let detailcodeArray =["保费调整","赔款后保额冲减","赔款后保额恢复","增加保额","减少保额","增加险别","变更清单信息","减少险别","变更保险期限","变更车辆信息","渠道信息变更","增减方案","变更投保数量","增加保费","变更每亩保费","减少保费","费率调整","报停展期","增加销售额","减少销售额","增加保费","其他","更改客户信息","变更工程造价","减少被保险人","变更建筑面积","收费延期","增加被保险人","增加清单信息","不记名补录被保险人","全单注销","全单退保","一般退保","当期退","分期失效",];
+// 用来处理 账户信息 哪些场景显示
+const isDetailCde = ()=>{
+  return detailcodeArray.includes(props.param.cRsnDetailCde);
+}
+
 
 //关闭
 const close = () => {
@@ -599,6 +608,12 @@ const initPage = async () => {
   }
     // 页面初始化
     const formconfig11 = JSON.parse(getProductRes.data);
+
+    //处理账户信息方面逻辑  根据isDetailcdeType 不包含这里的都不显示账户信息方面的内容
+    let isDetailcdeType = isDetailCde()
+    if(!isDetailcdeType){
+      formconfig11[0].pageInfo = formconfig11[0].pageInfo.filter(item => item.pageTtile !== '账户信息');
+    }
     console.log("页面初始化返回数据", formconfig11);
     if (props.param?.cAppTyp == "E") {
       if (props.param.cEdrType == "1") {
