@@ -53,6 +53,7 @@
                 v-model="tableDatas"
                 :item="gridEditConfig"
                 :parentFromUi="gridEditConfig"
+                @row-click="handleRowClick"
                 ref="rttableFrom"
               />
               <div
@@ -85,6 +86,7 @@ defineOptions({
   name: "AppGridEdit",
   inheritAttrs: false,
 });
+const emits = defineEmits([ "rowClick"]); // 父组件监听事件，同步子组件值的变化给父组件
 
 const props = defineProps({
   gridEditConfig: {
@@ -114,6 +116,10 @@ function setFormValue(data: any) {
 function validate() {
   const pro = rttableFrom.value?.tableExvalidate();
   return pro;
+}
+
+function handleRowClick(row: any) {
+  emits("rowClick", row);
 }
 
 function getTableValue() {

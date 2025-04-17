@@ -72,6 +72,7 @@
           ref="rttableFrom"
           @selection-change="handleSelectionChange"
           @status-change="handleStatusChange"
+          @row-click="handleRowClick"
         />
         <el-pagination
           v-model:current-page="queryParams.pageNum"
@@ -106,7 +107,7 @@ defineOptions({
   inheritAttrs: false,
 });
 
-const emits = defineEmits(["pageChange", "selection-change", "status-change"]); // 父组件监听事件，同步子组件值的变化给父组件
+const emits = defineEmits(["pageChange", "selection-change", "status-change", "rowClick"]); // 父组件监听事件，同步子组件值的变化给父组件
 
 const queryParams = reactive<PageQuery>({
   pageNum: 1,
@@ -169,6 +170,9 @@ function handleSelectionChange(selectedRows: any[]) {
 }
 function handleStatusChange(val: any, row: any) {
   emits("status-change", val, row); // 传递当前行的数据
+}
+function handleRowClick(row: any) {
+  emits("rowClick", row);
 }
 
 function pageChange() {

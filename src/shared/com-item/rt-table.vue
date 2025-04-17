@@ -214,6 +214,7 @@ const emits = defineEmits<{
   (e: "update:modelValue", value: any[]): void;
   (e: "selection-change", rows: any[]): void;
   (e: "status-change", row: any): void;
+  (e: "rowClick", row:any): void;
 }>();
 
 const expandFromItem = ref<Record<string, any>>({});
@@ -298,6 +299,7 @@ function rowClick(row: any, _column: any, _event: Event) {
       editIndex.value = row._dataId;
     }
   }
+  emits("rowClick", row);
 }
 
 function rowDblclick(row: any){
