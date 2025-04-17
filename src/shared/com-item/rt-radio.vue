@@ -95,7 +95,7 @@ watch([options, () => props.modelValue], ([newOptions, newModelValue]) => {
     return;
   }
   selectedValue.value = newModelValue;
-  if(props.item.typeCode && options.value.length === 0){
+  if (props.item.typeCode && options.value.length === 0) {
     uploadOption();
   }
   // }
@@ -113,7 +113,7 @@ watch(
     if (newtypeCode) {
       uploadOption();
     }
-  },
+  }
 );
 function handleChange(val?: string | number | boolean | undefined) {
   const option = options.value.find((item) => item.value === val);
@@ -135,7 +135,11 @@ function uploadOption() {
       false,
       props.item.cache ? props.item.cache : true
     )
-    .then((res) => (options.value = res))
+    .then((res) => {
+      if (res) {
+        options.value = res;
+      }
+    })
     .catch((err) => {
       console.error(err);
       options.value = [];

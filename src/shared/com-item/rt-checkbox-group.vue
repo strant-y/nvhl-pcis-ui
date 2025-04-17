@@ -146,7 +146,11 @@ function uploadOption() {
       false,
       props.item.cache ? props.item.cache : true
     )
-    .then((res) => (options.value = res))
+    .then((res) => {
+      if(res){
+        options.value = res;
+      }
+    })
     .catch((err) => {
       console.error(err);
       options.value = [];
