@@ -156,6 +156,10 @@ function setFormSchema(rowId: string,props:any,schama:any,value:any){
   return rttableFrom.value?.setFormSchema(rowId,props,schama,value);
 }
 
+function setValueByRowKey(props:string ,rowId: any, value:any){
+  return rttableFrom.value?.setValueByRowKey(props,rowId,value);
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
@@ -167,6 +171,7 @@ defineExpose({
   getSelectRow,
   setDisabledAll,
   setFormSchema,
+  setValueByRowKey
 });
 </script>
 

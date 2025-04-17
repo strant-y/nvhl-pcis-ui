@@ -513,6 +513,13 @@ function handleStatusChange(row: any) {
 function setFormSchema(rowId: string,props:any,schama:any,value:any){
   formItems.value[rowId][props][schama] = value ;
 }
+function setValueByRowKey(props:string , rowId: any, value:any){
+  tableDatas.value?.forEach((data) => {
+    if(data._dataId === rowId){
+      data[props] = value;
+    }
+  });
+}
 
 defineExpose({
   tableExvalidate,
@@ -521,6 +528,7 @@ defineExpose({
   addRowByData,
   getSelectRow,
   setFormSchema,
+  setValueByRowKey,
   
 });
 </script>

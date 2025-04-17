@@ -191,11 +191,15 @@ function getFromValue() {
 function setFormSchema(rowId: string,props:any,schama:any,value:any){
   return rttableFrom.value?.setFormSchema(rowId,props,schama,value);
 }
+function setValueByRowKey(props:string ,rowId: any, value:any){
+  return rttableFrom.value?.setValueByRowKey(props,rowId,value);
+}
 
 defineExpose({
   getPartnerPage,
   getFromValue,
   setFormSchema,
+  setValueByRowKey
 });
 </script>
 
