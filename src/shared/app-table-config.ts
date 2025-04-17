@@ -34,6 +34,7 @@ export interface AppTableMethod {
   getFromValue: () => any;
   setFormSchema: (rowId: string, props: any, schama: any, value: any) => void;
   setValueByRowKey:(props:string ,rowId: any, value:any) => void;
+  getRowById:(rowId: string) => void;
 }
 export interface MyTableMethod {
   addRow: (arg: any) => any;
@@ -44,6 +45,7 @@ export interface MyTableMethod {
   getTableValue(): () => any;
   removeRow: (dataId: string) => any;
   setValueByRowKey:(props:string ,rowId: any, value:any) => void;
+  getRowById:(rowId: string) => void;
 }
 export function createTableEditConfig(
   config: AppTableConfig = {}

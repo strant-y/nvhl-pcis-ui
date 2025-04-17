@@ -42,6 +42,7 @@ export interface AppGridEditMethod {
   setDisabledAll: () => void;
   setFormSchema: (rowId: string, props: any, schama: any, value: any) => void;
   setValueByRowKey:(props:string ,rowId: any, value:any) => void;
+  getRowById:(rowId: string) => void;
 }
 
 export function createAppGridEditConfig(

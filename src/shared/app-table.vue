@@ -194,6 +194,9 @@ function setFormSchema(rowId: string,props:any,schama:any,value:any){
 function setValueByRowKey(props:string ,rowId: any, value:any){
   return rttableFrom.value?.setValueByRowKey(props,rowId,value);
 }
+function getRowById(dataId: string) {
+  return rttableFrom.value?.getRowById(dataId);
+}
 
 defineExpose({
   getPartnerPage,

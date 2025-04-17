@@ -520,6 +520,13 @@ function setValueByRowKey(props:string , rowId: any, value:any){
     }
   });
 }
+function getRowById(rowId:any){
+  return tableDatas.value?.find((item) => {
+    if (item._dataId === rowId) {
+      return item;
+    }
+  });
+}
 
 defineExpose({
   tableExvalidate,
@@ -529,7 +536,7 @@ defineExpose({
   getSelectRow,
   setFormSchema,
   setValueByRowKey,
-  
+  getRowById
 });
 </script>
 
