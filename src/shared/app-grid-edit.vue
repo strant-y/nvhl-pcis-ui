@@ -124,7 +124,7 @@ function addRow() {
   rttableFrom.value?.addRow();
 }
 
-function delRow(editIndex) {
+function delRow(editIndex: any) {
   rttableFrom.value?.delRow(editIndex);
 }
 
