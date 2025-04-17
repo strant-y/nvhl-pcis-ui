@@ -354,7 +354,9 @@ const basicBtn = [
   createFreeButtonBase({
     label: "保存模板",
     type: "primary",
-    func: () => {},
+    func: () => {
+      console.log(13133)
+    },
   }),
   createFreeButtonBase({
     label: "复制出单",
@@ -801,7 +803,9 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "保存模板",
         type: "primary",
-        func: () => {},
+        func: () => {
+          console.log(1313)
+        },
       }),
       createFreeButtonBase({
         label: "复制出单",
@@ -870,7 +874,9 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "保存模板",
         type: "primary",
-        func: () => {},
+        func: () => {
+          console.log(13123)
+        },
       }),
       createFreeButtonBase({
         label: "保费计算",
@@ -1130,9 +1136,13 @@ const savePlyInfo = () => {
   const btn = getBtn("btn010102");
   btn.loading = true;
   const res = opertaor.getDataAll();
+
+  
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
+
+  
   console.log(res);
   if (res["cvrg"].length == 0) {
     ElMessage.error("请录入条款信息");
