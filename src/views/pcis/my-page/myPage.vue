@@ -47,6 +47,7 @@
                       v-for="(k, i) in pageConfig?.pageInfo"
                       :key="i"
                       :href="`#${k.pageKey}`"
+                      v-show="k.pageKey !== 'acctinfo' ? acctinfoFlag : true"
                     >
                       <rt-icon
                         style="margin-right: 14px"
@@ -143,6 +144,7 @@
                   v-for="(k, i) in pageConfig?.pageInfo"
                   :key="i"
                   :id="k.pageKey"
+                  v-show="k.pageKey !== 'acctinfo' ? acctinfoFlag : true"
                 >
                   <component
                     v-if="currentIndex >= i"
@@ -259,6 +261,7 @@ const tempFindBtn = [];
 let underwriteFlag = ref(false);
 let edrbaseFlag = ref(false);
 let edritemFlag = ref(false);
+let acctinfoFlag = ref(true);
 const user = JSON.parse(sessionStorage.getItem("user"));
 const nAmt = ref("0.00");
 const nPrm = ref("0.00");
@@ -590,11 +593,8 @@ const initPage = async () => {
       (props.param.cEdrType == "3" || props.param.cEdrType == "2"))
   ) {
     //退保不显示产品组件信息
-    const formconfig11 = [{ groupId: "", pageInfo: [] }];
-    console.log("页面初始化返回数据", formconfig11);
-    opertaor.setTableConfig(formconfig11);
-    renderComponents();
-  } else {
+      acctinfoFlag.value=false
+  }
     // 页面初始化
     const formconfig11 = JSON.parse(getProductRes.data);
     console.log("页面初始化返回数据", formconfig11);
@@ -606,7 +606,7 @@ const initPage = async () => {
     // 只读场景,提前将配置设置为只读
     if (
       props.param?.pageType === "PLY_UW_PROCESS_SCENE" ||
-      props.param?.pageType === "EDR_APP_NEW_SCENE" ||
+      (props.param?.pageType === "EDR_APP_NEW_SCENE" && props.param.cEdrType == "1") ||
       props.param?.pageType === "readonly" ||
       props.param?.pageType === "UW_READ_SCENE"
     ) {
@@ -614,7 +614,6 @@ const initPage = async () => {
     }
     opertaor.setTableConfig(formconfig11);
     renderComponents();
-  }
 };
 
 /**
@@ -1281,7 +1280,7 @@ const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase) => {
 const calcPremiumEdrSurrender = () => {
   const btn = getBtn("btn010101");
   btn.loading = true;
-  const res = {};
+  const res = opertaor.getDataAll();
   res["user"] = user;
   res["EdrBase"] = edrbase.value?.getFromValue();
   if (
@@ -1291,6 +1290,7 @@ const calcPremiumEdrSurrender = () => {
       res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
           res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   }
+  console.log(res)
   calcSurrenEdr(res).then((res) => {
     btn.loading = false;
     console.log("批改计算", res);
@@ -1299,7 +1299,7 @@ const calcPremiumEdrSurrender = () => {
       ElMessage.success(
         res.msg +
           "保费为：" +
-          res["res"]["composition"]["plyBase"][0]["Base.nPrm"] +
+          ops["base"]["Base.nPrm"]+
           "; 保费变化量为：" +
           res["res"]["composition"]["plyBase"][0]["Base.nPrmVar"]
       );
@@ -1342,7 +1342,8 @@ const saveApplicationEdr = () => {
     : null;
   res["plyNo"] = edrbase.value?.getFromValue()["EdrBase.cPlyNo"];
   res["taskId"] = props.param.taskId ? props.param.taskId : null;
-  res["data"] = {};
+  // res["data"] = {};
+  res["data"]=opertaor.getDataAll();
   res["data"]["EdrBase"] = edrbase.value?.getFromValue();
   res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"] =
       res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
@@ -1376,17 +1377,9 @@ const saveApplicationEdr = () => {
 const getSurrenderPrecisFun = () => {
   const btn = getBtn("btnCompare");
   btn.loading = true;
-  const res = {};
+  const res = opertaor.getDataAll();
   res["user"] = user;
   res["EdrBase"] = edrbase.value?.getFromValue();
-  res["Acctinfo"] = {
-    "Acctinfo.cAcctNo": null,
-    "Acctinfo.cAcctNme": "",
-    "Acctinfo.cBankRelTyp": null,
-    "Acctinfo.cBankPro": null,
-    "Acctinfo.cBankArea": null,
-    "Acctinfo.cAppNo": null,
-  };
   console.log(res);
   getSurrenderPrecis(res).then((res) => {
     btn.loading = false;
@@ -1413,16 +1406,8 @@ const submitEdrToUndrSurrender = () => {
     : null;
   res["plyNo"] = edrbase.value?.getFromValue()["EdrBase.cPlyNo"];
   res["taskId"] = props.param.taskId ? props.param.taskId : null;
-  res["data"] = {};
+  res["data"]=opertaor.getDataAll();
   res["data"]["EdrBase"] = edrbase.value?.getFromValue();
-  res["data"]["Acctinfo"] = {
-    "Acctinfo.cAcctNo": null,
-    "Acctinfo.cAcctNme": "",
-    "Acctinfo.cBankRelTyp": null,
-    "Acctinfo.cBankPro": null,
-    "Acctinfo.cBankArea": null,
-    "Acctinfo.cAppNo": null,
-  };
   console.log(res);
   submitEdrSurrender(res).then((res) => {
     btn.loading = false;
