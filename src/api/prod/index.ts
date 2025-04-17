@@ -1227,4 +1227,7 @@ export function checkAppBase(queryParams: any): AxiosPromise<any> {
 export function downloadDistTemplate(queryParams: any): AxiosPromise<any> {
   return post(`/policy/downloadDistTemplate`, queryParams);
 }
+export function syncDist(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/syncDist`, queryParams);
+}
 
