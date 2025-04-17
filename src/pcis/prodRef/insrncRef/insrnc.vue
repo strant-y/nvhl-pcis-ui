@@ -57,6 +57,7 @@ const method = {
     const tm = moment(baseBefore["Base.tInsrncEndTm"]).diff(moment(v), "days");
     baseBefore["Base.cTmSysCde"] = tm;
 
+    
     let today = new Date(baseBefore["Base.tInsrncBgnTm"])   // 开始时间
     let maxDate = new Date(today);  // 创建开始时间副本
     maxDate.setDate(today.getDate() + 365);  // 设置为今天起365天后的日期
