@@ -7,7 +7,7 @@
       ref="tableRef"
     />
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
-    <app-table
+   <app-table
       :tableConfig="tableconfig1"
       v-model:pageresult="pageresult1"
       ref="tableRef1"
@@ -442,12 +442,12 @@ function sumMoney(flag_to_alert: any,row:any) {
           }
          freeEditRef.value?.setValue("nFeePropSum", formartNum(0.00));
          freeEditRef.value?.setValue("nPrmSum",formartNum(0.00));
-          sumMoney(true,row);
+          //sumMoney(true,row);
           return false;
         } else {
           tableRef.value?.setValueByRowKey('nFeeProp', row._dataId, '0.00');
           tableRef.value?.setValueByRowKey('nFee',row._dataId, '0.00');
-          sumMoney(true,row);
+          //sumMoney(true,row);
           return false;
         }
       }
