@@ -216,6 +216,9 @@ import {
   getSurrenderPrecis,
   submitEdrSurrender,
 } from "../../../api/query/index";
+import {
+  checkFeeWindowType,
+} from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import moment from "moment";
 import dayjs from "dayjs";
@@ -520,6 +523,19 @@ const uwBtn = [
     type: "primary",
     id: "modFee",
     func: () => {
+        //获取费用信息类型接口（缺少渠道，保费，当前表单提交校验待后续补充）
+    checkFeeWindowType({ CAppNo: props.param.cAppNo })
+    .then((res:any) => {
+      if (200 !== res['code']) {
+            ElMessage.error(res['msg']);
+        } else {
+          if (!!res['data']) {
+              //typeFlag = res['data'];
+          } else {
+            ElMessage.error(res['msg']);
+        }
+    }
+    })
       dzmodal
         .open(CostInformation, { type: "Issuer", data: props.param })
         .then((res: any) => {
