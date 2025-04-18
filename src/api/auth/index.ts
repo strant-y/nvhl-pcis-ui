@@ -1,9 +1,7 @@
-import request from "@/utils/request";
-import { AxiosPromise } from "axios";
-import { CaptchaResult, LoginData, LoginResult } from "./types";
-import {post,del} from "@/utils/http";
+import {AxiosPromise} from "axios";
+import {LoginData, LoginResult} from "./types";
+import {post} from "@/utils/http";
 import {rsaEncoder} from "@/utils/encipher";
-import {AppBaseApi,LocalBaseApi} from "@/api/config"
 
 /**
  * 登录API
@@ -39,6 +37,13 @@ export function verifyCodeApi(data): AxiosPromise<LoginResult> {
  */
 export function getCaptchaApi(param) {
   return post(`/getCaptcha`,{source: param});
+}
+
+/**
+ * 根据token获取用户信息
+ */
+export function resolveTokenApi(param) {
+  return post(`/resolveToken`, {source: param});
 }
 
 

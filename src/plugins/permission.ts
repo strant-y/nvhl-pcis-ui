@@ -1,6 +1,6 @@
 import router from "@/router";
-import { useUserStore } from "@/store/modules/user";
-import { usePermissionStore } from "@/store/modules/permission";
+import {useUserStore} from "@/store/modules/user";
+import {usePermissionStore} from "@/store/modules/permission";
 import NProgress from "@/utils/nprogress";
 import {codeListViewStore} from "@/store";
 
@@ -78,9 +78,21 @@ export function setupPermission() {
           }
         }
       }
-    } else {  
+    } else {
+      const query = to.query;
+
+      if (!!query['token']) {
+        sessionStorage.setItem("token", "Bearer " + query['token']); // Bearer eyJhbGciOiJIUzI1NiJ9.xxx.xxx
+
+        const userStore = useUserStore();
+        const getCaptchaParam = ref({});
+        Object.assign(getCaptchaParam.value, {token: query['token']});
+
+        await userStore.resolveToken(getCaptchaParam.value);
+        next({...to, replace: true});
+      }
       // 未登录可以访问白名单页面
-      if (whiteList.indexOf(to.path) !== -1) {
+      else if (whiteList.indexOf(to.path) !== -1) {
         next();
       } else {
         next(`/login`);
