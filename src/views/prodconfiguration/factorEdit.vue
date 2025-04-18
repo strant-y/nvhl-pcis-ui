@@ -418,6 +418,12 @@ const schemaMap = reactive<Record<string, any>>({
       loadData: yesOrNo,
     },
     {
+      prop: "checkStrictly",
+      inputtype: "rtselect",
+      title: "任意一级可选",
+      loadData: yesOrNo,
+    },
+    {
       prop: "required",
       inputtype: "rtselect",
       title: "是否必填",

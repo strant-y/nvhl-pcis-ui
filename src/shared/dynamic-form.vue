@@ -302,11 +302,12 @@ const emits = defineEmits(["formsDataUpdate"]); // 父组件监听事件，同�
 const form = reactive<Record<string, any>>({});
 if (props.fromSchema) {
   props.fromSchema.forEach((key: any) => {
-    form[key.prop] = null;
     if (key.inputtype === "rtinputgroup") {
       key.groupList.forEach((gkey: any) => {
         form[gkey.prop] = null;
       });
+    }else{
+      form[key.prop] = null;
     }
   });
 }
@@ -418,7 +419,9 @@ function getFromValue() {
         const v = redata[key.prop];
         if (props && props.length > 0 && v) {
           for (var i = 0; i < props.length; i++) {
-            redata[props[i]] = v[i];
+            if (v[i]) {
+              redata[props[i]] = v[i];
+            }
           }
         }
         delete redata[key.prop];
@@ -433,7 +436,9 @@ function getFromValue() {
               const gv = redata[gkey.prop];
               if (gprops && gprops.length > 0 && gv) {
                 for (var i = 0; i < gprops.length; i++) {
-                  redata[gprops[i]] = gv[i];
+                  if (gv[i]) {
+                    redata[gprops[i]] = gv[i];
+                  }
                 }
               }
               delete redata[gkey.prop];
@@ -454,7 +459,9 @@ function setFormValue(data: any, noupdate = false) {
         if (props && props.length > 0) {
           let cascd = [];
           for (var i = 0; i < props.length; i++) {
-            cascd.push(setdata[props[i]]);
+            if (setdata[props[i]]) {
+              cascd.push(setdata[props[i]]);
+            }
             delete setdata[props[i]];
           }
           setdata[key.prop] = cascd;
@@ -467,7 +474,9 @@ function setFormValue(data: any, noupdate = false) {
               if (gprops && gprops.length > 0) {
                 let cascd = [];
                 for (var i = 0; i < gprops.length; i++) {
-                  cascd.push(setdata[gprops[i]]);
+                  if (setdata[gprops[i]]) {
+                    cascd.push(setdata[gprops[i]]);
+                  }
                   delete setdata[gprops[i]];
                 }
                 setdata[key.prop] = cascd;
