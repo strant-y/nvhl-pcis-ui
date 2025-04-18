@@ -116,7 +116,7 @@ onMounted(async () => {
     fromSchema: formconfig1.value.distSchema,
   });
   console.log(formconfig11.editBtns);
-  if(formconfig11.editBtns && formconfig11.editBtns.length>0){
+  if (formconfig11.editBtns && formconfig11.editBtns.length > 0) {
     tableconfig.value.tableBtnType = "btn";
     tableconfig.value.tableBtnWidth = 150;
     tableconfig.value.tableBtnPosition = "right";
@@ -127,6 +127,9 @@ onMounted(async () => {
     route.params.param.cProdNo,
     formconfig1.value.title
   );
+  setTimeout(() => {
+    method.handleQuery();
+  }, 500);
 });
 
 // 绑定方法
@@ -182,9 +185,16 @@ const method = {
     });
   },
   handleQuery: () => {
+    const param = opertaor.getParam();
+    let app = '';
+    if(param.cAppNo ){
+      app = param.cAppNo;
+    }else{
+      app = opertaor.getDataAll().plyBase["Base.cAppNo"]
+    }
     const selData = {
       cComponentTable: cComponentTableValue,
-      cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
+      cAppNo: app,
     };
     selectDist(selData).then((res) => {
       if (res.code === 200) {
