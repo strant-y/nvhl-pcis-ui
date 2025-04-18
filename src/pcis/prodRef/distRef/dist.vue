@@ -115,53 +115,13 @@ onMounted(async () => {
     titleBtns: formconfig1.value.titleBtns,
     fromSchema: formconfig1.value.distSchema,
   });
-  console.log(formconfig11);
-  tableconfig.value.tableBtnType = "btn";
-  tableconfig.value.tableBtnWidth = 150;
-  tableconfig.value.tableBtnPosition = "right";
-  tableconfig.value.tableBtn = [
-    {
-      id: "score",
-      link: true,
-      tooltip: "编辑",
-      type: "success",
-      size: "large",
-      icon: "Edit",
-      tableClick: (row) => {
-        dialog.value?.open(
-          "distAdd",
-          {
-            fromSchema: tableconfig.value.fromSchema,
-            title: "编辑",
-            rowData: row,
-          },
-          {
-            isOk: (res: any) => {},
-            handleQuery: method.handleQuery, // 新增：将 handleQuery 方法传递给 distAdd 组件
-          },
-          { width: "60" }
-        );
-      },
-    },
-    {
-      id: "score",
-      type: "danger",
-      tooltip: "删除",
-      icon: "Delete",
-      link: true,
-      tableClick: (row) => {
-        deleteDist({
-          cComponentTable: cComponentTableValue,
-          cPkId: [row.cPkId],
-        }).then((res) => {
-          if (res.code === 200) {
-            ElMessage.success("删除成功");
-            method.handleQuery();
-          }
-        });
-      },
-    },
-  ];
+  console.log(formconfig11.editBtns);
+  if(formconfig11.editBtns && formconfig11.editBtns.length>0){
+    tableconfig.value.tableBtnType = "btn";
+    tableconfig.value.tableBtnWidth = 150;
+    tableconfig.value.tableBtnPosition = "right";
+    tableconfig.value.tableBtn = formconfig11.editBtns;
+  }
   // 初始化 cComponentTableValue
   cComponentTableValue = getCComponentTableValue(
     route.params.param.cProdNo,
@@ -173,6 +133,32 @@ onMounted(async () => {
 const method = {
   func1: () => {},
   handleClose: (val) => {},
+  editmethod: (row: any) => {
+    dialog.value?.open(
+      "distAdd",
+      {
+        fromSchema: tableconfig.value.fromSchema,
+        title: "编辑",
+        rowData: row,
+      },
+      {
+        isOk: (res: any) => {},
+        handleQuery: method.handleQuery, // 新增：将 handleQuery 方法传递给 distAdd 组件
+      },
+      { width: "60" }
+    );
+  },
+  delmethod: (row: any) => {
+    deleteDist({
+      cComponentTable: cComponentTableValue,
+      cPkId: [row.cPkId],
+    }).then((res: any) => {
+      if (res.code === 200) {
+        ElMessage.success("删除成功");
+        method.handleQuery();
+      }
+    });
+  },
   funcdistadd: () => {
     let baseFlag = opertaor.getDataAll().plyBase["Base.cAppNo"];
     checkAppBase({ cAppNo: baseFlag }).then((res) => {

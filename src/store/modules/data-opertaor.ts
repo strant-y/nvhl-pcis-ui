@@ -103,6 +103,11 @@ export const dataOpertaor = defineStore(
                                 item.hidden = true;
                             });
                         }
+                        if (fsch.editBtns && fsch.editBtns.length > 0) {
+                            fsch.editBtns.forEach((item) => {
+                                item.hidden = true;
+                            });
+                        }
                     })
                 }
             });
