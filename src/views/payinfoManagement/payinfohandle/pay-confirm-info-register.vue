@@ -178,36 +178,36 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: 'TBgnTm',
         title: '保险起期',
         inputtype: "rtdatepicker",
-        type: "daterange",
-        
+        type: "datetime",
+        format: 'YYYY-MM-DD HH:mm:ss',
       },
       {
         prop: 'TEndTm',
         title: '保险止期',
         inputtype: "rtdatepicker",
-        type: "daterange",
-        
+        type: "datetime",
+        format: 'YYYY-MM-DD HH:mm:ss',
       },
       {
         prop: 'TUdrTm',
         title: '核保时间',
         inputtype: "rtdatepicker",
-        type: "daterange",
-        
+        type: "datetime",
+        format: 'YYYY-MM-DD HH:mm:ss',
       },
       {
         prop: 'TPlEdrMakeTm',
         title: '保批单生成时间',
         inputtype: "rtdatepicker",
-        type: "daterange",
-        
+        type: "datetime",
+        format: 'YYYY-MM-DD HH:mm:ss',
       },
       {
         prop: 'TPlyedrPrnTm',
         title: '打印时间',
         inputtype: "rtdatepicker",
-        type: "daterange",
-        
+        type: "datetime",
+        format: 'YYYY-MM-DD HH:mm:ss',
       },
       {
         prop: 'NPayAmt',
@@ -243,7 +243,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: 'TPayConfTm',
         title: '缴费确认时间',
-        inputtype: "rtinput",
+        inputtype: "rtdatepicker",
+        type: "datetime",
+        format: 'YYYY-MM-DD HH:mm:ss',
       },
       {
         prop: 'CAppNo',
