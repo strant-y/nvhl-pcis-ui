@@ -79,6 +79,11 @@
                                 hidden: false,
                                 rules: [getRules("required", {})],
                             })
+                            formconfig1.fromSchema.forEach((v,index)=>{
+                                if(index=='5'){
+                                    v.hidden=false
+                                }
+                            })
                             const param={
                                 "usrDptCde": user['companyId'],
                                 "operId": user['opCde'],
@@ -93,10 +98,16 @@
                                 hidden: true,
                                 rules: '',
                             })
+                            formconfig1.fromSchema.forEach((v,index)=>{
+                                if(index=='5'){
+                                    v.hidden=true
+                                }
+                            })
                             setValue('cBckOp', '')
                         }
                     }
                 },
+                {},
                 {
                     prop: "cUndrOpnList",
                     inputtype: "rtselect",
@@ -125,6 +136,7 @@
                     ],
                     clearable: true,
                 },
+                {},
                 {
                     prop: "cBckOp1",
                     inputtype: "rtselect",
@@ -136,18 +148,18 @@
                     ],
                     clearable: true,
                 },
+                {},
                 {
                     prop: "riFacMrk",
-                    inputtype: "rtselect",
+                    inputtype: "rtradio",
                     title: "是否临分",
-                    rules: [{ type: "required" }],
-                    loadData: [
-                        {value: '1', label: '是'},
-                        {value: '2', label: '否'},
+                    loadData :[
+                        { label:'是',value:'1' },
+                        { label:'否',value:'2' },
                     ],
                     rules: [getRules("required", {})],
-                    clearable: true,
                 },
+                {},
                 {
                     prop: "riFacMrk1",
                     inputtype: "rtselect",
@@ -242,6 +254,7 @@
                     {value: 'B', label: '退回给出单员'},
                     {value: 'T', label: '退回至指定核保级别人员'}]
             })
+            setValue("riFacMrk", '2')
             const param={'cProdNo':params.cProdNo,'opCde':user.opCde,'companyId':user.companyId,'cAppNo':params.cAppNo,'cPlanNo':params.cPlanNo}
             getCUndrMrkUrlFn(param);
         });
