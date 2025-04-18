@@ -13,7 +13,7 @@ import acctinfoRef from "./acctinfoRef/acctinfo.vue";
 // import ciRef from "./ciRef/ci.vue";
 import distRef from "./distRef/dist.vue";
 import distSummaryRef from "./distRef/distSummary.vue";
-import dis2Ref from "./distRef/dis2.vue";
+import dis2Ref from "./distRef/dist2.vue";
 import tgtRef from "./tgtRef/tgt.vue";
 import cvrgRef from "./cvrgRef/cvrg.vue";
 import plyCvrg04Ref from "./cvrgRef/plyCvrg04.vue";
