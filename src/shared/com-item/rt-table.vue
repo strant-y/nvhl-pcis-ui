@@ -65,7 +65,7 @@
       </el-table-column>
       <el-table-column
         :label="item.tableBtnTitle"
-        v-if="item.tableBtnPosition === 'left'"
+        v-if="item.tableBtn && item.tableBtn.length > 0 && item.tableBtnPosition === 'left'"
         :width="item.tableBtnWidth ? item.tableBtnWidth : 100"
         :align="item.align ? item.align : 'center'"
       >
@@ -152,7 +152,7 @@
       </template>
       <el-table-column
         :label="item.tableBtnTitle"
-        v-if="item.tableBtnPosition === 'right'"
+        v-if="item.tableBtn && item.tableBtn.length > 0 && item.tableBtnPosition === 'right' "
         :width="item.tableBtnWidth ? item.tableBtnWidth : 100"
         :align="item.align ? item.align : 'center'"
       >
