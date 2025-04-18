@@ -1,5 +1,5 @@
 <template>
-  <!-- v-if="iscRsnDetailCde" -->
+  <!-- v-if="iscRsnDetailCde"  -->
   <app-free-edit    :freeEditConfig="formconfig1" ref="tgtobjEditRef" /> 
 </template>
 

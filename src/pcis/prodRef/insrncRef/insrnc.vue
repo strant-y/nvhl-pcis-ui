@@ -33,43 +33,40 @@ onMounted(() => {
   Object.assign(formconfig1, formconfig11);
 });
 
+
 // 绑定方法
 const method = {
   // func demo
   func1: () => {
   
   },
-  tInsrncBgnTmDisabled:(data:any)=>{ 
-    console.log('禁用方法')
+  tInsrncBgnTmDisabled:(date:any)=>{ 
     const tabref = opertaor.getTableRefs();
-    const baseBefore = tabref["insrnc"].getFromValue();
-    // moment(baseBefore["Base.tInsrncEndTm"])
-    const today = new Date(baseBefore["Base.tInsrncBgnTm"])   // 开始时间
-    const endData = new Date(baseBefore["Base.tInsrncEndTm"]) // 结束时间
-    const maxDate = new Date(today);  // 创建开始时间副本
-    maxDate.setDate(today.getDate() + 365);  // 设置为今天起365天后的日期
-    baseBefore["Base.tInsrncEndTm"] = maxDate
-    return endData > maxDate; 
+    const baseBefore = tabref["insrnc"]?.getFromValue();
+    const startDate = new Date(baseBefore["Base.tInsrncBgnTm"])   // 开始时间   1
+   
+    const maxDate = new Date(startDate);  // 创建开始时间副本   365 
+    maxDate.setDate(startDate.getDate() + 365);  // 设置为今天起365天后的日期
+
+    return  date.getTime() < startDate.getTime() || date.getTime() > maxDate.getTime()
   },
   bgnTmFn: (v) => {   
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["insrnc"].getFromValue();
-    const tm = moment(baseBefore["Base.tInsrncEndTm"]).diff(moment(v), "days");
+    const tm = moment(baseBefore["Base.tInsrncEndTm"]).diff(moment(v), "days");  
     baseBefore["Base.cTmSysCde"] = tm;
-
-    
-    let today = new Date(baseBefore["Base.tInsrncBgnTm"])   // 开始时间
-    let maxDate = new Date(today);  // 创建开始时间副本
-    maxDate.setDate(today.getDate() + 365);  // 设置为今天起365天后的日期
+    let startDate = new Date(baseBefore["Base.tInsrncBgnTm"])   // 开始时间
+    let maxDate = new Date(startDate);  // 创建开始时间副本
+    maxDate.setDate(startDate.getDate() + 365);  // 设置为今天起365天后的日期
+    maxDate.setSeconds(maxDate.getSeconds() - 1);
     baseBefore["Base.tInsrncEndTm"] = formatDate(maxDate,'yyyy-MM-dd HH:mm:ss')
-    opertaor.getFatherPage().setTmDay(tm)
     setFormValue(baseBefore);
   },
   endTmFn: (v) => {
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["insrnc"].getFromValue();
-    const tm = moment(v).diff(moment(baseBefore["Base.tInsrncBgnTm"]), "days");
-    baseBefore["Base.cTmSysCde"] = tm;
+    const tm =   moment(v).add(1, 'second').diff(moment(baseBefore["Base.tInsrncBgnTm"]), "days");
+    baseBefore["Base.cTmSysCde"] = tm;   // 列表里面的 保险
     opertaor.getFatherPage().setTmDay(tm)
     setFormValue(baseBefore);
   },

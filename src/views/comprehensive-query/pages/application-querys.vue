@@ -8,20 +8,39 @@
         :label="tab.name"
         :name="tab.key"
       >
-        <div v-if="Number(tab.key) <= 4">
-          <app-free-edit
-            :freeEditConfig="formconfig1"
-            :ref="freeEditRef[Number(tab.key) - 1]"
-          />
-          <app-table
-            :tableConfig="tableconfig"
-            v-model:pageresult="pageresult"
-            :ref="tableRef[Number(tab.key) - 1]"
-            @selection-change="handleSelectionChange"
-            @page-change="handleQuery(false)"
-          />
-        </div>
-
+        <!--<div v-if="Number(tab.key) <= 4">-->
+          <!--<app-free-edit-->
+            <!--:freeEditConfig="formconfig1"-->
+            <!--:ref="freeEditRef[Number(tab.key) - 1]"-->
+          <!--/>-->
+          <!--<app-table-->
+            <!--:tableConfig="tableconfig"-->
+            <!--v-model:pageresult="pageresult"-->
+            <!--:ref="tableRef[Number(tab.key) - 1]"-->
+            <!--@selection-change="handleSelectionChange"-->
+            <!--@page-change="handleQuery(false)"-->
+          <!--/>-->
+        <!--</div>-->
+        <template v-if="Number(tab.key) == 1">
+          <Inquiry-Sheet
+                  :refreshData="nowTab === 0 ? true : false"
+          ></Inquiry-Sheet>
+        </template>
+        <template v-if="Number(tab.key) == 2">
+          <Applicant-Query
+                  :refreshData="nowTab === 1 ? true : false"
+          ></Applicant-Query>
+        </template>
+        <template v-if="Number(tab.key) == 3">
+          <Ply-Query
+                  :refreshData="nowTab === 2 ? true : false"
+          ></Ply-Query>
+        </template>
+        <template v-if="Number(tab.key) == 4">
+          <Edr-Query
+                  :refreshData="nowTab === 3 ? true : false"
+          ></Edr-Query>
+        </template>
         <template v-if="Number(tab.key) == 5">
           <withdraw-udrList
             :refreshData="nowTab === 4 ? true : false"
@@ -145,6 +164,26 @@ const removeIds = ref([]); // 删除用户ID集合 用于批量删除
 // import DepartmentTree from "../commodityRef/DepartmentTree.vue";
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 
+// tab 页面切换 1-9
+const InquirySheet = defineAsyncComponent(
+    // 投保待撤回任务
+    () => import("../common/InquirySheetQuery.vue")
+);
+// tab 页面切换 2-9
+const ApplicantQuery = defineAsyncComponent(
+    // 投保待撤回任务
+    () => import("../common/ApplicantQuery.vue")
+);
+// tab 页面切换 3-9
+const PlyQuery = defineAsyncComponent(
+    // 投保待撤回任务
+    () => import("../common/PlyQuery.vue")
+);
+// tab 页面切换 4-9
+const EdrQuery = defineAsyncComponent(
+    // 投保待撤回任务
+    () => import("../common/EdrQuery.vue")
+);
 // tab 页面切换 5-9
 const WithdrawUdrList = defineAsyncComponent(
   // 投保待撤回任务

@@ -47,6 +47,8 @@
                       v-for="(k, i) in pageConfig?.pageInfo"
                       :key="i"
                       :href="`#${k.pageKey}`"
+                      
+                      v-show="k.pageKey !== 'acctinfo' ? acctinfoFlag : true"
                     >
                       <rt-icon
                         style="margin-right: 14px"
@@ -143,6 +145,7 @@
                   v-for="(k, i) in pageConfig?.pageInfo"
                   :key="i"
                   :id="k.pageKey"
+                  v-show="k.pageKey !== 'acctinfo' ? acctinfoFlag : true"
                 >
                   <component
                     v-if="currentIndex >= i"
@@ -259,6 +262,7 @@ const tempFindBtn = [];
 let underwriteFlag = ref(false);
 let edrbaseFlag = ref(false);
 let edritemFlag = ref(false);
+let acctinfoFlag = ref(true);
 const user = JSON.parse(sessionStorage.getItem("user"));
 const nAmt = ref("0.00");
 const nPrm = ref("0.00");
@@ -269,6 +273,14 @@ const cacheKey = ref();
 let invoiceShow = ref(false); // 发票显示
 let amlInfoShow = ref(false); // 反洗钱显示
 let controlFlag = ""; // 用来处理反洗钱 页面窜窜以及显示
+
+// 存所有可显示账户信息场景
+let detailcodeArray =["保费调整","赔款后保额冲减","赔款后保额恢复","增加保额","减少保额","增加险别","变更清单信息","减少险别","变更保险期限","变更车辆信息","渠道信息变更","增减方案","变更投保数量","增加保费","变更每亩保费","减少保费","费率调整","报停展期","增加销售额","减少销售额","增加保费","其他","更改客户信息","变更工程造价","减少被保险人","变更建筑面积","收费延期","增加被保险人","增加清单信息","不记名补录被保险人","全单注销","全单退保","一般退保","当期退","分期失效",];
+// 用来处理 账户信息 哪些场景显示
+const isDetailCde = ()=>{
+  return detailcodeArray.includes(props.param.cRsnDetailCde);
+}
+
 
 //关闭
 const close = () => {
@@ -354,7 +366,9 @@ const basicBtn = [
   createFreeButtonBase({
     label: "保存模板",
     type: "primary",
-    func: () => {},
+    func: () => {
+      console.log(13133)
+    },
   }),
   createFreeButtonBase({
     label: "复制出单",
@@ -590,13 +604,16 @@ const initPage = async () => {
       (props.param.cEdrType == "3" || props.param.cEdrType == "2"))
   ) {
     //退保不显示产品组件信息
-    const formconfig11 = [{ groupId: "", pageInfo: [] }];
-    console.log("页面初始化返回数据", formconfig11);
-    opertaor.setTableConfig(formconfig11);
-    renderComponents();
-  } else {
+      acctinfoFlag.value=false
+  }
     // 页面初始化
     const formconfig11 = JSON.parse(getProductRes.data);
+
+    //处理账户信息方面逻辑  根据isDetailcdeType 不包含这里的都不显示账户信息方面的内容
+    let isDetailcdeType = isDetailCde()
+    if(!isDetailcdeType){
+      formconfig11[0].pageInfo = formconfig11[0].pageInfo.filter(item => item.pageTtile !== '账户信息');
+    }
     console.log("页面初始化返回数据", formconfig11);
     if (props.param?.cAppTyp == "E") {
       if (props.param.cEdrType == "1") {
@@ -606,7 +623,7 @@ const initPage = async () => {
     // 只读场景,提前将配置设置为只读
     if (
       props.param?.pageType === "PLY_UW_PROCESS_SCENE" ||
-      props.param?.pageType === "EDR_APP_NEW_SCENE" ||
+      (props.param?.pageType === "EDR_APP_NEW_SCENE" && props.param.cEdrType == "1") ||
       props.param?.pageType === "readonly" ||
       props.param?.pageType === "UW_READ_SCENE"
     ) {
@@ -614,7 +631,6 @@ const initPage = async () => {
     }
     opertaor.setTableConfig(formconfig11);
     renderComponents();
-  }
 };
 
 /**
@@ -801,7 +817,9 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "保存模板",
         type: "primary",
-        func: () => {},
+        func: () => {
+          console.log(1313)
+        },
       }),
       createFreeButtonBase({
         label: "复制出单",
@@ -870,7 +888,9 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "保存模板",
         type: "primary",
-        func: () => {},
+        func: () => {
+          console.log(13123)
+        },
       }),
       createFreeButtonBase({
         label: "保费计算",
@@ -1130,9 +1150,13 @@ const savePlyInfo = () => {
   const btn = getBtn("btn010102");
   btn.loading = true;
   const res = opertaor.getDataAll();
+
+  
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
+
+  
   console.log(res);
   if (res["cvrg"].length == 0) {
     ElMessage.error("请录入条款信息");
@@ -1281,7 +1305,7 @@ const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase) => {
 const calcPremiumEdrSurrender = () => {
   const btn = getBtn("btn010101");
   btn.loading = true;
-  const res = {};
+  const res = opertaor.getDataAll();
   res["user"] = user;
   res["EdrBase"] = edrbase.value?.getFromValue();
   if (
@@ -1291,6 +1315,7 @@ const calcPremiumEdrSurrender = () => {
       res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
           res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   }
+  console.log(res)
   calcSurrenEdr(res).then((res) => {
     btn.loading = false;
     console.log("批改计算", res);
@@ -1299,7 +1324,7 @@ const calcPremiumEdrSurrender = () => {
       ElMessage.success(
         res.msg +
           "保费为：" +
-          res["res"]["composition"]["plyBase"][0]["Base.nPrm"] +
+          ops["base"]["Base.nPrm"]+
           "; 保费变化量为：" +
           res["res"]["composition"]["plyBase"][0]["Base.nPrmVar"]
       );
@@ -1342,7 +1367,8 @@ const saveApplicationEdr = () => {
     : null;
   res["plyNo"] = edrbase.value?.getFromValue()["EdrBase.cPlyNo"];
   res["taskId"] = props.param.taskId ? props.param.taskId : null;
-  res["data"] = {};
+  // res["data"] = {};
+  res["data"]=opertaor.getDataAll();
   res["data"]["EdrBase"] = edrbase.value?.getFromValue();
   res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"] =
       res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
@@ -1376,17 +1402,9 @@ const saveApplicationEdr = () => {
 const getSurrenderPrecisFun = () => {
   const btn = getBtn("btnCompare");
   btn.loading = true;
-  const res = {};
+  const res = opertaor.getDataAll();
   res["user"] = user;
   res["EdrBase"] = edrbase.value?.getFromValue();
-  res["Acctinfo"] = {
-    "Acctinfo.cAcctNo": null,
-    "Acctinfo.cAcctNme": "",
-    "Acctinfo.cBankRelTyp": null,
-    "Acctinfo.cBankPro": null,
-    "Acctinfo.cBankArea": null,
-    "Acctinfo.cAppNo": null,
-  };
   console.log(res);
   getSurrenderPrecis(res).then((res) => {
     btn.loading = false;
@@ -1413,16 +1431,8 @@ const submitEdrToUndrSurrender = () => {
     : null;
   res["plyNo"] = edrbase.value?.getFromValue()["EdrBase.cPlyNo"];
   res["taskId"] = props.param.taskId ? props.param.taskId : null;
-  res["data"] = {};
+  res["data"]=opertaor.getDataAll();
   res["data"]["EdrBase"] = edrbase.value?.getFromValue();
-  res["data"]["Acctinfo"] = {
-    "Acctinfo.cAcctNo": null,
-    "Acctinfo.cAcctNme": "",
-    "Acctinfo.cBankRelTyp": null,
-    "Acctinfo.cBankPro": null,
-    "Acctinfo.cBankArea": null,
-    "Acctinfo.cAppNo": null,
-  };
   console.log(res);
   submitEdrSurrender(res).then((res) => {
     btn.loading = false;
