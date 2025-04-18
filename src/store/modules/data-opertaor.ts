@@ -138,7 +138,9 @@ export const dataOpertaor = defineStore(
                     //     f.editFlag = false;
                     // } else 
                     if (f.fromType === 'custom') {
-                        tableRefs[key].setDisabledAll();
+                        if(tableRefs[key].setDisabledAll){
+                            tableRefs[key].setDisabledAll();
+                        }
                     }
                     // if (
                     //     f.titleBtns &&
