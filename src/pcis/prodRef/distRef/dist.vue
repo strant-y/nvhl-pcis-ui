@@ -4,10 +4,9 @@
       <app-table
         :tableConfig="tableconfig"
         v-model:pageresult="pageresult"
-        ref="tableRef"
+        ref="distTableRef"
       />
     </myCard>
-
     <comDialog ref="dialog"></comDialog>
   </div>
 </template>
@@ -27,9 +26,12 @@ import {
   checkAppBase,
   deleteDist,
   downloadDistTemplate,
+  syncDist,
 } from "@/api/prod/index";
 import { saveAs } from "file-saver";
 import { formInit } from "@/shared/from-init";
+import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
+const policyService = new PolicyService();
 import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
@@ -52,7 +54,7 @@ const pageresult = reactive<Pageresult>({
   total: 0,
 });
 
-const tableRef = ref<AppTableMethod | null>(null);
+const distTableRef = ref<AppTableMethod | null>(null);
 const cardconfig = ref<CardConfig>(creatCardConfig({}));
 const formconfig1 = ref<Record<string, any>>({});
 const tableconfig = ref<AppTableConfig>(createTableEditConfig());
@@ -209,6 +211,20 @@ const method = {
       }
     });
   },
+  distSummeryQuery: () => {
+    syncDist({
+      cComponentTable: cComponentTableValue,
+      cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
+    }).then((res) => {
+      if (res.code == 200) {
+        pageresult.list = [];
+        pageresult.list = res.data;
+        pageresult.list.forEach((item, index) => {
+          item.nSeqNo = index + 1;
+        });
+      }
+    });
+  },
   carInfoAdd: () => {
     let baseFlag = opertaor.getDataAll().plyBase["Base.cAppNo"];
     checkAppBase({ cAppNo: baseFlag }).then((res) => {
@@ -233,14 +249,18 @@ const method = {
   },
   //模板下载
   downloadTemp: () => {
-    downloadDistTemplate(formconfig1.value)
+    policyService
+      .downloadDistTemplate(formconfig1.value)
       .then((res) => {
         if (res.size <= 0) {
           ElMessage.error({ message: "下载出错", duration: 3000 });
           return;
         }
-        const fileName = `模板地址清单.xls`;
-        const blob = new Blob([res], { type: "application/vnd.ms-excel" });
+        const fileName = `营业场所地址清单.xls`;
+        const blob = new Blob([res.data], {
+          responseType:
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
+        });
         saveAs(blob, fileName);
       })
       .catch(() => {
