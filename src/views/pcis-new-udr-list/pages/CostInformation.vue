@@ -5,10 +5,23 @@
       :tableConfig="tableconfig"
       v-model:pageresult="pageresult"
       ref="tableRef"
-      :isPage="false"
     />
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
+   <app-table
+      :tableConfig="tableconfig1"
+      v-model:pageresult="pageresult1"
+      ref="tableRef1"
+    />
     <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
+      <rt-button
+        :item="{
+          type: 'primary',
+          label: '比较',
+          func: () => {
+            compareAppFee();
+          },
+        }"
+      />
       <rt-button
         :item="{
           type: 'primary',
@@ -53,20 +66,22 @@ import {
   getAppFeeInfoNewUrl,
   getAppFeeBetwNew,
   getIlogC1,
-  checkFeeWindowType,
   getAppFee,
   saveAppFeeInfo_new,
   updateIIogFee,
   gettypflag,
+  compareAppFeeInfo,
 } from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { useFormLabelWidth } from "element-plus/es/components/form/src/utils";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { number } from "echarts";
 const opertaor = dataOpertaor();
 opertaor.init();
 
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
+const tableRef1 = ref<AppTableMethod | null>(null);
 const isDisabled = ref(true); //判断表单是否可编辑
 const dialogVisible = ref(true);
 const props = defineProps({
@@ -91,6 +106,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         itemWidth: 1,
         labelWidth: 200,
         clearable: true,
+        disabled:true,
       },
       {},
       {
@@ -103,6 +119,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         itemWidth: 1,
         labelWidth: 200,
         clearable: true,
+        disabled:true,
       },
       {
         prop: "min_value",
@@ -114,10 +131,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         itemWidth: 1,
         labelWidth: 200,
         clearable: true,
+        disabled:true,
       },
       {
         prop: "nFeePropSum",
-        inputtype: "rtnumber",
+        inputtype: "rtinput",
         title: "比例合计",
         min: 0,
         max: 999999999999999999.99,
@@ -125,10 +143,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         itemWidth: 1,
         labelWidth: 200,
         clearable: true,
+        disabled:true,
       },
       {
         prop: "nPrmSum",
-        inputtype: "rtnumber",
+        inputtype: "rtinput",
         title: "金额合计",
         min: 0,
         max: 999999999999999999.99,
@@ -136,6 +155,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         itemWidth: 1,
         labelWidth: 200,
         clearable: true,
+        disabled:true,
       },
       {
         prop: "A1_value",
@@ -144,6 +164,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         itemWidth: 1,
         labelWidth: 200,
         clearable: true,
+        func: (v: any) => {
+          if (Number(v) > Number(A_value.value)) {
+            ElMessage.error('此费用比例不可大于总公司下发二级机构的费用政策比例' + A_value.value + '重新输入!');
+            freeEditRef.value?.setValue("A1_value", A1_value.value);
+           }
+        }
       },
       {
         prop: "B1_value",
@@ -152,6 +178,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         itemWidth: 1,
         labelWidth: 200,
         clearable: true,
+        func: (v: any) => {
+          if (Number(v) > Number(B_value.value)) {
+            ElMessage.error('此费用比例不可大于二级机构下发三级机构的费用政策比例' + B_value.value + '重新输入!');
+            freeEditRef.value?.setValue("B1_value", B1_value.value);
+           }
+        }
       },
     ],
   })
@@ -165,30 +197,43 @@ const pageresult = reactive<Pageresult>({
   total: 0,
 });
 
+//更改比较表格数据参数
+const pageresult1 = reactive<Pageresult>({
+  result: "",
+  /** 数据列表 */
+  list: [],
+  /** 总数 */
+  total: 0,
+});
+
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     title: "费用信息",
     editFlag: true,
-    editList: ["cTypCde","nFeeProp","nFee","cFeeFlag"],
+    editList: ["nFeeProp","nFee","cFeeFlag"],
     fromSchema: [
       {
         prop: "cTypCde",
         inputtype: "rtinput",
         title: "费用类型",
         minWidth: 180,
-        disabled: true,
       },
       {
         prop: "nFeeProp",
         inputtype: "rtinput",
         title: "比例(%)",
         minWidth: 180,
+        func: (v: any,row:any) => {
+          getNFeeList(row)
+          //onFeePropKeyDown(row)
+        },
       },
       {
         prop: "nFee",
         inputtype: "rtinput",
         title: "金额",
         minWidth: 180,
+        disabled:true,
       },
       {
         prop: "cFeeFlag",
@@ -196,7 +241,57 @@ const tableconfig = reactive<AppTableConfig>(
         title: "ILOG系统费用计算提示信息",
         clearable: true,
         minWidth: 260,
+        disabled:true,
         loadData:  [{ value: 0, label: '成功' }, { value: 1, label: '无规则匹配' }, { value: 9, label: '规则引擎异常' }]
+      },
+    ],
+  })
+);
+
+//更改比较表格项
+const tableconfig1 = reactive<AppTableConfig>(
+  createTableEditConfig({
+    title: "更改比较",
+    editFlag: true,
+    fromSchema: [
+      {
+        prop: "cTypCde",
+        inputtype: "rtinput",
+        title: "序号",
+        minWidth: 180,
+      },
+      {
+        prop: "cFldNme",
+        inputtype: "rtinput",
+        title: "批改对象",
+        minWidth: 180,
+      },
+      {
+        prop: "cRelTableNme",
+        inputtype: "rtinput",
+        title: "批改项目",
+        minWidth: 180,
+      },
+      {
+        prop: "cOldVal",
+        inputtype: "rtinput",
+        title: "原值",
+        clearable: true,
+        minWidth: 260,
+      },
+      {
+        prop: "cChgVal",
+        inputtype: "rtinput",
+        title: "变化值",
+        clearable: true,
+        minWidth: 260,
+      },
+      {
+        prop: "cNewVal",
+        inputtype: "rtinput",
+        title: "新值",
+        clearable: true,
+        minWidth: 260,
       },
     ],
   })
@@ -204,11 +299,10 @@ const tableconfig = reactive<AppTableConfig>(
 
 onMounted(async () => {
   handleQuery();
-  //onFeePropKeyDown()
   findFeeBetween(); // 承包 查询 手续费 区间信息
   findIlogC1(); // 查询ilog原始C1值
-  readOnlyAB();
   checktype();
+  
 });
 let param = {
       pagePos: '',
@@ -235,9 +329,20 @@ const A_value: any= ref('');
 const B_value: any= ref('');
 const A1_value: any= ref('');
 const B1_value: any = ref('');
-let params: any;
+let params: any = {
+      typeFlag: 1,
+      scene: props.data?.pageType,//  场景
+      appNo: props.data?.cAppNo,
+      prodNo: props.data?.cProdNo,
+      dptCde: props.data?.cDptCde,
+      bsnsTyp:'19001',
+      nPrm: '10000',
+      isReadOnly:"1",
+      updFlag: '1',
+      appTyp:''
+  }
 let typ_flag: any;
-  
+
 function numComparison(num1: any, num2: any) {
     return Number.parseFloat(num1) === Number.parseFloat(num2);
 };
@@ -259,6 +364,22 @@ function tool_fix(num: any, prec: any) {
     }
     return num;
 };
+
+// 根据输入手续费比例计算出相应金额
+function getNFeeList(row:any) {
+      const feeProp = row.nFeeProp * 1;
+      let feePropSum = freeEditRef.value?.getValue("nFeePropSum") * 1;
+      let prmSum = freeEditRef.value?.getValue("nPrmSum") * 1;
+      const fee = params['nPrm'];
+      const temp = feeProp * fee * 0.01;
+      const gotPrm = formartNum(temp);
+      feePropSum = formartNum(feeProp);
+      prmSum = formartNum(gotPrm);
+      tableRef.value?.setValueByRowKey('nFee', row._dataId, gotPrm);
+      freeEditRef.value?.setValue("nFeePropSum", feePropSum);
+      freeEditRef.value?.setValue("nPrmSum", prmSum);
+      sumMoney(true,row);
+  }
 // 截取两位小数 （不进行 四舍五入） 公共方法
 function formartNum(obj: any) {
     if (typeof (obj) !== 'undefined' && (obj !== '0' || isNaN(obj))) {
@@ -272,8 +393,7 @@ function formartNum(obj: any) {
       return 0.00; // 非数字
     }
   }
-function sumMoney(flag_to_alert: any) {
-  //const items = this.gridEdit.gridForm.controls.items as FormArray;
+function sumMoney(flag_to_alert: any,row:any) {
   const items = pageresult.list;
     if (items.length > 0) {
       const my_length = items.length;
@@ -282,32 +402,30 @@ function sumMoney(flag_to_alert: any) {
       let my_node_name = '';
       const fee = params['nPrm'];
       for (const item of items) {
-        my_node_name = item['cTypCde'].value;
-        my_rate = my_rate + parseFloat(item['nUpdFeeProp'].value);
-        my_sum = my_sum + parseFloat(item['nUpdFee'].value);
+        my_node_name = row.cTypCde;
+        my_rate = my_rate + parseFloat(item['nFeeProp']);
+        my_sum = my_sum + parseFloat(item['nFee']);
         const appTyp = params['appTyp'];
         if (flag_to_alert && my_node_name === '手续费/佣金：') {
-          const targetRate = parseFloat(item['nUpdFeeProp'].value);
+          const targetRate = parseFloat(row.nFeeProp);
           if (targetRate > my_max_value.value || targetRate < my_min_value.value) {
             if (my_max_value.value === my_min_value.value) {
               ElMessage.error('手续费(佣金)比率 输入错误！\n应为：[ ' + my_max_value.value + ' ]');
             } else {
               ElMessage.error('手续费(佣金)比率 输入错误！\n应为： ' + my_min_value.value + ' 到 ' + my_max_value.value + '  之间的比率！');
             }
-            item['CTypCde'][item.editIndex]['nUpdFeeProp']='0.00'
+            tableRef.value?.setValueByRowKey('nFeeProp', row._dataId, '0.00');
             savenFeeValue();
-            if (my_min_value.value !== 0) {
-              sumMoney(false); // 是否要再次检查 手续费 区间
-            } else {
-              sumMoney(true);
-            }
+            // if (my_min_value.value !== 0) {
+            //   sumMoney(false,row); // 是否要再次检查 手续费 区间
+            // } else {
+            //   sumMoney(true,row);
+            // }
             return false;
           }
           else if (targetRate > freeEditRef.value?.getValue("ilog_c1") && appTyp !== 'E' && typ_flag === '01') {
             ElMessage.error('手续费(佣金)比率 不可高于默认值！,请重新输入！');
-            items[item.editIndex]['nUpdFeeProp'] = '0.00'
-            
-            //this.gridEdit.gridForm.controls.items['controls'][this.gridEdit.editIndex]['controls']['NUpdFeeProp'].setValue('0.00');
+            tableRef.value?.setValueByRowKey('nFeeProp', item._dataId, '0.00');
             return false;
           }
 
@@ -315,31 +433,26 @@ function sumMoney(flag_to_alert: any) {
       }
       if (my_rate && my_rate > 100) {
         ElMessage.error('费用比例合计不能大于100');
+        my_rate=0
+        my_sum=0
         if (items.length > 0) {
           for (let i = 0; i < items.length; i++) {
-            items[i]['nUpdFeeProp'] = '0.00'
-            items[i]['nUpdFee']='0.00'
-            // this.gridEdit.gridForm.controls.items['controls'][i]['controls']['NUpdFeeProp'].setValue('0.00');
-            // this.gridEdit.gridForm.controls.items['controls'][i]['controls']['NUpdFee'].setValue('0.00');
+            tableRef.value?.setValueByRowKey('nFeeProp', items[i]._dataId, '0.00');
+            tableRef.value?.setValueByRowKey('nFee', items[i]._dataId, '0.00');
           }
-          freeEditRef.value?.setValue("nFeePropSum", formartNum(0.00));
-          freeEditRef.value?.setValue("nPrmSum",formartNum(0.00));
-          //this.freeEdit.controls['NFeePropSum'].setValue(this.formartNum(0.00));
-          //this.freeEdit.controls['NPrmSum'].setValue(this.formartNum(0.00));
-          sumMoney(true);
+         freeEditRef.value?.setValue("nFeePropSum", formartNum(0.00));
+         freeEditRef.value?.setValue("nPrmSum",formartNum(0.00));
+          //sumMoney(true,row);
           return false;
         } else {
-          items[0]['nUpdFeeProp'] = '0.00'
-          items[0]['nUpdFee']='0.00'
-          // this.gridEdit.gridForm.controls.items['controls'][this.gridEdit.editIndex]['controls']['NUpdFeeProp'].setValue('0.00');
-          // this.gridEdit.gridForm.controls.items['controls'][this.gridEdit.editIndex]['controls']['NUpdFee'].setValue('0.00');
-          sumMoney(true);
+          tableRef.value?.setValueByRowKey('nFeeProp', row._dataId, '0.00');
+          tableRef.value?.setValueByRowKey('nFee',row._dataId, '0.00');
+          //sumMoney(true,row);
           return false;
         }
-      } else {
-        freeEditRef.value?.setValue("nFeePropSum", my_rate);
-        freeEditRef.value?.setValue("nPrmSum",my_sum);
       }
+      freeEditRef.value?.setValue("nFeePropSum", my_rate);
+      freeEditRef.value?.setValue("nPrmSum", my_sum);
     }
 }
 
@@ -347,38 +460,27 @@ function sumMoney(flag_to_alert: any) {
    * 只允许输入手续费比例
    */
 function  readCheck() {
-    const readOnle_flag = this.params['isReadOnly'];
-    const updFlag = this.params['updFlag'];
-    const appTyp = this.params['appTyp'];
+    const readOnle_flag = params['isReadOnly'];
+    const updFlag = params['updFlag'];
+    const appTyp = params['appTyp'];
     if (readOnle_flag === '0' || readOnle_flag === '1') {  // --- 批改系列操作 均设为只读
       // 保费
-      for (let i = 0; i < this.gridEdit.gridForm.controls.items['controls'].length; i++) {
-        this.gridEdit.gridForm.controls.items['controls'][i]['controls']['NUpdFee'].readOnly = true;
+      for (let i = 0; i < pageresult.list.length; i++) {
+        tableRef.value?.setFormSchema(pageresult.list[i]._dataId, "nFee", 'disabled',true);
         if (appTyp === 'E') {
-          this.gridEdit.gridForm.controls.items['controls'][i]['controls']['NUpdFeeProp'].readOnly = true;
+          tableRef.value?.setFormSchema(pageresult.list[i]._dataId, "nFeeProp", 'disabled',true);
         } else {
           if (updFlag === '1') {
-            const feetyp1 = this.gridEdit.gridForm.controls.items['controls'][i]['controls']['CFeetypCde'].value;
-            const bsnsTyp1 = this.params['bsnsTyp'];
+            const feetyp1 = pageresult.list[i]['cFeetypCde'];
+            const bsnsTyp1 = params['bsnsTyp'];
             if (bsnsTyp1 === '19001' && (feetyp1 === 'C1' || feetyp1 === 'C23')) {
-              this.gridEdit.gridForm.controls.items['controls'][i]['controls']['NUpdFeeProp'].readOnly = true; // 比例
+              tableRef.value?.setFormSchema(pageresult.list[i]._dataId, "nFeeProp", 'disabled',true);  // 比例
             } else {
-              this.gridEdit.gridForm.controls.items['controls'][i]['controls']['NUpdFeeProp'].readOnly = false; // 比例
+              tableRef.value?.setFormSchema(pageresult.list[i]._dataId, "nFeeProp", 'disabled',false); // 比例
             }
-            // 从2015年1月1日,C23停用,add 2014,12,17
-            // Calendar fixDate = Calendar.getInstance();
-            // fixDate.set(2015, 0, 1, 0, 0, 0);
-            // String isStop_C23 = (fixDate.getTime().getTime() - (new Date()).getTime() < 0)?"1":"0";
-            // const isStop_C23 = 0;
-            // if ((feetyp1 === 'C23' && isStop_C23 === 1)  || (feetyp1 === 'C22' && isStop_C23 === 1)) {
-            //     this.gridEdit.items.controls[i]['controls']['NUpdFeeProp'].readOnly = true; // 比例
-            // } else {
-            //     this.gridEdit.items.controls[i]['controls']['NUpdFeeProp'].readOnly = false; // 比例
-            // }
-            this.gridEdit.gridForm.controls.items['controls'][i]['controls']['NUpdFeeProp'].readOnly = false; // 比例
-
+            tableRef.value?.setFormSchema(pageresult.list[i]._dataId, "nFeeProp", 'disabled',false);
           } else {
-            this.gridEdit.gridForm.controls.items['controls'][i]['controls']['NUpdFeeProp'].readOnly = true; // 比例
+            tableRef.value?.setFormSchema(pageresult.list[i]._dataId, "nFeeProp", 'disabled',true);
           }
         }
       }
@@ -406,15 +508,27 @@ function checktype() {
   
 function readOnlyAB() {
   const company = user['companyId']; // 操作机构
-    const CCardBsnsTyp =opertaor.getTableRefs()["BASE"].getFromValue()["Base.CCardBsnsTyp"];
+  //const CCardBsnsTyp = opertaor.getTableRefs()["BASE"].getFromValue()["Base.CCardBsnsTyp"];
+  const CCardBsnsTyp=null
     const appTyp = params['appTyp'];
-    //this.freeEdit.controls['A1_value'].readOnly = true;
-    //this.freeEdit.controls['B1_value'].readOnly = true;
+    formconfig1.fromSchema?.forEach((e) => {
+        if (e.prop === "A1_value" || e.prop === "B1_value") {
+          e.disabled = true;
+        }
+      })
     if (CCardBsnsTyp == null && appTyp !== 'E') {
       if (company === '0200000000000') {
-        //this.freeEdit.controls['A1_value'].readOnly = false;
+        formconfig1.fromSchema?.forEach((e) => {
+          if (e.prop === "A1_value") {
+            e.disabled = true;
+          }
+        })
       } else {
-        //this.freeEdit.controls['B1_value'].readOnly = false;
+        formconfig1.fromSchema?.forEach((e) => {
+          if (e.prop === "B1_value") {
+            e.disabled = true;
+          }
+        })
       }
     }
   }
@@ -423,14 +537,14 @@ function readOnlyAB() {
   */
   function savenFeeValue() {
     const bsnsTyp = params['bsnsTyp'];
-    const items = pageresult.list;
-    if ((items.length > 0)) {
+    const item = pageresult.list;
+    if ((item.length > 0)) {
       let my_node_name = '';
-      for (const item of items) {
+      
         for (let i = 0; i < item.length; i++) {
           const fee = params['nPrm'];
           const n_fee = my_min_value.value * fee * 0.01;
-          my_node_name = item['cTypCde'].value;
+          my_node_name = item[i].cTypCde;
           let gotFee = formartNum(n_fee);
           if (my_min_value.value === 0.00) {
             gotFee = 0.00;
@@ -440,19 +554,18 @@ function readOnlyAB() {
           if (minPerformancePayValue === 0.00) {
             gotFeePay = 0.00;
           }
-
           if (my_node_name === '手续费/佣金') {
             if (bsnsTyp === '19001') {
-              item['nUpdFee'].setValue('0.00');
-              item['nUpdFeeProp'].setValue('0.00');
+              tableRef.value?.setValueByRowKey('nFee', item[i]._dataId, '0.00');
+              tableRef.value?.setValueByRowKey('nFeeProp', item[i]._dataId, '0.00');
             } else {
-              item['nUpdFee'].setValue(gotFee);
-              item['nUpdFeeProp'].setValue(my_min_value.value);
+              tableRef.value?.setValueByRowKey('nFee', item[i]._dataId, gotFee);
+              tableRef.value?.setValueByRowKey('nFeeProp', item[i]._dataId, my_min_value.value);
               freeEditRef.value?.setValue("nFeePropSum", my_min_value.value);
               freeEditRef.value?.setValue("nPrmSum",gotFee);
             }
           }
-        }
+        
       }
 
     }
@@ -460,53 +573,104 @@ function readOnlyAB() {
 
 
 }
+//比较接口
+function compareAppFee() {
+  const paramStr = {
+    appNo: params['appNo'],//保单号
+    nPrm: String(params['nPrm']),  
+    saveFlag: "0",
+    feeList: pageresult.list,
+    nUpdRateA:String(freeEditRef.value?.getValue("A1_value")) ,
+    nUpdRateB: String(freeEditRef.value?.getValue("B1_value")),
+    allFeeProp: String(freeEditRef.value?.getValue("nFeePropSum")),
+    allFee:String(freeEditRef.value?.getValue("nPrmSum"))
+  };
+  console.log(paramStr)
+  compareAppFeeInfo(paramStr)
+    .then((res:any) => {
+      if (res.code == 200) {
+        //let result = JSON.parse(res.data);
+        console.log("000000", res.data);
+        pageresult1.list = [];
+        pageresult1.list = res.data;
+        pageresult1.total = res.data.length;
   
+      } else {
+        ElMessage.error(res.msg);
+      }
+    })
+    .finally(() => { });
+
+    //pageresult1.list
+}
+//保存按钮
   function saveFeeInfo() {
-    const res = [];
     const items = pageresult.list;
-    if (items.length > 0) {
-      let my_node_name = '';
-      for (const item of items) {
-        const nfee = item['nUpdFee'].value;
-        my_node_name = item['cTypCde'].value;
-        if (my_node_name === '手续费/佣金：' && (nfee === 0.00 || nfee === 0)) {
-          continue
-          //const confirmRes = await this.openModel('手续费为零确定保存吗？');
-          // if (confirmRes) {
-          //   continue;
-          // } else {
-          //   return;
-          // }
-        }
-      }
-    }
-    for (const row of pageresult.list) {
-      const obj:any = {};
-      for (const k in row) {
-        obj[k] = row[k];
-      }
-      res.push(obj);
-    }
     const paramStr = {
-      feeList: res
+      feeList: items
     };
-    console.log(paramStr)
-    saveAppFeeInfo_new(paramStr)
+    if (items.length > 0) {
+        let my_node_name = '';
+      for (let i = 0; i < items.length; i++) { // 改用普通 for 循环
+      const item = items[i];
+        const nfee = item['nFee'];
+        my_node_name = item['cFeetypCde'];
+      if (my_node_name === 'C1' && (nfee == 0.00 || nfee == 0)) {
+        ElMessageBox.confirm('手续费为零确定保存吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          saveAppFeeInfo_new(paramStr)
+          .then((res:any) => {
+            if (null != res && null != res.code ) {
+              if (res.code === 200) {
+                ElMessage.success('费用信息保存:' + res['msg']);
+                const paramStr2 = {
+                  appNo: props.data?.cAppNo,
+                  A1_value:String(freeEditRef.value?.getValue("A1_value")),
+                  B1_value:String(freeEditRef.value?.getValue("B1_value")),
+                  Coper: JSON.parse(sessionStorage.getItem("user")).opCde,
+                };
+                updateIIogFee(paramStr2)
+                .then((res1:any) => {
+                  if (null != res1 && null != res1['code']) {
+                    if (res1['code'] === 200) {
+                      ElMessage.success('iLog费用信息同步:' + res1['msg'],);
+                    } else {
+                      ElMessage.error('iLog费用信息同步失败');
+                    }
+                  }
+                })
+                .finally(() => { });
+
+              } else {
+                ElMessage.error('费用信息保存失败');
+              }
+            }
+          })
+          .finally(() => { });
+              }).catch(() => {
+                // 取消时，可根据需求决定是否跳出循环（如直接 return 退出整个函数）
+                return;
+              });
+      } else {
+        saveAppFeeInfo_new(paramStr)
     .then((res:any) => {
       if (null != res && null != res.code ) {
         if (res.code === 200) {
           ElMessage.success('费用信息保存:' + res['msg']);
           const paramStr2 = {
-            appNo: '237022504000000316',
-            A1_value: freeEditRef.value?.getValue("A1_value"),
-            B1_value: freeEditRef.value?.getValue("B1_value"),
+            appNo: props.data?.cAppNo,
+            A1_value:String(freeEditRef.value?.getValue("A1_value")),
+            B1_value:String(freeEditRef.value?.getValue("B1_value")),
             Coper: JSON.parse(sessionStorage.getItem("user")).opCde,
           };
           updateIIogFee(paramStr2)
           .then((res1:any) => {
             if (null != res1 && null != res1['code']) {
               if (res1['code'] === 200) {
-                ElMessage.error('iLog费用信息同步:' + res1['msg'],);
+                ElMessage.success('iLog费用信息同步:' + res1['msg'],);
               } else {
                 ElMessage.error('iLog费用信息同步失败');
               }
@@ -520,11 +684,15 @@ function readOnlyAB() {
       }
     })
     .finally(() => { });
+        }
+        return;
+    }
+  }
 }
 
 //查询费用信息中的费率上下限
 function findFeeBetween() {
-    getAppFeeBetwNew({ appNo: "237022504000000316" })
+    getAppFeeBetwNew({ appNo: props.data?.cAppNo})
     .then((res:any) => {
       if (null != res && null != res.code) {
                 if (res.code === 200) {
@@ -559,10 +727,6 @@ function findFeeBetween() {
                         freeEditRef.value?.setValue("min_value", my_min_value.value);
                         freeEditRef.value?.setValue("A1_value", A1_value.value);
                         freeEditRef.value?.setValue("B1_value", B1_value.value);
-                        // this.freeEdit.controls['max_value'].setValue(this.my_max_value);
-                        // this.freeEdit.controls['min_value'].setValue(this.my_min_value);
-                        // this.freeEdit.controls['A1_value'].setValue(this.A1_value);
-                        // this.freeEdit.controls['B1_value'].setValue(this.B1_value);
                     } else {
                       ElMessage.error('获取费用信息手续费区间失败！');
                     }
@@ -574,7 +738,7 @@ function findFeeBetween() {
 
 //根据申请单号获取获取ilog原始C1 
 function findIlogC1(){  
-    getIlogC1({ appNo: "237022504000000316" })
+    getIlogC1({ appNo: props.data?.cAppNo })
     .then((res:any) => {
       if (null != res && null != res.code) {
               if (null != res && null != res.code) {
@@ -593,16 +757,9 @@ function findIlogC1(){
 
 /** 查询 */
 function handleQuery(flag?: boolean) {
-  // const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
-  // const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  // const s = props.data;
-  // const param = Object.assign(s, r);
   console.log("999999999", props.data);
-  // const param = {
-  //   appNo: props.data?.appNo
-  // }
   //费用信息接口调用
-  getAppFeeInfoNewUrl({ appNo: "237022504000000316" })
+  getAppFeeInfoNewUrl(params)
     .then((res:any) => {
       if (res.code == 200) {
         let result = JSON.parse(res.data);
@@ -610,6 +767,12 @@ function handleQuery(flag?: boolean) {
         pageresult.list = [];
         pageresult.list = result.FeeInfoList;
         pageresult.total = result.FeeInfoList.length;
+        sumMoney(false, pageresult.list)
+        setTimeout(() => {
+          readCheck();
+          //readOnlyAB();
+        }, 100);
+      
       } else {
         ElMessage.error(res.msg);
       }
@@ -617,7 +780,7 @@ function handleQuery(flag?: boolean) {
     .finally(() => { });
 
     //根据申请单号获取费用信息 
-    getAppFee({ appNo: "237022504000000316" })
+    getAppFee({ appNo: props.data?.cAppNo })
     .then((res:any) => {
       if (null != res && null != res.code) {
           if (res.code=== 200) {
@@ -634,28 +797,22 @@ function handleQuery(flag?: boolean) {
 }
 
   // 设置当销售渠道为直销业务时  手续费比例不允许输入
-function  onFeePropKeyDown() {
+function  onFeePropKeyDown(row:any) {
     const appTyp = params['appTyp'];
     const bsnsTyp = params['bsnsTyp'];
     const subDptCde = params['subDptCde'];
-    if (this.gridEdit.editIndex !== -1) {
-      const feetypCde = this.gridEdit.gridForm.controls.items['controls'][this.gridEdit.editIndex]['controls']['CFeetypCde'].value;
-      if (bsnsTyp === '19001' && feetypCde === 'C1') {
-        this.gridEdit.gridForm.controls.items['controls'][this.gridEdit.editIndex]['controls']['NUpdFeeProp'].readOnly = true;
-        // for (let i = 0; i < this.gridEdit.gridForm.controls.items['controls'].length; i++) {
-        //     this.gridEdit.gridForm.controls.items['controls'][i]['controls']['NUpdFeeProp'].readOnly = true;
-        // }
-      } else if (feetypCde === 'C27') {
-        this.gridEdit.gridForm.controls.items['controls'][this.gridEdit.editIndex]['controls']['NUpdFeeProp'].readOnly = true;
-      } else if (feetypCde === 'C33') {
-        this.gridEdit.gridForm.controls.items['controls'][this.gridEdit.editIndex]['controls']['NUpdFeeProp'].readOnly = true;
-      } else if (appTyp === 'E') {
-        for (let i = 0; i < this.gridEdit.gridForm.controls.items['controls'].length; i++) {
-          this.gridEdit.gridForm.controls.items['controls'][i]['controls']['NUpdFeeProp'].readOnly = true;
-        }
-      }
+    const feetypCde = row.cFeetypCde;
+  if (bsnsTyp === '19001' && feetypCde === 'C1') {
+    tableRef.value?.setFormSchema(row._dataId, "nFeeProp", 'disabled',true); 
+  } else if (feetypCde === 'C27') {
+    tableRef.value?.setFormSchema(row._dataId, "nFeeProp", 'disabled',true); 
+  } else if (feetypCde === 'C33') {
+    tableRef.value?.setFormSchema(row._dataId, "nFeeProp", 'disabled',true); 
+  } else if (appTyp === 'E') {
+    for (let i = 0; i < pageresult.list.length; i++) {
+      tableRef.value?.setFormSchema(row._dataId[i], "nFeeProp", 'disabled',true); 
     }
-
+  }
     // 如果是直销业务的时候 要不要去掉河南机构的此控制？20140428
     // else if(bsnsTyp!='19001' && feetypCde=='C1' && subDptCde== '0241010000000'){
     // event.returnValue = false;

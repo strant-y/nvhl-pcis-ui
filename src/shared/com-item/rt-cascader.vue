@@ -98,6 +98,13 @@ const selectedValue = ref<string | number | Array<any> | undefined>();
 
 const cascprops: CascaderProps = {
   lazy: true,
+  checkStrictly: props.item.checkStrictly
+    ? typeof props.item.checkStrictly === "boolean"
+      ? props.item.checkStrictly
+      : props.item.checkStrictly === "1" || props.item.checkStrictly === 1
+        ? true
+        : false
+    : false,
   lazyLoad(node, resolve) {
     const { level, value } = node;
     if (level !== 0) {

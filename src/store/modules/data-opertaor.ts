@@ -103,6 +103,11 @@ export const dataOpertaor = defineStore(
                                 item.hidden = true;
                             });
                         }
+                        if (fsch.editBtns && fsch.editBtns.length > 0) {
+                            fsch.editBtns.forEach((item) => {
+                                item.hidden = true;
+                            });
+                        }
                     })
                 }
             });
@@ -133,7 +138,9 @@ export const dataOpertaor = defineStore(
                     //     f.editFlag = false;
                     // } else 
                     if (f.fromType === 'custom') {
-                        tableRefs[key].setDisabledAll();
+                        if(tableRefs[key].setDisabledAll){
+                            tableRefs[key].setDisabledAll();
+                        }
                     }
                     // if (
                     //     f.titleBtns &&

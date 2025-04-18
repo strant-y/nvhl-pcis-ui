@@ -1204,6 +1204,11 @@ export function updateIIogFee(queryParams: any): AxiosPromise<any> {
 export function gettypflag(queryParams: any): AxiosPromise<any> {
   return post(`/policy/gettypflag`, queryParams);
 }
+//费用信息比较
+export function compareAppFeeInfo(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/compareAppFeeInfo`, queryParams);
+}
+
 //
 export function getRenewalAppPolicy(queryParams: any): AxiosPromise<any> {
   return post(`/policy/getPolicy`, queryParams);

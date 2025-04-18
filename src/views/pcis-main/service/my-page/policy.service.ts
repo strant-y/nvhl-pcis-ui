@@ -1442,4 +1442,10 @@ getNPrmNAmtOfSum(param) {
 getProdFunInfo(param){
     return request.post('/proddef/getProdFunInfo', param);
 }
+//清单模板下载
+downloadDistTemplate(data) {
+  return request.post(`/policy/downloadDistTemplate`, data, {
+      responseType: 'blob'
+  });
+}
 }
