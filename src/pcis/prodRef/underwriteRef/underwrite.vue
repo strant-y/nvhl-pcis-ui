@@ -138,9 +138,9 @@
                 },
                 {},
                 {
-                    prop: "cBckOp1",
+                    prop: "cRpt",
                     inputtype: "rtselect",
-                    title: "是否再保合约除外业务",
+                    title: "关联交易确认",
                     rules: [{ type: "required" }],
                     loadData: [
                         {value: '1', label: '是'},
@@ -149,6 +149,38 @@
                     clearable: true,
                 },
                 {},
+                {
+                    prop: "cIsRiskExp",
+                    inputtype: "rtselect",
+                    title: "是否需要风险查勘",
+                    rules: [{ type: "required" }],
+                    loadData: [
+                        {value: '1', label: '是'},
+                        {value: '2', label: '否'},
+                    ],
+                    clearable: true,
+                },
+                {},
+                {
+                    prop: "cBckOp1",
+                    inputtype: "rtselect",
+                    title: "是否再保合约除外业务",
+                    rules: [{ type: "required" }],
+                    loadData: [
+                        {value: '1', label: '是'},
+                        {value: '2', label: '否'},
+                    ],
+                    itemWidth: 2,
+                    showExBtn: true,
+                    clearable: true,
+                    btnItems: {
+                        label: "查看再保比例分保合同除外责任",
+                        type: "primary",
+                        func: () => {
+                            console.log(12323)
+                        },
+                    },
+                },
                 {
                     prop: "riFacMrk",
                     inputtype: "rtradio",
@@ -184,6 +216,14 @@
                     inputtype: "rtinput",
                     type: "textarea",
                     title: "临分反馈意见",
+                    rows: 4,
+                    itemWidth: 2,
+                },
+                {
+                    prop: "cFacObReOpn",
+                    inputtype: "rtinput",
+                    type: "textarea",
+                    title: "预约分保意见",
                     rows: 4,
                     itemWidth: 2,
                 },
