@@ -51,6 +51,35 @@
         />
       </el-col>
     </el-row>
+    <template v-if="showEditBtnFlag">
+      <el-row :gutter="20" style="margin-top: 10px">
+        <el-col :span="2">
+          <el-text class="mx-1" type="primary" :size="'large'">行内编辑按钮:</el-text>
+        </el-col>
+        <el-col :span="2" v-for="(btn, index) in editBtns" :key="index">
+          <rt-button :item="btn" @click="editBtn(btn, index, 'edit')" />
+        </el-col>
+        <el-col :span="2">
+          <rt-button
+            :item="{
+              type: 'primary',
+              circle: true,
+              icon: 'CirclePlus',
+              iconSize: '18',
+              func: () => {
+                const params = {
+                  type: 'primary',
+                  link: '1',
+                  icon: 'Edit',
+                };
+                editBtns.push(params);
+              },
+            }"
+          />
+        </el-col>
+      </el-row>
+    </template>
+    
     <rt-mytable
       v-if="showFactorList"
       :tableConfig="tableconfig"
@@ -80,6 +109,9 @@ const tableRef = ref<MyTableMethod | null>(null);
 
 const titleBtns = ref<Array<any>>([]);
 const endBtns = ref<Array<any>>([]);
+const editBtns = ref<Array<any>>([]);
+
+const showEditBtnFlag = ref(false);
 
 import {
   AppFreeEditConfig,
@@ -119,6 +151,12 @@ function editBtn(btn: any, index: any, sw: any) {
             titleBtns.value[index] = res.data;
           } else {
             titleBtns.value.splice(index, 1);
+          }
+        }else if(sw === "edit"){
+          if (res.type === "success") {
+            editBtns.value[index] = res.data;
+          } else {
+            editBtns.value.splice(index, 1);
           }
         } else {
           if (res.type === "success") {
@@ -215,6 +253,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           };
           querySelector(param);
 
+          if (index === "dist") {
+            showEditBtnFlag.value = true;
+          }else{
+            showEditBtnFlag.value = false;
+          }
           formconfig1.endBtns?.forEach((e: any) => {
             if (e.id === "DistFactorBtn") {
               if (index === "dist") {
@@ -362,10 +405,11 @@ onMounted(async () => {
         const btns = data.btns;
         const titlebtn = btns["title"];
         const endbtn = btns["end"];
+        const editbtn = btns["edit"];
         if (titlebtn && titlebtn.length > 0) {
           let title = [];
           for (let i = 0; i < titlebtn.length; i++) {
-            let b = {};
+            let b: any = {};
             Object.keys(titlebtn[i]).forEach((k) => {
               if (k.startsWith("cButton")) {
                 let key = k.replace("cButton", "");
@@ -380,7 +424,7 @@ onMounted(async () => {
         if (endbtn && endbtn.length > 0) {
           let ends = [];
           for (let i = 0; i < endbtn.length; i++) {
-            let b = {};
+            let b: any = {};
             Object.keys(endbtn[i]).forEach((k) => {
               if (k.startsWith("cButton")) {
                 let key = k.replace("cButton", "");
@@ -391,6 +435,21 @@ onMounted(async () => {
             ends.push(b);
           }
           endBtns.value = ends;
+        }
+        if (editbtn && editbtn.length > 0) {
+          let edits = [];
+          for (let i = 0; i < editbtn.length; i++) {
+            let b: any = {};
+            Object.keys(editbtn[i]).forEach((k) => {
+              if (k.startsWith("cButton")) {
+                let key = k.replace("cButton", "");
+                key = key.charAt(0).toLowerCase() + key.slice(1);
+                b[key] = editbtn[i][k];
+              }
+            });
+            edits.push(b);
+          }
+          editBtns.value = edits;
         }
         if (data.cComponentType !== "custom") {
           showFactorList.value = true;
@@ -437,6 +496,7 @@ function save() {
     selectFactor: selectList,
     titleBtns: titleBtns.value,
     endBtns: endBtns.value,
+    editBtns: editBtns.value
   });
   saveComponent(param)
     .then((res) => {
@@ -473,6 +533,7 @@ function showView(cComponentKey: any) {
     componentKey: cComponentKey,
   }).then((res) => {
     const { code, data, msg } = res;
+    console.log(data);
     if (200 === code) {
       dialog.value?.open(
         "componentView",

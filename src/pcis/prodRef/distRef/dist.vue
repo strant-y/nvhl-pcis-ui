@@ -115,6 +115,7 @@ onMounted(async () => {
     titleBtns: formconfig1.value.titleBtns,
     fromSchema: formconfig1.value.distSchema,
   });
+  console.log(formconfig11);
   tableconfig.value.tableBtnType = "btn";
   tableconfig.value.tableBtnWidth = 150;
   tableconfig.value.tableBtnPosition = "right";
