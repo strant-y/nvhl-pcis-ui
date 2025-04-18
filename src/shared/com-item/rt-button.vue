@@ -11,8 +11,24 @@
           :type="item.type"
           :size="item.size"
           :placeholder="item.placeholder"
-          :link="item.link ? item.link : false"
-          :circle="item.circle ? item.circle : false"
+          :link="
+            item.link
+              ? typeof item.link === 'boolean'
+                ? item.link
+                : item.link === 1 || item.link === '1'
+                  ? true
+                  : false
+              : false
+          "
+          :circle="
+            item.circle
+              ? typeof item.circle === 'boolean'
+                ? item.circle
+                : item.circle === 1 || item.circle === '1'
+                  ? true
+                  : false
+              : false
+          "
           :style="{
             backgroundColor: item.buttonColor,
             borderColor: item.buttonColor,
@@ -42,8 +58,24 @@
         (typeof item.disabled === 'function' ? item.disabled(row) : false)
       "
       :placeholder="item.placeholder"
-      :link="item.link ? item.link : false"
-      :circle="item.circle ? item.circle : false"
+      :link="
+        item.link
+          ? typeof item.link === 'boolean'
+            ? item.link
+            : item.link === 1 || item.link === '1'
+              ? true
+              : false
+          : false
+      "
+      :circle="
+        item.circle
+          ? typeof item.circle === 'boolean'
+            ? item.circle
+            : item.circle === 1 || item.circle === '1'
+              ? true
+              : false
+          : false
+      "
       :style="{
         backgroundColor: item.buttonColor,
         borderColor: item.buttonColor,
@@ -52,7 +84,11 @@
       @click="handleChange"
     >
       <!-- 将isBtn透传,防止出现icon方法重复执行  -->
-      <rt-icon :style="{marginRight: (item.label)?'5px':null }" v-if="item.icon" :item="{ ...item, isBtn: true }" />
+      <rt-icon
+        :style="{ marginRight: item.label ? '5px' : null }"
+        v-if="item.icon"
+        :item="{ ...item, isBtn: true }"
+      />
       {{ item.label }}</el-button
     >
   </template>
