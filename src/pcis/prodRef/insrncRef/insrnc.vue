@@ -1,5 +1,4 @@
 <template>
-  {{formconfig1}}
   <app-free-edit :freeEditConfig="formconfig1" ref="insrncEditRef" /> 
 </template>
 
