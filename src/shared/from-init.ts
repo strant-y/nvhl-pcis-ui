@@ -64,7 +64,7 @@ export function formInit(
       return fromUi;
     }
     // 方法绑定
-    if (key === "func"  || key === "disabledDate") {
+    if (key === "func"  || key === "disabledDate"|| key === "tableClick" ) {
       // 确保 value 是 method 对象的键之一
       const funcKey = value as keyof typeof method;
       return method[funcKey];
