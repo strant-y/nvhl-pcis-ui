@@ -42,9 +42,7 @@ const method = {
   
   },
   tInsrncBgnTmDisabled:(date:any)=>{ 
-    const tabref = opertaor.getTableRefs();
     const fs = insrncEditRef?.value?.getFromValue();
-    const baseBefore = tabref["insrnc"]?.getFromValue();
     if(fs){
       const startDate = new Date(fs["Base.tInsrncBgnTm"])   // 开始时间   1
       const maxDate = new Date(startDate);  // 创建开始时间副本   365 
