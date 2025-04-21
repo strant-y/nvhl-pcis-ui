@@ -169,7 +169,7 @@ const method = {
     });
   },
   funcdistadd: () => {
-    let baseFlag = opertaor.getDataAll()['plyBase-ref']["Base.cAppNo"]
+    let baseFlag = opertaor.getDataAll().plyBase["Base.cAppNo"];
     checkAppBase({ cAppNo: baseFlag }).then((res) => {
       if (res.code === 200) {
         dialog.value?.open(
@@ -197,7 +197,7 @@ const method = {
     if (param.cOrgAppNo) {
       app = param.cOrgAppNo;
     } else {
-      app = opertaor.getDataAll()['plyBase-ref']["Base.cAppNo"];
+      app = opertaor.getDataAll().plyBase["Base.cAppNo"];
     }
     const selData = {
       cComponentTable: cComponentTableValue,
@@ -216,7 +216,7 @@ const method = {
   distSummeryQuery: () => {
     syncDist({
       cComponentTable: cComponentTableValue,
-      cAppNo: opertaor.getDataAll()['plyBase-ref']["Base.cAppNo"],
+      cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
     }).then((res) => {
       if (res.code == 200) {
         pageresult.list = [];
@@ -228,7 +228,7 @@ const method = {
     });
   },
   carInfoAdd: () => {
-    let baseFlag = opertaor.getDataAll()['plyBase-ref']["Base.cAppNo"];
+    let baseFlag = opertaor.getDataAll().plyBase["Base.cAppNo"];
     checkAppBase({ cAppNo: baseFlag }).then((res) => {
       if (res.code === 200) {
         dialog.value?.open(
