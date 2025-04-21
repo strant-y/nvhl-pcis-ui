@@ -151,7 +151,7 @@
                     v-if="currentIndex >= i"
                     :ref="
                       (res) => {
-                        const pageK = (k.pageKey === 'dist' || k.pageKey === 'distSummary')? k.pageCode : k.pageKey + '-ref'
+                        const pageK = (k.pageKey === 'dist' || k.pageKey === 'distSummary')? k.pageCode : k.pageKey
                         opertaor.addTableRef(pageK, res);
                       }
                     "
