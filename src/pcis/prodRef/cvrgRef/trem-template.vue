@@ -537,35 +537,39 @@ function exChangeFunc() {
       if (data["tgt"]["Tgt.cInsuranceMethod"] !== "613001") {
         if (colInfo.value && colInfo.value.length > 0) {
           const r = colInfo.value.filter(
-            (r) => r["cColTitle"] !== "费率" && r["cColTitle"] !== "总保费"
+            (r) => r["cColTitle"] !== "分项费率" && r["cColTitle"] !== "分项保费"
           );
           colInfo.value = r;
         }
 
         const ex = termFactormap.value.filter(
           (r) =>
-            r["prop"] === "Term.nInsuredCount" ||
-            r["prop"] === "Term.nAccidentLimit"
+            r["prop"] === "Term.nRateVal" ||
+            r["prop"] === "Term.nInsuranceFee"
         );
 
         extermConf.value = ex;
       }
       const term = termFactormap.value.filter(
         (r) =>
-          r["prop"] !== "Term.nInsuredCount" &&
-          r["prop"] !== "Term.nAccidentLimit"
+          {
+            let s = r["prop"] !== "Term.nRateVal";
+            if (data["tgt"]["Tgt.cInsuranceMethod"] !== "613001") {
+              s = s && r["prop"] !== "Term.nInsuranceFee";
+            }
+            return s;
+          }
       );
       termFactormap.value = term;
     } else {
       const r = colInfo.value.filter(
-        (r) => r["cColTitle"] !== "费率" && r["cColTitle"] !== "总保费"
+        (r) => r["cColTitle"] !== "分项费率" && r["cColTitle"] !== "分项保费"
       );
       colInfo.value = r;
 
       const term = termFactormap.value.filter(
         (r) =>
-          r["prop"] !== "Term.nInsuredCount" &&
-          r["prop"] !== "Term.nAccidentLimit"
+          r["prop"] !== "Term.nRateVal"
       );
       termFactormap.value = term;
     }
