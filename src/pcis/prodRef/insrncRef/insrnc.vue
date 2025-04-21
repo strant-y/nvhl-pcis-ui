@@ -13,6 +13,7 @@ import moment from "moment";
 import dayjs from "dayjs";
 import { useValidator } from "@/typings/useValidator";
 import { formatDate } from "@/utils/date";
+import { transpileModule } from "typescript";
 const { getRules } = useValidator();
 const opertaor = dataOpertaor();
 const props = defineProps({
@@ -42,13 +43,16 @@ const method = {
   },
   tInsrncBgnTmDisabled:(date:any)=>{ 
     const tabref = opertaor.getTableRefs();
+    const fs = insrncEditRef?.value?.getFromValue();
     const baseBefore = tabref["insrnc"]?.getFromValue();
-    const startDate = new Date(baseBefore["Base.tInsrncBgnTm"])   // 开始时间   1
-   
-    const maxDate = new Date(startDate);  // 创建开始时间副本   365 
-    maxDate.setDate(startDate.getDate() + 365);  // 设置为今天起365天后的日期
-
-    return  date.getTime() < startDate.getTime() || date.getTime() > maxDate.getTime()
+    if(fs){
+      const startDate = new Date(fs["Base.tInsrncBgnTm"])   // 开始时间   1
+      const maxDate = new Date(startDate);  // 创建开始时间副本   365 
+      maxDate.setDate(startDate.getDate() + 365);  // 设置为今天起365天后的日期
+      return  date.getTime() < startDate.getTime() || date.getTime() > maxDate.getTime()
+    }else{
+        return true;
+    }
   },
   bgnTmFn: (v) => {   
     const tabref = opertaor.getTableRefs();
