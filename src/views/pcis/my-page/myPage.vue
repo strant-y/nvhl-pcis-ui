@@ -1337,18 +1337,18 @@ const calcPremiumEdrSurrender = () => {
     btn.loading = false;
     console.log("批改计算", res);
     if (res["code"] == "200") {
-      const ops = opertaor.convertData(res);
       ElMessage.success(
-        res.msg +
+          res.msg +
           "保费为：" +
-          ops["base"]["Base.nPrm"]+
+          res["res"]["composition"]["plyBase"][0]["Base.nPrm"]+
           "; 保费变化量为：" +
           res["res"]["composition"]["plyBase"][0]["Base.nPrmVar"]
       );
-      opertaor.setDataAll(ops);
       nAmt.value = res["res"]["composition"]["plyBase"][0]["Base.nAmt"];
-      nPrm.value = res["res"]["composition"]["plyBase"][0]["Base.nPrm"];
+      nPrm.value = res["res"]["composition"]["EdrBase"][0]["Base.nPrm"];
       tmDay.value = res["res"]["composition"]["plyBase"][0]["Base.cTmSysCde"];
+      const ops = opertaor.convertData(res);
+      opertaor.setDataAll(ops);
       if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
           if (
