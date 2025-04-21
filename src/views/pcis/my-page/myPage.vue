@@ -46,7 +46,7 @@
                     <el-anchor-link
                       v-for="(k, i) in pageConfig?.pageInfo"
                       :key="i"
-                      :href="`#${k.pageKey}`"
+                      :href="`#${(k.pageKey === 'dist' || k.pageKey === 'distSummary')? k.pageCode : k.pageKey}`"
                       
                       v-show="k.pageKey !== 'acctinfo' ? acctinfoFlag : true"
                     >
@@ -144,14 +144,15 @@
                   class="card_"
                   v-for="(k, i) in pageConfig?.pageInfo"
                   :key="i"
-                  :id="k.pageKey"
+                  :id="(k.pageKey === 'dist' || k.pageKey === 'distSummary')? k.pageCode : k.pageKey"
                   v-show="k.pageKey !== 'acctinfo' ? acctinfoFlag : true"
                 >
                   <component
                     v-if="currentIndex >= i"
                     :ref="
                       (res) => {
-                        opertaor.addTableRef(k.pageKey, res);
+                        const pageK = (k.pageKey === 'dist' || k.pageKey === 'distSummary')? k.pageCode : k.pageKey + '-ref'
+                        opertaor.addTableRef(pageK, res);
                       }
                     "
                     :is="

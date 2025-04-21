@@ -282,7 +282,6 @@ function setUnDisabledByKeyList(key: any) {
       item.hidden = false;
     }
   });
-  console.log(key);
   // tableconfig.value.tableBtn?.forEach((item: any) => {
   //   if(item.id = key){
   //     item.hidden = false;
@@ -293,7 +292,6 @@ function setUnDisabledByKeyList(key: any) {
       tableconfig.value.tableBtn?.push(item);
     }
   });
-  console.log(tableconfig.value);
 }
 
 function getFormconfig() {

@@ -162,6 +162,7 @@ export const dataOpertaor = defineStore(
             if (list && list.length > 0) {
                 list.forEach((item: string) => {
                     Object.keys(tableRefs).forEach(key => {
+                        console.log(key);
                         if (tableRefs[key] && tableRefs[key].getFormconfig) {
                             const conf = tableRefs[key].getFormconfig();
                             if (!item.startsWith('Btn_')) { // 非按钮控制
