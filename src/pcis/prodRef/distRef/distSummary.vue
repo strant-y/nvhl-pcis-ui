@@ -221,9 +221,11 @@ const method = {
       if (res.code == 200) {
         pageresult.list = [];
         pageresult.list = res.data;
-        pageresult.list.forEach((item, index) => {
-          item.nSeqNo = index + 1;
-        });
+        if (pageresult.list.length > 0) {
+          pageresult.list.forEach((item, index) => {
+            item.nSeqNo = index + 1;
+          });
+        }
       }
     });
   },
@@ -273,12 +275,12 @@ const method = {
 
 function setUnDisabledByKeyList(key: any) {
   cardconfig.value.endBtns?.forEach((item: any) => {
-    if (('Btn_' + item.id === key)) {
+    if ("Btn_" + item.id === key) {
       item.hidden = false;
     }
   });
   cardconfig.value.titleBtns?.forEach((item: any) => {
-    if (('Btn_' + item.id === key)) {
+    if ("Btn_" + item.id === key) {
       item.hidden = false;
     }
   });
@@ -289,7 +291,7 @@ function setUnDisabledByKeyList(key: any) {
   //   }
   // });
   formconfig11.value.editBtns?.forEach((item: any) => {
-    if (('Btn_' + item.id === key)) {
+    if ("Btn_" + item.id === key) {
       tableconfig.value.tableBtn?.push(item);
     }
   });

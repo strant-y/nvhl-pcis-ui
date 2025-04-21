@@ -169,6 +169,7 @@ const method = {
     });
   },
   funcdistadd: () => {
+    console.log("22", opertaor.getTableRefs());
     let baseFlag = opertaor.getDataAll().plyBase["Base.cAppNo"];
     checkAppBase({ cAppNo: baseFlag }).then((res) => {
       if (res.code === 200) {
@@ -273,12 +274,12 @@ const method = {
 
 function setUnDisabledByKeyList(key: any) {
   cardconfig.value.endBtns?.forEach((item: any) => {
-    if (('Btn_' + item.id === key)) {
+    if ("Btn_" + item.id === key) {
       item.hidden = false;
     }
   });
   cardconfig.value.titleBtns?.forEach((item: any) => {
-    if (('Btn_' + item.id === key)) {
+    if ("Btn_" + item.id === key) {
       item.hidden = false;
     }
   });
@@ -288,7 +289,7 @@ function setUnDisabledByKeyList(key: any) {
   //   }
   // });
   formconfig11.value.editBtns?.forEach((item: any) => {
-    if (('Btn_' + item.id === key)) {
+    if ("Btn_" + item.id === key) {
       tableconfig.value.tableBtn?.push(item);
     }
   });
