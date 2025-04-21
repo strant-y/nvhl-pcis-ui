@@ -265,7 +265,7 @@ export const dataOpertaor = defineStore(
                                 da = data[voNme];
                             }
                 }
-                res[voNme] = da;
+                res[voNme+'-ref'] = da;
             });
             return res;
         }
