@@ -142,7 +142,10 @@ onMounted(() => {
   formconfig1.value.fromSchema = props.data.fromSchema;
   formconfig1.value.title = props.data.title;
   if (props.data.title == "编辑") {
-    freeEditRef.value?.setFormValue(props.data.rowData);
+    setTimeout(() => {
+      freeEditRef.value?.setFormValue(props.data.rowData);
+    },100);
+    
   } else {
   }
 });
