@@ -740,6 +740,28 @@ async function loadAfter() {
     } else if (props.param.cAppTyp == "A") {
       bthList.value = basicBtn;
     }
+  } else if (props.param.pageType === "PLY_APP_MODIFY_BOUNCED_SCENE") {
+      // 投保单核保退回
+      const cAppNo = props.param.cAppNo;
+      loadAppPlyInfo(cAppNo);
+      bthList.value = basicBtn;
+  }else if (props.param.pageType === "EDR_APP_MODIFY_BOUNCED_SCENE") {
+      // 批改单核保退回
+      const cAppNo = props.param.cAppNo;
+      loadAppPlyInfo(cAppNo);
+      bthList.value = edrBtn;
+      nextTick(() => {
+          opertaor.setDisabledAll();
+          getEdrRsnItemFun(
+              props.param["cProdNo"],
+              props.param["cDptCde"],
+              props.param["cEdrRsnBundleCde"],
+              props.param["cEdrRsnBundleCde"],
+              props.param["cEdrType"],
+              props.param["cGrpMrk"]
+          );
+      });
+      edritem.value?.handleQuery();
   } else if (props.param.pageType === "PLY_UW_PROCESS_SCENE") {
     //核保处理
     nextTick(() => {

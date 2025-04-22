@@ -28,6 +28,8 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
+import { useValidator } from "@/typings/useValidator";
+const { getRules } = useValidator();
 import { useRoute } from "vue-router";
 import { createFreeButtonBase } from "@/shared/button-config";
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
@@ -62,6 +64,8 @@ const formconfig = reactive<AppFreeEditConfig>(
         type: "primary",
         label: "查询",
         func: async () => {
+          const isValid = await freeEditRef.value?.validate();
+          if (!isValid) return false;
           handleQuery();
         },
       }),
@@ -75,18 +79,20 @@ const formconfig = reactive<AppFreeEditConfig>(
     fromSchema: [
       {
         prop: "cEmpCde",
-        inputtype: "rtselect",
+        inputtype: "rtinput",
         title: "员工代码",
       },
       {
         prop: "cEmpCnm",
-        inputtype: "rtselect",
+        inputtype: "rtinput",
         title: "员工名称",
+        rules: [getRules("required", { change: true })],
       },
       {
         prop: "dptCde",
         inputtype: "rtselect",
         title: "员工所属机构",
+        rules: [getRules("required", { change: true })],
         showExBtn: true,
         btnItems: {
           icon: "Search",
