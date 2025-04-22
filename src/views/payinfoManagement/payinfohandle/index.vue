@@ -588,11 +588,11 @@ const tableconfig = reactive<AppTableConfig>(
                         let isOpen =  false;
                         let message = '';
                         multipleSelection.value.forEach(item => {
-                            // if ('18' !== item['cPayTyp']) {
-								// isOpen = true;
-                            //     message='该单缴费类型错误，只能对在线支付的单进行在线缴费！ 【申请单号='+item['cAppNo']+'】'
-								// return;
-						  	// }
+                            if ('18' !== item['cPayTyp']) {
+								isOpen = true;
+                                message='该单缴费类型错误，只能对在线支付的单进行在线缴费！ 【申请单号='+item['cAppNo']+'】'
+								return;
+						  	}
                             cPaySequences = cPaySequences === '' ? item['cPaySequence'] : cPaySequences + ',' + item['cPaySequence'];
                         });
                         if (isOpen) {
