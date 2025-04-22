@@ -95,8 +95,11 @@ onMounted(async () => {
   const processedFromSchema = props.pageSchema.fromSchema.map((item) => {
     return Object.keys(item).reduce(
       (acc, key) => {
-        if (typeof item[key] === "string" && item[key].startsWith("Dist.")) {
-          acc[key] = item[key].replace(/^Dist\./, "");
+        if (
+          typeof item[key] === "string" &&
+          item[key].startsWith("DistSummary.")
+        ) {
+          acc[key] = item[key].replace(/^DistSummary\./, "");
         } else {
           acc[key] = item[key];
         }
@@ -215,17 +218,12 @@ const method = {
   },
   distSummeryQuery: () => {
     syncDist({
-      cComponentTable: cComponentTableValue,
+      cComponentTable: "DistSummary",
       cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
     }).then((res) => {
       if (res.code == 200) {
         pageresult.list = [];
         pageresult.list = res.data;
-        if (pageresult.list.length > 0) {
-          pageresult.list.forEach((item, index) => {
-            item.nSeqNo = index + 1;
-          });
-        }
       }
     });
   },

@@ -136,7 +136,6 @@ const formconfig1 = ref<AppFreeEditConfig>(
 );
 
 onMounted(() => {
-  console.log("98888888", props.data);
   dataParams.value = opertaor.getDataAll();
   appNo.value = dataParams.value.plyBase["Base.cAppNo"];
   formconfig1.value.fromSchema = props.data.fromSchema;
@@ -144,8 +143,7 @@ onMounted(() => {
   if (props.data.title == "编辑") {
     setTimeout(() => {
       freeEditRef.value?.setFormValue(props.data.rowData);
-    },100);
-    
+    }, 100);
   } else {
   }
 });

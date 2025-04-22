@@ -81,10 +81,10 @@ onMounted(async () => {
     //回显保单来源
     setFormItem("Base.cPolicySource", {
       loadData: [
-        // {
-        //   value: param.cBsnsSrc,
-        //   label:  ${param.cBsnsSrcNm},
-        // },
+        {
+          value: param.cBsnsSrc,
+          label: param.cBsnsSrcNm,
+        },
       ],
     });
     setValue("Base.cDptCde", param.cDptCde);
@@ -103,7 +103,6 @@ onMounted(async () => {
       //新保时，续保单号隐藏
       setFormItem("Base.cOrigPlyNo", { hidden: true });
     }
-    console.log(param.cDptCde, "机构部门");
     // nextTick(() => {
     //   setFormValue(data);
     // });
@@ -247,7 +246,6 @@ const method = {
           },
           method: {
             getSelected: (params) => {
-              console.error("22222222222", params);
               dialogRef.value?.handleClose();
             },
           },
