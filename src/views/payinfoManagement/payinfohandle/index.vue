@@ -545,6 +545,10 @@ const tableconfig = reactive<AppTableConfig>(
 					type: "primary",
 					label: "支票登记",
 					func: async () => {
+                        if (multipleSelection.value.length < 1 ) {
+                            ElMessage.warning('所选记录为空！');
+                            return ;
+                        }
                         let CUniqueNos = ''; // 所选项的流水号组合
                         let isOpen =  false;
                         let message = '';
@@ -570,6 +574,32 @@ const tableconfig = reactive<AppTableConfig>(
 								console.log("审核")
 							}
 						});
+					},
+				}),
+				createFreeButtonBase({
+					type: "primary",
+					label: "在线缴费",
+					func: async () => {
+                        if (multipleSelection.value.length < 1 ) {
+                            ElMessage.warning('所选记录为空！');
+                            return ;
+                        }
+                        let cPaySequences = ''; // 所选项的支付号
+                        let isOpen =  false;
+                        let message = '';
+                        multipleSelection.value.forEach(item => {
+                            // if ('18' !== item['cPayTyp']) {
+								// isOpen = true;
+                            //     message='该单缴费类型错误，只能对在线支付的单进行在线缴费！ 【申请单号='+item['cAppNo']+'】'
+								// return;
+						  	// }
+                            cPaySequences = cPaySequences === '' ? item['cPaySequence'] : cPaySequences + ',' + item['cPaySequence'];
+                        });
+                        if (isOpen) {
+                            ElMessage.warning(message);
+                            return;
+                        }
+						window.open('http://t.yaic.com.cn:12003/02/'+cPaySequences)
 					},
 				}),
 			// createFreeButtonBase({
