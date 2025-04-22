@@ -86,7 +86,11 @@ const tableconfig = reactive<AppTableConfig>(
               delete e._dataId;
             });
           }
-          const jsonData = JSON.stringify(data);
+          let jsonData = null;
+          if(data && data.length !== 0 ){
+            jsonData = JSON.stringify(data);
+          }
+          console.log(jsonData);
           emits("ok", jsonData);
           dialogVisible.value = false;
         },
