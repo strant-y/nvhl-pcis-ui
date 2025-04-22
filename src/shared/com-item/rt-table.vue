@@ -67,6 +67,7 @@
         :label="item.tableBtnTitle"
         v-if="item.tableBtn && item.tableBtn.length > 0 && item.tableBtnPosition === 'left'"
         :width="item.tableBtnWidth ? item.tableBtnWidth : 100"
+        :fixed=" item.fixed ? (typeof item.fixed === 'boolean' ? (item.fixed ? 'left' : null ) : (item.fixed ==='1' ? 'left' : null)) : null"
         :align="item.align ? item.align : 'center'"
       >
         <template #default="scope">
@@ -155,6 +156,7 @@
         v-if="item.tableBtn && item.tableBtn.length > 0 && item.tableBtnPosition === 'right' "
         :width="item.tableBtnWidth ? item.tableBtnWidth : 100"
         :align="item.align ? item.align : 'center'"
+        :fixed=" item.fixed ? (typeof item.fixed === 'boolean' ? (item.fixed ? 'right' : null ) : (item.fixed ==='1' ? 'right' : null)) : null"
       >
         <template #default="scope">
           <template v-for="(btn, index) in item.tableBtn" :key="index">

@@ -1004,6 +1004,7 @@ const tableObj = {
 let tableconfig = reactive<AppTableConfig>(
     createTableEditConfig(tableObj.notWaitObj)
 );
+tableconfig.fixed= true;
 
 onMounted(async () => {
     formconfig1.fromSchema?.forEach((item) => {
