@@ -455,7 +455,8 @@ function setFormValue(data: any, noupdate = false) {
   if (props.fromSchema) {
     props.fromSchema.forEach((key: any) => {
       if (key.inputtype === "rtcascader") {
-        const props = key.cascaderprops;
+        const props = typeof key.cascaderprops === "string" ? JSON.parse(key.cascaderprops) : key.cascaderprops
+;
         if (props && props.length > 0) {
           let cascd = [];
           for (var i = 0; i < props.length; i++) {
@@ -470,7 +471,7 @@ function setFormValue(data: any, noupdate = false) {
         if (key.groupList && key.groupList.length > 0) {
           key.groupList.forEach((gkey: any) => {
             if (gkey.inputtype === "rtcascader") {
-              const gprops = gkey.cascaderprops;
+              const gprops = typeof gkey.cascaderprops === "string" ? JSON.parse(gkey.cascaderprops) : gkey.cascaderprops;
               if (gprops && gprops.length > 0) {
                 let cascd = [];
                 for (var i = 0; i < gprops.length; i++) {
@@ -479,7 +480,7 @@ function setFormValue(data: any, noupdate = false) {
                   }
                   delete setdata[gprops[i]];
                 }
-                setdata[key.prop] = cascd;
+                setdata[gkey.prop] = cascd;
               }
             }
           });
