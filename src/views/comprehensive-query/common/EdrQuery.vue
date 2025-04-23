@@ -1017,12 +1017,12 @@ onMounted(async () => {
             item.rules = []; // 清除必填规则
         }
     });
-    freeEditRef.value.setValue("cDptCde", "0200000000000");
+    freeEditRef.value.setValue("cDptCde", JSON.parse(sessionStorage.getItem("user")).companyId);
     setFormItem("cDptCde", {
         loadData: [
             {
-                label: "0200000000000永安保险公总司",
-                value: "0200000000000",
+                label: JSON.parse(sessionStorage.getItem("user")).companyCnm,
+                value: JSON.parse(sessionStorage.getItem("user")).companyId,
             },
         ],
     });
