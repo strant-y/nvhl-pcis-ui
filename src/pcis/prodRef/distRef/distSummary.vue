@@ -92,24 +92,8 @@ const getCComponentTableValue = (cProdNo: string, title: string): string => {
 
 const formconfig11 = ref<any>({});
 onMounted(async () => {
-  const processedFromSchema = props.pageSchema.fromSchema.map((item) => {
-    return Object.keys(item).reduce(
-      (acc, key) => {
-        if (
-          typeof item[key] === "string" &&
-          item[key].startsWith("DistSummary.")
-        ) {
-          acc[key] = item[key].replace(/^DistSummary\./, "");
-        } else {
-          acc[key] = item[key];
-        }
-        return acc;
-      },
-      {} as Record<string, any>
-    );
-  });
   formconfig11.value = formInit(
-    JSON.stringify({ ...props.pageSchema, fromSchema: processedFromSchema }),
+    JSON.stringify({ ...props.pageSchema }),
     method,
     exRules
   );
