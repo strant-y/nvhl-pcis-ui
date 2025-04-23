@@ -97,21 +97,21 @@ const formconfig1 = ref<AppFreeEditConfig>(
         func: () => {
           freeEditRef.value?.validate().then(() => {
             const s = freeEditRef.value?.getFromValue();
-            const processedData = Object.keys(s).reduce(
-              (acc, key) => {
-                const newKey = key.replace(/^Dist\./, "");
-                acc[newKey] = s[key];
-                return acc;
-              },
-              {} as Record<string, any>
-            );
+            // const processedData = Object.keys(s).reduce(
+            //   (acc, key) => {
+            //     const newKey = key.replace(/^Dist\./, "");
+            //     acc[newKey] = s[key];
+            //     return acc;
+            //   },
+            //   {} as Record<string, any>
+            // );
             const params = Object.assign(
               {
                 cProdNo: route.params.param.cProdNo,
                 cComponentTable: cComponentTable,
                 cAppNo: appNo.value,
               },
-              { dist: processedData }
+              { dist: s }
             );
             saveDist(params).then((res) => {
               if (res.code === 200) {

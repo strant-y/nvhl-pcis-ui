@@ -164,6 +164,7 @@ function add() {
 const returnData = () => {
   if (activeName.value == "first") {
     let tempData = multipleTableRef.value.getSelectionRows();
+    console.log("000",tempData);
     props.data.method.getSelected(tempData);
   } else {
     props.data.method.getSelected(addTableData);
