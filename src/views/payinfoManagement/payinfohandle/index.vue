@@ -31,6 +31,7 @@ import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service'
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { log } from "console";
 import { saveAs } from 'file-saver';
+import { useRoute, useRouter, RouteRecordRaw } from "vue-router";
 const pcisQueryService = new PcisQueryService();
 const policyService = new PolicyService();
 const dzmodal = useDzModal();
@@ -50,6 +51,7 @@ const cPayStatusList = [
   {value: '1', label: '已缴费'},
   {value: '2', label: '修改缴费'},
 ];
+const router = useRouter();
 const cCheckStsList = [
     {value: '00', label: '待缴费'},
     {value: '0', label: '待登记'},
@@ -619,36 +621,52 @@ const tableconfig = reactive<AppTableConfig>(
 		],
 		tableBtnType: "btn",
 		tableBtnWidth: 150,
-		// tableBtnPosition: "right",
+		tableBtnPosition: "right",
 		tableBtnFixed: "right",
-		// tableBtn: [
-			// createFreeButtonBase({
-			// 	id: "score",
-			// 	link: true,
-			// 	tooltip: "详情",
-			// 	type: "success",
-			// 	size: "large",
-			// 	icon: "View",
-			// 	tableClick: (row) => {
-			// 		dzmodal.open(payConfirmInfoDetailRead, { type: "view", data: row }).then((res) => {
-			// 			if (res.type === "ok") {
-			// 				console.log("详情")
-			// 			}
-			// 		});
-			// 	},
-			// }),
-			// createFreeButtonBase({
-			// 	id: "score",
-			// 	link: true,
-			// 	tooltip: "文档",
-			// 	type: "success",
-			// 	size: "large",
-			// 	icon: "Document",
-			// 	tableClick: (row) => {
-          	// 		console.log("编辑")
-			// 	},
-			// }),
-		// ],
+        fixed:true,
+		tableBtn: [
+			createFreeButtonBase({
+				id: "score",
+				link: true,
+				tooltip: "查看缴费信息",
+				type: "success",
+				size: "large",
+				icon: "View",
+				tableClick: (row) => {
+					dzmodal.open(payConfirmInfoDetailRead, { type: "view", data: row }).then((res) => {
+						if (res.type === "ok") {
+							console.log("详情")
+						}
+					});
+				},
+			}),
+			createFreeButtonBase({
+				id: "score",
+				link: true,
+				tooltip: "查看投保单信息",
+				type: "success",
+				size: "large",
+				icon: "Document",
+				tableClick: (row) => {
+                    const en = JSON.stringify({
+                        cAppNo: row['cAppNo'],
+                        cAppTyp: row['cAppTyp'],
+                        cCiMrk: row['cCiMrk'],
+                        cEdrRsnBundleCde: row['cEdrRsnBundleCde'],
+                        cProdNo: row['cProdNo'],
+                        cGrpMrk: row['cGrpMrk'],
+                        cDptCde: row['cDptCde'],
+                        pageType: "readonly",
+                    });
+                    router.push({
+                        path: "/pcis/my-page",
+                        query: {
+                            param: en,
+                        },
+                    });
+				},
+			}),
+		],
 		fromSchema: [
 			{
 				prop: "cAppNo",
