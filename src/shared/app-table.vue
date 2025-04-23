@@ -22,7 +22,7 @@
           justify="space-between"
           v-if="tableConfig.formconfig?.titleBtns.length > 0"
         >
-          <el-col :span="24" style="text-align: right">
+          <el-col :span="24" :style="{textAlign:tableConfig.titleBtnPosition}">
             <template
               v-for="(item, index) in tableConfig.formconfig?.titleBtns"
               :key="index"
@@ -34,7 +34,7 @@
           </el-col>
         </el-row>
         <el-row justify="space-between" v-if="tableConfig.titleBtns.length > 0">
-          <el-col :span="24">
+          <el-col :span="24" :style="{textAlign:tableConfig.titleBtnPosition}" >
             <template
               v-for="(item, index) in tableConfig.titleBtns"
               :key="index"
