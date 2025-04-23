@@ -430,6 +430,14 @@ const basicBtn = [
  */
 const edrBtn = [
   createFreeButtonBase({
+      label: "原保单查看",
+      type: "primary",
+      id: "btnCalEdr",
+      func: () => {
+        getPlyPolicyFun();
+      },
+  }),
+  createFreeButtonBase({
     label: "保费计算",
     type: "primary",
     id: "btnCalEdr",
@@ -1254,6 +1262,34 @@ const getEdrRsnItemFun = (
     }
   });
 };
+/**
+ * 原保单查看
+ * **/
+const getPlyPolicyFun = () =>{
+    const param = {
+        scene: 'EDR_APP_NEW_SCENE',
+        CPlyNo:opertaor.getTableRefByKey("plyBase").getValue("Base.cPlyNo")
+    };
+    getAppPolicy(param).then((res) => {
+        console.log("投保单明细", res);
+        if (res["code"] == "200") {
+            const en = JSON.stringify({
+                cAppNo: res["res"]["composition"]["plyBase"][0]['Base.cAppNo'],
+                cAppTyp: res["res"]["composition"]["plyBase"][0]['Base.cAppTyp'],
+                cCiMrk: res["res"]["composition"]["plyBase"][0]['Base.cCiMrk'],
+                cProdNo: res["res"]["composition"]["plyBase"][0]['Base.cProdNo'],
+                cGrpMrk: res["res"]["composition"]["plyBase"][0]['Base.cGrpMrk'],
+                cDptCde: res["res"]["composition"]["plyBase"][0]['Base.cDptCde'],
+                pageType: "readonly",
+            });
+            const query = new URLSearchParams({ param: en });
+            const url = window.location.origin
+                + '/#/pcis/my-page?'
+                + query.toString();
+            window.open(url, '_blank');
+        }
+    });
+}
 /**
  *批改单保费计算
  ***/
