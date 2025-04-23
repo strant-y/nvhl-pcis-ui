@@ -123,7 +123,7 @@ const refreshData = () => {
         pageresult.list.push({
           cSpecialCode: item.cSpecialCode,
           cSpecialName: item.cSpecialName,
-          cNmeEn: item.cNmeEn,
+          // cNmeEn: item.cNmeEn,
           cIfMust: item.cIfMust, //是否必选
           cIfEdit: item.cIfEdit, //是否可修改
           cIfFix: "1", //是否固定特约，接口查出来的1，自定义添加的为0
@@ -162,9 +162,9 @@ function add() {
 
 //点击确定按钮时把选中的数据派发给父组件
 const returnData = () => {
+  debugger
   if (activeName.value == "first") {
     let tempData = multipleTableRef.value.getSelectionRows();
-    console.log("000",tempData);
     props.data.method.getSelected(tempData);
   } else {
     props.data.method.getSelected(addTableData);

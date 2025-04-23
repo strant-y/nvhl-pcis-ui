@@ -208,7 +208,6 @@ const method = {
       if (res.code == 200) {
         pageresult.list = [];
         pageresult.list = res.data;
-        console.log(pageresult.list,"===s")
       }
     });
   },

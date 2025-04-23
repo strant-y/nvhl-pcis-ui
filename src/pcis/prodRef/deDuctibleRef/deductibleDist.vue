@@ -41,6 +41,10 @@ const method = {
       key["deducti.nTms"] = index + 1;
     });
   },
+  //获取免赔
+  getDuductible: () => {
+    console.log(getFromValue());
+  },
   funcpaydel: () => {
     const selData = deDuctibleEditRef?.value?.getSelectRow();
     if (!selData) {

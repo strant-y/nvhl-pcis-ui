@@ -92,6 +92,7 @@ const getCComponentTableValue = (cProdNo: string, title: string): string => {
 
 const formconfig11 = ref<any>({});
 onMounted(async () => {
+  console.log(tableconfig.value,"09999")
   // const processedFromSchema = props.pageSchema.fromSchema.map((item) => {
   //   return Object.keys(item).reduce(
   //     (acc, key) => {
@@ -217,7 +218,7 @@ const method = {
   },
   distSummeryQuery: () => {
     syncDist({
-      cComponentTable: cComponentTableValue,
+      cComponentTable: "DistSummary",
       cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
     }).then((res) => {
       if (res.code == 200) {

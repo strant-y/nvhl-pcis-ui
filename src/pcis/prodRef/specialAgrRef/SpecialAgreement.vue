@@ -226,18 +226,40 @@ const method = {
         method: {
           getSelected(selectdata: any) {
             selectdata.forEach((item: any) => {
+              console.log(item);
               formData.value.push(item);
             });
-            formData.value.forEach((item, index) => {
-              item.index = index + 1;
-            });
-            dialog.value?.handleClose();
+            // handleSelectedData(selectdata);
+            // dialog.value?.handleClose();
           },
+          // getSelected(selectdata: any) {
+          //   selectdata.forEach((item: any) => {
+          //     console.log(item);
+          //     formData.value.push(item);
+          //   });
+          //   formData.value.forEach((item, index) => {
+          //     item.index = index + 1;
+          //   });
+          //   dialog.value?.handleClose();
+          // },
         },
       },
       { title: "添加特约", width: 85 }
     );
   },
+};
+const handleSelectedData = (selectdata: any[]) => {
+  selectdata.forEach((item: any) => {
+    formData.value.push({
+      index: formData.value.length + 1,
+      cIfMust: "0", // 默认值，根据实际情况调整
+      cSpecialCode: item['PrdFixSpec.CSpecNo'],
+      cSpecialName: item['PrdFixSpec.CNmeCn'],
+    });
+  });
+  formData.value.forEach((item, index) => {
+    item.index = index + 1;
+  });
 };
 // 绑定特殊验证器
 const exRules = {};
