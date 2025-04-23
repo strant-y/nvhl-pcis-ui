@@ -83,10 +83,10 @@ const handleSave = () => {
 };
 
 const initDptTreeList = () => {
-  let root = "0200000000000";
-  if (user.value && user.value.companyId) {
-    root = user.value.companyId;
-  }
+  let root = JSON.parse(sessionStorage.getItem("user")).companyId;
+  // if (user.value && user.value.companyId) {
+  //   root = user.value.companyId;
+  // }
   const params = {
     pId: root,
   };
