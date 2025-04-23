@@ -765,6 +765,15 @@ onMounted(async () => {
     freeEditRef.value?.setValue('LoadSub', 1)
     freeEditRef.value?.setValue('TUnTmStart', startTm)
     freeEditRef.value?.setValue('TUnTmEnd', endTm)
+    freeEditRef.value.setValue("AccDpt", user.value['companyId']);
+    setFormItem("AccDpt", {
+      loadData: [
+          {
+              label: user.value['companyCnm'],
+              value: user.value['companyId'],
+          },
+      ],
+    });
   })  
   getListByCode('WEB_BAS_CODELIST', {
       'cParCde': 'shoufeifangshi',

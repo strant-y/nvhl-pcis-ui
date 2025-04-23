@@ -43,7 +43,8 @@ const sysOperatorMgrService = new SysOperatorMgrService();
 interface Tree {
   [key: string]: any;
 }
-const user = ref<any>(useUserStore.user);
+const userStore = useUserStore();
+const user = ref(userStore.user);
 const _nodes = ref([]);
 const dialogVisible = ref(true);
 const filterText = ref("");
@@ -83,7 +84,7 @@ const handleSave = () => {
 };
 
 const initDptTreeList = () => {
-  let root = JSON.parse(sessionStorage.getItem("user")).companyId;
+  let root = user.value['companyId'];
   // if (user.value && user.value.companyId) {
   //   root = user.value.companyId;
   // }
