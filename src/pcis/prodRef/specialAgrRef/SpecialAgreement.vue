@@ -226,22 +226,14 @@ const method = {
         method: {
           getSelected(selectdata: any) {
             selectdata.forEach((item: any) => {
-              console.log(item);
-              formData.value.push(item);
+              console.log(item,formData.value);
+              // formData.value.push(item);
             });
-            // handleSelectedData(selectdata);
-            // dialog.value?.handleClose();
+            formData.value.forEach((item, index) => {
+              item.index = index + 1;
+            });
+            dialog.value?.handleClose();
           },
-          // getSelected(selectdata: any) {
-          //   selectdata.forEach((item: any) => {
-          //     console.log(item);
-          //     formData.value.push(item);
-          //   });
-          //   formData.value.forEach((item, index) => {
-          //     item.index = index + 1;
-          //   });
-          //   dialog.value?.handleClose();
-          // },
         },
       },
       { title: "添加特约", width: 85 }

@@ -162,7 +162,6 @@ function add() {
 
 //点击确定按钮时把选中的数据派发给父组件
 const returnData = () => {
-  debugger
   if (activeName.value == "first") {
     let tempData = multipleTableRef.value.getSelectionRows();
     props.data.method.getSelected(tempData);
