@@ -449,6 +449,7 @@
             showSelection: true,
             tableBtnType: "btn",
             tableBtnWidth: 200,
+            fixed:true,
             tableBtnPosition: ref<any>(""),
             tableBtnFixed: "right",
             tableBtn: ref<any>([]),
