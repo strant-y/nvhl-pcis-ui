@@ -225,9 +225,10 @@ const method = {
         },
         method: {
           getSelected(selectdata: any) {
-            selectdata.forEach((item: any) => {
+            selectdata.forEach((item: any,index:number) => {
               console.log(item,formData.value);
-              // formData.value.push(item);
+              item.index = formData.value.length + 1; // 显式设置 index 属性
+              formData.value.push(item);
             });
             formData.value.forEach((item, index) => {
               item.index = index + 1;
