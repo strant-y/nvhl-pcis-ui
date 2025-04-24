@@ -5,6 +5,9 @@
 <script setup lang="ts">
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import {getPrdDeductible} from "@/api/prod/index";
+import { useRoute } from "vue-router";
+const route = useRoute();
 const opertaor = dataOpertaor();
 import {
   AppGridEditMethod,
@@ -43,7 +46,21 @@ const method = {
   },
   //获取免赔
   getDuductible: () => {
-    console.log(getFromValue());
+    
+  },
+  //查询免赔
+  queryDeductible: () => {
+    let param = Object.assign({pageNum:"1",pageSize:"999"}, {cProdNo:route.params.param.cProdNo},);
+    getPrdDeductible(param).then((res) => {
+      if (res.code == 200) {
+        console.log(res.data.result);
+        // const val = getFromValue();
+        // val.items = res.data.result;
+        // val.items.forEach((key, index) => {
+        //   key["deducti.nTms"] = index + 1;
+        // });
+      }
+    });
   },
   funcpaydel: () => {
     const selData = deDuctibleEditRef?.value?.getSelectRow();

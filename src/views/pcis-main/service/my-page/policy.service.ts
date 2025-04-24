@@ -1448,4 +1448,9 @@ downloadDistTemplate(data) {
       responseType: 'blob'
   });
 }
+exportDist(data) {
+  return request.post(`/policy/exportDist`, data, {
+      responseType: 'blob'
+  });
+}
 }

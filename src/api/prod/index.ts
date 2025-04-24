@@ -1235,4 +1235,12 @@ export function downloadDistTemplate(queryParams: any): AxiosPromise<any> {
 export function syncDist(queryParams: any): AxiosPromise<any> {
   return post(`/policy/syncDist`, queryParams);
 }
+export function exportDist(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/exportDist`, queryParams);
+}
+//免赔接口查询
+export function getPrdDeductible(queryParams: any): AxiosPromise<any> {
+  return post(`/proddef/getPrdDeductible`, queryParams);
+}
+
 

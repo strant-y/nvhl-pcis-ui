@@ -27,6 +27,7 @@ import {
   deleteDist,
   downloadDistTemplate,
   syncDist,
+  exportDist
 } from "@/api/prod/index";
 import { saveAs } from "file-saver";
 import { formInit } from "@/shared/from-init";
@@ -251,6 +252,25 @@ const method = {
         ElMessage.error("请先保存申请单!");
       }
     });
+  },
+  exportExcel: () => {
+    let paramitem  = Object.assign(formconfig1.value, {
+      cComponentTable: cComponentTableValue,
+      cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
+    });
+    policyService
+      .exportDist(paramitem).then((res) => {
+        if (res.size <= 0) {
+          ElMessage.error({ message: "导出出错", duration: 3000 });
+          return;
+        }
+        const fileName = `营业场所地址清单.xls`;
+        const blob = new Blob([res.data], {
+          responseType:
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
+        });
+        saveAs(blob, fileName);
+      })
   },
   //模板下载
   downloadTemp: () => {
