@@ -69,16 +69,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				params: { 'CDptCde': user.value['companyId'] }, 
         func: (val) =>{
           console.log("qqqqqqqqqq", val)
-          let s = freeEditRef.value?.getFromSchemaItem('cProdNo')
-          s['params'] = {'CRegDptCde': val, 'cStatus': '1'};          
-          s['typeCode'] = 'PROD_LIST';          
+          // let s = freeEditRef.value?.getFromSchemaItem('cProdNo')
+          // s['params'] = {'CRegDptCde': val, 'cStatus': '1'};
+          // s['typeCode'] = 'PROD_LIST';
         }
 			},
       {
         prop: "CProdNo",
         inputtype: "rtselect",
         title: "产品",
-        // typeCode: "PROD_LIST",
+        typeCode: "PROD_LIST_IN_GUIDE",
         // params: {'cStatus': '1'},
       },
       {
@@ -125,23 +125,19 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: 'TBgnTm',
         title: '保险起期',
         inputtype: "rtdatepicker",
-        type: "daterange",
 
-        
       },
       {
         prop: 'TEndTm',
         title: '保险止期',
         inputtype: "rtdatepicker",
-        type: "daterange",
-        
+
       },
       {
         prop: 'TUdrTm',
         title: '核保时间',
         inputtype: "rtdatepicker",
         format: 'YYYY-MM-DD HH:mm:ss',
-        type: "daterange",
         disabled: true,
         
       },
@@ -150,7 +146,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: '保批单生成时间',
         inputtype: "rtdatepicker",
         format: 'YYYY-MM-DD HH:mm:ss',
-        type: "daterange",
         disabled: true,
         
       },
@@ -159,7 +154,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: '打印时间',
         inputtype: "rtdatepicker",
         format: 'YYYY-MM-DD HH:mm:ss',
-        type: "daterange",
         disabled: true,
         
       },
@@ -186,7 +180,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: '缴费确认时间',
         inputtype: "rtdatepicker",
         format: 'YYYY-MM-DD HH:mm:ss',
-        type: "daterange",
         disabled: true,
       },
       {
@@ -201,12 +194,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 onMounted(async () => {
   if (props.type === "view" && props.data) {
     nextTick(()=>{
-      freeEditRef.value?.setFormValue(props.data);
-      const param = {
-        'CUniqueNo': props.data.CUniqueNo,
-        'CurrentUser': user.value['opCde']
-      };  
-      loadPayConfirmInfo(param); 
+      // freeEditRef.value?.setFormValue(props.data);
+      // const param = {
+      //   'CUniqueNo': props.data.CUniqueNo,
+      //   'CurrentUser': user.value['opCde']
+      // };
+        const param = {
+            'CUniqueNo': props.data.cUniqueNo,
+        };
+        loadPayConfirmInfo(param);
     })
   }
 });
@@ -214,13 +210,29 @@ function loadPayConfirmInfo(param: any) {
   pcisQueryService.loadPayConfirmInfo(param).then((res: any) => {
       if (null != res && null != res['code']) {
           if (res['code'] === 200) {
-              const data = res['data']['result'];
+              const data = res['data'];
               console.log("eeeeeeee", data)
+              const newdata = {};
+              Object.keys(data).forEach((key) => {
+                  const k = firstCharUpper(key);
+                  newdata[k] = data[key];
+              });
+              freeEditRef.value?.setFormValue(newdata);
           }
       }
   }, error => {
       ElMessage.error('连接失败！' + error);
   });  
+}
+/**
+ * 首字母转换大写
+ * @param {string} str
+ * @returns {string}
+ */
+function  firstCharUpper(str: string) {
+    return str.replace(/\b(\w)(\w*)/g, function ($0, $1, $2) {
+        return $1.toUpperCase() + $2;
+    });
 }
 </script>
 

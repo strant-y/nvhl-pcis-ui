@@ -97,21 +97,21 @@ const formconfig1 = ref<AppFreeEditConfig>(
         func: () => {
           freeEditRef.value?.validate().then(() => {
             const s = freeEditRef.value?.getFromValue();
-            const processedData = Object.keys(s).reduce(
-              (acc, key) => {
-                const newKey = key.replace(/^Dist\./, "");
-                acc[newKey] = s[key];
-                return acc;
-              },
-              {} as Record<string, any>
-            );
+            // const processedData = Object.keys(s).reduce(
+            //   (acc, key) => {
+            //     const newKey = key.replace(/^Dist\./, "");
+            //     acc[newKey] = s[key];
+            //     return acc;
+            //   },
+            //   {} as Record<string, any>
+            // );
             const params = Object.assign(
               {
                 cProdNo: route.params.param.cProdNo,
                 cComponentTable: cComponentTable,
                 cAppNo: appNo.value,
               },
-              { dist: processedData }
+              { dist: s }
             );
             saveDist(params).then((res) => {
               if (res.code === 200) {
@@ -136,13 +136,14 @@ const formconfig1 = ref<AppFreeEditConfig>(
 );
 
 onMounted(() => {
-  console.log("98888888", props.data);
   dataParams.value = opertaor.getDataAll();
   appNo.value = dataParams.value.plyBase["Base.cAppNo"];
   formconfig1.value.fromSchema = props.data.fromSchema;
   formconfig1.value.title = props.data.title;
   if (props.data.title == "编辑") {
-    freeEditRef.value?.setFormValue(props.data.rowData);
+    setTimeout(() => {
+      freeEditRef.value?.setFormValue(props.data.rowData);
+    }, 100);
   } else {
   }
 });

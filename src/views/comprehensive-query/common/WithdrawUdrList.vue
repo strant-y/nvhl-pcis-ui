@@ -111,10 +111,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "datetimerange",
         format: "YYYY-MM-DD HH:mm:ss",
         valueFormat: "YYYY-MM-DD HH:mm:ss",
-        defaultValue: [
-          moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format('YYYY-MM-DD 00:00:00'),
-          moment(new Date()).format('YYYY-MM-DD 23:59:59')
-        ],
       },
     ],
   })
@@ -227,21 +223,26 @@ const tableconfig = reactive<AppTableConfig>(
   })
 );
 
-onMounted(async () => {});
+onMounted(async () => {
+    freeEditRef.value?.setValue("dateRange", [
+        moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format('YYYY-MM-DD 00:00:00'),
+        moment(new Date()).format('YYYY-MM-DD 23:59:59')
+    ]);
+});
 
 watch(
   () => props.refreshData,
   (n,o) => {
     // 自动刷新列表获取数据
-    pageresult.list = [
-      {},{}
-    ]
-    pageresult.total = 2;
-    // 上面代码是仅用于本地调试
-    if(n) {
-      console.log(n,'投保待撤回任务')
-      // handleQuery(true);
-    }
+    // pageresult.list = [
+    //   {},{}
+    // ]
+    // pageresult.total = 2;
+    // // 上面代码是仅用于本地调试
+    // if(n) {
+    //   console.log(n,'投保待撤回任务')
+    //   // handleQuery(true);
+    // }
   },
   { 
     deep: true,
@@ -307,6 +308,7 @@ function handleQuery(flag?: boolean) {
     orgCde: user.value.companyId,
     roleCde: roleCde,
     operId: user.value.opCde,
+    udrType: '5',
   }, s, r);
   delete params.dateRange;
   let udrData;
@@ -320,11 +322,11 @@ function handleQuery(flag?: boolean) {
     udrData = getNewUdrList(params);
   }
   udrData.then((res) => {
-    const { code, data, msg } = res;
+    const { code, data, msg ,totalCount} = res;
     if (200 === code) {
       pageresult.list = [];
-      pageresult.list = data.result;
-      pageresult.total = data.total;
+      pageresult.list = data;
+      pageresult.total = totalCount;
     } else {
       ElMessage.error(msg);
     }

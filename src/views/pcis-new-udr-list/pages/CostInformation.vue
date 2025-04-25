@@ -18,7 +18,7 @@
           type: 'primary',
           label: '比较',
           func: () => {
-            compareAppFee();
+            compareAppFee('0');
           },
         }"
       />
@@ -210,6 +210,7 @@ const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     title: "费用信息",
     editFlag: true,
+    isPage: "false",
     editList: ["nFeeProp","nFee","cFeeFlag"],
     fromSchema: [
       {
@@ -253,9 +254,10 @@ const tableconfig1 = reactive<AppTableConfig>(
   createTableEditConfig({
     title: "更改比较",
     editFlag: true,
+    isPage: "false",
     fromSchema: [
       {
-        prop: "cTypCde",
+        prop: "nSeqNo",
         inputtype: "rtinput",
         title: "序号",
         minWidth: 180,
@@ -270,6 +272,12 @@ const tableconfig1 = reactive<AppTableConfig>(
         prop: "cRelTableNme",
         inputtype: "rtinput",
         title: "批改项目",
+        minWidth: 180,
+      },
+      {
+        prop: "cRelFldNme",
+        inputtype: "rtinput",
+        title: "类型",
         minWidth: 180,
       },
       {
@@ -574,18 +582,17 @@ function readOnlyAB() {
 
 }
 //比较接口
-function compareAppFee() {
+function compareAppFee(saveFlag:any) {
   const paramStr = {
     appNo: params['appNo'],//保单号
     nPrm: String(params['nPrm']),  
-    saveFlag: "0",
+    saveFlag:saveFlag,
     feeList: pageresult.list,
     nUpdRateA:String(freeEditRef.value?.getValue("A1_value")) ,
     nUpdRateB: String(freeEditRef.value?.getValue("B1_value")),
     allFeeProp: String(freeEditRef.value?.getValue("nFeePropSum")),
     allFee:String(freeEditRef.value?.getValue("nPrmSum"))
   };
-  console.log(paramStr)
   compareAppFeeInfo(paramStr)
     .then((res:any) => {
       if (res.code == 200) {
@@ -594,6 +601,9 @@ function compareAppFee() {
         pageresult1.list = [];
         pageresult1.list = res.data;
         pageresult1.total = res.data.length;
+        pageresult1.list.forEach((item, index) => {
+          item.nSeqNo = index + 1;
+        });
   
       } else {
         ElMessage.error(res.msg);
@@ -630,12 +640,13 @@ function compareAppFee() {
                   appNo: props.data?.cAppNo,
                   A1_value:String(freeEditRef.value?.getValue("A1_value")),
                   B1_value:String(freeEditRef.value?.getValue("B1_value")),
-                  Coper: JSON.parse(sessionStorage.getItem("user")).opCde,
+                  Coper: JSON.parse(String(sessionStorage.getItem("user"))).opCde,
                 };
                 updateIIogFee(paramStr2)
                 .then((res1:any) => {
                   if (null != res1 && null != res1['code']) {
                     if (res1['code'] === 200) {
+                      compareAppFee('1');
                       ElMessage.success('iLog费用信息同步:' + res1['msg'],);
                     } else {
                       ElMessage.error('iLog费用信息同步失败');
@@ -664,12 +675,13 @@ function compareAppFee() {
             appNo: props.data?.cAppNo,
             A1_value:String(freeEditRef.value?.getValue("A1_value")),
             B1_value:String(freeEditRef.value?.getValue("B1_value")),
-            Coper: JSON.parse(sessionStorage.getItem("user")).opCde,
+            Coper: JSON.parse(String(sessionStorage.getItem("user"))).opCde,
           };
           updateIIogFee(paramStr2)
           .then((res1:any) => {
             if (null != res1 && null != res1['code']) {
               if (res1['code'] === 200) {
+                compareAppFee('1');
                 ElMessage.success('iLog费用信息同步:' + res1['msg'],);
               } else {
                 ElMessage.error('iLog费用信息同步失败');

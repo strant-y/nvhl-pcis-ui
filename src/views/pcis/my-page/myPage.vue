@@ -46,7 +46,7 @@
                     <el-anchor-link
                       v-for="(k, i) in pageConfig?.pageInfo"
                       :key="i"
-                      :href="`#${k.pageKey}`"
+                      :href="`#${(k.pageKey === 'dist' || k.pageKey === 'distSummary')? k.pageCode : k.pageKey}`"
                       
                       v-show="k.pageKey !== 'acctinfo' ? acctinfoFlag : true"
                     >
@@ -144,14 +144,15 @@
                   class="card_"
                   v-for="(k, i) in pageConfig?.pageInfo"
                   :key="i"
-                  :id="k.pageKey"
+                  :id="(k.pageKey === 'dist' || k.pageKey === 'distSummary')? k.pageCode : k.pageKey"
                   v-show="k.pageKey !== 'acctinfo' ? acctinfoFlag : true"
                 >
                   <component
                     v-if="currentIndex >= i"
                     :ref="
                       (res) => {
-                        opertaor.addTableRef(k.pageKey, res);
+                        const pageK = (k.pageKey === 'dist' || k.pageKey === 'distSummary')? k.pageCode : k.pageKey
+                        opertaor.addTableRef(pageK, res);
                       }
                     "
                     :is="
@@ -496,6 +497,14 @@ const basicBtn = [
  */
 const edrBtn = [
   createFreeButtonBase({
+      label: "原保单查看",
+      type: "primary",
+      id: "btnCalEdr",
+      func: () => {
+        getPlyPolicyFun();
+      },
+  }),
+  createFreeButtonBase({
     label: "保费计算",
     type: "primary",
     id: "btnCalEdr",
@@ -815,6 +824,28 @@ async function loadAfter() {
     } else if (props.param.cAppTyp == "A") {
       bthList.value = basicBtn;
     }
+  } else if (props.param.pageType === "PLY_APP_MODIFY_BOUNCED_SCENE") {
+      // 投保单核保退回
+      const cAppNo = props.param.cAppNo;
+      loadAppPlyInfo(cAppNo);
+      bthList.value = basicBtn;
+  }else if (props.param.pageType === "EDR_APP_MODIFY_BOUNCED_SCENE") {
+      // 批改单核保退回
+      const cAppNo = props.param.cAppNo;
+      loadAppPlyInfo(cAppNo);
+      bthList.value = edrBtn;
+      nextTick(() => {
+          opertaor.setDisabledAll();
+          getEdrRsnItemFun(
+              props.param["cProdNo"],
+              props.param["cDptCde"],
+              props.param["cEdrRsnBundleCde"],
+              props.param["cEdrRsnBundleCde"],
+              props.param["cEdrType"],
+              props.param["cGrpMrk"]
+          );
+      });
+      edritem.value?.handleQuery();
   } else if (props.param.pageType === "PLY_UW_PROCESS_SCENE") {
     //核保处理
     nextTick(() => {
@@ -1308,6 +1339,34 @@ const getEdrRsnItemFun = (
   });
 };
 /**
+ * 原保单查看
+ * **/
+const getPlyPolicyFun = () =>{
+    const param = {
+        scene: 'EDR_APP_NEW_SCENE',
+        CPlyNo:opertaor.getTableRefByKey("plyBase").getValue("Base.cPlyNo")
+    };
+    getAppPolicy(param).then((res) => {
+        console.log("投保单明细", res);
+        if (res["code"] == "200") {
+            const en = JSON.stringify({
+                cAppNo: res["res"]["composition"]["plyBase"][0]['Base.cAppNo'],
+                cAppTyp: res["res"]["composition"]["plyBase"][0]['Base.cAppTyp'],
+                cCiMrk: res["res"]["composition"]["plyBase"][0]['Base.cCiMrk'],
+                cProdNo: res["res"]["composition"]["plyBase"][0]['Base.cProdNo'],
+                cGrpMrk: res["res"]["composition"]["plyBase"][0]['Base.cGrpMrk'],
+                cDptCde: res["res"]["composition"]["plyBase"][0]['Base.cDptCde'],
+                pageType: "readonly",
+            });
+            const query = new URLSearchParams({ param: en });
+            const url = window.location.origin
+                + '/#/pcis/my-page?'
+                + query.toString();
+            window.open(url, '_blank');
+        }
+    });
+}
+/**
  *批改单保费计算
  ***/
 const calcPremiumEdr = () => {
@@ -1412,18 +1471,18 @@ const calcPremiumEdrSurrender = () => {
     btn.loading = false;
     console.log("批改计算", res);
     if (res["code"] == "200") {
-      const ops = opertaor.convertData(res);
       ElMessage.success(
-        res.msg +
+          res.msg +
           "保费为：" +
-          ops["base"]["Base.nPrm"]+
+          res["res"]["composition"]["plyBase"][0]["Base.nPrm"]+
           "; 保费变化量为：" +
           res["res"]["composition"]["plyBase"][0]["Base.nPrmVar"]
       );
-      opertaor.setDataAll(ops);
       nAmt.value = res["res"]["composition"]["plyBase"][0]["Base.nAmt"];
-      nPrm.value = res["res"]["composition"]["plyBase"][0]["Base.nPrm"];
+      nPrm.value = res["res"]["composition"]["EdrBase"][0]["Base.nPrm"];
       tmDay.value = res["res"]["composition"]["plyBase"][0]["Base.cTmSysCde"];
+      const ops = opertaor.convertData(res);
+      opertaor.setDataAll(ops);
       if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
           if (

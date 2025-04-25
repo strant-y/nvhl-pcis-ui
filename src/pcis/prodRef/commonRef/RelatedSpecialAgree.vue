@@ -211,7 +211,7 @@ const handleConfirm = () => {
     cCrtCde: user.opCde,
     cUpdCde: user.opCde,
     webPrdProdSpecRelDTOList,
-    // cSpecNo: param,
+    cSpecNo: param,
     cProdNo: tabref.getFromValue().cProdNo,
   };
   associationSpec(newParam)

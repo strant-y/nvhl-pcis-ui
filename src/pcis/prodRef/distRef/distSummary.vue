@@ -27,7 +27,6 @@ import {
   deleteDist,
   downloadDistTemplate,
   syncDist,
-  exportDist
 } from "@/api/prod/index";
 import { saveAs } from "file-saver";
 import { formInit } from "@/shared/from-init";
@@ -93,22 +92,7 @@ const getCComponentTableValue = (cProdNo: string, title: string): string => {
 
 const formconfig11 = ref<any>({});
 onMounted(async () => {
-  console.log(tableconfig.value,"09999")
-  // const processedFromSchema = props.pageSchema.fromSchema.map((item) => {
-  //   return Object.keys(item).reduce(
-  //     (acc, key) => {
-  //       if (typeof item[key] === "string" && item[key].startsWith("Dist.")) {
-  //         acc[key] = item[key].replace(/^Dist\./, "");
-  //       } else {
-  //         acc[key] = item[key];
-  //       }
-  //       return acc;
-  //     },
-  //     {} as Record<string, any>
-  //   );
-  // });
   formconfig11.value = formInit(
-    // JSON.stringify({ ...props.pageSchema, fromSchema: processedFromSchema }),
     JSON.stringify({ ...props.pageSchema }),
     method,
     exRules
@@ -172,7 +156,6 @@ const method = {
     });
   },
   funcdistadd: () => {
-    console.log("22", opertaor.getTableRefs());
     let baseFlag = opertaor.getDataAll().plyBase["Base.cAppNo"];
     checkAppBase({ cAppNo: baseFlag }).then((res) => {
       if (res.code === 200) {
@@ -225,9 +208,6 @@ const method = {
       if (res.code == 200) {
         pageresult.list = [];
         pageresult.list = res.data;
-        pageresult.list.forEach((item, index) => {
-          item.nSeqNo = index + 1;
-        });
       }
     });
   },
@@ -252,25 +232,6 @@ const method = {
         ElMessage.error("请先保存申请单!");
       }
     });
-  },
-  exportExcel: () => {
-    let paramitem  = Object.assign(formconfig1.value, {
-      cComponentTable: cComponentTableValue,
-      cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
-    });
-    policyService
-      .exportDist(paramitem).then((res) => {
-        if (res.size <= 0) {
-          ElMessage.error({ message: "导出出错", duration: 3000 });
-          return;
-        }
-        const fileName = `营业场所地址清单.xls`;
-        const blob = new Blob([res.data], {
-          responseType:
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
-        });
-        saveAs(blob, fileName);
-      })
   },
   //模板下载
   downloadTemp: () => {
@@ -305,6 +266,7 @@ function setUnDisabledByKeyList(key: any) {
       item.hidden = false;
     }
   });
+  console.log(key);
   // tableconfig.value.tableBtn?.forEach((item: any) => {
   //   if(item.id = key){
   //     item.hidden = false;
@@ -315,6 +277,7 @@ function setUnDisabledByKeyList(key: any) {
       tableconfig.value.tableBtn?.push(item);
     }
   });
+  console.log(tableconfig.value);
 }
 
 function getFormconfig() {

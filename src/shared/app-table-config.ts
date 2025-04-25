@@ -4,6 +4,7 @@ export interface AppTableConfig {
 
   id?: string; // 表单主键
   title?: string | null | undefined; // 功能标题
+  fixed?: boolean;  // 是否固定编辑列
   production?: boolean; //标题是否显示tooltip
   productionTitle?: string; //标题内容
   fromUi?: any | null; // formUi配置
@@ -12,6 +13,7 @@ export interface AppTableConfig {
   shadow?: boolean; // 显示边框阴影 默认true
   titleBtns?: Array<FreeButtonBase>; //标题处按钮
   tableBtn?: Array<FreeButtonBase>; //表格内按钮
+  titleBtnPosition?: "left" | "right" | null; // 表格操作按钮所在位置
   tableBtnPosition?: "left" | "right" | null; // 表格操作按钮所在位置
   tableBtnTitle?: string; //表格操作列title;
   tableBtnType?: "icon" | "text" | "btn"; // 表格操作按钮类型(文本/图标)
@@ -55,12 +57,14 @@ export function createTableEditConfig(
     title: config.title || null,
     showBtn: config.showBtn || true,
     shadow: config.shadow || true,
+    fixed: config.fixed || false,
     production: config.production || false,
     productionTitle: config.productionTitle || "",
     fromSchema: config.fromSchema || [],
     titleBtns: config.titleBtns || [],
     tableBtn: config.tableBtn || [],
     tableBtnTitle: config.tableBtnTitle || "操作",
+    titleBtnPosition: config.titleBtnPosition || 'left',
     tableBtnPosition: config.tableBtnPosition || null,
     tableBtnType: config.tableBtnType || "btn",
     tableBtnWidth: config.tableBtnWidth || "100",

@@ -13,6 +13,7 @@ import moment from "moment";
 import dayjs from "dayjs";
 import { useValidator } from "@/typings/useValidator";
 import { formatDate } from "@/utils/date";
+import { transpileModule } from "typescript";
 const { getRules } = useValidator();
 const opertaor = dataOpertaor();
 const props = defineProps({
@@ -41,14 +42,15 @@ const method = {
   
   },
   tInsrncBgnTmDisabled:(date:any)=>{ 
-    const tabref = opertaor.getTableRefs();
-    const baseBefore = tabref["insrnc"]?.getFromValue();
-    const startDate = new Date(baseBefore["Base.tInsrncBgnTm"])   // 开始时间   1
-   
-    const maxDate = new Date(startDate);  // 创建开始时间副本   365 
-    maxDate.setDate(startDate.getDate() + 365);  // 设置为今天起365天后的日期
-
-    return  date.getTime() < startDate.getTime() || date.getTime() > maxDate.getTime()
+    const fs = insrncEditRef?.value?.getFromValue();
+    if(fs){
+      const startDate = new Date(fs["Base.tInsrncBgnTm"])   // 开始时间   1
+      const maxDate = new Date(startDate);  // 创建开始时间副本   365 
+      maxDate.setDate(startDate.getDate() + 365);  // 设置为今天起365天后的日期
+      return  date.getTime() < startDate.getTime() || date.getTime() > maxDate.getTime()
+    }else{
+        return true;
+    }
   },
   bgnTmFn: (v) => {   
     const tabref = opertaor.getTableRefs();
@@ -74,16 +76,16 @@ const method = {
   suopeiFunc: (val) => {
     setFormItem("Base.tRunBgnTm", { rules: null, disabled: false }); //追溯/日落起期
     setFormItem("Base.tRunEndTm", { rules: null, disabled: false }); //追溯/日落止期
-    setFormItem("Base.reportBgnTm", { rules: null }); //追溯/日落起期
-    setFormItem("Base.reportEndTm", { rules: null }); //追溯/日落止期
+    setFormItem("Base.tReportBgnTm", { rules: null }); //延长报告期起始日期
+    setFormItem("Base.tReportEndTm", { rules: null }); //延长报告期终止日期
     if (val == "0") {
       //内索赔制 时，追溯/日落起止期必填
       setFormItem("Base.tRunBgnTm", { rules: [getRules("required", {})] }); //追溯/日落起期
       setFormItem("Base.tRunEndTm", { rules: [getRules("required", {})] }); //追溯/日落止期
     } else if (val == "1") {
       //期内发生制时，报告起始、终止日期必填
-      setFormItem("Base.reportBgnTm", { rules: [getRules("required", {})] }); //延长报告期起始日期
-      setFormItem("Base.reportEndTm", { rules: [getRules("required", {})] }); //延长报告期终止日期
+      setFormItem("Base.tReportBgnTm", { rules: [getRules("required", {})] }); //延长报告期起始日期
+      setFormItem("Base.tReportEndTm", { rules: [getRules("required", {})] }); //延长报告期终止日期
     }
     setValue("Base.isRetroSpect", "");
   },
@@ -105,7 +107,7 @@ const method = {
       setFormValue({
         "Base.tRunBgnTm": "",
         "Base.tRunEndTm": "",
-        "Base.tracingDays": "",
+        "Base.nTracingDays": "",
       });
     } else {
       //是否有追溯期/日落期没有值时, 且索赔基础名称为内索赔制 时，追溯/日落起止期必填
@@ -134,7 +136,7 @@ const method = {
       return;
     }
     setFormValue({
-      "Base.tracingDays": tm,
+      "Base.nTracingDays": tm,
     });
   },
   // 追溯止期
@@ -153,13 +155,12 @@ const method = {
       return;
     }
     setFormValue({
-      "Base.tracingDays": tm,
+      "Base.nTracingDays": tm,
     });
   },
-  // 延长报告期起期
-  reportBgnTmFn: (v) => {
-    const start = getValue("Base.reportBgnTm");
-    const end = getValue("Base.reportEndTm");
+  reportBgnTmFn: (v:any) => {
+    const start = getValue("Base.tReportBgnTm");
+    const end = getValue("Base.tReportEndTm");
     if (!end || !v) {
       return;
     }
@@ -167,18 +168,18 @@ const method = {
     if (tm < 0) {
       ElMessage.warning("终止日期不能小于起始日期");
       setFormValue({
-        "Base.reportBgnTm": null,
+        "Base.tReportBgnTm": null,
       });
       return;
     }
     setFormValue({
-      "Base.reportDays": tm,
+      "Base.nReportDays": tm,
     });
   },
   // 延长报告期止期
-  reportEndTmFn: (v) => {
-    const start = getValue("Base.reportBgnTm");
-    const end = getValue("Base.reportEndTm");
+  reportEndTmFn: (v:any) => {
+    const start = getValue("Base.tReportBgnTm");
+    const end = getValue("Base.tReportEndTm");
     if (!start || !v) {
       return;
     }
@@ -186,12 +187,12 @@ const method = {
     if (tm < 0) {
       ElMessage.warning("终止日期不能小于起始日期");
       setFormValue({
-        "Base.reportBgnTm": null,
+        "Base.tReportEndTm": null,
       });
       return;
     }
     setFormValue({
-      "Base.reportDays": tm,
+      "Base.nReportDays": tm,
     });
   },
 };

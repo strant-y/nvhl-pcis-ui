@@ -221,12 +221,16 @@ const tableconfig = reactive<AppTableConfig>(
 );
 
 onMounted(async () => {
+    freeEditRef.value?.setValue("dateRange", [
+        moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format('YYYY-MM-DD 00:00:00'),
+        moment(new Date()).format('YYYY-MM-DD 23:59:59')
+    ]);
   if(props.homeJumpData && Object.keys(props.homeJumpData).length) {
     await nextTick()
     // 给投保日期赋值
     freeEditRef.value.setValue('dateRange', [props.homeJumpData.startBsTm1, props.homeJumpData.endBsTm1])
     if(props.homeJumpData.value.hasOwnProperty('objId')) { //申请单号
-      freeEditRef.value[1].value[0].setValue('objId', props.homeJumpData.value.objId)
+      freeEditRef.value.setValue('objId', props.homeJumpData.value.objId)
     }
     await nextTick()
     handleQuery(true) //跳转过来自动查数据
@@ -243,16 +247,16 @@ const method = {
 watch(
   () => props.refreshData,
   (n,o) => {
-    // 自动刷新列表获取数据
-    pageresult.list = [
-      {},{}
-    ]
-    pageresult.total = 2;
-    // 上面代码是仅用于本地调试
-    if(n) {
-      console.log(n,'待修改单查询')
-      // handleQuery(true);
-    }
+    // // 自动刷新列表获取数据
+    // pageresult.list = [
+    //   {},{}
+    // ]
+    // pageresult.total = 2;
+    // // 上面代码是仅用于本地调试
+    // if(n) {
+    //   console.log(n,'待修改单查询')
+    //   // handleQuery(true);
+    // }
   },
   { 
     deep: true,
@@ -277,7 +281,8 @@ const exRules = {
 function handleQuery(flag?: boolean) {
   let roleCde = '';
   roles.forEach((res: any) => {
-    roleCde = roleCde === '' ? res.COpgrpCde : roleCde + ',' + res.COpgrpCde;
+    // roleCde = roleCde === '' ? res.COpgrpCde : roleCde + ',' + res.COpgrpCde;
+    roleCde = res
   });
 
   const tmArr = freeEditRef.value?.getValue("dateRange");
@@ -311,6 +316,7 @@ function handleQuery(flag?: boolean) {
     orgCde: user.value.companyId,
     roleCde: roleCde,
     operId: user.value.opCde,
+    udrType: '5'
   }, s, r);
   delete params.dateRange;
   let udrData;
@@ -324,11 +330,11 @@ function handleQuery(flag?: boolean) {
     udrData = getNewUdrList(params);
   }
   udrData.then((res) => {
-    const { code, data, msg } = res;
+    const { code, data, msg, totalCount } = res;
     if (200 === code) {
       pageresult.list = [];
-      pageresult.list = data.result;
-      pageresult.total = data.total;
+      pageresult.list = data;
+      pageresult.total = totalCount;
     } else {
       ElMessage.error(msg);
     }
@@ -344,9 +350,9 @@ function handleSelectionChange(selection: any) {
 
 // 工作流处理
 function handleWorkFlow(row: any) {
-  const { objId, taskId, state, prodNo, bsType } = row;
+  const { objId, curtTask, state, prodNo, bsType } = row;
   const param = {
-    taskId: taskId,
+    taskId: curtTask,
     user: user.value,
   };
   hasReceived(param).then((result: any) => {
@@ -361,31 +367,45 @@ function handleWorkFlow(row: any) {
             if(bsType === 'A') {
               const en = JSON.stringify({
                 scene: SCENE_PLY_APP_MODIFY_BOUNCED,
-                CAppNo: objId,
-                CProdNo: prodNo,
-                TaskId: taskId,
-                CAppTyp: bsType,
-                CCiMrk: r.data.cCiMrk,
-                CGrpMrk: r.data.cGrpMrk,
-                CDptCde: r.data.cDptCde,
+                cAppNo: objId,
+                cProdNo: prodNo,
+                taskId: curtTask,
+                cAppTyp: bsType,
+                cCiMrk: r.data.cCiMrk,
+                cGrpMrk: r.data.cGrpMrk,
+                cDptCde: r.data.cDptCde,
+                cDptCnm:row.uwDptName,
                 isPlan: r.data.cCardPlanNo ? 'Y' : null,
+                pageType:'PLY_APP_MODIFY_BOUNCED_SCENE'
               });
-              router.push({ path: '/index/pcis-query/detail', query: { data: en } });
+              router.push({
+                  path: "/pcis/my-page",
+                  query: {
+                      param: en,
+                  },
+              });
             }else{
               const en = JSON.stringify({
-                scene: SCENE_EDR_APP_MODIFY_BOUNCED,
-                CAppNo: objId,
-                CProdNo: prodNo,
-                TaskId: taskId,
-                CAppTyp: bsType,
-                CCiMrk: r.data.cCiMrk,
-                CRsnCde: r.data.cEdrRsnBundleCde,
-                CEdrType: r.data.cEdrType,
-                CGrpMrk: r.data.cGrpMrk,
-                CDptCde: r.data.cDptCde,
+                // scene: SCENE_EDR_APP_MODIFY_BOUNCED,
+                cAppNo: objId,
+                cProdNo: prodNo,
+                taskId: curtTask,
+                cAppTyp: bsType,
+                cCiMrk: r.data.cCiMrk,
+                cRsnCde: r.data.cEdrRsnBundleCde,
+                cEdrType: r.data.cEdrType,
+                cGrpMrk: r.data.cGrpMrk,
+                cDptCde: r.data.cDptCde,
+                cDptCnm:row.uwDptName,
                 isPlan: r.data.cCardPlanNo ? 'Y' : null,
+                pageType:'EDR_APP_MODIFY_BOUNCED_SCENE'
               });
-              router.push({ path: '/index/endorse/edit', query: { data: en } });
+                router.push({
+                    path: "/pcis/my-page",
+                    query: {
+                        param: en,
+                    },
+                });
             }
           }
         })

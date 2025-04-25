@@ -233,7 +233,7 @@ import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { terConfig } from "@/store/modules/term-config";
 const opertaor = dataOpertaor();
-
+const pageparam = opertaor.getParam();
 const terconfig = terConfig();
 
 const props = defineProps({
@@ -375,16 +375,50 @@ function getRowConfig(groupId: string, riskNo: string) {
   const all = collist.value.filter(
     (v: any) => v.cGroupId === groupId && v.cRiskNo === riskNo
   );
-
+  const tgt = opertaor.getTableRefByKey("tgt");
   const colMap = all.reduce(
     (acc, item: { [key: string]: any }) => {
       const key = item["cColId"];
       if (!acc[key]) {
         acc[key] = [];
       }
+
       let colconfig = Object.assign({}, item);
       colconfig["factorItem"] = getProp(item);
-      acc[key].push(colconfig);
+      // 040002产品特殊处理，判断 cDeterminingMethod ,显示需要的列
+      if (pageparam.cProdNo === "040002") {
+        let deter = null;
+        if (tgt) {
+          deter = tgt.getValue("Tgt.cDeterminingMethod");
+        }
+        if (deter && deter === "1") {
+          if (colconfig["cRiskNo"] === "042225") {
+            if (
+              colconfig["factorItem"]["prop"] !== "TermRisktgt.nPersonDeath"
+            ) {
+              acc[key].push(colconfig);
+            }
+          } else {
+            acc[key].push(colconfig);
+          }
+        } else if (deter && deter === "0") {
+          if (colconfig["cRiskNo"] === "042225") {
+            if (
+              colconfig["factorItem"]["prop"] !== "TermRisktgt.nDeathLimit" &&
+              colconfig["factorItem"]["prop"] !== "TermRisktgt.nDisabilityLimit"
+            ) {
+              acc[key].push(colconfig);
+            }
+          } else {
+            acc[key].push(colconfig);
+          }
+        } else {
+          acc[key].push(colconfig);
+        }
+      } else {
+        acc[key].push(colconfig);
+      }
+
       return acc;
     },
     {} as { [key: string]: any[] }
@@ -529,48 +563,53 @@ function initshowConfig() {
  * @returns
  */
 function exChangeFunc() {
-  const param = opertaor.getParam();
   const data: { [key: string]: any } = opertaor.getDataAll();
   extermConf.value = Object.assign({});
-  if (param.cProdNo === "043009") {
+  if (pageparam.cProdNo === "043009") {
     if (data["tgt"]["Tgt.cInsuranceMethod"]) {
       if (data["tgt"]["Tgt.cInsuranceMethod"] !== "613001") {
         if (colInfo.value && colInfo.value.length > 0) {
           const r = colInfo.value.filter(
-            (r) => r["cColTitle"] !== "费率" && r["cColTitle"] !== "总保费"
+            (r) =>
+              r["cColTitle"] !== "分项费率" && r["cColTitle"] !== "分项保费"
           );
           colInfo.value = r;
         }
 
         const ex = termFactormap.value.filter(
           (r) =>
-            r["prop"] === "Term.nInsuredCount" ||
-            r["prop"] === "Term.nAccidentLimit"
+            r["prop"] === "Term.nRateVal" || r["prop"] === "Term.nInsuranceFee"
         );
 
         extermConf.value = ex;
       }
-      const term = termFactormap.value.filter(
-        (r) =>
-          r["prop"] !== "Term.nInsuredCount" &&
-          r["prop"] !== "Term.nAccidentLimit"
-      );
+      const term = termFactormap.value.filter((r) => {
+        let s = r["prop"] !== "Term.nRateVal";
+        if (data["tgt"]["Tgt.cInsuranceMethod"] !== "613001") {
+          s = s && r["prop"] !== "Term.nInsuranceFee";
+        }
+        return s;
+      });
       termFactormap.value = term;
     } else {
       const r = colInfo.value.filter(
-        (r) => r["cColTitle"] !== "费率" && r["cColTitle"] !== "总保费"
+        (r) => r["cColTitle"] !== "分项费率" && r["cColTitle"] !== "分项保费"
       );
       colInfo.value = r;
 
       const term = termFactormap.value.filter(
-        (r) =>
-          r["prop"] !== "Term.nInsuredCount" &&
-          r["prop"] !== "Term.nAccidentLimit"
+        (r) => r["prop"] !== "Term.nRateVal"
       );
       termFactormap.value = term;
     }
   }
-  if (param.cProdNo === "043009") {
+  if (pageparam.cProdNo === "040002") {
+    if (data["tgt"]["Tgt.cDeterminingMethod"]) {
+      if (data["tgt"]["Tgt.cDeterminingMethod"] === "0") {
+        const col = colInfo.value.filter((r: any) => r.cColTitle !== "单位");
+        colInfo.value = col;
+      }
+    }
   }
 }
 function setDisabledAll() {

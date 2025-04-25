@@ -65,8 +65,9 @@
       </el-table-column>
       <el-table-column
         :label="item.tableBtnTitle"
-        v-if="item.tableBtnPosition === 'left'"
+        v-if="item.tableBtn && item.tableBtn.length > 0 && item.tableBtnPosition === 'left'"
         :width="item.tableBtnWidth ? item.tableBtnWidth : 100"
+        :fixed=" item.fixed ? (typeof item.fixed === 'boolean' ? (item.fixed ? 'left' : null ) : (item.fixed ==='1' ? 'left' : null)) : null"
         :align="item.align ? item.align : 'center'"
       >
         <template #default="scope">
@@ -152,9 +153,10 @@
       </template>
       <el-table-column
         :label="item.tableBtnTitle"
-        v-if="item.tableBtnPosition === 'right'"
+        v-if="item.tableBtn && item.tableBtn.length > 0 && item.tableBtnPosition === 'right' "
         :width="item.tableBtnWidth ? item.tableBtnWidth : 100"
         :align="item.align ? item.align : 'center'"
+        :fixed=" item.fixed ? (typeof item.fixed === 'boolean' ? (item.fixed ? 'right' : null ) : (item.fixed ==='1' ? 'right' : null)) : null"
       >
         <template #default="scope">
           <template v-for="(btn, index) in item.tableBtn" :key="index">
@@ -235,7 +237,7 @@ const props = defineProps({
 });
 
 const indexMethod = (index: number) => {
-  return index;
+  return index !== undefined ? index + 1 : 0;
 };
 
 /**
@@ -443,6 +445,10 @@ function tabValidate() {
 onMounted(() => {
   tableDatas.value = props.modelValue ? props.modelValue : [];
   tableDatas.value?.forEach((data) => {
+    if (!data) {
+      console.error('Invalid data item:', data);
+      return;
+    }
     // 初始化行数字Id
     data._dataId = getuuid();
     formItems.value[data._dataId] = creatItem(schamaconf.value);

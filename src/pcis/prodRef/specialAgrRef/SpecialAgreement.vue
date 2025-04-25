@@ -2,9 +2,7 @@
 <template>
   <div>
     <myCard :cardConfig="cardconfig">
-      <el-form ref="specialAgr" :model="formData" :inline-message="true">
-        <rttable v-model="formData" :item="tableconfig" ref="rttableFrom" />
-      </el-form>
+      <rttable v-model="formData" :item="tableconfig" ref="rttableFrom" />
     </myCard>
     <comDialog ref="dialog"></comDialog>
   </div>
@@ -35,7 +33,6 @@ import {
 import { deleteFactorBykey, getBasicKindList } from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 const opertaor = dataOpertaor();
-const specialAgr = ref("specialAgr");
 const formData = ref<any[]>([]);
 const dzmodal = useDzModal();
 const dialog = ref<DialogMethod | null>(null);
@@ -52,6 +49,8 @@ const props = defineProps({
     required: true,
   },
 });
+
+const rttableFrom = ref<any>(null);
 
 const cardconfig = ref(creatCardConfig({}));
 const moveUpTimer = ref(null);
@@ -80,11 +79,9 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Edit",
         hideBtns: (row) => {
-          console.log("改变状态的row", row);
           if (!row.cSpecialName.includes("**")) return true;
         },
         tableClick: (row) => {
-          console.log(row);
           dzmodal.open(specEdit, { type: "view", data: row }).then((res) => {
             if (res.type === "ok") {
             }
@@ -101,7 +98,8 @@ const tableconfig = reactive<AppTableConfig>(
         tableClick: (row) => {
           const list = formData.value;
           const i = list.findIndex((item) => item.cSpecNo === row.cSpecNo);
-          if (i !== -1) list.splice(i, 1);
+          rttableFrom.value.delRow(row._dataId);
+          // if (i !== -1) list.splice(i, 1);
           formData.value.forEach((item, index) => {
             item.index = index + 1;
           });
@@ -218,26 +216,40 @@ const method = {
     dialog.value?.open(
       "prdFixSpec",
       {
-        type: "show",
-        data: {
           cProdNo: param.cProdNo,
           selectedData: formData.value, //需要把自定义的过滤掉，只传过去从模板中选择的
         },
-        method: {
-          getSelected(selectdata: any) {
-            selectdata.forEach((item: any) => {
-              formData.value.push(item);
+      {
+        getSelected(selectdata: any) {
+            let len = formData.value.length;
+            let sel : any[] = [];
+            selectdata.forEach((item: any,index:number) => {
+              item.index = len + 1;
+              sel.push(item);
+              len++;
             });
-            formData.value.forEach((item, index) => {
-              item.index = index + 1;
+            
+            sel.forEach((item) => {
+              rttableFrom.value.addRowByData(item);
             });
-            dialog.value?.handleClose();
           },
-        },
       },
       { title: "添加特约", width: 85 }
     );
   },
+};
+const handleSelectedData = (selectdata: any[]) => {
+  selectdata.forEach((item: any) => {
+    formData.value.push({
+      index: formData.value.length + 1,
+      cIfMust: "0", // 默认值，根据实际情况调整
+      cSpecialCode: item['PrdFixSpec.CSpecNo'],
+      cSpecialName: item['PrdFixSpec.CNmeCn'],
+    });
+  });
+  formData.value.forEach((item, index) => {
+    item.index = index + 1;
+  });
 };
 // 绑定特殊验证器
 const exRules = {};

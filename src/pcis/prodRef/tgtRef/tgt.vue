@@ -68,6 +68,12 @@ const method = {
     if(cvrgref.showFlush){
       cvrgref.showFlush();
     }
+  },
+  cDeterminingChange:()=>{
+    const cvrgref = opertaor.getTableRefByKey("cvrg");
+    if(cvrgref.showFlush){
+      cvrgref.showFlush();
+    }
   }
 };
 

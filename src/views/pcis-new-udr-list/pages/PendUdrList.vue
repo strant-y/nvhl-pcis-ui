@@ -449,6 +449,7 @@
             showSelection: true,
             tableBtnType: "btn",
             tableBtnWidth: 200,
+            fixed:true,
             tableBtnPosition: ref<any>(""),
             tableBtnFixed: "right",
             tableBtn: ref<any>([]),
@@ -716,7 +717,7 @@
             id: "score",
             link: true,
             tooltip: "查看",
-            showKey: [3],
+            showKey: [3,4],
             type: "danger",
             size: "large",
             icon: "View",
@@ -728,13 +729,13 @@
             id: "score",
             link: true,
             tooltip: "承保流程",
-            showKey: [3],
+            showKey: [3,4],
             type: "danger",
             size: "large",
             icon: "Refresh",
             tableClick: (row) => {
                 let data;
-                if (udrTypeValue.value == "3") {
+                if (udrTypeValue.value == "3"||udrTypeValue.value == "4") {
                     data = { objId: row.objId, sysType: row.objExt };
                 } else {
                     data = {
@@ -947,10 +948,10 @@
             }
             // 切换表格 操作列 显示/隐藏
             tableObj.notWaitObj.tableBtn.value = [];
-            tableObj.notWaitObj.tableBtnPosition.value = "";
-            if (n !== "4") {
-                tableObj.notWaitObj.tableBtnPosition.value = "right";
-            }
+            tableObj.notWaitObj.tableBtnPosition.value = "right";
+            // if (n !== "4") {
+            //     tableObj.notWaitObj.tableBtnPosition.value = "right";
+            // }
             if (n !== "5") {
                 tableBtn.value.map((item: any, index: number) => {
                     const isVal = item.showKey.findIndex((vals: any) => vals == n);

@@ -12,6 +12,7 @@ import acctinfoRef from "./acctinfoRef/acctinfo.vue";
 // import ourCompanyCiShareRef from "./ourCompanyCiShareRef/ourCompanyCiShare.vue";
 // import ciRef from "./ciRef/ci.vue";
 import distRef from "./distRef/dist.vue";
+import distSummaryRef from "./distRef/distSummary.vue";
 import tgtRef from "./tgtRef/tgt.vue";
 import cvrgRef from "./cvrgRef/cvrg.vue";
 import plyCvrg04Ref from "./cvrgRef/plyCvrg04.vue";
@@ -80,6 +81,7 @@ const componentMap = {
   payinfoRef: payinfoRef,
   acctinfoRef: acctinfoRef,
   distRef: distRef,
+  distSummaryRef:distSummaryRef,
   deductibleDistRef:deductibleDist,
   // ciRef: ciRef,
   // ciMasterAgreementRef: ciMasterAgreementRef,

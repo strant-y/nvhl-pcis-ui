@@ -28,6 +28,7 @@ const props = defineProps({
 
 const applicantEditRef = ref<AppFreeEditMethod | null>(null);
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { getDefaultCompilerOptions } from "typescript";
 const opertaor = dataOpertaor();
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));
@@ -129,7 +130,7 @@ const method = {
     });
   },
   funcreset: () => {
-    console.log(332)
+    console.log(332);
     const tabref = opertaor.getTableRefs();
     const applicantValue = tabref["applicant"].getFromValue();
     for (const k in applicantValue) {
@@ -148,7 +149,7 @@ const method = {
       disabled: false,
     });
 
-    tabref ['applicant'].setFormValue(applicantValue);
+    tabref["applicant"].setFormValue(applicantValue);
   },
   cardTypeChange: (val) => {
     if (val == "120001") {
@@ -419,6 +420,58 @@ const method = {
         setValue("Applicant.cSex", sex);
       }
     }
+  },
+  //注册地市是否同上
+  isSameChange: (val) => {
+    console.log(val, "0000");
+    if (val == "1") {
+      // 获取常驻地址的值
+      // const residenceAddr = applicantEditRef.value?.getValue(
+      //   "Applicant.cResidenceAddr"
+      // );
+      // console.log("00009999", residenceAddr);
+      // applicantEditRef.value?.setValue(
+      //   "Applicant.cRegisteredcapDre",
+      //   residenceAddr
+      // );
+    } else {
+    }
+  },
+  //注册地址
+  getCountry:(val)=>{
+    if(val){
+      // Applicant.cClntAddr 常住地址
+      console.log("0000",val)
+      applicantEditRef?.value?.setValue(
+        "Applicant.cRegisteredcapDre",
+        val
+      );
+    }
+  },
+  //常住地址
+  getAllProp:(val)=>{
+    console.log("999",val)
+    applicantEditRef?.value?.setValue(
+      "Applicant.cClntAddr",
+      val
+    );
+  },
+  //注册地址(input)
+  getcSuffixAddr:(val)=>{
+    const currentRegistAddr = applicantEditRef?.value?.getValue("Applicant.cRegisteredcapDre") || "";
+    applicantEditRef?.value?.setValue(
+    "Applicant.cRegisteredcapDre",
+    `${currentRegistAddr}${val}`
+  );
+    // console.log("555",val)
+  },
+  //常住地址(input)
+  getcRegisterSuffixAddr:(val)=>{
+    const currentAddr = applicantEditRef?.value?.getValue("Applicant.cClntAddr") || "";
+    applicantEditRef?.value?.setValue(
+    "Applicant.cClntAddr",
+    `${currentAddr}${val}`
+  );
   },
 };
 

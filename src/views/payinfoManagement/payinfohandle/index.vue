@@ -31,6 +31,7 @@ import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service'
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { log } from "console";
 import { saveAs } from 'file-saver';
+import { useRoute, useRouter, RouteRecordRaw } from "vue-router";
 const pcisQueryService = new PcisQueryService();
 const policyService = new PolicyService();
 const dzmodal = useDzModal();
@@ -50,6 +51,7 @@ const cPayStatusList = [
   {value: '1', label: '已缴费'},
   {value: '2', label: '修改缴费'},
 ];
+const router = useRouter();
 const cCheckStsList = [
     {value: '00', label: '待缴费'},
     {value: '0', label: '待登记'},
@@ -545,6 +547,10 @@ const tableconfig = reactive<AppTableConfig>(
 					type: "primary",
 					label: "支票登记",
 					func: async () => {
+                        if (multipleSelection.value.length < 1 ) {
+                            ElMessage.warning('所选记录为空！');
+                            return ;
+                        }
                         let CUniqueNos = ''; // 所选项的流水号组合
                         let isOpen =  false;
                         let message = '';
@@ -572,6 +578,32 @@ const tableconfig = reactive<AppTableConfig>(
 						});
 					},
 				}),
+				createFreeButtonBase({
+					type: "primary",
+					label: "在线缴费",
+					func: async () => {
+                        if (multipleSelection.value.length < 1 ) {
+                            ElMessage.warning('所选记录为空！');
+                            return ;
+                        }
+                        let cPaySequences = ''; // 所选项的支付号
+                        let isOpen =  false;
+                        let message = '';
+                        multipleSelection.value.forEach(item => {
+                            if ('18' !== item['cPayTyp']) {
+								isOpen = true;
+                                message='该单缴费类型错误，只能对在线支付的单进行在线缴费！ 【申请单号='+item['cAppNo']+'】'
+								return;
+						  	}
+                            cPaySequences = cPaySequences === '' ? item['cPaySequence'] : cPaySequences + ',' + item['cPaySequence'];
+                        });
+                        if (isOpen) {
+                            ElMessage.warning(message);
+                            return;
+                        }
+						window.open('http://t.yaic.com.cn:12003/02/'+cPaySequences)
+					},
+				}),
 			// createFreeButtonBase({
 			// 	type: "primary",
 			// 	label: "导出Excel",
@@ -589,36 +621,52 @@ const tableconfig = reactive<AppTableConfig>(
 		],
 		tableBtnType: "btn",
 		tableBtnWidth: 150,
-		// tableBtnPosition: "right",
+		tableBtnPosition: "right",
 		tableBtnFixed: "right",
-		// tableBtn: [
-			// createFreeButtonBase({
-			// 	id: "score",
-			// 	link: true,
-			// 	tooltip: "详情",
-			// 	type: "success",
-			// 	size: "large",
-			// 	icon: "View",
-			// 	tableClick: (row) => {
-			// 		dzmodal.open(payConfirmInfoDetailRead, { type: "view", data: row }).then((res) => {
-			// 			if (res.type === "ok") {
-			// 				console.log("详情")
-			// 			}
-			// 		});
-			// 	},
-			// }),
-			// createFreeButtonBase({
-			// 	id: "score",
-			// 	link: true,
-			// 	tooltip: "文档",
-			// 	type: "success",
-			// 	size: "large",
-			// 	icon: "Document",
-			// 	tableClick: (row) => {
-          	// 		console.log("编辑")
-			// 	},
-			// }),
-		// ],
+        fixed:true,
+		tableBtn: [
+			createFreeButtonBase({
+				id: "score",
+				link: true,
+				tooltip: "查看缴费信息",
+				type: "success",
+				size: "large",
+				icon: "View",
+				tableClick: (row) => {
+					dzmodal.open(payConfirmInfoDetailRead, { type: "view", data: row }).then((res) => {
+						if (res.type === "ok") {
+							console.log("详情")
+						}
+					});
+				},
+			}),
+			createFreeButtonBase({
+				id: "score",
+				link: true,
+				tooltip: "查看投保单信息",
+				type: "success",
+				size: "large",
+				icon: "Document",
+				tableClick: (row) => {
+                    const en = JSON.stringify({
+                        cAppNo: row['cAppNo'],
+                        cAppTyp: row['cAppTyp'],
+                        cCiMrk: row['cCiMrk'],
+                        cEdrRsnBundleCde: row['cEdrRsnBundleCde'],
+                        cProdNo: row['cProdNo'],
+                        cGrpMrk: row['cGrpMrk'],
+                        cDptCde: row['cDptCde'],
+                        pageType: "readonly",
+                    });
+                    router.push({
+                        path: "/pcis/my-page",
+                        query: {
+                            param: en,
+                        },
+                    });
+				},
+			}),
+		],
 		fromSchema: [
 			{
 				prop: "cAppNo",
@@ -717,6 +765,15 @@ onMounted(async () => {
     freeEditRef.value?.setValue('LoadSub', 1)
     freeEditRef.value?.setValue('TUnTmStart', startTm)
     freeEditRef.value?.setValue('TUnTmEnd', endTm)
+    freeEditRef.value.setValue("AccDpt", user.value['companyId']);
+    setFormItem("AccDpt", {
+      loadData: [
+          {
+              label: user.value['companyCnm'],
+              value: user.value['companyId'],
+          },
+      ],
+    });
   })  
   getListByCode('WEB_BAS_CODELIST', {
       'cParCde': 'shoufeifangshi',

@@ -201,9 +201,7 @@ onMounted(() => {
         let coms: any[] = [];
         if (data && data.length > 0) {
           data.forEach((el: any) => {
-            if (el.cComponentTab !== "dist") {
-              coms.push(el);
-            }
+            coms.push(el);
           });
         }
         componentList.value = coms;
