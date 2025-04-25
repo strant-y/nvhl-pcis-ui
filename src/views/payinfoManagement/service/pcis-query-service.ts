@@ -1,6 +1,7 @@
 import {AxiosPromise} from "axios";
 import {post} from "@/utils/http";
 import {del} from "@/utils/http";
+import { get } from "lodash";
 /**
  * 查询服务
  */
@@ -44,6 +45,10 @@ export class PcisQueryService {
     qryPayFaildListUrl = 'cash/qryPayFaildList'; // 获取支付失败的异常账户列表
     qryAppCustomerPolicyUrl = 'policy/getAppPolicyListByCustomerInfo';
     qryCustomerEquityPolicyUrl = 'policy/getCustomerEquityInfo';
+    qryNotifyByReceiver = '/notify/getNotifyByReceiver';  // 消息提醒
+    HistoryClaimYearAll = '/policy/qryHistoryClaimYearAll'; // 历史赔案-年度
+    HistoryClaimYearDetail = '/policy/qryHistoryClaimYearDetail'; // 历史赔案-年度明细
+    HistoryClaimDetail = '/policy/qryHistoryClaimDetail'; // 历史赔案-赔案明细
 
     /**
      * 查询客户权益
@@ -582,5 +587,24 @@ export class PcisQueryService {
      */
     saveCiPolicy(ops: any): AxiosPromise<any> {
         return post(`policy/saveCiPolicy`, ops);
+    }
+
+
+    // 消息信息 顶部导航喇叭
+    getNotifyByReceiver(ops: any): AxiosPromise<any> {
+        return post(`${this.qryNotifyByReceiver}`,ops)
+    }
+ 
+    // 历史赔案 年度
+    qryHistoryClaimYearAll(ops: any): AxiosPromise<any> {
+        return post(`${this.HistoryClaimYearAll}`,ops)
+    }
+    // 历史赔案 年度明细
+    qryHistoryClaimYearDetail(ops: any): AxiosPromise<any> {
+        return post(`${this.HistoryClaimYearDetail}`,ops)
+    }
+    // 历史赔案 赔案明细
+    qryHistoryClaimDetail(ops: any): AxiosPromise<any> {
+        return post(`${this.HistoryClaimDetail}`,ops)
     }
 }

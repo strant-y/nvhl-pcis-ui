@@ -27,6 +27,10 @@ import { permission } from 'process';
 const opertaor = dataOpertaor();
 opertaor.init();
 const props = defineProps({
+  visible: {
+      type: Boolean,
+      default: false,
+    },
   queryParam: {
     type: Object,
     required: true,
@@ -35,6 +39,12 @@ const props = defineProps({
     }
   },
 })
+
+const isVisible = computed(() => props.visible);
+// const props = defineProps({
+//   data: String,
+//   inititle: Array,
+// });
 
 let cGrpMrk =opertaor.getDataAll()['plyBase']['Base.cGrpMrk'];
 // let cGrpMrk =1;
@@ -319,6 +329,10 @@ const close = (type) => {
   // 关闭该弹框
   emits('ok', type)
 };
+
+const isShow = () =>{
+  dialogVisible.value = true
+}
 
 onMounted(() => {
   //投保单号；这里逻辑有问题，angular路径src\app\routes\pcis-main\prodDef\common\invoice-info-model\invoice-info-model.component.ts

@@ -13,16 +13,21 @@
 
     <el-row>
       <el-col :md="24">
-        <el-card shadow="never" class="index-blk" style="position: relative;">
+        <el-card v-if="isOperate || isAudit" shadow="never" class="index-blk" style="position: relative;">
+
           <el-tabs @tab-click="handleTabClick">
             <el-tab-pane v-for="tab in tabs" :key="tab.name" :label="tab.name">
-              <app-table :key="currentTabName" :tableConfig="tableconfig" v-model:pageresult="tab.content"
-                ref="tableRef" @row-click="(row) => toQuery2(row, tab)" />
             </el-tab-pane>
           </el-tabs>
-          <div style="display: block; position: absolute; top: 30px; right: 20px;">
+
+          <app-table :key="currentTabName" :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
+            @row-click="(row) => toQuery2(row, tab)" />
+
+          <div style="display: block; position: absolute; top: 8px; right: 20px;">
             <a @click="toQuery(moreurl)" class="sty">更多>></a>
           </div>
+          
+ 
         </el-card>
       </el-col>
     </el-row>
@@ -64,86 +69,159 @@ const tabs = ref<Array<any>>([]); //tabs数组
 const currentTabName = ref('暂存任务') //tabs默认值
 // const isOperate = ref(false)  //管理员
 //todo  假数据先写死
-const isOperate = ref(false) //管理员
-const isAudit = ref(true) // 审核员
+const isOperate = ref(true) //管理员 出单岗
+const isAudit = ref(false) //  核保岗
+const shortListData = ref(null)  // 第二模块tabl列表数据
+
+let pageresult = reactive<Pageresult>({
+  result: "",
+  /** 数据列表 */
+  list: [],
+  /** 总数 */
+  total: 0,
+});
+
+
+
+// name: '暂存任务',
+//           content: [],
+//           url: '/comprehensive-query/application-querys',
+
 
 const tableObj = {
-  // 非核保员-非待续保
+  // 出单--暂存任务
   notWaitObj: {
     fromSchema: [
       {
+        // prop: "cAppNo",
+        // inputtype: "rtinput",
         prop: "cAppNo",
-        inputtype: "table",
+        inputtype: "rtinput",
         title: "申请单号",
       },
       {
-        prop: "cAppNo",
-        inputtype: "table",
+        prop: "cAppTyp",
+        inputtype: "rtselect",
         title: "类型",
+        loadData: [
+          { value: "A", label: "投保单" },
+          { value: "E", label: "批单" },
+        ],
       },
       {
         prop: "cAppNme",
-        inputtype: "table",
+        inputtype: "rtinput",
         title: "投保人",
       },
       {
         prop: "tAppTm",
-        inputtype: "table",
+        inputtype: "rtinput",
         title: "投保日期",
       },
       {
-        prop: "cAppNo",
-        inputtype: "table",
+        prop: "nPrm",
+        inputtype: "rtinput",
         title: "保费",
       },
       {
-        prop: "cAppNo",
-        inputtype: "table",
+        prop: "cOperCnm",
+        inputtype: "rtinput",
         title: "操作员",
       },
       {
-        prop: "cAppNo",
-        inputtype: "table",
+        prop: "cAppStatus",
         title: "状态",
+        inputtype: "rtselect",
+        typeCode: "RECEIVE_BANK_CATEGORY",
+        codeParam: { cParCde: "shenqingdanzhuangtai" },
       },
     ],
   },
-  //非核保员-待续保
+  // 出单--待修改任务
+  notReviseObj: {
+    fromSchema: [
+      {
+        // prop: "cAppNo",
+        // inputtype: "rtinput",
+        prop: "objId",
+        inputtype: "rtinput",
+        title: "申请单号",
+      },
+      {
+        prop: "bsType",
+        inputtype: "rtselect",
+        title: "类型",
+        loadData: [
+          { value: "A", label: "投保单" },
+          { value: "E", label: "批单" },
+        ],
+      },
+      {
+        prop: "appCde",
+        inputtype: "rtinput",
+        title: "投保人",
+      },
+      {
+        prop: "crtTm",
+        inputtype: "rtinput",
+        title: "投保日期",
+      },
+      {
+        prop: "nPrm",
+        inputtype: "rtinput",
+        title: "保费",
+      },
+      {
+        prop: "operName",
+        inputtype: "rtinput",
+        title: "操作员",
+      },
+      {
+        prop: "cAppStatus",
+        title: "状态",
+        inputtype: "rtselect",
+        typeCode: "RECEIVE_BANK_CATEGORY",
+        codeParam: { cParCde: "shenqingdanzhuangtai" },
+      },
+    ],
+  },
+
+  //出单-待续保
   waitObj: {
     fromSchema: [
       {
-        prop: "cAppNo",
-        inputtype: "table",
+        prop: "cPlyNo",
+        inputtype: "rtinput",
         title: "保单号",
       },
       {
-        prop: "cAppNo",
-        inputtype: "table",
+        prop: "nPrm",
+        inputtype: "rtinput",
         title: "保费",
       },
       {
         prop: "cAppNme",
-        inputtype: "table",
+        inputtype: "rtinput",
         title: "投保人",
       },
       {
-        prop: "tAppTm",
-        inputtype: "table",
+        prop: "cMobile",
+        inputtype: "rtinput",
         title: "投保人联系电话",
       },
       {
-        prop: "cAppNo",
-        inputtype: "table",
+        prop: "tInsrncBgnTm",
+        inputtype: "rtinput",
         title: "保险起期",
       },
       {
-        prop: "cAppNo",
-        inputtype: "table",
+        prop: "tInsrncEndTm",
+        inputtype: "rtinput",
         title: "保险止期",
       },
       {
-        prop: "cAppNo",
-        inputtype: "table",
+        prop: "nExpirationDays",
+        inputtype: "rtinput",
         title: "终保倒计时(天)",
       },
     ],
@@ -153,22 +231,22 @@ const tableObj = {
     fromSchema: [
       {
         prop: "cAppNo",
-        inputtype: "table",
+        inputtype: "rtinput",
         title: "出单机构",
       },
       {
         prop: "cAppNo",
-        inputtype: "table",
+        inputtype: "rtinput",
         title: "投保人",
       },
       {
         prop: "cAppNo",
-        inputtype: "table",
+        inputtype: "rtinput",
         title: "险种",
       },
       {
         prop: "cAppNme",
-        inputtype: "table",
+        inputtype: "rtinput",
         title: "申请单号",
       }
     ],
@@ -178,27 +256,64 @@ const tableObj = {
     fromSchema: [
       {
         prop: "cAppNo",
-        inputtype: "table",
+        inputtype: "rtinput",
         title: "出单机构",
       },
       {
         prop: "cAppNo",
-        inputtype: "table",
+        inputtype: "rtinput",
         title: "申请单号",
       },
       {
         prop: "cAppNo",
-        inputtype: "table",
+        inputtype: "rtinput",
         title: "险种",
       },
       {
         prop: "cAppNme",
-        inputtype: "table",
+        inputtype: "rtinput",
         title: "状态",
       }
     ],
   }
 }
+// 出岗 tab
+let tab1 = [{
+  name: '暂存任务',
+  refName: 'stagingList',
+  tableObj: 'notWaitObj',
+  url: '/comprehensive-query/application-querys',
+},
+{
+  name: '待修改任务',
+  refName: 'reviseList',
+  tableObj: "notReviseObj",
+  url: '/comprehensive-query/application-querys',
+},
+{
+  name: '待续保',
+  refName: 'renewalList',
+  tableObj: 'waitObj',
+  url: '/RenewalManagement/renewal-management',
+}
+]
+
+// 核保tab
+let tab2 = [{
+  name: '暂存任务',
+  refName: 'udrStagingList',
+  tableObj: 'saveObj',
+  url: '/pcis-new-udr-list/PendUdrList',
+},
+{
+  name: '待修改任务',
+  refName: 'udrReturnList',
+  tableObj: "editObj",
+  url: '/pcis-new-udr-list/PendUdrList',
+}
+]
+
+
 let tableconfig = reactive<AppTableConfig>(
   createTableEditConfig(tableObj.notWaitObj)
 );
@@ -223,7 +338,7 @@ const shortcutSearch = (searchParams) => {
 const toQuery = (url: string) => {
   if (isOperate.value) { //出单员
     //暂存任务 （综合查询-投保单）、待修改任务 （综合查询-待修改单查询）
-    if (url === '/comprehensive-query/application-querys') { 
+    if (url === '/comprehensive-query/application-querys') {
       let param = {
         CurrentUser: user.value.opCde,
         CurrentUserOrg: user.value.companyId,
@@ -263,7 +378,7 @@ const toQuery = (url: string) => {
         startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
         endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
       });
-      if(currentTabName.value == '暂存任务') {
+      if (currentTabName.value == '暂存任务') {
         param.type = 'temp'
       } else {
         param.type = 'edit'
@@ -275,6 +390,8 @@ const toQuery = (url: string) => {
 };
 //table的row-click事件
 const toQuery2 = (data: any, tab: any) => {
+  aaa = true
+  console.log('toQuery2', data, tab)
   if (isOperate.value) { //出单员
     if (tab.name === '暂存任务') {
       const param = Object.assign({
@@ -321,7 +438,7 @@ const toQuery2 = (data: any, tab: any) => {
       });
       sessionStorage.setItem(AppKey.query.pcis_query_newudrlist, param);
       router.push({ path: '/pcis-new-udr-list/PendUdrList' });
-    } else if(tab.name === '修改单') {
+    } else if (tab.name === '修改单') {
       const param = Object.assign({
         type: 'edit',
         CurrentUser: user.value.opCde,
@@ -345,26 +462,40 @@ const initRoles = () => {
 
 const getData = (user: any, roles: any = []) => {
   let roleCde = '';
-  roles.forEach((res: any) => {
-    if (res === 'ROLE_00000196' || res === 'ROLE_00000324' || res === 'ROLE_00000001') {
-      isOperate.value = true;
-    }
-    if (res === 'ROLE_00000152') {
-      isAudit.value = true;
-    }
-    roleCde = roleCde === '' ? res : `${roleCde},${res}`;
-  });
+  console.log(332, Array.isArray(roles), roles)
+  if (roles)
+    roles.forEach((res: any) => {
+      // if (res === 'ROLE_00000196' || res === 'ROLE_00000324' || res === 'ROLE_00000001') {
+      // 出岗  ROLE_00000008
+
+      if (res === 'ROLE_00000008') {
+        isOperate.value = true;
+        tabs.value = tab1;
+          moreurl.value = "/comprehensive-query/application-querys"
+      }
+      // 核保
+      if (res === 'ROLE_00000167') {
+         moreurl.value = "/pcis-new-udr-list/PendUdrList"
+        isAudit.value = true;
+        tabs.value = tab2;
+      }
+      roleCde = roleCde === '' ? res : `${roleCde},${res}`;
+
+    });
+
+  console.log(338, tabs.value)
   const paramzc = {
-    pageNo: 1,
+    pageNum: 1,
     pageSize: 6,
+    udrType: 1,
     CAppStatus: '1',
     CurrentUser: user.opCde,
     CurrentUserOrg: user.companyId,
     TAppTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
     TAppTmStart: moment(new Date(Date.now())).subtract(7, 'day').format('YYYY-MM-DD HH:mm:ss'),
   };
-  const paramdh = {
-    pageNo: 1,
+  const paramhbzc = {
+    pageNum: 1,
     pageSize: 6,
     companyId: user.companyId,
     orgCde: user.companyId,
@@ -376,7 +507,7 @@ const getData = (user: any, roles: any = []) => {
     udrType: '0',
   };
   const paramdx = {
-    pageNo: 1,
+    pageNum: 1,
     pageSize: 6,
     roleCde: roleCde,
     operId: user.opCde,
@@ -388,63 +519,89 @@ const getData = (user: any, roles: any = []) => {
   };
   const param = {
     paramdx: paramdx,
-    paramdh: paramdh,
+    paramhbzc: paramhbzc,
+    // paramdh: paramdh,
     paramzc: paramzc,
   };
-  tabs.value = [];
+  // tabs.value = [];
+
+  console.log('首页参数', param)
+  // console.log('首页参数',user)
   // /policy/getPolicyShortList
   pcisQueryService.getPolicyShortList(param).then((res: any) => {
+    
+    console.log('首页table数据', res)
     if (res && res.code === 200) {
-      const zcdata: any[] = [];
-      const dxdata: any[] = [];
-      const dhdata: any[] = [];
-      // 管理员
+      shortListData.value = res.data
+
+      // const zcdata: any[] = [];
+      // const dxdata: any[] = [];
+      // const dhdata: any[] = [];
+      console.log('岗位--', isOperate.value)
+
+      // 管理员  出单岗
       if (isOperate.value) {
-        moreurl.value = "/comprehensive-query/application-querys"
-        if (res.data.shortList) {
-          res.data.shortList.forEach((data: any) => {
-            if (zcdata.length === 6) {
-              return;
-            }
-            if (zcdata.length < 6) {
-              zcdata.push(data);
-            }
-          });
-        }
-        tabs.value.push({
-          name: '暂存任务',
-          content: zcdata,
-          url: '/comprehensive-query/application-querys',
-        });
-        if (res.data.returnUdr) {
-          res.data.returnUdr.forEach((data: any) => {
-            if (dxdata.length === 6) {
-              return;
-            }
-            if (dxdata.length < 6) {
-              const newdxdata = {
-                cAppNo: data.objId,
-                cAppNme: data.appCde,
-                tAppTm: data.crtTm,
-              };
-              dxdata.push(newdxdata);
-            }
-          });
-        }
-        tabs.value.push({
-          name: '待修改任务',
-          content: dxdata,
-          url: '/comprehensive-query/application-querys',
-        });
-        tabs.value.push({
-          name: '待续保',
-          content: dxdata,
-          url: '/RenewalManagement/renewal-management',
-        });
+      
+        // if (res.data.shortList) {
+        //   res.data.shortList.forEach((data: any) => {
+        //     if (zcdata.length === 6) {
+        //       return;
+        //     }
+        //     if (zcdata.length < 6) {
+        //       zcdata.push(data);
+
+        //       // pageresult.list.push(data);
+        //     }
+        //   });
+        // }
+
+        console.log(res.data)
+        pageresult.list = res.data.stagingList;
+        pageresult.total = res.data.stagingList.length;
+
+
+
+
+        // tabs.value.push({
+        //   name: '暂存任务',
+        //   content: [],
+        //   url: '/comprehensive-query/application-querys',
+        // });
+        // if (res.data.returnUdr) {
+        //   console.log(336)
+        //   res.data.returnUdr.forEach((data: any) => {
+        //     if (dxdata.length === 6) {
+        //       return;
+        //     }
+        //     if (dxdata.length < 6) {
+        //       const newdxdata = {
+        //         cAppNo: data.objId, 
+        //         cAppNme: data.appCde,
+        //         tAppTm: data.crtTm,
+        //       };
+        //       dxdata.push(newdxdata);
+        //     }
+        //   });
+        // }
+
+        // tabs.value.push({
+        //   name: '待修改任务',
+        //   content: [],
+        //   url: '/comprehensive-query/application-querys',
+        // });
+        // tabs.value.push({
+        //   name: '待续保',
+        //   content: [],
+        //   url: '/RenewalManagement/renewal-management',
+        // });
+
+
+        console.log('666', tabs.value, isOperate.value, isAudit.value)
       }
-      //审核员
+      //审核员  核保岗
       if (isAudit.value) {
-        moreurl.value = "/pcis-new-udr-list/PendUdrList"
+       
+        // tabs.value = tab2;
         if (res.data.newUdrMap) {
           res.data.newUdrMap.forEach((data: any) => {
             if (dhdata.length === 6) {
@@ -461,12 +618,12 @@ const getData = (user: any, roles: any = []) => {
           });
         }
         tabs.value.push({
-          name: '暂存任务',
+          name: '暂存任务33',
           content: dhdata,
           url: '/pcis-new-udr-list/PendUdrList',
         });
         tabs.value.push({
-          name: '修改单',
+          name: '修改单44',
           content: dhdata,
           url: '/pcis-new-udr-list/PendUdrList',
         });
@@ -481,18 +638,25 @@ const toChange = (url: string) => {
 
 //tabs切换
 const handleTabClick = (tab: any) => {
+  console.log(41,pageresult)
+  console.log(667, tab.props.label)
+ 
+
+
   currentTabName.value = tab.props.label
   let url = ''
+  const clickedTabData = tabs.value.find(t => t.name === tab.props.label);
+  console.log(clickedTabData)
   if (isOperate.value) {
-    if (currentTabName.value == '待续保') {
-      tableconfig = reactive<AppTableConfig>(
-        createTableEditConfig(tableObj.waitObj)
-      )
-    } else {
-      tableconfig = reactive<AppTableConfig>(
-        createTableEditConfig(tableObj.notWaitObj)
-      )
-    }
+    tableconfig = reactive<AppTableConfig>(
+      createTableEditConfig(tableObj[clickedTabData.tableObj])
+    )
+
+    nextTick(() => {
+      pageresult.list = shortListData.value[clickedTabData.refName] || []
+      pageresult.total = shortListData.value[clickedTabData.refName].length  || 0
+      });
+ 
   }
   if (isAudit.value) {
     if (currentTabName.value == '暂存任务') {
@@ -795,7 +959,7 @@ onMounted(() => {
   //padding:20px;
   border-radius: 5px;
   margin-top: 20px;
-  height: 350px;
+  min-height: 350px;
 }
 
 .sty {

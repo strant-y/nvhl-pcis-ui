@@ -181,16 +181,24 @@
     <el-backtop :right="100" :bottom="100" />
 
     <!-- 发票弹框 -->
-    <invoiceInfoModel v-if="invoiceShow" @ok="close"></invoiceInfoModel>
+    <!-- <invoiceInfoModel v-if="invoiceShow"  ref="invoiceRef" @ok="close"></invoiceInfoModel> -->
 
     <!-- 反洗钱 -->
-    <amlExtendInfo
+    <!-- <amlExtendInfo
       ref="amlInfoRef"
-      v-if="amlInfoShow"
+
       :controlFlag="controlFlag"
       @ok="close"
-    ></amlExtendInfo>
+    ></amlExtendInfo> -->
     <!-- v-if="amlInfoShow" -->
+
+    <!-- 历史赔案 -->
+    <!-- v-if="historyShow" -->
+    <!-- <historyClaimcaseModel
+      ref="historyClaRef"
+ 
+         @ok="close"
+    ></historyClaimcaseModel> -->
   </div>
 </template>
 
@@ -225,9 +233,12 @@ import dayjs from "dayjs";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 
 // 发票信息
-import invoiceInfoModel from "@/views/pcis-new-udr-list/common/invoice-info-model.vue";
+// import invoiceInfoModel from "@/views/pcis-new-udr-list/common/invoice-info-model.vue";
 //  反洗钱
-import amlExtendInfo from "@/views/pcis-main/prodDef/common/aml-extend-info/index.vue";
+// import amlExtendInfo from "@/views/pcis-main/prodDef/common/aml-extend-info/index.vue";
+
+// 历史赔案
+// import historyClaimcaseModel from "@/views/comprehensive-query/modal/history-claimcase-model.vue"
 
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
@@ -241,12 +252,33 @@ const CostInformation = defineAsyncComponent(
 const PreviousdrOpnList = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/PreviousdrOpnList.vue")
 );
+
+//发票信息
+const invoiceInfoModel = defineAsyncComponent(
+  () => import("@/views/pcis-new-udr-list/common/invoice-info-model.vue")
+);
+
+//反洗钱
+const amlExtendInfo = defineAsyncComponent(
+  () => import("@/views/pcis-main/prodDef/common/aml-extend-info/index.vue")
+);
+
+//历史赔案
+const historyClaimcaseModel = defineAsyncComponent(
+  () => import("@/views/comprehensive-query/modal/history-claimcase-model.vue")
+);
+
+
 const opertaor = dataOpertaor();
 opertaor.init();
 const underwrite = ref(null);
 const edrbase = ref(null);
 const edritem = ref(null);
+
+const invoiceRef = ref(null);
 const amlInfoRef = ref(null);
+
+const historyClaRef = ref(null);
 
 const props = defineProps({
   param: {
@@ -275,6 +307,7 @@ const cacheKey = ref();
 
 let invoiceShow = ref(false); // 发票显示
 let amlInfoShow = ref(false); // 反洗钱显示
+let historyShow= ref(false); // 历史赔案
 let controlFlag = ""; // 用来处理反洗钱 页面窜窜以及显示
 
 // 存所有可显示账户信息场景
@@ -289,6 +322,8 @@ const isDetailCde = ()=>{
 const close = () => {
   invoiceShow.value = false;
   amlInfoShow.value = false;
+  // historyShow.value = false;
+  // console.log(historyShow.value)
 };
 
 onBeforeMount(() => {
@@ -304,7 +339,18 @@ const setTaxInfo = () => {
   const tabref = opertaor.getTableRefs();
   const appLicantValue = tabref["applicant"].getFromValue()["Applicant.cAppNo"]; // 单据编号
   if (!!appLicantValue) {
-    invoiceShow.value = true;
+    // invoiceRef.value?.isShow()
+    // invoiceShow.value = true;
+
+
+    dzmodal
+        .open(invoiceInfoModel, { type: "Issuer", data: {} })
+        .then((res: any) => {
+          if (res.type === "ok") {
+          }
+        });
+
+
   } else {
     ElMessage.error("请先保存单据");
     return;
@@ -320,9 +366,6 @@ const setCusBenefitInfo = () => {
   const AppcClntMrk = tabref["applicant"].getFromValue()["Applicant.cClntMrk"]; // 投保人 法人01
   const InscClntMrk = tabref["insured"].getFromValue()["Insured.cClntMrk"]; // 被保人  法人01
 
-  console.log("数据", opertaor.getDataAll());
-  console.log("数据", props.param);
-  // amlInfoShow.value = true;
   //  单据保存才有 单据编号
   if (!appNo) {
     ElMessage.error("请先保存单据");
@@ -331,13 +374,12 @@ const setCusBenefitInfo = () => {
 
   //  投被保人性质 没有填写或者都为个人 提示
   if (AppcClntMrk == undefined || AppcClntMrk == null) {
-    // ElMessage.error('投保人"投保人性质"不能为空！')
+
     ElMessage.error(
       "投保人性质或被保人性质为[法人]时，才允许录入反洗钱扩展信息！"
     );
     return;
   } else if (InscClntMrk == undefined || InscClntMrk === null) {
-    // ElMessage.error('被保人 "被保人性质" 不能为空！')
     ElMessage.error(
       "投保人性质或被保人性质为[法人]时，才允许录入反洗钱扩展信息！"
     );
@@ -351,21 +393,36 @@ const setCusBenefitInfo = () => {
 
   //  显示标志   1：投保人 2：被保人  3：都展示
   if (AppcClntMrk == "0" && InscClntMrk == "0") {
-    amlInfoShow.value = true;
     controlFlag = "3";
   } else if (AppcClntMrk == "0" && InscClntMrk == "1") {
-    amlInfoShow.value = true;
     controlFlag = "1";
   } else if (AppcClntMrk == "1" && InscClntMrk == "0") {
-    amlInfoShow.value = true;
     controlFlag = "2";
   }
+
+  
+  dzmodal.open(amlExtendInfo, { type: "Issuer",  controlFlag}).then((res: any) => {
+          if (res.type === "ok") {
+          }
+        });
 };
+/**
+ * 历史赔案
+ */
+const historyClaimcaseFun = () => {
+  dzmodal.open(historyClaimcaseModel, { type: "Issuer",  data: {}}).then((res: any) => {
+          if (res.type === "ok") {
+          }
+        });
+};
+
+
 
 /**
  * 投保需要的按钮
  */
 const basicBtn = [
+
   createFreeButtonBase({
     label: "保存模板",
     type: "primary",
@@ -421,6 +478,16 @@ const basicBtn = [
     type: "primary",
     func: () => {
       openLimit();
+    },
+    
+  }),
+  createFreeButtonBase({
+    label: "历史赔案",
+    type: "primary",
+    func: () => {
+      console.log(13133)
+      historyClaimcaseFun()
+      // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
     },
   }),
 ];
@@ -555,6 +622,15 @@ const uwBtn = [
           if (res.type === "ok") {
           }
         });
+    },
+  }),
+ createFreeButtonBase({
+    label: "历史赔案",
+    type: "primary",
+    func: () => {
+      console.log(13133)
+      historyClaimcaseFun()
+      // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
     },
   }),
   createFreeButtonBase({

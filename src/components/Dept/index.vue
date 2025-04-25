@@ -54,6 +54,7 @@ const selectedValue = ref<string | number | Array<any> | undefined>();
 // 默认获取机构1级的数据
 const options = computed(() =>
   codeListStore.getCacheCodeListByCode("QueryFormDeptType")
+ 
 );
 
 const listDeptsParams = reactive<DeptQuery>({});
@@ -70,8 +71,9 @@ watch([options, () => props.modelValue], ([newOptions, newModelValue]) => {
 });
 
 onMounted(async () => {
+
   console.log(
-    "当前登录用户信息",
+    "当前登录用户信息", 
     JSON.parse(sessionStorage.getItem("user")).companyId
   );
 
@@ -177,6 +179,7 @@ function findItemInTree(tree, value) {
 }
 
 function instChange(val) {
+  console.log('dept', options.value)
   emits("update:modelValue", val);
   const currentItem = findItemInTree(options.value, val);
   console.log("currentItem", currentItem);

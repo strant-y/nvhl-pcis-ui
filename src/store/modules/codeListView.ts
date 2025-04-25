@@ -187,8 +187,10 @@ function queryOnce(typeList: string[] = undefined){
 
     // 产品列表
     getProdInfoList({}).then(res => {
-      setOptionsToCacheMap('CProdMap', res.data.groupMap);
-      setOptionsToCacheMap('CProdList', res.data.list);
+        if(res.data){
+        setOptionsToCacheMap('CProdMap', res.data.groupMap);
+        setOptionsToCacheMap('CProdList', res.data.list);
+      }
     })
   }
 

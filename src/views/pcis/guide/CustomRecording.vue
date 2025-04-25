@@ -376,7 +376,7 @@ function updateOptionAll(e: any) {
 // 选择条款弹框
 function showModal() {
   dzmodal
-    .open(termDialog, {
+    .open(termDialog, { 
       type: "Issuer",
       data: { updateQuery },
       termList: termList.value,

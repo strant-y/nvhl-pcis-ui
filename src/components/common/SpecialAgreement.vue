@@ -69,7 +69,7 @@ const tableconfig = reactive<AppTableConfig>(
           data.a += 1;
           dzmodal.open(kindEdit, { type: "Issuer", data: data }).then((res) => {
             if (res.type === "ok") {
-            }
+            } 
           });
         },
       }),
