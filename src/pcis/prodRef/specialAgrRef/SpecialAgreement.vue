@@ -223,10 +223,9 @@ const method = {
             let len = formData.value.length;
             let sel : any[] = [];
             selectdata.forEach((item: any,index:number) => {
-              console.log(item,formData.value);
-              item.index = formData.value.length + 1; // 显式设置 index 属性
               item.index = len + 1;
               sel.push(item);
+              len++;
             });
             
             sel.forEach((item) => {
