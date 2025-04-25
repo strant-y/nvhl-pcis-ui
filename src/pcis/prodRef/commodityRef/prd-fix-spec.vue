@@ -123,7 +123,7 @@ const refreshData = () => {
         pageresult.list.push({
           cSpecialCode: item.cSpecialCode,
           cSpecialName: item.cSpecialName,
-          cNmeEn: item.cNmeEn,
+          // cNmeEn: item.cNmeEn,
           cIfMust: item.cIfMust, //是否必选
           cIfEdit: item.cIfEdit, //是否可修改
           cIfFix: "1", //是否固定特约，接口查出来的1，自定义添加的为0

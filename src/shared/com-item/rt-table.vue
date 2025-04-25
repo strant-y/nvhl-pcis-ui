@@ -237,7 +237,7 @@ const props = defineProps({
 });
 
 const indexMethod = (index: number) => {
-  return index;
+  return index !== undefined ? index + 1 : 0;
 };
 
 /**
@@ -445,6 +445,10 @@ function tabValidate() {
 onMounted(() => {
   tableDatas.value = props.modelValue ? props.modelValue : [];
   tableDatas.value?.forEach((data) => {
+    if (!data) {
+      console.error('Invalid data item:', data);
+      return;
+    }
     // 初始化行数字Id
     data._dataId = getuuid();
     formItems.value[data._dataId] = creatItem(schamaconf.value);

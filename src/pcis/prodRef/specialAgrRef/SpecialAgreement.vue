@@ -222,7 +222,9 @@ const method = {
         getSelected(selectdata: any) {
             let len = formData.value.length;
             let sel : any[] = [];
-            selectdata.forEach((item: any) => {
+            selectdata.forEach((item: any,index:number) => {
+              console.log(item,formData.value);
+              item.index = formData.value.length + 1; // 显式设置 index 属性
               item.index = len + 1;
               sel.push(item);
             });
@@ -235,6 +237,19 @@ const method = {
       { title: "添加特约", width: 85 }
     );
   },
+};
+const handleSelectedData = (selectdata: any[]) => {
+  selectdata.forEach((item: any) => {
+    formData.value.push({
+      index: formData.value.length + 1,
+      cIfMust: "0", // 默认值，根据实际情况调整
+      cSpecialCode: item['PrdFixSpec.CSpecNo'],
+      cSpecialName: item['PrdFixSpec.CNmeCn'],
+    });
+  });
+  formData.value.forEach((item, index) => {
+    item.index = index + 1;
+  });
 };
 // 绑定特殊验证器
 const exRules = {};
