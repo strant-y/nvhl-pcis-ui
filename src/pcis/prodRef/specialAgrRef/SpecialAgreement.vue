@@ -98,9 +98,10 @@ const tableconfig = reactive<AppTableConfig>(
         tableClick: (row) => {
           const list = formData.value;
           const i = list.findIndex((item) => item.cSpecNo === row.cSpecNo);
-          if (i !== -1) list.splice(i, 1);
+          rttableFrom.value.delRow(row._dataId);
+          // if (i !== -1) list.splice(i, 1);
           formData.value.forEach((item, index) => {
-            item.cIndex = index + 1;
+            item.index = index + 1;
           });
         },
       }),
