@@ -110,7 +110,7 @@ const handleSelectionChange = (selection) => {
 };
 
 const refreshData = () => {
-  const cProdNo = props.data.data.cProdNo;
+  const cProdNo = props.data.cProdNo;
   // 查询列表数据
   getpSpecialAgreement({
     cProdNo: cProdNo,
@@ -164,18 +164,18 @@ function add() {
 const returnData = () => {
   if (activeName.value == "first") {
     let tempData = multipleTableRef.value.getSelectionRows();
-    console.log("000",tempData);
-    props.data.method.getSelected(tempData);
+    props.method.getSelected(tempData);
   } else {
-    props.data.method.getSelected(addTableData);
+    props.method.getSelected(addTableData);
   }
+  close();
 };
 const close = () => {
   emits("handleClose");
 };
 
 function setSelected() {
-  const lastSelected = props.data.data.selectedData;
+  const lastSelected = props.data.selectedData;
   if (lastSelected && lastSelected.length) {
     lastSelected.forEach((item) => {
       pageresult.list.forEach((item2) => {
