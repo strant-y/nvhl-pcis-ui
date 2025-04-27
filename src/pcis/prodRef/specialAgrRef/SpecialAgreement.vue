@@ -325,7 +325,20 @@ function getFromValue() {
 //   return formData.value;
 // }
 function setFormValue(value: any) {
-  Object.assign(formData.value, value);
+  if(value && value.length>0){
+    let ind = 1;
+    value.forEach(e => {
+      Object.keys(e).forEach(key => {
+        const newKey = key.replace('SpecialAgreement.', '');
+        const v = e[key];
+        delete e[key];
+        e[newKey] = v;
+      })
+      e['index'] = ind++;
+    });
+  }
+  rttableFrom?.value?.setFormValue(value);
+  // Object.assign(formData.value, value);
 }
 function validate() {}
 defineExpose({
