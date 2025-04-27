@@ -3,16 +3,23 @@
     <el-row class="login-container-img">
       <el-col class="logo-img">
         <img src="../../assets/images/logo.png" alt="logo" />
+        <!-- <div class="system-name">
+          <h2>永安财产保险承保系统</h2>
+          <p>YONG AN Property Insurance Underwriting System</p>
+        </div> -->
+        <div class="illustration">
+          <!-- <img src="../../assets/images/illustration.png" alt="illustration" /> -->
+        </div>
       </el-col>
-      <el-col class="logo-text">
+      <!-- <el-col class="logo-text">
         <el-row><span class="text-class">财产保险</span>承保系统</el-row>
         <el-row class="text-en"
           ><span class="text-class">Property Insurance </span>Underwriting
           System
         </el-row>
-      </el-col>
+      </el-col> -->
 
-      <el-col class="ewm-img">
+      <!-- <el-col class="ewm-img">
         <el-row>
           <div
             style="display: flex; flex-direction: column; align-items: center"
@@ -28,17 +35,18 @@
             </div>
           </div>
         </el-row>
-      </el-col>
-    </el-row>
-    <div class="login-container-form">
+      </el-col> -->
+    
+    <div class="login-container-form" >
       <!-- 登录表单 -->
       <el-card
         class="!border-none !bg-transparent !rounded-4% w-100 <sm:w-85 card_self"
       >
         <div>
-          <h2>你好，欢迎使用平台</h2>
+          <!-- <h2>你好，欢迎使用平台</h2> -->
+          <h2>账号登录</h2>
         </div>
-        <el-row class="tab-container" justify="center">
+        <!-- <el-row class="tab-container" justify="center">
           <el-col
             class="tab-item"
             :class="curIndex === index ? 'active' : ''"
@@ -48,11 +56,11 @@
             @click="tabHandle(index)"
           >
             <el-row justify="center">{{ item.name }}</el-row>
-          </el-col>
+          </el-col> -->
           <!-- <el-col class="tab-item" :span="12">
         <el-row justify="center">第三方登录</el-row>
-      </el-col> -->
-        </el-row>
+      </el-col> 
+        </el-row>-->
         <!-- <el-tabs v-model="activeName" @tab-click="changeInside">
         <el-tab-pane label="内部登录" name="inside" bor> -->
         <el-form
@@ -120,7 +128,6 @@
                 :placeholder="$t('login.captCode')"
                 @keyup.enter="verifyCode"
               />
-              <!---->
               <!-- 验证码-->
               <el-button
                 v-if="verifyTime === 0"
@@ -137,7 +144,7 @@
               >
             </div>
           </el-form-item>
-
+          <el-checkbox> 30天内免登录</el-checkbox>
           <!-- 登录按钮 -->
           <el-button
             v-if="!verifyFlag"
@@ -260,12 +267,14 @@
             @click.prevent="verifyCode"
             >{{ $t("login.submit") }}
           </el-button>
+          
         </el-form>
+        <el-checkbox v-model="agreeTerms">已阅读并同意《用户服务协议》和《隐私政策》</el-checkbox>
         <!-- </el-tab-pane> -->
         <!-- </el-tabs> -->
       </el-card>
     </div>
-
+  </el-row>
     <!-- <el-button type="primary" @click="test" >测试</el-button> -->
     <!-- ICP备案 -->
     <!-- <div class="absolute bottom-1 text-[10px] text-center" v-show="icpVisible">
@@ -575,11 +584,14 @@ onMounted(() => {});
 <style lang="scss" scoped>
 .login-container {
   width: 100%;
+  height: 100vh;
+  
+  // margin-top: 20px;
   display: flex;
   .login-container-img {
-    width: 60%;
+    width: 100%;
     height: 100vh;
-    background: url("@/assets/images/login-new-bg.png") no-repeat center center /
+    background: url("@/assets/images/logo1.png") no-repeat center center /
       cover;
     .logo-img {
       display: flex;
@@ -587,7 +599,8 @@ onMounted(() => {});
       img {
         width: 300px;
         height: 75px;
-        margin-left: -20px;
+        margin-left: -50px;
+        margin-top: -20px;
       }
     }
     .logo-text {
@@ -599,7 +612,8 @@ onMounted(() => {});
         font-size: 20px;
       }
       .text-class {
-        color: #ff8c00;
+        // color: #ff8c00;
+        color: #3a76c6;
       }
     }
     .ewm-img {
@@ -608,8 +622,8 @@ onMounted(() => {});
     }
   }
   .login-container-form {
-    width: 40%;
-    margin: 10% 0 0 10%;
+    width: 20%;
+    margin: 0 20% 30% 70%;
     h2 {
       margin-left: 16px;
       text-align: center;
@@ -668,12 +682,12 @@ onMounted(() => {});
     }
     .active {
       background-color: #fff;
-      color: #ff8c00;
+      // color: #ff8c00;
+      color: #3a76c6;
       border-radius: 12px;
     }
   }
 }
-
 .getCaptcha_ {
   cursor: pointer;
 }
