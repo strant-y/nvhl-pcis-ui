@@ -2,12 +2,12 @@
   <div class="flex">
     <template v-if="device !== 'mobile'">
       <!--全屏 -->
-      <div class="setting-word" @click="downWord">
+      <!-- <div class="setting-word" @click="downWord">
         <el-icon>
           <Memo />
         </el-icon>
         操作手册
-      </div>
+      </div> -->
 
 
       <div class="setting-item" @click="toggle">
