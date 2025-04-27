@@ -272,6 +272,17 @@ watch(
   }
 );
 
+function setFormValue(data: any){
+  tableDatas.value = [];
+  formItems.value = {};
+  tableDatas.value = data ? data : [];
+  tableDatas.value?.forEach((data) => {
+    // 初始化行数字Id
+    data._dataId = getuuid();
+    formItems.value[data._dataId] = creatItem(schamaconf.value);
+  });
+}
+
 function creatSchama() {
   if(props.item.fromSchema && props.item.fromSchema.length > 0){
     props.item.fromSchema.forEach((item: any) => {
@@ -536,11 +547,13 @@ function getRowById(rowId:any){
   });
 }
 
+
 defineExpose({
   tableExvalidate,
   addRow,
   delRow,
   addRowByData,
+  setFormValue,
   getSelectRow,
   setFormSchema,
   setValueByRowKey,
