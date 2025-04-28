@@ -1,16 +1,47 @@
 <template>
   <div class="app-container">
-    <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
+    <!--<el-card>-->
+      <!--<underwriteRef ref="underwrite"></underwriteRef>-->
+    <!--</el-card>-->
+    <el-card>
+      <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
+    </el-card>
     <el-card style="margin-top: 20px;">
-      <risk-info :isAdd="isAdd"></risk-info>
+      <template v-for="(pageConfig, v) in formconfig2" :key="v">
+        <div
+                class="card_"
+                v-for="(k, i) in pageConfig?.pageInfo"
+                :key="i"
+                :id="(k.pageKey === 'dist' || k.pageKey === 'distSummary')? k.pageCode : k.pageKey"
+        >
+          <component
+                  v-if="currentIndex >= i"
+                  :ref="
+                      (res) => {
+                        const pageK = (k.pageKey === 'dist' || k.pageKey === 'distSummary')? k.pageCode : k.pageKey
+                        opertaor.addTableRef(pageK, res);
+                      }
+                    "
+                  :is="
+                      k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'
+                    "
+                  :pageSchema="k.pageSchema"
+          />
+        </div>
+      </template>
     </el-card>
     <el-card style="margin-top: 20px;" v-if="isAdd">
-      <review-info ></review-info>
+      <review-info ref="reviewInfoRef"></review-info>
     </el-card>
     <div style="text-align: right;margin-top: 20px;" v-if="!isAdd">
-      <el-button type="primary" @click="save">保存</el-button>
-      <el-button type="primary" @click="saveAndSubmit">保存并提交审核</el-button>
-      <el-button @click="goBack">返回</el-button>
+      <div style="text-align: right;margin-top: 20px;" v-if="routeQryParams.type !== 'view'">
+        <el-button type="primary" @click="save">保存</el-button>
+        <el-button type="primary" @click="saveAndSubmit">保存并提交审核</el-button>
+        <el-button @click="goBack">返回</el-button>
+      </div>
+      <div style="text-align: right;margin-top: 20px;" v-else>
+        <el-button @click="goBack">返回</el-button>
+      </div>
     </div>
     <div style="text-align: right;margin-top: 20px;" v-else>
       <el-button type="primary" @click="submit">提交</el-button>
@@ -36,14 +67,15 @@ import {
 } from "@/shared/app-free-edit-config";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
-
+import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
+import { getProductPage, getRenewalAppPolicy } from "../../../api/prod/index";
 import OrgDptModel from '@/components/common/DepartmentTree.vue';
 import RiskInfo from './risk-info/risk-info.vue'
 //审核详情得状态等
 import ReviewInfo from './review-info/review-info.vue';
-
+import { dataOpertaor } from "@/store/modules/data-opertaor";
 import PrdFixSpec from '../com/prd-fix-spec.vue'
-
+import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 const { getRules } = useValidator();
 const dzmodal = useDzModal();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
@@ -52,8 +84,48 @@ const userStore = useUserStore();
 const router = useRouter()
 const route = useRoute()
 const routeQryParams = route.query.data ? JSON.parse(route.query.data) : {}
-const isAdd = ref((routeQryParams.type !== 'add'))
-const user = userStore.user;
+const isAdd = ref((routeQryParams.type !== 'add'&&routeQryParams.type !== 'update'&&routeQryParams.type !== 'view'))
+const user = ref(userStore.user);
+const reviewInfoRef = ref(null);
+const policyService = new PolicyService();
+// 当前加载的组件索引
+const currentIndex = ref(0);
+const opertaor = dataOpertaor();
+const formconfig2 = opertaor.getTableConfig();
+opertaor.setParam(routeQryParams.rowData);
+onBeforeMount(() => {
+    console.log("routeQryParams", routeQryParams);
+    console.log("路由参数routeQryParams.rowData", routeQryParams.rowData);
+    initPage();
+});
+/**
+ * 数据初始化
+ * @param data
+ */
+const initPage = async () => {
+    const getProductRes = await getProductPage({
+        CProdNo: routeQryParams.rowData.cProdNo,
+        CGrpMrk: routeQryParams.rowData.cGrpMrk,
+    });
+    // 页面初始化
+    const formconfig21 = JSON.parse(getProductRes.data);
+    formconfig21[0].pageInfo = formconfig21[0].pageInfo.filter(item => item.pageKey == 'cvrg');
+    opertaor.setTableConfig(formconfig21);
+    renderComponents();
+};
+/**
+ * 逐个渲染组件
+ */
+function renderComponents() {
+    const interval = setInterval(() => {
+        if (currentIndex.value < formconfig1[0]?.pageInfo.length - 1) {
+            currentIndex.value++;
+        } else {
+            // loadAfter(); //页面加载完成之后,再加载后续所需的事件
+            clearInterval(interval);
+        }
+    }, 100); // 延迟组件渲染,增加页面响应效率
+}
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -64,16 +136,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         type: "primary",
         label: "保存",
-        disabled: isAdd,
         func: async () => {
           saveData()
         },
       }),
-      
+
     ],
     fromSchema: [
       {
-        prop: "CDptCde",
+        prop: "cDptCde",
         inputtype: "rtselect",
         title: "机构部门",
         disabled: true,
@@ -83,44 +154,51 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         btnItems: {
           icon: "Search",
           type: "primary",
-          disabled: isAdd,
           func: () => {
-            dzmodal.open(OrgDptModel, {})
-            .then((res) => {
-              if (res.type === "ok") {
-              }
-            });
-          }
+              dzmodal
+                  .open(DepartmentTree, { type: "Issuer", data: {} })
+                  .then((res) => {
+                      if (res.body) {
+                          const selectObj = res.body;
+                          freeEditRef.value?.setValue("cDptCde", selectObj.id);
+                          setFormItem("cDptCde", {
+                              loadData: [
+                                  {
+                                      label: selectObj.name,
+                                      value: selectObj.id,
+                                  },
+                              ],
+                          });
+                      }
+                  });
+          },
         },
         rules: [getRules("required", {})],
       },
       {
         prop: "cKindNo",
-        inputtype: "rtcascader",
+        inputtype: "rtselect",
         title: "险种大类",
-        typeCode: "KIND_LIST_CACHE", //产品大类的接口
-        params: { cStatus: '1' },
-        disabled: isAdd,
+        typeCode: "KIND_LIST_GRT", //产品大类的接口
+        codeParam: {
+            cOperId: user.value?.opCde,
+            cDptCde: user.value?.companyId,
+        },
         clearable: true,
+        child: "cProdNo",
+        disabled:true,
         rules: [getRules("required", {})],
         func: (val) => {
-          const item = freeEditRef.value.getFromSchemaItem('cProdNo')
-          if(val) { //选择了产品大类作为参数上送
-            item.params = {'cKindNo': val}
-          } else {
-            item.params = {}
-          }
         }
       },
       {
         prop: "cProdNo",
-        inputtype: "rtcascader",
+        inputtype: "rtselect",
         title: "险种名称",
-        disabled: isAdd,
         clearable: true,
-        typeCode: "PROD_LIST", //条款的接口
+        disabled:true,
+        typeCode: "PROD_LIST_IN_GUIDE", //条款的接口
         rules: [getRules("required", {})],
-        params: {},
       },
       {
         prop: "cPlanNo",
@@ -133,7 +211,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cPlanCn",
         inputtype: "rtinput",
         title: "方案名称",
-        disabled: isAdd,
         rules: [getRules("required", {})],
         clearable: true,
       },
@@ -141,17 +218,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cRationType",
         inputtype: "rtselect",
         title: "方案类型",
-        disabled: isAdd,
         clearable: true,
         rules: [getRules("required", {})],
-        typeCode: "BAS_COMM_CODE_OUT_CDE", //暂时无接口
-        params: {'cParCde': 'CRationType'},
+        typeCode: "BAS_COMM_CODE_OUT_CDE",
+        codeParam: {'cParCde': 'CRationType'},
       },
       {
         prop: "cOrigin",
         inputtype: "rtselect",
         title: "方案用途",
-        disabled: isAdd,
         clearable: true,
         rules: [getRules("required", {})],
         // typeCode: "", //暂时无接口
@@ -170,7 +245,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
         format: "YYYY-MM-DD HH:mm:ss",
         valueFormat: "YYYY-MM-DD HH:mm:ss",
-        disabled: isAdd,
       },
       {
         prop: "tEndTm",
@@ -180,13 +254,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "datetime",
         format: "YYYY-MM-DD HH:mm:ss",
         valueFormat: "YYYY-MM-DD HH:mm:ss",
-        disabled: isAdd,
       },
       {
         prop: "cCalcFormula",
         inputtype: "rtselect",
         title: "计算保费公式",
-        disabled: isAdd,
         clearable: true,
         rules: [getRules("required", {})],
         loadData: [
@@ -208,48 +280,42 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cAccessType",
         inputtype: "rtselect",
         title: "是否保密",
-        disabled: isAdd,
         clearable: true,
         rules: [getRules("required", {})],
-        typeCode: "BAS_COMM_CODE_OUT_CDE", //暂时无接口
-        params: {'cParCde': 'CAccessType'},
+        typeCode: "BAS_COMM_CODE_OUT_CDE",
+        codeParam: {'cParCde': 'CAccessType'},
       },
       {
         prop: "cCriterionTimeUnit",
         inputtype: "rtselect",
         title: "保险期间类型",
-        disabled: isAdd,
         clearable: true,
-        typeCode: "RECEIVE_BANK_CATEGORY", //暂时无接口
-        params: {'cParCde': 'CriterionUnit'},
+        typeCode: "RECEIVE_BANK_CATEGORY",
+        codeParam: {'cParCde': 'CriterionUnit'},
       },
       {
         prop: "nCriterionTime",
         inputtype: "rtinput",
         title: "标准承保期限",
         type: "number",
-        disabled: isAdd,
         clearable: true,
       },
       {
         prop: "nLowInsureDays",
         inputtype: "rtinput",
         title: "保险期限浮动区间起",
-        disabled: isAdd,
         clearable: true,
       },
       {
         prop: "nTopInsureDays",
         inputtype: "rtinput",
         title: "保险期限浮动区间止",
-        disabled: isAdd,
         clearable: true,
       },
       {
         prop: "CAppNme",
         inputtype: "rtselect",
         title: "是否绿色产业客户",
-        disabled: isAdd,
         clearable: true,
         typeCode: "", //暂时无接口
         params: {},
@@ -269,7 +335,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "greenDetailList",
         inputtype: "rtselect",
         title: "绿色产业细分列表",
-        disabled: isAdd,
         clearable: true,
         rules: [],
         typeCode: "", //暂时无接口
@@ -279,7 +344,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "CAppNme",
         inputtype: "rtselect",
         title: "是否调用智能风控",
-        disabled: isAdd,
         clearable: true,
         typeCode: "", //暂时无接口
         params: {},
@@ -289,7 +353,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "分公司出单配置",
         itemWidth: 2,
-        disabled: isAdd,
         clearable: true,
         typeCode: "BRANCH_ID_LIST", //暂时无接口
         params: {},
@@ -298,10 +361,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cSpecMrk",
         inputtype: "rtselect",
         title: "是否有特约",
-        disabled: isAdd,
         clearable: true,
-        typeCode: "WEB_SYS_STA_DICT", //暂时无接口
-        params: {'cParCde': 'yes_no'},
+        // typeCode: "WEB_SYS_STA_DICT", //暂时无接口
+        // params: {'cParCde': 'yes_no'},
       },
       {
         prop: "cSpecContent",
@@ -311,13 +373,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rows: 4,
         itemWidth: 2,
         clearable: true,
-        disabled: isAdd,
         showExBtn: true,
         btnWidth: 5,
         btnItems: {
           icon: "Search",
           type: "primary",
-          disabled: isAdd,
           func: () => {
             dzmodal.open(PrdFixSpec, {
               data: {
@@ -349,7 +409,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rows: 4,
         placeholder: "请填写预计使用本方案的渠道、代理、代理业务员信息",
         itemWidth: 2,
-        disabled: isAdd,
         clearable: true,
       },
       {
@@ -364,11 +423,27 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 );
 
 //form表单部分保存
-const saveData = () => {
+const saveData = (call?) => {
   freeEditRef.value?.validate().then((isValid) => {
     if(isValid) {
+        const s = freeEditRef.value?.getFromValue(); //获取表单数据
+        const param = Object.assign(s);
+        if(!!call){
+            param['cUndrStatus'] = '1';
+        }
       //调用接口
-
+        policyService.saveOrUpdatePlan(param).then(result => {
+            if (result['code'] === 200) {
+                freeEditRef.value?.setFormValue(result.data.data)
+                if (!!call) {
+                    call();
+                }else{
+                    ElMessage.success(result['data']['message']);
+                }
+            } else {
+                ElMessage.error(result['msg']);
+            }
+        });
     } else {
       ElMessage.error("请填写必填项");
     }
@@ -378,9 +453,41 @@ const saveData = () => {
 //总的保存
 const save = () => {
   //调用保存接口
+    const res = opertaor.getDataAll();
+    res['cPlanNo']=freeEditRef.value?.getValue("cPlanNo");
+    console.log(res)
+    policyService.savePlanCvrg(res).then(result => {
+        if (result['code'] === 200) {
+            const ops={cvrg:result.data.cvrg}
+            opertaor.setDataAll(ops);
+            ElMessage.success(result['msg']);
+        } else {
+            ElMessage.error(result['msg']);
+        }
+    });
 }
 const saveAndSubmit = () => {
   //调用保存并提交接口
+    const call = () => {
+        const res = {}
+        res['cRelNo']=freeEditRef.value?.getValue("cPlanNo");
+        res['cUndrStatus']='1';
+        res['cUndrDesc']='提交审核';
+        res['cType']='PLAN';
+        console.log(res)
+        policyService.addProcessUndr(res).then(result => {
+            if (result['code'] === 200) {
+                if(result['data']['code']=='1'){
+                    ElMessage.success(result['data']['message']);
+                }else{
+                    ElMessage.error(result['data']['message']);
+                }
+            } else {
+                ElMessage.error(result['msg']);
+            }
+        });
+    };
+    saveData(call)
 }
 const goBack = () => {
   //返回上个页面
@@ -390,11 +497,64 @@ const goBack = () => {
 //审核的提交
 const submit = () => {
   //提交
+    const s = reviewInfoRef.value.getFromValue(); //获取表单数据
+    const res = Object.assign(s);
+    res['cRelNo']=freeEditRef.value?.getValue("cPlanNo");
+    res['id']=routeQryParams.rowData.cPkId;
+    res['cType']='PLAN';
+    console.log(res)
+    policyService.processApprove(res).then(result => {
+        if (result['code'] === 200) {
+            if(result['data']['code']=='1'){
+                ElMessage.success(result['data']['message']);
+            }else{
+                ElMessage.error(result['data']['message']);
+            }
+        } else {
+            ElMessage.error(result['msg']);
+        }
+    });
 }
 
 onMounted(() => {
-  
+    if(routeQryParams.type=='add'){
+        nextTick(() => {
+            freeEditRef.value?.setValue("cKindNo", routeQryParams.rowData.cKindNo);
+            freeEditRef.value?.setValue("cProdNo", routeQryParams.rowData.cProdNo);
+        });
+    }else{
+        const param={'cPlanNo':routeQryParams.rowData.cPlanNo}
+        policyService.getPlanBase(param).then(result => {
+            if (result['code'] === 200) {
+                freeEditRef.value?.setFormValue(result.data.data)
+            } else {
+                ElMessage.error(result['msg']);
+            }
+        });
+        policyService.getPlanCvrg(param).then(result => {
+            if (result['code'] === 200) {
+                const ops={cvrg:result.data.cvrg}
+                opertaor.setDataAll(ops);
+            } else {
+                ElMessage.error(result['msg']);
+            }
+        });
+    }
+    nextTick(() => {
+        if(routeQryParams.type=='view'||routeQryParams.type=='under'){
+            freeEditRef.value.setDisabledAll();
+            opertaor.setDisabledAll();
+        }
+    });
 });
+//给表单下拉项赋值
+function setFormItem(prop: string, config: any) {
+    formconfig1.fromSchema?.forEach((item) => {
+        if (item.prop === prop) {
+            Object.assign(item, config);
+        }
+    });
+}
 </script>
 
 <style scoped lang="scss"></style>

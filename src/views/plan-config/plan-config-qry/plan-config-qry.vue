@@ -24,10 +24,14 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
+import { useUserStore } from "@/store/modules/user";
+const userStore = useUserStore();
+const user = ref(userStore.user);
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<MyTableMethod | null>(null);
 const router = useRouter()
 const policyService = new PolicyService();
+const { getRules } = useValidator();
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -51,37 +55,63 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
     fromSchema: [
       {
-        prop: "Base.cKindNo",
-        inputtype: "rtcascader",
-        title: "产品大类",
-        typeCode: "KIND_LIST_CACHE",
-        params: { cStatus: '1' },
-        clearable: true,
-        func: (val) => {
-          const item = freeEditRef.value.getFromSchemaItem('PrdProdPlan.CProdNo')
-          if(val) {
-            item['params'] = {'cKindNo': val}
-          } else {
-            item['params'] = {}
-          }
-        }
+          prop: "cKindNo",
+          inputtype: "rtselect",
+          title: "产品大类",
+          itemWidth: 1,
+          rules: [getRules("required", {})],
+          typeCode: "KIND_LIST_GRT",
+          child: "cProdNo",
+          codeParam: {
+              cOperId: user.value?.opCde,
+              cDptCde: user.value?.companyId,
+          },
+          filterable: true,
+          clearable: true,
+          func: (row: any) => {
+              // 更新产品下拉选
+              setFormItem("cProdNo", {
+                  codeParam: {
+                      cParCde: row,
+                      cOperId: user.value?.opCde,
+                      cDptCde: user.value?.companyId,
+                  },
+              });
+              freeEditRef.value?.setValue("cProdNo", null);
+          },
       },
       {
-        prop: "PrdProdPlan.CProdNo",
-        inputtype: "rtcascader",
-        title: "产品",
-        clearable: true,
-        typeCode: "PROD_LIST",
-        params: {},
+          prop: "cProdNo",
+          inputtype: "rtselect",
+          title: "产品",
+          itemWidth: 1,
+          rules: [getRules("required", {})],
+          filterable: true,
+          clearable: true,
+          typeCode: "PROD_LIST_IN_GUIDE",
+          codeParam: {
+              cParCde: "999",
+          },
       },
       {
-        prop: "PrdProdPlan.CPlanNo",
+          prop: "cGrpMrk",
+          inputtype: "rtselect",
+          rules: [getRules("required", {})],
+          title: "是否团单",
+          loadData: [
+              { value: "0", label: "否" },
+              { value: "1", label: "是" },
+              { value: "2", label: "家庭单" },
+          ],
+      },
+      {
+        prop: "cPlanNo",
         inputtype: "rtinput",
         title: "方案编号",
         clearable: true,
       },
       {
-        prop: "PrdProdPlan.CTplNme",
+        prop: "cTplNme",
         inputtype: "rtinput",
         title: "方案名称",
         clearable: true,
@@ -107,13 +137,22 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         icon: "Plus",
         func: function () {
-          openEdit('add', null)
+            freeEditRef.value?.validate().then((isValid) => {
+                if(isValid) {
+                    const param = freeEditRef.value?.getFromValue(); //获取表单数据
+                    param.pageType='app'
+                    openEdit('add', param)
+                } else {
+                    ElMessage.error("请填写必填项");
+                }
+            })
         },
       }),
     ],
     tableBtnType: "btn",
     tableBtnWidth: 220,
     tableBtnPosition: "right",
+    // editList: ["PrdProdPlan.CEnableStatus"],
     tableBtn: [
       createFreeButtonBase({
         id: "score",
@@ -122,7 +161,17 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         size: "large",
         icon: "Edit",
+        hideBtns: (row: any) => {
+            if (
+                row.cUndrStatus == "0"
+            ) {
+                return false;
+            } else {
+                return true;
+            }
+        },
         tableClick: (row) => {
+          row['cGrpMrk']='0'
           openEdit('update', row)
         },
       }),
@@ -133,51 +182,109 @@ const tableconfig = reactive<AppTableConfig>(
         type: "danger",
         size: "large",
         icon: "Delete",
+        hideBtns: (row: any) => {
+            if (
+                row.cUndrStatus == "0"
+            ) {
+                return false;
+            } else {
+                return true;
+            }
+        },
         tableClick: (row) => {
           showDetails(row)
         },
       }),
+      createFreeButtonBase({
+          id: "score",
+          link: true,
+          tooltip: "查看",
+          type: "danger",
+          size: "large",
+          icon: "View",
+          hideBtns: (row: any) => {
+              if (
+                  row.cUndrStatus != "0"
+              ) {
+                  return false;
+              } else {
+                  return true;
+              }
+          },
+          tableClick: (row) => {
+              row['cGrpMrk']='0'
+              openEdit('view', row)
+          },
+      }),
     ],
     fromSchema: [
       {
-        prop: "PrdProdPlan.cKindNme",
+        prop: "cKindNme",
         inputtype: 'rtinput',
         title: "产品大类",
       },
       {
-        prop: "PrdProdPlan.cProdNme",
+        prop: "cProdNme",
         inputtype: 'rtinput',
         title: "条款",
       },
       {
-        prop: "PrdProdPlan.CPlanNo",
+        prop: "cPlanNo",
         inputtype: 'rtinput',
         title: "方案编号",
       },
       {
-        prop: "PrdProdPlan.cPlanCn",
+        prop: "cPlanCn",
         inputtype: 'rtinput',
         title: "方案名称",
       },
       {
-        prop: "PrdProdPlan.cUndrStatus",
-        inputtype: 'rtinput',
+        prop: "cUndrStatus",
+        inputtype: 'rtselect',
         title: "审核状态",
+        loadData:[{value:'0',label:'暂存'},{value:'1',label:'待审核'},{value:'2',label:'已审核'}]
       },
       {
-        prop: "PrdProdPlan.cEnableStatus",
-        inputtype: 'rtinput',
-        title: "启用状态",
-      },
-      {
-        prop: "PrdProdPlan.cAccessType",
-        inputtype: 'rtinput',
+        prop: "cAccessType",
+        inputtype: 'rtselect',
         title: "访问类型",
+        typeCode: "BAS_COMM_CODE_OUT_CDE",
+        codeParam: {'cParCde': 'CAccessType'},
       },
+        {
+            prop: "cEnableStatus",
+            inputtype: 'rtselect',
+            title: "启用标识",
+            loadData:[{value:'0',label:'禁用'},{value:'1',label:'启用'}]
+        },
+        // {
+        //     prop: "PrdProdPlan.CEnableStatus",
+        //     inputtype: "rtswitch",
+        //     title: "启用标识",
+        //     keymap: {
+        //         y: "1",
+        //         n: "0",
+        //     },
+        //     activeText: "启用",
+        //     inactiveText: "禁用",
+        //     inlinePrompt: true,
+        //     func: async (val, row) => {
+        //         // await changeStatus({
+        //         //     cProdNo: row.cProdNo,
+        //         //     cStatus: val,
+        //         // }).then((res) => {
+        //         //     if (res.code === 200) {
+        //         //         handleQuery();
+        //         //     }
+        //         // });
+        //     },
+        // },
       {
-        prop: "PrdProdPlan.cTyp",
-        inputtype: 'rtinput',
+        prop: "cRationType",
+        inputtype: 'rtselect',
         title: "方案类型",
+        typeCode: "BAS_COMM_CODE_OUT_CDE",
+        codeParam: {'cParCde': 'CRationType'},
       },
     ],
   })
@@ -234,21 +341,29 @@ const refreshData = (reset = false) => {
   policyService.searchPlan(param).then(result => {
     if (result['code'] === 200) {
       ElMessage.success('查询成功');
-      const pageData = result['res'];
+      const pageData = result['data'];
       if (pageData) {
         pageresult.total = pageData.total;
         pageresult.list = [];
-        pageData.result.forEach(value => {
-          const data = dtofirstCharUpper(value, 'PrdProdPlan');
-          pageresult.list.push(data);
-        });
+        pageresult.list= pageData.result
+        // pageData.result.forEach(value => {
+          // const data = dtofirstCharUpper(value, 'PrdProdPlan');
+          // console.log(data)
+        //   pageresult.list.push(value);
+        // });
       }
     } else {
       ElMessage.error(result['msg']);
     }
   });
 };
-
+function setFormItem(prop: string, config: any) {
+    formconfig1.fromSchema?.forEach((item) => {
+        if (item.prop === prop) {
+            Object.assign(item, config);
+        }
+    });
+}
 onMounted(() => {
 });
 </script>

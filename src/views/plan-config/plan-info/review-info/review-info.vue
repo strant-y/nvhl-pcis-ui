@@ -22,13 +22,14 @@ const someProp = defineProps({
 const reviewOptions = ref([
   {
     label: '通过',
-    value: '1'
+    value: '2'
   },
   {
     label: '驳回',
     value: '0'
   }
 ]) //责任
+const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -38,7 +39,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     },
     fromSchema: [
       {
-        prop: "status",
+        prop: "cUndrStatus",
         inputtype: "rtselect",
         title: "审核意见",
         loadData: reviewOptions,
@@ -46,7 +47,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
       },
       {
-        prop: "remark",
+        prop: "cUndrDesc",
         inputtype: "rtinput",
         type: "textarea",
         rows: 4,
@@ -60,7 +61,32 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 onMounted(() => {
   
 });
+function getFromValue() {
+    return freeEditRef?.value?.getFromValue();
+}
 
+function setFormValue(value: any) {
+    freeEditRef?.value?.setFormValue(value);
+}
+
+function validate() {
+    return freeEditRef?.value?.validate();
+}
+
+function setValue(key: string, value: any) {
+    freeEditRef?.value?.setValue(key, value);
+}
+
+function getValue(key: string) {
+    return freeEditRef?.value?.getValue(key);
+}
+defineExpose({
+    getFromValue,
+    setFormValue,
+    validate,
+    setValue,
+    getValue,
+});
 </script>
 
 <style scoped lang="scss"></style>
