@@ -16,6 +16,7 @@ import { useValidator } from "@/typings/useValidator";
 import moment from "moment";
 import { codeListViewStore } from "@/store";
 import { useProductStore } from "@/store/modules/prod";
+import { getAddressStr } from "@/api/query";
 const productStore = useProductStore();
 const opertaor = dataOpertaor();
 const props = defineProps({
@@ -671,7 +672,60 @@ const method = {
     // productStore.$state.cClntMrk == "0";
     // setFormItem("Insured.cCntrNme", { hidden: false });
   },
+  //注册地址
+  getProp: (val: any) => {
+    setRegisterAdd();
+  },
+  //常住地址
+  getAllProp: (val: any) => {
+    setregistAdd();
+  },
+  //注册地址(input)
+  getcSuffixAddr:(val: any)=>{
+    setRegisterAdd();
+  },
+  //常住地址(input)
+  getcRegisterSuffixAddr: (val: any) => {
+    setregistAdd();
+  },
 };
+
+function setregistAdd() {
+  const ads = insuredEditRef?.value?.getValue('Insured.AllProp');
+  const a =  insuredEditRef?.value?.getValue("Insured.cRegisterSuffixAddr") || "";
+  if(ads){
+    getAddressStr({ address: ads }).then((res: any) => {
+    const { code, data, msg } = res;
+    if (code === 200) {
+      const b = data['addStr'] + a;
+      setAddressStr("Insured.cClntAddr", b);
+    }
+  });
+  }else{
+    setAddressStr("Insured.cClntAddr", a);
+  }
+}
+
+function setRegisterAdd() {
+  const ads = insuredEditRef?.value?.getValue('Insured.Prop');
+  const a =  insuredEditRef?.value?.getValue("Insured.cSuffixAddr") || "";
+  if(ads){
+    getAddressStr({ address: ads }).then((res: any) => {
+    const { code, data, msg } = res;
+    if (code === 200) {
+      const b = data['addStr'] + a;
+      setAddressStr("Insured.cRegisteredcapDre", b);
+    }
+  });
+  }else{
+    setAddressStr("Insured.cRegisteredcapDre", a);
+  }
+}
+
+function setAddressStr(key: any, data: any) {
+  insuredEditRef?.value?.setValue(key, data);
+}
+
 
 // 绑定特殊验证器
 const exRules = {};

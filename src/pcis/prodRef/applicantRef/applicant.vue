@@ -29,6 +29,7 @@ const props = defineProps({
 const applicantEditRef = ref<AppFreeEditMethod | null>(null);
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { getDefaultCompilerOptions } from "typescript";
+import { getAddressStr } from "@/api/query";
 const opertaor = dataOpertaor();
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));
@@ -438,42 +439,57 @@ const method = {
     }
   },
   //注册地址
-  getCountry:(val)=>{
-    if(val){
-      // Applicant.cClntAddr 常住地址
-      console.log("0000",val)
-      applicantEditRef?.value?.setValue(
-        "Applicant.cRegisteredcapDre",
-        val
-      );
-    }
+  getCountry: (val: any) => {
+    setRegisterAdd();
   },
   //常住地址
-  getAllProp:(val)=>{
-    console.log("999",val)
-    applicantEditRef?.value?.setValue(
-      "Applicant.cClntAddr",
-      val
-    );
+  getAllProp: (val: any) => {
+    setregistAdd();
   },
   //注册地址(input)
-  getcSuffixAddr:(val)=>{
-    const currentRegistAddr = applicantEditRef?.value?.getValue("Applicant.cRegisteredcapDre") || "";
-    applicantEditRef?.value?.setValue(
-    "Applicant.cRegisteredcapDre",
-    `${currentRegistAddr}${val}`
-  );
-    // console.log("555",val)
+  getcSuffixAddr:(val: any)=>{
+    setRegisterAdd();
   },
   //常住地址(input)
-  getcRegisterSuffixAddr:(val)=>{
-    const currentAddr = applicantEditRef?.value?.getValue("Applicant.cClntAddr") || "";
-    applicantEditRef?.value?.setValue(
-    "Applicant.cClntAddr",
-    `${currentAddr}${val}`
-  );
+  getcRegisterSuffixAddr: (val: any) => {
+    setregistAdd();
   },
 };
+
+function setregistAdd() {
+  const ads = applicantEditRef?.value?.getValue('Applicant.AllProp');
+  const a =  applicantEditRef?.value?.getValue("Applicant.cRegisterSuffixAddr") || "";
+  if(ads){
+    getAddressStr({ address: ads }).then((res: any) => {
+    const { code, data, msg } = res;
+    if (code === 200) {
+      const b = data['addStr'] + a;
+      setAddressStr("Applicant.cClntAddr", b);
+    }
+  });
+  }else{
+    setAddressStr("Applicant.cClntAddr", a);
+  }
+}
+
+function setRegisterAdd() {
+  const ads = applicantEditRef?.value?.getValue('Applicant.Prop');
+  const a =  applicantEditRef?.value?.getValue("Applicant.cSuffixAddr") || "";
+  if(ads){
+    getAddressStr({ address: ads }).then((res: any) => {
+    const { code, data, msg } = res;
+    if (code === 200) {
+      const b = data['addStr'] + a;
+      setAddressStr("Applicant.cRegisteredcapDre", b);
+    }
+  });
+  }else{
+    setAddressStr("Applicant.cRegisteredcapDre", a);
+  }
+}
+function setAddressStr(key: any, data: any) {
+  applicantEditRef?.value?.setValue(key, data);
+}
 
 function getFromValue() {
   return applicantEditRef?.value?.getFromValue();
