@@ -1,185 +1,172 @@
 <!-- 用户管理 -->
 <template>
-  <div>
-    <el-container>
-      <el-main>
-        <el-container>
-          <el-aside :width="(NavigaShow ? 200 : 100) + 'px'">
-            <el-affix :offset="150">
-              <div class="navi_container">
-                <div
-                  v-for="(pageConfig, v) in formconfig1"
-                  :key="v"
-                  class="NavigaList_card"
-                >
-                  <el-anchor :bound="120" :offset="80">
-                    <el-anchor-link
-                      :href="`#underwriteurl`"
-                      v-if="underwriteFlag"
-                    >
-                      <rt-icon
-                        style="margin-right: 14px"
-                        :item="{ icon: 'Tickets' }"
-                      />
-                      <span style="font-size: 15px" v-if="NavigaShow"
-                        >核保处理</span
-                      >
-                    </el-anchor-link>
-                    <el-anchor-link :href="`#edrbaseurl`" v-if="edrbaseFlag">
-                      <rt-icon
-                        style="margin-right: 14px"
-                        :item="{ icon: 'Tickets' }"
-                      />
-                      <span style="font-size: 15px" v-if="NavigaShow"
-                        >批改信息</span
-                      >
-                    </el-anchor-link>
-                    <el-anchor-link :href="`#edritemurl`" v-if="edritemFlag">
-                      <rt-icon
-                        style="margin-right: 14px"
-                        :item="{ icon: 'Tickets' }"
-                      />
-                      <span style="font-size: 15px" v-if="NavigaShow"
-                        >批改比较项</span
-                      >
-                    </el-anchor-link>
-                    <el-anchor-link
-                      v-for="(k, i) in pageConfig?.pageInfo"
-                      :key="i"
-                      :href="`#${(k.pageKey === 'dist' || k.pageKey === 'distSummary')? k.pageCode : k.pageKey}`"
-                      
-                      v-show="k.pageKey !== 'acctinfo' ? acctinfoFlag : true"
-                    >
-                      <rt-icon
-                        style="margin-right: 14px"
-                        :item="{
-                          icon:
-                            k.icon && k.icon !== 'null' && k.icon !== ''
-                              ? k.icon
-                              : 'Tickets',
-                        }"
-                      />
-                      <span style="font-size: 15px" v-if="NavigaShow">
-                        {{ k.pageTtile }}
-                      </span>
-                    </el-anchor-link>
-                  </el-anchor>
-                </div>
-                <div class="NavigaList_card" style="margin-left: 5px">
+  <div class="mypage-app">
+    <el-container class="dynamic-container" ref="scrollContainer">
+      <el-aside :width="(NavigaShow ? 200 : 100) + 'px'">
+        <el-affix :offset="100">
+          <div class="navi_container">
+            <div
+              v-for="(pageConfig, v) in formconfig1"
+              :key="v"
+              class="NavigaList_card"
+            >
+              <el-anchor :bound="120" :offset="80">
+                <el-anchor-link :href="`#underwriteurl`" v-if="underwriteFlag">
                   <rt-icon
-                    @click="NavigaShow = !NavigaShow"
-                    v-if="!NavigaShow"
-                    :item="{ icon: 'DArrowRight' }"
+                    style="margin-right: 14px"
+                    :item="{ icon: 'Tickets' }"
                   />
+                  <span style="font-size: 15px" v-if="NavigaShow"
+                    >核保处理</span
+                  >
+                </el-anchor-link>
+                <el-anchor-link :href="`#edrbaseurl`" v-if="edrbaseFlag">
                   <rt-icon
-                    @click="NavigaShow = !NavigaShow"
-                    v-if="NavigaShow"
-                    :item="{ icon: 'DArrowLeft' }"
+                    style="margin-right: 14px"
+                    :item="{ icon: 'Tickets' }"
                   />
-                </div>
-              </div>
-            </el-affix>
-          </el-aside>
-          <el-container>
-            <el-header height="60px">
-              <el-affix
-                :offset="95"
-                style="text-align: center; padding: 5px; background: #ebedfc"
-              >
-                <div class="tp" style="background: #ebedfc">
-                  <span style="font-weight: bold">条款：</span
-                  ><span class="publicStyle"
-                    >{{ props.param.cTermNo }}&nbsp;&nbsp;{{
-                      props.param.cTermNme
-                    }}</span
-                  >&nbsp;|&nbsp;<span style="font-weight: bold">出单方式：</span
-                  ><span class="publicStyle">核心页面出单</span>&nbsp;|
-                  <span class="publicStyle">非共保业务</span> |
-                  <span class="publicStyle">{{
-                    props.param.cGrpMrk == "0" ? "个单" : "团单"
-                  }}</span
-                  >&nbsp;|&nbsp;<span style="font-weight: bold"
-                    >是否互联网出单:</span
-                  >&nbsp;<span class="publicStyle">{{
-                    props.param.cIsNet == "0" ? "是" : "否"
-                  }}</span>
-                </div>
-                <div class="btm" style="background: #ebedfc">
-                  <span style="font-weight: bold">保险期限：</span
-                  ><span class="publicStyle">{{ tmDay }}</span
-                  >&nbsp;|&nbsp;<span style="font-weight: bold">保额：</span
-                  ><span class="publicStyle">{{ nAmt }}</span
-                  >&nbsp;<span style="font-weight: bold">元</span
-                  >&nbsp;|&nbsp;<span style="font-weight: bold">保费为: </span
-                  ><span class="publicStyle">{{ nPrm }}</span
-                  >&nbsp;<span style="font-weight: bold">元</span>
-                </div>
-              </el-affix>
-            </el-header>
-            <el-main>
-              <div
-                id="underwriteurl"
-                v-if="underwriteFlag"
-                style="margin-bottom: 10px"
-              >
-                <underwriteRef ref="underwrite"></underwriteRef>
-              </div>
-              <div
-                id="edrbaseurl"
-                v-if="edrbaseFlag"
-                style="margin-bottom: 10px"
-              >
-                <edrbaseRef ref="edrbase"></edrbaseRef>
-              </div>
-              <div
-                id="edritemurl"
-                v-if="edritemFlag"
-                style="margin-bottom: 10px"
-              >
-                <edritemRef ref="edritem"></edritemRef>
-              </div>
-
-              <template v-for="(pageConfig, v) in formconfig1" :key="v">
-                <div
-                  class="card_"
+                  <span style="font-size: 15px" v-if="NavigaShow"
+                    >批改信息</span
+                  >
+                </el-anchor-link>
+                <el-anchor-link :href="`#edritemurl`" v-if="edritemFlag">
+                  <rt-icon
+                    style="margin-right: 14px"
+                    :item="{ icon: 'Tickets' }"
+                  />
+                  <span style="font-size: 15px" v-if="NavigaShow"
+                    >批改比较项</span
+                  >
+                </el-anchor-link>
+                <el-anchor-link
                   v-for="(k, i) in pageConfig?.pageInfo"
                   :key="i"
-                  :id="(k.pageKey === 'dist' || k.pageKey === 'distSummary')? k.pageCode : k.pageKey"
+                  :href="`#${k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey}`"
                   v-show="k.pageKey !== 'acctinfo' ? acctinfoFlag : true"
                 >
-                  <component
-                    v-if="currentIndex >= i"
-                    :ref="
-                      (res) => {
-                        const pageK = (k.pageKey === 'dist' || k.pageKey === 'distSummary')? k.pageCode : k.pageKey
-                        opertaor.addTableRef(pageK, res);
-                      }
-                    "
-                    :is="
-                      k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'
-                    "
-                    :pageSchema="k.pageSchema"
+                  <rt-icon
+                    style="margin-right: 14px"
+                    :item="{
+                      icon:
+                        k.icon && k.icon !== 'null' && k.icon !== ''
+                          ? k.icon
+                          : 'Tickets',
+                    }"
                   />
-                </div>
-              </template>
-            </el-main>
-          </el-container>
-        </el-container>
-      </el-main>
-      <el-footer>
-        <el-affix position="bottom" :offset="10">
-          <div class="bottom-items">
-            <rt-button
-              v-for="(bth, idx) in bthList"
-              :item="bth"
-              :key="idx"
-              :loading="bth.loading"
-            />
+                  <span style="font-size: 15px" v-if="NavigaShow">
+                    {{ k.pageTtile }}
+                  </span>
+                </el-anchor-link>
+              </el-anchor>
+            </div>
+            <div class="NavigaList_card" style="margin-left: 5px">
+              <rt-icon
+                @click="NavigaShow = !NavigaShow"
+                v-if="!NavigaShow"
+                :item="{ icon: 'DArrowRight' }"
+              />
+              <rt-icon
+                @click="NavigaShow = !NavigaShow"
+                v-if="NavigaShow"
+                :item="{ icon: 'DArrowLeft' }"
+              />
+            </div>
           </div>
         </el-affix>
-      </el-footer>
+      </el-aside>
+      <el-main>
+        <el-backtop :right="100" :bottom="100" />
+        <el-affix
+          :offset="50"
+          :container="scrollContainer"
+          style="text-align: center; padding: 5px; background: #ebedfc"
+        >
+          <div class="tp" style="background: #ebedfc">
+            <span style="font-weight: bold">条款：</span
+            ><span class="publicStyle"
+              >{{ props.param.cTermNo }}&nbsp;&nbsp;{{
+                props.param.cTermNme
+              }}</span
+            >&nbsp;|&nbsp;<span style="font-weight: bold">出单方式：</span
+            ><span class="publicStyle">核心页面出单</span>&nbsp;|
+            <span class="publicStyle">非共保业务</span> |
+            <span class="publicStyle">{{
+              props.param.cGrpMrk == "0" ? "个单" : "团单"
+            }}</span
+            >&nbsp;|&nbsp;<span style="font-weight: bold">是否互联网出单:</span
+            >&nbsp;<span class="publicStyle">{{
+              props.param.cIsNet == "0" ? "是" : "否"
+            }}</span>
+          </div>
+          <div class="btm" style="background: #ebedfc">
+            <span style="font-weight: bold">保险期限：</span
+            ><span class="publicStyle">{{ tmDay }}</span
+            >&nbsp;|&nbsp;<span style="font-weight: bold">保额：</span
+            ><span class="publicStyle">{{ nAmt }}</span
+            >&nbsp;<span style="font-weight: bold">元</span>&nbsp;|&nbsp;<span
+              style="font-weight: bold"
+              >保费为: </span
+            ><span class="publicStyle">{{ nPrm }}</span
+            >&nbsp;<span style="font-weight: bold">元</span>
+          </div>
+        </el-affix>
+        <div
+          id="underwriteurl"
+          v-if="underwriteFlag"
+          style="margin-bottom: 10px"
+        >
+          <underwriteRef ref="underwrite"></underwriteRef>
+        </div>
+        <div id="edrbaseurl" v-if="edrbaseFlag" style="margin-bottom: 10px">
+          <edrbaseRef ref="edrbase"></edrbaseRef>
+        </div>
+        <div id="edritemurl" v-if="edritemFlag" style="margin-bottom: 10px">
+          <edritemRef ref="edritem"></edritemRef>
+        </div>
+
+        <template v-for="(pageConfig, v) in formconfig1" :key="v">
+          <div
+            class="card_"
+            v-for="(k, i) in pageConfig?.pageInfo"
+            :key="i"
+            :id="
+              k.pageKey === 'dist' || k.pageKey === 'distSummary'
+                ? k.pageCode
+                : k.pageKey
+            "
+            v-show="k.pageKey !== 'acctinfo' ? acctinfoFlag : true"
+          >
+            <component
+              v-if="currentIndex >= i"
+              :ref="
+                (res) => {
+                  const pageK =
+                    k.pageKey === 'dist' || k.pageKey === 'distSummary'
+                      ? k.pageCode
+                      : k.pageKey;
+                  opertaor.addTableRef(pageK, res);
+                }
+              "
+              :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
+              :pageSchema="k.pageSchema"
+            />
+          </div>
+        </template>
+      </el-main>
     </el-container>
-    <el-backtop :right="100" :bottom="100" />
+
+    <el-footer>
+      <el-affix position="bottom" :offset="10">
+        <div class="bottom-items">
+          <rt-button
+            v-for="(bth, idx) in bthList"
+            :item="bth"
+            :key="idx"
+            :loading="bth.loading"
+          />
+        </div>
+      </el-affix>
+    </el-footer>
 
     <!-- 发票弹框 -->
     <!-- <invoiceInfoModel v-if="invoiceShow"  ref="invoiceRef" @ok="close"></invoiceInfoModel> -->
@@ -225,14 +212,12 @@ import {
   getSurrenderPrecis,
   submitEdrSurrender,
 } from "../../../api/query/index";
-import {
-  checkFeeWindowType,
-} from "@/api/prod";
+import { checkFeeWindowType } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import moment from "moment";
 import dayjs from "dayjs";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
-
+const scrollContainer = ref("scrollContainer");
 // 发票信息
 // import invoiceInfoModel from "@/views/pcis-new-udr-list/common/invoice-info-model.vue";
 //  反洗钱
@@ -268,7 +253,6 @@ const amlExtendInfo = defineAsyncComponent(
 const historyClaimcaseModel = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/history-claimcase-model.vue")
 );
-
 
 const opertaor = dataOpertaor();
 opertaor.init();
@@ -308,16 +292,15 @@ const cacheKey = ref();
 
 let invoiceShow = ref(false); // 发票显示
 let amlInfoShow = ref(false); // 反洗钱显示
-let historyShow= ref(false); // 历史赔案
+let historyShow = ref(false); // 历史赔案
 let controlFlag = ""; // 用来处理反洗钱 页面窜窜以及显示
 
 // 存所有可显示账户信息场景
 let detailcodeArray =["保费调整","赔款后保额冲减","赔款后保额恢复","增加保额","减少保额","增加险别","变更清单信息","减少险别","变更保险期限","变更车辆信息","渠道信息变更","增减方案","变更投保数量","增加保费","变更每亩保费","减少保费","费率调整","报停展期","增加销售额","减少销售额","增加保费","其他","更改客户信息","变更工程造价","减少被保险人","变更建筑面积","收费延期","增加被保险人","增加清单信息","不记名补录被保险人","全单注销","全单退保","一般退保","当期退","分期失效",];
 // 用来处理 账户信息 哪些场景显示
-const isDetailCde = ()=>{
+const isDetailCde = () => {
   return detailcodeArray.includes(props.param.cRsnDetailCde);
-}
-
+};
 
 //关闭
 const close = () => {
@@ -343,15 +326,12 @@ const setTaxInfo = () => {
     // invoiceRef.value?.isShow()
     // invoiceShow.value = true;
 
-
     dzmodal
-        .open(invoiceInfoModel, { type: "Issuer", data: {} })
-        .then((res: any) => {
-          if (res.type === "ok") {
-          }
-        });
-
-
+      .open(invoiceInfoModel, { type: "Issuer", data: {} })
+      .then((res: any) => {
+        if (res.type === "ok") {
+        }
+      });
   } else {
     ElMessage.error("请先保存单据");
     return;
@@ -375,7 +355,6 @@ const setCusBenefitInfo = () => {
 
   //  投被保人性质 没有填写或者都为个人 提示
   if (AppcClntMrk == undefined || AppcClntMrk == null) {
-
     ElMessage.error(
       "投保人性质或被保人性质为[法人]时，才允许录入反洗钱扩展信息！"
     );
@@ -401,34 +380,34 @@ const setCusBenefitInfo = () => {
     controlFlag = "2";
   }
 
-  
-  dzmodal.open(amlExtendInfo, { type: "Issuer",  controlFlag}).then((res: any) => {
-          if (res.type === "ok") {
-          }
-        });
+  dzmodal
+    .open(amlExtendInfo, { type: "Issuer", controlFlag })
+    .then((res: any) => {
+      if (res.type === "ok") {
+      }
+    });
 };
 /**
  * 历史赔案
  */
 const historyClaimcaseFun = () => {
-  dzmodal.open(historyClaimcaseModel, { type: "Issuer",  data: {}}).then((res: any) => {
-          if (res.type === "ok") {
-          }
-        });
+  dzmodal
+    .open(historyClaimcaseModel, { type: "Issuer", data: {} })
+    .then((res: any) => {
+      if (res.type === "ok") {
+      }
+    });
 };
-
-
 
 /**
  * 投保需要的按钮
  */
 const basicBtn = [
-
   createFreeButtonBase({
     label: "保存模板",
     type: "primary",
     func: () => {
-      console.log(13133)
+      console.log(13133);
     },
   }),
   createFreeButtonBase({
@@ -480,14 +459,13 @@ const basicBtn = [
     func: () => {
       openLimit();
     },
-    
   }),
   createFreeButtonBase({
     label: "历史赔案",
     type: "primary",
     func: () => {
-      console.log(13133)
-      historyClaimcaseFun()
+      console.log(13133);
+      historyClaimcaseFun();
       // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
     },
   }),
@@ -497,12 +475,12 @@ const basicBtn = [
  */
 const edrBtn = [
   createFreeButtonBase({
-      label: "原保单查看",
-      type: "primary",
-      id: "btnCalEdr",
-      func: () => {
-        getPlyPolicyFun();
-      },
+    label: "原保单查看",
+    type: "primary",
+    id: "btnCalEdr",
+    func: () => {
+      getPlyPolicyFun();
+    },
   }),
   createFreeButtonBase({
     label: "保费计算",
@@ -599,19 +577,18 @@ const uwBtn = [
     type: "primary",
     id: "modFee",
     func: () => {
-        //获取费用信息类型接口（缺少渠道，保费，当前表单提交校验待后续补充）
-    checkFeeWindowType({ CAppNo: props.param.cAppNo })
-    .then((res:any) => {
-      if (200 !== res['code']) {
-            ElMessage.error(res['msg']);
+      //获取费用信息类型接口（缺少渠道，保费，当前表单提交校验待后续补充）
+      checkFeeWindowType({ CAppNo: props.param.cAppNo }).then((res: any) => {
+        if (200 !== res["code"]) {
+          ElMessage.error(res["msg"]);
         } else {
-          if (!!res['data']) {
-              //typeFlag = res['data'];
+          if (!!res["data"]) {
+            //typeFlag = res['data'];
           } else {
-            ElMessage.error(res['msg']);
+            ElMessage.error(res["msg"]);
+          }
         }
-    }
-    })
+      });
       dzmodal
         .open(CostInformation, { type: "Issuer", data: props.param })
         .then((res: any) => {
@@ -633,12 +610,12 @@ const uwBtn = [
         });
     },
   }),
- createFreeButtonBase({
+  createFreeButtonBase({
     label: "历史赔案",
     type: "primary",
     func: () => {
-      console.log(13133)
-      historyClaimcaseFun()
+      console.log(13133);
+      historyClaimcaseFun();
       // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
     },
   }),
@@ -705,33 +682,36 @@ const initPage = async () => {
       (props.param.cEdrType == "3" || props.param.cEdrType == "2"))
   ) {
     //退保不显示产品组件信息
-      acctinfoFlag.value=false
+    acctinfoFlag.value = false;
   }
-    // 页面初始化
-    const formconfig11 = JSON.parse(getProductRes.data);
+  // 页面初始化
+  const formconfig11 = JSON.parse(getProductRes.data);
 
-    //处理账户信息方面逻辑  根据isDetailcdeType 不包含这里的都不显示账户信息方面的内容
-    let isDetailcdeType = isDetailCde()
-    if(!isDetailcdeType){
-      formconfig11[0].pageInfo = formconfig11[0].pageInfo.filter(item => item.pageTtile !== '账户信息');
-    }
-    console.log("页面初始化返回数据", formconfig11);
-    if (props.param?.cAppTyp == "E") {
-      if (props.param.cEdrType == "1") {
-        opertaor.setReadOnly(formconfig11);
-      }
-    }
-    // 只读场景,提前将配置设置为只读
-    if (
-      props.param?.pageType === "PLY_UW_PROCESS_SCENE" ||
-      (props.param?.pageType === "EDR_APP_NEW_SCENE" && props.param.cEdrType == "1") ||
-      props.param?.pageType === "readonly" ||
-      props.param?.pageType === "UW_READ_SCENE"
-    ) {
+  //处理账户信息方面逻辑  根据isDetailcdeType 不包含这里的都不显示账户信息方面的内容
+  let isDetailcdeType = isDetailCde();
+  if (!isDetailcdeType) {
+    formconfig11[0].pageInfo = formconfig11[0].pageInfo.filter(
+      (item) => item.pageTtile !== "账户信息"
+    );
+  }
+  console.log("页面初始化返回数据", formconfig11);
+  if (props.param?.cAppTyp == "E") {
+    if (props.param.cEdrType == "1") {
       opertaor.setReadOnly(formconfig11);
     }
-    opertaor.setTableConfig(formconfig11);
-    renderComponents();
+  }
+  // 只读场景,提前将配置设置为只读
+  if (
+    props.param?.pageType === "PLY_UW_PROCESS_SCENE" ||
+    (props.param?.pageType === "EDR_APP_NEW_SCENE" &&
+      props.param.cEdrType == "1") ||
+    props.param?.pageType === "readonly" ||
+    props.param?.pageType === "UW_READ_SCENE"
+  ) {
+    opertaor.setReadOnly(formconfig11);
+  }
+  opertaor.setTableConfig(formconfig11);
+  renderComponents();
 };
 
 /**
@@ -825,27 +805,27 @@ async function loadAfter() {
       bthList.value = basicBtn;
     }
   } else if (props.param.pageType === "PLY_APP_MODIFY_BOUNCED_SCENE") {
-      // 投保单核保退回
-      const cAppNo = props.param.cAppNo;
-      loadAppPlyInfo(cAppNo);
-      bthList.value = basicBtn;
-  }else if (props.param.pageType === "EDR_APP_MODIFY_BOUNCED_SCENE") {
-      // 批改单核保退回
-      const cAppNo = props.param.cAppNo;
-      loadAppPlyInfo(cAppNo);
-      bthList.value = edrBtn;
-      nextTick(() => {
-          opertaor.setDisabledAll();
-          getEdrRsnItemFun(
-              props.param["cProdNo"],
-              props.param["cDptCde"],
-              props.param["cEdrRsnBundleCde"],
-              props.param["cEdrRsnBundleCde"],
-              props.param["cEdrType"],
-              props.param["cGrpMrk"]
-          );
-      });
-      edritem.value?.handleQuery();
+    // 投保单核保退回
+    const cAppNo = props.param.cAppNo;
+    loadAppPlyInfo(cAppNo);
+    bthList.value = basicBtn;
+  } else if (props.param.pageType === "EDR_APP_MODIFY_BOUNCED_SCENE") {
+    // 批改单核保退回
+    const cAppNo = props.param.cAppNo;
+    loadAppPlyInfo(cAppNo);
+    bthList.value = edrBtn;
+    nextTick(() => {
+      opertaor.setDisabledAll();
+      getEdrRsnItemFun(
+        props.param["cProdNo"],
+        props.param["cDptCde"],
+        props.param["cEdrRsnBundleCde"],
+        props.param["cEdrRsnBundleCde"],
+        props.param["cEdrType"],
+        props.param["cGrpMrk"]
+      );
+    });
+    edritem.value?.handleQuery();
   } else if (props.param.pageType === "PLY_UW_PROCESS_SCENE") {
     //核保处理
     nextTick(() => {
@@ -941,7 +921,7 @@ async function loadAfter() {
         label: "保存模板",
         type: "primary",
         func: () => {
-          console.log(1313)
+          console.log(1313);
         },
       }),
       createFreeButtonBase({
@@ -1012,7 +992,7 @@ async function loadAfter() {
         label: "保存模板",
         type: "primary",
         func: () => {
-          console.log(13123)
+          console.log(13123);
         },
       }),
       createFreeButtonBase({
@@ -1122,8 +1102,9 @@ const loadAppPlyInfo = (CAppNo) => {
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnBundleCde"] =
             props.param["cRsnCde"];
           if (props.param.cEdrType != "1") {
-            res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
-                [props.param["cRsnCde"]];
+            res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] = [
+              props.param["cRsnCde"],
+            ];
           }
         }
         edrbase.value?.setFormValue(EdrBaseData);
@@ -1234,38 +1215,50 @@ const submitToUndrFn = () => {
  */
 const openLimit = () => {
   //获取投保人信息
-    let operAppDatas = opertaor.getDataAll()['applicant'];
+  let operAppDatas = opertaor.getDataAll()["applicant"];
   //缴费明细非空逻辑校验
-      if (operAppDatas["Applicant.cAppNme"] == null || operAppDatas["Applicant.cAppNme"] === '') {
-          ElMessage.error("投保人信息客户名称不能为空！");
-          return;
-      }
-      if (operAppDatas["Applicant.cClntMrk"] == null || operAppDatas["Applicant.cClntMrk"] === '') {
-          ElMessage.error("投保人信息投保人性质不能为空！");
-          return;
-      }
-      if (operAppDatas["Applicant.cCertfCde"] == null || operAppDatas["Applicant.cCertfCde"] === '') {
-          ElMessage.error("投保人信息证件号码不能为空！");
-          return;
-      }
-      if (operAppDatas["Applicant.cRelateNo"] == null || operAppDatas["Applicant.cRelateNo"] === '') {
-          ElMessage.error("投保人信息关联交易审批单编号不能为空！");
-          return;
-      }
-    //额度明细功能参数
-    const limitParam = {
-      CRelateNo:operAppDatas["Applicant.cRelateNo"],//关联交易审批单编号
-      CClntMrk:operAppDatas["Applicant.cClntMrk"],//投保人性质
-      CAppNme:operAppDatas["Applicant.cAppNme"],//客户名称
-      CCertfCde:operAppDatas["Applicant.cCertfCde"],//身份证号
-    };
-    dzmodal
+  if (
+    operAppDatas["Applicant.cAppNme"] == null ||
+    operAppDatas["Applicant.cAppNme"] === ""
+  ) {
+    ElMessage.error("投保人信息客户名称不能为空！");
+    return;
+  }
+  if (
+    operAppDatas["Applicant.cClntMrk"] == null ||
+    operAppDatas["Applicant.cClntMrk"] === ""
+  ) {
+    ElMessage.error("投保人信息投保人性质不能为空！");
+    return;
+  }
+  if (
+    operAppDatas["Applicant.cCertfCde"] == null ||
+    operAppDatas["Applicant.cCertfCde"] === ""
+  ) {
+    ElMessage.error("投保人信息证件号码不能为空！");
+    return;
+  }
+  if (
+    operAppDatas["Applicant.cRelateNo"] == null ||
+    operAppDatas["Applicant.cRelateNo"] === ""
+  ) {
+    ElMessage.error("投保人信息关联交易审批单编号不能为空！");
+    return;
+  }
+  //额度明细功能参数
+  const limitParam = {
+    CRelateNo: operAppDatas["Applicant.cRelateNo"], //关联交易审批单编号
+    CClntMrk: operAppDatas["Applicant.cClntMrk"], //投保人性质
+    CAppNme: operAppDatas["Applicant.cAppNme"], //客户名称
+    CCertfCde: operAppDatas["Applicant.cCertfCde"], //身份证号
+  };
+  dzmodal
     .open(limitDetails, { type: "Issuer", data: limitParam })
     .then((res: any) => {
-    if (res.type === "ok") {
-    }
+      if (res.type === "ok") {
+      }
     });
-  }
+};
 /**
  * 投保单保存
  * **/
@@ -1274,12 +1267,10 @@ const savePlyInfo = () => {
   btn.loading = true;
   const res = opertaor.getDataAll();
 
-  
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
 
-  
   console.log(res);
   if (res["cvrg"].length == 0) {
     ElMessage.error("请录入条款信息");
@@ -1341,31 +1332,30 @@ const getEdrRsnItemFun = (
 /**
  * 原保单查看
  * **/
-const getPlyPolicyFun = () =>{
-    const param = {
-        scene: 'EDR_APP_NEW_SCENE',
-        CPlyNo:opertaor.getTableRefByKey("plyBase").getValue("Base.cPlyNo")
-    };
-    getAppPolicy(param).then((res) => {
-        console.log("投保单明细", res);
-        if (res["code"] == "200") {
-            const en = JSON.stringify({
-                cAppNo: res["res"]["composition"]["plyBase"][0]['Base.cAppNo'],
-                cAppTyp: res["res"]["composition"]["plyBase"][0]['Base.cAppTyp'],
-                cCiMrk: res["res"]["composition"]["plyBase"][0]['Base.cCiMrk'],
-                cProdNo: res["res"]["composition"]["plyBase"][0]['Base.cProdNo'],
-                cGrpMrk: res["res"]["composition"]["plyBase"][0]['Base.cGrpMrk'],
-                cDptCde: res["res"]["composition"]["plyBase"][0]['Base.cDptCde'],
-                pageType: "readonly",
-            });
-            const query = new URLSearchParams({ param: en });
-            const url = window.location.origin
-                + '/#/pcis/my-page?'
-                + query.toString();
-            window.open(url, '_blank');
-        }
-    });
-}
+const getPlyPolicyFun = () => {
+  const param = {
+    scene: "EDR_APP_NEW_SCENE",
+    CPlyNo: opertaor.getTableRefByKey("plyBase").getValue("Base.cPlyNo"),
+  };
+  getAppPolicy(param).then((res) => {
+    console.log("投保单明细", res);
+    if (res["code"] == "200") {
+      const en = JSON.stringify({
+        cAppNo: res["res"]["composition"]["plyBase"][0]["Base.cAppNo"],
+        cAppTyp: res["res"]["composition"]["plyBase"][0]["Base.cAppTyp"],
+        cCiMrk: res["res"]["composition"]["plyBase"][0]["Base.cCiMrk"],
+        cProdNo: res["res"]["composition"]["plyBase"][0]["Base.cProdNo"],
+        cGrpMrk: res["res"]["composition"]["plyBase"][0]["Base.cGrpMrk"],
+        cDptCde: res["res"]["composition"]["plyBase"][0]["Base.cDptCde"],
+        pageType: "readonly",
+      });
+      const query = new URLSearchParams({ param: en });
+      const url =
+        window.location.origin + "/#/pcis/my-page?" + query.toString();
+      window.open(url, "_blank");
+    }
+  });
+};
 /**
  *批改单保费计算
  ***/
@@ -1460,21 +1450,21 @@ const calcPremiumEdrSurrender = () => {
   res["user"] = user;
   res["EdrBase"] = edrbase.value?.getFromValue();
   if (
-      res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
-      res["EdrBase"]["EdrBase.cEdrRsnDetail"] != ""
+    res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
+    res["EdrBase"]["EdrBase.cEdrRsnDetail"] != ""
   ) {
-      res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
-          res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+    res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   }
-  console.log(res)
+  console.log(res);
   calcSurrenEdr(res).then((res) => {
     btn.loading = false;
     console.log("批改计算", res);
     if (res["code"] == "200") {
       ElMessage.success(
-          res.msg +
+        res.msg +
           "保费为：" +
-          res["res"]["composition"]["plyBase"][0]["Base.nPrm"]+
+          res["res"]["composition"]["plyBase"][0]["Base.nPrm"] +
           "; 保费变化量为：" +
           res["res"]["composition"]["plyBase"][0]["Base.nPrmVar"]
       );
@@ -1485,17 +1475,17 @@ const calcPremiumEdrSurrender = () => {
       opertaor.setDataAll(ops);
       if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
-          if (
-              res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] !=
-              "" &&
-              res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] !=
-              null
-          ) {
-              res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
-                  res["res"]["composition"]["EdrBase"][0][
-                      "EdrBase.cEdrRsnDetail"
-                      ].split(",");
-          }
+        if (
+          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] !=
+            "" &&
+          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] !=
+            null
+        ) {
+          res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
+            res["res"]["composition"]["EdrBase"][0][
+              "EdrBase.cEdrRsnDetail"
+            ].split(",");
+        }
         edrbase.value?.setFormValue(EdrBaseData);
       }
     } else {
@@ -1519,10 +1509,10 @@ const saveApplicationEdr = () => {
   res["plyNo"] = edrbase.value?.getFromValue()["EdrBase.cPlyNo"];
   res["taskId"] = props.param.taskId ? props.param.taskId : null;
   // res["data"] = {};
-  res["data"]=opertaor.getDataAll();
+  res["data"] = opertaor.getDataAll();
   res["data"]["EdrBase"] = edrbase.value?.getFromValue();
   res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"] =
-      res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+    res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   console.log(res);
   saveSurrenEdr(res).then((res) => {
     btn.loading = false;
@@ -1533,9 +1523,9 @@ const saveApplicationEdr = () => {
       if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
         res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
-            res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"].split(
-                ","
-            );
+          res["res"]["composition"]["EdrBase"][0][
+            "EdrBase.cEdrRsnDetail"
+          ].split(",");
         edrbase.value?.setFormValue(EdrBaseData);
       }
       ElMessage.success(res.msg);
@@ -1582,7 +1572,7 @@ const submitEdrToUndrSurrender = () => {
     : null;
   res["plyNo"] = edrbase.value?.getFromValue()["EdrBase.cPlyNo"];
   res["taskId"] = props.param.taskId ? props.param.taskId : null;
-  res["data"]=opertaor.getDataAll();
+  res["data"] = opertaor.getDataAll();
   res["data"]["EdrBase"] = edrbase.value?.getFromValue();
   console.log(res);
   submitEdrSurrender(res).then((res) => {
@@ -1609,11 +1599,11 @@ const saveEdrPlyInfo = () => {
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
   res["EdrBase"] = edrbase.value?.getFromValue();
   if (
-      res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
-      res["EdrBase"]["EdrBase.cEdrRsnDetail"] != ""
+    res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
+    res["EdrBase"]["EdrBase.cEdrRsnDetail"] != ""
   ) {
-      res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
-          res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+    res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   }
   saveEdrAppPlyInfo(res).then((res) => {
     console.log("saveAppPlyInfo-res", res);
@@ -1765,7 +1755,7 @@ opertaor.setFatherPage({
 });
 </script>
 
-<style scoped>
+<style lang="scss"  scoped>
 .bottom-items {
   height: 50px;
   background-color: #fff;
@@ -1791,5 +1781,14 @@ opertaor.setFatherPage({
 }
 .publicStyle {
   color: red;
+}
+.mypage-app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.dynamic-container {
+  height: calc(100vh - $navbar-height - 60px - 90px );
+  overflow: auto;
 }
 </style>

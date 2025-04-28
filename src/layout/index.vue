@@ -196,7 +196,7 @@ onUnmounted(() => {
   }
 
   .main-container {
-    min-height: calc(100vh - $navbar-height);
+    min-height: calc(100vh - $navbar-height - 60px );
     padding-top: $navbar-height;
     margin-left: 0;
   }
