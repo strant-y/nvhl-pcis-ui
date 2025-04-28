@@ -133,8 +133,11 @@ const method = {
   },
   //业务来源大类
   businessKindFunc: (val) => {
-    setValue("Base.cChaType", "");
-    setValue("Base.cChaSubtype", "");
+    const p = opertaor.getParam();
+    if (!p.initFlag) {
+      setValue("Base.cChaType", "");
+      setValue("Base.cChaSubtype", "");
+    }
     if (val) {
       getChaTypeList({ BsnsTyp: val, scene: "PLY_APP_NEW_SCENE" }).then(
         (res) => {
@@ -170,16 +173,22 @@ const method = {
           setFormItem("Base.cBrkrCde", obj); //代理(经纪)人
           setFormItem("Base.cBrkSlsCde", obj); //代理业务员
           setFormItem("Base.cAgtAgrNo", { rules: null }); //代理合作协议
-          setValue("Base.cBrkrCde", "");
-          setValue("Base.cBrkSlsCde", "");
-          setValue("Base.cAgtAgrNo", "");
+          if (!p.initFlag) {
+            setValue("Base.cBrkrCde", "");
+            setValue("Base.cBrkSlsCde", "");
+            setValue("Base.cAgtAgrNo", "");
+          }
         }
       });
     }
   },
   //业务来源中类
   businessFunc: (val) => {
-    setValue("Base.cChaSubtype", "");
+    const p = opertaor.getParam();
+    if (!p.initFlag) {
+      setValue("Base.cChaSubtype", "");
+    }
+
     if (val) {
       const params = {
         CChaType: val,
@@ -222,13 +231,20 @@ const method = {
   //业务来源子类
   businessSubFunc: (val) => {
     // 清除代理(经纪)人、代理业务员的值
-    setValue("Base.cBrkrCde", "");
-    setValue("Base.cBrkSlsCde", "");
+    const p = opertaor.getParam();
+
+    if (!p.initFlag) {
+      setValue("Base.cBrkrCde", "");
+      setValue("Base.cBrkSlsCde", "");
+    }
   },
   //代理(经纪)人change事件
   agentChange: () => {
     // 清除代代理业务员的值
-    setValue("Base.cBrkSlsCde", "");
+    const p = opertaor.getParam();
+    if (!p.initFlag) {
+      setValue("Base.cBrkSlsCde", "");
+    }
   },
   //代理(经纪)人icon事件
   agentFunc: () => {
