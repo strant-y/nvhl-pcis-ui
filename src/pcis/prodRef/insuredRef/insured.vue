@@ -102,6 +102,9 @@ const method = {
 
     for (const k in applicantValue) {
       switch (k) {
+        case "Applicant.cAppCde":
+          insuredValue["Insured.cAppCde"] = applicantValue[k];
+          break;
         case "Applicant.cAppNme":
           insuredValue["Insured.cAppNme"] = applicantValue[k];
           break;

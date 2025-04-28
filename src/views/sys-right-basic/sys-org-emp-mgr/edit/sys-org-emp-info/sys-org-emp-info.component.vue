@@ -242,6 +242,7 @@ const tableconfig = reactive<AppTableConfig>(
 				type: "success",
 				func: function () {
 					const CDptCde = freeEditRef.value?.getValue('cDptCde')
+					console.log('dddd----',CDptCde)
 					if(!CDptCde) {
 					  ElMessage.warning('请先选定机构,再进行操作！');
 					  return;            

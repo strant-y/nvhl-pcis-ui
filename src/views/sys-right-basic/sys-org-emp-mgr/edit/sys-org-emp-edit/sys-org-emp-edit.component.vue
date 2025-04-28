@@ -100,7 +100,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: '机构名称',
         inputtype: "rtselect",
         typeCode: "EMP_DPT_LIST_NOCACHE",
-        disabled: isDisabled,
+        disabled: true,
         rules: [getRules("required", {
           trigger: 'change'
         })]
@@ -298,11 +298,14 @@ onMounted(async () => {
       freeEditRef.value?.setFormValue(props.data);
     })
   }
+  console.log('aaaa',props.type,props.type === "add")
   if(props.type === "add"){
     nextTick(()=>{
-      let s = freeEditRef.value?.getFromSchemaItem('CDptCde')
-      freeEditRef.value?.setValue('CDptCde', props.cDptCde);
-      s['disabled'] = true
+      // let s = freeEditRef.value?.getFromSchemaItem('cDptCde')
+      // console.log('ssss',s)
+      freeEditRef.value?.setValue('cDptCde', props.cDptCde);
+      // s['disabled'] = true
+      
     })
   }
 });
