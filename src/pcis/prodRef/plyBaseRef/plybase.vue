@@ -78,15 +78,8 @@ onMounted(async () => {
         { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm}` },
       ],
     });
-    //回显保单来源
-    setFormItem("Base.cPolicySource", {
-      loadData: [
-        {
-          value: param.cBsnsSrc,
-          label: param.cBsnsSrcNm,
-        },
-      ],
-    });
+    //禁用保单来源
+    setFormItem("Base.cPolicySource", {disabled: true});
     setValue("Base.cDptCde", param.cDptCde);
     // 服务机构默认值
     setFormItem("Base.cIntroDptcde", {
