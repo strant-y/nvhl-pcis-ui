@@ -219,13 +219,26 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				inputtype: "rtselect",
 				title: "产品大类",
 				typeCode: "KIND_LIST_GRT",
+                clearable: true,
 				params: {'cOperId': user.value['opCde'], 'cDptCde': user.value['companyId']},
+                func: (val: any) => {
+                    // 更新产品下拉选
+                    setFormItem("CProdNo", {
+                        codeParam: {
+                            cParCde: val,
+                            cOperId: user.value?.opCde,
+                            cDptCde: user.value?.companyId,
+                        },
+                    });
+                    freeEditRef.value?.setValue("CProdNo", null);
+                },
 			},
 			{
 				prop: "CProdNo",
 				inputtype: "rtselect",
-				title: "产品",
-				typeCode: "PROD_LIST_GRT",
+				title: "条款",
+				typeCode: "TERM_LIST_IN_GUIDE_NEW",
+                clearable: true,
 				params: {'cParCde': '', 'cOperId': user.value['opCde'], 'cDptCde': user.value['companyId']},
 			},
 			{

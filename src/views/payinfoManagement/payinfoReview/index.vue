@@ -131,7 +131,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "dateRange",
         inputtype: "rtdatepicker",
         title: "日期起止期",
-        itemWidth: 2,
+        // itemWidth: 2,
         clearable: true,
         rules: [getRules("required", {})],
         type: "datetimerange",
@@ -173,19 +173,33 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         typeCode: "KIND_LIST_GRT",
         params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
         clearable: true,
-      },
-      {
-        prop: "CProdNo",
-        inputtype: "rtselect",
-        title: "产品",
-        typeCode: "PROD_LIST_GRT",
-        params: {
-          cParCde: "",
-          cOperId: user.value.opCde,
-          cDptCde: user.value.companyId,
+        func: (val: any) => {
+            // 更新产品下拉选
+            setFormItem("CProdNo", {
+                codeParam: {
+                    cParCde: val,
+                    cOperId: user.value?.opCde,
+                    cDptCde: user.value?.companyId,
+                },
+            });
+            freeEditRef.value?.setValue("CProdNo", null);
         },
-        clearable: true,
       },
+        {
+            prop: "CProdNo",
+            inputtype: "rtselect",
+            title: "条款",
+            itemWidth: 1,
+            filterable: true,
+            clearable: true,
+            typeCode: "TERM_LIST_IN_GUIDE_NEW",
+            codeParam: {
+                cOperId: user.value?.opCde,
+                cDptCde: user.value?.companyId,
+            },
+            func: (val) => {
+            },
+        },
     ],
   })
 );
