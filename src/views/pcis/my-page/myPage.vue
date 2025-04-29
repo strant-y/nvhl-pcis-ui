@@ -1224,8 +1224,12 @@ const setPayInfo = (base, applicant, insrnc) => {
     pay["Pay.cPayorNme"] = "";
   }
   pay["Pay.nPayablePrm"] = base["Base.nPrm"];
-  pay["Pay.tPayBgnTm"] = insrnc["Base.tAppTm"];
-  pay["Pay.tPayEndTm"] = insrnc["Base.tInsrncBgnTm"];
+  pay["Pay.tPayBgnTm"] =  moment(insrnc["Base.tAppTm"]).format(
+      "YYYY-MM-DD HH:mm:ss"
+  );
+  pay["Pay.tPayEndTm"] = moment(insrnc["Base.tInsrncBgnTm"]).format(
+      "YYYY-MM-DD HH:mm:ss"
+  );
   pay["Pay.nOwnPrm"] = base["Base.nPrm"];
   pay["Pay.cProdNo"] = base["Base.cProdNo"];
   pay["Pay.nPrmVar"] = !!base["Base.nPrm"] ? base["Base.nPrm"] : 0;
