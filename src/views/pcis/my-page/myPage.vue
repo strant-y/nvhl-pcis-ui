@@ -54,7 +54,18 @@
                     }"
                   />
                   <span style="font-size: 15px" v-if="NavigaShow">
-                    {{ k.pageTtile }}
+                    <template v-if="k.pageTtile && k.pageTtile.length > 6">
+                      <el-tooltip
+                        effect="dark"
+                        :content="k.pageTtile"
+                        placement="top-start"
+                      >
+                        {{ k.pageTtile.substring(0, 6) +  '...' }}
+                      </el-tooltip>
+                    </template>
+                    <template v-else>
+                      {{ k.pageTtile }}
+                    </template>
                   </span>
                 </el-anchor-link>
               </el-anchor>
@@ -296,7 +307,43 @@ let historyShow = ref(false); // 历史赔案
 let controlFlag = ""; // 用来处理反洗钱 页面窜窜以及显示
 
 // 存所有可显示账户信息场景
-let detailcodeArray =["保费调整","赔款后保额冲减","赔款后保额恢复","增加保额","减少保额","增加险别","变更清单信息","减少险别","变更保险期限","变更车辆信息","渠道信息变更","增减方案","变更投保数量","增加保费","变更每亩保费","减少保费","费率调整","报停展期","增加销售额","减少销售额","增加保费","其他","更改客户信息","变更工程造价","减少被保险人","变更建筑面积","收费延期","增加被保险人","增加清单信息","不记名补录被保险人","全单注销","全单退保","一般退保","当期退","分期失效",];
+let detailcodeArray = [
+  "保费调整",
+  "赔款后保额冲减",
+  "赔款后保额恢复",
+  "增加保额",
+  "减少保额",
+  "增加险别",
+  "变更清单信息",
+  "减少险别",
+  "变更保险期限",
+  "变更车辆信息",
+  "渠道信息变更",
+  "增减方案",
+  "变更投保数量",
+  "增加保费",
+  "变更每亩保费",
+  "减少保费",
+  "费率调整",
+  "报停展期",
+  "增加销售额",
+  "减少销售额",
+  "增加保费",
+  "其他",
+  "更改客户信息",
+  "变更工程造价",
+  "减少被保险人",
+  "变更建筑面积",
+  "收费延期",
+  "增加被保险人",
+  "增加清单信息",
+  "不记名补录被保险人",
+  "全单注销",
+  "全单退保",
+  "一般退保",
+  "当期退",
+  "分期失效",
+];
 // 用来处理 账户信息 哪些场景显示
 const isDetailCde = () => {
   return detailcodeArray.includes(props.param.cRsnDetailCde);
@@ -1755,7 +1802,7 @@ opertaor.setFatherPage({
 });
 </script>
 
-<style lang="scss"  scoped>
+<style lang="scss" scoped>
 .bottom-items {
   height: 50px;
   background-color: #fff;
@@ -1788,7 +1835,7 @@ opertaor.setFatherPage({
   height: 100%;
 }
 .dynamic-container {
-  height: calc(100vh - $navbar-height - 60px - 90px );
+  height: calc(100vh - $navbar-height - 60px - 90px);
   overflow: auto;
 }
 </style>
