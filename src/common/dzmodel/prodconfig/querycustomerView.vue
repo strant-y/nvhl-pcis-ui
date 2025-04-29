@@ -268,13 +268,15 @@ function getValue(key: string) {
 }
 function setDisa() {}
 
+
+//由于目前流程不完整，客户库还未对接，目前查询类似于新增功能，需要用户填入完整表单后续反显
 /** 查询 */
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r);
-  if (s["CClntNme"] == null && s["CCertfCde"] == null) {
-    ElMessage.error("客户姓名或证件号码至少一个不为空！");
+  if (s["CClntMrk"] == null || s["CClntNme"] == null|| s["CCertfCls"] == null|| s["CCertfCde"] == null) {
+    ElMessage.error("客户信息都不能为空！");
     return;
   }
   param["CurrentUser"] = user["companyId"];

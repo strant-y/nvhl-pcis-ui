@@ -804,6 +804,7 @@
                                 },
                             });
                         } else if ("3" === routeData["rsnTyp"]) {
+                            console.log("退保",selected.value);
                             //退保
                             const en = JSON.stringify({
                                 cAppNo: selected.value["cPlyNo"],
@@ -820,6 +821,8 @@
                                 cDptCnm: selected.value["cDptCnm"],
                                 cEdrType: routeData["rsnTyp"],
                                 pageType: "EDR_APP_NEW_SCENE",
+                                cTermNme: "",
+                                cTermNo: "",
                             });
                             //预留跳转路径
                             router.push({

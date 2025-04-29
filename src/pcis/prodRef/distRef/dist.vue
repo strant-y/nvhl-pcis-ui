@@ -31,6 +31,8 @@ import {
 } from "@/api/prod/index";
 import { saveAs } from "file-saver";
 import { formInit } from "@/shared/from-init";
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 const policyService = new PolicyService();
 import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
@@ -163,7 +165,7 @@ const method = {
   delmethod: (row: any) => {
     deleteDist({
       cComponentTable: cComponentTableValue,
-      cPkId: [row.cPkId],
+      cPkId: [row['Dist.cPkId']],
     }).then((res: any) => {
       if (res.code === 200) {
         ElMessage.success("删除成功");
@@ -272,6 +274,24 @@ const method = {
         saveAs(blob, fileName);
       })
   },
+  getDistoccupType:(val) => {
+    console.log("val",val);
+    codeListStore
+        .queryCodeList({
+          codeListName: "Occupt_ZYLB",
+          codeListParam: {cParCde: val.at(-1)},
+        })
+        .then((res) => {
+          console.log("Fetched data:", res); // 添加调试信息
+      if (Array.isArray(res)) {
+        setFormItem("Dist.cOccupationalLevel", {
+          loadData: res,
+        });
+      } else {
+        console.error("Unexpected data format:", res); // 添加调试信息
+      }
+    })
+  },
   //模板下载
   downloadTemp: () => {
     policyService
@@ -293,7 +313,30 @@ const method = {
       });
   },
 };
-
+//给表单下拉项赋值
+function setFormItem(key, obj) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.loadData && obj.loadData) {
+          let newBtnItems = null;
+          if (obj.loadData.length != 0) {
+            for (let key in obj.loadData) {
+              item.loadData[key] = obj.loadData[key];
+            }
+          } else {
+            item.loadData = obj.loadData;
+          }
+          newBtnItems = item.loadData;
+          newBtnItems && (obj.loadData = newBtnItems);
+        }
+        Object.assign(item, obj);
+        console.log(`Updated item for key ${key}:`, item);
+      }
+    });
+  }
+}
 function setUnDisabledByKeyList(key: any) {
   cardconfig.value.endBtns?.forEach((item: any) => {
     if ("Btn_" + item.id === key) {

@@ -186,8 +186,8 @@
                     inputtype: "rtradio",
                     title: "是否临分",
                     loadData :[
-                        { label:'是',value:'1' },
-                        { label:'否',value:'2' },
+                        {value: '1', label: '是'},
+                        {value: '0', label: '否'},
                     ],
                     rules: [getRules("required", {})],
                 },
