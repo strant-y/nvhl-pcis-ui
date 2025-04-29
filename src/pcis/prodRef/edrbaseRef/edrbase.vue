@@ -1,5 +1,7 @@
 <template>
-  <app-free-edit v-model:freeEditConfig="formconfig1" ref="edrbaseEditRef" />
+  <div>
+    <app-free-edit v-model:freeEditConfig="formconfig1" ref="edrbaseEditRef" />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -13,7 +15,6 @@ import { useValidator } from "@/typings/useValidator";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
 import { codeListViewStore } from "@/store";
-import func from "vue-temp/vue-editor-bridge";
 const codeListStore = codeListViewStore();
 const opertaor = dataOpertaor();
 const { getRules } = useValidator();
@@ -22,7 +23,7 @@ const props = defineProps({
   //   type: [Object],
   // },
 });
-const params=opertaor.getParam()
+const params=opertaor.getParam();
 const { getCUndrMrk, getBackClsList } = NewUdrListService();
 const edrbaseEditRef = ref<AppFreeEditMethod | null>(null);
 const user = JSON.parse(sessionStorage.getItem("user"));

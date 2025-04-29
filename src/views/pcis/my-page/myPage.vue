@@ -1,186 +1,182 @@
 <!-- 用户管理 -->
 <template>
-  <div>
-    <el-container>
-      <el-main>
-        <el-container>
-          <el-aside :width="(NavigaShow ? 200 : 100) + 'px'">
-            <el-affix :offset="150">
-              <div class="navi_container">
-                <div
-                  v-for="(pageConfig, v) in formconfig1"
-                  :key="v"
-                  class="NavigaList_card"
-                >
-                  <el-anchor :bound="120" :offset="80">
-                    <el-anchor-link
-                      :href="`#underwriteurl`"
-                      v-if="underwriteFlag"
-                    >
-                      <rt-icon
-                        style="margin-right: 14px"
-                        :item="{ icon: 'Tickets' }"
-                      />
-                      <span style="font-size: 15px" v-if="NavigaShow"
-                        >核保处理</span
-                      >
-                    </el-anchor-link>
-                    <el-anchor-link :href="`#edrbaseurl`" v-if="edrbaseFlag">
-                      <rt-icon
-                        style="margin-right: 14px"
-                        :item="{ icon: 'Tickets' }"
-                      />
-                      <span style="font-size: 15px" v-if="NavigaShow"
-                        >批改信息</span
-                      >
-                    </el-anchor-link>
-                    <el-anchor-link :href="`#edritemurl`" v-if="edritemFlag">
-                      <rt-icon
-                        style="margin-right: 14px"
-                        :item="{ icon: 'Tickets' }"
-                      />
-                      <span style="font-size: 15px" v-if="NavigaShow"
-                        >批改比较项</span
-                      >
-                    </el-anchor-link>
-                    <el-anchor-link
-                      v-for="(k, i) in pageConfig?.pageInfo"
-                      :key="i"
-                      :href="`#${(k.pageKey === 'dist' || k.pageKey === 'distSummary')? k.pageCode : k.pageKey}`"
-                      
-                      v-show="k.pageKey !== 'acctinfo' ? acctinfoFlag : true"
-                    >
-                      <rt-icon
-                        style="margin-right: 14px"
-                        :item="{
-                          icon:
-                            k.icon && k.icon !== 'null' && k.icon !== ''
-                              ? k.icon
-                              : 'Tickets',
-                        }"
-                      />
-                      <span style="font-size: 15px" v-if="NavigaShow">
-                        {{ k.pageTtile }}
-                      </span>
-                    </el-anchor-link>
-                  </el-anchor>
-                </div>
-                <div class="NavigaList_card" style="margin-left: 5px">
+  <div class="mypage-app">
+    <el-container class="dynamic-container" ref="scrollContainer">
+      <el-aside :width="(NavigaShow ? 200 : 100) + 'px'">
+        <el-affix :offset="100">
+          <div class="navi_container">
+            <div
+              v-for="(pageConfig, v) in formconfig1"
+              :key="v"
+              class="NavigaList_card"
+            >
+              <el-anchor :bound="120" :offset="80">
+                <el-anchor-link :href="`#underwriteurl`" v-if="underwriteFlag">
                   <rt-icon
-                    @click="NavigaShow = !NavigaShow"
-                    v-if="!NavigaShow"
-                    :item="{ icon: 'DArrowRight' }"
+                    style="margin-right: 14px"
+                    :item="{ icon: 'Tickets' }"
                   />
+                  <span style="font-size: 15px" v-if="NavigaShow"
+                    >核保处理</span
+                  >
+                </el-anchor-link>
+                <el-anchor-link :href="`#edrbaseurl`" v-if="edrbaseFlag">
                   <rt-icon
-                    @click="NavigaShow = !NavigaShow"
-                    v-if="NavigaShow"
-                    :item="{ icon: 'DArrowLeft' }"
+                    style="margin-right: 14px"
+                    :item="{ icon: 'Tickets' }"
                   />
-                </div>
-              </div>
-            </el-affix>
-          </el-aside>
-          <el-container>
-            <el-header height="60px">
-              <el-affix
-                :offset="95"
-                style="text-align: center; padding: 5px; background: #ebedfc"
-              >
-                <div class="tp" style="background: #ebedfc">
-                  <span style="font-weight: bold">条款：</span
-                  ><span class="publicStyle"
-                    >{{ props.param.cTermNo }}&nbsp;&nbsp;{{
-                      props.param.cTermNme
-                    }}</span
-                  >&nbsp;|&nbsp;<span style="font-weight: bold">出单方式：</span
-                  ><span class="publicStyle">核心页面出单</span>&nbsp;|
-                  <span class="publicStyle">非共保业务</span> |
-                  <span class="publicStyle">{{
-                    props.param.cGrpMrk == "0" ? "个单" : "团单"
-                  }}</span
-                  >&nbsp;|&nbsp;<span style="font-weight: bold"
-                    >是否互联网出单:</span
-                  >&nbsp;<span class="publicStyle">{{
-                    props.param.cIsNet == "0" ? "是" : "否"
-                  }}</span>
-                </div>
-                <div class="btm" style="background: #ebedfc">
-                  <span style="font-weight: bold">保险期限：</span
-                  ><span class="publicStyle">{{ tmDay }}</span
-                  >&nbsp;|&nbsp;<span style="font-weight: bold">保额：</span
-                  ><span class="publicStyle">{{ nAmt }}</span
-                  >&nbsp;<span style="font-weight: bold">元</span
-                  >&nbsp;|&nbsp;<span style="font-weight: bold">保费为: </span
-                  ><span class="publicStyle">{{ nPrm }}</span
-                  >&nbsp;<span style="font-weight: bold">元</span>
-                </div>
-              </el-affix>
-            </el-header>
-            <el-main>
-              <div
-                id="underwriteurl"
-                v-if="underwriteFlag"
-                style="margin-bottom: 10px"
-              >
-                <underwriteRef ref="underwrite"></underwriteRef>
-              </div>
-              <div
-                id="edrbaseurl"
-                v-if="edrbaseFlag"
-                style="margin-bottom: 10px"
-              >
-                <edrbaseRef ref="edrbase"></edrbaseRef>
-              </div>
-              <div
-                id="edritemurl"
-                v-if="edritemFlag"
-                style="margin-bottom: 10px"
-              >
-                <edritemRef ref="edritem"></edritemRef>
-              </div>
-
-              <template v-for="(pageConfig, v) in formconfig1" :key="v">
-           
-                <div
-                  class="card_"
+                  <span style="font-size: 15px" v-if="NavigaShow"
+                    >批改信息</span
+                  >
+                </el-anchor-link>
+                <el-anchor-link :href="`#edritemurl`" v-if="edritemFlag">
+                  <rt-icon
+                    style="margin-right: 14px"
+                    :item="{ icon: 'Tickets' }"
+                  />
+                  <span style="font-size: 15px" v-if="NavigaShow"
+                    >批改比较项</span
+                  >
+                </el-anchor-link>
+                <el-anchor-link
                   v-for="(k, i) in pageConfig?.pageInfo"
                   :key="i"
-                  :id="(k.pageKey === 'dist' || k.pageKey === 'distSummary')? k.pageCode : k.pageKey"
+                  :href="`#${k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey}`"
                   v-show="k.pageKey !== 'acctinfo' ? acctinfoFlag : true"
                 >
-                  <component
-                    v-if="currentIndex >= i"
-                    :ref="
-                      (res) => {
-                        const pageK = (k.pageKey === 'dist' || k.pageKey === 'distSummary')? k.pageCode : k.pageKey
-                        opertaor.addTableRef(pageK, res);
-                      }
-                    "
-                    :is="
-                      k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'
-                    "
-                    :pageSchema="k.pageSchema"
+                  <rt-icon
+                    style="margin-right: 14px"
+                    :item="{
+                      icon:
+                        k.icon && k.icon !== 'null' && k.icon !== ''
+                          ? k.icon
+                          : 'Tickets',
+                    }"
                   />
-                </div>
-              </template>
-            </el-main>
-          </el-container>
-        </el-container>
-      </el-main>
-      <el-footer>
-        <el-affix position="bottom" :offset="10">
-          <div class="bottom-items">
-            <rt-button
-              v-for="(bth, idx) in bthList"
-              :item="bth"
-              :key="idx"
-              :loading="bth.loading"
-            />
+                  <span style="font-size: 15px" v-if="NavigaShow">
+                    <template v-if="k.pageTtile && k.pageTtile.length > 6">
+                      <el-tooltip
+                        effect="dark"
+                        :content="k.pageTtile"
+                        placement="top-start"
+                      >
+                        {{ k.pageTtile.substring(0, 6) + "..." }}
+                      </el-tooltip>
+                    </template>
+                    <template v-else>
+                      {{ k.pageTtile }}
+                    </template>
+                  </span>
+                </el-anchor-link>
+              </el-anchor>
+            </div>
+            <div class="NavigaList_card" style="margin-left: 5px">
+              <rt-icon
+                @click="NavigaShow = !NavigaShow"
+                v-if="!NavigaShow"
+                :item="{ icon: 'DArrowRight' }"
+              />
+              <rt-icon
+                @click="NavigaShow = !NavigaShow"
+                v-if="NavigaShow"
+                :item="{ icon: 'DArrowLeft' }"
+              />
+            </div>
           </div>
         </el-affix>
-      </el-footer>
+      </el-aside>
+      <el-main>
+        <el-backtop :right="100" :bottom="100" />
+        <el-affix
+          :offset="50"
+          style="text-align: center; padding: 5px; background: #ebedfc"
+        >
+          <div class="tp" style="background: #ebedfc">
+            <span style="font-weight: bold">条款：</span
+            ><span class="publicStyle"
+              >{{ props.param.cTermNo }}&nbsp;&nbsp;{{
+                props.param.cTermNme
+              }}</span
+            >&nbsp;|&nbsp;<span style="font-weight: bold">出单方式：</span
+            ><span class="publicStyle">核心页面出单</span>&nbsp;|
+            <span class="publicStyle">非共保业务</span> |
+            <span class="publicStyle">{{
+              props.param.cGrpMrk == "0" ? "个单" : "团单"
+            }}</span
+            >&nbsp;|&nbsp;<span style="font-weight: bold">是否互联网出单:</span
+            >&nbsp;<span class="publicStyle">{{
+              props.param.cIsNet == "0" ? "是" : "否"
+            }}</span>
+          </div>
+          <div class="btm" style="background: #ebedfc">
+            <span style="font-weight: bold">保险期限：</span
+            ><span class="publicStyle">{{ tmDay }}</span
+            >&nbsp;|&nbsp;<span style="font-weight: bold">保额：</span
+            ><span class="publicStyle">{{ nAmt }}</span
+            >&nbsp;<span style="font-weight: bold">元</span>&nbsp;|&nbsp;<span
+              style="font-weight: bold"
+              >保费为: </span
+            ><span class="publicStyle">{{ nPrm }}</span
+            >&nbsp;<span style="font-weight: bold">元</span>
+          </div>
+        </el-affix>
+        <div
+          id="underwriteurl"
+          v-if="underwriteFlag"
+          style="margin-bottom: 10px"
+        >
+          <underwriteRef ref="underwrite"></underwriteRef>
+        </div>
+
+        <div id="edrbaseurl" v-if="edrbaseFlag" style="margin-bottom: 10px">
+          <edrbaseRef ref="edrbase"></edrbaseRef>
+        </div>
+        <div id="edritemurl" v-if="edritemFlag" style="margin-bottom: 10px">
+          <edritemRef ref="edritem"></edritemRef>
+        </div>
+        <template v-for="(pageConfig, v) in formconfig1" :key="v">
+          <div
+            class="card_"
+            v-for="(k, i) in pageConfig?.pageInfo"
+            :key="i"
+            :id="
+              k.pageKey === 'dist' || k.pageKey === 'distSummary'
+                ? k.pageCode
+                : k.pageKey
+            "
+            v-show="k.pageKey !== 'acctinfo' ? acctinfoFlag : true"
+          >
+            <component
+              v-if="currentIndex >= i"
+              :ref="
+                (res) => {
+                  const pageK =
+                    k.pageKey === 'dist' || k.pageKey === 'distSummary'
+                      ? k.pageCode
+                      : k.pageKey;
+                  opertaor.addTableRef(pageK, res);
+                }
+              "
+              :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
+              :pageSchema="k.pageSchema"
+            />
+          </div>
+        </template>
+      </el-main>
     </el-container>
-    <el-backtop :right="100" :bottom="100" />
+
+    <el-footer>
+      <el-affix position="bottom" :offset="10">
+        <div class="bottom-items">
+          <rt-button
+            v-for="(bth, idx) in bthList"
+            :item="bth"
+            :key="idx"
+            :loading="bth.loading"
+          />
+        </div>
+      </el-affix>
+    </el-footer>
   </div>
 </template>
 
