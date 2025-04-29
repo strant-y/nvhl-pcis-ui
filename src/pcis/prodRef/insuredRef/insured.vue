@@ -676,7 +676,13 @@ const method = {
 
   //注册地市是否同上
   isSameChange: (val) => {
+    if (val == "1") {
+      const ads = insuredEditRef?.value?.getValue('Insured.AllProp');
+      const a =  insuredEditRef?.value?.getValue("Insured.cRegisterSuffixAddr") || "";
 
+      insuredEditRef?.value?.setValue('Insured.Prop',ads);
+      insuredEditRef?.value?.setValue('Insured.cSuffixAddr',a);
+    }
   },
   hidPerson: () => {
 

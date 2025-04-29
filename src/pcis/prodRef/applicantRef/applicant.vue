@@ -473,15 +473,11 @@ const method = {
   //注册地市是否同上
   isSameChange: (val) => {
     if (val == "1") {
-      // 获取常驻地址的值
-      // const residenceAddr = applicantEditRef.value?.getValue(
-      //   "Applicant.cResidenceAddr"
-      // );
-      // console.log("00009999", residenceAddr);
-      // applicantEditRef.value?.setValue(
-      //   "Applicant.cRegisteredcapDre",
-      //   residenceAddr
-      // );
+      const ads = applicantEditRef?.value?.getValue('Applicant.AllProp');
+      const a =  applicantEditRef?.value?.getValue("Applicant.cRegisterSuffixAddr") || "";
+
+      applicantEditRef?.value?.setValue('Applicant.Prop',ads);
+      applicantEditRef?.value?.setValue('Applicant.cSuffixAddr',a);
     } else {
     }
   },
