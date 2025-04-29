@@ -129,7 +129,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: '保险起期',
         inputtype: "rtdatepicker",
         format: 'YYYY-MM-DD HH:mm:ss',
-        type: "daterange",
+        // type: "daterange",
         disabled: true,
       },
       {
@@ -137,7 +137,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: '保险止期',
         inputtype: "rtdatepicker",
         format: 'YYYY-MM-DD HH:mm:ss',
-        type: "daterange",
+        // type: "daterange",
         disabled: true,
       },
       {
@@ -145,7 +145,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: '核保时间',
         inputtype: "rtdatepicker",
         format: 'YYYY-MM-DD HH:mm:ss',
-        type: "daterange",
+        // type: "daterange",
         disabled: true,
       },
       {
@@ -153,7 +153,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: '保批单生成时间',
         inputtype: "rtdatepicker",
         format: 'YYYY-MM-DD HH:mm:ss',
-        type: "daterange",
+        // type: "daterange",
         disabled: true,
       },
       {
@@ -161,7 +161,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: '打印时间',
         inputtype: "rtdatepicker",
         format: 'YYYY-MM-DD HH:mm:ss',
-        type: "daterange",
+        // type: "daterange",
         disabled: true,
       },
       {
