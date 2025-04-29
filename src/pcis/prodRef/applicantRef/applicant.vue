@@ -35,6 +35,8 @@ const opertaor = dataOpertaor();
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 const formData = ref<any[]>([]);
 const cClntAddr = ref<any>(null);
+import { useRoute } from "vue-router";
+const route = useRoute();
 onMounted(() => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
@@ -48,10 +50,13 @@ onMounted(() => {
       rules: null,
       disabled: true,
     });
-
-
-    
+//【国民经济行业分类】初始化必填，只有法人时才必填，现在个人也是必填了（老系统需求：040001/042002/043004/043005/043011五款产品不区分法人个人投保，国民经济行业分类都必填，其他产品只有法人才必填）
+const cProdNo = route.params.param.cProdNo;
+  if (cProdNo === "040001" || cProdNo === "042002" || cProdNo === "043004" || cProdNo === "043005" || cProdNo === "043011") {
+    setFormItem("Applicant.cTrdCde", {rules: null });
+  } 
   });
+  
 });
 //给表单下拉项赋值
 function setFormItem(key, obj) {
