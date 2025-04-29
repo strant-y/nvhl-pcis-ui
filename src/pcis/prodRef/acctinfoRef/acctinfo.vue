@@ -1,5 +1,4 @@
 <template>
-  <!-- v-if="iscRsnDetailCde"  -->
   <app-free-edit    :freeEditConfig="formconfig1" ref="tgtobjEditRef" /> 
 </template>
 
@@ -24,53 +23,13 @@ const props = defineProps({
 });
 
 let cRsnDetailCde = ref(route.params.param?.cRsnDetailCde);
-
-let detailcodeArray =[
-"保费调整",
-"赔款后保额冲减",
-"赔款后保额恢复",
-"增加保额",
-"减少保额",
-"增加险别",
-"变更清单信息",
-"减少险别",
-"变更保险期限",
-"变更车辆信息",
-"渠道信息变更",
-"增减方案",
-"变更投保数量",
-"增加保费",
-"变更每亩保费",
-"减少保费",
-"费率调整",
-"报停展期",
-"增加销售额",
-"减少销售额",
-"增加保费",
-"减少保费",
-"其他",
-"更改客户信息",
-"变更工程造价",
-"减少被保险人",
-"变更建筑面积",
-"收费延期",
-"增加被保险人",
-"增加清单信息",
-"不记名补录被保险人",
-"全单注销",
-"全单退保",
-"一般退保",
-"当期退",
-"分期失效",
-];
-
 const tgtobjEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 
 onMounted(() => {
 const routeData = route.params ; // 获取路由参数 
-  console.log("路由参数props.param1212", routeData.param);
+  console.log("路由参数props.param1212", routeData.param,);
    // console.log('pay form' ,props.pageSchema.fromSchema[2].disabled = false)
 
     const formconfig11 = formInit(
@@ -78,6 +37,8 @@ const routeData = route.params ; // 获取路由参数
     method,
     exRules
   );
+
+  console.log('数据',formconfig11)
   Object.assign(formconfig1, formconfig11);
 
   canOperateForm();
@@ -127,17 +88,6 @@ const canOperateForm= ()=>{
 
 }
 
-
-
-// 用来处理 哪些场景显示
-const iscRsnDetailCde = computed(() => {
-      if (cRsnDetailCde.value === null || cRsnDetailCde.value === undefined) {
-        return false;
-      }
-      return detailcodeArray.includes(cRsnDetailCde.value);
-    })
-
-
 // 绑定方法
 const method = {
   // func demo
@@ -152,11 +102,20 @@ const method = {
             // 1直连银行 开户行 省、市、对公对私必填   0是非直联，开户行 省、市、区/县、开户行、对公对私必填
             if (isdefault === '1') {    
               setFormItem("Acctinfo.cBankPro", {
+             
                 rules: [getRules("required", {})],
               });
               setFormItem("Acctinfo.cBankArea", {
+                disabled: true,
                 rules: [getRules("required", {})],
               });
+
+              setFormItem("Acctinfo.cBankCounty", {
+                disabled: true,
+                rules: [getRules("required", {})],
+              });
+
+
               setFormItem("Acctinfo.cPubPri", {
                 rules: [getRules("required", {})],
               });
@@ -172,17 +131,57 @@ const method = {
                 rules: [getRules("required", {})],
               });
 
-              setFormItem("Acctinfo.cBankCde", {
-                rules: [getRules("required", {})],
-              });
-
+         
 
               setFormItem("Acctinfo.cPubPri", {
                 rules: [getRules("required", {})],
               });
             }
 
+            setFormItem("Acctinfo.cBankCde", {
+                codeParam: { 'banktypecod': para[0]  },
+                rules: [getRules("required", {})],
+              });
+
+
   },
+
+  // 开户行省    市 cCityChange    县 cCountyChange
+  cProvinceChange:(e)=>{
+    console.log(555,e)
+    setFormItem("Acctinfo.cBankArea", {
+                disabled: false,
+                codeParam: { 'areaprovince': e },
+                // changeFn: {
+                //         next: (value: any) => {
+                //             this.freeEdit.controls['CBankArea'].reset();
+
+                //             if (!!value) {
+                //                 const preParam = this.freeEdit.controls['CBankArea']['param'];
+                //                 let cParCde = {'areaprovince': value};
+                //                 if (!value) {
+                //                     cParCde = {'areaprovince': '-1'};
+                //                 }
+                //                 this.freeEdit.controls['CBankArea']['param'] = Object.assign(preParam, cParCde);
+                //             }
+                //         }
+                //     },
+                rules: [getRules("required", {})],
+              });
+
+  },
+  cCityChange:(e)=>{
+ 
+    setFormItem("Acctinfo.cBankCounty", {
+              codeParam: { 'areaname': e},
+                disabled: false,
+                rules: [getRules("required", {})],
+              });
+  },
+  cCountyChange:()=>{
+    console.log(5556)
+  },
+
 };
 
 

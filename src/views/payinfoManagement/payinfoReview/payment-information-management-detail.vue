@@ -143,16 +143,17 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
       },
       {
-        prop: "cPayNme",
+        prop: "CPayNme",
         inputtype: "rtinput",
-        title: "付款人",
+        title: "出票人",
       },
       {
-        prop: "cChqueNo",
+        prop: "CChequeNo",
         inputtype: "rtinput",
-        title: "交易号",
+        title: "支票号",
         defaultValue: props.CChqueNo,
       },
+
       {
         prop: "nPayAmt",
         inputtype: "rtnumber",
@@ -168,16 +169,43 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtnumber",
         title: "实收金额",
       },
+
+      {
+        prop: "tChargeTm",
+        inputtype: "rtdatepicker",
+        title: "收票时间",
+        format: "YYYY-MM-DD HH:mm:ss",
+        valueFormat: "YYYY-MM-DD HH:mm:ss",
+        // rules: [getRules("required", {})],
+      },
+
+
       {
         prop: "cChargeCde",
         inputtype: "rtinput",
         title: "(收据)收款人",
       },
-      {
-        prop: "cSeqNo",
-        inputtype: "rtinput",
-        title: "付款人账号",
-      },
+      // {
+      //   prop: "cSeqNo",
+      //   inputtype: "rtinput",
+      //   title: "付款人账号",
+      // },
+      // {
+      //   prop: "cSeqNo",
+      //   inputtype: "rtinput",
+      //   title: "单证号",
+      // },
+      // {
+      //   prop: "cSeqNo",
+      //   inputtype: "rtinput",
+      //   title: "付款人账号",
+      // },
+      // {
+      //   prop: "cSeqNo",
+      //   inputtype: "rtinput",
+      //   title: "付款人账号",
+      // },
+
       {
         prop: "cCHeckPsn",
         inputtype: "rtinput",
@@ -213,103 +241,103 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       //   title: "开户行县",
       //   // rules: [getRules("required", {})],
       // },
-      {
-        prop: "cascaderarea",
-        inputtype: "rtcascader",
-        title: "开户行",
-        // rules: [required()],
-        typeCode: "getarealist",
-        codeParam: { cParCde: "1" },
-        // loadData:[{"label":"中国","value":"1"}],
-        cascaderprops: ["cProvinces", "cCity", "cBankCounty"],
-        showExBtn: false,
-        maxlevel: 3,
-        btnWidth: 30,
-        // btnItems: createFreeButtonBase({
-        //     label: "测试塞值",
-        //     func: function () {
-        //         freeEditRef.value?.setFormValue({
-        //             'CProvinces':'120000',
-        //             'CCity':'120102',
-        //             'CBankCounty':'120102'
-        //         });
-        //         const t = freeEditRef.value?.getFromValue();
-        //         console.log(t);
-        //     },
-        // }),
-      },
-      {
-        prop: "cBankNme",
-        inputtype: "rtselect",
-        title: "收款银行大类",
-        // rules: [getRules("required", {})],
-        typeCode: "SELECT_CBANKRELTYP",
-        params: { cParCde: ["0", "1", "2", "3", "4", "5", "6", "7", "9"] },
-      },
-      {
-        prop: "cBankcode",
-        inputtype: "rtinput",
-        title: "开户行",
-        // rules: [getRules("required", {})],
-        showExBtn: true,
-        btnItems: {
-          icon: "Search",
-          type: "primary",
-          func: () => {
-            dzmodal
-              .open(bankList, {
-                type: "Issuer",
-                data: { CBankNme: freeEditRef.value?.getValue("CBankNme") },
-              })
-              .then((res) => {
-                if (res.type === "ok") {
-                  // res.data 为返回的数据
-                  freeEditRef.value?.setValue(
-                    "CBankcode",
-                    res.data.bankCde + "_" + res.data.bankName
-                  );
-                  freeEditRef.value?.setValue("CBankAddr", res.data.bankName);
-                  freeEditRef.value?.setValue("CBankCnaps", res.data.bankCde);
-                }
-              });
-          },
-        },
-      },
-      {
-        prop: "cBankCnaps",
-        inputtype: "rtinput",
-        title: "CNAPS号",
-      },
-      {
-        prop: "cBankAddr",
-        inputtype: "rtinput",
-        title: "开户行地址",
-      },
-      {
-        prop: "cPubPri",
-        inputtype: "rtselect",
-        title: "对公对私",
-        rules: [getRules("required", {})],
-        loadData: [
-          { label: "对公", value: "1" },
-          { label: "对私", value: "2" },
-        ],
-      },
-      {
-        prop: "cBankCde",
-        inputtype: "rtinput",
-        // typeCode: "BANK_QUERY",
-        // param: { CdptCde: user.value.companyId },
-        title: "收款人账号",
-        rules: [getRules("required", {})],
-      },
+      // {
+      //   prop: "cascaderarea",
+      //   inputtype: "rtcascader",
+      //   title: "开户行",
+      //   // rules: [required()],
+      //   typeCode: "getarealist",
+      //   codeParam: { cParCde: "1" },
+      //   // loadData:[{"label":"中国","value":"1"}],
+      //   cascaderprops: ["cProvinces", "cCity", "cBankCounty"],
+      //   showExBtn: false,
+      //   maxlevel: 3,
+      //   btnWidth: 30,
+      //   // btnItems: createFreeButtonBase({
+      //   //     label: "测试塞值",
+      //   //     func: function () {
+      //   //         freeEditRef.value?.setFormValue({
+      //   //             'CProvinces':'120000',
+      //   //             'CCity':'120102',
+      //   //             'CBankCounty':'120102'
+      //   //         });
+      //   //         const t = freeEditRef.value?.getFromValue();
+      //   //         console.log(t);
+      //   //     },
+      //   // }),
+      // },
+      // {
+      //   prop: "cBankNme",
+      //   inputtype: "rtselect",
+      //   title: "收款银行大类",
+      //   // rules: [getRules("required", {})],
+      //   typeCode: "SELECT_CBANKRELTYP",
+      //   params: { cParCde: ["0", "1", "2", "3", "4", "5", "6", "7", "9"] },
+      // },
+      // {
+      //   prop: "cBankcode",
+      //   inputtype: "rtinput",
+      //   title: "开户行",
+      //   // rules: [getRules("required", {})],
+      //   showExBtn: true,
+      //   btnItems: {
+      //     icon: "Search",
+      //     type: "primary",
+      //     func: () => {
+      //       dzmodal
+      //         .open(bankList, {
+      //           type: "Issuer",
+      //           data: { CBankNme: freeEditRef.value?.getValue("CBankNme") },
+      //         })
+      //         .then((res) => {
+      //           if (res.type === "ok") {
+      //             // res.data 为返回的数据
+      //             freeEditRef.value?.setValue(
+      //               "CBankcode",
+      //               res.data.bankCde + "_" + res.data.bankName
+      //             );
+      //             freeEditRef.value?.setValue("CBankAddr", res.data.bankName);
+      //             freeEditRef.value?.setValue("CBankCnaps", res.data.bankCde);
+      //           }
+      //         });
+      //     },
+      //   },
+      // },
+      // {
+      //   prop: "cBankCnaps",
+      //   inputtype: "rtinput",
+      //   title: "CNAPS号",
+      // },
+      // {
+      //   prop: "cBankAddr",
+      //   inputtype: "rtinput",
+      //   title: "开户行地址",
+      // },
+      // {
+      //   prop: "cPubPri",
+      //   inputtype: "rtselect",
+      //   title: "对公对私",
+      //   rules: [getRules("required", {})],
+      //   loadData: [
+      //     { label: "对公", value: "1" },
+      //     { label: "对私", value: "2" },
+      //   ],
+      // },
+      // {
+      //   prop: "cBankCde",
+      //   inputtype: "rtinput",
+      //   // typeCode: "BANK_QUERY",
+      //   // param: { CdptCde: user.value.companyId },
+      //   title: "收款人账号",
+      //   rules: [getRules("required", {})],
+      // },   
       {
         prop: "tChargeTm",
         inputtype: "rtdatepicker",
         title: "到账时间",
         format: "YYYY-MM-DD HH:mm:ss",
         valueFormat: "YYYY-MM-DD HH:mm:ss",
-        rules: [getRules("required", {})],
+        // rules: [getRules("required", {})],
       },
       {
         prop: "cCurtainNo",

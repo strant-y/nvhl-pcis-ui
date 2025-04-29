@@ -35,7 +35,6 @@ const formconfig1 = reactive(createAppFreeEditConfig({}));
 const formData = ref<any[]>([]);
 const cClntAddr = ref<any>(null);
 onMounted(() => {
-  console.log(props.pageSchema);
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
     method,
@@ -48,6 +47,9 @@ onMounted(() => {
       rules: null,
       disabled: true,
     });
+
+
+    
   });
 });
 //给表单下拉项赋值
@@ -97,7 +99,6 @@ const method = {
                 newobj["Applicant." + k] = selobj[key];
               }
             });
-            console.log(newobj);
             newobj["Applicant.cAppNme"] = newobj["Applicant.cClntNme"];
             setFormValue(newobj);
             setFormItem("Applicant.cAppNme", {
@@ -120,7 +121,6 @@ const method = {
   },
   funcconfirm: () => {
     applicantEditRef.value?.validate().then((isValid) => {
-      console.log(isValid);
       if (isValid) {
         // handleQuery();
         ElMessage.success("客户信息已经存在");
@@ -130,7 +130,7 @@ const method = {
     });
   },
   funcreset: () => {
-    console.log(332);
+
     const tabref = opertaor.getTableRefs();
     const applicantValue = tabref["applicant"].getFromValue();
     for (const k in applicantValue) {
@@ -151,7 +151,24 @@ const method = {
 
     tabref["applicant"].setFormValue(applicantValue);
   },
+
   cardTypeChange: (val) => {
+
+    setFormItem("Applicant.cNation", {
+      disabled: false,
+    });
+    setFormItem("Applicant.tBirthday", {
+      disabled: false,
+    });
+    setFormItem("Applicant.nAge", {
+      disabled: false,
+    });
+    setFormItem("Applicant.cSex", {
+      disabled: false,
+    });
+
+
+
     if (val == "120001") {
       setFormItem("Applicant.cCertfCde", {
         rules: [getRules("required", {}), getRules("idCard", {})],
@@ -162,6 +179,26 @@ const method = {
       setFormItem("Applicant.tCertfEndDate", {
         rules: [getRules("required", {})],
       });
+
+      setValue("Applicant.cNation", '1');  // 国籍
+      setValue("Applicant.tBirthday", null);
+      setValue("Applicant.nAge", null);
+      setValue("Applicant.cSex", null);
+      setFormItem("Applicant.cNation", {
+        disabled: true,
+      });
+      setFormItem("Applicant.tBirthday", {
+        disabled: true,
+      });
+      setFormItem("Applicant.nAge", {
+        disabled: true,
+      });
+      setFormItem("Applicant.cSex", {
+        disabled: true,
+      });
+
+
+
     } else if (val == "110002" || val == "110007") {
       setFormItem("Applicant.tCertfBgnDate", {
         rules: [getRules("required", {})],
@@ -192,7 +229,6 @@ const method = {
   InsureChange: (val) => {
     if (val == "0") {
       productStore.setcClntMrk(val);
-      console.log("000000000", productStore.$state.cClntMrk);
       setValue("Applicant.cCertfCls", "");
       setFormItem("Applicant.cCntrNme", { rules: [getRules("required", {})] });
       setFormItem("Applicant.cParticiinsocTyp", {
@@ -312,7 +348,7 @@ const method = {
         },
       },
       {
-        isOk: (selectdata: any) => {},
+        isOk: (selectdata: any) => { },
       },
       { title: "职业", width: 85 }
     );
@@ -391,7 +427,7 @@ const method = {
         setFormItem("Applicant.cCounty", objData);
       });
   },
-  handleClose: (val) => {},
+  handleClose: (val) => { },
   // 是否绿色产业客户change
   ApplicantIsGreen: (val) => {
     // 控制绿色产业细分列表是否必填
@@ -405,25 +441,31 @@ const method = {
   },
   // 证件号码change
   cCertfCdeChange: (val) => {
-    if (val) {
-      const certfCde = applicantEditRef.value?.getValue("Applicant.cCertfCde");
-      if (certfCde && certfCde.length === 18) {
-        const birthYear = parseInt(certfCde.substring(6, 10), 10);
-        const birthMonth = parseInt(certfCde.substring(10, 12), 10);
-        const birthDay = parseInt(certfCde.substring(12, 14), 10);
-        const birthday = `${birthYear}-${birthMonth.toString().padStart(2, "0")}-${birthDay.toString().padStart(2, "0")}`;
-        const sexCode = parseInt(certfCde.substring(16, 17), 10);
-        const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
-        const age = new Date().getFullYear() - birthYear;
-        setValue("Applicant.tBirthday", birthday);
-        setValue("Applicant.nAge", age);
-        setValue("Applicant.cSex", sex);
+
+    const tabref = opertaor.getTableRefs();
+    const cCertfCls = tabref["applicant"].getFromValue()['Applicant.cCertfCls'];
+    if (cCertfCls == '120001') {
+      if (val) {
+        const certfCde = applicantEditRef.value?.getValue("Applicant.cCertfCde");
+        if (certfCde && certfCde.length === 18) {
+          const birthYear = parseInt(certfCde.substring(6, 10), 10);
+          const birthMonth = parseInt(certfCde.substring(10, 12), 10);
+          const birthDay = parseInt(certfCde.substring(12, 14), 10);
+          const birthday = `${birthYear}-${birthMonth.toString().padStart(2, "0")}-${birthDay.toString().padStart(2, "0")}`;
+          const sexCode = parseInt(certfCde.substring(16, 17), 10);
+          const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
+          const age = new Date().getFullYear() - birthYear;
+
+          setValue("Applicant.cNation", '1');  // 国籍
+          setValue("Applicant.tBirthday", birthday);
+          setValue("Applicant.nAge", age);
+          setValue("Applicant.cSex", sex);
+        }
       }
     }
   },
   //注册地市是否同上
   isSameChange: (val) => {
-    console.log(val, "0000");
     if (val == "1") {
       // 获取常驻地址的值
       // const residenceAddr = applicantEditRef.value?.getValue(
@@ -438,10 +480,9 @@ const method = {
     }
   },
   //注册地址
-  getCountry:(val)=>{
-    if(val){
+  getCountry: (val) => {
+    if (val) {
       // Applicant.cClntAddr 常住地址
-      console.log("0000",val)
       applicantEditRef?.value?.setValue(
         "Applicant.cRegisteredcapDre",
         val
@@ -449,29 +490,27 @@ const method = {
     }
   },
   //常住地址
-  getAllProp:(val)=>{
-    console.log("999",val)
+  getAllProp: (val) => {
     applicantEditRef?.value?.setValue(
       "Applicant.cClntAddr",
       val
     );
   },
   //注册地址(input)
-  getcSuffixAddr:(val)=>{
+  getcSuffixAddr: (val) => {
     const currentRegistAddr = applicantEditRef?.value?.getValue("Applicant.cRegisteredcapDre") || "";
     applicantEditRef?.value?.setValue(
-    "Applicant.cRegisteredcapDre",
-    `${currentRegistAddr}${val}`
-  );
-    // console.log("555",val)
+      "Applicant.cRegisteredcapDre",
+      `${currentRegistAddr}${val}`
+    );
   },
   //常住地址(input)
-  getcRegisterSuffixAddr:(val)=>{
+  getcRegisterSuffixAddr: (val) => {
     const currentAddr = applicantEditRef?.value?.getValue("Applicant.cClntAddr") || "";
     applicantEditRef?.value?.setValue(
-    "Applicant.cClntAddr",
-    `${currentAddr}${val}`
-  );
+      "Applicant.cClntAddr",
+      `${currentAddr}${val}`
+    );
   },
 };
 
