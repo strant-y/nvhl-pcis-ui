@@ -510,7 +510,8 @@ function setregistAdd() {
     getAddressStr({ address: ads }).then((res: any) => {
     const { code, data, msg } = res;
     if (code === 200) {
-      const b = data?data['addStr']:"" + a;
+      const b = (data?data['addStr']:"" + a;
+      console.log(b);
       setAddressStr("Applicant.cClntAddr", b);
     }
   });
@@ -526,7 +527,7 @@ function setRegisterAdd() {
     getAddressStr({ address: ads }).then((res: any) => {
     const { code, data, msg } = res;
     if (code === 200) {
-      const b = data?data['addStr']:"" + a;
+      const b = (data?data['addStr']:"") + a;
       setAddressStr("Applicant.cRegisteredcapDre", b);
     }
   });
