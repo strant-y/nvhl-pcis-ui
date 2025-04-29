@@ -316,7 +316,6 @@ const isDetailCde = () => {
   return detailcodeArray.includes(props.param.cRsnDetailCde);
 };
 
-
 onMounted(() => {
   console.log("路由参数props.param", props.param);
   initPage();
@@ -1184,11 +1183,11 @@ const setPayInfo = (base, applicant, insrnc) => {
     pay["Pay.cPayorNme"] = "";
   }
   pay["Pay.nPayablePrm"] = base["Base.nPrm"];
-  pay["Pay.tPayBgnTm"] =  moment(insrnc["Base.tAppTm"]).format(
-      "YYYY-MM-DD HH:mm:ss"
+  pay["Pay.tPayBgnTm"] = moment(insrnc["Base.tAppTm"]).format(
+    "YYYY-MM-DD HH:mm:ss"
   );
   pay["Pay.tPayEndTm"] = moment(insrnc["Base.tInsrncBgnTm"]).format(
-      "YYYY-MM-DD HH:mm:ss"
+    "YYYY-MM-DD HH:mm:ss"
   );
   pay["Pay.nOwnPrm"] = base["Base.nPrm"];
   pay["Pay.cProdNo"] = base["Base.cProdNo"];
@@ -1199,26 +1198,28 @@ const setPayInfo = (base, applicant, insrnc) => {
 /**
  * 投保申请核保
  */
-const submitToUndrFn = () => {
-  const btn = getBtn("btn010103");
-  btn.loading = true;
-  const res = {};
-  console.log(opertaor.getTableRefByKey("plyBase").getFromValue());
-  const base = opertaor.getTableRefByKey("plyBase").getFromValue();
-  res["user"] = user;
-  res["appNo"] = base["Base.cAppNo"];
-  console.log(res);
-  submitToUndr(res).then((res) => {
-    btn.loading = false;
-    console.log("submitToUndr-res", res);
-    // ElMessage.success(res.msg);
-    // history.back();
-    if (res["code"] == "200") {
-      ElMessage.success(res.msg);
-    } else {
-      ElMessage.error(res.msg);
-    }
-  });
+const submitToUndrFn = async () => {
+  const f = await savePlyInfo(); // 提交核保,需要默认执行一次保存操作
+  if (f) {
+    const btn = getBtn("btn010103");
+    btn.loading = true;
+    const res: any = {};
+    setTimeout(() => {
+      console.log(opertaor.getTableRefByKey("plyBase").getFromValue());
+      const base = opertaor.getTableRefByKey("plyBase").getFromValue();
+      res["user"] = user;
+      res["appNo"] = base["Base.cAppNo"];
+      submitToUndr(res).then((res: any) => {
+        btn.loading = false;
+        console.log("submitToUndr-res", res);
+        if (res["code"] == "200") {
+          ElMessage.success(res.msg);
+        } else {
+          ElMessage.error(res.msg);
+        }
+      });
+    }, 100);
+  }
 };
 
 /**
@@ -1273,7 +1274,8 @@ const openLimit = () => {
 /**
  * 投保单保存
  * **/
-const savePlyInfo = () => {
+const savePlyInfo = async () => {
+  let saveFlag = false;
   const btn = getBtn("btn010102");
   btn.loading = true;
   const res = opertaor.getDataAll();
@@ -1286,22 +1288,23 @@ const savePlyInfo = () => {
   if (res["cvrg"].length == 0) {
     ElMessage.error("请录入条款信息");
     btn.loading = false;
-    return;
+    return false;
   }
-  saveAppPlyInfo(res).then((res) => {
-    console.log("saveAppPlyInfo-res", res);
-    btn.loading = false;
-    if (res["code"] == "200") {
-      const ops = opertaor.convertData(res);
-      console.log("转换的数据", ops);
-      ElMessage.success(res.msg);
-      opertaor.setDataAll(ops);
-    } else {
-      ElMessage.error(res.msg);
-    }
-    // ElMessage.success(res.msg);
-    // history.back();
-  });
+
+  const resInfo: any = await saveAppPlyInfo(res);
+  console.log("saveAppPlyInfo-res", resInfo);
+  btn.loading = false;
+  if (resInfo["code"] == "200") {
+    const ops = opertaor.convertData(resInfo);
+    console.log("转换的数据", ops);
+    ElMessage.success(resInfo.msg);
+    opertaor.setDataAll(ops);
+    saveFlag = true;
+  } else {
+    ElMessage.error(resInfo.msg);
+  }
+
+  return saveFlag;
 };
 /**
  * 获取批改项
