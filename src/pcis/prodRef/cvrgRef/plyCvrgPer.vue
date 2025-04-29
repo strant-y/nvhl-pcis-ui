@@ -23,7 +23,7 @@
               v-for="(i, index) in formData['m']"
               :key="index"
               v-model="formData['m'][index]"
-                :disabled-flag="disAbledFlag"
+              :disabled-flag="disAbledFlag"
               @delete="
                 (r) => {
                   deleteData(r);
@@ -267,28 +267,38 @@ function addTermData() {
 }
 
 function deleteData(term: any) {
-  deleteTermByNo(term["Term.cClauseCode"]);
-  if (term.cRdrTyp === "0") {
-    codeListStore
-      .queryCodeList(
-        {
-          codeListName: "MainTermlist",
-          codeListParam: { cTermNo: term["Term.cClauseCode"] },
-        },
-        false,
-        false
-      )
-      .then((res) => {
-        if (res && res.length > 0) {
-          res.forEach((r: any) => {
-            deleteTermByNo(r["RdrTerm"]);
-          });
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }
+  ElMessageBox.confirm("是否继续删除?", "Warning", {
+    confirmButtonText: "删除",
+    cancelButtonText: "取消",
+    type: "warning",
+  }).then(() => {
+    deleteTermByNo(term["Term.cClauseCode"]);
+    if (term.cRdrTyp === "0") {
+      codeListStore
+        .queryCodeList(
+          {
+            codeListName: "MainTermlist",
+            codeListParam: { cTermNo: term["Term.cClauseCode"] },
+          },
+          false,
+          false
+        )
+        .then((res) => {
+          if (res && res.length > 0) {
+            res.forEach((r: any) => {
+              deleteTermByNo(r["RdrTerm"]);
+            });
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    };
+    ElMessage({
+      type: "success",
+      message: "删除成功",
+    });
+  });
 }
 
 function deleteTermByNo(t: any) {
@@ -371,7 +381,7 @@ function getFormconfig() {
   };
 }
 function setDisabledAll() {
-    disAbledFlag.value = true;
+  disAbledFlag.value = true;
   if (cardconfig.value.titleBtns && cardconfig.value.titleBtns.length > 0) {
     cardconfig.value.titleBtns.forEach((item: any) => {
       item.hidden = true;
@@ -389,16 +399,16 @@ function setDisabledAll() {
   }
 }
 function setUnDisabledByKeyList(key: any) {
-    cardconfig.value.endBtns?.forEach((item: any) => {
-      if(item.id = key){
-        item.hidden = false;
-      }
-    });
-    cardconfig.value.titleBtns?.forEach((item: any) => {
-      if(item.id = key){
-        item.hidden = false;
-      }
-    });
+  cardconfig.value.endBtns?.forEach((item: any) => {
+    if ((item.id = key)) {
+      item.hidden = false;
+    }
+  });
+  cardconfig.value.titleBtns?.forEach((item: any) => {
+    if ((item.id = key)) {
+      item.hidden = false;
+    }
+  });
 }
 
 defineExpose({
