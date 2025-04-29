@@ -177,26 +177,6 @@
         </div>
       </el-affix>
     </el-footer>
-
-    <!-- 发票弹框 -->
-    <!-- <invoiceInfoModel v-if="invoiceShow"  ref="invoiceRef" @ok="close"></invoiceInfoModel> -->
-
-    <!-- 反洗钱 -->
-    <!-- <amlExtendInfo
-      ref="amlInfoRef"
-
-      :controlFlag="controlFlag"
-      @ok="close"
-    ></amlExtendInfo> -->
-    <!-- v-if="amlInfoShow" -->
-
-    <!-- 历史赔案 -->
-    <!-- v-if="historyShow" -->
-    <!-- <historyClaimcaseModel
-      ref="historyClaRef"
- 
-         @ok="close"
-    ></historyClaimcaseModel> -->
   </div>
 </template>
 
@@ -227,15 +207,6 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import moment from "moment";
 import dayjs from "dayjs";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
-const scrollContainer = ref("scrollContainer");
-// 发票信息
-// import invoiceInfoModel from "@/views/pcis-new-udr-list/common/invoice-info-model.vue";
-//  反洗钱
-// import amlExtendInfo from "@/views/pcis-main/prodDef/common/aml-extend-info/index.vue";
-
-// 历史赔案
-// import historyClaimcaseModel from "@/views/comprehensive-query/modal/history-claimcase-model.vue"
-
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -300,9 +271,6 @@ const tmDay = ref(0);
 const dzmodal = useDzModal();
 const cacheKey = ref();
 
-let invoiceShow = ref(false); // 发票显示
-let amlInfoShow = ref(false); // 反洗钱显示
-let historyShow = ref(false); // 历史赔案
 let controlFlag = ""; // 用来处理反洗钱 页面窜窜以及显示
 
 // 存所有可显示账户信息场景
@@ -348,13 +316,6 @@ const isDetailCde = () => {
   return detailcodeArray.includes(props.param.cRsnDetailCde);
 };
 
-//关闭
-const close = () => {
-  invoiceShow.value = false;
-  amlInfoShow.value = false;
-  // historyShow.value = false;
-  // console.log(historyShow.value)
-};
 
 onMounted(() => {
   console.log("路由参数props.param", props.param);

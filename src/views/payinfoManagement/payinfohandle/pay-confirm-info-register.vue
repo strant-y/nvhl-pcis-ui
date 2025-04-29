@@ -123,7 +123,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "CDptCde",
         inputtype: "rtselect",
         title: "业务机构",
-        // typeCode: "PLYDPT_LIST",
+        typeCode: "PLYDPT_LIST",
+        disabled: true,
         // param: { 'CDptCde': '' }, //待添加
       },
       {
@@ -148,11 +149,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "币种",
         typeCode: "CURRENCY_LIST"
       },
-      {
-        prop: 'CPlyNo',
-        title: '生成保批单号',
-        inputtype: "rtinput",
-      },
+      // {
+      //   prop: 'CPlyNo',
+      //   title: '生成保批单号',
+      //   inputtype: "rtinput",
+      // },
       {
         prop: 'NTax',
         title: '车船税',
@@ -219,16 +220,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: '生成保批单号',
         inputtype: "rtinput",
       },
-      {
-        prop: 'CUniqueNo',
-        title: '收据流水号',
-        inputtype: "rtinput",
-      },
-      {
-        prop: 'CCardNo',
-        title: '卡号',
-        inputtype: "rtinput",
-      },
+      // {
+      //   prop: 'CUniqueNo',
+      //   title: '收据流水号',
+      //   inputtype: "rtinput",
+      // },
+      // {
+      //   prop: 'CCardNo',
+      //   title: '卡号',
+      //   inputtype: "rtinput",
+      // },
       {
         prop: 'CPayNme',
         title: '出票人',
@@ -240,16 +241,21 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         rules: [getRules("required", {})],
       },
-      {
-        prop: 'TPayConfTm',
-        title: '缴费确认时间',
-        inputtype: "rtdatepicker",
-        type: "datetime",
-        format: 'YYYY-MM-DD HH:mm:ss',
-      },
+      // {
+      //   prop: 'TPayConfTm',
+      //   title: '缴费确认时间',
+      //   inputtype: "rtdatepicker",
+      //   type: "datetime",
+      //   format: 'YYYY-MM-DD HH:mm:ss',
+      // },
       {
         prop: 'CAppNo',
         title: '投保单号',
+        inputtype: "rtinput",
+      },
+      {
+        prop: 'NStampTax',
+        title: '印花税',
         inputtype: "rtinput",
       },
     ]

@@ -69,7 +69,7 @@ const checkUser = () => {
     applicantValue["Insured.cCertfCde"] &&
     applicantValue["Insured.cCertfCls"]
   ) {
-    console.log("根据4个选项 请求客户代码");
+
 
     //  obj = {'Insured.cCertfCde':'9000000504'}
     // obj['Insured.cInsuredCde'] = '0008'
@@ -82,13 +82,13 @@ const checkUser = () => {
   //  cAppNme  客户名称
   //  cCertfCde    身份号码
   //  cCertfCls   身份证类型
-  console.log("checkUser", applicantValue);
+
 };
 
 // 绑定方法
 const method = {
-  func: () => {},
-  func1: () => {},
+  func: () => { },
+  func1: () => { },
   funCheckUser: () => {
     checkUser(); // 根据名称  被保人性质 证件类型 证件号码查询用户信息
   },
@@ -289,26 +289,6 @@ const method = {
       }
     }
 
-    // console.log(355,InsuredValue)
-
-    // const insuredValue =applicantValue;
-
-    // for (const k in applicantValue) {
-    //   const key = "Insured." + k.split(".")[1];
-    //   if (k.split(".")[1] == "cAppNme") {
-    //     insuredValue["Insured.cInsuredNme"] =
-    //       applicantValue["Applicant.cAppNme"];
-    //   } else if (k.split(".")[1] == "cAppCde") {
-    //     insuredValue["Insured.cInsuredCde"] =
-    //       applicantValue["Applicant.cAppCde"];
-    //   } else {
-    //     insuredValue[key] = applicantValue[k];
-    //   }
-    // }
-    // setFormValue(insuredValue);
-
-    // console.log(555,insuredValue)
-
     tabref["insured"].setFormValue(insuredValue);
   },
   funcquery: () => {
@@ -332,7 +312,7 @@ const method = {
                 newobj["Insured." + k] = selobj[key];
               }
             });
-            console.log(newobj);
+
             newobj["Insured.cInsuredNme"] = newobj["Insured.cClntNme"];
             newobj["Insured.cInsuredCde"] = newobj["Insured.cAppCde"];
             setFormValue(newobj);
@@ -357,7 +337,7 @@ const method = {
 
   funcconfirm: () => {
     insuredEditRef.value?.validate().then((isValid) => {
-      console.log(isValid);
+
       if (isValid) {
         // handleQuery();
         ElMessage.success("客户信息已经存在");
@@ -366,33 +346,7 @@ const method = {
       }
     });
   },
-  cardTypeChange: (val) => {
-    // console.log('btn3')
-    if (val == "120001") {
-      setFormItem("Insured.cCertfCde", {
-        rules: [getRules("required", {}), getRules("idCard", {})],
-      });
-      setFormItem("Insured.tCertfBgnDate", {
-        rules: [getRules("required", {})],
-      });
-      setFormItem("Insured.tCertfEndDate", {
-        rules: [getRules("required", {})],
-      });
-    } else if (val == "110002" || val == "110007") {
-      setFormItem("Insured.tCertfBgnDate", {
-        rules: [getRules("required", {})],
-      });
-      setFormItem("Insured.tCertfEndDate", {
-        rules: [getRules("required", {})],
-      });
-    } else {
-      setFormItem("Insured.cCertfCde", {
-        rules: [getRules("required", {})],
-      });
-      setFormItem("Insured.tCertfBgnDate", null);
-      setFormItem("Insured.tCertfEndDate", null);
-    }
-  },
+
   //被保人性质change事件
   cClntMrkFunc: (val) => {
     checkUser();
@@ -478,12 +432,9 @@ const method = {
     }
   },
   funcreset: () => {
-    console.log("重置");
+
     const tabref = opertaor.getTableRefs();
     const InsuredValue = tabref["insured"].getFromValue();
-
-    console.log(111, InsuredValue);
-    // return false
     for (const k in InsuredValue) {
       InsuredValue[k] = null;
     }
@@ -538,13 +489,13 @@ const method = {
         },
       },
       {
-        isOk: (selectdata: any) => {},
+        isOk: (selectdata: any) => { },
       },
       { title: "职业", width: 85 }
     );
   },
   tCertMrkChecked: (val) => {
-    console.log(1123);
+
     if (val == "1") {
       setValue(
         "Insured.tCertfBgnDate",
@@ -575,20 +526,68 @@ const method = {
       setFormItem("Insured.cGreenIndustryList", { rules: null });
     }
   },
-  //证件类型change
-  InsuredCCertfCls: (val) => {
+
+  //证件类型change  
+  InsuredCCertfCls: (val: any) => {
     checkUser();
-    if (val == "110002") {
-      //证件类型是“营业执照”，参加社会统筹标志变化为必填
-      // 参加社会统筹标志
-      setFormItem("Insured.cParticiinsocTyp", {
+    setFormItem("Insured.cNation", {
+      disabled: false,
+    });
+    setFormItem("Insured.tBirthday", {
+      disabled: false,
+    });
+    setFormItem("Insured.nAge", {
+      disabled: false,
+    });
+    setFormItem("Insured.cSex", {
+      disabled: false,
+    });
+
+    if (val == "120001") {
+      setFormItem("Insured.cCertfCde", {
+        rules: [getRules("required", {}), getRules("idCard", {})],
+      });
+      setFormItem("Insured.tCertfBgnDate", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.tCertfEndDate", {
+        rules: [getRules("required", {})],
+      });
+      setValue("Insured.cNation", '1');  // 国籍
+      setValue("Insured.tBirthday", null);
+      setValue("Insured.nAge", null);
+      setValue("Insured.cSex", null);
+      setFormItem("Insured.cNation", {
+        disabled: true,
+      });
+      setFormItem("Insured.tBirthday", {
+        disabled: true,
+      });
+      setFormItem("Insured.nAge", {
+        disabled: true,
+      });
+      setFormItem("Insured.cSex", {
+        disabled: true,
+      });
+    } else if (val == "110002" || val == "110007") {
+      setFormItem("Insured.tCertfBgnDate", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.tCertfEndDate", {
         rules: [getRules("required", {})],
       });
     } else {
-      // 参加社会统筹标志
+      setFormItem("Insured.cCertfCde", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.tCertfBgnDate", null);
+      setFormItem("Insured.tCertfEndDate", null);
+
       setFormItem("Insured.cParticiinsocTyp", {
         rules: null,
       });
+
+
     }
   },
   emailChange: (val) => {
@@ -645,33 +644,42 @@ const method = {
         setFormItem("Insured.cCounty", objData);
       });
   },
+  // 身份号码 change
   cCertfCdeChange: (val) => {
     checkUser();
     const tabref = opertaor.getTableRefs();
 
-    if (val) {
-      // const certfCde = applicantEditRef.value?.getValue("Insured.cCertfCde");
-      const certfCde = tabref["insured"].getFromValue()["Insured.cCertfCde"];
-      if (certfCde && certfCde.length === 18) {
-        const birthYear = parseInt(certfCde.substring(6, 10), 10);
-        const birthMonth = parseInt(certfCde.substring(10, 12), 10);
-        const birthDay = parseInt(certfCde.substring(12, 14), 10);
-        const birthday = `${birthYear}-${birthMonth.toString().padStart(2, "0")}-${birthDay.toString().padStart(2, "0")}`;
-        const sexCode = parseInt(certfCde.substring(16, 17), 10);
-        const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
-        const age = new Date().getFullYear() - birthYear;
-        setValue("Insured.tBirthday", birthday);
-        setValue("Insured.nAge", age);
-        setValue("Insured.cSex", sex);
+    const cCertfCls = tabref["insured"].getFromValue()['Insured.cCertfCls'];
+
+    if (cCertfCls == '120001') {
+      if (val) {
+        const certfCde = tabref["insured"].getFromValue()["Insured.cCertfCde"];
+        if (certfCde && certfCde.length === 18) {
+          const birthYear = parseInt(certfCde.substring(6, 10), 10);
+          const birthMonth = parseInt(certfCde.substring(10, 12), 10);
+          const birthDay = parseInt(certfCde.substring(12, 14), 10);
+          const birthday = `${birthYear}-${birthMonth.toString().padStart(2, "0")}-${birthDay.toString().padStart(2, "0")}`;
+          const sexCode = parseInt(certfCde.substring(16, 17), 10);
+          const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
+          const age = new Date().getFullYear() - birthYear;
+
+          setValue("Insured.cNation", '1');  // 国籍
+          setValue("Insured.tBirthday", birthday);
+          setValue("Insured.nAge", age);
+          setValue("Insured.cSex", sex);
+        }
       }
     }
   },
+
+
+
   //注册地市是否同上
   isSameChange: (val) => {
-    console.log(val, "0000");
+
   },
   hidPerson: () => {
-    console.log(productStore.$state.cClntMrk, "00000000000000000000");
+
     // productStore.$state.cClntMrk == "0";
     // setFormItem("Insured.cCntrNme", { hidden: false });
   },
