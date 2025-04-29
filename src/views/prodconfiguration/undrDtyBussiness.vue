@@ -86,13 +86,13 @@ const formconfig = reactive<AppFreeEditConfig>(
         prop: "cEmpCnm",
         inputtype: "rtinput",
         title: "员工名称",
-        rules: [getRules("required", { change: true })],
+        // rules: [getRules("required", { change: true })],
       },
       {
         prop: "dptCde",
         inputtype: "rtselect",
         title: "员工所属机构",
-        rules: [getRules("required", { change: true })],
+        // rules: [getRules("required", { change: true })],
         showExBtn: true,
         btnItems: {
           icon: "Search",

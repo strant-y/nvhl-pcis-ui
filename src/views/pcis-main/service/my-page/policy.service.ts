@@ -527,7 +527,16 @@ export class PolicyService {
      * @returns {Observable<Object>}
      */
     saveOrUpdatePlan(data) {
-        return request.post('/plan/save', data);
+        return request.post('/plan/savePlanBase', data);
+    }
+
+    /**
+     * 保存方案(险别信息)
+     * @param data
+     * @returns {Observable<Object>}
+     */
+    savePlanCvrg(data) {
+        return request.post('/plan/savePlanCvrg', data);
     }
 
     /**
@@ -536,7 +545,69 @@ export class PolicyService {
      * @returns {Observable<Object>}
      */
     searchPlan(data = null) {
-        return request.post('/plan/list', data);
+        return request.post('/plan/getPlanBasePage', data);
+    }
+
+    /**
+     * 查询方案详情
+     * @param {any} data
+     * @returns {Observable<Object>}
+     */
+    getPlanBase(data = null) {
+        return request.post('/plan/getPlanBase', data);
+    }
+
+    /**
+     * 查询方案详情险别信息
+     * @param {any} data
+     * @returns {Observable<Object>}
+     */
+    getPlanCvrg(data = null) {
+        return request.post('/plan/getPlanCvrg', data);
+    }
+
+    /**
+     * 方案提交审核
+     * @param {any} data
+     * @returns {Observable<Object>}
+     */
+    addProcessUndr(data = null) {
+        return request.post('/plan/addProcessUndr', data);
+    }
+    /**
+     * 方案接收
+     * @param {any} data
+     * @returns {Observable<Object>}
+     */
+    accept(data = null) {
+        return request.post('/plan/accept', data);
+    }
+
+    /**
+     * 方案取消接收
+     * @param {any} data
+     * @returns {Observable<Object>}
+     */
+    unAccept(data = null) {
+        return request.post('/plan/unAccept', data);
+    }
+
+    /**
+     * 方案审核
+     * @param {any} data
+     * @returns {Observable<Object>}
+     */
+    processApprove(data = null) {
+        return request.post('/plan/processApprove', data);
+    }
+
+    /**
+     * 方案审核列表查询
+     * @param {any} data
+     * @returns {Observable<Object>}
+     */
+    qryUndrPlanBaseList(data = null) {
+        return request.post('/plan/qryUndrPlanBaseList', data);
     }
 
     /**

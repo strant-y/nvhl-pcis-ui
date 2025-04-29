@@ -215,6 +215,7 @@ const gridconfig = reactive<AppGridEditConfig>(
               const { code, data, msg } = res;
               if (200 === code) {
                 ElMessage.success("保存成功");
+                dialogVisible.value = false;
               } else {
                 ElMessage.error(msg);
               }

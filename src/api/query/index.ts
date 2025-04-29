@@ -21,6 +21,10 @@ export function getPlyInfo(queryParams: any): AxiosPromise<any> {
     return post(`${QUERY}getPlyInfo`, queryParams);
 }
 
+export function getAddressStr(queryParams: any): AxiosPromise<any> {
+    return post(`${QUERY}getAddressStr`, queryParams);
+}
+
 /**
  * 获取投保单号
  * @param queryParams

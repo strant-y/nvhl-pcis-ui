@@ -29,6 +29,7 @@ const props = defineProps({
 const applicantEditRef = ref<AppFreeEditMethod | null>(null);
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { getDefaultCompilerOptions } from "typescript";
+import { getAddressStr } from "@/api/query";
 const opertaor = dataOpertaor();
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));
@@ -229,7 +230,6 @@ const method = {
   InsureChange: (val) => {
     if (val == "0") {
       productStore.setcClntMrk(val);
-      setValue("Applicant.cCertfCls", "");
       setFormItem("Applicant.cCntrNme", { rules: [getRules("required", {})] });
       setFormItem("Applicant.cParticiinsocTyp", {
         rules: [getRules("required", {})],
@@ -268,6 +268,9 @@ const method = {
           codeListParam: {},
         })
         .then((res) => {
+          if (!res.some(item => Object.values(item).includes(getValue("Applicant.cCertfCls")))) {
+            setValue("Applicant.cCertfCls", "");
+          }
           setFormItem("Applicant.cCertfCls", {
             loadData: res,
             rules: [getRules("required", {})],
@@ -295,7 +298,7 @@ const method = {
       });
       setValue("Applicant.cGreenIndustryCustomers", "");
       setValue("Applicant.cIsMicroEntpris", "");
-      setValue("Applicant.cCertfCls", "");
+      // setValue("Applicant.cCertfCls", "");
       setFormItem("Applicant.cCntrNme", { rules: null });
       setFormItem("Applicant.cCntrCertfCde", { rules: null });
       codeListStore
@@ -304,6 +307,9 @@ const method = {
           codeListParam: {},
         })
         .then((res) => {
+          if (!res.some(item => Object.values(item).includes(getValue("Applicant.cCertfCls")))) {
+            setValue("Applicant.cCertfCls", "");
+          }
           setFormItem("Applicant.cCertfCls", {
             loadData: res,
             rules: [getRules("required", {})],
@@ -480,40 +486,57 @@ const method = {
     }
   },
   //注册地址
-  getCountry: (val) => {
-    if (val) {
-      // Applicant.cClntAddr 常住地址
-      applicantEditRef?.value?.setValue(
-        "Applicant.cRegisteredcapDre",
-        val
-      );
-    }
+  getCountry: (val: any) => {
+    setRegisterAdd();
   },
   //常住地址
-  getAllProp: (val) => {
-    applicantEditRef?.value?.setValue(
-      "Applicant.cClntAddr",
-      val
-    );
+  getAllProp: (val: any) => {
+    setregistAdd();
   },
   //注册地址(input)
-  getcSuffixAddr: (val) => {
-    const currentRegistAddr = applicantEditRef?.value?.getValue("Applicant.cRegisteredcapDre") || "";
-    applicantEditRef?.value?.setValue(
-      "Applicant.cRegisteredcapDre",
-      `${currentRegistAddr}${val}`
-    );
+  getcSuffixAddr:(val: any)=>{
+    setRegisterAdd();
   },
   //常住地址(input)
-  getcRegisterSuffixAddr: (val) => {
-    const currentAddr = applicantEditRef?.value?.getValue("Applicant.cClntAddr") || "";
-    applicantEditRef?.value?.setValue(
-      "Applicant.cClntAddr",
-      `${currentAddr}${val}`
-    );
+  getcRegisterSuffixAddr: (val: any) => {
+    setregistAdd();
   },
 };
 
+function setregistAdd() {
+  const ads = applicantEditRef?.value?.getValue('Applicant.AllProp');
+  const a =  applicantEditRef?.value?.getValue("Applicant.cRegisterSuffixAddr") || "";
+  if(ads){
+    getAddressStr({ address: ads }).then((res: any) => {
+    const { code, data, msg } = res;
+    if (code === 200) {
+      const b = data['addStr'] + a;
+      setAddressStr("Applicant.cClntAddr", b);
+    }
+  });
+  }else{
+    setAddressStr("Applicant.cClntAddr", a);
+  }
+}
+
+function setRegisterAdd() {
+  const ads = applicantEditRef?.value?.getValue('Applicant.Prop');
+  const a =  applicantEditRef?.value?.getValue("Applicant.cSuffixAddr") || "";
+  if(ads){
+    getAddressStr({ address: ads }).then((res: any) => {
+    const { code, data, msg } = res;
+    if (code === 200) {
+      const b = data['addStr'] + a;
+      setAddressStr("Applicant.cRegisteredcapDre", b);
+    }
+  });
+  }else{
+    setAddressStr("Applicant.cRegisteredcapDre", a);
+  }
+}
+function setAddressStr(key: any, data: any) {
+  applicantEditRef?.value?.setValue(key, data);
+}
 function getFromValue() {
   return applicantEditRef?.value?.getFromValue();
 }
