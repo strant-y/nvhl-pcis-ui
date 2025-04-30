@@ -277,6 +277,9 @@ const method = {
             setValue("Applicant.cCertfCls", "");
           }
           setFormItem("Applicant.cCertfCls", {
+            loadData: [],
+          });
+          setFormItem("Applicant.cCertfCls", {
             loadData: res,
             rules: [getRules("required", {})],
           });
@@ -342,15 +345,56 @@ const method = {
             setValue("Applicant.cCertfCls", "");
           }
           setFormItem("Applicant.cCertfCls", {
+            loadData: [],
+          });
+          setFormItem("Applicant.cCertfCls", {
             loadData: res,
             rules: [getRules("required", {})],
           });
         });
     }
   },
+  //大股东性质change事件
+  funcShareholderNature:(val)=>{
+    if(val=='1'){
+      codeListStore
+        .queryCodeList({
+          codeListName: "NATURAL_CERTIFICATE_CACHE",
+          codeListParam: {},
+        })
+        .then((res) => {
+          if (!res.some(item => Object.values(item).includes(getValue("Applicant.cShareholderCategory")))) {
+            setValue("Applicant.cShareholderCategory", "");
+          }
+          setFormItem("Applicant.cShareholderCategory", {
+            loadData: [],
+          });
+          setFormItem("Applicant.cShareholderCategory", {
+            loadData: res,
+          });
+        });
+    }else{
+      codeListStore
+        .queryCodeList({
+          codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
+          codeListParam: {},
+        })
+        .then((res) => {
+          if (!res.some(item => Object.values(item).includes(getValue("Applicant.cShareholderCategory")))) {
+            setValue("Applicant.cShareholderCategory", "");
+          }
+          setFormItem("Applicant.cShareholderCategory", {
+            loadData: [],
+          });
+          setFormItem("Applicant.cShareholderCategory", {
+            loadData: res,
+          });
+        });
+    }
+  },
 
-  // 是否个体工商户
-  cIsIndvduBizChange: (val: any) => {
+    // 是否个体工商户
+    cIsIndvduBizChange: (val: any) => {
     if (val == '1') {
       setFormItem("Applicant.cOccupCde", {
         rules: [getRules("required", {})],
@@ -366,14 +410,6 @@ const method = {
         rules: []
       });
     }
-  },
-  // 单位性质  
-  cWorkDptChange:(val: any)=>{
-    // 法人  且 单位性质为企业  实名认证必填
-    console.log('单位性质',val)
-
-
-
   },
   funcNdustryCate: () => {
     const param = opertaor.getParam();
