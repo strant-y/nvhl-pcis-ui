@@ -1156,7 +1156,11 @@ const calcPremium = () => {
     if (res["code"] == "200") {
       const ops = opertaor.convertData(res);
       console.log("保费计算转换的数据", ops);
-      ElMessage.success(res.msg + "保费为：" + ops["base"]["Base.nPrm"]);
+      if(ops["base"]["Base.nPrm"]!=undefined&&ops["base"]["Base.nPrm"]!=null){
+        ElMessage.success(res.msg + "保费为：" + ops["base"]["Base.nPrm"]);
+      }else{
+        ElMessage.success(res.msg + "保费为：0");
+      }
       opertaor.setDataAll(ops);
       nAmt.value = ops["base"]["Base.nAmt"];
       nPrm.value = ops["base"]["Base.nPrm"];

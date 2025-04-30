@@ -26,6 +26,7 @@ let cRsnDetailCde = ref(route.params.param?.cRsnDetailCde);
 const tgtobjEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));
+let  para =[]
 
 onMounted(() => {
 const routeData = route.params ; // 获取路由参数 
@@ -72,10 +73,10 @@ const canOperateForm= ()=>{
         disabled: false,
         // rules: [getRules("required", {})],
       });
-    setFormItem("Acctinfo.cBankCde", {
-        disabled: false,
-        // rules: [getRules("required", {})],
-      });
+    // setFormItem("Acctinfo.cBankCde", {
+    //     disabled: false,
+    //     // rules: [getRules("required", {})],
+    //   });
     setFormItem("Acctinfo.cBankAddr", {
         disabled: false,
         // rules: [getRules("required", {})],
@@ -86,6 +87,38 @@ const canOperateForm= ()=>{
       });
 
 
+      // setFormItem("Acctinfo.cBankCde", {
+      //   disabled: false,
+      //         });
+
+
+// 开户行
+// const obj = {
+//             rules: null,
+//             // disabled: false,
+            
+//             btnItems: {
+//             icon: "Search",
+//             type: "primary",
+//             func: () => {
+//               // const ck = freeEditRef.value?.getValue("componentGroup");
+//               // dzmodal
+//               //   .open(departmentTree, { type: "Issuer", data: {} })
+//               //   .then((res) => {
+//               //     if (res.type === "ok") {
+//               //       // freeEditRef.value?.setValue("componentGroup", res.body);
+//               //     }
+//               //   });
+//             },
+//           },
+//             // btnItems: {
+//             //   disabled: false,
+//             // },
+//           };
+
+
+
+
 }
 
 // 绑定方法
@@ -94,7 +127,7 @@ const method = {
   cBankRelTypFun: (val:any) => {
     console.log(313,val)
 
-    const para = val.split('_');
+         para= val.split('_');
             const bankname = para[1];  	// 银行名称
             const isdefault = para[2]; 	// 是否默认值
             const banktype = para[3];  	// 银行大类
@@ -116,6 +149,7 @@ const method = {
               });
 
 
+              // 对公对私
               setFormItem("Acctinfo.cPubPri", {
                 rules: [getRules("required", {})],
               });
@@ -124,25 +158,29 @@ const method = {
                 rules: [getRules("required", {})],
               });
               setFormItem("Acctinfo.cBankArea", {
+                disabled: true,
                 rules: [getRules("required", {})],
               });
 
               setFormItem("Acctinfo.cBankCounty", {
+                disabled: true,
                 rules: [getRules("required", {})],
               });
 
-         
 
               setFormItem("Acctinfo.cPubPri", {
                 rules: [getRules("required", {})],
               });
             }
-
+            
+            // 清空开户行
+            setValue("Acctinfo.cBankCde",'')
             setFormItem("Acctinfo.cBankCde", {
-                codeParam: { 'banktypecod': para[0]  },
-                rules: [getRules("required", {})],
+                 disabled: true,
               });
+            
 
+            
 
   },
 
@@ -170,6 +208,10 @@ const method = {
               });
 
   },
+  // 开户行 查询
+  cBankCdeFunc:()=>{
+
+  },
   cCityChange:(e)=>{
  
     setFormItem("Acctinfo.cBankCounty", {
@@ -178,8 +220,16 @@ const method = {
                 rules: [getRules("required", {})],
               });
   },
-  cCountyChange:()=>{
-    console.log(5556)
+  cCountyChange:(val)=>{
+    console.log(5556,para[3],val)
+ 
+
+      setFormItem("Acctinfo.cBankCde", {
+                 disabled: false,
+                codeParam: { 'banktypecod': para[3],'areacode':val},
+                rules: [getRules("required", {})],
+              });
+
   },
 
 };

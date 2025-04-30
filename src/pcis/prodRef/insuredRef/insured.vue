@@ -29,7 +29,8 @@ const { getRules } = useValidator();
 const codeListStore = codeListViewStore();
 const insuredEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
-
+import { useRoute } from "vue-router";
+const route = useRoute();
 onMounted(() => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
@@ -45,6 +46,11 @@ onMounted(() => {
       disabled: true,
     });
   });
+  //【国民经济行业分类】初始化必填，只有法人时才必填，现在个人也是必填了（老系统需求：040001/042002/043004/043005/043011五款产品不区分法人个人投保，国民经济行业分类都必填，其他产品只有法人才必填）
+const cProdNo = route.params.param.cProdNo;
+  if (cProdNo === "040001" || cProdNo === "042002" || cProdNo === "043004" || cProdNo === "043005" || cProdNo === "043011") {
+    setFormItem("Applicant.cTrdCde", {rules: null });
+  } 
 });
 function setFormItem(key, obj) {
   if (obj && Object.keys(obj).length) {
@@ -95,24 +101,35 @@ const method = {
   funccopyvalue: () => {
     const tabref = opertaor.getTableRefs();
     const applicantValue = tabref["applicant"].getFromValue();
-    // const applicantValue2 = tabref["insured"].getFromValue();
+    const applicantValue2 = tabref["insured"].getFromValue();
     let insuredValue = {};
     console.log("applicant---data", applicantValue);
-    console.log("insured----data", insuredValue);
+    console.log("insured----data", applicantValue2);
 
     for (const k in applicantValue) {
       switch (k) {
+
+ 
         case "Applicant.cAppCde":
-          insuredValue["Insured.cAppCde"] = applicantValue[k];
+          insuredValue["Insured.cInsuredCde"] = applicantValue[k];
           break;
         case "Applicant.cAppNme":
-          insuredValue["Insured.cAppNme"] = applicantValue[k];
+          insuredValue["Insured.cInsuredNme"] = applicantValue[k];
           break;
+ 
+ 
         case "Applicant.cCertfCde":
           insuredValue["Insured.cCertfCde"] = applicantValue[k];
           break;
         case "Applicant.cCertfCls":
-          insuredValue["Insured.cCertfCls"] = applicantValue[k];
+          // insuredValue["Insured.cCertfCls"] = applicantValue[k];
+
+          setTimeout(()=>{
+            setValue("Insured.cCertfCls",applicantValue[k] );
+          },0)
+
+          
+
           break;
         case "Applicant.nAge":
           insuredValue["Insured.nAge"] = applicantValue[k];
@@ -126,9 +143,11 @@ const method = {
         case "Applicant.tBirthday":
           insuredValue["Insured.tBirthday"] = applicantValue[k];
           break;
-        case "Applicant.cCertfCls":
-          insuredValue["Insured.cCertfCls"] = applicantValue[k];
-          break;
+        // case "Applicant.cCertfCls":
+        //   insuredValue["Insured.cCertfCls"] = applicantValue[k];
+
+        //   setValue("Insured.cCertfCls", "");
+        //   break;
         case "Applicant.cClntMrk":
           insuredValue["Insured.cClntMrk"] = applicantValue[k];
           break;
@@ -284,6 +303,49 @@ const method = {
         case "Applicant.cBusinessScope":
           insuredValue["Insured.cBusinessScope"] = applicantValue[k];
           break;
+
+        case "Applicant.cSuffixAddr":
+          insuredValue["Insured.cSuffixAddr"] = applicantValue[k];
+          break;
+     case "Applicant.cCustRiskRank":
+          insuredValue["Insured.cCustRiskRank"] = applicantValue[k];
+          break;
+     case "Applicant.cRegisterCity":
+          insuredValue["Insured.cRegisterCity"] = applicantValue[k];
+          break;
+ 
+     case "Applicant.cRegisterCountry":
+          insuredValue["Insured.cRegisterCountry"] = applicantValue[k];
+          break;
+     case "Applicant.cRegisterCounty":
+          insuredValue["Insured.cRegisterCounty"] = applicantValue[k];
+          break;
+     case "Applicant.cRegisterProvince":
+          insuredValue["Insured.cRegisterProvince"] = applicantValue[k];
+          break;
+     case "Applicant.isSame":
+          insuredValue["Insured.isSame"] = applicantValue[k];
+          break;
+     case "Applicant.cOccupCde":
+          insuredValue["Insured.cOccupCde"] = applicantValue[k];
+          break;
+     case "Applicant.cGcidCode":
+          insuredValue["Insured.cGcidCode"] = applicantValue[k];
+          break;
+     case "Applicant.cLegalRepresentative":
+          insuredValue["Insured.cLegalRepresentative"] = applicantValue[k];
+          break;
+     case "Applicant.cRealnameAuthType":
+          insuredValue["Insured.cRealnameAuthType"] = applicantValue[k];
+          break;
+     case "Applicant.cShareholderNature":
+          insuredValue["Insured.cShareholderNature"] = applicantValue[k];
+          break;
+
+
+
+
+
         default:
           insuredValue[k] = applicantValue[k];
       }
@@ -349,10 +411,13 @@ const method = {
 
   //被保人性质change事件
   cClntMrkFunc: (val) => {
+    const tabref = opertaor.getTableRefs();
+    const InsuredValue = tabref["insured"].getFromValue();
+    console.log('---------------',InsuredValue)
     checkUser();
     // val  0法人 1个人
     if (val == "0") {
-      setValue("Insured.cCertfCls", "");
+      // setValue("Insured.cCertfCls", "");
       setFormItem("Insured.cCntrNme", { rules: [getRules("required", {})] });
       setFormItem("Insured.cCntrCertfCde", {
         rules: [getRules("required", {})],
@@ -384,11 +449,38 @@ const method = {
           codeListParam: {},
         })
         .then((res) => {
+          if (!res.some(item => Object.values(item).includes(getValue("Insured.cCertfCls")))) {
+            setValue("Insured.cCertfCls", "");
+          }
           setFormItem("Insured.cCertfCls", {
             loadData: res,
             rules: [getRules("required", {})],
           });
         });
+
+      setFormItem("Insured.cWorkDpt", {
+        disabled: false,
+        rules: [getRules("required", {})],
+      });
+
+      // cCntrNme 办理人  cOperaterCertfTyp办理证件  cOperaterCertfCde 办理人员证件号码  tOperaterCertfEndTm有效期
+      setFormItem("Insured.cCntrNme", {
+        hidden:true
+      });
+      setFormItem("Insured.cOperaterCertfTyp", {
+        hidden:true
+      });
+      setFormItem("Insured.cOperaterCertfCde", {
+        hidden:true
+      });
+
+      setFormItem("Insured.tOperaterCertfEndTm", {
+        hidden:true
+      });
+
+
+
+
     } else {
       setFormItem("Insured.cIsMicroEntpris", {
         disabled: true,
@@ -397,10 +489,14 @@ const method = {
       setFormItem("Insured.cIsIndvduBiz", {
         disabled: false,
       });
-      setFormItem("Applicant.cWorkDpt", { disabled: true, rules: null });
+
+      // 单位性质
+      setFormItem("Insured.cWorkDpt", { disabled: true, rules: null });
+      
+
       //注册地址
-      setFormItem("Applicant.cRegisteredcapDre", { rules: null });
-      setFormItem("Applicant.cIsIndvduBiz", {
+      setFormItem("Insured.cRegisteredcapDre", { rules: null });
+      setFormItem("Insured.cIsIndvduBiz", {
         disabled: false,
       });
       // 是否绿色产业客户
@@ -415,7 +511,7 @@ const method = {
 
       setValue("Insured.cGreenIndustryCustomers", "");
       setValue("Insured.cIsMicroEntpris", "");
-      setValue("Insured.cCertfCls", "");
+      // setValue("Insured.cCertfCls", "");
       setFormItem("Insured.cCntrNme", { rules: null });
       setFormItem("Insured.cCntrCertfCde", { rules: null });
       codeListStore
@@ -424,12 +520,43 @@ const method = {
           codeListParam: {},
         })
         .then((res) => {
+          if (!res.some(item => Object.values(item).includes(getValue("Insured.cCertfCls")))) {
+            setValue("Insured.cCertfCls", "");
+          }
           setFormItem("Insured.cCertfCls", {
             loadData: res,
             rules: [getRules("required", {})],
           });
         });
-    }
+        // 处理办理人
+      setFormItem("Insured.cCntrNme", {
+        hidden:false
+      });
+      setFormItem("Insured.cOperaterCertfTyp", {
+        hidden:false
+      });
+      setFormItem("Insured.cOperaterCertfCde", {
+        hidden:false
+      });
+
+      setFormItem("Insured.tOperaterCertfEndTm", {
+        hidden:false
+      });
+   
+      }
+  },
+
+  // 是否个体工商户
+  cIsIndvduBizChange: (val: any)=>{
+      if(val=='1'){
+        setFormItem("Insured.cOccupCde", {
+          rules: [getRules("required", {})],
+        });
+      }else{
+        setFormItem("Insured.cOccupCde", {
+          rules: [],
+        });
+      }
   },
   funcreset: () => {
 

@@ -45,6 +45,14 @@ const method = {
   func1: () => {
     console.log(getRules);
   },
+  //投保乘客座位总数改变事件
+  changenTotalInsured: () => {
+    setValue("Tgt.nSeatCapacity",Number(getValue("Tgt.nTotalInsured"))+Number(getValue("Tgt.nInsuredcompanySeats")))
+  },
+ //投保司乘人员座位总数改变事件
+  changenInsuredcompanySeats: () => {
+    setValue("Tgt.nSeatCapacity",Number(getValue("Tgt.nTotalInsured"))+Number(getValue("Tgt.nInsuredcompanySeats")))
+  },
   //是否单项工程change事件
   cIsSingleFunc: (val) => {
     if(val == '1') {
