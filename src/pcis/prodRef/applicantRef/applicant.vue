@@ -277,6 +277,9 @@ const method = {
             setValue("Applicant.cCertfCls", "");
           }
           setFormItem("Applicant.cCertfCls", {
+            loadData: [],
+          });
+          setFormItem("Applicant.cCertfCls", {
             loadData: res,
             rules: [getRules("required", {})],
           });
@@ -316,8 +319,49 @@ const method = {
             setValue("Applicant.cCertfCls", "");
           }
           setFormItem("Applicant.cCertfCls", {
+            loadData: [],
+          });
+          setFormItem("Applicant.cCertfCls", {
             loadData: res,
             rules: [getRules("required", {})],
+          });
+        });
+    }
+  },
+  //大股东性质change事件
+  funcShareholderNature:(val)=>{
+    if(val=='1'){
+      codeListStore
+        .queryCodeList({
+          codeListName: "NATURAL_CERTIFICATE_CACHE",
+          codeListParam: {},
+        })
+        .then((res) => {
+          if (!res.some(item => Object.values(item).includes(getValue("Applicant.cShareholderCategory")))) {
+            setValue("Applicant.cShareholderCategory", "");
+          }
+          setFormItem("Applicant.cShareholderCategory", {
+            loadData: [],
+          });
+          setFormItem("Applicant.cShareholderCategory", {
+            loadData: res,
+          });
+        });
+    }else{
+      codeListStore
+        .queryCodeList({
+          codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
+          codeListParam: {},
+        })
+        .then((res) => {
+          if (!res.some(item => Object.values(item).includes(getValue("Applicant.cShareholderCategory")))) {
+            setValue("Applicant.cShareholderCategory", "");
+          }
+          setFormItem("Applicant.cShareholderCategory", {
+            loadData: [],
+          });
+          setFormItem("Applicant.cShareholderCategory", {
+            loadData: res,
           });
         });
     }

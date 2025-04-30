@@ -453,6 +453,9 @@ const method = {
             setValue("Insured.cCertfCls", "");
           }
           setFormItem("Insured.cCertfCls", {
+            loadData: [],
+          });
+          setFormItem("Insured.cCertfCls", {
             loadData: res,
             rules: [getRules("required", {})],
           });
@@ -523,6 +526,9 @@ const method = {
           if (!res.some(item => Object.values(item).includes(getValue("Insured.cCertfCls")))) {
             setValue("Insured.cCertfCls", "");
           }
+          setFormItem("Applicant.cCertfCls", {
+            loadData: [],
+          });
           setFormItem("Insured.cCertfCls", {
             loadData: res,
             rules: [getRules("required", {})],
@@ -545,7 +551,47 @@ const method = {
    
       }
   },
-
+  //大股东性质change事件
+  funcShareholderNature:(val)=>{
+    if(val=='1'){
+      // setFormItem("Insured.cShareholderNature", {
+      //   rules: [getRules("required", {})],
+      // });
+      codeListStore
+        .queryCodeList({
+          codeListName: "NATURAL_CERTIFICATE_CACHE",
+          codeListParam: {},
+        })
+        .then((res) => {
+          if (!res.some(item => Object.values(item).includes(getValue("Insured.cShareholderCategory")))) {
+            setValue("Insured.cShareholderCategory", "");
+          }
+          setFormItem("Insured.cShareholderCategory", {
+            loadData: [],
+          });
+          setFormItem("Insured.cShareholderCategory", {
+            loadData: res,
+          });
+        });
+    }else{
+      codeListStore
+        .queryCodeList({
+          codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
+          codeListParam: {},
+        })
+        .then((res) => {
+          if (!res.some(item => Object.values(item).includes(getValue("Insured.cShareholderCategory")))) {
+            setValue("Insured.cShareholderCategory", "");
+          }
+          setFormItem("Insured.cShareholderCategory", {
+            loadData: [],
+          });
+          setFormItem("Insured.cShareholderCategory", {
+            loadData: res,
+          });
+        });
+    }
+  },
   // 是否个体工商户
   cIsIndvduBizChange: (val: any)=>{
       if(val=='1'){
