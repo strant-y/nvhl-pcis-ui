@@ -202,9 +202,39 @@ const showTitleMap = ref<{ [key: string]: string }>({});
 
 function updateTitle() {
   Object.keys(planData.value).forEach((k: any) => {
-    const str = prodTemple.value.default;
-    const filledString = fillTemplate(str, { sumPrm: 0, sumObjs: 0 });
-    showTitleMap.value[k] = filledString;
+    if (parparam.cProdNo === "043009") {
+      const terms = planData.value[k];
+      console.log(terms);
+      // 获取模版字符串
+      const str = prodTemple.value.default;
+      let sumobj = 0;
+      let sumprm = 0;
+      const m = terms['m']; // 主条款
+      if(m && m.length > 0){
+        m.forEach((item: any) => {
+          sumobj += item['Term.nInsuredCount']?item['Term.nInsuredCount'] : 0;
+          sumprm += (item['Term.nInsuranceFee']?item['Term.nInsuranceFee'] : 0);
+        })
+      }
+
+      const a1 = terms['a1']; // 扩展类
+
+      if(a1 && a1.length > 0){
+        a1.forEach((item: any) => {
+          sumprm += (item['Term.nInsuranceFee']?item['Term.nInsuranceFee'] : 0);
+        })
+      }
+
+      const a2 = terms['a2']; // 限制类
+      if(a2 && a2.length > 0){
+        a2.forEach((item: any) => {
+          sumprm += (item['Term.nInsuranceFee']?item['Term.nInsuranceFee'] : 0);
+        })
+      }
+
+      const filledString = fillTemplate(str, { sumPrm: sumprm, sumObjs: sumobj });
+      showTitleMap.value[k] = filledString;
+    }
   });
 }
 
@@ -257,9 +287,6 @@ onMounted(async () => {
       }
     });
   }
-  nextTick(() => {
-    updateTitle();
-  });
 });
 
 // 绑定方法
@@ -274,7 +301,6 @@ const method = {
     });
     const planKey = "P" + (maxindex + 1);
     planData.value[planKey] = [];
-    updateTitle();
   },
 };
 
@@ -391,7 +417,6 @@ function deletePlan(plan: string) {
       message: "删除成功",
     });
   });
-  
 }
 function deleteData(plan: string, term: any) {
   ElMessageBox.confirm("是否继续删除?", "Warning", {
@@ -479,11 +504,11 @@ function setFormValue(value: any) {
   Object.keys(plandata).forEach((planNo: any) => {
     refushData(planNo, plandata[planNo]);
   });
-  updateTitle();
 }
 
 function validate() {}
 function showFlush() {
+  updateTitle();
   Object.keys(tremTemplateRefs.value).forEach((item) => {
     tremTemplateRefs.value[item].dataInit();
   });
