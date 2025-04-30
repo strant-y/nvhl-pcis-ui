@@ -50,13 +50,13 @@ onMounted(() => {
       rules: null,
       disabled: true,
     });
-//【国民经济行业分类】初始化必填，只有法人时才必填，现在个人也是必填了（老系统需求：040001/042002/043004/043005/043011五款产品不区分法人个人投保，国民经济行业分类都必填，其他产品只有法人才必填）
-const cProdNo = route.params.param.cProdNo;
-  if (cProdNo === "040001" || cProdNo === "042002" || cProdNo === "043004" || cProdNo === "043005" || cProdNo === "043011") {
-    setFormItem("Applicant.cTrdCde", {rules: null });
-  } 
+    //【国民经济行业分类】初始化必填，只有法人时才必填，现在个人也是必填了（老系统需求：040001/042002/043004/043005/043011五款产品不区分法人个人投保，国民经济行业分类都必填，其他产品只有法人才必填）
+    const cProdNo = route.params.param.cProdNo;
+    if (cProdNo === "040001" || cProdNo === "042002" || cProdNo === "043004" || cProdNo === "043005" || cProdNo === "043011") {
+      setFormItem("Applicant.cTrdCde", { rules: null });
+    }
   });
-  
+
 });
 //给表单下拉项赋值
 function setFormItem(key, obj) {
@@ -281,6 +281,19 @@ const method = {
             rules: [getRules("required", {})],
           });
         });
+      // 为法人 国民经济行业必填
+      setFormItem("Applicant.cTrdCde", {
+        rules: [getRules("required", {})],
+      });
+      // 为法人 移动电话不填
+      setFormItem("Applicant.cMobile", {
+        rules: null
+      });
+
+      // 是否个体工商户
+      setFormItem("Applicant.cIsIndvduBiz", {
+        rules: null
+      });
     } else {
       setFormItem("Applicant.cWorkDpt", { disabled: true, rules: null });
       setFormItem("Applicant.cIsMicroEntpris", {
@@ -306,6 +319,19 @@ const method = {
       // setValue("Applicant.cCertfCls", "");
       setFormItem("Applicant.cCntrNme", { rules: null });
       setFormItem("Applicant.cCntrCertfCde", { rules: null });
+
+      setFormItem("Applicant.cTrdCde", {
+        rules: null
+      });
+
+      // 个人 移动电话必填
+      setFormItem("Applicant.cMobile", {
+        rules: [getRules("required", {})],
+      });
+
+      setFormItem("Applicant.cIsIndvduBiz", {
+        rules: [getRules("required", {})],
+      });
       codeListStore
         .queryCodeList({
           codeListName: "NATURAL_CERTIFICATE_CACHE",
@@ -322,17 +348,32 @@ const method = {
         });
     }
   },
-    // 是否个体工商户
-    cIsIndvduBizChange: (val: any)=>{
-      if(val=='1'){
-        setFormItem("Insured.cOccupCde", {
-          rules: [getRules("required", {})],
-        });
-      }else{
-        setFormItem("Insured.cOccupCde", {
-          rules: [],
-        });
-      }
+
+  // 是否个体工商户
+  cIsIndvduBizChange: (val: any) => {
+    if (val == '1') {
+      setFormItem("Applicant.cOccupCde", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.cTrdCde", {
+        rules: [getRules("required", {})],
+      });
+    } else {
+      setFormItem("Applicant.cOccupCde", {
+        rules: [],
+      });
+      setFormItem("Applicant.cTrdCde", {
+        rules: []
+      });
+    }
+  },
+  // 单位性质  
+  cWorkDptChange:(val: any)=>{
+    // 法人  且 单位性质为企业  实名认证必填
+    console.log('单位性质',val)
+
+
+
   },
   funcNdustryCate: () => {
     const param = opertaor.getParam();
@@ -491,10 +532,10 @@ const method = {
   isSameChange: (val) => {
     if (val == "1") {
       const ads = applicantEditRef?.value?.getValue('Applicant.AllProp');
-      const a =  applicantEditRef?.value?.getValue("Applicant.cRegisterSuffixAddr") || "";
+      const a = applicantEditRef?.value?.getValue("Applicant.cRegisterSuffixAddr") || "";
 
-      applicantEditRef?.value?.setValue('Applicant.Prop',ads);
-      applicantEditRef?.value?.setValue('Applicant.cSuffixAddr',a);
+      applicantEditRef?.value?.setValue('Applicant.Prop', ads);
+      applicantEditRef?.value?.setValue('Applicant.cSuffixAddr', a);
     } else {
     }
   },
@@ -521,13 +562,13 @@ function setregistAdd() {
   const a = applicantEditRef?.value?.getValue("Applicant.cRegisterSuffixAddr") || "";
   if (ads) {
     getAddressStr({ address: ads }).then((res: any) => {
-    const { code, data, msg } = res;
-    if (code === 200) {
-      const b = (data?data['addStr']:"") + a;
-      setAddressStr("Applicant.cClntAddr", b);
-    }
-  });
-  }else{
+      const { code, data, msg } = res;
+      if (code === 200) {
+        const b = (data ? data['addStr'] : "") + a;
+        setAddressStr("Applicant.cClntAddr", b);
+      }
+    });
+  } else {
     setAddressStr("Applicant.cClntAddr", a);
   }
 }
@@ -537,13 +578,13 @@ function setRegisterAdd() {
   const a = applicantEditRef?.value?.getValue("Applicant.cSuffixAddr") || "";
   if (ads) {
     getAddressStr({ address: ads }).then((res: any) => {
-    const { code, data, msg } = res;
-    if (code === 200) {
-      const b = (data?data['addStr']:"") + a;
-      setAddressStr("Applicant.cRegisteredcapDre", b);
-    }
-  });
-  }else{
+      const { code, data, msg } = res;
+      if (code === 200) {
+        const b = (data ? data['addStr'] : "") + a;
+        setAddressStr("Applicant.cRegisteredcapDre", b);
+      }
+    });
+  } else {
     setAddressStr("Applicant.cRegisteredcapDre", a);
   }
 }
