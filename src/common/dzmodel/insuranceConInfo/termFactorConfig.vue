@@ -177,7 +177,7 @@ function savegroupinfo() {
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     editFlag: true,
-    editList: ["cPorpRequired","cPorpShowtitle"],
+    editList: ["cPorpRequired","cPorpShowtitle","cPorpDisabled"],
     fromSchema: [
       {
         prop: "icon",
@@ -220,6 +220,15 @@ const tableconfig = reactive<AppTableConfig>(
           n: "0",
         },
         func: (v: any) => {},
+      },
+      {
+        prop: "cPorpDisabled",
+        inputtype: "rtswitch",
+        title: "是否只读",
+        keymap: {
+          y: "1",
+          n: "0",
+        },
       },
       {
         prop: "cPorpShowtitle",

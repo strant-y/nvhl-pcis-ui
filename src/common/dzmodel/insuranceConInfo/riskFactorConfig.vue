@@ -141,7 +141,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     editFlag: true,
-    editList: ["c_porp_type", "c_porp_required"],
+    editList: ["c_porp_type", "c_porp_required","c_porp_disabled"],
     fromSchema: [
       {
         prop: "icon",
@@ -202,6 +202,18 @@ const tableconfig = reactive<AppTableConfig>(
           getFactorConf();
         },
       },
+      {
+        prop: "c_porp_disabled",
+        inputtype: "rtswitch",
+        title: "是否只读",
+        keymap: {
+          y: "1",
+          n: "0",
+        },
+        func: (v: any) => {
+          getFactorConf();
+        },
+      },
     ],
   })
 );
@@ -235,6 +247,7 @@ function select(item: any) {
       se.isChecked = element.isChecked;
       se.c_porp_type = element.c_porp_type;
       se.c_porp_required = element.c_porp_required;
+      se.c_porp_disabled = element.c_porp_disabled;
       newSelectl.push(se);
     }
   });
@@ -246,6 +259,7 @@ function select(item: any) {
       element.isChecked = "0";
       element.c_porp_type = null;
       element.c_porp_required = "0";
+      element.c_porp_disabled = '0';
       newSelectl.push(element);
     }
   });
@@ -263,6 +277,7 @@ function getFactorConf() {
           isChecked: element.isChecked,
           c_porp_type: element.c_porp_type,
           c_porp_required: element.c_porp_required,
+          c_porp_disabled: element.c_porp_disabled,
         }));
       e.selectFactorList = selectData1;
     }
