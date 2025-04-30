@@ -260,7 +260,9 @@
             if (r.code !== 200) {
                 // ElMessage.error({ message: r.msg, duration: 6000 });
             } else {
-
+                setFormItem("cUndrMrk", {
+                    loadData: r['data']
+                })
             }
         })
     }
@@ -288,13 +290,7 @@
     }
     onMounted(() => {
         nextTick(() => {
-            setFormItem("cUndrMrk", {
-                loadData: [{value: 'A', label: '同意'},
-                    {value: 'R', label: '上报'},
-                    {value: 'B', label: '退回给出单员'},
-                    {value: 'T', label: '退回至指定核保级别人员'}]
-            })
-            setValue("riFacMrk", '2')
+            setValue("riFacMrk", '0')
             const param={'cProdNo':params.cProdNo,'opCde':user.opCde,'companyId':user.companyId,'cAppNo':params.cAppNo,'cPlanNo':params.cPlanNo}
             getCUndrMrkUrlFn(param);
         });
