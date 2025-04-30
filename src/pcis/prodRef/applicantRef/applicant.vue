@@ -50,7 +50,7 @@ onMounted(() => {
     });
 
 
-    
+
   });
 });
 //给表单下拉项赋值
@@ -317,6 +317,18 @@ const method = {
         });
     }
   },
+    // 是否个体工商户
+    cIsIndvduBizChange: (val: any)=>{
+      if(val=='1'){
+        setFormItem("Insured.cOccupCde", {
+          rules: [getRules("required", {})],
+        });
+      }else{
+        setFormItem("Insured.cOccupCde", {
+          rules: [],
+        });
+      }
+  },
   funcNdustryCate: () => {
     const param = opertaor.getParam();
     dialog.value?.open(
@@ -494,7 +506,7 @@ const method = {
     setregistAdd();
   },
   //注册地址(input)
-  getcSuffixAddr:(val: any)=>{
+  getcSuffixAddr: (val: any) => {
     setRegisterAdd();
   },
   //常住地址(input)
@@ -505,32 +517,32 @@ const method = {
 
 function setregistAdd() {
   const ads = applicantEditRef?.value?.getValue('Applicant.AllProp');
-  const a =  applicantEditRef?.value?.getValue("Applicant.cRegisterSuffixAddr") || "";
-  if(ads){
+  const a = applicantEditRef?.value?.getValue("Applicant.cRegisterSuffixAddr") || "";
+  if (ads) {
     getAddressStr({ address: ads }).then((res: any) => {
-    const { code, data, msg } = res;
-    if (code === 200) {
-      const b = data?data['addStr']:"" + a;
-      setAddressStr("Applicant.cClntAddr", b);
-    }
-  });
-  }else{
+      const { code, data, msg } = res;
+      if (code === 200) {
+        const b = data ? data['addStr'] : "" + a;
+        setAddressStr("Applicant.cClntAddr", b);
+      }
+    });
+  } else {
     setAddressStr("Applicant.cClntAddr", a);
   }
 }
 
 function setRegisterAdd() {
   const ads = applicantEditRef?.value?.getValue('Applicant.Prop');
-  const a =  applicantEditRef?.value?.getValue("Applicant.cSuffixAddr") || "";
-  if(ads){
+  const a = applicantEditRef?.value?.getValue("Applicant.cSuffixAddr") || "";
+  if (ads) {
     getAddressStr({ address: ads }).then((res: any) => {
-    const { code, data, msg } = res;
-    if (code === 200) {
-      const b = data?data['addStr']:"" + a;
-      setAddressStr("Applicant.cRegisteredcapDre", b);
-    }
-  });
-  }else{
+      const { code, data, msg } = res;
+      if (code === 200) {
+        const b = data ? data['addStr'] : "" + a;
+        setAddressStr("Applicant.cRegisteredcapDre", b);
+      }
+    });
+  } else {
     setAddressStr("Applicant.cRegisteredcapDre", a);
   }
 }
