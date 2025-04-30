@@ -380,31 +380,52 @@ function refushData(planNo: string, datas: any) {
   }, 100);
 }
 function deletePlan(plan: string) {
-  delete planData.value[plan];
+  ElMessageBox.confirm("是否继续删除?", "Warning", {
+    confirmButtonText: "删除",
+    cancelButtonText: "取消",
+    type: "warning",
+  }).then(() => {
+    delete planData.value[plan];
+    ElMessage({
+      type: "success",
+      message: "删除成功",
+    });
+  });
+  
 }
 function deleteData(plan: string, term: any) {
-  deleteTermByNo(plan, term["Term.cClauseCode"]);
-  if (term["Term.cRdrTyp"] === "0") {
-    codeListStore
-      .queryCodeList(
-        {
-          codeListName: "MainTermlist",
-          codeListParam: { cTermNo: term["Term.cClauseCode"] },
-        },
-        false,
-        false
-      )
-      .then((res) => {
-        if (res && res.length > 0) {
-          res.forEach((r: any) => {
-            deleteTermByNo(plan, r["RdrTerm"]);
-          });
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }
+  ElMessageBox.confirm("是否继续删除?", "Warning", {
+    confirmButtonText: "删除",
+    cancelButtonText: "取消",
+    type: "warning",
+  }).then(() => {
+    deleteTermByNo(plan, term["Term.cClauseCode"]);
+    if (term["Term.cRdrTyp"] === "0") {
+      codeListStore
+        .queryCodeList(
+          {
+            codeListName: "MainTermlist",
+            codeListParam: { cTermNo: term["Term.cClauseCode"] },
+          },
+          false,
+          false
+        )
+        .then((res) => {
+          if (res && res.length > 0) {
+            res.forEach((r: any) => {
+              deleteTermByNo(plan, r["RdrTerm"]);
+            });
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    }
+    ElMessage({
+      type: "success",
+      message: "删除成功",
+    });
+  });
 }
 
 function deleteTermByNo(plan: any, t: any) {
@@ -495,16 +516,16 @@ function setDisabledAll() {
   });
 }
 function setUnDisabledByKeyList(key: any) {
-    cardconfig.value.endBtns?.forEach((item: any) => {
-      if(item.id = key){
-        item.hidden = false;
-      }
-    });
-    cardconfig.value.titleBtns?.forEach((item: any) => {
-      if(item.id = key){
-        item.hidden = false;
-      }
-    });
+  cardconfig.value.endBtns?.forEach((item: any) => {
+    if ((item.id = key)) {
+      item.hidden = false;
+    }
+  });
+  cardconfig.value.titleBtns?.forEach((item: any) => {
+    if ((item.id = key)) {
+      item.hidden = false;
+    }
+  });
 }
 
 defineExpose({

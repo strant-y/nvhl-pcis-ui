@@ -26,6 +26,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
 import { genCusConInfoBusinessList } from "../../../api/query/index";
+import { set } from "lodash";
 const opertaor = dataOpertaor();
 const { getRules } = useValidator();
 const props = defineProps({
@@ -105,8 +106,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 codeListParam: {},
               })
               .then((res) => {
+                setValue("CCertfCls", []);
                 setFormItem("CCertfCls", { loadData: res });
-                setTableFormItem("CCertfCls", { loadData: res });
+                pageresult.list = []
+                // setTableFormItem("CCertfCls", { loadData: res });
               });
           } else {
             codeListStore
@@ -115,8 +118,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 codeListParam: {},
               })
               .then((res) => {
+                setValue("CCertfCls", []);
                 setFormItem("CCertfCls", { loadData: res });
-                setTableFormItem("CCertfCls", { loadData: res });
+                pageresult.list = []
+                // setTableFormItem("CCertfCls", { loadData: res });
               });
           }
         },
@@ -130,6 +135,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "CCertfCls",
         inputtype: "rtselect",
         title: "证件类型",
+        rules: [getRules("required", { change: true })],
         // typeCode: "CERTIFICATE_TYPE_CACHE",
       },
       {

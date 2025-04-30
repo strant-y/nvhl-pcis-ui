@@ -170,6 +170,7 @@ const exRules = {};
 
 onMounted(async () => {
   const param = props.data.data;
+  console.log(param);
   qryProdRelTermRiskList(param).then((res: any) => {
     const { code, data, msg } = res;
     if (200 === code) {
@@ -193,12 +194,12 @@ function setNode() {
             const k = item["Term.cClauseCode"] + risk["TermRisktgt.cLiabCode"];
             addMainKey.push(k);
           });
-        } else {
-          addMainKey.push(item["Term.cClauseCode"]);
         }
+        addMainKey.push(item["Term.cClauseCode"]);
       }
     });
   }
+  console.log(addMainKey);
   mainRef.value?.setCheckedKeys(addMainKey, false);
 }
 function selectMainTerm(isselect = true) {

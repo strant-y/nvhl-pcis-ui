@@ -123,7 +123,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "CDptCde",
         inputtype: "rtselect",
         title: "业务机构",
-        // typeCode: "PLYDPT_LIST",
+        typeCode: "PLYDPT_LIST",
+        disabled: true,
         // param: { 'CDptCde': '' }, //待添加
       },
       {
