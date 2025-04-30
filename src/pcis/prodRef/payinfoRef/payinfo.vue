@@ -28,7 +28,6 @@ onMounted(() => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
-  
 });
 
 // 绑定方法
@@ -55,6 +54,10 @@ const method = {
           key['Pay.nTms']=index+1
       });
   },
+     //缴费止期控制
+  // tPayEndTmDisabled: (date: any) => {
+  //   return  date.getTime() <new Date( opertaor.getTableRefs()["insrnc"].getValue("Base.tInsrncEndTm").replace(/-/g, '/')).getTime()
+  // },
 };
 
 // 绑定特殊验证器
@@ -79,13 +82,25 @@ function getTableValue(rowId: number, key: string) {
 function getFormconfig(){
   return formconfig1;
 }
+//给表单赋值
+function setFormItem(key, obj) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        Object.assign(item, obj);
+      }
+    });
+  }
+}
 
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   getTableValue,
-  getFormconfig
+  getFormconfig,
+  setFormItem
 });
 </script>
 

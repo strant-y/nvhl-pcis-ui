@@ -13,6 +13,7 @@ import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
+import { formatDate } from "@/utils/date";
 const opertaor = dataOpertaor();
 const dialogRef = ref<DialogMethod | null>(null);
 const props = defineProps({
@@ -44,9 +45,10 @@ onMounted(async () => {
   if (sessionStorage.getItem("toMyPageData")) {
     sessionData.value = JSON.parse(sessionStorage.getItem("toMyPageData"));
   }
-  const value = getValue('Base.nAmt');
-  console.log("测试Base.nAmt得值");
-  console.log(value);
+  // const value = getValue('Base.nAmt');
+  // console.log("测试Base.nAmt得值");
+  // console.log(value);
+  
 });
 
 // 绑定方法
@@ -55,8 +57,13 @@ const method = {
   func1: () => {
     console.log(getRules);
   },
+ 
   //缴费拆分按钮事件
-  splitPayNumber(){
+  splitPayNumber() {
+    if (Number(getValue("Base.nPayNumber"))>12) {
+      ElMessage.warning("拆分最多为12期！");
+      return false
+    }
     if(getValue("Base.nPayNumber")!=''){
       const totalAmount = Number(getValue("Base.nPrm"));
       const splitCount = Number(getValue("Base.nPayNumber"));
@@ -70,10 +77,22 @@ const method = {
       let val= {}
       let valArr=[]
       for (let i = 0; i < Number(getValue("Base.nPayNumber")); i++) {
-           val= { "_dataId": "", "Pay.nTms":i+1 , "Pay.cPayorCde": opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppCde"), "Pay.tPayBgnTm": opertaor.getTableRefs()["insrnc"].getValue("Base.tInsrncBgnTm"), "Pay.tPayEndTm": opertaor.getTableRefs()["insrnc"].getValue("Base.tInsrncEndTm"), "Pay.nOwnPrm": result.value[i], "Pay.cPayorNme":opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppNme"), "Pay.nPayablePrm": result.value[i] }
+        let BgnTmDate = new Date(opertaor.getTableRefs()["insrnc"].getValue("Base.tInsrncBgnTm"))   // 开始时间
+        let startDate = new Date(BgnTmDate); 
+        let endDate = new Date(BgnTmDate);
+        if (getValue("Base.cInstMrk")=='5') {
+          startDate.setDate(BgnTmDate.getDate() + i * 15); 
+          endDate.setDate(BgnTmDate.getDate() + (i + 1) * 15); 
+        } else {
+          startDate.setDate(BgnTmDate.getDate() + i * 30); 
+          endDate.setDate(BgnTmDate.getDate() + (i + 1) * 30); 
+        }
+        let tInsrncBgnTm = formatDate(startDate, 'yyyy-MM-dd HH:mm:ss')
+        let tPayEndTm = formatDate(endDate,'yyyy-MM-dd HH:mm:ss')
+           val= { "_dataId": "", "Pay.nTms":i+1 , "Pay.cPayorCde": opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppCde"), "Pay.tPayBgnTm": tInsrncBgnTm, "Pay.tPayEndTm": tPayEndTm, "Pay.nOwnPrm": result.value[i], "Pay.cPayorNme":opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppNme"), "Pay.nPayablePrm": result.value[i] }
           valArr.push(val)
       }
-      opertaor.getTableRefs()["payinfo"].setFormValue(valArr);
+      opertaor.getTableRefByKey("payinfo").setFormValue(valArr);
   }
 },
   //付费约定下拉事件
