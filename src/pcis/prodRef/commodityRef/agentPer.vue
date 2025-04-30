@@ -165,19 +165,118 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "CBsnsTyp",
         inputtype: "rtselect",
         title: "业务来源大类",
-        loadData: [],
+        loadData: [
+        {
+            "label": "代理业务",
+            "value": "19002"
+        },
+        {
+            "label": "直销业务",
+            "value": "19001"
+        },
+        {
+            "label": "经纪业务",
+            "value": "19003"
+        }
+    ],
       },
       {
         prop: "CChaType",
         inputtype: "rtselect",
         title: "业务来源中类",
-        loadData: [],
+        loadData: [
+        {
+            "label": "个人代理",
+            "value": "1900201"
+        },
+        {
+            "label": "兼业代理",
+            "value": "1900202"
+        },
+        {
+            "label": "专业代理",
+            "value": "1900203"
+        }
+    ],
       },
       {
         prop: "CChaSubtype",
         inputtype: "rtselect",
         title: "业务来源子类",
-        loadData: [],
+        loadData: [
+        {
+            "label": "保险业兼业代理",
+            "value": "1900202001"
+        },
+        {
+            "label": "银行业兼业代理",
+            "value": "1900202002"
+        },
+        {
+            "label": "证券业兼业代理",
+            "value": "1900202003"
+        },
+        {
+            "label": "邮政业兼业代理",
+            "value": "1900202004"
+        },
+        {
+            "label": "民航系统",
+            "value": "1900202005"
+        },
+        {
+            "label": "铁路系统",
+            "value": "1900202006"
+        },
+        {
+            "label": "公路系统",
+            "value": "1900202007"
+        },
+        {
+            "label": "水运系统",
+            "value": "1900202008"
+        },
+        {
+            "label": "汽车销售与租赁",
+            "value": "1900202009"
+        },
+        {
+            "label": "汽车维修与服务",
+            "value": "1900202010"
+        },
+        {
+            "label": "机动车检验机构",
+            "value": "1900202011"
+        },
+        {
+            "label": "银保通",
+            "value": "1900202012"
+        },
+        {
+            "label": "物流公司",
+            "value": "1900202013"
+        },
+        {
+            "label": "担保、贷款公司",
+            "value": "1900202014"
+        },
+        {
+            "label": "金融租赁",
+            "value": "1900202016"
+        },
+        {
+            "label": "信托代理",
+            "value": "1900202017"
+        },
+        {
+            "label": "车友俱乐部代理",
+            "value": "1900202018"
+        },
+        {
+            "label": "其他兼业代理",
+            "value": "1900202099"
+        }
+    ],
       },
       {
         prop: "CChaCde",
@@ -252,9 +351,9 @@ function handleQuery(flag?: boolean) {
   param.CProdNo = props.data.data.CProdNo;
   getAgencyBusinessList(param);
   pageresult.list = [
-    {
-      CChaCde: 123,
-    },
+    // {
+    //   CChaCde: 123,
+    // },
   ];
 }
 /**

@@ -47,10 +47,10 @@ onMounted(() => {
     });
   });
   //【国民经济行业分类】初始化必填，只有法人时才必填，现在个人也是必填了（老系统需求：040001/042002/043004/043005/043011五款产品不区分法人个人投保，国民经济行业分类都必填，其他产品只有法人才必填）
-const cProdNo = route.params.param.cProdNo;
+  const cProdNo = route.params.param.cProdNo;
   if (cProdNo === "040001" || cProdNo === "042002" || cProdNo === "043004" || cProdNo === "043005" || cProdNo === "043011") {
-    setFormItem("Applicant.cTrdCde", {rules: null });
-  } 
+    setFormItem("Applicant.cTrdCde", { rules: null });
+  }
 });
 function setFormItem(key, obj) {
   if (obj && Object.keys(obj).length) {
@@ -109,26 +109,26 @@ const method = {
     for (const k in applicantValue) {
       switch (k) {
 
- 
+
         case "Applicant.cAppCde":
           insuredValue["Insured.cInsuredCde"] = applicantValue[k];
           break;
         case "Applicant.cAppNme":
           insuredValue["Insured.cInsuredNme"] = applicantValue[k];
           break;
- 
- 
+
+
         case "Applicant.cCertfCde":
           insuredValue["Insured.cCertfCde"] = applicantValue[k];
           break;
         case "Applicant.cCertfCls":
           // insuredValue["Insured.cCertfCls"] = applicantValue[k];
 
-          setTimeout(()=>{
-            setValue("Insured.cCertfCls",applicantValue[k] );
-          },0)
+          setTimeout(() => {
+            setValue("Insured.cCertfCls", applicantValue[k]);
+          }, 0)
 
-          
+
 
           break;
         case "Applicant.nAge":
@@ -307,38 +307,38 @@ const method = {
         case "Applicant.cSuffixAddr":
           insuredValue["Insured.cSuffixAddr"] = applicantValue[k];
           break;
-     case "Applicant.cCustRiskRank":
+        case "Applicant.cCustRiskRank":
           insuredValue["Insured.cCustRiskRank"] = applicantValue[k];
           break;
-     case "Applicant.cRegisterCity":
+        case "Applicant.cRegisterCity":
           insuredValue["Insured.cRegisterCity"] = applicantValue[k];
           break;
- 
-     case "Applicant.cRegisterCountry":
+
+        case "Applicant.cRegisterCountry":
           insuredValue["Insured.cRegisterCountry"] = applicantValue[k];
           break;
-     case "Applicant.cRegisterCounty":
+        case "Applicant.cRegisterCounty":
           insuredValue["Insured.cRegisterCounty"] = applicantValue[k];
           break;
-     case "Applicant.cRegisterProvince":
+        case "Applicant.cRegisterProvince":
           insuredValue["Insured.cRegisterProvince"] = applicantValue[k];
           break;
-     case "Applicant.isSame":
+        case "Applicant.isSame":
           insuredValue["Insured.isSame"] = applicantValue[k];
           break;
-     case "Applicant.cOccupCde":
+        case "Applicant.cOccupCde":
           insuredValue["Insured.cOccupCde"] = applicantValue[k];
           break;
-     case "Applicant.cGcidCode":
+        case "Applicant.cGcidCode":
           insuredValue["Insured.cGcidCode"] = applicantValue[k];
           break;
-     case "Applicant.cLegalRepresentative":
+        case "Applicant.cLegalRepresentative":
           insuredValue["Insured.cLegalRepresentative"] = applicantValue[k];
           break;
-     case "Applicant.cRealnameAuthType":
+        case "Applicant.cRealnameAuthType":
           insuredValue["Insured.cRealnameAuthType"] = applicantValue[k];
           break;
-     case "Applicant.cShareholderNature":
+        case "Applicant.cShareholderNature":
           insuredValue["Insured.cShareholderNature"] = applicantValue[k];
           break;
 
@@ -413,7 +413,7 @@ const method = {
   cClntMrkFunc: (val) => {
     const tabref = opertaor.getTableRefs();
     const InsuredValue = tabref["insured"].getFromValue();
-    console.log('---------------',InsuredValue)
+    console.log('---------------', InsuredValue)
     checkUser();
     // val  0法人 1个人
     if (val == "0") {
@@ -429,6 +429,7 @@ const method = {
       setValue("Insured.cIsIndvduBiz", "");
       setFormItem("Insured.cIsIndvduBiz", {
         disabled: true,
+        rules:null
       });
       // 是否绿色产业客户
       setFormItem("Insured.cGreenIndustryCustomers", {
@@ -443,6 +444,17 @@ const method = {
       setFormItem("Insured.cRegisteredcapDre", {
         rules: [getRules("required", {})],
       });
+
+      // 为法人 国民经济行业必填
+      setFormItem("Insured.cTrdCde", {
+        rules: [getRules("required", {})],
+      });
+
+      // 移动电话
+      setFormItem("Insured.cMobile", {
+        rules: null
+      });
+
       codeListStore
         .queryCodeList({
           codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
@@ -452,6 +464,9 @@ const method = {
           if (!res.some(item => Object.values(item).includes(getValue("Insured.cCertfCls")))) {
             setValue("Insured.cCertfCls", "");
           }
+          setFormItem("Insured.cCertfCls", {
+            loadData: [],
+          });
           setFormItem("Insured.cCertfCls", {
             loadData: res,
             rules: [getRules("required", {})],
@@ -465,20 +480,18 @@ const method = {
 
       // cCntrNme 办理人  cOperaterCertfTyp办理证件  cOperaterCertfCde 办理人员证件号码  tOperaterCertfEndTm有效期
       setFormItem("Insured.cCntrNme", {
-        hidden:true
+        hidden: true
       });
       setFormItem("Insured.cOperaterCertfTyp", {
-        hidden:true
+        hidden: true
       });
       setFormItem("Insured.cOperaterCertfCde", {
-        hidden:true
+        hidden: true
       });
 
       setFormItem("Insured.tOperaterCertfEndTm", {
-        hidden:true
+        hidden: true
       });
-
-
 
 
     } else {
@@ -487,18 +500,17 @@ const method = {
       });
       //是否个体工商户
       setFormItem("Insured.cIsIndvduBiz", {
+        rules: [getRules("required", {})],
         disabled: false,
       });
 
       // 单位性质
       setFormItem("Insured.cWorkDpt", { disabled: true, rules: null });
-      
+
 
       //注册地址
       setFormItem("Insured.cRegisteredcapDre", { rules: null });
-      setFormItem("Insured.cIsIndvduBiz", {
-        disabled: false,
-      });
+
       // 是否绿色产业客户
       setFormItem("Insured.cGreenIndustryCustomers", {
         rules: null,
@@ -514,6 +526,16 @@ const method = {
       // setValue("Insured.cCertfCls", "");
       setFormItem("Insured.cCntrNme", { rules: null });
       setFormItem("Insured.cCntrCertfCde", { rules: null });
+
+      // 为法人 国民经济行业必填
+      setFormItem("Insured.cTrdCde", {
+        rules: null
+      });
+
+      // 个人 移动电话必填
+      setFormItem("Insured.cMobile", {
+        rules: [getRules("required", {})],
+      });
       codeListStore
         .queryCodeList({
           codeListName: "NATURAL_CERTIFICATE_CACHE",
@@ -523,40 +545,90 @@ const method = {
           if (!res.some(item => Object.values(item).includes(getValue("Insured.cCertfCls")))) {
             setValue("Insured.cCertfCls", "");
           }
+          setFormItem("Applicant.cCertfCls", {
+            loadData: [],
+          });
           setFormItem("Insured.cCertfCls", {
             loadData: res,
             rules: [getRules("required", {})],
           });
         });
-        // 处理办理人
+      // 处理办理人
       setFormItem("Insured.cCntrNme", {
-        hidden:false
+        hidden: false
       });
       setFormItem("Insured.cOperaterCertfTyp", {
-        hidden:false
+        hidden: false
       });
       setFormItem("Insured.cOperaterCertfCde", {
-        hidden:false
+        hidden: false
       });
 
       setFormItem("Insured.tOperaterCertfEndTm", {
-        hidden:false
+        hidden: false
       });
-   
-      }
-  },
 
+    }
+  },
+  //大股东性质change事件
+  funcShareholderNature:(val)=>{
+    if(val=='1'){
+      // setFormItem("Insured.cShareholderNature", {
+      //   rules: [getRules("required", {})],
+      // });
+      codeListStore
+        .queryCodeList({
+          codeListName: "NATURAL_CERTIFICATE_CACHE",
+          codeListParam: {},
+        })
+        .then((res) => {
+          if (!res.some(item => Object.values(item).includes(getValue("Insured.cShareholderCategory")))) {
+            setValue("Insured.cShareholderCategory", "");
+          }
+          setFormItem("Insured.cShareholderCategory", {
+            loadData: [],
+          });
+          setFormItem("Insured.cShareholderCategory", {
+            loadData: res,
+          });
+        });
+    }else{
+      codeListStore
+        .queryCodeList({
+          codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
+          codeListParam: {},
+        })
+        .then((res) => {
+          if (!res.some(item => Object.values(item).includes(getValue("Insured.cShareholderCategory")))) {
+            setValue("Insured.cShareholderCategory", "");
+          }
+          setFormItem("Insured.cShareholderCategory", {
+            loadData: [],
+          });
+          setFormItem("Insured.cShareholderCategory", {
+            loadData: res,
+          });
+        });
+    }
+  },
   // 是否个体工商户
-  cIsIndvduBizChange: (val: any)=>{
-      if(val=='1'){
-        setFormItem("Insured.cOccupCde", {
-          rules: [getRules("required", {})],
-        });
-      }else{
-        setFormItem("Insured.cOccupCde", {
-          rules: [],
-        });
-      }
+  cIsIndvduBizChange: (val: any) => {
+    console.log('111',val)
+    if (val == '1') {
+      setFormItem("Insured.cOccupCde", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.cTrdCde", {
+        rules: [getRules("required", {})],
+      });
+    } else {
+      setFormItem("Insured.cOccupCde", {
+        rules: [],
+      });
+      setFormItem("Insured.cTrdCde", {
+        rules: []
+      });
+    }
   },
   funcreset: () => {
 
@@ -805,10 +877,10 @@ const method = {
   isSameChange: (val) => {
     if (val == "1") {
       const ads = insuredEditRef?.value?.getValue('Insured.AllProp');
-      const a =  insuredEditRef?.value?.getValue("Insured.cRegisterSuffixAddr") || "";
+      const a = insuredEditRef?.value?.getValue("Insured.cRegisterSuffixAddr") || "";
 
-      insuredEditRef?.value?.setValue('Insured.Prop',ads);
-      insuredEditRef?.value?.setValue('Insured.cSuffixAddr',a);
+      insuredEditRef?.value?.setValue('Insured.Prop', ads);
+      insuredEditRef?.value?.setValue('Insured.cSuffixAddr', a);
     }
   },
   hidPerson: () => {
@@ -825,7 +897,7 @@ const method = {
     setregistAdd();
   },
   //注册地址(input)
-  getcSuffixAddr:(val: any)=>{
+  getcSuffixAddr: (val: any) => {
     setRegisterAdd();
   },
   //常住地址(input)
@@ -836,32 +908,32 @@ const method = {
 
 function setregistAdd() {
   const ads = insuredEditRef?.value?.getValue('Insured.AllProp');
-  const a =  insuredEditRef?.value?.getValue("Insured.cRegisterSuffixAddr") || "";
-  if(ads){
+  const a = insuredEditRef?.value?.getValue("Insured.cRegisterSuffixAddr") || "";
+  if (ads) {
     getAddressStr({ address: ads }).then((res: any) => {
-    const { code, data, msg } = res;
-    if (code === 200) {
-      const b = (data?data['addStr']:"") + a;
-      setAddressStr("Insured.cClntAddr", b);
-    }
-  });
-  }else{
+      const { code, data, msg } = res;
+      if (code === 200) {
+        const b = (data ? data['addStr'] : "") + a;
+        setAddressStr("Insured.cClntAddr", b);
+      }
+    });
+  } else {
     setAddressStr("Insured.cClntAddr", a);
   }
 }
 
 function setRegisterAdd() {
   const ads = insuredEditRef?.value?.getValue('Insured.Prop');
-  const a =  insuredEditRef?.value?.getValue("Insured.cSuffixAddr") || "";
-  if(ads){
+  const a = insuredEditRef?.value?.getValue("Insured.cSuffixAddr") || "";
+  if (ads) {
     getAddressStr({ address: ads }).then((res: any) => {
-    const { code, data, msg } = res;
-    if (code === 200) {
-      const b = (data?data['addStr']:"") + a;
-      setAddressStr("Insured.cRegisteredcapDre", b);
-    }
-  });
-  }else{
+      const { code, data, msg } = res;
+      if (code === 200) {
+        const b = (data ? data['addStr'] : "") + a;
+        setAddressStr("Insured.cRegisteredcapDre", b);
+      }
+    });
+  } else {
     setAddressStr("Insured.cRegisteredcapDre", a);
   }
 }

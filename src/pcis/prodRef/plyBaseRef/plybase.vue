@@ -66,10 +66,23 @@ onMounted(async () => {
     setValue("Base.cNeedfeeFlag", "1");
     //是否可疑交易，默认否
     setValue("Base.cSusBusiness", "0");
-    //录单人 默认系统操作员
+    //录单人 默认系统操作员..
     setValue("Base.cOprCde", user.userName);
     //录单人联系方式  默认操作员的
-    setValue("Base.cCiOprRel", user.phoneNO);
+      console.log('user---',user)
+    if(user.phoneNO !==null && user.phoneNO !==''){
+      setValue("Base.cCiOprRel", user.phoneNO);
+    }else{
+      setFormItem("Base.cCiOprRel", {
+        readonly: false,
+        rules: [getRules("phoneNo", {})],
+      });
+    }
+    // 
+    // setValue("Base.cCiOprRel", 123); 
+
+
+
     // 查询承保机构所属分公司和项目类别大类数据
     getCheckCdeptByCdptCde();
     //回显机构部门数据
@@ -272,10 +285,10 @@ const method = {
   },
   //代理业务员icon事件
   agentSaleFunc: () => {
-    // if(!getValue('Base.cBrkrCde')) {
-    //   ElMessage.warning('请先选择代理(经济)人！');
-    //   return
-    // }
+    if(!getValue('Base.cBrkrCde')) {
+      ElMessage.warning('请先选择代理(经济)人！');
+      return
+    }
     let cslstyp = "";
     if (getValue("Base.cChaType") === "1900201") {
       // 个人代理时

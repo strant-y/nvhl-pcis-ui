@@ -1150,6 +1150,8 @@ const calcPremium = () => {
     btn.loading = false;
     return;
   }
+
+  
   appCalc(res).then((res) => {
     btn.loading = false;
     console.log("appCalc-res", res);

@@ -71,7 +71,28 @@ const method = {
     //把数据存在store，清单信息组件的是否必填根据这个来
     productStore.setCIsSingle(val)
   },
-  funcInsuranceChange: ()=>{
+  funcInsuranceChange: () => {
+    
+    //根据投保方式得选择对应控制必填项
+    if (getValue("Tgt.cInsuranceMethod") == '613002') {
+      setFormItem("Tgt.nEngineeringCost", {
+        rules: [getRules("required", { blur: true })],
+      });
+      setFormItem("Tgt.nProjectArea", {rules: null });
+      setFormItem("Tgt.nLaborPrice", {rules: null });
+    } else if (getValue("Tgt.cInsuranceMethod") == '613003') {
+      setFormItem("Tgt.nEngineeringCost",{rules: null });
+      setFormItem("Tgt.nProjectArea", {
+        rules: [getRules("required", { blur: true })],
+      });
+      setFormItem("Tgt.nLaborPrice", {rules: null });
+    } else if (getValue("Tgt.cInsuranceMethod") == '613004') {
+      setFormItem("Tgt.nEngineeringCost",{rules: null });
+      setFormItem("Tgt.nProjectArea", {rules: null });
+      setFormItem("Tgt.nLaborPrice",  {
+        rules: [getRules("required", { blur: true })],
+      });
+    }
     const cvrgref = opertaor.getTableRefByKey("cvrg");
     if(cvrgref.showFlush){
       cvrgref.showFlush();
