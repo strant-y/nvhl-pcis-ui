@@ -452,7 +452,18 @@ const getText = computed(() => {
 
 function getProp(col: any) {
   const factorId = col["cFactorId"];
-  const fact = factormap.value[factorId];
+  let fact: any = JSON.parse(JSON.stringify(factormap.value[factorId]));
+  // 将方法回填到item中
+  Object.keys(factormap.value[factorId]).forEach((k: any) => {
+    if(factormap.value[factorId][k]['func']){
+      fact[k]['func'] = factormap.value[factorId][k]['func']
+    }
+    if(factormap.value[factorId][k]['tableClick']){
+      fact[k]['tableClick'] = factormap.value[factorId][k]['tableClick']
+    }
+  });
+  fact.disabled = col['cPorpDisabled'];
+  fact.required = col['cPorpRequired'];
   return fact;
 }
 
