@@ -406,7 +406,7 @@ function refushData(planNo: string, datas: any) {
   }, 100);
 }
 function deletePlan(plan: string) {
-  ElMessageBox.confirm("是否继续删除?", "Warning", {
+  ElMessageBox.confirm("是否继续删除?", "提示", {
     confirmButtonText: "删除",
     cancelButtonText: "取消",
     type: "warning",
@@ -419,7 +419,7 @@ function deletePlan(plan: string) {
   });
 }
 function deleteData(plan: string, term: any) {
-  ElMessageBox.confirm("是否继续删除?", "Warning", {
+  ElMessageBox.confirm("是否继续删除?", "提示", {
     confirmButtonText: "删除",
     cancelButtonText: "取消",
     type: "warning",

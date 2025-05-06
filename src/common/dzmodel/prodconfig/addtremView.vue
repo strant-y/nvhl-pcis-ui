@@ -47,7 +47,7 @@
             show-checkbox
             :check-strictly="true"
             :data="data1"
-            @check-change="selectMainTerm"
+            @check-change="selectmainMethod"
           />
         </div>
       </el-col>
@@ -61,7 +61,7 @@
             show-checkbox
             :data="data2"
             :check-strictly="true"
-            @check-change="selectAdditionTerm"
+            @check-change="selectadditionMethod"
           />
         </div>
       </el-col>
@@ -134,6 +134,23 @@ const dataprops = {
 const data1 = ref([]);
 const mainRef = ref<InstanceType<typeof ElTree>>();
 const additionalRef = ref<InstanceType<typeof ElTree>>();
+
+const selectAdditionNodes = ref<any[]>([]);
+props.data.data.isselectData?.forEach((item: any) => {
+  let seadd: any = {};
+  seadd["cRdrTyp"] = item["Term.cRdrTyp"];
+  seadd["cTermNo"] = item["Term.cClauseCode"];
+
+  if (item["riskList"] && item["riskList"].length > 0) {
+    let list: any[] = [];
+    item["riskList"].forEach((risk: any) => {
+      list.push({ cRiskNo: risk["TermRisktgt.cLiabCode"] });
+    });
+    seadd["riskList"] = list;
+  }
+
+  selectAdditionNodes.value.push(seadd);
+});
 const data2 = ref([
   // {
   //   id: 1,
@@ -170,14 +187,13 @@ const exRules = {};
 
 onMounted(async () => {
   const param = props.data.data;
-  console.log(param);
   qryProdRelTermRiskList(param).then((res: any) => {
     const { code, data, msg } = res;
     if (200 === code) {
       data1.value = data;
-      setTimeout(() => {
+      nextTick(() => {
         setNode();
-      }, 50);
+      });
     } else {
       ElMessage.error(msg);
     }
@@ -186,32 +202,71 @@ onMounted(async () => {
 
 function setNode() {
   const addMainKey: any[] = [];
-  if (props.data.data.isselectData && props.data.data.isselectData.length > 0) {
-    props.data.data.isselectData.forEach((item: any) => {
-      if (item["Term.cRdrTyp"] === "0") {
+  console.log(selectAdditionNodes.value);
+  if (selectAdditionNodes.value && selectAdditionNodes.value.length > 0) {
+    selectAdditionNodes.value.forEach((item: any) => {
+      if (item["cRdrTyp"] === "0") {
         if (item["riskList"] && item["riskList"].length > 0) {
           item["riskList"].forEach((risk: any) => {
-            const k = item["Term.cClauseCode"] + risk["TermRisktgt.cLiabCode"];
+            const k = item["cTermNo"] + risk["cRiskNo"];
             addMainKey.push(k);
           });
         }
-        addMainKey.push(item["Term.cClauseCode"]);
+        addMainKey.push(item["cTermNo"]);
       }
     });
   }
-  console.log(addMainKey);
   mainRef.value?.setCheckedKeys(addMainKey, false);
+}
+
+function selectmainMethod(a: any, b: any, c: any) {
+  
+  // 重新判断,如果勾选责任,自动勾选主条款,如果主条款被反选,自动取消对应责任反选
+  let addMainKey: any[] = [];
+  const tree = mainRef.value?.getCheckedNodes(false, true);
+  if (tree && tree.length > 0) {
+    tree.forEach((t: any) => {
+      if (addMainKey.indexOf(t.id) === -1) {
+        addMainKey.push(t.id);
+      }
+    });
+    if (a.cTermNo) {
+      if (!b) {
+        a.children?.forEach((child: any) => {
+          addMainKey = addMainKey.filter((node: any) => node !== child.id);
+        });
+      }
+      mainRef.value?.setCheckedKeys(addMainKey, false);
+    } else {
+      if (b) {
+        data1.value.forEach((d: any) => {
+          d.children?.forEach((child: any) => {
+            if (child.id === a.id) {
+              if (addMainKey.indexOf(d.id) === -1) {
+                addMainKey.push(d.id);
+              }
+            }
+          });
+        });
+        mainRef.value?.setCheckedKeys(addMainKey, false);
+      }
+    }
+  }
+  nextTick(() => {
+    selectMainTerm(true);
+  });
 }
 function selectMainTerm(isselect = true) {
   const tree = mainRef.value?.getCheckedNodes(false, true);
+
   let selectNode: any[] = [];
-  let selectMainTerm: any[] = [];
+  let selectmainterm: any[] = [];
   tree?.forEach((item: any) => {
     // 获取选中的主条款信息
     if (item.cTermNo) {
       let seterm = Object.assign({}, item);
       let childnode: any[] = [];
-      selectMainTerm.push(item.cTermNo);
+      selectmainterm.push(item.cTermNo);
       item.children?.forEach((child: any) => {
         const issel = childnode?.filter(
           (node: any) => node.cRiskNo === child.cRiskNo
@@ -232,11 +287,13 @@ function selectMainTerm(isselect = true) {
     }
   });
   if (isselect) {
-    let additionStr = selectMainTerm.join("@&");
+    let additionStr = selectmainterm.join("@&");
     qryRelTermList({ cTermNo: additionStr }).then((res: any) => {
       const { code, data, msg } = res;
       if (200 === code) {
         data2.value = data;
+        const addtree = additionalRef.value?.getCheckedNodes(false, true);
+        selectAdditionNodes.value = addtree || [];
         setTimeout(() => {
           setAdditionNode();
         }, 50);
@@ -251,26 +308,118 @@ function selectMainTerm(isselect = true) {
 
 function setAdditionNode() {
   const addMainKey: any[] = [];
-  if (props.data.data.isselectData && props.data.data.isselectData.length > 0) {
-    props.data.data.isselectData.forEach((item: any) => {
-      if (item["Term.cRdrTyp"] === "1") {
+  if (selectAdditionNodes.value && selectAdditionNodes.value.length > 0) {
+    selectAdditionNodes.value.forEach((item: any) => {
+      if (item["cRdrTyp"] === "1") {
         if (item["riskList"] && item["riskList"].length > 0) {
           item["riskList"].forEach((risk: any) => {
-            const k = item["Term.cClauseCode"] + risk["TermRisktgt.cLiabCode"];
+            const k = item["cTermNo"] + risk["cRiskNo"];
             addMainKey.push(k);
           });
-        } else {
-          addMainKey.push(item["Term.cClauseCode"]);
         }
+        addMainKey.push(item["cTermNo"]);
       }
     });
   }
   additionalRef.value?.setCheckedKeys(addMainKey, false);
+  nextTick(() => {
+    const tree = additionalRef.value?.getCheckedNodes(false, true);
+
+    let selectNode: any[] = [];
+    tree?.forEach((item: any) => {
+      // 获取选中的主条款信息
+      if (item.cTermNo) {
+        let seterm = Object.assign({}, item);
+        let childnode: any[] = [];
+        item.children?.forEach((child: any) => {
+          const issel = childnode?.filter(
+            (node: any) => node.cRiskNo === child.cRiskNo
+          );
+          if (issel != null && issel.length > 0) {
+            return;
+          }
+          const f = tree?.filter(
+            (child2: any) => child2.cRiskNo === child.cRiskNo
+          );
+          if (f !== null && f.length > 0) {
+            childnode.push(...f);
+          }
+        });
+        seterm.cRdrTyp = "1";
+        seterm.children = childnode;
+        selectNode.push(seterm);
+      }
+    });
+    data3.value.push(...selectNode);
+  });
 }
 
+
+function selectadditionMethod(a: any, b: any, c: any) {
+  
+  // 重新判断,如果勾选责任,自动勾选附加条款,如果附加条款被反选,自动取消对应责任反选
+  let addMainKey: any[] = [];
+  const tree = additionalRef.value?.getCheckedNodes(false, true);
+  if (tree && tree.length > 0) {
+    tree.forEach((t: any) => {
+      if (addMainKey.indexOf(t.id) === -1) {
+        addMainKey.push(t.id);
+      }
+    });
+    if (a.cTermNo) {
+      if (!b) {
+        a.children?.forEach((child: any) => {
+          addMainKey = addMainKey.filter((node: any) => node !== child.id);
+        });
+      }
+      additionalRef.value?.setCheckedKeys(addMainKey, false);
+    } else {
+      if (b) {
+        data1.value.forEach((d: any) => {
+          d.children?.forEach((child: any) => {
+            if (child.id === a.id) {
+              if (addMainKey.indexOf(d.id) === -1) {
+                addMainKey.push(d.id);
+              }
+            }
+          });
+        });
+        additionalRef.value?.setCheckedKeys(addMainKey, false);
+      }
+    }
+  }
+  nextTick(() => {
+    selectAdditionTerm();
+  });
+}
 function selectAdditionTerm() {
   selectMainTerm(false);
   const tree = additionalRef.value?.getCheckedNodes(false, true);
+
+  const addMainKey: any[] = [];
+  // 重新判断,如果勾选责任,自动勾选主条款
+  data2.value.forEach((item: any) => {
+    item.children?.forEach((child: any) => {
+      if (tree && tree.length > 0) {
+        tree.forEach((t: any) => {
+          if (t.id === child.id) {
+            addMainKey.push(item.id);
+            addMainKey.push(t.id);
+          }
+        });
+      }
+    });
+  });
+  if (tree && tree.length > 0) {
+    tree.forEach((t: any) => {
+      if (t.cTermNo) {
+        addMainKey.push(t.id);
+      }
+    });
+  }
+
+  additionalRef.value?.setCheckedKeys(addMainKey, false);
+
   let selectNode: any[] = [];
   tree?.forEach((item: any) => {
     // 获取选中的主条款信息

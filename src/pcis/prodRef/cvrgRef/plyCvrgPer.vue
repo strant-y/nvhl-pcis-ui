@@ -267,7 +267,7 @@ function addTermData() {
 }
 
 function deleteData(term: any) {
-  ElMessageBox.confirm("是否继续删除?", "Warning", {
+  ElMessageBox.confirm("是否继续删除?", "提示", {
     confirmButtonText: "删除",
     cancelButtonText: "取消",
     type: "warning",

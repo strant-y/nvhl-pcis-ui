@@ -1253,7 +1253,6 @@ onMounted(async () => {
       console.log(edit);
       freeEditRef.value?.setFormValue(edit);
       setTimeout(() => {
-        console.log(inputType);
         if (inputType === "rtinputgroup") {
           appTableShow.value = true;
           showFactorList();
