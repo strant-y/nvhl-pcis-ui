@@ -211,9 +211,10 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
 );
-
+// 任务痕迹
 const CostInformation = defineAsyncComponent(
-  () => import("@/views/pcis-new-udr-list/pages/CostInformation.vue")
+  // () => import("@/views/pcis-new-udr-list/pages/CostInformation.vue")
+  () => import("@/views/pcis-new-udr-list/common/TaskListVestige.vue")
 );
 // 历次批单 弹框页面
 const PreviousdrOpnList = defineAsyncComponent(
@@ -233,6 +234,11 @@ const amlExtendInfo = defineAsyncComponent(
 //历史赔案
 const historyClaimcaseModel = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/history-claimcase-model.vue")
+);
+
+// 核保信息
+const UndrOpnList = defineAsyncComponent(
+  () => import("@/views/comprehensive-query/modal/UndrOpnList.vue")
 );
 
 const opertaor = dataOpertaor();
@@ -608,6 +614,10 @@ const uwBtn = [
     type: "primary",
     id: "preOrder",
     func: () => {
+      if (props.param?.bsType === "A") {
+        ElMessage.warning("这是一张承保申请单，无法查看【本保单历次批单】");
+        return;
+      }
       dzmodal
         .open(PreviousdrOpnList, { type: "Issuer", data: {} })
         .then((res: any) => {
@@ -627,9 +637,25 @@ const uwBtn = [
   }),
   createFreeButtonBase({
     label: "任务痕迹",
+    type: "primary",
     func: () => {
       dzmodal
-        .open(CostInformation, { type: "Issuer", data: {} })
+        .open(CostInformation, {
+          type: "Issuer",
+          data: { objId: props.param?.cAppNo, sysType: props.param?.sysType },
+        })
+        .then((res: any) => {
+          if (res.type === "ok") {
+          }
+        });
+    },
+  }),
+  createFreeButtonBase({
+    label: "核保信息",
+    type: "primary",
+    func: () => {
+      dzmodal
+        .open(UndrOpnList, { type: "", CAppNo: props.param?.cAppNo })
         .then((res: any) => {
           if (res.type === "ok") {
           }
@@ -1151,16 +1177,18 @@ const calcPremium = () => {
     return;
   }
 
-  
   appCalc(res).then((res) => {
     btn.loading = false;
     console.log("appCalc-res", res);
     if (res["code"] == "200") {
       const ops = opertaor.convertData(res);
       console.log("保费计算转换的数据", ops);
-      if(ops["base"]["Base.nPrm"]!=undefined&&ops["base"]["Base.nPrm"]!=null){
+      if (
+        ops["base"]["Base.nPrm"] != undefined &&
+        ops["base"]["Base.nPrm"] != null
+      ) {
         ElMessage.success(res.msg + "保费为：" + ops["base"]["Base.nPrm"]);
-      }else{
+      } else {
         ElMessage.success(res.msg + "保费为：0");
       }
       opertaor.setDataAll(ops);
