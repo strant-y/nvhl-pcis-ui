@@ -104,7 +104,14 @@ function loadTree() {
   };
   getProdEnableList(param).then((res: any) => {
     if (res.code === 200) {
-      nodes.value = res.data;
+      nodes.value = res.data.map((item: any) => ({
+        ...item,
+        list: item.list.map((child: any) => ({
+          ...child,
+          parentCode: item.code,
+          parentValue: item.value,
+        })),
+      }));
     } else {
       ElMessage.error(res.msg);
     }
