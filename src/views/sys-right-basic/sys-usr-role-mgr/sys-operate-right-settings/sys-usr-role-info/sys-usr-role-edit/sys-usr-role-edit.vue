@@ -1,28 +1,28 @@
 <template>
   <el-dialog v-model="dialogVisible" width="90%">
-    <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
-      @selection-change="handleSelectionChange" />
-      <div style="margin-top: 1rem; margin-bottom: 1rem; margin-right: 2rem;" align="right">
-      <el-button
-        type="primary"
-        style="margin-right: 10px;"
-        @click="saveData">
+    <app-table
+      :tableConfig="tableconfig"
+      v-model:pageresult="pageresult"
+      ref="tableRef"
+      @selection-change="handleSelectionChange"
+    />
+    <div
+      style="margin-top: 1rem; margin-bottom: 1rem; margin-right: 2rem"
+      align="right"
+    >
+      <el-button type="primary" style="margin-right: 10px" @click="saveData">
         保存
       </el-button>
-      <el-button
-        @click="goback">
-        返回
-      </el-button>
+      <el-button @click="goback"> 返回 </el-button>
     </div>
   </el-dialog>
-  
 </template>
 
 <script setup lang="ts">
-import { defineComponent, ref, onMounted, watch } from 'vue';
-import { ElMessage, ElMessageBox } from 'element-plus';
-import { SysOperatorMgrService } from '@/views/sys-right-basic/service/sys-operator-mgr.service';
-import { AppKey } from '@/constants/api';
+import { defineComponent, ref, onMounted, watch } from "vue";
+import { ElMessage, ElMessageBox } from "element-plus";
+import { SysOperatorMgrService } from "@/views/sys-right-basic/service/sys-operator-mgr.service";
+import { AppKey } from "@/constants/api";
 import { getListByCode } from "@/api/code-list-service";
 import { useUserStore } from "@/store/modules/user";
 
@@ -37,19 +37,19 @@ import {
 const props = defineProps({
   COperId: {
     type: String,
-    required: true
+    required: true,
   },
   CDptCde: {
     type: String,
-    required: true
+    required: true,
   },
   RoleData: {
     type: Array,
-    required: true
-  }
+    required: true,
+  },
 });
-const emits = defineEmits(['ok'])
-const dialogVisible = ref(true)
+const emits = defineEmits(["ok"]);
+const dialogVisible = ref(true);
 const userStore = useUserStore();
 const sysOperatorMgrService = new SysOperatorMgrService();
 
@@ -57,7 +57,7 @@ const user = userStore.user || {};
 const roles = userStore.user.roles || [];
 
 const _selectDataSet = ref(new Map<string, any>());
-const _roleLevl = ref('');
+const _roleLevl = ref("");
 
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -67,21 +67,20 @@ const pageresult = reactive<Pageresult>({
   total: 2,
 });
 
-
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
-    title: '操作权限-本次新增角色',
-    isPage: 'false',
+    title: "操作权限-本次新增角色",
+    isPage: "false",
     showSelection: true,
     fromSchema: [
       {
         prop: "cOpgrpCde",
-        inputtype: 'rtinput',
+        inputtype: "rtinput",
         title: "角色代码",
       },
       {
         prop: "cOpgrpCnm",
-        inputtype: 'rtinput',
+        inputtype: "rtinput",
         title: "角色名称",
       },
     ],
@@ -89,49 +88,52 @@ const tableconfig = reactive<AppTableConfig>(
 );
 
 const goback = () => {
-  dialogVisible.value = false
+  dialogVisible.value = false;
 };
 
 const saveData = () => {
-  const roleCdeBox = []
-  _selectDataSet.value.forEach(item => {
-    roleCdeBox.push({ COpgrpCde: item['cOpgrpCde'] })
-  })
-  sysOperatorMgrService.saveUsrRoleList({
-    CCrtCde: user.opCde,
-    CDptCde: props.CDptCde,
-    userId: props.COperId,
-    items: roleCdeBox
-  }).then((res: any) => {
-    if (res && res.code === 200) {
-      const data = res.data;
-      if (data.code === '1') {
-        ElMessage.success(data.message);
-        emits('ok')
-        goback();
-      } else {
-        ElMessage.error(data.message);
-      }
-    }
+  const roleCdeBox = [];
+  _selectDataSet.value.forEach((item) => {
+    roleCdeBox.push({ COpgrpCde: item["cOpgrpCde"] });
   });
+  sysOperatorMgrService
+    .saveUsrRoleList({
+      CCrtCde: user.opCde,
+      CDptCde: props.CDptCde,
+      userId: props.COperId,
+      items: roleCdeBox,
+    })
+    .then((res: any) => {
+      if (res && res.code === 200) {
+        const data = res.data;
+        if (data.code === "1") {
+          ElMessage.success(data.message);
+          emits("ok");
+          goback();
+        } else {
+          ElMessage.error(data.message);
+        }
+      }
+    });
 };
 
 const loadData = () => {
-  console.log('props',props.cOperId,props.cOwnDptCde)
-  sysOperatorMgrService.getUserAssociateRoles({
-    userId: props.COperId,
-    CDptCde: props.CDptCde,
-    CRoleLevl: _roleLevl.value
-  }).then((res: any) => {
-    if (res && res.code === 200) {
-      const pageData = res.data.result;
-      if (pageData) {
-        pageresult.list = pageData;
+  console.log("props", props.cOperId, props.cOwnDptCde);
+  sysOperatorMgrService
+    .getUserAssociateRoles({
+      userId: props.COperId,
+      CDptCde: props.CDptCde,
+      CRoleLevl: _roleLevl.value,
+    })
+    .then((res: any) => {
+      if (res && res.code === 200) {
+        const pageData = res.data;
+        if (pageData) {
+          pageresult.list = pageData;
+        }
       }
-    }
-  });
+    });
 };
-
 
 const handleSelectionChange = (val: any[]) => {
   _selectDataSet.value.clear();
@@ -140,24 +142,26 @@ const handleSelectionChange = (val: any[]) => {
   });
 };
 onMounted(() => {
-  let roleCde = '';
+  let roleCde = "";
   roles.forEach((res: any) => {
-    roleCde = roleCde === '' ? res : roleCde + ',' + res;
+    roleCde = roleCde === "" ? res : roleCde + "," + res;
   });
-  getListByCode('getRoleLevl', {
+  getListByCode("getRoleLevl", {
     cOperId: user.opCde,
-    cDptCde: user.companyId
-  }).then((res: any) => {
-    if (res.code === 200 && res.data && res.data.length > 0) {
-      _roleLevl.value = res.data[0].roleLevl;
-      loadData();
+    cDptCde: user.companyId,
+  }).then(
+    (res: any) => {
+      if (res.code === 200 && res.data && res.data.length > 0) {
+        _roleLevl.value = res.data[0].roleLevl;
+        loadData();
+      }
+    },
+    (error: any) => {
+      console.log("出错了", error);
+      ElMessage.error("后台服务异常,请联系管理员");
     }
-  }, (error: any) => {
-    console.log('出错了', error);
-    ElMessage.error('后台服务异常,请联系管理员');
-  });
+  );
 });
-
 </script>
 
 <style scoped lang="scss">
