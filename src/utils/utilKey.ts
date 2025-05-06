@@ -16,6 +16,10 @@ const typeMap = reactive<Record<string, Array<any>>>({
       label: "color",
       value: "color",
     },
+    {
+      label: "number",
+      value: "number",
+    },
   ],
   rtradio: [
     {
