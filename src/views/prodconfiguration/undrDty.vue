@@ -279,7 +279,11 @@ const tableconfig = reactive<AppTableConfig>(
         title: "产品",
         typeCode: "PROD_LIST_GRT",
         // typeCode: "KIND_LIST_CACHE",
-        codeParam: {},
+        codeParam: {
+          cParCde: "",
+          cOperId: user.value.opCde,
+          cDptCde: user.value.companyId,
+        },
       },
       {
         prop: "cUndrClsCde",
