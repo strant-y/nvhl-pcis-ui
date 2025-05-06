@@ -72,6 +72,7 @@ const formconfig = reactive<AppFreeEditConfig>(
                 gridEditRef.value?.addRowByData({
                   cProdNme: item.value,
                   cUndrClsCde: freeEditRef.value?.getValue("cUndrClsCde"),
+                  cKindNo: item.parentCode,
                   // cStatus: "0",
                 });
               });
