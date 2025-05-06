@@ -4,7 +4,9 @@
       ref="inputRef"
       :placeholder="item.placeholder"
       :size="item.size"
-      :type="item.type === 'color' ? 'text' : item.type"
+      :type="
+        item.type === 'color' || item.type === 'number' ? 'text' : item.type
+      "
       :showPassword="item.showPassword"
       :rows="item.rows"
       :style="
@@ -45,6 +47,16 @@
               ? true
               : false
           : false
+      "
+      :formatter="
+        item.type === 'number'
+          ? (value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+          : (value) => value
+      "
+      :parser="
+        item.type === 'number'
+          ? (value) => value.replace(/\$\s?|(,*)/g, '')
+          : (value) => value
       "
       v-model="vInput"
       @change="handleChange"
@@ -118,7 +130,7 @@ import * as ElementPlusIconsVue from "@element-plus/icons-vue";
 type IconNames = keyof typeof ElementPlusIconsVue;
 const props = defineProps({
   modelValue: {
-    type: [String,Number],
+    type: [String, Number],
   },
   item: {
     type: Object as () => Record<string, any>,
@@ -146,8 +158,15 @@ watch([() => props.modelValue], ([newModelValue]) => {
 });
 
 function handleChange(val?: string | undefined | null) {
-  emits("valueChange", val);
-  emits("update:modelValue", val);
+  let nv = 0;
+  if (props.item.type === "number") {
+    nv = val ? Number(val?.replace(/[^0-9]/g, '')) : 0;
+    emits("valueChange", nv);
+    emits("update:modelValue", nv);
+  } else {
+    emits("valueChange", val);
+    emits("update:modelValue", val);
+  }
   // props.item.func ? props.item.func(val) : null;
 }
 
