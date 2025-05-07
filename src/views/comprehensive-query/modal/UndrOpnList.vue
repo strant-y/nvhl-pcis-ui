@@ -127,23 +127,26 @@ function handleQuery(flag?: boolean) {
   const param = Object.assign(
     {
       appNo: props.CAppNo,
+      pageSize: 10,
+      pageNum: 1,
     },
     s,
     r
   );
   pcisQueryService
     .getUndrOpnList(param)
-    .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
+    .then((res: any) => {
+      if (200 === res.code) {
         pageresult.list = [];
-        pageresult.list = data.result;
-        pageresult.total = data.total;
+        pageresult.list = res.data;
+        pageresult.total = res.total;
       } else {
-        ElMessage.error(msg);
+        ElMessage.error(res.msg);
       }
     })
-    .finally(() => {});
+    .catch((err) => {
+      ElMessage.error(err);
+    });
 }
 </script>
 
