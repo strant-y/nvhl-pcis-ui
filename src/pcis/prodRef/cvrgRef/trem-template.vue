@@ -468,8 +468,8 @@ function getProp(col: any) {
 }
 
 onMounted(async () => {
-  dataInit();
   initData(props.modelValue);
+  dataInit();
 });
 
 function dataInit() {
