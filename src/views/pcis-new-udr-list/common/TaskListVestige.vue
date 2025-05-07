@@ -78,7 +78,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "任务名称",
         minWidth: 180,
-        fixed: 'left',
+        fixed: "left",
       },
       {
         prop: "type",
@@ -151,10 +151,9 @@ const tableconfig = reactive<AppTableConfig>(
 );
 
 onMounted(async () => {
-
-    nextTick(() => {
-        handleQuery(true);
-    })
+  nextTick(() => {
+    handleQuery(true);
+  });
 });
 
 // 绑定方法
@@ -164,28 +163,32 @@ const method = {
   },
 };
 
-
 /** 查询 */
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
-  const param = Object.assign({
-    objId: props.data.objId,
-    sysType: props.data.sysType,
-  }, r);
+  const param = Object.assign(
+    {
+      objId: props.data?.objId,
+      sysType: props.data?.sysType,
+      pageSize: 10,
+      pageNum: 1,
+    },
+    r
+  );
   getTaskVestige(param)
-    .then((res) => {
+    .then((res: any) => {
       const { code, data, msg } = res;
       if (200 === code) {
-          console.log(data)
         pageresult.list = data;
         pageresult.total = res.totalCount;
       } else {
         ElMessage.error(msg);
       }
     })
-    .finally(() => {});
+    .catch((err) => {
+      ElMessage.error(err);
+    });
 }
-
 </script>
 
 <style scoped></style>
