@@ -210,3 +210,10 @@ export function submitUnderwritingEdr(queryParams: any) {
 export function delTmpPolicy(queryParams: any) {
     return request.post('/policy/delTmpPolicy', queryParams);
 }
+
+/**
+ * 承保-短期费率类型
+ */
+export function policyRatio(queryParams: any) {
+    return request.post('/policy/ratio', queryParams);
+}

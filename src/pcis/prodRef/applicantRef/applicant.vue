@@ -43,6 +43,7 @@ onMounted(() => {
     method,
     getRules
   );
+  console.log(3838,formconfig11)
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
     //是否小微企业，默认非必填、只读
@@ -577,18 +578,22 @@ const method = {
   },
   //注册地址
   getCountry: (val: any) => {
+    console.log(111)
     setRegisterAdd();
   },
   //常住地址
   getAllProp: (val: any) => {
+    console.log(112)
     setregistAdd();
   },
   //注册地址(input)
   getcSuffixAddr: (val: any) => {
+    console.log(113)
     setRegisterAdd();
   },
   //常住地址(input)
   getcRegisterSuffixAddr: (val: any) => {
+    console.log(114)
     setregistAdd();
   },
 };

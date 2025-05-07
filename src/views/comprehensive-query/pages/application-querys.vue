@@ -1433,10 +1433,12 @@ onMounted(async () => {
       item.rules = []; // 清除必填规则
     }
   });
-  freeEditRef.value[0].value[0].setValue("cDptCde", "0200000000000");
-  freeEditRef.value[1].value[0].setValue("cDptCde", "0200000000000");
-  freeEditRef.value[2].value[0].setValue("cDptCde", "0200000000000");
-  freeEditRef.value[3].value[0].setValue("cDptCde", "0200000000000");
+
+  // freeEditRef?.value[0].value[0].setValue("cDptCde", "0200000000000");
+  // freeEditRef?.value[1].value[0].setValue("cDptCde", "0200000000000");
+  // freeEditRef?.value[2].value[0].setValue("cDptCde", "0200000000000");
+  // freeEditRef?.value[3].value[0].setValue("cDptCde", "0200000000000");
+
   setFormItem("cDptCde", {
     loadData: [
       {
@@ -1470,6 +1472,7 @@ onMounted(async () => {
     await nextTick();
     handleQuery(true); //跳转过来自动查数据
   } else if (sessionStorage.getItem(AppKey.query.pcis_query_returnudrlist)) {
+    
     //首页 待修改任务跳转过来的，选中待修改单
     homeJumpData.value = JSON.parse(
       sessionStorage.getItem(AppKey.query.pcis_query_returnudrlist)

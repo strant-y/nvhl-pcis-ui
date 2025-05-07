@@ -69,7 +69,7 @@ const tabs = ref<Array<any>>([]); //tabs数组
 const currentTabName = ref('暂存任务') //tabs默认值
 // const isOperate = ref(false)  //管理员
 //todo  假数据先写死
-const isOperate = ref(true) //管理员 出单岗
+const isOperate = ref(false) //管理员 出单岗
 const isAudit = ref(false) //  核保岗
 const shortListData = ref(null)  // 第二模块tabl列表数据
 
@@ -80,13 +80,6 @@ let pageresult = reactive<Pageresult>({
   /** 总数 */
   total: 0,
 });
-
-
-
-// name: '暂存任务',
-//           content: [],
-//           url: '/comprehensive-query/application-querys',
-
 
 const tableObj = {
   // 出单--暂存任务
@@ -230,22 +223,22 @@ const tableObj = {
   saveObj: {
     fromSchema: [
       {
-        prop: "cAppNo",
+        prop: "uwDptName",
         inputtype: "rtinput",
         title: "出单机构",
       },
       {
-        prop: "cAppNo",
+        prop: "appCde",
         inputtype: "rtinput",
         title: "投保人",
       },
       {
-        prop: "cAppNo",
+        prop: "prodName",
         inputtype: "rtinput",
         title: "险种",
       },
       {
-        prop: "cAppNme",
+        prop: "objId",
         inputtype: "rtinput",
         title: "申请单号",
       }
@@ -255,22 +248,22 @@ const tableObj = {
   editObj: {
     fromSchema: [
       {
-        prop: "cAppNo",
+        prop: "uwDptName",
         inputtype: "rtinput",
         title: "出单机构",
       },
       {
-        prop: "cAppNo",
+        prop: "appCde",
         inputtype: "rtinput",
         title: "申请单号",
       },
       {
-        prop: "cAppNo",
+        prop: "prodName",
         inputtype: "rtinput",
         title: "险种",
       },
       {
-        prop: "cAppNme",
+        prop: "cAppStatus",
         inputtype: "rtinput",
         title: "状态",
       }
@@ -282,13 +275,13 @@ let tab1 = [{
   name: '暂存任务',
   refName: 'stagingList',
   tableObj: 'notWaitObj',
-  url: '/comprehensive-query/application-querys',
+  url: '/query/application-querys',
 },
 {
   name: '待修改任务',
   refName: 'reviseList',
   tableObj: "notReviseObj",
-  url: '/comprehensive-query/application-querys',
+  url: '/query/application-querys',
 },
 {
   name: '待续保',
@@ -338,7 +331,7 @@ const shortcutSearch = (searchParams) => {
 const toQuery = (url: string) => {
   if (isOperate.value) { //出单员
     //暂存任务 （综合查询-投保单）、待修改任务 （综合查询-待修改单查询）
-    if (url === '/comprehensive-query/application-querys') {
+    if (url === '/query/application-querys') {
       let param = {
         CurrentUser: user.value.opCde,
         CurrentUserOrg: user.value.companyId,
@@ -402,7 +395,7 @@ const toQuery2 = (data: any, tab: any) => {
         TIssueTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
       });
       sessionStorage.setItem(AppKey.query.pcis_query_app, JSON.stringify(param));
-      router.push({ path: '/comprehensive-query/application-querys' });
+      router.push({ path: '/query/application-querys' });
     } else if (tab.name === '待修改任务') {
       const param = Object.assign({
         CurrentUser: user.value.opCde,
@@ -412,7 +405,7 @@ const toQuery2 = (data: any, tab: any) => {
         endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
       });
       sessionStorage.setItem(AppKey.query.pcis_query_returnudrlist, JSON.stringify(param));
-      router.push({ path: '/comprehensive-query/application-querys' });
+      router.push({ path: '/query/application-querys' });
     } else if (tab.name === '待续保') {
       const param = Object.assign({
         CurrentUser: user.value.opCde,
@@ -467,14 +460,19 @@ const getData = (user: any, roles: any = []) => {
     roles.forEach((res: any) => {
       // if (res === 'ROLE_00000196' || res === 'ROLE_00000324' || res === 'ROLE_00000001') {
       // 出岗  ROLE_00000008
+      console.log(res,'权限编码')
 
       if (res === 'ROLE_00000008') {
         isOperate.value = true;
         tabs.value = tab1;
-          moreurl.value = "/comprehensive-query/application-querys"
+          moreurl.value = "/query/application-querys"
       }
       // 核保
-      if (res === 'ROLE_00000167') {
+      if (res === 'ROLE_00000152') {
+        tableconfig = reactive<AppTableConfig>(
+          createTableEditConfig(tableObj.saveObj)
+        );
+
          moreurl.value = "/pcis-new-udr-list/PendUdrList"
         isAudit.value = true;
         tabs.value = tab2;
@@ -523,111 +521,28 @@ const getData = (user: any, roles: any = []) => {
     // paramdh: paramdh,
     paramzc: paramzc,
   };
-  // tabs.value = [];
-
   console.log('首页参数', param)
-  // console.log('首页参数',user)
-  // /policy/getPolicyShortList
   pcisQueryService.getPolicyShortList(param).then((res: any) => {
     
     console.log('首页table数据', res)
     if (res && res.code === 200) {
       shortListData.value = res.data
-
-      // const zcdata: any[] = [];
-      // const dxdata: any[] = [];
-      // const dhdata: any[] = [];
-      console.log('岗位--', isOperate.value)
+      console.log('岗位--', isOperate.value , isAudit.value)
 
       // 管理员  出单岗
       if (isOperate.value) {
-      
-        // if (res.data.shortList) {
-        //   res.data.shortList.forEach((data: any) => {
-        //     if (zcdata.length === 6) {
-        //       return;
-        //     }
-        //     if (zcdata.length < 6) {
-        //       zcdata.push(data);
-
-        //       // pageresult.list.push(data);
-        //     }
-        //   });
-        // }
-
         console.log(res.data)
         pageresult.list = res.data.stagingList;
         pageresult.total = res.data.stagingList.length;
-
-
-
-
-        // tabs.value.push({
-        //   name: '暂存任务',
-        //   content: [],
-        //   url: '/comprehensive-query/application-querys',
-        // });
-        // if (res.data.returnUdr) {
-        //   console.log(336)
-        //   res.data.returnUdr.forEach((data: any) => {
-        //     if (dxdata.length === 6) {
-        //       return;
-        //     }
-        //     if (dxdata.length < 6) {
-        //       const newdxdata = {
-        //         cAppNo: data.objId, 
-        //         cAppNme: data.appCde,
-        //         tAppTm: data.crtTm,
-        //       };
-        //       dxdata.push(newdxdata);
-        //     }
-        //   });
-        // }
-
-        // tabs.value.push({
-        //   name: '待修改任务',
-        //   content: [],
-        //   url: '/comprehensive-query/application-querys',
-        // });
-        // tabs.value.push({
-        //   name: '待续保',
-        //   content: [],
-        //   url: '/RenewalManagement/renewal-management',
-        // });
-
-
         console.log('666', tabs.value, isOperate.value, isAudit.value)
       }
       //审核员  核保岗
       if (isAudit.value) {
        
-        // tabs.value = tab2;
-        if (res.data.newUdrMap) {
-          res.data.newUdrMap.forEach((data: any) => {
-            if (dhdata.length === 6) {
-              return;
-            }
-            if (dhdata.length < 6) {
-              const newdhdata = {
-                cAppNo: data.objId,
-                cAppNme: data.appCde,
-                tAppTm: data.crtTm,
-              };
-              dhdata.push(newdhdata);
-            }
-          });
-        }
-        tabs.value.push({
-          name: '暂存任务33',
-          content: dhdata,
-          url: '/pcis-new-udr-list/PendUdrList',
-        });
-        tabs.value.push({
-          name: '修改单44',
-          content: dhdata,
-          url: '/pcis-new-udr-list/PendUdrList',
-        });
-      }
+        tabs.value = tab2;
+        pageresult.list = res.data.udrStagingList;
+        pageresult.total = res.data.udrStagingList.length;
+         }
     }
   });
 };
@@ -659,15 +574,25 @@ const handleTabClick = (tab: any) => {
  
   }
   if (isAudit.value) {
-    if (currentTabName.value == '暂存任务') {
-      tableconfig = reactive<AppTableConfig>(
-        createTableEditConfig(tableObj.saveObj)
-      )
-    } else {
-      tableconfig = reactive<AppTableConfig>(
-        createTableEditConfig(tableObj.editObj)
-      )
-    }
+
+    tableconfig = reactive<AppTableConfig>(
+      createTableEditConfig(tableObj[clickedTabData.tableObj])
+    )
+
+    nextTick(() => {
+      pageresult.list = shortListData.value[clickedTabData.refName] || []
+      pageresult.total = shortListData.value[clickedTabData.refName].length  || 0
+      });
+    // if (currentTabName.value == '暂存任务') {
+    //   console.log(668,tableObj,clickedTabData)
+    //   tableconfig = reactive<AppTableConfig>(
+    //     createTableEditConfig(tableObj[clickedTabData.tableObj])
+    //   )
+    // } else {
+    //   tableconfig = reactive<AppTableConfig>(
+    //     createTableEditConfig(tableObj[clickedTabData.tableObj])
+    //   )
+    // }
   }
   tabs.value.forEach(item => {
     if (item.name === tab.props.label) {
