@@ -31,12 +31,12 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { getDefaultCompilerOptions } from "typescript";
 import { getAddressStr } from "@/api/query";
 const opertaor = dataOpertaor();
-
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 const formData = ref<any[]>([]);
 const cClntAddr = ref<any>(null);
 import { useRoute } from "vue-router";
 const route = useRoute();
+const param = route.params.param;
 onMounted(() => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
@@ -54,6 +54,12 @@ onMounted(() => {
     const cProdNo = route.params.param.cProdNo;
     if (cProdNo === "040001" || cProdNo === "042002" || cProdNo === "043004" || cProdNo === "043005" || cProdNo === "043011") {
       setFormItem("Applicant.cTrdCde", { rules: null });
+    }
+    if(!cProdNo.startsWith("05")){
+      setFormItem("Applicant.cShareholderName", { hidden: true, rules: null });
+      setFormItem("Applicant.cShareholderCode", { hidden: true, rules: null });
+      setFormItem("Applicant.cShareholderNature", { hidden: true, rules: null });
+      setFormItem("Applicant.cShareholderCategory", { hidden: true, rules: null });
     }
   });
 
