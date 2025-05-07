@@ -614,12 +614,16 @@ const uwBtn = [
     type: "primary",
     id: "preOrder",
     func: () => {
-      if (props.param?.bsType === "A") {
+      if (props.param?.cAppTyp === "A") {
         ElMessage.warning("这是一张承保申请单，无法查看【本保单历次批单】");
         return;
       }
       dzmodal
-        .open(PreviousdrOpnList, { type: "Issuer", data: {} })
+        .open(PreviousdrOpnList, {
+          type: "Issuer",
+          objId: props.param?.cAppNo,
+          prodNo: props.param?.cProdNo,
+        })
         .then((res: any) => {
           if (res.type === "ok") {
           }
