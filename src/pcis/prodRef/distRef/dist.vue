@@ -274,22 +274,18 @@ const method = {
         saveAs(blob, fileName);
       })
   },
+  //根据获取的职业类别查询职业等级并绑定下拉框
   getDistoccupType:(val) => {
-    console.log("val",val);
     codeListStore
         .queryCodeList({
           codeListName: "Occupt_ZYLB",
           codeListParam: {cParCde: val.at(-1)},
         })
         .then((res) => {
-          console.log("Fetched data:", res); // 添加调试信息
-      if (Array.isArray(res)) {
+          console.log("职业等级下拉值",res);
         setFormItem("Dist.cOccupationalLevel", {
           loadData: res,
         });
-      } else {
-        console.error("Unexpected data format:", res); // 添加调试信息
-      }
     })
   },
   //模板下载
