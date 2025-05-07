@@ -488,7 +488,7 @@
             minWidth: 180,
             loadData: [
                 { label: "承保", value: "A" },
-                { label: "承保", value: "E" },
+                { label: "批改", value: "E" },
                 { label: "方案", value: "P" },
             ],
         },
@@ -1397,6 +1397,7 @@
                         cDptCde: r.data.cDptCde,
                         cDptCnm:row.uwDptName,
                         pageType: "PLY_UW_PROCESS_SCENE",
+                        sysType:row.objExt,
                     });
                     router.push({
                         path: "/pcis/my-page",
@@ -1421,6 +1422,7 @@
                         cDptCde: r.data.cDptCde,
                         cDptCnm:row.uwDptName,
                         pageType: "PLY_UW_PROCESS_SCENE",
+                        sysType: row.objExt,
                     });
                     router.push({
                         path: "/pcis/my-page",

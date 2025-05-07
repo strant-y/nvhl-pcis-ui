@@ -70,6 +70,7 @@ const formconfig = reactive<AppFreeEditConfig>(
               const selectObj = res.body;
               selectObj.forEach((item, index) => {
                 gridEditRef.value?.addRowByData({
+                  cProdNo: item.code,
                   cProdNme: item.value,
                   cUndrClsCde: freeEditRef.value?.getValue("cUndrClsCde"),
                   cKindNo: item.parentCode,
@@ -235,7 +236,7 @@ const gridconfig = reactive<AppGridEditConfig>(
         // codeParam: { kindNo: "06", cStatus: "1" },
       },
       {
-        prop: "cProdNme",
+        prop: "cProdNo",
         inputtype: "rtselect",
         title: "产品",
         typeCode: "PROD_LIST",
