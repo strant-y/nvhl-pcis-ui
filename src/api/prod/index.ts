@@ -1242,5 +1242,9 @@ export function exportDist(queryParams: any): AxiosPromise<any> {
 export function getPrdDeductible(queryParams: any): AxiosPromise<any> {
   return post(`/proddef/getPrdDeductible`, queryParams);
 }
+//免赔费率系数
+export function ratio(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/ratio`, queryParams);
+}
 
 

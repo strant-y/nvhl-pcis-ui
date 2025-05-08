@@ -51,6 +51,12 @@ onMounted(() => {
   if (cProdNo === "040001" || cProdNo === "042002" || cProdNo === "043004" || cProdNo === "043005" || cProdNo === "043011") {
     setFormItem("Applicant.cTrdCde", { rules: null });
   }
+  if(!cProdNo.startsWith("05")){
+      setFormItem("Insured.cShareholderNature", { hidden: true, rules: null });
+      setFormItem("Insured.cShareholderCode", { hidden: true, rules: null });
+      setFormItem("Insured.cShareholderName", { hidden: true, rules: null });
+      setFormItem("Insured.cShareholderCategory", { hidden: true, rules: null });
+    }
 });
 function setFormItem(key, obj) {
   if (obj && Object.keys(obj).length) {

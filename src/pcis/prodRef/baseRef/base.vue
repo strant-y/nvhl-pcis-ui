@@ -17,6 +17,7 @@ import { formatDate } from "@/utils/date";
 import { policyRatio } from "@/api/query";
 import { useRoute } from "vue-router";
 const route = useRoute();
+import { ratio } from "@/api/prod"
 const opertaor = dataOpertaor();
 const dialogRef = ref<DialogMethod | null>(null);
 const props = defineProps({
@@ -44,6 +45,7 @@ onMounted(async () => {
       "Base.cJuriCde",
       "本保单受中华人民共和国司法管辖（港、澳、台除外）"
     );
+    setValue("Base.nRatioCoef", "1.000000");
   });
   if (sessionStorage.getItem("toMyPageData")) {
     sessionData.value = JSON.parse(sessionStorage.getItem("toMyPageData"));
@@ -60,7 +62,7 @@ const method = {
   func1: () => {
     console.log(getRules);
   },
- 
+
   //缴费拆分按钮事件
   splitPayNumber() {
     if (Number(getValue("Base.nPayNumber"))>12) {
@@ -98,6 +100,24 @@ const method = {
       opertaor.getTableRefByKey("payinfo").setFormValue(valArr);
   }
 },
+cRatioTypChange(val){
+    // if(val=='3'){
+    //   setValue("Base.nRatioCoef", "1.000000");
+    // }else{
+    //   setValue("Base.nRatioCoef", "");
+    // }
+    let params = {
+      bgnTm: opertaor.getTableRefs()["insrnc"].getValue("Base.tInsrncBgnTm"),
+      endTm: opertaor.getTableRefs()["insrnc"].getValue("Base.tInsrncEndTm"),
+      prodNo: route.params.param.cProdNo,
+      ratioType:val,
+    }
+    ratio(params).then((res) => {
+      if (res.data) {
+        setValue("Base.nRatioCoef", res.data);
+      }
+    })
+  },
   //付费约定下拉事件
   cInstMrkChange(val: any) {
     setValue("Base.nPayNumber", '1');
