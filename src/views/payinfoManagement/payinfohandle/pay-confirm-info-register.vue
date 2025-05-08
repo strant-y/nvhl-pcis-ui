@@ -132,6 +132,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "产品",
         typeCode: "PROD_LIST_IN_GUIDE",
+       
         
       },
       {

@@ -102,9 +102,11 @@ const tableconfig = reactive<AppTableConfig>(
         label: "设置操作权限",
         type: "primary",
         func: function () {
-          if(operatorData.value) {
+          console.log('操作权限----2',operatorData.value)
+          if(operatorData.value ) {
             dzmodal.open(SysOperateRightSettings, { operatorData: operatorData }).then((res) => {
               if (res.type === "ok") {
+              
                 handleQuery();
               }
             });
@@ -169,12 +171,13 @@ const tableconfig = reactive<AppTableConfig>(
 const tableRef = ref<AppTableMethod | null>(null);
 
 const displayData = ref('');
-const operatorData = ref([]);
+const operatorData = ref(null);
 const codeListMap = ref<any>({});
 
 const sysOperatorMgrService = new SysOperatorMgrService();
 
 const handleQuery = (flag) => {
+  console.log('操作权限----1',flag)
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
       refreshData(flag);

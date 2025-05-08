@@ -118,7 +118,10 @@ const saveData = () => {
 };
 
 const loadData = () => {
-  console.log("props", props.cOperId, props.cOwnDptCde);
+  console.log("props", props.COperId, props.CDptCde,_roleLevl.value,);
+  // console.log('props.getOperator', props.getOperator._value.cOperId)
+  // console.log('props.getOperator', props.getOperator._value.cOwnDptCde)
+  
   sysOperatorMgrService
     .getUserAssociateRoles({
       userId: props.COperId,

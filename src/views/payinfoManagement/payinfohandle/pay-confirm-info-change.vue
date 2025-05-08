@@ -73,6 +73,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "产品",
         typeCode: "PROD_LIST_IN_GUIDE",
+        disabled: true,
         // params: {'cStatus': '1'},
       },
       {
@@ -125,9 +126,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         disabled: true,
       },
       {
-        prop: 'TBgnTm',
+        // prop: 'TBgnTm',
+        prop: 'TCrtTm',
         title: '保险起期',
-        inputtype: "rtdatepicker",
+        // inputtype: "rtdatepicker",
+        inputtype: "rtinput",
         format: 'YYYY-MM-DD HH:mm:ss',
         // type: "daterange",
         disabled: true,
@@ -135,7 +138,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: 'TEndTm',
         title: '保险止期',
-        inputtype: "rtdatepicker",
+        // inputtype: "rtdatepicker",
+        inputtype: "rtinput",
         format: 'YYYY-MM-DD HH:mm:ss',
         // type: "daterange",
         disabled: true,
@@ -143,7 +147,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: 'TEndTm',
         title: '核保时间',
-        inputtype: "rtdatepicker",
+        // inputtype: "rtdatepicker",
+        inputtype: "rtinput",
         format: 'YYYY-MM-DD HH:mm:ss',
         // type: "daterange",
         disabled: true,

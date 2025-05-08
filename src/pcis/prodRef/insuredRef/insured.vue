@@ -759,9 +759,9 @@ const method = {
         rules: [getRules("required", {})],
       });
       setValue("Insured.cNation", '1');  // 国籍
-      setValue("Insured.tBirthday", null);
-      setValue("Insured.nAge", null);
-      setValue("Insured.cSex", null);
+      // setValue("Insured.tBirthday", null);
+      // setValue("Insured.nAge", null);
+      // setValue("Insured.cSex", null);
       setFormItem("Insured.cNation", {
         disabled: true,
       });

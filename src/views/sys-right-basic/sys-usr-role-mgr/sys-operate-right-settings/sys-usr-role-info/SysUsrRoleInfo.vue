@@ -88,6 +88,8 @@ const tableconfig = reactive<AppTableConfig>(
         type: "primary",
         func: function () {
           console.log('props.getOperator', props.getOperator._value.cOperId)
+          console.log('props.getOperator', props.getOperator._value.cOwnDptCde)
+          // props.cOperId, props.cOwnDptCde
           dzmodal.open(SysUsrRoleEdit, { COperId: props.getOperator._value.cOperId, CDptCde: props.getOperator._value.cOwnDptCde, RoleData: pageresult.list }).then((res) => {
             if (res.type === "ok") {
               handleQuery(true);
@@ -181,16 +183,19 @@ const refreshData = (reset = false) => {
 
 
 const delRole = (id: string) => {
+  const param = {
+      COpgrpCde: id,
+      COperId: props.getOperator._value.cOperId,
+      CDptCde: props.getOperator._value.cOwnDptCde
+    };
+
+  console.log('删除参数',param)
   ElMessageBox.confirm('确认要删除吗？该数据删除之后将无法恢复。', '提示', {
     confirmButtonText: '删除',
     cancelButtonText: '取消',
     type: 'warning'
   }).then(() => {
-    const param = {
-      COpgrpCde: id,
-      COperId: props.getOperator._value.cOperId,
-      CDptCde: props.getOperator._value.cOwnDptCde
-    };
+
     sysOperatorMgrService.delUsrRoleInfo(param).then((res: any) => {
       if (res.code === 200) {
         const data = res.data;

@@ -14,10 +14,11 @@ const codeListStore = codeListViewStore();
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { formatDate } from "@/utils/date";
-import { ratio } from "@/api/prod"
-const opertaor = dataOpertaor();
+import { policyRatio } from "@/api/query";
 import { useRoute } from "vue-router";
 const route = useRoute();
+import { ratio } from "@/api/prod"
+const opertaor = dataOpertaor();
 const dialogRef = ref<DialogMethod | null>(null);
 const props = defineProps({
   pageSchema: {
@@ -225,6 +226,24 @@ cRatioTypChange(val){
       },
       { title: "特别约定", width: 85 }
     );
+  },
+  // 短期费率类型
+  cRatioTypChange:(val:any)=>{
+    const tabref = opertaor.getTableRefs();
+    const baseBefore = tabref["insrnc"].getFromValue();
+   let cProdNo = route.params.param.cProdNo;
+    let param = {
+      bgnTm: baseBefore["Base.tInsrncBgnTm"],
+      endTm: baseBefore["Base.tInsrncEndTm"],
+      cProdNo  ,
+      ratioType:val
+    }
+    policyRatio(param).then((res: any) => {
+      const { code, data, msg } = res;
+      if (code === 200) {
+        setValue("Base.nRatioCoef",JSON.stringify(data));
+        }
+    });
   },
 };
 

@@ -109,17 +109,17 @@ export default defineComponent({
         if (recordChart.value) {
           recordChartInstance = echarts.init(recordChart.value)
           recordChartInstance.setOption(optionsRecordProd.value)
-          console.log('11111111111111111')
+        
         }
         if (pieChart.value) {
           pieChartInstance = echarts.init(pieChart.value)
           pieChartInstance.setOption(optionsPieRecProd.value)
-          console.log('222222222222222')
+          
         }
         if (recordChartXs.value) {
           recordChartXsInstance = echarts.init(recordChartXs.value)
           recordChartXsInstance.setOption(optionsRecordProd.value)
-          console.log('333333333333333')
+        
         }
       })
     }
