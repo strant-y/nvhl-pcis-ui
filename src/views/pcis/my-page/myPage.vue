@@ -211,10 +211,9 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
 );
-// 任务痕迹
+// 费用信息
 const CostInformation = defineAsyncComponent(
-  // () => import("@/views/pcis-new-udr-list/pages/CostInformation.vue")
-  () => import("@/views/pcis-new-udr-list/common/TaskListVestige.vue")
+  () => import("@/views/pcis-new-udr-list/pages/CostInformation.vue")
 );
 // 历次批单 弹框页面
 const PreviousdrOpnList = defineAsyncComponent(
@@ -239,6 +238,11 @@ const historyClaimcaseModel = defineAsyncComponent(
 // 核保信息
 const UndrOpnList = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/UndrOpnList.vue")
+);
+
+// 任务痕迹
+const TaskListVestige = defineAsyncComponent(
+  () => import("@/views/pcis-new-udr-list/common/TaskListVestige.vue")
 );
 
 const opertaor = dataOpertaor();
@@ -644,7 +648,7 @@ const uwBtn = [
     type: "primary",
     func: () => {
       dzmodal
-        .open(CostInformation, {
+        .open(TaskListVestige, {
           type: "Issuer",
           data: { objId: props.param?.cAppNo, sysType: props.param?.sysType },
         })
@@ -1645,7 +1649,6 @@ const submitEdrToUndrSurrender = () => {
  * 批改单保存
  * **/
 const saveEdrPlyInfo = () => {
-  
   const btn = getBtn("saveEdr");
   btn.loading = true;
   const res = opertaor.getDataAll();
