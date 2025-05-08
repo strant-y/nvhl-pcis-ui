@@ -73,6 +73,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "产品",
         typeCode: "PROD_LIST_IN_GUIDE",
+        disabled: true,
         // params: {'cStatus': '1'},
       },
       {
@@ -127,7 +128,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         // prop: 'TBgnTm',
         prop: 'TCrtTm',
-        title: '保险起1期',
+        title: '保险起期',
         // inputtype: "rtdatepicker",
         inputtype: "rtinput",
         format: 'YYYY-MM-DD HH:mm:ss',

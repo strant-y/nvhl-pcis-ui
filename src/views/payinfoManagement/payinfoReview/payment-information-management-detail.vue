@@ -131,44 +131,53 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         // param: { cIsValid: '1', userOrg: user.value.companyId },
         title: "业务机构",
         itemWidth: 2,
+        disabled:true,
       },
       {
         prop: "cAppNum",
         inputtype: "rtinput",
         title: "选择单数",
+        disabled:true,
       },
       {
         prop: "cAppNo",
         inputtype: "rtinput",
         title: "投保单号",
         rules: [getRules("required", {})],
+        disabled:true,
       },
       {
-        prop: "CPayNme",
+        prop: "cPayNme",
         inputtype: "rtinput",
         title: "出票人",
+        disabled:true,
       },
       {
-        prop: "CChequeNo",
+        prop: "cChequeNo",
         inputtype: "rtinput",
         title: "支票号",
         defaultValue: props.CChqueNo,
+        disabled:true,
       },
 
       {
         prop: "nPayAmt",
         inputtype: "rtnumber",
         title: "(收据)金额",
+        disabled:true,
+        
       },
       {
         prop: "nTax",
         inputtype: "rtnumber",
         title: "车船税",
+        disabled:true,
       },
       {
         prop: "nPrm",
         inputtype: "rtnumber",
         title: "实收金额",
+          disabled:true,
       },
 
       {
@@ -185,6 +194,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cChargeCde",
         inputtype: "rtinput",
         title: "(收据)收款人",
+        disabled:true,
       },
       // {
       //   prop: "cSeqNo",
@@ -211,11 +221,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cCHeckPsn",
         inputtype: "rtinput",
         title: "审核人",
+        disabled:true,
       },
       {
         prop: "nStampTax",
         inputtype: "rtnumber",
         title: "印花税",
+        disabled:true,
         // rules: [getRules("required", {})],
       },
       // {
@@ -344,6 +356,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cCurtainNo",
         inputtype: "rtinput",
         title: "银行到账通知单号",
+        disabled:true,
       },
       // CUniqueNo TUpdTm CAppTyp 这三个需要询问，因为原文件是隐藏的字段
       {
@@ -355,6 +368,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         itemWidth: 3,
         // defaultValue: '同意',
         rules: [getRules("required", {})],
+        
       },
     ],
     showSuperior: true,

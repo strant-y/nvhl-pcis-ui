@@ -1210,11 +1210,13 @@ const submitToUndrFn = async () => {
     const btn = getBtn("btn010103");
     btn.loading = true;
     const res: any = {};
-    setTimeout(() => {
+    // setTimeout(() => {
       console.log(opertaor.getTableRefByKey("plyBase").getFromValue());
       const base = opertaor.getTableRefByKey("plyBase").getFromValue();
       res["user"] = user;
       res["appNo"] = base["Base.cAppNo"];
+
+      console.log('申请核保参数-----',res)
       submitToUndr(res).then((res: any) => {
         btn.loading = false;
         console.log("submitToUndr-res", res);
@@ -1224,7 +1226,7 @@ const submitToUndrFn = async () => {
           ElMessage.error(res.msg);
         }
       });
-    }, 100);
+    // }, 100);
   }
 };
 
@@ -1290,7 +1292,7 @@ const savePlyInfo = async () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
 
-  console.log(res);
+  console.log('保存参数-----1',res);
   if (res["cvrg"].length == 0) {
     ElMessage.error("请录入条款信息");
     btn.loading = false;
@@ -1611,6 +1613,7 @@ const submitEdrToUndrSurrender = () => {
  * 批改单保存
  * **/
 const saveEdrPlyInfo = () => {
+  
   const btn = getBtn("saveEdr");
   btn.loading = true;
   const res = opertaor.getDataAll();
