@@ -493,7 +493,6 @@ const edrBtn = [
   createFreeButtonBase({
     label: "原保单查看",
     type: "primary",
-    id: "btnCalEdr",
     func: () => {
       getPlyPolicyFun();
     },
