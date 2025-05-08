@@ -1134,7 +1134,7 @@ const tableObj = {
             cancelButtonText: "取消",
             type: "warning",
           }).then(function () {
-            const delResult = delTmpPolicy({ appNo: row.cAppNo });
+            const delResult = delTmpPolicy({ cAppNo: row.cAppNo });
             delResult.then((res: any) => {
               if (null != res && null != res["code"]) {
                 if (res["code"] === 200) {

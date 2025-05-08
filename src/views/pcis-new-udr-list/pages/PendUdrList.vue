@@ -1707,7 +1707,7 @@
             cancelButtonText: "取消",
             type: "warning",
         }).then(function () {
-            const delResult = pcisQueryService.delTmpPolicy({ appNo: id });
+            const delResult = pcisQueryService.delTmpPolicy({ cAppNo: id });
             delResult.then((res: any) => {
                 if (null != res && null != res["code"]) {
                     if (res["code"] === 200) {
