@@ -1,6 +1,7 @@
 <template>
   <app-free-edit :freeEditConfig="formconfig1" ref="insuredEditRef" />
   <comDialog ref="dialog"></comDialog>
+  <input type="file" ref="fileInputRef" style="display:none" @change="handleFileChange" />
 </template>
 
 <script setup lang="ts">
@@ -31,6 +32,9 @@ const insuredEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 import { useRoute } from "vue-router";
 const route = useRoute();
+const fileInputRef = ref(null);
+const fileInputType = ref();
+import { readFile } from "@/api/file";
 onMounted(() => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
@@ -916,6 +920,16 @@ const method = {
   getcRegisterSuffixAddr: (val: any) => {
     setregistAdd();
   },
+  // 读取身份证
+  readIdCard: (val: any) => {
+    fileInputRef.value?.click();
+    fileInputType.value = "1";
+  },
+  // 读取外国人永久居留身份证
+  readGreenCard: (val: any) => {
+    fileInputRef.value?.click();
+    fileInputType.value = "2";
+  },
 };
 
 function setregistAdd() {
@@ -979,6 +993,52 @@ function getValue(key: string) {
 }
 function getFormconfig() {
   return formconfig1;
+}
+function handleFileChange(event: Event) {
+  const fileInput = event.target as HTMLInputElement;
+  if (fileInput.files && fileInput.files.length > 0) {
+    const file = fileInput.files[0];
+    // 处理文件上传逻辑
+    const param = {
+      file: file,
+      type: fileInputType.value,
+    }
+    readFile(param).then((res:any) => {
+      if(res.code === 200 && res.data && res.data.result) {
+        if(fileInputType.value === "1") {// 身份证
+          const result = res.data.result.item_list;
+          const keys = result.map((item:any) => item.key);
+          let cardInfo = {};
+          keys.forEach((key:any) => {
+            const value = result.find((item:any) => item.key === key).value;
+            cardInfo[key] = value;
+          });
+          setValue("Insured.cCertfCde", cardInfo['id_number'] || null);
+          setValue("Insured.cInsuredNme", cardInfo['name'] || null);
+          setValue("Insured.cSex", cardInfo['sex'] ? cardInfo['sex'] === '男' ? '1':'2' : null);
+          setValue("Insured.tBirthday", cardInfo['date_of_birth'] ? cardInfo['date_of_birth'].replace(/(年|月)/g,'-').replace('日','') : null);
+          setValue("Insured.tCertfBgnDate", cardInfo['period_of_validity']);
+          setValue("Insured.tCertfEndDate", cardInfo['period_of_validity']);
+          setValue("Insured.cCertfCls", '120001');
+          setValue("Insured.cClntMrk", '0');
+        }
+        if(fileInputType.value === "2") {// 外国人永久居留身份证
+          const cardInfo = res.data.result.details;
+          setValue("Insured.cCertfCde", cardInfo['id_number']['value'] || null);
+          setValue("Insured.cInsuredNme", cardInfo['name']['value'] || null);
+          setValue("Insured.cSex", cardInfo['sex']['value'] ? cardInfo['sex']['value'].split('/')[0] === '男' ? '1':'2' : null);
+          setValue("Insured.tBirthday", cardInfo['date_of_birth']['value'] ? cardInfo['date_of_birth']['value'].replace('.','-') : null);
+          setValue("Insured.tCertfBgnDate", cardInfo['period_of_validity']['value'] || null);
+          setValue("Insured.tCertfEndDate", cardInfo['period_of_validity']['value'] || null);
+          setValue("Insured.cCertfCls", '19');
+          setValue("Insured.cClntMrk", '1');
+        }
+      }
+    }).catch(err => {
+      ElMessage.error(err);
+    })
+    fileInputRef.value.value = ''; // 清空文件输入框的值
+  }
 }
 
 defineExpose({

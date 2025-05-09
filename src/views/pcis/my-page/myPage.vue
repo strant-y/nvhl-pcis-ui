@@ -493,7 +493,6 @@ const edrBtn = [
   createFreeButtonBase({
     label: "原保单查看",
     type: "primary",
-    id: "btnCalEdr",
     func: () => {
       getPlyPolicyFun();
     },
@@ -625,7 +624,7 @@ const uwBtn = [
       dzmodal
         .open(PreviousdrOpnList, {
           type: "Issuer",
-          objId: props.param?.cAppNo,
+          objId: props.param?.plyNo,
           prodNo: props.param?.cProdNo,
         })
         .then((res: any) => {
