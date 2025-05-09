@@ -91,6 +91,8 @@ onMounted(async () => {
         { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm}` },
       ],
     });
+    //禁用不见费出单原因
+    setFormItem("Base.cCanclfeersnCde", { disabled: true });
     //禁用保单来源
     // setFormItem("Base.cPolicySource", {disabled: true});
     setValue("Base.cDptCde", param.cDptCde);
@@ -450,7 +452,8 @@ const method = {
       {
         type: "show",
         data: {
-          CDptCde: getValue("Base.CIntroDptcde"), //服务机构
+          CDptCde: sessionData.value?.cDptCde,
+          // CDptCde: getValue("Base.CIntroDptcde"), //服务机构
         },
         method: {
           getSelected: (params) => {

@@ -114,7 +114,9 @@ cRatioTypChange(val){
     }
     ratio(params).then((res) => {
       if (res.data) {
-        setValue("Base.nRatioCoef", res.data);
+        nextTick(() => {
+          setValue("Base.nRatioCoef", res.data);
+        });
       }
     })
   },

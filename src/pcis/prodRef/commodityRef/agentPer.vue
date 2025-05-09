@@ -422,8 +422,11 @@ onMounted(() => {
           const obj = {
             loadData: res.data,
           };
+          console.log("大类数据",obj);
           setFormItem("CBsnsTyp", obj);
           setValue("CBsnsTyp", props.data.data.cBsnsTyp);
+          // setValue("cChaType", props.data.data.cChaType);
+          // setValue("cChaSubtype", props.data.data.cChaSubtype);
         }
       }
     });
@@ -434,6 +437,7 @@ onMounted(() => {
           const obj = {
             loadData: res.data,
           };
+          console.log("中类数据", obj);
           setFormItem("CChaType", obj);
           setValue("CChaType", props.data.data.cChaType);
         }
@@ -450,6 +454,7 @@ onMounted(() => {
           const obj = {
             loadData: res.data,
           };
+          console.log("子类数据", res.data);
           setFormItem("CChaSubtype", obj);
           setValue("CChaSubtype", props.data.data.cChaSubtype);
         }
