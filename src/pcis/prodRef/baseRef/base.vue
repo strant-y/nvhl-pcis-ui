@@ -100,24 +100,7 @@ const method = {
       opertaor.getTableRefByKey("payinfo").setFormValue(valArr);
   }
 },
-cRatioTypChange(val){
-    // if(val=='3'){
-    //   setValue("Base.nRatioCoef", "1.000000");
-    // }else{
-    //   setValue("Base.nRatioCoef", "");
-    // }
-    let params = {
-      bgnTm: opertaor.getTableRefs()["insrnc"].getValue("Base.tInsrncBgnTm"),
-      endTm: opertaor.getTableRefs()["insrnc"].getValue("Base.tInsrncEndTm"),
-      prodNo: route.params.param.cProdNo,
-      ratioType:val,
-    }
-    ratio(params).then((res) => {
-      if (res.data) {
-        setValue("Base.nRatioCoef", res.data);
-      }
-    })
-  },
+
   //付费约定下拉事件
   cInstMrkChange(val: any) {
     setValue("Base.nPayNumber", '1');
@@ -231,17 +214,17 @@ cRatioTypChange(val){
   cRatioTypChange:(val:any)=>{
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["insrnc"].getFromValue();
-   let cProdNo = route.params.param.cProdNo;
+    let prodNo = route.params.param.cProdNo;
     let param = {
       bgnTm: baseBefore["Base.tInsrncBgnTm"],
       endTm: baseBefore["Base.tInsrncEndTm"],
-      cProdNo  ,
+      prodNo,
       ratioType:val
     }
     policyRatio(param).then((res: any) => {
-      const { code, data, msg } = res;
+      const { code, data, msg } = res;      
       if (code === 200) {
-        setValue("Base.nRatioCoef",JSON.stringify(data));
+        setValue("Base.nRatioCoef",Number(data).toFixed(6));
         }
     });
   },

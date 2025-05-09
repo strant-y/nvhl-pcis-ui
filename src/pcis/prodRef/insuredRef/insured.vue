@@ -637,11 +637,17 @@ const method = {
     }
   },
   funcreset: () => {
-
+    // 客户重置
+    console.log(112)
     const tabref = opertaor.getTableRefs();
     const InsuredValue = tabref["insured"].getFromValue();
     for (const k in InsuredValue) {
-      InsuredValue[k] = null;
+      console.log('---',k)
+        // 反洗钱不清空
+        if(k !== 'Applicant.cCustRiskRank' && k !== 'Insured.cCustRiskRank'){
+                                                     
+          InsuredValue[k] = null;
+        }
     }
     setFormItem("Insured.cInsuredNme", {
       disabled: false,

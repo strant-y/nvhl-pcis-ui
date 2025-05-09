@@ -705,6 +705,16 @@ export function saveHealthNotify(queryParams: any): AxiosPromise<any> {
 }
 
 /**
+ * 查询产品业务规则列表
+ *
+ * @param queryParams  /proddef/qryProdRuleList
+ */                             
+export function qryPrdProdRuleList(queryParams: any): AxiosPromise<any> {
+  return post(`/proddef/qryPrdProdRuleList`, queryParams);
+}
+
+
+/**
  * 产品工厂-查询业务规则
  *
  * @param queryParams
@@ -720,7 +730,7 @@ export function qryRefProdAndRuleList(queryParams: any): AxiosPromise<any> {
  */
 export function savePrdRuleInfo(queryParams: any): AxiosPromise<any> {
   return post(`/proddef/savePrdRuleInfo`, queryParams);
-}
+}                     
 
 /**
  * 产品工厂-删除业务规则
@@ -1012,14 +1022,6 @@ export function excelsave(queryParams: any): AxiosPromise<any> {
   return post(`/excelTemplateConfig/save`, queryParams);
 }
 
-/**
- * 查询产品业务规则列表
- *
- * @param queryParams
- */
-export function qryProdRuleList(queryParams: any): AxiosPromise<any> {
-  return post(`/proddef/qryProdRuleList`, queryParams);
-}
 
 /**
  * 查询联共保信息配置列表

@@ -14,6 +14,9 @@ import dayjs from "dayjs";
 import { useValidator } from "@/typings/useValidator";
 import { formatDate } from "@/utils/date";
 import { transpileModule } from "typescript";
+import { policyRatio } from "@/api/query";
+import { useRoute } from "vue-router";
+const route = useRoute();
 const { getRules } = useValidator();
 const opertaor = dataOpertaor();
 const props = defineProps({
@@ -34,6 +37,26 @@ onMounted(() => {
   Object.assign(formconfig1, formconfig11);
 });
 
+// 根据时间更改 短期费率系数 接口
+const nRatioCoefFunc = ()=>{
+    const tabref = opertaor.getTableRefs();
+    const baseBefore = tabref["insrnc"].getFromValue();
+    const baseBefore2 = tabref["base"].getFromValue();
+    let prodNo = route.params.param.cProdNo; 
+
+    let param = {
+      bgnTm: baseBefore["Base.tInsrncBgnTm"],
+      endTm: baseBefore["Base.tInsrncEndTm"],
+      prodNo,
+      ratioType:baseBefore2['Base.cRatioTyp']
+    }
+    policyRatio(param).then((res: any) => {
+      const { code, data, msg } = res;      
+      if (code === 200) {
+        opertaor.getTableRefByKey('base').setValue('Base.nRatioCoef',Number(data).toFixed(6))
+        }
+    });
+  };
 
 // 绑定方法
 const method = {
@@ -53,6 +76,7 @@ const method = {
     }
   },
   bgnTmFn: (v) => {   
+ 
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["insrnc"].getFromValue();
     const tm = moment(baseBefore["Base.tInsrncEndTm"]).diff(moment(v), "days");  
@@ -63,6 +87,7 @@ const method = {
     maxDate.setSeconds(maxDate.getSeconds() - 1);
     baseBefore["Base.tInsrncEndTm"] = formatDate(maxDate,'yyyy-MM-dd HH:mm:ss')
     setFormValue(baseBefore);
+    nRatioCoefFunc()
   },
   endTmFn: (v) => {
     const tabref = opertaor.getTableRefs();
@@ -71,6 +96,8 @@ const method = {
     baseBefore["Base.cTmSysCde"] = tm;   // 列表里面的 保险
     opertaor.getFatherPage().setTmDay(tm)
     setFormValue(baseBefore);
+    nRatioCoefFunc()
+
   },
   // 索赔基础名称change事件
   suopeiFunc: (val) => {

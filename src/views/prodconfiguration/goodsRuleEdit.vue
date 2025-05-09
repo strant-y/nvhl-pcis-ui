@@ -23,11 +23,18 @@ import {
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
 import { ref, reactive } from "vue";
-import { savePrdTermInfo, initMultiCodeList } from "@/api/prod"; // api接口
-
+import { savePrdRuleInfo, initMultiCodeList } from "@/api/prod"; // api接口 savePrdTermInfo savePrdRuleInfo
+import { useValidator } from "@/typings/useValidator";
+const { getRules } = useValidator();
 const props = defineProps<{
-  visible: boolean;
+  visible: boolean,
+  data:{
+    type: [Object],
+    required: true,
+  },
 }>();
+
+
 const dialogVisible = ref(true);
 const emit = defineEmits<{
   (e: "update:visible", value: boolean): void;
@@ -42,51 +49,58 @@ const formconfig = reactive<AppFreeEditConfig>(
     endBtnsPosition: "right",
     fromSchema: [
       {
-        prop: "CDptCde",
-        inputtype: "rtinput",
+        prop: "cDptCde",
         title: "机构代码",
-        typeCode: "PLYDPT_LIST_1",
-        codeParam: { cIsValid: "1", userOrg: "0200000000000" },
+        inputtype: "rtinput",
+
+        // typeCode: "PLYDPT_LIST_1",
+        // codeParam: { cIsValid: "1", userOrg: "0200000000000" },
+        disabled: true,
+        rules: [getRules("required", {})],
       },
       {
-        prop: "CRuleTyp",
+        prop: "cRuleTyp",
         inputtype: "rtcheckbox",
         title: "是否临时规则",
       },
       {
-        prop: "CPrd",
+        prop: "cPrd",
         inputtype: "rtselect",
         title: "产品大类",
         typeCode: "KIND_LIST_CACHE",
         codeParam: { codeListParam: "" },
+        rules: [getRules("required", {})],
         child: "CProdNo",
       },
       {
-        prop: "CProdNo",
+        prop: "cProdNo",
         inputtype: "rtselect",
         title: "产品",
         typeCode: "PROD_LIST",
         codeParam: { cParCde: "" },
+        rules: [getRules("required", {})],
       },
       {
-        prop: "CRuleCde",
+        prop: "cRuleCde",
         inputtype: "rtinput",
         title: "规则名称",
       },
       {
-        prop: "CRuleValue",
+        prop: "cRuleValue",
         inputtype: "rtinput",
         title: "规则值",
       },
       {
-        prop: "TStaTm",
+        prop: "tStaTm",
         inputtype: "rtdatepicker",
         title: "规则生效起期",
+        rules: [getRules("required", {})],
       },
       {
-        prop: "TEndTm",
+        prop: "tEndTm",
         inputtype: "rtdatepicker",
         title: "规则生效止期",
+        rules: [getRules("required", {})],
       },
     ],
     fromUi: createFromUiConfig({
@@ -95,14 +109,32 @@ const formconfig = reactive<AppFreeEditConfig>(
   })
 );
 
+
+onMounted(() => {
+  console.log('數據===',props.data)
+  // setFormValue(props.data)
+  setTimeout(() => {
+  freeEditRef.value?.setFormValue(props.data);
+    
+  }, 0);
+});
+
 const handleSave = async () => {
   const formData = freeEditRef.value?.getFromValue();
   if (formData) {
     try {
-      await savePrdTermInfo(formData); // 调用保存接口
-      ElMessage.success("保存成功");
+            
+     const res =  await savePrdRuleInfo(formData); // 调用保存接口
+    //  if(res.code == 200){
+    //   ElMessage.success("保存成功");
+    //  }else{
+    //   ElMessage.success(res.msg);
+    //  }
+            console.log('保存res===',res)
+            ElMessage.success(res.msg);
       emit("save");
       handleVisibleUpdate(false);
+      dialogVisible.value = false;
     } catch (error) {
       ElMessage.error("保存失败");
     }
@@ -116,6 +148,35 @@ const handleCancel = () => {
 const handleVisibleUpdate = (value: boolean) => {
   emit("update:visible", value);
 };
+
+function getFromValue() {
+  return freeEditRef?.value?.getFromValue();
+}
+
+function setFormValue(value: any) {
+  freeEditRef?.value?.setFormValue(value);
+}
+
+function validate() {
+  return freeEditRef?.value?.validate();
+}
+
+function setValue(key: string, value: any) {
+  freeEditRef?.value?.setValue(key, value);
+}
+
+function getValue(key: string) {
+  return freeEditRef?.value?.getValue(key);
+}
+ 
+
+defineExpose({
+  getFromValue,
+  setFormValue,
+  validate,
+  setValue,
+  getValue, 
+});
 </script>
 
 <style scoped>

@@ -93,6 +93,7 @@ const pageresult = reactive<Pageresult>({
 
 
 const tableconfig = reactive<AppTableConfig>(
+  
   createTableEditConfig({
     showSelection: true,
     isRadio: true,

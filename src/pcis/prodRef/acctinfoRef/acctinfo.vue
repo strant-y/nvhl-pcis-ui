@@ -43,12 +43,7 @@ const routeData = route.params ; // 获取路由参数
   Object.assign(formconfig1, formconfig11);
 
   canOperateForm();
-  // setFormItem("Acctinfo.cBankRelTyp", {
-  //       disabled: false,
-  //       rules: [getRules("required", {})],
-  //     });
-
-      
+     
 });
 
 // 可以操作的配置项处理  身份认真里面的几项
@@ -84,41 +79,7 @@ const canOperateForm= ()=>{
     setFormItem("Acctinfo.cPubPri", {
         disabled: false,
         // rules: [getRules("required", {})],
-      });
-
-
-      // setFormItem("Acctinfo.cBankCde", {
-      //   disabled: false,
-      //         });
-
-
-// 开户行
-// const obj = {
-//             rules: null,
-//             // disabled: false,
-            
-//             btnItems: {
-//             icon: "Search",
-//             type: "primary",
-//             func: () => {
-//               // const ck = freeEditRef.value?.getValue("componentGroup");
-//               // dzmodal
-//               //   .open(departmentTree, { type: "Issuer", data: {} })
-//               //   .then((res) => {
-//               //     if (res.type === "ok") {
-//               //       // freeEditRef.value?.setValue("componentGroup", res.body);
-//               //     }
-//               //   });
-//             },
-//           },
-//             // btnItems: {
-//             //   disabled: false,
-//             // },
-//           };
-
-
-
-
+      })
 }
 
 // 绑定方法
@@ -174,14 +135,13 @@ const method = {
             }
             
             // 清空开户行
-            setValue("Acctinfo.cBankCde",'')
+           
+            setValue("Acctinfo.cBankPro",'')
+            setValue("Acctinfo.cBankArea",'')
+            setValue("Acctinfo.cBankCounty",'')
             setFormItem("Acctinfo.cBankCde", {
                  disabled: true,
               });
-            
-
-            
-
   },
 
   // 开户行省    市 cCityChange    县 cCountyChange
@@ -190,20 +150,6 @@ const method = {
     setFormItem("Acctinfo.cBankArea", {
                 disabled: false,
                 codeParam: { 'areaprovince': e },
-                // changeFn: {
-                //         next: (value: any) => {
-                //             this.freeEdit.controls['CBankArea'].reset();
-
-                //             if (!!value) {
-                //                 const preParam = this.freeEdit.controls['CBankArea']['param'];
-                //                 let cParCde = {'areaprovince': value};
-                //                 if (!value) {
-                //                     cParCde = {'areaprovince': '-1'};
-                //                 }
-                //                 this.freeEdit.controls['CBankArea']['param'] = Object.assign(preParam, cParCde);
-                //             }
-                //         }
-                //     },
                 rules: [getRules("required", {})],
               });
 

@@ -66,12 +66,15 @@ const initDptTreeList = () => {
 };
 
 const loadNode = (node, resolve) => {
+  console.log(233,node.data.id)
   if (node.level === 0) {
     return resolve([]);
   }
   const params = {
     cDptCde: node.data.id,
   };
+
+
   sysOperatorMgrService.getOrgDptTreeListByPid(params).then((result) => {
     const dto = [];
     if (200 !== result['code']) {
@@ -88,6 +91,8 @@ const loadNode = (node, resolve) => {
         });
       })
     }
+
+    console.log('----------',resolve)
     resolve(dto);
   }).catch((error) => {
     console.log('出错了', error);

@@ -52,6 +52,7 @@ const sendData = () => {
   return selectData
 }
 
+
 //dialog弹框确定事件
 const confirmDialog = () => {
   const result = sendData()
@@ -102,6 +103,10 @@ onMounted(() => {
       CDptCde.value = props.getOperator.cOwnDptCde;
     }
   }
+
+  setTimeout(()=>{
+    nodes.value = [{name:'张三---',children:[{name:'张三---11'},{name:'张三---12'}] },{name:'张三---2'}]
+  },2000)
 });
 
 watch(

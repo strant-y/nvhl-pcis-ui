@@ -142,12 +142,15 @@ const method = {
       }
     });
   },
+  // 客户重置
   funcreset: () => {
-
     const tabref = opertaor.getTableRefs();
     const applicantValue = tabref["applicant"].getFromValue();
     for (const k in applicantValue) {
-      applicantValue[k] = null;
+      // 反洗钱不清空
+      if(k !== 'Applicant.cCustRiskRank' && k !== 'Insured.cCustRiskRank'){
+        applicantValue[k] = null;
+      }
     }
     setFormItem("Applicant.cAppNme", {
       disabled: false,
