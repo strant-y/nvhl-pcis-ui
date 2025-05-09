@@ -624,7 +624,7 @@ const uwBtn = [
       dzmodal
         .open(PreviousdrOpnList, {
           type: "Issuer",
-          objId: props.param?.cAppNo,
+          objId: props.param?.plyNo,
           prodNo: props.param?.cProdNo,
         })
         .then((res: any) => {
