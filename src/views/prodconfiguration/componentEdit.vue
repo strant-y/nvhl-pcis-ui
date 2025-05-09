@@ -5,61 +5,11 @@
       <el-col :span="2">
         <el-text class="mx-1" type="primary" :size="'large'">标题按钮:</el-text>
       </el-col>
-      <el-col :span="2" v-for="(btn, index) in titleBtns" :key="index">
-        <rt-button @click="editBtn(btn, index, 'title')" :item="btn" />
-      </el-col>
-      <el-col :span="2">
-        <rt-button
-          :item="{
-            type: 'primary',
-            circle: true,
-            icon: 'CirclePlus',
-            iconSize: '18',
-            func: () => {
-              const params = {
-                type: 'primary',
-                label: '按钮',
-              };
-              titleBtns.push(params);
-            },
-          }"
-        />
-      </el-col>
-    </el-row>
-    <el-row :gutter="20">
-      <el-col :span="2">
-        <el-text class="mx-1" type="primary" :size="'large'">尾部按钮:</el-text>
-      </el-col>
-      <el-col :span="2" v-for="(btn, index) in endBtns" :key="index">
-        <rt-button :item="btn" @click="editBtn(btn, index, 'end')" />
-      </el-col>
-      <el-col :span="2">
-        <rt-button
-          :item="{
-            type: 'primary',
-            circle: true,
-            icon: 'CirclePlus',
-            iconSize: '18',
-            func: () => {
-              const params = {
-                type: 'primary',
-                label: '按钮',
-              };
-              endBtns.push(params);
-            },
-          }"
-        />
-      </el-col>
-    </el-row>
-    <template v-if="showEditBtnFlag">
-      <el-row :gutter="20" style="margin-top: 10px">
-        <el-col :span="2">
-          <el-text class="mx-1" type="primary" :size="'large'">行内编辑按钮:</el-text>
-        </el-col>
-        <el-col :span="2" v-for="(btn, index) in editBtns" :key="index">
-          <rt-button :item="btn" @click="editBtn(btn, index, 'edit')" />
-        </el-col>
-        <el-col :span="2">
+      <el-col :span="22">
+        <div class="show-btn" v-for="(btn, index) in titleBtns" :key="index">
+          <rt-button @click="editBtn(btn, index, 'title')" :item="btn" />
+        </div>
+        <div class="show-btn">
           <rt-button
             :item="{
               type: 'primary',
@@ -69,17 +19,73 @@
               func: () => {
                 const params = {
                   type: 'primary',
-                  link: '1',
-                  icon: 'Edit',
+                  label: '按钮',
                 };
-                editBtns.push(params);
+                titleBtns.push(params);
               },
             }"
           />
+        </div>
+      </el-col>
+    </el-row>
+    <el-row :gutter="20">
+      <el-col :span="2">
+        <el-text class="mx-1" type="primary" :size="'large'">尾部按钮:</el-text>
+      </el-col>
+      <el-col :span="22">
+        <div class="show-btn" v-for="(btn, index) in endBtns" :key="index">
+          <rt-button :item="btn" @click="editBtn(btn, index, 'end')" />
+        </div>
+        <div class="show-btn">
+          <rt-button
+            :item="{
+              type: 'primary',
+              circle: true,
+              icon: 'CirclePlus',
+              iconSize: '18',
+              func: () => {
+                const params = {
+                  type: 'primary',
+                  label: '按钮',
+                };
+                endBtns.push(params);
+              },
+            }"
+          />
+        </div>
+      </el-col>
+    </el-row>
+    <template v-if="showEditBtnFlag">
+      <el-row :gutter="20" style="margin-top: 10px">
+        <el-col :span="2">
+          <el-text class="mx-1" type="primary" :size="'large'" >行内编辑按钮:</el-text>
+        </el-col>
+        <el-col :span="22">
+          <div class="show-btn" v-for="(btn, index) in editBtns" :key="index">
+            <rt-button :item="btn" @click="editBtn(btn, index, 'edit')" />
+          </div>
+          <div class="show-btn">
+            <rt-button
+              :item="{
+                type: 'primary',
+                circle: true,
+                icon: 'CirclePlus',
+                iconSize: '18',
+                func: () => {
+                  const params = {
+                    type: 'primary',
+                    link: '1',
+                    icon: 'Edit',
+                  };
+                  editBtns.push(params);
+                },
+              }"
+            />
+          </div>
         </el-col>
       </el-row>
     </template>
-    
+
     <rt-mytable
       v-if="showFactorList"
       :tableConfig="tableconfig"
@@ -152,7 +158,7 @@ function editBtn(btn: any, index: any, sw: any) {
           } else {
             titleBtns.value.splice(index, 1);
           }
-        }else if(sw === "edit"){
+        } else if (sw === "edit") {
           if (res.type === "success") {
             editBtns.value[index] = res.data;
           } else {
@@ -188,12 +194,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 return;
               }
               const ck = freeEditRef.value?.getValue("componentKey");
-              dialog.value?.open(
-                "distFactorMap",
-                { componentKey:ck },
-                null,
-                { title: "表单信息关联" }
-              );
+              dialog.value?.open("distFactorMap", { componentKey: ck }, null, {
+                title: "表单信息关联",
+              });
             }
           });
         },
@@ -255,7 +258,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 
           if (index === "dist") {
             showEditBtnFlag.value = true;
-          }else{
+          } else {
             showEditBtnFlag.value = false;
           }
           formconfig1.endBtns?.forEach((e: any) => {
@@ -496,7 +499,7 @@ function save() {
     selectFactor: selectList,
     titleBtns: titleBtns.value,
     endBtns: endBtns.value,
-    editBtns: editBtns.value
+    editBtns: editBtns.value,
   });
   saveComponent(param)
     .then((res) => {
@@ -577,5 +580,9 @@ function querySelector(param: any) {
   margin-top: 5px; /* 设置列表项间的间隔 */
   background-color: #fff; /* 设置列表项背景色 */
   cursor: move; /* 设置移动指针样式 */
+}
+.show-btn {
+  display: inline-block;
+  margin-left: 10px;
 }
 </style>
