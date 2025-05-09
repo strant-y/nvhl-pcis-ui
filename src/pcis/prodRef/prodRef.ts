@@ -63,6 +63,7 @@ import prdFixSpec from "./commodityRef/prd-fix-spec.vue" //特别约定
 import underwriteRef from "./underwriteRef/underwrite.vue"
 import edrbaseRef from "./edrbaseRef/edrbase.vue"
 import edritemRef from "./edritemRef/edritem.vue"
+import imageRef from "./commonRef/image.vue"; //影像信息
 
 /**用于动态组件的映射生成 */
 const componentMap = {
@@ -93,6 +94,7 @@ const componentMap = {
   underwriteRef: underwriteRef, //录单页面中的核保组件
   edrbaseRef: edrbaseRef, //录单页面中的批改信息组件
   edritemRef: edritemRef, //录单页面中的批改比较项组件
+  imageRef:imageRef,
 
 
   prodInfoRef: prodInfo,

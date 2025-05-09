@@ -211,10 +211,9 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
 );
-// 任务痕迹
+// 费用信息
 const CostInformation = defineAsyncComponent(
-  // () => import("@/views/pcis-new-udr-list/pages/CostInformation.vue")
-  () => import("@/views/pcis-new-udr-list/common/TaskListVestige.vue")
+  () => import("@/views/pcis-new-udr-list/pages/CostInformation.vue")
 );
 // 历次批单 弹框页面
 const PreviousdrOpnList = defineAsyncComponent(
@@ -239,6 +238,11 @@ const historyClaimcaseModel = defineAsyncComponent(
 // 核保信息
 const UndrOpnList = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/UndrOpnList.vue")
+);
+
+// 任务痕迹
+const TaskListVestige = defineAsyncComponent(
+  () => import("@/views/pcis-new-udr-list/common/TaskListVestige.vue")
 );
 
 const opertaor = dataOpertaor();
@@ -644,7 +648,7 @@ const uwBtn = [
     type: "primary",
     func: () => {
       dzmodal
-        .open(CostInformation, {
+        .open(TaskListVestige, {
           type: "Issuer",
           data: { objId: props.param?.cAppNo, sysType: props.param?.sysType },
         })
@@ -1196,9 +1200,8 @@ const calcPremium = () => {
         ElMessage.success(res.msg + "保费为：0");
       }
       opertaor.setDataAll(ops);
-      nAmt.value = ops["base"]["Base.nAmt"];
-      nPrm.value = ops["base"]["Base.nPrm"];
-      tmDay.value = ops["base"]["Base.cTmSysCde"];
+      nAmt.value = ops["base"]["Base.nAmt"]?ops["base"]["Base.nAmt"]:0;
+      nPrm.value = ops["base"]["Base.nPrm"]?ops["base"]["Base.nPrm"]:0;
       const payInfo = setPayInfo(ops["base"], ops["applicant"], ops["insrnc"]);
       console.log("生成缴费计划内容", payInfo);
       opertaor.getTableRefs()["payinfo"].setFormValue(payInfo);
@@ -1443,9 +1446,8 @@ const calcPremiumEdr = () => {
           ops["plyBase"]["Base.nPrmVar"]
       );
       opertaor.setDataAll(ops);
-      nAmt.value = ops["base"]["Base.nAmt"];
-      nPrm.value = ops["base"]["Base.nPrm"];
-      tmDay.value = ops["base"]["Base.cTmSysCde"];
+      nAmt.value = ops["base"]["Base.nAmt"]?ops["base"]["Base.nAmt"]:0;
+      nPrm.value = ops["base"]["Base.nPrm"]?ops["base"]["Base.nPrm"]:0;
       const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
       res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
         res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"].split(
@@ -1511,7 +1513,7 @@ const calcPremiumEdrSurrender = () => {
       res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   }
   console.log(res);
-  calcSurrenEdr(res).then((res) => {
+  calcSurrenEdr(res).then((res: any) => {
     btn.loading = false;
     console.log("批改计算", res);
     if (res["code"] == "200") {
@@ -1522,9 +1524,8 @@ const calcPremiumEdrSurrender = () => {
           "; 保费变化量为：" +
           res["res"]["composition"]["plyBase"][0]["Base.nPrmVar"]
       );
-      nAmt.value = res["res"]["composition"]["plyBase"][0]["Base.nAmt"];
-      nPrm.value = res["res"]["composition"]["EdrBase"][0]["Base.nPrm"];
-      tmDay.value = res["res"]["composition"]["plyBase"][0]["Base.cTmSysCde"];
+      nAmt.value = res["res"]["composition"]["plyBase"][0]["Base.nAmt"]?res["res"]["composition"]["plyBase"][0]["Base.nAmt"]:0;
+      nPrm.value = res["res"]["composition"]["EdrBase"][0]["Base.nPrm"]?res["res"]["composition"]["EdrBase"][0]["Base.nPrm"]:0;
       const ops = opertaor.convertData(res);
       opertaor.setDataAll(ops);
       if (res["res"]["composition"]["EdrBase"]) {
@@ -1645,7 +1646,6 @@ const submitEdrToUndrSurrender = () => {
  * 批改单保存
  * **/
 const saveEdrPlyInfo = () => {
-  
   const btn = getBtn("saveEdr");
   btn.loading = true;
   const res = opertaor.getDataAll();

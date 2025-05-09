@@ -186,6 +186,7 @@ function handleQuery(flag?: boolean) {
 
 onMounted(() => {
     nextTick(() => {
+        console.log('props.data.data.CDptCde',props.data.data)
         setValue('CDptCde', props.data.data.CDptCde)
     })
 });

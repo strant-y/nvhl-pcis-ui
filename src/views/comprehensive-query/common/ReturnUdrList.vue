@@ -431,7 +431,7 @@ function handleDelete(objId: any,id: any) {
     cancelButtonText: "取消",
     type: "warning",
   }).then(function () {
-    delTmpPolicy({ appNo: objId, id: id }).then((result: any) => {
+    delTmpPolicy({ cAppNo: objId, id: id }).then((result: any) => {
       if(result.code == 200){
         ElMessage.success({ message: result.msg, duration: 3000 });
         handleQuery(true);

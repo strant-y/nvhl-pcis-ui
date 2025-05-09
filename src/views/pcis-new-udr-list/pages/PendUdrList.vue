@@ -1022,6 +1022,22 @@
                 moment(new Date()).format("YYYY-MM-DD 23:59:59"),
             ],
         });
+        setTimeout(() => {
+            setFormItem("orgCde", {
+                loadData: [
+                    {
+                        label: "永安保险公总司",
+                        value: "0200000000000",
+                    },
+                ],
+            });
+
+            // 确保 loadData 设置完成后再设置表单值
+            freeEditRef.value?.setFormValue({
+                orgCde: "0200000000000",
+            });
+        }, 200);
+        
         // 初始化表单
         allForm.value.map((item: any, index: number) => {
             const isVal = item.showKey.findIndex((vals: any) => vals == 1);
@@ -1707,7 +1723,7 @@
             cancelButtonText: "取消",
             type: "warning",
         }).then(function () {
-            const delResult = pcisQueryService.delTmpPolicy({ appNo: id });
+            const delResult = pcisQueryService.delTmpPolicy({ cAppNo: id });
             delResult.then((res: any) => {
                 if (null != res && null != res["code"]) {
                     if (res["code"] === 200) {

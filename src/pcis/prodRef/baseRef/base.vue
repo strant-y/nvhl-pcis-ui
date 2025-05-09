@@ -100,7 +100,6 @@ const method = {
       opertaor.getTableRefByKey("payinfo").setFormValue(valArr);
   }
 },
-
   //付费约定下拉事件
   cInstMrkChange(val: any) {
     setValue("Base.nPayNumber", '1');
