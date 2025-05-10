@@ -143,7 +143,7 @@ const tableconfig = reactive<AppTableConfig>(
 );
 
 onMounted(async () => {
-  loadTree();
+  loadTree(props.data.type);
 });
 
 watch(
@@ -167,11 +167,12 @@ const method = {
 };
 
 // 获取条款列表
-function loadTree() {
+function loadTree(type: number) {
   nodes.value = [];
   const param = {
     name: formconfig1.value.name,
     level: 2,
+    type
   };
   getProdEnableList(param).then((res: any) => {
     if (res.code === 200) {
