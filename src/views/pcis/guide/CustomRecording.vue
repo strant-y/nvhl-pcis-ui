@@ -20,33 +20,46 @@
         >
           <dept v-model="formconfig1.cDptCde" @selected-item="selectedItem" />
         </el-form-item>
-
-        <h4 style="margin: 10px 20px">投保信息</h4>
         <el-form-item
-          label="投保标识"
-          prop="cRenewMrk"
+          label="录单方式"
+          prop="cRecordType"
+          style="width: 600px"
           :rules="[getRules('required', {})]"
         >
-          <el-radio-group v-model="formconfig1.cRenewMrk">
-            <el-radio value="0">新保</el-radio>
-            <el-radio value="1">续保</el-radio>
+          <el-radio-group v-model="formconfig1.cRecordType" @change="handleRecordTypeChange">
+            <el-radio :value="1">自定义录单</el-radio>
+            <el-radio :value="2">方案录单</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item
-          v-if="formconfig1.cRenewMrk == '1'"
-          label="上年保单号"
-          prop="cPlyNo"
-          :rules="[getRules('required', {})]"
-        >
-          <el-input
-            style="width: 300px"
-            placeholder="请输入续保保单号"
-            v-model="formconfig1.cPlyNo"
-          >
-          </el-input>
-        </el-form-item>
 
-        <h4 style="margin: 10px 20px">选择条款</h4>
+        <template v-if="formconfig1.cRecordType == 1">
+          <h4 style="margin: 10px 20px">投保信息</h4>
+          <el-form-item
+            label="投保标识"
+            prop="cRenewMrk"
+            :rules="[getRules('required', {})]"
+          >
+            <el-radio-group v-model="formconfig1.cRenewMrk">
+              <el-radio value="0">新保</el-radio>
+              <el-radio value="1">续保</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item
+            v-if="formconfig1.cRenewMrk == '1'"
+            label="上年保单号"
+            prop="cPlyNo"
+            :rules="[getRules('required', {})]"
+          >
+            <el-input
+              style="width: 300px"
+              placeholder="请输入续保保单号"
+              v-model="formconfig1.cPlyNo"
+            >
+            </el-input>
+          </el-form-item>
+        </template>
+
+        <h4 style="margin: 10px 20px">选择{{ labelNm }}</h4>
         <el-form-item
           label="团个属性"
           prop="cGrpMrk"
@@ -60,13 +73,13 @@
 
         <el-tooltip placement="top">
           <template #content>
-            可用鼠标左键，按住常用条款卡片<br />自由拖动常用条款排序<br />
+            可用鼠标左键，按住常用{{ labelNm }}卡片<br />自由拖动常用{{ labelNm }}排序<br />
           </template>
           <h4
             style="margin: 10px 20px; width: 200px"
             v-if="formconfig1.cRenewMrk !== '1'"
           >
-            常用条款
+            常用{{ labelNm }}
             <el-icon size="20" style="vertical-align: middle; color: red"
               ><InfoFilled
             /></el-icon>
@@ -109,7 +122,7 @@
           </el-col>
           <el-col :span="24">
             <el-form-item
-              label="条款名称"
+              :label="`${labelNm}名称`"
               prop="cTermNme"
               :rules="[getRules('required', {})]"
             >
@@ -219,12 +232,14 @@ const formconfig1 = ref({
   cProdNo: "",
   cProdNme: "",
   cPlyNo: "",
+  cRecordType: 1,
 });
 const selectTreeItem = ref({});
+const labelNm = ref("条款")
 // 条款下拉数据
-function loadOptions() {
-  const param = { pageNo: 1, pageSize: 999, CEnableFlag: "1", level: 2 };
-  getProdEnableList(param).then((res) => {
+function loadOptions(type:number = 1) {// 条款 1 方案 2
+  const param = { pageNo: 1, pageSize: 999, CEnableFlag: "1", level: 2, type };
+  getProdEnableList(param).then((res:any) => {
     if (res.code === 200) {
       options.value = res.data.result;
     } else {
@@ -378,7 +393,7 @@ function showModal() {
   dzmodal
     .open(termDialog, { 
       type: "Issuer",
-      data: { updateQuery },
+      data: { updateQuery, type: formconfig1.value.cRecordType },
       termList: termList.value,
     })
     .then((res: any) => {
@@ -393,6 +408,20 @@ function showModal() {
 }
 function updateQuery() {
   handleQuery();
+}
+
+// 录单方式
+function handleRecordTypeChange(val:any) {
+  formconfig1.value.cTermNme = "";
+  formconfig1.value.cGrpMrk = "0";
+  formconfig1.value.cRenewMrk = "0";
+  if (val == "2") {
+    loadOptions(2);
+    labelNm.value = "方案";
+  } else {
+    loadOptions();
+    labelNm.value = "条款";
+  }
 }
 </script>
 
