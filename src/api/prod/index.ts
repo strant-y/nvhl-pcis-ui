@@ -1249,4 +1249,21 @@ export function ratio(queryParams: any): AxiosPromise<any> {
   return post(`/policy/ratio`, queryParams);
 }
 
+/**
+ * 产品业务规则配置-查询业务规则
+ *
+ * @param queryParams
+ */
+export function qryProdRuleList(queryParams: any): AxiosPromise<any> {
+  return post(`/proddef/qryProdRuleList`, queryParams);
+}
+
+/**
+ * 产品业务规则配置-新增/修改业务规则
+ *
+ * @param queryParams
+ */
+export function saveProdRuleInfo(queryParams: any): AxiosPromise<any> {
+  return post(`/proddef/saveProdRuleInfo`, queryParams);
+}          
 

@@ -87,6 +87,9 @@
             :item="{
               icon: 'RefreshLeft',
               label: '取消',
+              func: () => {
+                emits('handleClose');
+              },
             }"
           />
           <rtButton

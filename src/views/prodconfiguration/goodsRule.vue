@@ -51,7 +51,7 @@ import {
 import { useRoute } from "vue-router";
 import { ref, reactive, onMounted } from "vue";
 import {
-  qryPrdProdRuleList,
+  qryProdRuleList,
   getOrgDptTreeNodeById,
   delProdRuleById,
 } from "@/api/prod";
@@ -87,7 +87,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         icon: "RefreshRight",
-        func: () => {},
+        func: () => {
+          freeEditRef.value?.resetFields();
+        },
       }),
     ],
 
@@ -115,12 +117,23 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         codeParam: { codeListParam: "" },
         child: "cProdNo",
         title: "产品大类",
+        func: (val: any) => {
+          // 更新产品下拉选
+          setFormItem("cProdNo", {
+            codeParam: {
+              cParCde: val,
+              cOperId: user.value?.opCde,
+              cDptCde: user.value?.companyId,
+            },
+          });
+          freeEditRef.value?.setValue("cProdNo", null);
+        },
       },
       {
         prop: "cProdNo",
         inputtype: "rtselect",
         typeCode: "PROD_LIST",
-        codeParam: { cParCde: "" },
+        codeParam: { cParCde: "999" },
         title: "产品",
       },
     ],
@@ -144,7 +157,12 @@ const tableconfig = reactive<AppTableConfig>(
         label: "增加",
         type: "success",
         func: function () {
-          dzmodal.open(goodsRuleEdit, { type: "add", data: {} }).then((res) => {
+          const cDptCde = freeEditRef.value?.getValue("cDptCde");
+          if(!cDptCde) {
+            ElMessage.error("请先选择机构");
+            return;
+          }
+          dzmodal.open(goodsRuleEdit, { type: "add", data: {cDptCde} }).then((res:any) => {
             if (res.type === "ok") {
               handleQuery();
             }
@@ -245,7 +263,11 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cRuleTyp",
         title: "是否临时规则",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
+        loadData: [
+          {label: "是", value: "1"},
+          {label: "否", value: "0"},
+        ]
       },
     ],
   })
@@ -489,9 +511,8 @@ function handleQuery(flag?: boolean) {
     const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
     const s = freeEditRef.value?.getFromValue(); //获取表单数据
     const param = Object.assign(s, r);
-    console.log(666,param)
-    qryPrdProdRuleList(param)
-      .then((res) => {
+    qryProdRuleList(param)
+      .then((res:any) => {
         const { code, data, msg } = res;
         if (200 === code) {
           pageresult.list = data.result;
@@ -531,6 +552,14 @@ function setValue(key: string, value: any) {
 
 function getValue(key: string) {
   return freeEditRef?.value?.getValue(key);
+}
+
+function setFormItem(prop: string, config: any) {
+  formconfig1.fromSchema?.forEach((item) => {
+    if (item.prop === prop) {
+        Object.assign(item, config);
+    }
+  });
 }
 
 defineExpose({

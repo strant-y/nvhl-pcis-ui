@@ -23,8 +23,11 @@ import {
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
 import { ref, reactive } from "vue";
-import { savePrdRuleInfo, initMultiCodeList } from "@/api/prod"; // api接口 savePrdTermInfo savePrdRuleInfo
+import { saveProdRuleInfo, initMultiCodeList } from "@/api/prod"; // api接口 savePrdTermInfo savePrdRuleInfo
 import { useValidator } from "@/typings/useValidator";
+import { useUserStore } from "@/store/modules/user";
+const userStore = useUserStore();
+const user = ref(userStore.user);
 const { getRules } = useValidator();
 const props = defineProps<{
   visible: boolean,
@@ -32,6 +35,7 @@ const props = defineProps<{
     type: [Object],
     required: true,
   },
+  type: string;
 }>();
 
 
@@ -39,7 +43,9 @@ const dialogVisible = ref(true);
 const emit = defineEmits<{
   (e: "update:visible", value: boolean): void;
   (e: "save"): void;
+  (e: "ok"): void;
 }>();
+const cProdNoOptions = ref<any[]>([]);
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 
@@ -71,13 +77,24 @@ const formconfig = reactive<AppFreeEditConfig>(
         codeParam: { codeListParam: "" },
         rules: [getRules("required", {})],
         child: "CProdNo",
+        func: (val: any) => {
+          // 更新产品下拉选
+          setFormItem("cProdNo", {
+            codeParam: {
+              cParCde: val,
+              cOperId: user.value?.opCde,
+              cDptCde: user.value?.companyId,
+            },
+          });
+          freeEditRef.value?.setValue("cProdNo", null);
+        },
       },
       {
         prop: "cProdNo",
         inputtype: "rtselect",
         title: "产品",
         typeCode: "PROD_LIST",
-        codeParam: { cParCde: "" },
+        codeParam: { cParCde: "999" },
         rules: [getRules("required", {})],
       },
       {
@@ -111,34 +128,41 @@ const formconfig = reactive<AppFreeEditConfig>(
 
 
 onMounted(() => {
-  console.log('數據===',props.data)
-  // setFormValue(props.data)
-  setTimeout(() => {
-  freeEditRef.value?.setFormValue(props.data);
-    
-  }, 0);
+  if(props.type === "edit") {
+    nextTick(() => {
+      freeEditRef.value?.setFormValue({
+        ...props.data,
+        cRuleTyp: props.data.cRuleTyp === "1" ? true : false,
+      });
+    }).then(() => {
+      freeEditRef.value?.setValue("cProdNo", props.data.cProdNo);
+    });
+  }
 });
 
 const handleSave = async () => {
-  const formData = freeEditRef.value?.getFromValue();
-  if (formData) {
-    try {
-            
-     const res =  await savePrdRuleInfo(formData); // 调用保存接口
-    //  if(res.code == 200){
-    //   ElMessage.success("保存成功");
-    //  }else{
-    //   ElMessage.success(res.msg);
-    //  }
-            console.log('保存res===',res)
-            ElMessage.success(res.msg);
-      emit("save");
-      handleVisibleUpdate(false);
-      dialogVisible.value = false;
-    } catch (error) {
-      ElMessage.error("保存失败");
+  freeEditRef.value?.validate().then((valid:boolean) => {
+    if(valid) {
+      const formData = {
+        ...freeEditRef.value?.getFromValue(),
+        cRuleTyp: freeEditRef.value?.getValue("cRuleTyp") ? "1" : "0",
+      }
+      if(props.type === "add") {
+        formData.type = "add"
+      }
+      saveProdRuleInfo(formData).then((res:any) => {
+        if (res.code == 200) {
+          ElMessage.success("保存成功");
+          emit("ok");
+          dialogVisible.value = false;
+        } else {
+          ElMessage.error(res.msg);
+        }
+      }).catch((err:any) => {
+        ElMessage.error(err);
+      });
     }
-  }
+  });
 };
 
 const handleCancel = () => {
@@ -167,6 +191,13 @@ function setValue(key: string, value: any) {
 
 function getValue(key: string) {
   return freeEditRef?.value?.getValue(key);
+}
+function setFormItem(prop: string, config: any) {
+  formconfig.fromSchema?.forEach((item) => {
+    if (item.prop === prop) {
+        Object.assign(item, config);
+    }
+  });
 }
  
 
