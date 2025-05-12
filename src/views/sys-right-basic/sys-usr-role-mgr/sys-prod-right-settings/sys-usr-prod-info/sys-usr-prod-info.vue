@@ -108,12 +108,12 @@ const tableconfig = reactive<AppTableConfig>(
         label: "配置",
         type: "primary",
         func: function () {
-          console.log(222,multipleSelection.value.length)
-          if(multipleSelection.value.length){
+          // console.log(222,multipleSelection.value.length)
+          // if(multipleSelection.value.length){
             addGrtProd()
-          }else{
-            ElMessage.warning('请先选择产品,再进行操作!')
-          }
+          // }else{
+          //   ElMessage.warning('请先选择产品,再进行操作!')
+          // }
          
         },
       }),

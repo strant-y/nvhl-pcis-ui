@@ -1,4 +1,5 @@
 <template>
+  123123
   <app-free-edit :freeEditConfig="formconfig1" ref="tgtEditRef" />
 </template>
 
@@ -12,6 +13,12 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useProductStore } from "@/store/modules/prod";
 import { rule } from "postcss";
 import { useValidator } from "@/typings/useValidator";
+const amlExtendInfo = defineAsyncComponent(
+  () => import("@/views/comprehensive-query/modal/wages-info-model.vue")
+);
+
+import { useDzModal } from "@/common/dzmodel/DzModalService";
+const dzmodal = useDzModal();
 const { getRules } = useValidator();
 const opertaor = dataOpertaor();
 const productStore = useProductStore()
@@ -103,6 +110,15 @@ const method = {
     if(cvrgref.showFlush){
       cvrgref.showFlush();
     }
+  },
+  wagesInfoBtn:()=>{
+    console.log('按钮 工资总额')
+    dzmodal
+    .open(amlExtendInfo, { })
+    .then((res: any) => {
+      if (res.type === "ok") {
+      }
+    });
   }
 };
 

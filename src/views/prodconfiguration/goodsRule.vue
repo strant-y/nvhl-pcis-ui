@@ -104,7 +104,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
       },
       {
-        prop: "cRuleCde",
+        // cRuleCde
+        prop: "ruleName",
         inputtype: "rtinput",
         title: "规则名称",
       },
@@ -182,17 +183,27 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "Delete",
         link: true,
         tableClick: (row) => {
-          delProdRuleById(row)
-            .then((res) => {
-              const { code, data, msg } = res;
-              if (200 === code) {
-                ElMessage.success("删除成功");
-                handleQuery();
-              } else {
-                ElMessage.error(msg);
-              }
+
+          ElMessageBox.confirm('确认要删除吗？该数据删除之后将无法恢复。', '提示', {
+              confirmButtonText: '删除',
+              cancelButtonText: '取消',
+              type: 'warning',
+            }).then(() => {
+              delProdRuleById(row)
+                      .then((res) => {
+                        const { code, data, msg } = res;
+                        if (200 === code) {
+                          ElMessage.success("删除成功");
+                          handleQuery();
+                        } else {
+                          ElMessage.error(msg);
+                        }
+                      })
+                      .finally(() => {});
+            }).catch(() => {
+              //防止报错
             })
-            .finally(() => {});
+     
         },
       }),
     ],
@@ -223,7 +234,7 @@ const tableconfig = reactive<AppTableConfig>(
         // clearable: true,
       },
       {
-        prop: "cRuleCde",
+        prop: "ruleName",
         title: "规则名称",
         inputtype: "rtinput",
       },
@@ -233,7 +244,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
       },
       {
-        prop: "tCrtTm",
+        prop: "tStaTm",
         title: "生效时间",
         inputtype: "rtdatepicker",
       },
@@ -243,9 +254,19 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtdatepicker",
       },
       {
-        prop: "cRuleTyp",
+        prop: "cJfcdFlag",
         title: "是否临时规则",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
+        loadData: [
+                    {
+                      "label": "是",
+                      "value": "1"
+                    },
+                    {
+                      "label": "否",
+                      "value": "2"
+                    }
+                  ]
       },
     ],
   })
