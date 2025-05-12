@@ -44,6 +44,8 @@ import {
 } from "@/constants/tab-constants";
 import { PcisQueryService } from "@/views/payinfoManagement/service/pcis-query-service";
 import dayjs from "dayjs";
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
 const pcisQueryService = new PcisQueryService();
 const userStore = useUserStore();
 const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
@@ -403,8 +405,29 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                           item.hidden = true;
                       }
                   });
-              },
+                  codeListStore
+                    .queryCodeList({
+                        codeListName: "TERM_LIST_IN_GUIDE_NEW",
+                        codeListParam:{
+                        cParCde: cPard.value,
+                        cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+                        cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+                    },
+                    })
+                    .then((res) => {
+                        // if (!res.some(item => Object.values(item).includes(getValue("Applicant.cCertfCls")))) {
+                        //     setValue("Applicant.cCertfCls", "");
+                        // }
+                        // setFormItem("Applicant.cCertfCls", {
+                        //     loadData: [],
+                        // });
+                        setFormItem("cProdNo", {
+                            loadData: res,
+                        });
+                    });
+                },
           },
+          
           {
               prop: "cProdNo",
               inputtype: "rtselect",
@@ -413,12 +436,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               rules: [{ type: "required" }],
               filterable: true,
               clearable: true,
-              typeCode: "TERM_LIST_IN_GUIDE_NEW",
-              codeParam: {
-                  cParCde: cPard.value,
-                  cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
-                  cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
-              },
+            //   typeCode: "TERM_LIST_IN_GUIDE_NEW",
+            //   codeParam: {
+            //       cParCde: cPard.value,
+            //       cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+            //       cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+            //   },
               func: (val) => {
                   formconfig1.fromSchema?.forEach((item) => {
                       if (
