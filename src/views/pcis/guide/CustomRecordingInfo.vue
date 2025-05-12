@@ -1,10 +1,10 @@
 <template>
   <div class="">
     <el-form ref="freeEditRef" :model="formconfig1">
-      <el-form-item label="条款列表" prop="name">
+      <el-form-item :label="`${labelNm}列表`" prop="name">
         <el-input
           v-model="formconfig1.name"
-          placeholder="请输入条款名称"
+          :placeholder="`请输入${labelNm}名称`"
           clearable=""
         >
           <template #append>
@@ -62,12 +62,17 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  type: {
+    type: Number,
+    default: 1,
+  }
 });
 const { datas } = toRefs(props);
 const sysOpMgrService = new SysOpMgrService();
 const formconfig1 = reactive({
   name: "",
 });
+const labelNm = ref("条款")
 const params = ref<any>({});
 const checkedIcon = ref("rgb(170, 170, 170)");
 const tableRef = ref<AppTableMethod | null>(null);
@@ -102,14 +107,22 @@ const tableconfig = reactive<AppTableConfig>(
             checkedIcon.value === "rgb(170, 170, 170)"
               ? "rgb(250, 219, 20)"
               : "rgb(170, 170, 170)";
+          const isPlan = props.type === 2 ? "1" : "0";
           if (checkedIcon.value === "rgb(250, 219, 20)") {
-            const params = {
+            const params = props.type === 2 ? {
+              planNo: row.code,
+              planCnm: row.value,
+              prodCnm: props.pNode.parent.data.value,
+              prodNo: props.pNode.parent.data.code,
+              isPlan: isPlan,
+            } : {
               termNo: row.code,
               termCnm: row.value,
               prodCnm: props.pNode.parent.data.value,
               prodNo: props.pNode.parent.data.code,
+              isPlan: isPlan,
             };
-            userUnionTerm(params).then((res) => {
+            userUnionTerm(params).then((res:any) => {
               if (res.code == "1") {
                 ElMessage.success(res.message);
                 emits("updateTerm", {});
@@ -118,7 +131,14 @@ const tableconfig = reactive<AppTableConfig>(
               }
             });
           } else {
-            unUserUnUntionTerm({ termNo: row.code }).then((res) => {
+            const param = props.type === 2 ? {
+              planNo: row.code,
+              isPlan: isPlan,
+            } : {
+              termNo: row.code,
+              isPlan: isPlan
+            };
+            unUserUnUntionTerm(param).then((res:any) => {
               if (res.code == "1") {
                 ElMessage.success(res.message);
                 emits("updateTerm", {});
@@ -134,12 +154,12 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "code",
         inputtype: "rtinput",
-        title: "条款代码",
+        title: `${labelNm.value}代码`,
       },
       {
         prop: "value",
         inputtype: "rtinput",
-        title: "条款名称",
+        title: `${labelNm.value}名称`,
       },
     ],
   })
@@ -147,6 +167,7 @@ const tableconfig = reactive<AppTableConfig>(
 onMounted(async () => {
   console.log("props.datas", props.termList);
   init();
+  labelNm.value = props.type === 2 ? "方案" : "条款";
 });
 
 watch(
