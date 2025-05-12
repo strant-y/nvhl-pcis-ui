@@ -32,6 +32,9 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
+
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
@@ -61,6 +64,8 @@ const TaskListVestige = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/TaskListVestige.vue")
 );
 const udrType = ref('4');
+const cPard = ref(null);
+
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -89,13 +94,31 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         typeCode: "KIND_LIST_GRT",
         params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
         clearable: true,
+        func:(val)=>{
+        cPard.value = val;
+        codeListStore
+            .queryCodeList({
+                codeListName: "TERM_LIST_IN_GUIDE_NEW",
+                codeListParam:{
+                cParCde: cPard.value,
+                cOperId: user.value.opCde,
+                cDptCde: user.value.companyId,
+            },
+            })
+            .then((res) => {
+                setFormItem("prodNo", {
+                    loadData: res,
+                });
+            });
+        
+        }
       },
       {
         prop: "prodNo",
         inputtype: "rtselect",
         title: "条款",
-        typeCode: "PROD_LIST_GRT",
-        params: { cParCde:'', cOperId: user.value.opCde, cDptCde: user.value.companyId },
+        // typeCode: "PROD_LIST_GRT",
+        // params: { cParCde:'', cOperId: user.value.opCde, cDptCde: user.value.companyId },
         clearable: true,
       },
       {
@@ -440,6 +463,16 @@ function handleDelete(objId: any,id: any) {
       }
     })
   });
+}
+//给表单下拉项赋值
+function setFormItem(key, obj) {
+    if (obj && Object.keys(obj).length) {
+        formconfig1.fromSchema?.forEach((item) => {
+            if (item.prop === key) {
+                Object.assign(item, obj);
+            }
+        });
+    }
 }
 </script>
 

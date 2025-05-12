@@ -1527,8 +1527,8 @@ const calcPremiumEdrSurrender = () => {
           "; 保费变化量为：" +
           res["res"]["composition"]["plyBase"][0]["Base.nPrmVar"]
       );
-      nAmt.value = res["res"]["composition"]["plyBase"][0]["Base.nAmt"]?res["res"]["composition"]["plyBase"][0]["Base.nAmt"]:0;
-      nPrm.value = res["res"]["composition"]["EdrBase"][0]["Base.nPrm"]?res["res"]["composition"]["EdrBase"][0]["Base.nPrm"]:0;
+      nAmt.value = res["res"]["composition"]["EdrBase"][0]["EdrBase.nAmt"]?res["res"]["composition"]["EdrBase"][0]["EdrBase.nAmt"]:0;
+      nPrm.value = res["res"]["composition"]["EdrBase"][0]["EdrBase.nPrm"]?res["res"]["composition"]["EdrBase"][0]["EdrBase.nPrm"]:0;
       const ops = opertaor.convertData(res);
       opertaor.setDataAll(ops);
       if (res["res"]["composition"]["EdrBase"]) {

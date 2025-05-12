@@ -795,6 +795,8 @@
                                 cDptCnm: selected.value["cDptCnm"],
                                 cEdrType: routeData["rsnTyp"],
                                 pageType: "EDR_APP_NEW_SCENE",
+                                cTermNme: selected.value["cTermNme"],
+                                cTermNo: selected.value["cTermNo"],
                             });
                             //预留跳转路径
                             router.push({
@@ -821,8 +823,8 @@
                                 cDptCnm: selected.value["cDptCnm"],
                                 cEdrType: routeData["rsnTyp"],
                                 pageType: "EDR_APP_NEW_SCENE",
-                                cTermNme: "",
-                                cTermNo: "",
+                                cTermNme: selected.value["cTermNme"],
+                                cTermNo: selected.value["cTermNo"],
                             });
                             //预留跳转路径
                             router.push({
@@ -849,6 +851,8 @@
                                 cDptCnm: selected.value["cDptCnm"],
                                 cEdrType: routeData["rsnTyp"],
                                 pageType: "EDR_APP_NEW_SCENE",
+                                cTermNme: selected.value["cTermNme"],
+                                cTermNo: selected.value["cTermNo"],
                             });
                             console.log(en);
                             router.push({
