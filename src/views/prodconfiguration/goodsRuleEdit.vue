@@ -23,8 +23,11 @@ import {
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
 import { ref, reactive } from "vue";
-import { saveProdRuleInfo, initMultiCodeList, query } from "@/api/prod"; // api接口 savePrdTermInfo savePrdRuleInfo
+import { saveProdRuleInfo, initMultiCodeList } from "@/api/prod"; // api接口 savePrdTermInfo savePrdRuleInfo
 import { useValidator } from "@/typings/useValidator";
+import { useUserStore } from "@/store/modules/user";
+const userStore = useUserStore();
+const user = ref(userStore.user);
 const { getRules } = useValidator();
 const props = defineProps<{
   visible: boolean,
@@ -75,24 +78,24 @@ const formconfig = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
         child: "CProdNo",
         func: (val: any) => {
+          // 更新产品下拉选
+          setFormItem("cProdNo", {
+            codeParam: {
+              cParCde: val,
+              cOperId: user.value?.opCde,
+              cDptCde: user.value?.companyId,
+            },
+          });
           freeEditRef.value?.setValue("cProdNo", null);
-          if (val) {
-            query({ codeListName: "PROD_LIST", codeListParam: { cParCde: val } }).then((res: any) => {
-              cProdNoOptions.value = res.data
-            });
-          } else {
-            cProdNoOptions.value = [];
-          }
         },
       },
       {
         prop: "cProdNo",
         inputtype: "rtselect",
         title: "产品",
-        // typeCode: "PROD_LIST",
-        // codeParam: { cParCde: "" },
+        typeCode: "PROD_LIST",
+        codeParam: { cParCde: "999" },
         rules: [getRules("required", {})],
-        loadData: cProdNoOptions
       },
       {
         prop: "cRuleCde",
@@ -188,6 +191,13 @@ function setValue(key: string, value: any) {
 
 function getValue(key: string) {
   return freeEditRef?.value?.getValue(key);
+}
+function setFormItem(prop: string, config: any) {
+  formconfig.fromSchema?.forEach((item) => {
+    if (item.prop === prop) {
+        Object.assign(item, config);
+    }
+  });
 }
  
 

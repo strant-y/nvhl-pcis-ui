@@ -87,7 +87,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         icon: "RefreshRight",
-        func: () => {},
+        func: () => {
+          freeEditRef.value?.resetFields();
+        },
       }),
     ],
 
@@ -115,12 +117,23 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         codeParam: { codeListParam: "" },
         child: "cProdNo",
         title: "产品大类",
+        func: (val: any) => {
+          // 更新产品下拉选
+          setFormItem("cProdNo", {
+            codeParam: {
+              cParCde: val,
+              cOperId: user.value?.opCde,
+              cDptCde: user.value?.companyId,
+            },
+          });
+          freeEditRef.value?.setValue("cProdNo", null);
+        },
       },
       {
         prop: "cProdNo",
         inputtype: "rtselect",
         typeCode: "PROD_LIST",
-        codeParam: { cParCde: "" },
+        codeParam: { cParCde: "999" },
         title: "产品",
       },
     ],
@@ -539,6 +552,14 @@ function setValue(key: string, value: any) {
 
 function getValue(key: string) {
   return freeEditRef?.value?.getValue(key);
+}
+
+function setFormItem(prop: string, config: any) {
+  formconfig1.fromSchema?.forEach((item) => {
+    if (item.prop === prop) {
+        Object.assign(item, config);
+    }
+  });
 }
 
 defineExpose({
