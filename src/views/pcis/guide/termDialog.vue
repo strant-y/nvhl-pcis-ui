@@ -1,6 +1,6 @@
 <!-- 配置 -->
 <template>
-  <el-dialog v-model="dialogVisible" width="75%" title="选择条款">
+  <el-dialog v-model="dialogVisible" width="75%" :title="`选择${labelNm}`">
     <el-row gutter="10">
       <el-col :span="12" class="col-md-12">
         <el-card :bordered="false" class="index-blk">
@@ -15,7 +15,7 @@
             <el-input
               v-model="filterText"
               style="width: 500px"
-              placeholder="请输入条款名称"
+              :placeholder="`请输入${labelNm}名称`"
             />
             <el-tree
               ref="treeRef"
@@ -44,6 +44,7 @@
           :datas="datas"
           :pNode="pNode"
           :termList="props.termList"
+          :type="props.data.type"
           @updateTerm="updateTermlist"
         />
       </el-col>
@@ -94,6 +95,7 @@ const termList = ref<any>([]);
 const formconfig1 = ref({
   name: "",
 });
+const labelNm = ref("条款")
 // 条款树
 const nodes = ref<Array<any>>([]);
 const defaultProps = {
@@ -144,6 +146,7 @@ const tableconfig = reactive<AppTableConfig>(
 
 onMounted(async () => {
   loadTree(props.data.type);
+  labelNm.value = props.data.type === 2 ? "方案" : "条款";
 });
 
 watch(
@@ -176,7 +179,16 @@ function loadTree(type: number) {
   };
   getProdEnableList(param).then((res: any) => {
     if (res.code === 200) {
-      nodes.value = res.data;
+      nodes.value = res.data.map((item:any) => ({
+        ...item,
+        list: item.list.map((child:any) => ({
+          ...child,
+          list: child.list.map((grandChild:any) => ({
+            ...grandChild,
+            isPlan: props.data.type === 2,
+          }))
+        })),
+      }))
     } else {
       ElMessage.error(res.msg);
     }
@@ -191,6 +203,11 @@ const getCurrentNode = (data: any) => {
 const onEvent = (data: any, node: any) => {
   // listShow.value = false;
   if (data.list.length == 0) {
+    if(props.data.type === 2 && !data.isPlan) {
+      listShow.value = true;
+      datas.value = [];
+      return
+    }
     listShow.value = true;
     datas.value = [data];
     pNode.value = node;
