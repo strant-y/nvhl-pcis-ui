@@ -115,7 +115,8 @@
                       ><StarFilled
                     /></el-icon>
                   </p>
-                  <p class="txt">{{ item.termNo }} - {{ item.termCnm }}</p>
+                  <p class="txt" v-if="formconfig1.cRecordType == 1">{{ item.termNo }} - {{ item.termCnm }}</p>
+                  <p class="txt" v-else>{{ item.planNo }} - {{ item.planCnm }}</p>
                 </el-card>
               </VueDraggable>
             </div>
@@ -327,14 +328,21 @@ function handleClick(item: any, index: number) {
     termList.value.forEach((item: any, index: any) => (item.checked = false));
   }
   item.checked = !item.checked;
-  formconfig1.value.cTermNme = item.checked ? item.termCnm : "";
-  formconfig1.value.cTermNo = item.termNo;
+  formconfig1.value.cTermNme = item.checked ? item.termCnm || item.planCnm : "";
+  formconfig1.value.cTermNo = item.termNo || item.planNo;
   formconfig1.value.cProdNo = item.prodNo;
   formconfig1.value.cProdNme = item.prodCnm;
 }
 //取消常用条款
 function handleStarClick(item: any) {
-  unUserUnUntionTerm({ termNo: item.termNo }).then((res) => {
+  const param = formconfig1.value.cRecordType === 2 ? {
+    planNo: item.planNo,
+    isPlan: "1",
+  } : {
+    termNo: item.planNo,
+    isPlan: "0",
+  }
+  unUserUnUntionTerm(param).then((res:any) => {
     if (res.code == "1") {
       ElMessage.success(res.message);
       handleQuery();
@@ -348,6 +356,7 @@ function handleQuery() {
     pageNum: 1,
     pageSize: 10,
     userId: JSON.parse(sessionStorage.getItem("user")).opCde,
+    isPLan: formconfig1.value.cRecordType === 2 ? "1" : "0",
   }).then((res: any) => {
     if (res.code == "1") {
       termList.value = res.result;
@@ -422,6 +431,11 @@ function handleRecordTypeChange(val:any) {
     loadOptions();
     labelNm.value = "条款";
   }
+  handleQuery()
+  formconfig1.value.cTermNme = "";
+  formconfig1.value.cTermNo = "";
+  formconfig1.value.cProdNo = "";
+  formconfig1.value.cProdNme = "";
 }
 </script>
 
