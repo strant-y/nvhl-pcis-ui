@@ -185,8 +185,14 @@ function init() {
 
   checkedIcon.value = "rgb(170, 170, 170)";
   props.termList.forEach((item: any, index: any) => {
-    if (datas.value.length && item.termNo == datas.value[0].code) {
-      checkedIcon.value = "rgb(250, 219, 20)";
+    if(props.type === 2) {
+      if (datas.value.length && item.planNo == datas.value[0].code) {
+        checkedIcon.value = "rgb(250, 219, 20)";
+      }
+    } else {
+      if (datas.value.length && item.termNo == datas.value[0].code) {
+        checkedIcon.value = "rgb(250, 219, 20)";
+      }
     }
   });
   console.log("props.datas", checkedIcon.value);
