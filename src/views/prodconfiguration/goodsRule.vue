@@ -252,7 +252,7 @@ const tableconfig = reactive<AppTableConfig>(
         // clearable: true,
       },
       {
-        prop: "ruleName",
+        prop: "cRuleCde",
         title: "规则名称",
         inputtype: "rtinput",
       },
@@ -272,7 +272,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtdatepicker",
       },
       {
-        prop: "cJfcdFlag",
+        prop: "cRuleTyp",
         title: "是否临时规则",
         inputtype: "rtselect",
         loadData: [
