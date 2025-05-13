@@ -1267,3 +1267,11 @@ export function saveProdRuleInfo(queryParams: any): AxiosPromise<any> {
   return post(`/proddef/saveProdRuleInfo`, queryParams);
 }          
 
+/**
+ * 核保人批量任职配置-配置-保存
+ *
+ * @param queryParams
+ */
+export function saveBatchUndrDtyInfo(queryParams: any): AxiosPromise<any> {
+  return post(`/proddef/saveBatchUndrDtyInfo`, queryParams);
+}
