@@ -1745,7 +1745,7 @@ const submitUnderwritingFn = () => {
   // btn.loading = true;
   const res = underwrite.value.getFromValue();
   res["user"] = user;
-  res["user"]["opRelCde"] = "10030892";
+  res["user"]["opRelCde"] = user.opCde;
   res["appNo"] = props.param.cAppNo;
   res["taskId"] = props.param.taskId;
   res["appTyp"] = props.param.cAppTyp;
