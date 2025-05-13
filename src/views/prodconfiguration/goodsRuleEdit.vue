@@ -137,6 +137,10 @@ onMounted(() => {
     }).then(() => {
       freeEditRef.value?.setValue("cProdNo", props.data.cProdNo);
     });
+  } else {
+    nextTick(() => {
+      freeEditRef.value?.setValue("cDptCde", props.data.cDptCde);
+    })
   }
 });
 
