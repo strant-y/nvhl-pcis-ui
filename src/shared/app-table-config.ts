@@ -46,7 +46,8 @@ export interface MyTableMethod {
   setFormValue: (data: any) => void;
   getTableValue(): () => any;
   removeRow: (dataId: string) => any;
-  setValueByRowKey:(props:string ,rowId: any, value:any) => void;
+  setValueByRowKey:(props:string ,rowId: any, value:any) => void; // (prop: 要素key, rowId: 行Id, value: 值)
+  deleteByRowKey:(rowId: any) => void;
   getRowById:(rowId: string) => void;
 }
 export function createTableEditConfig(

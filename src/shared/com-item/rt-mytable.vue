@@ -1,7 +1,13 @@
 <template>
   <div>
     <el-card shadow="never" class="table-container">
-      <template #header>
+      <template
+        #header
+        v-if="
+          tableConfig.productionTitle ||
+          (tableConfig.titleBtns && tableConfig.titleBtns.length > 0)
+        "
+      >
         <el-row justify="space-between">
           <el-col :span="9" v-if="!tableConfig.production">
             {{ tableConfig.title }}
@@ -86,10 +92,10 @@
                 <tr
                   v-for="(i, j) in dataList"
                   :key="j"
-                  :class="[appgrideditConfig.dragFlag ? 'handle cursor-move' : null,
-                  selectIndex === i._dataId ? 'highlight':''
-                  ]
-                  "
+                  :class="[
+                    appgrideditConfig.dragFlag ? 'handle cursor-move' : null,
+                    selectIndex === i._dataId ? 'highlight' : '',
+                  ]"
                   :style="{
                     textAlign: 'center',
                   }"
@@ -101,7 +107,9 @@
                       v-for="(btn, index) in appgrideditConfig.tableBtn"
                       :key="index"
                     >
-                      <template v-if="appgrideditConfig.tableBtnType === 'text'">
+                      <template
+                        v-if="appgrideditConfig.tableBtnType === 'text'"
+                      >
                         <a
                           @click="btn.tableClick ? btn.tableClick(i) : () => {}"
                           >{{ btn.label }}</a
@@ -115,12 +123,16 @@
                           effect="light"
                         >
                           <rtButton
-                            @click="btn.tableClick ? btn.tableClick(i) : () => {}"
+                            @click="
+                              btn.tableClick ? btn.tableClick(i) : () => {}
+                            "
                             :item="btn"
                           />
                         </el-tooltip>
                       </template>
-                      <template v-if="appgrideditConfig.tableBtnType === 'icon'">
+                      <template
+                        v-if="appgrideditConfig.tableBtnType === 'icon'"
+                      >
                         <el-tooltip
                           :disabled="btn.tooltip ? false : true"
                           :content="btn.tooltip ? btn.tooltip : undefined"
@@ -220,7 +232,9 @@
                       v-for="(btn, index) in appgrideditConfig.tableBtn"
                       :key="index"
                     >
-                      <template v-if="appgrideditConfig.tableBtnType === 'text'">
+                      <template
+                        v-if="appgrideditConfig.tableBtnType === 'text'"
+                      >
                         <a
                           @click="btn.tableClick ? btn.tableClick(i) : () => {}"
                           >{{ btn.label }}</a
@@ -234,12 +248,16 @@
                           effect="light"
                         >
                           <rtButton
-                            @click="btn.tableClick ? btn.tableClick(i) : () => {}"
+                            @click="
+                              btn.tableClick ? btn.tableClick(i) : () => {}
+                            "
                             :item="btn"
                           />
                         </el-tooltip>
                       </template>
-                      <template v-if="appgrideditConfig.tableBtnType === 'icon'">
+                      <template
+                        v-if="appgrideditConfig.tableBtnType === 'icon'"
+                      >
                         <el-tooltip
                           :disabled="btn.tooltip ? false : true"
                           :content="btn.tooltip ? btn.tooltip : undefined"
@@ -286,7 +304,7 @@ import { VueDraggable } from "vue-draggable-plus";
 import { AppTableConfig } from "../app-table-config";
 import { AppGridEditConfig } from "../app-grid-edit-config";
 
-const emits = defineEmits(["indexupdate","rowselect"]); // 告知父类,组件顺序变更
+const emits = defineEmits(["indexupdate", "rowselect"]); // 告知父类,组件顺序变更
 
 const appgrideditConfig = reactive<AppGridEditConfig>({
   editFlag: false, //是否可以编辑
@@ -328,8 +346,8 @@ function rowClick(row: any) {
   if (appgrideditConfig.editFlag) {
     editIndex.value = row._dataId;
   }
-    selectIndex.value = row._dataId;
-    emits("rowselect",row);
+  selectIndex.value = row._dataId;
+  emits("rowselect", row);
 }
 function dblclick(row: any) {
   appgrideditConfig.rowDbClickFun?.(row);
@@ -345,8 +363,10 @@ function addRow(data: any = {}) {
   const uuid = getuuid();
   data._dataId = uuid;
   dataList.value.push(data);
-  editIndex.value = uuid;
-  emits("rowselect",data);
+  if (appgrideditConfig.editFlag) {
+    editIndex.value = uuid;
+  }
+  emits("rowselect", data);
 }
 function getformRef() {
   return formRefs.value;
@@ -399,19 +419,23 @@ function setPopover(v: any, i: any, item: any) {
 function getFromValue() {
   return dataList.value;
 }
-function setValueByRowKey(props:string , rowId: any, value:any){
+function setValueByRowKey(props: string, rowId: any, value: any) {
   dataList.value?.forEach((data) => {
-      // 初始化行数字Id
-      if (data._dataId === rowId) {
-        data[props] = value;
-      }
-    });
+    // 初始化行数字Id
+    if (data._dataId === rowId) {
+      data[props] = value;
+    }
+  });
+}
+
+function deleteByRowKey(rowId: any){
+  dataList.value = dataList.value.filter((item) => item._dataId !== rowId);
 }
 
 function setFormValue(data: any) {
   dataList.value = data;
-  if(data){
-      dataList.value?.forEach((data) => {
+  if (data) {
+    dataList.value?.forEach((data) => {
       // 初始化行数字Id
       data._dataId = getuuid();
     });
@@ -431,6 +455,7 @@ defineExpose({
   setFormValue,
   removeRow,
   setValueByRowKey,
+  deleteByRowKey,
 });
 </script>
 

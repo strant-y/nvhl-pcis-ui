@@ -48,6 +48,14 @@ export function saveDistfrom(queryParams: any): AxiosPromise<any> {
   return post(`/prod/saveDistfrom`, queryParams);
 }
 
+export function getPrdTermByProd(queryParams: any): AxiosPromise<any> {
+  return post(`/proddef/getPrdTermByProd`, queryParams);
+}
+
+export function getFactorTermByProd(queryParams: any): AxiosPromise<any> {
+  return post(`/proddef/getFactorTermByProd`, queryParams);
+}
+
 /**
  * 获取组件信息列表
  *
@@ -69,13 +77,13 @@ export function queryPageComponents(queryParams: any): AxiosPromise<any> {
  * 配置批改比较项
  * **/
 export function initProdEdrRsnItemList(queryParams: any): AxiosPromise<any> {
-  return post(`proddef/initProdEdrRsnItemList`, queryParams);
+  return post(LocalBaseApi + `proddef/initProdEdrRsnItemList`, queryParams);
 }
 /**
  * 配置批改比较项保存
  * **/
 export function saveProdEdrRsnItemList(queryParams: any): AxiosPromise<any> {
-  return post(`proddef/saveProdEdrRsnItemList`, queryParams);
+  return post(LocalBaseApi + `proddef/saveProdEdrRsnItemList`, queryParams);
 }
 /**
  * 获取全部组件信息
