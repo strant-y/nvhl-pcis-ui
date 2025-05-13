@@ -98,7 +98,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
       },
       {
-        prop: "ruleName",
+        prop: "cRuleCde",
         inputtype: "rtinput",
         title: "规则名称",
       },
@@ -137,6 +137,10 @@ onMounted(() => {
     }).then(() => {
       freeEditRef.value?.setValue("cProdNo", props.data.cProdNo);
     });
+  } else {
+    nextTick(() => {
+      freeEditRef.value?.setValue("cDptCde", props.data.cDptCde);
+    })
   }
 });
 

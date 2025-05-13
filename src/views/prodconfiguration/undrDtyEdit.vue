@@ -25,7 +25,7 @@ import { useRoute } from "vue-router";
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 import BusinessCvrgTree from "@/pcis/prodRef/commodityRef/BusinessCvrgTree.vue";
 import undrDtyBussiness from "./undrDtyBussiness.vue";
-import { getPageViewByPage, getProdList, saveProdPages } from "@/api/prod";
+import { getPageViewByPage, getProdList, saveProdPages, saveBatchUndrDtyInfo } from "@/api/prod";
 import {
   AppGridEditConfig,
   AppGridEditMethod,
@@ -211,8 +211,8 @@ const gridconfig = reactive<AppGridEditConfig>(
         func: function () {
           let s = freeEditRef.value?.getFromValue();
           const pages = gridEditRef.value?.getTableValue();
-          const params = Object.assign(s, { pages: pages });
-          saveProdPages(params)
+          const params = Object.assign(s, { items: pages });
+          saveBatchUndrDtyInfo(params)
             .then((res) => {
               const { code, data, msg } = res;
               if (200 === code) {
