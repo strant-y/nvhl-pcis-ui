@@ -176,12 +176,18 @@ const method = {
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = Object.assign({
-    CPlyNo: props.objId,
-    CDataTyp: 'claim',
-  }, r);
-  pcisEdrQueryService.qryEndorseList(param)
-    .then((res) => {
+  const param = Object.assign(
+    {
+      CPlyNo: props.objId,
+      CDataTyp: "claim",
+      pageSize: 10,
+      pageNum: 1,
+    },
+    r
+  );
+  pcisEdrQueryService
+    .qryEndorseList(param)
+    .then((res:any) => {
       const { code, data, msg } = res;
       if (200 === code) {
         pageresult.list = [];

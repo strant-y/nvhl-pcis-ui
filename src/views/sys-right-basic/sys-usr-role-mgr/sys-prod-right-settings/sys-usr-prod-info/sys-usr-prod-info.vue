@@ -108,7 +108,13 @@ const tableconfig = reactive<AppTableConfig>(
         label: "配置",
         type: "primary",
         func: function () {
-          addGrtProd()
+          // console.log(222,multipleSelection.value.length)
+          // if(multipleSelection.value.length){
+            addGrtProd()
+          // }else{
+          //   ElMessage.warning('请先选择产品,再进行操作!')
+          // }
+         
         },
       }),
       createFreeButtonBase({
@@ -191,10 +197,16 @@ const handleSelectionChange = (val: any[]) => {
 
 
 const addGrtProd = () => {
+ 
+  console.log( props.getOperator._value.cOperId,     props.getOperator._value.cOwnDptCde,)
+
+
   sysOperatorMgrService.getUsrProdByUsrAndDpt({
     COperId: props.getOperator._value.cOperId,
     CDptCde: props.getOperator._value.cOwnDptCde,
   }).then((res: any) => {
+
+
     if (res && res.data) {
       treeData.value = [res.data];
       console.log('treeData.value', treeData.value);

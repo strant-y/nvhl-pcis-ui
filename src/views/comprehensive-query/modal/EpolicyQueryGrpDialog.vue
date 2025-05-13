@@ -25,7 +25,7 @@
         />
 
         <rt-button
-          :item="{
+          :item="{ 
             type: 'primary',
             label: '电子保单下载',
             func: () => {

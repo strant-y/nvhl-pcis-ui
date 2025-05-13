@@ -4,6 +4,10 @@
       <el-tree
         :data="treeData"
         :props="defaultProps"
+        :load="loadNode" 
+        :show-line="true"
+        :expand-on-click-node="false"
+            lazy accordion
         @node-click="handleNodeClick"
         ref="treeRef"
         class="tree-container"
@@ -36,6 +40,7 @@ import { saveProdInfo } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
 import { useDzModal } from "@/common/dzmodel/DzModalService";
+import { SysOperatorMgrService } from '@/views/sys-right-basic/service/sys-operator-mgr.service';
 const dzmodal = useDzModal();
 const goodsRuleEdit = defineAsyncComponent(() => import("./goodsRuleEdit.vue"));
 import {
@@ -52,6 +57,7 @@ import {
 } from "@/api/prod";
 import { inputtype } from "@/utils/utilKey";
 
+const sysOperatorMgrService = new SysOperatorMgrService();
 const route = useRoute();
 const query = ref(route.query);
 const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
@@ -61,10 +67,13 @@ const { getRules } = useValidator();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 const treeNodeId = ref("");
+import { useUserStore } from "@/store/modules/user";
+const userStore = useUserStore();
+const user = ref<any>({});
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    title: "联共保信息配置",
+    // title: "联共保信息配置",
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
@@ -78,20 +87,27 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         icon: "RefreshRight",
-        func: () => {},
+        func: () => {
+          freeEditRef.value?.resetFields();
+        },
       }),
     ],
 
     fromSchema: [
       {
         prop: "cDptCde",
-        inputtype: "rtselect",
+        inputtype: "rtinput",
+        // inputtype: "rtselect",
+        // title: "机构代码",
+        // typeCode: "PLYDPT_LIST_1",
+        // codeParam: { cIsValid: "1", userOrg: "0200000000000" },
         title: "机构代码",
-        typeCode: "PLYDPT_LIST_1",
-        codeParam: { cIsValid: "1", userOrg: "0200000000000" },
+        disabled: true,
+        rules: [getRules("required", {})],
       },
       {
-        prop: "cRuleCde",
+        // cRuleCde
+        prop: "ruleName",
         inputtype: "rtinput",
         title: "规则名称",
       },
@@ -102,12 +118,23 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         codeParam: { codeListParam: "" },
         child: "cProdNo",
         title: "产品大类",
+        func: (val: any) => {
+          // 更新产品下拉选
+          setFormItem("cProdNo", {
+            codeParam: {
+              cParCde: val,
+              cOperId: user.value?.opCde,
+              cDptCde: user.value?.companyId,
+            },
+          });
+          freeEditRef.value?.setValue("cProdNo", null);
+        },
       },
       {
         prop: "cProdNo",
         inputtype: "rtselect",
         typeCode: "PROD_LIST",
-        codeParam: { cParCde: "" },
+        codeParam: { cParCde: "999" },
         title: "产品",
       },
     ],
@@ -131,7 +158,12 @@ const tableconfig = reactive<AppTableConfig>(
         label: "增加",
         type: "success",
         func: function () {
-          dzmodal.open(goodsRuleEdit, { type: "add", data: {} }).then((res) => {
+          const cDptCde = freeEditRef.value?.getValue("cDptCde");
+          if(!cDptCde) {
+            ElMessage.error("请先选择机构");
+            return;
+          }
+          dzmodal.open(goodsRuleEdit, { type: "add", data: {cDptCde} }).then((res:any) => {
             if (res.type === "ok") {
               handleQuery();
             }
@@ -155,6 +187,7 @@ const tableconfig = reactive<AppTableConfig>(
           dzmodal
             .open(goodsRuleEdit, { type: "edit", data: row })
             .then((res) => {
+             
               if (res.type === "ok") {
                 handleQuery();
               }
@@ -168,17 +201,27 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "Delete",
         link: true,
         tableClick: (row) => {
-          delProdRuleById(row)
-            .then((res) => {
-              const { code, data, msg } = res;
-              if (200 === code) {
-                ElMessage.success("删除成功");
-                handleQuery();
-              } else {
-                ElMessage.error(msg);
-              }
+
+          ElMessageBox.confirm('确认要删除吗？该数据删除之后将无法恢复。', '提示', {
+              confirmButtonText: '删除',
+              cancelButtonText: '取消',
+              type: 'warning',
+            }).then(() => {
+              delProdRuleById(row)
+                      .then((res) => {
+                        const { code, data, msg } = res;
+                        if (200 === code) {
+                          ElMessage.success("删除成功");
+                          handleQuery();
+                        } else {
+                          ElMessage.error(msg);
+                        }
+                      })
+                      .finally(() => {});
+            }).catch(() => {
+              //防止报错
             })
-            .finally(() => {});
+     
         },
       }),
     ],
@@ -189,12 +232,27 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
       },
       {
-        prop: "clauseCode",
-        title: "产品名称",
+        // prop: "cProdNo",
+        // title: "产品名称",
+        // typeCode: "PROD_LIST_GRT",
         inputtype: "rtinput",
+        // inputtype: "rtselect",
+
+
+        prop: "cProdNo",
+        // inputtype: "rtselect",
+        title: "产品",
+        typeCode: "PROD_LIST_GRT",
+        // params: {
+        //   cParCde: "",
+        //   cOperId: user.value.opCde,
+        //   cDptCde: user.value.companyId,
+        // },
+        // loadData: [],
+        // clearable: true,
       },
       {
-        prop: "cRuleCde",
+        prop: "ruleName",
         title: "规则名称",
         inputtype: "rtinput",
       },
@@ -204,7 +262,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
       },
       {
-        prop: "tCrtTm",
+        prop: "tStaTm",
         title: "生效时间",
         inputtype: "rtdatepicker",
       },
@@ -214,9 +272,13 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtdatepicker",
       },
       {
-        prop: "cRuleTyp",
+        prop: "cJfcdFlag",
         title: "是否临时规则",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
+        loadData: [
+          {label: "是", value: "1"},
+          {label: "否", value: "0"},
+        ]
       },
     ],
   })
@@ -225,35 +287,44 @@ const tableconfig = reactive<AppTableConfig>(
 const showRelatedTermsModal = ref(false);
 const showAddTermModal = ref(false);
 
-const treeData = ref([
-  // {
-  //   label: "永安保险总公司",
-  //   id: "0200000000000",
-  //   children: [
-  //     {
-  //       label: "陕西西安分公司",
-  //       id: "0200000000001",
-  //       children: [
-  //         {
-  //           label: "碑林区分公司",
-  //         },
-  //       ],
-  //     },
-  //   ],
-  // },
-]);
+const treeData = ref<any[]>([]);
 
+// ref([
+//   // {
+//   //   label: "永安保险总公司",
+//   //   id: "0200000000000",
+//   //   children: [
+//   //     {
+//   //       label: "陕西西安分公司",
+//   //       id: "0200000000001",
+//   //       children: [
+//   //         {
+//   //           label: "碑林区分公司",
+//   //         },
+//   //       ],
+//   //     },
+//   //   ],
+//   // },
+// ]);
+
+// const defaultProps = {
+//   children: "children",
+//   label: "label",
+// };
 const defaultProps = {
-  children: "children",
-  label: "label",
+  children: 'children',
+  label: 'name',
+  isLeaf: 'leaf',
 };
 
 const handleNodeClick = (data: any) => {
-  treeNodeId.value = data.id;
+  // treeNodeId.value = 123;
+  setValue('cDptCde',data.id)
+  handleQuery()
   // tableRef.value?.setQuery({
   //   orgCode: data.id,
   // });
-  getOrgDptTreeList();
+  // getOrgDptTreeList();
 };
 
 const handleEdit = (index: number, row: any) => {
@@ -277,6 +348,203 @@ const handleDelete = (index: number, row: any) => {
     });
 };
 
+
+
+function setDisa() {
+  formconfig1.fromSchema?.forEach((e) => {
+    if (e.prop === "cProdNo" || e.prop === "cKindNo") {
+      e.disabled = true;
+    }
+  });
+}
+
+
+
+function getOrgDptTreeList() {
+  let root = '020000000000';
+  if (treeNodeId.value == "" || treeNodeId.value == undefined) {
+    treeNodeId.value = "0200000000000";
+  } else {
+    treeNodeId.value = treeNodeId.value;
+  }
+  const param = { pId: treeNodeId.value };
+  getOrgDptTreeNodeById(param)
+    .then((res) => {
+      const { code, data, msg } = res;
+      const dto = [];
+      if (200 === code) {
+        console.log(data, "data+++++++++++++++++++++++++==");
+        // treeData.value = data;
+        // treeData.value.push({
+        //                   label:data.name,
+        //                   id: data.id ,
+        //                   children: [
+        //                       {
+        //                         label: "陕西西安分公司",
+        //                         id: "0200000000001",
+        //                         children: [
+        //                           {
+        //                             label: "碑林区分公司",
+        //                           },
+        //                         ],
+        //                       },
+        //                     ],
+        //                 });   const dto = [];
+        treeData.value.push({
+          id: data.id,
+          name: root + '-' + data.name,
+          leaf: false,
+        });
+
+        // data.forEach(item => {
+        //   treeData.value.push({
+        //         id: item['id'],
+        //         name: item['id'] + '-' + item['name'],
+        //         leaf: !item.hasChildren,
+        //       })
+        // })
+   
+          // data.forEach(item => {
+          //     dto.push({
+          //       id: item['id'],
+          //       name: item['id'] + '-' + item['name'],
+          //       leaf: !item.hasChildren,
+          //     });
+          //   })
+     
+
+ 
+          // resolve(dto);
+
+
+                                 // id: res['data']['id'],
+                            // name: res['data']['name'],
+                            // hasChildren: res['data']['hasChildren']
+      } else {
+        ElMessage.error(msg);
+      }
+    })
+    .finally(() => {});
+}
+
+
+const initDptTreeList = () => {
+  // let root = '020000000000';
+  // if (user.value && user.value.companyId) {
+  //   root = user.value.companyId;
+  // }
+  // const params = {
+  //   pId: root,
+  // };
+  let root = '0200000000000';
+  if (treeNodeId.value == "" || treeNodeId.value == undefined) {
+    treeNodeId.value = "0200000000000";
+  } else {
+    treeNodeId.value = treeNodeId.value;
+  }
+  // const param = { pId: treeNodeId.value };
+  const param = { pId:"0200000000000" };
+  sysOperatorMgrService.getOrgDptTreeNodeById(param).then((res) => {
+    if (res && res['data']) {
+      if (treeData.value.length === 0) {
+        treeData.value = [];
+      }
+      const data = res['data'];
+      if (res['data']) {
+        treeData.value.push({
+          id: data.id,
+          name: data.id + '-' + res['data']['name'],
+          leaf: false,
+        });
+      }
+    }
+  }).catch((error) => {
+    ElMessage.error('后台服务异常,请联系管理员');
+  });
+};
+
+const loadNode = (node, resolve) => {
+ 
+  if (node.level === 0) {
+    return resolve([]);
+  }
+  const params = {
+    cDptCde:  node.data.id,
+    // cDptCde: '0200000000000',
+              // 0200000000000
+              // 0200000000000
+  };
+  console.log(111,params)
+ console.log(233,node.data.id.length)
+  sysOperatorMgrService.getOrgDptTreeListByPid(params).then((result) => {
+    const dto = [];
+    if (200 !== result['code']) {
+      ElMessage.error(result['msg']);
+    } else {
+      ElMessage.success(result['msg']);
+    }
+    if (result['data'] && result['data'].length > 0) {
+      result['data'].forEach(item => {
+        dto.push({
+          id: item['id'],
+          name: item['id'] + '-' + item['name'],
+          leaf: !item.hasChildren,
+        });
+      })
+    }
+
+    console.log('----------',resolve)
+    resolve(dto);
+  }).catch((error) => {
+    console.log('出错了', error);
+    ElMessage.error('后台服务异常,请联系管理员');
+  });
+};
+// const handleQuery = (flag) => {
+//   console.log('操作权限----1',flag)
+//   freeEditRef.value?.validate().then((isValid) => {
+//     if (isValid) {
+//       refreshData(flag);
+//     }
+//   })
+// };
+/** 查询 */
+function handleQuery(flag?: boolean) {
+  console.log( getFromValue().cDptCde)
+ 
+
+  freeEditRef.value?.validate().then((isValid) => {
+    if (isValid) {
+    
+
+    // if(getFromValue())
+  
+    const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
+    const s = freeEditRef.value?.getFromValue(); //获取表单数据
+    const param = Object.assign(s, r);
+    qryProdRuleList(param)
+      .then((res:any) => {
+        const { code, data, msg } = res;
+        if (200 === code) {
+          pageresult.list = data.result;
+          pageresult.total = data.total;
+        } else {
+          ElMessage.error(msg);
+        }
+      })
+      .finally(() => {});
+
+    }
+  })
+}
+onMounted(() => {
+  initDptTreeList()
+  // getOrgDptTreeList();
+  if (param.editType === "edit") {
+    setDisa();
+  }
+});
+
 function getFromValue() {
   return freeEditRef?.value?.getFromValue();
 }
@@ -297,55 +565,13 @@ function getValue(key: string) {
   return freeEditRef?.value?.getValue(key);
 }
 
-function setDisa() {
-  formconfig1.fromSchema?.forEach((e) => {
-    if (e.prop === "cProdNo" || e.prop === "cKindNo") {
-      e.disabled = true;
+function setFormItem(prop: string, config: any) {
+  formconfig1.fromSchema?.forEach((item) => {
+    if (item.prop === prop) {
+        Object.assign(item, config);
     }
   });
 }
-function getOrgDptTreeList() {
-  if (treeNodeId.value == "" || treeNodeId.value == undefined) {
-    treeNodeId.value = "0200000000000";
-  } else {
-    treeNodeId.value = treeNodeId.value;
-  }
-  const param = { pId: treeNodeId.value };
-  getOrgDptTreeNodeById(param)
-    .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
-        console.log(data, "data+++++++++++++++++++++++++==");
-        treeData = data;
-      } else {
-        ElMessage.error(msg);
-      }
-    })
-    .finally(() => {});
-}
-/** 查询 */
-function handleQuery(flag?: boolean) {
-  const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
-  const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(s, r);
-  qryProdRuleList(param)
-    .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
-        pageresult.list = data.result;
-        pageresult.total = data.total;
-      } else {
-        ElMessage.error(msg);
-      }
-    })
-    .finally(() => {});
-}
-onMounted(() => {
-  getOrgDptTreeList();
-  if (param.editType === "edit") {
-    setDisa();
-  }
-});
 
 defineExpose({
   getFromValue,

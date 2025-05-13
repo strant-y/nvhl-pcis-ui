@@ -88,7 +88,7 @@
       <el-main>
         <el-backtop :right="100" :bottom="100" />
         <el-affix
-          :offset="50"
+          :offset="80"
           style="text-align: center; padding: 5px; background: #ebedfc"
         >
           <div class="tp" style="background: #ebedfc">
@@ -207,6 +207,8 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import moment from "moment";
 import dayjs from "dayjs";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
+import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
+const policyService = new PolicyService();
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -493,7 +495,6 @@ const edrBtn = [
   createFreeButtonBase({
     label: "原保单查看",
     type: "primary",
-    id: "btnCalEdr",
     func: () => {
       getPlyPolicyFun();
     },
@@ -625,7 +626,7 @@ const uwBtn = [
       dzmodal
         .open(PreviousdrOpnList, {
           type: "Issuer",
-          objId: props.param?.cAppNo,
+          objId: props.param?.plyNo,
           prodNo: props.param?.cProdNo,
         })
         .then((res: any) => {
@@ -776,6 +777,8 @@ async function loadAfter() {
   if (props.param.pageType === "app") {
     //获取单号
     getCAppNoFun();
+    // 获取条款信息
+    getPlanCvrg();
     bthList.value = basicBtn;
     nextTick(() => {
       //保险期间初始化
@@ -1524,8 +1527,8 @@ const calcPremiumEdrSurrender = () => {
           "; 保费变化量为：" +
           res["res"]["composition"]["plyBase"][0]["Base.nPrmVar"]
       );
-      nAmt.value = res["res"]["composition"]["plyBase"][0]["Base.nAmt"]?res["res"]["composition"]["plyBase"][0]["Base.nAmt"]:0;
-      nPrm.value = res["res"]["composition"]["EdrBase"][0]["Base.nPrm"]?res["res"]["composition"]["EdrBase"][0]["Base.nPrm"]:0;
+      nAmt.value = res["res"]["composition"]["EdrBase"][0]["EdrBase.nAmt"]?res["res"]["composition"]["EdrBase"][0]["EdrBase.nAmt"]:0;
+      nPrm.value = res["res"]["composition"]["EdrBase"][0]["EdrBase.nPrm"]?res["res"]["composition"]["EdrBase"][0]["EdrBase.nPrm"]:0;
       const ops = opertaor.convertData(res);
       opertaor.setDataAll(ops);
       if (res["res"]["composition"]["EdrBase"]) {
@@ -1800,6 +1803,17 @@ function getcacheKey() {
 
 function setTmDay(tmday: any) {
   tmDay.value = tmday;
+}
+
+function getPlanCvrg() {
+  const param = { cPlanNo: props.param?.cTermNo }
+  policyService.getPlanCvrg(param).then((result:any) => {
+    if (result['code'] === 200) {
+      opertaor.getTableRefByKey("cvrg").setFormValue(result.data.cvrg);
+    } else {
+      ElMessage.error(result['msg']);
+    }
+  });
 }
 
 opertaor.setFatherPage({

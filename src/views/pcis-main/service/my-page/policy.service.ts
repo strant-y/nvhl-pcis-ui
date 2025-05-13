@@ -1524,4 +1524,7 @@ exportDist(data) {
       responseType: 'blob'
   });
 }
+listImage(data) {
+    return request.post('image/listImage', data);
+}
 }

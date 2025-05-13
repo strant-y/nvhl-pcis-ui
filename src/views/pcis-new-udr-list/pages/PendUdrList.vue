@@ -1414,6 +1414,7 @@
                         cDptCnm:row.uwDptName,
                         pageType: "PLY_UW_PROCESS_SCENE",
                         sysType:row.objExt,
+                        plyNo: row.plyNo,
                     });
                     router.push({
                         path: "/pcis/my-page",
@@ -1439,6 +1440,7 @@
                         cDptCnm:row.uwDptName,
                         pageType: "PLY_UW_PROCESS_SCENE",
                         sysType: row.objExt,
+                        plyNo: row.plyNo,
                     });
                     router.push({
                         path: "/pcis/my-page",

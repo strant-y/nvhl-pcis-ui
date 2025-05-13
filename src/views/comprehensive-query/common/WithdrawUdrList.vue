@@ -15,7 +15,8 @@
 import { useUserStore } from "@/store";
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
-
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
 import { ref } from "vue";
 import {
   AppFreeEditConfig,
@@ -52,6 +53,7 @@ const props = defineProps({
     default: false
   }
 })
+const cPard = ref(null);
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -81,13 +83,30 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         typeCode: "KIND_LIST_GRT",
         params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
         clearable: true,
+        func:(val)=>{
+          cPard.value = val;
+          codeListStore
+              .queryCodeList({
+                  codeListName: "TERM_LIST_IN_GUIDE_NEW",
+                  codeListParam:{
+                  cParCde: cPard.value,
+                  cOperId: user.value.opCde,
+                  cDptCde: user.value.companyId,
+              },
+              })
+              .then((res) => {
+                  setFormItem("prodNo", {
+                      loadData: res,
+                  });
+              });
+        }
       },
       {
         prop: "prodNo",
         inputtype: "rtselect",
         title: "条款",
-        typeCode: "PROD_LIST_GRT",
-        params: { cParCde:'', cOperId: user.value.opCde, cDptCde: user.value.companyId },
+        // typeCode: "PROD_LIST_GRT",
+        // params: { cParCde:'', cOperId: user.value.opCde, cDptCde: user.value.companyId },
         clearable: true,
       },
       {
@@ -357,6 +376,16 @@ function handleWorkFlow(row: any) {
     console.log('出错了', error);
     ElMessage.error({ message: '后台服务异常,请联系管理员', duration: 3000 });
   });
+}
+//给表单下拉项赋值
+function setFormItem(key, obj) {
+    if (obj && Object.keys(obj).length) {
+        formconfig1.fromSchema?.forEach((item) => {
+            if (item.prop === key) {
+                Object.assign(item, obj);
+            }
+        });
+    }
 }
 </script>
 

@@ -431,6 +431,7 @@ const saveData = (call?) => {
         if(!!call){
             param['cUndrStatus'] = '1';
         }
+        save()
       //调用接口
         policyService.saveOrUpdatePlan(param).then(result => {
             if (result['code'] === 200) {

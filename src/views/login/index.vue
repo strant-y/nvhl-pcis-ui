@@ -1,68 +1,24 @@
 <template>
   <div class="login-container">
     <el-row class="login-container-img">
-      <el-col class="logo-img">
+      <div class="login-left">
+      <!-- Logo -->
+      <div class="logo">
         <img src="../../assets/images/logo.png" alt="logo" />
-        <!-- <div class="system-name">
-          <h2>永安财产保险承保系统</h2>
-          <p>YONG AN Property Insurance Underwriting System</p>
-        </div> -->
-        <div class="illustration">
-          <!-- <img src="../../assets/images/illustration.png" alt="illustration" /> -->
+      </div>
+      <!-- 系统名称 -->
+      <div class="system-name">
+        <div class="name-cn">
+          <span class="text-class">永安财产保险承保系统</span>
         </div>
-      </el-col>
-      <!-- <el-col class="logo-text">
-        <el-row><span class="text-class">财产保险</span>承保系统</el-row>
-        <el-row class="text-en"
-          ><span class="text-class">Property Insurance </span>Underwriting
-          System
-        </el-row>
-      </el-col> -->
-
-      <!-- <el-col class="ewm-img">
-        <el-row>
-          <div
-            style="display: flex; flex-direction: column; align-items: center"
-          >
-            <img
-              width="100"
-              height="100"
-              src="../../assets/images/m_ui_ewm.png"
-              alt="移动端入口"
-            />
-            <div class="w-200px text-center mt-5">
-              <span>请使用手机扫描二维码进入移动端事故预防平台</span>
-            </div>
-          </div>
-        </el-row>
-      </el-col> -->
-    
-    <div class="login-container-form" >
-      <!-- 登录表单 -->
-      <el-card
-        class="!border-none !bg-transparent !rounded-4% w-100 <sm:w-85 card_self"
-      >
-        <div>
-          <!-- <h2>你好，欢迎使用平台</h2> -->
-          <h2>账号登录</h2>
+        <div class="name-en">
+          <span class="text-en">YONG AN Property Insurance Underwriting System</span>
         </div>
-        <!-- <el-row class="tab-container" justify="center">
-          <el-col
-            class="tab-item"
-            :class="curIndex === index ? 'active' : ''"
-            :span="12"
-            v-for="(item, index) in tabList"
-            :key="item.id"
-            @click="tabHandle(index)"
-          >
-            <el-row justify="center">{{ item.name }}</el-row>
-          </el-col> -->
-          <!-- <el-col class="tab-item" :span="12">
-        <el-row justify="center">第三方登录</el-row>
-      </el-col> 
-        </el-row>-->
-        <!-- <el-tabs v-model="activeName" @tab-click="changeInside">
-        <el-tab-pane label="内部登录" name="inside" bor> -->
+      </div>
+    </div>
+      <div class="login-container-form" >
+        <el-card class="login-card">
+            <h2>账号登录</h2>
         <el-form
           v-if="inside"
           ref="loginFormRef"
@@ -90,11 +46,6 @@
             </div>
           </el-form-item>
           <!-- 密码 -->
-          <!-- <el-tooltip
-              :visible="isCapslock"
-              content="Caps lock is On"
-              placement="right"
-            > -->
           <el-form-item prop="password">
             <div class="flex-y-center w-full">
               <span class="icon-box">
@@ -113,7 +64,6 @@
               />
             </div>
           </el-form-item>
-          <!-- </el-tooltip> -->
           <!-- 验证码 -->
           <el-form-item v-if="verifyFlag" prop="captchaCode">
             <div class="flex-y-center w-full">
@@ -166,7 +116,6 @@
             >{{ $t("login.submit") }}
           </el-button>
         </el-form>
-        <!-- </el-tab-pane> -->
         <!-- <el-tab-pane label="第三方登录" name="threePartyLogin"> -->
         <el-form
           v-else
@@ -270,8 +219,6 @@
           
         </el-form>
         <el-checkbox v-model="agreeTerms">已阅读并同意《用户服务协议》和《隐私政策》</el-checkbox>
-        <!-- </el-tab-pane> -->
-        <!-- </el-tabs> -->
       </el-card>
     </div>
   </el-row>
@@ -585,109 +532,130 @@ onMounted(() => {});
 .login-container {
   width: 100%;
   height: 100vh;
-  
-  // margin-top: 20px;
   display: flex;
+  background: url("@/assets/images/logo1.png") no-repeat center center /cover;
+
   .login-container-img {
+    display: flex; /* 确保 .login-container-img 也是 Flex 容器 */
     width: 100%;
-    height: 100vh;
-    background: url("@/assets/images/logo1.png") no-repeat center center /
-      cover;
-    .logo-img {
-      display: flex;
-      margin: 80px 0 0 150px;
+    height: 100%;
+  }
+
+  .login-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 20px;
+
+    .logo {
       img {
-        width: 300px;
-        height: 75px;
-        margin-left: -50px;
-        margin-top: -20px;
+        width: 200px; // 根据实际Logo大小调整
+        height: auto;
       }
     }
-    .logo-text {
-      font-size: 38px;
-      font-weight: 500;
-      margin: 100px 0 0 150px;
-      letter-spacing: 2px;
-      .text-en {
-        font-size: 20px;
+
+    .system-name {
+      position: absolute;
+      top: 50%; // 垂直居中
+      left: 50%; // 水平居中
+      transform: translate(-50%, -50%); // 精确垂直居中调整
+      text-align: center;
+      .name-cn, .name-en {
+        display: block; // 确保换行
       }
       .text-class {
-        // color: #ff8c00;
+        font-size: 32px;
+        font-weight: bold;
+        color: #3a76c6;
+      }
+      .text-en {
+        font-size: 15px;
         color: #3a76c6;
       }
     }
-    .ewm-img {
-      margin: 50px 0 0 150px;
-      letter-spacing: 2px;
-    }
   }
+
   .login-container-form {
-    width: 20%;
-    margin: 0 20% 30% 70%;
-    h2 {
-      margin-left: 16px;
-      text-align: center;
-    }
-    .el-card.is-always-shadow {
-      box-shadow: none;
-    }
-    .el-card__body {
-      padding-top: 0;
-    }
-    .login-form {
-      margin-top: 20px;
-    }
-  }
-  .el-form-item {
-    border: 1px solid #d0d2d9;
-    border-radius: 8px;
-    .icon-box {
-      border-radius: 8px 0 0 8px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 21%;
-      height: 48px;
-      font-size: 18px;
-      background-color: #e3e3e3;
-    }
-  }
-  :deep(.el-input) {
-    .el-input__wrapper {
-      padding: 0 0 0 15px;
-      background-color: transparent;
-      box-shadow: none;
-      &.is-focus,
-      &:hover {
-        box-shadow: none !important;
+    width: 400px; // 登录表单宽度
+    margin-left: auto; // 靠右展示
+    display: flex;
+    align-items: center; // 垂直居中
+    height: 100%;
+    position: static; /* 移除 position 干扰 */
+    float: none; /* 移除 float 干扰 */
+    margin-right: 50px; // 在最右侧留有50px的空间
+
+    .login-card {
+      margin: auto; // 垂直居中
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+
+      h2 {
+        text-align: center;
+        margin-bottom: 20px;
       }
 
-      input:-webkit-autofill {
-        /* 通过延时渲染背景色变相去除背景颜色 */
-        transition: background-color 1000s ease-in-out 0s;
+      .login-form {
+        width: 100%;
       }
-    }
-  }
-  .tab-container {
-    height: 48px;
-    background-color: #f8f8f8;
-    border-radius: 12px;
-    box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.12);
-    .tab-item {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      transition: all 0.2s linear;
-    }
-    .active {
-      background-color: #fff;
-      // color: #ff8c00;
-      color: #3a76c6;
-      border-radius: 12px;
     }
   }
 }
+
+.el-form-item {
+  border: 1px solid #d0d2d9;
+  border-radius: 8px;
+  .icon-box {
+    border-radius: 8px 0 0 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 21%;
+    height: 48px;
+    font-size: 18px;
+    background-color: #e3e3e3;
+  }
+}
+
+:deep(.el-input) {
+  .el-input__wrapper {
+    padding: 0 0 0 15px;
+    background-color: transparent;
+    box-shadow: none;
+    &.is-focus,
+    &:hover {
+      box-shadow: none !important;
+    }
+
+    input:-webkit-autofill {
+      transition: background-color 1000s ease-in-out 0s;
+    }
+  }
+}
+
+.tab-container {
+  height: 48px;
+  background-color: #f8f8f8;
+  border-radius: 12px;
+  box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.12);
+  .tab-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s linear;
+  }
+  .active {
+    background-color: #fff;
+    color: #3a76c6;
+    border-radius: 12px;
+  }
+}
+
 .getCaptcha_ {
   cursor: pointer;
 }

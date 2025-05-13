@@ -58,3 +58,20 @@ export function previewFile(url: string) {
   return get(url);
 }
 
+/**
+ * 读取身份证(身份证、外国人永久居留身份证)
+ * @param fileData
+ */
+export function readFile(fileData: UploadFileData): AxiosPromise<FileInfo> {
+  const formData = new FormData();
+  formData.append("file", fileData.file);
+  formData.append("type", fileData.type);
+  return request({
+    url:  `/ocr/readFile`,
+    method: "post",
+    data: formData,
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+}

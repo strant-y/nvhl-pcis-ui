@@ -19,6 +19,8 @@ import { useRouter, useRoute } from "vue-router";
 const { getRules } = useValidator();
 const router = useRouter();
 const route = useRoute();
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
 import { ref } from "vue";
 import {
   AppFreeEditConfig,
@@ -403,6 +405,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                           item.hidden = true;
                       }
                   });
+                  codeListStore
+                    .queryCodeList({
+                        codeListName: "TERM_LIST_IN_GUIDE_NEW",
+                        codeListParam:{
+                        cParCde: cPard.value,
+                        cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+                        cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+                    },
+                    })
+                    .then((res) => {
+                        setFormItem("cProdNo", {
+                            loadData: res,
+                        });
+                    });
               },
           },
           {
@@ -413,12 +429,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               rules: [{ type: "required" }],
               filterable: true,
               clearable: true,
-              typeCode: "TERM_LIST_IN_GUIDE_NEW",
-              codeParam: {
-                  cParCde: cPard.value,
-                  cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
-                  cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
-              },
+            //   typeCode: "TERM_LIST_IN_GUIDE_NEW",
+            //   codeParam: {
+            //       cParCde: cPard.value,
+            //       cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+            //       cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+            //   },
               func: (val) => {
                   formconfig1.fromSchema?.forEach((item) => {
                       if (
