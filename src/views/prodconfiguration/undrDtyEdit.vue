@@ -53,6 +53,7 @@ const { getRules } = useValidator();
 const dialogVisible = ref(true);
 const gridEditRef = ref<AppGridEditMethod | null>(null);
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
+const cDptCde = ref("");
 
 const formconfig = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -121,7 +122,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         },
       },
       {
-        prop: "cDptCde",
+        prop: "cDptCnm",
         inputtype: "rtselect",
         title: "核保任职机构",
         rules: [getRules("required", { change: true })],
@@ -141,7 +142,8 @@ const formconfig = reactive<AppFreeEditConfig>(
                     },
                   ],
                 };
-                freeEditRef.value?.setValue("cDptCde", selectObj.name);
+                freeEditRef.value?.setValue("cDptCnm", selectObj.name);
+                cDptCde.value = selectObj.id;
               }
             });
           },
@@ -211,7 +213,7 @@ const gridconfig = reactive<AppGridEditConfig>(
         func: function () {
           let s = freeEditRef.value?.getFromValue();
           const pages = gridEditRef.value?.getTableValue();
-          const params = Object.assign(s, { items: pages });
+          const params = Object.assign(s, { items: pages, cDptCde: cDptCde.value });
           saveBatchUndrDtyInfo(params)
             .then((res) => {
               const { code, data, msg } = res;
