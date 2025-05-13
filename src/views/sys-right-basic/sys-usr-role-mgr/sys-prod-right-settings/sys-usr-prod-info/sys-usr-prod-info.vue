@@ -171,8 +171,10 @@ const refreshData = (reset = false) => {
   const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign({}, s, r, {
-    COperId: props.getOperator._value.cOperId,
-    CDptCde: props.getOperator._value.cOwnDptCde,
+    // COperId: props.getOperator._value.cOperId,
+    cOperId: props.getOperator._value.cOperId,
+    // CDptCde: props.getOperator._value.cOwnDptCde,
+    cDptCde: props.getOperator._value.cOwnDptCde,
   });
   sysOperatorMgrService.getUsrProdList(param).then((res: any) => {
     if (res && res.code === 200) {

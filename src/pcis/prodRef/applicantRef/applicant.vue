@@ -66,6 +66,12 @@ onMounted(() => {
       setFormItem("Applicant.cShareholderNature", { hidden: true, rules: null });
       setFormItem("Applicant.cShareholderCategory", { hidden: true, rules: null });
     }
+
+    // 处理邮编 
+    setFormItem("Applicant.cZipCde", {  rules: [ getRules("signlessInt", {}), getRules("specifyLength", {len: 6})], });
+    //移动手机校验
+    setFormItem("Applicant.cMobile", { rules: [getRules("phoneNo", {})] });
+    
   });
 
 });
@@ -249,7 +255,12 @@ const method = {
   InsureChange: (val) => {
     if (val == "0") {
       productStore.setcClntMrk(val);
+      // 办理人
       setFormItem("Applicant.cCntrNme", { rules: [getRules("required", {})] });
+      setFormItem("Applicant.tOperaterCertfEndTm", { rules: [getRules("required", {})] });
+      setFormItem("Applicant.cOperaterCertfTyp", { rules: [getRules("required", {})] });
+      setFormItem("Applicant.cOperaterCertfCde", { rules: [getRules("required", {})] });
+
       setFormItem("Applicant.cParticiinsocTyp", {
         rules: [getRules("required", {})],
       });
@@ -304,7 +315,7 @@ const method = {
       });
       // 为法人 移动电话不填
       setFormItem("Applicant.cMobile", {
-        rules: null
+        rules: [getRules("phoneNo", {})]
       });
 
       // 是否个体工商户
@@ -312,6 +323,7 @@ const method = {
         rules: null
       });
     } else {
+
       setFormItem("Applicant.cWorkDpt", { disabled: true, rules: null });
       setFormItem("Applicant.cIsMicroEntpris", {
         disabled: true,
@@ -333,22 +345,34 @@ const method = {
       });
       setValue("Applicant.cGreenIndustryCustomers", "");
       setValue("Applicant.cIsMicroEntpris", "");
-      // setValue("Applicant.cCertfCls", "");
+        //是否分支机构
+      setValue("Applicant.cIsBranch", '1');
+
       setFormItem("Applicant.cCntrNme", { rules: null });
+      setFormItem("Applicant.tOperaterCertfEndTm", { rules: null });
+      setFormItem("Applicant.cOperaterCertfTyp", { rules: null });
+      setFormItem("Applicant.cOperaterCertfCde", { rules:null});
+
       setFormItem("Applicant.cCntrCertfCde", { rules: null });
 
       setFormItem("Applicant.cTrdCde", {
         rules: null
       });
 
-      // 个人 移动电话必填
+      // 个人 移动电话必填 
       setFormItem("Applicant.cMobile", {
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {}),
+        getRules("phoneNo", {})
+        ],
       });
 
       setFormItem("Applicant.cIsIndvduBiz", {
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {})
+     
+        ],
       });
+
+
       codeListStore
         .queryCodeList({
           codeListName: "NATURAL_CERTIFICATE_CACHE",
@@ -469,23 +493,24 @@ const method = {
   },
   tCertMrkChecked: (val) => {
     if (val == "1") {
-      setValue(
-        "Applicant.tCertfBgnDate",
-        moment(new Date("2099-12-31")).format("YYYY-MM-DD HH:mm:ss")
-      );
+      // setValue(
+      //   "Applicant.tCertfBgnDate",
+      //   moment(new Date("2099-12-31")).format("YYYY-MM-DD HH:mm:ss")
+      // );
       setValue(
         "Applicant.tCertfEndDate",
         moment(new Date("2099-12-31")).format("YYYY-MM-DD HH:mm:ss")
       );
+      setFormItem("Applicant.tCertfEndDate", { disabled: true, });
     } else {
       setValue("Applicant.tCertfBgnDate", "");
       setValue("Applicant.tCertfEndDate", "");
     }
   },
   mobileChange: (val) => {
-    if (val) {
-      setFormItem("Applicant.cMobile", { rules: [getRules("phoneNo", {})] });
-    }
+    // if (val) {
+    //   setFormItem("Applicant.cMobile", { rules: [getRules("required", {}),getRules("phoneNo", {})] });
+    // }
   },
   emailChange: (val) => {
     if (val) {
