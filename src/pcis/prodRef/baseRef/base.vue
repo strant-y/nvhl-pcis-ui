@@ -116,8 +116,7 @@ const method = {
       setValue("Base.cDisptSttlOrg", "提交____仲裁委员会");
     }else{
       setFormItem("Base.cDisptSttlOrg", { disabled: true });
-      setValue("Base.cDisptSttlOrg", "");
-      
+      setValue("Base.cDisptSttlOrg", "");   
     }
     
   },

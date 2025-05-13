@@ -98,7 +98,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
       },
       {
-        prop: "cRuleCde",
+        prop: "ruleName",
         inputtype: "rtinput",
         title: "规则名称",
       },
