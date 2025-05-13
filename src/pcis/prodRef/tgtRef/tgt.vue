@@ -1,5 +1,4 @@
 <template>
-  123123
   <app-free-edit :freeEditConfig="formconfig1" ref="tgtEditRef" />
 </template>
 
