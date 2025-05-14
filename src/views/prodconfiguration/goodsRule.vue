@@ -107,7 +107,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       },
       {
         // cRuleCde
-        prop: "ruleName",
+        prop: "cRuleCde",
         inputtype: "rtinput",
         title: "规则名称",
       },
@@ -232,27 +232,13 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
       },
       {
-        // prop: "cProdNo",
-        // title: "产品名称",
+        prop: "cProdName",
+        title: "产品",
         // typeCode: "PROD_LIST_GRT",
         inputtype: "rtinput",
-        // inputtype: "rtselect",
-
-
-        prop: "cProdNo",
-        // inputtype: "rtselect",
-        title: "产品",
-        typeCode: "PROD_LIST_GRT",
-        // params: {
-        //   cParCde: "",
-        //   cOperId: user.value.opCde,
-        //   cDptCde: user.value.companyId,
-        // },
-        // loadData: [],
-        // clearable: true,
       },
       {
-        prop: "ruleName",
+        prop: "cRuleCde",
         title: "规则名称",
         inputtype: "rtinput",
       },
@@ -272,7 +258,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtdatepicker",
       },
       {
-        prop: "cJfcdFlag",
+        prop: "cRuleTyp",
         title: "是否临时规则",
         inputtype: "rtselect",
         loadData: [
@@ -526,7 +512,11 @@ function handleQuery(flag?: boolean) {
       .then((res:any) => {
         const { code, data, msg } = res;
         if (200 === code) {
-          pageresult.list = data.result;
+          pageresult.list = data.result.map((item:any) => ({
+            ...item,
+            cProdName: item.cProdName ? item.cProdNo + " " + item.cProdName : item.cProdNo,
+
+          }));
           pageresult.total = data.total;
         } else {
           ElMessage.error(msg);

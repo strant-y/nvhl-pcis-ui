@@ -120,7 +120,7 @@ const tableconfig = reactive<AppTableConfig>(
         id: "score",
         label: "设置产品权限",
         type: "primary",
-        func: function () {
+        func: function () { 
           if(operatorData.value) {
             dzmodal.open(SysProdRightSettings, { operatorData: operatorData }).then((res) => {
               if (res.type === "ok") {

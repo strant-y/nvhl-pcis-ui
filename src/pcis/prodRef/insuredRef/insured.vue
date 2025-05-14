@@ -61,6 +61,11 @@ onMounted(() => {
       setFormItem("Insured.cShareholderName", { hidden: true, rules: null });
       setFormItem("Insured.cShareholderCategory", { hidden: true, rules: null });
     }
+
+    // 处理邮编 
+    setFormItem("Insured.cZipCde", {  rules: [ getRules("signlessInt", {}), getRules("specifyLength", {len: 6})], });
+    // 移动电话
+    setFormItem("Insured.cMobile", { rules: [getRules("phoneNo", {})] });
 });
 function setFormItem(key, obj) {
   if (obj && Object.keys(obj).length) {
@@ -351,6 +356,9 @@ const method = {
         case "Applicant.cShareholderNature":
           insuredValue["Insured.cShareholderNature"] = applicantValue[k];
           break;
+        case "Applicant.cMrgCde":
+          insuredValue["Insured.cMrgCde"] = applicantValue[k];
+          break;
 
 
 
@@ -427,6 +435,7 @@ const method = {
     checkUser();
     // val  0法人 1个人
     if (val == "0") {
+   
       // setValue("Insured.cCertfCls", "");
       setFormItem("Insured.cCntrNme", { rules: [getRules("required", {})] });
       setFormItem("Insured.cCntrCertfCde", {
@@ -460,10 +469,8 @@ const method = {
         rules: [getRules("required", {})],
       });
 
-      // 移动电话
-      setFormItem("Insured.cMobile", {
-        rules: null
-      });
+        // 移动电话
+        setFormItem("Insured.cMobile", { rules: [getRules("phoneNo", {}) ]});
 
       codeListStore
         .queryCodeList({
@@ -505,6 +512,7 @@ const method = {
 
 
     } else {
+
       setFormItem("Insured.cIsMicroEntpris", {
         disabled: true,
       });
@@ -541,10 +549,12 @@ const method = {
       setFormItem("Insured.cTrdCde", {
         rules: null
       });
+        // 是否分支机构
+      setValue("Insured.cIsBranch", '1');
 
-      // 个人 移动电话必填
+      // 个人 移动电话必填          
       setFormItem("Insured.cMobile", {
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {}),getRules("phoneNo", {})],
       });
       codeListStore
         .queryCodeList({
@@ -712,24 +722,25 @@ const method = {
   tCertMrkChecked: (val) => {
 
     if (val == "1") {
-      setValue(
-        "Insured.tCertfBgnDate",
-        moment(new Date("2099-12-31")).format("YYYY-MM-DD HH:mm:ss")
-      );
+      // setValue(
+      //   "Insured.tCertfBgnDate",
+      //   moment(new Date("2099-12-31")).format("YYYY-MM-DD HH:mm:ss")
+      // );
       setValue(
         "Insured.tCertfEndDate",
         moment(new Date("2099-12-31")).format("YYYY-MM-DD HH:mm:ss")
       );
+      setFormItem("Insured.tCertfEndDate", { disabled: true, });
     } else {
       setValue("Insured.tCertfBgnDate", "");
       setValue("Insured.tCertfEndDate", "");
     }
   },
-  mobileChange: (val) => {
-    if (val) {
-      setFormItem("Insured.cMobile", { rules: [getRules("phoneNo", {})] });
-    }
-  },
+  // mobileChange: (val) => {
+  //   if (val) {
+  //     setFormItem("Insured.cMobile", { rules: [getRules("phoneNo", {})] });
+  //   }
+  // },
   // 是否绿色产业客户change
   InsuredIsGreen: (val) => {
     // 控制绿色产业细分列表是否必填
