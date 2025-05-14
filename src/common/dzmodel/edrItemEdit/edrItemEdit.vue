@@ -114,7 +114,7 @@ const clickBtn = ref<Array<FreeButtonBase>>([
           ElMessage.warning("请先选择需要操作的条款/责任!再进行保存操作!");
           return;
         }
-        newparam["cKeyNo"] = key["cKeyNo"];
+        newparam["updateKey"] = key;
       } else {
         ds = tableRef.value?.getFromValue();
       }
@@ -134,6 +134,7 @@ const clickBtn = ref<Array<FreeButtonBase>>([
       sel["selectFactor"].forEach((v: any, key: any) => {
         const obj: any = {};
         obj["CGroup"] = v.cGroup;
+        obj["CFldId"] = v.cFldId;
         obj["CFactorKey"] = v["c_pk_id"];
         obj["CEdrItem"] = v["c_factor_prop"];
         obj["CFactorTitle"] = v["c_factor_title"];

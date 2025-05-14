@@ -48,6 +48,7 @@
                         deleteData(k, r);
                       }
                     "
+                    :faters="faters"
                     :ref="
                       (res) => {
                         tremTemplateRefs[k + 'm' + index] = res;
@@ -81,6 +82,7 @@
                           deleteData(k, r);
                         }
                       "
+                      :faters="faters"
                       :ref="
                         (res) => {
                           tremTemplateRefs[k + 'a1' + index] = res;
@@ -163,6 +165,7 @@ import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { prodTemple } from "./titleTemple";
 import { codeListViewStore } from "@/store";
 import { qryProdRelTermRiskList } from "@/api/prod";
+import { getEdrRsnTermItem } from "@/api/query";
 const codeListStore = codeListViewStore();
 const disAbledFlag = ref(false);
 
@@ -209,30 +212,33 @@ function updateTitle() {
       const str = prodTemple.value.default;
       let sumobj = 0;
       let sumprm = 0;
-      const m = terms['m']; // 主条款
-      if(m && m.length > 0){
+      const m = terms["m"]; // 主条款
+      if (m && m.length > 0) {
         m.forEach((item: any) => {
-          sumobj += item['Term.nInsuredCount']?item['Term.nInsuredCount'] : 0;
-          sumprm += (item['Term.nInsuranceFee']?item['Term.nInsuranceFee'] : 0);
-        })
+          sumobj += item["Term.nInsuredCount"] ? item["Term.nInsuredCount"] : 0;
+          sumprm += item["Term.nInsuranceFee"] ? item["Term.nInsuranceFee"] : 0;
+        });
       }
 
-      const a1 = terms['a1']; // 扩展类
+      const a1 = terms["a1"]; // 扩展类
 
-      if(a1 && a1.length > 0){
+      if (a1 && a1.length > 0) {
         a1.forEach((item: any) => {
-          sumprm += (item['Term.nInsuranceFee']?item['Term.nInsuranceFee'] : 0);
-        })
+          sumprm += item["Term.nInsuranceFee"] ? item["Term.nInsuranceFee"] : 0;
+        });
       }
 
-      const a2 = terms['a2']; // 限制类
-      if(a2 && a2.length > 0){
+      const a2 = terms["a2"]; // 限制类
+      if (a2 && a2.length > 0) {
         a2.forEach((item: any) => {
-          sumprm += (item['Term.nInsuranceFee']?item['Term.nInsuranceFee'] : 0);
-        })
+          sumprm += item["Term.nInsuranceFee"] ? item["Term.nInsuranceFee"] : 0;
+        });
       }
 
-      const filledString = fillTemplate(str, { sumPrm: sumprm, sumObjs: sumobj });
+      const filledString = fillTemplate(str, {
+        sumPrm: sumprm,
+        sumObjs: sumobj,
+      });
       showTitleMap.value[k] = filledString;
     }
   });
@@ -288,6 +294,56 @@ onMounted(async () => {
     });
   }
 });
+
+const edrItem = ref<[key: string, value: Array<any>] | any>({});
+function updateEdrItem(terms: any[]) {
+  if (
+    parparam.pageType === "EDR_APP_NEW_SCENE" ||
+    parparam.pageType === "EDR_APP_MODIFY_BOUNCED_SCENE" ||
+    parparam.pageType === "TEMPORARY_DEPOSIT"
+  ) {
+    const res = {
+      CProdNo: parparam.cProdNo,
+      CDptCde: parparam.cDptCde,
+      CRsnCde: parparam.cRsnCde,
+      CRsnDetailCde: parparam.cRsnDetailCde,
+      CEdrType: parparam.cEdrType,
+      CGrpMrk: parparam.cGrpMrk,
+      terms: terms,
+    };
+    getEdrRsnTermItem(res).then((res: any) => {
+      if (res["code"] == "200") {
+        const { data } = res;
+        edrItem.value = data.data;
+        showFlush();
+      } else {
+        ElMessage.error(res.msg);
+      }
+    });
+  }
+}
+
+function updateBtn() {
+  const unbut = getndisAbleConfig("null");
+  if (unbut && unbut.length > 0) {
+    cardconfig.value.endBtns?.forEach((item: any) => {
+      const t = unbut.find((un: any) => un["cEdrItem"] === item.id);
+      if (t) {
+        item.hidden = false;
+      }
+    });
+    cardconfig.value.titleBtns?.forEach((item: any) => {
+      const t = unbut.find((un: any) => un["cEdrItem"] === item.id);
+      if (t) {
+        item.hidden = false;
+      }
+    });
+    Object.keys(btnItem.value).forEach((k: any) => {
+      const t = unbut.find((un: any) => un["cEdrItem"] === k + "_btn");
+      btnItem.value[k].hidden = false;
+    });
+  }
+}
 
 // 绑定方法
 const method = {
@@ -486,10 +542,12 @@ function getFromValue() {
 }
 
 function setFormValue(value: any) {
+  const terms: any[] = [];
   Object.assign(planData.value, {});
   let plandata: { [key: string]: any } = {};
   value.forEach((item: any) => {
     const planKey = item["Term.cPlanNo"];
+    terms.push(item["Term.cClauseCode"]);
     let creData = JSON.parse(JSON.stringify(item));
     creData["riskList"] = creData["Term.riskList"];
     delete creData["Term.riskList"];
@@ -504,6 +562,7 @@ function setFormValue(value: any) {
   Object.keys(plandata).forEach((planNo: any) => {
     refushData(planNo, plandata[planNo]);
   });
+  updateEdrItem(terms);
 }
 
 function validate() {}
@@ -512,6 +571,7 @@ function showFlush() {
   Object.keys(tremTemplateRefs.value).forEach((item) => {
     tremTemplateRefs.value[item].dataInit();
   });
+  updateBtn();
 }
 function getTableValue(rowId: number, key: string) {}
 
@@ -542,16 +602,24 @@ function setDisabledAll() {
 }
 function setUnDisabledByKeyList(key: any) {
   cardconfig.value.endBtns?.forEach((item: any) => {
-    if ((item.id = key)) {
+    if ((item.id === key)) {
       item.hidden = false;
     }
   });
   cardconfig.value.titleBtns?.forEach((item: any) => {
-    if ((item.id = key)) {
+    if ((item.id === key)) {
       item.hidden = false;
     }
   });
 }
+
+function getndisAbleConfig(key: any) {
+  return edrItem.value[key];
+}
+
+const faters = ref({
+  getndisAbleConfig: getndisAbleConfig,
+});
 
 defineExpose({
   getFromValue,

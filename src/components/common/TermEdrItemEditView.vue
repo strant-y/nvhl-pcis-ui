@@ -144,17 +144,27 @@ const factorconfig = reactive<AppTableConfig>(
           const s = res.find(
             (item: any) => item.c_factor_prop === b.cFactorProp
           );
-          console.log(b);
+
           if (v === "1") {
             if (s) {
               tableRef.value?.setValueByRowKey("isChecked", s._dataId, v);
             } else {
+              let keyNo = selectNodeObj.value["cKeyNo"];
+
+              let k1 = keyNo;
+              let k2 = null;
+              if (selectNodeObj.value.ctype === "2") {
+                const termNo = sn.value["parent"]["data"]["cKeyNo"];
+                k1 = termNo;
+                k2 = keyNo;
+              }
               tableRef.value?.addRow({
                 c_factor_inputtype: b.cFactorInputtype,
                 c_factor_prop: b.cFactorProp,
                 c_factor_title: b.cFactorTitle,
                 c_pk_id: b.cPkId,
-                cGroup: selectNodeObj.value["cKeyNo"],
+                cGroup: k1,
+                cFldId: k2,
                 isChecked: "1",
               });
             }
@@ -254,7 +264,7 @@ async function initSelectData() {
   };
 
   if (selectNodeObj.value["cKeyNo"]) {
-    param["cKeyNo"] = selectNodeObj.value["cKeyNo"];
+    param["updateKey"] = getselectKey();
   }
   const res: any = await initProdEdrRsnItemList(param);
   const { code, data, msg } = res;
@@ -283,17 +293,16 @@ async function initSelectData() {
           element.isChecked = "2";
         }
         planBtn.forEach((e: any) => {
-          if (e.c_factor_prop === element.c_factor_prop) 
-          element.c_factor_title = e.c_factor_title
+          if (e.c_factor_prop === element.c_factor_prop)
+            element.c_factor_title = e.c_factor_title;
         });
         tempBtn.forEach((e: any) => {
-          if (e.c_factor_prop === element.c_factor_prop) 
-          element.c_factor_title = e.c_factor_title
+          if (e.c_factor_prop === element.c_factor_prop)
+            element.c_factor_title = e.c_factor_title;
         });
         addData.push(element);
       });
     }
-    console.log(addData);
     tableRef.value?.setFormValue(addData);
   } else {
     ElMessage.error(msg);
@@ -301,8 +310,10 @@ async function initSelectData() {
 }
 
 const selectNodeObj = ref<any>({});
+const sn = ref<any>({});
 async function selectNode(a: any, b: any) {
   selectNodeObj.value = a;
+  sn.value = b;
   await initSelectData();
   mainRef.value?.setCheckedKeys([a.cKeyNo], false);
   let parm = Object.assign({}, a);
@@ -336,7 +347,14 @@ function getselectCol() {
 }
 
 function getselectKey() {
-  return selectNodeObj.value;
+  const cKeyNo = selectNodeObj.value["cKeyNo"];
+  let par: any = { cKeyNo: cKeyNo, ctype: selectNodeObj.value.ctype };
+  if (selectNodeObj.value.ctype === "2") {
+    const termNo = sn.value["parent"]["data"]["cKeyNo"];
+    par["termNo"] = termNo;
+  }
+
+  return par;
 }
 function fail() {
   emits("handleClose");

@@ -245,6 +245,9 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  faters: {
+    type: Object,
+  },
 });
 
 const emit = defineEmits(["update:modelValue", "delete"]);
@@ -455,15 +458,15 @@ function getProp(col: any) {
   let fact: any = JSON.parse(JSON.stringify(factormap.value[factorId]));
   // 将方法回填到item中
   Object.keys(factormap.value[factorId]).forEach((k: any) => {
-    if(factormap.value[factorId][k]['func']){
-      fact[k]['func'] = factormap.value[factorId][k]['func']
+    if (factormap.value[factorId][k]["func"]) {
+      fact[k]["func"] = factormap.value[factorId][k]["func"];
     }
-    if(factormap.value[factorId][k]['tableClick']){
-      fact[k]['tableClick'] = factormap.value[factorId][k]['tableClick']
+    if (factormap.value[factorId][k]["tableClick"]) {
+      fact[k]["tableClick"] = factormap.value[factorId][k]["tableClick"];
     }
   });
-  fact.disabled = col['cPorpDisabled'];
-  fact.required = col['cPorpRequired'];
+  fact.disabled = col["cPorpDisabled"];
+  fact.required = col["cPorpRequired"];
   return fact;
 }
 
@@ -624,6 +627,10 @@ function exChangeFunc() {
   }
 }
 function setDisabledAll() {
+  const undis = props.faters?.getndisAbleConfig(
+    props.modelValue["Term.cClauseCode"]
+  );            // 条款要素批改项配置信息
+  const unbut = props.faters?.getndisAbleConfig('null');  //公共按钮类批改项配置信息
   // 禁用表单信息列
   if (
     termTitleConf.value.cFactorTabType !== "grid" &&
@@ -632,22 +639,46 @@ function setDisabledAll() {
     if (formconfig1.fromSchema && formconfig1.fromSchema.length > 0) {
       formconfig1.fromSchema.forEach((item: any) => {
         item.disabled = true;
+        if (undis && undis.length > 0) {
+          const t = undis.find((un: any) => un["cEdrItem"] === item["prop"]);
+          if (t) {
+            item.disabled = false;
+          }
+        }
       });
     }
   }
   if (termFactormap && termFactormap.value.length > 0) {
     termFactormap.value.forEach((item: any) => {
       item.disabled = true;
+      if (undis && undis.length > 0) {
+        const t = undis.find((un: any) => un["cEdrItem"] === item["prop"]);
+        if (t) {
+          item.disabled = false;
+        }
+      }
     });
   }
   // 禁用扩展表单信息列
   if (extermConf && extermConf.value.length > 0) {
     extermConf.value.forEach((item: any) => {
       item.disabled = true;
+      if (undis && undis.length > 0) {
+        const t = undis.find((un: any) => un["cEdrItem"] === item["prop"]);
+        if (t) {
+          item.disabled = false;
+        }
+      }
     });
   }
   Object.keys(btnItem.value).forEach((k: any) => {
     btnItem.value[k].hidden = true;
+    if(unbut && unbut.length > 0){
+      const t = unbut.find((un: any) => un["cEdrItem"] === k+'_btn');
+      if(k){
+        btnItem.value[k].hidden = false;
+      }
+    }
   });
   // 禁用责任表单项
   Object.keys(groupconf.value).forEach((g: any) => {
@@ -659,6 +690,14 @@ function setDisabledAll() {
         if (row && row.length > 0) {
           row.forEach((ri: any) => {
             ri.factorItem.disabled = true;
+            if (undis && undis.length > 0) {
+              const t = undis.find(
+                (un: any) => un["cEdrItem"] === ri.factorItem["prop"]
+              );
+              if (t) {
+                ri.factorItem.disabled = false;
+              }
+            }
           });
         }
       });

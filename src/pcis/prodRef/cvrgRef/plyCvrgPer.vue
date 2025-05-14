@@ -132,6 +132,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { codeListViewStore } from "@/store";
 import { qryProdRelTermRiskList } from "@/api/prod";
+import { getEdrRsnTermItem } from "@/api/query";
 const codeListStore = codeListViewStore();
 const opertaor = dataOpertaor();
 const parparam = opertaor.getParam();
@@ -196,6 +197,34 @@ const method = {
     addTermData();
   },
 };
+
+const edrItem = ref<[key: string, value: Array<any>] | any>({});
+function updateEdrItem(terms: any[]) {
+  if (
+    parparam.pageType === "EDR_APP_NEW_SCENE" ||
+    parparam.pageType === "EDR_APP_MODIFY_BOUNCED_SCENE" ||
+    parparam.pageType === "TEMPORARY_DEPOSIT"
+  ) {
+    const res = {
+      CProdNo: parparam.cProdNo,
+      CDptCde: parparam.cDptCde,
+      CRsnCde: parparam.cRsnCde,
+      CRsnDetailCde: parparam.cRsnDetailCde,
+      CEdrType: parparam.cEdrType,
+      CGrpMrk: parparam.cGrpMrk,
+      terms: terms,
+    };
+    getEdrRsnTermItem(res).then((res: any) => {
+      if (res["code"] == "200") {
+        const { data } = res;
+        edrItem.value = data.data;
+        showFlush();
+      } else {
+        ElMessage.error(res.msg);
+      }
+    });
+  }
+}
 
 // 绑定特殊验证器
 const exRules = {};
@@ -293,7 +322,7 @@ function deleteData(term: any) {
         .catch((err) => {
           console.error(err);
         });
-    };
+    }
     ElMessage({
       type: "success",
       message: "删除成功",
@@ -340,9 +369,11 @@ function refushData(datas: any) {
 
 function getFromValue() {
   let redata: any[] = [];
+  const terms: any[] = [];
   Object.keys(formData.value).forEach((item) => {
     formData.value[item].forEach((d: any) => {
       const i = JSON.parse(JSON.stringify(d));
+      terms.push(i["Term.cClauseCode"]);
       if (i["riskList"]) {
         i["Term.riskList"] = i["riskList"];
         delete i["riskList"];
@@ -350,6 +381,7 @@ function getFromValue() {
       redata.push(i);
     });
   });
+  updateEdrItem(terms);
   return redata;
 }
 
@@ -371,6 +403,25 @@ function showFlush() {
   Object.keys(tremTemplateRefs.value).forEach((item: any) => {
     tremTemplateRefs.value[item].dataInit();
   });
+  updateBtn();
+}
+
+function updateBtn() {
+  const unbut = getndisAbleConfig("null");
+  if (unbut && unbut.length > 0) {
+    cardconfig.value.endBtns?.forEach((item: any) => {
+      const t = unbut.find((un: any) => un["cEdrItem"] === item.id);
+      if (t) {
+        item.hidden = false;
+      }
+    });
+    cardconfig.value.titleBtns?.forEach((item: any) => {
+      const t = unbut.find((un: any) => un["cEdrItem"] === item.id);
+      if (t) {
+        item.hidden = false;
+      }
+    });
+  }
 }
 
 function getTableValue(rowId: number, key: string) {}
@@ -400,16 +451,24 @@ function setDisabledAll() {
 }
 function setUnDisabledByKeyList(key: any) {
   cardconfig.value.endBtns?.forEach((item: any) => {
-    if ((item.id = key)) {
+    if ((item.id === key)) {
       item.hidden = false;
     }
   });
   cardconfig.value.titleBtns?.forEach((item: any) => {
-    if ((item.id = key)) {
+    if ((item.id === key)) {
       item.hidden = false;
     }
   });
 }
+
+function getndisAbleConfig(key: any) {
+  return edrItem.value[key];
+}
+
+const faters = ref({
+  getndisAbleConfig: getndisAbleConfig,
+});
 
 defineExpose({
   getFromValue,

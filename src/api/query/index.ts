@@ -159,6 +159,14 @@ export function getEdrRsnItem(queryParams: any): AxiosPromise<any> {
 }
 
 /**
+ * 获取条款批改项
+ * @param queryParams
+ */
+export function getEdrRsnTermItem(queryParams: any): AxiosPromise<any> {
+    return post(`/edr/getEdrRsnTermItem`, queryParams);
+}
+
+/**
  * 获取批改比较项
  * @param queryParams
  */

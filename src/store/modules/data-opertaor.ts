@@ -142,7 +142,7 @@ export const dataOpertaor = defineStore(
                     //     f.editFlag = false;
                     // } else 
                     if (f.fromType === 'custom') {
-                        if(tableRefs[key].setDisabledAll){
+                        if (tableRefs[key].setDisabledAll) {
                             tableRefs[key].setDisabledAll();
                         }
                     }
@@ -220,6 +220,15 @@ export const dataOpertaor = defineStore(
                             }
                         }
                     })
+                })
+            } else {
+                Object.keys(tableRefs).forEach(key => {
+                    if (tableRefs[key] && tableRefs[key].getFormconfig) {
+                        const conf = tableRefs[key].getFormconfig();
+                        if (conf.fromType === 'custom') {
+                            tableRefs[key].setUnDisabledByKeyList();
+                        }
+                    }
                 })
             }
         }
