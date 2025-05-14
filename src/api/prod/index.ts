@@ -77,13 +77,13 @@ export function queryPageComponents(queryParams: any): AxiosPromise<any> {
  * 配置批改比较项
  * **/
 export function initProdEdrRsnItemList(queryParams: any): AxiosPromise<any> {
-  return post(LocalBaseApi + `proddef/initProdEdrRsnItemList`, queryParams);
+  return post(`proddef/initProdEdrRsnItemList`, queryParams);
 }
 /**
  * 配置批改比较项保存
  * **/
 export function saveProdEdrRsnItemList(queryParams: any): AxiosPromise<any> {
-  return post(LocalBaseApi + `proddef/saveProdEdrRsnItemList`, queryParams);
+  return post(`proddef/saveProdEdrRsnItemList`, queryParams);
 }
 /**
  * 获取全部组件信息
