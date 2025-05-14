@@ -1243,6 +1243,7 @@ const setPayInfo = (base, applicant, insrnc) => {
  * 投保申请核保
  */
 const submitToUndrFn = async () => {
+  if(!checkNAmt()) return;
   const f = await savePlyInfo(); // 提交核保,需要默认执行一次保存操作
   if (f) {
     const btn = getBtn("btn010103");
@@ -1814,6 +1815,21 @@ function getPlanCvrg() {
       ElMessage.error(result['msg']);
     }
   });
+}
+
+// 检查保额
+function checkNAmt() {
+  if(props.param.cEdrType !== "2" && props.param.cEdrType !== "3") {// 批改类型 2 注销 3 退保
+    if(nAmt.value === '0' || nAmt.value === '0.00' || nAmt.value === 0 || nAmt.value === null) {
+      ElMessage({
+        message: '非退保场景，保额不能为零，请检查页面数据!',
+        type: 'error',
+        duration: 3000
+      })
+      return false;
+    }
+  }
+  return true;
 }
 
 opertaor.setFatherPage({
