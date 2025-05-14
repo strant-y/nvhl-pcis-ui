@@ -401,7 +401,10 @@ const method = {
                 false
               )
               .then((res) => {
+         
+              
                 if (res && res.code == 200) {
+                
                   const codeValData = res.data;
                   if (codeValData) {
                     setFormItem("Base.cIntroSalecde", {
@@ -456,7 +459,12 @@ const method = {
           // CDptCde: getValue("Base.CIntroDptcde"), //服务机构
         },
         method: {
-          getSelected: (params) => {
+          getSelected: (params) => {    
+              console.log(333,params)
+            
+            setFormValue({
+              "Base.cIntroSalecde": params.CSlsNme, //业务员员工号
+            });
             codeListStore
               .queryCodeList(
                 {
@@ -469,7 +477,9 @@ const method = {
                 false
               )
               .then((res) => {
+                console.log('业务员=-==',res)
                 if (res && res.code == 200) {
+          
                   const codeValData = res.data;
                   if (codeValData) {
                     // 服务机构业务员下拉和显示的值
@@ -480,6 +490,7 @@ const method = {
                   }
                 }
               });
+              dialogRef.value?.handleClose();
           },
         },
       },
@@ -506,9 +517,12 @@ const method = {
   },
   //项目类别大类change事件
   cPrjCtgTypChange: (val) => {
+    console.log('类别',val)
     setValue("Base.cPrjCtgMidTyp", "");
     setValue("Base.cPrjCtgSubTyp", "");
     if (val) {
+      // Base.cPrjCtgMidTyp
+      // setFormItem("Base.cPrjCtgMidTyp", { rules: null, disabled: true });
       codeListStore
         .queryCodeList({
           codeListName: "CPrjCtgTyp_List",
@@ -520,7 +534,7 @@ const method = {
         })
         .then((res) => {
           if (res) {
-            setFormItem("Base.cPrjCtgMidTyp", { loadData: res });
+            setFormItem("Base.cPrjCtgMidTyp", { loadData: res,     rules: [getRules("required", {})] });
           }
         });
     }

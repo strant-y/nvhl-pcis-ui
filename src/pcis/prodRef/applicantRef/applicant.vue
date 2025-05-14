@@ -179,7 +179,6 @@ const method = {
   },
 
   cardTypeChange: (val) => {
-
     setFormItem("Applicant.cNation", {
       disabled: false,
     });
@@ -194,7 +193,6 @@ const method = {
     });
 
 
-
     if (val == "120001") {
       setFormItem("Applicant.cCertfCde", {
         rules: [getRules("required", {}), getRules("idCard", {})],
@@ -202,6 +200,7 @@ const method = {
       setFormItem("Applicant.tCertfBgnDate", {
         rules: [getRules("required", {})],
       });
+
       setFormItem("Applicant.tCertfEndDate", {
         rules: [getRules("required", {})],
       });
@@ -222,9 +221,6 @@ const method = {
       setFormItem("Applicant.cSex", {
         disabled: true,
       });
-
-
-
     } else if (val == "110002" || val == "110007") {
       setFormItem("Applicant.tCertfBgnDate", {
         rules: [getRules("required", {})],
@@ -243,8 +239,8 @@ const method = {
       setFormItem("Applicant.cCertfCde", {
         rules: [getRules("required", {})],
       });
-      setFormItem("Applicant.tCertfBgnDate", null);
-      setFormItem("Applicant.tCertfEndDate", null);
+      setFormItem("Applicant.tCertfBgnDate", { rules :null});
+      setFormItem("Applicant.tCertfEndDate",  { rules :null});
       // 参加社会统筹标志
       setFormItem("Applicant.cParticiinsocTyp", {
         rules: null,
@@ -324,7 +320,7 @@ const method = {
       });
     } else {
 
-      setFormItem("Applicant.cWorkDpt", { disabled: true, rules: null });
+      setFormItem("Applicant.cWorkDpt", {  rules: null });
       setFormItem("Applicant.cIsMicroEntpris", {
         disabled: true,
       });
@@ -508,9 +504,18 @@ const method = {
     }
   },
   mobileChange: (val) => {
-    // if (val) {
-    //   setFormItem("Applicant.cMobile", { rules: [getRules("required", {}),getRules("phoneNo", {})] });
-    // }
+    if (val) {
+      setFormItem("Applicant.cMobile", { rules: [getRules("required", {}),getRules("phoneNo", {})] });
+      setFormItem("Applicant.cTel", { rules: [getRules('phone',{})]});
+    }
+  },
+  // 固定电话
+  cTelChange:(val)=>{
+    console.log(val, '')
+    if (val) {
+      setFormItem("Applicant.cTel", { rules: [getRules('phone',{}),getRules("required", {})]});
+      setFormItem("Applicant.cMobile",  { rules: getRules("phoneNo", {})});
+    }
   },
   emailChange: (val) => {
     if (val) {

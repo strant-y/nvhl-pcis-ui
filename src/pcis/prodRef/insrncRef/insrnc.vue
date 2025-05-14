@@ -120,17 +120,17 @@ const method = {
   isTermFunc: (val) => {
     if (val == "1") {
       //选择 是 且索赔基础名称为内索赔制 时，追溯/日落起止期必填
-      setFormItem("Base.tRunBgnTm", {
-        rules: [getRules("required", {})],
-        disabled: false,
-      }); //追溯/日落起期
-      setFormItem("Base.tRunEndTm", {
-        rules: [getRules("required", {})],
-        disabled: false,
-      }); //追溯/日落止期
+      // setFormItem("Base.tRunBgnTm", {
+      //   rules: [getRules("required", {})],
+      //   disabled: false,
+      // }); //追溯/日落起期
+      // setFormItem("Base.tRunEndTm", {
+      //   rules: [getRules("required", {})],
+      //   disabled: false,
+      // }); //追溯/日落止期
     } else if (val == "0") {
-      setFormItem("Base.tRunBgnTm", { rules: null, disabled: true }); //追溯/日落起期
-      setFormItem("Base.tRunEndTm", { rules: null, disabled: true }); //追溯/日落止期
+      // setFormItem("Base.tRunBgnTm", { rules: null, disabled: true }); //追溯/日落起期
+      // setFormItem("Base.tRunEndTm", { rules: null, disabled: true }); //追溯/日落止期
       setFormValue({
         "Base.tRunBgnTm": "",
         "Base.tRunEndTm": "",

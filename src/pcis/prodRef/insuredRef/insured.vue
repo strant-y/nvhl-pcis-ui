@@ -463,7 +463,6 @@ const method = {
       setFormItem("Insured.cRegisteredcapDre", {
         rules: [getRules("required", {})],
       });
-
       // 为法人 国民经济行业必填
       setFormItem("Insured.cTrdCde", {
         rules: [getRules("required", {})],
@@ -523,7 +522,7 @@ const method = {
       });
 
       // 单位性质
-      setFormItem("Insured.cWorkDpt", { disabled: true, rules: null });
+      setFormItem("Insured.cWorkDpt", {  rules: null });
 
 
       //注册地址
@@ -736,11 +735,20 @@ const method = {
       setValue("Insured.tCertfEndDate", "");
     }
   },
-  // mobileChange: (val) => {
-  //   if (val) {
-  //     setFormItem("Insured.cMobile", { rules: [getRules("phoneNo", {})] });
-  //   }
-  // },
+  mobileChange: (val) => {
+    if (val) {
+      setFormItem("Insured.cMobile", { rules: [getRules("required", {}),getRules("phoneNo", {})] });
+      setFormItem("Insured.cTel", { rules: [getRules('phone',{}) ]});
+    }
+  },
+  // 固定电话
+  cTelChange:(val)=>{
+    console.log(val, '')
+    if (val) {
+      setFormItem("Insured.cTel", { rules: [getRules('phone',{}),getRules("required", {})]});
+      setFormItem("Insured.cMobile",  { rules: getRules("phoneNo", {})});
+    }
+  },
   // 是否绿色产业客户change
   InsuredIsGreen: (val) => {
     // 控制绿色产业细分列表是否必填
@@ -780,9 +788,6 @@ const method = {
         rules: [getRules("required", {})],
       });
       setValue("Insured.cNation", '1');  // 国籍
-      // setValue("Insured.tBirthday", null);
-      // setValue("Insured.nAge", null);
-      // setValue("Insured.cSex", null);
       setFormItem("Insured.cNation", {
         disabled: true,
       });
@@ -796,6 +801,7 @@ const method = {
         disabled: true,
       });
     } else if (val == "110002" || val == "110007") {
+     
       setFormItem("Insured.tCertfBgnDate", {
         rules: [getRules("required", {})],
       });
@@ -806,8 +812,8 @@ const method = {
       setFormItem("Insured.cCertfCde", {
         rules: [getRules("required", {})],
       });
-      setFormItem("Insured.tCertfBgnDate", null);
-      setFormItem("Insured.tCertfEndDate", null);
+      setFormItem("Insured.tCertfBgnDate",  { rules :null});
+      setFormItem("Insured.tCertfEndDate",  { rules :null});
 
       setFormItem("Insured.cParticiinsocTyp", {
         rules: null,
