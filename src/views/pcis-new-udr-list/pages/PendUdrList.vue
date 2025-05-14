@@ -1415,6 +1415,8 @@
                         pageType: "PLY_UW_PROCESS_SCENE",
                         sysType:row.objExt,
                         plyNo: row.plyNo,
+                        cTermNo:row.cTermNo,
+                        cTermNme:row.cTermNme,
                     });
                     router.push({
                         path: "/pcis/my-page",
@@ -1441,6 +1443,8 @@
                         pageType: "PLY_UW_PROCESS_SCENE",
                         sysType: row.objExt,
                         plyNo: row.plyNo,
+                        cTermNo:row.cTermNo,
+                        cTermNme:row.cTermNme,
                     });
                     router.push({
                         path: "/pcis/my-page",
@@ -1480,6 +1484,8 @@
                                 "Base.CProdNo": row.prodNo,
                                 scene: SCENE_PLAN_UW_PROCESS,
                                 cAppTyp: row.bsType,
+                                cTermNo:row.cTermNo,
+                                cTermNme:row.cTermNme
                             });
                             router.push({
                                 path: "/pcis/my-page",
@@ -1521,6 +1527,8 @@
             cRelateBusi,
             cEdrRsnBundleCde,
             plyNo,
+            cTermNme,
+            cTermNo
         } = row;
         // 关联交易业务，接收时给出提示
         if (
@@ -1562,6 +1570,8 @@
                             scene: SCENE_PLAN_UW_PROCESS,
                             CProdNo: "000000",
                             cAppTyp: row.bsType,
+                            cTermNme:row.cTermNme,
+                            cTermNo:row.cTermNo,
                         };
                         const en = JSON.stringify(data);
                         router.push({
@@ -1654,6 +1664,8 @@
                             cDptCde: r.data.cDptCde,
                             cDptCnm:row.uwDptName?row.uwDptName:row.cDptCnm,
                             pageType: "UW_READ_SCENE",
+                            cTermNme:row.cTermNme,
+                            cTermNo:row.cTermNo,
                         });
                         router.push({
                             path: "/pcis/my-page",
@@ -1674,6 +1686,8 @@
                             cDptCde: r.data.cDptCde,
                             cDptCnm:row.uwDptName?row.uwDptName:row.cDptCnm,
                             pageType: "UW_READ_SCENE",
+                            cTermNme:row.cTermNme,
+                            cTermNo:row.cTermNo,
                         });
                         router.push({
                             path: "/pcis/my-page",
@@ -1708,6 +1722,8 @@
             cCiMrk: row.cCiMrk,
             cGrpMrk: row.cGrpMrk,
             cRsnCde: row.cEdrRsnBundleCde,
+            cTermNme:row.cTermNme,
+            cTermNo:row.cTermNo,
             pageType: "PLY_UW_PROCESS_SCENE",
         });
         router.push({
