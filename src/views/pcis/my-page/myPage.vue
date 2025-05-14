@@ -246,6 +246,10 @@ const UndrOpnList = defineAsyncComponent(
 const TaskListVestige = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/TaskListVestige.vue")
 );
+//复制出单
+const copyPlyModel = defineAsyncComponent(
+  () => import("@/views/pcis-new-udr-list/common/copy-ply-model.vue")
+);
 
 const opertaor = dataOpertaor();
 opertaor.init();
@@ -416,6 +420,34 @@ const historyClaimcaseFun = () => {
       }
     });
 };
+//  复制保单
+const copyPolicyFun = () => {
+  dzmodal
+    .open(copyPlyModel, { type: "", data: {} })
+    .then((res: any) => {
+      if (res.type === "ok") {
+      }
+    });
+  // dialogRef.value?.open(
+  //       "copyPlyModel",
+  //       {
+  //         type: "show",
+  //         data: {
+  //         },
+  //         method: {
+  //           getSelected: (params) => {
+  //             dialogRef.value?.handleClose();
+  //           },
+  //         },
+  //       },
+  //       {
+  //         isOk: (selectdata: any) => {
+  //           console.log("a", selectdata);
+  //         },
+  //       },
+  //       { title: "复制保单", width: 85 }
+  //     );
+};
 
 /**
  * 投保需要的按钮
@@ -431,7 +463,9 @@ const basicBtn = [
   createFreeButtonBase({
     label: "复制出单",
     type: "primary",
-    func: () => {},
+    func: () => {
+      // copyPolicyFun()
+    },
   }),
   createFreeButtonBase({
     label: "保费计算",

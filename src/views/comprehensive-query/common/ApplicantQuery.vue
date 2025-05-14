@@ -852,23 +852,21 @@ const tableObj = {
                 tooltip: "复制",
                 size: "large",
                 icon: "DocumentCopy",
-                // hideBtns: (row: any) => {
-                //   if (
-                //     row.cAppStatus == "1" ||
-                //     row.cAppStatus == "3" ||
-                //     row.cAppStatus == "8"
-                //   ) {
-                //     return false;
-                //   } else {
-                //     return true;
-                //   }
-                // },
+                hideBtns: (row: any) => {
+                    if (
+                        row.cAppStatus == "1" ||
+                        row.cAppStatus == "5" 
+                    ) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                },
                 tableClick: async (row) => {
                     console.log(row);
                     const r = await row;
                     if (r) {
                         const data = row;
-                        console.log("0000000000000", data);
                         router.push({
                             path: "/pcis/my-page",
                             query: {
