@@ -743,7 +743,7 @@ const method = {
   },
   // 固定电话
   cTelChange:(val)=>{
-    console.log(val, '')
+    console.log(val, '11')
     if (val) {
       setFormItem("Insured.cTel", { rules: [getRules('phone',{}),getRules("required", {})]});
       setFormItem("Insured.cMobile",  { rules: getRules("phoneNo", {})});
