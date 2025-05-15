@@ -190,6 +190,21 @@ watch([() => props.modelValue], ([newModelValue]) => {
   }
 });
 
+watch(
+  () => props.item.disabled,
+  (newData, oldData) => {
+    if (oldData && !newData) {
+      //如果true 改 false,则做一次重新option获取
+      nextTick(() => {
+        if (props.item.typeCode) {
+          console.log(getParam());
+          uploadOption();
+        }
+      });
+    }
+  },
+  { deep: true }
+);
 /**
  * 页面数据监听
  */
@@ -285,7 +300,9 @@ function getParam() {
   if (props.item.codeParam && typeof props.item.codeParam === "string") {
     p = JSON.parse(props.item.codeParam);
   } else {
-    p = props.item.codeParam;
+    if (props.item.codeParam) {
+      p = JSON.parse(JSON.stringify(props.item.codeParam));
+    }
   }
 
   if (props.item.disabled) {
