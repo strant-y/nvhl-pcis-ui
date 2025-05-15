@@ -298,9 +298,9 @@ onMounted(async () => {
 const edrItem = ref<[key: string, value: Array<any>] | any>({});
 function updateEdrItem(terms: any[]) {
   if (
-    parparam.pageType === "EDR_APP_NEW_SCENE" ||
-    parparam.pageType === "EDR_APP_MODIFY_BOUNCED_SCENE" ||
-    parparam.pageType === "TEMPORARY_DEPOSIT"
+    (parparam.pageType === "EDR_APP_NEW_SCENE" ||
+    parparam.pageType === "EDR_APP_MODIFY_BOUNCED_SCENE" || 
+    parparam.pageType === "TEMPORARY_DEPOSIT") && parparam.cAppTyp === 'E'
   ) {
     const res = {
       CProdNo: parparam.cProdNo,
