@@ -75,7 +75,23 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         func: () => {
-          freeEditRef.value?.resetFields();
+          freeEditRef.value?.setFormValue({
+            dateRange: [
+              moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
+                "YYYY-MM-DD 00:00:00"
+              ),
+              moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+            ],
+            orgCde: user.value.companyId,
+            CLoadSub: 1,
+            CCombinationNo: null,
+            CAppNme: null,
+            CAppStatus: null
+          });
+          setFormItem("orgCde", {loadData: [{
+            label: user.value.companyCnm,
+            value: user.value.companyId,
+          }]});
           handleQuery(true);
           // freeEditRef.value?.resetForm();
         },
@@ -97,12 +113,32 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           func: () => {
             dzmodal
               .open(departmentTree, { type: "Issuer", data: {} })
-              .then((res) => {
-                if (res.type === "ok") {
+              .then((res:any) => {
+                if (res.body) {
+                  const selectObj = res.body;
+                  let obj = {
+                    loadData: [
+                      {
+                        label: selectObj.label,
+                        value: selectObj.id,
+                      },
+                    ],
+                  };
+                  freeEditRef.value?.setValue(
+                      "orgCde",
+                      selectObj.id
+                  );
+                  setFormItem("orgCde", obj);
                 }
               });
           },
         },
+        loadData: [
+          {
+            label: user.value.companyCnm,
+            value: user.value.companyId,
+          }
+        ]
       },
       {
         prop: "CLoadSub",
@@ -495,6 +531,16 @@ function handleDelete(row: any) {
     .catch((err) => {
       console.log(err);
     });
+}
+//给表单下拉项赋值
+function setFormItem(key, obj) {
+    if (obj && Object.keys(obj).length) {
+        formconfig1.fromSchema?.forEach((item) => {
+            if (item.prop === key) {
+                Object.assign(item, obj); 
+            }
+        });
+    }
 }
 </script>
 

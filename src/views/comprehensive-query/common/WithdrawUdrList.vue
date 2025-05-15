@@ -69,7 +69,17 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         func: () => {
-          freeEditRef.value?.resetFields()
+          // freeEditRef.value?.resetFields()
+          freeEditRef.value?.setFormValue({
+            CProdCatCde: null,
+            prodNo: null,
+            appCde: null,
+            objId: null,
+            dateRange: [
+              moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format('YYYY-MM-DD 00:00:00'),
+              moment(new Date()).format('YYYY-MM-DD 23:59:59')
+            ]
+          });
           handleQuery(true);
           // freeEditRef.value?.resetForm();
         },
