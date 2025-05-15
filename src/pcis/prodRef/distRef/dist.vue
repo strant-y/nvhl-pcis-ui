@@ -294,6 +294,7 @@ const method = {
       }
     });
   },
+  //导出
   exportExcel: () => {
     let paramitem  = Object.assign(formconfig1.value, {
       cComponentTable: cComponentTableValue,
@@ -312,6 +313,12 @@ const method = {
         });
         saveAs(blob, fileName);
       })
+  },
+  //导入
+  importDist() {
+    policyService.importDist(formconfig1.value).then((res) => {
+      ElMessage.success({ message: "导入成功", duration: 3000 });
+    });
   },
   //根据获取的职业类别查询职业等级并绑定下拉框
   getDistoccupType:(val) => {
