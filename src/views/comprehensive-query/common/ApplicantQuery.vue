@@ -534,6 +534,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                               item.hidden = true;
                           }
                       });
+                  } else if(!val) {
+                    // 清空选中值
+                    formconfig1.fromSchema?.forEach((item) => {
+                        if (item.prop === "tAppTm" || item.prop === "tEdrAppTm") {
+                            item.hidden = true; // 隐藏投保日期、批改申请日期
+                        } else if (item.prop == "tIssueTm") {
+                            item.hidden = false; // 显示签单日期
+                        }
+                    });
                   }
               },
           },
