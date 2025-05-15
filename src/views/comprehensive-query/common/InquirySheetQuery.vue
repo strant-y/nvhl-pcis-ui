@@ -98,12 +98,19 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               label: "重置",
               func: () => {
                   const freeEditRefs = freeEditRef.value;
-                  const s = freeEditRefs.getFromValue(); //获取表单数据
+                  const s = freeEditRefs?.getFromValue(); //获取表单数据
                   for (const k in s) {
                       s[k] = null;
                   }
-                  // handleQuery(true);
-                  // freeEditRef.value?.resetForm();
+                  freeEditRefs?.setFormValue({
+                    ...s,
+                    cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+                    cLoadSub: 1,
+                    tIssueTm: [
+                        dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
+                        moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+                    ]
+                  })
               },
           }),
           createFreeButtonBase({
@@ -542,6 +549,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                               item.hidden = true;
                           }
                       });
+                  } else if(!val) {
+                    // 清空选中值
+                    formconfig1.fromSchema?.forEach((item) => {
+                        if (item.prop === "tAppTm" || item.prop === "tEdrAppTm") {
+                            item.hidden = true; // 隐藏投保日期、批改申请日期
+                        } else if (item.prop == "tIssueTm") {
+                            item.hidden = false; // 显示签单日期
+                        }
+                    });
                   }
               },
           },

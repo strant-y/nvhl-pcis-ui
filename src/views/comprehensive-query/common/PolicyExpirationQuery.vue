@@ -71,10 +71,17 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         label: "重置",
         func: () => {
           freeEditRef.value?.setFormValue({
-            NExpirationDays: 30,
-            CDptCde: user.value.companyId,
+            NExpirationDays: 3,
+            orgCde: user.value.companyId,
             CLoadSub: 1,
+            cKindNo: null,
+            cProdNo: null,
+            CPlyNo: null
           });
+          setFormItem("orgCde", {loadData: [{
+            label: user.value.companyCnm,
+            value: user.value.companyId,
+          }]});
           handleQuery(true);
           // freeEditRef.value?.resetForm();
         },
@@ -96,12 +103,32 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           func: () => {
             dzmodal
               .open(departmentTree, { type: "Issuer", data: {} })
-              .then((res) => {
-                if (res.type === "ok") {
+              .then((res:any) => {
+                if (res.body) {
+                  const selectObj = res.body;
+                  let obj = {
+                    loadData: [
+                      {
+                        label: selectObj.label,
+                        value: selectObj.id,
+                      },
+                    ],
+                  };
+                  freeEditRef.value?.setValue(
+                      "orgCde",
+                      selectObj.id
+                  );
+                  setFormItem("orgCde", obj);
                 }
               });
           },
         },
+        loadData: [
+          {
+            label: user.value.companyCnm,
+            value: user.value.companyId,
+          }
+        ]
       },
       {
         prop: "CLoadSub",
