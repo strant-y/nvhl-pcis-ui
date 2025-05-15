@@ -1082,17 +1082,16 @@ const tableObj = {
         tooltip: "复制",
         size: "large",
         icon: "DocumentCopy",
-        // hideBtns: (row: any) => {
-        //   if (
-        //     row.cAppStatus == "1" ||
-        //     row.cAppStatus == "3" ||
-        //     row.cAppStatus == "8"
-        //   ) {
-        //     return false;
-        //   } else {
-        //     return true;
-        //   }
-        // },
+        hideBtns: (row: any) => {
+          if (
+            row.cAppStatus == "1" ||
+            row.cAppStatus == "5"
+          ) {
+            return false;
+          } else {
+            return true;
+          }
+        },
         tableClick: async (row) => {
           console.log(row);
           const r = await row;
@@ -1395,18 +1394,19 @@ const handleTabClick = (tab: any) => {
       // }
     });
 
-    freeEditRef.value[i].value[0].setValue("tIssueTm", [
-      dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
-      moment(new Date()).format("YYYY-MM-DD 23:59:59"),
-    ]);
-    freeEditRef.value[i].value[0].setValue("tAppTm", [
-      dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
-      moment(new Date()).format("YYYY-MM-DD 23:59:59"),
-    ]);
-    freeEditRef.value[i].value[0].setValue("tEdrAppTm", [
-      dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
-      moment(new Date()).format("YYYY-MM-DD 23:59:59"),
-    ]);
+    //复制出单报错，导致页面渲染不了，暂时注释掉
+    // freeEditRef.value[i].value[0].setValue("tIssueTm", [
+    //   dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
+    //   moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+    // ]);
+    // freeEditRef.value[i].value[0].setValue("tAppTm", [
+    //   dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
+    //   moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+    // ]);
+    // freeEditRef.value[i].value[0].setValue("tEdrAppTm", [
+    //   dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
+    //   moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+    // ]);
   }
   // 控制申请单类型字段的显示和隐藏
   formconfig1.fromSchema?.forEach((item) => {

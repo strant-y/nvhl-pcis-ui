@@ -1519,8 +1519,15 @@ downloadDistTemplate(data) {
       responseType: 'blob'
   });
 }
+//清单导出
 exportDist(data) {
   return request.post(`/policy/exportDist`, data, {
+      responseType: 'blob'
+  });
+}
+//清单导入
+importDist(data) {
+  return request.post(`/policy/importDistIncrement`, data, {
       responseType: 'blob'
   });
 }
