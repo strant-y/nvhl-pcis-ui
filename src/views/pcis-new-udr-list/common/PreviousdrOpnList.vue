@@ -65,6 +65,9 @@ const removeIds = ref([]); // 删除用户ID集合 用于批量删除
 const dialogVisible = ref(true);
 const userStore = useUserStore();
 const user = ref(userStore.user) || ref({ companyId: '',opCde: '' });
+const myPageDialog = defineAsyncComponent(
+  () => import("@/views/pcis/my-page/myPageDialog.vue")
+);
 
 const props = defineProps({
   objId: {// 申请单号
@@ -101,7 +104,7 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "View",
         tableClick: (row) => {
-          // 弹框
+          showDetails(row.cAppNo, row.cPlyNo, row.cProdNo, row.cKindNo, row);
         },
       }),
     ],
@@ -224,6 +227,31 @@ function handleExport() {
     ElMessage.error({ message: err, duration: 3000 });
   });
 }
+
+// 查看
+function showDetails(cAppNo, cPlyNo, cProdNo, cKindNo, data) {
+  const param = {
+    // scene: SCENE_PLY_APP_READ,
+    cAppNo: cAppNo,
+    cOrgAppNo: cAppNo,
+    cCiMrk: data["cCiMrk"],
+    cProdNo: cProdNo,
+    cAppTyp: data["cAppTyp"],
+    cGrpMrk: data["cGrpMrk"],
+    cDptCde: data["cDptCde"],
+    cDptCnm: data["cDptCnm"],
+    pageType: "readonly",
+  };
+  dzmodal
+    .open(myPageDialog, {
+      type: "Issuer",
+      param: param,
+    })
+    .then((res: any) => {
+      if (res.type === "ok") {
+      }
+    });
+};
 </script>
 
 <style scoped></style>
