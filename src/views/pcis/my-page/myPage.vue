@@ -1848,6 +1848,9 @@ function setTmDay(tmday: any) {
 }
 
 function getPlanCvrg() {
+  if(props.param?.cIsPlan !== '1'){
+    return ;
+  }
   const param = { cPlanNo: props.param?.cTermNo }
   policyService.getPlanCvrg(param).then((result:any) => {
     if (result['code'] === 200) {
