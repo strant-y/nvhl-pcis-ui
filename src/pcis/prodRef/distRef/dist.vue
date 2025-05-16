@@ -68,6 +68,7 @@ let cComponentTableValue: string;
 
 // 封装获取 cComponentTableValue 的逻辑
 const getCComponentTableValue = (cProdNo: string, title: string): string => {
+  console.log(title,"title00000")
   if (cProdNo == "040001") {
     return "AddressDist";
   } else if (cProdNo == "040002") {
@@ -277,8 +278,6 @@ const method = {
 
   handleQuery: () => {
     let tgtRef = opertaor.getTableRefByKey('tgt')
-
-
     const param = opertaor.getParam();
     console.log(param);
     let app = "";

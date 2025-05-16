@@ -47,65 +47,79 @@ const props = defineProps({
 });
 const getCComponentTable = () => {
   const cProdNo = route.params.param.cProdNo;
-  if (cProdNo == "040001") {
-    return "AddressDist";
-  } else if (cProdNo == "040002") {
-    if (title == "雇员清单") {
-      return "EmployeeDist";
-    } else if (title == "雇员清单汇总") {
-      return "DistSummary";
-    } else if (title == "车辆清单") {
-      return "VehicleDist";
-    } else if (title == "车辆清单汇总") {
-      return "DistSummary";
+  if (cProdNo === "040001") return "AddressDist";
+  if (cProdNo === "043002") return "VehicleDist";
+  if (cProdNo === "040020") return "PersonnelDist";
+  if (cProdNo === "042001") return "DesignDist";
+  if (cProdNo === "042003") return "EducatorDist";
+  if (cProdNo === "043001") return "ElevatorDist";
+  if (cProdNo === "043007") return "VehicleDist";
+  if (cProdNo === "043010") return "EducatorDist";
+  if (cProdNo === "043013") return "PollutionDist";
+  if (cProdNo === "043009") {
+    switch (props.data.tab) {
+      case "实际用工地址/工程项目地址清单":
+        return "ProjectDist";
+      case "从业人员清单":
+        return "EmployeeDist";
+      case "从业人员清单汇总":
+        return "DistSummary";
+      default:
+        return "";
     }
-  } else if (cProdNo == "040003") {
-    if(title == "产品清单"){
-      return "ProductDist";
-    }else if(title =="销售区域清单"){
-      return "SalesDist";
+  }
+  if (cProdNo === "040002") {
+    switch (props.data.tab) {
+      case "雇员清单":
+        return "EmployeeDist";
+      case "雇员清单汇总":
+        return "DistSummary";
+      case "车辆清单":
+        return "VehicleDist";
+      case "车辆清单汇总":
+        return "DistSummary";
+      default:
+        return "";
     }
-  } else if(cProdNo == "040005"){
-    if(title =="地址清单信息"){
-      return "AddressDist";
-    }else if(title == "人员清单"){
-      return "EducatorDist"
+  }
+  if(cProdNo === "040003"){
+    switch(props.data.tab){
+      case "产品清单":
+        return "ProductDist";
+      case "销售区域清单":
+        return "SalesDist";
+      default:
+        return "";
     }
-  }else if(cProdNo == "040020"){
-      return "PersonnelDist";
-  }else if(cProdNo == "042001"){
-      return "DesignDist"
-  }else if(cProdNo == "042003"){
-      return "EducatorDist"
-  }else if(cProdNo == "043001"){
-    return "ElevatorDist";
-  } else if (cProdNo == "043002") {
-    return "VehicleDist";
-  } else if(cProdNo == "043007"){
-    return "VehicleDist";
-  }else if (cProdNo == "043009") {
-    if (title == "实际用工地址/工程项目地址清单") {
-      return "ProjectDist";
-    } else if (title == "从业人员清单") {
-      return "EmployeeDist";
-    } else if (title == "从业人员清单汇总") {
-      return "DistSummary";
+  }
+  if(cProdNo === "040005"){
+    switch(props.data.tab){
+      case "地址清单信息":
+        return "AddressDist";
+      case "人员清单":
+        return "EducatorDist";
+      default:
+        return "";
     }
-  }else if(cProdNo == "043010"){
-    return "EducatorDist"
-  } else if(cProdNo == "043013"){
-    return "PollutionDist"
-  }else if(cProdNo =="043020"){
-    if(title =="房屋清单"){
-      return "AddressDist"
-    }else if(title =="家庭成员清单"){
-      return "FamilyTgt"
+  }
+  if(cProdNo === "043020"){
+    switch(props.data.tab){
+      case "房屋清单":
+        return "AddressDist";
+      case "家庭成员清单":
+        return "FamilyTgt";
+      default:
+        return "";
     }
-  }else if(cProdNo =="045001"){
-    if(title =="雇员清单信息"){
-      return "EmployeeDist"
-    }else if(title =="工程项目地址清单"){
-      return "ProjectDist"
+  }
+  if(cProdNo === "045001"){
+    switch(props.data.tab){
+      case "雇员清单信息":
+        return "EmployeeDist";
+      case "工程项目地址清单":
+        return "ProjectDist";
+      default:
+        return "";
     }
   }
   return "";
@@ -169,6 +183,7 @@ const formconfig1 = ref<AppFreeEditConfig>(
 );
 
 onMounted(() => {
+  console.log(props,"============")
   dataParams.value = opertaor.getDataAll();
   appNo.value = dataParams.value.plyBase["Base.cAppNo"];
   formconfig1.value.fromSchema = props.data.fromSchema;
