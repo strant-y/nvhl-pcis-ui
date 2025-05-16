@@ -183,7 +183,6 @@ const formconfig1 = ref<AppFreeEditConfig>(
 );
 
 onMounted(() => {
-  console.log(props,"============")
   dataParams.value = opertaor.getDataAll();
   appNo.value = dataParams.value.plyBase["Base.cAppNo"];
   formconfig1.value.fromSchema = props.data.fromSchema;
@@ -195,6 +194,7 @@ onMounted(() => {
   } else {
   }
 });
+
 </script>
 
 <style scoped></style>

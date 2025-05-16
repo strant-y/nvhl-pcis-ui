@@ -12,8 +12,9 @@
 </template>
 
 <script setup lang="ts">
+const applicantEditRef = ref<AppFreeEditMethod | null>(null);
 import { defineComponent, ref, reactive, onMounted } from 'vue';
-import { ElMessage, ElForm, ElFormItem, ElRadioGroup, ElRadio, ElSelect, ElOption, ElCascader, ElDatePicker, ElInput, ElButton, ElTable, ElTableColumn, ElPagination } from 'element-plus';
+// import { ElMessage, ElForm, ElFormItem, ElRadioGroup, ElRadio, ElSelect, ElOption, ElCascader, ElDatePicker, ElInput, ElButton, ElTable, ElTableColumn, ElPagination } from 'element-plus';
 import { getListByCode } from '@/api/code-list-service';
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
 import { AppKey } from '@/constants/api';
@@ -48,8 +49,10 @@ const tableRef = ref<AppTableMethod | null>(null);
 const userStore = useUserStore();
 const { getRules } = useValidator();
 const policyService = new PolicyService();
-
-const user = userStore.user
+// const user = userStore.user
+const user = ref(userStore.user);
+import { SysOperatorMgrService } from "@/views/sys-right-basic/service/sys-operator-mgr.service";
+const sysOperatorMgrService = new SysOperatorMgrService();
 
 const dialogVisible = ref(true)
 
@@ -101,16 +104,17 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       },
       {
         prop: "CLoadSub",
-        inputtype: "rtradio",
+        inputtype: "rtcheckbox",
         title: "是否包含下级",
-        loadData :[
-          { label:'是',value:1 },
-          { label:'否',value:0 },
-        ]
+        default: true,
+        // loadData :[
+        //   { label:'是',value:1 },
+        //   { label:'否',value:0 },
+        // ]
       },
       {
         prop: "CKindNo",
-        inputtype: "rtcascader",
+        inputtype: "rtselect",
         title: "产品大类",
         typeCode: "KIND_LIST_CACHE",
         param: { cOperId: user['opCde'], cDptCde: user['companyId'] },
@@ -118,7 +122,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       },
       {
         prop: "CProdNo",
-        inputtype: "rtcascader",
+        inputtype: "rtselect",
         title: "产品",
         typeCode: "PROD_LIST_GRT",
         param: { cParCde: '', cOperId: user['opCde'], cDptCde: user['companyId'] },
@@ -242,8 +246,39 @@ const handleSelectionChange = (selection) => {
   selectedCiMrk.value = selected.value[selected.value.length-1].cCiMrk;
 }
 
+const initDptTreeList = () => {
+  let root = user.value['companyId'];
+  // if (user.value && user.value.companyId) {
+  //   root = user.value.companyId;
+  // }
+  const params = {
+    pId: root,
+  };
+  sysOperatorMgrService.getOrgDptTreeNodeById(params).then((res) => {
+      if (res && res["data"]) {
+        if (_nodes.value.length === 0) {
+          _nodes.value = [];
+        }
+        const data = res["data"];
+        if (res["data"]) {
+          _nodes.value.push({
+            id: root,
+            name: res["data"]["name"],
+            leaf: false,
+          });
+        }
+      }
+    })
+    .catch((error) => {
+      ElMessage.error("后台服务异常,请联系管理员");
+    });
+};
+
 onMounted(() => {
-  
+  freeEditRef.value?.setFromValue({
+    CAntiLnderRisk: 1, // 默认选中投保单
+  });
+  initDptTreeList()
 });
 
 const submitForm = (flag) => {
@@ -382,7 +417,36 @@ const refreshData = async(flag = true) => {
     });
   }
 };
+function getFromValue() {
+  return applicantEditRef?.value?.getFromValue();
+}
 
+function setFormValue(value: any) {
+  applicantEditRef?.value?.setFormValue(value);
+}
+
+function validate() {
+  return applicantEditRef?.value?.validate();
+}
+
+function setValue(key: string, value: any) {
+  applicantEditRef?.value?.setValue(key, value);
+}
+
+function getValue(key: string) {
+  return applicantEditRef?.value?.getValue(key);
+}
+function getFormconfig() {
+  return formconfig1;
+}
+defineExpose({
+  getFromValue,
+  setFormValue,
+  validate,
+  setValue,
+  getValue,
+  getFormconfig,
+});
 
 
 </script>
