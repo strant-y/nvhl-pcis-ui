@@ -17,6 +17,7 @@ const amlExtendInfo = defineAsyncComponent(
 );
 
 import { useDzModal } from "@/common/dzmodel/DzModalService";
+import moment from "moment";
 const dzmodal = useDzModal();
 const { getRules } = useValidator();
 const opertaor = dataOpertaor();
@@ -53,15 +54,15 @@ const method = {
   },
   //投保乘客座位总数改变事件
   changenTotalInsured: () => {
-    setValue("Tgt.nSeatCapacity",Number(getValue("Tgt.nTotalInsured"))+Number(getValue("Tgt.nInsuredcompanySeats")))
+    setValue("Tgt.nSeatCapacity", Number(getValue("Tgt.nTotalInsured")) + Number(getValue("Tgt.nInsuredcompanySeats")))
   },
- //投保司乘人员座位总数改变事件
+  //投保司乘人员座位总数改变事件
   changenInsuredcompanySeats: () => {
-    setValue("Tgt.nSeatCapacity",Number(getValue("Tgt.nTotalInsured"))+Number(getValue("Tgt.nInsuredcompanySeats")))
+    setValue("Tgt.nSeatCapacity", Number(getValue("Tgt.nTotalInsured")) + Number(getValue("Tgt.nInsuredcompanySeats")))
   },
   //是否单项工程change事件
   cIsSingleFunc: (val) => {
-    if(val == '1') {
+    if (val == '1') {
       let obj = {
         rules: [getRules("required", {})],
         hidden: false
@@ -78,47 +79,170 @@ const method = {
     productStore.setCIsSingle(val)
   },
   funcInsuranceChange: () => {
-    
+
     //根据投保方式得选择对应控制必填项
     if (getValue("Tgt.cInsuranceMethod") == '613002') {
       setFormItem("Tgt.nEngineeringCost", {
         rules: [getRules("required", { blur: true })],
       });
-      setFormItem("Tgt.nProjectArea", {rules: null });
-      setFormItem("Tgt.nLaborPrice", {rules: null });
+      setFormItem("Tgt.nProjectArea", { rules: null });
+      setFormItem("Tgt.nLaborPrice", { rules: null });
     } else if (getValue("Tgt.cInsuranceMethod") == '613003') {
-      setFormItem("Tgt.nEngineeringCost",{rules: null });
+      setFormItem("Tgt.nEngineeringCost", { rules: null });
       setFormItem("Tgt.nProjectArea", {
         rules: [getRules("required", { blur: true })],
       });
-      setFormItem("Tgt.nLaborPrice", {rules: null });
+      setFormItem("Tgt.nLaborPrice", { rules: null });
     } else if (getValue("Tgt.cInsuranceMethod") == '613004') {
-      setFormItem("Tgt.nEngineeringCost",{rules: null });
-      setFormItem("Tgt.nProjectArea", {rules: null });
-      setFormItem("Tgt.nLaborPrice",  {
+      setFormItem("Tgt.nEngineeringCost", { rules: null });
+      setFormItem("Tgt.nProjectArea", { rules: null });
+      setFormItem("Tgt.nLaborPrice", {
         rules: [getRules("required", { blur: true })],
       });
     }
     const cvrgref = opertaor.getTableRefByKey("cvrg");
-    if(cvrgref.showFlush){
+    if (cvrgref.showFlush) {
       cvrgref.showFlush();
     }
   },
-  cDeterminingChange:()=>{
+  cDeterminingChange: () => {
     const cvrgref = opertaor.getTableRefByKey("cvrg");
-    if(cvrgref.showFlush){
+    if (cvrgref.showFlush) {
       cvrgref.showFlush();
     }
   },
-  wagesInfoBtn:()=>{
+  wagesInfoBtn: () => {
     console.log('按钮 工资总额')
     dzmodal
-    .open(amlExtendInfo, { })
-    .then((res: any) => {
-      if (res.type === "ok") {
-      }
+      .open(amlExtendInfo, {})
+      .then((res: any) => {
+        if (res.type === "ok") {
+        }
+      });
+  },
+  // 工程造价
+  nEngineeringCostChange: (val) => {
+    console.log(val)
+    if (val) {
+
+      setFormItem('Tgt.nLaborPrice', {
+        rules: null
+      })
+
+      setFormItem('Tgt.nProjectArea', {
+        rules: null,
+      })
+      setFormItem('Tgt.nEngineeringCost', {
+        rules: [getRules("required", {})],
+      })
+    }
+  },
+  // 工程面积(㎡)
+  nProjectAreaChange: (val) => {
+    console.log(val)
+    if (val) {
+
+      setFormItem('Tgt.nLaborPrice', {
+        rules:null
+      })
+
+      setFormItem('Tgt.nProjectArea', {
+        rules:  [getRules("required", {})],
+      })
+      setFormItem('Tgt.nEngineeringCost', {
+        rules: null,
+      })
+    }
+  },
+  // 劳务分包合同价格（元）
+  nLaborPriceChange: (val) => {
+    console.log(val)
+    if (val) {
+
+      setFormItem('Tgt.nLaborPrice', {
+        rules: [getRules("required", {})],
+      })
+
+      setFormItem('Tgt.nProjectArea', {
+        rules: null,
+      })
+      setFormItem('Tgt.nEngineeringCost', {
+        rules: null,
+      })
+    }
+
+
+  },
+  // 是否含隧道
+  cIncludeBridgesChange:(val)=>{
+    console.log(val)
+    if(val ==1){
+      setFormItem('Tgt.nBridgeProportion', {
+        rules: [getRules("required", {})],
+      })
+      setFormItem('Tgt.nTunnelProportion', {
+        rules: [getRules("required", {})],
+      })
+    }else{
+      setFormItem('Tgt.nBridgeProportion', {
+        rules: null,
+      })
+      setFormItem('Tgt.nTunnelProportion', {
+        rules:null,
+      })
+    }
+  },
+  // 计划开工日期
+  tPlannedDateChange:(v)=>{
+    const start = getValue("Tgt.tPlannedDate");
+    const end = getValue("Tgt.tPlannedCompletion");
+    const tm = moment(end).diff(moment(v), "days"); 
+    if (!end || !v) {
+      return;
+    }
+    if (tm < 0) {
+      ElMessage.warning("竣工日期不能小于开工日期");
+      setFormValue({
+        "Tgt.tPlannedDate": null,
+      });
+      return;
+    }
+    setFormValue({
+      "Tgt.nContractDuration": tm,
+    })
+
+  },
+  // 计划竣工日期 
+  tPlannedCompletionChange:(v)=>{
+    const start = getValue("Tgt.tPlannedDate");
+    const end = getValue("Tgt.tPlannedCompletion");
+    if (!start || !v) {
+      return;
+    }
+    const tm = moment(v).diff(moment(start), "days");
+    if (tm < 0) {
+      ElMessage.warning("竣工日期不能小于开工日期");
+      setFormValue({
+        "Tgt.tPlannedCompletion": null,
+      });
+      return;
+    }
+    setFormValue({
+      "Tgt.nContractDuration": tm,
     });
+  },
+  // 核定座位总数
+  nSeatsNumberChange:(v)=>{
+    // Tgt.nSeatsNumber 核定总数
+    // Tgt.nSeatCapacity 投保总数
+    // const start = getValue("Tgt.tPlannedDate");
+    const nSeatCapacity = getValue("Tgt.nSeatCapacity");
+    console.log( v, nSeatCapacity)
+    if(v !== nSeatCapacity){
+      ElMessage.warning("核定座位总数和投保座位数总数不一致！");
+    }
   }
+
 };
 
 function singChange(obj) {
@@ -133,10 +257,8 @@ function singChange(obj) {
     'Tgt.cProjectAddress': '',
   })
 }
-
 // 绑定特殊验证器
 const exRules = {};
-
 function getFromValue() {
   return tgtEditRef?.value?.getFromValue();
 }
@@ -159,16 +281,16 @@ function getValue(key: string) {
 
 //给表单下拉项赋值
 function setFormItem(key, obj) {
-    if (obj && Object.keys(obj).length) {
-        formconfig1.fromSchema?.forEach(item => {
-            if (item.prop === key) {
-                Object.assign(item, obj)
-            }
-        })
-    }
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach(item => {
+      if (item.prop === key) {
+        Object.assign(item, obj)
+      }
+    })
+  }
 }
 
-function getFormconfig(){
+function getFormconfig() {
   return formconfig1;
 }
 

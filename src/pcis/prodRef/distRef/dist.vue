@@ -180,7 +180,26 @@ onMounted(async () => {
   setTimeout(() => {
     method.handleQuery();
   }, 500);
+
+  // 电梯信息清单
+  let tgtRef = opertaor.getTableRefByKey('tgt')
+  tgtRef.setValue("Tgt.nElevatorsNumber",pageresult.list.length)
 });
+
+// const  modifyRules = (data, fieldValue)=> {
+//     data.forEach(item => {
+//         if (fieldValue === 0) {
+//             // 如果 fieldValue 是 1，把所有 rules 改成 null
+//             item.rules = null;
+
+//         } else if (fieldValue === 1) {
+//             // 如果 fieldValue 是 2，只为没有规则的字段添加必填规则
+//             if (!item.rules || (item.rules && !item.rules.some(rule => rule.required === true && rule.message === '该项为必填项'))) {
+//                 item.rules = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+//             }
+//         }
+//     });
+// }  Tgt.nEngineeringCost nEngineeringCostChange
 
 // 绑定方法
 const method = {
@@ -212,15 +231,35 @@ const method = {
       }
     });
   },
+  //  042003 根据电梯条数反
   funcdistadd: () => {
     console.log("22", opertaor.getTableRefs());
     let baseFlag = opertaor.getDataAll().plyBase["Base.cAppNo"];
+
+    let fromSchema = tableconfig.value.fromSchema;
+    let cIs= opertaor.getTableRefs()['tgt'].getFromValue()['Tgt.cIsinsuranceRegistered']  //  是否记名投保
+    
+    if(cIs == 1){
+      fromSchema?.forEach((item,index) =>{
+        // if(item.) Dist.nSeqNo   Dist.cPlanNo Dist.cPlanNo
+        if(item.prop !=='Dist.nSeqNo'){
+          item.rules = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+        }
+      })
+    }else if(cIs == 0){
+      fromSchema?.forEach((item,index) =>{
+        if(item.prop !=='Dist.cSchoolName' && item.prop !=='Dist.cSchoolAddress'){
+          item.rules =null;
+        }
+      })
+    }
+
     checkAppBase({ cAppNo: baseFlag }).then((res) => {
       if (res.code === 200) {
         dialog.value?.open(
           "distAdd",
           {
-            fromSchema: tableconfig.value.fromSchema,
+            fromSchema: fromSchema,
             title: "新增",
             tab: formconfig1.value.title,
           },
@@ -235,7 +274,11 @@ const method = {
       }
     });
   },
+
   handleQuery: () => {
+    let tgtRef = opertaor.getTableRefByKey('tgt')
+
+
     const param = opertaor.getParam();
     console.log(param);
     let app = "";
@@ -255,6 +298,7 @@ const method = {
         pageresult.list.forEach((item, index) => {
           item.nSeqNo = index + 1;
         });
+        tgtRef.setValue("Tgt.nElevatorsNumber",res.data.length)
       }
     });
   },
@@ -354,6 +398,7 @@ const method = {
         ElMessage.error("模板下载失败");
       });
   },
+
 };
 //给表单下拉项赋值
 function setFormItem(key, obj) {

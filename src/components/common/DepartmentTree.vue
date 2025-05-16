@@ -50,6 +50,8 @@ const defaultProps = {
   label: "label",
 };
 
+const emits = defineEmits(["ok"]);
+
 watch(filterText, (val) => {
   treeRef.value!.filter(val);
 });
@@ -67,6 +69,7 @@ const handleCancel = () => {
 const handleSave = () => {
   if (selectedNode.value) {
     console.log("选中的节点", selectedNode.value);
+    emits("ok", selectedNode.value);
   }
   dialogVisible.value = false;
 };
