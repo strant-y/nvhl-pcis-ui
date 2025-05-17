@@ -1302,6 +1302,9 @@ const submitToUndrFn = async () => {
         console.log("submitToUndr-res", res);
         if (res["code"] == "200") {
           ElMessage.success(res.msg);
+          // 申请核保成功后按钮设置为不可点击
+          const btn = getBtn("btn010103");
+          btn.disabled = true;
         } else {
           ElMessage.error(res.msg);
         }
