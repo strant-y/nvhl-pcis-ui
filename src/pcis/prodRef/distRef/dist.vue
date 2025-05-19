@@ -29,6 +29,7 @@ import {
   syncDist,
   exportDist
 } from "@/api/prod/index";
+import { getAddressStr } from "@/api/query";
 import { saveAs } from "file-saver";
 import { formInit } from "@/shared/from-init";
 import { codeListViewStore } from "@/store";
@@ -57,7 +58,7 @@ const pageresult = reactive<Pageresult>({
   /** 总数 */
   total: 0,
 });
-
+const applicantEditRef = ref<AppFreeEditMethod | null>(null);
 const distTableRef = ref<AppTableMethod | null>(null);
 const cardconfig = ref<CardConfig>(creatCardConfig({}));
 const formconfig1 = ref<Record<string, any>>({});
@@ -68,6 +69,7 @@ let cComponentTableValue: string;
 
 // 封装获取 cComponentTableValue 的逻辑
 const getCComponentTableValue = (cProdNo: string, title: string): string => {
+  console.log(title,"title00000")
   if (cProdNo == "040001") {
     return "AddressDist";
   } else if (cProdNo == "040002") {
@@ -120,7 +122,7 @@ const getCComponentTableValue = (cProdNo: string, title: string): string => {
     if(title =="房屋清单"){
       return "AddressDist"
     }else if(title =="家庭成员清单"){
-      return "FamilyTgt"
+      return "FamilyDist"
     }
   }else if(cProdNo =="045001"){
     if(title =="雇员清单信息"){
@@ -237,7 +239,7 @@ const method = {
     let baseFlag = opertaor.getDataAll().plyBase["Base.cAppNo"];
 
     let fromSchema = tableconfig.value.fromSchema;
-    let cIs= opertaor.getTableRefs()['tgt'].getFromValue()['Tgt.cIsinsuranceRegistered']  //  是否记名投保
+    let cIs= opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered']  //  是否记名投保
     
     if(cIs == 1){
       fromSchema?.forEach((item,index) =>{
@@ -277,10 +279,7 @@ const method = {
 
   handleQuery: () => {
     let tgtRef = opertaor.getTableRefByKey('tgt')
-
-
     const param = opertaor.getParam();
-    console.log(param);
     let app = "";
     if (param.cOrgAppNo) {
       app = param.cOrgAppNo;
@@ -298,7 +297,9 @@ const method = {
         pageresult.list.forEach((item, index) => {
           item.nSeqNo = index + 1;
         });
-        tgtRef.setValue("Tgt.nElevatorsNumber",res.data.length)
+        if(tgtRef !=undefined){
+          tgtRef.setValue("Tgt.nElevatorsNumber",res.data.length)
+        }
       }
     });
   },
@@ -398,8 +399,24 @@ const method = {
         ElMessage.error("模板下载失败");
       });
   },
-
+setregistAdd(){
+    const ads = distTableRef?.value?.getValue('Dist.AllProp');
+    const a = distTableRef?.value?.getValue("Dist.cRegisterSuffixAddr") || "";
+    if (ads) {
+      getAddressStr({ address: ads }).then((res: any) => {
+        const { code, data, msg } = res;
+        if (code === 200) {
+          const b = (data ? data['addStr'] : "") + a;
+          setAddressStr("Dist.cClntAddr", b);
+        }
+      });
+    } else {
+      setAddressStr("Dist.cClntAddr", a);
+    }
+    console.log("清单级联事件触发")
+  }
 };
+
 //给表单下拉项赋值
 function setFormItem(key, obj) {
   if (obj && Object.keys(obj).length) {
@@ -452,11 +469,37 @@ function getFormconfig() {
     fromType: "custom",
   };
 }
+function setAddressStr(key: any, data: any) {
+  applicantEditRef?.value?.setValue(key, data);
+}
+function getFromValue() {
+  return applicantEditRef?.value?.getFromValue();
+}
+
+function setFormValue(value: any) {
+  applicantEditRef?.value?.setFormValue(value);
+}
+
+function validate() {
+  return applicantEditRef?.value?.validate();
+}
+
+function setValue(key: string, value: any) {
+  applicantEditRef?.value?.setValue(key, value);
+}
+
+function getValue(key: string) {
+  return applicantEditRef?.value?.getValue(key);
+}
 
 // 绑定特殊验证器
 const exRules = {};
 
 defineExpose({
+  getValue,
+  setValue,
+  getFromValue,
+  setFormValue,
   getFormconfig,
   setUnDisabledByKeyList,
 });

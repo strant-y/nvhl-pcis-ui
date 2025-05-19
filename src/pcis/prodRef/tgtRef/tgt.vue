@@ -43,6 +43,7 @@ onMounted(async () => {
   nextTick(() => {
     //设置是否单项工程默认值：是
     setValue("Tgt.cIsSingle", '1')
+    setValue("Tgt.cContractCurrency", '01')
   })
 });
 

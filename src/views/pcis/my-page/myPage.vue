@@ -457,14 +457,13 @@ const basicBtn = [
     label: "保存模板",
     type: "primary",
     func: () => {
-      console.log(13133);
     },
   }),
   createFreeButtonBase({
     label: "复制出单",
     type: "primary",
     func: () => {
-      // copyPolicyFun()
+      copyPolicyFun()
     },
   }),
   createFreeButtonBase({
@@ -516,7 +515,6 @@ const basicBtn = [
     label: "历史赔案",
     type: "primary",
     func: () => {
-      console.log(13133);
       historyClaimcaseFun();
       // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
     },
@@ -1302,6 +1300,9 @@ const submitToUndrFn = async () => {
         console.log("submitToUndr-res", res);
         if (res["code"] == "200") {
           ElMessage.success(res.msg);
+          // 申请核保成功后按钮设置为不可点击
+          const btn = getBtn("btn010103");
+          btn.disabled = true;
         } else {
           ElMessage.error(res.msg);
         }
@@ -1848,6 +1849,9 @@ function setTmDay(tmday: any) {
 }
 
 function getPlanCvrg() {
+  if(props.param?.cIsPlan !== '1'){
+    return ;
+  }
   const param = { cPlanNo: props.param?.cTermNo }
   policyService.getPlanCvrg(param).then((result:any) => {
     if (result['code'] === 200) {

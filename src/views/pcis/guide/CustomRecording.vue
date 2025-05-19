@@ -234,6 +234,7 @@ const formconfig1 = ref({
   cProdNme: "",
   cPlyNo: "",
   cRecordType: 1,
+  cIsPlan:'0',
 });
 const selectTreeItem = ref({});
 const labelNm = ref("条款")
@@ -427,9 +428,11 @@ function handleRecordTypeChange(val:any) {
   if (val == "2") {
     loadOptions(2);
     labelNm.value = "方案";
+    formconfig1.value.cIsPlan = '1';
   } else {
     loadOptions();
     labelNm.value = "条款";
+    formconfig1.value.cIsPlan = '0';
   }
   handleQuery()
   formconfig1.value.cTermNme = "";
