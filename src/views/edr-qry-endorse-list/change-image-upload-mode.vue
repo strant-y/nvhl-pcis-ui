@@ -16,6 +16,7 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { useValidator } from "@/typings/useValidator";
+import { createFreeButtonBase } from "@/shared/button-config";
 
 const props = defineProps({
   parameter: {
@@ -28,11 +29,11 @@ const { getRules } = useValidator();
 const dialogVisible = ref(true)
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const userStore = useUserStore();
-const formData = reactive<any>(freeEditRef.value?.getFromValue());
+const formData = reactive<any>({});
 const originalImageUploadMode = ref<any>('');
 const policyService = new PolicyService();
 const user = userStore.user;
-formData.CUpdCde = user['opCde'];
+// formData.CUpdCde = user['opCde'];
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -59,7 +60,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "影像上传方式",
         clearable: true,
         typeCode: "RatioTyp_List",
-        param: { 'C_PAR_CDE': '036' },
+        codeParam: { 'C_PAR_CDE': "036" },
         rules: [getRules("required", {})],
       },
     ],
@@ -112,6 +113,7 @@ const close = () => {
 };
 
 onMounted(() => {
+  formData.CUpdCde = user['opCde']
   fetchImageUploadModeByPlyNo();
 });
 
