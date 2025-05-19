@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="dialogVisible" width="90%">
+  <el-dialog v-model="dialogVisible" width="70%">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
     <app-table
       :tableConfig="tableconfig"
@@ -14,7 +14,6 @@
 <script setup lang="ts">
 const applicantEditRef = ref<AppFreeEditMethod | null>(null);
 import { defineComponent, ref, reactive, onMounted } from 'vue';
-// import { ElMessage, ElForm, ElFormItem, ElRadioGroup, ElRadio, ElSelect, ElOption, ElCascader, ElDatePicker, ElInput, ElButton, ElTable, ElTableColumn, ElPagination } from 'element-plus';
 import { getListByCode } from '@/api/code-list-service';
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
 import { AppKey } from '@/constants/api';
@@ -91,6 +90,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           { label:'投保单',value:1 },
           { label:'保单',value:0 },
         ],
+        defaultValue: 1,
+        keymap: {
+          y: 1,
+          n: 0,
+        },
         rules: [getRules("required", {})],
       },
       {
@@ -106,11 +110,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "CLoadSub",
         inputtype: "rtcheckbox",
         title: "是否包含下级",
-        default: true,
-        // loadData :[
-        //   { label:'是',value:1 },
-        //   { label:'否',value:0 },
-        // ]
+        defaultValue: 1,
+        keymap: {
+          y: 1,
+          n: 0,
+        },
       },
       {
         prop: "CKindNo",

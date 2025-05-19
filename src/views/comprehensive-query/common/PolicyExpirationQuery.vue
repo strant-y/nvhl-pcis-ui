@@ -71,7 +71,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         label: "重置",
         func: () => {
           freeEditRef.value?.setFormValue({
-            NExpirationDays: 3,
+            NExpirationDays: "",
             orgCde: user.value.companyId,
             CLoadSub: 1,
             cKindNo: null,
@@ -151,6 +151,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "保单到期剩余天数",
         rules: [getRules("required", {})],
         clearable: true,
+        // func:(val)=>{
+        //   if(val <= 8){
+        //     console.log("9999999999",val)
+        //   }
+        // }
       },
       // {
       //   prop: "CKindNo",

@@ -457,14 +457,13 @@ const basicBtn = [
     label: "保存模板",
     type: "primary",
     func: () => {
-      console.log(13133);
     },
   }),
   createFreeButtonBase({
     label: "复制出单",
     type: "primary",
     func: () => {
-      // copyPolicyFun()
+      copyPolicyFun()
     },
   }),
   createFreeButtonBase({
@@ -516,7 +515,6 @@ const basicBtn = [
     label: "历史赔案",
     type: "primary",
     func: () => {
-      console.log(13133);
       historyClaimcaseFun();
       // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
     },
