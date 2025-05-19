@@ -1040,6 +1040,7 @@ export function pageFindPlanCiSNLBByParams(queryParams: any): AxiosPromise<any> 
   return post(`/plan/pageFindPlanCiSNLBByParams`, queryParams);
 }
 
+
 /**
  * 查询组织部门树列表
  *
@@ -1284,4 +1285,22 @@ export function saveProdRuleInfo(queryParams: any): AxiosPromise<any> {
  */
 export function saveBatchUndrDtyInfo(queryParams: any): AxiosPromise<any> {
   return post(`/proddef/saveBatchUndrDtyInfo`, queryParams);
+}
+
+
+/**
+ * 联共保信息配置--新增
+ *
+ * @param queryParams   /beauty-api/plan/savePlanCiInfo
+ */
+export function savePlanCiInfo(queryParams: any): AxiosPromise<any> {
+  return post(`/plan/savePlanCiInfo`, queryParams);
+}
+
+/**
+ * 联保信息配置  --根据主键删除
+ * 
+ */
+ export function deletePlanCiInfoById(queryParams: any): AxiosPromise<any> {
+  return post(`/plan/deletePlanCiInfoById`, queryParams);
 }
