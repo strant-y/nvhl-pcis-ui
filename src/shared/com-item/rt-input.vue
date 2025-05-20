@@ -50,12 +50,23 @@
       "
       :formatter="
         item.type === 'number'
-          ? (value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+          ? (value) => {
+              if (value == null) return '';
+              const parts = `${value}`.split('.');
+              const integerPart = parts[0].replace(
+                /\B(?=(\d{3})+(?!\d))/g,
+                ','
+              );
+              const decimalPart = parts.length > 1 ? `.${parts[1]}` : '';
+              return integerPart + decimalPart;
+            }
           : (value) => value
       "
       :parser="
         item.type === 'number'
-          ? (value) => value.replace(/\$\s?|(,*)/g, '')
+          ? (value) => {
+            return value?.replace(/,/g, '') ?? ''
+          }
           : (value) => value
       "
       v-model="vInput"
@@ -160,7 +171,7 @@ watch([() => props.modelValue], ([newModelValue]) => {
 function handleChange(val?: string | undefined | null) {
   let nv = 0;
   if (props.item.type === "number") {
-    nv = val ? Number(val?.replace(/[^0-9]/g, '')) : 0;
+    nv = val ? Number(val.replace(/[^\d.-]/g, '')) : 0;
     emits("valueChange", nv);
     emits("update:modelValue", nv);
   } else {
