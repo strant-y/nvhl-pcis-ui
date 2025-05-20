@@ -412,6 +412,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                           item.hidden = true;
                       }
                   });
+                  
                   codeListStore
                     .queryCodeList({
                         codeListName: "TERM_LIST_IN_GUIDE_NEW",

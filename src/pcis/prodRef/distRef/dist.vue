@@ -122,7 +122,7 @@ const getCComponentTableValue = (cProdNo: string, title: string): string => {
     if(title =="房屋清单"){
       return "AddressDist"
     }else if(title =="家庭成员清单"){
-      return "FamilyTgt"
+      return "FamilyDist"
     }
   }else if(cProdNo =="045001"){
     if(title =="雇员清单信息"){

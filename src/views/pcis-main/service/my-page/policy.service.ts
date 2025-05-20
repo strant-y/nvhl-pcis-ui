@@ -609,6 +609,46 @@ export class PolicyService {
     qryUndrPlanBaseList(data = null) {
         return request.post('/plan/qryUndrPlanBaseList', data);
     }
+    
+     /**
+     * 保存公式信息
+     * @param {any} data
+     * @returns {Observable<Object>}
+     */
+    //  
+    savePlanCvrgFormula(data = null) {
+        return request.post('/plan/savePlanCvrgFormula', data);
+    }
+
+
+        /**
+     * 功能描述: 获取方案关联公式信息
+     *  
+     *  
+     */
+    getPlanCvrgFormulaInfo(data = null) {
+        return request.post('plan/getPlanCvrgFormulaInfo', data);
+    }
+
+    /**
+     * 关联方案--根据主键删除公式表 
+     * 
+     */
+    deleteFormulaById(data = null) {
+        return request.post('plan/deleteFormulaById', data);
+    }
+
+      /**
+     * 关联方案--根据方案号山删除全部 公式表 
+     * 
+     */
+
+      deleteCvrgFormulaByPlanNo(data = null) {
+        return request.post('plan/deleteCvrgFormulaByPlanNo', data);
+        
+      }
+       
+
 
     /**
      * 修改方案状态

@@ -107,7 +107,7 @@ const getCComponentTable = () => {
       case "房屋清单":
         return "AddressDist";
       case "家庭成员清单":
-        return "FamilyTgt";
+        return "FamilyDist";
       default:
         return "";
     }
@@ -141,17 +141,10 @@ const formconfig1 = ref<AppFreeEditConfig>(
       createFreeButtonBase({
         type: "primary",
         label: "确定",
-        func: () => {
-          freeEditRef.value?.validate().then(() => {
+        func: async () => {
+          const isValid = await freeEditRef.value?.validate();
+          if(isValid){
             const s = freeEditRef.value?.getFromValue();
-            // const processedData = Object.keys(s).reduce(
-            //   (acc, key) => {
-            //     const newKey = key.replace(/^Dist\./, "");
-            //     acc[newKey] = s[key];
-            //     return acc;
-            //   },
-            //   {} as Record<string, any>
-            // );
             const params = Object.assign(
               {
                 cProdNo: route.params.param.cProdNo,
@@ -169,7 +162,10 @@ const formconfig1 = ref<AppFreeEditConfig>(
                 ElMessage.error(res.msg);
               }
             });
-          });
+          }
+          // freeEditRef.value?.validate().then(() => {
+            
+          // });
         },
       }),
       createFreeButtonBase({
@@ -195,6 +191,32 @@ onMounted(() => {
   }
 });
 
+function getFromValue() {
+  return freeEditRef?.value?.getFromValue();
+}
+
+function setFormValue(value: any) {
+  freeEditRef?.value?.setFormValue(value);
+}
+function validate() {
+  return freeEditRef?.value?.validate();
+}
+
+function setValue(key: string, value: any) {
+  freeEditRef?.value?.setValue(key, value);
+}
+
+function getValue(key: string) {
+  return freeEditRef?.value?.getValue(key);
+}
+
+defineExpose({
+  getFromValue,
+  setFormValue,
+  validate,
+  setValue,
+  getValue,
+});
 </script>
 
 <style scoped></style>

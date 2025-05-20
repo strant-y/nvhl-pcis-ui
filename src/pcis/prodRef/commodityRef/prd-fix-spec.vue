@@ -28,7 +28,7 @@
             label="特约代码"
             width="160"
           />
-          <el-table-column property="cSpecialName" label="特别约定内容" />
+          <el-table-column property="cSpecialContent" label="特别约定内容" />
         </el-table>
       </el-tab-pane>
       <el-tab-pane label="添加其他特约" name="second">
@@ -46,9 +46,9 @@
               ></el-input>
             </template>
           </el-table-column>
-          <el-table-column property="cSpecialName" label="特别约定内容">
+          <el-table-column property="cSpecialContent" label="特别约定内容">
             <template #default="scope">
-              <el-input v-model="scope.row['cSpecialName']"></el-input>
+              <el-input v-model="scope.row['cSpecialContent']"></el-input>
             </template>
           </el-table-column>
         </el-table>
@@ -122,7 +122,7 @@ const refreshData = () => {
       res.data.result.forEach((item, index) => {
         pageresult.list.push({
           cSpecialCode: item.cSpecialCode,
-          cSpecialName: item.cSpecialName,
+          cSpecialContent: item.cSpecialContent,
           // cNmeEn: item.cNmeEn,
           cIfMust: item.cIfMust, //是否必选
           cIfEdit: item.cIfEdit, //是否可修改
@@ -153,7 +153,7 @@ function add() {
   addTableData.push({
     addIndex: addTableData.length + 1, //序号
     cSpecialCode: "",
-    cSpecialName: "",
+    cSpecialContent: "",
     cIfMust: "1", //是否必选
     cIfEdit: "1", //是否可修改
     cIfFix: "0", //是否固定特约，查寻特约模板接口查出来的1，自定义添加的为0

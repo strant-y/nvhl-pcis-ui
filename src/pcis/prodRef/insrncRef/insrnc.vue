@@ -181,8 +181,11 @@ const method = {
       });
       return;
     }
+    const formattedDate = moment(v).format('YYYY-MM-DD') + ' 23:59:59';
+    console.log(formattedDate,"00000000000")
     setFormValue({
       "Base.nTracingDays": tm,
+      "Base.tRunEndTm": formattedDate, // 更新日期字段
     });
   },
   reportBgnTmFn: (v:any) => {
@@ -218,8 +221,10 @@ const method = {
       });
       return;
     }
+    const formatReportEnd = moment(v).format('YYYY-MM-DD') + ' 23:59:59';
     setFormValue({
       "Base.nReportDays": tm,
+      "Base.tReportEndTm":formatReportEnd,
     });
   },
 };
