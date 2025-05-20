@@ -35,6 +35,7 @@ const route = useRoute();
 const fileInputRef = ref(null);
 const fileInputType = ref();
 import { readFile } from "@/api/file";
+const tCertfDate = ref<any[]>([]);
 onMounted(() => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
@@ -731,8 +732,9 @@ const method = {
       );
       setFormItem("Insured.tCertfEndDate", { disabled: true, });
     } else {
-      setValue("Insured.tCertfBgnDate", "");
-      setValue("Insured.tCertfEndDate", "");
+      setValue("Insured.tCertfBgnDate", tCertfDate.value[0] || "");
+      setValue("Insured.tCertfEndDate", tCertfDate.value[1] || "");
+      setFormItem("Insured.tCertfEndDate", { disabled: false, });
     }
   },
   mobileChange: (val) => {
@@ -1022,6 +1024,7 @@ function handleFileChange(event: Event) {
     }
     readFile(param).then((res:any) => {
       if(res.code === 200 && res.data && res.data.result) {
+        tCertfDate.value = []
         if(fileInputType.value === "1") {// 身份证
           const result = res.data.result.item_list;
           const keys = result.map((item:any) => item.key);
@@ -1030,12 +1033,20 @@ function handleFileChange(event: Event) {
             const value = result.find((item:any) => item.key === key).value;
             cardInfo[key] = value;
           });
-          setValue("Insured.cCertfCde", cardInfo['id_number'] || null);
-          setValue("Insured.cInsuredNme", cardInfo['name'] || null);
-          setValue("Insured.cSex", cardInfo['sex'] ? cardInfo['sex'] === '男' ? '1':'2' : null);
-          setValue("Insured.tBirthday", cardInfo['date_of_birth'] ? cardInfo['date_of_birth'].replace(/(年|月)/g,'-').replace('日','') : null);
-          setValue("Insured.tCertfBgnDate", cardInfo['period_of_validity']);
-          setValue("Insured.tCertfEndDate", cardInfo['period_of_validity']);
+          if(cardInfo['id_number']) setValue("Insured.cCertfCde", cardInfo['id_number']);
+          if(cardInfo['name']) setValue("Insured.cInsuredNme", cardInfo['name']);
+          if(cardInfo['sex']) setValue("Insured.cSex", cardInfo['sex'] === '男' ? '1':'2');
+          if(cardInfo['date_of_birth']) setValue("Insured.tBirthday", cardInfo['date_of_birth'].replace(/(年|月)/g,'-').replace('日',''));
+          if(cardInfo['validate_date']) {
+            tCertfDate.value = cardInfo['validate_date'].split("-")
+            setValue("Insured.tCertfBgnDate", cardInfo['validate_date'].split("-")[0]);
+            if(cardInfo['validate_date'].split("-")[1] === "长期") {
+              setValue("Insured.cLongendTyp", "1")
+            } else {
+              setValue("Insured.cLongendTyp", "0")
+              setValue("Insured.tCertfEndDate", cardInfo['validate_date'].split("-")[1]);
+            }
+          } 
           setValue("Insured.cCertfCls", '120001');
           setValue("Insured.cClntMrk", '1');
         }
@@ -1045,8 +1056,12 @@ function handleFileChange(event: Event) {
           setValue("Insured.cInsuredNme", cardInfo['name']['value'] || null);
           setValue("Insured.cSex", cardInfo['sex']['value'] ? cardInfo['sex']['value'].split('/')[0] === '男' ? '1':'2' : null);
           setValue("Insured.tBirthday", cardInfo['date_of_birth']['value'] ? cardInfo['date_of_birth']['value'].replace('.','-') : null);
-          setValue("Insured.tCertfBgnDate", cardInfo['period_of_validity']['value'] || null);
-          setValue("Insured.tCertfEndDate", cardInfo['period_of_validity']['value'] || null);
+          if(cardInfo['period_of_validity']['value']) {
+            tCertfDate.value = cardInfo['period_of_validity']['value'].split("-")
+            setValue("Insured.cLongendTyp", "0")
+            setValue("Insured.tCertfBgnDate", cardInfo['period_of_validity']['value'].split("-")[0] || null);
+            setValue("Insured.tCertfEndDate", cardInfo['period_of_validity']['value'].split("-")[1] || null);
+          }
           setValue("Insured.cCertfCls", '19');
           setValue("Insured.cClntMrk", '1');
         }
