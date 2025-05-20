@@ -24,6 +24,9 @@ import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service'
 const policyService = new PolicyService();
 const opertaor = dataOpertaor();
 const { getRules } = useValidator();
+import { useRoute } from "vue-router";
+const route = useRoute();
+const routeParam = route.params.param;
 const props = defineProps({
     data: {
         type: Object,
@@ -186,8 +189,8 @@ function handleQuery(flag?: boolean) {
 
 onMounted(() => {
     nextTick(() => {
-        console.log('props.data.data.CDptCde',props.data.data)
-        setValue('CDptCde', props.data.data.CDptCde)
+        // setValue('CDptCde', props.data.data.CDptCde)
+        setValue('CDptCde',routeParam.cDptCnm)
     })
 });
 

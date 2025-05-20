@@ -8,9 +8,11 @@ import insrncRef from "./insrncRef/insrnc.vue";
 import tgtobjRef from "./tgtobjRef/tgtobj.vue";
 import payinfoRef from "./payinfoRef/payinfo.vue";
 import acctinfoRef from "./acctinfoRef/acctinfo.vue";
-// import ciMasterAgreementRef from "./ciMasterAgreementRef/ciMasterAgreement.vue";
-// import ourCompanyCiShareRef from "./ourCompanyCiShareRef/ourCompanyCiShare.vue";
-// import ciRef from "./ciRef/ci.vue";
+
+import ciMasterAgreementRef from "./ciMasterAgreementRef/ciMasterAgreement.vue";
+import ourCompanyCiShareRef from "./ourCompanyCiShareRef/ourCompanyCiShare.vue";
+import ciRef from "./ciRef/ci.vue";
+
 import distRef from "./distRef/dist.vue";
 import distSummaryRef from "./distRef/distSummary.vue";
 import tgtRef from "./tgtRef/tgt.vue";
@@ -84,9 +86,9 @@ const componentMap = {
   distRef: distRef,
   distSummaryRef:distSummaryRef,
   deductibleDistRef:deductibleDist,
-  // ciRef: ciRef,
-  // ciMasterAgreementRef: ciMasterAgreementRef,
-  // ourCompanyCiShareRef: ourCompanyCiShareRef,
+  ciRef: ciRef,
+  ciMasterAgreementRef: ciMasterAgreementRef,
+  ourCompanyCiShareRef: ourCompanyCiShareRef,
   insrncRef: insrncRef,
   baseafterRef: baseafterRef,
   informationRef: informationRef,

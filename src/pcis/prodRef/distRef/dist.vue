@@ -31,6 +31,7 @@ import {
 } from "@/api/prod/index";
 import { getAddressStr } from "@/api/query";
 import { saveAs } from "file-saver";
+import moment from "moment";
 import { formInit } from "@/shared/from-init";
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
@@ -296,6 +297,9 @@ const method = {
         pageresult.list = res.data;
         pageresult.list.forEach((item, index) => {
           item.nSeqNo = index + 1;
+          item.tOpeningTime = item['Dist.tOpeningTime']
+            ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
+            : "";
         });
         if(tgtRef !=undefined){
           tgtRef.setValue("Tgt.nElevatorsNumber",res.data.length)
@@ -341,6 +345,7 @@ const method = {
   },
   //导出
   exportExcel: () => {
+    const fileName = `${formconfig1.value.title}.xlsm`;
     let paramitem  = Object.assign(formconfig1.value, {
       cComponentTable: cComponentTableValue,
       cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
@@ -351,7 +356,6 @@ const method = {
           ElMessage.error({ message: "导出出错", duration: 3000 });
           return;
         }
-        const fileName = `营业场所地址清单.xls`;
         const blob = new Blob([res.data], {
           responseType:
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
@@ -388,7 +392,7 @@ const method = {
           ElMessage.error({ message: "下载出错", duration: 3000 });
           return;
         }
-        const fileName = `营业场所地址清单.xls`;
+        const fileName = `${formconfig1.value.title}.xlsm`;
         const blob = new Blob([res.data], {
           responseType:
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",

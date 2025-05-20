@@ -68,6 +68,33 @@
                     </template>
                   </span>
                 </el-anchor-link>
+                <el-anchor-link :href="`#ciMasterAgreement`" v-if="ciMasterAgreementFlag">
+                  <rt-icon
+                    style="margin-right: 14px"
+                    :item="{ icon: 'Tickets' }"
+                  />
+                  <span style="font-size: 15px" v-if="NavigaShow"
+                    >联共保主协议信息</span
+                  >
+                </el-anchor-link>
+                <el-anchor-link :href="`#ci`" v-if="ciFlag">
+                  <rt-icon
+                    style="margin-right: 14px"
+                    :item="{ icon: 'Tickets' }"
+                  />
+                  <span style="font-size: 15px" v-if="NavigaShow"
+                    >联共保信息</span
+                  >
+                </el-anchor-link>
+                <el-anchor-link :href="`#ourCompanyCiShare`" v-if="ourCompanyCiShareFlag">
+                  <rt-icon
+                    style="margin-right: 14px"
+                    :item="{ icon: 'Tickets' }"
+                  />
+                  <span style="font-size: 15px" v-if="NavigaShow"
+                    >我司联共保信息</span
+                  >
+                </el-anchor-link>
               </el-anchor>
             </div>
             <div class="NavigaList_card" style="margin-left: 5px">
@@ -162,6 +189,15 @@
             />
           </div>
         </template>
+        <div id="ci" v-if="ciFlag" style="margin-bottom: 10px">
+          <ciRef ref="ci"></ciRef>
+        </div>
+        <div id="ciMasterAgreement" v-if="ciMasterAgreementFlag" style="margin-bottom: 10px">
+          <ciMasterAgreementRef ref="ciMasterAgreement"></ciMasterAgreementRef>
+        </div>
+        <div id="ourCompanyCiShare" v-if="ourCompanyCiShareFlag" style="margin-bottom: 10px">
+          <ourCompanyCiShareRef ref="ourCompanyCiShare"></ourCompanyCiShareRef>
+        </div>
       </el-main>
     </el-container>
 
@@ -257,6 +293,10 @@ const underwrite = ref(null);
 const edrbase = ref(null);
 const edritem = ref(null);
 
+const ci = ref(null);
+const ciMasterAgreement = ref(null);
+const ourCompanyCiShare = ref(null);
+
 const invoiceRef = ref(null);
 const amlInfoRef = ref(null);
 
@@ -279,6 +319,9 @@ const tempFindBtn = [];
 let underwriteFlag = ref(false);
 let edrbaseFlag = ref(false);
 let edritemFlag = ref(false);
+let ciMasterAgreementFlag = ref(false); //
+let ourCompanyCiShareFlag = ref(false);   //
+let ciFlag = ref(false);   //
 let acctinfoFlag = ref(true);
 const user = JSON.parse(sessionStorage.getItem("user"));
 const nAmt = ref("0.00");
@@ -709,6 +752,11 @@ const uwBtn = [
  * @param data
  */
 const initPage = async () => {
+
+  // const tableref = opertaor.getTableRefs();
+  // const baseValue = tableref["Base"].getFromValue()["Base.cCiMrk"]; // 联共保信息
+  // console.log(baseValue,"8888888888")
+
   const getProductRes = await getProductPage({
     CProdNo: props.param.cProdNo,
     CGrpMrk: props.param.cGrpMrk,
@@ -805,7 +853,15 @@ function renderComponents() {
  * 页面加载后
  */
 async function loadAfter() {
-  // page.getRefTab("base").setFormValue(lowercaseKeys(props.param));
+  const baseData = opertaor.getTableRefByKey("base")?.getFromValue();
+  const cCiMrkValue = baseData?.["Base.cCiMrk"];
+
+  // 控制左侧菜单与组件的显示/隐藏
+  if (cCiMrkValue === "0") {
+    ciMasterAgreementFlag.value = false; // 联共保主协议信息 隐藏
+    ciFlag.value = false;               // 联共保信息 隐藏
+    ourCompanyCiShareFlag.value = false; // 我司联共保信息 隐藏
+  } 
   if (props.param.pageType === "app") {
     //获取单号
     getCAppNoFun();
