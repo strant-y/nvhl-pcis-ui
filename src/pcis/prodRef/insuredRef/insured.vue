@@ -1037,7 +1037,7 @@ function handleFileChange(event: Event) {
           setValue("Insured.tCertfBgnDate", cardInfo['period_of_validity']);
           setValue("Insured.tCertfEndDate", cardInfo['period_of_validity']);
           setValue("Insured.cCertfCls", '120001');
-          setValue("Insured.cClntMrk", '0');
+          setValue("Insured.cClntMrk", '1');
         }
         if(fileInputType.value === "2") {// 外国人永久居留身份证
           const cardInfo = res.data.result.details;
