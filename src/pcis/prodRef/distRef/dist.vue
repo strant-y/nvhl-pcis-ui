@@ -364,10 +364,35 @@ const method = {
       })
   },
   //导入
-  importDist() {
-    policyService.importDist(formconfig1.value).then((res) => {
-      ElMessage.success({ message: "导入成功", duration: 3000 });
-    });
+  importExcel() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.xlsx, .xls, .xlsm'; // 支持的文件类型
+    input.onchange = () => {
+      if (input.files?.length) {
+        const file = input.files[0];
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        // 将表单配置信息合并到请求参数中
+        const params = {
+          ...formconfig1.value,
+          file: file,
+        };
+        policyService.importDist(params).then((res) => {
+          if (res.code === 200) {
+            ElMessage.success("导入成功");
+            method.handleQuery(); // 刷新列表
+          } else {
+            ElMessage.error(res.message || "导入失败");
+          }
+        }).catch((error) => {
+          ElMessage.error("导入出错，请检查文件格式或内容");
+          console.error("导入错误：", error);
+        });
+      }
+    };
+    input.click(); // 触发文件选择对话框
   },
   //根据获取的职业类别查询职业等级并绑定下拉框
   getDistoccupType:(val) => {
@@ -377,7 +402,6 @@ const method = {
           codeListParam: {cParCde: val.at(-1)},
         })
         .then((res) => {
-          console.log("职业等级下拉值",res);
         setFormItem("Dist.cOccupationalLevel", {
           loadData: res,
         });

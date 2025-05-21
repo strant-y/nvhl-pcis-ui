@@ -245,6 +245,8 @@ import dayjs from "dayjs";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
 const policyService = new PolicyService();
+import { useProductStore } from "@/store/modules/prod";
+const productStore = useProductStore();
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -376,10 +378,15 @@ const isDetailCde = () => {
 };
 
 onMounted(() => {
-  console.log("路由参数props.param", props.param);
   initPage();
 });
-
+// watchEffect(() => {
+//   const isShow = productStore.$state.cCiMrk !== "0";
+//   ciMasterAgreementFlag.value = isShow;
+//   console.log(ciMasterAgreementFlag.value,"000000000")
+//   ciFlag.value = isShow;
+//   ourCompanyCiShareFlag.value = isShow;
+// });
 /**
  * 发票信息
  */
@@ -714,7 +721,6 @@ const uwBtn = [
     label: "历史赔案",
     type: "primary",
     func: () => {
-      console.log(13133);
       historyClaimcaseFun();
       // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
     },
@@ -752,15 +758,11 @@ const uwBtn = [
  * @param data
  */
 const initPage = async () => {
-
-  // const tableref = opertaor.getTableRefs();
-  // const baseValue = tableref["Base"].getFromValue()["Base.cCiMrk"]; // 联共保信息
-  // console.log(baseValue,"8888888888")
-
   const getProductRes = await getProductPage({
     CProdNo: props.param.cProdNo,
     CGrpMrk: props.param.cGrpMrk,
   });
+  
   const getRenewalAppPolicyres = await getRenewalAppPolicy({
     cPlyNo: props.param.cPlyNo,
     queryTyp: props.param.queryTyp,
@@ -808,6 +810,14 @@ const initPage = async () => {
   // 页面初始化
   const formconfig11 = JSON.parse(getProductRes.data);
 
+  
+  // if(productStore.$state.cCiMrk == "0"){
+  //   formconfig11[0].pageInfo = formconfig11[0].pageInfo.filter(
+  //     (item) => item.pageTtile !== "联共保主协议信息" && item.pageTtile !== "联共保信息" && item.pageTtile !== "我司联共保份额信息"
+  //   );
+  // }else if(productStore.$state.cCiMrk !=="0"){
+  // }
+  
   //处理账户信息方面逻辑  根据isDetailcdeType 不包含这里的都不显示账户信息方面的内容
   let isDetailcdeType = isDetailCde();
   if (!isDetailcdeType) {
@@ -815,6 +825,7 @@ const initPage = async () => {
       (item) => item.pageTtile !== "账户信息"
     );
   }
+  
   console.log("页面初始化返回数据", formconfig11);
   if (props.param?.cAppTyp == "E") {
     if (props.param.cEdrType == "1") {
@@ -853,15 +864,6 @@ function renderComponents() {
  * 页面加载后
  */
 async function loadAfter() {
-  const baseData = opertaor.getTableRefByKey("base")?.getFromValue();
-  const cCiMrkValue = baseData?.["Base.cCiMrk"];
-
-  // 控制左侧菜单与组件的显示/隐藏
-  if (cCiMrkValue === "0") {
-    ciMasterAgreementFlag.value = false; // 联共保主协议信息 隐藏
-    ciFlag.value = false;               // 联共保信息 隐藏
-    ourCompanyCiShareFlag.value = false; // 我司联共保信息 隐藏
-  } 
   if (props.param.pageType === "app") {
     //获取单号
     getCAppNoFun();
@@ -1895,7 +1897,6 @@ function lowercaseKeys<T extends object>(
   }
   return newObj;
 }
-
 function getcacheKey() {
   return cacheKey.value;
 }
