@@ -41,6 +41,7 @@ const param = route.params.param;
 const fileInputRef = ref(null);
 const fileInputType = ref();
 import { readFile } from "@/api/file";
+const tCertfDate = ref<any[]>([]);
 onMounted(() => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
@@ -174,7 +175,7 @@ const method = {
     setFormItem("Applicant.cCertfCde", {
       disabled: false,
     });
-
+    tCertfDate.value = []
     tabref["applicant"].setFormValue(applicantValue);
   },
 
@@ -499,8 +500,9 @@ const method = {
       );
       setFormItem("Applicant.tCertfEndDate", { disabled: true, });
     } else {
-      setValue("Applicant.tCertfBgnDate", "");
-      setValue("Applicant.tCertfEndDate", "");
+      setValue("Applicant.tCertfBgnDate", tCertfDate.value[0] || "");
+      setValue("Applicant.tCertfEndDate", tCertfDate.value[1] || "");
+      setFormItem("Applicant.tCertfEndDate", { disabled: false, });
     }
   },
   mobileChange: (val) => {
@@ -718,6 +720,7 @@ function handleFileChange(event: Event) {
     }
     readFile(param).then((res:any) => {
       if(res.code === 200 && res.data && res.data.result) {
+        tCertfDate.value = []
         if(fileInputType.value === "1") {// 身份证
           const result = res.data.result.item_list;
           const keys = result.map((item:any) => item.key);
@@ -726,23 +729,36 @@ function handleFileChange(event: Event) {
             const value = result.find((item:any) => item.key === key).value;
             cardInfo[key] = value;
           });
-          setValue("Applicant.cCertfCde", cardInfo['id_number'] || null);
-          setValue("Applicant.cAppNme", cardInfo['name'] || null);
-          setValue("Applicant.cSex", cardInfo['sex'] ? cardInfo['sex'] === '男' ? '1':'2' : null);
-          setValue("Applicant.tBirthday", cardInfo['date_of_birth'] ? cardInfo['date_of_birth'].replace(/(年|月)/g,'-').replace('日','') : null);
-          setValue("Applicant.tCertfBgnDate", cardInfo['period_of_validity']);
-          setValue("Applicant.tCertfEndDate", cardInfo['period_of_validity']);
+          if(cardInfo['id_number']) setValue("Applicant.cCertfCde", cardInfo['id_number']);
+          if(cardInfo['name']) setValue("Applicant.cAppNme", cardInfo['name']);
+          if(cardInfo['sex']) setValue("Applicant.cSex", cardInfo['sex'] === '男' ? '1':'2');
+          if(cardInfo['date_of_birth']) setValue("Applicant.tBirthday", cardInfo['date_of_birth'].replace(/(年|月)/g,'-').replace('日',''));
+          if(cardInfo['validate_date']) {
+            tCertfDate.value = cardInfo['validate_date'].split("-")
+            setValue("Applicant.tCertfBgnDate", cardInfo['validate_date'].split("-")[0]);
+            if(cardInfo['validate_date'].split("-")[1] === "长期") {
+              setValue("Applicant.cLongendTyp", "1")
+            } else {
+              setValue("Applicant.cLongendTyp", "0")
+              setValue("Applicant.tCertfEndDate", cardInfo['validate_date'].split("-")[1]);
+            }
+          } 
           setValue("Applicant.cCertfCls", '120001');
-          setValue("Applicant.cClntMrk", '0');
+          setValue("Applicant.cClntMrk", '1');
         }
         if(fileInputType.value === "2") {// 外国人永久居留身份证
           const cardInfo = res.data.result.details;
+          setValue("Applicant.cLongendTyp", "0")
           setValue("Applicant.cCertfCde", cardInfo['id_number']['value'] || null);
           setValue("Applicant.cAppNme", cardInfo['name']['value'] || null);
           setValue("Applicant.cSex", cardInfo['sex']['value'] ? cardInfo['sex']['value'].split('/')[0] === '男' ? '1':'2' : null);
           setValue("Applicant.tBirthday", cardInfo['date_of_birth']['value'] ? cardInfo['date_of_birth']['value'].replace('.','-') : null);
-          setValue("Applicant.tCertfBgnDate", cardInfo['period_of_validity']['value'] || null);
-          setValue("Applicant.tCertfEndDate", cardInfo['period_of_validity']['value'] || null);
+          if(cardInfo['period_of_validity']['value']) {
+            tCertfDate.value = cardInfo['period_of_validity']['value'].split("-")
+            setValue("Applicant.cLongendTyp", "0")
+            setValue("Applicant.tCertfBgnDate", cardInfo['period_of_validity']['value'].split("-")[0] || null);
+            setValue("Applicant.tCertfEndDate", cardInfo['period_of_validity']['value'].split("-")[1] || null);
+          }
           setValue("Applicant.cCertfCls", '19');
           setValue("Applicant.cClntMrk", '1');
         }

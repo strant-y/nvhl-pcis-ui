@@ -96,6 +96,8 @@ onMounted(async () => {
     //禁用保单来源
     // setFormItem("Base.cPolicySource", {disabled: true});
     setValue("Base.cDptCde", param.cDptCde);
+    //联共保业务
+    setValue("Base.cCiMrk","0")
     // 服务机构默认值
     setFormItem("Base.cIntroDptcde", {
       loadData: [
@@ -138,6 +140,10 @@ const method = {
   // func demo
   func1: () => {
     console.log(getRules);
+  },
+  //联共保下拉change
+  cCiMrkChange:(val)=>{
+    console.log(val,"99999999")
   },
   //业务来源大类
   businessKindFunc: (val) => {
