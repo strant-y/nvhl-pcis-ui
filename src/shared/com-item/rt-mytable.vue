@@ -36,7 +36,7 @@
           <rt-button :item="item" />
         </template> -->
       </template>
-      <div class="form-inner">
+      <div class="form-inner" :style="{'maxHeight':appgrideditConfig.maxHeight ?  appgrideditConfig.maxHeight : '500px'}">
         <VueDraggable
           v-model="dataList"
           :animation="150"
@@ -467,7 +467,7 @@ defineExpose({
   margin-bottom: 0px !important; /* 使内容显示更近紧促 */
 }
 .table-container .form-inner {
-  max-height: 500px; /* 设置最大高度 */
+  /* max-height: 500px;  设置最大高度  */
   overflow-y: auto; /* 添加垂直滚动条 */
   display: block; /* 将表格转换为块级元素以应用滚动条 */
   width: 100%; /* 使表格占满父容器的宽度 */
