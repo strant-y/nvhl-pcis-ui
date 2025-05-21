@@ -188,6 +188,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
         },
         func: (val) => {
+          setValue("cProdNo","")
           cPard.value = val;
           codeListStore
             .queryCodeList({
@@ -383,6 +384,17 @@ function setFormItem(key, obj) {
         });
     }
 }
+function setValue(key: string, value: any) {
+    freeEditRef?.value?.setValue(key, value);
+}
+
+function getValue(key: string) {
+  return freeEditRef?.value?.getValue(key);
+}
+defineExpose({
+  setValue,
+  getValue,
+});
 </script>
 
 <style scoped></style>
