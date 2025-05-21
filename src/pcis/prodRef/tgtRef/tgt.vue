@@ -12,7 +12,8 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useProductStore } from "@/store/modules/prod";
 import { rule } from "postcss";
 import { useValidator } from "@/typings/useValidator";
-const amlExtendInfo = defineAsyncComponent(
+import { syncDist } from "@/api/prod";
+const wagesInfo = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/wages-info-model.vue")
 );
 
@@ -46,6 +47,19 @@ onMounted(async () => {
     setValue("Tgt.cContractCurrency", '01')
   })
 });
+
+const wagesInfoModel = () => {
+  let cRegisteredLogo = opertaor.getDataAll()['tgt']['Tgt.cRegisteredLogo'];  // 记名投保标志 是 获取清单汇总   否可以自己修改添加
+  let cAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];
+
+
+  dzmodal.open(wagesInfo, { type: "edit", data: { cAppNo: cAppNo, cRegisteredLogo: cRegisteredLogo } }).then((res: any) => {
+    if (res.type === "ok") {
+        // setFormItem('Tgt.nTotalSalary',
+        setValue("Tgt.nTotalSalary",res.body        )
+    }
+  });
+}
 
 // 绑定方法
 const method = {
@@ -113,19 +127,47 @@ const method = {
     }
   },
   wagesInfoBtn: () => {
-    console.log('按钮 工资总额')
-    dzmodal
-      .open(amlExtendInfo, {})
-      .then((res: any) => {
-        if (res.type === "ok") {
+ 
+    let cRegisteredLogo = opertaor.getDataAll()['tgt']['Tgt.cRegisteredLogo'];  // 记名投保标志 是 获取清单汇总   否可以自己修改添加
+    // let cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];   //投保单号
+    let cAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];   //投保单号
+ 
+
+
+ 
+
+    if (cRegisteredLogo !== "1" && cRegisteredLogo !== "0") {
+      ElMessage.error('请选择“记名投保标志”！')
+      return false;
+    }
+
+    if(!cAppNo){
+      ElMessage.error("请先保存申请单!")
+      return false;
+    }
+
+    // 获取总额方式  没有数据给进行提示
+    if (cRegisteredLogo == 1) {
+      syncDist({ cComponentTable: "DistSummary", cAppNo: cAppNo }).then((res: any) => {
+        const { code, data, msg } = res;
+
+        if (code == 200) {
+          if (data.length > 0) {
+            wagesInfoModel();
+
+          } else {
+            ElMessage.error('雇员清单不能为空！');
+          }
         }
+
       });
+    } else {
+      wagesInfoModel();
+    }
   },
   // 工程造价
   nEngineeringCostChange: (val) => {
-    console.log(val)
     if (val) {
-
       setFormItem('Tgt.nLaborPrice', {
         rules: null
       })
@@ -140,15 +182,14 @@ const method = {
   },
   // 工程面积(㎡)
   nProjectAreaChange: (val) => {
-    console.log(val)
     if (val) {
 
       setFormItem('Tgt.nLaborPrice', {
-        rules:null
+        rules: null
       })
 
       setFormItem('Tgt.nProjectArea', {
-        rules:  [getRules("required", {})],
+        rules: [getRules("required", {})],
       })
       setFormItem('Tgt.nEngineeringCost', {
         rules: null,
@@ -175,29 +216,29 @@ const method = {
 
   },
   // 是否含隧道
-  cIncludeBridgesChange:(val)=>{
+  cIncludeBridgesChange: (val) => {
     console.log(val)
-    if(val ==1){
+    if (val == 1) {
       setFormItem('Tgt.nBridgeProportion', {
         rules: [getRules("required", {})],
       })
       setFormItem('Tgt.nTunnelProportion', {
         rules: [getRules("required", {})],
       })
-    }else{
+    } else {
       setFormItem('Tgt.nBridgeProportion', {
         rules: null,
       })
       setFormItem('Tgt.nTunnelProportion', {
-        rules:null,
+        rules: null,
       })
     }
   },
   // 计划开工日期
-  tPlannedDateChange:(v)=>{
+  tPlannedDateChange: (v) => {
     const start = getValue("Tgt.tPlannedDate");
     const end = getValue("Tgt.tPlannedCompletion");
-    const tm = moment(end).diff(moment(v), "days"); 
+    const tm = moment(end).diff(moment(v), "days");
     if (!end || !v) {
       return;
     }
@@ -214,7 +255,7 @@ const method = {
 
   },
   // 计划竣工日期 
-  tPlannedCompletionChange:(v)=>{
+  tPlannedCompletionChange: (v) => {
     const start = getValue("Tgt.tPlannedDate");
     const end = getValue("Tgt.tPlannedCompletion");
     if (!start || !v) {
@@ -233,13 +274,13 @@ const method = {
     });
   },
   // 核定座位总数
-  nSeatsNumberChange:(v)=>{
+  nSeatsNumberChange: (v) => {
     // Tgt.nSeatsNumber 核定总数
     // Tgt.nSeatCapacity 投保总数
     // const start = getValue("Tgt.tPlannedDate");
     const nSeatCapacity = getValue("Tgt.nSeatCapacity");
-    console.log( v, nSeatCapacity)
-    if(v !== nSeatCapacity){
+    console.log(v, nSeatCapacity)
+    if (v !== nSeatCapacity) {
       ElMessage.warning("核定座位总数和投保座位数总数不一致！");
     }
   }

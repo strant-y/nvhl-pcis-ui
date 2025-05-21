@@ -37,7 +37,7 @@
       <el-button @click="goBack">返回</el-button>
     </div>
     <el-card style="margin-top: 20px;" v-if="payinfo">
-      <app-grid-edit :gridEditConfig="formconfig3" ref="payinfoEditRef" />
+      <app-grid-edit :gridEditConfig="formconfig3" ref="payinfoEditRef" /> 
     </el-card>
   </div>
 </template>

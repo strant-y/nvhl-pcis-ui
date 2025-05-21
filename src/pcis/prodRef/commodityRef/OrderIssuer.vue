@@ -47,7 +47,7 @@ import {
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
 import { ref, reactive } from "vue";
-import { saveRiskInfo } from "@/api/prod";
+import { saveRiskInfo,getPageList } from "@/api/prod";
 
 const props = defineProps<{
   visible: boolean;
@@ -90,6 +90,15 @@ const formconfig = reactive<AppFreeEditConfig>(
     }),
   })
 );
+
+const save = async ()=>{
+  const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
+  const s = freeEditRef.value?.getFromValue(); //获取表单数据
+  const param = Object.assign(s, r);
+  param.cProdNo = props.data.data.cProdNo;
+
+  await getPageList("WEB_ORG_OPER_DPT_ALL",param); //保存接口调用
+}
 
 const handleSave = async () => {
   const formData = freeEditRef.value?.getFromValue();
