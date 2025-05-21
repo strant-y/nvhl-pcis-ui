@@ -68,7 +68,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         ],
         fromSchema: [
             {
-                prop: "CDptCde",
+                prop: "CDptCnm",
                 inputtype: "rtinput",
                 title: "机构部门",
                 disabled: true,
@@ -190,7 +190,7 @@ function handleQuery(flag?: boolean) {
 onMounted(() => {
     nextTick(() => {
         // setValue('CDptCde', props.data.data.CDptCde)
-        setValue('CDptCde',routeParam.cDptCnm)
+        setValue('CDptCnm',routeParam.cDptCnm)
     })
 });
 
