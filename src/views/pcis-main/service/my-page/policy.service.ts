@@ -35,6 +35,10 @@ export class PolicyService {
     qryTaskVestigeUrl = '/underwriting/query/taskVestige';
     getUnbindHealthNotifyUrl = '/proddef/getUnbindHealthNotify'; // 获取待绑定健康告知列表
 
+    selectTotalSalaryUrl = '/policy/selectTotalSalary';  //  工资总额 -- 列表
+    saveTotalSalaryUrl = '/policy/saveTotalSalary'  // 工资总额 -- 保存
+
+
     /**
      * 保单保费计算
      * @param  {[type]}          policy [description]
@@ -1574,4 +1578,19 @@ importDist(data) {
 listImage(data) {
     return request.post('image/listImage', data);
 }
+
+
+
+// 工资总额列表
+selectTotalSalary(data) {
+    return request.post(`${this.selectTotalSalaryUrl}`, data);
+  }
+// 工资总额-保存
+saveTotalSalary(data) {
+    return request.post(`${this.saveTotalSalaryUrl}`, data);
+  }
+// // 工资总额-
+// selectTotalSalary(data) {
+//     return request.post(`${this.selectTotalSalaryUrl}`, data);
+//   }
 }
