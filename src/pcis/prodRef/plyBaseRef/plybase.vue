@@ -528,8 +528,11 @@ const method = {
   //项目类别大类change事件
   cPrjCtgTypChange: (val) => {
     console.log('类别',val)
-    setValue("Base.cPrjCtgMidTyp", "");
-    setValue("Base.cPrjCtgSubTyp", "");
+    const p = opertaor.getParam();
+    if (!p.initFlag) {
+      setValue("Base.cPrjCtgMidTyp", "");
+      setValue("Base.cPrjCtgSubTyp", "");
+    }
     if (val) {
       // Base.cPrjCtgMidTyp
       // setFormItem("Base.cPrjCtgMidTyp", { rules: null, disabled: true });
@@ -551,7 +554,10 @@ const method = {
   },
   //项目类别中类change事件
   cPrjCtgMidTypChange: (val) => {
-    setValue("Base.cPrjCtgSubTyp", "");
+    const p = opertaor.getParam();
+    if (!p.initFlag) {
+      setValue("Base.cPrjCtgSubTyp", "");
+    }
     if (val) {
       codeListStore
         .queryCodeList({
