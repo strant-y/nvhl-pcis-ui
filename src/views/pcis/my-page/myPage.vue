@@ -1282,19 +1282,25 @@ const setPayInfo = (base, applicant, insrnc) => {
  * 投保申请核保
  */
 const submitToUndrFn = async () => {
-  if(!checkNAmt()) return;
+  if (!checkNAmt()) return;
   const f = await savePlyInfo(); // 提交核保,需要默认执行一次保存操作
   if (f) {
     const btn = getBtn("btn010103");
-    btn.loading = true;
+
     const res: any = {};
-    // setTimeout(() => {
+    nextTick(async () => {
+      const rv = await opertaor.validateAll();
+      if (!rv) {
+        ElMessage.error("存在未录入数据,请确认!");
+        return;
+      }
+      btn.loading = true;
       console.log(opertaor.getTableRefByKey("plyBase").getFromValue());
       const base = opertaor.getTableRefByKey("plyBase").getFromValue();
       res["user"] = user;
       res["appNo"] = base["Base.cAppNo"];
 
-      console.log('申请核保参数-----',res)
+      console.log("申请核保参数-----", res);
       submitToUndr(res).then((res: any) => {
         btn.loading = false;
         console.log("submitToUndr-res", res);
@@ -1305,9 +1311,10 @@ const submitToUndrFn = async () => {
           btn.disabled = true;
         } else {
           ElMessage.error(res.msg);
+          btn.disabled = true;
         }
       });
-    // }, 100);
+    });
   }
 };
 
@@ -1373,7 +1380,7 @@ const savePlyInfo = async () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
 
-  console.log('保存参数-----1',res);
+  console.log("保存参数-----1", res);
   if (res["cvrg"].length == 0) {
     ElMessage.error("请录入条款信息");
     btn.loading = false;
@@ -1384,10 +1391,19 @@ const savePlyInfo = async () => {
   console.log("saveAppPlyInfo-res", resInfo);
   btn.loading = false;
   if (resInfo["code"] == "200") {
-    const ops = opertaor.convertData(resInfo);
+    const ops: any = opertaor.convertData(resInfo);
     console.log("转换的数据", ops);
     ElMessage.success(resInfo.msg);
-    opertaor.setDataAll(ops);
+    const base = ops["base"];
+    const plyBase = ops["plyBase"];
+    if (base) {
+      const baseRef = opertaor.getTableRefByKey("base");
+      baseRef.setFormValue(base);
+    }
+    if (plyBase) {
+      const plyBaseRef = opertaor.getTableRefByKey("plyBase");
+      plyBaseRef.setFormValue(plyBase);
+    }
     saveFlag = true;
   } else {
     ElMessage.error(resInfo.msg);

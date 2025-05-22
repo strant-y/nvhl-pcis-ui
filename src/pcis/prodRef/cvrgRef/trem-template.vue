@@ -1,224 +1,255 @@
 <template>
   <div>
     <el-card class="cvrg-info">
-      <template #header>
-        <div class="cvrg-hearder">
-          <el-row>
-            <el-col :span="10">
-              <a style="margin-right: 5px" @click="showData = !showData">
-                <el-icon v-if="!showData"><ArrowUpBold /></el-icon>
-                <el-icon v-if="showData"><ArrowDownBold /></el-icon>
-              </a>
-              <el-tag type="danger">{{
-                term.cRdrTyp === "0" ? "主" : "附加"
-              }}</el-tag>
-              <el-tag type="warning">{{ term.cNmeCn }}</el-tag>
-            </el-col>
-            <el-col :span="12">
-              <el-row :gutter="20">
-                <template v-for="(item, k) in termFactormap" :key="k">
-                  <el-col :span="11" v-if="item.cPorpShowtitle === '1'">
-                    <el-form-item :label="item.title" class="show_title">
-                      <from-item
-                        v-model="termdata[item.prop]"
-                        @update:modelValue="update()"
-                        :item="item"
-                      />
-                    </el-form-item>
-                  </el-col>
-                </template>
-              </el-row>
-            </el-col>
-            <el-col :span="2">
-              <rtButton
-                v-if="!btnItem.delete.hidden"
-                @click="
-                  () => {
-                    emit('delete', termdata);
-                  }
-                "
-                :item="btnItem.delete"
-              />
-            </el-col>
-          </el-row>
-        </div>
-      </template>
+      <el-form ref="templateRef" :model="termdata" :inline-message="true">
+        <template #header>
+          <div class="cvrg-hearder">
+            <el-row>
+              <el-col :span="10">
+                <a style="margin-right: 5px" @click="showData = !showData">
+                  <el-icon v-if="!showData"><ArrowUpBold /></el-icon>
+                  <el-icon v-if="showData"><ArrowDownBold /></el-icon>
+                </a>
+                <el-tag type="danger">{{
+                  term.cRdrTyp === "0" ? "主" : "附加"
+                }}</el-tag>
+                <el-tag type="warning">{{ term.cNmeCn }}</el-tag>
+              </el-col>
+              <el-col :span="12">
+                <el-row :gutter="20">
+                  <template v-for="(item, k) in termFactormap" :key="k">
+                    <el-col :span="11" v-if="item.cPorpShowtitle === '1'">
+                      <el-form-item
+                        :label="item.title"
+                        class="show_title"
+                        :prop="item.prop"
+                        :rules="item.required ? getRequired() : undefined"
+                      >
+                        <from-item
+                          v-model="termdata[item.prop]"
+                          @update:modelValue="update()"
+                          :item="item"
+                        />
+                      </el-form-item>
+                    </el-col>
+                  </template>
+                </el-row>
+              </el-col>
+              <el-col :span="2">
+                <rtButton
+                  v-if="!btnItem.delete.hidden"
+                  @click="
+                    () => {
+                      emit('delete', termdata);
+                    }
+                  "
+                  :item="btnItem.delete"
+                />
+              </el-col>
+            </el-row>
+          </div>
+        </template>
 
-      <div v-if="showData">
-        <template v-if="termTitleConf.cFactorTabType === 'grid'">
-          <table style="width: 100%">
-            <thead>
-              <tr class="table-title">
-                <th>{{ termTitleConf.cFactorTabTitle }}</th>
-                <th>{{ termTitleConf.cFactorTabValue }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <template v-for="(item, k) in termFactormap" :key="k">
-                <tr v-if="item.cPorpShowtitle !== '1'">
-                  <td>
-                    <span>{{ item.title }}</span>
-                  </td>
-                  <td>
-                    <from-item
-                      v-model="termdata[item.prop]"
-                      @update:modelValue="update()"
-                      :item="item"
-                    />
-                  </td>
-                </tr>
-              </template>
-            </tbody>
-          </table>
-        </template>
-        <template v-else-if="termTitleConf.cFactorTabType === 'table'">
-          <table style="width: 100%">
-            <thead>
-              <tr class="table-title">
-                <template v-for="(item, k) in termFactormap" :key="k">
-                  <th v-if="item.cPorpShowtitle !== '1'">
-                    {{ item.title }}
-                  </th>
-                </template>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <template v-for="(item, k) in termFactormap" :key="k">
-                  <td v-if="item.cPorpShowtitle !== '1'">
-                    <from-item
-                      v-model="termdata[item.prop]"
-                      @update:modelValue="update()"
-                      :item="item"
-                    />
-                  </td>
-                </template>
-              </tr>
-            </tbody>
-          </table>
-        </template>
-        <template v-else>
-          <app-free-edit
-            :freeEditConfig="formconfig1"
-            ref="termRef"
-            @updateDatas="update"
-          />
-        </template>
-        <template v-for="(ginfo, gk) in groupInfo" :key="gk">
-          <el-row>
-            <el-col :span="22">
-              <a
-                style="margin-right: 5px"
-                @click="ginfo.hidden = !ginfo.hidden"
-              >
-                <el-icon v-if="ginfo.hidden"><ArrowUpBold /></el-icon>
-                <el-icon v-if="!ginfo.hidden"><ArrowDownBold /></el-icon>
-              </a>
-              <span>
-                {{ ginfo.cGroupTitle }}
-              </span>
-            </el-col>
-          </el-row>
-          <el-row v-if="!ginfo.hidden">
+        <div v-if="showData">
+          <template v-if="termTitleConf.cFactorTabType === 'grid'">
             <table style="width: 100%">
               <thead>
                 <tr class="table-title">
-                  <th
-                    v-for="col in getColinfo(ginfo.cGroupId)"
-                    :key="col.cColId"
-                    :width="col.cColWidth ? col.cColWidth : null"
-                  >
-                    {{ col.cColTitle }}
-                  </th>
-                  <th v-for="v in extermConf" :key="v.c_pk_id">
-                    {{ v.title }}
-                  </th>
+                  <th>{{ termTitleConf.cFactorTabTitle }}</th>
+                  <th>{{ termTitleConf.cFactorTabValue }}</th>
                 </tr>
               </thead>
               <tbody>
-                <template v-if="groupconf[ginfo.cGroupId]">
-                  <template
-                    v-for="(riskdata, k, ri) in groupconf[ginfo.cGroupId]
-                      .riskList"
-                    :key="k"
-                  >
-                    <template v-if="riskdata.maxNum > 0">
-                      <tr
-                        v-for="n in riskdata.maxNum"
-                        :key="`${ginfo.cGroupId}-${k}-${n}`"
+                <template v-for="(item, k) in termFactormap" :key="k">
+                  <tr v-if="item.cPorpShowtitle !== '1'">
+                    <td>
+                      <span>{{ item.title }}</span>
+                    </td>
+                    <td>
+                      <el-form-item
+                        :rules="item.required ? getRequired() : undefined"
+                        :prop="item.prop"
                       >
-                        <template
-                          v-for="colinfo in riskdata.col"
-                          :key="`${ginfo.cGroupId}-${k}-${n}-${colinfo.cColId}`"
-                        >
-                          <template
-                            v-if="
-                              riskdata.rowConfig[colinfo.cColId] &&
-                              riskdata.rowConfig[colinfo.cColId][n - 1]
-                            "
-                          >
-                            <td
-                              :rowspan="
-                                riskdata.rowConfig[colinfo.cColId][n - 1]
-                                  ?.cPorpType === 'rowspan'
-                                  ? riskdata.maxNum
-                                  : null
-                              "
-                            >
-                              <template
-                                v-if="
-                                  riskdata.rowConfig[colinfo.cColId][n - 1]
-                                    .cPorpType === 'text'
-                                "
-                              >
-                                <span
-                                  >{{
-                                    riskdata.rowConfig[colinfo.cColId][n - 1]
-                                      .factorItem.title
-                                  }}
-                                </span>
-                              </template>
-                              <template v-else>
-                                <from-item
-                                  v-model="
-                                    riskList[
-                                      riskdata.rowConfig[colinfo.cColId][n - 1]
-                                        .cRiskNo
-                                    ][
-                                      riskdata.rowConfig[colinfo.cColId][n - 1]
-                                        .factorItem?.prop
-                                    ]
-                                  "
-                                  @update:modelValue="update()"
-                                  :item="
-                                    riskdata.rowConfig[colinfo.cColId][n - 1]
-                                      .factorItem
-                                  "
-                                />
-                              </template>
-                            </td>
-                          </template>
-                        </template>
-                        <template v-if="n === 1 && ri === 0">
-                          <template v-for="v in extermConf" :key="v.c_pk_id">
-                            <td :rowspan="groupconf[ginfo.cGroupId].sumMax">
-                              <from-item
-                                v-model="termdata[v.prop]"
-                                @update:modelValue="update()"
-                                :item="v"
-                              />
-                            </td>
-                          </template>
-                        </template>
-                      </tr>
-                    </template>
-                  </template>
+                        <from-item
+                          v-model="termdata[item.prop]"
+                          @update:modelValue="update()"
+                          :item="item"
+                        />
+                      </el-form-item>
+                    </td>
+                  </tr>
                 </template>
               </tbody>
             </table>
-          </el-row>
-        </template>
-      </div>
+          </template>
+          <template v-else-if="termTitleConf.cFactorTabType === 'table'">
+            <table style="width: 100%">
+              <thead>
+                <tr class="table-title">
+                  <template v-for="(item, k) in termFactormap" :key="k">
+                    <th v-if="item.cPorpShowtitle !== '1'">
+                      {{ item.title }}
+                    </th>
+                  </template>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <template v-for="(item, k) in termFactormap" :key="k">
+                    <td v-if="item.cPorpShowtitle !== '1'">
+                      <el-form-item
+                        :rules="item.required ? getRequired() : undefined"
+                        :prop="item.prop"
+                      >
+                        <from-item
+                          v-model="termdata[item.prop]"
+                          @update:modelValue="update()"
+                          :item="item"
+                        />
+                      </el-form-item>
+                    </td>
+                  </template>
+                </tr>
+              </tbody>
+            </table>
+          </template>
+          <template v-else>
+            <app-free-edit
+              :freeEditConfig="formconfig1"
+              ref="termRef"
+              @updateDatas="update"
+            />
+          </template>
+          <template v-for="(ginfo, gk) in groupInfo" :key="gk">
+            <el-row>
+              <el-col :span="22">
+                <a
+                  style="margin-right: 5px"
+                  @click="ginfo.hidden = !ginfo.hidden"
+                >
+                  <el-icon v-if="ginfo.hidden"><ArrowUpBold /></el-icon>
+                  <el-icon v-if="!ginfo.hidden"><ArrowDownBold /></el-icon>
+                </a>
+                <span>
+                  {{ ginfo.cGroupTitle }}
+                </span>
+              </el-col>
+            </el-row>
+            <el-row v-if="!ginfo.hidden">
+              <table style="width: 100%">
+                <thead>
+                  <tr class="table-title">
+                    <th
+                      v-for="col in getColinfo(ginfo.cGroupId)"
+                      :key="col.cColId"
+                      :width="col.cColWidth ? col.cColWidth : null"
+                    >
+                      {{ col.cColTitle }}
+                    </th>
+                    <th v-for="v in extermConf" :key="v.c_pk_id">
+                      {{ v.title }}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template v-if="groupconf[ginfo.cGroupId]">
+                      <template
+                        v-for="(riskdata, k, ri) in groupconf[ginfo.cGroupId]
+                          .riskList"
+                        :key="k"
+                      >
+                        <template v-if="riskdata.maxNum > 0">
+                          <tr
+                            v-for="n in riskdata.maxNum"
+                            :key="`${ginfo.cGroupId}-${k}-${n}`"
+                          >
+                            <template
+                              v-for="colinfo in riskdata.col"
+                              :key="`${ginfo.cGroupId}-${k}-${n}-${colinfo.cColId}`"
+                            >
+                              <template
+                                v-if="
+                                  riskdata.rowConfig[colinfo.cColId] &&
+                                  riskdata.rowConfig[colinfo.cColId][n - 1]
+                                "
+                              >
+                                <td
+                                  :rowspan="
+                                    riskdata.rowConfig[colinfo.cColId][n - 1]
+                                      ?.cPorpType === 'rowspan'
+                                      ? riskdata.maxNum
+                                      : null
+                                  "
+                                >
+                                  <template
+                                    v-if="
+                                      riskdata.rowConfig[colinfo.cColId][n - 1]
+                                        .cPorpType === 'text'
+                                    "
+                                  >
+                                    <span
+                                      >{{
+                                        riskdata.rowConfig[colinfo.cColId][
+                                          n - 1
+                                        ].factorItem.title
+                                      }}
+                                    </span>
+                                  </template>
+                                  <template v-else>
+                                    <el-form-item :error="showError(riskdata.rowConfig[colinfo.cColId][n - 1],
+                                    riskList[
+                                      riskdata.rowConfig[colinfo.cColId][n - 1].cRiskNo]
+                                      [riskdata.rowConfig[colinfo.cColId][n - 1].factorItem?.prop])" >
+                                      <from-item
+                                        v-model="
+                                          riskList[
+                                            riskdata.rowConfig[colinfo.cColId][n - 1].cRiskNo]
+                                            [riskdata.rowConfig[colinfo.cColId][n - 1].factorItem?.prop
+                                          ]
+                                        "
+                                        @update:modelValue="update()"
+                                        :item="
+                                          riskdata.rowConfig[colinfo.cColId][
+                                            n - 1
+                                          ].factorItem
+                                        "
+                                      />
+                                    </el-form-item>
+                                  </template>
+                                </td>
+                              </template>
+                            </template>
+                            <template v-if="n === 1 && ri === 0">
+                              <template
+                                v-for="v in extermConf"
+                                :key="v.c_pk_id"
+                              >
+                                <td :rowspan="groupconf[ginfo.cGroupId].sumMax">
+                                  <el-form-item
+                                    :rules="
+                                      v.required ? getRequired() : undefined
+                                    "
+                                    :prop="v.prop"
+                                  >
+                                    <from-item
+                                      v-model="termdata[v.prop]"
+                                      @update:modelValue="update()"
+                                      :item="v"
+                                    />
+                                  </el-form-item>
+                                </td>
+                              </template>
+                            </template>
+                          </tr>
+                        </template>
+                      </template>
+                    </template>
+                </tbody>
+              </table>
+            </el-row>
+          </template>
+        </div>
+      </el-form>
     </el-card>
   </div>
 </template>
@@ -232,10 +263,12 @@ import {
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { terConfig } from "@/store/modules/term-config";
+import { useValidator } from "@/typings/useValidator";
+const templateRef = ref();
 const opertaor = dataOpertaor();
 const pageparam = opertaor.getParam();
 const terconfig = terConfig();
-
+const { getRules } = useValidator();
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -343,9 +376,14 @@ const formconfig1 = reactive(
   })
 );
 
+function getRequired() {
+  return getRules("required", {});
+}
+
 const showData = ref(true);
 const showRiskInfo = ref(true);
 const foldRiskInfo = ref(true);
+const showRequried  = ref(false);
 
 function getColinfo(groupId: string) {
   return colInfo.value.filter((v: any) => v.cGroupId === groupId);
@@ -626,11 +664,52 @@ function exChangeFunc() {
     }
   }
 }
+
+function showError(conf: any,value: any) {
+  if(conf['cPorpRequired'] === '1'){
+    if((value ===null || value === undefined) && showRequried.value){
+      return '该项为必填项'; 
+    }
+  }
+  return null;
+}
+async function validate() {
+  // 进行责任验证
+  let validate = true;
+  collist.value.forEach((col:any)=>{
+    const fact = factormap.value[col["cFactorId"]];
+    const v = riskList.value[col['cRiskNo']][fact['prop']];
+    if(col['cPorpRequired'] === '1'){
+      if(v === '' || v === null || v === undefined){
+        validate = false;
+      }
+    }
+  });
+  
+  if(!validate){
+    showRequried.value = true;
+  }else{
+    showRequried.value = false;
+  }
+  // 进行条款数据验证
+  const p: Promise<any> = new Promise((resolve) => {
+    templateRef.value.validate((valid: boolean, fields: any)=>{
+      if (valid) {
+      resolve(true);
+    } else {
+      resolve(fields);
+    }
+    })
+  });
+
+  const res = await p;
+  return (res === true ? true : false) && validate;
+}
 function setDisabledAll() {
   const undis = props.faters?.getndisAbleConfig(
     props.modelValue["Term.cClauseCode"]
-  );            // 条款要素批改项配置信息
-  const unbut = props.faters?.getndisAbleConfig('null');  //公共按钮类批改项配置信息
+  ); // 条款要素批改项配置信息
+  const unbut = props.faters?.getndisAbleConfig("null"); //公共按钮类批改项配置信息
   // 禁用表单信息列
   if (
     termTitleConf.value.cFactorTabType !== "grid" &&
@@ -673,9 +752,9 @@ function setDisabledAll() {
   }
   Object.keys(btnItem.value).forEach((k: any) => {
     btnItem.value[k].hidden = true;
-    if(unbut && unbut.length > 0){
-      const t = unbut.find((un: any) => un["cEdrItem"] === k+'_btn');
-      if(k){
+    if (unbut && unbut.length > 0) {
+      const t = unbut.find((un: any) => un["cEdrItem"] === k + "_btn");
+      if (k) {
         btnItem.value[k].hidden = false;
       }
     }
@@ -708,6 +787,7 @@ function setDisabledAll() {
 defineExpose({
   dataInit,
   setDisabledAll,
+  validate,
 });
 </script>
 <style lang="scss" scoped>
@@ -736,5 +816,8 @@ td {
   border: 1px solid #f5f5f5; /* 设置边框样式 */
   padding: 2px;
   text-align: left;
+}
+::v-deep .el-form-item {
+  margin-bottom: 0px !important; /* 使内容显示更近紧促 */
 }
 </style>
