@@ -300,7 +300,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", { change: true })],
       },
       {
-        prop: "cNeedFeeFlag",
+        prop: "isDutyfree",
         inputtype: "rtselect",
         title: "是否免税",
         typeCode: "WEB_SYS_STA_DICT",
