@@ -50,12 +50,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       }),
       createFreeButtonBase({
         label: "重置",
-        func: () => {},
+        func: () => {
+          freeEditRef.value?.resetFields();
+          // handleQuery();
+        }, 
       }),
     ],
     fromSchema: [
       {
-        prop: "cKindNme",
+        prop: "cKindNo",
         inputtype: "rtselect",
         title: "险种大类",
         typeCode: "KIND_LIST_GRT",
@@ -66,7 +69,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable: true,
       },
       {
-        prop: "cProdNme",
+        prop: "cProdNo",
         inputtype: "rtselect",
         title: "险种名称",
         typeCode: "PROD_LIST_GRT",
@@ -192,12 +195,17 @@ const tableconfig = reactive<AppTableConfig>(
     ],
     fromSchema: [
       {
-        prop: "cKindNme",
-        inputtype: "rtinput",
+        prop: "cKindNo",
+        inputtype: "rtselect",
+        typeCode: "KIND_LIST_GRT",
+        codeParam: {
+          cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+          cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+        },
         title: "险种大类",
       },
       {
-        prop: "cProdNme",
+        prop: "cProdNo",
         inputtype: "rtselect",
         title: "险种名称",
       },

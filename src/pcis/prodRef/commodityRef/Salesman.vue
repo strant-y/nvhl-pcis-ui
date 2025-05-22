@@ -1,4 +1,4 @@
-<!--商品配置-出单权限分配-业务员-->
+<!--商品配置-出单权限分配-业务员--> 
 <template>
   <el-dialog
     v-model="dialogVisible"
@@ -17,7 +17,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="handleCancel">取消</el-button>
-        <el-button type="primary" @click="handleSave">保存</el-button>
+        <!-- <el-button type="primary" @click="handleSave">保存</el-button> -->
       </span>
     </template>
   </el-dialog>
@@ -36,10 +36,15 @@ import {
 } from "@/shared/app-table-config";
 import { useRoute } from "vue-router";
 import { createFreeButtonBase } from "@/shared/button-config";
+
+
+
 const publicProblem = defineAsyncComponent(() => import("./PublicProblem.vue"));
 const route = useRoute();
 const query = ref(route.query);
 const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+
+
 import {
   AppFreeEditConfig,
   AppFreeEditMethod,
@@ -48,10 +53,24 @@ import {
 } from "@/shared/app-free-edit-config";
 import { ref, reactive } from "vue";
 import { saveRiskInfo } from "@/api/prod";
+import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
+const policyService = new PolicyService();
+
+
+import { useUserStore } from "@/store/modules/user";
+const userStore = useUserStore();
+const user = ref<any>(userStore.user);
 
 const props = defineProps<{
   visible: boolean;
+  data: Object;
 }>();
+// const props = defineProps<{
+//   data: Object;
+//   type: string;
+//   visible: boolean;
+// }>();
+
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: boolean): void;
@@ -59,17 +78,16 @@ const emit = defineEmits<{
 }>();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
-
 const formconfig = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    title: "业务员",
+    title: "业务员1",
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
         type: "primary",
         label: "查询",
         func: () => {
-          save();
+          handleSave();
         },
       }),
     ],
@@ -96,34 +114,6 @@ const formconfig = reactive<AppFreeEditConfig>(
   })
 );
 
-const handleSave = async () => {
-  const formData = freeEditRef.value?.getFromValue();
-  if (formData) {
-    try {
-      await saveRiskInfo(formData); //保存接口调用
-      ElMessage.success("保存成功");
-      emit("save");
-      // dialogVisible(false);
-    } catch (error) {
-      ElMessage.error("保存失败");
-    }
-  }
-};
-
-const handleCancel = () => {
-  dialogVisible.value = false;
-};
-
-const handleVisibleUpdate = (value: boolean) => {
-  emit("update:visible", value);
-};
-
-const tableRef = ref<AppTableMethod | null>(null);
-const pageresult = reactive<Pageresult>({
-  result: "",
-  list: [],
-  total: 0,
-});
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     // titleBtns: [
@@ -197,11 +187,96 @@ const tableconfig = reactive<AppTableConfig>(
     ],
   })
 );
+
+const handleSave = async () => {
+  freeEditRef.value?.validate().then((isValid) => {
+    if (!isValid) {
+      ElMessage.warning("表单验证不通过，请检查！");
+      return;
+    }
+    const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
+    const s = freeEditRef.value?.getFromValue();
+ 
+    return false;
+    policyService.getWebOrgSelsList(params).then((res: any) => {
+      if (res && res["code"] === 200) {
+        const pageData = res.data;
+        if (pageData) {
+          pageresult.total = pageData.total;
+          pageresult.list = pageData.result;
+        }
+      }
+    });
+  });
+
+
+  // const formData = freeEditRef.value?.getFromValue();
+  // if (formData) {
+  //   try {
+  //     await saveRiskInfo(formData); //保存接口调用
+  //     ElMessage.success("保存成功");
+  //     emit("save");
+  //     // dialogVisible(false);
+  //   } catch (error) {
+  //     ElMessage.error("保存失败");
+  //   }
+  // }
+};
+
+const handleCancel = () => {
+  dialogVisible.value = false;
+};
+
+const handleVisibleUpdate = (value: boolean) => {
+  emit("update:visible", value);
+};
+
+const tableRef = ref<AppTableMethod | null>(null);
+const pageresult = reactive<Pageresult>({
+  result: "",
+  list: [],
+  total: 0,
+});
+
 /** 查询 */
 function handleQuery() {
   const r = tableRef.value?.getPartnerPage(); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(s, r);
+  // const param = Object.assign(s, r);
+
+  const params = Object.assign(s, r, obj);
+
+
+
+
+const obj = {
+  CurrentUser: user.value ? user.value["opCde"] : "",   // 用户代码
+  CurrentUserOrg: user.value ? user.value["companyId"] : "", // 用户机构代码
+
+  CDptCde: formData.value["CDptCde"],   // 业务员代码
+  CSlsNme: formData.value["CSlsNme"],   // 名称
+  CSlsCde: formData.value["CSlsCde"],    // 工号
+
+  CBsnsTyp: formData.value["CBsnsTyp"],  //渠道类别
+  CChaType: formData.value["CChaType"],  // 渠道中类
+
+
+  CSlsTyp: formData.value["CSlsTyp"],   // 人员分类
+  leading: formData.value["leading"],   // 业务分类
+  CBrkrCde: formData.value["CBrkrCde"],  // 代理人/经纪人
+
+
+  // CBrkrCde: formData.value["CBrkrCde"],
+
+
+  // CDptAttr: formData.value["CDptAttr"],
+
+  // subSidiary: formData.value["subSidiary"],
+  // 
+};
+
+
+
   getCvrgRiskRelList(param)
     .then((res) => {
       const { code, data, msg } = res;

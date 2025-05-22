@@ -175,9 +175,22 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             dzmodal
               .open(orderIssuer, { type: "Issuer", data: {} })
               .then((res) => {
+                console.log(res,'-----')
                 if (res.type === "ok") {
-                  // freeEditRef.value?.setValue("componentGroup", res.body);
-                }
+                const selectObj = res.body;
+                  freeEditRef.value.setValue(
+                                      "cOperGroup",
+                                      selectObj.cSlsCde
+                                  );
+                  setFormItem("cOperGroup", {
+                                      loadData: [
+                                          {
+                                              label:selectObj.cSlsNme,
+                                              value: selectObj.cSlsCde,
+                                          },
+                                      ],
+                                  });
+                               }
               });
           },
         }),

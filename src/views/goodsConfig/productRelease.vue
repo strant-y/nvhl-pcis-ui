@@ -53,7 +53,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       }),
       createFreeButtonBase({
         label: "重置",
-        func: () => {},
+        func: () => {
+          freeEditRef.value?.resetFields();
+        },
       }),
     ],
     fromSchema: [
@@ -62,32 +64,47 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "险种大类",
         clearable: true,
+        typeCode: "KIND_LIST_GRT",
+        codeParam: {
+          cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+          cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+        },
       },
       {
         prop: "factorinputtype",
         inputtype: "rtselect",
         title: "险种名称",
         clearable: true,
+        typeCode: "PROD_LIST_GRT",
+        codeParam: {
+          cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+          cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+        },
       },
       {
-        prop: "factorTab",
+        prop: "cCommodityNo",
         inputtype: "rtinput",
         title: "商品编号",
         clearable: true,
         typeCode: "tablist",
       },
       {
-        prop: "factorTab",
+        prop: "cCommodityCn",
         inputtype: "rtinput",
         title: "商品名称",
         clearable: true,
         typeCode: "tablist",
       },
       {
-        prop: "factorTab",
+        prop: "cStatus",
         inputtype: "rtselect",
         title: "状态",
         clearable: true,
+        typeCode: "BAS_COMM_CODE_OUT_CDE",
+        codeParam: { "cParCde": "commodity_status"},
+        defaultValue: '5',
+        disabled: true,
+       
       },
     ],
   })
@@ -146,13 +163,23 @@ const tableconfig = reactive<AppTableConfig>(
     fromSchema: [
       {
         prop: "cKindNo",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "险种大类",
+        typeCode: "KIND_LIST_GRT",
+        codeParam: {
+          cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+          cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+        },
       },
       {
         prop: "cProdNo",
         inputtype: "rtselect",
         title: "险种名称",
+        typeCode: "PROD_LIST_GRT",
+        codeParam: {
+          cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+          cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+        },
       },
       {
         prop: "cCommodityNo",
@@ -168,6 +195,8 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cStatus",
         inputtype: "rtselect",
         title: "状态",
+        typeCode: "BAS_COMM_CODE_OUT_CDE",
+        codeParam: { "cParCde": "commodity_status"},
       },
     ],
   })
@@ -179,7 +208,10 @@ onMounted(async () => {});
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(s, r);
+
+  //  状态 改成待发布  根据意健险相同
+  const param = Object.assign(s, r,{cStatus:'5'});
+  console.log('参数',param)
   queryCommodityUndrList(param)
     .then((res) => {
       const { code, data, msg } = res;
