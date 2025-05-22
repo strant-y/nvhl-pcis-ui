@@ -675,7 +675,7 @@ const method = {
     setFormItem("Insured.cCertfCde", {
       disabled: false,
     });
-
+    tCertfDate.value = []
     tabref["insured"].setFormValue(InsuredValue);
   },
   funcNdustryCate: () => {

@@ -386,7 +386,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               itemWidth: 1,
               rules: [{ type: "required" }],
               typeCode: "KIND_LIST_GRT",
-              child: "cProdNo",
               filterable: true,
               clearable: true,
               codeParam: {
@@ -395,6 +394,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               },
               func: (val) => {
                   cPard.value = val;
+                  setValue("cProdNo","")
                   formconfig1.fromSchema?.forEach((item) => {
                       if (
                           item.prop === "CEmployeeName" ||
@@ -1240,6 +1240,17 @@ function setFormItem(key, obj) {
         });
     }
 }
+function setValue(key: string, value: any) {
+    freeEditRef?.value?.setValue(key, value);
+}
+
+function getValue(key: string) {
+  return freeEditRef?.value?.getValue(key);
+}
+defineExpose({
+  setValue,
+  getValue,
+});
 </script>
 
 <style scoped></style>

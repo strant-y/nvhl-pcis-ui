@@ -7,7 +7,7 @@
   >
     <el-divider></el-divider>
     <el-input
-      v-model="filterText"
+      v-model="filterText" 
       style="width: 500px"
       placeholder="输入机构代码或者机构名称查询，机构名称查询不得少于5个字符"
     />
@@ -80,7 +80,7 @@ const handleSave = () => {
     console.log("选中的节点", selectedNode.value);
     emits("ok", selectedNode.value);
   }
-  dialogVisible.value = false;
+  dialogVisible.value = false; 
 };
 
 const initDptTreeList = () => {

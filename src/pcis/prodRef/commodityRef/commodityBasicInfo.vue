@@ -17,6 +17,11 @@ const opertaor = dataOpertaor();
 
 import { useRoute } from "vue-router";
 import { cp } from "fs";
+
+import { useUserStore } from "@/store";
+
+const tabref = opertaor.getTableRefByKey("permissionAllo");
+
 const route = useRoute();
 const router = useRouter();
 const query = ref(route.query);
@@ -25,6 +30,8 @@ const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
 const { getRules } = useValidator();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
+const userStore = useUserStore();
+const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -45,7 +52,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 ElMessage.error(msg);
               }
             })
-            .finally(() => {});
+            .finally(() => { });
         },
       }),
       createFreeButtonBase({
@@ -66,6 +73,21 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
           cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
         },
+        func: (val:any) => {
+          // console.log('大类',tabref.getFromValue())
+          // 险种大类
+          if (!!val) {
+            // permissionAllo
+            // tabref.getFromValue().cProdNo,
+
+
+            // console.log('新变更的险类代码为', value);.
+            // this.newKindNo.emit(value);
+
+
+          }
+
+        }
       },
       {
         prop: "cProdNo",
@@ -82,7 +104,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cCommodityNo",
         inputtype: "rtinput",
         title: "商品编号",
-        rules: [getRules("required", {})],
+        disabled: true,
+        // rules: [getRules("required", {})],
       },
       {
         prop: "cCommodityCn",
@@ -94,11 +117,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cPlatformCn",
         inputtype: "rtinput",
         title: "平台名称",
-        rules: [getRules("required", {})],
+        // rules: [getRules("required", {})],
       },
       {
         prop: "cCriterionTimeUnit",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "保险期间类型",
         typeCode: "RECEIVE_BANK_CATEGORY",
         codeParam: { cParCde: "CriterionUnit" },
@@ -108,6 +131,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "nCriterionTime",
         inputtype: "rtinput",
         title: "标准承保期限",
+        rules: [getRules("required", {})],
       },
       {
         prop: "cPolicyLimit",
@@ -116,22 +140,22 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       },
       {
         prop: "nLowInsureDays",
-        inputtype: "rtinput",
+        inputtype: "rtnumber",
         title: "保险期限浮动区间起",
       },
       {
         prop: "nTopInsureDays",
-        inputtype: "rtinput",
+        inputtype: "rtnumber",
         title: "保险期限浮动区间止",
       },
       {
         prop: "nSurrenderHour",
-        inputtype: "rtinput",
+        inputtype: "rtnumber",
         title: "起保后可退保小时数",
       },
       {
         prop: "nDpdDays",
-        inputtype: "rtinput",
+        inputtype: "rtnumber",
         title: "倒签单天数",
       },
 
@@ -141,6 +165,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: " 是否见费出单",
         typeCode: "WEB_SYS_STA_DICT",
         codeParam: { cParCde: "yes_no" },
+        rules: [getRules("required", {})],
+
+
       },
       {
         prop: "cAutoUdr",
@@ -153,8 +180,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cImmeffMrk",
         inputtype: "rtselect",
         title: " 是否实时出单",
-        typeCode: "WEB_SYS_STA_DICT",
-        codeParam: { cParCde: "yes_no" },
+        typeCode: "BAS_COMM_CODE_OUT_CDE",
+        codeParam: { cParCde: "CImmeffMrk" },
+        rules: [getRules("required", {})],
+        // code: 'BAS_COMM_CODE_OUT_CDE',
+        // param: {'cParCde': 'CImmeffMrk'},
       },
       {
         prop: "cMailMrk",
@@ -172,8 +202,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       },
       {
         prop: "nOnsaleRate",
-        inputtype: "rtinput",
+        inputtype: "rtnumber",
         title: " 打折手续费系数",
+        precision: 2,
+        max: 999999.99,
+        min: 0,
       },
       {
         prop: "cPayType",
@@ -191,8 +224,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       },
       {
         prop: "nSentAcount",
-        inputtype: "rtinput",
+        inputtype: "rtnumber",
         title: "合单上送笔数",
+        max: 999999,
+        min: 0,
       },
       {
         prop: "cMessageMrk",
@@ -200,6 +235,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "  是否发送短信",
         typeCode: "WEB_SYS_STA_DICT",
         codeParam: { cParCde: "yes_no" },
+        rules: [getRules("required", {})],
       },
       {
         prop: "cGrpCompany",
@@ -223,7 +259,27 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: " 项目大类",
         typeCode: "CPrjCtgTyp_List",
-        codeParam: { cParCde: "-1", cLev: "1" },
+        codeParam: {
+          CRangeCde: user.value.companyId,
+          // cParCde: "-1", 
+          cLev: "1"
+        },
+        func: (val: any) => {
+          console.log('大类选择', val)
+          if (val) {
+            setFormItem('cPrjCtgMidTyp', {
+
+              // typeCode: 'CPrjCtgTyp_List',
+              // codeParam: { cParCde: "-1", cLev: "2" } ,
+              typeCode: "CPrjCtgTyp_List",
+              codeParam: {
+                CRangeCde: user.value.companyId,
+                cLev: "2",
+                CParCde: val,
+              },
+            })
+          }
+        }
       },
       {
         prop: "cPerFlag",
@@ -234,8 +290,21 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cPrjCtgMidTyp",
         inputtype: "rtselect",
         title: " 项目中类",
-        typeCode: "CPrjCtgTyp_List",
-        codeParam: { cParCde: "-1", cLev: "2" },
+        // typeCode: "CPrjCtgTyp_List",
+        // codeParam: { cParCde: "-1", cLev: "2" },
+        func: (val: any) => {
+          console.log('中类选择', val)
+          if (val) {
+            setFormItem('cPrjCtgSubTyp', {
+              typeCode: 'CPrjCtgTyp_List',
+              codeParam: {
+                CRangeCde: user.value.companyId,
+                cLev: "3",
+                CParCde: val,
+              },
+            })
+          }
+        }
       },
       {
         prop: "cPrjCtgMidContent",
@@ -246,8 +315,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cPrjCtgSubTyp",
         inputtype: "rtselect",
         title: " 项目小类",
-        typeCode: "CPrjCtgTyp_List",
-        codeParam: { cParCde: "-1", cLev: "3" },
+        // typeCode: "CPrjCtgTyp_List",
+        // codeParam: { cParCde: "-1", cLev: "3" },
       },
       {
         prop: "cPrjCtgSubContent",
@@ -260,6 +329,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: " 是否开具电子发票",
         typeCode: "WEB_SYS_STA_DICT",
         codeParam: { cParCde: "isInvoice" },
+        rules: [getRules("required", {})],
         // loadData: [
         //   {
         //     label: "是",
@@ -284,6 +354,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: " 是否互联网业务",
         typeCode: "WEB_SYS_STA_DICT",
         codeParam: { cParCde: "yes_no" },
+        rules: [getRules("required", {})],
       },
       {
         prop: "cInternetShowName",
@@ -294,11 +365,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "tBgnTm",
         inputtype: "rtdatepicker",
         title: "启用日期",
+        rules: [getRules("required", {})],
       },
       {
         prop: "tEndTm",
         inputtype: "rtdatepicker",
         title: "失效日期",
+        rules: [getRules("required", {})],
       },
       {
         prop: "cAffiliatedMrk",
@@ -311,13 +384,29 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cCiMrk",
         inputtype: "rtselect",
         title: "联共保业务",
-        loadData: [],
+        typeCode: 'Joint_Insurance_Business',
+        // loadData: [
+        //                 {value: '0', label: '非共保业务'},
+        //                 {value: '1', label: '外部共保我方主共_主联'},
+        //                 {value: '2', label: '外部共保我方从共_主联'},
+        //                 {value: '3', label: '外部共保我方主共_无联保'},
+        //                 {value: '4', label: '外部共保我方从共_无联保'},
+        //                 {value: '5', label: '司内联保_主联'}
+        //             ],
+        // defaultValue: '0'
       },
       {
         prop: "cBeginDateType",
         inputtype: "rtselect",
         title: "保险起期类型",
-        loadData: [],
+        loadData: [
+          { value: '1', label: '默认日期类型' },
+          { value: '2', label: '指定日期类型' },
+          { value: '3', label: 'T+N日期类型' },
+          { value: '4', label: '即时生效类型' },
+          { value: '5', label: 'T+N小时类型' }
+        ],
+        rules: [getRules("required", {})],
       },
       {
         prop: "cIsPlanRule",
@@ -344,6 +433,18 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     }),
   })
 );
+
+
+//给表单下拉项赋值
+function setFormItem(key, obj) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        Object.assign(item, obj);
+      }
+    });
+  }
+}
 
 function getFromValue() {
   return freeEditRef?.value?.getFromValue();
@@ -379,7 +480,7 @@ function handleQuery() {
         ElMessage.error(msg);
       }
     })
-    .finally(() => {});
+    .finally(() => { });
 }
 function setDisa() {
   // formconfig1.fromSchema?.forEach((e) => {

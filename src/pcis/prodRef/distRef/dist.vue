@@ -31,6 +31,7 @@ import {
 } from "@/api/prod/index";
 import { getAddressStr } from "@/api/query";
 import { saveAs } from "file-saver";
+import moment from "moment";
 import { formInit } from "@/shared/from-init";
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
@@ -296,6 +297,9 @@ const method = {
         pageresult.list = res.data;
         pageresult.list.forEach((item, index) => {
           item.nSeqNo = index + 1;
+          item.tOpeningTime = item['Dist.tOpeningTime']
+            ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
+            : "";
         });
         if(tgtRef !=undefined){
           tgtRef.setValue("Tgt.nElevatorsNumber",res.data.length)
@@ -341,6 +345,7 @@ const method = {
   },
   //导出
   exportExcel: () => {
+    const fileName = `${formconfig1.value.title}.xlsm`;
     let paramitem  = Object.assign(formconfig1.value, {
       cComponentTable: cComponentTableValue,
       cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
@@ -351,7 +356,6 @@ const method = {
           ElMessage.error({ message: "导出出错", duration: 3000 });
           return;
         }
-        const fileName = `营业场所地址清单.xls`;
         const blob = new Blob([res.data], {
           responseType:
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
@@ -360,10 +364,35 @@ const method = {
       })
   },
   //导入
-  importDist() {
-    policyService.importDist(formconfig1.value).then((res) => {
-      ElMessage.success({ message: "导入成功", duration: 3000 });
-    });
+  importExcel() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.xlsx, .xls, .xlsm'; // 支持的文件类型
+    input.onchange = () => {
+      if (input.files?.length) {
+        const file = input.files[0];
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        // 将表单配置信息合并到请求参数中
+        const params = {
+          ...formconfig1.value,
+          file: file,
+        };
+        policyService.importDist(params).then((res) => {
+          if (res.code === 200) {
+            ElMessage.success("导入成功");
+            method.handleQuery(); // 刷新列表
+          } else {
+            ElMessage.error(res.message || "导入失败");
+          }
+        }).catch((error) => {
+          ElMessage.error("导入出错，请检查文件格式或内容");
+          console.error("导入错误：", error);
+        });
+      }
+    };
+    input.click(); // 触发文件选择对话框
   },
   //根据获取的职业类别查询职业等级并绑定下拉框
   getDistoccupType:(val) => {
@@ -373,7 +402,6 @@ const method = {
           codeListParam: {cParCde: val.at(-1)},
         })
         .then((res) => {
-          console.log("职业等级下拉值",res);
         setFormItem("Dist.cOccupationalLevel", {
           loadData: res,
         });
@@ -388,7 +416,7 @@ const method = {
           ElMessage.error({ message: "下载出错", duration: 3000 });
           return;
         }
-        const fileName = `营业场所地址清单.xls`;
+        const fileName = `${formconfig1.value.title}.xlsm`;
         const blob = new Blob([res.data], {
           responseType:
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",

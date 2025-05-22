@@ -175,7 +175,7 @@ const method = {
     setFormItem("Applicant.cCertfCde", {
       disabled: false,
     });
-
+    tCertfDate.value = []
     tabref["applicant"].setFormValue(applicantValue);
   },
 
