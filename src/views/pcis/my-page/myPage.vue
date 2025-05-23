@@ -861,7 +861,7 @@ function renderComponents() {
       loadAfter(); //页面加载完成之后,再加载后续所需的事件
       clearInterval(interval);
     }
-  }, 100); // 延迟组件渲染,增加页面响应效率
+  }, 50); // 延迟组件渲染,增加页面响应效率
 }
 
 /**
@@ -1351,11 +1351,11 @@ const submitToUndrFn = async () => {
 
     const res: any = {};
     nextTick(async () => {
-      const rv = await opertaor.validateAll();
-      if (!rv) {
-        ElMessage.error("存在未录入数据,请确认!");
-        return;
-      }
+      // const rv = await opertaor.validateAll();
+      // if (!rv) {
+      //   ElMessage.error("存在未录入数据,请确认!");
+      //   return;
+      // }
       btn.loading = true;
       console.log(opertaor.getTableRefByKey("plyBase").getFromValue());
       const base = opertaor.getTableRefByKey("plyBase").getFromValue();
