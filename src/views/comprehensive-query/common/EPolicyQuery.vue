@@ -1,0 +1,497 @@
+<!-- 生成电子保单查询 -->
+<template>
+  <div class="app-container">
+    <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
+    <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef" @page-change="handleQuery(false)" />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { useUserStore } from '@/store'
+import { useValidator } from '@/typings/useValidator'
+import { useRouter, useRoute } from 'vue-router'
+const { getRules } = useValidator()
+const router = useRouter()
+const route = useRoute()
+import { ref } from 'vue'
+import { codeListViewStore } from '@/store'
+const codeListStore = codeListViewStore()
+import { AppFreeEditConfig, AppFreeEditMethod, createAppFreeEditConfig } from '@/shared/app-free-edit-config'
+const freeEditRef = ref<AppFreeEditMethod | null>(null)
+import { createFreeButtonBase } from '@/shared/button-config'
+import { AppTableConfig, AppTableMethod, createTableEditConfig } from '@/shared/app-table-config'
+import { useDzModal } from '@/common/dzmodel/DzModalService'
+import { SCENE_PLY_APP_READ } from '@/constants/tab-constants'
+import { PcisQueryService } from '@/views/payinfoManagement/service/pcis-query-service'
+const pcisQueryService = new PcisQueryService()
+const userStore = useUserStore()
+const user = ref(userStore.user) || ref({ companyId: '', opCde: '' })
+const dzmodal = useDzModal()
+const tableRef = ref<AppTableMethod | null>(null)
+const departmentTree = defineAsyncComponent(() => import('@/pcis/prodRef/commodityRef/DepartmentTree.vue'))
+const props = defineProps({
+  refreshData: {
+    type: Boolean,
+    default: false
+  }
+})
+const sessionUser: any = sessionStorage.getItem('user')?.toString()
+const cPard = ref(null)
+const formconfig1 = reactive<AppFreeEditConfig>(
+  createAppFreeEditConfig({
+    endBtnsPosition: 'right',
+    endBtns: [
+      createFreeButtonBase({
+        label: '生成电子保单',
+        func: () => {
+          createEPolicy()
+        }
+      }),
+      createFreeButtonBase({
+        label: '下载电子保单',
+        func: () => {}
+      }),
+      createFreeButtonBase({
+        type: 'primary',
+        label: '查询',
+        func: async () => {
+          handleQuery()
+        }
+      }),
+      createFreeButtonBase({
+        label: '重置',
+        func: () => {
+          freeEditRef.value?.setFormValue({
+            CDptCde: user.value.companyId,
+            CLoadSub: 1
+          })
+          handleQuery(true)
+        }
+      })
+    ],
+    fromSchema: [
+      {
+        prop: 'CDptCde',
+        inputtype: 'rtselect',
+        title: '承保机构',
+        btnWidth: 10,
+        itemWidth: 2,
+        showExBtn: true,
+        rules: [getRules('required', {})],
+        btnItems: {
+          icon: 'Search',
+          type: 'primary',
+          func: () => {
+            dzmodal.open(departmentTree, { type: 'Issuer', data: {} }).then((res: any) => {
+              if (res.body) {
+                const selectObj = res.body
+                let obj = {
+                  loadData: [
+                    {
+                      label: selectObj.name,
+                      value: selectObj.id
+                    }
+                  ]
+                }
+                freeEditRef.value?.setValue('CDptCde', selectObj.id)
+                setFormItem('CDptCde', {
+                  loadData: [
+                    {
+                      label: `${selectObj.id}${selectObj.name}`,
+                      value: selectObj.id
+                    }
+                  ]
+                })
+              }
+            })
+          }
+        }
+      },
+      {
+        prop: 'CLoadSub',
+        inputtype: 'rtcheckbox',
+        title: '包含下级机构',
+        keymap: {
+          y: '1',
+          n: '0'
+        }
+      },
+      {
+        prop: 'CProdNo',
+        inputtype: 'rtselect',
+        title: '产品',
+        itemWidth: 1,
+        rules: [getRules('required', {})],
+        typeCode: 'EPolicyProdList',
+        filterable: true,
+        clearable: true,
+        func: (val: any) => {
+          const plyTyp = freeEditRef.value?.getValue('CPlyTyp')
+          if ((val == '089900' && plyTyp == 'PLY') || (val == '010022' && plyTyp == 'PLY') || plyTyp == 'BL') {
+            setFormItem('CTyp', { disabled: false })
+          } else {
+            setFormItem('CTyp', { disabled: true })
+          }
+        }
+      },
+      {
+        prop: 'CPlyNo',
+        inputtype: 'rtinput',
+        title: '保单号',
+        clearable: true
+      },
+      {
+        prop: 'CAppNo',
+        inputtype: 'rtinput',
+        title: '投保单',
+        clearable: true
+      },
+      {
+        prop: 'CAppNme',
+        inputtype: 'rtinput',
+        title: '投保人名称',
+        clearable: true
+      },
+      {
+        prop: 'CAppCertfCde',
+        inputtype: 'rtinput',
+        title: '投保人证件号码',
+        clearable: true
+      },
+      {
+        prop: 'CInsuredNme',
+        inputtype: 'rtinput',
+        title: '被保人姓名',
+        clearable: true
+      },
+      {
+        prop: 'CInsuredCertfCde',
+        inputtype: 'rtinput',
+        title: '被保人证件号码',
+        clearable: true
+      },
+      {
+        prop: 'TAppTm',
+        inputtype: 'rtdatepicker',
+        title: '投保申请日期',
+        format: 'YYYY-MM-DD HH:mm:ss',
+        valueFormat: 'YYYY-MM-DD HH:mm:ss',
+        clearable: true,
+        type: 'datetimerange'
+      },
+      {
+        prop: 'TEdrAppTm',
+        inputtype: 'rtdatepicker',
+        title: '批改申请日期',
+        format: 'YYYY-MM-DD HH:mm:ss',
+        valueFormat: 'YYYY-MM-DD HH:mm:ss',
+        clearable: true,
+        type: 'datetimerange'
+      },
+      {
+        prop: 'TIssueTm',
+        inputtype: 'rtdatepicker',
+        title: '签单日期',
+        format: 'YYYY-MM-DD HH:mm:ss',
+        valueFormat: 'YYYY-MM-DD HH:mm:ss',
+        clearable: true,
+        type: 'datetimerange'
+      },
+      {
+        prop: 'CBatchNo',
+        inputtype: 'rtinput',
+        title: '导入保单批次号',
+        clearable: true
+      },
+      {
+        prop: 'CPlyTyp',
+        inputtype: 'rtselect',
+        title: '单证类型',
+        clearable: true,
+        loadData: [
+          { label: '电子保单', value: 'PLY' },
+          { label: '电子保函/电子保险凭证', value: 'BL' },
+          { label: '电子投保单', value: 'TBD' },
+          { label: '电子批单', value: 'EDR' },
+          { label: '诚信声明', value: 'SOG' }
+        ]
+      },
+      {
+        prop: 'CTyp',
+        inputtype: 'rtselect',
+        title: '保单类型',
+        clearable: true,
+        disabled: true,
+        loadData: [
+          { label: '保单', value: 'A' },
+          { label: '批单', value: 'E' }
+        ]
+      },
+      {
+        prop: 'CDzbdTyp',
+        inputtype: 'rtselect',
+        title: '生成电子保单方式',
+        clearable: true,
+        loadData: [
+          { label: '全国版', value: '01' },
+          { label: '江苏南通版', value: '02' },
+          { label: '江苏9附加险模板', value: '03' },
+          { label: '江苏10条附加险模板', value: '04' },
+          { label: '校车承运人责任险模板', value: '05' },
+          { label: '非营运客车承运人责任险模板', value: '06' }
+        ]
+      }
+    ]
+  })
+)
+
+const pageresult = reactive<Pageresult>({
+  result: '',
+  /** 数据列表 */
+  list: [],
+  /** 总数 */
+  total: 0
+})
+
+const tableconfig = reactive<AppTableConfig>(
+  createTableEditConfig({
+    tableBtnType: 'btn',
+    tableBtnWidth: 90,
+    tableBtnPosition: 'right',
+    showSelection: true,
+    fromSchema: [
+      {
+        prop: 'cAppNo',
+        inputtype: 'rtinput',
+        title: '投保单号'
+      },
+      {
+        prop: 'cPlyNo',
+        inputtype: 'rtinput',
+        title: '保单号'
+      },
+      {
+        prop: 'cEdrNo',
+        inputtype: 'rtinput',
+        title: '批单号'
+      },
+      {
+        prop: 'cAppNme',
+        inputtype: 'rtinput',
+        title: '投保人名称'
+      },
+      {
+        prop: 'nPrm',
+        inputtype: 'rtinput',
+        title: '保险费'
+      },
+      {
+        prop: 'cProdNmeCn',
+        inputtype: 'rtinput',
+        title: '产品'
+      },
+      {
+        prop: 'cSlsNme',
+        inputtype: 'rtinput',
+        title: '业务员名称'
+      },
+      {
+        prop: 'tAppTm',
+        inputtype: 'rtinput',
+        title: '投保申请日期'
+      },
+      {
+        prop: 'tInsrncBgnTm',
+        inputtype: 'rtinput',
+        title: '保险起期'
+      },
+      {
+        prop: 'tInsrncEndTm',
+        inputtype: 'rtinput',
+        title: '保险止期'
+      },
+      {
+        prop: 'tUdrTm',
+        inputtype: 'rtinput',
+        title: '核保日期'
+      }
+    ]
+  })
+)
+
+onMounted(async () => {
+  nextTick(() => {
+    freeEditRef.value?.setValue('CLoadSub', '1')
+  })
+})
+
+// 绑定方法
+const method = {
+  func1: () => {
+    console.log(getRules)
+  }
+}
+
+watch(
+  () => props.refreshData,
+  (n, o) => {
+    // 自动刷新列表获取数据
+    pageresult.list = [{}, {}]
+    pageresult.total = 2
+    // 上面代码是仅用于本地调试
+    if (n) {
+      // handleQuery(true);
+    }
+  },
+  {
+    deep: true,
+    immediate: true
+  }
+)
+
+// 绑定特殊验证器
+const exRules = {
+  byrtInput: (rule: any, value: any, callback: any) => {
+    const r = freeEditRef.value?.getFromValue()
+    // if (r['name']) {
+    //   callback()
+    // } else {
+    //   callback('姓名')
+    // }
+  }
+}
+
+/** 查询 */
+function handleQuery(flag?: boolean) {
+  freeEditRef.value?.validate().then((isValid: any) => {
+    if (isValid) {
+      const r = tableRef.value?.getPartnerPage(flag) //获取分页数据
+      const s = freeEditRef.value?.getFromValue() //获取表单数据
+      const plyTyp = freeEditRef.value?.getValue('CPlyTyp')
+      const param = Object.assign(
+        {
+          SysCode: 'POLY_CASU',
+          CurrentUser: user.value.opCde,
+          CurrentUserOrg: user.value.companyId,
+          CAppTyp: plyTyp === 'EDR' ? 'E' : 'A'
+        },
+        s,
+        r
+      )
+      // 投保申请日期
+      if (!!s.TAppTm && s.TAppTm.length > 1) {
+        param['TAppTmStart'] = s.TAppTm[0]
+        param['TAppTmEnd'] = s.TAppTm[1]
+        delete param.TAppTm
+      }
+      // 批改申请日期
+      if (!!s.TEdrAppTm && s.TEdrAppTm.length > 1) {
+        param['TEdrAppTmStart'] = s.TEdrAppTm[0]
+        param['TEdrAppTmEnd'] = s.TEdrAppTm[1]
+        delete param.TEdrAppTm
+      }
+      // 签单日期
+      if (!!s.TIssueTm && s.TIssueTm.length > 1) {
+        param['TIssueBgnTm'] = s.TIssueTm[0]
+        param['TIssueEndTm'] = s.TIssueTm[1]
+        delete param.TEdrAppTm
+      }
+      pcisQueryService
+        .getEpolicyPolicyList(param)
+        .then((res: any) => {
+          const { code, data } = res
+          if (200 === code) {
+            pageresult.list = []
+            pageresult.list = data.result
+            pageresult.total = data.total
+          }
+        })
+        .finally(() => {})
+    }
+  })
+}
+/**
+ * 生成电子保单
+ */
+function createEPolicy() {
+  const prodNo = freeEditRef.value?.getValue('CProdNo')
+  if (prodNo == null || prodNo == undefined) {
+    ElMessage.warning('请选择产品!')
+    return
+  }
+  const plyTyp = freeEditRef.value?.getValue('CPlyTyp')
+  if (plyTyp == null || plyTyp == undefined) {
+    ElMessage.warning('请选择单证类型!')
+    return
+  }
+  var dzbdTyp = freeEditRef.value?.getValue('CDzbdTyp')
+  if ((dzbdTyp == null || dzbdTyp == '' || dzbdTyp == undefined) && prodNo == '059002' && plyTyp == 'PLY') {
+    ElMessage.warning('请选择生成电子保单方式!')
+    return
+  }
+  if (prodNo != '059011' && prodNo != '059015' && prodNo != '059012' && prodNo != '059013' && prodNo != '059016' && prodNo != '059017' && prodNo != '059018' && prodNo != '059019' && prodNo != '059020' && prodNo != '040019' && prodNo != '049900' && plyTyp == 'BL') {
+    ElMessage.warning('该产品没有电子保函模板!')
+    return false
+  }
+  if (plyTyp == 'SOG' && prodNo != '049900') {
+    ElMessage.warning('该产品没有诚信声明模板!')
+    return false
+  }
+  const CTyp = freeEditRef.value?.getValue('CAppTyp')
+  if (CTyp != 'E' && prodNo == '089900' && plyTyp == 'PLY') {
+    ElMessage.warning('该产品保单不允许在核心生成电子保单!')
+    return
+  }
+  const selectData = tableRef.value?.getselectionData()
+  if (!selectData || selectData.length <= 0) {
+    ElMessage.warning('所选记录为空！')
+    return
+  }
+  if (selectData.length > 100) {
+    ElMessage.warning('生成电子保单数量最大为100单！')
+    return
+  }
+  const CUniqueNos: any[] = []
+  selectData.forEach((item: any) => {
+    CUniqueNos[CUniqueNos.length] = item.cAppNo
+  })
+  const vCUniqueNo = CUniqueNos.join('-,-')
+  const param = {
+    CurrentUser: user.value.opCde,
+    CurrentUserOrg: user.value.companyId,
+    vCUniqueNo: vCUniqueNo,
+    plyTy: plyTyp
+  } 
+  pcisQueryService
+    .generatingEPolicy(param)
+    .then((res: any) => {
+      const { code, msg } = res
+      if (200 === code) {
+        ElMessage.success(msg)
+      } else {
+        ElMessage.warning(msg)
+      }
+    })
+    .finally(() => {})
+}
+
+//给表单下拉项赋值
+function setFormItem(key: any, obj: any) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.btnItems && obj.btnItems) {
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
+          }
+        }else{
+          Object.assign(item, obj);
+        }
+      }
+    });
+  }
+}
+</script>
+
+<style scoped></style>

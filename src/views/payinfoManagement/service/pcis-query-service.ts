@@ -1,7 +1,7 @@
-import {AxiosPromise} from "axios";
-import {post} from "@/utils/http";
-import {del} from "@/utils/http";
-import { get } from "lodash";
+import { AxiosPromise } from 'axios'
+import { post } from '@/utils/http'
+import { del } from '@/utils/http'
+import { get } from 'lodash'
 /**
  * 查询服务
  */
@@ -28,6 +28,8 @@ export class PcisQueryService {
     getUndrOpnListUrl = 'policy/getUndrOpnList'; // 获取核保信息列表
     isExistInAlldbUrl = 'policy/isExistInAlldb';
     qryExpirationPolicyUrl = 'policy/getExpirationPolicyList';
+    qryEpolicyPolicyListUrl = 'edr/getPolicyList'; // 电子保单列表查询
+    generatingEPolicyUrl = 'epolicy/generatingEPolicy';// 生成电子保单
     qryDiaryListUrl = 'policy/getDiaryList';
     qryChangeFeeListUrl = 'edr/qryChangeFeeList';
     loadFeeInfoUrl = 'edr/getFeeInfo';
@@ -450,6 +452,24 @@ export class PcisQueryService {
      */
     getExpirationPolicyList(ops: any): AxiosPromise<any> {
         return post(`${this.qryExpirationPolicyUrl}`, ops);
+    }
+    
+    /**
+     * 电子保单列表查询 
+     * @param ops
+     * @returns
+     */
+    getEpolicyPolicyList(ops: any): AxiosPromise<any> {
+        return post(`${this.qryEpolicyPolicyListUrl}`, ops)
+    }
+
+    /**
+     * 生成电子保单
+     * @param ops 
+     * @returns 
+     */
+    generatingEPolicy(ops: any): AxiosPromise<any> {
+        return post(`${this.generatingEPolicyUrl}`, ops)
     }
 
     /**

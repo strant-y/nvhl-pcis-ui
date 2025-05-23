@@ -202,8 +202,8 @@ function getRowById(dataId: string) {
   return rttableFrom.value?.getRowById(dataId);
 }
 
-function getselectionData(dataId: string) {
-  return rttableFrom.value?.getselectionData(dataId);
+function getselectionData() {
+  return rttableFrom.value?.getselectionData();
 }
 
 defineExpose({
