@@ -24,6 +24,8 @@ import DepartmentTree from "../commodityRef/DepartmentTree.vue";
 import { codeListViewStore } from "@/store";
 import { useRoute } from "vue-router";
 import { get } from "lodash";
+import { useProductStore } from "@/store/modules/prod";
+const productStore = useProductStore();
 const route = useRoute();
 const query = ref(route.query);
 const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
@@ -70,7 +72,6 @@ onMounted(async () => {
     //录单人 默认系统操作员..
     setValue("Base.cOprCde", user.userName);
     //录单人联系方式  默认操作员的
-      console.log('user---',user)
     if(user.phoneNO !==null && user.phoneNO !==''){
       setValue("Base.cCiOprRel", user.phoneNO);
     }else{
@@ -79,6 +80,7 @@ onMounted(async () => {
         rules: [getRules("phoneNo", {})],
       });
     }
+
     // 
     // setValue("Base.cCiOprRel", 123); 
 
@@ -97,6 +99,8 @@ onMounted(async () => {
     //禁用保单来源
     // setFormItem("Base.cPolicySource", {disabled: true});
     setValue("Base.cDptCde", param.cDptCde);
+    //联共保业务
+    setValue("Base.cCiMrk","0")
     // 服务机构默认值
     setFormItem("Base.cIntroDptcde", {
       loadData: [
@@ -106,7 +110,8 @@ onMounted(async () => {
     setValue("Base.cIntroDptcde", param.cDptCde);
     setValue("Base.cCiMrk", param.cCiMrk || "0");
   });
-
+  //将联共保业务默认值设置为0并存到store中
+  productStore.setcCiMrk("0")
   if (sessionStorage.getItem("toMyPageData")) {
     const data = JSON.parse(sessionStorage.getItem("toMyPageData"));
     if (data.pageType && data.pageType === "app") {
@@ -140,6 +145,11 @@ const method = {
   // func demo
   func1: () => {
     console.log(getRules);
+  },
+  //联共保下拉change
+  cCiMrkChange:(val)=>{
+    console.log(val,"99999999")
+    productStore.setcCiMrk(val)
   },
   //业务来源大类
   businessKindFunc: (val) => {
@@ -520,8 +530,11 @@ const method = {
   //项目类别大类change事件
   cPrjCtgTypChange: (val) => {
     console.log('类别',val)
-    setValue("Base.cPrjCtgMidTyp", "");
-    setValue("Base.cPrjCtgSubTyp", "");
+    const p = opertaor.getParam();
+    if (!p.initFlag) {
+      setValue("Base.cPrjCtgMidTyp", "");
+      setValue("Base.cPrjCtgSubTyp", "");
+    }
     if (val) {
       // Base.cPrjCtgMidTyp
       // setFormItem("Base.cPrjCtgMidTyp", { rules: null, disabled: true });
@@ -543,7 +556,10 @@ const method = {
   },
   //项目类别中类change事件
   cPrjCtgMidTypChange: (val) => {
-    setValue("Base.cPrjCtgSubTyp", "");
+    const p = opertaor.getParam();
+    if (!p.initFlag) {
+      setValue("Base.cPrjCtgSubTyp", "");
+    }
     if (val) {
       codeListStore
         .queryCodeList({

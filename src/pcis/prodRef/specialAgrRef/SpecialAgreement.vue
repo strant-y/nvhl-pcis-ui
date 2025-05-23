@@ -79,7 +79,7 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Edit",
         hideBtns: (row) => {
-          if (!row.cSpecialName.includes("**")) return true;
+          if (!row.cSpecialContent.includes("**")) return true;
         },
         tableClick: (row) => {
           dzmodal.open(specEdit, { type: "view", data: row }).then((res) => {
@@ -184,7 +184,7 @@ const tableconfig = reactive<AppTableConfig>(
         width: 180,
       },
       {
-        prop: "cSpecialName",
+        prop: "cSpecialContent",
         inputtype: "rtinput",
         title: "特约内容",
       },
@@ -244,7 +244,7 @@ const handleSelectedData = (selectdata: any[]) => {
       index: formData.value.length + 1,
       cIfMust: "0", // 默认值，根据实际情况调整
       cSpecialCode: item['PrdFixSpec.CSpecNo'],
-      cSpecialName: item['PrdFixSpec.CNmeCn'],
+      cSpecialContent: item['PrdFixSpec.CNmeCn'],
     });
   });
   formData.value.forEach((item, index) => {

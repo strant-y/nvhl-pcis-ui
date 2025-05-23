@@ -88,7 +88,7 @@ const method = {
   cBankRelTypFun: (val:any) => {
     console.log(313,val)
 
-         para= val.split('_');
+             para= val.split('_');
             const bankname = para[1];  	// 银行名称
             const isdefault = para[2]; 	// 是否默认值
             const banktype = para[3];  	// 银行大类

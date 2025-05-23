@@ -35,6 +35,10 @@ export class PolicyService {
     qryTaskVestigeUrl = '/underwriting/query/taskVestige';
     getUnbindHealthNotifyUrl = '/proddef/getUnbindHealthNotify'; // 获取待绑定健康告知列表
 
+    selectTotalSalaryUrl = '/policy/selectTotalSalary';  //  工资总额 -- 列表
+    saveTotalSalaryUrl = '/policy/saveTotalSalary'  // 工资总额 -- 保存
+
+
     /**
      * 保单保费计算
      * @param  {[type]}          policy [description]
@@ -609,6 +613,46 @@ export class PolicyService {
     qryUndrPlanBaseList(data = null) {
         return request.post('/plan/qryUndrPlanBaseList', data);
     }
+    
+     /**
+     * 保存公式信息
+     * @param {any} data
+     * @returns {Observable<Object>}
+     */
+    //  
+    savePlanCvrgFormula(data = null) {
+        return request.post('/plan/savePlanCvrgFormula', data);
+    }
+
+
+        /**
+     * 功能描述: 获取方案关联公式信息
+     *  
+     *  
+     */
+    getPlanCvrgFormulaInfo(data = null) {
+        return request.post('plan/getPlanCvrgFormulaInfo', data);
+    }
+
+    /**
+     * 关联方案--根据主键删除公式表 
+     * 
+     */
+    deleteFormulaById(data = null) {
+        return request.post('plan/deleteFormulaById', data);
+    }
+
+      /**
+     * 关联方案--根据方案号山删除全部 公式表 
+     * 
+     */
+
+      deleteCvrgFormulaByPlanNo(data = null) {
+        return request.post('plan/deleteCvrgFormulaByPlanNo', data);
+        
+      }
+       
+
 
     /**
      * 修改方案状态
@@ -1526,12 +1570,30 @@ exportDist(data) {
   });
 }
 //清单导入
-importDist(data) {
-  return request.post(`/policy/importDistIncrement`, data, {
-      responseType: 'blob'
-  });
+// importDist(data) {
+//   return request.post(`/policy/importDistIncrement`, data, {
+//       responseType: 'blob'
+//   });
+// }
+importDist(param){
+    return request.post('/policy/importDistIncrement', param);
 }
 listImage(data) {
     return request.post('image/listImage', data);
 }
+
+
+
+// 工资总额列表
+selectTotalSalary(data) {
+    return request.post(`${this.selectTotalSalaryUrl}`, data);
+  }
+// 工资总额-保存
+saveTotalSalary(data) {
+    return request.post(`${this.saveTotalSalaryUrl}`, data);
+  }
+// // 工资总额-
+// selectTotalSalary(data) {
+//     return request.post(`${this.selectTotalSalaryUrl}`, data);
+//   }
 }

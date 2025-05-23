@@ -136,25 +136,6 @@ const method = {
 // 绑定特殊验证器
 const exRules = {};
 
-function getFromValue() {
-  return tgtobjEditRef?.value?.getFromValue();
-}
-
-function setFormValue(value: any) {
-  tgtobjEditRef?.value?.setFormValue(value);
-}
-
-function validate() {
-  return tgtobjEditRef?.value?.validate();
-}
-
-function setValue(key: string, value: any) {
-  tgtobjEditRef?.value?.setValue(key, value);
-}
-
-function getValue(key: string) {
-  return tgtobjEditRef?.value?.getValue(key);
-}
 function getFormconfig() {
   return formconfig1;
 }
@@ -203,11 +184,6 @@ function showImagSys(viewType: string) {
 }
 
 defineExpose({
-  getFromValue,
-  setFormValue,
-  validate,
-  setValue,
-  getValue,
   getFormconfig,
 });
 </script>

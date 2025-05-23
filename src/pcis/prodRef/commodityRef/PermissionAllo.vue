@@ -20,7 +20,7 @@ const orderIssuer = defineAsyncComponent(() => import("./OrderIssuer.vue"));
 const salesman = defineAsyncComponent(() => import("./Salesman.vue"));
 const agent = defineAsyncComponent(() => import("./Agent.vue"));
 const departmentTree = defineAsyncComponent(
-  () => import("./DepartmentTree.vue")
+  () => import("./DepartmentTree.vue") 
 );
 import { useRoute } from "vue-router";
 const route = useRoute();
@@ -60,7 +60,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
     fromSchema: [
       {
-        prop: "cDptCde",
+        prop: "cPertainDptCde",
         inputtype: "rtselect",
         title: "商品制定机构",
         btnWidth: 20,
@@ -75,8 +75,22 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             dzmodal
               .open(departmentTree, { type: "Issuer", data: {} })
               .then((res) => {
+             
                 if (res.type === "ok") {
-                  // freeEditRef.value?.setValue("componentGroup", res.body);
+                  const selectObj = res.body;
+                  freeEditRef.value.setValue(
+                                      "cPertainDptCde",
+                                      selectObj.id
+                                  );
+                  setFormItem("cPertainDptCde", {
+                                      loadData: [
+                                          {
+                                              label: `${selectObj.id}${selectObj.name}`,
+                                              value: selectObj.id,
+                                          },
+                                      ],
+                                  });
+
                 }
               });
           },
@@ -84,7 +98,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", { change: true })],
       },
       {
-        prop: "CBsnsTyp",
+        prop: "cBsnsTyp",
         inputtype: "rtselect",
         title: "渠道大类",
         rules: [getRules("required", {})],
@@ -100,19 +114,19 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         ],
       },
       {
-        prop: "CChaType",
+        prop: "cChaType",
         inputtype: "rtselect",
         title: "渠道中级分类",
         rules: [getRules("required", {})],
       },
       {
-        prop: "CChaSubType",
+        prop: "cChaSubType",
         inputtype: "rtselect",
         title: "渠道子类",
         rules: [getRules("required", {})],
       },
       {
-        prop: "CDptCde",
+        prop: "cDptCde",
         inputtype: "rtselect",
         title: "出单机构",
         btnWidth: 20,
@@ -126,6 +140,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               .open(departmentTree, { type: "Issuer", data: {} })
               .then((res) => {
                 if (res.type === "ok") {
+                  const selectObj = res.body;
+                  freeEditRef.value.setValue(
+                                      "cDptCde",
+                                      selectObj.id
+                                  );
+                  setFormItem("cDptCde", {
+                                      loadData: [
+                                          {
+                                              label: selectObj.name,
+                                              label: `${selectObj.id}${selectObj.name}`,
+                                              value: selectObj.id,
+                                          },
+                                      ],
+                                  });
                 }
               });
           },
@@ -133,7 +161,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
       },
       {
-        prop: "COperGroup",
+        prop: "cOperGroup",
         inputtype: "rtselect",
         title: "出单员",
         btnWidth: 10,
@@ -156,7 +184,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
       },
       {
-        prop: "CSlsGroup",
+        prop: "cSlsGroup",
         inputtype: "rtselect",
         title: " 业务员/产险专员",
         btnWidth: 10,
@@ -176,7 +204,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
       },
       {
-        prop: "CBrkrCde",
+        prop: "cBrkrCde",
         inputtype: "rtselect",
         title: "代理人/经纪人",
         btnWidth: 20,
@@ -187,31 +215,33 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           type: "primary",
           func: () => {
             // const ck = freeEditRef.value?.getValue("componentGroup");
-            dzmodal.open(agent, { type: "sales", data: {} }).then((res) => {
+            dzmodal.open(agent, { cProdNo: '',type: "sales", data: {} }).then((res) => {
+              console.log(res,78)
               if (res.type === "ok") {
                 // freeEditRef.value?.setValue("componentGroup", res.body);
+           
               }
             });
           },
         },
       },
       {
-        prop: "CAgtAgrNo",
+        prop: "cAgtAgrNo",
         inputtype: "rtinput",
         title: "代理协议号",
       },
       {
-        prop: "NPropFeeRate",
+        prop: "nPropFeeRate",
         inputtype: "rtinput",
         title: "手续费比例",
       },
       {
-        prop: "CBusinessTel",
+        prop: "cBusinessTel",
         inputtype: "rtinput",
         title: "机构业务人员联系电话",
       },
       {
-        prop: "CEvenJointTel",
+        prop: "cEvenJointTel",
         inputtype: "rtinput",
         title: "渠道对接人员联系电话",
       },
@@ -221,6 +251,17 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     }),
   })
 );
+
+//给表单下拉项赋值
+function setFormItem(key, obj) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        Object.assign(item, obj);
+      }
+    });
+  }
+}
 
 function getFromValue() {
   return freeEditRef?.value?.getFromValue();

@@ -291,6 +291,7 @@
     onMounted(() => {
         nextTick(() => {
             setValue("riFacMrk", '0')
+            setValue("cIsRiskExp","2")
             const param={'cProdNo':params.cProdNo,'opCde':user.opCde,'companyId':user.companyId,'cAppNo':params.cAppNo,'cPlanNo':params.cPlanNo}
             getCUndrMrkUrlFn(param);
         });

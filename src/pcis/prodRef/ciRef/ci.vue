@@ -75,7 +75,6 @@ function addFakeData() {
 function getFormconfig(){
   return formconfig1;
 }
-onMounted(() => {});
 defineExpose({
   getFromValue,
   setFormValue,

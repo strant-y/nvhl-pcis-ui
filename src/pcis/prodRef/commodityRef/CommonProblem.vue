@@ -176,6 +176,7 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Edit",
         tableClick: (row) => {
+          
           dzmodal.open(factorEdit, { type: "edit", data: row }).then((res) => {
             if (res.type === "ok") {
               handleQuery();

@@ -210,6 +210,7 @@
 import { v4 as uuidv4 } from "uuid";
 import Validator from "async-validator";
 import { ref, reactive, watch, onMounted, handleError } from "vue";
+import { ElTable } from "element-plus";
 
 // 定义要触发的事件
 const emits = defineEmits<{
@@ -247,7 +248,7 @@ const tableDatas = ref<any[]>([]);
 const formItems = ref<{[key:string] : any }>({});
 const schamaconf = ref<{[key:string] : any }>({});
 creatSchama();
-const tableFormfef = ref("tableFormfef");
+const tableFormfef = ref<InstanceType<typeof ElTable>>();
 watch([() => props.item], ([newitemValue]) => {
   creatSchama();
   formItems.value = {};
@@ -440,7 +441,7 @@ function tabValidate() {
   }
   validateFlag.value = true;
   setTimeout(() => {
-    const t = tableFormfef.value.validate((valid: boolean, fields) => {
+    const t = tableFormfef.value?.validate((valid: boolean, fields) => {
       if (valid) {
         console.log("tablesubmit!");
       } else {
@@ -547,6 +548,14 @@ function getRowById(rowId:any){
   });
 }
 
+function getselectionData(){
+  if(props.item.showSelection){
+    return tableFormfef.value?.getSelectionRows();
+  }else{
+    return null;
+  }
+}
+
 
 defineExpose({
   tableExvalidate,
@@ -557,7 +566,8 @@ defineExpose({
   getSelectRow,
   setFormSchema,
   setValueByRowKey,
-  getRowById
+  getRowById,
+  getselectionData,
 });
 </script>
 

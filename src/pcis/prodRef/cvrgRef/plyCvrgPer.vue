@@ -24,6 +24,7 @@
               :key="index"
               v-model="formData['m'][index]"
               :disabled-flag="disAbledFlag"
+              :faters="faters"
               @delete="
                 (r) => {
                   deleteData(r);
@@ -55,6 +56,7 @@
                 :key="index"
                 v-model="formData['a1'][index]"
                 :disabled-flag="disAbledFlag"
+                :faters="faters"
                 @delete="
                   (r) => {
                     deleteData(r);
@@ -123,9 +125,9 @@
 
 <script setup lang="ts">
 import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
-import tremTemplate from "./trem-template.vue";
-import tremAddTemplate2 from "./trem-add2-template.vue";
-import tremAddTemplate3 from "./trem-add3-template.vue";
+const tremTemplate = defineAsyncComponent(() => import("./trem-template.vue"));
+const tremAddTemplate2 = defineAsyncComponent(() => import("./trem-add2-template.vue"));
+const tremAddTemplate3 = defineAsyncComponent(() => import("./trem-add3-template.vue"));
 const dialog = ref<DialogMethod | null>(null);
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
@@ -200,10 +202,11 @@ const method = {
 
 const edrItem = ref<[key: string, value: Array<any>] | any>({});
 function updateEdrItem(terms: any[]) {
+  console.log(parparam);
   if (
-    (parparam.pageType === "EDR_APP_NEW_SCENE" ||
-    parparam.pageType === "EDR_APP_MODIFY_BOUNCED_SCENE" || 
-    parparam.pageType === "TEMPORARY_DEPOSIT") && parparam.cAppTyp === 'E'
+    parparam.pageType === "EDR_APP_NEW_SCENE" ||
+    parparam.pageType === "EDR_APP_MODIFY_BOUNCED_SCENE" ||
+    (parparam.pageType === "TEMPORARY_DEPOSIT" && parparam.cAppTyp === "E")
   ) {
     const res = {
       CProdNo: parparam.cProdNo,
@@ -294,7 +297,6 @@ function addTermData() {
     { title: "添加条款", width: 85 }
   );
 }
-
 function deleteData(term: any) {
   ElMessageBox.confirm("是否继续删除?", "提示", {
     confirmButtonText: "删除",
@@ -373,7 +375,6 @@ function getFromValue() {
   Object.keys(formData.value).forEach((item) => {
     formData.value[item].forEach((d: any) => {
       const i = JSON.parse(JSON.stringify(d));
-      terms.push(i["Term.cClauseCode"]);
       if (i["riskList"]) {
         i["Term.riskList"] = i["riskList"];
         delete i["riskList"];
@@ -381,27 +382,42 @@ function getFromValue() {
       redata.push(i);
     });
   });
-  updateEdrItem(terms);
   return redata;
 }
 
 function setFormValue(value: any) {
+  const terms: any[] = [];
   Object.assign(formData.value, {});
   let plandata: any[] = [];
   value.forEach((item: any) => {
     let creData = JSON.parse(JSON.stringify(item));
     creData["riskList"] = creData["Term.riskList"];
+      terms.push(creData["Term.cClauseCode"]);
     delete creData["Term.riskList"];
     plandata.push(creData);
   });
   refushData(plandata);
+  updateEdrItem(terms);
 }
 
-function validate() {}
+
+async function validate() {
+  let r = true;
+  const keys = Object.keys(tremTemplateRefs.value);
+  for (const item of keys) {
+    if (tremTemplateRefs.value[item]) {
+      const res = await tremTemplateRefs.value[item].validate();
+      r = r && res;
+    }
+  }
+  return r;
+}
 
 function showFlush() {
   Object.keys(tremTemplateRefs.value).forEach((item: any) => {
-    tremTemplateRefs.value[item].dataInit();
+    if (tremTemplateRefs.value[item]) {
+      tremTemplateRefs.value[item].dataInit();
+    }
   });
   updateBtn();
 }
@@ -451,12 +467,12 @@ function setDisabledAll() {
 }
 function setUnDisabledByKeyList(key: any) {
   cardconfig.value.endBtns?.forEach((item: any) => {
-    if ((item.id === key)) {
+    if (item.id === key) {
       item.hidden = false;
     }
   });
   cardconfig.value.titleBtns?.forEach((item: any) => {
-    if ((item.id === key)) {
+    if (item.id === key) {
       item.hidden = false;
     }
   });

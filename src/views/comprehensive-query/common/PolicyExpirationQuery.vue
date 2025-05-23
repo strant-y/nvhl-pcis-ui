@@ -71,7 +71,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         label: "重置",
         func: () => {
           freeEditRef.value?.setFormValue({
-            NExpirationDays: 3,
+            NExpirationDays: "",
             orgCde: user.value.companyId,
             CLoadSub: 1,
             cKindNo: null,
@@ -151,6 +151,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "保单到期剩余天数",
         rules: [getRules("required", {})],
         clearable: true,
+        // func:(val)=>{
+        //   if(val <= 8){
+        //     console.log("9999999999",val)
+        //   }
+        // }
       },
       // {
       //   prop: "CKindNo",
@@ -183,6 +188,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
         },
         func: (val) => {
+          setValue("cProdNo","")
           cPard.value = val;
           codeListStore
             .queryCodeList({
@@ -378,6 +384,17 @@ function setFormItem(key, obj) {
         });
     }
 }
+function setValue(key: string, value: any) {
+    freeEditRef?.value?.setValue(key, value);
+}
+
+function getValue(key: string) {
+  return freeEditRef?.value?.getValue(key);
+}
+defineExpose({
+  setValue,
+  getValue,
+});
 </script>
 
 <style scoped></style>

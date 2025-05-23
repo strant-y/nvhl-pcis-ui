@@ -394,6 +394,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
               },
               func: (val) => {
+                  setValue("cProdNo","")
                   cPard.value = val;
                   formconfig1.fromSchema?.forEach((item) => {
                       if (
@@ -412,6 +413,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                           item.hidden = true;
                       }
                   });
+                  
                   codeListStore
                     .queryCodeList({
                         codeListName: "TERM_LIST_IN_GUIDE_NEW",
@@ -1246,6 +1248,17 @@ function setFormItem(key, obj) {
         });
     }
 }
+function setValue(key: string, value: any) {
+    freeEditRef?.value?.setValue(key, value);
+}
+
+function getValue(key: string) {
+  return freeEditRef?.value?.getValue(key);
+}
+defineExpose({
+  setValue,
+  getValue,
+});
 </script>
 
 <style scoped></style>

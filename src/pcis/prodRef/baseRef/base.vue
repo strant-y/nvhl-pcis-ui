@@ -97,8 +97,8 @@ const method = {
            val= { "_dataId": "", "Pay.nTms":i+1 , "Pay.cPayorCde": opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppCde"), "Pay.tPayBgnTm": tInsrncBgnTm, "Pay.tPayEndTm": tPayEndTm, "Pay.nOwnPrm": result.value[i], "Pay.cPayorNme":opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppNme"), "Pay.nPayablePrm": result.value[i], "Pay.nPrmVar": result.value[i] }
           valArr.push(val)
       }
-      opertaor.getTableRefByKey("payinfo").setFormValue(valArr);
-  }
+      opertaor.getTableRefByKey("payinfo").setFormValue(valArr); 
+  } 
 },
   //付费约定下拉事件
   cInstMrkChange(val: any) {

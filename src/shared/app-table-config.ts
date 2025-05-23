@@ -27,6 +27,7 @@ export interface AppTableConfig {
   showSelection?:boolean; //行多选
   showEdit?: boolean; //是否显示查询表单
   formconfig?:AppGridEditConfig | null;  //表单配置
+  maxHeight?: string;
 
   rowDbClickFun?: (rowData) => void;
 }
@@ -79,6 +80,7 @@ export function createTableEditConfig(
     showSelection: config.showSelection || false,
     showEdit: config.showEdit || false,
     formconfig: config.formconfig || null,
+    maxHeight: config.maxHeight || null,
     rowDbClickFun: config.rowDbClickFun || null,
   };
 }

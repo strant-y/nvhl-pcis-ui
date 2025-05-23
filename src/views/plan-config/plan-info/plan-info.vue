@@ -1,32 +1,21 @@
 <template>
   <div class="app-container">
     <!--<el-card>-->
-      <!--<underwriteRef ref="underwrite"></underwriteRef>-->
+    <!--<underwriteRef ref="underwrite"></underwriteRef>-->
     <!--</el-card>-->
     <el-card>
       <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
     </el-card>
     <el-card style="margin-top: 20px;">
       <template v-for="(pageConfig, v) in formconfig2" :key="v">
-        <div
-                class="card_"
-                v-for="(k, i) in pageConfig?.pageInfo"
-                :key="i"
-                :id="(k.pageKey === 'dist' || k.pageKey === 'distSummary')? k.pageCode : k.pageKey"
-        >
-          <component
-                  v-if="currentIndex >= i"
-                  :ref="
-                      (res) => {
-                        const pageK = (k.pageKey === 'dist' || k.pageKey === 'distSummary')? k.pageCode : k.pageKey
-                        opertaor.addTableRef(pageK, res);
-                      }
-                    "
-                  :is="
-                      k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'
-                    "
-                  :pageSchema="k.pageSchema"
-          />
+        <div class="card_" v-for="(k, i) in pageConfig?.pageInfo" :key="i"
+          :id="(k.pageKey === 'dist' || k.pageKey === 'distSummary') ? k.pageCode : k.pageKey">
+          <component v-if="currentIndex >= i" :ref="(res) => {
+            const pageK = (k.pageKey === 'dist' || k.pageKey === 'distSummary') ? k.pageCode : k.pageKey
+            opertaor.addTableRef(pageK, res);
+          }
+            " :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'
+              " :pageSchema="k.pageSchema" />
         </div>
       </template>
     </el-card>
@@ -47,6 +36,9 @@
       <el-button type="primary" @click="submit">提交</el-button>
       <el-button @click="goBack">返回</el-button>
     </div>
+    <el-card style="margin-top: 20px;" v-if="payinfo">
+      <app-grid-edit :gridEditConfig="formconfig3" ref="payinfoEditRef" /> 
+    </el-card>
   </div>
 </template>
 
@@ -76,6 +68,10 @@ import ReviewInfo from './review-info/review-info.vue';
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import PrdFixSpec from '../com/prd-fix-spec.vue'
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
+import {
+  AppGridEditMethod,
+  createAppGridEditConfig,
+} from "@/shared/app-grid-edit-config";
 const { getRules } = useValidator();
 const dzmodal = useDzModal();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
@@ -84,7 +80,7 @@ const userStore = useUserStore();
 const router = useRouter()
 const route = useRoute()
 const routeQryParams = route.query.data ? JSON.parse(route.query.data) : {}
-const isAdd = ref((routeQryParams.type !== 'add'&&routeQryParams.type !== 'update'&&routeQryParams.type !== 'view'))
+const isAdd = ref((routeQryParams.type !== 'add' && routeQryParams.type !== 'update' && routeQryParams.type !== 'view'))
 const user = ref(userStore.user);
 const reviewInfoRef = ref(null);
 const policyService = new PolicyService();
@@ -92,39 +88,46 @@ const policyService = new PolicyService();
 const currentIndex = ref(0);
 const opertaor = dataOpertaor();
 const formconfig2 = opertaor.getTableConfig();
+const payinfoEditRef = ref<AppGridEditMethod | null>(null);
+let payinfo = ref(false)
+// const formconfig3 = reactive(createAppGridEditConfig({}));
+
+
+
+
 opertaor.setParam(routeQryParams.rowData);
 onBeforeMount(() => {
-    console.log("routeQryParams", routeQryParams);
-    console.log("路由参数routeQryParams.rowData", routeQryParams.rowData);
-    initPage();
+  console.log("routeQryParams", routeQryParams);
+  console.log("路由参数routeQryParams.rowData", routeQryParams.rowData);
+  initPage();
 });
 /**
  * 数据初始化
  * @param data
  */
 const initPage = async () => {
-    const getProductRes = await getProductPage({
-        CProdNo: routeQryParams.rowData.cProdNo,
-        CGrpMrk: routeQryParams.rowData.cGrpMrk,
-    });
-    // 页面初始化
-    const formconfig21 = JSON.parse(getProductRes.data);
-    formconfig21[0].pageInfo = formconfig21[0].pageInfo.filter(item => item.pageKey == 'cvrg');
-    opertaor.setTableConfig(formconfig21);
-    renderComponents();
+  const getProductRes = await getProductPage({
+    CProdNo: routeQryParams.rowData.cProdNo,
+    CGrpMrk: routeQryParams.rowData.cGrpMrk,
+  });
+  // 页面初始化
+  const formconfig21 = JSON.parse(getProductRes.data);
+  formconfig21[0].pageInfo = formconfig21[0].pageInfo.filter(item => item.pageKey == 'cvrg');
+  opertaor.setTableConfig(formconfig21);
+  renderComponents();
 };
 /**
  * 逐个渲染组件
  */
 function renderComponents() {
-    const interval = setInterval(() => {
-        if (currentIndex.value < formconfig1[0]?.pageInfo.length - 1) {
-            currentIndex.value++;
-        } else {
-            // loadAfter(); //页面加载完成之后,再加载后续所需的事件
-            clearInterval(interval);
-        }
-    }, 100); // 延迟组件渲染,增加页面响应效率
+  const interval = setInterval(() => {
+    if (currentIndex.value < formconfig1[0]?.pageInfo.length - 1) {
+      currentIndex.value++;
+    } else {
+      // loadAfter(); //页面加载完成之后,再加载后续所需的事件
+      clearInterval(interval);
+    }
+  }, 100); // 延迟组件渲染,增加页面响应效率
 }
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -136,7 +139,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         type: "primary",
         label: "保存",
-        func: async () => {
+        func: () => {
           saveData()
         },
       }),
@@ -155,22 +158,22 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           icon: "Search",
           type: "primary",
           func: () => {
-              dzmodal
-                  .open(DepartmentTree, { type: "Issuer", data: {} })
-                  .then((res) => {
-                      if (res.body) {
-                          const selectObj = res.body;
-                          freeEditRef.value?.setValue("cDptCde", selectObj.id);
-                          setFormItem("cDptCde", {
-                              loadData: [
-                                  {
-                                      label: selectObj.name,
-                                      value: selectObj.id,
-                                  },
-                              ],
-                          });
-                      }
+            dzmodal
+              .open(DepartmentTree, { type: "Issuer", data: {} })
+              .then((res) => {
+                if (res.body) {
+                  const selectObj = res.body;
+                  freeEditRef.value?.setValue("cDptCde", selectObj.id);
+                  setFormItem("cDptCde", {
+                    loadData: [
+                      {
+                        label: selectObj.name,
+                        value: selectObj.id,
+                      },
+                    ],
                   });
+                }
+              });
           },
         },
         rules: [getRules("required", {})],
@@ -181,12 +184,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "险种大类",
         typeCode: "KIND_LIST_GRT", //产品大类的接口
         codeParam: {
-            cOperId: user.value?.opCde,
-            cDptCde: user.value?.companyId,
+          cOperId: user.value?.opCde,
+          cDptCde: user.value?.companyId,
         },
         clearable: true,
         child: "cProdNo",
-        disabled:true,
+        disabled: true,
         rules: [getRules("required", {})],
         func: (val) => {
         }
@@ -196,7 +199,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "险种名称",
         clearable: true,
-        disabled:true,
+        disabled: true,
         typeCode: "PROD_LIST_IN_GUIDE", //条款的接口
         rules: [getRules("required", {})],
       },
@@ -221,7 +224,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable: true,
         rules: [getRules("required", {})],
         typeCode: "BAS_COMM_CODE_OUT_CDE",
-        codeParam: {'cParCde': 'CRationType'},
+        codeParam: { 'cParCde': 'CRationType' },
       },
       {
         prop: "cOrigin",
@@ -232,9 +235,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         // typeCode: "", //暂时无接口
         // params: {},
         loadData: [
-            {value: 'core', label: '核心专用'},
-            {value: 'channel', label: '渠道专用'},
-            {value: 'public', label: '核心渠道公用'},
+          { value: 'core', label: '核心专用' },
+          { value: 'channel', label: '渠道专用' },
+          { value: 'public', label: '核心渠道公用' },
         ]
       },
       {
@@ -262,17 +265,24 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable: true,
         rules: [getRules("required", {})],
         loadData: [
-            {value: '1', label: '固定保额保费'},
-            {value: '2', label: '根据费率表计算'},
-            {value: '3', label: '根据公式计算'},
-            // {value: '1', label: '定险别/保额保费不校验'},
-            // {value: '2', label: '非定费非定保险期间(不校验)'},
-            // {value: '3', label: '非定额非定费率计算公式'},
-            // {value: '4', label: '定额计算公式'},
-            // {value: '5', label: '非定险别/保额保费不校验'},
-            // {value: '6', label: '保额保费不校验'},
-            // {value: '7', label: '非定额非定保费(不校验)'},
+          { value: '1', label: '固定保额保费' },
+          // { value: '2', label: '根据费率表计算' },
+          { value: '3', label: '根据公式计算' },
+          // {value: '1', label: '定险别/保额保费不校验'},
+          // {value: '2', label: '非定费非定保险期间(不校验)'},
+          // {value: '3', label: '非定额非定费率计算公式'},
+          // {value: '4', label: '定额计算公式'},
+          // {value: '5', label: '非定险别/保额保费不校验'},
+          // {value: '6', label: '保额保费不校验'},
+          // {value: '7', label: '非定额非定保费(不校验)'},
         ],
+        func: (v: any) => {
+          if (v == 3) {
+            payinfo.value = true;
+          } else {
+            payinfo.value = false;
+          }
+        },
         // typeCode: "", //暂时无接口
         // params: {},
       },
@@ -283,7 +293,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable: true,
         rules: [getRules("required", {})],
         typeCode: "BAS_COMM_CODE_OUT_CDE",
-        codeParam: {'cParCde': 'CAccessType'},
+        codeParam: { 'cParCde': 'CAccessType' },
       },
       {
         prop: "cCriterionTimeUnit",
@@ -291,7 +301,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "保险期间类型",
         clearable: true,
         typeCode: "RECEIVE_BANK_CATEGORY",
-        codeParam: {'cParCde': 'CriterionUnit'},
+        codeParam: { 'cParCde': 'CriterionUnit' },
       },
       {
         prop: "nCriterionTime",
@@ -322,7 +332,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         func: (val) => {
           //获取 绿色产业细分列表 配置项
           const item = freeEditRef.value?.getFromSchemaItem('greenDetailList')
-          if(val === '1') { //当选择是的时候绿色产业细分列表必输
+          if (val === '1') { //当选择是的时候绿色产业细分列表必输
             item['disabled'] = false
             item['rules'] = [getRules("required", {})]
           } else {
@@ -390,11 +400,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 let cSpecNo = '';
                 let cUnfixSpc = '';
                 res.body.forEach(value => {
-                    cSpecNo = '' === cSpecNo ? value['PrdFixSpec.CSpecNo'] : cSpecNo + '$$' + value['PrdFixSpec.CSpecNo'];
-                    cUnfixSpc = '' === cUnfixSpc ? i + '.' + value['PrdFixSpec.CNmeCn'] : cUnfixSpc + '\n' + i + '.' + value['PrdFixSpec.CNmeCn'];
-                    freeEditRef.value?.setValue('cSpecContent', cUnfixSpc)
-                    freeEditRef.value?.setValue('CSpecNo', cSpecNo)
-                    i++;
+                  cSpecNo = '' === cSpecNo ? value['PrdFixSpec.CSpecNo'] : cSpecNo + '$$' + value['PrdFixSpec.CSpecNo'];
+                  cUnfixSpc = '' === cUnfixSpc ? i + '.' + value['PrdFixSpec.CNmeCn'] : cUnfixSpc + '\n' + i + '.' + value['PrdFixSpec.CNmeCn'];
+                  freeEditRef.value?.setValue('cSpecContent', cUnfixSpc)
+                  freeEditRef.value?.setValue('CSpecNo', cSpecNo)
+                  i++;
                 });
               }
             });
@@ -422,29 +432,330 @@ const formconfig1 = reactive<AppFreeEditConfig>(
   })
 );
 
+
+const formconfig3 = reactive<AppFreeEditConfig>(
+  createAppGridEditConfig({
+    "title": "添加计算公式",
+    "editFlag": true,
+    endBtnsPosition: 'right',
+    "titleBtns": [
+      createFreeButtonBase({
+        "size": "default",
+        "label": "新增",
+        "type": "primary",
+        func: (v: any) => {
+          let cPlanNo = freeEditRef.value?.getValue("cPlanNo");
+          if (cPlanNo == null || cPlanNo === undefined) {
+            ElMessage.error("方案编号不能为空");
+            return;
+          }
+          payinfoEditRef?.value?.addRow();
+          const val = getFromValue()
+          console.log('添加', val)
+          val.forEach((key, index) => {
+            console.log(key)
+            key['nSeqNo'] = index + 1;
+            key['cPlanNo'] = cPlanNo
+          });
+        }
+      }),
+      createFreeButtonBase({
+        type: "primary",
+        label: "删除",
+        func: () => {
+          const selData = payinfoEditRef?.value?.getSelectRow()
+          if (!selData) {
+            ElMessage.error("请选择要删除的数据!");
+            return;
+          }
+          const editIndex = selData['_dataId']
+          console.log(selData)
+
+          if (!selData["cPkId"] || !selData) {
+            ElMessage.error(" 主键为空！请重新点击查询。");
+            return;
+          }
+          ElMessageBox.confirm("是否要删除此行？", "提示", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+          })
+            .then(() => {
+              // 删除逻辑
+              const param = {
+                id: selData["cPkId"]
+              };
+              policyService.deleteFormulaById(param).then((res: any) => {
+                const { code, data, msg } = res;
+                console.log('删除', res)
+                // if (null != res && null != code) {
+                if (code === 200) {
+
+                  if ('1' === data['code']) { // 删除成功
+                    ElMessage.success("删除成功");
+                    payinfoEditRef?.value?.delRow(editIndex);
+                  } else {
+                    ElMessage.error(msg);
+                  }
+                }
+
+              })
+
+            })
+            .catch(() => {
+              // 取消删除
+
+            });
+        },
+      }),
+      createFreeButtonBase({
+        type: "primary",
+        label: "删除所有",
+        func: () => {
+          ElMessageBox.confirm("是否要删除所有行？", "提示", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+          })
+            .then(() => {
+              let cPlanNo = freeEditRef.value?.getValue("cPlanNo");
+              const param = {
+                cPlanNo: cPlanNo
+              };
+              policyService.deleteCvrgFormulaByPlanNo(param).then((res: any) => {
+                const { code, data, msg } = res;
+                if (code === 200) {
+                  if ('1' === data['code']) { // 删除成功
+                      ElMessage.success("删除所有成功");
+                    initData();
+                  } else {
+                    ElMessage.error(msg);
+                  }
+                }
+
+              })
+
+            })
+            .catch(() => {
+              // 取消删除
+
+            });
+
+
+        },
+      }),
+
+      createFreeButtonBase({
+        type: "primary",
+        label: "查询",
+        func: () => {
+          let cPlanNo = freeEditRef.value?.getValue("cPlanNo");
+          if (!!cPlanNo) {
+            initData();
+          } else {
+            ElMessage.error("方案号不存在!");
+
+          }
+        },
+      }),
+
+
+    ],
+    endBtns: [
+      createFreeButtonBase({
+        "size": "default",
+        "label": "保存",
+        "type": "primary",
+        func: async (v: any) => {
+          saveProdDataFun()
+        }
+      }),
+    ],
+    fromSchema: [{
+
+      "prop": "nSeqNo",
+      "inputtype": "rtnumber",
+      rules: [getRules("required", {})],
+      "disabled": 1,
+      "title": "序号"
+    }, {
+
+      // "readonly": 1,
+      "prop": "cPlanNo",
+      "inputtype": "rtinput",
+      "title": "方案号",
+      "disabled": 1,
+      rules: [getRules("required", {})],
+      func: (v: any) => {
+        console.log(v)
+      }
+    }, {
+
+      // "readonly": 1,
+      "prop": "cAmtFormula",
+      "inputtype": "rtinput",
+      "rules": [{
+        "type": "required"
+      }],
+      "title": "保额计算公式",
+
+
+    }, {
+
+      "prop": "cPrmFormula",
+      "inputtype": "rtinput",
+      // "disabled": 0,
+      "title": "保费计算公式",
+
+    }, {
+      "prop": "cPerPrmFormula",
+      "inputtype": "rtinput",
+      "rules": [{
+        "type": "required"
+      }],
+      "disabled": 0,
+      "title": "每人保费计算公式",
+
+    }, {
+      "prop": "cRateFormula",
+      "disabledDate": "tPayEndTmDisabled",
+      "inputtype": "rtinput",
+      "rules": [{
+        "type": "required"
+      }],
+      "disabled": 0,
+      "title": "费率计算公式",
+
+    }, {
+      "prop": "cTab",
+      "inputtype": "rtinput",
+      "title": '取值组件（逗号分隔）',
+    },
+
+    {
+      "prop": "nStartDay",
+      "inputtype": "rtinput",
+      "title": '开始天数',
+    }, {
+      "prop": "nEndDay",
+      "inputtype": "rtinput",
+      "title": '结束天数',
+    },
+    {
+      "prop": "nVerifyStart",
+      "inputtype": "rtinput",
+      "title": '核定座位起',
+    },
+    {
+      "prop": "nVerifyEnd",
+      "inputtype": "rtinput",
+      "title": '核定座位止',
+    }
+
+
+    ]
+  })
+)
+
+
+const initData = () => {
+  let cPlanNo = freeEditRef.value?.getValue("cPlanNo");
+  const param = {
+    cPlanNo: cPlanNo
+  };
+
+
+  console.log('init', param)
+  policyService.getPlanCvrgFormulaInfo(param).then((res: any) => {
+    const { code, data, msg } = res;
+    console.log('查询res', res)
+    if (null != res && null != code) {
+      if (code === 200) {
+        if (data) {
+
+          let setData = data;
+          for(let i =0;i<setData.length;i++){
+            setData[i].nSeqNo = i+1;
+          }
+          setFormValue(setData)
+
+        }
+      }
+    }
+  })
+
+}
+
+//  添加公式 保存
+const saveProdDataFun = async () => {
+  let cPlanNo = freeEditRef.value?.getValue("cPlanNo");
+  if (cPlanNo == null || cPlanNo === undefined) {
+    ElMessage.error("方案编号不能为空");
+    return;
+  }
+
+
+  const param = Object.assign({
+    cPlanNo: freeEditRef.value?.getValue("cPlanNo")
+
+  }, { items: getFromValue() });
+
+
+  console.log('getFormData', param, getFromValue())
+  policyService.savePlanCvrgFormula(param).then((res: any) => {
+    const { code, data, msg } = res;
+    console.log(res)
+    if (null != res && null != code) {
+      if (code === 200) {
+
+        console.log(data);
+        if (data.code === '1') { // 保存成功
+          ElMessage.success("保存成功");
+          let setData = data['data'];
+          for(let i =0;i<setData.length;i++){
+            setData[i].nSeqNo = i+1;
+          }
+          console.log(11,setData)
+
+          setFormValue(setData)
+          // for (const i in data['data']) {
+          //   // const row = initGuidParam(data['data'][i]);
+          //   // this.form.editRow(+i, row);
+          // }
+        } else {
+          ElMessage.error(msg);
+        }
+      }
+    }
+
+  })
+}
+
+
+
 //form表单部分保存
 const saveData = (call?) => {
   freeEditRef.value?.validate().then((isValid) => {
-    if(isValid) {
-        const s = freeEditRef.value?.getFromValue(); //获取表单数据
-        const param = Object.assign(s);
-        if(!!call){
-            param['cUndrStatus'] = '1';
-        }
-        save()
+    if (isValid) {
+      const s = freeEditRef.value?.getFromValue(); //获取表单数据
+      const param = Object.assign(s);
+      if (!!call) {
+        param['cUndrStatus'] = '1';
+      }
+      save()
       //调用接口
-        policyService.saveOrUpdatePlan(param).then(result => {
-            if (result['code'] === 200) {
-                freeEditRef.value?.setFormValue(result.data.data)
-                if (!!call) {
-                    call();
-                }else{
-                    ElMessage.success(result['data']['message']);
-                }
-            } else {
-                ElMessage.error(result['msg']);
-            }
-        });
+      policyService.saveOrUpdatePlan(param).then(result => {
+        if (result['code'] === 200) {
+          freeEditRef.value?.setFormValue(result.data.data)
+          if (!!call) {
+            call();
+          } else {
+            ElMessage.success(result['data']['message']);
+          }
+        } else {
+          ElMessage.error(result['msg']);
+        }
+      });
     } else {
       ElMessage.error("请填写必填项");
     }
@@ -454,41 +765,41 @@ const saveData = (call?) => {
 //总的保存
 const save = () => {
   //调用保存接口
-    const res = opertaor.getDataAll();
-    res['cPlanNo']=freeEditRef.value?.getValue("cPlanNo");
-    console.log(res)
-    policyService.savePlanCvrg(res).then(result => {
-        if (result['code'] === 200) {
-            const ops={cvrg:result.data.cvrg}
-            opertaor.setDataAll(ops);
-            ElMessage.success(result['msg']);
-        } else {
-            ElMessage.error(result['msg']);
-        }
-    });
+  const res = opertaor.getDataAll();
+  res['cPlanNo'] = freeEditRef.value?.getValue("cPlanNo");
+  console.log(res)
+  policyService.savePlanCvrg(res).then(result => {
+    if (result['code'] === 200) {
+      const ops = { cvrg: result.data.cvrg }
+      opertaor.setDataAll(ops);
+      ElMessage.success(result['msg']);
+    } else {
+      ElMessage.error(result['msg']);
+    }
+  });
 }
 const saveAndSubmit = () => {
   //调用保存并提交接口
-    const call = () => {
-        const res = {}
-        res['cRelNo']=freeEditRef.value?.getValue("cPlanNo");
-        res['cUndrStatus']='1';
-        res['cUndrDesc']='提交审核';
-        res['cType']='PLAN';
-        console.log(res)
-        policyService.addProcessUndr(res).then(result => {
-            if (result['code'] === 200) {
-                if(result['data']['code']=='1'){
-                    ElMessage.success(result['data']['message']);
-                }else{
-                    ElMessage.error(result['data']['message']);
-                }
-            } else {
-                ElMessage.error(result['msg']);
-            }
-        });
-    };
-    saveData(call)
+  const call = () => {
+    const res = {}
+    res['cRelNo'] = freeEditRef.value?.getValue("cPlanNo");
+    res['cUndrStatus'] = '1';
+    res['cUndrDesc'] = '提交审核';
+    res['cType'] = 'PLAN';
+    console.log(res)
+    policyService.addProcessUndr(res).then(result => {
+      if (result['code'] === 200) {
+        if (result['data']['code'] == '1') {
+          ElMessage.success(result['data']['message']);
+        } else {
+          ElMessage.error(result['data']['message']);
+        }
+      } else {
+        ElMessage.error(result['msg']);
+      }
+    });
+  };
+  saveData(call)
 }
 const goBack = () => {
   //返回上个页面
@@ -498,64 +809,99 @@ const goBack = () => {
 //审核的提交
 const submit = () => {
   //提交
-    const s = reviewInfoRef.value.getFromValue(); //获取表单数据
-    const res = Object.assign(s);
-    res['cRelNo']=freeEditRef.value?.getValue("cPlanNo");
-    res['id']=routeQryParams.rowData.cPkId;
-    res['cType']='PLAN';
-    console.log(res)
-    policyService.processApprove(res).then(result => {
-        if (result['code'] === 200) {
-            if(result['data']['code']=='1'){
-                ElMessage.success(result['data']['message']);
-            }else{
-                ElMessage.error(result['data']['message']);
-            }
-        } else {
-            ElMessage.error(result['msg']);
-        }
-    });
+  const s = reviewInfoRef.value.getFromValue(); //获取表单数据
+  const res = Object.assign(s);
+  res['cRelNo'] = freeEditRef.value?.getValue("cPlanNo");
+  res['id'] = routeQryParams.rowData.cPkId;
+  res['cType'] = 'PLAN';
+  console.log(res)
+  policyService.processApprove(res).then(result => {
+    if (result['code'] === 200) {
+      if (result['data']['code'] == '1') {
+        ElMessage.success(result['data']['message']);
+      } else {
+        ElMessage.error(result['data']['message']);
+      }
+    } else {
+      ElMessage.error(result['msg']);
+    }
+  });
 }
 
 onMounted(() => {
-    if(routeQryParams.type=='add'){
-        nextTick(() => {
-            freeEditRef.value?.setValue("cKindNo", routeQryParams.rowData.cKindNo);
-            freeEditRef.value?.setValue("cProdNo", routeQryParams.rowData.cProdNo);
-        });
-    }else{
-        const param={'cPlanNo':routeQryParams.rowData.cPlanNo}
-        policyService.getPlanBase(param).then(result => {
-            if (result['code'] === 200) {
-                freeEditRef.value?.setFormValue(result.data.data)
-            } else {
-                ElMessage.error(result['msg']);
-            }
-        });
-        policyService.getPlanCvrg(param).then(result => {
-            if (result['code'] === 200) {
-                const ops={cvrg:result.data.cvrg}
-                opertaor.setDataAll(ops);
-            } else {
-                ElMessage.error(result['msg']);
-            }
-        });
-    }
+  if (routeQryParams.type == 'add') {
     nextTick(() => {
-        if(routeQryParams.type=='view'||routeQryParams.type=='under'){
-            freeEditRef.value.setDisabledAll();
-            opertaor.setDisabledAll();
-        }
+      freeEditRef.value?.setValue("cKindNo", routeQryParams.rowData.cKindNo);
+      freeEditRef.value?.setValue("cProdNo", routeQryParams.rowData.cProdNo);
     });
+  } else {
+    const param = { 'cPlanNo': routeQryParams.rowData.cPlanNo }
+    policyService.getPlanBase(param).then(result => {
+      if (result['code'] === 200) {
+        freeEditRef.value?.setFormValue(result.data.data)
+
+        // 根据公式计算弹框
+        payinfo.value = result.data.data.cCalcFormula == 3 ? true : false;
+        // payinfo.value = true
+        console.log(payinfo.value)
+        if (payinfo.value) {
+          initData();
+        }
+
+      } else {
+        ElMessage.error(result['msg']);
+      }
+    });
+    policyService.getPlanCvrg(param).then(result => {
+      if (result['code'] === 200) {
+        const ops = { cvrg: result.data.cvrg }
+        opertaor.setDataAll(ops);
+      } else {
+        ElMessage.error(result['msg']);
+      }
+    });
+  }
+  nextTick(() => {
+    if (routeQryParams.type == 'view' || routeQryParams.type == 'under') {
+      freeEditRef.value.setDisabledAll();
+      opertaor.setDisabledAll();
+    }
+  });
 });
 //给表单下拉项赋值
 function setFormItem(prop: string, config: any) {
-    formconfig1.fromSchema?.forEach((item) => {
-        if (item.prop === prop) {
-            Object.assign(item, config);
-        }
-    });
+  formconfig1.fromSchema?.forEach((item) => {
+    if (item.prop === prop) {
+      Object.assign(item, config);
+    }
+  });
 }
+
+
+
+function getFromValue() {
+  return payinfoEditRef?.value?.getFromValue();
+}
+
+function setFormValue(value: any) {
+  payinfoEditRef?.value?.setFormValue(value);
+}
+
+function validate() {
+  return payinfoEditRef?.value?.validate();
+}
+
+function getTableValue(rowId: number, key: string) {
+  payinfoEditRef?.value?.getTableValue(rowId, key);
+}
+
+
+defineExpose({
+  getFromValue,
+  setFormValue,
+  validate,
+  getTableValue,
+});
 </script>
 
 <style scoped lang="scss"></style>

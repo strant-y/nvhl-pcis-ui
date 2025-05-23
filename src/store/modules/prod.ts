@@ -5,7 +5,8 @@ import { defineStore } from "pinia";
 export const useProductStore = defineStore('product', {
     state: () => ({
       cIsSingle: '1', //是否单项工程，默认值：是
-      cClntMrk: '1' //投保人性质
+      cClntMrk: '1', //投保人性质
+      cCiMrk:"0", //联共保业务
     }),
     actions: {
         setCIsSingle(newVal) {
@@ -13,6 +14,9 @@ export const useProductStore = defineStore('product', {
         },
         setcClntMrk(newVal){
             this.cClntMrk = newVal
+        },
+        setcCiMrk(newVal){
+            this.cCiMrk = newVal
         }
     }
 })

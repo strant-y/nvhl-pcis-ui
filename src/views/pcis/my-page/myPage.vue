@@ -68,6 +68,33 @@
                     </template>
                   </span>
                 </el-anchor-link>
+                <el-anchor-link :href="`#ciMasterAgreement`" v-if="ciMasterAgreementFlag">
+                  <rt-icon
+                    style="margin-right: 14px"
+                    :item="{ icon: 'Tickets' }"
+                  />
+                  <span style="font-size: 15px" v-if="NavigaShow"
+                    >联共保主协议信息</span
+                  >
+                </el-anchor-link>
+                <el-anchor-link :href="`#ci`" v-if="ciFlag">
+                  <rt-icon
+                    style="margin-right: 14px"
+                    :item="{ icon: 'Tickets' }"
+                  />
+                  <span style="font-size: 15px" v-if="NavigaShow"
+                    >联共保信息</span
+                  >
+                </el-anchor-link>
+                <el-anchor-link :href="`#ourCompanyCiShare`" v-if="ourCompanyCiShareFlag">
+                  <rt-icon
+                    style="margin-right: 14px"
+                    :item="{ icon: 'Tickets' }"
+                  />
+                  <span style="font-size: 15px" v-if="NavigaShow"
+                    >我司联共保信息</span
+                  >
+                </el-anchor-link>
               </el-anchor>
             </div>
             <div class="NavigaList_card" style="margin-left: 5px">
@@ -163,6 +190,15 @@
             />
           </div>
         </template>
+        <div id="ci" v-if="ciFlag" style="margin-bottom: 10px">
+          <ciRef ref="ci"></ciRef>
+        </div>
+        <div id="ciMasterAgreement" v-if="ciMasterAgreementFlag" style="margin-bottom: 10px">
+          <ciMasterAgreementRef ref="ciMasterAgreement"></ciMasterAgreementRef>
+        </div>
+        <div id="ourCompanyCiShare" v-if="ourCompanyCiShareFlag" style="margin-bottom: 10px">
+          <ourCompanyCiShareRef ref="ourCompanyCiShare"></ourCompanyCiShareRef>
+        </div>
       </el-main>
     </el-container>
 
@@ -210,6 +246,8 @@ import dayjs from "dayjs";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
 const policyService = new PolicyService();
+import { useProductStore } from "@/store/modules/prod";
+const productStore = useProductStore();
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -258,6 +296,10 @@ const underwrite = ref(null);
 const edrbase = ref(null);
 const edritem = ref(null);
 
+const ci = ref(null);
+const ciMasterAgreement = ref(null);
+const ourCompanyCiShare = ref(null);
+
 const invoiceRef = ref(null);
 const amlInfoRef = ref(null);
 
@@ -281,6 +323,9 @@ const tempFindBtn = [];
 let underwriteFlag = ref(false);
 let edrbaseFlag = ref(false);
 let edritemFlag = ref(false);
+let ciMasterAgreementFlag = ref(false); //
+let ourCompanyCiShareFlag = ref(false);   //
+let ciFlag = ref(false);   //
 let acctinfoFlag = ref(true);
 const user = JSON.parse(sessionStorage.getItem("user"));
 const nAmt = ref("0.00");
@@ -335,10 +380,15 @@ const isDetailCde = () => {
 };
 
 onMounted(() => {
-  console.log("路由参数props.param", props.param);
   initPage();
 });
-
+// watchEffect(() => {
+//   const isShow = productStore.$state.cCiMrk !== "0";
+//   ciMasterAgreementFlag.value = isShow;
+//   console.log(ciMasterAgreementFlag.value,"000000000")
+//   ciFlag.value = isShow;
+//   ourCompanyCiShareFlag.value = isShow;
+// });
 /**
  * 发票信息
  */
@@ -459,14 +509,13 @@ const basicBtn = [
     label: "保存模板",
     type: "primary",
     func: () => {
-      console.log(13133);
     },
   }),
   createFreeButtonBase({
     label: "复制出单",
     type: "primary",
     func: () => {
-      // copyPolicyFun()
+      copyPolicyFun()
     },
   }),
   createFreeButtonBase({
@@ -518,7 +567,6 @@ const basicBtn = [
     label: "历史赔案",
     type: "primary",
     func: () => {
-      console.log(13133);
       historyClaimcaseFun();
       // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
     },
@@ -675,7 +723,6 @@ const uwBtn = [
     label: "历史赔案",
     type: "primary",
     func: () => {
-      console.log(13133);
       historyClaimcaseFun();
       // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
     },
@@ -717,6 +764,7 @@ const initPage = async () => {
     CProdNo: props.param.cProdNo,
     CGrpMrk: props.param.cGrpMrk,
   });
+  
   const getRenewalAppPolicyres = await getRenewalAppPolicy({
     cPlyNo: props.param.cPlyNo,
     queryTyp: props.param.queryTyp,
@@ -764,6 +812,14 @@ const initPage = async () => {
   // 页面初始化
   const formconfig11 = JSON.parse(getProductRes.data);
 
+  
+  // if(productStore.$state.cCiMrk == "0"){
+  //   formconfig11[0].pageInfo = formconfig11[0].pageInfo.filter(
+  //     (item) => item.pageTtile !== "联共保主协议信息" && item.pageTtile !== "联共保信息" && item.pageTtile !== "我司联共保份额信息"
+  //   );
+  // }else if(productStore.$state.cCiMrk !=="0"){
+  // }
+  
   //处理账户信息方面逻辑  根据isDetailcdeType 不包含这里的都不显示账户信息方面的内容
   let isDetailcdeType = isDetailCde();
   if (!isDetailcdeType) {
@@ -771,6 +827,7 @@ const initPage = async () => {
       (item) => item.pageTtile !== "账户信息"
     );
   }
+  
   console.log("页面初始化返回数据", formconfig11);
   if (props.param?.cAppTyp == "E") {
     if (props.param.cEdrType == "1") {
@@ -809,7 +866,6 @@ function renderComponents() {
  * 页面加载后
  */
 async function loadAfter() {
-  // page.getRefTab("base").setFormValue(lowercaseKeys(props.param));
   if (props.param.pageType === "app") {
     //获取单号
     getCAppNoFun();
@@ -1286,19 +1342,25 @@ const setPayInfo = (base, applicant, insrnc) => {
  * 投保申请核保
  */
 const submitToUndrFn = async () => {
-  if(!checkNAmt()) return;
+  if (!checkNAmt()) return;
   const f = await savePlyInfo(); // 提交核保,需要默认执行一次保存操作
   if (f) {
     const btn = getBtn("btn010103");
-    btn.loading = true;
+
     const res: any = {};
-    // setTimeout(() => {
+    nextTick(async () => {
+      const rv = await opertaor.validateAll();
+      if (!rv) {
+        ElMessage.error("存在未录入数据,请确认!");
+        return;
+      }
+      btn.loading = true;
       console.log(opertaor.getTableRefByKey("plyBase").getFromValue());
       const base = opertaor.getTableRefByKey("plyBase").getFromValue();
       res["user"] = user;
       res["appNo"] = base["Base.cAppNo"];
 
-      console.log('申请核保参数-----',res)
+      console.log("申请核保参数-----", res);
       submitToUndr(res).then((res: any) => {
         btn.loading = false;
         console.log("submitToUndr-res", res);
@@ -1309,9 +1371,10 @@ const submitToUndrFn = async () => {
           btn.disabled = true;
         } else {
           ElMessage.error(res.msg);
+          btn.disabled = true;
         }
       });
-    // }, 100);
+    });
   }
 };
 
@@ -1377,7 +1440,7 @@ const savePlyInfo = async () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
 
-  console.log('保存参数-----1',res);
+  console.log("保存参数-----1", res);
   if (res["cvrg"].length == 0) {
     ElMessage.error("请录入条款信息");
     btn.loading = false;
@@ -1388,10 +1451,19 @@ const savePlyInfo = async () => {
   console.log("saveAppPlyInfo-res", resInfo);
   btn.loading = false;
   if (resInfo["code"] == "200") {
-    const ops = opertaor.convertData(resInfo);
+    const ops: any = opertaor.convertData(resInfo);
     console.log("转换的数据", ops);
     ElMessage.success(resInfo.msg);
-    opertaor.setDataAll(ops);
+    const base = ops["base"];
+    const plyBase = ops["plyBase"];
+    if (base) {
+      const baseRef = opertaor.getTableRefByKey("base");
+      baseRef.setFormValue(base);
+    }
+    if (plyBase) {
+      const plyBaseRef = opertaor.getTableRefByKey("plyBase");
+      plyBaseRef.setFormValue(plyBase);
+    }
     saveFlag = true;
   } else {
     ElMessage.error(resInfo.msg);
@@ -1843,7 +1915,6 @@ function lowercaseKeys<T extends object>(
   }
   return newObj;
 }
-
 function getcacheKey() {
   return cacheKey.value;
 }
@@ -1853,6 +1924,9 @@ function setTmDay(tmday: any) {
 }
 
 function getPlanCvrg() {
+  if(props.param?.cIsPlan !== '1'){
+    return ;
+  }
   const param = { cPlanNo: props.param?.cTermNo }
   policyService.getPlanCvrg(param).then((result:any) => {
     if (result['code'] === 200) {

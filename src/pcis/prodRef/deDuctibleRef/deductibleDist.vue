@@ -7,6 +7,13 @@ import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import {getPrdDeductible} from "@/api/prod/index";
 import { useRoute } from "vue-router";
+
+import { useDzModal } from "@/common/dzmodel/DzModalService";
+const dzmodal = useDzModal();
+
+const deductibleDistModal = defineAsyncComponent(
+  () => import("../commodityRef/deductibleDistModal.vue")
+);
 const route = useRoute();
 const opertaor = dataOpertaor();
 import {
@@ -46,11 +53,17 @@ const method = {
   },
   //获取免赔
   getDuductible: () => {
-    
+    dzmodal
+      .open(deductibleDistModal, { type: "add", data: {} })
+      .then((res) => {
+        if (res.type === "ok") {
+          handleQuery();
+        }
+      });
   },
   //查询免赔
   queryDeductible: () => {
-    let param = Object.assign({pageNum:"1",pageSize:"999"}, {cProdNo:route.params.param.cProdNo},);
+    let param = Object.assign({pageNum:1,pageSize:999}, {cProdNo:route.params.param.cProdNo},);
     getPrdDeductible(param).then((res) => {
       if (res.code == 200) {
         console.log(res.data.result);
