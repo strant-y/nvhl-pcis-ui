@@ -65,6 +65,7 @@ const cardconfig = ref<CardConfig>(creatCardConfig({}));
 const formconfig1 = ref<Record<string, any>>({});
 const tableconfig = ref<AppTableConfig>(createTableEditConfig());
 
+let fileBase: string;
 // 声明全局变量
 let cComponentTableValue: string;
 
@@ -371,18 +372,28 @@ const method = {
     input.onchange = () => {
       if (input.files?.length) {
         const file = input.files[0];
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        // 将表单配置信息合并到请求参数中
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+        const base64String = e.target?.result as string;
+
+        // ✅ 此处赋值有效
+        // fileBase = base64String.split(',')[1]; // 去掉 data:image/type;base64, 前缀
+
+        // console.log(fileBase, "0000000"); // ✅ 此处可以正常打印 Base64 字符串
+
+        // 构建参数并请求接口
         const params = {
           ...formconfig1.value,
-          file: file,
+          file: base64String, // ✅ 正确传入
+          cComponentTable: cComponentTableValue,
+          cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
         };
+
         policyService.importDist(params).then((res) => {
           if (res.code === 200) {
             ElMessage.success("导入成功");
-            method.handleQuery(); // 刷新列表
+            method.handleQuery();
           } else {
             ElMessage.error(res.message || "导入失败");
           }
@@ -390,6 +401,14 @@ const method = {
           ElMessage.error("导入出错，请检查文件格式或内容");
           console.error("导入错误：", error);
         });
+      };
+
+      reader.onerror = (e) => {
+        console.error("文件读取失败", e);
+        ElMessage.error("文件读取失败");
+      };
+
+      reader.readAsDataURL(file); // 启动读取
       }
     };
     input.click(); // 触发文件选择对话框
