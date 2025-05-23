@@ -292,7 +292,6 @@ const tableDatas = ref<any[]>([]);
 const schamaconf = ref<{[key:string] : any }>({});
 const tableRef = ref()
 const formItems = ref<{ [key: string]: any }>({});
-const schamaconf = ref<{ [key: string]: any }>({});
 creatSchama();
 const tableFormfef = ref<InstanceType<typeof ElTable>>();
 watch(
