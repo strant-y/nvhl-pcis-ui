@@ -159,6 +159,7 @@
               "
               :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
               :pageSchema="k.pageSchema"
+              @updateSide="handleUpdateSide"
             />
           </div>
         </template>
@@ -261,6 +262,7 @@ const invoiceRef = ref(null);
 const amlInfoRef = ref(null);
 
 const historyClaRef = ref(null);
+const sliceSide = ref([])
 
 const props = defineProps({
   param: {
@@ -1874,6 +1876,21 @@ function checkNAmt() {
     }
   }
   return true;
+}
+// 联共保业务
+function handleUpdateSide(data:any) {
+  if(data === "0") {// 非共保业务
+    sliceSide.value = formconfig1[0].pageInfo.filter((item:any) => {
+      return item.pageKey === "ciMasterAgreement" || item.pageKey === "ci" || item.pageKey === "ourCompanyCiShare"
+    })
+    formconfig1[0].pageInfo = formconfig1[0].pageInfo.filter((item:any) => {
+      return item.pageKey !== "ciMasterAgreement" && item.pageKey !== "ci" && item.pageKey !== "ourCompanyCiShare"
+    })
+  } else if(sliceSide.value.length > 0) {
+    const index = formconfig1[0].pageInfo.findIndex((item:any) => item.pageKey === "image") + 1;
+    formconfig1[0].pageInfo.splice(index, 0, ...sliceSide.value)
+    sliceSide.value = []
+  }
 }
 
 opertaor.setFatherPage({

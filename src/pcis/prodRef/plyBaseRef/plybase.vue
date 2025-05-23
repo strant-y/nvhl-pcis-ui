@@ -49,6 +49,7 @@ const formconfig1 = reactive(createAppFreeEditConfig({}));
 const user = JSON.parse(sessionStorage.getItem("user"));
 console.log("user", user);
 const subDptCde = ref(); //所属分公司
+const emits = defineEmits(["updateSide"]);
 
 onMounted(async () => {
   const formconfig11 = formInit(
@@ -103,6 +104,7 @@ onMounted(async () => {
       ],
     });
     setValue("Base.cIntroDptcde", param.cDptCde);
+    setValue("Base.cCiMrk", param.cCiMrk || "0");
   });
 
   if (sessionStorage.getItem("toMyPageData")) {
@@ -559,6 +561,10 @@ const method = {
         });
     }
   },
+  // 联共保业务
+  cCiMrkChange: (val:any) => {
+    emits("updateSide",val)
+  }
 };
 
 // 绑定特殊验证器
