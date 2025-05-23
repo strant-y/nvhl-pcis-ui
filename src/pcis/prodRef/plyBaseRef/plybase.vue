@@ -264,6 +264,7 @@ const method = {
   },
   //代理(经纪)人icon事件
   agentFunc: () => {
+    console.log("代理(经纪)人icon事件");
     if (getValue("Base.cBsnsTyp") && getValue("Base.cBsnsTyp") !== "19001") {
       dialogRef.value?.open(
         "agentPre",
@@ -279,12 +280,10 @@ const method = {
           },
           method: {
             getSelected: (params) => {
-              setFormValue({
-                "Base.cBrkrCde": params.CChaNme, //代理经纪人
-                "Base.cBrkSlsCde":params.CChaNme,
-                // "Base.cCertfNo": params.CCtfctNo, //代理业务执业证号
-                // "Base.cBrkrDptcde": params.CDptCde, //代理业务员机构代码
+              setFormItem("Base.cBrkrCde", {
+                loadData: [{ value: params.CChaCde, label: params.CChaNme}],
               });
+              setValue("Base.cBrkrCde", params.CChaNme);
               dialogRef.value?.handleClose();
             },
           },
@@ -301,7 +300,8 @@ const method = {
     }
   },
   //代理业务员icon事件
-  agentSaleFunc: () => {
+  agentSaleFuncA: () => {
+    console.log("代理业务员icon事件");
     if(!getValue('Base.cBrkrCde')) {
       ElMessage.warning('请先选择代理(经济)人！');
       return
@@ -416,8 +416,6 @@ const method = {
                 false
               )
               .then((res) => {
-         
-              
                 if (res && res.code == 200) {
                 
                   const codeValData = res.data;
@@ -475,8 +473,6 @@ const method = {
         },
         method: {
           getSelected: (params) => {    
-              console.log(333,params)
-            
             setFormValue({
               "Base.cIntroSalecde": params.CSlsNme, //业务员员工号
             });
