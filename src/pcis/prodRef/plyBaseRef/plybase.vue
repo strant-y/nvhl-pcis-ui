@@ -23,6 +23,7 @@ import DepartmentTree from "../commodityRef/DepartmentTree.vue";
 import { useRoute } from "vue-router";
 import { get } from "lodash";
 import { codeListViewStore, dataOpertaor, useProductStore } from "@/store";
+import { de } from "element-plus/es/locale";
 const productStore = useProductStore();
 const route = useRoute();
 const query = ref(route.query);
@@ -248,7 +249,6 @@ const method = {
   businessSubFunc: (val) => {
     // 清除代理(经纪)人、代理业务员的值
     const p = opertaor.getParam();
-
     if (!p.initFlag) {
       setValue("Base.cBrkrCde", "");
       setValue("Base.cBrkSlsCde", "");
@@ -275,9 +275,16 @@ const method = {
             cBsnsTyp: getValue("Base.cBsnsTyp"), //业务来源大类
             cChaType: getValue("Base.cChaType"), //业务来源中类
             cChaSubtype: getValue("Base.cChaSubtype"), //业务来源子类
+            
           },
           method: {
             getSelected: (params) => {
+              setFormValue({
+                "Base.cBrkrCde": params.CChaNme, //代理经纪人
+                "Base.cBrkSlsCde":params.CChaNme,
+                // "Base.cCertfNo": params.CCtfctNo, //代理业务执业证号
+                // "Base.cBrkrDptcde": params.CDptCde, //代理业务员机构代码
+              });
               dialogRef.value?.handleClose();
             },
           },

@@ -305,8 +305,8 @@ const tableconfig = reactive<AppTableConfig>(
       },
     ],
     rowDbClickFun(rowData) {
-      console.log(props.data);
       props.data.method?.getSelected(rowData);
+      console.log("rowData",rowData);
     },
   })
 );
@@ -403,9 +403,9 @@ function getAgencyBusinessList(param?: any) {
   }
 }
 
-function handleRowClick(val) {
-  console.error(val);
-}
+// function handleRowClick(val) {
+//   console.error(val);
+// }
 
 onMounted(() => {
   if (sessionStorage.getItem("toMyPageData")) {
