@@ -137,6 +137,10 @@
           :align="item.align ? item.align : 'center'"
           :min-width="i.minWidth"
         >
+          <template #header="header">
+            <el-text v-if="isrequired(i)" class="mx-1" style="margin-right: 2px" type="danger">*</el-text
+            >{{ header.column.label }}
+          </template>
           <template #default="scope">
             <template v-if="item.editFlag">
               <el-form-item
@@ -288,13 +292,17 @@ const formItems = ref<{ [key: string]: any }>({});
 const schamaconf = ref<{ [key: string]: any }>({});
 creatSchama();
 const tableFormfef = ref<InstanceType<typeof ElTable>>();
-watch([() => props.item], ([newitemValue]) => {
-  creatSchama();
-  formItems.value = {};
-  tableDatas.value?.forEach((data) => {
-    formItems.value[data._dataId] = creatItem(schamaconf.value);
-  });
-},{deep:true});
+watch(
+  [() => props.item],
+  ([newitemValue]) => {
+    creatSchama();
+    formItems.value = {};
+    tableDatas.value?.forEach((data) => {
+      formItems.value[data._dataId] = creatItem(schamaconf.value);
+    });
+  },
+  { deep: true }
+);
 watch([() => props.modelValue], ([newModelValue]) => {
   tableDatas.value = [];
   formItems.value = {};
@@ -607,6 +615,16 @@ defineExpose({
   getRowById,
   getselectionData,
 });
+function isrequired(i: any) {
+  if (i.rules) {
+    for (let j = 0; j < i.rules.length; j++) {
+      if (i.rules[j].required) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
 </script>
 
 <style scoped>
