@@ -42,6 +42,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { useRoute } from "vue-router";
 import { runInThisContext } from "vm";
+import { AppFreeEditMethod } from "@/shared/app-free-edit-config";
 const route = useRoute();
 const dialog = ref<DialogMethod | null>(null);
 const opertaor = dataOpertaor();
@@ -467,7 +468,7 @@ setregistAdd(){
 //给表单下拉项赋值
 function setFormItem(key: any, obj: any) {
   if (obj && Object.keys(obj).length) {
-    formconfig1.fromSchema?.forEach((item) => {
+    formconfig1.value.fromSchema?.forEach((item: any) => {
       if (item.prop === key) {
         //控制尾部按钮的
         if (item.btnItems && obj.btnItems) {
