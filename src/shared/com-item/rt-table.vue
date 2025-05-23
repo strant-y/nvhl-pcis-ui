@@ -613,4 +613,7 @@ defineExpose({
 ::v-deep .el-form-item__content {
   justify-content: center !important;
 }
+::v-deep .el-form-item {
+  margin-bottom: 0px !important; /* 使内容显示更近紧促 */
+}
 </style>
