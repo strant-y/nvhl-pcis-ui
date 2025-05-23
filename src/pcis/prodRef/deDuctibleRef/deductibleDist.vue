@@ -63,7 +63,7 @@ const method = {
   },
   //查询免赔
   queryDeductible: () => {
-    let param = Object.assign({pageNum:"1",pageSize:"999"}, {cProdNo:route.params.param.cProdNo},);
+    let param = Object.assign({pageNum:1,pageSize:999}, {cProdNo:route.params.param.cProdNo},);
     getPrdDeductible(param).then((res) => {
       if (res.code == 200) {
         console.log(res.data.result);

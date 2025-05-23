@@ -289,6 +289,7 @@ const indexMethod = (index: number) => {
  *  表单组件,用来写table表格的验证等方法的引用
  */
 const tableDatas = ref<any[]>([]);
+const schamaconf = ref<{[key:string] : any }>({});
 const tableRef = ref()
 const formItems = ref<{ [key: string]: any }>({});
 const schamaconf = ref<{ [key: string]: any }>({});

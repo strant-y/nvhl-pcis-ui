@@ -110,7 +110,7 @@ async function getDownLists(dpt: string) {
 }
 
 async function setDpt(t) {
-  const { data, code } = await listChrDepts(t);
+  const { data, code } = await listChrDepts({cDptCde: t});
   if (code == 200) {
     let newLsit = data.map((item) => ({
       value: item.cDptCde,
@@ -130,7 +130,7 @@ const dpetData = {
     let result = node.data;
     if (result) {
       if (node.level != 4) {
-        listChrDepts(result.value).then((res) => {
+        listChrDepts({cDptCde: result.value}).then((res) => {
           if (res.code == 200) {
             let newLsit = res.data.map((item) => ({
               value: item.cDptCde,

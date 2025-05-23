@@ -38,11 +38,12 @@
                     >批改比较项</span
                   >
                 </el-anchor-link>
+
                 <el-anchor-link
                   v-for="(k, i) in pageConfig?.pageInfo"
                   :key="i"
                   :href="`#${k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey}`"
-                  v-show="k.pageKey !== 'acctinfo' ? acctinfoFlag : true"
+                  v-show="k.pageKey !== 'acctinfo' ? (['ciMasterAgreement', 'ci', 'ourCompanyCiShare'].includes(k.pageKey) ? isCiJiMrk : acctinfoFlag) : true"
                 >
                   <rt-icon
                     style="margin-right: 14px"
@@ -68,7 +69,8 @@
                     </template>
                   </span>
                 </el-anchor-link>
-                <el-anchor-link :href="`#ciMasterAgreement`" v-if="ciMasterAgreementFlag">
+
+                <el-anchor-link :href="`#ciMasterAgreement`" v-if="ciMasterAgreementFlag && isCiJiMrk">
                   <rt-icon
                     style="margin-right: 14px"
                     :item="{ icon: 'Tickets' }"
@@ -77,7 +79,7 @@
                     >联共保主协议信息</span
                   >
                 </el-anchor-link>
-                <el-anchor-link :href="`#ci`" v-if="ciFlag">
+                <el-anchor-link :href="`#ci`" v-if="ciFlag && isCiJiMrk">
                   <rt-icon
                     style="margin-right: 14px"
                     :item="{ icon: 'Tickets' }"
@@ -86,7 +88,7 @@
                     >联共保信息</span
                   >
                 </el-anchor-link>
-                <el-anchor-link :href="`#ourCompanyCiShare`" v-if="ourCompanyCiShareFlag">
+                <el-anchor-link :href="`#ourCompanyCiShare`" v-if="ourCompanyCiShareFlag && isCiJiMrk">
                   <rt-icon
                     style="margin-right: 14px"
                     :item="{ icon: 'Tickets' }"
@@ -171,7 +173,7 @@
                 ? k.pageCode
                 : k.pageKey
             "
-            v-show="k.pageKey !== 'acctinfo' ? acctinfoFlag : true"
+            v-show="k.pageKey !== 'acctinfo' ? (['ciMasterAgreement', 'ci', 'ourCompanyCiShare'].includes(k.pageKey) ? isCiJiMrk : acctinfoFlag) : true"
           >
             <component
               v-if="currentIndex >= i"
@@ -239,14 +241,16 @@ import {
   submitEdrSurrender,
 } from "../../../api/query/index";
 import { checkFeeWindowType } from "@/api/prod";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { dataOpertaor, useProductStore } from "@/store";
 import moment from "moment";
 import dayjs from "dayjs";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
 const policyService = new PolicyService();
-import { useProductStore } from "@/store/modules/prod";
 const productStore = useProductStore();
+const { isCiJiMrk } = storeToRefs(productStore);
+
+
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -857,7 +861,7 @@ function renderComponents() {
       loadAfter(); //页面加载完成之后,再加载后续所需的事件
       clearInterval(interval);
     }
-  }, 100); // 延迟组件渲染,增加页面响应效率
+  }, 50); // 延迟组件渲染,增加页面响应效率
 }
 
 /**

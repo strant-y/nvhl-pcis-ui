@@ -199,7 +199,8 @@
                                     <el-form-item :error="showError(riskdata.rowConfig[colinfo.cColId][n - 1],
                                     riskList[
                                       riskdata.rowConfig[colinfo.cColId][n - 1].cRiskNo]
-                                      [riskdata.rowConfig[colinfo.cColId][n - 1].factorItem?.prop])" >
+                                      [riskdata.rowConfig[colinfo.cColId][n - 1].factorItem?.prop]
+                                      )" >
                                       <from-item
                                         v-model="
                                           riskList[
@@ -676,7 +677,7 @@ function showError(conf: any,value: any) {
 async function validate() {
   // 进行责任验证
   let validate = true;
-  collist.value.forEach((col:any)=>{
+  collist.value?.forEach((col:any)=>{
     const fact = factormap.value[col["cFactorId"]];
     const v = riskList.value[col['cRiskNo']][fact['prop']];
     if(col['cPorpRequired'] === '1'){

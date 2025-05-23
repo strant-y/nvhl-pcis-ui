@@ -42,6 +42,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { useRoute } from "vue-router";
 import { runInThisContext } from "vm";
+import { AppFreeEditMethod } from "@/shared/app-free-edit-config";
 const route = useRoute();
 const dialog = ref<DialogMethod | null>(null);
 const opertaor = dataOpertaor();
@@ -65,6 +66,7 @@ const cardconfig = ref<CardConfig>(creatCardConfig({}));
 const formconfig1 = ref<Record<string, any>>({});
 const tableconfig = ref<AppTableConfig>(createTableEditConfig());
 
+let fileBase: string;
 // 声明全局变量
 let cComponentTableValue: string;
 
@@ -371,18 +373,28 @@ const method = {
     input.onchange = () => {
       if (input.files?.length) {
         const file = input.files[0];
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        // 将表单配置信息合并到请求参数中
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+        const base64String = e.target?.result as string;
+
+        // ✅ 此处赋值有效
+        // fileBase = base64String.split(',')[1]; // 去掉 data:image/type;base64, 前缀
+
+        // console.log(fileBase, "0000000"); // ✅ 此处可以正常打印 Base64 字符串
+
+        // 构建参数并请求接口
         const params = {
           ...formconfig1.value,
-          file: file,
+          file: base64String, // ✅ 正确传入
+          cComponentTable: cComponentTableValue,
+          cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
         };
+
         policyService.importDist(params).then((res) => {
           if (res.code === 200) {
             ElMessage.success("导入成功");
-            method.handleQuery(); // 刷新列表
+            method.handleQuery();
           } else {
             ElMessage.error(res.message || "导入失败");
           }
@@ -390,6 +402,14 @@ const method = {
           ElMessage.error("导入出错，请检查文件格式或内容");
           console.error("导入错误：", error);
         });
+      };
+
+      reader.onerror = (e) => {
+        console.error("文件读取失败", e);
+        ElMessage.error("文件读取失败");
+      };
+
+      reader.readAsDataURL(file); // 启动读取
       }
     };
     input.click(); // 触发文件选择对话框
@@ -446,25 +466,18 @@ setregistAdd(){
 };
 
 //给表单下拉项赋值
-function setFormItem(key, obj) {
+function setFormItem(key: any, obj: any) {
   if (obj && Object.keys(obj).length) {
-    formconfig1.fromSchema?.forEach((item) => {
+    formconfig1.value.fromSchema?.forEach((item: any) => {
       if (item.prop === key) {
         //控制尾部按钮的
-        if (item.loadData && obj.loadData) {
-          let newBtnItems = null;
-          if (obj.loadData.length != 0) {
-            for (let key in obj.loadData) {
-              item.loadData[key] = obj.loadData[key];
-            }
-          } else {
-            item.loadData = obj.loadData;
+        if (item.btnItems && obj.btnItems) {
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
           }
-          newBtnItems = item.loadData;
-          newBtnItems && (obj.loadData = newBtnItems);
+        }else{
+          Object.assign(item, obj);
         }
-        Object.assign(item, obj);
-        console.log(`Updated item for key ${key}:`, item);
       }
     });
   }
