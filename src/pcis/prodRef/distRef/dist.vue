@@ -465,25 +465,18 @@ setregistAdd(){
 };
 
 //给表单下拉项赋值
-function setFormItem(key, obj) {
+function setFormItem(key: any, obj: any) {
   if (obj && Object.keys(obj).length) {
     formconfig1.fromSchema?.forEach((item) => {
       if (item.prop === key) {
         //控制尾部按钮的
-        if (item.loadData && obj.loadData) {
-          let newBtnItems = null;
-          if (obj.loadData.length != 0) {
-            for (let key in obj.loadData) {
-              item.loadData[key] = obj.loadData[key];
-            }
-          } else {
-            item.loadData = obj.loadData;
+        if (item.btnItems && obj.btnItems) {
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
           }
-          newBtnItems = item.loadData;
-          newBtnItems && (obj.loadData = newBtnItems);
+        }else{
+          Object.assign(item, obj);
         }
-        Object.assign(item, obj);
-        console.log(`Updated item for key ${key}:`, item);
       }
     });
   }

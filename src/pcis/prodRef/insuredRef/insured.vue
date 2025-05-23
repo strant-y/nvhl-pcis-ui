@@ -68,11 +68,18 @@ onMounted(() => {
     // 移动电话
     setFormItem("Insured.cMobile", { rules: [getRules("phoneNo", {})] });
 });
-function setFormItem(key, obj) {
+function setFormItem(key: any, obj: any) {
   if (obj && Object.keys(obj).length) {
     formconfig1.fromSchema?.forEach((item) => {
       if (item.prop === key) {
-        Object.assign(item, obj);
+        //控制尾部按钮的
+        if (item.btnItems && obj.btnItems) {
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
+          }
+        }else{
+          Object.assign(item, obj);
+        }
       }
     });
   }
