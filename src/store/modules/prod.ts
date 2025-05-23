@@ -23,11 +23,15 @@ export const useProductStore = defineStore('product', () => {
         cCiMrk.value = newVal
     }
 
+    function checkCiMrk(){
+        return cCiMrk.value !== '0';
+    }
+
     return {
         isCiJiMrk,
-
         setCIsSingle,
         setcClntMrk,
-        setcCiMrk
+        setcCiMrk,
+        checkCiMrk
     }
 })

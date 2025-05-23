@@ -145,7 +145,6 @@ const method = {
   },
   //联共保下拉change
   cCiMrkChange:(val)=>{
-    console.log(val,"99999999")
     productStore.setcCiMrk(val)
   },
   //业务来源大类
