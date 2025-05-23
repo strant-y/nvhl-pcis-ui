@@ -43,7 +43,7 @@
                 :span="i.itemWidth ? i.itemWidth * formUi.span : formUi.span"
               >
                 <el-form-item
-                  :prop="`${props.$index}.${i.prop}`"
+                  :prop="[props.$index, i.prop]"
                   :rules="i.rules ? i.rules : undefined"
                   :label="i.title"
                   :label-position="
@@ -65,9 +65,23 @@
       </el-table-column>
       <el-table-column
         :label="item.tableBtnTitle"
-        v-if="item.tableBtn && item.tableBtn.length > 0 && item.tableBtnPosition === 'left'"
+        v-if="
+          item.tableBtn &&
+          item.tableBtn.length > 0 &&
+          item.tableBtnPosition === 'left'
+        "
         :width="item.tableBtnWidth ? item.tableBtnWidth : 100"
-        :fixed=" item.fixed ? (typeof item.fixed === 'boolean' ? (item.fixed ? 'left' : null ) : (item.fixed ==='1' ? 'left' : null)) : null"
+        :fixed="
+          item.fixed
+            ? typeof item.fixed === 'boolean'
+              ? item.fixed
+                ? 'left'
+                : null
+              : item.fixed === '1'
+                ? 'left'
+                : null
+            : null
+        "
         :align="item.align ? item.align : 'center'"
       >
         <template #default="scope">
@@ -126,7 +140,7 @@
           <template #default="scope">
             <template v-if="item.editFlag">
               <el-form-item
-                :prop="`${scope.$index}.${i.prop}`"
+                :prop="[scope.$index, i.prop]"
                 :rules="i.rules ? i.rules : undefined"
               >
                 <from-item
@@ -137,26 +151,45 @@
               </el-form-item>
             </template>
             <template v-else>
-              <from-item
-                v-model="scope.row[i.prop]"
-                :item="formItems[scope.row._dataId][i.prop]"
-                :showLabel="
-                  !(props.item.editList && props.item.editList.length > 0
-                    ? props.item.editList?.includes(i.prop)
-                    : false )
-                "
-                :row="scope.row"
-              />
+              <el-form-item
+                :prop="[scope.$index, i.prop]"
+                :rules="i.rules ? i.rules : undefined"
+              >
+                <from-item
+                  v-model="scope.row[i.prop]"
+                  :item="formItems[scope.row._dataId][i.prop]"
+                  :showLabel="
+                    !(props.item.editList && props.item.editList.length > 0
+                      ? props.item.editList?.includes(i.prop)
+                      : false)
+                  "
+                  :row="scope.row"
+                />
+              </el-form-item>
             </template>
           </template>
         </el-table-column>
       </template>
       <el-table-column
         :label="item.tableBtnTitle"
-        v-if="item.tableBtn && item.tableBtn.length > 0 && item.tableBtnPosition === 'right' "
+        v-if="
+          item.tableBtn &&
+          item.tableBtn.length > 0 &&
+          item.tableBtnPosition === 'right'
+        "
         :width="item.tableBtnWidth ? item.tableBtnWidth : 100"
         :align="item.align ? item.align : 'center'"
-        :fixed=" item.fixed ? (typeof item.fixed === 'boolean' ? (item.fixed ? 'right' : null ) : (item.fixed ==='1' ? 'right' : null)) : null"
+        :fixed="
+          item.fixed
+            ? typeof item.fixed === 'boolean'
+              ? item.fixed
+                ? 'right'
+                : null
+              : item.fixed === '1'
+                ? 'right'
+                : null
+            : null
+        "
       >
         <template #default="scope">
           <template v-for="(btn, index) in item.tableBtn" :key="index">
@@ -196,7 +229,13 @@
                 /></a>
               </el-tooltip>
             </template>
-            <template v-if="index !== item.tableBtn.length - 1&& !btn.hideBtns?.(scope.row) && index !=0">
+            <template
+              v-if="
+                index !== item.tableBtn.length - 1 &&
+                !btn.hideBtns?.(scope.row) &&
+                index != 0
+              "
+            >
               <el-divider direction="vertical" />
             </template>
           </template>
@@ -217,12 +256,12 @@ const emits = defineEmits<{
   (e: "update:modelValue", value: any[]): void;
   (e: "selection-change", rows: any[]): void;
   (e: "status-change", row: any): void;
-  (e: "rowClick", row:any): void;
+  (e: "rowClick", row: any): void;
 }>();
 
 const expandFromItem = ref<Record<string, any>>({});
 // 编辑行id
-const editIndex = ref('');
+const editIndex = ref("");
 const props = defineProps({
   modelValue: {
     type: [Array<any>],
@@ -245,8 +284,8 @@ const indexMethod = (index: number) => {
  *  表单组件,用来写table表格的验证等方法的引用
  */
 const tableDatas = ref<any[]>([]);
-const formItems = ref<{[key:string] : any }>({});
-const schamaconf = ref<{[key:string] : any }>({});
+const formItems = ref<{ [key: string]: any }>({});
+const schamaconf = ref<{ [key: string]: any }>({});
 creatSchama();
 const tableFormfef = ref<InstanceType<typeof ElTable>>();
 watch([() => props.item], ([newitemValue]) => {
@@ -273,7 +312,7 @@ watch(
   }
 );
 
-function setFormValue(data: any){
+function setFormValue(data: any) {
   tableDatas.value = [];
   formItems.value = {};
   tableDatas.value = data ? data : [];
@@ -285,21 +324,21 @@ function setFormValue(data: any){
 }
 
 function creatSchama() {
-  if(props.item.fromSchema && props.item.fromSchema.length > 0){
+  if (props.item.fromSchema && props.item.fromSchema.length > 0) {
     props.item.fromSchema.forEach((item: any) => {
       schamaconf.value[item.prop] = item;
     });
   }
 }
-function creatItem(d: any){
+function creatItem(d: any) {
   let sc: any = JSON.parse(JSON.stringify(schamaconf.value));
   // 将方法回填到item中
   Object.keys(schamaconf.value).forEach((k: any) => {
-    if(schamaconf.value[k]['func']){
-      sc[k]['func'] = schamaconf.value[k]['func']
+    if (schamaconf.value[k]["func"]) {
+      sc[k]["func"] = schamaconf.value[k]["func"];
     }
-    if(schamaconf.value[k]['tableClick']){
-      sc[k]['tableClick'] = schamaconf.value[k]['tableClick']
+    if (schamaconf.value[k]["tableClick"]) {
+      sc[k]["tableClick"] = schamaconf.value[k]["tableClick"];
     }
   });
   return sc;
@@ -316,7 +355,7 @@ function rowClick(row: any, _column: any, _event: Event) {
   emits("rowClick", row);
 }
 
-function rowDblclick(row: any){
+function rowDblclick(row: any) {
   props.item.rowDbClickFun?.(row);
 }
 
@@ -458,7 +497,7 @@ onMounted(() => {
   tableDatas.value = props.modelValue ? props.modelValue : [];
   tableDatas.value?.forEach((data) => {
     if (!data) {
-      console.error('Invalid data item:', data);
+      console.error("Invalid data item:", data);
       return;
     }
     // 初始化行数字Id
@@ -503,17 +542,17 @@ function addRow() {
 }
 
 function delRow(editIndex: any) {
-    for (let i = tableDatas.value.length - 1; i >= 0; i--) {
-        const element = tableDatas.value[i];
-        if(element['_dataId']==editIndex){
-            tableDatas.value.splice(i, 1)
-        }
+  for (let i = tableDatas.value.length - 1; i >= 0; i--) {
+    const element = tableDatas.value[i];
+    if (element["_dataId"] == editIndex) {
+      tableDatas.value.splice(i, 1);
     }
+  }
 }
 
 function addRowByData(data: any) {
   const rowId = getuuid();
-  tableDatas.value?.push({ _dataId: rowId ,...data});
+  tableDatas.value?.push({ _dataId: rowId, ...data });
   formItems.value[rowId] = creatItem(schamaconf.value);
   editIndex.value = rowId;
 }
@@ -530,17 +569,17 @@ function handleStatusChange(row: any) {
   emits("status-change", row); // 触发事件并传递行对象
 }
 
-function setFormSchema(rowId: string,props:any,schama:any,value:any){
-  formItems.value[rowId][props][schama] = value ;
+function setFormSchema(rowId: string, props: any, schama: any, value: any) {
+  formItems.value[rowId][props][schama] = value;
 }
-function setValueByRowKey(props:string , rowId: any, value:any){
+function setValueByRowKey(props: string, rowId: any, value: any) {
   tableDatas.value?.forEach((data) => {
-    if(data._dataId === rowId){
+    if (data._dataId === rowId) {
       data[props] = value;
     }
   });
 }
-function getRowById(rowId:any){
+function getRowById(rowId: any) {
   return tableDatas.value?.find((item) => {
     if (item._dataId === rowId) {
       return item;
@@ -548,14 +587,13 @@ function getRowById(rowId:any){
   });
 }
 
-function getselectionData(){
-  if(props.item.showSelection){
+function getselectionData() {
+  if (props.item.showSelection) {
     return tableFormfef.value?.getSelectionRows();
-  }else{
+  } else {
     return null;
   }
 }
-
 
 defineExpose({
   tableExvalidate,
