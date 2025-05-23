@@ -9,7 +9,6 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
 import {
   getBsnsTypList,
   getChaTypeList,
@@ -21,10 +20,9 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { useValidator } from "@/typings/useValidator";
 import DepartmentTree from "../commodityRef/DepartmentTree.vue";
-import { codeListViewStore } from "@/store";
 import { useRoute } from "vue-router";
 import { get } from "lodash";
-import { useProductStore } from "@/store/modules/prod";
+import { codeListViewStore, dataOpertaor, useProductStore } from "@/store";
 const productStore = useProductStore();
 const route = useRoute();
 const query = ref(route.query);
