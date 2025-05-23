@@ -70,7 +70,7 @@ export const dataOpertaor = defineStore(
             const ci = productStore.checkCiMrk();
             keys.forEach(key => {
                 try {
-                    if (ci && (key === 'ci' || key === 'ciMasterAgreement' || key === 'ourCompanyCiShare')) {
+                    if (!ci && (key === 'ci' || key === 'ciMasterAgreement' || key === 'ourCompanyCiShare')) {
                         //: 再保时,不再获取这3个组件的数据
                     } else {
                         res[key] = JSON.parse(JSON.stringify(tableRefs[key].getFromValue()));
@@ -311,7 +311,7 @@ export const dataOpertaor = defineStore(
             const validationPromises = entries.map(([key, ref]) => {
                 if (key === 'cvrg') {
                     return null;
-                } else if (ci && (key === 'ci' || key === 'ciMasterAgreement' || key === 'ourCompanyCiShare')) {
+                } else if (!ci && (key === 'ci' || key === 'ciMasterAgreement' || key === 'ourCompanyCiShare')) {
                     return null;
                 } else {
                     return ref?.validate?.()
