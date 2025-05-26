@@ -37,6 +37,7 @@ import { saveCvrgRiskRel, queryCommodityPlanList } from "@/api/prod";
 const dzmodal = useDzModal();
 const tabref = opertaor.getTableRefByKey("commodityBasicInfo");
 import { useRoute } from "vue-router";
+import { c } from "vite/dist/node/types.d-aGj9QkWt";
 const route = useRoute();
 const query = ref(route.query);
 const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
@@ -95,9 +96,20 @@ const tableconfig = reactive<AppTableConfig>(
         label: "选择方案",
         type: "success",
         func: function () {
+          console.log('点这里 选择方案',)
+
+          console.log(tabref.getFromValue());
+          if(!tabref.getFromValue()['cCommodityNo']){
+            ElMessage.error('产品代码为空,请保存后操作!');
+            return false;
+          }
+          // return false;
           dzmodal
-            .open(planConfigurationAdd, { type: "add", data: {} })
+            .open(planConfigurationAdd, { type: "add", data:tabref.getFromValue() })
             .then((res) => {
+
+
+             
               if (res.type === "ok") {
                 handleQuery();
               }
@@ -164,23 +176,28 @@ const tableconfig = reactive<AppTableConfig>(
     ],
     fromSchema: [
       {
-        prop: "cPlanNo",
+        prop: "CPlanNo",
+        inputtype: "rtinput",
         title: "方案编号",
       },
       {
-        prop: "cPlanCn",
+        prop: "CPlanCn",
+        inputtype: "rtinput",
         title: "方案名称",
       },
       {
-        prop: "cIsMainProdPlan",
+        prop: "CIsMainProdPlan",
+        inputtype: "rtinput",
         title: "是否主产品方案",
       },
       {
-        prop: "cDispNme",
+        prop: "CDispNme",
+        inputtype: "rtinput",
         title: "方案别名",
       },
       {
-        prop: "cSaleName",
+        prop: "CSaleName",
+        inputtype: "rtinput",
         title: "销售名称",
       },
     ],
@@ -226,9 +243,10 @@ function handleQuery() {
     queryCommodityPlanList(param)
       .then((res) => {
         const { code, data, msg } = res;
+        console.log(data,'1212')
         if (200 === code) {
-          pageresult.list = data.data;
-          pageresult.total = data.total;
+          pageresult.list = data;
+          pageresult.total = data.length;
         } else {
           ElMessage.error(msg);
         }

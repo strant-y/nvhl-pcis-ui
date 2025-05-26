@@ -1,3 +1,4 @@
+<!-- 商品基本信息 -->
 <template>
   <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
 </template>
@@ -17,7 +18,7 @@ const opertaor = dataOpertaor();
 
 import { useRoute } from "vue-router";
 import { cp } from "fs";
-
+import { eventBus } from '@/utils/event-bus'
 import { useUserStore } from "@/store";
 
 const tabref = opertaor.getTableRefByKey("permissionAllo");
@@ -42,11 +43,29 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "primary",
         label: "保存",
         func: async () => {
+          console.log()
           const s = freeEditRef.value?.getFromValue(); //获取表单数据
+          // setFormItem('cCommodityNo',data["data"]['cCommodityNo'])
+          // setValue('cCommodityNo',1221)
+          console.log('基本信息参数',s)
           saveCommodityBase(s)
             .then((res) => {
               const { code, data, msg } = res;
               if (200 === code) {
+                console.log(data["data"],data["data"]['cCommodityNo'])
+                                if(data['data']){
+                  // setFormItem('cCommodityNo',data["data"]['cCommodityNo'])
+                  setValue('cCommodityNo',data["data"]['cCommodityNo'])
+                }
+               
+                // sessionStorage.setItem(
+                //   "toMyPageData",
+                //   JSON.stringify({
+                //     ...{data:s},
+                //     ...{ pageType: "app" },
+                //     // ...{ dptItem: selectTreeItem.value },
+                //   })
+                // );
                 ElMessage.success("保存成功");
               } else {
                 ElMessage.error(msg);
@@ -76,7 +95,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         func: (val:any) => {
           // console.log('大类',tabref.getFromValue())
           // 险种大类
-          if (!!val) {
+          if (!!val) { 
+            eventBus.emit('cKindNo-change', val)
             // permissionAllo
             // tabref.getFromValue().cProdNo,
 
@@ -379,6 +399,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "是否关联附属信息",
         typeCode: "WEB_SYS_STA_DICT",
         codeParam: { cParCde: "yes_no" },
+        func:(val:any)=>{
+          console.log("关联信息",val);
+          if(val ==='1'){
+            
+          }
+        }
       },
       {
         prop: "cCiMrk",

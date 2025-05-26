@@ -7,12 +7,13 @@
     @update:model-value="handleVisibleUpdate"
   >
     <app-free-edit v-model:freeEditConfig="formconfig" ref="freeEditRef" />
+    <!-- @selection-change="handleSelectionChange" -->
     <app-table
       :tableConfig="tableconfig"
       v-model:pageresult="pageresult"
       ref="tableRef"
       @page-change="handleQuery(false)"
-      @selection-change="handleSelectionChange"
+  
     />
     <template #footer>
       <span class="dialog-footer">
@@ -62,8 +63,11 @@ const userStore = useUserStore();
 const user = ref<any>(userStore.user);
 
 const props = defineProps<{
-  visible: boolean;
-  data: Object;
+  // visible: boolean;
+  data: {
+        type: Object,
+        default: () => ({}),
+    },
 }>();
 // const props = defineProps<{
 //   data: Object;
@@ -75,35 +79,38 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "update:modelValue", value: boolean): void;
   (e: "save"): void;
+  (e: "ok", data: Object): void;
 }>();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    title: "业务员1",
+    title: "业务员",
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
         type: "primary",
         label: "查询",
         func: () => {
-          handleSave();
+          // handleSave();
+          handleQuery();
         },
       }),
     ],
     fromSchema: [
       {
-        prop: "cProdNme",
-        inputtype: "rtselect",
+        prop: "CDptCde",
+        // inputtype: "rtselect",
+        inputtype: "rtinput",
         title: "机构代码",
       },
       {
-        prop: "cPlanCn",
+        prop: "CSlsCde",
         inputtype: "rtinput",
         title: "业务员工号",
       },
       {
-        prop: "cPlanCn",
+        prop: "CSlsNme",
         inputtype: "rtinput",
         title: "业务员名称",
       },
@@ -133,95 +140,74 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtnType: "btn",
     tableBtnWidth: 220,
     tableBtnPosition: "right",
-    tableBtn: [
-      createFreeButtonBase({
-        id: "score",
-        type: "danger",
-        tooltip: "删除",
-        icon: "Delete",
-        link: true,
-        tableClick: (row) => {
-          //   delRiskRel(row)
-          //     .then((res) => {
-          //       const { code, data, msg } = res;
-          //       if (200 === code) {
-          //         ElMessage.success("删除成功");
-          //         handleQuery();
-          //       } else {
-          //         ElMessage.error(msg);
-          //       }
-          //     })
-          //     .finally(() => {});
-        },
-      }),
-    ],
+    // tableBtn: [
+    //   createFreeButtonBase({
+    //     id: "score",
+    //     type: "danger",
+    //     tooltip: "删除",
+    //     icon: "Delete",
+    //     link: true,
+    //     tableClick: (row) => {
+    //       //   delRiskRel(row)
+    //       //     .then((res) => {
+    //       //       const { code, data, msg } = res;
+    //       //       if (200 === code) {
+    //       //         ElMessage.success("删除成功");
+    //       //         handleQuery();
+    //       //       } else {
+    //       //         ElMessage.error(msg);
+    //       //       }
+    //       //     })
+    //       //     .finally(() => {});
+    //     },
+    //   }),
+    // ],
     fromSchema: [
       {
-        prop: "CProdNo",
+        prop: "CSlsCde",
+        inputtype: "rtinput",
         title: "业务员员工号",
       },
       {
-        prop: "CProdNme",
+        prop: "CSlsNme",
+        inputtype: "rtinput",
         title: "业务员名称",
       },
       {
-        prop: "CProdNme",
+        prop: "CSlsTyp",
+        inputtype: "rtinput",
         title: "人员分类",
       },
       {
-        prop: "CProdNme",
+        prop: "CDptName", 
+        inputtype: "rtinput",
         title: "所在部门",
       },
       {
-        prop: "CProdNme",
+        prop: "CDptCde",
+        inputtype: "rtinput",
         title: "所在部门代码",
       },
       {
-        prop: "CProdNme",
+        prop: "CTel",
+        inputtype: "rtinput",
         title: "联系电话",
       },
       {
         prop: "CProdNme",
+        inputtype: "rtinput",
         title: "邮箱",
       },
     ],
+    rowDbClickFun(row) {
+          // console.log('111',row)
+          emit("ok", row);
+          dialogVisible.value = false;
+        }
   })
 );
 
-const handleSave = async () => {
-  freeEditRef.value?.validate().then((isValid) => {
-    if (!isValid) {
-      ElMessage.warning("表单验证不通过，请检查！");
-      return;
-    }
-    const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
-    const s = freeEditRef.value?.getFromValue();
- 
-    return false;
-    policyService.getWebOrgSelsList(params).then((res: any) => {
-      if (res && res["code"] === 200) {
-        const pageData = res.data;
-        if (pageData) {
-          pageresult.total = pageData.total;
-          pageresult.list = pageData.result;
-        }
-      }
-    });
-  });
 
-
-  // const formData = freeEditRef.value?.getFromValue();
-  // if (formData) {
-  //   try {
-  //     await saveRiskInfo(formData); //保存接口调用
-  //     ElMessage.success("保存成功");
-  //     emit("save");
-  //     // dialogVisible(false);
-  //   } catch (error) {
-  //     ElMessage.error("保存失败");
-  //   }
-  // }
-};
 
 const handleCancel = () => {
   dialogVisible.value = false;
@@ -242,52 +228,49 @@ const pageresult = reactive<Pageresult>({
 function handleQuery() {
   const r = tableRef.value?.getPartnerPage(); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  // const param = Object.assign(s, r);
-
-  const params = Object.assign(s, r, obj);
 
 
+console.log(user.value)
 
+console.log(props.data)
 
 const obj = {
   CurrentUser: user.value ? user.value["opCde"] : "",   // 用户代码
   CurrentUserOrg: user.value ? user.value["companyId"] : "", // 用户机构代码
 
-  CDptCde: formData.value["CDptCde"],   // 业务员代码
-  CSlsNme: formData.value["CSlsNme"],   // 名称
-  CSlsCde: formData.value["CSlsCde"],    // 工号
+        CBsnsTyp: props.data['cBsnsTyp'],
+        CBrkrCde: props.data['cBrkrCde'],
+        CSlsTyp: props.data['cSlsTyp'],
+        CChaType: props.data['cChaType'],
+        CDptAttr: props.data['cDptAttr'],
+        subSidiary: props.data['subSidiary'],
+        leading: props.data['leading'],
 
-  CBsnsTyp: formData.value["CBsnsTyp"],  //渠道类别
-  CChaType: formData.value["CChaType"],  // 渠道中类
+  // CDptCde: formData.value["CDptCde"],   // 业务员代码
+  // CSlsNme: formData.value["CSlsNme"],   // 名称
+  // CSlsCde: formData.value["CSlsCde"],    // 工号
+  // CBsnsTyp: tab2["cBsnsTyp"],  //渠道类别
+  // CChaType: tab2["cChaType"],  // 渠道中类
+  // CSlsTyp: formData.value["CSlsTyp"],   // 人员分类
+  // leading: "CSlsId",   // 业务分类
+  // CBrkrCde: tab2["cBrkrCde"],  // 代理人/经纪人
 
-
-  CSlsTyp: formData.value["CSlsTyp"],   // 人员分类
-  leading: formData.value["leading"],   // 业务分类
-  CBrkrCde: formData.value["CBrkrCde"],  // 代理人/经纪人
-
-
-  // CBrkrCde: formData.value["CBrkrCde"],
-
-
-  // CDptAttr: formData.value["CDptAttr"],
-
-  // subSidiary: formData.value["subSidiary"],
-  // 
 };
+const params = Object.assign(s, r, obj);
 
-
-
-  getCvrgRiskRelList(param)
-    .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
-        pageresult.list = data.data;
-        pageresult.total = data.total;
-      } else {
-        ElMessage.error(msg);
+console.log('参数',params)
+policyService.getWebOrgSelsList(params).then((res: any) => {
+      if (res && res["code"] === 200) {
+        const pageData = res.data;
+        if (pageData) {
+          pageresult.total = pageData.total;
+          pageresult.list = pageData.result;
+        }
+     
+        // pageresult.total =2
+        // pageresult.list = [{CSlsCde:122,CSlsNme:"张三", },{CSlsCde:123,CSlsNme:"张三2"}];
       }
-    })
-    .finally(() => {});
+    });
 }
 </script>
 

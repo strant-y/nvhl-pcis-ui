@@ -329,7 +329,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 	})
 );
 
-const pageresult = reactive<Pageresult>({
+const pageresult = reactive<Pageresult>({ 
 	result: "",
 	/** 数据列表 */
 	list: [],

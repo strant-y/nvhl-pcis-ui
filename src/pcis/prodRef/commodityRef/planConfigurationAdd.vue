@@ -54,7 +54,8 @@ import { saveRiskInfo, queryPlan } from "@/api/prod";
 import { on } from "events";
 
 const props = defineProps<{
-  visible: boolean;
+  // visible: boolean;
+  data:object;
 }>();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
@@ -114,24 +115,31 @@ const tableconfig = reactive<AppTableConfig>(
     // ],
     fromSchema: [
       {
-        prop: "CProdNo",
-        title: "产品代码",
+        prop: "CNmeCn",
+        inputtype: "rtinput",
+        title: "产品名称",
       },
       {
-        prop: "CProdNme",
+        prop: "CPlanNo",
+        inputtype: "rtinput",
         title: "方案代码",
       },
       {
-        prop: "CCvrgNo",
+        prop: "CPlanCn",
+        inputtype: "rtinput",
         title: "方案名称",
       },
       {
         prop: "CNmeCn",
+        // inputtype: "rtselect",
         title: "方案类型",
       },
       {
-        prop: "CRiskNo",
+        prop: "CTyp",
+        inputtype: "rtselect",
         title: "是否主产品方案",
+        // typeCode: "WEB_SYS_STA_DICT",
+        // codeParam: { cParCde: "yes_no" },
       },
     ],
   })
@@ -140,14 +148,15 @@ const tableconfig = reactive<AppTableConfig>(
 function handleQuery() {
   const r = tableRef.value?.getPartnerPage(); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const dptCde = sessionStorage.getItem("user");
+  const dptCde = JSON.parse(sessionStorage.getItem("user"));
   const c = tabref.getFromValue().cCommodityNo;
+  // CCommodityNo    companyId
   const param = {
     codeListName: "Commodity_PLAN_LIST",
     codeListParam: {
-      cCommodityNo: "c",
-      dptCde: "dptCde",
-      prodNo: "",
+      cCommodityNo: props.data['cCommodityNo'] || 'S25000032',    // 商品编号
+      dptCde: dptCde.companyId,     // companyId
+      prodNo: props.data['cProdNo'],
       status: "1",
     },
   };
@@ -155,8 +164,8 @@ function handleQuery() {
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
-        pageresult.list = data.data;
-        pageresult.total = data.total;
+        pageresult.list = data;
+        pageresult.total = data.length;
       } else {
         ElMessage.error(msg);
       }
