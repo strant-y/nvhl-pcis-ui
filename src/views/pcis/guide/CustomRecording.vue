@@ -13,12 +13,38 @@
       >
         <h4 style="margin: 10px 20px">投保向导</h4>
         <el-form-item
-          label="归属机构"
-          prop="cDptCde"
-          style="width: 600px"
+          v-if="isZGS"
+          label="分公司"
+          prop="dptCde"
+          style="width: 400px"
           :rules="[getRules('required', {})]"
         >
-          <dept v-model="formconfig1.cDptCde" @selected-item="selectedItem" />
+            <el-select-v2
+                v-model="formconfig1.dptCde"
+                :options="dptCdeList"
+                placeholder="分公司"
+                size="large"
+                filterable
+                @change="getCDptCdeList"
+            />
+        </el-form-item>
+        <el-form-item
+          label="承保机构"
+          prop="cDptCde"
+          style="width: 650px"
+          :rules="[getRules('required', {})]"
+        >
+            <el-select-v2
+                v-model="formconfig1.cDptCde"
+                :options="cDptCdeList"
+                placeholder="承保机构"
+                size="large"
+                style="width: 500px"
+                :loading="cDptCdeLoading"
+                filterable
+                clearable
+                @change="selectedItem"
+            />
         </el-form-item>
         <el-form-item
           label="录单方式"
@@ -198,8 +224,10 @@ import {
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
-import { b, i } from "vite/dist/node/types.d-jgA8ss1A";
 import { getListByCode } from "@/api/code-list-service";
+import {useUserStore} from "@/store";
+import { listChrDepts } from "@/api/dept";
+
 const router = useRouter();
 const dialogVisible = ref(true);
 const step = ref("");
@@ -249,11 +277,58 @@ function loadOptions(type:number = 1) {// 条款 1 方案 2
     }
   });
 }
+
+const userStore = useUserStore();
+
+const dptCdeList = ref<any[]>([]);
+const cDptCdeList = ref<any[]>([]);
+
+const isZGS = computed(()=>'0200000000000' === userStore.user.companyId);
+
+// 查询分公司机构
+const getDptCdeList = ()=> {
+    if(isZGS.value) {
+        listChrDepts({cDptCde: userStore.user.companyId, cDptCls: '1'}).then(({data, code}) => {
+            if (code === 200) {
+                dptCdeList.value = data.map((item) => ({
+                    value: item.cDptCde,
+                    label: item.cDptCnm,
+                }));
+            }
+        }).catch(err => console.error(err));
+    }
+    dptCdeList.value?.push({
+        label: userStore.user.companyCnm,
+        value: userStore.user.companyId,
+    });
+};
+
+// 查询出单机构
+const cDptCdeLoading = ref(false);
+const getCDptCdeList = (data: any)=> {
+    cDptCdeLoading.value = true;
+    listChrDepts({cDptRelCde: data,cSignDptMrk: '1',cDptCls: '2'}).then(({data, code}) => {
+        if (code === 200) {
+            cDptCdeList.value = data.map((item) => ({
+                value: item.cDptCde,
+                label: item.cDptCnm,
+            }));
+        }
+        cDptCdeLoading.value = false;
+    }).catch(err => console.error(err));
+};
+
 onMounted(async () => {
   handleQuery();
   loadOptions();
   nextTick(() => {
     step.value = "0";
+
+      if(isZGS.value) {
+          getDptCdeList();
+      }else {
+          getCDptCdeList(userStore.user.companyId);
+      }
   });
 });
 
@@ -261,10 +336,11 @@ onMounted(async () => {
 const method = {};
 
 //当前选中的机构item
-function selectedItem(item) {
-  selectTreeItem.value = item;
-  formconfig1.value.cDptCnm = item.label;
-  formconfig1.value.cDptCde = item.value;
+function selectedItem(value) {
+    const item = cDptCdeList.value.filter(f => f.value === value)[0];
+    selectTreeItem.value = item;
+    formconfig1.value.cDptCnm = item?.label;
+    formconfig1.value.cDptCde = item?.value;
 }
 
 // 下一步

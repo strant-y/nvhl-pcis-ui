@@ -11,6 +11,7 @@ export interface CardConfig {
   showInTitle?: boolean; //是否显示折叠切换按钮
   showMyfromBtm?: boolean; //是否显示折叠切换按钮
   titleBtns?: Array<FreeButtonBase>; //标题处按钮
+  tableBtn?: Array<FreeButtonBase>; //表格内按钮
   endBtns?: Array<FreeButtonBase>; //结尾处按钮
   endBtnsPosition?: "left" | "right" | "center"; // 结尾处按钮位置
   formconfig?:AppGridEditConfig | null;  //表单配置
@@ -28,6 +29,7 @@ export function creatCardConfig(
     showMyfromBtm: config.showMyfromBtm || false,
     showInTitle: config.showInTitle || false,
     production: config.production || false,
+    tableBtn: config.tableBtn || [],
     productionTitle: config.productionTitle || "",
     superFromShow: config.superFromShow || "点击打开",
     superFromClose: config.superFromClose || "点击折叠",

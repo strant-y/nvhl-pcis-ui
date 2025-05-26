@@ -202,11 +202,16 @@ function getRowById(dataId: string) {
   return rttableFrom.value?.getRowById(dataId);
 }
 
+function getselectionData() {
+  return rttableFrom.value?.getselectionData();
+}
+
 defineExpose({
   getPartnerPage,
   getFromValue,
   setFormSchema,
-  setValueByRowKey
+  setValueByRowKey,
+  getselectionData
 });
 </script>
 

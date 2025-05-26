@@ -27,7 +27,7 @@
         </div>
       </el-col>
       <el-col :span="16">
-        <div style="height: 180px; border: 1px solid #f3f3f3; overflow-y: auto">
+        <div>
           <rt-mytable :tableConfig="factorconfig" ref="factorRef" />
         </div>
       </el-col>
@@ -129,6 +129,7 @@ const factorRef = ref<MyTableMethod | null>(null);
 
 const factorconfig = reactive<AppTableConfig>(
   createTableEditConfig({
+    maxHeight: "180px",
     fromSchema: [
       {
         prop: "isChecked",

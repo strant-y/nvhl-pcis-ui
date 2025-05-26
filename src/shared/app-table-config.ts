@@ -27,6 +27,7 @@ export interface AppTableConfig {
   showSelection?:boolean; //行多选
   showEdit?: boolean; //是否显示查询表单
   formconfig?:AppGridEditConfig | null;  //表单配置
+  maxHeight?: string;
 
   rowDbClickFun?: (rowData) => void;
 }
@@ -37,6 +38,7 @@ export interface AppTableMethod {
   setFormSchema: (rowId: string, props: any, schama: any, value: any) => void;
   setValueByRowKey:(props:string ,rowId: any, value:any) => void;
   getRowById:(rowId: string) => void;
+  getselectionData:() => any;
 }
 export interface MyTableMethod {
   addRow: (arg: any) => any;
@@ -49,6 +51,7 @@ export interface MyTableMethod {
   setValueByRowKey:(props:string ,rowId: any, value:any) => void; // (prop: 要素key, rowId: 行Id, value: 值)
   deleteByRowKey:(rowId: any) => void;
   getRowById:(rowId: string) => void;
+  getselectionData:() => any;
 }
 export function createTableEditConfig(
   config: AppTableConfig = {}
@@ -79,6 +82,7 @@ export function createTableEditConfig(
     showSelection: config.showSelection || false,
     showEdit: config.showEdit || false,
     formconfig: config.formconfig || null,
+    maxHeight: config.maxHeight || null,
     rowDbClickFun: config.rowDbClickFun || null,
   };
 }

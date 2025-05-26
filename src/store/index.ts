@@ -16,4 +16,6 @@ export * from "./modules/settings";
 export * from "./modules/tagsView";
 export * from "./modules/user";
 export * from "./modules/codeListView";
+export * from "./modules/prod";
+export * from "./modules/data-opertaor";
 export { store };

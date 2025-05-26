@@ -153,9 +153,14 @@
 
 <script setup lang="ts">
 import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
-import tremTemplate from "./trem-template.vue";
-import tremAddTemplate2 from "./trem-add2-template.vue";
-import tremAddTemplate3 from "./trem-add3-template.vue";
+
+const tremTemplate = defineAsyncComponent(() => import("./trem-template.vue"));
+const tremAddTemplate2 = defineAsyncComponent(
+  () => import("./trem-add2-template.vue")
+);
+const tremAddTemplate3 = defineAsyncComponent(
+  () => import("./trem-add3-template.vue")
+);
 
 const dialog = ref<DialogMethod | null>(null);
 import { formInit } from "@/shared/from-init";
@@ -565,7 +570,17 @@ function setFormValue(value: any) {
   updateEdrItem(terms);
 }
 
-function validate() {}
+async function validate() {
+  let r = true;
+  const keys = Object.keys(tremTemplateRefs.value);
+  for (const item of keys) {
+    if (tremTemplateRefs.value[item]) {
+      const res = await tremTemplateRefs.value[item].validate();
+      r = r && res;
+    }
+  }
+  return r;
+}
 function showFlush() {
   updateTitle();
   Object.keys(tremTemplateRefs.value).forEach((item) => {
@@ -602,12 +617,12 @@ function setDisabledAll() {
 }
 function setUnDisabledByKeyList(key: any) {
   cardconfig.value.endBtns?.forEach((item: any) => {
-    if ((item.id === key)) {
+    if (item.id === key) {
       item.hidden = false;
     }
   });
   cardconfig.value.titleBtns?.forEach((item: any) => {
-    if ((item.id === key)) {
+    if (item.id === key) {
       item.hidden = false;
     }
   });

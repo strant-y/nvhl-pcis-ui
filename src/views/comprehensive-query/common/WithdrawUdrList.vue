@@ -94,6 +94,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
         clearable: true,
         func:(val)=>{
+          setValue("prodNo", "");
           cPard.value = val;
           codeListStore
               .queryCodeList({
@@ -388,15 +389,33 @@ function handleWorkFlow(row: any) {
   });
 }
 //给表单下拉项赋值
-function setFormItem(key, obj) {
-    if (obj && Object.keys(obj).length) {
-        formconfig1.fromSchema?.forEach((item) => {
-            if (item.prop === key) {
-                Object.assign(item, obj);
-            }
-        });
-    }
+function setFormItem(key: any, obj: any) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.btnItems && obj.btnItems) {
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
+          }
+        }else{
+          Object.assign(item, obj);
+        }
+      }
+    });
+  }
 }
+function setValue(key: string, value: any) {
+    freeEditRef?.value?.setValue(key, value);
+}
+
+function getValue(key: string) {
+  return freeEditRef?.value?.getValue(key);
+}
+defineExpose({
+  setValue,
+  getValue,
+});
 </script>
 
 <style scoped></style>

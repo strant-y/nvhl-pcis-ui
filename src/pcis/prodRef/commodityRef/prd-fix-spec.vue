@@ -118,6 +118,7 @@ const refreshData = () => {
     pageSize: 999,
   }).then((res) => {
     if (res.data.result) {
+      console.log("res.data.result", res.data.result);
       pageresult.list = [];
       res.data.result.forEach((item, index) => {
         pageresult.list.push({
@@ -154,9 +155,9 @@ function add() {
     addIndex: addTableData.length + 1, //序号
     cSpecialCode: "",
     cSpecialContent: "",
-    cIfMust: "1", //是否必选
+    cIfMust: "2", //是否必选
     cIfEdit: "1", //是否可修改
-    cIfFix: "0", //是否固定特约，查寻特约模板接口查出来的1，自定义添加的为0
+    cIfFix: "2", //是否固定特约，查寻特约模板接口查出来的1，自定义添加的为0
   });
 }
 
@@ -166,6 +167,7 @@ const returnData = () => {
     let tempData = multipleTableRef.value.getSelectionRows();
     props.method.getSelected(tempData);
   } else {
+    console.log("addTableData", addTableData);
     props.method.getSelected(addTableData);
   }
   close();
@@ -176,6 +178,7 @@ const close = () => {
 
 function setSelected() {
   const lastSelected = props.data.selectedData;
+  console.log("lastSelected", lastSelected);
   if (lastSelected && lastSelected.length) {
     lastSelected.forEach((item) => {
       pageresult.list.forEach((item2) => {

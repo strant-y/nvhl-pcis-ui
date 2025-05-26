@@ -9,7 +9,6 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
 import {
   getBsnsTypList,
   getChaTypeList,
@@ -21,9 +20,13 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { useValidator } from "@/typings/useValidator";
 import DepartmentTree from "../commodityRef/DepartmentTree.vue";
-import { codeListViewStore } from "@/store";
 import { useRoute } from "vue-router";
 import { get } from "lodash";
+import { codeListViewStore, dataOpertaor, useProductStore } from "@/store";
+import { de } from "element-plus/es/locale";
+import { rule } from "postcss";
+import { debug } from "console";
+const productStore = useProductStore();
 const route = useRoute();
 const query = ref(route.query);
 const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
@@ -69,7 +72,6 @@ onMounted(async () => {
     //录单人 默认系统操作员..
     setValue("Base.cOprCde", user.userName);
     //录单人联系方式  默认操作员的
-      console.log('user---',user)
     if(user.phoneNO !==null && user.phoneNO !==''){
       setValue("Base.cCiOprRel", user.phoneNO);
     }else{
@@ -78,6 +80,7 @@ onMounted(async () => {
         rules: [getRules("phoneNo", {})],
       });
     }
+
     // 
     // setValue("Base.cCiOprRel", 123); 
 
@@ -106,7 +109,8 @@ onMounted(async () => {
     });
     setValue("Base.cIntroDptcde", param.cDptCde);
   });
-
+  //将联共保业务默认值设置为0并存到store中
+  productStore.setcCiMrk("0")
   if (sessionStorage.getItem("toMyPageData")) {
     const data = JSON.parse(sessionStorage.getItem("toMyPageData"));
     if (data.pageType && data.pageType === "app") {
@@ -143,7 +147,7 @@ const method = {
   },
   //联共保下拉change
   cCiMrkChange:(val)=>{
-    console.log(val,"99999999")
+    productStore.setcCiMrk(val)
   },
   //业务来源大类
   businessKindFunc: (val) => {
@@ -179,14 +183,14 @@ const method = {
           setFormItem("Base.cAgtAgrNo", { rules: [getRules("required", {})] }); //代理合作协议
         } else {
           const obj = {
-            rules: null,
+            rules: [],
             btnItems: {
               disabled: true,
             },
           };
           setFormItem("Base.cBrkrCde", obj); //代理(经纪)人
           setFormItem("Base.cBrkSlsCde", obj); //代理业务员
-          setFormItem("Base.cAgtAgrNo", { rules: null }); //代理合作协议
+          setFormItem("Base.cAgtAgrNo", { rules: [] }); //代理合作协议
           if (!p.initFlag) {
             setValue("Base.cBrkrCde", "");
             setValue("Base.cBrkSlsCde", "");
@@ -246,7 +250,6 @@ const method = {
   businessSubFunc: (val) => {
     // 清除代理(经纪)人、代理业务员的值
     const p = opertaor.getParam();
-
     if (!p.initFlag) {
       setValue("Base.cBrkrCde", "");
       setValue("Base.cBrkSlsCde", "");
@@ -262,6 +265,7 @@ const method = {
   },
   //代理(经纪)人icon事件
   agentFunc: () => {
+    console.log("代理(经纪)人icon事件");
     if (getValue("Base.cBsnsTyp") && getValue("Base.cBsnsTyp") !== "19001") {
       dialogRef.value?.open(
         "agentPre",
@@ -273,9 +277,19 @@ const method = {
             cBsnsTyp: getValue("Base.cBsnsTyp"), //业务来源大类
             cChaType: getValue("Base.cChaType"), //业务来源中类
             cChaSubtype: getValue("Base.cChaSubtype"), //业务来源子类
+            
           },
           method: {
             getSelected: (params) => {
+              setFormItem("Base.cBrkrCde", {
+                loadData: [{ value: params.CChaCde, label: params.CChaNme}],
+              });
+              setValue("Base.cBrkrCde", params.CChaNme);
+              setValue("Base.cAgtAgrNo", params.CAgtAgrNo);
+              
+              console.log('回显----',params)
+
+
               dialogRef.value?.handleClose();
             },
           },
@@ -292,7 +306,8 @@ const method = {
     }
   },
   //代理业务员icon事件
-  agentSaleFunc: () => {
+  agentSaleFuncA: () => {
+    console.log("代理业务员icon事件");
     if(!getValue('Base.cBrkrCde')) {
       ElMessage.warning('请先选择代理(经济)人！');
       return
@@ -407,8 +422,6 @@ const method = {
                 false
               )
               .then((res) => {
-         
-              
                 if (res && res.code == 200) {
                 
                   const codeValData = res.data;
@@ -466,8 +479,6 @@ const method = {
         },
         method: {
           getSelected: (params) => {    
-              console.log(333,params)
-            
             setFormValue({
               "Base.cIntroSalecde": params.CSlsNme, //业务员员工号
             });
@@ -524,8 +535,11 @@ const method = {
   //项目类别大类change事件
   cPrjCtgTypChange: (val) => {
     console.log('类别',val)
-    setValue("Base.cPrjCtgMidTyp", "");
-    setValue("Base.cPrjCtgSubTyp", "");
+    const p = opertaor.getParam();
+    if (!p.initFlag) {
+      setValue("Base.cPrjCtgMidTyp", "");
+      setValue("Base.cPrjCtgSubTyp", "");
+    }
     if (val) {
       // Base.cPrjCtgMidTyp
       // setFormItem("Base.cPrjCtgMidTyp", { rules: null, disabled: true });
@@ -547,7 +561,10 @@ const method = {
   },
   //项目类别中类change事件
   cPrjCtgMidTypChange: (val) => {
-    setValue("Base.cPrjCtgSubTyp", "");
+    const p = opertaor.getParam();
+    if (!p.initFlag) {
+      setValue("Base.cPrjCtgSubTyp", "");
+    }
     if (val) {
       codeListStore
         .queryCodeList({
@@ -635,23 +652,49 @@ function getValue(key: string) {
 }
 
 //给表单下拉项赋值
-function setFormItem(key, obj) {
-  if (obj && Object.keys(obj).length) {
-    formconfig1.fromSchema?.forEach((item) => {
-      if (item.prop === key) {
-        //控制尾部按钮的
-        if (item.btnItems && obj.btnItems) {
-          let newBtnItems = null;
-          for (let key in obj.btnItems) {
-            item.btnItems[key] = obj.btnItems[key];
-          }
-          newBtnItems = item.btnItems;
-          newBtnItems && (obj.btnItems = newBtnItems);
+// function setFormItem(key: any, obj: any) {
+//   if (obj && Object.keys(obj).length) {
+//     formconfig1.fromSchema?.forEach((item) => {
+//       if (item.prop === key) {
+//         //控制尾部按钮的
+//         if (item.btnItems && obj.btnItems) {
+//           for (let key in obj.btnItems) {
+//             item.btnItems[key] = obj.btnItems[key];
+//           }
+//         }else{
+//           Object.assign(item, obj);
+//         }
+//       }
+//     });
+//   }
+// }
+function setFormItem(key: string, obj: Record<string, any>) {
+  if (!obj || !formconfig1.fromSchema) return;
+
+  formconfig1.fromSchema.forEach((item) => {
+    if (item.prop === key) {
+      // 单独处理 btnItems
+      if (obj.btnItems && item.btnItems) {
+        for (let k in obj.btnItems) {
+          item.btnItems[k] = obj.btnItems[k];
         }
-        Object.assign(item, obj);
       }
-    });
-  }
+
+      // 清除已有属性再赋值，避免残留
+      const propsToCopy = ['rules', 'readonly', 'disabled', 'hidden', 'loadData', 'placeholder', 'filterable'];
+      propsToCopy.forEach(prop => {
+        if (prop in obj) {
+          item[prop] = obj[prop];
+        }
+      });
+
+      // 其他非特定属性通过 assign 补充
+      const extraProps = Object.keys(obj).filter(k => !propsToCopy.includes(k) && k !== 'btnItems');
+      if (extraProps.length > 0) {
+        Object.assign(item, ...extraProps.map(k => ({ [k]: obj[k] })));
+      }
+    }
+  });
 }
 
 //设置select的可搜索

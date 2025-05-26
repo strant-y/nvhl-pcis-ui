@@ -65,7 +65,8 @@ import {
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import { createFreeButtonBase, FreeButtonBase } from "@/shared/button-config";
-import termEdrItemEditView from "@/components/common/TermEdrItemEditView.vue";
+
+const termEdrItemEditView = defineAsyncComponent(() => import("@/components/common/TermEdrItemEditView.vue"));
 const emits = defineEmits(["handleClose"]);
 const props = defineProps({
   data: {

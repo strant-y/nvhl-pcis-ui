@@ -1,10 +1,13 @@
 import en from "@/lang/package/en";
 import path from "path";
 import { defineStore } from "pinia";
+import { useProductStore } from "@/store";
 
 export const dataOpertaor = defineStore(
     "dataOpertaor",
     () => {
+
+        const productStore = useProductStore();
         const tableConfig = reactive<Array<any>>([]);
         const tableRefs = reactive<Record<string, any>>({});
         const param = reactive<any>({});
@@ -64,9 +67,14 @@ export const dataOpertaor = defineStore(
         const getDataAll = () => {
             const keys = Object.keys(tableRefs);
             const res = {};
+            const ci = productStore.checkCiMrk();
             keys.forEach(key => {
                 try {
-                    res[key] = JSON.parse(JSON.stringify(tableRefs[key].getFromValue()));
+                    if (!ci && (key === 'ci' || key === 'ciMasterAgreement' || key === 'ourCompanyCiShare')) {
+                        //: 再保时,不再获取这3个组件的数据
+                    } else {
+                        res[key] = JSON.parse(JSON.stringify(tableRefs[key].getFromValue()));
+                    }
                 } catch (error) {
                     console.log('方法不存在或出现错误，跳过执行');
                 }
@@ -299,8 +307,18 @@ export const dataOpertaor = defineStore(
         const validateAll = async (): Promise<boolean> => {
             // 1. 收集所有验证Promise并保留对应key
             const entries = Object.entries(tableRefs); // 保留[key, ref]的映射关系
-            const validationPromises = entries.map(([key, ref]) => ref?.validate?.());
-
+            const ci = productStore.checkCiMrk();
+            const validationPromises = entries.map(([key, ref]) => {
+                if (key === 'cvrg') {
+                    return null;
+                } else if (!ci && (key === 'ci' || key === 'ciMasterAgreement' || key === 'ourCompanyCiShare')) {
+                    return null;
+                } else {
+                    return ref?.validate?.()
+                }
+            });
+            // 险别验证独立完成
+            const cv = await tableRefs['cvrg'].validate();
             // 2. 等待所有Promise完成并关联结果与key
             const results = await Promise.all(validationPromises);
             // 3. 关联每个结果与对应的key
@@ -313,7 +331,7 @@ export const dataOpertaor = defineStore(
 
             // 4. 汇总结果（示例：收集所有失败的key）
             const failedKeys = resultMapping
-                .filter(item => item.result !== true)
+                .filter(item => item.result === false)
                 .map(item => {
                     console.log("失败的表单key:" + item.key);
                     return item.key
@@ -321,8 +339,7 @@ export const dataOpertaor = defineStore(
 
             // 5. 返回验证结果和失败详情
             const isValid = failedKeys.length === 0;
-
-            return isValid;
+            return isValid && cv;
         }
         /**
          * 首字母转换小写

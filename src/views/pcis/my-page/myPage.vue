@@ -38,11 +38,12 @@
                     >批改比较项</span
                   >
                 </el-anchor-link>
+
                 <el-anchor-link
                   v-for="(k, i) in pageConfig?.pageInfo"
                   :key="i"
                   :href="`#${k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey}`"
-                  v-show="k.pageKey !== 'acctinfo' ? acctinfoFlag : true"
+                  v-show="k.pageKey !== 'acctinfo' ? (['ciMasterAgreement', 'ci', 'ourCompanyCiShare'].includes(k.pageKey) ? isCiJiMrk : acctinfoFlag) : true"
                 >
                   <rt-icon
                     style="margin-right: 14px"
@@ -68,7 +69,8 @@
                     </template>
                   </span>
                 </el-anchor-link>
-                <el-anchor-link :href="`#ciMasterAgreement`" v-if="ciMasterAgreementFlag">
+
+                <el-anchor-link :href="`#ciMasterAgreement`" v-if="ciMasterAgreementFlag && isCiJiMrk">
                   <rt-icon
                     style="margin-right: 14px"
                     :item="{ icon: 'Tickets' }"
@@ -77,7 +79,7 @@
                     >联共保主协议信息</span
                   >
                 </el-anchor-link>
-                <el-anchor-link :href="`#ci`" v-if="ciFlag">
+                <el-anchor-link :href="`#ci`" v-if="ciFlag && isCiJiMrk">
                   <rt-icon
                     style="margin-right: 14px"
                     :item="{ icon: 'Tickets' }"
@@ -86,7 +88,7 @@
                     >联共保信息</span
                   >
                 </el-anchor-link>
-                <el-anchor-link :href="`#ourCompanyCiShare`" v-if="ourCompanyCiShareFlag">
+                <el-anchor-link :href="`#ourCompanyCiShare`" v-if="ourCompanyCiShareFlag && isCiJiMrk">
                   <rt-icon
                     style="margin-right: 14px"
                     :item="{ icon: 'Tickets' }"
@@ -171,7 +173,7 @@
                 ? k.pageCode
                 : k.pageKey
             "
-            v-show="k.pageKey !== 'acctinfo' ? acctinfoFlag : true"
+            v-show="k.pageKey !== 'acctinfo' ? (['ciMasterAgreement', 'ci', 'ourCompanyCiShare'].includes(k.pageKey) ? isCiJiMrk : acctinfoFlag) : true"
           >
             <component
               v-if="currentIndex >= i"
@@ -239,12 +241,16 @@ import {
   submitEdrSurrender,
 } from "../../../api/query/index";
 import { checkFeeWindowType } from "@/api/prod";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { dataOpertaor, useProductStore } from "@/store";
 import moment from "moment";
 import dayjs from "dayjs";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
 const policyService = new PolicyService();
+const productStore = useProductStore();
+const { isCiJiMrk } = storeToRefs(productStore);
+
+
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -376,10 +382,15 @@ const isDetailCde = () => {
 };
 
 onMounted(() => {
-  console.log("路由参数props.param", props.param);
   initPage();
 });
-
+// watchEffect(() => {
+//   const isShow = productStore.$state.cCiMrk !== "0";
+//   ciMasterAgreementFlag.value = isShow;
+//   console.log(ciMasterAgreementFlag.value,"000000000")
+//   ciFlag.value = isShow;
+//   ourCompanyCiShareFlag.value = isShow;
+// });
 /**
  * 发票信息
  */
@@ -714,7 +725,6 @@ const uwBtn = [
     label: "历史赔案",
     type: "primary",
     func: () => {
-      console.log(13133);
       historyClaimcaseFun();
       // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
     },
@@ -752,15 +762,11 @@ const uwBtn = [
  * @param data
  */
 const initPage = async () => {
-
-  // const tableref = opertaor.getTableRefs();
-  // const baseValue = tableref["Base"].getFromValue()["Base.cCiMrk"]; // 联共保信息
-  // console.log(baseValue,"8888888888")
-
   const getProductRes = await getProductPage({
     CProdNo: props.param.cProdNo,
     CGrpMrk: props.param.cGrpMrk,
   });
+  
   const getRenewalAppPolicyres = await getRenewalAppPolicy({
     cPlyNo: props.param.cPlyNo,
     queryTyp: props.param.queryTyp,
@@ -808,6 +814,14 @@ const initPage = async () => {
   // 页面初始化
   const formconfig11 = JSON.parse(getProductRes.data);
 
+  
+  // if(productStore.$state.cCiMrk == "0"){
+  //   formconfig11[0].pageInfo = formconfig11[0].pageInfo.filter(
+  //     (item) => item.pageTtile !== "联共保主协议信息" && item.pageTtile !== "联共保信息" && item.pageTtile !== "我司联共保份额信息"
+  //   );
+  // }else if(productStore.$state.cCiMrk !=="0"){
+  // }
+  
   //处理账户信息方面逻辑  根据isDetailcdeType 不包含这里的都不显示账户信息方面的内容
   let isDetailcdeType = isDetailCde();
   if (!isDetailcdeType) {
@@ -815,6 +829,7 @@ const initPage = async () => {
       (item) => item.pageTtile !== "账户信息"
     );
   }
+  
   console.log("页面初始化返回数据", formconfig11);
   if (props.param?.cAppTyp == "E") {
     if (props.param.cEdrType == "1") {
@@ -846,22 +861,13 @@ function renderComponents() {
       loadAfter(); //页面加载完成之后,再加载后续所需的事件
       clearInterval(interval);
     }
-  }, 100); // 延迟组件渲染,增加页面响应效率
+  }, 50); // 延迟组件渲染,增加页面响应效率
 }
 
 /**
  * 页面加载后
  */
 async function loadAfter() {
-  const baseData = opertaor.getTableRefByKey("base")?.getFromValue();
-  const cCiMrkValue = baseData?.["Base.cCiMrk"];
-
-  // 控制左侧菜单与组件的显示/隐藏
-  if (cCiMrkValue === "0") {
-    ciMasterAgreementFlag.value = false; // 联共保主协议信息 隐藏
-    ciFlag.value = false;               // 联共保信息 隐藏
-    ourCompanyCiShareFlag.value = false; // 我司联共保信息 隐藏
-  } 
   if (props.param.pageType === "app") {
     //获取单号
     getCAppNoFun();
@@ -1338,19 +1344,25 @@ const setPayInfo = (base, applicant, insrnc) => {
  * 投保申请核保
  */
 const submitToUndrFn = async () => {
-  if(!checkNAmt()) return;
+  if (!checkNAmt()) return;
   const f = await savePlyInfo(); // 提交核保,需要默认执行一次保存操作
   if (f) {
     const btn = getBtn("btn010103");
-    btn.loading = true;
+
     const res: any = {};
-    // setTimeout(() => {
+    nextTick(async () => {
+      const rv = await opertaor.validateAll();
+      if (!rv) {
+        ElMessage.error("存在未录入数据,请确认!");
+        return;
+      }
+      btn.loading = true;
       console.log(opertaor.getTableRefByKey("plyBase").getFromValue());
       const base = opertaor.getTableRefByKey("plyBase").getFromValue();
       res["user"] = user;
       res["appNo"] = base["Base.cAppNo"];
 
-      console.log('申请核保参数-----',res)
+      console.log("申请核保参数-----", res);
       submitToUndr(res).then((res: any) => {
         btn.loading = false;
         console.log("submitToUndr-res", res);
@@ -1361,9 +1373,10 @@ const submitToUndrFn = async () => {
           btn.disabled = true;
         } else {
           ElMessage.error(res.msg);
+          btn.disabled = true;
         }
       });
-    // }, 100);
+    });
   }
 };
 
@@ -1429,7 +1442,7 @@ const savePlyInfo = async () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
 
-  console.log('保存参数-----1',res);
+  console.log("保存参数-----1", res);
   if (res["cvrg"].length == 0) {
     ElMessage.error("请录入条款信息");
     btn.loading = false;
@@ -1440,10 +1453,19 @@ const savePlyInfo = async () => {
   console.log("saveAppPlyInfo-res", resInfo);
   btn.loading = false;
   if (resInfo["code"] == "200") {
-    const ops = opertaor.convertData(resInfo);
+    const ops: any = opertaor.convertData(resInfo);
     console.log("转换的数据", ops);
     ElMessage.success(resInfo.msg);
-    opertaor.setDataAll(ops);
+    const base = ops["base"];
+    const plyBase = ops["plyBase"];
+    if (base) {
+      const baseRef = opertaor.getTableRefByKey("base");
+      baseRef.setFormValue(base);
+    }
+    if (plyBase) {
+      const plyBaseRef = opertaor.getTableRefByKey("plyBase");
+      plyBaseRef.setFormValue(plyBase);
+    }
     saveFlag = true;
   } else {
     ElMessage.error(resInfo.msg);
@@ -1895,7 +1917,6 @@ function lowercaseKeys<T extends object>(
   }
   return newObj;
 }
-
 function getcacheKey() {
   return cacheKey.value;
 }

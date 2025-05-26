@@ -1570,10 +1570,13 @@ exportDist(data) {
   });
 }
 //清单导入
-importDist(data) {
-  return request.post(`/policy/importDistIncrement`, data, {
-      responseType: 'blob'
-  });
+// importDist(data) {
+//   return request.post(`/policy/importDistIncrement`, data, {
+//       responseType: 'blob'
+//   });
+// }
+importDist(param){
+    return request.post('/policy/importDistIncrement', param);
 }
 listImage(data) {
     return request.post('image/listImage', data);

@@ -8,14 +8,14 @@ export const useValidator = () => {
   /**
    * 生成一个必填项验证规则
    * @param message 验证失败时的提示信息 如果未提供则使用默认值
-   * @param trigger 触发验证的方式 如果未提供则使用默认值 'blur'
+   * @param trigger 触发验证的方式 如果未提供则使用默认值 'change'
    * @returns 返回一个必填项验证规则对象
    */
   const required = (trigger?: string, message?: string) => {
     return {
       required: true,
       message: message || "该项为必填项",
-      trigger: trigger || "blur",
+      trigger: trigger || "change",
     };
   };
 

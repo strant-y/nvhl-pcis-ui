@@ -17,11 +17,15 @@ export function listDepts(queryParams?: DeptQuery): AxiosPromise<DeptVO[]> {
 
 /**
  * 部门树形表格
- *
- * @param queryParams
+ * @param param{
+ * cDptRelCde 关系码
+ * cDptCde 上级机构编码
+ * cDptCls
+ * cSignDptMrk
+ * }
  */
-export function listChrDepts(cDptCde?: string): AxiosPromise<DeptVO[]> {
-  return post(`/dpt/dptChrList`,{cDptCde:cDptCde})
+export function listChrDepts(param?: any): AxiosPromise<DeptVO[]> {
+  return post(`/dpt/dptChrList`, param)
 }
 
 /**
