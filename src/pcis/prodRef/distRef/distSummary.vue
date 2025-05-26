@@ -294,21 +294,16 @@ const method = {
 };
 
 function setUnDisabledByKeyList(key: any) {
-  cardconfig.value.endBtns?.forEach((item: any) => {
+  tableconfig.value.formconfig.endBtns?.forEach((item: any) => {
     if ("Btn_" + item.id === key) {
       item.hidden = false;
     }
   });
-  cardconfig.value.titleBtns?.forEach((item: any) => {
+  tableconfig.value.formconfig.titleBtns?.forEach((item: any) => {
     if ("Btn_" + item.id === key) {
       item.hidden = false;
     }
   });
-  // tableconfig.value.tableBtn?.forEach((item: any) => {
-  //   if(item.id = key){
-  //     item.hidden = false;
-  //   }
-  // });
   tableconfig.value.tableBtn?.forEach((item: any) => {
     if ("Btn_" + item.id === key) {
       item.hidden = false;
