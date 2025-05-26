@@ -51,7 +51,6 @@ const formconfig1 = reactive(createAppFreeEditConfig({}));
 const user = JSON.parse(sessionStorage.getItem("user"));
 console.log("user", user);
 const subDptCde = ref(); //所属分公司
-const emits = defineEmits(["updateSide"]);
 
 onMounted(async () => {
   const formconfig11 = formInit(
@@ -99,8 +98,6 @@ onMounted(async () => {
     //禁用保单来源
     // setFormItem("Base.cPolicySource", {disabled: true});
     setValue("Base.cDptCde", param.cDptCde);
-    //联共保业务
-    setValue("Base.cCiMrk","0")
     // 服务机构默认值
     setFormItem("Base.cIntroDptcde", {
       loadData: [
@@ -577,10 +574,6 @@ const method = {
         });
     }
   },
-  // 联共保业务
-  cCiMrkChange: (val:any) => {
-    emits("updateSide",val)
-  }
 };
 
 // 绑定特殊验证器
