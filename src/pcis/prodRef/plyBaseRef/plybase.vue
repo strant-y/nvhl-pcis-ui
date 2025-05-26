@@ -24,6 +24,8 @@ import { useRoute } from "vue-router";
 import { get } from "lodash";
 import { codeListViewStore, dataOpertaor, useProductStore } from "@/store";
 import { de } from "element-plus/es/locale";
+import { rule } from "postcss";
+import { debug } from "console";
 const productStore = useProductStore();
 const route = useRoute();
 const query = ref(route.query);
@@ -168,6 +170,7 @@ const method = {
         }
       );
       nextTick(() => {
+        debugger;
         if (val === "19002" || val === "19003") {
           //代理业务 | 经纪业务
           const obj = {
@@ -181,14 +184,14 @@ const method = {
           setFormItem("Base.cAgtAgrNo", { rules: [getRules("required", {})] }); //代理合作协议
         } else {
           const obj = {
-            rules: null,
+            rules: [],
             btnItems: {
               disabled: true,
             },
           };
           setFormItem("Base.cBrkrCde", obj); //代理(经纪)人
           setFormItem("Base.cBrkSlsCde", obj); //代理业务员
-          setFormItem("Base.cAgtAgrNo", { rules: null }); //代理合作协议
+          setFormItem("Base.cAgtAgrNo", { rules: [] }); //代理合作协议
           if (!p.initFlag) {
             setValue("Base.cBrkrCde", "");
             setValue("Base.cBrkSlsCde", "");
@@ -645,21 +648,49 @@ function getValue(key: string) {
 }
 
 //给表单下拉项赋值
-function setFormItem(key: any, obj: any) {
-  if (obj && Object.keys(obj).length) {
-    formconfig1.fromSchema?.forEach((item) => {
-      if (item.prop === key) {
-        //控制尾部按钮的
-        if (item.btnItems && obj.btnItems) {
-          for (let key in obj.btnItems) {
-            item.btnItems[key] = obj.btnItems[key];
-          }
-        }else{
-          Object.assign(item, obj);
+// function setFormItem(key: any, obj: any) {
+//   if (obj && Object.keys(obj).length) {
+//     formconfig1.fromSchema?.forEach((item) => {
+//       if (item.prop === key) {
+//         //控制尾部按钮的
+//         if (item.btnItems && obj.btnItems) {
+//           for (let key in obj.btnItems) {
+//             item.btnItems[key] = obj.btnItems[key];
+//           }
+//         }else{
+//           Object.assign(item, obj);
+//         }
+//       }
+//     });
+//   }
+// }
+function setFormItem(key: string, obj: Record<string, any>) {
+  if (!obj || !formconfig1.fromSchema) return;
+
+  formconfig1.fromSchema.forEach((item) => {
+    if (item.prop === key) {
+      // 单独处理 btnItems
+      if (obj.btnItems && item.btnItems) {
+        for (let k in obj.btnItems) {
+          item.btnItems[k] = obj.btnItems[k];
         }
       }
-    });
-  }
+
+      // 清除已有属性再赋值，避免残留
+      const propsToCopy = ['rules', 'readonly', 'disabled', 'hidden', 'loadData', 'placeholder', 'filterable'];
+      propsToCopy.forEach(prop => {
+        if (prop in obj) {
+          item[prop] = obj[prop];
+        }
+      });
+
+      // 其他非特定属性通过 assign 补充
+      const extraProps = Object.keys(obj).filter(k => !propsToCopy.includes(k) && k !== 'btnItems');
+      if (extraProps.length > 0) {
+        Object.assign(item, ...extraProps.map(k => ({ [k]: obj[k] })));
+      }
+    }
+  });
 }
 
 //设置select的可搜索
