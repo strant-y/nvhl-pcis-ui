@@ -368,6 +368,40 @@ function handleQuery(flag?: boolean) {
             const r = tableRef.value?.getPartnerPage(flag) //获取分页数据
             const s = freeEditRef.value?.getFromValue() //获取表单数据
             const plyTyp = freeEditRef.value?.getValue('CPlyTyp')
+            const appNme = freeEditRef.value?.getValue('CAppNme')
+            if (!!appNme && appNme.length < 2) {
+                ElMessage.warning('投保人名称至少输入2位')
+                return
+            }
+            const insuredNme = freeEditRef.value?.getValue('CInsuredNme')
+            if (!!insuredNme && insuredNme.length < 2) {
+                ElMessage.warning('被保人名称至少输入2位!')
+                return
+            }
+            const appNo = freeEditRef.value?.getValue('CAppNo')
+            const plyNo = freeEditRef.value?.getValue('CPlyNo')
+            const appTm = freeEditRef.value?.getValue('TAppTm')
+            const edrAppTm = freeEditRef.value?.getValue('TEdrAppTm')
+            const issueTm = freeEditRef.value?.getValue('TIssueTm')
+            const appCertfCde = freeEditRef.value?.getValue('CAppCertfCde')
+            const insuredCertfCde = freeEditRef.value?.getValue('CInsuredCertfCde')
+            const batchNo = freeEditRef.value?.getValue('CBatchNo')
+            if (
+                (appNo != null && appNo != '') ||
+                (plyNo != null && plyNo != '') ||
+                (appNme != null && appNme != '') ||
+                (appCertfCde != null && appCertfCde != '') ||
+                (insuredNme != null && insuredNme != '') ||
+                (insuredCertfCde != null && insuredCertfCde != '') ||
+                (batchNo != null && batchNo != '')
+            ) {
+            } else {
+                if ((appTm != null && appTm != '') || (edrAppTm != null && edrAppTm != '') || (issueTm != null && issueTm != '')) {
+                } else {
+                    ElMessage.warning('申请日期和签单日期不能同时为空!')
+                    return
+                }
+            }
             const param = Object.assign(
                 {
                     SysCode: 'POLY_CASU',

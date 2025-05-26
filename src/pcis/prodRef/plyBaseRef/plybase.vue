@@ -284,6 +284,11 @@ const method = {
                 loadData: [{ value: params.CChaCde, label: params.CChaNme}],
               });
               setValue("Base.cBrkrCde", params.CChaNme);
+              setValue("Base.cAgtAgrNo", params.CAgtAgrNo);
+              
+              console.log('回显----',params)
+
+
               dialogRef.value?.handleClose();
             },
           },
