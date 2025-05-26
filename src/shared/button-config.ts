@@ -28,6 +28,7 @@ export class FreeButtonBase {
   popoverWidth?: number | undefined | null; //弹出框宽度
   showKey?: Array; //显示数组合集，需要与数据匹配是否包含 findIndex方法
   hidden?: boolean;
+  hideBtns?: (...args: any[]) => any;
   beginLoading?: () => void;
   endLoading?: () => void;
 }

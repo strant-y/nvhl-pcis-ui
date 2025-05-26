@@ -1,10 +1,13 @@
 import en from "@/lang/package/en";
 import path from "path";
 import { defineStore } from "pinia";
+import { useProductStore } from "@/store";
 
 export const dataOpertaor = defineStore(
     "dataOpertaor",
     () => {
+
+        const productStore = useProductStore();
         const tableConfig = reactive<Array<any>>([]);
         const tableRefs = reactive<Record<string, any>>({});
         const param = reactive<any>({});
@@ -64,9 +67,14 @@ export const dataOpertaor = defineStore(
         const getDataAll = () => {
             const keys = Object.keys(tableRefs);
             const res = {};
+            const ci = productStore.checkCiMrk();
             keys.forEach(key => {
                 try {
-                    res[key] = JSON.parse(JSON.stringify(tableRefs[key].getFromValue()));
+                    if (!ci && (key === 'ci' || key === 'ciMasterAgreement' || key === 'ourCompanyCiShare')) {
+                        //: 再保时,不再获取这3个组件的数据
+                    } else {
+                        res[key] = JSON.parse(JSON.stringify(tableRefs[key].getFromValue()));
+                    }
                 } catch (error) {
                     console.log('方法不存在或出现错误，跳过执行');
                 }
@@ -299,8 +307,13 @@ export const dataOpertaor = defineStore(
         const validateAll = async (): Promise<boolean> => {
             // 1. 收集所有验证Promise并保留对应key
             const entries = Object.entries(tableRefs); // 保留[key, ref]的映射关系
+            const ci = productStore.checkCiMrk();
             const validationPromises = entries.map(([key, ref]) => {
-                if (key != 'cvrg') {
+                if (key === 'cvrg') {
+                    return null;
+                } else if (!ci && (key === 'ci' || key === 'ciMasterAgreement' || key === 'ourCompanyCiShare')) {
+                    return null;
+                } else {
                     return ref?.validate?.()
                 }
             });

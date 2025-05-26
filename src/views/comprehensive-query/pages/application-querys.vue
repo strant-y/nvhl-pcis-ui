@@ -67,6 +67,11 @@
             :refreshData="nowTab === 8 ? true : false"
           ></combination-query>
         </template>
+        <template v-if="Number(tab.key) == 10">
+          <e-policy-query
+            :refreshData="nowTab === 9 ? true : false"
+          ></e-policy-query>
+        </template>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -205,6 +210,10 @@ const CombinationQuery = defineAsyncComponent(
   // 产品组合出单查询
   () => import("../common/CombinationQuery.vue")
 );
+const EPolicyQuery = defineAsyncComponent(
+  // 生成电子保单查询
+  () => import("../common/EPolicyQuery.vue")
+);
 const tabs = ref<Array<any>>([
   {
     name: "询价单",
@@ -242,6 +251,10 @@ const tabs = ref<Array<any>>([
     name: "产品组合出单查询",
     key: "9",
   },
+  {
+    name: "生成电子保单查询",
+    key: "10",
+  }
 ]); //tabs数组
 const currentTabName = ref("暂存任务"); //tabs默认值
 const currentTabKey = ref(0); //tabs默认值
@@ -908,11 +921,18 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 //       },
 
 //给表单下拉项赋值
-function setFormItem(key, obj) {
+function setFormItem(key: any, obj: any) {
   if (obj && Object.keys(obj).length) {
     formconfig1.fromSchema?.forEach((item) => {
       if (item.prop === key) {
-        Object.assign(item, obj);
+        //控制尾部按钮的
+        if (item.btnItems && obj.btnItems) {
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
+          }
+        }else{
+          Object.assign(item, obj);
+        }
       }
     });
   }

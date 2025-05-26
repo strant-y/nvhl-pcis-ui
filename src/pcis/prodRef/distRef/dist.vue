@@ -42,6 +42,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { useRoute } from "vue-router";
 import { runInThisContext } from "vm";
+import { AppFreeEditMethod } from "@/shared/app-free-edit-config";
 const route = useRoute();
 const dialog = ref<DialogMethod | null>(null);
 const opertaor = dataOpertaor();
@@ -171,7 +172,7 @@ onMounted(async () => {
   tableconfig.value.tableBtnPosition = "right";
   if (formconfig11.value.editBtns && formconfig11.value.editBtns.length > 0) {
     let btns: any[] = [];
-    btns = formconfig11.value.editBtns.filter((btn: any) => !btn.hidden);
+    btns = formconfig11.value.editBtns;
     if (btns && btns.length > 0) {
       tableconfig.value.tableBtn = btns;
     }
@@ -292,10 +293,10 @@ const method = {
       cComponentTable: cComponentTableValue,
       cAppNo: app,
     };
-    selectDist(selData).then((res) => {
+    selectDist(selData).then((res: any) => {
       if (res.code === 200) {
         pageresult.list = [];
-        pageresult.list = res.data;
+        pageresult.list = res.data.data;
         pageresult.list.forEach((item, index) => {
           item.nSeqNo = index + 1;
           item.tOpeningTime = item['Dist.tOpeningTime']
@@ -465,48 +466,36 @@ setregistAdd(){
 };
 
 //给表单下拉项赋值
-function setFormItem(key, obj) {
+function setFormItem(key: any, obj: any) {
   if (obj && Object.keys(obj).length) {
-    formconfig1.fromSchema?.forEach((item) => {
+    formconfig1.value.fromSchema?.forEach((item: any) => {
       if (item.prop === key) {
         //控制尾部按钮的
-        if (item.loadData && obj.loadData) {
-          let newBtnItems = null;
-          if (obj.loadData.length != 0) {
-            for (let key in obj.loadData) {
-              item.loadData[key] = obj.loadData[key];
-            }
-          } else {
-            item.loadData = obj.loadData;
+        if (item.btnItems && obj.btnItems) {
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
           }
-          newBtnItems = item.loadData;
-          newBtnItems && (obj.loadData = newBtnItems);
+        }else{
+          Object.assign(item, obj);
         }
-        Object.assign(item, obj);
-        console.log(`Updated item for key ${key}:`, item);
       }
     });
   }
 }
 function setUnDisabledByKeyList(key: any) {
-  cardconfig.value.endBtns?.forEach((item: any) => {
+  tableconfig.value.formconfig.endBtns?.forEach((item: any) => {
     if ("Btn_" + item.id === key) {
       item.hidden = false;
     }
   });
-  cardconfig.value.titleBtns?.forEach((item: any) => {
+  tableconfig.value.formconfig.titleBtns?.forEach((item: any) => {
     if ("Btn_" + item.id === key) {
       item.hidden = false;
     }
   });
-  // tableconfig.value.tableBtn?.forEach((item: any) => {
-  //   if(item.id = key){
-  //     item.hidden = false;
-  //   }
-  // });
-  formconfig11.value.editBtns?.forEach((item: any) => {
+  tableconfig.value.tableBtn?.forEach((item: any) => {
     if ("Btn_" + item.id === key) {
-      tableconfig.value.tableBtn?.push(item);
+      item.hidden = false;
     }
   });
 }
@@ -528,7 +517,7 @@ function setFormValue(value: any) {
 }
 
 function validate() {
-  return applicantEditRef?.value?.validate();
+  return true;
 }
 
 function setValue(key: string, value: any) {

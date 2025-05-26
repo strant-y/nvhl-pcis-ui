@@ -177,12 +177,12 @@ const tableconfig = reactive<AppTableConfig>(
           },
         ],
       },
-      {
-        prop: "cSpecialCode",
-        inputtype: "rtinput",
-        title: "特约代码",
-        width: 180,
-      },
+      // {
+      //   prop: "cSpecialCode",
+      //   inputtype: "rtinput",
+      //   title: "特约代码",
+      //   width: 180,
+      // },
       {
         prop: "cSpecialContent",
         inputtype: "rtinput",
