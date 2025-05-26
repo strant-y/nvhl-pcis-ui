@@ -13,40 +13,78 @@
       >
         <h4 style="margin: 10px 20px">投保向导</h4>
         <el-form-item
+          v-if="isZGS"
+          label="分公司"
+          prop="dptCde"
+          style="width: 400px"
+          :rules="[getRules('required', {})]"
+        >
+            <el-select-v2
+                v-model="formconfig1.dptCde"
+                :options="dptCdeList"
+                placeholder="分公司"
+                size="large"
+                @change="getCDptCdeList"
+            />
+        </el-form-item>
+        <el-form-item
           label="归属机构"
           prop="cDptCde"
+          style="width: 650px"
+          :rules="[getRules('required', {})]"
+        >
+            <el-select-v2
+                v-model="formconfig1.cDptCde"
+                :options="cDptCdeList"
+                placeholder="归属机构"
+                size="large"
+                style="width: 500px"
+                :loading="cDptCdeLoading"
+                filterable
+                clearable
+                @change="selectedItem"
+            />
+        </el-form-item>
+        <el-form-item
+          label="录单方式"
+          prop="cRecordType"
           style="width: 600px"
           :rules="[getRules('required', {})]"
         >
-          <dept v-model="formconfig1.cDptCde" @selected-item="selectedItem" />
-        </el-form-item>
-
-        <h4 style="margin: 10px 20px">投保信息</h4>
-        <el-form-item
-          label="投保标识"
-          prop="cRenewMrk"
-          :rules="[getRules('required', {})]"
-        >
-          <el-radio-group v-model="formconfig1.cRenewMrk">
-            <el-radio value="0">新保</el-radio>
-            <el-radio value="1">续保</el-radio>
+          <el-radio-group v-model="formconfig1.cRecordType" @change="handleRecordTypeChange">
+            <el-radio :value="1">自定义录单</el-radio>
+            <el-radio :value="2">方案录单</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item
-          v-if="formconfig1.cRenewMrk == '1'"
-          label="上年保单号"
-          prop="cPlyNo"
-          :rules="[getRules('required', {})]"
-        >
-          <el-input
-            style="width: 300px"
-            placeholder="请输入续保保单号"
-            v-model="formconfig1.cPlyNo"
-          >
-          </el-input>
-        </el-form-item>
 
-        <h4 style="margin: 10px 20px">选择条款</h4>
+        <template v-if="formconfig1.cRecordType == 1">
+          <h4 style="margin: 10px 20px">投保信息</h4>
+          <el-form-item
+            label="投保标识"
+            prop="cRenewMrk"
+            :rules="[getRules('required', {})]"
+          >
+            <el-radio-group v-model="formconfig1.cRenewMrk">
+              <el-radio value="0">新保</el-radio>
+              <el-radio value="1">续保</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item
+            v-if="formconfig1.cRenewMrk == '1'"
+            label="上年保单号"
+            prop="cPlyNo"
+            :rules="[getRules('required', {})]"
+          >
+            <el-input
+              style="width: 300px"
+              placeholder="请输入续保保单号"
+              v-model="formconfig1.cPlyNo"
+            >
+            </el-input>
+          </el-form-item>
+        </template>
+
+        <h4 style="margin: 10px 20px">选择{{ labelNm }}</h4>
         <el-form-item
           label="团个属性"
           prop="cGrpMrk"
@@ -60,13 +98,13 @@
 
         <el-tooltip placement="top">
           <template #content>
-            可用鼠标左键，按住常用条款卡片<br />自由拖动常用条款排序<br />
+            可用鼠标左键，按住常用{{ labelNm }}卡片<br />自由拖动常用{{ labelNm }}排序<br />
           </template>
           <h4
             style="margin: 10px 20px; width: 200px"
             v-if="formconfig1.cRenewMrk !== '1'"
           >
-            常用条款
+            常用{{ labelNm }}
             <el-icon size="20" style="vertical-align: middle; color: red"
               ><InfoFilled
             /></el-icon>
@@ -102,14 +140,15 @@
                       ><StarFilled
                     /></el-icon>
                   </p>
-                  <p class="txt">{{ item.termNo }} - {{ item.termCnm }}</p>
+                  <p class="txt" v-if="formconfig1.cRecordType == 1">{{ item.termNo }} - {{ item.termCnm }}</p>
+                  <p class="txt" v-else>{{ item.planNo }} - {{ item.planCnm }}</p>
                 </el-card>
               </VueDraggable>
             </div>
           </el-col>
           <el-col :span="24">
             <el-form-item
-              label="条款名称"
+              :label="`${labelNm}名称`"
               prop="cTermNme"
               :rules="[getRules('required', {})]"
             >
@@ -184,8 +223,10 @@ import {
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
-import { b, i } from "vite/dist/node/types.d-jgA8ss1A";
 import { getListByCode } from "@/api/code-list-service";
+import {useUserStore} from "@/store";
+import { listChrDepts } from "@/api/dept";
+
 const router = useRouter();
 const dialogVisible = ref(true);
 const step = ref("");
@@ -219,12 +260,15 @@ const formconfig1 = ref({
   cProdNo: "",
   cProdNme: "",
   cPlyNo: "",
+  cRecordType: 1,
+  cIsPlan:'0',
 });
 const selectTreeItem = ref({});
+const labelNm = ref("条款")
 // 条款下拉数据
-function loadOptions() {
-  const param = { pageNo: 1, pageSize: 999, CEnableFlag: "1", level: 2 };
-  getProdEnableList(param).then((res) => {
+function loadOptions(type:number = 1) {// 条款 1 方案 2
+  const param = { pageNo: 1, pageSize: 999, CEnableFlag: "1", level: 2, type };
+  getProdEnableList(param).then((res:any) => {
     if (res.code === 200) {
       options.value = res.data.result;
     } else {
@@ -232,11 +276,58 @@ function loadOptions() {
     }
   });
 }
+
+const userStore = useUserStore();
+
+const dptCdeList = ref<any[]>([]);
+const cDptCdeList = ref<any[]>([]);
+
+const isZGS = computed(()=>'0200000000000' === userStore.user.companyId);
+
+// 查询分公司机构
+const getDptCdeList = ()=> {
+    if(isZGS.value) {
+        listChrDepts({cDptCde: userStore.user.companyId, cDptCls: '1'}).then(({data, code}) => {
+            if (code === 200) {
+                dptCdeList.value = data.map((item) => ({
+                    value: item.cDptCde,
+                    label: item.cDptCnm,
+                }));
+            }
+        }).catch(err => console.error(err));
+    }
+    dptCdeList.value?.push({
+        label: userStore.user.companyCnm,
+        value: userStore.user.companyId,
+    });
+};
+
+// 查询出单机构
+const cDptCdeLoading = ref(false);
+const getCDptCdeList = (data: any)=> {
+    cDptCdeLoading.value = true;
+    listChrDepts({cDptRelCde: data,cSignDptMrk: '1',cDptCls: '2'}).then(({data, code}) => {
+        if (code === 200) {
+            cDptCdeList.value = data.map((item) => ({
+                value: item.cDptCde,
+                label: item.cDptCnm,
+            }));
+        }
+        cDptCdeLoading.value = false;
+    }).catch(err => console.error(err));
+};
+
 onMounted(async () => {
   handleQuery();
   loadOptions();
   nextTick(() => {
     step.value = "0";
+
+      if(isZGS.value) {
+          getDptCdeList();
+      }else {
+          getCDptCdeList(userStore.user.companyId);
+      }
   });
 });
 
@@ -244,10 +335,11 @@ onMounted(async () => {
 const method = {};
 
 //当前选中的机构item
-function selectedItem(item) {
-  selectTreeItem.value = item;
-  formconfig1.value.cDptCnm = item.label;
-  formconfig1.value.cDptCde = item.value;
+function selectedItem(value) {
+    const item = cDptCdeList.value.filter(f => f.value === value)[0];
+    selectTreeItem.value = item;
+    formconfig1.value.cDptCnm = item?.label;
+    formconfig1.value.cDptCde = item?.value;
 }
 
 // 下一步
@@ -312,14 +404,21 @@ function handleClick(item: any, index: number) {
     termList.value.forEach((item: any, index: any) => (item.checked = false));
   }
   item.checked = !item.checked;
-  formconfig1.value.cTermNme = item.checked ? item.termCnm : "";
-  formconfig1.value.cTermNo = item.termNo;
+  formconfig1.value.cTermNme = item.checked ? item.termCnm || item.planCnm : "";
+  formconfig1.value.cTermNo = item.termNo || item.planNo;
   formconfig1.value.cProdNo = item.prodNo;
   formconfig1.value.cProdNme = item.prodCnm;
 }
 //取消常用条款
 function handleStarClick(item: any) {
-  unUserUnUntionTerm({ termNo: item.termNo }).then((res) => {
+  const param = formconfig1.value.cRecordType === 2 ? {
+    planNo: item.planNo,
+    isPlan: "1",
+  } : {
+    termNo: item.planNo,
+    isPlan: "0",
+  }
+  unUserUnUntionTerm(param).then((res:any) => {
     if (res.code == "1") {
       ElMessage.success(res.message);
       handleQuery();
@@ -333,6 +432,7 @@ function handleQuery() {
     pageNum: 1,
     pageSize: 10,
     userId: JSON.parse(sessionStorage.getItem("user")).opCde,
+    isPLan: formconfig1.value.cRecordType === 2 ? "1" : "0",
   }).then((res: any) => {
     if (res.code == "1") {
       termList.value = res.result;
@@ -378,7 +478,7 @@ function showModal() {
   dzmodal
     .open(termDialog, { 
       type: "Issuer",
-      data: { updateQuery },
+      data: { updateQuery, type: formconfig1.value.cRecordType },
       termList: termList.value,
     })
     .then((res: any) => {
@@ -393,6 +493,27 @@ function showModal() {
 }
 function updateQuery() {
   handleQuery();
+}
+
+// 录单方式
+function handleRecordTypeChange(val:any) {
+  formconfig1.value.cTermNme = "";
+  formconfig1.value.cGrpMrk = "0";
+  formconfig1.value.cRenewMrk = "0";
+  if (val == "2") {
+    loadOptions(2);
+    labelNm.value = "方案";
+    formconfig1.value.cIsPlan = '1';
+  } else {
+    loadOptions();
+    labelNm.value = "条款";
+    formconfig1.value.cIsPlan = '0';
+  }
+  handleQuery()
+  formconfig1.value.cTermNme = "";
+  formconfig1.value.cTermNo = "";
+  formconfig1.value.cProdNo = "";
+  formconfig1.value.cProdNme = "";
 }
 </script>
 
