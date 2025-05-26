@@ -28,7 +28,7 @@
             />
         </el-form-item>
         <el-form-item
-          label="归属机构"
+          label="承保机构"
           prop="cDptCde"
           style="width: 650px"
           :rules="[getRules('required', {})]"
@@ -36,7 +36,7 @@
             <el-select-v2
                 v-model="formconfig1.cDptCde"
                 :options="cDptCdeList"
-                placeholder="归属机构"
+                placeholder="承保机构"
                 size="large"
                 style="width: 500px"
                 :loading="cDptCdeLoading"
