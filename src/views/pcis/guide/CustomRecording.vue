@@ -24,6 +24,7 @@
                 :options="dptCdeList"
                 placeholder="分公司"
                 size="large"
+                filterable
                 @change="getCDptCdeList"
             />
         </el-form-item>
