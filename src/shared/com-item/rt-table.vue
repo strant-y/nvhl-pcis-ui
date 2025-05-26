@@ -139,7 +139,12 @@
           :min-width="i.minWidth"
         >
           <template #header="header">
-            <el-text v-if="isrequired(i)" class="mx-1" style="margin-right: 2px" type="danger">*</el-text
+            <el-text
+              v-if="isrequired(i)"
+              class="mx-1"
+              style="margin-right: 2px"
+              type="danger"
+              >*</el-text
             >{{ header.column.label }}
           </template>
           <template #default="scope">
@@ -177,11 +182,7 @@
       </template>
       <el-table-column
         :label="item.tableBtnTitle"
-        v-if="
-          item.tableBtn &&
-          item.tableBtn.length > 0 &&
-          item.tableBtnPosition === 'right'
-        "
+        v-if="!isHidden(item)"
         :width="item.tableBtnWidth ? item.tableBtnWidth : 100"
         :align="item.align ? item.align : 'center'"
         :fixed="
@@ -200,50 +201,52 @@
           <template v-for="(btn, index) in item.tableBtn" :key="index">
             <template v-if="btn.hidden !== true">
               <template v-if="item.tableBtnType === 'text'">
-              <a @click="btn.func ? btn.tableClick(scope.row) : () => {}">{{
-                btn.label
-              }}</a>
-            </template>
-            <template v-if="item.tableBtnType === 'btn'">
-              <el-tooltip
-                :disabled="btn.tooltip ? false : true"
-                :content="btn.tooltip"
-                placement="top"
-                effect="light"
-              >
-                <rtButton
-                  @click="btn.tableClick ? btn.tableClick(scope.row) : () => {}"
-                  :item="btn"
-                  :disabled="btn.disabled ? btn.disabled(scope.row) : false"
-                  v-if="!btn.hideBtns?.(scope.row) ?? false"
-                />
-              </el-tooltip>
-            </template>
-            <template v-if="item.tableBtnType === 'icon'">
-              <el-tooltip
-                :disabled="btn.tooltip ? false : true"
-                :content="btn.tooltip"
-                placement="top"
-                effect="light"
-              >
-                <a
-                  ><rtIcon
+                <a @click="btn.func ? btn.tableClick(scope.row) : () => {}">{{
+                  btn.label
+                }}</a>
+              </template>
+              <template v-if="item.tableBtnType === 'btn'">
+                <el-tooltip
+                  :disabled="btn.tooltip ? false : true"
+                  :content="btn.tooltip"
+                  placement="top"
+                  effect="light"
+                >
+                  <rtButton
                     @click="
                       btn.tableClick ? btn.tableClick(scope.row) : () => {}
                     "
                     :item="btn"
-                /></a>
-              </el-tooltip>
-            </template>
-            <template
-              v-if="
-                index !== item.tableBtn.length - 1 &&
-                !btn.hideBtns?.(scope.row) &&
-                index != 0
-              "
-            >
-              <el-divider direction="vertical" />
-            </template>
+                    :disabled="btn.disabled ? btn.disabled(scope.row) : false"
+                    v-if="!btn.hideBtns?.(scope.row) ?? false"
+                  />
+                </el-tooltip>
+              </template>
+              <template v-if="item.tableBtnType === 'icon'">
+                <el-tooltip
+                  :disabled="btn.tooltip ? false : true"
+                  :content="btn.tooltip"
+                  placement="top"
+                  effect="light"
+                >
+                  <a
+                    ><rtIcon
+                      @click="
+                        btn.tableClick ? btn.tableClick(scope.row) : () => {}
+                      "
+                      :item="btn"
+                  /></a>
+                </el-tooltip>
+              </template>
+              <template
+                v-if="
+                  index !== item.tableBtn.length - 1 &&
+                  !btn.hideBtns?.(scope.row) &&
+                  index != 0
+                "
+              >
+                <el-divider direction="vertical" />
+              </template>
             </template>
           </template>
         </template>
@@ -291,8 +294,8 @@ const indexMethod = (index: number) => {
  *  表单组件,用来写table表格的验证等方法的引用
  */
 const tableDatas = ref<any[]>([]);
-const schamaconf = ref<{[key:string] : any }>({});
-const tableRef = ref()
+const schamaconf = ref<{ [key: string]: any }>({});
+const tableRef = ref();
 const formItems = ref<{ [key: string]: any }>({});
 creatSchama();
 const tableFormfef = ref<InstanceType<typeof ElTable>>();
@@ -384,6 +387,21 @@ function expandChange(_val: any, expandedRows: any) {
   });
 }
 
+// 判断控制域按钮,是否隐藏
+function isHidden(item: any) {
+  let r = true;
+
+  if (!item.tableBtn || item.tableBtn.length === 0) {
+    return true;
+  }
+
+  for (const key in item.tableBtn) {
+    r = r && item.tableBtn[key].hidden;
+  }
+  console.log(r);
+  return r;
+}
+
 function getfromSchema() {
   const expands = props.item.fromSchema.filter((s: any) => s.expand === true);
   return expands;
@@ -445,11 +463,14 @@ function validate() {
       // 如果当前列有验证规则，则将其添加到规则对象中
       if (props.item.fromSchema[schama].rules) {
         let rul = props.item.fromSchema[schama].rules;
-        if(props.item.fromSchema[schama].inputtype === 'rtnumber' || 
-        (props.item.fromSchema[schama].inputtype === 'rtinput' && props.item.fromSchema[schama].type)){
-          if(rul && rul.length > 0){
+        if (
+          props.item.fromSchema[schama].inputtype === "rtnumber" ||
+          (props.item.fromSchema[schama].inputtype === "rtinput" &&
+            props.item.fromSchema[schama].type)
+        ) {
+          if (rul && rul.length > 0) {
             rul.forEach((item: any) => {
-              item.type = 'number';
+              item.type = "number";
             });
           }
         }
