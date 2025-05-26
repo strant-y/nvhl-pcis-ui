@@ -170,7 +170,6 @@ const method = {
         }
       );
       nextTick(() => {
-        debugger;
         if (val === "19002" || val === "19003") {
           //代理业务 | 经纪业务
           const obj = {

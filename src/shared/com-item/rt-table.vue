@@ -442,8 +442,16 @@ function validate() {
     for (const schama in props.item.fromSchema) {
       // 如果当前列有验证规则，则将其添加到规则对象中
       if (props.item.fromSchema[schama].rules) {
-        rules[props.item.fromSchema[schama].prop] =
-          props.item.fromSchema[schama].rules;
+        let rul = props.item.fromSchema[schama].rules;
+        if(props.item.fromSchema[schama].inputtype === 'rtnumber' || 
+        (props.item.fromSchema[schama].inputtype === 'rtinput' && props.item.fromSchema[schama].type)){
+          if(rul && rul.length > 0){
+            rul.forEach((item: any) => {
+              item.type = 'number';
+            });
+          }
+        }
+        rules[props.item.fromSchema[schama].prop] = rul;
       }
     }
 

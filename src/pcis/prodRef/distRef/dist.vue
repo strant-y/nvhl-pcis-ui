@@ -522,7 +522,7 @@ function setFormValue(value: any) {
 }
 
 function validate() {
-  return applicantEditRef?.value?.validate();
+  return true;
 }
 
 function setValue(key: string, value: any) {

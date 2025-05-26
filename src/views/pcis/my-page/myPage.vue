@@ -1351,11 +1351,11 @@ const submitToUndrFn = async () => {
 
     const res: any = {};
     nextTick(async () => {
-      // const rv = await opertaor.validateAll();
-      // if (!rv) {
-      //   ElMessage.error("存在未录入数据,请确认!");
-      //   return;
-      // }
+      const rv = await opertaor.validateAll();
+      if (!rv) {
+        ElMessage.error("存在未录入数据,请确认!");
+        return;
+      }
       btn.loading = true;
       console.log(opertaor.getTableRefByKey("plyBase").getFromValue());
       const base = opertaor.getTableRefByKey("plyBase").getFromValue();
