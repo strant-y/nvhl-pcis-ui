@@ -228,10 +228,10 @@ const method = {
       cComponentTable: cComponentTableValue,
       cAppNo: app,
     };
-    selectDist(selData).then((res) => {
+    selectDist(selData).then((res: any) => {
       if (res.code === 200) {
         pageresult.list = [];
-        pageresult.list = res.data;
+        pageresult.list = res.data.data;
         pageresult.list.forEach((item, index) => {
           item.nSeqNo = index + 1;
         });
@@ -304,18 +304,16 @@ function setUnDisabledByKeyList(key: any) {
       item.hidden = false;
     }
   });
-  console.log(key);
   // tableconfig.value.tableBtn?.forEach((item: any) => {
   //   if(item.id = key){
   //     item.hidden = false;
   //   }
   // });
-  formconfig11.value.editBtns?.forEach((item: any) => {
+  tableconfig.value.tableBtn?.forEach((item: any) => {
     if ("Btn_" + item.id === key) {
-      tableconfig.value.tableBtn?.push(item);
+      item.hidden = false;
     }
   });
-  console.log(tableconfig.value);
 }
 
 function getFormconfig() {

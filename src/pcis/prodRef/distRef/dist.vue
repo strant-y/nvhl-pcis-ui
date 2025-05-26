@@ -172,7 +172,7 @@ onMounted(async () => {
   tableconfig.value.tableBtnPosition = "right";
   if (formconfig11.value.editBtns && formconfig11.value.editBtns.length > 0) {
     let btns: any[] = [];
-    btns = formconfig11.value.editBtns.filter((btn: any) => !btn.hidden);
+    btns = formconfig11.value.editBtns;
     if (btns && btns.length > 0) {
       tableconfig.value.tableBtn = btns;
     }
@@ -293,10 +293,10 @@ const method = {
       cComponentTable: cComponentTableValue,
       cAppNo: app,
     };
-    selectDist(selData).then((res) => {
+    selectDist(selData).then((res: any) => {
       if (res.code === 200) {
         pageresult.list = [];
-        pageresult.list = res.data;
+        pageresult.list = res.data.data;
         pageresult.list.forEach((item, index) => {
           item.nSeqNo = index + 1;
           item.tOpeningTime = item['Dist.tOpeningTime']
@@ -498,9 +498,9 @@ function setUnDisabledByKeyList(key: any) {
   //     item.hidden = false;
   //   }
   // });
-  formconfig11.value.editBtns?.forEach((item: any) => {
+  tableconfig.value.tableBtn?.forEach((item: any) => {
     if ("Btn_" + item.id === key) {
-      tableconfig.value.tableBtn?.push(item);
+      item.hidden = false;
     }
   });
 }

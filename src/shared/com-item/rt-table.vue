@@ -198,7 +198,8 @@
       >
         <template #default="scope">
           <template v-for="(btn, index) in item.tableBtn" :key="index">
-            <template v-if="item.tableBtnType === 'text'">
+            <template v-if="btn.hidden !== true">
+              <template v-if="item.tableBtnType === 'text'">
               <a @click="btn.func ? btn.tableClick(scope.row) : () => {}">{{
                 btn.label
               }}</a>
@@ -242,6 +243,7 @@
               "
             >
               <el-divider direction="vertical" />
+            </template>
             </template>
           </template>
         </template>
