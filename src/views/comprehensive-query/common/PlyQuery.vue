@@ -1,4 +1,4 @@
-<!-- 产品组合出单查询 -->
+<!-- 综合查询-保单 -->
 <template>
   <div class="app-container">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
@@ -56,6 +56,7 @@ import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 import { getAppPolicyList, qryEndorseList, delTmpPolicy } from "@/api/query";
 // 变更列
 const colChange = defineAsyncComponent(() => import("../modal/colChange.vue"));
+const PrintView = defineAsyncComponent(() => import("../modal/PrintView.vue"))
 const params = route.query.data ? JSON.parse(route.query.data) : {};
 const props = defineProps({
   refreshData: {
@@ -933,6 +934,28 @@ const tableObj = {
                             }
                         });
                     });
+                },
+            }),
+            createFreeButtonBase({
+                id: "score",
+                link: true,
+                tooltip: "打印",
+                type: "primary",
+                size: "large",
+                icon: "Printer",
+                hideBtns: (row:any) => {
+                    if(row.cAppStatus == '5' || row.cAppStatus == '6') {
+                        return false
+                    } else {
+                        return true
+                    }
+                },
+                tableClick: (row) => {
+                  dzmodal
+                    .open(PrintView, { type: "edit", data: row })
+                    .then((res:any) => {
+
+                    })
                 },
             }),
         ],

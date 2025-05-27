@@ -108,6 +108,7 @@ onMounted(async () => {
       ],
     });
     setValue("Base.cIntroDptcde", param.cDptCde);
+    setValue("Base.cCiMrk", param.cCiMrk || "0");
   });
   //将联共保业务默认值设置为0并存到store中
   productStore.setcCiMrk("0");
