@@ -1,6 +1,8 @@
 <template>
-  <app-free-edit :freeEditConfig="formconfig1" ref="plyBaseEditRef" />
-  <comDialog ref="dialogRef"></comDialog>
+  <div>
+    <app-free-edit :freeEditConfig="formconfig1" ref="plyBaseEditRef" />
+    <comDialog ref="dialogRef"></comDialog>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -72,19 +74,17 @@ onMounted(async () => {
     //录单人 默认系统操作员..
     setValue("Base.cOprCde", user.userName);
     //录单人联系方式  默认操作员的
-    if(user.phoneNO !==null && user.phoneNO !==''){
+    if (user.phoneNO !== null && user.phoneNO !== "") {
       setValue("Base.cCiOprRel", user.phoneNO);
-    }else{
+    } else {
       setFormItem("Base.cCiOprRel", {
         readonly: false,
         rules: [getRules("phoneNo", {})],
       });
     }
 
-    // 
-    // setValue("Base.cCiOprRel", 123); 
-
-
+    //
+    // setValue("Base.cCiOprRel", 123);
 
     // 查询承保机构所属分公司和项目类别大类数据
     getCheckCdeptByCdptCde();
@@ -100,7 +100,7 @@ onMounted(async () => {
     // setFormItem("Base.cPolicySource", {disabled: true});
     setValue("Base.cDptCde", param.cDptCde);
     //联共保业务
-    setValue("Base.cCiMrk","0")
+    setValue("Base.cCiMrk", "0");
     // 服务机构默认值
     setFormItem("Base.cIntroDptcde", {
       loadData: [
@@ -110,7 +110,7 @@ onMounted(async () => {
     setValue("Base.cIntroDptcde", param.cDptCde);
   });
   //将联共保业务默认值设置为0并存到store中
-  productStore.setcCiMrk("0")
+  productStore.setcCiMrk("0");
   if (sessionStorage.getItem("toMyPageData")) {
     const data = JSON.parse(sessionStorage.getItem("toMyPageData"));
     if (data.pageType && data.pageType === "app") {
@@ -146,8 +146,8 @@ const method = {
     console.log(getRules);
   },
   //联共保下拉change
-  cCiMrkChange:(val)=>{
-    productStore.setcCiMrk(val)
+  cCiMrkChange: (val) => {
+    productStore.setcCiMrk(val);
   },
   //业务来源大类
   businessKindFunc: (val) => {
@@ -190,12 +190,15 @@ const method = {
           };
           setFormItem("Base.cBrkrCde", obj); //代理(经纪)人
           setFormItem("Base.cBrkSlsCde", obj); //代理业务员
-          setFormItem("Base.cAgtAgrNo", { rules: [] }); //代理合作协议
+          setFormItem("Base.cAgtAgrNo", { rules: null }); //代理合作协议
           if (!p.initFlag) {
             setValue("Base.cBrkrCde", "");
             setValue("Base.cBrkSlsCde", "");
             setValue("Base.cAgtAgrNo", "");
           }
+          nextTick(() => {
+            plyBaseEditRef.value?.clearValidate("Base.cBrkSlsCde");
+          });
         }
       });
     }
@@ -277,18 +280,16 @@ const method = {
             cBsnsTyp: getValue("Base.cBsnsTyp"), //业务来源大类
             cChaType: getValue("Base.cChaType"), //业务来源中类
             cChaSubtype: getValue("Base.cChaSubtype"), //业务来源子类
-            
           },
           method: {
             getSelected: (params) => {
               setFormItem("Base.cBrkrCde", {
-                loadData: [{ value: params.CChaCde, label: params.CChaNme}],
+                loadData: [{ value: params.CChaCde, label: params.CChaNme }],
               });
               setValue("Base.cBrkrCde", params.CChaNme);
               setValue("Base.cAgtAgrNo", params.CAgtAgrNo);
-              
-              console.log('回显----',params)
 
+              console.log("回显----", params);
 
               dialogRef.value?.handleClose();
             },
@@ -308,9 +309,9 @@ const method = {
   //代理业务员icon事件
   agentSaleFuncA: () => {
     console.log("代理业务员icon事件");
-    if(!getValue('Base.cBrkrCde')) {
-      ElMessage.warning('请先选择代理(经济)人！');
-      return
+    if (!getValue("Base.cBrkrCde")) {
+      ElMessage.warning("请先选择代理(经济)人！");
+      return;
     }
     let cslstyp = "";
     if (getValue("Base.cChaType") === "1900201") {
@@ -423,7 +424,6 @@ const method = {
               )
               .then((res) => {
                 if (res && res.code == 200) {
-                
                   const codeValData = res.data;
                   if (codeValData) {
                     setFormItem("Base.cIntroSalecde", {
@@ -478,7 +478,7 @@ const method = {
           // CDptCde: getValue("Base.CIntroDptcde"), //服务机构
         },
         method: {
-          getSelected: (params) => {    
+          getSelected: (params) => {
             setFormValue({
               "Base.cIntroSalecde": params.CSlsNme, //业务员员工号
             });
@@ -494,9 +494,8 @@ const method = {
                 false
               )
               .then((res) => {
-                console.log('业务员=-==',res)
+                console.log("业务员=-==", res);
                 if (res && res.code == 200) {
-          
                   const codeValData = res.data;
                   if (codeValData) {
                     // 服务机构业务员下拉和显示的值
@@ -507,7 +506,7 @@ const method = {
                   }
                 }
               });
-              dialogRef.value?.handleClose();
+            dialogRef.value?.handleClose();
           },
         },
       },
@@ -534,7 +533,6 @@ const method = {
   },
   //项目类别大类change事件
   cPrjCtgTypChange: (val) => {
-    console.log('类别',val)
     const p = opertaor.getParam();
     if (!p.initFlag) {
       setValue("Base.cPrjCtgMidTyp", "");
@@ -554,7 +552,10 @@ const method = {
         })
         .then((res) => {
           if (res) {
-            setFormItem("Base.cPrjCtgMidTyp", { loadData: res,     rules: [getRules("required", {})] });
+            setFormItem("Base.cPrjCtgMidTyp", {
+              loadData: res,
+              rules: [getRules("required", {})],
+            });
           }
         });
     }
@@ -681,17 +682,27 @@ function setFormItem(key: string, obj: Record<string, any>) {
       }
 
       // 清除已有属性再赋值，避免残留
-      const propsToCopy = ['rules', 'readonly', 'disabled', 'hidden', 'loadData', 'placeholder', 'filterable'];
-      propsToCopy.forEach(prop => {
+      const propsToCopy = [
+        "rules",
+        "readonly",
+        "disabled",
+        "hidden",
+        "loadData",
+        "placeholder",
+        "filterable",
+      ];
+      propsToCopy.forEach((prop) => {
         if (prop in obj) {
           item[prop] = obj[prop];
         }
       });
 
       // 其他非特定属性通过 assign 补充
-      const extraProps = Object.keys(obj).filter(k => !propsToCopy.includes(k) && k !== 'btnItems');
+      const extraProps = Object.keys(obj).filter(
+        (k) => !propsToCopy.includes(k) && k !== "btnItems"
+      );
       if (extraProps.length > 0) {
-        Object.assign(item, ...extraProps.map(k => ({ [k]: obj[k] })));
+        Object.assign(item, ...extraProps.map((k) => ({ [k]: obj[k] })));
       }
     }
   });
