@@ -945,7 +945,7 @@ const tableObj = {
                     if(row.cAppStatus == '5' || row.cAppStatus == '6') {
                         return false
                     } else {
-                        return false
+                        return true
                     }
                 },
                 tableClick: (row) => {
