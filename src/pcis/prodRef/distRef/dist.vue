@@ -170,6 +170,7 @@ onMounted(async () => {
   tableconfig.value.tableBtnType = "btn";
   tableconfig.value.tableBtnWidth = 150;
   tableconfig.value.tableBtnPosition = "right";
+    tableconfig.value.isPage = false;
   if (formconfig11.value.editBtns && formconfig11.value.editBtns.length > 0) {
     let btns: any[] = [];
     btns = formconfig11.value.editBtns;
@@ -281,20 +282,21 @@ const method = {
     selectDist(selData).then((res: any) => {
       if (res.code === 200) {
         pageresult.list = [];
-          pageresult.list = res.data.data.map((item, index) => {
-              return{
-                  ... item,
-                  ... {
-                      nSeqNo: index + 1,
-                      tOpeningTime: item['Dist.tOpeningTime']
-                          ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
-                          : "",
-                      'Dist.AllOccup': [
-                          item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
-                      ],
-                  }
-              };
-          });
+        pageresult.total = res.data.total;
+        pageresult.list = res.data.data.map((item, index) => {
+          return{
+              ... item,
+              ... {
+                  nSeqNo: index + 1,
+                  tOpeningTime: item['Dist.tOpeningTime']
+                      ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
+                      : "",
+                  'Dist.AllOccup': [
+                      item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
+                  ],
+              }
+          };
+        });
         if(tgtRef !=undefined){
           tgtRef.setValue("Tgt.nElevatorsNumber",res.data.length)
         }
