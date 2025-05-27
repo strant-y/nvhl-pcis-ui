@@ -163,7 +163,7 @@ const pageresult = reactive<Pageresult>({
 });
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
-    isPage: 'false',
+    isPage: true,
     tableBtnType: "btn",
     tableBtnWidth: 220,
     tableBtnPosition: "right",

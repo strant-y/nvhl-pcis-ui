@@ -126,7 +126,6 @@ const tableconfig = reactive<AppTableConfig>(
       }),
     ],
     tableBtnType: "btn",
-    isPage: false,
     tableBtnWidth: 220,
     tableBtnPosition: "right",
     tableBtn: [
