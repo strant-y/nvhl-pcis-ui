@@ -1309,10 +1309,16 @@ const calcPremium = () => {
       opertaor.setDataAll(ops);
       nAmt.value = ops["base"]["Base.nAmt"]?ops["base"]["Base.nAmt"]:0;
       nPrm.value = ops["base"]["Base.nPrm"]?ops["base"]["Base.nPrm"]:0;
-      const nPrmVal = ops["base"]["Base.nPrm"]
-      const nAmtVal = ops["base"]["Base.nAmt"]
+      const nPrmVal = ops["base"]["Base.nPrm"];
+      const nAmtVal = ops["base"]["Base.nAmt"];
       productStore.setnPrm(nPrmVal);
-      productstore.setnAmt(nAmtVal);
+      productStore.setnAmt(nAmtVal);
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntAmt", nAmt.value);
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntAmt", nAmt.value);
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntPrm", nPrm.value);
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm", nPrm.value);
+      opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnAmt", nAmt.value);
+      opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnPrm", nPrm.value);
       const payInfo = setPayInfo(ops["base"], ops["applicant"], ops["insrnc"]);
       console.log("生成缴费计划内容", payInfo);
       opertaor.getTableRefs()["payinfo"].setFormValue(payInfo);
