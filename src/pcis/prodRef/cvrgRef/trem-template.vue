@@ -1,7 +1,7 @@
 <template>
   <div>
-    <el-card class="cvrg-info">
-      <el-form ref="templateRef" :model="termdata" :inline-message="true">
+    <el-form ref="templateRef" :model="termdata" :inline-message="true">
+      <el-card class="cvrg-info">
         <template #header>
           <div class="cvrg-hearder">
             <el-row>
@@ -153,105 +153,119 @@
                 </thead>
                 <tbody>
                   <template v-if="groupconf[ginfo.cGroupId]">
-                      <template
-                        v-for="(riskdata, k, ri) in groupconf[ginfo.cGroupId]
-                          .riskList"
-                        :key="k"
-                      >
-                        <template v-if="riskdata.maxNum > 0">
-                          <tr
-                            v-for="n in riskdata.maxNum"
-                            :key="`${ginfo.cGroupId}-${k}-${n}`"
+                    <template
+                      v-for="(riskdata, k, ri) in groupconf[ginfo.cGroupId]
+                        .riskList"
+                      :key="k"
+                    >
+                      <template v-if="riskdata.maxNum > 0">
+                        <tr
+                          v-for="n in riskdata.maxNum"
+                          :key="`${ginfo.cGroupId}-${k}-${n}`"
+                        >
+                          <template
+                            v-for="colinfo in riskdata.col"
+                            :key="`${ginfo.cGroupId}-${k}-${n}-${colinfo.cColId}`"
                           >
                             <template
-                              v-for="colinfo in riskdata.col"
-                              :key="`${ginfo.cGroupId}-${k}-${n}-${colinfo.cColId}`"
+                              v-if="
+                                riskdata.rowConfig[colinfo.cColId] &&
+                                riskdata.rowConfig[colinfo.cColId][n - 1]
+                              "
                             >
-                              <template
-                                v-if="
-                                  riskdata.rowConfig[colinfo.cColId] &&
+                              <td
+                                :rowspan="
                                   riskdata.rowConfig[colinfo.cColId][n - 1]
+                                    ?.cPorpType === 'rowspan'
+                                    ? riskdata.maxNum
+                                    : null
                                 "
                               >
-                                <td
-                                  :rowspan="
+                                <template
+                                  v-if="
                                     riskdata.rowConfig[colinfo.cColId][n - 1]
-                                      ?.cPorpType === 'rowspan'
-                                      ? riskdata.maxNum
-                                      : null
+                                      .cPorpType === 'text'
                                   "
                                 >
-                                  <template
-                                    v-if="
+                                  <span
+                                    >{{
                                       riskdata.rowConfig[colinfo.cColId][n - 1]
-                                        .cPorpType === 'text'
-                                    "
-                                  >
-                                    <span
-                                      >{{
+                                        .factorItem.title
+                                    }}
+                                  </span>
+                                </template>
+                                <template v-else>
+                                  <el-form-item
+                                    :error="
+                                      showError(
                                         riskdata.rowConfig[colinfo.cColId][
                                           n - 1
-                                        ].factorItem.title
-                                      }}
-                                    </span>
-                                  </template>
-                                  <template v-else>
-                                    <el-form-item :error="showError(riskdata.rowConfig[colinfo.cColId][n - 1],
-                                    riskList[
-                                      riskdata.rowConfig[colinfo.cColId][n - 1].cRiskNo]
-                                      [riskdata.rowConfig[colinfo.cColId][n - 1].factorItem?.prop]
-                                      )" >
-                                      <from-item
-                                        v-model="
-                                          riskList[
-                                            riskdata.rowConfig[colinfo.cColId][n - 1].cRiskNo]
-                                            [riskdata.rowConfig[colinfo.cColId][n - 1].factorItem?.prop
-                                          ]
-                                        "
-                                        @update:modelValue="update()"
-                                        :item="
+                                        ],
+                                        riskList[
                                           riskdata.rowConfig[colinfo.cColId][
                                             n - 1
-                                          ].factorItem
-                                        "
-                                      />
-                                    </el-form-item>
-                                  </template>
-                                </td>
-                              </template>
-                            </template>
-                            <template v-if="n === 1 && ri === 0">
-                              <template
-                                v-for="v in extermConf"
-                                :key="v.c_pk_id"
-                              >
-                                <td :rowspan="groupconf[ginfo.cGroupId].sumMax">
-                                  <el-form-item
-                                    :rules="
-                                      v.required ? getRequired() : undefined
+                                          ].cRiskNo
+                                        ][
+                                          riskdata.rowConfig[colinfo.cColId][
+                                            n - 1
+                                          ].factorItem?.prop
+                                        ]
+                                      )
                                     "
-                                    :prop="v.prop"
                                   >
                                     <from-item
-                                      v-model="termdata[v.prop]"
+                                      v-model="
+                                        riskList[
+                                          riskdata.rowConfig[colinfo.cColId][
+                                            n - 1
+                                          ].cRiskNo
+                                        ][
+                                          riskdata.rowConfig[colinfo.cColId][
+                                            n - 1
+                                          ].factorItem?.prop
+                                        ]
+                                      "
                                       @update:modelValue="update()"
-                                      :item="v"
+                                      :item="
+                                        riskdata.rowConfig[colinfo.cColId][
+                                          n - 1
+                                        ].factorItem
+                                      "
                                     />
                                   </el-form-item>
-                                </td>
-                              </template>
+                                </template>
+                              </td>
                             </template>
-                          </tr>
-                        </template>
+                          </template>
+                          <template v-if="n === 1 && ri === 0">
+                            <template v-for="v in extermConf" :key="v.c_pk_id">
+                              <td :rowspan="groupconf[ginfo.cGroupId].sumMax">
+                                <el-form-item
+                                  :rules="
+                                    v.required ? getRequired() : undefined
+                                  "
+                                  :prop="v.prop"
+                                >
+                                  <from-item
+                                    v-model="termdata[v.prop]"
+                                    @update:modelValue="update()"
+                                    :item="v"
+                                  />
+                                </el-form-item>
+                              </td>
+                            </template>
+                          </template>
+                        </tr>
                       </template>
                     </template>
+                  </template>
                 </tbody>
               </table>
             </el-row>
           </template>
         </div>
-      </el-form>
-    </el-card>
+      </el-card>
+    </el-form>
   </div>
 </template>
 
@@ -384,7 +398,7 @@ function getRequired() {
 const showData = ref(true);
 const showRiskInfo = ref(true);
 const foldRiskInfo = ref(true);
-const showRequried  = ref(false);
+const showRequried = ref(false);
 
 function getColinfo(groupId: string) {
   return colInfo.value.filter((v: any) => v.cGroupId === groupId);
@@ -666,10 +680,10 @@ function exChangeFunc() {
   }
 }
 
-function showError(conf: any,value: any) {
-  if(conf['cPorpRequired'] === '1'){
-    if((value ===null || value === undefined) && showRequried.value){
-      return '该项为必填项'; 
+function showError(conf: any, value: any) {
+  if (conf["cPorpRequired"] === "1") {
+    if ((value === null || value === undefined) && showRequried.value) {
+      return "该项为必填项";
     }
   }
   return null;
@@ -677,30 +691,30 @@ function showError(conf: any,value: any) {
 async function validate() {
   // 进行责任验证
   let validate = true;
-  collist.value?.forEach((col:any)=>{
+  collist.value?.forEach((col: any) => {
     const fact = factormap.value[col["cFactorId"]];
-    const v = riskList.value[col['cRiskNo']][fact['prop']];
-    if(col['cPorpRequired'] === '1'){
-      if(v === '' || v === null || v === undefined){
+    const v = riskList.value[col["cRiskNo"]][fact["prop"]];
+    if (col["cPorpRequired"] === "1") {
+      if (v === "" || v === null || v === undefined) {
         validate = false;
       }
     }
   });
-  
-  if(!validate){
+
+  if (!validate) {
     showRequried.value = true;
-  }else{
+  } else {
     showRequried.value = false;
   }
   // 进行条款数据验证
   const p: Promise<any> = new Promise((resolve) => {
-    templateRef.value.validate((valid: boolean, fields: any)=>{
+    templateRef.value.validate((valid: boolean, fields: any) => {
       if (valid) {
-      resolve(true);
-    } else {
-      resolve(fields);
-    }
-    })
+        resolve(true);
+      } else {
+        resolve(fields);
+      }
+    });
   });
 
   const res = await p;
