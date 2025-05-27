@@ -23,6 +23,9 @@ import { AppTableConfig, AppTableMethod, createTableEditConfig } from '@/shared/
 import { useDzModal } from '@/common/dzmodel/DzModalService'
 import { SCENE_PLY_APP_READ } from '@/constants/tab-constants'
 import { PcisQueryService } from '@/views/payinfoManagement/service/pcis-query-service'
+import { rsaEncoder, base64encoder } from '@/utils/encipher'
+// @ts-ignore
+import { saveAs } from 'file-saver'
 const pcisQueryService = new PcisQueryService()
 const userStore = useUserStore()
 const user = ref(userStore.user) || ref({ companyId: '', opCde: '' })
@@ -49,7 +52,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             }),
             createFreeButtonBase({
                 label: '下载电子保单',
-                func: () => {}
+                func: () => {
+                    downloadEPolicy()
+                }
             }),
             createFreeButtonBase({
                 type: 'primary',
@@ -506,6 +511,39 @@ function createEPolicy() {
             } else {
                 ElMessage.warning(msg)
             }
+        })
+        .finally(() => {})
+}
+
+/**
+ * 下载电子保单
+ */
+function downloadEPolicy() {
+    const plyTyp = freeEditRef.value?.getValue('CPlyTyp')
+    if (plyTyp == null || plyTyp == undefined) {
+        ElMessage.warning('请选择单证类型!')
+        return
+    }
+    const selectData = tableRef.value?.getselectionData()
+    if (!selectData || selectData.length <= 0) {
+        ElMessage.warning('所选记录为空！')
+        return
+    }
+    if (selectData.length > 1) {
+        ElMessage.warning('每次只能下载1个单据！')
+        return
+    }
+    const plyNo = selectData.cPlyNo
+    const data = {
+        plyNo: base64encoder(rsaEncoder(plyNo)),
+        type: 'EXP_EPOLICY_IMP_PDF',
+        impType: plyTyp
+    }
+    pcisQueryService
+        .downloadEPolicy(data)
+        .then((res: any) => {
+            const fileName = `${plyNo}.pdf`
+            saveAs(res, decodeURI(fileName))
         })
         .finally(() => {})
 }

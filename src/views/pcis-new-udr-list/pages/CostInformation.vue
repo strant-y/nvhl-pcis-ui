@@ -210,7 +210,7 @@ const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     title: "费用信息",
     editFlag: true,
-    isPage: "false",
+    isPage: true,
     editList: ["nFeeProp","nFee","cFeeFlag"],
     fromSchema: [
       {
@@ -254,7 +254,7 @@ const tableconfig1 = reactive<AppTableConfig>(
   createTableEditConfig({
     title: "更改比较",
     editFlag: true,
-    isPage: "false",
+    isPage: true,
     fromSchema: [
       {
         prop: "nSeqNo",

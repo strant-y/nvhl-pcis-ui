@@ -177,6 +177,7 @@ onMounted(async () => {
       tableconfig.value.tableBtn = btns;
     }
   }
+  tableconfig.value.isPage = true;
   // 初始化 cComponentTableValue
   cComponentTableValue = getCComponentTableValue(
     route.params.param.cProdNo,
@@ -217,6 +218,7 @@ const method = {
         fromSchema: tableconfig.value.fromSchema,
         title: "编辑",
         rowData: row,
+          tab: formconfig1.value.title
       },
       {
         isOk: (res: any) => {},
@@ -280,13 +282,20 @@ const method = {
     selectDist(selData).then((res: any) => {
       if (res.code === 200) {
         pageresult.list = [];
-        pageresult.list = res.data.data;
-        pageresult.list.forEach((item, index) => {
-          item.nSeqNo = index + 1;
-          item.tOpeningTime = item['Dist.tOpeningTime']
-            ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
-            : "";
-        });
+          pageresult.list = res.data.data.map((item, index) => {
+              return{
+                  ... item,
+                  ... {
+                      nSeqNo: index + 1,
+                      tOpeningTime: item['Dist.tOpeningTime']
+                          ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
+                          : "",
+                      'Dist.AllOccup': [
+                          item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
+                      ],
+                  }
+              };
+          });
         if(tgtRef !=undefined){
           tgtRef.setValue("Tgt.nElevatorsNumber",res.data.length)
         }

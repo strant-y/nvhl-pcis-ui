@@ -9,10 +9,10 @@ const encryptByMD5 = (data: string): string => {
   const res = Md5.hashStr(data);
   return res.toString();
 };
-const base64encoder = (Context): any => {
+export const base64encoder = (Context): any => {
   return fromByteArray(new TextEncoder().encode(Context));
 };
-const encryptParameter = (Context) => {
+export const encryptParameter = (Context) => {
   return base64encoder(Context);
 };
 export const rsaEncoder = (Context): any => {

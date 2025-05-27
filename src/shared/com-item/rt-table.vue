@@ -42,6 +42,7 @@
             <template v-for="(i, index) in getfromSchema()" :key="index">
               <el-col
                 :span="i.itemWidth ? i.itemWidth * formUi.span : formUi.span"
+                style="margin-top: 5px;"
               >
                 <el-form-item
                   :prop="[props.$index, i.prop]"

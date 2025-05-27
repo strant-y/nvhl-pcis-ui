@@ -273,6 +273,8 @@
 </template>
 
 <script setup lang="ts">
+import { FormInstance } from 'element-plus';
+
 defineOptions({
   name: "DynamicForms",
   inheritAttrs: false,
@@ -283,7 +285,7 @@ interface GroupItem {
   disabled: boolean;
 }
 
-const fromRef = ref("fromRef");
+const fromRef = ref<FormInstance>();
 const fromListRef = ref("fromListRef");
 const props = defineProps({
   fromSchema: {
@@ -378,7 +380,7 @@ function setPopover(v: any, item: any) {
 }
 
 async function validate() {
-  const promise = await fromRef.value.validate((valid, fields) => {
+  const promise = await fromRef.value?.validate((valid, fields) => {
     if (valid) {
       console.log("submit!");
     } else {
@@ -398,14 +400,15 @@ async function validate() {
 }
 
 //只清空报错信息
-function clearValidate(key) {
-  key ? fromRef.value.clearValidate(key) : fromRef.value.clearValidate();
+function clearValidate(key: string) {
+  key ? fromRef.value?.clearValidate(key) : null;
 }
 
 //初始化值和清空报错信息
 function resetFields() {
-  fromRef.value.resetFields();
+  fromRef.value?.resetFields();
 }
+
 
 function getFromValue() {
   const redata = JSON.parse(JSON.stringify(form));
