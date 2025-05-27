@@ -177,6 +177,7 @@ onMounted(async () => {
       tableconfig.value.tableBtn = btns;
     }
   }
+  tableconfig.value.isPage = true;
   // 初始化 cComponentTableValue
   cComponentTableValue = getCComponentTableValue(
     route.params.param.cProdNo,

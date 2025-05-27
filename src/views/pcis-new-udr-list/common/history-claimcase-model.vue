@@ -145,7 +145,7 @@ setTimeout(() => {
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
-    isPage: "false",
+    isPage: true,
     showSelection: false,
     tableBtnType: "btn",
     tableBtnWidth: 110,
@@ -207,7 +207,7 @@ const pageresult1 = reactive<Pageresult>({
 });
 const tableconfig1 = reactive<AppTableConfig>(
   createTableEditConfig({
-    isPage: "false",
+    isPage: true,
     showSelection: false,
     titleBtns: [
       createFreeButtonBase({
@@ -316,7 +316,7 @@ const pageresult2 = reactive<Pageresult>({
 
 const tableconfig2 = reactive<AppTableConfig>(
   createTableEditConfig({
-    isPage: "false",
+    isPage: true,
     showSelection: false,
     titleBtns: [
       createFreeButtonBase({

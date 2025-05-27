@@ -77,7 +77,7 @@ export function createTableEditConfig(
     dragFlag: config.dragFlag || false,
     editFlag: config.editFlag || false,
     editList: config.editList || [],
-    isPage: config.isPage,
+    isPage: config.isPage || false,
     fromUi: createTableUiConfig(config.fromUi),
     showSelection: config.showSelection || false,
     showEdit: config.showEdit || false,
