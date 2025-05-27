@@ -140,6 +140,10 @@ const method = {
         setTimeout(() => {
           setValue("Insured.cCertfCls", applicantValue[k]);
         }, 0);
+      } else if (k === "Applicant.cAppCde") {
+        insuredValue["Insured.cInsuredCde"] = applicantValue[k];
+      } else if (k === "Applicant.cAppNme") {
+        insuredValue["Insured.cInsuredNme"] = applicantValue[k];
       } else if (k.startsWith("Applicant")) {
         const nk = k.replace("Applicant", "Insured");
         insuredValue[nk] = applicantValue[k];
