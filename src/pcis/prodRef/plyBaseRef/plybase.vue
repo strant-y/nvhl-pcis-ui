@@ -216,6 +216,32 @@ const method = {
         flag: 1,
         scene: "PLY_APP_NEW_SCENE",
       };
+      if (val === "1900201") {
+        //个人代理
+        const obj = {
+          rules: null,
+          btnItems: {
+            disabled: true,
+          },
+        };
+        if (!p.initFlag) {
+          setFormItem("Base.cSlsId", obj); //业务员工号
+        }
+        setFormItem("Base.cSlsId", {rules: null}); //业务员工号
+        setValue("Base.cSlsId", "");
+      } else {
+        const obj = {
+          rules: [getRules("required", {})],
+          btnItems: {
+            disabled: false,
+          },
+        };
+        if (!p.initFlag) {
+          setFormItem("Base.cSlsId", obj); //业务员工号
+        }
+        setFormItem("Base.cSlsId", {rules: [getRules("required", {})]}); //业务员工号
+      }
+
       getChaSubtypList(params).then((res) => {
         if (null != res && null != res["code"]) {
           if (res["code"] === 200) {
@@ -224,27 +250,6 @@ const method = {
             };
             setFormItem("Base.cChaSubtype", obj);
           }
-        }
-      });
-      nextTick(() => {
-        if (val === "1900201") {
-          //个人代理
-          const obj = {
-            rules: null,
-            btnItems: {
-              disabled: true,
-            },
-          };
-          setFormItem("Base.cSlsId", obj); //业务员工号
-          setValue("Base.cSlsId", "");
-        } else {
-          const obj = {
-            rules: [getRules("required", {})],
-            btnItems: {
-              disabled: false,
-            },
-          };
-          setFormItem("Base.cSlsId", obj); //业务员工号
         }
       });
     }
