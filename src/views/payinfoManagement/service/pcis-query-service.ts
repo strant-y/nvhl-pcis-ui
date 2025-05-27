@@ -640,4 +640,12 @@ export class PcisQueryService {
     qryHistoryClaimDetail(ops: any): AxiosPromise<any> {
         return post(`${this.HistoryClaimDetail}`,ops)
     }
+    // 单据打印 根据单号查询详情接口
+    getAppPolicy(ops: any): AxiosPromise<any> {
+        return post(`policy/getAppPolicy`, ops);
+    }
+    // 获取投保险种
+    getCvrgByAppNo(ops: any): AxiosPromise<any> {
+        return post(`policy/getCvrgByAppNo`, ops);
+    }
 }

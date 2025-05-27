@@ -10,6 +10,8 @@ export const useProductStore = defineStore('product', () => {
     const cIsSingle = ref('1'); //是否单项工程，默认值：是
     const cClntMrk = ref('1'); //投保人性质
     const cCiMrk = ref('0'); //联共保业务
+    const nPrm = ref("0.00");
+    const nAmt = ref("0.00");
 
     const isCiJiMrk = computed(()=> cCiMrk.value !== '0');
 
@@ -22,6 +24,13 @@ export const useProductStore = defineStore('product', () => {
     function setcCiMrk(newVal){
         cCiMrk.value = newVal
     }
+    function setnPrm(newVal) {
+    nPrm.value = newVal;
+    }
+
+    function setnAmt(newVal) {
+        nAmt.value = newVal;
+    }
 
     function checkCiMrk(){
         return cCiMrk.value !== '0';
@@ -32,6 +41,10 @@ export const useProductStore = defineStore('product', () => {
         setCIsSingle,
         setcClntMrk,
         setcCiMrk,
-        checkCiMrk
+        checkCiMrk,
+        setnAmt,
+        setnPrm,
+        nPrm,
+        nAmt,
     }
 })

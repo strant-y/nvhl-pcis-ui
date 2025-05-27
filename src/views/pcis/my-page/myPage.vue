@@ -188,6 +188,7 @@
               "
               :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
               :pageSchema="k.pageSchema"
+              @updateSide="handleUpdateSide"
             />
           </div>
         </template>
@@ -307,6 +308,7 @@ const invoiceRef = ref(null);
 const amlInfoRef = ref(null);
 
 const historyClaRef = ref(null);
+const sliceSide = ref([])
 
 const props = defineProps({
   param: {
@@ -1303,9 +1305,20 @@ const calcPremium = () => {
       } else {
         ElMessage.success(res.msg + "保费为：0");
       }
+      
       opertaor.setDataAll(ops);
       nAmt.value = ops["base"]["Base.nAmt"]?ops["base"]["Base.nAmt"]:0;
       nPrm.value = ops["base"]["Base.nPrm"]?ops["base"]["Base.nPrm"]:0;
+      const nPrmVal = ops["base"]["Base.nPrm"];
+      const nAmtVal = ops["base"]["Base.nAmt"];
+      productStore.setnPrm(nPrmVal);
+      productStore.setnAmt(nAmtVal);
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntAmt", nAmt.value);
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntAmt", nAmt.value);
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntPrm", nPrm.value);
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm", nPrm.value);
+      opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnAmt", nAmt.value);
+      opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnPrm", nPrm.value);
       const payInfo = setPayInfo(ops["base"], ops["applicant"], ops["insrnc"]);
       console.log("生成缴费计划内容", payInfo);
       opertaor.getTableRefs()["payinfo"].setFormValue(payInfo);
@@ -1952,6 +1965,21 @@ function checkNAmt() {
     }
   }
   return true;
+}
+// 联共保业务
+function handleUpdateSide(data:any) {
+  if(data === "0") {// 非共保业务
+    sliceSide.value = formconfig1[0].pageInfo.filter((item:any) => {
+      return item.pageKey === "ciMasterAgreement" || item.pageKey === "ci" || item.pageKey === "ourCompanyCiShare"
+    })
+    formconfig1[0].pageInfo = formconfig1[0].pageInfo.filter((item:any) => {
+      return item.pageKey !== "ciMasterAgreement" && item.pageKey !== "ci" && item.pageKey !== "ourCompanyCiShare"
+    })
+  } else if(sliceSide.value.length > 0) {
+    const index = formconfig1[0].pageInfo.findIndex((item:any) => item.pageKey === "image") + 1;
+    formconfig1[0].pageInfo.splice(index, 0, ...sliceSide.value)
+    sliceSide.value = []
+  }
 }
 
 opertaor.setFatherPage({

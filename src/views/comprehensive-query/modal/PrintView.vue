@@ -1,41 +1,21 @@
 <!-- 综合查询-单据打印 -->
 <template>
-  <el-dialog v-model="dialogVisible" width="90%" title="单据打印">
+  <el-dialog v-model="dialogVisible" width="800px" title="单据打印">
     <div>
       <app-free-edit
         v-model:freeEditConfig="formconfig1"
         ref="freeEditRef"
         @update-datas="fromUpdata"
       />
-      <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
-        <rt-button
-          :item="{
-            type: 'primary',
-            label: '保存',
-            disabled: true,
-            func: () => {
-              save();
-            },
-          }"
-        />
-      </div>
     </div>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
 import { useValidator } from "@/typings/useValidator";
-import { yesOrNo, size, inputtype, typeMap, dateType } from "@/utils/utilKey";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { ref, defineProps, defineEmits, onMounted } from "vue";
 import { createFreeButtonBase } from "@/shared/button-config";
-import {
-  getButtonByFacKey,
-  getFactorList,
-  getInputGroupList,
-  saveFactor,
-  saveKindInfo,
-} from "@/api/prod";
 import {
   AppFreeEditConfig,
   AppFreeEditMethod,
@@ -57,7 +37,9 @@ import { v4 as uuidv4 } from "uuid";
 const jsonArrayEdit = defineAsyncComponent(
   () => import("@/common/dzmodel/jsonArrayEdit.vue")
 );
+import { PcisQueryService } from "@/views/payinfoManagement/service/pcis-query-service";
 
+const pcisQueryService = new PcisQueryService();
 const showBtnConfig = ref(false);
 const dialogVisible = ref(true);
 const showView = ref(false);
@@ -68,6 +50,7 @@ const freeLookRef = ref<AppFreeEditMethod | null>(null);
 const freeEditRefBtn = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<MyTableMethod | null>(null);
 const appTableShow = ref(false);
+const user = JSON.parse(sessionStorage.getItem("user") || "{}");
 
 function fromUpdata(newData: any) {
   const jsonObj = getFrom();
@@ -98,6 +81,12 @@ function fromUpdata(newData: any) {
 const schemaMap = reactive<Record<string, any>>({
   rtinputgroup: [],
 });
+const cPrnTypeLoadData = ref([]);
+const isflag = ref(false); // 是否有服务卡险别
+const _PrnTemplate = ref<any>(null); // 打印模板
+const CResId = ref<string | null>(null); // 打印模板资源ID
+const flag = ref(false); // 服务卡销号
+const flagCancle = ref(false); // 撤销服务卡销号
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -105,72 +94,232 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     endBtns: [
       createFreeButtonBase({
         type: "primary",
-        label: "预览打印",
+        label: "预览",
         func: async () => {
-          
+          const formData = freeEditRef.value?.getFromValue();
+          // if (flag.value) {
+          //   if (formData.cPrnType === "P") {
+          //     checkUseCard();
+          //   }
+          //   if (formData.cPrnType === "E") {
+          //     checkEdrCard();
+          //   }
+          // } else if (flagCancle.value) {
+          //   checkEdrCard();
+          // } else {
+          //   smartbipreview();
+          // }
+          smartbipreview();
         },
       }),
     ],
     fromSchema: [
       {
-        prop: "CPrnType",
+        prop: "cPrnType",
         inputtype: "rtselect",
         title: "单据类型",
         rules: [getRules("required", {})],
-        typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "use_mrk" },
+        loadData: cPrnTypeLoadData.value,
+        itemWidth: 3,
+        func: (value: any) => {
+          setPrnTemplate();
+          const CPrnNo = freeEditRef.value?.getValue("cPrnNo");
+          const CPlyType = freeEditRef.value?.getValue("cPlyType");
+          if (!!CPrnNo) {
+            freeEditRef.value?.setValue("cPrnNo", "");
+          }
+          if (!!CPlyType) {
+            freeEditRef.value?.setValue("cPlyType", "");
+          }
+          /*服务卡号使用条件限定：
+              1.单据大类必须为保单（前台校验即可）
+              2.产品必须为060030
+              3.保单不能为重打
+              4.不能为从联单
+              5.使用机构必须为“永安保险盘龙营销服务部 0253350000000”并且
+              投保人必须为“昆明公交集团有限责任公司“或”昆明公交城乡巴士有限责任公司“。*/
+          if (
+            "060030" === props.data?.cProdNo &&
+            "025335000" === user.companyId.substring(0, 9) &&
+            props.data?.cCiMrk !== "6" &&
+            "1" === props.data?.cGrpMrk &&
+            ("昆明公交集团有限责任公司" === props.data?.cAppNme ||
+              "昆明公交城乡巴士有限责任公司" === props.data?.cAppNme)
+          ) {
+            if ("P" === value) {
+              // 服务卡销号开始
+              flag.value = true;
+              // 服务卡结束
+            } else if ("E" === value) {
+              if (
+                props.data?.cEdrRsnBundleCde === "Z1" ||
+                props.data?.cEdrRsnBundleCde === "22"
+              ) {
+                flag.value = true;
+              }
+              if (
+                props.data?.cEdrRsnBundleCde === "J1" ||
+                props.data?.cEdrRsnBundleCde === "22"
+              ) {
+                //撤销服务卡销号开始
+                flagCancle.value = true;
+                //撤销服务卡销号结束
+              }
+            }
+          } else {
+            flag.value = false;
+            flagCancle.value = false;
+          }
+          check060024FlagCancle(value);
+        },
       },
       {
-        prop: "CAppNo",
+        prop: "cAppNo",
         inputtype: "rtinput",
         title: "投保(批改申请)单号",
+        rules: [getRules("required", {})],
+        itemWidth: 3,
+        disabled: true,
       },
       {
-        prop: "CPlyNo",
+        prop: "cPlyNo",
         inputtype: "rtinput",
         title: "保(批)单号",
+        rules: [getRules("required", {})],
+        itemWidth: 3,
+        disabled: true,
       },
       {
-        prop: "CAppNme",
+        prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人",
+        itemWidth: 3,
+        disabled: true,
       },
       {
-        prop: "CPrnFmp",
-        inputtype: "rtinput",
+        prop: "cPrnFmp",
+        inputtype: "rtselect",
         title: "打印模板",
+        loadData: [],
+        itemWidth: 3,
+        func: (value: any) => {
+          if (!!value) {
+            debugger
+            const CPrnNo = freeEditRef.value?.getValue("cPrnNo");
+            if (!!CPrnNo) {
+              freeEditRef.value?.setValue("cPrnNo", "");
+            }
+            if (!!freeEditRef.value?.getValue("cPlyType")) {
+              freeEditRef.value?.setValue("cPlyType", "");
+            }
+            const CFmpType = _PrnTemplate.value[value]?.cFmpType;
+            if (
+              CFmpType === "2" &&
+              freeEditRef.value?.getValue("cPrnType") === "P"
+            ) {
+              setFormItem("cPlyType", {
+                title: "保单类型",
+                type: "radio",
+                rules: [getRules("required", {})],
+              });
+            } else {
+              setFormItem("cPlyType", {
+                title: null,
+                hidden: true,
+                rules: [],
+              });
+            }
+            CResId.value = _PrnTemplate.value[value].cResId;
+          } else {
+            setFormItem("cPlyType", {
+              title: null,
+              hidden: true,
+              rules: [],
+            });
+          }
+        },
       },
       {
-        prop: "CPrnNo",
+        prop: "cPrnNo",
         inputtype: "rtinput",
         title: "印刷号",
+        itemWidth: 3,
+        showExBtn: true,
+        btnWidth: 30,
+        btnItems: {
+          label: "获取最小印刷号",
+          type: "plain",
+          func: () => {
+            const formData = freeEditRef.value?.getFromValue();
+            if (!formData.cPrnType) {
+              ElMessage.error("请选择单据类型");
+              return;
+            }
+            if (!formData.cPrnFmp) {
+              ElMessage.error("请选择打印模板");
+              return;
+            }
+            const param = {
+              CDptCde: user.companyId,
+              CProdNo: props.data?.cProdNo,
+              COperId: user.opCde,
+              CPrnFmp: formData.cPrnFmp,
+              CPrnType: formData.cPrnType,
+            };
+            pcisQueryService
+              .getMinPrnNo(param)
+              .then((res: any) => {
+                if (res.data) {
+                  freeEditRef.value?.setValue("cPrnNo", res.data);
+                } else {
+                  ElMessage.error(res.msg);
+                }
+              })
+              .catch((err) => {
+                ElMessage.error(err);
+              });
+          },
+        },
       },
       {
-        prop: "CPrnTarget",
+        prop: "cPrnTarget",
         inputtype: "rtselect",
         title: "打印目的",
         loadData: [
-          { value: 0, label: '打印正本' },
-          { value: 1, label: '打印副本' },
-          { value: 2, label: '打印抄件' },
-        ]
+          { value: "0", label: "打印正本" },
+          { value: "1", label: "打印副本" },
+          { value: "2", label: "打印抄件" },
+        ],
+        defaultValue: "0",
+        disabled: true,
+        itemWidth: 3,
       },
       {
-        prop: "CLanguage",
+        prop: "cLanguage",
         inputtype: "rtradio",
         title: "打印格式",
-        loadData :[
-          { label:'中文',value:'C' },
-        ]
+        loadData: [{ label: "中文", value: "C" }],
+        rules: [getRules("required", {})],
+        defaultValue: "C",
+        itemWidth: 3,
       },
       {
-        prop: "CPlyType",
+        prop: "cPlyType",
         inputtype: "rtradio",
         title: "保单类型",
-        loadData :[
-          { label:'原始保单',value:'0' },
-          { label:'最新保单',value:'1' },
-        ]
+        loadData: [
+          { label: "原始保单", value: "0" },
+          { label: "最新保单", value: "1" },
+        ],
+        itemWidth: 3,
+      },
+      {
+        prop: "nEdrPrjNo",
+        inputtype: "rtinput",
+        title: "cEdrPrjNo",
+        itemWidth: 3,
+        defaultValue: '0',
+        hidden: true
       },
     ],
     showSuperior: true,
@@ -179,10 +328,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 );
 
 onMounted(async () => {
-  if (props.type === "edit" && props.data) {
-    setTimeout(() => {
-      freeEditRef.value?.setFormValue(props.data);
-    }, 50);
+  if (props.data) {
+    nextTick(() => {
+      freeEditRef.value?.setFormValue({ ...props.data, cLanguage: "C" });
+      getPrnTypeOptions();
+    });
   }
 });
 
@@ -204,30 +354,6 @@ const exRules = {
     }
   },
 };
-
-/** 查询 */
-function save() {
-  freeEditRef.value?.validate().then((isValid) => {
-    if (isValid) {
-      const formParam = getFrom();
-      const param = Object.assign({ type: props.type }, formParam);
-      saveKindInfo(param)
-        .then((res) => {
-          const { code, data, msg } = res;
-          if (200 === code) {
-            emits("ok", {});
-            ElMessage.success("保存成功");
-            dialogVisible.value = false;
-          } else {
-            ElMessage.error(msg);
-          }
-        })
-        .finally(() => {});
-    } else {
-      ElMessage.error("请填写必填项");
-    }
-  });
-}
 
 /* 获取全量表单数据 */
 function getFrom() {
@@ -253,6 +379,223 @@ function getFrom() {
       param["tabjson"] = selectList;
     }
     return param;
+  }
+}
+// 获取单据类型下拉选项
+function getPrnTypeOptions() {
+  pcisQueryService
+    .getPrnType({
+      CLanguage: "C",
+      CProdNo: props.data?.cProdNo,
+      CPrnType: "W",
+      CAppNo: props.data?.cAppNo,
+    })
+    .then((res: any) => {
+      if (res.code === 200) {
+        // cPrnTypeLoadData.value = res.data
+        setFormItem("cPrnType", {
+          loadData: res.data,
+        });
+      }
+    });
+}
+// 获取打印模板下拉选项
+function getPrnFmpOptions(val: any) {
+  if (val) {
+    pcisQueryService
+      .getPrintBeanTemplate({
+        CLanguage: "C",
+        CProdNo: props.data?.cProdNo,
+        CDptCde: user.companyId,
+        CPlyNo: props.data?.cPlyNo,
+        CAppTyp: props.data?.cAppTyp,
+        plyNo: props.data?.cPlyNo,
+        CPrnType: val,
+      })
+      .then((res: any) => {
+        if (res.code === 200) {
+          setFormItem("cPrnFmp", {
+            loadData: res.codelist,
+          });
+        }
+      });
+  } else {
+    setFormItem("cPrnFmp", { loadData: [] });
+  }
+}
+
+// 预览
+function smartbipreview() {
+  const formData = freeEditRef.value?.getFromValue();
+  const param = {
+    CDptCde: user.companyId,
+    CDptCnm: user.companyCnm,
+    COperId: user.opCde,
+    COperCnm: user.opCnm,
+    CProdNo: props.data?.cProdNo,
+    CAppTyp: props.data?.cAppTyp,
+    CResId: CResId.value,
+    CPlyType: formData?.cPlyType,
+    CPrnNo: formData?.cPrnNo,
+    CEdrNo: props.data?.cEdrNo,
+    plyNo: props.data?.cPlyNo,
+    CPrnType: formData?.cPrnType,
+    CAppNo: props.data?.cAppNo,
+    CPlyNo: props.data?.cPlyNo,
+    CAppNme: props.data?.cAppNme,
+    CPrnFmp: formData?.cPrnFmp,
+    CPrnTarget: formData?.cPrnTarget,
+    CLanguage: "C",
+    CEdrPrjNo: props.data?.nEdrPrjNo,
+  };
+  pcisQueryService
+    .smartbipreview(param)
+    .then((res: any) => {
+      if (res.code === 200 && res.data) {
+        const url = res.data;
+        window.open(url, "_blank");
+      } else {
+        ElMessage.error(res.msg);
+      }
+    })
+    .catch((err) => {
+      ElMessage.error(err);
+    });
+}
+
+// 设置打印模板
+function setPrnTemplate() {
+  setYNCvrg(props.data?.cAppNo);
+  freeEditRef.value?.setValue("cPrnFmp", null);
+  setFormItem("cPrnFmp", { loadData: [] });
+  _PrnTemplate.value = null;
+  const param = {
+    CProdNo: props.data?.cProdNo,
+    CDptCde: user.companyId, // 操作机构
+    CLanguage: "C",
+    CPlyNo: props.data?.cPlyNo,
+    CAppTyp: props.data?.cAppTyp,
+    plyNo: props.data?.cPlyNo,
+    CPrnType: freeEditRef.value?.getFromValue().cPrnType,
+  };
+  pcisQueryService
+    .getPrintBeanTemplate(param)
+    .then((result: any) => {
+      if (result.code === 200) {
+        _PrnTemplate.value = result.data;
+        if (result["codelist"].length > 0) {
+          if (props.data?.cProdNo === "060024") {
+            let index = null;
+            if ("0253" == param.CDptCde.substring(0, 4) && isflag.value) {
+              setFormItem("cPrnFmp", { loadData: result.codelist });
+            } else {
+              for (let i = 0; i < result["codelist"].length; i++) {
+                if (
+                  result["codelist"][i]["value"] === "PC060030_3rd_newnpcis"
+                ) {
+                  index = i;
+                }
+              }
+              if (index !== null) {
+                result["codelist"].splice(index, 1);
+              }
+              setFormItem("cPrnFmp", { loadData: result.codelist });
+            }
+          } else {
+            setFormItem("cPrnFmp", { loadData: result.codelist });
+          }
+          if (result["codelist"].length === 1) {
+            freeEditRef.value?.setValue(
+              "cPrnFmp",
+              result["codelist"][0]["value"]
+            );
+          }
+        } else {
+          setFormItem("cPrnFmp", { loadData: [] });
+          ElMessage.warning(
+            "根据传入的参数未获取到相应的打印模板,请核对检查！"
+          );
+          return;
+        }
+      } else {
+        setFormItem("cPrnFmp", { loadData: [] });
+        ElMessage.error(result["msg"]);
+      }
+    })
+    .catch((error) => {
+      ElMessage.error("后台服务异常,请联系管理员");
+    });
+}
+
+/**
+ * 获取投保险种
+ * @param appNo
+ */
+function setYNCvrg(appNo: any) {
+  const param = { appNo: appNo };
+  pcisQueryService
+    .getCvrgByAppNo(param)
+    .then((res: any) => {
+      if (res.code === 200) {
+        const data = res["data"];
+        for (let i = 0; i < data.length; i++) {
+          console.log("查询到的险别信息为" + data[i]);
+          if (
+            data[i]["CCvrgNo"] === "060386" ||
+            data[i]["CCvrgNo"] === "060387" ||
+            data[i]["CCvrgNo"] === "060388"
+          ) {
+            isflag.value = true;
+          }
+        }
+      } else {
+        ElMessage.error(res.msg);
+      }
+    })
+    .catch((err) => {
+      ElMessage.error(err);
+    });
+}
+
+function check060024FlagCancle(CPrnType: any) {
+  if (
+    "060024" === props.data?.cProdNo &&
+    "025335000" === user.companyId.substring(0, 9) &&
+    props.data?.cCiMrk !== "6" &&
+    "1" === props.data?.cGrpMrk &&
+    "昆明公交集团有限责任公司" === props.data?.cAppNme
+  ) {
+    if ("P" === CPrnType) {
+      // 服务卡销号开始
+      flag.value = true;
+      // 服务卡结束
+    } else if ("E" === CPrnType) {
+      if (
+        props.data?.cEdrRsnBundleCde === "Z1" ||
+        props.data?.cEdrRsnBundleCde === "22"
+      ) {
+        flag.value = true;
+      }
+      if (
+        props.data?.cEdrRsnBundleCde === "J1" ||
+        props.data?.cEdrRsnBundleCde === "22"
+      ) {
+        //撤销服务卡销号开始
+        flagCancle.value = true;
+        //撤销服务卡销号结束
+      }
+    }
+  }
+}
+
+//给表单下拉项赋值
+function setFormItem(key, obj) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        Object.assign(item, obj);
+      }
+    });
   }
 }
 </script>
