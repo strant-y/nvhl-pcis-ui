@@ -30,6 +30,7 @@ export class PcisQueryService {
     qryExpirationPolicyUrl = 'policy/getExpirationPolicyList';
     qryEpolicyPolicyListUrl = 'edr/getPolicyList'; // 电子保单列表查询
     generatingEPolicyUrl = 'epolicy/generatingEPolicy';// 生成电子保单
+    downloadEPolicyUrl = 'epolicy/downloadData';// 下载电子保单
     qryDiaryListUrl = 'policy/getDiaryList';
     qryChangeFeeListUrl = 'edr/qryChangeFeeList';
     loadFeeInfoUrl = 'edr/getFeeInfo';
@@ -470,6 +471,18 @@ export class PcisQueryService {
      */
     generatingEPolicy(ops: any): AxiosPromise<any> {
         return post(`${this.generatingEPolicyUrl}`, ops)
+    }
+
+    /**
+     * 下载电子保单
+     * @param ops 
+     * @returns 
+     */
+    downloadEPolicy(ops: any): AxiosPromise<any> {
+        return post(`${this.downloadEPolicyUrl}`,{}, {
+            params: ops,
+            responseType: 'blob'
+        });
     }
 
     /**
