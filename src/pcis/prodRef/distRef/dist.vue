@@ -238,28 +238,12 @@ const method = {
   },
   //  042003 根据电梯条数反
   funcdistadd: () => {
-    console.log("22", opertaor.getTableRefs());
-    let baseFlag = opertaor.getDataAll().plyBase["Base.cAppNo"];
+    const alldata: any = opertaor.getDataAll();
+    let baseFlag = alldata['plyBase']["Base.cAppNo"];
 
     let fromSchema = tableconfig.value.fromSchema;
-    let cIs= opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered']  //  是否记名投保
-    
-    if(cIs == 1){
-      fromSchema?.forEach((item,index) =>{
-        // if(item.) Dist.nSeqNo   Dist.cPlanNo Dist.cPlanNo
-        if(item.prop !=='Dist.nSeqNo'){
-          item.rules = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
-        }
-      })
-    }else if(cIs == 0){
-      fromSchema?.forEach((item,index) =>{
-        if(item.prop !=='Dist.cSchoolName' && item.prop !=='Dist.cSchoolAddress'){
-          item.rules =null;
-        }
-      })
-    }
 
-    checkAppBase({ cAppNo: baseFlag }).then((res) => {
+    checkAppBase({ cAppNo: baseFlag }).then((res: any) => {
       if (res.code === 200) {
         dialog.value?.open(
           "distAdd",

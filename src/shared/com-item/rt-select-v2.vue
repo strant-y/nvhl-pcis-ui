@@ -203,7 +203,6 @@ watch(
       //如果true 改 false,则做一次重新option获取
       nextTick(() => {
         if (props.item.typeCode) {
-          console.log(getParam());
           uploadOption();
         }
       });

@@ -181,7 +181,30 @@ const formconfig1 = ref<AppFreeEditConfig>(
 onMounted(() => {
   dataParams.value = opertaor.getDataAll();
   appNo.value = dataParams.value.plyBase["Base.cAppNo"];
-  formconfig1.value.fromSchema = props.data.fromSchema;
+  
+  let newSchema = [];
+  let cIs= opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered']  //  是否记名投保
+
+  for(let i = 0; props.data.fromSchema && i < props.data.fromSchema.length; i++){
+    let item = JSON.parse(JSON.stringify(props.data.fromSchema[i]));
+    if (props.data.fromSchema[i]["func"]) {
+      item["func"] = props.data.fromSchema[i]["func"];
+    }
+    if (props.data.fromSchema[i]["tableClick"]) {
+      item["tableClick"] = props.data.fromSchema[i]["tableClick"];
+    }
+
+    if(cIs == 1 && item.prop !=='Dist.nSeqNo'){
+        item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+    }else if(cIs == 0 && (item.prop !=='Dist.cSchoolName' && item.prop !=='Dist.cSchoolAddress')){
+      item['rules'] =null;
+    }
+    item["disabled"] = false;
+    newSchema.push(item);
+  }
+
+  formconfig1.value.fromSchema = newSchema;
+  
   formconfig1.value.title = props.data.title;
   if (props.data.title == "编辑") {
     setTimeout(() => {

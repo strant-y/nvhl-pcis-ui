@@ -101,8 +101,14 @@ const method = {
   },
   // 索赔基础名称change事件
   suopeiFunc: (val) => {
-    setFormItem("Base.tRunBgnTm", { rules: null, disabled: false }); //追溯/日落起期
-    setFormItem("Base.tRunEndTm", { rules: null, disabled: false }); //追溯/日落止期
+     const p = opertaor.getParam();
+    if (!p.initFlag) {
+      setFormItem("Base.tRunBgnTm", { disabled: false }); //追溯/日落起期
+      setFormItem("Base.tRunEndTm", { disabled: false }); //追溯/日落止期
+    }
+    setFormItem("Base.tRunBgnTm", { rules: null }); //追溯/日落起期
+    setFormItem("Base.tRunEndTm", { rules: null }); //追溯/日落止期
+    
     setFormItem("Base.tReportBgnTm", { rules: null }); //延长报告期起始日期
     setFormItem("Base.tReportEndTm", { rules: null }); //延长报告期终止日期
     if (val == "0") {
