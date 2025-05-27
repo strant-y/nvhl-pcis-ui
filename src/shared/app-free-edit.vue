@@ -150,7 +150,7 @@ interface dynamicFormMethod {
   setValue: (key: any, value: any) => void;
   getValue: (key: any) => any;
   checkKey: (key: any) => boolean;
-  clearValidate: () => any;
+  clearValidate: (key: string | null ) => any;
   resetFields: () => any;
   setDisabledAll: () => void;
 }

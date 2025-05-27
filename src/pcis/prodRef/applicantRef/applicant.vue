@@ -1,7 +1,12 @@
 <template>
   <app-free-edit :freeEditConfig="formconfig1" ref="applicantEditRef" />
   <comDialog ref="dialog"></comDialog>
-  <input type="file" ref="fileInputRef" style="display:none" @change="handleFileChange" />
+  <input
+    type="file"
+    ref="fileInputRef"
+    style="display: none"
+    @change="handleFileChange"
+  />
 </template>
 
 <script setup lang="ts">
@@ -48,7 +53,7 @@ onMounted(() => {
     method,
     getRules
   );
-  console.log(3838,formconfig11)
+  console.log(3838, formconfig11);
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
     //是否小微企业，默认非必填、只读
@@ -58,23 +63,38 @@ onMounted(() => {
     });
     //【国民经济行业分类】初始化必填，只有法人时才必填，现在个人也是必填了（老系统需求：040001/042002/043004/043005/043011五款产品不区分法人个人投保，国民经济行业分类都必填，其他产品只有法人才必填）
     const cProdNo = route.params.param.cProdNo;
-    if (cProdNo === "040001" || cProdNo === "042002" || cProdNo === "043004" || cProdNo === "043005" || cProdNo === "043011") {
+    if (
+      cProdNo === "040001" ||
+      cProdNo === "042002" ||
+      cProdNo === "043004" ||
+      cProdNo === "043005" ||
+      cProdNo === "043011"
+    ) {
       setFormItem("Applicant.cTrdCde", { rules: null });
     }
-    if(!cProdNo.startsWith("05")){
+    if (!cProdNo.startsWith("05")) {
       setFormItem("Applicant.cShareholderName", { hidden: true, rules: null });
       setFormItem("Applicant.cShareholderCode", { hidden: true, rules: null });
-      setFormItem("Applicant.cShareholderNature", { hidden: true, rules: null });
-      setFormItem("Applicant.cShareholderCategory", { hidden: true, rules: null });
+      setFormItem("Applicant.cShareholderNature", {
+        hidden: true,
+        rules: null,
+      });
+      setFormItem("Applicant.cShareholderCategory", {
+        hidden: true,
+        rules: null,
+      });
     }
 
-    // 处理邮编 
-    setFormItem("Applicant.cZipCde", {  rules: [ getRules("signlessInt", {}), getRules("specifyLength", {len: 6})], });
+    // 处理邮编
+    setFormItem("Applicant.cZipCde", {
+      rules: [
+        getRules("signlessInt", {}),
+        getRules("specifyLength", { len: 6 }),
+      ],
+    });
     //移动手机校验
     setFormItem("Applicant.cMobile", { rules: [getRules("phoneNo", {})] });
-    
   });
-
 });
 //给表单下拉项赋值
 function setFormItem(key: any, obj: any) {
@@ -86,7 +106,7 @@ function setFormItem(key: any, obj: any) {
           for (let key in obj.btnItems) {
             item.btnItems[key] = obj.btnItems[key];
           }
-        }else{
+        } else {
           Object.assign(item, obj);
         }
       }
@@ -119,18 +139,20 @@ const method = {
             });
             newobj["Applicant.cAppNme"] = newobj["Applicant.cClntNme"];
             setFormValue(newobj);
-            setFormItem("Applicant.cAppNme", {
-              disabled: true,
-            });
-            setFormItem("Applicant.cClntMrk", {
-              disabled: true,
-            });
-            setFormItem("Applicant.cCertfCls", {
-              disabled: true,
-            });
-            setFormItem("Applicant.cCertfCde", {
-              disabled: true,
-            });
+            if (!param.initFlag) {
+              setFormItem("Applicant.cAppNme", {
+                disabled: true,
+              });
+              setFormItem("Applicant.cClntMrk", {
+                disabled: true,
+              });
+              setFormItem("Applicant.cCertfCls", {
+                disabled: true,
+              });
+              setFormItem("Applicant.cCertfCde", {
+                disabled: true,
+              });
+            }
           }
         },
       },
@@ -151,42 +173,50 @@ const method = {
   funcreset: () => {
     const tabref = opertaor.getTableRefs();
     const applicantValue = tabref["applicant"].getFromValue();
+    const param = opertaor.getParam();
     for (const k in applicantValue) {
       // 反洗钱不清空
-      if(k !== 'Applicant.cCustRiskRank' && k !== 'Insured.cCustRiskRank'){
+      if (k !== "Applicant.cCustRiskRank" && k !== "Insured.cCustRiskRank") {
         applicantValue[k] = null;
       }
     }
-    setFormItem("Applicant.cAppNme", {
-      disabled: false,
-    });
-    setFormItem("Applicant.cClntMrk", {
-      disabled: false,
-    });
-    setFormItem("Applicant.cCertfCls", {
-      disabled: false,
-    });
-    setFormItem("Applicant.cCertfCde", {
-      disabled: false,
-    });
-    tCertfDate.value = []
+
+    if (!param.initFlag) {
+      setFormItem("Applicant.cAppNme", {
+        disabled: false,
+      });
+      setFormItem("Applicant.cClntMrk", {
+        disabled: false,
+      });
+      setFormItem("Applicant.cCertfCls", {
+        disabled: false,
+      });
+      setFormItem("Applicant.cCertfCde", {
+        disabled: false,
+      });
+    }
+
+    tCertfDate.value = [];
     tabref["applicant"].setFormValue(applicantValue);
   },
 
   cardTypeChange: (val) => {
-    setFormItem("Applicant.cNation", {
-      disabled: false,
-    });
-    setFormItem("Applicant.tBirthday", {
-      disabled: false,
-    });
-    setFormItem("Applicant.nAge", {
-      disabled: false,
-    });
-    setFormItem("Applicant.cSex", {
-      disabled: false,
-    });
+    const param = opertaor.getParam();
 
+    if (!param.initFlag) {
+      setFormItem("Applicant.cNation", {
+        disabled: false,
+      });
+      setFormItem("Applicant.tBirthday", {
+        disabled: false,
+      });
+      setFormItem("Applicant.nAge", {
+        disabled: false,
+      });
+      setFormItem("Applicant.cSex", {
+        disabled: false,
+      });
+    }
 
     if (val == "120001") {
       setFormItem("Applicant.cCertfCde", {
@@ -200,22 +230,25 @@ const method = {
         rules: [getRules("required", {})],
       });
 
-      setValue("Applicant.cNation", '1');  // 国籍
+      setValue("Applicant.cNation", "1"); // 国籍
       setValue("Applicant.tBirthday", null);
       setValue("Applicant.nAge", null);
       setValue("Applicant.cSex", null);
-      setFormItem("Applicant.cNation", {
-        disabled: true,
-      });
-      setFormItem("Applicant.tBirthday", {
-        disabled: true,
-      });
-      setFormItem("Applicant.nAge", {
-        disabled: true,
-      });
-      setFormItem("Applicant.cSex", {
-        disabled: true,
-      });
+
+      if (!param.initFlag) {
+        setFormItem("Applicant.cNation", {
+          disabled: true,
+        });
+        setFormItem("Applicant.tBirthday", {
+          disabled: true,
+        });
+        setFormItem("Applicant.nAge", {
+          disabled: true,
+        });
+        setFormItem("Applicant.cSex", {
+          disabled: true,
+        });
+      }
     } else if (val == "110002" || val == "110007") {
       setFormItem("Applicant.tCertfBgnDate", {
         rules: [getRules("required", {})],
@@ -234,8 +267,8 @@ const method = {
       setFormItem("Applicant.cCertfCde", {
         rules: [getRules("required", {})],
       });
-      setFormItem("Applicant.tCertfBgnDate", { rules :null});
-      setFormItem("Applicant.tCertfEndDate",  { rules :null});
+      setFormItem("Applicant.tCertfBgnDate", { rules: null });
+      setFormItem("Applicant.tCertfEndDate", { rules: null });
       // 参加社会统筹标志
       setFormItem("Applicant.cParticiinsocTyp", {
         rules: null,
@@ -244,13 +277,21 @@ const method = {
   },
   //投保人性质(0是法人1是个人)
   InsureChange: (val) => {
+    const param = opertaor.getParam();
+
     if (val == "0") {
       productStore.setcClntMrk(val);
       // 办理人
       setFormItem("Applicant.cCntrNme", { rules: [getRules("required", {})] });
-      setFormItem("Applicant.tOperaterCertfEndTm", { rules: [getRules("required", {})] });
-      setFormItem("Applicant.cOperaterCertfTyp", { rules: [getRules("required", {})] });
-      setFormItem("Applicant.cOperaterCertfCde", { rules: [getRules("required", {})] });
+      setFormItem("Applicant.tOperaterCertfEndTm", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.cOperaterCertfTyp", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.cOperaterCertfCde", {
+        rules: [getRules("required", {})],
+      });
 
       setFormItem("Applicant.cParticiinsocTyp", {
         rules: [getRules("required", {})],
@@ -258,22 +299,31 @@ const method = {
       setFormItem("Applicant.cCntrCertfCde", {
         rules: [getRules("required", {})],
       });
-      setFormItem("Applicant.cWorkDpt", {
+
+      
+      if (!param.initFlag) {
+        setFormItem("Applicant.cWorkDpt", {
         disabled: false,
-        rules: [getRules("required", {})],
       });
       setFormItem("Applicant.cIsMicroEntpris", {
         disabled: false,
       });
-      //是否个体工商户
-      setValue("Applicant.cIsIndvduBiz", "");
       setFormItem("Applicant.cIsIndvduBiz", {
         disabled: true,
       });
       // 是否绿色产业客户
       setFormItem("Applicant.cGreenIndustryCustomers", {
-        rules: [getRules("required", {})],
         disabled: false,
+      });
+      }
+      setFormItem("Applicant.cWorkDpt", {
+        rules: [getRules("required", {})],
+      });
+      //是否个体工商户
+      setValue("Applicant.cIsIndvduBiz", "");
+      // 是否绿色产业客户
+      setFormItem("Applicant.cGreenIndustryCustomers", {
+        rules: [getRules("required", {})],
       });
       // 参加社会统筹标志
       setFormItem("Applicant.cParticiinsocTyp", {
@@ -289,7 +339,11 @@ const method = {
           codeListParam: {},
         })
         .then((res) => {
-          if (!res.some(item => Object.values(item).includes(getValue("Applicant.cCertfCls")))) {
+          if (
+            !res.some((item) =>
+              Object.values(item).includes(getValue("Applicant.cCertfCls"))
+            )
+          ) {
             setValue("Applicant.cCertfCls", "");
           }
           setFormItem("Applicant.cCertfCls", {
@@ -306,16 +360,15 @@ const method = {
       });
       // 为法人 移动电话不填
       setFormItem("Applicant.cMobile", {
-        rules: [getRules("phoneNo", {})]
+        rules: [getRules("phoneNo", {})],
       });
 
       // 是否个体工商户
       setFormItem("Applicant.cIsIndvduBiz", {
-        rules: null
+        rules: null,
       });
     } else {
-
-      setFormItem("Applicant.cWorkDpt", {  rules: null });
+      setFormItem("Applicant.cWorkDpt", { rules: null });
       setFormItem("Applicant.cIsMicroEntpris", {
         disabled: true,
       });
@@ -336,33 +389,28 @@ const method = {
       });
       setValue("Applicant.cGreenIndustryCustomers", "");
       setValue("Applicant.cIsMicroEntpris", "");
-        //是否分支机构
-      setValue("Applicant.cIsBranch", '1');
+      //是否分支机构
+      setValue("Applicant.cIsBranch", "1");
 
       setFormItem("Applicant.cCntrNme", { rules: null });
       setFormItem("Applicant.tOperaterCertfEndTm", { rules: null });
       setFormItem("Applicant.cOperaterCertfTyp", { rules: null });
-      setFormItem("Applicant.cOperaterCertfCde", { rules:null});
+      setFormItem("Applicant.cOperaterCertfCde", { rules: null });
 
       setFormItem("Applicant.cCntrCertfCde", { rules: null });
 
       setFormItem("Applicant.cTrdCde", {
-        rules: null
+        rules: null,
       });
 
-      // 个人 移动电话必填 
+      // 个人 移动电话必填
       setFormItem("Applicant.cMobile", {
-        rules: [getRules("required", {}),
-        getRules("phoneNo", {})
-        ],
+        rules: [getRules("required", {}), getRules("phoneNo", {})],
       });
 
       setFormItem("Applicant.cIsIndvduBiz", {
-        rules: [getRules("required", {})
-     
-        ],
+        rules: [getRules("required", {})],
       });
-
 
       codeListStore
         .queryCodeList({
@@ -370,7 +418,11 @@ const method = {
           codeListParam: {},
         })
         .then((res) => {
-          if (!res.some(item => Object.values(item).includes(getValue("Applicant.cCertfCls")))) {
+          if (
+            !res.some((item) =>
+              Object.values(item).includes(getValue("Applicant.cCertfCls"))
+            )
+          ) {
             setValue("Applicant.cCertfCls", "");
           }
           setFormItem("Applicant.cCertfCls", {
@@ -384,15 +436,21 @@ const method = {
     }
   },
   //大股东性质change事件
-  funcShareholderNature:(val)=>{
-    if(val=='1'){
+  funcShareholderNature: (val) => {
+    if (val == "1") {
       codeListStore
         .queryCodeList({
           codeListName: "NATURAL_CERTIFICATE_CACHE",
           codeListParam: {},
         })
         .then((res) => {
-          if (!res.some(item => Object.values(item).includes(getValue("Applicant.cShareholderCategory")))) {
+          if (
+            !res.some((item) =>
+              Object.values(item).includes(
+                getValue("Applicant.cShareholderCategory")
+              )
+            )
+          ) {
             setValue("Applicant.cShareholderCategory", "");
           }
           setFormItem("Applicant.cShareholderCategory", {
@@ -402,14 +460,20 @@ const method = {
             loadData: res,
           });
         });
-    }else{
+    } else {
       codeListStore
         .queryCodeList({
           codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
           codeListParam: {},
         })
         .then((res) => {
-          if (!res.some(item => Object.values(item).includes(getValue("Applicant.cShareholderCategory")))) {
+          if (
+            !res.some((item) =>
+              Object.values(item).includes(
+                getValue("Applicant.cShareholderCategory")
+              )
+            )
+          ) {
             setValue("Applicant.cShareholderCategory", "");
           }
           setFormItem("Applicant.cShareholderCategory", {
@@ -422,9 +486,9 @@ const method = {
     }
   },
 
-    // 是否个体工商户
-    cIsIndvduBizChange: (val: any) => {
-    if (val == '1') {
+  // 是否个体工商户
+  cIsIndvduBizChange: (val: any) => {
+    if (val == "1") {
       setFormItem("Applicant.cOccupCde", {
         rules: [getRules("required", {})],
       });
@@ -436,7 +500,7 @@ const method = {
         rules: [],
       });
       setFormItem("Applicant.cTrdCde", {
-        rules: []
+        rules: [],
       });
     }
   },
@@ -477,12 +541,13 @@ const method = {
         },
       },
       {
-        isOk: (selectdata: any) => { },
+        isOk: (selectdata: any) => {},
       },
       { title: "职业", width: 85 }
     );
   },
   tCertMrkChecked: (val) => {
+    const param = opertaor.getParam();
     if (val == "1") {
       // setValue(
       //   "Applicant.tCertfBgnDate",
@@ -492,25 +557,35 @@ const method = {
         "Applicant.tCertfEndDate",
         moment(new Date("2099-12-31")).format("YYYY-MM-DD HH:mm:ss")
       );
-      setFormItem("Applicant.tCertfEndDate", { disabled: true, });
+      if (!param.initFlag) {
+        setFormItem("Applicant.tCertfEndDate", { disabled: true });
+      }
+      setFormItem("Applicant.tCertfEndDate", { disabled: true });
     } else {
       setValue("Applicant.tCertfBgnDate", tCertfDate.value[0] || "");
       setValue("Applicant.tCertfEndDate", tCertfDate.value[1] || "");
-      setFormItem("Applicant.tCertfEndDate", { disabled: false, });
+      if (!param.initFlag) {
+      setFormItem("Applicant.tCertfEndDate", { disabled: false });
+
+      }
     }
   },
   mobileChange: (val) => {
     if (val) {
-      setFormItem("Applicant.cMobile", { rules: [getRules("required", {}),getRules("phoneNo", {})] });
-      setFormItem("Applicant.cTel", { rules: [getRules('phone',{})]});
+      setFormItem("Applicant.cMobile", {
+        rules: [getRules("required", {}), getRules("phoneNo", {})],
+      });
+      setFormItem("Applicant.cTel", { rules: [getRules("phone", {})] });
     }
   },
   // 固定电话
-  cTelChange:(val)=>{
-    console.log(val, '')
+  cTelChange: (val) => {
+    console.log(val, "");
     if (val) {
-      setFormItem("Applicant.cTel", { rules: [getRules('phone',{}),getRules("required", {})]});
-      setFormItem("Applicant.cMobile",  { rules: getRules("phoneNo", {})});
+      setFormItem("Applicant.cTel", {
+        rules: [getRules("phone", {}), getRules("required", {})],
+      });
+      setFormItem("Applicant.cMobile", { rules: getRules("phoneNo", {}) });
     }
   },
   emailChange: (val) => {
@@ -567,7 +642,7 @@ const method = {
         setFormItem("Applicant.cCounty", objData);
       });
   },
-  handleClose: (val) => { },
+  handleClose: (val) => {},
   // 是否绿色产业客户change
   ApplicantIsGreen: (val) => {
     // 控制绿色产业细分列表是否必填
@@ -581,12 +656,13 @@ const method = {
   },
   // 证件号码change
   cCertfCdeChange: (val) => {
-
     const tabref = opertaor.getTableRefs();
-    const cCertfCls = tabref["applicant"].getFromValue()['Applicant.cCertfCls'];
-    if (cCertfCls == '120001') {
+    const cCertfCls = tabref["applicant"].getFromValue()["Applicant.cCertfCls"];
+    if (cCertfCls == "120001") {
       if (val) {
-        const certfCde = applicantEditRef.value?.getValue("Applicant.cCertfCde");
+        const certfCde = applicantEditRef.value?.getValue(
+          "Applicant.cCertfCde"
+        );
         if (certfCde && certfCde.length === 18) {
           const birthYear = parseInt(certfCde.substring(6, 10), 10);
           const birthMonth = parseInt(certfCde.substring(10, 12), 10);
@@ -596,7 +672,7 @@ const method = {
           const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
           const age = new Date().getFullYear() - birthYear;
 
-          setValue("Applicant.cNation", '1');  // 国籍
+          setValue("Applicant.cNation", "1"); // 国籍
           setValue("Applicant.tBirthday", birthday);
           setValue("Applicant.nAge", age);
           setValue("Applicant.cSex", sex);
@@ -607,32 +683,34 @@ const method = {
   //注册地市是否同上
   isSameChange: (val) => {
     if (val == "1") {
-      const ads = applicantEditRef?.value?.getValue('Applicant.AllProp');
-      const a = applicantEditRef?.value?.getValue("Applicant.cRegisterSuffixAddr") || "";
+      const ads = applicantEditRef?.value?.getValue("Applicant.AllProp");
+      const a =
+        applicantEditRef?.value?.getValue("Applicant.cRegisterSuffixAddr") ||
+        "";
 
-      applicantEditRef?.value?.setValue('Applicant.Prop', ads);
-      applicantEditRef?.value?.setValue('Applicant.cSuffixAddr', a);
+      applicantEditRef?.value?.setValue("Applicant.Prop", ads);
+      applicantEditRef?.value?.setValue("Applicant.cSuffixAddr", a);
     } else {
     }
   },
   //注册地址
   getCountry: (val: any) => {
-    console.log(111)
+    console.log(111);
     setRegisterAdd();
   },
   //常住地址
   getAllProp: (val: any) => {
-    console.log(112)
+    console.log(112);
     setregistAdd();
   },
   //注册地址(input)
   getcSuffixAddr: (val: any) => {
-    console.log(113)
+    console.log(113);
     setRegisterAdd();
   },
   //常住地址(input)
   getcRegisterSuffixAddr: (val: any) => {
-    console.log(114)
+    console.log(114);
     setregistAdd();
   },
   // 读取身份证
@@ -648,13 +726,14 @@ const method = {
 };
 
 function setregistAdd() {
-  const ads = applicantEditRef?.value?.getValue('Applicant.AllProp');
-  const a = applicantEditRef?.value?.getValue("Applicant.cRegisterSuffixAddr") || "";
+  const ads = applicantEditRef?.value?.getValue("Applicant.AllProp");
+  const a =
+    applicantEditRef?.value?.getValue("Applicant.cRegisterSuffixAddr") || "";
   if (ads) {
     getAddressStr({ address: ads }).then((res: any) => {
       const { code, data, msg } = res;
       if (code === 200) {
-        const b = (data ? data['addStr'] : "") + a;
+        const b = (data ? data["addStr"] : "") + a;
         setAddressStr("Applicant.cClntAddr", b);
       }
     });
@@ -664,13 +743,13 @@ function setregistAdd() {
 }
 
 function setRegisterAdd() {
-  const ads = applicantEditRef?.value?.getValue('Applicant.Prop');
+  const ads = applicantEditRef?.value?.getValue("Applicant.Prop");
   const a = applicantEditRef?.value?.getValue("Applicant.cSuffixAddr") || "";
   if (ads) {
     getAddressStr({ address: ads }).then((res: any) => {
       const { code, data, msg } = res;
       if (code === 200) {
-        const b = (data ? data['addStr'] : "") + a;
+        const b = (data ? data["addStr"] : "") + a;
         setAddressStr("Applicant.cRegisteredcapDre", b);
       }
     });
@@ -711,56 +790,97 @@ function handleFileChange(event: Event) {
     const param = {
       file: file,
       type: fileInputType.value,
-    }
-    readFile(param).then((res:any) => {
-      if(res.code === 200 && res.data && res.data.result) {
-        tCertfDate.value = []
-        if(fileInputType.value === "1") {// 身份证
-          const result = res.data.result.item_list;
-          const keys = result.map((item:any) => item.key);
-          let cardInfo = {};
-          keys.forEach((key:any) => {
-            const value = result.find((item:any) => item.key === key).value;
-            cardInfo[key] = value;
-          });
-          if(cardInfo['id_number']) setValue("Applicant.cCertfCde", cardInfo['id_number']);
-          if(cardInfo['name']) setValue("Applicant.cAppNme", cardInfo['name']);
-          if(cardInfo['sex']) setValue("Applicant.cSex", cardInfo['sex'] === '男' ? '1':'2');
-          if(cardInfo['date_of_birth']) setValue("Applicant.tBirthday", cardInfo['date_of_birth'].replace(/(年|月)/g,'-').replace('日',''));
-          if(cardInfo['validate_date']) {
-            tCertfDate.value = cardInfo['validate_date'].split("-")
-            setValue("Applicant.tCertfBgnDate", cardInfo['validate_date'].split("-")[0]);
-            if(cardInfo['validate_date'].split("-")[1] === "长期") {
-              setValue("Applicant.cLongendTyp", "1")
-            } else {
-              setValue("Applicant.cLongendTyp", "0")
-              setValue("Applicant.tCertfEndDate", cardInfo['validate_date'].split("-")[1]);
+    };
+    readFile(param)
+      .then((res: any) => {
+        if (res.code === 200 && res.data && res.data.result) {
+          tCertfDate.value = [];
+          if (fileInputType.value === "1") {
+            // 身份证
+            const result = res.data.result.item_list;
+            const keys = result.map((item: any) => item.key);
+            let cardInfo = {};
+            keys.forEach((key: any) => {
+              const value = result.find((item: any) => item.key === key).value;
+              cardInfo[key] = value;
+            });
+            if (cardInfo["id_number"])
+              setValue("Applicant.cCertfCde", cardInfo["id_number"]);
+            if (cardInfo["name"])
+              setValue("Applicant.cAppNme", cardInfo["name"]);
+            if (cardInfo["sex"])
+              setValue("Applicant.cSex", cardInfo["sex"] === "男" ? "1" : "2");
+            if (cardInfo["date_of_birth"])
+              setValue(
+                "Applicant.tBirthday",
+                cardInfo["date_of_birth"]
+                  .replace(/(年|月)/g, "-")
+                  .replace("日", "")
+              );
+            if (cardInfo["validate_date"]) {
+              tCertfDate.value = cardInfo["validate_date"].split("-");
+              setValue(
+                "Applicant.tCertfBgnDate",
+                cardInfo["validate_date"].split("-")[0]
+              );
+              if (cardInfo["validate_date"].split("-")[1] === "长期") {
+                setValue("Applicant.cLongendTyp", "1");
+              } else {
+                setValue("Applicant.cLongendTyp", "0");
+                setValue(
+                  "Applicant.tCertfEndDate",
+                  cardInfo["validate_date"].split("-")[1]
+                );
+              }
             }
-          } 
-          setValue("Applicant.cCertfCls", '120001');
-          setValue("Applicant.cClntMrk", '1');
-        }
-        if(fileInputType.value === "2") {// 外国人永久居留身份证
-          const cardInfo = res.data.result.details;
-          setValue("Applicant.cLongendTyp", "0")
-          setValue("Applicant.cCertfCde", cardInfo['id_number']['value'] || null);
-          setValue("Applicant.cAppNme", cardInfo['name']['value'] || null);
-          setValue("Applicant.cSex", cardInfo['sex']['value'] ? cardInfo['sex']['value'].split('/')[0] === '男' ? '1':'2' : null);
-          setValue("Applicant.tBirthday", cardInfo['date_of_birth']['value'] ? cardInfo['date_of_birth']['value'].replace('.','-') : null);
-          if(cardInfo['period_of_validity']['value']) {
-            tCertfDate.value = cardInfo['period_of_validity']['value'].split("-")
-            setValue("Applicant.cLongendTyp", "0")
-            setValue("Applicant.tCertfBgnDate", cardInfo['period_of_validity']['value'].split("-")[0] || null);
-            setValue("Applicant.tCertfEndDate", cardInfo['period_of_validity']['value'].split("-")[1] || null);
+            setValue("Applicant.cCertfCls", "120001");
+            setValue("Applicant.cClntMrk", "1");
           }
-          setValue("Applicant.cCertfCls", '19');
-          setValue("Applicant.cClntMrk", '1');
+          if (fileInputType.value === "2") {
+            // 外国人永久居留身份证
+            const cardInfo = res.data.result.details;
+            setValue("Applicant.cLongendTyp", "0");
+            setValue(
+              "Applicant.cCertfCde",
+              cardInfo["id_number"]["value"] || null
+            );
+            setValue("Applicant.cAppNme", cardInfo["name"]["value"] || null);
+            setValue(
+              "Applicant.cSex",
+              cardInfo["sex"]["value"]
+                ? cardInfo["sex"]["value"].split("/")[0] === "男"
+                  ? "1"
+                  : "2"
+                : null
+            );
+            setValue(
+              "Applicant.tBirthday",
+              cardInfo["date_of_birth"]["value"]
+                ? cardInfo["date_of_birth"]["value"].replace(".", "-")
+                : null
+            );
+            if (cardInfo["period_of_validity"]["value"]) {
+              tCertfDate.value =
+                cardInfo["period_of_validity"]["value"].split("-");
+              setValue("Applicant.cLongendTyp", "0");
+              setValue(
+                "Applicant.tCertfBgnDate",
+                cardInfo["period_of_validity"]["value"].split("-")[0] || null
+              );
+              setValue(
+                "Applicant.tCertfEndDate",
+                cardInfo["period_of_validity"]["value"].split("-")[1] || null
+              );
+            }
+            setValue("Applicant.cCertfCls", "19");
+            setValue("Applicant.cClntMrk", "1");
+          }
         }
-      }
-    }).catch(err => {
-      ElMessage.error(err);
-    })
-    fileInputRef.value.value = ''; // 清空文件输入框的值
+      })
+      .catch((err) => {
+        ElMessage.error(err);
+      });
+    fileInputRef.value.value = ""; // 清空文件输入框的值
   }
 }
 

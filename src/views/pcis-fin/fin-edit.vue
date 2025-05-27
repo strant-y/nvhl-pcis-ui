@@ -180,7 +180,7 @@ const pageresult = reactive<Pageresult>({
 const tableconfig = reactive<AppTableConfig>(
 	createTableEditConfig({
     title: "审核修改记录",
-    isPage: 'false',
+    isPage: true,
 		fromSchema: [
 			{
 				prop: "CCustSeq",
