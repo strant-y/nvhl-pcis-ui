@@ -206,12 +206,22 @@ function getselectionData() {
   return rttableFrom.value?.getselectionData();
 }
 
+function clearSelection() {
+  rttableFrom.value?.clearSelection();
+}
+
+function toggleRowSelection(row: any, selected: boolean) {
+  rttableFrom.value?.toggleRowSelection(row, selected);
+}
+
 defineExpose({
   getPartnerPage,
   getFromValue,
   setFormSchema,
   setValueByRowKey,
-  getselectionData
+  getselectionData,
+  clearSelection,
+  toggleRowSelection,
 });
 </script>
 
