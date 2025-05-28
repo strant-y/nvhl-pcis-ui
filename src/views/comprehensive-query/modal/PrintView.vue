@@ -424,54 +424,54 @@ function getPrnFmpOptions(val: any) {
 
 // 预览
 function smartbipreview() {
-  const result = freeEditRef.value?.validate();
-  if (result) {
-    return;
-  }
-  if (!freeEditRef.value?.getValue('cPrnFmp')) {
-    if (!getFormItem('CPrnFmp','loadData') || getFormItem('CPrnFmp','loadData').length === 0) {
-      ElMessage.warning('根据传入的参数未获取到相应的打印模板,请核对检查！');
-      return;
-    } else {
-      ElMessage.warning('打印模板不能为空，请核对检查！');
-      return;
-    }
-  }
-  const formData = freeEditRef.value?.getFromValue();
-  const param = {
-    CDptCde: user.companyId,
-    CDptCnm: user.companyCnm,
-    COperId: user.opCde,
-    COperCnm: user.opCnm,
-    CProdNo: props.data?.cProdNo,
-    CAppTyp: props.data?.cAppTyp,
-    CResId: CResId.value,
-    CPlyType: formData?.cPlyType,
-    CPrnNo: formData?.cPrnNo,
-    CEdrNo: props.data?.cEdrNo,
-    plyNo: props.data?.cPlyNo,
-    CPrnType: formData?.cPrnType,
-    CAppNo: props.data?.cAppNo,
-    CPlyNo: props.data?.cPlyNo,
-    CAppNme: props.data?.cAppNme,
-    CPrnFmp: formData?.cPrnFmp,
-    CPrnTarget: formData?.cPrnTarget,
-    CLanguage: formData?.cLanguage,
-    CEdrPrjNo: props.data?.nEdrPrjNo,
-  };
-  pcisQueryService
-    .smartbipreview(param)
-    .then((res: any) => {
-      if (res.code === 200 && res.data) {
-        const url = res.data;
-        window.open(url, "_blank");
-      } else {
-        ElMessage.error(res.msg);
+  freeEditRef.value?.validate().then((res:Boolean) => {
+    if(res) {
+      if (!freeEditRef.value?.getValue('cPrnFmp')) {
+        if (!getFormItem('CPrnFmp','loadData') || getFormItem('CPrnFmp','loadData').length === 0) {
+          ElMessage.warning('根据传入的参数未获取到相应的打印模板,请核对检查！');
+          return;
+        } else {
+          ElMessage.warning('打印模板不能为空，请核对检查！');
+          return;
+        }
       }
-    })
-    .catch((err) => {
-      ElMessage.error(err);
-    });
+      const formData = freeEditRef.value?.getFromValue();
+      const param = {
+        CDptCde: user.companyId,
+        CDptCnm: user.companyCnm,
+        COperId: user.opCde,
+        COperCnm: user.opCnm,
+        CProdNo: props.data?.cProdNo,
+        CAppTyp: props.data?.cAppTyp,
+        CResId: CResId.value,
+        CPlyType: formData?.cPlyType,
+        CPrnNo: formData?.cPrnNo,
+        CEdrNo: props.data?.cEdrNo,
+        plyNo: props.data?.cPlyNo,
+        CPrnType: formData?.cPrnType,
+        CAppNo: props.data?.cAppNo,
+        CPlyNo: props.data?.cPlyNo,
+        CAppNme: props.data?.cAppNme,
+        CPrnFmp: formData?.cPrnFmp,
+        CPrnTarget: formData?.cPrnTarget,
+        CLanguage: formData?.cLanguage,
+        CEdrPrjNo: props.data?.nEdrPrjNo,
+      };
+      pcisQueryService
+        .smartbipreview(param)
+        .then((res: any) => {
+          if (res.code === 200 && res.data) {
+            const url = res.data;
+            window.open(url, "_blank");
+          } else {
+            ElMessage.error(res.msg);
+          }
+        })
+        .catch((err) => {
+          ElMessage.error(err);
+        });
+    }
+  })
 }
 
 // 设置打印模板
