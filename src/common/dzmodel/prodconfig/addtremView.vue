@@ -154,6 +154,7 @@ props.data.data.isselectData?.forEach((item: any) => {
 
   selectAdditionNodes.value.push(seadd);
 });
+console.log(selectAdditionNodes.value);
 const data2 = ref([
   // {
   //   id: 1,
@@ -205,7 +206,6 @@ onMounted(async () => {
 
 function setNode() {
   const addMainKey: any[] = [];
-  console.log(selectAdditionNodes.value);
   if (selectAdditionNodes.value && selectAdditionNodes.value.length > 0) {
     selectAdditionNodes.value.forEach((item: any) => {
       if (item["cRdrTyp"] === "0") {
@@ -223,7 +223,6 @@ function setNode() {
 }
 
 function selectmainMethod(a: any, b: any, c: any) {
-  
   // 重新判断,如果勾选责任,自动勾选主条款,如果主条款被反选,自动取消对应责任反选
   let addMainKey: any[] = [];
   const tree = mainRef.value?.getCheckedNodes(false, true);
@@ -296,7 +295,9 @@ function selectMainTerm(isselect = true) {
       if (200 === code) {
         data2.value = data;
         const addtree = additionalRef.value?.getCheckedNodes(false, true);
-        selectAdditionNodes.value = addtree || [];
+        if (addtree && addtree.length !== 0) {
+          selectAdditionNodes.value = addtree;
+        };
         setTimeout(() => {
           setAdditionNode();
         }, 50);
@@ -311,6 +312,7 @@ function selectMainTerm(isselect = true) {
 
 function setAdditionNode() {
   const addMainKey: any[] = [];
+  console.log(selectAdditionNodes.value);
   if (selectAdditionNodes.value && selectAdditionNodes.value.length > 0) {
     selectAdditionNodes.value.forEach((item: any) => {
       if (item["cRdrTyp"] === "1") {
@@ -357,9 +359,7 @@ function setAdditionNode() {
   });
 }
 
-
 function selectadditionMethod(a: any, b: any, c: any) {
-  
   // 重新判断,如果勾选责任,自动勾选附加条款,如果附加条款被反选,自动取消对应责任反选
   let addMainKey: any[] = [];
   const tree = additionalRef.value?.getCheckedNodes(false, true);
