@@ -328,8 +328,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 onMounted(async () => {
   if (props.data) {
     nextTick(() => {
-      freeEditRef.value?.setValue("cLanguage", "C");
       getPrnTypeOptions();
+      freeEditRef.value?.setFormValue({...props.data, cLanguage: "C"});
     });
   }
 });
@@ -424,6 +424,19 @@ function getPrnFmpOptions(val: any) {
 
 // 预览
 function smartbipreview() {
+  const result = freeEditRef.value?.validate();
+  if (result) {
+    return;
+  }
+  if (!freeEditRef.value?.getValue('cPrnFmp')) {
+    if (!getFormItem('CPrnFmp','loadData') || getFormItem('CPrnFmp','loadData').length === 0) {
+      ElMessage.warning('根据传入的参数未获取到相应的打印模板,请核对检查！');
+      return;
+    } else {
+      ElMessage.warning('打印模板不能为空，请核对检查！');
+      return;
+    }
+  }
   const formData = freeEditRef.value?.getFromValue();
   const param = {
     CDptCde: user.companyId,
@@ -443,7 +456,7 @@ function smartbipreview() {
     CAppNme: props.data?.cAppNme,
     CPrnFmp: formData?.cPrnFmp,
     CPrnTarget: formData?.cPrnTarget,
-    CLanguage: "C",
+    CLanguage: formData?.cLanguage,
     CEdrPrjNo: props.data?.nEdrPrjNo,
   };
   pcisQueryService
@@ -595,6 +608,10 @@ function setFormItem(key, obj) {
       }
     });
   }
+}
+function getFormItem(key:any, prop:any) {
+  const item = formconfig1.fromSchema?.find((item) => item.prop === key);
+  return item ? item[prop] : null;
 }
 </script>
 
