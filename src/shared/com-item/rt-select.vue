@@ -3,6 +3,7 @@
   <el-select
     v-if="!showLabel"
     ref="selectRef"
+    :class="isReQuired() ? 're-quired-flag' : '' "
     v-model="selectedValue"
     :placeholder="item.placeholder ? item.placeholder : '请选择'"
     :disabled="
@@ -293,6 +294,18 @@ onMounted(() => {
 
 function updateOption(newOption: any) {
   options.value = newOption;
+}
+function isReQuired(){
+  const rule = props.item.rules;
+  let r = false;
+  if(rule && rule.length > 0){
+    for (const key in rule) {
+      if(rule[key].required){
+        r = true;
+      }
+    }
+  }
+  return r;
 }
 
 function getParam() {

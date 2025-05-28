@@ -6,6 +6,7 @@
             ref="cascaderRef"
             v-model="selectedValue"
             class="cascader_"
+            :class="isReQuired() ? 're-quired-flag' : '' "
             :props="cascprops"
             :placeholder="item.placeholder ? item.placeholder : '请选择'"
             :options="options"
@@ -221,6 +222,19 @@ onMounted(() => {
     }
   }
 });
+
+function isReQuired(){
+  const rule = props.item.rules;
+  let r = false;
+  if(rule && rule.length > 0){
+    for (const key in rule) {
+      if(rule[key].required){
+        r = true;
+      }
+    }
+  }
+  return r;
+}
 
 function updateOption(newOption: any) {
   options.value = newOption;
