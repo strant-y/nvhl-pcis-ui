@@ -10,6 +10,8 @@ import {
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
+import { useProductStore } from "@/store/modules/prod";
+const productStore = useProductStore();
 
 const props = defineProps({
   pageSchema: {
@@ -17,7 +19,10 @@ const props = defineProps({
     required: true,
   },
 });
-
+// Base.nCiJntAmt  //共保总保额
+// Base.nCiJntPrm  共保总保费
+// Base.nJiJntAmt  联保总保额
+// Base.nJiJntPrm  联保总保费
 const tgtobjEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));
