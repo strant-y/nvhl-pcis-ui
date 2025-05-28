@@ -261,10 +261,23 @@ export const dataOpertaor = defineStore(
                 if (sc['fromSchema'] && sc['fromSchema'].length > 0) {
                     const fromSchema = sc['fromSchema'];
                     fromSchema.forEach(f => {
-                        const prop = f['prop']; // 抽离需要的数据
-                        const d = getDataByKey(prop, data);
-                        if (d) {
-                            res1[k][prop] = d;
+                        if (f.inputtype === 'rtinputgroup') {
+                            const grouplist = f.groupList;
+                            if (grouplist && grouplist.length > 0) {
+                                grouplist.forEach(g => {
+                                    const gprop = g['prop']; // 抽离需要的数据
+                                    const gd = getDataByKey(gprop, data);
+                                    if (gd) {
+                                        res1[k][gprop] = gd;
+                                    }
+                                })
+                            }
+                        } else {
+                            const prop = f['prop']; // 抽离需要的数据
+                            const d = getDataByKey(prop, data);
+                            if (d) {
+                                res1[k][prop] = d;
+                            }
                         }
                     });
                 }
