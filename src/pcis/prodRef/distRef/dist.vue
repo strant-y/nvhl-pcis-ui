@@ -340,7 +340,6 @@ const method = {
   },
   //导出
   exportExcel: () => {
-    const fileName = `${formconfig1.value.title}.xlsx`;
     let paramitem  = Object.assign(formconfig1.value, {
       cComponentTable: cComponentTableValue,
       cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
@@ -351,6 +350,7 @@ const method = {
           ElMessage.error({ message: "导出出错", duration: 3000 });
           return;
         }
+        const fileName = decodeURIComponent(res.headers['content-disposition'].split('filename=')[1]);
         const blob = new Blob([res.data], {
           responseType:res.headers["content-type"]
             // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
@@ -429,8 +429,7 @@ const method = {
           ElMessage.error({ message: "下载出错", duration: 3000 });
           return;
         }
-        console.log(res,"000");
-        const fileName = res.headers['content-disposition'].split('filename=')[1];
+        const fileName = decodeURIComponent(res.headers['content-disposition'].split('filename=')[1]);
         const blob = new Blob([res.data], {
           responseType:res.headers["content-type"]
             // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
