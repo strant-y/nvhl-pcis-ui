@@ -350,12 +350,17 @@ function creatItem(d: any) {
   let sc: any = JSON.parse(JSON.stringify(schamaconf.value));
   // 将方法回填到item中
   Object.keys(schamaconf.value).forEach((k: any) => {
-    if (schamaconf.value[k]["func"]) {
-      sc[k]["func"] = schamaconf.value[k]["func"];
-    }
-    if (schamaconf.value[k]["tableClick"]) {
-      sc[k]["tableClick"] = schamaconf.value[k]["tableClick"];
-    }
+    Object.keys(schamaconf.value[k]).forEach((k2: any) => {
+      if (typeof schamaconf.value[k][k2] === 'function') {
+        sc[k][k2] = schamaconf.value[k][k2];
+      }
+    })
+    // if (schamaconf.value[k]["func"]) {
+    //   sc[k]["func"] = schamaconf.value[k]["func"];
+    // }
+    // if (schamaconf.value[k]["tableClick"]) {
+    //   sc[k]["tableClick"] = schamaconf.value[k]["tableClick"];
+    // }
   });
   return sc;
 }
@@ -637,6 +642,14 @@ function getselectionData() {
   }
 }
 
+/**
+ * 获取指定行所有列组件的ref
+ * @param id 行id
+ */
+function getRowAllItemRefById(id: string) {
+  return formItems.value[id];
+}
+
 function clearSelection() {
   tableRef.value?.clearSelection();
 }
@@ -656,6 +669,7 @@ defineExpose({
   setValueByRowKey,
   getRowById,
   getselectionData,
+  getRowAllItemRefById,
   clearSelection,
   toggleRowSelection,
 });

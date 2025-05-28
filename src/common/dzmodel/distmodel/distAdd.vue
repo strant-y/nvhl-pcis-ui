@@ -22,11 +22,14 @@ import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { saveDist } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { codeListViewStore } from "@/store";
 const opertaor = dataOpertaor();
 const param = ref({});
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const { getRules } = useValidator();
 const tableRef = ref<MyTableMethod | null>(null);
+const codeListStore = codeListViewStore();
+
 const props = defineProps({
   data: {
     type: Object,
@@ -184,10 +187,11 @@ onMounted(() => {
   
   let newSchema = [];
   let cIs= opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered']  //  是否记名投保
-
   for(let i = 0; props.data.fromSchema && i < props.data.fromSchema.length; i++){
     let item = JSON.parse(JSON.stringify(props.data.fromSchema[i]));
-    if (props.data.fromSchema[i]["func"]) {
+    if(['Dist.AllOccup'].includes(item.prop)) {
+      item["func"] = getDistoccupType;
+    }else if (props.data.fromSchema[i]["func"]) {
       item["func"] = props.data.fromSchema[i]["func"];
     }
     if (props.data.fromSchema[i]["tableClick"]) {
@@ -213,6 +217,21 @@ onMounted(() => {
   } else {
   }
 });
+
+  //根据获取的职业类别查询职业等级并绑定下拉框
+const getDistoccupType = (val) => {
+  if(!val || val.length < 3) return;
+  codeListStore.queryCodeList({
+    codeListName: "Occupt_ZYLB",
+    codeListParam: {cParCde: val.at(-1)},
+  }).then((res) => {
+    const item = freeEditRef.value?.getFromSchemaItem('Dist.cOccupationalLevel')
+    //给表单下拉项赋值
+    item.itemConfig.loadData = res
+  });
+}
+
+
 
 function getFromValue() {
   return freeEditRef?.value?.getFromValue();
