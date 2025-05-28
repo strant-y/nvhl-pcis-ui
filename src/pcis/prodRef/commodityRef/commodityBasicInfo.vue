@@ -19,7 +19,10 @@ const opertaor = dataOpertaor();
 import { useRoute } from "vue-router";
 import { cp } from "fs";
 import { eventBus } from '@/utils/event-bus'
-import { useUserStore } from "@/store";
+import { useUserStore,useProductStore } from "@/store";
+// import { useProductStore } from "@/store";
+const productStore = useProductStore();
+
 
 const tabref = opertaor.getTableRefByKey("permissionAllo");
 
@@ -41,7 +44,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     endBtns: [
       createFreeButtonBase({
         type: "primary",
-        label: "保存",
+        label: "保存", 
         func: async () => {
           console.log()
           const s = freeEditRef.value?.getFromValue(); //获取表单数据
@@ -399,11 +402,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "是否关联附属信息",
         typeCode: "WEB_SYS_STA_DICT",
         codeParam: { cParCde: "yes_no" },
+        defaultValue: '0',
         func:(val:any)=>{
           console.log("关联信息",val);
-          if(val ==='1'){
+          productStore.setcAffiliatedMrk(val)
+          // if(val ==='1'){
             
-          }
+          // }
         }
       },
       {

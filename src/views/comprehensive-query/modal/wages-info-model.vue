@@ -67,10 +67,9 @@ const pageresult = reactive<Pageresult>({
     result: "",
     /** 数据列表 */
     list: [
-        { "DistSummary.cPlanNo": 123 }
-    ],
+            ],
     /** 总数 */
-    total: 4,
+    total: 0,
 });
 
 const close = (type) => {
@@ -116,11 +115,11 @@ const tableconfig = reactive<AppGridEditConfig>(
                     freeEditRef.value?.addRowByData({ cGrpMrk: "0" });
 
 
-                    let seleObj = [
-                        { cOpgrpCnm: '张', cName: '草人' },
-                        { cOpgrpCnm: '张2', cName: '草人' },
-                        { cOpgrpCnm: '张3', cName: '草人' },
-                    ]
+                    // let seleObj = [
+                    //     { cOpgrpCnm: '张', cName: '草人' },
+                    //     { cOpgrpCnm: '张2', cName: '草人' },
+                    //     { cOpgrpCnm: '张3', cName: '草人' },
+                    // ]
 
                     // seleObj.forEach((item,index)=>{
                     // 	tableRef.value?.addRowByData({

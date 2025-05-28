@@ -835,6 +835,7 @@ onMounted(() => {
       freeEditRef.value?.setValue("cProdNo", routeQryParams.rowData.cProdNo);
     });
   } else {
+    console.log('-----router=-=',routeQryParams)
     const param = { 'cPlanNo': routeQryParams.rowData.cPlanNo }
     policyService.getPlanBase(param).then(result => {
       if (result['code'] === 200) {

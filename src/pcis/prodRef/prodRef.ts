@@ -45,6 +45,7 @@ import rateConfiguration from "./commonRef/RateConfiguration.vue";
 import InstituTaxRateAllocat from "./commonRef/InstituTaxRateAllocat.vue";
 import assoCorrPreCalculFormula from "./commonRef/AssoCorrPreCalculFormula.vue";
 import commodityBasicInfo from "./commodityRef/commodityBasicInfo.vue";
+import relatedancillaryInfo from "./commodityRef/relatedancillaryInfo.vue";
 import choosePlan from "./commodityRef/ChonsePlan.vue";
 import relatedHealthNotify from "./commodityRef/RelatedHealthNotify.vue";
 import fileList from "./commodityRef/FileList.vue";
@@ -119,6 +120,7 @@ const componentMap = {
   InstituTaxRateAllocatRef:InstituTaxRateAllocat,
   assoCorrPreCalculFormulaRef:assoCorrPreCalculFormula,
   commodityBasicInfoRef:commodityBasicInfo,
+  relatedancillaryInfoRef:relatedancillaryInfo,
   choosePlanRef:choosePlan,
   relatedHealthNotifyRef:relatedHealthNotify,
   fileListRef:fileList,

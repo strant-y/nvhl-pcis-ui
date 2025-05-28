@@ -1306,3 +1306,51 @@ export function savePlanCiInfo(queryParams: any): AxiosPromise<any> {
  export function deletePlanCiInfoById(queryParams: any): AxiosPromise<any> {
   return post(`/plan/deletePlanCiInfoById`, queryParams);
 }
+/**
+ * 商品配置  --关联附属信息-新增
+ * 
+ */
+ export function saveCommodityAttached(queryParams: any): AxiosPromise<any> {
+  return post(`/commodity/saveCommodityAttached`, queryParams);
+}
+
+
+
+/**
+ * 商品配置  --选择方案 分保校验
+ * 
+ */
+export function commodityBaseOperatorCheck(queryParams: any): AxiosPromise<any> {
+  return post(`/commodity/commodityBaseOperatorCheck`, queryParams);
+}
+/**
+ * 商品配置  --选择方案  保存2
+ * 
+ */
+export function saveCommodityPlan(queryParams: any): AxiosPromise<any> {
+  return post(`/commodity/saveCommodityPlan`, queryParams);
+}
+
+
+/**
+ * 商品配置  --选择方案  删除单条
+ * 
+ */
+export function deleteCommodityPlan(queryParams: any): AxiosPromise<any> {
+  return post(`/commodity/deleteCommodityPlan`, queryParams);
+}
+
+/**
+ * 商品配置  --选择方案  保存别名
+ * 
+ */
+export function saveCommodityPlanCvrgDisPlayNme(queryParams: any): AxiosPromise<any> {
+  return post(`/commodity/saveCommodityPlanCvrgDisPlayNme`, queryParams);
+}
+/**
+ * 商品配置  --选择方案  编辑查询
+ * 
+ */
+export function queryPlanCvrgByCommodityNo(queryParams: any): AxiosPromise<any> {
+  return post(`/commodity/queryPlanCvrgByCommodityNo`, queryParams);
+}

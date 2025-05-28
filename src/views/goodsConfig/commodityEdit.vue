@@ -7,7 +7,7 @@
           <template v-for="(pageConfig, v) in formconfig1" :key="v">
             <el-affix :offset="150">
               <el-anchor :bound="120" :offset="80">
-                <el-anchor-link v-for="(k, i) in pageConfig?.pageInfo" :key="i" :href="`#${k.pageKey}`">
+                <el-anchor-link v-for="(k, i) in pageConfig?.pageInfo" :key="i"    v-show="k.pageKey == 'relatedancillaryInfo' ?iscAffiliatedMrk : true"  :href="`#${k.pageKey}`">
                   {{ k.pageTtile }}
                 </el-anchor-link>
               </el-anchor>
@@ -16,8 +16,11 @@
         </el-aside>
         <el-container>
           <el-main>
+            <!-- v-show="k.pageKey == 'relatedancillaryinfo' ?iscAffiliatedMrk : true" -->
             <template v-for="(pageConfig, v) in formconfig1" :key="v">
-              <div v-for="(k, i) in pageConfig?.pageInfo" :key="i" :id="k.pageKey">
+              <div v-for="(k, i) in pageConfig?.pageInfo" :key="i" :id="k.pageKey" 
+              v-show="k.pageKey == 'relatedancillaryInfo' ?iscAffiliatedMrk : true" 
+              >
                 {{ k.pageKey }}
                 <component :ref="(res) => {
                     opertaor.addTableRef(k.pageKey, res);
@@ -35,7 +38,7 @@
       <el-button type="primary" @click="scrollToTop">一键回到顶部</el-button>
       <el-button type="primary" @click="saveAll">保存</el-button>
       <el-button type="primary">保存并提交审核</el-button>
-      <el-button type="primary" @click="validateForm">返回</el-button>
+      <el-button type="primary" @click="validateForm">返回（{{iscAffiliatedMrk}}）</el-button>
     </div>
   </el-footer>
 </template>
@@ -47,6 +50,9 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
 opertaor.init();
 
+import { useProductStore } from "@/store";
+const productStore = useProductStore();
+const { iscAffiliatedMrk } = storeToRefs(productStore);
 
 
 // const tabref2 = opertaor.getTableRefByKey("permissionAllo");
@@ -65,14 +71,20 @@ opertaor.setTableConfig([
     pageInfo: {
       commodityBasicInfo: {
         pageKey: "commodityBasicInfo",
-        pageTtile: "商品基本信息",
+        pageTtile: "商品基本信息", 
         pageRef: "commodityBasicInfo",
+      },
+      relatedancillaryInfo: {
+        pageKey: "relatedancillaryInfo",
+        pageTtile: "关联附属信息",
+        pageRef: "relatedancillaryInfo",
       },
       choosePlan: {
         pageKey: "choosePlan",
         pageTtile: "选择方案",
         pageRef: "choosePlan",
       },
+
       // relatedHealthNotify: {
       //   pageKey: "relatedHealthNotify",
       //   pageTtile: "关联健康告知",
@@ -93,11 +105,11 @@ opertaor.setTableConfig([
         pageTtile: "投保规则",
         pageRef: "InsuranceRules",
       },
-      commonProblem: {
-        pageKey: "commonProblem",
-        pageTtile: "常见问题配置",
-        pageRef: "commonProblem",
-      },
+      // commonProblem: {
+      //   pageKey: "commonProblem",
+      //   pageTtile: "常见问题配置",
+      //   pageRef: "commonProblem",
+      // },
     },
   },
 ]);
@@ -281,7 +293,7 @@ const validateForm = async () => {
     }
   }
 
-
+  
 
   return false;
   // 基本信息
