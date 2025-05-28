@@ -49,7 +49,8 @@ import {
 } from "@/api/prod";
 const dzmodal = useDzModal();
 const tabref = opertaor.getTableRefByKey("commodityBasicInfo");
-import { useRoute } from "vue-router";
+// import { useRoute } from "vue-router";
+import { useRouter, useRoute } from 'vue-router';
 
 import { c } from "vite/dist/node/types.d-aGj9QkWt";
 const planConfigurationEdit = defineAsyncComponent(() => import("./planConfigurationEdit.vue"));
@@ -195,11 +196,18 @@ const tableconfig = reactive<AppTableConfig>(
             _dataId: "c4bede5cda0c4cb9ae682d76e7f29638",
           }
           router.push({
-            // path: '/plan-config/plan-info',
-            // path: '@/views/plan-config/plan-info/plan-info.vue',
-            name: 'plan-info',
-            query: { data: JSON.stringify({ type: 'view', rowData: ss }) }
+            path: '/plan-config/plan-info',
+            query: { data: JSON.stringify({ type:'view', rowData: ss }) }
           })
+
+          // router.push({
+          //   path: "/goodsConfig/commodityEdit",
+          //   query: {
+          //     param: JSON.stringify({
+          //       editType: "add",
+          //     }),
+          //   },
+          // });
           // dzmodal.open(planInfoDialog, { type: "view", data: row }).then((res) => {
           //   if (res.type === "ok") {
           //     handleQuery();
@@ -395,6 +403,7 @@ const handleVisibleUpdate = (value: boolean) => {
   // emit("update:visible", value);
 };
 onMounted(() => {
+  console.log('path')
   if (param.editType === "edit") {
     setDisa();
   }
