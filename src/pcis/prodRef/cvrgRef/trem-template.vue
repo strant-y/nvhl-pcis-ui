@@ -63,6 +63,13 @@
                 <template v-for="(item, k) in termFactormap" :key="k">
                   <tr v-if="item.cPorpShowtitle !== '1'">
                     <td>
+                      <el-text
+                        v-if="isrequired(item)"
+                        class="mx-1"
+                        style="margin-right: 2px"
+                        type="danger"
+                        >*</el-text
+                      >
                       <span>{{ item.title }}</span>
                     </td>
                     <td>
@@ -187,6 +194,19 @@
                                       .cPorpType === 'text'
                                   "
                                 >
+                                  <el-text
+                                    v-if="
+                                      isrequired(
+                                        riskdata.rowConfig[colinfo.cColId][
+                                          n - 1
+                                        ].factorItem
+                                      )
+                                    "
+                                    class="mx-1"
+                                    style="margin-right: 2px"
+                                    type="danger"
+                                    >*</el-text
+                                  >
                                   <span
                                     >{{
                                       riskdata.rowConfig[colinfo.cColId][n - 1]
@@ -797,6 +817,13 @@ function setDisabledAll() {
       });
     });
   });
+}
+
+function isrequired(i: any) {
+  if (i.required) {
+    return true;
+  }
+  return false;
 }
 
 defineExpose({
