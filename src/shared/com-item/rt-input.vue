@@ -164,6 +164,9 @@ const props = defineProps({
 });
 
 function isReQuired(){
+  if(props.item.required){
+    return true;
+  }
   const rule = props.item.rules;
   let r = false;
   if(rule && rule.length > 0){

@@ -3,7 +3,7 @@
   <el-select
     v-if="!showLabel"
     ref="selectRef"
-    :class="isReQuired() ? 're-quired-flag' : '' "
+    :class="isReQuired() ? 're-quired-flag' : ''"
     v-model="selectedValue"
     :placeholder="item.placeholder ? item.placeholder : '请选择'"
     :disabled="
@@ -250,7 +250,7 @@ function uploadOption() {
       props.item.cache ? props.item.cache : true
     )
     .then((res) => {
-      if(res){
+      if (res) {
         options.value = res;
       }
     })
@@ -295,12 +295,15 @@ onMounted(() => {
 function updateOption(newOption: any) {
   options.value = newOption;
 }
-function isReQuired(){
+function isReQuired() {
+  if (props.item.required) {
+    return true;
+  }
   const rule = props.item.rules;
   let r = false;
-  if(rule && rule.length > 0){
+  if (rule && rule.length > 0) {
     for (const key in rule) {
-      if(rule[key].required){
+      if (rule[key].required) {
         r = true;
       }
     }

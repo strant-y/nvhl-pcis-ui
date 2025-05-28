@@ -1,65 +1,65 @@
 <!-- 多级的级联选择器，如省市区 -->
 <template>
   <!-- 下拉选择框-->
-    <div class="cascader_" v-show="!props.showLabel">
-        <el-cascader
-            ref="cascaderRef"
-            v-model="selectedValue"
-            class="cascader_"
-            :class="isReQuired() ? 're-quired-flag' : '' "
-            :props="cascprops"
-            :placeholder="item.placeholder ? item.placeholder : '请选择'"
-            :options="options"
-            :show-all-levels="false"
-            :disabled="
-              (item.readonly
-                ? typeof item.readonly === 'boolean'
-                  ? item.readonly
-                  : item.readonly === 1 || item.readonly === '1'
-                    ? true
-                    : false
-                : false) ||
-              (item.disabled
-                ? typeof item.disabled === 'boolean'
-                  ? item.disabled
-                  : item.disabled === 1 || item.disabled === '1'
-                    ? true
-                    : false
-                : false) ||
-              showLabel
-            "
-            :clearable="
-              item.clearable
-                ? typeof item.clearable === 'boolean'
-                  ? item.clearable
-                  : item.clearable === 1 || item.clearable === '1'
-                    ? true
-                    : false
-                : false
-            "
-            :size="item.size"
-            :filterable="item.filterable"
-            :showAllLevels="item.showAllLevels"
-            :multiple="
-              item.multiple
-                ? typeof item.multiple === 'boolean'
-                  ? item.multiple
-                  : item.multiple === 1 || item.multiple === '1'
-                    ? true
-                    : false
-                : false
-            "
-            @change="handleChange"
-        >
-            <template #empty>
-                {{ "暂无数据" }}
-            </template>
-        </el-cascader>
-    </div>
+  <div class="cascader_" v-show="!props.showLabel">
+    <el-cascader
+      ref="cascaderRef"
+      v-model="selectedValue"
+      class="cascader_"
+      :class="isReQuired() ? 're-quired-flag' : ''"
+      :props="cascprops"
+      :placeholder="item.placeholder ? item.placeholder : '请选择'"
+      :options="options"
+      :show-all-levels="false"
+      :disabled="
+        (item.readonly
+          ? typeof item.readonly === 'boolean'
+            ? item.readonly
+            : item.readonly === 1 || item.readonly === '1'
+              ? true
+              : false
+          : false) ||
+        (item.disabled
+          ? typeof item.disabled === 'boolean'
+            ? item.disabled
+            : item.disabled === 1 || item.disabled === '1'
+              ? true
+              : false
+          : false) ||
+        showLabel
+      "
+      :clearable="
+        item.clearable
+          ? typeof item.clearable === 'boolean'
+            ? item.clearable
+            : item.clearable === 1 || item.clearable === '1'
+              ? true
+              : false
+          : false
+      "
+      :size="item.size"
+      :filterable="item.filterable"
+      :showAllLevels="item.showAllLevels"
+      :multiple="
+        item.multiple
+          ? typeof item.multiple === 'boolean'
+            ? item.multiple
+            : item.multiple === 1 || item.multiple === '1'
+              ? true
+              : false
+          : false
+      "
+      @change="handleChange"
+    >
+      <template #empty>
+        {{ "暂无数据" }}
+      </template>
+    </el-cascader>
+  </div>
 
-    <div v-if="props.showLabel">
-        <span>{{displayText}}</span>
-    </div>
+  <div v-if="props.showLabel">
+    <span>{{ displayText }}</span>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -179,7 +179,7 @@ function handleChange(val?: string | number | Array<any> | undefined) {
 }
 
 function uploadOption() {
-  if(!getParam() || Object.keys(getParam()).length === 0) return;
+  if (!getParam() || Object.keys(getParam()).length === 0) return;
   codeListStore
     .queryCodeList(
       {
@@ -197,12 +197,17 @@ function uploadOption() {
 }
 
 onMounted(() => {
-  selectedValue.value = props.modelValue
+  selectedValue.value = props.modelValue;
   // 初始化组件数据
   if (props.item) {
     if (props.item.loadData) {
       options.value = props.item.loadData;
-    } else if (props.item.typeCode && props.modelValue && getParam() && Object.keys(getParam()).length > 0) {
+    } else if (
+      props.item.typeCode &&
+      props.modelValue &&
+      getParam() &&
+      Object.keys(getParam()).length > 0
+    ) {
       codeListStore
         .queryCodeList(
           {
@@ -223,12 +228,15 @@ onMounted(() => {
   }
 });
 
-function isReQuired(){
+function isReQuired() {
+  if (props.item.required) {
+    return true;
+  }
   const rule = props.item.rules;
   let r = false;
-  if(rule && rule.length > 0){
+  if (rule && rule.length > 0) {
     for (const key in rule) {
-      if(rule[key].required){
+      if (rule[key].required) {
         r = true;
       }
     }
@@ -253,8 +261,7 @@ defineExpose({
 });
 </script>
 <style lang="scss">
-.cascader_{
-    width: 100%;
+.cascader_ {
+  width: 100%;
 }
 </style>
-

@@ -110,12 +110,15 @@ function getValueFormat() {
   }
 }
 
-function isReQuired(){
+function isReQuired() {
+  if (props.item.required) {
+    return true;
+  }
   const rule = props.item.rules;
   let r = false;
-  if(rule && rule.length > 0){
+  if (rule && rule.length > 0) {
     for (const key in rule) {
-      if(rule[key].required){
+      if (rule[key].required) {
         r = true;
       }
     }

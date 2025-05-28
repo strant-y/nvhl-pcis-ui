@@ -4,7 +4,7 @@
     v-if="!showLabel"
     ref="selectV2Ref"
     v-model="selectedValue"
-    :class="isReQuired() ? 're-quired-flag' : '' "
+    :class="isReQuired() ? 're-quired-flag' : ''"
     :placeholder="item.placeholder ? item.placeholder : '请选择'"
     :disabled="
       (item.readonly
@@ -281,12 +281,15 @@ onMounted(() => {
     }
   }
 });
-function isReQuired(){
+function isReQuired() {
+  if (props.item.required) {
+    return true;
+  }
   const rule = props.item.rules;
   let r = false;
-  if(rule && rule.length > 0){
+  if (rule && rule.length > 0) {
     for (const key in rule) {
-      if(rule[key].required){
+      if (rule[key].required) {
         r = true;
       }
     }

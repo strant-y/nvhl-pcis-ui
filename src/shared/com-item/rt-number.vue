@@ -86,6 +86,9 @@ function handleChange(val?: string | number | undefined) {
   // props.item.func ? props.item.func(val) : null;
 }
 function isReQuired() {
+  if (props.item.required) {
+    return true;
+  }
   const rule = props.item.rules;
   let r = false;
   if (rule && rule.length > 0) {
