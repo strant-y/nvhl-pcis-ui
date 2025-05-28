@@ -16,6 +16,7 @@ import { useRoute } from "vue-router";
 const route = useRoute();
 const param = route.params.param;
 import { useProductStore } from "@/store/modules/prod";
+import { log } from "console";
 const productStore = useProductStore();
 
 const props = defineProps({
@@ -68,9 +69,11 @@ const method = {
           key['Ci.nSeqNo']=index+1
       });
   },
+  //机构部门下拉事件
   cCoinsurerCdeChange:(val)=>{
     const rowData = freeEditRef.value?.getSelectRow();
     if(val ==="327001"){
+      freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde",rowData._dataId,"")
     codeListStore
         .queryCodeList({
           codeListName: "Comm_Code_LIST",
@@ -89,17 +92,32 @@ const method = {
       });
     }
   },
+  //出单标志下拉事件
+  clssueMrkChange:  (val)=>{
+    const rowData = freeEditRef.value?.getSelectRow();
+    if(val ==="0" && rowData["Ci.cCoinsurerCde"] === "327001"){
+        ElMessage.error("联保单出单方必须是主联单的分公司！")
+    }
+    nextTick(()=>{
+        freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk",rowData._dataId,"1")
+      })
+  },
   nCiShareChange:(val)=>{
     const rowDatas = freeEditRef.value?.getSelectRow();
     let value = parseFloat(val);
-    // 如果输入值大于1，则限制为1
-    if (value > 1) {
+    if (value > 1 || value == "") {
       freeEditRef?.value?.setValueByRowKey("Ci.nCiShare",rowDatas._dataId,parseFloat(1.00000000));
     }
-    const nAmt =  parseFloat(productStore.nPrm) * parseFloat(val)
-    const nPrm = parseFloat(productStore.nAmt) * parseFloat(val)
-    freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm",rowDatas._dataId,nAmt)
-    freeEditRef?.value?.setValueByRowKey("Ci.nCiAmt",rowDatas._dataId,nPrm)
+    const nPrm =  parseFloat(productStore.nPrm) * parseFloat(val)
+    const nAmt = parseFloat(productStore.nAmt) * parseFloat(val)
+    freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm",rowDatas._dataId,nPrm)
+    freeEditRef?.value?.setValueByRowKey("Ci.nCiAmt",rowDatas._dataId,nAmt)
+    if(rowDatas["Ci.cCoinsurerCde"] == "327001"){
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntAmt",nAmt)  //联保总保额
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm",nPrm) //联保总保费
+      opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnAmt",nAmt) //我司份额保额
+      opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnPrm",nPrm) //我司份额保费
+    }
   }
 };
 //给表单下拉项赋值
@@ -160,6 +178,11 @@ function ciAdd() {
         key['Ci.nCiShare'] = parseFloat(num.toFixed(8));
         //强制更新
         freeEditRef?.value?.setValueByRowKey('Ci.nCiShare',key._dataId,key['Ci.nCiShare'])
+        setFormItem("Ci.cDptCde", {
+          loadData: [
+            { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm}` },
+          ],
+    }); 
     });
   }
 }
