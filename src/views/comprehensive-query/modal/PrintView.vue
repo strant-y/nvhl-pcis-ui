@@ -204,7 +204,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         itemWidth: 3,
         func: (value: any) => {
           if (!!value) {
-            debugger
             const CPrnNo = freeEditRef.value?.getValue("cPrnNo");
             if (!!CPrnNo) {
               freeEditRef.value?.setValue("cPrnNo", "");
@@ -300,7 +299,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "打印格式",
         loadData: [{ label: "中文", value: "C" }],
         rules: [getRules("required", {})],
-        defaultValue: "C",
         itemWidth: 3,
       },
       {
@@ -330,7 +328,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 onMounted(async () => {
   if (props.data) {
     nextTick(() => {
-      freeEditRef.value?.setFormValue({ ...props.data, cLanguage: "C" });
+      freeEditRef.value?.setValue("cLanguage", "C");
       getPrnTypeOptions();
     });
   }

@@ -215,13 +215,24 @@ function getRowAllItemRefById(id: string) {
   return rttableFrom.value?.getRowAllItemRefById(id);
 }
 
+function clearSelection() {
+  rttableFrom.value?.clearSelection();
+}
+
+function toggleRowSelection(row: any, selected: boolean) {
+  rttableFrom.value?.toggleRowSelection(row, selected);
+}
+
 defineExpose({
   getPartnerPage,
   getFromValue,
   setFormSchema,
   setValueByRowKey,
   getselectionData,
-  getRowAllItemRefById
+  getRowAllItemRefById,
+
+  clearSelection,
+  toggleRowSelection,
 });
 </script>
 

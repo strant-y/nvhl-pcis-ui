@@ -650,6 +650,14 @@ function getRowAllItemRefById(id: string) {
   return formItems.value[id];
 }
 
+function clearSelection() {
+  tableRef.value?.clearSelection();
+}
+
+function toggleRowSelection(row: any, selected: boolean) {
+  tableRef.value?.toggleRowSelection(row, selected);
+}
+
 defineExpose({
   tableExvalidate,
   addRow,
@@ -661,7 +669,9 @@ defineExpose({
   setValueByRowKey,
   getRowById,
   getselectionData,
-  getRowAllItemRefById
+  getRowAllItemRefById,
+  clearSelection,
+  toggleRowSelection,
 });
 function isrequired(i: any) {
   if (i.rules) {
