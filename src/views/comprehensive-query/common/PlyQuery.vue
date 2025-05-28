@@ -1072,6 +1072,7 @@ onMounted(async () => {
             item.rules = []; // 清除必填规则
         }
     });
+    freeEditRef.value.setValue("cDataTyp","app") ; // 列表类型默认值 为全部
     freeEditRef.value.setValue("cDptCde", JSON.parse(sessionStorage.getItem("user")).companyId);
     setFormItem("cDptCde", {
         loadData: [
