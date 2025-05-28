@@ -169,7 +169,7 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "撤回",
         type: "success",
         size: "large",
-        icon: "Edit",
+        icon: "return",
         tableClick: (row: any) => {
           handleWorkFlow(row);
         },
