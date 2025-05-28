@@ -160,9 +160,9 @@ onMounted(async () => {
     route.params.param.cProdNo,
     formconfig1.value.title
   );
-  setTimeout(() => {
+  nextTick(() => {
     handleQuery();
-  }, 200);
+  });
 });
 
 // 绑定方法
@@ -269,12 +269,13 @@ const method = {
 
 const handleQuery = () => {
   const param = opertaor.getParam();
-  console.log(param);
   let app = "";
   if (param.cOrgAppNo) {
     app = param.cOrgAppNo;
-  } else {
+  } else if(opertaor.getDataAll().plyBase["Base.cAppNo"]){
     app = opertaor.getDataAll().plyBase["Base.cAppNo"];
+  } else {
+    app = route.params.param.cAppNo
   }
   query({
     cComponentTable: cComponentTableValue,
@@ -285,7 +286,6 @@ const handleQuery = () => {
 }
 
 const query = (param: any) => {
-  console.log('query-param', param)
   selectDist(param).then((res) => {
     if (res.code == 200) {
       pageresult.list = [];

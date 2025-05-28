@@ -185,9 +185,9 @@ onMounted(async () => {
     route.params.param.cProdNo,
     formconfig1.value.title
   );
-  setTimeout(() => {
+  nextTick(() => {
     method.handleQuery();
-  }, 500);
+  });
 
   // 电梯信息清单
   let tgtRef = opertaor.getTableRefByKey('tgt')
@@ -274,8 +274,10 @@ const method = {
     let app = "";
     if (param.cOrgAppNo) {
       app = param.cOrgAppNo;
-    } else {
+    } else if(opertaor.getDataAll().plyBase["Base.cAppNo"]){
       app = opertaor.getDataAll().plyBase["Base.cAppNo"];
+    } else {
+      app = route.params.param.cAppNo
     }
     const selData = {
       cComponentTable: cComponentTableValue,
@@ -307,7 +309,6 @@ const method = {
         let distSummary045001 = opertaor.getTableRefByKey('DistSummary045001')
         console.log('distSummary045001', distSummary045001)
         distSummary045001?.handleQuery();
-
       }
     });
   },
