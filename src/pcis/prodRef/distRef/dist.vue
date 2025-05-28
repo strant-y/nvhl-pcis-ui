@@ -167,6 +167,7 @@ onMounted(async () => {
     titleBtns: formconfig1.value.titleBtns,
     fromSchema: formconfig1.value.distSchema,
   });
+  tableconfig.value.fromSchema.forEach( r => r['onInit'] = rowChange);
   tableconfig.value.tableBtnType = "btn";
   tableconfig.value.tableBtnWidth = 150;
   tableconfig.value.tableBtnPosition = "right";
@@ -178,7 +179,7 @@ onMounted(async () => {
       tableconfig.value.tableBtn = btns;
     }
   }
-  tableconfig.value.isPage = true;
+  tableconfig.value.isPage = false;
   // 初始化 cComponentTableValue
   cComponentTableValue = getCComponentTableValue(
     route.params.param.cProdNo,
@@ -301,23 +302,29 @@ const method = {
         if(tgtRef !=undefined){
           tgtRef.setValue("Tgt.nElevatorsNumber",res.data.length)
         }
+
+        // 刷新汇总表格
+        let distSummary045001 = opertaor.getTableRefByKey('DistSummary045001')
+        console.log('distSummary045001', distSummary045001)
+        distSummary045001?.handleQuery();
+
       }
     });
   },
-  distSummeryQuery: () => {
-    syncDist({
-      cComponentTable: "DistSummary",
-      cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
-    }).then((res) => {
-      if (res.code == 200) {
-        pageresult.list = [];
-        pageresult.list = res.data;
-        pageresult.list.forEach((item, index) => {
-          item.nSeqNo = index + 1;
-        });
-      }
-    });
-  },
+  // distSummeryQuery: () => {
+  //   syncDist({
+  //     cComponentTable: "DistSummary",
+  //     cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
+  //   }).then((res) => {
+  //     if (res.code == 200) {
+  //       pageresult.list = [];
+  //       pageresult.list = res.data;
+  //       pageresult.list.forEach((item, index) => {
+  //         item.nSeqNo = index + 1;
+  //       });
+  //     }
+  //   });
+  // },
   carInfoAdd: () => {
     let baseFlag = opertaor.getDataAll().plyBase["Base.cAppNo"];
     checkAppBase({ cAppNo: baseFlag }).then((res) => {
@@ -409,19 +416,6 @@ const method = {
     };
     input.click(); // 触发文件选择对话框
   },
-  //根据获取的职业类别查询职业等级并绑定下拉框
-  getDistoccupType:(val) => {
-    codeListStore
-        .queryCodeList({
-          codeListName: "Occupt_ZYLB",
-          codeListParam: {cParCde: val.at(-1)},
-        })
-        .then((res) => {
-        setFormItem("Dist.cOccupationalLevel", {
-          loadData: res,
-        });
-    })
-  },
   //模板下载
   downloadTemp: () => {
     policyService
@@ -461,23 +455,23 @@ setregistAdd(){
   }
 };
 
-//给表单下拉项赋值
-function setFormItem(key: any, obj: any) {
-  if (obj && Object.keys(obj).length) {
-    formconfig1.value.fromSchema?.forEach((item: any) => {
-      if (item.prop === key) {
-        //控制尾部按钮的
-        if (item.btnItems && obj.btnItems) {
-          for (let key in obj.btnItems) {
-            item.btnItems[key] = obj.btnItems[key];
-          }
-        }else{
-          Object.assign(item, obj);
-        }
-      }
-    });
+const rowChange = (data: any) => {
+  const {value, rowData, config, itemRef} = data;
+  if(!value || !rowData || !config || !itemRef) return;
+  if('Dist.cOccupationalLevel' === config.prop){
+    const AllOccup = rowData['Dist.AllOccup'];
+    if( AllOccup.length < 3) return;
+      codeListStore.queryCodeList({
+        codeListName: "Occupt_ZYLB",
+        codeListParam: {cParCde: AllOccup.at(-1)},
+      }).then((res) => {
+        //给表单下拉项赋值
+        config.loadData = res;
+      }); 
   }
 }
+
+
 function setUnDisabledByKeyList(key: any) {
   tableconfig.value.formconfig.endBtns?.forEach((item: any) => {
     if ("Btn_" + item.id === key) {

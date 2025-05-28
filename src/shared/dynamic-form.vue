@@ -578,6 +578,7 @@ defineExpose({
   clearValidate,
   resetFields,
   setDisabledAll,
+  fromListRef
 });
 </script>
 

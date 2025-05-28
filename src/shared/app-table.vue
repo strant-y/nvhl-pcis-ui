@@ -77,7 +77,7 @@
         <el-pagination
           v-model:current-page="queryParams.pageNum"
           v-model:page-size="queryParams.pageSize"
-          layout="prev, pager, next, jumper, total"
+          layout="total, prev, pager, next, jumper"
           :total="pageresult.total"
           v-if="!tableConfig.isPage && pageresult.total > 0"
           @size-change="pageChange"
@@ -160,10 +160,15 @@ watch(
   { deep: true }
 );
 
-onMounted(() => {
+onMounted(()=>{
   Object.assign(appgrideditConfig, props.tableConfig);
   appgrideditConfig.editFlag = false;
-});
+  nextTick(()=>{
+    dataList.value = props.pageresult?.list;
+  })
+})
+
+
 
 function handleSelectionChange(selectedRows: any[]) {
   emits("selection-change", selectedRows);
@@ -206,12 +211,17 @@ function getselectionData() {
   return rttableFrom.value?.getselectionData();
 }
 
+function getRowAllItemRefById(id: string) {
+  return rttableFrom.value?.getRowAllItemRefById(id);
+}
+
 defineExpose({
   getPartnerPage,
   getFromValue,
   setFormSchema,
   setValueByRowKey,
-  getselectionData
+  getselectionData,
+  getRowAllItemRefById
 });
 </script>
 

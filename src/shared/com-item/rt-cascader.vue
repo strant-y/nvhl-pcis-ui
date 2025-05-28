@@ -114,7 +114,7 @@ const cascprops: CascaderProps = {
     : false,
   lazyLoad(node, resolve) {
     const { level, value } = node;
-    if (level !== 0) {
+    if (level !== 0 && !!value) {
       codeListStore
         .queryCodeList(
           {
@@ -178,6 +178,7 @@ function handleChange(val?: string | number | Array<any> | undefined) {
 }
 
 function uploadOption() {
+  if(!getParam() || Object.keys(getParam()).length === 0) return;
   codeListStore
     .queryCodeList(
       {
@@ -195,11 +196,12 @@ function uploadOption() {
 }
 
 onMounted(() => {
+  selectedValue.value = props.modelValue
   // 初始化组件数据
   if (props.item) {
     if (props.item.loadData) {
       options.value = props.item.loadData;
-    } else if (props.item.typeCode) {
+    } else if (props.item.typeCode && props.modelValue && getParam() && Object.keys(getParam()).length > 0) {
       codeListStore
         .queryCodeList(
           {
