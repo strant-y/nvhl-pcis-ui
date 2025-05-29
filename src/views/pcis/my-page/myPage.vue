@@ -933,7 +933,7 @@ async function loadAfter() {
       opertaor.getTableRefByKey("plyBase").setFormValue(baseobj);
       //承保信息初始化
       const baseafterobj = {};
-      baseafterobj["Base.cRatioTyp"] = "3";
+      baseafterobj["Base.cRatioTyp"] = "2";
       baseafterobj["Base.cInstMrk"] = "0";
       baseafterobj["Base.cDisptSttlCde"] = "B";
       baseafterobj["Base.cInsExchCde"] = "1";
