@@ -168,6 +168,9 @@ function setValueByRowKey(props:string ,rowId: any, value:any){
 function getRowById(dataId: string) {
   return rttableFrom.value?.getRowById(dataId);
 }
+function setRowFieldProp(rowId: string, field: string, prop: string, value: any) {
+  return rttableFrom.value?.setRowFieldProp(rowId, field, prop, value);
+}
 
 defineExpose({
   getFromValue,
@@ -181,7 +184,8 @@ defineExpose({
   setDisabledAll,
   setFormSchema,
   setValueByRowKey,
-  getRowById
+  getRowById,
+  setRowFieldProp
 });
 </script>
 

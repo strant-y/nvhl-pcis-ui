@@ -626,6 +626,17 @@ function setValueByRowKey(props: string, rowId: any, value: any) {
     }
   });
 }
+function setRowFieldProp(rowId: string, field: string, prop: string, value: any) {
+  if (formItems.value[rowId] && formItems.value[rowId][field]) {
+    // 使用 Vue.set 确保响应式更新
+    formItems.value[rowId][field] = {
+      ...formItems.value[rowId][field],
+      [prop]: value
+    };
+  } else {
+    console.warn(`Field ${field} or row ${rowId} not found.`);
+  }
+}
 function getRowById(rowId: any) {
   return tableDatas.value?.find((item) => {
     if (item._dataId === rowId) {
@@ -672,6 +683,7 @@ defineExpose({
   getRowAllItemRefById,
   clearSelection,
   toggleRowSelection,
+  setRowFieldProp,
 });
 function isrequired(i: any) {
   if (i.rules) {
