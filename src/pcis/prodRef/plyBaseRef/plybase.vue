@@ -108,10 +108,20 @@ onMounted(async () => {
     setValue("Base.cIntroDptcde", param.cDptCde);
     setValue("Base.cCiMrk", param.cCiMrk || "0");
 
+    const data = JSON.parse(sessionStorage.getItem("toMyPageData"));
+    //将联共保业务默认值设置为0并存到store中
+    productStore.setcCiMrk("0");
+    if (sessionStorage.getItem("toMyPageData")) {
+      if (data.pageType && data.pageType === "app") {
+        //新保时，续保单号隐藏
+        setFormItem("Base.cOrigPlyNo", { hidden: true });
+      }
+      sessionData.value = data;
+    }
     //业务来源大类下拉数据
     const params = {
-      CDptCde: data["cDptCde"],
-      CKindNo: data["cKindNo"],
+      CDptCde: param.cDptCde,
+      CKindNo: param.cKindNo,
     };
     getBsnsTypList(params).then((res) => {
       if (null != res && null != res["code"]) {
@@ -123,17 +133,6 @@ onMounted(async () => {
         }
       }
     });
-
-    //将联共保业务默认值设置为0并存到store中
-    productStore.setcCiMrk("0");
-    if (sessionStorage.getItem("toMyPageData")) {
-      const data = JSON.parse(sessionStorage.getItem("toMyPageData"));
-      if (data.pageType && data.pageType === "app") {
-        //新保时，续保单号隐藏
-        setFormItem("Base.cOrigPlyNo", { hidden: true });
-      }
-      sessionData.value = data;
-    }
   });
 });
 
