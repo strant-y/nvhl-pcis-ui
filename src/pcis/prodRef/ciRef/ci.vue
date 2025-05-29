@@ -39,6 +39,16 @@ onMounted(async () => {
   Object.assign(formconfig1, formconfig11);
   ciAdd();
   nextTick(() => {
+    freeEditRef?.value.forEach(row => {
+      if (row["Ci.cCoinsurerCde"] !== "327001") {
+        freeEditRef.value?.setRowFieldProp(
+          row._dataId,
+          "Ci.cSubDptCde",
+          "loadData",
+          [{ value: '1', label: '其他' }]
+        );
+      }
+    });
     setFormItem("Ci.cDptCde", {
       loadData: [
         { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm}` },
@@ -50,11 +60,32 @@ onMounted(async () => {
 // 绑定方法
 const method = {
   ciAdd: () => {
-    freeEditRef?.value?.addRow();
     const val=getFromValue()
+    // const total = val.reduce((sum, item) => sum + parseFloat(item['Ci.nCiShare'] || 0), 0);
+    // if (total >= 1) {
+    //   ElMessage.warning("联共保份额已用完，不能新增");
+    //   return;
+    // }
+
+    freeEditRef?.value?.addRow();
+    // const newCiShare = 1-total;
+
     val.forEach((key,index) => { 
         key['Ci.nSeqNo']=index+1
     });
+
+    //新增行赋值
+    // const newRow = {
+    //     "Ci.cCoinsurerCde": "",
+    //   "Ci.cSubDptCde": "",
+    //   "Ci.cIssueMrk": "",
+    //   "Ci.nCiShare": parseFloat(newCiShare.toFixed(8)),
+    //   "Ci.nCiPrm": "",
+    //   "Ci.nCiAmt": "",
+    //   "Ci.cDptCde": param.cDptCde,
+    // };
+    // freeEditRef?.value?.setFormValue([...val,newRow]);
+    
   },
   ciDelete:()=>{
     const selData=freeEditRef?.value?.getSelectRow()
@@ -72,8 +103,9 @@ const method = {
   //机构部门下拉事件
   cCoinsurerCdeChange:(val)=>{
     const rowData = freeEditRef.value?.getSelectRow();
+    const rowId = rowData._dataId;
     if(val ==="327001"){
-      freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde",rowData._dataId,"")
+      freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde",rowId,"")
     codeListStore
         .queryCodeList({
           codeListName: "Comm_Code_LIST",
@@ -85,28 +117,30 @@ const method = {
           });
         });
     }else {
-      freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde",rowData._dataId,"")
-      setFormItem("Ci.cSubDptCde", {loadData: [],});
-      setFormItem("Ci.cSubDptCde", {
-        loadData: [{ value: '1', label: '其他' }]
-      });
+      freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde",rowId,"")
+      freeEditRef.value?.setRowFieldProp(
+        rowId,
+        "Ci.cSubDptCde",
+        "loadData",
+        [{ value: '1', label: '其他' }]
+      );
     }
   },
   //出单标志下拉事件
   clssueMrkChange:  (val)=>{
-    const rowData = freeEditRef.value?.getSelectRow();
-    if(val ==="0" && rowData["Ci.cCoinsurerCde"] === "327001"){
-        ElMessage.error("联保单出单方必须是主联单的分公司！")
-    }
-    nextTick(()=>{
-        freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk",rowData._dataId,"1")
-      })
+    // const rowData = freeEditRef.value?.getSelectRow();
+    // if(val ==="0" && rowData["Ci.cCoinsurerCde"] === "327001"){
+    //     ElMessage.error("联保单出单方必须是主联单的分公司！")
+    // }
+    // nextTick(()=>{
+    //     freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk",rowData._dataId,"1")
+    //   })
   },
   nCiShareChange:(val)=>{
     const rowDatas = freeEditRef.value?.getSelectRow();
     let value = parseFloat(val);
     if (value > 1 || value == "") {
-      freeEditRef?.value?.setValueByRowKey("Ci.nCiShare",rowDatas._dataId,parseFloat(1.00000000));
+      freeEditRef?.value?.setValueByRowKey("Ci.nCiShare",rowDatas._dataId,parseFloat('1.00000000'));
     }
     const nPrm =  parseFloat(productStore.nPrm) * parseFloat(val)
     const nAmt = parseFloat(productStore.nAmt) * parseFloat(val)
@@ -118,6 +152,11 @@ const method = {
       opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnAmt",nAmt) //我司份额保额
       opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnPrm",nPrm) //我司份额保费
     }
+  },
+  nPlyFeeRateChange:(val)=>{
+    const rowDatas = freeEditRef.value?.getSelectRow();
+    const nPlyFee = parseFloat(val) * parseFloat(rowDatas["Ci.nCiPrm"])
+    freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee",rowDatas._dataId,nPlyFee)
   }
 };
 //给表单下拉项赋值
@@ -159,6 +198,9 @@ function setFormValue(value: any) {
 function setValueByRowKey(props:string ,rowId: any, value:any){
   return freeEditRef?.value?.setValueByRowKey(props,rowId,value);
 }
+function setRowFieldProp(rowId: string, field: string, prop: string, value: any) {
+  return freeEditRef?.value?.setRowFieldProp(rowId, field, prop, value);
+}
 function getRowById(rowId: string) {
   return freeEditRef?.value?.getRowById(rowId);
 }
@@ -173,7 +215,7 @@ function ciAdd() {
     freeEditRef.value.addRow(); // 添加新行
     const val=getFromValue()
     const num = 1
-    val.forEach((key,index) => { 
+    val.forEach((key,index) => {
         key['Ci.nSeqNo']= index+1;
         key['Ci.nCiShare'] = parseFloat(num.toFixed(8));
         //强制更新
@@ -182,11 +224,10 @@ function ciAdd() {
           loadData: [
             { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm}` },
           ],
-    }); 
+        });
     });
   }
 }
-
 function getFormconfig(){
   return formconfig1;
 }
@@ -199,6 +240,8 @@ defineExpose({
   getRowById,
   getTableValue,
   getFormconfig,
+  setRowFieldProp,
+  
 });
 </script>
 
