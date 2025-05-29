@@ -154,7 +154,6 @@ props.data.data.isselectData?.forEach((item: any) => {
 
   selectAdditionNodes.value.push(seadd);
 });
-console.log(selectAdditionNodes.value);
 const data2 = ref([
   // {
   //   id: 1,
@@ -312,7 +311,6 @@ function selectMainTerm(isselect = true) {
 
 function setAdditionNode() {
   const addMainKey: any[] = [];
-  console.log(selectAdditionNodes.value);
   if (selectAdditionNodes.value && selectAdditionNodes.value.length > 0) {
     selectAdditionNodes.value.forEach((item: any) => {
       if (item["cRdrTyp"] === "1") {

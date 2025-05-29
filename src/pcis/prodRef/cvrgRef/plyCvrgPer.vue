@@ -308,7 +308,7 @@ function deleteData(term: any) {
     type: "warning",
   }).then(() => {
     deleteTermByNo(term["Term.cClauseCode"]);
-    if (term.cRdrTyp === "0") {
+    if (term['Term.cRdrTyp'] === "0") {
       codeListStore
         .queryCodeList(
           {
