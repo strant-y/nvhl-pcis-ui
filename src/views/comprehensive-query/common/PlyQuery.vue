@@ -997,6 +997,12 @@ const tableObj = {
                 minWidth: 180,
             },
             {
+                prop: "tIssueTm",
+                inputtype: "rtdatepicker",
+                title: "签单日期",
+                minWidth: 180,
+            },
+            {
                 prop: "cTermNo",
                 inputtype: "rtinput",
                 title: "条款",
