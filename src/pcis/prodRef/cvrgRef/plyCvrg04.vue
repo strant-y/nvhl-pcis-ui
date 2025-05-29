@@ -574,7 +574,7 @@ async function validate() {
   let r = true;
   const keys = Object.keys(tremTemplateRefs.value);
   for (const item of keys) {
-    if (tremTemplateRefs.value[item]) {
+    if (tremTemplateRefs.value[item] && tremTemplateRefs.value[item].validate) {
       const res = await tremTemplateRefs.value[item].validate();
       r = r && res;
     }

@@ -7,6 +7,7 @@
       :type="
         item.type === 'color' || item.type === 'number' ? 'text' : item.type
       "
+      :class="isReQuired() ? 're-quired-flag' : '' "
       :showPassword="item.showPassword"
       :rows="item.rows"
       :style="
@@ -162,6 +163,21 @@ const props = defineProps({
   },
 });
 
+function isReQuired(){
+  if(props.item.required === '1' || props.item.required === 1 || props.item.required === true){
+    return true;
+  }
+  const rule = props.item.rules;
+  let r = false;
+  if(rule && rule.length > 0){
+    for (const key in rule) {
+      if(rule[key].required){
+        r = true;
+      }
+    }
+  }
+  return r;
+}
 const emits = defineEmits(["update:modelValue", "valueChange"]); // 父组件监听事件，同步子组件值的变化给父组件
 const vInput = ref<string | Number | undefined>();
 watch([() => props.modelValue], ([newModelValue]) => {

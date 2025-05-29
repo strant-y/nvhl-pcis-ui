@@ -3,6 +3,7 @@
     ref="datepickerRef"
     v-if="!showLabel"
     v-model="vInput"
+    :class="isReQuired() ? 're-quired-flag' : ''"
     :type="item.type ? item.type : 'date'"
     :readonly="
       item.readonly
@@ -107,6 +108,22 @@ function getValueFormat() {
     default:
       return "YYYY-MM-DD";
   }
+}
+
+function isReQuired() {
+  if(props.item.required === '1' || props.item.required === 1 || props.item.required === true){
+    return true;
+  }
+  const rule = props.item.rules;
+  let r = false;
+  if (rule && rule.length > 0) {
+    for (const key in rule) {
+      if (rule[key].required) {
+        r = true;
+      }
+    }
+  }
+  return r;
 }
 
 onMounted(() => {
