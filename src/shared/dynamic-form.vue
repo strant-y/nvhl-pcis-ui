@@ -175,7 +175,7 @@
               "
             >
               <template v-if="item.inputtype === 'rtinputgroup'">
-                <el-form-item>
+                <el-form-item :required="checkRequired(item)">
                   <template #label>
                     <template v-if="item.title?.length > 8">
                       <el-tooltip
@@ -273,7 +273,7 @@
 </template>
 
 <script setup lang="ts">
-import { FormInstance } from 'element-plus';
+import { FormInstance } from "element-plus";
 
 defineOptions({
   name: "DynamicForms",
@@ -308,7 +308,7 @@ if (props.fromSchema) {
       key.groupList.forEach((gkey: any) => {
         form[gkey.prop] = null;
       });
-    }else{
+    } else {
       form[key.prop] = null;
     }
   });
@@ -409,7 +409,6 @@ function resetFields() {
   fromRef.value?.resetFields();
 }
 
-
 function getFromValue() {
   const redata = JSON.parse(JSON.stringify(form));
   if (props.fromSchema) {
@@ -458,8 +457,10 @@ function setFormValue(data: any, noupdate = false) {
   if (props.fromSchema) {
     props.fromSchema.forEach((key: any) => {
       if (key.inputtype === "rtcascader") {
-        const props = typeof key.cascaderprops === "string" ? JSON.parse(key.cascaderprops) : key.cascaderprops
-;
+        const props =
+          typeof key.cascaderprops === "string"
+            ? JSON.parse(key.cascaderprops)
+            : key.cascaderprops;
         if (props && props.length > 0) {
           let cascd = [];
           for (var i = 0; i < props.length; i++) {
@@ -474,7 +475,10 @@ function setFormValue(data: any, noupdate = false) {
         if (key.groupList && key.groupList.length > 0) {
           key.groupList.forEach((gkey: any) => {
             if (gkey.inputtype === "rtcascader") {
-              const gprops = typeof gkey.cascaderprops === "string" ? JSON.parse(gkey.cascaderprops) : gkey.cascaderprops;
+              const gprops =
+                typeof gkey.cascaderprops === "string"
+                  ? JSON.parse(gkey.cascaderprops)
+                  : gkey.cascaderprops;
               if (gprops && gprops.length > 0) {
                 let cascd = [];
                 for (var i = 0; i < gprops.length; i++) {
@@ -508,6 +512,28 @@ function getValue(key: any) {
 function setValue(key: any, value: any) {
   form[key] = value;
   emits("formsDataUpdate", form);
+}
+
+function checkRequired(item: any) {
+  let re = false;
+  if (item.groupList && item.groupList.length > 0) {
+    for (let i = 0; i < item.groupList.length; i++) {
+      const g = item.groupList[i];
+
+      if (g.required === "1" || g.required === 1 || g.required === true) {
+        return true;
+      }
+      const rule = g.rules;
+      if (rule && rule.length > 0) {
+        for (const key in rule) {
+          if (rule[key].required) {
+            re = true;
+          }
+        }
+      }
+    }
+  }
+  return re;
 }
 function setDisabledAll() {
   if (props.fromSchema) {
@@ -578,7 +604,7 @@ defineExpose({
   clearValidate,
   resetFields,
   setDisabledAll,
-  fromListRef
+  fromListRef,
 });
 </script>
 
