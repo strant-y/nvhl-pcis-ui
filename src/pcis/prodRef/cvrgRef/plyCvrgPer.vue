@@ -126,8 +126,12 @@
 <script setup lang="ts">
 import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
 const tremTemplate = defineAsyncComponent(() => import("./trem-template.vue"));
-const tremAddTemplate2 = defineAsyncComponent(() => import("./trem-add2-template.vue"));
-const tremAddTemplate3 = defineAsyncComponent(() => import("./trem-add3-template.vue"));
+const tremAddTemplate2 = defineAsyncComponent(
+  () => import("./trem-add2-template.vue")
+);
+const tremAddTemplate3 = defineAsyncComponent(
+  () => import("./trem-add3-template.vue")
+);
 const dialog = ref<DialogMethod | null>(null);
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
@@ -333,16 +337,16 @@ function deleteData(term: any) {
 }
 
 function deleteTermByNo(t: any) {
-  let deleindex = null;
-  Object.keys(formData).forEach((item) => {
-    let deleindex = null;
-    for (let i = 0; i < formData.value[item].length; i++) {
+  Object.keys(formData.value).forEach((item) => {
+    let deleindex: any = null;
+    for (const i in formData.value[item]) {
       if (formData.value[item][i]["Term.cClauseCode"] === t) {
         deleindex = i;
       }
-    }
-    if (deleindex != null) {
-      formData.value[item].splice(deleindex, 1);
+      if (deleindex != null) {
+        formData.value[item].splice(deleindex, 1);
+        deleindex = null;
+      }
     }
   });
 }
@@ -392,14 +396,13 @@ function setFormValue(value: any) {
   value.forEach((item: any) => {
     let creData = JSON.parse(JSON.stringify(item));
     creData["riskList"] = creData["Term.riskList"];
-      terms.push(creData["Term.cClauseCode"]);
+    terms.push(creData["Term.cClauseCode"]);
     delete creData["Term.riskList"];
     plandata.push(creData);
   });
   refushData(plandata);
   updateEdrItem(terms);
 }
-
 
 async function validate() {
   let r = true;
