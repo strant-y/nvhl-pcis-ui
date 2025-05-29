@@ -299,7 +299,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           {
               prop: "cDptCde",
               inputtype: "rtselect",
-              title: "承保机构",
+              title: "机构部门",
               btnWidth: 10,
               itemWidth: 2,
               showExBtn: true,
@@ -742,7 +742,7 @@ const modalForm = [
             { label: "保单", value: "cPlyNo" },
             { label: "批单", value: "cEdrNo" },
             { label: "批改序号", value: "c" },
-            { label: "机构", value: "cDptCnm" },
+            { label: "承保机构", value: "cDptCnm" },
             { label: "二级分公司", value: "cSecondDptCnm" },
             { label: "产品", value: "cProdNmeCn" },
             { label: "条款", value: "cTermNme" },
@@ -978,10 +978,37 @@ const tableObj = {
                 title: "批单",
                 minWidth: 180,
             },
+          {
+            prop: "cAppStatus",
+            inputtype: "rtselect",
+            title: "状态",
+            minWidth: 100,
+            loadData: [
+              { label: "暂存", value: "1" },
+              { label: "已提核", value: "2" },
+              { label: "核保退回/撤回", value: "3" },
+              { label: "核保通过", value: "4" },
+              { label: "已出保单", value: "5" },
+              { label: "已做失效操作", value: "6" },
+              { label: "已提交未接收", value: "7" },
+              { label: "见费出单退回", value: "8" },
+            ],
+            hideBtns: (row: any) => {
+              if (
+                  queryType.value == "2" ||
+                  queryType.value == "3" ||
+                  queryType.value == "4"
+              ) {
+                return false;
+              } else {
+                return true;
+              }
+            },
+          },
             {
                 prop: "cDptCnm",
                 inputtype: "rtinput",
-                title: "机构",
+                title: "承保机构",
                 minWidth: 180,
             },
             {
@@ -994,6 +1021,12 @@ const tableObj = {
                 prop: "cProdNmeCn",
                 inputtype: "rtinput",
                 title: "产品",
+                minWidth: 180,
+            },
+            {
+                prop: "tIssueTm",
+                inputtype: "rtdatepicker",
+                title: "签单日期",
                 minWidth: 180,
             },
             {
@@ -1026,33 +1059,7 @@ const tableObj = {
                 title: "保费",
                 minWidth: 100,
             },
-            {
-                prop: "cAppStatus",
-                inputtype: "rtselect",
-                title: "状态",
-                minWidth: 100,
-                loadData: [
-                    { label: "暂存", value: "1" },
-                    { label: "已提核", value: "2" },
-                    { label: "核保退回/撤回", value: "3" },
-                    { label: "核保通过", value: "4" },
-                    { label: "已出保单", value: "5" },
-                    { label: "已做失效操作", value: "6" },
-                    { label: "已提交未接收", value: "7" },
-                    { label: "见费出单退回", value: "8" },
-                ],
-                hideBtns: (row: any) => {
-                    if (
-                        queryType.value == "2" ||
-                        queryType.value == "3" ||
-                        queryType.value == "4"
-                    ) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                },
-            },
+
         ],
     },
 };
@@ -1072,6 +1079,7 @@ onMounted(async () => {
             item.rules = []; // 清除必填规则
         }
     });
+    freeEditRef.value.setValue("cDataTyp","app") ; // 列表类型默认值 为全部
     freeEditRef.value.setValue("cDptCde", JSON.parse(sessionStorage.getItem("user")).companyId);
     setFormItem("cDptCde", {
         loadData: [
