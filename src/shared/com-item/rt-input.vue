@@ -164,7 +164,7 @@ const props = defineProps({
 });
 
 function isReQuired(){
-  if(props.item.required){
+  if(props.item.required === '1' || props.item.required === 1 || props.item.required === true){
     return true;
   }
   const rule = props.item.rules;
