@@ -391,7 +391,7 @@ function getFromValue() {
 
 function setFormValue(value: any) {
   const terms: any[] = [];
-  Object.assign(formData.value, {});
+  formData.value = {};
   let plandata: any[] = [];
   value.forEach((item: any) => {
     let creData = JSON.parse(JSON.stringify(item));

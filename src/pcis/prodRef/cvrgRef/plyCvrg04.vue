@@ -548,7 +548,7 @@ function getFromValue() {
 
 function setFormValue(value: any) {
   const terms: any[] = [];
-  Object.assign(planData.value, {});
+  planData.value = {};
   let plandata: { [key: string]: any } = {};
   value.forEach((item: any) => {
     const planKey = item["Term.cPlanNo"];
