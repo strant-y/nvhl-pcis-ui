@@ -820,7 +820,7 @@ function setDisabledAll() {
 }
 
 function isrequired(i: any) {
-  if (i.required) {
+  if(i.required === '1' || i.required === 1 || i.required === true){
     return true;
   }
   return false;
