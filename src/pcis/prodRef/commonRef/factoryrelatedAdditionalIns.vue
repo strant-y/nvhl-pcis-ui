@@ -22,6 +22,8 @@ import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { qryProdRelCvrgList } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { dataParam } from "@/store/modules/dataParam";
+const dataparam = dataParam();
 const opertaor = dataOpertaor();
 import {
   AppTableConfig,
@@ -44,9 +46,7 @@ import {
 } from "@/api/prod";
 // import { setTimeout } from "timers/promises";
 const tabref = opertaor.getTableRefByKey("prodInfo");
-const route = useRoute();
-const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const param = dataparam.getParam();
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 

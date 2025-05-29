@@ -56,7 +56,6 @@ import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 import { getAppPolicyList, qryEndorseList, delTmpPolicy } from "@/api/query";
 // 变更列
 const colChange = defineAsyncComponent(() => import("../modal/colChange.vue"));
-const params = route.query.data ? JSON.parse(route.query.data) : {};
 const props = defineProps({
   refreshData: {
     type: Boolean,

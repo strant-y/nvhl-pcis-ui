@@ -404,7 +404,6 @@ function isHidden(item: any) {
   for (const key in item.tableBtn) {
     r = r && item.tableBtn[key].hidden;
   }
-  console.log(r);
   return r;
 }
 

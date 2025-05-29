@@ -18,15 +18,13 @@ const { getRules } = useValidator();
 import { saveProInfo, getProducts } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useRoute } from "vue-router";
+import { dataParam } from "@/store/modules/dataParam";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
-
+const dataparam = dataParam();
 const opertaor = dataOpertaor();
 
-const route = useRoute();
 const router = useRouter();
-const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
-
+const param = dataparam.getParam();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const props = defineProps({
   data: Object,
