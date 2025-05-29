@@ -84,25 +84,25 @@ watch([() => props.modelValue], ([newModelValue]) => {
 });
 function blur(v: any) {
   const value = v.target.value;
-  if(!value && value === '' ){
-    return ;
+  if (!value && value === "") {
+    return;
   }
   const format = props.item.valueFormat
     ? props.item.valueFormat
     : getValueFormat();
   if (format) {
     const wordsList = format.match(/[a-zA-Z]+/g);
-    if(wordsList && wordsList.length > 0){
+    if (wordsList && wordsList.length > 0) {
       let le = 0;
       let nv = format;
       for (const key in wordsList) {
         const w = wordsList[key];
         const v = value.substring(le, le + w.length);
-        nv = nv.replace(w,v);
+        nv = nv.replace(w, v);
         le = le + w.length;
       }
       const s = moment(nv).isValid();
-      if(s){
+      if (s) {
         vInput.value = nv;
         handleChange(nv);
       }
@@ -131,6 +131,14 @@ function getValueFormat() {
 }
 
 function isReQuired() {
+  // 如果是禁用状态,默认带底色
+  if (
+    props.item.disabled === true ||
+    props.item.disabled === "1" ||
+    props.item.disabled === 1
+  ) {
+    return false;
+  }
   if (
     props.item.required === "1" ||
     props.item.required === 1 ||
