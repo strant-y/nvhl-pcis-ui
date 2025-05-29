@@ -56,15 +56,24 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
     fromSchema: [
       {
+        prop: "factorProp",
+        inputtype: "rtinput",
+        title: "要素key",
+        placeholder:"可输入要查询的key值",
+        clearable: true,
+      },
+      {
         prop: "factortitle",
         inputtype: "rtinput",
         title: "要素名称",
+        placeholder:"可输入要查询的名称",
         clearable: true,
       },
       {
         prop: "factorinputtype",
         inputtype: "rtselect",
         title: "要素类型",
+        placeholder:"可选择类型",
         clearable: true,
         loadData: inputtype,
       },
@@ -72,6 +81,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "factorTab",
         inputtype: "rtselect",
         title: "所属tab",
+        placeholder:"可选择tab",
         clearable: true,
         typeCode: "tablist",
       },
