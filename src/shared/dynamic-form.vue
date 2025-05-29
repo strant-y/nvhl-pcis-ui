@@ -274,6 +274,7 @@
 
 <script setup lang="ts">
 import { FormInstance } from "element-plus";
+import { AppGridEditMethod } from "./app-grid-edit-config";
 
 defineOptions({
   name: "DynamicForms",
@@ -286,7 +287,7 @@ interface GroupItem {
 }
 
 const fromRef = ref<FormInstance>();
-const fromListRef = ref("fromListRef");
+const fromListRef = ref<Array<AppGridEditMethod>>([]);
 const props = defineProps({
   fromSchema: {
     type: Object as () => Record<string, any>,
@@ -329,32 +330,35 @@ const formUi = reactive<Record<string, any>>({});
  *  样式初始化,对于未设置的参数进行初始化
  * */
 function initUI() {
-  Object.keys(props.fromUi).forEach((key) => {
-    if (key === "cols") {
-      if (props.fromUi[key]) {
-        formUi["span"] = 24 / props.fromUi[key];
-      } else {
-        formUi["span"] = 8;
-      }
-    } else if (key === "groupBy") {
-      if (props.fromUi.groupBy) {
-        for (const item of props.fromUi.groupBy) {
-          const g = {
-            id: item.id,
-            title: item.title,
-            disabled: item.disabled,
-          };
-          const s = item.active ? item.active : true;
-          if (s) {
-            activeList.value.push(item.id);
-          }
-          groupByList.value.push(g);
+  if (props.fromUi) {
+    Object.keys(props.fromUi).forEach((key) => {
+      if (key === "cols") {
+        if (props.fromUi && props.fromUi[key]) {
+          formUi["span"] = 24 / props.fromUi[key];
+        } else {
+          formUi["span"] = 8;
         }
+      } else if (key === "groupBy") {
+        if (props.fromUi && props.fromUi.groupBy) {
+          for (const item of props.fromUi.groupBy) {
+            const g = {
+              id: item.id,
+              title: item.title,
+              disabled: item.disabled,
+            };
+            const s = item.active ? item.active : true;
+            if (s) {
+              activeList.value.push(item.id);
+            }
+            groupByList.value.push(g);
+          }
+        }
+      } else {
+        formUi[key] = props.fromUi?.[key];
       }
-    } else {
-      formUi[key] = props.fromUi[key];
-    }
-  });
+    });
+  }
+
   if (!formUi["span"]) {
     formUi["span"] = 8;
   }
@@ -570,7 +574,7 @@ function checkKey(k: any) {
 }
 
 /* 计算所需span宽度 */
-function getspan(item, gitem) {
+function getspan(item: any, gitem: any) {
   const r = Math.floor(
     gitem.persent ? gitem.persent : 24 / item.groupList.length
   );
