@@ -54,7 +54,6 @@ const departmentTree = defineAsyncComponent(
 const TaskListVestige = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/TaskListVestige.vue")
 );
-const params = route.query.data ? JSON.parse(route.query.data) : {};
 const props = defineProps({
   refreshData: {
     type: Boolean,
