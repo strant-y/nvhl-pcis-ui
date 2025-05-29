@@ -28,12 +28,10 @@ import { ref, reactive, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { clear } from "console";
+import { dataParam } from "@/store/modules/dataParam";
+const paramparam = dataParam();
 const dialog = ref<DialogMethod | null>(null);
-
-const route = useRoute();
-const router = useRouter();
-const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const param = paramparam.getParam();
 const { getRules } = useValidator();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 
