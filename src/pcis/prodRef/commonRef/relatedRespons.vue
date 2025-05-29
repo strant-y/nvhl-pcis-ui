@@ -48,11 +48,11 @@ const ResponsibilityModal = defineAsyncComponent(
   () => import("./ResponsibilityModal.vue")
 );
 
-import { useRoute } from "vue-router";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
-const route = useRoute();
-const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+import { dataParam } from "@/store/modules/dataParam";
+const paramparam = dataParam();
+const param =  paramparam.getParam();
+
 const { getRules } = useValidator();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive<AppFreeEditConfig>(
