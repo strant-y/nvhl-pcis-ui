@@ -107,30 +107,32 @@ onMounted(async () => {
     });
     setValue("Base.cIntroDptcde", param.cDptCde);
     setValue("Base.cCiMrk", param.cCiMrk || "0");
-  });
-  //将联共保业务默认值设置为0并存到store中
-  productStore.setcCiMrk("0");
-  if (sessionStorage.getItem("toMyPageData")) {
-    const data = JSON.parse(sessionStorage.getItem("toMyPageData"));
-    if (data.pageType && data.pageType === "app") {
-      //新保时，续保单号隐藏
-      setFormItem("Base.cOrigPlyNo", { hidden: true });
-    }
-    sessionData.value = data;
-  }
-  //业务来源大类下拉数据
-  const params = {
-    CDptCde: data["cDptCde"],
-    CKindNo: data["cKindNo"],
-  };
-  getBsnsTypList(params).then((res) => {
-    if (null != res && null != res["code"]) {
-      if (res["code"] === 200) {
-        const obj = {
-          loadData: res.data,
-        };
-        setFormItem("Base.cBsnsTyp", obj);
+
+    //业务来源大类下拉数据
+    const params = {
+      CDptCde: data["cDptCde"],
+      CKindNo: data["cKindNo"],
+    };
+    getBsnsTypList(params).then((res) => {
+      if (null != res && null != res["code"]) {
+        if (res["code"] === 200) {
+          const obj = {
+            loadData: res.data,
+          };
+          setFormItem("Base.cBsnsTyp", obj);
+        }
       }
+    });
+
+    //将联共保业务默认值设置为0并存到store中
+    productStore.setcCiMrk("0");
+    if (sessionStorage.getItem("toMyPageData")) {
+      const data = JSON.parse(sessionStorage.getItem("toMyPageData"));
+      if (data.pageType && data.pageType === "app") {
+        //新保时，续保单号隐藏
+        setFormItem("Base.cOrigPlyNo", { hidden: true });
+      }
+      sessionData.value = data;
     }
   });
 });
