@@ -299,7 +299,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           {
               prop: "cDptCde",
               inputtype: "rtselect",
-              title: "承保机构",
+              title: "机构部门",
               btnWidth: 10,
               itemWidth: 2,
               showExBtn: true,
@@ -742,7 +742,7 @@ const modalForm = [
             { label: "保单", value: "cPlyNo" },
             { label: "批单", value: "cEdrNo" },
             { label: "批改序号", value: "c" },
-            { label: "机构", value: "cDptCnm" },
+            { label: "承保机构", value: "cDptCnm" },
             { label: "二级分公司", value: "cSecondDptCnm" },
             { label: "产品", value: "cProdNmeCn" },
             { label: "条款", value: "cTermNme" },
@@ -981,7 +981,7 @@ const tableObj = {
             {
                 prop: "cDptCnm",
                 inputtype: "rtinput",
-                title: "机构",
+                title: "承保机构",
                 minWidth: 180,
             },
             {
