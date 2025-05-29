@@ -56,6 +56,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
     fromSchema: [
       {
+        prop: "factorProp",
+        inputtype: "rtinput",
+        title: "要素key",
+        clearable: true,
+      },
+      {
         prop: "factortitle",
         inputtype: "rtinput",
         title: "要素名称",
