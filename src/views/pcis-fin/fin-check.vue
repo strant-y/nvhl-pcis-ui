@@ -50,7 +50,6 @@ const freeEditRef = ref<AppFreeEditMethod | null>(null);
 // 绑定方法
 const method = {
   func1: () => {
-    console.log(getRules);
   },
 };
 const formconfig1 = reactive<AppFreeEditConfig>(
@@ -58,83 +57,88 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     title: '资金退票审核',
     fromSchema: [
       {
-        prop: "submitBtn",
+        prop: "cAcctNme",
         inputtype: "rtselect",
         typeCode: "",
         title: "收款人姓名",
         disabled: true,
       },
       {
-        prop: 'CAcctNo',
+        prop: 'cAcctNo',
         title: '收款人账号',
         inputtype: "rtinput",
         disabled: true,
       },
       {
-        prop: "CBankRelTyp",
+        prop: "cBankRelTyp",
         inputtype: "rtselect",
         title: "收款银行大类",
-        typeCode: "",
+        typeCode: 'CBankRelTypList',
         disabled: true,
       },
       {
-        prop: "CBankPro",
-        inputtype: "rtselect",
+        prop: "cBankPro",
+        inputtype: "rtinput",
         title: "开户行省",
-        typeCode: "",
+        typeCode: "CBankProList",
         disabled: true,
+      
       },
       {
-        prop: "CBankArea",
-        inputtype: "rtselect",
+        prop: "cBankArea",
+        inputtype: "rtinput",
         title: "开户行市",
-        typeCode: "",
         disabled: true,
       },
       {
-        prop: "CBankCounty",
+        prop: "cBankCounty",
         inputtype: "rtselect",
         title: "开户行县",
-        typeCode: "",
         disabled: true,
+
       },
       {
-        prop: "CBankCde",
+        prop: "cBankCde",
         inputtype: "rtselect",
         title: "开户银行",
-        typeCode: "",
         disabled: true,
       },  
       {
-        prop: "CBankCnaps",
+        prop: "cBankCnaps",
         inputtype: "rtinput",
-        title: "CNAPS号"
-      },
-      {
-        prop: 'CBankAddr',
-        title: '开户行地址',
-        inputtype: "rtinput"
-      },
-      {
-        prop: 'CPubPri',
-        title: '对公对私',
-        inputtype: "rtinput",
+        title: "CNAPS号",
         disabled: true,
       },
       {
-        prop: 'CStatus',
+        prop: 'cBankAddr',
+        title: '开户行地址',
+        disabled: true,
+        inputtype: "rtinput"
+      },
+      {
+        prop: 'cPubPri',
+        title: '对公对私',
+        inputtype: "rtselect",
+        disabled: true,
+        loadData: [
+          { label: "对公", value: "1" },
+          { label: "对私", value: "2" },
+        ],
+      },
+      {
+        prop: 'cStatus',
         title: '状态',
         inputtype: "rtselect",
         rules: [getRules("required", {
           trigger: 'change'
         })],
         loadData :[
-          { label:'同意',value:1 },
-          { label:'不同意',value:0 },
+          { label:'同意',value:'2' },
+          { label:'不同意',value:'3' },
         ]
       },
       {
-        prop: 'CCheckOpn',
+        prop: 'cCheckOpn',
         title: '审核意见',
         type: 'textarea',
         inputtype: "rtinput"
@@ -144,32 +148,45 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 );
 onMounted(async () => {
   if (props.type === "check" && props.data) {
-    setTimeout(() => {
+
+
+    nextTick(() => {
+   
+
+          setFormItem("cBankCounty", {
+              typeCode: 'CBankCountyList',
+              codeParam: { 'areaname':  props.data.cBankArea},
+            });
+
       freeEditRef.value?.setFormValue(props.data);
-    }, 50);
+      setValue('cStatus',null);
+
+    })
   }
 });
 
 
 /** 提交审核 */
 function saveSubmit(obj) {
+
 	freeEditRef.value?.validate().then((isValid) => {
 		if (isValid) {
       const s = cloneDeep(freeEditRef.value?.getFromValue()); //获取表单数据
-      const prm = obj + '|' + props.data['CCustSeq'];
+      const prm = obj + '|' + props.data['cCustSeq'];
       if (obj === 'commit') {
-        const saveFormData = Object.assign({CStatus: '1'}, s);
-        const returnData = finService.saveFinReback({param: prm, banckTraVOList: [saveFormData]});
+        const returnData = finService.comitFinReback({param: prm, banckTraVOList: [s]});
         returnData.then((res: any) => {
             if (null != res && null != res['code']) {
                 if (res['code'] === 200) {
+                          
+                    emits("ok", {});
                     ElMessage.success(res['msg']);
+                    dialogVisible.value = false;
                 }else {
                     ElMessage.warning(res['msg']);
                 }
             }
         }, error => {
-            console.log('出错了', error);
             ElMessage.error('后台服务异常,请联系管理员');
         });
       }
@@ -179,6 +196,61 @@ function saveSubmit(obj) {
 	})
 }
 
+
+//给表单下拉项赋值
+const setFormItem = (key, obj) => {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.loadData && obj.loadData) {
+          let newBtnItems = null;
+          if (obj.loadData.length != 0) {
+            for (let key in obj.loadData) {
+              item.loadData[key] = obj.loadData[key];
+            }
+          } else {
+            item.loadData = obj.loadData;
+          }
+          newBtnItems = item.loadData;
+          newBtnItems && (obj.loadData = newBtnItems);
+        }
+        Object.assign(item, obj);
+      }
+    });
+  }
+}
+function getFromValue() {
+  return freeEditRef?.value?.getFromValue();
+}
+
+function setFormValue(value: any) {
+  freeEditRef?.value?.setFormValue(value);
+}
+
+function validate() {
+  return freeEditRef?.value?.validate();
+}
+
+function setValue(key: string, value: any) {
+  freeEditRef?.value?.setValue(key, value);
+}
+
+function getValue(key: string) {
+  return freeEditRef?.value?.getValue(key);
+}
+function getFormconfig() {
+  return formconfig1;
+}
+
+defineExpose({
+  getFromValue,
+  setFormValue,
+  validate,
+  setValue,
+  getValue,
+  getFormconfig,
+})
 </script>
 
 <style scoped></style>
