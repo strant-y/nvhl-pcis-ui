@@ -6,6 +6,7 @@ export const dataParam = defineStore(
         const param = reactive<any>({});
 
         const setParam = (params: any) => {
+            Object.assign(param, {});
             Object.assign(param, params);
         };
 

@@ -25,7 +25,6 @@ const opertaor = dataOpertaor();
 
 const router = useRouter();
 const param = dataparam.getParam();
-
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const props = defineProps({
   data: Object,

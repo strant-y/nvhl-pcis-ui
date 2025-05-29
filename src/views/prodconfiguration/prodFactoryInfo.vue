@@ -56,7 +56,14 @@ const dataparam = dataParam();
 const opertaor = dataOpertaor();
 opertaor.init();
 
-const param = dataparam.getParam();
+const props = defineProps({
+  param: {
+    type: Object,
+  },
+});
+
+const param = props.param;
+dataparam.setParam(param);
 
 const formconfig1 = opertaor.getTableConfig();
 // 当前加载的组件索引
