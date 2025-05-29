@@ -114,11 +114,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "componentId",
         inputtype: "rtinput",
         title: "组件主键",
+        clearable: true,
       },
       {
         prop: "componentName",
         inputtype: "rtinput",
         title: "组件名称",
+        clearable: true,
       },
       {
         prop: "cComponentTab",
