@@ -23,7 +23,9 @@ import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { qryProdRelCvrgList, deleteTermRel } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { dataParam } from "@/store/modules/dataParam";
 const opertaor = dataOpertaor();
+const dataparam = dataParam();
 import {
   AppTableConfig,
   AppTableMethod,
@@ -41,10 +43,7 @@ import { getCvrgRelList, delCvrgRel, queryTermRelList } from "@/api/prod";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { RefSymbol } from "@vue/reactivity";
 const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
-const route = useRoute();
-const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
-
+const param = dataparam.getParam();
 const { getRules } = useValidator();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
