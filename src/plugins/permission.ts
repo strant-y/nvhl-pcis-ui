@@ -107,9 +107,10 @@ export function setupPermission() {
       for (const key in to.query) {
         if (Object.prototype.hasOwnProperty.call(to.query, key)) {
           if (key !== 'encrypted') {
+            const p = to.query[key];
             const keyData = descryptParameter(to.query[key]);
             if (!!keyData) {
-              to.query[key] = keyData;
+              to.query[key] = p;
               to.params[key] = JSON.parse(keyData);
             }
           }

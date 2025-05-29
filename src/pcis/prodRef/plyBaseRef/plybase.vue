@@ -22,24 +22,22 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { useValidator } from "@/typings/useValidator";
 import DepartmentTree from "../commodityRef/DepartmentTree.vue";
-import { useRoute } from "vue-router";
 import { get } from "lodash";
 import { codeListViewStore, dataOpertaor, useProductStore } from "@/store";
 import { de } from "element-plus/es/locale";
 import { rule } from "postcss";
 import { debug } from "console";
 const productStore = useProductStore();
-const route = useRoute();
-const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+
 const codeListStore = codeListViewStore();
 const { getRules } = useValidator();
 const dzmodal = useDzModal();
 const dialogRef = ref<DialogMethod | null>(null);
+
 const opertaor = dataOpertaor();
+const param = opertaor.getParam();
 
 const sessionData = ref(null);
-
 const props = defineProps({
   pageSchema: {
     type: [Object],
