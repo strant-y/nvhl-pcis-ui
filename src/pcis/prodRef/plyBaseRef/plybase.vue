@@ -116,26 +116,23 @@ onMounted(async () => {
       //新保时，续保单号隐藏
       setFormItem("Base.cOrigPlyNo", { hidden: true });
     }
-    // nextTick(() => {
-    //   setFormValue(data);
-    // });
     sessionData.value = data;
-    //业务来源大类下拉数据
-    const params = {
-      CDptCde: data["cDptCde"],
-      CKindNo: data["cKindNo"],
-    };
-    getBsnsTypList(params).then((res) => {
-      if (null != res && null != res["code"]) {
-        if (res["code"] === 200) {
-          const obj = {
-            loadData: res.data,
-          };
-          setFormItem("Base.cBsnsTyp", obj);
-        }
-      }
-    });
   }
+  //业务来源大类下拉数据
+  const params = {
+    CDptCde: data["cDptCde"],
+    CKindNo: data["cKindNo"],
+  };
+  getBsnsTypList(params).then((res) => {
+    if (null != res && null != res["code"]) {
+      if (res["code"] === 200) {
+        const obj = {
+          loadData: res.data,
+        };
+        setFormItem("Base.cBsnsTyp", obj);
+      }
+    }
+  });
 });
 
 // 绑定方法
@@ -226,7 +223,7 @@ const method = {
         if (!p.initFlag) {
           setFormItem("Base.cSlsId", obj); //业务员工号
         }
-        setFormItem("Base.cSlsId", {rules: null}); //业务员工号
+        setFormItem("Base.cSlsId", { rules: null }); //业务员工号
         setValue("Base.cSlsId", "");
       } else {
         const obj = {
@@ -238,7 +235,7 @@ const method = {
         if (!p.initFlag) {
           setFormItem("Base.cSlsId", obj); //业务员工号
         }
-        setFormItem("Base.cSlsId", {rules: [getRules("required", {})]}); //业务员工号
+        setFormItem("Base.cSlsId", { rules: [getRules("required", {})] }); //业务员工号
       }
 
       getChaSubtypList(params).then((res) => {
