@@ -30,7 +30,7 @@ import {
 } from "@/shared/app-table-config";
 import { onMounted, reactive, ref } from "vue";
 import { getEdrFormulaRel, delEdrFormulaRel } from "@/api/prod";
-
+import { dataParam } from "@/store/modules/dataParam";
 import { useRoute } from "vue-router";
 
 const dzmodal = useDzModal();
@@ -41,10 +41,9 @@ const AddAssoCorrPreCalculFormulaModal = defineAsyncComponent(
   () => import("./AddAssoCorrPreCalculFormulaModal.vue")
 );
 const opertaor = dataOpertaor();
+const dataparam = dataParam();
 const tabref = opertaor.getTableRefByKey("prodInfo");
-const route = useRoute();
-const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const param = dataparam.getParam();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 

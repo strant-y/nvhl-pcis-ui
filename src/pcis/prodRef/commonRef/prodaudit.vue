@@ -14,19 +14,13 @@ import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 import { saveProdAudit, getProducts } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { dataParam } from "@/store/modules/dataParam";
 import { useRoute } from "vue-router";
-import { cp } from "fs";
-import { yesOrNo, size, inputtype } from "@/utils/utilKey";
-import { rule } from "postcss";
-import { clear } from "console";
-import { objectEntries } from "@vueuse/core";
-
+const dataparam = dataParam();
 const opertaor = dataOpertaor();
 
-const route = useRoute();
 const router = useRouter();
-const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const param = dataparam.getParam();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const props = defineProps({

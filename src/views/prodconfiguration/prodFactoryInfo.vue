@@ -51,14 +51,13 @@
 import { getProdInfos } from "@/api/prod";
 import { useRoute } from "vue-router";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { dataParam } from "@/store/modules/dataParam";
+const dataparam = dataParam();
 const opertaor = dataOpertaor();
 opertaor.init();
 
-const route = useRoute();
-const router = useRouter();
-const query = ref(route.query);
+const param = dataparam.getParam();
 
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
 const formconfig1 = opertaor.getTableConfig();
 // 当前加载的组件索引
 const currentIndex = ref(0);

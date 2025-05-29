@@ -25,7 +25,9 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 
 const dzmodal = useDzModal();
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { dataParam } from "@/store/modules/dataParam";
 const opertaor = dataOpertaor();
+const dataparam = dataParam();
 const tabref = opertaor.getTableRefByKey("prodInfo");
 // const productNo = tabref.getFormValue().cProdNo;
 const AddRateConfModal = defineAsyncComponent(
@@ -51,9 +53,7 @@ import {
 } from "@/api/prod";
 
 import { useRoute } from "vue-router";
-const route = useRoute();
-const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const param = dataparam.getParam();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 

@@ -22,6 +22,7 @@ import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { getUnbindHealthNotify } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { dataParam } from "@/store/modules/dataParam";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 const RelatedHealthNoticModal = defineAsyncComponent(
@@ -43,12 +44,9 @@ import {
   saveCvrgRiskRel,
   delHealthNotify,
 } from "@/api/prod";
-
+const dataparam = dataParam();
 import { useRoute } from "vue-router";
-// import { setTimeout } from "timers/promises";
-const route = useRoute();
-const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const param = dataparam.getParam();
 
 const { getRules } = useValidator();
 

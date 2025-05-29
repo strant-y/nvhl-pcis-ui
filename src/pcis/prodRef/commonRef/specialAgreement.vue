@@ -22,7 +22,7 @@ import {
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { qryRefProdAndSpecList } from "@/api/prod";
-
+import { dataParam } from "@/store/modules/dataParam";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 const RelatedSpecialAgree = defineAsyncComponent(
@@ -33,6 +33,7 @@ const AddSpecialAgreeModal = defineAsyncComponent(
 );
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
+const dataparam = dataParam();
 import {
   AppTableConfig,
   AppTableMethod,
@@ -45,13 +46,7 @@ import {
   saveCvrgRiskRel,
   unAssociationSpec,
 } from "@/api/prod";
-
-import { useRoute } from "vue-router";
-import { cp } from "fs";
-const route = useRoute();
-const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
-
+const param = dataparam.getParam();
 const { getRules } = useValidator();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
