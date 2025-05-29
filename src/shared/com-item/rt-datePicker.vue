@@ -41,15 +41,6 @@
             : false
         : false
     "
-    :editable="
-      item.editable
-        ? typeof item.editable === 'boolean'
-          ? item.editable
-          : item.editable === 1
-            ? true
-            : false
-        : false
-    "
     :dateFormat="'YYYY-MM-DD'"
     :timeFormat="'HH:mm:ss'"
     :valueFormat="item.valueFormat ? item.valueFormat : getValueFormat()"
