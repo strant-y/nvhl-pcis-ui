@@ -175,7 +175,7 @@
               "
             >
               <template v-if="item.inputtype === 'rtinputgroup'">
-                <el-form-item>
+                <el-form-item :required="checkRequired(item)">
                   <template #label>
                     <template v-if="item.title?.length > 8">
                       <el-tooltip
@@ -273,7 +273,8 @@
 </template>
 
 <script setup lang="ts">
-import { FormInstance } from 'element-plus';
+import { FormInstance } from "element-plus";
+import { AppGridEditMethod } from "./app-grid-edit-config";
 
 defineOptions({
   name: "DynamicForms",
@@ -286,7 +287,7 @@ interface GroupItem {
 }
 
 const fromRef = ref<FormInstance>();
-const fromListRef = ref("fromListRef");
+const fromListRef = ref<Array<AppGridEditMethod>>([]);
 const props = defineProps({
   fromSchema: {
     type: Object as () => Record<string, any>,
@@ -308,7 +309,7 @@ if (props.fromSchema) {
       key.groupList.forEach((gkey: any) => {
         form[gkey.prop] = null;
       });
-    }else{
+    } else {
       form[key.prop] = null;
     }
   });
@@ -329,32 +330,35 @@ const formUi = reactive<Record<string, any>>({});
  *  样式初始化,对于未设置的参数进行初始化
  * */
 function initUI() {
-  Object.keys(props.fromUi).forEach((key) => {
-    if (key === "cols") {
-      if (props.fromUi[key]) {
-        formUi["span"] = 24 / props.fromUi[key];
-      } else {
-        formUi["span"] = 8;
-      }
-    } else if (key === "groupBy") {
-      if (props.fromUi.groupBy) {
-        for (const item of props.fromUi.groupBy) {
-          const g = {
-            id: item.id,
-            title: item.title,
-            disabled: item.disabled,
-          };
-          const s = item.active ? item.active : true;
-          if (s) {
-            activeList.value.push(item.id);
-          }
-          groupByList.value.push(g);
+  if (props.fromUi) {
+    Object.keys(props.fromUi).forEach((key) => {
+      if (key === "cols") {
+        if (props.fromUi && props.fromUi[key]) {
+          formUi["span"] = 24 / props.fromUi[key];
+        } else {
+          formUi["span"] = 8;
         }
+      } else if (key === "groupBy") {
+        if (props.fromUi && props.fromUi.groupBy) {
+          for (const item of props.fromUi.groupBy) {
+            const g = {
+              id: item.id,
+              title: item.title,
+              disabled: item.disabled,
+            };
+            const s = item.active ? item.active : true;
+            if (s) {
+              activeList.value.push(item.id);
+            }
+            groupByList.value.push(g);
+          }
+        }
+      } else {
+        formUi[key] = props.fromUi?.[key];
       }
-    } else {
-      formUi[key] = props.fromUi[key];
-    }
-  });
+    });
+  }
+
   if (!formUi["span"]) {
     formUi["span"] = 8;
   }
@@ -409,7 +413,6 @@ function resetFields() {
   fromRef.value?.resetFields();
 }
 
-
 function getFromValue() {
   const redata = JSON.parse(JSON.stringify(form));
   if (props.fromSchema) {
@@ -458,8 +461,10 @@ function setFormValue(data: any, noupdate = false) {
   if (props.fromSchema) {
     props.fromSchema.forEach((key: any) => {
       if (key.inputtype === "rtcascader") {
-        const props = typeof key.cascaderprops === "string" ? JSON.parse(key.cascaderprops) : key.cascaderprops
-;
+        const props =
+          typeof key.cascaderprops === "string"
+            ? JSON.parse(key.cascaderprops)
+            : key.cascaderprops;
         if (props && props.length > 0) {
           let cascd = [];
           for (var i = 0; i < props.length; i++) {
@@ -474,7 +479,10 @@ function setFormValue(data: any, noupdate = false) {
         if (key.groupList && key.groupList.length > 0) {
           key.groupList.forEach((gkey: any) => {
             if (gkey.inputtype === "rtcascader") {
-              const gprops = typeof gkey.cascaderprops === "string" ? JSON.parse(gkey.cascaderprops) : gkey.cascaderprops;
+              const gprops =
+                typeof gkey.cascaderprops === "string"
+                  ? JSON.parse(gkey.cascaderprops)
+                  : gkey.cascaderprops;
               if (gprops && gprops.length > 0) {
                 let cascd = [];
                 for (var i = 0; i < gprops.length; i++) {
@@ -508,6 +516,28 @@ function getValue(key: any) {
 function setValue(key: any, value: any) {
   form[key] = value;
   emits("formsDataUpdate", form);
+}
+
+function checkRequired(item: any) {
+  let re = false;
+  if (item.groupList && item.groupList.length > 0) {
+    for (let i = 0; i < item.groupList.length; i++) {
+      const g = item.groupList[i];
+
+      if (g.required === "1" || g.required === 1 || g.required === true) {
+        return true;
+      }
+      const rule = g.rules;
+      if (rule && rule.length > 0) {
+        for (const key in rule) {
+          if (rule[key].required) {
+            re = true;
+          }
+        }
+      }
+    }
+  }
+  return re;
 }
 function setDisabledAll() {
   if (props.fromSchema) {
@@ -544,7 +574,7 @@ function checkKey(k: any) {
 }
 
 /* 计算所需span宽度 */
-function getspan(item, gitem) {
+function getspan(item: any, gitem: any) {
   const r = Math.floor(
     gitem.persent ? gitem.persent : 24 / item.groupList.length
   );
@@ -578,7 +608,7 @@ defineExpose({
   clearValidate,
   resetFields,
   setDisabledAll,
-  fromListRef
+  fromListRef,
 });
 </script>
 
