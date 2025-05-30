@@ -86,7 +86,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cNmeCn",
         inputtype: "rtinput",
-        title: "中文名称",
+        title: "责任名称",
         clearable: true,
       },
     ],
@@ -157,7 +157,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cNmeCn",
         inputtype: "rtinput",
-        title: "中文名称",
+        title: "责任名称",
       },
       {
         prop: "cNmeEn",

@@ -75,11 +75,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
         },
         title: "产品大类",
+        clearable: true,
       },
       {
         prop: "cRsnCde",
         inputtype: "rtinput",
         title: "批改原因编号",
+        clearable: true,
       },
       {
         prop: "cRsnTyp",
@@ -92,11 +94,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           { value: "4", label: "变更保险期限" },
           { value: "5", label: "批改分期" },
         ],
+        clearable: true,
       },
       {
         prop: "cRsnNme",
         inputtype: "rtinput",
         title: "批改原因名称",
+        clearable: true,
       },
       {
         prop: "cIsValid",
