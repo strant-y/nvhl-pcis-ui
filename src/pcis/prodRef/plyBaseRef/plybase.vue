@@ -288,7 +288,7 @@ const method = {
               setFormItem("Base.cBrkrCde", {
                 loadData: [{ value: params.CChaCde, label: params.CChaNme }],
               });
-              setValue("Base.cBrkrCde", params.CChaNme);
+              setValue("Base.cBrkrCde", params.CChaCde);
               setValue("Base.cAgtAgrNo", params.CAgtAgrNo);
 
               console.log("回显----", params);
