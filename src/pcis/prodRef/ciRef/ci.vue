@@ -37,7 +37,7 @@ onMounted(async () => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
-  ciAdd();
+  // ciAdd();
   nextTick(() => {
     freeEditRef?.value.forEach(row => {
       if (row["Ci.cCoinsurerCde"] !== "327001") {
@@ -61,30 +61,15 @@ onMounted(async () => {
 const method = {
   ciAdd: () => {
     const val=getFromValue()
-    // const total = val.reduce((sum, item) => sum + parseFloat(item['Ci.nCiShare'] || 0), 0);
-    // if (total >= 1) {
-    //   ElMessage.warning("联共保份额已用完，不能新增");
-    //   return;
-    // }
-
+    const nCiAmt = parseFloat(productStore.nAmt)
+    if(nCiAmt =="0"){
+      ElMessage.warning("总保额为0");
+      return;
+    }
     freeEditRef?.value?.addRow();
-    // const newCiShare = 1-total;
-
     val.forEach((key,index) => { 
         key['Ci.nSeqNo']=index+1
     });
-
-    //新增行赋值
-    // const newRow = {
-    //     "Ci.cCoinsurerCde": "",
-    //   "Ci.cSubDptCde": "",
-    //   "Ci.cIssueMrk": "",
-    //   "Ci.nCiShare": parseFloat(newCiShare.toFixed(8)),
-    //   "Ci.nCiPrm": "",
-    //   "Ci.nCiAmt": "",
-    //   "Ci.cDptCde": param.cDptCde,
-    // };
-    // freeEditRef?.value?.setFormValue([...val,newRow]);
     
   },
   ciDelete:()=>{
