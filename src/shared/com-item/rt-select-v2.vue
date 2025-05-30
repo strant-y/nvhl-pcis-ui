@@ -6,43 +6,15 @@
     v-model="selectedValue"
     :class="isReQuired() ? 're-quired-flag' : ''"
     :placeholder="item.placeholder ? item.placeholder : '请选择'"
-    :disabled="
-      (item.readonly
-        ? typeof item.readonly === 'boolean'
-          ? item.readonly
-          : item.readonly === 1 || item.readonly === '1'
-            ? true
-            : false
-        : false) ||
-      (item.disabled
-        ? typeof item.disabled === 'boolean'
-          ? item.disabled
-          : item.disabled === 1 || item.disabled === '1'
-            ? true
-            : false
-        : false)
-    "
-    :clearable="
-      item.clearable
-        ? typeof item.clearable === 'boolean'
-          ? item.clearable
-          : item.clearable === 1 || item.clearable === '1'
-            ? true
-            : false
-        : false
-    "
+    :disabled="isClearable() || isDisabled() "
+    :clearable="isClearable()"
     :size="item.size"
     value-key="label"
     :filterable="item.filterable != null ? item.filterable : true"
-    :multiple="
-      item.multiple
-        ? typeof item.multiple === 'boolean'
-          ? item.multiple
-          : item.multiple === 1 || item.multiple === '1'
-            ? true
-            : false
-        : false
-    "
+    :multiple="isMultiple()"
+    :collapse-tags="isMultiple()"
+    :collapse-tags-tooltip="isMultiple()"
+    :max-collapse-tags="isMultiple() ? 3 : null"
     :options="options"
     @change="handleChange"
   >
@@ -283,6 +255,27 @@ onMounted(() => {
     }
   }
 });
+function isMultiple(){
+  if(props.item.multiple === true || props.item.multiple === 1 || props.item.multiple === '1'){
+    return true;
+  }else{
+    return false;
+  }
+}
+function isClearable(){
+  if(props.item.clearable === true || props.item.clearable === 1 || props.item.clearable === '1'){
+    return true;
+  }else{
+    return false;
+  }
+}
+function isDisabled(){
+  if(props.item.disabled === true || props.item.disabled === 1 || props.item.disabled === '1'){
+    return true;
+  }else{
+    return false;
+  }
+}
 function isReQuired() {
   // 如果是禁用状态,默认带底色
   if(props.item.disabled === true || props.item.disabled === '1' || props.item.disabled === 1){
