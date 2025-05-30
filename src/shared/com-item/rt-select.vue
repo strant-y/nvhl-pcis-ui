@@ -6,7 +6,7 @@
     :class="isReQuired() ? 're-quired-flag' : ''"
     v-model="selectedValue"
     :placeholder="item.placeholder ? item.placeholder : '请选择'"
-    :disabled="isClearable() || isDisabled() "
+    :disabled="isReadonly() || isDisabled() "
     :clearable="isClearable()"
     :size="item.size"
     :filterable="item.filterable != null ? item.filterable : true"
@@ -235,6 +235,13 @@ function uploadOption() {
 }
 function isMultiple(){
   if(props.item.multiple === true || props.item.multiple === 1 || props.item.multiple === '1'){
+    return true;
+  }else{
+    return false;
+  }
+}
+function isReadonly(){
+  if(props.item.readonly === true || props.item.readonly === 1 || props.item.readonly === '1'){
     return true;
   }else{
     return false;

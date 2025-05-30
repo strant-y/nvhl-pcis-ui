@@ -6,7 +6,7 @@
     v-model="selectedValue"
     :class="isReQuired() ? 're-quired-flag' : ''"
     :placeholder="item.placeholder ? item.placeholder : '请选择'"
-    :disabled="isClearable() || isDisabled() "
+    :disabled="isReadonly() || isDisabled() "
     :clearable="isClearable()"
     :size="item.size"
     value-key="label"
@@ -262,6 +262,14 @@ function isMultiple(){
     return false;
   }
 }
+function isReadonly(){
+  if(props.item.readonly === true || props.item.readonly === 1 || props.item.readonly === '1'){
+    return true;
+  }else{
+    return false;
+  }
+}
+
 function isClearable(){
   if(props.item.clearable === true || props.item.clearable === 1 || props.item.clearable === '1'){
     return true;
