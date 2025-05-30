@@ -181,6 +181,8 @@ watch([() => props.modelValue], ([newModelValue]) => {
   selectedValue.value = newModelValue;
   if (props.item.typeCode && options.value.length === 0) {
     uploadOption();
+  }else if(props.item.disabled){  // 如果是禁用项,则固定刷新下拉选
+    uploadOption();
   }
 });
 
