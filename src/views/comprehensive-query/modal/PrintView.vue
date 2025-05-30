@@ -81,7 +81,6 @@ function fromUpdata(newData: any) {
 const schemaMap = reactive<Record<string, any>>({
   rtinputgroup: [],
 });
-const cPrnTypeLoadData = ref([]);
 const isflag = ref(false); // 是否有服务卡险别
 const _PrnTemplate = ref<any>(null); // 打印模板
 const CResId = ref<string | null>(null); // 打印模板资源ID
@@ -119,7 +118,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "单据类型",
         rules: [getRules("required", {})],
-        loadData: cPrnTypeLoadData.value,
         itemWidth: 3,
         func: (value: any) => {
           setPrnTemplate();
@@ -219,6 +217,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               setFormItem("cPlyType", {
                 title: "保单类型",
                 type: "radio",
+                hidden: false,
                 rules: [getRules("required", {})],
               });
             } else {
@@ -310,6 +309,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           { label: "最新保单", value: "1" },
         ],
         itemWidth: 3,
+        hidden: true,
       },
       {
         prop: "nEdrPrjNo",
@@ -390,7 +390,6 @@ function getPrnTypeOptions() {
     })
     .then((res: any) => {
       if (res.code === 200) {
-        // cPrnTypeLoadData.value = res.data
         setFormItem("cPrnType", {
           loadData: res.data,
         });

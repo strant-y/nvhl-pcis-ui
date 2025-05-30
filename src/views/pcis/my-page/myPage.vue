@@ -1364,6 +1364,8 @@ const calcPremium = () => {
       const payInfo = setPayInfo(ops["base"], ops["applicant"], ops["insrnc"]);
       console.log("生成缴费计划内容", payInfo);
       opertaor.getTableRefs()["payinfo"].setFormValue(payInfo);
+      const ciInfo = setCiInfo(ops["base"]);
+      opertaor.getTableRefs()["ci"].setFormValue(ciInfo); //生产联共保信息
       needCalc.value = false;
     } else {
       ElMessage.error(res.msg);
@@ -1395,6 +1397,17 @@ const setPayInfo = (base: any, applicant: any, insrnc: any) => {
   pay["Pay.nPrmVar"] = !!base["Base.nPrm"] ? base["Base.nPrm"] : 0;
   payList.push(pay);
   return payList;
+};
+const setCiInfo = (base: any) => {
+  const ciList: any[] = [];
+  const ci: any = {};
+  ci["Ci.nSeqNo"] = 1;
+  ci["Ci.nCiShare"] = 1;
+  ci["Ci.nCiAmt"] = base["Base.nAmt"];
+  ci["Ci.nCiPrm"] = base["Base.nPrm"];
+  ci["Ci.cChiefMrk"] = "1"
+  ciList.push(ci)
+  return ciList;
 };
 /**
  * 投保申请核保
