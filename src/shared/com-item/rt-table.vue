@@ -646,7 +646,7 @@ function getRowById(rowId: any) {
 
 function getselectionData() {
   if (props.item.showSelection) {
-    return tableFormfef.value?.getSelectionRows();
+    return tableRef.value?.getSelectionRows();
   } else {
     return null;
   }
