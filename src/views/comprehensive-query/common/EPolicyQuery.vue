@@ -549,7 +549,7 @@ function downloadEPolicy() {
                 return
             }
             const fileName = `${plyNo}.pdf`
-            const blob = new Blob([res], { type: 'application/pdf;charset=utf-8' })
+            const blob = new Blob([res.data], { type: 'application/pdf;charset=UTF-8' })
             saveAs(blob, fileName)
         })
         .catch(e => {
