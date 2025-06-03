@@ -26,6 +26,8 @@ import { PcisQueryService } from '@/views/payinfoManagement/service/pcis-query-s
 import { rsaEncoder, base64encoder } from '@/utils/encipher'
 // @ts-ignore
 import { saveAs } from 'file-saver'
+import dayjs from 'dayjs'
+import moment from 'moment'
 const pcisQueryService = new PcisQueryService()
 const userStore = useUserStore()
 const user = ref(userStore.user) || ref({ companyId: '', opCde: '', companyCnm: '' })
@@ -338,6 +340,9 @@ onMounted(async () => {
                 }
             ]
         })
+        const beginTime = dayjs(new Date()).subtract(3, 'month').format('YYYY-MM-DD 00:00:00')
+        const endTime = moment(new Date()).format('YYYY-MM-DD 23:59:59')
+        freeEditRef.value?.setValue('TIssueTm', [beginTime, endTime])
     })
 })
 
