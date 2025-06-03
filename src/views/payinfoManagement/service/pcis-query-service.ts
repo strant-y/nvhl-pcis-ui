@@ -479,8 +479,7 @@ export class PcisQueryService {
      * @returns 
      */
     downloadEPolicy(ops: any): AxiosPromise<any> {
-        return post(`${this.downloadEPolicyUrl}`,{}, {
-            params: ops,
+        return post(`${this.downloadEPolicyUrl}`,ops, {
             responseType: 'blob'
         });
     }
