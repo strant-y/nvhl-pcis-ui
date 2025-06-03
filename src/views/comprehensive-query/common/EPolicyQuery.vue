@@ -28,7 +28,7 @@ import { rsaEncoder, base64encoder } from '@/utils/encipher'
 import { saveAs } from 'file-saver'
 const pcisQueryService = new PcisQueryService()
 const userStore = useUserStore()
-const user = ref(userStore.user) || ref({ companyId: '', opCde: '' })
+const user = ref(userStore.user) || ref({ companyId: '', opCde: '', companyCnm: '' })
 const dzmodal = useDzModal()
 const tableRef = ref<AppTableMethod | null>(null)
 const departmentTree = defineAsyncComponent(() => import('@/pcis/prodRef/commodityRef/DepartmentTree.vue'))
@@ -38,7 +38,7 @@ const props = defineProps({
         default: false
     }
 })
-const sessionUser: any = sessionStorage.getItem('user')?.toString()
+const sessionUser: any = sessionStorage.getItem('user')
 const cPard = ref(null)
 const formconfig1 = reactive<AppFreeEditConfig>(
     createAppFreeEditConfig({
@@ -329,6 +329,15 @@ const tableconfig = reactive<AppTableConfig>(
 onMounted(async () => {
     nextTick(() => {
         freeEditRef.value?.setValue('CLoadSub', '1')
+        freeEditRef.value?.setValue('CDptCde', user.value.companyId)
+        setFormItem('CDptCde', {
+            loadData: [
+                {
+                    label: user.value.companyCnm,
+                    value: user.value.companyId
+                }
+            ]
+        })
     })
 })
 
