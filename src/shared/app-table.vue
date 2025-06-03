@@ -79,7 +79,7 @@
           v-model:page-size="queryParams.pageSize"
           layout="total, prev, pager, next, jumper"
           :total="pageresult.total"
-          v-if="!tableConfig.isPage && pageresult.total > 0"
+          v-if="tableConfig.isPage && pageresult.total > 0"
           @size-change="pageChange"
           @current-change="pageChange"
         />
@@ -101,6 +101,7 @@
 import { AppGridEditConfig } from "./app-grid-edit-config";
 import { AppTableConfig } from "./app-table-config";
 import { ref, reactive, defineEmits, defineProps, onMounted, watch } from "vue";
+import { dynamicFormMethod } from "./dynamic-form-config";
 
 defineOptions({
   name: "AppTable",
@@ -117,16 +118,6 @@ const queryParams = reactive<PageQuery>({
 const appgrideditConfig = reactive<AppGridEditConfig>({
   editFlag: false, //是否可以编辑
 });
-interface dynamicFormMethod {
-  getFromValue: () => any;
-  setFormValue: (data: any, noupdate?: boolean) => void;
-  validate: () => any;
-  setValue: (key: any, value: any) => void;
-  getValue: (key: any) => any;
-  checkKey: (key: any) => boolean;
-  clearValidate: () => any;
-  resetFields: () => any;
-}
 const dynamicForm = ref<dynamicFormMethod | null>(null);
 const dataList = ref<any>([]);
 const rttableFrom = ref<any>(null);

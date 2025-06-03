@@ -91,25 +91,47 @@ const method = {
     const rowId = rowData._dataId;
     if(val ==="327001"){
       freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde",rowId,"")
+      codeListStore
+          .queryCodeList({
+            codeListName: "Comm_Code_LIST",
+            codeListParam: { "CParCde": "subdpt", cParCde: "327001" },
+          })
+          .then((res) => {
+            setFormItem("Ci.cSubDptCde", {
+              loadData: res,
+            });
+          });
+      }else {
+        freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde",rowId,"")
+        freeEditRef.value?.setRowFieldProp(
+          rowId,
+          "Ci.cSubDptCde",
+          "loadData",
+          [{ value: '1', label: '其他' }]
+        );
+      }
+  },
+  //分公司下拉事件
+  cSubDptCdeChange:(val)=>{
+    const rowData = freeEditRef.value?.getSelectRow();
+    const rowId = rowData._dataId;
+    freeEditRef?.value?.setValueByRowKey("Ci.cDptCde",rowId,"")
     codeListStore
         .queryCodeList({
-          codeListName: "Comm_Code_LIST",
-          codeListParam: { "CParCde": "subdpt", cParCde: "327001" },
+          codeListName: "CDptCde_List",
+          codeListParam: { "CDptCde": val },
         })
         .then((res) => {
-          setFormItem("Ci.cSubDptCde", {
-            loadData: res,
-          });
+          freeEditRef.value?.setRowFieldProp(
+            rowId,
+            "Ci.cDptCde",
+            "loadData",
+            res,
+          );
         });
-    }else {
-      freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde",rowId,"")
-      freeEditRef.value?.setRowFieldProp(
-        rowId,
-        "Ci.cSubDptCde",
-        "loadData",
-        [{ value: '1', label: '其他' }]
-      );
-    }
+    
+    
+      
   },
   //出单标志下拉事件
   clssueMrkChange:  (val)=>{

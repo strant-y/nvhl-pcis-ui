@@ -218,7 +218,7 @@ const pageresult = reactive<Pageresult>({
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
-    isPage: true,
+    isPage: false,
     showSelection: false,
     tableBtnType: "btn",
     tableBtnWidth: 110,
@@ -280,7 +280,7 @@ const pageresult1 = reactive<Pageresult>({
 });
 const tableconfig1 = reactive<AppTableConfig>(
   createTableEditConfig({
-    isPage: true,
+    isPage: false,
     showSelection: false,
     tableBtnPosition: "right",
     titleBtns: [
@@ -367,7 +367,7 @@ const pageresult2 = reactive<Pageresult>({
 
 const tableconfig2 = reactive<AppTableConfig>(
   createTableEditConfig({
-    isPage: true,
+    isPage: false,
     showSelection: false,
     endBtnsPosition: "right",
     titleBtns: [

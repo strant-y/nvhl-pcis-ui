@@ -17,6 +17,8 @@ import termRiskGroupConfig from "./insuranceConInfo/termRiskGroupConfig.vue";
 import queryUtils from "./insuranceConInfo/queryUtils.vue";
 import relatedAdditionalInsModal from "./insuranceConInfo/relatedAdditionalInsModal.vue";
 
+import componentEdit from "./componentModel/componentEdit.vue";
+
 import edrItemEdit from "./edrItemEdit/edrItemEdit.vue";
 import buttonEdit from "./commonutils/buttonEdit.vue";
 
@@ -43,7 +45,9 @@ const componentMap = {
     queryUtils:queryUtils,
 
     buttonEdit:buttonEdit,
-    edrItemEdit:edrItemEdit
+    edrItemEdit:edrItemEdit,
+
+    componentEdit:componentEdit
 
 };
 
