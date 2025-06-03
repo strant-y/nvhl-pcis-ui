@@ -67,13 +67,15 @@
                   >
                     {{ appgrideditConfig.tableBtnTitle }}
                   </th>
-                  <th
+                  <template 
                     v-for="(i, index) in appgrideditConfig.fromSchema"
-                    :key="index"
+                    :key="index">
+                    <th v-if="i.isShow !== false" 
                     :width="i.width ? i.width : 100"
                   >
                     {{ i.title }}
                   </th>
+                  </template>
                   <th
                     v-if="appgrideditConfig.tableBtnPosition === 'right'"
                     :style="{
@@ -155,9 +157,10 @@
                       </template>
                     </template>
                   </td>
-                  <td
+                  <template 
                     v-for="(t, ts) in appgrideditConfig.fromSchema"
-                    :key="ts"
+                    :key="ts">
+                    <td v-if="t.isShow !== false"
                     :class="
                       !appgrideditConfig.dragFlag && t.dragFlag
                         ? 'handle cursor-move'
@@ -227,6 +230,7 @@
                       </template>
                     </el-form-item>
                   </td>
+                  </template>
                   <td v-if="appgrideditConfig.tableBtnPosition === 'right'">
                     <template
                       v-for="(btn, index) in appgrideditConfig.tableBtn"

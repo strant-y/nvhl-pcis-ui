@@ -268,6 +268,12 @@ const method = {
       setValue("Base.cBrkSlsCde", "");
     }
   },
+  updateSlsId: (v: any) => {
+    const p = opertaor.getParam();
+    if (!p.initFlag) {
+      setValue("Base.cIntroSalecde", v);
+    }
+  },
   //代理(经纪)人icon事件
   agentFunc: () => {
     console.log("代理(经纪)人icon事件");

@@ -214,6 +214,12 @@ const schemaMap = reactive<Record<string, any>>({
       loadData: yesOrNo,
     },
     {
+      prop: "multiple",
+      inputtype: "rtselect",
+      title: "是否可以多选",
+      loadData: yesOrNo,
+    },
+    {
       prop: "required",
       inputtype: "rtselect",
       title: "是否必填",
@@ -313,6 +319,12 @@ const schemaMap = reactive<Record<string, any>>({
       prop: "clearable",
       inputtype: "rtselect",
       title: "是否显示清除按钮",
+      loadData: yesOrNo,
+    },
+    {
+      prop: "multiple",
+      inputtype: "rtselect",
+      title: "是否可以多选",
       loadData: yesOrNo,
     },
     {

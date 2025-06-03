@@ -23,7 +23,7 @@
             v-if="!item.group"
           >
             <template v-if="item.inputtype === 'rtinputgroup'">
-              <el-form-item>
+              <el-form-item :required="checkRequired(item)">
                 <template #label>
                   <template v-if="item.title?.length > 8">
                     <el-tooltip

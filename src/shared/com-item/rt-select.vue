@@ -6,42 +6,14 @@
     :class="isReQuired() ? 're-quired-flag' : ''"
     v-model="selectedValue"
     :placeholder="item.placeholder ? item.placeholder : '请选择'"
-    :disabled="
-      (item.readonly
-        ? typeof item.readonly === 'boolean'
-          ? item.readonly
-          : item.readonly === 1 || item.readonly === '1'
-            ? true
-            : false
-        : false) ||
-      (item.disabled
-        ? typeof item.disabled === 'boolean'
-          ? item.disabled
-          : item.disabled === 1 || item.disabled === '1'
-            ? true
-            : false
-        : false)
-    "
-    :clearable="
-      item.clearable
-        ? typeof item.clearable === 'boolean'
-          ? item.clearable
-          : item.clearable === 1 || item.clearable === '1'
-            ? true
-            : false
-        : false
-    "
+    :disabled="isReadonly() || isDisabled() "
+    :clearable="isClearable()"
     :size="item.size"
     :filterable="item.filterable != null ? item.filterable : true"
-    :multiple="
-      item.multiple
-        ? typeof item.multiple === 'boolean'
-          ? item.multiple
-          : item.multiple === 1 || item.multiple === '1'
-            ? true
-            : false
-        : false
-    "
+    :multiple="isMultiple()"
+    :collapse-tags="isMultiple()"
+    :collapse-tags-tooltip="isMultiple()"
+    :max-collapse-tags="isMultiple() ? 3 : null"
     @change="handleChange"
   >
     <template
@@ -188,6 +160,8 @@ watch([() => props.modelValue], ([newModelValue]) => {
   selectedValue.value = newModelValue;
   if (props.item.typeCode && options.value.length === 0) {
     uploadOption();
+  }else if(props.item.typeCode && props.item.disabled){  // 如果是禁用项,则固定刷新下拉选
+    uploadOption();
   }
 });
 
@@ -258,6 +232,34 @@ function uploadOption() {
       console.error(err);
       options.value = [];
     });
+}
+function isMultiple(){
+  if(props.item.multiple === true || props.item.multiple === 1 || props.item.multiple === '1'){
+    return true;
+  }else{
+    return false;
+  }
+}
+function isReadonly(){
+  if(props.item.readonly === true || props.item.readonly === 1 || props.item.readonly === '1'){
+    return true;
+  }else{
+    return false;
+  }
+}
+function isClearable(){
+  if(props.item.clearable === true || props.item.clearable === 1 || props.item.clearable === '1'){
+    return true;
+  }else{
+    return false;
+  }
+}
+function isDisabled(){
+  if(props.item.disabled === true || props.item.disabled === 1 || props.item.disabled === '1'){
+    return true;
+  }else{
+    return false;
+  }
 }
 
 function handleChange(val?: string | number | Array<any> | undefined) {

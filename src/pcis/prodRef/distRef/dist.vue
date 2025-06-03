@@ -162,6 +162,12 @@ onMounted(async () => {
   Object.assign(formconfig1.value, formconfig11.value);
   cardconfig.value.title = formconfig1.value.title;
   tableconfig.value.showEdit = true;
+  formconfig1.value.fromSchema.forEach((e: any)=>{  // 隐藏不需要显示在表格内的数据
+    if(e.cShowLocation === '0'){
+      e.isShow = false
+    }
+    return e;
+  });
   tableconfig.value.fromSchema = formconfig1.value.fromSchema;
   tableconfig.value.formconfig = createAppGridEditConfig({
     titleBtns: formconfig1.value.titleBtns,
