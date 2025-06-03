@@ -97,7 +97,7 @@
 
 <script setup lang="ts">
 import { useValidator } from "@/typings/useValidator";
-import { componentType, position } from "@/utils/utilKey";
+import { componentType, position, showLocation } from "@/utils/utilKey";
 const { getRules } = useValidator();
 const dialog = ref<DialogMethod | null>(null);
 import { ref, defineProps } from "vue";
@@ -271,6 +271,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               }
             }
           });
+
+          tableconfig.fromSchema?.forEach((e: any) => {
+            if (e.prop === "cShowLocation") {
+              if (index === "dist") {
+                e.isShow = true;
+              } else {
+                e.isShow = false;
+              }
+            }
+          });
         },
       },
       {
@@ -333,7 +343,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     editFlag: true,
-    editList: ["cGroup", "cExpand"],
+    editList: ["cGroup", "cExpand", "cShowLocation"],
     fromSchema: [
       {
         prop: "icon",
@@ -379,6 +389,12 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtselect",
         title: "折叠内容",
         loadData: yesOrNo,
+      },
+      {
+        prop: "cShowLocation",
+        inputtype: "rtselect",
+        title: "显示位置",
+        loadData: showLocation,
       },
     ],
   })
@@ -494,7 +510,6 @@ function save() {
       }
     });
   }
-
   const param = Object.assign(s, {
     selectFactor: selectList,
     titleBtns: titleBtns.value,

@@ -131,7 +131,8 @@
         :align="item.align ? item.align : 'center'"
       />
       <template v-for="(i, index) in item.fromSchema" :key="index">
-        <el-table-column
+        <template v-if="i.isShow !== false" >
+          <el-table-column
           v-if="!i.expand"
           :prop="i.prop"
           :label="i.title"
@@ -180,6 +181,7 @@
             </template>
           </template>
         </el-table-column>
+        </template>
       </template>
       <el-table-column
         :label="item.tableBtnTitle"

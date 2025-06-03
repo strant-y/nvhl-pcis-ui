@@ -187,6 +187,7 @@ onMounted(() => {
   
   let newSchema = [];
   let cIs= opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered']  //  是否记名投保
+
   for(let i = 0; props.data.fromSchema && i < props.data.fromSchema.length; i++){
     let item = JSON.parse(JSON.stringify(props.data.fromSchema[i]));
     if(['Dist.AllOccup'].includes(item.prop)) {
@@ -204,6 +205,9 @@ onMounted(() => {
       item['rules'] =null;
     }
     item["disabled"] = false;
+    if(item.cShowLocation === '1'){
+      item["hidden"] = true;
+    }
     newSchema.push(item);
   }
 

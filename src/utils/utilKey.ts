@@ -93,6 +93,16 @@ const yesOrNo = [
     value: "0",
   },
 ];
+const showLocation = [
+  {
+    label: "表格中",
+    value: "1",
+  },
+  {
+    label: "表单中",
+    value: "0",
+  },
+];
 const position = [
   {
     label: "left",
@@ -261,4 +271,5 @@ export {
   dateType,
   position,
   showtype,
+  showLocation,
 };
