@@ -401,8 +401,9 @@ const method = {
         };
 
         policyService.importDist(params).then((res) => {
+          debugger
           if (res.code === 200) {
-            ElMessage.success("导入成功");
+            ElMessage.success(`导入完成：${res.data.msg}`);
             method.handleQuery();
           } else {
             ElMessage.error(res.message || "导入失败");
