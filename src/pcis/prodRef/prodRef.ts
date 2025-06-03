@@ -62,6 +62,7 @@ import  cOccupCdeModal  from "./commodityRef/cOccupCdeModal.vue";
 import agentPre from "./commodityRef/agentPer.vue" //代理(经济)人
 import agentWorker from "./commodityRef/agentWorker.vue" //代理业务员
 import prdFixSpec from "./commodityRef/prd-fix-spec.vue" //特别约定
+import deductibleFix from "./commodityRef/DeductibleFix.vue" //免赔条件选择
 import underwriteRef from "./underwriteRef/underwrite.vue"
 import edrbaseRef from "./edrbaseRef/edrbase.vue"
 import edritemRef from "./edritemRef/edritem.vue"
@@ -134,6 +135,7 @@ const componentMap = {
   ndustryCateModal:ndustryCateModal,
   cOccupCdeModal:cOccupCdeModal,
   prdFixSpec: prdFixSpec,
+  deductibleFix: deductibleFix,
 };
 
 const install = (Vue) => {
