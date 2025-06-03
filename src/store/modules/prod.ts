@@ -46,5 +46,6 @@ export const useProductStore = defineStore('product', () => {
         setnPrm,
         nPrm,
         nAmt,
+        cCiMrk,
     }
 })

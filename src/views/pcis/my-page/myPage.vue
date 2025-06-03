@@ -144,7 +144,12 @@
               }}</span
             >&nbsp;|&nbsp;<span style="font-weight: bold">出单方式：</span
             ><span class="publicStyle">核心页面出单</span>&nbsp;|
-            <span class="publicStyle">非共保业务</span> |
+            <span class="publicStyle">{{productStore.cCiMrk === '0' ? '非共保业务' 
+              : productStore.cCiMrk == '1' ? '外部共保我方主共_主联'
+              : productStore.cCiMrk == '2' ? '外部共保我方从共_主联'
+              : productStore.cCiMrk == '3' ? '外部共保我方主共_无联保'
+              : productStore.cCiMrk == '4' ? '外部共保我方从共_无联保'
+              : '司内联保_主联' }}</span> |
             <span class="publicStyle">{{
               props.param.cGrpMrk == "0" ? "个单" : "团单"
             }}</span
@@ -1402,10 +1407,11 @@ const setCiInfo = (base: any) => {
   const ciList: any[] = [];
   const ci: any = {};
   ci["Ci.nSeqNo"] = 1;
-  ci["Ci.nCiShare"] = 1;
+  ci["Ci.nCiShare"] = '1'
   ci["Ci.nCiAmt"] = base["Base.nAmt"];
   ci["Ci.nCiPrm"] = base["Base.nPrm"];
   ci["Ci.cChiefMrk"] = "1"
+  ci["Ci.cIssueMrk"] = "1"
   ciList.push(ci)
   return ciList;
 };

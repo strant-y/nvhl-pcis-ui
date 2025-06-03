@@ -258,6 +258,8 @@ const pageresult = reactive<Pageresult>({
     total: 0
 })
 
+const platTypeMap: any = { TBD: '投保单', BL: '保函', PLY: '保单', EDR: '批单' }
+
 const tableconfig = reactive<AppTableConfig>(
     createTableEditConfig({
         tableBtnType: 'btn',
@@ -533,7 +535,7 @@ function downloadEPolicy() {
         ElMessage.warning('每次只能下载1个单据！')
         return
     }
-    const plyNo = selectData.cPlyNo
+    const plyNo = selectData[0].cPlyNo
     const data = {
         plyNo: base64encoder(rsaEncoder(plyNo)),
         type: 'EXP_EPOLICY_IMP_PDF',
@@ -542,8 +544,16 @@ function downloadEPolicy() {
     pcisQueryService
         .downloadEPolicy(data)
         .then((res: any) => {
+            if (res == '' || res == '500' || res.size <= 0) {
+                ElMessage.error('下载出错，请核实是否有生成电子' + platTypeMap[plyTyp] + '！')
+                return
+            }
             const fileName = `${plyNo}.pdf`
-            saveAs(res, decodeURI(fileName))
+            const blob = new Blob([res.data], { type: 'application/pdf;charset=UTF-8' })
+            saveAs(blob, fileName)
+        })
+        .catch(e => {
+            ElMessage.error('电子单据下载失败' + e)
         })
         .finally(() => {})
 }

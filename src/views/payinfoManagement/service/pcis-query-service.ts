@@ -1,5 +1,6 @@
 import { AxiosPromise } from 'axios'
 import { post } from '@/utils/http'
+import request from '@/utils/request'
 import { del } from '@/utils/http'
 import { get } from 'lodash'
 /**
@@ -478,9 +479,8 @@ export class PcisQueryService {
      * @param ops 
      * @returns 
      */
-    downloadEPolicy(ops: any): AxiosPromise<any> {
-        return post(`${this.downloadEPolicyUrl}`,{}, {
-            params: ops,
+    downloadEPolicy(ops: any) {
+        return request.post(`${this.downloadEPolicyUrl}`,ops, {
             responseType: 'blob'
         });
     }
