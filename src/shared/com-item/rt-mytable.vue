@@ -5,7 +5,8 @@
         #header
         v-if="
           tableConfig.productionTitle ||
-          (tableConfig.titleBtns && tableConfig.titleBtns.length > 0)
+          (tableConfig.titleBtns && tableConfig.titleBtns.length > 0) ||
+          tableConfig.showEdit
         "
       >
         <el-row justify="space-between">
@@ -32,11 +33,28 @@
             </el-button-group>
           </el-col>
         </el-row>
+        <el-row justify="space-between" v-if="tableConfig.showEdit">
+          <el-col :span="24">
+            <dynamic-forms
+              :fromSchema="tableConfig.formconfig.fromSchema"
+              :fromUi="tableConfig.formconfig.fromUi"
+              ref="dynamicForm"
+            />
+          </el-col>
+        </el-row>
+
         <!-- <template v-for="(item, index) in tableConfig.titleBtns" :key="index">
           <rt-button :item="item" />
         </template> -->
       </template>
-      <div class="form-inner" :style="{'maxHeight':appgrideditConfig.maxHeight ?  appgrideditConfig.maxHeight : '500px'}">
+      <div
+        class="form-inner"
+        :style="{
+          maxHeight: appgrideditConfig.maxHeight
+            ? appgrideditConfig.maxHeight
+            : '500px',
+        }"
+      >
         <VueDraggable
           v-model="dataList"
           :animation="150"
@@ -67,14 +85,16 @@
                   >
                     {{ appgrideditConfig.tableBtnTitle }}
                   </th>
-                  <template 
+                  <template
                     v-for="(i, index) in appgrideditConfig.fromSchema"
-                    :key="index">
-                    <th v-if="i.isShow !== false" 
-                    :width="i.width ? i.width : 100"
+                    :key="index"
                   >
-                    {{ i.title }}
-                  </th>
+                    <th
+                      v-if="i.isShow !== false"
+                      :width="i.width ? i.width : 100"
+                    >
+                      {{ i.title }}
+                    </th>
                   </template>
                   <th
                     v-if="appgrideditConfig.tableBtnPosition === 'right'"
@@ -157,79 +177,81 @@
                       </template>
                     </template>
                   </td>
-                  <template 
+                  <template
                     v-for="(t, ts) in appgrideditConfig.fromSchema"
-                    :key="ts">
-                    <td v-if="t.isShow !== false"
-                    :class="
-                      !appgrideditConfig.dragFlag && t.dragFlag
-                        ? 'handle cursor-move'
-                        : null
-                    "
-                    :style="{
-                      textAlign: 'center',
-                    }"
+                    :key="ts"
                   >
-                    <el-form-item
-                      :prop="`${j}.${t.prop}`"
-                      :rules="t.rules ? t.rules : undefined"
+                    <td
+                      v-if="t.isShow !== false"
+                      :class="
+                        !appgrideditConfig.dragFlag && t.dragFlag
+                          ? 'handle cursor-move'
+                          : null
+                      "
+                      :style="{
+                        textAlign: 'center',
+                      }"
                     >
-                      <div
-                        :style="{
-                          width:
-                            t.showExBtn && t.inputtype !== 'rttable' // 显示组件尾部按钮 table 组件不显示尾部按钮
-                              ? (t.btnWidth ? 100 - t.btnWidth : 75) + '%'
-                              : '100%',
-                        }"
+                      <el-form-item
+                        :prop="`${j}.${t.prop}`"
+                        :rules="t.rules ? t.rules : undefined"
                       >
-                        <from-item
-                          v-model="i[t.prop]"
-                          :item="t"
-                          :row="i"
-                          :showLabel="
-                            editIndex !== i._dataId ||
-                            (appgrideditConfig.editList &&
-                            appgrideditConfig.editList.length > 0
-                              ? !appgrideditConfig.editList?.includes(t.prop)
-                              : false)
-                          "
-                          :ref="
-                            (re) => {
-                              if (formRefs[i._dataId]) {
-                                formRefs[i._dataId][t.prop] = re;
-                              } else {
-                                formRefs[i._dataId] = {};
-                                formRefs[i._dataId][t.prop] = re;
-                              }
-                            }
-                          "
-                        />
-                      </div>
-                      <!---       显示组件尾部按钮       --->
-                      <template
-                        v-if="
-                          t.showExBtn &&
-                          !(
-                            editIndex !== i._dataId ||
-                            (appgrideditConfig.editList &&
-                            appgrideditConfig.editList.length > 0
-                              ? !appgrideditConfig.editList?.includes(t.prop)
-                              : false)
-                          )
-                        "
-                      >
-                        <rt-button
-                          v-if="t.inputtype !== 'rttable'"
+                        <div
                           :style="{
-                            width: (t.btnWidth ? t.btnWidth : 25) + '%',
-                            height: '100%',
+                            width:
+                              t.showExBtn && t.inputtype !== 'rttable' // 显示组件尾部按钮 table 组件不显示尾部按钮
+                                ? (t.btnWidth ? 100 - t.btnWidth : 75) + '%'
+                                : '100%',
                           }"
-                          :item="t.btnItems"
-                          @closepopover="(rev) => setPopover(rev, i, t)"
-                        />
-                      </template>
-                    </el-form-item>
-                  </td>
+                        >
+                          <from-item
+                            v-model="i[t.prop]"
+                            :item="t"
+                            :row="i"
+                            :showLabel="
+                              editIndex !== i._dataId ||
+                              (appgrideditConfig.editList &&
+                              appgrideditConfig.editList.length > 0
+                                ? !appgrideditConfig.editList?.includes(t.prop)
+                                : false)
+                            "
+                            :ref="
+                              (re) => {
+                                if (formRefs[i._dataId]) {
+                                  formRefs[i._dataId][t.prop] = re;
+                                } else {
+                                  formRefs[i._dataId] = {};
+                                  formRefs[i._dataId][t.prop] = re;
+                                }
+                              }
+                            "
+                          />
+                        </div>
+                        <!---       显示组件尾部按钮       --->
+                        <template
+                          v-if="
+                            t.showExBtn &&
+                            !(
+                              editIndex !== i._dataId ||
+                              (appgrideditConfig.editList &&
+                              appgrideditConfig.editList.length > 0
+                                ? !appgrideditConfig.editList?.includes(t.prop)
+                                : false)
+                            )
+                          "
+                        >
+                          <rt-button
+                            v-if="t.inputtype !== 'rttable'"
+                            :style="{
+                              width: (t.btnWidth ? t.btnWidth : 25) + '%',
+                              height: '100%',
+                            }"
+                            :item="t.btnItems"
+                            @closepopover="(rev) => setPopover(rev, i, t)"
+                          />
+                        </template>
+                      </el-form-item>
+                    </td>
                   </template>
                   <td v-if="appgrideditConfig.tableBtnPosition === 'right'">
                     <template
@@ -299,6 +321,15 @@
           </template>
         </div>
       </div>
+      <el-pagination
+        v-model:current-page="queryParams.pageNum"
+        v-model:page-size="queryParams.pageSize"
+        layout="total, prev, pager, next, jumper"
+        :total="pageresult?.total"
+        v-if="tableConfig.isPage && pageresult?.total > 0"
+        @size-change="pageChange"
+        @current-change="pageChange"
+      />
     </el-card>
   </div>
 </template>
@@ -307,14 +338,15 @@ import { v4 as uuidv4 } from "uuid";
 import { VueDraggable } from "vue-draggable-plus";
 import { AppTableConfig } from "../app-table-config";
 import { AppGridEditConfig } from "../app-grid-edit-config";
+import { dynamicFormMethod } from "../dynamic-form-config";
 
-const emits = defineEmits(["indexupdate", "rowselect"]); // 告知父类,组件顺序变更
+const emits = defineEmits(["pageChange", "indexupdate", "rowselect"]); // 告知父类,组件顺序变更
 
 const appgrideditConfig = reactive<AppGridEditConfig>({
   editFlag: false, //是否可以编辑
 });
 const dataList = ref<any[]>([]);
-
+const dynamicForm = ref<dynamicFormMethod | null>(null);
 const formRefs = ref<any>([]);
 
 const props = defineProps({
@@ -331,6 +363,11 @@ const props = defineProps({
     type: Object as () => Record<string, any>,
     required: false,
   },
+  pageresult: {
+    type: Object as () => Pageresult,
+    
+    required: false,
+  },
 });
 watch(
   () => props.tableConfig,
@@ -343,6 +380,15 @@ watch(
 const editIndex = ref(-1);
 // 选中行id
 const selectIndex = ref(-1);
+
+const queryParams = reactive<PageQuery>({
+  pageNum: 1,
+  pageSize: 10,
+});
+
+function pageChange() {
+  emits("pageChange");
+}
 
 const formUi = reactive<Record<string, any>>({});
 
@@ -404,6 +450,21 @@ function updateOption(rowId: string, propKey: string, newOption: any) {
     }
   }, 50);
 }
+
+function getPartnerPage(flag = true) {
+  if (flag) {
+    queryParams.pageNum = 1;
+  }
+  return queryParams;
+}
+
+function getFormData() {
+  if (props.tableConfig.showEdit) {
+    return dynamicForm.value?.getFromValue();
+  } else {
+    return null;
+  }
+}
 function getSelectRow() {
   const sele = dataList.value?.find((item) => {
     if (item._dataId === editIndex.value) {
@@ -432,7 +493,7 @@ function setValueByRowKey(props: string, rowId: any, value: any) {
   });
 }
 
-function deleteByRowKey(rowId: any){
+function deleteByRowKey(rowId: any) {
   dataList.value = dataList.value.filter((item) => item._dataId !== rowId);
 }
 
@@ -451,6 +512,8 @@ function removeRow(dataId: string) {
 }
 
 defineExpose({
+  getPartnerPage,
+  getFormData,
   addRow,
   getformRef,
   updateOption,

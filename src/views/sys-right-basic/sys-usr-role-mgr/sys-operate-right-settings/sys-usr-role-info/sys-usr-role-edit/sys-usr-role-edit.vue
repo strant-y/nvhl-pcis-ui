@@ -70,7 +70,7 @@ const pageresult = reactive<Pageresult>({
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     title: "操作权限-本次新增角色",
-    isPage: true,
+    isPage: false,
     showSelection: true,
     fromSchema: [
       {

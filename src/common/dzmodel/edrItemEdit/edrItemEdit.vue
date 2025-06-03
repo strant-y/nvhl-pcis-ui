@@ -166,6 +166,7 @@ const tableRef = ref<MyTableMethod | null>(null);
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     title: "配置明细",
+    isPage:false,
     fromSchema: [
       {
         prop: "isChecked",

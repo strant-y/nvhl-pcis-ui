@@ -50,6 +50,7 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtnPosition: "right",
     title: "组件绑定关系",
     editFlag: true,
+    isPage:false,
     tableBtn: [
       createFreeButtonBase({
         id: "score",
@@ -205,7 +206,6 @@ onMounted(() => {
         setTimeout(() => {
           const tabData = tableRef.value?.getFromValue();
           Object.keys(tabData).forEach((key) => {
-            console.log(tabData[key]);
             const sdata = tabData[key];
             const params = {
               cComponentTab: sdata.cComponentTab,

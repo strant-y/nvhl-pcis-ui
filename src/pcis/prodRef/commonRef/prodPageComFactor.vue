@@ -8,6 +8,12 @@
             <el-menu-item
               v-for="(item, index) in componentList"
               :key="index"
+              class="component-item"
+              :class="
+                selectConItem.cComponentKey === item.cComponentKey
+                  ? 'com_active'
+                  : ''
+              "
               @click="selectComponent(item)"
             >
               <template #title>{{ item.cComponentName }}</template>
@@ -143,6 +149,7 @@ const tableRef = ref<MyTableMethod | null>(null);
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     title: "配置明细",
+    isPage: false,
     fromSchema: [
       {
         prop: "icon",
@@ -227,3 +234,13 @@ onMounted(() => {
     .finally(() => {});
 });
 </script>
+
+<style scoped>
+/* 确保样式与现有组件一致 */
+.component-item {
+  height: 30px;
+}
+.com_active {
+  background-color: #72ffff;
+}
+</style>
