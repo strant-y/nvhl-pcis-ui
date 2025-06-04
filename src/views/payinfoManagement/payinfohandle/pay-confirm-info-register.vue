@@ -132,13 +132,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "产品",
         typeCode: "PROD_LIST_IN_GUIDE",
-       
+       disabled: true,
         
       },
       {
         prop: "CAppTyp",
         inputtype: "rtselect",
         title: "申请类型",
+        disabled: true,
         loadData :[
           { label:'投保',value:"A" },
           { label:'批改',value:"E" },
@@ -148,6 +149,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "CCurNo",
         inputtype: "rtselect",
         title: "币种",
+        disabled: true,
         typeCode: "CURRENCY_LIST"
       },
       // {
@@ -158,11 +160,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: 'NTax',
         title: '车船税',
+        disabled: true,
         inputtype: "rtinput",
       },
       {
         prop: 'NPrm',
         title: '实收金额',
+        disabled: true,
         inputtype: "rtinput",
       },
       {
@@ -180,6 +184,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: 'TBgnTm',
         title: '保险起期',
         inputtype: "rtdatepicker",
+        disabled: true,
         type: "datetime",
         format: 'YYYY-MM-DD HH:mm:ss',
       },
@@ -187,12 +192,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: 'TEndTm',
         title: '保险止期',
         inputtype: "rtdatepicker",
+        disabled: true,
         type: "datetime",
         format: 'YYYY-MM-DD HH:mm:ss',
       },
       {
         prop: 'TUdrTm',
         title: '核保时间',
+        disabled: true,
         inputtype: "rtdatepicker",
         type: "datetime",
         format: 'YYYY-MM-DD HH:mm:ss',
@@ -200,6 +207,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: 'TPlEdrMakeTm',
         title: '保批单生成时间',
+        disabled: true,
         inputtype: "rtdatepicker",
         type: "datetime",
         format: 'YYYY-MM-DD HH:mm:ss',
@@ -207,17 +215,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: 'TPlyedrPrnTm',
         title: '打印时间',
+        disabled: true,
         inputtype: "rtdatepicker",
         type: "datetime",
         format: 'YYYY-MM-DD HH:mm:ss',
       },
       {
         prop: 'NPayAmt',
+        disabled: true,
         title: '支票（收据）金额',
         inputtype: "rtinput",
       },
       {
         prop: 'CPlyNo',
+        disabled: true,
         title: '生成保批单号',
         inputtype: "rtinput",
       },
@@ -251,11 +262,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       // },
       {
         prop: 'CAppNo',
+        disabled: true,
         title: '投保单号',
         inputtype: "rtinput",
       },
       {
         prop: 'NStampTax',
+        disabled: true,
         title: '印花税',
         inputtype: "rtinput",
       },
