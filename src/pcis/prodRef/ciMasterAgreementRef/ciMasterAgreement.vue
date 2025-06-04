@@ -11,6 +11,7 @@ import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
 import { useProductStore } from "@/store/modules/prod";
+import { setTimeout } from "timers/promises";
 const productStore = useProductStore();
 
 const props = defineProps({
@@ -20,20 +21,9 @@ const props = defineProps({
   },
 });
 
-// const nJiJntPrm = ref("0.00");   //联保总保费
-// const nJiJntAmt = ref("0.00");   //联保总保额
-// const nCiJntAmt = ref("0.00");   //共保总保额
-// const nCiJntPrm = ref("0.00");   //共保总保费
-
-// 响应式引用 store 中的值
-const nJiJntPrm = ref(productStore.nPrm);  // 联保总保费
-const nCiJntPrm = ref(productStore.nAmt);  // 共保总保费
-
-
 // 监听 store 中的变化并更新本地变量
 watchEffect(() => {
-  nJiJntPrm.value = productStore.nPrm;
-  nCiJntPrm.value = productStore.nAmt;
+  console.log("nPrm:", productStore.cCiMrk);
 });
 
 const tgtobjEditRef = ref<AppFreeEditMethod | null>(null);
@@ -53,7 +43,6 @@ onMounted(() => {
 
 // 绑定方法
 const method = {
-
   // func demo
   func1: () => {},
 };
