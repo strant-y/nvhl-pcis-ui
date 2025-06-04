@@ -273,7 +273,7 @@ import {
   getSurrenderPrecis,
   submitEdrSurrender,
 } from "../../../api/query/index";
-import { checkFeeWindowType } from "@/api/prod";
+import { checkFeeWindowType, selectDist, saveDistBatch } from "@/api/prod";
 import { dataOpertaor, useProductStore } from "@/store";
 import moment from "moment";
 import dayjs from "dayjs";
@@ -1152,6 +1152,13 @@ async function loadAfter() {
       if (res) {
         const ops = opertaor.convertData(res);
         opertaor.setDataAll(ops);
+        // 获取原投保单号下的清单列表数据
+        const distMap = formconfig1[0].pageInfo.filter((item:any) => {
+          return item.pageKey === "dist" || item.pageKey === "distSummary";
+        });
+        distMap.forEach((item:any) => {
+          getDistData(props.param?.cAppNo, item)
+        });
         //获取单号
         getCAppNoFun();
       }
@@ -1220,6 +1227,21 @@ async function loadAfter() {
     })
   );
 }
+// 获取清单数据并填充到列表
+const getDistData = (appNo:any, item: any) => {
+  const selData = {
+    cComponentTable: item.pageCode.slice(0, -6),
+    cAppNo: appNo,
+  };
+  if(item.pageKey === "distSummary") {
+    selData.isSummary = '1';
+  }
+  selectDist(selData).then((res: any) => {
+    if (res.code === 200) {
+      opertaor.getTableRefs()[item.pageCode].setTableData(res.data.data);
+    }
+  });
+}
 const getCAppNoFun = () => {
   const res = {
     cProdNo: props.param.cProdNo,
@@ -1230,9 +1252,52 @@ const getCAppNoFun = () => {
     console.log("generatelSingleNo-res", res);
     if (res["code"] == "200") {
       opertaor.getTableRefByKey("plyBase").setValue("Base.cAppNo", res["data"]);
+      nextTick(() => {
+        savePlyInfo()
+      })
     }
   });
 };
+const saveDistBatchFlag = ref(true);
+// 批量保存清单
+const saveDist = (appNo:any) => {
+  const distMap = formconfig1[0].pageInfo.filter((item:any) => {
+    return item.pageKey === "dist" || item.pageKey === "distSummary";
+  });
+  distMap.forEach((item:any) => {
+    if(item.pageKey === "dist") {
+      const data = opertaor.getTableRefs()[item.pageCode].getTableData();
+      
+      if(data && data.length > 0) {
+        const param = {
+          cComponentTable: item.pageCode.slice(0, -6),
+          cAppNo: appNo,
+          dist: data.map((item:any) => {
+            return {
+              ...item,
+              'Dist.tOpeningTime': item['Dist.tOpeningTime'] ? dayjs(item['Dist.tOpeningTime']).format('YYYY-MM-DD') : null,
+              'Dist.tCrtTm': item['Dist.tCrtTm'] ? dayjs(item['Dist.tCrtTm']).format('YYYY-MM-DD') : null,
+              'Dist.tUpdTm': item['Dist.tUpdTm'] ? dayjs(item['Dist.tUpdTm']).format('YYYY-MM-DD') : null,
+            };
+          }),
+        }
+        saveDistBatch(param).then((res:any) => {
+          if(res.code === 200) {
+            // 批量保存清单成功后再查询一遍清单
+            distMap.forEach((item:any) => {
+              opertaor.getTableRefs()[item.pageCode].handleQuery();
+            });
+            saveDistBatchFlag.value = false;
+          } else {
+            ElMessage.error(res.msg);
+          }
+        }).catch((err:any) => {
+          ElMessage.error(err);
+        });
+      }
+    }
+  });
+}
 /**
  * 加载投保单明细
  */
@@ -1542,6 +1607,16 @@ const savePlyInfo = async () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
 
+  if(props.param?.pageType === "copy" && saveDistBatchFlag.value) {
+    const cAppNo = res["plyBase"]["Base.cAppNo"];
+    res["applicant"]["Applicant.cAppNo"] = cAppNo;
+    res["insured"]["Insured.cAppNo"] = cAppNo;
+    res["cvrg"] = res["cvrg"].map((item:any) => ({
+      ...item,
+      'Term.cAppNo': cAppNo,
+    }));
+  }
+
   console.log("保存参数-----1", res);
   if (res["cvrg"].length == 0) {
     ElMessage.error("请录入条款信息");
@@ -1567,6 +1642,11 @@ const savePlyInfo = async () => {
       plyBaseRef.setFormValue(plyBase);
     }
     saveFlag = true;
+    if(props.param?.pageType === "copy" && saveDistBatchFlag.value) {
+      // 保存清单
+      const appNo = plyBase["Base.cAppNo"];
+      saveDist(appNo);
+    }
   } else {
     ElMessage.error(resInfo.msg);
   }
