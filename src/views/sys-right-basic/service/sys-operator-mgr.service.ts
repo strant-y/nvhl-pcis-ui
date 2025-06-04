@@ -29,6 +29,7 @@ export class SysOperatorMgrService {
     getUserAssociateRolesUrl = '/role/getUserAssociateRolesListByUserId'; // 机构权限： 批量删除机构权限
     getUsrProdByUsrAndDptUrl = '/role/getUsrProdByUsrAndDpt'; // 产品权限： 根据用户和机构获取用户产品权限
     dataSynchronizationUrl = 'proddef/dataSynchronization'; // 数据同步
+    qureyAppPolicyListForCopyUrl = '/policy/qureyAppPolicyListForCopy'; // 复制出单查询
 
     /**
      * @Title: 获取操作员信息列表
@@ -321,5 +322,14 @@ export class SysOperatorMgrService {
      */
     dataSynchronization(ops) {
         return request.post(`${this.dataSynchronizationUrl}`, ops)
+    }
+    
+    /**
+     *  复制出单弹框查询
+     * @param ops
+     * @returns {Observable<any>}
+     */
+    qureyAppPolicyListForCopy(ops) {
+        return request.post(`${this.qureyAppPolicyListForCopyUrl}`, ops);
     }
 }
