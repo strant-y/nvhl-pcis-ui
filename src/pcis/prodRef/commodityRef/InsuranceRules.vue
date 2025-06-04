@@ -11,7 +11,7 @@ import {
 } from "@/shared/app-free-edit-config";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
-import { saveProInfo } from "@/api/prod";
+import { saveProInfo ,getCommodityRule} from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
 import { useDzModal } from "@/common/dzmodel/DzModalService";
@@ -29,49 +29,49 @@ const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "投保规则",
     endBtnsPosition: "right",
-    endBtns: [
-      createFreeButtonBase({
-        type: "primary",
-        label: "保存",
-        func: async () => {
-          const s = freeEditRef.value?.getFromValue(); //获取表单数据
-          saveProInfo(s)
-            .then((res) => {
-              const { code, data, msg } = res;
-              if (200 === code) {
-                ElMessage.success("保存成功");
-              } else {
-                ElMessage.error(msg);
-              }
-            })
-            .finally(() => {});
-        },
-      }),
-      createFreeButtonBase({
-        label: "返回",
-        func: () => {},
-      }),
-    ],
+    // endBtns: [
+    //   createFreeButtonBase({
+    //     type: "primary",
+    //     label: "保存",
+    //     func: async () => {
+    //       const s = freeEditRef.value?.getFromValue(); //获取表单数据
+    //       saveProInfo(s)
+    //         .then((res) => {
+    //           const { code, data, msg } = res;
+    //           if (200 === code) {
+    //             ElMessage.success("保存成功");
+    //           } else {
+    //             ElMessage.error(msg);
+    //           }
+    //         })
+    //         .finally(() => {});
+    //     },
+    //   }),
+    //   createFreeButtonBase({
+    //     label: "返回",
+    //     func: () => {},
+    //   }),
+    // ],
     fromSchema: [
       {
-        prop: "NMaxPieces",
+        prop: "nMaxPieces",
         inputtype: "rtinput",
         title: "份数上限（含）",
-        rules: [getRules("required", {})],
+        // rules: [getRules("required", {})],
       },
       {
-        prop: "NMinAge",
+        prop: "nMinAge",
         inputtype: "rtinput",
         title: "被保人年龄下限（含）",
-        rules: [getRules("required", {})],
+        // rules: [getRules("required", {})],
       },
       {
-        prop: "NDispOrd",
+        prop: "nDispOrd",
         inputtype: "rtinput",
         title: "被保人年龄上限（含）",
       },
       {
-        prop: "CSex",
+        prop: "cSex",
         inputtype: "rtselect",
         title: "被保人性别",
         // codeType: "Sex_List",
@@ -82,17 +82,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         ],
       },
       {
-        prop: "CSocialSec",
-        inputtype: "rtinput",
+        prop: "cSocialSec",
+        inputtype: "rtselect",
         title: "被保人是否有社保",
+        typeCode: "WEB_SYS_STA_DICT",
+        codeParam: { cParCde: "yes_no" },
+
       },
       {
-        prop: "NAppMinAge",
+        prop: "nAppMinAge",
         inputtype: "rtinput",
         title: "投保人年龄下限（含）",
       },
       {
-        prop: "NAppMaxAge",
+        prop: "nAppMaxAge",
         inputtype: "rtinput",
         title: "投保人年龄上限（含）",
       },
@@ -102,6 +105,27 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     }),
   })
 );
+
+
+const handleQuery=()=>{
+  const newparam = { cCommodityNo: param.cCommodityNo };
+  getCommodityRule(newparam)
+    .then((res) => {
+      const { code, data, msg } = res;
+      console.log('数据',res)
+      freeEditRef.value?.setDisabledAll();
+      if (200 === code) {
+        freeEditRef?.value?.setFormValue(data);
+
+        // freeEditRef.value?.setDisabledAll();
+      } else {
+        // ElMessage.error(msg);
+      }
+    })
+    .finally(() => { });
+
+
+}
 
 function getFromValue() {
   return freeEditRef?.value?.getFromValue();
@@ -132,9 +156,15 @@ function setDisa() {
 }
 
 onMounted(() => {
-  if (param.editType === "edit") {
-    setDisa();
-  }
+  // if (param.editType === "edit") {
+  //   setDisa();
+  // }
+
+
+  if (param.editType === "edit" || param.editType === 'view' || param.editType === 'review') {
+
+    handleQuery();
+    }
 });
 
 defineExpose({

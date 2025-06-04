@@ -124,53 +124,53 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtnType: "btn",
     tableBtnWidth: 220,
     tableBtnPosition: "right",
-    tableBtn: [
-    createFreeButtonBase({
-        id: "score",
-        type: "danger",
-        tooltip: "选择",
-        icon: "Edit",
-        link: true,
-        tableClick: (row) => {
+    // tableBtn: [
+    // createFreeButtonBase({
+    //     id: "score",
+    //     type: "danger",
+    //     tooltip: "选择",
+    //     icon: "Edit",
+    //     link: true,
+    //     tableClick: (row) => {
 
 
-          emit("ok",row);
-          dialogVisible.value=false;
-          //   delRiskRel(row)
-          //     .then((res) => {
-          //       const { code, data, msg } = res;
-          //       if (200 === code) {
-          //         ElMessage.success("删除成功");
-          //         handleQuery();
-          //       } else {
-          //         ElMessage.error(msg);
-          //       }
-          //     })
-          //     .finally(() => {});
-        },
-      }),
-      createFreeButtonBase({
-        id: "score",
-        type: "danger",
-        tooltip: "删除",
-        icon: "Delete",
-        link: true,
-        tableClick: (row) => {
-          //   delRiskRel(row)
-          //     .then((res) => {
-          //       const { code, data, msg } = res;
-          //       if (200 === code) {
-          //         ElMessage.success("删除成功");
-          //         handleQuery();
-          //       } else {
-          //         ElMessage.error(msg);
-          //       }
-          //     })
-          //     .finally(() => {});
-        },
-      }),
+    //       emit("ok",row);
+    //       dialogVisible.value=false;
+    //       //   delRiskRel(row)
+    //       //     .then((res) => {
+    //       //       const { code, data, msg } = res;
+    //       //       if (200 === code) {
+    //       //         ElMessage.success("删除成功");
+    //       //         handleQuery();
+    //       //       } else {
+    //       //         ElMessage.error(msg);
+    //       //       }
+    //       //     })
+    //       //     .finally(() => {});
+    //     },
+    //   }),
+    //   createFreeButtonBase({
+    //     id: "score",
+    //     type: "danger",
+    //     tooltip: "删除",
+    //     icon: "Delete",
+    //     link: true,
+    //     tableClick: (row) => {
+    //       //   delRiskRel(row)
+    //       //     .then((res) => {
+    //       //       const { code, data, msg } = res;
+    //       //       if (200 === code) {
+    //       //         ElMessage.success("删除成功");
+    //       //         handleQuery();
+    //       //       } else {
+    //       //         ElMessage.error(msg);
+    //       //       }
+    //       //     })
+    //       //     .finally(() => {});
+    //     },
+    //   }),
       
-    ],
+    // ],
     fromSchema: [
       {
         prop: "cSlsCde",
@@ -220,6 +220,10 @@ const tableconfig = reactive<AppTableConfig>(
       //   title: "电话",
       // },
     ],
+    rowDbClickFun:(row: any)=>{
+              emit("ok",row);
+          dialogVisible.value=false;
+    }
   })
 );
 /** 查询 */

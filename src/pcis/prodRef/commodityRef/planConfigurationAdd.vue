@@ -68,49 +68,52 @@ const handleSave = async () => {
   // });
 
   // selValue.value
-  if(selValue.value.length == 0){
+  if (selValue.value.length == 0) {
     ElMessage.error('请选择方案信息');
     return false;
   }
-  
-  let planList = selValue.value.map((item)=>{
+
+  let planList = selValue.value.map((item) => {
     return item.CPlanNo
   })
 
   let param = {
-    CCommodityNo: props.data['cCommodityNo'] ,
+    CCommodityNo: props.data['cCommodityNo'],
     checkType: 'addPlan',
     planList: planList
   }
 
   let param2 = {
     CCommodityNo: props.data['cCommodityNo'],
-    items:  selValue.value
+    items: selValue.value
   }
 
   console.log('参数---', param)
-  console.log('参数2---',param2)
+  console.log('参数2---', param2)
   commodityBaseOperatorCheck(param)
     .then((res) => {
       const { code, data, msg } = res;
-      if (!!data) {
-        console.log(data)
-        ElMessage.error('方案号[' + data.map((obj) => obj.CPlanNo).join(', ') + ']存在无效的再保分保配置记录，若该类业务需分保，请联系再保部对该方案进行分保配置！');
+      console.log(data)
+      if (code === 200) {
+        if (!!data && data.length>0) {
+          ElMessage.error('方案号[' + data.map((obj) => obj.CPlanNo).join(', ') + ']存在无效的再保分保配置记录，若该类业务需分保，请联系再保部对该方案进行分保配置！');
+        }
       }
+
     })
 
 
 
- 
+
   saveCommodityPlan(param2)
     .then((res) => {
       const { code, data, msg } = res;
       dialogVisible.value = false;
-      emits("ok",data)
-      if (code==200) {
+      emits("ok", data)
+      if (code == 200) {
         console.log(data)
         ElMessage.success('保存成功！')
-      }else{
+      } else {
         ElMessage.error(msg)
       }
     })
@@ -130,6 +133,8 @@ const pageresult = reactive<Pageresult>({
   list: [],
   total: 0,
 });
+
+const selectedIds = ref(['P25000034']);
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     tableBtnType: "btn",
@@ -211,7 +216,7 @@ function handleQuery() {
   const param = {
     codeListName: "Commodity_PLAN_LIST",
     codeListParam: {
-      cCommodityNo: props.data['cCommodityNo'] || 'S25000032',    // 商品编号
+      cCommodityNo: props.data['cCommodityNo'],    // 商品编号
       dptCde: dptCde.companyId,     // companyId
       prodNo: props.data['cProdNo'],
       status: "1",
@@ -234,10 +239,10 @@ function handleQuery() {
       if (200 === code) {
         // pageresult.list = [
         //   { CPlanNo: "P20003007", CPlanEn: null, CPlanCn: "核心出单测试060003", CProdNo: "060003", CNmeCn: "旅游意外伤害保险", },
-        //   { CPlanNo: "P20003007", CPlanEn: null, CPlanCn: "核心出单测试060003", CProdNo: "060003", CNmeCn: "旅游意外伤害保险", },
-        //   { CPlanNo: "P20003007", CPlanEn: null, CPlanCn: "核心出单测试060003", CProdNo: "060003", CNmeCn: "旅游意外伤害保险", },
-        //   { CPlanNo: "P20003007", CPlanEn: null, CPlanCn: "核心出单测试060003", CProdNo: "060003", CNmeCn: "旅游意外伤害保险", },
-        //   { CPlanNo: "P20003007", CPlanEn: null, CPlanCn: "核心出单测试060003", CProdNo: "060003", CNmeCn: "旅游意外伤害保险", },
+        //   { CPlanNo: "P20003008", CPlanEn: null, CPlanCn: "核心出单测试060003", CProdNo: "060003", CNmeCn: "旅游意外伤害保险", },
+        //   { CPlanNo: "P20003009", CPlanEn: null, CPlanCn: "核心出单测试060003", CProdNo: "060003", CNmeCn: "旅游意外伤害保险", },
+        //   { CPlanNo: "P20003006", CPlanEn: null, CPlanCn: "核心出单测试060003", CProdNo: "060003", CNmeCn: "旅游意外伤害保险", },
+        //   { CPlanNo: "P20003005", CPlanEn: null, CPlanCn: "核心出单测试060003", CProdNo: "060003", CNmeCn: "旅游意外伤害保险", },
 
 
         // ]
@@ -245,6 +250,9 @@ function handleQuery() {
         if (data !== null) {
           pageresult.list = data;
           pageresult.total = data.length;
+
+          nextTick();
+          setDefaultSelection();
 
         }
 
@@ -254,6 +262,22 @@ function handleQuery() {
     })
     .finally(() => { });
 }
+
+const setDefaultSelection = () => {
+  console.log(22)
+
+  tableRef.value?.setValueByRowKey()
+
+  // pageresult.list.forEach(row => {
+  //   console.log(row.CPlanNo)
+  //   if (selectedIds.value.includes(row.CPlanNo)) {
+  //     console.log('进来了',row)
+  //     tableRef.value?.toggleRowSelection(row, true);
+
+  //   }
+  // });
+};
+
 function getFromValue() {
   return freeEditRef?.value?.getFromValue();
 }
@@ -275,6 +299,7 @@ function getValue(key: string) {
 }
 onMounted(() => {
   handleQuery();
+
 });
 defineExpose({
   getFromValue,

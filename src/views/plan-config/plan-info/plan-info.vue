@@ -19,10 +19,12 @@
         </div>
       </template>
     </el-card>
-    <el-card style="margin-top: 20px;" v-if="isAdd">
+
+    <div v-if="!props.goodsType">
+    <el-card style="margin-top: 20px;" v-if="isAdd ">
       <review-info ref="reviewInfoRef"></review-info>
     </el-card>
-    <div style="text-align: right;margin-top: 20px;" v-if="!isAdd">
+    <div style="text-align: right;margin-top: 20px;" v-if="!isAdd ">
       <div style="text-align: right;margin-top: 20px;" v-if="routeQryParams.type !== 'view'">
         <el-button type="primary" @click="save">保存</el-button>
         <el-button type="primary" @click="saveAndSubmit">保存并提交审核</el-button>
@@ -40,10 +42,11 @@
       <app-grid-edit :gridEditConfig="formconfig3" ref="payinfoEditRef" /> 
     </el-card>
   </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { defineComponent, ref, reactive, onMounted } from 'vue';
+import { defineComponent, ref, reactive, onMounted,watch } from 'vue';
 import { ElMessage } from 'element-plus';
 import { getListByCode } from '@/api/code-list-service';
 import { Search } from '@element-plus/icons-vue'
@@ -89,29 +92,65 @@ const currentIndex = ref(0);
 const opertaor = dataOpertaor();
 const formconfig2 = opertaor.getTableConfig();
 const payinfoEditRef = ref<AppGridEditMethod | null>(null);
+const props = defineProps({
+  goodsData: Object,
+  goodsType: String,
+});
 let payinfo = ref(false)
 // const formconfig3 = reactive(createAppGridEditConfig({}));
 
 
-
+watch(
+  () => props.goodsData,
+  (newVal,oldVal) => {
+    console.log('watch',newVal,oldVal,props.goodsType == 'goods');
+    if (props.goodsType == 'goods') {
+      // initPage();
+      // againActiveTop(newVal as string);
+    }
+  },
+  {
+    deep: true,
+    // immediate:true
+  }
+);
 
 opertaor.setParam(routeQryParams.rowData);
 onBeforeMount(() => {
   console.log("routeQryParams", routeQryParams);
   console.log("路由参数routeQryParams.rowData", routeQryParams.rowData);
-  initPage();
+  if(routeQryParams.rowData){
+    initPage();
+  }
 });
 /**
  * 数据初始化
  * @param data
  */
 const initPage = async () => {
-  const getProductRes = await getProductPage({
-    CProdNo: routeQryParams.rowData.cProdNo,
-    CGrpMrk: routeQryParams.rowData.cGrpMrk,
-  });
+  let param = {}
+
+  console.log('进来了====',props)
+
+  if(props.type == 'goods'){
+    param = {
+      CProdNo: props.goodsData.cProdNo,
+      CGrpMrk:props.goodsData.cGrpMrk,
+    }
+  }else{
+    param = {
+      CProdNo: routeQryParams.rowData.cProdNo,
+      CGrpMrk: routeQryParams.rowData.cGrpMrk,
+    }
+  }
+
+  console.log('参数',param, props.goodsType,props.goodsData)
+  const getProductRes = await getProductPage(param);
   // 页面初始化
   const formconfig21 = JSON.parse(getProductRes.data);
+
+  console.log('cccc1',getProductRes)
+  console.log('cccc',formconfig21)
   formconfig21[0].pageInfo = formconfig21[0].pageInfo.filter(item => item.pageKey == 'cvrg');
   opertaor.setTableConfig(formconfig21);
   renderComponents();
@@ -829,6 +868,7 @@ const submit = () => {
 }
 
 onMounted(() => {
+  console.log('-----------------',props.goodsData == null ,props.goodsType)
   if (routeQryParams.type == 'add') {
     nextTick(() => {
       freeEditRef.value?.setValue("cKindNo", routeQryParams.rowData.cKindNo);
@@ -836,7 +876,14 @@ onMounted(() => {
     });
   } else {
     console.log('-----router=-=',routeQryParams)
-    const param = { 'cPlanNo': routeQryParams.rowData.cPlanNo }
+    let param = {
+      cPlanNo: props.goodsType=='goods'? props.goodsData.cPlanNo:  routeQryParams.rowData.cPlanNo
+    };
+
+    console.log('param', param)
+    
+    // if( !props.type || props.type !== 'goods')
+    // const param = { 'cPlanNo': routeQryParams.rowData.cPlanNo }
     policyService.getPlanBase(param).then(result => {
       if (result['code'] === 200) {
         freeEditRef.value?.setFormValue(result.data.data)
@@ -862,8 +909,9 @@ onMounted(() => {
       }
     });
   }
+  // || props.type == 'goods'
   nextTick(() => {
-    if (routeQryParams.type == 'view' || routeQryParams.type == 'under') {
+    if (routeQryParams.type == 'view' || routeQryParams.type == 'under' ||props.goodsType=='goods' ) {
       freeEditRef.value.setDisabledAll();
       opertaor.setDisabledAll();
     }

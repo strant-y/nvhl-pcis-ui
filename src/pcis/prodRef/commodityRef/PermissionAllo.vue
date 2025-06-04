@@ -47,29 +47,29 @@ const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "出单权限分配",
     endBtnsPosition: "right",
-    endBtns: [
-      createFreeButtonBase({
-        type: "primary",
-        label: "保存",
-        func: async () => {
-          const s = freeEditRef.value?.getFromValue(); //获取表单数据
-          saveProInfo(s)
-            .then((res) => {
-              const { code, data, msg } = res;
-              if (200 === code) {
-                ElMessage.success("保存成功");
-              } else {
-                ElMessage.error(msg);
-              }
-            })
-            .finally(() => { });
-        },
-      }),
-      createFreeButtonBase({
-        label: "返回",
-        func: () => { },
-      }),
-    ],
+    // endBtns: [
+    //   createFreeButtonBase({
+    //     type: "primary",
+    //     label: "保存",
+    //     func: async () => {
+    //       const s = freeEditRef.value?.getFromValue(); //获取表单数据
+    //       saveProInfo(s)
+    //         .then((res) => {
+    //           const { code, data, msg } = res;
+    //           if (200 === code) {
+    //             ElMessage.success("保存成功");
+    //           } else {
+    //             ElMessage.error(msg);
+    //           }
+    //         })
+    //         .finally(() => { });
+    //     },
+    //   }),
+    //   createFreeButtonBase({
+    //     label: "返回",
+    //     func: () => { },
+    //   }),
+    // ],
     fromSchema: [
       {
         prop: "cPertainDptCde",
@@ -117,8 +117,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         func: (val: any) => {
           if (val) {
             //  查询中类 selelct
-            setValue("cChaType", "");
-            setValue("cChaSubType", "");
+            // setValue("cChaType", "");
+            // setValue("cChaSubType", "");
             queryChaTypeList(val)
           }
         }
@@ -131,7 +131,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         func: (val: any) => {
           if (val) {
             //  查询子类 selelct 
-            setValue("cChaSubType", "");
+            // setValue("cChaSubType", "");
             queryCChaSubtype(val)
           }
         }
@@ -158,14 +158,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               .then((res) => {
                 if (res.type === "ok") {
                   const selectObj = res.body;
-                  freeEditRef.value.setValue(
+                  freeEditRef.value?.setValue(
                     "cDptCde",
                     selectObj.id
                   );
                   setFormItem("cDptCde", {
                     loadData: [
                       {
-                        label: selectObj.name,
+                        // label: selectObj.name,
                         label: `${selectObj.id}${selectObj.name}`,
                         value: selectObj.id,
                       },
@@ -192,11 +192,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             // const ck = freeEditRef.value?.getValue("componentGroup");
             dzmodal
               .open(orderIssuer, { type: "Issuer", data: {} })
-              .then((res) => {
+              .then((res:any) => {
                 console.log(res, '-----')
                 if (res.type === "ok") {
                   const selectObj = res.body;
-                  freeEditRef.value.setValue(
+                  freeEditRef.value?.setValue(
                     "cOperGroup",
                     selectObj.cSlsCde
                   );
@@ -290,8 +290,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       },
       {
         prop: "nPropFeeRate",
-        inputtype: "rtinput",
+        inputtype: "rtnumber",
         title: "手续费比例",
+        max: 1,
+        min: 0
       },
       {
         prop: "cBusinessTel",
@@ -407,6 +409,13 @@ onMounted(() => {
   eventBus.on('cKindNo-change', queryCBsnsTyp)
   if (param.editType === "edit") {
     setDisa();
+  }
+
+
+  if (param.editType === "edit" || param.editType === 'view' || param.editType === 'review') {
+    // handleQuery();
+    // setDisa();
+    freeEditRef.value?.setDisabledAll();
   }
 
 });

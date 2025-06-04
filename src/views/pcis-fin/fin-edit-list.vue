@@ -41,6 +41,9 @@ const departmentTree = defineAsyncComponent(
 const multipleSelection = ref([]);
 const startTm = moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format('YYYY-MM-DD')
 const endTm = moment(new Date(Date.now())).format('YYYY-MM-DD')
+
+
+
 const finEdit = defineAsyncComponent(() => import("./fin-edit.vue"));
 const tableRef = ref<AppTableMethod | null>(null);
 const formconfig1 = reactive<AppFreeEditConfig>(

@@ -1344,13 +1344,55 @@ export function deleteCommodityPlan(queryParams: any): AxiosPromise<any> {
  * 商品配置  --选择方案  保存别名
  * 
  */
-export function saveCommodityPlanCvrgDisPlayNme(queryParams: any): AxiosPromise<any> {
-  return post(`/commodity/saveCommodityPlanCvrgDisPlayNme`, queryParams);
+export function saveCommodityPlanTermDisPlayNme(queryParams: any): AxiosPromise<any> {
+  return post(`/commodity/saveCommodityPlanTermDisPlayNme`, queryParams);
 }
 /**
  * 商品配置  --选择方案  编辑查询
  * 
  */
-export function queryPlanCvrgByCommodityNo(queryParams: any): AxiosPromise<any> {
-  return post(`/commodity/queryPlanCvrgByCommodityNo`, queryParams);
+export function queryPlanTermByCommodityNo(queryParams: any): AxiosPromise<any> {
+  return post(`/commodity/queryPlanTermByCommodityNo`, queryParams);
 }
+
+/**
+ * 商品配置  --投保规则   保存投保规则
+ * 
+ */
+export function saveRule(queryParams: any): AxiosPromise<any> {
+  return post(`/commodity/saveRule`, queryParams);
+}
+
+/**
+ * 商品配置  --投保规则   获取投保规则
+ * 
+ */
+export function getCommodityRule(queryParams: any): AxiosPromise<any> {
+  return post(`/commodity/getCommodityRule`, queryParams);
+}
+ 
+
+/**
+ * 商品配置  --保存并提交按钮
+ * 
+ */
+export function addProcessUndr(queryParams: any): AxiosPromise<any> {
+  return post(`/commodity/addProcessUndr`, queryParams);
+}
+ 
+/**
+ * 商品配置  --提交（审核）
+ * 
+ */
+export function processApprove(queryParams: any): AxiosPromise<any> {
+  return post(`/plan/processApprove`, queryParams);
+}
+ 
+/**
+ * 商品配置  -- 查询 商品配置流程状态
+ * 
+ */
+export function getProcessInfo(queryParams: any): AxiosPromise<any> {
+  return post(`/plan/getProcessInfo`, queryParams);
+}
+ 

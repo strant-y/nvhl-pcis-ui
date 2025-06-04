@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { useDzModal } from "@/common/dzmodel/DzModalService";
-import { saveCommodityAttached,queryPlanCvrgByCommodityNo } from "@/api/prod";
+import { saveCommodityAttached,queryPlanTermByCommodityNo,saveCommodityPlanTermDisPlayNme } from "@/api/prod";
 const showBtnConfig = ref(false);
 const dialogVisible = ref(true);
 const showView = ref(false);
@@ -77,84 +77,77 @@ const formconfig = reactive<AppFreeEditConfig>(
         production: false,
         fromSchema: [
             {
-                prop: "CCommodityNo",
+                prop: "cCommodityNo",
                 inputtype: "rtinput",
                 title: "商品编号",
                 disabled: true,
                 itemWidth: 1.5,
-                rules: [getRules("required", {})], 
             },
 
             {
-                prop: "CCommodityCn",
+                prop: "cCommodityCn",
                 inputtype: "rtinput",
                 title: "商品名称",
                 itemWidth: 1.5,
                 disabled: true,
-                rules: [getRules("required", {})], 
             },
 
             {
-                prop: "CPlanNo",
+                prop: "cPlanNo",
                 inputtype: "rtinput",
                 itemWidth: 1.5,
                 title: "方案编号",
                 disabled: true,
-                rules: [getRules("required", {})], 
             },
 
             {
-                prop: "CPlanCn",
+                prop: "cPlanCn",
                 inputtype: "rtinput",
                 itemWidth: 1.5,
                 title: "方案名称",
                 disabled: true,
-                rules: [getRules("required", {})], 
             },
 
             {
-                prop: "CDispNme",
+                prop: "cDispNme",
                 inputtype: "rtinput",
                 itemWidth: 1.5,
                 title: "方案别名",
-                rules: [getRules("required", {})], 
             },
 
             {
-                prop: "NMaxPieces",
-                inputtype: "rtinput",
+                prop: "nMaxPieces",
+                inputtype: "rtnumber",
                 title: "份数上限（含）",
                 itemWidth: 1.5,
-                rules: [getRules("required", {})], 
             },
 
             {
-                prop: "COldPlanNo",
+                prop: "cOldPlanNo",
                 inputtype: "rtinput",
                 title: "原短意险系统方案号",
                 itemWidth: 1.5,
-                rules: [getRules("required", {})], 
             },
 
             {
-                prop: "CIsGroup",
+                prop: "cIsGroup",
                 inputtype: "rtselect",
                 title: "可出团/个单",
                 itemWidth: 1.5,
+                defaultValue: "1",
+                disabled: true,
                 loadData: [
                         {value: '1', label: '个单'},
-                        {value: '2', label: '团单'},
-                        {value: '3', label: '通用'}
+                        // {value: '2', label: '团单'},
+                        // {value: '3', label: '通用'}
                     ],
-                rules: [getRules("required", {})], 
 
             },
             {
-                prop: "CSaleName",
+                prop: "cSaleName",
                 inputtype: "rtinput",
                 itemWidth: 1.5,
                 title: "销售名称",
-                rules: [getRules("required", {})], 
             },
         ],
         fromUi: createFromUiConfig({
@@ -165,7 +158,7 @@ const formconfig = reactive<AppFreeEditConfig>(
 
 const tableconfig2 = reactive<AppGridEditConfig>(
     createAppGridEditConfig({
-        title: '修改险别别名',
+        title: '修改条款别名',
         // editList:['CSeqNo','CCusLnme','CCusFnme','TCerftBgnTm','CCusAddr'],
         // showSelection: true,  // 是否显示多选框
         editFlag: true, //是否可以编辑
@@ -173,57 +166,63 @@ const tableconfig2 = reactive<AppGridEditConfig>(
         endBtnsPosition: 'right',
         fromSchema: [
             {
-                prop: "DistSummary.cPlanNo",
+                prop: "cClauseCode",
                 inputtype: "rtinput",
-                title: "方案号",
+                title: "条款代码",
+                disabled: true,
             },
             {
-                prop: "DistSummary.nInsuredHeadcount",
+                prop: "cClauseName",
                 inputtype: "rtinput",
-                title: "投保雇员人数",
+                title: "条款名称",
+                disabled: true,
             },
 
             {
-                prop: "DistSummary.nAnnualSalary",
+                prop: "cRiskName",
                 inputtype: "rtinput",
-                title: "年工资总额（必填）元",
+                title: "责任名称",
+                disabled: true,
                 // rules:[getRules("required", {})]
                 // rules: [getRules("idCard", {})],
             },
             {
-                prop: "DistSummary.cJobRole",
+                prop: "cTermDispNme",
                 inputtype: "rtinput",
-                title: "岗位（非必填）",
+                title: "别名",
             }
         ],
     })
 );
 
 const handleSave =  () => {
-    const user = JSON.parse(sessionStorage.getItem('user'))
+    // const user = JSON.parse(sessionStorage.getItem('user'))
     const formData = freeEditRef.value?.getFromValue();
-    
-    const obj = {  CCrtCde:user.opCde,
-        CUpdCde:user.opCde,
+    const list = freeEditRef2.value?.getFromValue();
+
+
+    //  for PkId
+    list.forEach((e:any) => {
+        e.cPkId  = e.cTermPkId
+        e.cDispNme = e.cTermDispNme
+            });
+    let param  = {
+        plan:formData,
+        term:{
+            items:list
+        }
     }
-   
-    let param = Object.assign({
-        ...formData,...obj
-        })
 
-        console.log(param);
-
-
-
-    saveCommodityAttached(param)
+    console.log(param)
+    saveCommodityPlanTermDisPlayNme(param)
     .then((res) => {
       const { code, data, msg } = res;
       console.log(data)
-
-      emits('ok',)
+ 
       if (200 === code) {
-       
+        emits('ok',)
         ElMessage.success("保存成功");
+        dialogVisible.value = false;
         
       } else {
         ElMessage.error(msg);
@@ -270,13 +269,16 @@ function handleQuery() {
         planNo: props.data['CPlanNo']
     }
 
-    queryPlanCvrgByCommodityNo(param)
+    queryPlanTermByCommodityNo(param)
         .then((res) => {
-            const { code, data, msg } = res;
-            console.log('查询数据反显',res);
-            setValue('CCommodityNo','123123')
+            let {data,msg,code} = res;
+            // const { code, data, msg } = res;
+            // console.log('查询数据反显',res);
+            // setValue('CCommodityNo','123123')
             if(code == 200){
-             
+                // freeEditRef2.value.setFromValue(data)
+                freeEditRef2.value.setFormValue(data);
+                // tableconfig2
                 // CCommodityNo
             }else{
                 ElMessage.error(msg);
@@ -311,9 +313,10 @@ onMounted(() => {
 // console.log('----',props.data)
  
  
-//   nextTick(() => {
-//     // setValue('CCommodityNo',tabref.getFromValue()['cCommodityNo'])
-//   });
+  nextTick(() => {
+    // setValue('CCommodityNo',tabref.getFromValue()['cCommodityNo'])
+    setFormValue(props.data)
+  });
 });
 defineExpose({
     getFromValue,

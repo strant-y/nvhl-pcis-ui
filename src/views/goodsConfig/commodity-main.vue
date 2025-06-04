@@ -172,6 +172,25 @@ const tableconfig = reactive<AppTableConfig>(
           });
         },
       }),
+      createFreeButtonBase({
+        id: "score",
+        link: true,
+        tooltip: "查看",
+        type: "success",
+        size: "large",
+        icon: "View",
+        tableClick: (row) => {
+          router.push({
+            path: "/goodsConfig/commodityEdit",
+            query: {
+              param: JSON.stringify({
+                editType: "view",
+                cCommodityNo:row.cCommodityNo,
+              }),
+            },
+          });
+        },
+      }),
       // createFreeButtonBase({
       //   id: "score",
       //   type: "danger",
@@ -208,6 +227,11 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cProdNo",
         inputtype: "rtselect",
         title: "险种名称",
+        typeCode: "PROD_LIST_GRT",
+                codeParam: {
+                    cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+                    cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+                },
       },
       {
         prop: "cCommodityNo",
@@ -216,28 +240,49 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "cCommodityCn",
-        inputtype: "rtselect",
+        inputtype: "rtinput",
         title: "商品名称",
       },
       {
         prop: "cPlatformCn",
-        inputtype: "rtselect",
+        inputtype: "rtinput",
         title: "平台名称",
       },
       {
         prop: "cIsOpenCommodity",
         inputtype: "rtselect",
         title: "是否全国性商品",
+           loadData:[
+          {value: '0',label:'否'},
+          { value: "1",  label: "是" },
+        ]
       },
       {
         prop: "cStatus",
         inputtype: "rtselect",
         title: "状态",
+        // codeListName: '',
+        // codeListParam: 
+        typeCode: "BAS_COMM_CODE_OUT_CDE",
+        codeParam: {
+          cParCde: 'commodity_status'
+          // cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+          // cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+        },
+
+        // loadData:[
+        //   {value: '0',label:'禁用'},
+        //   { value: "1",  label: "启用" },
+        // ]
       },
       {
         prop: "cEnableStatus",
         inputtype: "rtselect",
         title: "启用状态",
+        loadData:[
+          {value: '0',label:'禁用'},
+          { value: "1",  label: "启用" },
+        ]
       },
       {
         prop: "tCrtTm",

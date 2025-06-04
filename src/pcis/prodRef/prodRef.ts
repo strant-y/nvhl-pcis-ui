@@ -51,6 +51,7 @@ import relatedHealthNotify from "./commodityRef/RelatedHealthNotify.vue";
 import fileList from "./commodityRef/FileList.vue";
 import permissionAllo from "./commodityRef/PermissionAllo.vue";
 import InsuranceRules from "./commodityRef/InsuranceRules.vue";
+import ReviewComments from "./commodityRef/ReviewComments.vue";
 import commonProblem from "./commodityRef/CommonProblem.vue";
 import healthNoticeAdd from "./commodityRef/HealthNoticeAdd.vue";
 import clauseConf from "./clauseConfRef/clauseConf.vue";
@@ -126,6 +127,7 @@ const componentMap = {
   fileListRef:fileList,
   permissionAlloRef:permissionAllo,
   InsuranceRulesRef:InsuranceRules,
+  ReviewCommentsRef:ReviewComments,
   commonProblemRef:commonProblem,
   healthNoticeAddRef:healthNoticeAdd,
   clauseConfRef:clauseConf,

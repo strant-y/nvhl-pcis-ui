@@ -7,11 +7,9 @@
   </div>
 
 
-  <el-dialog v-model="dialogVisible" @update:visible="handleVisibleUpdate">
-    <div>123123
-      <planInfo></planInfo>
-
-
+  <el-dialog v-model="dialogVisible" @update:visible="handleVisibleUpdate" width="90%" title="方案详情">
+    <div>
+      <planInfo :goodsData="rowData" :goodsType='"goods"'></planInfo>
     </div>
 
   </el-dialog>
@@ -44,7 +42,7 @@ import {
   queryCommodityPlanList,
   commodityBaseOperatorCheck,
   deleteCommodityPlan,
-  saveCommodityPlanCvrgDisPlayNme,
+  saveCommodityPlanTermDisPlayNme,
 
 } from "@/api/prod";
 const dzmodal = useDzModal();
@@ -66,6 +64,7 @@ const dialogVisible = ref(false);
 const { getRules } = useValidator();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
+const rowData = ref(null);
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -91,12 +90,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
     fromSchema: [
       {
-        prop: "CPlanNo",
+        prop: "cPlanNo",
         inputtype: "rtinput",
         title: "方案编号",
       },
       {
-        prop: "CPlanCn",
+        prop: "cPlanCn",
         inputtype: "rtinput",
         title: "方案名称",
       },
@@ -120,7 +119,8 @@ const tableconfig = reactive<AppTableConfig>(
         label: "选择方案",
         type: "success",
         func: function () {
-          console.log('点这里 选择方案',)
+          console.log('点这里 选择方案', tabref.getFromValue())
+          
 
           console.log(tabref.getFromValue());
           if (!tabref.getFromValue()['cCommodityNo']) {
@@ -152,8 +152,13 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "View",
         tableClick: (row) => {
-          console.log(row);
+
+          console.log(7777, row)
+          rowData.value = row
+          dialogVisible.value = true;
+
           let ss = {
+            ss: new Date().getTime(),
             cAccessType: "1",
             cCalcFormula: null,
             cCiMrk: null,
@@ -195,10 +200,13 @@ const tableconfig = reactive<AppTableConfig>(
             tUpdTm: null,
             _dataId: "c4bede5cda0c4cb9ae682d76e7f29638",
           }
-          router.push({
-            path: '/plan-config/plan-info',
-            query: { data: JSON.stringify({ type:'view', rowData: ss }) }
-          })
+
+
+          
+          // router.push({
+          //   path: '/plan-config/plan-info',
+          //   query: { data: JSON.stringify({ type:'view', rowData: ss }) }
+          // })
 
           // router.push({
           //   path: "/goodsConfig/commodityEdit",
@@ -221,6 +229,14 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "删除",
         icon: "Delete",
         link: true,
+        hideBtns: (row: any) => {
+            console.log(param.editType === "view"  )
+          if (            param.editType !== "view"   ) {
+            return false;
+          } else {
+            return true;
+          }
+        },
         tableClick: (row) => {
           ElMessageBox.confirm("该数据删除之后将无法恢复, 是否继续?", "提示", {
             confirmButtonText: "确定",
@@ -229,35 +245,11 @@ const tableconfig = reactive<AppTableConfig>(
           })
             .then(() => {
               delFunc(row);
-              //   unAssociationTerm(row)
-              //     .then((res) => {
-              //       const { code, data, msg } = res;
-              //       if (200 === code) {
-              //         ElMessage.success("删除成功");
-              //         handleQuery();
-              //       } else {
-              //         ElMessage.error(msg);
-              //       }
-              //     })
-              //     .finally(() => {});
             })
             .catch(() => {
               // 取消删除
             });
-
-
-          // delRiskRel(row)
-          //   .then((res) => {
-          //     const { code, data, msg } = res;
-          //     if (200 === code) {
-          //       ElMessage.success("删除成功");
-          //       handleQuery();
-          //     } else {
-          //       ElMessage.error(msg);
-          //     }
-          //   })
-          //   .finally(() => { });
-        },
+       },
       }),
       createFreeButtonBase({
         id: "score",
@@ -266,6 +258,14 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         size: "large",
         icon: "Edit",
+          hideBtns: (row: any) => {
+            // &&    param.editType !== "edit" 
+          if (            param.editType !== "view"      ) {
+            return false;
+          } else {
+            return true;
+          }
+        },
         tableClick: (row) => {
           console.log(row);
           dzmodal.open(planConfigurationEdit, { type: "edit", data: row }).then((res) => {
@@ -278,27 +278,31 @@ const tableconfig = reactive<AppTableConfig>(
     ],
     fromSchema: [
       {
-        prop: "CPlanNo",
+        prop: "cPlanNo",
         inputtype: "rtinput",
         title: "方案编号",
       },
       {
-        prop: "CPlanCn",
+        prop: "cPlanCn",
         inputtype: "rtinput",
         title: "方案名称",
       },
       {
-        prop: "CIsMainProdPlan",
-        inputtype: "rtinput",
+        prop: "cIsMainProdPlan",
+        inputtype: "rtselect",
         title: "是否主产品方案",
+        loadData: [
+          { value: '1', label: '主产品方案' },
+          { value: "0",  label: "附属产品方案" },
+        ]
       },
       {
-        prop: "CDispNme",
+        prop: "cDispNme",
         inputtype: "rtinput",
         title: "方案别名",
       },
       {
-        prop: "   ",
+        prop: "cSaleName",
         inputtype: "rtinput",
         title: "销售名称",
       },
@@ -310,37 +314,43 @@ const tableconfig = reactive<AppTableConfig>(
 
 const delFunc = (row: any) => {
   const chkParam = {
-    CCommodityNo: row.cCommodityNo,
-    CPlanNo: row.cPlanNo,
+    cCommodityNo: row.cCommodityNo,
+    cPlanNo: row.cPlanNo,
     checkType: 'deletePlan',
   };
   // 校验要删除的方案号是否配置有有效分保记录
   commodityBaseOperatorCheck(chkParam).then((res) => {
     let { code, msg, data } = res;
     if (code === 200) {
-      if (data) { // 有 则中断
+      if (data.data.length>0) { // 有 则中断
         ElMessage.error('该方案号存在有效的再保分保配置，不能进行无效操作，若需置为无效，请联系再保部对该方案号的分保配置做无效处理！');
         return;
       } else { // 无 可删除
+
+
         const param = {
-          id: id
+          id: row.cPkId
         };
-        const saveProdData = this.commodityService.deleteCommodityPlan(param);
-        saveProdData.subscribe((res: any) => {
-          if (null != res && null != res['code']) {
-            if (code === 200) {
-              ElMessage.success(msg);
+
+        deleteCommodityPlan(param).then((res2) => {
+         
+            if (res2.code === 200) {
+              ElMessage.success('删除成功！');
+              handleQuery();
               // this.refreshData();
             } else {
-              ElMessage.error(msg);
+              ElMessage.error(res2.msg);
             }
-          }
-        });
+        })
       }
+    }else{
+      ElMessage.error(msg)
     }
   });
 }
 
+
+// from表单查询
 function getFromValue() {
   return freeEditRef?.value?.getFromValue();
 }
@@ -367,13 +377,21 @@ function setDisa() {
     }
   });
 }
+
+// table  查询
+function getTableValue() {
+  return pageresult.list
+}
+
 /** 查询 */
-function handleQuery() {
-  console.log("查询条件:", sessionStorage.getItem("user"));
+function handleQuery(cid:any) {
+  
+
+  // console.log("查询条件:", sessionStorage.getItem("user"));
   const r = tableRef.value?.getPartnerPage(); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const c = tabref.getFromValue().cCommodityNo;
-  const param = Object.assign(s, r, { cCommodityNo: c });
+  const param = Object.assign(s, r, { cCommodityNo: cid? cid: c });
   if (c == !null) {
     ElMessage.error("商品编号为空,请保存后操作!");
     return;
@@ -383,8 +401,11 @@ function handleQuery() {
         const { code, data, msg } = res;
         console.log(data, '1212')
         if (200 === code) {
-          pageresult.list = data;
+          pageresult.list = data.result;
           pageresult.total = data.length;
+
+
+
         } else {
           ElMessage.error(msg);
         }
@@ -404,19 +425,49 @@ const handleVisibleUpdate = (value: boolean) => {
 };
 onMounted(() => {
   console.log('path')
-  if (param.editType === "edit") {
-    setDisa();
+  if (param.editType === "edit" || param.editType === 'view' || param.editType === 'review') {
+    // setDisa();
+    // const newparam = { cCommodityNo: param.cCommodityNo };
+   
+    handleQuery(param.cCommodityNo)
+
+    // hideBtns: (row: any) => {
+    // //       if (
+    // //         row.cAppStatus == "1" ||
+    // //         row.cAppStatus == "3" ||
+    // //         row.cAppStatus == "8"
+    // //       ) {
+    // //         return false;
+    // //       } else {
+    // //         return true;
+    // //       }
+    // //     },
+    // // nextTick(()=>{
+    //     tableconfig.tableBtn.forEach((btn,index) => {
+    //     console.log('09090',btn.tooltip,index)
+    //     if(btn.tooltip === '删除' || btn.tooltip=== '编辑'){
+    //       // tableconfig.tableBtn[index] = []
+    //       btn.disabled = true;
+    //     }
+    //     // btn.disabled = true;
+    //   });
+    // // })
+ 
+   
   }
 
-  setTimeout(() => {
-    pageresult.list = [
-      { CPlanNo: "P20003007", CPlanEn: null, CPlanCn: "核心出单测试060003", CProdNo: "060003", CNmeCn: "旅游意外伤害保险", },
-      { CPlanNo: "P20003007", CPlanEn: null, CPlanCn: "核心出单测试060003", CProdNo: "060003", CNmeCn: "旅游意外伤害保险", },
-      { CPlanNo: "P20003007", CPlanEn: null, CPlanCn: "核心出单测试060003", CProdNo: "060003", CNmeCn: "旅游意外伤害保险", },
-      { CPlanNo: "P20003007", CPlanEn: null, CPlanCn: "核心出单测试060003", CProdNo: "060003", CNmeCn: "旅游意外伤害保险", },
-      { CPlanNo: "P20003007", CPlanEn: null, CPlanCn: "核心出单测试060003", CProdNo: "060003", CNmeCn: "旅游意外伤害保险", },
-    ]
-  }, 1000);
+
+
+  //   setTimeout(() => {
+  //   pageresult.list = [
+  //     { cPlanNo: "P20003007", cSaleName: '张三', CPlanCn: "核心出单测试060003", CProdNo: "060003", CNmeCn: "旅游意外伤害保险", },
+  //     { cPlanNo: "P20003007", cSaleName: null, CPlanCn: "核心出单测试060003", CProdNo: "060003", CNmeCn: "旅游意外伤害保险", },
+  //     { cPlanNo: "P20003007", cSaleName: null, CPlanCn: "核心出单测试060003", CProdNo: "060003", CNmeCn: "旅游意外伤害保险", },
+  //     { cPlanNo: "P20003007", cSaleName: null, CPlanCn: "核心出单测试060003", CProdNo: "060003", CNmeCn: "旅游意外伤害保险", },
+  //     { cPlanNo: "P20003007", cSaleName: null, CPlanCn: "核心出单测试060003", CProdNo: "060003", CNmeCn: "旅游意外伤害保险", },
+  //   ]
+  // }, 1000);
+
 });
 
 defineExpose({
@@ -425,5 +476,6 @@ defineExpose({
   validate,
   setValue,
   getValue,
+  getTableValue
 });
 </script>

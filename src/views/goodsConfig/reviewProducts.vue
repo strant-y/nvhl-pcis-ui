@@ -130,8 +130,10 @@ const tableconfig = reactive<AppTableConfig>(
             path: "/goodsConfig/commodityEdit",
             query: {
               param: JSON.stringify({
-                editType: "view",
-                prodNo: row.cProdNo,
+                editType: "review",
+                cCommodityNo:row.cCommodityNo,
+                cPkId: row.cCommodityNo
+                // prodNo: row.cProdNo,
               }),
             },
           });
