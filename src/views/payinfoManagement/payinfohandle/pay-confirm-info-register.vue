@@ -246,6 +246,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: 'CPayNme',
         title: '出票人',
         inputtype: "rtinput",
+        rules: [getRules("required", {})],
       },
       {
         prop: 'CChequeNo',
