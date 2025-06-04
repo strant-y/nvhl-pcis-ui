@@ -603,7 +603,6 @@ const viewDetails = (row: any) => {
   //   ]
   // }, 2000)
   console.log('第二row', row)
-  debugger
   let params = {
     ...row,
     ...freeEditRef.value?.getFromValue()
