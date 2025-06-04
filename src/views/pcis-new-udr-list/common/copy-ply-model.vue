@@ -427,15 +427,15 @@ const getCDptCdeOptions = (data: any) => {
 onMounted(() => {
   nextTick(() => {
     freeEditRef.value?.setValue("CAntiLnderRisk", '1');// 默认选中投保单
-    freeEditRef.value?.setValue("dptCde", props.data.dptCde);
-    freeEditRef.value?.setValue("cKindNo", props.data.cProdNo.slice(0, 2))
+    freeEditRef.value?.setValue("dptCde", props.data.dptCde || null);
+    freeEditRef.value?.setValue("cKindNo", props.data.cProdNo ? props.data.cProdNo.slice(0, 2) : null)
     freeEditRef.value?.setValue("tm", [dayjs().format("YYYY-MM-DD HH:mm:ss"), dayjs().format("YYYY-MM-DD HH:mm:ss")]);
     nextTick(() => {
-      freeEditRef.value?.setValue("cDptCde", props.data.cDptCde);
-      freeEditRef.value?.setValue("cProdNo", props.data.cProdNo);
+      freeEditRef.value?.setValue("cDptCde", props.data.cDptCde || null);
+      freeEditRef.value?.setValue("cProdNo", props.data.cProdNo || null);
     });
   })
-  initDptTreeList();
+  // initDptTreeList();
   initCDptCde();
 });
 
