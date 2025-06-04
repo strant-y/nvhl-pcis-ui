@@ -1224,6 +1224,10 @@ async function loadAfter() {
       },
     })
   );
+
+  if(props.param?.showBtn === false){
+    bthList.value = [];
+  }
 }
 const getCAppNoFun = () => {
   const res = {
@@ -1624,7 +1628,7 @@ const getPlyPolicyFun = () => {
     scene: "EDR_APP_NEW_SCENE",
     CPlyNo: opertaor.getTableRefByKey("plyBase").getValue("Base.cPlyNo"),
   };
-  getAppPolicy(param).then((res) => {
+  getAppPolicy(param).then((res: any) => {
     console.log("投保单明细", res);
     if (res["code"] == "200") {
       const en = JSON.stringify({
@@ -1635,6 +1639,7 @@ const getPlyPolicyFun = () => {
         cGrpMrk: res["res"]["composition"]["plyBase"][0]["Base.cGrpMrk"],
         cDptCde: res["res"]["composition"]["plyBase"][0]["Base.cDptCde"],
         pageType: "readonly",
+        showBtn: false,
       });
       const query = new URLSearchParams({ param: en });
       const url =
