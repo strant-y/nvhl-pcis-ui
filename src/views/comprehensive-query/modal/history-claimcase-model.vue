@@ -604,8 +604,8 @@ const viewDetails = (row: any) => {
   // }, 2000)
   console.log('第二row', row)
   let params = {
-    ...row
-
+    ...row,
+    ...freeEditRef.value?.getFromValue()
   }
 
   pcisQueryService.qryHistoryClaimYearDetail(params).then((res: any) => {
