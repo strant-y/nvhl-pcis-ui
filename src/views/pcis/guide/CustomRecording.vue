@@ -431,7 +431,7 @@ function handleStarClick(item: any) {
 function handleQuery() {
   qryUserCommonTerm({
     pageNum: 1,
-    pageSize: 10,
+    pageSize: 9999,
     userId: JSON.parse(sessionStorage.getItem("user")).opCde,
     isPLan: formconfig1.value.cRecordType === 2 ? "1" : "0",
   }).then((res: any) => {
