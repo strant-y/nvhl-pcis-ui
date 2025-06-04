@@ -1252,9 +1252,6 @@ const getCAppNoFun = () => {
     console.log("generatelSingleNo-res", res);
     if (res["code"] == "200") {
       opertaor.getTableRefByKey("plyBase").setValue("Base.cAppNo", res["data"]);
-      nextTick(() => {
-        savePlyInfo()
-      })
     }
   });
 };
@@ -1611,10 +1608,21 @@ const savePlyInfo = async () => {
     const cAppNo = res["plyBase"]["Base.cAppNo"];
     res["applicant"]["Applicant.cAppNo"] = cAppNo;
     res["insured"]["Insured.cAppNo"] = cAppNo;
-    res["cvrg"] = res["cvrg"].map((item:any) => ({
-      ...item,
-      'Term.cAppNo': cAppNo,
-    }));
+    delete res["insured"]["Insured.cPkId"];
+    res["cvrg"] = res["cvrg"].map((item:any) => {
+      delete item["Term.cPkId"];
+      return {
+        ...item,
+        'Term.cAppNo': cAppNo,
+        'Term.riskList': item['Term.riskList'].map((risk:any) => {
+          delete risk['TermRisktgt.cPkId'];
+          return {
+            ...risk,
+            'TermRisktgt.cAppNo': cAppNo,
+          };
+        }),
+      }
+    });
   }
 
   console.log("保存参数-----1", res);
