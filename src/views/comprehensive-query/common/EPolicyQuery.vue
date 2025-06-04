@@ -18,7 +18,7 @@ import { codeListViewStore } from '@/store'
 const codeListStore = codeListViewStore()
 import { AppFreeEditConfig, AppFreeEditMethod, createAppFreeEditConfig } from '@/shared/app-free-edit-config'
 const freeEditRef = ref<AppFreeEditMethod | null>(null)
-import { createFreeButtonBase } from '@/shared/button-config'
+import { createFreeButtonBase, FreeButtonBase } from '@/shared/button-config'
 import { AppTableConfig, AppTableMethod, createTableEditConfig } from '@/shared/app-table-config'
 import { useDzModal } from '@/common/dzmodel/DzModalService'
 import { SCENE_PLY_APP_READ } from '@/constants/tab-constants'
@@ -41,41 +41,47 @@ const props = defineProps({
     }
 })
 const sessionUser: any = sessionStorage.getItem('user')
-const cPard = ref(null)
+const bthList = ref<Array<FreeButtonBase>>([])
+const buttonList = [
+    createFreeButtonBase({
+        label: '生成电子保单',
+        type: 'primary',
+        id: 'generateEPolicy',
+        func: () => {
+            createEPolicy()
+        }
+    }),
+    createFreeButtonBase({
+        label: '下载电子保单',
+        type: 'primary',
+        id: 'downloadEPolicy',
+        func: () => {
+            downloadEPolicy()
+        }
+    }),
+    createFreeButtonBase({
+        type: 'primary',
+        label: '查询',
+        func: async () => {
+            handleQuery()
+        }
+    }),
+    createFreeButtonBase({
+        label: '重置',
+        func: () => {
+            freeEditRef.value?.setFormValue({
+                CDptCde: user.value.companyId,
+                CLoadSub: 1
+            })
+            handleQuery(true)
+        }
+    })
+]
+bthList.value = buttonList
 const formconfig1 = reactive<AppFreeEditConfig>(
     createAppFreeEditConfig({
         endBtnsPosition: 'right',
-        endBtns: [
-            createFreeButtonBase({
-                label: '生成电子保单',
-                func: () => {
-                    createEPolicy()
-                }
-            }),
-            createFreeButtonBase({
-                label: '下载电子保单',
-                func: () => {
-                    downloadEPolicy()
-                }
-            }),
-            createFreeButtonBase({
-                type: 'primary',
-                label: '查询',
-                func: async () => {
-                    handleQuery()
-                }
-            }),
-            createFreeButtonBase({
-                label: '重置',
-                func: () => {
-                    freeEditRef.value?.setFormValue({
-                        CDptCde: user.value.companyId,
-                        CLoadSub: 1
-                    })
-                    handleQuery(true)
-                }
-            })
-        ],
+        endBtns: buttonList,
         fromSchema: [
             {
                 prop: 'CDptCde',
@@ -340,7 +346,7 @@ onMounted(async () => {
                 }
             ]
         })
-        const beginTime = dayjs(new Date()).subtract(3, 'month').format('YYYY-MM-DD 00:00:00')
+        const beginTime = dayjs(new Date()).subtract(1, 'month').format('YYYY-MM-DD 00:00:00')
         const endTime = moment(new Date()).format('YYYY-MM-DD 23:59:59')
         freeEditRef.value?.setValue('TIssueTm', [beginTime, endTime])
     })
@@ -469,6 +475,7 @@ function handleQuery(flag?: boolean) {
  * 生成电子保单
  */
 function createEPolicy() {
+    const btn = getBtn('generateEPolicy')
     const prodNo = freeEditRef.value?.getValue('CProdNo')
     if (prodNo == null || prodNo == undefined) {
         ElMessage.warning('请选择产品!')
@@ -510,6 +517,11 @@ function createEPolicy() {
     selectData.forEach((item: any) => {
         CUniqueNos[CUniqueNos.length] = item.cAppNo
     })
+    if (!CUniqueNos[0]) {
+        ElMessage.warning('所选记录为空！')
+        return
+    }
+    setButton(btn, true)
     const vCUniqueNo = CUniqueNos.join('-,-')
     const param = {
         CurrentUser: user.value.opCde,
@@ -528,13 +540,16 @@ function createEPolicy() {
                 ElMessage.warning(msg)
             }
         })
-        .finally(() => {})
+        .finally(() => {
+            setButton(btn, false)
+        })
 }
 
 /**
  * 下载电子保单
  */
 function downloadEPolicy() {
+    const btn = getBtn('downloadEPolicy')
     const plyTyp = freeEditRef.value?.getValue('CPlyTyp')
     if (plyTyp == null || plyTyp == undefined) {
         ElMessage.warning('请选择单证类型!')
@@ -550,11 +565,16 @@ function downloadEPolicy() {
         return
     }
     const plyNo = selectData[0].cPlyNo
+    if (!plyNo) {
+        ElMessage.warning('没有数据，请核实确认！')
+        return
+    }
     const data = {
         plyNo: base64encoder(rsaEncoder(plyNo)),
         type: 'EXP_EPOLICY_IMP_PDF',
         impType: plyTyp
     }
+    setButton(btn, true)
     pcisQueryService
         .downloadEPolicy(data)
         .then((res: any) => {
@@ -569,7 +589,9 @@ function downloadEPolicy() {
         .catch(e => {
             ElMessage.error('电子单据下载失败' + e)
         })
-        .finally(() => {})
+        .finally(() => {
+            setButton(btn, false)
+        })
 }
 
 //给表单下拉项赋值
@@ -588,6 +610,21 @@ function setFormItem(key: any, obj: any) {
             }
         })
     }
+}
+function setButton(btn: any, val: boolean) {
+    if (!!btn) {
+        btn.loading = val
+        btn.disabled = val
+    }
+}
+/**
+ * 获取button
+ * @param id
+ */
+const getBtn = (id: any) => {
+    return bthList.value.find(item => {
+        return id === item.id
+    })
 }
 </script>
 
