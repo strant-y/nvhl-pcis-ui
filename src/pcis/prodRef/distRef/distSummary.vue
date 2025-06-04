@@ -329,13 +329,30 @@ function getFormconfig() {
   };
 }
 
+function setTableData(data: any) {
+  if (data && data.length > 0) {
+    pageresult.list = data.map((item:any, index:number) => {
+      return{
+        ... item,
+        ... {
+          nSeqNo: index + 1,
+          'DistSummary.AllOccup': [
+            item['DistSummary.cMajorCategories'], item['DistSummary.cMediumClassification'], item['DistSummary.cOccupationalSubcategory']
+          ],
+        }
+      };
+    });
+  }
+}
+
 // 绑定特殊验证器
 const exRules = {};
 
 defineExpose({
   getFormconfig,
   setUnDisabledByKeyList,
-  handleQuery
+  handleQuery,
+  setTableData,
 });
 </script>
 

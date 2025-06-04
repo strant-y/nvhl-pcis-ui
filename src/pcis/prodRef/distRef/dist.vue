@@ -300,7 +300,7 @@ const method = {
                   nSeqNo: index + 1,
                   tOpeningTime: item['Dist.tOpeningTime']
                       ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
-                      : "",
+                      : null,
                   'Dist.AllOccup': [
                       item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
                   ],
@@ -524,6 +524,27 @@ function getValue(key: string) {
   return applicantEditRef?.value?.getValue(key);
 }
 
+function getTableData() {
+  return pageresult.list
+}
+
+function setTableData(data: any) {
+  pageresult.list = data.map((item: any, index: any) => {
+    return{
+        ... item,
+        ... {
+            nSeqNo: index + 1,
+            tOpeningTime: item['Dist.tOpeningTime']
+                ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
+                : null,
+            'Dist.AllOccup': [
+                item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
+            ],
+        }
+    };
+  });
+}
+
 // 绑定特殊验证器
 const exRules = {};
 
@@ -534,6 +555,9 @@ defineExpose({
   setFormValue,
   getFormconfig,
   setUnDisabledByKeyList,
+  handleQuery: method.handleQuery,
+  getTableData,
+  setTableData,
 });
 </script>
 
