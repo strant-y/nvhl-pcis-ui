@@ -1,3 +1,4 @@
+<!-- 商品基本信息 -->
 <template>
   <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
 </template>
@@ -17,8 +18,12 @@ const opertaor = dataOpertaor();
 
 import { useRoute } from "vue-router";
 import { cp } from "fs";
+import { eventBus } from '@/utils/event-bus'
+import { useUserStore, useProductStore } from "@/store";
+import moment from "moment";
+// import { useProductStore } from "@/store";
+const productStore = useProductStore();
 
-import { useUserStore } from "@/store";
 
 const tabref = opertaor.getTableRefByKey("permissionAllo");
 
@@ -33,6 +38,11 @@ const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const userStore = useUserStore();
 const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
 
+// const startTm = moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format('YYYY-MM-DD')
+const startTm = moment(new Date(Date.now())).format('YYYY-MM-DD')
+const endTm = moment(new Date(Date.now()).setHours(23, 59, 59)).add(1, 'year').format('YYYY-MM-DD')
+// const endTm =  moment(new Date().setHours(23, 59, 59)).add(10, 'year')
+
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "商品基本信息",
@@ -42,17 +52,52 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "primary",
         label: "保存",
         func: async () => {
+          console.log()
           const s = freeEditRef.value?.getFromValue(); //获取表单数据
-          saveCommodityBase(s)
-            .then((res) => {
-              const { code, data, msg } = res;
-              if (200 === code) {
-                ElMessage.success("保存成功");
-              } else {
-                ElMessage.error(msg);
-              }
-            })
-            .finally(() => { });
+          // setFormItem('cCommodityNo',data["data"]['cCommodityNo'])
+          // setValue('cCommodityNo',1221)
+          console.log('基本信息参数', s)
+          freeEditRef.value?.validate().then((isValid: any) => {
+            if (isValid) {
+
+              saveCommodityBase(s)
+                .then((res) => {
+                  const { code, data, msg } = res;
+                  if (200 === code) {
+                    console.log(data["data"], data["data"]['cCommodityNo'])
+                    if (data['data']) {
+                      // setFormItem('cCommodityNo',data["data"]['cCommodityNo'])
+                      setValue('cCommodityNo', data["data"]['cCommodityNo'])
+                    }
+
+                    setFormItem('cKindNo', {
+                      disabled: true,
+                    })
+                    setFormItem('cProdNo', {
+                      disabled: true,
+                    })
+
+
+                    // sessionStorage.setItem(
+                    //   "toMyPageData",
+                    //   JSON.stringify({
+                    //     ...{data:s},
+                    //     ...{ pageType: "app" },
+                    //     // ...{ dptItem: selectTreeItem.value },
+                    //   })
+                    // );
+                    ElMessage.success("保存成功");
+                  } else {
+                    ElMessage.error(msg);
+                  }
+                })
+                .finally(() => { });
+
+
+
+            }
+          })
+
         },
       }),
       createFreeButtonBase({
@@ -73,10 +118,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
           cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
         },
-        func: (val:any) => {
-          // console.log('大类',tabref.getFromValue())
+        func: (val: any) => {
+          console.log('大类', val)
           // 险种大类
           if (!!val) {
+            eventBus.emit('cKindNo-change', val)
             // permissionAllo
             // tabref.getFromValue().cProdNo,
 
@@ -84,6 +130,19 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             // console.log('新变更的险类代码为', value);.
             // this.newKindNo.emit(value);
 
+            // PROD_LIST_GRT
+
+            // cParCde
+
+
+            setFormItem('cProdNo', {
+              typeCode: "PROD_LIST_GRT",
+              codeParam: {
+                cParCde: val,
+                cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+                cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+              }
+            })
 
           }
 
@@ -94,11 +153,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "险种名称",
         rules: [getRules("required", {})],
-        typeCode: "PROD_LIST_GRT",
-        codeParam: {
-          cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
-          cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
-        },
+        // typeCode: "PROD_LIST_GRT",
+        // codeParam: {
+        //   cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+        //   cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+        // },
       },
       {
         prop: "cCommodityNo",
@@ -163,11 +222,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cNeedfeeFlag",
         inputtype: "rtselect",
         title: " 是否见费出单",
-        typeCode: "WEB_SYS_STA_DICT",
-        codeParam: { cParCde: "yes_no" },
+        // typeCode: "WEB_SYS_STA_DICT",
+        // codeParam: { cParCde: "yes_no" },
+        // defaultValue:'0',
+        loadData: [{ value: '1', label: '是' }, { value: '0', label: '否' }],
         rules: [getRules("required", {})],
-
-
       },
       {
         prop: "cAutoUdr",
@@ -175,6 +234,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: " 是否自动核保",
         typeCode: "WEB_SYS_STA_DICT",
         codeParam: { cParCde: "yes_no" },
+        defaultValue: '1',
+        disabled: true,
+
       },
       {
         prop: "cImmeffMrk",
@@ -214,6 +276,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "  支付方式",
         typeCode: "BAS_COMM_CODE_OUT_CDE",
         codeParam: { cParCde: "PayType" },
+        defaultValue: '1',
       },
       {
         prop: "cFeeTypeCde",
@@ -366,12 +429,28 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtdatepicker",
         title: "启用日期",
         rules: [getRules("required", {})],
+        // defaultValue: new Date(Date.now()).setHours(0, 0, 0),
+        // format: 'YYYY-MM-DD HH:mm:ss',
+        format: "YYYY-MM-DD HH:mm:ss",
+        type: "datetime",
+        valueFormat: "YYYY-MM-DD",
+        // defaultValue: new Date(Date.now() - 6 * 1000 * 60 * 60 * 24),
       },
       {
         prop: "tEndTm",
         inputtype: "rtdatepicker",
         title: "失效日期",
         rules: [getRules("required", {})],
+        format: "YYYY-MM-DD HH:mm:ss",
+        type: "datetime",
+        // defaultValue: new Date(Date.now()),
+        // defaultValue:  moment(new Date().setHours(23, 59, 59)).add(10, 'year'),
+
+
+        // format: "YYYY-MM-DD",
+        valueFormat: "YYYY-MM-DD",
+        // defaultValue: new Date(Date.now()),
+
       },
       {
         prop: "cAffiliatedMrk",
@@ -379,6 +458,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "是否关联附属信息",
         typeCode: "WEB_SYS_STA_DICT",
         codeParam: { cParCde: "yes_no" },
+        defaultValue: '0',
+        func: (val: any) => {
+          console.log("关联信息", val);
+          productStore.setcAffiliatedMrk(val)
+          // if(val ==='1'){
+
+          // }
+        }
       },
       {
         prop: "cCiMrk",
@@ -414,6 +501,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "是否取方案份数配置",
         typeCode: "WEB_SYS_STA_DICT",
         codeParam: { cParCde: "yes_no" },
+        defaultValue: '0'
       },
       {
         prop: "cSpePlatTyp",
@@ -422,7 +510,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       },
       {
         prop: "cIsAutoVerification",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: " 是否自动核销",
         typeCode: "WEB_SYS_STA_DICT",
         codeParam: { cParCde: "yes_no" },
@@ -445,7 +533,7 @@ function setFormItem(key: any, obj: any) {
           for (let key in obj.btnItems) {
             item.btnItems[key] = obj.btnItems[key];
           }
-        }else{
+        } else {
           Object.assign(item, obj);
         }
       }
@@ -472,17 +560,20 @@ function setValue(key: string, value: any) {
 function getValue(key: string) {
   return freeEditRef?.value?.getValue(key);
 }
+
 /**
  * 获取商品详情
  */
 function handleQuery() {
-  console.log("param", sessionStorage.getItem("user"));
+  console.log("param", param);
   const newparam = { cCommodityNo: param.cCommodityNo };
   getCommodityBase(newparam)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
-        freeEditRef?.value?.setFormValue(data.data);
+        freeEditRef?.value?.setFormValue(data['result'][0]);
+
+        freeEditRef.value?.setDisabledAll();
       } else {
         ElMessage.error(msg);
       }
@@ -498,12 +589,33 @@ function setDisa() {
 }
 
 onMounted(() => {
-  console.log("当前登录用户信息", sessionStorage.getItem("user"));
+  // console.log("当前登录用户信息", sessionStorage.getItem("user"));
+
+  nextTick(() => {
+    freeEditRef.value?.setValue('tBgnTm', startTm)
+    freeEditRef.value?.setValue('tEndTm', endTm)
+  })
+
   const user = JSON.parse(sessionStorage.getItem("user")).opCde;
-  console.log("当前登录用户信息546546456", user);
-  if (param.editType === "edit") {
-    handleQuery();
+  console.log("当前登录用户信息546546456", param.editType);
+  if (param.editType !== 'add' && param.editType !== 'edit' && param.editType) {
+    // handleQuery();
     // setDisa();
+    freeEditRef.value?.setDisabledAll();
+  } else if (param.editType === 'edit') {
+    setFormItem('cKindNo', {
+      disabled: true,
+    })
+    setFormItem('cProdNo', {
+      disabled: true,
+    })
+    setFormItem('cAutoUdr', {
+      disabled: true,
+    })
+    setFormItem('cAffiliatedMrk', {
+      disabled: true,
+    })
+
   }
 });
 
@@ -513,5 +625,6 @@ defineExpose({
   validate,
   setValue,
   getValue,
+  setFormItem,
 });
 </script>

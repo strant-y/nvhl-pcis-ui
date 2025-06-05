@@ -45,11 +45,14 @@ import rateConfiguration from "./commonRef/RateConfiguration.vue";
 import InstituTaxRateAllocat from "./commonRef/InstituTaxRateAllocat.vue";
 import assoCorrPreCalculFormula from "./commonRef/AssoCorrPreCalculFormula.vue";
 import commodityBasicInfo from "./commodityRef/commodityBasicInfo.vue";
+import relatedancillaryInfo from "./commodityRef/relatedancillaryInfo.vue";
 import choosePlan from "./commodityRef/ChonsePlan.vue";
 import relatedHealthNotify from "./commodityRef/RelatedHealthNotify.vue";
 import fileList from "./commodityRef/FileList.vue";
 import permissionAllo from "./commodityRef/PermissionAllo.vue";
 import InsuranceRules from "./commodityRef/InsuranceRules.vue";
+import ReviewComments from "./commodityRef/ReviewComments.vue";
+import TestReport from "./commodityRef/TestReport.vue";
 import commonProblem from "./commodityRef/CommonProblem.vue";
 import healthNoticeAdd from "./commodityRef/HealthNoticeAdd.vue";
 import clauseConf from "./clauseConfRef/clauseConf.vue";
@@ -120,11 +123,14 @@ const componentMap = {
   InstituTaxRateAllocatRef:InstituTaxRateAllocat,
   assoCorrPreCalculFormulaRef:assoCorrPreCalculFormula,
   commodityBasicInfoRef:commodityBasicInfo,
+  relatedancillaryInfoRef:relatedancillaryInfo,
   choosePlanRef:choosePlan,
   relatedHealthNotifyRef:relatedHealthNotify,
   fileListRef:fileList,
   permissionAlloRef:permissionAllo,
   InsuranceRulesRef:InsuranceRules,
+  ReviewCommentsRef:ReviewComments,
+  TestReportRef:TestReport,
   commonProblemRef:commonProblem,
   healthNoticeAddRef:healthNoticeAdd,
   clauseConfRef:clauseConf,
