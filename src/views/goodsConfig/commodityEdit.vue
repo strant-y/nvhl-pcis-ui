@@ -8,8 +8,9 @@
             <template v-for="(pageConfig, v) in formconfig1" :key="v">
               <el-affix :offset="150">
                 <el-anchor :bound="120" :offset="80">
+                  <!-- k.pageKey == 'relatedancillaryInfo' ? iscAffiliatedMrk : true -->
                   <el-anchor-link v-for="(k, i) in pageConfig?.pageInfo" :key="i"
-                    v-show="k.pageKey == 'relatedancillaryInfo' ? iscAffiliatedMrk : true" :href="`#${k.pageKey}`">
+                    v-show="k.pageKey === 'ReviewComments' ? isShowReview : k.pageKey === 'TestReport' ? isShowTest : true" :href="`#${k.pageKey}`">
                     {{ k.pageTtile }}
                   </el-anchor-link>
                 </el-anchor>
@@ -22,7 +23,7 @@
               <template v-for="(pageConfig, v) in formconfig1" :key="v">
                 <div v-for="(k, i) in pageConfig?.pageInfo" :key="i" :id="k.pageKey"
                   v-show="k.pageKey === 'ReviewComments' ? isShowReview : k.pageKey === 'TestReport' ? isShowTest : true">
-                  {{ k.pageKey }}
+                  <!-- {{ k.pageKey }} -->
                   <component :ref="(res) => {
                     opertaor.addTableRef(k.pageKey, res);
                   }
@@ -73,10 +74,12 @@
 <script setup lang="ts">
 import { getProdInfos, saveProInfo, saveCommodityBase, commodityBaseOperatorCheck, saveRule, addProcessUndr, getCommodityBase, processApprove, getProcessInfo } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+
 const opertaor = dataOpertaor();
 opertaor.init();
 
 import { useProductStore } from "@/store";
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
 const productStore = useProductStore();
 const { iscAffiliatedMrk } = storeToRefs(productStore);
 import { useRouter, useRoute } from 'vue-router';
@@ -84,18 +87,12 @@ const route = useRoute();
 const query = ref(route.query);
 
 const router = useRouter();
-
-
 let isShowTest = ref(false)  // 用来控制显示审核信息模块
 let TestData = ref({});  // 审核状态 返回数据 
-
 let isShowReview = ref(false)  // 用来控制显示审核信息模块
 let ProcessData = ref({});  // 审核状态 返回数据 
 
-
-
-
-const queryParam = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const queryParam = JSON.parse(   query.value?.param ?  descryptParameter(query.value.param) : "{}");
 const formconfig1 = opertaor.getTableConfig();
 
 opertaor.setTableConfig([
@@ -163,21 +160,15 @@ opertaor.setTableConfig([
 const btns = {};
 
 
-
-
-
 // 审核提交
 const reViewClick = async () => {
   const tabref5 = opertaor.getTableRefByKey("ReviewComments");  // 审核信息
-  // {"CType":"COMMODITY","CRelNo":"S25000067","id":"Process2500192","CUndrStatus":"3","CUndrDesc":"发测试(信息补充)132123123123123"}
   const isValid = await validateSingleForm(tabref5);
   if (!isValid) {
     ElMessage.error('请填写审核信息!');
     return false;
   }
 
-
-  // return false;
   let params = {
     cType: ProcessData.value?.cType,
     cRelNo: ProcessData.value?.cRelNo,
@@ -187,8 +178,6 @@ const reViewClick = async () => {
 
   processApprove(params).then((res) => {
     let { code, msg, data } = res;
-
-    console.log('审核 提交 save', res)
     if (code === 200) {
       ElMessage.success('审核成功');
       router.go(-1)
@@ -203,8 +192,6 @@ const processinfoQuery = () => {
   getProcessInfo({ id: queryParam.cPkId })
     .then((res) => {
       const { code, data, msg } = res;
-
-      console.log('商品配置流程', res)
       if (200 === code) {
         let cUndrStatus = data['data'].cUndrStatus;
         if (data['data']) {
@@ -243,82 +230,14 @@ const processinfoQuery = () => {
                   { value: '6', label: '已发布' },
                 ],
               })
-
               break;
           }
-
 
           if (queryParam.editType === 'review') {
             tabref5.setFormValue(data['data'])
             tabref5.setDisabledAll()
-
-
-            // switch (formData['cUndrStatus']) {
-            //   case '1': // 一级审核
-            //     this.form.codeListMap['CUndrStatus'] = [
-            //       { value: '2', label: '发测试' },
-            //       { value: '3', label: '发测试(信息补充)' },
-            //       { value: '0', label: '驳回' }
-            //     ];
-            //     break;
-            //   case '4': // 二级审核
-            //     this.form.codeListMap['CUndrStatus'] = [
-            //       { value: '5', label: '提交发布' },
-            //       { value: '2', label: '驳回至测试' },
-            //       { value: '3', label: '驳回至测试(信息补充)' },
-            //     ];
-            //     break;
-            //   case '5': // IT审核
-            //     this.form.codeListMap['CUndrStatus'] = [
-            //       { value: '6', label: '已发布' },
-            //     ];
-            //     break;
-            // }
-
-
-
-
-            // switch (this.params['type']) {
-            //                     case 'view':
-            //                         // 回显信息
-            //                         const viewData = data['data'];
-            //                         if (!!viewData && !!viewData['cUndrStatus']) {
-            //                             this.form._loadData(initGuidParam(data['data']));
-            //                         }
-            //                         break;
-            //                     case 'undr':
-            //                         const formData = data['data'];
-            //                         if (!!formData && !!formData['cUndrStatus']) {
-            //                             switch (formData['cUndrStatus']) {
-            //                                 case '1': // 一级审核
-            //                                     this.form.codeListMap['CUndrStatus'] = [
-            //                                         {value: '2', label: '发测试'},
-            //                                         {value: '3', label: '发测试(信息补充)'},
-            //                                         {value: '0', label: '驳回'}
-            //                                     ];
-            //                                     break;
-            //                                 case '4': // 二级审核
-            //                                     this.form.codeListMap['CUndrStatus'] = [
-            //                                         {value: '5', label: '提交发布'},
-            //                                         {value: '2', label: '驳回至测试'},
-            //                                         {value: '3', label: '驳回至测试(信息补充)'},
-            //                                     ];
-            //                                     break;
-            //                                 case '5': // IT审核
-            //                                     this.form.codeListMap['CUndrStatus'] = [
-            //                                         {value: '6', label: '已发布'},
-            //                                     ];
-            //                                     break;
-            //                             }
-            //                         }
-            //                         break;
-            //                 }
-
-
-
           }
         }
-        // cUndrStatus
       } else {
         ElMessage.error(msg);
       }
@@ -336,22 +255,20 @@ function handleQuery() {
   const tabref6 = opertaor.getTableRefByKey("TestReport");  // 测试规则
 
 
-  console.log("param", tabref);
+  console.log("反显param", tabref);
   const newparam = { cCommodityNo: queryParam.cCommodityNo };
+
+  console.log('queryParam',queryParam)
   getCommodityBase(newparam)
     .then((res) => {
       const { code, data, msg } = res;
-      console.log('数据', res)
       if (200 === code) {
         let dataS = data['result'][0];
         let cStatus = data['result'][0]['cStatus'];
-        // freeEditRef?.value?.setFormValue(data['result'][0]);
         tabref.setFormValue(data['result'][0])
 
-
-
-        // tabref3.setFormValue(data['result'][0])
         //  出单权限分配 数据回显
+        console.log(dataS.cPertainDptCde)
         tabref3.setValue('cPertainDptCde', dataS.cPertainDptCde);
         tabref3.setValue('cBsnsTyp', dataS.cBsnsTyp);
         tabref3.setValue('cChaType', dataS.cChaType);
@@ -365,26 +282,18 @@ function handleQuery() {
         tabref3.setValue('cBusinessTel', dataS.cBusinessTel);
         tabref3.setValue('cEvenJointTel', dataS.cEvenJointTel);
 
-
         TestData.value = data['result'][0];
 
         //  测试报告说明
         tabref6.setValue('cTestReport', dataS.cTestReport)
-
-
-
-
         if (queryParam.editType === "edit") {
           isShowTest.value = cStatus == '3' || cStatus == '6' || cStatus == '2' ? true : false;
         } else if (queryParam.editType === "upload") {
           isShowTest.value = true
         } else {
           isShowTest.value = cStatus == '2' || cStatus == '3' || cStatus == '4' || cStatus == '5' || cStatus == '6' ? true : false;
-
           tabref6.setDisabledAll()
         }
-
-        // freeEditRef.value?.setDisabledAll();
       } else {
         ElMessage.error(msg);
       }
@@ -400,19 +309,9 @@ const saveAll = async (call) => {
   const tabref3 = opertaor.getTableRefByKey("permissionAllo");  // 出单权限分配
   const tabref4 = opertaor.getTableRefByKey("InsuranceRules");  // 投保规则
   const tabref6 = opertaor.getTableRefByKey("TestReport");  // 测试规则
-
-  console.log(44, tabref6.getFromValue())
-  console.log('callcallcall', await call)
-
-  console.log(tabref3.getFromValue().cDptCde)
-  console.log(tabref4.getFromValue())
   let isValid = await validateForm();
-
-
   // 方案基本信息检查
   if (!isValid) {
-
-    console.log('验证不通过')
     return;
   } else {
 
@@ -421,56 +320,13 @@ const saveAll = async (call) => {
     param = Object.assign({
       cCrtCde: user.opCde,
       cUpdCde: user.opCde,
-      // ...tabref.getFromValue(),
-
-
     }, tabref.getFromValue(), tabref3.getFromValue(), tabref6.getFromValue());
-
-
-    // tabref4.getFromValue()
-
-    console.log('111', tabref.getFromValue(),)
-    console.log('3333', tabref3.getFromValue(),)
-
-    console.log('保存-----', param)
-
-
-    // 状态等于  待测试及信息补充 或者 已发布 填写测试报告
-    // if( tabref.getFromValue()['cStatus'] =='3' ||  tabref.getFromValue()['cStatus'] == '6'){
-    //   param = Object.assign({...param,...tabref6.getFromValue()})
-    // }
-
-
-
-    // if ('1' === this.commodityType) {
-    //   param = Object.assign({
-    //     CCrtCde: user.opCde,
-    //     CUpdCde: user.opCde,
-    //   }, tabref.getFormData(),
-    //     this.testOfCommodityComponent.getFormData(),
-    //     this.roleOfCommodityComponent.getFormData());
-    // } else {
-    //   param = Object.assign({
-    //     CCrtCde: this.user.opCde,
-    //     CUpdCde: this.user.opCde
-    //   }, this.baseOfCommodityComponent.getFormData(),
-    //     !!this.elementOfCommodityComponent ? this.elementOfCommodityComponent.getFormData() : {},
-    //     this.testOfCommodityComponent.getFormData(),
-    //     this.roleOfCommodityComponent.getFormData());
-    // }
-
     const chkParam = {
       cCommodityNo: tabref.getFromValue().cCommodityNo,
       checkType: 'saveAll',
       //           oldDptCde: this.dptCde,
       newDptCde: tabref3.getFromValue().CDptCde,
     };
-
-    // checkType: 'saveAll',
-    //           oldDptCde: this.dptCde,
-    //           newDptCde: param.CDptCde,
-    //           CCommodityNo: param.CCommodityNo,
-
 
     await commodityBaseOperatorCheck(chkParam).then((res) => {
       let { code, msg, data } = res;
@@ -493,11 +349,7 @@ const saveAll = async (call) => {
 //  保存接口
 const save = (call, param: any) => {
   const tabref = opertaor.getTableRefByKey("commodityBasicInfo");  // 基本信息
-  console.log(33333, call)
-
   if (!!call) {
-
-    console.log('保存 ', param)
     // return false;
     if ('0' === param['cStatus']) {
       param['cStatus'] = '1'; // 一级审核
@@ -505,10 +357,7 @@ const save = (call, param: any) => {
       param['cStatus'] = '4'; // 二级审核
     }
   }
-
   console.log('参数-----', param)
-
-
   saveCommodityBase(param).then((res) => {
     let { code, msg, data } = res;
 
@@ -546,34 +395,12 @@ const InsuranceSaveData = () => {
   const user = JSON.parse(sessionStorage.getItem("user"));
   const tabref = opertaor.getTableRefByKey("commodityBasicInfo");  // 基本信息
   const tabref4 = opertaor.getTableRefByKey("InsuranceRules");  // 投保规则
-  // const v = this.freeEdit.validateForm(); 
-  // if (v) {
-  //     this.msg.warning('表单验证失败,请修正', { nzDuration: 3000 });
-  //     return;
-  // }
 
   const param = Object.assign({
     cCrtCde: user.opCde,
     cUpdCde: user.opCde,
     cCommodityNo: tabref.getFromValue().cCommodityNo,
   }, tabref4.getFromValue());
-  // if (!!this.CCommodityNo) {
-  //     param['CCommodityNo'] = this.CCommodityNo;
-  // }
-  // const saveProdData = this.commodityService.saveRule(param);
-  // saveProdData.subscribe((res: any) => {
-  //     console.log('resresresresres', res);
-  //     if (null != res && null != res['code']) {
-  //         if (res['code'] === 200) {
-  //             this.msg.success(res['msg'], { nzDuration: 3000 });
-  //             // 回显保存后生成的信息
-  //             this.form._loadData(res['data']);
-  //         } else {
-  //             this.msg.error(res['msg'], {nzDuration: 3000});
-  //         }
-  //     }
-  // });
-
   saveRule(param).then((res) => {
     let { code, data, msg } = res;
     if (code === 200) {
@@ -589,13 +416,8 @@ const InsuranceSaveData = () => {
 const saveAllSubmit = async () => {
 
   let isValid = await validateForm();
-
-  console.log(111, isValid)
-
   // 方案基本信息检查
   if (!isValid) {
-
-    console.log('验证不通过')
     return;
   } else {
 
@@ -617,15 +439,9 @@ const saveAllSubmit = async () => {
           router.go(-1)
 
         } else {
-
         }
-
-
       })
-
-
     }
-
     saveAll(call);
 
   }
@@ -648,17 +464,11 @@ const validateForm = async () => {
   const tabref2 = opertaor.getTableRefByKey("choosePlan");  // 选择方案
   const tabref3 = opertaor.getTableRefByKey("permissionAllo");  // 出单权限分配
   const tabref4 = opertaor.getTableRefByKey("InsuranceRules");  // 投保规则
-
-
   let choosePlanList = tabref2.getTableValue()
-
-
-
   // const tabref4 = opertaor.getTableRefByKey("InsuranceRules");  // 投保规则
   // const tabref5= opertaor.getTableRefByKey("commonProblem");  // 常见问题配置
 
 
-  console.log('校验', tabref2.getTableValue())
   let v = false; // 没有错误  
   const formRefs = [tabref, tabref2, tabref3, tabref4]
 
@@ -672,12 +482,10 @@ const validateForm = async () => {
           ElMessage.error('商品基本信息表单验证失败,请修正');
           return false;
         }
-        console.log('长度', choosePlanList)
         if (choosePlanList.length < 1) {
           ElMessage.error('未关联附属信息！');
           return false;
         }
-
         continue;
       }
 
@@ -685,7 +493,6 @@ const validateForm = async () => {
       const isValid = await validateSingleForm(formRef);
       if (!isValid) {
         if (i === 1) {
-
         } else if (i === 2) {
           ElMessage.error('出单权限分配表单验证失败,请修正');
         }
@@ -694,7 +501,6 @@ const validateForm = async () => {
 
     } catch (error) {
       // 处理验证过程中的异常
-      console.error(`验证第${i + 1}个表单时出错:`, error)
       ElMessage.error(`验证过程出错，请重试`)
       return false
     }

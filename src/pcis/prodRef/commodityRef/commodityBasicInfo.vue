@@ -14,6 +14,7 @@ import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { saveCommodityBase, getCommodityBase } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
 const opertaor = dataOpertaor();
 
 import { useRoute } from "vue-router";
@@ -30,7 +31,7 @@ const tabref = opertaor.getTableRefByKey("permissionAllo");
 const route = useRoute();
 const router = useRouter();
 const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
 
 const { getRules } = useValidator();
 
@@ -52,7 +53,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "primary",
         label: "保存",
         func: async () => {
-          console.log()
           const s = freeEditRef.value?.getFromValue(); //获取表单数据
           // setFormItem('cCommodityNo',data["data"]['cCommodityNo'])
           // setValue('cCommodityNo',1221)
@@ -64,7 +64,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 .then((res) => {
                   const { code, data, msg } = res;
                   if (200 === code) {
-                    console.log(data["data"], data["data"]['cCommodityNo'])
                     if (data['data']) {
                       // setFormItem('cCommodityNo',data["data"]['cCommodityNo'])
                       setValue('cCommodityNo', data["data"]['cCommodityNo'])
@@ -76,16 +75,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     setFormItem('cProdNo', {
                       disabled: true,
                     })
-
-
-                    // sessionStorage.setItem(
-                    //   "toMyPageData",
-                    //   JSON.stringify({
-                    //     ...{data:s},
-                    //     ...{ pageType: "app" },
-                    //     // ...{ dptItem: selectTreeItem.value },
-                    //   })
-                    // );
                     ElMessage.success("保存成功");
                   } else {
                     ElMessage.error(msg);
@@ -123,18 +112,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           // 险种大类
           if (!!val) {
             eventBus.emit('cKindNo-change', val)
-            // permissionAllo
-            // tabref.getFromValue().cProdNo,
-
-
-            // console.log('新变更的险类代码为', value);.
-            // this.newKindNo.emit(value);
-
-            // PROD_LIST_GRT
-
-            // cParCde
-
-
             setFormItem('cProdNo', {
               typeCode: "PROD_LIST_GRT",
               codeParam: {
@@ -461,10 +438,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         defaultValue: '0',
         func: (val: any) => {
           console.log("关联信息", val);
-          productStore.setcAffiliatedMrk(val)
-          // if(val ==='1'){
-
-          // }
+          // productStore.setcAffiliatedMrk(val)
         }
       },
       {
@@ -565,7 +539,6 @@ function getValue(key: string) {
  * 获取商品详情
  */
 function handleQuery() {
-  console.log("param", param);
   const newparam = { cCommodityNo: param.cCommodityNo };
   getCommodityBase(newparam)
     .then((res) => {
@@ -589,15 +562,12 @@ function setDisa() {
 }
 
 onMounted(() => {
-  // console.log("当前登录用户信息", sessionStorage.getItem("user"));
-
   nextTick(() => {
     freeEditRef.value?.setValue('tBgnTm', startTm)
     freeEditRef.value?.setValue('tEndTm', endTm)
   })
 
   const user = JSON.parse(sessionStorage.getItem("user")).opCde;
-  console.log("当前登录用户信息546546456", param.editType);
   if (param.editType !== 'add' && param.editType !== 'edit' && param.editType) {
     // handleQuery();
     // setDisa();

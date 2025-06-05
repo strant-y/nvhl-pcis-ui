@@ -14,6 +14,7 @@ import { useValidator } from "@/typings/useValidator";
 import { saveProInfo } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { eventBus } from '@/utils/event-bus'
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
 import {
   getBsnsTypList,
   getChaTypeList,
@@ -37,7 +38,7 @@ const departmentTree = defineAsyncComponent(
 import { useRoute } from "vue-router";
 const route = useRoute();
 const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
 
 const { getRules } = useValidator();
 
@@ -87,7 +88,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             dzmodal
               .open(departmentTree, { type: "Issuer", data: {} })
               .then((res) => {
-
+                console.log('row',res)
                 if (res.type === "ok") {
                   const selectObj = res.body;
                   freeEditRef.value.setValue(
@@ -194,7 +195,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             dzmodal
               .open(orderIssuer, { type: "Issuer", data: {} })
               .then((res:any) => {
-                console.log(res, '-----')
                 if (res.type === "ok") {
                   const selectObj = res.body;
                   freeEditRef.value?.setValue(
@@ -315,7 +315,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 
 // 查询  渠道大类
 const queryCBsnsTyp = (category) => {
-  console.log('数据666', category)
   let CDptCde = JSON.parse(sessionStorage.getItem("user")).companyId;
   const params = {
     CDptCde,
@@ -324,7 +323,6 @@ const queryCBsnsTyp = (category) => {
   //查询大类数据，用于默认回显
   getBsnsTypList(params).then((res) => {
     const { code, data, msg } = res;
-    console.log(res)
     if (code === 200) {
       setFormItem("cBsnsTyp", {
         loadData: data
@@ -332,18 +330,6 @@ const queryCBsnsTyp = (category) => {
     } else {
       ElMessage.error(msg);
     }
-
-    // if (null != res && null != res["code"]) {
-    //   if (res["code"] === 200) {
-    //     const obj = {
-    //       loadData: res.data,
-    //     };
-    //     console.log("大类数据",obj);
-    //     setFormItem("cBsnsTyp", obj);
-    //     setValue("cBsnsTyp", props.data.data.cBsnsTyp);
-
-    //   }
-    // }
   });
 }
 
@@ -361,16 +347,6 @@ const queryChaTypeList = (val: any) => {
     } else {
       ElMessage.error(msg);
     }
-    //   if (null != res && null != res["code"]) {
-    //     if (res["code"] === 200) {
-    //       const obj = {
-    //         loadData: res.data,
-    //       };
-    //       console.log("中类数据", obj);
-    //       setFormItem("CChaType", obj);
-    //       setValue("CChaType", props.data.data.cChaType);
-    //     }
-    //   }
   });
 }
 
@@ -390,23 +366,11 @@ const queryCChaSubtype = (val: any) => {
     } else {
       ElMessage.error(msg);
     }
-
-    // if (null != res && null != res["code"]) {
-    //   if (res["code"] === 200) {
-    //     const obj = {
-    //       loadData: res.data,
-    //     };
-    //     console.log("子类数据", res.data);
-    //     setFormItem("CChaSubtype", obj);
-    //     setValue("CChaSubtype", props.data.data.cChaSubtype);
-    //   }
-    // }
   });
 }
 
 
 onMounted(() => {
-  console.log('param.editType')
   eventBus.on('cKindNo-change', queryCBsnsTyp)
   if (param.editType === "edit") {
     setDisa();

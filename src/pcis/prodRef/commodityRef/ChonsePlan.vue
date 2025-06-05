@@ -26,6 +26,7 @@ import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
 const opertaor = dataOpertaor();
 import {
   AppTableConfig,
@@ -59,7 +60,7 @@ const planInfoDialog = defineAsyncComponent(() => import("./planInfoDialog.vue")
 const route = useRoute();
 const router = useRouter()
 const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
 const dialogVisible = ref(false);
 const { getRules } = useValidator();
 
@@ -326,12 +327,9 @@ const delFunc = (row: any) => {
         ElMessage.error('该方案号存在有效的再保分保配置，不能进行无效操作，若需置为无效，请联系再保部对该方案号的分保配置做无效处理！');
         return;
       } else { // 无 可删除
-
-
         const param = {
           id: row.cPkId
         };
-
         deleteCommodityPlan(param).then((res2) => {
          
             if (res2.code === 200) {
@@ -385,9 +383,6 @@ function getTableValue() {
 
 /** 查询 */
 function handleQuery(cid:any) {
-  
-
-  // console.log("查询条件:", sessionStorage.getItem("user"));
   const r = tableRef.value?.getPartnerPage(); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const c = tabref.getFromValue().cCommodityNo;
@@ -426,34 +421,7 @@ const handleVisibleUpdate = (value: boolean) => {
 onMounted(() => {
   console.log('path')
   if (param.editType!== 'add' && param.editType) {
-    // setDisa();
-    // const newparam = { cCommodityNo: param.cCommodityNo };
-   
     handleQuery(param.cCommodityNo)
-
-    // hideBtns: (row: any) => {
-    // //       if (
-    // //         row.cAppStatus == "1" ||
-    // //         row.cAppStatus == "3" ||
-    // //         row.cAppStatus == "8"
-    // //       ) {
-    // //         return false;
-    // //       } else {
-    // //         return true;
-    // //       }
-    // //     },
-    // // nextTick(()=>{
-    //     tableconfig.tableBtn.forEach((btn,index) => {
-    //     console.log('09090',btn.tooltip,index)
-    //     if(btn.tooltip === '删除' || btn.tooltip=== '编辑'){
-    //       // tableconfig.tableBtn[index] = []
-    //       btn.disabled = true;
-    //     }
-    //     // btn.disabled = true;
-    //   });
-    // // })
- 
-   
   }
 
 
