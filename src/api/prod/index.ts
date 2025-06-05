@@ -1405,3 +1405,51 @@ export function getProcessInfo(queryParams: any): AxiosPromise<any> {
 export function saveDistBatch(queryParams: any): AxiosPromise<any> {
   return post(`/policy/saveDistBatch`, queryParams);
 }
+
+/**
+ * 产品配置明细-询价页面保存
+ * 
+ */
+export function saveInquiryPage(queryParams: any): AxiosPromise<any> {
+  return post(`/prod/saveInquiryPage`, queryParams);
+}
+
+/**
+ * 产品配置明细-询价页面查询
+ * 
+ */
+export function getInquiryPage(queryParams: any): AxiosPromise<any> {
+  return post(`/prod/getInquiryPage`, queryParams);
+}
+
+/**
+ * 产品配置明细-询价页面-组件关联保存按钮
+ * 
+ */
+export function saveInquiryPageComponent(queryParams: any): AxiosPromise<any> {
+  return post(`/prod/saveInquiryPageComponent`, queryParams);
+}
+
+/**
+ * 产品配置明细-询价页面-组件关联查询
+ * 
+ */
+export function queryInquiryPageComponents(queryParams: any): AxiosPromise<any> {
+  return post(`/prod/queryInquiryPageComponents`, queryParams);
+}
+
+/**
+ * 产品配置明细-询价页面-组件要素绑定查询
+ * 
+ */
+export function queryInquiryPageComponentList(queryParams: any): AxiosPromise<any> {
+  return post(`/prod/queryInquiryPageComponentList`, queryParams);
+}
+
+/**
+ * 产品配置明细-询价页面-组件要素绑定发布
+ * 
+ */
+export function releaseInquiryPage(queryParams: any): AxiosPromise<any> {
+  return post(`/prod/releaseInquiryPage`, queryParams);
+}

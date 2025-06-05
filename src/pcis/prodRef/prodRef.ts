@@ -70,6 +70,7 @@ import underwriteRef from "./underwriteRef/underwrite.vue"
 import edrbaseRef from "./edrbaseRef/edrbase.vue"
 import edritemRef from "./edritemRef/edritem.vue"
 import imageRef from "./commonRef/image.vue"; //影像信息
+import priceComponent from "./commonRef/priceComponent.vue";//询价页面配置
 
 /**用于动态组件的映射生成 */
 const componentMap = {
@@ -135,6 +136,7 @@ const componentMap = {
   healthNoticeAddRef:healthNoticeAdd,
   clauseConfRef:clauseConf,
   clauseConfBasicInfoRef:clauseConfBasicInfo,
+  priceComponentRef: priceComponent, //询价页面配置
 
   agentPre: agentPre,
   agentWorker: agentWorker,
