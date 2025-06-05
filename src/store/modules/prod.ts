@@ -15,6 +15,11 @@ export const useProductStore = defineStore('product', () => {
 
     const isCiJiMrk = computed(()=> cCiMrk.value !== '0');
 
+
+    const iscAffiliatedMrk = computed(()=> cAffiliatedMrk.value !== '0');
+    
+
+
     function setCIsSingle(newVal) {
         cIsSingle.value = newVal
     }
@@ -36,15 +41,27 @@ export const useProductStore = defineStore('product', () => {
         return cCiMrk.value !== '0';
     }
 
+    function setcAffiliatedMrk(newVal){
+        cAffiliatedMrk.value = newVal
+    }
+
+    // function getcAffiliatedMrk(){
+    //     return cAffiliatedMrk.value;
+    // }
+
+
     return {
         isCiJiMrk,
         setCIsSingle,
         setcClntMrk,
         setcCiMrk,
         checkCiMrk,
+        setcAffiliatedMrk,
+        iscAffiliatedMrk,
         setnAmt,
         setnPrm,
         nPrm,
         nAmt,
+        cCiMrk,
     }
 })

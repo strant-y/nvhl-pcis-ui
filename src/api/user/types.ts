@@ -7,6 +7,7 @@ export interface UserInfo {
   cIsValid?: boolean;
   roles?: string[];
   companyId?: string;
+  companyCnm?:string;
 }
 
 /**

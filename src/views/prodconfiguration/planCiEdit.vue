@@ -439,15 +439,6 @@ const ciSubCompOnChangeHandle = (value: string) => {
       // "CParCde":"subdpt","cParCde":"327001"}
       // codeParam
       codeParam: { "CParCde": "subdpt", cParCde: "327001" },
-
-
-      // typeCode: "Cvrg_LIST",
-      // codeParam: { cProdNo: '0200000000000'},
-      // typeCode: "PLYDPT_LIST_1",
-      // codeParam: { cIsValid: "1", userOrg: "0200000000000" },
-      //  disabled: false,
-      // codeParam: { 'CParCde':'subdpt'},
-      // rules: [getRules("required", {})],
     });
 
 
@@ -458,24 +449,6 @@ const ciSubCompOnChangeHandle = (value: string) => {
       typeCode: '',
       disabled: false,
     })
-
-    //     // 【共保子公司】的可选项设置为分公司
-    //     ciSubCompControl['param'] = Object.assign(preParam, {'CParCde': 'subdpt'});
-    //     // 【本公司标志】设置为 是
-    //     selfMrkControl.setValue('1');
-    //     // 【主共标志】设置为 是
-    //   //  chiefMrkControl.setValue('1');
-    //     // 【出单标志】设置为 是
-    //  //   issueMrkControl.setValue('1');
-    //     // 【出单机构】设置为 必填项
-    //     dptCdeControl.clearValidators();
-    //     dptCdeControl.setValidators([Validators.required]);
-    //     dptCdeControl.readOnly = false;
-    //     this.freeConfig.setItemAttribute(dptCdeControl, 'readOnly', false);
-    //     dptCdeControl.markAsDirty();
-    //     dptCdeControl.updateValueAndValidity();
-    //  //   jiMrkControl.readOnly = true;
-    //     this.freeConfig.setItemAttribute(jiMrkControl, 'readOnly', false);
   } else {
     // 共保子公司 设置为其他
     setValue('cCiSubComp', '')

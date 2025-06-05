@@ -1557,11 +1557,17 @@ getNPrmNAmtOfSum(param) {
 getProdFunInfo(param){
     return request.post('/proddef/getProdFunInfo', param);
 }
-//清单模板下载
+//清单全量模板下载
 downloadDistTemplate(data) {
   return request.post(`/policy/downloadDistTemplate`, data, {
       responseType: 'blob'
   });
+}
+//清单增量模板下载
+downloadDistTemplateIncrement(data) {
+    return request.post(`/policy/downloadDistTemplateIncrement`, data, {
+        responseType: 'blob'
+    });
 }
 //清单导出
 exportDist(data) {
@@ -1569,13 +1575,12 @@ exportDist(data) {
       responseType: 'blob'
   });
 }
-//清单导入
-// importDist(data) {
-//   return request.post(`/policy/importDistIncrement`, data, {
-//       responseType: 'blob'
-//   });
-// }
-importDist(param){
+//清单增量导入
+importDist(data) {
+    return request.post(`/policy/importDist`, data);
+}
+//清单全量导入
+importDistIncrement(param){
     return request.post('/policy/importDistIncrement', param);
 }
 listImage(data) {

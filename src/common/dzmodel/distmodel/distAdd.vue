@@ -23,6 +23,7 @@ import { useValidator } from "@/typings/useValidator";
 import { saveDist } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { codeListViewStore } from "@/store";
+import {getAddressStr} from "@/api/query";
 const opertaor = dataOpertaor();
 const param = ref({});
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
@@ -180,6 +181,7 @@ const formconfig1 = ref<AppFreeEditConfig>(
     ],
   })
 );
+const distContactList:Array<string> = ['Dist.PartProp','Tgt.cSuffixAddr','Dist.Prop','Dist.cSuffixAddr','Dist.JingyingProp','Dist.cDetailedAddress']
 
 onMounted(() => {
   dataParams.value = opertaor.getDataAll();
@@ -208,6 +210,17 @@ onMounted(() => {
     if(item.cShowLocation === '1'){
       item["hidden"] = true;
     }
+    // 遍历groupList数组把函数赋值给fromSchema
+    if (props.data.fromSchema[i]["groupList"] && props.data.fromSchema[i]["groupList"].length>0) {
+      props.data.fromSchema[i]["groupList"].forEach((data:any,index:number,arr:any) =>{
+        //  040001经营场所地址 040005 学校地址 040021 经营场所地址 042003 学校地址 043013 标的坐落地址 043020 房屋所在地区 045001工程项目地址
+        if(distContactList.includes(data.prop)){
+          item["groupList"][index]['func'] = function (){
+            return setcDetailedAddress(arr,JSON.parse(JSON.stringify(props.data.fromSchema[i+1])))
+          }
+        }
+      })
+    }
     newSchema.push(item);
   }
 
@@ -221,6 +234,21 @@ onMounted(() => {
   } else {
   }
 });
+const setcDetailedAddress = (prop:any,aftProp:any)=> {
+  const ads = freeEditRef?.value?.getValue(prop[0].prop);
+  const a = freeEditRef?.value?.getValue(prop[1].prop) || "";
+  if (ads) {
+    getAddressStr({ address: ads }).then((res: any) => {
+      const { code, data, msg } = res;
+      if (code === 200) {
+        const b = (data ? data["addStr"] : "") + a;
+        freeEditRef?.value?.setValue(aftProp.prop, b);
+      }
+    });
+  } else {
+    freeEditRef?.value?.setValue(aftProp.prop, a);
+  }
+};
 
   //根据获取的职业类别查询职业等级并绑定下拉框
 const getDistoccupType = (val) => {

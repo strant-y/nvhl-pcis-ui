@@ -103,6 +103,22 @@ const fromSchema = {
       disabled: true,
     },
     {
+      prop:"cClntMrk",
+      inputtype: "rtselect",
+      title: "投保人性质",
+      disabled: true,
+      loadData: [
+        {
+          label: "个人",
+          value: "1"
+        },
+        {
+          label: "法人",
+          value: "0"
+        }
+      ]
+    },
+    {
       prop: "cCstomerType",
       inputtype: "rtselect",
       title: "查询类型",
@@ -135,6 +151,22 @@ const fromSchema = {
       inputtype: "rtinput",
       title: "被保人证件号码",
       disabled: true,
+    },
+    {
+      prop:"cClntMrk",
+      inputtype: "rtselect",
+      title: "被保人性质",
+      disabled: true,
+      loadData: [
+        {
+          label: "个人",
+          value: "1"
+        },
+        {
+          label: "法人",
+          value: "0"
+        }
+      ]
     },
     {
       prop: "cCstomerType",
@@ -218,7 +250,7 @@ const pageresult = reactive<Pageresult>({
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
-    isPage: true,
+    isPage: false,
     showSelection: false,
     tableBtnType: "btn",
     tableBtnWidth: 110,
@@ -280,7 +312,7 @@ const pageresult1 = reactive<Pageresult>({
 });
 const tableconfig1 = reactive<AppTableConfig>(
   createTableEditConfig({
-    isPage: true,
+    isPage: false,
     showSelection: false,
     tableBtnPosition: "right",
     titleBtns: [
@@ -367,7 +399,7 @@ const pageresult2 = reactive<Pageresult>({
 
 const tableconfig2 = reactive<AppTableConfig>(
   createTableEditConfig({
-    isPage: true,
+    isPage: false,
     showSelection: false,
     endBtnsPosition: "right",
     titleBtns: [
@@ -465,6 +497,7 @@ nextTick(() => {
   freeEditRef.value?.setValue("cAppNme", DataAll['Applicant.cAppNme']);
   freeEditRef.value?.setValue("cCertfCls", DataAll['Applicant.cCertfCls']);
   freeEditRef.value?.setValue("cCertfCde", DataAll['Applicant.cCertfCde']);
+  freeEditRef.value?.setValue("cClntMrk", DataAll['Applicant.cClntMrk']);
   freeEditRef.value?.setValue("cCstomerType", '01' );
 
   handleQuery();
@@ -503,13 +536,21 @@ nextTick(() => {
 
 // 初始化年度查询
 const handleQuery = () => {
+  // let DataAll = opertaor.getDataAll()['applicant']['Applicant.cClntMrk']
+  // let DataAll2 = opertaor.getDataAll()['insured']['Insured.cClntMrk'];
+ 
 
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const r = tableRef.value?.getPartnerPage(); //获取分页数据
 
-
+  
  
   let params = { ...s }
+  if(s.cCstomerType=='01'){
+    params.cClntMrk = opertaor.getDataAll()['applicant']['Applicant.cClntMrk'];
+  }else{
+    params.cClntMrk = opertaor.getDataAll()['insured']['Insured.cClntMrk'];
+  }
 
   console.log('params', params)
   pcisQueryService.qryHistoryClaimYearAll(params).then((res: any) => {
@@ -571,8 +612,8 @@ const viewDetails = (row: any) => {
   // }, 2000)
   console.log('第二row', row)
   let params = {
-    ...row
-
+    ...row,
+    ...freeEditRef.value?.getFromValue()
   }
 
   pcisQueryService.qryHistoryClaimYearDetail(params).then((res: any) => {
@@ -628,10 +669,10 @@ const tabChangeTb = (name: any) => {
     
     let DataAll = opertaor.getDataAll()['insured']
     // nextTick(() => {
-
       freeEditRef.value?.setValue("cAppNme", DataAll['Insured.cAppNme']);
       freeEditRef.value?.setValue("cCertfCls", DataAll['Insured.cCertfCls']);
       freeEditRef.value?.setValue("cCertfCde", DataAll['Insured.cCertfCde']);
+    freeEditRef.value?.setValue("cClntMrk", DataAll['Insured.cClntMrk']);
   
     // })
 
@@ -642,11 +683,11 @@ const tabChangeTb = (name: any) => {
     let DataAll = opertaor.getDataAll()['applicant']
 
     // nextTick(() => {
-
       freeEditRef.value?.setValue("cAppNme", DataAll['Applicant.cAppNme']);
       freeEditRef.value?.setValue("cCertfCls", DataAll['Applicant.cCertfCls']);
       freeEditRef.value?.setValue("cCertfCde", DataAll['Applicant.cCertfCde']);
-     
+      freeEditRef.value?.setValue("cClntMrk", DataAll['Applicant.cClntMrk']);
+
     // })
     console.log(332, DataAll)
   }

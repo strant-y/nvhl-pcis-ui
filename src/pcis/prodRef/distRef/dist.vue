@@ -311,10 +311,10 @@ const method = {
           tgtRef.setValue("Tgt.nElevatorsNumber",res.data.length)
         }
 
-        // 刷新汇总表格
-        let distSummary045001 = opertaor.getTableRefByKey('DistSummary045001')
-        console.log('distSummary045001', distSummary045001)
-        distSummary045001?.handleQuery();
+        // 刷新汇总表格 DistSummary045001'
+        const compKey = 'DistSummary' + route.params.param.cProdNo
+        const distSummary = opertaor.getTableRefByKey(compKey)
+        distSummary?.handleQuery();
       }
     });
   },
@@ -374,7 +374,7 @@ const method = {
         saveAs(blob, fileName);
       })
   },
-  //导入
+  //全量导入
   importExcel() {
     const input = document.createElement('input');
     input.type = 'file';
@@ -402,10 +402,10 @@ const method = {
 
         policyService.importDist(params).then((res) => {
           if (res.code === 200) {
-            ElMessage.success("导入成功");
+            ElMessage.success(`导入完成：${res.data.msg}`);
             method.handleQuery();
           } else {
-            ElMessage.error(res.message || "导入失败");
+            ElMessage.error(res.message || "全量导入失败");
           }
         }).catch((error) => {
           ElMessage.error("导入出错，请检查文件格式或内容");
@@ -423,7 +423,56 @@ const method = {
     };
     input.click(); // 触发文件选择对话框
   },
-  //模板下载
+  // 增量导入
+  importExcelIncrement: () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.xlsx, .xls, .xlsm'; // 支持的文件类型
+    input.onchange = () => {
+      if (input.files?.length) {
+        const file = input.files[0];
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+        const base64String = e.target?.result as string;
+
+        // ✅ 此处赋值有效
+        // fileBase = base64String.split(',')[1]; // 去掉 data:image/type;base64, 前缀
+
+        // console.log(fileBase, "0000000"); // ✅ 此处可以正常打印 Base64 字符串
+
+        // 构建参数并请求接口
+        const params = {
+          ...formconfig1.value,
+          file: base64String, // ✅ 正确传入
+          cComponentTable: cComponentTableValue,
+          cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
+        };
+
+        policyService.importDistIncrement(params).then((res) => {
+          if (res.code === 200) {
+            ElMessage.success(`导入完成：${res.data.msg}`);
+            method.handleQuery();
+          } else {
+            ElMessage.error(res.message || "增量导入失败");
+          }
+        }).catch((error) => {
+          ElMessage.error("导入出错，请检查文件格式或内容");
+          console.error("导入错误：", error);
+        });
+      };
+
+      reader.onerror = (e) => {
+        console.error("文件读取失败", e);
+        ElMessage.error("文件读取失败");
+      };
+
+      reader.readAsDataURL(file); // 启动读取
+      }
+    };
+    input.click(); // 触发文件选择对话框
+  },
+  //全量模板下载
   downloadTemp: () => {
     policyService
       .downloadDistTemplate(formconfig1.value)
@@ -440,7 +489,27 @@ const method = {
         saveAs(blob, fileName);
       })
       .catch(() => {
-        ElMessage.error("模板下载失败");
+        ElMessage.error("全量模板下载失败");
+      });
+  },
+  // 增量模板下载
+  downloadIncrement: () => {
+    policyService
+      .downloadDistTemplateIncrement(formconfig1.value)
+      .then((res) => {
+        if (res.size <= 0) {
+          ElMessage.error({ message: "下载出错", duration: 3000 });
+          return;
+        }
+        const fileName = decodeURIComponent(res.headers['content-disposition'].split('filename=')[1]);
+        const blob = new Blob([res.data], {
+          responseType:res.headers["content-type"]
+            // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
+        });
+        saveAs(blob, fileName);
+      })
+      .catch(() => {
+        ElMessage.error("增量模板下载失败");
       });
   },
 setregistAdd(){

@@ -13,19 +13,32 @@ import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { saveProInfo } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { eventBus } from '@/utils/event-bus'
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
+import {
+  getBsnsTypList,
+  getChaTypeList,
+  getChaSubtypList,
+  // getPageList,
+} from "@/api/code-list-service";
 const opertaor = dataOpertaor();
 import { useDzModal } from "@/common/dzmodel/DzModalService";
+
+ 
+const tabref = opertaor.getTableRefByKey("commodityBasicInfo");
+// const tabref2 = opertaor.getTableRefByKey("permissionAllo");
+
 const dzmodal = useDzModal();
 const orderIssuer = defineAsyncComponent(() => import("./OrderIssuer.vue"));
 const salesman = defineAsyncComponent(() => import("./Salesman.vue"));
 const agent = defineAsyncComponent(() => import("./Agent.vue"));
 const departmentTree = defineAsyncComponent(
-  () => import("./DepartmentTree.vue") 
+  () => import("./DepartmentTree.vue")
 );
 import { useRoute } from "vue-router";
 const route = useRoute();
 const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
 
 const { getRules } = useValidator();
 
@@ -35,29 +48,29 @@ const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "出单权限分配",
     endBtnsPosition: "right",
-    endBtns: [
-      createFreeButtonBase({
-        type: "primary",
-        label: "保存",
-        func: async () => {
-          const s = freeEditRef.value?.getFromValue(); //获取表单数据
-          saveProInfo(s)
-            .then((res) => {
-              const { code, data, msg } = res;
-              if (200 === code) {
-                ElMessage.success("保存成功");
-              } else {
-                ElMessage.error(msg);
-              }
-            })
-            .finally(() => {});
-        },
-      }),
-      createFreeButtonBase({
-        label: "返回",
-        func: () => {},
-      }),
-    ],
+    // endBtns: [
+    //   createFreeButtonBase({
+    //     type: "primary",
+    //     label: "保存",
+    //     func: async () => {
+    //       const s = freeEditRef.value?.getFromValue(); //获取表单数据
+    //       saveProInfo(s)
+    //         .then((res) => {
+    //           const { code, data, msg } = res;
+    //           if (200 === code) {
+    //             ElMessage.success("保存成功");
+    //           } else {
+    //             ElMessage.error(msg);
+    //           }
+    //         })
+    //         .finally(() => { });
+    //     },
+    //   }),
+    //   createFreeButtonBase({
+    //     label: "返回",
+    //     func: () => { },
+    //   }),
+    // ],
     fromSchema: [
       {
         prop: "cPertainDptCde",
@@ -75,21 +88,21 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             dzmodal
               .open(departmentTree, { type: "Issuer", data: {} })
               .then((res) => {
-             
+                console.log('row',res)
                 if (res.type === "ok") {
                   const selectObj = res.body;
                   freeEditRef.value.setValue(
-                                      "cPertainDptCde",
-                                      selectObj.id
-                                  );
+                    "cPertainDptCde",
+                    selectObj.id
+                  );
                   setFormItem("cPertainDptCde", {
-                                      loadData: [
-                                          {
-                                              label: `${selectObj.id}${selectObj.name}`,
-                                              value: selectObj.id,
-                                          },
-                                      ],
-                                  });
+                    loadData: [
+                      {
+                        label: `${selectObj.id}${selectObj.name}`,
+                        value: selectObj.id,
+                      },
+                    ],
+                  });
 
                 }
               });
@@ -102,22 +115,27 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "渠道大类",
         rules: [getRules("required", {})],
-        loadData: [
-          {
-            label: "13233",
-            value: "04",
-          },
-          {
-            label: "34234",
-            value: "05",
-          },
-        ],
+        func: (val: any) => {
+          if (val) {
+            //  查询中类 selelct
+            // setValue("cChaType", "");
+            // setValue("cChaSubType", "");
+            queryChaTypeList(val)
+          }
+        }
       },
       {
         prop: "cChaType",
         inputtype: "rtselect",
         title: "渠道中级分类",
         rules: [getRules("required", {})],
+        func: (val: any) => {
+          if (val) {
+            //  查询子类 selelct 
+            // setValue("cChaSubType", "");
+            queryCChaSubtype(val)
+          }
+        }
       },
       {
         prop: "cChaSubType",
@@ -142,21 +160,19 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 if (res.type === "ok") {
                   
                   const selectObj = res.body;
-                  freeEditRef.value.setValue(
-                                      "cDptCde",
-                                      selectObj.id
-                                  );
-
-
+                  freeEditRef.value?.setValue(
+                    "cDptCde",
+                    selectObj.id
+                  );
                   setFormItem("cDptCde", {
-                                      loadData: [
-                                          {
-                                              label: selectObj.name,
-                                              label: `${selectObj.id}${selectObj.name}`,
-                                              value: selectObj.id,
-                                          },
-                                      ],
-                                  });
+                    loadData: [
+                      {
+                        // label: selectObj.name,
+                        label: `${selectObj.id}${selectObj.name}`,
+                        value: selectObj.id,
+                      },
+                    ],
+                  });
                 }
               });
           },
@@ -164,7 +180,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
       },
       {
-        prop: "cOperGroup",
+        prop: "cOperId",
         inputtype: "rtselect",
         title: "出单员",
         btnWidth: 10,
@@ -174,12 +190,25 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           icon: "Search",
           type: "primary",
           func: () => {
+  
             // const ck = freeEditRef.value?.getValue("componentGroup");
             dzmodal
               .open(orderIssuer, { type: "Issuer", data: {} })
-              .then((res) => {
+              .then((res:any) => {
                 if (res.type === "ok") {
-                  // freeEditRef.value?.setValue("componentGroup", res.body);
+                  const selectObj = res.body;
+                  freeEditRef.value?.setValue(
+                    "cOperId",
+                    selectObj.cSlsCde
+                  );
+                  setFormItem("cOperId", {
+                    loadData: [
+                      {
+                        label: selectObj.cSlsNme,
+                        value: selectObj.cSlsCde,
+                      },
+                    ],
+                  });
                 }
               });
           },
@@ -197,10 +226,24 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           icon: "Search",
           type: "primary",
           func: () => {
-            // const ck = freeEditRef.value?.getValue("componentGroup");
-            dzmodal.open(salesman, { type: "sales", data: {} }).then((res) => {
+            dzmodal.open(salesman, { type: "sales", data: {...tabref.getFromValue(),...getFromValue()} }).then((res) => {
+              console.log('业务员',res)
               if (res.type === "ok") {
-                // freeEditRef.value?.setValue("componentGroup", res.body);
+                const selectObj = res.body;
+                freeEditRef.value.setValue(
+                  "cSlsGroup",
+                  selectObj.CSlsNme
+                );
+                setFormItem("cSlsGroup", {
+                  loadData: [
+                    {
+                      label: selectObj.CSlsNme,
+                      value: selectObj.CSlsCde,
+                    },
+                  ],
+                });
+
+
               }
             });
           },
@@ -218,11 +261,24 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           type: "primary",
           func: () => {
             // const ck = freeEditRef.value?.getValue("componentGroup");
-            dzmodal.open(agent, { cProdNo: '',type: "sales", data: {} }).then((res) => {
-              console.log(res,78)
+            
+            dzmodal.open(agent, { cProdNo: '', type: "sales", data: getFromValue() }).then((res) => {
+          
               if (res.type === "ok") {
-                // freeEditRef.value?.setValue("componentGroup", res.body);
-           
+                const selectObj = res.body;
+                freeEditRef.value.setValue(
+                  "cBrkrCde",
+                  selectObj.CChaNme
+                );
+                setFormItem("cBrkrCde", {
+                  loadData: [
+                    {
+                      label: selectObj.CChaNme,
+                      value: selectObj.CChaCde,
+                    },
+                  ],
+                });
+
               }
             });
           },
@@ -235,8 +291,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       },
       {
         prop: "nPropFeeRate",
-        inputtype: "rtinput",
+        inputtype: "rtnumber",
         title: "手续费比例",
+        max: 1,
+        min: 0
       },
       {
         prop: "cBusinessTel",
@@ -254,6 +312,88 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     }),
   })
 );
+
+// 查询  渠道大类
+const queryCBsnsTyp = (category) => {
+  let CDptCde = JSON.parse(sessionStorage.getItem("user")).companyId;
+  const params = {
+    CDptCde,
+    CKindNo: category,
+  };
+  //查询大类数据，用于默认回显
+  getBsnsTypList(params).then((res) => {
+    const { code, data, msg } = res;
+    if (code === 200) {
+      setFormItem("cBsnsTyp", {
+        loadData: data
+      });
+    } else {
+      ElMessage.error(msg);
+    }
+  });
+}
+
+
+// 查询  渠道中类
+const queryChaTypeList = (val: any) => {
+
+  getChaTypeList({ BsnsTyp: val ,scene:'' }).then((res) => {
+    const { code, data, msg } = res;
+    console.log(res)
+    if (code === 200) {
+      setFormItem("cChaType", {
+        loadData: data
+      });
+    } else {
+      ElMessage.error(msg);
+    }
+  });
+}
+
+// 查询  渠道子类
+const queryCChaSubtype = (val: any) => {
+  const param = {
+    CChaType: val,
+    flag: 1,
+    scene:''
+  };
+  getChaSubtypList(param).then((res) => {
+    const { code, data, msg } = res;
+    if (code === 200) {
+      setFormItem("cChaSubType", {
+        loadData: data
+      });
+    } else {
+      ElMessage.error(msg);
+    }
+  });
+}
+
+
+onMounted(() => {
+  eventBus.on('cKindNo-change', queryCBsnsTyp)
+  if (param.editType === "edit") {
+    setDisa();
+  }
+
+
+  if (param.editType!== 'add'  &&  param.editType!== 'edit' && param.editType) {
+    // handleQuery();
+    // setDisa();
+    freeEditRef.value?.setDisabledAll();
+  }
+
+});
+
+
+
+
+// 组件卸载时移除事件监听（避免内存泄漏）
+onUnmounted(() => {
+  eventBus.off('cKindNo-change', queryCBsnsTyp)
+})
+
+
 
 //给表单下拉项赋值
 function setFormItem(key: any, obj: any) {
@@ -301,11 +441,7 @@ function setDisa() {
   });
 }
 
-onMounted(() => {
-  if (param.editType === "edit") {
-    setDisa();
-  }
-});
+
 
 defineExpose({
   getFromValue,

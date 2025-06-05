@@ -75,7 +75,8 @@ const getCComponentTableValue = (cProdNo: string, title: string): string => {
     } else if (title == "车辆清单") {
       return "VehicleDist";
     } else if (title == "车辆清单汇总") {
-      return "DistSummary";
+      // return "DistSummary";
+      return "VehicleDist";
     }
   } else if (cProdNo == "040003") {
     if(title == "产品清单"){

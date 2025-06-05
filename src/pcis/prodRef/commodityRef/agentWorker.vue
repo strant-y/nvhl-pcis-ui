@@ -176,6 +176,8 @@ function handleQuery(flag?: boolean) {
         leading: props.data.data['leading'],
 
     }, param);
+
+    console.log('param', params)
     policyService.getWebOrgSelsList(params).then((res: any) => {
       if (res && res["code"] === 200) {
         const pageData = res.data;

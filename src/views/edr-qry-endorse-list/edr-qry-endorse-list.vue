@@ -273,7 +273,7 @@
             editFlag: true,
             editList: ["id", "iddetail"],
             tableBtnType: "btn",
-            tableBtnWidth: 220,
+            tableBtnWidth: 100,
             tableBtnPosition: "right",
             tableBtn: [
                 createFreeButtonBase({
@@ -304,16 +304,19 @@
                     prop: "cAppNo",
                     inputtype: "rtinput",
                     title: "申请单号",
+                    width:155,
                 },
                 {
                     prop: "cPlyNo",
                     inputtype: "rtinput",
                     title: "保单号",
+                    width:155,
                 },
                 {
                     prop: "cEdrNo",
                     inputtype: "rtinput",
                     title: "批单号",
+                    width:155,
                 },
                 {
                     prop: "cAppNme",

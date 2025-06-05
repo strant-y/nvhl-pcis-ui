@@ -17,6 +17,7 @@ const route = useRoute();
 const param = route.params.param;
 import { useProductStore } from "@/store/modules/prod";
 import { log } from "console";
+import { set } from "lodash";
 const productStore = useProductStore();
 
 const props = defineProps({
@@ -25,6 +26,11 @@ const props = defineProps({
     required: true,
   },
 });
+// const props = defineProps({
+//   param: {
+//     type: Object,
+//   },
+// });
 
 const rowData = ref(null)
 const freeEditRef = ref<AppGridEditMethod | null>(null);
@@ -37,7 +43,17 @@ onMounted(async () => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
-  // ciAdd();
+  //一般批改，部分要素可编辑
+  if (param.pageType === "EDR_APP_NEW_SCENE" &&  productStore.cCiMrk !== "0") {
+    formconfig1.editFlag = true;
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === 'Ci.cChiefMrk' || item.prop === 'Ci.cIssueMrk') {
+        item.disabled = true; // 设置为不可编辑
+      } else {
+        item.disabled = false; // 其他字段可以编辑
+      }
+    });
+  }
   nextTick(() => {
     freeEditRef?.value.forEach(row => {
       if (row["Ci.cCoinsurerCde"] !== "327001") {
@@ -53,7 +69,7 @@ onMounted(async () => {
       loadData: [
         { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm}` },
       ],
-    }); 
+    });
   });
 });
 
@@ -85,12 +101,17 @@ const method = {
           key['Ci.nSeqNo']=index+1
       });
   },
-  //机构部门下拉事件
+  //共保公司下拉事件
   cCoinsurerCdeChange:(val)=>{
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData._dataId;
+    if(productStore.cCiMrk == "5" && val !== "327001"){
+      freeEditRef?.value?.setValueByRowKey("Ci.cCoinsurerCde",rowId,"")
+      ElMessage.error("司内联保，不能录入除永安以外的其他公司！");
+      return;
+    }
     if(val ==="327001"){
-      freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde",rowId,"")
+    freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde",rowId,"")
     codeListStore
         .queryCodeList({
           codeListName: "Comm_Code_LIST",
@@ -111,6 +132,25 @@ const method = {
       );
     }
   },
+  //分公司下拉事件
+  cSubDptCdeChange:(val)=>{
+    const rowData = freeEditRef.value?.getSelectRow();
+    const rowId = rowData._dataId;
+    freeEditRef?.value?.setValueByRowKey("Ci.cDptCde",rowId,"")
+    codeListStore
+        .queryCodeList({
+          codeListName: "CDptCde_List",
+          codeListParam: { "CDptCde": val },
+        })
+        .then((res) => {
+          freeEditRef.value?.setRowFieldProp(
+            rowId,
+            "Ci.cDptCde",
+            "loadData",
+            res,
+          );
+        });
+  },
   //出单标志下拉事件
   clssueMrkChange:  (val)=>{
     // const rowData = freeEditRef.value?.getSelectRow();
@@ -129,8 +169,8 @@ const method = {
     }
     const nPrm =  parseFloat(productStore.nPrm) * parseFloat(val)
     const nAmt = parseFloat(productStore.nAmt) * parseFloat(val)
-    freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm",rowDatas._dataId,nPrm)
-    freeEditRef?.value?.setValueByRowKey("Ci.nCiAmt",rowDatas._dataId,nAmt)
+    freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm",rowDatas._dataId,nPrm.toFixed(8))
+    freeEditRef?.value?.setValueByRowKey("Ci.nCiAmt",rowDatas._dataId,nAmt.toFixed(8))
     if(rowDatas["Ci.cCoinsurerCde"] == "327001"){
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntAmt",nAmt)  //联保总保额
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm",nPrm) //联保总保费
@@ -142,8 +182,21 @@ const method = {
     const rowDatas = freeEditRef.value?.getSelectRow();
     const nPlyFee = parseFloat(val) * parseFloat(rowDatas["Ci.nCiPrm"])
     freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee",rowDatas._dataId,nPlyFee)
+  },
+  //联共保批改时不禁用部分要素
+  setItemReadonly:()=> {
+    const pageType = param.pageType;  //
+    const cCiMrk =productStore.cCiMrk;  //是否联共保
+    debugger
+    if (pageType === "EDR_APP_NEW_SCENE" &&  cCiMrk !== "0") {
+      formconfig1.fromSchema?.forEach((item) => {
+        item.disabled = false;
+      });
+    }
+    console.log("setItemReadonly",formconfig1.fromSchema);
   }
 };
+
 //给表单下拉项赋值
 const setFormItem = (key, obj) => {
   if (obj && Object.keys(obj).length) {
