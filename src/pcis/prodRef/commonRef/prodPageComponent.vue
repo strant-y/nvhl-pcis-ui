@@ -17,6 +17,8 @@ import {
   getComponentList,
   queryPageComponents,
   savePageComonent,
+  saveInquiryPageComponent,
+  queryInquiryPageComponents,
 } from "@/api/prod";
 import {
   AppTableConfig,
@@ -27,6 +29,7 @@ import { codeListViewStore } from "@/store";
 const emits = defineEmits(["ok", "cancel"]);
 const props = defineProps({
   data: Object,
+  component: String,
 });
 const codeListStore = codeListViewStore();
 let dataList = ref<any[]>([]);
@@ -160,16 +163,29 @@ const saveBtn = createFreeButtonBase({
     const params = Object.assign(props.data, {
       pageComponents: param,
     });
-    savePageComonent(params)
-      .then((res) => {
-        const { code, data, msg } = res;
-        if (200 === code) {
-          ElMessage.success("保存成功");
-        } else {
-          ElMessage.error(msg);
-        }
-      })
-      .finally(() => {});
+    if(props.component === "priceComponent") {
+      saveInquiryPageComponent(params)
+        .then((res) => {
+          const { code, data, msg } = res;
+          if (200 === code) {
+            ElMessage.success("保存成功");
+          } else {
+            ElMessage.error(msg);
+          }
+        })
+        .finally(() => {});
+    } else {
+      savePageComonent(params)
+        .then((res) => {
+          const { code, data, msg } = res;
+          if (200 === code) {
+            ElMessage.success("保存成功");
+          } else {
+            ElMessage.error(msg);
+          }
+        })
+        .finally(() => {});
+    }
   },
 });
 function updateOption(params: any, dataId: string, props: string) {
@@ -197,26 +213,50 @@ function updateOption(params: any, dataId: string, props: string) {
 }
 
 onMounted(() => {
-  queryPageComponents(props.data)
-    .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
-        tableRef.value?.setFormValue(data);
-        setTimeout(() => {
-          const tabData = tableRef.value?.getFromValue();
-          Object.keys(tabData).forEach((key) => {
-            console.log(tabData[key]);
-            const sdata = tabData[key];
-            const params = {
-              cComponentTab: sdata.cComponentTab,
-            };
-            updateOption(params, sdata._dataId, "cComponentKey");
-          });
-        }, 100);
-      } else {
-        ElMessage.error(msg);
-      }
-    })
-    .finally(() => {});
+  if(props.component === "priceComponent") {
+    queryInquiryPageComponents(props.data)
+      .then((res) => {
+        const { code, data, msg } = res;
+        if (200 === code) {
+          tableRef.value?.setFormValue(data);
+          setTimeout(() => {
+            const tabData = tableRef.value?.getFromValue();
+            Object.keys(tabData).forEach((key) => {
+              console.log(tabData[key]);
+              const sdata = tabData[key];
+              const params = {
+                cComponentTab: sdata.cComponentTab,
+              };
+              updateOption(params, sdata._dataId, "cComponentKey");
+            });
+          }, 100);
+        } else {
+          ElMessage.error(msg);
+        }
+      })
+      .finally(() => {});
+  } else {
+    queryPageComponents(props.data)
+      .then((res) => {
+        const { code, data, msg } = res;
+        if (200 === code) {
+          tableRef.value?.setFormValue(data);
+          setTimeout(() => {
+            const tabData = tableRef.value?.getFromValue();
+            Object.keys(tabData).forEach((key) => {
+              console.log(tabData[key]);
+              const sdata = tabData[key];
+              const params = {
+                cComponentTab: sdata.cComponentTab,
+              };
+              updateOption(params, sdata._dataId, "cComponentKey");
+            });
+          }, 100);
+        } else {
+          ElMessage.error(msg);
+        }
+      })
+      .finally(() => {});
+  }
 });
 </script>
