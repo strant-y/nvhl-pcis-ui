@@ -86,7 +86,7 @@ const componentMap = {
   acctinfoRef: acctinfoRef,
   distRef: distRef,
   distSummaryRef:distSummaryRef,
-  deductibleDistRef:deductibleDist,
+  DeductibleDist:deductibleDist,
   ciRef: ciRef,
   ciMasterAgreementRef: ciMasterAgreementRef,
   ourCompanyCiShareRef: ourCompanyCiShareRef,
