@@ -1,5 +1,5 @@
 <template>
-  <app-free-edit    :freeEditConfig="formconfig1" ref="tgtobjEditRef" /> 
+  <app-free-edit :freeEditConfig="formconfig1" ref="tgtobjEditRef" />
 </template>
 
 <script setup lang="ts">
@@ -19,170 +19,173 @@ const props = defineProps({
     type: [Object],
     required: true,
   },
- 
 });
 
-let cRsnDetailCde = ref(route.params.param?.cRsnDetailCde);
+let cRsnDetailCde = ref(opertaor.getParam()?.cRsnDetailCde);
 const tgtobjEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));
-let  para =[]
+let para: any[] = [];
 
 onMounted(() => {
-const routeData = route.params ; // 获取路由参数 
-  console.log("路由参数props.param1212", routeData.param,);
-   // console.log('pay form' ,props.pageSchema.fromSchema[2].disabled = false)
+  const routeData = route.params; // 获取路由参数
+  console.log("路由参数props.param1212", routeData.param);
+  // console.log('pay form' ,props.pageSchema.fromSchema[2].disabled = false)
 
-    const formconfig11 = formInit(
+  const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
     method,
     exRules
   );
 
-  console.log('数据',formconfig11)
+  console.log("数据", formconfig11);
   Object.assign(formconfig1, formconfig11);
 
   canOperateForm();
-     
 });
 
 // 可以操作的配置项处理  身份认真里面的几项
-const canOperateForm= ()=>{
-    setFormItem("Acctinfo.cAcctNo", {
-        disabled: false,
-        // rules: [getRules("required", {})],
-      });
-    setFormItem("Acctinfo.cBankRelTyp", {
-        disabled: false,
-        // rules: [getRules("required", {})],
-      });
-    setFormItem("Acctinfo.cBankPro", {
-        disabled: false,
-        // rules: [getRules("required", {})],
-      });
-    setFormItem("Acctinfo.cBankArea", {
-        disabled: false,
-        // rules: [getRules("required", {})],
-      });
-    setFormItem("Acctinfo.cBankCounty", {
-        disabled: false,
-        // rules: [getRules("required", {})],
-      });
-    // setFormItem("Acctinfo.cBankCde", {
-    //     disabled: false,
-    //     // rules: [getRules("required", {})],
-    //   });
-    setFormItem("Acctinfo.cBankAddr", {
-        disabled: false,
-        // rules: [getRules("required", {})],
-      });
-    setFormItem("Acctinfo.cPubPri", {
-        disabled: false,
-        // rules: [getRules("required", {})],
-      })
-}
+const canOperateForm = () => {
+  setFormItem("Acctinfo.cAcctNo", {
+    disabled: false,
+    // rules: [getRules("required", {})],
+  });
+  setFormItem("Acctinfo.cBankRelTyp", {
+    disabled: false,
+    // rules: [getRules("required", {})],
+  });
+  setFormItem("Acctinfo.cBankPro", {
+    disabled: false,
+    // rules: [getRules("required", {})],
+  });
+  setFormItem("Acctinfo.cBankArea", {
+    disabled: false,
+    // rules: [getRules("required", {})],
+  });
+  setFormItem("Acctinfo.cBankCounty", {
+    disabled: false,
+    // rules: [getRules("required", {})],
+  });
+  // setFormItem("Acctinfo.cBankCde", {
+  //     disabled: false,
+  //     // rules: [getRules("required", {})],
+  //   });
+  setFormItem("Acctinfo.cBankAddr", {
+    disabled: false,
+    // rules: [getRules("required", {})],
+  });
+  setFormItem("Acctinfo.cPubPri", {
+    disabled: false,
+    // rules: [getRules("required", {})],
+  });
+};
 
 // 绑定方法
 const method = {
   // func demo
-  cBankRelTypFun: (val:any) => {
-    console.log(313,val)
+  cBankRelTypFun: (val: any) => {
+    console.log(313, val);
 
-             para= val.split('_');
-            const bankname = para[1];  	// 银行名称
-            const isdefault = para[2]; 	// 是否默认值
-            const banktype = para[3];  	// 银行大类
-            console.log(para)
-            // 1直连银行 开户行 省、市、对公对私必填   0是非直联，开户行 省、市、区/县、开户行、对公对私必填
-            if (isdefault === '1') {    
-              setFormItem("Acctinfo.cBankPro", {
-             
-                rules: [getRules("required", {})],
-              });
-              setFormItem("Acctinfo.cBankArea", {
-                disabled: true,
-                rules: [getRules("required", {})],
-              });
+    para = val.split("_");
+    const bankname = para[1]; // 银行名称
+    const isdefault = para[2]; // 是否默认值
+    const banktype = para[3]; // 银行大类
+    console.log(para);
+    // 1直连银行 开户行 省、市、对公对私必填   0是非直联，开户行 省、市、区/县、开户行、对公对私必填
+    if (isdefault === "1") {
+      setFormItem("Acctinfo.cBankPro", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Acctinfo.cBankArea", {
+        disabled: true,
+        rules: [getRules("required", {})],
+      });
 
-              setFormItem("Acctinfo.cBankCounty", {
-                disabled: true,
-                rules: [getRules("required", {})],
-              });
+      setFormItem("Acctinfo.cBankCounty", {
+        disabled: true,
+        rules: [getRules("required", {})],
+      });
 
+      // 对公对私
+      setFormItem("Acctinfo.cPubPri", {
+        rules: [getRules("required", {})],
+      });
+    } else {
+      setFormItem("Acctinfo.cBankPro", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Acctinfo.cBankArea", {
+        disabled: true,
+        rules: [getRules("required", {})],
+      });
 
-              // 对公对私
-              setFormItem("Acctinfo.cPubPri", {
-                rules: [getRules("required", {})],
-              });
-            }else {
-              setFormItem("Acctinfo.cBankPro", {
-                rules: [getRules("required", {})],
-              });
-              setFormItem("Acctinfo.cBankArea", {
-                disabled: true,
-                rules: [getRules("required", {})],
-              });
+      setFormItem("Acctinfo.cBankCounty", {
+        disabled: true,
+        rules: [getRules("required", {})],
+      });
 
-              setFormItem("Acctinfo.cBankCounty", {
-                disabled: true,
-                rules: [getRules("required", {})],
-              });
+      setFormItem("Acctinfo.cPubPri", {
+        rules: [getRules("required", {})],
+      });
+    }
 
+    // 清空开户行
 
-              setFormItem("Acctinfo.cPubPri", {
-                rules: [getRules("required", {})],
-              });
-            }
-            
-            // 清空开户行
-           
-            setValue("Acctinfo.cBankPro",'')
-            setValue("Acctinfo.cBankArea",'')
-            setValue("Acctinfo.cBankCounty",'')
-            setFormItem("Acctinfo.cBankCde", {
-                 disabled: true,
-              });
+    if (isdefault === "1") {
+      setValue("Acctinfo.cBankPro", "");
+      setValue("Acctinfo.cBankArea", "");
+      setValue("Acctinfo.cBankCounty", "");
+      setValue("Acctinfo.cBankAddr", bankname);
+    } else {
+      setValue("Acctinfo.cBankAddr", null);
+
+      const data = tgtobjEditRef.value?.getFromValue();
+      const cBankCde = data["Acctinfo.cBankCde"];
+
+      if (cBankCde !== null && cBankCde !== "" && cBankCde !== "undefined") {
+        const arrayCBankCde = cBankCde.split("_");
+        const codeCBankCde = arrayCBankCde[0];
+        const nameCBankCde = arrayCBankCde[1];
+        setValue("Acctinfo.cBankAddr", nameCBankCde);
+        setValue("Acctinfo.cBankCnaps", codeCBankCde);
+      }
+    }
+    setFormItem("Acctinfo.cBankCde", {
+      disabled: true,
+    });
   },
 
   // 开户行省    市 cCityChange    县 cCountyChange
-  cProvinceChange:(e)=>{
-    console.log(555,e)
+  cProvinceChange: (e: any) => {
+    console.log(555, e);
     setFormItem("Acctinfo.cBankArea", {
-                disabled: false,
-                codeParam: { 'areaprovince': e },
-                rules: [getRules("required", {})],
-              });
-
+      disabled: false,
+      codeParam: { areaprovince: e },
+      rules: [getRules("required", {})],
+    });
   },
   // 开户行 查询
-  cBankCdeFunc:()=>{
-
-  },
-  cCityChange:(e)=>{
- 
+  cBankCdeFunc: () => {},
+  cCityChange: (e: any) => {
     setFormItem("Acctinfo.cBankCounty", {
-              codeParam: { 'areaname': e},
-                disabled: false,
-                rules: [getRules("required", {})],
-              });
+      codeParam: { areaname: e },
+      disabled: false,
+      rules: [getRules("required", {})],
+    });
   },
-  cCountyChange:(val)=>{
-    console.log(5556,para[3],val)
- 
+  cCountyChange: (val: any) => {
+    console.log(5556, para[3], val);
 
-      setFormItem("Acctinfo.cBankCde", {
-                 disabled: false,
-                codeParam: { 'banktypecod': para[3],'areacode':val},
-                rules: [getRules("required", {})],
-              });
-
+    setFormItem("Acctinfo.cBankCde", {
+      disabled: false,
+      codeParam: { banktypecod: para[3], areacode: val },
+      rules: [getRules("required", {})],
+    });
   },
-
 };
 
-
 //给表单下拉项赋值
-const setFormItem = (key, obj) =>{
+const setFormItem = (key: any, obj: any) => {
   if (obj && Object.keys(obj).length) {
     formconfig1.fromSchema?.forEach((item) => {
       if (item.prop === key) {
@@ -203,7 +206,7 @@ const setFormItem = (key, obj) =>{
       }
     });
   }
-}
+};
 
 // 绑定特殊验证器
 const exRules = {};
@@ -228,7 +231,7 @@ function getValue(key: string) {
   return tgtobjEditRef?.value?.getValue(key);
 }
 
-function getFormconfig(){
+function getFormconfig() {
   return formconfig1;
 }
 

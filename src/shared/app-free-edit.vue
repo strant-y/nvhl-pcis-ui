@@ -44,7 +44,7 @@
                   </el-button-group>
                   <a
                     style="margin-left: 20px"
-                    @click="showMyfrom = !showMyfrom"
+                    @click="changeMyfrom()"
                     v-if="
                       freeEditConfig.showMyfromBtm
                         ? freeEditConfig.showMyfromBtm
@@ -135,8 +135,16 @@ const props = defineProps({
 const { freeEditConfig } = toRefs(props);
 const emits = defineEmits(["updateDatas"]); // 父组件监听事件，同步子组件值的变化给父组件
 
+const formData = ref({});   // 临时存储数据,用于折叠式,数据回显
 function updateDatas(newDatas: any) {
+  formData.value = newDatas;
   emits("updateDatas", newDatas);
+}
+function changeMyfrom() {
+  showMyfrom.value = !showMyfrom.value;
+  nextTick(() => {
+    dynamicForm.value?.setFormValue(formData.value);
+  });
 }
 const showMyfrom = ref(false);
 showMyfrom.value = props.freeEditConfig?.showMyfrom
