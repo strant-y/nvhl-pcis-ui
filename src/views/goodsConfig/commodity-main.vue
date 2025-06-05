@@ -50,12 +50,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       }),
       createFreeButtonBase({
         label: "重置",
-        func: () => {},
+        func: () => {
+          freeEditRef.value?.resetFields();
+          // handleQuery();
+        }, 
       }),
     ],
     fromSchema: [
       {
-        prop: "cKindNme",
+        prop: "cKindNo",
         inputtype: "rtselect",
         title: "险种大类",
         typeCode: "KIND_LIST_GRT",
@@ -66,7 +69,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable: true,
       },
       {
-        prop: "cProdNme",
+        prop: "cProdNo",
         inputtype: "rtselect",
         title: "险种名称",
         typeCode: "PROD_LIST_GRT",
@@ -157,6 +160,14 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         size: "large",
         icon: "Edit",
+        hideBtns: (row: any) => {
+            // &&    param.editType !== "edit" 
+          if ( row.cStatus === '0' ||row.cStatus === '3' || row.cStatus === '6' ) {
+            return false;
+          } else {
+            return true;
+          }
+        },
         tableClick: (row) => {
           router.push({
             path: "/goodsConfig/commodityEdit",
@@ -164,6 +175,51 @@ const tableconfig = reactive<AppTableConfig>(
               param: JSON.stringify({
                 editType: "edit",
                 cCommodityNo: row.cCommodityNo,
+              }),
+            },
+          });
+        },
+      }),
+      createFreeButtonBase({
+        id: "score",
+        link: true,
+        tooltip: "提交审核",
+        type: "success",
+        size: "large",
+        icon: "Upload",
+        hideBtns: (row: any) => {
+          if ( row.cStatus === '2' ) {
+            return false;
+          } else {
+            return true;
+          }
+        },
+        tableClick: (row) => {
+          router.push({
+            path: "/goodsConfig/commodityEdit",
+            query: {
+              param: JSON.stringify({
+                editType: "upload",
+                cCommodityNo: row.cCommodityNo,
+              }),
+            },
+          });
+        },
+      }),
+      createFreeButtonBase({
+        id: "score",
+        link: true,
+        tooltip: "查看",
+        type: "success",
+        size: "large",
+        icon: "View",
+        tableClick: (row) => {
+          router.push({
+            path: "/goodsConfig/commodityEdit",
+            query: {
+              param: JSON.stringify({
+                editType: "view",
+                cCommodityNo:row.cCommodityNo,
               }),
             },
           });
@@ -189,17 +245,30 @@ const tableconfig = reactive<AppTableConfig>(
       //   .finally(() => {});
       //   },
       // }),
+
+
+   
     ],
     fromSchema: [
       {
-        prop: "cKindNme",
-        inputtype: "rtinput",
+        prop: "cKindNo",
+        inputtype: "rtselect",
+        typeCode: "KIND_LIST_GRT",
+        codeParam: {
+          cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+          cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+        },
         title: "险种大类",
       },
       {
-        prop: "cProdNme",
+        prop: "cProdNo",
         inputtype: "rtselect",
         title: "险种名称",
+        typeCode: "PROD_LIST_GRT",
+                codeParam: {
+                    cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+                    cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+                },
       },
       {
         prop: "cCommodityNo",
@@ -208,32 +277,53 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "cCommodityCn",
-        inputtype: "rtselect",
+        inputtype: "rtinput",
         title: "商品名称",
       },
       {
         prop: "cPlatformCn",
-        inputtype: "rtselect",
+        inputtype: "rtinput",
         title: "平台名称",
       },
       {
         prop: "cIsOpenCommodity",
         inputtype: "rtselect",
         title: "是否全国性商品",
+           loadData:[
+          {value: '0',label:'否'},
+          { value: "1",  label: "是" },
+        ]
       },
       {
         prop: "cStatus",
         inputtype: "rtselect",
         title: "状态",
+        // codeListName: '',
+        // codeListParam: 
+        typeCode: "BAS_COMM_CODE_OUT_CDE",
+        codeParam: {
+          cParCde: 'commodity_status'
+          // cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+          // cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+        },
+
+        // loadData:[
+        //   {value: '0',label:'禁用'},
+        //   { value: "1",  label: "启用" },
+        // ]
       },
       {
         prop: "cEnableStatus",
         inputtype: "rtselect",
         title: "启用状态",
+        loadData:[
+          {value: '0',label:'禁用'},
+          { value: "1",  label: "启用" },
+        ]
       },
       {
         prop: "tCrtTm",
-        inputtype: "rtdatetime",
+        inputtype: "rtinput",
         title: "启用时间",
       },
     ],

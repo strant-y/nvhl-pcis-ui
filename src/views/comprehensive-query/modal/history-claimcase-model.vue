@@ -536,13 +536,21 @@ nextTick(() => {
 
 // 初始化年度查询
 const handleQuery = () => {
+  // let DataAll = opertaor.getDataAll()['applicant']['Applicant.cClntMrk']
+  // let DataAll2 = opertaor.getDataAll()['insured']['Insured.cClntMrk'];
+ 
 
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const r = tableRef.value?.getPartnerPage(); //获取分页数据
 
-
+  
  
   let params = { ...s }
+  if(s.cCstomerType=='01'){
+    params.cClntMrk = opertaor.getDataAll()['applicant']['Applicant.cClntMrk'];
+  }else{
+    params.cClntMrk = opertaor.getDataAll()['insured']['Insured.cClntMrk'];
+  }
 
   console.log('params', params)
   pcisQueryService.qryHistoryClaimYearAll(params).then((res: any) => {
