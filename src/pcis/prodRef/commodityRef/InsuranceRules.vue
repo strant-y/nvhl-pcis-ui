@@ -15,11 +15,12 @@ import { saveProInfo, getCommodityRule } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
 import { useDzModal } from "@/common/dzmodel/DzModalService";
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
 const dzmodal = useDzModal();
 import { useRoute } from "vue-router";
 const route = useRoute();
 const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
 
 const { getRules } = useValidator();
 
@@ -112,8 +113,6 @@ const handleQuery = () => {
   getCommodityRule(newparam)
     .then((res) => {
       const { code, data, msg } = res;
-      console.log('数据', res)
-
       if (200 === code) {
 
 

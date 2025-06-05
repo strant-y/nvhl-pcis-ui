@@ -15,7 +15,7 @@
       </div>
 
       <!-- 消息 -->
-      <div ref="buttonRef" class="setting-word" v-click-outside="showPopover"
+      <div ref="buttonRef" class="setting-word"  v-click-outside="showPopover"
         style="position: relative;display: inline-block;">
         <el-icon style="font-size: 20px; ">
           <bell />
