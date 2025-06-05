@@ -11,7 +11,7 @@ import {
 } from "@/shared/app-free-edit-config";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
-import { saveProInfo ,getCommodityRule} from "@/api/prod";
+import { saveProInfo, getCommodityRule } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
 import { useDzModal } from "@/common/dzmodel/DzModalService";
@@ -66,7 +66,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         // rules: [getRules("required", {})],
       },
       {
-        prop: "nDispOrd",
+        prop: "nMaxAge",
         inputtype: "rtinput",
         title: "被保人年龄上限（含）",
       },
@@ -74,12 +74,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cSex",
         inputtype: "rtselect",
         title: "被保人性别",
-        // codeType: "Sex_List",
-        // params: "",
-        loadData: [
-          { label: "男", value: "男" },
-          { label: "女", value: "女" },
-        ],
+        typeCode: "Sex_List",
+ 
+        // loadData: [
+        //   { label: "男", value: "男" },
+        //   { label: "女", value: "女" },
+        // ],
       },
       {
         prop: "cSocialSec",
@@ -107,17 +107,18 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 );
 
 
-const handleQuery=()=>{
+const handleQuery = () => {
   const newparam = { cCommodityNo: param.cCommodityNo };
   getCommodityRule(newparam)
     .then((res) => {
       const { code, data, msg } = res;
-      console.log('数据',res)
-      freeEditRef.value?.setDisabledAll();
+      console.log('数据', res)
+
       if (200 === code) {
+
+
         freeEditRef?.value?.setFormValue(data);
 
-        // freeEditRef.value?.setDisabledAll();
       } else {
         // ElMessage.error(msg);
       }
@@ -161,10 +162,19 @@ onMounted(() => {
   // }
 
 
-  if (param.editType === "edit" || param.editType === 'view' || param.editType === 'review') {
+  if (param.editType !== 'add' && param.editType) {
 
     handleQuery();
+
+    if (param.editType !== "edit") {
+      freeEditRef.value?.setDisabledAll();
     }
+
+  }
+
+
+
+
 });
 
 defineExpose({

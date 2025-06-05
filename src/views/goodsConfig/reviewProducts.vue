@@ -121,10 +121,47 @@ const tableconfig = reactive<AppTableConfig>(
       createFreeButtonBase({
         id: "score",
         link: true,
-        tooltip: "查看",
+        tooltip: "处理",
         type: "success",
         size: "large",
         icon: "Edit",
+        hideBtns: (row: any) => {
+            // &&    param.editType !== "edit" 
+          if ( row.cStatus === '1' || row.cStatus === '4') {
+            return false;
+          } else {
+            return true;
+          }
+        },
+        tableClick: (row) => {  //cStatus
+          router.push({
+            path: "/goodsConfig/commodityEdit",
+            query: {
+              param: JSON.stringify({
+                editType: "handle",
+                cCommodityNo:row.cCommodityNo,
+                cPkId: row.cPkId
+                // prodNo: row.cProdNo,
+              }),
+            },
+          });
+        },
+      }),
+      createFreeButtonBase({
+        id: "score",
+        link: true,
+        tooltip: "查看",
+        type: "success",
+        size: "large",
+        icon: "View",
+        hideBtns: (row: any) => {
+            // &&    param.editType !== "edit" 
+          if ( row.cStatus !== '1' && row.cStatus !== '4') {
+            return false;
+          } else {
+            return true;
+          }
+        },
         tableClick: (row) => {
           router.push({
             path: "/goodsConfig/commodityEdit",
@@ -132,7 +169,7 @@ const tableconfig = reactive<AppTableConfig>(
               param: JSON.stringify({
                 editType: "review",
                 cCommodityNo:row.cCommodityNo,
-                cPkId: row.cCommodityNo
+                cPkId: row.cPkId
                 // prodNo: row.cProdNo,
               }),
             },
@@ -177,7 +214,7 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "cCommodityCn",
-        inputtype: "rtselect",
+        inputtype: "rtinput",
         title: "商品名称",
       },
       {
@@ -192,7 +229,9 @@ const tableconfig = reactive<AppTableConfig>(
   })
 );
 
-onMounted(async () => {});
+onMounted(() => {
+  handleQuery();
+});
 
 /** 查询 */
 function handleQuery(flag?: boolean) {

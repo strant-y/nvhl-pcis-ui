@@ -231,7 +231,7 @@ const tableconfig = reactive<AppTableConfig>(
         link: true,
         hideBtns: (row: any) => {
             console.log(param.editType === "view"  )
-          if (            param.editType !== "view"   ) {
+          if (param.editType === 'add' ||  param.editType === 'edit'|| !param.editType ) {
             return false;
           } else {
             return true;
@@ -260,7 +260,7 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "Edit",
           hideBtns: (row: any) => {
             // &&    param.editType !== "edit" 
-          if (            param.editType !== "view"      ) {
+          if ( param.editType === 'add' ||  param.editType === 'edit'||  !param.editType) {
             return false;
           } else {
             return true;
@@ -425,7 +425,7 @@ const handleVisibleUpdate = (value: boolean) => {
 };
 onMounted(() => {
   console.log('path')
-  if (param.editType === "edit" || param.editType === 'view' || param.editType === 'review') {
+  if (param.editType!== 'add' && param.editType) {
     // setDisa();
     // const newparam = { cCommodityNo: param.cCommodityNo };
    

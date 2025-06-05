@@ -1,4 +1,4 @@
-<!-- 商品发布 -->
+<!--商品审核--》 商品发布 -->
 <template>
   <div class="app-container">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
@@ -124,6 +124,26 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtnWidth: 220,
     tableBtnPosition: "right",
     tableBtn: [
+    createFreeButtonBase({
+        id: "score",
+        link: true,
+        tooltip: "处理",
+        type: "success",
+        size: "large",
+        icon: "Edit",
+        tableClick: (row) => {
+          router.push({
+            path: "/goodsConfig/commodityEdit",
+            query: {
+              param: JSON.stringify({
+                editType: "handle",
+                cCommodityNo:row.cCommodityNo,
+                cPkId: row.cPkId
+              }),
+            },
+          });
+        },
+      }),
       createFreeButtonBase({
         id: "score",
         link: true,
@@ -137,7 +157,8 @@ const tableconfig = reactive<AppTableConfig>(
             query: {
               param: JSON.stringify({
                 editType: "view",
-                prodNo: row.cProdNo,
+                cCommodityNo:row.cCommodityNo,
+                cPkId: row.cPkId
               }),
             },
           });
@@ -149,6 +170,7 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "审核历史",
         type: "success",
         size: "large",
+        icon: "Document",
         tableClick: (row) => {
           dzmodal
             .open(historyProduct, { type: "edit", data: {} })

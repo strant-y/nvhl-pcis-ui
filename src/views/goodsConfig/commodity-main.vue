@@ -160,12 +160,46 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         size: "large",
         icon: "Edit",
+        hideBtns: (row: any) => {
+            // &&    param.editType !== "edit" 
+          if ( row.cStatus === '0' ||row.cStatus === '3' || row.cStatus === '6' ) {
+            return false;
+          } else {
+            return true;
+          }
+        },
         tableClick: (row) => {
           router.push({
             path: "/goodsConfig/commodityEdit",
             query: {
               param: JSON.stringify({
                 editType: "edit",
+                cCommodityNo: row.cCommodityNo,
+              }),
+            },
+          });
+        },
+      }),
+      createFreeButtonBase({
+        id: "score",
+        link: true,
+        tooltip: "提交审核",
+        type: "success",
+        size: "large",
+        icon: "Upload",
+        hideBtns: (row: any) => {
+          if ( row.cStatus === '2' ) {
+            return false;
+          } else {
+            return true;
+          }
+        },
+        tableClick: (row) => {
+          router.push({
+            path: "/goodsConfig/commodityEdit",
+            query: {
+              param: JSON.stringify({
+                editType: "upload",
                 cCommodityNo: row.cCommodityNo,
               }),
             },
@@ -211,6 +245,9 @@ const tableconfig = reactive<AppTableConfig>(
       //   .finally(() => {});
       //   },
       // }),
+
+
+   
     ],
     fromSchema: [
       {
@@ -286,7 +323,7 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "tCrtTm",
-        inputtype: "rtdatetime",
+        inputtype: "rtinput",
         title: "启用时间",
       },
     ],

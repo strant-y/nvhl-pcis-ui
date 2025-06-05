@@ -178,7 +178,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
       },
       {
-        prop: "cOperGroup",
+        prop: "cOperId",
         inputtype: "rtselect",
         title: "出单员",
         btnWidth: 10,
@@ -197,10 +197,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 if (res.type === "ok") {
                   const selectObj = res.body;
                   freeEditRef.value?.setValue(
-                    "cOperGroup",
+                    "cOperId",
                     selectObj.cSlsCde
                   );
-                  setFormItem("cOperGroup", {
+                  setFormItem("cOperId", {
                     loadData: [
                       {
                         label: selectObj.cSlsNme,
@@ -412,7 +412,7 @@ onMounted(() => {
   }
 
 
-  if (param.editType === "edit" || param.editType === 'view' || param.editType === 'review') {
+  if (param.editType!== 'add'  &&  param.editType!== 'edit' && param.editType) {
     // handleQuery();
     // setDisa();
     freeEditRef.value?.setDisabledAll();
