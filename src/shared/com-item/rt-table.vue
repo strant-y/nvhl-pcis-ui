@@ -42,6 +42,7 @@
             <template v-for="(i, index) in getfromSchema()" :key="index">
               <el-col
                 :span="i.itemWidth ? i.itemWidth * formUi.span : formUi.span"
+                style="margin-top: 5px;"
               >
                 <el-form-item
                   :prop="[props.$index, i.prop]"
@@ -130,7 +131,8 @@
         :align="item.align ? item.align : 'center'"
       />
       <template v-for="(i, index) in item.fromSchema" :key="index">
-        <el-table-column
+        <template v-if="i.isShow !== false" >
+          <el-table-column
           v-if="!i.expand"
           :prop="i.prop"
           :label="i.title"
@@ -179,6 +181,7 @@
             </template>
           </template>
         </el-table-column>
+        </template>
       </template>
       <el-table-column
         :label="item.tableBtnTitle"
@@ -349,12 +352,17 @@ function creatItem(d: any) {
   let sc: any = JSON.parse(JSON.stringify(schamaconf.value));
   // 将方法回填到item中
   Object.keys(schamaconf.value).forEach((k: any) => {
-    if (schamaconf.value[k]["func"]) {
-      sc[k]["func"] = schamaconf.value[k]["func"];
-    }
-    if (schamaconf.value[k]["tableClick"]) {
-      sc[k]["tableClick"] = schamaconf.value[k]["tableClick"];
-    }
+    Object.keys(schamaconf.value[k]).forEach((k2: any) => {
+      if (typeof schamaconf.value[k][k2] === 'function') {
+        sc[k][k2] = schamaconf.value[k][k2];
+      }
+    })
+    // if (schamaconf.value[k]["func"]) {
+    //   sc[k]["func"] = schamaconf.value[k]["func"];
+    // }
+    // if (schamaconf.value[k]["tableClick"]) {
+    //   sc[k]["tableClick"] = schamaconf.value[k]["tableClick"];
+    // }
   });
   return sc;
 }
@@ -398,7 +406,6 @@ function isHidden(item: any) {
   for (const key in item.tableBtn) {
     r = r && item.tableBtn[key].hidden;
   }
-  console.log(r);
   return r;
 }
 
@@ -620,6 +627,17 @@ function setValueByRowKey(props: string, rowId: any, value: any) {
     }
   });
 }
+function setRowFieldProp(rowId: string, field: string, prop: string, value: any) {
+  if (formItems.value[rowId] && formItems.value[rowId][field]) {
+    // 使用 Vue.set 确保响应式更新
+    formItems.value[rowId][field] = {
+      ...formItems.value[rowId][field],
+      [prop]: value
+    };
+  } else {
+    console.warn(`Field ${field} or row ${rowId} not found.`);
+  }
+}
 function getRowById(rowId: any) {
   return tableDatas.value?.find((item) => {
     if (item._dataId === rowId) {
@@ -630,10 +648,26 @@ function getRowById(rowId: any) {
 
 function getselectionData() {
   if (props.item.showSelection) {
-    return tableFormfef.value?.getSelectionRows();
+    return tableRef.value?.getSelectionRows();
   } else {
     return null;
   }
+}
+
+/**
+ * 获取指定行所有列组件的ref
+ * @param id 行id
+ */
+function getRowAllItemRefById(id: string) {
+  return formItems.value[id];
+}
+
+function clearSelection() {
+  tableRef.value?.clearSelection();
+}
+
+function toggleRowSelection(row: any, selected: boolean) {
+  tableRef.value?.toggleRowSelection(row, selected);
 }
 
 defineExpose({
@@ -647,6 +681,10 @@ defineExpose({
   setValueByRowKey,
   getRowById,
   getselectionData,
+  getRowAllItemRefById,
+  clearSelection,
+  toggleRowSelection,
+  setRowFieldProp,
 });
 function isrequired(i: any) {
   if (i.rules) {

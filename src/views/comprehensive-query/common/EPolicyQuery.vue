@@ -18,14 +18,19 @@ import { codeListViewStore } from '@/store'
 const codeListStore = codeListViewStore()
 import { AppFreeEditConfig, AppFreeEditMethod, createAppFreeEditConfig } from '@/shared/app-free-edit-config'
 const freeEditRef = ref<AppFreeEditMethod | null>(null)
-import { createFreeButtonBase } from '@/shared/button-config'
+import { createFreeButtonBase, FreeButtonBase } from '@/shared/button-config'
 import { AppTableConfig, AppTableMethod, createTableEditConfig } from '@/shared/app-table-config'
 import { useDzModal } from '@/common/dzmodel/DzModalService'
 import { SCENE_PLY_APP_READ } from '@/constants/tab-constants'
 import { PcisQueryService } from '@/views/payinfoManagement/service/pcis-query-service'
+import { rsaEncoder, base64encoder } from '@/utils/encipher'
+// @ts-ignore
+import { saveAs } from 'file-saver'
+import dayjs from 'dayjs'
+import moment from 'moment'
 const pcisQueryService = new PcisQueryService()
 const userStore = useUserStore()
-const user = ref(userStore.user) || ref({ companyId: '', opCde: '' })
+const user = ref(userStore.user) || ref({ companyId: '', opCde: '', companyCnm: '' })
 const dzmodal = useDzModal()
 const tableRef = ref<AppTableMethod | null>(null)
 const departmentTree = defineAsyncComponent(() => import('@/pcis/prodRef/commodityRef/DepartmentTree.vue'))
@@ -35,40 +40,48 @@ const props = defineProps({
         default: false
     }
 })
-const sessionUser: any = sessionStorage.getItem('user')?.toString()
-const cPard = ref(null)
+const sessionUser: any = sessionStorage.getItem('user')
+const bthList = ref<Array<FreeButtonBase>>([])
+const buttonList = [
+    createFreeButtonBase({
+        label: '生成电子保单',
+        type: 'primary',
+        id: 'generateEPolicy',
+        func: () => {
+            createEPolicy()
+        }
+    }),
+    createFreeButtonBase({
+        label: '下载电子保单',
+        type: 'primary',
+        id: 'downloadEPolicy',
+        func: () => {
+            downloadEPolicy()
+        }
+    }),
+    createFreeButtonBase({
+        type: 'primary',
+        label: '查询',
+        func: async () => {
+            handleQuery()
+        }
+    }),
+    createFreeButtonBase({
+        label: '重置',
+        func: () => {
+            freeEditRef.value?.setFormValue({
+                CDptCde: user.value.companyId,
+                CLoadSub: 1
+            })
+            handleQuery(true)
+        }
+    })
+]
+bthList.value = buttonList
 const formconfig1 = reactive<AppFreeEditConfig>(
     createAppFreeEditConfig({
         endBtnsPosition: 'right',
-        endBtns: [
-            createFreeButtonBase({
-                label: '生成电子保单',
-                func: () => {
-                    createEPolicy()
-                }
-            }),
-            createFreeButtonBase({
-                label: '下载电子保单',
-                func: () => {}
-            }),
-            createFreeButtonBase({
-                type: 'primary',
-                label: '查询',
-                func: async () => {
-                    handleQuery()
-                }
-            }),
-            createFreeButtonBase({
-                label: '重置',
-                func: () => {
-                    freeEditRef.value?.setFormValue({
-                        CDptCde: user.value.companyId,
-                        CLoadSub: 1
-                    })
-                    handleQuery(true)
-                }
-            })
-        ],
+        endBtns: buttonList,
         fromSchema: [
             {
                 prop: 'CDptCde',
@@ -253,6 +266,8 @@ const pageresult = reactive<Pageresult>({
     total: 0
 })
 
+const platTypeMap: any = { TBD: '投保单', BL: '保函', PLY: '保单', EDR: '批单' }
+
 const tableconfig = reactive<AppTableConfig>(
     createTableEditConfig({
         tableBtnType: 'btn',
@@ -322,6 +337,18 @@ const tableconfig = reactive<AppTableConfig>(
 onMounted(async () => {
     nextTick(() => {
         freeEditRef.value?.setValue('CLoadSub', '1')
+        freeEditRef.value?.setValue('CDptCde', user.value.companyId)
+        setFormItem('CDptCde', {
+            loadData: [
+                {
+                    label: user.value.companyCnm,
+                    value: user.value.companyId
+                }
+            ]
+        })
+        const beginTime = dayjs(new Date()).subtract(1, 'month').format('YYYY-MM-DD 00:00:00')
+        const endTime = moment(new Date()).format('YYYY-MM-DD 23:59:59')
+        freeEditRef.value?.setValue('TIssueTm', [beginTime, endTime])
     })
 })
 
@@ -368,6 +395,40 @@ function handleQuery(flag?: boolean) {
             const r = tableRef.value?.getPartnerPage(flag) //获取分页数据
             const s = freeEditRef.value?.getFromValue() //获取表单数据
             const plyTyp = freeEditRef.value?.getValue('CPlyTyp')
+            const appNme = freeEditRef.value?.getValue('CAppNme')
+            if (!!appNme && appNme.length < 2) {
+                ElMessage.warning('投保人名称至少输入2位')
+                return
+            }
+            const insuredNme = freeEditRef.value?.getValue('CInsuredNme')
+            if (!!insuredNme && insuredNme.length < 2) {
+                ElMessage.warning('被保人名称至少输入2位!')
+                return
+            }
+            const appNo = freeEditRef.value?.getValue('CAppNo')
+            const plyNo = freeEditRef.value?.getValue('CPlyNo')
+            const appTm = freeEditRef.value?.getValue('TAppTm')
+            const edrAppTm = freeEditRef.value?.getValue('TEdrAppTm')
+            const issueTm = freeEditRef.value?.getValue('TIssueTm')
+            const appCertfCde = freeEditRef.value?.getValue('CAppCertfCde')
+            const insuredCertfCde = freeEditRef.value?.getValue('CInsuredCertfCde')
+            const batchNo = freeEditRef.value?.getValue('CBatchNo')
+            if (
+                (appNo != null && appNo != '') ||
+                (plyNo != null && plyNo != '') ||
+                (appNme != null && appNme != '') ||
+                (appCertfCde != null && appCertfCde != '') ||
+                (insuredNme != null && insuredNme != '') ||
+                (insuredCertfCde != null && insuredCertfCde != '') ||
+                (batchNo != null && batchNo != '')
+            ) {
+            } else {
+                if ((appTm != null && appTm != '') || (edrAppTm != null && edrAppTm != '') || (issueTm != null && issueTm != '')) {
+                } else {
+                    ElMessage.warning('申请日期和签单日期不能同时为空!')
+                    return
+                }
+            }
             const param = Object.assign(
                 {
                     SysCode: 'POLY_CASU',
@@ -414,6 +475,7 @@ function handleQuery(flag?: boolean) {
  * 生成电子保单
  */
 function createEPolicy() {
+    const btn = getBtn('generateEPolicy')
     const prodNo = freeEditRef.value?.getValue('CProdNo')
     if (prodNo == null || prodNo == undefined) {
         ElMessage.warning('请选择产品!')
@@ -455,6 +517,11 @@ function createEPolicy() {
     selectData.forEach((item: any) => {
         CUniqueNos[CUniqueNos.length] = item.cAppNo
     })
+    if (!CUniqueNos[0]) {
+        ElMessage.warning('所选记录为空！')
+        return
+    }
+    setButton(btn, true)
     const vCUniqueNo = CUniqueNos.join('-,-')
     const param = {
         CurrentUser: user.value.opCde,
@@ -473,7 +540,58 @@ function createEPolicy() {
                 ElMessage.warning(msg)
             }
         })
-        .finally(() => {})
+        .finally(() => {
+            setButton(btn, false)
+        })
+}
+
+/**
+ * 下载电子保单
+ */
+function downloadEPolicy() {
+    const btn = getBtn('downloadEPolicy')
+    const plyTyp = freeEditRef.value?.getValue('CPlyTyp')
+    if (plyTyp == null || plyTyp == undefined) {
+        ElMessage.warning('请选择单证类型!')
+        return
+    }
+    const selectData = tableRef.value?.getselectionData()
+    if (!selectData || selectData.length <= 0) {
+        ElMessage.warning('所选记录为空！')
+        return
+    }
+    if (selectData.length > 1) {
+        ElMessage.warning('每次只能下载1个单据！')
+        return
+    }
+    const plyNo = selectData[0].cPlyNo
+    if (!plyNo) {
+        ElMessage.warning('没有数据，请核实确认！')
+        return
+    }
+    const data = {
+        plyNo: base64encoder(rsaEncoder(plyNo)),
+        type: 'EXP_EPOLICY_IMP_PDF',
+        impType: plyTyp
+    }
+    setButton(btn, true)
+    pcisQueryService
+        .downloadEPolicy(data)
+        .then((res: any) => {
+            if (res == '' || res == '500' || res.size <= 0) {
+                ElMessage.error('下载出错，请核实是否有生成电子' + platTypeMap[plyTyp] + '！')
+                return
+            }
+            const fileName = `${plyNo}.pdf`
+            const blob = new Blob([res.data], { type: 'application/pdf;charset=UTF-8' })
+            saveAs(blob, fileName)
+        })
+        .catch(e => {
+            ElMessage.error('电子单据下载失败' + e)
+        })
+        .finally(() => {
+            setButton(btn, false)
+        })
 }
 
 //给表单下拉项赋值
@@ -492,6 +610,21 @@ function setFormItem(key: any, obj: any) {
             }
         })
     }
+}
+function setButton(btn: any, val: boolean) {
+    if (!!btn) {
+        btn.loading = val
+        btn.disabled = val
+    }
+}
+/**
+ * 获取button
+ * @param id
+ */
+const getBtn = (id: any) => {
+    return bthList.value.find(item => {
+        return id === item.id
+    })
 }
 </script>
 

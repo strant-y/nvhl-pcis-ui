@@ -22,12 +22,14 @@ import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { qryRefProdAndRuleList } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { dataParam } from "@/store/modules/dataParam";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 const AddBusinessRulesModal = defineAsyncComponent(
   () => import("./AddBusinessRulesModal.vue")
 );
 const opertaor = dataOpertaor();
+const dataparam = dataParam();
 const tabref = opertaor.getTableRefByKey("prodInfo");
 import {
   AppTableConfig,
@@ -44,10 +46,7 @@ import {
 
 import { useRoute } from "vue-router";
 // import { setTimeout } from "node:timers/promises";
-const route = useRoute();
-const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
-
+const param = dataparam.getParam();
 const { getRules } = useValidator();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);

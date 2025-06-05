@@ -3,6 +3,7 @@
     v-if="!showLabel"
     ref="inputNumberRef"
     v-model="vInput"
+    :class="isReQuired() ? 're-quired-flag' : ''"
     :readonly="
       item.readonly
         ? typeof item.readonly === 'boolean'
@@ -83,6 +84,25 @@ function handleChange(val?: string | number | undefined) {
   emits("update:modelValue", val);
   emits("valueChange", val);
   // props.item.func ? props.item.func(val) : null;
+}
+function isReQuired() {
+  // 如果是禁用状态,默认带底色
+  if(props.item.disabled === true || props.item.disabled === '1' || props.item.disabled === 1){
+    return false;
+  }
+  if(props.item.required === '1' || props.item.required === 1 || props.item.required === true){
+    return true;
+  }
+  const rule = props.item.rules;
+  let r = false;
+  if (rule && rule.length > 0) {
+    for (const key in rule) {
+      if (rule[key].required) {
+        r = true;
+      }
+    }
+  }
+  return r;
 }
 
 onMounted(() => {

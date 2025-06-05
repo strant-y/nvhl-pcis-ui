@@ -81,8 +81,15 @@ const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<MyTableMethod | null>(null);
 const userStore = useUserStore();
 const router = useRouter()
-const route = useRoute()
-const routeQryParams = route.query.data ? JSON.parse(route.query.data) : {}
+const props = defineProps({
+  data: {
+    type: Object,
+  },
+  goodsData: Object,
+  goodsType: String,
+});
+
+const routeQryParams: any = props.data;
 const isAdd = ref((routeQryParams.type !== 'add' && routeQryParams.type !== 'update' && routeQryParams.type !== 'view'))
 const user = ref(userStore.user);
 const reviewInfoRef = ref(null);
@@ -92,10 +99,9 @@ const currentIndex = ref(0);
 const opertaor = dataOpertaor();
 const formconfig2 = opertaor.getTableConfig();
 const payinfoEditRef = ref<AppGridEditMethod | null>(null);
-const props = defineProps({
-  goodsData: Object,
-  goodsType: String,
-});
+
+
+ 
 let payinfo = ref(false)
 // const formconfig3 = reactive(createAppGridEditConfig({}));
 

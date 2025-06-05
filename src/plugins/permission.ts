@@ -1,8 +1,9 @@
 import router from "@/router";
-import {useUserStore} from "@/store/modules/user";
-import {usePermissionStore} from "@/store/modules/permission";
+import { useUserStore } from "@/store/modules/user";
+import { usePermissionStore } from "@/store/modules/permission";
 import NProgress from "@/utils/nprogress";
-import {codeListViewStore} from "@/store";
+import { codeListViewStore } from "@/store";
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
 
 export function setupPermission() {
   // 白名单路由
@@ -24,12 +25,12 @@ export function setupPermission() {
         if (hasRoles) {
           // 未匹配到任何路由，跳转404
           if (to.matched.length === 0) {
-            if(to.href){
+            if (to.href) {
               next(from);
-            }else if(from.name) {
+            } else if (from.name) {
               ElMessage.error('无权限访问！');
-              next({name: from.name})
-            }else {
+              next({ name: from.name })
+            } else {
               next("/404");
             }
           } else {
@@ -37,24 +38,24 @@ export function setupPermission() {
             const query = to.query;
             if (!isEncrypted.value && to.query && Object.keys(to.query).length > 0) {
               isEncrypted.value = true;
-              if(!!query.encrypted && query.encrypted === '1'){ // 页面刷新
+              if (!!query.encrypted && query.encrypted === '1') { // 页面刷新
                 nextTick(() => {
-                  router.push({ path: to.fullPath, query: query});
+                  router.push({ path: to.fullPath, query: query });
                 });
-              }else {
+              } else {
                 for (const key in query) {
                   if (Object.prototype.hasOwnProperty.call(query, key)) {
-                    if(!!query[key] && key !== 'encrypted') {
-                      to.query[key] = encodeURI(query[key]);
+                    if (!!query[key] && key !== 'encrypted') {
+                      to.query[key] = encryptParameter(query[key]);
                     }
                   }
                 }
-                if(Object.keys(query).length > 0) {
+                if (Object.keys(query).length > 0) {
                   query['encrypted'] = '1';
-                  next({path: to.path , query: query});
+                  next({ path: to.path, query: query });
                 }
               }
-            }else {
+            } else {
               isEncrypted.value = false;
               next();
             }
@@ -86,10 +87,9 @@ export function setupPermission() {
 
         const userStore = useUserStore();
         const getCaptchaParam = ref({});
-        Object.assign(getCaptchaParam.value, {token: query['token']});
-
+        Object.assign(getCaptchaParam.value, { token: query['token'] });
         await userStore.resolveToken(getCaptchaParam.value);
-        next({...to, replace: true});
+        next({ ...to, replace: true });
       }
       // 未登录可以访问白名单页面
       else if (whiteList.indexOf(to.path) !== -1) {
@@ -106,10 +106,13 @@ export function setupPermission() {
     if (to.query) {
       for (const key in to.query) {
         if (Object.prototype.hasOwnProperty.call(to.query, key)) {
-          const keyData = decodeURI(to.query[key]);
-          to.query[key] = keyData;
-          if(!!keyData && key !== 'encrypted') {
-            to.params[key] = JSON.parse(keyData);
+          if (key !== 'encrypted') {
+            const p = to.query[key];
+            const keyData = descryptParameter(to.query[key]);
+            if (!!keyData) {
+              to.query[key] = p;
+              to.params[key] = JSON.parse(keyData);
+            }
           }
         }
       }

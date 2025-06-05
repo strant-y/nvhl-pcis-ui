@@ -77,9 +77,9 @@
         <el-pagination
           v-model:current-page="queryParams.pageNum"
           v-model:page-size="queryParams.pageSize"
-          layout="prev, pager, next, jumper, total"
+          layout="total, prev, pager, next, jumper"
           :total="pageresult.total"
-          v-if="!tableConfig.isPage && pageresult.total > 0"
+          v-if="tableConfig.isPage && pageresult.total > 0"
           @size-change="pageChange"
           @current-change="pageChange"
         />
@@ -101,6 +101,7 @@
 import { AppGridEditConfig } from "./app-grid-edit-config";
 import { AppTableConfig } from "./app-table-config";
 import { ref, reactive, defineEmits, defineProps, onMounted, watch } from "vue";
+import { dynamicFormMethod } from "./dynamic-form-config";
 
 defineOptions({
   name: "AppTable",
@@ -117,16 +118,6 @@ const queryParams = reactive<PageQuery>({
 const appgrideditConfig = reactive<AppGridEditConfig>({
   editFlag: false, //是否可以编辑
 });
-interface dynamicFormMethod {
-  getFromValue: () => any;
-  setFormValue: (data: any, noupdate?: boolean) => void;
-  validate: () => any;
-  setValue: (key: any, value: any) => void;
-  getValue: (key: any) => any;
-  checkKey: (key: any) => boolean;
-  clearValidate: () => any;
-  resetFields: () => any;
-}
 const dynamicForm = ref<dynamicFormMethod | null>(null);
 const dataList = ref<any>([]);
 const rttableFrom = ref<any>(null);
@@ -160,10 +151,15 @@ watch(
   { deep: true }
 );
 
-onMounted(() => {
+onMounted(()=>{
   Object.assign(appgrideditConfig, props.tableConfig);
   appgrideditConfig.editFlag = false;
-});
+  nextTick(()=>{
+    dataList.value = props.pageresult?.list;
+  })
+})
+
+
 
 function handleSelectionChange(selectedRows: any[]) {
   emits("selection-change", selectedRows);
@@ -206,12 +202,28 @@ function getselectionData() {
   return rttableFrom.value?.getselectionData();
 }
 
+function getRowAllItemRefById(id: string) {
+  return rttableFrom.value?.getRowAllItemRefById(id);
+}
+
+function clearSelection() {
+  rttableFrom.value?.clearSelection();
+}
+
+function toggleRowSelection(row: any, selected: boolean) {
+  rttableFrom.value?.toggleRowSelection(row, selected);
+}
+
 defineExpose({
   getPartnerPage,
   getFromValue,
   setFormSchema,
   setValueByRowKey,
-  getselectionData
+  getselectionData,
+  getRowAllItemRefById,
+
+  clearSelection,
+  toggleRowSelection,
 });
 </script>
 

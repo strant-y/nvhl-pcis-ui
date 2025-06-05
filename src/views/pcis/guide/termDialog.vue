@@ -130,7 +130,7 @@ const pageresult = reactive<Pageresult>({
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
-    isPage: "false",
+    isPage: false,
     showSelection: true,
     maxHeight: 350,
     fromSchema: [

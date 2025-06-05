@@ -1396,3 +1396,12 @@ export function getProcessInfo(queryParams: any): AxiosPromise<any> {
   return post(`/plan/getProcessInfo`, queryParams);
 }
  
+
+
+/**
+ * 复制出单-批量保存清单
+ * 
+ */
+export function saveDistBatch(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/saveDistBatch`, queryParams);
+}

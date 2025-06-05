@@ -22,7 +22,9 @@ import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { getCvrgRiskRelList } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { dataParam } from "@/store/modules/dataParam";
 const opertaor = dataOpertaor();
+const dataparam = dataParam();
 const tabref = opertaor.getTableRefByKey("prodInfo");
 import {
   AppTableConfig,
@@ -30,11 +32,7 @@ import {
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import { ref, reactive, onMounted } from "vue";
-
-import { useRoute } from "vue-router";
-const route = useRoute();
-const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const param = dataparam.getParam();
 
 const { getRules } = useValidator();
 

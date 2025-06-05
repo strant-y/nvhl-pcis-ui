@@ -181,7 +181,7 @@ const ApplicantQuery = defineAsyncComponent(
 );
 // tab 页面切换 3-9
 const PlyQuery = defineAsyncComponent(
-    // 投保待撤回任务
+    // 综合查询保单
     () => import("../common/PlyQuery.vue")
 );
 // tab 页面切换 4-9

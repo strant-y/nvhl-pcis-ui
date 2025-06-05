@@ -212,7 +212,6 @@ function updateTitle() {
   Object.keys(planData.value).forEach((k: any) => {
     if (parparam.cProdNo === "043009") {
       const terms = planData.value[k];
-      console.log(terms);
       // 获取模版字符串
       const str = prodTemple.value.default;
       let sumobj = 0;
@@ -353,6 +352,18 @@ function updateBtn() {
 // 绑定方法
 const method = {
   funcadd: () => {
+    if(parparam.cProdNo === "043009"){
+      const tgt = opertaor.getTableRefByKey('tgt');
+      const tgtData = tgt.getFromValue();
+      if(!tgtData['Tgt.cInsuranceMethod']){
+        ElMessage.error("请先选择标的信息中的投保方式!");
+        return ;
+      }
+      if(tgtData['Tgt.cInsuranceMethod'] !== '613001'){
+        ElMessage.error("当投保方式为工程造价投保/劳务合同价投保/按建筑面积投保时,不可添加多方案!");
+        return ;
+      }
+    }
     let maxindex = 0;
     const l = Object.keys(planData.value).forEach((k: any) => {
       const numberPart = parseInt(k.replace(/\D/g, ""), 10);
@@ -548,7 +559,7 @@ function getFromValue() {
 
 function setFormValue(value: any) {
   const terms: any[] = [];
-  Object.assign(planData.value, {});
+  planData.value = {};
   let plandata: { [key: string]: any } = {};
   value.forEach((item: any) => {
     const planKey = item["Term.cPlanNo"];
@@ -574,7 +585,7 @@ async function validate() {
   let r = true;
   const keys = Object.keys(tremTemplateRefs.value);
   for (const item of keys) {
-    if (tremTemplateRefs.value[item]) {
+    if (tremTemplateRefs.value[item] && tremTemplateRefs.value[item].validate) {
       const res = await tremTemplateRefs.value[item].validate();
       r = r && res;
     }

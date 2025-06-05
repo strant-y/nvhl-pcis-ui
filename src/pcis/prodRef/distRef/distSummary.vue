@@ -70,11 +70,13 @@ const getCComponentTableValue = (cProdNo: string, title: string): string => {
     if (title == "雇员清单") {
       return "EmployeeDist";
     } else if (title == "雇员清单汇总") {
-      return "DistSummary";
+      return "EmployeeDist";
+      // return "DistSummary";
     } else if (title == "车辆清单") {
       return "VehicleDist";
     } else if (title == "车辆清单汇总") {
-      return "DistSummary";
+      // return "DistSummary";
+      return "VehicleDist";
     }
   } else if (cProdNo == "040003") {
     if(title == "产品清单"){
@@ -106,7 +108,8 @@ const getCComponentTableValue = (cProdNo: string, title: string): string => {
     } else if (title == "从业人员清单") {
       return "EmployeeDist";
     } else if (title == "从业人员清单汇总") {
-      return "DistSummary";
+        return "EmployeeDist";
+      // return "DistSummary";
     }
   }else if(cProdNo == "043010"){
     return "EducatorDist"
@@ -158,9 +161,9 @@ onMounted(async () => {
     route.params.param.cProdNo,
     formconfig1.value.title
   );
-  setTimeout(() => {
-    method.handleQuery();
-  }, 500);
+  nextTick(() => {
+    handleQuery();
+  });
 });
 
 // 绑定方法
@@ -177,7 +180,7 @@ const method = {
       },
       {
         isOk: (res: any) => {},
-        handleQuery: method.handleQuery, // 新增：将 handleQuery 方法传递给 distAdd 组件
+        handleQuery: handleQuery, // 新增：将 handleQuery 方法传递给 distAdd 组件
       },
       { width: "60" }
     );
@@ -189,7 +192,7 @@ const method = {
     }).then((res: any) => {
       if (res.code === 200) {
         ElMessage.success("删除成功");
-        method.handleQuery();
+        handleQuery();
       }
     });
   },
@@ -206,7 +209,7 @@ const method = {
           },
           {
             isOk: (res: any) => {},
-            handleQuery: method.handleQuery, // 新增：将 handleQuery 方法传递给 distAdd 组件
+            handleQuery: handleQuery, // 新增：将 handleQuery 方法传递给 distAdd 组件
           },
           { width: "60" }
         );
@@ -215,38 +218,10 @@ const method = {
       }
     });
   },
-  handleQuery: () => {
-    const param = opertaor.getParam();
-    console.log(param);
-    let app = "";
-    if (param.cOrgAppNo) {
-      app = param.cOrgAppNo;
-    } else {
-      app = opertaor.getDataAll().plyBase["Base.cAppNo"];
-    }
-    const selData = {
-      cComponentTable: cComponentTableValue,
-      cAppNo: app,
-    };
-    selectDist(selData).then((res: any) => {
-      if (res.code === 200) {
-        pageresult.list = [];
-        pageresult.list = res.data.data;
-        pageresult.list.forEach((item, index) => {
-          item.nSeqNo = index + 1;
-        });
-      }
-    });
-  },
   distSummeryQuery: () => {
-    syncDist({
-      cComponentTable: "DistSummary",
+    query({
+      cComponentTable: cComponentTableValue,
       cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
-    }).then((res) => {
-      if (res.code == 200) {
-        pageresult.list = [];
-        pageresult.list = res.data;
-      }
     });
   },
   carInfoAdd: () => {
@@ -262,7 +237,7 @@ const method = {
           },
           {
             isOk: (res: any) => {},
-            handleQuery: method.handleQuery, //将 handleQuery 方法传递给 distAdd 组件
+            handleQuery: handleQuery, //将 handleQuery 方法传递给 distAdd 组件
           },
           { width: "60" }
         );
@@ -293,6 +268,44 @@ const method = {
   },
 };
 
+const handleQuery = () => {
+  const param = opertaor.getParam();
+  let app = "";
+  if (param.cOrgAppNo) {
+    app = param.cOrgAppNo;
+  } else if(opertaor.getDataAll().plyBase["Base.cAppNo"]){
+    app = opertaor.getDataAll().plyBase["Base.cAppNo"];
+  } else {
+    app = route.params.param.cAppNo
+  }
+  query({
+    cComponentTable: cComponentTableValue,
+    cAppNo: app,
+    ...{isSummary: '1'}
+  });
+
+}
+
+const query = (param: any) => {
+  selectDist(param).then((res) => {
+    if (res.code == 200) {
+      pageresult.list = [];
+      pageresult.list = res.data.data.map((item, index) => {
+        return{
+            ... item,
+            ... {
+                nSeqNo: index + 1,
+                'DistSummary.AllOccup': [
+                    item['DistSummary.cMajorCategories'], item['DistSummary.cMediumClassification'], item['DistSummary.cOccupationalSubcategory']
+                ],
+            }
+        };
+      });
+    }
+  });
+}
+
+
 function setUnDisabledByKeyList(key: any) {
   tableconfig.value.formconfig.endBtns?.forEach((item: any) => {
     if ("Btn_" + item.id === key) {
@@ -317,12 +330,30 @@ function getFormconfig() {
   };
 }
 
+function setTableData(data: any) {
+  if (data && data.length > 0) {
+    pageresult.list = data.map((item:any, index:number) => {
+      return{
+        ... item,
+        ... {
+          nSeqNo: index + 1,
+          'DistSummary.AllOccup': [
+            item['DistSummary.cMajorCategories'], item['DistSummary.cMediumClassification'], item['DistSummary.cOccupationalSubcategory']
+          ],
+        }
+      };
+    });
+  }
+}
+
 // 绑定特殊验证器
 const exRules = {};
 
 defineExpose({
   getFormconfig,
   setUnDisabledByKeyList,
+  handleQuery,
+  setTableData,
 });
 </script>
 

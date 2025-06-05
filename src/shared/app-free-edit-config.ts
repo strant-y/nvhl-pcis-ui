@@ -29,6 +29,7 @@ export interface AppFreeEditMethod {
   validate: () => any;
   setValue: (key: any, value: any) => void;
   getValue: (key: any) => any;
+  clearValidate: (key: string | null ) => any;
   setDisabledAll: () => void;
   resetFields: () => void;
 }

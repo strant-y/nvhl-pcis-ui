@@ -50,16 +50,20 @@
 <script setup lang="ts">
 import { useRoute } from "vue-router";
 import { getProdInfos } from "@/api/prod";
+import { dataParam } from "@/store/modules/dataParam";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { ref, onMounted } from "vue";
 
+
+const props = defineProps({
+  param: {
+    type: Object,
+  },
+});
+
+const paramparam = dataParam();
+paramparam.setParam(props.param);
 const opertaor = dataOpertaor();
-opertaor.init();
-
-const route = useRoute();
-const query = ref(route.query);
-
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
 const formconfig1 = opertaor.getTableConfig();
 
 opertaor.setTableConfig([

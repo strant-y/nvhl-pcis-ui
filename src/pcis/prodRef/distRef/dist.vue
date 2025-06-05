@@ -162,14 +162,22 @@ onMounted(async () => {
   Object.assign(formconfig1.value, formconfig11.value);
   cardconfig.value.title = formconfig1.value.title;
   tableconfig.value.showEdit = true;
+  formconfig1.value.fromSchema.forEach((e: any)=>{  // 隐藏不需要显示在表格内的数据
+    if(e.cShowLocation === '0'){
+      e.isShow = false
+    }
+    return e;
+  });
   tableconfig.value.fromSchema = formconfig1.value.fromSchema;
   tableconfig.value.formconfig = createAppGridEditConfig({
     titleBtns: formconfig1.value.titleBtns,
     fromSchema: formconfig1.value.distSchema,
   });
+  tableconfig.value.fromSchema.forEach( r => r['onInit'] = rowChange);
   tableconfig.value.tableBtnType = "btn";
   tableconfig.value.tableBtnWidth = 150;
   tableconfig.value.tableBtnPosition = "right";
+    tableconfig.value.isPage = false;
   if (formconfig11.value.editBtns && formconfig11.value.editBtns.length > 0) {
     let btns: any[] = [];
     btns = formconfig11.value.editBtns;
@@ -177,14 +185,15 @@ onMounted(async () => {
       tableconfig.value.tableBtn = btns;
     }
   }
+  tableconfig.value.isPage = false;
   // 初始化 cComponentTableValue
   cComponentTableValue = getCComponentTableValue(
     route.params.param.cProdNo,
     formconfig1.value.title
   );
-  setTimeout(() => {
+  nextTick(() => {
     method.handleQuery();
-  }, 500);
+  });
 
   // 电梯信息清单
   let tgtRef = opertaor.getTableRefByKey('tgt')
@@ -217,6 +226,7 @@ const method = {
         fromSchema: tableconfig.value.fromSchema,
         title: "编辑",
         rowData: row,
+          tab: formconfig1.value.title
       },
       {
         isOk: (res: any) => {},
@@ -238,28 +248,12 @@ const method = {
   },
   //  042003 根据电梯条数反
   funcdistadd: () => {
-    console.log("22", opertaor.getTableRefs());
-    let baseFlag = opertaor.getDataAll().plyBase["Base.cAppNo"];
+    const alldata: any = opertaor.getDataAll();
+    let baseFlag = alldata['plyBase']["Base.cAppNo"];
 
     let fromSchema = tableconfig.value.fromSchema;
-    let cIs= opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered']  //  是否记名投保
-    
-    if(cIs == 1){
-      fromSchema?.forEach((item,index) =>{
-        // if(item.) Dist.nSeqNo   Dist.cPlanNo Dist.cPlanNo
-        if(item.prop !=='Dist.nSeqNo'){
-          item.rules = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
-        }
-      })
-    }else if(cIs == 0){
-      fromSchema?.forEach((item,index) =>{
-        if(item.prop !=='Dist.cSchoolName' && item.prop !=='Dist.cSchoolAddress'){
-          item.rules =null;
-        }
-      })
-    }
 
-    checkAppBase({ cAppNo: baseFlag }).then((res) => {
+    checkAppBase({ cAppNo: baseFlag }).then((res: any) => {
       if (res.code === 200) {
         dialog.value?.open(
           "distAdd",
@@ -286,8 +280,10 @@ const method = {
     let app = "";
     if (param.cOrgAppNo) {
       app = param.cOrgAppNo;
-    } else {
+    } else if(opertaor.getDataAll().plyBase["Base.cAppNo"]){
       app = opertaor.getDataAll().plyBase["Base.cAppNo"];
+    } else {
+      app = route.params.param.cAppNo
     }
     const selData = {
       cComponentTable: cComponentTableValue,
@@ -296,33 +292,46 @@ const method = {
     selectDist(selData).then((res: any) => {
       if (res.code === 200) {
         pageresult.list = [];
-        pageresult.list = res.data.data;
-        pageresult.list.forEach((item, index) => {
-          item.nSeqNo = index + 1;
-          item.tOpeningTime = item['Dist.tOpeningTime']
-            ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
-            : "";
+        pageresult.total = res.data.total;
+        pageresult.list = res.data.data.map((item, index) => {
+          return{
+              ... item,
+              ... {
+                  nSeqNo: index + 1,
+                  tOpeningTime: item['Dist.tOpeningTime']
+                      ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
+                      : null,
+                  'Dist.AllOccup': [
+                      item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
+                  ],
+              }
+          };
         });
         if(tgtRef !=undefined){
           tgtRef.setValue("Tgt.nElevatorsNumber",res.data.length)
         }
+
+        // 刷新汇总表格 DistSummary045001'
+        const compKey = 'DistSummary' + route.params.param.cProdNo
+        const distSummary = opertaor.getTableRefByKey(compKey)
+        distSummary?.handleQuery();
       }
     });
   },
-  distSummeryQuery: () => {
-    syncDist({
-      cComponentTable: "DistSummary",
-      cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
-    }).then((res) => {
-      if (res.code == 200) {
-        pageresult.list = [];
-        pageresult.list = res.data;
-        pageresult.list.forEach((item, index) => {
-          item.nSeqNo = index + 1;
-        });
-      }
-    });
-  },
+  // distSummeryQuery: () => {
+  //   syncDist({
+  //     cComponentTable: "DistSummary",
+  //     cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
+  //   }).then((res) => {
+  //     if (res.code == 200) {
+  //       pageresult.list = [];
+  //       pageresult.list = res.data;
+  //       pageresult.list.forEach((item, index) => {
+  //         item.nSeqNo = index + 1;
+  //       });
+  //     }
+  //   });
+  // },
   carInfoAdd: () => {
     let baseFlag = opertaor.getDataAll().plyBase["Base.cAppNo"];
     checkAppBase({ cAppNo: baseFlag }).then((res) => {
@@ -347,7 +356,6 @@ const method = {
   },
   //导出
   exportExcel: () => {
-    const fileName = `${formconfig1.value.title}.xlsm`;
     let paramitem  = Object.assign(formconfig1.value, {
       cComponentTable: cComponentTableValue,
       cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
@@ -358,14 +366,15 @@ const method = {
           ElMessage.error({ message: "导出出错", duration: 3000 });
           return;
         }
+        const fileName = decodeURIComponent(res.headers['content-disposition'].split('filename=')[1]);
         const blob = new Blob([res.data], {
-          responseType:
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
+          responseType:res.headers["content-type"]
+            // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
         });
         saveAs(blob, fileName);
       })
   },
-  //导入
+  //全量导入
   importExcel() {
     const input = document.createElement('input');
     input.type = 'file';
@@ -393,10 +402,10 @@ const method = {
 
         policyService.importDist(params).then((res) => {
           if (res.code === 200) {
-            ElMessage.success("导入成功");
+            ElMessage.success(`导入完成：${res.data.msg}`);
             method.handleQuery();
           } else {
-            ElMessage.error(res.message || "导入失败");
+            ElMessage.error(res.message || "全量导入失败");
           }
         }).catch((error) => {
           ElMessage.error("导入出错，请检查文件格式或内容");
@@ -414,20 +423,56 @@ const method = {
     };
     input.click(); // 触发文件选择对话框
   },
-  //根据获取的职业类别查询职业等级并绑定下拉框
-  getDistoccupType:(val) => {
-    codeListStore
-        .queryCodeList({
-          codeListName: "Occupt_ZYLB",
-          codeListParam: {cParCde: val.at(-1)},
-        })
-        .then((res) => {
-        setFormItem("Dist.cOccupationalLevel", {
-          loadData: res,
+  // 增量导入
+  importExcelIncrement: () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.xlsx, .xls, .xlsm'; // 支持的文件类型
+    input.onchange = () => {
+      if (input.files?.length) {
+        const file = input.files[0];
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+        const base64String = e.target?.result as string;
+
+        // ✅ 此处赋值有效
+        // fileBase = base64String.split(',')[1]; // 去掉 data:image/type;base64, 前缀
+
+        // console.log(fileBase, "0000000"); // ✅ 此处可以正常打印 Base64 字符串
+
+        // 构建参数并请求接口
+        const params = {
+          ...formconfig1.value,
+          file: base64String, // ✅ 正确传入
+          cComponentTable: cComponentTableValue,
+          cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
+        };
+
+        policyService.importDistIncrement(params).then((res) => {
+          if (res.code === 200) {
+            ElMessage.success(`导入完成：${res.data.msg}`);
+            method.handleQuery();
+          } else {
+            ElMessage.error(res.message || "增量导入失败");
+          }
+        }).catch((error) => {
+          ElMessage.error("导入出错，请检查文件格式或内容");
+          console.error("导入错误：", error);
         });
-    })
+      };
+
+      reader.onerror = (e) => {
+        console.error("文件读取失败", e);
+        ElMessage.error("文件读取失败");
+      };
+
+      reader.readAsDataURL(file); // 启动读取
+      }
+    };
+    input.click(); // 触发文件选择对话框
   },
-  //模板下载
+  //全量模板下载
   downloadTemp: () => {
     policyService
       .downloadDistTemplate(formconfig1.value)
@@ -436,15 +481,35 @@ const method = {
           ElMessage.error({ message: "下载出错", duration: 3000 });
           return;
         }
-        const fileName = `${formconfig1.value.title}.xlsm`;
+        const fileName = decodeURIComponent(res.headers['content-disposition'].split('filename=')[1]);
         const blob = new Blob([res.data], {
-          responseType:
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
+          responseType:res.headers["content-type"]
+            // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
         });
         saveAs(blob, fileName);
       })
       .catch(() => {
-        ElMessage.error("模板下载失败");
+        ElMessage.error("全量模板下载失败");
+      });
+  },
+  // 增量模板下载
+  downloadIncrement: () => {
+    policyService
+      .downloadDistTemplateIncrement(formconfig1.value)
+      .then((res) => {
+        if (res.size <= 0) {
+          ElMessage.error({ message: "下载出错", duration: 3000 });
+          return;
+        }
+        const fileName = decodeURIComponent(res.headers['content-disposition'].split('filename=')[1]);
+        const blob = new Blob([res.data], {
+          responseType:res.headers["content-type"]
+            // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
+        });
+        saveAs(blob, fileName);
+      })
+      .catch(() => {
+        ElMessage.error("增量模板下载失败");
       });
   },
 setregistAdd(){
@@ -465,23 +530,23 @@ setregistAdd(){
   }
 };
 
-//给表单下拉项赋值
-function setFormItem(key: any, obj: any) {
-  if (obj && Object.keys(obj).length) {
-    formconfig1.value.fromSchema?.forEach((item: any) => {
-      if (item.prop === key) {
-        //控制尾部按钮的
-        if (item.btnItems && obj.btnItems) {
-          for (let key in obj.btnItems) {
-            item.btnItems[key] = obj.btnItems[key];
-          }
-        }else{
-          Object.assign(item, obj);
-        }
-      }
-    });
+const rowChange = (data: any) => {
+  const {value, rowData, config, itemRef} = data;
+  if(!value || !rowData || !config || !itemRef) return;
+  if('Dist.cOccupationalLevel' === config.prop){
+    const AllOccup = rowData['Dist.AllOccup'];
+    if( AllOccup.length < 3) return;
+      codeListStore.queryCodeList({
+        codeListName: "Occupt_ZYLB",
+        codeListParam: {cParCde: AllOccup.at(-1)},
+      }).then((res) => {
+        //给表单下拉项赋值
+        config.loadData = res;
+      }); 
   }
 }
+
+
 function setUnDisabledByKeyList(key: any) {
   tableconfig.value.formconfig.endBtns?.forEach((item: any) => {
     if ("Btn_" + item.id === key) {
@@ -528,6 +593,27 @@ function getValue(key: string) {
   return applicantEditRef?.value?.getValue(key);
 }
 
+function getTableData() {
+  return pageresult.list
+}
+
+function setTableData(data: any) {
+  pageresult.list = data.map((item: any, index: any) => {
+    return{
+        ... item,
+        ... {
+            nSeqNo: index + 1,
+            tOpeningTime: item['Dist.tOpeningTime']
+                ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
+                : null,
+            'Dist.AllOccup': [
+                item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
+            ],
+        }
+    };
+  });
+}
+
 // 绑定特殊验证器
 const exRules = {};
 
@@ -538,6 +624,9 @@ defineExpose({
   setFormValue,
   getFormconfig,
   setUnDisabledByKeyList,
+  handleQuery: method.handleQuery,
+  getTableData,
+  setTableData,
 });
 </script>
 

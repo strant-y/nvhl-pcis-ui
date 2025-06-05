@@ -150,7 +150,7 @@ interface dynamicFormMethod {
   setValue: (key: any, value: any) => void;
   getValue: (key: any) => any;
   checkKey: (key: any) => boolean;
-  clearValidate: () => any;
+  clearValidate: (key: string | null ) => any;
   resetFields: () => any;
   setDisabledAll: () => void;
 }
@@ -241,6 +241,20 @@ function setDisabledAll() {
   }
   dynamicForm.value?.setDisabledAll();
 }
+
+/**
+ * 获取指定表单项
+ * {id} 要素key
+ */
+function getFromSchemaItem(id: string) {
+  const fromListRef = dynamicForm.value?.fromListRef;
+  if(!!fromListRef) {
+    return fromListRef.find( (item: any) => item.key === id)
+  }else {
+    return undefined;
+  }
+}
+
 watch(
   () => freeEditConfig,
   (newVal) => {
@@ -261,6 +275,7 @@ defineExpose({
   clearValidate,
   resetFields,
   setDisabledAll,
+  getFromSchemaItem
 });
 </script>
 

@@ -229,11 +229,15 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "条款名称",
       },
-      // {
-      //   prop: "cRdrTyp",
-      //   inputtype: "rtinput",
-      //   title: "主附条款标识",
-      // },
+      {
+        prop: "cRdrTyp",
+        inputtype: "rttag",
+        title: "条款标志",
+        loadData: [
+          { label: "附加条款", value: "1" ,color: "#67C23A",},
+          { label: "主条款", value: "0", color: "##409EFF",}
+        ],
+       },
       {
         prop: "cEnableFlag",
         inputtype: "rtswitch",

@@ -16,8 +16,9 @@ import {
   createGridFromUiConfig,
 } from "@/shared/app-grid-edit-config";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { dataParam } from "@/store/modules/dataParam";
 const opertaor = dataOpertaor();
-
+const dataparam = dataParam();
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 const dzmodal = useDzModal();

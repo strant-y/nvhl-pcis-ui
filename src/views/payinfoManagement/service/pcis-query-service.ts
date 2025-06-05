@@ -1,5 +1,6 @@
 import { AxiosPromise } from 'axios'
 import { post } from '@/utils/http'
+import request from '@/utils/request'
 import { del } from '@/utils/http'
 import { get } from 'lodash'
 /**
@@ -30,6 +31,7 @@ export class PcisQueryService {
     qryExpirationPolicyUrl = 'policy/getExpirationPolicyList';
     qryEpolicyPolicyListUrl = 'edr/getPolicyList'; // 电子保单列表查询
     generatingEPolicyUrl = 'epolicy/generatingEPolicy';// 生成电子保单
+    downloadEPolicyUrl = 'epolicy/downloadData';// 下载电子保单
     qryDiaryListUrl = 'policy/getDiaryList';
     qryChangeFeeListUrl = 'edr/qryChangeFeeList';
     loadFeeInfoUrl = 'edr/getFeeInfo';
@@ -473,6 +475,17 @@ export class PcisQueryService {
     }
 
     /**
+     * 下载电子保单
+     * @param ops 
+     * @returns 
+     */
+    downloadEPolicy(ops: any) {
+        return request.post(`${this.downloadEPolicyUrl}`,ops, {
+            responseType: 'blob'
+        });
+    }
+
+    /**
      * 操作日志查询
      */
     getDiaryList(ops: any): AxiosPromise<any> {
@@ -626,5 +639,13 @@ export class PcisQueryService {
     // 历史赔案 赔案明细
     qryHistoryClaimDetail(ops: any): AxiosPromise<any> {
         return post(`${this.HistoryClaimDetail}`,ops)
+    }
+    // 单据打印 根据单号查询详情接口
+    getAppPolicy(ops: any): AxiosPromise<any> {
+        return post(`policy/getAppPolicy`, ops);
+    }
+    // 获取投保险种
+    getCvrgByAppNo(ops: any): AxiosPromise<any> {
+        return post(`policy/getCvrgByAppNo`, ops);
     }
 }

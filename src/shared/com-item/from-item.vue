@@ -36,6 +36,9 @@ const props = defineProps({
 });
 const itemRef = ref("itemRef");
 const value = ref<any>();
+const key = computed(() => props.item.prop );
+const itemConfig = computed(() => props.item );
+
 
 const emits = defineEmits(["update:modelValue", "updateMethod"]); // 父组件监听事件，同步子组件值的变化给父组件
 function handleChange(val?: any) {
@@ -69,13 +72,35 @@ function getcomRef(type: any) {
 defineExpose({
   tableExvalidate,
   updateOption,
+  key,
+  value,
+  itemConfig
 });
 
 onMounted(() => {
   value.value = props.modelValue;
-  
   if(props.item.defaultValue){
     value.value = props.item.defaultValue;
   }
+  //组件初始化回调
+  init()
 });
+
+/**
+ * 初始化数据变化触发
+ * value 组件绑定的value
+ * rowData 表格当前行的数据
+ * config 当前组件的配置信息
+ * itemRef 表单项ref
+ */
+function init() {
+  if(props.modelValue && props.item.onInit) {
+     props.item.onInit({
+      value: props.modelValue,
+      rowData: props.row,
+      config: props.item,
+      itemRef: itemRef.value
+     });
+  }
+}
 </script>

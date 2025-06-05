@@ -43,6 +43,8 @@ export interface AppTableMethod {
 export interface MyTableMethod {
   addRow: (arg: any) => any;
   getSelectRow: () => any;
+  getPartnerPage: (flag?: boolean) => any;
+  getFormData: () => any;
   updateOption: (rowId: string, propKey: string, newOption: Array<any>) => void;
   getFromValue: () => any;
   setFormValue: (data: any) => void;
@@ -77,7 +79,7 @@ export function createTableEditConfig(
     dragFlag: config.dragFlag || false,
     editFlag: config.editFlag || false,
     editList: config.editList || [],
-    isPage: config.isPage,
+    isPage: config.isPage || true,
     fromUi: createTableUiConfig(config.fromUi),
     showSelection: config.showSelection || false,
     showEdit: config.showEdit || false,

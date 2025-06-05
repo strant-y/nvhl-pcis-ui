@@ -3,7 +3,7 @@
 	<div class="app-container">
 		<app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
 		<app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
-			@page-change="handleQuery(false)" @selection-change="handleSelectionChange"/>
+			@page-change="handleQuery(false)" @selection-change="handleSelectionChange" />
 	</div>
 </template>
 
@@ -61,11 +61,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 			createFreeButtonBase({
 				label: "重置",
 				func: () => {
-          freeEditRef.value?.resetFields()
-          nextTick(()=>{
-            freeEditRef.value?.setValue('tUnTmStart', startTm)
-            freeEditRef.value?.setValue('tUnTmEnd', endTm)
-          })
+					freeEditRef.value?.resetFields()
+					nextTick(() => {
+						freeEditRef.value?.setValue('tUnTmStart', startTm)
+						freeEditRef.value?.setValue('tUnTmEnd', endTm)
+					})
 				},
 			}),
 		],
@@ -77,12 +77,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				btnWidth: 10,
 				itemWidth: 2,
 				rules: [getRules("required", {
-          trigger: 'change'
-        })],
-        typeCode: "org_dpt",
-				params: {'cDptCde': user.value['companyId']},
+					trigger: 'change'
+				})],
 				showExBtn: true,
-        //disabled: true,
+				disabled: true,
 				btnItems: {
 					icon: "Search",
 					type: "primary",
@@ -90,11 +88,22 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 						dzmodal
 							.open(departmentTree, { type: "Issuer", data: {} })
 							.then((res) => {
+
 								if (res.type === "ok") {
-                  const label = res.label
-                  nextTick(()=>{
-                    freeEditRef.value?.setValue('cDptCde', label)
-                  })
+									const selectObj = res.body;
+									freeEditRef.value.setValue(
+										"cDptCde",
+										selectObj.id
+									);
+								setFormItem("cDptCde", {
+										loadData: [
+											{
+												// label: selectObj.name,
+												label: `${selectObj.id}${selectObj.name}`,
+												value: selectObj.id,
+											},
+										],
+									});
 								}
 							});
 					},
@@ -113,19 +122,19 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 			{
 				prop: "tUnTmStart",
 				inputtype: "rtdatepicker",
-        rules: [getRules("required", {})],
-        format: "YYYY-MM-DD",
-        valueFormat: "YYYY-MM-DD",
-        defaultValue: new Date(Date.now() - 6 * 1000 * 60 * 60 * 24),
+				rules: [getRules("required", {})],
+				format: "YYYY-MM-DD",
+				valueFormat: "YYYY-MM-DD",
+				defaultValue: new Date(Date.now() - 6 * 1000 * 60 * 60 * 24),
 				title: "退票日期起"
 			},
 			{
 				prop: "tUnTmEnd",
 				inputtype: "rtdatepicker",
-        rules: [getRules("required", {})],
-        format: "YYYY-MM-DD",
-        valueFormat: "YYYY-MM-DD",
-        defaultValue: new Date(Date.now()),
+				rules: [getRules("required", {})],
+				format: "YYYY-MM-DD",
+				valueFormat: "YYYY-MM-DD",
+				defaultValue: new Date(Date.now()),
 				title: "退票日期止"
 			},
 		],
@@ -141,19 +150,20 @@ const pageresult = reactive<Pageresult>({
 });
 const tableconfig = reactive<AppTableConfig>(
 	createTableEditConfig({
-    showSelection: true,
-    isRadio: true,
+		showSelection: true,
+		isRadio: true,
 		titleBtns: [
 			createFreeButtonBase({
 				id: "score",
 				label: "修改",
 				type: "success",
 				func: function () {
-          if (multipleSelection.value.length < 1 ) {
-            ElMessage.warning('请选择一条记录');
-            return ;
-          }          
-					dzmodal.open(finEdit, { type: "update" , data: multipleSelection.value[0] }).then((res) => {
+					if (multipleSelection.value.length !== 1) {
+						ElMessage.warning('请选择一条记录');
+						return;
+					}
+
+					dzmodal.open(finEdit, { type: "update", data: multipleSelection.value[0] }).then((res) => {
 						if (res.type === "ok") {
 							handleQuery();
 						}
@@ -163,62 +173,72 @@ const tableconfig = reactive<AppTableConfig>(
 		],
 		fromSchema: [
 			{
-				prop: "CCustSeq",
+				prop: "cCustSeq",
 				inputtype: "rtinput",
 				title: "业务唯一流水号",
 			},
 			{
-				prop: "CPlyNo",
+				prop: "cPlyNo",
 				inputtype: "rtinput",
 				title: "保单号",
 			},
 			{
-				prop: "CEdrNo",
+				prop: "cEdrNo",
 				inputtype: "rtinput",
 				title: "批单号",
 			},
 			{
-				prop: "CStatus",
-				inputtype: "rtinput",
+				prop: "cStatus",
+				inputtype: "rtselect",
 				title: "状态",
+				loadData:[
+				{label: '未申请修改',value: "0"},
+					{label: "提交",value :"1"},
+					{label: '已通过',value: "2"},
+					{label: '已退回', value: '3'}
+				]
 			},
 			{
-				prop: "CDepartmentCode",
+				prop: "cDepartmentCode",
 				inputtype: "rtinput",
 				title: "业务部门代码",
 			},
 			{
-				prop: "CCustomerNameCn",
+				prop: "cCustomerNameCn",
 				inputtype: "rtinput",
 				title: "收款客户名称",
 			},
 			{
-				prop: "CCustAccountNo",
+				prop: "cCustAccountNo",
 				inputtype: "rtinput",
 				title: "收款客户账号",
 			},
 			{
-				prop: "CBankProvince",
+				prop: "cBankProvince",
 				inputtype: "rtinput",
 				title: "开户行省",
 			},
 			{
-				prop: "CBankCity",
+				prop: "cBankCity",
 				inputtype: "rtinput",
 				title: "开户行市",
 			},
 			{
-				prop: "CBankName",
+				prop: "cBankName",
 				inputtype: "rtinput",
 				title: "开户行名称",
 			},
 			{
-				prop: "CIspayPublic",
-				inputtype: "rtinput",
+				prop: "cIspayPublic",
+				inputtype: "rtselect",
 				title: "对公对私",
+				loadData: [
+					{ label: "对公", value: "1" },
+					{ label: "对私", value: "2" },
+					],
 			},
 			{
-				prop: "CResult",
+				prop: "cResult",
 				inputtype: "rtinput",
 				title: "退票原因",
 			}
@@ -226,79 +246,127 @@ const tableconfig = reactive<AppTableConfig>(
 	})
 );
 onMounted(async () => {
-  nextTick(()=>{
-    freeEditRef.value?.setValue('tUnTmStart', startTm)
-    freeEditRef.value?.setValue('tUnTmEnd', endTm)
-  })
+	nextTick(() => {
+		freeEditRef.value?.setValue('tUnTmStart', startTm)
+		freeEditRef.value?.setValue('tUnTmEnd', endTm)
+	})
 });
 
 // 绑定方法
 const method = {
 	func1: () => {
-		console.log(getRules);
 	},
 };
 
 const handleSelectionChange = (val: any[]) => {
-  multipleSelection.value = val;
+	multipleSelection.value = val;
 };
 /** 查询 */
 function handleQuery(flag?: boolean) {
 	//模拟数据
-	pageresult.list = [{
-		CCustSeq: '111',
-		CPlyNo: '222',
-		CEdrNo: '333',
-		CStatus: '1',
-		CDepartmentCode: '1',
-		CCustomerNameCn: '1',
-		CCustAccountNo: '1',
-		CBankProvince: '1',
-		CBankCity: '1',
-		CBankName: '1',
-		CIspayPublic: '1',
-		CResult: '1',
-    CId:'22'
-	}];
-  freeEditRef.value?.validate().then((isValid) => {
-    if (!isValid) {
-      return false;
-    } else {
-      const form = freeEditRef.value?.getFromValue(); //获取表单数据
-      if(!form.cPlyNo && !form.cEdrNo){
-        const start = Date.parse(form.tUnTmStart);
-        const end = Date.parse(form.tUnTmEnd);
-        if (start - end > 0) {
-            ElMessage.warning('退票起期不能大于退票止期');
-            return;
-        }
-        if (end - start >= 7 * 1000 * 60 * 60 * 24) {
-            ElMessage.warning('退票时间范围请控制在7天以内');
-            return;
-        }
-      }
-      const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
-      const s = freeEditRef.value?.getFromValue(); //获取表单数据
-      const param = Object.assign(s, r, {
-          sortField: 'name',
-          CurrentUser: user.value['opCde'],
-          CurrentUserOrg: user.value['companyId']
-      });
-      finService.getFinRebackList(param)
-        .then((res) => {
-          const { code, data, msg } = res;
-          if (200 === code) {
-            pageresult.list = [];
-            pageresult.list = data.result;
-            pageresult.total = data.total;
-          } else {
-            ElMessage.error(msg);
-          }
-        })
-        .finally(() => { });
-    }
-  });
+	// pageresult.list = [{
+	// 	CCustSeq: '111',
+	// 	CPlyNo: '222',
+	// 	CEdrNo: '333',
+	// 	CStatus: '1',
+	// 	CDepartmentCode: '1',
+	// 	CCustomerNameCn: '1',
+	// 	CCustAccountNo: '1',
+	// 	CBankProvince: '1',
+	// 	CBankCity: '1',
+	// 	CBankName: '1',
+	// 	CIspayPublic: '1',
+	// 	CResult: '1',
+	// 	CId: '22'
+	// }];
+	freeEditRef.value?.validate().then((isValid) => {
+		if (!isValid) {
+			return false;
+		} else {
+			const form = freeEditRef.value?.getFromValue(); //获取表单数据
+			if (!form.cPlyNo && !form.cEdrNo) {
+				const start = Date.parse(form.tUnTmStart);
+				const end = Date.parse(form.tUnTmEnd);
+				if (start - end > 0) {
+					ElMessage.warning('退票起期不能大于退票止期');
+					return;
+				}
+				if (end - start >= 7 * 1000 * 60 * 60 * 24) {
+					ElMessage.warning('退票时间范围请控制在7天以内');
+					return;
+				}
+			}
+			const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
+			const s = freeEditRef.value?.getFromValue(); //获取表单数据
+			const param = Object.assign(s, r, {
+				sortField: 'name',
+				CurrentUser: user.value['opCde'],
+				CurrentUserOrg: user.value['companyId']
+			});
+
+			finService.getFinRebackList(param)
+				.then((res) => {
+					const { code, data, msg } = res;
+					if (200 === code) {
+						pageresult.list = [];
+						pageresult.list = data.result;
+						pageresult.total = data.total;
+					} else {
+						ElMessage.error(msg);
+					}
+				})
+				.finally(() => { });
+		}
+	});
 }
+
+
+
+function getFromValue() {
+	return freeEditRef?.value?.getFromValue();
+}
+
+function setFormValue(value: any) {
+	freeEditRef?.value?.setFormValue(value);
+}
+
+function validate() {
+	return freeEditRef?.value?.validate();
+}
+
+function setValue(key: string, value: any) {
+	freeEditRef?.value?.setValue(key, value);
+}
+
+function getValue(key: string) {
+	return freeEditRef?.value?.getValue(key);
+}
+
+//给表单赋值
+function setFormItem(key: any, obj: any) {
+	if (obj && Object.keys(obj).length) {
+		formconfig1.fromSchema?.forEach((item) => {
+			if (item.prop === key) {
+				//控制尾部按钮的
+				if (item.btnItems && obj.btnItems) {
+					for (let key in obj.btnItems) {
+						item.btnItems[key] = obj.btnItems[key];
+					}
+				} else {
+					Object.assign(item, obj);
+				}
+			}
+		});
+	}
+}
+
+defineExpose({
+	getFromValue,
+	setFormValue,
+	validate,
+	setValue,
+	getValue,
+});
 </script>
 
 <style scoped></style>

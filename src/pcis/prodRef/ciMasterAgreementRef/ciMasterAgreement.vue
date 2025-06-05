@@ -10,12 +10,20 @@ import {
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
+import { useProductStore } from "@/store/modules/prod";
+import { setTimeout } from "timers/promises";
+const productStore = useProductStore();
 
 const props = defineProps({
   pageSchema: {
     type: [Object],
     required: true,
   },
+});
+
+// 监听 store 中的变化并更新本地变量
+watchEffect(() => {
+  console.log("nPrm:", productStore.cCiMrk);
 });
 
 const tgtobjEditRef = ref<AppFreeEditMethod | null>(null);
@@ -29,6 +37,8 @@ onMounted(() => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
+  nextTick(() => {
+  });
 });
 
 // 绑定方法

@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="dialogVisible" width="90%">
+  <div>
     <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
     <el-row :gutter="20" style="margin-bottom: 10px">
       <el-col :span="2">
@@ -58,7 +58,9 @@
     <template v-if="showEditBtnFlag">
       <el-row :gutter="20" style="margin-top: 10px">
         <el-col :span="2">
-          <el-text class="mx-1" type="primary" :size="'large'" >行内编辑按钮:</el-text>
+          <el-text class="mx-1" type="primary" :size="'large'"
+            >行内编辑按钮:</el-text
+          >
         </el-col>
         <el-col :span="22">
           <div class="show-btn" v-for="(btn, index) in editBtns" :key="index">
@@ -89,24 +91,22 @@
     <rt-mytable
       v-if="showFactorList"
       :tableConfig="tableconfig"
+      :pageresult="pageresult"
       ref="tableRef"
+      @pageChange="pageQuerySelect(false)"
     />
-  </el-dialog>
-  <comDialog ref="dialog"></comDialog>
+
+    <comDialog ref="dialog"></comDialog>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { useValidator } from "@/typings/useValidator";
-import { componentType, position } from "@/utils/utilKey";
+import { componentType, position, showLocation } from "@/utils/utilKey";
 const { getRules } = useValidator();
 const dialog = ref<DialogMethod | null>(null);
 import { ref, defineProps } from "vue";
 const emits = defineEmits(["ok", "cancel"]);
-
-const props = defineProps({
-  data: Object,
-  type: String,
-});
 
 const dialogVisible = ref(true);
 
@@ -140,11 +140,30 @@ import {
 } from "@/shared/app-table-config";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { title } from "process";
-import { DialogMethod } from "../../common/dzmodel/ComDialogConf";
+import { DialogMethod } from "../ComDialogConf";
 const dzmodal = useDzModal();
 const jsonArrayEdit = defineAsyncComponent(
   () => import("@/common/dzmodel/jsonArrayEdit.vue")
 );
+
+const props = defineProps({
+  data: {
+    type: Object,
+    default: () => ({}),
+  },
+  method: {
+    type: Object,
+    default: () => ({}),
+  },
+  handleQuery: {
+    type: Function,
+    required: false,
+  },
+  rowData: {
+    type: Object,
+    default: () => ({}),
+  },
+});
 
 function editBtn(btn: any, index: any, sw: any) {
   dialog.value?.open(
@@ -223,7 +242,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         title: "组件主键",
         placeholder: "请输入主键",
-        disabled: props.type === "edit" ? true : false,
+        disabled: props.data.type === "edit" ? true : false,
         rules: [getRules("required", {})],
       },
       {
@@ -248,13 +267,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           if (ct === "custom") {
             return;
           }
-          const ck = freeEditRef.value?.getValue("componentKey");
           showFactorList.value = true;
-          const param = {
-            componentKey: ck,
-            componentTab: index,
-          };
-          querySelector(param);
+          pageQuerySelect(true);
 
           if (index === "dist") {
             showEditBtnFlag.value = true;
@@ -268,6 +282,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 e.hidden = false;
               } else {
                 e.hidden = true;
+              }
+            }
+          });
+
+          tableconfig.fromSchema?.forEach((e: any) => {
+            if (e.prop === "cShowLocation") {
+              if (index === "dist") {
+                e.isShow = true;
+              } else {
+                e.isShow = false;
               }
             }
           });
@@ -309,7 +333,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 data: ck,
                 inititle: ["id", "title"],
               })
-              .then((res) => {
+              .then((res: any) => {
                 if (res.type === "ok") {
                   freeEditRef.value?.setValue("componentGroup", res.body);
                 }
@@ -330,10 +354,43 @@ const formconfig1 = reactive<AppFreeEditConfig>(
   })
 );
 
+const pageresult = reactive<Pageresult>({
+  result: "",
+  /** 数据列表 */
+  list: [],
+  /** 总数 */
+  total: 0,
+});
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     editFlag: true,
-    editList: ["cGroup", "cExpand"],
+    editList: ["cGroup", "cExpand", "cShowLocation"],
+    showEdit: true,
+    formconfig: {
+      fromSchema: [
+        {
+          prop: "cFactorKey",
+          inputtype: "rtinput",
+          title: "要素key",
+        },
+        {
+          prop: "cFactorTitle",
+          inputtype: "rtinput",
+          title: "要素名称",
+        },
+      ],
+    },
+    titleBtns:[
+      createFreeButtonBase({
+        link:true,
+        type: "primary",
+        label:"查询", 
+        icon: "Search",
+        func: () => {
+          pageQuerySelect(true);
+        },
+      }),
+    ],
     fromSchema: [
       {
         prop: "icon",
@@ -380,15 +437,21 @@ const tableconfig = reactive<AppTableConfig>(
         title: "折叠内容",
         loadData: yesOrNo,
       },
+      {
+        prop: "cShowLocation",
+        inputtype: "rtselect",
+        title: "显示位置",
+        loadData: showLocation,
+      },
     ],
   })
 );
 
 onMounted(async () => {
-  if (props.type === "edit") {
+  if (props.data.type === "edit") {
     getComponentByKey({
-      componentKey: props.data?.componentKey,
-    }).then((res) => {
+      componentKey: props.data.data?.componentKey,
+    }).then((res: any) => {
       const { code, data, msg } = res;
       if (200 === code) {
         const param = {
@@ -456,7 +519,9 @@ onMounted(async () => {
         }
         if (data.cComponentType !== "custom") {
           showFactorList.value = true;
-          querySelector(param);
+          nextTick(() => {
+            pageQuerySelect(true);
+          });
         }
       }
     });
@@ -494,7 +559,6 @@ function save() {
       }
     });
   }
-
   const param = Object.assign(s, {
     selectFactor: selectList,
     titleBtns: titleBtns.value,
@@ -502,7 +566,7 @@ function save() {
     editBtns: editBtns.value,
   });
   saveComponent(param)
-    .then((res) => {
+    .then((res: any) => {
       const { code, data, msg } = res;
       if (200 === code) {
         // emits("ok", {});
@@ -515,14 +579,8 @@ function save() {
 
         const ct = freeEditRef.value?.getValue("componentType");
         if (ct !== "custom") {
-          const ck = freeEditRef.value?.getValue("componentKey");
-          const tb = freeEditRef.value?.getValue("componentTab");
           showFactorList.value = true;
-          const param = {
-            componentKey: ck,
-            componentTab: tb,
-          };
-          querySelector(param);
+          pageQuerySelect(true);
         }
       } else {
         ElMessage.error(msg);
@@ -534,7 +592,7 @@ function save() {
 function showView(cComponentKey: any) {
   getComponentViewByKey({
     componentKey: cComponentKey,
-  }).then((res) => {
+  }).then((res: any) => {
     const { code, data, msg } = res;
     console.log(data);
     if (200 === code) {
@@ -548,9 +606,24 @@ function showView(cComponentKey: any) {
   });
 }
 
+function pageQuerySelect(isPage: boolean = true) {
+  const paraParam = tableRef.value?.getPartnerPage(isPage);
+
+  const fromp = tableRef.value?.getFormData();
+  const ck = freeEditRef.value?.getValue("componentKey");
+  const tb = freeEditRef.value?.getValue("componentTab");
+  showFactorList.value = true;
+  const param = {
+    componentKey: ck,
+    componentTab: tb,
+  };
+
+  const p = Object.assign({}, paraParam, param, fromp);
+  querySelector(p);
+}
 function querySelector(param: any) {
-  querySelectorList(param).then((res) => {
-    const { code, data, msg } = res;
+  querySelectorList(param).then((res: any) => {
+    const { code, data, msg, total } = res;
     if (200 === code) {
       Object.keys(data).forEach((i) => {
         if (data[i].factorPkId) {
@@ -558,6 +631,7 @@ function querySelector(param: any) {
         }
       });
       tableRef.value?.setFormValue(data);
+      pageresult.total = total;
     } else {
       ElMessage.error(msg);
     }

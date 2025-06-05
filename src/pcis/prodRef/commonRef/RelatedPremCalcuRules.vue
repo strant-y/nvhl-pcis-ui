@@ -23,12 +23,14 @@ import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { dataParam } from "@/store/modules/dataParam";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 const AddPremCalcuRulesModal = defineAsyncComponent(
   () => import("./AddPremCalcuRulesModal.vue")
 );
 const opertaor = dataOpertaor();
+const dataparam = dataParam();
 const tabref = opertaor.getTableRefByKey("prodInfo");
 import {
   AppTableConfig,
@@ -44,9 +46,7 @@ import {
 } from "@/api/prod";
 
 import { useRoute } from "vue-router";
-const route = useRoute();
-const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const param = dataparam.getParam();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig1 = reactive<AppFreeEditConfig>(

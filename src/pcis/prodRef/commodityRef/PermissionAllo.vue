@@ -157,6 +157,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               .open(departmentTree, { type: "Issuer", data: {} })
               .then((res) => {
                 if (res.type === "ok") {
+                  
                   const selectObj = res.body;
                   freeEditRef.value?.setValue(
                     "cDptCde",

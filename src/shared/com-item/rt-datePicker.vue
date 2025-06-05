@@ -3,6 +3,7 @@
     ref="datepickerRef"
     v-if="!showLabel"
     v-model="vInput"
+    :class="isReQuired() ? 're-quired-flag' : ''"
     :type="item.type ? item.type : 'date'"
     :readonly="
       item.readonly
@@ -40,19 +41,11 @@
             : false
         : false
     "
-    :editable="
-      item.editable
-        ? typeof item.editable === 'boolean'
-          ? item.editable
-          : item.editable === 1
-            ? true
-            : false
-        : false
-    "
     :dateFormat="'YYYY-MM-DD'"
     :timeFormat="'HH:mm:ss'"
     :valueFormat="item.valueFormat ? item.valueFormat : getValueFormat()"
     @change="handleChange"
+    @blur="blur"
   />
   <span v-else>
     {{ vInput }}
@@ -60,9 +53,10 @@
 </template>
 
 <script setup lang="ts">
+import moment from "moment";
 const props = defineProps({
   modelValue: {
-    type: [Number, String, Array],
+    type: [Number, String],
   },
   item: {
     type: Object as () => Record<string, any>,
@@ -88,6 +82,33 @@ const vInput = ref<number | string>();
 watch([() => props.modelValue], ([newModelValue]) => {
   vInput.value = newModelValue;
 });
+function blur(v: any) {
+  const value = v.target.value;
+  if (!value && value === "") {
+    return;
+  }
+  const format = props.item.valueFormat
+    ? props.item.valueFormat
+    : getValueFormat();
+  if (format) {
+    const wordsList = format.match(/[a-zA-Z]+/g);
+    if (wordsList && wordsList.length > 0) {
+      let le = 0;
+      let nv = format;
+      for (const key in wordsList) {
+        const w = wordsList[key];
+        const v = value.substring(le, le + w.length);
+        nv = nv.replace(w, v);
+        le = le + w.length;
+      }
+      const s = moment(nv).isValid();
+      if (s) {
+        vInput.value = nv;
+        handleChange(nv);
+      }
+    }
+  }
+}
 function handleChange(val?: string | undefined) {
   emits("valueChange", val);
   emits("update:modelValue", val);
@@ -107,6 +128,34 @@ function getValueFormat() {
     default:
       return "YYYY-MM-DD";
   }
+}
+
+function isReQuired() {
+  // 如果是禁用状态,默认带底色
+  if (
+    props.item.disabled === true ||
+    props.item.disabled === "1" ||
+    props.item.disabled === 1
+  ) {
+    return false;
+  }
+  if (
+    props.item.required === "1" ||
+    props.item.required === 1 ||
+    props.item.required === true
+  ) {
+    return true;
+  }
+  const rule = props.item.rules;
+  let r = false;
+  if (rule && rule.length > 0) {
+    for (const key in rule) {
+      if (rule[key].required) {
+        r = true;
+      }
+    }
+  }
+  return r;
 }
 
 onMounted(() => {
