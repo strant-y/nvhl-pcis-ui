@@ -85,7 +85,7 @@ const vInputShow = computed(()=> {
     ? props.item.valueFormat
     : getValueFormat();
   if (format && value) {
-    return moment(new Date(value)).format('YYYY-MM-DD')
+    return moment(new Date(value)).format(format)
   } else {
     return "";
   }
