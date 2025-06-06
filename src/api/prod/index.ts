@@ -1453,3 +1453,11 @@ export function queryInquiryPageComponentList(queryParams: any): AxiosPromise<an
 export function releaseInquiryPage(queryParams: any): AxiosPromise<any> {
   return post(`/prod/releaseInquiryPage`, queryParams);
 }
+
+/**
+ * 询价录单-出单页面查询配置
+ * 
+ */
+export function getReleaseInquiryPage(queryParams: any): AxiosPromise<any> {
+  return post(`/prod/getReleaseInquiryPage`, queryParams);
+}
