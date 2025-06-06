@@ -65,11 +65,17 @@ onMounted(async () => {
         );
       }
     });
-    setFormItem("Ci.cDptCde", {
-      loadData: [
-        { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm}` },
-      ],
-    });
+    // freeEditRef.value?.setRowFieldProp(
+    //       row._dataId,
+    //       "Ci.cDptCde",
+    //       "loadData",
+    //       [{ value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm}` }]
+    //     );
+    // setFormItem("Ci.cDptCde", {
+    //   loadData: [
+    //     { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm}` },
+    //   ],
+    // });
   });
 });
 
@@ -163,37 +169,68 @@ const method = {
   },
   nCiShareChange:(val)=>{
     const rowDatas = freeEditRef.value?.getSelectRow();
-    let value = parseFloat(val);
+    let value = val;
     if (value > 1 || value == "") {
-      freeEditRef?.value?.setValueByRowKey("Ci.nCiShare",rowDatas._dataId,parseFloat('1.00000000'));
+      freeEditRef?.value?.setValueByRowKey("Ci.nCiShare",rowDatas._dataId,parseFloat('1').toFixed(8));
     }
-    const nPrm =  parseFloat(productStore.nPrm) * parseFloat(val)
-    const nAmt = parseFloat(productStore.nAmt) * parseFloat(val)
-    freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm",rowDatas._dataId,nPrm.toFixed(8))
-    freeEditRef?.value?.setValueByRowKey("Ci.nCiAmt",rowDatas._dataId,nAmt.toFixed(8))
+    const nPrm =  productStore.nPrm * val
+    const nAmt = productStore.nAmt * val
+    console.log("nPrm", typeof(nPrm),typeof(nAmt) );
+    freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm",rowDatas._dataId,nPrm.toFixed(2))
+    freeEditRef?.value?.setValueByRowKey("Ci.nCiAmt",rowDatas._dataId,nAmt.toFixed(2))
     if(rowDatas["Ci.cCoinsurerCde"] == "327001"){
-      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntAmt",nAmt)  //联保总保额
-      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm",nPrm) //联保总保费
-      opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnAmt",nAmt) //我司份额保额
-      opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnPrm",nPrm) //我司份额保费
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntAmt",nAmt.toFixed(2))  //联保总保额
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm",nPrm.toFixed(2)) //联保总保费
+      opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnAmt",nAmt.toFixed(2)) //我司份额保额
+      opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnPrm",nPrm.toFixed(2)) //我司份额保费
     }
   },
   nPlyFeeRateChange:(val)=>{
     const rowDatas = freeEditRef.value?.getSelectRow();
-    const nPlyFee = parseFloat(val) * parseFloat(rowDatas["Ci.nCiPrm"])
+    const nPlyFee = val * rowDatas["Ci.nCiPrm"]
     freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee",rowDatas._dataId,nPlyFee)
   },
-  //联共保批改时不禁用部分要素
-  setItemReadonly:()=> {
-    const pageType = param.pageType;  //
-    const cCiMrk =productStore.cCiMrk;  //是否联共保
-    debugger
-    if (pageType === "EDR_APP_NEW_SCENE" &&  cCiMrk !== "0") {
-      formconfig1.fromSchema?.forEach((item) => {
-        item.disabled = false;
-      });
-    }
-    console.log("setItemReadonly",formconfig1.fromSchema);
+  //开户行省改变
+  cProvinceChange:(val)=>{
+    const rowData = freeEditRef.value?.getSelectRow();
+    const rowId = rowData._dataId;
+    freeEditRef?.value?.setValueByRowKey("Ci.cBankArea",rowId,"")
+    freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBankArea","loadData",[],);
+    codeListStore
+        .queryCodeList({
+          codeListName: "CBankAreaList",
+          codeListParam: { "areaprovince": val },
+        })
+        .then((res) => {
+          freeEditRef.value?.setRowFieldProp(
+            rowId,
+            "Ci.cBankArea",
+            "loadData",
+            res,
+          );
+        });
+  },
+  //开户行市改变
+  cCityChange:(val)=>{
+    const rowData = freeEditRef.value?.getSelectRow();
+    const rowId = rowData._dataId;
+    freeEditRef?.value?.setValueByRowKey("Ci.cCountryCde",rowId,"")
+    codeListStore
+        .queryCodeList({
+          codeListName: "CBankCountyList",
+          codeListParam: { "areaprovince": rowData['Ci.cBankArea'],"areaname":val },
+        })
+        .then((res) => {
+          freeEditRef.value?.setRowFieldProp(
+            rowId,
+            "Ci.cBankCounty",
+            "loadData",
+            res,
+          );
+        });
+        //Ci.cBankPro 省
+        //Ci.cBankArea 市
+        // Ci.cBankCounty  县
   }
 };
 

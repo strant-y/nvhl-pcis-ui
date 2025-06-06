@@ -166,7 +166,7 @@ function handleQuery(flag?: boolean) {
         CurrentUser: user.opCde,
         CurrentUserOrg: user.companyId,
         CBsnsTyp: props.data.data['CBsnsTyp'],
-        CDptCde: props.data.data['CDptCde'],
+        CDptCde: routeParam.cDptCde,
         CBrkrCde: props.data.data['CBrkrCde'],
         CSlsTyp: props.data.data['CSlsTyp'],
         CChaType: props.data.data['CChaType'],
@@ -177,7 +177,7 @@ function handleQuery(flag?: boolean) {
 
     }, param);
 
-    console.log('param', params)
+    console.log('param', routeParam)
     policyService.getWebOrgSelsList(params).then((res: any) => {
       if (res && res["code"] === 200) {
         const pageData = res.data;

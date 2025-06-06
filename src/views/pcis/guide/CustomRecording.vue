@@ -412,11 +412,12 @@ function handleClick(item: any, index: number) {
 }
 //取消常用条款
 function handleStarClick(item: any) {
+  console.log("0000000",item);
   const param = formconfig1.value.cRecordType === 2 ? {
     planNo: item.planNo,
     isPlan: "1",
   } : {
-    termNo: item.planNo,
+    termNo: item.termNo,
     isPlan: "0",
   }
   unUserUnUntionTerm(param).then((res:any) => {
