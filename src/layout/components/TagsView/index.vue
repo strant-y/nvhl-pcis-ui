@@ -9,8 +9,9 @@
         ref="tagRef"
         v-for="tag in visitedViews"
         :key="tag.fullPath"
+        :to="''"
         :class="'tags-item ' + (isActive(tag) ? 'active' : '')"
-        :to="{ path: tag.path, query: tag.query }"
+        @click.prevent="toView(tag)"
         @click.middle="!isAffix(tag) ? closeSelectedTag(tag) : ''"
         @contextmenu.prevent="openContentMenu(tag, $event)"
       >
@@ -95,16 +96,16 @@ const affixTags = ref<TagView[]>([]);
 const left = ref(0);
 const top = ref(0);
 
-watch(
-  route,
-  () => {
-    addTags();
-    moveToCurrentTag();
-  },
-  {
-    immediate: true, //初始化立即执行
-  }
-);
+// watch(
+//   route,
+//   () => {
+//     addTags();
+//     moveToCurrentTag();
+//   },
+//   {
+//     immediate: true, //初始化立即执行
+//   }
+// );
 
 const contentMenuVisible = ref(false); // 右键菜单是否显示
 watch(contentMenuVisible, (value) => {
@@ -114,6 +115,14 @@ watch(contentMenuVisible, (value) => {
     document.body.removeEventListener("click", closeContentMenu);
   }
 });
+
+function toView(tag: TagView) {
+  tagsViewStore.setCurrentView(tag);
+  console.log('tag.mode', tag.mode);
+  nextTick(()=>{
+    router.push({ path: tag.path, query: tag.query})
+  })
+}
 
 /**
  * 过滤出需要固定的标签
@@ -153,43 +162,6 @@ function initTags() {
   }
 }
 
-function addTags() {
-  if (route.meta.title) {
-    tagsViewStore.addView({
-      name: route.name as string,
-      title: route.meta.title,
-      path: route.path,
-      query: route.query,
-      fullPath: route.fullPath,
-      affix: route.meta?.affix,
-      keepAlive: route.meta?.keepAlive,
-      hidden: route.meta.hidden
-    });
-  }
-}
-
-function moveToCurrentTag() {
-  // 使用 nextTick() 的目的是确保在更新 tagsView 组件之前，scrollPaneRef 对象已经滚动到了正确的位置。
-  nextTick(() => {
-    for (const tag of visitedViews.value) {
-      if (tag.path === route.path) {
-        // when query is different then update
-        // route.query = { ...route.query, ...tag.query };
-        if (tag.fullPath !== route.fullPath) {
-          tagsViewStore.updateVisitedView({
-            name: route.name as string,
-            title: route.meta.title || "",
-            path: route.path,
-            query: route.query,
-            fullPath: route.fullPath,
-            affix: route.meta?.affix,
-            keepAlive: route.meta?.keepAlive,
-          });
-        }
-      }
-    }
-  });
-}
 
 function isActive(tag: TagView) {
   return tag.path === route.path;
@@ -231,7 +203,9 @@ function refreshSelectedTag(view: TagView) {
 
 function toLastView(visitedViews: TagView[], view?: TagView) {
   const latestView = visitedViews.slice(-1)[0];
-  if (latestView && latestView.fullPath) {
+  if(latestView.mode === '2') {
+    toView(latestView);
+  } else if (latestView && latestView.fullPath) {
     router.push(latestView.fullPath);
   } else {
     // now the default is to redirect to the home page if there is no tags-view,
@@ -271,7 +245,7 @@ function closeRightTags() {
 function closeOtherTags() {
   router.push(selectedTag.value);
   tagsViewStore.delOtherViews(selectedTag.value).then(() => {
-    moveToCurrentTag();
+    tagsViewStore.moveToCurrentTag(route);
   });
 }
 

@@ -1,13 +1,21 @@
+import { getCompByName } from '@/typings/views-component'
+
 export const useTagsViewStore = defineStore("tagsView", () => {
   const visitedViews = ref<TagView[]>([]);
   const cachedViews = ref<string[]>([]);
-
+  const currentView = ref<TagView>();
   /**
    * 添加已访问视图到已访问视图列表中
    */
   function addVisitedView(view: TagView) {
-    // 如果已经存在于已访问的视图列表中，则不再添加
+    // 如果已经存在于已访问的视图列表中，则不再添加 只更新视图中的路由参数
     if (visitedViews.value.some((v) => v.path === view.path)) {
+      visitedViews.value.forEach(item => {
+        if (item.path === view.path) {
+          item.query = view.query
+          item.params = view.params
+        }
+      })
       return;
     }
     // 如果视图是固定的（affix），则在已访问的视图列表的开头添加
@@ -92,8 +100,23 @@ export const useTagsViewStore = defineStore("tagsView", () => {
   }
 
   function addView(view: TagView) {
-    addVisitedView(view);
-    // addCachedView(view);
+    let viewData: TagView = view;
+    const comp = getCompByName(view.name);
+    if (!!comp) {
+      // 添加组件模式视图
+      viewData = {
+        ...view,
+        ... {
+          mode: !!comp ? '2' : '1',
+          isActive: true,
+          compKey: `${view.path}_${Date.now()}`,
+          component: comp,
+        }
+      }
+    }
+    addVisitedView(viewData);
+    setCurrentView(viewData);
+    // addCachedView(viewData);
   }
 
   function delView(view: TagView) {
@@ -188,9 +211,42 @@ export const useTagsViewStore = defineStore("tagsView", () => {
     });
   }
 
+  function setCurrentView(view: TagView) {
+    currentView.value = view
+    visitedViews.value.forEach(item => item.isActive = view.path === item.path )
+  }
+
+
+  function moveToCurrentTag(route) {
+    // 使用 nextTick() 的目的是确保在更新 tagsView 组件之前，scrollPaneRef 对象已经滚动到了正确的位置。
+    nextTick(() => {
+      for (const tag of visitedViews.value) {
+        if (tag.path === route.path) {
+          // when query is different then update
+          if (tag.fullPath !== route.fullPath) {
+            updateVisitedView({
+              name: route.name as string,
+              title: route.meta.title || "",
+              path: route.path,
+              fullPath: route.fullPath,
+              affix: route.meta?.affix,
+              keepAlive: route.meta?.keepAlive,
+              hidden: route.meta.hidden,
+              component: tag.component,
+              query: tag.query,
+              params: tag.params,
+              mode: tag.mode,
+            });
+          }
+        }
+      }
+    });
+  }
+
   return {
     visitedViews,
     cachedViews,
+    currentView,
     addVisitedView,
     addCachedView,
     delVisitedView,
@@ -206,5 +262,7 @@ export const useTagsViewStore = defineStore("tagsView", () => {
     delAllViews,
     delAllVisitedViews,
     delAllCachedViews,
+    setCurrentView,
+    moveToCurrentTag
   };
 });

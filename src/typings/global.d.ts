@@ -49,6 +49,12 @@ declare global {
     keepAlive?: boolean;
     /** 路由查询参数 */
     query?: any;
+    /** 组件实例*/
+    component?: any;
+    /** 承载方式 1：路由，2：组件实例 默认路由方式*/
+    mode?: any;
+    /** 是否显示*/
+    hidden?: boolean;
   }
 
   /**

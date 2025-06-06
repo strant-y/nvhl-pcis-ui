@@ -2,14 +2,19 @@ import router from "@/router";
 import { useUserStore } from "@/store/modules/user";
 import { usePermissionStore } from "@/store/modules/permission";
 import NProgress from "@/utils/nprogress";
-import { codeListViewStore } from "@/store";
+import { codeListViewStore, useTagsViewStore } from "@/store";
 import { descryptParameter, encryptParameter } from "@/utils/encipher";
+import { descryptParameterToQuery } from '@/utils/common'
 
 export function setupPermission() {
   // 白名单路由
   const whiteList = ["/login"];
   // 加密标志位
   const isEncrypted = ref<Boolean>(false);
+
+  const tagsViewStore = useTagsViewStore();
+
+  const { visitedViews } = storeToRefs(tagsViewStore);
 
   router.beforeEach(async (to, from, next) => {
     NProgress.start();
@@ -57,6 +62,21 @@ export function setupPermission() {
               }
             } else {
               isEncrypted.value = false;
+              if (to.meta.title) {
+                const data = descryptParameterToQuery(query);
+                tagsViewStore.addView({
+                  name: to.name as string,
+                  title: to.meta.title,
+                  path: to.path,
+                  fullPath: to.fullPath,
+                  affix: to.meta?.affix,
+                  keepAlive: to.meta?.keepAlive,
+                  hidden: to.meta.hidden,
+                  query: data.JSONquery,
+                  params: data.ParseParams
+                });
+                tagsViewStore.moveToCurrentTag(to);
+              }
               next();
             }
           }
@@ -104,19 +124,11 @@ export function setupPermission() {
   router.afterEach((to) => {
     // Decrypt route parameters 路由参数解密
     if (to.query) {
-      for (const key in to.query) {
-        if (Object.prototype.hasOwnProperty.call(to.query, key)) {
-          if (key !== 'encrypted') {
-            const p = to.query[key];
-            const keyData = descryptParameter(to.query[key]);
-            if (!!keyData) {
-              to.query[key] = p;
-              to.params[key] = JSON.parse(keyData);
-            }
-          }
-        }
-      }
+      const {JMquery, ParseParams} = descryptParameterToQuery(to.query);
+      to.query = JMquery
+      to.params = ParseParams
     }
     NProgress.done();
   });
+
 }

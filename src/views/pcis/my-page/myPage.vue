@@ -10,7 +10,7 @@
               :key="v"
               class="NavigaList_card"
             >
-              <el-anchor :bound="120" :offset="80">
+              <el-anchor :bound="120" :offset="80" style="margin-top: 40px">
                 <el-anchor-link :href="`#underwriteurl`" v-if="underwriteFlag">
                   <rt-icon
                     style="margin-right: 14px"
@@ -42,7 +42,7 @@
                 <el-anchor-link
                   v-for="(k, i) in pageConfig?.pageInfo"
                   :key="i"
-                  :href="`#${k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey}`"
+                  :custom="true"
                   v-show="
                     k.pageKey !== 'acctinfo'
                       ? [
@@ -54,6 +54,7 @@
                         : acctinfoFlag
                       : true
                   "
+                  @click="handleAnchorClick($event, `#${k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey}`)"
                 >
                   <rt-icon
                     style="margin-right: 14px"
@@ -134,7 +135,7 @@
         <el-backtop :right="100" :bottom="100" />
         <el-affix
           :offset="80"
-          style="text-align: center; padding: 5px; background: #ebedfc"
+          style="text-align: center; padding: 5px; background: #ebedfc;width: 100%;"
         >
           <div class="tp" style="background: #ebedfc">
             <span style="font-weight: bold">条款：</span
@@ -284,9 +285,13 @@ import moment from "moment";
 import dayjs from "dayjs";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
+import { useRouter, useRoute } from "vue-router";
 const policyService = new PolicyService();
 const productStore = useProductStore();
 const { isCiJiMrk } = storeToRefs(productStore);
+
+const route = useRoute();
+const router = useRouter();
 
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
@@ -1665,6 +1670,16 @@ const savePlyInfo = async () => {
       const appNo = plyBase["Base.cAppNo"];
       saveDist(appNo);
     }
+
+    // 保存后替换路由参数
+    router.replace({path: route.path, name: route.name, query: {
+        param: JSON.stringify({
+        ... route.params.param,
+        ... {
+          cAppNo: plyBase["Base.cAppNo"]
+        }
+      })
+    }});
   } else {
     ElMessage.error(resInfo.msg);
   }
@@ -2187,6 +2202,26 @@ function handleUpdateSide(data: any) {
       ) + 1;
     formconfig1[0].pageInfo.splice(index, 0, ...sliceSide.value);
     sliceSide.value = [];
+  }
+}
+
+/**
+ * 锚点点击事件重写 
+ * 避免触发路由
+ */
+function handleAnchorClick(event: any, targetId: string) {
+  // 阻止默认的路由跳转行为
+  event.preventDefault();
+  // 获取目标元素的ID
+  if (targetId) {
+    // 手动实现平滑滚动效果
+    const targetElement = document.querySelector(targetId);
+    if (targetElement) {
+      targetElement.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' // 可选值：'start', 'center', 'end', 'nearest'
+      });
+    }
   }
 }
 
