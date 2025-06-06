@@ -278,7 +278,7 @@ import {
   getSurrenderPrecis,
   submitEdrSurrender,
 } from "../../../api/query/index";
-import { checkFeeWindowType, selectDist, saveDistBatch } from "@/api/prod";
+import { checkFeeWindowType, selectDist, saveDistBatch, getReleaseInquiryPage } from "@/api/prod";
 import { dataOpertaor, useProductStore } from "@/store";
 import moment from "moment";
 import dayjs from "dayjs";
@@ -800,7 +800,10 @@ const uwBtn = [
  * @param data
  */
 const initPage = async () => {
-  const getProductRes = await getProductPage({
+  const getProductRes = props.param?.pageName === "priceInquiry" ? await getReleaseInquiryPage({
+    CProdNo: props.param.cProdNo,
+    CGrpMrk: props.param.cGrpMrk,
+  }) : await getProductPage({
     CProdNo: props.param.cProdNo,
     CGrpMrk: props.param.cGrpMrk,
   });
