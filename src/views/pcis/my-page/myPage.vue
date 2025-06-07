@@ -1498,6 +1498,12 @@ const submitToUndrFn = async () => {
     ElMessage.error("请先进行保费计算!");
     return;
   }
+  // 校验承包基本信息中的总保额和总保费币种须一致
+  const baseValue = opertaor.getTableRefByKey("base").getFromValue();
+  if(baseValue["Base.cAmtCur"] !== baseValue["Base.cPrmCur"]) {
+    ElMessage.error("承保基本信息中的总保额币种和总保费币种须一致!");
+    return;
+  }
   if (!checkNAmt()) return;
   const f = await savePlyInfo(); // 提交核保,需要默认执行一次保存操作
   if (f) {
