@@ -4,7 +4,7 @@
     <!-- <div class="el-card__header">
       <span class="el-card__header__title">{{ title }}</span>
     </div> -->
-    <div v-if="step == '0'">
+    <div>
       <el-form
         ref="freeEditRef"
         :model="formconfig1"
@@ -178,18 +178,13 @@
         </el-row>
       </el-form>
     </div>
-    <div v-if="step == '1'">内容</div>
     <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
       <rt-button
         :item="{
           type: 'primary',
-          label: step == '0' ? '下一步' : '上一步',
+          label: '下一步',
           func: () => {
-            if (step == '0') {
-              next();
-            } else {
-              step = '0';
-            }
+            next();
           },
         }"
       />
