@@ -43,7 +43,7 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { userUnionTerm, unUserUnUntionTerm } from "./custom-recording.service";
+import { userUnionTerm, unUserUnUntionTerm,qryUserCommonTerm} from "./custom-recording.service";
 import { SysOpMgrService } from "@/views/sys-right-basic/service/sys-op-mgr.service";
 import { max } from "lodash";
 import func from "vue-temp/vue-editor-bridge";
@@ -76,7 +76,7 @@ const labelNm = ref("条款")
 const params = ref<any>({});
 const checkedIcon = ref("rgb(170, 170, 170)");
 const tableRef = ref<AppTableMethod | null>(null);
-
+const countNum = ref(0);
 const pageresult = reactive<Pageresult>({
   result: "",
   /** 数据列表 */
@@ -108,45 +108,59 @@ const tableconfig = reactive<AppTableConfig>(
               ? "rgb(250, 219, 20)"
               : "rgb(170, 170, 170)";
           const isPlan = props.type === 2 ? "1" : "0";
-          if (checkedIcon.value === "rgb(250, 219, 20)") {
-            const params = props.type === 2 ? {
-              planNo: row.code,
-              planCnm: row.value,
-              prodCnm: props.pNode.parent.data.value,
-              prodNo: props.pNode.parent.data.code,
-              isPlan: isPlan,
-            } : {
-              termNo: row.code,
-              termCnm: row.value,
-              prodCnm: props.pNode.parent.data.value,
-              prodNo: props.pNode.parent.data.code,
-              isPlan: isPlan,
-            };
-            userUnionTerm(params).then((res:any) => {
-              if (res.code == "1") {
-                ElMessage.success(res.message);
-                emits("updateTerm", {});
+          qryUserCommonTerm({
+            pageNum: 1,
+            pageSize: 9999,
+            userId: JSON.parse(sessionStorage.getItem("user")).opCde,
+            isPLan: isPlan,
+          }).then((res: any) => {
+              countNum.value = res.total;
+              if(countNum.value >=9){
+                ElMessage.error("最多只能收藏9条");
+                checkedIcon.value = "rgb(170, 170, 170)";
+                return false;
+              }else{
+                if (checkedIcon.value === "rgb(250, 219, 20)") {
+                  const params = props.type === 2 ? {
+                    planNo: row.code,
+                    planCnm: row.value,
+                    prodCnm: props.pNode.parent.data.value,
+                    prodNo: props.pNode.parent.data.code,
+                    isPlan: isPlan,
+                  } : {
+                    termNo: row.code,
+                    termCnm: row.value,
+                    prodCnm: props.pNode.parent.data.value,
+                    prodNo: props.pNode.parent.data.code,
+                    isPlan: isPlan,
+                  };
+                userUnionTerm(params).then((res:any) => {
+                  if (res.code == "1") {
+                    ElMessage.success(res.message);
+                    emits("updateTerm", {});
+                  } else {
+                    ElMessage.error(res.msg);
+                  }
+                });
               } else {
-                ElMessage.error(res.msg);
+                const param = props.type === 2 ? {
+                  planNo: row.code,
+                  isPlan: isPlan,
+                } : {
+                  termNo: row.code,
+                  isPlan: isPlan
+                };
+                unUserUnUntionTerm(param).then((res:any) => {
+                  if (res.code == "1") {
+                    ElMessage.success(res.message);
+                    emits("updateTerm", {});
+                  } else {
+                    ElMessage.error(res.msg);
+                  }
+                });
               }
+            }
             });
-          } else {
-            const param = props.type === 2 ? {
-              planNo: row.code,
-              isPlan: isPlan,
-            } : {
-              termNo: row.code,
-              isPlan: isPlan
-            };
-            unUserUnUntionTerm(param).then((res:any) => {
-              if (res.code == "1") {
-                ElMessage.success(res.message);
-                emits("updateTerm", {});
-              } else {
-                ElMessage.error(res.msg);
-              }
-            });
-          }
         },
       }),
     ],

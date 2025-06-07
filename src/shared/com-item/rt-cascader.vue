@@ -11,44 +11,12 @@
       :placeholder="item.placeholder ? item.placeholder : '请选择'"
       :options="options"
       :show-all-levels="false"
-      :disabled="
-        (item.readonly
-          ? typeof item.readonly === 'boolean'
-            ? item.readonly
-            : item.readonly === 1 || item.readonly === '1'
-              ? true
-              : false
-          : false) ||
-        (item.disabled
-          ? typeof item.disabled === 'boolean'
-            ? item.disabled
-            : item.disabled === 1 || item.disabled === '1'
-              ? true
-              : false
-          : false) ||
-        showLabel
-      "
-      :clearable="
-        item.clearable
-          ? typeof item.clearable === 'boolean'
-            ? item.clearable
-            : item.clearable === 1 || item.clearable === '1'
-              ? true
-              : false
-          : false
-      "
+      :disabled="isReadonly() || isDisabled() || showLabel"
+      :clearable="isClearable()"
       :size="item.size"
       :filterable="item.filterable"
       :showAllLevels="item.showAllLevels"
-      :multiple="
-        item.multiple
-          ? typeof item.multiple === 'boolean'
-            ? item.multiple
-            : item.multiple === 1 || item.multiple === '1'
-              ? true
-              : false
-          : false
-      "
+      :multiple="isMultiple()"
       @change="handleChange"
     >
       <template #empty>
@@ -235,10 +203,18 @@ onMounted(() => {
 
 function isReQuired() {
   // 如果是禁用状态,默认带底色
-  if(props.item.disabled === true || props.item.disabled === '1' || props.item.disabled === 1){
+  if (
+    props.item.disabled === true ||
+    props.item.disabled === "1" ||
+    props.item.disabled === 1
+  ) {
     return false;
   }
-  if(props.item.required === '1' || props.item.required === 1 || props.item.required === true){
+  if (
+    props.item.required === "1" ||
+    props.item.required === 1 ||
+    props.item.required === true
+  ) {
     return true;
   }
   const rule = props.item.rules;
@@ -253,6 +229,46 @@ function isReQuired() {
   return r;
 }
 
+function isReadonly() {
+  if (
+    props.item.readonly === true ||
+    props.item.readonly === 1 ||
+    props.item.readonly === "1"
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+}
+function isClearable() {
+  if (
+    props.item.clearable === true ||
+    props.item.clearable === 1 ||
+    props.item.clearable === "1"
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+}
+function isDisabled() {
+  if (
+    props.item.disabled === true ||
+    props.item.disabled === 1 ||
+    props.item.disabled === "1"
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+}
+function isMultiple(){
+  if(props.item.multiple === true || props.item.multiple === 1 || props.item.multiple === '1'){
+    return true;
+  }else{
+    return false;
+  }
+}
 function updateOption(newOption: any) {
   options.value = newOption;
 }

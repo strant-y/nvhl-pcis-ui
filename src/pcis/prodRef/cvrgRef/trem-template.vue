@@ -582,6 +582,7 @@ function dataInit() {
     groupInfo.value = d.groupInfo;
     term.value = d.term;
     termFactormap.value = d.termFactormap;
+    methodLink(termFactormap.value);
     initshowConfig();
     const fromc = termFactormap.value?.filter(
       (v: any) => v.cPorpShowtitle !== "1"
@@ -603,6 +604,8 @@ function dataInit() {
         groupInfo.value = data.data.groupInfo;
         term.value = data.data.term;
         termFactormap.value = data.data.termFactormap;
+
+        methodLink(termFactormap.value);
         initshowConfig();
         const fromc = termFactormap.value?.filter(
           (v: any) => v.cPorpShowtitle !== "1"
@@ -820,11 +823,40 @@ function setDisabledAll() {
 }
 
 function isrequired(i: any) {
-  if(i.required === '1' || i.required === 1 || i.required === true){
+  if (i.required === "1" || i.required === 1 || i.required === true) {
     return true;
   }
   return false;
 }
+
+/**
+ * 方法连接绑定
+ */
+function methodLink(items: any) {
+  if (items && items.length > 0) {
+    for (const i in items) {
+      if (items[i]["func"] && typeof items[i]["func"] === "string") {
+        items[i]["func"] = methodMap[items[i]["func"]];
+      }
+    }
+  }
+}
+
+const methodMap = {
+  unifiedPremiumChange: (val: any) => {
+    if (pageparam.cProdNo === "040006") {
+      termFactormap.value.forEach((item: any) => {
+        if (item["prop"] === "Term.nPersonPremium") {
+          if (val === "0") {
+            item.disabled = true;
+          } else {
+            item.disabled = false;
+          }
+        }
+      });
+    }
+  },
+};
 
 defineExpose({
   dataInit,
