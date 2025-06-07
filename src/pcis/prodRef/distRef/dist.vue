@@ -474,8 +474,12 @@ const method = {
   },
   //全量模板下载
   downloadTemp: () => {
+    const param = {
+          ...formconfig1.value,
+          cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
+        }
     policyService
-      .downloadDistTemplate(formconfig1.value)
+      .downloadDistTemplate(param)
       .then((res) => {
         if (res.size <= 0) {
           ElMessage.error({ message: "下载出错", duration: 3000 });
@@ -494,8 +498,12 @@ const method = {
   },
   // 增量模板下载
   downloadIncrement: () => {
+    const param = {
+          ...formconfig1.value,
+          cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
+        }
     policyService
-      .downloadDistTemplateIncrement(formconfig1.value)
+      .downloadDistTemplateIncrement(param)
       .then((res) => {
         if (res.size <= 0) {
           ElMessage.error({ message: "下载出错", duration: 3000 });

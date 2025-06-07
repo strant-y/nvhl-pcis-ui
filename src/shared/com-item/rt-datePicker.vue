@@ -48,7 +48,7 @@
     @blur="blur"
   />
   <span v-else>
-    {{ vInput }}
+    {{ vInputShow }}
   </span>
 </template>
 
@@ -79,6 +79,17 @@ const props = defineProps({
 
 const emits = defineEmits(["update:modelValue", "valueChange"]); // 父组件监听事件，同步子组件值的变化给父组件
 const vInput = ref<number | string>();
+const vInputShow = computed(()=> {
+  const value = props.modelValue;
+  const format = props.item.valueFormat
+    ? props.item.valueFormat
+    : getValueFormat();
+  if (format && value) {
+    return moment(new Date(value)).format(format)
+  } else {
+    return "";
+  }
+});
 watch([() => props.modelValue], ([newModelValue]) => {
   vInput.value = newModelValue;
 });

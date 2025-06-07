@@ -10,12 +10,6 @@ export const useTagsViewStore = defineStore("tagsView", () => {
   function addVisitedView(view: TagView) {
     // 如果已经存在于已访问的视图列表中，则不再添加 只更新视图中的路由参数
     if (visitedViews.value.some((v) => v.path === view.path)) {
-      visitedViews.value.forEach(item => {
-        if (item.path === view.path) {
-          item.query = view.query
-          item.params = view.params
-        }
-      })
       return;
     }
     // 如果视图是固定的（affix），则在已访问的视图列表的开头添加
