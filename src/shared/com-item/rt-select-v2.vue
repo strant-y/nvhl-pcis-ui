@@ -150,7 +150,13 @@ watch([() => props.modelValue], ([newModelValue]) => {
     selectedValue.value = undefined;
     return;
   }
-  selectedValue.value = newModelValue;
+  let nd = null;
+  try  {
+    nd = JSON.parse(newModelValue);
+  }catch(e) {
+    nd = newModelValue;
+  }
+  selectedValue.value = nd;
   if (props.item.typeCode && options.value.length === 0) {
     uploadOption();
   }else if( props.item.typeCode && props.item.disabled){  // 如果是禁用项,则固定刷新下拉选
