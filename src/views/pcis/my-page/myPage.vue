@@ -329,6 +329,10 @@ const TaskListVestige = defineAsyncComponent(
 const copyPlyModel = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/copy-ply-model.vue")
 );
+// 保存模板
+const templateDialog = defineAsyncComponent(
+  () => import("@/views/pcis/my-page/templateDialog.vue")
+);
 
 const opertaor = dataOpertaor();
 opertaor.init();
@@ -549,7 +553,9 @@ const basicBtn = [
   createFreeButtonBase({
     label: "保存模板",
     type: "primary",
-    func: () => {},
+    func: () => {
+      handleSaveTemplate()
+    },
   }),
   createFreeButtonBase({
     label: "复制出单",
@@ -2199,6 +2205,42 @@ opertaor.setFatherPage({
   getcacheKey: getcacheKey,
   setTmDay: setTmDay,
 });
+
+// 保存模板
+function handleSaveTemplate() {
+  const res = opertaor.getDataAll();
+  for (const key in res) {
+    if (res[key]) {
+      res[key] = clearCAppNoAndCPkId(res[key]);
+    }
+  }
+  dzmodal
+    .open(templateDialog, { type: "", data: res })
+    .then((res: any) => {
+      if (res.type === "ok") {
+      }
+    });
+}
+
+/**
+ * 清空数据中的CAppNo 与CPkId
+ */
+function clearCAppNoAndCPkId(res:any) {
+  for (const k in res) {
+    if (res[k] instanceof Object) {
+      res[k] = clearCAppNoAndCPkId(res[k]);
+    } else {
+      // 清空投保单号, 主键,保单标志,续保\复制单号 签单日期 录单日期  投保日期,主共保，联共保标志清空，联保号，开口保单协议号
+      if (k.indexOf('NCiOwnPrm') !== -1 || k.indexOf('NCiOwnAmt') !== -1 || k.indexOf('NCiJntPrm') !== -1 || k.indexOf('NCiJntAmt') !== -1 || k.indexOf('COcAgrEdrNo') !== -1 || k.indexOf('TAgreeStopTm') !== -1 || k.indexOf('TAgreeStartTm') !== -1 || k.indexOf('COcAgrNo') !== -1 || k.indexOf('CJiAgtNo') !== -1 || k.indexOf('CCiMrk') !== -1 || k.indexOf('CAppNo') !== -1 || k.indexOf('CPkId') !== -1 || k === 'Base.CRenewMrk' || k === 'Base.COrigPlyNo' || k === 'Base.TIssueTm' || k === 'Base.TOprTm' || k === 'Base.TAppTm' || k === 'Base.CTmSysCde' || k === 'Base.TInsrncBgnTm' || k === 'Base.TInsrncEndTm' || k === 'Base.TCrtTm' || k === 'Base.TUpdTm' || k === 'Base.CPrePlyNo') {
+        res[k] = null;
+      }
+      if (props.param?.pageType !== "PLY_APP_NEW_PLAN_SCENE" && props.param?.pageType !== "PLY_APP_UPDATE_PLAN_SCENE" && (k === 'Base.CDptCde' || k === 'Base.CCiMrk' || k === 'Base.CGrpMrk')) {
+        res[k] = null;
+      }
+    }
+  }
+  return res;
+}
 </script>
 
 <style lang="scss" scoped>
