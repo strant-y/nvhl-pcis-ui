@@ -305,6 +305,7 @@ function saveTitleFactor() {
 onMounted(() => {
   const param = {
     componentTab: "TermRisktgt",
+    selectall:'1'
   };
   // 一次性初始化所有险别要素信息,不用多次获取
   querySelectorList(param).then((res) => {
