@@ -152,7 +152,12 @@ watch([() => props.modelValue], ([newModelValue]) => {
   }
   let nd = null;
   try  {
-    nd = JSON.parse(newModelValue);
+    const s: string = newModelValue;
+    if(typeof s === "string" &&s.trim().startsWith('[') && s.trim().endsWith(']')){
+      nd = JSON.parse(newModelValue);
+    }else{
+      nd = newModelValue;
+    }
   }catch(e) {
     nd = newModelValue;
   }
