@@ -1796,6 +1796,7 @@ const calcPremiumEdr = () => {
       );
       console.log("生成缴费计划内容", payInfo);
       opertaor.getTableRefs()["payinfo"].setFormValue(payInfo);
+      needCalc.value = false;
     } else {
       ElMessage.error(res.msg);
     }
@@ -1879,6 +1880,7 @@ const calcPremiumEdrSurrender = () => {
         }
         edrbase.value?.setFormValue(EdrBaseData);
       }
+      needCalc.value = false;
     } else {
       ElMessage.error(res.msg);
     }
@@ -1954,6 +1956,10 @@ const getSurrenderPrecisFun = () => {
  * 批改单申请核保(退保、注销)
  */
 const submitEdrToUndrSurrender = () => {
+  if (needCalc.value) {
+    ElMessage.error("请先进行保费计算!");
+    return;
+  }
   const btn = getBtn("btn010103");
   btn.loading = true;
   const res = {};
@@ -2049,6 +2055,10 @@ const generateEndorse = () => {
  * 批单申请核保
  */
 const submitEdrToUndrFun = () => {
+  if (needCalc.value) {
+    ElMessage.error("请先进行保费计算!");
+    return;
+  }
   const btn = getBtn("btnSubmitEdr");
   btn.loading = true;
   const res = {};
