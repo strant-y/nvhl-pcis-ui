@@ -153,11 +153,15 @@ const method = {
   },
   //保额汇率标识change事件
   cInsExchCdeChange(val: any) {
-    if (val == "0") {
+    if (val == "0") {// 协议汇率
       setFormItem("Base.nAmtRmbExch", { disabled: false });
-    } else {
+    } else {// 实时汇率
       setFormItem("Base.nAmtRmbExch", { disabled: true });
-      setValue("Base.nAmtRmbExch", "1.000000");
+      // setValue("Base.nAmtRmbExch", "1.000000");
+      const cAmtCur = getValue("Base.cAmtCur")
+      if(cAmtCur) {
+        method.cAmtCurChange(cAmtCur)
+      }
     }
   },
   //保费汇率标识change事件
@@ -166,7 +170,11 @@ const method = {
       setFormItem("Base.nPrmRmbExch", { disabled: false });
     } else {
       setFormItem("Base.nPrmRmbExch", { disabled: true });
-      setValue("Base.nPrmRmbExch", "1.000000");
+      // setValue("Base.nPrmRmbExch", "1.000000");
+      const cPrmCur = getValue("Base.cPrmCur")
+      if(cPrmCur) {
+        method.cPrmCurChange(cPrmCur)
+      }
     }
   },
   // 特别约定ICON事件
