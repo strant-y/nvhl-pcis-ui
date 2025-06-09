@@ -46,7 +46,7 @@ const rttableFrom = ref<any>(null);
 const cardconfig = ref(creatCardConfig({}));
 const moveUpTimer = ref(null);
 const moveDownTimer = ref(null);
-
+const originalData = ref<any[]>([]);
 const pageresult = reactive<Pageresult>({
   result: "",
   /** 数据列表 */
@@ -66,6 +66,7 @@ onMounted(()=>{
   formData.value.forEach((item, index) => {
     item.index = index + 1;
   });
+  initOriginalData();
 })
 
 const tableconfig = reactive<AppTableConfig>(
@@ -84,12 +85,15 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Edit",
         hideBtns: (row) => {
-          if (!row.cDeductibleContent.includes("**")) return true;
+          return row.cIfEdit !== '1';
         },
         tableClick: (row) => {
+          const param = {};
+          const f = originalData.value.find(f => row.cDeductibleCode === f.cDeductibleCode);
+          Object.assign(param, f);
           dzmodal.open(deductibleFixEdit, { 
             type: "view", 
-            data: row , 
+            data: param, 
             callback: (res: any) => {
               if (res.type === "ok") {
                 row.cDeductibleContent = res.data.cDeductibleContent
@@ -171,12 +175,12 @@ const tableconfig = reactive<AppTableConfig>(
           },
         ],
       },
-      // {
-      //   prop: "cPkId",
-      //   inputtype: "rtinput",
-      //   title: "免赔条件ID",
-      //   width: 180,
-      // },
+      {
+        prop: "cDeductibleCode",
+        inputtype: "rtinput",
+        title: "免赔条件ID",
+        width: 180,
+      },
       {
         prop: "cDeductibleContent",
         inputtype: "rtinput",
@@ -186,6 +190,29 @@ const tableconfig = reactive<AppTableConfig>(
   })
 );
 
+
+
+const initOriginalData = ()=> {
+  const param = {
+    cProdNo: route.params.param.cProdNo,
+    pageNum: 1,
+    pageSize: 999,
+  }
+  getPrdDeductible(param).then((res) => {
+    if (res.data.result) {
+      pageresult.list = [];
+      originalData.value = res.data.result.map((item: any) => {
+         return {
+          cDeductibleCode: item.cDeductibleCode,
+          cDeductibleContent: item.cDeductibleContent,
+          cStatus: item.cStatus, //是否必选
+          cIfMust: item.cIfMust, //是否必选
+          cIfEdit: item.cIfEdit, //是否可修改
+        }
+      });
+    }
+  });
+}
 
 
 // 上移一行
@@ -246,18 +273,21 @@ const method = {
           cProdNo: route.params.param.cProdNo,
           selectedData: formData.value, //需要把自定义的过滤掉，只传过去从模板中选择的
         }, 
-        { getSelected(selectdata: any) {
-                let len = formData.value.length;
-                let sel : any[] = [];
-                selectdata.forEach((item: any,index:number) => {
-                  item.index = len + 1;
-                  sel.push(item);
-                  len++;
-                });
-                sel.forEach((item) => {
-                  rttableFrom.value.addRowByData(item);
-                });
-              },
+        { 
+          getSelected(selectdata: any) {
+            const mergeAndNumberArraysPreserveOrder = (a: [], b: []): any[] => {
+              const akeys = new Set(a.map(item => item.cDeductibleCode));
+              const bkeys = new Set(b.map(item => item.cDeductibleCode));
+              const aInB = a.filter(item => bkeys.has(item.cDeductibleCode));
+              const bNotInA = b.filter(item => !akeys.has(item.cDeductibleCode));
+              const merged = [...aInB, ...bNotInA];
+              return merged.map((item: any, index: number) => ({
+                ...item,
+                index: index + 1
+              }));
+            }
+            formData.value = mergeAndNumberArraysPreserveOrder(formData.value, selectdata);
+          },
         }, 
         { title: "添加免赔条件", width: 85 });
   },
