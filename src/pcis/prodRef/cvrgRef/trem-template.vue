@@ -758,6 +758,10 @@ async function validate() {
   return (res === true ? true : false) && validate;
 }
 function setDisabledAll() {
+  if(pageparam.cEdrType && !props.modelValue['Term.cRowId']){
+    // 批改新增条款时，不禁用
+    return ;
+  }
   const undis = props.faters?.getndisAbleConfig(
     props.modelValue["Term.cClauseCode"]
   ); // 条款要素批改项配置信息
