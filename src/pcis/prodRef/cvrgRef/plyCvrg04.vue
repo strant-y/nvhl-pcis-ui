@@ -352,16 +352,18 @@ function updateBtn() {
 // 绑定方法
 const method = {
   funcadd: () => {
-    if(parparam.cProdNo === "043009"){
-      const tgt = opertaor.getTableRefByKey('tgt');
+    if (parparam.cProdNo === "043009") {
+      const tgt = opertaor.getTableRefByKey("tgt");
       const tgtData = tgt.getFromValue();
-      if(!tgtData['Tgt.cInsuranceMethod']){
+      if (!tgtData["Tgt.cInsuranceMethod"]) {
         ElMessage.error("请先选择标的信息中的投保方式!");
-        return ;
+        return;
       }
-      if(tgtData['Tgt.cInsuranceMethod'] !== '613001'){
-        ElMessage.error("当投保方式为工程造价投保/劳务合同价投保/按建筑面积投保时,不可添加多方案!");
-        return ;
+      if (tgtData["Tgt.cInsuranceMethod"] !== "613001") {
+        ElMessage.error(
+          "当投保方式为工程造价投保/劳务合同价投保/按建筑面积投保时,不可添加多方案!"
+        );
+        return;
       }
     }
     let maxindex = 0;
@@ -472,9 +474,9 @@ function refushData(planNo: string, datas: any) {
 
   setTimeout(() => {
     planData.value[planNo] = pd;
-    nextTick(() => {
-      showFlush();
-    });
+    // nextTick(() => {
+    //   showFlush();
+    // });
   }, 100);
 }
 function deletePlan(plan: string) {
@@ -530,7 +532,12 @@ function deleteTermByNo(plan: any, t: any) {
     let deleindex = null;
     for (let i = 0; i < planData.value[plan][item].length; i++) {
       if (planData.value[plan][item][i]["Term.cClauseCode"] === t) {
-        deleindex = i;
+        // 批改的情况下，标记该单为删除状态
+        if (parparam.cEdrType) {
+          planData.value[plan][item][i]["Term.cCancelMrk"] = "1";
+        } else {
+          deleindex = i;
+        }
       }
     }
     if (deleindex != null) {

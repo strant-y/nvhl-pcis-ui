@@ -341,7 +341,13 @@ function deleteTermByNo(t: any) {
     let deleindex: any = null;
     for (const i in formData.value[item]) {
       if (formData.value[item][i]["Term.cClauseCode"] === t) {
-        deleindex = i;
+
+        // 批改的情况下，标记该单为删除状态
+        if (parparam.cEdrType) {
+          formData.value[item][i]["Term.cCancelMrk"] = "1";
+        } else {
+          deleindex = i;
+        }
       }
       if (deleindex != null) {
         formData.value[item].splice(deleindex, 1);

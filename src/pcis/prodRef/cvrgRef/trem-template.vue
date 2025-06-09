@@ -4,7 +4,7 @@
       <el-card class="cvrg-info">
         <template #header>
           <div class="cvrg-hearder">
-            <el-row>
+            <el-row style="margin-top: 5px;">
               <el-col :span="10">
                 <a style="margin-right: 5px" @click="showData = !showData">
                   <el-icon v-if="!showData"><ArrowUpBold /></el-icon>
@@ -13,7 +13,14 @@
                 <el-tag type="danger">{{
                   term.cRdrTyp === "0" ? "主" : "附加"
                 }}</el-tag>
-                <el-tag type="warning">{{ term.cNmeCn }}</el-tag>
+                <template v-if="termdata['Term.cCancelMrk'] === '1'">
+                  <el-badge value="退" class="item">
+                    <el-tag type="warning">{{ term.cNmeCn }}</el-tag>
+                  </el-badge>
+                </template>
+                <template v-else>
+                  <el-tag type="warning">{{ term.cNmeCn }}</el-tag>
+                </template>
               </el-col>
               <el-col :span="12">
                 <el-row :gutter="20">
@@ -546,6 +553,13 @@ function getProp(col: any) {
 onMounted(async () => {
   initData(props.modelValue);
   dataInit();
+});
+
+watch(() => props.modelValue, (o,n)=>{
+  initData(n);
+  dataInit();
+},{
+  deep: true
 });
 
 function dataInit() {

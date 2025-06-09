@@ -785,7 +785,6 @@
                     ElMessage.error(result["msg"]);
                 } else {
                     if (result["data"]) {
-                        debugger
                         console.log("000000000",rsnCde.value[selected.value["cPlyNo"]]);
                         // 如果选的批改原因是变更影像上传方式
                         if ("DZ" === rsnCde.value[selected.value["cPlyNo"]]) {
