@@ -1517,6 +1517,13 @@ const calcPremium = () => {
     btn.loading = false;
     return;
   }
+  // 校验承包基本信息中的总保额和总保费币种须一致
+  const baseValue = opertaor.getTableRefByKey("base").getFromValue();
+  if(baseValue["Base.cAmtCur"] !== baseValue["Base.cPrmCur"]) {
+    ElMessage.error("承保基本信息中的总保额币种和总保费币种须一致!");
+    btn.loading = false;
+    return;
+  }
 
   appCalc(res).then((res: any) => {
     btn.loading = false;
@@ -1613,12 +1620,6 @@ const setCiInfo = (base: any) => {
 const submitToUndrFn = async () => {
   if (needCalc.value) {
     ElMessage.error("请先进行保费计算!");
-    return;
-  }
-  // 校验承包基本信息中的总保额和总保费币种须一致
-  const baseValue = opertaor.getTableRefByKey("base").getFromValue();
-  if(baseValue["Base.cAmtCur"] !== baseValue["Base.cPrmCur"]) {
-    ElMessage.error("承保基本信息中的总保额币种和总保费币种须一致!");
     return;
   }
   if (!checkNAmt()) return;
