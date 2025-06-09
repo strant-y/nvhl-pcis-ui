@@ -160,7 +160,7 @@ watch(filterText, (val) => {
 });
 const filterNode = (value: string, data: Tree) => {
   if (!value) return true;
-  return data.value?.includes(value);
+  return data.value?.includes(value) || data.code?.includes(value);
 };
 // 绑定方法
 const method = {
