@@ -205,7 +205,7 @@
                 : true
             "
           >
-          {{ k.pageKey }}
+          <!-- {{ k.pageKey }} -->
             <component
               v-if="currentIndex >= i"
               :ref="
@@ -1310,11 +1310,20 @@ async function loadAfter() {
   }
   bthList.value.push(
     createFreeButtonBase({
+    label: "历史赔案",
+    type: "primary",
+    func: () => {
+      historyClaimcaseFun();
+      // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
+    },
+  }),
+    createFreeButtonBase({
       label: "返回",
       func: () => {
         history.back();
       },
-    })
+    }),
+  
   );
 
   if(props.param?.showBtn === false){

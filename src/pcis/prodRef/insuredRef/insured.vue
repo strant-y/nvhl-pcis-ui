@@ -31,6 +31,15 @@ import { codeListViewStore } from "@/store";
 import { useProductStore } from "@/store/modules/prod";
 import { getAddressStr,qryCustomer } from "@/api/query";
 
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
+import { useRouter, useRoute } from 'vue-router';
+const route = useRoute();
+const query = ref(route.query);
+const router = useRouter();
+const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
+
+
+
 const productStore = useProductStore();
 const opertaor = dataOpertaor();
 const props = defineProps({
@@ -43,8 +52,8 @@ const { getRules } = useValidator();
 const codeListStore = codeListViewStore();
 const insuredEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
-import { useRoute } from "vue-router";
-const route = useRoute();
+// import { useRoute } from "vue-router";
+// const route = useRoute();
 const fileInputRef = ref(null);
 const fileInputType = ref();
 import { readFile } from "@/api/file";
@@ -109,6 +118,16 @@ function setFormItem(key: any, obj: any) {
 //  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
 const checkUser = () => {
 
+
+  // 自定义录单 进入 可以查询用户信息
+  console.log('录单 ZT' ,param.cRecordType)
+  if (param.cRecordType !== 1) {
+      // setTimeout(() => {
+      //   setValue("Tgt.cInsuranceMethod", '613001')
+      // }, 1000)
+      return false;
+    }
+
   let obj = {};
   const tabref = opertaor.getTableRefs();
   const applicantValue = tabref["insured"].getFromValue();
@@ -125,16 +144,6 @@ console.log(applicantValue["Insured.cInsuredNme"]&&
     applicantValue["Insured.cCertfCde"] &&
     applicantValue["Insured.cCertfCls"]
   ) {
-    //  obj = {'Insured.cCertfCde':'9000000504'}
-    //  obj['Insured.cInsuredCde'] = '0008'
-    //  obj['Insured.cAppCde'] = '0009'
-    //  tabref ['insured'].setFormValue(obj);
-
-
-
-    // const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
-    // const s = freeEditRef.value?.getFromValue(); //获取表单数据
-
     const param = {
       coustName: applicantValue["Insured.cInsuredNme"],
       coustMrk: applicantValue["Insured.cClntMrk"],
@@ -166,20 +175,12 @@ console.log(applicantValue["Insured.cInsuredNme"]&&
           // pageresult.list = data.result;
           // pageresult.total = data.total;
           if(data){
-            // tabref ['insured'].setValue('Insured.cInsuredCde',data['result'][0]['CAppCde']);
-              
-
           tabref ['insured'].setFormValue(data[0])
-
-          // tabref ['insured'].
-
-
-
           }
         
           
         } else {
-          ElMessage.error(msg);
+          // ElMessage.error(msg);
         }
       })
       .finally(() => {});

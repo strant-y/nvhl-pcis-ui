@@ -13,7 +13,8 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useProductStore } from "@/store/modules/prod";
 import { rule } from "postcss";
 import { useValidator } from "@/typings/useValidator";
-import { syncDist } from "@/api/prod";
+import { syncDist ,selectDist } from "@/api/prod";
+
 const wagesInfo = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/wages-info-model.vue")
 );
@@ -26,6 +27,15 @@ const surveyInfo = defineAsyncComponent(
 
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import moment from "moment";
+
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
+import { useRouter, useRoute } from 'vue-router';
+const route = useRoute();
+const query = ref(route.query);
+const router = useRouter();
+const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
+
+
 const dzmodal = useDzModal();
 const { getRules } = useValidator();
 const opertaor = dataOpertaor();
@@ -52,14 +62,24 @@ onMounted(async () => {
     //设置是否单项工程默认值：是
     setValue("Tgt.cIsSingle", '1')
     setValue("Tgt.cContractCurrency", '01')
+
+
+    //  安全生产责任险  设置投保方式默认值
+    if (param.cRecordType == '1' && param.cProdNo == "043009") {
+      setTimeout(() => {
+        setValue("Tgt.cInsuranceMethod", '613001')
+      }, 1000)
+    }
+    // console.log('数据----props', param)
   })
+
+
+
 });
 
 const wagesInfoModel = () => {
   let cRegisteredLogo = opertaor.getDataAll()['tgt']['Tgt.cRegisteredLogo'];  // 记名投保标志 是 获取清单汇总   否可以自己修改添加
-  let cAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];
-
-
+  let cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];
   dzmodal.open(wagesInfo, { type: "edit", data: { cAppNo: cAppNo, cRegisteredLogo: cRegisteredLogo } }).then((res: any) => {
     if (res.type === "ok") {
       // setFormItem('Tgt.nTotalSalary',
@@ -100,7 +120,8 @@ const method = {
     //把数据存在store，清单信息组件的是否必填根据这个来
     productStore.setCIsSingle(val)
   },
-  funcInsuranceChange: () => {
+  funcInsuranceChange: (row) => {
+    console.log(row)
 
     //根据投保方式得选择对应控制必填项
     if (getValue("Tgt.cInsuranceMethod") == '613002') {
@@ -138,7 +159,7 @@ const method = {
     let cRegisteredLogo = opertaor.getDataAll()['tgt']['Tgt.cRegisteredLogo'];  // 记名投保标志 是 获取清单汇总   否可以自己修改添加
     // let cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];   //投保单号
     let cAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'] || opertaor.getDataAll()['plyBase']['Base.cAppNo'];   //投保单号
- 
+
     if (cRegisteredLogo !== "1" && cRegisteredLogo !== "0") {
       ElMessage.error('请选择“记名投保标志”！')
       return false;
@@ -151,11 +172,10 @@ const method = {
 
     // 获取总额方式  没有数据给进行提示
     if (cRegisteredLogo == 1) {
-      syncDist({ cComponentTable: "DistSummary", cAppNo: cAppNo }).then((res: any) => {
+      selectDist({ cComponentTable: "EmployeeDist", cAppNo: cAppNo }).then((res: any) => {
         const { code, data, msg } = res;
-
         if (code == 200) {
-          if (data.length > 0) {
+          if (data['data'].length > 0) {
             wagesInfoModel();
 
           } else {
@@ -305,38 +325,38 @@ const method = {
     dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
       console.log('选中了2----', res)
       if (res.type === "ok") {
-        setValue("Tgt.cTransitCountry",res.body.id);
-        setValue("Tgt.cTransitProvince",res.body.id);
-        setValue("Tgt.cTransitDetail",res.body.id +  res.body.CDptCde);
+        setValue("Tgt.cTransitCountry", res.body.id);
+        setValue("Tgt.cTransitProvince", res.body.id);
+        setValue("Tgt.cTransitDetail", res.body.id + res.body.CDptCde);
       };
     });
   },
   // 目的港国家 按钮
-  cDestinationPortCountryFun:()=>{
+  cDestinationPortCountryFun: () => {
     dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
       console.log('选中了3----', res)
       if (res.type === "ok") {
-        setValue("Tgt.cDestinationPortCountry",res.body.id);
-        setValue("Tgt.cDestinationPortProvince",res.body.id);
-        setValue("Tgt.cDestinationPort",res.body.id +  res.body.CDptCde);
+        setValue("Tgt.cDestinationPortCountry", res.body.id);
+        setValue("Tgt.cDestinationPortProvince", res.body.id);
+        setValue("Tgt.cDestinationPort", res.body.id + res.body.CDptCde);
       };
     });
 
   },
   // // 起运港国家 按钮
-  cDestinationCountryFunc:()=>{
+  cDestinationCountryFunc: () => {
     dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
       console.log('选中了4----', res)
       if (res.type === "ok") {
-        setValue("Tgt.cDestinationCountry",res.body.id);
-        setValue("Tgt.cDestinationProvince",res.body.id);
-        setValue("Tgt.cDestinationDetail",res.body.id +  res.body.CDptCde);
+        setValue("Tgt.cDestinationCountry", res.body.id);
+        setValue("Tgt.cDestinationProvince", res.body.id);
+        setValue("Tgt.cDestinationDetail", res.body.id + res.body.CDptCde);
       };
     });
   },
 
   //  检验代理人  按钮
-  cCheckerCdeFunc:()=>{
+  cCheckerCdeFunc: () => {
     dzmodal.open(surveyInfo, { type: "departure", data: {} }).then((res: any) => {
       console.log('勘察', res)
       if (res.type === "ok") {
