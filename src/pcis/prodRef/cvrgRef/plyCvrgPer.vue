@@ -187,6 +187,11 @@ onMounted(async () => {
           if (item.cRdrTyp === "1") {
             data["Term.cClauseCategory"] = item.cClauseCategory;
           }
+          if(item.cRdrTyp === "0"){
+            if(parparam.cProdNo === '040011'){
+              data["Term.nAdjustFactor"] = 100;
+            }
+          }
           plans.push(data);
         });
         refushData(plans);
@@ -291,6 +296,12 @@ function addTermData() {
           }
           if (item.cRdrTyp === "1") {
             data["Term.cClauseCategory"] = item.cClauseCategory;
+          }
+          
+          if(item.cRdrTyp === "0"){
+            if(parparam.cProdNo === '040011'){
+              data["Term.nAdjustFactor"] = 100;
+            }
           }
           data.riskList = riskList;
           plans.push(data);

@@ -862,7 +862,6 @@ function methodLink(items: any) {
 
 const methodMap = {
   unifiedPremiumChange: (val: any) => {
-    console.log(pageparam);
     if (pageparam.cProdNo === "040006") {
       termFactormap.value.forEach((item: any) => {
         if (item["prop"] === "Term.nPersonPremium") {
