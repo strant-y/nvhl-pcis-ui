@@ -218,7 +218,6 @@
               "
               :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
               :pageSchema="k.pageSchema"
-              @updateSide="handleUpdateSide"
             />
           </div>
         </template>
@@ -813,10 +812,10 @@ const initPage = async () => {
     CGrpMrk: props.param.cGrpMrk,
   });
 
-  const getRenewalAppPolicyres = await getRenewalAppPolicy({
-    cPlyNo: props.param.cPlyNo,
-    queryTyp: props.param.queryTyp,
-  });
+  // const getRenewalAppPolicyres = await getRenewalAppPolicy({
+  //   cPlyNo: props.param.cPlyNo,
+  //   queryTyp: props.param.queryTyp,
+  // });
 
   if (props.param.pageType === "PLY_UW_PROCESS_SCENE") {
     underwriteFlag.value = true;
