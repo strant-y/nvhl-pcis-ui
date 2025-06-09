@@ -65,11 +65,17 @@ onMounted(async () => {
         );
       }
     });
-    setFormItem("Ci.cDptCde", {
-      loadData: [
-        { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm}` },
-      ],
-    });
+    // freeEditRef.value?.setRowFieldProp(
+    //       row._dataId,
+    //       "Ci.cDptCde",
+    //       "loadData",
+    //       [{ value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm}` }]
+    //     );
+    // setFormItem("Ci.cDptCde", {
+    //   loadData: [
+    //     { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm}` },
+    //   ],
+    // });
   });
 });
 
@@ -82,10 +88,26 @@ const method = {
       ElMessage.warning("总保额为0");
       return;
     }
+    const totalCiShare = val.reduce((sum, row) => sum + parseFloat(row['Ci.nCiShare'] || 0), 0);
+    // 判断总和是否等于 1
+    if (totalCiShare >= 1) {
+      ElMessage.warning("共保总保额已被全部分完!不能新增");
+      return;
+    }
+
+    // 新增行前计算剩余比例
+    const remaining = (1 - totalCiShare).toFixed(8);
+
     freeEditRef?.value?.addRow();
     val.forEach((key,index) => { 
         key['Ci.nSeqNo']=index+1
     });
+
+    // 设置新行的 Ci.nCiShare 为剩余比例
+    const newRowId = val[val.length - 1]?._dataId;
+    if (newRowId && parseFloat(remaining) > 0) {
+      freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", newRowId, remaining);
+    }
     
   },
   ciDelete:()=>{
@@ -108,7 +130,7 @@ const method = {
     if(productStore.cCiMrk == "5" && val !== "327001"){
       freeEditRef?.value?.setValueByRowKey("Ci.cCoinsurerCde",rowId,"")
       ElMessage.error("司内联保，不能录入除永安以外的其他公司！");
-      return;
+      return false;
     }
     if(val ==="327001"){
     freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde",rowId,"")
@@ -136,6 +158,19 @@ const method = {
   cSubDptCdeChange:(val)=>{
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData._dataId;
+    //获取所有行数据
+    const allRows = getFromValue();
+    // 校验是否存在重复的 Ci.cSubDptCde
+    const isDuplicate = allRows.some((row) => {
+      // 排除当前行自身
+      return row._dataId !== rowId && row["Ci.cSubDptCde"] === val;
+    });
+    if (isDuplicate) {
+      ElMessage.error("联保子公司不能重复选择！");
+      // 回退当前行的值
+    freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "");
+      return;
+    }
     freeEditRef?.value?.setValueByRowKey("Ci.cDptCde",rowId,"")
     codeListStore
         .queryCodeList({
@@ -161,40 +196,129 @@ const method = {
     //     freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk",rowData._dataId,"1")
     //   })
   },
+  //主共标志下拉事件
+  cChiefMrkChange:(val)=>{
+    const rowData = freeEditRef.value?.getSelectRow();
+    const rowId = rowData._dataId;
+    //获取所有行数据
+    const allRows = getFromValue();
+    // 
+    const isDuplicate = allRows.some((row) => {
+      // 排除当前行自身
+      return row._dataId !== rowId && row["Ci.cChiefMrk"] === val;
+    });
+    if (isDuplicate) {
+      ElMessage.error("主共方只能有一个！");
+      // 回退当前行的值
+    freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowId, "");
+      return;
+    }
+  },
   nCiShareChange:(val)=>{
     const rowDatas = freeEditRef.value?.getSelectRow();
-    let value = parseFloat(val);
-    if (value > 1 || value == "") {
-      freeEditRef?.value?.setValueByRowKey("Ci.nCiShare",rowDatas._dataId,parseFloat('1.00000000'));
+    const rowId = rowDatas?._dataId;
+    // 校验输入是否合法
+    if (val > 1 || val <= 0) {
+      ElMessage.warning("联共保比例必须大于0且不能超过1");
+      freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, parseFloat('1').toFixed(8));
+      return;
     }
-    const nPrm =  parseFloat(productStore.nPrm) * parseFloat(val)
-    const nAmt = parseFloat(productStore.nAmt) * parseFloat(val)
-    freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm",rowDatas._dataId,nPrm.toFixed(8))
-    freeEditRef?.value?.setValueByRowKey("Ci.nCiAmt",rowDatas._dataId,nAmt.toFixed(8))
+
+    // 计算当前所有行的总和（排除当前行）
+    const allRows = getFromValue();
+    const totalOther = allRows
+      .filter(row => row._dataId !== rowId)
+      .reduce((sum, row) => sum + parseFloat(row["Ci.nCiShare"] || 0), 0);
+    // 如果当前值 + 其他行 >= 1，则限制当前行最大值为 1 - 其他行总和
+    if (parseFloat(val) + totalOther > 1) {
+      const maxVal = (1 - totalOther).toFixed(8);
+      freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, maxVal);
+      return;
+    }
+
+    const nPrm =  productStore.nPrm * val
+    const nAmt = productStore.nAmt * val
+    freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm",rowDatas._dataId,nPrm.toFixed(2))
+    freeEditRef?.value?.setValueByRowKey("Ci.nCiAmt",rowDatas._dataId,nAmt.toFixed(2))
+
     if(rowDatas["Ci.cCoinsurerCde"] == "327001"){
-      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntAmt",nAmt)  //联保总保额
-      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm",nPrm) //联保总保费
-      opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnAmt",nAmt) //我司份额保额
-      opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnPrm",nPrm) //我司份额保费
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntAmt",nPrm.toFixed(2))  //联保总保额
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm",nAmt.toFixed(2)) //联保总保费
+      opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnAmt",nAmt.toFixed(2)) //我司份额保额
+      opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnPrm",nAmt.toFixed(2)) //我司份额保费
     }
   },
   nPlyFeeRateChange:(val)=>{
     const rowDatas = freeEditRef.value?.getSelectRow();
-    const nPlyFee = parseFloat(val) * parseFloat(rowDatas["Ci.nCiPrm"])
+    const nPlyFee = val * rowDatas["Ci.nCiPrm"]
     freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee",rowDatas._dataId,nPlyFee)
   },
-  //联共保批改时不禁用部分要素
-  setItemReadonly:()=> {
-    const pageType = param.pageType;  //
-    const cCiMrk =productStore.cCiMrk;  //是否联共保
-    debugger
-    if (pageType === "EDR_APP_NEW_SCENE" &&  cCiMrk !== "0") {
-      formconfig1.fromSchema?.forEach((item) => {
-        item.disabled = false;
-      });
-    }
-    console.log("setItemReadonly",formconfig1.fromSchema);
-  }
+  //开户行大类改变
+  cBankRelTypChange:(val)=>{
+    const rowDatas = freeEditRef.value?.getSelectRow();
+    freeEditRef.value?.setValueByRowKey("Ci.cBankAddr",rowDatas._dataId,val)
+  },
+  //开户行省改变
+  cProvinceChange:(val)=>{
+    const rowData = freeEditRef.value?.getSelectRow();
+    const rowId = rowData._dataId;
+    freeEditRef?.value?.setValueByRowKey("Ci.cBankArea",rowId,"")
+    freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBankArea","loadData",[],);
+    codeListStore
+        .queryCodeList({
+          codeListName: "CBankAreaList",
+          codeListParam: { "areaprovince": val },
+        })
+        .then((res) => {
+          freeEditRef.value?.setRowFieldProp(
+            rowId,
+            "Ci.cBankArea",
+            "loadData",
+            res,
+          );
+        });
+  },
+  //开户行市改变
+  cCityChange:(val)=>{
+    const rowData = freeEditRef.value?.getSelectRow();
+    const rowId = rowData._dataId;
+    freeEditRef?.value?.setValueByRowKey("Ci.cCountryCde",rowId,"")
+    codeListStore
+        .queryCodeList({
+          codeListName: "CBankCountyList",
+          codeListParam: { "areaprovince": rowData['Ci.cBankArea'],"areaname":val },
+        })
+        .then((res) => {
+          freeEditRef.value?.setRowFieldProp(
+            rowId,
+            "Ci.cBankCounty",
+            "loadData",
+            res,
+          );
+        });
+        //Ci.cBankPro 省
+        //Ci.cBankArea 市
+        // Ci.cBankCounty  县
+  },
+  //开户行县改变
+  cCountyChange:(val) => { 
+    const rowData = freeEditRef.value?.getSelectRow();
+    const rowId = rowData._dataId;
+    freeEditRef?.value?.setValueByRowKey("Ci.cBankCde",rowId,"")
+    codeListStore
+        .queryCodeList({
+          codeListName: "CBankCountyList",
+          codeListParam: { "areaprovince": rowData['Ci.cBankCounty'],"areaname":val },
+        })
+        .then((res) => {
+          freeEditRef.value?.setRowFieldProp(
+            rowId,
+            "Ci.cBankCde",
+            "loadData",
+            res,
+          );
+        });
+  },
 };
 
 //给表单下拉项赋值

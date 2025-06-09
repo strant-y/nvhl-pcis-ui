@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { getProdInfos } from "@/api/prod";
+import { getProdInfos, getInquiryPage } from "@/api/prod";
 import { useRoute } from "vue-router";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { dataParam } from "@/store/modules/dataParam";
@@ -154,6 +154,11 @@ opertaor.setTableConfig([
         pageTtile: "页面组件绑定",
         pageRef: "prodComponent",
       },
+      priceComponent: {
+        pageKey: "priceComponent",
+        pageTtile: "询价页面配置",
+        pageRef: "priceComponent",
+      },
     },
   },
 ]);
@@ -189,6 +194,18 @@ function loadAfter() {
           if (200 === code) {
             setTimeout(() => {
               setData(data);
+            }, 100);
+          } else {
+            ElMessage.error(msg);
+          }
+        })
+        .finally(() => {});
+      getInquiryPage(param)
+        .then((res) => {
+          const { code, data, msg } = res;
+          if (200 === code) {
+            setTimeout(() => {
+              setData({ priceComponent: data});
             }, 100);
           } else {
             ElMessage.error(msg);

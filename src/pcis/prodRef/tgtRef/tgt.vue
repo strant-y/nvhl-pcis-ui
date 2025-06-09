@@ -137,12 +137,8 @@ const method = {
 
     let cRegisteredLogo = opertaor.getDataAll()['tgt']['Tgt.cRegisteredLogo'];  // 记名投保标志 是 获取清单汇总   否可以自己修改添加
     // let cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];   //投保单号
-    let cAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];   //投保单号
-
-
-
-
-
+    let cAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'] || opertaor.getDataAll()['plyBase']['Base.cAppNo'];   //投保单号
+ 
     if (cRegisteredLogo !== "1" && cRegisteredLogo !== "0") {
       ElMessage.error('请选择“记名投保标志”！')
       return false;

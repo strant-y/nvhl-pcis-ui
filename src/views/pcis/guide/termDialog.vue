@@ -200,6 +200,7 @@ const getCurrentNode = (data: any) => {
     datas.value = [];
   }
 };
+const selectedNode = ref<any>(null);
 const onEvent = (data: any, node: any) => {
   // listShow.value = false;
   if (data.list.length == 0) {
@@ -212,14 +213,19 @@ const onEvent = (data: any, node: any) => {
     datas.value = [data];
     pNode.value = node;
     console.log("------", node);
-    emits("ok", node);
+    // emits("ok", node);
+    selectedNode.value = node;
+  } else {
+    selectedNode.value = null;
   }
 };
 
 // 保存
 function confirm() {
   dialogVisible.value = false;
-  emits("ok", {});
+  if(selectedNode.value && selectedNode.value !== null) {
+    emits("ok", selectedNode.value);
+  }
 }
 function updateTermlist() {
   props.data.updateQuery();

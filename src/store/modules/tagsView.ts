@@ -1,13 +1,17 @@
+import { getIfCompViewByName, getCompByName } from '@/typings/views-component'
+
 export const useTagsViewStore = defineStore("tagsView", () => {
   const visitedViews = ref<TagView[]>([]);
   const cachedViews = ref<string[]>([]);
-
   /**
    * 添加已访问视图到已访问视图列表中
    */
   function addVisitedView(view: TagView) {
-    // 如果已经存在于已访问的视图列表中，则不再添加
-    if (visitedViews.value.some((v) => v.path === view.path)) {
+    // 如果已经存在于已访问的视图列表中，则不再添加 只更新视图中的路由参数
+    // if (visitedViews.value.some((v) => v.path === view.path)) {
+    const index = visitedViews.value.findIndex(item => item.path === view.path);
+    if (index !== -1) {
+      // visitedViews.value[index] = view;
       return;
     }
     // 如果视图是固定的（affix），则在已访问的视图列表的开头添加
@@ -91,9 +95,40 @@ export const useTagsViewStore = defineStore("tagsView", () => {
     }
   }
 
+  /**
+   * 清理冲突视图
+   * @param view 
+   * @returns 
+   */
+  function removeDuplicatesView(view: TagView) {
+    return new Promise((resolve) => { 
+      if(view.mode === '2' || (getIfCompViewByName(view.name) && !view.compKey)) {
+        const index = visitedViews.value.findIndex(item => item.path === view.path && item.compKey !== view.compKey);
+        if (index !== -1) {
+          visitedViews.value.splice(index, 1);
+        }
+      }
+      resolve(true)
+    });
+  }
+
   function addView(view: TagView) {
-    addVisitedView(view);
-    // addCachedView(view);
+    let viewData: TagView = view;
+    const ifCompView = getIfCompViewByName(view.name);
+    view.mode = ifCompView ? '2' : '1';
+    if (!!ifCompView) {
+      // 添加组件模式视图
+      viewData = {
+        ...view,
+        ... {
+          isActive: true,
+          compKey: `${view.path}_${Date.now()}`,
+          component: getCompByName(view.name)
+        }
+      }
+    }
+    addVisitedView(viewData);
+    // addCachedView(viewData);
   }
 
   function delView(view: TagView) {
@@ -188,6 +223,33 @@ export const useTagsViewStore = defineStore("tagsView", () => {
     });
   }
 
+
+  function moveToCurrentTag(route) {
+    // 使用 nextTick() 的目的是确保在更新 tagsView 组件之前，scrollPaneRef 对象已经滚动到了正确的位置。
+    nextTick(() => {
+      for (const tag of visitedViews.value) {
+        if (tag.path === route.path) {
+          // when query is different then update
+          if (tag.fullPath !== route.fullPath) {
+            updateVisitedView({
+              name: route.name as string,
+              title: route.meta.title || "",
+              path: route.path,
+              fullPath: route.fullPath,
+              affix: route.meta?.affix,
+              keepAlive: route.meta?.keepAlive,
+              hidden: route.meta.hidden,
+              component: tag.component,
+              query: tag.query,
+              params: tag.params,
+              mode: tag.mode,
+            });
+          }
+        }
+      }
+    });
+  }
+
   return {
     visitedViews,
     cachedViews,
@@ -206,5 +268,7 @@ export const useTagsViewStore = defineStore("tagsView", () => {
     delAllViews,
     delAllVisitedViews,
     delAllCachedViews,
+    moveToCurrentTag,
+    removeDuplicatesView
   };
 });

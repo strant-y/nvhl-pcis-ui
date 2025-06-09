@@ -48,6 +48,8 @@ import {
   queryPageComponentList,
   releasePage,
   SaveComponentFactors,
+  releaseInquiryPage,
+  queryInquiryPageComponentList,
 } from "@/api/prod";
 import {
   AppTableConfig,
@@ -64,6 +66,7 @@ const dialog = ref<DialogMethod | null>(null);
 
 const props = defineProps({
   data: Object,
+  component: String,
 });
 const componentList = ref([]);
 interface MyTableMethod {
@@ -129,17 +132,31 @@ const clickBtn = ref<Array<FreeButtonBase>>([
     func: async () => {
       console.log(props.data);
       const param = Object.assign(props.data, selectConItem.value);
-      releasePage(param)
-        .then((res) => {
-          const { code, data, msg } = res;
-          if (200 === code) {
-            // emits("ok", {});
-            ElMessage.success("保存成功");
-          } else {
-            ElMessage.error(msg);
-          }
-        })
-        .finally(() => {});
+      if(props.component === "priceComponent") {
+        releaseInquiryPage(param)
+          .then((res) => {
+            const { code, data, msg } = res;
+            if (200 === code) {
+              // emits("ok", {});
+              ElMessage.success("保存成功");
+            } else {
+              ElMessage.error(msg);
+            }
+          })
+          .finally(() => {});
+      } else {
+        releasePage(param)
+          .then((res) => {
+            const { code, data, msg } = res;
+            if (200 === code) {
+              // emits("ok", {});
+              ElMessage.success("保存成功");
+            } else {
+              ElMessage.error(msg);
+            }
+          })
+          .finally(() => {});
+      }
     },
   }),
 ]);
@@ -222,16 +239,29 @@ function selectComponent(item: any) {
     .finally(() => {});
 }
 onMounted(() => {
-  queryPageComponentList(props.data)
-    .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
-        componentList.value = data;
-      } else {
-        ElMessage.error(msg);
-      }
-    })
-    .finally(() => {});
+  if(props.component === "priceComponent") {
+    queryInquiryPageComponentList(props.data)
+      .then((res) => {
+        const { code, data, msg } = res;
+        if (200 === code) {
+          componentList.value = data;
+        } else {
+          ElMessage.error(msg);
+        }
+      })
+      .finally(() => {});
+  } else {
+    queryPageComponentList(props.data)
+      .then((res) => {
+        const { code, data, msg } = res;
+        if (200 === code) {
+          componentList.value = data;
+        } else {
+          ElMessage.error(msg);
+        }
+      })
+      .finally(() => {});
+  }
 });
 </script>
 

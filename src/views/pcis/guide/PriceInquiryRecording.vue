@@ -1,10 +1,10 @@
-<!-- 自定义录单 -->
+<!-- 询价录单 -->
 <template>
   <div class="searchbar el-card app-container">
     <!-- <div class="el-card__header">
       <span class="el-card__header__title">{{ title }}</span>
     </div> -->
-    <div>
+    <div v-if="step == '0'">
       <el-form
         ref="freeEditRef"
         :model="formconfig1"
@@ -45,83 +45,6 @@
                 clearable
                 @change="selectedItem"
             />
-        </el-form-item>
-        <el-form-item
-          label="录单方式"
-          prop="cRecordType"
-          style="width: 600px"
-          :rules="[getRules('required', {})]"
-        >
-          <el-radio-group v-model="formconfig1.cRecordType" @change="handleRecordTypeChange">
-            <el-radio :value="1">自定义录单</el-radio>
-            <el-radio :value="2">方案录单</el-radio>
-            <el-radio :value="3">模板出单</el-radio>
-          </el-radio-group>
-        </el-form-item>
-
-        <el-form-item
-          v-if="formconfig1.cRecordType === 3"
-          label="选择模板"
-          prop="tpl"
-          style="width: 400px"
-          :rules="[getRules('required', {})]"
-        >
-          <el-select-v2
-            v-model="formconfig1.tpl"
-            :options="tplOptions"
-            placeholder="选择模板"
-            size="large"
-            filterable
-            @change="selectedTpl"
-          />
-        </el-form-item>
-
-        <el-form-item
-          v-if="formconfig1.cRecordType === 3"
-          label="模板描述"
-          prop="seldef"
-          style="width: 600px"
-        >
-          <div>{{ formconfig1.seldef }}</div>
-        </el-form-item>
-
-        <template v-if="formconfig1.cRecordType == 1">
-          <h4 style="margin: 10px 20px">投保信息</h4>
-          <el-form-item
-            label="投保标识"
-            prop="cRenewMrk"
-            :rules="[getRules('required', {})]"
-          >
-            <el-radio-group v-model="formconfig1.cRenewMrk">
-              <el-radio value="0">新保</el-radio>
-              <el-radio value="1">续保</el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item
-            v-if="formconfig1.cRenewMrk == '1'"
-            label="上年保单号"
-            prop="cPlyNo"
-            :rules="[getRules('required', {})]"
-          >
-            <el-input
-              style="width: 300px"
-              placeholder="请输入续保保单号"
-              v-model="formconfig1.cPlyNo"
-            >
-            </el-input>
-          </el-form-item>
-        </template>
-
-        <h4 style="margin: 10px 20px">选择{{ labelNm }}</h4>
-        <el-form-item
-          label="团个属性"
-          prop="cGrpMrk"
-          :rules="[getRules('required', {})]"
-        >
-          <el-radio-group v-model="formconfig1.cGrpMrk">
-            <el-radio value="0">个单</el-radio>
-            <el-radio value="1">团单</el-radio>
-          </el-radio-group>
         </el-form-item>
 
         <el-tooltip placement="top">
@@ -205,13 +128,18 @@
         </el-row>
       </el-form>
     </div>
+    <div v-if="step == '1'">内容</div>
     <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
       <rt-button
         :item="{
           type: 'primary',
-          label: '下一步',
+          label: step == '0' ? '下一步' : '上一步',
           func: () => {
-            next();
+            if (step == '0') {
+              next();
+            } else {
+              step = '0';
+            }
           },
         }"
       />
@@ -249,8 +177,6 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { getListByCode } from "@/api/code-list-service";
 import {useUserStore} from "@/store";
 import { listChrDepts } from "@/api/dept";
-import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
-const policyService = new PolicyService();
 
 const router = useRouter();
 const dialogVisible = ref(true);
@@ -290,9 +216,8 @@ const formconfig1 = ref({
 });
 const selectTreeItem = ref({});
 const labelNm = ref("条款")
-const tplOptions = ref([])
 // 条款下拉数据
-function loadOptions(type:number = 1) {// 条款 1 方案 2 模板 3
+function loadOptions(type:number = 1) {// 条款 1 方案 2
   const param = { pageNo: 1, pageSize: 999, CEnableFlag: "1", level: 2, type };
   getProdEnableList(param).then((res:any) => {
     if (res.code === 200) {
@@ -391,18 +316,11 @@ function next() {
             }
           }
         );
-      } else if (formconfig1.value.cRecordType == 3) {// 模板出单
-        router.push({
-          path: "/pcis/my-page",
-          query: {
-            param: JSON.stringify({ ...data, ...{ pageType: "template", cPkId: formconfig1.value.cPkId } }),
-          },
-        });
       } else {
         router.push({
           path: "/pcis/my-page",
           query: {
-            param: JSON.stringify({ ...data, ...{ pageType: "app" } }),
+            param: JSON.stringify({ ...data, ...{ pageType: "app", pageName: "priceInquiry" } }),
           },
         });
       }
@@ -444,12 +362,11 @@ function handleClick(item: any, index: number) {
 }
 //取消常用条款
 function handleStarClick(item: any) {
-  console.log("0000000",item);
   const param = formconfig1.value.cRecordType === 2 ? {
     planNo: item.planNo,
     isPlan: "1",
   } : {
-    termNo: item.termNo,
+    termNo: item.planNo,
     isPlan: "0",
   }
   unUserUnUntionTerm(param).then((res:any) => {
@@ -549,58 +466,6 @@ function handleRecordTypeChange(val:any) {
   formconfig1.value.cProdNo = "";
   formconfig1.value.cProdNme = "";
 }
-
-// 模板下拉选项
-function getTplOptions() {
-  tplOptions.value = [];
-  formconfig1.value.seldef = "";
-  formconfig1.value.tpl = null;
-  const param = {
-    'PrdProdTemplate.CProdNo': formconfig1.value.cProdNo,
-    'PrdProdTemplate.CCrtCde': userStore.user.opCde,
-    pageNo: 1,
-    pageSize: 1000,
-  }
-  policyService.searchTemplate(param).then((res:any) => {
-    if (res.code === 200) {
-      tplOptions.value = res.res.map((item:any) => ({
-        value: item.cPkId,
-        label: item.cTplNme,
-        desc: item.cDesc,
-      }));
-    } else {
-      ElMessage.error(res.msg);
-    }
-  });
-}
-
-// 选择模板
-function selectedTpl(value:any) {
-  if(value) {
-    const item = tplOptions.value.filter(f => f.value === value)[0];
-    formconfig1.value.seldef = item?.desc;
-    formconfig1.value.cPkId = value;
-  } else {
-    formconfig1.value.seldef = "";
-    formconfig1.value.cPkId = "";
-  }
-}
-
-watch(
-  () => formconfig1.value.cTermNme,
-  (newVal) => {
-    if(formconfig1.value.cRecordType == 3) {
-      if(newVal) {
-        getTplOptions();
-      } else {
-        formconfig1.value.tpl = null;
-        formconfig1.value.seldef = "";
-        tplOptions.value = [];
-        formconfig1.value.cPkId = "";
-      }
-    }
-  }
-);
 </script>
 
 <style scoped>
