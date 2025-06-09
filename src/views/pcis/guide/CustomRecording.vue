@@ -391,6 +391,13 @@ function next() {
             }
           }
         );
+      } else if (formconfig1.value.cRecordType == 3) {// 模板出单
+        router.push({
+          path: "/pcis/my-page",
+          query: {
+            param: JSON.stringify({ ...data, ...{ pageType: "template", cPkId: formconfig1.value.cPkId } }),
+          },
+        });
       } else {
         router.push({
           path: "/pcis/my-page",
@@ -572,8 +579,10 @@ function selectedTpl(value:any) {
   if(value) {
     const item = tplOptions.value.filter(f => f.value === value)[0];
     formconfig1.value.seldef = item?.desc;
+    formconfig1.value.cPkId = value;
   } else {
     formconfig1.value.seldef = "";
+    formconfig1.value.cPkId = "";
   }
 }
 
@@ -587,6 +596,7 @@ watch(
         formconfig1.value.tpl = null;
         formconfig1.value.seldef = "";
         tplOptions.value = [];
+        formconfig1.value.cPkId = "";
       }
     }
   }
