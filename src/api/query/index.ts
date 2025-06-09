@@ -225,3 +225,11 @@ export function delTmpPolicy(queryParams: any) {
 export function policyRatio(queryParams: any) {
     return request.post('/policy/ratio', queryParams);
 }
+
+/**
+ * 询价-投保单保费计算
+ * @param queryParams
+ */
+export function calculatePremium(queryParams: any): AxiosPromise<any> {
+    return post(`/inquiry/calculatePremium`, queryParams);
+}
