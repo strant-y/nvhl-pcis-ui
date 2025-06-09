@@ -234,6 +234,46 @@ const method = {
         }
     });
   },
+  // 总保额(累计赔偿限额)change事件
+  nAmtChange: (val: any) => {
+    if (null != val) {
+      const namtRmbExch = getValue('Base.nAmtRmbExch');
+      if (!!namtRmbExch) {
+        // 计算折人民币保额
+        setValue("Base.nRmbAmt", numMulti(val, namtRmbExch));
+      }
+    }
+  },
+  // 总保费change事件
+  nprmChange: (val: any) => {
+    if (null != val) {
+      const nprmRmbExch = getValue('Base.nPrmRmbExch');
+      if (!!nprmRmbExch) {
+        // 计算折人民币保费
+        setValue('Base.nRmbPrm', numMulti(val, nprmRmbExch))
+      }
+    }
+  },
+  // 总保额(累计赔偿限额)汇率change事件
+  nAmtRmbExchChange: (val: any) => {
+    if (!!val) {
+      const namt = getValue('Base.nAmt');
+      if (!!namt) {
+        // 计算折人民币保额
+        setValue("Base.nRmbAmt", numMulti(namt, val));
+      }
+    }
+  },
+  // 总保费汇率change事件
+  nPrmRmbExchChange: (val: any) => {
+    if (!!val) {
+      const nprm = getValue('Base.nPrm');
+      if (!!nprm) {
+        // 计算折人民币保费
+        setValue("Base.nRmbPrm", numMulti(nprm, val));
+      }
+    }
+  },
 };
 
 // 绑定特殊验证器
@@ -279,6 +319,19 @@ function setFormItem(key: any, obj: any) {
 
 function getFormconfig(){
   return formconfig1;
+}
+
+function numMulti(num1, num2) {
+  let baseNum = 0;
+  try {
+    baseNum += num1.toString().split('.')[1].length;
+  } catch (e) {
+  }
+  try {
+    baseNum += num2.toString().split('.')[1].length;
+  } catch (e) {
+  }
+  return Number(num1.toString().replace('.', '')) * Number(num2.toString().replace('.', '')) / Math.pow(10, baseNum);
 }
 
 defineExpose({
