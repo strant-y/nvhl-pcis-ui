@@ -15,36 +15,34 @@
     </router-view>
 
     <!-- 缓存组件状态模式-->
-    <template v-for="view in compViews" :key="view.compKey">
-      <transition
-        enter-active-class="animate__animated animate__fadeIn"
-        mode="out-in"
-        name="expand"
-      >
+    <div v-for="view in compViews" :key="view.compKey">
+      <transition name="expand" mode="out-in" enter-active-class="animate__animated animate__fadeIn">
         <keep-alive>
           <component
-            v-if="view.isActive"
-            :id="view.path"
+            v-if="isActive(view)"
             :is="view.component"
+            :key="view.compKey"
             :param="view.params?.param"
           />
         </keep-alive>
       </transition>
-    </template>
+    </div>
   </section>
 </template>
 
 <script setup lang="ts">
 import { useTagsViewStore } from "@/store";
 import { useRoute } from 'vue-router'
+import { getCompByName } from '@/typings/views-component'
+const route = useRoute();
 
 const tagsViewStore = useTagsViewStore()
 const { 
   visitedViews,  // 所有页面
   cachedViews,  // 缓存页面集合
-  currentView  // 当前页面
 } = storeToRefs(tagsViewStore);
 
+const currentView = computed(() => visitedViews.value.find(f => f.path === route.path)); // 当前页面
 const compViews = computed(() => visitedViews.value.filter(f => f.mode === '2')); // 组件视图
 
 function isActive(view: TagView, idx: number) {

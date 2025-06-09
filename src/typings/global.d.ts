@@ -55,6 +55,8 @@ declare global {
     mode?: any;
     /** 是否显示*/
     hidden?: boolean;
+    /** 页面key*/
+    compKey?: boolean;
   }
 
   /**

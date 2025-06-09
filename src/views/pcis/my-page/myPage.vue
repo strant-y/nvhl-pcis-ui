@@ -1807,14 +1807,14 @@ const savePlyInfo = async () => {
     }
 
     // 保存后替换路由参数
-    router.replace({path: route.path, name: route.name, query: {
-        param: JSON.stringify({
-        ... route.params.param,
-        ... {
-          cAppNo: plyBase["Base.cAppNo"]
-        }
-      })
-    }});
+    // router.replace({path: route.path, name: route.name, query: {
+    //     param: JSON.stringify({
+    //     ... route.params.param,
+    //     ... {
+    //       cAppNo: plyBase["Base.cAppNo"]
+    //     }
+    //   })
+    // }});
   } else {
     ElMessage.error(resInfo.msg);
   }

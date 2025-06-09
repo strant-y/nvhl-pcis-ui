@@ -9,7 +9,7 @@
         ref="tagRef"
         v-for="tag in visitedViews"
         :key="tag.fullPath"
-        :to="''"
+        :to="{}"
         :class="'tags-item ' + (isActive(tag) ? 'active' : '')"
         @click.prevent="toView(tag)"
         @click.middle="!isAffix(tag) ? closeSelectedTag(tag) : ''"
@@ -117,11 +117,7 @@ watch(contentMenuVisible, (value) => {
 });
 
 function toView(tag: TagView) {
-  tagsViewStore.setCurrentView(tag);
-  console.log('tag.mode', tag.mode);
-  nextTick(()=>{
-    router.push({ path: tag.path, query: tag.query})
-  })
+  router.push({ path: tag.path, query: {...tag.query, compKey: tag.compKey}})
 }
 
 /**
