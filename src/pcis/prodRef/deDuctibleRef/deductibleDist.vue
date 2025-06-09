@@ -306,7 +306,20 @@ function getTableData() {
   return formData.value;
 }
 
+function getFromValue() {
+  return formData.value.map((item) => {
+    const prefixedItem: { [key: string]: any } = {};
+    for (const key in item) {
+      if (item.hasOwnProperty(key)) {
+        prefixedItem[`DeductibleDist.${key}`] = item[key];
+      }
+    }
+    return prefixedItem;
+  });
+}
+
 defineExpose({
+  getFromValue,
   getFormconfig,
   getTableData,
 });
