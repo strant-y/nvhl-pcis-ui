@@ -771,6 +771,7 @@
             ElMessage.warning("此产品暂不支持延期批改，请选择通用批改");
             return;
         }
+        // if(rsnCde.value[selected.value["cPlyNo"]] == ""){}
         const param = {
             plyNo: cPlyNo,
             edrType: routeData["rsnTyp"],
@@ -784,6 +785,8 @@
                     ElMessage.error(result["msg"]);
                 } else {
                     if (result["data"]) {
+                        debugger
+                        console.log("000000000",rsnCde.value[selected.value["cPlyNo"]]);
                         // 如果选的批改原因是变更影像上传方式
                         if ("DZ" === rsnCde.value[selected.value["cPlyNo"]]) {
                             modifyImageUploadMode(cPlyNo);
@@ -872,8 +875,10 @@
                                 },
                             });
                         }
-                    } else {
-                        ElMessage.success(result["msg"]);
+                    } else if("DP" === rsnCde.value[selected.value["cPlyNo"]]){
+                        ciCoopCorrect(selected.value["cPlyNo"])
+                    }else{
+                        ElMessage.error(result["msg"]);
                     }
                 }
             },
@@ -893,7 +898,15 @@
                 }
             });
     };
-
+    //联共保批改
+    const ciCoopCorrect = (plyNo) => {
+        dzmodal
+            .open(CiendorseModalList, { parameter: { plyNo } })
+            .then((res) => {
+                if (res.type === "ok") {
+                }
+            });
+    };
     const transferRsnDetail = (rsnDetail) => {
         let str = "";
         rsnDetail.forEach((item) => {
