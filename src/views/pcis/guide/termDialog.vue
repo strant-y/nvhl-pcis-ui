@@ -160,8 +160,21 @@ watch(filterText, (val) => {
 });
 const filterNode = (value: string, data: Tree) => {
   if (!value) return true;
-  return data.value?.includes(value);
+  return data.searchKey?.includes(value);
 };
+
+function addSearchKey(node, path = "") {
+  const currentKey = (node.code || "") + (node.value || "");
+  const fullPath = path + "_" + currentKey;
+  node.searchKey = fullPath;
+  if (Array.isArray(node.list)) {
+    node.list.forEach(child => addSearchKey(child, fullPath));
+  }
+  if (Array.isArray(node)) {
+    node.forEach(child => addSearchKey(child, fullPath));
+  }
+}
+
 // 绑定方法
 const method = {
   func1: () => {
@@ -175,20 +188,22 @@ function loadTree(type: number) {
   const param = {
     name: formconfig1.value.name,
     level: 2,
-    type
+    type: type == 2 ? 2 : 1
   };
   getProdEnableList(param).then((res: any) => {
     if (res.code === 200) {
-      nodes.value = res.data.map((item:any) => ({
+      var nodesData = res.data.map((item: any) => ({
         ...item,
-        list: item.list.map((child:any) => ({
+        list: item.list.map((child: any) => ({
           ...child,
-          list: child.list.map((grandChild:any) => ({
+          list: child.list.map((grandChild: any) => ({
             ...grandChild,
             isPlan: props.data.type === 2,
           }))
         })),
       }))
+      addSearchKey(nodesData)
+      nodes.value = nodesData;
     } else {
       ElMessage.error(res.msg);
     }

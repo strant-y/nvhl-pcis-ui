@@ -67,6 +67,10 @@ export const NewUdrListService = () => {
   const deleteOCContsUrl = 'reinsured/deleteOCConts';
   // 在线签名核保信息
   const getUdrOpnInfo = 'policy/getUdrOpnInfo';
+  // 风险责任划分弹框查询信息
+  const getReinsuredContData = 'reinsured/queryContData';
+  // 再保比例分保合同除外责任接口
+  const queryRiskCodelistUrl = 'reinsured/queryRiskCodelist';
 
   // 查询（待核保、暂存、上报）
   const getNewUdrList = async (ops: any) => {
@@ -347,6 +351,24 @@ export const NewUdrListService = () => {
     throw new Error(errMsg);
   };
 
+  // 获取风险责任划分弹框基本信息
+  const getReinsuredData = async (ops: any) => {
+    try {
+      return post(`${getReinsuredContData}`, ops);
+    } catch (error) {
+      return handleError(error);
+    }
+  };
+
+  // 再保比例分保合同除外责任接口
+  const queryRiskCodelist = async (ops: any) => {
+    try {
+      return post(`${queryRiskCodelistUrl}`, ops);
+    } catch (error) {
+      return handleError(error);
+    }
+  }
+
   return {
     getNewUdrList,
     getBackUdrList,
@@ -378,5 +400,7 @@ export const NewUdrListService = () => {
     checkLiberty,
     getRelateBus,
     getUdrOpn,
+    getReinsuredData,
+    queryRiskCodelist,
   };
 }

@@ -219,7 +219,6 @@
               "
               :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
               :pageSchema="k.pageSchema"
-              @updateSide="handleUpdateSide"
             />
           </div>
         </template>
@@ -279,6 +278,7 @@ import {
   saveSurrenEdr,
   getSurrenderPrecis,
   submitEdrSurrender,
+  calculatePremium,
 } from "../../../api/query/index";
 import { checkFeeWindowType, selectDist, saveDistBatch, getReleaseInquiryPage } from "@/api/prod";
 import { dataOpertaor, useProductStore } from "@/store";
@@ -820,10 +820,10 @@ const initPage = async () => {
     CGrpMrk: props.param.cGrpMrk,
   });
 
-  const getRenewalAppPolicyres = await getRenewalAppPolicy({
-    cPlyNo: props.param.cPlyNo,
-    queryTyp: props.param.queryTyp,
-  });
+  // const getRenewalAppPolicyres = await getRenewalAppPolicy({
+  //   cPlyNo: props.param.cPlyNo,
+  //   queryTyp: props.param.queryTyp,
+  // });
 
   if (props.param.pageType === "PLY_UW_PROCESS_SCENE") {
     underwriteFlag.value = true;
@@ -1540,7 +1540,8 @@ const calcPremium = () => {
     return;
   }
 
-  appCalc(res).then((res: any) => {
+  const appCalcFun = props.param?.pageName === "priceInquiry" ? calculatePremium(res) : appCalc(res);
+  appCalcFun.then((res: any) => {
     btn.loading = false;
     console.log("appCalc-res", res);
     if (res["code"] == "200") {
@@ -1670,7 +1671,7 @@ const submitToUndrFn = async () => {
       const calBtn = getBtn("btn010101");
       try {
         calBtn.loading = true;
-        const calcres: any = await appCalc(calcData);
+        const calcres: any = props.param?.pageName === "priceInquiry" ? await calculatePremium(calcData) : await appCalc(calcData);
         if (calcres.code === 200) {
           const newOp: any = opertaor.convertData(calcres);
           const newPrm = newOp.base["Base.nPrm"];

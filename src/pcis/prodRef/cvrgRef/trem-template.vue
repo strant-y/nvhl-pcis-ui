@@ -4,7 +4,7 @@
       <el-card class="cvrg-info">
         <template #header>
           <div class="cvrg-hearder">
-            <el-row>
+            <el-row style="margin-top: 5px;">
               <el-col :span="10">
                 <a style="margin-right: 5px" @click="showData = !showData">
                   <el-icon v-if="!showData"><ArrowUpBold /></el-icon>
@@ -13,7 +13,14 @@
                 <el-tag type="danger">{{
                   term.cRdrTyp === "0" ? "主" : "附加"
                 }}</el-tag>
-                <el-tag type="warning">{{ term.cNmeCn }}</el-tag>
+                <template v-if="termdata['Term.cCancelMrk'] === '1'">
+                  <el-badge value="退" class="item">
+                    <el-tag type="warning">{{ term.cNmeCn }}</el-tag>
+                  </el-badge>
+                </template>
+                <template v-else>
+                  <el-tag type="warning">{{ term.cNmeCn }}</el-tag>
+                </template>
               </el-col>
               <el-col :span="12">
                 <el-row :gutter="20">
@@ -548,6 +555,13 @@ onMounted(async () => {
   dataInit();
 });
 
+watch(() => props.modelValue, (o,n)=>{
+  initData(n);
+  dataInit();
+},{
+  deep: true
+});
+
 function dataInit() {
   let queryList: { [k: string]: any }[] = [];
   let queryKey = props.modelValue["Term.cClauseCode"];
@@ -744,6 +758,10 @@ async function validate() {
   return (res === true ? true : false) && validate;
 }
 function setDisabledAll() {
+  if(pageparam.cEdrType && !props.modelValue['Term.cRowId']){
+    // 批改新增条款时，不禁用
+    return ;
+  }
   const undis = props.faters?.getndisAbleConfig(
     props.modelValue["Term.cClauseCode"]
   ); // 条款要素批改项配置信息
@@ -848,6 +866,13 @@ const methodMap = {
       termFactormap.value.forEach((item: any) => {
         if (item["prop"] === "Term.nPersonPremium") {
           if (val === "0") {
+            item.disabled = true;
+          } else {
+            item.disabled = false;
+          }
+        }
+        if (item["prop"] === "Term.nDoctorFee" || item["prop"] === "Term.nNurseFee") {
+          if (val === "1") {
             item.disabled = true;
           } else {
             item.disabled = false;

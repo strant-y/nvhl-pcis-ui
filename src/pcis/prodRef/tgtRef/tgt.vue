@@ -72,9 +72,10 @@ onMounted(async () => {
     }
     // console.log('数据----props', param)
   })
-
-
-
+  // 约定保期内服务次数正整数
+  setFormItem("Tgt.nAgreeFrequency", {
+    rules: [getRules("signlessInt", {})],
+  });
 });
 
 const wagesInfoModel = () => {
@@ -87,9 +88,103 @@ const wagesInfoModel = () => {
     }
   });
 }
-
+//水运规则
+const tgtWaterMatterList:Array<string> = ["Tgt.cTransportationName","Tgt.tConstructionYear","Tgt.nTransportationTotalTonnage","Tgt.cShipRegistration","Tgt.nTransportationShipAge","Tgt.cShipType","Tgt.cShipClassOne","Tgt.cShipClassTwo","Tgt.cShipClassThree","Tgt.cOldshipSurcharge"]
+//水运外其他规则
+const tgtOtherMatterList:Array<string> = ["Tgt.cLicenseNumber","Tgt.cFrameNumber","Tgt.cTransitMode"]
+//非水运隐藏
+const tgtIsWaterMatterList:Array<string> = ["Tgt.cTowing","Tgt.cWholeShip","Tgt.cShipName","Tgt.cTransportVoyage","Tgt.nTotalTonnage","Tgt.nShipAge","Tgt.cTransportationName","Tgt.tConstructionYear","Tgt.nTransportationTotalTonnage","Tgt.cShipRegistration","Tgt.nTransportationShipAge","Tgt.cShipType","Tgt.cShipClassOne","Tgt.cShipClassTwo","Tgt.cShipClassThree","Tgt.cOldshipSurcharge"]
+const setIsRule = ()=>{
+  if(getValue("Tgt.cTowing") === '1'){
+    setFormItem("Tgt.cShipType", {
+      typeCode: 'Ship_Type',
+      codeParam: { 'cMapCde': '1' },
+    });
+  }else {
+    setFormItem("Tgt.cShipType", {
+      typeCode: 'Ship_Type',
+      codeParam: { },
+    });
+  }
+  if(getValue("Tgt.cTowing") === '1' || getValue("Tgt.cWholeShip") === '1'){
+    tgtWaterMatterList.forEach(item =>{
+      setFormItem(item, {
+        rules: [getRules("required", {})],
+      });
+    })
+  }else if(getValue("Tgt.cTowing") === '0' || getValue("Tgt.cWholeShip") === '0'){
+    tgtWaterMatterList.forEach(item =>{
+      setFormItem(item, {
+        rules: null,
+      });
+    })
+  }
+}
 // 绑定方法
 const method = {
+  getcShippingMethodChange:(val:string)=>{
+    if(val === 'NV591001'){
+      tgtIsWaterMatterList.forEach(item =>{
+        setFormItem(item, {
+          hidden: false,
+        });
+      })
+      tgtOtherMatterList.forEach(item =>{
+        setFormItem(item, {
+          hidden: true,
+        });
+      })
+    }else{
+      tgtIsWaterMatterList.forEach(item =>{
+        setFormItem(item, {
+          hidden: true,
+        });
+      })
+      tgtOtherMatterList.forEach(item =>{
+        setFormItem(item, {
+          hidden: false,
+        });
+      })
+    }
+    if(val === 'NV591003'){
+      tgtOtherMatterList.forEach(item =>{
+        setFormItem(item, {
+          rules: [getRules("required", {})],
+        });
+      })
+    }else {
+      tgtOtherMatterList.forEach(item =>{
+        setFormItem(item, {
+          rules: null,
+        });
+      })
+    }
+  },
+  getcShippingTypeChange:(val:string)=>{
+    if(val === '582006'){
+      setFormItem("Tgt.cRailwayMode", {
+        rules: [getRules("required", {})],
+      });
+    }
+  },
+  getcTransportChange:(val:string)=>{
+    if(val === '1'){
+      setFormItem("Tgt.cTransportTools", {
+        readonly: '0',
+      });
+    }else {
+      setValue("Tgt.cTransportTools", '')
+      setFormItem("Tgt.cTransportTools", {
+        readonly: '1',
+      });
+    }
+ },
+  getcTowingChange:(val:string)=>{
+    setIsRule()
+ },
+  getcWholeShipChange:(val:string)=>{
+     setIsRule()
+  },
   // func demo
   func1: () => {
     console.log(getRules);

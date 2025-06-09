@@ -132,6 +132,7 @@ const props = defineProps({
 const dataprops = {
   children: "children",
   label: "label",
+  disabled: 'disabled',
 };
 
 const data1 = ref([]);
@@ -143,6 +144,7 @@ props.data.data.isselectData?.forEach((item: any) => {
   let seadd: any = {};
   seadd["cRdrTyp"] = item["Term.cRdrTyp"];
   seadd["cTermNo"] = item["Term.cClauseCode"];
+  seadd["cRowId"] = item["Term.cRowId"];
 
   if (item["riskList"] && item["riskList"].length > 0) {
     let list: any[] = [];
@@ -194,6 +196,16 @@ onMounted(async () => {
     const { code, data, msg } = res;
     if (200 === code) {
       data1.value = data;
+      data1.value.forEach((item: any) => { 
+        selectAdditionNodes.value.forEach(v=>{
+          if(v.cRowId && v.cTermNo === item.cTermNo){
+            item.disabled = true;
+            item.children?.forEach((i: any) => {
+              i.disabled = true;
+            });
+          }
+        })
+      });
       nextTick(() => {
         setNode();
       });
@@ -293,6 +305,16 @@ function selectMainTerm(isselect = true) {
       const { code, data, msg } = res;
       if (200 === code) {
         data2.value = data;
+        data2.value.forEach((item: any) => { 
+        selectAdditionNodes.value.forEach(v=>{
+          if(v.cRowId && v.cTermNo === item.cTermNo){
+            item.disabled = true;
+            item.children?.forEach((i: any) => {
+              i.disabled = true;
+            });
+          }
+        })
+      });
         const addtree = additionalRef.value?.getCheckedNodes(false, true);
         if (addtree && addtree.length !== 0) {
           selectAdditionNodes.value = addtree;
