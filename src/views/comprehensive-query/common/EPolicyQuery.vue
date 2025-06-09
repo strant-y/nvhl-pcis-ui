@@ -3,6 +3,7 @@
     <div class="app-container">
         <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
         <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef" @page-change="handleQuery(false)" />
+        <comDialog ref="dialogRef"></comDialog>
     </div>
 </template>
 
@@ -24,6 +25,7 @@ import { useDzModal } from '@/common/dzmodel/DzModalService'
 import { SCENE_PLY_APP_READ } from '@/constants/tab-constants'
 import { PcisQueryService } from '@/views/payinfoManagement/service/pcis-query-service'
 import { rsaEncoder, base64encoder } from '@/utils/encipher'
+import { DialogMethod } from '@/common/dzmodel/ComDialogConf'
 // @ts-ignore
 import { saveAs } from 'file-saver'
 import dayjs from 'dayjs'
@@ -41,8 +43,17 @@ const props = defineProps({
     }
 })
 const sessionUser: any = sessionStorage.getItem('user')
-const bthList = ref<Array<FreeButtonBase>>([])
+const btnList = ref<Array<FreeButtonBase>>([])
+const dialogRef = ref<DialogMethod | null>(null)
 const buttonList = [
+    createFreeButtonBase({
+        label: '雇主责任险在保证明',
+        type: 'primary',
+        id: 'zbzmGenEPolicy',
+        func: () => {
+            genZBZMEPolicy()
+        }
+    }),
     createFreeButtonBase({
         label: '生成电子保单',
         type: 'primary',
@@ -77,7 +88,7 @@ const buttonList = [
         }
     })
 ]
-bthList.value = buttonList
+btnList.value = buttonList
 const formconfig1 = reactive<AppFreeEditConfig>(
     createAppFreeEditConfig({
         endBtnsPosition: 'right',
@@ -338,6 +349,7 @@ onMounted(async () => {
     nextTick(() => {
         freeEditRef.value?.setValue('CLoadSub', '1')
         freeEditRef.value?.setValue('CDptCde', user.value.companyId)
+        freeEditRef.value?.setValue('CPlyTyp', 'PLY')
         setFormItem('CDptCde', {
             loadData: [
                 {
@@ -375,18 +387,6 @@ watch(
         immediate: true
     }
 )
-
-// 绑定特殊验证器
-const exRules = {
-    byrtInput: (rule: any, value: any, callback: any) => {
-        const r = freeEditRef.value?.getFromValue()
-        // if (r['name']) {
-        //   callback()
-        // } else {
-        //   callback('姓名')
-        // }
-    }
-}
 
 /** 查询 */
 function handleQuery(flag?: boolean) {
@@ -472,6 +472,31 @@ function handleQuery(flag?: boolean) {
     })
 }
 /**
+ * 在保证明
+ */
+function genZBZMEPolicy() {
+    dialogRef.value?.open(
+        'epolicyWorker',
+        {
+            type: 'show',
+            data: {
+                leading: 'CSlsId'
+            },
+            method: {
+                getSelected: (params: any) => {
+                    dialogRef.value?.handleClose()
+                }
+            }
+        },
+        {
+            isOk: (selectdata: any) => {
+                console.log('a', selectdata)
+            }
+        },
+        { title: '在保证明', width: 85 }
+    )
+}
+/**
  * 生成电子保单
  */
 function createEPolicy() {
@@ -484,6 +509,10 @@ function createEPolicy() {
     const plyTyp = freeEditRef.value?.getValue('CPlyTyp')
     if (plyTyp == null || plyTyp == undefined) {
         ElMessage.warning('请选择单证类型!')
+        return
+    }
+    if (plyTyp == 'TBD' && prodNo != '019003') {
+        ElMessage.warning('非019003产品，不存在电子投保单业务!')
         return
     }
     var dzbdTyp = freeEditRef.value?.getValue('CDzbdTyp')
@@ -622,7 +651,7 @@ function setButton(btn: any, val: boolean) {
  * @param id
  */
 const getBtn = (id: any) => {
-    return bthList.value.find(item => {
+    return btnList.value.find(item => {
         return id === item.id
     })
 }

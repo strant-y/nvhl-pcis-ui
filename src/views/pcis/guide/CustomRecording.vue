@@ -55,7 +55,34 @@
           <el-radio-group v-model="formconfig1.cRecordType" @change="handleRecordTypeChange">
             <el-radio :value="1">自定义录单</el-radio>
             <el-radio :value="2">方案录单</el-radio>
+            <el-radio :value="3">模板出单</el-radio>
           </el-radio-group>
+        </el-form-item>
+
+        <el-form-item
+          v-if="formconfig1.cRecordType === 3"
+          label="选择模板"
+          prop="tpl"
+          style="width: 400px"
+          :rules="[getRules('required', {})]"
+        >
+          <el-select-v2
+            v-model="formconfig1.tpl"
+            :options="tplOptions"
+            placeholder="选择模板"
+            size="large"
+            filterable
+            @change="selectedTpl"
+          />
+        </el-form-item>
+
+        <el-form-item
+          v-if="formconfig1.cRecordType === 3"
+          label="模板描述"
+          prop="seldef"
+          style="width: 600px"
+        >
+          <div>{{ formconfig1.seldef }}</div>
         </el-form-item>
 
         <template v-if="formconfig1.cRecordType == 1">
@@ -222,6 +249,8 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { getListByCode } from "@/api/code-list-service";
 import {useUserStore} from "@/store";
 import { listChrDepts } from "@/api/dept";
+import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
+const policyService = new PolicyService();
 
 const router = useRouter();
 const dialogVisible = ref(true);
@@ -261,8 +290,9 @@ const formconfig1 = ref({
 });
 const selectTreeItem = ref({});
 const labelNm = ref("条款")
+const tplOptions = ref([])
 // 条款下拉数据
-function loadOptions(type:number = 1) {// 条款 1 方案 2
+function loadOptions(type:number = 1) {// 条款 1 方案 2 模板 3
   const param = { pageNo: 1, pageSize: 999, CEnableFlag: "1", level: 2, type };
   getProdEnableList(param).then((res:any) => {
     if (res.code === 200) {
@@ -361,6 +391,13 @@ function next() {
             }
           }
         );
+      } else if (formconfig1.value.cRecordType == 3) {// 模板出单
+        router.push({
+          path: "/pcis/my-page",
+          query: {
+            param: JSON.stringify({ ...data, ...{ pageType: "template", cPkId: formconfig1.value.cPkId } }),
+          },
+        });
       } else {
         router.push({
           path: "/pcis/my-page",
@@ -512,6 +549,58 @@ function handleRecordTypeChange(val:any) {
   formconfig1.value.cProdNo = "";
   formconfig1.value.cProdNme = "";
 }
+
+// 模板下拉选项
+function getTplOptions() {
+  tplOptions.value = [];
+  formconfig1.value.seldef = "";
+  formconfig1.value.tpl = null;
+  const param = {
+    'PrdProdTemplate.CProdNo': formconfig1.value.cProdNo,
+    'PrdProdTemplate.CCrtCde': userStore.user.opCde,
+    pageNo: 1,
+    pageSize: 1000,
+  }
+  policyService.searchTemplate(param).then((res:any) => {
+    if (res.code === 200) {
+      tplOptions.value = res.res.map((item:any) => ({
+        value: item.cPkId,
+        label: item.cTplNme,
+        desc: item.cDesc,
+      }));
+    } else {
+      ElMessage.error(res.msg);
+    }
+  });
+}
+
+// 选择模板
+function selectedTpl(value:any) {
+  if(value) {
+    const item = tplOptions.value.filter(f => f.value === value)[0];
+    formconfig1.value.seldef = item?.desc;
+    formconfig1.value.cPkId = value;
+  } else {
+    formconfig1.value.seldef = "";
+    formconfig1.value.cPkId = "";
+  }
+}
+
+watch(
+  () => formconfig1.value.cTermNme,
+  (newVal) => {
+    if(formconfig1.value.cRecordType == 3) {
+      if(newVal) {
+        getTplOptions();
+      } else {
+        formconfig1.value.tpl = null;
+        formconfig1.value.seldef = "";
+        tplOptions.value = [];
+        formconfig1.value.cPkId = "";
+      }
+    }
+  }
+);
 </script>
 
 <style scoped>

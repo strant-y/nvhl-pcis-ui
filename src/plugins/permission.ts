@@ -14,8 +14,6 @@ export function setupPermission() {
 
   const tagsViewStore = useTagsViewStore();
 
-  const { visitedViews } = storeToRefs(tagsViewStore);
-
   router.beforeEach(async (to, from, next) => {
     NProgress.start();
     const hasToken = sessionStorage.getItem("token");
@@ -64,7 +62,7 @@ export function setupPermission() {
               isEncrypted.value = false;
               if (to.meta.title) {
                 const data = descryptParameterToQuery(query);
-                tagsViewStore.addView({
+                const view = {
                   name: to.name as string,
                   title: to.meta.title,
                   path: to.path,
@@ -73,9 +71,14 @@ export function setupPermission() {
                   keepAlive: to.meta?.keepAlive,
                   hidden: to.meta.hidden,
                   query: data.JSONquery,
-                  params: data.ParseParams
-                });
-                tagsViewStore.moveToCurrentTag(to);
+                  params: data.ParseParams,
+                  compKey: data.ParseParams?.compKey
+                }
+                const flag = await tagsViewStore.removeDuplicatesView(view);
+                if(flag) {
+                  tagsViewStore.addView(view);
+                  tagsViewStore.moveToCurrentTag(to);
+                }
               }
               next();
             }

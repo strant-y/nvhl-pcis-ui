@@ -272,8 +272,13 @@ function getFormconfig() {
   return formconfig1;
 }
 
+function getTableData() {
+  return formData.value;
+}
+
 defineExpose({
   getFormconfig,
+  getTableData,
 });
 </script>
 

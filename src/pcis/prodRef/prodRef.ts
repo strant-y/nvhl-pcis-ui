@@ -71,6 +71,7 @@ import edrbaseRef from "./edrbaseRef/edrbase.vue"
 import edritemRef from "./edritemRef/edritem.vue"
 import imageRef from "./commonRef/image.vue"; //影像信息
 import priceComponent from "./commonRef/priceComponent.vue";//询价页面配置
+import epolicyWorker from './commodityRef/EPolicyWorker.vue' //在保证明
 
 /**用于动态组件的映射生成 */
 const componentMap = {
@@ -144,6 +145,7 @@ const componentMap = {
   cOccupCdeModal:cOccupCdeModal,
   prdFixSpec: prdFixSpec,
   deductibleFix: deductibleFix,
+  epolicyWorker:epolicyWorker,
 };
 
 const install = (Vue) => {

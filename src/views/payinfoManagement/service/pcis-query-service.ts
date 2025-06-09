@@ -30,6 +30,7 @@ export class PcisQueryService {
     isExistInAlldbUrl = 'policy/isExistInAlldb';
     qryExpirationPolicyUrl = 'policy/getExpirationPolicyList';
     qryEpolicyPolicyListUrl = 'edr/getPolicyList'; // 电子保单列表查询
+    queryEmpEpolicyPolicyListUrl = 'edr/getEmpPolicyList'; // 查询雇主责任保批单列表信息
     generatingEPolicyUrl = 'epolicy/generatingEPolicy';// 生成电子保单
     downloadEPolicyUrl = 'epolicy/downloadData';// 下载电子保单
     qryDiaryListUrl = 'policy/getDiaryList';
@@ -454,6 +455,15 @@ export class PcisQueryService {
      */
     getExpirationPolicyList(ops: any): AxiosPromise<any> {
         return post(`${this.qryExpirationPolicyUrl}`, ops);
+    }
+
+    /**
+     * 查询雇主责任保批单列表
+     * @param ops
+     * @returns
+     */
+    queryEmpEPolicyList(ops: any): AxiosPromise<any> {
+        return post(`${this.queryEmpEpolicyPolicyListUrl}`, ops)
     }
     
     /**
