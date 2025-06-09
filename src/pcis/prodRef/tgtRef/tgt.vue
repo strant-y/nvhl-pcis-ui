@@ -46,6 +46,10 @@ onMounted(async () => {
     setValue("Tgt.cIsSingle", '1')
     setValue("Tgt.cContractCurrency", '01')
   })
+  // 约定保期内服务次数正整数
+  setFormItem("Tgt.nAgreeFrequency", {
+    rules: [getRules("signlessInt", {})],
+  });
 });
 
 const wagesInfoModel = () => {
