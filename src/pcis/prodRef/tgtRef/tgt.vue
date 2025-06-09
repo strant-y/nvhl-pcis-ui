@@ -1,3 +1,4 @@
+<!-- 标的信息 -->
 <template>
   <app-free-edit :freeEditConfig="formconfig1" ref="tgtEditRef" />
 </template>
@@ -15,6 +16,12 @@ import { useValidator } from "@/typings/useValidator";
 import { syncDist } from "@/api/prod";
 const wagesInfo = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/wages-info-model.vue")
+);
+const countryInfo = defineAsyncComponent(
+  () => import("@/views/comprehensive-query/modal/country-info-modal.vue")
+);
+const surveyInfo = defineAsyncComponent(
+  () => import("@/views/comprehensive-query/modal/survey-info-modal.vue")
 );
 
 import { useDzModal } from "@/common/dzmodel/DzModalService";
@@ -55,8 +62,8 @@ const wagesInfoModel = () => {
 
   dzmodal.open(wagesInfo, { type: "edit", data: { cAppNo: cAppNo, cRegisteredLogo: cRegisteredLogo } }).then((res: any) => {
     if (res.type === "ok") {
-        // setFormItem('Tgt.nTotalSalary',
-        setValue("Tgt.nTotalSalary",res.body        )
+      // setFormItem('Tgt.nTotalSalary',
+      setValue("Tgt.nTotalSalary", res.body)
     }
   });
 }
@@ -127,21 +134,21 @@ const method = {
     }
   },
   wagesInfoBtn: () => {
- 
+
     let cRegisteredLogo = opertaor.getDataAll()['tgt']['Tgt.cRegisteredLogo'];  // 记名投保标志 是 获取清单汇总   否可以自己修改添加
     // let cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];   //投保单号
     let cAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];   //投保单号
- 
 
 
- 
+
+
 
     if (cRegisteredLogo !== "1" && cRegisteredLogo !== "0") {
       ElMessage.error('请选择“记名投保标志”！')
       return false;
     }
 
-    if(!cAppNo){
+    if (!cAppNo) {
       ElMessage.error("请先保存申请单!")
       return false;
     }
@@ -283,8 +290,66 @@ const method = {
     if (v !== nSeatCapacity) {
       ElMessage.warning("核定座位总数和投保座位数总数不一致！");
     }
-  }
+  },
 
+  // 起运港国家 弹框
+  countryFun: () => {
+    dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
+      console.log('选中了----', res)
+      if (res.type === "ok") {
+        // setFormItem('Tgt.nTotalSalary',
+        // setValue("Tgt.cDeparturePortCountry",res.body.id)
+        // setValue("Tgt.cDeparturePortProvince",res.body.id)
+        // setValue("Tgt.cDeparturePort",res.body.id +  res.body.CDptCde)
+      }
+    });
+  },
+  // 中转地国家 按钮
+  cTransitCountryFun: () => {
+    dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
+      console.log('选中了2----', res)
+      if (res.type === "ok") {
+        setValue("Tgt.cTransitCountry",res.body.id);
+        setValue("Tgt.cTransitProvince",res.body.id);
+        setValue("Tgt.cTransitDetail",res.body.id +  res.body.CDptCde);
+      };
+    });
+  },
+  // 目的港国家 按钮
+  cDestinationPortCountryFun:()=>{
+    dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
+      console.log('选中了3----', res)
+      if (res.type === "ok") {
+        setValue("Tgt.cDestinationPortCountry",res.body.id);
+        setValue("Tgt.cDestinationPortProvince",res.body.id);
+        setValue("Tgt.cDestinationPort",res.body.id +  res.body.CDptCde);
+      };
+    });
+
+  },
+  // // 起运港国家 按钮
+  cDestinationCountryFunc:()=>{
+    dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
+      console.log('选中了4----', res)
+      if (res.type === "ok") {
+        setValue("Tgt.cDestinationCountry",res.body.id);
+        setValue("Tgt.cDestinationProvince",res.body.id);
+        setValue("Tgt.cDestinationDetail",res.body.id +  res.body.CDptCde);
+      };
+    });
+  },
+
+  //  检验代理人  按钮
+  cCheckerCdeFunc:()=>{
+    dzmodal.open(surveyInfo, { type: "departure", data: {} }).then((res: any) => {
+      console.log('勘察', res)
+      if (res.type === "ok") {
+        // setValue("Tgt.cDestinationPortCountry",res.body.id);
+        // setValue("Tgt.cDestinationPortProvince",res.body.id);
+        // setValue("Tgt.cDestinationPort",res.body.id +  res.body.CDptCde);
+      };
+    });
+  }
 };
 
 function singChange(obj) {
@@ -331,7 +396,7 @@ function setFormItem(key: any, obj: any) {
           for (let key in obj.btnItems) {
             item.btnItems[key] = obj.btnItems[key];
           }
-        }else{
+        } else {
           Object.assign(item, obj);
         }
       }

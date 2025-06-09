@@ -16,13 +16,21 @@ import {
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+
+
+// import { genCusConInfoBusinessList } from "../../../api/query/index";
+
+// import {genCusConInfoBusinessList} from "@/api/query/index"
+
+
 const dialog = ref<DialogMethod | null>(null);
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { useValidator } from "@/typings/useValidator";
 import moment from "moment";
 import { codeListViewStore } from "@/store";
 import { useProductStore } from "@/store/modules/prod";
-import { getAddressStr } from "@/api/query";
+import { getAddressStr,qryCustomer } from "@/api/query";
+
 const productStore = useProductStore();
 const opertaor = dataOpertaor();
 const props = defineProps({
@@ -40,6 +48,7 @@ const route = useRoute();
 const fileInputRef = ref(null);
 const fileInputType = ref();
 import { readFile } from "@/api/file";
+const user = JSON.parse(sessionStorage.getItem("user"));
 const tCertfDate = ref<any[]>([]);
 onMounted(() => {
   const formconfig11 = formInit(
@@ -99,26 +108,88 @@ function setFormItem(key: any, obj: any) {
 }
 //  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
 const checkUser = () => {
+
   let obj = {};
   const tabref = opertaor.getTableRefs();
   const applicantValue = tabref["insured"].getFromValue();
+
+  console.log('查询----', applicantValue["Insured.cInsuredCde"],applicantValue["Insured.cInsuredNme"] ,  applicantValue["Insured.cClntMrk"],  applicantValue["Insured.cCertfCde"],applicantValue["Insured.cCertfCls"])
+console.log(applicantValue["Insured.cInsuredNme"]&&
+    applicantValue["Insured.cClntMrk"] !== null &&
+    applicantValue["Insured.cCertfCde"] &&
+    applicantValue["Insured.cCertfCls"])
   //  只要4个有值 去请求客户信息
   if (
+    applicantValue["Insured.cInsuredNme"]&&
     applicantValue["Insured.cClntMrk"] !== null &&
-    applicantValue["Insured.cClntMrk"] !== undefined &&
-    applicantValue["Insured.cClntMrk"] !== "" &&
-    applicantValue["Insured.cAppNme"] &&
     applicantValue["Insured.cCertfCde"] &&
     applicantValue["Insured.cCertfCls"]
   ) {
     //  obj = {'Insured.cCertfCde':'9000000504'}
-    // obj['Insured.cInsuredCde'] = '0008'
-    // obj['Insured.cAppCde'] = '0009'
+    //  obj['Insured.cInsuredCde'] = '0008'
+    //  obj['Insured.cAppCde'] = '0009'
     //  tabref ['insured'].setFormValue(obj);
-  }
 
+
+
+    // const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
+    // const s = freeEditRef.value?.getFromValue(); //获取表单数据
+
+    const param = {
+      coustName: applicantValue["Insured.cInsuredNme"],
+      coustMrk: applicantValue["Insured.cClntMrk"],
+      coustType:applicantValue["Insured.cCertfCls"],
+      coustCode: applicantValue["Insured.cCertfCde"],
+      personnelType:"Insured"
+      // CClntMrk:applicantValue["Insured.cInsuredNme"],
+      // CClntNme:applicantValue["Insured.cClntMrk"],
+      // CCertfCde:applicantValue["Insured.cCertfCde"],
+      // CCertfCls:applicantValue["Insured.cCertfCls"],
+      // CurrentUser: user["companyId"],
+      // CurrentUserOrg:user["opCde"]
+ 
+    }
+    // if (s["CClntMrk"] == null || s["CClntNme"] == null|| s["CCertfCls"] == null|| s["CCertfCde"] == null) {
+    //   ElMessage.error("客户信息都不能为空！");
+    //   return;
+    // }
+
+    // param["pageNo"] = param["pageNum"];
+
+
+    console.log('客户参数', param);
+    qryCustomer(param)
+      .then((res) => {
+        const { code, data, msg } = res;
+        if (200 === code) {
+          console.log('客户数据', res)
+          // pageresult.list = data.result;
+          // pageresult.total = data.total;
+          if(data){
+            // tabref ['insured'].setValue('Insured.cInsuredCde',data['result'][0]['CAppCde']);
+              
+
+          tabref ['insured'].setFormValue(data[0])
+
+          // tabref ['insured'].
+
+
+
+          }
+        
+          
+        } else {
+          ElMessage.error(msg);
+        }
+      })
+      .finally(() => {});
+
+  }
+  
+  //  cInsuredCde  客户代码.
+    //  cInsuredNme  客户名称
   //  cClntMrk  被保人性质
-  //  cAppNme  客户名称
+
   //  cCertfCde    身份号码
   //  cCertfCls   身份证类型
 };

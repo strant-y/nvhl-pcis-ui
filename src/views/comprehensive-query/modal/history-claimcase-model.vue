@@ -133,7 +133,7 @@ const fromSchema = {
 
   BBfromSchema: [
     {
-      prop: "cAppNme",
+      prop: "cInsuredNme",
       inputtype: "rtinput",
       title: "被保人名称",
       disabled: true,
@@ -668,13 +668,17 @@ const tabChangeTb = (name: any) => {
     formconfig1.fromSchema = fromSchema.BBfromSchema
     
     let DataAll = opertaor.getDataAll()['insured']
-    // nextTick(() => {
-      freeEditRef.value?.setValue("cAppNme", DataAll['Insured.cAppNme']);
-      freeEditRef.value?.setValue("cCertfCls", DataAll['Insured.cCertfCls']);
-      freeEditRef.value?.setValue("cCertfCde", DataAll['Insured.cCertfCde']);
-    freeEditRef.value?.setValue("cClntMrk", DataAll['Insured.cClntMrk']);
-  
-    // })
+    console.log(DataAll)
+ 
+
+      nextTick(() => {
+        freeEditRef.value?.setValue("cInsuredNme", DataAll['Insured.cInsuredNme']);
+        freeEditRef.value?.setValue("cCertfCls", DataAll['Insured.cCertfCls']);
+        freeEditRef.value?.setValue("cCertfCde", DataAll['Insured.cCertfCde']);
+        freeEditRef.value?.setValue("cClntMrk", DataAll['Insured.cClntMrk']);
+      })
+ 
+ 
 
 
   } else {
@@ -682,18 +686,19 @@ const tabChangeTb = (name: any) => {
 
     let DataAll = opertaor.getDataAll()['applicant']
 
-    // nextTick(() => {
-      freeEditRef.value?.setValue("cAppNme", DataAll['Applicant.cAppNme']);
+    nextTick(() => {  
+      freeEditRef.value?.setValue("cAppNme",DataAll['Applicant.cAppNme']);
       freeEditRef.value?.setValue("cCertfCls", DataAll['Applicant.cCertfCls']);
       freeEditRef.value?.setValue("cCertfCde", DataAll['Applicant.cCertfCde']);
       freeEditRef.value?.setValue("cClntMrk", DataAll['Applicant.cClntMrk']);
 
-    // })
-    console.log(332, DataAll)
+    })
+    // console.log(332, DataAll)
   }
 
 
   freeEditRef.value?.setValue("cCstomerType", name );
+
   handleQuery()
 }
 

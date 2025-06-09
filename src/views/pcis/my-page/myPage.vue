@@ -204,6 +204,7 @@
                 : true
             "
           >
+          {{ k.pageKey }}
             <component
               v-if="currentIndex >= i"
               :ref="
@@ -1777,7 +1778,7 @@ const calcPremiumEdr = () => {
           ","
         );
       edrbase.value?.setFormValue(EdrBaseData);
-      const nPrmVar = ops["plyBase"]["Base.nPrmVar"];
+      const nPrmVar = ops["plyBase"]["Base.nPrmVar"]  || 0;
       const payInfo = setPayInfoEdr(
         ops["payinfo"],
         ops["base"],

@@ -176,10 +176,15 @@ const method = {
   tRunEndTmFn: (v) => {
     const start = getValue("Base.tRunBgnTm");
     const end = getValue("Base.tRunEndTm");
+    const tInsrncBgnTm = getValue('Base.tInsrncBgnTm');  // 保险起期
     if (!start || !v) {
       return;
     }
+ 
     const tm = moment(v).diff(moment(start), "days");
+    // const traceTime = moment(v).diff(moment(tInsrncBgnTm), "days")
+    const traceTime = moment(tInsrncBgnTm).diff(moment(v), "seconds")
+ 
     if (tm < 0) {
       ElMessage.warning("追溯/日落止期不能小于追溯起期");
       setFormValue({
@@ -187,8 +192,20 @@ const method = {
       });
       return;
     }
+ 
+    //校验追溯时间
+    if (traceTime < 0) {
+      ElMessage.warning("追溯期的止期|须早于保险起期！");
+      setFormValue({
+        "Base.tRunEndTm": null,
+      });
+      return;
+    }
+
+
+
     const formattedDate = moment(v).format('YYYY-MM-DD') + ' 23:59:59';
-    console.log(formattedDate,"00000000000")
+ 
     setFormValue({
       "Base.nTracingDays": tm,
       "Base.tRunEndTm": formattedDate, // 更新日期字段
