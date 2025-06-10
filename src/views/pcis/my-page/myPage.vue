@@ -1516,6 +1516,20 @@ const getBtn = (id) => {
     return id === item.id;
   });
 };
+
+/**
+ * 公共验证，保费计算和核保，都需要走的验证方法
+ */
+function baseValite(){
+  let r = true;
+    // 校验承包基本信息中的总保额和总保费币种须一致
+  const baseValue = opertaor.getTableRefByKey("base").getFromValue();
+  if(baseValue["Base.cAmtCur"] !== baseValue["Base.cPrmCur"]) {
+    ElMessage.error("承保基本信息中的总保额币种和总保费币种须一致!");
+    r = false;
+  }
+  return r;
+}
 /**
  * 投保保费计算
  */
@@ -1532,10 +1546,7 @@ const calcPremium = () => {
     btn.loading = false;
     return;
   }
-  // 校验承包基本信息中的总保额和总保费币种须一致
-  const baseValue = opertaor.getTableRefByKey("base").getFromValue();
-  if(baseValue["Base.cAmtCur"] !== baseValue["Base.cPrmCur"]) {
-    ElMessage.error("承保基本信息中的总保额币种和总保费币种须一致!");
+  if (!baseValite()) {
     btn.loading = false;
     return;
   }
@@ -1638,6 +1649,10 @@ const setCiInfo = (base: any) => {
 const submitToUndrFn = async () => {
   if (needCalc.value) {
     ElMessage.error("请先进行保费计算!");
+    return;
+  }
+  if (!baseValite()) {
+    btn.loading = false;
     return;
   }
   if (!checkNAmt()) return;
