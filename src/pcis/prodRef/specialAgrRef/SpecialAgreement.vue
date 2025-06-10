@@ -339,6 +339,7 @@ function setFormValue(value: any) {
   }
   rttableFrom?.value?.setFormValue(value);
   // Object.assign(formData.value, value);
+  formData.value = value;
 }
 function validate() {}
 defineExpose({
