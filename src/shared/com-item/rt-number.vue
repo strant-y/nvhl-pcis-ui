@@ -4,27 +4,11 @@
     ref="inputNumberRef"
     v-model="vInput"
     :class="isReQuired() ? 're-quired-flag' : ''"
-    :readonly="
-      item.readonly
-        ? typeof item.readonly === 'boolean'
-          ? item.readonly
-          : item.readonly === 1 || item.readonly === '1'
-            ? true
-            : false
-        : false
-    "
+    :readonly="isReadonly()"
     :placeholder="item.placeholder"
-    :disabled="
-      item.disabled
-        ? typeof item.disabled === 'boolean'
-          ? item.disabled
-          : item.disabled === 1 || item.disabled === '1'
-            ? true
-            : false
-        : false
-    "
-    :min="item.min"
-    :max="item.max"
+    :disabled="isDisabled()"
+    :min="item.min!=null && item.min !=undefined ?  item.min : -Infinity"
+    :max="item.max!=null && item.max !=undefined ?  item.max : Infinity"
     :step="item.step"
     :step-strictly="item.stepStrictly"
     :size="item.size"
@@ -77,12 +61,15 @@ const props = defineProps({
 
 const vInput = ref<number | undefined>();
 watch([() => props.modelValue], ([newModelValue]) => {
-  vInput.value = newModelValue ? Number(newModelValue) : undefined;
+  console.log(newModelValue);
+  vInput.value = newModelValue !== null && newModelValue != undefined ? Number(newModelValue) : undefined;
+  console.log(vInput.value);
 });
 
 function handleChange(val?: string | number | undefined) {
   emits("update:modelValue", val);
   emits("valueChange", val);
+  console.log(val);
   // props.item.func ? props.item.func(val) : null;
 }
 function isReQuired() {
@@ -103,6 +90,30 @@ function isReQuired() {
     }
   }
   return r;
+}
+
+
+function isReadonly(){
+  if(props.item.readonly === true || props.item.readonly === 1 || props.item.readonly === '1'){
+    return true;
+  }else{
+    return false;
+  }
+}
+
+function isClearable(){
+  if(props.item.clearable === true || props.item.clearable === 1 || props.item.clearable === '1'){
+    return true;
+  }else{
+    return false;
+  }
+}
+function isDisabled(){
+  if(props.item.disabled === true || props.item.disabled === 1 || props.item.disabled === '1'){
+    return true;
+  }else{
+    return false;
+  }
 }
 
 onMounted(() => {
