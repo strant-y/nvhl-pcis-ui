@@ -132,7 +132,6 @@
         </el-affix>
       </el-aside>
       <el-main>
-        <el-backtop :right="100" :bottom="100" />
         <el-affix
           :offset="80"
           style="text-align: center; padding: 5px; background: #ebedfc;width: 100%;"
@@ -239,6 +238,7 @@
         >
           <ourCompanyCiShareRef ref="ourCompanyCiShare"></ourCompanyCiShareRef>
         </div>
+        <el-backtop :target="'.el-main'" :right="100" :bottom="150" />
       </el-main>
     </el-container>
 
