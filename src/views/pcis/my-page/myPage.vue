@@ -1703,9 +1703,13 @@ const submitToUndrFn = async () => {
             btn.loading = false;
             console.log("submitToUndr-res", undr);
             if (undr["code"] == "200") {
-              ElMessage.success(undr.msg);
-              // 申请核保成功后按钮设置为不可点击
-              const btn = getBtn("btn010103");
+              if(!undr['cDecision'] === '0'){
+                ElMessage.success(undr.msg);
+                // 申请核保成功后按钮设置为不可点击
+                const btn = getBtn("btn010103");
+              }else{
+                ElMessage.error(undr.msg);
+              }
             } else {
               ElMessage.error(undr.msg);
             }
