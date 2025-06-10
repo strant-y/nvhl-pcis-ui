@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { formInit } from "@/shared/from-init";
+import { formInit } from "@/shared/from-init"; 
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
 import {
@@ -33,28 +33,44 @@ onMounted(() => {
 // 绑定方法
 const method = {
   // func demo
-  func1: () => {},
+  func1: () => { },
   funcpayadd: () => {
-      payinfoEditRef?.value?.addRow();
-      const val=getFromValue()
-      val.items.forEach((key,index) => { 
-          key['Pay.nTms']=index+1
+
+    const tabref = opertaor.getTableRefs();
+    const baseBefore = tabref["base"].getFromValue();
+    const val = getFromValue()
+    console.log(1111111,baseBefore['Base.cInstMrk'])
+    
+
+    if(baseBefore['Base.cInstMrk'] ==='0' && val.length === 1){
+      ElMessage.error('付费约定为一次交清，只能录入一条！');
+      return false;
+    }
+    payinfoEditRef?.value?.addRow();
+  
+
+    console.log(val)
+    if (val) {
+      val.forEach((key, index) => {
+        key['Pay.nTms'] = index + 1
       });
+    }
+
   },
   funcpaydel: () => {
-      const selData=payinfoEditRef?.value?.getSelectRow()
-      if (!selData) {
-          ElMessage.error("请选择要删除的数据!");
-          return;
-      }
-      const editIndex=selData['_dataId']
-      payinfoEditRef?.value?.delRow(editIndex);
-      const val=getFromValue()
-      val.items.forEach((key,index) => {
-          key['Pay.nTms']=index+1
-      });
+    const selData = payinfoEditRef?.value?.getSelectRow()
+    if (!selData) {
+      ElMessage.error("请选择要删除的数据!");
+      return;
+    }
+    const editIndex = selData['_dataId']
+    payinfoEditRef?.value?.delRow(editIndex);
+    const val = getFromValue()
+    val.forEach((key, index) => {
+      key['Pay.nTms'] = index + 1
+    });
   },
-     //缴费止期控制
+  //缴费止期控制
   // tPayEndTmDisabled: (date: any) => {
   //   return  date.getTime() <new Date( opertaor.getTableRefs()["insrnc"].getValue("Base.tInsrncEndTm").replace(/-/g, '/')).getTime()
   // },
@@ -79,7 +95,7 @@ function getTableValue(rowId: number, key: string) {
   payinfoEditRef?.value?.getTableValue(rowId, key);
 }
 
-function getFormconfig(){
+function getFormconfig() {
   return formconfig1;
 }
 //给表单赋值
@@ -92,7 +108,7 @@ function setFormItem(key: any, obj: any) {
           for (let key in obj.btnItems) {
             item.btnItems[key] = obj.btnItems[key];
           }
-        }else{
+        } else {
           Object.assign(item, obj);
         }
       }

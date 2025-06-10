@@ -33,6 +33,8 @@ import {
   MyTableMethod,
 } from "@/shared/app-table-config";
 import { PcisQueryService } from '../service/pcis-query-service';
+import { useUserStore } from "@/store/modules/user";
+
 const pcisQueryService = new PcisQueryService();
 const props = defineProps({
   data: Object,
@@ -50,6 +52,9 @@ const freeLookRef = ref<AppFreeEditMethod | null>(null);
 const freeEditRefBtn = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<MyTableMethod | null>(null);
 const appTableShow = ref(false);
+const userStore = useUserStore();
+const user = ref(userStore.user);
+
 
 const schemaMap = reactive<Record<string, any>>({
   rtinputgroup: [],
@@ -165,7 +170,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       },
       {
         prop: 'NPrm',
-        title: '实收金额',
+        title: '实收金额', 
         disabled: true,
         inputtype: "rtinput",
       },
@@ -223,7 +228,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: 'NPayAmt',
         disabled: true,
-        title: '支票（收据）金额',
+        title: '支票（收据）金额', 
         inputtype: "rtinput",
       },
       {
@@ -283,6 +288,7 @@ onMounted(async () => {
     // }, 50);
       nextTick(()=>{
           const param = {
+               CurrentUser:user.value.opCde,
               'CUniqueNo': props.data.CUniqueNos,
           };
           loadPayConfirmInfo(param);

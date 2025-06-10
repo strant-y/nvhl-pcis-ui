@@ -225,6 +225,12 @@ export function delTmpPolicy(queryParams: any) {
 export function policyRatio(queryParams: any) {
     return request.post('/policy/ratio', queryParams);
 }
+/**
+ * 承保-查询客户信息 （全量）
+ */
+export function qryCustomer(queryParams: any) {
+    return request.post('/policy/qryCustomer', queryParams);
+}
 
 /**
  * 询价-投保单保费计算

@@ -313,6 +313,16 @@ onMounted(async () => {
       ),
       moment(new Date()).format("YYYY-MM-DD 23:59:59"),
     ]);
+
+    freeEditRef.value?.setValue("AccDpt", user.value['companyId']);
+    setFormItem("AccDpt", {
+      loadData: [
+        {
+          label: user.value['companyCnm'],
+          value: user.value['companyId'],
+        },
+      ],
+    });
   });
   // handleQuery(true);
 });

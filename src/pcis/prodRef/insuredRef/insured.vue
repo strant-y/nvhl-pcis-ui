@@ -16,13 +16,30 @@ import {
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+
+
+// import { genCusConInfoBusinessList } from "../../../api/query/index";
+
+// import {genCusConInfoBusinessList} from "@/api/query/index"
+
+
 const dialog = ref<DialogMethod | null>(null);
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { useValidator } from "@/typings/useValidator";
 import moment from "moment";
 import { codeListViewStore } from "@/store";
 import { useProductStore } from "@/store/modules/prod";
-import { getAddressStr } from "@/api/query";
+import { getAddressStr,qryCustomer } from "@/api/query";
+
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
+import { useRouter, useRoute } from 'vue-router';
+const route = useRoute();
+const query = ref(route.query);
+const router = useRouter();
+const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
+
+
+
 const productStore = useProductStore();
 const opertaor = dataOpertaor();
 const props = defineProps({
@@ -35,11 +52,12 @@ const { getRules } = useValidator();
 const codeListStore = codeListViewStore();
 const insuredEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
-import { useRoute } from "vue-router";
-const route = useRoute();
+// import { useRoute } from "vue-router";
+// const route = useRoute();
 const fileInputRef = ref(null);
 const fileInputType = ref();
 import { readFile } from "@/api/file";
+const user = JSON.parse(sessionStorage.getItem("user"));
 const tCertfDate = ref<any[]>([]);
 onMounted(() => {
   const formconfig11 = formInit(
@@ -99,26 +117,80 @@ function setFormItem(key: any, obj: any) {
 }
 //  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
 const checkUser = () => {
+
+
+  // 自定义录单 进入 可以查询用户信息
+  console.log('录单 ZT' ,param.cRecordType)
+  if (param.cRecordType !== 1) {
+      // setTimeout(() => {
+      //   setValue("Tgt.cInsuranceMethod", '613001')
+      // }, 1000)
+      return false;
+    }
+
   let obj = {};
   const tabref = opertaor.getTableRefs();
   const applicantValue = tabref["insured"].getFromValue();
+
+  console.log('查询----', applicantValue["Insured.cInsuredCde"],applicantValue["Insured.cInsuredNme"] ,  applicantValue["Insured.cClntMrk"],  applicantValue["Insured.cCertfCde"],applicantValue["Insured.cCertfCls"])
+console.log(applicantValue["Insured.cInsuredNme"]&&
+    applicantValue["Insured.cClntMrk"] !== null &&
+    applicantValue["Insured.cCertfCde"] &&
+    applicantValue["Insured.cCertfCls"])
   //  只要4个有值 去请求客户信息
   if (
+    applicantValue["Insured.cInsuredNme"]&&
     applicantValue["Insured.cClntMrk"] !== null &&
-    applicantValue["Insured.cClntMrk"] !== undefined &&
-    applicantValue["Insured.cClntMrk"] !== "" &&
-    applicantValue["Insured.cAppNme"] &&
     applicantValue["Insured.cCertfCde"] &&
     applicantValue["Insured.cCertfCls"]
   ) {
-    //  obj = {'Insured.cCertfCde':'9000000504'}
-    // obj['Insured.cInsuredCde'] = '0008'
-    // obj['Insured.cAppCde'] = '0009'
-    //  tabref ['insured'].setFormValue(obj);
-  }
+    const param = {
+      coustName: applicantValue["Insured.cInsuredNme"],
+      coustMrk: applicantValue["Insured.cClntMrk"],
+      coustType:applicantValue["Insured.cCertfCls"],
+      coustCode: applicantValue["Insured.cCertfCde"],
+      personnelType:"Insured"
+      // CClntMrk:applicantValue["Insured.cInsuredNme"],
+      // CClntNme:applicantValue["Insured.cClntMrk"],
+      // CCertfCde:applicantValue["Insured.cCertfCde"],
+      // CCertfCls:applicantValue["Insured.cCertfCls"],
+      // CurrentUser: user["companyId"],
+      // CurrentUserOrg:user["opCde"]
+ 
+    }
+    // if (s["CClntMrk"] == null || s["CClntNme"] == null|| s["CCertfCls"] == null|| s["CCertfCde"] == null) {
+    //   ElMessage.error("客户信息都不能为空！");
+    //   return;
+    // }
 
+    // param["pageNo"] = param["pageNum"];
+
+
+    console.log('客户参数', param);
+    qryCustomer(param)
+      .then((res) => {
+        const { code, data, msg } = res;
+        if (200 === code) {
+          console.log('客户数据', res)
+          // pageresult.list = data.result;
+          // pageresult.total = data.total;
+          if(data){
+          tabref ['insured'].setFormValue(data[0])
+          }
+        
+          
+        } else {
+          // ElMessage.error(msg);
+        }
+      })
+      .finally(() => {});
+
+  }
+  
+  //  cInsuredCde  客户代码.
+    //  cInsuredNme  客户名称
   //  cClntMrk  被保人性质
-  //  cAppNme  客户名称
+
   //  cCertfCde    身份号码
   //  cCertfCls   身份证类型
 };

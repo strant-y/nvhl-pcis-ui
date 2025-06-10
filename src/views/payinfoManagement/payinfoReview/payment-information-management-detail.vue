@@ -2,31 +2,23 @@
 <template>
   <el-dialog v-model="dialogVisible" width="90%">
     <div>
-      <app-free-edit
-        v-model:freeEditConfig="formconfig1"
-        ref="freeEditRef"
-        @update-datas="fromUpdata"
-      />
+      <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" @update-datas="fromUpdata" />
       <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
-        <rt-button
-          :item="{
-            type: 'primary',
-            label: '审核通过',
-            func: () => {
-              passInfo();
-            },
-          }"
-        />
+        <rt-button :item="{
+          type: 'primary',
+          label: '审核通过',
+          func: () => {
+            passInfo();
+          },
+        }" />
 
-        <rt-button
-          :item="{
-            type: 'primary',
-            label: '支票退回',
-            func: () => {
-              backInfo();
-            },
-          }"
-        />
+        <rt-button :item="{
+          type: 'primary',
+          label: '支票退回',
+          func: () => {
+            backInfo();
+          },
+        }" />
       </div>
     </div>
   </el-dialog>
@@ -131,53 +123,53 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         // param: { cIsValid: '1', userOrg: user.value.companyId },
         title: "业务机构",
         itemWidth: 2,
-        disabled:true,
+        disabled: true,
       },
       {
         prop: "cAppNum",
         inputtype: "rtinput",
         title: "选择单数",
-        disabled:true,
+        disabled: true,
       },
       {
         prop: "cAppNo",
         inputtype: "rtinput",
         title: "投保单号",
         rules: [getRules("required", {})],
-        disabled:true,
+        disabled: true,
       },
       {
         prop: "cPayNme",
         inputtype: "rtinput",
         title: "出票人",
-        disabled:true,
+        disabled: true,
       },
       {
         prop: "cChequeNo",
         inputtype: "rtinput",
         title: "支票号",
         defaultValue: props.CChqueNo,
-        disabled:true,
+        disabled: true,
       },
 
       {
         prop: "nPayAmt",
         inputtype: "rtnumber",
         title: "(收据)金额",
-        disabled:true,
-        
+        disabled: true,
+
       },
       {
         prop: "nTax",
         inputtype: "rtnumber",
         title: "车船税",
-        disabled:true,
+        disabled: true,
       },
       {
         prop: "nPrm",
         inputtype: "rtnumber",
         title: "实收金额",
-          disabled:true,
+        disabled: true,
       },
 
       {
@@ -194,7 +186,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cChargeCde",
         inputtype: "rtinput",
         title: "(收据)收款人",
-        disabled:true,
+        disabled: true,
       },
       // {
       //   prop: "cSeqNo",
@@ -221,13 +213,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cCHeckPsn",
         inputtype: "rtinput",
         title: "审核人",
-        disabled:true,
+        disabled: true,
       },
       {
         prop: "nStampTax",
         inputtype: "rtnumber",
         title: "印花税",
-        disabled:true,
+        disabled: true,
         // rules: [getRules("required", {})],
       },
       // {
@@ -356,7 +348,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cCurtainNo",
         inputtype: "rtinput",
         title: "银行到账通知单号",
-        disabled:true,
+        disabled: true,
       },
       // CUniqueNo TUpdTm CAppTyp 这三个需要询问，因为原文件是隐藏的字段
       {
@@ -368,7 +360,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         itemWidth: 3,
         // defaultValue: '同意',
         rules: [getRules("required", {})],
-        
+
       },
     ],
     showSuperior: true,

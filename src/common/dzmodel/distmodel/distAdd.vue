@@ -184,6 +184,7 @@ const formconfig1 = ref<AppFreeEditConfig>(
 const distContactList:Array<string> = ['Dist.PartProp','Tgt.cSuffixAddr','Dist.Prop','Dist.cSuffixAddr','Dist.JingyingProp','Dist.cDetailedAddress']
 
 onMounted(() => {
+  // console.log(333)   distAdd
   dataParams.value = opertaor.getDataAll();
   appNo.value = dataParams.value.plyBase["Base.cAppNo"];
   
@@ -191,6 +192,7 @@ onMounted(() => {
   let cIs= opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered']  //  是否记名投保
 
   for(let i = 0; props.data.fromSchema && i < props.data.fromSchema.length; i++){
+    console.log('Dist.cPlateNumber',props.data.fromSchema)
     let item = JSON.parse(JSON.stringify(props.data.fromSchema[i]));
     if(['Dist.AllOccup'].includes(item.prop)) {
       item["func"] = getDistoccupType;

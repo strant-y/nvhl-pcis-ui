@@ -35,7 +35,7 @@ const props = defineProps({
 const applicantEditRef = ref<AppFreeEditMethod | null>(null);
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { getDefaultCompilerOptions } from "typescript";
-import { getAddressStr } from "@/api/query";
+import { getAddressStr,qryCustomer } from "@/api/query";
 const opertaor = dataOpertaor();
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 const formData = ref<any[]>([]);
@@ -113,6 +113,45 @@ function setFormItem(key: any, obj: any) {
     });
   }
 }
+
+
+//  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
+const checkUser = () => {
+if (param.cRecordType !== 1) {
+    return false;
+  }
+const tabref = opertaor.getTableRefs();
+const applicantValue = tabref["applicant"].getFromValue();
+//  只要4个有值 去请求客户信息
+if (
+  applicantValue["Applicant.cAppNme"]&&
+  applicantValue["Applicant.cClntMrk"] !== null &&
+  applicantValue["Applicant.cCertfCde"] &&
+  applicantValue["Applicant.cCertfCls"]
+) {
+  const param = {
+    coustName: applicantValue["Applicant.cAppNme"],
+    coustMrk: applicantValue["Applicant.cClntMrk"],
+    coustType:applicantValue["Applicant.cCertfCls"],
+    coustCode: applicantValue["Applicant.cCertfCde"],
+    personnelType:"Applicant"
+  }
+  qryCustomer(param)
+    .then((res) => {
+      const { code, data, msg } = res;
+      if (200 === code) {
+        if(data){
+        tabref ['applicant'].setFormValue(data[0])
+        }
+        
+      } else {
+        // ElMessage.error(msg);
+      }
+    })
+    .finally(() => {});
+}
+};
+
 // 绑定方法
 const method = {
   // func demo
@@ -159,6 +198,10 @@ const method = {
       { title: "选择客户信息", width: 70 }
     );
   },
+  // 客户姓名
+  funCheckUser:()=>{
+    checkUser();
+  },
   funcconfirm: () => {
     applicantEditRef.value?.validate().then((isValid) => {
       if (isValid) {
@@ -201,6 +244,7 @@ const method = {
   },
 
   cardTypeChange: (val) => {
+    checkUser();
     const param = opertaor.getParam();
 
     if (!param.initFlag) {
@@ -277,6 +321,7 @@ const method = {
   },
   //投保人性质(0是法人1是个人)
   InsureChange: (val) => {
+    checkUser();
     const param = opertaor.getParam();
 
     if (val == "0") {
@@ -656,6 +701,7 @@ const method = {
   },
   // 证件号码change
   cCertfCdeChange: (val) => {
+
     const tabref = opertaor.getTableRefs();
     const cCertfCls = tabref["applicant"].getFromValue()["Applicant.cCertfCls"];
     if (cCertfCls == "120001") {
@@ -679,6 +725,8 @@ const method = {
         }
       }
     }
+
+    checkUser();
   },
   //注册地市是否同上
   isSameChange: (val) => {
