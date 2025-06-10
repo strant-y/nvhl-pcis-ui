@@ -20,7 +20,10 @@
                     >核保处理</span
                   >
                 </el-anchor-link>
-                <el-anchor-link :href="`#edrbaseurl`" v-if="edrbaseFlag">
+                <el-anchor-link
+                  v-if="edrbaseFlag"
+                  @click="handleAnchorClick($event, `#edrbase`)"
+                >
                   <rt-icon
                     style="margin-right: 14px"
                     :item="{ icon: 'Tickets' }"
@@ -29,7 +32,10 @@
                     >批改信息</span
                   >
                 </el-anchor-link>
-                <el-anchor-link :href="`#edritemurl`" v-if="edritemFlag">
+                <el-anchor-link
+                  v-if="edritemFlag"
+                  @click="handleAnchorClick($event, `#edritem`)"
+                >
                   <rt-icon
                     style="margin-right: 14px"
                     :item="{ icon: 'Tickets' }"
@@ -178,10 +184,10 @@
           <underwriteRef ref="underwrite"></underwriteRef>
         </div>
 
-        <div id="edrbaseurl" v-if="edrbaseFlag" style="margin-bottom: 10px">
+        <div id="edrbase" v-if="edrbaseFlag" style="margin-bottom: 10px">
           <edrbaseRef ref="edrbase"></edrbaseRef>
         </div>
-        <div id="edritemurl" v-if="edritemFlag" style="margin-bottom: 10px">
+        <div id="edritem" v-if="edritemFlag" style="margin-bottom: 10px">
           <edritemRef ref="edritem"></edritemRef>
         </div>
         <template v-for="(pageConfig, v) in formconfig1" :key="v">
