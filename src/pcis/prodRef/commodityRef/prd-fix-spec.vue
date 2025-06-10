@@ -184,6 +184,7 @@ function setSelected() {
       pageresult.list.forEach((item2) => {
         if (item["cSpecialCode"] === item2["cSpecialCode"]) {
           item2["checked"] = true;
+          multipleTableRef.value.toggleRowSelection(item2, true);
         }
       });
     });
