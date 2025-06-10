@@ -819,6 +819,7 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                             pageType: "EDR_APP_NEW_SCENE",
                             cTermNme: selected.value["cTermNme"],
                             cTermNo: selected.value["cTermNo"],
+                            cProdNmeCn: selected.value["cProdNmeCn"],
                         });
                         //预留跳转路径
                         router.push({
@@ -847,6 +848,7 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                             pageType: "EDR_APP_NEW_SCENE",
                             cTermNme: selected.value["cTermNme"],
                             cTermNo: selected.value["cTermNo"],
+                            cProdNmeCn: selected.value["cProdNmeCn"],
                         });
                         //预留跳转路径
                         router.push({
@@ -875,6 +877,7 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                             pageType: "EDR_APP_NEW_SCENE",
                             cTermNme: selected.value["cTermNme"],
                             cTermNo: selected.value["cTermNo"],
+                            cProdNmeCn: selected.value["cProdNmeCn"],
                         });
                         console.log(en);
                         router.push({
