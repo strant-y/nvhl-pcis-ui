@@ -254,11 +254,11 @@
 <!--           新增的投保单号显示和复制按钮-->
           <div style="margin-right: 20px; width: 100%; display: flex; justify-content: flex-end; align-items: center;">
             <div style="display: flex; align-items: center; background: #fff; padding: 6px 12px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
-              投保单号:
+              {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "投保单号:" }}
               <span id="policyNumber" style="margin-left: 5px; margin-right: 8px; font-weight: bold;">
                {{ opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || '暂无' }}
               </span>
-              <el-tooltip content="点击复制投保单号" placement="top">
+              <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号'}`" placement="top">
                 <el-button @click="copyPolicyNumber" circle size="small" style="color: red;">
                   <rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />
                 </el-button>
@@ -1412,7 +1412,7 @@ const getCAppNoFun = () => {
   const res = {
     cProdNo: props.param.cProdNo,
     cDptCde: props.param.cDptCde,
-    icVchTyp: "POLICY_NUMBER",
+    icVchTyp: props.param?.pageName === "priceInquiry" ? "INQUIRY_NUMBER" : "POLICY_NUMBER",
   };
   generatelSingleNo(res).then((res) => {
     console.log("generatelSingleNo-res", res);
