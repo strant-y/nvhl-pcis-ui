@@ -527,8 +527,21 @@ const historyClaimcaseFun = () => {
 };
 //  复制保单
 const copyPolicyFun = () => {
-  dzmodal.open(copyPlyModel, { type: "", data: {} }).then((res: any) => {
+  dzmodal.open(copyPlyModel, { type: "", data: {queryType: "1",...props.param,...opertaor.getDataAll()} }).then((res: any) => {
     if (res.type === "ok") {
+      const param = {
+        ...props.param,
+        ...res.body
+      }
+      router.push({
+        path: "/pcis/my-page",
+        query: {
+          param: JSON.stringify(param),
+        },
+      });
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     }
   });
   // dialogRef.value?.open(
