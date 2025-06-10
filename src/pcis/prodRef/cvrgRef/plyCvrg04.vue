@@ -534,7 +534,7 @@ function deleteTermByNo(plan: any, t: any) {
       if (planData.value[plan][item][i]["Term.cClauseCode"] === t) {
         // 批改的情况下，标记该单为删除状态
         if (parparam.cEdrType) {
-          planData.value[plan][item][i]["Term.cCancelMrk"] = "1";
+          tremTemplateRefs.value[plan+item+i].setCancel();
         } else {
           deleindex = i;
         }

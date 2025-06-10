@@ -355,7 +355,7 @@ function deleteTermByNo(t: any) {
 
         // 批改的情况下，标记该单为删除状态
         if (parparam.cEdrType) {
-          formData.value[item][i]["Term.cCancelMrk"] = "1";
+          tremTemplateRefs.value[item+i].setCancel();
         } else {
           deleindex = i;
         }

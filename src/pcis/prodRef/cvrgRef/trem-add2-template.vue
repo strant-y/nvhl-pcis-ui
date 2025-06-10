@@ -111,9 +111,14 @@ function setDisabledAll() {
 }
 function dataInit() {}
 
+function setCancel(){
+  props.planData['Term.cCancelMrk'] = '1';
+}
+
 defineExpose({
   dataInit,
   setDisabledAll,
+  setCancel
 });
 
 defineOptions({

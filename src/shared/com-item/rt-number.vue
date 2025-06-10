@@ -61,15 +61,12 @@ const props = defineProps({
 
 const vInput = ref<number | undefined>();
 watch([() => props.modelValue], ([newModelValue]) => {
-  console.log(newModelValue);
   vInput.value = newModelValue !== null && newModelValue != undefined ? Number(newModelValue) : undefined;
-  console.log(vInput.value);
 });
 
 function handleChange(val?: string | number | undefined) {
   emits("update:modelValue", val);
   emits("valueChange", val);
-  console.log(val);
   // props.item.func ? props.item.func(val) : null;
 }
 function isReQuired() {

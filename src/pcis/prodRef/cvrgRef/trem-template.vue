@@ -548,8 +548,8 @@ onMounted(async () => {
   dataInit();
 });
 
-watch(() => props.modelValue, (o,n)=>{
-  initData(n);
+watch(() => props.modelValue, (newv,oldv)=>{
+  initData(newv);
   dataInit();
 });
 
@@ -874,9 +874,15 @@ const methodMap = {
   },
 };
 
+function setCancel(){
+  termdata.value['Term.cCancelMrk'] = '1';
+  update();
+}
+
 defineExpose({
   dataInit,
   setDisabledAll,
+  setCancel,
   validate,
 });
 </script>
