@@ -340,13 +340,6 @@ const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
   },
 });
 
-watch(
-  () => props.modelValue,
-  (newVal) => {
-    dataInit();
-    initData(props.modelValue);
-  }
-);
 function update() {
   let newData;
 
@@ -558,8 +551,6 @@ onMounted(async () => {
 watch(() => props.modelValue, (o,n)=>{
   initData(n);
   dataInit();
-},{
-  deep: true
 });
 
 function dataInit() {
