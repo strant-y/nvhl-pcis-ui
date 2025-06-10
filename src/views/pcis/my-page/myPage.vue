@@ -251,7 +251,7 @@
     <el-footer>
       <el-affix position="bottom" :offset="10">
         <div class="bottom-items">
-<!--           新增的投保单号显示和复制按钮-->
+          <!--新增的投保单号显示和复制按钮-->
           <div style="margin-right: 20px; width: 100%; display: flex; justify-content: flex-end; align-items: center;">
             <div style="display: flex; align-items: center; background: #fff; padding: 6px 12px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
               {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "投保单号:" }}
@@ -265,7 +265,6 @@
               </el-tooltip>
             </div>
           </div>
-
           <rt-button
             v-for="(bth, idx) in bthList"
             :item="bth"
@@ -585,6 +584,7 @@ const copyPolicyFun = () => {
   //       { title: "复制保单", width: 85 }
   //     );
 };
+
 // 复制投保单号
 const copyPolicyNumber = () => {
   const policyNumberElement = document.getElementById("policyNumber");
@@ -613,7 +613,6 @@ const copyPolicyNumber = () => {
   // 清除选中内容
   selection.removeAllRanges();
 };
-
 
 /**
  * 投保需要的按钮
@@ -1701,6 +1700,7 @@ const setCiInfo = (base: any) => {
   ci["Ci.nCiPrm"] = base["Base.nPrm"];
   ci["Ci.cChiefMrk"] = "1"
   ci["Ci.cIssueMrk"] = "1"
+  ci["Ci.nPlyFeeRate"] = "0"
   ci["Ci.cCoinsurerCde"] = "327001"
   ci["Ci.cSubDptCde"] = props.param.cDptCde
   ciList.push(ci)

@@ -104,6 +104,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               item.hidden = h;
             }
           });
+
+          tableconfig.fromSchema?.forEach((item) => {
+            if ( item.prop === "cPropHeight" ) {
+              item.isShow = val === "table";
+            }
+          });
         },
       },
       {
@@ -177,7 +183,7 @@ function savegroupinfo() {
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     editFlag: true,
-    editList: ["cPorpRequired","cPorpShowtitle","cPorpDisabled"],
+    editList: ["cPorpRequired","cPorpShowtitle","cPorpDisabled","cPropHeight"],
     fromSchema: [
       {
         prop: "icon",
@@ -262,6 +268,12 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cFactorTitle",
         inputtype: "rtinput",
         title: "要素名称",
+      },
+      {
+        prop: "cPropHeight",
+        inputtype: "rtinput",
+        title: "宽度",
+        isShow: false,
       },
     ],
   })
