@@ -1677,6 +1677,13 @@ const submitToUndrFn = async () => {
 
       const params = opertaor.getParam();
       //:TODO 进行一次保费计算,如果发生保费变化,则告知需要进行保费计算
+      // 校验承包基本信息中的总保额和总保费币种须一致
+      const baseValue = opertaor.getTableRefByKey("base").getFromValue();
+      if(baseValue["Base.cAmtCur"] !== baseValue["Base.cPrmCur"]) {
+        ElMessage.error("承保基本信息中的总保额币种和总保费币种须一致!");
+        btn.loading = false;
+        return;
+      }
       const calcData: any = opertaor.getDataAll();
       calcData["user"] = user;
       calcData["plyBase"]["Base.cDptCde"] = params.cDptCde;
