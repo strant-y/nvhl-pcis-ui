@@ -342,14 +342,27 @@ export const dataOpertaor = defineStore(
                     refs: ref
                 }));
 
+            const pageObj = getTableConfig();
             // 4. 汇总结果（示例：收集所有失败的key）
             const failedKeys = resultMapping
                 .filter(item => item.result === false)
                 .map(item => {
                     console.log("失败的表单key:" + item.key);
+
+                    pageObj.forEach((page: any) =>{
+                        const info = page.pageInfo;
+                        info.forEach((i: any) =>{
+                            if(i.pageKey === item.key){
+                                ElMessage.error(i.pageTtile + '存在验证失败数据，请确认！');
+                            }
+                        })
+                    })
                     return item.key
                 });
 
+                if(!cv){
+                    ElMessage.error('条款信息存在验证失败数据，请确认！');
+                }
             // 5. 返回验证结果和失败详情
             const isValid = failedKeys.length === 0;
             return isValid && cv;

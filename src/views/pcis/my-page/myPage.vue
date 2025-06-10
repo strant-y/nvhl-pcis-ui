@@ -132,7 +132,6 @@
         </el-affix>
       </el-aside>
       <el-main>
-        <el-backtop :right="100" :bottom="100" />
         <el-affix
           :offset="80"
           style="text-align: center; padding: 5px; background: #ebedfc;width: 100%;"
@@ -205,6 +204,7 @@
                 : true
             "
           >
+          <!-- {{ k.pageKey }} -->
             <component
               v-if="currentIndex >= i"
               :ref="
@@ -218,7 +218,6 @@
               "
               :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
               :pageSchema="k.pageSchema"
-              @updateSide="handleUpdateSide"
             />
           </div>
         </template>
@@ -239,12 +238,28 @@
         >
           <ourCompanyCiShareRef ref="ourCompanyCiShare"></ourCompanyCiShareRef>
         </div>
+        <el-backtop :target="'.el-main'" :right="100" :bottom="150" />
       </el-main>
     </el-container>
 
     <el-footer>
       <el-affix position="bottom" :offset="10">
         <div class="bottom-items">
+<!--           新增的投保单号显示和复制按钮-->
+          <div style="margin-right: 20px; width: 100%; display: flex; justify-content: flex-end; align-items: center;">
+            <div style="display: flex; align-items: center; background: #fff; padding: 6px 12px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
+              投保单号:
+              <span id="policyNumber" style="margin-left: 5px; margin-right: 8px; font-weight: bold;">
+               {{ opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || '暂无' }}
+              </span>
+              <el-tooltip content="点击复制投保单号" placement="top">
+                <el-button @click="copyPolicyNumber" circle size="small" style="color: red;">
+                  <rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />
+                </el-button>
+              </el-tooltip>
+            </div>
+          </div>
+
           <rt-button
             v-for="(bth, idx) in bthList"
             :item="bth"
@@ -564,6 +579,35 @@ const copyPolicyFun = () => {
   //       { title: "复制保单", width: 85 }
   //     );
 };
+// 复制投保单号
+const copyPolicyNumber = () => {
+  const policyNumberElement = document.getElementById("policyNumber");
+  if (!policyNumberElement) return;
+
+  const range = document.createRange();
+  range.selectNode(policyNumberElement);
+
+  const selection = window.getSelection();
+  if (!selection) return;
+
+  selection.removeAllRanges();
+  selection.addRange(range);
+
+  try {
+    const successful = document.execCommand("copy");
+    if (successful) {
+      ElMessage.success("投保单号已成功复制到剪贴板！");
+    } else {
+      ElMessage.error("投保单号复制失败，请手动复制。");
+    }
+  } catch (err) {
+    ElMessage.error("当前浏览器不支持自动复制功能，请手动复制。");
+  }
+
+  // 清除选中内容
+  selection.removeAllRanges();
+};
+
 
 /**
  * 投保需要的按钮
@@ -833,10 +877,10 @@ const initPage = async () => {
     CGrpMrk: props.param.cGrpMrk,
   });
 
-  const getRenewalAppPolicyres = await getRenewalAppPolicy({
-    cPlyNo: props.param.cPlyNo,
-    queryTyp: props.param.queryTyp,
-  });
+  // const getRenewalAppPolicyres = await getRenewalAppPolicy({
+  //   cPlyNo: props.param.cPlyNo,
+  //   queryTyp: props.param.queryTyp,
+  // });
 
   if (props.param.pageType === "PLY_UW_PROCESS_SCENE") {
     underwriteFlag.value = true;
@@ -1323,11 +1367,20 @@ async function loadAfter() {
   }
   bthList.value.push(
     createFreeButtonBase({
+    label: "历史赔案",
+    type: "primary",
+    func: () => {
+      historyClaimcaseFun();
+      // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
+    },
+  }),
+    createFreeButtonBase({
       label: "返回",
       func: () => {
         history.back();
       },
-    })
+    }),
+  
   );
 
   if(props.param?.showBtn === false){
@@ -1520,6 +1573,20 @@ const getBtn = (id) => {
     return id === item.id;
   });
 };
+
+/**
+ * 公共验证，保费计算和核保，都需要走的验证方法
+ */
+function baseValite(){
+  let r = true;
+    // 校验承包基本信息中的总保额和总保费币种须一致
+  const baseValue = opertaor.getTableRefByKey("base").getFromValue();
+  if(baseValue["Base.cAmtCur"] !== baseValue["Base.cPrmCur"]) {
+    ElMessage.error("承保基本信息中的总保额币种和总保费币种须一致!");
+    r = false;
+  }
+  return r;
+}
 /**
  * 投保保费计算
  */
@@ -1536,10 +1603,7 @@ const calcPremium = () => {
     btn.loading = false;
     return;
   }
-  // 校验承包基本信息中的总保额和总保费币种须一致
-  const baseValue = opertaor.getTableRefByKey("base").getFromValue();
-  if(baseValue["Base.cAmtCur"] !== baseValue["Base.cPrmCur"]) {
-    ElMessage.error("承保基本信息中的总保额币种和总保费币种须一致!");
+  if (!baseValite()) {
     btn.loading = false;
     return;
   }
@@ -1644,6 +1708,10 @@ const submitToUndrFn = async () => {
     ElMessage.error("请先进行保费计算!");
     return;
   }
+  if (!baseValite()) {
+    btn.loading = false;
+    return;
+  }
   if (!checkNAmt()) return;
   const f = await savePlyInfo(); // 提交核保,需要默认执行一次保存操作
   if (f) {
@@ -1653,7 +1721,6 @@ const submitToUndrFn = async () => {
     nextTick(async () => {
       const rv = await opertaor.validateAll();
       if (!rv) {
-        ElMessage.error("存在未录入数据,请确认!");
         return;
       }
       btn.loading = true;
@@ -1692,9 +1759,13 @@ const submitToUndrFn = async () => {
             btn.loading = false;
             console.log("submitToUndr-res", undr);
             if (undr["code"] == "200") {
-              ElMessage.success(undr.msg);
-              // 申请核保成功后按钮设置为不可点击
-              const btn = getBtn("btn010103");
+              if(!undr['cDecision'] === '0'){
+                ElMessage.success(undr.msg);
+                // 申请核保成功后按钮设置为不可点击
+                const btn = getBtn("btn010103");
+              }else{
+                ElMessage.error(undr.msg);
+              }
             } else {
               ElMessage.error(undr.msg);
             }
@@ -1949,7 +2020,7 @@ const calcPremiumEdr = () => {
           ","
         );
       edrbase.value?.setFormValue(EdrBaseData);
-      const nPrmVar = ops["plyBase"]["Base.nPrmVar"];
+      const nPrmVar = ops["plyBase"]["Base.nPrmVar"]  || 0;
       const payInfo = setPayInfoEdr(
         ops["payinfo"],
         ops["base"],

@@ -126,18 +126,21 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: 'TBgnTm',
         title: '保险起期',
         inputtype: "rtdatepicker",
+        disabled: true,
 
       },
       {
         prop: 'TEndTm',
         title: '保险止期',
         inputtype: "rtdatepicker",
+        disabled: true,
 
       },
       {
         prop: 'TUdrTm',
         title: '核保时间',
-        inputtype: "rtdatepicker",
+        // inputtype: "rtdatepicker",
+        inputtype: "rtinput",
         format: 'YYYY-MM-DD HH:mm:ss',
         disabled: true,
         
@@ -146,7 +149,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: 'TPlEdrMakeTm',
         title: '保批单生成时间',
         inputtype: "rtdatepicker",
-        format: 'YYYY-MM-DD HH:mm:ss',
+        format: 'YYYY-MM-DD HH:MM:SS',
         disabled: true,
         
       },

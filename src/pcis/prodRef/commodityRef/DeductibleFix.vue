@@ -7,6 +7,7 @@
           ref="multipleTableRef"
           :data="pageresult.list"
           style="width: 100%"
+          row-key="cDeductibleCode"
           :row-class-name="tableRowClassName"
           @selection-change="handleSelectionChange"
         >
@@ -54,11 +55,6 @@ import { defineComponent, ref, reactive, onMounted } from "vue";
 import { Plus } from "@element-plus/icons-vue";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
-import {
-  AppTableConfig,
-  AppTableMethod,
-  createTableEditConfig,
-} from "@/shared/app-table-config";
 import { codeListViewStore } from "@/store";
 import { getPrdDeductible } from "@/api/prod";
 const codeListStore = codeListViewStore();
@@ -87,7 +83,7 @@ const selectable = (row) => row["cIfMust"] != "1"; //这里调用是把必选的
 const tableRowClassName = ({ row, rowIndex }) => {
   let sty = "";
   selected.value.forEach((item) => {
-    if (item["cPkId"] == row["cPkId"]) {
+    if (item["cDeductibleCode"] == row["cDeductibleCode"]) {
       sty = "checkedSty";
     }
   });
@@ -103,15 +99,13 @@ const refreshData = () => {
     pageNum: 1,
     pageSize: 999,
   }
-  console.log('param', param)
   // 查询列表数据
   getPrdDeductible(param).then((res) => {
     if (res.data.result) {
-      console.log("res.data.result-2", res.data.result);
       pageresult.list = [];
       res.data.result.forEach((item, index) => {
         pageresult.list.push({
-          cPkId: item.cPkId,
+          cDeductibleCode: item.cDeductibleCode,
           cDeductibleContent: item.cDeductibleContent,
           cStatus: item.cStatus, //是否必选
           cIfMust: item.cIfMust, //是否必选
@@ -133,7 +127,7 @@ const toggleSpecificRow = () => {
     // 假设要切换 id 为 2 的行的选中状态
     pageresult.list.forEach((row) => {
       if (row["cIfMust"] == "1") {
-        multipleTableRef.value.toggleRowSelection(row, true);
+        multipleTableRef.value.toggleRowSelection(row, true, true);
       }
     });
   }
@@ -142,7 +136,7 @@ const toggleSpecificRow = () => {
 function add() {
   addTableData.push({
     addIndex: addTableData.length + 1, //序号
-    cPkId: "", 
+    cDeductibleCode: "", 
     cDeductibleContent: "",
     cStatus: "",
     cIfEdit: "1", // 是否可修改
@@ -168,15 +162,13 @@ const close = () => {
 
 function setSelected() {
   const lastSelected = props.data.selectedData;
-  console.log("lastSelected", lastSelected);
   if (lastSelected && lastSelected.length) {
-    lastSelected.forEach((item) => {
-      pageresult.list.forEach((item2) => {
-        if (item["cPkId"] === item2["cPkId"]) {
-          item2["checked"] = true;
-        }
-      });
-    });
+    const sarr = lastSelected.map( (f: any) => f["cDeductibleCode"]);
+    pageresult.list.forEach(f => { 
+      if(sarr.includes(f["cDeductibleCode"])){
+        multipleTableRef.value!.toggleRowSelection(f, true, true);
+      }
+    })
   }
 }
 

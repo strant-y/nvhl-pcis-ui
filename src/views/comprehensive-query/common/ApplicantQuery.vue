@@ -848,6 +848,9 @@ const tableObj = {
                     const r = await row;
                     if (r) {
                         const data = row;
+                        if(row['cEdrRsnBundleCde']){
+                            data.cRsnCde = row['cEdrRsnBundleCde'];
+                        }
                         router.push({
                             path: "/pcis/my-page",
                             query: {

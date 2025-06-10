@@ -187,6 +187,11 @@ onMounted(async () => {
           if (item.cRdrTyp === "1") {
             data["Term.cClauseCategory"] = item.cClauseCategory;
           }
+          if(item.cRdrTyp === "0"){
+            if(parparam.cProdNo === '040011'){
+              data["Term.nAdjustFactor"] = 100;
+            }
+          }
           plans.push(data);
         });
         refushData(plans);
@@ -292,6 +297,12 @@ function addTermData() {
           if (item.cRdrTyp === "1") {
             data["Term.cClauseCategory"] = item.cClauseCategory;
           }
+          
+          if(item.cRdrTyp === "0"){
+            if(parparam.cProdNo === '040011'){
+              data["Term.nAdjustFactor"] = 100;
+            }
+          }
           data.riskList = riskList;
           plans.push(data);
         });
@@ -341,7 +352,13 @@ function deleteTermByNo(t: any) {
     let deleindex: any = null;
     for (const i in formData.value[item]) {
       if (formData.value[item][i]["Term.cClauseCode"] === t) {
-        deleindex = i;
+
+        // 批改的情况下，标记该单为删除状态
+        if (parparam.cEdrType) {
+          tremTemplateRefs.value[item+i].setCancel();
+        } else {
+          deleindex = i;
+        }
       }
       if (deleindex != null) {
         formData.value[item].splice(deleindex, 1);
