@@ -19,7 +19,7 @@ export function formInit(
   method: { [key: string]: Function },
   exRules: { [key: string]: any }
 ) {
-  return JSON.parse(str, (key, value) => {
+  const newObj =  JSON.parse(str, (key, value) => {
     // 按钮绑定
     if (
       key === "titleBtns" ||
@@ -38,26 +38,27 @@ export function formInit(
     if( ["loadData","codeParam"].includes(key) && typeof value === "string") {  //解决部分场景,json字符串为不是对象的问题
       return JSON.parse(value);
     }
-    // 规则绑定
-    if (key === "rules") {
-      const rules = [];
-      for (let i = 0; i < value.length; i++) {
-        const rulesItem = value[i];
-        // 如果有自定义规则,则使用自定义规则,否则去规则库查找
-        if (exRules[rulesItem.type]) {
-          rules.push({
-            validator: exRules[rulesItem.type],
-            trigger: rulesItem.trigger,
-          });
-        } else {
-          const rul = getRules(rulesItem.type, rulesItem);
-          if (rul) {
-            rules.push(rul);
-          }
-        }
-      }
-      return rules;
-    }
+    // 规则绑定 --移至外部处理
+    // if (key === "rules") {
+    //   const rules = [];
+    //   console.log(str);
+    //   for (let i = 0; i < value.length; i++) {
+    //     const rulesItem = value[i];
+    //     // 如果有自定义规则,则使用自定义规则,否则去规则库查找
+    //     if (exRules[rulesItem.type]) {
+    //       rules.push({
+    //         validator: exRules[rulesItem.type],
+    //         trigger: rulesItem.trigger,
+    //       });
+    //     } else {
+    //       const rul = getRules(rulesItem.type, rulesItem);
+    //       if (rul) {
+    //         rules.push(rul);
+    //       }
+    //     }
+    //   }
+    //   return rules;
+    // }
     // 样式绑定
     if (key === "fromUi" || key === "superFromUi") {
       const fromUi: GridFromUiConfig = createFromUiConfig(value);
@@ -71,4 +72,33 @@ export function formInit(
     }
     return value;
   });
+
+  if(newObj.fromSchema && newObj.fromSchema.length>0){
+    newObj.fromSchema = newObj.fromSchema.map(item=>{
+      if(item.rules && item.rules.length>0){
+          const rules = [];
+          for (let i = 0; i < item.rules.length; i++) {
+            const rulesItem = item.rules[i];
+            // 如果有自定义规则,则使用自定义规则,否则去规则库查找
+            if (exRules[rulesItem.type]) {
+              rules.push({
+                validator: exRules[rulesItem.type],
+                trigger: rulesItem.trigger,
+              });
+            } else {
+              if(item.inputtype === 'rtinput' || item.inputtype === 'rtnumber' ){
+                rulesItem.trigger = 'blur';
+              }
+              const rul = getRules(rulesItem.type, rulesItem);
+              if (rul) {
+                rules.push(rul);
+              }
+            }
+          }
+          item.rules = rules;
+      }
+      return item;
+    })
+  }
+  return newObj;
 }
