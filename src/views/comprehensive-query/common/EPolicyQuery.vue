@@ -524,7 +524,7 @@ function createEPolicy() {
         ElMessage.warning('该产品没有电子保函模板!')
         return false
     }
-    if (plyTyp == 'SOG' && prodNo != '049900') {
+    if (plyTyp == 'SOG' && prodNo != '047002') {
         ElMessage.warning('该产品没有诚信声明模板!')
         return false
     }
