@@ -409,6 +409,40 @@ const businessLicense = () => {
   };
 };
 
+/**
+ * 中国大陆车牌号码校验器
+ * @returns {Object} - 包含 validator 和 trigger 的对象
+ */
+ const vehiclePlate = () => {
+  return {
+    validator: (rule, value, callback) => {
+      // if (!value) {
+      //   return callback(new Error('请输入车牌号码'));
+      // }
+      
+      // 去除空格和非法字符，转大写
+      const cleanPlate = value.trim().replace(/[^\u4e00-\u9fa5A-Z0-9]/g, '').toUpperCase();
+      
+      // 普通燃油车车牌正则
+      const normalPattern = /^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼]{1}[A-HJ-NP-Z]{1}[A-HJ-NP-Z0-9]{4}[A-HJ-NP-Z0-9挂学警港澳]{0,1}$/;
+      
+      // 新能源车车牌正则
+      const newEnergyPattern = /^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼]{1}[A-HJ-NP-Z]{1}(([0-9]{5}[DF])|([DF][A-HJ-NP-Z0-9][0-9]{4}))$/;
+      
+      // 验证逻辑
+      if (normalPattern.test(cleanPlate)) {
+        callback(); // 普通车牌验证通过
+      } else if (newEnergyPattern.test(cleanPlate)) {
+        callback(); // 新能源车牌验证通过
+      } else {
+        callback(new Error('车牌格式不正确（如：粤A12345或粤AD12345）'));
+      }
+    },
+    trigger: ['blur', 'change'] // 失去焦点和内容变化时触发验证
+  };
+}
+
+
   const getRules = (type: any, param: any) => {
     if (type === "required") {
       return required(param.trigger, param.message);
@@ -457,6 +491,9 @@ const businessLicense = () => {
     }
     if(type == 'businessLicense') {
       return businessLicense()
+    }
+    if(type == 'vehiclePlate') {
+      return vehiclePlate()
     }
   };
   const validorMap = {

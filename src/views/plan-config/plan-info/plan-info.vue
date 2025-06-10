@@ -419,6 +419,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable: true,
         // typeCode: "WEB_SYS_STA_DICT", //暂时无接口
         // params: {'cParCde': 'yes_no'},
+        typeCode: "WEB_SYS_STA_DICT",
+        codeParam: { cParCde: "yes_no" },
       },
       {
         prop: "cSpecContent",

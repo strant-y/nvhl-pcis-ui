@@ -685,21 +685,25 @@ const tableconfig = reactive<AppTableConfig>(
 				prop: "cAppNo",
 				inputtype: "rtinput",
 				title: "投保单号",
+                width: 200,
 			},
 			{
 				prop: "nTms",
 				inputtype: "rtinput",
 				title: "期次",
+                width: 100,
 			},
 			{
 				prop: "cAppNmeInvest",
 				inputtype: "rtinput",
 				title: "投保人名称",
+                width: 150,
 			},
 			{
 				prop: "cPayTyp",
 				inputtype: "rtselect",
 				title: "缴费类型",
+                width: 100,
                 typeCode: "CHARGE_TYPE_CACHE",
                 param: {'cCde': [ '2', '3', '5',  '99']},
 				formatter: (val)=>{
@@ -711,21 +715,25 @@ const tableconfig = reactive<AppTableConfig>(
 				prop: "cPaySequence",
 				inputtype: "rtinput",
 				title: "支付号",
+                width: 100,
 			},
 			{
 				prop: "nPrm",
 				inputtype: "rtinput",
 				title: "保费金额",
+                width: 100,
 			},
 			{
 				prop: "nPayAmt",
 				inputtype: "rtinput",
 				title: "应缴金额",
+                width: 100,
 			},
 			{
 				prop: "cCheckSts",
 				inputtype: "rtselect",
 				title: "处理状态",
+                width: 100,
 				loadData:cCheckStsList,
 				formatter: (val)=>{
 				  const result = cCheckStsList.find(item => item.value === val);
@@ -736,21 +744,25 @@ const tableconfig = reactive<AppTableConfig>(
 				prop: "tBgnTm",
 				inputtype: "rtinput",
 				title: "起保日期",
+                width: 150,
 			},
 			{
 				prop: "cUniqueNo",
 				inputtype: "rtinput",
 				title: "收据流水号",
+                width: 200,
 			},
 			{
 				prop: "cBatchNo",
 				inputtype: "rtinput",
 				title: "批号",
+                width: 200,
 			},
 			{
 				prop: "cPayStatus",
 				inputtype: "rtselect",
 				title: "缴费状态",
+                width: 100,
                 typeCode: "WEB_BAS_CODELIST",
                 codeParam: {'cParCde': 'DY1'},
 				formatter: (val)=>{
@@ -762,11 +774,13 @@ const tableconfig = reactive<AppTableConfig>(
 				prop: "tUdrTm",
 				inputtype: "rtinput",
 				title: "核保日期",
+                width: 150,
 			},
 			{
 				prop: "cChargeCde",
 				inputtype: "rtinput",
 				title: "操作员",
+                width: 100,
 			}
 		],
 	})
@@ -785,7 +799,7 @@ onMounted(async () => {
               label: user.value['companyCnm'],
               value: user.value['companyId'],
           },
-      ],
+      ], 
     });
   })  
   getListByCode('WEB_BAS_CODELIST', {
