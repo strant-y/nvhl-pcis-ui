@@ -42,7 +42,7 @@
             <template v-for="(i, index) in getfromSchema()" :key="index">
               <el-col
                 :span="i.itemWidth ? i.itemWidth * formUi.span : formUi.span"
-                style="margin-top: 5px;"
+                style="margin-top: 5px"
               >
                 <el-form-item
                   :prop="[props.$index, i.prop]"
@@ -53,12 +53,48 @@
                   "
                   style="margin-bottom: 18px"
                 >
-                  <from-item
-                    v-model="props.row[i.prop]"
-                    :item="formItems[props.row._dataId][i.prop]"
-                    :showLabel="editIndex !== props.row._dataId"
-                    :row="props.row"
-                  />
+                  <div
+                    :style="{
+                      width:
+                        formItems[props.row._dataId][i.prop].showExBtn &&
+                        formItems[props.row._dataId][i.prop].inputtype !==
+                          'rttable' // 显示组件尾部按钮 table 组件不显示尾部按钮
+                          ? (formItems[props.row._dataId][i.prop].btnWidth
+                              ? 100 -
+                                formItems[props.row._dataId][i.prop].btnWidth
+                              : 75) + '%'
+                          : '100%',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                    }"
+                  >
+                    <from-item
+                      v-model="props.row[i.prop]"
+                      :item="formItems[props.row._dataId][i.prop]"
+                      :showLabel="editIndex !== props.row._dataId"
+                      :row="props.row"
+                    />
+                  </div>
+
+                  <!---       显示组件尾部按钮       --->
+                  <template
+                    v-if="formItems[props.row._dataId][i.prop].showExBtn"
+                  >
+                    <rt-button
+                      v-if="
+                        formItems[props.row._dataId][i.prop].inputtype !==
+                        'rttable'
+                      "
+                      :style="{
+                        width:
+                          (formItems[props.row._dataId][i.prop].btnWidth
+                            ? formItems[props.row._dataId][i.prop].btnWidth
+                            : 25) + '%',
+                        height: '100%',
+                      }"
+                      :item="formItems[props.row._dataId][i.prop].btnItems"
+                    />
+                  </template>
                 </el-form-item>
               </el-col>
             </template>
@@ -131,56 +167,56 @@
         :align="item.align ? item.align : 'center'"
       />
       <template v-for="(i, index) in item.fromSchema" :key="index">
-        <template v-if="i.isShow !== false" >
+        <template v-if="i.isShow !== false">
           <el-table-column
-          v-if="!i.expand"
-          :prop="i.prop"
-          :label="i.title"
-          :width="i.width ? i.width : null"
-          :align="item.align ? item.align : 'center'"
-          :min-width="i.minWidth"
-        >
-          <template #header="header">
-            <el-text
-              v-if="isrequired(i)"
-              class="mx-1"
-              style="margin-right: 2px"
-              type="danger"
-              >*</el-text
-            >{{ header.column.label }}
-          </template>
-          <template #default="scope">
-            <template v-if="item.editFlag">
-              <el-form-item
-                :prop="[scope.$index, i.prop]"
-                :rules="i.rules ? i.rules : undefined"
-              >
-                <from-item
-                  v-model="scope.row[i.prop]"
-                  :item="formItems[scope.row._dataId][i.prop]"
-                  :showLabel="editIndex !== scope.row._dataId"
-                />
-              </el-form-item>
+            v-if="!i.expand"
+            :prop="i.prop"
+            :label="i.title"
+            :width="i.width ? i.width : null"
+            :align="item.align ? item.align : 'center'"
+            :min-width="i.minWidth"
+          >
+            <template #header="header">
+              <el-text
+                v-if="isrequired(i)"
+                class="mx-1"
+                style="margin-right: 2px"
+                type="danger"
+                >*</el-text
+              >{{ header.column.label }}
             </template>
-            <template v-else>
-              <el-form-item
-                :prop="[scope.$index, i.prop]"
-                :rules="i.rules ? i.rules : undefined"
-              >
-                <from-item
-                  v-model="scope.row[i.prop]"
-                  :item="formItems[scope.row._dataId][i.prop]"
-                  :showLabel="
-                    !(props.item.editList && props.item.editList.length > 0
-                      ? props.item.editList?.includes(i.prop)
-                      : false)
-                  "
-                  :row="scope.row"
-                />
-              </el-form-item>
+            <template #default="scope">
+              <template v-if="item.editFlag">
+                <el-form-item
+                  :prop="[scope.$index, i.prop]"
+                  :rules="i.rules ? i.rules : undefined"
+                >
+                  <from-item
+                    v-model="scope.row[i.prop]"
+                    :item="formItems[scope.row._dataId][i.prop]"
+                    :showLabel="editIndex !== scope.row._dataId"
+                  />
+                </el-form-item>
+              </template>
+              <template v-else>
+                <el-form-item
+                  :prop="[scope.$index, i.prop]"
+                  :rules="i.rules ? i.rules : undefined"
+                >
+                  <from-item
+                    v-model="scope.row[i.prop]"
+                    :item="formItems[scope.row._dataId][i.prop]"
+                    :showLabel="
+                      !(props.item.editList && props.item.editList.length > 0
+                        ? props.item.editList?.includes(i.prop)
+                        : false)
+                    "
+                    :row="scope.row"
+                  />
+                </el-form-item>
+              </template>
             </template>
-          </template>
-        </el-table-column>
+          </el-table-column>
         </template>
       </template>
       <el-table-column
@@ -353,10 +389,10 @@ function creatItem(d: any) {
   // 将方法回填到item中
   Object.keys(schamaconf.value).forEach((k: any) => {
     Object.keys(schamaconf.value[k]).forEach((k2: any) => {
-      if (typeof schamaconf.value[k][k2] === 'function') {
+      if (typeof schamaconf.value[k][k2] === "function") {
         sc[k][k2] = schamaconf.value[k][k2];
       }
-    })
+    });
     // if (schamaconf.value[k]["func"]) {
     //   sc[k]["func"] = schamaconf.value[k]["func"];
     // }
@@ -627,12 +663,17 @@ function setValueByRowKey(props: string, rowId: any, value: any) {
     }
   });
 }
-function setRowFieldProp(rowId: string, field: string, prop: string, value: any) {
+function setRowFieldProp(
+  rowId: string,
+  field: string,
+  prop: string,
+  value: any
+) {
   if (formItems.value[rowId] && formItems.value[rowId][field]) {
     // 使用 Vue.set 确保响应式更新
     formItems.value[rowId][field] = {
       ...formItems.value[rowId][field],
-      [prop]: value
+      [prop]: value,
     };
   } else {
     console.warn(`Field ${field} or row ${rowId} not found.`);
