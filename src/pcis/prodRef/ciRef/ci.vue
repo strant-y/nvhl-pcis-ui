@@ -15,9 +15,9 @@ const codeListStore = codeListViewStore();
 import { useRoute } from "vue-router";
 const route = useRoute();
 const param = route.params.param;
+import { useValidator } from "@/typings/useValidator";
+const { getRules } = useValidator();
 import { useProductStore } from "@/store/modules/prod";
-import { log } from "console";
-import { set } from "lodash";
 const productStore = useProductStore();
 
 const props = defineProps({
@@ -43,6 +43,7 @@ onMounted(async () => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
+  console.log("url路由参数",param);
   //一般批改，部分要素可编辑
   if (param.pageType === "EDR_APP_NEW_SCENE" &&  productStore.cCiMrk !== "0") {
     formconfig1.editFlag = true;
@@ -133,17 +134,24 @@ const method = {
       return false;
     }
     if(val ==="327001"){
-    freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde",rowId,"")
-    codeListStore
+      freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde",rowId,"")
+      codeListStore
         .queryCodeList({
           codeListName: "Comm_Code_LIST",
           codeListParam: { "CParCde": "subdpt", cParCde: "327001" },
         })
         .then((res) => {
-          setFormItem("Ci.cSubDptCde", {
-            loadData: res,
-          });
+          // setFormItem("Ci.cSubDptCde", {
+          //   loadData: res,
+          // });
+          freeEditRef.value?.setRowFieldProp(
+            rowId,
+            "Ci.cSubDptCde",
+            "loadData",
+            res,
+          );
         });
+        updateMasterAgreementValues();
     }else {
       freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde",rowId,"")
       freeEditRef.value?.setRowFieldProp(
@@ -152,6 +160,7 @@ const method = {
         "loadData",
         [{ value: '1', label: '其他' }]
       );
+      updateMasterAgreementValues();
     }
   },
   //分公司下拉事件
@@ -159,19 +168,36 @@ const method = {
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData._dataId;
     //获取所有行数据
-    const allRows = getFromValue();
+    // const allRws = getFromValue();
     // 校验是否存在重复的 Ci.cSubDptCde
-    const isDuplicate = allRows.some((row) => {
+    // const isDuplicate = allRows.some((row) => {
       // 排除当前行自身
-      return row._dataId !== rowId && row["Ci.cSubDptCde"] === val;
-    });
-    if (isDuplicate) {
-      ElMessage.error("联保子公司不能重复选择！");
-      // 回退当前行的值
-    freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "");
-      return;
+      // return row._dataId !== rowId && row["Ci.cSubDptCde"] === val;
+    // });
+    // if (isDuplicate) {
+    //   ElMessage.error("联保子公司不能重复选择！");
+    //   // 回退当前行的值
+    // freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "");
+    //   return;
+    // }
+    // freeEditRef?.value?.setValueByRowKey("Ci.cDptCde",rowId,"")
+    console.log("val",val);
+    if(val === "1"){
+      freeEditRef?.value?.setValueByRowKey("Ci.cDptCde",rowId,"")
+      freeEditRef?.value?.setRowFieldProp(
+        rowId,
+        "Ci.cDptCde",
+        "rules",
+        [] 
+      );
+      } else {
+        freeEditRef?.value?.setRowFieldProp(
+          rowId,
+          "Ci.cDptCde",
+          "rules",
+          [getRules("required", {})] // 使用 getRules 设置必填规则
+        );
     }
-    freeEditRef?.value?.setValueByRowKey("Ci.cDptCde",rowId,"")
     codeListStore
         .queryCodeList({
           codeListName: "CDptCde_List",
@@ -186,33 +212,73 @@ const method = {
           );
         });
   },
+  //出单机构下拉事件
+  cDptCdeChange:(val)=>{
+    const rowData = freeEditRef.value?.getSelectRow();
+    const rowId = rowData._dataId;
+
+    // 获取所有行数据
+    const allRows = getFromValue();
+
+    // 校验是否存在重复的 Ci.cCoinsurerCde, Ci.cSubDptCde, Ci.cDptCde 组合
+    const isDuplicate = allRows.some((row) => {
+      // 排除当前行自身
+      return row._dataId !== rowId &&
+            row["Ci.cCoinsurerCde"] === rowData["Ci.cCoinsurerCde"] &&
+            row["Ci.cSubDptCde"] === rowData["Ci.cSubDptCde"] &&
+            row["Ci.cDptCde"] === val;
+    });
+
+    if (isDuplicate) {
+      ElMessage.error("已经存在相同的共保公司、分公司和出单机构组合！");
+      // 回退当前行的出单机构值
+      freeEditRef?.value?.setValueByRowKey("Ci.cDptCde", rowId, "");
+      return;
+    }
+
+  },
   //出单标志下拉事件
   clssueMrkChange:  (val)=>{
-    // const rowData = freeEditRef.value?.getSelectRow();
-    // if(val ==="0" && rowData["Ci.cCoinsurerCde"] === "327001"){
-    //     ElMessage.error("联保单出单方必须是主联单的分公司！")
+    const rowData = freeEditRef.value?.getSelectRow();
+    const rowId = rowData?._dataId;
+    if (!rowData || !rowId) return;
+    // if (productStore.cCiMrk === "2" || productStore.cCiMrk === "4") {
+      // 获取所有行数据
+      const allRows = getFromValue();
+      // 检查是否已有其他行的 cIssueMrk 是 1
+      const existingIssueMrk = allRows.some(
+        (row) => row._dataId !== rowId && row["Ci.cIssueMrk"] === "1"
+      );
+      if (val === "1" && existingIssueMrk) {
+        ElMessage.error("出单方有且只能有一个！");
+        // 回退当前行的值
+        freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
+        return;
+      }
     // }
-    // nextTick(()=>{
-    //     freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk",rowData._dataId,"1")
-    //   })
+    
   },
   //主共标志下拉事件
   cChiefMrkChange:(val)=>{
+    //否0,1是
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData._dataId;
     //获取所有行数据
     const allRows = getFromValue();
-    // 
-    const isDuplicate = allRows.some((row) => {
-      // 排除当前行自身
-      return row._dataId !== rowId && row["Ci.cChiefMrk"] === val;
-    });
-    if (isDuplicate) {
-      ElMessage.error("主共方只能有一个！");
-      // 回退当前行的值
-    freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowId, "");
-      return;
+    //
+    if(val === "1"){
+      
     }
+    // const isDuplicate = allRows.some((row) => {
+    //   // 排除当前行自身
+    //   return row._dataId !== rowId && row["Ci.cChiefMrk"] === val;
+    // });
+    // if (isDuplicate) {
+    //   ElMessage.error("主共方只能有一个！");
+    //   // 回退当前行的值
+    // freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowId, "");
+    //   return;
+    // }
   },
   nCiShareChange:(val)=>{
     const rowDatas = freeEditRef.value?.getSelectRow();
@@ -241,12 +307,22 @@ const method = {
     freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm",rowDatas._dataId,nPrm.toFixed(2))
     freeEditRef?.value?.setValueByRowKey("Ci.nCiAmt",rowDatas._dataId,nAmt.toFixed(2))
 
-    if(rowDatas["Ci.cCoinsurerCde"] == "327001"){
-      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntAmt",nPrm.toFixed(2))  //联保总保额
-      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm",nAmt.toFixed(2)) //联保总保费
-      opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnAmt",nAmt.toFixed(2)) //我司份额保额
-      opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnPrm",nAmt.toFixed(2)) //我司份额保费
+    if (rowDatas["Ci.cCoinsurerCde"] === "327001") {
+      // 更新当前行的 Ci.nCiAmt 和 Ci.nCiPrm，并更新 ciMasterAgreement 的值
+      const ciAmt = val * productStore.nAmt;
+      const ciPrm = val * productStore.nPrm;
+
+      freeEditRef?.value?.setValueByRowKey("Ci.nCiAmt", rowDatas._dataId, ciAmt.toFixed(2));
+      freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm", rowDatas._dataId, ciPrm.toFixed(2));
     }
+    // 更新 ciMasterAgreement 的值
+    updateMasterAgreementValues();
+    // if(rowDatas["Ci.cCoinsurerCde"] == "327001"){
+      // opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntAmt",nPrm.toFixed(2))  //联保总保额
+      // opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm",nAmt.toFixed(2)) //联保总保费
+      // opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnAmt",nAmt.toFixed(2)) //我司份额保额
+      // opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnPrm",nAmt.toFixed(2)) //我司份额保费
+    // }
   },
   nPlyFeeRateChange:(val)=>{
     const rowDatas = freeEditRef.value?.getSelectRow();
@@ -320,7 +396,34 @@ const method = {
         });
   },
 };
+const updateMasterAgreementValues = () => {
+  const allRows = getFromValue(); // 获取所有行数据
+  let totalAmt = 0;
+  let totalPrm = 0;
 
+  // 遍历所有行，只处理 Ci.cCoinsurerCde === "327001" 的行
+  allRows.forEach(row => {
+    if (row["Ci.cCoinsurerCde"] === "327001") {
+      const share = parseFloat(row["Ci.nCiShare"]) || 0;
+      const nAmt = productStore.nAmt ? parseFloat(productStore.nAmt) : 0;
+      const nPrm = productStore.nPrm ? parseFloat(productStore.nPrm) : 0;
+
+      const ciAmt = share * nAmt;
+      const ciPrm = share * nPrm;
+
+      // 更新当前行的 Ci.nCiAmt 和 Ci.nCiPrm
+      freeEditRef?.value?.setValueByRowKey("Ci.nCiAmt", row._dataId, ciAmt.toFixed(2));
+      freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm", row._dataId, ciPrm.toFixed(2));
+
+      // 累加到总和
+      totalAmt += ciAmt;
+      totalPrm += ciPrm;
+    }
+  });
+  // 设置到对应组件字段
+  opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntAmt", totalAmt.toFixed(2));
+  opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm", totalPrm.toFixed(2));
+};
 //给表单下拉项赋值
 const setFormItem = (key, obj) => {
   if (obj && Object.keys(obj).length) {
