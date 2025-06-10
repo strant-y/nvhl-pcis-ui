@@ -101,7 +101,7 @@
               <thead>
                 <tr class="table-title">
                   <template v-for="(item, k) in termFactormap" :key="k">
-                    <th v-if="item.cPorpShowtitle !== '1'">
+                    <th v-if="item.cPorpShowtitle !== '1'" :style="{ width: item.cPropHeight?item.cPropHeight+'px':null }">
                       {{ item.title }}
                     </th>
                   </template>
