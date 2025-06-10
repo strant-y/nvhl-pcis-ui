@@ -245,21 +245,6 @@
     <el-footer>
       <el-affix position="bottom" :offset="10">
         <div class="bottom-items">
-<!--           新增的投保单号显示和复制按钮-->
-          <div style="margin-right: 20px; width: 100%; display: flex; justify-content: flex-end; align-items: center;">
-            <div style="display: flex; align-items: center; background: #fff; padding: 6px 12px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
-              投保单号:
-              <span id="policyNumber" style="margin-left: 5px; margin-right: 8px; font-weight: bold;">
-               {{ opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || '暂无' }}
-              </span>
-              <el-tooltip content="点击复制投保单号" placement="top">
-                <el-button @click="copyPolicyNumber" circle size="small" style="color: red;">
-                  <rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />
-                </el-button>
-              </el-tooltip>
-            </div>
-          </div>
-
           <rt-button
             v-for="(bth, idx) in bthList"
             :item="bth"
@@ -579,35 +564,6 @@ const copyPolicyFun = () => {
   //       { title: "复制保单", width: 85 }
   //     );
 };
-// 复制投保单号
-const copyPolicyNumber = () => {
-  const policyNumberElement = document.getElementById("policyNumber");
-  if (!policyNumberElement) return;
-
-  const range = document.createRange();
-  range.selectNode(policyNumberElement);
-
-  const selection = window.getSelection();
-  if (!selection) return;
-
-  selection.removeAllRanges();
-  selection.addRange(range);
-
-  try {
-    const successful = document.execCommand("copy");
-    if (successful) {
-      ElMessage.success("投保单号已成功复制到剪贴板！");
-    } else {
-      ElMessage.error("投保单号复制失败，请手动复制。");
-    }
-  } catch (err) {
-    ElMessage.error("当前浏览器不支持自动复制功能，请手动复制。");
-  }
-
-  // 清除选中内容
-  selection.removeAllRanges();
-};
-
 
 /**
  * 投保需要的按钮
@@ -1695,6 +1651,7 @@ const setCiInfo = (base: any) => {
   ci["Ci.nCiPrm"] = base["Base.nPrm"];
   ci["Ci.cChiefMrk"] = "1"
   ci["Ci.cIssueMrk"] = "1"
+  ci["Ci.nPlyFeeRate"] = "0"
   ci["Ci.cCoinsurerCde"] = "327001"
   ci["Ci.cSubDptCde"] = props.param.cDptCde
   ciList.push(ci)
