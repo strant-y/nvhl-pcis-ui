@@ -1677,7 +1677,6 @@ const submitToUndrFn = async () => {
     nextTick(async () => {
       const rv = await opertaor.validateAll();
       if (!rv) {
-        ElMessage.error("存在未录入数据,请确认!");
         return;
       }
       btn.loading = true;

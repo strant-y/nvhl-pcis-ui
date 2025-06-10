@@ -342,11 +342,21 @@ export const dataOpertaor = defineStore(
                     refs: ref
                 }));
 
+            const pageObj = getTableConfig();
             // 4. 汇总结果（示例：收集所有失败的key）
             const failedKeys = resultMapping
                 .filter(item => item.result === false)
                 .map(item => {
                     console.log("失败的表单key:" + item.key);
+
+                    pageObj.forEach((page: any) =>{
+                        const info = page.pageInfo;
+                        info.forEach((i: any) =>{
+                            if(i.pageKey === item.key){
+                                ElMessage.error(i.pageTtile + '存在验证失败数据，请确认！');
+                            }
+                        })
+                    })
                     return item.key
                 });
 
