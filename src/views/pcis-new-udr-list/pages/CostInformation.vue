@@ -6,7 +6,7 @@
       v-model:pageresult="pageresult"
       ref="tableRef"
     />
-    <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
+    <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" /> 
    <app-table
       :tableConfig="tableconfig1"
       v-model:pageresult="pageresult1"

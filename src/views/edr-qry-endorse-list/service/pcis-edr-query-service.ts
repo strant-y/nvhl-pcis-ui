@@ -11,6 +11,8 @@ export class PcisEdrQueryService {
   validAddNoRecordUrl = '/edr/validAddNoRecord'; // 补录前的验证
   findTInsrncBgnTmUrl = '/edr/findTInsrncBgnTm'; // 不记名补录前的时间查询
   getRelationDataInfoUrl = '/policy/getRelationDataInfo'; //额度明细查询
+  getEdrCiRelUrl = '/policy/getEdrCiRel'; //据保单号获取联共保信息
+  updateEdrCiInfoByPkIdUrl = '/policy/updateEdrCiInfoByPkId'; //据保单号修改影像上传方式
 
   /**
    * 待批改单查询
@@ -50,4 +52,17 @@ export class PcisEdrQueryService {
   getRelationDataInfo(ops) {
     return request.post(`${this.getRelationDataInfoUrl}`, { source: JSON.stringify(ops) })
   }
+  /**
+     * 变更联共保保单编号  查询
+     */
+  getEdrCiRel(ops) {
+    return request.post(`${this.getEdrCiRelUrl}`, { source: JSON.stringify(ops) })
+  }
+  /**
+     * 变更联共保保单编号 保存
+     */
+  updateEdrCiInfoByPkId(ops) {
+    return request.post(`${this.updateEdrCiInfoByPkIdUrl}`, { source: JSON.stringify(ops) })
+  }
+ 
 }

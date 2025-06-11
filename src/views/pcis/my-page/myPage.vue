@@ -471,6 +471,7 @@ const setTaxInfo = () => {
   console.log("发票信息", opertaor.getTableRefs());
   const tabref = opertaor.getTableRefs();
   const appLicantValue = tabref["applicant"].getFromValue()["Applicant.cAppNo"]; // 单据编号
+  
   if (!!appLicantValue) {
     // invoiceRef.value?.isShow()
     // invoiceShow.value = true;
@@ -679,14 +680,14 @@ const basicBtn = [
       openLimit();
     },
   }),
-  createFreeButtonBase({
-    label: "历史赔案",
-    type: "primary",
-    func: () => {
-      historyClaimcaseFun();
-      // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
-    },
-  }),
+  // createFreeButtonBase({
+  //   label: "历史赔案",
+  //   type: "primary",
+  //   func: () => {
+  //     historyClaimcaseFun();
+  //     // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
+  //   },
+  // }),
 ];
 /**
  * 一般批改按钮
@@ -835,14 +836,14 @@ const uwBtn = [
         });
     },
   }),
-  createFreeButtonBase({
-    label: "历史赔案",
-    type: "primary",
-    func: () => {
-      historyClaimcaseFun();
-      // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
-    },
-  }),
+  // createFreeButtonBase({
+  //   label: "历史赔案",
+  //   type: "primary",
+  //   func: () => {
+  //     historyClaimcaseFun();
+  //     // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
+  //   },
+  // }),
   createFreeButtonBase({
     label: "任务痕迹",
     type: "primary",
