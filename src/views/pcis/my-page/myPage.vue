@@ -981,12 +981,14 @@ function renderComponents() {
     }
   }, 50); // 延迟组件渲染,增加页面响应效率
   
-  const idata = getData();
-  dataInit.value = opertaor.mapSetData(idata);
-  setTimeout(() => {
-    // 基本信息预加载，降低空窗期
-    opertaor.setDataAll(dataInit.value);
-  }, 100);
+  if (props.param.pageType === "app") {
+    const idata = getData();
+    dataInit.value = opertaor.mapSetData(idata);
+    setTimeout(() => {
+      // 基本信息预加载，降低空窗期
+      opertaor.setDataAll(dataInit.value);
+    }, 100);
+  }
 }
 
 /**
