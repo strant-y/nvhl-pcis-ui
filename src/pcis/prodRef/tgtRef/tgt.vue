@@ -13,7 +13,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useProductStore } from "@/store/modules/prod";
 import { rule } from "postcss";
 import { useValidator } from "@/typings/useValidator";
-import { syncDist ,selectDist } from "@/api/prod";
+import { syncDist ,selectDist,checkAppBase } from "@/api/prod";
 
 const wagesInfo = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/wages-info-model.vue")
@@ -120,6 +120,11 @@ const setIsRule = ()=>{
     })
   }
 }
+
+ const  funcdistadd=  () => {
+  
+  };
+
 // 绑定方法
 const method = {
   getcShippingMethodChange:(val:string)=>{
@@ -274,15 +279,33 @@ const method = {
             wagesInfoModel();
 
           } else {
-            ElMessage.error('雇员清单不能为空！');
+            ElMessage.error('雇员清单不能为空！'); 
           }
         }
 
       });
     } else {
-      wagesInfoModel();
+      // wagesInfoModel();
+      funcdistadd();
+
+        // const alldata: any = opertaor.getDataAll();
+    // let baseFlag = alldata['plyBase']["Base.cAppNo"];
+
+ 
+
+    checkAppBase({ cAppNo: cAppNo }).then((res: any) => {
+      if (res.code === 200) {
+        wagesInfoModel();
+      } else {
+        ElMessage.error("请先保存申请单!");
+      }
+    });
     }
   },
+
+
+
+
   // 工程造价
   nEngineeringCostChange: (val) => {
     if (val) {
