@@ -1,4 +1,4 @@
-<!-- 用户管理 -->
+<!-- 投保大页面 -->
 <template>
   <div class="mypage-app">
     <el-container class="dynamic-container" ref="scrollContainer">
@@ -1008,6 +1008,7 @@ async function loadAfter() {
       baseobj["Base.cIsNet"] = "0";
       baseobj["Base.cPolicySource"] = "1";
       opertaor.getTableRefByKey("plyBase").setFormValue(baseobj);
+
       //承保信息初始化
       const baseafterobj = {};
       baseafterobj["Base.cRatioTyp"] = "2";
@@ -1021,6 +1022,15 @@ async function loadAfter() {
       baseafterobj["Applicant.cCustRiskRank"] = "925104";
       baseafterobj["Insured.cStkMrk"] = "0";
       baseafterobj["Insured.cCustRiskRank"] = "925104";
+
+      /*标的信息初始化*/
+      if(props.param.cProdNo=== "040002"){  // 雇主责任保险
+        const cDeterminingMethod=  opertaor.getTableRefByKey("tgt").getValue("Tgt.cDeterminingMethod")
+        if(cDeterminingMethod === undefined || cDeterminingMethod === null || cDeterminingMethod === "") {
+          opertaor.getTableRefByKey("tgt").setValue("Tgt.cDeterminingMethod","0");//赔偿限额确定方式 页面初始化为直接限额制
+        }
+      }
+
       opertaor.getTableRefByKey("base").setFormValue(baseafterobj);
       opertaor.getTableRefByKey("applicant").setFormValue(baseafterobj);
       opertaor.getTableRefByKey("insured").setFormValue(baseafterobj);
