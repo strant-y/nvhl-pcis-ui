@@ -323,6 +323,7 @@ onMounted(async () => {
         },
       ],
     });
+    freeEditRef.value?.setValue("LoadSub", 1);
   });
   // handleQuery(true);
 });

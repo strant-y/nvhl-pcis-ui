@@ -40,19 +40,10 @@ onMounted(async () => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
-  nextTick(() => {
-    setValue(
-      "Base.cJuriCde",
-      "本保单受中华人民共和国司法管辖（港、澳、台除外）"
-    );
-    setValue("Base.nRatioCoef", "1.000000");
-  });
+  
   if (sessionStorage.getItem("toMyPageData")) {
     sessionData.value = JSON.parse(sessionStorage.getItem("toMyPageData"));
   }
-  // const value = getValue('Base.nAmt');
-  // console.log("测试Base.nAmt得值");
-  // console.log(value);
   
 });
 

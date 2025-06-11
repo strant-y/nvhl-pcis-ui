@@ -593,7 +593,7 @@ const method = {
             setFormItem("Insured.cOccupCde", {
               loadData: [{ label: data.cnm, value: data.cde }],
             });
-            setValue("Insured.cOccupCde", data.cnm);
+            setValue("Insured.cOccupCde", data.cde + data.cnm);
             dialog.value?.handleClose();
           },
         },

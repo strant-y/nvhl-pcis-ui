@@ -20,7 +20,10 @@
                     >核保处理</span
                   >
                 </el-anchor-link>
-                <el-anchor-link :href="`#edrbaseurl`" v-if="edrbaseFlag">
+                <el-anchor-link
+                  v-if="edrbaseFlag"
+                  @click="handleAnchorClick($event, `#edrbase`)"
+                >
                   <rt-icon
                     style="margin-right: 14px"
                     :item="{ icon: 'Tickets' }"
@@ -29,7 +32,10 @@
                     >批改信息</span
                   >
                 </el-anchor-link>
-                <el-anchor-link :href="`#edritemurl`" v-if="edritemFlag">
+                <el-anchor-link
+                  v-if="edritemFlag"
+                  @click="handleAnchorClick($event, `#edritem`)"
+                >
                   <rt-icon
                     style="margin-right: 14px"
                     :item="{ icon: 'Tickets' }"
@@ -132,7 +138,6 @@
         </el-affix>
       </el-aside>
       <el-main>
-        <el-backtop :right="100" :bottom="100" />
         <el-affix
           :offset="80"
           style="text-align: center; padding: 5px; background: #ebedfc;width: 100%;"
@@ -179,10 +184,10 @@
           <underwriteRef ref="underwrite"></underwriteRef>
         </div>
 
-        <div id="edrbaseurl" v-if="edrbaseFlag" style="margin-bottom: 10px">
+        <div id="edrbase" v-if="edrbaseFlag" style="margin-bottom: 10px">
           <edrbaseRef ref="edrbase"></edrbaseRef>
         </div>
-        <div id="edritemurl" v-if="edritemFlag" style="margin-bottom: 10px">
+        <div id="edritem" v-if="edritemFlag" style="margin-bottom: 10px">
           <edritemRef ref="edritem"></edritemRef>
         </div>
         <template v-for="(pageConfig, v) in formconfig1" :key="v">
@@ -239,12 +244,27 @@
         >
           <ourCompanyCiShareRef ref="ourCompanyCiShare"></ourCompanyCiShareRef>
         </div>
+        <el-backtop :target="'.el-main'" :right="100" :bottom="150" />
       </el-main>
     </el-container>
 
     <el-footer>
       <el-affix position="bottom" :offset="10">
         <div class="bottom-items">
+          <!--新增的投保单号显示和复制按钮-->
+          <div style="margin-right: 20px; width: 100%; display: flex; justify-content: flex-end; align-items: center;">
+            <div style="display: flex; align-items: center; background: #fff; padding: 6px 12px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
+              {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "投保单号:" }}
+              <span id="policyNumber" style="margin-left: 5px; margin-right: 8px; font-weight: bold;">
+               {{ opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || '暂无' }}
+              </span>
+              <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号'}`" placement="top">
+                <el-button @click="copyPolicyNumber" circle size="small" style="color: red;">
+                  <rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />
+                </el-button>
+              </el-tooltip>
+            </div>
+          </div>
           <rt-button
             v-for="(bth, idx) in bthList"
             :item="bth"
@@ -287,6 +307,8 @@ import dayjs from "dayjs";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 import { useRouter, useRoute } from "vue-router";
+import { getData } from "@/pcis/prodRef/dataInit";
+
 const policyService = new PolicyService();
 const productStore = useProductStore();
 const { isCiJiMrk } = storeToRefs(productStore);
@@ -528,8 +550,21 @@ const historyClaimcaseFun = () => {
 };
 //  复制保单
 const copyPolicyFun = () => {
-  dzmodal.open(copyPlyModel, { type: "", data: {} }).then((res: any) => {
+  dzmodal.open(copyPlyModel, { type: "", data: {queryType: "1",...props.param,...opertaor.getDataAll()} }).then((res: any) => {
     if (res.type === "ok") {
+      const param = {
+        ...props.param,
+        ...res.body
+      }
+      router.push({
+        path: "/pcis/my-page",
+        query: {
+          param: JSON.stringify(param),
+        },
+      });
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     }
   });
   // dialogRef.value?.open(
@@ -551,6 +586,35 @@ const copyPolicyFun = () => {
   //       },
   //       { title: "复制保单", width: 85 }
   //     );
+};
+
+// 复制投保单号
+const copyPolicyNumber = () => {
+  const policyNumberElement = document.getElementById("policyNumber");
+  if (!policyNumberElement) return;
+
+  const range = document.createRange();
+  range.selectNode(policyNumberElement);
+
+  const selection = window.getSelection();
+  if (!selection) return;
+
+  selection.removeAllRanges();
+  selection.addRange(range);
+
+  try {
+    const successful = document.execCommand("copy");
+    if (successful) {
+      ElMessage.success("投保单号已成功复制到剪贴板！");
+    } else {
+      ElMessage.error("投保单号复制失败，请手动复制。");
+    }
+  } catch (err) {
+    ElMessage.error("当前浏览器不支持自动复制功能，请手动复制。");
+  }
+
+  // 清除选中内容
+  selection.removeAllRanges();
 };
 
 /**
@@ -929,45 +993,48 @@ async function loadAfter() {
     bthList.value = basicBtn;
     nextTick(() => {
       //保险期间初始化
-      const baseBefore = {};
-      baseBefore["Base.tAppTm"] = moment(new Date()).format(
-        "YYYY-MM-DD HH:mm:ss"
-      );
-      baseBefore["Base.tInsrncBgnTm"] = moment(
-        new Date(Date.now() + 1 * 1000 * 60 * 60 * 24)
-      ).format("YYYY-MM-DD 00:00:00");
-      baseBefore["Base.tInsrncEndTm"] = dayjs(baseBefore["Base.tInsrncBgnTm"])
-        .add(1, "year")
-        .format("YYYY-MM-DD 23:59:59");
-      const tm = moment(baseBefore["Base.tInsrncEndTm"]).diff(
-        moment(baseBefore["Base.tInsrncBgnTm"]),
-        "days"
-      );
-      baseBefore["Base.cTmSysCde"] = tm;
-      tmDay.value = tm;
-      opertaor.getTableRefByKey("insrnc").setFormValue(baseBefore);
-      //保单基本信息初始化
-      const baseobj = {};
-      baseobj["Base.cRenewMrk"] = "0";
-      baseobj["Base.cIsNet"] = "0";
-      baseobj["Base.cPolicySource"] = "1";
-      opertaor.getTableRefByKey("plyBase").setFormValue(baseobj);
-      //承保信息初始化
-      const baseafterobj = {};
-      baseafterobj["Base.cRatioTyp"] = "2";
-      baseafterobj["Base.cInstMrk"] = "0";
-      baseafterobj["Base.cDisptSttlCde"] = "B";
-      baseafterobj["Base.cInsExchCde"] = "1";
-      baseafterobj["Base.cPremExchCde"] = "1";
-      baseafterobj["Base.cPrmCur"] = "CNY";
-      baseafterobj["Base.cAmtCur"] = "CNY";
-      baseafterobj["Applicant.cStkMrk"] = "0";
-      baseafterobj["Applicant.cCustRiskRank"] = "925104";
-      baseafterobj["Insured.cStkMrk"] = "0";
-      baseafterobj["Insured.cCustRiskRank"] = "925104";
-      opertaor.getTableRefByKey("base").setFormValue(baseafterobj);
-      opertaor.getTableRefByKey("applicant").setFormValue(baseafterobj);
-      opertaor.getTableRefByKey("insured").setFormValue(baseafterobj);
+      const dataInit = getData();
+      console.log(dataInit);
+      opertaor.mapSetData(dataInit);
+      // const baseBefore = {};
+      // baseBefore["Base.tAppTm"] = moment(new Date()).format(
+      //   "YYYY-MM-DD HH:mm:ss"
+      // );
+      // baseBefore["Base.tInsrncBgnTm"] = moment(
+      //   new Date(Date.now() + 1 * 1000 * 60 * 60 * 24)
+      // ).format("YYYY-MM-DD 00:00:00");
+      // baseBefore["Base.tInsrncEndTm"] = dayjs(baseBefore["Base.tInsrncBgnTm"])
+      //   .add(1, "year")
+      //   .format("YYYY-MM-DD 23:59:59");
+      // const tm = moment(baseBefore["Base.tInsrncEndTm"]).diff(
+      //   moment(baseBefore["Base.tInsrncBgnTm"]),
+      //   "days"
+      // );
+      // baseBefore["Base.cTmSysCde"] = tm;
+      // tmDay.value = tm;
+      // opertaor.getTableRefByKey("insrnc").setFormValue(baseBefore);
+      // //保单基本信息初始化
+      // const baseobj = {};
+      // baseobj["Base.cRenewMrk"] = "0";
+      // baseobj["Base.cIsNet"] = "0";
+      // baseobj["Base.cPolicySource"] = "1";
+      // opertaor.getTableRefByKey("plyBase").setFormValue(baseobj);
+      // //承保信息初始化
+      // const baseafterobj = {};
+      // baseafterobj["Base.cRatioTyp"] = "2";
+      // baseafterobj["Base.cInstMrk"] = "0";
+      // baseafterobj["Base.cDisptSttlCde"] = "B";
+      // baseafterobj["Base.cInsExchCde"] = "1";
+      // baseafterobj["Base.cPremExchCde"] = "1";
+      // baseafterobj["Base.cPrmCur"] = "CNY";
+      // baseafterobj["Base.cAmtCur"] = "CNY";
+      // baseafterobj["Applicant.cStkMrk"] = "0";
+      // baseafterobj["Applicant.cCustRiskRank"] = "925104";
+      // baseafterobj["Insured.cStkMrk"] = "0";
+      // baseafterobj["Insured.cCustRiskRank"] = "925104";
+      // opertaor.getTableRefByKey("base").setFormValue(baseafterobj);
+      // opertaor.getTableRefByKey("applicant").setFormValue(baseafterobj);
+      // opertaor.getTableRefByKey("insured").setFormValue(baseafterobj);
     });
   } else if (props.param.pageType === "TEMPORARY_DEPOSIT") {
     // 暂存单
@@ -1350,7 +1417,7 @@ const getCAppNoFun = () => {
   const res = {
     cProdNo: props.param.cProdNo,
     cDptCde: props.param.cDptCde,
-    icVchTyp: "POLICY_NUMBER",
+    icVchTyp: props.param?.pageName === "priceInquiry" ? "INQUIRY_NUMBER" : "POLICY_NUMBER",
   };
   generatelSingleNo(res).then((res) => {
     console.log("generatelSingleNo-res", res);
@@ -1517,6 +1584,20 @@ const getBtn = (id) => {
     return id === item.id;
   });
 };
+
+/**
+ * 公共验证，保费计算和核保，都需要走的验证方法
+ */
+function baseValite(){
+  let r = true;
+    // 校验承包基本信息中的总保额和总保费币种须一致
+  const baseValue = opertaor.getTableRefByKey("base").getFromValue();
+  if(baseValue["Base.cAmtCur"] !== baseValue["Base.cPrmCur"]) {
+    ElMessage.error("承保基本信息中的总保额币种和总保费币种须一致!");
+    r = false;
+  }
+  return r;
+}
 /**
  * 投保保费计算
  */
@@ -1533,10 +1614,7 @@ const calcPremium = () => {
     btn.loading = false;
     return;
   }
-  // 校验承包基本信息中的总保额和总保费币种须一致
-  const baseValue = opertaor.getTableRefByKey("base").getFromValue();
-  if(baseValue["Base.cAmtCur"] !== baseValue["Base.cPrmCur"]) {
-    ElMessage.error("承保基本信息中的总保额币种和总保费币种须一致!");
+  if (!baseValite()) {
     btn.loading = false;
     return;
   }
@@ -1628,6 +1706,7 @@ const setCiInfo = (base: any) => {
   ci["Ci.nCiPrm"] = base["Base.nPrm"];
   ci["Ci.cChiefMrk"] = "1"
   ci["Ci.cIssueMrk"] = "1"
+  
   ci["Ci.cCoinsurerCde"] = "327001"
   ci["Ci.cSubDptCde"] = props.param.cDptCde
   ciList.push(ci)
@@ -1641,6 +1720,10 @@ const submitToUndrFn = async () => {
     ElMessage.error("请先进行保费计算!");
     return;
   }
+  if (!baseValite()) {
+    btn.loading = false;
+    return;
+  }
   if (!checkNAmt()) return;
   const f = await savePlyInfo(); // 提交核保,需要默认执行一次保存操作
   if (f) {
@@ -1650,7 +1733,6 @@ const submitToUndrFn = async () => {
     nextTick(async () => {
       const rv = await opertaor.validateAll();
       if (!rv) {
-        ElMessage.error("存在未录入数据,请确认!");
         return;
       }
       btn.loading = true;
@@ -1663,6 +1745,13 @@ const submitToUndrFn = async () => {
 
       const params = opertaor.getParam();
       //:TODO 进行一次保费计算,如果发生保费变化,则告知需要进行保费计算
+      // 校验承包基本信息中的总保额和总保费币种须一致
+      const baseValue = opertaor.getTableRefByKey("base").getFromValue();
+      if(baseValue["Base.cAmtCur"] !== baseValue["Base.cPrmCur"]) {
+        ElMessage.error("承保基本信息中的总保额币种和总保费币种须一致!");
+        btn.loading = false;
+        return;
+      }
       const calcData: any = opertaor.getDataAll();
       calcData["user"] = user;
       calcData["plyBase"]["Base.cDptCde"] = params.cDptCde;
@@ -1682,9 +1771,13 @@ const submitToUndrFn = async () => {
             btn.loading = false;
             console.log("submitToUndr-res", undr);
             if (undr["code"] == "200") {
-              ElMessage.success(undr.msg);
-              // 申请核保成功后按钮设置为不可点击
-              const btn = getBtn("btn010103");
+              if(!undr['cDecision'] === '0'){
+                ElMessage.success(undr.msg);
+                // 申请核保成功后按钮设置为不可点击
+                const btn = getBtn("btn010103");
+              }else{
+                ElMessage.error(undr.msg);
+              }
             } else {
               ElMessage.error(undr.msg);
             }

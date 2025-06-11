@@ -35,6 +35,10 @@ onMounted(() => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
+  if(route.params.param.cRsnCde == "M1") {
+    // 如果批改原因是免费延期，保险止期可以修改
+    setFormItem("Base.tInsrncEndTm", { disabled: false });
+  }
 });
 
 // 根据时间更改 短期费率系数 接口

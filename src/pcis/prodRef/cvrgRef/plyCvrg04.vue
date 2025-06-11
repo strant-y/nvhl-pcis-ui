@@ -265,7 +265,7 @@ onMounted(async () => {
   );
   Object.assign(cardconfig.value, formconfig11);
   if (parparam.pageType === "app") {
-    method.funcadd();
+    addPlanMethod();
     const param = {
       cProdNo: parparam.cProdNo,
       cTermNo: parparam.cTermNo,
@@ -366,7 +366,12 @@ const method = {
         return;
       }
     }
-    let maxindex = 0;
+    addPlanMethod();
+  },
+};
+
+function addPlanMethod() {
+  let maxindex = 0;
     const l = Object.keys(planData.value).forEach((k: any) => {
       const numberPart = parseInt(k.replace(/\D/g, ""), 10);
       if (numberPart > maxindex) {
@@ -375,8 +380,7 @@ const method = {
     });
     const planKey = "P" + (maxindex + 1);
     planData.value[planKey] = [];
-  },
-};
+}
 
 function isHidden(pl: any) {
   return hiddenFlag.value.indexOf(pl) == -1;
