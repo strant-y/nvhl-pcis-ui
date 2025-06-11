@@ -20,7 +20,10 @@
                     >核保处理</span
                   >
                 </el-anchor-link>
-                <el-anchor-link :href="`#edrbaseurl`" v-if="edrbaseFlag">
+                <el-anchor-link
+                  v-if="edrbaseFlag"
+                  @click="handleAnchorClick($event, `#edrbase`)"
+                >
                   <rt-icon
                     style="margin-right: 14px"
                     :item="{ icon: 'Tickets' }"
@@ -29,7 +32,10 @@
                     >批改信息</span
                   >
                 </el-anchor-link>
-                <el-anchor-link :href="`#edritemurl`" v-if="edritemFlag">
+                <el-anchor-link
+                  v-if="edritemFlag"
+                  @click="handleAnchorClick($event, `#edritem`)"
+                >
                   <rt-icon
                     style="margin-right: 14px"
                     :item="{ icon: 'Tickets' }"
@@ -178,10 +184,10 @@
           <underwriteRef ref="underwrite"></underwriteRef>
         </div>
 
-        <div id="edrbaseurl" v-if="edrbaseFlag" style="margin-bottom: 10px">
+        <div id="edrbase" v-if="edrbaseFlag" style="margin-bottom: 10px">
           <edrbaseRef ref="edrbase"></edrbaseRef>
         </div>
-        <div id="edritemurl" v-if="edritemFlag" style="margin-bottom: 10px">
+        <div id="edritem" v-if="edritemFlag" style="margin-bottom: 10px">
           <edritemRef ref="edritem"></edritemRef>
         </div>
         <template v-for="(pageConfig, v) in formconfig1" :key="v">
@@ -245,21 +251,20 @@
     <el-footer>
       <el-affix position="bottom" :offset="10">
         <div class="bottom-items">
-<!--           新增的投保单号显示和复制按钮-->
+          <!--新增的投保单号显示和复制按钮-->
           <div style="margin-right: 20px; width: 100%; display: flex; justify-content: flex-end; align-items: center;">
             <div style="display: flex; align-items: center; background: #fff; padding: 6px 12px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
-              投保单号:
+              {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "投保单号:" }}
               <span id="policyNumber" style="margin-left: 5px; margin-right: 8px; font-weight: bold;">
                {{ opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || '暂无' }}
               </span>
-              <el-tooltip content="点击复制投保单号" placement="top">
+              <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号'}`" placement="top">
                 <el-button @click="copyPolicyNumber" circle size="small" style="color: red;">
                   <rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />
                 </el-button>
               </el-tooltip>
             </div>
           </div>
-
           <rt-button
             v-for="(bth, idx) in bthList"
             :item="bth"
@@ -581,6 +586,7 @@ const copyPolicyFun = () => {
   //       { title: "复制保单", width: 85 }
   //     );
 };
+
 // 复制投保单号
 const copyPolicyNumber = () => {
   const policyNumberElement = document.getElementById("policyNumber");
@@ -609,7 +615,6 @@ const copyPolicyNumber = () => {
   // 清除选中内容
   selection.removeAllRanges();
 };
-
 
 /**
  * 投保需要的按钮
@@ -1411,7 +1416,7 @@ const getCAppNoFun = () => {
   const res = {
     cProdNo: props.param.cProdNo,
     cDptCde: props.param.cDptCde,
-    icVchTyp: "POLICY_NUMBER",
+    icVchTyp: props.param?.pageName === "priceInquiry" ? "INQUIRY_NUMBER" : "POLICY_NUMBER",
   };
   generatelSingleNo(res).then((res) => {
     console.log("generatelSingleNo-res", res);
@@ -1700,6 +1705,7 @@ const setCiInfo = (base: any) => {
   ci["Ci.nCiPrm"] = base["Base.nPrm"];
   ci["Ci.cChiefMrk"] = "1"
   ci["Ci.cIssueMrk"] = "1"
+  
   ci["Ci.cCoinsurerCde"] = "327001"
   ci["Ci.cSubDptCde"] = props.param.cDptCde
   ciList.push(ci)
