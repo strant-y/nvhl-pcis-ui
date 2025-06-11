@@ -58,20 +58,6 @@ onMounted(async () => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
-  nextTick(() => {
-    //设置是否单项工程默认值：是
-    setValue("Tgt.cIsSingle", '1')
-    setValue("Tgt.cContractCurrency", '01')
-
-
-    //  安全生产责任险  设置投保方式默认值
-    if (param.cRecordType == '1' && param.cProdNo == "043009") {
-      setTimeout(() => {
-        setValue("Tgt.cInsuranceMethod", '613001')
-      }, 1000)
-    }
-    // console.log('数据----props', param)
-  })
   // 约定保期内服务次数正整数
   setFormItem("Tgt.nAgreeFrequency", {
     rules: [getRules("signlessInt", {})],

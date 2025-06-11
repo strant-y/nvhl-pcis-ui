@@ -1,4 +1,4 @@
-<!-- 投保大页面 -->
+<!-- 用户管理 -->
 <template>
   <div class="mypage-app">
     <el-container class="dynamic-container" ref="scrollContainer">
@@ -307,6 +307,8 @@ import dayjs from "dayjs";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 import { useRouter, useRoute } from "vue-router";
+import { getData } from "@/pcis/prodRef/dataInit";
+
 const policyService = new PolicyService();
 const productStore = useProductStore();
 const { isCiJiMrk } = storeToRefs(productStore);
@@ -990,55 +992,48 @@ async function loadAfter() {
     bthList.value = basicBtn;
     nextTick(() => {
       //保险期间初始化
-      const baseBefore = {};
-      baseBefore["Base.tAppTm"] = moment(new Date()).format(
-        "YYYY-MM-DD HH:mm:ss"
-      );
-      baseBefore["Base.tInsrncBgnTm"] = moment(
-        new Date(Date.now() + 1 * 1000 * 60 * 60 * 24)
-      ).format("YYYY-MM-DD 00:00:00");
-      baseBefore["Base.tInsrncEndTm"] = dayjs(baseBefore["Base.tInsrncBgnTm"])
-        .add(1, "year")
-        .format("YYYY-MM-DD 23:59:59");
-      const tm = moment(baseBefore["Base.tInsrncEndTm"]).diff(
-        moment(baseBefore["Base.tInsrncBgnTm"]),
-        "days"
-      );
-      baseBefore["Base.cTmSysCde"] = tm;
-      tmDay.value = tm;
-      opertaor.getTableRefByKey("insrnc").setFormValue(baseBefore);
-      //保单基本信息初始化
-      const baseobj = {};
-      baseobj["Base.cRenewMrk"] = "0";
-      baseobj["Base.cIsNet"] = "0";
-      baseobj["Base.cPolicySource"] = "1";
-      opertaor.getTableRefByKey("plyBase").setFormValue(baseobj);
-
-      //承保信息初始化
-      const baseafterobj = {};
-      baseafterobj["Base.cRatioTyp"] = "2";
-      baseafterobj["Base.cInstMrk"] = "0";
-      baseafterobj["Base.cDisptSttlCde"] = "B";
-      baseafterobj["Base.cInsExchCde"] = "1";
-      baseafterobj["Base.cPremExchCde"] = "1";
-      baseafterobj["Base.cPrmCur"] = "CNY";
-      baseafterobj["Base.cAmtCur"] = "CNY";
-      baseafterobj["Applicant.cStkMrk"] = "0";
-      baseafterobj["Applicant.cCustRiskRank"] = "925104";
-      baseafterobj["Insured.cStkMrk"] = "0";
-      baseafterobj["Insured.cCustRiskRank"] = "925104";
-
-      /*标的信息初始化*/
-      if(props.param.cProdNo=== "040002"){  // 雇主责任保险
-        const cDeterminingMethod=  opertaor.getTableRefByKey("tgt").getValue("Tgt.cDeterminingMethod")
-        if(cDeterminingMethod === undefined || cDeterminingMethod === null || cDeterminingMethod === "") {
-          opertaor.getTableRefByKey("tgt").setValue("Tgt.cDeterminingMethod","0");//赔偿限额确定方式 页面初始化为直接限额制
-        }
-      }
-
-      opertaor.getTableRefByKey("base").setFormValue(baseafterobj);
-      opertaor.getTableRefByKey("applicant").setFormValue(baseafterobj);
-      opertaor.getTableRefByKey("insured").setFormValue(baseafterobj);
+      const dataInit = getData();
+      console.log(dataInit);
+      opertaor.mapSetData(dataInit);
+      // const baseBefore = {};
+      // baseBefore["Base.tAppTm"] = moment(new Date()).format(
+      //   "YYYY-MM-DD HH:mm:ss"
+      // );
+      // baseBefore["Base.tInsrncBgnTm"] = moment(
+      //   new Date(Date.now() + 1 * 1000 * 60 * 60 * 24)
+      // ).format("YYYY-MM-DD 00:00:00");
+      // baseBefore["Base.tInsrncEndTm"] = dayjs(baseBefore["Base.tInsrncBgnTm"])
+      //   .add(1, "year")
+      //   .format("YYYY-MM-DD 23:59:59");
+      // const tm = moment(baseBefore["Base.tInsrncEndTm"]).diff(
+      //   moment(baseBefore["Base.tInsrncBgnTm"]),
+      //   "days"
+      // );
+      // baseBefore["Base.cTmSysCde"] = tm;
+      // tmDay.value = tm;
+      // opertaor.getTableRefByKey("insrnc").setFormValue(baseBefore);
+      // //保单基本信息初始化
+      // const baseobj = {};
+      // baseobj["Base.cRenewMrk"] = "0";
+      // baseobj["Base.cIsNet"] = "0";
+      // baseobj["Base.cPolicySource"] = "1";
+      // opertaor.getTableRefByKey("plyBase").setFormValue(baseobj);
+      // //承保信息初始化
+      // const baseafterobj = {};
+      // baseafterobj["Base.cRatioTyp"] = "2";
+      // baseafterobj["Base.cInstMrk"] = "0";
+      // baseafterobj["Base.cDisptSttlCde"] = "B";
+      // baseafterobj["Base.cInsExchCde"] = "1";
+      // baseafterobj["Base.cPremExchCde"] = "1";
+      // baseafterobj["Base.cPrmCur"] = "CNY";
+      // baseafterobj["Base.cAmtCur"] = "CNY";
+      // baseafterobj["Applicant.cStkMrk"] = "0";
+      // baseafterobj["Applicant.cCustRiskRank"] = "925104";
+      // baseafterobj["Insured.cStkMrk"] = "0";
+      // baseafterobj["Insured.cCustRiskRank"] = "925104";
+      // opertaor.getTableRefByKey("base").setFormValue(baseafterobj);
+      // opertaor.getTableRefByKey("applicant").setFormValue(baseafterobj);
+      // opertaor.getTableRefByKey("insured").setFormValue(baseafterobj);
     });
   } else if (props.param.pageType === "TEMPORARY_DEPOSIT") {
     // 暂存单
