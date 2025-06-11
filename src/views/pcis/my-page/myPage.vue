@@ -1700,7 +1700,7 @@ const setCiInfo = (base: any) => {
   ci["Ci.nCiPrm"] = base["Base.nPrm"];
   ci["Ci.cChiefMrk"] = "1"
   ci["Ci.cIssueMrk"] = "1"
-  ci["Ci.nPlyFeeRate"] = "0"
+  
   ci["Ci.cCoinsurerCde"] = "327001"
   ci["Ci.cSubDptCde"] = props.param.cDptCde
   ciList.push(ci)
