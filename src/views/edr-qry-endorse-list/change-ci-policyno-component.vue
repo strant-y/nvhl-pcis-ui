@@ -2,7 +2,8 @@
 <template>
     <el-dialog style="position: relative;" :close-on-click-modal="false" v-model="dialogVisible" @close="close"
         width="90%" title="变更联共保保单编号">
-        <app-grid-edit v-model:gridEditConfig="tableconfig" ref="freeEditRef" />
+        <!-- <app-grid-edit v-model:gridEditConfig="tableconfig" ref="freeEditRef" /> -->
+        <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef" />
     </el-dialog>
 </template>
 
@@ -22,14 +23,18 @@ import {
 import {
     creatCardConfig,
 } from "@/shared/mytemplate/card-config";
-import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
+import { PcisEdrQueryService } from "./service/pcis-edr-query-service";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import {
+    AppTableConfig,
+    AppTableMethod,
+    createTableEditConfig,
+} from "@/shared/app-table-config";
 const opertaor = dataOpertaor();
 opertaor.init();
 const props = defineProps({
-    cAppNo:String
-    // data: Object,
-    // type: String,
+    cAppNo: String,
+    cPlyNo: String,
 });
 const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
@@ -39,9 +44,12 @@ const showBtnConfig = ref(false);
 const showView = ref(false);
 const freeEditRef = ref<AppGridEditMethod | null>(null);
 const appTableShow = ref(false);
-const policyService = new PolicyService();
 const dialogVisible = ref(true);
-let totalSalary = ref(0);    // 总金额
+
+const pcisEdrQueryService = new PcisEdrQueryService();
+
+const tableRef = ref<AppTableMethod | null>(null);
+
 const schemaMap = reactive<Record<string, any>>({
     rtinputgroup: [],
 });
@@ -55,175 +63,132 @@ const pageresult = reactive<Pageresult>({
     result: "",
     /** 数据列表 */
     list: [
-            ],
+    ],
     /** 总数 */
     total: 0,
 });
 
+
+
 const close = (type) => {
-    let ss = getFromValue()
-    let numS = 0;
- 
-        for(let i=0;i<ss.length;i++){
-            numS += ss[i]['DistSummary.nAnnualSalary']
-        }
-        if(totalSalary.value !== numS){
-            ElMessage.info('数据未保存！');
-        }
 
 };
 
 // 校验必填项
 const checkAnnualSalaries = (data: any) => {
     for (let i = 0; i < data.length; i++) {
-        if (  data[i]["DistSummary.nAnnualSalary"] === undefined || data[i]["DistSummary.nAnnualSalary"] === null || data[i]["DistSummary.nAnnualSalary"] === '') {
+        if (data[i]["DistSummary.nAnnualSalary"] === undefined || data[i]["DistSummary.nAnnualSalary"] === null || data[i]["DistSummary.nAnnualSalary"] === '') {
             return true
         }
     }
     return false;
 }
-
-const tableconfig = reactive<AppGridEditConfig>(
-    createAppGridEditConfig({
-        title: '联共保信息',
-        // editList:['CSeqNo','CCusLnme','CCusFnme','TCerftBgnTm','CCusAddr'],
-        // showSelection: true,  // 是否显示多选框
-        editFlag: true, //是否可以编辑
-        // editList:['cOpgrpCnm','cName'],
+const tableconfig = reactive<AppTableConfig>(
+    createTableEditConfig({
+        title: "联共保信息",
+        editFlag: true,
+        isPage: 'true',
+        editList: ["cPolicyNo"],
         endBtnsPosition: 'right',
-        // titleBtns: [
-        //     createFreeButtonBase({
-        //         type: "primary",
-        //         label: "新增",
-        //         func: async () => {
-        //             freeEditRef.value?.addRowByData({ cGrpMrk: "0" });
-        //         },
-        //     }),
-        //     createFreeButtonBase({
-        //         type: "primary",
-        //         label: "删除",
-        //         func: async () => {
-        //             const selData = freeEditRef?.value?.getSelectRow();
-        //             if (!selData) {
-        //                 ElMessage.error("请选择要删除的数据!");
-        //                 return;
-        //             }
-        //             const editIndex = selData["_dataId"];
-        //             freeEditRef?.value?.delRow(editIndex);
-        //         },
-        //     })
-        // ],
         endBtns: [
             createFreeButtonBase({
                 "size": "default",
                 "label": "保存",
                 "type": "primary",
                 func: async (v: any) => {
-                    // 校验 必填项是否必填
-                    // if (checkAnnualSalaries(getFromValue())) {
-                    //     ElMessage.error('年工资总额为必填项，请填写齐全！')
-                    //     return false
-                    // }
                     saveProdDataFun()
                 }
             }),
         ],
         fromSchema: [
-        // 			
             {
-                prop: "DistSummary.cPlanNo",
+                prop: "nSeqNo",
                 inputtype: "rtinput",
                 title: "序号",
+                minWidth: 180,
             },
             {
-                prop: "DistSummary.nInsuredHeadcount",
-                inputtype: "rtinput",
+                prop: "cCoinsurerCde",
+                inputtype: "rtselect",
+                typeCode: 'Comm_Code_LIST',
+                //   codeParam: {'CParCde': 'subdpt'},
+                codeParam: { 'CParCde': '327' },
                 title: "共保公司",
-            },
+                minWidth: 180,
+                func: (v: any, row: any) => {
 
-            {
-                prop: "DistSummary.nAnnualSalary",
-                inputtype: "rtinput",
-                title: "分公司",
+                },
             },
             {
-                prop: "DistSummary.cJobRole",
+                prop: "cSubDptCde",
+                inputtype: "rtselect",
+                typeCode: "Comm_Code_LIST",
+                codeParam: { "CParCde": "subdpt" },
+                title: "分公司",
+                minWidth: 180,
+                disabled: true,
+            },
+            {
+                prop: "cPolicyNo",
                 inputtype: "rtinput",
                 title: "保单编号",
-            }
+                clearable: true,
+                minWidth: 260,
+            },
         ],
     })
 );
 onMounted(async () => {
-    // if (props.data.cRegisteredLogo == 1) {
-    //     tableconfig.titleBtns = []
-    //     setFormItem('DistSummary.cPlanNo', {
-    //         disabled: true,
-    //     })
-    //     setFormItem('DistSummary.nInsuredHeadcount', {
-    //         disabled: true,
-    //     })
-    //     setFormItem('DistSummary.nAnnualSalary', {
-    //         disabled: true,
-    //     })
-    // } else {
-    //     setFormItem('DistSummary.cPlanNo', {
-    //         disabled: false,
-    //     })
-    //     setFormItem('DistSummary.nInsuredHeadcount', {
-    //         disabled: false,
-    //     })
-    //     setFormItem('DistSummary.nAnnualSalary', {
-    //         disabled: false,
-    //     })
-    // }
     getTableFun();
 });
 
 // 收益所有人table信息
-const getTableFun = async (isSave=false) => {
-    let cAppNo = props.data.cAppNo;  // 投保单号
-    let cRegisteredLogo = props.data.cRegisteredLogo;   // 
+const getTableFun = async (isSave = false) => {
+    let cAppNo = props.cAppNo;  // 申请单号
+    let cPlyNo = props.cPlyNo;  // 投保单号
     let param = {
         cAppNo,
-        cRegisteredLogo
-
+        cPlyNo
     };
-    policyService.selectTotalSalary(param).then((response) => {
-        let { code, data, msg } = response
-        if (code === 200) {
-            if (data['data']) {
-                totalSalary.value = data.totalSalary;
-                setFormValue(data['data'])
-                // 如果保存成功就进行关闭 并且传值
-                if(isSave){
-                    dialogVisible.value = false;
-                    emits("ok", data.totalSalary)
-                }
+    pcisEdrQueryService.getEdrCiRel(param).then((response: any) => {
+        let { code, data, msg, res } = response;
+        if (200 === code) {
+            if (res['result']) {
+                pageresult.list = res['result'];
+                pageresult.total = res['total'];
+                nextTick(() => {
+                    for (let i = 0; i < pageresult.list.length; i++) {
+                        if (pageresult.list[i].cCoinsurerCde == '327001') {
+                            tableRef.value?.setFormSchema(pageresult.list[i]._dataId, "cPolicyNo", 'disabled', true);
+
+                        } else {
+                            tableRef.value?.setFormSchema(pageresult.list[i]._dataId, "cPolicyNo", 'disabled', false);
+                        }
+                    }
+
+                })
             }
-        } else {
-            ElMessage.error(msg);
         }
-    }).catch(() => {
-        // ElMessage.error('根据申请单号获取发票信息出现异常！1');
     });
 }
 
 
 // 保存
 const saveProdDataFun = () => {
+    const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+    let cAppNo = props.cAppNo;  // 申请单号
+    let cPlyNo = props.cPlyNo;  // 投保单号
+    let listS = pageresult.list;
 
-    console.log('保存')
-    return  false;
-    let cAppNo = props.data.cAppNo;  // 投保单号
-    let cRegisteredLogo = props.data.cRegisteredLogo;
-    let param = Object.assign({
-        cAppNo,
-        cRegisteredLogo
-
-    }, { data: getFromValue() });
-
-    policyService.saveTotalSalary(param).then((response) => {
+    listS.forEach((item) => {
+        item.cAppNo = cAppNo;
+        item.cPlyNo = cPlyNo;
+        item.cUpdCde = user.opCde;
+    })
+    let param = {
+        items: listS
+    };
+    pcisEdrQueryService.updateEdrCiInfoByPkId(param).then((response) => {
         let { code, data, msg } = response
         if (code === 200) {
             ElMessage.success('保存成功！')

@@ -279,15 +279,15 @@ const tableconfig = reactive<AppTableConfig>(
                 size: "large",
                 icon: "Edit",
                 tableClick: (row) => {
-                    if ("DP" === row.id) {
-                        ciCoopCorrect(row.cPlyNo)
-                    }else{
-                        openEdr(row.cAppNo, row.cPlyNo, row.cProdNo, row.cKindNo, row);
-                    }
-          
+                    // if ("DP" === row.id) {
+                    //     ciCoopCorrect(row)
+                    // }else{
+                    openEdr(row.cAppNo, row.cPlyNo, row.cProdNo, row.cKindNo, row);
+                    // }
 
 
-                  
+
+
 
 
                     // else if ("DP" === rsnCde.value[selected.value["cPlyNo"]]) {
@@ -787,7 +787,7 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
         prodNo: cProdNo,
         edrRsnCde: rsnCde.value[selected.value["cPlyNo"]],
     };
-    console.log(33333, data);
+
     pcisEdrQueryService.validEndorse(param).then(
         async (result) => {
             if (200 !== result["code"]) {
@@ -800,6 +800,13 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                     if ("DZ" === rsnCde.value[selected.value["cPlyNo"]]) {
                         modifyImageUploadMode(cPlyNo);
                         return;
+                    } else if ("DP" === rsnCde.value[selected.value["cPlyNo"]]) {
+                        const cCiMrk = selected.value["cCiMrk"]
+                            if (cCiMrk ==='0' || cCiMrk ==='5'){
+                                ElMessage.error('非共保或司内联保保单不可以进行补充共保保单编号批改！');
+                                return false;
+                            }
+                             ciCoopCorrect(cAppNo, cPlyNo)
                     } else if ("2" === routeData["rsnTyp"]) {
                         //注销
                         const en = JSON.stringify({
@@ -909,10 +916,10 @@ const modifyImageUploadMode = (plyNo) => {
         });
 };
 //联共保批改
-const ciCoopCorrect = (plyNo) => {
+const ciCoopCorrect = (cAppNo, cPlyNo) => {
     console.log(3333)
     dzmodal
-        .open(changeCiPolicynoComponent, { cAppNo: { plyNo } })
+        .open(changeCiPolicynoComponent, { cAppNo,cPlyNo})
         .then((res) => {
             if (res.type === "ok") {
             }

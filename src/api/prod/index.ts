@@ -1461,3 +1461,19 @@ export function releaseInquiryPage(queryParams: any): AxiosPromise<any> {
 export function getReleaseInquiryPage(queryParams: any): AxiosPromise<any> {
   return post(`/prod/getReleaseInquiryPage`, queryParams);
 }
+
+/**
+ * 地点查询--查询
+ * 
+ */
+export function selCountryPort(queryParams: any): AxiosPromise<any> {
+  return post(`/countPort/selCountryPort`, queryParams);
+}
+
+/**
+ * 地点查询--新增
+ * 
+ */
+export function addCountryPort(queryParams: any): AxiosPromise<any> {
+  return post(`/countPort/addCountryPort`, queryParams);
+}
