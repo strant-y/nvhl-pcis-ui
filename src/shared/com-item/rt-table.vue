@@ -446,7 +446,7 @@ function isHidden(item: any) {
 }
 
 function getfromSchema() {
-  const expands = props.item.fromSchema.filter((s: any) => s.expand === true);
+  const expands = props.item.fromSchema.filter((s: any) => s.expand === true && s.isShow !== false );
   return expands;
 }
 const formUi = reactive<Record<string, any>>({});
