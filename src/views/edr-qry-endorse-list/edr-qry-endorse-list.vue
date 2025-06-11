@@ -878,6 +878,8 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                             cTermNme: selected.value["cTermNme"],
                             cTermNo: selected.value["cTermNo"],
                             cProdNmeCn: selected.value["cProdNmeCn"],
+                            tInsrncBgnTm: selected.value["tInsrncBgnTm"],
+                            tInsrncEndTm: selected.value["tInsrncEndTm"],
                         });
                         console.log(en);
                         router.push({
