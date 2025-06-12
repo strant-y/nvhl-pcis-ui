@@ -116,6 +116,7 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtnType: "btn",
     tableBtnWidth: 220,
     tableBtnPosition: "right",
+    isPage:'true',
     fromSchema: [
       {
         prop: "countryCn",
@@ -165,10 +166,16 @@ const addFunc = () => {
 
 
 /** 查询 */
-function handleQuery() {
-  const r = tableRef.value?.getPartnerPage(); //获取分页数据
+function handleQuery(reset = true) {
+  // const r = tableRef.value?.getPartnerPage(); //获取分页数据
+  // const s = freeEditRef.value?.getFromValue(); //获取表单数据
+  // const param = {...r,...s }
+  const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = {...r,...s }
+  const param = Object.assign(s, r);
+
+  console.log('查询-----分页',param)
+
   selCountryPort(param)
     .then((res) => {
       const { code, data, msg, total } = res;

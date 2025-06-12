@@ -319,9 +319,9 @@ const method = {
       });
     }
   },
-  //投保人性质(0是法人1是个人)
-  InsureChange: (val) => {
-    checkUser();
+  //投保人性质(0是法人 1是个人)
+  InsureChange: async (val) => {
+    console.log('vvvvvvv',val)
     const param = opertaor.getParam();
 
     if (val == "0") {
@@ -378,7 +378,31 @@ const method = {
       setFormItem("Applicant.cRegisteredcapDre", {
         rules: [getRules("required", {})],
       });
-      codeListStore
+ 
+   
+
+      console.log('vvvvvvv',val)
+      // 为法人 移动电话不填
+      setFormItem("Applicant.cMobile", {
+        rules: [getRules("phoneNo", {})],
+      });
+
+      // 是否个体工商户
+      setFormItem("Applicant.cIsIndvduBiz", {
+        rules: [],
+      });
+         // 为法人 国民经济行业必填
+      setFormItem("Applicant.cTrdCde", {
+        rules: [getRules("required", {})],
+      });
+
+      // setFormItem("Applicant.cCertfCls", {
+      //      typeCode: 'UN_NATURAL_CERTIFICATE_CACHE',
+      //       codeParam: {  },
+
+      // })
+
+           codeListStore
         .queryCodeList({
           codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
           codeListParam: {},
@@ -399,19 +423,6 @@ const method = {
             rules: [getRules("required", {})],
           });
         });
-      // 为法人 国民经济行业必填
-      setFormItem("Applicant.cTrdCde", {
-        rules: [getRules("required", {})],
-      });
-      // 为法人 移动电话不填
-      setFormItem("Applicant.cMobile", {
-        rules: [getRules("phoneNo", {})],
-      });
-
-      // 是否个体工商户
-      setFormItem("Applicant.cIsIndvduBiz", {
-        rules: null,
-      });
     } else {
       setFormItem("Applicant.cWorkDpt", { rules: null });
       setFormItem("Applicant.cIsMicroEntpris", {
@@ -445,7 +456,7 @@ const method = {
       setFormItem("Applicant.cCntrCertfCde", { rules: null });
 
       setFormItem("Applicant.cTrdCde", {
-        rules: null,
+        rules: [],
       });
 
       // 个人 移动电话必填
@@ -456,6 +467,14 @@ const method = {
       setFormItem("Applicant.cIsIndvduBiz", {
         rules: [getRules("required", {})],
       });
+
+      //       setFormItem("Applicant.cCertfCls", {
+      //      typeCode: 'NATURAL_CERTIFICATE_CACHE',
+      //       codeParam: {  },
+
+      // })
+
+      
 
       codeListStore
         .queryCodeList({
@@ -479,6 +498,8 @@ const method = {
           });
         });
     }
+
+      checkUser();
   },
   //大股东性质change事件
   funcShareholderNature: (val) => {
@@ -533,6 +554,7 @@ const method = {
 
   // 是否个体工商户
   cIsIndvduBizChange: (val: any) => {
+    console.log('触发了',val)
     if (val == "1") {
       setFormItem("Applicant.cOccupCde", {
         rules: [getRules("required", {})],
@@ -540,7 +562,7 @@ const method = {
       setFormItem("Applicant.cTrdCde", {
         rules: [getRules("required", {})],
       });
-    } else {
+    } else if(val == "0") {
       setFormItem("Applicant.cOccupCde", {
         rules: [],
       });

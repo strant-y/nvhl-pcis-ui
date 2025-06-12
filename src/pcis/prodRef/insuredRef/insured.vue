@@ -524,7 +524,7 @@ const method = {
       setFormItem("Insured.cTrdCde", {
         rules: [getRules("required", {})],
       });
-    } else {
+    } else if (val == "0") {
       setFormItem("Insured.cOccupCde", {
         rules: [],
       });

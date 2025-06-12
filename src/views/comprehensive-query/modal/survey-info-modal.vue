@@ -181,17 +181,17 @@ const tableconfig = reactive<AppTableConfig>(
   })
 );
 /** 查询 */
-function handleQuery() {
-  const r = tableRef.value?.getPartnerPage(); //获取分页数据
+function handleQuery(reset = true) {
+  const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = { ...r, ...s }
   carSelCountryPort(param).then((res) => {
-    const { code, data, msg } = res;
+    const { code, data, msg ,total} = res;
 
     console.log('返回数据', data)
     if (200 === code) {
       pageresult.list = data;
-      pageresult.total = 5
+      pageresult.total =total
 
     } else {
       ElMessage.error(msg);
