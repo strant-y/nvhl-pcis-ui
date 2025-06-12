@@ -1,12 +1,8 @@
 <template>
   <div class="app-container">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
-    <app-table
-      :tableConfig="tableconfig"
-      v-model:pageresult="pageresult"
-      ref="tableRef"
-      @page-change="handleQuery(false)"
-    />
+    <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
+      @page-change="handleQuery(false)" />
   </div>
 </template>
 
@@ -66,41 +62,66 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "模板名称",
         clearable: true,
       },
+
+      // typeCode: "KIND_LIST_GRT",
+      // child: "cProdNo",
+      // filterable: true,
+      // clearable: true,
+      // codeParam: {
+      //   cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+      //   cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+      // },
       {
         prop: "Base.cKindNo",
-        inputtype: "rtcascader",
-        title: "产品大类",
-        typeCode: "KIND_LIST_CACHE", 
-        params: {},
-        clearable: true,
-        func: (val) => {
-          handleKindNoChange(val)
-        }
-      },
-      {
-        prop: "CKindNoSub",
-        type: "hidden",
         inputtype: "rtselect",
-        title: "产品小类",
-        loadData: [
-          { value: '1', label: '国内' }, 
-          { value: '2', label: '出口' },
-          { value: '3', label: '进口' }
-        ],
-        rules: kindNoSubRules,
+        title: "产品大类",
+        typeCode: "KIND_LIST_GRT",
+        codeParam: {
+          cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+          cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+        },
         clearable: true,
         func: (val) => {
-          handleCKindNoSubChange(val)
+          if (val) {
+            console.log('vvvv', val)
+            // setFormI 
+            setFormItem('PrdProdTemplate.CProdNo', {
+              typeCode: "PROD_LIST",
+              codeParam: {
+                cParCde: val,
+                cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+                cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+              }
+
+            })
+          }
+          // handleKindNoChange(val)
         }
       },
+      // {
+      //   prop: "CKindNoSub",
+      //   type: "hidden",
+      //   inputtype: "rtselect",
+      //   title: "产品小类",
+      //   loadData: [
+      //     { value: '1', label: '国内' },
+      //     { value: '2', label: '出口' },
+      //     { value: '3', label: '进口' }
+      //   ],
+      //   rules: kindNoSubRules,
+      //   clearable: true,
+      //   func: (val) => {
+      //     handleCKindNoSubChange(val)
+      //   }
+      // },
       {
         prop: "PrdProdTemplate.CProdNo",
-        inputtype: "rtcascader",
+        inputtype: "rtselect",
         title: "产品",
         clearable: true,
-        loadData: prodList,
-        typeCode: "PROD_LIST",
-        params: {},
+        // loadData: prodList,
+        // typeCode: "PROD_LIST",
+
       },
     ],
   })
@@ -168,7 +189,7 @@ const handleKindNoChange = (value: any[]) => {
       let item = freeEditRef.value.getFromSchemaItem('CKindNoSub')
       item.type = ''
     })
-     kindNoSubRules.value = [getRules("required", {})]
+    kindNoSubRules.value = [getRules("required", {})]
   } else {
     nextTick(() => {
       let item = freeEditRef.value.getFromSchemaItem('CKindNoSub')
@@ -266,6 +287,44 @@ onMounted(() => {
   handleQuery();
 });
 
+
+//给表单下拉项赋值
+function setFormItem(key, obj) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        Object.assign(item, obj);
+      }
+    });
+  }
+}
+function getFromValue() {
+  return freeEditRef?.value?.getFromValue();
+}
+
+function setFormValue(value: any) {
+  freeEditRef?.value?.setFormValue(value);
+}
+
+function validate() {
+  return freeEditRef?.value?.validate();
+}
+
+function setValue(key: string, value: any) {
+  freeEditRef?.value?.setValue(key, value);
+}
+
+function getValue(key: string) {
+  return freeEditRef?.value?.getValue(key);
+}
+
+defineExpose({
+  getFromValue,
+  setFormValue,
+  validate,
+  setValue,
+  getValue,
+});
 
 </script>
 

@@ -73,6 +73,8 @@ const method = {
     if(fs){
       const startDate = new Date(fs["Base.tInsrncBgnTm"])   // 开始时间   1
       const maxDate = new Date(startDate);  // 创建开始时间副本   365 
+
+
       maxDate.setDate(startDate.getDate() + 365);  // 设置为今天起365天后的日期
       return  date.getTime() < startDate.getTime() || date.getTime() > maxDate.getTime()
     }else{
@@ -80,16 +82,23 @@ const method = {
     }
   },
   bgnTmFn: (v) => {   
+    
  
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["insrnc"].getFromValue();
     const tm = moment(baseBefore["Base.tInsrncEndTm"]).diff(moment(v), "days");  
-    baseBefore["Base.cTmSysCde"] = tm;
+
+       baseBefore["Base.cTmSysCde"] = tm;
+
     let startDate = new Date(baseBefore["Base.tInsrncBgnTm"])   // 开始时间
+    let endDate = baseBefore["Base.tInsrncEndTm"]  // 结束时间
     let maxDate = new Date(startDate);  // 创建开始时间副本
-    maxDate.setDate(startDate.getDate() + 365);  // 设置为今天起365天后的日期
-    maxDate.setSeconds(maxDate.getSeconds() - 1);
-    baseBefore["Base.tInsrncEndTm"] = formatDate(maxDate,'yyyy-MM-dd HH:mm:ss')
+
+    if(!endDate){
+      maxDate.setDate(startDate.getDate() + 365);  // 设置为今天起365天后的日期
+      maxDate.setSeconds(maxDate.getSeconds() - 1);
+      baseBefore["Base.tInsrncEndTm"] = formatDate(maxDate,'yyyy-MM-dd HH:mm:ss')
+    }
     setFormValue(baseBefore);
     nRatioCoefFunc()
   },
