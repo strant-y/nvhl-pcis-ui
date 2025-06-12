@@ -44,7 +44,10 @@ onMounted(async () => {
   );
   Object.assign(formconfig1, formconfig11);
   //一般批改，部分要素可编辑
-  if (param.pageType === "EDR_APP_NEW_SCENE" &&  productStore.cCiMrk !== "0") {
+  const cCiMrkValue =  opertaor.getTableRefByKey("plyBase")
+  console.log("0000000000000",cCiMrkValue,productStore.cCiMrk,)
+  setTimeout(() => {
+    if (param.pageType === "EDR_APP_NEW_SCENE" &&   productStore.cCiMrk !== "0") {
     formconfig1.editFlag = true;
     formconfig1.fromSchema?.forEach((item) => {
       if (item.prop === 'Ci.cChiefMrk' || item.prop === 'Ci.cIssueMrk') {
@@ -54,6 +57,8 @@ onMounted(async () => {
       }
     });
   }
+  }, 500);
+  
   nextTick(() => {
     freeEditRef?.value.forEach(row => {
       if (row["Ci.cCoinsurerCde"] !== "327001") {
@@ -283,25 +288,23 @@ const method = {
       freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, maxVal);
       return;
     }
-    const cCiMrk = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
-    debugger;
-    if (cCiMrk === "2" || cCiMrk === "4") {
-      for (let i = 1; i < allRows.length; i++) {
-        const currentRow = allRows[i];
-        const previousRow = allRows[i - 1];
-
-        const currentPremium = parseFloat(currentRow["Ci.nCiPrm"] || 0);
-        const previousPremium = parseFloat(previousRow["Ci.nCiPrm"] || 0);
-
-        const diff = Math.abs(currentPremium - previousPremium);
-
-        if (diff > 1) {
-          ElMessage.error('联共保保费之间的误差不能大于1');
-          break;
-        }
-      }
-        updateMasterAgreementValues();
-    }
+    // const cCiMrk = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
+    // if (cCiMrk === "2" || cCiMrk === "4") {
+    //   updateMasterAgreementValues();
+    //   const allData =  getFromValue();
+    //   for (let i = 1; i < allData.length; i++) {
+    //     const currentRow = allData[i];
+    //     const previousRow = allData[i - 1];
+    //     const currentPremium = parseFloat(currentRow["Ci.nCiPrm"] || 0);
+    //     const previousPremium = parseFloat(previousRow["Ci.nCiPrm"] || 0);
+    //     const diff = Math.abs(currentPremium - previousPremium);
+    //     if (diff > 1) {
+    //       ElMessage.error('联共保保费之间的误差不能大于1');
+    //       break;
+    //     }
+    //   }
+    // }
+    updateMasterAgreementValues();
   },
   nPlyFeeRateChange:(val)=>{
     const rowDatas = freeEditRef.value?.getSelectRow();
@@ -380,11 +383,13 @@ const updateMasterAgreementValues = () => {
   let totalAmt = 0;
   let totalPrm = 0;
   // 遍历所有行，只处理 Ci.cCoinsurerCde === "327001" 的行
+  const res = opertaor.getDataAll();
+  console.log("res",res)
   allRows.forEach(row => {
     if (row["Ci.cCoinsurerCde"] === "327001") {
       const share = parseFloat(row["Ci.nCiShare"]) || 0;
-      const nAmt = productStore.nAmt ? parseFloat(productStore.nAmt) : 0;
-      const nPrm = productStore.nPrm ? parseFloat(productStore.nPrm) : 0;
+      const nAmt = res["base"]["Base.nAmt"] ? parseFloat(res["base"]["Base.nAmt"]) : 0;
+      const nPrm = res["base"]["Base.nPrm"] ? parseFloat(res["base"]["Base.nPrm"]) : 0;
       const ciAmt = share * nAmt;
       const ciPrm = share * nPrm;
       // 更新当前行的 Ci.nCiAmt 和 Ci.nCiPrm
@@ -396,8 +401,8 @@ const updateMasterAgreementValues = () => {
     }else{
       // 非永安保险公司：仅更新该行的 Ci.nCiAmt 和 Ci.nCiPrm，不参与总和计算
       const share = parseFloat(row["Ci.nCiShare"]) || 0;
-      const nAmt = productStore.nAmt ? parseFloat(productStore.nAmt) : 0;
-      const nPrm = productStore.nPrm ? parseFloat(productStore.nPrm) : 0;
+      const nAmt = res["base"]["Base.nAmt"] ? parseFloat(res["base"]["Base.nAmt"]) : 0;
+      const nPrm = res["base"]["Base.nPrm"] ? parseFloat(res["base"]["Base.nPrm"]) : 0;
 
       const ciAmt = share * nAmt;
       const ciPrm = share * nPrm;
@@ -405,8 +410,6 @@ const updateMasterAgreementValues = () => {
       // 更新当前行的 Ci.nCiAmt 和 Ci.nCiPrm
       freeEditRef?.value?.setValueByRowKey("Ci.nCiAmt", row._dataId, ciAmt.toFixed(2));
       freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm", row._dataId, ciPrm.toFixed(2));
-      // freeEditRef?.value?.setValueByRowKey("Base.nCiJntAmt", row._dataId, ciAmt.toFixed(2));
-      // freeEditRef?.value?.setValueByRowKey("Base.nCiJntPrm", row._dataId, ciPrm.toFixed(2));
     }
   });
   // 设置到对应组件字段（仅使用永安保险的总和）

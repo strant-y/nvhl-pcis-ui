@@ -11,6 +11,7 @@ import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
 import { useProductStore } from "@/store/modules/prod";
+import { set } from "lodash";
 const productStore = useProductStore();
 
 const props = defineProps({
@@ -34,6 +35,21 @@ onMounted(() => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
+  // const cCiMrk = (opertaor.getTableRefByKey("plyBase")).getValue("Base.cCiMrk");
+  watchEffect(() => {
+    const cCiMrk = (opertaor.getTableRefByKey("plyBase")).getValue("Base.cCiMrk");
+    if(cCiMrk === "1"){
+      setValue("Base.cCiInpTyp", '600001');
+    }else if(cCiMrk === "2"){
+      setValue("Base.cCiInpTyp", '600004');
+    }else if(cCiMrk === "3"){
+      setValue("Base.cCiInpTyp", '600001');
+    }else if(cCiMrk === "4"){
+      setValue("Base.cCiInpTyp", '600004');
+    }else if(cCiMrk === "5"){
+      setValue("Base.cCiInpTyp", '600005');
+    }
+  })
 });
 
 // 绑定方法
