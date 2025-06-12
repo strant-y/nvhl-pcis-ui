@@ -1478,6 +1478,13 @@ export function addCountryPort(queryParams: any): AxiosPromise<any> {
   return post(`/countPort/addCountryPort`, queryParams);
 }
 /**
+ * 代理人查询
+ * 
+ */
+export function carSelCountryPort(queryParams: any): AxiosPromise<any> {
+  return post(`/cargoInsurance/selCountryPort`, queryParams);
+}
+/**
  * 获取续保列表
  *
  * @param queryParams

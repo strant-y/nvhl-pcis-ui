@@ -418,9 +418,9 @@ const method = {
       console.log('选中了----', res)
       if (res.type === "ok") {
         // setFormItem('Tgt.nTotalSalary',
-        // setValue("Tgt.cDeparturePortCountry",res.body.id)
-        // setValue("Tgt.cDeparturePortProvince",res.body.id)
-        // setValue("Tgt.cDeparturePort",res.body.id +  res.body.CDptCde)
+        setValue("Tgt.cDeparturePortCountry",res.body.countryCn)
+        setValue("Tgt.cDeparturePortProvince",res.body.portCn)
+        setValue("Tgt.cDeparturePort",res.body.countryCn +'/'+  res.body.portCn)
       }
     });
   },
@@ -429,9 +429,9 @@ const method = {
     dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
       console.log('选中了2----', res)
       if (res.type === "ok") {
-        setValue("Tgt.cTransitCountry", res.body.id);
-        setValue("Tgt.cTransitProvince", res.body.id);
-        setValue("Tgt.cTransitDetail", res.body.id + res.body.CDptCde);
+        setValue("Tgt.cTransitCountry", res.body.countryCn);
+        setValue("Tgt.cTransitProvince", res.body.portCn);
+        setValue("Tgt.cTransitDetail", res.body.countryCn +'/'+ res.body.portCn);
       };
     });
   },
@@ -440,9 +440,9 @@ const method = {
     dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
       console.log('选中了3----', res)
       if (res.type === "ok") {
-        setValue("Tgt.cDestinationPortCountry", res.body.id);
-        setValue("Tgt.cDestinationPortProvince", res.body.id);
-        setValue("Tgt.cDestinationPort", res.body.id + res.body.CDptCde);
+        setValue("Tgt.cDestinationPortCountry", res.body.countryCn);
+        setValue("Tgt.cDestinationPortProvince", res.body.portCn);
+        setValue("Tgt.cDestinationPort", res.body.countryCn +'/'+ res.body.portCn);
       };
     });
 
@@ -452,9 +452,20 @@ const method = {
     dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
       console.log('选中了4----', res)
       if (res.type === "ok") {
-        setValue("Tgt.cDestinationCountry", res.body.id);
-        setValue("Tgt.cDestinationProvince", res.body.id);
-        setValue("Tgt.cDestinationDetail", res.body.id + res.body.CDptCde);
+        setValue("Tgt.cDestinationCountry", res.body.countryCn);
+        setValue("Tgt.cDestinationProvince", res.body.portCn);
+        setValue("Tgt.cDestinationDetail", res.body.countryCn +'/'+ res.body.portCn);
+      };
+    });
+  },
+  // 起运地国家 按钮
+  cDispatchCountryFunc: () => {
+    dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
+      console.log('选中了5----', res)
+      if (res.type === "ok") {
+        setValue("Tgt.cDispatchCountry", res.body.countryCn);
+        setValue("Tgt.cDispatchProvince", res.body.portCn);
+        setValue("Tgt.cDispatchDetail", res.body.countryCn +'/'+ res.body.portCn);
       };
     });
   },
@@ -464,9 +475,13 @@ const method = {
     dzmodal.open(surveyInfo, { type: "departure", data: {} }).then((res: any) => {
       console.log('勘察', res)
       if (res.type === "ok") {
-        // setValue("Tgt.cDestinationPortCountry",res.body.id);
-        // setValue("Tgt.cDestinationPortProvince",res.body.id);
-        // setValue("Tgt.cDestinationPort",res.body.id +  res.body.CDptCde);
+
+        setValue("Tgt.cCheckerCde",res.body.cSryDoc);   // 代理人
+        setValue("Tgt.cAddr",res.body.cAddr);   // 大洲
+        // setValue("Tgt.cCountry",res.body.id);  // ?国家
+        setValue("Tgt.cAraCde",res.body.cAraCde); // ?国家
+        setValue("Tgt.cCtyCnm", res.body.cCtyCnm);  // 城市
+        setValue("Tgt.cCode",  res.body.cSrvyCde);  // 城市
       };
     });
   }

@@ -471,7 +471,10 @@ const setTaxInfo = () => {
   console.log("发票信息", opertaor.getTableRefs());
   const tabref = opertaor.getTableRefs();
   const appLicantValue = tabref["applicant"].getFromValue()["Applicant.cAppNo"]; // 单据编号
+  // const appLicantValue = tabref["plyBase"].getFromValue()["Base.cAppNo"]; // 单据编号
   
+  console.log('Applicant.cAppNo',tabref["applicant"].getFromValue())
+  console.log('Applicant.cAppNo',tabref['plyBase'].getFromValue())
   if (!!appLicantValue) {
     // invoiceRef.value?.isShow()
     // invoiceShow.value = true;
@@ -1918,6 +1921,8 @@ const savePlyInfo = async () => {
     ElMessage.success(resInfo.msg);
     const base = ops["base"];
     const plyBase = ops["plyBase"];
+    const applicant = ops["applicant"];
+    const insured = ops["insured"];
     if (base) {
       const baseRef = opertaor.getTableRefByKey("base");
       baseRef.setFormValue(base);
@@ -1926,6 +1931,17 @@ const savePlyInfo = async () => {
       const plyBaseRef = opertaor.getTableRefByKey("plyBase");
       plyBaseRef.setFormValue(plyBase);
     }
+    if (applicant) {
+      const applicantRef = opertaor.getTableRefByKey("applicant");
+      applicantRef.setFormValue(applicant);
+    }
+    if (insured) {
+      const insuredRef = opertaor.getTableRefByKey("insured");
+      insuredRef.setFormValue(insured);
+    }
+
+
+
     saveFlag = true;
     if(props.param?.pageType === "copy" && saveDistBatchFlag.value) {
       // 保存清单
