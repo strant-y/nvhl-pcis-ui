@@ -307,6 +307,8 @@ import dayjs from "dayjs";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 import { useRouter, useRoute } from "vue-router";
+import { getData } from "@/pcis/prodRef/dataInit";
+
 const policyService = new PolicyService();
 const productStore = useProductStore();
 const { isCiJiMrk } = storeToRefs(productStore);
@@ -474,6 +476,10 @@ const setTaxInfo = () => {
   console.log("发票信息", opertaor.getTableRefs());
   const tabref = opertaor.getTableRefs();
   const appLicantValue = tabref["applicant"].getFromValue()["Applicant.cAppNo"]; // 单据编号
+  // const appLicantValue = tabref["plyBase"].getFromValue()["Base.cAppNo"]; // 单据编号
+  
+  console.log('Applicant.cAppNo',tabref["applicant"].getFromValue())
+  console.log('Applicant.cAppNo',tabref['plyBase'].getFromValue())
   if (!!appLicantValue) {
     // invoiceRef.value?.isShow()
     // invoiceShow.value = true;
@@ -682,14 +688,14 @@ const basicBtn = [
       openLimit();
     },
   }),
-  createFreeButtonBase({
-    label: "历史赔案",
-    type: "primary",
-    func: () => {
-      historyClaimcaseFun();
-      // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
-    },
-  }),
+  // createFreeButtonBase({
+  //   label: "历史赔案",
+  //   type: "primary",
+  //   func: () => {
+  //     historyClaimcaseFun();
+  //     // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
+  //   },
+  // }),
 ];
 /**
  * 一般批改按钮
@@ -838,14 +844,14 @@ const uwBtn = [
         });
     },
   }),
-  createFreeButtonBase({
-    label: "历史赔案",
-    type: "primary",
-    func: () => {
-      historyClaimcaseFun();
-      // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
-    },
-  }),
+  // createFreeButtonBase({
+  //   label: "历史赔案",
+  //   type: "primary",
+  //   func: () => {
+  //     historyClaimcaseFun();
+  //     // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
+  //   },
+  // }),
   createFreeButtonBase({
     label: "任务痕迹",
     type: "primary",
@@ -969,6 +975,7 @@ const initPage = async () => {
   renderComponents();
 };
 
+const dataInit = ref({});
 /**
  * 逐个渲染组件
  */
@@ -981,6 +988,15 @@ function renderComponents() {
       clearInterval(interval);
     }
   }, 50); // 延迟组件渲染,增加页面响应效率
+  
+  if (props.param.pageType === "app") {
+    const idata = getData();
+    dataInit.value = opertaor.mapSetData(idata);
+    setTimeout(() => {
+      // 基本信息预加载，降低空窗期
+      opertaor.setDataAll(dataInit.value);
+    }, 100);
+  }
 }
 
 /**
@@ -994,46 +1010,7 @@ async function loadAfter() {
     getPlanCvrg();
     bthList.value = basicBtn;
     nextTick(() => {
-      //保险期间初始化
-      const baseBefore = {};
-      baseBefore["Base.tAppTm"] = moment(new Date()).format(
-        "YYYY-MM-DD HH:mm:ss"
-      );
-      baseBefore["Base.tInsrncBgnTm"] = moment(
-        new Date(Date.now() + 1 * 1000 * 60 * 60 * 24)
-      ).format("YYYY-MM-DD 00:00:00");
-      baseBefore["Base.tInsrncEndTm"] = dayjs(baseBefore["Base.tInsrncBgnTm"])
-        .add(1, "year")
-        .format("YYYY-MM-DD 23:59:59");
-      const tm = moment(baseBefore["Base.tInsrncEndTm"]).diff(
-        moment(baseBefore["Base.tInsrncBgnTm"]),
-        "days"
-      );
-      baseBefore["Base.cTmSysCde"] = tm;
-      tmDay.value = tm;
-      opertaor.getTableRefByKey("insrnc").setFormValue(baseBefore);
-      //保单基本信息初始化
-      const baseobj = {};
-      baseobj["Base.cRenewMrk"] = "0";
-      baseobj["Base.cIsNet"] = "0";
-      baseobj["Base.cPolicySource"] = "1";
-      opertaor.getTableRefByKey("plyBase").setFormValue(baseobj);
-      //承保信息初始化
-      const baseafterobj = {};
-      baseafterobj["Base.cRatioTyp"] = "2";
-      baseafterobj["Base.cInstMrk"] = "0";
-      baseafterobj["Base.cDisptSttlCde"] = "B";
-      baseafterobj["Base.cInsExchCde"] = "1";
-      baseafterobj["Base.cPremExchCde"] = "1";
-      baseafterobj["Base.cPrmCur"] = "CNY";
-      baseafterobj["Base.cAmtCur"] = "CNY";
-      baseafterobj["Applicant.cStkMrk"] = "0";
-      baseafterobj["Applicant.cCustRiskRank"] = "925104";
-      baseafterobj["Insured.cStkMrk"] = "0";
-      baseafterobj["Insured.cCustRiskRank"] = "925104";
-      opertaor.getTableRefByKey("base").setFormValue(baseafterobj);
-      opertaor.getTableRefByKey("applicant").setFormValue(baseafterobj);
-      opertaor.getTableRefByKey("insured").setFormValue(baseafterobj);
+      opertaor.setDataAll(dataInit.value);
     });
   } else if (props.param.pageType === "TEMPORARY_DEPOSIT") {
     // 暂存单
@@ -1171,7 +1148,27 @@ async function loadAfter() {
         item.disabled = true;
       });
     }
-  } else if (props.param.cPlyNo === "orig") {
+  } else if (props.param.pageType === "orig") {
+    getAppPolicy({
+      cAppNo: props.param.cAppNo,
+      queryTyp: props.param.pageType,
+    }).then((res) => {
+      if (res) {
+        const ops = opertaor.convertData(res);
+        ops['plyBase']['Base.cRenewMrk'] = '1'
+        ops['insrnc']['Base.tInsrncBgnTm'] = addOneYear(ops['insrnc']['Base.tInsrncBgnTm'])
+        opertaor.setDataAll(ops);
+        // 获取原投保单号下的清单列表数据
+        const distMap = formconfig1[0].pageInfo.filter((item:any) => {
+          return item.pageKey === "dist" || item.pageKey === "distSummary";
+        });
+        distMap.forEach((item:any) => {
+          getDistData(props.param?.cAppNo, item)
+        });
+        //获取单号
+        // getCAppNoFun();
+      }
+    });
     bthList.value.push(
       createFreeButtonBase({
         label: "保存模板",
@@ -1396,6 +1393,39 @@ async function loadAfter() {
   if(props.param?.showBtn === false){
     bthList.value = [];
   }
+}
+function addOneYear(a:any) {
+  // 将字符串转换为本地时间的日期对象
+  let date = new Date(a.replace(' ', 'T'));
+
+  // 获取当前年份
+  let currentYear = date.getFullYear();
+
+  // 获取当前月份和日期
+  let currentMonth = date.getMonth();
+  let currentDay = date.getDate();
+
+  // 获取加一年后的年份
+  let nextYear = currentYear + 1;
+
+  // 设置加一年后的日期
+  date.setFullYear(nextYear);
+
+  // 检查是否跨年后的日期无效 (如闰年情况)
+  if (date.getMonth() !== currentMonth || date.getDate() !== currentDay) {
+    // 设置为下个月的最后一天，确保日期正确
+    date.setMonth(currentMonth + 1, 0); // 设置为当前月最后一天
+  }
+
+  // 手动格式化日期为 'YYYY-MM-DD HH:MM:SS'
+  let year = date.getFullYear();
+  let month = String(date.getMonth() + 1).padStart(2, '0'); // 保证2位数
+  let day = String(date.getDate()).padStart(2, '0'); // 保证2位数
+  let hours = String(date.getHours()).padStart(2, '0');
+  let minutes = String(date.getMinutes()).padStart(2, '0');
+  let seconds = String(date.getSeconds()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 // 获取清单数据并填充到列表
 const getDistData = (appNo:any, item: any) => {
@@ -1706,7 +1736,8 @@ const setCiInfo = (base: any) => {
   ci["Ci.nCiPrm"] = base["Base.nPrm"];
   ci["Ci.cChiefMrk"] = "1"
   ci["Ci.cIssueMrk"] = "1"
-  ci["Ci.nPlyFeeRate"] = "0"
+  ci["Ci.nPlyFee"]="0.00"
+  ci["Ci.nPlyFeeRate"]="0.00"
   ci["Ci.cCoinsurerCde"] = "327001"
   ci["Ci.cSubDptCde"] = props.param.cDptCde
   ciList.push(ci)
@@ -1899,6 +1930,8 @@ const savePlyInfo = async () => {
     ElMessage.success(resInfo.msg);
     const base = ops["base"];
     const plyBase = ops["plyBase"];
+    const applicant = ops["applicant"];
+    const insured = ops["insured"];
     if (base) {
       const baseRef = opertaor.getTableRefByKey("base");
       baseRef.setFormValue(base);
@@ -1907,6 +1940,17 @@ const savePlyInfo = async () => {
       const plyBaseRef = opertaor.getTableRefByKey("plyBase");
       plyBaseRef.setFormValue(plyBase);
     }
+    if (applicant) {
+      const applicantRef = opertaor.getTableRefByKey("applicant");
+      applicantRef.setFormValue(applicant);
+    }
+    if (insured) {
+      const insuredRef = opertaor.getTableRefByKey("insured");
+      insuredRef.setFormValue(insured);
+    }
+
+
+
     saveFlag = true;
     if(props.param?.pageType === "copy" && saveDistBatchFlag.value) {
       // 保存清单

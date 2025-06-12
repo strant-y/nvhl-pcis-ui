@@ -13,7 +13,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useProductStore } from "@/store/modules/prod";
 import { rule } from "postcss";
 import { useValidator } from "@/typings/useValidator";
-import { syncDist ,selectDist } from "@/api/prod";
+import { syncDist ,selectDist,checkAppBase } from "@/api/prod";
 
 const wagesInfo = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/wages-info-model.vue")
@@ -58,20 +58,6 @@ onMounted(async () => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
-  nextTick(() => {
-    //设置是否单项工程默认值：是
-    setValue("Tgt.cIsSingle", '1')
-    setValue("Tgt.cContractCurrency", '01')
-
-
-    //  安全生产责任险  设置投保方式默认值
-    if (param.cRecordType == '1' && param.cProdNo == "043009") {
-      setTimeout(() => {
-        setValue("Tgt.cInsuranceMethod", '613001')
-      }, 1000)
-    }
-    // console.log('数据----props', param)
-  })
   // 约定保期内服务次数正整数
   setFormItem("Tgt.nAgreeFrequency", {
     rules: [getRules("signlessInt", {})],
@@ -120,6 +106,11 @@ const setIsRule = ()=>{
     })
   }
 }
+
+ const  funcdistadd=  () => {
+  
+  };
+
 // 绑定方法
 const method = {
   getcShippingMethodChange:(val:string)=>{
@@ -274,15 +265,33 @@ const method = {
             wagesInfoModel();
 
           } else {
-            ElMessage.error('雇员清单不能为空！');
+            ElMessage.error('雇员清单不能为空！'); 
           }
         }
 
       });
     } else {
-      wagesInfoModel();
+      // wagesInfoModel();
+      funcdistadd();
+
+        // const alldata: any = opertaor.getDataAll();
+    // let baseFlag = alldata['plyBase']["Base.cAppNo"];
+
+ 
+
+    checkAppBase({ cAppNo: cAppNo }).then((res: any) => {
+      if (res.code === 200) {
+        wagesInfoModel();
+      } else {
+        ElMessage.error("请先保存申请单!");
+      }
+    });
     }
   },
+
+
+
+
   // 工程造价
   nEngineeringCostChange: (val) => {
     if (val) {
@@ -409,9 +418,9 @@ const method = {
       console.log('选中了----', res)
       if (res.type === "ok") {
         // setFormItem('Tgt.nTotalSalary',
-        // setValue("Tgt.cDeparturePortCountry",res.body.id)
-        // setValue("Tgt.cDeparturePortProvince",res.body.id)
-        // setValue("Tgt.cDeparturePort",res.body.id +  res.body.CDptCde)
+        setValue("Tgt.cDeparturePortCountry",res.body.countryCn)
+        setValue("Tgt.cDeparturePortProvince",res.body.portCn)
+        setValue("Tgt.cDeparturePort",res.body.countryCn +'/'+  res.body.portCn)
       }
     });
   },
@@ -420,9 +429,9 @@ const method = {
     dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
       console.log('选中了2----', res)
       if (res.type === "ok") {
-        setValue("Tgt.cTransitCountry", res.body.id);
-        setValue("Tgt.cTransitProvince", res.body.id);
-        setValue("Tgt.cTransitDetail", res.body.id + res.body.CDptCde);
+        setValue("Tgt.cTransitCountry", res.body.countryCn);
+        setValue("Tgt.cTransitProvince", res.body.portCn);
+        setValue("Tgt.cTransitDetail", res.body.countryCn +'/'+ res.body.portCn);
       };
     });
   },
@@ -431,9 +440,9 @@ const method = {
     dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
       console.log('选中了3----', res)
       if (res.type === "ok") {
-        setValue("Tgt.cDestinationPortCountry", res.body.id);
-        setValue("Tgt.cDestinationPortProvince", res.body.id);
-        setValue("Tgt.cDestinationPort", res.body.id + res.body.CDptCde);
+        setValue("Tgt.cDestinationPortCountry", res.body.countryCn);
+        setValue("Tgt.cDestinationPortProvince", res.body.portCn);
+        setValue("Tgt.cDestinationPort", res.body.countryCn +'/'+ res.body.portCn);
       };
     });
 
@@ -443,9 +452,20 @@ const method = {
     dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
       console.log('选中了4----', res)
       if (res.type === "ok") {
-        setValue("Tgt.cDestinationCountry", res.body.id);
-        setValue("Tgt.cDestinationProvince", res.body.id);
-        setValue("Tgt.cDestinationDetail", res.body.id + res.body.CDptCde);
+        setValue("Tgt.cDestinationCountry", res.body.countryCn);
+        setValue("Tgt.cDestinationProvince", res.body.portCn);
+        setValue("Tgt.cDestinationDetail", res.body.countryCn +'/'+ res.body.portCn);
+      };
+    });
+  },
+  // 起运地国家 按钮
+  cDispatchCountryFunc: () => {
+    dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
+      console.log('选中了5----', res)
+      if (res.type === "ok") {
+        setValue("Tgt.cDispatchCountry", res.body.countryCn);
+        setValue("Tgt.cDispatchProvince", res.body.portCn);
+        setValue("Tgt.cDispatchDetail", res.body.countryCn +'/'+ res.body.portCn);
       };
     });
   },
@@ -455,9 +475,13 @@ const method = {
     dzmodal.open(surveyInfo, { type: "departure", data: {} }).then((res: any) => {
       console.log('勘察', res)
       if (res.type === "ok") {
-        // setValue("Tgt.cDestinationPortCountry",res.body.id);
-        // setValue("Tgt.cDestinationPortProvince",res.body.id);
-        // setValue("Tgt.cDestinationPort",res.body.id +  res.body.CDptCde);
+
+        setValue("Tgt.cCheckerCde",res.body.cSryDoc);   // 代理人
+        setValue("Tgt.cAddr",res.body.cAddr);   // 大洲
+        // setValue("Tgt.cCountry",res.body.id);  // ?国家
+        setValue("Tgt.cAraCde",res.body.cAraCde); // ?国家
+        setValue("Tgt.cCtyCnm", res.body.cCtyCnm);  // 城市
+        setValue("Tgt.cCode",  res.body.cSrvyCde);  // 城市
       };
     });
   }

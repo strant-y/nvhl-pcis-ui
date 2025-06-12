@@ -44,7 +44,10 @@ onMounted(async () => {
   );
   Object.assign(formconfig1, formconfig11);
   //一般批改，部分要素可编辑
-  if (param.pageType === "EDR_APP_NEW_SCENE" &&  productStore.cCiMrk !== "0") {
+  const cCiMrkValue =  opertaor.getTableRefByKey("plyBase")
+  console.log("0000000000000",cCiMrkValue,productStore.cCiMrk,)
+  setTimeout(() => {
+    if (param.pageType === "EDR_APP_NEW_SCENE" &&   productStore.cCiMrk !== "0") {
     formconfig1.editFlag = true;
     formconfig1.fromSchema?.forEach((item) => {
       if (item.prop === 'Ci.cChiefMrk' || item.prop === 'Ci.cIssueMrk') {
@@ -54,6 +57,8 @@ onMounted(async () => {
       }
     });
   }
+  }, 500);
+  
   nextTick(() => {
     freeEditRef?.value.forEach(row => {
       if (row["Ci.cCoinsurerCde"] !== "327001") {
@@ -71,6 +76,7 @@ onMounted(async () => {
 // 绑定方法
 const method = {
   ciAdd: () => {
+    const cCiMrkFlag = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
     const val=getFromValue()
     const nCiAmt = parseFloat(productStore.nAmt)
     if(nCiAmt =="0"){
@@ -94,6 +100,9 @@ const method = {
     if (newRowId && parseFloat(remaining) > 0) {
       freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", newRowId, remaining);
     }
+    // if(cCiMrkFlag=="2" || cCiMrkFlag=="4"){
+
+    // }
     updateMasterAgreementValues()
   },
   ciDelete:()=>{
@@ -115,7 +124,6 @@ const method = {
     const rowId = rowData._dataId;
     const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue()
     if (cCiMrk["Base.cCiMrk"] == "5" && val !== "327001") {
-      // 司内联保，只能选择永安保险
       freeEditRef?.value?.setValueByRowKey("Ci.cCoinsurerCde", rowId, "");
       ElMessage.error("司内联保，不能录入除永安以外的其他公司！");
       return false;
@@ -229,11 +237,8 @@ const method = {
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData?._dataId;
     const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue()
-
     if (!rowData || !rowId) return;
-
     const cCoinsurerCde = rowData["Ci.cCoinsurerCde"];
-
     // 我方主共或从共的情况
     if (cCiMrk["Base.cCiMrk"] === '1' || cCiMrk["Base.cCiMrk"] === '3') {
       // 情况1：如果选中的是“是”且是永安保险(327001)
@@ -283,19 +288,22 @@ const method = {
       freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, maxVal);
       return;
     }
-    const nPrm =  productStore.nPrm * val
-    const nAmt = productStore.nAmt * val
-    freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm",rowDatas._dataId,nPrm.toFixed(2))
-    freeEditRef?.value?.setValueByRowKey("Ci.nCiAmt",rowDatas._dataId,nAmt.toFixed(2))
-
-    if (rowDatas["Ci.cCoinsurerCde"] === "327001") {
-      // 更新当前行的 Ci.nCiAmt 和 Ci.nCiPrm，并更新 ciMasterAgreement 的值
-      const ciAmt = val * productStore.nAmt;
-      const ciPrm = val * productStore.nPrm;
-
-      freeEditRef?.value?.setValueByRowKey("Ci.nCiAmt", rowDatas._dataId, ciAmt.toFixed(2));
-      freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm", rowDatas._dataId, ciPrm.toFixed(2));
-    }
+    // const cCiMrk = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
+    // if (cCiMrk === "2" || cCiMrk === "4") {
+    //   updateMasterAgreementValues();
+    //   const allData =  getFromValue();
+    //   for (let i = 1; i < allData.length; i++) {
+    //     const currentRow = allData[i];
+    //     const previousRow = allData[i - 1];
+    //     const currentPremium = parseFloat(currentRow["Ci.nCiPrm"] || 0);
+    //     const previousPremium = parseFloat(previousRow["Ci.nCiPrm"] || 0);
+    //     const diff = Math.abs(currentPremium - previousPremium);
+    //     if (diff > 1) {
+    //       ElMessage.error('联共保保费之间的误差不能大于1');
+    //       break;
+    //     }
+    //   }
+    // }
     updateMasterAgreementValues();
   },
   nPlyFeeRateChange:(val)=>{
@@ -374,13 +382,14 @@ const updateMasterAgreementValues = () => {
   const allRows = getFromValue(); // 获取所有行数据
   let totalAmt = 0;
   let totalPrm = 0;
-
   // 遍历所有行，只处理 Ci.cCoinsurerCde === "327001" 的行
+  const res = opertaor.getDataAll();
+  console.log("res",res)
   allRows.forEach(row => {
     if (row["Ci.cCoinsurerCde"] === "327001") {
       const share = parseFloat(row["Ci.nCiShare"]) || 0;
-      const nAmt = productStore.nAmt ? parseFloat(productStore.nAmt) : 0;
-      const nPrm = productStore.nPrm ? parseFloat(productStore.nPrm) : 0;
+      const nAmt = res["base"]["Base.nAmt"] ? parseFloat(res["base"]["Base.nAmt"]) : 0;
+      const nPrm = res["base"]["Base.nPrm"] ? parseFloat(res["base"]["Base.nPrm"]) : 0;
       const ciAmt = share * nAmt;
       const ciPrm = share * nPrm;
       // 更新当前行的 Ci.nCiAmt 和 Ci.nCiPrm
@@ -392,8 +401,8 @@ const updateMasterAgreementValues = () => {
     }else{
       // 非永安保险公司：仅更新该行的 Ci.nCiAmt 和 Ci.nCiPrm，不参与总和计算
       const share = parseFloat(row["Ci.nCiShare"]) || 0;
-      const nAmt = productStore.nAmt ? parseFloat(productStore.nAmt) : 0;
-      const nPrm = productStore.nPrm ? parseFloat(productStore.nPrm) : 0;
+      const nAmt = res["base"]["Base.nAmt"] ? parseFloat(res["base"]["Base.nAmt"]) : 0;
+      const nPrm = res["base"]["Base.nPrm"] ? parseFloat(res["base"]["Base.nPrm"]) : 0;
 
       const ciAmt = share * nAmt;
       const ciPrm = share * nPrm;
@@ -408,6 +417,8 @@ const updateMasterAgreementValues = () => {
     if(row['Ci.cCoinsurerCde']){
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntAmt", totalAmt.toFixed(2));
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm", totalPrm.toFixed(2));
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntAmt", totalPrm.toFixed(2));
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntPrm", totalPrm.toFixed(2));
     }
   });
 };

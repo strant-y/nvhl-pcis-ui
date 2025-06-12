@@ -31,8 +31,9 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { deleteFactorBykey, getBasicKindList } from "@/api/prod";
+import {deleteFactorBykey, exportRenewalInsurance, findRenewalInsurance, getBasicKindList, getPolicy} from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
+import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 const dzmodal = useDzModal();
 const kindEdit = defineAsyncComponent(() => import("./kindEdit.vue"));
 const tableRef = ref<AppTableMethod | null>(null);
@@ -40,6 +41,12 @@ const removeIds = ref([]); // 删除用户ID集合 用于批量删除
 const departmentTree = defineAsyncComponent(
   () => import("@/components/common/DepartmentTree.vue")
 );
+import { useUserStore } from "@/store/modules/user";
+import {saveAs} from "file-saver";
+import {useRouter} from "vue-router";
+const router = useRouter();
+const userStore = useUserStore();
+const user = ref(userStore.user);
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "续保管理",
@@ -55,18 +62,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         func: () => {
-          freeEditRef.value?.setFormValue({
-            cKindNo: "",
-            cStatus: "",
-          });
-          handleQuery(true);
-          // freeEditRef.value?.resetForm();
+          freeEditRef.value?.resetFields();
         },
       }),
       createFreeButtonBase({
         label: "导出",
         func: () => {
-          
+          exportExcel()
         },
       }),
     ],
@@ -75,37 +77,48 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cDptCde",
         inputtype: "rtselect",
         title: "机构部门",
-        rules: [getRules("required", {})],
         btnWidth: 10,
         itemWidth: 2,
+        // rules: [getRules("required", {
+        //   trigger: 'change'
+        // })],
         showExBtn: true,
         btnItems: {
           icon: "Search",
           type: "primary",
           func: () => {
             dzmodal
-              .open(departmentTree, { type: "Issuer", data: {} })
-              .then((res) => {
-                if (res.type === "ok") {
-                }
-              });
+                .open(DepartmentTree, { type: "Issuer", data: {} })
+                .then((res) => {
+                  if (res.body) {
+                    const selectObj = res.body;
+                    freeEditRef.value?.setValue("cDptCde", selectObj.id);
+                    setFormItem("cDptCde", {
+                      loadData: [
+                        {
+                          label: selectObj.name,
+                          value: selectObj.id,
+                        },
+                      ],
+                    });
+                  }
+                });
           },
         },
       },
       {
-        prop: "cStatus",
-        inputtype: "rtradio",
-        title: "包含下级机构",
-        loadData :[
-          { label:'是',value:1 },
-          { label:'否',value:0 },
-        ]
+        prop: "cLoadSub",
+        inputtype: "rtcheckbox",
+        title: "是否包含下级",
+        keymap: {
+          y: 1,
+          n: 0,
+        },
       },
       {
         prop: "tm",
-        inputtype: "rtdatepicker",
+        inputtype: "tEdrAppTm",
         title: "保险起止期",
-        rules: [getRules("required", {})],
         itemWidth: 2,
         clearable: true,
         type: "datetimerange",
@@ -113,35 +126,46 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         valueFormat: "YYYY-MM-DD HH:mm:ss",
       },
       {
-        prop: "cStatus",
+        prop: "cProdNo",
         inputtype: "rtselect",
         title: "条款",
-        typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "use_mrk" },
+        typeCode: "TERM_LIST_IN_GUIDE_NEW",
         clearable: true,
+        params: {'cParCde': '', 'cOperId': user.value['opCde'], 'cDptCde': user.value['companyId']},
       },
       {
-        prop: "cStatus",
+        prop: "cKindNo",
         inputtype: "rtselect",
-        title: "产品",
-        typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "use_mrk" },
+        title: "产品大类",
+        typeCode: "KIND_LIST_GRT",
         clearable: true,
+        params: {'cOperId': user.value['opCde'], 'cDptCde': user.value['companyId']},
+        func: (val: any) => {
+          // 更新产品下拉选
+          setFormItem("cProdNo", {
+            codeParam: {
+              cParCde: val,
+              cOperId: user.value?.opCde,
+              cDptCde: user.value?.companyId,
+            },
+          });
+          freeEditRef.value?.setValue("cProdNo", null);
+        },
       },
       {
-        prop: "appCde",
+        prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
         clearable: true,
       },
       {
-        prop: "appCde",
+        prop: "cAppNo",
         inputtype: "rtinput",
         title: "投保单号",
         clearable: true,
       },
       {
-        prop: "appCde",
+        prop: "cPlyNo",
         inputtype: "rtinput",
         title: "保单号",
         clearable: true,
@@ -170,89 +194,62 @@ const tableconfig = reactive<AppTableConfig>(
       createFreeButtonBase({
         id: "score",
         link: true,
-        tooltip: "查看",
-        type: "success",
-        size: "large",
-        icon: "View",
-        tableClick: (row) => {
-          console.log(row);
-          dzmodal.open(kindEdit, { type: "edit", data: row }).then((res) => {
-            if (res.type === "ok") {
-              // handleQuery();
-            }
-          });
-        },
-      }),
-      createFreeButtonBase({
-        id: "score",
-        link: true,
         tooltip: "一键续保",
         type: "success",
         size: "large",
         icon: "Document",
         tableClick: (row) => {
-           
-        },
-      }),
-      createFreeButtonBase({
-        id: "score",
-        link: true,
-        tooltip: "跳转",
-        type: "success",
-        size: "large",
-        icon: "Document",
-        tableClick: (row) => {
-           
+           getRenewal(row)
         },
       }),
     ],
 
     fromSchema: [
       {
-        prop: "a",
+        prop: "cDptNameL2",
         inputtype: "rtinput",
         title: "二级机构",
         minWidth: 180,
         fixed: 'left',
       },
       {
-        prop: "b",
+        prop: "cDptNameL3",
         inputtype: "rtinput",
         title: "三级机构",
         minWidth: 180,
       },
       {
-        prop: "c",
+        prop: "cAppNo",
         inputtype: "rtinput",
         title: "投保单号",
         minWidth: 180,
       },
       {
-        prop: "d",
+        prop: "cPlyNo",
         inputtype: "rtinput",
         title: "保单号",
         minWidth: 180,
       },
       {
-        prop: "d",
+        prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人姓名",
         minWidth: 180,
       },
       {
-        prop: "d",
+        prop: "cProdNo",
         inputtype: "rtinput",
         title: "条款",
         minWidth: 180,
       },
       {
-        prop: "d",
+        prop: "nAmt",
         inputtype: "rtinput",
         title: "保额",
         minWidth: 180,
       },
       {
-        prop: "d",
+        prop: "tInsrncEndTm",
         inputtype: "rtinput",
         title: "保险起止日期",
         minWidth: 180,
@@ -260,32 +257,62 @@ const tableconfig = reactive<AppTableConfig>(
     ],
   })
 );
-
-onMounted(async () => {
-  //首页跳转过来的逻辑 Start
-  if(sessionStorage.getItem('renewPolicy')) {
-    //首页 暂存任务跳转过来的,选中投保单
-    const homeJumpData = JSON.parse(sessionStorage.getItem('renewPolicy'))
-    await nextTick()
-    freeEditRef.value.setValue('tm', [homeJumpData.startBsTm1, homeJumpData.endBsTm1])
-    if(homeJumpData.hasOwnProperty('objId')) { //投保单号
-      freeEditRef.value.setValue('appCde', homeJumpData.objId)
+const handleArray = (obj:any)=>{
+  // 创建一个新的对象，并移除"Base."前缀
+  let newObj = {};
+  for (let key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      // 通过字符串操作去掉前缀
+      let newKey = key.replace('Base.', '');
+      newObj[newKey] = obj[key];
     }
-  } 
-  //首页跳转过来的逻辑 End
-});
-onUnmounted(() => {
-  //组件销毁，清除sessionStorage数据
-  sessionStorage.getItem('renewPolicy') && sessionStorage.removeItem('renewPolicy')
-})
+  }
+  return newObj
+}
 
-// 绑定方法
-const method = {
-  func1: () => {
-    console.log(getRules);
-  },
+const getRenewal = (row:any)=>{
+   console.log('一键续保。。。',row.cPlyNo)
+  getPolicy({cPlyNo:row.cPlyNo,queryTyp: "orig"})
+      .then((res) => {
+        const { code, res:data, msg } = res;
+        if (200 === code) {
+          router.push({
+            path: "/pcis/my-page",
+            query: {
+              param: JSON.stringify({ ...handleArray(data.composition.plyBase[0] ), ...{ pageType: "orig" } }),
+            },
+          });
+          sessionStorage.setItem(
+              "toMyPageData",
+              JSON.stringify({
+                ...JSON.parse(sessionStorage.getItem("toMyPageData")),
+                ...{ pageType: "orig" },
+              })
+          );
+        } else {
+          ElMessage.error(msg);
+        }
+      })
+      .finally(() => {});
+}
+
+//导出
+const exportExcel = () => {
+  const s = freeEditRef.value?.getFromValue(); //获取表单数据
+ exportRenewalInsurance(s).then((res) => {
+    if (res.size <= 0) {
+      ElMessage.error({ message: "导出出错", duration: 3000 });
+      return;
+    }
+   const fileName = "queryList.xls";
+    // const fileName = decodeURIComponent(res.headers['content-disposition'].split('filename=')[1]);
+    const blob = new Blob([res.data], {
+      responseType:res.headers["content-type"]
+      // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
+    });
+    saveAs(blob, fileName);
+  })
 };
-
 // 绑定特殊验证器
 const exRules = {
   byrtInput: (rule: any, value: any, callback: any) => {
@@ -313,7 +340,7 @@ function refreshData(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r);
-  getBasicKindList(param)
+  findRenewalInsurance(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
@@ -332,7 +359,22 @@ function handleSelectionChange(selection: any) {
   console.log('selection',selection)
   removeIds.value = selection.map((item: any) => item.cPkId);
 }
-
+function setFormItem(key: any, obj: any) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.btnItems && obj.btnItems) {
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
+          }
+        }else{
+          Object.assign(item, obj);
+        }
+      }
+    });
+  }
+}
 </script>
 
 <style scoped></style>

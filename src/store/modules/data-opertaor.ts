@@ -240,6 +240,58 @@ export const dataOpertaor = defineStore(
                 })
             }
         }
+
+        const mapSetData = (data) => {
+            const res1 = {}; //临时存放抽离数据
+            const pageInfo = tableConfig[0]["pageInfo"];
+            const schema = {};
+            pageInfo.forEach((k) => {
+                const pageKey = k["pageKey"];
+                if (!data[pageKey]) {
+                res1[pageKey] = {};
+                schema[pageKey] = k["pageSchema"];
+                }
+            });
+
+            Object.keys(res1)?.forEach((k) => {
+                const sc = schema[k];
+                if (sc["fromSchema"] && sc["fromSchema"].length > 0) {
+                const fromSchema = sc["fromSchema"];
+                fromSchema.forEach((f) => {
+                    if (f.inputtype === "rtinputgroup") {
+                    const grouplist = f.groupList;
+                    if (grouplist && grouplist.length > 0) {
+                        grouplist.forEach((g) => {
+                        const gprop = g["prop"]; // 抽离需要的数据
+                        const gd = getDatabykey(gprop, data);
+                        if (gd) {
+                            res1[k][gprop] = gd;
+                        }
+                        });
+                    }
+                    } else {
+                    const prop = f["prop"]; // 抽离需要的数据
+                    const d = getDatabykey(prop, data);
+                    if (d) {
+                        res1[k][prop] = d;
+                    }
+                    }
+                });
+                }
+            });
+
+            return res1;
+        };
+
+        const getDatabykey = (key: string, data: any) => {
+            let r = null;
+            Object.keys(data).forEach((d) => {
+                if (d === key) {
+                    r = data[d];
+                }
+            });
+            return r;
+        }
         /**
          * @Title: 转换数据
          */
@@ -395,6 +447,7 @@ export const dataOpertaor = defineStore(
             setUnDisabledByKeyList,
             validateAll,
             setReadOnly,
+            mapSetData,
         };
     },
     {

@@ -76,7 +76,7 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtnWidth: 220,
     tableBtnPosition: "right",
     align: "left",
-    tableBtn: [
+    tableBtn: opertaor.getParam().pageType == "readonly" ? [] : [
       createFreeButtonBase({
         id: "score",
         link: true,
@@ -306,6 +306,24 @@ function getTableData() {
   return formData.value;
 }
 
+function setFormValue(value: any) {
+  if(value && value.length>0){
+    let ind = 1;
+    value.forEach(e => {
+      Object.keys(e).forEach(key => {
+        const newKey = key.replace('DeductibleDist.', '');
+        const v = e[key];
+        delete e[key];
+        e[newKey] = v;
+      })
+      e['index'] = ind++;
+    });
+  }
+  rttableFrom?.value?.setFormValue(value);
+  // Object.assign(formData.value, value);
+  formData.value = value;
+}
+
 function getFromValue() {
   return formData.value.map((item) => {
     const prefixedItem: { [key: string]: any } = {};
@@ -320,6 +338,7 @@ function getFromValue() {
 
 defineExpose({
   getFromValue,
+  setFormValue,
   getFormconfig,
   getTableData,
 });

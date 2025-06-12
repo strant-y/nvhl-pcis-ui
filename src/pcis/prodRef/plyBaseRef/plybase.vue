@@ -25,8 +25,6 @@ import DepartmentTree from "../commodityRef/DepartmentTree.vue";
 import { get } from "lodash";
 import { codeListViewStore, dataOpertaor, useProductStore } from "@/store";
 import { de } from "element-plus/es/locale";
-import { rule } from "postcss";
-import { debug } from "console";
 const productStore = useProductStore();
 
 const codeListStore = codeListViewStore();
@@ -62,18 +60,9 @@ onMounted(async () => {
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
     setForSelectFilterable(); //给下拉框设置可搜索
-    // 录单日期、签单日期默认值
-    setValue("Base.tOprTm", moment(new Date()).format("YYYY-MM-DD"));
-    setValue("Base.tIssueTm", moment(new Date()).format("YYYY-MM-DD"));
-    // 是否见费出单 默认值
-    setValue("Base.cNeedfeeFlag", "1");
-    //是否可疑交易，默认否
-    setValue("Base.cSusBusiness", "0");
-    //录单人 默认系统操作员..
-    setValue("Base.cOprCde", user.userName);
+
     //录单人联系方式  默认操作员的
     if (user.phoneNO !== null && user.phoneNO !== "") {
-      setValue("Base.cCiOprRel", user.phoneNO);
     } else {
       setFormItem("Base.cCiOprRel", {
         readonly: false,
@@ -96,17 +85,13 @@ onMounted(async () => {
     setFormItem("Base.cCanclfeersnCde", { disabled: true });
     //禁用保单来源
     // setFormItem("Base.cPolicySource", {disabled: true});
-    setValue("Base.cDptCde", param.cDptCde);
-    //联共保业务
-    setValue("Base.cCiMrk", "0");
+
     // 服务机构默认值
     setFormItem("Base.cIntroDptcde", {
       loadData: [
         { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm}` },
       ],
     });
-    setValue("Base.cIntroDptcde", param.cDptCde);
-    setValue("Base.cCiMrk", param.cCiMrk || "0");
 
     const data = JSON.parse(sessionStorage.getItem("toMyPageData"));
     //将联共保业务默认值设置为0并存到store中
@@ -115,6 +100,12 @@ onMounted(async () => {
       if (data.pageType && data.pageType === "app") {
         //新保时，续保单号隐藏
         setFormItem("Base.cOrigPlyNo", { hidden: true });
+        setFormItem("Base.cPlyNo", { hidden: false });
+      }else if(data.pageType && data.pageType === "orig") {
+        //续保时，保单号隐藏
+        setFormItem("Base.cPlyNo", { hidden: true });
+        setFormItem("Base.cOrigPlyNo", { hidden: false });
+        setValue('Base.cOrigPlyNo',param.cPlyNo)
       }
       sessionData.value = data;
     }
