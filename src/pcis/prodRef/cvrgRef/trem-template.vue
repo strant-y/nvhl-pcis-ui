@@ -7,10 +7,10 @@
             <el-row style="margin-top: 5px;">
               <el-col :span="10">
                 <a style="margin-right: 5px" @click="showData = !showData">
-                  <el-icon v-if="!showData"><ArrowUpBold /></el-icon>
+                  <el-icon v-if="!showData"><ArrowRightBold /></el-icon>
                   <el-icon v-if="showData"><ArrowDownBold /></el-icon>
                 </a>
-                <el-tag type="danger">{{
+                <el-tag :type="term.cRdrTyp === '0' ? 'danger' : 'success'">{{
                   term.cRdrTyp === "0" ? "主" : "附加"
                 }}</el-tag>
                 <template v-if="termdata['Term.cCancelMrk'] === '1'">
@@ -141,7 +141,7 @@
                   style="margin-right: 5px"
                   @click="ginfo.hidden = !ginfo.hidden"
                 >
-                  <el-icon v-if="ginfo.hidden"><ArrowUpBold /></el-icon>
+                  <el-icon v-if="ginfo.hidden"><ArrowRightBold /></el-icon>
                   <el-icon v-if="!ginfo.hidden"><ArrowDownBold /></el-icon>
                 </a>
                 <span>
