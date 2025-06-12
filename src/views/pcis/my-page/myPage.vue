@@ -1140,7 +1140,27 @@ async function loadAfter() {
         item.disabled = true;
       });
     }
-  } else if (props.param.cPlyNo === "orig") {
+  } else if (props.param.pageType === "orig") {
+    getAppPolicy({
+      cAppNo: props.param.cAppNo,
+      queryTyp: props.param.pageType,
+    }).then((res) => {
+      if (res) {
+        const ops = opertaor.convertData(res);
+        ops['plyBase']['Base.cRenewMrk'] = '1'
+        ops['insrnc']['Base.tInsrncBgnTm'] = addOneYear(ops['insrnc']['Base.tInsrncBgnTm'])
+        opertaor.setDataAll(ops);
+        // 获取原投保单号下的清单列表数据
+        const distMap = formconfig1[0].pageInfo.filter((item:any) => {
+          return item.pageKey === "dist" || item.pageKey === "distSummary";
+        });
+        distMap.forEach((item:any) => {
+          getDistData(props.param?.cAppNo, item)
+        });
+        //获取单号
+        // getCAppNoFun();
+      }
+    });
     bthList.value.push(
       createFreeButtonBase({
         label: "保存模板",
@@ -1365,6 +1385,39 @@ async function loadAfter() {
   if(props.param?.showBtn === false){
     bthList.value = [];
   }
+}
+function addOneYear(a:any) {
+  // 将字符串转换为本地时间的日期对象
+  let date = new Date(a.replace(' ', 'T'));
+
+  // 获取当前年份
+  let currentYear = date.getFullYear();
+
+  // 获取当前月份和日期
+  let currentMonth = date.getMonth();
+  let currentDay = date.getDate();
+
+  // 获取加一年后的年份
+  let nextYear = currentYear + 1;
+
+  // 设置加一年后的日期
+  date.setFullYear(nextYear);
+
+  // 检查是否跨年后的日期无效 (如闰年情况)
+  if (date.getMonth() !== currentMonth || date.getDate() !== currentDay) {
+    // 设置为下个月的最后一天，确保日期正确
+    date.setMonth(currentMonth + 1, 0); // 设置为当前月最后一天
+  }
+
+  // 手动格式化日期为 'YYYY-MM-DD HH:MM:SS'
+  let year = date.getFullYear();
+  let month = String(date.getMonth() + 1).padStart(2, '0'); // 保证2位数
+  let day = String(date.getDate()).padStart(2, '0'); // 保证2位数
+  let hours = String(date.getHours()).padStart(2, '0');
+  let minutes = String(date.getMinutes()).padStart(2, '0');
+  let seconds = String(date.getSeconds()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 // 获取清单数据并填充到列表
 const getDistData = (appNo:any, item: any) => {

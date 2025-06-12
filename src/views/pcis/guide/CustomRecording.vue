@@ -369,6 +369,18 @@ function selectedItem(value) {
 }
 
 // 下一步
+const handleArray = (obj:any)=>{
+  // 创建一个新的对象，并移除"Base."前缀
+  let newObj = {};
+  for (let key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      // 通过字符串操作去掉前缀
+      let newKey = key.replace('Base.', '');
+      newObj[newKey] = obj[key];
+    }
+  }
+  return newObj
+}
 function next() {
   // console.log(formconfig1.value);
   freeEditRef.value?.validate().then((isValid: boolean) => {
@@ -383,7 +395,7 @@ function next() {
               router.push({
                 path: "/pcis/my-page",
                 query: {
-                  param: JSON.stringify({ ...data, ...{ queryTyp: "orig" } }),
+                  param: JSON.stringify({ ...handleArray(res.res.composition.plyBase[0]), ...{ pageType: "orig" } }),
                 },
               });
             } else {
@@ -410,7 +422,7 @@ function next() {
         "toMyPageData",
         JSON.stringify({
           ...data,
-          ...{ pageType: "app" },
+          ...{ pageType: formconfig1.value.cRenewMrk == "1"? "orig" : "app" },
           // ...{ dptItem: selectTreeItem.value },
         })
       );
