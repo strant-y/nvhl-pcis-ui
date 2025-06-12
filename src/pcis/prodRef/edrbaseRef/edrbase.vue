@@ -39,6 +39,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "延长天数",
         disabled: true,
         hidden: params.cRsnCde != "M1",
+        rules: [getRules("required", {})],
       },
       {
         prop: "EdrBase.tRepStopExtBgnTm",
