@@ -6,21 +6,29 @@
           <div class="cvrg-hearder">
             <el-row style="margin-top: 5px;">
               <el-col :span="10">
-                <a style="margin-right: 5px" @click="showData = !showData">
-                  <el-icon v-if="!showData"><ArrowRightBold /></el-icon>
-                  <el-icon v-if="showData"><ArrowDownBold /></el-icon>
-                </a>
-                <el-tag :type="term.cRdrTyp === '0' ? 'danger' : 'success'">{{
-                  term.cRdrTyp === "0" ? "主" : "附加"
-                }}</el-tag>
-                <template v-if="termdata['Term.cCancelMrk'] === '1'">
-                  <el-badge value="退" class="item">
-                    <el-tag type="warning">{{ term.cNmeCn }}</el-tag>
-                  </el-badge>
-                </template>
-                <template v-else>
-                  <el-tag type="warning">{{ term.cNmeCn }}</el-tag>
-                </template>
+                <div style="display: flex; align-items: center;">
+                  <a style="margin-right: 5px" @click="showData = !showData">
+                    <el-icon v-if="!showData"><ArrowRightBold /></el-icon>
+                    <el-icon v-if="showData"><ArrowDownBold /></el-icon>
+                  </a>
+
+                  <el-tag :type="term.cRdrTyp === '0' ? 'danger' : 'success'">{{
+                    term.cRdrTyp === "0" ? "主" : "附加"
+                  }}</el-tag>
+                  <template v-if="termdata['Term.cCancelMrk'] === '1'">
+                    <el-badge value="退" class="item">
+                      <el-tag type="warning">{{ term.cNmeCn }}</el-tag>
+                    </el-badge>
+                  </template>
+                  <template v-else>
+                    <el-tag type="warning"  style="margin-right: 8px;">{{ term.cNmeCn }}</el-tag>
+                    <el-tooltip content="下载条款" placement="top">
+                      <el-icon style="cursor: pointer;"   @click.stop="downloadTerm">
+                        <Document />
+                      </el-icon>
+                    </el-tooltip>
+                  </template>
+                </div>
               </el-col>
               <el-col :span="12">
                 <el-row :gutter="20">
@@ -541,6 +549,17 @@ function getProp(col: any) {
   fact.disabled = col["cPorpDisabled"];
   fact.required = col["cPorpRequired"];
   return fact;
+}
+/*
+条款下载
+*/
+function downloadTerm() {
+  const clauseLink = termdata.value["Term.cClauseLink"];
+  if (!clauseLink) {
+    ElMessage.warning("条款链接为空，无法下载");
+    return;
+  }
+
 }
 
 onMounted(async () => {
