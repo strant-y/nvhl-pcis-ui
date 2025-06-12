@@ -181,7 +181,7 @@
           v-if="underwriteFlag"
           style="margin-bottom: 10px"
         >
-          <underwriteRef ref="underwrite"></underwriteRef>
+          <underwriteRef ref="underwrite" :pageData="pageData"></underwriteRef>
         </div>
 
         <div id="edrbase" v-if="edrbaseFlag" style="margin-bottom: 10px">
@@ -316,6 +316,10 @@ const { isCiJiMrk } = storeToRefs(productStore);
 const route = useRoute();
 const router = useRouter();
 
+
+import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
+const { saveData } = NewUdrListService();
+import {useUserStore} from "@/store";
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -408,6 +412,7 @@ const nPrm = ref("0.00");
 const tmDay = ref(0);
 const dzmodal = useDzModal();
 const cacheKey = ref();
+const pageData = ref({}); // 页面数据
 
 let controlFlag = ""; // 用来处理反洗钱 页面窜窜以及显示
 
@@ -1590,6 +1595,7 @@ const loadAppPlyInfo = (CAppNo) => {
         if (ops["base"]["Base.nAmt"] && ops["base"]["Base.nAmt"] > 0) {
           nAmt.value = ops["base"]["Base.nAmt"];
         }
+        pageData.value = ops;
       }
     });
   }
@@ -1760,6 +1766,9 @@ const submitToUndrFn = async () => {
       if (!rv) {
         return;
       }
+      // 调用再保险位接口
+      const s = await saveDataInfo()
+      if(!s) return;
       btn.loading = true;
       console.log(opertaor.getTableRefByKey("plyBase").getFromValue());
       const base = opertaor.getTableRefByKey("plyBase").getFromValue();
@@ -1795,7 +1804,7 @@ const submitToUndrFn = async () => {
             const undr: any = await submitToUndr(res);
             btn.loading = false;
             console.log("submitToUndr-res", undr);
-            if (undr["code"] == "200") {
+            if (undr["code"] == 200) {
               if(!undr['cDecision'] === '0'){
                 ElMessage.success(undr.msg);
                 // 申请核保成功后按钮设置为不可点击
@@ -2239,11 +2248,14 @@ const getSurrenderPrecisFun = () => {
 /**
  * 批改单申请核保(退保、注销)
  */
-const submitEdrToUndrSurrender = () => {
+const submitEdrToUndrSurrender = async () => {
   if (needCalc.value) {
     ElMessage.error("请先进行保费计算!");
     return;
   }
+  // 调用再保险位接口
+  const s = await saveDataInfo()
+  if(!s) return;
   const btn = getBtn("btn010103");
   btn.loading = true;
   const res = {};
@@ -2338,11 +2350,13 @@ const generateEndorse = () => {
 /**
  * 批单申请核保
  */
-const submitEdrToUndrFun = () => {
+const submitEdrToUndrFun = async () => {
   if (needCalc.value) {
     ElMessage.error("请先进行保费计算!");
     return;
   }
+  const s = await saveDataInfo()
+  if(!s) return;
   const btn = getBtn("btnSubmitEdr");
   btn.loading = true;
   const res = {};
@@ -2384,6 +2398,38 @@ const submitUnderwritingFn = () => {
   res["backUndrClsCde"] = null; // 退回指定核保级别编码
   res["backUndrDptCnm"] = null; // 退回指定核保人员名称
   console.log(res);
+  // if(res.cUndrMrk === "A") {//核保选项为同意时，调用强制临分接口
+  //   const deductibleDist = opertaor.getTableRefByKey("deductibleDist")?.getTableData();
+  //   const insured = opertaor.getTableRefByKey("insured")?.getFromValue();
+  //   const applicant = opertaor.getTableRefByKey("applicant")?.getFromValue();
+  //   const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
+  //   const insrnc = opertaor.getTableRefByKey("insrnc")?.getFromValue();
+  //   const edrbase = opertaor.getTableRefByKey("edrbase")?.getFromValue();
+  //   const param = {
+  //     cAppNo: props.param?.cAppNo,// 保批单申请单号
+  //     cDductDesc: deductibleDist[0]?["DeductibleDist.cDeductibleContent"]:"",// 免赔约定
+  //     cDocTyp: props.param?.cAppTyp,// 单证类型 A 保单 E 批单
+  //     cDptCde: props.param?.cDptCde,// 机构代码
+  //     cInsrntNme: insured['Insured.cInsuredNme'],//被保人名称
+  //     cPlyNo: props.param?.plyNo,// 保单号
+  //     cProdNme: props.param?.cTermNme,// 产品名称
+  //     cProdNo: props.param?.cProdNo,//产品代码
+  //     cStockMrk: props.param?.cGrpMrk == "0" ? insured['Insured.cStkMrk'] : applicant['Applicant.cStkMrk'],// 股东业务标志(团单1取投保人标识，个单0取被保人标识)
+  //     // nAmtChgRate: "1.00",// 保额币种汇率
+  //     nEdrPrjNo: plyBase['Base.nEdrPrjNo'],// 批改序号
+  //     // nPrmChgRate: "1.00",// 保费币种汇率
+  //     tAppTm: insrnc['Base.tAppTm'],// 投保日期
+  //     tEdrBgnTm: edrbase?['EdrBase.tEdrBgnTm']:'',// 批改生效起期
+  //     // tEdrEndTm: "2025-05-07 13:57:37",// 批改生效止期
+  //     tInsrncBgnTm: insrnc['Base.tInsrncBgnTm'],// 保险起期
+  //     tInsrncEndTm: insrnc['Base.tInsrncEndTm'],// 保险止期
+  //   }
+  //   const queryRiFacMrk = policyService.queryRiFacMrk(param)
+  //   if(queryRiFacMrk && queryRiFacMrk.responseCode === '0') {
+  //     ElMessage.error(queryRiFacMrk.message);
+  //     return
+  //   }
+  // }
   let submitUnder;
   if (props.param.cAppTyp === "A") {
     submitUnder = submitUnderwriting(res);
@@ -2492,6 +2538,28 @@ function handleUpdateSide(data: any) {
     sliceSide.value = [];
   }
 }
+/**
+ * 点击申请核保调用险位接口
+ * **/
+const saveDataInfo = async () => {
+  let saveFlag = false;
+  const param = getSaveDataParams();
+
+  const resInfo: any = await saveData({param});
+  if (resInfo["code"] === "1") {
+    saveFlag = true;
+  } else {
+    ElMessage.error(resInfo["message"]);
+  }
+
+  return saveFlag;
+};
+
+function getTotalNum(arr: any[]) {
+  return arr.reduce((acc, item) => {
+    return Number(acc) + Number(item)
+  }, 0);
+}
 
 /**
  * 锚点点击事件重写 
@@ -2518,6 +2586,8 @@ opertaor.setFatherPage({
   lowercaseKeys: lowercaseKeys,
   getcacheKey: getcacheKey,
   setTmDay: setTmDay,
+  setnDelayNum: setnDelayNum,
+  getSaveDataParams: getSaveDataParams
 });
 
 // 保存模板
@@ -2554,6 +2624,107 @@ function clearCAppNoAndCPkId(res:any) {
     }
   }
   return res;
+}
+
+// 设置延长天数
+function setnDelayNum(val:any) {
+  edrbase.value?.setValue("EdrBase.nDelayNum", val)
+}
+
+function getSaveDataParams() {
+  const res = opertaor.getDataAll();
+  const plyClauseObj = {
+    cClauseCode: props.param?.cTermNo,
+    cClauseName: props.param?.cTermNme,
+  }
+  /* 雇主责任险(取主条款项下的累积赔偿限额、每次事故赔偿限额和每人限额。若存在多个方案，累积赔偿限额、每次事故赔偿限额取累加数，每人赔偿限额取最大值) */
+  if(props.param?.cProdNo === '040002') {
+    plyClauseObj.nAmt = getTotalNum(res.cvrg?.map((item:any) => item['Term.nInsuranceAmount']));// 累积赔偿限额
+    plyClauseObj.nOnceIndemLmt = getTotalNum(res.cvrg?.map((item:any) => item['Term.nAccidentLimit']));// 每次事故赔偿限额
+    plyClauseObj.nPerIndemLmt = getTotalNum(res.cvrg?.map((item:any) => item['Term.nPersonLimit']));// 每人赔偿限额
+  }
+  /* 校方责任险(取主条款项下的累积赔偿限额、每次事故赔偿限额和每人赔偿限额。若有多个方案，累积赔偿限额、每次事故赔偿限额取累加数，每人赔偿限额取最大值) */
+  if(props.param?.cProdNo === '040005') {
+    plyClauseObj.nAmt = getTotalNum(res.cvrg?.map((item:any) => item['Term.nInsuranceAmount']));// 累积赔偿限额
+    plyClauseObj.nOnceIndemLmt = getTotalNum(res.cvrg?.map((item:any) => item['Term.nAccidentLimit']));// 每次事故赔偿限额
+    plyClauseObj.nPerIndemLmt = Math.max(...res.cvrg?.map((item:any) => item['Term.nPersonLimit']));// 每人赔偿限额
+  }
+  /* 律师责任险(取主条款项下的累积赔偿限额、每次事故赔偿限额。每位律师年度累积限额作为每人赔偿限额。若有多个方案，累积赔偿限额、每次事故赔偿限额取累加数，每人赔偿限额取最大值) */
+  if(props.param?.cProdNo === '040007') {
+    plyClauseObj.nAmt = getTotalNum(res.cvrg?.map((item:any) => item['Term.nInsuranceAmount']));// 累积赔偿限额
+    plyClauseObj.nOnceIndemLmt = getTotalNum(res.cvrg?.map((item:any) => item['Term.nAccidentLimit']));// 每次事故赔偿限额
+    plyClauseObj.nPerIndemLmt = Math.max(...res.cvrg?.map((item:any) => item['Term.nLawyerLimit']));// 每人赔偿限额
+  }
+  /* 注册会计师职业责任险(取主条款项下的累积赔偿限额、每次事故赔偿限额。每位会计师年度累积限额作为每人赔偿限额。若有多个方案，累积赔偿限额、每次事故赔偿限额取累加数，每人赔偿限额取最大值) */
+  if(props.param?.cProdNo === "041001") {
+    plyClauseObj.nAmt = getTotalNum(res.cvrg?.map((item:any) => item['Term.nInsuranceAmount']));// 累积赔偿限额
+    plyClauseObj.nOnceIndemLmt = getTotalNum(res.cvrg?.map((item:any) => item['Term.nAccidentLimit']));// 每次事故赔偿限额
+    plyClauseObj.nPerIndemLmt = Math.max(...res.cvrg?.map((item:any) => item['TermRisktgt.nAccountantLimit']));// 每人赔偿限额
+  }
+  /* 建设工程设计责任险(取主条款项下的累积赔偿限额、每次事故赔偿限额。没有每人赔偿限额，传空值。若有多个方案，每次事故累积赔偿限额、每次事故赔偿限额取累加数) */
+  if(props.param?.cProdNo === "042001") {
+    plyClauseObj.nAmt = getTotalNum(res.cvrg?.map((item:any) => item['Term.nInsuranceAmount']));// 累积赔偿限额
+    plyClauseObj.nOnceIndemLmt = getTotalNum(res.cvrg?.map((item:any) => item['Term.nAccidentLimit']));// 每次事故赔偿限额
+    plyClauseObj.nPerIndemLmt = "";
+  }
+  /* 道路客运承运人责任险(取主条款项下的累积赔偿限额、每次事故赔偿限额、每座赔偿限额作为每人赔偿限额。若有多个方案，每次事故累积赔偿限额、每次事故赔偿限额取累加数，每座赔偿限额取最大值) */
+  if(props.param?.cProdNo === "043002") {
+    plyClauseObj.nAmt = getTotalNum(res.cvrg?.map((item:any) => item['Term.nInsuranceAmount']));// 累积赔偿限额
+    plyClauseObj.nOnceIndemLmt = getTotalNum(res.cvrg?.map((item:any) => item['Term.nAccidentLimit']));// 每次事故赔偿限额
+    plyClauseObj.nPerIndemLmt = Math.max(...res.cvrg?.map((item:any) => item['Term.nSeatLimit']));// 每人赔偿限额
+  }
+  /* 道路货物运输承运人责任险(取主条款项下的累积赔偿限额、每次事故赔偿限额，没有每人赔偿限额，传空值。若有多个方案，每次事故累积赔偿限额、每次事故赔偿限额取累加数) */
+  if(props.param?.cProdNo === "043016") {
+    plyClauseObj.nAmt = getTotalNum(res.cvrg?.map((item:any) => item['Term.nInsuranceAmount']));// 累积赔偿限额
+    plyClauseObj.nOnceIndemLmt = getTotalNum(res.cvrg?.map((item:any) => item['Term.nAccidentLimit']));// 每次事故赔偿限额
+    plyClauseObj.nPerIndemLmt = "";
+  }
+  const param = [
+    {
+      "cPlyAppNo": res['applicant']['Applicant.cAppNo'],
+      "cPlyNo": res['applicant']['Base.cPlyNo'] || "",
+      "nEdrPrjNo": res['plyBase']['Base.nEdrPrjNo'],
+      "cProdNo": props.param?.cProdNo,
+      "cProdNme": props.param?.cProdNmeCn,
+      "tAppTm": props.param?.tAppTm || res['insrnc']['Base.tAppTm'],
+      "tInsrncBgnTm": props.param?.tInsrncBgnTm || res['insrnc']['Base.tInsrncBgnTm'],
+      "cStockMrk": res['insured']['Insured.cStkMrk'],
+      "cDptCde": props.param?.cDptCde,
+      "cAmtCur": res['base']['Base.cAmtCur'],
+      "nRmbChgRate": res['base']['Base.nAmtRmbExch'],
+      "nPrmCur": res['base']['Base.cPrmCur'],
+      "nRicurChgRate":res['base']['Base.nPrmRmbExch'],
+      "cCiMrk": props.param?.cCiMrk,
+      "cFacTyp": "0",// 临分类型（暂定默认传0）
+      "cResvTxt1": "0",// 是否农银代理业务（暂定默认传0）
+      "tAppCekTm": dayjs().format("YYYY-MM-DD HH:mm:ss"),
+      "cSysSource": "3",
+      "plyRiskUnitCvrgObjList": [
+        {
+          "nSeqNo": "1",
+          "nAmt": res['base']['Base.nAmt'],
+          "nPrm": res['base']['Base.nPrm'],
+          "nNotaxPrm": res.payinfo[0]['Pay.nNotaxPrm'] || null,
+          "nPrmVar":res.payinfo[0]['Pay.nPrmVar'],
+          "nAddedTax": res.payinfo[0]['Pay.nAddedTax'] || null,
+          "cTaxTyp":"VAT",
+          "cRiskLvlCde": props.param?.cProdNo,
+          "cRiskUnitNme": props.param?.cProdNmeCn,
+        }
+      ],
+      "plyClauseObj": plyClauseObj,
+    }
+  ]
+  // cAppTyp = E 批单;cEdrType 批改类型 2 注销 3 退保
+  if(props.param?.cAppTyp === "E" || props.param.cEdrType === "2" || props.param.cEdrType === "3") {
+    param[0].cPlyNo = res['plyBase']['Base.cPlyNo']
+    param[0].cEdrType = props.param?.cEdrType // 批改类型
+    // param[0].tAppTm = res['insrnc']['Base.tAppTm']
+    // param[0].tInsrncBgnTm = res['insrnc']['Base.tInsrncBgnTm']
+    param[0].plyRiskUnitCvrgObjList[0].nAmt = edrbase.value?.getValue('EdrBase.nAmt')
+    param[0].plyRiskUnitCvrgObjList[0].nPrm = edrbase.value?.getValue('EdrBase.nPrm')
+  }
+   return param;
 }
 </script>
 

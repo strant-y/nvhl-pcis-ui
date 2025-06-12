@@ -28,6 +28,7 @@ const props = defineProps({
 
 const insrncEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
+const tInsrncEndTm = ref(null);
 onMounted(() => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
@@ -35,10 +36,10 @@ onMounted(() => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
-  if(route.params.param.cRsnCde == "M1") {
-    // 如果批改原因是免费延期，保险止期可以修改
-    setFormItem("Base.tInsrncEndTm", { disabled: false });
-  }
+    if(route.params.param.cRsnCde == "M1") {
+      // 如果批改原因是免费延期，保险止期可以修改
+      setFormItem("Base.tInsrncEndTm", { disabled: false });
+    }
 });
 
 // 根据时间更改 短期费率系数 接口
@@ -76,7 +77,12 @@ const method = {
 
 
       maxDate.setDate(startDate.getDate() + 365);  // 设置为今天起365天后的日期
-      return  date.getTime() < startDate.getTime() || date.getTime() > maxDate.getTime()
+      if(route.params.param.cRsnCde && route.params.param.cRsnCde == "M1") {
+        // 如果批改原因是免费延期，当前保险止期日期之后的日期都可以选择
+        return  date.getTime() < maxDate.getTime()
+      } else {
+        return  date.getTime() < startDate.getTime() || date.getTime() > maxDate.getTime()
+      }
     }else{
         return true;
     }
@@ -105,12 +111,22 @@ const method = {
   endTmFn: (v) => {
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["insrnc"].getFromValue();
-    const tm =   moment(v).add(1, 'second').diff(moment(baseBefore["Base.tInsrncBgnTm"]), "days");
-    baseBefore["Base.cTmSysCde"] = tm;   // 列表里面的 保险
-    opertaor.getFatherPage().setTmDay(tm)
-    setFormValue(baseBefore);
+    if(route.params.param.cRsnCde != "46") {
+      // 如果批改原因是报停展期，保险止期延长报停起止期计算出的差值，保险期限维持不变
+      const tm =   moment(v).add(1, 'second').diff(moment(baseBefore["Base.tInsrncBgnTm"]), "days");
+      baseBefore["Base.cTmSysCde"] = tm;   // 列表里面的 保险
+      opertaor.getFatherPage().setTmDay(tm)
+      setFormValue(baseBefore);
+    }
     nRatioCoefFunc()
-
+    // 如果批改原因是免费延期，根据保险止期的变化计算出延长天数
+    if(route.params.param.cRsnCde == "M1" && tInsrncEndTm.value) {
+      const days =   moment(v).add(1, 'second').diff(moment(tInsrncEndTm.value), "days");
+      opertaor.getFatherPage().setnDelayNum(days)
+    }
+    if(route.params.param.cRsnCde == "M1" && !tInsrncEndTm.value) {
+      tInsrncEndTm.value = baseBefore["Base.tInsrncEndTm"]
+    }
   },
   // 索赔基础名称change事件
   suopeiFunc: (val) => {

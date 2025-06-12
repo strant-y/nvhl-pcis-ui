@@ -550,8 +550,12 @@ function handleRecordTypeChange(val:any) {
     loadOptions(2);
     labelNm.value = "方案";
     formconfig1.value.cIsPlan = '1';
-  } else {
+  } else if (val == "1") {
     loadOptions();
+    labelNm.value = "条款";
+    formconfig1.value.cIsPlan = '0';
+  } else {
+    loadOptions(3);
     labelNm.value = "条款";
     formconfig1.value.cIsPlan = '0';
   }
