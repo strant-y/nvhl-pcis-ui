@@ -75,7 +75,7 @@ const wagesInfoModel = () => {
   });
 }
 //水运规则
-const tgtWaterMatterList:Array<string> = ["Tgt.cTransportationName","Tgt.tConstructionYear","Tgt.nTransportationTotalTonnage","Tgt.cShipRegistration","Tgt.nTransportationShipAge","Tgt.cShipType","Tgt.cShipClassOne","Tgt.cShipClassTwo","Tgt.cShipClassThree","Tgt.cOldshipSurcharge"]
+const tgtWaterMatterList:Array<string> = ["Tgt.cShipName","Tgt.cTransportVoyage","Tgt.cTransportationName","Tgt.tConstructionYear","Tgt.nTransportationTotalTonnage","Tgt.cShipRegistration","Tgt.nTransportationShipAge","Tgt.cShipType","Tgt.cShipClassOne","Tgt.cShipClassTwo","Tgt.cShipClassThree","Tgt.cOldshipSurcharge"]
 //水运外其他规则
 const tgtOtherMatterList:Array<string> = ["Tgt.cLicenseNumber","Tgt.cFrameNumber","Tgt.cTransitMode"]
 //非水运隐藏
@@ -108,11 +108,36 @@ const setIsRule = ()=>{
 }
 
  const  funcdistadd=  () => {
-  
-  };
 
+  };
+function calculateCarAge(initialDateStr:any) {
+  const initialDate = new Date(initialDateStr);
+  const currentDate = new Date();
+
+  // 计算时间差（毫秒）
+  const diffTime = currentDate - initialDate;
+
+  // 获取初登年份
+  const year = initialDate.getFullYear();
+
+  // 判断是否为闰年
+  const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+  const daysInYear = isLeapYear ? 366 : 365;
+
+  // 计算车龄（年）
+  const carAge = diffTime / (1000 * 60 * 60 * 24) / daysInYear;
+
+  // 四舍五入保留一位小数
+  const roundedAge = Number(carAge.toFixed(1));
+
+  // 如果小于0.5，返回0.5，否则返回原值
+  return roundedAge < 0.5 ? 0.5 : roundedAge;
+}
 // 绑定方法
 const method = {
+  gettInitialDateChange:(val:string)=>{
+  setValue("Tgt.cVehicleAge",calculateCarAge(val))
+  },
   getcShippingMethodChange:(val:string)=>{
     if(val === 'NV591001'){
       tgtIsWaterMatterList.forEach(item =>{
