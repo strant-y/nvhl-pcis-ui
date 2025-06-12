@@ -218,20 +218,12 @@ function handleQuery() {
   const param = {...r,...s }
 
   console.log('参数', param)
-
-
-  // pageresult.list = [{
-  //     CDptCde: '小日本',
-  //     id:'250'
-  // }];
-  // pageresult.total = 1
-
   selCountryPort(param)
     .then((res) => {
-      const { code, data, msg, totalCount } = res;
+      const { code, data, msg, total } = res;
       if (200 == code) {
         pageresult.list = data;
-        pageresult.total = 20
+        pageresult.total = total
 
       } else {
         ElMessage.error(msg);
