@@ -3,7 +3,7 @@ import { post } from "@/utils/http";
 import { get } from "@/utils/http";
 import { del } from "@/utils/http";
 import { LocalBaseApi } from "../config";
-
+import request from '@/utils/request'
 /**
  * 获取要素列表
  *
@@ -1476,4 +1476,35 @@ export function selCountryPort(queryParams: any): AxiosPromise<any> {
  */
 export function addCountryPort(queryParams: any): AxiosPromise<any> {
   return post(`/countPort/addCountryPort`, queryParams);
+}
+/**
+ * 代理人查询
+ * 
+ */
+export function carSelCountryPort(queryParams: any): AxiosPromise<any> {
+  return post(`/cargoInsurance/selCountryPort`, queryParams);
+}
+/**
+ * 获取续保列表
+ *
+ * @param queryParams
+ */
+export function findRenewalInsurance(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/findRenewalInsurance`, queryParams);
+}
+/**
+ * 续保列表导出
+ *
+ * @param queryParams
+ */
+export function exportRenewalInsurance(data:any) {
+    return request.post(`/policy/exportRenewalInsurance`, data, { params: data,responseType: 'blob'});
+}
+/**
+ * 一键续保
+ *
+ * @param queryParams
+ */
+export function getPolicy(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/getPolicy`, queryParams);
 }

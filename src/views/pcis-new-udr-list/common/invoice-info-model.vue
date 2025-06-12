@@ -73,6 +73,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       cols: 2
     },
     endBtnsPosition: "right",
+    title: '发票信息',
     endBtns: [
       createFreeButtonBase({
         type: "primary",
@@ -259,10 +260,9 @@ const copyInsured = () => {
     freeEditRef.value?.setValue('CTele', '');
     freeEditRef.value?.setValue('CEmail', '');
 
-
     freeEditRef.value?.setValue('CCustomerCode', operDatas['Insured.cInsuredCde']);
     freeEditRef.value?.setValue('CCustomerType',  operDatas['Insured.cClntMrk']);
-    freeEditRef.value?.setValue('CCustomerNm',  operDatas['Insured.cAppNme']);
+    freeEditRef.value?.setValue('CCustomerNm',  operDatas['Insured.cInsuredNme']);
     freeEditRef.value?.setValue('CCertfCls',  operDatas['Insured.cCertfCls']);
     freeEditRef.value?.setValue('CCertfCde',  operDatas['Insured.cCertfCde']);
     freeEditRef.value?.setValue('CTele',  operDatas['Insured.cMobile']);
@@ -288,6 +288,7 @@ const copyApplicant = () => {
   // const applicant = dataOperator.getTabByName(APPLICANT, route);
   // const applicant = { content: null };
   let operAppDatas = opertaor.getDataAll()['applicant'];  // 投保人数据
+  console.log('投保人数据',operAppDatas)
  
   freeEditRef.value?.setValue('CInvoiceType', '');
   // if (applicant && applicant.content) {
@@ -298,9 +299,10 @@ const copyApplicant = () => {
     freeEditRef.value?.setValue('CCertfCde', '');   // 证件号码
     freeEditRef.value?.setValue('CTele', '');   // 电话
     freeEditRef.value?.setValue('CEmail', '');   // 邮箱
+// Applicant.cAppCde
 
 
-    freeEditRef.value?.setValue('CCustomerCode', operAppDatas['Applicant.cInsuredCde']);
+    freeEditRef.value?.setValue('CCustomerCode', operAppDatas['Applicant.cAppCde']);
     freeEditRef.value?.setValue('CCustomerType',  operAppDatas['Applicant.cClntMrk']);
     freeEditRef.value?.setValue('CCustomerNm',  operAppDatas['Applicant.cAppNme']);
     freeEditRef.value?.setValue('CCertfCls',  operAppDatas['Applicant.cCertfCls']);
@@ -339,10 +341,10 @@ onMounted(() => {
   //     let CAppNo = freeEditRef.value?.getValue('CAppNo') 
  
   let CAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];   // 投保单号
-   setTimeout(()=>{
+   nextTick(()=>{
     freeEditRef.value?.setValue('CAppNo', CAppNo); 
     freeEditRef.value?.setValue('CGrpMrk', cGrpMrk); 
-  },300)
+  })
  
   policyService.getTaxInfoByAppNo(CAppNo).then((response) => {
     if (response.code === 200) {

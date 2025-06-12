@@ -71,6 +71,7 @@ onMounted(async () => {
 // 绑定方法
 const method = {
   ciAdd: () => {
+    const cCiMrkFlag = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
     const val=getFromValue()
     const nCiAmt = parseFloat(productStore.nAmt)
     if(nCiAmt =="0"){
@@ -94,6 +95,9 @@ const method = {
     if (newRowId && parseFloat(remaining) > 0) {
       freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", newRowId, remaining);
     }
+    // if(cCiMrkFlag=="2" || cCiMrkFlag=="4"){
+
+    // }
     updateMasterAgreementValues()
   },
   ciDelete:()=>{
@@ -115,7 +119,6 @@ const method = {
     const rowId = rowData._dataId;
     const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue()
     if (cCiMrk["Base.cCiMrk"] == "5" && val !== "327001") {
-      // 司内联保，只能选择永安保险
       freeEditRef?.value?.setValueByRowKey("Ci.cCoinsurerCde", rowId, "");
       ElMessage.error("司内联保，不能录入除永安以外的其他公司！");
       return false;
@@ -229,11 +232,8 @@ const method = {
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData?._dataId;
     const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue()
-
     if (!rowData || !rowId) return;
-
     const cCoinsurerCde = rowData["Ci.cCoinsurerCde"];
-
     // 我方主共或从共的情况
     if (cCiMrk["Base.cCiMrk"] === '1' || cCiMrk["Base.cCiMrk"] === '3') {
       // 情况1：如果选中的是“是”且是永安保险(327001)
@@ -283,20 +283,25 @@ const method = {
       freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, maxVal);
       return;
     }
-    const nPrm =  productStore.nPrm * val
-    const nAmt = productStore.nAmt * val
-    freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm",rowDatas._dataId,nPrm.toFixed(2))
-    freeEditRef?.value?.setValueByRowKey("Ci.nCiAmt",rowDatas._dataId,nAmt.toFixed(2))
+    const cCiMrk = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
+    debugger;
+    if (cCiMrk === "2" || cCiMrk === "4") {
+      for (let i = 1; i < allRows.length; i++) {
+        const currentRow = allRows[i];
+        const previousRow = allRows[i - 1];
 
-    if (rowDatas["Ci.cCoinsurerCde"] === "327001") {
-      // 更新当前行的 Ci.nCiAmt 和 Ci.nCiPrm，并更新 ciMasterAgreement 的值
-      const ciAmt = val * productStore.nAmt;
-      const ciPrm = val * productStore.nPrm;
+        const currentPremium = parseFloat(currentRow["Ci.nCiPrm"] || 0);
+        const previousPremium = parseFloat(previousRow["Ci.nCiPrm"] || 0);
 
-      freeEditRef?.value?.setValueByRowKey("Ci.nCiAmt", rowDatas._dataId, ciAmt.toFixed(2));
-      freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm", rowDatas._dataId, ciPrm.toFixed(2));
+        const diff = Math.abs(currentPremium - previousPremium);
+
+        if (diff > 1) {
+          ElMessage.error('联共保保费之间的误差不能大于1');
+          break;
+        }
+      }
+        updateMasterAgreementValues();
     }
-    updateMasterAgreementValues();
   },
   nPlyFeeRateChange:(val)=>{
     const rowDatas = freeEditRef.value?.getSelectRow();
@@ -374,7 +379,6 @@ const updateMasterAgreementValues = () => {
   const allRows = getFromValue(); // 获取所有行数据
   let totalAmt = 0;
   let totalPrm = 0;
-
   // 遍历所有行，只处理 Ci.cCoinsurerCde === "327001" 的行
   allRows.forEach(row => {
     if (row["Ci.cCoinsurerCde"] === "327001") {
@@ -401,6 +405,8 @@ const updateMasterAgreementValues = () => {
       // 更新当前行的 Ci.nCiAmt 和 Ci.nCiPrm
       freeEditRef?.value?.setValueByRowKey("Ci.nCiAmt", row._dataId, ciAmt.toFixed(2));
       freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm", row._dataId, ciPrm.toFixed(2));
+      // freeEditRef?.value?.setValueByRowKey("Base.nCiJntAmt", row._dataId, ciAmt.toFixed(2));
+      // freeEditRef?.value?.setValueByRowKey("Base.nCiJntPrm", row._dataId, ciPrm.toFixed(2));
     }
   });
   // 设置到对应组件字段（仅使用永安保险的总和）
@@ -408,6 +414,8 @@ const updateMasterAgreementValues = () => {
     if(row['Ci.cCoinsurerCde']){
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntAmt", totalAmt.toFixed(2));
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm", totalPrm.toFixed(2));
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntAmt", totalPrm.toFixed(2));
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntPrm", totalPrm.toFixed(2));
     }
   });
 };

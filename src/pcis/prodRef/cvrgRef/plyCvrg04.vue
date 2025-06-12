@@ -8,7 +8,7 @@
               <el-row :gutter="16">
                 <el-col :span="4">
                   <a style="margin-right: 5px" @click="changeHidden(k)">
-                    <el-icon v-if="!isHidden(k)"><ArrowUpBold /></el-icon>
+                    <el-icon v-if="!isHidden(k)"><ArrowRightBold /></el-icon>
                     <el-icon v-if="isHidden(k)"><ArrowDownBold /></el-icon>
                   </a>
                   {{ k }}方案</el-col

@@ -11,19 +11,26 @@ import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
 import { useProductStore } from "@/store/modules/prod";
-import { setTimeout } from "timers/promises";
 const productStore = useProductStore();
-
 const props = defineProps({
   pageSchema: {
     type: [Object],
     required: true,
   },
 });
-
 // 监听 store 中的变化并更新本地变量
 watchEffect(() => {
-  console.log("nPrm:", productStore.cCiMrk);
+  console.log("productStore.$state.cCiMrk", productStore.$state.cCiMrk);
+    if(productStore.$state.cCiMrk == "5"){
+      formconfig1.fromSchema?.forEach((item)=>{
+        if(item["prop"] === "Base.cCiAgtNo" || item["prop"] === "Base.nCiJntAmt" ||  item["prop"] === "Base.cCiAgtNo"){
+          item.isShow = false;
+        }else {
+          item.isShow = true;
+        }
+        console.log("item",item);
+      })
+  }
 });
 
 const tgtobjEditRef = ref<AppFreeEditMethod | null>(null);
@@ -38,6 +45,16 @@ onMounted(() => {
   );
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
+    if(productStore.$state.cCiMrk == "5"){
+      formconfig1.fromSchema?.forEach((item)=>{
+        if(item["prop"] == "Base.cCiAgtNo" || item["prop"] == "Base.nCiJntAmt" ||  item["prop"] == "Base.cCiAgtNo"){
+          item.isShow = false;
+        }else {
+          item.isShow = true;
+        }
+        console.log("item",item);
+      })
+  }
   });
 });
 
@@ -46,7 +63,6 @@ const method = {
   // func demo
   func1: () => {},
 };
-
 // 绑定特殊验证器
 const exRules = {};
 
@@ -69,7 +85,28 @@ function setValue(key: string, value: any) {
 function getValue(key: string) {
   return tgtobjEditRef?.value?.getValue(key);
 }
-
+const setFormItem = (key, obj) => {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.loadData && obj.loadData) {
+          let newBtnItems = null;
+          if (obj.loadData.length != 0) {
+            for (let key in obj.loadData) {
+              item.loadData[key] = obj.loadData[key];
+            }
+          } else {
+            item.loadData = obj.loadData;
+          }
+          newBtnItems = item.loadData;
+          newBtnItems && (obj.loadData = newBtnItems);
+        }
+        Object.assign(item, obj);
+      }
+    });
+  }
+}
 function getFormconfig(){
   return formconfig1;
 }
