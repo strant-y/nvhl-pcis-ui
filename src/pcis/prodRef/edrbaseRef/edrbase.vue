@@ -215,7 +215,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "批改原因",
         typeCode: "EDR_RSN_LIST",
-        codeParam: { prodNo: params["cProdNo"] ,rsnTyp: params["cEdrType"],isGrp:params["cGrpMrk"] === "1" ? "1" : null,isPer: params["CGrpMrk"] === "1" ? "1" : null},
+        codeParam: { prodNo: params["cProdNo"] ,rsnTyp: params["cEdrType"],isGrp:params["cGrpMrk"] === "1" ? "1" : null,isPer: params["CGrpMrk"] === "1" ? "1" : null,calcMrk:params["cGrpMrk"] === "1" ? "1" : "0"},
         rules: [getRules("required", {})],
         clearable: true,
         disabled: true,
@@ -342,10 +342,12 @@ onMounted(() => {
         };
         if(params.cRsncde=='FZ'){
             param["calcMrk"] = '0'
+        }else{
+          param["calcMrk"] = '1'
         }
         codeListStore
             .queryCodeList({
-                codeListName: "EDR_RSN_LIST",
+                codeListName: "EDR_RSN_LIST_FZ",
                 codeListParam: param,
             })
             .then((res) => {
