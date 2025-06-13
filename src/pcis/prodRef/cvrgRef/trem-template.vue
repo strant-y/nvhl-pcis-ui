@@ -202,6 +202,9 @@
                                     ? riskdata.maxNum
                                     : null
                                 "
+                                :class="{
+                                    'custom-indent':riskdata.rowConfig[colinfo.cColId]?.[n - 1]?.cPorpType === 'text' &&  riskdata.rowConfig[colinfo.cColId]?.[n - 1]?.factorItem?.Indent === '1',
+                                 }"
                               >
                                 <template
                                   v-if="
@@ -548,6 +551,7 @@ function getProp(col: any) {
   });
   fact.disabled = col["cPorpDisabled"];
   fact.required = col["cPorpRequired"];
+  fact.Indent = col["cPropIndent"];  // 缩进
   return fact;
 }
 /*
@@ -924,6 +928,13 @@ table {
 }
 .show_title {
   margin-bottom: 0px;
+}
+.custom-indent {
+  padding-left: 30px; /* 空三格 */
+}
+
+.custom-left {
+  text-align: left;
 }
 table,
 th,

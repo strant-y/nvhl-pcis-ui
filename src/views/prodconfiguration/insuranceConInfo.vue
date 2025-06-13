@@ -1,4 +1,4 @@
-<!-- 用户管理 -->
+<!-- 条款配置 -->
 <template>
   <el-container>
     <el-main>

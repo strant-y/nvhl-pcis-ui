@@ -141,7 +141,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     editFlag: true,
-    editList: ["c_porp_type", "c_porp_required","c_porp_disabled"],
+    editList: ["c_porp_type", "c_porp_required","c_porp_disabled","c_prop_indent"],
     fromSchema: [
       {
         prop: "icon",
@@ -214,6 +214,18 @@ const tableconfig = reactive<AppTableConfig>(
           getFactorConf();
         },
       },
+      {
+        prop: "c_prop_indent",
+        inputtype: "rtswitch",
+        title: "是否缩进",
+        keymap: {
+          y: "1",
+          n: "0",
+        },
+        func: (v: any) => {
+          getFactorConf();
+        },
+      },
     ],
   })
 );
@@ -278,6 +290,7 @@ function getFactorConf() {
           c_porp_type: element.c_porp_type,
           c_porp_required: element.c_porp_required,
           c_porp_disabled: element.c_porp_disabled,
+          c_prop_indent:element.c_prop_indent,
         }));
       e.selectFactorList = selectData1;
     }
