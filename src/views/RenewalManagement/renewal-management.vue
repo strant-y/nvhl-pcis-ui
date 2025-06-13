@@ -44,6 +44,8 @@ const departmentTree = defineAsyncComponent(
 import { useUserStore } from "@/store/modules/user";
 import {saveAs} from "file-saver";
 import {useRouter} from "vue-router";
+import dayjs from "dayjs";
+import moment from "moment/moment";
 const router = useRouter();
 const userStore = useUserStore();
 const user = ref(userStore.user);
@@ -237,7 +239,7 @@ const tableconfig = reactive<AppTableConfig>(
         minWidth: 180,
       },
       {
-        prop: "cProdNo",
+        prop: "cClauseCode",
         inputtype: "rtinput",
         title: "条款",
         minWidth: 180,
@@ -257,6 +259,17 @@ const tableconfig = reactive<AppTableConfig>(
     ],
   })
 );
+onMounted(async () => {
+  freeEditRef.value.setValue("cDptCde", JSON.parse(sessionStorage.getItem("user")).companyId);
+  setFormItem("cDptCde", {
+    loadData: [
+      {
+        label: JSON.parse(sessionStorage.getItem("user")).companyCnm,
+        value: JSON.parse(sessionStorage.getItem("user")).companyId,
+      },
+    ],
+  });
+});
 const handleArray = (obj:any)=>{
   // 创建一个新的对象，并移除"Base."前缀
   let newObj = {};
