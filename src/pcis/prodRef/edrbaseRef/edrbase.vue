@@ -16,6 +16,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
 import { codeListViewStore } from "@/store";
 import dayjs from "dayjs";
+import { debug } from "console";
 const codeListStore = codeListViewStore();
 const opertaor = dataOpertaor();
 const { getRules } = useValidator();
@@ -215,7 +216,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "批改原因",
         typeCode: "EDR_RSN_LIST",
-        codeParam: { prodNo: params["cProdNo"] ,rsnTyp: params["cEdrType"],isGrp:params["cGrpMrk"] === "1" ? "1" : null,isPer: params["CGrpMrk"] === "1" ? "1" : null,calcMrk:params["cGrpMrk"] === "1" ? "1" : "0"},
+        codeParam: { prodNo: params["cProdNo"] ,rsnTyp: params["cEdrType"],isGrp:params["cGrpMrk"] === "1" ? "1" : null,isPer: params["CGrpMrk"] === "1" ? "1" : null,calcMrk:params["cGrpMrk"]},
         rules: [getRules("required", {})],
         clearable: true,
         disabled: true,
@@ -332,6 +333,7 @@ onMounted(() => {
     }else{
         const isGrp = params["cGrpMrk"] === "1" ? "1" : null;
         const isPer = params["CGrpMrk"] === "1" ? "1" : null;
+        debugger;
         const param = {
             prodNo: params["cProdNo"],
             rsnTyp: params["cEdrType"],
@@ -340,7 +342,7 @@ onMounted(() => {
             ZH: "ZH",
             FZ: "FZ",
         };
-        if(params.cRsncde=='FZ'){
+        if(params.cRsnCde=='FZ'){
             param["calcMrk"] = '0'
         }else{
           param["calcMrk"] = '1'
