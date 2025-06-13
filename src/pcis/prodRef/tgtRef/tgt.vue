@@ -135,6 +135,45 @@ function calculateCarAge(initialDateStr:any) {
 }
 // 绑定方法
 const method = {
+  getcMemberLogoChange:(val:string)=>{
+    if(val=== '1'){
+      setFormItem('Tgt.cBareboatLessee', {
+        rules: [getRules("required", {})],
+      });
+    }else {
+      setFormItem('Tgt.cBareboatLessee', {
+        rules: null
+      });
+    }
+  },
+  getcRentalLogoChange:(val:string)=>{
+    if(val=== '1'){
+      setFormItem('Tgt.cBareboatLessee', {
+        rules: [getRules("required", {})],
+      });
+    }else {
+      setFormItem('Tgt.cBareboatLessee', {
+        rules: null
+      });
+    }
+  },
+  getcMortgageMarkChange:(val:string)=>{
+    if(val=== '1'){
+      setFormItem('Tgt.cShipMortgagee', {
+        rules: [getRules("required", {})],
+      });
+      setFormItem('Tgt.nMortgageAmount', {
+        rules: [getRules("required", {})],
+      });
+    }else {
+      setFormItem('Tgt.cShipMortgagee', {
+        rules: null
+      });
+      setFormItem('Tgt.nMortgageAmount', {
+        rules: null
+      });
+    }
+  },
   gettInitialDateChange:(val:string)=>{
   setValue("Tgt.cVehicleAge",calculateCarAge(val))
   },
