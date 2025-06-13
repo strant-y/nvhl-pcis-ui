@@ -94,6 +94,8 @@ onMounted(() => {
     });
     //移动手机校验
     setFormItem("Applicant.cMobile", { rules: [getRules("phoneNo", {})] });
+      // 传真校验
+    setFormItem("Applicant.cFax", { rules: [getRules("faxNumber", {})] });
   });
 });
 //给表单下拉项赋值

@@ -192,16 +192,19 @@ onMounted(() => {
   let cIs= opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered']  //  是否记名投保
 
   for(let i = 0; props.data.fromSchema && i < props.data.fromSchema.length; i++){
-    console.log('Dist.cPlateNumber',props.data.fromSchema)
+
+    
+    // console.log('Dist.cPlateNumber',props.data.fromSchema)
     let item = JSON.parse(JSON.stringify(props.data.fromSchema[i]));
     if(['Dist.AllOccup'].includes(item.prop)) {
       item["func"] = getDistoccupType;
     }else if (props.data.fromSchema[i]["func"]) {
-      item["func"] = props.data.fromSchema[i]["func"];
+     
     }
     if (props.data.fromSchema[i]["tableClick"]) {
       item["tableClick"] = props.data.fromSchema[i]["tableClick"];
     }
+    
 
     if(cIs == 1 && item.prop !=='Dist.nSeqNo'){
         item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
@@ -212,6 +215,23 @@ onMounted(() => {
     if(item.cShowLocation === '1'){
       item["hidden"] = true;
     }
+
+    // 车牌号校验 vehiclePlate
+  if(item.prop =='Dist.cPlateNumber'){
+     item['rules'] = [getRules("vehiclePlate", {})];
+    }
+
+
+
+    // 车架号校验
+    // Dist.cVinCode  getRules   { rules: [getRules("faxNumber", {})] }
+    if(item.prop =='Dist.cVinCode'){
+     item['rules'] = [getRules("vinNumber", {})];
+    }
+
+  
+    console.log(item)
+
     // 遍历groupList数组把函数赋值给fromSchema
     if (props.data.fromSchema[i]["groupList"] && props.data.fromSchema[i]["groupList"].length>0) {
       props.data.fromSchema[i]["groupList"].forEach((data:any,index:number,arr:any) =>{
