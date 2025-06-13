@@ -1174,13 +1174,15 @@ async function loadAfter() {
         label: "保存模板",
         type: "primary",
         func: () => {
-          console.log(1313);
+          handleSaveTemplate()
         },
       }),
       createFreeButtonBase({
         label: "复制出单",
         type: "primary",
-        func: () => {},
+        func: () => {
+          copyPolicyFun();
+        },
       }),
       createFreeButtonBase({
         label: "保费计算",
@@ -1252,7 +1254,14 @@ async function loadAfter() {
         label: "保存模板",
         type: "primary",
         func: () => {
-          console.log(13123);
+          handleSaveTemplate()
+        },
+      }),
+      createFreeButtonBase({
+        label: "复制出单",
+        type: "primary",
+        func: () => {
+          copyPolicyFun();
         },
       }),
       createFreeButtonBase({
@@ -1322,7 +1331,14 @@ async function loadAfter() {
         label: "保存模板",
         type: "primary",
         func: () => {
-          console.log(13123);
+          handleSaveTemplate()
+        },
+      }),
+      createFreeButtonBase({
+        label: "复制出单",
+        type: "primary",
+        func: () => {
+          copyPolicyFun();
         },
       }),
       createFreeButtonBase({
@@ -2679,6 +2695,7 @@ function getSaveDataParams() {
     plyClauseObj.nOnceIndemLmt = getTotalNum(res.cvrg?.map((item:any) => item['Term.nAccidentLimit']));// 每次事故赔偿限额
     plyClauseObj.nPerIndemLmt = "";
   }
+  /* 除上述几个险种以外，其他险种plyClauseObj中不用传nAmt、nOnceIndemLmt、nPerIndemLmt这三个参数 */
   const param = [
     {
       "cPlyAppNo": res['applicant']['Applicant.cAppNo'],
