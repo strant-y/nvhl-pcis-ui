@@ -1767,8 +1767,8 @@ const submitToUndrFn = async () => {
         return;
       }
       // 调用再保险位接口
-      const s = await saveDataInfo()
-      if(!s) return;
+      // const s = await saveDataInfo()
+      // if(!s) return;
       btn.loading = true;
       console.log(opertaor.getTableRefByKey("plyBase").getFromValue());
       const base = opertaor.getTableRefByKey("plyBase").getFromValue();
@@ -2254,8 +2254,8 @@ const submitEdrToUndrSurrender = async () => {
     return;
   }
   // 调用再保险位接口
-  const s = await saveDataInfo()
-  if(!s) return;
+  // const s = await saveDataInfo()
+  // if(!s) return;
   const btn = getBtn("btn010103");
   btn.loading = true;
   const res = {};
@@ -2355,8 +2355,8 @@ const submitEdrToUndrFun = async () => {
     ElMessage.error("请先进行保费计算!");
     return;
   }
-  const s = await saveDataInfo()
-  if(!s) return;
+  // const s = await saveDataInfo()
+  // if(!s) return;
   const btn = getBtn("btnSubmitEdr");
   btn.loading = true;
   const res = {};
