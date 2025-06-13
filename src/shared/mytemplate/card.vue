@@ -4,7 +4,7 @@
       <el-card>
         <template #header>
           <el-row justify="space-between">
-            <el-col :span="4" v-if="!cardConfig.production">
+            <el-col :span="6" v-if="!cardConfig.production">
               <a
                 style="margin-left: 20px"
                 @click="showMyfrom = !showMyfrom"
@@ -15,7 +15,7 @@
               </a>
               {{ cardConfig.title }}
             </el-col>
-            <el-col :span="4" v-if="cardConfig.production">
+            <el-col :span="6" v-if="cardConfig.production">
               <a
                 style="margin-left: 20px"
                 @click="showMyfrom = !showMyfrom"
@@ -29,7 +29,7 @@
               </el-tooltip>
             </el-col>
             <el-col
-              :span="20"
+              :span="18"
               style="text-align: right"
               v-if="
                 (cardConfig.titleBtns && cardConfig.titleBtns.length > 0) ||

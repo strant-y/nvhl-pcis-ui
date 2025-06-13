@@ -156,16 +156,16 @@ const method = {
     if (val == "1") {
       //选择 是 且索赔基础名称为内索赔制 时，追溯/日落起止期必填
       // setFormItem("Base.tRunBgnTm", {
-      //   rules: [getRules("required", {})],
+      //   // rules: [getRules("required", {})],
       //   disabled: false,
       // }); //追溯/日落起期
       // setFormItem("Base.tRunEndTm", {
-      //   rules: [getRules("required", {})],
+      //   // rules: [getRules("required", {})],
       //   disabled: false,
       // }); //追溯/日落止期
     } else if (val == "0") {
-      // setFormItem("Base.tRunBgnTm", { rules: null, disabled: true }); //追溯/日落起期
-      // setFormItem("Base.tRunEndTm", { rules: null, disabled: true }); //追溯/日落止期
+      // setFormItem("Base.tRunBgnTm", {  disabled: true }); //追溯/日落起期
+      // setFormItem("Base.tRunEndTm", { disabled: true }); //追溯/日落止期
       setFormValue({
         "Base.tRunBgnTm": "",
         "Base.tRunEndTm": "",
@@ -174,8 +174,8 @@ const method = {
     } else {
       //是否有追溯期/日落期没有值时, 且索赔基础名称为内索赔制 时，追溯/日落起止期必填
       if (getValue("Base.claimName") == "0") {
-        setFormItem("Base.tRunBgnTm", { rules: [getRules("required", {})] }); //追溯/日落起期
-        setFormItem("Base.tRunEndTm", { rules: [getRules("required", {})] }); //追溯/日落止期
+        setFormItem("Base.tRunBgnTm", { rules: [getRules("required", {})],  disabled: false, }); //追溯/日落起期
+        setFormItem("Base.tRunEndTm", { rules: [getRules("required", {})],  disabled: false, }); //追溯/日落止期
       } else {
         setFormItem("Base.tRunBgnTm", { rules: null }); //追溯/日落起期
         setFormItem("Base.tRunEndTm", { rules: null }); //追溯/日落止期

@@ -1,12 +1,7 @@
 <template>
   <app-free-edit :freeEditConfig="formconfig1" ref="insuredEditRef" />
   <comDialog ref="dialog"></comDialog>
-  <input
-    type="file"
-    ref="fileInputRef"
-    style="display: none"
-    @change="handleFileChange"
-  />
+  <input type="file" ref="fileInputRef" style="display: none" @change="handleFileChange" />
 </template>
 
 <script setup lang="ts">
@@ -29,7 +24,7 @@ import { useValidator } from "@/typings/useValidator";
 import moment from "moment";
 import { codeListViewStore } from "@/store";
 import { useProductStore } from "@/store/modules/prod";
-import { getAddressStr,qryCustomer } from "@/api/query";
+import { getAddressStr, qryCustomer } from "@/api/query";
 
 import { descryptParameter, encryptParameter } from "@/utils/encipher";
 import { useRouter, useRoute } from 'vue-router';
@@ -98,6 +93,11 @@ onMounted(() => {
   });
   // 移动电话
   setFormItem("Insured.cMobile", { rules: [getRules("phoneNo", {})] });
+
+  // 传真校验
+  setFormItem("Insured.cFax", { rules: [getRules("faxNumber", {})] });
+
+
 });
 function setFormItem(key: any, obj: any) {
   if (obj && Object.keys(obj).length) {
@@ -120,26 +120,26 @@ const checkUser = () => {
 
 
   // 自定义录单 进入 可以查询用户信息
-  console.log('录单 ZT' ,param.cRecordType)
+  console.log('录单 ZT', param.cRecordType)
   if (param.cRecordType !== 1) {
-      // setTimeout(() => {
-      //   setValue("Tgt.cInsuranceMethod", '613001')
-      // }, 1000)
-      return false;
-    }
+    // setTimeout(() => {
+    //   setValue("Tgt.cInsuranceMethod", '613001')
+    // }, 1000)
+    return false;
+  }
 
   let obj = {};
   const tabref = opertaor.getTableRefs();
   const applicantValue = tabref["insured"].getFromValue();
 
-  console.log('查询----', applicantValue["Insured.cInsuredCde"],applicantValue["Insured.cInsuredNme"] ,  applicantValue["Insured.cClntMrk"],  applicantValue["Insured.cCertfCde"],applicantValue["Insured.cCertfCls"])
-console.log(applicantValue["Insured.cInsuredNme"]&&
+  console.log('查询----', applicantValue["Insured.cInsuredCde"], applicantValue["Insured.cInsuredNme"], applicantValue["Insured.cClntMrk"], applicantValue["Insured.cCertfCde"], applicantValue["Insured.cCertfCls"])
+  console.log(applicantValue["Insured.cInsuredNme"] &&
     applicantValue["Insured.cClntMrk"] !== null &&
     applicantValue["Insured.cCertfCde"] &&
     applicantValue["Insured.cCertfCls"])
   //  只要4个有值 去请求客户信息
   if (
-    applicantValue["Insured.cInsuredNme"]&&
+    applicantValue["Insured.cInsuredNme"] &&
     applicantValue["Insured.cClntMrk"] !== null &&
     applicantValue["Insured.cCertfCde"] &&
     applicantValue["Insured.cCertfCls"]
@@ -147,16 +147,16 @@ console.log(applicantValue["Insured.cInsuredNme"]&&
     const param = {
       coustName: applicantValue["Insured.cInsuredNme"],
       coustMrk: applicantValue["Insured.cClntMrk"],
-      coustType:applicantValue["Insured.cCertfCls"],
+      coustType: applicantValue["Insured.cCertfCls"],
       coustCode: applicantValue["Insured.cCertfCde"],
-      personnelType:"Insured"
+      personnelType: "Insured"
       // CClntMrk:applicantValue["Insured.cInsuredNme"],
       // CClntNme:applicantValue["Insured.cClntMrk"],
       // CCertfCde:applicantValue["Insured.cCertfCde"],
       // CCertfCls:applicantValue["Insured.cCertfCls"],
       // CurrentUser: user["companyId"],
       // CurrentUserOrg:user["opCde"]
- 
+
     }
     // if (s["CClntMrk"] == null || s["CClntNme"] == null|| s["CCertfCls"] == null|| s["CCertfCde"] == null) {
     //   ElMessage.error("客户信息都不能为空！");
@@ -174,21 +174,21 @@ console.log(applicantValue["Insured.cInsuredNme"]&&
           console.log('客户数据', res)
           // pageresult.list = data.result;
           // pageresult.total = data.total;
-          if(data){
-          tabref ['insured'].setFormValue(data[0])
+          if (data) {
+            tabref['insured'].setFormValue(data[0])
           }
-        
-          
+
+
         } else {
           // ElMessage.error(msg);
         }
       })
-      .finally(() => {});
+      .finally(() => { });
 
   }
-  
+
   //  cInsuredCde  客户代码.
-    //  cInsuredNme  客户名称
+  //  cInsuredNme  客户名称
   //  cClntMrk  被保人性质
 
   //  cCertfCde    身份号码
@@ -197,8 +197,8 @@ console.log(applicantValue["Insured.cInsuredNme"]&&
 
 // 绑定方法
 const method = {
-  func: () => {},
-  func1: () => {},
+  func: () => { },
+  func1: () => { },
   funCheckUser: () => {
     checkUser(); // 根据名称  被保人性质 证件类型 证件号码查询用户信息
   },
@@ -599,7 +599,7 @@ const method = {
         },
       },
       {
-        isOk: (selectdata: any) => {},
+        isOk: (selectdata: any) => { },
       },
       { title: "职业", width: 85 }
     );
@@ -657,6 +657,7 @@ const method = {
 
   //证件类型change
   InsuredCCertfCls: (val: any) => {
+    console.log(val)
     checkUser();
     const param = opertaor.getParam();
 
@@ -700,13 +701,24 @@ const method = {
           disabled: true,
         });
       }
-    } else if (val == "110002" || val == "110007") {
+    } else if (val == "110002") {
       setFormItem("Insured.tCertfBgnDate", {
         rules: [getRules("required", {})],
       });
       setFormItem("Insured.tCertfEndDate", {
         rules: [getRules("required", {})],
       });
+    } else if (val == "110007") {
+      setFormItem("Insured.tCertfBgnDate", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.tCertfEndDate", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.cCertfCde", {
+        rules: [getRules("socialCode", {})],
+      });
+
     } else {
       setFormItem("Insured.cCertfCde", {
         rules: [getRules("required", {})],

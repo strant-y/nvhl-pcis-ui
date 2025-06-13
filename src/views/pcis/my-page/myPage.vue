@@ -1686,6 +1686,9 @@ const calcPremium = () => {
       nPrm.value = ops["base"]["Base.nPrm"] ? ops["base"]["Base.nPrm"] : 0;
       const nPrmVal = ops["base"]["Base.nPrm"];
       const nAmtVal = ops["base"]["Base.nAmt"];
+
+
+// 
       productStore.setnPrm(nPrmVal);
       productStore.setnAmt(nAmtVal);
       opertaor
@@ -1706,12 +1709,29 @@ const calcPremium = () => {
       opertaor
         .getTableRefByKey("ourCompanyCiShare")
         .setValue("Base.nCiOwnPrm", nPrm.value);
+        
+        //承保 总保费
+        opertaor.getTableRefs()["base"].setValue("Base.nPrm", nPrm.value);
+        console.log('到————————')
+
+        //     opertaor
+        // .getTableRefByKey("ourCompanyCiShare")
+        // .setValue("Base.groupPrmCur", 122);
+        //     opertaor
+        // .getTableRefByKey("ourCompanyCiShare")
+        // .setValue("Base.nPrm", 123);
+
       const payInfo = setPayInfo(ops["base"], ops["applicant"], ops["insrnc"]);
+
       console.log("生成缴费计划内容", payInfo);
       opertaor.getTableRefs()["payinfo"].setFormValue(payInfo);
       const ciInfo = setCiInfo(ops["base"]);
       opertaor.getTableRefs()["ci"].setFormValue(ciInfo); //生产联共保信息
       needCalc.value = false;
+
+//  opertaor.getTableRefs()["base"].setValue("Base.groupPrmCur", 122);
+
+
     } else {
       ElMessage.error(res.msg);
     }
@@ -1730,14 +1750,15 @@ const setPayInfo = (base: any, applicant: any, insrnc: any) => {
     pay["Pay.cPayorCde"] = "";
     pay["Pay.cPayorNme"] = "";
   }
-  pay["Pay.nPayablePrm"] = base["Base.nPrm"];
+  pay["Pay.nPayablePrm"] = base["Base.nPrm"] ? base["Base.nPrm"] : 0;
+
   pay["Pay.tPayBgnTm"] = moment(insrnc["Base.tAppTm"]).format(
     "YYYY-MM-DD HH:mm:ss"
   );
   pay["Pay.tPayEndTm"] = moment(insrnc["Base.tInsrncBgnTm"]).format(
     "YYYY-MM-DD HH:mm:ss"
   );
-  pay["Pay.nOwnPrm"] = base["Base.nPrm"];
+  pay["Pay.nOwnPrm"] = base["Base.nPrm"] ? base["Base.nPrm"] : 0;
   pay["Pay.cProdNo"] = base["Base.cProdNo"];
   pay["Pay.nPrmVar"] = !!base["Base.nPrm"] ? base["Base.nPrm"] : 0;
   payList.push(pay);
@@ -1749,7 +1770,7 @@ const setCiInfo = (base: any) => {
   ci["Ci.nSeqNo"] = 1;
   ci["Ci.nCiShare"] = '1'
   ci["Ci.nCiAmt"] = base["Base.nAmt"];
-  ci["Ci.nCiPrm"] = base["Base.nPrm"];
+  ci["Ci.nCiPrm"] = base["Base.nPrm"]  ? base["Base.nPrm"] : 0;
   ci["Ci.cChiefMrk"] = "1"
   ci["Ci.cIssueMrk"] = "1"
   ci["Ci.nPlyFee"]="0.00"
