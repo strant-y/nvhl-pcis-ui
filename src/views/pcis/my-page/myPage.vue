@@ -1156,10 +1156,20 @@ async function loadAfter() {
       if (res) {
         const ops = opertaor.convertData(res);
         ops['plyBase']['Base.cRenewMrk'] = '1'
-        ops['insrnc']['Base.tInsrncBgnTm'] = addOneYear(ops['insrnc']['Base.tInsrncBgnTm'])
         ops['insrnc']['Base.tAppTm'] = moment(new Date(Date.now())).format(
-            "YYYY-MM-DD 00:00:00"
+            "YYYY-MM-DD HH:mm:ss"
         )
+        // ops['insrnc']['Base.tInsrncBgnTm'] = addOneYear(ops['insrnc']['Base.tInsrncBgnTm'])
+        ops['insrnc']['Base.tInsrncBgnTm'] = dayjs(ops['insrnc']['Base.tInsrncBgnTm'])
+            .add(1, "year")
+            .format("YYYY-MM-DD HH:mm:ss");
+        ops['insrnc']['Base.tInsrncEndTm'] = dayjs(ops['insrnc']['Base.tInsrncBgnTm'])
+            .add(1, "year")
+            .format("YYYY-MM-DD HH:mm:ss");
+        ops['insrnc']['Base.cTmSysCde']= moment(ops['insrnc']['Base.tInsrncEndTm']).diff(
+            moment(ops['insrnc']['Base.tInsrncBgnTm']),
+            "days"
+        );
         opertaor.setDataAll(ops);
         // 获取原投保单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {

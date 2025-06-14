@@ -283,6 +283,7 @@ onMounted(async () => {
       moment(new Date()).format("YYYY-MM-DD 23:59:59"),
     ],
     cDptCde: "0200000000000",
+    cLoadSub:1
   });
   setFormItem("cDptCde", {
     loadData: [
