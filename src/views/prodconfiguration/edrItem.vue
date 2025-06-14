@@ -137,7 +137,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         rules: [getRules("required", {})],
         title: "批改原因",
-        typeCode: "EDR_RSN_LIST_KIND",
+        typeCode: "EDR_RSN_LIST_KIND_PG",
         codeParam: {
           kindNo: "999",
         },
