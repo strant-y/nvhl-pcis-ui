@@ -279,6 +279,7 @@ const formconfig1 = ref({
   cDptCnm: "",
   cRenewMrk: "0",
   cGrpMrk: "0",
+  dptCde:  "",
   // cNmeCn: "",
   cTermNme: "",
   cTermNo: "",
