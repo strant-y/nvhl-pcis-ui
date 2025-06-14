@@ -23,9 +23,7 @@
                   <template v-else>
                     <el-tag type="warning"  style="margin-right: 8px;">{{ term.cNmeCn }}</el-tag>
                     <el-tooltip content="下载条款" placement="top">
-                      <el-icon style="cursor: pointer;"   @click.stop="downloadTerm">
-                        <Document />
-                      </el-icon>
+                      <rt-icon :item="{ icon: 'term' }" />
                     </el-tooltip>
                   </template>
                 </div>
