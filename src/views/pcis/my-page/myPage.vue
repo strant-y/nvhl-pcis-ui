@@ -1599,6 +1599,33 @@ const loadAppPlyInfo = (CAppNo) => {
                 props.param["cRsnCde"],
               ];
             }
+            // 初始化时，将cPkId赋值给cRowId
+            Object.keys(ops).forEach((key) => {
+              if(key !== 'base' && key !== 'plyBase'){
+                const v = ops[key];
+                const ls = [];
+                if(v && v instanceof Array){
+                  for (const i in v) {
+                    let nd = {};
+                    const d = v[i];
+                    Object.keys(d).forEach((ks)=>{
+                      if(ks && ks.endsWith("cPkId")){
+                        const newks = ks;
+                        const rowKs = ks.split(".")[0] + "." + "cRowId";
+                        nd[rowKs] = d[ks];
+                        nd[ks] = null;
+                      }else if(ks && ks.endsWith("cRowId")){
+                        // RowId上面已经操作了，下面不再进行操作
+                      }else{
+                        nd[ks] = d[ks];
+                      }
+                    })
+                    ls.push(nd);
+                  }
+                  ops[key] = ls;
+                }
+              }
+            })
           }
           edrbase.value?.setFormValue(EdrBaseData);
         }

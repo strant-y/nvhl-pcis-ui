@@ -399,14 +399,7 @@ function creatItem(d: any) {
         sc[k][k2] = schamaconf.value[k][k2];
       }
     });
-    // if (schamaconf.value[k]["func"]) {
-    //   sc[k]["func"] = schamaconf.value[k]["func"];
-    // }
-    // if (schamaconf.value[k]["tableClick"]) {
-    //   sc[k]["tableClick"] = schamaconf.value[k]["tableClick"];
-    // }
   });
-  console.log(sc);
   return sc;
 }
 function handleSelectionChange(selectedRows: any[]) {

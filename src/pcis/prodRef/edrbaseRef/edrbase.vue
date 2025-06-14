@@ -333,7 +333,6 @@ onMounted(() => {
     }else{
         const isGrp = params["cGrpMrk"] === "1" ? "1" : null;
         const isPer = params["CGrpMrk"] === "1" ? "1" : null;
-        debugger;
         const param = {
             prodNo: params["cProdNo"],
             rsnTyp: params["cEdrType"],
