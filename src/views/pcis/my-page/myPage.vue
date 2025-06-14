@@ -2384,10 +2384,10 @@ const saveEdrPlyInfo = () => {
       ElMessage.success(res.msg);
       opertaor.setDataAll(ops);
       const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
-      res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
-        res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"].split(
-          ","
-        );
+      // res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
+      //   res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"].split(
+      //     ","
+      //   );    //影响二次批改报错,先注释掉待调整
       edrbase.value?.setFormValue(EdrBaseData);
     } else {
       ElMessage.error(res.msg);
