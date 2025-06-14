@@ -239,3 +239,11 @@ export function qryCustomer(queryParams: any) {
 export function calculatePremium(queryParams: any): AxiosPromise<any> {
     return post(`/inquiry/calculatePremium`, queryParams);
 }
+
+/**
+ * 复制出单-查询原保单数据
+ * @param queryParams
+ */
+export function getAppPolicyForCopy(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/getAppPolicyForCopy`, queryParams);
+}

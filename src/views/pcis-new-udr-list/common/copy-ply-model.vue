@@ -86,12 +86,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
     fromSchema: [
       {
-        prop: "CAntiLnderRisk",
+        prop: "queryType",
         inputtype: "rtradio",
         title: "单据",
         loadData: [
-          { label: "投保单", value: '1' },
-          { label: "保单", value: '0' },
+          { label: "投保单", value: '3' },
+          { label: "保单", value: '2' },
         ],
         // defaultValue: 1,
         keymap: {
@@ -263,7 +263,6 @@ const selected = ref([]);
 const displayData = ref("");
 const selectedGrpMrk = ref("");
 const selectedCiMrk = ref("");
-const CAntiLnderRisk = ref("");
 
 const handleQuery = (flag = true) => {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
@@ -305,11 +304,11 @@ const handleQuery = (flag = true) => {
     pageNum: 1,
     ...r,
     ...formData,
-    queryType: props.data.queryType,
+    queryType: "3",
     tAppTmStart: formData.tm ? formData.tm[0] : "",
     tAppTmEnd: formData.tm ? formData.tm[1] : "",
   }
-  if(formData.CAntiLnderRisk === '0') {
+  if(formData.queryType === '2') {
     // 保单
     param.cPlyNo = formData.cAppNo; // 保单号
     delete param.cAppNo;
@@ -426,7 +425,7 @@ const getCDptCdeOptions = (data: any) => {
 
 onMounted(() => {
   nextTick(() => {
-    freeEditRef.value?.setValue("CAntiLnderRisk", '1');// 默认选中投保单
+    freeEditRef.value?.setValue("queryType", '3');// 默认选中投保单
     freeEditRef.value?.setValue("dptCde", props.data.dptCde || null);
     freeEditRef.value?.setValue("cKindNo", props.data.cProdNo ? props.data.cProdNo.slice(0, 2) : null)
     freeEditRef.value?.setValue("tm", [dayjs().format("YYYY-MM-DD HH:mm:ss"), dayjs().format("YYYY-MM-DD HH:mm:ss")]);
@@ -456,7 +455,7 @@ const confirm = () => {
     //关闭模态框并传递数据
     emits("ok", {
       cAppNo: displayData.value,
-      cAntiLnderRisk: CAntiLnderRisk.value,
+      queryType: freeEditRef.value?.getValue("queryType"),
       dptCde: freeEditRef.value?.getValue("dptCde"),
       cDptCde: freeEditRef.value?.getValue("cDptCde"),
       cProdNo: freeEditRef.value?.getValue("cProdNo"),

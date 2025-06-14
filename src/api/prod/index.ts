@@ -1464,7 +1464,7 @@ export function getReleaseInquiryPage(queryParams: any): AxiosPromise<any> {
 
 /**
  * 地点查询--查询
- * 
+ *
  */
 export function selCountryPort(queryParams: any): AxiosPromise<any> {
   return post(`/countPort/selCountryPort`, queryParams);
@@ -1472,14 +1472,14 @@ export function selCountryPort(queryParams: any): AxiosPromise<any> {
 
 /**
  * 地点查询--新增
- * 
+ *
  */
 export function addCountryPort(queryParams: any): AxiosPromise<any> {
   return post(`/countPort/addCountryPort`, queryParams);
 }
 /**
  * 代理人查询
- * 
+ *
  */
 export function carSelCountryPort(queryParams: any): AxiosPromise<any> {
   return post(`/cargoInsurance/selCountryPort`, queryParams);
@@ -1498,7 +1498,7 @@ export function findRenewalInsurance(queryParams: any): AxiosPromise<any> {
  * @param queryParams
  */
 export function exportRenewalInsurance(data:any) {
-    return request.post(`/policy/exportRenewalInsurance`, data, { params: data,responseType: 'blob'});
+  return request.post(`/policy/exportRenewalInsurance`, data, { responseType: 'blob'});
 }
 /**
  * 一键续保
