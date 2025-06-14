@@ -18,7 +18,7 @@ const param = route.params.param;
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 import { useProductStore } from "@/store/modules/prod";
-import { fa } from "element-plus/es/locale";
+import { fa, pa } from "element-plus/es/locale";
 import CostInformation from "@/views/pcis-new-udr-list/pages/CostInformation.vue";
 const productStore = useProductStore();
 
@@ -41,7 +41,9 @@ onMounted(async () => {
   );
   Object.assign(formconfig1, formconfig11);
   setTimeout(() => {
-    addCi()
+    if(param.pageType == "app"){
+      addCi()
+    }
   }, 800);
   
   //一般批改，部分要素可编辑
@@ -58,19 +60,6 @@ onMounted(async () => {
     });
   }
   }, 800);
-  
-  nextTick(() => {
-    // freeEditRef?.value.forEach(row => {
-    //   if (row["Ci.cCoinsurerCde"] !== "327001") {
-    //     freeEditRef.value?.setRowFieldProp(
-    //       row._dataId,
-    //       "Ci.cSubDptCde",
-    //       "loadData",
-    //       [{ value: '1', label: '其他' }]
-    //     );
-    //   }
-    // });
-  });
 });
 
 // 绑定方法
@@ -419,8 +408,8 @@ const addCi = () => {
         key['Ci.cChiefMrk'] = '1'
         key['Ci.cIssueMrk'] = '1'
         key['Ci.cCoinsurerCde'] = '327001'
-        ci["Ci.cSubDptCde"] = param.dptCde
-        ci['Ci.cDptCde'] = param.cDptCde
+        // ci["Ci.cSubDptCde"] = param.dptCde
+        // ci['Ci.cDptCde'] = param.cDptCde
     });
     codeListStore
         .queryCodeList({
