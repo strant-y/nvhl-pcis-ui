@@ -168,7 +168,7 @@
                       ><StarFilled
                     /></el-icon>
                   </p>
-                  <p class="txt" v-if="formconfig1.cRecordType == 1">{{ item.termNo }} - {{ item.termCnm }}</p>
+                  <p class="txt" v-if="formconfig1.cRecordType == 1 || formconfig1.cRecordType == 3">{{ item.termNo }} - {{ item.termCnm }}</p>
                   <p class="txt" v-else>{{ item.planNo }} - {{ item.planCnm }}</p>
                 </el-card>
               </VueDraggable>
