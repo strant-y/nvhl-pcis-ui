@@ -13,6 +13,14 @@
       </el-col>
       <el-col :span="16"> </el-col>
     </el-row>
+
+    <el-row>
+      <el-col :span="21"> </el-col>
+      <el-col :span="3">
+        <el-button @click="saveTitleFactor()" type="primary">保存</el-button>
+      </el-col>
+    </el-row>
+
     <el-row :gutter="10">
       <el-col :span="3">
         <table class="col_table">
@@ -37,12 +45,6 @@
           ref="tableRef"
           @indexupdate="getFactorConf()"
         />
-      </el-col>
-    </el-row>
-    <el-row>
-      <el-col :span="21"> </el-col>
-      <el-col :span="3">
-        <el-button @click="saveTitleFactor()" type="primary">保存</el-button>
       </el-col>
     </el-row>
   </div>
@@ -140,8 +142,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
+    // 启用固定表头功能
+    fixedHeader:true,
     editFlag: true,
-    editList: ["c_porp_type", "c_porp_required","c_porp_disabled","c_prop_indent"],
+    editList: ["c_porp_type", "c_porp_required","c_porp_disabled","c_prop_indent","c_parent_key"],
     fromSchema: [
       {
         prop: "icon",
@@ -175,6 +179,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtselect",
         title: "要素类型",
         loadData: inputtype,
+        width: 55,
       },
       {
         prop: "c_porp_type",
@@ -225,6 +230,11 @@ const tableconfig = reactive<AppTableConfig>(
         func: (v: any) => {
           getFactorConf();
         },
+      },
+      {
+        prop: "c_parent_key",
+        inputtype: "rtinput",
+        title: "父级key",
       },
     ],
   })

@@ -4,6 +4,7 @@ export interface AppTableConfig {
 
   id?: string; // 表单主键
   title?: string | null | undefined; // 功能标题
+  fixedHeader?: boolean; // 是否固定表头
   fixed?: boolean;  // 是否固定编辑列
   production?: boolean; //标题是否显示tooltip
   productionTitle?: string; //标题内容
@@ -64,6 +65,7 @@ export function createTableEditConfig(
     showBtn: config.showBtn || true,
     shadow: config.shadow || true,
     fixed: config.fixed || false,
+    fixedHeader: config.fixedHeader || false,
     production: config.production || false,
     productionTitle: config.productionTitle || "",
     fromSchema: config.fromSchema || [],
