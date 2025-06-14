@@ -559,7 +559,7 @@ const historyClaimcaseFun = () => {
 };
 //  复制保单
 const copyPolicyFun = () => {
-  dzmodal.open(copyPlyModel, { type: "", data: {queryType: "1",...props.param,...opertaor.getDataAll()} }).then((res: any) => {
+  dzmodal.open(copyPlyModel, { type: "", data: {...props.param,...opertaor.getDataAll()} }).then((res: any) => {
     if (res.type === "ok") {
       const param = {
         // ...props.param,
