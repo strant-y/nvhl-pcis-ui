@@ -260,6 +260,7 @@ function select(item: any) {
       se.c_porp_type = element.c_porp_type;
       se.c_porp_required = element.c_porp_required;
       se.c_porp_disabled = element.c_porp_disabled;
+      se.c_prop_indent = element.c_prop_indent;
       newSelectl.push(se);
     }
   });
@@ -272,6 +273,7 @@ function select(item: any) {
       element.c_porp_type = null;
       element.c_porp_required = "0";
       element.c_porp_disabled = '0';
+      element.c_prop_indent = '0';
       newSelectl.push(element);
     }
   });
