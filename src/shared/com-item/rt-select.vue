@@ -85,7 +85,7 @@
       >
     </template>
     <template v-else>
-      {{ getLabel() }}
+      {{ getLabel }}
     </template>
   </span>
 </template>
