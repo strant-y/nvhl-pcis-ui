@@ -299,6 +299,7 @@ import {
   getSurrenderPrecis,
   submitEdrSurrender,
   calculatePremium,
+  getAppPolicyForCopy,
 } from "../../../api/query/index";
 import { checkFeeWindowType, selectDist, saveDistBatch, getReleaseInquiryPage } from "@/api/prod";
 import { dataOpertaor, useProductStore } from "@/store";
@@ -558,10 +559,10 @@ const historyClaimcaseFun = () => {
 };
 //  复制保单
 const copyPolicyFun = () => {
-  dzmodal.open(copyPlyModel, { type: "", data: {queryType: "1",...props.param,...opertaor.getDataAll()} }).then((res: any) => {
+  dzmodal.open(copyPlyModel, { type: "", data: {...props.param,...opertaor.getDataAll()} }).then((res: any) => {
     if (res.type === "ok") {
       const param = {
-        ...props.param,
+        // ...props.param,
         ...res.body
       }
       router.push({
@@ -1244,9 +1245,8 @@ async function loadAfter() {
       })
     );
   } else if (props.param.pageType === "copy") {
-    getAppPolicy({
+    getAppPolicyForCopy({
       cAppNo: props.param.cAppNo,
-      queryTyp: props.param.pageType,
     }).then((res) => {
       if (res) {
         const ops = opertaor.convertData(res);
@@ -1259,7 +1259,7 @@ async function loadAfter() {
           getDistData(props.param?.cAppNo, item)
         });
         //获取单号
-        getCAppNoFun();
+        // getCAppNoFun();
       }
     });
     bthList.value.push(
