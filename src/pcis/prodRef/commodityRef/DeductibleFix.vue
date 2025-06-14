@@ -7,7 +7,7 @@
           ref="multipleTableRef"
           :data="pageresult.list"
           style="width: 100%"
-          row-key="cDeductibleCode"
+          row-key="cDeductibleClass"
           :row-class-name="tableRowClassName"
           @selection-change="handleSelectionChange"
         >
@@ -83,7 +83,7 @@ const selectable = (row) => row["cIfMust"] != "1"; //这里调用是把必选的
 const tableRowClassName = ({ row, rowIndex }) => {
   let sty = "";
   selected.value.forEach((item) => {
-    if (item["cDeductibleCode"] == row["cDeductibleCode"]) {
+    if (item["cDeductibleClass"] == row["cDeductibleClass"]) {
       sty = "checkedSty";
     }
   });
@@ -105,7 +105,7 @@ const refreshData = () => {
       pageresult.list = [];
       res.data.result.forEach((item, index) => {
         pageresult.list.push({
-          cDeductibleCode: item.cDeductibleCode,
+          cDeductibleClass: item.cDeductibleCode,
           cDeductibleContent: item.cDeductibleContent,
           cStatus: item.cStatus, //是否必选
           cIfMust: item.cIfMust, //是否必选
@@ -136,7 +136,7 @@ const toggleSpecificRow = () => {
 function add() {
   addTableData.push({
     addIndex: addTableData.length + 1, //序号
-    cDeductibleCode: "", 
+    cDeductibleClass: "", 
     cDeductibleContent: "",
     cStatus: "",
     cIfEdit: "1", // 是否可修改
@@ -163,9 +163,9 @@ const close = () => {
 function setSelected() {
   const lastSelected = props.data.selectedData;
   if (lastSelected && lastSelected.length) {
-    const sarr = lastSelected.map( (f: any) => f["cDeductibleCode"]);
+    const sarr = lastSelected.map( (f: any) => f["cDeductibleClass"]);
     pageresult.list.forEach(f => { 
-      if(sarr.includes(f["cDeductibleCode"])){
+      if(sarr.includes(f["cDeductibleClass"])){
         multipleTableRef.value!.toggleRowSelection(f, true, true);
       }
     })
