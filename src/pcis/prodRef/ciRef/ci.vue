@@ -183,6 +183,7 @@ const method = {
           codeListParam: { "CDptCde": val },
         })
         .then((res) => {
+          freeEditRef?.value?.setValueByRowKey("Ci.cDptCde", rowId, "");
           freeEditRef.value?.setRowFieldProp(
             rowId,
             "Ci.cDptCde",
@@ -408,7 +409,7 @@ const addCi = () => {
         key['Ci.cChiefMrk'] = '1'
         key['Ci.cIssueMrk'] = '1'
         key['Ci.cCoinsurerCde'] = '327001'
-        // ci["Ci.cSubDptCde"] = param.dptCde
+        ci["Ci.cSubDptCde"] = param.dptCde
         // ci['Ci.cDptCde'] = param.cDptCde
     });
     codeListStore
