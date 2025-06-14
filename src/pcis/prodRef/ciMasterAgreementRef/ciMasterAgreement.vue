@@ -18,19 +18,39 @@ const props = defineProps({
     required: true,
   },
 });
-// 监听 store 中的变化并更新本地变量
+// 监听 cCiMrk 的变化并更新本地变量
 watchEffect(() => {
-  console.log("productStore.$state.cCiMrk", productStore.$state.cCiMrk);
-    if(productStore.$state.cCiMrk == "5"){
-      formconfig1.fromSchema?.forEach((item)=>{
-        if(item["prop"] === "Base.cCiAgtNo" || item["prop"] === "Base.nCiJntAmt" ||  item["prop"] === "Base.cCiAgtNo"){
-          item.isShow = false;
-        }else {
-          item.isShow = true;
+  const cCiMrkValue = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
+    // formconfig1.value?.fromSchema?.forEach((item) => {
+    //   item.hidden = false;
+    // });
+    if (cCiMrkValue === "3" || cCiMrkValue === "4") {
+      formconfig1.fromSchema?.forEach((item) => {
+        const prop = item.prop;
+        if (
+          prop === "Base.cCiAgtNo" ||
+          prop === "Base.nCiJntAmt" ||
+          prop === "Base.nCiJntPrm"
+        ) {
+          item.hidden = false; // 显示共保字段
+        } else {
+          item.hidden = true; // 隐藏其他字段
         }
-        console.log("item",item);
-      })
-  }
+      });
+      } else if (cCiMrkValue === "5") {
+        formconfig1.fromSchema?.forEach((item) => {
+          const prop = item.prop;
+          if (
+            prop === "Base.cJiAgtNo" ||
+            prop === "Base.nJiJntAmt" ||
+            prop === "Base.nJiJntPrm"
+          ) {
+            item.hidden = false; // 显示联保字段
+          } else {
+            item.hidden = true; // 隐藏其他字段
+          }
+        });
+      } 
 });
 
 const tgtobjEditRef = ref<AppFreeEditMethod | null>(null);
@@ -44,18 +64,7 @@ onMounted(() => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
-  nextTick(() => {
-    if(productStore.$state.cCiMrk == "5"){
-      formconfig1.fromSchema?.forEach((item)=>{
-        if(item["prop"] == "Base.cCiAgtNo" || item["prop"] == "Base.nCiJntAmt" ||  item["prop"] == "Base.cCiAgtNo"){
-          item.isShow = false;
-        }else {
-          item.isShow = true;
-        }
-        console.log("item",item);
-      })
-  }
-  });
+  
 });
 
 // 绑定方法

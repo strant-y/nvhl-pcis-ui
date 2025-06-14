@@ -1752,8 +1752,8 @@ const calcPremium = () => {
 
       console.log("生成缴费计划内容", payInfo);
       opertaor.getTableRefs()["payinfo"].setFormValue(payInfo);
-      const ciInfo = setCiInfo(ops["base"]);
-      opertaor.getTableRefs()["ci"].setFormValue(ciInfo); //生产联共保信息
+      // const ciInfo = setCiInfo(ops["base"]);
+      // opertaor.getTableRefs()["ci"].setFormValue(ciInfo); //生产联共保信息
       needCalc.value = false;
 
 //  opertaor.getTableRefs()["base"].setValue("Base.groupPrmCur", 122);
