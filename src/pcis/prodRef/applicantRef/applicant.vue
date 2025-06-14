@@ -604,7 +604,7 @@ const method = {
             setFormItem("Applicant.cOccupCde", {
               loadData: [{ label: data.cnm, value: data.cde }],
             });
-            setValue("Applicant.cOccupCde", data.cde + data.cnm);
+            setValue("Applicant.cOccupCde", data.cde);
             dialog.value?.handleClose();
           },
         },
