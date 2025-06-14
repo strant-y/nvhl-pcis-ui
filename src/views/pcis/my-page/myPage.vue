@@ -1157,6 +1157,9 @@ async function loadAfter() {
         const ops = opertaor.convertData(res);
         ops['plyBase']['Base.cRenewMrk'] = '1'
         ops['insrnc']['Base.tInsrncBgnTm'] = addOneYear(ops['insrnc']['Base.tInsrncBgnTm'])
+        ops['insrnc']['Base.tAppTm'] = moment(new Date(Date.now())).format(
+            "YYYY-MM-DD 00:00:00"
+        )
         opertaor.setDataAll(ops);
         // 获取原投保单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
@@ -1166,7 +1169,7 @@ async function loadAfter() {
           getDistData(props.param?.cAppNo, item)
         });
         //获取单号
-        // getCAppNoFun();
+        getCAppNoFun();
       }
     });
     bthList.value.push(

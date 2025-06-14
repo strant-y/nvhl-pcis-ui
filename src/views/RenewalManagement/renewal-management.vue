@@ -44,6 +44,8 @@ const departmentTree = defineAsyncComponent(
 import { useUserStore } from "@/store/modules/user";
 import {saveAs} from "file-saver";
 import {useRouter} from "vue-router";
+import dayjs from "dayjs";
+import moment from "moment/moment";
 const router = useRouter();
 const userStore = useUserStore();
 const user = ref(userStore.user);
@@ -79,9 +81,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "机构部门",
         btnWidth: 10,
         itemWidth: 2,
-        // rules: [getRules("required", {
-        //   trigger: 'change'
-        // })],
+        rules: [getRules("required", {
+          trigger: 'change'
+        })],
         showExBtn: true,
         btnItems: {
           icon: "Search",
@@ -116,24 +118,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
       },
       {
-        prop: "tm",
-        inputtype: "tEdrAppTm",
-        title: "保险起止期",
-        itemWidth: 2,
-        clearable: true,
-        type: "datetimerange",
-        format: "YYYY-MM-DD HH:mm:ss",
-        valueFormat: "YYYY-MM-DD HH:mm:ss",
-      },
-      {
-        prop: "cProdNo",
-        inputtype: "rtselect",
-        title: "条款",
-        typeCode: "TERM_LIST_IN_GUIDE_NEW",
-        clearable: true,
-        params: {'cParCde': '', 'cOperId': user.value['opCde'], 'cDptCde': user.value['companyId']},
-      },
-      {
         prop: "cKindNo",
         inputtype: "rtselect",
         title: "产品大类",
@@ -153,6 +137,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
       },
       {
+        prop: "cProdNo",
+        inputtype: "rtselect",
+        title: "条款",
+        typeCode: "TERM_LIST_IN_GUIDE_NEW",
+        clearable: true,
+        params: {'cParCde': '', 'cOperId': user.value['opCde'], 'cDptCde': user.value['companyId']},
+      },
+      {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
@@ -170,6 +162,18 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "保单号",
         clearable: true,
       },
+      {
+        prop: "tAppTm",
+        inputtype: "rtdatepicker",
+        title: "保险起止期",
+        type: "datetimerange",
+        format: "YYYY-MM-DD HH:mm:ss",
+        valueFormat: "YYYY-MM-DD HH:mm:ss",
+        rules: [getRules("required", {})],
+        func: (val) => {
+          handleDateChange(val);
+        },
+      },
     ],
   })
 );
@@ -181,7 +185,14 @@ const pageresult = reactive<Pageresult>({
   /** 总数 */
   total: 0,
 });
-
+const handleDateChange = (value) => {
+  let startDate,
+      endDate = "";
+  startDate = moment(new Date(value[0])).format("YYYY-MM-DD 00:00:00");
+  endDate = moment(new Date(value[1]))
+      .endOf("day")
+      .format("YYYY-MM-DD HH:mm:ss");
+};
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     editFlag: true,
@@ -237,7 +248,7 @@ const tableconfig = reactive<AppTableConfig>(
         minWidth: 180,
       },
       {
-        prop: "cProdNo",
+        prop: "cClauseCode",
         inputtype: "rtinput",
         title: "条款",
         minWidth: 180,
@@ -249,14 +260,39 @@ const tableconfig = reactive<AppTableConfig>(
         minWidth: 180,
       },
       {
+        prop: "tInsrncBgnTm",
+        inputtype: "rtinput",
+        title: "保险起期",
+        minWidth: 180,
+      },
+      {
         prop: "tInsrncEndTm",
         inputtype: "rtinput",
-        title: "保险起止日期",
+        title: "保险止期",
         minWidth: 180,
       },
     ],
   })
 );
+onMounted(async () => {
+  freeEditRef.value?.setFormValue({
+    tAppTm: [
+      moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
+          "YYYY-MM-DD 00:00:00"
+      ),
+      moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+    ],
+    cDptCde: "0200000000000",
+  });
+  setFormItem("cDptCde", {
+    loadData: [
+      {
+        label: JSON.parse(sessionStorage.getItem("user")).companyCnm,
+        value: JSON.parse(sessionStorage.getItem("user")).companyId,
+      },
+    ],
+  });
+});
 const handleArray = (obj:any)=>{
   // 创建一个新的对象，并移除"Base."前缀
   let newObj = {};
@@ -299,13 +335,17 @@ const getRenewal = (row:any)=>{
 //导出
 const exportExcel = () => {
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
- exportRenewalInsurance(s).then((res) => {
+  const param = Object.assign(s, {tInsrncBgnTm:s.tAppTm[0],tInsrncEndTm:s.tAppTm[1]});
+  if ( (Date.parse(param.tInsrncEndTm) - Date.parse(param.tInsrncBgnTm)) >= (180 * 1000 * 60 * 60 * 24)) {
+    ElMessage.warning("保险起止日期范围请控制在半年以内");
+    return;
+  }
+ exportRenewalInsurance(param).then((res) => {
     if (res.size <= 0) {
       ElMessage.error({ message: "导出出错", duration: 3000 });
       return;
     }
-   const fileName = "queryList.xls";
-    // const fileName = decodeURIComponent(res.headers['content-disposition'].split('filename=')[1]);
+   const fileName = decodeURIComponent(res.headers['content-disposition'].split('filename=')[1]);
     const blob = new Blob([res.data], {
       responseType:res.headers["content-type"]
       // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
@@ -340,6 +380,13 @@ function refreshData(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r);
+  param.tInsrncBgnTm = param.tAppTm[0]
+  param.tInsrncEndTm = param.tAppTm[1]
+  if ( (Date.parse(param.tInsrncEndTm) - Date.parse(param.tInsrncBgnTm)) >= (180 * 1000 * 60 * 60 * 24)) {
+    ElMessage.warning("保险起止日期范围请控制在距离当前时间半年以内");
+    return;
+  }
+  console.log('param)))))))))))))))))))',param)
   findRenewalInsurance(param)
     .then((res) => {
       const { code, data, msg } = res;
