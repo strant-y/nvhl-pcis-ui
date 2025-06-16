@@ -190,12 +190,10 @@ function setFormValue(data: any, noupdate = false) {
     let dy: Record<string, any> = {};
     let sp: Record<string, any> = {};
     Object.keys(data).forEach((k) => {
-      if (dynamicForm.value?.checkKey(k)) {
+      if (superDynamicForm.value?.checkKey(k)) {
+        sp[k] = data[k];
+      }else{
         dy[k] = data[k];
-      } else {
-        if (superDynamicForm.value?.checkKey(k)) {
-          sp[k] = data[k];
-        }
       }
     });
     dynamicForm.value?.setFormValue(dy, noupdate);
@@ -218,11 +216,10 @@ function resetFields() {
 }
 
 function getValue(key: any) {
-  if (dynamicForm.value?.checkKey(key)) {
-    return dynamicForm.value?.getValue(key);
-  }
   if (superDynamicForm.value?.checkKey(key)) {
     return superDynamicForm.value?.getValue(key);
+  }else{
+    return dynamicForm.value?.getValue(key);
   }
 }
 function setValue(key: any, value: any) {
