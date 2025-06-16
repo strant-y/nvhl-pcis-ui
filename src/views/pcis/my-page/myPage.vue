@@ -1504,6 +1504,7 @@ const saveDist = (appNo:any) => {
               'Dist.tOpeningTime': item['Dist.tOpeningTime'] ? dayjs(item['Dist.tOpeningTime']).format('YYYY-MM-DD') : null,
               'Dist.tCrtTm': item['Dist.tCrtTm'] ? dayjs(item['Dist.tCrtTm']).format('YYYY-MM-DD') : null,
               'Dist.tUpdTm': item['Dist.tUpdTm'] ? dayjs(item['Dist.tUpdTm']).format('YYYY-MM-DD') : null,
+              'Dist.tValidityPeriod': item['Dist.tValidityPeriod'] ? dayjs(item['Dist.tUpdTm']).format('YYYY-MM-DD HH:mm:ss') : null
             };
           }),
         }
@@ -2763,7 +2764,7 @@ function getSaveDataParams() {
       "cPlyNo": res['applicant']['Base.cPlyNo'] || "",
       "nEdrPrjNo": res['plyBase']['Base.nEdrPrjNo'],
       "cProdNo": props.param?.cProdNo,
-      "cProdNme": props.param?.cProdNmeCn,
+      "cProdNme": props.param?.cProdNmeCn || props.param?.cProdNme,
       "tAppTm": props.param?.tAppTm || res['insrnc']['Base.tAppTm'],
       "tInsrncBgnTm": props.param?.tInsrncBgnTm || res['insrnc']['Base.tInsrncBgnTm'],
       "cStockMrk": res['insured']['Insured.cStkMrk'],
@@ -2772,7 +2773,7 @@ function getSaveDataParams() {
       "nRmbChgRate": res['base']['Base.nAmtRmbExch'],
       "nPrmCur": res['base']['Base.cPrmCur'],
       "nRicurChgRate":res['base']['Base.nPrmRmbExch'],
-      "cCiMrk": props.param?.cCiMrk,
+      "cCiMrk": props.param?.cCiMrk || res['plyBase']['Base.cCiMrk'],
       "cFacTyp": "0",// 临分类型（暂定默认传0）
       "cResvTxt1": "0",// 是否农银代理业务（暂定默认传0）
       "tAppCekTm": dayjs().format("YYYY-MM-DD HH:mm:ss"),
@@ -2787,7 +2788,7 @@ function getSaveDataParams() {
           "nAddedTax": res.payinfo[0]['Pay.nAddedTax'] || null,
           "cTaxTyp":"VAT",
           "cRiskLvlCde": props.param?.cProdNo,
-          "cRiskUnitNme": props.param?.cProdNmeCn,
+          "cRiskUnitNme": props.param?.cProdNmeCn || props.param?.cProdNme,
         }
       ],
       "plyClauseObj": plyClauseObj,
