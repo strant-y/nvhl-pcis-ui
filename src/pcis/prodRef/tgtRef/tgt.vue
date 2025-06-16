@@ -1,6 +1,7 @@
 <!-- 标的信息 -->
 <template>
   <app-free-edit :freeEditConfig="formconfig1" ref="tgtEditRef" />
+  <comDialog ref="dialog"></comDialog>
 </template>
 
 <script setup lang="ts">
@@ -30,6 +31,7 @@ import moment from "moment";
 
 import { descryptParameter, encryptParameter } from "@/utils/encipher";
 import { useRouter, useRoute } from 'vue-router';
+import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
 const route = useRoute();
 const query = ref(route.query);
 const router = useRouter();
@@ -40,6 +42,7 @@ const dzmodal = useDzModal();
 const { getRules } = useValidator();
 const opertaor = dataOpertaor();
 const productStore = useProductStore()
+const dialog = ref<DialogMethod | null>(null);
 
 const props = defineProps({
   pageSchema: {
@@ -135,6 +138,19 @@ function calculateCarAge(initialDateStr:any) {
 }
 // 绑定方法
 const method = {
+  funccDetailsAccident:()=>{
+    dialog.value?.open('detailsAccident', {
+          selectedData: getValue("Tgt.cFinanceCde"), //需要把自定义的过滤掉，只传过去从模板中选择的
+        },
+        {
+          getSelected(selectdata: any) {
+            setValue("Tgt.cFinanceCde",selectdata.map(item => item.value).join(','))
+            setValue("Tgt.cDetailsAccident",selectdata.map((item, index) => `${index + 1}. ${item.label}`).join(','))
+            console.log('selectdata.map(item => item.value).join',selectdata.map(item => item.value).join(','))
+            console.log('selectdataAAAAAAAAA',getValue("Tgt.cDetailsAccident"),getValue("Tgt.cFinanceCde"))
+          },
+        });
+  },
   getcMemberLogoChange:(val:string)=>{
     if(val=== '1'){
       setFormItem('Tgt.cBareboatLessee', {
