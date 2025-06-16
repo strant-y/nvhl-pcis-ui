@@ -428,7 +428,7 @@ onMounted(() => {
     freeEditRef.value?.setValue("queryType", '3');// 默认选中投保单
     freeEditRef.value?.setValue("dptCde", props.data.dptCde || null);
     freeEditRef.value?.setValue("cKindNo", props.data.cProdNo ? props.data.cProdNo.slice(0, 2) : null)
-    freeEditRef.value?.setValue("tm", [dayjs().format("YYYY-MM-DD HH:mm:ss"), dayjs().format("YYYY-MM-DD HH:mm:ss")]);
+    freeEditRef.value?.setValue("tm", [dayjs().format("YYYY-MM-DD 00:00:00"), dayjs().format("YYYY-MM-DD 23:59:59")]);
     nextTick(() => {
       freeEditRef.value?.setValue("cDptCde", props.data.cDptCde || null);
       freeEditRef.value?.setValue("cProdNo", props.data.cProdNo || null);
