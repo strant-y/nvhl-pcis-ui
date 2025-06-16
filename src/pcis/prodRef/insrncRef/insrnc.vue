@@ -36,10 +36,6 @@ onMounted(() => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
-    if(route.params.param.cRsnCde == "M1") {
-      // 如果批改原因是免费延期，保险止期可以修改
-      setFormItem("Base.tInsrncEndTm", { disabled: false });
-    }
 });
 
 // 根据时间更改 短期费率系数 接口
@@ -77,7 +73,7 @@ const method = {
 
 
       maxDate.setDate(startDate.getDate() + 365);  // 设置为今天起365天后的日期
-      if(route.params.param.cRsnCde && route.params.param.cRsnCde == "M1") {
+      if(route.params.param.cRsnCde && route.params.param.cRsnCde == "FZ") {
         // 如果批改原因是免费延期，当前保险止期日期之后的日期都可以选择
         return  date.getTime() < maxDate.getTime()
       } else {
@@ -120,11 +116,11 @@ const method = {
     }
     nRatioCoefFunc()
     // 如果批改原因是免费延期，根据保险止期的变化计算出延长天数
-    if(route.params.param.cRsnCde == "M1" && tInsrncEndTm.value) {
+    if(route.params.param.cRsnCde == "FZ" && tInsrncEndTm.value) {
       const days =   moment(v).add(1, 'second').diff(moment(tInsrncEndTm.value), "days");
       opertaor.getFatherPage().setnDelayNum(days)
     }
-    if(route.params.param.cRsnCde == "M1" && !tInsrncEndTm.value) {
+    if(route.params.param.cRsnCde == "FZ" && !tInsrncEndTm.value) {
       tInsrncEndTm.value = baseBefore["Base.tInsrncEndTm"]
     }
   },
