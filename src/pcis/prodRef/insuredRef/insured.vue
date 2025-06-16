@@ -380,7 +380,7 @@ const method = {
           disabled: true,
         });
         setFormItem("Insured.cIsIndvduBiz", {
-          disabled: true,
+          disabled: false,
         });
         setFormItem("Insured.cGreenIndustryCustomers", {
           disabled: true,

@@ -112,7 +112,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         //         const objDate = {
         //           loadData: res,
         //         };
-        //         setFormItem("cMidCde", objDate);
+        //         setFormItem("cMidCde", objDate); 
         //       });
         //   }
         // },
@@ -147,7 +147,9 @@ const tableconfig = reactive<AppTableConfig>(
         link: true,
         type: "danger",
         icon: "Check",
-        tableClick: async (row) => {},
+         tableClick: async (row) => {
+          props.data.method?.getdbClickData(row);
+        },
       }),
     ],
 

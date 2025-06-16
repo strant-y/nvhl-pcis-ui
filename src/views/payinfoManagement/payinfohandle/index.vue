@@ -66,6 +66,7 @@ const cCheckStsList = [
 ];
 const cPayTypList = ref([])
 const payConfirmInfoChange = defineAsyncComponent(() => import("./pay-confirm-info-change.vue"));
+const payConfirmInfoChanges = defineAsyncComponent(() => import("./pay-confirm-info-changes.vue"));
 const payConfirmInfoRegister = defineAsyncComponent(() => import("./pay-confirm-info-register.vue"));
 const payConfirmInfoDetailRead = defineAsyncComponent(() => import("./pay-confirm-info-detail-read.vue"));
 const tableRef = ref<AppTableMethod | null>(null);
@@ -467,6 +468,12 @@ const tableconfig = reactive<AppTableConfig>(
 					type: "primary",
 					label: "缴费类型转换",
 					func: async () => {
+                                // dzmodal.open(payConfirmInfoChanges, { type: "check" , data:{
+                                //     }}).then((res) => {
+                                //     if (res.type === "ok") {
+                                //         handleQuery();
+                                //     }
+                                // });
 						  if (multipleSelection.value.length < 1 ) {
 							ElMessage.warning('所选记录为空！');
 							return ;
@@ -534,6 +541,9 @@ const tableconfig = reactive<AppTableConfig>(
                             //     return;
                             // }
                         });
+
+                   
+
                         if (isOpen) {
                             ElMessage.warning(message);
                             return;
@@ -564,7 +574,9 @@ const tableconfig = reactive<AppTableConfig>(
                             ElMessage.warning('所选记录为空！');
                             return ;
                         }
+                        let CAppNos = '';
                         let CUniqueNos = ''; // 所选项的流水号组合
+
                         let isOpen =  false;
                         let message = '';
                         multipleSelection.value.forEach(item => {
@@ -578,17 +590,47 @@ const tableconfig = reactive<AppTableConfig>(
                                 message='该单处理状态为待审核状态！ 【申请单号='+item['cAppNo']+'】'
 								return;
 						  	}
+                            
+                            CAppNos = CAppNos === '' ? item['cAppNo'] : CAppNos + ',' + item['cAppNo'];
                             CUniqueNos = CUniqueNos === '' ? item['cUniqueNo'] : CUniqueNos + ',' + item['cUniqueNo'];
                         });
+                        
+                        // if (CCombinationFlag.size > 1) {
+                        //  ElMessage.warning('组合产品不能和其他产品单据同时缴费');
+                        //                 return;
+                        // }
+
+
+
                         if (isOpen) {
                             ElMessage.warning(message);
                             return;
                         }
-						dzmodal.open(payConfirmInfoRegister, { type: "edit",data:{CUniqueNos: CUniqueNos} }).then((res) => {
-							if (res.type === "ok") {
-								console.log("审核")
-							}
-						});
+
+                        // CAppNos
+                          if (CAppNos.indexOf(',') === -1) {
+                            	dzmodal.open(payConfirmInfoRegister, { type: "edit",data:{   CAppNo: CAppNos,CUniqueNos: CUniqueNos} }).then((res) => {
+                                    if (res.type === "ok") {
+                                        console.log("审核")
+                                    }
+                                });
+
+                          }else{
+                                dzmodal.open(payConfirmInfoRegister, { type: "edit",
+                                data:{   CAppNo: CAppNos,
+                                    CUniqueNos: CUniqueNos,
+                                    CAppNum:  multipleSelection.value.length
+                                } }).then((res) => {
+                                    if (res.type === "ok") {
+                                        console.log("审核")
+                                    }
+                                });
+                          }
+                        // console.log('ssssss',CAppNos)
+                        // console.log('ssssss',CUniqueNos)
+        
+
+					
 					},
 				}),
 				createFreeButtonBase({
@@ -891,15 +933,34 @@ function gotoChangeSts() {
   const param = { 
     CUniqueNo: CUniqueNos
   };
-  dzmodal.open(payConfirmInfoChange, { type: "check" , data:{
-            CUniqueNos: CUniqueNos,
-            CAppNos: CAppNos,
-            CRelAppNos: CRelAppNos
-        }}).then((res) => {
-        if (res.type === "ok") {
-            handleQuery();
-        }
-    });
+
+
+  console.log('zzz',multipleSelection.value )
+
+  if(multipleSelection.value.length>1){
+        dzmodal.open(payConfirmInfoChanges, { type: "check" , data:{
+                CUniqueNos: CUniqueNos,
+                CAppNos: CAppNos,
+                CRelAppNos: CRelAppNos
+            }}).then((res) => {
+            if (res.type === "ok") {
+                handleQuery();
+            }
+        });
+   
+  }else{
+
+
+    dzmodal.open(payConfirmInfoChange, { type: "check" , data:{
+                CUniqueNos: CUniqueNos,
+                CAppNos: CAppNos,
+                CRelAppNos: CRelAppNos
+            }}).then((res) => {
+            if (res.type === "ok") {
+                handleQuery();
+            }
+        });
+    }
   // pcisQueryService.befChangeSts(param)
   //   .then((res) => {
   //     // const { code, data, msg } = res;
