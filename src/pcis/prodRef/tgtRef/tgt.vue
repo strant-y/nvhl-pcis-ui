@@ -145,11 +145,9 @@ const method = {
         {
           getSelected(selectdata: any) {
             setValue("Tgt.cFinanceCde",selectdata.map(item => item.value).join(','))
-            setValue("Tgt.cDetailsAccident",selectdata.map((item, index) => `${index + 1}. ${item.label}`).join(','))
-            console.log('selectdata.map(item => item.value).join',selectdata.map(item => item.value).join(','))
-            console.log('selectdataAAAAAAAAA',getValue("Tgt.cDetailsAccident"),getValue("Tgt.cFinanceCde"))
+            setValue("Tgt.cDetailsAccident",selectdata.map((item, index) => `${index + 1}. ${item.label}`).join('\n'))
           },
-        });
+        },{width: 45});
   },
   getcMemberLogoChange:(val:string)=>{
     if(val=== '1'){
