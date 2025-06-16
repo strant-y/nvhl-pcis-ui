@@ -226,11 +226,10 @@ function getValue(key: any) {
   }
 }
 function setValue(key: any, value: any) {
-  if (dynamicForm.value?.checkKey(key)) {
-    dynamicForm.value?.setValue(key, value);
-  }
   if (superDynamicForm.value?.checkKey(key)) {
     superDynamicForm.value?.setValue(key, value);
+  }else {
+    dynamicForm.value?.setValue(key, value);
   }
 }
 function setDisabledAll() {
