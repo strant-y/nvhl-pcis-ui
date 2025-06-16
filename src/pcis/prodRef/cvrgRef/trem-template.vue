@@ -36,7 +36,7 @@
                         :label="item.title"
                         class="show_title"
                         :prop="item.prop"
-                        :rules="item.required ? getRequired() : undefined"
+                        :rules="isrequired(item) ? getRequired() : undefined"
                       >
                         <from-item
                           v-model="termdata[item.prop]"
@@ -87,7 +87,7 @@
                     </td>
                     <td>
                       <el-form-item
-                        :rules="item.required ? getRequired() : undefined"
+                        :rules="isrequired(item) ? getRequired() : undefined"
                         :prop="item.prop"
                       >
                         <from-item
@@ -118,7 +118,7 @@
                   <template v-for="(item, k) in termFactormap" :key="k">
                     <td v-if="item.cPorpShowtitle !== '1'">
                       <el-form-item
-                        :rules="item.required ? getRequired() : undefined"
+                        :rules="isrequired(item) ? getRequired() : undefined"
                         :prop="item.prop"
                       >
                         <from-item
@@ -278,7 +278,7 @@
                               <td :rowspan="groupconf[ginfo.cGroupId].sumMax">
                                 <el-form-item
                                   :rules="
-                                    v.required ? getRequired() : undefined
+                                    isrequired(v) ? getRequired() : undefined
                                   "
                                   :prop="v.prop"
                                 >
@@ -652,6 +652,10 @@ function dataInit() {
 }
 
 function initshowConfig() {
+  termFactormap.value.forEach((item) => { 
+    item.required = isrequired(item);
+    item.disabled = isdisabled(item);
+  });
   let grouplist: { [k: string]: any } = {};
   if (groupInfo.value) {
     exChangeFunc();
@@ -853,7 +857,17 @@ function setDisabledAll() {
 }
 
 function isrequired(i: any) {
-  if (i.required === "1" || i.required === 1 || i.required === true) {
+  if (i.required === "1" || i.required === 1 || i.required === true ||
+    i.cPropRequired === "1" || i.cPropRequired === 1 || i.cPropRequired === true 
+  ) {
+    return true;
+  }
+  return false;
+}
+function isdisabled(i: any) {
+  if (i.disabled === "1" || i.disabled === 1 || i.disabled === true ||
+    i.disabled === "1" || i.disabled === 1 || i.disabled === true 
+  ) {
     return true;
   }
   return false;
