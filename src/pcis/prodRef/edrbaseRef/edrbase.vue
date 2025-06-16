@@ -39,8 +39,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         title: "延长天数",
         disabled: true,
-        hidden: params.cRsnCde != "M1",
-        rules: [getRules("required", {})],
+        hidden: params.cRsnCde != "FZ",
       },
       {
         prop: "EdrBase.tRepStopExtBgnTm",
