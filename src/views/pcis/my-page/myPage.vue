@@ -1887,6 +1887,8 @@ const submitToUndrFn = async () => {
                 ElMessage.success(undr.msg);
                 // 申请核保成功后按钮设置为不可点击
                 const btn = getBtn("btn010103");
+              }else if(undr["cDecision"] == '0'){
+                ElMessage.error(undr.msg);
               }else{
                 ElMessage.error(undr.msg);
               }
