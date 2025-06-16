@@ -76,6 +76,7 @@ const fetchImageUploadModeByPlyNo = async () => {
   if (response.code === 200) {
     originalImageUploadMode.value = response.data;
     formData.CImageUploadMode = response.data;
+    freeEditRef.value?.setValue('CImageUploadMode',response.data)
   } else {
     ElMessage.error('查询保单的影像上传方式失败！');
   }
@@ -87,15 +88,14 @@ const confirm = () => {
       ElMessage.warning('请选择影像上传方式');
       return;
     }
-
-    if (formData.CImageUploadMode === originalImageUploadMode.value) {
+    if (freeEditRef.value?.getValue('CImageUploadMode') === originalImageUploadMode.value) {
       ElMessage.warning('影像上传方式没有变化, 请重新选择!');
       return;
     }
 
     const param = {
       CPlyNo: formData.CPlyNo,
-      CImageUploadMode: formData.CImageUploadMode,
+      CImageUploadMode: freeEditRef.value?.getValue('CImageUploadMode'),
       CUpdCde: formData.CUpdCde,
     };
     const response = await policyService.updateImageUploadModeByPlyNo(param);

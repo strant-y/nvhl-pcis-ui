@@ -193,18 +193,18 @@ onMounted(() => {
 
   for(let i = 0; props.data.fromSchema && i < props.data.fromSchema.length; i++){
 
-    
+
     // console.log('Dist.cPlateNumber',props.data.fromSchema)
     let item = JSON.parse(JSON.stringify(props.data.fromSchema[i]));
     if(['Dist.AllOccup'].includes(item.prop)) {
       item["func"] = getDistoccupType;
     }else if (props.data.fromSchema[i]["func"]) {
-     
+
     }
     if (props.data.fromSchema[i]["tableClick"]) {
       item["tableClick"] = props.data.fromSchema[i]["tableClick"];
     }
-    
+
 
     if(cIs == 1 && item.prop !=='Dist.nSeqNo'){
         item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
@@ -215,7 +215,9 @@ onMounted(() => {
     if(item.cShowLocation === '1'){
       item["hidden"] = true;
     }
-
+    if(item.prop ==='Dist.nSalesRevenue'){
+      item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' },getRules("positiveNumber", {})];
+    }
     // 车牌号校验 vehiclePlate
   if(item.prop =='Dist.cPlateNumber'){
      item['rules'] = [getRules("vehiclePlate", {})];
@@ -229,7 +231,7 @@ onMounted(() => {
      item['rules'] = [getRules("vinNumber", {})];
     }
 
-  
+
     console.log(item)
 
     // 遍历groupList数组把函数赋值给fromSchema
