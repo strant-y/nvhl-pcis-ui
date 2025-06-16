@@ -1,5 +1,6 @@
 <template>
   <app-grid-edit :gridEditConfig="formconfig1" ref="freeEditRef" />
+  <comDialog ref="dialogRef"></comDialog>
 </template>
 
 <script setup lang="ts">
@@ -21,6 +22,7 @@ import { useProductStore } from "@/store/modules/prod";
 import { fa, pa } from "element-plus/es/locale";
 import CostInformation from "@/views/pcis-new-udr-list/pages/CostInformation.vue";
 const productStore = useProductStore();
+const dialogRef = ref<DialogMethod | null>(null);
 
 const props = defineProps({
   pageSchema: {
@@ -29,6 +31,7 @@ const props = defineProps({
   },
 });
 
+const sessionData = ref(null);
 const rowData = ref(null)
 const freeEditRef = ref<AppGridEditMethod | null>(null);
 const formconfig1 = reactive(createAppGridEditConfig({}));
@@ -177,7 +180,8 @@ const method = {
     //       [getRules("required", {})] // 使用 getRules 设置必填规则
     //     );
     // }
-    codeListStore
+    if(val !=""){
+      codeListStore
         .queryCodeList({
           codeListName: "CDptCde_List",
           codeListParam: { "CDptCde": val },
@@ -191,6 +195,7 @@ const method = {
             res,
           );
         });
+    }
   },
   //出单机构下拉事件
   cDptCdeChange:(val)=>{
@@ -378,10 +383,121 @@ const method = {
   },
   //代理/经纪人
   cBrkrCdeChange:()=>{
-    console.log("cBrkrCdeChange")
+    // if (getValue("Base.cBsnsTyp") && getValue("Base.cBsnsTyp") !== "19001") {
+      dialogRef.value?.open(
+        "agentPre",
+        {
+          type: "show",
+          data: {
+            CDptCde: sessionData.value?.cDptCde, //机构
+            CProdNo: sessionData.value?.cProdNo, //产品
+            // cBsnsTyp: getValue("Base.cBsnsTyp"), //业务来源大类
+            // cChaType: getValue("Base.cChaType"), //业务来源中类
+            // cChaSubtype: getValue("Base.cChaSubtype"), //业务来源子类
+          },
+          method: {
+            getSelected: (params) => {
+              setFormItem("Base.cBrkrCde", {
+                loadData: [{ value: params.CChaCde, label: params.CChaNme }],
+              });
+              // setValue("Base.cBrkrCde", params.CChaCde);
+              // setValue("Base.cAgtAgrNo", params.CAgtAgrNo);
+              dialogRef.value?.handleClose();
+            },
+          },
+        },
+        {
+          isOk: (selectdata: any) => {
+            console.log("a", selectdata);
+          },
+        },
+        { title: "代理查询", width: 85 }
+      );
+    // } else {
+    //   ElMessage.warning("渠道分类--请选择非直销业务!");
+    // }
   },
   //业务员
   cSlsCdeChange:()=>{
+    dialogRef.value?.open(
+      "agentWorker",
+      {
+        type: "show",
+        data: {
+          CDptCde: sessionData.value?.cDptCde,
+          // cBsnsTyp: getValue("Base.cBsnsTyp"),
+          // cChaType: getValue("Base.cChaType"),
+          // cChaSubtype: getValue("Base.cChaSubtype"),
+          // CSlsId: getValue("Base.CSlsId"), //业务员员工号
+          // CBrkrCde: getValue("Base.CBrkrCde"), //代理(经纪)人
+          // CDptAttr: getValue("Base.CDptAttr"), //投保单业务归属部门的部门类型(angular上被hidden的,逻辑赋值angular：guide.component.ts【324行】)
+          // CSlsTyp: cslstyp,
+          leading: "CSlsId",
+        },
+        method: {
+          getSelected: (params) => {
+            setFormValue({
+              "Base.cSlsId": params.CSlsCde, //业务员员工号
+              "Base.cSlsNme": params.CSlsNme, //业务员名称
+              "Base.cSlsCde": params.CCtfctNo, //业务员执业证号
+              "Base.cSlsTel": params.CMobile, //业务员电话
+              "Base.cSlsDptcde": params.CDptCde, //业务员机构代码
+              "Base.cIntroDptcde": "", //清空服务机构值
+            });
+            const ops = {
+              code: "orgDpt",
+              val: params["CDptCde"],
+            };
+            getNmeByCde(ops).then((res) => {
+              if (res && res.code == 200) {
+                const codeValData = res.data;
+                if (codeValData) {
+                  setFormItem("Base.cIntroDptcde", {
+                    loadData: [
+                      {
+                        value: params["CDptCde"],
+                        label: codeValData["data"],
+                      },
+                    ],
+                  });
+                  setValue("Base.cIntroDptcde", params.CDptCde);
+                }
+              }
+            });
+            codeListStore
+              .queryCodeList(
+                {
+                  codeListName: "CSaleCde_List",
+                  codeListParam: {
+                    CSlsCde: params["CSlsCde"],
+                  },
+                },
+                false,
+                false
+              )
+              .then((res) => {
+                if (res && res.code == 200) {
+                  const codeValData = res.data;
+                  if (codeValData) {
+                    setFormItem("Base.cIntroSalecde", {
+                      loadData: codeValData,
+                    });
+                    // 当选择了业务员时，服务机构业务员默认为业务员
+                    // setValue("Base.cIntroSalecde", params.CSlsCde);
+                  }
+                }
+              });
+            dialogRef.value?.handleClose();
+          },
+        },
+      },
+      {
+        isOk: (selectdata: any) => {
+          console.log("a", selectdata);
+        },
+      },
+      { title: "业务员", width: 85 }
+    );
   },
   //代理业务员
   cBrkSlsCdeChange:()=>{
