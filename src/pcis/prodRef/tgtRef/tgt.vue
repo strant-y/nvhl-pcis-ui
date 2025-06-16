@@ -1,6 +1,7 @@
 <!-- 标的信息 -->
 <template>
   <app-free-edit :freeEditConfig="formconfig1" ref="tgtEditRef" />
+  <comDialog ref="dialog"></comDialog>
 </template>
 
 <script setup lang="ts">
@@ -30,6 +31,7 @@ import moment from "moment";
 
 import { descryptParameter, encryptParameter } from "@/utils/encipher";
 import { useRouter, useRoute } from 'vue-router';
+import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
 const route = useRoute();
 const query = ref(route.query);
 const router = useRouter();
@@ -39,7 +41,9 @@ const param = JSON.parse(query.value?.param ? descryptParameter(query.value.para
 const dzmodal = useDzModal();
 const { getRules } = useValidator();
 const opertaor = dataOpertaor();
+const params = opertaor.getParam();
 const productStore = useProductStore()
+const dialog = ref<DialogMethod | null>(null);
 
 const props = defineProps({
   pageSchema: {
@@ -75,7 +79,7 @@ const wagesInfoModel = () => {
   });
 }
 //水运规则
-const tgtWaterMatterList:Array<string> = ["Tgt.cTransportationName","Tgt.tConstructionYear","Tgt.nTransportationTotalTonnage","Tgt.cShipRegistration","Tgt.nTransportationShipAge","Tgt.cShipType","Tgt.cShipClassOne","Tgt.cShipClassTwo","Tgt.cShipClassThree","Tgt.cOldshipSurcharge"]
+const tgtWaterMatterList:Array<string> = ["Tgt.cShipName","Tgt.cTransportVoyage","Tgt.cTransportationName","Tgt.tConstructionYear","Tgt.nTransportationTotalTonnage","Tgt.cShipRegistration","Tgt.nTransportationShipAge","Tgt.cShipType","Tgt.cShipClassOne","Tgt.cShipClassTwo","Tgt.cShipClassThree","Tgt.cOldshipSurcharge"]
 //水运外其他规则
 const tgtOtherMatterList:Array<string> = ["Tgt.cLicenseNumber","Tgt.cFrameNumber","Tgt.cTransitMode"]
 //非水运隐藏
@@ -108,11 +112,86 @@ const setIsRule = ()=>{
 }
 
  const  funcdistadd=  () => {
-  
-  };
 
+  };
+function calculateCarAge(initialDateStr:any) {
+  const initialDate = new Date(initialDateStr);
+  const currentDate = new Date();
+
+  // 计算时间差（毫秒）
+  const diffTime = currentDate - initialDate;
+
+  // 获取初登年份
+  const year = initialDate.getFullYear();
+
+  // 判断是否为闰年
+  const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+  const daysInYear = isLeapYear ? 366 : 365;
+
+  // 计算车龄（年）
+  const carAge = diffTime / (1000 * 60 * 60 * 24) / daysInYear;
+
+  // 四舍五入保留一位小数
+  const roundedAge = Number(carAge.toFixed(1));
+
+  // 如果小于0.5，返回0.5，否则返回原值
+  return roundedAge < 0.5 ? 0.5 : roundedAge;
+}
 // 绑定方法
 const method = {
+  funccDetailsAccident:()=>{
+    dialog.value?.open('detailsAccident', {
+          selectedData: getValue("Tgt.cFinanceCde"), //需要把自定义的过滤掉，只传过去从模板中选择的
+        },
+        {
+          getSelected(selectdata: any) {
+            setValue("Tgt.cFinanceCde",selectdata.map(item => item.value).join(','))
+            setValue("Tgt.cDetailsAccident",selectdata.map((item, index) => `${index + 1}. ${item.label}`).join('\n'))
+          },
+        },{width: 45});
+  },
+  getcMemberLogoChange:(val:string)=>{
+    if(val=== '1'){
+      setFormItem('Tgt.cBareboatLessee', {
+        rules: [getRules("required", {})],
+      });
+    }else {
+      setFormItem('Tgt.cBareboatLessee', {
+        rules: null
+      });
+    }
+  },
+  getcRentalLogoChange:(val:string)=>{
+    if(val=== '1'){
+      setFormItem('Tgt.cBareboatLessee', {
+        rules: [getRules("required", {})],
+      });
+    }else {
+      setFormItem('Tgt.cBareboatLessee', {
+        rules: null
+      });
+    }
+  },
+  getcMortgageMarkChange:(val:string)=>{
+    if(val=== '1'){
+      setFormItem('Tgt.cShipMortgagee', {
+        rules: [getRules("required", {})],
+      });
+      setFormItem('Tgt.nMortgageAmount', {
+        rules: [getRules("required", {})],
+      });
+    }else {
+      setFormItem('Tgt.cShipMortgagee', {
+        rules: null
+      });
+      setFormItem('Tgt.nMortgageAmount', {
+        rules: null
+      });
+    }
+  },
+  gettInitialDateChange:(val:string)=>{
+  setValue("Tgt.cVehicleAge",calculateCarAge(val))
+  },
   getcShippingMethodChange:(val:string)=>{
     if(val === 'NV591001'){
       tgtIsWaterMatterList.forEach(item =>{
@@ -206,23 +285,39 @@ const method = {
     //把数据存在store，清单信息组件的是否必填根据这个来
     productStore.setCIsSingle(val)
   },
-  funcInsuranceChange: (row) => {
-    console.log(row)
+  funcInsuranceChange: (val) => {
+    console.log(val)
 
+    if (params.cProdNo === '043009' || params.cProdNo === '045001'
+      ||params.cProdNo === '049035' || params.cProdNo === '049036'
+      ||params.cProdNo === '049037' || params.cProdNo === '049040'
+      ||params.cProdNo === '049041' 
+    ) {
+      let hd = true;
+      if(val !== '613001'){
+        hd = false;
+      }
+
+      formconfig1.fromUi.groupBy.forEach(item => {
+        if(item.id == 'group2'){
+          item.hidden = hd;
+        }
+      })
+    }
     //根据投保方式得选择对应控制必填项
-    if (getValue("Tgt.cInsuranceMethod") == '613002') {
+    if (val == '613002') {
       setFormItem("Tgt.nEngineeringCost", {
         rules: [getRules("required", { blur: true })],
       });
       setFormItem("Tgt.nProjectArea", { rules: null });
       setFormItem("Tgt.nLaborPrice", { rules: null });
-    } else if (getValue("Tgt.cInsuranceMethod") == '613003') {
+    } else if (val == '613003') {
       setFormItem("Tgt.nEngineeringCost", { rules: null });
       setFormItem("Tgt.nProjectArea", {
         rules: [getRules("required", { blur: true })],
       });
       setFormItem("Tgt.nLaborPrice", { rules: null });
-    } else if (getValue("Tgt.cInsuranceMethod") == '613004') {
+    } else if (val == '613004') {
       setFormItem("Tgt.nEngineeringCost", { rules: null });
       setFormItem("Tgt.nProjectArea", { rules: null });
       setFormItem("Tgt.nLaborPrice", {

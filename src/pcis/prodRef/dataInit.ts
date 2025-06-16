@@ -68,6 +68,14 @@ export const getData = () => {
     //设置是否单项工程默认值：是
     dataInit["Tgt.cIsSingle"] = "1";
     dataInit["Tgt.cContractCurrency"] = "01";
+    //光船租赁标志程、船舶抵押标志、保赔协会成员标志默认值：否
+    dataInit["Tgt.cRentalLogo"] = "0";
+    dataInit["Tgt.cMortgageMark"] = "0";
+    dataInit["Tgt.cMemberLogo"] = "0";
+    //自航标志默认是
+    dataInit["Tgt.cNavigationMark"] = "1";
+    //保险价值币种 默认人民币
+    dataInit["Tgt.cInsuranceCurrency"] = "01";
     return dataInit;
   };
 

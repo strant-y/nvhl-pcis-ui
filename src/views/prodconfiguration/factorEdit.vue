@@ -126,6 +126,18 @@ const schemaMap = reactive<Record<string, any>>({
       inputtype: "rtselect",
       title: "type类型",
       loadData: typeMap.rtinput,
+      func:(val: any)=>{
+        let f = "0";
+        if(val=== "number"){
+          f = "1";
+        }
+
+        formconfig1.superFromSchema?.forEach((item: any) => {
+          if (item.prop === "max" || item.prop === "min") {
+            item.hidden = f === "1" ? false : true;
+          }
+        });
+      }
     },
     {
       prop: "placeholder",
@@ -152,6 +164,18 @@ const schemaMap = reactive<Record<string, any>>({
       prop: "suffix",
       inputtype: "rtinput",
       title: "后缀符号",
+    },
+    {
+      prop: "min",
+      inputtype: "rtnumber",
+      title: "最小值",
+      hidden: true,
+    },
+    {
+      prop: "max",
+      inputtype: "rtnumber",
+      title: "最大值",
+      hidden: true,
     },
     {
       prop: "required",

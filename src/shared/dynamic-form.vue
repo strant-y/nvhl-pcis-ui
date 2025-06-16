@@ -112,8 +112,7 @@
                   <rt-button
                     v-if="item.inputtype !== 'rttable'"
                     :style="{
-                      width: (item.btnWidth ? item.btnWidth : 25) + '%',
-                      height: '100%',
+                      width: (item.btnWidth ? item.btnWidth : 25) + '%'
                     }"
                     :item="item.btnItems"
                     @closepopover="(rev) => setPopover(rev, item)"
@@ -127,7 +126,8 @@
     </el-row>
     <!------- 折叠筐内 表单 需要单独来显示  上面是未分组公共部分内容,下面为折叠筐内内容 -------->
     <div v-for="(v, k) in groupByList" :key="k">
-      <div class="rt_group">
+      <template  v-if="!v.hidden">
+        <div class="rt_group">
         <span class="rt_group_title">{{ v.title }} </span>
         <template v-if="checkNeadGroup(v)">
           <a
@@ -268,6 +268,7 @@
           </template>
         </template>
       </el-row>
+      </template>
     </div>
   </el-form>
 </template>
@@ -331,6 +332,7 @@ const formUi = reactive<Record<string, any>>({});
  * */
 function initUI() {
   if (props.fromUi) {
+    groupByList.value = [];
     Object.keys(props.fromUi).forEach((key) => {
       if (key === "cols") {
         if (props.fromUi && props.fromUi[key]) {
@@ -344,12 +346,8 @@ function initUI() {
             const g = {
               id: item.id,
               title: item.title,
-              disabled: item.disabled,
+              hidden: item.hidden === true ? true:false ,
             };
-            const s = item.active ? item.active : true;
-            if (s) {
-              activeList.value.push(item.id);
-            }
             groupByList.value.push(g);
           }
         }
@@ -585,6 +583,8 @@ watch(
   () => props.fromUi,
   (newFromUi) => {
     initUI();
+  },{
+    deep: true,
   }
 );
 watch(form, (newForm) => {});

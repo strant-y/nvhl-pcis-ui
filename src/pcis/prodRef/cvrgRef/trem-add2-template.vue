@@ -5,7 +5,7 @@
         <tr class="table-title">
           <th style="width: 80px">序号</th>
           <th style="width: 300px">附加条款名称</th>
-          <th>费率(主险费率的百分比)</th>
+          <th>费率({{ formcof.nMainRate.suffix }})</th>
           <th>保费</th>
           <th>备注</th>
           <th style="width: 100px">操作</th>
@@ -62,7 +62,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { terConfig } from "@/store/modules/term-config";
 const emit = defineEmits(["update:modelValue", "delete"]);
 const opertaor = dataOpertaor();
-
+const param = opertaor.getParam();
 const terconfig = terConfig();
 
 const props = defineProps({
@@ -75,7 +75,18 @@ const props = defineProps({
     default: false,
   },
 });
-onMounted(() => {});
+
+const notList = ['040019','047002','049025'];
+onMounted(() => {
+  if(param.cProdNo.startsWith("04")){
+    if(!notList.includes(param.cProdNo)){
+      formcof.value.nMainRate.suffix = "%";
+    }
+  }
+  if(param.cProdNo === "059002" || param.cProdNo === "059003"){
+    formcof.value.nMainRate.suffix = "%";
+  }
+});
 
 const btnConf = ref<{ [key: string]: { [key: string]: any } }>({
   delete: {

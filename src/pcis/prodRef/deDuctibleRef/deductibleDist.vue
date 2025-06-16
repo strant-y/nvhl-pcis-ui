@@ -64,7 +64,7 @@ onMounted(()=>{
   Object.assign(cardconfig.value, formconfig11);
   formData.value = [];
   formData.value.forEach((item, index) => {
-    item.index = index + 1;
+    item.nSeqNo = index + 1;
   });
   initOriginalData();
 })
@@ -76,7 +76,7 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtnWidth: 220,
     tableBtnPosition: "right",
     align: "left",
-    tableBtn: [
+    tableBtn: opertaor.getParam().pageType == "readonly" ? [] : [
       createFreeButtonBase({
         id: "score",
         link: true,
@@ -89,7 +89,7 @@ const tableconfig = reactive<AppTableConfig>(
         },
         tableClick: (row) => {
           const param = {};
-          const f = originalData.value.find(f => row.cDeductibleCode === f.cDeductibleCode);
+          const f = originalData.value.find(f => row.cDeductibleCode === f.cDeductibleClass);
           Object.assign(param, f);
           dzmodal.open(deductibleFixEdit, { 
             type: "view", 
@@ -115,7 +115,7 @@ const tableconfig = reactive<AppTableConfig>(
           rttableFrom.value.delRow(row._dataId);
           // if (i !== -1) list.splice(i, 1);
           formData.value.forEach((item, index) => {
-            item.index = index + 1;
+            item.nSeqNo = index + 1;
           });
         },
       }),
@@ -127,10 +127,10 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Top",
         hideBtns: (row) => {
-          if (row.index == 1) return true;
+          if (row.nSeqNo == 1) return true;
         },
         tableClick: (row) => {
-          moveUp(row.index - 1);
+          moveUp(row.nSeqNo - 1);
         },
       }),
       createFreeButtonBase({
@@ -141,16 +141,16 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Bottom",
         hideBtns: (row) => {
-          if (row.index == formData.value.length) return true;
+          if (row.nSeqNo == formData.value.length) return true;
         },
         tableClick: (row) => {
-          moveDown(row.index - 1);
+          moveDown(row.nSeqNo - 1);
         },
       }),
     ],
     fromSchema: [
       {
-        prop: "index",
+        prop: "nSeqNo",
         inputtype: "rtinput",
         title: "序号",
         width: 100,
@@ -176,7 +176,7 @@ const tableconfig = reactive<AppTableConfig>(
         ],
       },
       {
-        prop: "cDeductibleCode",
+        prop: "cDeductibleClass",
         inputtype: "rtinput",
         title: "免赔条件ID",
         width: 180,
@@ -203,7 +203,7 @@ const initOriginalData = ()=> {
       pageresult.list = [];
       originalData.value = res.data.result.map((item: any) => {
          return {
-          cDeductibleCode: item.cDeductibleCode,
+          cDeductibleClass: item.cDeductibleCode,
           cDeductibleContent: item.cDeductibleContent,
           cStatus: item.cStatus, //是否必选
           cIfMust: item.cIfMust, //是否必选
@@ -230,7 +230,7 @@ const moveUp = async (index) => {
   }
   moveUpTimer.value = setTimeout(() => {
     tableData.forEach((item, index) => {
-      item.index = index + 1;
+      item.nSeqNo = index + 1;
     });
   }, 0);
 };
@@ -250,7 +250,7 @@ const moveDown = (index) => {
   }
   moveDownTimer.value = setTimeout(() => {
     tableData.forEach((item, index) => {
-      item.index = index + 1;
+      item.nSeqNo = index + 1;
     });
   }, 0);
 };
@@ -276,14 +276,14 @@ const method = {
         { 
           getSelected(selectdata: any) {
             const mergeAndNumberArraysPreserveOrder = (a: [], b: []): any[] => {
-              const akeys = new Set(a.map(item => item.cDeductibleCode));
-              const bkeys = new Set(b.map(item => item.cDeductibleCode));
-              const aInB = a.filter(item => bkeys.has(item.cDeductibleCode));
-              const bNotInA = b.filter(item => !akeys.has(item.cDeductibleCode));
+              const akeys = new Set(a.map(item => item.cDeductibleClass));
+              const bkeys = new Set(b.map(item => item.cDeductibleClass));
+              const aInB = a.filter(item => bkeys.has(item.cDeductibleClass));
+              const bNotInA = b.filter(item => !akeys.has(item.cDeductibleClass));
               const merged = [...aInB, ...bNotInA];
               return merged.map((item: any, index: number) => ({
                 ...item,
-                index: index + 1
+                nSeqNo: index + 1
               }));
             }
             formData.value = mergeAndNumberArraysPreserveOrder(formData.value, selectdata);
@@ -306,12 +306,37 @@ function getTableData() {
   return formData.value;
 }
 
+function setFormValue(value: any) {
+  if(value && value.length>0){
+    let ind = 1;
+    value.forEach(e => {
+      Object.keys(e).forEach(key => {
+        const newKey = key.replace('DeductibleDist.', '');
+        const v = e[key];
+        delete e[key];
+        if(newKey === 'cDeductibleClass') {
+          e['cDeductibleCode'] = v;
+        }else {
+          e[newKey] = v;
+        }
+      })
+    });
+  }
+  rttableFrom?.value?.setFormValue(value);
+  // Object.assign(formData.value, value);
+  formData.value = value;
+}
+
 function getFromValue() {
   return formData.value.map((item) => {
     const prefixedItem: { [key: string]: any } = {};
     for (const key in item) {
       if (item.hasOwnProperty(key)) {
-        prefixedItem[`DeductibleDist.${key}`] = item[key];
+        if(key == 'cDeductibleCode') {
+          prefixedItem[`DeductibleDist.cDeductibleClass`] = item[key];
+        }else {
+          prefixedItem[`DeductibleDist.${key}`] = item[key];
+        }
       }
     }
     return prefixedItem;
@@ -320,6 +345,7 @@ function getFromValue() {
 
 defineExpose({
   getFromValue,
+  setFormValue,
   getFormconfig,
   getTableData,
 });

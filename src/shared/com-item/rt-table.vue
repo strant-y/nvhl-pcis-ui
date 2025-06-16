@@ -389,16 +389,16 @@ function creatItem(d: any) {
   // 将方法回填到item中
   Object.keys(schamaconf.value).forEach((k: any) => {
     Object.keys(schamaconf.value[k]).forEach((k2: any) => {
-      if (typeof schamaconf.value[k][k2] === "function") {
+      if(k2 === "btnItems"){
+        Object.keys(schamaconf.value[k]['btnItems']).forEach((k3: any) => {
+          if  (typeof schamaconf.value[k]['btnItems'][k3] === "function") {
+            sc[k]['btnItems'][k3] = schamaconf.value[k]['btnItems'][k3];
+          }
+        });
+      }else if (typeof schamaconf.value[k][k2] === "function") {
         sc[k][k2] = schamaconf.value[k][k2];
       }
     });
-    // if (schamaconf.value[k]["func"]) {
-    //   sc[k]["func"] = schamaconf.value[k]["func"];
-    // }
-    // if (schamaconf.value[k]["tableClick"]) {
-    //   sc[k]["tableClick"] = schamaconf.value[k]["tableClick"];
-    // }
   });
   return sc;
 }

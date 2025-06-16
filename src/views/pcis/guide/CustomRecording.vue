@@ -168,7 +168,7 @@
                       ><StarFilled
                     /></el-icon>
                   </p>
-                  <p class="txt" v-if="formconfig1.cRecordType == 1">{{ item.termNo }} - {{ item.termCnm }}</p>
+                  <p class="txt" v-if="formconfig1.cRecordType == 1 || formconfig1.cRecordType == 3">{{ item.termNo }} - {{ item.termCnm }}</p>
                   <p class="txt" v-else>{{ item.planNo }} - {{ item.planCnm }}</p>
                 </el-card>
               </VueDraggable>
@@ -279,6 +279,7 @@ const formconfig1 = ref({
   cDptCnm: "",
   cRenewMrk: "0",
   cGrpMrk: "0",
+  dptCde:  "",
   // cNmeCn: "",
   cTermNme: "",
   cTermNo: "",
@@ -550,8 +551,12 @@ function handleRecordTypeChange(val:any) {
     loadOptions(2);
     labelNm.value = "方案";
     formconfig1.value.cIsPlan = '1';
-  } else {
+  } else if (val == "1") {
     loadOptions();
+    labelNm.value = "条款";
+    formconfig1.value.cIsPlan = '0';
+  } else {
+    loadOptions(3);
     labelNm.value = "条款";
     formconfig1.value.cIsPlan = '0';
   }

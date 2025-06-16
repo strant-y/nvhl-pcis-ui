@@ -53,7 +53,14 @@
         item.type === 'number'
           ? (value) => {
               if (value == null) return '';
-              const parts = `${value}`.split('.');
+              let num = value.replace(/[^0-9.-]/g, '');
+              if(item.max && num > item.max){
+                num = item.max;
+              }
+              if(item.min && num < item.min){
+                num = item.min;
+              }
+              const parts = `${num}`.split('.');
               const integerPart = parts[0].replace(
                 /\B(?=(\d{3})+(?!\d))/g,
                 ','

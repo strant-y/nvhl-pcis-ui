@@ -1,60 +1,69 @@
 <template>
   <!-- 下拉选择框-->
-  <el-select
-    v-if="!showLabel"
-    ref="selectRef"
-    :class="isReQuired() ? 're-quired-flag' : ''"
-    v-model="selectedValue"
-    :placeholder="item.placeholder ? item.placeholder : '请选择'"
-    :disabled="isReadonly() || isDisabled() "
-    :clearable="isClearable()"
-    :size="item.size"
-    :filterable="item.filterable != null ? item.filterable : true"
-    :multiple="isMultiple()"
-    :collapse-tags="isMultiple()"
-    :collapse-tags-tooltip="isMultiple()"
-    :max-collapse-tags="isMultiple() ? 3 : null"
-    @change="handleChange"
-  >
-    <template
-      #label="{ label, value }"
-      v-if="
-        item.tag
-          ? typeof item.tag === 'boolean'
-            ? item.tag
-            : item.tag === 1 || item.tag === '1'
-              ? true
-              : false
-          : false
-      "
+  <template v-if="!showLabel">
+    <el-tooltip
+      :content="getLabel"
+      :disabled="getLabel ? false : true"
+      placement="top"
     >
-      <el-tag :color="getColor(value)" effect="dark">{{ label }}</el-tag>
-    </template>
-    <el-option
-      v-for="option in options"
-      :key="option.value"
-      :label="option.label"
-      :disabled="option.disabled ? option.disabled : false"
-      :value="option.value"
-    >
-      <template
-        v-if="
-          item.tag
-            ? typeof item.tag === 'boolean'
-              ? item.tag
-              : item.tag === 1 || item.tag === '1'
-                ? true
-                : false
-            : false
-        "
+      <el-select
+        ref="selectRef"
+        :class="isReQuired() ? 're-quired-flag' : ''"
+        v-model="selectedValue"
+        :placeholder="item.placeholder ? item.placeholder : '请选择'"
+        :disabled="isReadonly() || isDisabled()"
+        :clearable="isClearable()"
+        :size="item.size"
+        :filterable="item.filterable != null ? item.filterable : true"
+        :multiple="isMultiple()"
+        :collapse-tags="isMultiple()"
+        :collapse-tags-tooltip="isMultiple()"
+        :max-collapse-tags="isMultiple() ? 3 : null"
+        @change="handleChange"
       >
-        <el-tag :color="option.color" effect="dark">{{ option.label }}</el-tag>
-      </template>
-    </el-option>
-    <template #empty>
-      {{ "暂无数据" }}
-    </template>
-  </el-select>
+        <template
+          #label="{ label, value }"
+          v-if="
+            item.tag
+              ? typeof item.tag === 'boolean'
+                ? item.tag
+                : item.tag === 1 || item.tag === '1'
+                  ? true
+                  : false
+              : false
+          "
+        >
+          <el-tag :color="getColor(value)" effect="dark">{{ label }}</el-tag>
+        </template>
+        <el-option
+          v-for="option in options"
+          :key="option.value"
+          :label="option.label"
+          :disabled="option.disabled ? option.disabled : false"
+          :value="option.value"
+        >
+          <template
+            v-if="
+              item.tag
+                ? typeof item.tag === 'boolean'
+                  ? item.tag
+                  : item.tag === 1 || item.tag === '1'
+                    ? true
+                    : false
+                : false
+            "
+          >
+            <el-tag :color="option.color" effect="dark">{{
+              option.label
+            }}</el-tag>
+          </template>
+        </el-option>
+        <template #empty>
+          {{ "暂无数据" }}
+        </template>
+      </el-select>
+    </el-tooltip>
+  </template>
   <span v-else>
     <template
       v-if="
@@ -76,7 +85,7 @@
       >
     </template>
     <template v-else>
-      {{ getLabel() }}
+      {{ getLabel }}
     </template>
   </span>
 </template>
@@ -158,20 +167,25 @@ watch([() => props.modelValue], ([newModelValue]) => {
     return;
   }
   let nd = null;
-  try  {
+  try {
     const s: string = newModelValue;
-    if(typeof s === "string" &&s.trim().startsWith('[') && s.trim().endsWith(']')){
+    if (
+      typeof s === "string" &&
+      s.trim().startsWith("[") &&
+      s.trim().endsWith("]")
+    ) {
       nd = JSON.parse(newModelValue);
-    }else{
+    } else {
       nd = newModelValue;
     }
-  }catch(e) {
+  } catch (e) {
     nd = newModelValue;
   }
   selectedValue.value = nd;
   if (props.item.typeCode && options.value.length === 0) {
     uploadOption();
-  }else if(props.item.typeCode && props.item.disabled){  // 如果是禁用项,则固定刷新下拉选
+  } else if (props.item.typeCode && props.item.disabled) {
+    // 如果是禁用项,则固定刷新下拉选
     uploadOption();
   }
 });
@@ -244,31 +258,47 @@ function uploadOption() {
       options.value = [];
     });
 }
-function isMultiple(){
-  if(props.item.multiple === true || props.item.multiple === 1 || props.item.multiple === '1'){
+function isMultiple() {
+  if (
+    props.item.multiple === true ||
+    props.item.multiple === 1 ||
+    props.item.multiple === "1"
+  ) {
     return true;
-  }else{
+  } else {
     return false;
   }
 }
-function isReadonly(){
-  if(props.item.readonly === true || props.item.readonly === 1 || props.item.readonly === '1'){
+function isReadonly() {
+  if (
+    props.item.readonly === true ||
+    props.item.readonly === 1 ||
+    props.item.readonly === "1"
+  ) {
     return true;
-  }else{
+  } else {
     return false;
   }
 }
-function isClearable(){
-  if(props.item.clearable === true || props.item.clearable === 1 || props.item.clearable === '1'){
+function isClearable() {
+  if (
+    props.item.clearable === true ||
+    props.item.clearable === 1 ||
+    props.item.clearable === "1"
+  ) {
     return true;
-  }else{
+  } else {
     return false;
   }
 }
-function isDisabled(){
-  if(props.item.disabled === true || props.item.disabled === 1 || props.item.disabled === '1'){
+function isDisabled() {
+  if (
+    props.item.disabled === true ||
+    props.item.disabled === 1 ||
+    props.item.disabled === "1"
+  ) {
     return true;
-  }else{
+  } else {
     return false;
   }
 }
@@ -279,14 +309,14 @@ function handleChange(val?: string | number | Array<any> | undefined) {
   emits("update:modelValue", val);
   // props.item.func ? props.item.func(val, option) : null;
 }
-function getLabel() {
+const getLabel = computed(() =>  {
   if (options.value && options.value.length > 0) {
     const se = options.value.find((item) => item.value === selectedValue.value);
     if (se) {
       return se.label;
     }
   }
-}
+});
 
 onMounted(() => {
   // 初始化组件数据
@@ -310,10 +340,18 @@ function updateOption(newOption: any) {
 }
 function isReQuired() {
   // 如果是禁用状态,默认带底色
-  if(props.item.disabled === true || props.item.disabled === '1' || props.item.disabled === 1){
+  if (
+    props.item.disabled === true ||
+    props.item.disabled === "1" ||
+    props.item.disabled === 1
+  ) {
     return false;
   }
-  if(props.item.required === '1' || props.item.required === 1 || props.item.required === true){
+  if (
+    props.item.required === "1" ||
+    props.item.required === 1 ||
+    props.item.required === true
+  ) {
     return true;
   }
   const rule = props.item.rules;

@@ -13,6 +13,14 @@
       </el-col>
       <el-col :span="16"> </el-col>
     </el-row>
+
+    <el-row>
+      <el-col :span="21"> </el-col>
+      <el-col :span="3">
+        <el-button @click="saveTitleFactor()" type="primary">保存</el-button>
+      </el-col>
+    </el-row>
+
     <el-row :gutter="10">
       <el-col :span="3">
         <table class="col_table">
@@ -37,12 +45,6 @@
           ref="tableRef"
           @indexupdate="getFactorConf()"
         />
-      </el-col>
-    </el-row>
-    <el-row>
-      <el-col :span="21"> </el-col>
-      <el-col :span="3">
-        <el-button @click="saveTitleFactor()" type="primary">保存</el-button>
       </el-col>
     </el-row>
   </div>
@@ -140,8 +142,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
+    // 启用固定表头功能
+    fixedHeader:true,
     editFlag: true,
-    editList: ["c_porp_type", "c_porp_required","c_porp_disabled"],
+    editList: ["c_porp_type", "c_porp_required","c_porp_disabled","c_prop_indent","c_parent_key"],
     fromSchema: [
       {
         prop: "icon",
@@ -175,6 +179,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtselect",
         title: "要素类型",
         loadData: inputtype,
+        width: 55,
       },
       {
         prop: "c_porp_type",
@@ -214,6 +219,23 @@ const tableconfig = reactive<AppTableConfig>(
           getFactorConf();
         },
       },
+      {
+        prop: "c_prop_indent",
+        inputtype: "rtswitch",
+        title: "是否缩进",
+        keymap: {
+          y: "1",
+          n: "0",
+        },
+        func: (v: any) => {
+          getFactorConf();
+        },
+      },
+      {
+        prop: "c_parent_key",
+        inputtype: "rtinput",
+        title: "父级key",
+      },
     ],
   })
 );
@@ -248,6 +270,7 @@ function select(item: any) {
       se.c_porp_type = element.c_porp_type;
       se.c_porp_required = element.c_porp_required;
       se.c_porp_disabled = element.c_porp_disabled;
+      se.c_prop_indent = element.c_prop_indent;
       newSelectl.push(se);
     }
   });
@@ -260,6 +283,7 @@ function select(item: any) {
       element.c_porp_type = null;
       element.c_porp_required = "0";
       element.c_porp_disabled = '0';
+      element.c_prop_indent = '0';
       newSelectl.push(element);
     }
   });
@@ -278,6 +302,7 @@ function getFactorConf() {
           c_porp_type: element.c_porp_type,
           c_porp_required: element.c_porp_required,
           c_porp_disabled: element.c_porp_disabled,
+          c_prop_indent:element.c_prop_indent,
         }));
       e.selectFactorList = selectData1;
     }

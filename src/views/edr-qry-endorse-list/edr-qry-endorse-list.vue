@@ -472,40 +472,36 @@ function handleRsnChange(val, row) {
     if (val === "FZ") {
         // 如果是非涉费批改
         getListByCode("EDR_RSN_LIST", {
-            prodNo: prodNo,
-            rsnTyp: rsnTyp,
-            isGrp: isGrp,
-            isPer: isPer,
-            calcMrk: "0",
-            ZH: "ZH",
-            FZ: "FZ",
-        }).then(
-            (cde2Res) => {
-                cde2Res["data"] = [{ value: 'FZ', label: '非涉费组合批改' }];
-                if (!codeListMap.value[prodNo + val + grpMrk]) {
-                    codeListMap.value[prodNo + val + grpMrk] = cde2Res["data"]
-                }
-                // const detailOption = cde2Res["data"].find(
-                //   (option) => option.value === val
-                // );
-                console.log(codeListMap.value)
-                if (cde2Res["data"].length > 0) {
-                    const detailOption = codeListMap.value[prodNo + val + grpMrk]?.find(
-                        (option) => option.value === val
-                    );
-                    if (detailOption) {
-                        row["iddetail"] = [detailOption.label];
-                        changeRsn({ value: val }, row["cPlyNo"], { value: row["iddetail"] });
-                    }
-                } else {
-                    row["iddetail"] = '';
-                }
-            },
-            (error) => {
-                console.log("出错了", error);
-                ElMessage.error("后台服务异常,请联系管理员");
+        prodNo: prodNo,
+        rsnTyp: rsnTyp,
+        isGrp: isGrp,
+        isPer: isPer,
+        calcMrk: "0",
+        ZH: "ZH",
+        FZ: "FZ",
+    }).then(
+        (cde2Res) => {
+            cde2Res["data"] = [{ value: 'FZ', label: '非涉费组合批改' }];
+            if (!codeListMap.value[prodNo + val + grpMrk]) {
+                codeListMap.value[prodNo + val + grpMrk] = cde2Res["data"];
             }
-        );
+
+            const detailOption = cde2Res["data"].find(
+                (option) => option.value === val
+            );
+
+            if (detailOption) {
+                row["iddetail"] = [detailOption.label];
+                changeRsn({ value: val }, row["cPlyNo"], { value: row["iddetail"] });
+            } else {
+                row["iddetail"] = '';
+            }
+        },
+        (error) => {
+            console.log("出错了", error);
+            ElMessage.error("后台服务异常,请联系管理员");
+        }
+    );
     } else {
         const detailOption = codeListMap.value[prodNo + grpMrk]?.find(
             (option) => option.value === val
@@ -565,7 +561,7 @@ const getDetailRsn = (item) => {
     const detail = [];
     if (item["id"] === "FZ") {
         // 如果是非涉费批改
-        getListByCode("EDR_RSN_LIST", {
+        getListByCode("EDR_RSN_LIST_FZ", {
             prodNo: prodNo,
             rsnTyp: rsnTyp,
             isGrp: isGrp,
@@ -597,18 +593,49 @@ const getDetailRsn = (item) => {
             }
         );
     } else {
-        const detailOption = codeListMap.value[prodNo + grpMrk]?.find(
-            (option) => option.value === item["id"]
+        // const detailOption = codeListMap.value[prodNo + grpMrk]?.find(
+        //     (option) => option.value === item["id"]
+        // );
+        // if (detailOption) {
+        //     detail.push(detailOption.label);
+        //     setTimeout(() => {
+        //         item["iddetail"] = detail;
+        //         changeRsn({ value: item["id"] }, item["cPlyNo"], {
+        //             value: item["iddetail"],
+        //         });
+        //     }, 5);
+        // }
+        getListByCode("EDR_RSN_LIST_FZ", {
+            prodNo: prodNo,
+            rsnTyp: rsnTyp,
+            isGrp: isGrp,
+            isPer: isPer,
+            calcMrk: "1",
+            ZH: "ZH",
+            FZ: "FZ",
+        }).then(
+            (cde2Res) => {
+                if (!codeListMap.value[prodNo + item["id"] + grpMrk]) {
+                    codeListMap.value[prodNo + item["id"] + grpMrk] = cde2Res["data"];
+                }
+                const detailOption = codeListMap.value[
+                    prodNo + item["id"] + grpMrk
+                ]?.find((option) => option.value === item["id"]);
+                if (detailOption) {
+                    detail.push(detailOption.label);
+                    setTimeout(() => {
+                        item["iddetail"] = detail;
+                        changeRsn({ value: item["id"] }, item["cPlyNo"], {
+                            value: item["iddetail"],
+                        });
+                    }, 5);
+                }
+            },
+            (error) => {
+                console.log("出错了", error);
+                ElMessage.error("后台服务异常,请联系管理员");
+            }
         );
-        if (detailOption) {
-            detail.push(detailOption.label);
-            setTimeout(() => {
-                item["iddetail"] = detail;
-                changeRsn({ value: item["id"] }, item["cPlyNo"], {
-                    value: item["iddetail"],
-                });
-            }, 5);
-        }
     }
 };
 
@@ -885,6 +912,8 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                             cTermNme: selected.value["cTermNme"],
                             cTermNo: selected.value["cTermNo"],
                             cProdNmeCn: selected.value["cProdNmeCn"],
+                            tInsrncBgnTm: selected.value["tInsrncBgnTm"],
+                            tInsrncEndTm: selected.value["tInsrncEndTm"],
                         });
                         console.log(en);
                         router.push({

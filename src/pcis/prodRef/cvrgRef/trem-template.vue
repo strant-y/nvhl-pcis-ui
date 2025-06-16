@@ -6,21 +6,27 @@
           <div class="cvrg-hearder">
             <el-row style="margin-top: 5px;">
               <el-col :span="10">
-                <a style="margin-right: 5px" @click="showData = !showData">
-                  <el-icon v-if="!showData"><ArrowUpBold /></el-icon>
-                  <el-icon v-if="showData"><ArrowDownBold /></el-icon>
-                </a>
-                <el-tag type="danger">{{
-                  term.cRdrTyp === "0" ? "主" : "附加"
-                }}</el-tag>
-                <template v-if="termdata['Term.cCancelMrk'] === '1'">
-                  <el-badge value="退" class="item">
-                    <el-tag type="warning">{{ term.cNmeCn }}</el-tag>
-                  </el-badge>
-                </template>
-                <template v-else>
-                  <el-tag type="warning">{{ term.cNmeCn }}</el-tag>
-                </template>
+                <div style="display: flex; align-items: center;">
+                  <a style="margin-right: 5px" @click="showData = !showData">
+                    <el-icon v-if="!showData"><ArrowRightBold /></el-icon>
+                    <el-icon v-if="showData"><ArrowDownBold /></el-icon>
+                  </a>
+
+                  <el-tag :type="term.cRdrTyp === '0' ? 'danger' : 'success'">{{
+                    term.cRdrTyp === "0" ? "主" : "附加"
+                  }}</el-tag>
+                  <template v-if="termdata['Term.cCancelMrk'] === '1'">
+                    <el-badge value="退" class="item">
+                      <el-tag type="warning">{{ term.cNmeCn }}</el-tag>
+                    </el-badge>
+                  </template>
+                  <template v-else>
+                    <el-tag type="warning"  style="margin-right: 8px;">{{ term.cNmeCn }}</el-tag>
+                    <el-tooltip content="下载条款" placement="top">
+                      <rt-icon :item="{ icon: 'term' }" />
+                    </el-tooltip>
+                  </template>
+                </div>
               </el-col>
               <el-col :span="12">
                 <el-row :gutter="20">
@@ -30,7 +36,7 @@
                         :label="item.title"
                         class="show_title"
                         :prop="item.prop"
-                        :rules="item.required ? getRequired() : undefined"
+                        :rules="isrequired(item) ? getRequired() : undefined"
                       >
                         <from-item
                           v-model="termdata[item.prop]"
@@ -81,7 +87,7 @@
                     </td>
                     <td>
                       <el-form-item
-                        :rules="item.required ? getRequired() : undefined"
+                        :rules="isrequired(item) ? getRequired() : undefined"
                         :prop="item.prop"
                       >
                         <from-item
@@ -112,7 +118,7 @@
                   <template v-for="(item, k) in termFactormap" :key="k">
                     <td v-if="item.cPorpShowtitle !== '1'">
                       <el-form-item
-                        :rules="item.required ? getRequired() : undefined"
+                        :rules="isrequired(item) ? getRequired() : undefined"
                         :prop="item.prop"
                       >
                         <from-item
@@ -141,7 +147,7 @@
                   style="margin-right: 5px"
                   @click="ginfo.hidden = !ginfo.hidden"
                 >
-                  <el-icon v-if="ginfo.hidden"><ArrowUpBold /></el-icon>
+                  <el-icon v-if="ginfo.hidden"><ArrowRightBold /></el-icon>
                   <el-icon v-if="!ginfo.hidden"><ArrowDownBold /></el-icon>
                 </a>
                 <span>
@@ -194,6 +200,9 @@
                                     ? riskdata.maxNum
                                     : null
                                 "
+                                :class="{
+                                    'custom-indent':riskdata.rowConfig[colinfo.cColId]?.[n - 1]?.cPorpType === 'text' &&  riskdata.rowConfig[colinfo.cColId]?.[n - 1]?.factorItem?.Indent === '1',
+                                 }"
                               >
                                 <template
                                   v-if="
@@ -269,7 +278,7 @@
                               <td :rowspan="groupconf[ginfo.cGroupId].sumMax">
                                 <el-form-item
                                   :rules="
-                                    v.required ? getRequired() : undefined
+                                    isrequired(v) ? getRequired() : undefined
                                   "
                                   :prop="v.prop"
                                 >
@@ -540,7 +549,19 @@ function getProp(col: any) {
   });
   fact.disabled = col["cPorpDisabled"];
   fact.required = col["cPorpRequired"];
+  fact.Indent = col["cPropIndent"];  // 缩进
   return fact;
+}
+/*
+条款下载
+*/
+function downloadTerm() {
+  const clauseLink = termdata.value["Term.cClauseLink"];
+  if (!clauseLink) {
+    ElMessage.warning("条款链接为空，无法下载");
+    return;
+  }
+
 }
 
 onMounted(async () => {
@@ -631,6 +652,10 @@ function dataInit() {
 }
 
 function initshowConfig() {
+  termFactormap.value.forEach((item) => { 
+    item.required = isrequired(item);
+    item.disabled = isdisabled(item);
+  });
   let grouplist: { [k: string]: any } = {};
   if (groupInfo.value) {
     exChangeFunc();
@@ -832,7 +857,17 @@ function setDisabledAll() {
 }
 
 function isrequired(i: any) {
-  if (i.required === "1" || i.required === 1 || i.required === true) {
+  if (i.required === "1" || i.required === 1 || i.required === true ||
+    i.cPropRequired === "1" || i.cPropRequired === 1 || i.cPropRequired === true 
+  ) {
+    return true;
+  }
+  return false;
+}
+function isdisabled(i: any) {
+  if (i.disabled === "1" || i.disabled === 1 || i.disabled === true ||
+    i.disabled === "1" || i.disabled === 1 || i.disabled === true 
+  ) {
     return true;
   }
   return false;
@@ -897,7 +932,7 @@ defineExpose({
   }
 }
 .table-title {
-  background-color: #f5f5f5;
+  background-color: #e6e6e6;
 }
 table {
   border-collapse: collapse; /* 合并边框 */
@@ -906,10 +941,17 @@ table {
 .show_title {
   margin-bottom: 0px;
 }
+.custom-indent {
+  padding-left: 30px; /* 空三格 */
+}
+
+.custom-left {
+  text-align: left;
+}
 table,
 th,
 td {
-  border: 1px solid #f5f5f5; /* 设置边框样式 */
+  border: 1px solid #e2e2e2; /* 设置边框样式 */
   padding: 2px;
   text-align: left;
 }

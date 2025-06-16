@@ -71,7 +71,7 @@
             :label-position="formUi.labelPosition"
           >
             <table style="width: 100%">
-              <thead>
+              <thead  :class="{ 'sticky-header': appgrideditConfig.fixedHeader }">
                 <tr>
                   <th
                     v-if="appgrideditConfig.tableBtnPosition === 'left'"
@@ -563,5 +563,12 @@ defineExpose({
 }
 .el-table tr:hover {
   background-color: #ecfcf3; /* 修改为你想要的颜色 */
+}
+.sticky-header {
+  position: sticky;
+  top: 0;
+  background-color: #f5f7fa;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 </style>
