@@ -15,9 +15,11 @@ export const getData = () => {
     dataInit["Base.tInsrncBgnTm"] = moment(
       new Date(Date.now() + 1 * 1000 * 60 * 60 * 24)
     ).format("YYYY-MM-DD 00:00:00");
-    dataInit["Base.tInsrncEndTm"] = dayjs(dataInit["Base.tInsrncBgnTm"])
-      .add(1, "year")
-      .format("YYYY-MM-DD 23:59:59");
+
+    
+    // dataInit["Base.tInsrncEndTm"] = dayjs(dataInit["Base.tInsrncBgnTm"])
+    //   .add(1, "year")
+    //   .format("YYYY-MM-DD 23:59:59");
     const tm = moment(dataInit["Base.tInsrncEndTm"]).diff(
       moment(dataInit["Base.tInsrncBgnTm"]),
       "days"

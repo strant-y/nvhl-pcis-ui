@@ -281,7 +281,91 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ]
   })
 );
+
+
+
+const formconfigMany= ref( [
+      {
+        prop: "CDptCde",
+        inputtype: "rtselect",
+        title: "业务机构",
+        typeCode: "PLYDPT_LIST",
+        disabled: true,
+        // param: { 'CDptCde': '' }, //待添加
+      },
+      {
+        prop: "CAppNum",
+       inputtype: "rtinput",
+        title: "选择单数",
+       disabled: true,
+        
+      },
+      {
+        prop: 'NTax',
+        title: '车船税',
+        disabled: true,
+        inputtype: "rtinput",
+      },
+      {
+        prop: 'NPrm',
+        title: '实收金额', 
+        disabled: true,
+        inputtype: "rtinput",
+      },
+      {
+        prop: 'CChargeCde',
+        title: '支票(票据)收款人',
+        inputtype: "rtinput",
+      },
+      {
+        prop: 'CSeqNo',
+        title: '出票人账号',
+        inputtype: "rtinput",
+        rules: [getRules("required", {})],
+      },
+      {
+        prop: 'NPayAmt',
+        disabled: true,
+        title: '支票（收据）金额', 
+        inputtype: "rtinput",
+      },
+      {
+        prop: 'CPayNme',
+        title: '出票人',
+        inputtype: "rtinput",
+        rules: [getRules("required", {})],
+      },
+      {
+        prop: 'CChequeNo',
+        title: '支票号',
+        inputtype: "rtinput",
+        rules: [getRules("required", {})],
+      },
+      {
+        prop: 'CAppNo',
+        disabled: true,
+        title: '投保单号',
+        inputtype: "rtinput",
+      },
+      {
+        prop: 'NStampTax',
+        disabled: true,
+        title: '印花税',
+        inputtype: "rtinput",
+      },
+    ]) 
+
 onMounted(async () => {
+  console.log('kkkk',props.data)
+  
+
+  if(props.data?.CAppNum>1){
+    formconfig1.fromSchema = formconfigMany.value;
+ 
+           nextTick(()=>{
+                freeEditRef.value?.setValue('CAppNum',props.data.CAppNum)
+              })
+  }
   if (props.type === "edit" && props.data) {
     // setTimeout(() => {
     //   freeEditRef.value?.setFormValue(props.data);
@@ -290,7 +374,8 @@ onMounted(async () => {
           const param = {
                CurrentUser:user.value.opCde,
               'CUniqueNo': props.data.CUniqueNos,
-          };
+          }; 
+          
           loadPayConfirmInfo(param);
       })
   }

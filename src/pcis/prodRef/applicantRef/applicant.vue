@@ -295,20 +295,31 @@ const method = {
           disabled: true,
         });
       }
-    } else if (val == "110002" || val == "110007") {
+    } else if (val == "110002") {
       setFormItem("Applicant.tCertfBgnDate", {
         rules: [getRules("required", {})],
       });
       setFormItem("Applicant.tCertfEndDate", {
         rules: [getRules("required", {})],
       });
-      if (val == "110002") {
         //证件类型是“营业执照”，参加社会统筹标志变化为必填
         // 参加社会统筹标志
         setFormItem("Applicant.cParticiinsocTyp", {
           rules: [getRules("required", {})],
         });
-      }
+        
+    }   else if ( val == "110007") {   
+      setFormItem("Applicant.tCertfBgnDate", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.tCertfEndDate", {
+        rules: [getRules("required", {})],
+      });
+
+      // 统一社会信用代码校验
+        setFormItem("Applicant.cCertfCde", {
+        rules: [getRules("socialCode", {})],
+      });
     } else {
       setFormItem("Applicant.cCertfCde", {
         rules: [getRules("required", {})],
