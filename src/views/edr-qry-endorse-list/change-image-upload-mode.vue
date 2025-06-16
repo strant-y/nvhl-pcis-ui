@@ -75,7 +75,8 @@ const fetchImageUploadModeByPlyNo = async () => {
   const response = await policyService.getImageUploadModeByPlyNo(param);
   if (response.code === 200) {
     originalImageUploadMode.value = response.data;
-    // formData.CImageUploadMode = response.data;
+    formData.CImageUploadMode = response.data;
+    freeEditRef.value?.setValue('CImageUploadMode',response.data)
   } else {
     ElMessage.error('查询保单的影像上传方式失败！');
   }
