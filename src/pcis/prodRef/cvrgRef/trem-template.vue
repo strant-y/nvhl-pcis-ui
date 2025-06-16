@@ -866,7 +866,7 @@ function isrequired(i: any) {
 }
 function isdisabled(i: any) {
   if (i.disabled === "1" || i.disabled === 1 || i.disabled === true ||
-    i.disabled === "1" || i.disabled === 1 || i.disabled === true 
+    i.cPropDisabled === "1" || i.cPropDisabled === 1 || i.cPropDisabled === true 
   ) {
     return true;
   }
