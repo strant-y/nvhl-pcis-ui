@@ -112,8 +112,7 @@
                   <rt-button
                     v-if="item.inputtype !== 'rttable'"
                     :style="{
-                      width: (item.btnWidth ? item.btnWidth : 25) + '%',
-                      height: '100%',
+                      width: (item.btnWidth ? item.btnWidth : 25) + '%'
                     }"
                     :item="item.btnItems"
                     @closepopover="(rev) => setPopover(rev, item)"
