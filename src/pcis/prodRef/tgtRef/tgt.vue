@@ -39,6 +39,7 @@ const param = JSON.parse(query.value?.param ? descryptParameter(query.value.para
 const dzmodal = useDzModal();
 const { getRules } = useValidator();
 const opertaor = dataOpertaor();
+const params = opertaor.getParam();
 const productStore = useProductStore()
 
 const props = defineProps({
@@ -206,23 +207,39 @@ const method = {
     //把数据存在store，清单信息组件的是否必填根据这个来
     productStore.setCIsSingle(val)
   },
-  funcInsuranceChange: (row) => {
-    console.log(row)
+  funcInsuranceChange: (val) => {
+    console.log(val)
 
+    if (params.cProdNo === '043009' || params.cProdNo === '045001'
+      ||params.cProdNo === '049035' || params.cProdNo === '049036'
+      ||params.cProdNo === '049037' || params.cProdNo === '049040'
+      ||params.cProdNo === '049041' 
+    ) {
+      let hd = true;
+      if(val !== '613001'){
+        hd = false;
+      }
+
+      formconfig1.fromUi.groupBy.forEach(item => {
+        if(item.id == 'group2'){
+          item.hidden = hd;
+        }
+      })
+    }
     //根据投保方式得选择对应控制必填项
-    if (getValue("Tgt.cInsuranceMethod") == '613002') {
+    if (val == '613002') {
       setFormItem("Tgt.nEngineeringCost", {
         rules: [getRules("required", { blur: true })],
       });
       setFormItem("Tgt.nProjectArea", { rules: null });
       setFormItem("Tgt.nLaborPrice", { rules: null });
-    } else if (getValue("Tgt.cInsuranceMethod") == '613003') {
+    } else if (val == '613003') {
       setFormItem("Tgt.nEngineeringCost", { rules: null });
       setFormItem("Tgt.nProjectArea", {
         rules: [getRules("required", { blur: true })],
       });
       setFormItem("Tgt.nLaborPrice", { rules: null });
-    } else if (getValue("Tgt.cInsuranceMethod") == '613004') {
+    } else if (val == '613004') {
       setFormItem("Tgt.nEngineeringCost", { rules: null });
       setFormItem("Tgt.nProjectArea", { rules: null });
       setFormItem("Tgt.nLaborPrice", {
