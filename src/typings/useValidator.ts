@@ -104,6 +104,13 @@ export const useValidator = () => {
       trigger: "blur",
     };
   }
+  const positiveNumber = () => {
+    return {
+      pattern:/^\d+(\.\d+)?$/,
+      message: "只能输入正数",
+      trigger: "blur",
+    };
+  }
   const specifyLength = (num) => {
     const regex = new RegExp(`^\\d{${num}}$`);
     return {
@@ -417,7 +424,7 @@ const businessLicense = () => {
 
 /**
  * 中国车牌号码校验器 油  电
- * 
+ *
  */
  const vehiclePlate = () => {
   return {
@@ -504,6 +511,9 @@ const faxNumber = () => {
     }
     if(type == 'faxNumber') {
       return faxNumber()
+    }
+    if(type == 'positiveNumber') {
+      return positiveNumber()
     }
   };
   const validorMap = {
