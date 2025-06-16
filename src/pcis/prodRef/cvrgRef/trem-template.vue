@@ -932,7 +932,7 @@ defineExpose({
   }
 }
 .table-title {
-  background-color: #f5f5f5;
+  background-color: #e6e6e6;
 }
 table {
   border-collapse: collapse; /* 合并边框 */
@@ -951,7 +951,7 @@ table {
 table,
 th,
 td {
-  border: 1px solid #f5f5f5; /* 设置边框样式 */
+  border: 1px solid #e2e2e2; /* 设置边框样式 */
   padding: 2px;
   text-align: left;
 }
