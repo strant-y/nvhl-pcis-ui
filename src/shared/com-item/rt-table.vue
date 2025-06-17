@@ -741,7 +741,7 @@ function isrequired(i: any) {
 
 <style scoped>
 ::v-deep .el-form-item__content {
-  justify-content: center !important;
+  display: block;
 }
 ::v-deep .el-form-item {
   margin-bottom: 0px !important; /* 使内容显示更近紧促 */

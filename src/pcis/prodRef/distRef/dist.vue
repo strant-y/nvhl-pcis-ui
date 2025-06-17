@@ -46,6 +46,7 @@ import { AppFreeEditMethod } from "@/shared/app-free-edit-config";
 const route = useRoute();
 const dialog = ref<DialogMethod | null>(null);
 const opertaor = dataOpertaor();
+const params = opertaor.getParam(); 
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -176,7 +177,12 @@ onMounted(async () => {
     titleBtns: formconfig1.value.titleBtns,
     fromSchema: formconfig1.value.distSchema,
   });
-  tableconfig.value.fromSchema.forEach( r => r['onInit'] = rowChange);
+  tableconfig.value.fromSchema.forEach( r => {
+    r['onInit'] = rowChange;
+    if(r['prop'] === 'Dist.cVinCode'){  //调整车架号列宽
+      r.width = '160';
+    }
+  });
   tableconfig.value.tableBtnType = "btn";
   tableconfig.value.tableBtnWidth = 150;
   tableconfig.value.tableBtnPosition = "right";
@@ -188,6 +194,7 @@ onMounted(async () => {
       tableconfig.value.tableBtn = btns;
     }
   }
+ 
   tableconfig.value.isPage = false;
   // 初始化 cComponentTableValue
   cComponentTableValue = getCComponentTableValue(
