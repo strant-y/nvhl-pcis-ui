@@ -195,6 +195,7 @@
                     v-model="scope.row[i.prop]"
                     :item="formItems[scope.row._dataId][i.prop]"
                     :showLabel="editIndex !== scope.row._dataId"
+                    :row="scope.row"
                   />
                 </el-form-item>
               </template>
