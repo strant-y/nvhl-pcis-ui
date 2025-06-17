@@ -76,6 +76,10 @@ export const getData = () => {
     dataInit["Tgt.cNavigationMark"] = "1";
     //保险价值币种 默认人民币
     dataInit["Tgt.cInsuranceCurrency"] = "01";
+
+    
+
+ 
     return dataInit;
   };
 
