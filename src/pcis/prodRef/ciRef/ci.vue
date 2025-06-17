@@ -38,6 +38,7 @@ const freeEditRef = ref<AppGridEditMethod | null>(null);
 const formconfig1 = reactive(createAppGridEditConfig({}));
 
 onMounted(async () => {
+  console.log('99999',props.pageSchema)
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
     method,

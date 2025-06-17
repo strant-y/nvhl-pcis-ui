@@ -1,5 +1,5 @@
 <template>
-  <app-free-edit :freeEditConfig="formconfig1" ref="insrncEditRef" /> 
+  <app-free-edit :freeEditConfig="formconfig1" ref="insrncEditRef" />
 </template>
 
 <script setup lang="ts">
@@ -39,35 +39,35 @@ onMounted(() => {
 });
 
 // 根据时间更改 短期费率系数 接口
-const nRatioCoefFunc = ()=>{
-    const tabref = opertaor.getTableRefs();
-    const baseBefore = tabref["insrnc"].getFromValue();
-    const baseBefore2 = tabref["base"].getFromValue();
-    let prodNo = route.params.param.cProdNo; 
+const nRatioCoefFunc = () => {
+  const tabref = opertaor.getTableRefs();
+  const baseBefore = tabref["insrnc"].getFromValue();
+  const baseBefore2 = tabref["base"].getFromValue();
+  let prodNo = route.params.param.cProdNo;
 
-    let param = {
-      bgnTm: baseBefore["Base.tInsrncBgnTm"],
-      endTm: baseBefore["Base.tInsrncEndTm"],
-      prodNo,
-      ratioType:baseBefore2['Base.cRatioTyp']
+  let param = {
+    bgnTm: baseBefore["Base.tInsrncBgnTm"],
+    endTm: baseBefore["Base.tInsrncEndTm"],
+    prodNo,
+    ratioType: baseBefore2['Base.cRatioTyp']
+  }
+  policyRatio(param).then((res: any) => {
+    const { code, data, msg } = res;
+    if (code === 200) {
+      opertaor.getTableRefByKey('base').setValue('Base.nRatioCoef', Number(data).toFixed(6))
     }
-    policyRatio(param).then((res: any) => {
-      const { code, data, msg } = res;      
-      if (code === 200) {
-        opertaor.getTableRefByKey('base').setValue('Base.nRatioCoef',Number(data).toFixed(6))
-        }
-    });
-  };
+  });
+};
 
 // 绑定方法
 const method = {
   // func demo
   func1: () => {
-  
+
   },
-  tInsrncBgnTmDisabled:(date:any)=>{ 
+  tInsrncBgnTmDisabled: (date: any) => {
     const fs = insrncEditRef?.value?.getFromValue();
-    if(fs){
+    if (fs) {
       const startDate = new Date(fs["Base.tInsrncBgnTm"])   // 开始时间   1
       const maxDate = new Date(startDate);  // 创建开始时间副本   365 
 
@@ -83,24 +83,22 @@ const method = {
         return true;
     }
   },
-  bgnTmFn: (v) => {   
-    
- 
+  bgnTmFn: (v) => {
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["insrnc"].getFromValue();
-    const tm = moment(baseBefore["Base.tInsrncEndTm"]).diff(moment(v), "days");  
-
-       baseBefore["Base.cTmSysCde"] = tm;
+    const tm = moment(baseBefore["Base.tInsrncEndTm"]).diff(moment(v), "days");
+    baseBefore["Base.cTmSysCde"] = tm;
 
     let startDate = new Date(baseBefore["Base.tInsrncBgnTm"])   // 开始时间
     let endDate = baseBefore["Base.tInsrncEndTm"]  // 结束时间
     let maxDate = new Date(startDate);  // 创建开始时间副本
 
-    if(!endDate){
+    if (!endDate) {
       maxDate.setDate(startDate.getDate() + 365);  // 设置为今天起365天后的日期
       maxDate.setSeconds(maxDate.getSeconds() - 1);
-      baseBefore["Base.tInsrncEndTm"] = formatDate(maxDate,'yyyy-MM-dd HH:mm:ss')
+      baseBefore["Base.tInsrncEndTm"] = formatDate(maxDate, 'yyyy-MM-dd HH:mm:ss')
     }
+    console.log('结束时间-----', baseBefore, maxDate.setSeconds(maxDate.getSeconds() - 1) )
     setFormValue(baseBefore);
     nRatioCoefFunc()
   },
@@ -126,21 +124,32 @@ const method = {
   },
   // 索赔基础名称change事件
   suopeiFunc: (val) => {
-     const p = opertaor.getParam();
+    console.log(val)
+    let cIsRetroSpect = getFromValue()['Base.cIsRetroSpect']      // 获取是否有追溯期/日期
+    console.log(cIsRetroSpect)
+    const p = opertaor.getParam();
     if (!p.initFlag) {
-      setFormItem("Base.tRunBgnTm", { disabled: false }); //追溯/日落起期
-      setFormItem("Base.tRunEndTm", { disabled: false }); //追溯/日落止期
+      // setFormItem("Base.tRunBgnTm", { disabled: false }); //追溯/日落起期
+      // setFormItem("Base.tRunEndTm", { disabled: false }); //追溯/日落止期
     }
-    setFormItem("Base.tRunBgnTm", { rules: null }); //追溯/日落起期
-    setFormItem("Base.tRunEndTm", { rules: null }); //追溯/日落止期
-    
     setFormItem("Base.tReportBgnTm", { rules: null }); //延长报告期起始日期
     setFormItem("Base.tReportEndTm", { rules: null }); //延长报告期终止日期
+
     if (val == "0") {
       //内索赔制 时，追溯/日落起止期必填
-      setFormItem("Base.tRunBgnTm", { rules: [getRules("required", {})] }); //追溯/日落起期
-      setFormItem("Base.tRunEndTm", { rules: [getRules("required", {})] }); //追溯/日落止期
+      if (cIsRetroSpect !== '0') {
+        setFormItem("Base.tRunBgnTm", { rules: [getRules("required", {})] }); //追溯/日落起期
+        setFormItem("Base.tRunEndTm", { rules: [getRules("required", {})] }); //追溯/日落止期
+      }
+
     } else if (val == "1") {
+
+      if (cIsRetroSpect !== '0') {
+        console.log('1212')
+        setFormItem("Base.tRunBgnTm", { rules: null }); //追溯/日落起期
+        setFormItem("Base.tRunEndTm", { rules: null }); //追溯/日落止期
+      }
+
       //期内发生制时，报告起始、终止日期必填
       setFormItem("Base.tReportBgnTm", { rules: [getRules("required", {})] }); //延长报告期起始日期
       setFormItem("Base.tReportEndTm", { rules: [getRules("required", {})] }); //延长报告期终止日期
@@ -149,33 +158,33 @@ const method = {
   },
   // 是否有追溯期/日落期 change事件
   isTermFunc: (val) => {
+    let cIsRetroSpect = getFromValue()['Base.cClaimName']      // 索赔基础名称  0 期内索赔制  
     if (val == "1") {
-      //选择 是 且索赔基础名称为内索赔制 时，追溯/日落起止期必填
-      // setFormItem("Base.tRunBgnTm", {
-      //   // rules: [getRules("required", {})],
-      //   disabled: false,
-      // }); //追溯/日落起期
-      // setFormItem("Base.tRunEndTm", {
-      //   // rules: [getRules("required", {})],
-      //   disabled: false,
-      // }); //追溯/日落止期
+      //选择 是 且索赔基础名称为内索赔制 时，追溯/日落起止期必填  期内索赔制  放开并且必填
+      if (cIsRetroSpect == '0') {
+        setFormItem("Base.tRunBgnTm", { rules: [getRules("required", {})], disabled: false, }); //追溯/日落起期
+        setFormItem("Base.tRunEndTm", { rules: [getRules("required", {})], disabled: false, }); //追溯/日落止期
+      } else {
+        setFormItem("Base.tRunBgnTm", { rules: [], disabled: false, }); //追溯/日落起期
+        setFormItem("Base.tRunEndTm", { rules: [], disabled: false, }); //追溯/日落止期
+      }
     } else if (val == "0") {
-      // setFormItem("Base.tRunBgnTm", {  disabled: true }); //追溯/日落起期
-      // setFormItem("Base.tRunEndTm", { disabled: true }); //追溯/日落止期
+      setFormItem("Base.tRunBgnTm", { rules: [], disabled: true }); //追溯/日落起期
+      setFormItem("Base.tRunEndTm", { rules: [], disabled: true }); //追溯/日落止期
       setFormValue({
         "Base.tRunBgnTm": "",
         "Base.tRunEndTm": "",
         "Base.nTracingDays": "",
       });
     } else {
-      //是否有追溯期/日落期没有值时, 且索赔基础名称为内索赔制 时，追溯/日落起止期必填
-      if (getValue("Base.claimName") == "0") {
-        setFormItem("Base.tRunBgnTm", { rules: [getRules("required", {})],  disabled: false, }); //追溯/日落起期
-        setFormItem("Base.tRunEndTm", { rules: [getRules("required", {})],  disabled: false, }); //追溯/日落止期
-      } else {
-        setFormItem("Base.tRunBgnTm", { rules: null }); //追溯/日落起期
-        setFormItem("Base.tRunEndTm", { rules: null }); //追溯/日落止期
-      }
+      // //是否有追溯期/日落期没有值时, 且索赔基础名称为内索赔制 时，追溯/日落起止期必填
+      // if (getValue("Base.claimName") == "0") {
+      //   setFormItem("Base.tRunBgnTm", { rules: [getRules("required", {})], disabled: false, }); //追溯/日落起期
+      //   setFormItem("Base.tRunEndTm", { rules: [getRules("required", {})], disabled: false, }); //追溯/日落止期
+      // } else {
+      //   setFormItem("Base.tRunBgnTm", { rules: null }); //追溯/日落起期
+      //   setFormItem("Base.tRunEndTm", { rules: null }); //追溯/日落止期
+      // }
     }
   },
   // 追溯起期
@@ -185,7 +194,10 @@ const method = {
     if (!end || !v) {
       return;
     }
-    const tm = moment(end).diff(moment(v), "days");
+    console.log(moment(end))
+    const tmDay = moment(end).diff(moment(v), "days");
+    const tm = moment(end).diff(moment(v), "seconds")
+    console.log(tm,tmDay)
     if (tm < 0) {
       ElMessage.warning("追溯/日落止期不能小于追溯起期");
       setFormValue({
@@ -194,7 +206,7 @@ const method = {
       return;
     }
     setFormValue({
-      "Base.nTracingDays": tm,
+      "Base.nTracingDays": tmDay,
     });
   },
   // 追溯止期
@@ -205,19 +217,21 @@ const method = {
     if (!start || !v) {
       return;
     }
- 
+
     const tm = moment(v).diff(moment(start), "days");
     // const traceTime = moment(v).diff(moment(tInsrncBgnTm), "days")
-    const traceTime = moment(tInsrncBgnTm).diff(moment(v), "seconds")
- 
-    if (tm < 0) {
+
+    const startTime = moment(v).diff(moment(start), "days");
+    // console.log(traceTime)
+    if (startTime < 0) {
       ElMessage.warning("追溯/日落止期不能小于追溯起期");
       setFormValue({
         "Base.tRunEndTm": null,
       });
       return;
     }
- 
+
+        const traceTime = moment(tInsrncBgnTm).diff(moment(v), "seconds")
     //校验追溯时间
     if (traceTime < 0) {
       ElMessage.warning("追溯期的止期|须早于保险起期！");
@@ -230,13 +244,13 @@ const method = {
 
 
     const formattedDate = moment(v).format('YYYY-MM-DD') + ' 23:59:59';
- 
+
     setFormValue({
       "Base.nTracingDays": tm,
       "Base.tRunEndTm": formattedDate, // 更新日期字段
     });
   },
-  reportBgnTmFn: (v:any) => {
+  reportBgnTmFn: (v: any) => {
     const start = getValue("Base.tReportBgnTm");
     const end = getValue("Base.tReportEndTm");
     if (!end || !v) {
@@ -255,7 +269,7 @@ const method = {
     });
   },
   // 延长报告期止期
-  reportEndTmFn: (v:any) => {
+  reportEndTmFn: (v: any) => {
     const start = getValue("Base.tReportBgnTm");
     const end = getValue("Base.tReportEndTm");
     if (!start || !v) {
@@ -272,7 +286,7 @@ const method = {
     const formatReportEnd = moment(v).format('YYYY-MM-DD') + ' 23:59:59';
     setFormValue({
       "Base.nReportDays": tm,
-      "Base.tReportEndTm":formatReportEnd,
+      "Base.tReportEndTm": formatReportEnd,
     });
   },
 };
@@ -310,7 +324,7 @@ function setFormItem(key: any, obj: any) {
           for (let key in obj.btnItems) {
             item.btnItems[key] = obj.btnItems[key];
           }
-        }else{
+        } else {
           Object.assign(item, obj);
         }
       }
@@ -318,7 +332,7 @@ function setFormItem(key: any, obj: any) {
   }
 }
 
-function getFormconfig(){
+function getFormconfig() {
   return formconfig1;
 }
 
