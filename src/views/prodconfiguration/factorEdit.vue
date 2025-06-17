@@ -133,7 +133,7 @@ const schemaMap = reactive<Record<string, any>>({
         }
 
         formconfig1.superFromSchema?.forEach((item: any) => {
-          if (item.prop === "max" || item.prop === "min") {
+          if (item.prop === "max" || item.prop === "min" || item.prop === "precision") {
             item.hidden = f === "1" ? false : true;
           }
         });
@@ -175,6 +175,12 @@ const schemaMap = reactive<Record<string, any>>({
       prop: "max",
       inputtype: "rtnumber",
       title: "最大值",
+      hidden: true,
+    },
+    {
+      prop: "precision",
+      inputtype: "rtnumber",
+      title: "数值精度",
       hidden: true,
     },
     {

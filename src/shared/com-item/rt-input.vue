@@ -192,7 +192,13 @@ function isReQuired(){
 const emits = defineEmits(["update:modelValue", "valueChange"]); // 父组件监听事件，同步子组件值的变化给父组件
 const vInput = ref<string | Number | undefined>();
 watch([() => props.modelValue], ([newModelValue]) => {
-  vInput.value = newModelValue;
+  let n = null;
+  if(props.item.precision && newModelValue){
+    n = Number(newModelValue).toFixed(props.item.precision);
+  }else{
+    n = newModelValue;
+  }
+  vInput.value = n;
 });
 
 function handleChange(val?: string | undefined | null) {
