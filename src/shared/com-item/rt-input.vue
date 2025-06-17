@@ -193,11 +193,16 @@ const emits = defineEmits(["update:modelValue", "valueChange"]); // 父组件监
 const vInput = ref<string | Number | undefined>();
 watch([() => props.modelValue], ([newModelValue]) => {
   let n = null;
-  if(props.item.precision && newModelValue){
-    n = Number(newModelValue).toFixed(props.item.precision);
+  if (props.item.type === "number") {
+    if(props.item.precision && newModelValue){
+      n = Number(newModelValue).toFixed(props.item.precision);
+    }else{
+      n = newModelValue;
+    }
   }else{
     n = newModelValue;
   }
+  
   vInput.value = n;
 });
 
