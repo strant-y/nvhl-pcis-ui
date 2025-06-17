@@ -385,6 +385,10 @@ function initData(data: any) {
   const termData = JSON.parse(JSON.stringify(data));
   termData.riskList = null;
   termdata.value = termData;
+  if(termdata.value['Term.nSeatTotal']){
+    const tgt = opertaor.getTableRefByKey("tgt");
+    tgt.setValue('Tgt.nSeatCapacity',termdata.value['Term.nSeatTotal'])
+  }
   // 缓存条款责任数据
   let riskData: { [key: string]: any } = {};
   newData.riskList?.forEach((v: any) => {

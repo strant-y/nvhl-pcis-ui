@@ -139,6 +139,46 @@ function calculateCarAge(initialDateStr:any) {
 }
 // 绑定方法
 const method = {
+  getcIsSingleChange:(val:string)=>{
+    if(val=== '1'){
+      setFormItem('Tgt.nTotalCost', {
+        rules: [getRules("required", {})],
+      });
+      setFormItem('Tgt.nSurveyPrice', {
+        rules: [getRules("required", {})],
+      });
+      setFormItem('Tgt.Prop', {
+        rules: [getRules("required", {})],
+      });
+      setFormItem('Tgt.cSuffixAddr', {
+        rules: [getRules("required", {})],
+      });
+    }else {
+      setFormItem('Tgt.nTotalCost', {
+        rules: null
+      });
+      setFormItem('Tgt.nSurveyPrice', {
+        rules: null
+      });
+      setFormItem('Tgt.Prop', {
+        rules: null
+      });
+      setFormItem('Tgt.cSuffixAddr', {
+        rules: null
+      });
+    }
+  },
+  getcTransportationToolsChange:(val:string)=>{
+    if(val=== '02'){
+      setFormItem('Tgt.cPlateNumber', {
+        rules: [getRules("required", {})],
+      });
+    }else {
+      setFormItem('Tgt.cPlateNumber', {
+        rules: null
+      });
+    }
+  },
   funccDetailsAccident:()=>{
     dialog.value?.open('detailsAccident', {
           selectedData: getValue("Tgt.cFinanceCde"), //需要把自定义的过滤掉，只传过去从模板中选择的

@@ -263,7 +263,20 @@ const method = {
     let baseFlag = alldata['plyBase']["Base.cAppNo"];
 
     let fromSchema = tableconfig.value.fromSchema;
-
+    const tgt = opertaor.getTableRefByKey("tgt");
+    if(tgt.getValue('Tgt.cIsRegistered') === '1'){
+      fromSchema.forEach(item=>{
+        item.rules = [{required: true, message: '该项为必填项', trigger: 'blur'}]
+      })
+    }else {
+      fromSchema.forEach(item=>{
+        if(item.prop=== 'Dist.cAssociatedGuardian' || item.prop === 'Dist.cWardName'){
+          item.rules = [{required: true, message: '该项为必填项', trigger: 'blur'}]
+        }else {
+          item.rules = null
+        }
+      })
+    }
     checkAppBase({ cAppNo: baseFlag }).then((res: any) => {
       if (res.code === 200) {
         dialog.value?.open(
