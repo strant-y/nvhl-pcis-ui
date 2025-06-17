@@ -1250,6 +1250,44 @@ async function loadAfter() {
     }).then((res) => {
       if (res) {
         const ops = opertaor.convertData(res);
+        // 保险期限 投保日期更新为当前日期 保险起期和保险止期重置为第二天0点至一年后
+        if(ops.insrnc) {
+          const beginTm = dayjs().add(1, 'day').format("YYYY-MM-DD 00:00:00")
+          const endTm = dayjs(beginTm).add(1, 'year').format("YYYY-MM-DD 23:59:59")
+          ops.insrnc["Base.tInsrncBgnTm"] = beginTm;
+          ops.insrnc["Base.tInsrncEndTm"] = endTm;
+          ops.insrnc['Base.tAppTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")
+        }
+        // 条款信息中的cPkId删除
+        if(ops.cvrg && ops.cvrg.length > 0) {
+          ops.cvrg.forEach((item:any) => {
+            delete item['Term.cPkId']
+            item['Term.riskList'].forEach((i:any) => {
+              delete i['Term.cPkId']
+            })
+          })
+        }
+        // 承包基本信息中的保额和保费也初始化为0
+        if(ops.base) {
+          ops.base['Base.nPrm'] = 0
+          ops.base['Base.nAmt'] = 0
+        }
+        // 缴费计划列表清空
+        if(ops.payinfo && ops.payinfo.length > 0) {
+          ops.payinfo = []
+        }
+        // 特约信息
+        if(ops.SpecialAgreement && ops.SpecialAgreement.length > 0) {
+          ops.SpecialAgreement.forEach((item:any) => {
+            delete item['SpecialAgreement.cPkId']
+          })
+        }
+        // 免赔条件
+        if(ops.deductibleDist && ops.deductibleDist.length > 0) {
+          ops.deductibleDist.forEach((item:any) => {
+            delete item['DeductibleDist.cPkId']
+          })
+        }
         opertaor.setDataAll(ops);
         // 获取原投保单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
@@ -1332,12 +1370,21 @@ async function loadAfter() {
         // this.cTplDesc = result['res'].cDesc;
         // this.TplPkId = result['res'].cPkId;
         const ops = JSON.parse(cTplCtnt);
-        // 模板出单 条款信息的保险费初始化为0
+        // 保险期限 投保日期更新为当前日期 保险起期和保险止期重置为第二天0点至一年后
+        if(ops.insrnc) {
+          const beginTm = dayjs().add(1, 'day').format("YYYY-MM-DD 00:00:00")
+          const endTm = dayjs(beginTm).add(1, 'year').format("YYYY-MM-DD 23:59:59")
+          ops.insrnc["Base.tInsrncBgnTm"] = beginTm;
+          ops.insrnc["Base.tInsrncEndTm"] = endTm;
+          ops.insrnc['Base.tAppTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")
+        }
+        // 条款信息中的cPkId删除
         if(ops.cvrg && ops.cvrg.length > 0) {
-          ops.cvrg?.forEach((item:any) => {
-            if(item['Term.nInsuranceFee']) {
-              item['Term.nInsuranceFee'] = 0
-            }
+          ops.cvrg.forEach((item:any) => {
+            delete item['Term.cPkId']
+            item['Term.riskList'].forEach((i:any) => {
+              delete i['Term.cPkId']
+            })
           })
         }
         // 承包基本信息中的保额和保费也初始化为0
@@ -1351,11 +1398,15 @@ async function loadAfter() {
         }
         // 特约信息
         if(ops.SpecialAgreement && ops.SpecialAgreement.length > 0) {
-          ops.SpecialAgreement = []
+          ops.SpecialAgreement.forEach((item:any) => {
+            delete item['SpecialAgreement.cPkId']
+          })
         }
-        // 保险期限 投保日期更新为当前日期
-        if(ops.insrnc) {
-          ops.insrnc['Base.tAppTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")
+        // 免赔条件
+        if(ops.deductibleDist && ops.deductibleDist.length > 0) {
+          ops.deductibleDist.forEach((item:any) => {
+            delete item['DeductibleDist.cPkId']
+          })
         }
         opertaor.setDataAll(ops);
         //获取单号
