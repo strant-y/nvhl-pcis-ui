@@ -245,6 +245,13 @@ const method = {
       }
     }
   },
+  aAmtChange:(val:any)=>{
+    const namtExch = getValue('Base.nAmtRmbExch');
+    if (!!namtExch) {
+        // 计算折人民币保额
+        setValue("Base.nRmbAmt", numMulti(namtExch, val));
+      }
+  },
   // 总保额(累计赔偿限额)汇率change事件
   nAmtRmbExchChange: (val: any) => {
     if (!!val) {
