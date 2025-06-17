@@ -315,6 +315,8 @@ import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { terConfig } from "@/store/modules/term-config";
 import { useValidator } from "@/typings/useValidator";
+import { useRoute } from "vue-router";
+const route = useRoute();
 const templateRef = ref();
 const opertaor = dataOpertaor();
 const pageparam = opertaor.getParam();
@@ -881,6 +883,10 @@ function methodLink(items: any) {
     for (const i in items) {
       if (items[i]["func"] && typeof items[i]["func"] === "string") {
         items[i]["func"] = methodMap[items[i]["func"]];
+      }
+      // 方案配置时条款信息中的保险费是可以编辑的
+      if(items[i].prop === "Term.nInsuranceFee" && route.name === "plan-info") {
+        items[i].disabled = false
       }
     }
   }
