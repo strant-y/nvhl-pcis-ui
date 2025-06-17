@@ -687,6 +687,7 @@ function initshowConfig() {
 function exChangeFunc() {
   const data: { [key: string]: any } = opertaor.getDataAll();
   extermConf.value = Object.assign({});
+  // 043009个性化配置
   if (pageparam.cProdNo === "043009") {
     if (data["tgt"]["Tgt.cInsuranceMethod"]) {
       if (data["tgt"]["Tgt.cInsuranceMethod"] !== "613001") {
@@ -725,6 +726,16 @@ function exChangeFunc() {
       termFactormap.value = term;
     }
   }
+  // 045001个性化配置
+  if (pageparam.cProdNo === "045001") {
+    if(data["tgt"]["Tgt.cRegisteredLogo"] && data["tgt"]["Tgt.cRegisteredLogo"] === '0'){
+      const term = termFactormap.value.filter(
+        (r) => r["prop"] !== "Term.nInsuredCount"
+      );
+      termFactormap.value = term;
+    }
+  }
+   // 040002个性化配置
   if (pageparam.cProdNo === "040002") {
     if (data["tgt"]["Tgt.cDeterminingMethod"]) {
       if (data["tgt"]["Tgt.cDeterminingMethod"] === "0") {
