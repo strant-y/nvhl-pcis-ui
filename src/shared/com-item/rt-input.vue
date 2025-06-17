@@ -54,11 +54,19 @@
           ? (value) => {
               if (value == null) return '';
               let num = value.replace(/[^0-9.-]/g, '');
-              if(item.max && num > item.max){
-                num = item.max;
+              let Max = 99999999999;
+              if(item.max){
+                Max = item.max;
               }
-              if(item.min && num < item.min){
-                num = item.min;
+              if(num > Max){
+                num = Max;
+              }
+              let Min = 0;
+              if(item.min){
+                Min = item.min;
+              }
+              if(num < Min){
+                num = Min;
               }
               const parts = `${num}`.split('.');
               const integerPart = parts[0].replace(
