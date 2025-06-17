@@ -224,6 +224,7 @@
               "
               :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
               :pageSchema="k.pageSchema"
+              :compKey="k.pageCode"
             />
           </div>
         </template>
@@ -367,7 +368,11 @@ const templateDialog = defineAsyncComponent(
   () => import("@/views/pcis/my-page/templateDialog.vue")
 );
 
-const opertaor = dataOpertaor();
+const idxParam = {
+  opertaorId: 'my-page',
+};
+provide('idxParam', idxParam);
+const opertaor = dataOpertaor(idxParam.opertaorId);
 opertaor.init();
 const underwrite = ref(null);
 const edrbase = ref(null);
