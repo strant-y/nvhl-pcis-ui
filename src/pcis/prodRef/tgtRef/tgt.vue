@@ -66,6 +66,9 @@ onMounted(async () => {
   setFormItem("Tgt.nAgreeFrequency", {
     rules: [getRules("signlessInt", {})],
   });
+  setFormItem("Tgt.nCarsNumber", {
+    rules: [getRules("required", {'trigger':'blur'}),getRules("positiveNumber", {})],
+  });
 });
 
 const wagesInfoModel = () => {
