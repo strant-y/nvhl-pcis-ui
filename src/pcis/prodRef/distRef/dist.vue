@@ -288,7 +288,9 @@ const method = {
             compKey: props.compKey
           },
           {
-            isOk: (res: any) => {},
+            isOk: (res: any) => {
+              console.log(111)
+            },
             handleQuery: method.handleQuery, // 新增：将 handleQuery 方法传递给 distAdd 组件
           },
           { width: "60" }
