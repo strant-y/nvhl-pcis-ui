@@ -51,6 +51,9 @@ const props = defineProps({
     type: [Object],
     required: true,
   },
+  compKey: {
+    type: String
+  }
 });
 
 const pageresult = reactive<Pageresult>({
@@ -73,68 +76,68 @@ let cComponentTableValue: string;
 // 封装获取 cComponentTableValue 的逻辑
 const getCComponentTableValue = (cProdNo: string, title: string): string => {
   console.log(title,"title00000")
-  if (cProdNo == "040001") {
-    return "AddressDist";
-  } else if (cProdNo == "040002") {
-    if (title == "雇员清单") {
-      return "EmployeeDist";
-    } else if (title == "雇员清单汇总") {
-      return "DistSummary";
-    } else if (title == "车辆清单") {
-      return "VehicleDist";
-    } else if (title == "车辆清单汇总") {
-      return "DistSummary";
-    }
-  } else if (cProdNo == "040003") {
-    if(title == "产品清单"){
-      return "ProductDist";
-    }else if(title =="销售区域清单"){
-      return "SalesDist";
-    }
-  } else if(cProdNo == "040005"){
-    if(title =="地址清单信息"){
-      return "AddressDist";
-    }else if(title == "人员清单"){
-      return "EducatorDist"
-    }
-  }else if(cProdNo == "040020"){
-      return "PersonnelDist";
-  }else if(cProdNo == "042001"){
-      return "DesignDist"
-  }else if(cProdNo == "042003"){
-      return "EducatorDist"
-  }else if(cProdNo == "043001"){
-    return "ElevatorDist";
-  } else if (cProdNo == "043002") {
-    return "VehicleDist";
-  } else if(cProdNo == "043007"){
-    return "VehicleDist";
-  }else if (cProdNo == "043009") {
-    if (title == "实际用工地址/工程项目地址清单") {
-      return "ProjectDist";
-    } else if (title == "从业人员清单") {
-      return "EmployeeDist";
-    } else if (title == "从业人员清单汇总") {
-      return "DistSummary";
-    }
-  }else if(cProdNo == "043010"){
-    return "EducatorDist"
-  } else if(cProdNo == "043013"){
-    return "PollutionDist"
-  }else if(cProdNo =="043020"){
-    if(title =="房屋清单"){
-      return "AddressDist"
-    }else if(title =="家庭成员清单"){
-      return "FamilyDist"
-    }
-  }else if(cProdNo =="045001"){
-    if(title =="雇员清单信息"){
-      return "EmployeeDist"
-    }else if(title =="工程项目地址清单"){
-      return "ProjectDist"
-    }
-  }
-  return "";
+  // if (cProdNo == "040001") {
+  //   return "AddressDist";
+  // } else if (cProdNo == "040002") {
+  //   if (title == "雇员清单") {
+  //     return "EmployeeDist";
+  //   } else if (title == "雇员清单汇总") {
+  //     return "DistSummary";
+  //   } else if (title == "车辆清单") {
+  //     return "VehicleDist";
+  //   } else if (title == "车辆清单汇总") {
+  //     return "DistSummary";
+  //   }
+  // } else if (cProdNo == "040003") {
+  //   if(title == "产品清单"){
+  //     return "ProductDist";
+  //   }else if(title =="销售区域清单"){
+  //     return "SalesDist";
+  //   }
+  // } else if(cProdNo == "040005"){
+  //   if(title =="地址清单信息"){
+  //     return "AddressDist";
+  //   }else if(title == "人员清单"){
+  //     return "EducatorDist"
+  //   }
+  // }else if(cProdNo == "040020"){
+  //     return "PersonnelDist";
+  // }else if(cProdNo == "042001"){
+  //     return "DesignDist"
+  // }else if(cProdNo == "042003"){
+  //     return "EducatorDist"
+  // }else if(cProdNo == "043001"){
+  //   return "ElevatorDist";
+  // } else if (cProdNo == "043002") {
+  //   return "VehicleDist";
+  // } else if(cProdNo == "043007"){
+  //   return "VehicleDist";
+  // }else if (cProdNo == "043009") {
+  //   if (title == "实际用工地址/工程项目地址清单") {
+  //     return "ProjectDist";
+  //   } else if (title == "从业人员清单") {
+  //     return "EmployeeDist";
+  //   } else if (title == "从业人员清单汇总") {
+  //     return "DistSummary";
+  //   }
+  // }else if(cProdNo == "043010"){
+  //   return "EducatorDist"
+  // } else if(cProdNo == "043013"){
+  //   return "PollutionDist"
+  // }else if(cProdNo =="043020"){
+  //   if(title =="房屋清单"){
+  //     return "AddressDist"
+  //   }else if(title =="家庭成员清单"){
+  //     return "FamilyDist"
+  //   }
+  // }else if(cProdNo =="045001"){
+  //   if(title =="雇员清单信息"){
+  //     return "EmployeeDist"
+  //   }else if(title =="工程项目地址清单"){
+  //     return "ProjectDist"
+  //   }
+  // }
+  return props.compKey ? props.compKey.substring(0, props.compKey.length - 6) : "";
 };
 
 const formconfig11 = ref<any>({});
@@ -226,7 +229,8 @@ const method = {
         fromSchema: tableconfig.value.fromSchema,
         title: "编辑",
         rowData: row,
-          tab: formconfig1.value.title
+        tab: formconfig1.value.title,
+        compKey: props.compKey
       },
       {
         isOk: (res: any) => {},
@@ -261,6 +265,7 @@ const method = {
             fromSchema: fromSchema,
             title: "新增",
             tab: formconfig1.value.title,
+            compKey: props.compKey
           },
           {
             isOk: (res: any) => {},
@@ -342,6 +347,7 @@ const method = {
             fromSchema: tableconfig.value.fromSchema,
             title: "新增",
             tab: formconfig1.value.title,
+            compKey: props.compKey,
           },
           {
             isOk: (res: any) => {},
