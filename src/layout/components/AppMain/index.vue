@@ -15,9 +15,9 @@
     </router-view>
 
     <!-- 缓存组件状态模式-->
-    <div v-for="view in compViews" :key="view.compKey">
+    <!-- <div v-for="view in compViews" :key="view.compKey">
       <transition name="expand" mode="out-in" enter-active-class="animate__animated animate__fadeIn">
-        <keep-alive>
+        <keep-alive max="6">
           <component
             v-if="isActive(view)"
             :is="view.component"
@@ -26,7 +26,23 @@
           />
         </keep-alive>
       </transition>
-    </div>
+    </div> -->
+      <transition name="expand" mode="out-in" enter-active-class="animate__animated animate__fadeIn">
+        <keep-alive :max="4">
+          <component
+            v-if="isCompView"
+            :is="currentView?.component"
+            :key="currentView?.compKey"
+            :param="currentView?.params?.param"
+          />
+        </keep-alive>
+      </transition>
+      <!-- 不活跃的标签完全卸载 -->
+    <component 
+      :is="currentView.component" 
+      :key="compKey + '-no-cache'" 
+      v-if="!isCompView"
+    />
   </section>
 </template>
 
@@ -48,6 +64,11 @@ const compViews = computed(() => visitedViews.value.filter(f => f.mode === '2'))
 function isActive(view: TagView, idx: number) {
   return currentView.value?.path === view.path
 }
+
+const isCompView = () => {
+  return compViews.value.some(f => f.compKey === currentView.value?.compKey)
+};
+
 </script>
 
 <style lang="scss" scoped>

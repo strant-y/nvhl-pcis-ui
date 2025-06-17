@@ -1,4 +1,5 @@
 import { getIfCompViewByName, getCompByName } from '@/typings/views-component'
+import { clearDataOpertaorByPageKey } from '@/store';
 
 export const useTagsViewStore = defineStore("tagsView", () => {
   const visitedViews = ref<TagView[]>([]);
@@ -102,6 +103,7 @@ export const useTagsViewStore = defineStore("tagsView", () => {
    */
   function removeDuplicatesView(view: TagView) {
     return new Promise((resolve) => { 
+      clearDataOpertaorByPageKey(view.name);
       if(view.mode === '2' || (getIfCompViewByName(view.name) && !view.compKey)) {
         const index = visitedViews.value.findIndex(item => item.path === view.path && item.compKey !== view.compKey);
         if (index !== -1) {
