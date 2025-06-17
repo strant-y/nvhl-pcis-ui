@@ -1332,6 +1332,31 @@ async function loadAfter() {
         // this.cTplDesc = result['res'].cDesc;
         // this.TplPkId = result['res'].cPkId;
         const ops = JSON.parse(cTplCtnt);
+        // 模板出单 条款信息的保险费初始化为0
+        if(ops.cvrg && ops.cvrg.length > 0) {
+          ops.cvrg?.forEach((item:any) => {
+            if(item['Term.nInsuranceFee']) {
+              item['Term.nInsuranceFee'] = 0
+            }
+          })
+        }
+        // 承包基本信息中的保额和保费也初始化为0
+        if(ops.base) {
+          ops.base['Base.nPrm'] = 0
+          ops.base['Base.nAmt'] = 0
+        }
+        // 缴费计划列表清空
+        if(ops.payinfo && ops.payinfo.length > 0) {
+          ops.payinfo = []
+        }
+        // 特约信息
+        if(ops.SpecialAgreement && ops.SpecialAgreement.length > 0) {
+          ops.SpecialAgreement = []
+        }
+        // 保险期限 投保日期更新为当前日期
+        if(ops.insrnc) {
+          ops.insrnc['Base.tAppTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")
+        }
         opertaor.setDataAll(ops);
         //获取单号
         getCAppNoFun();
