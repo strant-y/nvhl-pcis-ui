@@ -60,7 +60,7 @@ onMounted(() => {
 });
 
 // 使用正则表达式分割字符串，保留分隔符 ** 作为单独的数组项
-const cNmeCnArray = computed(() => rowData.value.cSpecialName.split(/(\*+)/));
+const cNmeCnArray = computed(() => rowData.value.cSpecialContent.split(/(\*+)/));
 // const inputValues = ref<string[]>([]);
 const inputValues = ref(
   cNmeCnArray.value.map((item) => (item === "**" ? "" : item))
@@ -77,7 +77,7 @@ const handleSave = () => {
   const parts = cNmeCnArray.value.map((item, idx) =>
     item === "**" ? inputValues.value[idx] : item
   );
-  rowData.value.cSpecialName = parts.join("");
+  rowData.value.cSpecialContent = parts.join("");
   console.log("提交的数据:", rowData.value);
 };
 </script>
