@@ -623,6 +623,14 @@ function dataInit() {
     if (d.termTitleConf?.CCnm) {
       termTitleConf.value = JSON.parse(d.termTitleConf.CCnm);
     }
+    // 方案配置时条款信息中的保险费是可以编辑的
+    if(route.name === "plan-info") {
+      termFactormap.value.forEach((item:any) => {
+        if(item.prop === "Term.nInsuranceFee") {
+          item.disabled = false
+        }
+      })
+    }
     if (props.disabledFlag) {
       setDisabledAll();
     }
@@ -649,6 +657,14 @@ function dataInit() {
         terconfig.addConfig(queryKey, data.data);
       } else {
         ElMessage.error(msg);
+      }
+      // 方案配置时条款信息中的保险费是可以编辑的
+      if(route.name === "plan-info") {
+        termFactormap.value.forEach((item:any) => {
+          if(item.prop === "Term.nInsuranceFee") {
+            item.disabled = false
+          }
+        })
       }
       if (props.disabledFlag) {
         setDisabledAll();
@@ -898,10 +914,6 @@ function methodLink(items: any) {
     for (const i in items) {
       if (items[i]["func"] && typeof items[i]["func"] === "string") {
         items[i]["func"] = methodMap[items[i]["func"]];
-      }
-      // 方案配置时条款信息中的保险费是可以编辑的
-      if(items[i].prop === "Term.nInsuranceFee" && route.name === "plan-info") {
-        items[i].disabled = false
       }
     }
   }
