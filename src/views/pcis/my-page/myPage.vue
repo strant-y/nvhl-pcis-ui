@@ -2231,7 +2231,7 @@ const calcPremiumEdr = () => {
       nPrm.value = ops["base"]["Base.nPrm"] ? ops["base"]["Base.nPrm"] : 0;
       const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
       res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
-        res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"].split(
+        res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"]?.split(
           ","
         );
       edrbase.value?.setFormValue(EdrBaseData);
