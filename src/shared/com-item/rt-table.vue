@@ -53,7 +53,8 @@
                   "
                   style="margin-bottom: 18px"
                 >
-                  <div
+                  <div style="display: flex;">
+                    <div
                     :style="{
                       width:
                         formItems[props.row._dataId][i.prop].showExBtn &&
@@ -95,6 +96,7 @@
                       :item="formItems[props.row._dataId][i.prop].btnItems"
                     />
                   </template>
+                  </div>
                 </el-form-item>
               </el-col>
             </template>
