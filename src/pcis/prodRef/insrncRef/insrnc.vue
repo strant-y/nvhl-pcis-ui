@@ -73,7 +73,7 @@ const method = {
 
 
       maxDate.setDate(startDate.getDate() + 365);  // 设置为今天起365天后的日期
-      if(route.params.param.cRsnCde && route.params.param.cRsnCde == "FZ") {
+      if(route.params.param && route.params.param.cRsnCde && route.params.param.cRsnCde == "FZ") {
         // 如果批改原因是免费延期，当前保险止期日期之后的日期都可以选择
         return  date.getTime() < maxDate.getTime()
       } else {
