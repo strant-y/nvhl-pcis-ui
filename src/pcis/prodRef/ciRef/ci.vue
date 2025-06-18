@@ -40,27 +40,12 @@ const formconfig1 = reactive(createAppGridEditConfig({}));
 onMounted(async () => {
   console.log('99999',props.pageSchema)
 
-  props.pageSchema.fromSchema.forEach(item => {
-    if(['Ci.cCoinsurerCde'].includes(item['prop'])){
-      item['onInit'] = 'cCoinsurerCdeOnInit';
-    }
-    if(['Ci.cSubDptCde'].includes(item['prop'])){
-      item['onInit'] = 'cSubDptCdeOnInit';
-    }
-  })
-
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
     method,
     exRules
   );
   Object.assign(formconfig1, formconfig11);
-  setTimeout(() => {
-    if(param.pageType == "app"){
-      addCi()
-    }
-  }, 800);
-  
   //一般批改，部分要素可编辑
   const cCiMrkValue =  opertaor.getTableRefByKey("plyBase")
   setTimeout(() => {
@@ -133,7 +118,7 @@ const method = {
           key['Ci.nSeqNo']=index+1
       });
   },
-  // 共保公司下拉初始化事件
+  // 共保公司下拉初始化事件 from-init 会自动绑定
   cCoinsurerCdeOnInit: (data: any) => {
     const {value, rowData, config, itemRef} = data;
     if(!rowData || !config || !itemRef) return;
@@ -152,7 +137,6 @@ const method = {
                 "loadData",
                 res
             );
-            config.loadData = res;
           });
       // updateMasterAgreementValues();
     } else {
@@ -206,6 +190,7 @@ const method = {
     }
   },
 
+  // 分公司下拉初始化事件 from-init 会自动绑定
   cSubDptCdeOnInit: (data: any) => {
     const {value, rowData, config, itemRef} = data;
     if(!rowData || !config || !itemRef) return;
@@ -530,61 +515,7 @@ const method = {
     );
   },
 };
-//自动添加一行
-const addCi = () => {
-  // const plyBaseData = opertaor.getTableRefByKey("plyBase");
-  // const cBsnsTyp = plyBaseData.getValue("Base.cBsnsTyp")
-  // const cChaType = plyBaseData.getValue("Base.cChaType")
-  // const cChaSubtype = plyBaseData.getValue("Base.cChaSubtype")
-  // console.log("cBsnsTyp",cBsnsTyp,cChaType,cChaSubtype)
-  // if(cBsnsTyp === "" || cChaType== "" || cChaSubtype ==""){
-  //   ElMessage.error("请选择业务来源");
-  // }
-  freeEditRef?.value?.addRow();
-  const rowData = freeEditRef.value?.getSelectRow();
-  const rowId = rowData._dataId;
-  const val=getFromValue()
-    val.forEach((key,index) => {
-        key['Ci.nSeqNo']=index+1
-        key['Ci.nCiShare'] = '1.00000000'
-        key['Ci.nPlyFeeRate']= '0.00'
-        key['Ci.nPlyFee']= '0.00'
-        key['Ci.cChiefMrk'] = '1'
-        key['Ci.cIssueMrk'] = '1'
-        key['Ci.cCoinsurerCde'] = '327001'
-        ci["Ci.cSubDptCde"] = param.dptCde
-        // ci['Ci.cDptCde'] = param.cDptCde
-    });
-    codeListStore
-        .queryCodeList({
-          codeListName: "Comm_Code_LIST",
-          codeListParam: { "CParCde": "subdpt", cParCde: "327001" },
-        })
-        .then((res) => {
-          freeEditRef.value?.setRowFieldProp(
-            rowId,
-            "Ci.cSubDptCde",
-            "loadData",
-            res
-          );
-          freeEditRef.value?.setValueByRowKey('Ci.cSubDptCde', rowId, param.dptCde);
-            // return codeListStore
-            //   .queryCodeList({
-            //     codeListName: "CDptCde_List",
-            //     codeListParam: { "CParCde": "subdpt", cParCde: param.dptCde },
-            //   })
-            //   .then((res) => {
-            //     freeEditRef.value?.setRowFieldProp(
-            //       rowId,
-            //       "Ci.cDptCde",
-            //       "loadData",
-            //       res,
-            //     )
-            //     freeEditRef.value?.setValueByRowKey('Ci.cSubDptCde', rowId, param.cDptCde);
-            //   })
-        }
-      );
-};
+
 const updateMasterAgreementValues = () => {
   const allRows = getFromValue(); // 获取所有行数据
   let totalAmt = 0;
@@ -653,6 +584,31 @@ const setFormItem = (key, obj) => {
   }
 };
 
+
+
+// 初始化联共保信息
+const initCiInfo = (data: any) => {
+  setFormValue([]);
+  const dataList = getFromValue();
+  nextTick(() => {
+    freeEditRef?.value?.addRow();
+    const rowData = freeEditRef.value?.getSelectRow();
+    const rowId = rowData._dataId;
+    dataList.forEach((key,index) => {
+      key['Ci.nSeqNo']=index+1;
+      key['Ci.nCiShare'] = '1.00000000';
+      key['Ci.nPlyFeeRate']= '0.00';
+      key['Ci.nPlyFee']= '0.00';
+      key['Ci.cChiefMrk'] = data.cChiefMrk;
+      key['Ci.cIssueMrk'] = '1';
+      key['Ci.cCoinsurerCde'] = '327001';
+      key["Ci.cSubDptCde"] = param.dptCde;
+      key['Ci.cDptCde'] = param.cDptCde;
+    });
+  });
+};
+
+
 // 绑定特殊验证器
 const exRules = {};
 
@@ -693,7 +649,7 @@ defineExpose({
   getTableValue,
   getFormconfig,
   setRowFieldProp,
-  
+  initCiInfo
 });
 </script>
 
