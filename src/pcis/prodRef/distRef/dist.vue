@@ -335,7 +335,7 @@ const method = {
           };
         });
         if(tgtRef !=undefined){
-          tgtRef.setValue("Tgt.nElevatorsNumber",res.data.length)
+          tgtRef.setValue("Tgt.nElevatorsNumber",res.data.total)
         }
 
         // 刷新汇总表格 DistSummary045001'
@@ -438,14 +438,13 @@ const method = {
         }).catch((error) => {
           ElMessage.error("导入出错，请检查文件格式或内容");
           console.error("导入错误：", error);
-        });
+        });addCi
       };
 
       reader.onerror = (e) => {
         console.error("文件读取失败", e);
         ElMessage.error("文件读取失败");
       };
-
       reader.readAsDataURL(file); // 启动读取
       }
     };
