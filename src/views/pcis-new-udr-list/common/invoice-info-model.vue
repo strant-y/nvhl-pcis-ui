@@ -348,6 +348,7 @@ onMounted(() => {
  
   policyService.getTaxInfoByAppNo(CAppNo).then((response) => {
     if (response.code === 200) {
+      // 未返回 发票数据自动同步投保人信息
       if (response.data) {
         freeEditRef.value?.setValue('CCustomerCode', response.data.cCustomerCode);
         freeEditRef.value?.setValue('CCustomerType', response.data.cCustomerType);
@@ -361,6 +362,8 @@ onMounted(() => {
         freeEditRef.value?.setValue('CTele', response.data.cTele);
         freeEditRef.value?.setValue('CEmail', response.data.cEmail);
         freeEditRef.value?.setValue('CAddress', response.data.cAddress);
+      }else{
+        copyApplicant()
       }
     } else {
       ElMessage.error('根据申请单号获取发票信息出现异常！');
