@@ -39,6 +39,16 @@ const formconfig1 = reactive(createAppGridEditConfig({}));
 
 onMounted(async () => {
   console.log('99999',props.pageSchema)
+
+  props.pageSchema.fromSchema.forEach(item => {
+    if(['Ci.cCoinsurerCde'].includes(item['prop'])){
+      item['onInit'] = 'cCoinsurerCdeOnInit';
+    }
+    if(['Ci.cSubDptCde'].includes(item['prop'])){
+      item['onInit'] = 'cSubDptCdeOnInit';
+    }
+  })
+
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
     method,
@@ -123,6 +133,39 @@ const method = {
           key['Ci.nSeqNo']=index+1
       });
   },
+  // 共保公司下拉初始化事件
+  cCoinsurerCdeOnInit: (data: any) => {
+    const {value, rowData, config, itemRef} = data;
+    if(!rowData || !config || !itemRef) return;
+    const rowId = rowData._dataId;
+    if (value === "327001") {
+      // 如果选择的是永安保险，加载对应的分公司列表
+      codeListStore
+          .queryCodeList({
+            codeListName: "Comm_Code_LIST",
+            codeListParam: { "CParCde": "subdpt", cParCde: "327001" },
+          })
+          .then((res) => {
+            freeEditRef.value?.setRowFieldProp(
+                rowId,
+                "Ci.cSubDptCde",
+                "loadData",
+                res
+            );
+            config.loadData = res;
+          });
+      // updateMasterAgreementValues();
+    } else {
+      // 非永安保险，设置默认值和其他数据
+      freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "");
+      freeEditRef.value?.setRowFieldProp(
+          rowId,
+          "Ci.cSubDptCde",
+          "loadData",
+          [{ value: '1', label: '其他' }]
+      );
+    }
+  },
   //共保公司下拉事件
   cCoinsurerCdeChange:(val)=>{
     const rowData = freeEditRef.value?.getSelectRow();
@@ -160,6 +203,27 @@ const method = {
         [{ value: '1', label: '其他' }]
       );
       // updateMasterAgreementValues();
+    }
+  },
+
+  cSubDptCdeOnInit: (data: any) => {
+    const {value, rowData, config, itemRef} = data;
+    if(!rowData || !config || !itemRef) return;
+    const rowId = rowData._dataId;
+    if(value !=""){
+      codeListStore
+          .queryCodeList({
+            codeListName: "CDptCde_List",
+            codeListParam: { "CDptCde": value },
+          })
+          .then((res) => {
+            freeEditRef.value?.setRowFieldProp(
+                rowId,
+                "Ci.cDptCde",
+                "loadData",
+                res,
+            );
+          });
     }
   },
   //分公司下拉事件

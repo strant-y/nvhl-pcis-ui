@@ -94,8 +94,14 @@ onMounted(() => {
     });
     //移动手机校验
     setFormItem("Applicant.cMobile", { rules: [getRules("phoneNo", {})] });
-      // 传真校验
+    // 传真校验
     setFormItem("Applicant.cFax", { rules: [getRules("faxNumber", {})] });
+
+    
+    setFormItem("Applicant.cGreenIndustryCustomers",{disabled: true});
+    setFormItem("Applicant.cGreenIndustryList",{disabled: true});
+
+
   });
 });
 //给表单下拉项赋值
@@ -320,6 +326,11 @@ const method = {
         setFormItem("Applicant.cCertfCde", {
         rules: [getRules("socialCode", {})],
       });
+
+            // 为法人  企业成立日期
+      setFormItem("Applicant.tEstablishingDate", {
+        rules: [getRules("required", {})],
+      });
     } else {
       setFormItem("Applicant.cCertfCde", {
         rules: [getRules("required", {})],
@@ -383,6 +394,7 @@ const method = {
       setFormItem("Applicant.cGreenIndustryCustomers", {
         rules: [getRules("required", {})],
       });
+
       // 参加社会统筹标志
       setFormItem("Applicant.cParticiinsocTyp", {
         rules: [getRules("required", {})],
@@ -393,12 +405,19 @@ const method = {
       });
  
    
-
-      console.log('vvvvvvv',val)
-      // 为法人 移动电话不填
-      setFormItem("Applicant.cMobile", {
-        rules: [getRules("phoneNo", {})],
-      });
+      let cMobile = getValue('Applicant.cMobile');  // 移动 
+      let cTel = getValue('Applicant.cTel');  // 固定电话    
+      if(!cMobile &&  !cTel ){
+         setFormItem("Applicant.cMobile", {
+          rules: [getRules("required", {}), getRules("phoneNo", {})],
+        });
+      }else  if(cMobile){
+        setFormItem("Applicant.cTel", { rules: [getRules("phone", {})] });
+        setFormItem("Applicant.cMobile", { rules: [getRules("required", {}), getRules("phoneNo", {})]})
+      } else if(cTel){
+        setFormItem("Applicant.cTel", { rules: [getRules("required", {}),getRules("phone", {})] });
+        setFormItem("Applicant.cMobile", { rules: [ getRules("phoneNo", {})]})
+      }
 
       // 是否个体工商户
       setFormItem("Applicant.cIsIndvduBiz", {
@@ -408,13 +427,6 @@ const method = {
       setFormItem("Applicant.cTrdCde", {
         rules: [getRules("required", {})],
       });
-
-      // setFormItem("Applicant.cCertfCls", {
-      //      typeCode: 'UN_NATURAL_CERTIFICATE_CACHE',
-      //       codeParam: {  },
-
-      // })
-
            codeListStore
         .queryCodeList({
           codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
@@ -456,6 +468,11 @@ const method = {
         rules: null,
         disabled: true,
       });
+
+      // 为法人  企业成立日期
+      setFormItem("Applicant.tEstablishingDate", {
+        rules: null,
+      });
       setValue("Applicant.cGreenIndustryCustomers", "");
       setValue("Applicant.cIsMicroEntpris", "");
       //是否分支机构
@@ -472,22 +489,14 @@ const method = {
         rules: [],
       });
 
-      // 个人 移动电话必填
+      // 个人 移动电话必填  
       setFormItem("Applicant.cMobile", {
-        rules: [getRules("required", {}), getRules("phoneNo", {})],
+        rules: [ getRules("required", {}), getRules("phoneNo", {})],
       });
-
+      setFormItem("Applicant.cTel", { rules: [getRules("phone", {})] });
       setFormItem("Applicant.cIsIndvduBiz", {
         rules: [getRules("required", {})],
       });
-
-      //       setFormItem("Applicant.cCertfCls", {
-      //      typeCode: 'NATURAL_CERTIFICATE_CACHE',
-      //       codeParam: {  },
-
-      // })
-
-      
 
       codeListStore
         .queryCodeList({
@@ -623,13 +632,11 @@ const method = {
       { title: "职业", width: 85 }
     );
   },
+
+  // 证件有效期长期标识
   tCertMrkChecked: (val) => {
     const param = opertaor.getParam();
     if (val == "1") {
-      // setValue(
-      //   "Applicant.tCertfBgnDate",
-      //   moment(new Date("2099-12-31")).format("YYYY-MM-DD HH:mm:ss")
-      // );
       setValue(
         "Applicant.tCertfEndDate",
         moment(new Date("2099-12-31")).format("YYYY-MM-DD HH:mm:ss")
@@ -637,18 +644,25 @@ const method = {
       if (!param.initFlag) {
         setFormItem("Applicant.tCertfEndDate", { disabled: true });
       }
-      setFormItem("Applicant.tCertfEndDate", { disabled: true });
+      setFormItem("Applicant.tCertfBgnDate", {  rules: [],});
+      setFormItem("Applicant.tCertfEndDate", { disabled: true , rules: [],});
+
     } else {
       setValue("Applicant.tCertfBgnDate", tCertfDate.value[0] || "");
       setValue("Applicant.tCertfEndDate", tCertfDate.value[1] || "");
       if (!param.initFlag) {
       setFormItem("Applicant.tCertfEndDate", { disabled: false });
-
       }
+      setFormItem("Applicant.tCertfBgnDate", {     rules: [getRules("required", {})],});
+      setFormItem("Applicant.tCertfEndDate", {    rules: [getRules("required", {})],});
+
     }
   },
+  // 移动电话 切换
   mobileChange: (val) => {
-    if (val) {
+    let cClntMrk =  getValue('Applicant.cClntMrk'); // 法人  1个人  0法人
+ 
+    if (cClntMrk &&  val) {
       setFormItem("Applicant.cMobile", {
         rules: [getRules("required", {}), getRules("phoneNo", {})],
       });
@@ -657,8 +671,10 @@ const method = {
   },
   // 固定电话
   cTelChange: (val) => {
-    console.log(val, "");
-    if (val) {
+    let cClntMrk =  getValue('Applicant.cClntMrk'); // 法人  1个人  0法人
+    let cMobile = getValue('Applicant.cMobile');  // 移动 
+
+    if (cClntMrk =='0' && val && !cMobile) {
       setFormItem("Applicant.cTel", {
         rules: [getRules("phone", {}), getRules("required", {})],
       });
@@ -726,6 +742,7 @@ const method = {
     if (val == "1") {
       setFormItem("Applicant.cGreenIndustryList", {
         rules: [getRules("required", {})],
+        disabled: false,
       });
     } else {
       setFormItem("Applicant.cGreenIndustryList", { rules: null });
@@ -775,22 +792,18 @@ const method = {
   },
   //注册地址
   getCountry: (val: any) => {
-    console.log(111);
     setRegisterAdd();
   },
   //常住地址
   getAllProp: (val: any) => {
-    console.log(112);
     setregistAdd();
   },
   //注册地址(input)
   getcSuffixAddr: (val: any) => {
-    console.log(113);
     setRegisterAdd();
   },
   //常住地址(input)
   getcRegisterSuffixAddr: (val: any) => {
-    console.log(114);
     setregistAdd();
   },
   // 读取身份证

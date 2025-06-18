@@ -194,9 +194,9 @@ const method = {
     if (!end || !v) {
       return;
     }
-    console.log(moment(end))
-    const tmDay = moment(end).diff(moment(v), "days");
-    const tm = moment(end).diff(moment(v), "seconds")
+    console.log(moment(start),moment(start),moment(end))
+    const tmDay = moment(end).diff(moment(start), "days");
+    const tm = moment(end).diff(moment(start), "seconds")
     console.log(tm,tmDay)
     if (tm < 0) {
       ElMessage.warning("追溯/日落止期不能小于追溯起期");

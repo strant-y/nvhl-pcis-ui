@@ -1920,8 +1920,11 @@ const submitToUndrFn = async () => {
               }else if(undr["cDecision"] == '0'){
                 ElMessage.error(undr.msg);
               }else{
-                ElMessage.error(undr.msg);
+                ElMessage.success(undr.msg);
               }
+              //关闭当前tab页面
+              // this.$router.back();
+              
             } else {
               ElMessage.error(undr.msg);
             }

@@ -209,10 +209,12 @@ const method = {
     }
   },
   getcRentalLogoChange:(val:string)=>{
+    console.log('111',val)
     if(val=== '1'){
       setFormItem('Tgt.cBareboatLessee', {
         rules: [getRules("required", {})],
       });
+      
     }else {
       setFormItem('Tgt.cBareboatLessee', {
         rules: null
@@ -430,11 +432,7 @@ const method = {
     });
     }
   },
-
-
-
-
-  // 工程造价
+ // 工程造价
   nEngineeringCostChange: (val) => {
     if (val) {
       setFormItem('Tgt.nLaborPrice', {
@@ -626,6 +624,15 @@ const method = {
         setValue("Tgt.cCode",  res.body.cSrvyCde);  // 城市
       };
     });
+  },
+  // 建造完成年份
+  tCompletionYearChange:(val:any)=>{
+    if(val){
+        const currentYear = new Date().getFullYear();
+        const targetYear = new Date(val).getFullYear();
+        console.log(val,targetYear,currentYear - targetYear)
+        setValue('Tgt.nShipAge',currentYear - targetYear)
+    }
   }
 };
 

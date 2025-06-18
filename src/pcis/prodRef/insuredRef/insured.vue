@@ -328,8 +328,23 @@ const method = {
         rules: [getRules("required", {})],
       });
 
-      // 移动电话
-      setFormItem("Insured.cMobile", { rules: [getRules("phoneNo", {})] });
+
+      // // 移动电话
+      // setFormItem("Insured.cMobile", { rules: [getRules("phoneNo", {})] });
+      let cMobile = getValue('Insured.cMobile');  // 移动 
+      let cTel = getValue('Insured.cTel');  // 固定电话    
+      if(!cMobile &&  !cTel ){
+         setFormItem("Insured.cMobile", {
+          rules: [getRules("required", {}), getRules("phoneNo", {})],
+        });
+      }else  if(cMobile){
+        setFormItem("Insured.cTel", { rules: [getRules("phone", {})] });
+        setFormItem("Insured.cMobile", { rules: [getRules("required", {}), getRules("phoneNo", {})]})
+      } else if(cTel){
+        setFormItem("Insured.cTel", { rules: [getRules("required", {}),getRules("phone", {})] });
+        setFormItem("Insured.cMobile", { rules: [ getRules("phoneNo", {})]})
+      }
+
 
       codeListStore
         .queryCodeList({
@@ -407,6 +422,11 @@ const method = {
         rules: null,
       });
 
+            // 为法人  企业成立日期
+      setFormItem("Insured.tEstablishingDate", {
+        rules: null,
+      });
+
       setValue("Insured.cGreenIndustryCustomers", "");
       setValue("Insured.cIsMicroEntpris", "");
       // setValue("Insured.cCertfCls", "");
@@ -420,10 +440,13 @@ const method = {
       // 是否分支机构
       setValue("Insured.cIsBranch", "1");
 
-      // 个人 移动电话必填
+      // 个人 移动电话必填  
       setFormItem("Insured.cMobile", {
-        rules: [getRules("required", {}), getRules("phoneNo", {})],
+        rules: [ getRules("required", {}), getRules("phoneNo", {})],
       });
+      setFormItem("Insured.cTel", { rules: [getRules("phone", {})] });
+
+
       codeListStore
         .queryCodeList({
           codeListName: "NATURAL_CERTIFICATE_CACHE",
@@ -627,7 +650,8 @@ const method = {
     }
   },
   mobileChange: (val) => {
-    if (val) {
+    let cClntMrk =  getValue('Insured.cClntMrk'); // 法人  1个人  0法人
+    if (cClntMrk &&  val) {
       setFormItem("Insured.cMobile", {
         rules: [getRules("required", {}), getRules("phoneNo", {})],
       });
@@ -636,7 +660,10 @@ const method = {
   },
   // 固定电话
   cTelChange: (val) => {
-    if (val) {
+    let cClntMrk =  getValue('Insured.cClntMrk'); // 法人  1个人  0法人
+    let cMobile = getValue('Insured.cMobile');  // 移动 
+
+    if (cClntMrk =='0' && val && !cMobile) {
       setFormItem("Insured.cTel", {
         rules: [getRules("phone", {}), getRules("required", {})],
       });
@@ -718,6 +745,14 @@ const method = {
       setFormItem("Insured.cCertfCde", {
         rules: [getRules("socialCode", {})],
       });
+
+
+
+            // 为法人  企业成立日期
+      setFormItem("Insured.tEstablishingDate", {
+        rules: [getRules("required", {})],
+      });
+
 
     } else {
       setFormItem("Insured.cCertfCde", {
