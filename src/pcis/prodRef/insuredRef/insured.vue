@@ -756,7 +756,7 @@ const method = {
 
     } else {
       setFormItem("Insured.cCertfCde", {
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {}),getRules("passPort", {})],
       });
       setFormItem("Insured.tCertfBgnDate", { rules: null });
       setFormItem("Insured.tCertfEndDate", { rules: null });

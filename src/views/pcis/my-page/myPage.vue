@@ -1298,6 +1298,7 @@ async function loadAfter() {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
         }
+        ops['plyBase']['Base.cPlyNo'] = ''
         opertaor.setDataAll(ops);
         // 获取原投保单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
@@ -1820,7 +1821,7 @@ const calcPremium = () => {
       const nAmtVal = ops["base"]["Base.nAmt"];
 
 
-// 
+//
       productStore.setnPrm(nPrmVal);
       productStore.setnAmt(nAmtVal);
       opertaor
@@ -1841,7 +1842,7 @@ const calcPremium = () => {
       opertaor
         .getTableRefByKey("ourCompanyCiShare")
         .setValue("Base.nCiOwnPrm", nPrm.value);
-        
+
         //承保 总保费
         opertaor.getTableRefs()["base"].setValue("Base.nPrm", nPrm.value);
         console.log('到————————')
@@ -1996,7 +1997,7 @@ const submitToUndrFn = async () => {
                 btn.disabled = true;
               //关闭当前tab页面
               // this.$router.back();
-              
+
             } else {
               ElMessage.error(undr.msg);
             }
