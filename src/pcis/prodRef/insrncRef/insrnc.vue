@@ -65,50 +65,58 @@ const method = {
   func1: () => {
 
   },
-  tInsrncBgnTmDisabled: (date: any) => {
+  // 开始时间处理  不能小于结束时间
+  tInsrncBgnTmDisabled: (date: any) => { 
     const fs = insrncEditRef?.value?.getFromValue();
     if (fs) {
-      const startDate = new Date(fs["Base.tInsrncBgnTm"])   // 开始时间   1
-      const maxDate = new Date(startDate);  // 创建开始时间副本   365 
-
-
-      maxDate.setDate(startDate.getDate() + 365);  // 设置为今天起365天后的日期
+      const endDate = new Date(fs["Base.tInsrncEndTm"])   // 开始时间   
+      let minDate = dayjs(endDate).valueOf();
       if(route.params.param && route.params.param.cRsnCde && route.params.param.cRsnCde == "FZ") {
         // 如果批改原因是免费延期，当前保险止期日期之后的日期都可以选择
-        return  date.getTime() < maxDate.getTime()
+        return  date.getTime() > minDate
       } else {
-        return  date.getTime() < startDate.getTime() || date.getTime() > maxDate.getTime()
+        return   date.getTime() > minDate
       }
     }else{
         return true;
     }
   },
+  // 结束时间禁止
+  tInsrncEndTmDisabled: (date: any) => { 
+    const fs = insrncEditRef?.value?.getFromValue();
+    if (fs) {
+      const startDate = new Date(fs["Base.tInsrncBgnTm"])   // 开始时间   1
+      let maxDate = dayjs(startDate).add(1,'year').valueOf();
+      if(route.params.param && route.params.param.cRsnCde && route.params.param.cRsnCde == "FZ") {
+        // 如果批改原因是免费延期，当前保险止期日期之后的日期都可以选择
+        return  date.getTime() < maxDate
+      } else {
+        return  date.getTime() < startDate.getTime() || date.getTime() > maxDate
+      }
+    }else{
+        return true;
+    }
+  },
+
   bgnTmFn: (v) => {
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["insrnc"].getFromValue();
     let startDate = new Date(baseBefore["Base.tInsrncBgnTm"])   // 开始时间
     let endDate = baseBefore["Base.tInsrncEndTm"]  // 结束时间
-    let maxDate = new Date(startDate);  // 创建开始时间副本
-    console.log(99,startDate,maxDate)
+    let day = dayjs(startDate).add(1,'year')
     let tm = null;
-
+ 
     if (!endDate) {
-      maxDate.setDate(startDate.getDate() + 365);  // 设置为今天起365天后的日期.
-      tm = moment(formatDate(maxDate, 'yyyy-MM-dd HH:mm:ss')).diff(moment(v), "days");
-      maxDate.setSeconds(maxDate.getSeconds() - 1);
-      baseBefore["Base.tInsrncEndTm"] = formatDate(maxDate, 'yyyy-MM-dd HH:mm:ss')
-      // tm =    moment(formatDate(maxDate, 'yyyy-MM-dd HH:mm:ss')).diff(moment(v), "days");
+      tm = moment(day.format("YYYY-MM-DD HH:mm:ss")).diff(moment(v), "days");
+      baseBefore["Base.tInsrncEndTm"] = day.add(-1,'second').format("YYYY-MM-DD HH:mm:ss")
     }else{
-      tm =  moment(endDate).add(1, 'second').diff(moment(baseBefore["Base.tInsrncBgnTm"]), "days");
+      tm =  moment(endDate).add(1, 'second').diff(moment(baseBefore["Base.tInsrncBgnTm"]), "days"); 
     }
-    console.log('结束时间-----',tm )
-
     baseBefore["Base.cTmSysCde"] = tm;   // 列表时间
     setFormValue(baseBefore);
     nRatioCoefFunc()
   },
   endTmFn: (v) => {
-    console.log(33332,v)
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["insrnc"].getFromValue();
     if(route.params.param.cRsnCde != "46") {
@@ -196,6 +204,7 @@ const method = {
   },
   // 追溯起期
   tRunBgnTmFn: (v) => {
+    
     const start = getValue("Base.tRunBgnTm");
     const end = getValue("Base.tRunEndTm");
     if (!end || !v) {
