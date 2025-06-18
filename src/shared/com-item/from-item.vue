@@ -102,7 +102,7 @@ function init(is: boolean) {
       config: props.item,
       itemRef: itemRef.value
     });
-    // initFlag.value = is;
+    initFlag.value = is;
   }
 }
 </script>
