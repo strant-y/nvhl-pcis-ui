@@ -2547,6 +2547,7 @@ const submitEdrToUndrFun = async () => {
     // history.back();
     if (res["code"] == "200") {
       ElMessage.success(res.msg);
+      btn.disabled = true;
     } else {
       ElMessage.error(res.msg);
     }
@@ -2617,6 +2618,7 @@ const submitUnderwritingFn = () => {
       // const ops = opertaor.convertData(res);
       // console.log("转换的数据", ops);
       ElMessage.success(res.msg);
+      btn.disabled = true;
       // opertaor.setDataAll(ops);
     } else {
       ElMessage.error(res.msg);
