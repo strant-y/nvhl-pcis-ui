@@ -86,28 +86,35 @@ const method = {
   bgnTmFn: (v) => {
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["insrnc"].getFromValue();
-    const tm = moment(baseBefore["Base.tInsrncEndTm"]).diff(moment(v), "days");
-    baseBefore["Base.cTmSysCde"] = tm;
-
     let startDate = new Date(baseBefore["Base.tInsrncBgnTm"])   // 开始时间
     let endDate = baseBefore["Base.tInsrncEndTm"]  // 结束时间
     let maxDate = new Date(startDate);  // 创建开始时间副本
+    console.log(99,startDate,maxDate)
+    let tm = null;
 
     if (!endDate) {
-      maxDate.setDate(startDate.getDate() + 365);  // 设置为今天起365天后的日期
+      maxDate.setDate(startDate.getDate() + 365);  // 设置为今天起365天后的日期.
+      tm = moment(formatDate(maxDate, 'yyyy-MM-dd HH:mm:ss')).diff(moment(v), "days");
       maxDate.setSeconds(maxDate.getSeconds() - 1);
       baseBefore["Base.tInsrncEndTm"] = formatDate(maxDate, 'yyyy-MM-dd HH:mm:ss')
+      // tm =    moment(formatDate(maxDate, 'yyyy-MM-dd HH:mm:ss')).diff(moment(v), "days");
+    }else{
+      tm =  moment(endDate).add(1, 'second').diff(moment(baseBefore["Base.tInsrncBgnTm"]), "days");
     }
-    console.log('结束时间-----', baseBefore, maxDate.setSeconds(maxDate.getSeconds() - 1) )
+    console.log('结束时间-----',tm )
+
+    baseBefore["Base.cTmSysCde"] = tm;   // 列表时间
     setFormValue(baseBefore);
     nRatioCoefFunc()
   },
   endTmFn: (v) => {
+    console.log(33332,v)
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["insrnc"].getFromValue();
     if(route.params.param.cRsnCde != "46") {
       // 如果批改原因是报停展期，保险止期延长报停起止期计算出的差值，保险期限维持不变
       const tm =   moment(v).add(1, 'second').diff(moment(baseBefore["Base.tInsrncBgnTm"]), "days");
+      console.log('天',tm)
       baseBefore["Base.cTmSysCde"] = tm;   // 列表里面的 保险
       opertaor.getFatherPage().setTmDay(tm)
       setFormValue(baseBefore);
@@ -206,7 +213,9 @@ const method = {
       return;
     }
     setFormValue({
-      "Base.nTracingDays": tmDay,
+      
+      "Base.nTracingDays":   moment(end).add(1,'second').diff(moment(start), "days"),
+      // "Base.nTracingDays":  moment(end).add(1,'second').diff(moment(start), "days")
     });
   },
   // 追溯止期
@@ -237,6 +246,7 @@ const method = {
       ElMessage.warning("追溯期的止期|须早于保险起期！");
       setFormValue({
         "Base.tRunEndTm": null,
+        "Base.nTracingDays":null
       });
       return;
     }
@@ -246,7 +256,7 @@ const method = {
     const formattedDate = moment(v).format('YYYY-MM-DD') + ' 23:59:59';
 
     setFormValue({
-      "Base.nTracingDays": tm,
+      "Base.nTracingDays": moment(formattedDate).add(1,'second').diff(moment(start), "days"),
       "Base.tRunEndTm": formattedDate, // 更新日期字段
     });
   },
@@ -261,6 +271,7 @@ const method = {
       ElMessage.warning("终止日期不能小于起始日期");
       setFormValue({
         "Base.tReportBgnTm": null,
+        "Base.nTracingDays":null
       });
       return;
     }
