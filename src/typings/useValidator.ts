@@ -426,13 +426,63 @@ const businessLicense = () => {
  * 中国车牌号码校验器 油  电
  *
  */
- const vehiclePlate = () => {
+//  const vehiclePlate = () => {
+//   return {
+//     pattern: /^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼]{1}[A-HJ-NP-Z]{1}(([0-9]{5})|([0-9]{5}[DF])|([DF][0-9]{5}))$/,
+//     message: "请输入正确格式的车牌号（如：粤A12345或粤AD12345）",
+//     trigger: "blur"
+//   };
+// }
+ 
+/**
+ * 车牌号校验规则（仅格式验证，不含空值校验）
+ * @param {Object} [options] - 配置选项
+ * @param {string} [options.message] - 通用错误提示
+ * @param {string} [options.normalMessage] - 普通车牌错误提示
+ * @param {string} [options.newEnergyMessage] - 新能源车牌错误提示
+ * @param {boolean} [options.allowSpecial] - 是否允许特殊车牌（使、领等）
+ * @returns {Object} - 验证规则
+ */
+const vehiclePlate = (options = {}) => {
+  const { 
+    message = "请输入正确的车牌号",
+    normalMessage = "普通车牌号格式应为：省份简称+字母+5位数字/字母",
+    newEnergyMessage = "新能源车牌号格式应为：省份简称+字母+6位数字/字母",
+    allowSpecial = false
+  } = options;
+  
+  // 省份简称列表（包含特殊区域）
+  const provinceChars = allowSpecial 
+    ? "京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领" 
+    : "京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼";
+  
   return {
-    pattern: /^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼]{1}[A-HJ-NP-Z]{1}(([0-9]{5})|([0-9]{5}[DF])|([DF][0-9]{5}))$/,
-    message: "请输入正确格式的车牌号（如：粤A12345或粤AD12345）",
+    validator: (rule, value, callback) => {
+      const formattedValue = value.trim().toUpperCase();
+      
+      // 普通车牌正则表达式
+      const normalPattern = new RegExp(
+        `^[${provinceChars}][A-HJ-NP-Z][A-HJ-NP-Z0-9]{4}[A-HJ-NP-Z0-9挂学警港澳]{0,1}$`
+      );
+      
+      // 新能源车牌正则表达式
+      const newEnergyPattern = new RegExp(
+        `^[${provinceChars}][A-HJ-NP-Z]([0-9]{5}[DF]|[DF][A-HJ-NP-Z0-9][0-9]{4})$`
+      );
+      
+      // 验证逻辑
+      if (normalPattern.test(formattedValue)) {
+        callback();
+      } else if (newEnergyPattern.test(formattedValue)) {
+        callback();
+      } else {
+        callback(new Error(message));
+      }
+    },
     trigger: "blur"
   };
-}
+};
+
 /**
  * 车架号(VIN)格式验证器
  *
