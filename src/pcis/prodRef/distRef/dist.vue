@@ -178,7 +178,6 @@ onMounted(async () => {
     fromSchema: formconfig1.value.distSchema,
   });
   tableconfig.value.fromSchema.forEach( r => {
-    r['onInit'] = rowChange;
     if(r['prop'] === 'Dist.cVinCode'){  //调整车架号列宽
       r.width = '160';
     }
@@ -229,6 +228,21 @@ onMounted(async () => {
 const method = {
   func1: () => {},
   handleClose: (val) => {},
+
+  // grid row 地址级联 初始化
+  cOccupationalLevelOnInit: (data: any) => {
+    const {value, rowData, config, itemRef} = data;
+    if(!value || !rowData || !config || !itemRef) return;
+    const AllOccup = rowData['Dist.AllOccup'];
+    if( AllOccup.length < 3) return;
+    codeListStore.queryCodeList({
+      codeListName: "Occupt_ZYLB",
+      codeListParam: {cParCde: AllOccup.at(-1)},
+    }).then((res) => {
+      //给表单下拉项赋值
+      config.loadData = res;
+    });
+  },
   editmethod: (row: any) => {
     dialog.value?.open(
       "distAdd",
@@ -264,7 +278,7 @@ const method = {
 
     let fromSchema = tableconfig.value.fromSchema;
     const tgt = opertaor.getTableRefByKey("tgt");
-    if(tgt.getValue('Tgt.cIsRegistered') === '1'){
+    if(!!tgt && tgt.getValue('Tgt.cIsRegistered') === '1'){
       fromSchema.forEach(item=>{
         item.rules = [{required: true, message: '该项为必填项', trigger: 'blur'}]
       })
@@ -564,23 +578,6 @@ setregistAdd(){
     console.log("清单级联事件触发")
   }
 };
-
-const rowChange = (data: any) => {
-  const {value, rowData, config, itemRef} = data;
-  if(!value || !rowData || !config || !itemRef) return;
-  if('Dist.cOccupationalLevel' === config.prop){
-    const AllOccup = rowData['Dist.AllOccup'];
-    if( AllOccup.length < 3) return;
-      codeListStore.queryCodeList({
-        codeListName: "Occupt_ZYLB",
-        codeListParam: {cParCde: AllOccup.at(-1)},
-      }).then((res) => {
-        //给表单下拉项赋值
-        config.loadData = res;
-      }); 
-  }
-}
-
 
 function setUnDisabledByKeyList(key: any) {
   tableconfig.value.formconfig.endBtns?.forEach((item: any) => {
