@@ -1,11 +1,11 @@
-import en from "@/lang/package/en";
-import path from "path";
 import { defineStore } from "pinia";
 import { useProductStore } from "@/store";
 
-export const dataOpertaor = defineStore(
-    "dataOpertaor",
-    () => {
+type StoreCache = Map<string, ReturnType<typeof defineStore>>
+const dataOpertaorMap: StoreCache = new Map();
+
+export const dataOpertaor = (pageKey?: string) => {
+    return storeFactory(pageKey, defineStore(`dataOpertaor-${pageKey}`, () => {
 
         const productStore = useProductStore();
         const tableConfig = reactive<Array<any>>([]);
@@ -460,5 +460,39 @@ export const dataOpertaor = defineStore(
                 },
             ],
         },
-    }
+    })
 );
+}
+
+/**
+ * 缓存清理
+ * @param pageKey 
+ */
+export function clearDataOpertaorByPageKey(pageKey: string) {
+    if (dataOpertaorMap.has(pageKey)) {
+        const store = dataOpertaorMap.get(pageKey);
+        store?.$dispose?.();
+        dataOpertaorMap.delete(pageKey);
+        console.log('### 已清理dataOpertaor pageKey -> ', pageKey);
+    }
+}
+
+/**
+ * 缓存管理
+ */
+function storeFactory(
+    storeId?: string,
+    newStore?: ReturnType<typeof defineStore>
+) {
+    const pageKey = storeId ? storeId : 'my-page';
+    const storeRef = ref();
+    if(!pageKey) {
+        storeRef.value = {};
+    }else if (dataOpertaorMap.has(pageKey)) {
+        storeRef.value = dataOpertaorMap.get(pageKey)
+    }else if (newStore) {
+        storeRef.value = newStore();
+        dataOpertaorMap.set(pageKey, storeRef.value);
+    }
+    return storeRef.value;
+}

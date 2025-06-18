@@ -315,6 +315,8 @@ import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { terConfig } from "@/store/modules/term-config";
 import { useValidator } from "@/typings/useValidator";
+import { useRoute } from "vue-router";
+const route = useRoute();
 const templateRef = ref();
 const opertaor = dataOpertaor();
 const pageparam = opertaor.getParam();
@@ -383,6 +385,10 @@ function initData(data: any) {
   const termData = JSON.parse(JSON.stringify(data));
   termData.riskList = null;
   termdata.value = termData;
+  if(termdata.value['Term.nSeatTotal']){
+    const tgt = opertaor.getTableRefByKey("tgt");
+    tgt.setValue('Tgt.nSeatCapacity',termdata.value['Term.nSeatTotal'])
+  }
   // 缓存条款责任数据
   let riskData: { [key: string]: any } = {};
   newData.riskList?.forEach((v: any) => {
@@ -617,6 +623,14 @@ function dataInit() {
     if (d.termTitleConf?.CCnm) {
       termTitleConf.value = JSON.parse(d.termTitleConf.CCnm);
     }
+    // 方案配置时条款信息中的保险费是可以编辑的
+    if(route.name === "plan-info") {
+      termFactormap.value.forEach((item:any) => {
+        if(item.prop === "Term.nInsuranceFee") {
+          item.disabled = false
+        }
+      })
+    }
     if (props.disabledFlag) {
       setDisabledAll();
     }
@@ -643,6 +657,14 @@ function dataInit() {
         terconfig.addConfig(queryKey, data.data);
       } else {
         ElMessage.error(msg);
+      }
+      // 方案配置时条款信息中的保险费是可以编辑的
+      if(route.name === "plan-info") {
+        termFactormap.value.forEach((item:any) => {
+          if(item.prop === "Term.nInsuranceFee") {
+            item.disabled = false
+          }
+        })
       }
       if (props.disabledFlag) {
         setDisabledAll();
@@ -685,6 +707,7 @@ function initshowConfig() {
 function exChangeFunc() {
   const data: { [key: string]: any } = opertaor.getDataAll();
   extermConf.value = Object.assign({});
+  // 043009个性化配置
   if (pageparam.cProdNo === "043009") {
     if (data["tgt"]["Tgt.cInsuranceMethod"]) {
       if (data["tgt"]["Tgt.cInsuranceMethod"] !== "613001") {
@@ -723,6 +746,16 @@ function exChangeFunc() {
       termFactormap.value = term;
     }
   }
+  // 045001个性化配置
+  if (pageparam.cProdNo === "045001") {
+    if(data["tgt"]["Tgt.cRegisteredLogo"] && data["tgt"]["Tgt.cRegisteredLogo"] === '0'){
+      const term = termFactormap.value.filter(
+        (r) => r["prop"] !== "Term.nInsuredCount"
+      );
+      termFactormap.value = term;
+    }
+  }
+   // 040002个性化配置
   if (pageparam.cProdNo === "040002") {
     if (data["tgt"]["Tgt.cDeterminingMethod"]) {
       if (data["tgt"]["Tgt.cDeterminingMethod"] === "0") {
@@ -866,7 +899,7 @@ function isrequired(i: any) {
 }
 function isdisabled(i: any) {
   if (i.disabled === "1" || i.disabled === 1 || i.disabled === true ||
-    i.disabled === "1" || i.disabled === 1 || i.disabled === true 
+    i.cPropDisabled === "1" || i.cPropDisabled === 1 || i.cPropDisabled === true 
   ) {
     return true;
   }

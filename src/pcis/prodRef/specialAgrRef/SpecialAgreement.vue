@@ -224,14 +224,15 @@ const method = {
             let len = formData.value.length;
             let sel : any[] = [];
             selectdata.forEach((item: any,index:number) => {
-              item.index = len + 1;
+              item.index = index + 1;
               sel.push(item);
               len++;
             });
             
-            sel.forEach((item) => {
-              rttableFrom.value.addRowByData(item);
-            });
+            // sel.forEach((item) => {
+            //   rttableFrom.value.addRowByData(item);
+            // });
+            formData.value = sel
           },
       },
       { title: "添加特约", width: 85 }

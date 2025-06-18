@@ -10,6 +10,7 @@ import {
 } from "@/shared/app-grid-edit-config";
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { checkCdeptByCdptCde, getNmeByCde } from "@/api/prod/index";
 const opertaor = dataOpertaor();
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
@@ -38,6 +39,16 @@ const formconfig1 = reactive(createAppGridEditConfig({}));
 
 onMounted(async () => {
   console.log('99999',props.pageSchema)
+
+  props.pageSchema.fromSchema.forEach(item => {
+    if(['Ci.cCoinsurerCde'].includes(item['prop'])){
+      item['onInit'] = 'cCoinsurerCdeOnInit';
+    }
+    if(['Ci.cSubDptCde'].includes(item['prop'])){
+      item['onInit'] = 'cSubDptCdeOnInit';
+    }
+  })
+
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
     method,
@@ -122,6 +133,39 @@ const method = {
           key['Ci.nSeqNo']=index+1
       });
   },
+  // 共保公司下拉初始化事件
+  cCoinsurerCdeOnInit: (data: any) => {
+    const {value, rowData, config, itemRef} = data;
+    if(!rowData || !config || !itemRef) return;
+    const rowId = rowData._dataId;
+    if (value === "327001") {
+      // 如果选择的是永安保险，加载对应的分公司列表
+      codeListStore
+          .queryCodeList({
+            codeListName: "Comm_Code_LIST",
+            codeListParam: { "CParCde": "subdpt", cParCde: "327001" },
+          })
+          .then((res) => {
+            freeEditRef.value?.setRowFieldProp(
+                rowId,
+                "Ci.cSubDptCde",
+                "loadData",
+                res
+            );
+            config.loadData = res;
+          });
+      // updateMasterAgreementValues();
+    } else {
+      // 非永安保险，设置默认值和其他数据
+      freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "");
+      freeEditRef.value?.setRowFieldProp(
+          rowId,
+          "Ci.cSubDptCde",
+          "loadData",
+          [{ value: '1', label: '其他' }]
+      );
+    }
+  },
   //共保公司下拉事件
   cCoinsurerCdeChange:(val)=>{
     const rowData = freeEditRef.value?.getSelectRow();
@@ -159,6 +203,27 @@ const method = {
         [{ value: '1', label: '其他' }]
       );
       // updateMasterAgreementValues();
+    }
+  },
+
+  cSubDptCdeOnInit: (data: any) => {
+    const {value, rowData, config, itemRef} = data;
+    if(!rowData || !config || !itemRef) return;
+    const rowId = rowData._dataId;
+    if(value !=""){
+      codeListStore
+          .queryCodeList({
+            codeListName: "CDptCde_List",
+            codeListParam: { "CDptCde": value },
+          })
+          .then((res) => {
+            freeEditRef.value?.setRowFieldProp(
+                rowId,
+                "Ci.cDptCde",
+                "loadData",
+                res,
+            );
+          });
     }
   },
   //分公司下拉事件
@@ -390,19 +455,13 @@ const method = {
         {
           type: "show",
           data: {
-            CDptCde: sessionData.value?.cDptCde, //机构
-            CProdNo: sessionData.value?.cProdNo, //产品
-            // cBsnsTyp: getValue("Base.cBsnsTyp"), //业务来源大类
-            // cChaType: getValue("Base.cChaType"), //业务来源中类
-            // cChaSubtype: getValue("Base.cChaSubtype"), //业务来源子类
           },
           method: {
             getSelected: (params) => {
-              setFormItem("Base.cBrkrCde", {
-                loadData: [{ value: params.CChaCde, label: params.CChaNme }],
-              });
-              // setValue("Base.cBrkrCde", params.CChaCde);
-              // setValue("Base.cAgtAgrNo", params.CAgtAgrNo);
+              // setFormItem("Ci.cBrkrCde", {
+              //   loadData: [{ value: params.CChaCde, label: params.CChaNme }],
+              // });
+              // freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData","")
               dialogRef.value?.handleClose();
             },
           },
@@ -420,74 +479,17 @@ const method = {
   },
   //业务员
   cSlsCdeChange:()=>{
+    const rowData = freeEditRef.value?.getSelectRow();
+    const rowId = rowData?._dataId;
     dialogRef.value?.open(
       "agentWorker",
       {
         type: "show",
-        data: {
-          CDptCde: sessionData.value?.cDptCde,
-          // cBsnsTyp: getValue("Base.cBsnsTyp"),
-          // cChaType: getValue("Base.cChaType"),
-          // cChaSubtype: getValue("Base.cChaSubtype"),
-          // CSlsId: getValue("Base.CSlsId"), //业务员员工号
-          // CBrkrCde: getValue("Base.CBrkrCde"), //代理(经纪)人
-          // CDptAttr: getValue("Base.CDptAttr"), //投保单业务归属部门的部门类型(angular上被hidden的,逻辑赋值angular：guide.component.ts【324行】)
-          // CSlsTyp: cslstyp,
-          leading: "CSlsId",
-        },
+        data: {},
         method: {
           getSelected: (params) => {
-            setFormValue({
-              "Base.cSlsId": params.CSlsCde, //业务员员工号
-              "Base.cSlsNme": params.CSlsNme, //业务员名称
-              "Base.cSlsCde": params.CCtfctNo, //业务员执业证号
-              "Base.cSlsTel": params.CMobile, //业务员电话
-              "Base.cSlsDptcde": params.CDptCde, //业务员机构代码
-              "Base.cIntroDptcde": "", //清空服务机构值
-            });
-            const ops = {
-              code: "orgDpt",
-              val: params["CDptCde"],
-            };
-            getNmeByCde(ops).then((res) => {
-              if (res && res.code == 200) {
-                const codeValData = res.data;
-                if (codeValData) {
-                  setFormItem("Base.cIntroDptcde", {
-                    loadData: [
-                      {
-                        value: params["CDptCde"],
-                        label: codeValData["data"],
-                      },
-                    ],
-                  });
-                  setValue("Base.cIntroDptcde", params.CDptCde);
-                }
-              }
-            });
-            codeListStore
-              .queryCodeList(
-                {
-                  codeListName: "CSaleCde_List",
-                  codeListParam: {
-                    CSlsCde: params["CSlsCde"],
-                  },
-                },
-                false,
-                false
-              )
-              .then((res) => {
-                if (res && res.code == 200) {
-                  const codeValData = res.data;
-                  if (codeValData) {
-                    setFormItem("Base.cIntroSalecde", {
-                      loadData: codeValData,
-                    });
-                    // 当选择了业务员时，服务机构业务员默认为业务员
-                    // setValue("Base.cIntroSalecde", params.CSlsCde);
-                  }
-                }
-              });
+            freeEditRef.value?.setRowFieldProp(rowId,"Ci.cSlsCde","loadData",[{ label: params.CSlsNme, value: params.CSlsCde }])
+            freeEditRef?.value?.setValueByRowKey("Ci.cSlsCde", rowId, params.CSlsCde);
             dialogRef.value?.handleClose();
           },
         },
@@ -502,6 +504,30 @@ const method = {
   },
   //代理业务员
   cBrkSlsCdeChange:()=>{
+    const rowData = freeEditRef.value?.getSelectRow();
+    const rowId = rowData?._dataId;
+    dialogRef.value?.open(
+      "agentWorker",
+      {
+        type: "show",
+        data: {
+
+        },
+        method: {
+          getSelected: (params) => {
+            freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkSlsCde","loadData",[{ label: params.CSlsNme, value: params.CSlsCde }])
+            freeEditRef?.value?.setValueByRowKey("Ci.cBrkSlsCde", rowId, params.CSlsCde);
+            dialogRef.value?.handleClose();
+          },
+        },
+      },
+      {
+        isOk: (selectdata: any) => {
+          console.log("a", selectdata);
+        },
+      },
+      { title: "业务员", width: 85 }
+    );
   },
 };
 //自动添加一行

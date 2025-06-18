@@ -46,11 +46,15 @@ import { AppFreeEditMethod } from "@/shared/app-free-edit-config";
 const route = useRoute();
 const dialog = ref<DialogMethod | null>(null);
 const opertaor = dataOpertaor();
+const params = opertaor.getParam(); 
 const props = defineProps({
   pageSchema: {
     type: [Object],
     required: true,
   },
+  compKey: {
+    type: String
+  }
 });
 
 const pageresult = reactive<Pageresult>({
@@ -73,68 +77,68 @@ let cComponentTableValue: string;
 // 封装获取 cComponentTableValue 的逻辑
 const getCComponentTableValue = (cProdNo: string, title: string): string => {
   console.log(title,"title00000")
-  if (cProdNo == "040001") {
-    return "AddressDist";
-  } else if (cProdNo == "040002") {
-    if (title == "雇员清单") {
-      return "EmployeeDist";
-    } else if (title == "雇员清单汇总") {
-      return "DistSummary";
-    } else if (title == "车辆清单") {
-      return "VehicleDist";
-    } else if (title == "车辆清单汇总") {
-      return "DistSummary";
-    }
-  } else if (cProdNo == "040003") {
-    if(title == "产品清单"){
-      return "ProductDist";
-    }else if(title =="销售区域清单"){
-      return "SalesDist";
-    }
-  } else if(cProdNo == "040005"){
-    if(title =="地址清单信息"){
-      return "AddressDist";
-    }else if(title == "人员清单"){
-      return "EducatorDist"
-    }
-  }else if(cProdNo == "040020"){
-      return "PersonnelDist";
-  }else if(cProdNo == "042001"){
-      return "DesignDist"
-  }else if(cProdNo == "042003"){
-      return "EducatorDist"
-  }else if(cProdNo == "043001"){
-    return "ElevatorDist";
-  } else if (cProdNo == "043002") {
-    return "VehicleDist";
-  } else if(cProdNo == "043007"){
-    return "VehicleDist";
-  }else if (cProdNo == "043009") {
-    if (title == "实际用工地址/工程项目地址清单") {
-      return "ProjectDist";
-    } else if (title == "从业人员清单") {
-      return "EmployeeDist";
-    } else if (title == "从业人员清单汇总") {
-      return "DistSummary";
-    }
-  }else if(cProdNo == "043010"){
-    return "EducatorDist"
-  } else if(cProdNo == "043013"){
-    return "PollutionDist"
-  }else if(cProdNo =="043020"){
-    if(title =="房屋清单"){
-      return "AddressDist"
-    }else if(title =="家庭成员清单"){
-      return "FamilyDist"
-    }
-  }else if(cProdNo =="045001"){
-    if(title =="雇员清单信息"){
-      return "EmployeeDist"
-    }else if(title =="工程项目地址清单"){
-      return "ProjectDist"
-    }
-  }
-  return "";
+  // if (cProdNo == "040001") {
+  //   return "AddressDist";
+  // } else if (cProdNo == "040002") {
+  //   if (title == "雇员清单") {
+  //     return "EmployeeDist";
+  //   } else if (title == "雇员清单汇总") {
+  //     return "DistSummary";
+  //   } else if (title == "车辆清单") {
+  //     return "VehicleDist";
+  //   } else if (title == "车辆清单汇总") {
+  //     return "DistSummary";
+  //   }
+  // } else if (cProdNo == "040003") {
+  //   if(title == "产品清单"){
+  //     return "ProductDist";
+  //   }else if(title =="销售区域清单"){
+  //     return "SalesDist";
+  //   }
+  // } else if(cProdNo == "040005"){
+  //   if(title =="地址清单信息"){
+  //     return "AddressDist";
+  //   }else if(title == "人员清单"){
+  //     return "EducatorDist"
+  //   }
+  // }else if(cProdNo == "040020"){
+  //     return "PersonnelDist";
+  // }else if(cProdNo == "042001"){
+  //     return "DesignDist"
+  // }else if(cProdNo == "042003"){
+  //     return "EducatorDist"
+  // }else if(cProdNo == "043001"){
+  //   return "ElevatorDist";
+  // } else if (cProdNo == "043002") {
+  //   return "VehicleDist";
+  // } else if(cProdNo == "043007"){
+  //   return "VehicleDist";
+  // }else if (cProdNo == "043009") {
+  //   if (title == "实际用工地址/工程项目地址清单") {
+  //     return "ProjectDist";
+  //   } else if (title == "从业人员清单") {
+  //     return "EmployeeDist";
+  //   } else if (title == "从业人员清单汇总") {
+  //     return "DistSummary";
+  //   }
+  // }else if(cProdNo == "043010"){
+  //   return "EducatorDist"
+  // } else if(cProdNo == "043013"){
+  //   return "PollutionDist"
+  // }else if(cProdNo =="043020"){
+  //   if(title =="房屋清单"){
+  //     return "AddressDist"
+  //   }else if(title =="家庭成员清单"){
+  //     return "FamilyDist"
+  //   }
+  // }else if(cProdNo =="045001"){
+  //   if(title =="雇员清单信息"){
+  //     return "EmployeeDist"
+  //   }else if(title =="工程项目地址清单"){
+  //     return "ProjectDist"
+  //   }
+  // }
+  return props.compKey ? props.compKey.substring(0, props.compKey.length - 6) : "";
 };
 
 const formconfig11 = ref<any>({});
@@ -173,7 +177,12 @@ onMounted(async () => {
     titleBtns: formconfig1.value.titleBtns,
     fromSchema: formconfig1.value.distSchema,
   });
-  tableconfig.value.fromSchema.forEach( r => r['onInit'] = rowChange);
+  tableconfig.value.fromSchema.forEach( r => {
+    r['onInit'] = rowChange;
+    if(r['prop'] === 'Dist.cVinCode'){  //调整车架号列宽
+      r.width = '160';
+    }
+  });
   tableconfig.value.tableBtnType = "btn";
   tableconfig.value.tableBtnWidth = 150;
   tableconfig.value.tableBtnPosition = "right";
@@ -185,6 +194,7 @@ onMounted(async () => {
       tableconfig.value.tableBtn = btns;
     }
   }
+ 
   tableconfig.value.isPage = false;
   // 初始化 cComponentTableValue
   cComponentTableValue = getCComponentTableValue(
@@ -226,7 +236,8 @@ const method = {
         fromSchema: tableconfig.value.fromSchema,
         title: "编辑",
         rowData: row,
-          tab: formconfig1.value.title
+        tab: formconfig1.value.title,
+        compKey: props.compKey
       },
       {
         isOk: (res: any) => {},
@@ -252,7 +263,20 @@ const method = {
     let baseFlag = alldata['plyBase']["Base.cAppNo"];
 
     let fromSchema = tableconfig.value.fromSchema;
-
+    const tgt = opertaor.getTableRefByKey("tgt");
+    if(tgt.getValue('Tgt.cIsRegistered') === '1'){
+      fromSchema.forEach(item=>{
+        item.rules = [{required: true, message: '该项为必填项', trigger: 'blur'}]
+      })
+    }else {
+      fromSchema.forEach(item=>{
+        if(item.prop=== 'Dist.cAssociatedGuardian' || item.prop === 'Dist.cWardName'){
+          item.rules = [{required: true, message: '该项为必填项', trigger: 'blur'}]
+        }else {
+          item.rules = null
+        }
+      })
+    }
     checkAppBase({ cAppNo: baseFlag }).then((res: any) => {
       if (res.code === 200) {
         dialog.value?.open(
@@ -261,6 +285,7 @@ const method = {
             fromSchema: fromSchema,
             title: "新增",
             tab: formconfig1.value.title,
+            compKey: props.compKey
           },
           {
             isOk: (res: any) => {
@@ -310,7 +335,7 @@ const method = {
           };
         });
         if(tgtRef !=undefined){
-          tgtRef.setValue("Tgt.nElevatorsNumber",res.data.length)
+          tgtRef.setValue("Tgt.nElevatorsNumber",res.data.total)
         }
 
         // 刷新汇总表格 DistSummary045001'
@@ -344,6 +369,7 @@ const method = {
             fromSchema: tableconfig.value.fromSchema,
             title: "新增",
             tab: formconfig1.value.title,
+            compKey: props.compKey,
           },
           {
             isOk: (res: any) => {},
@@ -412,14 +438,13 @@ const method = {
         }).catch((error) => {
           ElMessage.error("导入出错，请检查文件格式或内容");
           console.error("导入错误：", error);
-        });
+        });addCi
       };
 
       reader.onerror = (e) => {
         console.error("文件读取失败", e);
         ElMessage.error("文件读取失败");
       };
-
       reader.readAsDataURL(file); // 启动读取
       }
     };

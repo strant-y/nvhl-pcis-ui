@@ -53,7 +53,8 @@
                   "
                   style="margin-bottom: 18px"
                 >
-                  <div
+                  <div style="display: flex;">
+                    <div
                     :style="{
                       width:
                         formItems[props.row._dataId][i.prop].showExBtn &&
@@ -95,6 +96,7 @@
                       :item="formItems[props.row._dataId][i.prop].btnItems"
                     />
                   </template>
+                  </div>
                 </el-form-item>
               </el-col>
             </template>
@@ -195,6 +197,7 @@
                     v-model="scope.row[i.prop]"
                     :item="formItems[scope.row._dataId][i.prop]"
                     :showLabel="editIndex !== scope.row._dataId"
+                    :row="scope.row"
                   />
                 </el-form-item>
               </template>
@@ -741,7 +744,7 @@ function isrequired(i: any) {
 
 <style scoped>
 ::v-deep .el-form-item__content {
-  justify-content: center !important;
+  display: block;
 }
 ::v-deep .el-form-item {
   margin-bottom: 0px !important; /* 使内容显示更近紧促 */

@@ -54,11 +54,19 @@
           ? (value) => {
               if (value == null) return '';
               let num = value.replace(/[^0-9.-]/g, '');
-              if(item.max && num > item.max){
-                num = item.max;
+              let Max = 99999999999;
+              if(item.max){
+                Max = item.max;
               }
-              if(item.min && num < item.min){
-                num = item.min;
+              if(num > Max){
+                num = Max;
+              }
+              let Min = 0;
+              if(item.min){
+                Min = item.min;
+              }
+              if(num < Min){
+                num = Min;
               }
               const parts = `${num}`.split('.');
               const integerPart = parts[0].replace(
@@ -192,7 +200,18 @@ function isReQuired(){
 const emits = defineEmits(["update:modelValue", "valueChange"]); // 父组件监听事件，同步子组件值的变化给父组件
 const vInput = ref<string | Number | undefined>();
 watch([() => props.modelValue], ([newModelValue]) => {
-  vInput.value = newModelValue;
+  let n = null;
+  if (props.item.type === "number") {
+    if(props.item.precision && newModelValue){
+      n = Number(newModelValue).toFixed(props.item.precision);
+    }else{
+      n = newModelValue;
+    }
+  }else{
+    n = newModelValue;
+  }
+  
+  vInput.value = n;
 });
 
 function handleChange(val?: string | undefined | null) {

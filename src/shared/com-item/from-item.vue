@@ -39,17 +39,15 @@ const value = ref<any>();
 const key = computed(() => props.item.prop );
 const itemConfig = computed(() => props.item );
 
-
 const emits = defineEmits(["update:modelValue", "updateMethod"]); // 父组件监听事件，同步子组件值的变化给父组件
 function handleChange(val?: any) {
   emits("update:modelValue", val);
   emits("updateMethod");
-  // props.item.func ? props.item.func(val,props.row) : null;
+  props.item.func ? props.item.func(val, props.row) : null;
 }
 
 watch([() => props.modelValue], ([newModelValue]) => {
   value.value = newModelValue;
-  props.item.func ? props.item.func(newModelValue,props.row) : null;
 });
 function tableExvalidate() {
   if (typeof itemRef.value.tableExvalidate === "function") {
@@ -82,8 +80,7 @@ onMounted(() => {
   if(props.item.defaultValue){
     value.value = props.item.defaultValue;
   }
-  //组件初始化回调
-  init()
+  init();
 });
 
 /**
@@ -94,13 +91,13 @@ onMounted(() => {
  * itemRef 表单项ref
  */
 function init() {
-  if(props.modelValue && props.item.onInit) {
-     props.item.onInit({
+  if(props.item.onInit) {
+    props.item.onInit({
       value: props.modelValue,
       rowData: props.row,
       config: props.item,
       itemRef: itemRef.value
-     });
+    });
   }
 }
 </script>

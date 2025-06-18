@@ -155,6 +155,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "EdrBase.nAmtVar",
         inputtype: "rtinput",
+        min:-999999999999,
         title: "保额变化",
         disabled:true
       },
@@ -173,6 +174,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "EdrBase.nPrmVar",
         inputtype: "rtinput",
+        min:-999999999999,
         title: "保费变化",
         disabled:true
       },
@@ -261,6 +263,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "批文",
         rows: 6,
         itemWidth: 2,
+        rules: [getRules("specifyLength", {len:2000})],
       },
       {
           prop: "EdrBase.cEdrType",

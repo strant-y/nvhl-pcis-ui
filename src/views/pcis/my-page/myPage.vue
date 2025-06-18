@@ -224,6 +224,7 @@
               "
               :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
               :pageSchema="k.pageSchema"
+              :compKey="k.pageCode"
             />
           </div>
         </template>
@@ -367,7 +368,11 @@ const templateDialog = defineAsyncComponent(
   () => import("@/views/pcis/my-page/templateDialog.vue")
 );
 
-const opertaor = dataOpertaor();
+const idxParam = {
+  opertaorId: 'my-page',
+};
+provide('idxParam', idxParam);
+const opertaor = dataOpertaor(idxParam.opertaorId);
 opertaor.init();
 const underwrite = ref(null);
 const edrbase = ref(null);
@@ -1250,6 +1255,44 @@ async function loadAfter() {
     }).then((res) => {
       if (res) {
         const ops = opertaor.convertData(res);
+        // 保险期限 投保日期更新为当前日期 保险起期和保险止期重置为第二天0点至一年后
+        if(ops.insrnc) {
+          const beginTm = dayjs().add(1, 'day').format("YYYY-MM-DD 00:00:00")
+          const endTm = dayjs(beginTm).add(1, 'year').format("YYYY-MM-DD 23:59:59")
+          ops.insrnc["Base.tInsrncBgnTm"] = beginTm;
+          ops.insrnc["Base.tInsrncEndTm"] = endTm;
+          ops.insrnc['Base.tAppTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")
+        }
+        // 条款信息中的cPkId删除
+        if(ops.cvrg && ops.cvrg.length > 0) {
+          ops.cvrg.forEach((item:any) => {
+            delete item['Term.cPkId']
+            item['Term.riskList'].forEach((i:any) => {
+              delete i['Term.cPkId']
+            })
+          })
+        }
+        // 承包基本信息中的保额和保费也初始化为0
+        if(ops.base) {
+          ops.base['Base.nPrm'] = 0
+          ops.base['Base.nAmt'] = 0
+        }
+        // 缴费计划列表清空
+        if(ops.payinfo && ops.payinfo.length > 0) {
+          ops.payinfo = []
+        }
+        // 特约信息
+        if(ops.SpecialAgreement && ops.SpecialAgreement.length > 0) {
+          ops.SpecialAgreement.forEach((item:any) => {
+            delete item['SpecialAgreement.cPkId']
+          })
+        }
+        // 免赔条件
+        if(ops.deductibleDist && ops.deductibleDist.length > 0) {
+          ops.deductibleDist.forEach((item:any) => {
+            delete item['DeductibleDist.cPkId']
+          })
+        }
         opertaor.setDataAll(ops);
         // 获取原投保单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
@@ -1332,6 +1375,44 @@ async function loadAfter() {
         // this.cTplDesc = result['res'].cDesc;
         // this.TplPkId = result['res'].cPkId;
         const ops = JSON.parse(cTplCtnt);
+        // 保险期限 投保日期更新为当前日期 保险起期和保险止期重置为第二天0点至一年后
+        if(ops.insrnc) {
+          const beginTm = dayjs().add(1, 'day').format("YYYY-MM-DD 00:00:00")
+          const endTm = dayjs(beginTm).add(1, 'year').format("YYYY-MM-DD 23:59:59")
+          ops.insrnc["Base.tInsrncBgnTm"] = beginTm;
+          ops.insrnc["Base.tInsrncEndTm"] = endTm;
+          ops.insrnc['Base.tAppTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")
+        }
+        // 条款信息中的cPkId删除
+        if(ops.cvrg && ops.cvrg.length > 0) {
+          ops.cvrg.forEach((item:any) => {
+            delete item['Term.cPkId']
+            item['Term.riskList'].forEach((i:any) => {
+              delete i['Term.cPkId']
+            })
+          })
+        }
+        // 承包基本信息中的保额和保费也初始化为0
+        if(ops.base) {
+          ops.base['Base.nPrm'] = 0
+          ops.base['Base.nAmt'] = 0
+        }
+        // 缴费计划列表清空
+        if(ops.payinfo && ops.payinfo.length > 0) {
+          ops.payinfo = []
+        }
+        // 特约信息
+        if(ops.SpecialAgreement && ops.SpecialAgreement.length > 0) {
+          ops.SpecialAgreement.forEach((item:any) => {
+            delete item['SpecialAgreement.cPkId']
+          })
+        }
+        // 免赔条件
+        if(ops.deductibleDist && ops.deductibleDist.length > 0) {
+          ops.deductibleDist.forEach((item:any) => {
+            delete item['DeductibleDist.cPkId']
+          })
+        }
         opertaor.setDataAll(ops);
         //获取单号
         getCAppNoFun();
@@ -1887,9 +1968,14 @@ const submitToUndrFn = async () => {
                 ElMessage.success(undr.msg);
                 // 申请核保成功后按钮设置为不可点击
                 const btn = getBtn("btn010103");
-              }else{
+              }else if(undr["cDecision"] == '0'){
                 ElMessage.error(undr.msg);
+              }else{
+                ElMessage.success(undr.msg);
               }
+              //关闭当前tab页面
+              // this.$router.back();
+              
             } else {
               ElMessage.error(undr.msg);
             }
@@ -2153,7 +2239,7 @@ const calcPremiumEdr = () => {
       nPrm.value = ops["base"]["Base.nPrm"] ? ops["base"]["Base.nPrm"] : 0;
       const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
       res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
-        res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"].split(
+        res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"]?.split(
           ","
         );
       edrbase.value?.setFormValue(EdrBaseData);
