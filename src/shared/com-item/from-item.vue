@@ -44,7 +44,6 @@ const emits = defineEmits(["update:modelValue", "updateMethod"]); // 父组件�
 function handleChange(val?: any) {
   emits("update:modelValue", val);
   emits("updateMethod");
-  props.item.func ? props.item.func(val, props.row) : null;
 }
 
 watch([() => props.modelValue], ([newModelValue]) => {
@@ -52,6 +51,7 @@ watch([() => props.modelValue], ([newModelValue]) => {
   if(!initFlag.value && !!newModelValue) {
     init(true)
   }
+  props.item.func ? props.item.func(newModelValue, props.row) : null;
 });
 function tableExvalidate() {
   if (typeof itemRef.value.tableExvalidate === "function") {
