@@ -1983,13 +1983,13 @@ const submitToUndrFn = async () => {
               }else{
                 ElMessage.success(undr.msg);
               }
+                btn.disabled = true;
               //关闭当前tab页面
               // this.$router.back();
               
             } else {
               ElMessage.error(undr.msg);
             }
-            btn.disabled = true;
           } else {
             needCalc.value = true;
             ElMessage.error("保费发生变化,请重新进行保费计算!");
