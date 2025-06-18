@@ -147,8 +147,49 @@ function calculateCarAge(initialDateStr:any) {
   // 如果小于0.5，返回0.5，否则返回原值
   return roundedAge < 0.5 ? 0.5 : roundedAge;
 }
+//计算两个日期年份差
+function calAgeDif(val1:any,val2:any) {
+  const date1 = new Date(val1);
+  const date2 = new Date(val2);
+
+  const diffInMilliseconds = Math.abs(date1 - date2);
+  const millisecondsInYear = 1000 * 60 * 60 * 24 * 365.25; // 考虑闰年平均一年365.25天
+
+  const diffInYears = diffInMilliseconds / millisecondsInYear;
+
+  return Math.round(diffInYears)
+}
+const guaranteeMethodList = ['Tgt.cCollateralName','Tgt.cPledgeNumber','Tgt.cPledgeAddress','Tgt.cItemNumber','Tgt.nFaceValue','Tgt.cApplicationLine','Tgt.cBankApply','Tgt.cAcceptor','Tgt.cMaturityWeek','Tgt.cDueWeek','Tgt.tTicketStartingandending','Tgt.cConfirmingBank','Tgt.cMortgageName','Tgt.cMortgageNumber','Tgt.cCollateralAddress']
 // 绑定方法
 const method = {
+  gettCompletionDateChange:(val:string)=>{
+    const insrnc = opertaor.getTableRefByKey( "insrnc").getFromValue()
+    setValue('Tgt.nServiceLife',calAgeDif(insrnc['Base.tAppTm'],val))
+  },
+  getcGuaranteeMethodChange:(val:string)=>{
+    if(val === 'A05Assure001'){
+      guaranteeMethodList.forEach(item=>{
+        setFormItem(item, {
+          hidden: false,
+        });
+      })
+    }else{
+      guaranteeMethodList.forEach(item=>{
+        setFormItem(item, {
+          hidden: true,
+        });
+      })
+    }
+    if(val === 'A05Assure002'){
+      setFormItem('Tgt.cTypeName', {
+        hidden: false,
+      });
+    }else{
+      setFormItem('Tgt.cTypeName', {
+        hidden: true,
+      });
+    }
+  },
   getcIsSingleChange:(val:string)=>{
     if(val=== '1'){
       setFormItem('Tgt.nTotalCost', {
