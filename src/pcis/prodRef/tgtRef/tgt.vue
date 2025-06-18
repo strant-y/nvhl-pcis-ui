@@ -61,6 +61,13 @@ onMounted(async () => {
     method,
     exRules
   );
+  if(params.cProdNo === '045001'){
+    formconfig11.fromSchema?.forEach(item=>{
+      if(item['prop'] ==='Tgt.cInsuranceMethod'){
+        item['typeCode'] = 'InsuranceMethod045001';
+      }
+    })
+  }
   Object.assign(formconfig1, formconfig11);
   // 约定保期内服务次数正整数
   setFormItem("Tgt.nAgreeFrequency", {
