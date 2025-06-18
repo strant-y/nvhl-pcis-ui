@@ -44,7 +44,7 @@ onMounted(async () => {
   if (sessionStorage.getItem("toMyPageData")) {
     sessionData.value = JSON.parse(sessionStorage.getItem("toMyPageData"));
   }
-  
+  setValue("Base.nAmtRmbExch", "1.000000");
 });
 
 // 绑定方法
