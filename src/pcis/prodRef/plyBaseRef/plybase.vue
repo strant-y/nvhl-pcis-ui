@@ -166,7 +166,7 @@ const method = {
               disabled: false,
             },
           };
-          setFormItem("Base.cBrkrCde", obj); //代理(经纪)人
+          setFormItem("Base.cBrkrCde", {...obj,disabled:0}); //代理(经纪)人
           setFormItem("Base.cBrkSlsCde", obj); //代理业务员
           setFormItem("Base.cAgtAgrNo", { rules: [getRules("required", {})] }); //代理合作协议
         } else {
