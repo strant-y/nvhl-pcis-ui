@@ -333,7 +333,7 @@ const method = {
       });
     } else {
       setFormItem("Applicant.cCertfCde", {
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {}),getRules("passPort", {})],
       });
       setFormItem("Applicant.tCertfBgnDate", { rules: null });
       setFormItem("Applicant.tCertfEndDate", { rules: null });
