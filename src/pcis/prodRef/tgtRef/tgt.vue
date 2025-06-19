@@ -162,6 +162,10 @@ function calAgeDif(val1:any,val2:any) {
 const guaranteeMethodList = ['Tgt.cCollateralName','Tgt.cPledgeNumber','Tgt.cPledgeAddress','Tgt.cItemNumber','Tgt.nFaceValue','Tgt.cApplicationLine','Tgt.cBankApply','Tgt.cAcceptor','Tgt.cMaturityWeek','Tgt.cDueWeek','Tgt.tTicketStartingandending','Tgt.cConfirmingBank','Tgt.cMortgageName','Tgt.cMortgageNumber','Tgt.cCollateralAddress']
 // 绑定方法
 const method = {
+  gettCompletionYearChange:(val:string)=>{
+    const currentYear = new Date().getFullYear();
+    setValue('Tgt.nShipAge',currentYear - Number(val))
+  },
   gettCompletionDateChange:(val:string)=>{
     const insrnc = opertaor.getTableRefByKey( "insrnc").getFromValue()
     setValue('Tgt.nServiceLife',calAgeDif(insrnc['Base.tAppTm'],val))
