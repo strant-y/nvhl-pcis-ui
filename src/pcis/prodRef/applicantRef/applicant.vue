@@ -15,7 +15,7 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
-
+import dayjs from "dayjs";
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
 import moment from "moment";
@@ -87,6 +87,7 @@ onMounted(() => {
 
     // 处理邮编
     setFormItem("Applicant.cZipCde", {
+        'maxlength':6,
       rules: [
         getRules("signlessInt", {}),
         getRules("specifyLength", { len: 6 }),
@@ -100,7 +101,7 @@ onMounted(() => {
     
     setFormItem("Applicant.cGreenIndustryCustomers",{disabled: true});
     setFormItem("Applicant.cGreenIndustryList",{disabled: true});
-
+    // setFormItem("Applicant.cGcidCode", {rules: [getRules("leiCode", {})]});
 
   });
 });
@@ -121,6 +122,23 @@ function setFormItem(key: any, obj: any) {
     });
   }
 }
+
+// 解析身份证
+const idAnalysis = (id:string)=>{
+     const birthYear = parseInt(id.substring(6, 10), 10);
+          const birthMonth = parseInt(id.substring(10, 12), 10);
+          const birthDay = parseInt(id.substring(12, 14), 10);
+          const birthday = `${birthYear}-${birthMonth.toString().padStart(2, "0")}-${birthDay.toString().padStart(2, "0")}`;
+          const sexCode = parseInt(id.substring(16, 17), 10);
+          const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
+          const age = new Date().getFullYear() - birthYear;
+
+          setValue("Applicant.cNation", "1"); // 国籍
+          setValue("Applicant.tBirthday", birthday);
+          setValue("Applicant.nAge", age);
+          setValue("Applicant.cSex", sex);
+}
+
 
 
 //  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
@@ -270,7 +288,9 @@ const method = {
       });
     }
 
-    if (val == "120001") {
+    if (val == "120001") { 
+      
+      setValue('Applicant.cCertfCde','')  //选身份证时清空
       setFormItem("Applicant.cCertfCde", {
         rules: [getRules("required", {}), getRules("idCard", {})],
       });
@@ -469,11 +489,19 @@ const method = {
         disabled: true,
       });
 
+         // 是否绿色详情
+      setFormItem("Applicant.cGreenIndustryList", {
+        rules: null,
+        disabled: true,
+      });
+      setValue("Applicant.cGreenIndustryCustomers", "");
+      setValue("Applicant.cGreenIndustryList", "");
+
       // 为法人  企业成立日期
       setFormItem("Applicant.tEstablishingDate", {
         rules: null,
       });
-      setValue("Applicant.cGreenIndustryCustomers", "");
+ 
       setValue("Applicant.cIsMicroEntpris", "");
       //是否分支机构
       setValue("Applicant.cIsBranch", "1");
@@ -745,7 +773,8 @@ const method = {
         disabled: false,
       });
     } else {
-      setFormItem("Applicant.cGreenIndustryList", { rules: null });
+      setFormItem("Applicant.cGreenIndustryList", { rules: null,  disabled: true, });
+      setValue('Applicant.cGreenIndustryList','')
     }
   },
   // 证件号码change
@@ -759,21 +788,11 @@ const method = {
           "Applicant.cCertfCde"
         );
         if (certfCde && certfCde.length === 18) {
-          const birthYear = parseInt(certfCde.substring(6, 10), 10);
-          const birthMonth = parseInt(certfCde.substring(10, 12), 10);
-          const birthDay = parseInt(certfCde.substring(12, 14), 10);
-          const birthday = `${birthYear}-${birthMonth.toString().padStart(2, "0")}-${birthDay.toString().padStart(2, "0")}`;
-          const sexCode = parseInt(certfCde.substring(16, 17), 10);
-          const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
-          const age = new Date().getFullYear() - birthYear;
-
-          setValue("Applicant.cNation", "1"); // 国籍
-          setValue("Applicant.tBirthday", birthday);
-          setValue("Applicant.nAge", age);
-          setValue("Applicant.cSex", sex);
+            idAnalysis(val)
         }
       }
     }
+
 
     checkUser();
   },
@@ -816,6 +835,43 @@ const method = {
     fileInputRef.value?.click();
     fileInputType.value = "2";
   },
+  // 单位性质
+  cWorkDptChange:(val:any)=>{
+      console.log('单位性质',val)
+      if(val =='350'){
+        setFormItem("Applicant.cGcidCode", {
+              rules: [getRules("required", {}),getRules("leiCode", {})],
+            });
+      }else if(val){
+        setFormItem("Applicant.cGcidCode", {
+              rules: [getRules("leiCode", {})],
+            });
+      }
+  },
+  // 证件有效起期
+  tCertfBgnDateDisable:(date:any)=>{
+    const fs = applicantEditRef?.value?.getFromValue();
+    if (JSON.stringify(fs) !== '{}') {
+
+      const endDate = new Date(fs["Applicant.tCertfEndDate"] || '')   // 结束时间 
+      let minDate = dayjs(endDate).valueOf();
+      return   date.getTime() > minDate
+    }else{
+        return true;
+    }
+
+  },
+  // 证件有效止期
+  tCertfEndDateDisable:(date:any)=>{
+    const fs = applicantEditRef?.value?.getFromValue();
+    if (JSON.stringify(fs) !== '{}') {
+      const startDate = new Date(fs["Applicant.tCertfBgnDate"]|| '')   // 开始时间   
+      let maxDate = dayjs(startDate).valueOf();
+        return   date.getTime() < maxDate
+    }else{
+        return true;
+    }
+  }
 };
 
 function setregistAdd() {
@@ -928,6 +984,9 @@ function handleFileChange(event: Event) {
             }
             setValue("Applicant.cCertfCls", "120001");
             setValue("Applicant.cClntMrk", "1");
+            if (cardInfo["id_number"])
+              idAnalysis(cardInfo["id_number"])
+
           }
           if (fileInputType.value === "2") {
             // 外国人永久居留身份证
@@ -968,6 +1027,8 @@ function handleFileChange(event: Event) {
             setValue("Applicant.cCertfCls", "19");
             setValue("Applicant.cClntMrk", "1");
           }
+
+           checkUser();
         }
       })
       .catch((err) => {

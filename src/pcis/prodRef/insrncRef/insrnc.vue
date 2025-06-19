@@ -285,7 +285,7 @@ const method = {
     if (!end || !v) {
       return;
     }
-    const tm = moment(end).diff(moment(v), "days");
+    const tm = moment(end).add(1,'second').diff(moment(v), "days");
     if (tm < 0) {
       ElMessage.warning("终止日期不能小于起始日期");
       setFormValue({
@@ -305,7 +305,7 @@ const method = {
     if (!start || !v) {
       return;
     }
-    const tm = moment(v).diff(moment(start), "days");
+    const tm = moment(end).add(1,'second').diff(moment(start), "days");
     if (tm < 0) {
       ElMessage.warning("终止日期不能小于起始日期");
       setFormValue({
@@ -313,9 +313,9 @@ const method = {
       });
       return;
     }
-    const formatReportEnd = moment(v).format('YYYY-MM-DD') + ' 23:59:59';
+    const formatReportEnd  =   moment(v).format("YYYY-MM-DD 23:59:59");
     setFormValue({
-      "Base.nReportDays": tm,
+      "Base.nReportDays": moment(formatReportEnd).add(1,'second').diff(moment(start), "days"),
       "Base.tReportEndTm": formatReportEnd,
     });
   },

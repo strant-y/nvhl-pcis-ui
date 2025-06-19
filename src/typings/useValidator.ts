@@ -504,6 +504,18 @@ const faxNumber = () => {
 };
 
 
+/**
+ * 全球法人识别编码（LEI）校验规则
+ * @returns {Object} - 校验规则配置
+ */
+const leiCode = () => {
+  return {
+    pattern: /^[A-Z0-9]{4}[0-9]{2}[A-Z0-9]{12}[0-9]{2}$/,
+    message: "LEI编码格式不正确",
+    trigger: "blur"
+  };
+};
+
   const getRules = (type: any, param: any) => {
     if (type === "required") {
       return required(param.trigger, param.message);
@@ -564,6 +576,9 @@ const faxNumber = () => {
     }
     if(type == 'positiveNumber') {
       return positiveNumber()
+    }
+    if(type == 'leiCode') {
+      return leiCode()
     }
   };
   const validorMap = {

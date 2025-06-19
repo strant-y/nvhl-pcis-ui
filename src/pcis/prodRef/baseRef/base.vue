@@ -4,6 +4,7 @@
 </template>
 
 <script setup lang="ts">
+import { useValidator } from "@/typings/useValidator";
 import {
   AppFreeEditMethod,
   createAppFreeEditConfig,
@@ -26,7 +27,7 @@ const props = defineProps({
     required: true,
   },
 });
-
+const { getRules } = useValidator();
 const baseEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));
@@ -104,10 +105,10 @@ const method = {
   //争议处理选择事件
   cDisptSttlCdeChange(val){
     if(val=='A'){
-      setFormItem("Base.cDisptSttlOrg", { disabled: false });
+      setFormItem("Base.cDisptSttlOrg", { disabled: false ,rules: [getRules("required", {})]});
       setValue("Base.cDisptSttlOrg", "提交____仲裁委员会");
     }else{
-      setFormItem("Base.cDisptSttlOrg", { disabled: true });
+      setFormItem("Base.cDisptSttlOrg", { disabled: true,rules:null });
       setValue("Base.cDisptSttlOrg", "");   
     }
     
