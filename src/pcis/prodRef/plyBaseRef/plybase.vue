@@ -180,12 +180,17 @@ const method = {
         } else {
           const obj = {
             rules: [],
+            disabled: true,
             btnItems: {
               disabled: true,
             },
           };
           setFormItem("Base.cBrkrCde", obj); //代理(经纪)人
           setFormItem("Base.cBrkSlsCde", obj); //代理业务员
+
+ 
+
+
           setFormItem("Base.cAgtAgrNo", { rules: null }); //代理合作协议
           if (!p.initFlag) {
             setValue("Base.cBrkrCde", "");
@@ -291,7 +296,7 @@ const method = {
           method: {
             getSelected: (params) => {
               setFormItem("Base.cBrkrCde", {
-                loadData: [{ value: params.CChaCde, label: params.CChaNme }],
+                loadData: [{ value: params.CChaCde, label:params.CChaCde + params.CChaNme }],
               });
               setValue("Base.cBrkrCde", params.CChaCde);
               setValue("Base.cAgtAgrNo", params.CAgtAgrNo);
@@ -330,7 +335,8 @@ const method = {
     ) {
       // 非直销且非个人代理
       cslstyp = "020004";
-    }
+    };
+    
     dialogRef.value?.open(
       "agentWorker",
       {
@@ -349,10 +355,21 @@ const method = {
         method: {
           getSelected: (params) => {
             setFormValue({
-              "Base.cBrkSlsCde": params.CSlsCde, //代理业务员
+              // "Base.cBrkSlsCde": params.CSlsCde, //代理业务员
               "Base.cCertfNo": params.CCtfctNo, //代理业务执业证号
               "Base.cBrkrDptcde": params.CDptCde, //代理业务员机构代码
             });
+
+                   setFormItem("Base.cBrkSlsCde", {
+                    loadData: [
+                      {
+                        value:  params["CSlsCde"],
+                        label:params["CSlsCde"] + params['CSlsNme'],
+                      },
+                    ],
+                  });
+                  setValue("Base.cBrkSlsCde", params.CSlsCde);
+            
             dialogRef.value?.handleClose();
           },
         },
@@ -390,6 +407,7 @@ const method = {
         },
         method: {
           getSelected: (params) => {
+            console.log('111Base.cSlsId',params)
             setFormValue({
               "Base.cSlsId": params.CSlsCde, //业务员员工号
               "Base.cSlsNme": params.CSlsNme, //业务员名称
