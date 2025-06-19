@@ -2588,9 +2588,10 @@ const submitUnderwritingFn = () => {
   res["cAntiLnderRisk"] = "0"; //关联交易确认
   res["cIsTransaction"] = "0"; //反洗钱风险
   res["CRiBesprakMrk"] = "0"; // 预约分保标志
-  res["backUndrDptCde"] = null; // 退回指定核保级别机构编码
-  res["backUndrClsCde"] = null; // 退回指定核保级别编码
-  res["backUndrDptCnm"] = null; // 退回指定核保人员名称
+  const parts = res["cBckOp"].split("-");
+  res["backUndrDptCde"] = parts[0]; // 退回指定核保级别机构编码
+  res["backUndrClsCde"] = parts[1]; // 退回指定核保级别编码
+  res["backUndrDptCnm"] = parts[2]; // 退回指定核保人员名称
   console.log(res);
   // if(res.cUndrMrk === "A") {//核保选项为同意时，调用强制临分接口
   //   const deductibleDist = opertaor.getTableRefByKey("deductibleDist")?.getTableData();
