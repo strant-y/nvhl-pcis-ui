@@ -303,7 +303,7 @@ import {
   getAppPolicyForCopy,
 } from "../../../api/query/index";
 import { checkFeeWindowType, selectDist, saveDistBatch, getReleaseInquiryPage } from "@/api/prod";
-import { dataOpertaor, useProductStore } from "@/store";
+import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
 import moment from "moment";
 import dayjs from "dayjs";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
@@ -317,7 +317,7 @@ const { isCiJiMrk } = storeToRefs(productStore);
 
 const route = useRoute();
 const router = useRouter();
-
+const tagsViewStore = useTagsViewStore();
 
 import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
 const { saveData } = NewUdrListService();
@@ -1964,10 +1964,20 @@ const submitToUndrFn = async () => {
             btn.loading = false;
             console.log("submitToUndr-res", undr);
             if (undr["code"] == 200) {
-              if(!undr['cDecision'] === '0'){
+              if(undr['cDecision'] !== '0'){
                 ElMessage.success(undr.msg);
                 // 申请核保成功后按钮设置为不可点击
                 const btn = getBtn("btn010103");
+
+                if(undr['cDecision'] === '1' || undr['cDecision'] === '2'){
+                  tagsViewStore.delView({"name": "my-page",
+                    "title": "申请单录入",
+                    "path": "/pcis/my-page",
+                    "fullPath": "/pcis/my-page"}).then((res: any) => {
+                    router.replace({ path: "/dashboard" });
+                  });
+                }
+
               }else if(undr["cDecision"] == '0'){
                 ElMessage.error(undr.msg);
               }else{
@@ -2538,6 +2548,14 @@ const submitEdrToUndrFun = async () => {
     if (res["code"] == "200") {
       ElMessage.success(res.msg);
       btn.disabled = true;
+      if(res['cDecision'] === '1' || res['cDecision'] === '2'){
+        tagsViewStore.delView({"name": "my-page",
+          "title": "申请单录入",
+          "path": "/pcis/my-page",
+          "fullPath": "/pcis/my-page"}).then((res: any) => {
+          router.replace({ path: "/dashboard" });
+        });
+      }
     } else {
       ElMessage.error(res.msg);
     }
@@ -2609,6 +2627,14 @@ const submitUnderwritingFn = () => {
       // console.log("转换的数据", ops);
       ElMessage.success(res.msg);
       btn.disabled = true;
+      if(res['cDecision'] === '1' || res['cDecision'] === '2'){
+        tagsViewStore.delView({"name": "my-page",
+          "title": "申请单录入",
+          "path": "/pcis/my-page",
+          "fullPath": "/pcis/my-page"}).then((res: any) => {
+          router.replace({ path: "/dashboard" });
+        });
+      }
       // opertaor.setDataAll(ops);
     } else {
       ElMessage.error(res.msg);
