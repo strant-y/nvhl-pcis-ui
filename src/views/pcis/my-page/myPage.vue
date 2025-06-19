@@ -1293,6 +1293,11 @@ async function loadAfter() {
             delete item['DeductibleDist.cPkId']
           })
         }
+        // 保单基本信息 录单日期和签单日期默认为当前年月日
+        if(ops.plyBase) {
+          ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+          ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+        }
         opertaor.setDataAll(ops);
         // 获取原投保单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
@@ -1412,6 +1417,11 @@ async function loadAfter() {
           ops.deductibleDist.forEach((item:any) => {
             delete item['DeductibleDist.cPkId']
           })
+        }
+        // 保单基本信息 录单日期和签单日期默认为当前年月日
+        if(ops.plyBase) {
+          ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+          ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
         }
         opertaor.setDataAll(ops);
         //获取单号
