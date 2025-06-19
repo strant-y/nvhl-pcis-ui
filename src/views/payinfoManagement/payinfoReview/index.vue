@@ -148,6 +148,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "CBillTyp",
         inputtype: "rtselect",
         title: "单据类型",
+        clearable:true,
         loadData: [
           { label: "投保单号", value: "1" },
           { label: "交易号", value: "3" },

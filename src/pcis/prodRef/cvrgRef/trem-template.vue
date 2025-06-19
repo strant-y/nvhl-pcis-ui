@@ -940,6 +940,20 @@ const methodMap = {
       });
     }
   },
+
+
+  InsuranceChange043009:(val: any)=>{
+    if (pageparam.cProdNo === "049035") {
+      termFactormap.value.forEach((item: any) => {
+        if (item["prop"] === "Term.nAccidentLimit") {
+          item['max'] = val/2;
+        }
+      });
+    }
+  },
+  LimitSameChange:(val: any)=>{
+    console.log(val);
+  }
 };
 
 function setCancel(){

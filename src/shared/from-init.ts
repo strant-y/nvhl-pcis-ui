@@ -19,7 +19,8 @@ export function formInit(
   method: { [key: string]: Function },
   exRules: { [key: string]: any }
 ) {
-  const newObj =  JSON.parse(str, (key, value) => {
+  const newObj =  JSON.parse(str, function (key, value, ) {
+    const parent = this; // `this` 就是当前属性的父对象
     // 按钮绑定
     if (
       key === "titleBtns" ||
@@ -66,6 +67,14 @@ export function formInit(
     }
     // 方法绑定
     if (key === "func"  || key === "disabledDate"|| key === "tableClick" || key === "onInit") {
+      const inputTypeList = ['rtinput', 'rtSelect', 'rtSelectV2', 'rtcheckbox', 'rtcascader'];
+      // 给指定要素绑定默认初始化方法
+      if(inputTypeList.includes(parent.inputtype) && !!parent.prop && !parent.onInit) {
+        const propArr = parent.prop.split('\.');
+        const propName = propArr.length > 1 ? propArr[propArr.length - 1] : propArr[0] ;
+        const onInitKey = propName + 'OnInit';
+        parent.onInit = method[onInitKey as keyof typeof method];
+      }
       // 确保 value 是 method 对象的键之一
       const funcKey = value as keyof typeof method;
       return method[funcKey];

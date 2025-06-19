@@ -520,7 +520,7 @@ function createEPolicy() {
         ElMessage.warning('请选择生成电子保单方式!')
         return
     }
-    if (prodNo != '059011' && prodNo != '059015' && prodNo != '059012' && prodNo != '059013' && prodNo != '059016' && prodNo != '059017' && prodNo != '059018' && prodNo != '059019' && prodNo != '059020' && prodNo != '040019' && prodNo != '049900' && plyTyp == 'BL') {
+    if (prodNo != '059011' && prodNo != '059015' && prodNo != '059012' && prodNo != '059013' && prodNo != '059016' && prodNo != '059017' && prodNo != '059018' && prodNo != '059019' && prodNo != '059020' && prodNo != '040019' && prodNo != '047002' && plyTyp == 'BL') {
         ElMessage.warning('该产品没有电子保函模板!')
         return false
     }
