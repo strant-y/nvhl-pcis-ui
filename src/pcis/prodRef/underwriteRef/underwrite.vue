@@ -131,9 +131,7 @@
                     prop: "cBckOp",
                     inputtype: "rtselect",
                     title: "退回核保级别",
-                    loadData: [
-
-                    ],
+                    loadData: [],
                     clearable: true,
                 },
                 {},

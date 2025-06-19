@@ -205,7 +205,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         loadData: [
           { value: "3", label: "客户申请" },
           { value: "4", label: "内部批改" },
-          { value: "6", label: "客户提供错误信息" },
+          // { value: "6", label: "客户提供错误信息" },
           { value: "9", label: "其他" },
         ],
         rules: [getRules("required", {})],
