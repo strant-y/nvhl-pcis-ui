@@ -136,11 +136,11 @@ const method = {
   //联共保下拉change
   cCiMrkChange: (val) => {
     productStore.setcCiMrk(val);
-    if (!!val) {
+    if (!!val && !opertaor.getParam().initFlag) {
       const ciRef = opertaor.getTableRefs()['ci'];
       if (!!ciRef) {
         ciRef.initCiInfo({
-          cChiefMrk: ['1', '3'].includes(val) ? '1' : '0',
+          cCiMrk: val
         });
       }
     }

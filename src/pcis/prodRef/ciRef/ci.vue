@@ -36,6 +36,7 @@ const sessionData = ref(null);
 const rowData = ref(null)
 const freeEditRef = ref<AppGridEditMethod | null>(null);
 const formconfig1 = reactive(createAppGridEditConfig({}));
+const initFlag = computed(() => opertaor.getParam().initFlag);
 
 onMounted(async () => {
   console.log('99999',props.pageSchema)
@@ -141,7 +142,6 @@ const method = {
       // updateMasterAgreementValues();
     } else {
       // 非永安保险，设置默认值和其他数据
-      freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "");
       freeEditRef.value?.setRowFieldProp(
           rowId,
           "Ci.cSubDptCde",
@@ -153,16 +153,17 @@ const method = {
   //共保公司下拉事件
   cCoinsurerCdeChange:(val)=>{
     const rowData = freeEditRef.value?.getSelectRow();
+    if (!rowData || !initFlag.value) return;
     const rowId = rowData._dataId;
     const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue()
     if (cCiMrk["Base.cCiMrk"] == "5" && val !== "327001") {
       freeEditRef?.value?.setValueByRowKey("Ci.cCoinsurerCde", rowId, "");
       ElMessage.error("司内联保，不能录入除永安以外的其他公司！");
       return false;
-    } 
+    }
+    freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "");
     if (val === "327001") {
       // 如果选择的是永安保险，加载对应的分公司列表
-      freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "");
       codeListStore
         .queryCodeList({
           codeListName: "Comm_Code_LIST",
@@ -179,7 +180,6 @@ const method = {
       // updateMasterAgreementValues();
     } else {
       // 非永安保险，设置默认值和其他数据
-      freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "");
       freeEditRef.value?.setRowFieldProp(
         rowId,
         "Ci.cSubDptCde",
@@ -214,23 +214,8 @@ const method = {
   //分公司下拉事件
   cSubDptCdeChange:(val)=>{
     const rowData = freeEditRef.value?.getSelectRow();
+    if (!rowData || !initFlag.value) return;
     const rowId = rowData._dataId;
-    // if(val === "1"){
-    //   freeEditRef?.value?.setValueByRowKey("Ci.cDptCde",rowId,"")
-    //   freeEditRef?.value?.setRowFieldProp(
-    //     rowId,
-    //     "Ci.cDptCde",
-    //     "rules",
-    //     []
-    //   );
-    //   } else {
-    //     freeEditRef?.value?.setRowFieldProp(
-    //       rowId,
-    //       "Ci.cDptCde",
-    //       "rules",
-    //       [getRules("required", {})] // 使用 getRules 设置必填规则
-    //     );
-    // }
     if(val !=""){
       codeListStore
         .queryCodeList({
@@ -253,6 +238,7 @@ const method = {
   cDptCdeChange:(val)=>{
     console.log("出单机构下拉事件",val);
     const rowData = freeEditRef.value?.getSelectRow();
+    if (!rowData || !initFlag.value) return;
     const rowId = rowData._dataId;
     // 获取所有行数据
     const allRows = getFromValue();
@@ -644,23 +630,24 @@ const setFormItem = (key, obj) => {
 
 // 初始化联共保信息
 const initCiInfo = (data: any) => {
-  setFormValue([]);
+  const {cCiMrk} = data;
+  const cChiefMrk = ['1', '3', '5'].includes(cCiMrk) ? '1' : '0';
   const dataList = getFromValue();
+  if(dataList.length > 0) {
+    setFormValue([]);
+  }
   nextTick(() => {
-      freeEditRef?.value?.addRow();
-      const rowData = freeEditRef.value?.getSelectRow();
-      const rowId = rowData._dataId;
-      dataList.forEach((key,index) => {
-        key['Ci.nSeqNo']=index+1;
-        key['Ci.nCiShare'] = '1.00000000';
-        key['Ci.nPlyFeeRate']= '0.00';
-        key['Ci.nPlyFee']= '0.00';
-        key['Ci.cChiefMrk'] = data.cChiefMrk;
-        key['Ci.cIssueMrk'] = '1';
-        key['Ci.cCoinsurerCde'] = '327001';
-        key["Ci.cSubDptCde"] = param.dptCde;
-        key['Ci.cDptCde'] = param.cDptCde;
-      });
+    freeEditRef?.value?.addRowByData( {
+      'Ci.nSeqNo': 1,
+      'Ci.nCiShare': '1.00000000',
+      'Ci.nPlyFeeRate': '0.00',
+      'Ci.nPlyFee': '0.00',
+      'Ci.cChiefMrk': cChiefMrk,
+      'Ci.cIssueMrk': '1',
+      'Ci.cCoinsurerCde': '327001',
+      "Ci.cSubDptCde": param.dptCde,
+      'Ci.cDptCde': param.cDptCde,
+    });
   });
 };
 
