@@ -256,9 +256,30 @@ function handleChange(val?: string | number | Array<any> | undefined) {
 }
 const getLabel = computed(() =>  {
   if (options.value && options.value.length > 0) {
-    const se = options.value.find((item) => item.value === selectedValue.value);
-    if (se) {
-      return se.label;
+    let se = null;
+    console.log();
+    if(!Array.isArray(selectedValue.value)){
+      const s = options.value.find((item) => item.value === selectedValue.value);
+      if (s) {
+      se = s.label;
+    }
+    }else{
+      if(selectedValue.value && selectedValue.value.length > 0){
+        let str = "";
+        selectedValue.value.forEach((i) => {
+          const s = options.value.find((item) => {
+            return item.value === i
+          });
+          str += (s?.label+",");
+        });
+        str = str.substring(0,str.length-1);
+        se = str;
+      }
+    }
+    if(se){
+      return se;
+    }else{
+      return null;
     }
   }
 });
