@@ -609,6 +609,29 @@ const method = {
       "Tgt.nContractDuration": tm,
     });
   },
+
+  ShipClassOneChange:(val: any)=>{
+    const param = opertaor.getParam();
+    if(!param.initFlag){
+      if(val=='01'){
+        setFormValue({
+          "Tgt.cShipClassTwo": null,
+          "Tgt.cShipClassThree": null,
+        });
+      }
+    }
+    if(val=='01'){
+      setFormItem('Tgt.cShipClassTwo', {disabled:true});
+    }else{
+      setFormItem('Tgt.cShipClassTwo', {disabled:false});
+    }
+    if(val=='02'){
+      setFormItem('Tgt.cShipClassTwo', {codeParam:{classone:'level1'},typeCode:'Ship_Class_Level2'});
+    }
+    if(val=='03'){
+      setFormItem('Tgt.cShipClassTwo', {codeParam:{classone:'level1'},typeCode:'Ship_Class_Level2'});
+    }
+  },
   // 核定座位总数
   nSeatsNumberChange: (v) => {
     // Tgt.nSeatsNumber 核定总数
