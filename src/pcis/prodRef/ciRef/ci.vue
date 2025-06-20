@@ -236,6 +236,7 @@ const method = {
   },
   //出单机构下拉事件
   cDptCdeChange:(val)=>{
+    onChiefMrkChange()
     console.log("出单机构下拉事件",val);
     const rowData = freeEditRef.value?.getSelectRow();
     if (!rowData || !initFlag.value) return;
@@ -256,7 +257,7 @@ const method = {
       freeEditRef?.value?.setValueByRowKey("Ci.cDptCde", rowId, "");
       return;
     }
-    onChiefMrkChange()
+    
   },
   //出单标志下拉事件
   clssueMrkChange:  (val)=>{
@@ -350,6 +351,7 @@ const method = {
       }
     }
     updateMasterAgreementValues();
+    onChiefMrkChange()
   },
   //出单费比例
   nPlyFeeRateChange:(val)=>{
@@ -555,25 +557,25 @@ const onChiefMrkChange = () => {
   const rowData = freeEditRef.value?.getSelectRow();
   const rowId = rowData?._dataId;
   const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue();
-  // const aa = 
   if (!rowData || !rowId) return;
   const cCoinsurerCde = rowData["Ci.cCoinsurerCde"];  //获取当前行的联共保公司编码
   const cSubDptCde = rowData["Ci.cSubDptCde"];     //获取当前行的分公司
   const cDptCde = param.cDptCde;   // 获取出单机构编码(cDptCnm:浙江电网销团队)
-  let cSelfMrkVal = '0';
-  let cJiMrkVal = '0';
-  let cChiefMrkVal = '0';
+  let cSelfMrkVal = '0';   // 本公司标识
+  let cJiMrkVal = '0';     // 联保标识
+  let cChiefMrkVal = '0';  // 共保标识
   const ciMrkValue = cCiMrk["Base.cCiMrk"]; // 获取联共保标识
-
   if (cCoinsurerCde === "327001") {
-    switch (ciMrkValue) {
-      case "1":
-      case "2":
-      case "5":
-        cJiMrkVal = '1'; // 主联方
-        break;
-      default:
-        cJiMrkVal = '0'; // 从联方
+    if(rowData["Ci.cDptCde"] === cDptCde){
+      cSelfMrkVal = '1';
+      switch (ciMrkValue) {
+        case "1":
+        case "2":
+        case "5":
+          cJiMrkVal = '1'; // 主联方
+          break;
+        default:
+          cJiMrkVal = '0'; // 从联方
     }
     switch (ciMrkValue) {
       case "3":
@@ -583,6 +585,12 @@ const onChiefMrkChange = () => {
       default:
         cChiefMrkVal = '0'; // 从共方
     }
+    }else{
+      cChiefMrkVal = '0';
+      cJiMrkVal = '0';
+      cSelfMrkVal = '0';
+    }
+    
   } else {
     switch (ciMrkValue) {
       case "2":
@@ -595,12 +603,11 @@ const onChiefMrkChange = () => {
     cJiMrkVal = '2'; // 外部公司
     cSelfMrkVal = '0'; // 非本分公司
   }
-  // const cChiefMrk = rowData["Ci.cChiefMrk"];
-  // const cSelfMrk = rowData["Ci.cSelfMrk"];
-  // const cJiMrk = rowData["Ci.cJiMrk"];
-  freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowData._dataId, cChiefMrkVal );
-  freeEditRef?.value?.setValueByRowKey("Ci.cJiMrkVal", rowData._dataId, cJiMrkVal );
-  freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrkVal", rowData._dataId, cChiefMrkVal );
+    freeEditRef?.value?.setValueByRowKey("Ci.cSelfMrk", rowData._dataId, cSelfMrkVal );
+    freeEditRef?.value?.setValueByRowKey("Ci.cJiMrk", rowData._dataId, cJiMrkVal );
+    freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowData._dataId, cChiefMrkVal );
+
+    console.log("8988888888888888888888",getFromValue())
 };
 //给表单下拉项赋值
 const setFormItem = (key, obj) => {
@@ -648,6 +655,7 @@ const initCiInfo = (data: any) => {
       "Ci.cSubDptCde": param.dptCde,
       'Ci.cDptCde': param.cDptCde,
     });
+    onChiefMrkChange()
   });
 };
 
