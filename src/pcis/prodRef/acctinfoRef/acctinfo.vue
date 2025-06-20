@@ -19,6 +19,10 @@ const props = defineProps({
     type: [Object],
     required: true,
   },
+  compKey: {
+    type: String,
+    required: false,
+  },
 });
 
 let cRsnDetailCde = ref(opertaor.getParam()?.cRsnDetailCde);

@@ -50,6 +50,10 @@ const props = defineProps({
     type: [Object],
     required: true,
   },
+  compKey: {
+    type: String,
+    required: false,
+  },
 });
 
 const tgtEditRef = ref<AppFreeEditMethod | null>(null);

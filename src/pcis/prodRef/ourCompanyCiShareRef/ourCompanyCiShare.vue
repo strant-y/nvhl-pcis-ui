@@ -19,6 +19,10 @@ const props = defineProps({
     type: [Object],
     required: true,
   },
+  compKey: {
+    type: String,
+    required: false,
+  },
 });
 // Base.nCiJntAmt  //共保总保额
 // Base.nCiJntPrm  共保总保费

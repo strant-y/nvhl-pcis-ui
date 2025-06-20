@@ -17,6 +17,10 @@ const props = defineProps({
     type: [Object],
     required: true,
   },
+  compKey: {
+    type: String,
+    required: false,
+  },
 });
 // 监听 cCiMrk 的变化并更新本地变量
 watchEffect(() => {

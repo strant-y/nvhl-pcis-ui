@@ -37,6 +37,10 @@ const props = defineProps({
     type: [Object],
     required: true,
   },
+  compKey: {
+    type: String,
+    required: false,
+  },
 });
 const { getRules } = useValidator();
 const codeListStore = codeListViewStore();
