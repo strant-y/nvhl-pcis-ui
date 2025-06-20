@@ -247,6 +247,7 @@ const method = {
           );
         });
     }
+    onChiefMrkChange()
   },
   //出单机构下拉事件
   cDptCdeChange:(val)=>{
@@ -269,6 +270,7 @@ const method = {
       freeEditRef?.value?.setValueByRowKey("Ci.cDptCde", rowId, "");
       return;
     }
+    onChiefMrkChange()
   },
   //出单标志下拉事件
   clssueMrkChange:  (val)=>{
@@ -604,11 +606,9 @@ const onChiefMrkChange = () => {
       default:
         cChiefMrkVal = '0'; // 从共方
     }
-
     cJiMrkVal = '2'; // 外部公司
     cSelfMrkVal = '0'; // 非本分公司
   }
-
   // const cChiefMrk = rowData["Ci.cChiefMrk"];
   // const cSelfMrk = rowData["Ci.cSelfMrk"];
   // const cJiMrk = rowData["Ci.cJiMrk"];
