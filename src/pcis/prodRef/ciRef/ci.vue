@@ -612,9 +612,9 @@ const onChiefMrkChange = () => {
   // const cChiefMrk = rowData["Ci.cChiefMrk"];
   // const cSelfMrk = rowData["Ci.cSelfMrk"];
   // const cJiMrk = rowData["Ci.cJiMrk"];
-  freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", row._dataId, cChiefMrkVal );
-  freeEditRef?.value?.setValueByRowKey("Ci.cJiMrkVal", row._dataId, cJiMrkVal );
-  freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrkVal", row._dataId, cChiefMrkVal );
+  freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowData._dataId, cChiefMrkVal );
+  freeEditRef?.value?.setValueByRowKey("Ci.cJiMrkVal", rowData._dataId, cJiMrkVal );
+  freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrkVal", rowData._dataId, cChiefMrkVal );
 };
 //给表单下拉项赋值
 const setFormItem = (key, obj) => {
