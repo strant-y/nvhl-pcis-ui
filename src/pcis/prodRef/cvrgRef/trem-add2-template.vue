@@ -4,10 +4,9 @@
       <thead>
         <tr class="table-title">
           <th style="width: 80px">序号</th>
-          <th style="width: 300px">附加条款名称</th>
-          <th>费率({{ formcof.nMainRate.suffix }})</th>
-          <th>保费</th>
-          <th>备注</th>
+          <th v-for="(item, k) in formcof" :key="k" :style="{width: item.width?item.width+'px':null}">
+            {{ item.title + (k === 'nMainRate' || k === 'nDeductibleRate' ? item.suffix : '') }}
+          </th>
           <th style="width: 100px">操作</th>
         </tr>
       </thead>
@@ -16,28 +15,10 @@
           <td>
             {{ k + 1 }}
           </td>
-          <td>
+          <td v-for="(it, kk) in formcof" :key="kk">
             <from-item
-              v-model="item['Term.cClauseCode']"
-              :item="formcof.cClauseCode"
-            />
-          </td>
-          <td>
-            <from-item
-              v-model="item['Term.nMainRate']"
-              :item="formcof.nMainRate"
-            />
-          </td>
-          <td>
-            <from-item
-              v-model="item['Term.nInsuranceFee']"
-              :item="formcof.nInsuranceFee"
-            />
-          </td>
-          <td>
-            <from-item
-              v-model="item['Term.cRemarkInfo']"
-              :item="formcof.cRemarkInfo"
+              v-model="item['Term.'+kk]"
+              :item="it"
             />
           </td>
           <td>
@@ -86,6 +67,7 @@ onMounted(() => {
   if(param.cProdNo === "059002" || param.cProdNo === "059003"){
     formcof.value.nMainRate.suffix = "%";
   }
+
 });
 
 const btnConf = ref<{ [key: string]: { [key: string]: any } }>({
@@ -98,19 +80,68 @@ const formcof = ref<{ [key: string]: { [key: string]: any } }>({
   cClauseCode: {
     inputtype: "rttag",
     typeCode: "TermCodeTag",
+    title:'附加条款名称',
+    width:300
   },
   nMainRate: {
     inputtype: "rtnumber",
     suffix: "‰",
+    title:'费率',
   },
   nInsuranceFee: {
     inputtype: "rtnumber",
     suffix: "元",
+    title:'保费',
   },
   cRemarkInfo: {
     inputtype: "rtinput",
+    title:'备注',
   },
 });
+
+if(param.cProdNo.startsWith('02')){
+  formcof.value = {
+    cClauseCode: {
+      inputtype: "rttag",
+      typeCode: "TermCodeTag",
+      title:'附加条款名称',
+      width:200
+    },
+    nInsuranceAmount: {
+      inputtype: "rtnumber",
+      title:'赔偿限额/保额',
+      width:120
+    },
+    nMainRate: {
+      inputtype: "rtnumber",
+      suffix: "‰",
+      title:'费率',
+    },
+    nInsuranceFee: {
+      inputtype: "rtnumber",
+      suffix: "元",
+      title:'保费',
+    },
+    nDeductibleAmount: {
+      inputtype: "rtnumber",
+      title:'免赔额',
+    },
+    nDeductibleRate: {
+      inputtype: "rtnumber",
+      title:'免赔率',
+      suffix: "%",
+    },
+    cDeductibleNote: {
+      inputtype: "rtinput",
+      title:'免赔说明',
+    },
+    cRemarkInfo: {
+      inputtype: "rtinput",
+      title:'备注',
+    },
+  }
+}
+
 
 function setDisabledAll() {
   Object.keys(formcof.value).forEach((k: any) => {
