@@ -159,15 +159,21 @@ function calAgeDif(val1:any,val2:any) {
 
   return Math.round(diffInYears)
 }
-const guaranteeMethodList = ['Tgt.cCollateralName','Tgt.cPledgeNumber','Tgt.cPledgeAddress','Tgt.cItemNumber','Tgt.nFaceValue','Tgt.cApplicationLine','Tgt.cBankApply','Tgt.cAcceptor','Tgt.cMaturityWeek','Tgt.cDueWeek','Tgt.tTicketStartingandending','Tgt.cConfirmingBank','Tgt.cMortgageName','Tgt.cMortgageNumber','Tgt.cCollateralAddress']
+const guaranteeMethodList = ['Tgt.cCollateralName','Tgt.cPledgeNumber','Tgt.cPledgeAddress','Tgt.cItemNumber','Tgt.nFaceValue','Tgt.cApplicationLine','Tgt.cBankApply','Tgt.cAcceptor','Tgt.cMaturityWeek','Tgt.cDueWeek','Tgt.tTicketStartingandending','Tgt.cConfirmingBank']
+const cMortgageList =['Tgt.cMortgageName','Tgt.cMortgageNumber','Tgt.cCollateralAddress']
 // 绑定方法
 const method = {
+  gettCompletionYearChange:(val:string)=>{
+    const currentYear = new Date().getFullYear();
+    setValue('Tgt.nShipAge',currentYear - Number(val))
+  },
   gettCompletionDateChange:(val:string)=>{
     const insrnc = opertaor.getTableRefByKey( "insrnc").getFromValue()
     setValue('Tgt.nServiceLife',calAgeDif(insrnc['Base.tAppTm'],val))
   },
   getcGuaranteeMethodChange:(val:string)=>{
-    if(val === 'A05Assure001'){
+    //担保方式选择"质押贷款"时带出
+    if(val === 'B05Assure004'){
       guaranteeMethodList.forEach(item=>{
         setFormItem(item, {
           hidden: false,
@@ -180,7 +186,22 @@ const method = {
         });
       })
     }
-    if(val === 'A05Assure002'){
+    // 担保方式选择"抵押贷款"时带出
+    if(val === 'B05Assure003'){
+      cMortgageList.forEach(item=>{
+        setFormItem(item, {
+          hidden: false,
+        });
+      })
+    }else{
+      cMortgageList.forEach(item=>{
+        setFormItem(item, {
+          hidden: true,
+        });
+      })
+    }
+    // 担保方式选择"保证贷款 "时带出
+    if(val === 'B05Assure002'){
       setFormItem('Tgt.cTypeName', {
         hidden: false,
       });
