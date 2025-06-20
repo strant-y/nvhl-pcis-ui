@@ -32,6 +32,7 @@ import moment from "moment";
 import { descryptParameter, encryptParameter } from "@/utils/encipher";
 import { useRouter, useRoute } from 'vue-router';
 import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
+import {getAddressStr} from "@/api/query";
 const route = useRoute();
 const query = ref(route.query);
 const router = useRouter();
@@ -59,6 +60,11 @@ const props = defineProps({
 const tgtEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));
+
+const distContactList:Array<string> = ['Tgt.DispatchProp','Tgt.cDispatchAddress',"Tgt.DepartureAirportProp","Tgt.cDepartureAirportAddress",
+  "Tgt.TransitProp","Tgt.cTransitAddress","Tgt.DestinationAirportProp","Tgt.cDestinationAirportAddress",
+  "Tgt.DestinationProp","Tgt.cDestinationAddress"]
+
 onMounted(async () => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
@@ -71,6 +77,18 @@ onMounted(async () => {
         item['typeCode'] = 'InsuranceMethod045001';
       }
     })
+  }
+  for(let i = 0; formconfig11.fromSchema && i < formconfig11.fromSchema.length; i++){
+    // 遍历groupList数组把函数赋值给fromSchema
+    if (formconfig11.fromSchema[i]["groupList"] && formconfig11.fromSchema[i]["groupList"].length>0) {
+      formconfig11.fromSchema[i]["groupList"].forEach((data:any,index:number,arr:any) =>{
+        if(distContactList.includes(data.prop)){
+          formconfig11.fromSchema[i]["groupList"][index]['func'] = function (){
+            return setcDetailedAddress(arr,JSON.parse(JSON.stringify(formconfig11.fromSchema[i+1])))
+          }
+        }
+      })
+    }
   }
   Object.assign(formconfig1, formconfig11);
   // 约定保期内服务次数正整数
@@ -165,6 +183,21 @@ function calAgeDif(val1:any,val2:any) {
 }
 const guaranteeMethodList = ['Tgt.cCollateralName','Tgt.cPledgeNumber','Tgt.cPledgeAddress','Tgt.cItemNumber','Tgt.nFaceValue','Tgt.cApplicationLine','Tgt.cBankApply','Tgt.cAcceptor','Tgt.cMaturityWeek','Tgt.cDueWeek','Tgt.tTicketStartingandending','Tgt.cConfirmingBank']
 const cMortgageList =['Tgt.cMortgageName','Tgt.cMortgageNumber','Tgt.cCollateralAddress']
+const setcDetailedAddress = (prop:any,aftProp:any)=> {
+  const ads = getValue(prop[0].prop);
+  const a = getValue(prop[1].prop) || "";
+  if (ads) {
+    getAddressStr({ address: ads }).then((res: any) => {
+      const { code, data, msg } = res;
+      if (code === 200) {
+        const b = (data ? data["addStr"] : "") + a;
+        setValue(aftProp.prop, b);
+      }
+    });
+  } else {
+     setValue(aftProp.prop, a);
+  }
+};
 // 绑定方法
 const method = {
   gettCompletionYearChange:(val:string)=>{
