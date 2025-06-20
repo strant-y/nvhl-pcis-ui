@@ -8,29 +8,25 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
 import { useProductStore } from "@/store/modules/prod";
-import { set } from "lodash";
-const productStore = useProductStore();
 
 const props = defineProps({
   pageSchema: {
     type: [Object],
     required: true,
   },
-  compKey: {
-    type: String,
-    required: false,
-  },
 });
-// Base.nCiJntAmt  //共保总保额
-// Base.nCiJntPrm  共保总保费
-// Base.nJiJntAmt  联保总保额
-// Base.nJiJntPrm  联保总保费
+// ECargoBase.nCiJntAmt  //共保总保额
+// ECargoBase.nCiJntPrm  共保总保费
+// ECargoBase.nJiJntAmt  联保总保额
+// ECargoBase.nJiJntPrm  联保总保费
 const tgtobjEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));
+
+const idxParam = inject('idxParam');
+const formPage = idxParam?.formPage;
+const param = idxParam?.param;
 
 onMounted(() => {
   const formconfig11 = formInit(
@@ -39,19 +35,18 @@ onMounted(() => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
-  // const cCiMrk = (opertaor.getTableRefByKey("plyBase")).getValue("Base.cCiMrk");
   watchEffect(() => {
-    const cCiMrk = (opertaor.getTableRefByKey("plyBase")).getValue("Base.cCiMrk");
+    const cCiMrk = formPage.getFormDataById('AgreementBase')['ECargoECargoBase.cCiMrk'];
     if(cCiMrk === "1"){
-      setValue("Base.cCiInpTyp", '600001');
+      setValue("ECargoBase.cCiInpTyp", '600001');
     }else if(cCiMrk === "2"){
-      setValue("Base.cCiInpTyp", '600004');
+      setValue("ECargoBase.cCiInpTyp", '600004');
     }else if(cCiMrk === "3"){
-      setValue("Base.cCiInpTyp", '600001');
+      setValue("ECargoBase.cCiInpTyp", '600001');
     }else if(cCiMrk === "4"){
-      setValue("Base.cCiInpTyp", '600004');
+      setValue("ECargoBase.cCiInpTyp", '600004');
     }else if(cCiMrk === "5"){
-      setValue("Base.cCiInpTyp", '600005');
+      setValue("ECargoBase.cCiInpTyp", '600005');
     }
   })
 });

@@ -26,6 +26,10 @@ const props = defineProps({
     type: [Object],
     required: true,
   },
+  compKey: {
+    type: String,
+    required: false,
+  },
 });
 
 const baseEditRef = ref<AppFreeEditMethod | null>(null);

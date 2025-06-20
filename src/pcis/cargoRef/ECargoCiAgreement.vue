@@ -8,54 +8,18 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
-import { useProductStore } from "@/store/modules/prod";
-const productStore = useProductStore();
 const props = defineProps({
   pageSchema: {
     type: [Object],
     required: true,
   },
-  compKey: {
-    type: String,
-    required: false,
-  },
 });
+
+const idxParam = inject('idxParam');
+const formPage = idxParam?.formPage;
+const param = idxParam?.param;
+
 // 监听 cCiMrk 的变化并更新本地变量
-watchEffect(() => {
-  const cCiMrkValue = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
-    // formconfig1.value?.fromSchema?.forEach((item) => {
-    //   item.hidden = false;
-    // });
-    if (cCiMrkValue === "3" || cCiMrkValue === "4") {
-      formconfig1.fromSchema?.forEach((item) => {
-        const prop = item.prop;
-        if (
-          prop === "Base.cCiAgtNo" ||
-          prop === "Base.nCiJntAmt" ||
-          prop === "Base.nCiJntPrm"
-        ) {
-          item.hidden = false; // 显示共保字段
-        } else {
-          item.hidden = true; // 隐藏其他字段
-        }
-      });
-      } else if (cCiMrkValue === "5") {
-        formconfig1.fromSchema?.forEach((item) => {
-          const prop = item.prop;
-          if (
-            prop === "Base.cJiAgtNo" ||
-            prop === "Base.nJiJntAmt" ||
-            prop === "Base.nJiJntPrm"
-          ) {
-            item.hidden = false; // 显示联保字段
-          } else {
-            item.hidden = true; // 隐藏其他字段
-          }
-        });
-      } 
-});
 
 const tgtobjEditRef = ref<AppFreeEditMethod | null>(null);
 
@@ -76,6 +40,50 @@ const method = {
   // func demo
   func1: () => {},
 };
+
+
+
+
+
+
+
+const cCiMrkChangeFun = (data: any) => {
+  const { cCiMrk  } = data;
+  // formconfig1.value?.fromSchema?.forEach((item) => {
+  //   item.hidden = false;
+  // });
+  if (cCiMrk === "3" || cCiMrk === "4") {
+    formconfig1.fromSchema?.forEach((item) => {
+      const prop = item.prop;
+      if (
+          prop === "ECargoBase.cCiAgtNo" ||
+          prop === "ECargoBase.nCiJntAmt" ||
+          prop === "ECargoBase.nCiJntPrm"
+      ) {
+        item.hidden = false; // 显示共保字段
+      } else {
+        item.hidden = true; // 隐藏其他字段
+      }
+    });
+  } else if (cCiMrk === "5") {
+    formconfig1.fromSchema?.forEach((item) => {
+      const prop = item.prop;
+      if (
+          prop === "ECargoBase.cJiAgtNo" ||
+          prop === "ECargoBase.nJiJntAmt" ||
+          prop === "ECargoBase.nJiJntPrm"
+      ) {
+        item.hidden = false; // 显示联保字段
+      } else {
+        item.hidden = true; // 隐藏其他字段
+      }
+    });
+  }
+}
+
+
+
+
 // 绑定特殊验证器
 const exRules = {};
 
@@ -129,7 +137,8 @@ defineExpose({
   validate,
   setValue,
   getValue,
-  getFormconfig
+  getFormconfig,
+  cCiMrkChangeFun
 });
 </script>
 

@@ -1258,7 +1258,7 @@ async function loadAfter() {
         // 保险期限 投保日期更新为当前日期 保险起期和保险止期重置为第二天0点至一年后
         if(ops.insrnc) {
           const beginTm = dayjs().add(1, 'day').format("YYYY-MM-DD 00:00:00")
-          const endTm = dayjs(beginTm).add(1, 'year').format("YYYY-MM-DD 23:59:59")
+          const endTm = dayjs().add(1, 'year').format("YYYY-MM-DD 23:59:59")
           ops.insrnc["Base.tInsrncBgnTm"] = beginTm;
           ops.insrnc["Base.tInsrncEndTm"] = endTm;
           ops.insrnc['Base.tAppTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")
@@ -1384,7 +1384,7 @@ async function loadAfter() {
         // 保险期限 投保日期更新为当前日期 保险起期和保险止期重置为第二天0点至一年后
         if(ops.insrnc) {
           const beginTm = dayjs().add(1, 'day').format("YYYY-MM-DD 00:00:00")
-          const endTm = dayjs(beginTm).add(1, 'year').format("YYYY-MM-DD 23:59:59")
+          const endTm = dayjs().add(1, 'year').format("YYYY-MM-DD 23:59:59")
           ops.insrnc["Base.tInsrncBgnTm"] = beginTm;
           ops.insrnc["Base.tInsrncEndTm"] = endTm;
           ops.insrnc['Base.tAppTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")

@@ -214,7 +214,7 @@ onMounted(() => {
     }else if(cIs == 0 && (item.prop !=='Dist.cSchoolName' && item.prop !=='Dist.cSchoolAddress')){
       item['rules'] =null;
     }
-    item["disabled"] = false;
+    // item["disabled"] = false;
     if(item.cShowLocation === '1'){
       item["hidden"] = true;
     }

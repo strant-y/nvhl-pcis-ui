@@ -186,6 +186,10 @@ const props = defineProps({
     type: [Object],
     required: true,
   },
+  compKey: {
+    type: String,
+    required: false,
+  },
 });
 
 const btnItem = ref<{ [key: string]: { [key: string]: any } }>({

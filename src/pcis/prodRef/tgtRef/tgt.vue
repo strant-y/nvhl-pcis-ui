@@ -33,6 +33,7 @@ import { descryptParameter, encryptParameter } from "@/utils/encipher";
 import { useRouter, useRoute } from 'vue-router';
 import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
 import dayjs from "dayjs";
+import {getAddressStr} from "@/api/query";
 const route = useRoute();
 const query = ref(route.query);
 const router = useRouter();
@@ -51,11 +52,20 @@ const props = defineProps({
     type: [Object],
     required: true,
   },
+  compKey: {
+    type: String,
+    required: false,
+  },
 });
 
 const tgtEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));
+
+const distContactList:Array<string> = ['Tgt.DispatchProp','Tgt.cDispatchAddress',"Tgt.DepartureAirportProp","Tgt.cDepartureAirportAddress",
+  "Tgt.TransitProp","Tgt.cTransitAddress","Tgt.DestinationAirportProp","Tgt.cDestinationAirportAddress",
+  "Tgt.DestinationProp","Tgt.cDestinationAddress"]
+
 onMounted(async () => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
@@ -69,16 +79,18 @@ onMounted(async () => {
       }
     })
   }
-
-
-  // if(params.cProdNo === '043002' || params.cProdNo === '041010'){
-  //   formconfig11.fromSchema?.forEach(item=>{
-  //     if(item['prop'] ==='Tgt.cCertificateType'){
-  //       item['typeCode'] = 'TfiCertfCls_List_0410';
-  //     }
-  //   })
-  // }
-
+  for(let i = 0; formconfig11.fromSchema && i < formconfig11.fromSchema.length; i++){
+    // 遍历groupList数组把函数赋值给fromSchema
+    if (formconfig11.fromSchema[i]["groupList"] && formconfig11.fromSchema[i]["groupList"].length>0) {
+      formconfig11.fromSchema[i]["groupList"].forEach((data:any,index:number,arr:any) =>{
+        if(distContactList.includes(data.prop)){
+          formconfig11.fromSchema[i]["groupList"][index]['func'] = function (){
+            return setcDetailedAddress(arr,JSON.parse(JSON.stringify(formconfig11.fromSchema[i+1])))
+          }
+        }
+      })
+    }
+  }
   Object.assign(formconfig1, formconfig11);
   // 约定保期内服务次数正整数
   setFormItem("Tgt.nAgreeFrequency", {
@@ -170,15 +182,36 @@ function calAgeDif(val1:any,val2:any) {
 
   return Math.round(diffInYears)
 }
-const guaranteeMethodList = ['Tgt.cCollateralName','Tgt.cPledgeNumber','Tgt.cPledgeAddress','Tgt.cItemNumber','Tgt.nFaceValue','Tgt.cApplicationLine','Tgt.cBankApply','Tgt.cAcceptor','Tgt.cMaturityWeek','Tgt.cDueWeek','Tgt.tTicketStartingandending','Tgt.cConfirmingBank','Tgt.cMortgageName','Tgt.cMortgageNumber','Tgt.cCollateralAddress']
+const guaranteeMethodList = ['Tgt.cCollateralName','Tgt.cPledgeNumber','Tgt.cPledgeAddress','Tgt.cItemNumber','Tgt.nFaceValue','Tgt.cApplicationLine','Tgt.cBankApply','Tgt.cAcceptor','Tgt.cMaturityWeek','Tgt.cDueWeek','Tgt.tTicketStartingandending','Tgt.cConfirmingBank']
+const cMortgageList =['Tgt.cMortgageName','Tgt.cMortgageNumber','Tgt.cCollateralAddress']
+const setcDetailedAddress = (prop:any,aftProp:any)=> {
+  const ads = getValue(prop[0].prop);
+  const a = getValue(prop[1].prop) || "";
+  if (ads) {
+    getAddressStr({ address: ads }).then((res: any) => {
+      const { code, data, msg } = res;
+      if (code === 200) {
+        const b = (data ? data["addStr"] : "") + a;
+        setValue(aftProp.prop, b);
+      }
+    });
+  } else {
+     setValue(aftProp.prop, a);
+  }
+};
 // 绑定方法
 const method = {
+  gettCompletionYearChange:(val:string)=>{
+    const currentYear = new Date().getFullYear();
+    setValue('Tgt.nShipAge',currentYear - Number(val))
+  },
   gettCompletionDateChange:(val:string)=>{
     const insrnc = opertaor.getTableRefByKey( "insrnc").getFromValue()
     setValue('Tgt.nServiceLife',calAgeDif(insrnc['Base.tAppTm'],val))
   },
   getcGuaranteeMethodChange:(val:string)=>{
-    if(val === 'A05Assure001'){
+    //担保方式选择"质押贷款"时带出
+    if(val === 'B05Assure004'){
       guaranteeMethodList.forEach(item=>{
         setFormItem(item, {
           hidden: false,
@@ -191,7 +224,22 @@ const method = {
         });
       })
     }
-    if(val === 'A05Assure002'){
+    // 担保方式选择"抵押贷款"时带出
+    if(val === 'B05Assure003'){
+      cMortgageList.forEach(item=>{
+        setFormItem(item, {
+          hidden: false,
+        });
+      })
+    }else{
+      cMortgageList.forEach(item=>{
+        setFormItem(item, {
+          hidden: true,
+        });
+      })
+    }
+    // 担保方式选择"保证贷款 "时带出
+    if(val === 'B05Assure002'){
       setFormItem('Tgt.cTypeName', {
         hidden: false,
       });
@@ -594,6 +642,29 @@ const method = {
     setFormValue({
       "Tgt.nContractDuration": tm,
     });
+  },
+
+  ShipClassOneChange:(val: any)=>{
+    const param = opertaor.getParam();
+    if(!param.initFlag){
+      if(val=='01'){
+        setFormValue({
+          "Tgt.cShipClassTwo": null,
+          "Tgt.cShipClassThree": null,
+        });
+      }
+    }
+    if(val=='01'){
+      setFormItem('Tgt.cShipClassTwo', {disabled:true});
+    }else{
+      setFormItem('Tgt.cShipClassTwo', {disabled:false});
+    }
+    if(val=='02'){
+      setFormItem('Tgt.cShipClassTwo', {codeParam:{classone:'level1'},typeCode:'Ship_Class_Level2'});
+    }
+    if(val=='03'){
+      setFormItem('Tgt.cShipClassTwo', {codeParam:{classone:'level1'},typeCode:'Ship_Class_Level2'});
+    }
   },
   // 核定座位总数
   nSeatsNumberChange: (v) => {
