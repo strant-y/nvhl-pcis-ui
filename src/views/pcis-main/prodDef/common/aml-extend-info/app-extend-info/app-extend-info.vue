@@ -277,26 +277,6 @@ const tableconfig = reactive<AppGridEditConfig>(
 				label: "新增",
 				func: async () => {
 					tableRef.value?.addRowByData({ cGrpMrk: "0" });
-
-
-					let seleObj= [
-						{cOpgrpCnm:'张',cName:'草人'},
-						{cOpgrpCnm:'张2',cName:'草人'},
-						{cOpgrpCnm:'张3',cName:'草人'},
-					]
-					 
-					// seleObj.forEach((item,index)=>{
-					// 	tableRef.value?.addRowByData({
-					// 		cOpgrpCnm: item.cOpgrpCnm,
-					// 		// cName: freeEditRef.value?.getValue("cUndrClsCde"),
-					// 	// cStatus: "0",
-					// 	});	
-					// })
-
-					
-					// tableRef.value?.addRowByData(seleObj);
-
-					// tableRef.value?.setFormValue(seleObj)
 				},
 			}),
 			createFreeButtonBase({
@@ -326,40 +306,64 @@ const tableconfig = reactive<AppGridEditConfig>(
 				prop: "cCusLnme",
 				inputtype: "rtinput",
 				title: "姓",
+				rules: [getRules("required", {})]
 			},
 			{
 				prop: "cCusFnme",
 				inputtype: "rtinput",
 				title: "名",
+					rules: [getRules("required", {})]
 			},
 			{
 				prop: "cCerftCls",
 				inputtype: "rtselect",
 				typeCode: "NATURAL_CERTIFICATE_ALL",
 				title: "证件类型",
-				params: { },
-				// clearable: true,
+				rules: [getRules("required", {})], 
+				func:(val:any)=>{
+					console.log('----',val)
+					 if (val == "120001") {
+						     setFormItem("cCerftCde", {
+								rules: [getRules("required", {}), getRules("idCard", {
+								})],
+							});
+
+					 }else  if (val == "110007") {
+						// 统一社会信用代码
+						setFormItem("cCerftCde", {
+							rules: [getRules("required", {}),getRules("socialCode", {})],
+						});
+					 }else if(val =='120002'){
+						// 护照 
+						setFormItem("cCerftCde", {
+							rules: [getRules("required", {}),getRules("passPort", {})],
+						});
+					 }
+				}
 			},
 			{
 				prop: "cCerftCde",
 				inputtype: "rtinput",
 				title: "证件号码",
-				rules: [getRules("idCard", {})],
+					rules: [getRules("required", {})]
 			},
 			{
 				prop: "tCerftBgnTm",
 				inputtype: "rtdatepicker",
 				title: "证件有效起期",
+				rules: [getRules("required", {})]
 			},
 			{
 				prop: "tCerftEndTm",
 				inputtype: "rtdatepicker",
 				title: "证件有效止期",
+				rules: [getRules("required", {})]
 			},
 			{
 				prop: "cCusAddr",
 				inputtype: "rtinput",
 				title: "地址",
+				rules: [getRules("required", {})]
 			}
 		],
 	})
@@ -367,13 +371,6 @@ const tableconfig = reactive<AppGridEditConfig>(
 onMounted(async () => {
 
 	getTableFun();
-	
-	// if (props.type === "edit" && props.data) {
-	// 	setTimeout(() => {
-	// 		freeEditRef1.value?.setFormValue(props.data);
-	// 	}, 50);
-	// }
-	// freeEditRef2.value?.setValue('CCusNme_B', '李四');
 	let CAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];   // 投保单号
 
 	policyService.getAMLExtendInfoByAppNo(CAppNo,'Applicant').then((response) => {
@@ -512,6 +509,23 @@ function handleQuery(flag?: boolean) {
 			}
 		})
 		.finally(() => { });
+}
+
+function setFormItem(key: any, obj: any) {
+  if (obj && Object.keys(obj).length) {
+    tableconfig.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.btnItems && obj.btnItems) {
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
+          }
+        } else {
+          Object.assign(item, obj);
+        }
+      }
+    });
+  }
 }
 
 defineExpose({getFrom });

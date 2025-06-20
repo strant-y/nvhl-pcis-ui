@@ -88,9 +88,10 @@ const tableconfig = reactive<AppTableConfig>(
           return row.cIfEdit !== '1';
         },
         tableClick: (row) => {
-          const param = {};
-          const f = originalData.value.find(f => row.cDeductibleCode === f.cDeductibleClass);
-          Object.assign(param, f);
+          let param = {};
+          // const f = originalData.value.find(f => row.cDeductibleCode === f.cDeductibleClass);
+          const f = originalData.value.find(f => row.cDeductibleClass === f.cDeductibleClass);
+          param =  Object.assign(param, f);
           dzmodal.open(deductibleFixEdit, { 
             type: "view", 
             data: param, 

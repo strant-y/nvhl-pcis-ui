@@ -561,7 +561,7 @@ const method = {
         ElMessage.error("增量模板下载失败");
       });
   },
-setregistAdd(){
+  setregistAdd(){
     const ads = distTableRef?.value?.getValue('Dist.AllProp');
     const a = distTableRef?.value?.getValue("Dist.cRegisterSuffixAddr") || "";
     if (ads) {
@@ -576,7 +576,9 @@ setregistAdd(){
       setAddressStr("Dist.cClntAddr", a);
     }
     console.log("清单级联事件触发")
-  }
+  },
+
+
 };
 
 function setUnDisabledByKeyList(key: any) {

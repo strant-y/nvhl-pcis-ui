@@ -32,6 +32,7 @@ import moment from "moment";
 import { descryptParameter, encryptParameter } from "@/utils/encipher";
 import { useRouter, useRoute } from 'vue-router';
 import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
+import dayjs from "dayjs";
 const route = useRoute();
 const query = ref(route.query);
 const router = useRouter();
@@ -68,6 +69,16 @@ onMounted(async () => {
       }
     })
   }
+
+
+  // if(params.cProdNo === '043002' || params.cProdNo === '041010'){
+  //   formconfig11.fromSchema?.forEach(item=>{
+  //     if(item['prop'] ==='Tgt.cCertificateType'){
+  //       item['typeCode'] = 'TfiCertfCls_List_0410';
+  //     }
+  //   })
+  // }
+
   Object.assign(formconfig1, formconfig11);
   // 约定保期内服务次数正整数
   setFormItem("Tgt.nAgreeFrequency", {
@@ -677,7 +688,54 @@ const method = {
         console.log(val,targetYear,currentYear - targetYear)
         setValue('Tgt.nShipAge',currentYear - targetYear)
     }
+  },
+    // 标的信息--证件类型
+  cCertificateTypeChange:(val:any)=>{
+      console.log('证件类型--1',val)
+      // 道路运输
+      if(val==='1'){
+// setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}),getRules("idCard", {})]})  //证件号
+        setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}),getRules("roadTransportLicense", {})]})  //证件号
+        
+      }else if(val==='2'){
+        //  网络预约出租汽车经营许可证
+        setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}),getRules("onlineTaxiLicense", {})]})  //证件号
+
+      }else if(val==='3'){
+          //  网络预约出租汽车运输证 
+           setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}),getRules("onlineTaxiTransportLicense", {})]})  //证件号
+    
+      }
+      
+      
+  },
+    // 证件有效起期
+  tStartDateDisable:(date:any)=>{
+    const fs = tgtEditRef?.value?.getFromValue();
+    if (JSON.stringify(fs) !== '{}') {
+    // if (JSON.stringify(fs) !== '{}') {
+ 
+      const endDate = new Date(fs["Tgt.tEndDate"] || '')   // 结束时间 
+      let minDate = dayjs(endDate).valueOf();
+      return   date.getTime() > minDate
+    }else{
+        return true;
+    }
+  },
+  // 证件有效止期
+  tEndDateDisable:(date:any)=>{
+    const fs = tgtEditRef?.value?.getFromValue();
+    if (JSON.stringify(fs) !== '{}') {
+      const startDate = new Date(fs["Tgt.tStartDate"] || '')   // 开始时间   
+
+      let maxDate = dayjs(startDate).valueOf();
+        return   date.getTime() < maxDate
+    }else{
+        return true;
+    }
   }
+
+
 };
 
 function singChange(obj) {

@@ -4,7 +4,6 @@
 </template>
 
 <script setup lang="ts">
-import { useValidator } from "@/typings/useValidator";
 import {
   AppFreeEditMethod,
   createAppFreeEditConfig,
@@ -19,6 +18,7 @@ import { policyRatio } from "@/api/query";
 import { useRoute } from "vue-router";
 const route = useRoute();
 import { ratio } from "@/api/prod"
+import dayjs from "dayjs";
 const opertaor = dataOpertaor();
 const dialogRef = ref<DialogMethod | null>(null);
 const props = defineProps({
@@ -27,7 +27,7 @@ const props = defineProps({
     required: true,
   },
 });
-const { getRules } = useValidator();
+
 const baseEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));
@@ -77,7 +77,7 @@ const method = {
       for (let i = 0; i < Number(getValue("Base.nPayNumber")); i++) {
         let BgnTmDate = new Date(opertaor.getTableRefs()["insrnc"].getValue("Base.tInsrncBgnTm"))   // 开始时间
         let startDate = new Date(BgnTmDate); 
-        let endDate = new Date(BgnTmDate);
+        let endDate = new Date(BgnTmDate)
         if (getValue("Base.cInstMrk")=='5') {
           startDate.setDate(BgnTmDate.getDate() + i * 15); 
           endDate.setDate(BgnTmDate.getDate() + (i + 1) * 15); 
@@ -85,8 +85,11 @@ const method = {
           startDate.setDate(BgnTmDate.getDate() + i * 30); 
           endDate.setDate(BgnTmDate.getDate() + (i + 1) * 30); 
         }
+
         let tInsrncBgnTm = formatDate(startDate, 'yyyy-MM-dd HH:mm:ss')
-        let tPayEndTm = formatDate(endDate,'yyyy-MM-dd HH:mm:ss')
+        // let tPayEndTm = formatDate(endDate,'yyyy-MM-dd HH:mm:ss')
+ 
+        let tPayEndTm = dayjs(endDate).add(-1,'second').format("YYYY-MM-DD HH:mm:ss")
            val= { "_dataId": "", "Pay.nTms":i+1 , "Pay.cPayorCde": opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppCde"), "Pay.tPayBgnTm": tInsrncBgnTm, "Pay.tPayEndTm": tPayEndTm, "Pay.nOwnPrm": result.value[i], "Pay.cPayorNme":opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppNme"), "Pay.nPayablePrm": result.value[i], "Pay.nPrmVar": result.value[i] }
           valArr.push(val)
       }
@@ -105,10 +108,10 @@ const method = {
   //争议处理选择事件
   cDisptSttlCdeChange(val){
     if(val=='A'){
-      setFormItem("Base.cDisptSttlOrg", { disabled: false ,rules: [getRules("required", {})]});
+      setFormItem("Base.cDisptSttlOrg", { disabled: false });
       setValue("Base.cDisptSttlOrg", "提交____仲裁委员会");
     }else{
-      setFormItem("Base.cDisptSttlOrg", { disabled: true,rules:null });
+      setFormItem("Base.cDisptSttlOrg", { disabled: true });
       setValue("Base.cDisptSttlOrg", "");   
     }
     
