@@ -75,7 +75,10 @@
               <tbody>
                 <template v-for="(item, k) in termFactormap" :key="k">
                   <tr v-if="item.cPorpShowtitle !== '1'">
-                    <td>
+                    <td
+                    :class="{
+                        'custom-indent':item.cPropIndent,
+                    }">
                       <el-text
                         v-if="isrequired(item)"
                         class="mx-1"
@@ -952,9 +955,28 @@ const methodMap = {
     }
   },
   LimitSameChange:(val: any)=>{
-    console.log(val);
+    if(val === '1'){
+      const trems = opertaor.getTableRefByKey('cvrg');
+      const data = trems.getFromValue();
+      const cocyData = {};
+      console.log(data);
+      data.forEach((item: any) => {
+        if(item['Term.cClauseCode'] === '00425000085'){
+          Object.keys(copyMaps).forEach((key: any) => { 
+            if(item[copyMaps[key]]){
+              cocyData[copyMaps[key]] = item[copyMaps[key]];
+            }
+          })
+        }
+      });
+      console.log(cocyData);
+    }
   }
 };
+
+const copyMaps = ['Term.nAccidentLimit','Term.nInsuranceAmount','Term.nLegalAccident','Term.nLegalTotal','Term.nRateVal',
+'Term.nResponsePer','Term.nResponseTotal','Term.nSeatLimit','Term.nSeatMedical','Term.nSeatPremium','Term.nSeatProperty',
+'Term.nSeatTotal','Term.cLimitMethod']
 
 function setCancel(){
   termdata.value['Term.cCancelMrk'] = '1';
