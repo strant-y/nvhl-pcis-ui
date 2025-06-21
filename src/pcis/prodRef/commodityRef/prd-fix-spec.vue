@@ -16,7 +16,7 @@
             width="55"
           />
           <el-table-column type="index" label="序号" width="55" />
-          <el-table-column label="cIfMust" width="100">
+          <el-table-column label="是否可选" width="100">
             <template #default="scope">
               <el-tag type="primary">{{
                 scope.row["cIfMust"] == "1" ? "必选" : "可选"
