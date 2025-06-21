@@ -1,3 +1,5 @@
+import { indexOf } from "lodash";
+
 type Callback = (error?: string | Error | undefined) => void;
 
 /**
@@ -190,7 +192,7 @@ export const useValidator = () => {
 
     return {
       validator: (rule, value, callback) => {
-        if (value === null || value === '') {
+        if (value === null || value === '' || value ===undefined) {
           callback();
           return;
         }
@@ -199,7 +201,6 @@ export const useValidator = () => {
         let ereg;
         let idcard_array = value.split('');
         console.log("idcard_array",idcard_array);
-        
         // 地区检验
         if (AREA[parseInt(value.substr(0, 2), 10)] == null) {
           callback(new Error(ERRORS[4]));
@@ -516,6 +517,61 @@ const leiCode = () => {
   };
 };
 
+// 道路运输经营许可证验证规则
+const roadTransportLicense = (options = {}) => {
+  const { 
+    message = "请输入正确的道路运输经营许可证号",
+    formatMessage = "许可证格式应为：省份简称+地市代码+交运政许可+地市代码+字+行政区划代码+编号+号",
+    lengthMessage = "许可证长度不符合规范"
+  } = options;
+  
+  return {
+    validator: (rule, value, callback) => {
+      if (!value) return callback(); // 空值校验由required规则处理
+      const formattedValue = value.trim();
+      const pattern = /^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼][A-Z]{1,2}交运政许可[A-Z]{1,2}字\d{12}号$/;
+      
+      if (!pattern.test(formattedValue)) {
+        return callback(new Error(formatMessage));
+      }
+      
+      // 长度验证（总长度通常为20-25位）
+      if (formattedValue.length < 20 || formattedValue.length > 25) {
+        return callback(new Error(lengthMessage));
+      }
+      // 行政区划代码验证（前6位应为有效行政区划代码）
+      // 实际应用中可根据需要扩展更详细的验证
+      callback(); // 验证通过
+    },
+    trigger: "blur"
+  };
+};
+
+ 
+/**
+ * 网络预约出租汽车经营许可证验证规则
+ */
+const onlineTaxiLicense = () => {
+  return {
+    pattern: /^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼]{1,2}交运管网约出租许\d{4}\d{6,10}号$/,
+    message: "许可证格式应为：地区代码+交运管+网约出租+许+年份+编号+号，如京交运管网约出租许2023000001号",
+    // message: "网约车经营许可证格式有误！",
+    trigger: "blur"
+  };
+};
+
+/**
+ * 网络预约出租汽车运输证正则校验规则
+ * @returns {Object} - 校验规则配置
+ */
+const onlineTaxiTransportLicense = () => {
+  return {
+    pattern: /^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼]{1}[A-HJ-NP-Z]{1}[A-HJ-NP-Z0-9]{5}运管备[0-9]{4}[A-Z0-9]{6,10}$/,
+    message: "运输证格式应为：车牌前缀+运管备+年份+编号，如京A12345运管备2023000001",
+    trigger: "blur"
+  };
+};
+
   const getRules = (type: any, param: any) => {
     if (type === "required") {
       return required(param.trigger, param.message);
@@ -579,6 +635,15 @@ const leiCode = () => {
     }
     if(type == 'leiCode') {
       return leiCode()
+    }
+    if(type == 'roadTransportLicense') {
+      return roadTransportLicense()
+    }
+    if(type == 'onlineTaxiLicense') {
+      return onlineTaxiLicense()
+    }
+    if(type == 'onlineTaxiTransportLicense') {
+      return onlineTaxiTransportLicense()
     }
   };
   const validorMap = {
