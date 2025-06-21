@@ -183,7 +183,7 @@ function savegroupinfo() {
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     editFlag: true,
-    editList: ["cPorpRequired","cPorpShowtitle","cPorpDisabled","cPropHeight"],
+    editList: ["cPorpRequired","cPorpShowtitle","cPorpDisabled","cPropHeight","cPropIndent"],
     fromSchema: [
       {
         prop: "icon",
@@ -274,6 +274,15 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "宽度",
         isShow: false,
+      },
+      {
+        prop: "cPropIndent",
+        inputtype: "rtswitch",
+        title: "是否缩进",
+        keymap: {
+          y: "1",
+          n: "0",
+        },
       },
     ],
   })
