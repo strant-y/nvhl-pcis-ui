@@ -192,9 +192,6 @@ const method = {
           setFormItem("Base.cBrkrCde", obj); //代理(经纪)人
           setFormItem("Base.cBrkSlsCde", obj); //代理业务员
 
- 
-
-
           setFormItem("Base.cAgtAgrNo", { rules: null }); //代理合作协议
           if (!p.initFlag) {
             setValue("Base.cBrkrCde", "");

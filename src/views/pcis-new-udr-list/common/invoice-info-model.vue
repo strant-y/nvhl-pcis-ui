@@ -122,7 +122,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "CCustomerCode",
         inputtype: "rtinput",
         title: "客户代码",
-        clearable: true,
+        // clearable: true,
+         disabled: true,
         rules: [getRules("required", {})],
       },
       {

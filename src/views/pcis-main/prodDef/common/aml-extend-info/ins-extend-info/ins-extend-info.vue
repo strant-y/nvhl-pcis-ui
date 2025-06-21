@@ -286,58 +286,75 @@ const tableconfig = reactive<AppGridEditConfig>(
 						return;
 					}
 					const editIndex = selData["_dataId"];
-
 					tableRef?.value?.delRow(editIndex);
 				},
 			})
 		],
 		fromSchema: [
-			// {
-			// 	prop: "cSeqNo",
-			// 	inputtype: "rtinput",
-			// 	title: "序号",
-			// 	disabled: true,
-			// },
 			{
 				prop: "cCusLnme",
 				inputtype: "rtinput",
 				title: "姓",
+				rules: [getRules("required", {})]
 			},
 			{
 				prop: "cCusFnme",
 				inputtype: "rtinput",
 				title: "名",
+				rules: [getRules("required", {})]
 			},
 			{
 				prop: "cCerftCls",
 				inputtype: "rtselect",
 				typeCode: "NATURAL_CERTIFICATE_ALL",
 				title: "证件类型",
-				params: { },
-				// clearable: true,
+				rules: [getRules("required", {})], 
+				func:(val:any)=>{
+					console.log('----',val)
+					 if (val == "120001") {
+						     setFormItem("cCerftCde", {
+								rules: [getRules("required", {}), getRules("idCard", {
+								})],
+							});
+
+					 }else  if (val == "110007") {
+						// 统一社会信用代码
+						setFormItem("cCerftCde", {
+							rules: [getRules("required", {}),getRules("socialCode", {})],
+						});
+					 }else if(val =='120002'){
+						// 护照 
+						setFormItem("cCerftCde", {
+							rules: [getRules("required", {}),getRules("passPort", {})],
+						});
+					 }
+				}	
 			},
 			{
 				prop: "cCerftCde",
 				inputtype: "rtinput",
 				title: "证件号码",
-				
-				rules: [getRules("idCard", {})],
+				rules: [getRules("required", {})]
 			},
 			{
 				prop: "tCerftBgnTm",
 				inputtype: "rtdatepicker",
 				title: "证件有效起期",
+					rules: [getRules("required", {})]
 			},
 			{
 				prop: "tCerftEndTm",
 				inputtype: "rtdatepicker",
 				title: "证件有效止期",
+					rules: [getRules("required", {})]
 			
 			},
 			{
 				prop: "cCusAddr",
 				inputtype: "rtinput",
 				title: "地址",
+					rules: [getRules("required", {})]
+
 			}
 		],
 	})
@@ -477,6 +494,22 @@ function handleQuery(flag?: boolean) {
 		.finally(() => { });
 }
 
+function setFormItem(key: any, obj: any) {
+  if (obj && Object.keys(obj).length) {
+    tableconfig.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.btnItems && obj.btnItems) {
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
+          }
+        } else {
+          Object.assign(item, obj);
+        }
+      }
+    });
+  }
+}
 defineExpose({getFrom });
 </script>
 

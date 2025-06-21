@@ -698,7 +698,9 @@ const method = {
     if (val == "120001") {
       setValue('Insured.cCertfCde','')  //选身份证时清空
       setFormItem("Insured.cCertfCde", {
-        rules: [getRules("required", {}), getRules("idCard", {})],
+        rules: [getRules("required", {}), getRules("idCard", {
+          
+        })],
       });
       setFormItem("Insured.tCertfBgnDate", {
         rules: [getRules("required", {})],
@@ -755,9 +757,15 @@ const method = {
 
 
 
+    } else if(val === '120002'){
+      // 护照
+          setFormItem("Insured.cCertfCde", {
+        rules: [getRules("required", {}),getRules("passPort", {})],
+      });
+
     } else {
       setFormItem("Insured.cCertfCde", {
-        rules: [getRules("required", {}),getRules("passPort", {})],
+        rules: [],
       });
       setFormItem("Insured.tCertfBgnDate", { rules: null });
       setFormItem("Insured.tCertfEndDate", { rules: null });
@@ -898,6 +906,7 @@ const method = {
   tCertfBgnDateDisable:(date:any)=>{
     const fs = insuredEditRef?.value?.getFromValue();
     if (JSON.stringify(fs) !== '{}') {
+    // if (JSON.stringify(fs) !== '{}') {
  
       const endDate = new Date(fs["Insured.tCertfEndDate"] || '')   // 结束时间 
       let minDate = dayjs(endDate).valueOf();
