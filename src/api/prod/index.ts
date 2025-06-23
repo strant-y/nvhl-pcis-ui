@@ -194,6 +194,15 @@ export function getComponentViewByKey(queryParams: any): AxiosPromise<any> {
 }
 
 /**
+ * 根据组件tab进行全量跟新组件
+ * @param queryParams 
+ * @returns 
+ */
+export function releaseByComptype(queryParams: any): AxiosPromise<any> {
+  return post(`/prod/releaseByComptype`, queryParams);
+}
+
+/**
  * 根据组件Key获取组件相关信息
  * @param queryParams
  * @returns
