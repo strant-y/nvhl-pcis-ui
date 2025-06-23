@@ -50,7 +50,6 @@ onBeforeMount(async() => {
   config[0].pageInfo.forEach((comp: any) => {
     const it = ReviewCompList.find(f => f.tab === comp.pageCode);
     comp['sort'] = it.sort;
-    comp['readonly'] = it.readonly;
   });
   // 排序
   config[0].pageInfo = config[0].pageInfo.sort((a, b) => a.sort - b.sort)
@@ -65,7 +64,7 @@ onMounted(() => {
 
 function query() {
   cargoApi.checkInit({
-    ...formPage.param,
+    ...idxParam.param,
     ...{}
   }).then((res: any) => {
     if(res.code === 200) {

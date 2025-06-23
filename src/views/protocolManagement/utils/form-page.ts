@@ -6,7 +6,7 @@ import {AppTableMethod, MyTableMethod} from "@/shared/app-table-config";
 export class FormPage {
 
     private componentRefMap = new Map<string, AppFreeEditMethod | AppGridEditMethod | AppTableMethod | MyTableMethod | any>();
-    private buttonRefMap = new Map<string, FreeButtonBase>();
+    private buttonRefMap = new Map<string, FreeButtonBase | any>();
     private formConfig= new Array<any>();
     private initial: boolean = false;
 
