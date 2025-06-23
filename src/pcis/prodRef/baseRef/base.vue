@@ -102,9 +102,10 @@ const method = {
 },
   //付费约定下拉事件
   cInstMrkChange(val: any) {
+    console.log(val)
     setValue("Base.nPayNumber", '1');
     if(val=='5'){
-      setFormItem("Base.nPayNumber", { disabled: false });
+      setFormItem("Base.nPayNumber", { disabled: false ,  max:12});
     }else{
       setFormItem("Base.nPayNumber", { disabled: true });
     }

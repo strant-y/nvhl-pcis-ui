@@ -51,6 +51,8 @@ const fileInputRef = ref(null);
 const fileInputType = ref();
 import { readFile } from "@/api/file";
 const tCertfDate = ref<any[]>([]);
+const  cWorkDptList =['310','320','330','340','350','360']  // 单位性质带企业的ID
+
 onMounted(() => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
@@ -105,7 +107,7 @@ onMounted(() => {
     
     setFormItem("Applicant.cGreenIndustryCustomers",{disabled: true});
     setFormItem("Applicant.cGreenIndustryList",{disabled: true});
-    // setFormItem("Applicant.cGcidCode", {rules: [getRules("leiCode", {})]});
+    setFormItem("Applicant.cGcidCode", {rules: [getRules("leiCode", {})]});
 
   });
 });
@@ -294,7 +296,7 @@ const method = {
 
     if (val == "120001") { 
       
-      setValue('Applicant.cCertfCde','')  //选身份证时清空
+      // setValue('Applicant.cCertfCde','')  //选身份证时清空
       setFormItem("Applicant.cCertfCde", {
         rules: [getRules("required", {}), getRules("idCard", {})],
       });
@@ -373,6 +375,7 @@ const method = {
     const param = opertaor.getParam();
 
     if (val == "0") {
+      // Applicant.cWorkDpt
       productStore.setcClntMrk(val);
       // 办理人
       setFormItem("Applicant.cCntrNme", { rules: [getRules("required", {})] });
@@ -425,6 +428,11 @@ const method = {
       });
       //注册地址
       setFormItem("Applicant.cRegisteredcapDre", {
+        rules: [getRules("required", {})],
+      });
+ 
+      //实名认证方式
+      setFormItem("Applicant.cRealnameAuthType", {
         rules: [getRules("required", {})],
       });
  
@@ -520,6 +528,17 @@ const method = {
       setFormItem("Applicant.cTrdCde", {
         rules: [],
       });
+
+      console.log(cWorkDptList.includes(getValue('Applicant.cWorkDpt')))
+
+      if(!cWorkDptList.includes(getValue('Applicant.cWorkDpt'))){
+        //实名认证方式
+        setFormItem("Applicant.cRealnameAuthType", {
+          rules: [],
+        });
+      }
+      
+
 
       // 个人 移动电话必填  
       setFormItem("Applicant.cMobile", {
@@ -840,8 +859,21 @@ const method = {
     fileInputType.value = "2";
   },
   // 单位性质
-  cWorkDptChange:(val:any)=>{
-      console.log('单位性质',val)
+  cWorkDptChange:(val:any,lab:any)=>{
+      console.log('单位性质',val,lab)
+       let cClntMrk = getValue('Applicant.cClntMrk');  // 投保人性质 
+      
+      if(cWorkDptList.includes(val) || cClntMrk =='0'){
+          //实名认证方式
+          setFormItem("Applicant.cRealnameAuthType", {
+            rules: [getRules("required", {})],
+          });
+      }else{
+          setFormItem("Applicant.cRealnameAuthType", {
+            rules: [],
+          });
+      }
+
       if(val =='350'){
         setFormItem("Applicant.cGcidCode", {
               rules: [getRules("required", {}),getRules("leiCode", {})],
