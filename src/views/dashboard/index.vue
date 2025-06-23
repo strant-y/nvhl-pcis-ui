@@ -1,467 +1,398 @@
 <template>
   <div class="dashboard-container">
-    <el-row class="mb-2">
-      <el-col>
-        <home-header ref="homeHeaderRef" @search="shortcutSearch" @msgHandle="msgHandle" />
-      </el-col>
-    </el-row>
-    <div class="subbanner">
-      <div class="chart-main">
-        <Echarts />
+    <div class="home">
+      <div class="top-box">
+        <div class="top-title1">财险承保系统</div>
+        <div class="top-title2">智能高效助力承保，精准把控风险，让财险业务开展更顺畅无忧</div>
+        <div class="top-search">
+          <rtinput :item="searchItem" />
+          <rtButton :item="searchBtnItem" />
+        </div>
+        <div class="top-menu">
+          <div>热搜菜单:</div>
+          <div class="top-menu-list">
+            <span>角色管理</span>
+            <span>菜单管理</span>
+          </div>
+        </div>
+      </div>
+      <div class="center-box">
+        <div class="center-content1">
+          <div class="title-box">
+            <div class="title-line">
+              <span class="title">统计图</span>
+              <img class="icon" :src="labelIcon" alt="">
+            </div>
+          </div>
+          <div class="title-second">渠道出单量统计图</div>
+          <div class="content-details-box">
+            <div class="content-details">
+              <span class="round"></span>
+              <span class="details-title">今日总录单：</span>
+              <span class="details-content">10000单</span>
+            </div>
+            <div class="content-details">
+              <span class="round"></span>
+              <span class="details-title">本周总录单：</span>
+              <span class="details-content">100000单</span>
+            </div>
+            <div class="content-details">
+              <span class="round"></span>
+              <span class="details-title">本月总录单：</span>
+              <span class="details-content">10000单</span>
+            </div>
+            <div class="content-details">
+              <span class="round"></span>
+              <span class="details-title">总占比录单：</span>
+              <span class="details-content">7.70%</span>
+            </div>
+          </div>
+          <div class="content-charts-box">
+            <div class="tab-box">
+              <div class="checkbox">
+                <rtcheckbox :item="{}" />
+                查看录单KOL量
+              </div>
+              <div class="tab-btns">
+                <rtButton :item="issueBtnItem"/>
+                <rtButton :item="nPrmBtnItem"/>
+              </div>
+            </div>
+            <div class="echarts-box">
+              <div ref="ecahrtsRef" class="echarts-container" :style="{ width: chartWidth, height: chartHeight }"></div>
+            </div>
+          </div>
+        </div>
+        <div class="center-content2">
+          <div class="user-box">
+            <img :src="headIcon" alt="">
+            <div class="user-info">
+              <div class="user-name">大大依依</div>
+              <rtButton :item="{label:'出单测试',size: 'small'}" />
+            </div>
+          </div>
+          <div class="content-list-box">
+            <div class="list-title">
+              <div class="title-line">
+                <span class="title">消息通知</span>
+                <img class="icon" :src="labelIcon" alt="">
+              </div>
+              <rtButton :item="{label:'查看全部',type:'text'}" />
+            </div>
+            <div class="list-content">
+              <div class="list-content-item">
+                <div class="item-title">
+                  <span class="title">永安保险好物节</span>
+                  <span class="point"></span>
+                </div>
+                <div class="item-content">大撒打发斯蒂芬撒打发斯蒂芬大师傅山东省地方啊实打实</div>
+              </div>
+              <div class="list-content-item">
+                <div class="item-title">
+                  <span class="title">永安保险好物节</span>
+                  <span class="point"></span>
+                </div>
+                <div class="item-content">大撒打发斯蒂芬撒打发斯蒂芬大师傅山东省地方啊实打实</div>
+              </div>
+            </div>
+          </div>
+          <div class="content-list-box">
+            <div class="list-title">
+              <div class="title-line">
+                <span class="title">代办事项</span>
+                <img class="icon" :src="labelIcon" alt="">
+              </div>
+              <rtButton :item="{label:'查看全部',type:'text'}" />
+            </div>
+            <div class="list-content">
+              <div class="list-content-item">
+                <div class="item-title">
+                  <span class="title">永安保险好物节</span>
+                  <span class="point"></span>
+                </div>
+                <div class="item-content">大撒打发斯蒂芬撒打发斯蒂芬大师傅</div>
+              </div>
+              <div class="list-content-item">
+                <div class="item-title">
+                  <span class="title">永安保险好物节</span>
+                  <span class="point"></span>
+                </div>
+                <div class="item-content">大撒打发斯蒂芬撒打发斯蒂芬大师傅</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bottom-box">
+        <div class="title-box">
+          <div class="title-line">
+            <span class="title">出单任务</span>
+            <img class="icon" :src="labelIcon" alt="">
+          </div>
+          <rtButton :item="moreBtnItem" />
+        </div>
+        <div class="table-box">
+          <div class="tabs-box">
+            <el-tabs @tab-click="handleTabClick">
+              <el-tab-pane v-for="tab in tabs" :key="tab.name" :label="tab.name">
+              </el-tab-pane>
+            </el-tabs>
+          </div>
+          <div class="table">
+            <app-table :key="currentTabName" :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
+            @row-click="(row) => toQuery2(row, tab)" />
+          </div>
+        </div>
       </div>
     </div>
-
-    <el-row>
-      <el-col :md="24">
-        <el-card v-if="isOperate || isAudit" shadow="never" class="index-blk" style="position: relative;">
-
-          <el-tabs @tab-click="handleTabClick">
-            <el-tab-pane v-for="tab in tabs" :key="tab.name" :label="tab.name">
-            </el-tab-pane>
-          </el-tabs>
-
-          <app-table :key="currentTabName" :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
-            @row-click="(row) => toQuery2(row, tab)" />
-
-          <div style="display: block; position: absolute; top: 8px; right: 20px;">
-            <a @click="toQuery(moreurl)" class="sty">更多>></a>
-          </div>
-          
- 
-        </el-card>
-      </el-col>
-    </el-row>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useRouter } from "vue-router";
-import { useUserStore } from "@/store/modules/user";
-import moment from "moment";
-
-import Echarts from '@/views/charts/echarts/echartsComponent.vue';
+import * as echarts from 'echarts'
+import type { ECharts, EChartsOption } from 'echarts'
+import { EchartsService, ChartConfig } from '@/views/charts/service/echarts/echarts.service'
+import {useSettingsStore, useUserStore} from "@/store";
 import {
   AppTableConfig,
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-
-import { AppKey } from '@/constants/api';
+import { tableObj, tab1, tab2 } from "./mapObj"
+import moment from "moment";
 import { PcisQueryService } from '@/views/dashboard/service/v1.service';
+const pcisQueryService = new PcisQueryService();
+import { useRouter } from "vue-router";
+const router = useRouter();
+import { AppKey } from '@/constants/api';
+
 
 defineOptions({
   name: "Dashboard",
   inheritAttrs: false,
 });
-const userStore = useUserStore();
-const user = ref(userStore.user)
-const ops = user.value.ops;
-const roles = ref(userStore.user.roles)
-const topStatic = ref<Array<any>>([]);
-const router = useRouter();
-const homeHeaderRef = ref();
 
-const pcisQueryService = new PcisQueryService();
-const _current = ref(1);
-const _pageSize = ref(6);
-const moreurl = ref('');
-const tabs = ref<Array<any>>([]); //tabs数组
+const searchItem = {
+  prop: "cQueryStr",
+  inputtype: "rtinput",
+  title: "",
+  placeholder: "输入关键词进行查询，支持搜索任务号、保单号、被保人名称",
+  itemWidth: 2,
+  prefixIcon: "Search"
+}
+const searchBtnItem = {
+  label: "搜索",
+  type: "primary",
+  func: () => {
+      // handleQuery(true);
+  },
+}
+const issueBtnItem = ref({
+  label: "出单统计图",
+  type: 'primary',
+  func: () => {
+    ecahrtsBtnIndex.value = 0
+    handleRefreshEcharts()
+  },
+})
+const nPrmBtnItem = ref({
+  label: "保费统计图",
+  type: 'default',
+  func: () => {
+    ecahrtsBtnIndex.value = 1
+    handleRefreshEcharts()
+  },
+})
+const moreBtnItem = ref({
+  type:'text',
+  label:'查看更多',
+  func: () => {
+    toQuery(moreurl.value)
+  }
+})
+const labelIcon = "/src/assets/img/9.svg"
+const ecahrtsRef = ref(null)
+let ecahrtsRefInstance: ECharts | null = null
+const chartWidth = ref('100%')
+const chartHeight = ref('300px')
+const userStore = useUserStore();
+const user = userStore.user;
+const roles = user.roles;
 const currentTabName = ref('暂存任务') //tabs默认值
-// const isOperate = ref(false)  //管理员
-//todo  假数据先写死
 const isOperate = ref(false) //管理员 出单岗
 const isAudit = ref(false) //  核保岗
+const moreurl = ref('');
 const shortListData = ref(null)  // 第二模块tabl列表数据
+const headIcon = `/src/assets/images/${userStore.user.cCssStyle === '2' ? '0' : '1'}_.png`
 
-let pageresult = reactive<Pageresult>({
+const pageresult = reactive<Pageresult>({
   result: "",
   /** 数据列表 */
   list: [],
   /** 总数 */
   total: 0,
 });
-
-const tableObj = {
-  // 出单--暂存任务
-  notWaitObj: {
-    fromSchema: [
-      {
-        // prop: "cAppNo",
-        // inputtype: "rtinput",
-        prop: "cAppNo",
-        inputtype: "rtinput",
-        title: "申请单号",
-      },
-      {
-        prop: "cAppTyp",
-        inputtype: "rtselect",
-        title: "类型",
-        loadData: [
-          { value: "A", label: "投保单" },
-          { value: "E", label: "批单" },
-        ],
-      },
-      {
-        prop: "cAppNme",
-        inputtype: "rtinput",
-        title: "投保人",
-      },
-      {
-        prop: "tAppTm",
-        inputtype: "rtinput",
-        title: "投保日期",
-      },
-      {
-        prop: "nPrm",
-        inputtype: "rtinput",
-        title: "保费",
-      },
-      {
-        prop: "cOperCnm",
-        inputtype: "rtinput",
-        title: "操作员",
-      },
-      {
-        prop: "cAppStatus",
-        title: "状态",
-        inputtype: "rtselect",
-        typeCode: "RECEIVE_BANK_CATEGORY",
-        codeParam: { cParCde: "shenqingdanzhuangtai" },
-      },
-    ],
-  },
-  // 出单--待修改任务
-  notReviseObj: {
-    fromSchema: [
-      {
-        // prop: "cAppNo",
-        // inputtype: "rtinput",
-        prop: "objId",
-        inputtype: "rtinput",
-        title: "申请单号",
-      },
-      {
-        prop: "bsType",
-        inputtype: "rtselect",
-        title: "类型",
-        loadData: [
-          { value: "A", label: "投保单" },
-          { value: "E", label: "批单" },
-        ],
-      },
-      {
-        prop: "appCde",
-        inputtype: "rtinput",
-        title: "投保人",
-      },
-      {
-        prop: "crtTm",
-        inputtype: "rtinput",
-        title: "投保日期",
-      },
-      {
-        prop: "nPrm",
-        inputtype: "rtinput",
-        title: "保费",
-      },
-      {
-        prop: "operName",
-        inputtype: "rtinput",
-        title: "操作员",
-      },
-      {
-        prop: "cAppStatus",
-        title: "状态",
-        inputtype: "rtselect",
-        typeCode: "RECEIVE_BANK_CATEGORY",
-        codeParam: { cParCde: "shenqingdanzhuangtai" },
-      },
-    ],
-  },
-
-  //出单-待续保
-  waitObj: {
-    fromSchema: [
-      {
-        prop: "cPlyNo",
-        inputtype: "rtinput",
-        title: "保单号",
-      },
-      {
-        prop: "nPrm",
-        inputtype: "rtinput",
-        title: "保费",
-      },
-      {
-        prop: "cAppNme",
-        inputtype: "rtinput",
-        title: "投保人",
-      },
-      {
-        prop: "cMobile",
-        inputtype: "rtinput",
-        title: "投保人联系电话",
-      },
-      {
-        prop: "tInsrncBgnTm",
-        inputtype: "rtinput",
-        title: "保险起期",
-      },
-      {
-        prop: "tInsrncEndTm",
-        inputtype: "rtinput",
-        title: "保险止期",
-      },
-      {
-        prop: "nExpirationDays",
-        inputtype: "rtinput",
-        title: "终保倒计时(天)",
-      },
-    ],
-  },
-  //核保员-暂存任务
-  saveObj: {
-    fromSchema: [
-      {
-        prop: "uwDptName",
-        inputtype: "rtinput",
-        title: "出单机构",
-      },
-      {
-        prop: "appCde",
-        inputtype: "rtinput",
-        title: "投保人",
-      },
-      {
-        prop: "prodName",
-        inputtype: "rtinput",
-        title: "险种",
-      },
-      {
-        prop: "objId",
-        inputtype: "rtinput",
-        title: "申请单号",
-      }
-    ],
-  },
-  //核保员-修改单
-  editObj: {
-    fromSchema: [
-      {
-        prop: "uwDptName",
-        inputtype: "rtinput",
-        title: "出单机构",
-      },
-      {
-        prop: "appCde",
-        inputtype: "rtinput",
-        title: "申请单号",
-      },
-      {
-        prop: "prodName",
-        inputtype: "rtinput",
-        title: "险种",
-      },
-      {
-        prop: "cAppStatus",
-        inputtype: "rtinput",
-        title: "状态",
-      }
-    ],
-  }
-}
-// 出岗 tab
-let tab1 = [{
-  name: '暂存任务',
-  refName: 'stagingList',
-  tableObj: 'notWaitObj',
-  url: '/query/application-querys',
-},
-{
-  name: '待修改任务',
-  refName: 'reviseList',
-  tableObj: "notReviseObj",
-  url: '/query/application-querys',
-},
-{
-  name: '待续保',
-  refName: 'renewalList',
-  tableObj: 'waitObj',
-  url: '/RenewalManagement/renewal-management',
-}
-]
-
-// 核保tab
-let tab2 = [{
-  name: '暂存任务',
-  refName: 'udrStagingList',
-  tableObj: 'saveObj',
-  url: '/pcis-new-udr-list/PendUdrList',
-},
-{
-  name: '待修改任务',
-  refName: 'udrReturnList',
-  tableObj: "editObj",
-  url: '/pcis-new-udr-list/PendUdrList',
-}
-]
-
-
 let tableconfig = reactive<AppTableConfig>(
   createTableEditConfig(tableObj.notWaitObj)
 );
 
-// 待办跳转
-const itemHandle = (item) => {
-  const param = JSON.stringify({ queryType: item.state });
-  router.push({ path: item.pageRoute, query: { param: param } });
+const echartsService = new EchartsService()
+const { getAnalysis } = echartsService
+const ecahrtsBtnIndex = ref(0)
+const echartsOptions = reactive({
+  barWidth: "10px",
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'cross',
+      label: {
+        backgroundColor: '#6a7985'
+      }
+    }
+  },
+  color: [
+    '#f57c11'
+  ],
+  grid: {
+    left: '5%',
+    right: '5%',
+    bottom: '25%',
+    top: '5%',
+    // height: 150,
+    containLabel: true
+  },
+  legend: {
+    data: ['每月出单量', '每月出单量同比'],
+    bottom: 0,
+    show: true,
+  },
+  xAxis: [{
+    type: 'category',
+    name: "月份",
+    axisLabel: {
+      show: true,
+      // color: 'red'
+    },
+    axisLine: { // x轴的颜色和宽度
+      lineStyle: {
+        // color: 'red',
+        width: 1
+      }
+    },
+    boundaryGap: false,
+    data: []
+  }],
+  yAxis: [
+    {
+      type: 'value',
+      name: "总量",
+      min: 0,
+      // max: 1000,
+      axisLabel: { // y轴的字体样式
+        show: true,
+        // color: 'red'
+      },
+      axisLine: { // y轴的颜色和宽度
+        lineStyle: {
+          
+          width: 0
+        }
+      }
+    },
+    {
+      type: 'value',
+      name: "占比",
+      min: 0,
+      // max: 50,
+      axisLabel: { // y轴的字体样式
+        show: true,
+        // color: 'red'
+      },
+      axisLine: { // y轴的颜色和宽度
+        lineStyle: {
+          // color: 'yellow',
+          width: 0
+        }
+      }
+    }
+  ],
+  series: [
+    {
+      type: 'bar',
+      name: '每月出单量',
+      data: [],
+      itemStyle: {
+        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+              offset: 0,
+              color: 'red'// 起始颜色
+          }, {
+              offset: 1,
+              color: 'white' // 结束颜色
+          }]),
+      barBorderRadius: [5, 5, 5, 5]
+      }
+    },
+    {
+      type: 'line',
+      name: '每月出单量同比',
+      yAxisIndex: 1,
+      data: [],
+      itemStyle: {
+        color: 'yellow'
+      }
+    },
+  ]
+})
+const tabs = ref<Array<any>>([]); //tabs数组
+
+function init() {
+  if(!ecahrtsRefInstance) {
+    ecahrtsRefInstance = echarts.init(ecahrtsRef.value)
+  }
+  handleRefreshEcharts()
 }
 
-const shortcutSearch = (searchParams) => {
-  router.push({
-    path: `/query/comprehensive`,
-    query: {
-      param: JSON.stringify({
-        queryParam: searchParams
-      })
-    }
-  });
-};
-//点击更多按钮事件
-const toQuery = (url: string) => {
-  if (isOperate.value) { //出单员
-    //暂存任务 （综合查询-投保单）、待修改任务 （综合查询-待修改单查询）
-    if (url === '/query/application-querys') {
-      let param = {
-        CurrentUser: user.value.opCde,
-        CurrentUserOrg: user.value.companyId,
-        CAppStatus: '1',
-        TIssueTmStart: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-        TIssueTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-      };
-      if (currentTabName.value == '待修改任务') {
-        param = Object.assign({
-          CurrentUser: user.value.opCde,
-          CurrentUserOrg: user.value.companyId,
-          startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-          endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-        });
-        sessionStorage.setItem(AppKey.query.pcis_query_returnudrlist, JSON.stringify(param));
-      } else {
-        sessionStorage.setItem(AppKey.query.pcis_query_app, JSON.stringify(param));
-      }
-      router.push({ path: url });
-    } else if (url === '/RenewalManagement/renewal-management') { //待续保 （续保管理）
-      const param = Object.assign({
-        CurrentUser: user.value.opCde,
-        CurrentUserOrg: user.value.companyId,
-        startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-        endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-      });
-      sessionStorage.setItem('renewPolicy', JSON.stringify(param));
-      router.push({ path: url });
-    }
-  } else if (isAudit.value) {
-    if (url === '/pcis-new-udr-list/PendUdrList') { //核保员 （核保任务查询）
-      let param = Object.assign({
-        CurrentUser: user.value.opCde,
-        CurrentUserOrg: user.value.companyId,
-        startCrtTm: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-        TAppTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-        startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-        endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-      });
-      if (currentTabName.value == '暂存任务') {
-        param.type = 'temp'
-      } else {
-        param.type = 'edit'
-      }
-      sessionStorage.setItem(AppKey.query.pcis_query_newudrlist, JSON.stringify(param));
-      router.push({ path: url });
-    }
+function handleRefreshEcharts() {
+  if(ecahrtsBtnIndex.value === 0) {
+    issueBtnItem.value.type = "primary"
+    nPrmBtnItem.value.type = "default"
+  } else {
+    issueBtnItem.value.type = "default"
+    nPrmBtnItem.value.type = "primary"
   }
-};
-//table的row-click事件
-const toQuery2 = (data: any, tab: any) => {
-  aaa = true
-  console.log('toQuery2', data, tab)
-  if (isOperate.value) { //出单员
-    if (tab.name === '暂存任务') {
-      const param = Object.assign({
-        CurrentUser: user.value.opCde,
-        CurrentUserOrg: user.value.companyId,
-        CAppNo: data['cAppNo'],
-        TIssueTmStart: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-        TIssueTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-      });
-      sessionStorage.setItem(AppKey.query.pcis_query_app, JSON.stringify(param));
-      router.push({ path: '/query/application-querys' });
-    } else if (tab.name === '待修改任务') {
-      const param = Object.assign({
-        CurrentUser: user.value.opCde,
-        CurrentUserOrg: user.value.companyId,
-        objId: data['cAppNo'],
-        startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-        endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-      });
-      sessionStorage.setItem(AppKey.query.pcis_query_returnudrlist, JSON.stringify(param));
-      router.push({ path: '/query/application-querys' });
-    } else if (tab.name === '待续保') {
-      const param = Object.assign({
-        CurrentUser: user.value.opCde,
-        CurrentUserOrg: user.value.companyId,
-        objId: data['cAppNo'],
-        startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-        endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-      });
-      sessionStorage.setItem('renewPolicy', JSON.stringify(param));
-      router.push({ path: '/RenewalManagement/renewal-management' });
-    }
-  } else if (isAudit.value) { //核保员
-    if (tab.name === '暂存任务') {
-      const param = Object.assign({
-        type: 'temp',
-        CurrentUser: user.value.opCde,
-        CurrentUserOrg: user.value.companyId,
-        objId: data['cAppNo'],
-        startCrtTm: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-        TAppTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-        startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-        endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-      });
-      sessionStorage.setItem(AppKey.query.pcis_query_newudrlist, param);
-      router.push({ path: '/pcis-new-udr-list/PendUdrList' });
-    } else if (tab.name === '修改单') {
-      const param = Object.assign({
-        type: 'edit',
-        CurrentUser: user.value.opCde,
-        CurrentUserOrg: user.value.companyId,
-        objId: data['cAppNo'],
-        startCrtTm: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-        TAppTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-        startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-        endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-      });
-      sessionStorage.setItem(AppKey.query.pcis_query_newudrlist, param);
-      router.push({ path: '/pcis-new-udr-list/PendUdrList' });
-    }
+  const param = {
+    type: ecahrtsBtnIndex.value === 0 ? 'ply' : 'fee'
   }
-};
+  getAnalysis(param).then((res:any) => {
+    if(res.code === 200) {
+      echartsOptions.xAxis[0].data = res.dataMapList.map((item:any) => item.item)
+      echartsOptions.series[0].data = res.dataMapList.map((item:any) => item.value)
+      echartsOptions.series[1].data = res.dataMapList.map((item:any) => item.rate)
+      ecahrtsRefInstance?.setOption(echartsOptions)
+    } else {
+      ElMessage.error(res.msg)
+    }
+  }).catch(err => {
+    ElMessage.error(err)
+  })
+}
+
+onMounted(() => {
+  init()
+  initRoles()
+});
+
 const initRoles = () => {
   tabs.value = [];
-  getData(user.value, roles.value)
+  getData(user, roles)
 };
-
-
 const getData = (user: any, roles: any = []) => {
   let roleCde = '';
-  console.log(332, Array.isArray(roles), roles)
   if (roles)
     roles.forEach((res: any) => {
       // if (res === 'ROLE_00000196' || res === 'ROLE_00000324' || res === 'ROLE_00000001') {
       // 出岗  ROLE_00000008
       console.log(res,'权限编码')
-
       if (res === 'ROLE_00000008') {
         isOperate.value = true;
         tabs.value = tab1;
@@ -472,16 +403,12 @@ const getData = (user: any, roles: any = []) => {
         tableconfig = reactive<AppTableConfig>(
           createTableEditConfig(tableObj.saveObj)
         );
-
-         moreurl.value = "/pcis-new-udr-list/PendUdrList"
+        moreurl.value = "/pcis-new-udr-list/PendUdrList"
         isAudit.value = true;
         tabs.value = tab2;
       }
       roleCde = roleCde === '' ? res : `${roleCde},${res}`;
-
     });
-
-  console.log(338, tabs.value)
   const paramzc = {
     pageNum: 1,
     pageSize: 6,
@@ -528,21 +455,17 @@ const getData = (user: any, roles: any = []) => {
     if (res && res.code === 200) {
       shortListData.value = res.data
       console.log('岗位--', isOperate.value , isAudit.value)
-
       // 管理员  出单岗
       if (isOperate.value) {
-        console.log(res.data)
         pageresult.list = res.data.stagingList;
         pageresult.total = res.data.stagingList.length;
-        console.log('666', tabs.value, isOperate.value, isAudit.value)
       }
       //审核员  核保岗
       if (isAudit.value) {
-       
         tabs.value = tab2;
         pageresult.list = res.data.udrStagingList;
         pageresult.total = res.data.udrStagingList.length;
-         }
+      }
     }
   });
 };
@@ -553,32 +476,22 @@ const toChange = (url: string) => {
 
 //tabs切换
 const handleTabClick = (tab: any) => {
-  console.log(41,pageresult)
-  console.log(667, tab.props.label)
- 
-
-
   currentTabName.value = tab.props.label
   let url = ''
   const clickedTabData = tabs.value.find(t => t.name === tab.props.label);
-  console.log(clickedTabData)
   if (isOperate.value) {
     tableconfig = reactive<AppTableConfig>(
       createTableEditConfig(tableObj[clickedTabData.tableObj])
     )
-
     nextTick(() => {
       pageresult.list = shortListData.value[clickedTabData.refName] || []
       pageresult.total = shortListData.value[clickedTabData.refName].length  || 0
-      });
- 
+    });
   }
   if (isAudit.value) {
-
     tableconfig = reactive<AppTableConfig>(
       createTableEditConfig(tableObj[clickedTabData.tableObj])
     )
-
     nextTick(() => {
       pageresult.list = shortListData.value[clickedTabData.refName] || []
       pageresult.total = shortListData.value[clickedTabData.refName].length  || 0
@@ -602,248 +515,351 @@ const handleTabClick = (tab: any) => {
   toChange(url);
 };
 
-onMounted(() => {
-
-  initRoles();
-  router.afterEach((to, from) => {
-    if (to.path !== from.path) {
-      initRoles();
+//点击更多按钮事件
+const toQuery = (url: string) => {
+  if (isOperate.value) { //出单员
+    //暂存任务 （综合查询-投保单）、待修改任务 （综合查询-待修改单查询）
+    if (url === '/query/application-querys') {
+      let param = {
+        CurrentUser: user.opCde,
+        CurrentUserOrg: user.companyId,
+        CAppStatus: '1',
+        TIssueTmStart: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
+        TIssueTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+      };
+      if (currentTabName.value == '待修改任务') {
+        param = Object.assign({
+          CurrentUser: user.opCde,
+          CurrentUserOrg: user.companyId,
+          startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
+          endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+        });
+        sessionStorage.setItem(AppKey.query.pcis_query_returnudrlist, JSON.stringify(param));
+      } else {
+        sessionStorage.setItem(AppKey.query.pcis_query_app, JSON.stringify(param));
+      }
+      router.push({ path: url });
+    } else if (url === '/RenewalManagement/renewal-management') { //待续保 （续保管理）
+      const param = Object.assign({
+        CurrentUser: user.opCde,
+        CurrentUserOrg: user.companyId,
+        startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
+        endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+      });
+      sessionStorage.setItem('renewPolicy', JSON.stringify(param));
+      router.push({ path: url });
     }
-  });
-});
+  } else if (isAudit.value) {
+    if (url === '/pcis-new-udr-list/PendUdrList') { //核保员 （核保任务查询）
+      let param = Object.assign({
+        CurrentUser: user.opCde,
+        CurrentUserOrg: user.companyId,
+        startCrtTm: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
+        TAppTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+        startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
+        endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+      });
+      if (currentTabName.value == '暂存任务') {
+        param.type = 'temp'
+      } else {
+        param.type = 'edit'
+      }
+      sessionStorage.setItem(AppKey.query.pcis_query_newudrlist, JSON.stringify(param));
+      router.push({ path: url });
+    }
+  }
+};
+//table的row-click事件
+const toQuery2 = (data: any) => {
+  console.log('toQuery2', data)
+  if (isOperate.value) { //出单员
+    if (currentTabName.value === '暂存任务') {
+      const param = Object.assign({
+        CurrentUser: user.opCde,
+        CurrentUserOrg: user.companyId,
+        CAppNo: data['cAppNo'],
+        TIssueTmStart: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
+        TIssueTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+      });
+      sessionStorage.setItem(AppKey.query.pcis_query_app, JSON.stringify(param));
+      router.push({ path: '/query/application-querys' });
+    } else if (currentTabName.value === '待修改任务') {
+      const param = Object.assign({
+        CurrentUser: user.opCde,
+        CurrentUserOrg: user.companyId,
+        objId: data['cAppNo'],
+        startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
+        endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+      });
+      sessionStorage.setItem(AppKey.query.pcis_query_returnudrlist, JSON.stringify(param));
+      router.push({ path: '/query/application-querys' });
+    } else if (currentTabName.value === '待续保') {
+      const param = Object.assign({
+        CurrentUser: user.opCde,
+        CurrentUserOrg: user.companyId,
+        objId: data['cAppNo'],
+        startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
+        endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+      });
+      sessionStorage.setItem('renewPolicy', JSON.stringify(param));
+      router.push({ path: '/RenewalManagement/renewal-management' });
+    }
+  } else if (isAudit.value) { //核保员
+    if (currentTabName.value === '暂存任务') {
+      const param = Object.assign({
+        type: 'temp',
+        CurrentUser: user.opCde,
+        CurrentUserOrg: user.companyId,
+        objId: data['cAppNo'],
+        startCrtTm: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
+        TAppTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+        startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
+        endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+      });
+      sessionStorage.setItem(AppKey.query.pcis_query_newudrlist, param);
+      router.push({ path: '/pcis-new-udr-list/PendUdrList' });
+    } else if (currentTabName.value === '修改单') {
+      const param = Object.assign({
+        type: 'edit',
+        CurrentUser: user.opCde,
+        CurrentUserOrg: user.companyId,
+        objId: data['cAppNo'],
+        startCrtTm: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
+        TAppTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+        startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
+        endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+      });
+      sessionStorage.setItem(AppKey.query.pcis_query_newudrlist, param);
+      router.push({ path: '/pcis-new-udr-list/PendUdrList' });
+    }
+  }
+};
+
+// 窗口大小变化时重置图表
+window.addEventListener('resize', () => {
+  if(ecahrtsRefInstance) {
+    ecahrtsRefInstance.resize()
+  }
+})
 </script>
 
 <style lang="scss" scoped>
 .dashboard-container {
-  position: relative;
-  padding: 8px;
+  position: absolute;
+  width: 100%;
+  height: 100%;
 
-  .user-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-  }
-
-  .github-corner {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 1;
-    border: 0;
-  }
-
-  .user-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .msg-container {
+  .home {
+    width: 100%;
     height: 100%;
+    background-color: #fff;
+    background-image: url('@/assets/img/home_bg.png');
+    background-size: 100% 24.06667rem;
+    background-position: top;
+    background-repeat: no-repeat;
+    padding: 1.5rem 7rem;
+    overflow-y: auto;
 
-    .msg-title {
+    .top-box {
+      width: 100%;
+      margin-bottom: 1.5rem;
+
+      .top-title1 {
+        width: 100%;
+        font-size: 2rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: .6rem;
+      }
+
+      .top-title2 {
+        font-size: .8rem;
+        color: #333;
+        margin-bottom: 2rem;
+      }
+
+      .top-search {
+        width: 100%;
+        height: 3.2rem;
+        display: flex;
+        align-items: center;
+        background: #FFFFFF;
+
+        :deep(.el-input__wrapper) {
+          box-shadow: none;
+        }
+
+        .el-button {
+          margin-right: 10px;
+        }
+      }
+
+      .top-menu {
+        display: flex;
+        padding: 20px 0;
+
+        .top-menu-list {
+          span {
+            margin-left: 20px;
+          }
+        }
+      }
+    }
+
+    .center-box {
+      width: 100%;
       display: flex;
-      align-items: center;
-      cursor: pointer;
+      margin-bottom: 1.5rem;
+      justify-content: space-between;
 
-      span {
-        font-size: 14px;
-        color: #fff;
-        margin-left: -10px;
+      .center-content1 {
+        width: 75%;
+        background: #fff;
+        box-shadow: 0 0 .4rem #0000001a;
+        border-radius: 5px;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+
+        .title-box {
+          .title {
+            font-size: 1.2rem;
+            color: #333333;
+            font-weight: 600;
+            margin-right: 8px;
+          }
+          .icon {
+            width: 1.2rem;
+          }
+        }
+
+        .title-second {
+          margin: 10px 0;
+          color: #666;
+        }
+
+        .content-details-box {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          color: #666;
+
+          .content-details {
+            display: flex;
+            align-items: center;
+            margin: 10px 10px 10px 0;
+
+            .round {
+              width: 6px;
+              height: 6px;
+              border-radius: 50%;
+              background-color: #d9d9d9;
+              margin-right: 10px;
+            }
+          }
+        }
+        .content-charts-box {
+          .tab-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            color: #666;
+          }
+        }
       }
 
-      .el-badge {
-        margin-left: 10px;
+      .center-content2 {
+        width: 24%;
+        background: #fff;
+        box-shadow: 0 0 .4rem #0000001a;
+        border-radius: 5px;
+        padding: 2rem 1rem;
+        display: flex;
+        flex-direction: column;
+        .user-box {
+          display: flex;
+          align-items: center;
+          img {
+            width: 80px;
+          }
+          .user-info {
+            .user-name {
+              font-size: 18px;
+              font-weight: bold;
+            }
+            .el-button {
+              color: var(--el-color-primary);
+              border-color: var(--el-color-primary);
+            }
+          }
+        }
+        .content-list-box {
+          .list-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            .title {
+              color: #333;
+              font-weight: bold;
+              margin-right: 5px;
+              font-size: 18px;
+            }
+          }
+          .list-content {
+            .list-content-item {
+              padding: 10px;
+              .item-title {
+                display: flex;
+                align-items: center;
+                color: #333;
+                .point {
+                  width: 6px;
+                  height: 6px;
+                  background: var(--el-color-primary);
+                  border-radius: 50%;
+                  margin-left: 5px;
+                }
+              }
+              .item-content {
+                font-size: 14px;
+                color: #999;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                margin-top: 5px;
+              }
+            }
+          }
+        }
       }
     }
-
-  }
-
-  .user-name {
-    font-size: 14px;
-    margin-top: 5px;
-    color: var(--el-text-color);
-  }
-
-  .data-box {
-    display: flex;
-    justify-content: space-between;
-    padding: 20px;
-    font-weight: bold;
-    color: var(--el-text-color-regular);
-    background: var(--el-bg-color-overlay);
-    border-color: var(--el-border-color);
-    box-shadow: var(--el-box-shadow-dark);
-  }
-
-  .svg-icon {
-    fill: currentcolor !important;
-  }
-
-  .shortcut {
-    width: 100%;
-    height: 157px;
-
-    padding: 5px;
-    border-radius: var(--el-card-border-radius);
-    border: 1px solid var(--el-card-border-color);
-    background-color: var(--el-card-bg-color);
-    overflow: hidden;
-    color: var(--el-text-color-primary);
-    transition: var(--el-transition-duration);
-
-    --el-card-border-color: var(--el-border-color-light);
-    --el-card-border-radius: 4px;
-    --el-card-padding: 20px;
-    --el-card-bg-color: var(--el-fill-color-blank);
-
-    box-shadow: var(--el-box-shadow-light);
-  }
-
-  .shortcut_top {
-    padding-top: 5px;
-    height: 50px;
-    border-bottom: 1px solid var(--el-card-border-color);
-    background-color: var(--el-card-bg-color);
-  }
-
-  .shortcut_search {
-    padding: 10px 2px 2px 2px;
-  }
-
-  .shortcut_search_input {
-    padding-left: 10px;
-    padding-right: 10px;
-    width: 100%;
-    text-align: end;
-  }
-
-  .tag_ {
-    cursor: pointer;
-  }
-
-  .edit_tag {
-    padding-left: 15px;
-    border-left: 1px solid var(--el-card-border-color);
-    background-color: var(--el-card-bg-color);
-  }
-
-  .dialog_ {
-    text-align: center;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .dialog_text {
-    text-align: center;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .dialog_button {
-    width: 100%;
-    height: 45px;
-    margin-top: 20px;
-    border-top: 1px solid var(--el-card-border-color);
-    padding-right: 21px;
-    text-align: end;
-  }
-
-  .drawer-page {
-    background-color: rgba(0, 0, 0, 0.5);
-  }
-
-  .fast-menu {
-    bottom: 7px;
-    position: absolute;
-    width: 100%;
-  }
-
-  :deep(.user-card) {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    background: linear-gradient(to right, var(--el-color-primary), var(--menu-background));
-
-    .el-card__body {
-      padding-left: 0;
-      padding-right: 0;
-
-      .span_text__ {
-        width: 93px;
-        color: var(--el-text-color);
-      }
-    }
-  }
-
-  :deep(.card-container) {
-    box-shadow: none;
-
-    .el-card__header {
-      padding: 0;
-    }
-
-    .header-card {
-      height: 45px;
-      align-items: center;
-      padding-left: 10px;
-      padding-right: 10px;
+    .bottom-box {
+      width: 100%;
+      background: #fff;
+      box-shadow: 0 0 .4rem #0000001a;
+      border-radius: 5px;
+      padding: 2rem;
       display: flex;
-    }
-
-    .bg-color-ready {
-      background-color: #C2EAA2 !important;
-
-      &:hover {
-        font-weight: bold;
+      flex-direction: column;
+      .title-box {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .title {
+          font-size: 1.2rem;
+          color: #333333;
+          font-weight: 600;
+          margin-right: 8px;
+        }
+        .icon {
+          width: 1.2rem;
+        }
       }
-    }
-
-    .bg-color-doing {
-      background-color: #F49E60 !important;
-
-      &:hover {
-        font-weight: bold;
+      .table-box {
+        .table {
+          width: 100%;
+        }
       }
-    }
-
-    .bg-color-complete {
-      background-color: #FAE093 !important;
-
-      &:hover {
-        font-weight: bold;
-      }
-    }
-  }
-
-  .content-container {
-    margin-top: -8px;
-    height: 150px;
-    overflow: auto;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-
-    :deep(.el-card__header) {
-      padding: 0;
-    }
-
-    .item-title {
-      cursor: pointer;
-    }
-  }
-
-  .content-container::-webkit-scrollbar {
-    display: none;
-  }
-
-  // #27d7a8 #9880e0 #e16e67
-
-  .custom-items-content {
-    &:hover {
-      background-color: rgba(241, 241, 241, 0.51);
-      color: var(--el-color-primary);
-      font-weight: bold;
     }
   }
 }
@@ -888,10 +904,19 @@ onMounted(() => {
 }
 
 .sty {
-  color: #f57c10;
+  // color: #f57c10;
+  color: var(--el-color-primary);
+  font-size: var(--el-font-size-base);
 }
 
 .sty:hover {
-  color: #f57c10;
+  // color: #f57c10;
+  color: var(--el-color-primary);
+}
+
+.more {
+  position: absolute;
+  top: var(--el-card-padding);
+  right: var(--el-card-padding);
 }
 </style>

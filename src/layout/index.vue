@@ -160,10 +160,14 @@ onUnmounted(() => {
 }
 
 .main-container {
-  position: relative;
-  min-height: 100%;
+  // position: relative;
+  // min-height: 100%;
   margin-left: $sidebar-width;
   transition: margin-left 0.28s;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .layout-top {
@@ -196,7 +200,7 @@ onUnmounted(() => {
   }
 
   .main-container {
-    min-height: calc(100vh - $navbar-height - 60px );
+    // min-height: calc(100vh - $navbar-height - 60px );
     padding-top: $navbar-height;
     margin-left: 0;
   }

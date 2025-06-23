@@ -3,17 +3,16 @@
   <div class="mypage-app">
     <el-container class="dynamic-container" ref="scrollContainer">
       <el-aside :width="(NavigaShow ? 200 : 100) + 'px'">
-        <el-affix :offset="100">
+        <!-- <el-affix :offset="100"> -->
           <div class="navi_container">
             <div
               v-for="(pageConfig, v) in formconfig1"
               :key="v"
               class="NavigaList_card"
             >
-              <el-anchor :bound="120" :offset="80" style="margin-top: 40px">
+              <el-anchor :bound="120" :offset="80" style="margin-top: 10px">
                 <el-anchor-link :href="`#underwriteurl`" v-if="underwriteFlag">
                   <rt-icon
-                    style="margin-right: 14px"
                     :item="{ icon: 'Tickets' }"
                   />
                   <span style="font-size: 15px" v-if="NavigaShow"
@@ -25,7 +24,6 @@
                   @click="handleAnchorClick($event, `#edrbase`)"
                 >
                   <rt-icon
-                    style="margin-right: 14px"
                     :item="{ icon: 'Tickets' }"
                   />
                   <span style="font-size: 15px" v-if="NavigaShow"
@@ -37,7 +35,6 @@
                   @click="handleAnchorClick($event, `#edritem`)"
                 >
                   <rt-icon
-                    style="margin-right: 14px"
                     :item="{ icon: 'Tickets' }"
                   />
                   <span style="font-size: 15px" v-if="NavigaShow"
@@ -61,9 +58,9 @@
                       : true
                   "
                   @click="handleAnchorClick($event, `#${k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey}`)"
+                  :class="i === 0 ? 'isActive' : ''"
                 >
                   <rt-icon
-                    style="margin-right: 14px"
                     :item="{
                       icon:
                         k.icon && k.icon !== 'null' && k.icon !== ''
@@ -92,7 +89,6 @@
                   v-if="ciMasterAgreementFlag && isCiJiMrk"
                 >
                   <rt-icon
-                    style="margin-right: 14px"
                     :item="{ icon: 'Tickets' }"
                   />
                   <span style="font-size: 15px" v-if="NavigaShow"
@@ -101,7 +97,6 @@
                 </el-anchor-link>
                 <el-anchor-link :href="`#ci`" v-if="ciFlag && isCiJiMrk">
                   <rt-icon
-                    style="margin-right: 14px"
                     :item="{ icon: 'Tickets' }"
                   />
                   <span style="font-size: 15px" v-if="NavigaShow"
@@ -113,7 +108,6 @@
                   v-if="ourCompanyCiShareFlag && isCiJiMrk"
                 >
                   <rt-icon
-                    style="margin-right: 14px"
                     :item="{ icon: 'Tickets' }"
                   />
                   <span style="font-size: 15px" v-if="NavigaShow"
@@ -122,7 +116,7 @@
                 </el-anchor-link>
               </el-anchor>
             </div>
-            <div class="NavigaList_card" style="margin-left: 5px">
+            <!-- <div class="NavigaList_card" style="margin-left: 5px">
               <rt-icon
                 @click="NavigaShow = !NavigaShow"
                 v-if="!NavigaShow"
@@ -133,9 +127,9 @@
                 v-if="NavigaShow"
                 :item="{ icon: 'DArrowLeft' }"
               />
-            </div>
+            </div> -->
           </div>
-        </el-affix>
+        <!-- </el-affix> -->
       </el-aside>
       <el-main>
         <el-affix
@@ -246,14 +240,38 @@
           <ourCompanyCiShareRef ref="ourCompanyCiShare"></ourCompanyCiShareRef>
         </div>
         <el-backtop :target="'.el-main'" :right="100" :bottom="150" />
+        <el-affix position="bottom" :offset="55">
+          <div class="bottom-items">
+            <!--新增的投保单号显示和复制按钮-->
+            <div style="margin-right: 20px; width: 100%; display: flex; justify-content: flex-end; align-items: center;">
+              <div style="display: flex; align-items: center; background: #fff; padding: 6px 12px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap;">
+                {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "投保单号:" }}
+                <span id="policyNumber" style="margin-left: 5px; margin-right: 8px; font-weight: bold;">
+                {{ opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || '暂无' }}
+                </span>
+                <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号'}`" placement="top">
+                  <el-button @click="copyPolicyNumber" circle size="small" style="color: red;">
+                    <rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />
+                  </el-button>
+                </el-tooltip>
+              </div>
+            </div>
+            <rt-button
+              v-for="(bth, idx) in bthList"
+              :item="bth"
+              :key="idx"
+              :loading="bth.loading"
+            />
+          </div>
+        </el-affix>
       </el-main>
     </el-container>
 
-    <el-footer>
+    <!-- <el-footer>
       <el-affix position="bottom" :offset="10">
-        <div class="bottom-items">
+        <div class="bottom-items"> -->
           <!--新增的投保单号显示和复制按钮-->
-          <div style="margin-right: 20px; width: 100%; display: flex; justify-content: flex-end; align-items: center;">
+          <!-- <div style="margin-right: 20px; width: 100%; display: flex; justify-content: flex-end; align-items: center;">
             <div style="display: flex; align-items: center; background: #fff; padding: 6px 12px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
               {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "投保单号:" }}
               <span id="policyNumber" style="margin-left: 5px; margin-right: 8px; font-weight: bold;">
@@ -274,7 +292,7 @@
           />
         </div>
       </el-affix>
-    </el-footer>
+    </el-footer> -->
   </div>
 </template>
 
@@ -2755,6 +2773,12 @@ function handleAnchorClick(event: any, targetId: string) {
       });
     }
   }
+  if(document.querySelectorAll('.el-anchor__item') && document.querySelectorAll('.el-anchor__item').length > 0) {
+    document.querySelectorAll('.el-anchor__item').forEach((item:any) => {
+      item.classList.remove('isActive')
+    })
+  }
+  event.currentTarget.classList.add('isActive')
 }
 
 opertaor.setFatherPage({
@@ -2936,9 +2960,45 @@ function getSaveDataParams() {
   display: flex;
   flex-direction: column;
   height: 100%;
+  position: absolute;
+  width: 100%;
 }
 .dynamic-container {
   height: calc(100vh - $navbar-height - 60px - 90px);
   overflow: auto;
+}
+
+.mypage-aside {
+  background: var(--el-color-primary);
+}
+
+.el-anchor {
+  background: var(--el-color-primary);
+  :deep(.el-anchor__list) {
+    padding: 15px 10px;
+  } 
+  .el-anchor__item {
+    background: #ffffff1a;
+    margin-bottom: 10px;
+    padding-left: 0;
+    border-radius: 8px;
+    opacity: .6;
+    &.isActive {
+      opacity: 1;
+    }
+    :deep(a) {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #FFFFFF;
+      .el-icon {
+        font-size: 3rem!important;
+        margin: 0 0 10px 0;
+      }
+    }
+  }
+}
+.el-aside {
+  width: auto;
 }
 </style>

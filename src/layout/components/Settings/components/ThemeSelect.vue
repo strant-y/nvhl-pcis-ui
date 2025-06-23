@@ -66,6 +66,18 @@ const colors = [
     value: 'summer',
     label: '夏天',
   },
+  {
+    value: 'blue',
+    label: '靛蓝',
+  },
+  {
+    value: 'orange',
+    label: '橙黄',
+  },
+  {
+    value: 'green',
+    label: '草绿',
+  }
 ];
 </script>
 
@@ -101,6 +113,18 @@ const colors = [
 }
 .summer{
   background: linear-gradient(to right,  #40bfc1, #ff6f5e);
+  color: white;
+}
+.blue{
+  background: #3a76c6;
+  color: white;
+}
+.orange{
+  background: #ff8c03;
+  color: white;
+}
+.green{
+  background: #09d067;
   color: white;
 }
 </style>

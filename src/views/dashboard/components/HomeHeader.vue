@@ -372,7 +372,7 @@ defineExpose({
   }
   .header-user-text{
     font-size: 15px;
-    color: var(--menu-active-text);
+    color: var(--el-color-primary);
     padding-right: 5px;
   }
 }
