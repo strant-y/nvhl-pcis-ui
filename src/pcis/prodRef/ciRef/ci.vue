@@ -93,7 +93,7 @@ const method = {
     const cChiefMrk = ['1', '3'].includes(cCiMrkFlag) ? '1' : '0';
     if(val.length ==1){
       // const newRowId = val[val.length - 1]?._dataId;
-      freeEditRef?.value?.setValueByRowKey('Ci.cCoinsurerCde', val[val.length - 1]?._dataId, '327001');
+      // freeEditRef?.value?.setValueByRowKey('Ci.cCoinsurerCde', val[val.length - 1]?._dataId, '327001');
       val.forEach((key,index) => { 
           key['Ci.nSeqNo']=index+1
           key['Ci.nPlyFeeRate']= '0.00'
@@ -307,7 +307,7 @@ const method = {
     if (!rowData || !rowId) return;
     const cCoinsurerCde = rowData["Ci.cCoinsurerCde"];
     // 我方主共或从共的情况
-    if (cCiMrk["Base.cCiMrk"] === '1' || cCiMrk["Base.cCiMrk"] === '3') {
+    if (cCiMrk["Base.cCiMrk"] === '2' || cCiMrk["Base.cCiMrk"] === '4') {
       // 情况1：如果选中的是“是”且是永安保险(327001)
       if (rowData.length>1 && val === "1" && cCoinsurerCde === "327001") {
         ElMessage.error("我方从共时主共保方不能是我司！");
@@ -326,7 +326,7 @@ const method = {
       }
     }
     // 我方从共时，主共保方必须是我司
-    if (cCiMrk["Base.cCiMrk"] === '2' || cCiMrk["Base.cCiMrk"] === '4') {
+    if (cCiMrk["Base.cCiMrk"] === '1' || cCiMrk["Base.cCiMrk"] === '3') {
       if (val === "1" && cCoinsurerCde !== "327001") {
         ElMessage.error("我方主共时主共保方必须是我司！");
         freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowId, "");
