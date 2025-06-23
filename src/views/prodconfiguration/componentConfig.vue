@@ -93,7 +93,6 @@ const compareList = ref<any>([]);
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "组件配置",
-    production: true,
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
@@ -119,15 +118,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           
 
           ElMessageBox.confirm(
-          '确认是否执行组件'+k+'的全量更新吗??',
-          '提示',
-          {
-            confirmButtonText: '确认',
-            cancelButtonText: '取消',
-            type: 'info',
-          }
-        )
-          .then(() => {
+            '确认是否执行组件'+k+'的全量更新吗??',
+            '提示',
+            {
+              confirmButtonText: '确认',
+              cancelButtonText: '取消',
+              type: 'info',
+            }
+          ).then(() => {
             releaseByComptype({
               cComponentCode: k,
             }).then((res) => {
@@ -201,7 +199,7 @@ const tableconfig = reactive<AppTableConfig>(
       }),
     ],
     tableBtnType: "btn",
-    tableBtnWidth: 220,
+    tableBtnWidth: 250,
     tableBtnPosition: "right",
     tableBtn: [
       createFreeButtonBase({
@@ -278,6 +276,37 @@ const tableconfig = reactive<AppTableConfig>(
               type: "warning",
             });
           }
+        },
+      }),
+      createFreeButtonBase({
+        id: "refresh",
+        tooltip: "组件刷新",
+        icon: "Refresh",
+        link: true,
+        tableClick: (row: any) => {
+          console.log(row);
+          ElMessageBox.confirm(
+            '确认是否执行组件'+row.cComponentName+'的更新操作吗??',
+            '提示',
+            {
+              confirmButtonText: '确认',
+              cancelButtonText: '取消',
+              type: 'info',
+            }
+          ).then(() => {
+            releaseByComptype({
+              cComponentCode: row.cComponentTab,
+              cComponentKey: row.cComponentKey,
+            }).then((res) => {
+              const { code, data, msg } = res;
+              if (200 === code) {
+                ElMessage.success("更新成功");
+              }else{
+                console.log(res);
+                ElMessage.error("更新失败");
+              }
+            });
+          })
         },
       }),
     ],
