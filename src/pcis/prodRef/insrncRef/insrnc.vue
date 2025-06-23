@@ -95,7 +95,8 @@ const method = {
         // 如果批改原因是免费延期，当前保险止期日期之后的日期都可以选择
         return  date.getTime() < maxDate
       } else {
-        return  date.getTime() < startDate.getTime() || date.getTime() > maxDate
+        return  date.getTime() < startDate.getTime() 
+        // || date.getTime() > maxDate
       }
     }else{
         return true;

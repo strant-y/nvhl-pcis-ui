@@ -53,6 +53,8 @@ const fileInputType = ref();
 import { readFile } from "@/api/file";
 const user = JSON.parse(sessionStorage.getItem("user"));
 const tCertfDate = ref<any[]>([]);
+const  cWorkDptList =['310','320','330','340','350','360']  // 单位性质带企业的ID
+
 onMounted(() => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
@@ -98,7 +100,9 @@ onMounted(() => {
   setFormItem("Insured.cFax", { rules: [getRules("faxNumber", {})] });
   // 法人身份证
   setFormItem("Insured.cLegalCertfCde", { rules: [getRules("idCard", {})] });
-
+  setFormItem("Insured.cGcidCode", {
+        rules: [getRules("leiCode", {})],
+  });
 
 });
 function setFormItem(key: any, obj: any) {
@@ -310,6 +314,11 @@ const method = {
         rules: [getRules("required", {})],
       });
 
+           //实名认证方式
+      setFormItem("Insured.cRealnameAuthType", {
+        rules: [getRules("required", {})],
+      });
+ 
 
       // // 移动电话
       // setFormItem("Insured.cMobile", { rules: [getRules("phoneNo", {})] });
@@ -415,6 +424,14 @@ const method = {
       setFormItem("Insured.tEstablishingDate", {
         rules: null,
       });
+
+      if(!cWorkDptList.includes(getValue('Insured.cWorkDpt'))){
+        //实名认证方式
+        setFormItem("Insured.cRealnameAuthType", {
+          rules: [],
+        });
+      }
+      
 
       setValue("Insured.cGreenIndustryCustomers", "");
       setValue('Insured.cGreenIndustryList','')
@@ -696,7 +713,7 @@ const method = {
     }
 
     if (val == "120001") {
-      setValue('Insured.cCertfCde','')  //选身份证时清空
+      // setValue('Insured.cCertfCde','')  //选身份证时清空
       setFormItem("Insured.cCertfCde", {
         rules: [getRules("required", {}), getRules("idCard", {
           
@@ -892,6 +909,19 @@ const method = {
     // 单位性质
   cWorkDptChange:(val:any)=>{
       console.log('单位性质',val)
+      let cClntMrk = getValue('Insured.cClntMrk');  // 投保人性质 
+      if(cWorkDptList.includes(val) || cClntMrk =='0'){
+        console.log(12)
+          //实名认证方式
+          // setFormItem("Insured.cRealnameAuthType", {
+          setFormItem("Insured.cRealnameAuthType", {
+            rules: [getRules("required", {})],
+          });
+      }else{
+          setFormItem("Insured.cRealnameAuthType", {
+            rules: [],
+          });
+      }
       if(val =='350'){
         setFormItem("Insured.cGcidCode", {
               rules: [getRules("required", {}),getRules("leiCode", {})],
