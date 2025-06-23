@@ -9,7 +9,7 @@
           <rtButton :item="searchBtnItem" />
         </div>
         <div class="top-menu">
-          <div>热搜菜单:
+          <div class="menu-label">
             <i class="flex-center fast-edit">
               <el-button
                 title="修改快捷菜单"
@@ -21,10 +21,10 @@
                 size="small"
               />
             </i>
+            热搜菜单:
           </div>
           <div class="top-menu-list">
-            <span>角色管理</span>
-            <span>菜单管理</span>
+            <span v-for="item in shorMenuList" :key="item.name">{{item.name}}</span>
           </div>
         </div>
       </div>
@@ -177,6 +177,11 @@ const pcisQueryService = new PcisQueryService();
 import { useRouter } from "vue-router";
 const router = useRouter();
 import { AppKey } from '@/constants/api';
+import { useDzModal } from "@/common/dzmodel/DzModalService";
+const dzmodal = useDzModal();
+const shortMenuDialog = defineAsyncComponent(() =>
+  import("./components/shortMenuDialog.vue")
+);
 
 
 defineOptions({
@@ -237,6 +242,7 @@ const isAudit = ref(false) //  核保岗
 const moreurl = ref('');
 const shortListData = ref(null)  // 第二模块tabl列表数据
 const headIcon = `/src/assets/images/${userStore.user.cCssStyle === '2' ? '0' : '1'}_.png`
+const shorMenuList = ref([])// 快捷菜单列表
 
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -678,7 +684,11 @@ function handleSearch(val:any) {
 
 // 编辑快捷菜单
 function openShortcutEdit() {
-  
+  dzmodal.open(shortMenuDialog, { type: "", data: {} }).then((res:any) => {
+    if (res.type === "ok") {
+      shorMenuList.value = res.body
+    } 
+  });
 }
 
 // 窗口大小变化时重置图表
@@ -743,7 +753,9 @@ window.addEventListener('resize', () => {
       .top-menu {
         display: flex;
         padding: 20px 0;
-
+        .menu-label {
+          display: flex;
+        }
         .top-menu-list {
           span {
             margin-left: 20px;
