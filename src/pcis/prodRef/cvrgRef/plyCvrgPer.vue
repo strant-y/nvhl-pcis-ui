@@ -260,6 +260,7 @@ function addTermData() {
     },
     {
       isOk: (selectdata: any) => {
+        console.log('-------------',selectdata)
         let plans: any[] = [];
         selectdata.forEach((item: any) => {
           let riskList: { [key: string]: any }[] = [];
@@ -306,6 +307,7 @@ function addTermData() {
           data.riskList = riskList;
           plans.push(data);
         });
+        console.log('2121',plans)
         refushData(plans);
       },
     },
