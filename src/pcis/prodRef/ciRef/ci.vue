@@ -207,8 +207,8 @@ const method = {
         [{ value: '1', label: '其他' }]
       );
       setFormItem("Ci.cDptCde", { rules: [] });
-      // updateMasterAgreementValues();
     }
+    // updateMasterAgreementValues();
   },
 
   // 分公司下拉初始化事件 from-init 会自动绑定
@@ -284,6 +284,7 @@ const method = {
   clssueMrkChange:  (val)=>{
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData?._dataId;
+    const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue()
     if (!rowData || !rowId) return;
       // 获取所有行数据
       const allRows = getFromValue();
@@ -297,10 +298,18 @@ const method = {
         freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
         return;
       }
+      if (val === "0") { 
+        if(cCiMrk["Base.cCiMrk"] == '1' || cCiMrk["Base.cCiMrk"] == '5'){
+          if(rowData['Ci.cDptCde'] == param.cDptCde){
+            ElMessage.error("联保单出单方必须是主联单的分公司！");
+            freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
+          }
+        }
+      }
   },
   //主共标志下拉事件
   cChiefMrkChange:(val)=>{
-    //否0,1是
+    //否0,是1
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData?._dataId;
     const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue()
@@ -314,7 +323,8 @@ const method = {
         freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowId, "");
         return;
       }
-      // 情况2：检查是否已有其他行的主共标志为“是”
+    }
+    // 情况2：检查是否已有其他行的主共标志为“是”
       const allRows = getFromValue();
       const existingChief = allRows.some(
         (row) => row._dataId !== rowId && row["Ci.cChiefMrk"] === "1"
@@ -324,7 +334,6 @@ const method = {
         freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowId, "");
         return;
       }
-    }
     // 我方从共时，主共保方必须是我司
     if (cCiMrk["Base.cCiMrk"] === '1' || cCiMrk["Base.cCiMrk"] === '3') {
       if (val === "1" && cCoinsurerCde !== "327001") {
@@ -568,6 +577,8 @@ const updateMasterAgreementValues = () => {
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm", totalPrm.toFixed(2));
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntAmt", totalPrm.toFixed(2));
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntPrm", totalPrm.toFixed(2));
+      // opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnAmt", nAmt.value);
+      // opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnPrm", nPrm.value);
     }
   });
 };
