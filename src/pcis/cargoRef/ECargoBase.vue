@@ -53,11 +53,11 @@ const method = {
 
   cCiMrkChange: (val: string) => {
     idxParam.ciJiMrk = val;
-    const ciAgreementECargo = formPage.getComponentRefById('ciAgreementECargo');
+    const ciAgreementECargo = formPage.getComponentRefById('AgreementCiTcp');
     if(ciAgreementECargo) {
       ciAgreementECargo.cCiMrkChangeFun({cCiMrk: val})
     }
-    const cargoCiRef = formPage.getComponentRefById('cargoCi');
+    const cargoCiRef = formPage.getComponentRefById('AgreementCi');
     if (!!cargoCiRef) {
       cargoCiRef.initCiInfo({
         cCiMrk: val
@@ -86,7 +86,7 @@ function setFormItem(key: any, obj: any) {
 }
 
 
-function getFromValue() {
+function getFormValue() {
   return baseEditRef?.value?.getFromValue();
 }
 
@@ -106,12 +106,30 @@ function getValue(key: string) {
   return baseEditRef?.value?.getValue(key);
 }
 
+function getFormConfig(){
+  return formconfig1;
+}
+
+function getFormBtn() {
+  return baseEditRef?.value?.getFormBtn();
+}
+function setDisabledAll() {
+  baseEditRef?.value?.setDisabledAll();
+  const formBtn = getFormBtn();
+  if(formBtn && Object.keys(formBtn).length > 0) {
+    Object.keys(formBtn).forEach((key: any) => {formBtn[key].hidden = true;})
+  }
+}
+
 defineExpose({
-  getFromValue,
+  getFormValue,
   setFormValue,
   validate,
   setValue,
   getValue,
+  getFormBtn,
+  getFormConfig,
+  setDisabledAll
 });
 </script>
 

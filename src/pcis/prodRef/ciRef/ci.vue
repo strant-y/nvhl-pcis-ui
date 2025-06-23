@@ -211,7 +211,6 @@ const method = {
   cCoinsurerCdeChange:(val)=>{
     const rowData = freeEditRef.value?.getSelectRow();
     if (!rowData) return;
-    
     const rowId = rowData._dataId;
     if(!initFlag.value){
       const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue()
@@ -250,8 +249,8 @@ const method = {
         [{ value: '1', label: '其他' }]
       );
       setFormItem("Ci.cDptCde", { rules: [] });
-      // updateMasterAgreementValues();
     }
+    updateMasterAgreementValues()
   },
 
   // 分公司下拉初始化事件 from-init 会自动绑定
@@ -327,6 +326,7 @@ const method = {
   clssueMrkChange:  (val)=>{
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData?._dataId;
+    const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue()
     if (!rowData || !rowId) return;
       // 获取所有行数据
       const allRows = getFromValue();
@@ -340,10 +340,18 @@ const method = {
         freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
         return;
       }
+      if (val === "0") { 
+        if(cCiMrk["Base.cCiMrk"] == '1' || cCiMrk["Base.cCiMrk"] == '5'){
+          if(rowData['Ci.cDptCde'] == param.cDptCde){
+            ElMessage.error("联保单出单方必须是主联单的分公司！");
+            freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
+          }
+        }
+      }
   },
   //主共标志下拉事件
   cChiefMrkChange:(val)=>{
-    //否0,1是
+    //否0,是1
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData?._dataId;
     const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue()
@@ -357,7 +365,8 @@ const method = {
         freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowId, "");
         return;
       }
-      // 情况2：检查是否已有其他行的主共标志为“是”
+    }
+    // 情况2：检查是否已有其他行的主共标志为“是”
       const allRows = getFromValue();
       const existingChief = allRows.some(
         (row) => row._dataId !== rowId && row["Ci.cChiefMrk"] === "1"
@@ -367,7 +376,6 @@ const method = {
         freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowId, "");
         return;
       }
-    }
     // 我方从共时，主共保方必须是我司
     if (cCiMrk["Base.cCiMrk"] === '1' || cCiMrk["Base.cCiMrk"] === '3') {
       if (val === "1" && cCoinsurerCde !== "327001") {
@@ -426,7 +434,8 @@ const method = {
   //开户行大类改变
   cBankRelTypChange:(val)=>{
     const rowDatas = freeEditRef.value?.getSelectRow();
-    freeEditRef.value?.setValueByRowKey("Ci.cBankAddr",rowDatas._dataId,val)
+    const bankRelTypeArr = val.split('_')
+    freeEditRef.value?.setValueByRowKey("Ci.cBankAddr",rowDatas._dataId,bankRelTypeArr[1])
   },
   //开户行省改变
   cProvinceChange:(val)=>{
@@ -590,6 +599,8 @@ const updateMasterAgreementValues = () => {
       // 累加到总和
       totalAmt += ciAmt;
       totalPrm += ciPrm;
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntAmt", totalAmt.toFixed(2));  //联保总保额
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm", totalPrm.toFixed(2)); //联保总保费
     }else{
       // 非永安保险公司：仅更新该行的 Ci.nCiAmt 和 Ci.nCiPrm，不参与总和计算
       const share = parseFloat(row["Ci.nCiShare"]) || 0;
@@ -607,10 +618,13 @@ const updateMasterAgreementValues = () => {
   // 设置到对应组件字段（仅使用永安保险的总和）
   allRows.forEach((row) => {
     if(row['Ci.cCoinsurerCde']){
-      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntAmt", totalAmt.toFixed(2));
-      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm", totalPrm.toFixed(2));
-      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntAmt", totalPrm.toFixed(2));
-      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntPrm", totalPrm.toFixed(2));
+      console.log(totalAmt,"totalAmt")
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntAmt", totalAmt.toFixed(2));  //联保总保额
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm", totalPrm.toFixed(2)); //联保总保费
+      // opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntAmt", totalAmt.toFixed(2));  //共保总保额
+      // opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntPrm", totalPrm.toFixed(2));  //共保总保费
+      opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnAmt", totalAmt.toFixed(2));  //我司分额保额
+      opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnPrm", totalPrm.toFixed(2));  //我司份额保费
     }
   });
 };

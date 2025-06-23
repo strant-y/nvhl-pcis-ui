@@ -38,7 +38,7 @@
                       :key="index"
                     >
                       <template v-if="!item.hidden">
-                        <rt-button :item="item" />
+                        <rt-button :item="item" :ref="(res: any) => {btnMap[item?.id] = item}"/>
                       </template>
                     </template>
                   </el-button-group>
@@ -106,7 +106,7 @@
                   :key="index"
                 >
                   <template v-if="!item.hidden">
-                    <rt-button :item="item" />
+                    <rt-button :item="item" :ref="(res: any) => {btnMap[item?.id] = item}"/>
                   </template>
                 </template>
               </div>
@@ -132,6 +132,7 @@ const props = defineProps({
   },
 });
 
+const btnMap = ref({});
 const { freeEditConfig } = toRefs(props);
 const emits = defineEmits(["updateDatas"]); // 父组件监听事件，同步子组件值的变化给父组件
 
@@ -161,6 +162,7 @@ interface dynamicFormMethod {
   clearValidate: (key: string | null ) => any;
   resetFields: () => any;
   setDisabledAll: () => void;
+  getFormBtn: () => any;
 }
 const dynamicForm = ref<dynamicFormMethod | null>(null);
 const superDynamicForm = ref<dynamicFormMethod | null>(null);
@@ -270,6 +272,11 @@ watch(
   }
 );
 
+
+function getFormBtn() {
+  return btnMap.value
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
@@ -279,7 +286,8 @@ defineExpose({
   clearValidate,
   resetFields,
   setDisabledAll,
-  getFromSchemaItem
+  getFromSchemaItem,
+  getFormBtn
 });
 </script>
 

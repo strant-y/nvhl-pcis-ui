@@ -1,17 +1,18 @@
-import ECargoDistECargo from './ECargoDist.vue' //ECargo 清单
-import ECargoCvrgECargo from './ECargoCvrg.vue' // 险别信息
-import ECargoFeeWarn from './ECargoFeeWarn.vue' // 协议费用提醒
-import ECargoApplicantECargo from './ECargoApplicant.vue' // 投保人信息
-import ECargoBase from './ECargoBase.vue'; //
-import ECargoCi from './ECargoCi.vue'; //
-import ECargoCiAgreement from './ECargoCiAgreement.vue'; //
-import ECargoCiShare from './ECargoCiShare.vue'; //
-import ECargoReview from './ECargoReview.vue'; //
+import ECargoDistECargo from '@/pcis/cargoRef/ECargoDist.vue' //ECargo 清单
+import ECargoCvrgECargo from '@/pcis/cargoRef/ECargoCvrg.vue' // 险别信息
+import ECargoFeeWarn from '@/pcis/cargoRef/ECargoFeeWarn.vue' // 协议费用提醒
+import ECargoApplicantECargo from '@/pcis/cargoRef/ECargoApplicant.vue' // 投保人信息
+import ECargoBase from '@/pcis/cargoRef/ECargoBase.vue'; //
+import ECargoCi from '@/pcis/cargoRef/ECargoCi.vue'; //
+import ECargoCiAgreement from '@/pcis/cargoRef/ECargoCiAgreement.vue'; //
+import ECargoCiShare from '@/pcis/cargoRef/ECargoCiShare.vue'; //
+import ECargoReview from '@/pcis/cargoRef/ECargoReview.vue';
+import ECargoSpecial from "@/pcis/cargoRef/ECargoSpecial.vue"; //
 
 /**用于动态组件的映射生成 */
 const componentMap = {
   distECargoRef: ECargoDistECargo,
-  AgreementCvrgERef: ECargoCvrgECargo,
+  AgreementCvrgRef: ECargoCvrgECargo,
   AgreementFeeWarnRef: ECargoFeeWarn,
   AgreementApplicantRef: ECargoApplicantECargo,
   AgreementBaseRef: ECargoBase,
@@ -19,6 +20,7 @@ const componentMap = {
   AgreementCiTcpRef: ECargoCiAgreement,
   AgreementCiShareRef: ECargoCiShare,
   AgreementReviewRef: ECargoReview,
+  AgreementSpecialRef: ECargoSpecial,
 };
 
 const install = (Vue) => {

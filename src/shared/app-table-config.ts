@@ -40,6 +40,8 @@ export interface AppTableMethod {
   setValueByRowKey:(props:string ,rowId: any, value:any) => void;
   getRowById:(rowId: string) => void;
   getselectionData:() => any;
+  getFormBtn: () => any;
+  getTableBtn: () => any;
 }
 export interface MyTableMethod {
   addRow: (arg: any) => any;

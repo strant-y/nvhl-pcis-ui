@@ -27,7 +27,7 @@ function deleteDist(queryParams: any): AxiosPromise<any> {
     return post(`${DistBaseUrl}/deleteDist`, queryParams);
 }
 
-//协议录入页面 保存
+//协议录入、批改页面 保存
 function save(queryParams: any): AxiosPromise<any> {
     return post(`${PageBaseUrl}/save`, queryParams);
 }
@@ -67,6 +67,7 @@ export default {
     checkSubmit,
     checkInit,
     editInit,
+    init,
     query,
     getECargoPageView
 }
