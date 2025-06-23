@@ -537,18 +537,18 @@ function checkRequired(item: any) {
   }
   return re;
 }
-function setDisabledAll() {
+function setDisabledAll(isDisabled: boolean = true) {
   if (props.fromSchema) {
     props.fromSchema.forEach((key: any) => {
       if (key.inputtype === "rtinputgroup") {
         key.groupList.forEach((gkey: any) => {
-          gkey.disabled = true;
+          gkey.disabled = isDisabled;
         });
       } else {
-        key.disabled = true;
+        key.disabled = isDisabled;
       }
       if (key.btnItems) {
-        key.btnItems.disabled = true;
+        key.btnItems.disabled = isDisabled;
       }
     });
   }

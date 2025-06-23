@@ -138,7 +138,7 @@ const getCComponentTableValue = (cProdNo: string, title: string): string => {
   //     return "ProjectDist"
   //   }
   // }
-  return props.compKey ? props.compKey.substring(0, props.compKey.length - 6) : "";
+  return props.compKey ? props.compKey.replace(/\d+/g, '') : "";
 };
 
 const formconfig11 = ref<any>({});

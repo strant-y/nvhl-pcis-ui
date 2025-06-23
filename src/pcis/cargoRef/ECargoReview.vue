@@ -99,8 +99,8 @@ function getFormConfig(){
 function getFormBtn() {
   return freeEditRef?.value?.getFormBtn();
 }
-function setDisabledAll() {
-  freeEditRef?.value?.setDisabledAll();
+function setDisabledAll(isDisabled: boolean) {
+  freeEditRef?.value?.setDisabledAll(isDisabled);
 }
 defineExpose({
   getFormValue,

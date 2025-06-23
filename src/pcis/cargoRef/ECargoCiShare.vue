@@ -85,11 +85,11 @@ function getFormConfig(){
 function getFormBtn() {
   return tgtobjEditRef?.value?.getFormBtn();
 }
-function setDisabledAll() {
-  tgtobjEditRef?.value?.setDisabledAll();
+function setDisabledAll(isDisabled: boolean) {
+  tgtobjEditRef?.value?.setDisabledAll(isDisabled);
   const formBtn = getFormBtn();
   if(formBtn && Object.keys(formBtn).length > 0) {
-    Object.keys(formBtn).forEach((key: any) => {formBtn[key].hidden = true;})
+    Object.keys(formBtn).forEach((key: any) => {formBtn[key].hidden = isDisabled;})
   }
 }
 defineExpose({

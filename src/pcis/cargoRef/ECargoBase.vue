@@ -113,11 +113,11 @@ function getFormConfig(){
 function getFormBtn() {
   return baseEditRef?.value?.getFormBtn();
 }
-function setDisabledAll() {
-  baseEditRef?.value?.setDisabledAll();
+function setDisabledAll(isDisabled: boolean) {
+  baseEditRef?.value?.setDisabledAll(isDisabled);
   const formBtn = getFormBtn();
   if(formBtn && Object.keys(formBtn).length > 0) {
-    Object.keys(formBtn).forEach((key: any) => {formBtn[key].hidden = true;})
+    Object.keys(formBtn).forEach((key: any) => {formBtn[key].hidden = isDisabled;})
   }
 }
 
