@@ -51,7 +51,7 @@ watch([() => props.modelValue], ([newModelValue]) => {
   if(!initFlag.value && !!newModelValue) {
     init(true)
   }
-  props.item.func ? props.item.func(newModelValue, props.row) : null;
+  props.item.func ? props.item.func(newModelValue, props.row, props.item) : null;
 });
 function tableExvalidate() {
   if (typeof itemRef.value.tableExvalidate === "function") {

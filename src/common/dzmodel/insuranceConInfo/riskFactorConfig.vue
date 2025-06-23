@@ -145,7 +145,7 @@ const tableconfig = reactive<AppTableConfig>(
     // 启用固定表头功能
     fixedHeader:true,
     editFlag: true,
-    editList: ["c_porp_type", "c_porp_required","c_porp_disabled","c_prop_indent","c_parent_key"],
+    editList: ["c_porp_type", "c_porp_required","c_porp_disabled","c_prop_indent","c_father_key"],
     fromSchema: [
       {
         prop: "icon",
@@ -232,7 +232,7 @@ const tableconfig = reactive<AppTableConfig>(
         },
       },
       {
-        prop: "c_parent_key",
+        prop: "c_father_key",
         inputtype: "rtinput",
         title: "父级key",
       },
@@ -271,6 +271,7 @@ function select(item: any) {
       se.c_porp_required = element.c_porp_required;
       se.c_porp_disabled = element.c_porp_disabled;
       se.c_prop_indent = element.c_prop_indent;
+      se.c_father_key = element.c_father_key;
       newSelectl.push(se);
     }
   });
@@ -303,6 +304,7 @@ function getFactorConf() {
           c_porp_required: element.c_porp_required,
           c_porp_disabled: element.c_porp_disabled,
           c_prop_indent:element.c_prop_indent,
+          c_father_key:element.c_father_key,
         }));
       e.selectFactorList = selectData1;
     }
