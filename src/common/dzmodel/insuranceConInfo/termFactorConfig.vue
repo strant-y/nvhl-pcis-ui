@@ -109,6 +109,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             if ( item.prop === "cPropHeight" ) {
               item.isShow = val === "table";
             }
+            if ( item.prop === "cPropIndent" || item.prop === "cFatherKey" ) {
+              item.isShow = !h;
+            }
           });
         },
       },
@@ -183,7 +186,7 @@ function savegroupinfo() {
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     editFlag: true,
-    editList: ["cPorpRequired","cPorpShowtitle","cPorpDisabled","cPropHeight","cPropIndent"],
+    editList: ["cPorpRequired","cPorpShowtitle","cPorpDisabled","cPropHeight","cPropIndent","cFatherKey"],
     fromSchema: [
       {
         prop: "icon",
@@ -283,6 +286,11 @@ const tableconfig = reactive<AppTableConfig>(
           y: "1",
           n: "0",
         },
+      },
+      {
+        prop: "cFatherKey",
+        inputtype: "rtinput",
+        title: "父级key",
       },
     ],
   })

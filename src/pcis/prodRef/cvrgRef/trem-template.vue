@@ -77,7 +77,7 @@
                   <tr v-if="item.cPorpShowtitle !== '1'">
                     <td
                     :class="{
-                        'custom-indent':item.cPropIndent,
+                        'custom-indent':item.cPropIndent === '1',
                     }">
                       <el-text
                         v-if="isrequired(item)"
@@ -677,9 +677,16 @@ function dataInit() {
 }
 
 function initshowConfig() {
+  // 条款组件遍历,对一些个性化操作进行处理
   termFactormap.value.forEach((item) => { 
     item.required = isrequired(item);
     item.disabled = isdisabled(item);
+
+    if (item.cFatherKey ) {  //如果存在上级,则将上限设置成0,等待父级修改后,再修改自己的上限
+      if(!item.max){
+        item.max = 0;
+      }
+    }
   });
   let grouplist: { [k: string]: any } = {};
   if (groupInfo.value) {
@@ -969,8 +976,23 @@ const methodMap = {
           })
         }
       });
-      console.log(cocyData);
     }
+  },
+  /**
+   * 用于父级向子集校验,修改子集可输入的最大值
+   */
+  FathersCheck:(val:any,row:any,item:any)=>{
+    const fk = item.prop;
+    termFactormap.value.forEach((item: any) => {
+      if(item.cFatherKey === fk){
+        item.max = val;
+      }
+      if(termdata.value[item.prop]){
+        if(item.max < termdata.value[item.prop]){
+          termdata.value[item.prop] = item.max;
+        }
+      }
+    });
   }
 };
 

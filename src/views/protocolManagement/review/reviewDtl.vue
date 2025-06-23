@@ -24,6 +24,7 @@ const idxParam = reactive({
   formPage: formPage.value,
   param: { ...props.param, ...{}},
   ciJiMrk: '0',
+  readonly: computed(() => ['view'].includes(props.type)),
 });
 provide('idxParam', idxParam);
 
@@ -54,52 +55,49 @@ onBeforeMount(async() => {
   config[0].pageInfo = config[0].pageInfo.sort((a, b) => a.sort - b.sort)
   // 页面初始化
   formPage.value?.setFormConfig(config);
+  query();
 });
 
 onMounted(() => {
-  console.log('formPage', formPage);
-  console.log('props.param', props.param);
-  console.log('props.type', props.type);
-  formPage.value?.setAllFormData({});
+  formPage.value?.setPageReadOnly(['AgreementReview']);
 });
 
-function save() {
-  const allFromData = formPage.value?.getAllFormData();
-  console.log('allFromData', allFromData);
-  ElMessage.warning('保存');
-
-  const ref = formPage.value?.getComponentRefById('AgreementBase');
-  console.log('ref', ref);
-
-  const saveBtn = formPage.value?.getButtonRefById('save');
-  if(saveBtn) {
-    saveBtn.disabled = true;
+function query() {
+  cargoApi.checkInit({
+    ...idxParam.param,
+    ...{}
+  }).then((res: any) => {
+    if(res.code === 200) {
+      ElMessage.success('查询成功');
+      formPage.value?.setAllFormData(res.data);
+    }else {
+      ElMessage.error(res.msg);
+    }
+  });
+  if(idxParam.readonly === true) {
+    formPage.value.setFormReadOnlyById('AgreementReview');
+    const submitBtn = formPage.value?.getPageBtnRefById('submit')?.getConfig()
+    submitBtn.disabled = true;
   }
 }
+
 
 function submit() {
   const allFromData = formPage.value?.getAllFormData();
   ElMessage.warning('提交');
-}
-
-/**
- * 锚点点击事件重写
- * 避免触发路由
- */
-function handleAnchorClick(event: any, targetId: string) {
-  // 阻止默认的路由跳转行为
-  event.preventDefault();
-  // 获取目标元素的ID
-  if (targetId) {
-    // 手动实现平滑滚动效果
-    const targetElement = document.querySelector(targetId);
-    if (targetElement) {
-      targetElement.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center' // 可选值：'start', 'center', 'end', 'nearest'
-      });
+  cargoApi.checkSubmit({
+    ...allFromData,
+    ...{}
+  }).then((res: any) => {
+    if(res.code === 200) {
+      ElMessage.success('提交成功')
+      formPage.value.setFormReadOnlyById('AgreementReview');
+      const submitBtn = formPage.value.getPageBtnRefById('submit')?.getConfig();
+      submitBtn.disabled = true;
+    }else {
+      ElMessage.success(res.msg);
     }
-  }
+  });
 }
 </script>
 <style lang="scss" scoped>

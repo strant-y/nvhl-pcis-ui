@@ -34,6 +34,9 @@ const props = defineProps({
     type: [Object],
     required: true,
   },
+  compKey: {
+    type: String
+  }
 });
 
 const deductibleFixEdit = defineAsyncComponent(() => import("@/pcis/prodRef/commodityRef/DeductibleFixEdit.vue"));

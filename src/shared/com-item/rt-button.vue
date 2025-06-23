@@ -129,4 +129,11 @@ function handleChange() {
   emits("click");
   props.item.func ? props.item.func() : null;
 }
+
+function getConfig() {
+  return props.item
+}
+defineExpose({
+  getConfig
+})
 </script>

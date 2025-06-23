@@ -87,7 +87,7 @@ const cCiMrkChangeFun = (data: any) => {
 // 绑定特殊验证器
 const exRules = {};
 
-function getFromValue() {
+function getFormValue() {
   return tgtobjEditRef?.value?.getFromValue();
 }
 
@@ -128,17 +128,21 @@ const setFormItem = (key, obj) => {
     });
   }
 }
-function getFormconfig(){
+function getFormConfig(){
   return formconfig1;
 }
+function setDisabledAll() {
+  return tgtobjEditRef?.value?.setDisabledAll();
+}
 defineExpose({
-  getFromValue,
+  getFormValue,
   setFormValue,
   validate,
   setValue,
   getValue,
-  getFormconfig,
-  cCiMrkChangeFun
+  getFormConfig,
+  cCiMrkChangeFun,
+  setDisabledAll
 });
 </script>
 

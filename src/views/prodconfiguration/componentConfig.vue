@@ -84,6 +84,7 @@ import {
   getComponentViewByKey,
   getComponentList,
   querySelectorList,
+  releaseByComptype,
 } from "@/api/prod";
 
 const tableRef = ref<AppTableMethod | null>(null);
@@ -92,7 +93,6 @@ const compareList = ref<any>([]);
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "组件配置",
-    production: true,
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
@@ -105,6 +105,40 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         func: () => {},
+      }),
+      createFreeButtonBase({
+        label: "根据tab全量更新组件",
+        type:'success',
+        func: () => {
+          const k = freeEditRef.value?.getValue('cComponentTab');
+          if(!k){
+            ElMessage.error('请选择要更新的组件tab!');
+            return ;
+          }
+          
+
+          ElMessageBox.confirm(
+            '确认是否执行组件'+k+'的全量更新吗??',
+            '提示',
+            {
+              confirmButtonText: '确认',
+              cancelButtonText: '取消',
+              type: 'info',
+            }
+          ).then(() => {
+            releaseByComptype({
+              cComponentCode: k,
+            }).then((res) => {
+              const { code, data, msg } = res;
+              if (200 === code) {
+                ElMessage.success("更新成功");
+              }else{
+                console.log(res);
+                ElMessage.error("更新失败");
+              }
+            });
+          })
+        },
       }),
     ],
     fromSchema: [
@@ -165,7 +199,7 @@ const tableconfig = reactive<AppTableConfig>(
       }),
     ],
     tableBtnType: "btn",
-    tableBtnWidth: 220,
+    tableBtnWidth: 250,
     tableBtnPosition: "right",
     tableBtn: [
       createFreeButtonBase({
@@ -242,6 +276,37 @@ const tableconfig = reactive<AppTableConfig>(
               type: "warning",
             });
           }
+        },
+      }),
+      createFreeButtonBase({
+        id: "refresh",
+        tooltip: "组件刷新",
+        icon: "Refresh",
+        link: true,
+        tableClick: (row: any) => {
+          console.log(row);
+          ElMessageBox.confirm(
+            '确认是否执行组件'+row.cComponentName+'的更新操作吗??',
+            '提示',
+            {
+              confirmButtonText: '确认',
+              cancelButtonText: '取消',
+              type: 'info',
+            }
+          ).then(() => {
+            releaseByComptype({
+              cComponentCode: row.cComponentTab,
+              cComponentKey: row.cComponentKey,
+            }).then((res) => {
+              const { code, data, msg } = res;
+              if (200 === code) {
+                ElMessage.success("更新成功");
+              }else{
+                console.log(res);
+                ElMessage.error("更新失败");
+              }
+            });
+          })
         },
       }),
     ],

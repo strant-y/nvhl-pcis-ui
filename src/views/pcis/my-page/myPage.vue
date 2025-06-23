@@ -1827,21 +1827,21 @@ const calcPremium = () => {
       opertaor
         .getTableRefByKey("ciMasterAgreement")
         .setValue("Base.nCiJntAmt", nAmt.value);
-      opertaor
-        .getTableRefByKey("ciMasterAgreement")
-        .setValue("Base.nJiJntAmt", nAmt.value);
+      // opertaor
+      //   .getTableRefByKey("ciMasterAgreement")
+      //   .setValue("Base.nJiJntAmt", nAmt.value);
       opertaor
         .getTableRefByKey("ciMasterAgreement")
         .setValue("Base.nCiJntPrm", nPrm.value);
-      opertaor
-        .getTableRefByKey("ciMasterAgreement")
-        .setValue("Base.nJiJntPrm", nPrm.value);
-      opertaor
-        .getTableRefByKey("ourCompanyCiShare")
-        .setValue("Base.nCiOwnAmt", nAmt.value);
-      opertaor
-        .getTableRefByKey("ourCompanyCiShare")
-        .setValue("Base.nCiOwnPrm", nPrm.value);
+      // opertaor
+      //   .getTableRefByKey("ciMasterAgreement")
+      //   .setValue("Base.nJiJntPrm", nPrm.value);
+      // opertaor
+      //   .getTableRefByKey("ourCompanyCiShare")
+      //   .setValue("Base.nCiOwnAmt", nAmt.value);
+      // opertaor
+      //   .getTableRefByKey("ourCompanyCiShare")
+      //   .setValue("Base.nCiOwnPrm", nPrm.value);
 
         //承保 总保费
         opertaor.getTableRefs()["base"].setValue("Base.nPrm", nPrm.value);
