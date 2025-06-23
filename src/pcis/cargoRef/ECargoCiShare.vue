@@ -60,7 +60,7 @@ const method = {
 // 绑定特殊验证器
 const exRules = {};
 
-function getFromValue() {
+function getFormValue() {
   return tgtobjEditRef?.value?.getFromValue();
 }
 
@@ -79,18 +79,28 @@ function setValue(key: string, value: any) {
 function getValue(key: string) {
   return tgtobjEditRef?.value?.getValue(key);
 }
-function getFormconfig(){
+function getFormConfig(){
   return formconfig1;
 }
-
-
+function getFormBtn() {
+  return tgtobjEditRef?.value?.getFormBtn();
+}
+function setDisabledAll() {
+  tgtobjEditRef?.value?.setDisabledAll();
+  const formBtn = getFormBtn();
+  if(formBtn && Object.keys(formBtn).length > 0) {
+    Object.keys(formBtn).forEach((key: any) => {formBtn[key].hidden = true;})
+  }
+}
 defineExpose({
-  getFromValue,
+  getFormValue,
   setFormValue,
   validate,
   setValue,
   getValue,
-  getFormconfig,
+  getFormConfig,
+  getFormBtn,
+  setDisabledAll
 });
 </script>
 

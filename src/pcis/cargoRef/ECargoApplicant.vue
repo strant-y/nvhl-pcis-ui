@@ -18,11 +18,9 @@ import { formInit } from "@/shared/from-init";
 
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
-import moment from "moment";
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 import { useProductStore } from "@/store/modules/prod";
-const productStore = useProductStore();
 const dialog = ref<DialogMethod | null>(null);
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 const props = defineProps({
@@ -118,7 +116,7 @@ const method = {
 };
 
 
-function getFromValue() {
+function getFormValue() {
   return applicantEditRef?.value?.getFromValue();
 }
 
@@ -143,13 +141,20 @@ function getFormconfig() {
 function handleFileChange(event: Event) {
   const fileInput = event.target as HTMLInputElement;
 }
-
+function getFormConfig(){
+  return formconfig1;
+}
+function setDisabledAll() {
+  applicantEditRef?.value?.setDisabledAll();
+}
 defineExpose({
-  getFromValue,
+  getFormValue,
   setFormValue,
   validate,
   setValue,
   getValue,
+  getFormConfig,
+  setDisabledAll
 });
 </script>
 

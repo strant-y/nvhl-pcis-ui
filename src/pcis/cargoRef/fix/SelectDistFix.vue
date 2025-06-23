@@ -68,13 +68,13 @@ const tableRowClassName = ({ row, rowIndex }) => {
 };
 
 onMounted(() => {
-  const dataList = formPage.getComponentRefById('GoodsDistECargo').getTableData();
+  const dataList = formPage.getComponentRefById('AgreementDistGoods').getFormValue();
   pageresult.list.push(...dataList)
   nextTick(() => {
     toggleSpecificRow(); //这里调用是把必选的选中
     setSelected();
   });
-})
+});
 
 const handleSelectionChange = (selection: any) => {
   selected.value = selection;

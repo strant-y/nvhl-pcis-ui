@@ -69,7 +69,6 @@
               "
                 :is="getConmpName(k)"
                 :pageSchema="k.pageSchema"
-                :compKey="k.pageCode"
             />
           </div>
         </template>
@@ -86,8 +85,8 @@
               :key="idx"
               :loading="bth.loading"
               :ref="(res: any) => {
-              formPage.setButtonRef(bth?.id as string, res);
-            }"
+                formPage.setButtonRef(bth?.id as string, res);
+              }"
           />
         </div>
       </el-affix>
@@ -109,10 +108,10 @@ const formPage = idxParam?.formPage;
 const isCiJiMrk = computed(() => !!idxParam.ciJiMrk && idxParam.ciJiMrk !== '0');
 
 const getConmpName = (k: any) => {
-  if( ['AgreementCvrg', 'AgreementBase', 'AgreementApplicant', 'AgreementCiTcp', 'AgreementCi', 'AgreementCiShare'].includes(k.pageCode))
+  if( ['AgreementCvrg', 'AgreementBase', 'AgreementApplicant', 'AgreementCiTcp', 'AgreementCi', 'AgreementCiShare', 'AgreementSpecial'].includes(k.pageCode))
     return k.pageCode + '-ref';
   if( k.pageKey === 'customECargo') return k.pageCode + '-ref';
-  return (k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref');
+  return ((k.pageType === 'custom' ? k.pageCode : k.pageKey) + '-ref');
 }
 const NavigaShow = ref(true);
 

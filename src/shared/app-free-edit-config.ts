@@ -32,6 +32,7 @@ export interface AppFreeEditMethod {
   clearValidate: (key: string | null ) => any;
   setDisabledAll: () => void;
   resetFields: () => void;
+  getFormBtn: () => any;
 }
 export function createAppFreeEditConfig(
   config: AppFreeEditConfig = {}

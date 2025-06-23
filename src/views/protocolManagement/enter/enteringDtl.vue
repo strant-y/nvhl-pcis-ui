@@ -24,6 +24,7 @@ const idxParam = reactive({
   param: { ...props.param, ...{}},
   user: JSON.parse(sessionStorage.getItem("user")),
   ciJiMrk: '0',
+  readonly: computed(() => ['view'].includes(props.type)),
 });
 provide('idxParam', idxParam);
 
@@ -60,30 +61,76 @@ onBeforeMount(async () => {
   config[0].pageInfo = config[0].pageInfo.sort((a, b) => a.sort - b.sort)
   // 页面初始化
   formPage.value?.setFormConfig(config);
+  query();
 });
 
 onMounted(() => {
-  console.log('formPage', formPage);
-  formPage.value?.setAllFormData({});
+  console.log(idxParam.readonly);
 });
+
+
+function query() {
+  cargoApi.init({
+    ...formPage.param,
+    ...{}
+  }).then((res: any) => {
+    if(res.code === 200) {
+      ElMessage.success('查询成功');
+      formPage.value?.setAllFormData(res.data);
+    }else {
+      ElMessage.error(res.msg);
+    }
+  });
+  if(idxParam.readonly === true) {
+    formPage.value?.setPageReadOnly();
+    const submitBtn = formPage.value?.getPageBtnRefById('submit')?.getConfig()
+    submitBtn.disabled = true;
+    const saveBtn = formPage.value?.getPageBtnRefById('save')?.getConfig()
+    saveBtn.disabled = true;
+  }
+}
 
 function save() {
   const allFromData = formPage.value?.getAllFormData();
   console.log('allFromData', allFromData);
   ElMessage.warning('保存');
+  cargoApi.save({
+    ...allFromData,
+    ...{}
+  }).then((res: any) => {
+    if(res.code === 200) {
+      ElMessage.success('保存成功')
+    }else {
+      ElMessage.success(res.msg);
+    }
+  });
 
-  const ref = formPage.value?.getComponentRefById('AgreementBase');
-  console.log('ref', ref);
+  const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase');
+  console.log('AgreementBaseRef', agreementBaseRef);
+  const agreementDistInsuredRef = formPage.value?.getComponentRefById('AgreementDistInsured');
+  const agreementCvrgRef = formPage.value?.getComponentRefById('AgreementCvrg');
 
-  const saveBtn = formPage.value?.getButtonRefById('save');
-  if(saveBtn) {
-    saveBtn.disabled = true;
-  }
+  // const agreementDistGoodsRef = formPage.value?.getComponentRefById('AgreementSpecial');
+  // const formBtn = agreementDistGoodsRef.getFormBtn();
+  // const tableBtn = agreementCvrgRef.getTableBtn();
 }
 
 function submit() {
   const allFromData = formPage.value?.getAllFormData();
   ElMessage.warning('提交');
+  cargoApi.submit({
+    ...allFromData,
+    ...{}
+  }).then((res: any) => {
+    if(res.code === 200) {
+      ElMessage.success('提交成功')
+      formPage.value.setPageReadOnly();
+      const submitBtn = formPage.value.getPageBtnRefById('submit')?.getConfig();
+      submitBtn.disabled = true;
+    }else {
+      ElMessage.success(res.msg);
+    }
+  });
 }
 
 </script>
