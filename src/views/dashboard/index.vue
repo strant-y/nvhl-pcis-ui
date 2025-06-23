@@ -5,11 +5,23 @@
         <div class="top-title1">财险承保系统</div>
         <div class="top-title2">智能高效助力承保，精准把控风险，让财险业务开展更顺畅无忧</div>
         <div class="top-search">
-          <rtinput :item="searchItem" />
+          <rtinput v-model="searchValue" :item="searchItem" />
           <rtButton :item="searchBtnItem" />
         </div>
         <div class="top-menu">
-          <div>热搜菜单:</div>
+          <div>热搜菜单:
+            <i class="flex-center fast-edit">
+              <el-button
+                title="修改快捷菜单"
+                type="primary"
+                @click="openShortcutEdit"
+                circle
+                plain
+                icon="Edit"
+                size="small"
+              />
+            </i>
+          </div>
           <div class="top-menu-list">
             <span>角色管理</span>
             <span>菜单管理</span>
@@ -172,19 +184,20 @@ defineOptions({
   inheritAttrs: false,
 });
 
+const searchValue = ref("");
 const searchItem = {
   prop: "cQueryStr",
   inputtype: "rtinput",
   title: "",
-  placeholder: "输入关键词进行查询，支持搜索任务号、保单号、被保人名称",
+  placeholder: "输入投保单号进行查询",
   itemWidth: 2,
   prefixIcon: "Search"
 }
 const searchBtnItem = {
-  label: "搜索",
+  label: "投保单查询",
   type: "primary",
   func: () => {
-      // handleQuery(true);
+    handleSearch(searchValue.value);
   },
 }
 const issueBtnItem = ref({
@@ -634,6 +647,39 @@ const toQuery2 = (data: any) => {
     }
   }
 };
+
+// 输入框查询
+function handleSearch(val:any) {
+  if (isOperate.value) { //出单员
+    const param = Object.assign({
+      CurrentUser: user.opCde,
+      CurrentUserOrg: user.companyId,
+      CAppNo: val,
+      TIssueTmStart: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
+      TIssueTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+    });
+    sessionStorage.setItem(AppKey.query.pcis_query_app, JSON.stringify(param));
+    router.push({ path: '/query/application-querys' });
+  } else if (isAudit.value) { //核保员
+    const param = Object.assign({
+      type: 'temp',
+      CurrentUser: user.opCde,
+      CurrentUserOrg: user.companyId,
+      objId: val,
+      startCrtTm: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
+      TAppTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+      startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
+      endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+    });
+    sessionStorage.setItem(AppKey.query.pcis_query_newudrlist, param);
+    router.push({ path: '/pcis-new-udr-list/PendUdrList' });
+  }
+}
+
+// 编辑快捷菜单
+function openShortcutEdit() {
+  
+}
 
 // 窗口大小变化时重置图表
 window.addEventListener('resize', () => {
