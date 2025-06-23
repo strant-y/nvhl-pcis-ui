@@ -759,7 +759,7 @@ const method = {
         rules: [getRules("required", {})],
       });
       setFormItem("Insured.cCertfCde", {
-        rules: [getRules("socialCode", {})],
+        rules: [getRules("required", {}),getRules("socialCode", {})],
       });
 
       // 为法人  企业成立日期
@@ -782,7 +782,7 @@ const method = {
 
     } else {
       setFormItem("Insured.cCertfCde", {
-        rules: [],
+        rules: [getRules("required", {})],
       });
       setFormItem("Insured.tCertfBgnDate", { rules: null });
       setFormItem("Insured.tCertfEndDate", { rules: null });

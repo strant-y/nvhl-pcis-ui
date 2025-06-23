@@ -309,9 +309,9 @@ const method = {
       });
 
       setValue("Applicant.cNation", "1"); // 国籍
-      setValue("Applicant.tBirthday", null);
-      setValue("Applicant.nAge", null);
-      setValue("Applicant.cSex", null);
+      // setValue("Applicant.tBirthday", null);
+      // setValue("Applicant.nAge", null);
+      // setValue("Applicant.cSex", null);
 
       if (!param.initFlag) {
         setFormItem("Applicant.cNation", {
@@ -350,7 +350,7 @@ const method = {
 
       // 统一社会信用代码校验
         setFormItem("Applicant.cCertfCde", {
-        rules: [getRules("socialCode", {})],
+        rules: [getRules("required", {}),getRules("socialCode", {})],
       });
 
             // 为法人  企业成立日期
@@ -359,7 +359,7 @@ const method = {
       });
     } else {
       setFormItem("Applicant.cCertfCde", {
-        rules: [getRules("required", {}),getRules("passPort", {})],
+        rules: [getRules("required", {})],
       });
       setFormItem("Applicant.tCertfBgnDate", { rules: null });
       setFormItem("Applicant.tCertfEndDate", { rules: null });
