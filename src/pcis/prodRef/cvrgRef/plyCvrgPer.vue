@@ -147,6 +147,9 @@ const props = defineProps({
     type: [Object],
     required: true,
   },
+  compKey: {
+    type: String
+  }
 });
 
 const cardconfig = ref(creatCardConfig({}));
