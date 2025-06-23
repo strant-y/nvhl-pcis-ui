@@ -94,6 +94,13 @@ onMounted(async () => {
     method,
     exRules
   );
+  if(params.cProdNo === '040003'){
+    formconfig11.value.fromSchema?.forEach(item=>{
+      if(item['prop'] ==='Dist.cProductType'){
+        item['typeCode'] = 'Product_Type040003';
+      }
+    })
+  }
   Object.assign(formconfig1.value, formconfig11.value);
   cardconfig.value.title = formconfig1.value.title;
   tableconfig.value.showEdit = true;
