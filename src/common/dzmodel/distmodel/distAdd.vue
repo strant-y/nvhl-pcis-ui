@@ -24,6 +24,7 @@ import { saveDist } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { codeListViewStore } from "@/store";
 import {getAddressStr} from "@/api/query";
+import {eventBus} from "@/utils/event-bus";
 const opertaor = dataOpertaor();
 const param = ref({});
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
@@ -146,14 +147,25 @@ onMounted(() => {
      item['rules'] = [getRules("vehiclePlate", {})];
     }
 
-
-
     // 车架号校验
     // Dist.cVinCode  getRules   { rules: [getRules("faxNumber", {})] }
     if(item.prop =='Dist.cVinCode'){
      item['rules'] = [getRules("vinNumber", {})];
     }
 
+    // 043009 实际用工地址关联
+    if(item.prop === 'Dist.cEmploymentAddress'){
+      eventBus.emit('ProjectDist043009', (res: any) => {
+        if(res) {
+          item['loadData'] = res.map((m: any) => {
+            return {
+              label: m['Dist.cDetailedAddress'],
+              value: m['Dist.cPkId']
+            }
+          })
+        }
+      });
+    }
 
     console.log(item)
 
