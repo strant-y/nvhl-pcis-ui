@@ -58,14 +58,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "primary",
         label: "查询",
         func: async () => {
-          handleQuery();
-          // freeEditRef.value?.validate().then((isValid) => {
-          //   if (isValid) {
-          //     handleQuery();
-          //   } else {
-          //     ElMessage.error("请填写必填项");
-          //   }
-          // });
+         // handleQuery();
+           freeEditRef.value?.validate().then((isValid) => {
+             if (isValid) {
+               handleQuery();
+             } /*else {
+               ElMessage.error("请填写必填项");
+             }*/
+           });
         },
       }),
     ],
@@ -73,8 +73,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cSuperCde",
         inputtype: "rtselect",
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {'message':'请选择一级分类'})],
         title: "一级分类",
+        clearable:true,
         typeCode: "Industry_Category_List2",
         codeParam: { cParCde: "hangyefenlei2" },
         func: (val) => {
@@ -99,8 +100,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cMaxCde",
         inputtype: "rtselect",
         title: "二级分类",
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {'message':'请选择二级分类'})],
         loadData: [],
+        clearable:true,
         func: (val) => {
           setValue("cMidCde", "");
           if (val) {
@@ -121,9 +123,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cMidCde",
         inputtype: "rtselect",
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {'message':'请选择三级分类'})],
         title: "三级分类",
         loadData: [],
+        clearable:true
+
       },
       {
         prop: "cCde",
