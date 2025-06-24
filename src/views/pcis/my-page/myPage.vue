@@ -2074,6 +2074,23 @@ const savePlyInfo = async () => {
   btn.loading = true;
   const res = opertaor.getDataAll();
 
+  console.log('保费====',res)
+  let payList = res.payinfo;
+  // Base.nPrm
+  // payinfo
+  if(payList.length>0){
+      let numS =0;
+        payList.forEach((item) => {
+        numS+= item['Pay.nPayablePrm']
+      });
+      if(numS>res['base']['Base.nPrm']){
+
+        ElMessage.error('缴费计划“应收保费”之和大于整单保费！')
+         btn.loading = false;
+        return false;
+      }
+  }
+
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;

@@ -314,14 +314,19 @@ const method = {
         rules: [getRules("required", {})],
       });
 
-           //实名认证方式
-      setFormItem("Insured.cRealnameAuthType", {
-        rules: [getRules("required", {})],
-      });
- 
 
-      // // 移动电话
-      // setFormItem("Insured.cMobile", { rules: [getRules("phoneNo", {})] });
+      let cWorkDpt = getValue('Insured.cWorkDpt')
+      if(cWorkDptList.includes(cWorkDpt)){
+          setFormItem("Insured.cRealnameAuthType", {
+            rules: [getRules("required", {})],
+          });
+      }else{
+          setFormItem("Insured.cRealnameAuthType", {
+            rules: [],
+          });
+      }
+
+      // 移动电话
       let cMobile = getValue('Insured.cMobile');  // 移动 
       let cTel = getValue('Insured.cTel');  // 固定电话    
       if(!cMobile &&  !cTel ){
@@ -335,6 +340,17 @@ const method = {
         setFormItem("Insured.cTel", { rules: [getRules("required", {}),getRules("phone", {})] });
         setFormItem("Insured.cMobile", { rules: [ getRules("phoneNo", {})]})
       }
+
+      // 性别 、年龄、生日个人必填
+      setFormItem("Insured.tBirthday", {
+        rules: [getRules("required", {})]
+      });
+      setFormItem("Insured.nAge", {
+       rules: [getRules("required", {})]
+      });
+      setFormItem("Insured.cSex", {
+        rules: [getRules("required", {})]
+      });
 
 
       codeListStore
@@ -420,22 +436,17 @@ const method = {
         rules: null,
       });
 
-            // 为法人  企业成立日期
+      // 为法人  企业成立日期
       setFormItem("Insured.tEstablishingDate", {
         rules: null,
       });
 
-      if(!cWorkDptList.includes(getValue('Insured.cWorkDpt'))){
-        //实名认证方式
-        setFormItem("Insured.cRealnameAuthType", {
-          rules: [],
-        });
-      }
-      
-
+      //实名认证方式
+      setFormItem("Insured.cRealnameAuthType", {
+        rules: [],
+      });
       setValue("Insured.cGreenIndustryCustomers", "");
       setValue('Insured.cGreenIndustryList','')
-
       setValue("Insured.cIsMicroEntpris", "");
       // setValue("Insured.cCertfCls", "");
       setFormItem("Insured.cCntrNme", { rules: null });
@@ -453,6 +464,17 @@ const method = {
         rules: [ getRules("required", {}), getRules("phoneNo", {})],
       });
       setFormItem("Insured.cTel", { rules: [getRules("phone", {})] });
+
+      // 性别 、年龄、生日个人必填
+      setFormItem("Insured.tBirthday", {
+        rules: []
+      });
+      setFormItem("Insured.nAge", {
+       rules: []
+      });
+      setFormItem("Insured.cSex", {
+        rules: []
+      });
 
 
       codeListStore
@@ -910,10 +932,8 @@ const method = {
   cWorkDptChange:(val:any)=>{
       console.log('单位性质',val)
       let cClntMrk = getValue('Insured.cClntMrk');  // 投保人性质 
-      if(cWorkDptList.includes(val) || cClntMrk =='0'){
-        console.log(12)
-          //实名认证方式
-          // setFormItem("Insured.cRealnameAuthType", {
+        //实名认证方式
+      if(cWorkDptList.includes(val) && cClntMrk =='0'){
           setFormItem("Insured.cRealnameAuthType", {
             rules: [getRules("required", {})],
           });
