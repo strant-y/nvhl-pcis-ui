@@ -41,23 +41,23 @@
             <div class="content-details">
               <span class="round"></span>
               <span class="details-title">今日总录单：</span>
-              <span class="details-content">10000单</span>
+              <span class="details-content">{{ dayTotalRecords }}单</span>
             </div>
             <div class="content-details">
               <span class="round"></span>
               <span class="details-title">本周总录单：</span>
-              <span class="details-content">100000单</span>
+              <span class="details-content">{{ weekTotalRecords }}单</span>
             </div>
             <div class="content-details">
               <span class="round"></span>
               <span class="details-title">本月总录单：</span>
-              <span class="details-content">10000单</span>
+              <span class="details-content">{{ monthTotalRecords }}单</span>
             </div>
-            <div class="content-details">
+            <!-- <div class="content-details">
               <span class="round"></span>
               <span class="details-title">总占比录单：</span>
               <span class="details-content">7.70%</span>
-            </div>
+            </div> -->
           </div>
           <div class="content-charts-box">
             <div class="tab-box">
@@ -79,7 +79,7 @@
           <div class="user-box">
             <img :src="headIcon" alt="">
             <div class="user-info">
-              <div class="user-name">大大依依</div>
+              <div class="user-name">{{ user.opCnm }}</div>
               <rtButton :item="{label:'出单测试',size: 'small'}" />
             </div>
           </div>
@@ -111,7 +111,7 @@
           <div class="content-list-box">
             <div class="list-title">
               <div class="title-line">
-                <span class="title">代办事项</span>
+                <span class="title">待办事项</span>
                 <img class="icon" :src="labelIcon" alt="">
               </div>
               <rtButton :item="{label:'查看全部',type:'text'}" />
@@ -243,6 +243,9 @@ const moreurl = ref('');
 const shortListData = ref(null)  // 第二模块tabl列表数据
 const headIcon = `/src/assets/images/${userStore.user.cCssStyle === '2' ? '0' : '1'}_.png`
 const shorMenuList = ref([])// 快捷菜单列表
+const dayTotalRecords = ref(0)// 今日总录单
+const weekTotalRecords = ref(0)// 本周总录单
+const monthTotalRecords = ref(0)// 本月总录单
 
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -369,6 +372,21 @@ function init() {
     ecahrtsRefInstance = echarts.init(ecahrtsRef.value)
   }
   handleRefreshEcharts()
+  getOrderInfo()
+}
+
+function getOrderInfo() {
+   getAnalysis({type:'ply_total'}).then((res:any) => {
+    if(res.code === 200) {
+      dayTotalRecords.value = res.dataMapList?.find((item:any) => item.unit === "day").num
+      weekTotalRecords.value = res.dataMapList?.find((item:any) => item.unit === "week").num
+      monthTotalRecords.value = res.dataMapList?.find((item:any) => item.unit === "month").num
+    } else {
+      ElMessage.error(res.msg)
+    }
+  }).catch(err => {
+    ElMessage.error(err)
+  })
 }
 
 function handleRefreshEcharts() {
