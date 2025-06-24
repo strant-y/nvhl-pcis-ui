@@ -375,6 +375,15 @@ const method = {
     const param = opertaor.getParam();
 
     if (val == "0") {
+      setFormItem("Applicant.tBirthday", {
+        rules: null
+      });
+      setFormItem("Applicant.nAge", {
+        rules: null
+      });
+      setFormItem("Applicant.cSex", {
+        rules: null
+      });
       // Applicant.cWorkDpt
       productStore.setcClntMrk(val);
       // 办理人
@@ -502,6 +511,15 @@ const method = {
           });
         });
     } else {
+      setFormItem("Applicant.tBirthday", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.nAge", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.cSex", {
+        rules: [getRules("required", {})],
+      });
       setFormItem("Applicant.cWorkDpt", { rules: null });
       setFormItem("Applicant.cIsMicroEntpris", {
         disabled: true,

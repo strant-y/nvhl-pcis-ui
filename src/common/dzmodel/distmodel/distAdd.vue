@@ -166,6 +166,12 @@ onMounted(() => {
         }
       });
     }
+    if(item.prop =='Dist.cSchoolName'){
+      item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+    }
+    if(item.prop =='Dist.cIdentificationNumber'){
+      item['rules'] = [ getRules("idCard", {})];
+    }
 
     console.log(item)
 

@@ -276,6 +276,15 @@ const method = {
     checkUser();
     // val  0法人 1个人
     if (val == "0") {
+      setFormItem("Insured.tBirthday", {
+        rules: null
+      });
+      setFormItem("Insured.nAge", {
+        rules: null
+      });
+      setFormItem("Insured.cSex", {
+        rules: null
+      });
       // setValue("Insured.cCertfCls", "");
       setFormItem("Insured.cCntrNme", { rules: [getRules("required", {})] });
       setFormItem("Insured.cCntrCertfCde", {
@@ -394,6 +403,15 @@ const method = {
         hidden: true,
       });
     } else {
+      setFormItem("Insured.tBirthday", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.nAge", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.cSex", {
+        rules: [getRules("required", {})],
+      });
       if (!param.initFlag) {
         setFormItem("Insured.cWorkDpt", {
           disabled: false,
