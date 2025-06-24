@@ -5,6 +5,7 @@
         :tableConfig="tableconfig"
         v-model:pageresult="pageresult"
         ref="distTableRef"
+        @pageChange="method.handleQuery"
       />
     </myCard>
     <comDialog ref="dialog"></comDialog>
@@ -185,7 +186,7 @@ onMounted(async () => {
   tableconfig.value.tableBtnType = "btn";
   tableconfig.value.tableBtnWidth = 150;
   tableconfig.value.tableBtnPosition = "right";
-    tableconfig.value.isPage = false;
+  tableconfig.value.isPage = true;
   if (formconfig11.value.editBtns && formconfig11.value.editBtns.length > 0) {
     let btns: any[] = [];
     btns = formconfig11.value.editBtns;
@@ -194,7 +195,6 @@ onMounted(async () => {
     }
   }
  
-  tableconfig.value.isPage = false;
   // 初始化 cComponentTableValue
   cComponentTableValue = getCComponentTableValue(
     route.params.param.cProdNo,
@@ -315,7 +315,7 @@ const method = {
     });
   },
 
-  handleQuery: () => {
+  handleQuery: (queryParams: any = { pageNum: 1 }) => {
     let tgtRef = opertaor.getTableRefByKey('tgt')
     const param = opertaor.getParam();
     let app = "";
@@ -329,6 +329,7 @@ const method = {
     const selData = {
       cComponentTable: cComponentTableValue,
       cAppNo: app,
+      ...queryParams
     };
     selectDist(selData).then((res: any) => {
       if (res.code === 200) {

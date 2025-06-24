@@ -173,7 +173,7 @@ function handleRowClick(row: any) {
 }
 
 function pageChange() {
-  emits("pageChange");
+  emits("pageChange", queryParams);
 }
 
 function getPartnerPage(flag = true) {
