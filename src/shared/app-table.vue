@@ -173,7 +173,7 @@ function handleRowClick(row: any) {
 }
 
 function pageChange() {
-  emits("pageChange");
+  emits("pageChange", queryParams);
 }
 
 function getPartnerPage(flag = true) {
@@ -219,13 +219,13 @@ function getFormBtn() {
   return btnMap.value
 }
 function getTableBtn() {
-  const btnMap = ref({});
+  const map = ref({});
   appgrideditConfig.tableBtn?.forEach((btn: any) => {
     if(btn.id) {
-      btnMap.value[btn.id] = btn
+      map.value[btn.id] = btn
     }
   });
-  return btnMap.value
+  return map.value
 }
 
 defineExpose({

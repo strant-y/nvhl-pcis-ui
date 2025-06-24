@@ -5,6 +5,7 @@
         :tableConfig="tableconfig"
         v-model:pageresult="pageresult"
         ref="distTableRef"
+        @pageChange="method.handleQuery"
       />
     </myCard>
     <comDialog ref="dialog"></comDialog>
@@ -25,6 +26,7 @@ import {
   selectDist,
   checkAppBase,
   deleteDist,
+  distMapCollectCompKey,
   downloadDistTemplate,
   syncDist,
   exportDist
@@ -75,90 +77,18 @@ let fileBase: string;
 let cComponentTableValue: string;
 
 // 封装获取 cComponentTableValue 的逻辑
-const getCComponentTableValue = (cProdNo: string, title: string): string => {
-  console.log(title,"title00000")
-  // if (cProdNo == "040001") {
-  //   return "AddressDist";
-  // } else if (cProdNo == "040002") {
-  //   if (title == "雇员清单") {
-  //     return "EmployeeDist";
-  //   } else if (title == "雇员清单汇总") {
-  //     return "DistSummary";
-  //   } else if (title == "车辆清单") {
-  //     return "VehicleDist";
-  //   } else if (title == "车辆清单汇总") {
-  //     return "DistSummary";
-  //   }
-  // } else if (cProdNo == "040003") {
-  //   if(title == "产品清单"){
-  //     return "ProductDist";
-  //   }else if(title =="销售区域清单"){
-  //     return "SalesDist";
-  //   }
-  // } else if(cProdNo == "040005"){
-  //   if(title =="地址清单信息"){
-  //     return "AddressDist";
-  //   }else if(title == "人员清单"){
-  //     return "EducatorDist"
-  //   }
-  // }else if(cProdNo == "040020"){
-  //     return "PersonnelDist";
-  // }else if(cProdNo == "042001"){
-  //     return "DesignDist"
-  // }else if(cProdNo == "042003"){
-  //     return "EducatorDist"
-  // }else if(cProdNo == "043001"){
-  //   return "ElevatorDist";
-  // } else if (cProdNo == "043002") {
-  //   return "VehicleDist";
-  // } else if(cProdNo == "043007"){
-  //   return "VehicleDist";
-  // }else if (cProdNo == "043009") {
-  //   if (title == "实际用工地址/工程项目地址清单") {
-  //     return "ProjectDist";
-  //   } else if (title == "从业人员清单") {
-  //     return "EmployeeDist";
-  //   } else if (title == "从业人员清单汇总") {
-  //     return "DistSummary";
-  //   }
-  // }else if(cProdNo == "043010"){
-  //   return "EducatorDist"
-  // } else if(cProdNo == "043013"){
-  //   return "PollutionDist"
-  // }else if(cProdNo =="043020"){
-  //   if(title =="房屋清单"){
-  //     return "AddressDist"
-  //   }else if(title =="家庭成员清单"){
-  //     return "FamilyDist"
-  //   }
-  // }else if(cProdNo =="045001"){
-  //   if(title =="雇员清单信息"){
-  //     return "EmployeeDist"
-  //   }else if(title =="工程项目地址清单"){
-  //     return "ProjectDist"
-  //   }
-  // }
-  return props.compKey ? props.compKey.substring(0, props.compKey.length - 6) : "";
+const getCComponentTableValue = (): string => {
+  return props.compKey ? props.compKey.replace(/\d+/g, '') : "";
 };
 
+const distSummaryRef = ref(); // 汇总组件对象
+const collectCompKey = ref(); // 汇总组件key
 const formconfig11 = ref<any>({});
 onMounted(async () => {
-  console.log(tableconfig.value,"09999")
-  // const processedFromSchema = props.pageSchema.fromSchema.map((item) => {
-  //   return Object.keys(item).reduce(
-  //     (acc, key) => {
-  //       if (typeof item[key] === "string" && item[key].startsWith("Dist.")) {
-  //         acc[key] = item[key].replace(/^Dist\./, "");
-  //       } else {
-  //         acc[key] = item[key];
-  //       }
-  //       return acc;
-  //     },
-  //     {} as Record<string, any>
-  //   );
-  // });
+  // 初始化 cComponentTableValue
+  cComponentTableValue = getCComponentTableValue();
+
   formconfig11.value = formInit(
-    // JSON.stringify({ ...props.pageSchema, fromSchema: processedFromSchema }),
     JSON.stringify({ ...props.pageSchema }),
     method,
     exRules
@@ -185,7 +115,7 @@ onMounted(async () => {
   tableconfig.value.tableBtnType = "btn";
   tableconfig.value.tableBtnWidth = 150;
   tableconfig.value.tableBtnPosition = "right";
-    tableconfig.value.isPage = false;
+  tableconfig.value.isPage = true;
   if (formconfig11.value.editBtns && formconfig11.value.editBtns.length > 0) {
     let btns: any[] = [];
     btns = formconfig11.value.editBtns;
@@ -194,19 +124,26 @@ onMounted(async () => {
     }
   }
  
-  tableconfig.value.isPage = false;
-  // 初始化 cComponentTableValue
-  cComponentTableValue = getCComponentTableValue(
-    route.params.param.cProdNo,
-    formconfig1.value.title
-  );
-  nextTick(() => {
+  distMapCollectCompKey({
+    cProdNo: route.params.param.cProdNo,
+    cComponentKey: props.compKey,
+  }).then((res) => {
+    collectCompKey.value = res;
+    // 获取清单对应的汇总组件对象
+    distSummaryRef.value = opertaor.getTableRefByKey(collectCompKey.value);
+    if(distSummaryRef.value) {
+      // 设置汇总组件里对应的清单vo
+      distSummaryRef.value?.setDistCompKey(cComponentTableValue);
+    }
+    // 初始化页面数据
     method.handleQuery();
   });
 
   // 电梯信息清单
-  let tgtRef = opertaor.getTableRefByKey('tgt')
-  tgtRef.setValue("Tgt.nElevatorsNumber",pageresult.list.length)
+  let tgtRef = opertaor.getTableRefByKey('tgt');
+  if(tgtRef){
+    tgtRef.setValue("Tgt.nElevatorsNumber",pageresult.list.length)
+  }
 });
 
 // const  modifyRules = (data, fieldValue)=> {
@@ -315,7 +252,7 @@ const method = {
     });
   },
 
-  handleQuery: () => {
+  handleQuery: (queryParams: any = { pageNum: 1 }) => {
     let tgtRef = opertaor.getTableRefByKey('tgt')
     const param = opertaor.getParam();
     let app = "";
@@ -329,6 +266,7 @@ const method = {
     const selData = {
       cComponentTable: cComponentTableValue,
       cAppNo: app,
+      ...queryParams
     };
     selectDist(selData).then((res: any) => {
       if (res.code === 200) {
@@ -352,10 +290,10 @@ const method = {
           tgtRef.setValue("Tgt.nElevatorsNumber",res.data.total)
         }
 
-        // 刷新汇总表格 DistSummary045001'
-        const compKey = 'DistSummary' + route.params.param.cProdNo
-        const distSummary = opertaor.getTableRefByKey(compKey)
-        distSummary?.handleQuery();
+        // 刷新汇总表格
+        if(distSummaryRef.value) {
+          distSummaryRef.value?.handleQuery();
+        }
       }
     });
   },

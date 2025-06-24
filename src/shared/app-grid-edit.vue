@@ -140,21 +140,21 @@ function addRowByData(data: any) {
   rttableFrom.value?.addRowByData(data);
 }
 
-function setDisabledAll() {
+function setDisabledAll(isDisabled: boolean = true) {
   if (
     props.gridEditConfig.titleBtns &&
     props.gridEditConfig.titleBtns.length > 0
   ) {
     props.gridEditConfig.titleBtns.forEach((item) => {
-      item.hidden = true;
+      item.hidden = isDisabled;
     });
   }
   if (props.gridEditConfig.endBtns && props.gridEditConfig.endBtns.length > 0) {
     props.gridEditConfig.endBtns.forEach((item) => {
-      item.hidden = true;
+      item.hidden = isDisabled;
     });
   }
-  gridEditConfig.value.editFlag = false;
+  gridEditConfig.value.editFlag = !isDisabled;
 }
 
 function getSelectRow() {

@@ -345,14 +345,22 @@ function getFormBtn() {
 function getTableBtn() {
   return distTableRef?.value?.getTableBtn();
 }
-function setDisabledAll() {
+function setDisabledAll(isDisabled: boolean, noSet: string[] = []) {
   const tableBtn = getTableBtn();
   if(tableBtn && Object.keys(tableBtn).length > 0) {
-    Object.keys(tableBtn).forEach((key: any) => {tableBtn[key].hidden = true;});
+    Object.keys(tableBtn).forEach((key: any) => {
+      if(!noSet.includes(key)) {
+        tableBtn[key].hidden = isDisabled;
+      }
+    });
   }
   const formBtn = getFormBtn();
   if(formBtn && Object.keys(formBtn).length > 0) {
-    Object.keys(formBtn).forEach((key: any) => {formBtn[key].hidden = true;})
+    Object.keys(formBtn).forEach((key: any) => {
+      if(!noSet.includes(key)) {
+        formBtn[key].hidden = isDisabled;
+      }
+    })
   }
 }
 defineExpose({

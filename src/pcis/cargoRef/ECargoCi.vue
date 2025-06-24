@@ -55,10 +55,10 @@ onMounted(async () => {
 
 // 绑定方法
 const method = {
-  ciAdd: () => {
+  addCiRow: () => {
     console.log("ciAdd",param);
     const cCiMrkFlag = formPage.getFormDataById("AgreementBase")['ECargoBase.cCiMrk'];
-    const val = getFromValue();
+    const val = getFormValue();
     const totalCiShare = val.reduce((sum, row) => sum + parseFloat(row['Ci.nCiShare'] || 0), 0);
     // 判断总和是否等于 1
     if (totalCiShare >= 1) {
@@ -88,14 +88,14 @@ const method = {
     updateMasterAgreementValues()
   },
   ciDelete:()=>{
-    const selData=freeEditRef?.value?.getSelectRow()
+    const selData=freeEditRef?.value?.getSelectRow();
       if (!selData) {
           ElMessage.error("请选择要删除的数据!");
           return;
       }
-      const editIndex=selData['_dataId']
+      const editIndex=selData['_dataId'];
       freeEditRef?.value?.delRow(editIndex);
-      const val=getFromValue()
+      const val = getFormValue();
       val.forEach((key,index) => {
           key['Ci.nSeqNo']=index+1
       });
@@ -535,7 +535,7 @@ const updateMasterAgreementValues = () => {
 const onChiefMrkChange = () => {
   const rowData = freeEditRef.value?.getSelectRow();
   const rowId = rowData?._dataId;
-  const cCiMrk =  formPage.getComponentRefById("AgreementBase").getFromValue();
+  const cCiMrk =  formPage.getComponentRefById("AgreementBase").getFormValue();
   // const aa = 
   if (!rowData || !rowId) return;
   const cCoinsurerCde = rowData["Ci.cCoinsurerCde"];  //获取当前行的联共保公司编码
@@ -663,8 +663,8 @@ function getTableValue(rowId: number, key: string) {
 function getFormConfig(){
   return formconfig1;
 }
-function setDisabledAll() {
-  return freeEditRef?.value?.setDisabledAll();
+function setDisabledAll(isDisabled: boolean) {
+  return freeEditRef?.value?.setDisabledAll(isDisabled);
 }
 defineExpose({
   getFormValue,
