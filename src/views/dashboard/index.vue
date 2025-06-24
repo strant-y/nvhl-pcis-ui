@@ -36,7 +36,9 @@
               <img class="icon" :src="labelIcon" alt="">
             </div>
           </div>
-          <div class="title-second">渠道出单量统计图</div>
+          <div class="statistic-tab-box">
+            <span v-for="item in statisticTabList" :key="item" class="tab-item" @click="">{{ item }}</span>
+          </div>
           <div class="content-details-box">
             <div class="content-details">
               <span class="round"></span>
@@ -61,10 +63,6 @@
           </div>
           <div class="content-charts-box">
             <div class="tab-box">
-              <div class="checkbox">
-                <rtcheckbox :item="{}" />
-                查看录单KOL量
-              </div>
               <div class="tab-btns">
                 <rtButton :item="issueBtnItem"/>
                 <rtButton :item="nPrmBtnItem"/>
@@ -178,6 +176,7 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 import { AppKey } from '@/constants/api';
 import { useDzModal } from "@/common/dzmodel/DzModalService";
+import { statisticProps } from 'element-plus';
 const dzmodal = useDzModal();
 const shortMenuDialog = defineAsyncComponent(() =>
   import("./components/shortMenuDialog.vue")
@@ -243,9 +242,6 @@ const moreurl = ref('');
 const shortListData = ref(null)  // 第二模块tabl列表数据
 const headIcon = `/src/assets/images/${userStore.user.cCssStyle === '2' ? '0' : '1'}_.png`
 const shorMenuList = ref([])// 快捷菜单列表
-const dayTotalRecords = ref(0)// 今日总录单
-const weekTotalRecords = ref(0)// 本周总录单
-const monthTotalRecords = ref(0)// 本月总录单
 
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -366,6 +362,21 @@ const echartsOptions = reactive({
   ]
 })
 const tabs = ref<Array<any>>([]); //tabs数组
+const statisticTabList = ref<Array<any>>([]);
+const tabDataMap = ref({});
+const currentTab = ref("");
+const dayTotalRecords = computed(() => {
+  const currentItem = tabDataMap.value ? [currentTab.value] : [];
+  return currentItem.length > 0 ? currentItem.find((item:any) => item.unit === "day")?.num : 0
+})// 今日总录单
+const weekTotalRecords = computed(() => {
+  const currentItem = tabDataMap.value ? [currentTab.value] : [];
+  return currentItem.length > 0 ? currentItem.find((item:any) => item.unit === "week")?.num : 0
+})// 本周总录单
+const monthTotalRecords = computed(() => {
+  const currentItem = tabDataMap.value ? [currentTab.value] : [];
+  return currentItem.length > 0 ? currentItem.find((item:any) => item.unit === "month")?.num : 0
+})// 本月总录单
 
 function init() {
   if(!ecahrtsRefInstance) {
@@ -378,9 +389,10 @@ function init() {
 function getOrderInfo() {
    getAnalysis({type:'ply_total'}).then((res:any) => {
     if(res.code === 200) {
-      dayTotalRecords.value = res.dataMapList?.find((item:any) => item.unit === "day").num
-      weekTotalRecords.value = res.dataMapList?.find((item:any) => item.unit === "week").num
-      monthTotalRecords.value = res.dataMapList?.find((item:any) => item.unit === "month").num
+      tabDataMap.value = res.dataMap;
+      const keys = Object.keys(res.dataMap);
+      currentTab.value = keys[0];
+      statisticTabList.value = keys
     } else {
       ElMessage.error(res.msg)
     }
@@ -809,9 +821,17 @@ window.addEventListener('resize', () => {
           }
         }
 
-        .title-second {
+        .statistic-tab-box {
           margin: 10px 0;
           color: #666;
+          display: flex;
+          .tab-item {
+            margin-right: 10px;
+            cursor: pointer;
+            &:hover {
+              color: var(--el-color-primary);
+            }
+          }
         }
 
         .content-details-box {
@@ -836,7 +856,7 @@ window.addEventListener('resize', () => {
         .content-charts-box {
           .tab-box {
             display: flex;
-            justify-content: space-between;
+            justify-content: end;
             align-items: center;
             margin: 20px 0;
             color: #666;
