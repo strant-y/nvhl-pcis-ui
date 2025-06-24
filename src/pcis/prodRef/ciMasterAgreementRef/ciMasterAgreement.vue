@@ -11,6 +11,7 @@ import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
 import { useProductStore } from "@/store/modules/prod";
+import { fa } from "element-plus/es/locale";
 const productStore = useProductStore();
 const props = defineProps({
   pageSchema: {
@@ -51,6 +52,10 @@ watchEffect(() => {
             item.hidden = true; // 隐藏其他字段
           }
         });
+      }else if(cCiMrkValue === "1" || cCiMrkValue ==="2" || cCiMrkValue ==="6"){
+        formconfig1.fromSchema?.forEach((item)=>{
+          item.hidden = false;
+        })
       }
 });
 
