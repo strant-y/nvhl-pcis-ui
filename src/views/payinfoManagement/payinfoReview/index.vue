@@ -284,7 +284,7 @@ const tableconfig = reactive<AppTableConfig>(
         minWidth: 180,
       },
       {
-        prop: "cAppNum",
+        prop: "cTermName",
         inputtype: "rtinput",
         title: "条款",
         minWidth: 180,
