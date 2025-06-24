@@ -166,34 +166,6 @@ const method = {
       );
     }
   },
-  //共保公司下拉事件
-  cCoinsurerCdeOnInit:(val)=>{
-    const rowData = freeEditRef.value?.getSelectRow();
-    if (!rowData) return;
-    
-    const rowId = rowData._dataId;
-    if (val.value === "327001") {
-      // 如果选择的是永安保险，加载对应的分公司列表
-      codeListStore
-        .queryCodeList({
-          codeListName: "Comm_Code_LIST",
-          codeListParam: { "CParCde": "subdpt", cParCde: "327001" },
-        })
-        .then((res) => {
-          freeEditRef.value?.setRowFieldProp(
-            rowId,
-            "Ci.cSubDptCde",
-            "loadData",
-            res
-          );
-        });
-        freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
-        );
-    } else if(val !='327001') {
-      freeEditRef.value?.setRowFieldProp(rowId,"Ci.cSubDptCde","loadData",[{ value: '1', label: '其他' }]);
-    }
-  },
 
   cCoinsurerCdeChange:(val)=>{
     const rowData = freeEditRef.value?.getSelectRow();
