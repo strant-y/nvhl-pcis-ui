@@ -60,14 +60,15 @@
                   @click="handleAnchorClick($event, `#${k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey}`)"
                   :class="i === 0 ? 'isActive' : ''"
                 >
-                  <rt-icon
+                  <!-- <rt-icon
                     :item="{
                       icon:
                         k.icon && k.icon !== 'null' && k.icon !== ''
                           ? k.icon
                           : 'Tickets',
                     }"
-                  />
+                  /> -->
+                  <i class="icon iconfont icon-wenjianban1"></i>
                   <span style="font-size: 15px" v-if="NavigaShow">
                     <template v-if="k.pageTtile && k.pageTtile.length > 6">
                       <el-tooltip
@@ -2978,13 +2979,13 @@ function getSaveDataParams() {
     padding: 15px 10px;
   } 
   .el-anchor__item {
-    background: #ffffff1a;
     margin-bottom: 10px;
     padding-left: 0;
     border-radius: 8px;
-    opacity: .6;
+    opacity: .4;
     &.isActive {
       opacity: 1;
+      background: #ffffff1a;
     }
     :deep(a) {
       display: flex;
@@ -3000,5 +3001,10 @@ function getSaveDataParams() {
 }
 .el-aside {
   width: auto;
+}
+.iconfont {
+  font-size: 2rem;
+  color: #FFF;
+  margin: 20px 0;
 }
 </style>

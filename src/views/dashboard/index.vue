@@ -37,7 +37,11 @@
             </div>
           </div>
           <div class="statistic-tab-box">
-            <span v-for="item in statisticTabList" :key="item" class="tab-item" @click="">{{ item }}</span>
+            <el-tabs @tab-click="handleStatisticTabClick">
+              <el-tab-pane v-for="tab in statisticTabList" :key="tab" :label="tab">
+              </el-tab-pane>
+            </el-tabs>
+            <!-- <span v-for="item in statisticTabList" :key="item" class="tab-item" @click="handleTabClick(item)">{{ item }}</span> -->
           </div>
           <div class="content-details-box">
             <div class="content-details">
@@ -106,7 +110,7 @@
               </div>
             </div>
           </div>
-          <div class="content-list-box">
+          <!-- <div class="content-list-box">
             <div class="list-title">
               <div class="title-line">
                 <span class="title">待办事项</span>
@@ -130,7 +134,7 @@
                 <div class="item-content">大撒打发斯蒂芬撒打发斯蒂芬大师傅</div>
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
       <div class="bottom-box">
@@ -209,6 +213,9 @@ const issueBtnItem = ref({
   type: 'primary',
   func: () => {
     ecahrtsBtnIndex.value = 0
+    echartsOptions.legend.data = ['每月出单量', '每月出单量同比']
+    echartsOptions.series[0].name = '每月出单量'
+    echartsOptions.series[1].name = '每月出单量同比'
     handleRefreshEcharts()
   },
 })
@@ -217,6 +224,9 @@ const nPrmBtnItem = ref({
   type: 'default',
   func: () => {
     ecahrtsBtnIndex.value = 1
+    echartsOptions.legend.data = ['每月保费量', '每月保费量同比']
+    echartsOptions.series[0].name = '每月保费量'
+    echartsOptions.series[1].name = '每月保费量同比'
     handleRefreshEcharts()
   },
 })
@@ -365,24 +375,32 @@ const tabs = ref<Array<any>>([]); //tabs数组
 const statisticTabList = ref<Array<any>>([]);
 const tabDataMap = ref({});
 const currentTab = ref("");
+// 今日总录单
 const dayTotalRecords = computed(() => {
-  const currentItem = tabDataMap.value ? [currentTab.value] : [];
-  return currentItem.length > 0 ? currentItem.find((item:any) => item.unit === "day")?.num : 0
-})// 今日总录单
+  const currentItem = tabDataMap.value[currentTab.value] || [];
+  const dayInfo = currentItem.find((item:any) => item.unit === "day")
+  const num = dayInfo ? dayInfo.num : 0
+  return num
+})
+// 本周总录单
 const weekTotalRecords = computed(() => {
-  const currentItem = tabDataMap.value ? [currentTab.value] : [];
-  return currentItem.length > 0 ? currentItem.find((item:any) => item.unit === "week")?.num : 0
-})// 本周总录单
+  const currentItem = tabDataMap.value[currentTab.value] || [];
+  const dayInfo = currentItem.find((item:any) => item.unit === "week")
+  const num = dayInfo ? dayInfo.num : 0
+  return num
+})
+// 本月总录单
 const monthTotalRecords = computed(() => {
-  const currentItem = tabDataMap.value ? [currentTab.value] : [];
-  return currentItem.length > 0 ? currentItem.find((item:any) => item.unit === "month")?.num : 0
-})// 本月总录单
+  const currentItem = tabDataMap.value[currentTab.value] || [];
+  const dayInfo = currentItem.find((item:any) => item.unit === "month")
+  const num = dayInfo ? dayInfo.num : 0
+  return num
+})
 
 function init() {
   if(!ecahrtsRefInstance) {
     ecahrtsRefInstance = echarts.init(ecahrtsRef.value)
   }
-  handleRefreshEcharts()
   getOrderInfo()
 }
 
@@ -393,12 +411,18 @@ function getOrderInfo() {
       const keys = Object.keys(res.dataMap);
       currentTab.value = keys[0];
       statisticTabList.value = keys
+      handleRefreshEcharts()
     } else {
       ElMessage.error(res.msg)
     }
   }).catch(err => {
     ElMessage.error(err)
   })
+}
+
+function handleStatisticTabClick(tab:any) {
+  currentTab.value = tab.props.label
+  handleRefreshEcharts()
 }
 
 function handleRefreshEcharts() {
@@ -414,9 +438,10 @@ function handleRefreshEcharts() {
   }
   getAnalysis(param).then((res:any) => {
     if(res.code === 200) {
-      echartsOptions.xAxis[0].data = res.dataMapList.map((item:any) => item.item)
-      echartsOptions.series[0].data = res.dataMapList.map((item:any) => item.value)
-      echartsOptions.series[1].data = res.dataMapList.map((item:any) => item.rate)
+      const data = res.dataMap[currentTab.value] || [];
+      echartsOptions.xAxis[0].data = data.map((item:any) => item.item)
+      echartsOptions.series[0].data = data.map((item:any) => item.value)
+      echartsOptions.series[1].data = data.map((item:any) => item.rate)
       ecahrtsRefInstance?.setOption(echartsOptions)
     } else {
       ElMessage.error(res.msg)
@@ -429,6 +454,7 @@ function handleRefreshEcharts() {
 onMounted(() => {
   init()
   initRoles()
+  getNoticeData()
 });
 
 const initRoles = () => {
@@ -721,6 +747,22 @@ function openShortcutEdit() {
   });
 }
 
+// 获取消息通知数据
+function getNoticeData() {
+  let param = {
+    CReceiver: user.opCde,
+    CState: '0',
+    CType: '0',
+    limit: 10
+  }
+  pcisQueryService.getNotifyByReceiver(param).then((res: any) => {
+    console.log('消息数据', res.data.result)
+    if (res && res.code === 200) {
+      
+    }
+  })
+}
+
 // 窗口大小变化时重置图表
 window.addEventListener('resize', () => {
   if(ecahrtsRefInstance) {
@@ -783,12 +825,18 @@ window.addEventListener('resize', () => {
       .top-menu {
         display: flex;
         padding: 20px 0;
+        color: #333;
+        font-weight: bold;
         .menu-label {
           display: flex;
         }
         .top-menu-list {
           span {
             margin-left: 20px;
+            cursor: pointer;
+            &:hover {
+              color: var(--el-color-primary);
+            }
           }
         }
       }

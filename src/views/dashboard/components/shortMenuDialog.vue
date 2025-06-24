@@ -13,10 +13,6 @@
         :data="shortcutDataList"
       />
     </div>
-    <div class="dialog_button">
-      <el-button @click="dialog.visible = false">取消</el-button>
-      <el-button type="primary" @click="transferDataSendTag">确认</el-button>
-    </div>
     <template #footer>
       <rt-button :item="cancelBtn"/>
       <rt-button :item="confirmBtn"/>

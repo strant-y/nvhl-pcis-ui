@@ -18,6 +18,7 @@ import shareds from "./shared/shared"; //公共组件引用
 import prodRef from "./pcis/prodRef/prodRef"; //产品组件引用
 import popover from "./common/dzpopover/popover"; //弹出框组件引用
 import dzmodel from "./common/dzmodel/dzmodel";  //弹窗公共组件
+import './assets/iconfont/iconfont.css'
 
 const app = createApp(App);
 // 全局注册 自定义指令(directive)
