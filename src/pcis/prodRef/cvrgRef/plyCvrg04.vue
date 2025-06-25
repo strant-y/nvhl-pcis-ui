@@ -288,6 +288,8 @@ onMounted(async () => {
           let data: { [key: string]: any } = {
             "Term.cClauseCode": item.cTermNo,
             "Term.cRdrTyp": item.cRdrTyp,
+            "Term.cUniqueTermNo": item.cUniqueTermNo,
+            "Term.NSeqNo":1,
             riskList: riskList,
           };
           if (item.cRdrTyp === "1") {
@@ -419,7 +421,7 @@ function addTermData(PlanNo: string) {
     {
       isOk: (selectdata: any) => {
         let plans: any[] = [];
-        selectdata.forEach((item: any) => {
+        selectdata.forEach((item: any, index:number) => {
           let riskList: { [key: string]: any }[] = [];
           const se = seld.filter(
             (em) => em["Term.cClauseCode"] === item.cTermNo
@@ -451,6 +453,8 @@ function addTermData(PlanNo: string) {
             data = {
               "Term.cClauseCode": item.cTermNo,
               "Term.cRdrTyp": item.cRdrTyp,
+              "Term.cUniqueTermNo": item.cUniqueTermNo,
+              "Term.NSeqNo": index+1,
             };
           }
           data.riskList = riskList;
