@@ -24,6 +24,8 @@ import { saveDist } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { codeListViewStore } from "@/store";
 import {getAddressStr} from "@/api/query";
+import {eventBus} from "@/utils/event-bus";
+import {calculateAgeFromIdCard} from "@/utils/common";
 const opertaor = dataOpertaor();
 const param = ref({});
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
@@ -54,6 +56,7 @@ const cComponentTable = computed(() => props.data.compKey ? props.data.compKey.r
 
 const dataParams = ref({});
 const appNo = ref("");
+const cGrpMrk = ref("");
 const emits = defineEmits(["handleClose"]);
 const formconfigdist = ref<Record<string, any>>({});
 const formconfig1 = ref<AppFreeEditConfig>(
@@ -110,7 +113,7 @@ onMounted(() => {
   // console.log(333)   distAdd
   dataParams.value = opertaor.getDataAll();
   appNo.value = dataParams.value.plyBase["Base.cAppNo"];
-  
+  cGrpMrk.value = route.params.param.cGrpMrk;
   let newSchema = [];
   let cIs= opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered']  //  是否记名投保
 
@@ -146,14 +149,45 @@ onMounted(() => {
      item['rules'] = [getRules("vehiclePlate", {})];
     }
 
-
-
     // 车架号校验
     // Dist.cVinCode  getRules   { rules: [getRules("faxNumber", {})] }
     if(item.prop =='Dist.cVinCode'){
      item['rules'] = [getRules("vinNumber", {})];
     }
+    // 043009 实际用工地址关联 团单才展示
+    if(item.prop === 'Dist.cEmploymentAddress'){
+      if(cGrpMrk.value !== '1') {
+        item['rules'] = [];
+        item["hidden"] = true;
+      }else {
+        eventBus.emit('ProjectDist043009', (res: any) => {
+          if(res) {
+            item['loadData'] = res.map((m: any) => {
+              return {
+                label: m['Dist.cDetailedAddress'],
+                value: m['Dist.cPkId']
+              }
+            })
+          }
+        });
+      }
+    }
+    // 身份证类型自动回填年龄
+    if(item.prop =='Dist.cIdentificationNumber'){
+      item['func'] = (val: string) => {
+        if(val && val.length === 18 && getValue('Dist.cDocumentType') === '120001') {
+          const age = calculateAgeFromIdCard(val);
+          setValue('Dist.nAge', age);
+        }
+      }
+    }
 
+    if(item.prop =='Dist.cSchoolName'){
+      item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+    }
+    if(item.prop =='Dist.cIdentificationNumber'){
+      item['rules'] = [ getRules("idCard", {})];
+    }
 
     console.log(item)
 

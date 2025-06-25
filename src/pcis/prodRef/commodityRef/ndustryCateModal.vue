@@ -159,7 +159,7 @@ const tableconfig = reactive<AppTableConfig>(
         type: "danger",
         icon: "Check",
         tableClick: async (row) => {
-        props.data.method?.getdbClickData(row);
+          props.data.method?.getdbClickData(row);
         },
       }),
     ],

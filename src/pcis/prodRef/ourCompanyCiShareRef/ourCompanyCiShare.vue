@@ -60,8 +60,37 @@ onMounted(() => {
 const method = {
   // func demo
   func1: () => {},
+  cReceiTitleCdeChange:(val)=>{
+    if(val === '3127001'){
+      setFormItem("Base.cReceiptTitleNme", {disabled: true})
+    }else{
+      setFormItem("Base.cReceiptTitleNme", {disabled: false})
+    }
+  },
 };
-
+//给表单下拉项赋值
+const setFormItem = (key, obj) => {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.loadData && obj.loadData) {
+          let newBtnItems = null;
+          if (obj.loadData.length != 0) {
+            for (let key in obj.loadData) {
+              item.loadData[key] = obj.loadData[key];
+            }
+          } else {
+            item.loadData = obj.loadData;
+          }
+          newBtnItems = item.loadData;
+          newBtnItems && (obj.loadData = newBtnItems);
+        }
+        Object.assign(item, obj);
+      }
+    });
+  }
+};
 // 绑定特殊验证器
 const exRules = {};
 

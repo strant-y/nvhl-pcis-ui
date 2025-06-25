@@ -45,6 +45,7 @@ import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { useRoute } from "vue-router";
 import { runInThisContext } from "vm";
 import { AppFreeEditMethod } from "@/shared/app-free-edit-config";
+import {eventBus} from "@/utils/event-bus";
 const route = useRoute();
 const dialog = ref<DialogMethod | null>(null);
 const opertaor = dataOpertaor();
@@ -294,6 +295,9 @@ const method = {
         if(distSummaryRef.value) {
           distSummaryRef.value?.handleQuery();
         }
+
+        // 注册清单数据导出事件
+        eventBus.on(props.compKey, onDistList);
       }
     });
   },
@@ -385,7 +389,7 @@ const method = {
             ElMessage.success(`导入完成：${res.data.msg}`);
             method.handleQuery();
           } else {
-            ElMessage.error(res.message || "全量导入失败");
+            ElMessage.error(res.msg || "全量导入失败");
           }
         }).catch((error) => {
           ElMessage.error("导入出错，请检查文件格式或内容");
@@ -433,7 +437,7 @@ const method = {
             ElMessage.success(`导入完成：${res.data.msg}`);
             method.handleQuery();
           } else {
-            ElMessage.error(res.message || "增量导入失败");
+            ElMessage.error(res.msg || "增量导入失败");
           }
         }).catch((error) => {
           ElMessage.error("导入出错，请检查文件格式或内容");
@@ -537,6 +541,12 @@ function setUnDisabledByKeyList(key: any) {
   });
 }
 
+function onDistList (callback: Function) {
+  if(typeof callback === 'function') {
+    callback(pageresult.list);
+  }
+}
+
 function getFormconfig() {
   return {
     fromType: "custom",
@@ -588,6 +598,10 @@ function setTableData(data: any) {
 
 // 绑定特殊验证器
 const exRules = {};
+
+onUnmounted(() => {
+  eventBus.off(props.compKey, onDistList);
+});
 
 defineExpose({
   getValue,
