@@ -169,10 +169,12 @@ const method = {
 
   cCoinsurerCdeChange:(val)=>{
     const rowData = freeEditRef.value?.getSelectRow();
+    const formTableData = getFromValue();
+    const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue()
     if (!rowData) return;
     const rowId = rowData._dataId;
     if(!initFlag.value){
-      const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue()
+      
       if (cCiMrk["Base.cCiMrk"] == "5" && val !== "327001") {
         freeEditRef?.value?.setValueByRowKey("Ci.cCoinsurerCde", rowId, "");
         ElMessage.error("司内联保，不能录入除永安以外的其他公司！");
@@ -180,6 +182,7 @@ const method = {
       }
       freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "");
     }
+    debugger
     if (val === "327001") {
       // 如果选择的是永安保险，加载对应的分公司列表
       codeListStore
@@ -199,6 +202,15 @@ const method = {
         freeEditRef.value?.setRowFieldProp(
                 rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
         );
+
+        if(cCiMrk["Base.cCiMrk"] === "3" || cCiMrk["Base.cCiMrk"] ==="4"){
+          const isYonganAlreadyPresent = formTableData.some(row => row['Ci.cCoinsurerCde'] === "327001");
+          if (isYonganAlreadyPresent) {
+              ElMessage.error('主（从）共无联保，我司只能录入一次！');
+              freeEditRef.value?.setValueByRowKey("Ci.cCoinsurerCde", rowId, "");
+              return; 
+          }
+        }
     } else {
       // 非永安保险，设置默认值和其他数据
       freeEditRef.value?.setRowFieldProp(
