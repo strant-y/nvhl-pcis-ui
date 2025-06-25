@@ -1815,11 +1815,13 @@ const calcPremium = () => {
       }
 
       opertaor.setDataAll(ops);
-      nAmt.value = ops["base"]["Base.nAmt"] ? ops["base"]["Base.nAmt"] : 0;
-      nPrm.value = ops["base"]["Base.nPrm"] ? ops["base"]["Base.nPrm"] : 0;
-      const nPrmVal = ops["base"]["Base.nPrm"];
-      const nAmtVal = ops["base"]["Base.nAmt"];
 
+      nPrm.value = ops["base"]["Base.nPrm"] ? ops["base"]["Base.nPrm"] : 0;
+            nAmt.value = ops["base"]["Base.nAmt"] ? ops["base"]["Base.nAmt"] : 0;
+
+      const nAmtVal = ops["base"]["Base.nAmt"];
+      const nPrmVal = ops["base"]["Base.nPrm"];
+      const nPrmRmbExch = ops["base"]["Base.nPrmRmbExch"];
 
 //
       productStore.setnPrm(nPrmVal);
@@ -1843,9 +1845,12 @@ const calcPremium = () => {
       //   .getTableRefByKey("ourCompanyCiShare")
       //   .setValue("Base.nCiOwnPrm", nPrm.value);
 
-        //承保 总保费
+        //承保 总保费  Base.nPrm * Base.nPrmRmbExch
+
+
         opertaor.getTableRefs()["base"].setValue("Base.nPrm", nPrm.value);
-        console.log('到————————')
+        opertaor.getTableRefs()["base"].setValue("Base.nRmbPrm", nPrmVal*nPrmRmbExch);
+        console.log('到————————', nPrm.value)
 
         //     opertaor
         // .getTableRefByKey("ourCompanyCiShare")

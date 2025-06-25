@@ -312,7 +312,6 @@ const method = {
     }
   },
   getcRentalLogoChange:(val:string)=>{
-    console.log('111',val)
     if(val=== '1'){
       setFormItem('Tgt.cBareboatLessee', {
         rules: [getRules("required", {})],
@@ -438,7 +437,6 @@ const method = {
     productStore.setCIsSingle(val)
   },
   funcInsuranceChange: (val) => {
-    console.log(val)
 
     if (params.cProdNo === '043009' || params.cProdNo === '045001'
       ||params.cProdNo === '049035' || params.cProdNo === '049036'
@@ -568,7 +566,6 @@ const method = {
   },
   // 劳务分包合同价格（元）
   nLaborPriceChange: (val) => {
-    console.log(val)
     if (val) {
 
       setFormItem('Tgt.nLaborPrice', {
@@ -587,7 +584,6 @@ const method = {
   },
   // 是否含隧道
   cIncludeBridgesChange: (val) => {
-    console.log(val)
     if (val == 1) {
       setFormItem('Tgt.nBridgeProportion', {
         rules: [getRules("required", {})],
@@ -656,14 +652,24 @@ const method = {
     }
     if(val=='01'){
       setFormItem('Tgt.cShipClassTwo', {disabled:true});
+       setFormItem('Tgt.cShipClassThree',{disabled:false})
     }else{
       setFormItem('Tgt.cShipClassTwo', {disabled:false});
     }
     if(val=='02'){
+      setFormItem('Tgt.cShipClassThree',{disabled:true})
       setFormItem('Tgt.cShipClassTwo', {codeParam:{classone:'level1'},typeCode:'Ship_Class_Level2'});
     }
     if(val=='03'){
-      setFormItem('Tgt.cShipClassTwo', {codeParam:{classone:'level1'},typeCode:'Ship_Class_Level2'});
+      setFormItem('Tgt.cShipClassThree',{disabled:true})
+      setFormItem('Tgt.cShipClassTwo', {codeParam:{classone:'level2'},typeCode:'Ship_Class_Level2',});
+    }
+  },
+  cShipClassTwoChange:(val:any)=>{
+    if(val==='15'){
+        setFormItem('Tgt.cShipClassThree',{disabled:false})
+    }else if(val){
+       setFormItem('Tgt.cShipClassThree',{disabled:true})
     }
   },
   // 核定座位总数
@@ -672,7 +678,7 @@ const method = {
     // Tgt.nSeatCapacity 投保总数
     // const start = getValue("Tgt.tPlannedDate");
     const nSeatCapacity = getValue("Tgt.nSeatCapacity");
-    console.log(v, nSeatCapacity)
+
     if (v !== nSeatCapacity) {
       ElMessage.warning("核定座位总数和投保座位数总数不一致！");
     }
@@ -681,7 +687,7 @@ const method = {
   // 起运港国家 弹框
   countryFun: () => {
     dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
-      console.log('选中了----', res)
+
       if (res.type === "ok") {
         // setFormItem('Tgt.nTotalSalary',
         setValue("Tgt.cDeparturePortCountry",res.body.countryCn)
@@ -693,7 +699,7 @@ const method = {
   // 中转地国家 按钮
   cTransitCountryFun: () => {
     dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
-      console.log('选中了2----', res)
+
       if (res.type === "ok") {
         setValue("Tgt.cTransitCountry", res.body.countryCn);
         setValue("Tgt.cTransitProvince", res.body.portCn);
@@ -704,7 +710,7 @@ const method = {
   // 目的港国家 按钮
   cDestinationPortCountryFun: () => {
     dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
-      console.log('选中了3----', res)
+
       if (res.type === "ok") {
         setValue("Tgt.cDestinationPortCountry", res.body.countryCn);
         setValue("Tgt.cDestinationPortProvince", res.body.portCn);
@@ -716,7 +722,7 @@ const method = {
   // // 起运港国家 按钮
   cDestinationCountryFunc: () => {
     dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
-      console.log('选中了4----', res)
+
       if (res.type === "ok") {
         setValue("Tgt.cDestinationCountry", res.body.countryCn);
         setValue("Tgt.cDestinationProvince", res.body.portCn);
@@ -727,7 +733,7 @@ const method = {
   // 起运地国家 按钮
   cDispatchCountryFunc: () => {
     dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
-      console.log('选中了5----', res)
+
       if (res.type === "ok") {
         setValue("Tgt.cDispatchCountry", res.body.countryCn);
         setValue("Tgt.cDispatchProvince", res.body.portCn);
@@ -735,11 +741,35 @@ const method = {
       };
     });
   },
+  // 起运机场国家
+  cDepartureAirportCountryFunc:()=>{
+        dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
+
+      if (res.type === "ok") {
+        setValue("Tgt.cDepartureAirportCountry", res.body.countryCn);
+        setValue("Tgt.cDepartureAirportProvince", res.body.portCn);
+        setValue("Tgt.cDepartureAirport", res.body.countryCn +'/'+ res.body.portCn);
+      };
+    });
+
+  },
+
+  // 目的地机场国家
+  cDestinationAirportCountryFunc:()=>{
+        dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
+
+      if (res.type === "ok") {
+        setValue("Tgt.cDestinationAirportCountry", res.body.countryCn);
+        setValue("Tgt.cDestinationAirportProvince", res.body.portCn);
+        setValue("Tgt.cDestinationAirport", res.body.countryCn +'/'+ res.body.portCn);
+      };
+    });
+
+  },
 
   //  检验代理人  按钮
   cCheckerCdeFunc: () => {
     dzmodal.open(surveyInfo, { type: "departure", data: {} }).then((res: any) => {
-      console.log('勘察', res)
       if (res.type === "ok") {
 
         setValue("Tgt.cCheckerCde",res.body.cSryDoc);   // 代理人
@@ -756,13 +786,11 @@ const method = {
     if(val){
         const currentYear = new Date().getFullYear();
         const targetYear = new Date(val).getFullYear();
-        console.log(val,targetYear,currentYear - targetYear)
         setValue('Tgt.nShipAge',currentYear - targetYear)
     }
   },
     // 标的信息--证件类型
   cCertificateTypeChange:(val:any)=>{
-      console.log('证件类型--1',val)
       // 道路运输
       if(val==='1'){
 // setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}),getRules("idCard", {})]})  //证件号
@@ -808,7 +836,6 @@ const method = {
 
 // 是否记名投保
 cIsinsuranceRegisteredChange:(val:any)=>{
-    console.log(11122,val)
     if(val=='0'){
         setFormItem('Tgt.cPracticeType',{
           rules:[getRules("required", {})]
@@ -818,8 +845,20 @@ cIsinsuranceRegisteredChange:(val:any)=>{
           rules:[]
         })
     }
+},
+// 投保行业
+getcInsuranceIndustryChange:(val:any)=>{
+    console.log('val-=--',val)
+    if(val ==='8'){
+       setFormItem('Tgt.cIndustryRemarks',{
+          rules:[getRules("required", {})]
+       })
+    }else{
+        setFormItem('Tgt.cIndustryRemarks',{
+          rules:[]
+       })
+    }
 }
-
 
 };
 
