@@ -24,7 +24,15 @@
             热搜菜单:
           </div>
           <div class="top-menu-list">
-            <span v-for="item in shorMenuList" :key="item.name">{{item.name}}</span>
+            <el-tag
+              class="top-menu-text"
+              v-for="tag in shorMenuList"
+              :type="tag.type"
+              :key="tag.name"
+              @click="$router.push(tag.url)"
+            >
+              {{tag.name.replace('事故预防','')}}
+            </el-tag>
           </div>
         </div>
       </div>
@@ -178,6 +186,7 @@ const dzmodal = useDzModal();
 const shortMenuDialog = defineAsyncComponent(() =>
   import("./components/shortMenuDialog.vue")
 );
+import {getShortcutDataList, updateShortRoute} from "@/api/menu";
 
 
 defineOptions({
@@ -448,6 +457,7 @@ onMounted(() => {
   init()
   initRoles()
   getNoticeData()
+  getShortMenuList()
 });
 
 const initRoles = () => {
@@ -733,7 +743,7 @@ function handleSearch(val:any) {
 
 // 编辑快捷菜单
 function openShortcutEdit() {
-  dzmodal.open(shortMenuDialog, { type: "", data: {} }).then((res:any) => {
+  dzmodal.open(shortMenuDialog, { type: "", data: shortcutDataList.value }).then((res:any) => {
     if (res.type === "ok") {
       shorMenuList.value = res.body
     } 
@@ -753,6 +763,27 @@ function getNoticeData() {
     console.log('消息数据', res)
     if (res.code === 200 && res.data.code === '1') {
       noticeList.value = res.data.result
+    }
+  })
+}
+
+// 获取热搜菜单
+const shortcutDataList = ref([])
+const tagType = ["primary", "success", "info", "warning", "danger"];// 标签类型
+function getShortMenuList() {
+  getShortcutDataList().then((res:any) => {
+    if(res.code == 200){
+      shortcutDataList.value = res.data;
+      shorMenuList.value = [];
+      res.data.forEach((d:any, i:boolean) => {
+        if(d.select && shorMenuList.value.length < 5){
+          shorMenuList.value.push({
+            name: d.label,
+            type: tagType[(i % 5) + 1],
+            url: d.url
+          });
+        }
+      })
     }
   })
 }
