@@ -21,6 +21,7 @@ import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 import { useProductStore } from "@/store/modules/prod";
 import CostInformation from "@/views/pcis-new-udr-list/pages/CostInformation.vue";
+import { set } from "lodash";
 const productStore = useProductStore();
 const dialogRef = ref<DialogMethod | null>(null);
 
@@ -182,7 +183,6 @@ const method = {
       }
       freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "");
     }
-    debugger
     if (val === "327001") {
       // 如果选择的是永安保险，加载对应的分公司列表
       codeListStore
@@ -198,17 +198,23 @@ const method = {
             res
           );
         });
-        // updateValidationRule(rowData, 'Ci.cCoinsurerCde', 'Ci.cDptCde', val);
-        freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
-        );
-
-        if(cCiMrk["Base.cCiMrk"] === "3" || cCiMrk["Base.cCiMrk"] ==="4"){
-          const isYonganAlreadyPresent = formTableData.some(row => row['Ci.cCoinsurerCde'] === "327001");
+        // freeEditRef.value?.setRowFieldProp(
+        //         rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
+        // );
+        setFormItem("Ci.cDptCde", { rules: [getRules("required", {})] });
+        setFormItem("Ci.cDptCde", { disabled: false });
+        setFormItem("Ci.nComm", { disabled: false});
+        setFormItem("Ci.cBrkrCde", { disabled: false});
+        setFormItem("Ci.cBrkSlsCde", { disabled: false});
+        setFormItem("Ci.cSlsCde", { disabled: false});
+        if (cCiMrk["Base.cCiMrk"] === "3" || cCiMrk["Base.cCiMrk"] === "4") {
+          const isYonganAlreadyPresent = formTableData.some(
+            (row) => row._dataId !== rowId && row['Ci.cCoinsurerCde'] === "327001"
+          );
           if (isYonganAlreadyPresent) {
-              ElMessage.error('主（从）共无联保，我司只能录入一次！');
-              freeEditRef.value?.setValueByRowKey("Ci.cCoinsurerCde", rowId, "");
-              return; 
+            ElMessage.error('主（从）共无联保，我司只能录入一次！');
+            freeEditRef.value?.setValueByRowKey("Ci.cCoinsurerCde", rowId, "");
+            return;
           }
         }
     } else {
@@ -219,13 +225,13 @@ const method = {
         "loadData",
         [{ value: '1', label: '其他' }]
       );
-      // setFormItem("Ci.cDptCde", { rules: [] });
-      freeEditRef.value?.setRowFieldProp(rowId,"Ci.cDptCde", "rules",[]);
-      freeEditRef.value?.setRowFieldProp(rowId,"Ci.cDptCde",'disabled',true)
-      freeEditRef.value?.setRowFieldProp(rowId,"Ci.nComm",'disabled',true)
-      freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde",'disabled',true)
-      freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkSlsCde",'disabled',true)
-      freeEditRef.value?.setRowFieldProp(rowId,"Ci.cSlsCde",'disabled',true)
+      setFormItem("Ci.cDptCde", { rules: [] });
+      setFormItem("Ci.cDptCde", { disabled: true });
+      setFormItem("Ci.nComm", { disabled: true});
+      setFormItem("Ci.cBrkrCde", { disabled: true});
+      setFormItem("Ci.cBrkSlsCde", { disabled: true});
+      setFormItem("Ci.cSlsCde", { disabled: true});
+      freeEditRef.value?.setValueByRowKey("Ci.cDptCde", rowId, "");
     }
     updateMasterAgreementValues()
   },
@@ -273,6 +279,16 @@ const method = {
         });
     }
     onChiefMrkChange()
+  },
+  cContactTypChange:(val)=>{
+    const rowData = freeEditRef.value?.getSelectRow();
+    const rowId = rowData._dataId;
+    freeEditRef.value?.setRowFieldProp(
+      rowId,
+      "Ci.cContactTyp",
+      "rules",
+      [getRules("phoneNo", {})]
+    );
   },
   //出单机构下拉事件
   cDptCdeChange:(val)=>{
