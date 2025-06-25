@@ -45,7 +45,7 @@ const logo = ref(new URL(`../../../../assets/logo.png`, import.meta.url).href);
     flex-shrink: 0; /* 防止容器在空间不足时缩小 */
     margin-left: 10px;
     font-size: 14px;
-    font-weight: bold;
+    // font-weight: bold;
     color: var(--menu-text);
   }
 }

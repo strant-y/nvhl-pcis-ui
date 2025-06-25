@@ -68,7 +68,7 @@
                           : 'Tickets',
                     }"
                   /> -->
-                  <i class="icon iconfont icon-wenjianban1"></i>
+                  <i :class="['icon','iconfont',iconMap[k.pageKey]]"></i>
                   <span style="font-size: 15px" v-if="NavigaShow">
                     <template v-if="k.pageTtile && k.pageTtile.length > 6">
                       <el-tooltip
@@ -336,6 +336,20 @@ const { isCiJiMrk } = storeToRefs(productStore);
 
 const route = useRoute();
 const router = useRouter();
+const iconMap = ref({
+  'plyBase': 'icon-renyuantiaodu',
+  'applicant': 'icon-renyuantiaodu',
+  'insured': 'icon-renyuantiaodu',
+  'insrnc': 'icon-renyuantiaodu',
+  'dist': 'icon-renyuantiaodu',
+  'distSummary': 'icon-renyuantiaodu',
+  'cvrg': 'icon-renyuantiaodu',
+  'deductibleDist': 'icon-renyuantiaodu',
+  'base': 'icon-renyuantiaodu',
+  'SpecialAgreement': 'icon-renyuantiaodu',
+  'payinfo': 'icon-renyuantiaodu',
+  'image': 'icon-renyuantiaodu',
+})
 
 
 import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
