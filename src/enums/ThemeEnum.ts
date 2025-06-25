@@ -39,13 +39,6 @@ export enum ThemeEnum {
  */
 export enum ThemeSuitedColorEnum{
   default = '#3a76c6',
-  // default = '#FF8C00',
-  sentimental = '#FFAAA6',
-  simple = '#a7b0b8',
-  linen = '#62929a',
-  summer = '#ff6f5e',
-  graceful = '#c7b198',
-  blue = '#3a76c6',
   orange = '#ff8c03',
   green = '#09d067',
 }

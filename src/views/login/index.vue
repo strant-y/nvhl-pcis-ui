@@ -94,7 +94,7 @@
               >
             </div>
           </el-form-item>
-          <el-checkbox> 30天内免登录</el-checkbox>
+          <!-- <el-checkbox> 30天内免登录</el-checkbox> -->
           <!-- 登录按钮 -->
           <el-button
             v-if="!verifyFlag"
@@ -218,7 +218,7 @@
           </el-button>
           
         </el-form>
-        <el-checkbox v-model="agreeTerms">已阅读并同意《用户服务协议》和《隐私政策》</el-checkbox>
+        <!-- <el-checkbox v-model="agreeTerms">已阅读并同意《用户服务协议》和《隐私政策》</el-checkbox> -->
       </el-card>
     </div>
   </el-row>

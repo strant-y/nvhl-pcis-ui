@@ -94,19 +94,12 @@
               <rtButton :item="{label:'查看全部',type:'text'}" />
             </div>
             <div class="list-content">
-              <div class="list-content-item">
+              <div class="list-content-item" v-for="item in noticeList" :key="item.id">
                 <div class="item-title">
-                  <span class="title">永安保险好物节</span>
+                  <span class="title">{{ item.title }}</span>
                   <span class="point"></span>
                 </div>
-                <div class="item-content">大撒打发斯蒂芬撒打发斯蒂芬大师傅山东省地方啊实打实</div>
-              </div>
-              <div class="list-content-item">
-                <div class="item-title">
-                  <span class="title">永安保险好物节</span>
-                  <span class="point"></span>
-                </div>
-                <div class="item-content">大撒打发斯蒂芬撒打发斯蒂芬大师傅山东省地方啊实打实</div>
+                <div class="item-content">{{ item.description }}</div>
               </div>
             </div>
           </div>
@@ -748,6 +741,7 @@ function openShortcutEdit() {
 }
 
 // 获取消息通知数据
+const noticeList = ref([])
 function getNoticeData() {
   let param = {
     CReceiver: user.opCde,
@@ -756,9 +750,9 @@ function getNoticeData() {
     limit: 10
   }
   pcisQueryService.getNotifyByReceiver(param).then((res: any) => {
-    console.log('消息数据', res.data.result)
-    if (res && res.code === 200) {
-      
+    console.log('消息数据', res)
+    if (res.code === 200 && res.data.code === '1') {
+      noticeList.value = res.data.result
     }
   })
 }
@@ -1001,7 +995,8 @@ window.addEventListener('resize', () => {
       }
       .table-box {
         .table {
-          width: 100%;
+          display: flex;
+          flex-direction: column;
         }
       }
     }

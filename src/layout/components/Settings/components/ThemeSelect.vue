@@ -47,30 +47,6 @@ const colors = [
     label: '默认',
   },
   {
-    value: 'linen',
-    label: '藏青',
-  },
-  {
-    value: 'simple',
-    label: '简约',
-  },
-  {
-    value: 'graceful',
-    label: '淡雅',
-  },
-  {
-    value: 'sentimental',
-    label: '青春',
-  },
-  {
-    value: 'summer',
-    label: '夏天',
-  },
-  {
-    value: 'blue',
-    label: '靛蓝',
-  },
-  {
     value: 'orange',
     label: '橙黄',
   },
@@ -92,30 +68,6 @@ const colors = [
 }
 
 .default{
-  background: linear-gradient(to right,  #f0f5f9, #FF8C00);
-  color: white;
-}
-.sentimental{
-  background: linear-gradient(to right,  #bad7df, #FFAAA6);
-  color: white;
-}
-.simple{
-  background: linear-gradient(to right,  #52616b, #c9d6df);
-  color: white;
-}
-.linen{
-  background: linear-gradient(to right,  #1d566e, #62929a);
-  color: white;
-}
-.graceful{
-  background: linear-gradient(to right,  #596e79, #c7b198);
-  color: white;
-}
-.summer{
-  background: linear-gradient(to right,  #40bfc1, #ff6f5e);
-  color: white;
-}
-.blue{
   background: #3a76c6;
   color: white;
 }
