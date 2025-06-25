@@ -369,6 +369,33 @@ export const NewUdrListService = () => {
     }
   }
 
+  // 保存风险单位
+  const saveRiskData = async (ops: any) => {
+    try {
+      return post(`/reinsured/saveRiskData`, ops);
+    } catch (error) {
+      return handleError(error);
+    }
+  }
+
+  //查询风险单位划分
+  const riskQueryData = async (ops: any) => {
+    try {
+      return post(`/reinsured/riskQueryData`, ops);
+    } catch (error) {
+      return handleError(error);
+    }
+  }
+
+  // 查询标的地址下拉选项
+  const queryComponentCodeList = async (ops: any) => {
+    try {
+      return post(`reinsured/queryComponentCodeList`, ops);
+    } catch (error) {
+      return handleError(error);
+    }
+  }
+
   return {
     getNewUdrList,
     getBackUdrList,
@@ -402,5 +429,8 @@ export const NewUdrListService = () => {
     getUdrOpn,
     getReinsuredData,
     queryRiskCodelist,
+    saveRiskData,
+    riskQueryData,
+    queryComponentCodeList,
   };
 }
