@@ -64,6 +64,7 @@ export const getData = () => {
     dataInit["Base.cCiMrk"] = "0";
     dataInit["Base.cIntroDptcde"] = param.cDptCde;
     dataInit["Base.cCiMrk"] = param.cCiMrk || "0";
+    dataInit["Base.nPayNumber"] = '1'; //缴费期数
 
     dataInit["Applicant.cStkMrk"] = "0";
     dataInit["Applicant.cCustRiskRank"] = "925104";

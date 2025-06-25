@@ -1,4 +1,5 @@
 import { FreeButtonBase } from "./button-config";
+import { AppGridEditConfig } from "@/shared/app-grid-edit-config";
 
 export interface AppTableConfig {
 
@@ -27,7 +28,7 @@ export interface AppTableConfig {
   editList?: Array<any>; //指定可编辑列
   showSelection?:boolean; //行多选
   showEdit?: boolean; //是否显示查询表单
-  formconfig?:AppGridEditConfig | null;  //表单配置
+  formconfig?: AppGridEditConfig | null;  //表单配置
   maxHeight?: string;
 
   rowDbClickFun?: (rowData) => void;
@@ -40,6 +41,8 @@ export interface AppTableMethod {
   setValueByRowKey:(props:string ,rowId: any, value:any) => void;
   getRowById:(rowId: string) => void;
   getselectionData:() => any;
+  getFormBtn: () => any;
+  getTableBtn: () => any;
 }
 export interface MyTableMethod {
   addRow: (arg: any) => any;

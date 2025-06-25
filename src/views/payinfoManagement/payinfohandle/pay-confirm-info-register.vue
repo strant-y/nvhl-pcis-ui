@@ -278,6 +278,17 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: '印花税',
         inputtype: "rtinput",
       },
+     {
+        prop: 'CAddto',
+        // disabled: true,
+        title: '是否追加',
+        inputtype: "rtcheckbox",
+         keymap: {
+          y: "1",
+          n: "0",
+        },
+      },
+
     ]
   })
 );
@@ -353,6 +364,16 @@ const formconfigMany= ref( [
         title: '印花税',
         inputtype: "rtinput",
       },
+     {
+        prop: 'CAddto',
+        // disabled: true,
+        title: '是否追加',
+        inputtype: "rtcheckbox",
+         keymap: {
+          y: "1",
+          n: "0",
+        },
+      },
     ]) 
 
 onMounted(async () => {
@@ -385,11 +406,12 @@ function loadPayConfirmInfo(param: any) {
         if (null != res && null != res['code']) {
             if (res['code'] === 200) {
                 const data = res['data'];
-                console.log("eeeeeeee", data)
+              
                 const newdata = {};
                 Object.keys(data).forEach((key) => {
                     const k = firstCharUpper(key);
                     newdata[k] = data[key];
+
                 });
                 freeEditRef.value?.setFormValue(newdata);
             }

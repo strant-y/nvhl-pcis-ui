@@ -28,7 +28,7 @@
               :key="index"
             >
               <template v-if="!item.hidden">
-                <rt-button :item="item" />
+                <rt-button :item="item" :ref="(res: any) => {btnMap[item?.id] = item}"/>
               </template>
             </template>
           </el-col>
@@ -40,7 +40,7 @@
               :key="index"
             >
               <template v-if="!item.hidden">
-                <rt-button :item="item" />
+                <rt-button :item="item" :ref="(res: any) => {btnMap[item?.id] = item}"/>
               </template>
             </template>
           </el-col>
@@ -89,7 +89,7 @@
           v-if="tableConfig.endBtns && tableConfig.endBtns.length > 0"
         >
           <template v-for="(item, index) in tableConfig.endBtns" :key="index">
-            <rt-button :item="item" />
+            <rt-button :item="item" :ref="(res: any) => { btnMap[item?.id] = item}"/>
           </template>
         </div>
       </div>
@@ -108,6 +108,7 @@ defineOptions({
   inheritAttrs: false,
 });
 
+const btnMap = ref({});
 const emits = defineEmits(["pageChange", "selection-change", "status-change", "rowClick"]); // 父组件监听事件，同步子组件值的变化给父组件
 
 const queryParams = reactive<PageQuery>({
@@ -172,7 +173,7 @@ function handleRowClick(row: any) {
 }
 
 function pageChange() {
-  emits("pageChange");
+  emits("pageChange", queryParams);
 }
 
 function getPartnerPage(flag = true) {
@@ -214,6 +215,19 @@ function toggleRowSelection(row: any, selected: boolean) {
   rttableFrom.value?.toggleRowSelection(row, selected);
 }
 
+function getFormBtn() {
+  return btnMap.value
+}
+function getTableBtn() {
+  const map = ref({});
+  appgrideditConfig.tableBtn?.forEach((btn: any) => {
+    if(btn.id) {
+      map.value[btn.id] = btn
+    }
+  });
+  return map.value
+}
+
 defineExpose({
   getPartnerPage,
   getFromValue,
@@ -224,6 +238,8 @@ defineExpose({
 
   clearSelection,
   toggleRowSelection,
+  getFormBtn,
+  getTableBtn
 });
 </script>
 

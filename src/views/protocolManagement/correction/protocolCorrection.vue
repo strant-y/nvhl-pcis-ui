@@ -193,7 +193,6 @@ const pageresult = reactive<Pageresult>({
 
 const tableconfig = reactive<AppTableConfig>(
     createTableEditConfig({
-      showSelection: true,
       tableBtn: [
         createFreeButtonBase({
           id: "score",
@@ -220,11 +219,10 @@ const tableconfig = reactive<AppTableConfig>(
           },
         }),
       ],
-      tableBtnPosition: "left",
-      tableBtnType: "icon",
-      tableBtnWidth: "auto",
+      tableBtnWidth: 120,
+      tableBtnPosition: "right",
+      tableBtnType: "btn",
       title: "协议列表",
-
       fromSchema: [
         {
           prop: "cAgreementNo",

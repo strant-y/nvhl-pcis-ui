@@ -69,13 +69,21 @@ const method = {
     if(getValue("Base.nPayNumber")!=''){
       const totalAmount = Number(getValue("Base.nPrm"));
       const splitCount = Number(getValue("Base.nPayNumber"));
+
+      const totalCent = Math.round(totalAmount * 100);
       const result = ref<number[]>([]);
-      const quotient = Math.floor(totalAmount / splitCount);
-      const remainder = totalAmount % splitCount;
+      const quotient = Math.floor(totalCent / splitCount) ;
+      const remainder = totalCent % splitCount;
+
       result.value = Array(splitCount).fill(quotient);
+      // result.value = result.value.map(cent => parseFloat((cent / 100).toFixed(2)))
       if (remainder > 0) {
         result.value[0] += remainder;
       }
+
+      result.value = result.value.map(cent => parseFloat((cent / 100).toFixed(2)));
+       
+      console.log('12123,',result)
       let val= {}
       let valArr=[]
       for (let i = 0; i < Number(getValue("Base.nPayNumber")); i++) {
@@ -94,17 +102,31 @@ const method = {
         // let tPayEndTm = formatDate(endDate,'yyyy-MM-dd HH:mm:ss')
  
         let tPayEndTm = dayjs(endDate).add(-1,'second').format("YYYY-MM-DD HH:mm:ss")
-           val= { "_dataId": "", "Pay.nTms":i+1 , "Pay.cPayorCde": opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppCde"), "Pay.tPayBgnTm": tInsrncBgnTm, "Pay.tPayEndTm": tPayEndTm, "Pay.nOwnPrm": result.value[i], "Pay.cPayorNme":opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppNme"), "Pay.nPayablePrm": result.value[i], "Pay.nPrmVar": result.value[i] }
+           val= { "_dataId": "",
+            "Pay.nTms":i+1 ,
+            "Pay.cPayorCde": opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppCde"),
+            "Pay.tPayBgnTm": tInsrncBgnTm,
+            "Pay.tPayEndTm": tPayEndTm,
+            "Pay.nOwnPrm": result.value[i], 
+            "Pay.cPayorNme":opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppNme"),
+            "Pay.nPayablePrm": result.value[i], 
+            "Pay.nPrmVar": result.value[i] 
+          }
           valArr.push(val)
       }
+
+      console.log('数据',valArr)
       opertaor.getTableRefByKey("payinfo").setFormValue(valArr); 
+
+      
   } 
 },
   //付费约定下拉事件
   cInstMrkChange(val: any) {
-    setValue("Base.nPayNumber", '1');
+    console.log(val)
+    // setValue("Base.nPayNumber", '1');
     if(val=='5'){
-      setFormItem("Base.nPayNumber", { disabled: false });
+      setFormItem("Base.nPayNumber", { disabled: false ,  max:12});
     }else{
       setFormItem("Base.nPayNumber", { disabled: true });
     }

@@ -53,6 +53,8 @@ const fileInputType = ref();
 import { readFile } from "@/api/file";
 const user = JSON.parse(sessionStorage.getItem("user"));
 const tCertfDate = ref<any[]>([]);
+const  cWorkDptList =['310','320','330','340','350','360']  // 单位性质带企业的ID
+
 onMounted(() => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
@@ -98,7 +100,9 @@ onMounted(() => {
   setFormItem("Insured.cFax", { rules: [getRules("faxNumber", {})] });
   // 法人身份证
   setFormItem("Insured.cLegalCertfCde", { rules: [getRules("idCard", {})] });
-
+  setFormItem("Insured.cGcidCode", {
+        rules: [getRules("leiCode", {})],
+  });
 
 });
 function setFormItem(key: any, obj: any) {
@@ -272,6 +276,15 @@ const method = {
     checkUser();
     // val  0法人 1个人
     if (val == "0") {
+      setFormItem("Insured.tBirthday", {
+        rules: null
+      });
+      setFormItem("Insured.nAge", {
+        rules: null
+      });
+      setFormItem("Insured.cSex", {
+        rules: null
+      });
       // setValue("Insured.cCertfCls", "");
       setFormItem("Insured.cCntrNme", { rules: [getRules("required", {})] });
       setFormItem("Insured.cCntrCertfCde", {
@@ -311,8 +324,18 @@ const method = {
       });
 
 
-      // // 移动电话
-      // setFormItem("Insured.cMobile", { rules: [getRules("phoneNo", {})] });
+      let cWorkDpt = getValue('Insured.cWorkDpt')
+      if(cWorkDptList.includes(cWorkDpt)){
+          setFormItem("Insured.cRealnameAuthType", {
+            rules: [getRules("required", {})],
+          });
+      }else{
+          setFormItem("Insured.cRealnameAuthType", {
+            rules: [],
+          });
+      }
+
+      // 移动电话
       let cMobile = getValue('Insured.cMobile');  // 移动 
       let cTel = getValue('Insured.cTel');  // 固定电话    
       if(!cMobile &&  !cTel ){
@@ -326,6 +349,17 @@ const method = {
         setFormItem("Insured.cTel", { rules: [getRules("required", {}),getRules("phone", {})] });
         setFormItem("Insured.cMobile", { rules: [ getRules("phoneNo", {})]})
       }
+
+      // 性别 、年龄、生日个人必填
+      setFormItem("Insured.tBirthday", {
+        rules: [getRules("required", {})]
+      });
+      setFormItem("Insured.nAge", {
+       rules: [getRules("required", {})]
+      });
+      setFormItem("Insured.cSex", {
+        rules: [getRules("required", {})]
+      });
 
 
       codeListStore
@@ -369,6 +403,15 @@ const method = {
         hidden: true,
       });
     } else {
+      setFormItem("Insured.tBirthday", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.nAge", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.cSex", {
+        rules: [getRules("required", {})],
+      });
       if (!param.initFlag) {
         setFormItem("Insured.cWorkDpt", {
           disabled: false,
@@ -411,14 +454,17 @@ const method = {
         rules: null,
       });
 
-            // 为法人  企业成立日期
+      // 为法人  企业成立日期
       setFormItem("Insured.tEstablishingDate", {
         rules: null,
       });
 
+      //实名认证方式
+      setFormItem("Insured.cRealnameAuthType", {
+        rules: [],
+      });
       setValue("Insured.cGreenIndustryCustomers", "");
       setValue('Insured.cGreenIndustryList','')
-
       setValue("Insured.cIsMicroEntpris", "");
       // setValue("Insured.cCertfCls", "");
       setFormItem("Insured.cCntrNme", { rules: null });
@@ -436,6 +482,17 @@ const method = {
         rules: [ getRules("required", {}), getRules("phoneNo", {})],
       });
       setFormItem("Insured.cTel", { rules: [getRules("phone", {})] });
+
+      // 性别 、年龄、生日个人必填
+      setFormItem("Insured.tBirthday", {
+        rules: []
+      });
+      setFormItem("Insured.nAge", {
+       rules: []
+      });
+      setFormItem("Insured.cSex", {
+        rules: []
+      });
 
 
       codeListStore
@@ -587,7 +644,7 @@ const method = {
             setFormItem("Insured.cTrdCde", {
               loadData: [{ label: data.cnm, value: data.cde }],
             });
-            setValue("Insured.cTrdCde", data.cnm);
+            setValue("Insured.cTrdCde", data.cde);
             dialog.value?.handleClose();
           },
         },
@@ -607,7 +664,7 @@ const method = {
             setFormItem("Insured.cOccupCde", {
               loadData: [{ label: data.cnm, value: data.cde }],
             });
-            setValue("Insured.cOccupCde", data.cde + data.cnm);
+            setValue("Insured.cOccupCde", data.cde);
             dialog.value?.handleClose();
           },
         },
@@ -696,7 +753,7 @@ const method = {
     }
 
     if (val == "120001") {
-      setValue('Insured.cCertfCde','')  //选身份证时清空
+      // setValue('Insured.cCertfCde','')  //选身份证时清空
       setFormItem("Insured.cCertfCde", {
         rules: [getRules("required", {}), getRules("idCard", {
           
@@ -742,7 +799,7 @@ const method = {
         rules: [getRules("required", {})],
       });
       setFormItem("Insured.cCertfCde", {
-        rules: [getRules("socialCode", {})],
+        rules: [getRules("required", {}),getRules("socialCode", {})],
       });
 
       // 为法人  企业成立日期
@@ -765,7 +822,7 @@ const method = {
 
     } else {
       setFormItem("Insured.cCertfCde", {
-        rules: [],
+        rules: [getRules("required", {})],
       });
       setFormItem("Insured.tCertfBgnDate", { rules: null });
       setFormItem("Insured.tCertfEndDate", { rules: null });
@@ -892,6 +949,17 @@ const method = {
     // 单位性质
   cWorkDptChange:(val:any)=>{
       console.log('单位性质',val)
+      let cClntMrk = getValue('Insured.cClntMrk');  // 投保人性质 
+        //实名认证方式
+      if(cWorkDptList.includes(val) && cClntMrk =='0'){
+          setFormItem("Insured.cRealnameAuthType", {
+            rules: [getRules("required", {})],
+          });
+      }else{
+          setFormItem("Insured.cRealnameAuthType", {
+            rules: [],
+          });
+      }
       if(val =='350'){
         setFormItem("Insured.cGcidCode", {
               rules: [getRules("required", {}),getRules("leiCode", {})],

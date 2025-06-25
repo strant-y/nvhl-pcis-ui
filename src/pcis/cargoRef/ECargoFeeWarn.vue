@@ -123,7 +123,7 @@ function setFormItem(key: any, obj: any) {
   }
 }
 
-function getFromValue() {
+function getFormValue() {
   return applicantEditRef?.value?.getFromValue();
 }
 
@@ -142,18 +142,25 @@ function setValue(key: string, value: any) {
 function getValue(key: string) {
   return applicantEditRef?.value?.getValue(key);
 }
-function getFormconfig() {
+
+function getFormConfig(){
   return formconfig1;
 }
-
-
+function getFormBtn() {
+  return applicantEditRef?.value?.getFormBtn();
+}
+function setDisabledAll(isDisabled: boolean) {
+  applicantEditRef?.value?.setDisabledAll(isDisabled);
+}
 defineExpose({
-  getFromValue,
+  getFormValue,
   setFormValue,
   validate,
   setValue,
   getValue,
-  getFormconfig,
+  getFormConfig,
+  getFormBtn,
+  setDisabledAll
 });
 </script>
 

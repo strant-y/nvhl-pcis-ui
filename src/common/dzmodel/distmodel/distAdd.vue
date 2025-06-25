@@ -24,6 +24,8 @@ import { saveDist } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { codeListViewStore } from "@/store";
 import {getAddressStr} from "@/api/query";
+import {eventBus} from "@/utils/event-bus";
+import {calculateAgeFromIdCard} from "@/utils/common";
 const opertaor = dataOpertaor();
 const param = ref({});
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
@@ -49,91 +51,12 @@ const props = defineProps({
     default: () => ({}),
   },
 });
-const getCComponentTable = () => {
-  // const cProdNo = route.params.param.cProdNo;
-  // if (cProdNo === "040001") return "AddressDist";
-  // if (cProdNo === "043002") return "VehicleDist";
-  // if (cProdNo === "040020") return "PersonnelDist";
-  // if (cProdNo === "042001") return "DesignDist";
-  // if (cProdNo === "042003") return "EducatorDist";
-  // if (cProdNo === "043001") return "ElevatorDist";
-  // if (cProdNo === "043007") return "VehicleDist";
-  // if (cProdNo === "043010") return "EducatorDist";
-  // if (cProdNo === "043013") return "PollutionDist";
-  // if (cProdNo === "043009") {
-  //   switch (props.data.tab) {
-  //     case "实际用工地址/工程项目地址清单":
-  //       return "ProjectDist";
-  //     case "从业人员清单":
-  //       return "EmployeeDist";
-  //     case "从业人员清单汇总":
-  //       return "DistSummary";
-  //     default:
-  //       return "";
-  //   }
-  // }
-  // if (cProdNo === "040002") {
-  //   switch (props.data.tab) {
-  //     case "雇员清单":
-  //       return "EmployeeDist";
-  //     case "雇员清单汇总":
-  //       return "DistSummary";
-  //     case "车辆清单":
-  //       return "VehicleDist";
-  //     case "车辆清单汇总":
-  //       return "DistSummary";
-  //     default:
-  //       return "";
-  //   }
-  // }
-  // if(cProdNo === "040003"){
-  //   switch(props.data.tab){
-  //     case "产品清单":
-  //       return "ProductDist";
-  //     case "销售区域清单":
-  //       return "SalesDist";
-  //     default:
-  //       return "";
-  //   }
-  // }
-  // if(cProdNo === "040005"){
-  //   switch(props.data.tab){
-  //     case "地址清单信息":
-  //       return "AddressDist";
-  //     case "人员清单":
-  //       return "EducatorDist";
-  //     default:
-  //       return "";
-  //   }
-  // }
-  // if(cProdNo === "043020"){
-  //   switch(props.data.tab){
-  //     case "房屋清单":
-  //       return "AddressDist";
-  //     case "家庭成员清单":
-  //       return "FamilyDist";
-  //     default:
-  //       return "";
-  //   }
-  // }
-  // if(cProdNo === "045001"){
-  //   switch(props.data.tab){
-  //     case "雇员清单信息":
-  //       return "EmployeeDist";
-  //     case "工程项目地址清单":
-  //       return "ProjectDist";
-  //     default:
-  //       return "";
-  //   }
-  // }
-  return props.data.compKey ? props.data.compKey.substring(0, props.data.compKey.length - 6) : "";
-  // return "";
-};
-const cComponentTable = computed(() => getCComponentTable());
 
+const cComponentTable = computed(() => props.data.compKey ? props.data.compKey.replace(/\d+/g, '') : "");
 
 const dataParams = ref({});
 const appNo = ref("");
+const cGrpMrk = ref("");
 const emits = defineEmits(["handleClose"]);
 const formconfigdist = ref<Record<string, any>>({});
 const formconfig1 = ref<AppFreeEditConfig>(
@@ -190,7 +113,7 @@ onMounted(() => {
   // console.log(333)   distAdd
   dataParams.value = opertaor.getDataAll();
   appNo.value = dataParams.value.plyBase["Base.cAppNo"];
-  
+  cGrpMrk.value = route.params.param.cGrpMrk;
   let newSchema = [];
   let cIs= opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered']  //  是否记名投保
 
@@ -226,14 +149,45 @@ onMounted(() => {
      item['rules'] = [getRules("vehiclePlate", {})];
     }
 
-
-
     // 车架号校验
     // Dist.cVinCode  getRules   { rules: [getRules("faxNumber", {})] }
     if(item.prop =='Dist.cVinCode'){
      item['rules'] = [getRules("vinNumber", {})];
     }
+    // 043009 实际用工地址关联 团单才展示
+    if(item.prop === 'Dist.cEmploymentAddress'){
+      if(cGrpMrk.value !== '1') {
+        item['rules'] = [];
+        item["hidden"] = true;
+      }else {
+        eventBus.emit('ProjectDist043009', (res: any) => {
+          if(res) {
+            item['loadData'] = res.map((m: any) => {
+              return {
+                label: m['Dist.cDetailedAddress'],
+                value: m['Dist.cPkId']
+              }
+            })
+          }
+        });
+      }
+    }
+    // 身份证类型自动回填年龄
+    if(item.prop =='Dist.cIdentificationNumber'){
+      item['func'] = (val: string) => {
+        if(val && val.length === 18 && getValue('Dist.cDocumentType') === '120001') {
+          const age = calculateAgeFromIdCard(val);
+          setValue('Dist.nAge', age);
+        }
+      }
+    }
 
+    if(item.prop =='Dist.cSchoolName'){
+      item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+    }
+    if(item.prop =='Dist.cIdentificationNumber'){
+      item['rules'] = [ getRules("idCard", {})];
+    }
 
     console.log(item)
 

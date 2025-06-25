@@ -55,10 +55,10 @@ onMounted(async () => {
 
 // 绑定方法
 const method = {
-  ciAdd: () => {
+  addCiRow: () => {
     console.log("ciAdd",param);
     const cCiMrkFlag = formPage.getFormDataById("AgreementBase")['ECargoBase.cCiMrk'];
-    const val = getFromValue();
+    const val = getFormValue();
     const totalCiShare = val.reduce((sum, row) => sum + parseFloat(row['Ci.nCiShare'] || 0), 0);
     // 判断总和是否等于 1
     if (totalCiShare >= 1) {
@@ -88,14 +88,14 @@ const method = {
     updateMasterAgreementValues()
   },
   ciDelete:()=>{
-    const selData=freeEditRef?.value?.getSelectRow()
+    const selData=freeEditRef?.value?.getSelectRow();
       if (!selData) {
           ElMessage.error("请选择要删除的数据!");
           return;
       }
-      const editIndex=selData['_dataId']
+      const editIndex=selData['_dataId'];
       freeEditRef?.value?.delRow(editIndex);
-      const val=getFromValue()
+      const val = getFormValue();
       val.forEach((key,index) => {
           key['Ci.nSeqNo']=index+1
       });
@@ -213,7 +213,7 @@ const method = {
           );
         });
     }
-    onChiefMrkChange()
+    // onChiefMrkChange()
   },
   //出单机构下拉事件
   cDptCdeChange:(val)=>{
@@ -222,7 +222,7 @@ const method = {
     if (!rowData || !initFlag.value) return;
     const rowId = rowData._dataId;
     // 获取所有行数据
-    const allRows = getFromValue();
+    const allRows = getFormValue();
     // 校验是否存在重复的 Ci.cCoinsurerCde, Ci.cSubDptCde, Ci.cDptCde 组合
     const isDuplicate = allRows.some((row) => {
       // 排除当前行自身
@@ -245,7 +245,7 @@ const method = {
     const rowId = rowData?._dataId;
     if (!rowData || !rowId) return;
       // 获取所有行数据
-      const allRows = getFromValue();
+      const allRows = getFormValue();
       // 检查是否已有其他行的 cIssueMrk 是 1
       const existingIssueMrk = allRows.some(
         (row) => row._dataId !== rowId && row["Ci.cIssueMrk"] === "1"
@@ -274,7 +274,7 @@ const method = {
         return;
       }
       // 情况2：检查是否已有其他行的主共标志为“是”
-      const allRows = getFromValue();
+      const allRows = getFormValue();
       const existingChief = allRows.some(
         (row) => row._dataId !== rowId && row["Ci.cChiefMrk"] === "1"
       );
@@ -304,7 +304,7 @@ const method = {
       return;
     }
     // 计算当前所有行的总和（排除当前行）
-    const allRows = getFromValue();
+    const allRows = getFormValue();
     const totalOther = allRows
       .filter(row => row._dataId !== rowId)
       .reduce((sum, row) => sum + parseFloat(row["Ci.nCiShare"] || 0), 0);
@@ -317,7 +317,7 @@ const method = {
     const cCiMrk = formPage.getFormDataById("AgreementBase")['ECargoBase.cCiMrk'];
     if (cCiMrk === "2" || cCiMrk === "4") {
       updateMasterAgreementValues();
-      const allData =  getFromValue();
+      const allData =  getFormValue();
       for (let i = 1; i < allData.length; i++) {
         const currentRow = allData[i];
         const previousRow = allData[i - 1];
@@ -535,7 +535,7 @@ const updateMasterAgreementValues = () => {
 const onChiefMrkChange = () => {
   const rowData = freeEditRef.value?.getSelectRow();
   const rowId = rowData?._dataId;
-  const cCiMrk =  formPage.getComponentRefById("AgreementBase").getFromValue();
+  const cCiMrk =  formPage.getComponentRefById("AgreementBase").getFormValue();
   // const aa = 
   if (!rowData || !rowId) return;
   const cCoinsurerCde = rowData["Ci.cCoinsurerCde"];  //获取当前行的联共保公司编码
@@ -613,7 +613,7 @@ const setFormItem = (key, obj) => {
 const initCiInfo = (data: any) => {
   const {cCiMrk} = data;
   const cChiefMrk = ['1', '3', '5'].includes(cCiMrk) ? '1' : '0';
-  const dataList = getFromValue();
+  const dataList = getFormValue();
   if(dataList.length > 0) {
     setFormValue([]);
   }
@@ -636,7 +636,7 @@ const initCiInfo = (data: any) => {
 // 绑定特殊验证器
 const exRules = {};
 
-function getFromValue() {
+function getFormValue() {
   return freeEditRef?.value?.getFromValue();
 }
 function getSelectRow() {
@@ -660,20 +660,24 @@ function validate() {
 function getTableValue(rowId: number, key: string) {
   freeEditRef?.value?.getTableValue(rowId, key);
 }
-function getFormconfig(){
+function getFormConfig(){
   return formconfig1;
 }
+function setDisabledAll(isDisabled: boolean) {
+  return freeEditRef?.value?.setDisabledAll(isDisabled);
+}
 defineExpose({
-  getFromValue,
+  getFormValue,
   setFormValue,
   getSelectRow,
   validate,
   setValueByRowKey,
   getRowById,
   getTableValue,
-  getFormconfig,
+  getFormConfig,
   setRowFieldProp,
-  initCiInfo
+  initCiInfo,
+  setDisabledAll
 });
 </script>
 

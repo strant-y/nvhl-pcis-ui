@@ -4,15 +4,15 @@
       <div class="login-left">
       <!-- Logo -->
       <div class="logo">
-        <img src="../../assets/images/logo.png" alt="logo" />
+        <!-- <img src="../../assets/images/logo.png" alt="logo" /> -->
       </div>
       <!-- 系统名称 -->
       <div class="system-name">
         <div class="name-cn">
-          <span class="text-class">永安财产保险承保系统</span>
+          <span class="text-class">软通财产保险承保系统</span>
         </div>
         <div class="name-en">
-          <span class="text-en">YONG AN Property Insurance Underwriting System</span>
+          <span class="text-en">IsoftStone Property Insurance Underwriting System</span>
         </div>
       </div>
     </div>

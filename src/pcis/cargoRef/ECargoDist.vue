@@ -117,6 +117,7 @@ onMounted(async () => {
   }
   tableconfig.value.isPage = false;
   console.log('tableconfig.value', tableconfig.value)
+  console.log('props.pageSchema', props.pageSchema)
   // 初始化 cComponentTableValue
   cComponentTableValue = getCComponentTableValue(
       ''
@@ -139,7 +140,7 @@ const method = {
           fromUi: tableconfig.value.fromUi,
           title: "详情",
           rowData: row,
-          compKey: props.compKey
+          compKey: props.pageSchema.compKey
         },
         {width: "60"}
     );
@@ -152,7 +153,7 @@ const method = {
           fromUi: tableconfig.value.fromUi,
           title: "新增",
           rowData: row,
-          compKey: props.compKey
+          compKey: props.pageSchema.compKey
         },
         {
           isOk: (res: any) => {
@@ -177,7 +178,7 @@ const method = {
           fromUi: tableconfig.value.fromUi,
           title: "编辑",
           rowData: row,
-          compKey: props.compKey
+          compKey: props.pageSchema.compKey
         },
         {
           isOk: (res: any) => {
@@ -199,7 +200,7 @@ const method = {
 
   // 同投保人按钮点击事件
   applicantToInsured: () => {
-    const appInfo = formPage.getFormDataById('ApplicantECargo');
+    const appInfo = formPage.getFormDataById('AgreementApplicant');
     if(Object.keys(appInfo).length > 0) {
       const f = pageresult.list.filter((item: any) =>
           item['DistECargo.cCustomerName'] === appInfo['Applicant.cAppNme'] &&
@@ -274,6 +275,19 @@ const method = {
   }
 };
 
+// 绑定特殊验证器
+const exRules = {};
+
+function validate() {
+  return true;
+}
+function setValue(key: string, value: any) {
+  distTableRef?.value?.setValue(key, value);
+}
+
+function getValue(key: string) {
+  return distTableRef?.value?.getValue(key);
+}
 
 function setUnDisabledByKeyList(key: any) {
   tableconfig.value.formconfig.endBtns?.forEach((item: any) => {
@@ -293,40 +307,6 @@ function setUnDisabledByKeyList(key: any) {
   });
 }
 
-function getFormconfig() {
-  return {
-    fromType: "custom",
-  };
-}
-
-function setAddressStr(key: any, data: any) {
-  applicantEditRef?.value?.setValue(key, data);
-}
-
-function getFromValue() {
-  return applicantEditRef?.value?.getFromValue();
-}
-
-function setFormValue(value: any) {
-  applicantEditRef?.value?.setFormValue(value);
-}
-
-function validate() {
-  return true;
-}
-
-function setValue(key: string, value: any) {
-  applicantEditRef?.value?.setValue(key, value);
-}
-
-function getValue(key: string) {
-  return applicantEditRef?.value?.getValue(key);
-}
-
-function getTableData() {
-  return pageresult.list
-}
-
 function setTableData(data: any) {
   pageresult.list = data.map((item: any, index: any) => {
     return {
@@ -344,19 +324,57 @@ function setTableData(data: any) {
   });
 }
 
-// 绑定特殊验证器
-const exRules = {};
+function setAddressStr(key: any, data: any) {
+  applicantEditRef?.value?.setValue(key, data);
+}
 
+function getFormValue() {
+  return pageresult.list;
+}
+
+function setFormValue(value: any) {
+  setTableData(value);
+}
+
+function getFormConfig(){
+  return formconfig1;
+}
+function getFormBtn() {
+  return distTableRef?.value?.getFormBtn();
+}
+function getTableBtn() {
+  return distTableRef?.value?.getTableBtn();
+}
+function setDisabledAll(isDisabled: boolean, noSet: string[] = []) {
+  const tableBtn = getTableBtn();
+  if(tableBtn && Object.keys(tableBtn).length > 0) {
+    Object.keys(tableBtn).forEach((key: any) => {
+      if(!noSet.includes(key)) {
+        tableBtn[key].hidden = isDisabled;
+      }
+    });
+  }
+  const formBtn = getFormBtn();
+  if(formBtn && Object.keys(formBtn).length > 0) {
+    Object.keys(formBtn).forEach((key: any) => {
+      if(!noSet.includes(key)) {
+        formBtn[key].hidden = isDisabled;
+      }
+    })
+  }
+}
 defineExpose({
   getValue,
   setValue,
-  getFromValue,
+  getFormValue,
   setFormValue,
-  getFormconfig,
+  getFormConfig,
   setUnDisabledByKeyList,
   handleQuery: method.handleQuery,
-  getTableData,
   setTableData,
+  getFormBtn,
+  setDisabledAll,
+  getTableBtn
 });
 </script>
 

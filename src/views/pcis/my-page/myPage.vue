@@ -1827,21 +1827,21 @@ const calcPremium = () => {
       opertaor
         .getTableRefByKey("ciMasterAgreement")
         .setValue("Base.nCiJntAmt", nAmt.value);
-      opertaor
-        .getTableRefByKey("ciMasterAgreement")
-        .setValue("Base.nJiJntAmt", nAmt.value);
+      // opertaor
+      //   .getTableRefByKey("ciMasterAgreement")
+      //   .setValue("Base.nJiJntAmt", nAmt.value);
       opertaor
         .getTableRefByKey("ciMasterAgreement")
         .setValue("Base.nCiJntPrm", nPrm.value);
-      opertaor
-        .getTableRefByKey("ciMasterAgreement")
-        .setValue("Base.nJiJntPrm", nPrm.value);
-      opertaor
-        .getTableRefByKey("ourCompanyCiShare")
-        .setValue("Base.nCiOwnAmt", nAmt.value);
-      opertaor
-        .getTableRefByKey("ourCompanyCiShare")
-        .setValue("Base.nCiOwnPrm", nPrm.value);
+      // opertaor
+      //   .getTableRefByKey("ciMasterAgreement")
+      //   .setValue("Base.nJiJntPrm", nPrm.value);
+      // opertaor
+      //   .getTableRefByKey("ourCompanyCiShare")
+      //   .setValue("Base.nCiOwnAmt", nAmt.value);
+      // opertaor
+      //   .getTableRefByKey("ourCompanyCiShare")
+      //   .setValue("Base.nCiOwnPrm", nPrm.value);
 
         //承保 总保费
         opertaor.getTableRefs()["base"].setValue("Base.nPrm", nPrm.value);
@@ -2073,6 +2073,23 @@ const savePlyInfo = async () => {
   const btn = getBtn("btn010102");
   btn.loading = true;
   const res = opertaor.getDataAll();
+
+  console.log('保费====',res)
+  let payList = res.payinfo;
+  // Base.nPrm
+  // payinfo
+  if(payList.length>0){
+      let numS =0;
+        payList.forEach((item) => {
+        numS+= item['Pay.nPayablePrm']
+      });
+      if(numS>res['base']['Base.nPrm']){
+
+        ElMessage.error('缴费计划“应收保费”之和大于整单保费！')
+         btn.loading = false;
+        return false;
+      }
+  }
 
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;

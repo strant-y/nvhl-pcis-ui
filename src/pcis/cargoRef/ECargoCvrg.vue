@@ -5,7 +5,6 @@
 
 <script setup lang="ts">
 import { formInit } from "@/shared/from-init";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
 import {
   AppGridEditMethod,
   createAppGridEditConfig,
@@ -52,7 +51,7 @@ const method = {
   funcCvrgCargoAdd: () => {
     console.log('funcCvrgCargoAdd')
     cvrgEditRef?.value?.addRow();
-    const val = getFromValue();
+    const val = getFormValue();
     console.log('val', val)
     val.forEach((key: string, index: number) => {
       key['Term.nSeqNo'] = index + 1
@@ -113,7 +112,7 @@ const method = {
 // 绑定特殊验证器
 const exRules = {};
 
-function getFromValue() {
+function getFormValue() {
   return cvrgEditRef?.value?.getFromValue();
 }
 
@@ -129,7 +128,7 @@ function getTableValue(rowId: number, key: string) {
   cvrgEditRef?.value?.getTableValue(rowId, key);
 }
 
-function getFormconfig() {
+function getFormConfig() {
   return formconfig1;
 }
 //给表单赋值
@@ -149,14 +148,25 @@ function setFormItem(key: any, obj: any) {
     });
   }
 }
-
+function getFormBtn() {
+  return cvrgEditRef?.value?.getFormBtn();
+}
+function getTableBtn() {
+  return cvrgEditRef?.value?.getTableBtn();
+}
+function setDisabledAll(isDisabled: boolean) {
+  cvrgEditRef?.value?.setDisabledAll(isDisabled);
+}
 defineExpose({
-  getFromValue,
+  getFormValue,
   setFormValue,
   validate,
   getTableValue,
-  getFormconfig,
-  setFormItem
+  getFormConfig,
+  setFormItem,
+  getFormBtn,
+  setDisabledAll,
+  getTableBtn
 });
 </script>
 

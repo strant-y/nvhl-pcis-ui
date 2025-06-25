@@ -74,7 +74,7 @@ function setFormItem(key: any, obj: any) {
   }
 }
 
-function getFromValue() {
+function getFormValue() {
   return freeEditRef?.value?.getFromValue();
 }
 
@@ -93,12 +93,23 @@ function setValue(key: string, value: any) {
 function getValue(key: string) {
   return freeEditRef?.value?.getValue(key);
 }
-
+function getFormConfig(){
+  return formconfig1;
+}
+function getFormBtn() {
+  return freeEditRef?.value?.getFormBtn();
+}
+function setDisabledAll(isDisabled: boolean) {
+  freeEditRef?.value?.setDisabledAll(isDisabled);
+}
 defineExpose({
-  getFromValue,
+  getFormValue,
   setFormValue,
   validate,
   setValue,
   getValue,
+  getFormConfig,
+  getFormBtn,
+  setDisabledAll
 });
 </script>

@@ -39,11 +39,13 @@ export interface AppGridEditMethod {
   addRowByData: (rowData) => any;
   getSelectRow: () => any;
   tableExvalidate: () => any;
-  setDisabledAll: () => void;
+  setDisabledAll: (isDisabled: boolean) => void;
   setFormSchema: (rowId: string, props: any, schama: any, value: any) => void;
   setValueByRowKey:(props:string ,rowId: any, value:any) => void;
   getRowById:(rowId: string) => void;
   setRowFieldProp: (rowId: string, field: string, prop: string, value: any) => void,
+  getFormBtn: () => any;
+  getTableBtn: () => any;
 }
 
 export function createAppGridEditConfig(

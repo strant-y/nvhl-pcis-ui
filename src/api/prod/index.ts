@@ -194,6 +194,15 @@ export function getComponentViewByKey(queryParams: any): AxiosPromise<any> {
 }
 
 /**
+ * 根据组件tab进行全量跟新组件
+ * @param queryParams 
+ * @returns 
+ */
+export function releaseByComptype(queryParams: any): AxiosPromise<any> {
+  return post(`/prod/releaseByComptype`, queryParams);
+}
+
+/**
  * 根据组件Key获取组件相关信息
  * @param queryParams
  * @returns
@@ -1233,6 +1242,10 @@ export function saveDist(queryParams: any): AxiosPromise<any> {
 //查询清单
 export function selectDist(queryParams: any): AxiosPromise<any> {
   return post(`/policy/selectDist`, queryParams);
+}
+//查询清单对应汇总组件key
+export function distMapCollectCompKey(queryParams: any): AxiosPromise<any> {
+  return post(`/proddef/getDistSummaryComponentKeyByDistComponentKeyAndProdNo`, queryParams);
 }
 //删除清单
 export function deleteDist(queryParams: any): AxiosPromise<any> {

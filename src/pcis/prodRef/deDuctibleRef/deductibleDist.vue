@@ -34,6 +34,9 @@ const props = defineProps({
     type: [Object],
     required: true,
   },
+  compKey: {
+    type: String
+  }
 });
 
 const deductibleFixEdit = defineAsyncComponent(() => import("@/pcis/prodRef/commodityRef/DeductibleFixEdit.vue"));
@@ -89,9 +92,12 @@ const tableconfig = reactive<AppTableConfig>(
         },
         tableClick: (row) => {
           let param = {};
-          // const f = originalData.value.find(f => row.cDeductibleCode === f.cDeductibleClass);
-          const f = originalData.value.find(f => row.cDeductibleClass === f.cDeductibleClass);
-          param =  Object.assign(param, f);
+          if(row['cIfMust'] !== '9') {
+            const f = originalData.value.find(f => row.cDeductibleClass === f.cDeductibleClass);
+            Object.assign(param, f);
+          }else {
+            Object.assign(param, row)
+          }
           dzmodal.open(deductibleFixEdit, { 
             type: "view", 
             data: param, 
@@ -172,7 +178,7 @@ const tableconfig = reactive<AppTableConfig>(
           },
           {
             label: "自定义",
-            value: "2",
+            value: "9",
           },
         ],
       },
@@ -273,7 +279,7 @@ const method = {
     dialog.value?.open('deductibleFix', {
           cProdNo: route.params.param.cProdNo,
           selectedData: formData.value, //需要把自定义的过滤掉，只传过去从模板中选择的
-        }, 
+        },
         { 
           getSelected(selectdata: any) {
             const mergeAndNumberArraysPreserveOrder = (a: [], b: []): any[] => {
