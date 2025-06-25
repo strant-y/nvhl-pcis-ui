@@ -681,7 +681,8 @@ const method = {
             setFormItem("Applicant.cTrdCde", {
               loadData: [{ label: data.cnm, value: data.cde }],
             });
-            setValue("Applicant.cTrdCde", data.cnm);
+           // setValue("Applicant.cTrdCde", data.cnm);
+            setValue("Applicant.cTrdCde", data.cde);
             dialog.value?.handleClose();
           },
         },
@@ -698,6 +699,9 @@ const method = {
         type: "show",
         method: {
           getdbClickData: (data) => {
+            setFormItem("Applicant.cOccupCde", {
+              loadData: [{ label: data.cnm, value: data.cde }],
+            });
             setValue("Applicant.cOccupCde", data.cde);
             dialog.value?.handleClose();
           },

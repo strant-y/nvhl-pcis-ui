@@ -626,7 +626,7 @@ const method = {
             setFormItem("Insured.cTrdCde", {
               loadData: [{ label: data.cnm, value: data.cde }],
             });
-            setValue("Insured.cTrdCde", data.cnm);
+            setValue("Insured.cTrdCde", data.cde);
             dialog.value?.handleClose();
           },
         },
@@ -646,7 +646,7 @@ const method = {
             setFormItem("Insured.cOccupCde", {
               loadData: [{ label: data.cnm, value: data.cde }],
             });
-            setValue("Insured.cOccupCde", data.cde + data.cnm);
+            setValue("Insured.cOccupCde", data.cde);
             dialog.value?.handleClose();
           },
         },
