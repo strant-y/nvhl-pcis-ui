@@ -58,14 +58,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "primary",
         label: "查询",
         func: async () => {
-          handleQuery();
-          // freeEditRef.value?.validate().then((isValid) => {
-          //   if (isValid) {
-          //     handleQuery();
-          //   } else {
-          //     ElMessage.error("请填写必填项");
-          //   }
-          // });
+         // handleQuery();
+          freeEditRef.value?.validate().then((isValid) => {
+             if (isValid) {
+               handleQuery();
+             } /*else {
+               ElMessage.error("请填写必填项");
+             }*/
+           });
         },
       }),
     ],
@@ -74,8 +74,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cMaxCde",
         inputtype: "rtselect",
         title: "行业大类",
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {'message':"请选择行业大类"})],
         typeCode: "Job_Description_List",
+        clearable:true,
         codeParam: { cParCde: "JobDescription" },
         func: (val) => {
           setValue("cMidCde", "");
@@ -98,7 +99,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cMidCde",
         inputtype: "rtselect",
         title: "行业中类",
-        rules: [getRules("required", {})],
+        clearable:true,
+        rules: [getRules("required", {'message':"请选择行业中类"})],
         loadData: [],
         // func: (val) => {
         //   setValue("cMidCde", "");
@@ -112,7 +114,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         //         const objDate = {
         //           loadData: res,
         //         };
-        //         setFormItem("cMidCde", objDate); 
+        //         setFormItem("cMidCde", objDate);
         //       });
         //   }
         // },
@@ -147,7 +149,7 @@ const tableconfig = reactive<AppTableConfig>(
         link: true,
         type: "danger",
         icon: "Check",
-         tableClick: async (row) => {
+        tableClick: async (row) => {
           props.data.method?.getdbClickData(row);
         },
       }),
