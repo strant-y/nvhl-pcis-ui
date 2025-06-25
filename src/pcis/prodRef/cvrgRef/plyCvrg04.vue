@@ -460,6 +460,7 @@ function addTermData(PlanNo: string) {
           data.riskList = riskList;
           if (item.cRdrTyp === "1") {
             data["Term.cClauseCategory"] = item.cClauseCategory;
+            // data["Term.cClaiminclude"] = '0';
           }
           plans.push(data);
         });

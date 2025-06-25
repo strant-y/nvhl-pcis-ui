@@ -201,6 +201,17 @@ const setcDetailedAddress = (prop:any,aftProp:any)=> {
 };
 // 绑定方法
 const method = {
+  getcInsuranceIndustryChange:(val:string)=>{
+    if(val === '8'){
+      setFormItem('Tgt.cIndustryRemarks', {
+        rules: [getRules("required", {})],
+      });
+    }else{
+      setFormItem('Tgt.cIndustryRemarks', {
+        rules: null
+      });
+    }
+  },
   gettCompletionYearChange:(val:string)=>{
     const currentYear = new Date().getFullYear();
     setValue('Tgt.nShipAge',currentYear - Number(val))
