@@ -389,7 +389,7 @@ const method = {
             ElMessage.success(`导入完成：${res.data.msg}`);
             method.handleQuery();
           } else {
-            ElMessage.error(res.message || "全量导入失败");
+            ElMessage.error(res.msg || "全量导入失败");
           }
         }).catch((error) => {
           ElMessage.error("导入出错，请检查文件格式或内容");
@@ -437,7 +437,7 @@ const method = {
             ElMessage.success(`导入完成：${res.data.msg}`);
             method.handleQuery();
           } else {
-            ElMessage.error(res.message || "增量导入失败");
+            ElMessage.error(res.msg || "增量导入失败");
           }
         }).catch((error) => {
           ElMessage.error("导入出错，请检查文件格式或内容");
