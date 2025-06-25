@@ -39,7 +39,6 @@
                 :placeholder="$t('login.username')"
                 name="username"
                 size="large"
-                class="h-[48px] w-[79%]"
                 :disabled="verifyFlag"
                 @keyup.enter="handleLogin"
               />
@@ -58,7 +57,6 @@
                 name="password"
                 @keyup.enter="handleLogin"
                 size="large"
-                class="h-[48px] pr-3 w-[79%]"
                 show-password
                 :disabled="verifyFlag"
               />
@@ -589,18 +587,27 @@ onMounted(() => {});
 
     .login-card {
       margin: auto; // 垂直居中
-      padding: 20px;
       border-radius: 8px;
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
       background-color: #fff;
 
       h2 {
-        text-align: center;
-        margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 20px;
+        color: #141414;
+        font-weight: 600;
+        margin: 25px 0;
       }
 
       .login-form {
         width: 100%;
+        padding: 0 12px 22px;
+      }
+
+      :deep(.el-card__body) {
+        padding: 10px;
       }
     }
   }
@@ -617,13 +624,13 @@ onMounted(() => {});
     width: 21%;
     height: 48px;
     font-size: 18px;
-    background-color: #e3e3e3;
+    // background-color: #e3e3e3;
   }
 }
 
 :deep(.el-input) {
   .el-input__wrapper {
-    padding: 0 0 0 15px;
+    padding: 0 15px 0 0;
     background-color: transparent;
     box-shadow: none;
     &.is-focus,
@@ -634,6 +641,9 @@ onMounted(() => {});
     input:-webkit-autofill {
       transition: background-color 1000s ease-in-out 0s;
     }
+  }
+  .el-input__suffix {
+    width: 22px;
   }
 }
 
