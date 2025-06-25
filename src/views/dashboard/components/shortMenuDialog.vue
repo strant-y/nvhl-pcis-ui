@@ -24,7 +24,7 @@
 import { createFreeButtonBase } from "@/shared/button-config";
 import {getShortcutDataList, updateShortRoute} from "@/api/menu";
 const props = defineProps({
-  param: {
+  data: {
     type: Object,
   },
 });
@@ -50,7 +50,7 @@ const confirmBtn = createFreeButtonBase({
   type: "primary",
   label: "确认",
   func: () => {
-    transferDataSendTag()
+    confirm()
   },
 });
 onMounted(() => {
@@ -59,22 +59,20 @@ onMounted(() => {
 const init = ref(true);
 const initShortRoute = () => {
   transferData.value = [];
-  getShortcutDataList().then((res:any) => {
-    if(res.code == 200){
-      shortcutDataList.value = res.data;
-      res.data.forEach(d => {
-        if(d.select){
-          transferData.value.push(d.key);
-        }
-      })
-      transferDataSendTag();
-    }
-  }).finally(()=>{
+  if(props.data) {
+    shortcutDataList.value = props.data;
+    props.data.forEach(d => {
+      if(d.select){
+        transferData.value.push(d.key);
+      }
+    })
+    transferDataSendTag();
     init.value = false;
-  })
+  }
 }
+let tagList:any = [];
 const transferDataSendTag = () => {
-  const tagList:any = [];
+  tagList = [];
   let i = 0 ;
   if(transferData.value.length > 5){
     transferData.value = transferDataOld.value;
@@ -97,12 +95,16 @@ const transferDataSendTag = () => {
     })
     transferDataOld.value = transferData.value;
   });
-  emits('ok',tagList)
   if(!init.value){
     updateShortRoute({shortRoute: transferData.value}).then((res => {
       dialogVisible.value = false;
     }))
   }
 };
+
+function confirm() {
+  transferDataSendTag()
+  emits('ok', tagList)
+}
 </script>
     
