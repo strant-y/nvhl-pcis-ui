@@ -10,7 +10,7 @@ import { ElMessage } from 'element-plus';
 import { InsuranceLimit } from '../service/index';
 import { getListByCode } from '@/api/code-list-service';
 import { AppKey } from "@/constants/api";
-// import { BaseCheck } from '@/utils/base-check';
+// import { BaseCheck } from '@/utils/base-review';
 
 import { useUserStore } from "@/store/modules/user";
 import { useValidator } from "@/typings/useValidator";

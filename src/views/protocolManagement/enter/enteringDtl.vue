@@ -19,7 +19,6 @@ const props = defineProps({
 });
 const formPage = ref(new FormPage('enteringDtl'));
 const idxParam = reactive({
-  opertaorId: 'enteringDtl',
   formPage: formPage.value,
   param: { ...props.param, ...{}},
   user: JSON.parse(sessionStorage.getItem("user")),
@@ -71,7 +70,7 @@ onMounted(() => {
 
 function query() {
   cargoApi.init({
-    ...formPage.param,
+    ...idxParam.param,
     ...{}
   }).then((res: any) => {
     if(res.code === 200) {
@@ -82,10 +81,10 @@ function query() {
     }
   });
   if(idxParam.readonly === true) {
-    formPage.value?.setPageReadOnly();
-    const submitBtn = formPage.value?.getPageBtnRefById('submit')?.getConfig()
+    formPage.value?.setPageReadOnly(true);
+    const submitBtn = formPage.value?.getPageBtnRefById('submit')?.getConfig();
     submitBtn.disabled = true;
-    const saveBtn = formPage.value?.getPageBtnRefById('save')?.getConfig()
+    const saveBtn = formPage.value?.getPageBtnRefById('save')?.getConfig();
     saveBtn.disabled = true;
   }
 }
@@ -124,7 +123,7 @@ function submit() {
   }).then((res: any) => {
     if(res.code === 200) {
       ElMessage.success('提交成功')
-      formPage.value.setPageReadOnly();
+      formPage.value.setPageReadOnly(true);
       const submitBtn = formPage.value.getPageBtnRefById('submit')?.getConfig();
       submitBtn.disabled = true;
     }else {

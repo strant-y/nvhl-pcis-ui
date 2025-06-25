@@ -345,14 +345,22 @@ function getFormBtn() {
   return r.value;
 }
 
-function setDisabledAll() {
+function setDisabledAll(isDisabled: boolean, noSet: string[] = []) {
   const tableBtn = tableconfig.tableBtn;
   if(tableBtn && tableBtn.length > 0) {
-    tableBtn.forEach((btn: any) => {btn.hidden = true;});
+    tableBtn.forEach((btn: any) => {
+      if(!noSet.includes(btn.id)) {
+        btn.hidden = isDisabled;
+      }
+    });
   }
   const formBtn = getFormBtn();
   if(formBtn && Object.keys(formBtn).length > 0) {
-    Object.keys(formBtn).forEach((key: any) => {formBtn[key].hidden = true;})
+    Object.keys(formBtn).forEach((key: any) => {
+      if(!noSet.includes(key)) {
+        formBtn[key].hidden = isDisabled;
+      }
+    });
   }
 }
 defineExpose({

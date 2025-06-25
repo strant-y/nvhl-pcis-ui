@@ -144,8 +144,8 @@ function handleFileChange(event: Event) {
 function getFormConfig(){
   return formconfig1;
 }
-function setDisabledAll() {
-  applicantEditRef?.value?.setDisabledAll();
+function setDisabledAll(isDisabled: boolean) {
+  applicantEditRef?.value?.setDisabledAll(isDisabled);
 }
 defineExpose({
   getFormValue,

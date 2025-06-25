@@ -81,6 +81,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 inputtype: 'rtinput',
                 title: '保单号',
                 itemWidth: 1
+            },
+            {
+                prop: 'CEdrNo',
+                inputtype: 'rtinput',
+                title: '批单号',
+                itemWidth: 1
             }
         ],
         fromUi: createFromUiConfig({
@@ -164,8 +170,9 @@ function getValue(key: string) {
 /** 查询 */
 function handleQuery(flag?: boolean) {
     const plyNo = freeEditRef.value?.getValue('CPlyNo')
-    if (!plyNo) {
-        ElMessage.warning('保单号不能为空，请输入保单号进行查询!')
+    const edrNo = freeEditRef.value?.getValue('CEdrNo')
+    if (!plyNo && !edrNo) {
+        ElMessage.warning('保单号和批单号不能同时为空，请录入后进行查询!')
         return
     }
     const r = tableRef.value?.getPartnerPage(flag) //获取分页数据
@@ -175,7 +182,8 @@ function handleQuery(flag?: boolean) {
         {
             CurrentUser: user.opCde,
             CurrentUserOrg: user.companyId,
-            CPlyNo: props.data.data['CPlyNo']
+            CPlyNo: props.data.data['CPlyNo'],
+            CEdrNo: props.data.data['CEdrNo']
         },
         param
     )
@@ -189,7 +197,7 @@ function handleQuery(flag?: boolean) {
                 pageresult.total = data.total
             }
         })
-        .finally(() => {})
+        .finally(() => { })
 }
 
 /**

@@ -62,3 +62,35 @@ export function descryptParameterToQuery(query): any {
   }
   return data;
 }
+/**
+ * 根据身份证号计算年龄
+ * @param idCard 身份证号（18位）
+ * @returns 年龄（周岁）
+ */
+export function calculateAgeFromIdCard(idCard: string): number {
+  if (!idCard || idCard.length !== 18) {
+    throw new Error("Invalid ID card number");
+  }
+
+  // 提取出生年月日（YYYYMMDD）
+  const birthDateStr = idCard.substring(6, 14);
+  const birthYear = parseInt(birthDateStr.substring(0, 4), 10);
+  const birthMonth = parseInt(birthDateStr.substring(4, 6), 10);
+  const birthDay = parseInt(birthDateStr.substring(6, 8), 10);
+
+  // 获取当前日期
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1; // 月份从0开始，需+1
+  const currentDay = currentDate.getDate();
+
+  // 计算年龄
+  let age = currentYear - birthYear;
+
+  // 如果当前月份 < 出生月份，或者月份相同但当前日 < 出生日，则年龄减1（未过生日）
+  if (currentMonth < birthMonth || (currentMonth === birthMonth && currentDay < birthDay)) {
+    age--;
+  }
+
+  return age;
+}

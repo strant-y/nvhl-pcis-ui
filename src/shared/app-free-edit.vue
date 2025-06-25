@@ -161,7 +161,7 @@ interface dynamicFormMethod {
   checkKey: (key: any) => boolean;
   clearValidate: (key: string | null ) => any;
   resetFields: () => any;
-  setDisabledAll: () => void;
+  setDisabledAll: (isDisabled: boolean) => void;
   getFormBtn: () => any;
 }
 const dynamicForm = ref<dynamicFormMethod | null>(null);
@@ -231,21 +231,21 @@ function setValue(key: any, value: any) {
     dynamicForm.value?.setValue(key, value);
   }
 }
-function setDisabledAll() {
+function setDisabledAll(isDisabled: boolean = true) {
   if (
     props.freeEditConfig.titleBtns &&
     props.freeEditConfig.titleBtns.length > 0
   ) {
     props.freeEditConfig.titleBtns.forEach((item) => {
-      item.hidden = true;
+      item.hidden = isDisabled;
     });
   }
   if (props.freeEditConfig.endBtns && props.freeEditConfig.endBtns.length > 0) {
     props.freeEditConfig.endBtns.forEach((item) => {
-      item.hidden = true;
+      item.hidden = isDisabled;
     });
   }
-  dynamicForm.value?.setDisabledAll();
+  dynamicForm.value?.setDisabledAll(isDisabled);
 }
 
 /**

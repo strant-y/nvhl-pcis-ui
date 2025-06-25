@@ -154,8 +154,8 @@ function getFormBtn() {
 function getTableBtn() {
   return cvrgEditRef?.value?.getTableBtn();
 }
-function setDisabledAll() {
-  cvrgEditRef?.value?.setDisabledAll();
+function setDisabledAll(isDisabled: boolean) {
+  cvrgEditRef?.value?.setDisabledAll(isDisabled);
 }
 defineExpose({
   getFormValue,

@@ -17,6 +17,7 @@
             width="55"
           />
           <el-table-column type="index" label="序号" width="55" />
+          <el-table-column property="cDeductibleClass" label="ID" width="100"/>
           <el-table-column label="是否可选" width="100">
             <template #default="scope">
               <el-tag type="primary">{{
@@ -29,14 +30,26 @@
       </el-tab-pane>
       <el-tab-pane label="添加其他免赔条件" name="second">
         <el-table
-          ref="multipleTableRef"
+          ref="multipleTableOtherRef"
           :data="addTableData"
           style="width: 100%"
         >
-          <el-table-column property="addIndex" label="序号" width="55" />
+          <el-table-column property="index" label="序号" width="55"/>
+          <el-table-column property="cDeductibleClass" label="ID" width="100"/>
           <el-table-column property="cDeductibleContent" label="免赔内容">
             <template #default="scope">
               <el-input v-model="scope.row['cDeductibleContent']"></el-input>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="55">
+            <template #default="{row}">
+              <el-button
+                  type="danger"
+                  link
+                  size="small"
+                  @click="delAdd(row)"
+              ><i-ep-delete />
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -51,12 +64,11 @@
 </template>
 
 <script setup lang="ts">
-import { defineComponent, ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import { Plus } from "@element-plus/icons-vue";
-import { createFreeButtonBase } from "@/shared/button-config";
-import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { codeListViewStore } from "@/store";
 import { getPrdDeductible } from "@/api/prod";
+import {MyTableMethod} from "@/shared/app-table-config";
 const codeListStore = codeListViewStore();
 const props = defineProps({
   data: {
@@ -72,12 +84,13 @@ const props = defineProps({
 });
 const emits = defineEmits(["handleClose"]);
 const multipleTableRef = ref<MyTableMethod | null>(null);
+const multipleTableOtherRef = ref<MyTableMethod | null>(null);
 const selected = ref([]);
 const pageresult = reactive<Pageresult>({
   /** 数据列表 */
   list: [],
 });
-const addTableData = reactive([]); //添加其他特约
+const addTableData = ref<Array<any>>([]); //添加其他特约
 const activeName = ref("first");
 const selectable = (row) => row["cIfMust"] != "1"; //这里调用是把必选的置灰
 const tableRowClassName = ({ row, rowIndex }) => {
@@ -134,26 +147,27 @@ const toggleSpecificRow = () => {
 };
 
 function add() {
-  addTableData.push({
-    addIndex: addTableData.length + 1, //序号
-    cDeductibleClass: "", 
+  const idx = addTableData.value.length + 1;
+  addTableData.value.push({
+    index: idx, //序号
+    cDeductibleClass: ( idx < 10 ? "other_0" : "other_" ) + idx,
     cDeductibleContent: "",
     cStatus: "",
     cIfEdit: "1", // 是否可修改
-    cIfMust: "", // 是否必选
+    cIfMust: "9", // 是否必选 9 其他
     cYuliu1: "",
   });
 }
 
 //点击确定按钮时把选中的数据派发给父组件
 const returnData = () => {
-  if (activeName.value == "first") {
-    let tempData = multipleTableRef.value.getSelectionRows();
-    props.method.getSelected(tempData);
-  } else {
-    console.log("addTableData", addTableData);
-    props.method.getSelected(addTableData);
+  const tempData = multipleTableRef.value?.getSelectionRows();
+  if(addTableData.value) {
+    for (const item of addTableData.value) {
+      tempData.push(item);
+    }
   }
+  props.method.getSelected(tempData);
   close();
 };
 const close = () => {
@@ -170,6 +184,22 @@ function setSelected() {
       }
     })
   }
+  addTableData.value =  lastSelected.filter(f => f['cIfMust'] === '9');
+}
+
+function delAdd(row: any) {
+  const list = addTableData.value.filter(f => f['cDeductibleClass'] !== row['cDeductibleClass']);
+  const newAddList = list.map(m => {
+    const idx = list.length;
+    return {
+      ...m,
+      ...{
+        index: idx,
+        cDeductibleClass: ( idx < 10 ? "other_0" : "other_" ) + idx,
+      }
+    }
+  });
+  addTableData.value = newAddList;
 }
 
 onMounted(() => {

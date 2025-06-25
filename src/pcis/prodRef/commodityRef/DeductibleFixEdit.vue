@@ -3,6 +3,7 @@
     <div class="form-item">
       <div class="content-container">
         <div
+          v-if="rowData['cIfMust'] !== '9'"
           v-for="(item, index) in cNmeCnArray"
           :key="index"
           class="content-item"
@@ -17,6 +18,15 @@
             style="font-size: 13px;"
           ></el-input>
           <span v-else>{{ item }}</span>
+        </div>
+        <div style="width: 60%" v-else>
+          <el-input
+              type="textarea"
+              v-model="rowData.cDeductibleContent"
+              placeholder="请输入"
+              size="small"
+              style="font-size: 14px;"
+          ></el-input>
         </div>
       </div>
     </div>
@@ -64,10 +74,12 @@ const handleCancel = () => {
 };
 const handleSave = () => {
   dialogVisible.value = false;
-  const parts = cNmeCnArray.value.map((item, idx) =>
-    item === "**" ? inputValues.value[idx] : item
-  );
-  rowData.value.cDeductibleContent = parts.join("");
+  if(rowData.value['cIfMust'] === "9") {
+    const parts = cNmeCnArray.value.map((item, idx) =>
+        item === "**" ? inputValues.value[idx] : item
+    );
+    rowData.value.cDeductibleContent = parts.join("");
+  }
   props.callback({type: 'ok', data: rowData.value});
 };
 </script>

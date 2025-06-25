@@ -6,7 +6,7 @@ import {AppTableMethod, MyTableMethod} from "@/shared/app-table-config";
 export class FormPage {
 
     private componentRefMap = new Map<string, AppFreeEditMethod | AppGridEditMethod | AppTableMethod | MyTableMethod | any>();
-    private buttonRefMap = new Map<string, FreeButtonBase>();
+    private buttonRefMap = new Map<string, FreeButtonBase | any>();
     private formConfig= new Array<any>();
     private initial: boolean = false;
 
@@ -125,11 +125,11 @@ export class FormPage {
      * 设置指定组件只读模式
      * @param id
      */
-    setFormReadOnlyById(id: string) {
+    setFormReadOnlyById(id: string, isDisabled: boolean) {
         nextTick(() => {
             const comp = this.componentRefMap.get(id);
             if (comp) {
-                comp.setDisabledAll();
+                comp.setDisabledAll(isDisabled);
             }
         });
     }
@@ -139,21 +139,24 @@ export class FormPage {
      * @param id
      * @param noSet 不需要设置只读的组件key数组
      */
-    setPageReadOnly(noSet: any[] = []) {
-        nextTick(() => {
+    setPageReadOnly(isDisabled: boolean, noSet: any[] = []) {
+        setTimeout(() => {
             const keys = this.componentRefMap.keys();
             for (const key of keys) {
                 if (noSet.includes(key)) continue;
-                this.setFormReadOnlyById(key)
+                this.setFormReadOnlyById(key, isDisabled)
             }
-        });
-        const btnKeys = this.buttonRefMap.keys();
-        // for (const key of btnKeys) {
-        //     const btnConfig = this.getPageBtnRefById(key);
-        //     if(btnConfig) {
-        //         btnConfig.disabled = true;
-        //     }
-        // }
+
+            // const btnKeys = this.buttonRefMap.keys();
+            // for (const key of btnKeys) {
+            //     if(noSet.includes(key)) continue;
+            //     const btnConfig = this.getPageBtnRefById(key);
+            //     if(btnConfig) {
+            //         btnConfig.disabled = true;
+            //     }
+            // }
+
+        }, 250);
     }
 
 

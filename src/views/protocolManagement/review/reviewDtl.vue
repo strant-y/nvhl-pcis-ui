@@ -20,9 +20,9 @@ const props = defineProps({
 
 const formPage = ref(new FormPage('enteringDtl'));
 const idxParam = reactive({
-  opertaorId: 'enteringDtl',
   formPage: formPage.value,
   param: { ...props.param, ...{}},
+  user: JSON.parse(sessionStorage.getItem("user")),
   ciJiMrk: '0',
   readonly: computed(() => ['view'].includes(props.type)),
 });
@@ -50,22 +50,20 @@ onBeforeMount(async() => {
   config[0].pageInfo.forEach((comp: any) => {
     const it = ReviewCompList.find(f => f.tab === comp.pageCode);
     comp['sort'] = it.sort;
-    comp['readonly'] = it.readonly;
   });
   // 排序
   config[0].pageInfo = config[0].pageInfo.sort((a, b) => a.sort - b.sort)
   // 页面初始化
   formPage.value?.setFormConfig(config);
-  query();
 });
 
 onMounted(() => {
-  formPage.value?.setPageReadOnly(['AgreementReview']);
+  query();
 });
 
 function query() {
   cargoApi.checkInit({
-    ...formPage.param,
+    ...idxParam.param,
     ...{}
   }).then((res: any) => {
     if(res.code === 200) {
@@ -75,8 +73,9 @@ function query() {
       ElMessage.error(res.msg);
     }
   });
+  formPage.value?.setPageReadOnly(true, ['AgreementReview']);
   if(idxParam.readonly === true) {
-    formPage.value.setFormReadOnlyById('AgreementReview');
+    formPage.value.setFormReadOnlyById('AgreementReview', true);
     const submitBtn = formPage.value?.getPageBtnRefById('submit')?.getConfig()
     submitBtn.disabled = true;
   }
@@ -92,7 +91,7 @@ function submit() {
   }).then((res: any) => {
     if(res.code === 200) {
       ElMessage.success('提交成功')
-      formPage.value.setFormReadOnlyById('AgreementReview');
+      formPage.value.setFormReadOnlyById('AgreementReview', true);
       const submitBtn = formPage.value.getPageBtnRefById('submit')?.getConfig();
       submitBtn.disabled = true;
     }else {

@@ -309,9 +309,9 @@ const method = {
       });
 
       setValue("Applicant.cNation", "1"); // 国籍
-      setValue("Applicant.tBirthday", null);
-      setValue("Applicant.nAge", null);
-      setValue("Applicant.cSex", null);
+      // setValue("Applicant.tBirthday", null);
+      // setValue("Applicant.nAge", null);
+      // setValue("Applicant.cSex", null);
 
       if (!param.initFlag) {
         setFormItem("Applicant.cNation", {
@@ -350,7 +350,7 @@ const method = {
 
       // 统一社会信用代码校验
         setFormItem("Applicant.cCertfCde", {
-        rules: [getRules("socialCode", {})],
+        rules: [getRules("required", {}),getRules("socialCode", {})],
       });
 
             // 为法人  企业成立日期
@@ -359,7 +359,7 @@ const method = {
       });
     } else {
       setFormItem("Applicant.cCertfCde", {
-        rules: [getRules("required", {}),getRules("passPort", {})],
+        rules: [getRules("required", {})],
       });
       setFormItem("Applicant.tCertfBgnDate", { rules: null });
       setFormItem("Applicant.tCertfEndDate", { rules: null });
@@ -375,6 +375,15 @@ const method = {
     const param = opertaor.getParam();
 
     if (val == "0") {
+      setFormItem("Applicant.tBirthday", {
+        rules: null
+      });
+      setFormItem("Applicant.nAge", {
+        rules: null
+      });
+      setFormItem("Applicant.cSex", {
+        rules: null
+      });
       // Applicant.cWorkDpt
       productStore.setcClntMrk(val);
       // 办理人
@@ -432,9 +441,17 @@ const method = {
       });
  
       //实名认证方式
-      setFormItem("Applicant.cRealnameAuthType", {
-        rules: [getRules("required", {})],
-      });
+      let cWorkDpt = getValue('Applicant.cWorkDpt')
+      if(cWorkDptList.includes(cWorkDpt)){
+          setFormItem("Applicant.cRealnameAuthType", {
+            rules: [getRules("required", {})],
+          });
+      }else{
+          setFormItem("Applicant.cRealnameAuthType", {
+            rules: [],
+          });
+      }
+   
  
    
       let cMobile = getValue('Applicant.cMobile');  // 移动 
@@ -459,6 +476,19 @@ const method = {
       setFormItem("Applicant.cTrdCde", {
         rules: [getRules("required", {})],
       });
+
+      // 性别 、年龄、生日个人必填
+      setFormItem("Applicant.tBirthday", {
+        rules: [],
+      });
+      setFormItem("Applicant.nAge", {
+      rules: [],
+      });
+      setFormItem("Applicant.cSex", {
+        rules: [],
+      });
+
+
            codeListStore
         .queryCodeList({
           codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
@@ -481,6 +511,15 @@ const method = {
           });
         });
     } else {
+      setFormItem("Applicant.tBirthday", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.nAge", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.cSex", {
+        rules: [getRules("required", {})],
+      });
       setFormItem("Applicant.cWorkDpt", { rules: null });
       setFormItem("Applicant.cIsMicroEntpris", {
         disabled: true,
@@ -529,16 +568,10 @@ const method = {
         rules: [],
       });
 
-      console.log(cWorkDptList.includes(getValue('Applicant.cWorkDpt')))
-
-      if(!cWorkDptList.includes(getValue('Applicant.cWorkDpt'))){
-        //实名认证方式
-        setFormItem("Applicant.cRealnameAuthType", {
-          rules: [],
-        });
-      }
-      
-
+      //实名认证方式
+      setFormItem("Applicant.cRealnameAuthType", {
+        rules: [],
+      });
 
       // 个人 移动电话必填  
       setFormItem("Applicant.cMobile", {
@@ -546,6 +579,17 @@ const method = {
       });
       setFormItem("Applicant.cTel", { rules: [getRules("phone", {})] });
       setFormItem("Applicant.cIsIndvduBiz", {
+        rules: [getRules("required", {})],
+      });
+
+      // 性别 、年龄、生日个人必填
+      setFormItem("Applicant.tBirthday", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.nAge", {
+      rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.cSex", {
         rules: [getRules("required", {})],
       });
 
@@ -655,7 +699,8 @@ const method = {
             setFormItem("Applicant.cTrdCde", {
               loadData: [{ label: data.cnm, value: data.cde }],
             });
-            setValue("Applicant.cTrdCde", data.cnm);
+           // setValue("Applicant.cTrdCde", data.cnm);
+            setValue("Applicant.cTrdCde", data.cde);
             dialog.value?.handleClose();
           },
         },
@@ -672,6 +717,9 @@ const method = {
         type: "show",
         method: {
           getdbClickData: (data) => {
+            setFormItem("Applicant.cOccupCde", {
+              loadData: [{ label: data.cnm, value: data.cde }],
+            });
             setValue("Applicant.cOccupCde", data.cde);
             dialog.value?.handleClose();
           },
@@ -861,9 +909,8 @@ const method = {
   // 单位性质
   cWorkDptChange:(val:any,lab:any)=>{
       console.log('单位性质',val,lab)
-       let cClntMrk = getValue('Applicant.cClntMrk');  // 投保人性质 
-      
-      if(cWorkDptList.includes(val) || cClntMrk =='0'){
+      let cClntMrk = getValue('Applicant.cClntMrk');  // 投保人性质 
+      if(cWorkDptList.includes(val) && cClntMrk =='0'){
           //实名认证方式
           setFormItem("Applicant.cRealnameAuthType", {
             rules: [getRules("required", {})],
@@ -876,12 +923,12 @@ const method = {
 
       if(val =='350'){
         setFormItem("Applicant.cGcidCode", {
-              rules: [getRules("required", {}),getRules("leiCode", {})],
-            });
+          rules: [getRules("required", {}),getRules("leiCode", {})],
+        });
       }else if(val){
         setFormItem("Applicant.cGcidCode", {
-              rules: [getRules("leiCode", {})],
-            });
+          rules: [getRules("leiCode", {})],
+        });
       }
   },
   // 证件有效起期

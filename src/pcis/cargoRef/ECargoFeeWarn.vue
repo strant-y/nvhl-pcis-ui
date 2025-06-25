@@ -149,8 +149,8 @@ function getFormConfig(){
 function getFormBtn() {
   return applicantEditRef?.value?.getFormBtn();
 }
-function setDisabledAll() {
-  applicantEditRef?.value?.setDisabledAll();
+function setDisabledAll(isDisabled: boolean) {
+  applicantEditRef?.value?.setDisabledAll(isDisabled);
 }
 defineExpose({
   getFormValue,

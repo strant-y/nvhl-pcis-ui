@@ -256,6 +256,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				inputtype: "rtselect",
 				title: "缴费类型",
 				typeCode: "CHARGE_TYPE_CACHE",
+                clearable: true,
 				param: {'cCde': [ '2', '3', '5',  '99']},
 			},
 			{

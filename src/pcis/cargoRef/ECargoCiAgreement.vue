@@ -131,8 +131,8 @@ const setFormItem = (key, obj) => {
 function getFormConfig(){
   return formconfig1;
 }
-function setDisabledAll() {
-  return tgtobjEditRef?.value?.setDisabledAll();
+function setDisabledAll(isDisabled: boolean) {
+  return tgtobjEditRef?.value?.setDisabledAll(isDisabled);
 }
 defineExpose({
   getFormValue,
