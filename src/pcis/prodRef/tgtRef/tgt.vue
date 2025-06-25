@@ -804,7 +804,21 @@ const method = {
     }else{
         return true;
     }
-  }
+  },
+
+// 是否记名投保
+cIsinsuranceRegisteredChange:(val:any)=>{
+    console.log(11122,val)
+    if(val=='0'){
+        setFormItem('Tgt.cPracticeType',{
+          rules:[getRules("required", {})]
+        })
+    }else{
+        setFormItem('Tgt.cPracticeType',{
+          rules:[]
+        })
+    }
+}
 
 
 };
