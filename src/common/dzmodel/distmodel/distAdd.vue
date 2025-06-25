@@ -25,6 +25,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { codeListViewStore } from "@/store";
 import {getAddressStr} from "@/api/query";
 import {eventBus} from "@/utils/event-bus";
+import {calculateAgeFromIdCard} from "@/utils/common";
 const opertaor = dataOpertaor();
 const param = ref({});
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
@@ -166,6 +167,16 @@ onMounted(() => {
         }
       });
     }
+    // 身份证类型自动回填年龄
+    if(item.prop =='Dist.cIdentificationNumber'){
+      item['func'] = (val: string) => {
+        if(val && val.length === 18 && getValue('Dist.cDocumentType') === '120001') {
+          const age = calculateAgeFromIdCard(val);
+          setValue('Dist.nAge', age);
+        }
+      }
+    }
+
     if(item.prop =='Dist.cSchoolName'){
       item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
     }
