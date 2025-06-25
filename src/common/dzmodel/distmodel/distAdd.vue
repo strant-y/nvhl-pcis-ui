@@ -56,6 +56,7 @@ const cComponentTable = computed(() => props.data.compKey ? props.data.compKey.r
 
 const dataParams = ref({});
 const appNo = ref("");
+const cGrpMrk = ref("");
 const emits = defineEmits(["handleClose"]);
 const formconfigdist = ref<Record<string, any>>({});
 const formconfig1 = ref<AppFreeEditConfig>(
@@ -112,7 +113,7 @@ onMounted(() => {
   // console.log(333)   distAdd
   dataParams.value = opertaor.getDataAll();
   appNo.value = dataParams.value.plyBase["Base.cAppNo"];
-  
+  cGrpMrk.value = route.params.param.cGrpMrk;
   let newSchema = [];
   let cIs= opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered']  //  是否记名投保
 
@@ -153,19 +154,23 @@ onMounted(() => {
     if(item.prop =='Dist.cVinCode'){
      item['rules'] = [getRules("vinNumber", {})];
     }
-
-    // 043009 实际用工地址关联
+    // 043009 实际用工地址关联 团单才展示
     if(item.prop === 'Dist.cEmploymentAddress'){
-      eventBus.emit('ProjectDist043009', (res: any) => {
-        if(res) {
-          item['loadData'] = res.map((m: any) => {
-            return {
-              label: m['Dist.cDetailedAddress'],
-              value: m['Dist.cPkId']
-            }
-          })
-        }
-      });
+      if(cGrpMrk.value !== '1') {
+        item['rules'] = [];
+        item["hidden"] = true;
+      }else {
+        eventBus.emit('ProjectDist043009', (res: any) => {
+          if(res) {
+            item['loadData'] = res.map((m: any) => {
+              return {
+                label: m['Dist.cDetailedAddress'],
+                value: m['Dist.cPkId']
+              }
+            })
+          }
+        });
+      }
     }
     // 身份证类型自动回填年龄
     if(item.prop =='Dist.cIdentificationNumber'){
