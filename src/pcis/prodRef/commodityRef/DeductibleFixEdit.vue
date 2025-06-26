@@ -74,7 +74,7 @@ const handleCancel = () => {
 };
 const handleSave = () => {
   dialogVisible.value = false;
-  if(rowData.value['cIfMust'] === "9") {
+  if(rowData.value['cIfMust'] !== "9") {
     const parts = cNmeCnArray.value.map((item, idx) =>
         item === "**" ? inputValues.value[idx] : item
     );
