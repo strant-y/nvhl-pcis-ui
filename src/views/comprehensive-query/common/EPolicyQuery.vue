@@ -431,7 +431,6 @@ function handleQuery(flag?: boolean) {
             }
             const param = Object.assign(
                 {
-                    SysCode: 'POLY_CASU',
                     CurrentUser: user.value.opCde,
                     CurrentUserOrg: user.value.companyId,
                     CAppTyp: plyTyp === 'EDR' ? 'E' : 'A'
