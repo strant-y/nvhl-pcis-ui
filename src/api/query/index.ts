@@ -247,3 +247,19 @@ export function calculatePremium(queryParams: any): AxiosPromise<any> {
 export function getAppPolicyForCopy(queryParams: any): AxiosPromise<any> {
     return post(`/policy/getAppPolicyForCopy`, queryParams);
 }
+
+/**
+ * 询价-投保单保存
+ * @param queryParams
+ */
+export function saveInquiry(queryParams: any): AxiosPromise<any> {
+    return post(`/inquiry/save`, queryParams);
+}
+
+/**
+ * 询价-投保单申请核保
+ * @param queryParams
+ */
+export function submitInquiry(queryParams: any): AxiosPromise<any> {
+    return post(`/inquiry/submit`, queryParams);
+}
