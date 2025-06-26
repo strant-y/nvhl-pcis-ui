@@ -218,6 +218,10 @@ const method = {
       });
     }
   },
+  knowledgeShow:()=>{
+    dialog.value?.open('detailsKnows', null,
+        null,{width: 45,title:'战争及罢工险核保限制和运输地国家限制'});
+  },
   gettCompletionYearChange:(val:string)=>{
     const currentYear = new Date().getFullYear();
     setValue('Tgt.nShipAge',currentYear - Number(val))
