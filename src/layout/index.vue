@@ -41,7 +41,7 @@
       <Settings v-if="defaultSettings.showSettings" />
     </div>
     <div>
-      <CopyRight />
+    <CopyRight v-if="route.name === 'Dashboard'" />
     </div>
   </div>
 </template>
@@ -49,6 +49,8 @@
 <script setup lang="ts">
 import { useAppStore, useSettingsStore, usePermissionStore } from "@/store";
 import defaultSettings from "@/settings";
+import { useRoute } from "vue-router";
+const route = useRoute();
 
 const appStore = useAppStore();
 const settingsStore = useSettingsStore();

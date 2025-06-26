@@ -10,11 +10,12 @@
               :key="v"
               class="NavigaList_card"
             >
-              <el-anchor :bound="120" :offset="80" style="margin-top: 10px">
+              <el-anchor :bound="120" :offset="80">
                 <el-anchor-link :href="`#underwriteurl`" v-if="underwriteFlag">
-                  <rt-icon
+                  <!-- <rt-icon
                     :item="{ icon: 'Tickets' }"
-                  />
+                  /> -->
+                  <i class="icon iconfont icon-shenhexinxi"></i>
                   <span style="font-size: 15px" v-if="NavigaShow"
                     >核保处理</span
                   >
@@ -23,9 +24,10 @@
                   v-if="edrbaseFlag"
                   @click="handleAnchorClick($event, `#edrbase`)"
                 >
-                  <rt-icon
+                  <!-- <rt-icon
                     :item="{ icon: 'Tickets' }"
-                  />
+                  /> -->
+                  <i class="icon iconfont icon-shujuxiuzheng"></i>
                   <span style="font-size: 15px" v-if="NavigaShow"
                     >批改信息</span
                   >
@@ -34,9 +36,10 @@
                   v-if="edritemFlag"
                   @click="handleAnchorClick($event, `#edritem`)"
                 >
-                  <rt-icon
+                  <!-- <rt-icon
                     :item="{ icon: 'Tickets' }"
-                  />
+                  /> -->
+                  <i class="icon iconfont icon-zhongkaian"></i>
                   <span style="font-size: 15px" v-if="NavigaShow"
                     >批改比较项</span
                   >
@@ -69,7 +72,7 @@
                     }"
                   /> -->
                   <i :class="['icon','iconfont',iconMap[k.pageKey]]"></i>
-                  <span style="font-size: 15px" v-if="NavigaShow">
+                  <span class="icon-title" v-if="NavigaShow">
                     <template v-if="k.pageTtile && k.pageTtile.length > 6">
                       <el-tooltip
                         effect="dark"
@@ -89,17 +92,19 @@
                   :href="`#ciMasterAgreement`"
                   v-if="ciMasterAgreementFlag && isCiJiMrk"
                 >
-                  <rt-icon
+                  <!-- <rt-icon
                     :item="{ icon: 'Tickets' }"
-                  />
+                  /> -->
+                  <i class="icon iconfont icon-yishoubaodan"></i>
                   <span style="font-size: 15px" v-if="NavigaShow"
                     >联共保主协议信息</span
                   >
                 </el-anchor-link>
                 <el-anchor-link :href="`#ci`" v-if="ciFlag && isCiJiMrk">
-                  <rt-icon
+                  <!-- <rt-icon
                     :item="{ icon: 'Tickets' }"
-                  />
+                  /> -->
+                  <i class="icon iconfont icon-zaibaoxinxi"></i>
                   <span style="font-size: 15px" v-if="NavigaShow"
                     >联共保信息</span
                   >
@@ -108,9 +113,10 @@
                   :href="`#ourCompanyCiShare`"
                   v-if="ourCompanyCiShareFlag && isCiJiMrk"
                 >
-                  <rt-icon
+                  <!-- <rt-icon
                     :item="{ icon: 'Tickets' }"
-                  />
+                  /> -->
+                  <i class="icon iconfont icon-lishiyijian"></i>
                   <span style="font-size: 15px" v-if="NavigaShow"
                     >我司联共保信息</span
                   >
@@ -135,15 +141,15 @@
       <el-main>
         <el-affix
           :offset="80"
-          style="text-align: center; padding: 5px; background: #ebedfc;width: 100%;"
+          style="text-align: center; padding: 5px; background: #ebedfc;width: 100%;font-size: 16px;"
         >
           <div class="tp" style="background: #ebedfc">
-            <span style="font-weight: bold">条款：</span
+            <span class="font-weight-500">条款：</span
             ><span class="publicStyle"
               >{{ props.param.cTermNo }}&nbsp;&nbsp;{{
                 props.param.cTermNme
               }}</span
-            >&nbsp;|&nbsp;<span style="font-weight: bold">出单方式：</span
+            >&nbsp;|&nbsp;<span class="font-weight-500">出单方式：</span
             ><span class="publicStyle">核心页面出单</span>&nbsp;|
             <span class="publicStyle">{{productStore.cCiMrk === '0' ? '非共保业务' 
               : productStore.cCiMrk == '1' ? '外部共保我方主共_主联'
@@ -154,21 +160,21 @@
             <span class="publicStyle">{{
               props.param.cGrpMrk == "0" ? "个单" : "团单"
             }}</span
-            >&nbsp;|&nbsp;<span style="font-weight: bold">是否互联网出单:</span
+            >&nbsp;|&nbsp;<span class="font-weight-500">是否互联网出单:</span
             >&nbsp;<span class="publicStyle">{{
               props.param.cIsNet == "0" ? "是" : "否"
             }}</span>
           </div>
           <div class="btm" style="background: #ebedfc">
-            <span style="font-weight: bold">保险期限：</span
+            <span class="font-weight-500">保险期限：</span
             ><span class="publicStyle">{{ tmDay }}</span
-            >&nbsp;|&nbsp;<span style="font-weight: bold">保额：</span
+            >&nbsp;|&nbsp;<span class="font-weight-500">保额：</span
             ><span class="publicStyle">{{ nAmt }}</span
-            >&nbsp;<span style="font-weight: bold">元</span>&nbsp;|&nbsp;<span
-              style="font-weight: bold"
+            >&nbsp;<span class="font-weight-500">元</span>&nbsp;|&nbsp;<span
+              class="font-weight-500"
               >保费为: </span
             ><span class="publicStyle">{{ nPrm }}</span
-            >&nbsp;<span style="font-weight: bold">元</span>
+            >&nbsp;<span class="font-weight-500">元</span>
           </div>
         </el-affix>
         <div
@@ -241,7 +247,7 @@
           <ourCompanyCiShareRef ref="ourCompanyCiShare"></ourCompanyCiShareRef>
         </div>
         <el-backtop :target="'.el-main'" :right="100" :bottom="150" />
-        <el-affix position="bottom" :offset="55">
+        <el-affix position="bottom" :offset="10">
           <div class="bottom-items">
             <!--新增的投保单号显示和复制按钮-->
             <div style="margin-right: 20px; width: 100%; display: flex; justify-content: flex-end; align-items: center;">
@@ -337,18 +343,18 @@ const { isCiJiMrk } = storeToRefs(productStore);
 const route = useRoute();
 const router = useRouter();
 const iconMap = ref({
-  'plyBase': 'icon-renyuantiaodu',
-  'applicant': 'icon-renyuantiaodu',
-  'insured': 'icon-renyuantiaodu',
-  'insrnc': 'icon-renyuantiaodu',
-  'dist': 'icon-renyuantiaodu',
-  'distSummary': 'icon-renyuantiaodu',
-  'cvrg': 'icon-renyuantiaodu',
-  'deductibleDist': 'icon-renyuantiaodu',
-  'base': 'icon-renyuantiaodu',
-  'SpecialAgreement': 'icon-renyuantiaodu',
-  'payinfo': 'icon-renyuantiaodu',
-  'image': 'icon-renyuantiaodu',
+  'plyBase': 'icon-wenjianban1',
+  'applicant': 'icon-changyongshoukuanrenguanli',
+  'insured': 'icon-changyongshoukuanrenguanli',
+  'insrnc': 'icon-lishicaozuojilu',
+  'dist': 'icon-wenjuantiaocha',
+  'distSummary': 'icon-zu9120',
+  'cvrg': 'icon-chakanmingxi',
+  'deductibleDist': 'icon-lipeixiangguan',
+  'base': 'icon-yishoubaodan',
+  'SpecialAgreement': 'icon-anjiantiaocha',
+  'payinfo': 'icon-hepei',
+  'image': 'icon-yingxiangxinxi',
 })
 
 
@@ -2988,37 +2994,45 @@ function getSaveDataParams() {
 }
 
 .el-anchor {
-  background: var(--el-color-primary);
+  background: transparent;
   :deep(.el-anchor__list) {
-    padding: 15px 10px;
+    padding: 10px 5px;
   } 
   .el-anchor__item {
     margin-bottom: 10px;
     padding-left: 0;
     border-radius: 8px;
-    opacity: .4;
-    &.isActive {
+    opacity: .6;
+    &.isActive,&:hover {
       opacity: 1;
-      background: #ffffff1a;
+      // background: #ffffff1a;
     }
     :deep(a) {
       display: flex;
       flex-direction: column;
       align-items: center;
       color: #FFFFFF;
+      padding: 0;
       .el-icon {
         font-size: 3rem!important;
         margin: 0 0 10px 0;
+      }
+      .iconfont {
+        font-size: 1.5rem;
+        color: #FFF;
+        margin: 5px 0;
+      }
+      .icon-title {
+        font-size: 12px;
       }
     }
   }
 }
 .el-aside {
   width: auto;
+  background: var(--el-color-primary);
 }
-.iconfont {
-  font-size: 2rem;
-  color: #FFF;
-  margin: 20px 0;
+.font-weight-500 {
+  font-weight: 500;
 }
 </style>

@@ -82,6 +82,7 @@
             </div>
             <div class="echarts-box">
               <div ref="ecahrtsRef" class="echarts-container" :style="{ width: chartWidth, height: chartHeight }"></div>
+              <div ref="ecahrtsRef1" class="echarts-container" :style="{ width: chartWidth, height: chartHeight }"></div>
             </div>
           </div>
         </div>
@@ -90,7 +91,7 @@
             <img :src="headIcon" alt="">
             <div class="user-info">
               <div class="user-name">{{ user.opCnm }}</div>
-              <rtButton :item="{label:'出单测试',size: 'small'}" />
+               <el-tag v-if="cOpgrpCnm">{{ cOpgrpCnm }}</el-tag>
             </div>
           </div>
           <div class="content-list-box">
@@ -120,13 +121,6 @@
               <rtButton :item="{label:'查看全部',type:'text'}" />
             </div>
             <div class="list-content">
-              <div class="list-content-item">
-                <div class="item-title">
-                  <span class="title">永安保险好物节</span>
-                  <span class="point"></span>
-                </div>
-                <div class="item-content">大撒打发斯蒂芬撒打发斯蒂芬大师傅</div>
-              </div>
               <div class="list-content-item">
                 <div class="item-title">
                   <span class="title">永安保险好物节</span>
@@ -242,11 +236,15 @@ const moreBtnItem = ref({
 const labelIcon = "/src/assets/img/9.svg"
 const ecahrtsRef = ref(null)
 let ecahrtsRefInstance: ECharts | null = null
+const ecahrtsRef1 = ref(null)
+let ecahrtsRefInstance1: ECharts | null = null
 const chartWidth = ref('100%')
 const chartHeight = ref('300px')
 const userStore = useUserStore();
 const user = userStore.user;
 const roles = user.roles;
+const userItem = JSON.parse(sessionStorage.getItem("user") || '{}');
+const cOpgrpCnm = userItem.roles && userItem.roles[0] ? userItem.roles[0].cOpgrpCnm : "";
 const currentTabName = ref('暂存任务') //tabs默认值
 const isOperate = ref(false) //管理员 出单岗
 const isAudit = ref(false) //  核保岗
