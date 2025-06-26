@@ -240,10 +240,10 @@ watch(
 );
 function getCodeListMapToOption(): boolean {
   if(!!codeListMap) {
-    if(props.item.typeCode in codeListMap) {
+    if(!!codeListMap[props.item.typeCode]) {
       options.value = codeListMap[props.item.typeCode];
       return true;
-    }else if(props.item.prop in codeListMap) {
+    }else if(!!codeListMap[props.item.prop]) {
       options.value = codeListMap[props.item.prop];
       return true;
     }

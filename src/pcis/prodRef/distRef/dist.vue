@@ -72,8 +72,6 @@ const distTableRef = ref<AppTableMethod | null>(null);
 const cardconfig = ref<CardConfig>(creatCardConfig({}));
 const formconfig1 = ref<Record<string, any>>({});
 const tableconfig = ref<AppTableConfig>(createTableEditConfig());
-const codeListMap = ref<any>({});
-provide('codeListMap', codeListMap.value);
 const idxParam = inject('idxParam');
 let fileBase: string;
 // 声明全局变量
@@ -154,10 +152,10 @@ onMounted(async () => {
   if(tgtRef){
     tgtRef.setValue("Tgt.nElevatorsNumber",pageresult.list.length)
   }
+  if(distTableRef.value) {
+    eventBus.on(`setMap-${props.compKey}`, addCodeListMap);
+  }
 });
-
-
-eventBus.on(`setMap-${props.compKey}`, setCodeListMap);
 
 // const  modifyRules = (data, fieldValue)=> {
 //     data.forEach(item => {
@@ -202,7 +200,8 @@ const method = {
           title: "编辑",
           rowData: row,
           tab: formconfig1.value.title,
-          compKey: props.compKey
+          compKey: props.compKey,
+          codeListMap: distTableRef.value?.getCodeListMap(),
         },
         {
           isOk: (res: any) => {
@@ -253,7 +252,8 @@ const method = {
               fromSchema: fromSchema,
               title: "新增",
               tab: formconfig1.value.title,
-              compKey: props.compKey
+              compKey: props.compKey,
+              codeListMap: distTableRef.value?.getCodeListMap(),
             },
             {
               isOk: (res: any) => {
@@ -367,6 +367,7 @@ const method = {
               title: "新增",
               tab: formconfig1.value.title,
               compKey: props.compKey,
+              codeListMap: distTableRef.value?.getCodeListMap(),
             },
             {
               isOk: (res: any) => {
@@ -584,9 +585,8 @@ function setUnDisabledByKeyList(key: any) {
   });
 }
 
-function setCodeListMap (data: any) {
-  const {code, list} = data;
-  codeListMap.value[code] = list
+function addCodeListMap (data: any) {
+  distTableRef.value?.addCodeListMap(data);
 }
 
 function getFormconfig() {
@@ -647,7 +647,7 @@ function handleQuery() {
 const exRules = {};
 
 onUnmounted(() => {
-  eventBus.off(`setMap-${props.compKey}`, setCodeListMap);
+  eventBus.off(`setMap-${props.compKey}`, addCodeListMap);
 });
 
 defineExpose({

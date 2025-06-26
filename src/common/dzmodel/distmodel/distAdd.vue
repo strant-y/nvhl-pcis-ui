@@ -208,6 +208,10 @@ onMounted(() => {
     }, 100);
   } else {
   }
+  nextTick(() => {
+    // 同步dist组件中的codeListMap到表单中
+    freeEditRef.value?.setCodeListMap(props.data.codeListMap);
+  })
 });
 const setcDetailedAddress = (prop:any,aftProp:any)=> {
   const ads = freeEditRef?.value?.getValue(prop[0].prop);

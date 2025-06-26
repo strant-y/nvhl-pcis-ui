@@ -120,6 +120,7 @@
 
 <script setup lang="ts">
 import { AppFreeEditConfig, AppFreeEditMethod } from "./app-free-edit-config";
+import {ref} from "vue";
 defineOptions({
   name: "AppFreeEdit",
   inheritAttrs: false,
@@ -131,7 +132,8 @@ const props = defineProps({
     required: true,
   },
 });
-
+const codeListMap = ref<any>({});
+provide('codeListMap', codeListMap.value);
 const btnMap = ref({});
 const { freeEditConfig } = toRefs(props);
 const emits = defineEmits(["updateDatas"]); // 父组件监听事件，同步子组件值的变化给父组件
@@ -276,6 +278,18 @@ watch(
 function getFormBtn() {
   return btnMap.value
 }
+function getCodeListMap() {
+  return codeListMap.value;
+}
+function addCodeListMap(data: any) {
+  const {code, list} = data;
+  codeListMap.value[code] = list;
+}
+function setCodeListMap(map: any) {
+  if(map) {
+    Object.assign(codeListMap.value, map);
+  }
+}
 
 defineExpose({
   getFromValue,
@@ -287,7 +301,10 @@ defineExpose({
   resetFields,
   setDisabledAll,
   getFromSchemaItem,
-  getFormBtn
+  getFormBtn,
+  getCodeListMap,
+  setCodeListMap,
+  addCodeListMap
 });
 </script>
 
