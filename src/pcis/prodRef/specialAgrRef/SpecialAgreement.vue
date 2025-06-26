@@ -1,6 +1,6 @@
 <!-- 特别约定组件 -->
 <template>
-  <div>
+  <div> 
     <myCard :cardConfig="cardconfig">
       <rttable v-model="formData" :item="tableconfig" ref="rttableFrom" />
     </myCard>
@@ -83,13 +83,26 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Edit",
         hideBtns: (row) => {
-          if (!row.cSpecialContent.includes("**")) return true;
+          if (!row.cSpecialContent.includes("*")) return true;
         },
         tableClick: (row) => {
-          dzmodal.open(specEdit, { type: "view", data: row }).then((res) => {
-            if (res.type === "ok") {
-            }
-          });
+
+          let param = {};
+          Object.assign(param, row)
+          dzmodal.open(specEdit, { type: "view", data: param,
+           callback: (res: any) => {
+              if (res.type === "ok") {
+                row.cSpecialContent = res.data.cSpecialContent
+              }
+            } })
+          // .
+          // then((res) => {
+          //   console.log('000kkk',res)
+          //   if (res.type === "ok") {
+          //       row.cSpecialContent = res.data.cSpecialContent
+
+          //   }
+          // });
         },
       }),
       createFreeButtonBase({

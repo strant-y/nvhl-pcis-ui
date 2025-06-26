@@ -21,7 +21,7 @@
           class="content-item"
         >
           <el-input
-            v-if="item === '**'"
+            v-if="item.match(/^\*+$/)"
             v-model="inputValues[index]"
             @input="updateCNmeCn(index, $event)"
             :class="`input-${index}`"
@@ -45,7 +45,7 @@
 <script lang="ts" setup>
 import { ref, watch, onMounted, computed } from "vue";
 const dialogVisible = ref(true);
-const props = defineProps(["data"]);
+const props = defineProps(["data","callback"]);
 const rowData = ref(props.data);
 //rowData当前行数据
 /**
@@ -62,9 +62,12 @@ onMounted(() => {
 // 使用正则表达式分割字符串，保留分隔符 ** 作为单独的数组项
 const cNmeCnArray = computed(() => rowData.value.cSpecialContent.split(/(\*+)/));
 // const inputValues = ref<string[]>([]);
-const inputValues = ref(
-  cNmeCnArray.value.map((item) => (item === "**" ? "" : item))
+const inputValues = ref( //item.match(/^\*+$/)
+  cNmeCnArray.value.map((item) => (item === "*" ? "*" : item))
 );
+
+
+ console.log(inputValues.value)
 
 const updateCNmeCn = (index: number, value: string) => {
   inputValues.value[index] = value;
@@ -74,11 +77,15 @@ const handleCancel = () => {
 };
 const handleSave = () => {
   dialogVisible.value = false;
+
+
   const parts = cNmeCnArray.value.map((item, idx) =>
-    item === "**" ? inputValues.value[idx] : item
+    item.match(/^\*+$/) ? inputValues.value[idx] : item
   );
+
   rowData.value.cSpecialContent = parts.join("");
   console.log("提交的数据:", rowData.value);
+  props.callback({type: 'ok', data: rowData.value});
 };
 </script>
 <style scoped>

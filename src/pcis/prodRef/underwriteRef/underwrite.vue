@@ -31,102 +31,7 @@
             title: "核保信息",
             endBtnsPosition: "right",
             fromSchema: [
-                {
-                    prop: "cUndrMrk",
-                    inputtype: "rtselect",
-                    title: "核保选项",
-                    loadData: [
-                        // {value: 'A', label: '同意'},
-                        // {value: 'R', label: '上报'},
-                        // {value: 'B', label: '退回给出单员'},
-                        // {value: 'T', label: '退回至指定核保级别人员'}
-                    ],
-                    rules: [getRules("required", {})],
-                    clearable: true,
-                    func:(v)=>{
-                        if ('A' === v) {
-                            setValue('cUndrOpnList', '')
-                            if ('E' === params['cAppTyp']){
-                                setFormItem("cUndrOpnList", {
-                                    loadData: [{label: '审核通过', value: '6'}]
-                                })
-                            }else{
-                                setFormItem("cUndrOpnList", {
-                                    loadData: [{label: '审核通过', value: '0'}]
-                                })
-                            }
-                        }else if ('R' === v) {
-                            setValue('cUndrOpnList', '')
-                            setFormItem("cUndrOpnList", {
-                                loadData: [{label: '提交上级', value: '5'}]
-                            })
-                        }else{
-                            setValue('cUndrOpnList', '')
-                            setFormItem("cUndrOpnList", {
-                                loadData: [{label: '缺少必要信息', value: '1'},
-                                    {label: '修改承保条件', value: '2'},
-                                    {label: '费用超标', value: '3'},
-                                    {label: '拒绝承保', value: '4'},
-                                    {label: '录入错误', value: '7'},
-                                    {label: '资料不全', value: '8'},
-                                    {label: '其他', value: '9'},
-                                ]
-                            })
-                        }
-                        if ('T' === v) {
-                            setValue('cBckOp', '')
-                            setFormItem("cBckOp", {
-                                hidden: false,
-                                rules: [getRules("required", {})],
-                            })
-                            formconfig1.fromSchema.forEach((v,index)=>{
-                                if(index=='5'){
-                                    v.hidden=false
-                                }
-                            })
-                            const param={
-                                "usrDptCde": user['companyId'],
-                                "operId": user['opCde'],
-                                "prodNo": params.cProdNo,
-                                "appNo": params.cAppNo,
-                                "dptCde": params.cDptCde
-                            }
-                            console.log(param)
-                            getBackClsListUrlFn(param)
-                        }else {
-                            setFormItem("cBckOp", {
-                                hidden: true,
-                                rules: '',
-                            })
-                            formconfig1.fromSchema.forEach((v,index)=>{
-                                if(index=='5'){
-                                    v.hidden=true
-                                }
-                            })
-                            setValue('cBckOp', '')
-                        }
-                    }
-                },
-                {},
-                {
-                    prop: "cUndrOpnList",
-                    inputtype: "rtselect",
-                    title: "核保意见选项",
-                    loadData: [
-                    ],
-                    rules: [getRules("required", {})],
-                    itemWidth: 1,
-                    valueSpan: 10,
-                    clearable: true,
-                },
-                {
-                    prop: "undrOpn",
-                    inputtype: "rtinput",
-                    type: "textarea",
-                    title: "核保意见",
-                    rows: 4,
-                    itemWidth: 2,
-                },
+          
                 {
                     prop: "cBckOp",
                     inputtype: "rtselect",
@@ -222,6 +127,102 @@
                     inputtype: "rtinput",
                     type: "textarea",
                     title: "预约分保意见",
+                    rows: 4,
+                    itemWidth: 2,
+                },
+                      {
+                    prop: "cUndrMrk",
+                    inputtype: "rtselect",
+                    title: "核保选项",
+                    loadData: [
+                        // {value: 'A', label: '同意'},
+                        // {value: 'R', label: '上报'},
+                        // {value: 'B', label: '退回给出单员'},
+                        // {value: 'T', label: '退回至指定核保级别人员'}
+                    ],
+                    rules: [getRules("required", {})],
+                    clearable: true,
+                    func:(v)=>{
+                        if ('A' === v) {
+                            setValue('cUndrOpnList', '')
+                            if ('E' === params['cAppTyp']){
+                                setFormItem("cUndrOpnList", {
+                                    loadData: [{label: '审核通过', value: '6'}]
+                                })
+                            }else{
+                                setFormItem("cUndrOpnList", {
+                                    loadData: [{label: '审核通过', value: '0'}]
+                                })
+                            }
+                        }else if ('R' === v) {
+                            setValue('cUndrOpnList', '')
+                            setFormItem("cUndrOpnList", {
+                                loadData: [{label: '提交上级', value: '5'}]
+                            })
+                        }else{
+                            setValue('cUndrOpnList', '')
+                            setFormItem("cUndrOpnList", {
+                                loadData: [{label: '缺少必要信息', value: '1'},
+                                    {label: '修改承保条件', value: '2'},
+                                    {label: '费用超标', value: '3'},
+                                    {label: '拒绝承保', value: '4'},
+                                    {label: '录入错误', value: '7'},
+                                    {label: '资料不全', value: '8'},
+                                    {label: '其他', value: '9'},
+                                ]
+                            })
+                        }
+                        if ('T' === v) {
+                            setValue('cBckOp', '')
+                            setFormItem("cBckOp", {
+                                hidden: false,
+                                rules: [getRules("required", {})],
+                            })
+                            formconfig1.fromSchema.forEach((v,index)=>{
+                                if(index=='5'){
+                                    v.hidden=false
+                                }
+                            })
+                            const param={
+                                "usrDptCde": user['companyId'],
+                                "operId": user['opCde'],
+                                "prodNo": params.cProdNo,
+                                "appNo": params.cAppNo,
+                                "dptCde": params.cDptCde
+                            }
+                            console.log(param)
+                            getBackClsListUrlFn(param)
+                        }else {
+                            setFormItem("cBckOp", {
+                                hidden: true,
+                                rules: '',
+                            })
+                            formconfig1.fromSchema.forEach((v,index)=>{
+                                if(index=='5'){
+                                    v.hidden=true
+                                }
+                            })
+                            setValue('cBckOp', '')
+                        }
+                    }
+                },
+                {},
+                {
+                    prop: "cUndrOpnList",
+                    inputtype: "rtselect",
+                    title: "核保意见选项",
+                    loadData: [
+                    ],
+                    rules: [getRules("required", {})],
+                    itemWidth: 1,
+                    valueSpan: 10,
+                    clearable: true,
+                },
+                {
+                    prop: "undrOpn",
+                    inputtype: "rtinput",
+                    type: "textarea",
+                    title: "核保意见",
                     rows: 4,
                     itemWidth: 2,
                 },

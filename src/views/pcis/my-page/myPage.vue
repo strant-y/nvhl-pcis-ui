@@ -1740,18 +1740,22 @@ const loadAppPlyInfo = (CAppNo) => {
               }
             })
           }
+          console.log('---老宋1',ops)
           edrbase.value?.setFormValue(EdrBaseData);
         }
         ElMessage.success(res.msg);
-        opertaor.setDataAll(ops);
+ 
+        
         // 展示保费和保额金额
         if (ops["base"]["Base.nPrm"] && ops["base"]["Base.nPrm"] > 0) {
           nPrm.value = ops["base"]["Base.nPrm"];
+          ops["base"]["Base.nRmbPrm"] = ops["base"]["Base.nPrm"] *  ops["base"]["Base.nAmtRmbExch"]
         }
         if (ops["base"]["Base.nAmt"] && ops["base"]["Base.nAmt"] > 0) {
           nAmt.value = ops["base"]["Base.nAmt"];
         }
         pageData.value = ops;
+        opertaor.setDataAll(ops);
       }
     });
   }
