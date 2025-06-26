@@ -225,6 +225,7 @@
     <!-- <div class="absolute bottom-1 text-[10px] text-center" v-show="icpVisible">
       <p>2005-2024 版权所有 软通动力信息技术（集团）股份有限公司 版权所有</p>
     </div> -->
+    <CopyRight style="position: absolute;border: none;background: transparent;bottom: 0;" />
     <third-party-dialog
       v-if="dialogShow"
       v-model:dialogShow="dialogShow"

@@ -41,7 +41,7 @@
       <Settings v-if="defaultSettings.showSettings" />
     </div>
     <div>
-    <CopyRight v-if="route.name === 'Dashboard'" />
+    <!-- <CopyRight v-if="route.name === 'Dashboard'" /> -->
     </div>
   </div>
 </template>
