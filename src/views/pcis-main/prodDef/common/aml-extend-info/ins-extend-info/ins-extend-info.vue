@@ -88,15 +88,16 @@ const formconfigData = {
 			prop: 'CCusNme_A',
 			title: '姓名',
 			inputtype: "rtinput",
-			// clearable: true,
-			// rules: [getRules("required", {})],
+			clearable: true,
+			rules: [getRules("required", {})],
 		},
 		{
 			prop: 'CCertfCls_A',
 			title: '证件类型',
 			inputtype: "rtselect",
 			typeCode: "NATURAL_CERTIFICATE_ALL",
-			// clearable: true,
+      clearable: true,
+      rules: [getRules("required", {})]
 			
 		},
 		{
@@ -108,12 +109,16 @@ const formconfigData = {
 		{
 			prop: 'TCertfBgnTm_A',
 			title: '认证有效起期',
-			inputtype: "rtdatepicker"
+			inputtype: "rtdatepicker",
+      clearable: true,
+      rules: [getRules("required", {})]
 		},
 		{
 			prop: 'TCertfEndTm_A',
 			title: '认证有效止期',
-			inputtype: "rtdatepicker"
+			inputtype: "rtdatepicker",
+      clearable: true,
+      rules: [getRules("required", {})]
 		}
 	]
 }
@@ -128,31 +133,37 @@ const formconfigData2 = {
 			title: '姓名',
 			inputtype: "rtinput",
 
-			// clearable: true,
-			// rules: [getRules("required", {})],
+			clearable: true,
+			rules: [getRules("required", {})],
 		},
 		{
 			prop: 'CCertfCls_B',
 			title: '证件类型',
 			inputtype: "rtselect",
 			typeCode: "NATURAL_CERTIFICATE_ALL",
-			// clearable: true,
+      clearable: true,
+      rules: [getRules("required", {})]
 		},
 		{
 			prop: 'CCertfCde_B',
 			title: '证件号码',
-			rules: [getRules("idCard", {})],
-			inputtype: "rtinput"
+			rules: [getRules("required", {}),getRules("idCard", {})],
+			inputtype: "rtinput",
+      clearable: true,
 		},
 		{
 			prop: 'TCertfBgnTm_B',
 			title: '认证有效起期',
-			inputtype: "rtdatepicker"
+			inputtype: "rtdatepicker",
+      clearable: true,
+      rules: [getRules("required", {})]
 		},
 		{
 			prop: 'TCertfEndTm_B',
 			title: '认证有效止期',
-			inputtype: "rtdatepicker"
+			inputtype: "rtdatepicker",
+      clearable: true,
+      rules: [getRules("required", {})]
 		}
 	]
 }
@@ -166,30 +177,37 @@ const formconfigData3 = {
 			prop: 'CCusNme_C',
 			title: '姓名',
 			inputtype: "rtinput",
-			// clearable: true,
+      clearable: true,
+      rules: [getRules("required", {})]
 		},
 		{
 			prop: 'CCertfCls_C',
 			title: '证件类型',
 			inputtype: "rtselect",
 			typeCode: "NATURAL_CERTIFICATE_ALL",
-			// clearable: true,
+      clearable: true,
+      rules: [getRules("required", {})]
 		},
 		{
 			prop: 'CCertfCde_C',
 			title: '证件号码',
-			rules: [getRules("idCard", {})],
-			inputtype: "rtinput"
+			rules: [getRules("required", {}),getRules("idCard", {})],
+			inputtype: "rtinput",
+      clearable: true,
 		},
 		{
 			prop: 'TCertfBgnTm_C',
 			title: '认证有效起期',
-			inputtype: "rtdatepicker"
+			inputtype: "rtdatepicker",
+      clearable: true,
+      rules: [getRules("required", {})]
 		},
 		{
 			prop: 'TCertfEndTm_C',
 			title: '认证有效止期',
-			inputtype: "rtdatepicker"
+			inputtype: "rtdatepicker",
+      clearable: true,
+      rules: [getRules("required", {})]
 		}
 	]
 }
@@ -203,30 +221,37 @@ const formconfigData4 = {
 			prop: 'CCusNme_D',
 			title: '姓名',
 			inputtype: "rtinput",
-			// clearable: true,
+      clearable: true,
+      rules: [getRules("required", {})]
 		},
 		{
 			prop: 'CCertfCls_D',
 			title: '证件类型',
 			inputtype: "rtselect",
 			typeCode: "NATURAL_CERTIFICATE_ALL",
-			// clearable: true,
+      clearable: true,
+      rules: [getRules("required", {})]
 		},
 		{
 			prop: 'CCertfCde_D',
 			title: '证件号码',
-			rules: [getRules("idCard", {})],
-			inputtype: "rtinput"
+			rules: [getRules("required", {}),getRules("idCard", {})],
+			inputtype: "rtinput",
+      clearable: true
 		},
 		{
 			prop: 'TCertfBgnTm_D',
 			title: '认证有效起期',
-			inputtype: "rtdatepicker"
+			inputtype: "rtdatepicker",
+      clearable: true,
+      rules: [getRules("required", {})]
 		},
 		{
 			prop: 'TCertfEndTm_D',
 			title: '认证有效止期',
-			inputtype: "rtdatepicker"
+			inputtype: "rtdatepicker",
+      clearable: true,
+      rules: [getRules("required", {})]
 		}
 	]
 }
