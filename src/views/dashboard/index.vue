@@ -108,7 +108,12 @@
                   <span class="title">{{ item.title }}</span>
                   <span class="point"></span>
                 </div>
-                <div class="item-content">{{ item.description }}</div>
+                <div class="item-content">
+                  {{ item.description }}
+                  <template v-if="item.dataId">【申请单号：{{ item.dataId }}】</template>
+                  <template v-if="item.cEdrNo">【批单号：{{ item.cEdrNo }}】</template>
+                  <template v-if="item.cplyNo">【保单号：{{ item.cplyNo }}】</template>
+                </div>
               </div>
             </div>
           </div>
@@ -352,7 +357,7 @@ const echartsOptions = reactive({
       itemStyle: {
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
               offset: 0,
-              color: 'red'// 起始颜色
+              color: '#cd1920'// 起始颜色
           }, {
               offset: 1,
               color: 'white' // 结束颜色
@@ -366,7 +371,7 @@ const echartsOptions = reactive({
       yAxisIndex: 1,
       data: [],
       itemStyle: {
-        color: 'yellow'
+        color: '#e7b329'
       }
     },
   ]
@@ -456,7 +461,7 @@ const echartsOptions1 = reactive({
       itemStyle: {
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
               offset: 0,
-              color: 'red'// 起始颜色
+              color: '#cd1920'// 起始颜色
           }, {
               offset: 1,
               color: 'white' // 结束颜色
@@ -470,7 +475,7 @@ const echartsOptions1 = reactive({
       yAxisIndex: 1,
       data: [],
       itemStyle: {
-        color: 'yellow'
+        color: '#e7b329'
       }
     },
   ]
@@ -947,7 +952,14 @@ function getNoticeData() {
   pcisQueryService.getNotifyByReceiver(param).then((res: any) => {
     console.log('消息数据', res)
     if (res.code === 200 && res.data.code === '1') {
-      noticeList.value = res.data.result
+      noticeList.value = res.data.result.concat(
+        [
+          { id: 1, title: '您有一条出单信息！', description: '大师傅东方航空件阿萨德发士大夫阿斯蒂芬' },
+          { id: 2, title: '您有一条待审核信息！', description: '大师傅东方航空件阿萨德发士大夫阿斯蒂芬' },
+          { id: 3, title: '您有一条待审批信息！', description: '大师傅东方航空件阿萨德发士大夫阿斯蒂芬' },
+          { id: 4, title: '您有一条驳回信息！', description: '大师傅东方航空件阿萨德发士大夫阿斯蒂芬' },
+        ]
+      )
     }
   })
 }
