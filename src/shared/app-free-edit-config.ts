@@ -33,6 +33,9 @@ export interface AppFreeEditMethod {
   setDisabledAll: (isDisabled: boolean) => void;
   resetFields: () => void;
   getFormBtn: () => any;
+  getCodeListMap: () => any;
+  setCodeListMap: (map: any) => void;
+  addCodeListMap: (data: any) => void;
 }
 export function createAppFreeEditConfig(
   config: AppFreeEditConfig = {}

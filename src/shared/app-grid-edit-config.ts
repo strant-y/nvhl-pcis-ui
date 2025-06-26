@@ -46,6 +46,9 @@ export interface AppGridEditMethod {
   setRowFieldProp: (rowId: string, field: string, prop: string, value: any) => void,
   getFormBtn: () => any;
   getTableBtn: () => any;
+  getCodeListMap: () => any;
+  setCodeListMap: (map: any) => void;
+  addCodeListMap: (data: any) => void;
 }
 
 export function createAppGridEditConfig(

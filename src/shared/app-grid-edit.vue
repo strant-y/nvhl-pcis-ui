@@ -95,7 +95,8 @@ const props = defineProps({
     required: true,
   },
 });
-
+const codeListMap = ref<any>({});
+provide('codeListMap', codeListMap.value);
 const btnMap = ref({});
 const { gridEditConfig } = toRefs(props);
 
@@ -187,7 +188,22 @@ function getTableBtn() {
   });
   return btnMap.value
 }
-
+function getCodeListMap() {
+  return codeListMap.value;
+}
+function addCodeListMap(data: any) {
+  const {code, list} = data;
+  if(!code || !list) {
+    console.warn("setCodeListMap warn , code or list is empty!");
+    return;
+  }
+  codeListMap.value[code] = list;
+}
+function setCodeListMap(map: any) {
+  if(map) {
+    Object.assign(codeListMap.value, map);
+  }
+}
 
 defineExpose({
   getFromValue,
@@ -204,7 +220,10 @@ defineExpose({
   getRowById,
   setRowFieldProp,
   getFormBtn,
-  getTableBtn
+  getTableBtn,
+  getCodeListMap,
+  setCodeListMap,
+  addCodeListMap
 });
 </script>
 

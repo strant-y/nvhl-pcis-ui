@@ -360,10 +360,37 @@ function setFormValue(value: any) {
   formData.value = value;
 }
 function validate() {}
+
+function setDisabledAll() {
+  if (cardconfig.value.titleBtns && cardconfig.value.titleBtns.length > 0) {
+    cardconfig.value.titleBtns.forEach((item: any) => {
+      item.hidden = true;
+    });
+  }
+  if (cardconfig.value.endBtns && cardconfig.value.endBtns.length > 0) {
+    cardconfig.value.endBtns.forEach((item: any) => {
+      item.hidden = true;
+    });
+  }
+}
+function setUnDisabledByKeyList(key: any) {
+  cardconfig.value.endBtns?.forEach((item: any) => {
+    if ("Btn_" + item.id === key) {
+      item.hidden = false;
+    }
+  });
+  cardconfig.value.titleBtns?.forEach((item: any) => {
+    if ("Btn_" + item.id === key) {
+      item.hidden = false;
+    }
+  });
+}
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
+  setDisabledAll,
+  setUnDisabledByKeyList
 });
 </script>
 

@@ -167,7 +167,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             {
                 prop: 'CAppNo',
                 inputtype: 'rtinput',
-                title: '投保单',
+                title: '投保单号',
                 clearable: true
             },
             {
@@ -397,7 +397,7 @@ function handleQuery(flag?: boolean) {
             const plyTyp = freeEditRef.value?.getValue('CPlyTyp')
             const appNme = freeEditRef.value?.getValue('CAppNme')
             if (!!appNme && appNme.length < 2) {
-                ElMessage.warning('投保人名称至少输入2位')
+                ElMessage.warning('投保人名称至少输入2位!')
                 return
             }
             const insuredNme = freeEditRef.value?.getValue('CInsuredNme')
@@ -431,7 +431,6 @@ function handleQuery(flag?: boolean) {
             }
             const param = Object.assign(
                 {
-                    SysCode: 'POLY_CASU',
                     CurrentUser: user.value.opCde,
                     CurrentUserOrg: user.value.companyId,
                     CAppTyp: plyTyp === 'EDR' ? 'E' : 'A'

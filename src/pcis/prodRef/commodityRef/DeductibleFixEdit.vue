@@ -85,6 +85,12 @@ const handleSave = () => {
   dialogVisible.value = false;
   rowData.value.editList = newListValue(cNmeCnArray.value,inputValues.value)
   rowData.value.cDeductibleContent =inputValues.value.join("");
+  // if(rowData.value['cIfMust'] !== "9") {
+  //   const parts = cNmeCnArray.value.map((item, idx) =>
+  //       item === "**" ? inputValues.value[idx] : item
+  //   );
+  //   rowData.value.cDeductibleContent = parts.join("");
+  // }
   props.callback({type: 'ok', data: rowData.value});
   console.log('处理了====',rowData.value)
 };

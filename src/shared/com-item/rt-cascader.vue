@@ -67,6 +67,8 @@ interface OptionTypeBySelect extends OptionType {
   disabled?: boolean;
 }
 
+const codeListMap = inject<any>('codeListMap');
+
 const options: Ref<OptionTypeBySelect[]> = ref([]); // 字典下拉数据源
 
 const cascaderRef = ref();
@@ -89,6 +91,11 @@ const cascprops: CascaderProps = {
   lazyLoad(node, resolve) {
     const { level, value } = node;
     if (level !== 0 && !!value) {
+      const list = codeListMap[`${props.item.typeCode}-${level}-${value}`];
+      if(list) {
+        resolve(list);
+        return;
+      }
       codeListStore
         .queryCodeList(
           {
@@ -106,6 +113,7 @@ const cascprops: CascaderProps = {
           res.forEach((e: any) => {
             e.leaf = level >= (l && l.length > 0 ? l.length - 1 : 5);
           });
+          codeListMap[`${props.item.typeCode}-${level}-${value}`] = res;
           resolve(res);
         })
         .catch((err) => {

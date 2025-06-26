@@ -370,6 +370,7 @@ const templateDialog = defineAsyncComponent(
 
 const idxParam = {
   opertaorId: 'my-page',
+  handleAnchorClick: handleAnchorClick,
 };
 provide('idxParam', idxParam);
 const opertaor = dataOpertaor(idxParam.opertaorId);
@@ -510,7 +511,7 @@ const setCusBenefitInfo = () => {
   const appNo = tabref["applicant"].getFromValue()["Applicant.cAppNo"]; // 单据编号
   const AppcClntMrk = tabref["applicant"].getFromValue()["Applicant.cClntMrk"]; // 投保人 法人01
   const InscClntMrk = tabref["insured"].getFromValue()["Insured.cClntMrk"]; // 被保人  法人01
-
+  const baseValue = opertaor.getTableRefByKey("base").getFromValue()["Base.nRmbPrm"];//承保基本信息 折合人民币总保费
   //  单据保存才有 单据编号
   if (!appNo) {
     ElMessage.error("请先保存单据");
@@ -531,6 +532,12 @@ const setCusBenefitInfo = () => {
   } else if (AppcClntMrk === "1" && InscClntMrk === "1") {
     ElMessage.error(
       "投保人性质或被保人性质为[法人]时，才允许录入反洗钱扩展信息！"
+    );
+    return;
+  }
+  if (baseValue < 200000) {
+    ElMessage.error(
+        "根据反洗钱相关规定，当前保单保费折合人民币大于等于20万元，才允许录入反洗钱扩展信息！"
     );
     return;
   }
@@ -1801,7 +1808,13 @@ const calcPremium = () => {
     btn.loading = false;
     return;
   }
-
+// 校验标的信息中核定座位总数和投保座位数总数不一致！
+  const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue() || '';
+  if(tgtValue && tgtValue["Tgt.nSeatCapacity"] !== tgtValue["Tgt.nSeatsNumber"]) {
+    ElMessage.error("核定座位总数和投保座位数总数不一致！");
+    btn.loading = false;
+    return;
+  }
   const appCalcFun = props.param?.pageName === "priceInquiry" ? calculatePremium(res) : appCalc(res);
   appCalcFun.then((res: any) => {
     btn.loading = false;
@@ -1962,6 +1975,13 @@ const submitToUndrFn = async () => {
       const baseValue = opertaor.getTableRefByKey("base").getFromValue();
       if(baseValue["Base.cAmtCur"] !== baseValue["Base.cPrmCur"]) {
         ElMessage.error("承保基本信息中的总保额币种和总保费币种须一致!");
+        btn.loading = false;
+        return;
+      }
+      // 校验标的信息中核定座位总数和投保座位数总数不一致！
+      const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue() || '';
+      if(tgtValue && tgtValue["Tgt.nSeatCapacity"] !== tgtValue["Tgt.nSeatsNumber"]) {
+        ElMessage.error("核定座位总数和投保座位数总数不一致！");
         btn.loading = false;
         return;
       }
@@ -2797,7 +2817,9 @@ function getTotalNum(arr: any[]) {
  */
 function handleAnchorClick(event: any, targetId: string) {
   // 阻止默认的路由跳转行为
-  event.preventDefault();
+  if(event) {
+    event.preventDefault();
+  }
   // 获取目标元素的ID
   if (targetId) {
     // 手动实现平滑滚动效果
