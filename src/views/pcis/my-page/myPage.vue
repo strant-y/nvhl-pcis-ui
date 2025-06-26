@@ -1798,8 +1798,8 @@ const calcPremium = () => {
     return;
   }
 // 校验标的信息中核定座位总数和投保座位数总数不一致！
-  const tgtValue = opertaor.getTableRefByKey("tgt").getFromValue();
-  if(tgtValue["Tgt.nSeatCapacity"] !== tgtValue["Tgt.nSeatsNumber"]) {
+  const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue() || '';
+  if(tgtValue && tgtValue["Tgt.nSeatCapacity"] !== tgtValue["Tgt.nSeatsNumber"]) {
     ElMessage.error("核定座位总数和投保座位数总数不一致！");
     btn.loading = false;
     return;
@@ -1963,8 +1963,8 @@ const submitToUndrFn = async () => {
         return;
       }
       // 校验标的信息中核定座位总数和投保座位数总数不一致！
-      const tgtValue = opertaor.getTableRefByKey("tgt").getFromValue();
-      if(tgtValue["Tgt.nSeatCapacity"] !== tgtValue["Tgt.nSeatsNumber"]) {
+      const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue() || '';
+      if(tgtValue && tgtValue["Tgt.nSeatCapacity"] !== tgtValue["Tgt.nSeatsNumber"]) {
         ElMessage.error("核定座位总数和投保座位数总数不一致！");
         btn.loading = false;
         return;
