@@ -75,12 +75,12 @@
           </div>
           <div class="content-charts-box">
             <div class="tab-box">
-              <div class="tab-btns">
+              <!-- <div class="tab-btns">
                 <rtButton :item="issueBtnItem"/>
                 <rtButton :item="nPrmBtnItem"/>
-              </div>
+              </div> -->
             </div>
-            <div class="echarts-box">
+            <div class="echarts-box" style="display: flex;">
               <div ref="ecahrtsRef" class="echarts-container" :style="{ width: chartWidth, height: chartHeight }"></div>
               <div ref="ecahrtsRef1" class="echarts-container" :style="{ width: chartWidth, height: chartHeight }"></div>
             </div>
@@ -238,8 +238,8 @@ const ecahrtsRef = ref(null)
 let ecahrtsRefInstance: ECharts | null = null
 const ecahrtsRef1 = ref(null)
 let ecahrtsRefInstance1: ECharts | null = null
-const chartWidth = ref('100%')
-const chartHeight = ref('300px')
+const chartWidth = ref('50%')
+const chartHeight = ref('400px')
 const userStore = useUserStore();
 const user = userStore.user;
 const roles = user.roles;
@@ -285,7 +285,7 @@ const echartsOptions = reactive({
     left: '5%',
     right: '5%',
     bottom: '25%',
-    top: '5%',
+    top: '10%',
     // height: 150,
     containLabel: true
   },
@@ -371,6 +371,110 @@ const echartsOptions = reactive({
     },
   ]
 })
+const echartsOptions1 = reactive({
+  barWidth: "10px",
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'cross',
+      label: {
+        backgroundColor: '#6a7985'
+      }
+    }
+  },
+  color: [
+    '#f57c11'
+  ],
+  grid: {
+    left: '5%',
+    right: '5%',
+    bottom: '25%',
+    top: '10%',
+    // height: 150,
+    containLabel: true
+  },
+  legend: {
+    data: ['每月保费量', '每月保费量同比'],
+    bottom: 0,
+    show: true,
+  },
+  xAxis: [{
+    type: 'category',
+    name: "月份",
+    axisLabel: {
+      show: true,
+      // color: 'red'
+    },
+    axisLine: { // x轴的颜色和宽度
+      lineStyle: {
+        // color: 'red',
+        width: 1
+      }
+    },
+    boundaryGap: false,
+    data: []
+  }],
+  yAxis: [
+    {
+      type: 'value',
+      name: "保费",
+      min: 0,
+      // max: 1000,
+      axisLabel: { // y轴的字体样式
+        show: true,
+        // color: 'red'
+      },
+      axisLine: { // y轴的颜色和宽度
+        lineStyle: {
+          
+          width: 0
+        }
+      }
+    },
+    {
+      type: 'value',
+      name: "占比",
+      min: 0,
+      // max: 50,
+      axisLabel: { // y轴的字体样式
+        show: true,
+        // color: 'red'
+      },
+      axisLine: { // y轴的颜色和宽度
+        lineStyle: {
+          // color: 'yellow',
+          width: 0
+        }
+      }
+    }
+  ],
+  series: [
+    {
+      type: 'bar',
+      name: '每月保费量',
+      data: [],
+      itemStyle: {
+        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+              offset: 0,
+              color: 'red'// 起始颜色
+          }, {
+              offset: 1,
+              color: 'white' // 结束颜色
+          }]),
+      barBorderRadius: [5, 5, 5, 5]
+      }
+    },
+    {
+      type: 'line',
+      name: '每月保费量同比',
+      yAxisIndex: 1,
+      data: [],
+      itemStyle: {
+        color: 'yellow'
+      }
+    },
+  ]
+})
 const tabs = ref<Array<any>>([]); //tabs数组
 const statisticTabList = ref<Array<any>>([]);
 const tabDataMap = ref({});
@@ -400,6 +504,7 @@ const monthTotalRecords = computed(() => {
 function init() {
   if(!ecahrtsRefInstance) {
     ecahrtsRefInstance = echarts.init(ecahrtsRef.value)
+    ecahrtsRefInstance1 = echarts.init(ecahrtsRef1.value)
   }
   getOrderInfo()
 }
@@ -424,7 +529,8 @@ function handleStatisticTabClick(tab:any) {
   currentTab.value = tab.props.label
   handleRefreshEcharts()
 }
-
+const echartsOptionsData = ref([])
+const echartsOptionsData1 = ref([])
 function handleRefreshEcharts() {
   if(ecahrtsBtnIndex.value === 0) {
     issueBtnItem.value.type = "primary"
@@ -433,22 +539,55 @@ function handleRefreshEcharts() {
     issueBtnItem.value.type = "default"
     nPrmBtnItem.value.type = "primary"
   }
-  const param = {
-    type: ecahrtsBtnIndex.value === 0 ? 'ply' : 'fee'
-  }
-  getAnalysis(param).then((res:any) => {
-    if(res.code === 200) {
-      const data = res.dataMap[currentTab.value] || [];
-      echartsOptions.xAxis[0].data = data.map((item:any) => item.item)
-      echartsOptions.series[0].data = data.map((item:any) => item.value)
-      echartsOptions.series[1].data = data.map((item:any) => item.rate)
-      ecahrtsRefInstance?.setOption(echartsOptions)
-    } else {
-      ElMessage.error(res.msg)
+  if(echartsOptionsData.value.length < 1) {
+    const param = {
+      // type: ecahrtsBtnIndex.value === 0 ? 'ply' : 'fee'
+      type: 'ply'
     }
-  }).catch(err => {
-    ElMessage.error(err)
-  })
+    getAnalysis(param).then((res:any) => {
+      if(res.code === 200) {
+        echartsOptionsData.value = res.dataMap[currentTab.value] || [];
+        const data = res.dataMap[currentTab.value] || [];
+        echartsOptions.xAxis[0].data = data.map((item:any) => item.item)
+        echartsOptions.series[0].data = data.map((item:any) => item.value)
+        echartsOptions.series[1].data = data.map((item:any) => item.rate)
+        ecahrtsRefInstance?.setOption(echartsOptions)
+      } else {
+        ElMessage.error(res.msg)
+      }
+    }).catch(err => {
+      ElMessage.error(err)
+    })
+  } else {
+    echartsOptions.xAxis[0].data = echartsOptionsData.value.map((item:any) => item.item)
+    echartsOptions.series[0].data = echartsOptionsData.value.map((item:any) => item.value)
+    echartsOptions.series[1].data = echartsOptionsData.value.map((item:any) => item.rate)
+    ecahrtsRefInstance?.setOption(echartsOptions)
+  }
+  if(echartsOptionsData1.value.length < 1) {
+    const param1 = {
+      type: 'fee'
+    }
+    getAnalysis(param1).then((res:any) => {
+      if(res.code === 200) {
+        echartsOptionsData1.value = res.dataMap[currentTab.value] || [];
+        const data = res.dataMap[currentTab.value] || [];
+        echartsOptions1.xAxis[0].data = data.map((item:any) => item.item)
+        echartsOptions1.series[0].data = data.map((item:any) => item.value)
+        echartsOptions1.series[1].data = data.map((item:any) => item.rate)
+        ecahrtsRefInstance1?.setOption(echartsOptions1)
+      } else {
+        ElMessage.error(res.msg)
+      }
+    }).catch(err => {
+      ElMessage.error(err)
+    })
+  } else {
+    echartsOptions1.xAxis[0].data = echartsOptionsData1.value.map((item:any) => item.item)
+    echartsOptions1.series[0].data = echartsOptionsData1.value.map((item:any) => item.value)
+    echartsOptions1.series[1].data = echartsOptionsData1.value.map((item:any) => item.rate)
+    ecahrtsRefInstance1?.setOption(echartsOptions1)
+  }
 }
 
 onMounted(() => {
@@ -790,6 +929,9 @@ function getShortMenuList() {
 window.addEventListener('resize', () => {
   if(ecahrtsRefInstance) {
     ecahrtsRefInstance.resize()
+  }
+  if(ecahrtsRefInstance1) {
+    ecahrtsRefInstance1.resize()
   }
 })
 </script>
