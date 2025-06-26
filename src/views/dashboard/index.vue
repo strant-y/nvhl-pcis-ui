@@ -546,7 +546,31 @@ function handleRefreshEcharts() {
     }
     getAnalysis(param).then((res:any) => {
       if(res.code === 200) {
-        echartsOptionsData.value = res.dataMap[currentTab.value] || [];
+        res.dataMap['方案出单'].forEach((item:any, index:number) => {
+          item.value = Math.random() * 123
+          item.rate = Math.random() * 3.6
+        })
+        res.dataMap['核心导入'].forEach((item:any, index:number) => {
+          item.value = Math.random() * 18
+          item.rate = Math.random() * 1.2
+        })
+        res.dataMap['核心页面出单'].forEach((item:any, index:number) => {
+          item.value = Math.random() * 153
+          item.rate = Math.random() * 2.2
+        })
+        res.dataMap['渠道出单'].forEach((item:any, index:number) => {
+          item.value = Math.random() * 222
+          item.rate = Math.random() * 2.4
+        })
+        res.dataMap['移动端出单'].forEach((item:any, index:number) => {
+          item.value = Math.random() * 134
+          item.rate = Math.random() * 1.6
+        })
+        res.dataMap['询报价转投保'].forEach((item:any, index:number) => {
+          item.value = Math.random() * 356
+          item.rate = Math.random() * 3.5
+        })
+        echartsOptionsData.value = res.dataMap;
         const data = res.dataMap[currentTab.value] || [];
         echartsOptions.xAxis[0].data = data.map((item:any) => item.item)
         echartsOptions.series[0].data = data.map((item:any) => item.value)
@@ -559,9 +583,9 @@ function handleRefreshEcharts() {
       ElMessage.error(err)
     })
   } else {
-    echartsOptions.xAxis[0].data = echartsOptionsData.value.map((item:any) => item.item)
-    echartsOptions.series[0].data = echartsOptionsData.value.map((item:any) => item.value)
-    echartsOptions.series[1].data = echartsOptionsData.value.map((item:any) => item.rate)
+    echartsOptions.xAxis[0].data = echartsOptionsData.value[currentTab.value].map((item:any) => item.item)
+    echartsOptions.series[0].data = echartsOptionsData.value[currentTab.value].map((item:any) => item.value)
+    echartsOptions.series[1].data = echartsOptionsData.value[currentTab.value].map((item:any) => item.rate)
     ecahrtsRefInstance?.setOption(echartsOptions)
   }
   if(echartsOptionsData1.value.length < 1) {
@@ -570,7 +594,31 @@ function handleRefreshEcharts() {
     }
     getAnalysis(param1).then((res:any) => {
       if(res.code === 200) {
-        echartsOptionsData1.value = res.dataMap[currentTab.value] || [];
+        res.dataMap['方案出单'].forEach((item:any, index:number) => {
+          item.value = Math.random() * 10000
+          item.rate = Math.random() * 0.8
+        })
+        res.dataMap['核心导入'].forEach((item:any, index:number) => {
+          item.value = Math.random() * 1800
+          item.rate = Math.random() * 3.6
+        })
+        res.dataMap['核心页面出单'].forEach((item:any, index:number) => {
+          item.value = Math.random() * 153000
+          item.rate = Math.random() * 2.8
+        })
+        res.dataMap['渠道出单'].forEach((item:any, index:number) => {
+          item.value = Math.random() * 22200
+          item.rate = Math.random() * 2.9
+        })
+        res.dataMap['移动端出单'].forEach((item:any, index:number) => {
+          item.value = Math.random() * 134000
+          item.rate = Math.random() * 1.6
+        })
+        res.dataMap['询报价转投保'].forEach((item:any, index:number) => {
+          item.value = Math.random() * 3560
+          item.rate = Math.random() * 3.5
+        })
+        echartsOptionsData1.value = res.dataMap;
         const data = res.dataMap[currentTab.value] || [];
         echartsOptions1.xAxis[0].data = data.map((item:any) => item.item)
         echartsOptions1.series[0].data = data.map((item:any) => item.value)
@@ -583,9 +631,9 @@ function handleRefreshEcharts() {
       ElMessage.error(err)
     })
   } else {
-    echartsOptions1.xAxis[0].data = echartsOptionsData1.value.map((item:any) => item.item)
-    echartsOptions1.series[0].data = echartsOptionsData1.value.map((item:any) => item.value)
-    echartsOptions1.series[1].data = echartsOptionsData1.value.map((item:any) => item.rate)
+    echartsOptions1.xAxis[0].data = echartsOptionsData1.value[currentTab.value].map((item:any) => item.item)
+    echartsOptions1.series[0].data = echartsOptionsData1.value[currentTab.value].map((item:any) => item.value)
+    echartsOptions1.series[1].data = echartsOptionsData1.value[currentTab.value].map((item:any) => item.rate)
     ecahrtsRefInstance1?.setOption(echartsOptions1)
   }
 }
