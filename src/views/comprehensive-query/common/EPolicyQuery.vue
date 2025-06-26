@@ -397,7 +397,7 @@ function handleQuery(flag?: boolean) {
             const plyTyp = freeEditRef.value?.getValue('CPlyTyp')
             const appNme = freeEditRef.value?.getValue('CAppNme')
             if (!!appNme && appNme.length < 2) {
-                ElMessage.warning('投保人名称至少输入2位')
+                ElMessage.warning('投保人名称至少输入2位!')
                 return
             }
             const insuredNme = freeEditRef.value?.getValue('CInsuredNme')
