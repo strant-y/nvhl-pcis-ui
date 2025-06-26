@@ -2,10 +2,10 @@
   <div>
     <myCard :cardConfig="cardconfig">
       <app-table
-		:tableConfig="tableconfig"
-		v-model:pageresult="pageresult"
-		ref="distTableRef"
-		@pageChange="method.handleQuery"
+        :tableConfig="tableconfig"
+        v-model:pageresult="pageresult"
+        ref="distTableRef"
+        @pageChange="method.handleQuery($event, true)"
       />
     </myCard>
     <comDialog ref="dialog"></comDialog>
@@ -74,6 +74,7 @@ const formconfig1 = ref<Record<string, any>>({});
 const tableconfig = ref<AppTableConfig>(createTableEditConfig());
 const codeListMap = ref<any>({});
 provide('codeListMap', codeListMap.value);
+const idxParam = inject('idxParam');
 let fileBase: string;
 // 声明全局变量
 let cComponentTableValue: string;
@@ -204,8 +205,10 @@ const method = {
           compKey: props.compKey
         },
         {
-          isOk: (res: any) => {},
-          handleQuery: method.handleQuery, // 新增：将 handleQuery 方法传递给 distAdd 组件
+          isOk: (res: any) => {
+            const queryParams = distTableRef.value?.getPartnerPage(false);
+            handleQuery: method.handleQuery(queryParams);
+          },
         },
         { width: "60" }
     );
@@ -217,7 +220,8 @@ const method = {
     }).then((res: any) => {
       if (res.code === 200) {
         ElMessage.success("删除成功");
-        method.handleQuery();
+        const queryParams = distTableRef.value?.getPartnerPage(false);
+        method.handleQuery(queryParams, true);
       }
     });
   },
@@ -253,9 +257,9 @@ const method = {
             },
             {
               isOk: (res: any) => {
-                console.log(111)
+                const queryParams = distTableRef.value?.getPartnerPage(false);
+                handleQuery: method.handleQuery(queryParams, true);
               },
-              handleQuery: method.handleQuery, // 新增：将 handleQuery 方法传递给 distAdd 组件
             },
             { width: "60" }
         );
@@ -265,7 +269,7 @@ const method = {
     });
   },
 
-  handleQuery: (queryParams: any = { pageNum: 1 }) => {
+  handleQuery: (queryParams: any = { pageNum: 1 }, isChange: boolean = false) => {
     let tgtRef = opertaor.getTableRefByKey('tgt')
     const param = opertaor.getParam();
     let app = "";
@@ -331,6 +335,10 @@ const method = {
         if(distSummaryRef.value) {
           distSummaryRef.value?.handleQuery();
         }
+
+        if(idxParam && isChange) { // 保存清单表格在屏幕中间
+          idxParam.handleAnchorClick(undefined, `#${props.compKey}`);
+        }
       }
     });
   },
@@ -361,8 +369,10 @@ const method = {
               compKey: props.compKey,
             },
             {
-              isOk: (res: any) => {},
-              handleQuery: method.handleQuery, //将 handleQuery 方法传递给 distAdd 组件
+              isOk: (res: any) => {
+                const queryParams = distTableRef.value?.getPartnerPage(false);
+                handleQuery: method.handleQuery(queryParams);
+              },
             },
             { width: "60" }
         );
@@ -628,6 +638,11 @@ function setTableData(data: any) {
   });
 }
 
+function handleQuery() {
+  const queryParams = distTableRef.value?.getPartnerPage(true);
+  method.handleQuery(queryParams);
+}
+
 // 绑定特殊验证器
 const exRules = {};
 
@@ -642,7 +657,7 @@ defineExpose({
   setFormValue,
   getFormconfig,
   setUnDisabledByKeyList,
-  handleQuery: method.handleQuery,
+  handleQuery,
   getTableData,
   setTableData,
 });

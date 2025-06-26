@@ -370,6 +370,7 @@ const templateDialog = defineAsyncComponent(
 
 const idxParam = {
   opertaorId: 'my-page',
+  handleAnchorClick: handleAnchorClick,
 };
 provide('idxParam', idxParam);
 const opertaor = dataOpertaor(idxParam.opertaorId);
@@ -2801,7 +2802,9 @@ function getTotalNum(arr: any[]) {
  */
 function handleAnchorClick(event: any, targetId: string) {
   // 阻止默认的路由跳转行为
-  event.preventDefault();
+  if(event) {
+    event.preventDefault();
+  }
   // 获取目标元素的ID
   if (targetId) {
     // 手动实现平滑滚动效果
