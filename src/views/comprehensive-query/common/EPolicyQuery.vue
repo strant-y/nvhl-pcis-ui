@@ -167,7 +167,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             {
                 prop: 'CAppNo',
                 inputtype: 'rtinput',
-                title: '投保单',
+                title: '投保单号',
                 clearable: true
             },
             {
