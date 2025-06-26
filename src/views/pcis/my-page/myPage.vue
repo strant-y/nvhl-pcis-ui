@@ -1797,7 +1797,13 @@ const calcPremium = () => {
     btn.loading = false;
     return;
   }
-
+// 校验标的信息中核定座位总数和投保座位数总数不一致！
+  const tgtValue = opertaor.getTableRefByKey("tgt").getFromValue();
+  if(tgtValue["Tgt.nSeatCapacity"] !== tgtValue["Tgt.nSeatsNumber"]) {
+    ElMessage.error("核定座位总数和投保座位数总数不一致！");
+    btn.loading = false;
+    return;
+  }
   const appCalcFun = props.param?.pageName === "priceInquiry" ? calculatePremium(res) : appCalc(res);
   appCalcFun.then((res: any) => {
     btn.loading = false;
@@ -1953,6 +1959,13 @@ const submitToUndrFn = async () => {
       const baseValue = opertaor.getTableRefByKey("base").getFromValue();
       if(baseValue["Base.cAmtCur"] !== baseValue["Base.cPrmCur"]) {
         ElMessage.error("承保基本信息中的总保额币种和总保费币种须一致!");
+        btn.loading = false;
+        return;
+      }
+      // 校验标的信息中核定座位总数和投保座位数总数不一致！
+      const tgtValue = opertaor.getTableRefByKey("tgt").getFromValue();
+      if(tgtValue["Tgt.nSeatCapacity"] !== tgtValue["Tgt.nSeatsNumber"]) {
+        ElMessage.error("核定座位总数和投保座位数总数不一致！");
         btn.loading = false;
         return;
       }

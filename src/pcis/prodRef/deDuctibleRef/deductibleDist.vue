@@ -306,7 +306,9 @@ const method = {
 const exRules = {};
 
 function getFormconfig() {
-  return formconfig1;
+  return {
+    fromType: "custom",
+  };
 }
 
 function getTableData() {
@@ -350,11 +352,40 @@ function getFromValue() {
   });
 }
 
+function setDisabledAll() {
+  if (cardconfig.value.titleBtns && cardconfig.value.titleBtns.length > 0) {
+    cardconfig.value.titleBtns.forEach((item: any) => {
+      item.hidden = true;
+    });
+  }
+  if (cardconfig.value.endBtns && cardconfig.value.endBtns.length > 0) {
+    cardconfig.value.endBtns.forEach((item: any) => {
+      item.hidden = true;
+    });
+  }
+}
+
+
+function setUnDisabledByKeyList(key: any) {
+  cardconfig.value.endBtns?.forEach((item: any) => {
+    if ("Btn_" + item.id === key) {
+      item.hidden = false;
+    }
+  });
+  cardconfig.value.titleBtns?.forEach((item: any) => {
+    if ("Btn_" + item.id === key) {
+      item.hidden = false;
+    }
+  });
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
   getFormconfig,
   getTableData,
+  setDisabledAll,
+  setUnDisabledByKeyList
 });
 </script>
 

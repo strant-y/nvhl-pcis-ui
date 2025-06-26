@@ -154,23 +154,19 @@ onMounted(() => {
     if(item.prop =='Dist.cVinCode'){
      item['rules'] = [getRules("vinNumber", {})];
     }
-    // 043009 实际用工地址关联 团单才展示
-    if(item.prop === 'Dist.cEmploymentAddress'){
-      if(cGrpMrk.value !== '1') {
-        item['rules'] = [];
-        item["hidden"] = true;
-      }else {
-        eventBus.emit('ProjectDist043009', (res: any) => {
-          if(res) {
-            item['loadData'] = res.map((m: any) => {
-              return {
-                label: m['Dist.cDetailedAddress'],
-                value: m['Dist.cPkId']
-              }
-            })
-          }
-        });
+    // 043009 关联被保人
+    if(item.prop === 'Dist.cRelatedInsured'){
+      const insured =  opertaor.getDataAll()['insured'];
+      if(insured && insured['Insured.cInsuredCde']) {
+        setTimeout(() => {
+          setValue('Dist.cRelatedInsured', insured);
+        }, 100);
       }
+    }
+    // 043009 实际用工地址关联 团单才展示
+    if(item.prop === 'Dist.cEmploymentAddress' && cGrpMrk.value !== '1'){
+      item['rules'] = [];
+      item["hidden"] = true;
     }
     // 身份证类型自动回填年龄
     if(item.prop =='Dist.cIdentificationNumber'){

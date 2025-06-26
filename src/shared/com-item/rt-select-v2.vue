@@ -84,6 +84,7 @@
 <script setup lang="ts">
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
+const codeListMap = inject<any>('codeListMap');
 const props = defineProps({
   modelValue: {
     type: [String, Number, Array<any>, Boolean],
@@ -228,7 +229,21 @@ watch(
   },
   { deep: true }
 );
+
+function getCodeListMapToOption(): boolean {
+  if(!!codeListMap) {
+    if(props.item.typeCode in codeListMap) {
+      options.value = codeListMap[props.item.typeCode];
+      return true;
+    }else if(props.item.prop in codeListMap) {
+      options.value = codeListMap[props.item.prop];
+      return true;
+    }
+  }
+  return false;
+}
 function uploadOption() {
+  if(getCodeListMapToOption()) return;
   codeListStore
     .queryCodeList(
       {
@@ -241,6 +256,9 @@ function uploadOption() {
     .then((res) => {
       if (res) {
         options.value = res;
+        if(!!codeListMap && (!getParam() || Object.keys(getParam()).length === 0)) {
+          codeListMap[props.item.prop] = res;
+        }
       }
     })
     .catch((err) => {
@@ -255,9 +273,9 @@ function handleChange(val?: string | number | Array<any> | undefined) {
   // props.item.func ? props.item.func(val, option) : null;
 }
 const getLabel = computed(() =>  {
+  getCodeListMapToOption();
   if (options.value && options.value.length > 0) {
     let se = null;
-    console.log();
     if(!Array.isArray(selectedValue.value)){
       const s = options.value.find((item) => item.value === selectedValue.value);
       if (s) {
@@ -286,6 +304,7 @@ const getLabel = computed(() =>  {
 onMounted(() => {
   // 初始化组件数据
   if (props.item) {
+    if(getCodeListMapToOption()) return;
     if (!props.item.loadData && !props.item.typeCode) {
       options.value = [];
     } else if (!props.item.loadData && !!props.item.typeCode) {
