@@ -3036,22 +3036,4 @@ function getSaveDataParams() {
 .font-weight-500 {
   font-weight: 500;
 }
-::-webkit-scrollbar {
-  width: 4px; /* 垂直滚动条宽度 */
-  height: 4px; /* 水平滚动条高度 */
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1; /* 轨道背景色 */
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #8b8b8b; /* 滑块颜色 */
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #636363; /* 滑块悬停颜色 */
-}
 </style>
