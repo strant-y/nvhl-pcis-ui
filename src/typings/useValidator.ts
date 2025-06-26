@@ -138,7 +138,8 @@ export const useValidator = () => {
     return {
       pattern:
         /^(([0\+]\d{2,3}-)?(0\d{2,3})-)?(\d{7,8})(-(\d{3,}))?$/,
-      message: "固话号码格式不对或后七位或者八位不能重复,格式如0511-4405222 或 010-87888822",
+      // message: "固话号码格式不对,格式如0511-4405222 或 010-87888822",
+      message: "请输入正确的固话号码",
       trigger: "blur",
     };
   }
@@ -390,19 +391,27 @@ export const useValidator = () => {
 };
 
 // 外国人永久居留身份证校验
+// const ariCard = () => {
+//   return {
+//       validator: (rule, value, callback) => {
+//           const ariCard = value;
+//           if (ariCard.length!== 15) {
+//               callback(new Error('外国人永久居留身份证号码必须是十五位'));
+//           } else if (ariCard.indexOf(' ') >= 0) {
+//               callback(new Error('外国人永久居留身份证号码中不能带有空格'));
+//           } else {
+//               callback();
+//           }
+//       },
+//       trigger: 'blur'
+//   };
+// };
+// 外国人永久居留身份证校验
 const ariCard = () => {
   return {
-      validator: (rule, value, callback) => {
-          const ariCard = value;
-          if (ariCard.length!== 15) {
-              callback(new Error('外国人永久居留身份证号码必须是十五位'));
-          } else if (ariCard.indexOf(' ') >= 0) {
-              callback(new Error('外国人永久居留身份证号码中不能带有空格'));
-          } else {
-              callback();
-          }
-      },
-      trigger: 'blur'
+    pattern: /^(?:[A-Z]{3}\d{12}|3[A-Z]{3}\d{12}[0-9X])$/,
+    message: "外国人永久居留身份证必须是15位或18位",
+    trigger: "blur"
   };
 };
 
