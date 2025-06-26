@@ -16,7 +16,7 @@
                     :item="{ icon: 'Tickets' }"
                   /> -->
                   <i class="icon iconfont icon-shenhexinxi"></i>
-                  <span style="font-size: 15px" v-if="NavigaShow"
+                  <span class="icon-title" v-if="NavigaShow"
                     >核保处理</span
                   >
                 </el-anchor-link>
@@ -28,7 +28,7 @@
                     :item="{ icon: 'Tickets' }"
                   /> -->
                   <i class="icon iconfont icon-shujuxiuzheng"></i>
-                  <span style="font-size: 15px" v-if="NavigaShow"
+                  <span class="icon-title" v-if="NavigaShow"
                     >批改信息</span
                   >
                 </el-anchor-link>
@@ -40,7 +40,7 @@
                     :item="{ icon: 'Tickets' }"
                   /> -->
                   <i class="icon iconfont icon-zhongkaian"></i>
-                  <span style="font-size: 15px" v-if="NavigaShow"
+                  <span class="icon-title" v-if="NavigaShow"
                     >批改比较项</span
                   >
                 </el-anchor-link>
@@ -96,7 +96,7 @@
                     :item="{ icon: 'Tickets' }"
                   /> -->
                   <i class="icon iconfont icon-yishoubaodan"></i>
-                  <span style="font-size: 15px" v-if="NavigaShow"
+                  <span class="icon-title" v-if="NavigaShow"
                     >联共保主协议信息</span
                   >
                 </el-anchor-link>
@@ -105,7 +105,7 @@
                     :item="{ icon: 'Tickets' }"
                   /> -->
                   <i class="icon iconfont icon-zaibaoxinxi"></i>
-                  <span style="font-size: 15px" v-if="NavigaShow"
+                  <span class="icon-title" v-if="NavigaShow"
                     >联共保信息</span
                   >
                 </el-anchor-link>
@@ -117,7 +117,7 @@
                     :item="{ icon: 'Tickets' }"
                   /> -->
                   <i class="icon iconfont icon-lishiyijian"></i>
-                  <span style="font-size: 15px" v-if="NavigaShow"
+                  <span class="icon-title" v-if="NavigaShow"
                     >我司联共保信息</span
                   >
                 </el-anchor-link>
@@ -355,6 +355,7 @@ const iconMap = ref({
   'SpecialAgreement': 'icon-anjiantiaocha',
   'payinfo': 'icon-hepei',
   'image': 'icon-yingxiangxinxi',
+  'tgt': 'icon-jiwangpeian'
 })
 
 
@@ -3034,5 +3035,23 @@ function getSaveDataParams() {
 }
 .font-weight-500 {
   font-weight: 500;
+}
+::-webkit-scrollbar {
+  width: 4px; /* 垂直滚动条宽度 */
+  height: 4px; /* 水平滚动条高度 */
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* 轨道背景色 */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #8b8b8b; /* 滑块颜色 */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #636363; /* 滑块悬停颜色 */
 }
 </style>
