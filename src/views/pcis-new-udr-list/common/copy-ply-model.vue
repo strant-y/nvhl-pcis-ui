@@ -304,7 +304,6 @@ const handleQuery = (flag = true) => {
     pageNum: 1,
     ...r,
     ...formData,
-    queryType: "3",
     tAppTmStart: formData.tm ? formData.tm[0] : "",
     tAppTmEnd: formData.tm ? formData.tm[1] : "",
   }
