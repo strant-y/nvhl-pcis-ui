@@ -103,6 +103,14 @@ onMounted(() => {
   setFormItem("Insured.cGcidCode", {
         rules: [getRules("leiCode", {})],
   });
+  // 关联交易审批单编号
+  setFormItem("Insured.cRelateNo", {rules: [getRules("txnApprovalNo", {})]});
+
+  // 营业执照号码
+  setFormItem("Insured.cBuslicenceNo", {rules: [getRules("businessLicense", {})]});
+  
+  // 组织机构代码
+  setFormItem("Insured.cOrganizationCode", {rules: [getRules("socialCode", {})]});
 
 });
 function setFormItem(key: any, obj: any) {

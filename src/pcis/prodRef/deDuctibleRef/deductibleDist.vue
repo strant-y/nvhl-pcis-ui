@@ -98,12 +98,20 @@ const tableconfig = reactive<AppTableConfig>(
           }else {
             Object.assign(param, row)
           }
+
+          if(row.editList && row.editList.length>0){
+            param['editList'] = row.editList
+          }
+
+          console.log('数据====',param)
           dzmodal.open(deductibleFixEdit, { 
             type: "view", 
             data: param, 
             callback: (res: any) => {
+              console.l
               if (res.type === "ok") {
                 row.cDeductibleContent = res.data.cDeductibleContent
+                row['editList']= res.data['editList']
               }
             }
           });
