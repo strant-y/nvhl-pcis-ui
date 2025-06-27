@@ -159,6 +159,8 @@ onMounted(() => {
         setTimeout(() => {
           setValue('Dist.cRelatedInsured', insured);
         }, 100);
+
+        
       }
     }
     // 043009 实际用工地址关联 团单才展示
@@ -176,14 +178,20 @@ onMounted(() => {
       }
     }
 
+        // 身份证类型自动回填年龄
+    if(item.prop =='Dist.cDocumentType'){
+      item['func'] =  cDocumentTypeChange;
+    }
+
+
     if(item.prop =='Dist.cSchoolName'){
       item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
     }
-    if(item.prop =='Dist.cIdentificationNumber'){
-      item['rules'] = [ getRules("idCard", {})];
-    }
+    // if(item.prop =='Dist.cIdentificationNumber'){
+    //   item['rules'] = [ getRules("idCard", {})];
+    // }
 
-    console.log(item)
+    console.log(item) 
 
     // 遍历groupList数组把函数赋值给fromSchema
     if (props.data.fromSchema[i]["groupList"] && props.data.fromSchema[i]["groupList"].length>0) {
@@ -242,6 +250,48 @@ const getDistoccupType = (val) => {
   });
 }
 
+// 证件类型change
+const cDocumentTypeChange =(val:any)=>{
+  console.log(val)
+   const item = freeEditRef.value?.getFromSchemaItem('Dist.cIdentificationNumber')
+    //  身份证
+    if (val == "120001") { 
+     item.itemConfig['rules'] = [ getRules("idCard", {})];
+    } else if ( val == "110007") {   
+      // 统一社会信用代码校验
+      item.itemConfig['rules'] = [getRules("socialCode", {})];
+    } else if(val == "19"){
+      // 外国人证件号
+      item.itemConfig['rules'] = [getRules("ariCard", {})];
+    } else if (val == "110002") {
+      // 护照
+      //  item.itemConfig['rules'] =[getRules("passPort", {})];
+    }else if(val =='110001'){
+      // 组织机构编码校验
+      item.itemConfig['rules'] =[getRules("orgCode", {})];
+    } else {
+      item.itemConfig['rules'] = [ getRules("isNull", {})];
+    }
+}
+
+
+//给表单赋值
+function setFormItem(key: any, obj: any) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.btnItems && obj.btnItems) {
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
+          }
+        }else{
+          Object.assign(item, obj);
+        }
+      }
+    });
+  }
+}
 
 
 function getFromValue() {

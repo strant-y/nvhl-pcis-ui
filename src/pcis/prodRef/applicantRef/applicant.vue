@@ -281,6 +281,7 @@ const method = {
   },
 
   cardTypeChange: (val) => {
+    console.log(val)
     checkUser();
     const param = opertaor.getParam();
 

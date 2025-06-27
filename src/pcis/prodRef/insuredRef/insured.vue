@@ -799,9 +799,9 @@ const method = {
       setFormItem("Insured.tCertfBgnDate", {
         rules: [getRules("required", {})],
       });
-      // setFormItem("Insured.tCertfEndDate", {
-      //   rules: [getRules("required", {})],
-      // });
+      setFormItem("Insured.cCertfCde", {
+        rules: [getRules("required", {}),getRules("passPort", {})],
+      });
     } else if (val == "110007") {
       setFormItem("Insured.tCertfBgnDate", {
         rules: [getRules("required", {})],
@@ -826,9 +826,6 @@ const method = {
       setFormItem("Insured.cOrganizationCode", {
           disabled: true,
       });
-
-
-
     } else if(val === '120002'){
       // 护照
       setFormItem("Insured.cCertfCde", {
@@ -841,7 +838,7 @@ const method = {
         rules: [getRules("required", {}),getRules("ariCard", {})],
       });
     } else {
-      setFormItem("Insured.cCertfCde", {
+      setFormItem("Insured.cCertfCde", { 
         rules: [getRules("required", {})],
       });
       setFormItem("Insured.tCertfBgnDate", { rules: null });

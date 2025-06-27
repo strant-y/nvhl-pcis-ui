@@ -17,7 +17,7 @@ export const useValidator = () => {
     return {
       required: true,
       message: message || "该项为必填项",
-      trigger: trigger || "change",
+      trigger: trigger || "blur",
     };
   };
 
@@ -304,7 +304,7 @@ export const useValidator = () => {
       trigger: "blur"
     };
   };
-  //统一组织机构编码校验
+  //组织机构编码校验
   const orgCode = () => {
     return {
       validator: (rule, value, callback) => {
@@ -318,7 +318,7 @@ export const useValidator = () => {
         const reg = /^([0-9A-Z]){8}$/;
 
         if (!reg.test(values[0])) {
-          callback(new Error('不是有效的统一组织机构编码！'));
+          callback(new Error('不是有效的组织机构编码！'));
           return;
         }
 
@@ -339,12 +339,12 @@ export const useValidator = () => {
         }
 
         if (YC9 !== C9_str) {
-          callback(new Error('不是有效的统一组织机构编码！'));
+          callback(new Error('不是有效的组织机构编码！'));
         } else {
           callback();
         }
       },
-      message: '不是有效的统一组织机构编码！',
+      message: '不是有效的组织机构编码！',
       trigger: 'blur'
     };
   };
@@ -410,8 +410,8 @@ export const useValidator = () => {
 // 外国人永久居留身份证校验
 const ariCard = () => {
   return {
-    pattern: /^(?:[A-Z]{3}\d{12}|3[A-Z]{3}\d{12}[0-9X])$/,
-    message: "外国人永久居留身份证必须是15位或18位",
+    pattern: /^[A-Z9][0-9A-Z]{14}([0-9A-Z]{3})?$/,
+    message: "必须为15位或18位，且首位只能是大写字母或9",
     trigger: "blur"
   };
 };
@@ -604,6 +604,18 @@ const txnApprovalNo = () => {
 };
 
 
+  // 空值校验 用来处理底部校验出异常提示后清空问题
+  const isNull = () => {
+     return {
+     validator: (rule, value, callback) => {
+       callback();
+      },
+      trigger: "blur"
+    }
+  };
+
+
+
   const getRules = (type: any, param: any) => {
     if (type === "required") {
       return required(param.trigger, param.message);
@@ -679,6 +691,9 @@ const txnApprovalNo = () => {
     }
     if(type == 'txnApprovalNo') {
       return txnApprovalNo()
+    }
+    if(type == 'isNull') {
+      return isNull()
     }
 
   };
