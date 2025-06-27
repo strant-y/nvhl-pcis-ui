@@ -592,7 +592,7 @@ function downloadEPolicy() {
         ElMessage.warning('每次只能下载1个单据！')
         return
     }
-    const plyNo = selectData[0].cPlyNo
+    let plyNo = selectData[0].cPlyNo
     if (!plyNo) {
         ElMessage.warning('没有数据，请核实确认！')
         return
