@@ -41,7 +41,7 @@
       <Settings v-if="defaultSettings.showSettings" />
     </div>
     <div>
-      <CopyRight />
+    <!-- <CopyRight v-if="route.name === 'Dashboard'" /> -->
     </div>
   </div>
 </template>
@@ -49,6 +49,8 @@
 <script setup lang="ts">
 import { useAppStore, useSettingsStore, usePermissionStore } from "@/store";
 import defaultSettings from "@/settings";
+import { useRoute } from "vue-router";
+const route = useRoute();
 
 const appStore = useAppStore();
 const settingsStore = useSettingsStore();
@@ -160,10 +162,14 @@ onUnmounted(() => {
 }
 
 .main-container {
-  position: relative;
-  min-height: 100%;
+  // position: relative;
+  // min-height: 100%;
   margin-left: $sidebar-width;
   transition: margin-left 0.28s;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .layout-top {
@@ -196,7 +202,7 @@ onUnmounted(() => {
   }
 
   .main-container {
-    min-height: calc(100vh - $navbar-height - 60px );
+    // min-height: calc(100vh - $navbar-height - 60px );
     padding-top: $navbar-height;
     margin-left: 0;
   }
@@ -247,8 +253,8 @@ onUnmounted(() => {
         align-items: center;
         justify-content: center;
         width: 99%;
-        height: 50px;
-        line-height: 50px;
+        height: 45px;
+        line-height: 45px;
         box-shadow: 0 0 6px -2px var(--el-color-primary);
 
         div:hover {

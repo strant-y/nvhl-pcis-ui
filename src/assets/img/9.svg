@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="18px" height="11px" viewBox="0 0 18 11" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>编组 9</title>
+    <defs>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#3A76C6" offset="0%"></stop>
+            <stop stop-color="#3975C6" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="孟锋锋" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="理赔-首页备份" transform="translate(-249, -339)" fill="url(#linearGradient-1)">
+            <g id="编组-13" transform="translate(120, 304)">
+                <g id="编组-10" transform="translate(37, 28)">
+                    <g id="编组-9" transform="translate(92, 7)">
+                        <rect id="矩形" transform="translate(3.799, 5.0801) rotate(30) translate(-3.799, -5.0801)" x="2.29903811" y="0.0801270189" width="3" height="10" rx="1.5"></rect>
+                        <rect id="矩形备份" opacity="0.4" transform="translate(8.799, 5.0801) rotate(30) translate(-8.799, -5.0801)" x="7.29903811" y="0.0801270189" width="3" height="10" rx="1.5"></rect>
+                        <rect id="矩形备份-2" opacity="0.1" transform="translate(13.799, 5.0801) rotate(30) translate(-13.799, -5.0801)" x="12.2990381" y="0.0801270189" width="3" height="10" rx="1.5"></rect>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

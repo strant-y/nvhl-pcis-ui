@@ -50,6 +50,15 @@ export class EchartsService {
         return request.post(`${this.getRiskTreeListUrl}`, ops);
     }
 
+    /**
+     * 图表查询首页
+     * @param  {[type]}
+     * @return {Observable<any>}           [description]
+     */
+    getAnalysis(ops) {
+        return request.post('/policy/getAnalysis', ops);
+    }
+
 }
 
 /**

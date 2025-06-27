@@ -24,7 +24,7 @@ export const useSettingsStore = defineStore("setting", () => {
   const layout = useStorage<string>("layout", defaultSettings.layout);
   // 主题颜色
   const themeColor = useStorage<string>(
-    "themeColor",
+    "theme-color",
     defaultSettings.themeColor
   );
   // 主题：light-亮色(默认) dark-暗色

@@ -81,7 +81,7 @@ const isCompView = () => {
 }
 
 .hasTagsView .app-main {
-  min-height: calc(100vh - $navbar-height - $tags-view-height  - 55px);
+  min-height: calc(100vh - $navbar-height - $tags-view-height);
 }
 
 .fixed-header + .app-main {

@@ -3,20 +3,20 @@
   <div class="mypage-app">
     <el-container class="dynamic-container" ref="scrollContainer">
       <el-aside :width="(NavigaShow ? 200 : 100) + 'px'">
-        <el-affix :offset="100">
+        <!-- <el-affix :offset="100"> -->
           <div class="navi_container">
             <div
               v-for="(pageConfig, v) in formconfig1"
               :key="v"
               class="NavigaList_card"
             >
-              <el-anchor :bound="120" :offset="80" style="margin-top: 40px">
+              <el-anchor :bound="120" :offset="80">
                 <el-anchor-link :href="`#underwriteurl`" v-if="underwriteFlag">
-                  <rt-icon
-                    style="margin-right: 14px"
+                  <!-- <rt-icon
                     :item="{ icon: 'Tickets' }"
-                  />
-                  <span style="font-size: 15px" v-if="NavigaShow"
+                  /> -->
+                  <i :class="['icon','iconfont',iconMap['underwriteurl']]"></i>
+                  <span class="icon-title" v-if="NavigaShow"
                     >核保处理</span
                   >
                 </el-anchor-link>
@@ -24,11 +24,11 @@
                   v-if="edrbaseFlag"
                   @click="handleAnchorClick($event, `#edrbase`)"
                 >
-                  <rt-icon
-                    style="margin-right: 14px"
+                  <!-- <rt-icon
                     :item="{ icon: 'Tickets' }"
-                  />
-                  <span style="font-size: 15px" v-if="NavigaShow"
+                  /> -->
+                  <i :class="['icon','iconfont',iconMap['edrbase']]"></i>
+                  <span class="icon-title" v-if="NavigaShow"
                     >批改信息</span
                   >
                 </el-anchor-link>
@@ -36,11 +36,11 @@
                   v-if="edritemFlag"
                   @click="handleAnchorClick($event, `#edritem`)"
                 >
-                  <rt-icon
-                    style="margin-right: 14px"
+                  <!-- <rt-icon
                     :item="{ icon: 'Tickets' }"
-                  />
-                  <span style="font-size: 15px" v-if="NavigaShow"
+                  /> -->
+                  <i :class="['icon','iconfont',iconMap['edritem']]"></i>
+                  <span class="icon-title" v-if="NavigaShow"
                     >批改比较项</span
                   >
                 </el-anchor-link>
@@ -61,17 +61,18 @@
                       : true
                   "
                   @click="handleAnchorClick($event, `#${k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey}`)"
+                  :class="i === 0 ? 'isActive' : ''"
                 >
-                  <rt-icon
-                    style="margin-right: 14px"
+                  <!-- <rt-icon
                     :item="{
                       icon:
                         k.icon && k.icon !== 'null' && k.icon !== ''
                           ? k.icon
                           : 'Tickets',
                     }"
-                  />
-                  <span style="font-size: 15px" v-if="NavigaShow">
+                  /> -->
+                  <i :class="['icon','iconfont',iconMap[k.pageKey]]"></i>
+                  <span class="icon-title" v-if="NavigaShow">
                     <template v-if="k.pageTtile && k.pageTtile.length > 6">
                       <el-tooltip
                         effect="dark"
@@ -91,20 +92,20 @@
                   :href="`#ciMasterAgreement`"
                   v-if="ciMasterAgreementFlag && isCiJiMrk"
                 >
-                  <rt-icon
-                    style="margin-right: 14px"
+                  <!-- <rt-icon
                     :item="{ icon: 'Tickets' }"
-                  />
-                  <span style="font-size: 15px" v-if="NavigaShow"
+                  /> -->
+                  <i :class="['icon','iconfont',iconMap['ciMasterAgreement']]"></i>
+                  <span class="icon-title" v-if="NavigaShow"
                     >联共保主协议信息</span
                   >
                 </el-anchor-link>
                 <el-anchor-link :href="`#ci`" v-if="ciFlag && isCiJiMrk">
-                  <rt-icon
-                    style="margin-right: 14px"
+                  <!-- <rt-icon
                     :item="{ icon: 'Tickets' }"
-                  />
-                  <span style="font-size: 15px" v-if="NavigaShow"
+                  /> -->
+                  <i :class="['icon','iconfont',iconMap['ci']]"></i>
+                  <span class="icon-title" v-if="NavigaShow"
                     >联共保信息</span
                   >
                 </el-anchor-link>
@@ -112,17 +113,17 @@
                   :href="`#ourCompanyCiShare`"
                   v-if="ourCompanyCiShareFlag && isCiJiMrk"
                 >
-                  <rt-icon
-                    style="margin-right: 14px"
+                  <!-- <rt-icon
                     :item="{ icon: 'Tickets' }"
-                  />
-                  <span style="font-size: 15px" v-if="NavigaShow"
+                  /> -->
+                  <i :class="['icon','iconfont',iconMap['ourCompanyCiShare']]"></i>
+                  <span class="icon-title" v-if="NavigaShow"
                     >我司联共保信息</span
                   >
                 </el-anchor-link>
               </el-anchor>
             </div>
-            <div class="NavigaList_card" style="margin-left: 5px">
+            <!-- <div class="NavigaList_card" style="margin-left: 5px">
               <rt-icon
                 @click="NavigaShow = !NavigaShow"
                 v-if="!NavigaShow"
@@ -133,22 +134,22 @@
                 v-if="NavigaShow"
                 :item="{ icon: 'DArrowLeft' }"
               />
-            </div>
+            </div> -->
           </div>
-        </el-affix>
+        <!-- </el-affix> -->
       </el-aside>
       <el-main>
         <el-affix
           :offset="80"
-          style="text-align: center; padding: 5px; background: #ebedfc;width: 100%;"
+          style="text-align: center; padding: 5px; background: #ebedfc;width: 100%;font-size: 16px;"
         >
           <div class="tp" style="background: #ebedfc">
-            <span style="font-weight: bold">条款：</span
+            <span class="font-weight-500">条款：</span
             ><span class="publicStyle"
               >{{ props.param.cTermNo }}&nbsp;&nbsp;{{
                 props.param.cTermNme
               }}</span
-            >&nbsp;|&nbsp;<span style="font-weight: bold">出单方式：</span
+            >&nbsp;|&nbsp;<span class="font-weight-500">出单方式：</span
             ><span class="publicStyle">核心页面出单</span>&nbsp;|
             <span class="publicStyle">{{productStore.cCiMrk === '0' ? '非共保业务' 
               : productStore.cCiMrk == '1' ? '外部共保我方主共_主联'
@@ -159,21 +160,21 @@
             <span class="publicStyle">{{
               props.param.cGrpMrk == "0" ? "个单" : "团单"
             }}</span
-            >&nbsp;|&nbsp;<span style="font-weight: bold">是否互联网出单:</span
+            >&nbsp;|&nbsp;<span class="font-weight-500">是否互联网出单:</span
             >&nbsp;<span class="publicStyle">{{
               props.param.cIsNet == "0" ? "是" : "否"
             }}</span>
           </div>
           <div class="btm" style="background: #ebedfc">
-            <span style="font-weight: bold">保险期限：</span
+            <span class="font-weight-500">保险期限：</span
             ><span class="publicStyle">{{ tmDay }}</span
-            >&nbsp;|&nbsp;<span style="font-weight: bold">保额：</span
+            >&nbsp;|&nbsp;<span class="font-weight-500">保额：</span
             ><span class="publicStyle">{{ nAmt }}</span
-            >&nbsp;<span style="font-weight: bold">元</span>&nbsp;|&nbsp;<span
-              style="font-weight: bold"
+            >&nbsp;<span class="font-weight-500">元</span>&nbsp;|&nbsp;<span
+              class="font-weight-500"
               >保费为: </span
             ><span class="publicStyle">{{ nPrm }}</span
-            >&nbsp;<span style="font-weight: bold">元</span>
+            >&nbsp;<span class="font-weight-500">元</span>
           </div>
         </el-affix>
         <div
@@ -246,14 +247,38 @@
           <ourCompanyCiShareRef ref="ourCompanyCiShare"></ourCompanyCiShareRef>
         </div>
         <el-backtop :target="'.el-main'" :right="100" :bottom="150" />
+        <el-affix position="bottom" :offset="10">
+          <div class="bottom-items">
+            <!--新增的投保单号显示和复制按钮-->
+            <div style="margin-right: 20px; width: 100%; display: flex; justify-content: flex-end; align-items: center;">
+              <div style="display: flex; align-items: center; background: #fff; padding: 6px 12px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap;">
+                {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "投保单号:" }}
+                <span id="policyNumber" style="margin-left: 5px; margin-right: 8px; font-weight: bold;">
+                {{ opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || '暂无' }}
+                </span>
+                <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号'}`" placement="top">
+                  <el-button @click="copyPolicyNumber" circle size="small" style="color: red;">
+                    <rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />
+                  </el-button>
+                </el-tooltip>
+              </div>
+            </div>
+            <rt-button
+              v-for="(bth, idx) in bthList"
+              :item="bth"
+              :key="idx"
+              :loading="bth.loading"
+            />
+          </div>
+        </el-affix>
       </el-main>
     </el-container>
 
-    <el-footer>
+    <!-- <el-footer>
       <el-affix position="bottom" :offset="10">
-        <div class="bottom-items">
+        <div class="bottom-items"> -->
           <!--新增的投保单号显示和复制按钮-->
-          <div style="margin-right: 20px; width: 100%; display: flex; justify-content: flex-end; align-items: center;">
+          <!-- <div style="margin-right: 20px; width: 100%; display: flex; justify-content: flex-end; align-items: center;">
             <div style="display: flex; align-items: center; background: #fff; padding: 6px 12px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
               {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "投保单号:" }}
               <span id="policyNumber" style="margin-left: 5px; margin-right: 8px; font-weight: bold;">
@@ -274,7 +299,7 @@
           />
         </div>
       </el-affix>
-    </el-footer>
+    </el-footer> -->
   </div>
 </template>
 
@@ -310,6 +335,7 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 import { useRouter, useRoute } from "vue-router";
 import { getData } from "@/pcis/prodRef/dataInit";
+import { iconMap } from './iconMap';
 
 const policyService = new PolicyService();
 const productStore = useProductStore();
@@ -2836,6 +2862,12 @@ function handleAnchorClick(event: any, targetId: string) {
       });
     }
   }
+  if(document.querySelectorAll('.el-anchor__item') && document.querySelectorAll('.el-anchor__item').length > 0) {
+    document.querySelectorAll('.el-anchor__item').forEach((item:any) => {
+      item.classList.remove('isActive')
+    })
+  }
+  event.currentTarget.classList.add('isActive')
 }
 
 opertaor.setFatherPage({
@@ -2988,7 +3020,7 @@ function getSaveDataParams() {
 
 <style lang="scss" scoped>
 .bottom-items {
-  height: 50px;
+  height: 45px;
   background-color: #fff;
   display: flex;
   justify-content: end;
@@ -3017,9 +3049,58 @@ function getSaveDataParams() {
   display: flex;
   flex-direction: column;
   height: 100%;
+  position: absolute;
+  width: 100%;
 }
 .dynamic-container {
   height: calc(100vh - $navbar-height - 60px - 90px);
   overflow: auto;
+}
+
+.mypage-aside {
+  background: var(--el-color-primary);
+}
+
+.el-anchor {
+  background: transparent;
+  :deep(.el-anchor__list) {
+    padding: 10px 5px;
+  } 
+  .el-anchor__item {
+    margin-bottom: 10px;
+    padding-left: 0;
+    border-radius: 8px;
+    opacity: .6;
+    &.isActive,&:hover {
+      opacity: 1;
+      // background: #ffffff1a;
+    }
+    :deep(a) {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #FFFFFF;
+      padding: 0;
+      .el-icon {
+        font-size: 3rem!important;
+        margin: 0 0 10px 0;
+      }
+      .iconfont {
+        font-size: 1.5rem;
+        color: #FFF;
+        margin: 5px 0;
+      }
+      .icon-title {
+        font-size: 12px;
+      }
+    }
+  }
+}
+.el-aside {
+  width: auto;
+  background: var(--el-color-primary);
+}
+.font-weight-500 {
+  font-weight: 500;
 }
 </style>

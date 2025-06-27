@@ -1,16 +1,25 @@
 /** 全局SCSS变量 */
 :root {
-  --menu-background: #f0f5f9;
-  --menu-active-text: #FF8C00;
-  --menu-hover:  #FF8C00;
-  --sidebar-logo-background: #f0f5f9;
-  --el-text-color: #333 !important;
-  --menu-active-bg-color: rgba(229, 224, 224, 0.45);
-  --menu-text: #333;
-  --el-card-header-bg-color: rgba(245, 250, 255, 0.86);
+  // --menu-background: #f0f5f9;
+  // --menu-active-text: #FF8C00;
+  // --menu-hover:  #FF8C00;
+  // --sidebar-logo-background: #f0f5f9;
+  // --el-text-color: #333 !important;
+  // --menu-active-bg-color: rgba(229, 224, 224, 0.45);
+  // --menu-text: #333;
+  // --el-card-header-bg-color: rgba(245, 250, 255, 0.86);
 
   // 只读状态字体颜色调整
   --el-disabled-text-color: #777;
+
+  --menu-background: var(--el-color-primary);
+  --menu-active-text: #FFFFFF;
+  --menu-hover:  #ffffff1a;
+  // --sidebar-logo-background: #f0f5f9;
+  --el-text-color: #FFFFFF !important;
+  // --menu-active-bg-color: rgba(229, 224, 224, 0.45);
+  --menu-text: #FFFFFF;
+  --el-card-header-bg-color: rgba(245, 250, 255, 0.86);
 }
 
 // 主题
@@ -53,6 +62,30 @@ html.summer {
   --menu-text: #fff;
   --el-text-color: #000 !important;
 }
+html.blue {
+  --menu-background: #3a76c6;
+  --sidebar-logo-background: #3a76c6;
+  --menu-active-text: #ff6f5e;
+  --menu-hover: #ff6f5e;
+  --menu-text: #fff;
+  --el-text-color: #000 !important;
+}
+html.orange {
+  --menu-background: #ff8c03;
+  --sidebar-logo-background: #ff8c03;
+  --menu-active-text: #ff6f5e;
+  --menu-hover: #ff6f5e;
+  --menu-text: #fff;
+  --el-text-color: #000 !important;
+}
+html.green {
+  --menu-background: #09d067;
+  --sidebar-logo-background: #09d067;
+  --menu-active-text: #ff6f5e;
+  --menu-hover: #ff6f5e;
+  --menu-text: #fff;
+  --el-text-color: #000 !important;
+}
 
 
 /** 暗黑主题 */
@@ -87,5 +120,5 @@ $sidebar-logo-background: var(--sidebar-logo-background); // 侧边栏 Logo 背�
 
 $sidebar-width: 210px; // 侧边栏宽度
 $sidebar-width-collapsed: 54px; // 侧边栏收缩宽度
-$navbar-height: 50px; // 导航栏高度
+$navbar-height: 45px; // 导航栏高度
 $tags-view-height: 34px; // TagsView 高度
