@@ -108,7 +108,6 @@ const tableconfig = reactive<AppTableConfig>(
             type: "view", 
             data: param, 
             callback: (res: any) => {
-              console.l
               if (res.type === "ok") {
                 row.cDeductibleContent = res.data.cDeductibleContent
                 row['editList']= res.data['editList']
@@ -213,6 +212,7 @@ const initOriginalData = ()=> {
     pageNum: 1,
     pageSize: 999,
   }
+  console.log(332,)
   getPrdDeductible(param).then((res) => {
     if (res.data.result) {
       pageresult.list = [];
