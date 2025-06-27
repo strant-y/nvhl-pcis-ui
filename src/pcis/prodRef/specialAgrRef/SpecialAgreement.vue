@@ -432,10 +432,17 @@ function setUnDisabledByKeyList(key: any) {
     }
   });
 }
+function getFormconfig() {
+  return {
+    fromType: "custom",
+  };
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
+  getFormconfig,
   setDisabledAll,
   setUnDisabledByKeyList
 });
