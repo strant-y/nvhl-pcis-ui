@@ -322,6 +322,7 @@ const tagsViewStore = useTagsViewStore();
 import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
 const { saveData } = NewUdrListService();
 import {useUserStore} from "@/store";
+import { pa } from "element-plus/es/locale";
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -2315,7 +2316,13 @@ const calcPremiumEdr = () => {
         ops["plyBase"]
       );
       console.log("生成缴费计划内容", payInfo);
-      opertaor.getTableRefs()["payinfo"].setFormValue(payInfo);
+      // opertaor.getTableRefs()["payinfo"].setFormValue(payInfo);
+      const payinfoRef = opertaor.getTableRefs()["payinfo"];
+      if (payinfoRef && payinfoRef.setFormValue) {
+        const currentPayList = [...payinfoRef.getFromValue()]; // 获取当前列表
+        currentPayList.push(payInfo); // 插入新条目
+        payinfoRef.setFormValue(currentPayList); // 更新表单数据
+      }
       needCalc.value = false;
     } else {
       ElMessage.error(res.msg);
@@ -2325,7 +2332,8 @@ const calcPremiumEdr = () => {
   });
 };
 const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase) => {
-  const payListNew = [];
+  // const payListNew = [];
+  const payListNew = [...payList];
   const pay = {};
   if (applicant) {
     pay["Pay.cPayorCde"] = applicant["Applicant.cAppCde"];
@@ -2340,14 +2348,15 @@ const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase) => {
   pay["Pay.nOwnPrm"] = nPrmVar;
   pay["Pay.cProdNo"] = base["Base.cProdNo"];
   pay["Pay.nPrmVar"] = nPrmVar;
-  for (const i in payList) {
-    if (!!payList[i]["Pay.cPkId"]) {
-      payListNew.push(payList[i]);
-    }
-  }
+  // for (const i in payList) {
+  //   if (!!payList[i]["Pay.cPkId"]) {
+  //     payListNew.push(payList[i]);
+  //   }
+  // }
   pay["Pay.nTms"] = payListNew.length + 1;
-  payListNew.push(pay);
-  return payListNew;
+  // payListNew.push(pay);
+  // return payListNew;
+  return pay;
 };
 /**
  * 批改:注销退保保费计算
