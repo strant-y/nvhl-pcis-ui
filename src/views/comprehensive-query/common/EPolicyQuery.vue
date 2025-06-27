@@ -55,7 +55,7 @@ const buttonList = [
         }
     }),
     createFreeButtonBase({
-        label: '生成电子保单',
+        label: '生成',
         type: 'primary',
         id: 'generateEPolicy',
         func: () => {
@@ -63,7 +63,7 @@ const buttonList = [
         }
     }),
     createFreeButtonBase({
-        label: '下载电子保单',
+        label: '下载',
         type: 'primary',
         id: 'downloadEPolicy',
         func: () => {
@@ -596,6 +596,9 @@ function downloadEPolicy() {
     if (!plyNo) {
         ElMessage.warning('没有数据，请核实确认！')
         return
+    }
+    if (plyTyp == 'EDR') {
+        plyNo = selectData[0].cEdrNo
     }
     const data = {
         plyNo: base64encoder(rsaEncoder(plyNo)),
