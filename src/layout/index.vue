@@ -253,8 +253,8 @@ onUnmounted(() => {
         align-items: center;
         justify-content: center;
         width: 99%;
-        height: 50px;
-        line-height: 50px;
+        height: 45px;
+        line-height: 45px;
         box-shadow: 0 0 6px -2px var(--el-color-primary);
 
         div:hover {

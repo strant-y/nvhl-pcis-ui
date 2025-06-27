@@ -15,7 +15,7 @@
                   <!-- <rt-icon
                     :item="{ icon: 'Tickets' }"
                   /> -->
-                  <i class="icon iconfont icon-shenhexinxi"></i>
+                  <i :class="['icon','iconfont',iconMap['underwriteurl']]"></i>
                   <span class="icon-title" v-if="NavigaShow"
                     >核保处理</span
                   >
@@ -27,7 +27,7 @@
                   <!-- <rt-icon
                     :item="{ icon: 'Tickets' }"
                   /> -->
-                  <i class="icon iconfont icon-shujuxiuzheng"></i>
+                  <i :class="['icon','iconfont',iconMap['edrbase']]"></i>
                   <span class="icon-title" v-if="NavigaShow"
                     >批改信息</span
                   >
@@ -39,7 +39,7 @@
                   <!-- <rt-icon
                     :item="{ icon: 'Tickets' }"
                   /> -->
-                  <i class="icon iconfont icon-zhongkaian"></i>
+                  <i :class="['icon','iconfont',iconMap['edritem']]"></i>
                   <span class="icon-title" v-if="NavigaShow"
                     >批改比较项</span
                   >
@@ -95,7 +95,7 @@
                   <!-- <rt-icon
                     :item="{ icon: 'Tickets' }"
                   /> -->
-                  <i class="icon iconfont icon-yishoubaodan"></i>
+                  <i :class="['icon','iconfont',iconMap['ciMasterAgreement']]"></i>
                   <span class="icon-title" v-if="NavigaShow"
                     >联共保主协议信息</span
                   >
@@ -104,7 +104,7 @@
                   <!-- <rt-icon
                     :item="{ icon: 'Tickets' }"
                   /> -->
-                  <i class="icon iconfont icon-zaibaoxinxi"></i>
+                  <i :class="['icon','iconfont',iconMap['ci']]"></i>
                   <span class="icon-title" v-if="NavigaShow"
                     >联共保信息</span
                   >
@@ -116,7 +116,7 @@
                   <!-- <rt-icon
                     :item="{ icon: 'Tickets' }"
                   /> -->
-                  <i class="icon iconfont icon-lishiyijian"></i>
+                  <i :class="['icon','iconfont',iconMap['ourCompanyCiShare']]"></i>
                   <span class="icon-title" v-if="NavigaShow"
                     >我司联共保信息</span
                   >
@@ -335,6 +335,7 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 import { useRouter, useRoute } from "vue-router";
 import { getData } from "@/pcis/prodRef/dataInit";
+import { iconMap } from './iconMap';
 
 const policyService = new PolicyService();
 const productStore = useProductStore();
@@ -342,21 +343,6 @@ const { isCiJiMrk } = storeToRefs(productStore);
 
 const route = useRoute();
 const router = useRouter();
-const iconMap = ref({
-  'plyBase': 'icon-wenjianban1',
-  'applicant': 'icon-changyongshoukuanrenguanli',
-  'insured': 'icon-changyongshoukuanrenguanli',
-  'insrnc': 'icon-lishicaozuojilu',
-  'dist': 'icon-wenjuantiaocha',
-  'distSummary': 'icon-zu9120',
-  'cvrg': 'icon-chakanmingxi',
-  'deductibleDist': 'icon-lipeixiangguan',
-  'base': 'icon-yishoubaodan',
-  'SpecialAgreement': 'icon-anjiantiaocha',
-  'payinfo': 'icon-hepei',
-  'image': 'icon-yingxiangxinxi',
-  'tgt': 'icon-jiwangpeian'
-})
 
 
 import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
@@ -2953,7 +2939,7 @@ function getSaveDataParams() {
 
 <style lang="scss" scoped>
 .bottom-items {
-  height: 50px;
+  height: 45px;
   background-color: #fff;
   display: flex;
   justify-content: end;

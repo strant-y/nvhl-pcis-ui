@@ -531,7 +531,7 @@ const switchTab = (tab) => {
 
 :deep(.v1-select-input) {
   width: 150px;
-  margin-top: 10px;
+  margin: auto;
 
   .el-select__wrapper {
     text-align: end;

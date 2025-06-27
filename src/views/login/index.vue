@@ -65,7 +65,7 @@
           <!-- 验证码 -->
           <el-form-item v-if="verifyFlag" prop="captchaCode">
             <div class="flex-y-center w-full">
-              <span class="icon-box">
+              <span class="icon-box captcha-icon-box">
                 <svg-icon icon-class="captcha" class="mx-2" />
               </span>
               <el-input
@@ -77,19 +77,21 @@
                 @keyup.enter="verifyCode"
               />
               <!-- 验证码-->
-              <el-button
-                v-if="verifyTime === 0"
-                class="mr-1 w-72px"
-                :loading="loading"
-                type="primary"
-                size="small"
-                plain
-                @click="getCaptcha"
-                >获取验证码</el-button
-              >
-              <el-tag v-else disabled class="mr-1" type="primary"
-                >{{ verifyTime }}秒</el-tag
-              >
+              <span style="width: 72px;text-align: right;">
+                <el-button
+                  v-if="verifyTime === 0"
+                  class="mr-1 w-72px"
+                  :loading="loading"
+                  type="primary"
+                  size="small"
+                  plain
+                  @click="getCaptcha"
+                  >获取验证码</el-button
+                >
+                <el-tag v-else disabled class="mr-1 " type="primary"
+                  >{{ verifyTime }}秒</el-tag
+                >
+              </span>
             </div>
           </el-form-item>
           <!-- <el-checkbox> 30天内免登录</el-checkbox> -->
@@ -626,6 +628,9 @@ onMounted(() => {});
     height: 48px;
     font-size: 18px;
     // background-color: #e3e3e3;
+    &.captcha-icon-box {
+      width: calc(21% - 10.5px);
+    }
   }
 }
 
