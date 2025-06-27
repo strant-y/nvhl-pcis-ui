@@ -562,6 +562,8 @@ const handleQuery = () => {
         yearData.value = res.data
         // pageresult.list = res.data
         pageresult.list = res.data[activeTab.value]
+      }else{
+          ElMessage.success(res.msg )
       }
     } else {
       ElMessage.error({ message: res.msg, duration: 3000 });
