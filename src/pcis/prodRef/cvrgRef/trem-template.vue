@@ -869,7 +869,7 @@ function setDisabledAll() {
     btnItem.value[k].hidden = true;
     if (unbut && unbut.length > 0) {
       const t = unbut.find((un: any) => un["cEdrItem"] === k + "_btn");
-      if (k) {
+      if (t) {
         btnItem.value[k].hidden = false;
       }
     }

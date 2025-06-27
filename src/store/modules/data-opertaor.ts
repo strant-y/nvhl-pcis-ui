@@ -130,25 +130,25 @@ export const dataOpertaor = (pageKey?: string) => {
                 if (tableRefs[key] && tableRefs[key].getFormconfig) {
                     // 配置层面已经实现只读,这里不再实现
                     const f = tableRefs[key].getFormconfig();
-                    // if (f.fromType === 'free') {  // 表单模式时,修改表单disabled实现只读
-                    //     if (f.fromSchema && f.fromSchema.length > 0) {
-                    //         f.fromSchema.forEach(f => {
-                    //             if (f.inputtype === 'rtinputgroup') {
-                    //                 f.groupList.forEach((gkey: any) => {
-                    //                     gkey.disabled = true;
-                    //                 });
-                    //             } else {
-                    //                 f.disabled = true;
-                    //             }
-                    //             if (f.btnItems) {
-                    //                 f.btnItems.disabled = true;
-                    //             }
+                    if (f.fromType === 'free') {  // 表单模式时,修改表单disabled实现只读
+                        if (f.fromSchema && f.fromSchema.length > 0) {
+                            f.fromSchema.forEach(f => {
+                                if (f.inputtype === 'rtinputgroup') {
+                                    f.groupList.forEach((gkey: any) => {
+                                        gkey.disabled = true;
+                                    });
+                                } else {
+                                    f.disabled = true;
+                                }
+                                if (f.btnItems) {
+                                    f.btnItems.disabled = true;
+                                }
 
-                    //         });
-                    //     }
-                    // } else if (f.fromType === 'grid') { // 表格模式时,修改表格属性,实现只读
-                    //     f.editFlag = false;
-                    // } else 
+                            });
+                        }
+                    } else if (f.fromType === 'grid') { // 表格模式时,修改表格属性,实现只读
+                        f.editFlag = false;
+                    } else 
                     if (f.fromType === 'custom') {
                         if (tableRefs[key].setDisabledAll) {
                             tableRefs[key].setDisabledAll();
@@ -180,14 +180,13 @@ export const dataOpertaor = (pageKey?: string) => {
                                 if (conf.fromType === 'free') {  // 表单模式时,修改表单disabled实现只读
                                     if (conf.fromSchema && conf.fromSchema.length > 0) {
                                         conf.fromSchema.forEach(f => {
-                                            if (f.inputtype === 'rtinputgroup') {
+                                            if (f.prop === item) {
+                                                if (f.inputtype === 'rtinputgroup') {
+                                                console.log(f.inputtype);
                                                 f.groupList.forEach((gkey: any) => {
-                                                    if (gkey.prop === item) {
-                                                        gkey.disabled = false;
-                                                    }
+                                                    gkey.disabled = false;
                                                 });
-                                            } else {
-                                                if (f.prop === item) {
+                                                }else {
                                                     f.disabled = false;
                                                 }
                                             }

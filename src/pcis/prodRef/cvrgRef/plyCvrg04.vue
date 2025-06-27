@@ -350,7 +350,9 @@ function updateBtn() {
     });
     Object.keys(btnItem.value).forEach((k: any) => {
       const t = unbut.find((un: any) => un["cEdrItem"] === k + "_btn");
-      btnItem.value[k].hidden = false;
+      if(t){
+        btnItem.value[k].hidden = false;
+      }
     });
   }
 }

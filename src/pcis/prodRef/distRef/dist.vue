@@ -276,7 +276,7 @@ const method = {
     });
   },
 
-  handleQuery: (queryParams: any = { pageNum: 1 }, isChange: boolean = false) => {
+  handleQuery: (queryParams: any = { pageNum: 1, pageSize: 10 }, isChange: boolean = false) => {
     let tgtRef = opertaor.getTableRefByKey('tgt')
     const param = opertaor.getParam();
     let app = "";
@@ -300,7 +300,8 @@ const method = {
           return{
             ... item,
             ... {
-              nSeqNo: index + 1,
+              // 序号全部由后端处理
+              // 'Dist.nSeqNo': ((queryParams.pageNum - 1) * queryParams.pageSize) + index + 1,
               tOpeningTime: item['Dist.tOpeningTime']
                   ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
                   : null,

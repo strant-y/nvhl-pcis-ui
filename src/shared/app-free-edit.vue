@@ -58,7 +58,7 @@
                 </el-col>
               </el-row> 
             </template>
-            <div class="form-inner" v-if="showMyfrom">
+            <div class="form-inner" v-show="showMyfrom">
               <dynamic-forms
                 :fromSchema="freeEditConfig.fromSchema"
                 :fromUi="freeEditConfig.fromUi"

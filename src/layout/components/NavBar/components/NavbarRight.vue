@@ -113,7 +113,8 @@
           src="/src/assets/images/0_.png" />
         <img v-else-if="userStore.user.cCssStyle === '1'" class="rounded-full mr-10px w24px w24px"
           src="/src/assets/images/1_.png" />
-        <span>{{ userStore.user.opCnm }}</span>
+        <el-icon v-else><User /></el-icon>
+        <span style="margin-left: 0.3rem;">{{ userStore.user.opCnm }}</span>
       </div>
       <template #dropdown>
         <el-dropdown-menu>
@@ -530,12 +531,16 @@ const switchTab = (tab) => {
 
 :deep(.v1-select-input) {
   width: 150px;
-  margin-top: 10px;
+  margin: auto;
 
   .el-select__wrapper {
     text-align: end;
     background-color: transparent;
     box-shadow: none;
+  }
+
+  .el-select__placeholder,.el-select__caret {
+    color: #FFFFFF;
   }
 }
 

@@ -39,7 +39,6 @@
                 :placeholder="$t('login.username')"
                 name="username"
                 size="large"
-                class="h-[48px] w-[79%]"
                 :disabled="verifyFlag"
                 @keyup.enter="handleLogin"
               />
@@ -58,7 +57,6 @@
                 name="password"
                 @keyup.enter="handleLogin"
                 size="large"
-                class="h-[48px] pr-3 w-[79%]"
                 show-password
                 :disabled="verifyFlag"
               />
@@ -67,7 +65,7 @@
           <!-- 验证码 -->
           <el-form-item v-if="verifyFlag" prop="captchaCode">
             <div class="flex-y-center w-full">
-              <span class="icon-box">
+              <span class="icon-box captcha-icon-box">
                 <svg-icon icon-class="captcha" class="mx-2" />
               </span>
               <el-input
@@ -79,22 +77,24 @@
                 @keyup.enter="verifyCode"
               />
               <!-- 验证码-->
-              <el-button
-                v-if="verifyTime === 0"
-                class="mr-1 w-72px"
-                :loading="loading"
-                type="primary"
-                size="small"
-                plain
-                @click="getCaptcha"
-                >获取验证码</el-button
-              >
-              <el-tag v-else disabled class="mr-1" type="primary"
-                >{{ verifyTime }}秒</el-tag
-              >
+              <span style="width: 72px;text-align: right;">
+                <el-button
+                  v-if="verifyTime === 0"
+                  class="mr-1 w-72px"
+                  :loading="loading"
+                  type="primary"
+                  size="small"
+                  plain
+                  @click="getCaptcha"
+                  >获取验证码</el-button
+                >
+                <el-tag v-else disabled class="mr-1 " type="primary"
+                  >{{ verifyTime }}秒</el-tag
+                >
+              </span>
             </div>
           </el-form-item>
-          <el-checkbox> 30天内免登录</el-checkbox>
+          <!-- <el-checkbox> 30天内免登录</el-checkbox> -->
           <!-- 登录按钮 -->
           <el-button
             v-if="!verifyFlag"
@@ -218,7 +218,7 @@
           </el-button>
           
         </el-form>
-        <el-checkbox v-model="agreeTerms">已阅读并同意《用户服务协议》和《隐私政策》</el-checkbox>
+        <!-- <el-checkbox v-model="agreeTerms">已阅读并同意《用户服务协议》和《隐私政策》</el-checkbox> -->
       </el-card>
     </div>
   </el-row>
@@ -227,6 +227,7 @@
     <!-- <div class="absolute bottom-1 text-[10px] text-center" v-show="icpVisible">
       <p>2005-2024 版权所有 软通动力信息技术（集团）股份有限公司 版权所有</p>
     </div> -->
+    <CopyRight style="position: absolute;border: none;background: transparent;bottom: 0;" />
     <third-party-dialog
       v-if="dialogShow"
       v-model:dialogShow="dialogShow"
@@ -589,18 +590,27 @@ onMounted(() => {});
 
     .login-card {
       margin: auto; // 垂直居中
-      padding: 20px;
       border-radius: 8px;
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
       background-color: #fff;
 
       h2 {
-        text-align: center;
-        margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 20px;
+        color: #141414;
+        font-weight: 600;
+        margin: 25px 0;
       }
 
       .login-form {
         width: 100%;
+        padding: 0 12px 22px;
+      }
+
+      :deep(.el-card__body) {
+        padding: 10px;
       }
     }
   }
@@ -617,13 +627,16 @@ onMounted(() => {});
     width: 21%;
     height: 48px;
     font-size: 18px;
-    background-color: #e3e3e3;
+    // background-color: #e3e3e3;
+    &.captcha-icon-box {
+      width: calc(21% - 10.5px);
+    }
   }
 }
 
 :deep(.el-input) {
   .el-input__wrapper {
-    padding: 0 0 0 15px;
+    padding: 0 15px 0 0;
     background-color: transparent;
     box-shadow: none;
     &.is-focus,
@@ -634,6 +647,9 @@ onMounted(() => {});
     input:-webkit-autofill {
       transition: background-color 1000s ease-in-out 0s;
     }
+  }
+  .el-input__suffix {
+    width: 22px;
   }
 }
 

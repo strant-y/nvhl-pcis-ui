@@ -61,7 +61,7 @@
           </el-row>
         </template>
 
-        <div class="form-inner" v-if="showMyfrom">
+        <div class="form-inner" v-show="showMyfrom">
           <div v-if="cardConfig.showEdit">
             <app-free-edit :freeEditConfig="formconfig" ref="EditRef" />
           </div>

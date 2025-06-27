@@ -95,6 +95,7 @@ const method = {
           key['Ci.nSeqNo']=index+1
           key['Ci.nPlyFeeRate']= '0.00'
           key['Ci.nPlyFee']= '0.00'
+          key['Ci.nComm']= '0.00'
           // key['Ci.cIssueMrk']= '0'
           key['Ci.cChiefMrk']= cChiefMrk
           key['Ci.cCoinsurerCde']= '327001'
@@ -165,6 +166,7 @@ const method = {
           "loadData",
           [{ value: '1', label: '其他' }]
       );
+      
     }
   },
 
@@ -225,6 +227,7 @@ const method = {
         "loadData",
         [{ value: '1', label: '其他' }]
       );
+      freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "1");
       setFormItem("Ci.cDptCde", { rules: [] });
       setFormItem("Ci.cDptCde", { disabled: true });
       setFormItem("Ci.nComm", { disabled: true});
@@ -740,6 +743,7 @@ const initCiInfo = (data: any) => {
       'Ci.nCiShare': '1.00000000',
       'Ci.nPlyFeeRate': '0.00',
       'Ci.nPlyFee': '0.00',
+      'Ci.nComm':'0.00',
       'Ci.cChiefMrk': cChiefMrk,
       'Ci.cIssueMrk': '1',
       'Ci.cCoinsurerCde': '327001',
