@@ -886,8 +886,8 @@ const method = {
   },
   // 证件有效起期
   tCertfBgnDateDisable:(date:any)=>{
-    const fs = applicantEditRef?.value?.getFromValue();
-    if (JSON.stringify(fs) !== '{}') {
+    const fs = applicantEditRef.value?.getFromValue();
+    if (fs && JSON.stringify(fs) !== '{}') {
 
       const endDate = new Date(fs["Applicant.tCertfEndDate"] || '')   // 结束时间 
       let minDate = dayjs(endDate).valueOf();
@@ -900,7 +900,7 @@ const method = {
   // 证件有效止期
   tCertfEndDateDisable:(date:any)=>{
     const fs = applicantEditRef?.value?.getFromValue();
-    if (JSON.stringify(fs) !== '{}') {
+    if (fs && JSON.stringify(fs) !== '{}') {
       const startDate = new Date(fs["Applicant.tCertfBgnDate"]|| '')   // 开始时间   
       let maxDate = dayjs(startDate).valueOf();
         return   date.getTime() < maxDate

@@ -935,7 +935,7 @@ const method = {
     // 证件有效起期
   tCertfBgnDateDisable:(date:any)=>{
     const fs = insuredEditRef?.value?.getFromValue();
-    if (JSON.stringify(fs) !== '{}') {
+    if (fs && JSON.stringify(fs) !== '{}') {
     // if (JSON.stringify(fs) !== '{}') {
  
       const endDate = new Date(fs["Insured.tCertfEndDate"] || '')   // 结束时间 
@@ -949,7 +949,7 @@ const method = {
   // 证件有效止期
   tCertfEndDateDisable:(date:any)=>{
     const fs = insuredEditRef?.value?.getFromValue();
-    if (JSON.stringify(fs) !== '{}') {
+    if (fs && JSON.stringify(fs) !== '{}') {
       const startDate = new Date(fs["Insured.tCertfBgnDate"] || '')   // 开始时间   
 
       let maxDate = dayjs(startDate).valueOf();
