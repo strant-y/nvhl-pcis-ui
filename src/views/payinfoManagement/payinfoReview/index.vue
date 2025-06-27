@@ -148,6 +148,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "CBillTyp",
         inputtype: "rtselect",
         title: "单据类型",
+        clearable:true,
         loadData: [
           { label: "投保单号", value: "1" },
           { label: "交易号", value: "3" },
@@ -283,7 +284,7 @@ const tableconfig = reactive<AppTableConfig>(
         minWidth: 180,
       },
       {
-        prop: "cAppNum",
+        prop: "cTermName",
         inputtype: "rtinput",
         title: "条款",
         minWidth: 180,

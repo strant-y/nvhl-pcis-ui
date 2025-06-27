@@ -19,6 +19,10 @@ const props = defineProps({
     type: [Object],
     required: true,
   },
+  compKey: {
+    type: String,
+    required: false,
+  },
 });
 
 let cRsnDetailCde = ref(opertaor.getParam()?.cRsnDetailCde);
@@ -37,11 +41,13 @@ onMounted(() => {
     method,
     exRules
   );
-
-  console.log("数据", formconfig11);
   Object.assign(formconfig1, formconfig11);
 
   canOperateForm();
+ 
+  setTimeout(()=>{
+     setValue('Acctinfo.cAcctNme',opertaor.getDataAll()['applicant']['Applicant.cAppNme'])
+  },1000)
 });
 
 // 可以操作的配置项处理  身份认真里面的几项
@@ -85,7 +91,7 @@ const method = {
   // func demo
   cBankRelTypFun: (val: any) => {
     console.log(313, val);
-
+    setValue('Acctinfo.cAcctNme',opertaor.getDataAll()['applicant']['Applicant.cAppNme'])
     para = val.split("_");
     const bankname = para[1]; // 银行名称
     const isdefault = para[2]; // 是否默认值
@@ -93,6 +99,7 @@ const method = {
     console.log(para);
     // 1直连银行 开户行 省、市、对公对私必填   0是非直联，开户行 省、市、区/县、开户行、对公对私必填
     if (isdefault === "1") {
+      
       setFormItem("Acctinfo.cBankPro", {
         rules: [getRules("required", {})],
       });
@@ -135,7 +142,7 @@ const method = {
       setValue("Acctinfo.cBankPro", "");
       setValue("Acctinfo.cBankArea", "");
       setValue("Acctinfo.cBankCounty", "");
-      setValue("Acctinfo.cBankAddr", bankname);
+      // setValue("Acctinfo.cBankAddr", bankname);
     } else {
       setValue("Acctinfo.cBankAddr", null);
 
@@ -146,7 +153,7 @@ const method = {
         const arrayCBankCde = cBankCde.split("_");
         const codeCBankCde = arrayCBankCde[0];
         const nameCBankCde = arrayCBankCde[1];
-        setValue("Acctinfo.cBankAddr", nameCBankCde);
+        // setValue("Acctinfo.cBankAddr", nameCBankCde);
         setValue("Acctinfo.cBankCnaps", codeCBankCde);
       }
     }
@@ -164,8 +171,7 @@ const method = {
       rules: [getRules("required", {})],
     });
   },
-  // 开户行 查询
-  cBankCdeFunc: () => {},
+
   cCityChange: (e: any) => {
     setFormItem("Acctinfo.cBankCounty", {
       codeParam: { areaname: e },
@@ -178,9 +184,20 @@ const method = {
 
     setFormItem("Acctinfo.cBankCde", {
       disabled: false,
+       typeCode: 'CBankCdeList',
+              // codeParam: { 'banktypecod': para[3], 'areacode': val },
       codeParam: { banktypecod: para[3], areacode: val },
       rules: [getRules("required", {})],
     });
+  },
+    // 开户行 查询
+  cBankCdeChange: (val:any) => {
+    console.log(val,'开户行')
+      if(val){
+          let backAddr  = val.split('_');
+          setValue('Acctinfo.cBankCnaps',backAddr[0])
+          setValue('Acctinfo.cBankAddr',backAddr[1])
+      }
   },
 };
 

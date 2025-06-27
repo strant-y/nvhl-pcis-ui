@@ -75,7 +75,10 @@
               <tbody>
                 <template v-for="(item, k) in termFactormap" :key="k">
                   <tr v-if="item.cPorpShowtitle !== '1'">
-                    <td>
+                    <td
+                    :class="{
+                        'custom-indent':item.cPropIndent === '1',
+                    }">
                       <el-text
                         v-if="isrequired(item)"
                         class="mx-1"
@@ -674,9 +677,16 @@ function dataInit() {
 }
 
 function initshowConfig() {
+  // 条款组件遍历,对一些个性化操作进行处理
   termFactormap.value.forEach((item) => { 
     item.required = isrequired(item);
     item.disabled = isdisabled(item);
+
+    if (item.cFatherKey ) {  //如果存在上级,则将上限设置成0,等待父级修改后,再修改自己的上限
+      if(!item.max){
+        item.max = 0;
+      }
+    }
   });
   let grouplist: { [k: string]: any } = {};
   if (groupInfo.value) {
@@ -859,7 +869,7 @@ function setDisabledAll() {
     btnItem.value[k].hidden = true;
     if (unbut && unbut.length > 0) {
       const t = unbut.find((un: any) => un["cEdrItem"] === k + "_btn");
-      if (k) {
+      if (t) {
         btnItem.value[k].hidden = false;
       }
     }
@@ -940,7 +950,55 @@ const methodMap = {
       });
     }
   },
+
+
+  InsuranceChange043009:(val: any)=>{
+    if (pageparam.cProdNo === "049035") {
+      termFactormap.value.forEach((item: any) => {
+        if (item["prop"] === "Term.nAccidentLimit") {
+          item['max'] = val/2;
+        }
+      });
+    }
+  },
+  LimitSameChange:(val: any)=>{
+    if(val === '1'){
+      const trems = opertaor.getTableRefByKey('cvrg');
+      const data = trems.getFromValue();
+      const cocyData = {};
+      console.log(data);
+      data.forEach((item: any) => {
+        if(item['Term.cClauseCode'] === '00425000085'){
+          Object.keys(copyMaps).forEach((key: any) => { 
+            if(item[copyMaps[key]]){
+              cocyData[copyMaps[key]] = item[copyMaps[key]];
+            }
+          })
+        }
+      });
+    }
+  },
+  /**
+   * 用于父级向子集校验,修改子集可输入的最大值
+   */
+  FathersCheck:(val:any,row:any,item:any)=>{
+    const fk = item.prop;
+    termFactormap.value.forEach((item: any) => {
+      if(item.cFatherKey === fk){
+        item.max = val;
+      }
+      if(termdata.value[item.prop]){
+        if(item.max < termdata.value[item.prop]){
+          termdata.value[item.prop] = item.max;
+        }
+      }
+    });
+  }
 };
+
+const copyMaps = ['Term.nAccidentLimit','Term.nInsuranceAmount','Term.nLegalAccident','Term.nLegalTotal','Term.nRateVal',
+'Term.nResponsePer','Term.nResponseTotal','Term.nSeatLimit','Term.nSeatMedical','Term.nSeatPremium','Term.nSeatProperty',
+'Term.nSeatTotal','Term.cLimitMethod']
 
 function setCancel(){
   termdata.value['Term.cCancelMrk'] = '1';

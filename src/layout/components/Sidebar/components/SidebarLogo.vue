@@ -2,7 +2,7 @@
   <div class="logo-container">
     <transition enter-active-class="animate__animated animate__fadeInLeft">
       <router-link v-if="collapse" class="wh-full flex-center" to="/">
-        <img v-if="settingsStore.sidebarLogo" :src="logo" class="logo-image" />
+        <!-- <img v-if="settingsStore.sidebarLogo" :src="logo" class="logo-image" /> -->
       </router-link>
 
       <router-link v-else class="wh-full logo-title-box" to="/">

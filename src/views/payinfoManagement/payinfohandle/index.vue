@@ -256,6 +256,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				inputtype: "rtselect",
 				title: "缴费类型",
 				typeCode: "CHARGE_TYPE_CACHE",
+                clearable: true,
 				param: {'cCde': [ '2', '3', '5',  '99']},
 			},
 			{
@@ -472,7 +473,7 @@ const tableconfig = reactive<AppTableConfig>(
 					type: "primary",
 					label: "缴费类型转换",
 					func: async () => {
-                                // dzmodal.open(payConfirmInfoChanges, { type: "check" , data:{
+                                // dzmodal.open(payConfirmInfoChanges, { type: "review" , data:{
                                 //     }}).then((res) => {
                                 //     if (res.type === "ok") {
                                 //         handleQuery();
@@ -970,7 +971,7 @@ function gotoChangeSts() {
   //     // const { code, data, msg } = res;
   //     // if (200 === code) {
   //     //   if(msg === 'OK') {
-  //     //     dzmodal.open(payConfirmInfoChange, { type: "check" , data:{
+  //     //     dzmodal.open(payConfirmInfoChange, { type: "review" , data:{
   //     //       CUniqueNos: CUniqueNos,
   //     //       CRelAppNos: CRelAppNos
   //     //     }}).then((res) => {
@@ -984,7 +985,7 @@ function gotoChangeSts() {
   //     // }
   //   })
   //   .finally(() => {
-  //     dzmodal.open(payConfirmInfoChange, { type: "check" , data:{
+  //     dzmodal.open(payConfirmInfoChange, { type: "review" , data:{
   //       CUniqueNos: CUniqueNos,
   //       CRelAppNos: CRelAppNos
   //     }}).then((res) => {

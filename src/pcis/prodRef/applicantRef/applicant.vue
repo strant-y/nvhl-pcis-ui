@@ -15,7 +15,7 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
-
+import dayjs from "dayjs";
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
 import moment from "moment";
@@ -29,6 +29,10 @@ const props = defineProps({
   pageSchema: {
     type: [Object],
     required: true,
+  },
+  compKey: {
+    type: String,
+    required: false,
   },
 });
 
@@ -47,6 +51,8 @@ const fileInputRef = ref(null);
 const fileInputType = ref();
 import { readFile } from "@/api/file";
 const tCertfDate = ref<any[]>([]);
+const  cWorkDptList =['310','320','330','340','350','360']  // 单位性质带企业的ID
+
 onMounted(() => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
@@ -87,6 +93,7 @@ onMounted(() => {
 
     // 处理邮编
     setFormItem("Applicant.cZipCde", {
+        'maxlength':6,
       rules: [
         getRules("signlessInt", {}),
         getRules("specifyLength", { len: 6 }),
@@ -100,6 +107,11 @@ onMounted(() => {
     
     setFormItem("Applicant.cGreenIndustryCustomers",{disabled: true});
     setFormItem("Applicant.cGreenIndustryList",{disabled: true});
+    setFormItem("Applicant.cGcidCode", {rules: [getRules("leiCode", {})]});
+    // 关联交易审批单编号
+    setFormItem("Applicant.cRelateNo", {rules: [getRules("txnApprovalNo", {})]});
+    
+
 
 
   });
@@ -121,6 +133,23 @@ function setFormItem(key: any, obj: any) {
     });
   }
 }
+
+// 解析身份证
+const idAnalysis = (id:string)=>{
+     const birthYear = parseInt(id.substring(6, 10), 10);
+          const birthMonth = parseInt(id.substring(10, 12), 10);
+          const birthDay = parseInt(id.substring(12, 14), 10);
+          const birthday = `${birthYear}-${birthMonth.toString().padStart(2, "0")}-${birthDay.toString().padStart(2, "0")}`;
+          const sexCode = parseInt(id.substring(16, 17), 10);
+          const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
+          const age = new Date().getFullYear() - birthYear;
+
+          setValue("Applicant.cNation", "1"); // 国籍
+          setValue("Applicant.tBirthday", birthday);
+          setValue("Applicant.nAge", age);
+          setValue("Applicant.cSex", sex);
+}
+
 
 
 //  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
@@ -270,7 +299,9 @@ const method = {
       });
     }
 
-    if (val == "120001") {
+    if (val == "120001") { 
+      
+      // setValue('Applicant.cCertfCde','')  //选身份证时清空
       setFormItem("Applicant.cCertfCde", {
         rules: [getRules("required", {}), getRules("idCard", {})],
       });
@@ -283,9 +314,9 @@ const method = {
       });
 
       setValue("Applicant.cNation", "1"); // 国籍
-      setValue("Applicant.tBirthday", null);
-      setValue("Applicant.nAge", null);
-      setValue("Applicant.cSex", null);
+      // setValue("Applicant.tBirthday", null);
+      // setValue("Applicant.nAge", null);
+      // setValue("Applicant.cSex", null);
 
       if (!param.initFlag) {
         setFormItem("Applicant.cNation", {
@@ -302,9 +333,6 @@ const method = {
         });
       }
     } else if (val == "110002") {
-      setFormItem("Applicant.tCertfBgnDate", {
-        rules: [getRules("required", {})],
-      });
       setFormItem("Applicant.tCertfEndDate", {
         rules: [getRules("required", {})],
       });
@@ -314,7 +342,7 @@ const method = {
           rules: [getRules("required", {})],
         });
         
-    }   else if ( val == "110007") {   
+    } else if ( val == "110007") {   
       setFormItem("Applicant.tCertfBgnDate", {
         rules: [getRules("required", {})],
       });
@@ -324,12 +352,17 @@ const method = {
 
       // 统一社会信用代码校验
         setFormItem("Applicant.cCertfCde", {
-        rules: [getRules("socialCode", {})],
+        rules: [getRules("required", {}),getRules("socialCode", {})],
       });
 
             // 为法人  企业成立日期
       setFormItem("Applicant.tEstablishingDate", {
         rules: [getRules("required", {})],
+      });
+    } else if(val == "19"){
+      // 外国人证件号
+      setFormItem("Applicant.cCertfCde", {
+        rules: [getRules("required", {}),getRules("ariCard", {})],
       });
     } else {
       setFormItem("Applicant.cCertfCde", {
@@ -349,6 +382,16 @@ const method = {
     const param = opertaor.getParam();
 
     if (val == "0") {
+      setFormItem("Applicant.tBirthday", {
+        rules: null
+      });
+      setFormItem("Applicant.nAge", {
+        rules: null
+      });
+      setFormItem("Applicant.cSex", {
+        rules: null
+      });
+      // Applicant.cWorkDpt
       productStore.setcClntMrk(val);
       // 办理人
       setFormItem("Applicant.cCntrNme", { rules: [getRules("required", {})] });
@@ -404,6 +447,19 @@ const method = {
         rules: [getRules("required", {})],
       });
  
+      //实名认证方式
+      let cWorkDpt = getValue('Applicant.cWorkDpt')
+      if(cWorkDptList.includes(cWorkDpt)){
+          setFormItem("Applicant.cRealnameAuthType", {
+            rules: [getRules("required", {})],
+          });
+      }else{
+          setFormItem("Applicant.cRealnameAuthType", {
+            rules: [],
+          });
+      }
+   
+ 
    
       let cMobile = getValue('Applicant.cMobile');  // 移动 
       let cTel = getValue('Applicant.cTel');  // 固定电话    
@@ -427,6 +483,19 @@ const method = {
       setFormItem("Applicant.cTrdCde", {
         rules: [getRules("required", {})],
       });
+
+      // 性别 、年龄、生日个人必填
+      setFormItem("Applicant.tBirthday", {
+        rules: [],
+      });
+      setFormItem("Applicant.nAge", {
+      rules: [],
+      });
+      setFormItem("Applicant.cSex", {
+        rules: [],
+      });
+
+
            codeListStore
         .queryCodeList({
           codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
@@ -449,6 +518,15 @@ const method = {
           });
         });
     } else {
+      setFormItem("Applicant.tBirthday", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.nAge", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.cSex", {
+        rules: [getRules("required", {})],
+      });
       setFormItem("Applicant.cWorkDpt", { rules: null });
       setFormItem("Applicant.cIsMicroEntpris", {
         disabled: true,
@@ -469,11 +547,19 @@ const method = {
         disabled: true,
       });
 
+         // 是否绿色详情
+      setFormItem("Applicant.cGreenIndustryList", {
+        rules: null,
+        disabled: true,
+      });
+      setValue("Applicant.cGreenIndustryCustomers", "");
+      setValue("Applicant.cGreenIndustryList", "");
+
       // 为法人  企业成立日期
       setFormItem("Applicant.tEstablishingDate", {
         rules: null,
       });
-      setValue("Applicant.cGreenIndustryCustomers", "");
+ 
       setValue("Applicant.cIsMicroEntpris", "");
       //是否分支机构
       setValue("Applicant.cIsBranch", "1");
@@ -489,12 +575,28 @@ const method = {
         rules: [],
       });
 
+      //实名认证方式
+      setFormItem("Applicant.cRealnameAuthType", {
+        rules: [],
+      });
+
       // 个人 移动电话必填  
       setFormItem("Applicant.cMobile", {
         rules: [ getRules("required", {}), getRules("phoneNo", {})],
       });
       setFormItem("Applicant.cTel", { rules: [getRules("phone", {})] });
       setFormItem("Applicant.cIsIndvduBiz", {
+        rules: [getRules("required", {})],
+      });
+
+      // 性别 、年龄、生日个人必填
+      setFormItem("Applicant.tBirthday", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.nAge", {
+      rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.cSex", {
         rules: [getRules("required", {})],
       });
 
@@ -604,7 +706,8 @@ const method = {
             setFormItem("Applicant.cTrdCde", {
               loadData: [{ label: data.cnm, value: data.cde }],
             });
-            setValue("Applicant.cTrdCde", data.cnm);
+           // setValue("Applicant.cTrdCde", data.cnm);
+            setValue("Applicant.cTrdCde", data.cde);
             dialog.value?.handleClose();
           },
         },
@@ -621,6 +724,9 @@ const method = {
         type: "show",
         method: {
           getdbClickData: (data) => {
+            setFormItem("Applicant.cOccupCde", {
+              loadData: [{ label: data.cnm, value: data.cde }],
+            });
             setValue("Applicant.cOccupCde", data.cde);
             dialog.value?.handleClose();
           },
@@ -634,7 +740,7 @@ const method = {
   },
 
   // 证件有效期长期标识
-  tCertMrkChecked: (val) => {
+  tCertMrkChecked: (val:any) => {
     const param = opertaor.getParam();
     if (val == "1") {
       setValue(
@@ -644,18 +750,35 @@ const method = {
       if (!param.initFlag) {
         setFormItem("Applicant.tCertfEndDate", { disabled: true });
       }
-      setFormItem("Applicant.tCertfBgnDate", {  rules: [],});
-      setFormItem("Applicant.tCertfEndDate", { disabled: true , rules: [],});
+
+      // let cCertfCls = getValue('Applicant.cCertfCls');  // 证件类型   110007  120001
+      // if(cCertfCls ==="120001" || cCertfCls ==="110008=7"){
+      //     setFormItem("Applicant.tCertfBgnDate", {  rules: [getRules("required", {})],});
+      //     setFormItem("Applicant.tCertfEndDate", { disabled: true , rules: [getRules("required", {})],});
+      // }else{
+      //   setFormItem("Applicant.tCertfBgnDate", {  rules: [],});
+      //   setFormItem("Applicant.tCertfEndDate", { disabled: true , rules: [],});
+      // }
 
     } else {
-      setValue("Applicant.tCertfBgnDate", tCertfDate.value[0] || "");
-      setValue("Applicant.tCertfEndDate", tCertfDate.value[1] || "");
-      if (!param.initFlag) {
-      setFormItem("Applicant.tCertfEndDate", { disabled: false });
+      if(tCertfDate.value.length>0){
+        setValue("Applicant.tCertfBgnDate", tCertfDate.value[0] || "");
+        setValue("Applicant.tCertfEndDate", tCertfDate.value[1] || "");
       }
-      setFormItem("Applicant.tCertfBgnDate", {     rules: [getRules("required", {})],});
-      setFormItem("Applicant.tCertfEndDate", {    rules: [getRules("required", {})],});
+  
+      if (!param.initFlag) {
+        setFormItem("Applicant.tCertfEndDate", { disabled: false });
+      }
+      
+      // let cCertfCls = getValue('Applicant.cCertfCls');  // 证件类型   110007  120001
+      // if(cCertfCls ==="120001" || cCertfCls ==="110008=7"){
+      //     setFormItem("Applicant.tCertfBgnDate", {     rules: [getRules("required", {})],});
+      //     setFormItem("Applicant.tCertfEndDate", {    rules: [getRules("required", {})],});
 
+      // }else{
+      //      setFormItem("Applicant.tCertfBgnDate", {     rules: []});
+      //     setFormItem("Applicant.tCertfEndDate", {    rules: []});
+      // }
     }
   },
   // 移动电话 切换
@@ -745,7 +868,8 @@ const method = {
         disabled: false,
       });
     } else {
-      setFormItem("Applicant.cGreenIndustryList", { rules: null });
+      setFormItem("Applicant.cGreenIndustryList", { rules: null,  disabled: true, });
+      setValue('Applicant.cGreenIndustryList','')
     }
   },
   // 证件号码change
@@ -759,21 +883,11 @@ const method = {
           "Applicant.cCertfCde"
         );
         if (certfCde && certfCde.length === 18) {
-          const birthYear = parseInt(certfCde.substring(6, 10), 10);
-          const birthMonth = parseInt(certfCde.substring(10, 12), 10);
-          const birthDay = parseInt(certfCde.substring(12, 14), 10);
-          const birthday = `${birthYear}-${birthMonth.toString().padStart(2, "0")}-${birthDay.toString().padStart(2, "0")}`;
-          const sexCode = parseInt(certfCde.substring(16, 17), 10);
-          const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
-          const age = new Date().getFullYear() - birthYear;
-
-          setValue("Applicant.cNation", "1"); // 国籍
-          setValue("Applicant.tBirthday", birthday);
-          setValue("Applicant.nAge", age);
-          setValue("Applicant.cSex", sex);
+            idAnalysis(val)
         }
       }
     }
+
 
     checkUser();
   },
@@ -816,6 +930,55 @@ const method = {
     fileInputRef.value?.click();
     fileInputType.value = "2";
   },
+  // 单位性质
+  cWorkDptChange:(val:any,lab:any)=>{
+      console.log('单位性质',val,lab)
+      let cClntMrk = getValue('Applicant.cClntMrk');  // 投保人性质 
+      if(cWorkDptList.includes(val) && cClntMrk =='0'){
+          //实名认证方式
+          setFormItem("Applicant.cRealnameAuthType", {
+            rules: [getRules("required", {})],
+          });
+      }else{
+          setFormItem("Applicant.cRealnameAuthType", {
+            rules: [],
+          });
+      }
+
+      if(val =='350'){
+        setFormItem("Applicant.cGcidCode", {
+          rules: [getRules("required", {}),getRules("leiCode", {})],
+        });
+      }else if(val){
+        setFormItem("Applicant.cGcidCode", {
+          rules: [getRules("leiCode", {})],
+        });
+      }
+  },
+  // 证件有效起期
+  tCertfBgnDateDisable:(date:any)=>{
+    const fs = applicantEditRef?.value?.getFromValue();
+    if (JSON.stringify(fs) !== '{}') {
+
+      const endDate = new Date(fs["Applicant.tCertfEndDate"] || '')   // 结束时间 
+      let minDate = dayjs(endDate).valueOf();
+      return   date.getTime() > minDate
+    }else{
+        return true;
+    }
+
+  },
+  // 证件有效止期
+  tCertfEndDateDisable:(date:any)=>{
+    const fs = applicantEditRef?.value?.getFromValue();
+    if (JSON.stringify(fs) !== '{}') {
+      const startDate = new Date(fs["Applicant.tCertfBgnDate"]|| '')   // 开始时间   
+      let maxDate = dayjs(startDate).valueOf();
+        return   date.getTime() < maxDate
+    }else{
+        return true;
+    }
+  }
 };
 
 function setregistAdd() {
@@ -928,6 +1091,9 @@ function handleFileChange(event: Event) {
             }
             setValue("Applicant.cCertfCls", "120001");
             setValue("Applicant.cClntMrk", "1");
+            if (cardInfo["id_number"])
+              idAnalysis(cardInfo["id_number"])
+
           }
           if (fileInputType.value === "2") {
             // 外国人永久居留身份证
@@ -968,6 +1134,8 @@ function handleFileChange(event: Event) {
             setValue("Applicant.cCertfCls", "19");
             setValue("Applicant.cClntMrk", "1");
           }
+
+           checkUser();
         }
       })
       .catch((err) => {

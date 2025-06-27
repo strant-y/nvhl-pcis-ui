@@ -34,6 +34,9 @@ const props = defineProps({
     type: [Object],
     required: true,
   },
+  compKey: {
+    type: String
+  }
 });
 
 const deductibleFixEdit = defineAsyncComponent(() => import("@/pcis/prodRef/commodityRef/DeductibleFixEdit.vue"));
@@ -88,15 +91,26 @@ const tableconfig = reactive<AppTableConfig>(
           return row.cIfEdit !== '1';
         },
         tableClick: (row) => {
-          const param = {};
-          const f = originalData.value.find(f => row.cDeductibleCode === f.cDeductibleClass);
-          Object.assign(param, f);
+          let param = {};
+          if(row['cIfMust'] !== '9') {
+            const f = originalData.value.find(f => row.cDeductibleClass === f.cDeductibleClass);
+            Object.assign(param, f);
+          }else {
+            Object.assign(param, row)
+          }
+
+          if(row.editList && row.editList.length>0){
+            param['editList'] = row.editList
+          }
+
+          console.log('数据====',param)
           dzmodal.open(deductibleFixEdit, { 
             type: "view", 
             data: param, 
             callback: (res: any) => {
               if (res.type === "ok") {
                 row.cDeductibleContent = res.data.cDeductibleContent
+                row['editList']= res.data['editList']
               }
             }
           });
@@ -171,7 +185,7 @@ const tableconfig = reactive<AppTableConfig>(
           },
           {
             label: "自定义",
-            value: "2",
+            value: "9",
           },
         ],
       },
@@ -198,6 +212,7 @@ const initOriginalData = ()=> {
     pageNum: 1,
     pageSize: 999,
   }
+  console.log(332,)
   getPrdDeductible(param).then((res) => {
     if (res.data.result) {
       pageresult.list = [];
@@ -272,7 +287,7 @@ const method = {
     dialog.value?.open('deductibleFix', {
           cProdNo: route.params.param.cProdNo,
           selectedData: formData.value, //需要把自定义的过滤掉，只传过去从模板中选择的
-        }, 
+        },
         { 
           getSelected(selectdata: any) {
             const mergeAndNumberArraysPreserveOrder = (a: [], b: []): any[] => {
@@ -299,7 +314,9 @@ const method = {
 const exRules = {};
 
 function getFormconfig() {
-  return formconfig1;
+  return {
+    fromType: "custom",
+  };
 }
 
 function getTableData() {
@@ -343,11 +360,40 @@ function getFromValue() {
   });
 }
 
+function setDisabledAll() {
+  if (cardconfig.value.titleBtns && cardconfig.value.titleBtns.length > 0) {
+    cardconfig.value.titleBtns.forEach((item: any) => {
+      item.hidden = true;
+    });
+  }
+  if (cardconfig.value.endBtns && cardconfig.value.endBtns.length > 0) {
+    cardconfig.value.endBtns.forEach((item: any) => {
+      item.hidden = true;
+    });
+  }
+}
+
+
+function setUnDisabledByKeyList(key: any) {
+  cardconfig.value.endBtns?.forEach((item: any) => {
+    if ("Btn_" + item.id === key) {
+      item.hidden = false;
+    }
+  });
+  cardconfig.value.titleBtns?.forEach((item: any) => {
+    if ("Btn_" + item.id === key) {
+      item.hidden = false;
+    }
+  });
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
   getFormconfig,
   getTableData,
+  setDisabledAll,
+  setUnDisabledByKeyList
 });
 </script>
 

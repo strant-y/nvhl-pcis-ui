@@ -1,6 +1,6 @@
 <!-- 特别约定组件 -->
 <template>
-  <div>
+  <div> 
     <myCard :cardConfig="cardconfig">
       <rttable v-model="formData" :item="tableconfig" ref="rttableFrom" />
     </myCard>
@@ -48,6 +48,10 @@ const props = defineProps({
     type: [Object],
     required: true,
   },
+  compKey: {
+    type: String,
+    required: false,
+  },
 });
 
 const rttableFrom = ref<any>(null);
@@ -62,6 +66,8 @@ const pageresult = reactive<Pageresult>({
   /** 总数 */
   total: 0,
 });
+
+const originalData =  ref<any[]>([]);
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
@@ -79,13 +85,41 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Edit",
         hideBtns: (row) => {
-          if (!row.cSpecialContent.includes("**")) return true;
+          // if (!row.cSpecialContent.includes("*")) return true;
+           return row.cIfEdit !== '1';
         },
         tableClick: (row) => {
-          dzmodal.open(specEdit, { type: "view", data: row }).then((res) => {
-            if (res.type === "ok") {
-            }
-          });
+
+          let param = {};
+          if(row['cIfMust'] !== '9') {
+            const f = originalData.value.find(f => row.cSpecialCode === f.cSpecialCode);
+            Object.assign(param, f);
+          }else {
+            Object.assign(param, row)
+          }
+
+          if(row.editList && row.editList.length>0){
+            param['editList'] = row.editList
+          }
+
+          console.log(param)
+          console.log('dd0',row)
+          console.log('dd1',originalData.value)
+          dzmodal.open(specEdit, { type: "view", data: param,
+          callback: (res: any) => {
+              if (res.type === "ok") {
+                row.cSpecialContent = res.data.cSpecialContent
+                row['editList']= res.data['editList']
+              }
+            } })
+          // .
+          // then((res) => {
+          //   console.log('000kkk',res)
+          //   if (res.type === "ok") {
+          //       row.cSpecialContent = res.data.cSpecialContent
+
+          //   }
+          // });
         },
       }),
       createFreeButtonBase({
@@ -205,6 +239,8 @@ onMounted(async () => {
   });
 });
 
+
+
 // 绑定方法
 const method = {
   func1: () => {
@@ -228,11 +264,9 @@ const method = {
               sel.push(item);
               len++;
             });
-            
-            // sel.forEach((item) => {
-            //   rttableFrom.value.addRowByData(item);
-            // });
+            originalData.value =    deepClone(sel)
             formData.value = sel
+            console.log(sel)
           },
       },
       { title: "添加特约", width: 85 }
@@ -342,11 +376,68 @@ function setFormValue(value: any) {
   // Object.assign(formData.value, value);
   formData.value = value;
 }
+
+// 深拷贝
+const  deepClone =(obj:any)=> {
+  // 处理原始值和 null
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+  
+  // 处理日期对象
+  if (obj instanceof Date) {
+    return new Date(obj.getTime());
+  }
+  
+  // 处理数组
+  if (obj instanceof Array) {
+    return obj.map(item => deepClone(item));
+  }
+  
+  // 处理普通对象
+  const clone = {};
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      clone[key] = deepClone(obj[key]);
+    }
+  }
+  
+  return clone;
+}
+
+
 function validate() {}
+
+function setDisabledAll() {
+  if (cardconfig.value.titleBtns && cardconfig.value.titleBtns.length > 0) {
+    cardconfig.value.titleBtns.forEach((item: any) => {
+      item.hidden = true;
+    });
+  }
+  if (cardconfig.value.endBtns && cardconfig.value.endBtns.length > 0) {
+    cardconfig.value.endBtns.forEach((item: any) => {
+      item.hidden = true;
+    });
+  }
+}
+function setUnDisabledByKeyList(key: any) {
+  cardconfig.value.endBtns?.forEach((item: any) => {
+    if ("Btn_" + item.id === key) {
+      item.hidden = false;
+    }
+  });
+  cardconfig.value.titleBtns?.forEach((item: any) => {
+    if ("Btn_" + item.id === key) {
+      item.hidden = false;
+    }
+  });
+}
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
+  setDisabledAll,
+  setUnDisabledByKeyList
 });
 </script>
 

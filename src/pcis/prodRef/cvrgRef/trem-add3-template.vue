@@ -4,8 +4,9 @@
       <thead>
         <tr class="table-title">
           <th style="width: 80px">序号</th>
-          <th style="width: 300px">附加条款名称</th>
-          <th>备注</th>
+          <th v-for="(item, k) in formcof" :key="k" :style="{width: item.width?item.width+'px':null}">
+            {{ item.title + (k === 'nMainRate' ? item.suffix : '') }}
+          </th>
           <th style="width: 100px">操作</th>
         </tr>
       </thead>
@@ -14,17 +15,10 @@
           <td>
             {{ k + 1 }}
           </td>
-          <td>
+          <td v-for="(it, kk) in formcof" :key="kk">
             <from-item
-              v-model="item['Term.cClauseCode']"
-              :item="formcof.cClauseCode"
-            />
-            {{ item["index"] }}
-          </td>
-          <td>
-            <from-item
-              v-model="item['Term.cRemarkInfo']"
-              :item="formcof.cRemarkInfo"
+              v-model="item['Term.'+kk]"
+              :item="it"
             />
           </td>
           <td>
@@ -75,9 +69,11 @@ const formcof = ref<{ [key: string]: { [key: string]: any } }>({
   cClauseCode: {
     inputtype: "rttag",
     typeCode: "TermCodeTag",
+    title:'附加条款名称',
   },
   cRemarkInfo: {
     inputtype: "rtinput",
+    title:'备注',
   },
 });
 

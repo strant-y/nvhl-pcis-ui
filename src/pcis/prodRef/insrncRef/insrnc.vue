@@ -24,6 +24,10 @@ const props = defineProps({
     type: [Object],
     required: true,
   },
+  compKey: {
+    type: String,
+    required: false,
+  },
 });
 
 const insrncEditRef = ref<AppFreeEditMethod | null>(null);
@@ -66,10 +70,10 @@ const method = {
 
   },
   // 开始时间处理  不能小于结束时间
-  tInsrncBgnTmDisabled: (date: any) => { 
+  tInsrncBgnTmDisabled: (date: any) => {
     const fs = insrncEditRef?.value?.getFromValue();
     if (fs) {
-      const endDate = new Date(fs["Base.tInsrncEndTm"])   // 开始时间   
+      const endDate = new Date(fs["Base.tInsrncEndTm"])   // 开始时间
       let minDate = dayjs(endDate).valueOf();
       if(route.params.param && route.params.param.cRsnCde && route.params.param.cRsnCde == "FZ") {
         // 如果批改原因是免费延期，当前保险止期日期之后的日期都可以选择
@@ -82,7 +86,7 @@ const method = {
     }
   },
   // 结束时间禁止
-  tInsrncEndTmDisabled: (date: any) => { 
+  tInsrncEndTmDisabled: (date: any) => {
     const fs = insrncEditRef?.value?.getFromValue();
     if (fs) {
       const startDate = new Date(fs["Base.tInsrncBgnTm"])   // 开始时间   1
@@ -91,7 +95,8 @@ const method = {
         // 如果批改原因是免费延期，当前保险止期日期之后的日期都可以选择
         return  date.getTime() < maxDate
       } else {
-        return  date.getTime() < startDate.getTime() || date.getTime() > maxDate
+        return  date.getTime() < startDate.getTime() 
+        // || date.getTime() > maxDate
       }
     }else{
         return true;
@@ -105,12 +110,12 @@ const method = {
     let endDate = baseBefore["Base.tInsrncEndTm"]  // 结束时间
     let day = dayjs(startDate).add(1,'year')
     let tm = null;
- 
+
     if (!endDate) {
       tm = moment(day.format("YYYY-MM-DD HH:mm:ss")).diff(moment(v), "days");
       baseBefore["Base.tInsrncEndTm"] = day.add(-1,'second').format("YYYY-MM-DD HH:mm:ss")
     }else{
-      tm =  moment(endDate).add(1, 'second').diff(moment(baseBefore["Base.tInsrncBgnTm"]), "days"); 
+      tm =  moment(endDate).add(1, 'second').diff(moment(baseBefore["Base.tInsrncBgnTm"]), "days");
     }
     baseBefore["Base.cTmSysCde"] = tm;   // 列表时间
     setFormValue(baseBefore);
@@ -156,9 +161,25 @@ const method = {
         setFormItem("Base.tRunBgnTm", { rules: [getRules("required", {})] }); //追溯/日落起期
         setFormItem("Base.tRunEndTm", { rules: [getRules("required", {})] }); //追溯/日落止期
       }
+      
+      setValue('Base.nReportDays','')
+      setValue('Base.tRunBgnTm','')
+      setValue('Base.tRunEndTm','')
+
+
+
+      setFormItem("Base.tRunBgnTm", { rules: [getRules("required", {})] }); //追溯/日落起期
+      setFormItem("Base.tRunEndTm", { rules: [getRules("required", {})] }); //追溯/日落止期
+      setFormItem("Base.tRunBgnTm", {  hidden: false  }); //追溯/日落起期
+      setFormItem("Base.tRunEndTm", {  hidden: false  }); //追溯/日落止期
+      setFormItem("Base.tReportBgnTm", {  hidden: true  }); //延长报告期起始日期
+      setFormItem("Base.tReportEndTm", {  hidden: true  }); //延长报告期终止日期
+
 
     } else if (val == "1") {
-
+      setValue('Base.nTracingDays','')    
+      setValue("Base.tReportBgnTm",'')
+      setValue("Base.tReportEndTm",'')  
       if (cIsRetroSpect !== '0') {
         console.log('1212')
         setFormItem("Base.tRunBgnTm", { rules: null }); //追溯/日落起期
@@ -168,12 +189,16 @@ const method = {
       //期内发生制时，报告起始、终止日期必填
       setFormItem("Base.tReportBgnTm", { rules: [getRules("required", {})] }); //延长报告期起始日期
       setFormItem("Base.tReportEndTm", { rules: [getRules("required", {})] }); //延长报告期终止日期
+      setFormItem("Base.tRunBgnTm", {  hidden: true  }); //追溯/日落起期
+      setFormItem("Base.tRunEndTm", {  hidden: true  }); //追溯/日落止期
+      setFormItem("Base.tReportBgnTm", {  hidden: false  }); //延长报告期起始日期
+      setFormItem("Base.tReportEndTm", {  hidden: false  }); //延长报告期终止日期
     }
     setValue("Base.isRetroSpect", "");
   },
   // 是否有追溯期/日落期 change事件
   isTermFunc: (val) => {
-    let cIsRetroSpect = getFromValue()['Base.cClaimName']      // 索赔基础名称  0 期内索赔制  
+    let cIsRetroSpect = getFromValue()['Base.cClaimName']      // 索赔基础名称  0 期内索赔制
     if (val == "1") {
       //选择 是 且索赔基础名称为内索赔制 时，追溯/日落起止期必填  期内索赔制  放开并且必填
       if (cIsRetroSpect == '0') {
@@ -204,7 +229,7 @@ const method = {
   },
   // 追溯起期
   tRunBgnTmFn: (v) => {
-    
+
     const start = getValue("Base.tRunBgnTm");
     const end = getValue("Base.tRunEndTm");
     if (!end || !v) {
@@ -222,7 +247,7 @@ const method = {
       return;
     }
     setFormValue({
-      
+
       "Base.nTracingDays":   moment(end).add(1,'second').diff(moment(start), "days"),
       // "Base.nTracingDays":  moment(end).add(1,'second').diff(moment(start), "days")
     });
@@ -275,7 +300,7 @@ const method = {
     if (!end || !v) {
       return;
     }
-    const tm = moment(end).diff(moment(v), "days");
+    const tm = moment(end).add(1,'second').diff(moment(v), "days");
     if (tm < 0) {
       ElMessage.warning("终止日期不能小于起始日期");
       setFormValue({
@@ -295,7 +320,7 @@ const method = {
     if (!start || !v) {
       return;
     }
-    const tm = moment(v).diff(moment(start), "days");
+    const tm = moment(end).add(1,'second').diff(moment(start), "days");
     if (tm < 0) {
       ElMessage.warning("终止日期不能小于起始日期");
       setFormValue({
@@ -303,9 +328,9 @@ const method = {
       });
       return;
     }
-    const formatReportEnd = moment(v).format('YYYY-MM-DD') + ' 23:59:59';
+    const formatReportEnd  =   moment(v).format("YYYY-MM-DD 23:59:59");
     setFormValue({
-      "Base.nReportDays": tm,
+      "Base.nReportDays": moment(formatReportEnd).add(1,'second').diff(moment(start), "days"),
       "Base.tReportEndTm": formatReportEnd,
     });
   },

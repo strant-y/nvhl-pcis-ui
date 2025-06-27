@@ -5,6 +5,7 @@
         :tableConfig="tableconfig"
         v-model:pageresult="pageresult"
         ref="distTableRef"
+        @pageChange="method.handleQuery($event, true)"
       />
     </myCard>
     <comDialog ref="dialog"></comDialog>
@@ -25,6 +26,7 @@ import {
   selectDist,
   checkAppBase,
   deleteDist,
+  distMapCollectCompKey,
   downloadDistTemplate,
   syncDist,
   exportDist
@@ -43,6 +45,7 @@ import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { useRoute } from "vue-router";
 import { runInThisContext } from "vm";
 import { AppFreeEditMethod } from "@/shared/app-free-edit-config";
+import {eventBus} from "@/utils/event-bus";
 const route = useRoute();
 const dialog = ref<DialogMethod | null>(null);
 const opertaor = dataOpertaor();
@@ -69,100 +72,42 @@ const distTableRef = ref<AppTableMethod | null>(null);
 const cardconfig = ref<CardConfig>(creatCardConfig({}));
 const formconfig1 = ref<Record<string, any>>({});
 const tableconfig = ref<AppTableConfig>(createTableEditConfig());
-
+const idxParam = inject('idxParam');
 let fileBase: string;
 // 声明全局变量
 let cComponentTableValue: string;
 
 // 封装获取 cComponentTableValue 的逻辑
-const getCComponentTableValue = (cProdNo: string, title: string): string => {
-  console.log(title,"title00000")
-  // if (cProdNo == "040001") {
-  //   return "AddressDist";
-  // } else if (cProdNo == "040002") {
-  //   if (title == "雇员清单") {
-  //     return "EmployeeDist";
-  //   } else if (title == "雇员清单汇总") {
-  //     return "DistSummary";
-  //   } else if (title == "车辆清单") {
-  //     return "VehicleDist";
-  //   } else if (title == "车辆清单汇总") {
-  //     return "DistSummary";
-  //   }
-  // } else if (cProdNo == "040003") {
-  //   if(title == "产品清单"){
-  //     return "ProductDist";
-  //   }else if(title =="销售区域清单"){
-  //     return "SalesDist";
-  //   }
-  // } else if(cProdNo == "040005"){
-  //   if(title =="地址清单信息"){
-  //     return "AddressDist";
-  //   }else if(title == "人员清单"){
-  //     return "EducatorDist"
-  //   }
-  // }else if(cProdNo == "040020"){
-  //     return "PersonnelDist";
-  // }else if(cProdNo == "042001"){
-  //     return "DesignDist"
-  // }else if(cProdNo == "042003"){
-  //     return "EducatorDist"
-  // }else if(cProdNo == "043001"){
-  //   return "ElevatorDist";
-  // } else if (cProdNo == "043002") {
-  //   return "VehicleDist";
-  // } else if(cProdNo == "043007"){
-  //   return "VehicleDist";
-  // }else if (cProdNo == "043009") {
-  //   if (title == "实际用工地址/工程项目地址清单") {
-  //     return "ProjectDist";
-  //   } else if (title == "从业人员清单") {
-  //     return "EmployeeDist";
-  //   } else if (title == "从业人员清单汇总") {
-  //     return "DistSummary";
-  //   }
-  // }else if(cProdNo == "043010"){
-  //   return "EducatorDist"
-  // } else if(cProdNo == "043013"){
-  //   return "PollutionDist"
-  // }else if(cProdNo =="043020"){
-  //   if(title =="房屋清单"){
-  //     return "AddressDist"
-  //   }else if(title =="家庭成员清单"){
-  //     return "FamilyDist"
-  //   }
-  // }else if(cProdNo =="045001"){
-  //   if(title =="雇员清单信息"){
-  //     return "EmployeeDist"
-  //   }else if(title =="工程项目地址清单"){
-  //     return "ProjectDist"
-  //   }
-  // }
-  return props.compKey ? props.compKey.substring(0, props.compKey.length - 6) : "";
+const getCComponentTableValue = (): string => {
+  return props.compKey ? props.compKey.replace(/\d+/g, '') : "";
 };
 
+const distSummaryRef = ref(); // 汇总组件对象
+const collectCompKey = ref(); // 汇总组件key
 const formconfig11 = ref<any>({});
 onMounted(async () => {
-  console.log(tableconfig.value,"09999")
-  // const processedFromSchema = props.pageSchema.fromSchema.map((item) => {
-  //   return Object.keys(item).reduce(
-  //     (acc, key) => {
-  //       if (typeof item[key] === "string" && item[key].startsWith("Dist.")) {
-  //         acc[key] = item[key].replace(/^Dist\./, "");
-  //       } else {
-  //         acc[key] = item[key];
-  //       }
-  //       return acc;
-  //     },
-  //     {} as Record<string, any>
-  //   );
-  // });
+  // 初始化 cComponentTableValue
+  cComponentTableValue = getCComponentTableValue();
+
   formconfig11.value = formInit(
-    // JSON.stringify({ ...props.pageSchema, fromSchema: processedFromSchema }),
-    JSON.stringify({ ...props.pageSchema }),
-    method,
-    exRules
+      JSON.stringify({ ...props.pageSchema }),
+      method,
+      exRules
   );
+  if(params.cProdNo === '040003'){
+    formconfig11.value.fromSchema?.forEach(item=>{
+      if(item['prop'] ==='Dist.cProductType'){
+        item['typeCode'] = 'Product_Type040003';
+      }
+    })
+  }
+  if(params.cProdNo === '043009'){
+    formconfig11.value.fromSchema?.forEach(item=>{
+      if(item['prop'] ==='Dist.cEmploymentAddress' && route.params.param.cGrpMrk !== '1'){
+        item.isShow = false;
+      }
+    })
+  }
   Object.assign(formconfig1.value, formconfig11.value);
   cardconfig.value.title = formconfig1.value.title;
   tableconfig.value.showEdit = true;
@@ -185,7 +130,7 @@ onMounted(async () => {
   tableconfig.value.tableBtnType = "btn";
   tableconfig.value.tableBtnWidth = 150;
   tableconfig.value.tableBtnPosition = "right";
-    tableconfig.value.isPage = false;
+  tableconfig.value.isPage = true;
   if (formconfig11.value.editBtns && formconfig11.value.editBtns.length > 0) {
     let btns: any[] = [];
     btns = formconfig11.value.editBtns;
@@ -194,19 +139,29 @@ onMounted(async () => {
     }
   }
  
-  tableconfig.value.isPage = false;
-  // 初始化 cComponentTableValue
-  cComponentTableValue = getCComponentTableValue(
-    route.params.param.cProdNo,
-    formconfig1.value.title
-  );
-  nextTick(() => {
+  distMapCollectCompKey({
+    cProdNo: route.params.param.cProdNo,
+    cComponentKey: props.compKey,
+  }).then((res) => {
+    collectCompKey.value = res;
+    // 获取清单对应的汇总组件对象
+    distSummaryRef.value = opertaor.getTableRefByKey(collectCompKey.value);
+    if(distSummaryRef.value) {
+      // 设置汇总组件里对应的清单vo
+      distSummaryRef.value?.setDistCompKey(cComponentTableValue);
+    }
+    // 初始化页面数据
     method.handleQuery();
   });
 
   // 电梯信息清单
-  let tgtRef = opertaor.getTableRefByKey('tgt')
-  tgtRef.setValue("Tgt.nElevatorsNumber",pageresult.list.length)
+  let tgtRef = opertaor.getTableRefByKey('tgt');
+  if(tgtRef){
+    tgtRef.setValue("Tgt.nElevatorsNumber",pageresult.list.length)
+  }
+  if(distTableRef.value) {
+    eventBus.on(`setMap-${props.compKey}`, addCodeListMap);
+  }
 });
 
 // const  modifyRules = (data, fieldValue)=> {
@@ -243,21 +198,25 @@ const method = {
       config.loadData = res;
     });
   },
+
   editmethod: (row: any) => {
     dialog.value?.open(
-      "distAdd",
-      {
-        fromSchema: tableconfig.value.fromSchema,
-        title: "编辑",
-        rowData: row,
-        tab: formconfig1.value.title,
-        compKey: props.compKey
-      },
-      {
-        isOk: (res: any) => {},
-        handleQuery: method.handleQuery, // 新增：将 handleQuery 方法传递给 distAdd 组件
-      },
-      { width: "60" }
+        "distAdd",
+        {
+          fromSchema: tableconfig.value.fromSchema,
+          title: "编辑",
+          rowData: row,
+          tab: formconfig1.value.title,
+          compKey: props.compKey,
+          codeListMap: distTableRef.value?.getCodeListMap(),
+        },
+        {
+          isOk: (res: any) => {
+            const queryParams = distTableRef.value?.getPartnerPage(false);
+            handleQuery: method.handleQuery(queryParams);
+          },
+        },
+        { width: "60" }
     );
   },
   delmethod: (row: any) => {
@@ -267,7 +226,8 @@ const method = {
     }).then((res: any) => {
       if (res.code === 200) {
         ElMessage.success("删除成功");
-        method.handleQuery();
+        const queryParams = distTableRef.value?.getPartnerPage(false);
+        method.handleQuery(queryParams, true);
       }
     });
   },
@@ -294,20 +254,21 @@ const method = {
     checkAppBase({ cAppNo: baseFlag }).then((res: any) => {
       if (res.code === 200) {
         dialog.value?.open(
-          "distAdd",
-          {
-            fromSchema: fromSchema,
-            title: "新增",
-            tab: formconfig1.value.title,
-            compKey: props.compKey
-          },
-          {
-            isOk: (res: any) => {
-              console.log(111)
+            "distAdd",
+            {
+              fromSchema: fromSchema,
+              title: "新增",
+              tab: formconfig1.value.title,
+              compKey: props.compKey,
+              codeListMap: distTableRef.value?.getCodeListMap(),
             },
-            handleQuery: method.handleQuery, // 新增：将 handleQuery 方法传递给 distAdd 组件
-          },
-          { width: "60" }
+            {
+              isOk: (res: any) => {
+                const queryParams = distTableRef.value?.getPartnerPage(false);
+                handleQuery: method.handleQuery(queryParams, true);
+              },
+            },
+            { width: "60" }
         );
       } else {
         ElMessage.error("请先保存申请单!");
@@ -315,7 +276,7 @@ const method = {
     });
   },
 
-  handleQuery: () => {
+  handleQuery: (queryParams: any = { pageNum: 1, pageSize: 10 }, isChange: boolean = false) => {
     let tgtRef = opertaor.getTableRefByKey('tgt')
     const param = opertaor.getParam();
     let app = "";
@@ -329,6 +290,7 @@ const method = {
     const selData = {
       cComponentTable: cComponentTableValue,
       cAppNo: app,
+      ...queryParams
     };
     selectDist(selData).then((res: any) => {
       if (res.code === 200) {
@@ -336,26 +298,55 @@ const method = {
         pageresult.total = res.data.total;
         pageresult.list = res.data.data.map((item, index) => {
           return{
-              ... item,
-              ... {
-                  nSeqNo: index + 1,
-                  tOpeningTime: item['Dist.tOpeningTime']
-                      ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
-                      : null,
-                  'Dist.AllOccup': [
-                      item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
-                  ],
-              }
+            ... item,
+            ... {
+              // 序号全部由后端处理
+              // 'Dist.nSeqNo': ((queryParams.pageNum - 1) * queryParams.pageSize) + index + 1,
+              tOpeningTime: item['Dist.tOpeningTime']
+                  ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
+                  : null,
+              'Dist.AllOccup': [
+                item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
+              ],
+            }
           };
         });
-        if(tgtRef !=undefined){
+
+        if(tgtRef !== undefined){
           tgtRef.setValue("Tgt.nElevatorsNumber",res.data.total)
         }
 
-        // 刷新汇总表格 DistSummary045001'
-        const compKey = 'DistSummary' + route.params.param.cProdNo
-        const distSummary = opertaor.getTableRefByKey(compKey)
-        distSummary?.handleQuery();
+        // 043009 set 被保人关联关系、实际用工地址关联关系 下拉值
+        if(props.compKey === 'ProjectDist043009'){
+          const insured =  opertaor.getDataAll()['insured'];
+          if(insured && insured['Insured.cInsuredCde']) {
+            eventBus.emit('setMap-ProjectDist043009', {
+              code: 'Dist.cRelatedInsured',
+              list: [{
+                value: insured['Insured.cInsuredCde'],
+                label: insured['Insured.cInsuredNme']
+              }]
+            });
+          }
+          eventBus.emit('setMap-EmployeeDist043009', {
+            code: 'Dist.cEmploymentAddress',
+            list: pageresult.list.map((m: any) => {
+              return {
+                label: m['Dist.cDetailedAddress'],
+                value: m['Dist.cPkId']
+              }
+            })
+          });
+        }
+
+        // 刷新汇总表格
+        if(distSummaryRef.value) {
+          distSummaryRef.value?.handleQuery();
+        }
+
+        if(idxParam && isChange) { // 保存清单表格在屏幕中间
+          idxParam.handleAnchorClick(undefined, `#${props.compKey}`);
+        }
       }
     });
   },
@@ -378,18 +369,21 @@ const method = {
     checkAppBase({ cAppNo: baseFlag }).then((res) => {
       if (res.code === 200) {
         dialog.value?.open(
-          "distAdd",
-          {
-            fromSchema: tableconfig.value.fromSchema,
-            title: "新增",
-            tab: formconfig1.value.title,
-            compKey: props.compKey,
-          },
-          {
-            isOk: (res: any) => {},
-            handleQuery: method.handleQuery, //将 handleQuery 方法传递给 distAdd 组件
-          },
-          { width: "60" }
+            "distAdd",
+            {
+              fromSchema: tableconfig.value.fromSchema,
+              title: "新增",
+              tab: formconfig1.value.title,
+              compKey: props.compKey,
+              codeListMap: distTableRef.value?.getCodeListMap(),
+            },
+            {
+              isOk: (res: any) => {
+                const queryParams = distTableRef.value?.getPartnerPage(false);
+                handleQuery: method.handleQuery(queryParams);
+              },
+            },
+            { width: "60" }
         );
       } else {
         ElMessage.error("请先保存申请单!");
@@ -403,18 +397,18 @@ const method = {
       cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
     });
     policyService
-      .exportDist(paramitem).then((res) => {
-        if (res.size <= 0) {
-          ElMessage.error({ message: "导出出错", duration: 3000 });
-          return;
-        }
-        const fileName = decodeURIComponent(res.headers['content-disposition'].split('filename=')[1]);
-        const blob = new Blob([res.data], {
-          responseType:res.headers["content-type"]
-            // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
-        });
-        saveAs(blob, fileName);
-      })
+        .exportDist(paramitem).then((res) => {
+      if (res.size <= 0) {
+        ElMessage.error({ message: "导出出错", duration: 3000 });
+        return;
+      }
+      const fileName = decodeURIComponent(res.headers['content-disposition'].split('filename=')[1]);
+      const blob = new Blob([res.data], {
+        responseType:res.headers["content-type"]
+        // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
+      });
+      saveAs(blob, fileName);
+    })
   },
   //全量导入
   importExcel() {
@@ -427,39 +421,39 @@ const method = {
         const reader = new FileReader();
 
         reader.onload = (e) => {
-        const base64String = e.target?.result as string;
+          const base64String = e.target?.result as string;
 
-        // ✅ 此处赋值有效
-        // fileBase = base64String.split(',')[1]; // 去掉 data:image/type;base64, 前缀
+          // ✅ 此处赋值有效
+          // fileBase = base64String.split(',')[1]; // 去掉 data:image/type;base64, 前缀
 
-        // console.log(fileBase, "0000000"); // ✅ 此处可以正常打印 Base64 字符串
+          // console.log(fileBase, "0000000"); // ✅ 此处可以正常打印 Base64 字符串
 
-        // 构建参数并请求接口
-        const params = {
-          ...formconfig1.value,
-          file: base64String, // ✅ 正确传入
-          cComponentTable: cComponentTableValue,
-          cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
+          // 构建参数并请求接口
+          const params = {
+            ...formconfig1.value,
+            file: base64String, // ✅ 正确传入
+            cComponentTable: cComponentTableValue,
+            cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
+          };
+
+          policyService.importDist(params).then((res) => {
+            if (res.code === 200) {
+              ElMessage.success(`导入完成：${res.data.msg}`);
+              method.handleQuery();
+            } else {
+              ElMessage.error(res.msg || "全量导入失败");
+            }
+          }).catch((error) => {
+            ElMessage.error("导入出错，请检查文件格式或内容");
+            console.error("导入错误：", error);
+          });addCi
         };
 
-        policyService.importDist(params).then((res) => {
-          if (res.code === 200) {
-            ElMessage.success(`导入完成：${res.data.msg}`);
-            method.handleQuery();
-          } else {
-            ElMessage.error(res.message || "全量导入失败");
-          }
-        }).catch((error) => {
-          ElMessage.error("导入出错，请检查文件格式或内容");
-          console.error("导入错误：", error);
-        });addCi
-      };
-
-      reader.onerror = (e) => {
-        console.error("文件读取失败", e);
-        ElMessage.error("文件读取失败");
-      };
-      reader.readAsDataURL(file); // 启动读取
+        reader.onerror = (e) => {
+          console.error("文件读取失败", e);
+          ElMessage.error("文件读取失败");
+        };
+        reader.readAsDataURL(file); // 启动读取
       }
     };
     input.click(); // 触发文件选择对话框
@@ -475,40 +469,40 @@ const method = {
         const reader = new FileReader();
 
         reader.onload = (e) => {
-        const base64String = e.target?.result as string;
+          const base64String = e.target?.result as string;
 
-        // ✅ 此处赋值有效
-        // fileBase = base64String.split(',')[1]; // 去掉 data:image/type;base64, 前缀
+          // ✅ 此处赋值有效
+          // fileBase = base64String.split(',')[1]; // 去掉 data:image/type;base64, 前缀
 
-        // console.log(fileBase, "0000000"); // ✅ 此处可以正常打印 Base64 字符串
+          // console.log(fileBase, "0000000"); // ✅ 此处可以正常打印 Base64 字符串
 
-        // 构建参数并请求接口
-        const params = {
-          ...formconfig1.value,
-          file: base64String, // ✅ 正确传入
-          cComponentTable: cComponentTableValue,
-          cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
+          // 构建参数并请求接口
+          const params = {
+            ...formconfig1.value,
+            file: base64String, // ✅ 正确传入
+            cComponentTable: cComponentTableValue,
+            cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
+          };
+
+          policyService.importDistIncrement(params).then((res) => {
+            if (res.code === 200) {
+              ElMessage.success(`导入完成：${res.data.msg}`);
+              method.handleQuery();
+            } else {
+              ElMessage.error(res.msg || "增量导入失败");
+            }
+          }).catch((error) => {
+            ElMessage.error("导入出错，请检查文件格式或内容");
+            console.error("导入错误：", error);
+          });
         };
 
-        policyService.importDistIncrement(params).then((res) => {
-          if (res.code === 200) {
-            ElMessage.success(`导入完成：${res.data.msg}`);
-            method.handleQuery();
-          } else {
-            ElMessage.error(res.message || "增量导入失败");
-          }
-        }).catch((error) => {
-          ElMessage.error("导入出错，请检查文件格式或内容");
-          console.error("导入错误：", error);
-        });
-      };
+        reader.onerror = (e) => {
+          console.error("文件读取失败", e);
+          ElMessage.error("文件读取失败");
+        };
 
-      reader.onerror = (e) => {
-        console.error("文件读取失败", e);
-        ElMessage.error("文件读取失败");
-      };
-
-      reader.readAsDataURL(file); // 启动读取
+        reader.readAsDataURL(file); // 启动读取
       }
     };
     input.click(); // 触发文件选择对话框
@@ -516,52 +510,52 @@ const method = {
   //全量模板下载
   downloadTemp: () => {
     const param = {
-          ...formconfig1.value,
-          cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
-        }
+      ...formconfig1.value,
+      cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
+    }
     policyService
-      .downloadDistTemplate(param)
-      .then((res) => {
-        if (res.size <= 0) {
-          ElMessage.error({ message: "下载出错", duration: 3000 });
-          return;
-        }
-        const fileName = decodeURIComponent(res.headers['content-disposition'].split('filename=')[1]);
-        const blob = new Blob([res.data], {
-          responseType:res.headers["content-type"]
+        .downloadDistTemplate(param)
+        .then((res) => {
+          if (res.size <= 0) {
+            ElMessage.error({ message: "下载出错", duration: 3000 });
+            return;
+          }
+          const fileName = decodeURIComponent(res.headers['content-disposition'].split('filename=')[1]);
+          const blob = new Blob([res.data], {
+            responseType:res.headers["content-type"]
             // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
+          });
+          saveAs(blob, fileName);
+        })
+        .catch(() => {
+          ElMessage.error("全量模板下载失败");
         });
-        saveAs(blob, fileName);
-      })
-      .catch(() => {
-        ElMessage.error("全量模板下载失败");
-      });
   },
   // 增量模板下载
   downloadIncrement: () => {
     const param = {
-          ...formconfig1.value,
-          cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
-        }
+      ...formconfig1.value,
+      cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
+    }
     policyService
-      .downloadDistTemplateIncrement(param)
-      .then((res) => {
-        if (res.size <= 0) {
-          ElMessage.error({ message: "下载出错", duration: 3000 });
-          return;
-        }
-        const fileName = decodeURIComponent(res.headers['content-disposition'].split('filename=')[1]);
-        const blob = new Blob([res.data], {
-          responseType:res.headers["content-type"]
+        .downloadDistTemplateIncrement(param)
+        .then((res) => {
+          if (res.size <= 0) {
+            ElMessage.error({ message: "下载出错", duration: 3000 });
+            return;
+          }
+          const fileName = decodeURIComponent(res.headers['content-disposition'].split('filename=')[1]);
+          const blob = new Blob([res.data], {
+            responseType:res.headers["content-type"]
             // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
+          });
+          saveAs(blob, fileName);
+        })
+        .catch(() => {
+          ElMessage.error("增量模板下载失败");
         });
-        saveAs(blob, fileName);
-      })
-      .catch(() => {
-        ElMessage.error("增量模板下载失败");
-      });
   },
-setregistAdd(){
+  setregistAdd(){
     const ads = distTableRef?.value?.getValue('Dist.AllProp');
     const a = distTableRef?.value?.getValue("Dist.cRegisterSuffixAddr") || "";
     if (ads) {
@@ -576,7 +570,9 @@ setregistAdd(){
       setAddressStr("Dist.cClntAddr", a);
     }
     console.log("清单级联事件触发")
-  }
+  },
+
+
 };
 
 function setUnDisabledByKeyList(key: any) {
@@ -595,6 +591,10 @@ function setUnDisabledByKeyList(key: any) {
       item.hidden = false;
     }
   });
+}
+
+function addCodeListMap (data: any) {
+  distTableRef.value?.addCodeListMap(data);
 }
 
 function getFormconfig() {
@@ -632,22 +632,31 @@ function getTableData() {
 function setTableData(data: any) {
   pageresult.list = data.map((item: any, index: any) => {
     return{
-        ... item,
-        ... {
-            nSeqNo: index + 1,
-            tOpeningTime: item['Dist.tOpeningTime']
-                ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
-                : null,
-            'Dist.AllOccup': [
-                item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
-            ],
-        }
+      ... item,
+      ... {
+        nSeqNo: index + 1,
+        tOpeningTime: item['Dist.tOpeningTime']
+            ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
+            : null,
+        'Dist.AllOccup': [
+          item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
+        ],
+      }
     };
   });
 }
 
+function handleQuery() {
+  const queryParams = distTableRef.value?.getPartnerPage(true);
+  method.handleQuery(queryParams);
+}
+
 // 绑定特殊验证器
 const exRules = {};
+
+onUnmounted(() => {
+  eventBus.off(`setMap-${props.compKey}`, addCodeListMap);
+});
 
 defineExpose({
   getValue,
@@ -656,7 +665,7 @@ defineExpose({
   setFormValue,
   getFormconfig,
   setUnDisabledByKeyList,
-  handleQuery: method.handleQuery,
+  handleQuery,
   getTableData,
   setTableData,
 });

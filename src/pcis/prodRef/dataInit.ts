@@ -64,6 +64,7 @@ export const getData = () => {
     dataInit["Base.cCiMrk"] = "0";
     dataInit["Base.cIntroDptcde"] = param.cDptCde;
     dataInit["Base.cCiMrk"] = param.cCiMrk || "0";
+    dataInit["Base.nPayNumber"] = '1'; //缴费期数
 
     dataInit["Applicant.cStkMrk"] = "0";
     dataInit["Applicant.cCustRiskRank"] = "925104";
@@ -80,8 +81,8 @@ export const getData = () => {
     dataInit["Tgt.cNavigationMark"] = "1";
     //保险价值币种 默认人民币
     dataInit["Tgt.cInsuranceCurrency"] = "01";
-
-    
+    // “标的信息”中“车辆使用性质”默认值为营运
+    dataInit["Tgt.cUsageNature"] = "364113098";
 
  
     return dataInit;

@@ -11,19 +11,21 @@ import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
 import { useProductStore } from "@/store/modules/prod";
+import { fa } from "element-plus/es/locale";
 const productStore = useProductStore();
 const props = defineProps({
   pageSchema: {
     type: [Object],
     required: true,
   },
+  compKey: {
+    type: String,
+    required: false,
+  },
 });
 // 监听 cCiMrk 的变化并更新本地变量
 watchEffect(() => {
   const cCiMrkValue = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
-    // formconfig1.value?.fromSchema?.forEach((item) => {
-    //   item.hidden = false;
-    // });
     if (cCiMrkValue === "3" || cCiMrkValue === "4") {
       formconfig1.fromSchema?.forEach((item) => {
         const prop = item.prop;
@@ -50,7 +52,11 @@ watchEffect(() => {
             item.hidden = true; // 隐藏其他字段
           }
         });
-      } 
+      }else if(cCiMrkValue === "1" || cCiMrkValue ==="2" || cCiMrkValue ==="6"){
+        formconfig1.fromSchema?.forEach((item)=>{
+          item.hidden = false;
+        })
+      }
 });
 
 const tgtobjEditRef = ref<AppFreeEditMethod | null>(null);

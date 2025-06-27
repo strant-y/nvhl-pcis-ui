@@ -1414,9 +1414,10 @@
                         cDptCnm:row.uwDptName,
                         pageType: "PLY_UW_PROCESS_SCENE",
                         sysType:row.objExt,
-                        plyNo: row.plyNo,
+                        plyNo: row.plyNo === "*" ? "" : row.plyNo,
                         cTermNo:row.cTermNo,
                         cTermNme:row.cTermNme,
+                        cProdNmeCn: row.prodName,
                     });
                     router.push({
                         path: "/pcis/my-page",
@@ -1445,6 +1446,7 @@
                         plyNo: row.plyNo,
                         cTermNo:row.cTermNo,
                         cTermNme:row.cTermNme,
+                        cProdNmeCn: row.prodName,
                     });
                     router.push({
                         path: "/pcis/my-page",
@@ -1485,7 +1487,8 @@
                                 scene: SCENE_PLAN_UW_PROCESS,
                                 cAppTyp: row.bsType,
                                 cTermNo:row.cTermNo,
-                                cTermNme:row.cTermNme
+                                cTermNme:row.cTermNme,
+                                cProdNmeCn: row.prodName,
                             });
                             router.push({
                                 path: "/pcis/my-page",
@@ -1666,6 +1669,7 @@
                             pageType: "UW_READ_SCENE",
                             cTermNme:row.cTermNme,
                             cTermNo:row.cTermNo,
+                            cProdNmeCn: row.prodName,
                         });
                         router.push({
                             path: "/pcis/my-page",
@@ -1688,6 +1692,7 @@
                             pageType: "UW_READ_SCENE",
                             cTermNme:row.cTermNme,
                             cTermNo:row.cTermNo,
+                            cProdNmeCn: row.prodName,
                         });
                         router.push({
                             path: "/pcis/my-page",
@@ -1725,6 +1730,7 @@
             cTermNme:row.cTermNme,
             cTermNo:row.cTermNo,
             pageType: "PLY_UW_PROCESS_SCENE",
+            cProdNmeCn: row.prodName,
         });
         router.push({
             path: "/pcis/my-page",

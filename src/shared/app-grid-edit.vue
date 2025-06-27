@@ -28,7 +28,7 @@
                       :key="index"
                     >
                       <template v-if="!item.hidden">
-                        <rt-button :item="item" />
+                        <rt-button :item="item" :ref="(res: any) => {btnMap[item?.id] = item}"/>
                       </template>
                     </template>
                   </el-button-group>
@@ -68,7 +68,7 @@
                   :key="index"
                 >
                   <template v-if="!item.hidden">
-                    <rt-button :item="item" />
+                    <rt-button :item="item" :ref="(res: any) => {btnMap[item?.id] = item}"/>
                   </template>
                 </template>
               </div>
@@ -82,6 +82,7 @@
 
 <script setup lang="ts">
 import { AppGridEditConfig, AppGridEditMethod } from "./app-grid-edit-config";
+import {ref} from "vue";
 defineOptions({
   name: "AppGridEdit",
   inheritAttrs: false,
@@ -94,7 +95,9 @@ const props = defineProps({
     required: true,
   },
 });
-
+const codeListMap = ref<any>({});
+provide('codeListMap', codeListMap.value);
+const btnMap = ref({});
 const { gridEditConfig } = toRefs(props);
 
 const tableDatas = ref<any[] | undefined>([]);
@@ -138,21 +141,21 @@ function addRowByData(data: any) {
   rttableFrom.value?.addRowByData(data);
 }
 
-function setDisabledAll() {
+function setDisabledAll(isDisabled: boolean = true) {
   if (
     props.gridEditConfig.titleBtns &&
     props.gridEditConfig.titleBtns.length > 0
   ) {
     props.gridEditConfig.titleBtns.forEach((item) => {
-      item.hidden = true;
+      item.hidden = isDisabled;
     });
   }
   if (props.gridEditConfig.endBtns && props.gridEditConfig.endBtns.length > 0) {
     props.gridEditConfig.endBtns.forEach((item) => {
-      item.hidden = true;
+      item.hidden = isDisabled;
     });
   }
-  gridEditConfig.value.editFlag = false;
+  gridEditConfig.value.editFlag = !isDisabled;
 }
 
 function getSelectRow() {
@@ -172,6 +175,36 @@ function setRowFieldProp(rowId: string, field: string, prop: string, value: any)
   return rttableFrom.value?.setRowFieldProp(rowId, field, prop, value);
 }
 
+function getFormBtn() {
+  return btnMap.value
+}
+
+function getTableBtn() {
+  const btnMap = ref({});
+  gridEditConfig.value.tableBtn?.forEach((btn: any) => {
+    if(btn.id) {
+      btnMap.value[btn.id] = btn
+    }
+  });
+  return btnMap.value
+}
+function getCodeListMap() {
+  return codeListMap.value;
+}
+function addCodeListMap(data: any) {
+  const {code, list} = data;
+  if(!code || !list) {
+    console.warn("setCodeListMap warn , code or list is empty!");
+    return;
+  }
+  codeListMap.value[code] = list;
+}
+function setCodeListMap(map: any) {
+  if(map) {
+    Object.assign(codeListMap.value, map);
+  }
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
@@ -185,7 +218,12 @@ defineExpose({
   setFormSchema,
   setValueByRowKey,
   getRowById,
-  setRowFieldProp
+  setRowFieldProp,
+  getFormBtn,
+  getTableBtn,
+  getCodeListMap,
+  setCodeListMap,
+  addCodeListMap
 });
 </script>
 

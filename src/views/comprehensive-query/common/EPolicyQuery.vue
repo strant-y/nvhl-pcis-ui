@@ -55,7 +55,7 @@ const buttonList = [
         }
     }),
     createFreeButtonBase({
-        label: '生成电子保单',
+        label: '生成',
         type: 'primary',
         id: 'generateEPolicy',
         func: () => {
@@ -63,7 +63,7 @@ const buttonList = [
         }
     }),
     createFreeButtonBase({
-        label: '下载电子保单',
+        label: '下载',
         type: 'primary',
         id: 'downloadEPolicy',
         func: () => {
@@ -167,7 +167,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             {
                 prop: 'CAppNo',
                 inputtype: 'rtinput',
-                title: '投保单',
+                title: '投保单号',
                 clearable: true
             },
             {
@@ -397,7 +397,7 @@ function handleQuery(flag?: boolean) {
             const plyTyp = freeEditRef.value?.getValue('CPlyTyp')
             const appNme = freeEditRef.value?.getValue('CAppNme')
             if (!!appNme && appNme.length < 2) {
-                ElMessage.warning('投保人名称至少输入2位')
+                ElMessage.warning('投保人名称至少输入2位!')
                 return
             }
             const insuredNme = freeEditRef.value?.getValue('CInsuredNme')
@@ -431,7 +431,6 @@ function handleQuery(flag?: boolean) {
             }
             const param = Object.assign(
                 {
-                    SysCode: 'POLY_CASU',
                     CurrentUser: user.value.opCde,
                     CurrentUserOrg: user.value.companyId,
                     CAppTyp: plyTyp === 'EDR' ? 'E' : 'A'
@@ -520,7 +519,7 @@ function createEPolicy() {
         ElMessage.warning('请选择生成电子保单方式!')
         return
     }
-    if (prodNo != '059011' && prodNo != '059015' && prodNo != '059012' && prodNo != '059013' && prodNo != '059016' && prodNo != '059017' && prodNo != '059018' && prodNo != '059019' && prodNo != '059020' && prodNo != '040019' && prodNo != '049900' && plyTyp == 'BL') {
+    if (prodNo != '059011' && prodNo != '059015' && prodNo != '059012' && prodNo != '059013' && prodNo != '059016' && prodNo != '059017' && prodNo != '059018' && prodNo != '059019' && prodNo != '059020' && prodNo != '040019' && prodNo != '047002' && plyTyp == 'BL') {
         ElMessage.warning('该产品没有电子保函模板!')
         return false
     }
@@ -593,10 +592,13 @@ function downloadEPolicy() {
         ElMessage.warning('每次只能下载1个单据！')
         return
     }
-    const plyNo = selectData[0].cPlyNo
+    let plyNo = selectData[0].cPlyNo
     if (!plyNo) {
         ElMessage.warning('没有数据，请核实确认！')
         return
+    }
+    if (plyTyp == 'EDR') {
+        plyNo = selectData[0].cEdrNo
     }
     const data = {
         plyNo: base64encoder(rsaEncoder(plyNo)),

@@ -44,6 +44,10 @@ const props = defineProps({
     type: [Object],
     required: true,
   },
+  compKey: {
+    type: String,
+    required: false,
+  },
 });
 
 const pageresult = reactive<Pageresult>({
@@ -279,11 +283,10 @@ const handleQuery = () => {
     app = route.params.param.cAppNo
   }
   query({
-    cComponentTable: cComponentTableValue,
+    cComponentTable: distCompKey.value,
     cAppNo: app,
     ...{isSummary: '1'}
   });
-
 }
 
 const query = (param: any) => {
@@ -348,12 +351,16 @@ function setTableData(data: any) {
 
 // 绑定特殊验证器
 const exRules = {};
-
+const distCompKey = ref<string>();
+function setDistCompKey(key: string) {
+  distCompKey.value = key;
+}
 defineExpose({
   getFormconfig,
   setUnDisabledByKeyList,
   handleQuery,
   setTableData,
+  setDistCompKey
 });
 </script>
 

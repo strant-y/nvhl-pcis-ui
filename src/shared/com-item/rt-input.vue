@@ -54,20 +54,6 @@
           ? (value) => {
               if (value == null) return '';
               let num = value.replace(/[^0-9.-]/g, '');
-              let Max = 99999999999;
-              if(item.max){
-                Max = item.max;
-              }
-              if(num > Max){
-                num = Max;
-              }
-              let Min = 0;
-              if(item.min){
-                Min = item.min;
-              }
-              if(num < Min){
-                num = Min;
-              }
               const parts = `${num}`.split('.');
               const integerPart = parts[0].replace(
                 /\B(?=(\d{3})+(?!\d))/g,
@@ -218,6 +204,22 @@ function handleChange(val?: string | undefined | null) {
   let nv = 0;
   if (props.item.type === "number") {
     nv = val ? Number(val.replace(/[^\d.-]/g, '')) : 0;
+    let Max = 99999999999;
+    if(props.item.max || props.item.max === 0){
+      Max = props.item.max;
+    }
+    if(nv > Max){
+      nv = Max;
+      vInput.value = nv;
+    }
+    let Min = 0;
+    if(props.item.min || props.item.min === 0){
+      Min = props.item.min;
+    }
+    if(nv < Min){
+      nv = Min;
+      vInput.value = nv;
+    }
     emits("valueChange", nv);
     emits("update:modelValue", nv);
   } else {

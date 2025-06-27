@@ -46,7 +46,7 @@
               >
                 <el-form-item
                   :prop="[props.$index, i.prop]"
-                  :rules="i.rules ? i.rules : undefined"
+                  :rules="formItems[props.row._dataId][i.prop].rules ? formItems[props.row._dataId][i.prop].rules : undefined"
                   :label="i.title"
                   :label-position="
                     i.inputtype === 'table' ? 'top' : formUi.labelPosition // table 组件,默认标题显示在top上
@@ -681,6 +681,7 @@ function setRowFieldProp(
   } else {
     console.warn(`Field ${field} or row ${rowId} not found.`);
   }
+  console.log(formItems.value);
 }
 function getRowById(rowId: any) {
   return tableDatas.value?.find((item) => {

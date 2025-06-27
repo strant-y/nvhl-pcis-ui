@@ -1,12 +1,7 @@
 <template>
   <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
-  <app-table
-    :tableConfig="tableconfig"
-    v-model:pageresult="pageresult"
-    ref="tableRef"
-    @page-change="handleQuery(false)"
-    @row-click="handleRowClick"
-  />
+  <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef" @page-change="handleQuery(false)"
+    @row-click="handleRowClick" />
 </template>
 
 <script setup lang="ts">
@@ -94,8 +89,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         loadData: [],
         rules: [getRules("required", {})],
         func: (val) => {
-          setValue("CChaType", "");
-          setValue("CChaSubtype", "");
+          console.log(3232, val)
+          // setValue("CChaType", "");
+          // setValue("CChaSubtype", "");
           getChaTypeList({ BsnsTyp: val, scene: "PLY_APP_NEW_SCENE" }).then(
             (res) => {
               if (null != res && null != res["code"]) {
@@ -166,117 +162,117 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtselect",
         title: "业务来源大类",
         loadData: [
-        {
+          {
             "label": "代理业务",
             "value": "19002"
-        },
-        {
+          },
+          {
             "label": "直销业务",
             "value": "19001"
-        },
-        {
+          },
+          {
             "label": "经纪业务",
             "value": "19003"
-        }
-    ],
+          }
+        ],
       },
       {
         prop: "CChaType",
         inputtype: "rtselect",
         title: "业务来源中类",
         loadData: [
-        {
+          {
             "label": "个人代理",
             "value": "1900201"
-        },
-        {
+          },
+          {
             "label": "兼业代理",
             "value": "1900202"
-        },
-        {
+          },
+          {
             "label": "专业代理",
             "value": "1900203"
-        }
-    ],
+          }
+        ],
       },
       {
         prop: "CChaSubtype",
         inputtype: "rtselect",
         title: "业务来源子类",
         loadData: [
-        {
+          {
             "label": "保险业兼业代理",
             "value": "1900202001"
-        },
-        {
+          },
+          {
             "label": "银行业兼业代理",
             "value": "1900202002"
-        },
-        {
+          },
+          {
             "label": "证券业兼业代理",
             "value": "1900202003"
-        },
-        {
+          },
+          {
             "label": "邮政业兼业代理",
             "value": "1900202004"
-        },
-        {
+          },
+          {
             "label": "民航系统",
             "value": "1900202005"
-        },
-        {
+          },
+          {
             "label": "铁路系统",
             "value": "1900202006"
-        },
-        {
+          },
+          {
             "label": "公路系统",
             "value": "1900202007"
-        },
-        {
+          },
+          {
             "label": "水运系统",
             "value": "1900202008"
-        },
-        {
+          },
+          {
             "label": "汽车销售与租赁",
             "value": "1900202009"
-        },
-        {
+          },
+          {
             "label": "汽车维修与服务",
             "value": "1900202010"
-        },
-        {
+          },
+          {
             "label": "机动车检验机构",
             "value": "1900202011"
-        },
-        {
+          },
+          {
             "label": "银保通",
             "value": "1900202012"
-        },
-        {
+          },
+          {
             "label": "物流公司",
             "value": "1900202013"
-        },
-        {
+          },
+          {
             "label": "担保、贷款公司",
             "value": "1900202014"
-        },
-        {
+          },
+          {
             "label": "金融租赁",
             "value": "1900202016"
-        },
-        {
+          },
+          {
             "label": "信托代理",
             "value": "1900202017"
-        },
-        {
+          },
+          {
             "label": "车友俱乐部代理",
             "value": "1900202018"
-        },
-        {
+          },
+          {
             "label": "其他兼业代理",
             "value": "1900202099"
-        }
-    ],
+          }
+        ],
       },
       {
         prop: "CChaCde",
@@ -306,7 +302,7 @@ const tableconfig = reactive<AppTableConfig>(
     ],
     rowDbClickFun(rowData) {
       props.data.method?.getSelected(rowData);
-      console.log("rowData",rowData);
+      console.log("rowData", rowData);
     },
   })
 );
@@ -330,7 +326,7 @@ function setValue(key: string, value: any) {
 function getValue(key: string) {
   return freeEditRef?.value?.getValue(key);
 }
-function setDisa() {}
+function setDisa() { }
 
 //给表单下拉项赋值
 function setFormItem(key: any, obj: any) {
@@ -342,7 +338,7 @@ function setFormItem(key: any, obj: any) {
           for (let key in obj.btnItems) {
             item.btnItems[key] = obj.btnItems[key];
           }
-        }else{
+        } else {
           Object.assign(item, obj);
         }
       }
@@ -429,7 +425,7 @@ onMounted(() => {
           const obj = {
             loadData: res.data,
           };
-          console.log("大类数据",obj);
+          console.log("大类数据", obj);
           setFormItem("CBsnsTyp", obj);
           setValue("CBsnsTyp", props.data.data.cBsnsTyp);
           // setValue("cChaType", props.data.data.cChaType);
@@ -437,8 +433,8 @@ onMounted(() => {
         }
       }
     });
-    //查询中类数据，用于默认回显
-    getChaTypeList({ BsnsTyp: props.data.data.cBsnsTyp }).then((res) => {
+    //查询中类数据，用于默认回显  { BsnsTyp: val, scene: "PLY_APP_NEW_SCENE" }
+    getChaTypeList({ BsnsTyp: props.data.data.cBsnsTyp, scene: "PLY_APP_NEW_SCENE" }).then((res) => {
       if (null != res && null != res["code"]) {
         if (res["code"] === 200) {
           const obj = {
@@ -454,6 +450,8 @@ onMounted(() => {
     const paramSub = {
       CChaType: props.data.data.cChaType,
       flag: 1,
+
+      scene: "PLY_APP_NEW_SCENE",
     };
     getChaSubtypList(paramSub).then((res) => {
       if (null != res && null != res["code"]) {

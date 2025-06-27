@@ -186,6 +186,10 @@ const props = defineProps({
     type: [Object],
     required: true,
   },
+  compKey: {
+    type: String,
+    required: false,
+  },
 });
 
 const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
@@ -284,6 +288,8 @@ onMounted(async () => {
           let data: { [key: string]: any } = {
             "Term.cClauseCode": item.cTermNo,
             "Term.cRdrTyp": item.cRdrTyp,
+            "Term.cUniqueTermNo": item.cUniqueTermNo,
+            "Term.NSeqNo":1,
             riskList: riskList,
           };
           if (item.cRdrTyp === "1") {
@@ -344,7 +350,9 @@ function updateBtn() {
     });
     Object.keys(btnItem.value).forEach((k: any) => {
       const t = unbut.find((un: any) => un["cEdrItem"] === k + "_btn");
-      btnItem.value[k].hidden = false;
+      if(t){
+        btnItem.value[k].hidden = false;
+      }
     });
   }
 }
@@ -415,7 +423,7 @@ function addTermData(PlanNo: string) {
     {
       isOk: (selectdata: any) => {
         let plans: any[] = [];
-        selectdata.forEach((item: any) => {
+        selectdata.forEach((item: any, index:number) => {
           let riskList: { [key: string]: any }[] = [];
           const se = seld.filter(
             (em) => em["Term.cClauseCode"] === item.cTermNo
@@ -447,11 +455,14 @@ function addTermData(PlanNo: string) {
             data = {
               "Term.cClauseCode": item.cTermNo,
               "Term.cRdrTyp": item.cRdrTyp,
+              "Term.cUniqueTermNo": item.cUniqueTermNo,
+              "Term.NSeqNo": index+1,
             };
           }
           data.riskList = riskList;
           if (item.cRdrTyp === "1") {
             data["Term.cClauseCategory"] = item.cClauseCategory;
+            // data["Term.cClaiminclude"] = '0';
           }
           plans.push(data);
         });
