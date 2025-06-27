@@ -48,7 +48,7 @@
                 </el-col>
               </el-row>
             </template>
-            <div class="form-inner" v-if="showMyfrom">
+            <div class="form-inner" v-show="showMyfrom">
               <rttable
                 v-model="tableDatas"
                 :item="gridEditConfig"
