@@ -98,12 +98,19 @@ const tableconfig = reactive<AppTableConfig>(
           }else {
             Object.assign(param, row)
           }
+
+          if(row.editList && row.editList.length>0){
+            param['editList'] = row.editList
+          }
+
+          console.log('数据====',param)
           dzmodal.open(deductibleFixEdit, { 
             type: "view", 
             data: param, 
             callback: (res: any) => {
               if (res.type === "ok") {
                 row.cDeductibleContent = res.data.cDeductibleContent
+                row['editList']= res.data['editList']
               }
             }
           });
@@ -205,6 +212,7 @@ const initOriginalData = ()=> {
     pageNum: 1,
     pageSize: 999,
   }
+  console.log(332,)
   getPrdDeductible(param).then((res) => {
     if (res.data.result) {
       pageresult.list = [];

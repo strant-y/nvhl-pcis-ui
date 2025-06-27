@@ -138,7 +138,8 @@ export const useValidator = () => {
     return {
       pattern:
         /^(([0\+]\d{2,3}-)?(0\d{2,3})-)?(\d{7,8})(-(\d{3,}))?$/,
-      message: "固话号码格式不对或后七位或者八位不能重复,格式如0511-4405222 或 010-87888822",
+      // message: "固话号码格式不对,格式如0511-4405222 或 010-87888822",
+      message: "请输入正确的固话号码",
       trigger: "blur",
     };
   }
@@ -298,7 +299,8 @@ export const useValidator = () => {
 
       return {
       pattern: /^[123456789ANY][0-9A-HJ-NPQRTUWXY]{17}$/,
-      message: "不是有效的统一社会信用编码！",
+      // message: "不是有效的统一社会信用编码！",
+      message: "格式有误，请输入正确格式！",
       trigger: "blur"
     };
   };
@@ -390,19 +392,27 @@ export const useValidator = () => {
 };
 
 // 外国人永久居留身份证校验
+// const ariCard = () => {
+//   return {
+//       validator: (rule, value, callback) => {
+//           const ariCard = value;
+//           if (ariCard.length!== 15) {
+//               callback(new Error('外国人永久居留身份证号码必须是十五位'));
+//           } else if (ariCard.indexOf(' ') >= 0) {
+//               callback(new Error('外国人永久居留身份证号码中不能带有空格'));
+//           } else {
+//               callback();
+//           }
+//       },
+//       trigger: 'blur'
+//   };
+// };
+// 外国人永久居留身份证校验
 const ariCard = () => {
   return {
-      validator: (rule, value, callback) => {
-          const ariCard = value;
-          if (ariCard.length!== 15) {
-              callback(new Error('外国人永久居留身份证号码必须是十五位'));
-          } else if (ariCard.indexOf(' ') >= 0) {
-              callback(new Error('外国人永久居留身份证号码中不能带有空格'));
-          } else {
-              callback();
-          }
-      },
-      trigger: 'blur'
+    pattern: /^(?:[A-Z]{3}\d{12}|3[A-Z]{3}\d{12}[0-9X])$/,
+    message: "外国人永久居留身份证必须是15位或18位",
+    trigger: "blur"
   };
 };
 
@@ -410,6 +420,10 @@ const ariCard = () => {
 const businessLicense = () => {
   return {
       validator: (rule, value, callback) => {
+       if (value === null || value === '' || value ===undefined) {
+          callback();
+          return;
+        }
           const businessLicense = value;
           if ((businessLicense.length !== 15) && (businessLicense.length !== 18)) {
               callback(new Error('营业执照号码必须是十五位或十八位'));
@@ -498,7 +512,8 @@ const vinNumber = () => {
 // 传真校验
 const faxNumber = () => {
   return {
-    pattern: /^(\+?\d{1,3}[- ]?)?\d{2,4}[- ]?\d{7,8}$/,
+    // pattern: /^(\+?\d{1,3}[- ]?)?\d{2,4}[- ]?\d{7,8}$/,
+    pattern: /^(\+?\d{1,3}[- ]?)?(\d{2,4}[- ]?)?\d{7,8}([- ]?\d{1,6})?$/,
     message: "请输入正确格式的传真号码（如：+86-10-12345678）",
     trigger: "blur"
   };
@@ -571,6 +586,23 @@ const onlineTaxiTransportLicense = () => {
     trigger: "blur"
   };
 };
+
+/**
+ * 关联交易审批单编号校验规则
+ * @returns {Object} - 验证规则配置
+ */
+const txnApprovalNo = () => {
+  return {
+    // 支持格式：
+    // 1. 公司代码-年份-月份-流水号（如：CT-2025-06-001）
+    // 2. 公司代码_年份_月份_流水号（如：CT_2025_06_001）
+    // 3. 公司代码年份月份流水号（如：CT202506001）
+    pattern: /^[A-Z0-9]{2,6}(-|_|)?\d{4}(-|_|)?\d{1,2}(-|_|)?\d{3,6}$/,
+    message: "审批单编号有误（如：CT-2025-06-001 或 CT202506001）",
+    trigger: "blur"
+  };
+};
+
 
   const getRules = (type: any, param: any) => {
     if (type === "required") {
@@ -645,6 +677,10 @@ const onlineTaxiTransportLicense = () => {
     if(type == 'onlineTaxiTransportLicense') {
       return onlineTaxiTransportLicense()
     }
+    if(type == 'txnApprovalNo') {
+      return txnApprovalNo()
+    }
+
   };
   const validorMap = {
     required: required,

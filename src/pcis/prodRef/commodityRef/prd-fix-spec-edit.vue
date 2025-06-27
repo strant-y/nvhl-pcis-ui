@@ -21,7 +21,7 @@
           class="content-item"
         >
           <el-input
-            v-if="item === '**'"
+            v-if="item.match(/^\*+$/)"
             v-model="inputValues[index]"
             @input="updateCNmeCn(index, $event)"
             :class="`input-${index}`"
@@ -45,7 +45,7 @@
 <script lang="ts" setup>
 import { ref, watch, onMounted, computed } from "vue";
 const dialogVisible = ref(true);
-const props = defineProps(["data"]);
+const props = defineProps(["data","callback"]);
 const rowData = ref(props.data);
 //rowData当前行数据
 /**
@@ -57,14 +57,21 @@ const rowData = ref(props.data);
 console.log("rowData", rowData);
 onMounted(() => {
   console.log("cNmeCnArray", cNmeCnArray.value);
+
+    if(rowData.value.editList){
+      inputValues.value  = setEditList(inputValues.value,rowData.value.editList)
+    }
 });
 
 // 使用正则表达式分割字符串，保留分隔符 ** 作为单独的数组项
 const cNmeCnArray = computed(() => rowData.value.cSpecialContent.split(/(\*+)/));
 // const inputValues = ref<string[]>([]);
-const inputValues = ref(
-  cNmeCnArray.value.map((item) => (item === "**" ? "" : item))
+const inputValues = ref( //item.match(/^\*+$/)
+  cNmeCnArray.value.map((item) => (item === "*" ? "*" : item))
 );
+
+
+ console.log(inputValues.value)
 
 const updateCNmeCn = (index: number, value: string) => {
   inputValues.value[index] = value;
@@ -74,12 +81,60 @@ const handleCancel = () => {
 };
 const handleSave = () => {
   dialogVisible.value = false;
-  const parts = cNmeCnArray.value.map((item, idx) =>
-    item === "**" ? inputValues.value[idx] : item
-  );
-  rowData.value.cSpecialContent = parts.join("");
+  rowData.value.editList = newListValue(cNmeCnArray.value,inputValues.value)
+  rowData.value.cSpecialContent =inputValues.value.join("");
+
+  // const parts = cNmeCnArray.value.map((item, idx) =>
+  //   item.match(/^\*+$/) ? inputValues.value[idx] : item
+  // );
+
+  // rowData.value.cSpecialContent = parts.join("");
   console.log("提交的数据:", rowData.value);
+  props.callback({type: 'ok', data: rowData.value});
 };
+
+
+
+// 星号回显赋值
+function setEditList(target, source, placeholderPattern = /^\*+$/) {
+  const result = [...target]; // 复制目标数组，避免修改原数组
+  let sourceIndex = 0; // 源数组的当前索引
+  for (let i = 0; i < result.length; i++) {
+    const targetItem = result[i];
+    
+    // 如果当前元素是占位符
+    if (placeholderPattern.test(targetItem)) {
+      // 如果源数组还有元素，则使用下一个元素进行替换
+      if (sourceIndex < source.length) {
+        result[i] = source[sourceIndex];
+        sourceIndex++;
+      }
+    }
+  }
+  return result;
+}
+
+
+// 星号修改赋新值
+function newListValue(original, modified, placeholderPattern = /^\*+$/) {
+  const result = [];
+  for (let i = 0; i < original.length; i++) {
+    // 如果原始位置是占位符
+    if (placeholderPattern.test(original[i])) {
+      // 获取占位符长度（星号数量）
+      const placeholderLength = original[i].length;
+      
+      // 如果该位置已被修改，则使用修改后的值
+      // 否则使用占位符本身（保持原始长度）
+      const value = modified[i] !== original[i] 
+        ? modified[i] 
+        : '*'.repeat(placeholderLength);
+      result.push(value);
+    }
+  }
+  return result;
+}
+
 </script>
 <style scoped>
 .form-item {

@@ -43,6 +43,9 @@ export interface AppTableMethod {
   getselectionData:() => any;
   getFormBtn: () => any;
   getTableBtn: () => any;
+  getCodeListMap: () => any;
+  setCodeListMap: (map: any) => void;
+  addCodeListMap: (data: any) => void;
 }
 export interface MyTableMethod {
   addRow: (arg: any) => any;

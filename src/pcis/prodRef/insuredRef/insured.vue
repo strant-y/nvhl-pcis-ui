@@ -103,6 +103,14 @@ onMounted(() => {
   setFormItem("Insured.cGcidCode", {
         rules: [getRules("leiCode", {})],
   });
+  // 关联交易审批单编号
+  setFormItem("Insured.cRelateNo", {rules: [getRules("txnApprovalNo", {})]});
+
+  // 营业执照号码
+  setFormItem("Insured.cBuslicenceNo", {rules: [getRules("businessLicense", {})]});
+  
+  // 组织机构代码
+  setFormItem("Insured.cOrganizationCode", {rules: [getRules("socialCode", {})]});
 
 });
 function setFormItem(key: any, obj: any) {
@@ -678,10 +686,6 @@ const method = {
   tCertMrkChecked: (val) => {
     const param = opertaor.getParam();
     if (val == "1") {
-      // setValue(
-      //   "Insured.tCertfBgnDate",
-      //   moment(new Date("2099-12-31")).format("YYYY-MM-DD HH:mm:ss")
-      // );
       setValue(
         "Insured.tCertfEndDate",
         moment(new Date("2099-12-31")).format("YYYY-MM-DD HH:mm:ss")
@@ -689,12 +693,17 @@ const method = {
       if (!param.initFlag) {
         setFormItem("Insured.tCertfEndDate", { disabled: true });
       }
+
     } else {
-      setValue("Insured.tCertfBgnDate", tCertfDate.value[0] || "");
-      setValue("Insured.tCertfEndDate", tCertfDate.value[1] || "");
+      if(tCertfDate.value.length>0){
+          setValue("Insured.tCertfBgnDate", tCertfDate.value[0] || "");
+          setValue("Insured.tCertfEndDate", tCertfDate.value[1] || "");
+      }
+    
       if (!param.initFlag) {
         setFormItem("Insured.tCertfEndDate", { disabled: false });
       }
+      
     }
   },
   mobileChange: (val) => {
@@ -781,16 +790,18 @@ const method = {
         });
         setFormItem("Insured.cTaxRegistrationNo", {
           disabled: false,
-        
-      });
+        });
+        setFormItem("Insured.cOrganizationCode", {
+          disabled: false,
+        });
       }
     } else if (val == "110002") {
       setFormItem("Insured.tCertfBgnDate", {
         rules: [getRules("required", {})],
       });
-      setFormItem("Insured.tCertfEndDate", {
-        rules: [getRules("required", {})],
-      });
+      // setFormItem("Insured.tCertfEndDate", {
+      //   rules: [getRules("required", {})],
+      // });
     } else if (val == "110007") {
       setFormItem("Insured.tCertfBgnDate", {
         rules: [getRules("required", {})],
@@ -811,15 +822,24 @@ const method = {
       setFormItem("Insured.cTaxRegistrationNo", {
           disabled: true,
       });
+      // 组织机构代码
+      setFormItem("Insured.cOrganizationCode", {
+          disabled: true,
+      });
 
 
 
     } else if(val === '120002'){
       // 护照
-          setFormItem("Insured.cCertfCde", {
+      setFormItem("Insured.cCertfCde", {
         rules: [getRules("required", {}),getRules("passPort", {})],
       });
 
+    } else if(val == "19"){
+      // 外国人证件号
+      setFormItem("Insured.cCertfCde", {
+        rules: [getRules("required", {}),getRules("ariCard", {})],
+      });
     } else {
       setFormItem("Insured.cCertfCde", {
         rules: [getRules("required", {})],
@@ -902,6 +922,7 @@ const method = {
       }
     }else if(cCertfCls =='110007'){
       setValue('Insured.cTaxRegistrationNo',val)
+      setValue('Insured.cOrganizationCode',val)
     }
   },
 

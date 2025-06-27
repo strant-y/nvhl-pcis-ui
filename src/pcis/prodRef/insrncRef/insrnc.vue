@@ -161,6 +161,12 @@ const method = {
         setFormItem("Base.tRunBgnTm", { rules: [getRules("required", {})] }); //追溯/日落起期
         setFormItem("Base.tRunEndTm", { rules: [getRules("required", {})] }); //追溯/日落止期
       }
+      
+      setValue('Base.nReportDays','')
+      setValue('Base.tRunBgnTm','')
+      setValue('Base.tRunEndTm','')
+
+
 
       setFormItem("Base.tRunBgnTm", { rules: [getRules("required", {})] }); //追溯/日落起期
       setFormItem("Base.tRunEndTm", { rules: [getRules("required", {})] }); //追溯/日落止期
@@ -168,8 +174,12 @@ const method = {
       setFormItem("Base.tRunEndTm", {  hidden: false  }); //追溯/日落止期
       setFormItem("Base.tReportBgnTm", {  hidden: true  }); //延长报告期起始日期
       setFormItem("Base.tReportEndTm", {  hidden: true  }); //延长报告期终止日期
-    } else if (val == "1") {
 
+
+    } else if (val == "1") {
+      setValue('Base.nTracingDays','')    
+      setValue("Base.tReportBgnTm",'')
+      setValue("Base.tReportEndTm",'')  
       if (cIsRetroSpect !== '0') {
         console.log('1212')
         setFormItem("Base.tRunBgnTm", { rules: null }); //追溯/日落起期

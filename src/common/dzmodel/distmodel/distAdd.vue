@@ -42,10 +42,6 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
-  handleQuery: {
-    type: Function,
-    required: false,
-  },
   rowData: {
     type: Object,
     default: () => ({}),
@@ -87,7 +83,9 @@ const formconfig1 = ref<AppFreeEditConfig>(
               if (res.code === 200) {
                 ElMessage.success(res.msg);
                 emits("handleClose");
-                props.method.handleQuery();
+                if(!!props.method.isOk && typeof props.method.isOk === 'function') {
+                  props.method.isOk(res);
+                }
               } else {
                 ElMessage.error(res.msg);
               }
@@ -210,6 +208,10 @@ onMounted(() => {
     }, 100);
   } else {
   }
+  nextTick(() => {
+    // 同步dist组件中的codeListMap到表单中
+    freeEditRef.value?.setCodeListMap(props.data.codeListMap);
+  })
 });
 const setcDetailedAddress = (prop:any,aftProp:any)=> {
   const ads = freeEditRef?.value?.getValue(prop[0].prop);

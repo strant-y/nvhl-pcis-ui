@@ -108,6 +108,11 @@ onMounted(() => {
     setFormItem("Applicant.cGreenIndustryCustomers",{disabled: true});
     setFormItem("Applicant.cGreenIndustryList",{disabled: true});
     setFormItem("Applicant.cGcidCode", {rules: [getRules("leiCode", {})]});
+    // 关联交易审批单编号
+    setFormItem("Applicant.cRelateNo", {rules: [getRules("txnApprovalNo", {})]});
+    
+
+
 
   });
 });
@@ -328,9 +333,6 @@ const method = {
         });
       }
     } else if (val == "110002") {
-      setFormItem("Applicant.tCertfBgnDate", {
-        rules: [getRules("required", {})],
-      });
       setFormItem("Applicant.tCertfEndDate", {
         rules: [getRules("required", {})],
       });
@@ -340,7 +342,7 @@ const method = {
           rules: [getRules("required", {})],
         });
         
-    }   else if ( val == "110007") {   
+    } else if ( val == "110007") {   
       setFormItem("Applicant.tCertfBgnDate", {
         rules: [getRules("required", {})],
       });
@@ -356,6 +358,11 @@ const method = {
             // 为法人  企业成立日期
       setFormItem("Applicant.tEstablishingDate", {
         rules: [getRules("required", {})],
+      });
+    } else if(val == "19"){
+      // 外国人证件号
+      setFormItem("Applicant.cCertfCde", {
+        rules: [getRules("required", {}),getRules("ariCard", {})],
       });
     } else {
       setFormItem("Applicant.cCertfCde", {
@@ -733,7 +740,7 @@ const method = {
   },
 
   // 证件有效期长期标识
-  tCertMrkChecked: (val) => {
+  tCertMrkChecked: (val:any) => {
     const param = opertaor.getParam();
     if (val == "1") {
       setValue(
@@ -743,18 +750,35 @@ const method = {
       if (!param.initFlag) {
         setFormItem("Applicant.tCertfEndDate", { disabled: true });
       }
-      setFormItem("Applicant.tCertfBgnDate", {  rules: [],});
-      setFormItem("Applicant.tCertfEndDate", { disabled: true , rules: [],});
+
+      // let cCertfCls = getValue('Applicant.cCertfCls');  // 证件类型   110007  120001
+      // if(cCertfCls ==="120001" || cCertfCls ==="110008=7"){
+      //     setFormItem("Applicant.tCertfBgnDate", {  rules: [getRules("required", {})],});
+      //     setFormItem("Applicant.tCertfEndDate", { disabled: true , rules: [getRules("required", {})],});
+      // }else{
+      //   setFormItem("Applicant.tCertfBgnDate", {  rules: [],});
+      //   setFormItem("Applicant.tCertfEndDate", { disabled: true , rules: [],});
+      // }
 
     } else {
-      setValue("Applicant.tCertfBgnDate", tCertfDate.value[0] || "");
-      setValue("Applicant.tCertfEndDate", tCertfDate.value[1] || "");
-      if (!param.initFlag) {
-      setFormItem("Applicant.tCertfEndDate", { disabled: false });
+      if(tCertfDate.value.length>0){
+        setValue("Applicant.tCertfBgnDate", tCertfDate.value[0] || "");
+        setValue("Applicant.tCertfEndDate", tCertfDate.value[1] || "");
       }
-      setFormItem("Applicant.tCertfBgnDate", {     rules: [getRules("required", {})],});
-      setFormItem("Applicant.tCertfEndDate", {    rules: [getRules("required", {})],});
+  
+      if (!param.initFlag) {
+        setFormItem("Applicant.tCertfEndDate", { disabled: false });
+      }
+      
+      // let cCertfCls = getValue('Applicant.cCertfCls');  // 证件类型   110007  120001
+      // if(cCertfCls ==="120001" || cCertfCls ==="110008=7"){
+      //     setFormItem("Applicant.tCertfBgnDate", {     rules: [getRules("required", {})],});
+      //     setFormItem("Applicant.tCertfEndDate", {    rules: [getRules("required", {})],});
 
+      // }else{
+      //      setFormItem("Applicant.tCertfBgnDate", {     rules: []});
+      //     setFormItem("Applicant.tCertfEndDate", {    rules: []});
+      // }
     }
   },
   // 移动电话 切换

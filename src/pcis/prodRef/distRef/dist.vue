@@ -2,10 +2,10 @@
   <div>
     <myCard :cardConfig="cardconfig">
       <app-table
-		:tableConfig="tableconfig"
-		v-model:pageresult="pageresult"
-		ref="distTableRef"
-		@pageChange="method.handleQuery"
+        :tableConfig="tableconfig"
+        v-model:pageresult="pageresult"
+        ref="distTableRef"
+        @pageChange="method.handleQuery($event, true)"
       />
     </myCard>
     <comDialog ref="dialog"></comDialog>
@@ -72,8 +72,7 @@ const distTableRef = ref<AppTableMethod | null>(null);
 const cardconfig = ref<CardConfig>(creatCardConfig({}));
 const formconfig1 = ref<Record<string, any>>({});
 const tableconfig = ref<AppTableConfig>(createTableEditConfig());
-const codeListMap = ref<any>({});
-provide('codeListMap', codeListMap.value);
+const idxParam = inject('idxParam');
 let fileBase: string;
 // 声明全局变量
 let cComponentTableValue: string;
@@ -99,6 +98,13 @@ onMounted(async () => {
     formconfig11.value.fromSchema?.forEach(item=>{
       if(item['prop'] ==='Dist.cProductType'){
         item['typeCode'] = 'Product_Type040003';
+      }
+    })
+  }
+  if(params.cProdNo === '043009'){
+    formconfig11.value.fromSchema?.forEach(item=>{
+      if(item['prop'] ==='Dist.cEmploymentAddress' && route.params.param.cGrpMrk !== '1'){
+        item.isShow = false;
       }
     })
   }
@@ -153,10 +159,10 @@ onMounted(async () => {
   if(tgtRef){
     tgtRef.setValue("Tgt.nElevatorsNumber",pageresult.list.length)
   }
+  if(distTableRef.value) {
+    eventBus.on(`setMap-${props.compKey}`, addCodeListMap);
+  }
 });
-
-
-eventBus.on(`setMap-${props.compKey}`, setCodeListMap);
 
 // const  modifyRules = (data, fieldValue)=> {
 //     data.forEach(item => {
@@ -201,11 +207,14 @@ const method = {
           title: "编辑",
           rowData: row,
           tab: formconfig1.value.title,
-          compKey: props.compKey
+          compKey: props.compKey,
+          codeListMap: distTableRef.value?.getCodeListMap(),
         },
         {
-          isOk: (res: any) => {},
-          handleQuery: method.handleQuery, // 新增：将 handleQuery 方法传递给 distAdd 组件
+          isOk: (res: any) => {
+            const queryParams = distTableRef.value?.getPartnerPage(false);
+            handleQuery: method.handleQuery(queryParams);
+          },
         },
         { width: "60" }
     );
@@ -217,7 +226,8 @@ const method = {
     }).then((res: any) => {
       if (res.code === 200) {
         ElMessage.success("删除成功");
-        method.handleQuery();
+        const queryParams = distTableRef.value?.getPartnerPage(false);
+        method.handleQuery(queryParams, true);
       }
     });
   },
@@ -249,13 +259,14 @@ const method = {
               fromSchema: fromSchema,
               title: "新增",
               tab: formconfig1.value.title,
-              compKey: props.compKey
+              compKey: props.compKey,
+              codeListMap: distTableRef.value?.getCodeListMap(),
             },
             {
               isOk: (res: any) => {
-                console.log(111)
+                const queryParams = distTableRef.value?.getPartnerPage(false);
+                handleQuery: method.handleQuery(queryParams, true);
               },
-              handleQuery: method.handleQuery, // 新增：将 handleQuery 方法传递给 distAdd 组件
             },
             { width: "60" }
         );
@@ -265,7 +276,7 @@ const method = {
     });
   },
 
-  handleQuery: (queryParams: any = { pageNum: 1 }) => {
+  handleQuery: (queryParams: any = { pageNum: 1, pageSize: 10 }, isChange: boolean = false) => {
     let tgtRef = opertaor.getTableRefByKey('tgt')
     const param = opertaor.getParam();
     let app = "";
@@ -289,7 +300,8 @@ const method = {
           return{
             ... item,
             ... {
-              nSeqNo: index + 1,
+              // 序号全部由后端处理
+              // 'Dist.nSeqNo': ((queryParams.pageNum - 1) * queryParams.pageSize) + index + 1,
               tOpeningTime: item['Dist.tOpeningTime']
                   ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
                   : null,
@@ -331,6 +343,10 @@ const method = {
         if(distSummaryRef.value) {
           distSummaryRef.value?.handleQuery();
         }
+
+        if(idxParam && isChange) { // 保存清单表格在屏幕中间
+          idxParam.handleAnchorClick(undefined, `#${props.compKey}`);
+        }
       }
     });
   },
@@ -359,10 +375,13 @@ const method = {
               title: "新增",
               tab: formconfig1.value.title,
               compKey: props.compKey,
+              codeListMap: distTableRef.value?.getCodeListMap(),
             },
             {
-              isOk: (res: any) => {},
-              handleQuery: method.handleQuery, //将 handleQuery 方法传递给 distAdd 组件
+              isOk: (res: any) => {
+                const queryParams = distTableRef.value?.getPartnerPage(false);
+                handleQuery: method.handleQuery(queryParams);
+              },
             },
             { width: "60" }
         );
@@ -574,9 +593,8 @@ function setUnDisabledByKeyList(key: any) {
   });
 }
 
-function setCodeListMap (data: any) {
-  const {code, list} = data;
-  codeListMap.value[code] = list
+function addCodeListMap (data: any) {
+  distTableRef.value?.addCodeListMap(data);
 }
 
 function getFormconfig() {
@@ -628,11 +646,16 @@ function setTableData(data: any) {
   });
 }
 
+function handleQuery() {
+  const queryParams = distTableRef.value?.getPartnerPage(true);
+  method.handleQuery(queryParams);
+}
+
 // 绑定特殊验证器
 const exRules = {};
 
 onUnmounted(() => {
-  eventBus.off(`setMap-${props.compKey}`, setCodeListMap);
+  eventBus.off(`setMap-${props.compKey}`, addCodeListMap);
 });
 
 defineExpose({
@@ -642,7 +665,7 @@ defineExpose({
   setFormValue,
   getFormconfig,
   setUnDisabledByKeyList,
-  handleQuery: method.handleQuery,
+  handleQuery,
   getTableData,
   setTableData,
 });

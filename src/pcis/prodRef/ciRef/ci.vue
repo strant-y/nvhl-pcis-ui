@@ -165,6 +165,7 @@ const method = {
           "loadData",
           [{ value: '1', label: '其他' }]
       );
+      
     }
   },
 
@@ -225,6 +226,7 @@ const method = {
         "loadData",
         [{ value: '1', label: '其他' }]
       );
+      freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "1");
       setFormItem("Ci.cDptCde", { rules: [] });
       setFormItem("Ci.cDptCde", { disabled: true });
       setFormItem("Ci.nComm", { disabled: true});
