@@ -449,5 +449,6 @@ defineExpose({
   validate,
   setValue,
   getValue,
+  setFormItem,
 });
 </script>
