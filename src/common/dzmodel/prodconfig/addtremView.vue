@@ -230,25 +230,33 @@ function setNode() {
       }
     });
   }
+  ignoreCheckChange = true;
   mainRef.value?.setCheckedKeys(addMainKey, false);
+  nextTick(()=>{
+    ignoreCheckChange = false;
+  })
 }
+
+let ignoreCheckChange = false;
 
 function selectmainMethod(a: any, b: any, c: any) {
   // 重新判断,如果勾选责任,自动勾选主条款,如果主条款被反选,自动取消对应责任反选
   let addMainKey: any[] = [];
   const tree = mainRef.value?.getCheckedNodes(false, true);
-  if (tree && tree.length > 0) {
+  if ( !ignoreCheckChange && tree && tree.length > 0) {
     tree.forEach((t: any) => {
       if (addMainKey.indexOf(t.id) === -1) {
         addMainKey.push(t.id);
       }
     });
     if (a.cTermNo) {
-      if (!b) {
-        a.children?.forEach((child: any) => {
+      a.children?.forEach((child: any) => {
+        if(b){
+          addMainKey.push(child.id);
+        }else{
           addMainKey = addMainKey.filter((node: any) => node !== child.id);
-        });
-      }
+        }
+      });
       mainRef.value?.setCheckedKeys(addMainKey, false);
     } else {
       if (b) {
