@@ -72,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { getProdInfos, saveProInfo, saveCommodityBase, commodityBaseOperatorCheck, saveRule, addProcessUndr, getCommodityBase, processApprove, getProcessInfo } from "@/api/prod";
+import { getProdInfos, saveProInfo, saveCommodityBase, commodityBaseOperatorCheck, saveRule, addProcessUndr, getCommodityBase, processApprove, getProcessInfo, getEdrNmeByCde } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 
 const opertaor = dataOpertaor();
@@ -268,11 +268,12 @@ function handleQuery() {
         tabref.setFormValue(data['result'][0])
 
         //  出单权限分配 数据回显
-        console.log(dataS.cPertainDptCde)
+        getNmeByCde(dataS.cPertainDptCde, "cPertainDptCde", "permissionAllo")
         tabref3.setValue('cPertainDptCde', dataS.cPertainDptCde);
         tabref3.setValue('cBsnsTyp', dataS.cBsnsTyp);
         tabref3.setValue('cChaType', dataS.cChaType);
         tabref3.setValue('cChaSubType', dataS.cChaSubType);
+        getNmeByCde(dataS.cDptCde, "cDptCde", "permissionAllo")
         tabref3.setValue('cDptCde', dataS.cDptCde);
         tabref3.setValue('cOperId', dataS.cOperId);
         tabref3.setValue('cSlsGroup', dataS.cSlsGroup);
@@ -550,6 +551,22 @@ onMounted(async () => {
 
 
 });
+// 根据机构编码获取机构名称
+const getNmeByCde = async(val:any, key: string, pageKey: string) => {
+  const tabref = opertaor.getTableRefByKey(pageKey);
+  await getEdrNmeByCde({
+    code: "orgDpt",
+    val: val
+  }).then((res:any) => {
+    if (res.code === 200 && res.data && res.data.data) {
+      tabref.setFormItem(key, {
+        loadData: [
+          { value: val, label: val+res.data.data }
+        ],
+      });
+    }
+  });
+}
 
 function setData(datas: any) {
   Object.keys(datas).forEach((k) => {
