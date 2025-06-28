@@ -607,6 +607,16 @@ onMounted(() => {});
       .login-form {
         width: 100%;
         padding: 0 12px 22px;
+        :deep(.el-form-item__content) {
+          flex-direction: column;
+        }
+        :deep(.el-form-item__error) {
+          width: 100%;
+          height: 0;
+          transform: translate(0, 2px);
+          padding: 0;
+          text-align: left;
+        }
       }
 
       :deep(.el-card__body) {
@@ -619,6 +629,7 @@ onMounted(() => {});
 .el-form-item {
   border: 1px solid #d0d2d9;
   border-radius: 8px;
+  width: 243px;
   .icon-box {
     border-radius: 8px 0 0 8px;
     display: flex;
