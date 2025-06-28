@@ -1529,3 +1529,8 @@ export function exportRenewalInsurance(data:any) {
 export function getPolicy(queryParams: any): AxiosPromise<any> {
     return post(`/policy/getPolicy`, queryParams);
 }
+// 根据code和val解析字典值
+export function getEdrNmeByCde(queryParams: any): AxiosPromise<any> {
+    return post(`/edr/getNmeByCde`, queryParams);
+}
+
