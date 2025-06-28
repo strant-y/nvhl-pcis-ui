@@ -119,7 +119,7 @@
 <script setup lang="ts">
 import { qryProdRelTermRiskList, qryRelTermList } from "@/api/prod";
 import { useValidator } from "@/typings/useValidator";
-
+import { tremMap } from "@/pcis/prodRef/cvrgRef/trem-map-config.ts"
 const { getRules } = useValidator();
 import { ref, defineProps } from "vue";
 const emits = defineEmits(["handleClose"]);
@@ -220,6 +220,14 @@ onMounted(async () => {
     if (200 === code) {
       data1.value = data;
       data1.value.forEach((item: any) => { 
+        if(tremMap.value[item.cUniqueTermNo]){
+          const risks = tremMap.value[item.cUniqueTermNo];
+          item.children?.forEach((i: any) => {
+              if(risks.includes(i.cRiskNo)){
+                i.disabled = true;
+              }
+          });
+        }
         selectAdditionNodes.value.forEach(v=>{
           if(v.cRowId && v.cTermNo === item.cTermNo){
             item.disabled = true;
