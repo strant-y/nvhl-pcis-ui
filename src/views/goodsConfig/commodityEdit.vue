@@ -553,19 +553,21 @@ onMounted(async () => {
 });
 // 根据机构编码获取机构名称
 const getNmeByCde = async(val:any, key: string, pageKey: string) => {
-  const tabref = opertaor.getTableRefByKey(pageKey);
-  await getEdrNmeByCde({
-    code: "orgDpt",
-    val: val
-  }).then((res:any) => {
-    if (res.code === 200 && res.data && res.data.data) {
-      tabref.setFormItem(key, {
-        loadData: [
-          { value: val, label: val+res.data.data }
-        ],
-      });
-    }
-  });
+  if(val) {
+    const tabref = opertaor.getTableRefByKey(pageKey);
+    await getEdrNmeByCde({
+      code: "orgDpt",
+      val: val
+    }).then((res:any) => {
+      if (res.code === 200 && res.data && res.data.data) {
+        tabref.setFormItem(key, {
+          loadData: [
+            { value: val, label: val+res.data.data }
+          ],
+        });
+      }
+    });
+  }
 }
 
 function setData(datas: any) {
