@@ -12,11 +12,14 @@
         <div class="search-btn">
           <div style="width: 50%; float: right">
             <div class="inline-block-div" style="width: 75%">
-              <rtinput :item="{ placeholder: '请输入主条款名称或编码' }" />
+              <rtinput v-model="query.main" :item="{ placeholder: '请输入主条款名称或编码' }" />
             </div>
             <rtButton
               :item="{
                 icon: 'Search',
+                func: () => {
+                  mainRef.filter(query.main);
+                },
               }"
             />
           </div>
@@ -27,11 +30,14 @@
           <span style="font-size: 16px"> 请选择附加条款责任 </span>
           <div style="width: 50%; float: right">
             <div class="inline-block-div" style="width: 75%">
-              <rtinput :item="{ placeholder: '请输入附加条款名称或编码' }" />
+              <rtinput v-model="query.sub" :item="{ placeholder: '请输入附加条款名称或编码' }" />
             </div>
             <rtButton
               :item="{
                 icon: 'Search',
+                func: () => {
+                  additionalRef.filter(query.sub);
+                },
               }"
             />
           </div>
@@ -46,6 +52,7 @@
             node-key="id"
             show-checkbox
             :check-strictly="true"
+            :filter-node-method="mainfilterNode"
             :data="data1"
             @check-change="selectmainMethod"
           />
@@ -60,6 +67,7 @@
             node-key="id"
             show-checkbox
             :data="data2"
+            :filter-node-method="subfilterNode"
             :check-strictly="true"
             @check-change="selectadditionMethod"
           />
@@ -135,6 +143,11 @@ const dataprops = {
   disabled: 'disabled',
 };
 
+const query =ref({
+  main:"",
+  sub:""
+});
+
 const data1 = ref([]);
 const mainRef = ref<InstanceType<typeof ElTree>>();
 const additionalRef = ref<InstanceType<typeof ElTree>>();
@@ -189,6 +202,16 @@ const method = {};
 
 // 绑定特殊验证器
 const exRules = {};
+
+const mainfilterNode = (value: string, data: Tree) => {
+if (!value) return true
+  return data.label.includes(value);
+}
+
+const subfilterNode = (value: string, data: Tree) => {
+if (!value) return true
+  return data.label.includes(value);
+}
 
 onMounted(async () => {
   const param = props.data.data;
