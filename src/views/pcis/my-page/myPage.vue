@@ -11,7 +11,11 @@
               class="NavigaList_card"
             >
               <el-anchor :bound="120" :offset="80">
-                <el-anchor-link :href="`#underwriteurl`" v-if="underwriteFlag">
+                <el-anchor-link
+                  v-if="underwriteFlag"
+                  @click="handleAnchorClick($event, `#underwriteurl`)"
+                  class="isActive"
+                >
                   <!-- <rt-icon
                     :item="{ icon: 'Tickets' }"
                   /> -->
@@ -23,6 +27,7 @@
                 <el-anchor-link
                   v-if="edrbaseFlag"
                   @click="handleAnchorClick($event, `#edrbase`)"
+                  class="isActive"
                 >
                   <!-- <rt-icon
                     :item="{ icon: 'Tickets' }"
@@ -61,7 +66,7 @@
                       : true
                   "
                   @click="handleAnchorClick($event, `#${k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey}`)"
-                  :class="i === 0 ? 'isActive' : ''"
+                  :class="!underwriteFlag && !edrbaseFlag && !edritemFlag && i === 0 ? 'isActive' : ''"
                 >
                   <!-- <rt-icon
                     :item="{
@@ -138,10 +143,10 @@
           </div>
         <!-- </el-affix> -->
       </el-aside>
-      <el-main>
+      <el-main style="margin-top: 58px;">
         <el-affix
           :offset="80"
-          style="text-align: center; padding: 5px; background: #ebedfc;width: 100%;font-size: 16px;"
+          class="affix-main-header"
         >
           <div class="tp" style="background: #ebedfc">
             <span class="font-weight-500">条款：</span
@@ -2858,7 +2863,7 @@ function handleAnchorClick(event: any, targetId: string) {
     if (targetElement) {
       targetElement.scrollIntoView({ 
         behavior: 'smooth', 
-        block: 'center' // 可选值：'start', 'center', 'end', 'nearest'
+        block: 'start' // 可选值：'start', 'center', 'end', 'nearest'
       });
     }
   }
@@ -3102,5 +3107,14 @@ function getSaveDataParams() {
 }
 .font-weight-500 {
   font-weight: 500;
+}
+.affix-main-header {
+  position: absolute;
+  top: 0;
+  text-align: center;
+  padding: 5px;
+  background: #ebedfc;
+  width: 100%;
+  font-size: 16px;
 }
 </style>
