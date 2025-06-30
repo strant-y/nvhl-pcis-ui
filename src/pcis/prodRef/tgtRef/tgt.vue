@@ -218,7 +218,11 @@ const method = {
       });
     }
   },
-  knowledgeShow:()=>{
+  getcIsExcludingChange:()=>{
+    dialog.value?.open('reinsuranceTips', null,
+        null,{width: 45,title:'水险再保提示'});
+  },
+  getcSanctionAreasChange:()=>{
     dialog.value?.open('detailsKnows', null,
         null,{width: 45,title:'战争及罢工险核保限制和运输地国家限制'});
   },
