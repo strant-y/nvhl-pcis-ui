@@ -678,7 +678,7 @@ const method = {
         method: {
           getdbClickData: (data) => {
             setFormItem("Insured.cOccupCde", {
-              loadData: [{ label: data.cnm, value: data.cde }],
+              loadData: [{ label: data.cde + " " + data.cnm, value: data.cde }],
             });
             setValue("Insured.cOccupCde", data.cde);
             dialog.value?.handleClose();
