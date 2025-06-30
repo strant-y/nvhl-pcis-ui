@@ -148,6 +148,8 @@ const method = {
     let cIsRetroSpect = getFromValue()['Base.cIsRetroSpect']      // 获取是否有追溯期/日期
     console.log(cIsRetroSpect)
     const p = opertaor.getParam();
+
+    console.log('数据---‘',getFromValue())
     if (!p.initFlag) {
       // setFormItem("Base.tRunBgnTm", { disabled: false }); //追溯/日落起期
       // setFormItem("Base.tRunEndTm", { disabled: false }); //追溯/日落止期
@@ -162,9 +164,9 @@ const method = {
         setFormItem("Base.tRunEndTm", { rules: [getRules("required", {})] }); //追溯/日落止期
       }
       
-      setValue('Base.nReportDays','')
-      setValue('Base.tRunBgnTm','')
-      setValue('Base.tRunEndTm','')
+      // setValue('Base.nReportDays','')
+      // setValue('Base.tRunBgnTm','')
+      // setValue('Base.tRunEndTm','')
 
 
 
@@ -182,9 +184,9 @@ const method = {
 
 
     } else if (val == "1") {
-      setValue('Base.nTracingDays','')    
-      setValue("Base.tReportBgnTm",'')
-      setValue("Base.tReportEndTm",'')  
+      // setValue('Base.nTracingDays','')    
+      // setValue("Base.tReportBgnTm",'')
+      // setValue("Base.tReportEndTm",'')  
       if (cIsRetroSpect !== '0') {
         console.log('1212')
         setFormItem("Base.tRunBgnTm", { rules: null }); //追溯/日落起期
@@ -224,16 +226,7 @@ const method = {
         "Base.tRunEndTm": "",
         "Base.nTracingDays": "",
       });
-    } else {
-      // //是否有追溯期/日落期没有值时, 且索赔基础名称为内索赔制 时，追溯/日落起止期必填
-      // if (getValue("Base.claimName") == "0") {
-      //   setFormItem("Base.tRunBgnTm", { rules: [getRules("required", {})], disabled: false, }); //追溯/日落起期
-      //   setFormItem("Base.tRunEndTm", { rules: [getRules("required", {})], disabled: false, }); //追溯/日落止期
-      // } else {
-      //   setFormItem("Base.tRunBgnTm", { rules: null }); //追溯/日落起期
-      //   setFormItem("Base.tRunEndTm", { rules: null }); //追溯/日落止期
-      // }
-    }
+    } 
   },
   // 追溯起期
   tRunBgnTmFn: (v) => {

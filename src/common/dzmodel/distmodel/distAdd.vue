@@ -120,6 +120,7 @@ onMounted(() => {
 
     // console.log('Dist.cPlateNumber',props.data.fromSchema)
     let item = JSON.parse(JSON.stringify(props.data.fromSchema[i]));
+       console.log(item) 
     if(['Dist.AllOccup'].includes(item.prop)) {
       item["func"] = getDistoccupType;
     }else if (props.data.fromSchema[i]["func"]) {
@@ -133,7 +134,7 @@ onMounted(() => {
     if(cIs == 1 && item.prop !=='Dist.nSeqNo'){
         item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
     }else if(cIs == 0 && (item.prop !=='Dist.cSchoolName' && item.prop !=='Dist.cSchoolAddress')){
-      item['rules'] =null;
+      // item['rules'] =null;
     }
     // item["disabled"] = false;
     if(item.cShowLocation === '1'){
@@ -187,11 +188,14 @@ onMounted(() => {
     if(item.prop =='Dist.cSchoolName'){
       item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
     }
-    // if(item.prop =='Dist.cIdentificationNumber'){
-    //   item['rules'] = [ getRules("idCard", {})];
-    // }
 
-    console.log(item) 
+    // 040001产品 必填项问题
+    if(item.prop =='Dist.cPlanNo' ||item.prop =='Dist.tOpeningTime' ||item.prop =='Dist.cLocationSigns' ||item.prop =='Dist.cFacilitySigns' ||item.prop =='Dist.cVenueSign' || item.prop =='Dist.cBuildingStructure'  ){
+      console.log('进啊2=',item.prop)
+      item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];   
+    }
+
+ 
 
     // 遍历groupList数组把函数赋值给fromSchema
     if (props.data.fromSchema[i]["groupList"] && props.data.fromSchema[i]["groupList"].length>0) {
@@ -263,10 +267,7 @@ const cDocumentTypeChange =(val:any)=>{
     } else if(val == "19"){
       // 外国人证件号
       item.itemConfig['rules'] = [getRules("ariCard", {})];
-    } else if (val == "110002") {
-      // 护照
-      //  item.itemConfig['rules'] =[getRules("passPort", {})];
-    }else if(val =='110001'){
+    } else if(val =='110001'){
       // 组织机构编码校验
       item.itemConfig['rules'] =[getRules("orgCode", {})];
     } else {

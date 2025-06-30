@@ -377,36 +377,11 @@ export const useValidator = () => {
   // 护照
   const passPort = () => {
     return {
-        validator: (rule, value, callback) => {
-            const passPort = value;
-            if (passPort.length!== 9) {
-                callback(new Error('护照号码必须是九位！'));
-            } else if (passPort.indexOf(' ') >= 0) {
-                callback(new Error('护照号码中不能带有空格'));
-            } else {
-                callback();
-            }
-        },
-        trigger: 'blur'
+          pattern: /^[a-zA-Z0-9]{5,20}$/,
+          message: "护照号码格式不正确（5-20位字母或数字）",
+          trigger: "blur"
     };
 };
-
-// 外国人永久居留身份证校验
-// const ariCard = () => {
-//   return {
-//       validator: (rule, value, callback) => {
-//           const ariCard = value;
-//           if (ariCard.length!== 15) {
-//               callback(new Error('外国人永久居留身份证号码必须是十五位'));
-//           } else if (ariCard.indexOf(' ') >= 0) {
-//               callback(new Error('外国人永久居留身份证号码中不能带有空格'));
-//           } else {
-//               callback();
-//           }
-//       },
-//       trigger: 'blur'
-//   };
-// };
 // 外国人永久居留身份证校验
 const ariCard = () => {
   return {
@@ -437,18 +412,7 @@ const businessLicense = () => {
   };
 };
 
-/**
- * 中国车牌号码校验器 油  电
- *
- */
-//  const vehiclePlate = () => {
-//   return {
-//     pattern: /^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼]{1}[A-HJ-NP-Z]{1}(([0-9]{5})|([0-9]{5}[DF])|([DF][0-9]{5}))$/,
-//     message: "请输入正确格式的车牌号（如：粤A12345或粤AD12345）",
-//     trigger: "blur"
-//   };
-// }
- 
+
 /**
  * 车牌号校验规则（仅格式验证，不含空值校验）
  * @param {Object} [options] - 配置选项
@@ -473,6 +437,10 @@ const vehiclePlate = (options = {}) => {
   
   return {
     validator: (rule, value, callback) => {
+         if (value === null || value === '' || value ===undefined) {
+          callback();
+          return;
+        }
       const formattedValue = value.trim().toUpperCase();
       
       // 普通车牌正则表达式
