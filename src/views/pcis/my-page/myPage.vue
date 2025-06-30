@@ -11,7 +11,11 @@
               class="NavigaList_card"
             >
               <el-anchor :bound="120" :offset="80">
-                <el-anchor-link :href="`#underwriteurl`" v-if="underwriteFlag">
+                <el-anchor-link
+                  v-if="underwriteFlag"
+                  @click="handleAnchorClick($event, `#underwriteurl`)"
+                  class="isActive"
+                >
                   <!-- <rt-icon
                     :item="{ icon: 'Tickets' }"
                   /> -->
@@ -23,6 +27,7 @@
                 <el-anchor-link
                   v-if="edrbaseFlag"
                   @click="handleAnchorClick($event, `#edrbase`)"
+                  class="isActive"
                 >
                   <!-- <rt-icon
                     :item="{ icon: 'Tickets' }"
@@ -61,7 +66,7 @@
                       : true
                   "
                   @click="handleAnchorClick($event, `#${k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey}`)"
-                  :class="i === 0 ? 'isActive' : ''"
+                  :class="!underwriteFlag && !edrbaseFlag && !edritemFlag && i === 0 ? 'isActive' : ''"
                 >
                   <!-- <rt-icon
                     :item="{
@@ -138,10 +143,10 @@
           </div>
         <!-- </el-affix> -->
       </el-aside>
-      <el-main>
+      <el-main style="margin-top: 58px;">
         <el-affix
           :offset="80"
-          style="text-align: center; padding: 5px; background: #ebedfc;width: 100%;font-size: 16px;"
+          class="affix-main-header"
         >
           <div class="tp" style="background: #ebedfc">
             <span class="font-weight-500">条款：</span
@@ -332,6 +337,7 @@ import {
 import { checkFeeWindowType, selectDist, saveDistBatch, getReleaseInquiryPage } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
 import moment from "moment";
+import {numAdd, numComparison, numMulti, numSubp, tool_fix} from "@/utils/Math";
 import dayjs from "dayjs";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
@@ -2016,6 +2022,14 @@ const submitToUndrFn = async () => {
         btn.loading = false;
         return;
       }
+      //校验联共保信息
+      const ciValue = opertaor.getTableRefByKey("Ci")?.getFromValue() || '';
+      console.log('ciValue', ciValue);
+      // const isCiValid = validateCiInfo();
+      // if (!isCiValid) {
+      //   btn.loading = false;
+      //   return;
+      // }
       const calcData: any = opertaor.getDataAll();
       calcData["user"] = user;
       calcData["plyBase"]["Base.cDptCde"] = params.cDptCde;
@@ -2745,7 +2759,52 @@ const submitUnderwritingFn = () => {
     // history.back();
   });
 };
-
+/**
+ * 投保申请核保时校验联共保信息
+ */
+const validateCiInfo = () => {
+  debugger;
+  const ciData = opertaor.getTableRefByKey("Ci").getFromValue()
+  if (ciData.value) {
+      let NCiShare = 0;
+      let chiefMrkM = 0; // 主
+      let chiefMrkS = 0; // 从
+      let CCoinsurerCdeNum = 0; // 分公司份额
+      for (const ciRow of ciData.items) {
+        if (ciRow) {
+          NCiShare = numAdd(NCiShare, parseFloat(ciRow["Ci.nCiShare"] || 0));
+          if ("327001" === ciRow["Ci.cCoinsurerCde"]) {
+            CCoinsurerCdeNum++;
+          }
+          if ("1" === ciRow["Ci.cChiefMrk"]) {
+            chiefMrkM++;
+          } else {
+            chiefMrkS++;
+          }
+        }
+      }
+      if (chiefMrkM === 0 || chiefMrkS === 0) {
+        ElMessage.error("主/从共保信息不完整!");
+        return false;
+      }
+      if (NCiShare !== 100.0) {
+        ElMessage.error("共保比例和应为100%!");
+        return false;
+      }
+      if (chiefMrkM > 1) {
+        ElMessage.error("主共保信息只允许增加一条!");
+        return false;
+      }
+      if (CCoinsurerCdeNum <= 1) {
+        ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
+        return false;
+      }
+    } else {
+      ElMessage.error("请录入共保信息!");
+      return false;
+    }
+  return true;
+};
 // 将对象的属性首字母转换为小写
 function lowercaseKeys<T extends object>(
   obj: T
@@ -2871,7 +2930,7 @@ function handleAnchorClick(event: any, targetId: string) {
     if (targetElement) {
       targetElement.scrollIntoView({ 
         behavior: 'smooth', 
-        block: 'center' // 可选值：'start', 'center', 'end', 'nearest'
+        block: 'start' // 可选值：'start', 'center', 'end', 'nearest'
       });
     }
   }
@@ -3150,5 +3209,14 @@ function replacecInquiryNo(res:any) {
 }
 .font-weight-500 {
   font-weight: 500;
+}
+.affix-main-header {
+  position: absolute;
+  top: 0;
+  text-align: center;
+  padding: 5px;
+  background: #ebedfc;
+  width: 100%;
+  font-size: 16px;
 }
 </style>

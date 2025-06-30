@@ -657,6 +657,14 @@ export function saveTermRel(queryParams: any): AxiosPromise<any> {
 export function qryRefProdAndSpecList(queryParams: any): AxiosPromise<any> {
   return post(`/proddef/qryRefProdAndSpecList`, queryParams);
 }
+/**
+ * 产品工厂-关联特别约定修改
+ *
+ * @param queryParams
+ */
+export function editSpecStatus(queryParams: any): AxiosPromise<any> {
+  return post(`/proddef/editSpecStatus`, queryParams);
+}
 export function unAssociationSpec(queryParams: any): AxiosPromise<any> {
   return post(`/proddef/unAssociationSpec`, queryParams);
 }

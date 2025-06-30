@@ -33,7 +33,7 @@
       </el-tab-pane>
       <el-tab-pane label="添加其他特约" name="second">
         <el-table
-          ref="multipleTableRef"
+          ref="multipleTableOtherRef"
           :data="addTableData"
           style="width: 100%"
         >
@@ -88,6 +88,7 @@ const props = defineProps({
 });
 const emits = defineEmits(["handleClose"]);
 const multipleTableRef = ref<MyTableMethod | null>(null);
+const multipleTableOtherRef = ref<MyTableMethod | null>(null);
 const selected = ref([]);
 const pageresult = reactive<Pageresult>({
   /** 数据列表 */
@@ -163,13 +164,13 @@ function add() {
 
 //点击确定按钮时把选中的数据派发给父组件
 const returnData = () => {
-  if (activeName.value == "first") {
-    let tempData = multipleTableRef.value.getSelectionRows();
-    props.method.getSelected(tempData);
-  } else {
-    console.log("addTableData", addTableData);
-    props.method.getSelected(addTableData);
+  let tempData = multipleTableRef.value.getSelectionRows();
+  if(addTableData) {
+    for (const item of addTableData) {
+      tempData.push(item);
+    }
   }
+  props.method.getSelected(tempData);
   close();
 };
 const close = () => {

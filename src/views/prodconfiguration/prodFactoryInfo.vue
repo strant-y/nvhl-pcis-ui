@@ -94,26 +94,26 @@ opertaor.setTableConfig([
         pageTtile: "关联主条款",
         pageRef: "relatedMainInsurance",
       },
-      factoryrelatedAdditionalIns: {
-        pageKey: "factoryrelatedAdditionalIns",
-        pageTtile: "关联附加条款",
-        pageRef: "factoryrelatedAdditionalIns",
-      },
+      // factoryrelatedAdditionalIns: {
+      //   pageKey: "factoryrelatedAdditionalIns",
+      //   pageTtile: "关联附加条款",
+      //   pageRef: "factoryrelatedAdditionalIns",
+      // },
       specialAgreement: {
         pageKey: "specialAgreement",
         pageTtile: "关联特别约定",
         pageRef: "specialAgreement",
       },
-      healthNotice: {
-        pageKey: "healthNotice",
-        pageTtile: "关联健康告知",
-        pageRef: "healthNotice",
-      },
-      relatedInsuranceLiability: {
-        pageKey: "relatedInsuranceLiability",
-        pageTtile: "关联条款责任",
-        pageRef: "relatedInsuranceLiability",
-      },
+      // healthNotice: {
+      //   pageKey: "healthNotice",
+      //   pageTtile: "关联健康告知",
+      //   pageRef: "healthNotice",
+      // },
+      // relatedInsuranceLiability: {
+      //   pageKey: "relatedInsuranceLiability",
+      //   pageTtile: "关联条款责任",
+      //   pageRef: "relatedInsuranceLiability",
+      // },
       relatedBusinessRules: {
         pageKey: "relatedBusinessRules",
         pageTtile: "关联业务规则",

@@ -12,11 +12,14 @@
         <div class="search-btn">
           <div style="width: 50%; float: right">
             <div class="inline-block-div" style="width: 75%">
-              <rtinput :item="{ placeholder: '请输入主条款名称或编码' }" />
+              <rtinput v-model="query.main" :item="{ placeholder: '请输入主条款名称或编码' }" />
             </div>
             <rtButton
               :item="{
                 icon: 'Search',
+                func: () => {
+                  mainRef.filter(query.main);
+                },
               }"
             />
           </div>
@@ -27,11 +30,14 @@
           <span style="font-size: 16px"> 请选择附加条款责任 </span>
           <div style="width: 50%; float: right">
             <div class="inline-block-div" style="width: 75%">
-              <rtinput :item="{ placeholder: '请输入附加条款名称或编码' }" />
+              <rtinput v-model="query.sub" :item="{ placeholder: '请输入附加条款名称或编码' }" />
             </div>
             <rtButton
               :item="{
                 icon: 'Search',
+                func: () => {
+                  additionalRef.filter(query.sub);
+                },
               }"
             />
           </div>
@@ -46,6 +52,7 @@
             node-key="id"
             show-checkbox
             :check-strictly="true"
+            :filter-node-method="mainfilterNode"
             :data="data1"
             @check-change="selectmainMethod"
           />
@@ -60,6 +67,7 @@
             node-key="id"
             show-checkbox
             :data="data2"
+            :filter-node-method="subfilterNode"
             :check-strictly="true"
             @check-change="selectadditionMethod"
           />
@@ -111,7 +119,7 @@
 <script setup lang="ts">
 import { qryProdRelTermRiskList, qryRelTermList } from "@/api/prod";
 import { useValidator } from "@/typings/useValidator";
-
+import { tremMap } from "@/pcis/prodRef/cvrgRef/trem-map-config.ts"
 const { getRules } = useValidator();
 import { ref, defineProps } from "vue";
 const emits = defineEmits(["handleClose"]);
@@ -134,6 +142,11 @@ const dataprops = {
   label: "label",
   disabled: 'disabled',
 };
+
+const query =ref({
+  main:"",
+  sub:""
+});
 
 const data1 = ref([]);
 const mainRef = ref<InstanceType<typeof ElTree>>();
@@ -190,6 +203,16 @@ const method = {};
 // 绑定特殊验证器
 const exRules = {};
 
+const mainfilterNode = (value: string, data: Tree) => {
+if (!value) return true
+  return data.label.includes(value);
+}
+
+const subfilterNode = (value: string, data: Tree) => {
+if (!value) return true
+  return data.label.includes(value);
+}
+
 onMounted(async () => {
   const param = props.data.data;
   qryProdRelTermRiskList(param).then((res: any) => {
@@ -197,6 +220,14 @@ onMounted(async () => {
     if (200 === code) {
       data1.value = data;
       data1.value.forEach((item: any) => { 
+        if(tremMap.value[item.cUniqueTermNo]){
+          const risks = tremMap.value[item.cUniqueTermNo];
+          item.children?.forEach((i: any) => {
+              if(risks.includes(i.cRiskNo)){
+                i.disabled = true;
+              }
+          });
+        }
         selectAdditionNodes.value.forEach(v=>{
           if(v.cRowId && v.cTermNo === item.cTermNo){
             item.disabled = true;
@@ -230,25 +261,33 @@ function setNode() {
       }
     });
   }
+  ignoreCheckChange = true;
   mainRef.value?.setCheckedKeys(addMainKey, false);
+  nextTick(()=>{
+    ignoreCheckChange = false;
+  })
 }
+
+let ignoreCheckChange = false;
 
 function selectmainMethod(a: any, b: any, c: any) {
   // 重新判断,如果勾选责任,自动勾选主条款,如果主条款被反选,自动取消对应责任反选
   let addMainKey: any[] = [];
   const tree = mainRef.value?.getCheckedNodes(false, true);
-  if (tree && tree.length > 0) {
+  if ( !ignoreCheckChange && tree && tree.length > 0) {
     tree.forEach((t: any) => {
       if (addMainKey.indexOf(t.id) === -1) {
         addMainKey.push(t.id);
       }
     });
     if (a.cTermNo) {
-      if (!b) {
-        a.children?.forEach((child: any) => {
+      a.children?.forEach((child: any) => {
+        if(b){
+          addMainKey.push(child.id);
+        }else{
           addMainKey = addMainKey.filter((node: any) => node !== child.id);
-        });
-      }
+        }
+      });
       mainRef.value?.setCheckedKeys(addMainKey, false);
     } else {
       if (b) {
