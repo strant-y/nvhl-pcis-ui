@@ -344,6 +344,8 @@ import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service"
 import { useRouter, useRoute } from "vue-router";
 import { getData } from "@/pcis/prodRef/dataInit";
 import { iconMap } from './iconMap';
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
 
 const policyService = new PolicyService();
 const productStore = useProductStore();
@@ -357,6 +359,7 @@ import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-lis
 const { saveData } = NewUdrListService();
 import {useUserStore} from "@/store";
 import { pa } from "element-plus/es/locale";
+import { initMultiCodeList } from "@/api/code-list-service";
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -1019,9 +1022,60 @@ const initPage = async () => {
   ) {
     opertaor.setReadOnly(formconfig11);
   }
+
+  const codeinit = getAllcodelist(formconfig11);
+  let codeparam = [];
+  
+  Object.keys(codeinit).forEach(res =>{
+    codeparam.push(codeinit[res]);
+  });
+  await getInitParam(codeparam);
+
   opertaor.setTableConfig(formconfig11);
   renderComponents();
 };
+
+async function getInitParam(codeparam){
+  const res = await initMultiCodeList(codeparam);
+  if(res.code === 200){
+    for(let i = 0; i < res.data.length ; i++){
+      codeListStore.setOptionsToCacheMap(res.data[i]['key'],res.data[i]['data']);
+    }
+  }
+  console.log(res);
+}
+
+function getAllcodelist(formconfig11){
+  let l = {};
+  if(formconfig11?.[0].pageInfo){
+    for(let i = 0; i < formconfig11[0].pageInfo.length; i++){
+      const schema = formconfig11[0].pageInfo[i].pageSchema;
+      if(schema && schema.fromSchema && schema.fromSchema.length>0){
+        for(let j = 0; j < schema.fromSchema.length; j++){
+          const sc = schema.fromSchema[j]; 
+          if((sc.inputtype === 'rtSelectV2' || sc.inputtype === 'rtselect') && !isDisabled(sc.disabled) && sc.typeCode){
+            const k = sc.typeCode + (sc.codeParam?sc.codeParam:'');
+            const m = {codeListName:sc.typeCode,codeListParam:sc.codeParam,source:k};
+            l[k] = m;
+          }
+        }
+      }
+    }
+  }
+  return l;
+}
+
+function isDisabled(v: any){
+if (
+    v === true ||
+    v === 1 ||
+    v === "1"
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+}
 
 const dataInit = ref({});
 /**

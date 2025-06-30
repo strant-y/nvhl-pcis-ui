@@ -89,6 +89,12 @@ function queryOnce(typeList: string[] = undefined){
   function queryCodeList(param: any, unAuthor: boolean = false, cache: boolean = false): Promise<OptionType[]>{
     return new Promise<OptionType[]> (async (resolve, reject) => {
       const result = ref<OptionType[]>([]);
+      const k = param.codeListName + ((param.codeListParam && Object.keys(param.codeListParam).length > 0) ? JSON.stringify(param.codeListParam):'');
+      const v = codeListMap.value[k];
+      if(codeListMap.value[k]){
+        resolve(codeListMap.value[k]);
+        return ;
+      }
       const cacheData = codeListMap.value[param.codeListName];
       if (!!cacheData) {
         // 缓存有数据就返回
