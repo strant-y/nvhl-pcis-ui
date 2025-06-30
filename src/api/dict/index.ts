@@ -8,7 +8,7 @@ import {
   DictForm,
   DictPageResult,
 } from "./types";
-import {post} from "@/utils/http";
+import {post,get} from "@/utils/http";
 import { LocalBaseApi } from "../config";
 
 /**
@@ -174,4 +174,18 @@ export function getRiskMapList(param: any): AxiosPromise  {
  */
 export function getEmpList(param: any): AxiosPromise  {
   return post(`/getEmpList`,param);
+}
+/**
+ * 获取制裁国家名单
+ *
+ */
+export function sanctionCountry(param: any): AxiosPromise<OptionType[]> {
+  return post( `/cargoInsurance/sanctionCountry`, param);
+}
+/**
+ * 获取水险再保提示
+ *
+ */
+export function insurancePolicies(): AxiosPromise<OptionType[]> {
+  return get( `/cargoInsurance/insurancePolicies`);
 }
