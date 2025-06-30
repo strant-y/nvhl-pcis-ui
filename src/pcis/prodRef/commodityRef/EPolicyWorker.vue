@@ -1,6 +1,7 @@
 <template>
     <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
-    <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef" @page-change="handleQuery(false)" />
+    <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
+        @page-change="handleQuery(false, false)" />
 </template>
 
 <script setup lang="ts">
@@ -65,7 +66,7 @@ const buttonList = [
         type: 'primary',
         label: '查询',
         func: async () => {
-            handleQuery()
+            handleQuery(false, true)
         }
     })
 ]
@@ -168,7 +169,7 @@ function getValue(key: string) {
 }
 
 /** 查询 */
-function handleQuery(flag?: boolean) {
+function handleQuery(flag?: boolean, isAlert?: boolean) {
     const plyNo = freeEditRef.value?.getValue('CPlyNo')
     const edrNo = freeEditRef.value?.getValue('CEdrNo')
     if (!plyNo && !edrNo) {
@@ -190,13 +191,19 @@ function handleQuery(flag?: boolean) {
     pcisQueryService
         .queryEmpEPolicyList(params)
         .then((res: any) => {
-            const { code, data } = res
+            const { code, data, msg } = res
             if (200 === code) {
                 pageresult.list = []
                 pageresult.list = data.result
                 pageresult.total = data.total
+                if (isAlert) {
+                    ElMessage.success(data.message)
+                }
+            } else {
+                ElMessage.warning(msg)
             }
-        })
+        }
+        )
         .finally(() => { })
 }
 
@@ -237,7 +244,7 @@ function generateEPolicy() {
         })
         .finally(() => {
             setButton(btn, false)
-            handleQuery()
+            handleQuery(false, false)
         })
 }
 

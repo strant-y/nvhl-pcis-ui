@@ -85,7 +85,7 @@ export function initMultiCodeList(ops: any) {
     return request.post(
         `/codelist/initMultiCodeList`,
         {
-            source: JSON.stringify(ops)
+            params: JSON.stringify(ops)
         }
     );
 }

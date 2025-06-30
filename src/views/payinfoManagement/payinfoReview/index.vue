@@ -95,7 +95,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   setFormItem("AccDpt", {
                     loadData: [
                       {
-                        label: selectObj.name,
+                        label: selectObj.id + ' ' + selectObj.name,
                         value: selectObj.id,
                       },
                     ],
@@ -319,7 +319,7 @@ onMounted(async () => {
     setFormItem("AccDpt", {
       loadData: [
         {
-          label: user.value['companyCnm'],
+          label: user.value['companyId'] + ' ' + user.value['companyCnm'],
           value: user.value['companyId'],
         },
       ],
