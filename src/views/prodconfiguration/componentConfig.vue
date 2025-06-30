@@ -118,7 +118,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           
 
           ElMessageBox.confirm(
-            '确认是否执行组件'+k+'的全量更新吗??',
+            '确认是否执行组件'+k+'的全量更新吗?',
             '提示',
             {
               confirmButtonText: '确认',
@@ -286,7 +286,7 @@ const tableconfig = reactive<AppTableConfig>(
         tableClick: (row: any) => {
           console.log(row);
           ElMessageBox.confirm(
-            '确认是否执行组件'+row.cComponentName+'的更新操作吗??',
+            '确认是否执行组件'+row.cComponentName+'的更新操作吗?',
             '提示',
             {
               confirmButtonText: '确认',

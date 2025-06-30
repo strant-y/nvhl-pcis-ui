@@ -515,6 +515,14 @@ const faters = ref({
   getndisAbleConfig: getndisAbleConfig,
 });
 
+
+function calcCheck(){
+  return {
+    res: true,
+    msg: "验证通过",
+  };
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
@@ -524,6 +532,7 @@ defineExpose({
   getFormconfig,
   setDisabledAll,
   setUnDisabledByKeyList,
+  calcCheck,
 });
 </script>
 

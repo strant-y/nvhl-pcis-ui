@@ -45,15 +45,15 @@ onMounted(() => {
 // 根据时间更改 短期费率系数 接口
 const nRatioCoefFunc = () => {
   const tabref = opertaor.getTableRefs();
-  const baseBefore = tabref["insrnc"].getFromValue();
-  const baseBefore2 = tabref["base"].getFromValue();
+  const baseBefore = tabref["insrnc"]?.getFromValue();
+  const baseBefore2 = tabref["base"]?.getFromValue();
   let prodNo = route.params.param.cProdNo;
 
   let param = {
     bgnTm: baseBefore["Base.tInsrncBgnTm"],
     endTm: baseBefore["Base.tInsrncEndTm"],
     prodNo,
-    ratioType: baseBefore2['Base.cRatioTyp']
+    ratioType: baseBefore2 ? baseBefore2['Base.cRatioTyp'] : null
   }
   policyRatio(param).then((res: any) => {
     const { code, data, msg } = res;
