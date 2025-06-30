@@ -928,6 +928,11 @@ const method = {
 
   //注册地市是否同上
   isSameChange: (val) => {
+    const param = opertaor.getParam();
+    if (param.initFlag) {
+      return ;
+    }
+    
     if (val == "1") {
       const ads = insuredEditRef?.value?.getValue("Insured.AllProp");
       const a =
