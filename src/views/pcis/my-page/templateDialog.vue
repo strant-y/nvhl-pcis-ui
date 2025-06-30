@@ -74,7 +74,7 @@ function confirmBtnFn() {
     if (r) {
       const param = {
         ...templateFreeEditRef.value?.getFromValue(),
-        cProdNo: props.data['plyBase']['Base.cProdNo'],
+        cProdNo: props.data?.cProdNo,
         cCrtCde: user.opCde,
         cUpdCde: user.opCde,
         cTplCtnt: JSON.stringify(props.data),
