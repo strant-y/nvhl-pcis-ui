@@ -3114,7 +3114,7 @@ function getSaveDataParams() {
   text-align: center;
   padding: 5px;
   background: #ebedfc;
-  width: 100%;
+  width: 100%!important;
   font-size: 16px;
 }
 </style>
