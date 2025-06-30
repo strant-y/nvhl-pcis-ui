@@ -331,6 +331,8 @@ import {
   submitEdrSurrender,
   calculatePremium,
   getAppPolicyForCopy,
+  saveInquiry,
+  submitInquiry,
 } from "../../../api/query/index";
 import { checkFeeWindowType, selectDist, saveDistBatch, getReleaseInquiryPage } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
@@ -1872,15 +1874,20 @@ const calcPremium = () => {
 //
       productStore.setnPrm(nPrmVal);
       productStore.setnAmt(nAmtVal);
-      opertaor
-        .getTableRefByKey("ciMasterAgreement")
-        .setValue("Base.nCiJntAmt", nAmt.value);
+      if(opertaor.getTableRefByKey("ciMasterAgreement")) {
+        opertaor
+          .getTableRefByKey("ciMasterAgreement")
+          .setValue("Base.nCiJntAmt", nAmt.value);
+        opertaor
+          .getTableRefByKey("ciMasterAgreement")
+          .setValue("Base.nCiJntPrm", nPrm.value);
+      }
       // opertaor
       //   .getTableRefByKey("ciMasterAgreement")
       //   .setValue("Base.nJiJntAmt", nAmt.value);
-      opertaor
-        .getTableRefByKey("ciMasterAgreement")
-        .setValue("Base.nCiJntPrm", nPrm.value);
+      // opertaor
+      //   .getTableRefByKey("ciMasterAgreement")
+      //   .setValue("Base.nCiJntPrm", nPrm.value);
       // opertaor
       //   .getTableRefByKey("ciMasterAgreement")
       //   .setValue("Base.nJiJntPrm", nPrm.value);
@@ -1908,7 +1915,7 @@ const calcPremium = () => {
       const payInfo = setPayInfo(ops["base"], ops["applicant"], ops["insrnc"]);
 
       console.log("生成缴费计划内容", payInfo);
-      opertaor.getTableRefs()["payinfo"].setFormValue(payInfo);
+      opertaor.getTableRefs()["payinfo"]?.setFormValue(payInfo);
       // const ciInfo = setCiInfo(ops["base"]);
       // opertaor.getTableRefs()["ci"].setFormValue(ciInfo); //生产联共保信息
       needCalc.value = false;
@@ -1996,6 +2003,12 @@ const submitToUndrFn = async () => {
       res["user"] = user;
       res["appNo"] = base["Base.cAppNo"];
 
+      // 询价单申请核保参数
+      if(props.param?.pageName === "priceInquiry") {
+        res["taskId"] = 0;
+        res["openPolicy"] = null;
+      }
+
       console.log("申请核保参数-----", res);
 
       const params = opertaor.getParam();
@@ -2037,7 +2050,7 @@ const submitToUndrFn = async () => {
           const newPrm = newOp.base["Base.nPrm"];
           const oldPrm = calcData.base["Base.nPrm"];
           if (newPrm === oldPrm) {
-            const undr: any = await submitToUndr(res);
+            const undr: any = props.param?.pageName === "priceInquiry" ? await submitInquiry(res) : await submitToUndr(res);
             btn.loading = false;
             console.log("submitToUndr-res", undr);
             if (undr["code"] == 200) {
@@ -2144,7 +2157,7 @@ const savePlyInfo = async () => {
   let payList = res.payinfo;
   // Base.nPrm
   // payinfo
-  if(payList.length>0){
+  if(payList && payList.length>0){
       let numS =0;
         payList.forEach((item) => {
         numS+= item['Pay.nPayablePrm']
@@ -2188,8 +2201,13 @@ const savePlyInfo = async () => {
     btn.loading = false;
     return false;
   }
+  // 询价单需要把cAppNo换成cInquiryNo
+  let priceInquiryParam;
+  if(props.param?.pageName === "priceInquiry") {
+    priceInquiryParam = replacecInquiryNo(res)
+  }
 
-  const resInfo: any = await saveAppPlyInfo(res);
+  const resInfo: any = props.param?.pageName === "priceInquiry" ? await saveInquiry(priceInquiryParam) : await saveAppPlyInfo(res);
   console.log("saveAppPlyInfo-res", resInfo);
   btn.loading = false;
   if (resInfo["code"] == "200") {
@@ -3074,6 +3092,41 @@ function getSaveDataParams() {
     param[0].plyRiskUnitCvrgObjList[0].nPrm = edrbase.value?.getValue('EdrBase.nPrm')
   }
    return param;
+}
+
+// 询价保存入参中cAppNo替换为cInquiryNo
+function replacecInquiryNo(res:any) {
+  let data = null;
+  if(res instanceof Array) {
+    data = [...res]
+    data.forEach((item:any) => {
+      item = replacecInquiryNo(item)
+    })
+  } else if(res instanceof Object) {
+    data = {...res}
+    for (const key in data) {
+      if(data[key] instanceof Object || data[key] instanceof Array) {
+        data[key] = replacecInquiryNo(data[key])
+      } else if (data.hasOwnProperty(key)) {
+        if(key.indexOf('.') !== -1) {
+          const k0 = key.split('.')[0];
+          const k1 = key.split('.')[1];
+          if(k1.indexOf('cAppNo') !== -1) {
+            data[`${k0}.cInquiryNo`] = data[key]
+            delete data[key]
+          }
+        } else {
+          if(key === "cAppNo") {
+            data['cInquiryNo'] = data[key]
+            delete data[key]
+          }
+        }
+      }
+    }
+  } else {
+    data = res
+  }
+  return data;
 }
 </script>
 
