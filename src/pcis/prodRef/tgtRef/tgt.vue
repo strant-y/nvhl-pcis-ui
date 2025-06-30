@@ -72,6 +72,8 @@ onMounted(async () => {
     method,
     exRules
   );
+
+  console.log('------------',props.pageSchema)
   if(params.cProdNo === '045001'){
     formconfig11.fromSchema?.forEach(item=>{
       if(item['prop'] ==='Tgt.cInsuranceMethod'){
@@ -98,6 +100,10 @@ onMounted(async () => {
   });
   setFormItem("Tgt.nCarsNumber", {
     rules: [getRules("required", {'trigger':'blur'}),getRules("positiveNumber", {})],
+  });
+
+  setFormItem("Tgt.cContactNumber", {
+    rules: [getRules("phoneNo", {})],
   });
 });
 
