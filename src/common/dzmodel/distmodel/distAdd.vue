@@ -177,6 +177,7 @@ onMounted(() => {
           setValue('Dist.nAge', age);
         }
       }
+      item['rules'] = [getRules("idCard", {})];
     }
 
         // 身份证类型自动回填年龄
