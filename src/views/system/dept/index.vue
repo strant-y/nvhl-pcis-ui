@@ -216,7 +216,7 @@ const total = ref(0); // 数据总数
 const queryParams = reactive<DeptQuery>({
   pageNum: 1,
   pageSize: 10,
-  subordinate: false,
+  subordinate: true,
 });
 const deptList = ref<DeptVO[]>();
 
