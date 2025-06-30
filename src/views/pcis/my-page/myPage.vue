@@ -1874,15 +1874,20 @@ const calcPremium = () => {
 //
       productStore.setnPrm(nPrmVal);
       productStore.setnAmt(nAmtVal);
-      opertaor
-        .getTableRefByKey("ciMasterAgreement")
-        .setValue("Base.nCiJntAmt", nAmt.value);
+      if(opertaor.getTableRefByKey("ciMasterAgreement")) {
+        opertaor
+          .getTableRefByKey("ciMasterAgreement")
+          .setValue("Base.nCiJntAmt", nAmt.value);
+        opertaor
+          .getTableRefByKey("ciMasterAgreement")
+          .setValue("Base.nCiJntPrm", nPrm.value);
+      }
       // opertaor
       //   .getTableRefByKey("ciMasterAgreement")
       //   .setValue("Base.nJiJntAmt", nAmt.value);
-      opertaor
-        .getTableRefByKey("ciMasterAgreement")
-        .setValue("Base.nCiJntPrm", nPrm.value);
+      // opertaor
+      //   .getTableRefByKey("ciMasterAgreement")
+      //   .setValue("Base.nCiJntPrm", nPrm.value);
       // opertaor
       //   .getTableRefByKey("ciMasterAgreement")
       //   .setValue("Base.nJiJntPrm", nPrm.value);
