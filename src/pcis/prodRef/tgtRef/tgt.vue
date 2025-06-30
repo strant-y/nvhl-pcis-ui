@@ -72,6 +72,8 @@ onMounted(async () => {
     method,
     exRules
   );
+
+  console.log('------------',props.pageSchema)
   if(params.cProdNo === '045001'){
     formconfig11.fromSchema?.forEach(item=>{
       if(item['prop'] ==='Tgt.cInsuranceMethod'){
@@ -98,6 +100,10 @@ onMounted(async () => {
   });
   setFormItem("Tgt.nCarsNumber", {
     rules: [getRules("required", {'trigger':'blur'}),getRules("positiveNumber", {})],
+  });
+
+  setFormItem("Tgt.cContactNumber", {
+    rules: [getRules("phoneNo", {})],
   });
 });
 
@@ -211,6 +217,14 @@ const method = {
         rules: null
       });
     }
+  },
+  getcIsExcludingChange:()=>{
+    dialog.value?.open('reinsuranceTips', null,
+        null,{width: 45,title:'水险再保提示'});
+  },
+  getcSanctionAreasChange:()=>{
+    dialog.value?.open('detailsKnows', null,
+        null,{width: 45,title:'战争及罢工险核保限制和运输地国家限制'});
   },
   gettCompletionYearChange:(val:string)=>{
     const currentYear = new Date().getFullYear();

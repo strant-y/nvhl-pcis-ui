@@ -132,6 +132,9 @@ function setFormItem(key: any, obj: any) {
 
 // 解析身份证
 const idAnalysis = (id:string)=>{
+      if (  id.length !== 18) {
+        return false
+      }
       // const certfCde = tabref["insured"].getFromValue()["Insured.cCertfCde"];
       //   if (certfCde && certfCde.length === 18) {
           const birthYear = parseInt(id.substring(6, 10), 10);
@@ -146,6 +149,8 @@ const idAnalysis = (id:string)=>{
           setValue("Insured.tBirthday", birthday);
           setValue("Insured.nAge", age);
           setValue("Insured.cSex", sex);
+
+           clearValidate('Insured.cCertfCde') 
         // }
 }
 
@@ -181,6 +186,9 @@ const checkUser = () => {
           console.log('客户数据', res)
           if (data) {
             tabref['insured'].setFormValue(data[0])
+            
+            let userId = getValue('Insured.cCertfCde')
+            idAnalysis(userId)
           }
         } else {
         }
@@ -744,6 +752,8 @@ const method = {
   InsuredCCertfCls: (val: any) => {
     console.log(val)
     checkUser();
+        // 清除报错信息
+    clearValidate('Insured.cCertfCde')  
     const param = opertaor.getParam();
     console.log(param)
     if (!param.initFlag) {
@@ -799,9 +809,9 @@ const method = {
       setFormItem("Insured.tCertfBgnDate", {
         rules: [getRules("required", {})],
       });
-      // setFormItem("Insured.tCertfEndDate", {
-      //   rules: [getRules("required", {})],
-      // });
+      setFormItem("Insured.cCertfCde", {
+        rules: [getRules("required", {}),getRules("passPort", {})],
+      });
     } else if (val == "110007") {
       setFormItem("Insured.tCertfBgnDate", {
         rules: [getRules("required", {})],
@@ -826,9 +836,6 @@ const method = {
       setFormItem("Insured.cOrganizationCode", {
           disabled: true,
       });
-
-
-
     } else if(val === '120002'){
       // 护照
       setFormItem("Insured.cCertfCde", {
@@ -841,7 +848,7 @@ const method = {
         rules: [getRules("required", {}),getRules("ariCard", {})],
       });
     } else {
-      setFormItem("Insured.cCertfCde", {
+      setFormItem("Insured.cCertfCde", { 
         rules: [getRules("required", {})],
       });
       setFormItem("Insured.tCertfBgnDate", { rules: null });
@@ -917,7 +924,7 @@ const method = {
       if (val) {
         const certfCde = tabref["insured"].getFromValue()["Insured.cCertfCde"];
         if (certfCde && certfCde.length === 18) {
-          idAnalysis(certfCde)
+          // idAnalysis(certfCde)
         }
       }
     }else if(cCertfCls =='110007'){
@@ -928,6 +935,11 @@ const method = {
 
   //注册地市是否同上
   isSameChange: (val) => {
+    const param = opertaor.getParam();
+    if (param.initFlag) {
+      return ;
+    }
+    
     if (val == "1") {
       const ads = insuredEditRef?.value?.getValue("Insured.AllProp");
       const a =
@@ -991,10 +1003,46 @@ const method = {
             });
       }
   },
+  // 办理人员证件种类
+  cOperaterCertfTypChange:(val: any)=>{
+    // 清除报错信息
+    clearValidate('Insured.cOperaterCertfCde')  
+
+    //  身份证
+    if (val == "120001") { 
+        setFormItem("Insured.cOperaterCertfCde", {
+              rules: [getRules("idCard", {}),],
+            });
+    } else if ( val == "110007") {   
+      // 统一社会信用代码校验
+           setFormItem("Insured.cOperaterCertfCde", {
+              rules: [getRules("socialCode", {}),],
+            });
+    } else if(val == "19"){
+      // 外国人证件号
+           setFormItem("Insured.cOperaterCertfCde", {
+              rules: [getRules("ariCard", {}),],
+            });
+    } else if (val == "120002") {
+      // 护照
+        setFormItem("Insured.cOperaterCertfCde", {
+              rules: [getRules("passPort", {}),],
+            });
+    }else if(val =='110001'){
+      // 组织机构编码校验
+           setFormItem("Insured.cOperaterCertfCde", {
+              rules: [getRules("orgCode", {}),],
+            });
+    } else {
+           setFormItem("Insured.cOperaterCertfCde", {
+              rules: [],
+            });
+    }
+  },
     // 证件有效起期
   tCertfBgnDateDisable:(date:any)=>{
     const fs = insuredEditRef?.value?.getFromValue();
-    if (JSON.stringify(fs) !== '{}') {
+    if (fs && JSON.stringify(fs) !== '{}') {
     // if (JSON.stringify(fs) !== '{}') {
  
       const endDate = new Date(fs["Insured.tCertfEndDate"] || '')   // 结束时间 
@@ -1008,7 +1056,7 @@ const method = {
   // 证件有效止期
   tCertfEndDateDisable:(date:any)=>{
     const fs = insuredEditRef?.value?.getFromValue();
-    if (JSON.stringify(fs) !== '{}') {
+    if (fs && JSON.stringify(fs) !== '{}') {
       const startDate = new Date(fs["Insured.tCertfBgnDate"] || '')   // 开始时间   
 
       let maxDate = dayjs(startDate).valueOf();
@@ -1081,6 +1129,12 @@ function getValue(key: string) {
 function getFormconfig() {
   return formconfig1;
 }
+
+
+function clearValidate(key=null) {
+  insuredEditRef?.value?.clearValidate(key);
+}
+
 function handleFileChange(event: Event) {
   const fileInput = event.target as HTMLInputElement;
   if (fileInput.files && fileInput.files.length > 0) {
@@ -1194,6 +1248,7 @@ defineExpose({
   setValue,
   getValue,
   getFormconfig,
+  clearValidate,
 });
 </script>
 

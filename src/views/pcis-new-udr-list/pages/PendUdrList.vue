@@ -221,6 +221,7 @@
             typeCode: "KIND_LIST_GRT",
             params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
             clearable: true,
+             multiple:1,
             func: (val: any) => {
                 //根据产品大类再次请求条款接口
                 codeListStore
@@ -261,6 +262,7 @@
             title: "条款",
             showKey: [1, 2, 3, 4, 5],
             typeCode: "TERM_LIST_IN_GUIDE_NEW",
+            multiple:1,
             params: {
                 cParCde: "",
                 cOperId: user.value.opCde,
@@ -273,6 +275,7 @@
             prop: "undrClsCde",
             inputtype: "rtSelectV2",
             title: "核保级别",
+             
             showKey: [1, 2],
             typeCode: "WEB_SYS_STA_DICT",
             params: { cDptCde: user.value.companyId, cEmpCde: user.value.opCde },
@@ -315,7 +318,7 @@
         {
             prop: "tm2",
             inputtype: "rtdatepicker",
-            title: "提核日期",
+            title: "核保日期",
             rules: [],
             itemWidth: 1,
             showKey: [1, 2],
@@ -895,6 +898,7 @@
     };
 
     const changeForm = (val: any) => {
+            console.log(val);
         freeEditRef.value?.resetFields();
         // resetForm();
         freeEditRef.value?.setFormValue({
@@ -917,7 +921,7 @@
             }
             allForm.value.map((item: any, index: number) => {
                 const isVal = item.showKey.findIndex((vals: any) => vals == val);
-                console.log(isVal);
+            
                 if (isVal !== -1) {
                     if (item.prop == "tm1") {
                         item.rules =
@@ -993,8 +997,11 @@
             if (
                 udrTypeValue.value == "1" ||
                 udrTypeValue.value == "2" ||
+                udrTypeValue.value == "3" ||
+                udrTypeValue.value == "4" ||
                 udrTypeValue.value == "5"
-            ) {
+            ) {  
+                  console.log(133,udrTypeValue.value)
                 if (udrTypeValue.value == "1" || udrTypeValue.value == "2") {
                     freeEditRef.value?.setValue("inNextDpt", "1");
                     freeEditRef.value?.setValue("tm2", [
@@ -1003,15 +1010,59 @@
                         ),
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
                     ]);
+
+                       freeEditRef.value?.setValue("tm1", [
+                        moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
+                            "YYYY-MM-DD 00:00:00"
+                        ),
+                        moment(new Date()).format("YYYY-MM-DD 23:59:58"),
+                    ]);
                 }
+                
+                 if (udrTypeValue.value == "3") {
+                    freeEditRef.value?.setValue("CLoadSub", 1);
+                        freeEditRef.value?.setValue("tm1", [
+                        moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
+                            "YYYY-MM-DD 00:00:00"
+                        ),
+                        moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+                    ]);
+                }
+                 if (udrTypeValue.value == "4") {
+                    freeEditRef.value?.setValue("CLoadSub", 1);
+                        freeEditRef.value?.setValue("tm1", [
+                        moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
+                            "YYYY-MM-DD 00:00:00"
+                        ),
+                        moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+                    ]);
+                }
+
                 if (udrTypeValue.value == "5") {
                     freeEditRef.value?.setValue("CLoadSub", 1);
+                        freeEditRef.value?.setValue("tm1", [
+                        moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
+                            "YYYY-MM-DD 00:00:00"
+                        ),
+                        moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+                    ]);
                 }
             }
         });
     };
 
     onMounted(async () => {
+         freeEditRef.value?.setFormValue({
+            udrType: "1",
+            inNextDpt: "1",
+            tm1: [
+                moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
+                    "YYYY-MM-DD 00:00:00"
+                ),
+                moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+            ],
+        });
+
         freeEditRef.value?.setFormValue({
             udrType: "1",
             inNextDpt: "1",
@@ -1042,7 +1093,10 @@
         allForm.value.map((item: any, index: number) => {
             const isVal = item.showKey.findIndex((vals: any) => vals == 1);
             if (isVal !== -1) {
+                       console.log('123122',item)
                 if (item.prop == "tm1") item.rules = [];
+                
+
                 if (item.prop == "tm2") item.rules = [getRules("required", {})];
                 formObj.notWaitObj.fromSchema.value.push(item);
             }
@@ -1062,6 +1116,7 @@
                 //核保退回任务
                 changeForm("4"); //展示form表单不同的栏位
             }
+            console.log('123123',homeJumpData)
             // 投保日期
             freeEditRef.value.setValue("tm1", [
                 homeJumpData.startCrtTm,

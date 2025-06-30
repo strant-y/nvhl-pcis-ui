@@ -11,7 +11,11 @@
               class="NavigaList_card"
             >
               <el-anchor :bound="120" :offset="80">
-                <el-anchor-link :href="`#underwriteurl`" v-if="underwriteFlag">
+                <el-anchor-link
+                  v-if="underwriteFlag"
+                  @click="handleAnchorClick($event, `#underwriteurl`)"
+                  class="isActive"
+                >
                   <!-- <rt-icon
                     :item="{ icon: 'Tickets' }"
                   /> -->
@@ -23,6 +27,7 @@
                 <el-anchor-link
                   v-if="edrbaseFlag"
                   @click="handleAnchorClick($event, `#edrbase`)"
+                  class="isActive"
                 >
                   <!-- <rt-icon
                     :item="{ icon: 'Tickets' }"
@@ -61,7 +66,7 @@
                       : true
                   "
                   @click="handleAnchorClick($event, `#${k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey}`)"
-                  :class="i === 0 ? 'isActive' : ''"
+                  :class="!underwriteFlag && !edrbaseFlag && !edritemFlag && i === 0 ? 'isActive' : ''"
                 >
                   <!-- <rt-icon
                     :item="{
@@ -138,10 +143,10 @@
           </div>
         <!-- </el-affix> -->
       </el-aside>
-      <el-main>
+      <el-main style="margin-top: 58px;">
         <el-affix
           :offset="80"
-          style="text-align: center; padding: 5px; background: #ebedfc;width: 100%;font-size: 16px;"
+          class="affix-main-header"
         >
           <div class="tp" style="background: #ebedfc">
             <span class="font-weight-500">条款：</span
@@ -326,10 +331,13 @@ import {
   submitEdrSurrender,
   calculatePremium,
   getAppPolicyForCopy,
+  saveInquiry,
+  submitInquiry,
 } from "../../../api/query/index";
 import { checkFeeWindowType, selectDist, saveDistBatch, getReleaseInquiryPage } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
 import moment from "moment";
+import {numAdd, numComparison, numMulti, numSubp, tool_fix} from "@/utils/Math";
 import dayjs from "dayjs";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
@@ -1866,15 +1874,20 @@ const calcPremium = () => {
 //
       productStore.setnPrm(nPrmVal);
       productStore.setnAmt(nAmtVal);
-      opertaor
-        .getTableRefByKey("ciMasterAgreement")
-        .setValue("Base.nCiJntAmt", nAmt.value);
+      if(opertaor.getTableRefByKey("ciMasterAgreement")) {
+        opertaor
+          .getTableRefByKey("ciMasterAgreement")
+          .setValue("Base.nCiJntAmt", nAmt.value);
+        opertaor
+          .getTableRefByKey("ciMasterAgreement")
+          .setValue("Base.nCiJntPrm", nPrm.value);
+      }
       // opertaor
       //   .getTableRefByKey("ciMasterAgreement")
       //   .setValue("Base.nJiJntAmt", nAmt.value);
-      opertaor
-        .getTableRefByKey("ciMasterAgreement")
-        .setValue("Base.nCiJntPrm", nPrm.value);
+      // opertaor
+      //   .getTableRefByKey("ciMasterAgreement")
+      //   .setValue("Base.nCiJntPrm", nPrm.value);
       // opertaor
       //   .getTableRefByKey("ciMasterAgreement")
       //   .setValue("Base.nJiJntPrm", nPrm.value);
@@ -1902,7 +1915,7 @@ const calcPremium = () => {
       const payInfo = setPayInfo(ops["base"], ops["applicant"], ops["insrnc"]);
 
       console.log("生成缴费计划内容", payInfo);
-      opertaor.getTableRefs()["payinfo"].setFormValue(payInfo);
+      opertaor.getTableRefs()["payinfo"]?.setFormValue(payInfo);
       // const ciInfo = setCiInfo(ops["base"]);
       // opertaor.getTableRefs()["ci"].setFormValue(ciInfo); //生产联共保信息
       needCalc.value = false;
@@ -1990,6 +2003,12 @@ const submitToUndrFn = async () => {
       res["user"] = user;
       res["appNo"] = base["Base.cAppNo"];
 
+      // 询价单申请核保参数
+      if(props.param?.pageName === "priceInquiry") {
+        res["taskId"] = 0;
+        res["openPolicy"] = null;
+      }
+
       console.log("申请核保参数-----", res);
 
       const params = opertaor.getParam();
@@ -2008,6 +2027,14 @@ const submitToUndrFn = async () => {
         btn.loading = false;
         return;
       }
+      //校验联共保信息
+      const ciValue = opertaor.getTableRefByKey("Ci")?.getFromValue() || '';
+      console.log('ciValue', ciValue);
+      // const isCiValid = validateCiInfo();
+      // if (!isCiValid) {
+      //   btn.loading = false;
+      //   return;
+      // }
       const calcData: any = opertaor.getDataAll();
       calcData["user"] = user;
       calcData["plyBase"]["Base.cDptCde"] = params.cDptCde;
@@ -2023,7 +2050,7 @@ const submitToUndrFn = async () => {
           const newPrm = newOp.base["Base.nPrm"];
           const oldPrm = calcData.base["Base.nPrm"];
           if (newPrm === oldPrm) {
-            const undr: any = await submitToUndr(res);
+            const undr: any = props.param?.pageName === "priceInquiry" ? await submitInquiry(res) : await submitToUndr(res);
             btn.loading = false;
             console.log("submitToUndr-res", undr);
             if (undr["code"] == 200) {
@@ -2130,7 +2157,7 @@ const savePlyInfo = async () => {
   let payList = res.payinfo;
   // Base.nPrm
   // payinfo
-  if(payList.length>0){
+  if(payList && payList.length>0){
       let numS =0;
         payList.forEach((item) => {
         numS+= item['Pay.nPayablePrm']
@@ -2174,8 +2201,13 @@ const savePlyInfo = async () => {
     btn.loading = false;
     return false;
   }
+  // 询价单需要把cAppNo换成cInquiryNo
+  let priceInquiryParam;
+  if(props.param?.pageName === "priceInquiry") {
+    priceInquiryParam = replacecInquiryNo(res)
+  }
 
-  const resInfo: any = await saveAppPlyInfo(res);
+  const resInfo: any = props.param?.pageName === "priceInquiry" ? await saveInquiry(priceInquiryParam) : await saveAppPlyInfo(res);
   console.log("saveAppPlyInfo-res", resInfo);
   btn.loading = false;
   if (resInfo["code"] == "200") {
@@ -2732,7 +2764,52 @@ const submitUnderwritingFn = () => {
     // history.back();
   });
 };
-
+/**
+ * 投保申请核保时校验联共保信息
+ */
+const validateCiInfo = () => {
+  debugger;
+  const ciData = opertaor.getTableRefByKey("Ci").getFromValue()
+  if (ciData.value) {
+      let NCiShare = 0;
+      let chiefMrkM = 0; // 主
+      let chiefMrkS = 0; // 从
+      let CCoinsurerCdeNum = 0; // 分公司份额
+      for (const ciRow of ciData.items) {
+        if (ciRow) {
+          NCiShare = numAdd(NCiShare, parseFloat(ciRow["Ci.nCiShare"] || 0));
+          if ("327001" === ciRow["Ci.cCoinsurerCde"]) {
+            CCoinsurerCdeNum++;
+          }
+          if ("1" === ciRow["Ci.cChiefMrk"]) {
+            chiefMrkM++;
+          } else {
+            chiefMrkS++;
+          }
+        }
+      }
+      if (chiefMrkM === 0 || chiefMrkS === 0) {
+        ElMessage.error("主/从共保信息不完整!");
+        return false;
+      }
+      if (NCiShare !== 100.0) {
+        ElMessage.error("共保比例和应为100%!");
+        return false;
+      }
+      if (chiefMrkM > 1) {
+        ElMessage.error("主共保信息只允许增加一条!");
+        return false;
+      }
+      if (CCoinsurerCdeNum <= 1) {
+        ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
+        return false;
+      }
+    } else {
+      ElMessage.error("请录入共保信息!");
+      return false;
+    }
+  return true;
+};
 // 将对象的属性首字母转换为小写
 function lowercaseKeys<T extends object>(
   obj: T
@@ -2858,7 +2935,7 @@ function handleAnchorClick(event: any, targetId: string) {
     if (targetElement) {
       targetElement.scrollIntoView({ 
         behavior: 'smooth', 
-        block: 'center' // 可选值：'start', 'center', 'end', 'nearest'
+        block: 'start' // 可选值：'start', 'center', 'end', 'nearest'
       });
     }
   }
@@ -2888,7 +2965,7 @@ function handleSaveTemplate() {
     }
   }
   dzmodal
-    .open(templateDialog, { type: "", data: res })
+    .open(templateDialog, { type: "", data: {...res, cProdNo: props.param?.cProdNo} })
     .then((res: any) => {
       if (res.type === "ok") {
       }
@@ -3016,6 +3093,41 @@ function getSaveDataParams() {
   }
    return param;
 }
+
+// 询价保存入参中cAppNo替换为cInquiryNo
+function replacecInquiryNo(res:any) {
+  let data = null;
+  if(res instanceof Array) {
+    data = [...res]
+    data.forEach((item:any) => {
+      item = replacecInquiryNo(item)
+    })
+  } else if(res instanceof Object) {
+    data = {...res}
+    for (const key in data) {
+      if(data[key] instanceof Object || data[key] instanceof Array) {
+        data[key] = replacecInquiryNo(data[key])
+      } else if (data.hasOwnProperty(key)) {
+        if(key.indexOf('.') !== -1) {
+          const k0 = key.split('.')[0];
+          const k1 = key.split('.')[1];
+          if(k1.indexOf('cAppNo') !== -1) {
+            data[`${k0}.cInquiryNo`] = data[key]
+            delete data[key]
+          }
+        } else {
+          if(key === "cAppNo") {
+            data['cInquiryNo'] = data[key]
+            delete data[key]
+          }
+        }
+      }
+    }
+  } else {
+    data = res
+  }
+  return data;
+}
 </script>
 
 <style lang="scss" scoped>
@@ -3102,5 +3214,14 @@ function getSaveDataParams() {
 }
 .font-weight-500 {
   font-weight: 500;
+}
+.affix-main-header {
+  position: absolute;
+  top: 0;
+  text-align: center;
+  padding: 5px;
+  background: #ebedfc;
+  width: 100%!important;
+  font-size: 16px;
 }
 </style>
