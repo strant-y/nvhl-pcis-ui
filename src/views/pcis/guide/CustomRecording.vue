@@ -568,6 +568,9 @@ function handleRecordTypeChange(val:any) {
   formconfig1.value.cTermNo = "";
   formconfig1.value.cProdNo = "";
   formconfig1.value.cProdNme = "";
+  formconfig1.value.tpl = null;
+  formconfig1.value.seldef = "";
+  tplOptions.value = [];
 }
 
 // 模板下拉选项
