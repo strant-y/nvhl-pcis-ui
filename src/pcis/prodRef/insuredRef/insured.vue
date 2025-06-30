@@ -159,9 +159,10 @@ const idAnalysis = (id:string)=>{
 //  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
 const checkUser = () => {
   // 自定义录单 进入 可以查询用户信息
-  if (param.cRecordType !== 1) {
+  if (param.cRecordType !== 1 && param.cRecordType !== 2) {
     return false;
   }
+  
 
   const tabref = opertaor.getTableRefs();
   const applicantValue = tabref["insured"].getFromValue();

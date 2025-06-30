@@ -157,7 +157,8 @@ const idAnalysis = (id:string)=>{
 
 //  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
 const checkUser = () => {
-if (param.cRecordType !== 1) {
+  console.log('param',param)
+if (param.cRecordType !== 1 && param.cRecordType !== 2 ) {
     return false;
   }
 const tabref = opertaor.getTableRefs();
@@ -289,7 +290,10 @@ const method = {
   },
 
   cardTypeChange: (val) => {
-    console.log(val)
+
+       const tabref = opertaor.getTableRefs();
+    const applicantValue = tabref["applicant"].getFromValue();
+    console.log(val,applicantValue)
     checkUser();
     // 清除报错信息
     clearValidate('Applicant.cCertfCde')  
