@@ -111,6 +111,12 @@
                 <tr class="table-title">
                   <template v-for="(item, k) in termFactormap" :key="k">
                     <th v-if="item.cPorpShowtitle !== '1'" :style="{ width: item.cPropHeight?item.cPropHeight+'px':null }">
+                      <el-text
+                        v-if="isrequired(item)"
+                        class="mx-1"
+                        style="margin-right: 2px"
+                        type="danger"
+                        >*</el-text>
                       {{ item.title }}
                     </th>
                   </template>

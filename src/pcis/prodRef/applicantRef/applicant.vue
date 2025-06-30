@@ -737,7 +737,7 @@ const method = {
         method: {
           getdbClickData: (data) => {
             setFormItem("Applicant.cOccupCde", {
-              loadData: [{ label: data.cnm, value: data.cde }],
+              loadData: [{ label: `${data.cde} ${data.cnm}`, value: data.cde }],
             });
             setValue("Applicant.cOccupCde", data.cde);
             dialog.value?.handleClose();
@@ -905,6 +905,11 @@ const method = {
   },
   //注册地市是否同上
   isSameChange: (val) => {
+    const param = opertaor.getParam();
+    if (param.initFlag) {
+      return ;
+    }
+    
     if (val == "1") {
       const ads = applicantEditRef?.value?.getValue("Applicant.AllProp");
       const a =
@@ -1007,8 +1012,8 @@ const method = {
   },
   // 证件有效起期
   tCertfBgnDateDisable:(date:any)=>{
-    const fs = applicantEditRef?.value?.getFromValue();
-    if (JSON.stringify(fs) !== '{}') {
+    const fs = applicantEditRef.value?.getFromValue();
+    if (fs && JSON.stringify(fs) !== '{}') {
 
       const endDate = new Date(fs["Applicant.tCertfEndDate"] || '')   // 结束时间 
       let minDate = dayjs(endDate).valueOf();
@@ -1021,7 +1026,7 @@ const method = {
   // 证件有效止期
   tCertfEndDateDisable:(date:any)=>{
     const fs = applicantEditRef?.value?.getFromValue();
-    if (JSON.stringify(fs) !== '{}') {
+    if (fs && JSON.stringify(fs) !== '{}') {
       const startDate = new Date(fs["Applicant.tCertfBgnDate"]|| '')   // 开始时间   
       let maxDate = dayjs(startDate).valueOf();
         return   date.getTime() < maxDate
