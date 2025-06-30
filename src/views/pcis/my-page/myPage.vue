@@ -3019,7 +3019,7 @@ function handleSaveTemplate() {
     }
   }
   dzmodal
-    .open(templateDialog, { type: "", data: res })
+    .open(templateDialog, { type: "", data: {...res, cProdNo: props.param?.cProdNo} })
     .then((res: any) => {
       if (res.type === "ok") {
       }
