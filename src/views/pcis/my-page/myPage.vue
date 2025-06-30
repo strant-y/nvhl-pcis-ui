@@ -990,7 +990,14 @@ const initPage = async () => {
   }
   // 页面初始化
   const formconfig11 = JSON.parse(getProductRes.data);
-
+  // 初始化全页面下拉选一次性获取,解决页面响应效率
+  const codeinit = getAllcodelist(formconfig11);
+  let codeparam = [];
+  
+  Object.keys(codeinit).forEach(res =>{
+    codeparam.push(codeinit[res]);
+  });
+  await getInitParam(codeparam);
   // if(productStore.$state.cCiMrk == "0"){
   //   formconfig11[0].pageInfo = formconfig11[0].pageInfo.filter(
   //     (item) => item.pageTtile !== "联共保主协议信息" && item.pageTtile !== "联共保信息" && item.pageTtile !== "我司联共保份额信息"
@@ -1022,14 +1029,6 @@ const initPage = async () => {
   ) {
     opertaor.setReadOnly(formconfig11);
   }
-
-  const codeinit = getAllcodelist(formconfig11);
-  let codeparam = [];
-  
-  Object.keys(codeinit).forEach(res =>{
-    codeparam.push(codeinit[res]);
-  });
-  await getInitParam(codeparam);
 
   opertaor.setTableConfig(formconfig11);
   renderComponents();
