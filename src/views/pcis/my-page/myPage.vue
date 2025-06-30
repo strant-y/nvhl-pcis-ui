@@ -1891,6 +1891,15 @@ const calcPremium = () => {
     btn.loading = false;
     return;
   }
+  
+  const termref = opertaor.getTableRefByKey("cvrg");
+  const calccheck = termref.calcCheck();
+  if(!calccheck['res']){
+    console.log(calccheck);
+    ElMessage.error(calccheck['msg']);
+    btn.loading = false;
+    return;
+  }
   if (!baseValite()) {
     btn.loading = false;
     return;

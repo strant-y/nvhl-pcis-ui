@@ -669,6 +669,24 @@ const faters = ref({
   getndisAbleConfig: getndisAbleConfig,
 });
 
+function calcCheck(){
+  let r = true;
+  let m = "";
+  Object.keys(planData.value).forEach((k)=>{
+    if(planData.value[k].length === 0){
+      r = false;
+      m = k;
+    }
+  });
+  let res = {};
+  res['res'] = r;
+  res['msg'] = '验证通过';
+  if(!r){
+    res['msg'] =m + '方案未添加条款!请先添加条款!';
+  }
+  return res;
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
@@ -678,6 +696,7 @@ defineExpose({
   getFormconfig,
   setDisabledAll,
   setUnDisabledByKeyList,
+  calcCheck
 });
 </script>
 
