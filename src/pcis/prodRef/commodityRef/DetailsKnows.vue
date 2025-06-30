@@ -7,7 +7,7 @@
 
 <script setup lang="ts">
 import {ref, onMounted, reactive} from "vue";
-import {codelistQuery} from "@/api/dict";
+import {codelistQuery, sanctionCountry} from "@/api/dict";
 import {AppTableConfig, AppTableMethod, createTableEditConfig} from "@/shared/app-table-config";
 const emits = defineEmits(["handleClose"]);
 const multipleTableRef = ref<MyTableMethod | null>(null);
@@ -28,17 +28,17 @@ const tableconfig = reactive<AppTableConfig>(
       isPage:'true',
       fromSchema: [
         {
-          prop: "value",
+          prop: "cPkId",
           inputtype: "rtinput",
           title: "序号",
         },
         {
-          prop: "value",
+          prop: "country",
           inputtype: "rtinput",
           title: "国家/地区",
         },
         {
-          prop: "label",
+          prop: "reason",
           inputtype: "rtinput",
           title: "受制裁说明",
         }
@@ -52,7 +52,7 @@ const refreshData = (reset = true) => {
   }
   const param = Object.assign(s, r);
   // 查询列表数据
-  codelistQuery(param).then((response) => {
+  sanctionCountry(param).then((response) => {
     if (response.code === 200) {
       pageresult.list = response.data;
       pageresult.total = response.total
