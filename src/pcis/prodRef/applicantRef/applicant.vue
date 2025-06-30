@@ -725,7 +725,7 @@ const method = {
         method: {
           getdbClickData: (data) => {
             setFormItem("Applicant.cOccupCde", {
-              loadData: [{ label: data.cnm, value: data.cde }],
+              loadData: [{ label: `${data.cde} ${data.cnm}`, value: data.cde }],
             });
             setValue("Applicant.cOccupCde", data.cde);
             dialog.value?.handleClose();

@@ -31,6 +31,9 @@ const RelatedSpecialAgree = defineAsyncComponent(
 const AddSpecialAgreeModal = defineAsyncComponent(
   () => import("./AddSpecialAgreeModal.vue")
 );
+const UpdateSpecialAgreement = defineAsyncComponent(
+    () => import("./UpdateSpecialAgreement.vue")
+);
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
 const dataparam = dataParam();
@@ -83,11 +86,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         title: "特约代码",
       },
-      {
-        prop: "cNmeEn",
-        inputtype: "rtinput",
-        title: "英文名称",
-      },
+      // {
+      //   prop: "cNmeEn",
+      //   inputtype: "rtinput",
+      //   title: "英文名称",
+      // },
       {
         prop: "cNmeCn",
         inputtype: "rtinput",
@@ -107,6 +110,7 @@ const pageresult = reactive<Pageresult>({
 });
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
+    showSelection: true,
     titleBtns: [
       createFreeButtonBase({
         id: "score",
@@ -141,34 +145,91 @@ const tableconfig = reactive<AppTableConfig>(
             });
         },
       }),
+      createFreeButtonBase({
+        id: "del-responsibility",
+        label: "删除",
+        type: "danger",
+        func: function () {
+          const selectDate = tableRef.value?.getselectionData()
+          const webPrdProdSpecRelDTOList = selectDate.map(item => item.cSpecrelPkId)
+          if(webPrdProdSpecRelDTOList.length === 0){
+            ElMessage.error("请先选中要删除的数据!");
+            return
+          }
+          ElMessageBox.confirm("是否继续删除数据?", "提示", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+          })
+              .then(() => {
+                // 删除逻辑
+                console.log("删除",webPrdProdSpecRelDTOList);
+                // 可以在这里调用 API 删除数据
+                unAssociationSpec( webPrdProdSpecRelDTOList)
+                    .then((res) => {
+                      const { code, data, msg } = res;
+                      if (200 === code) {
+                        ElMessage.success("删除成功");
+                        handleQuery();
+                      } else {
+                        ElMessage.error(msg);
+                      }
+                    })
+                    .finally(() => {});
+              })
+              .catch(() => {
+                // 取消删除
+              });
+        },
+      }),
     ],
     tableBtnType: "btn",
     tableBtnWidth: 220,
     tableBtnPosition: "right",
     tableBtn: [
+      // createFreeButtonBase({
+      //   id: "score",
+      //   type: "danger",
+      //   tooltip: "删除",
+      //   icon: "Delete",
+      //   link: true,
+      //   tableClick: (row) => {
+      //     const ids = row.cSpecrelPkId;
+      //     const c = sessionStorage.getItem("user").opCde;
+      //     const delParam = { ids: ids, cCrtCde: c, cUpdCde: c };
+      //     unAssociationSpec(delParam)
+      //       .then((res) => {
+      //         const { code, data, msg } = res;
+      //         if (200 === code) {
+      //           ElMessage.success("删除成功");
+      //           handleQuery();
+      //         } else {
+      //           ElMessage.error(msg);
+      //         }
+      //       })
+      //       .finally(() => {});
+      //   },
+      // }),
       createFreeButtonBase({
         id: "score",
-        type: "danger",
-        tooltip: "删除",
-        icon: "Delete",
         link: true,
+        tooltip: "修改",
+        type: "success",
+        size: "large",
+        icon: "Edit",
         tableClick: (row) => {
-          const ids = row.cSpecrelPkId;
-          const c = sessionStorage.getItem("user").opCde;
-          const delParam = { ids: ids, cCrtCde: c, cUpdCde: c };
-          unAssociationSpec(delParam)
-            .then((res) => {
-              const { code, data, msg } = res;
-              if (200 === code) {
-                ElMessage.success("删除成功");
-                handleQuery();
-              } else {
-                ElMessage.error(msg);
-              }
-            })
-            .finally(() => {});
+          dzmodal.open(UpdateSpecialAgreement, {
+            type: "update",
+            data: row,
+            title: '关联特约修改',
+            CEmpCde: ''
+          }).then((res) => {
+            if (res.type === "ok") {
+              handleQuery();
+            }
+          });
         },
-      }),
+      })
     ],
     fromSchema: [
       {
@@ -177,11 +238,6 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         width: 200,
       },
-      // {
-      //   prop: "cNmeEn",
-      //   title: "英文名称",
-      //   inputtype: "rtinput",
-      // },
       {
         prop: "cNmeCn",
         title: "特约内容",
@@ -192,19 +248,22 @@ const tableconfig = reactive<AppTableConfig>(
         title: "是否可编辑",
         inputtype: "rtcheckbox",
         width: "100",
-        func: (val) => {
-          return val === "1" ? true : false;
-        },
+        disabled: true,
+        keymap:{
+          y:"1",
+          n:'0'
+        }
       },
       {
         prop: "cIfMust",
         title: "是否必选",
         inputtype: "rtcheckbox",
         width: "100",
-        func: (val, row) => {
-          console.log("改变状态的row", row);
-          return val === "1" ? true : false;
-        },
+        disabled: true,
+        keymap:{
+          y:"1",
+          n:'0'
+        }
       },
     ],
   })
