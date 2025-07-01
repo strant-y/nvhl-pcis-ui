@@ -45,6 +45,7 @@ export const dataOpertaor = (pageKey?: string) => {
             return tableRefs[key];
         };
         const init = () => {
+            param = {};
             Object.assign(tableConfig, {});
             Object.assign(tableRefs, {});
         };
@@ -123,7 +124,6 @@ export const dataOpertaor = (pageKey?: string) => {
                     })
                 }
             });
-            console.log(formconfig);
         }
         const setDisabledAll = () => {
             Object.keys(tableRefs).forEach(key => {
