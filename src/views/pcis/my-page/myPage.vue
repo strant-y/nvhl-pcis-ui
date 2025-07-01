@@ -1028,6 +1028,7 @@ const initPage = async () => {
     props.param?.pageType === "UW_READ_SCENE"
   ) {
     opertaor.setReadOnly(formconfig11);
+    console.log(77,formconfig11)
   }
 
   opertaor.setTableConfig(formconfig11);

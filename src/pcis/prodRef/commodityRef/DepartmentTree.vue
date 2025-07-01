@@ -59,9 +59,7 @@ const defaultProps = {
 
 const emits = defineEmits(["ok"]);
 
-watch(filterText, (val) => {
-  treeRef.value!.filter(val);
-});
+ 
 
 const filterNode = (value: string, data: Tree) => {
   if (!value) return true;

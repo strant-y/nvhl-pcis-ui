@@ -139,7 +139,7 @@
                     func:(v)=>{
                         console.log(v)
                         if ('A' === v) {
-                            setValue('cUndrOpnList', '')
+                           
                             if ('E' === params['cAppTyp']){
                                 setFormItem("cUndrOpnList", {
                                     loadData: [{label: '审核通过', value: '6'}]
@@ -148,7 +148,9 @@
                                 setFormItem("cUndrOpnList", {
                                     loadData: [{label: '审核通过', value: '0'}]
                                 })
+                                 setValue('cUndrOpnList', '0')
                             }
+                            
                         }else if ('R' === v) {
                             setValue('cUndrOpnList', '')
                             setFormItem("cUndrOpnList", {

@@ -68,7 +68,7 @@ onMounted(() => {
       disabled: true,
     });
     //【国民经济行业分类】初始化必填，只有法人时才必填，现在个人也是必填了（老系统需求：040001/042002/043004/043005/043011五款产品不区分法人个人投保，国民经济行业分类都必填，其他产品只有法人才必填）
-    const cProdNo = route.params.param.cProdNo;
+    const cProdNo = route.params.param?.cProdNo;
     if (
       cProdNo === "040001" ||
       cProdNo === "042002" ||
@@ -101,6 +101,8 @@ onMounted(() => {
     });
     //移动手机校验
     setFormItem("Applicant.cMobile", { rules: [getRules("phoneNo", {})] });
+    // 固话
+    setFormItem("Applicant.cTel", { rules: [getRules("phone", {})] });
     // 传真校验
     setFormItem("Applicant.cFax", { rules: [getRules("faxNumber", {})] });
 
@@ -110,7 +112,7 @@ onMounted(() => {
     setFormItem("Applicant.cGcidCode", {rules: [getRules("leiCode", {})]});
     // 关联交易审批单编号
     setFormItem("Applicant.cRelateNo", {rules: [getRules("txnApprovalNo", {})]});
-
+   
 
   });
 });
@@ -158,9 +160,16 @@ const idAnalysis = (id:string)=>{
 //  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
 const checkUser = () => {
   console.log('param',param)
-if (param.cRecordType !== 1 && param.cRecordType !== 2 ) {
+// if (param.cRecordType !== 1 && param.cRecordType !== 2 ) {
+//     return false;
+//   }
+ 
+  // 自定义录单 方案配置 模版 进入 可以查询用户信息  
+  if (param.pageType !== "app" &&  param.pageType !== "copy" && param.pageType !== "template") {
     return false;
   }
+  
+
 const tabref = opertaor.getTableRefs();
 const applicantValue = tabref["applicant"].getFromValue();
 //  只要4个有值 去请求客户信息
