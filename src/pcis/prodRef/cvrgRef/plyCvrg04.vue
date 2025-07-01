@@ -271,7 +271,12 @@ onMounted(async () => {
   );
   Object.assign(cardconfig.value, formconfig11);
   if (parparam.pageType === "app") {
-    addPlanMethod();
+    addAndinitData();
+  }
+});
+
+function addAndinitData() { 
+  const pl = addPlanMethod();
     const param = {
       cProdNo: parparam.cProdNo,
       cTermNo: parparam.cTermNo,
@@ -299,13 +304,12 @@ onMounted(async () => {
           }
           plans.push(data);
         });
-        refushData("P1", plans);
+        refushData(pl, plans);
       } else {
         ElMessage.error(msg);
       }
     });
-  }
-});
+}
 
 const edrItem = ref<[key: string, value: Array<any>] | any>({});
 function updateEdrItem(terms: any[]) {
@@ -376,7 +380,7 @@ const method = {
         return;
       }
     }
-    addPlanMethod();
+    addAndinitData();
   },
 };
 
@@ -390,6 +394,7 @@ function addPlanMethod() {
     });
     const planKey = "P" + (maxindex + 1);
     planData.value[planKey] = [];
+    return planKey;
 }
 
 function isHidden(pl: any) {
