@@ -1262,6 +1262,7 @@ async function loadAfter() {
       if (res) {
         const ops = opertaor.convertData(res);
         ops['plyBase']['Base.cRenewMrk'] = '1'
+        ops['plyBase']['Base.cPlyNo'] = ''
         ops['insrnc']['Base.tAppTm'] = moment(new Date(Date.now())).format(
             "YYYY-MM-DD HH:mm:ss"
         )
