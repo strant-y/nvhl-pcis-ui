@@ -45,7 +45,7 @@ export const dataOpertaor = (pageKey?: string) => {
             return tableRefs[key];
         };
         const init = () => {
-            param = {};
+            Object.assign(param, {});
             Object.assign(tableConfig, {});
             Object.assign(tableRefs, {});
         };
