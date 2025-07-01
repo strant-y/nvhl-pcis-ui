@@ -208,6 +208,9 @@ function changeBtn() {
   Object.keys(formcof.value).forEach((k: any) => {
     formcof.value[k].disabled = props.disabledFlag;
   });
+  if(param.cRsnCde === '45'){ // 费率调整,放开费率字段编辑
+      formcof.value['nMainRate'].disabled = false;
+  }
   Object.keys(btnConf.value).forEach((k: any) => {
     btnConf.value[k].hidden = props.disabledFlag;
   });
