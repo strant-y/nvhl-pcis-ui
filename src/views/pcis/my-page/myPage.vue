@@ -1044,6 +1044,7 @@ async function getInitParam(codeparam){
   console.log(res);
 }
 
+const exlist = ['acctinfo','ci','ourCompanyCiShare'];
 function getAllcodelist(formconfig11){
   let l = {};
   if(formconfig11?.[0].pageInfo){
