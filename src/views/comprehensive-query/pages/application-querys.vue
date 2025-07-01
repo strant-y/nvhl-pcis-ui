@@ -24,21 +24,25 @@
         <template v-if="Number(tab.key) == 1">
           <Inquiry-Sheet
                   :refreshData="nowTab === 0 ? true : false"
+                  :ref="freeEditRef[0]"
           ></Inquiry-Sheet>
         </template>
         <template v-if="Number(tab.key) == 2">
           <Applicant-Query
                   :refreshData="nowTab === 1 ? true : false"
+                  :ref="freeEditRef[1]"
           ></Applicant-Query>
         </template>
         <template v-if="Number(tab.key) == 3">
           <Ply-Query
                   :refreshData="nowTab === 2 ? true : false"
+                  :ref="freeEditRef[2]"
           ></Ply-Query>
         </template>
         <template v-if="Number(tab.key) == 4">
           <Edr-Query
                   :refreshData="nowTab === 3 ? true : false"
+                  :ref="freeEditRef[3]"
           ></Edr-Query>
         </template>
         <template v-if="Number(tab.key) == 5">
@@ -1476,21 +1480,40 @@ onMounted(async () => {
       sessionStorage.getItem(AppKey.query.pcis_query_app)
     );
     activeName.value = "2";
-    await nextTick();
-    freeEditRef.value[1].value[0].setValue("seeBilling", "A");
-    freeEditRef.value[1].value[0].setValue("tIssueTm", [
-      homeJumpData.value.TIssueTmStart,
-      homeJumpData.value.TIssueTmEnd,
-    ]);
-    if (homeJumpData.value.hasOwnProperty("CAppNo")) {
-      //投保单号
-      freeEditRef.value[1].value[0].setValue(
-        "cAppNo",
-        homeJumpData.value.CAppNo
-      );
-    }
-    await nextTick();
-    handleQuery(true); //跳转过来自动查数据
+    setTimeout(() => {
+      freeEditRef.value[1].value[0].setValue("seeBilling", "A");
+      freeEditRef.value[1].value[0].setValue("tIssueTm", [
+        homeJumpData.value.TIssueTmStart,
+        homeJumpData.value.TIssueTmEnd,
+      ]);
+      if (homeJumpData.value.hasOwnProperty("CAppNo")) {
+        //投保单号
+        freeEditRef.value[1].value[0].setValue(
+          "cAppNo",
+          homeJumpData.value.CAppNo
+        );
+      }
+      nextTick(() => {
+        handleQuery(true); //跳转过来自动查数据
+      })
+    }, 500)
+    // await nextTick();
+    // if(freeEditRef.value[1] && freeEditRef.value[1].value && freeEditRef.value[1].value[0]){
+    //   freeEditRef.value[1].value[0].setValue("seeBilling", "A");
+    //   freeEditRef.value[1].value[0].setValue("tIssueTm", [
+    //     homeJumpData.value.TIssueTmStart,
+    //     homeJumpData.value.TIssueTmEnd,
+    //   ]);
+    //   if (homeJumpData.value.hasOwnProperty("CAppNo")) {
+    //     //投保单号
+    //     freeEditRef.value[1].value[0].setValue(
+    //       "cAppNo",
+    //       homeJumpData.value.CAppNo
+    //     );
+    //   }
+    // }
+    // await nextTick();
+    // handleQuery(true); //跳转过来自动查数据
   } else if (sessionStorage.getItem(AppKey.query.pcis_query_returnudrlist)) {
     
     //首页 待修改任务跳转过来的，选中待修改单
