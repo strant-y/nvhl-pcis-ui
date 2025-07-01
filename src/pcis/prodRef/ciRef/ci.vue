@@ -52,7 +52,7 @@ onMounted(async () => {
   //一般批改，部分要素可编辑
   const cCiMrkValue =  opertaor.getTableRefByKey("plyBase")
   setTimeout(() => {
-    if (param.pageType === "EDR_APP_NEW_SCENE" &&   cCiMrkValue !== "0") {
+    if (param?.pageType === "EDR_APP_NEW_SCENE" &&   cCiMrkValue !== "0") {
     formconfig1.editFlag = true;
     formconfig1.fromSchema?.forEach((item) => {
       if (item.prop === 'Ci.cChiefMrk' || item.prop === 'Ci.cIssueMrk') {

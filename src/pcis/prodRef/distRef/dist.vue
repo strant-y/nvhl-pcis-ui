@@ -103,7 +103,7 @@ onMounted(async () => {
   }
   if(params.cProdNo === '043009'){
     formconfig11.value.fromSchema?.forEach(item=>{
-      if(item['prop'] ==='Dist.cEmploymentAddress' && route.params.param.cGrpMrk !== '1'){
+      if(item['prop'] ==='Dist.cEmploymentAddress' && route.params.param?.cGrpMrk !== '1'){
         item.isShow = false;
       }
     })
@@ -140,7 +140,7 @@ onMounted(async () => {
   }
  
   distMapCollectCompKey({
-    cProdNo: route.params.param.cProdNo,
+    cProdNo: route.params.param?.cProdNo,
     cComponentKey: props.compKey,
   }).then((res) => {
     collectCompKey.value = res;
@@ -271,7 +271,7 @@ const method = {
     } else if(opertaor.getDataAll().plyBase["Base.cAppNo"]){
       app = opertaor.getDataAll().plyBase["Base.cAppNo"];
     } else {
-      app = route.params.param.cAppNo
+      app = route.params.param?.cAppNo
     }
     const selData = {
       cComponentTable: cComponentTableValue,

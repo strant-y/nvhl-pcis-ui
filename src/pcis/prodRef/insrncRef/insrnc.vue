@@ -47,7 +47,7 @@ const nRatioCoefFunc = () => {
   const tabref = opertaor.getTableRefs();
   const baseBefore = tabref["insrnc"]?.getFromValue();
   const baseBefore2 = tabref["base"]?.getFromValue();
-  let prodNo = route.params.param.cProdNo;
+  let prodNo = route.params.param?.cProdNo;
 
   let param = {
     bgnTm: baseBefore["Base.tInsrncBgnTm"],
@@ -124,7 +124,7 @@ const method = {
   endTmFn: (v) => {
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["insrnc"].getFromValue();
-    if(route.params.param.cRsnCde != "46") {
+    if(route.params.param?.cRsnCde != "46") {
       // 如果批改原因是报停展期，保险止期延长报停起止期计算出的差值，保险期限维持不变
       const tm =   moment(v).add(1, 'second').diff(moment(baseBefore["Base.tInsrncBgnTm"]), "days");
       console.log('天',tm)
@@ -134,11 +134,11 @@ const method = {
     }
     nRatioCoefFunc()
     // 如果批改原因是免费延期，根据保险止期的变化计算出延长天数
-    if(route.params.param.cRsnCde == "FZ" && tInsrncEndTm.value) {
+    if(route.params.param?.cRsnCde == "FZ" && tInsrncEndTm.value) {
       const days =   moment(v).add(1, 'second').diff(moment(tInsrncEndTm.value), "days");
       opertaor.getFatherPage().setnDelayNum(days)
     }
-    if(route.params.param.cRsnCde == "FZ" && !tInsrncEndTm.value) {
+    if(route.params.param?.cRsnCde == "FZ" && !tInsrncEndTm.value) {
       tInsrncEndTm.value = baseBefore["Base.tInsrncEndTm"]
     }
   },
