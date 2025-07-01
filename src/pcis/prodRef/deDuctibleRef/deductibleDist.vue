@@ -208,7 +208,7 @@ const tableconfig = reactive<AppTableConfig>(
 
 const initOriginalData = ()=> {
   const param = {
-    cProdNo: route.params.param.cProdNo,
+    cProdNo: route.params.param?.cProdNo,
     pageNum: 1,
     pageSize: 999,
   }

@@ -162,7 +162,7 @@ onMounted(async () => {
   }
   // 初始化 cComponentTableValue
   cComponentTableValue = getCComponentTableValue(
-    route.params.param.cProdNo,
+    route.params.param?.cProdNo,
     formconfig1.value.title
   );
   nextTick(() => {
@@ -280,7 +280,7 @@ const handleQuery = () => {
   } else if(opertaor.getDataAll().plyBase["Base.cAppNo"]){
     app = opertaor.getDataAll().plyBase["Base.cAppNo"];
   } else {
-    app = route.params.param.cAppNo
+    app = route.params.param?.cAppNo
   }
   query({
     cComponentTable: distCompKey.value,

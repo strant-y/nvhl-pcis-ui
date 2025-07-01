@@ -491,7 +491,7 @@ function handleRecordTypeChange(val:any) {
 .eachCon {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: stretch;
   justify-content: start;
   padding-left: 100px;
   margin-bottom: 10px;
