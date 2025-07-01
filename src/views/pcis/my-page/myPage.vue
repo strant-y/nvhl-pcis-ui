@@ -2012,7 +2012,7 @@ const setPayInfo = (base: any, applicant: any, insrnc: any) => {
   pay["Pay.tPayBgnTm"] = moment(insrnc["Base.tAppTm"]).format(
     "YYYY-MM-DD HH:mm:ss"
   );
-  pay["Pay.tPayEndTm"] = moment(insrnc["Base.tInsrncBgnTm"]).format(
+  pay["Pay.tPayEndTm"] = moment(insrnc["Base.tInsrncBgnTm"]).add(29, 'days').endOf('day').format(
     "YYYY-MM-DD HH:mm:ss"
   );
   pay["Pay.nOwnPrm"] = base["Base.nPrm"] ? base["Base.nPrm"] : 0;

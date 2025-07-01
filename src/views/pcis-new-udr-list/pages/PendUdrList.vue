@@ -221,7 +221,7 @@
             typeCode: "KIND_LIST_GRT",
             params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
             clearable: true,
-             multiple:1,
+            //  multiple:1,
             func: (val: any) => {
                 //根据产品大类再次请求条款接口
                 codeListStore
@@ -262,7 +262,7 @@
             title: "条款",
             showKey: [1, 2, 3, 4, 5],
             typeCode: "TERM_LIST_IN_GUIDE_NEW",
-            multiple:1,
+            // multiple:1,
             params: {
                 cParCde: "",
                 cOperId: user.value.opCde,
@@ -1005,14 +1005,14 @@
                 if (udrTypeValue.value == "1" || udrTypeValue.value == "2") {
                     freeEditRef.value?.setValue("inNextDpt", "1");
                     freeEditRef.value?.setValue("tm2", [
-                        moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
+                        moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
                             "YYYY-MM-DD 00:00:00"
                         ),
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
                     ]);
 
                        freeEditRef.value?.setValue("tm1", [
-                        moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
+                        moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
                             "YYYY-MM-DD 00:00:00"
                         ),
                         moment(new Date()).format("YYYY-MM-DD 23:59:58"),
@@ -1022,7 +1022,7 @@
                  if (udrTypeValue.value == "3") {
                     freeEditRef.value?.setValue("CLoadSub", 1);
                         freeEditRef.value?.setValue("tm1", [
-                        moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
+                        moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
                             "YYYY-MM-DD 00:00:00"
                         ),
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
@@ -1031,7 +1031,7 @@
                  if (udrTypeValue.value == "4") {
                     freeEditRef.value?.setValue("CLoadSub", 1);
                         freeEditRef.value?.setValue("tm1", [
-                        moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
+                        moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
                             "YYYY-MM-DD 00:00:00"
                         ),
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
@@ -1041,7 +1041,7 @@
                 if (udrTypeValue.value == "5") {
                     freeEditRef.value?.setValue("CLoadSub", 1);
                         freeEditRef.value?.setValue("tm1", [
-                        moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
+                        moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
                             "YYYY-MM-DD 00:00:00"
                         ),
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
@@ -1206,7 +1206,7 @@
                 31 * 1000 * 60 * 60 * 24
             ) {
                 // this._loading = false;
-                ElMessage.warning("投保日期范围请控制在7天以内");
+                ElMessage.warning("投保日期范围请控制在30天以内");
                 return;
             }
         }
@@ -1274,10 +1274,10 @@
                 // }
                 if (
                     new Date(date1[1]).getTime() - new Date(date1[0]).getTime() >=
-                    7 * 1000 * 60 * 60 * 24
+                    31 * 1000 * 60 * 60 * 24
                 ) {
                     // loading.value = false;
-                    ElMessage.warning("投保日期范围请控制在7天以内");
+                    ElMessage.warning("投保日期范围请控制在30天以内");
                     return;
                 }
             } else {
@@ -1287,9 +1287,9 @@
                 }
                 if (
                     new Date(date2[1]).getTime() - new Date(date2[0]).getTime() >=
-                    7 * 1000 * 60 * 60 * 24
+                    31 * 1000 * 60 * 60 * 24
                 ) {
-                    ElMessage.warning("提核日期范围请控制在7天以内");
+                    ElMessage.warning("提核日期范围请控制在30天以内");
                     return;
                 }
             }
