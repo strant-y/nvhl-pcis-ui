@@ -196,11 +196,10 @@ const method = {
           codeListParam: { "CParCde": "subdpt", cParCde: "327001" },
         })
         .then((res) => {
-          freeEditRef.value?.setRowFieldProp(
-            rowId,
-            "Ci.cSubDptCde",
-            "loadData",
-            res
+          freeEditRef.value?.addCodeListMap(
+              {code: "Ci.cSubDptCde"+rowId,
+                list: res
+              }
           );
         });
         // freeEditRef.value?.setRowFieldProp(
@@ -225,11 +224,10 @@ const method = {
         }
     } else {
       // 非永安保险，设置默认值和其他数据
-      freeEditRef.value?.setRowFieldProp(
-        rowId,
-        "Ci.cSubDptCde",
-        "loadData",
-        [{ value: '1', label: '其他' }]
+      freeEditRef.value?.addCodeListMap(
+          {code: "Ci.cSubDptCde"+rowId,
+          list: [{ value: '1', label: '其他' }]
+          }
       );
       freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "1");
       setFormItem("Ci.cDptCde", { rules: [] });
