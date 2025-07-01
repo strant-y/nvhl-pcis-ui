@@ -96,6 +96,12 @@
     const udrTypeValue = ref<string>(); // 单据状态 值
     const undrClsListOptions = ref<Array<any>>([]); // 核保级别 下拉数据
     const selectData = ref([]); // 删除用户ID集合 用于批量删除
+
+    watch(() => freeEditRef.value?.getValue("tm1"), (newVal,old) => {
+      
+    },{
+         deep: true
+    });
     // 根据切换下拉数据显示/隐藏对应表单
     const allForm = ref<Array<any>>([
         {
@@ -314,6 +320,7 @@
             type: "datetimerange",
             format: "YYYY-MM-DD HH:mm:ss",
             valueFormat: "YYYY-MM-DD HH:mm:ss",
+            
         },
         {
             prop: "tm2",
@@ -1001,7 +1008,7 @@
                 udrTypeValue.value == "4" ||
                 udrTypeValue.value == "5"
             ) {  
-                  console.log(133,udrTypeValue.value)
+                  
                 if (udrTypeValue.value == "1" || udrTypeValue.value == "2") {
                     freeEditRef.value?.setValue("inNextDpt", "1");
                     freeEditRef.value?.setValue("tm2", [
@@ -1015,7 +1022,11 @@
                         moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
                             "YYYY-MM-DD 00:00:00"
                         ),
-                        moment(new Date()).format("YYYY-MM-DD 23:59:58"),
+                         moment().endOf('day').format('YYYY-MM-DD HH:mm:ss')
+                        // moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+                        // moment(new Date()).endOf('day').toDate()
+                        // .format("HH:mm:ss"),
+                        // .format("YYYY-MM-DD 23:59:58"),
                     ]);
                 }
                 
@@ -1077,26 +1088,23 @@
             setFormItem("orgCde", {
                 loadData: [
                     {
-                        label: "永安保险公总司",
+                        label: "永安保险总公司",
                         value: "0200000000000",
                     },
                 ],
             });
 
             // 确保 loadData 设置完成后再设置表单值
-            freeEditRef.value?.setFormValue({
-                orgCde: "0200000000000",
-            });
+            freeEditRef.value?.setValue(
+                'orgCde', "0200000000000",
+            );
         }, 200);
         
         // 初始化表单
         allForm.value.map((item: any, index: number) => {
             const isVal = item.showKey.findIndex((vals: any) => vals == 1);
             if (isVal !== -1) {
-                       console.log('123122',item)
                 if (item.prop == "tm1") item.rules = [];
-                
-
                 if (item.prop == "tm2") item.rules = [getRules("required", {})];
                 formObj.notWaitObj.fromSchema.value.push(item);
             }
