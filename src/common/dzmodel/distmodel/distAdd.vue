@@ -155,13 +155,16 @@ onMounted(() => {
     }
     // 043009 关联被保人
     if(item.prop === 'Dist.cRelatedInsured'){
-      const insured =  opertaor.getDataAll()['insured'];
-      if(insured && insured['Insured.cInsuredCde']) {
-        setTimeout(() => {
-          setValue('Dist.cRelatedInsured', insured);
-        }, 100);
-
-        
+      if(cGrpMrk.value === '1') {
+        const insured = opertaor.getDataAll()['insured'];
+        if (insured && insured['Insured.cInsuredCde']) {
+          setTimeout(() => {
+            setValue('Dist.cRelatedInsured', insured['Insured.cPkId']);
+          }, 100);
+        }
+      }else {
+        item['rules'] = [];
+        item["hidden"] = true;
       }
     }
     // 043009 实际用工地址关联 团单才展示
@@ -177,6 +180,7 @@ onMounted(() => {
           setValue('Dist.nAge', age);
         }
       }
+      item['rules'] = [getRules("idCard", {})];
     }
 
         // 身份证类型自动回填年龄
@@ -188,7 +192,11 @@ onMounted(() => {
     if(item.prop =='Dist.cSchoolName'){
       item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
     }
-
+    if(item.prop =='Dist.HouseAreaProp'){
+      item?.groupList.forEach(data => {
+        data.rules = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+      })
+    }
     // 040001产品 必填项问题
     if(item.prop =='Dist.cPlanNo' ||item.prop =='Dist.tOpeningTime' ||item.prop =='Dist.cLocationSigns' ||item.prop =='Dist.cFacilitySigns' ||item.prop =='Dist.cVenueSign' || item.prop =='Dist.cBuildingStructure'  ){
       console.log('进啊2=',item.prop)

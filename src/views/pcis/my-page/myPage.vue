@@ -1045,11 +1045,12 @@ async function getInitParam(codeparam){
   console.log(res);
 }
 
+const exlist = ['acctinfo','ci','ourCompanyCiShare'];
 function getAllcodelist(formconfig11){
   let l = {};
   if(formconfig11?.[0].pageInfo){
     for(let i = 0; i < formconfig11[0].pageInfo.length; i++){
-      if(formconfig11[0].pageInfo[i]['pageKey'] === 'acctinfo'){
+      if(exlist.includes(formconfig11[0].pageInfo[i]['pageKey'])){
         continue;
       }
       const schema = formconfig11[0].pageInfo[i].pageSchema;
@@ -1205,9 +1206,6 @@ async function loadAfter() {
       bthList.value = edrSurrenderBtn;
     }
   } else if (props.param.pageType === "readonly") {
-    nextTick(() => {
-      opertaor.setDisabledAll();
-    });
     // 查询数据
     // const getAppPlyInfoRes = await getAppPlyInfoByAppNo({
     //   CAppNo: props.param.cAppNo,
@@ -1223,6 +1221,10 @@ async function loadAfter() {
         item.disabled = true;
       });
     }
+    
+    nextTick(() => {
+      opertaor.setDisabledAll();
+    });
     nextTick(() => {
       // console.log(data);
       // opertaor.setDataAll(data);
@@ -1261,6 +1263,7 @@ async function loadAfter() {
       if (res) {
         const ops = opertaor.convertData(res);
         ops['plyBase']['Base.cRenewMrk'] = '1'
+        ops['plyBase']['Base.cPlyNo'] = ''
         ops['insrnc']['Base.tAppTm'] = moment(new Date(Date.now())).format(
             "YYYY-MM-DD HH:mm:ss"
         )
@@ -1889,6 +1892,15 @@ const calcPremium = () => {
   console.log(res);
   if (res["cvrg"].length == 0) {
     ElMessage.error("请录入条款信息");
+    btn.loading = false;
+    return;
+  }
+  
+  const termref = opertaor.getTableRefByKey("cvrg");
+  const calccheck = termref.calcCheck();
+  if(!calccheck['res']){
+    console.log(calccheck);
+    ElMessage.error(calccheck['msg']);
     btn.loading = false;
     return;
   }

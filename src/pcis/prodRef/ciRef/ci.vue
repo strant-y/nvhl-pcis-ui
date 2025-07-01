@@ -52,7 +52,7 @@ onMounted(async () => {
   //一般批改，部分要素可编辑
   const cCiMrkValue =  opertaor.getTableRefByKey("plyBase")
   setTimeout(() => {
-    if (param.pageType === "EDR_APP_NEW_SCENE" &&   cCiMrkValue !== "0") {
+    if (param?.pageType === "EDR_APP_NEW_SCENE" &&   cCiMrkValue !== "0") {
     formconfig1.editFlag = true;
     formconfig1.fromSchema?.forEach((item) => {
       if (item.prop === 'Ci.cChiefMrk' || item.prop === 'Ci.cIssueMrk') {
@@ -173,17 +173,20 @@ const method = {
   cCoinsurerCdeChange:(val)=>{
     const rowData = freeEditRef.value?.getSelectRow();
     const formTableData = getFromValue();
-    const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue()
+    const plyBasedata = opertaor.getTableRefByKey("plyBase").getFromValue();
     if (!rowData) return;
     const rowId = rowData._dataId;
     if(!initFlag.value){
       
-      if (cCiMrk["Base.cCiMrk"] == "5" && val !== "327001") {
+      if (plyBasedata["Base.cCiMrk"] === "5" && val !== "327001") {
         freeEditRef?.value?.setValueByRowKey("Ci.cCoinsurerCde", rowId, "");
         ElMessage.error("司内联保，不能录入除永安以外的其他公司！");
         return false;
       }
       freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "");
+      if(plyBasedata["Base.cBsnsTyp"] === '19001'){
+        setFormItem("Ci.cDptCde", { rules: [getRules("required", {})] });
+      }
     }
     if (val === "327001") {
       // 如果选择的是永安保险，加载对应的分公司列表
@@ -208,8 +211,9 @@ const method = {
         setFormItem("Ci.nComm", { disabled: false});
         setFormItem("Ci.cBrkrCde", { disabled: false});
         setFormItem("Ci.cBrkSlsCde", { disabled: false});
+        setFormItem("Ci.cSlsCde", { rules: [getRules("required", {})] });
         setFormItem("Ci.cSlsCde", { disabled: false});
-        if (cCiMrk["Base.cCiMrk"] === "3" || cCiMrk["Base.cCiMrk"] === "4") {
+        if (plyBasedata["Base.cCiMrk"] === "3" || plyBasedata["Base.cCiMrk"] === "4") {
           const isYonganAlreadyPresent = formTableData.some(
             (row) => row._dataId !== rowId && row['Ci.cCoinsurerCde'] === "327001"
           );
@@ -234,6 +238,7 @@ const method = {
       setFormItem("Ci.cBrkrCde", { disabled: true});
       setFormItem("Ci.cBrkSlsCde", { disabled: true});
       setFormItem("Ci.cSlsCde", { disabled: true});
+      setFormItem("Ci.cSlsCde", { rules: []});
       freeEditRef.value?.setValueByRowKey("Ci.cDptCde", rowId, "");
     }
     updateMasterAgreementValues()

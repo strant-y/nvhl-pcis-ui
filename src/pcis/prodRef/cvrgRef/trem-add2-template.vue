@@ -20,7 +20,7 @@
               (k === "nMainRate" || k === "nDeductibleRate" ? item.suffix : "")
             }}
           </th>
-          <th style="width: 100px">操作</th>
+          <th v-if="checkShowBtn" style="width: 100px">操作</th>
         </tr>
       </thead>
       <tbody>
@@ -36,7 +36,7 @@
               <from-item v-model="item['Term.' + kk]" :item="it" />
             </el-form-item>
           </td>
-          <td>
+          <td v-if="checkShowBtn" >
             <rtButton
               v-if="!btnConf.delete.hidden"
               @click="
@@ -196,6 +196,33 @@ function dataInit() {}
 function setCancel() {
   props.planData["Term.cCancelMrk"] = "1";
 }
+const checkShowBtn = computed(()=>{ 
+  let r = true;
+  Object.keys(btnConf.value).forEach((k: any) => {
+    r = r && !btnConf.value[k].hidden;
+  });
+  return r;
+}) ;
+
+function changeBtn() { 
+  Object.keys(formcof.value).forEach((k: any) => {
+    formcof.value[k].disabled = props.disabledFlag;
+  });
+  if(param.cRsnCde === '45'){ // 费率调整,放开费率字段编辑
+      formcof.value['nMainRate'].disabled = false;
+  }
+  Object.keys(btnConf.value).forEach((k: any) => {
+    btnConf.value[k].hidden = props.disabledFlag;
+  });
+}
+
+watch(() => props.disabledFlag, (val) => { 
+  changeBtn();
+});
+
+onMounted(() => { 
+  changeBtn();
+});
 
 defineExpose({
   dataInit,

@@ -103,7 +103,7 @@ onMounted(async () => {
   }
   if(params.cProdNo === '043009'){
     formconfig11.value.fromSchema?.forEach(item=>{
-      if(item['prop'] ==='Dist.cEmploymentAddress' && route.params.param.cGrpMrk !== '1'){
+      if(item['prop'] ==='Dist.cEmploymentAddress' && route.params.param?.cGrpMrk !== '1'){
         item.isShow = false;
       }
     })
@@ -140,7 +140,7 @@ onMounted(async () => {
   }
  
   distMapCollectCompKey({
-    cProdNo: route.params.param.cProdNo,
+    cProdNo: route.params.param?.cProdNo,
     cComponentKey: props.compKey,
   }).then((res) => {
     collectCompKey.value = res;
@@ -237,20 +237,6 @@ const method = {
     let baseFlag = alldata['plyBase']["Base.cAppNo"];
 
     let fromSchema = tableconfig.value.fromSchema;
-    const tgt = opertaor.getTableRefByKey("tgt");
-    if(!!tgt && tgt.getValue('Tgt.cIsRegistered') === '1'){
-      fromSchema.forEach(item=>{
-        item.rules = [{required: true, message: '该项为必填项', trigger: 'blur'}]
-      })
-    }else {
-      fromSchema.forEach(item=>{
-        if(item.prop=== 'Dist.cAssociatedGuardian' || item.prop === 'Dist.cWardName'){
-          item.rules = [{required: true, message: '该项为必填项', trigger: 'blur'}]
-        }else {
-          item.rules = null
-        }
-      })
-    }
     checkAppBase({ cAppNo: baseFlag }).then((res: any) => {
       if (res.code === 200) {
         dialog.value?.open(
@@ -285,7 +271,7 @@ const method = {
     } else if(opertaor.getDataAll().plyBase["Base.cAppNo"]){
       app = opertaor.getDataAll().plyBase["Base.cAppNo"];
     } else {
-      app = route.params.param.cAppNo
+      app = route.params.param?.cAppNo
     }
     const selData = {
       cComponentTable: cComponentTableValue,

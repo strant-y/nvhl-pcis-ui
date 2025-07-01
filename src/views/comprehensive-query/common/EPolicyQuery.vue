@@ -609,7 +609,7 @@ function downloadEPolicy() {
     pcisQueryService
         .downloadEPolicy(data)
         .then((res: any) => {
-            if (res == '' || res == '500' || res.size <= 0) {
+            if (res == '' || res == '500' || res.data.size <= 3 ) {
                 ElMessage.error('下载出错，请核实是否有生成电子' + platTypeMap[plyTyp] + '！')
                 return
             }
