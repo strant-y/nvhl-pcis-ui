@@ -108,10 +108,11 @@ const formPage = idxParam?.formPage;
 const isCiJiMrk = computed(() => !!idxParam.ciJiMrk && idxParam.ciJiMrk !== '0');
 
 const getConmpName = (k: any) => {
-  if( ['AgreementCvrg', 'AgreementBase', 'AgreementApplicant', 'AgreementCiTcp', 'AgreementCi', 'AgreementCiShare', 'AgreementSpecial'].includes(k.pageCode))
-    return k.pageCode + '-ref';
-  if( k.pageKey === 'customECargo') return k.pageCode + '-ref';
-  return ((k.pageType === 'custom' ? k.pageCode : k.pageKey) + '-ref');
+  if( k.pageKey === 'ECargoDist' ) return k.pageKey + '-ref';
+  if( k.pageType === 'custom' ) return k.pageCode + '-ref';
+  // if( ['AgreementCvrg', 'AgreementBase', 'AgreementApplicant', 'AgreementCiTcp', 'AgreementCi', 'AgreementCiShare', 'AgreementSpecial', 'AgreementFeeWarn'].includes(k.pageCode))
+  //   return k.pageCode + '-ref';
+  return k.pageCode + '-ref';
 }
 const NavigaShow = ref(true);
 
