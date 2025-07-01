@@ -107,9 +107,8 @@ onMounted(async () => {
         setFormItem("Base.cPlyNo", { hidden: false });
       }else if(data.pageType && data.pageType === "orig") {
         //续保时，保单号隐藏
-        setFormItem("Base.cPlyNo", { hidden: true });
         setFormItem("Base.cOrigPlyNo", { hidden: false });
-        setValue('Base.cOrigPlyNo',param.cPlyNo)
+        setValue('Base.cOrigPlyNo',param?.cPlyNo)
       }
       sessionData.value = data;
     }
