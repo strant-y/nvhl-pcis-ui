@@ -192,11 +192,8 @@ onMounted(async () => {
           if (item.cRdrTyp === "1") {
             data["Term.cClauseCategory"] = item.cClauseCategory;
           }
-          if(item.cRdrTyp === "0"){
-            if(parparam.cProdNo === '040011'){
-              data["Term.nAdjustFactor"] = 100;
-            }
-          }
+          // 数据初始化
+          initTermData(item,data);
           plans.push(data);
         });
         refushData(plans);
@@ -305,12 +302,8 @@ function addTermData() {
           if (item.cRdrTyp === "1") {
             data["Term.cClauseCategory"] = item.cClauseCategory;
           }
-          
-          if(item.cRdrTyp === "0"){
-            if(parparam.cProdNo === '040011'){
-              data["Term.nAdjustFactor"] = 100;
-            }
-          }
+          // 数据初始化
+          initTermData(item,data);
           data.riskList = riskList;
           plans.push(data);
         });
@@ -320,6 +313,16 @@ function addTermData() {
     },
     { title: "添加条款", width: 85 }
   );
+}
+
+function initTermData(item: any,data:any){
+  if(item.cUniqueTermNo === "00425000137"){
+    data["Term.nAdjustFactor"] = 100;
+  }
+  if(item.cUniqueTermNo === "00425000179"){
+    console.log(data);
+    data['Term.cClaimInclude'] = '0';
+  }
 }
 function deleteData(term: any) {
   ElMessageBox.confirm("是否继续删除?", "提示", {

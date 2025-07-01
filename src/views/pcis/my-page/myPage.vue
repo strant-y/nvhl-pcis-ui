@@ -1049,7 +1049,7 @@ function getAllcodelist(formconfig11){
   let l = {};
   if(formconfig11?.[0].pageInfo){
     for(let i = 0; i < formconfig11[0].pageInfo.length; i++){
-      if(formconfig11[0].pageInfo[i]['pageKey'] === 'acctinfo'){
+      if(exlist.includes(formconfig11[0].pageInfo[i]['pageKey'])){
         continue;
       }
       const schema = formconfig11[0].pageInfo[i].pageSchema;
