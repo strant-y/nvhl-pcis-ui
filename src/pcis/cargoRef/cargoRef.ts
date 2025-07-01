@@ -11,16 +11,16 @@ import ECargoSpecial from "@/pcis/cargoRef/ECargoSpecial.vue"; //
 
 /**用于动态组件的映射生成 */
 const componentMap = {
-  distECargoRef: ECargoDistECargo,
-  AgreementCvrgRef: ECargoCvrgECargo,
-  AgreementFeeWarnRef: ECargoFeeWarn,
-  AgreementApplicantRef: ECargoApplicantECargo,
-  AgreementBaseRef: ECargoBase,
-  AgreementCiRef: ECargoCi,
-  AgreementCiTcpRef: ECargoCiAgreement,
-  AgreementCiShareRef: ECargoCiShare,
-  AgreementReviewRef: ECargoReview,
-  AgreementSpecialRef: ECargoSpecial,
+  ECargoDistRef: markRaw(ECargoDistECargo),
+  AgreementCvrgRef:  markRaw(ECargoCvrgECargo),
+  AgreementFeeWarnRef:  markRaw(ECargoFeeWarn),
+  AgreementApplicantRef:  markRaw(ECargoApplicantECargo),
+  AgreementBaseRef:  markRaw(ECargoBase),
+  AgreementCiRef:  markRaw(ECargoCi),
+  AgreementCiTcpRef:  markRaw(ECargoCiAgreement),
+  AgreementCiShareRef:  markRaw(ECargoCiShare),
+  AgreementReviewRef:  markRaw(ECargoReview),
+  AgreementSpecialRef:  markRaw(ECargoSpecial),
 };
 
 const install = (Vue) => {
