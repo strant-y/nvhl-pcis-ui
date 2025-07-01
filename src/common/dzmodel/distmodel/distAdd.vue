@@ -155,13 +155,16 @@ onMounted(() => {
     }
     // 043009 关联被保人
     if(item.prop === 'Dist.cRelatedInsured'){
-      const insured =  opertaor.getDataAll()['insured'];
-      if(insured && insured['Insured.cInsuredCde']) {
-        setTimeout(() => {
-          setValue('Dist.cRelatedInsured', insured);
-        }, 100);
-
-        
+      if(cGrpMrk.value === '1') {
+        const insured = opertaor.getDataAll()['insured'];
+        if (insured && insured['Insured.cInsuredCde']) {
+          setTimeout(() => {
+            setValue('Dist.cRelatedInsured', insured['Insured.cPkId']);
+          }, 100);
+        }
+      }else {
+        item['rules'] = [];
+        item["hidden"] = true;
       }
     }
     // 043009 实际用工地址关联 团单才展示
