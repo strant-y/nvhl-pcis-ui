@@ -143,7 +143,7 @@
           </div>
         <!-- </el-affix> -->
       </el-aside>
-      <el-main style="margin-top: 58px;">
+      <el-main class="main-container">
         <el-affix
           :offset="80"
           class="affix-main-header"
@@ -3112,9 +3112,13 @@ function getSaveDataParams() {
   position: absolute;
   top: 0;
   text-align: center;
-  padding: 5px;
+  // padding: 5px;
   background: #ebedfc;
-  width: 100%!important;
+  width: calc(100% - 20px)!important;
   font-size: 16px;
+}
+.main-container {
+  position: relative;
+  padding-top: 58px;
 }
 </style>
