@@ -157,6 +157,8 @@ const tremTemplateRefs = ref<any>({});
 const cvrgFormfef = ref("cvrgFormfef");
 const formData = ref<{ [key: string]: [] }>({});
 const disAbledFlag = ref(false);
+const codeListMap = ref<any>({});
+provide('codeListMap', codeListMap.value);
 
 onMounted(async () => {
   const formconfig11 = formInit(

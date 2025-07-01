@@ -7,7 +7,7 @@
           <th v-for="(item, k) in formcof" :key="k" :style="{width: item.width?item.width+'px':null}">
             {{ item.title + (k === 'nMainRate' ? item.suffix : '') }}
           </th>
-          <th style="width: 100px">操作</th>
+          <th v-if="checkShowBtn" style="width: 100px">操作</th>
         </tr>
       </thead>
       <tbody>
@@ -21,7 +21,7 @@
               :item="it"
             />
           </td>
-          <td>
+          <td v-if="checkShowBtn" >
             <rtButton
               v-if="!btnConf.delete.hidden"
               @click="
@@ -86,9 +86,34 @@ function setDisabledAll() {
   });
 }
 
+const checkShowBtn = computed(()=>{ 
+  let r = true;
+  Object.keys(btnConf.value).forEach((k: any) => {
+    r = r && !btnConf.value[k].hidden;
+  });
+  return r;
+}) ;
+
+function changeBtn() { 
+  Object.keys(formcof.value).forEach((k: any) => {
+    formcof.value[k].disabled = props.disabledFlag;
+  });
+  Object.keys(btnConf.value).forEach((k: any) => {
+    btnConf.value[k].hidden = props.disabledFlag;
+  });
+}
+
+
 function setCancel(){
   props.planData['Term.cCancelMrk'] = '1';
 }
+watch(() => props.disabledFlag, (val) => { 
+  changeBtn();
+});
+
+onMounted(() => { 
+  changeBtn();
+});
 
 function dataInit() {}
 defineExpose({

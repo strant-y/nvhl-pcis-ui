@@ -111,7 +111,7 @@
                     "
                     :ref="
                       (res) => {
-                        tremTemplateRefs[k + 'a2' + index] = res;
+                        tremTemplateRefs[k + 'a2'] = res;
                       }
                     "
                   />
@@ -136,7 +136,7 @@
                     "
                     :ref="
                       (res) => {
-                        tremTemplateRefs[k + 'a3' + index] = res;
+                        tremTemplateRefs[k + 'a3'] = res;
                       }
                     "
                   />
@@ -173,6 +173,8 @@ import { qryProdRelTermRiskList } from "@/api/prod";
 import { getEdrRsnTermItem } from "@/api/query";
 const codeListStore = codeListViewStore();
 const disAbledFlag = ref(false);
+const codeListMap = ref<any>({});
+provide('codeListMap', codeListMap.value);
 
 const opertaor = dataOpertaor();
 const parparam = opertaor.getParam();
@@ -644,6 +646,8 @@ function setDisabledAll() {
   Object.keys(btnItem.value).forEach((k: any) => {
     btnItem.value[k].hidden = true;
   });
+  
+  console.log(tremTemplateRefs.value);
   Object.keys(tremTemplateRefs.value).forEach((item) => {
     tremTemplateRefs.value[item].setDisabledAll();
   });
