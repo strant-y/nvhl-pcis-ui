@@ -53,13 +53,13 @@ export function resolveTokenApi(param) {
 /**
  * 注销API
  */
-/*export function logoutApi() {
-  return post('/logout',{source: null});
-}*/
-// 临时测试
 export function logoutApi() {
-  return post('http://10.12.18.114:8082/beauty-api/logout', { source: null }); // 指定完整URL
+  return post('/logout',{source: null});
 }
+// 临时测试
+/*export function logoutApi() {
+  return post('http://10.12.18.114:8082/beauty-api/logout', { source: null }); // 指定完整URL
+}*/
 /**
  * 绑定用户
  */
