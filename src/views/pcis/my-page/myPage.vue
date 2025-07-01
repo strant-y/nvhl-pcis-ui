@@ -1204,9 +1204,6 @@ async function loadAfter() {
       bthList.value = edrSurrenderBtn;
     }
   } else if (props.param.pageType === "readonly") {
-    nextTick(() => {
-      opertaor.setDisabledAll();
-    });
     // 查询数据
     // const getAppPlyInfoRes = await getAppPlyInfoByAppNo({
     //   CAppNo: props.param.cAppNo,
@@ -1222,6 +1219,10 @@ async function loadAfter() {
         item.disabled = true;
       });
     }
+    
+    nextTick(() => {
+      opertaor.setDisabledAll();
+    });
     nextTick(() => {
       // console.log(data);
       // opertaor.setDataAll(data);
