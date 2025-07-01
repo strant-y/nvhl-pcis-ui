@@ -55,7 +55,7 @@ const props = defineProps({
 });
 
 const rttableFrom = ref<any>(null);
-
+const parparam = opertaor.getParam();
 const cardconfig = ref(creatCardConfig({}));
 const moveUpTimer = ref(null);
 const moveDownTimer = ref(null);
@@ -419,6 +419,9 @@ function setDisabledAll() {
       item.hidden = true;
     });
   }
+  tableconfig.tableBtn.forEach(element => {
+    element.hidden = true;
+  });
 }
 function setUnDisabledByKeyList(key: any) {
   cardconfig.value.endBtns?.forEach((item: any) => {
@@ -431,6 +434,17 @@ function setUnDisabledByKeyList(key: any) {
       item.hidden = false;
     }
   });
+
+  let r = false;
+  if(key === "Btn_getSpecial_btn"){
+    r = true;
+  }
+  
+  if(r){
+    tableconfig.tableBtn.forEach(element => {
+      element.hidden = false;
+    });
+  }
 }
 function getFormconfig() {
   return {

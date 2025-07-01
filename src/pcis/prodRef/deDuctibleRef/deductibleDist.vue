@@ -50,6 +50,7 @@ const cardconfig = ref(creatCardConfig({}));
 const moveUpTimer = ref(null);
 const moveDownTimer = ref(null);
 const originalData = ref<any[]>([]);
+const parparam = opertaor.getParam();
 const pageresult = reactive<Pageresult>({
   result: "",
   /** 数据列表 */
@@ -79,7 +80,7 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtnWidth: 220,
     tableBtnPosition: "right",
     align: "left",
-    tableBtn: opertaor.getParam().pageType == "readonly" ? [] : [
+    tableBtn: [
       createFreeButtonBase({
         id: "score",
         link: true,
@@ -371,6 +372,9 @@ function setDisabledAll() {
       item.hidden = true;
     });
   }
+  tableconfig.tableBtn.forEach(element => {
+    element.hidden = true;
+  });
 }
 
 
@@ -385,6 +389,16 @@ function setUnDisabledByKeyList(key: any) {
       item.hidden = false;
     }
   });
+  let r = false;
+  if(key === "Btn_select_deductible_btn"){
+    r = true;
+  }
+  
+  if(r){
+    tableconfig.tableBtn.forEach(element => {
+      element.hidden = false;
+    });
+  }
 }
 
 defineExpose({
