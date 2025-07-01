@@ -78,6 +78,14 @@ const getCComponentTableValue = (compKey: string): string => {
   return "";
 };
 
+const tabKey = computed(() => {
+  if(props.compKey === 'AgreementDistInsured') {
+    return 'ECargoInsured';
+  }else {
+    return 'ECargoDist';
+  }
+})
+
 const formconfig11 = ref<any>({});
 onMounted(async () => {
   console.log("props.compKey", props.compKey)
@@ -157,12 +165,13 @@ const method = {
         },
         {
           isOk: (res: any) => {
+            const newRow = {
+              ...res,
+            };
+            newRow[tabKey.value + '.nSeqNo'] = pageresult.list.length + 1;
             setTableData([
               ...pageresult.list,
-              ...[{
-                ...res,
-                ...{'DistECargo.nSeqNo': pageresult.list.length + 1},
-              }]
+              ...[newRow]
             ]);
           },
         },
@@ -203,8 +212,8 @@ const method = {
     const appInfo = formPage.getFormDataById('AgreementApplicant');
     if(Object.keys(appInfo).length > 0) {
       const f = pageresult.list.filter((item: any) =>
-          item['DistECargo.cCustomerName'] === appInfo['Applicant.cAppNme'] &&
-          item['DistECargo.cIdentificationNumber'] === appInfo['Applicant.cCertfCde']
+          item['ECargoInsured.cCustomerName'] === appInfo['Applicant.cAppNme'] &&
+          item['ECargoInsured.cIdentificationNumber'] === appInfo['Applicant.cCertfCde']
       );
       if(f.length > 0) {
         return;
@@ -213,12 +222,12 @@ const method = {
         ...pageresult.list,
         ...[{
           ...{
-            'DistECargo.nSeqNo': pageresult.list.length + 1,
-            'DistECargo.cCustomerName': appInfo['Applicant.cAppNme'],
-            'DistECargo.cIdentificationNumber': appInfo['Applicant.cCertfCde'],
-            'DistECargo.cDocumentType': appInfo['Applicant.cCertfCls'],
-            'DistECargo.cGender': appInfo['Applicant.cSex'],
-            'DistECargo.nAge': appInfo['Applicant.nAge'],
+            'ECargoInsured.nSeqNo': pageresult.list.length + 1,
+            'ECargoInsured.cCustomerName': appInfo['Applicant.cAppNme'],
+            'ECargoInsured.cIdentificationNumber': appInfo['Applicant.cCertfCde'],
+            'ECargoInsured.cDocumentType': appInfo['Applicant.cCertfCls'],
+            'ECargoInsured.cGender': appInfo['Applicant.cSex'],
+            'ECargoInsured.nAge': appInfo['Applicant.nAge'],
           },
         }]
       ]);
@@ -245,25 +254,25 @@ const method = {
   },
 
   setregistAdd() {
-    const ads = distTableRef?.value?.getValue('DistECargo.AllProp');
-    const a = distTableRef?.value?.getValue("DistECargo.cRegisterSuffixAddr") || "";
+    const ads = distTableRef?.value?.getValue('ECargoDist.AllProp');
+    const a = distTableRef?.value?.getValue("ECargoDist.cRegisterSuffixAddr") || "";
     if (ads) {
       getAddressStr({address: ads}).then((res: any) => {
         const {code, data, msg} = res;
         if (code === 200) {
           const b = (data ? data['addStr'] : "") + a;
-          setAddressStr("DistECargo.cClntAddr", b);
+          setAddressStr("ECargoDist.cClntAddr", b);
         }
       });
     } else {
-      setAddressStr("DistECargo.cClntAddr", a);
+      setAddressStr("ECargoDist.cClntAddr", a);
     }
     console.log("清单级联事件触发")
   },
   cOccupationalLevelOnInit: (data: any) => {
     const {value, rowData, config, itemRef} = data;
     if (!value || !rowData || !config || !itemRef) return;
-    const AllOccup = rowData['DistECargo.AllOccup'];
+    const AllOccup = rowData['ECargoDist.AllOccup'];
     if (AllOccup.length < 3) return;
     codeListStore.queryCodeList({
       codeListName: "Occupt_ZYLB",
@@ -313,11 +322,11 @@ function setTableData(data: any) {
       ...item,
       ...{
         nSeqNo: index + 1,
-        tOpeningTime: item['DistECargo.tOpeningTime']
-            ? moment(item['DistECargo.tOpeningTime']).format("YYYY-MM-DD")
+        tOpeningTime: item['ECargoDist.tOpeningTime']
+            ? moment(item['ECargoDist.tOpeningTime']).format("YYYY-MM-DD")
             : null,
-        'DistECargo.AllOccup': [
-          item['DistECargo.cMajorCategories'], item['DistECargo.cMediumClassification'], item['DistECargo.cOccupationalSubcategory']
+        'ECargoDist.AllOccup': [
+          item['ECargoDist.cMajorCategories'], item['ECargoDist.cMediumClassification'], item['ECargoDist.cOccupationalSubcategory']
         ],
       }
     };
