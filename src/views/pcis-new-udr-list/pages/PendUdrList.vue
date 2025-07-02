@@ -906,7 +906,7 @@
 
     const changeForm = (val: any) => {
             console.log(val);
-        freeEditRef.value?.resetFields();
+        // freeEditRef.value?.resetFields();
         // resetForm();
         freeEditRef.value?.setFormValue({
             udrType: val,

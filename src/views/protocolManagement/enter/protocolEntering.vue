@@ -235,7 +235,6 @@ const tableconfig = reactive<AppTableConfig>(
         },
       }),
     ],
-    title: "协议列表",
     fromSchema: [
       {
         prop: "cAgreementNo",
