@@ -2839,7 +2839,6 @@ const submitUnderwritingFn = () => {
  * 投保申请核保时校验联共保信息
  */
 const validateCiInfo = () => {
-  debugger;
   const ciData = opertaor.getTableRefByKey("ci").getFromValue()
   if (ciData.length > 0) {
       let NCiShare = 0;
