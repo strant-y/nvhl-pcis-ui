@@ -1,6 +1,9 @@
 <template>
   <div class="searchbar">
-    <el-card shadow="never" class="table-container">
+    <el-card
+        shadow="never"
+        :class="['table-container','table_header']"
+    >
       <template
         #header
         v-if="
@@ -20,17 +23,26 @@
         </el-row>
         <el-row
           justify="space-between"
-          v-if="tableConfig.formconfig?.titleBtns.length > 0"
+          v-if="tableConfig.title || tableConfig.formconfig?.titleBtns.length > 0"
         >
-          <el-col :span="24" :style="{textAlign:tableConfig.titleBtnPosition}">
-            <template
-              v-for="(item, index) in tableConfig.formconfig?.titleBtns"
-              :key="index"
-            >
-              <template v-if="!item.hidden">
-                <rt-button :item="item" :ref="(res: any) => {btnMap[item?.id] = item}"/>
+          <el-col :span="5" v-if="tableConfig.title && tableConfig.title.length > 0">
+              {{ tableConfig.title }}
+          </el-col>
+          <el-col
+              v-if="tableConfig.formconfig?.titleBtns.length > 0"
+              :span="tableConfig.title && tableConfig.title.length > 0 ? 19 : 24"
+              :style="{textAlign:tableConfig.titleBtnPosition}"
+          >
+            <el-button-group>
+              <template
+                v-for="(item, index) in tableConfig.formconfig?.titleBtns"
+                :key="index"
+              >
+                <template v-if="!item.hidden">
+                  <rt-button :item="item" :ref="(res: any) => {btnMap[item?.id] = item}"/>
+                </template>
               </template>
-            </template>
+            </el-button-group>
           </el-col>
         </el-row>
         <el-row justify="space-between" v-if="tableConfig.titleBtns.length > 0">
@@ -275,5 +287,9 @@ defineExpose({
 .table-container {
   margin-top: 0px;
   margin-bottom: 0px;
+}
+.table_header :deep(.el-card__header) {
+  background-color: #e5f3fa;
+  padding: 15px 20px;
 }
 </style>

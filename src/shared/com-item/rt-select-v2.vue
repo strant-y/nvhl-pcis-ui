@@ -231,12 +231,13 @@ watch(
 );
 
 function getCodeListMapToOption(): boolean {
+  const rowId = props.row && props.row._dataId ? props.row._dataId : '';
   if(!!codeListMap) {
-    if(!!codeListMap[props.item.typeCode]) {
-      options.value = codeListMap[props.item.typeCode];
+    if(!!codeListMap[props.item.typeCode + rowId]) {
+      options.value = codeListMap[props.item.typeCode + rowId];
       return true;
-    }else if(!!codeListMap[props.item.prop]) {
-      options.value = codeListMap[props.item.prop];
+    }else if(!!codeListMap[props.item.prop + rowId]) {
+      options.value = codeListMap[props.item.prop + rowId];
       return true;
     }
   }
@@ -257,7 +258,8 @@ function uploadOption() {
       if (res) {
         options.value = res;
         if(!!codeListMap && (!getParam() || Object.keys(getParam()).length === 0)) {
-          codeListMap[props.item.prop] = res;
+          const rowId = props.row && props.row._dataId ? props.row._dataId : '';
+          codeListMap[props.item.prop + rowId] = res;
         }
       }
     })

@@ -51,6 +51,7 @@ const formconfig1 = reactive(createAppFreeEditConfig({}));
 const fileInputRef = ref(null);
 const fileInputType = ref();
 import { readFile } from "@/api/file";
+import { dataParam } from "@/store/modules/dataParam";
 const user = JSON.parse(sessionStorage.getItem("user"));
 const tCertfDate = ref<any[]>([]);
 const  cWorkDptList =['310','320','330','340','350','360']  // 单位性质带企业的ID
@@ -71,7 +72,7 @@ onMounted(() => {
     });
   });
   //【国民经济行业分类】初始化必填，只有法人时才必填，现在个人也是必填了（老系统需求：040001/042002/043004/043005/043011五款产品不区分法人个人投保，国民经济行业分类都必填，其他产品只有法人才必填）
-  const cProdNo = route.params.param.cProdNo;
+  const cProdNo = route.params.param?.cProdNo;
   if (
     cProdNo === "040001" ||
     cProdNo === "042002" ||
@@ -95,7 +96,8 @@ onMounted(() => {
   });
   // 移动电话
   setFormItem("Insured.cMobile", { rules: [getRules("phoneNo", {})] });
-
+  // 固话
+  setFormItem("Insured.cTel", { rules: [getRules("phone", {})] });
   // 传真校验
   setFormItem("Insured.cFax", { rules: [getRules("faxNumber", {})] });
   // 法人身份证
@@ -132,11 +134,12 @@ function setFormItem(key: any, obj: any) {
 
 // 解析身份证
 const idAnalysis = (id:string)=>{
-      if (  id.length !== 18) {
+    const tabref = opertaor.getTableRefs();
+    const insuredValue = tabref["insured"].getFromValue();
+      if (  id.length !== 18 || insuredValue["Insured.cCertfCls"] !=='120001') {
         return false
       }
-      // const certfCde = tabref["insured"].getFromValue()["Insured.cCertfCde"];
-      //   if (certfCde && certfCde.length === 18) {
+ 
           const birthYear = parseInt(id.substring(6, 10), 10);
           const birthMonth = parseInt(id.substring(10, 12), 10);
           const birthDay = parseInt(id.substring(12, 14), 10);
@@ -151,33 +154,34 @@ const idAnalysis = (id:string)=>{
           setValue("Insured.cSex", sex);
 
            clearValidate('Insured.cCertfCde') 
-        // }
+
 }
 
 
 
 //  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
 const checkUser = () => {
-  // 自定义录单 进入 可以查询用户信息
-  if (param.cRecordType !== 1 && param.cRecordType !== 2) {
+ 
+  // 自定义录单 方案配置 模版 进入 可以查询用户信息  
+  if (param.pageType !== "app" &&  param.pageType !== "copy" && param.pageType !== "template") {
     return false;
   }
   
 
   const tabref = opertaor.getTableRefs();
-  const applicantValue = tabref["insured"].getFromValue();
+  const insuredValue = tabref["insured"].getFromValue();
   //  只要4个有值 去请求客户信息
   if (
-    applicantValue["Insured.cInsuredNme"] &&
-    applicantValue["Insured.cClntMrk"] !== null &&
-    applicantValue["Insured.cCertfCde"] &&
-    applicantValue["Insured.cCertfCls"]
+    insuredValue["Insured.cInsuredNme"] &&
+    insuredValue["Insured.cClntMrk"] !== null &&
+    insuredValue["Insured.cCertfCde"] &&
+    insuredValue["Insured.cCertfCls"]
   ) {
     const param = {
-      coustName: applicantValue["Insured.cInsuredNme"],
-      coustMrk: applicantValue["Insured.cClntMrk"],
-      coustType: applicantValue["Insured.cCertfCls"],
-      coustCode: applicantValue["Insured.cCertfCde"],
+      coustName: insuredValue["Insured.cInsuredNme"],
+      coustMrk: insuredValue["Insured.cClntMrk"],
+      coustType: insuredValue["Insured.cCertfCls"],
+      coustCode: insuredValue["Insured.cCertfCde"],
       personnelType: "Insured"
     }
     qryCustomer(param)
@@ -289,7 +293,7 @@ const method = {
     const param = opertaor.getParam();
     const tabref = opertaor.getTableRefs();
     const InsuredValue = tabref["insured"].getFromValue();
-    console.log("---------------", InsuredValue);
+    console.log("---------------", val);
     checkUser();
     // val  0法人 1个人
     if (val == "0") {
@@ -367,17 +371,16 @@ const method = {
         setFormItem("Insured.cMobile", { rules: [ getRules("phoneNo", {})]})
       }
 
-      // 性别 、年龄、生日个人必填
+           // 性别 、年龄、生日个人必填
       setFormItem("Insured.tBirthday", {
-        rules: [getRules("required", {})]
+        rules: []
       });
       setFormItem("Insured.nAge", {
-       rules: [getRules("required", {})]
+       rules: []
       });
       setFormItem("Insured.cSex", {
-        rules: [getRules("required", {})]
+        rules: []
       });
-
 
       codeListStore
         .queryCodeList({
@@ -500,16 +503,20 @@ const method = {
       });
       setFormItem("Insured.cTel", { rules: [getRules("phone", {})] });
 
+      
       // 性别 、年龄、生日个人必填
       setFormItem("Insured.tBirthday", {
-        rules: []
+        rules: [getRules("required", {})]
       });
       setFormItem("Insured.nAge", {
-       rules: []
+       rules: [getRules("required", {})]
       });
       setFormItem("Insured.cSex", {
-        rules: []
+        rules: [getRules("required", {})]
       });
+
+
+ 
 
 
       codeListStore

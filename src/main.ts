@@ -19,6 +19,7 @@ import prodRef from "./pcis/prodRef/prodRef"; //产品组件引用
 import cargoRef from "./pcis/cargoRef/cargoRef"; //产品组件引用
 import popover from "./common/dzpopover/popover"; //弹出框组件引用
 import dzmodel from "./common/dzmodel/dzmodel";  //弹窗公共组件
+// import zhCn from 'element-plus/es/locale/lang/zh-cn';
 import './assets/iconfont/iconfont.css'
 
 const app = createApp(App);
@@ -39,3 +40,4 @@ app.use(shareds);
 app.use(prodRef);
 app.use(popover);
 app.use(cargoRef);
+// app.use(zhCn);

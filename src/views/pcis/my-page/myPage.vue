@@ -143,7 +143,7 @@
           </div>
         <!-- </el-affix> -->
       </el-aside>
-      <el-main style="margin-top: 58px;">
+      <el-main class="main-container">
         <el-affix
           :offset="80"
           class="affix-main-header"
@@ -1028,6 +1028,7 @@ const initPage = async () => {
     props.param?.pageType === "UW_READ_SCENE"
   ) {
     opertaor.setReadOnly(formconfig11);
+    console.log(77,formconfig11)
   }
 
   opertaor.setTableConfig(formconfig11);
@@ -2096,13 +2097,15 @@ const submitToUndrFn = async () => {
         return;
       }
       //校验联共保信息
-      const ciValue = opertaor.getTableRefByKey("Ci")?.getFromValue() || '';
-      console.log('ciValue', ciValue);
-      // const isCiValid = validateCiInfo();
-      // if (!isCiValid) {
-      //   btn.loading = false;
-      //   return;
-      // }
+      const plyBasedata = opertaor.getTableRefByKey("plyBase").getFromValue();
+      if(plyBasedata["Base.cCiMrk"] !== "0") {
+        const ciValue = opertaor.getTableRefByKey("ci")?.getFromValue() || '';
+        const isCiValid = validateCiInfo();
+        if (!isCiValid) {
+          btn.loading = false;
+          return;
+        }
+      }
       const calcData: any = opertaor.getDataAll();
       calcData["user"] = user;
       calcData["plyBase"]["Base.cDptCde"] = params.cDptCde;
@@ -2836,14 +2839,13 @@ const submitUnderwritingFn = () => {
  * 投保申请核保时校验联共保信息
  */
 const validateCiInfo = () => {
-  debugger;
-  const ciData = opertaor.getTableRefByKey("Ci").getFromValue()
-  if (ciData.value) {
+  const ciData = opertaor.getTableRefByKey("ci").getFromValue()
+  if (ciData.length > 0) {
       let NCiShare = 0;
       let chiefMrkM = 0; // 主
       let chiefMrkS = 0; // 从
       let CCoinsurerCdeNum = 0; // 分公司份额
-      for (const ciRow of ciData.items) {
+      for (const ciRow of ciData) {
         if (ciRow) {
           NCiShare = numAdd(NCiShare, parseFloat(ciRow["Ci.nCiShare"] || 0));
           if ("327001" === ciRow["Ci.cCoinsurerCde"]) {
@@ -2860,8 +2862,8 @@ const validateCiInfo = () => {
         ElMessage.error("主/从共保信息不完整!");
         return false;
       }
-      if (NCiShare !== 100.0) {
-        ElMessage.error("共保比例和应为100%!");
+      if (NCiShare !== 1) {
+        ElMessage.error("共保比例和应为1!");
         return false;
       }
       if (chiefMrkM > 1) {
@@ -3287,9 +3289,13 @@ function replacecInquiryNo(res:any) {
   position: absolute;
   top: 0;
   text-align: center;
-  padding: 5px;
+  // padding: 5px;
   background: #ebedfc;
-  width: 100%!important;
+  width: calc(100% - 20px)!important;
   font-size: 16px;
+}
+.main-container {
+  position: relative;
+  padding-top: 58px;
 }
 </style>
