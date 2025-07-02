@@ -134,11 +134,12 @@ function setFormItem(key: any, obj: any) {
 
 // 解析身份证
 const idAnalysis = (id:string)=>{
-      if (  id.length !== 18) {
+    const tabref = opertaor.getTableRefs();
+    const insuredValue = tabref["insured"].getFromValue();
+      if (  id.length !== 18 || insuredValue["Insured.cCertfCls"] !=='120001') {
         return false
       }
-      // const certfCde = tabref["insured"].getFromValue()["Insured.cCertfCde"];
-      //   if (certfCde && certfCde.length === 18) {
+ 
           const birthYear = parseInt(id.substring(6, 10), 10);
           const birthMonth = parseInt(id.substring(10, 12), 10);
           const birthDay = parseInt(id.substring(12, 14), 10);
@@ -153,7 +154,7 @@ const idAnalysis = (id:string)=>{
           setValue("Insured.cSex", sex);
 
            clearValidate('Insured.cCertfCde') 
-        // }
+
 }
 
 
@@ -168,19 +169,19 @@ const checkUser = () => {
   
 
   const tabref = opertaor.getTableRefs();
-  const applicantValue = tabref["insured"].getFromValue();
+  const insuredValue = tabref["insured"].getFromValue();
   //  只要4个有值 去请求客户信息
   if (
-    applicantValue["Insured.cInsuredNme"] &&
-    applicantValue["Insured.cClntMrk"] !== null &&
-    applicantValue["Insured.cCertfCde"] &&
-    applicantValue["Insured.cCertfCls"]
+    insuredValue["Insured.cInsuredNme"] &&
+    insuredValue["Insured.cClntMrk"] !== null &&
+    insuredValue["Insured.cCertfCde"] &&
+    insuredValue["Insured.cCertfCls"]
   ) {
     const param = {
-      coustName: applicantValue["Insured.cInsuredNme"],
-      coustMrk: applicantValue["Insured.cClntMrk"],
-      coustType: applicantValue["Insured.cCertfCls"],
-      coustCode: applicantValue["Insured.cCertfCde"],
+      coustName: insuredValue["Insured.cInsuredNme"],
+      coustMrk: insuredValue["Insured.cClntMrk"],
+      coustType: insuredValue["Insured.cCertfCls"],
+      coustCode: insuredValue["Insured.cCertfCde"],
       personnelType: "Insured"
     }
     qryCustomer(param)
