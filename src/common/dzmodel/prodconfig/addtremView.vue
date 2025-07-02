@@ -54,6 +54,7 @@
             :check-strictly="true"
             :filter-node-method="mainfilterNode"
             :data="data1"
+            :default-expanded-keys="expandedKeys"
             @check-change="selectmainMethod"
           />
         </div>
@@ -151,6 +152,7 @@ const query =ref({
 const data1 = ref([]);
 const mainRef = ref<InstanceType<typeof ElTree>>();
 const additionalRef = ref<InstanceType<typeof ElTree>>();
+const expandedKeys = ref<string[]>([]);
 
 const selectAdditionNodes = ref<any[]>([]);
 props.data.data.isselectData?.forEach((item: any) => {
@@ -219,6 +221,7 @@ onMounted(async () => {
     const { code, data, msg } = res;
     if (200 === code) {
       data1.value = data;
+      expandedKeys.value = data.map(item => item.id);
       data1.value.forEach((item: any) => { 
         if(tremMap.value[item.cUniqueTermNo]){
           const risks = tremMap.value[item.cUniqueTermNo];
