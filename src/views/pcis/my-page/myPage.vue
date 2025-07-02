@@ -2097,13 +2097,15 @@ const submitToUndrFn = async () => {
         return;
       }
       //校验联共保信息
-      const ciValue = opertaor.getTableRefByKey("Ci")?.getFromValue() || '';
-      console.log('ciValue', ciValue);
-      // const isCiValid = validateCiInfo();
-      // if (!isCiValid) {
-      //   btn.loading = false;
-      //   return;
-      // }
+      const plyBasedata = opertaor.getTableRefByKey("plyBase").getFromValue();
+      if(plyBasedata["Base.cCiMrk"] !== "0") {
+        const ciValue = opertaor.getTableRefByKey("ci")?.getFromValue() || '';
+        const isCiValid = validateCiInfo();
+        if (!isCiValid) {
+          btn.loading = false;
+          return;
+        }
+      }
       const calcData: any = opertaor.getDataAll();
       calcData["user"] = user;
       calcData["plyBase"]["Base.cDptCde"] = params.cDptCde;
@@ -2838,13 +2840,13 @@ const submitUnderwritingFn = () => {
  */
 const validateCiInfo = () => {
   debugger;
-  const ciData = opertaor.getTableRefByKey("Ci").getFromValue()
-  if (ciData.value) {
+  const ciData = opertaor.getTableRefByKey("ci").getFromValue()
+  if (ciData.length > 0) {
       let NCiShare = 0;
       let chiefMrkM = 0; // 主
       let chiefMrkS = 0; // 从
       let CCoinsurerCdeNum = 0; // 分公司份额
-      for (const ciRow of ciData.items) {
+      for (const ciRow of ciData) {
         if (ciRow) {
           NCiShare = numAdd(NCiShare, parseFloat(ciRow["Ci.nCiShare"] || 0));
           if ("327001" === ciRow["Ci.cCoinsurerCde"]) {
