@@ -136,10 +136,12 @@ function setFormItem(key: any, obj: any) {
 
 // 解析身份证
 const idAnalysis = (id:string)=>{
-    if (  id.length !== 18) {
-      return false
-     }
-     const birthYear = parseInt(id.substring(6, 10), 10);
+      const tabref = opertaor.getTableRefs();
+      const applicantValue = tabref["applicant"].getFromValue();
+      if (  id.length !== 18 || applicantValue["Applicant.cCertfCls"] !=='120001') {
+        return false
+      }
+          const birthYear = parseInt(id.substring(6, 10), 10);
           const birthMonth = parseInt(id.substring(10, 12), 10);
           const birthDay = parseInt(id.substring(12, 14), 10);
           const birthday = `${birthYear}-${birthMonth.toString().padStart(2, "0")}-${birthDay.toString().padStart(2, "0")}`;
