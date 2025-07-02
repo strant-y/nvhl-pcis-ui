@@ -209,7 +209,7 @@ const setcDetailedAddress = (prop:any,aftProp:any)=> {
 const method = {
   getcNavigationAreaChange:()=>{
     dialog.value?.open('navigationAreaTips', null,
-        null,{width: 65,title:'航行区域提示'});
+        null,{width: 50,title:'航行区域提示'});
   },
   getcInsuranceIndustryChange:(val:string)=>{
     if(val === '8'){

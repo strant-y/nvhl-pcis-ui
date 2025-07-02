@@ -16,7 +16,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column prop="area" width="150">
+      <el-table-column prop="area" width="200">
         <template #default="{ row }">
           <div class="wrap-content">
             {{ row.area }}
@@ -39,66 +39,58 @@
 import {onMounted, ref} from 'vue';
 import {codelistQuery} from "@/api/dict";
 
-const tableData = ref([
-  {
-    category: '国际海域',
-    area: '近洋航区',
-    description: '北纬55度至北回归线之间与东经142度以西的太平洋水域以及北回归线至赤道之间与东经99度以东，东经130度以西所包括的太平洋水域（俗称东南亚航线、中日韩航线）'
-  },
-  {
-    category: '国际海域',
-    area: '无限航区（远洋YY）',
-    description: '海上任何通航水域包括世界各国的开放港口和国际通航运河及河流。'
-  },
-  {
-    category: '国内海域',
-    area: '遮蔽航区',
-    description: '系指在沿海航区内，由海岸与岛屿、岛屿与岛屿围成的遮蔽条件较好、波浪较小的海域。在该海域内岛屿之间、岛屿与海岸之间的横跨距离应不超过10m mile。'
-  },
-  {
-    category: '国内海域',
-    area: '沿海航区',
-    description: '系指台湾岛东海岸、台湾海峡东南海岸、海南岛东海岸及南海岸距岸不超过10m mile的海域和除上述海域外距岸不超过20m mile的海域；距有避风条件且有施救能力的沿海岛屿不超过20m mile的海域。'
-  },
-  {
-    category: '国内海域',
-    area: '近海航区',
-    description: '系指中国渤海、黄海及东海岸距岸不超过200m mile的海域；台湾海峡：南海距岸不超过120m mile（台湾岛东海岸、海南岛东海岸及南海岸距岸不超过50m mile）的海域。'
-  },
-  {
-    category: '国内海域',
-    area: '远海航区',
-    description: '系指国内航行超出近海航区的海域'
-  },
-  {
-    category: '国内内河',
-    area: '内河A级',
-    description: '内河急流航段（在选择内河B级和内河C级的时候，允许选择内河J1级、内河J2级）'
-  },
-  {
-    category: '国内内河',
-    area: '内河B级',
-    description: '内河J1级'
-  },
-  {
-    category: '国内内河',
-    area: '内河C级',
-    description: '内河J2级'
-  }
-]);
+const tableData = ref([]);
 onMounted(() => {
   refreshData();
 });
+function transformAreaData(data) {
+  const result = [];
+  let currentKey = '';
+  let currentCategory = '';
+
+  for (let i = 0; i < data.length; i++) {
+    const item = data[i];
+    const { label, value, tip } = item;
+
+    // 如果是顶级分类（如 B01、B02、B03）
+    if (/^B\d{2}$/.test(value)) {
+      currentKey = value;
+      currentCategory = label;
+    } else {
+      const next = data[i + 1];
+
+      // 如果下一个是当前项的子项（value 以当前项开头且更长）
+      if (next && next.value.startsWith(value)) {
+        result.push({
+          key: currentKey,
+          category: currentCategory,
+          area: label,
+          description: next.tip || next.label
+        });
+        i++; // 跳过子项
+      } else {
+        result.push({
+          key: currentKey,
+          category: currentCategory,
+          area: label,
+          description: tip || label
+        });
+      }
+    }
+  }
+
+  return result;
+}
+const spanArr = ref([]);
 const refreshData = () => {
   const param = {
-    codeListName: "Sailing_Area",
+    codeListName: "Sailing_Area_Knowledge",
   }
   // 查询列表数据
   codelistQuery(param).then((response) => {
     if (response.code === 200) {
-      debugger
-      console.log('response.data',response.data)
-      list.value = response.data;
+      tableData.value = transformAreaData(response.data)
+      spanArr.value = getSpanArr(tableData.value)
     } else {
       ElMessage.error(response.msg);
     }
@@ -126,7 +118,6 @@ const getSpanArr = (data) => {
   return spanArr;
 };
 
-const spanArr = ref(getSpanArr(tableData.value));
 
 const objectSpanMethod = ({ row, column, rowIndex, columnIndex }) => {
   if (columnIndex === 0) {
