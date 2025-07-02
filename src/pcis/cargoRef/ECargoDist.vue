@@ -1,12 +1,10 @@
 <template>
   <div>
-    <myCard :cardConfig="cardconfig">
       <app-table
           :tableConfig="tableconfig"
           v-model:pageresult="pageresult"
           ref="distTableRef"
       />
-    </myCard>
     <comDialog ref="dialog"></comDialog>
   </div>
 </template>
@@ -29,7 +27,6 @@ import {formInit} from "@/shared/from-init";
 import {codeListViewStore} from "@/store";
 
 const codeListStore = codeListViewStore();
-import {CardConfig, creatCardConfig} from "@/shared/mytemplate/card-config";
 import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
 import {useRoute} from "vue-router";
 import {AppFreeEditMethod} from "@/shared/app-free-edit-config";
@@ -63,7 +60,6 @@ const pageresult = reactive<Pageresult>({
 });
 const applicantEditRef = ref<AppFreeEditMethod | null>(null);
 const distTableRef = ref<AppTableMethod | null>(null);
-const cardconfig = ref<CardConfig>(creatCardConfig({}));
 const formconfig1 = ref<Record<string, any>>({});
 const tableconfig = ref<AppTableConfig>(createTableEditConfig());
 
@@ -96,7 +92,8 @@ onMounted(async () => {
       exRules
   );
   Object.assign(formconfig1.value, formconfig11.value);
-  cardconfig.value.title = formconfig1.value.title;
+  tableconfig.value.title =formconfig1.value.title;
+  tableconfig.value.titleBtnPosition = 'right';
   tableconfig.value.showEdit = true;
   formconfig1.value.fromSchema.forEach((e: any) => {  // 隐藏不需要显示在表格内的数据
     if (e.cShowLocation === '0') {

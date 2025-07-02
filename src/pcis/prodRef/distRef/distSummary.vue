@@ -1,12 +1,10 @@
 <template>
   <div>
-    <myCard :cardConfig="cardconfig">
-      <app-table
-        :tableConfig="tableconfig"
-        v-model:pageresult="pageresult"
-        ref="distTableRef"
-      />
-    </myCard>
+    <app-table
+      :tableConfig="tableconfig"
+      v-model:pageresult="pageresult"
+      ref="distTableRef"
+    />
     <comDialog ref="dialog"></comDialog>
   </div>
 </template>
@@ -59,7 +57,6 @@ const pageresult = reactive<Pageresult>({
 });
 
 const distTableRef = ref<AppTableMethod | null>(null);
-const cardconfig = ref<CardConfig>(creatCardConfig({}));
 const formconfig1 = ref<Record<string, any>>({});
 const tableconfig = ref<AppTableConfig>(createTableEditConfig());
 
@@ -143,7 +140,6 @@ onMounted(async () => {
     exRules
   );
   Object.assign(formconfig1.value, formconfig11.value);
-  cardconfig.value.title = formconfig1.value.title;
   tableconfig.value.showEdit = true;
   tableconfig.value.fromSchema = formconfig1.value.fromSchema;
   tableconfig.value.formconfig = createAppGridEditConfig({
@@ -153,6 +149,7 @@ onMounted(async () => {
   tableconfig.value.tableBtnType = "btn";
   tableconfig.value.tableBtnWidth = 150;
   tableconfig.value.tableBtnPosition = "right";
+  tableconfig.value.title = formconfig1.value.title;
   if (formconfig11.value.editBtns && formconfig11.value.editBtns.length > 0) {
     let btns: any[] = [];
     btns = formconfig11.value.editBtns.filter((btn: any) => !btn.hidden);
