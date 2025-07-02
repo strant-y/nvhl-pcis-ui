@@ -2862,8 +2862,8 @@ const validateCiInfo = () => {
         ElMessage.error("主/从共保信息不完整!");
         return false;
       }
-      if (NCiShare !== 100.0) {
-        ElMessage.error("共保比例和应为100%!");
+      if (NCiShare !== 1) {
+        ElMessage.error("共保比例和应为1!");
         return false;
       }
       if (chiefMrkM > 1) {
