@@ -132,6 +132,12 @@ export const useUserStore = defineStore("user", () => {
           resolve();
         })
         .catch((error) => {
+          sessionStorage.removeItem("token");
+          sessionStorage.removeItem("returntime");
+          location.reload(); // 清空路由
+          localStorage.clear();
+          sessionStorage.clear();
+          document.cookie = '';
           reject(error);
         });
     });
