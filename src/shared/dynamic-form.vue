@@ -239,10 +239,11 @@
                   </template>
                   <div
                     :style="{
-                      width:
-                        item.showExBtn && item.inputtype !== 'rttable'
-                          ? (item.btnWidth ? 100 - item.btnWidth : 75) + '%'
-                          : '100%',
+                      // width:
+                      //   item.showExBtn && item.inputtype !== 'rttable'
+                      //     ? (item.btnWidth ? 100 - item.btnWidth : 75) + '%'
+                      //     : '100%',
+                      flex: 1,
                     }"
                   >
                     <from-item
@@ -258,7 +259,7 @@
                   <rt-button
                     v-if="item.showExBtn && item.inputtype !== 'rttable'"
                     :style="{
-                      width: (item.btnWidth ? item.btnWidth : 25) + '%',
+                      width: item.btnWidth ? item.btnWidth + '%' : 'auto',
                     }"
                     :item="item.btnItems"
                   />
