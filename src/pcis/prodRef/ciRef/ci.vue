@@ -157,6 +157,13 @@ const method = {
                 res
             );
           });
+        setFormItem("Ci.cDptCde", { rules: [getRules("required", {})] });
+        setFormItem("Ci.cDptCde", { disabled: false });
+        setFormItem("Ci.nComm", { disabled: false});
+        setFormItem("Ci.cBrkrCde", { disabled: false});
+        setFormItem("Ci.cBrkSlsCde", { disabled: false});
+        setFormItem("Ci.cSlsCde", { rules: [getRules("required", {})] });
+        setFormItem("Ci.cSlsCde", { disabled: false});
       // updateMasterAgreementValues();
     } else {
       // 非永安保险，设置默认值和其他数据
@@ -166,7 +173,13 @@ const method = {
           "loadData",
           [{ value: '1', label: '其他' }]
       );
-      
+      setFormItem("Ci.cDptCde", { rules: [] });
+      setFormItem("Ci.cDptCde", { disabled: true });
+      setFormItem("Ci.nComm", { disabled: true});
+      setFormItem("Ci.cBrkrCde", { disabled: true});
+      setFormItem("Ci.cBrkSlsCde", { disabled: true});
+      setFormItem("Ci.cSlsCde", { disabled: true});
+      setFormItem("Ci.cSlsCde", { rules: []});
     }
   },
 
@@ -359,7 +372,7 @@ const method = {
     // 我方主共或从共的情况
     if (cCiMrk["Base.cCiMrk"] === '2' || cCiMrk["Base.cCiMrk"] === '4') {
       // 情况1：如果选中的是“是”且是永安保险(327001)
-      if (rowData.length>1 && val === "1" && cCoinsurerCde === "327001") {
+      if ( val === "1" && cCoinsurerCde === "327001") {
         ElMessage.error("我方从共时主共保方不能是我司！");
         freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowId, "");
         return;
