@@ -75,6 +75,7 @@ import epolicyWorker from './commodityRef/EPolicyWorker.vue' //在保证明
 import detailsAccident from "./commodityRef/DetailsAccident.vue" //合同约定的事故预防服务项目详情
 import detailsKnows from "./commodityRef/DetailsKnows.vue" //标的信息知识点提醒详情
 import reinsuranceTips from "./commodityRef/ReinsuranceTips.vue" //水险再保提示详情
+import navigationAreaTips from "./commodityRef/NavigationAreaTips.vue" //航行区域提示详情
 
 /**用于动态组件的映射生成 */
 const componentMap = {
@@ -151,7 +152,8 @@ const componentMap = {
   epolicyWorker:epolicyWorker,
   detailsAccident:detailsAccident,
   detailsKnows:detailsKnows,
-  reinsuranceTips:reinsuranceTips
+  reinsuranceTips:reinsuranceTips,
+  navigationAreaTips:navigationAreaTips
 };
 
 const install = (Vue) => {
