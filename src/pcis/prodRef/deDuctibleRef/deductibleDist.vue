@@ -103,15 +103,26 @@ const tableconfig = reactive<AppTableConfig>(
           if(row.editList && row.editList.length>0){
             param['editList'] = row.editList
           }
-
-          console.log('数据====',param)
           dzmodal.open(deductibleFixEdit, { 
             type: "view", 
             data: param, 
             callback: (res: any) => {
               if (res.type === "ok") {
-                row.cDeductibleContent = res.data.cDeductibleContent
-                row['editList']= res.data['editList']
+                // row.cDeductibleContent = res.data.cDeductibleContent
+                // row['editList']= res.data['editList']
+
+                 let list = formData.value;
+                 const index = list.findIndex(
+                    item => item.cDeductibleClass === row.cDeductibleClass
+                  );
+                  if (index !== -1) {
+                    nextTick(()=>{
+                      list[index]['cDeductibleContent'] = res.data.cDeductibleContent;
+                      list[index]['editList'] =res.data['editList']
+                      formData.value = list
+                    })
+                  }      
+
               }
             }
           });
@@ -145,6 +156,7 @@ const tableconfig = reactive<AppTableConfig>(
           if (row.nSeqNo == 1) return true;
         },
         tableClick: (row) => {
+          console.log('1112')
           moveUp(row.nSeqNo - 1);
         },
       }),
@@ -233,6 +245,7 @@ const initOriginalData = ()=> {
 
 // 上移一行
 const moveUp = async (index) => {
+   console.log('上下----')
   const tableData = formData.value;
   if (index > 0) {
     [tableData[index], tableData[index - 1]] = [
@@ -253,6 +266,7 @@ const moveUp = async (index) => {
 
 // 下移一行
 const moveDown = (index) => {
+  console.log('上下----')
   const tableData = formData.value;
   if (index < tableData.length - 1) {
     [tableData[index], tableData[index + 1]] = [

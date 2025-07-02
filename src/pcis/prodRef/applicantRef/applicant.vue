@@ -167,11 +167,9 @@ const checkUser = () => {
 //   }
  
   // 自定义录单 方案配置 模版 进入 可以查询用户信息  
-  if (param.pageType !== "app" &&  param.pageType !== "copy" && param.pageType !== "template") {
+  if (param.pageType !== "app" &&  param.pageType !== "copy" && param.pageType !== "template" && param.cAppStatus !=='1') {
     return false;
   }
-  
-
 const tabref = opertaor.getTableRefs();
 const applicantValue = tabref["applicant"].getFromValue();
 //  只要4个有值 去请求客户信息
