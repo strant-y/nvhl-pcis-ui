@@ -279,7 +279,7 @@ const method = {
   //分公司下拉事件
   cSubDptCdeChange:(val)=>{
     const rowData = freeEditRef.value?.getSelectRow();
-    if (!rowData || !initFlag.value) return;
+    // if (!rowData || !initFlag.value) return;
     const rowId = rowData._dataId;
     if(val !=""){
       codeListStore
@@ -314,7 +314,7 @@ const method = {
     onChiefMrkChange()
     console.log("出单机构下拉事件",val);
     const rowData = freeEditRef.value?.getSelectRow();
-    if (!rowData || !initFlag.value) return;
+    // if (!rowData || !initFlag.value) return;
     const rowId = rowData._dataId;
     // 获取所有行数据
     const allRows = getFromValue();
