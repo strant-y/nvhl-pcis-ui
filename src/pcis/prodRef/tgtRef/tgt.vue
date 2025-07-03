@@ -908,7 +908,7 @@ function groupCheck() {
 
     let h = true;
     if(cIndustryType === '15' && (subSidiary === '024101' || subSidiary === '026201' || subSidiary === '024201'
-      || subSidiary === '023702' || subSidiary === '026401' )){09
+      || subSidiary === '023702' || subSidiary === '026401' )){
       h = false;
     }else{
       if(cInsuranceMethod !== '613001'){
