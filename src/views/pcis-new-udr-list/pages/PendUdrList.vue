@@ -129,7 +129,7 @@
             rules: [getRules("required", {})],
             showKey: [1, 2, 5],
             btnWidth: 10,
-            itemWidth: 2,
+            // itemWidth: 2,
             showExBtn: true,
             btnItems: {
                 icon: "Search",

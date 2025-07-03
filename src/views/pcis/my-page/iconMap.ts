@@ -18,4 +18,5 @@ export const iconMap = {
   'underwriteurl': 'icon-shenhexinxi',
   'edrbase': 'icon-shujuxiuzheng',
   'edritem': 'icon-zhongkaian',
+  'acctinfo': 'icon-yonghutousuxinxi',
 }

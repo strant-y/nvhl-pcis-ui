@@ -279,3 +279,12 @@ export function submitUnderwrite(queryParams: any): AxiosPromise<any> {
 export function getInquiryPolicyList(queryParams: any): AxiosPromise<any> {
     return post(`/policy/getInquiryPolicyList`, queryParams);
 }
+
+
+/**
+ * 综合查询-询价单删除
+ * @param queryParams
+ */
+export function delInquiryPolicy(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/delInquiryPolicy`, queryParams);
+}
