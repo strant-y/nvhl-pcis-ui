@@ -714,7 +714,7 @@ const basicBtn = [
   }),
   createFreeButtonBase({
     label: "申请核保",
-    type: "primary",
+    type: "warning",
     id: "btn010103",
     func: () => {
       submitToUndrFn();
