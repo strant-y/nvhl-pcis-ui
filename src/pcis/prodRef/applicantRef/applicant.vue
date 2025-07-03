@@ -772,9 +772,7 @@ const method = {
         "Applicant.tCertfEndDate",
         moment(new Date("2099-12-31")).format("YYYY-MM-DD HH:mm:ss")
       );
-      if (!param.initFlag) {
         setFormItem("Applicant.tCertfEndDate", { disabled: true });
-      }
 
       // let cCertfCls = getValue('Applicant.cCertfCls');  // 证件类型   110007  120001
       // if(cCertfCls ==="120001" || cCertfCls ==="110008=7"){
@@ -790,10 +788,7 @@ const method = {
         setValue("Applicant.tCertfBgnDate", tCertfDate.value[0] || "");
         setValue("Applicant.tCertfEndDate", tCertfDate.value[1] || "");
       }
-  
-      if (!param.initFlag) {
         setFormItem("Applicant.tCertfEndDate", { disabled: false });
-      }
       
       // let cCertfCls = getValue('Applicant.cCertfCls');  // 证件类型   110007  120001
       // if(cCertfCls ==="120001" || cCertfCls ==="110008=7"){

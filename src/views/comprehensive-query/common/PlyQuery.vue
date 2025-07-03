@@ -1012,6 +1012,12 @@ const tableObj = {
                 minWidth: 180,
             },
             {
+              prop: "cAppNme",
+              inputtype: "rtinput",
+              title: "投保人名称",
+              minWidth: 180,
+            },
+            {
                 prop: "cSecondDptCnm",
                 inputtype: "rtinput",
                 title: "二级分公司",
@@ -1025,7 +1031,7 @@ const tableObj = {
             },
             {
                 prop: "tIssueTm",
-                inputtype: "rtdatepicker",
+                inputtype: "rtinput",
                 title: "签单日期",
                 minWidth: 180,
             },

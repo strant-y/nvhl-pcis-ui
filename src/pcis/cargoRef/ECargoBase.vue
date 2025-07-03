@@ -14,6 +14,7 @@ import {
   AppFreeEditMethod,
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
+import { checkCdeptByCdptCde, getNmeByCde } from "@/api/prod/index";
 import { formInit } from "@/shared/from-init";
 import { codeListViewStore,dataOpertaor, useProductStore } from "@/store";
 import { useValidator } from "@/typings/useValidator";
@@ -37,7 +38,10 @@ const idxParam = inject<any>('idxParam', {});
 const formPage = idxParam?.formPage;
 const param = idxParam?.param;
 const user = idxParam?.user;
+const productStore = useProductStore();
+const codeListStore = codeListViewStore();
 const opertaor = dataOpertaor();
+const subDptCde = ref(); //所属分公司
 
 onMounted(() => {
   const formconfig11 = formInit(
@@ -48,6 +52,8 @@ onMounted(() => {
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
     initComp();
+    // 查询承保机构所属分公司和项目类别大类数据
+    getCheckCdeptByCdptCde();
   })
 });
 
@@ -164,9 +170,9 @@ const method = {
           },
         };
         if (!p.initFlag) {
-          setFormItem("ECargoBase.cSlsId", obj); //业务员工号
+          // setFormItem("ECargoBase.cSlsId", obj); //业务员工号
         }
-        setFormItem("ECargoBase.cSlsId", { rules: null }); //业务员工号
+        // setFormItem("ECargoBase.cSlsId", { rules: null }); //业务员工号
         setValue("ECargoBase.cSlsId", "");
       } else {
         const obj = {
@@ -176,9 +182,9 @@ const method = {
           },
         };
         if (!p.initFlag) {
-          setFormItem("ECargoBase.cSlsId", obj); //业务员工号
+          // setFormItem("ECargoBase.cSlsId", obj); //业务员工号
         }
-        setFormItem("ECargoBase.cSlsId", { rules: [getRules("required", {})] }); //业务员工号
+        // setFormItem("ECargoBase.cSlsId", { rules: [getRules("required", {})] }); //业务员工号
       }
 
       getChaSubtypList(params).then((res) => {
@@ -246,7 +252,178 @@ const method = {
       ElMessage.warning("渠道分类--请选择非直销业务!");
     }
   },
+    //代理业务员icon事件
+  agentSaleFuncA: () => {
+    console.log("代理业务员icon事件");
+    if (!getValue("ECargoBase.cBrkrCde")) {
+      ElMessage.warning("请先选择代理(经济)人！");
+      return;
+    }
+    let cslstyp = "";
+    if (getValue("ECargoBase.cChaType") === "1900201") {
+      // 个人代理时
+      cslstyp = "020003";
+    } else if (
+      getValue("ECargoBase.cBsnsTyp") !== "19001" &&
+      getValue("ECargoBase.cChaType") !== "1900201"
+    ) {
+      // 非直销且非个人代理
+      cslstyp = "020004";
+    };
+    
+    dialogRef.value?.open(
+      "agentWorker",
+      {
+        type: "show",
+        data: {
+          CDptCde: sessionData.value?.cDptCde,
+          cBsnsTyp: getValue("ECargoBase.cBsnsTyp"),
+          cChaType: getValue("ECargoBase.cChaType"),
+          cChaSubtype: getValue("ECargoBase.cChaSubtype"),
+          CSlsId: getValue("ECargoBase.CSlsId"), //业务员员工号
+          CBrkrCde: getValue("ECargoBase.CBrkrCde"), //代理(经纪)人
+          CDptAttr: getValue("ECargoBase.CDptAttr"), //投保单业务归属部门的部门类型(angular上被hidden的,逻辑赋值angular：guide.component.ts【324行】)
+          CSlsTyp: cslstyp,
+          leading: "CBrkSlsCde",
+        },
+        method: {
+          getSelected: (params) => {
+            setFormValue({
+              // "ECargoBase.cBrkSlsCde": params.CSlsCde, //代理业务员
+              "ECargoBase.cCertfNo": params.CCtfctNo, //代理业务执业证号
+              "ECargoBase.cBrkrDptcde": params.CDptCde, //代理业务员机构代码
+            });
+
+                   setFormItem("ECargoBase.cBrkSlsCde", {
+                    loadData: [
+                      {
+                        value:  params["CSlsCde"],
+                        label:params["CSlsCde"] + params['CSlsNme'],
+                      },
+                    ],
+                  });
+                  setValue("ECargoBase.cBrkSlsCde", params.CSlsCde);
+            
+            dialogRef.value?.handleClose();
+          },
+        },
+      },
+      { title: "业务员", width: 85 }
+    );
+  },
+    //项目类别大类change事件
+  cPrjCtgTypChange: (val) => {
+    const p = opertaor.getParam();
+    if (!p.initFlag) {
+      setValue("ECargoBase.cPrjCtgMidTyp", "");
+      setValue("ECargoBase.cPrjCtgSubTyp", "");
+    }
+    if (val) {
+      // Base.cPrjCtgMidTyp
+      // setFormItem("ECargoBase.cPrjCtgMidTyp", { rules: null, disabled: true });
+      codeListStore
+        .queryCodeList({
+          codeListName: "CPrjCtgTyp_List",
+          codeListParam: {
+            CRangeCde: subDptCde.value,
+            CParCde: val,
+            cLev: "2",
+          },
+        })
+        .then((res) => {
+          if (res) {
+            baseEditRef?.value?.addCodeListMap({
+              code: 'ECargoBase.cPrjCtgMidTyp',
+              list: res
+            })
+            // setFormItem("ECargoBase.cPrjCtgMidTyp", {
+            //   loadData: res,
+            //   rules: [getRules("required", {})],
+            // });
+          }
+        });
+    }
+  },
+  //项目类别中类change事件
+  cPrjCtgMidTypChange: (val) => {
+    const p = opertaor.getParam();
+    if (!p.initFlag) {
+      setValue("ECargoBase.cPrjCtgSubTyp", "");
+    }
+    if (val) {
+      codeListStore
+        .queryCodeList({
+          codeListName: "CPrjCtgTyp_List",
+          codeListParam: {
+            CRangeCde: subDptCde.value,
+            CParCde: val,
+            cLev: "3",
+          },
+        })
+        .then((res) => {
+          if (res) {
+            baseEditRef?.value?.addCodeListMap({
+              code: 'ECargoBase.cPrjCtgSubTyp',
+              list: res
+            })
+            // setFormItem("ECargoBase.cPrjCtgSubTyp", { loadData: res });
+          }
+        });
+    }
+  },
 };
+
+function getCheckCdeptByCdptCde() {
+  // const CDptCde = getValue("Base.cDptCde");
+  const CDptCde = JSON.parse(sessionStorage.getItem("user")).companyId;
+  if (CDptCde) {
+    // 查询承保机构所属分公司
+    checkCdeptByCdptCde({ dptCde: CDptCde }).then(
+      (res) => {
+        if (res["code"] === 200) {
+          if (res.data) {
+            subDptCde.value = res.data;
+            //查询项目类别大类数据
+            codeListStore
+              .queryCodeList(
+                {
+                  codeListName: "CPrjCtgTyp_List",
+                  codeListParam: {
+                    CRangeCde: subDptCde.value,
+                    // CParCde: "",
+                    cLev: "1",
+                  },
+                },
+                false,
+                false
+              )
+              .then((res) => {
+                if (res) {
+                  baseEditRef.value?.addCodeListMap({
+                    code: "ECargoBase.cPrjCtgTyp",
+                    list: res,
+                  })
+                  // setFormItem("Base.cPrjCtgTyp", { loadData: res });
+                }
+              })
+              .catch((err) => {
+                  baseEditRef.value?.addCodeListMap({
+                    code: "ECargoBase.cPrjCtgTyp",
+                    list: [],
+                  })
+                // setFormItem("ECargoBase.cPrjCtgTyp", { loadData: [] });
+              });
+          }
+        } else {
+          ElMessage.error("根据机构编码查询分公司出现异常！");
+        }
+      },
+      (error) => {
+        ElMessage.error("根据机构编码查询分公司出现异常！");
+      }
+    );
+  }
+}
 
 function getFormValue() {
   return baseEditRef?.value?.getFromValue();

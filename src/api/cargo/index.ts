@@ -67,7 +67,7 @@ export default {
     checkSubmit,
     checkInit,
     editInit,
-    init,
+    // init,
     query,
     getECargoPageView
 }

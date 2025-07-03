@@ -279,7 +279,7 @@ const method = {
   //分公司下拉事件
   cSubDptCdeChange:(val)=>{
     const rowData = freeEditRef.value?.getSelectRow();
-    if (!rowData || !initFlag.value) return;
+    // if (!rowData || !initFlag.value) return;
     const rowId = rowData._dataId;
     if(val !=""){
       codeListStore
@@ -297,6 +297,25 @@ const method = {
           );
         });
     }
+    // 新增逻辑：判断当前选择的分公司是否在其他行中已经存在且共保公司为永安保险
+    const allRows = getFromValue(); // 获取所有行数据
+    // 查找当前行的分公司值
+    const currentSubDptCde = val;
+    // 遍历所有行，检查是否有其他行选择了相同的分公司且共保公司是永安保险
+    const isDuplicate = allRows.some((row) => {
+      // 排除当前行自身
+      return row._dataId !== rowId &&
+            row["Ci.cCoinsurerCde"] === "327001" && // 共保公司是永安保险
+            row["Ci.cSubDptCde"] === currentSubDptCde; // 分公司相同
+    });
+
+    if (isDuplicate) {
+      ElMessage.error("联保子公司不能重复选择！");
+      // 回退当前行的分公司值
+      freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "");
+      return;
+    }
+
     onChiefMrkChange()
   },
   cContactTypChange:(val)=>{
@@ -314,7 +333,7 @@ const method = {
     onChiefMrkChange()
     console.log("出单机构下拉事件",val);
     const rowData = freeEditRef.value?.getSelectRow();
-    if (!rowData || !initFlag.value) return;
+    // if (!rowData || !initFlag.value) return;
     const rowId = rowData._dataId;
     // 获取所有行数据
     const allRows = getFromValue();
@@ -352,7 +371,7 @@ const method = {
         freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
         return;
       }
-      if (val === "0") { 
+      if (val === "0") {
         if(cCiMrk["Base.cCiMrk"] == '1' || cCiMrk["Base.cCiMrk"] == '5'){
           if(rowData['Ci.cDptCde'] == param.cDptCde){
             ElMessage.error("联保单出单方必须是主联单的分公司！");

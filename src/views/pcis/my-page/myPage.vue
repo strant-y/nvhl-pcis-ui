@@ -255,7 +255,7 @@
         <el-affix position="bottom" :offset="10">
           <div class="bottom-items">
             <!--新增的投保单号显示和复制按钮-->
-            <div style="margin-right: 20px; width: 100%; display: flex; justify-content: flex-end; align-items: center;">
+            <div style="margin-right: 20px; width: 100%; display: flex; justify-content: flex-end; align-items: center;" v-if="pageLoaded">
               <div style="display: flex; align-items: center; background: #fff; padding: 6px 12px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap;">
                 {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "投保单号:" }}
                 <span id="policyNumber" style="margin-left: 5px; margin-right: 8px; font-weight: bold;">
@@ -355,6 +355,7 @@ const { isCiJiMrk } = storeToRefs(productStore);
 const route = useRoute();
 const router = useRouter();
 const tagsViewStore = useTagsViewStore();
+const pageLoaded = ref(false);
 
 import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
 const { saveData } = NewUdrListService();
@@ -713,7 +714,7 @@ const basicBtn = [
   }),
   createFreeButtonBase({
     label: "申请核保",
-    type: "primary",
+    type: "warning",
     id: "btn010103",
     func: () => {
       submitToUndrFn();
@@ -1655,6 +1656,8 @@ async function loadAfter() {
   if(props.param?.showBtn === false){
     bthList.value = [];
   }
+  pageLoaded.value = true;
+
 }
 function addOneYear(a:any) {
   // 将字符串转换为本地时间的日期对象
@@ -2916,10 +2919,10 @@ const validateCiInfo = () => {
         ElMessage.error("主共保信息只允许增加一条!");
         return false;
       }
-      if (CCoinsurerCdeNum <= 1) {
-        ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
-        return false;
-      }
+      // if (CCoinsurerCdeNum <= 1) {
+      //   ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
+      //   return false;
+      // }
     } else {
       ElMessage.error("请录入共保信息!");
       return false;
