@@ -960,9 +960,14 @@ function setFormItem(key: any, obj: any) {
     });
   }
 }
-const terms = ['00425000277','00425000278','00425000279','00425000282','00425000283'];
+const terms1 = ['00425000277','00425000278','00425000279','00425000282','00425000283'];
+const terms2 = ['00425000281','00425000280'];
 function change403009(v){
-  if(terms.includes(v)){
+  if(terms1.includes(v)){
+    setValue("Tgt.cInsuranceMethod", "613001");
+    setFormItem("Tgt.cInsuranceMethod",{disabled:true});
+  }
+  if(terms2.includes(v)){
     setValue("Tgt.cInsuranceMethod", "613001");
     setFormItem("Tgt.cInsuranceMethod",{disabled:true});
   }
