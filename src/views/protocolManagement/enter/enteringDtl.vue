@@ -97,7 +97,7 @@ function save() {
   cargoApi.save({
     ...allFromData,
     ...{},
-    ...user,
+    ...{user},
   }).then((res: any) => {
     if(res.code === 200) {
       ElMessage.success('保存成功')
@@ -123,7 +123,7 @@ function submit() {
   cargoApi.submit({
     ...allFromData,
     ...{},
-    ...user,
+    ...{user},
   }).then((res: any) => {
     if(res.code === 200) {
       ElMessage.success('提交成功')
