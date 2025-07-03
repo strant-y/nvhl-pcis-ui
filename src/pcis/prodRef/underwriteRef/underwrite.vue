@@ -32,14 +32,8 @@
             endBtnsPosition: "right",
             fromSchema: [
           
-                {
-                    prop: "cBckOp",
-                    inputtype: "rtselect",
-                    title: "退回核保级别",
-                    loadData: [],
-                    clearable: true,
-                },
-                {},
+              
+       
                 {
                     prop: "cRpt",
                     inputtype: "rtselect",
@@ -143,8 +137,9 @@
                     rules: [getRules("required", {})],
                     clearable: true,
                     func:(v)=>{
+                        console.log(v)
                         if ('A' === v) {
-                            setValue('cUndrOpnList', '')
+                           
                             if ('E' === params['cAppTyp']){
                                 setFormItem("cUndrOpnList", {
                                     loadData: [{label: '审核通过', value: '6'}]
@@ -153,7 +148,9 @@
                                 setFormItem("cUndrOpnList", {
                                     loadData: [{label: '审核通过', value: '0'}]
                                 })
+                                 setValue('cUndrOpnList', '0')
                             }
+                            
                         }else if ('R' === v) {
                             setValue('cUndrOpnList', '')
                             setFormItem("cUndrOpnList", {
@@ -175,14 +172,15 @@
                         if ('T' === v) {
                             setValue('cBckOp', '')
                             setFormItem("cBckOp", {
-                                hidden: false,
+                                // hidden: false,
+                                disabled: false ,
                                 rules: [getRules("required", {})],
                             })
-                            formconfig1.fromSchema.forEach((v,index)=>{
-                                if(index=='5'){
-                                    v.hidden=false
-                                }
-                            })
+                            // formconfig1.fromSchema.forEach((v,index)=>{
+                            //     if(index=='5'){
+                            //         v.hidden=false
+                            //     }
+                            // })
                             const param={
                                 "usrDptCde": user['companyId'],
                                 "operId": user['opCde'],
@@ -193,20 +191,30 @@
                             console.log(param)
                             getBackClsListUrlFn(param)
                         }else {
+                            setValue('cBckOp', '')
                             setFormItem("cBckOp", {
-                                hidden: true,
+                                // hidden: true,
+                                disabled: true ,
                                 rules: '',
                             })
-                            formconfig1.fromSchema.forEach((v,index)=>{
-                                if(index=='5'){
-                                    v.hidden=true
-                                }
-                            })
-                            setValue('cBckOp', '')
+                            // formconfig1.fromSchema.forEach((v,index)=>{
+                            //     if(index=='5'){
+                            //         v.hidden=true
+                            //     }
+                            // })
+                            
                         }
                     }
                 },
-                {},
+        
+                  {
+                    prop: "cBckOp",
+                    inputtype: "rtselect",
+                    title: "退回核保级别",
+                    loadData: [],
+                    clearable: true,
+                },
+                
                 {
                     prop: "cUndrOpnList",
                     inputtype: "rtselect",

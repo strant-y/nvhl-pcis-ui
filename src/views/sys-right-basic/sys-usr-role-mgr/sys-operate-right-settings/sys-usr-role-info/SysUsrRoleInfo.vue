@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div> 
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
     <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
       @page-change="handleQuery(false)" @selection-change="handleSelectionChange" />
@@ -74,7 +74,7 @@ const pageresult = reactive<Pageresult>({
   /** 数据列表 */
   list: [],
   /** 总数 */
-  total: 2,
+  total: 0,
 });
 
 const tableconfig = reactive<AppTableConfig>(

@@ -157,6 +157,13 @@ const method = {
                 res
             );
           });
+        setFormItem("Ci.cDptCde", { rules: [getRules("required", {})] });
+        setFormItem("Ci.cDptCde", { disabled: false });
+        setFormItem("Ci.nComm", { disabled: false});
+        setFormItem("Ci.cBrkrCde", { disabled: false});
+        setFormItem("Ci.cBrkSlsCde", { disabled: false});
+        setFormItem("Ci.cSlsCde", { rules: [getRules("required", {})] });
+        setFormItem("Ci.cSlsCde", { disabled: false});
       // updateMasterAgreementValues();
     } else {
       // 非永安保险，设置默认值和其他数据
@@ -166,24 +173,33 @@ const method = {
           "loadData",
           [{ value: '1', label: '其他' }]
       );
-      
+      setFormItem("Ci.cDptCde", { rules: [] });
+      setFormItem("Ci.cDptCde", { disabled: true });
+      setFormItem("Ci.nComm", { disabled: true});
+      setFormItem("Ci.cBrkrCde", { disabled: true});
+      setFormItem("Ci.cBrkSlsCde", { disabled: true});
+      setFormItem("Ci.cSlsCde", { disabled: true});
+      setFormItem("Ci.cSlsCde", { rules: []});
     }
   },
 
   cCoinsurerCdeChange:(val)=>{
     const rowData = freeEditRef.value?.getSelectRow();
     const formTableData = getFromValue();
-    const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue()
+    const plyBasedata = opertaor.getTableRefByKey("plyBase").getFromValue();
     if (!rowData) return;
     const rowId = rowData._dataId;
     if(!initFlag.value){
       
-      if (cCiMrk["Base.cCiMrk"] == "5" && val !== "327001") {
+      if (plyBasedata["Base.cCiMrk"] === "5" && val !== "327001") {
         freeEditRef?.value?.setValueByRowKey("Ci.cCoinsurerCde", rowId, "");
         ElMessage.error("司内联保，不能录入除永安以外的其他公司！");
         return false;
       }
       freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "");
+      if(plyBasedata["Base.cBsnsTyp"] === '19001'){
+        setFormItem("Ci.cDptCde", { rules: [getRules("required", {})] });
+      }
     }
     if (val === "327001") {
       // 如果选择的是永安保险，加载对应的分公司列表
@@ -193,11 +209,10 @@ const method = {
           codeListParam: { "CParCde": "subdpt", cParCde: "327001" },
         })
         .then((res) => {
-          freeEditRef.value?.setRowFieldProp(
-            rowId,
-            "Ci.cSubDptCde",
-            "loadData",
-            res
+          freeEditRef.value?.addCodeListMap(
+              {code: "Ci.cSubDptCde"+rowId,
+                list: res
+              }
           );
         });
         // freeEditRef.value?.setRowFieldProp(
@@ -208,8 +223,9 @@ const method = {
         setFormItem("Ci.nComm", { disabled: false});
         setFormItem("Ci.cBrkrCde", { disabled: false});
         setFormItem("Ci.cBrkSlsCde", { disabled: false});
+        setFormItem("Ci.cSlsCde", { rules: [getRules("required", {})] });
         setFormItem("Ci.cSlsCde", { disabled: false});
-        if (cCiMrk["Base.cCiMrk"] === "3" || cCiMrk["Base.cCiMrk"] === "4") {
+        if (plyBasedata["Base.cCiMrk"] === "3" || plyBasedata["Base.cCiMrk"] === "4") {
           const isYonganAlreadyPresent = formTableData.some(
             (row) => row._dataId !== rowId && row['Ci.cCoinsurerCde'] === "327001"
           );
@@ -221,11 +237,10 @@ const method = {
         }
     } else {
       // 非永安保险，设置默认值和其他数据
-      freeEditRef.value?.setRowFieldProp(
-        rowId,
-        "Ci.cSubDptCde",
-        "loadData",
-        [{ value: '1', label: '其他' }]
+      freeEditRef.value?.addCodeListMap(
+          {code: "Ci.cSubDptCde"+rowId,
+          list: [{ value: '1', label: '其他' }]
+          }
       );
       freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "1");
       setFormItem("Ci.cDptCde", { rules: [] });
@@ -234,6 +249,7 @@ const method = {
       setFormItem("Ci.cBrkrCde", { disabled: true});
       setFormItem("Ci.cBrkSlsCde", { disabled: true});
       setFormItem("Ci.cSlsCde", { disabled: true});
+      setFormItem("Ci.cSlsCde", { rules: []});
       freeEditRef.value?.setValueByRowKey("Ci.cDptCde", rowId, "");
     }
     updateMasterAgreementValues()
@@ -356,7 +372,7 @@ const method = {
     // 我方主共或从共的情况
     if (cCiMrk["Base.cCiMrk"] === '2' || cCiMrk["Base.cCiMrk"] === '4') {
       // 情况1：如果选中的是“是”且是永安保险(327001)
-      if (rowData.length>1 && val === "1" && cCoinsurerCde === "327001") {
+      if ( val === "1" && cCoinsurerCde === "327001") {
         ElMessage.error("我方从共时主共保方不能是我司！");
         freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowId, "");
         return;

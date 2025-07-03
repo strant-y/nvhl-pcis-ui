@@ -4,6 +4,7 @@
       :tableConfig="tableconfig"
       v-model:pageresult="pageresult"
       ref="tableRef"
+        @page-change="loadData(false)"
       @selection-change="handleSelectionChange"
     />
     <div
@@ -28,6 +29,7 @@ import { useUserStore } from "@/store/modules/user";
 
 import { createFreeButtonBase } from "@/shared/button-config";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
+
 import {
   AppTableConfig,
   AppTableMethod,
@@ -58,13 +60,13 @@ const roles = userStore.user.roles || [];
 
 const _selectDataSet = ref(new Map<string, any>());
 const _roleLevl = ref("");
-
+const tableRef = ref<AppTableMethod | null>(null);
 const pageresult = reactive<Pageresult>({
   result: "",
   /** 数据列表 */
   list: [],
   /** 总数 */
-  total: 2,
+  total: 0,
 });
 
 const tableconfig = reactive<AppTableConfig>(
@@ -117,22 +119,23 @@ const saveData = () => {
     });
 };
 
-const loadData = () => {
-  console.log("props", props.COperId, props.CDptCde,_roleLevl.value,);
-  // console.log('props.getOperator', props.getOperator._value.cOperId)
-  // console.log('props.getOperator', props.getOperator._value.cOwnDptCde)
-  
-  sysOperatorMgrService
-    .getUserAssociateRoles({
-      userId: props.COperId,
+const loadData = (flag = true) => {
+     const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
+     console.log('分页---',r)
+    let param = Object.assign({
+     userId: props.COperId,
       CDptCde: props.CDptCde,
-      CRoleLevl: _roleLevl.value,
-    })
+      CRoleLevl: _roleLevl.value
+  }, r);
+  sysOperatorMgrService
+    .getUserAssociateRoles(param)
     .then((res: any) => {
       if (res && res.code === 200) {
         const pageData = res.data;
         if (pageData) {
-          pageresult.list = pageData;
+          pageresult.list = pageData['data'];
+          pageresult.total = pageData['total'];
+        
         }
       }
     });

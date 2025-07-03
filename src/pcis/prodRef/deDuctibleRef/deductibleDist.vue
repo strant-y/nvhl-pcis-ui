@@ -50,6 +50,7 @@ const cardconfig = ref(creatCardConfig({}));
 const moveUpTimer = ref(null);
 const moveDownTimer = ref(null);
 const originalData = ref<any[]>([]);
+const parparam = opertaor.getParam();
 const pageresult = reactive<Pageresult>({
   result: "",
   /** 数据列表 */
@@ -79,7 +80,7 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtnWidth: 220,
     tableBtnPosition: "right",
     align: "left",
-    tableBtn: opertaor.getParam().pageType == "readonly" ? [] : [
+    tableBtn: [
       createFreeButtonBase({
         id: "score",
         link: true,
@@ -102,15 +103,26 @@ const tableconfig = reactive<AppTableConfig>(
           if(row.editList && row.editList.length>0){
             param['editList'] = row.editList
           }
-
-          console.log('数据====',param)
           dzmodal.open(deductibleFixEdit, { 
             type: "view", 
             data: param, 
             callback: (res: any) => {
               if (res.type === "ok") {
-                row.cDeductibleContent = res.data.cDeductibleContent
-                row['editList']= res.data['editList']
+                // row.cDeductibleContent = res.data.cDeductibleContent
+                // row['editList']= res.data['editList']
+
+                 let list = formData.value;
+                 const index = list.findIndex(
+                    item => item.cDeductibleClass === row.cDeductibleClass
+                  );
+                  if (index !== -1) {
+                    nextTick(()=>{
+                      list[index]['cDeductibleContent'] = res.data.cDeductibleContent;
+                      list[index]['editList'] =res.data['editList']
+                      formData.value = list
+                    })
+                  }      
+
               }
             }
           });
@@ -144,6 +156,7 @@ const tableconfig = reactive<AppTableConfig>(
           if (row.nSeqNo == 1) return true;
         },
         tableClick: (row) => {
+          console.log('1112')
           moveUp(row.nSeqNo - 1);
         },
       }),
@@ -232,6 +245,7 @@ const initOriginalData = ()=> {
 
 // 上移一行
 const moveUp = async (index) => {
+   console.log('上下----')
   const tableData = formData.value;
   if (index > 0) {
     [tableData[index], tableData[index - 1]] = [
@@ -252,6 +266,7 @@ const moveUp = async (index) => {
 
 // 下移一行
 const moveDown = (index) => {
+  console.log('上下----')
   const tableData = formData.value;
   if (index < tableData.length - 1) {
     [tableData[index], tableData[index + 1]] = [
@@ -371,6 +386,9 @@ function setDisabledAll() {
       item.hidden = true;
     });
   }
+  tableconfig.tableBtn.forEach(element => {
+    element.hidden = true;
+  });
 }
 
 
@@ -385,6 +403,16 @@ function setUnDisabledByKeyList(key: any) {
       item.hidden = false;
     }
   });
+  let r = false;
+  if(key === "Btn_select_deductible_btn"){
+    r = true;
+  }
+  
+  if(r){
+    tableconfig.tableBtn.forEach(element => {
+      element.hidden = false;
+    });
+  }
 }
 
 defineExpose({

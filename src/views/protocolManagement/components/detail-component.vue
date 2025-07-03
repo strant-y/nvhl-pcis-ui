@@ -2,26 +2,28 @@
   <div class="mypage-app">
     <el-container class="dynamic-container" ref="scrollContainer">
       <el-aside :width="(NavigaShow ? 200 : 100) + 'px'">
-        <el-affix :offset="100">
+        <!-- <el-affix :offset="100"> -->
           <div class="navi_container">
             <div
                 v-for="(pageConfig, v) in formPage.config"
                 :key="v"
                 class="NavigaList_card"
             >
-              <el-anchor :bound="120" :offset="80" style="margin-top: 40px">
+              <el-anchor :bound="120" :offset="80">
                 <el-anchor-link
                     v-for="(k, i) in pageConfig?.pageInfo"
                     :key="i"
                     :custom="true"
                     v-show="['AgreementCiShare', 'AgreementCi', 'AgreementCiTcp'].includes(k.pageCode) ? isCiJiMrk : true"
                     @click="handleAnchorClick($event, `#${k.pageCode}`)"
+                    :class="i === 0 ? 'isActive' : ''"
                 >
-                  <rt-icon
+                  <!-- <rt-icon
                       style="margin-right: 14px"
                       :item="{ icon: k.icon && k.icon !== 'null' && k.icon !== '' ? k.icon : 'Tickets', }"
-                  />
-                  <span style="font-size: 15px" v-if="NavigaShow">
+                  /> -->
+                  <i :class="['icon','iconfont',iconMap[k.pageKey]]"></i>
+                  <span class="icon-title" v-if="NavigaShow">
                     <template v-if="k.pageTtile && k.pageTtile.length > 6">
                       <el-tooltip
                           effect="dark"
@@ -38,7 +40,7 @@
                 </el-anchor-link>
               </el-anchor>
             </div>
-            <div class="NavigaList_card" style="margin-left: 5px">
+            <!-- <div class="NavigaList_card" style="margin-left: 5px">
               <rt-icon
                   @click="NavigaShow = !NavigaShow"
                   v-if="!NavigaShow"
@@ -49,9 +51,9 @@
                   v-if="NavigaShow"
                   :item="{ icon: 'DArrowLeft' }"
               />
-            </div>
+            </div> -->
           </div>
-        </el-affix>
+        <!-- </el-affix> -->
       </el-aside>
       <el-main>
         <template v-for="(pageConfig, v) in formPage.config" :key="v">
@@ -73,10 +75,23 @@
           </div>
         </template>
         <el-backtop :target="'.el-main'" :right="100" :bottom="150" />
+        <el-affix position="bottom" :offset="10">
+        <div class="bottom-items">
+          <rt-button
+              v-for="(bth, idx) in props.bthList"
+              :item="bth"
+              :key="idx"
+              :loading="bth.loading"
+              :ref="(res: any) => {
+                formPage.setButtonRef(bth?.id as string, res);
+              }"
+          />
+        </div>
+      </el-affix>
       </el-main>
     </el-container>
 
-    <el-footer>
+    <!-- <el-footer>
       <el-affix position="bottom" :offset="10">
         <div class="bottom-items">
           <rt-button
@@ -90,12 +105,13 @@
           />
         </div>
       </el-affix>
-    </el-footer>
+    </el-footer> -->
   </div>
 </template>
 
 <script setup lang="ts">
 import {computed} from "vue";
+import { iconMap } from './iconMap';
 
 const props = defineProps({
   bthList: {
@@ -108,10 +124,7 @@ const formPage = idxParam?.formPage;
 const isCiJiMrk = computed(() => !!idxParam.ciJiMrk && idxParam.ciJiMrk !== '0');
 
 const getConmpName = (k: any) => {
-  if( ['AgreementCvrg', 'AgreementBase', 'AgreementApplicant', 'AgreementCiTcp', 'AgreementCi', 'AgreementCiShare', 'AgreementSpecial'].includes(k.pageCode))
-    return k.pageCode + '-ref';
-  if( k.pageKey === 'customECargo') return k.pageCode + '-ref';
-  return ((k.pageType === 'custom' ? k.pageCode : k.pageKey) + '-ref');
+  return k.pageCode + '-ref';
 }
 const NavigaShow = ref(true);
 
@@ -129,15 +142,21 @@ function handleAnchorClick(event: any, targetId: string) {
     if (targetElement) {
       targetElement.scrollIntoView({
         behavior: 'smooth',
-        block: 'center' // 可选值：'start', 'center', 'end', 'nearest'
+        block: 'start' // 可选值：'start', 'center', 'end', 'nearest'
       });
     }
   }
+  if(document.querySelectorAll('.el-anchor__item') && document.querySelectorAll('.el-anchor__item').length > 0) {
+    document.querySelectorAll('.el-anchor__item').forEach((item:any) => {
+      item.classList.remove('isActive')
+    })
+  }
+  event.currentTarget.classList.add('isActive')
 }
 </script>
 <style lang="scss" scoped>
 .bottom-items {
-  height: 50px;
+  height: 45px;
   background-color: #fff;
   display: flex;
   justify-content: end;
@@ -166,9 +185,54 @@ function handleAnchorClick(event: any, targetId: string) {
   display: flex;
   flex-direction: column;
   height: 100%;
+  position: absolute;
+  width: 100%;
 }
 .dynamic-container {
   height: calc(100vh - $navbar-height - 60px - 90px);
   overflow: auto;
 }
+
+.mypage-aside {
+  background: var(--el-color-primary);
+}
+.el-anchor {
+  background: transparent;
+  :deep(.el-anchor__list) {
+    padding: 10px 5px;
+  }
+  .el-anchor__item {
+    margin-bottom: 10px;
+    padding-left: 0;
+    border-radius: 8px;
+    opacity: .6;
+    &.isActive,&:hover {
+      opacity: 1;
+    }
+    :deep(a) {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #FFFFFF;
+      padding: 0;
+      .el-icon {
+        font-size: 3rem!important;
+        margin: 0 0 10px 0;
+      }
+      .iconfont {
+        font-size: 1.5rem;
+        color: #FFF;
+        margin: 5px 0;
+      }
+      .icon-title {
+        font-size: 12px;
+      }
+    }
+  }
+}
+.el-aside {
+  width: auto;
+  background: var(--el-color-primary);
+}
+
 </style>

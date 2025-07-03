@@ -143,7 +143,7 @@
           </div>
         <!-- </el-affix> -->
       </el-aside>
-      <el-main style="margin-top: 58px;">
+      <el-main class="main-container">
         <el-affix
           :offset="80"
           class="affix-main-header"
@@ -216,7 +216,7 @@
                 : true
             "
           >
-          <!-- {{ k.pageKey }} -->
+         
             <component
               v-if="currentIndex >= i"
               :ref="
@@ -345,6 +345,8 @@ import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service"
 import { useRouter, useRoute } from "vue-router";
 import { getData } from "@/pcis/prodRef/dataInit";
 import { iconMap } from './iconMap';
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
 
 const policyService = new PolicyService();
 const productStore = useProductStore();
@@ -358,6 +360,7 @@ import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-lis
 const { saveData } = NewUdrListService();
 import {useUserStore} from "@/store";
 import { pa } from "element-plus/es/locale";
+import { initMultiCodeList } from "@/api/code-list-service";
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -988,7 +991,14 @@ const initPage = async () => {
   }
   // 页面初始化
   const formconfig11 = JSON.parse(getProductRes.data);
-
+  // 初始化全页面下拉选一次性获取,解决页面响应效率
+  const codeinit = getAllcodelist(formconfig11);
+  let codeparam = [];
+  
+  Object.keys(codeinit).forEach(res =>{
+    codeparam.push(codeinit[res]);
+  });
+  await getInitParam(codeparam);
   // if(productStore.$state.cCiMrk == "0"){
   //   formconfig11[0].pageInfo = formconfig11[0].pageInfo.filter(
   //     (item) => item.pageTtile !== "联共保主协议信息" && item.pageTtile !== "联共保信息" && item.pageTtile !== "我司联共保份额信息"
@@ -1019,10 +1029,58 @@ const initPage = async () => {
     props.param?.pageType === "UW_READ_SCENE"
   ) {
     opertaor.setReadOnly(formconfig11);
+    console.log(77,formconfig11)
   }
+
   opertaor.setTableConfig(formconfig11);
   renderComponents();
 };
+
+async function getInitParam(codeparam){
+  const res = await initMultiCodeList(codeparam);
+  if(res.code === 200){
+    for(let i = 0; i < res.data.length ; i++){
+      codeListStore.setOptionsToCacheMap(res.data[i]['key'],res.data[i]['data']);
+    }
+  }
+  console.log(res);
+}
+
+const exlist = ['acctinfo','ci','ourCompanyCiShare'];
+function getAllcodelist(formconfig11){
+  let l = {};
+  if(formconfig11?.[0].pageInfo){
+    for(let i = 0; i < formconfig11[0].pageInfo.length; i++){
+      if(exlist.includes(formconfig11[0].pageInfo[i]['pageKey'])){
+        continue;
+      }
+      const schema = formconfig11[0].pageInfo[i].pageSchema;
+      if(schema && schema.fromSchema && schema.fromSchema.length>0){
+        for(let j = 0; j < schema.fromSchema.length; j++){
+          const sc = schema.fromSchema[j]; 
+          if((sc.inputtype === 'rtSelectV2' || sc.inputtype === 'rtselect') && !isDisabled(sc.disabled) && sc.typeCode){
+            const k = sc.typeCode + (sc.codeParam?sc.codeParam:'');
+            const m = {codeListName:sc.typeCode,codeListParam:sc.codeParam,source:k};
+            l[k] = m;
+          }
+        }
+      }
+    }
+  }
+  return l;
+}
+
+function isDisabled(v: any){
+if (
+    v === true ||
+    v === 1 ||
+    v === "1"
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+}
 
 const dataInit = ref({});
 /**
@@ -1179,9 +1237,6 @@ async function loadAfter() {
       bthList.value = edrSurrenderBtn;
     }
   } else if (props.param.pageType === "readonly") {
-    nextTick(() => {
-      opertaor.setDisabledAll();
-    });
     // 查询数据
     // const getAppPlyInfoRes = await getAppPlyInfoByAppNo({
     //   CAppNo: props.param.cAppNo,
@@ -1197,6 +1252,10 @@ async function loadAfter() {
         item.disabled = true;
       });
     }
+    
+    nextTick(() => {
+      opertaor.setDisabledAll();
+    });
     nextTick(() => {
       // console.log(data);
       // opertaor.setDataAll(data);
@@ -1235,6 +1294,7 @@ async function loadAfter() {
       if (res) {
         const ops = opertaor.convertData(res);
         ops['plyBase']['Base.cRenewMrk'] = '1'
+        ops['plyBase']['Base.cPlyNo'] = ''
         ops['insrnc']['Base.tAppTm'] = moment(new Date(Date.now())).format(
             "YYYY-MM-DD HH:mm:ss"
         )
@@ -1866,6 +1926,15 @@ const calcPremium = () => {
     btn.loading = false;
     return;
   }
+  
+  const termref = opertaor.getTableRefByKey("cvrg");
+  const calccheck = termref.calcCheck();
+  if(!calccheck['res']){
+    console.log(calccheck);
+    ElMessage.error(calccheck['msg']);
+    btn.loading = false;
+    return;
+  }
   if (!baseValite()) {
     btn.loading = false;
     return;
@@ -1977,7 +2046,7 @@ const setPayInfo = (base: any, applicant: any, insrnc: any) => {
   pay["Pay.tPayBgnTm"] = moment(insrnc["Base.tAppTm"]).format(
     "YYYY-MM-DD HH:mm:ss"
   );
-  pay["Pay.tPayEndTm"] = moment(insrnc["Base.tInsrncBgnTm"]).format(
+  pay["Pay.tPayEndTm"] = moment(insrnc["Base.tInsrncBgnTm"]).add(29, 'days').endOf('day').format(
     "YYYY-MM-DD HH:mm:ss"
   );
   pay["Pay.nOwnPrm"] = base["Base.nPrm"] ? base["Base.nPrm"] : 0;
@@ -2061,13 +2130,15 @@ const submitToUndrFn = async () => {
         return;
       }
       //校验联共保信息
-      const ciValue = opertaor.getTableRefByKey("Ci")?.getFromValue() || '';
-      console.log('ciValue', ciValue);
-      // const isCiValid = validateCiInfo();
-      // if (!isCiValid) {
-      //   btn.loading = false;
-      //   return;
-      // }
+      const plyBasedata = opertaor.getTableRefByKey("plyBase").getFromValue();
+      if(plyBasedata["Base.cCiMrk"] !== "0") {
+        const ciValue = opertaor.getTableRefByKey("ci")?.getFromValue() || '';
+        const isCiValid = validateCiInfo();
+        if (!isCiValid) {
+          btn.loading = false;
+          return;
+        }
+      }
       const calcData: any = opertaor.getDataAll();
       calcData["user"] = user;
       calcData["plyBase"]["Base.cDptCde"] = params.cDptCde;
@@ -2806,14 +2877,13 @@ const submitUnderwritingFn = () => {
  * 投保申请核保时校验联共保信息
  */
 const validateCiInfo = () => {
-  debugger;
-  const ciData = opertaor.getTableRefByKey("Ci").getFromValue()
-  if (ciData.value) {
+  const ciData = opertaor.getTableRefByKey("ci").getFromValue()
+  if (ciData.length > 0) {
       let NCiShare = 0;
       let chiefMrkM = 0; // 主
       let chiefMrkS = 0; // 从
       let CCoinsurerCdeNum = 0; // 分公司份额
-      for (const ciRow of ciData.items) {
+      for (const ciRow of ciData) {
         if (ciRow) {
           NCiShare = numAdd(NCiShare, parseFloat(ciRow["Ci.nCiShare"] || 0));
           if ("327001" === ciRow["Ci.cCoinsurerCde"]) {
@@ -2830,8 +2900,8 @@ const validateCiInfo = () => {
         ElMessage.error("主/从共保信息不完整!");
         return false;
       }
-      if (NCiShare !== 100.0) {
-        ElMessage.error("共保比例和应为100%!");
+      if (NCiShare !== 1) {
+        ElMessage.error("共保比例和应为1!");
         return false;
       }
       if (chiefMrkM > 1) {
@@ -3257,9 +3327,13 @@ function replacecInquiryNo(res:any) {
   position: absolute;
   top: 0;
   text-align: center;
-  padding: 5px;
+  // padding: 5px;
   background: #ebedfc;
-  width: 100%!important;
+  width: calc(100% - 20px)!important;
   font-size: 16px;
+}
+.main-container {
+  position: relative;
+  padding-top: 58px;
 }
 </style>

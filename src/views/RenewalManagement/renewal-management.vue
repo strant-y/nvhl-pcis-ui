@@ -248,7 +248,7 @@ const tableconfig = reactive<AppTableConfig>(
         minWidth: 180,
       },
       {
-        prop: "cClauseCode",
+        prop: "cTermNo",
         inputtype: "rtinput",
         title: "条款",
         minWidth: 180,
@@ -316,7 +316,7 @@ const getRenewal = (row:any)=>{
           router.push({
             path: "/pcis/my-page",
             query: {
-              param: JSON.stringify({ ...handleArray(data.composition.plyBase[0] ), ...{ pageType: "orig" } }),
+              param: JSON.stringify({ ...handleArray(data.composition.plyBase[0] ),...{cDptCnm:row.cDptCnm,cTermNme:row.cTermNme,cTermNo:row.cTermNo}, ...{ pageType: "orig" } }),
             },
           });
           sessionStorage.setItem(

@@ -222,7 +222,6 @@ const tableconfig = reactive<AppTableConfig>(
       tableBtnWidth: 120,
       tableBtnPosition: "right",
       tableBtnType: "btn",
-      title: "协议列表",
       fromSchema: [
         {
           prop: "cAgreementNo",

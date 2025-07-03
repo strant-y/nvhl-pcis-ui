@@ -68,7 +68,7 @@ onMounted(() => {
       disabled: true,
     });
     //【国民经济行业分类】初始化必填，只有法人时才必填，现在个人也是必填了（老系统需求：040001/042002/043004/043005/043011五款产品不区分法人个人投保，国民经济行业分类都必填，其他产品只有法人才必填）
-    const cProdNo = route.params.param.cProdNo;
+    const cProdNo = route.params.param?.cProdNo;
     if (
       cProdNo === "040001" ||
       cProdNo === "042002" ||
@@ -101,6 +101,8 @@ onMounted(() => {
     });
     //移动手机校验
     setFormItem("Applicant.cMobile", { rules: [getRules("phoneNo", {})] });
+    // 固话
+    setFormItem("Applicant.cTel", { rules: [getRules("phone", {})] });
     // 传真校验
     setFormItem("Applicant.cFax", { rules: [getRules("faxNumber", {})] });
 
@@ -110,9 +112,7 @@ onMounted(() => {
     setFormItem("Applicant.cGcidCode", {rules: [getRules("leiCode", {})]});
     // 关联交易审批单编号
     setFormItem("Applicant.cRelateNo", {rules: [getRules("txnApprovalNo", {})]});
-    
-
-
+   
 
   });
 });
@@ -136,7 +136,12 @@ function setFormItem(key: any, obj: any) {
 
 // 解析身份证
 const idAnalysis = (id:string)=>{
-     const birthYear = parseInt(id.substring(6, 10), 10);
+      const tabref = opertaor.getTableRefs();
+      const applicantValue = tabref["applicant"].getFromValue();
+      if (  id.length !== 18 || applicantValue["Applicant.cCertfCls"] !=='120001') {
+        return false
+      }
+          const birthYear = parseInt(id.substring(6, 10), 10);
           const birthMonth = parseInt(id.substring(10, 12), 10);
           const birthDay = parseInt(id.substring(12, 14), 10);
           const birthday = `${birthYear}-${birthMonth.toString().padStart(2, "0")}-${birthDay.toString().padStart(2, "0")}`;
@@ -148,13 +153,21 @@ const idAnalysis = (id:string)=>{
           setValue("Applicant.tBirthday", birthday);
           setValue("Applicant.nAge", age);
           setValue("Applicant.cSex", sex);
+         
+          clearValidate('Applicant.cCertfCde')  
 }
 
 
 
 //  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
 const checkUser = () => {
-if (param.cRecordType !== 1) {
+  console.log('param',param)
+// if (param.cRecordType !== 1 && param.cRecordType !== 2 ) {
+//     return false;
+//   }
+ 
+  // 自定义录单 方案配置 模版 进入 可以查询用户信息  
+  if (param.pageType !== "app" &&  param.pageType !== "copy" && param.pageType !== "template" && param.cAppStatus !=='1') {
     return false;
   }
 const tabref = opertaor.getTableRefs();
@@ -178,9 +191,14 @@ if (
       const { code, data, msg } = res;
       if (200 === code) {
         if(data){
-        tabref ['applicant'].setFormValue(data[0])
+           tabref ['applicant'].setFormValue(data[0])
+
+          let userId = getValue('Applicant.cCertfCde')
+          idAnalysis(userId)
         }
         
+            
+      
       } else {
         // ElMessage.error(msg);
       }
@@ -281,7 +299,14 @@ const method = {
   },
 
   cardTypeChange: (val) => {
+
+       const tabref = opertaor.getTableRefs();
+    const applicantValue = tabref["applicant"].getFromValue();
+    console.log(val,applicantValue)
     checkUser();
+    // 清除报错信息
+    clearValidate('Applicant.cCertfCde')  
+      // freeEditRef.value?.clearValidate('phoneNo');
     const param = opertaor.getParam();
 
     if (!param.initFlag) {
@@ -883,7 +908,7 @@ const method = {
           "Applicant.cCertfCde"
         );
         if (certfCde && certfCde.length === 18) {
-            idAnalysis(val)
+            // idAnalysis(val)
         }
       }
     }
@@ -959,6 +984,44 @@ const method = {
           rules: [getRules("leiCode", {})],
         });
       }
+  },
+   // 办理人员证件种类
+  cOperaterCertfTypChange:(val: any)=>{
+    console.log(val)
+    // 清除报错信息
+    clearValidate('Applicant.cOperaterCertfCde')  
+
+    //  身份证
+    if (val == "120001") { 
+        setFormItem("Applicant.cOperaterCertfCde", {
+              rules: [getRules("idCard", {}),],
+            });
+    } else if ( val == "110007") {   
+      // 统一社会信用代码校验
+           setFormItem("Applicant.cOperaterCertfCde", {
+              rules: [getRules("socialCode", {}),],
+            });
+    } else if(val == "19"){
+      // 外国人证件号
+           setFormItem("Applicant.cOperaterCertfCde", {
+              rules: [getRules("ariCard", {}),],
+            });
+    } else if (val == "120002") {
+      // 护照
+   
+      setFormItem("Applicant.cOperaterCertfCde", {
+              rules: [getRules("passPort", {}),],
+            });
+    }else if(val =='110001'){
+      // 组织机构编码校验
+           setFormItem("Applicant.cOperaterCertfCde", {
+              rules: [getRules("orgCode", {}),],
+            });
+    } else {
+           setFormItem("Insured.cOperaterCertfCde", {
+              rules: [],
+            });
+    }
   },
   // 证件有效起期
   tCertfBgnDateDisable:(date:any)=>{
@@ -1150,6 +1213,9 @@ function handleFileChange(event: Event) {
   }
 }
 
+function clearValidate(key=null) {
+  applicantEditRef?.value?.clearValidate(key);
+}
 defineExpose({
   getFromValue,
   setFormValue,
@@ -1157,6 +1223,7 @@ defineExpose({
   setValue,
   getValue,
   getFormconfig,
+  clearValidate
 });
 </script>
 

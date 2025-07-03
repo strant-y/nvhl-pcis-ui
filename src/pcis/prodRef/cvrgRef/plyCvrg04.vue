@@ -111,7 +111,7 @@
                     "
                     :ref="
                       (res) => {
-                        tremTemplateRefs[k + 'a2' + index] = res;
+                        tremTemplateRefs[k + 'a2'] = res;
                       }
                     "
                   />
@@ -136,7 +136,7 @@
                     "
                     :ref="
                       (res) => {
-                        tremTemplateRefs[k + 'a3' + index] = res;
+                        tremTemplateRefs[k + 'a3'] = res;
                       }
                     "
                   />
@@ -173,6 +173,8 @@ import { qryProdRelTermRiskList } from "@/api/prod";
 import { getEdrRsnTermItem } from "@/api/query";
 const codeListStore = codeListViewStore();
 const disAbledFlag = ref(false);
+const codeListMap = ref<any>({});
+provide('codeListMap', codeListMap.value);
 
 const opertaor = dataOpertaor();
 const parparam = opertaor.getParam();
@@ -269,7 +271,12 @@ onMounted(async () => {
   );
   Object.assign(cardconfig.value, formconfig11);
   if (parparam.pageType === "app") {
-    addPlanMethod();
+    addAndinitData();
+  }
+});
+
+function addAndinitData() { 
+  const pl = addPlanMethod();
     const param = {
       cProdNo: parparam.cProdNo,
       cTermNo: parparam.cTermNo,
@@ -297,13 +304,12 @@ onMounted(async () => {
           }
           plans.push(data);
         });
-        refushData("P1", plans);
+        refushData(pl, plans);
       } else {
         ElMessage.error(msg);
       }
     });
-  }
-});
+}
 
 const edrItem = ref<[key: string, value: Array<any>] | any>({});
 function updateEdrItem(terms: any[]) {
@@ -374,7 +380,7 @@ const method = {
         return;
       }
     }
-    addPlanMethod();
+    addAndinitData();
   },
 };
 
@@ -388,6 +394,7 @@ function addPlanMethod() {
     });
     const planKey = "P" + (maxindex + 1);
     planData.value[planKey] = [];
+    return planKey;
 }
 
 function isHidden(pl: any) {
@@ -644,6 +651,8 @@ function setDisabledAll() {
   Object.keys(btnItem.value).forEach((k: any) => {
     btnItem.value[k].hidden = true;
   });
+  
+  console.log(tremTemplateRefs.value);
   Object.keys(tremTemplateRefs.value).forEach((item) => {
     tremTemplateRefs.value[item].setDisabledAll();
   });
@@ -669,6 +678,24 @@ const faters = ref({
   getndisAbleConfig: getndisAbleConfig,
 });
 
+function calcCheck(){
+  let r = true;
+  let m = "";
+  Object.keys(planData.value).forEach((k)=>{
+    if(planData.value[k].length === 0){
+      r = false;
+      m = k;
+    }
+  });
+  let res = {};
+  res['res'] = r;
+  res['msg'] = '验证通过';
+  if(!r){
+    res['msg'] =m + '方案未添加条款!请先添加条款!';
+  }
+  return res;
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
@@ -678,6 +705,7 @@ defineExpose({
   getFormconfig,
   setDisabledAll,
   setUnDisabledByKeyList,
+  calcCheck
 });
 </script>
 
