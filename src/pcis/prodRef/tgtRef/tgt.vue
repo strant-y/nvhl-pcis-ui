@@ -207,6 +207,10 @@ const setcDetailedAddress = (prop:any,aftProp:any)=> {
 };
 // 绑定方法
 const method = {
+  getcNavigationAreaChange:()=>{
+    dialog.value?.open('navigationAreaTips', null,
+        null,{width: 50,title:'航行区域提示'});
+  },
   getcInsuranceIndustryChange:(val:string)=>{
     if(val === '8'){
       setFormItem('Tgt.cIndustryRemarks', {

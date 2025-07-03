@@ -380,18 +380,24 @@ const handleDateChange = (value) => {
         .format("YYYY-MM-DD HH:mm:ss");
 };
 const handleQuery = (flag = true) => {
-    submitForm(flag);
-};
-
-const submitForm = (flag) => {
-    freeEditRef.value?.validate().then((isValid) => {
+    // submitForm(flag);
+       freeEditRef.value?.validate().then((isValid) => {
         if (isValid) {
             refreshData(flag);
         }
     });
 };
 
+// const submitForm = (flag) => {
+//     freeEditRef.value?.validate().then((isValid) => {
+//         if (isValid) {
+//             refreshData(flag);
+//         }
+//     });
+// };
+
 const refreshData = (reset = true) => {
+ 
     const formData = freeEditRef.value?.getFromValue();
     if (!formData.cPlyNo) {
         const startTemp =
@@ -417,7 +423,7 @@ const refreshData = (reset = true) => {
             return;
         }
     }
-    console.log(props.activeName, "=====");
+    // console.log(props.activeName, "=====");
     const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
     const s = freeEditRef.value?.getFromValue(); //获取表单数据
     if (s.cLoadSub == null) {
@@ -438,20 +444,26 @@ const refreshData = (reset = true) => {
     };
     const params = Object.assign(s, r, obj);
     sessionStorage.setItem(AppKey.query.pcis_query_endorse, params);
-
+      
     pcisEdrQueryService.qryEndorseList(params).then((res: any) => {
-        if (null != res && null != res["code"]) {
-            if (res["code"] === 200) {
-                const pageData = res.data;
+        let{code , data }=res;
+ 
+        pageresult.list =[];
+        // if (null != res && null != res["code"]) {
+            if (code === 200) {
+              
+                const pageData = data;
                 if (pageData) {
+                  
                     pageresult.total = pageData.total;
                     pageData.result.forEach((item) => {
                         changeRsnValue(item);
                     });
                     pageresult.list = pageData.result;
+                   
                 }
             }
-        }
+        // }
     });
 };
 function handleRsnChange(val, row) {
@@ -641,7 +653,7 @@ const getDetailRsn = (item) => {
 
 // 批改原因处理
 const changeRsnValue = (item) => {
-    const detail = [];
+    let detail = [];
     // const rsnTyp = routeData["rsnTyp"];
     let rsnTyp = "";
     if (props.activeName === "一般批改") {
@@ -657,6 +669,7 @@ const changeRsnValue = (item) => {
     const prodNo = item["cProdNo"];
     const isGrp = grpMrk !== "0" ? "1" : null;
     const isPer = grpMrk === "0" ? "1" : null;
+//    console.log(rsnTyp,grpMrk,prodNo,codeListMap.value[prodNo + item["id"]])
     if (
         undefined === codeListMap.value[prodNo + grpMrk] ||
         null === codeListMap.value[prodNo + grpMrk]
@@ -721,12 +734,16 @@ const changeRsnValue = (item) => {
         item["id"] = item["id"]
             ? item["id"]
             : codeListMap.value[prodNo + grpMrk][0]["value"];
-        if (
+
+
+            if (
             undefined === codeListMap.value[prodNo + item["id"] + grpMrk] ||
-            null === codeListMap.value[prodNo + item["id"] + grpMrk]
+            null === codeListMap.value[prodNo + item["id"] + grpMrk] 
+            || codeListMap.value[prodNo + item["id"] + grpMrk].length ===0
         ) {
             // 当缓存中无该产品批改原因详细时
             // 处理批改原因详细
+     
             getDetailRsn(item);
         } else {
             // 当缓存中有该产品批改原因详细时
@@ -734,17 +751,21 @@ const changeRsnValue = (item) => {
                 detail.push(
                     codeListMap.value[prodNo + item["id"] + grpMrk][0]["value"]
                 );
+             
                 setTimeout(() => {
                     item["iddetail"] = detail;
                     // 缓存批改原因
                     changeRsn(item["id"], item["cPlyNo"], item["iddetail"]);
                 }, 5);
+                
             } else {
+     
                 detail.push(item["id"]);
                 setTimeout(() => {
                     item["iddetail"] = detail;
                     // 缓存批改原因
                     changeRsn(item["id"], item["cPlyNo"], item["iddetail"]);
+                    
                 }, 5);
             }
         }
@@ -822,7 +843,6 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
             } else {
                 if (result["data"]) {
                     // debugger
-                    console.log("000000000", rsnCde.value[selected.value["cPlyNo"]], routeData["rsnTyp"]);
                     // 如果选的批改原因是变更影像上传方式
                     if ("DZ" === rsnCde.value[selected.value["cPlyNo"]]) {
                         modifyImageUploadMode(cPlyNo);
