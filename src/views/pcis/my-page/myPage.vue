@@ -216,7 +216,7 @@
                 : true
             "
           >
-         <!-- {{ k.pageKey }} -->
+         
             <component
               v-if="currentIndex >= i"
               :ref="
@@ -255,11 +255,11 @@
         <el-affix position="bottom" :offset="10">
           <div class="bottom-items">
             <!--新增的投保单号显示和复制按钮-->
-            <div style="margin-right: 20px; width: 100%; display: flex; justify-content: flex-end; align-items: center;">
+            <div style="margin-right: 20px; width: 100%; display: flex; justify-content: flex-end; align-items: center;" v-if="pageLoaded">
               <div style="display: flex; align-items: center; background: #fff; padding: 6px 12px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap;">
                 {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "投保单号:" }}
                 <span id="policyNumber" style="margin-left: 5px; margin-right: 8px; font-weight: bold;">
-                {{ opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || '暂无' }}
+                {{ props.param?.pageName === "priceInquiry" ? opertaor.getTableRefByKey('plyBase')?.getValue('Base.cInquiryNo') || '暂无' : opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || '暂无' }}
                 </span>
                 <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号'}`" placement="top">
                   <el-button @click="copyPolicyNumber" circle size="small" style="color: red;">
@@ -333,6 +333,7 @@ import {
   getAppPolicyForCopy,
   saveInquiry,
   submitInquiry,
+  submitUnderwrite,
 } from "../../../api/query/index";
 import { checkFeeWindowType, selectDist, saveDistBatch, getReleaseInquiryPage } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
@@ -354,6 +355,7 @@ const { isCiJiMrk } = storeToRefs(productStore);
 const route = useRoute();
 const router = useRouter();
 const tagsViewStore = useTagsViewStore();
+const pageLoaded = ref(false);
 
 import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
 const { saveData } = NewUdrListService();
@@ -712,7 +714,7 @@ const basicBtn = [
   }),
   createFreeButtonBase({
     label: "申请核保",
-    type: "primary",
+    type: "warning",
     id: "btn010103",
     func: () => {
       submitToUndrFn();
@@ -836,7 +838,7 @@ const edrSurrenderBtn = [
  */
 const uwBtn = [
   createFreeButtonBase({
-    label: "保存",
+    label: props.param?.pageName === "priceInquiry" ? "提交" : "保存",
     type: "primary",
     id: "btnUdr",
     func: () => {
@@ -1114,7 +1116,37 @@ async function loadAfter() {
     getCAppNoFun();
     // 获取条款信息
     getPlanCvrg();
-    bthList.value = basicBtn;
+    if(props.param?.pageName === "priceInquiry") {
+      // 询价单
+      bthList.value.push(
+        createFreeButtonBase({
+          label: "保费计算",
+          type: "primary",
+          id: "btn010101",
+          func: () => {
+            calcPremium();
+          },
+        }),
+        createFreeButtonBase({
+          label: "保存",
+          type: "primary",
+          id: "btn010102",
+          func: () => {
+            savePlyInfo();
+          },
+        }),
+        createFreeButtonBase({
+          label: "申请核保",
+          type: "primary",
+          id: "btn010103",
+          func: () => {
+            submitToUndrFn();
+          },
+        }),
+      );
+    } else {
+      bthList.value = basicBtn;
+    }
     nextTick(() => {
       opertaor.setDataAll(dataInit.value);
     });
@@ -1616,6 +1648,8 @@ async function loadAfter() {
   if(props.param?.showBtn === false){
     bthList.value = [];
   }
+  pageLoaded.value = true;
+
 }
 function addOneYear(a:any) {
   // 将字符串转换为本地时间的日期对象
@@ -2070,12 +2104,14 @@ const submitToUndrFn = async () => {
       console.log(opertaor.getTableRefByKey("plyBase").getFromValue());
       const base = opertaor.getTableRefByKey("plyBase").getFromValue();
       res["user"] = user;
-      res["appNo"] = base["Base.cAppNo"];
 
       // 询价单申请核保参数
       if(props.param?.pageName === "priceInquiry") {
         res["taskId"] = 0;
         res["openPolicy"] = null;
+        res["cInquiryNo"] = base["Base.cInquiryNo"];
+      } else {
+        res["appNo"] = base["Base.cAppNo"];
       }
 
       console.log("申请核保参数-----", res);
@@ -2772,6 +2808,9 @@ const submitUnderwritingFn = () => {
   res["backUndrDptCde"] = parts[0]; // 退回指定核保级别机构编码
   res["backUndrClsCde"] = parts[1]; // 退回指定核保级别编码
   res["backUndrDptCnm"] = parts[2]; // 退回指定核保人员名称
+  if(props.param?.pageName === "priceInquiry") {
+    res["inquiryNo"] = props.param.cAppNo;
+  }
   console.log(res);
   // if(res.cUndrMrk === "A") {//核保选项为同意时，调用强制临分接口
   //   const deductibleDist = opertaor.getTableRefByKey("deductibleDist")?.getTableData();
@@ -2806,12 +2845,14 @@ const submitUnderwritingFn = () => {
   //   }
   // }
   let submitUnder;
-  if (props.param.cAppTyp === "A") {
+  // 询价单
+  if (props.param?.pageName === "priceInquiry") {
+    submitUnder = submitUnderwrite(res);
+  } else if (props.param?.cAppTyp === "A") {
     submitUnder = submitUnderwriting(res);
-  }
-  if (props.param.cAppTyp === "E") submitUnder = submitUnderwritingEdr(res);
+  } else if (props.param?.cAppTyp === "E") submitUnder = submitUnderwritingEdr(res);
 
-  submitUnder.then((res) => {
+  submitUnder?.then((res) => {
     console.log("submitUnderwriting-res", res);
     // btn.loading = false;
     if (res["code"] == "200") {
@@ -2870,10 +2911,10 @@ const validateCiInfo = () => {
         ElMessage.error("主共保信息只允许增加一条!");
         return false;
       }
-      if (CCoinsurerCdeNum <= 1) {
-        ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
-        return false;
-      }
+      // if (CCoinsurerCdeNum <= 1) {
+      //   ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
+      //   return false;
+      // }
     } else {
       ElMessage.error("请录入共保信息!");
       return false;

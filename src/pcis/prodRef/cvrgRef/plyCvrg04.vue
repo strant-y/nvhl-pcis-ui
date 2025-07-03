@@ -176,6 +176,25 @@ const disAbledFlag = ref(false);
 const codeListMap = ref<any>({});
 provide('codeListMap', codeListMap.value);
 
+
+const allTermMap = [
+'00425000281','00425000282','00425000283','00425000277','00425000279',
+'00425000278','00425000092','00425000280'
+];
+
+const cAddTermNo = ref('');
+watch(() => cAddTermNo.value, (val) => { 
+  if(allTermMap.includes(val)){
+    const tgt = opertaor.getTableRefByKey('tgt');
+    if(tgt){
+      tgt.change403009(val);
+    }
+    const insured = opertaor.getTableRefByKey('insured');
+    if(insured){
+      insured.change403009(val);
+    }
+  }
+})
 const opertaor = dataOpertaor();
 const parparam = opertaor.getParam();
 const terconfig = terConfig();
@@ -302,6 +321,7 @@ function addAndinitData() {
           if (item.cRdrTyp === "1") {
             data["Term.cClauseCategory"] = item.cClauseCategory;
           }
+          cAddTermNo.value = item.cUniqueTermNo;
           plans.push(data);
         });
         refushData(pl, plans);
@@ -410,7 +430,6 @@ function changeHidden(pl: any) {
 }
 // 绑定特殊验证器
 const exRules = {};
-
 function addTermData(PlanNo: string) {
   const param = opertaor.getParam();
   const sp = planData.value[PlanNo];
@@ -418,14 +437,18 @@ function addTermData(PlanNo: string) {
   Object.keys(sp).forEach((k: any) => {
     seld.push(...sp[k]);
   });
+  let parmdata = {
+    cProdNo: param.cProdNo,
+    isselectData: seld,
+  }
+  if(allTermMap.includes(cAddTermNo.value)){
+    parmdata.cTermNo = cAddTermNo.value;
+  }
   dialog.value?.open(
     "addtremView",
     {
       type: "show",
-      data: {
-        cProdNo: param.cProdNo,
-        isselectData: seld,
-      },
+      data: parmdata,
     },
     {
       isOk: (selectdata: any) => {
@@ -652,7 +675,6 @@ function setDisabledAll() {
     btnItem.value[k].hidden = true;
   });
   
-  console.log(tremTemplateRefs.value);
   Object.keys(tremTemplateRefs.value).forEach((item) => {
     tremTemplateRefs.value[item].setDisabledAll();
   });

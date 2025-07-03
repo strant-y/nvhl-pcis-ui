@@ -66,10 +66,10 @@ onMounted(() => {
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
     //是否小微企业，默认非必填、只读
-    setFormItem("Insured.cIsMicroEntpris", {
-      rules: null,
-      disabled: true,
-    });
+    // setFormItem("Insured.cIsMicroEntpris", {
+    //   rules: null,
+    //   disabled: true,
+    // });
   });
   //【国民经济行业分类】初始化必填，只有法人时才必填，现在个人也是必填了（老系统需求：040001/042002/043004/043005/043011五款产品不区分法人个人投保，国民经济行业分类都必填，其他产品只有法人才必填）
   const cProdNo = route.params.param?.cProdNo;
@@ -89,6 +89,9 @@ onMounted(() => {
     setFormItem("Insured.cShareholderCategory", { hidden: true, rules: null });
   }
 
+  setFormItem("Insured.cSafetyStandardizationLevel", { hidden: true });
+  setFormItem("Insured.cCreditRating", { hidden: true });
+  setFormItem("Insured.cIsLargeMediumEnterprise", { hidden: true });
   // 处理邮编
   setFormItem("Insured.cZipCde", {
            'maxlength':6,
@@ -163,11 +166,10 @@ const idAnalysis = (id:string)=>{
 const checkUser = () => {
  
   // 自定义录单 方案配置 模版 进入 可以查询用户信息  
-  if (param.pageType !== "app" &&  param.pageType !== "copy" && param.pageType !== "template") {
+  if (param.pageType !== "app" &&  param.pageType !== "copy" && param.pageType !== "template" && param.cAppStatus !=='1') {
     return false;
   }
   
-
   const tabref = opertaor.getTableRefs();
   const insuredValue = tabref["insured"].getFromValue();
   //  只要4个有值 去请求客户信息
@@ -1249,6 +1251,16 @@ function handleFileChange(event: Event) {
   }
 }
 
+const terms = ['00425000277','00425000278','00425000279','00425000280','00425000281'];
+function change403009(v){
+if(terms.includes(v)){
+    setValue("Tgt.cInsuranceMethod", "613001");
+    setFormItem("Insured.cSafetyStandardizationLevel", { hidden: false });
+    setFormItem("Insured.cCreditRating", { hidden: false });
+    setFormItem("Insured.cIsLargeMediumEnterprise", { hidden: false });
+  }
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
@@ -1257,6 +1269,7 @@ defineExpose({
   getValue,
   getFormconfig,
   clearValidate,
+  change403009,
 });
 </script>
 

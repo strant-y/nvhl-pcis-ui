@@ -1,4 +1,4 @@
-<!-- 待核保任务 暂存任务 已上报任务 核保退回任务 核保通过任务 -->
+<!-- 询价待核保任务 -->
 <template>
   <div class="app-container">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
@@ -58,12 +58,12 @@
     const pcisQueryService = new PcisQueryService();
     const policyService = new PolicyService();
     const {
-        getBaseInfoByAppNo,
         getBackUdrList,
-        getNewUdrList,
         removeReceived,
         checkEdrPocly,
         hasReceived,
+        getInquiryNewUdrList,
+        getBaseInfoByInquiryNo,
     } = NewUdrListService();
     import moment from "moment";
     import { Row } from "element-plus/es/components/table-v2/src/components";
@@ -96,12 +96,6 @@
     const udrTypeValue = ref<string>(); // 单据状态 值
     const undrClsListOptions = ref<Array<any>>([]); // 核保级别 下拉数据
     const selectData = ref([]); // 删除用户ID集合 用于批量删除
-
-    watch(() => freeEditRef.value?.getValue("tm1"), (newVal,old) => {
-      
-    },{
-         deep: true
-    });
     // 根据切换下拉数据显示/隐藏对应表单
     const allForm = ref<Array<any>>([
         {
@@ -180,33 +174,33 @@
         {
             prop: "objId",
             inputtype: "rtinput",
-            title: "申请单号",
+            title: "询价单号",
             showKey: [1, 2, 3, 4, 5],
             clearable: true,
         },
-        {
-            prop: "bsType",
-            inputtype: "rtradio",
-            title: "申请单类型",
-            showKey: [1],
-            minWidth: 180,
-            loadData: [
-                { label: "投保单", value: "A" },
-                { label: "批改申请单", value: "E" },
-            ],
-        },
-        {
-            prop: "bsType",
-            inputtype: "rtSelectV2",
-            title: "申请单类型",
-            showKey: [2, 4, 5],
-            minWidth: 180,
-            loadData: [
-                { label: "投保单", value: "A" },
-                { label: "批改申请单", value: "E" },
-                { label: "方案", value: "P" },
-            ],
-        },
+        // {
+        //     prop: "bsType",
+        //     inputtype: "rtradio",
+        //     title: "申请单类型",
+        //     showKey: [1],
+        //     minWidth: 180,
+        //     loadData: [
+        //         { label: "投保单", value: "A" },
+        //         { label: "批改申请单", value: "E" },
+        //     ],
+        // },
+        // {
+        //     prop: "bsType",
+        //     inputtype: "rtSelectV2",
+        //     title: "申请单类型",
+        //     showKey: [2, 4, 5],
+        //     minWidth: 180,
+        //     loadData: [
+        //         { label: "投保单", value: "A" },
+        //         { label: "批改申请单", value: "E" },
+        //         { label: "方案", value: "P" },
+        //     ],
+        // },
         // {
         //   prop: "cAppTyp",
         //   inputtype: "rtSelectV2",
@@ -227,7 +221,6 @@
             typeCode: "KIND_LIST_GRT",
             params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
             clearable: true,
-            //  multiple:1,
             func: (val: any) => {
                 //根据产品大类再次请求条款接口
                 codeListStore
@@ -268,7 +261,6 @@
             title: "条款",
             showKey: [1, 2, 3, 4, 5],
             typeCode: "TERM_LIST_IN_GUIDE_NEW",
-            // multiple:1,
             params: {
                 cParCde: "",
                 cOperId: user.value.opCde,
@@ -281,9 +273,8 @@
             prop: "undrClsCde",
             inputtype: "rtSelectV2",
             title: "核保级别",
-             
             showKey: [1, 2],
-            typeCode: "UNDR_CLS_CDE",
+            typeCode: "WEB_SYS_STA_DICT",
             params: { cDptCde: user.value.companyId, cEmpCde: user.value.opCde },
             clearable: true,
             lodaData: undrClsListOptions,
@@ -303,29 +294,9 @@
             clearable: true,
         },
         {
-            prop: "appCde",
-            inputtype: "rtinput",
-            title: "投保人",
-            showKey: [1, 2, 3, 4],
-            clearable: true,
-        },
-        {
-            prop: "tm1",
-            inputtype: "rtdatepicker",
-            title: "投保日期",
-            rules: [],
-            itemWidth: 1,
-            showKey: [1, 2, 3, 4, 5],
-            clearable: true,
-            type: "datetimerange",
-            format: "YYYY-MM-DD HH:mm:ss",
-            valueFormat: "YYYY-MM-DD HH:mm:ss",
-            
-        },
-        {
             prop: "tm2",
             inputtype: "rtdatepicker",
-            title: "申请核保时间",
+            title: "提核日期",
             rules: [],
             itemWidth: 1,
             showKey: [1, 2],
@@ -338,7 +309,7 @@
     // 默认表单数据
     const formObj = {
         notWaitObj: {
-            title: "核保任务查询",
+            title: "询价核保任务查询",
             endBtnsPosition: "right",
             endBtns: [
                 createFreeButtonBase({
@@ -471,7 +442,7 @@
         {
             prop: "objId",
             inputtype: "rtinput",
-            title: "申请单号",
+            title: "询价单号",
             showKey: [1, 2, 3, 4],
             minWidth: 180,
             fixed: "left",
@@ -519,7 +490,7 @@
         {
             prop: "appCde",
             inputtype: "rtinput",
-            title: "投保人名称",
+            title: "投保人",
             showKey: [1, 2, 3, 4],
             minWidth: 180,
         },
@@ -529,9 +500,6 @@
             title: "投保日期",
             showKey: [1, 2, 3, 4],
             minWidth: 180,
-            type: "datetimerange", // 显示日期和时间选择器
-            format: "YYYY-MM-DD HH:mm:ss", // 显示在界面上的格式
-            valueFormat: "YYYY-MM-DD HH:mm:ss" // 传递给后端的值格式
         },
         {
             prop: "preUserName",
@@ -553,9 +521,6 @@
             title: "提交时间",
             showKey: [1, 2, 3, 4],
             minWidth: 180,
-            type: "datetimerange", // 显示日期和时间选择器
-            format: "YYYY-MM-DD HH:mm:ss", // 显示在界面上的格式
-            valueFormat: "YYYY-MM-DD HH:mm:ss" // 传递给后端的值格式
         },
         {
             prop: "curtUserName",
@@ -598,7 +563,7 @@
         {
             prop: "cAppNo",
             inputtype: "rtinput",
-            title: "申请单号",
+            title: "询价单号",
             minWidth: 180,
             fixed: "left",
         },
@@ -911,8 +876,7 @@
     };
 
     const changeForm = (val: any) => {
-            console.log(val);
-        // freeEditRef.value?.resetFields();
+        freeEditRef.value?.resetFields();
         // resetForm();
         freeEditRef.value?.setFormValue({
             udrType: val,
@@ -934,12 +898,8 @@
             }
             allForm.value.map((item: any, index: number) => {
                 const isVal = item.showKey.findIndex((vals: any) => vals == val);
-            
+                console.log(isVal);
                 if (isVal !== -1) {
-                    if (item.prop == "tm1") {
-                        item.rules =
-                            val == 3 || val == 4 || val == 5 ? [getRules("required", {})] : [];
-                    }
                     if (item.prop == "tm2") {
                         item.rules = val == 1 || val == 2 ? [getRules("required", {})] : [];
                     }
@@ -1010,76 +970,25 @@
             if (
                 udrTypeValue.value == "1" ||
                 udrTypeValue.value == "2" ||
-                udrTypeValue.value == "3" ||
-                udrTypeValue.value == "4" ||
                 udrTypeValue.value == "5"
-            ) {  
-                  
+            ) {
                 if (udrTypeValue.value == "1" || udrTypeValue.value == "2") {
                     freeEditRef.value?.setValue("inNextDpt", "1");
                     freeEditRef.value?.setValue("tm2", [
-                        moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
-                            "YYYY-MM-DD 00:00:00"
-                        ),
-                        moment(new Date()).format("YYYY-MM-DD 23:59:59"),
-                    ]);
-
-                       freeEditRef.value?.setValue("tm1", [
-                        moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
-                            "YYYY-MM-DD 00:00:00"
-                        ),
-                         moment().endOf('day').format('YYYY-MM-DD HH:mm:ss')
-                        // moment(new Date()).format("YYYY-MM-DD 23:59:59"),
-                        // moment(new Date()).endOf('day').toDate()
-                        // .format("HH:mm:ss"),
-                        // .format("YYYY-MM-DD 23:59:58"),
-                    ]);
-                }
-                
-                 if (udrTypeValue.value == "3") {
-                    freeEditRef.value?.setValue("CLoadSub", 1);
-                        freeEditRef.value?.setValue("tm1", [
-                        moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
+                        moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
                             "YYYY-MM-DD 00:00:00"
                         ),
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
                     ]);
                 }
-                 if (udrTypeValue.value == "4") {
-                    freeEditRef.value?.setValue("CLoadSub", 1);
-                        freeEditRef.value?.setValue("tm1", [
-                        moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
-                            "YYYY-MM-DD 00:00:00"
-                        ),
-                        moment(new Date()).format("YYYY-MM-DD 23:59:59"),
-                    ]);
-                }
-
                 if (udrTypeValue.value == "5") {
                     freeEditRef.value?.setValue("CLoadSub", 1);
-                        freeEditRef.value?.setValue("tm1", [
-                        moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
-                            "YYYY-MM-DD 00:00:00"
-                        ),
-                        moment(new Date()).format("YYYY-MM-DD 23:59:59"),
-                    ]);
                 }
             }
         });
     };
 
     onMounted(async () => {
-         freeEditRef.value?.setFormValue({
-            udrType: "1",
-            inNextDpt: "1",
-            tm1: [
-                moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
-                    "YYYY-MM-DD 00:00:00"
-                ),
-                moment(new Date()).format("YYYY-MM-DD 23:59:59"),
-            ],
-        });
-
         freeEditRef.value?.setFormValue({
             udrType: "1",
             inNextDpt: "1",
@@ -1094,16 +1003,16 @@
             setFormItem("orgCde", {
                 loadData: [
                     {
-                        label: "永安保险总公司",
+                        label: "永安保险公总司",
                         value: "0200000000000",
                     },
                 ],
             });
 
             // 确保 loadData 设置完成后再设置表单值
-            freeEditRef.value?.setValue(
-                'orgCde', "0200000000000",
-            );
+            freeEditRef.value?.setFormValue({
+                orgCde: "0200000000000",
+            });
         }, 200);
         
         // 初始化表单
@@ -1130,12 +1039,6 @@
                 //核保退回任务
                 changeForm("4"); //展示form表单不同的栏位
             }
-            console.log('123123',homeJumpData)
-            // 投保日期
-            freeEditRef.value.setValue("tm1", [
-                homeJumpData.startCrtTm,
-                homeJumpData.TAppTmEnd,
-            ]);
             // 提核日期
             freeEditRef.value.setValue("tm2", [
                 homeJumpData.startBsTm1,
@@ -1220,7 +1123,7 @@
                 31 * 1000 * 60 * 60 * 24
             ) {
                 // this._loading = false;
-                ElMessage.warning("投保日期范围请控制在30天以内");
+                ElMessage.warning("投保日期范围请控制在7天以内");
                 return;
             }
         }
@@ -1268,7 +1171,6 @@
 
     /** 查询 */
     function refreshData(flag?: boolean) {
-        const date1 = freeEditRef.value?.getValue("tm1"); //投保日期
         const date2 = freeEditRef.value?.getValue("tm2"); //提核日期
         const objId = freeEditRef.value?.getValue("objId"); //申请单号
         const udrType = freeEditRef.value?.getValue("udrType"); //单据状态
@@ -1277,89 +1179,37 @@
         roles.value.forEach((role) => {
             roleCde = roleCde === "" ? role : `${roleCde},${role}`;
         });
-        roleCde = "ROLE_00000152";
-        if (!objId) {
-            // 查询时间段验证
-            if (udrType == "3" || udrType == "4" || udrType == "5") {
-                // if (!date1) {
-                //   // loading.value = false;
-                //   ElMessage.warning('投保日期不能为空');
-                //   return;
-                // }
-                if (
-                    new Date(date1[1]).getTime() - new Date(date1[0]).getTime() >=
-                    31 * 1000 * 60 * 60 * 24
-                ) {
-                    // loading.value = false;
-                    ElMessage.warning("投保日期范围请控制在30天以内");
-                    return;
-                }
-            } else {
-                if (!date2) {
-                    ElMessage.warning("提核日期不能为空");
-                    return;
-                }
-                if (
-                    new Date(date2[1]).getTime() - new Date(date2[0]).getTime() >=
-                    31 * 1000 * 60 * 60 * 24
-                ) {
-                    ElMessage.warning("提核日期范围请控制在30天以内");
-                    return;
-                }
-            }
-        }
+        // roleCde = "ROLE_00000152";
         const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
         const s = freeEditRef.value?.getFromValue(); //获取表单数据
-        let params = {};
-
-        if (udrType !== "5") {
-            params = {
-                companyId: user.value.companyId,
-                roleCde: roleCde,
-                operId: user.value.opCde,
-                inNextDpt: freeEditRef.value?.getValue("inNextDpt"),
-                ...s,
-            };
-            if (udrType == "3" || udrType == "4") {
-                params.startBsTm1 = date1[0];
-                params.endBsTm1 = date1[1];
-            } else {
+        const params = {
+            ...s,
+            ...r,
+            isInquiry: "1",
+            operId: user.value.opCde,
+            companyId: user.value.companyId,
+            roleCde: roleCde,
+            udrType: String(udrType - 1)
+        }
+        if(udrType && (udrType === "1" || udrType === "2")) {
+            if (!date2) {
+                ElMessage.warning("提核日期不能为空");
+                return;
+            }
+            if (
+                new Date(date2[1]).getTime() - new Date(date2[0]).getTime() >=
+                7 * 1000 * 60 * 60 * 24
+            ) {
+                ElMessage.warning("提核日期范围请控制在7天以内");
+                return;
+            }
+            if(date2 && date2.length > 0) {
                 params.startCrtTm = date2[0];
                 params.TAppTmEnd = date2[1];
             }
-        } else {
-            params = Object.assign(
-                {
-                    sortField: "name",
-                    bsType: "A",
-                    CAppStatus: "4",
-                    // CUdrCde: this.user.opCde, // 已核保查询去掉人员限制
-                    sortOrder: null, // 存在问题_sortValue需要确认5个页面，每个tale具体哪些字段需要排序
-                    CurrentUser: user.value.opCde,
-                    CurrentUserOrg: user.value.companyId,
-                    TAppTmStart: date1[0],
-                    TAppTmEnd: date1[1],
-                    CLoadSub: freeEditRef.value?.getValue("CLoadSub"),
-                },
-                s
-            );
-            params["findPlan"] = true;
         }
-        delete params.tm1;
         delete params.tm2;
-        const querys = Object.assign(params, r);
-        const requestParam = cloneDeep(querys);
-        requestParam.udrType = String(requestParam.udrType - 1);
-        let udrData;
-        if (udrType !== "5") {
-            if (udrType === "4") {
-                udrData = getBackUdrList(requestParam);
-            } else {
-                udrData = getNewUdrList(requestParam);
-            }
-        } else {
-            udrData = pcisQueryService.getAppPolicyList(requestParam);
-        }
+        const udrData = getInquiryNewUdrList(params);
 
         udrData
             .then((res: any) => {
@@ -1466,7 +1316,7 @@
 
     // 查看详情
     function updateUdrDetail(row: any) {
-        getBaseInfoByAppNo({ appNo: row.objId }).then((r: any) => {
+        getBaseInfoByInquiryNo({ inquiryNo: row.objId }).then((r: any) => {
             if (r.code !== 200) {
                 ElMessage.error({ message: r.msg, duration: 6000 });
             } else {
@@ -1487,6 +1337,7 @@
                         cTermNo:row.cTermNo,
                         cTermNme:row.cTermNme,
                         cProdNmeCn: row.prodName,
+                        pageName: 'priceInquiry',
                     });
                     router.push({
                         path: "/pcis/my-page",
@@ -1720,7 +1571,7 @@
                 });
             }
         } else {
-            getBaseInfoByAppNo({ appNo: row.objId ? row.objId : row.cAppNo }).then((r: any) => {
+            getBaseInfoByInquiryNo({ inquiryNo: row.objId ? row.objId : row.cAppNo }).then((r: any) => {
                 if (r.code !== 200) {
                     ElMessage.error({ message: r.msg, duration: 6000 });
                 } else {

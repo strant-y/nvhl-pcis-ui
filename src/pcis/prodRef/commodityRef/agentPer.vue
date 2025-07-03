@@ -271,6 +271,13 @@ const tableconfig = reactive<AppTableConfig>(
           {
             "label": "其他兼业代理",
             "value": "1900202099"
+          },
+          {
+            "label": "专业代理",
+            "value": "1900203001"
+          },{
+            "label": "永安销售公司",
+            "value": "1900203002"
           }
         ],
       },

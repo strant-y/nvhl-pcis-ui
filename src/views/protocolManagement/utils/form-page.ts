@@ -9,11 +9,12 @@ export class FormPage {
     private buttonRefMap = new Map<string, FreeButtonBase | any>();
     private formConfig= new Array<any>();
     private initial: boolean = false;
+    private readonly soleKey: string;
 
     constructor(pageId: string) {
+        this.soleKey = pageId;
         this.initial = true;
     }
-
 
     get config() {
         return this.formConfig;
@@ -21,7 +22,9 @@ export class FormPage {
     get init() {
         return this.initial;
     }
-
+    get constraint() {
+        return this.soleKey;
+    }
     setFormConfig(config: any) {
         this.formConfig.push(...config);
     }
