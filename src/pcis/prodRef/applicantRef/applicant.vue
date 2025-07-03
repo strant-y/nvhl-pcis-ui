@@ -107,8 +107,8 @@ onMounted(() => {
     setFormItem("Applicant.cFax", { rules: [getRules("faxNumber", {})] });
 
     
-    setFormItem("Applicant.cGreenIndustryCustomers",{disabled: true});
-    setFormItem("Applicant.cGreenIndustryList",{disabled: true});
+    // setFormItem("Applicant.cGreenIndustryCustomers",{disabled: true});
+    // setFormItem("Applicant.cGreenIndustryList",{disabled: true});
     setFormItem("Applicant.cGcidCode", {rules: [getRules("leiCode", {})]});
     // 关联交易审批单编号
     setFormItem("Applicant.cRelateNo", {rules: [getRules("txnApprovalNo", {})]});
