@@ -325,7 +325,7 @@
         {
             prop: "tm2",
             inputtype: "rtdatepicker",
-            title: "核保日期",
+            title: "申请核保时间",
             rules: [],
             itemWidth: 1,
             showKey: [1, 2],
@@ -519,7 +519,7 @@
         {
             prop: "appCde",
             inputtype: "rtinput",
-            title: "投保人",
+            title: "投保人名称",
             showKey: [1, 2, 3, 4],
             minWidth: 180,
         },
@@ -529,6 +529,9 @@
             title: "投保日期",
             showKey: [1, 2, 3, 4],
             minWidth: 180,
+            type: "datetimerange", // 显示日期和时间选择器
+            format: "YYYY-MM-DD HH:mm:ss", // 显示在界面上的格式
+            valueFormat: "YYYY-MM-DD HH:mm:ss" // 传递给后端的值格式
         },
         {
             prop: "preUserName",
@@ -550,6 +553,9 @@
             title: "提交时间",
             showKey: [1, 2, 3, 4],
             minWidth: 180,
+            type: "datetimerange", // 显示日期和时间选择器
+            format: "YYYY-MM-DD HH:mm:ss", // 显示在界面上的格式
+            valueFormat: "YYYY-MM-DD HH:mm:ss" // 传递给后端的值格式
         },
         {
             prop: "curtUserName",
