@@ -442,7 +442,7 @@
         {
             prop: "objId",
             inputtype: "rtinput",
-            title: "申请单号",
+            title: "询价单号",
             showKey: [1, 2, 3, 4],
             minWidth: 180,
             fixed: "left",
@@ -563,7 +563,7 @@
         {
             prop: "cAppNo",
             inputtype: "rtinput",
-            title: "申请单号",
+            title: "询价单号",
             minWidth: 180,
             fixed: "left",
         },
