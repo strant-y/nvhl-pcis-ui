@@ -52,7 +52,7 @@ const removeIds = ref([]); // 删除用户ID集合 用于批量删除
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
-import { getInquiryPolicyList, qryEndorseList, delTmpPolicy } from "@/api/query";
+import { getInquiryPolicyList, qryEndorseList, delInquiryPolicy } from "@/api/query";
 // 变更列
 const colChange = defineAsyncComponent(() => import("../modal/colChange.vue"));
 const props = defineProps({
@@ -280,7 +280,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               inputtype: "rtinput",
               title: "查询条件",
               placeholder:
-                  "申请单号 保单号 批单号 产品名称 被保人名称 被保人证件号码 手机号码 被保人地址 投保人名称",
+                  "询价单号 保单号 产品名称",
               btnWidth: 10,
               itemWidth: 2,
               showExBtn: true,
@@ -892,8 +892,7 @@ const tableObj = {
                         cancelButtonText: "取消",
                         type: "warning",
                     }).then(function () {
-                        // TODO
-                        const delResult = delTmpPolicy({ cAppNo: row.cAppNo });
+                        const delResult = delInquiryPolicy({ cInquiryNo: row.cInquiryNo });
                         delResult.then((res: any) => {
                             if (null != res && null != res["code"]) {
                                 if (res["code"] === 200) {
