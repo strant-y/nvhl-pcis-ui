@@ -1,12 +1,12 @@
 <template>
   <app-free-edit :freeEditConfig="formconfig1" ref="baseEditRef" />
   <comDialog ref="dialog"></comDialog>
-  <input
-      type="file"
-      ref="fileInputRef"
-      style="display: none"
-      @change="handleFileChange"
-  />
+<!--  <input-->
+<!--      type="file"-->
+<!--      ref="fileInputRef"-->
+<!--      style="display: none"-->
+<!--      @change="handleFileChange"-->
+<!--  />-->
 </template>
 
 <script setup lang="ts">
@@ -30,12 +30,13 @@ const props = defineProps({
 const baseEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 import { useRoute } from "vue-router";
+import {getBsnsTypList} from "@/api/code-list-service";
 const route = useRoute();
 const fileInputRef = ref(null);
-const codeListStore = codeListViewStore();
-const idxParam = inject('idxParam');
+const idxParam = inject<any>('idxParam', {});
 const formPage = idxParam?.formPage;
 const param = idxParam?.param;
+const user = idxParam?.user;
 
 onMounted(() => {
   const formconfig11 = formInit(
@@ -44,7 +45,27 @@ onMounted(() => {
       getRules
   );
   Object.assign(formconfig1, formconfig11);
+  nextTick(() => {
+    initComp();
+  })
 });
+
+
+// 组件初始化方法
+function initComp() {
+  //业务来源大类下拉数据
+  getBsnsTypList({ CDptCde: user.companyId, CKindNo: '02'}).then((res) => {
+    if (null != res && null != res["code"]) {
+      if (res["code"] === 200) {
+        baseEditRef.value?.addCodeListMap({
+          code: 'ECargoBase.cBsnsTyp',
+          list: res.data
+        });
+      }
+    }
+  });
+
+}
 
 // 绑定方法
 const method = {
@@ -65,26 +86,6 @@ const method = {
     }
   }
 };
-
-
-//给表单下拉项赋值
-function setFormItem(key: any, obj: any) {
-  if (obj && Object.keys(obj).length) {
-    formconfig1.fromSchema?.forEach((item) => {
-      if (item.prop === key) {
-        //控制尾部按钮的
-        if (item.btnItems && obj.btnItems) {
-          for (let key in obj.btnItems) {
-            item.btnItems[key] = obj.btnItems[key];
-          }
-        } else {
-          Object.assign(item, obj);
-        }
-      }
-    });
-  }
-}
-
 
 function getFormValue() {
   return baseEditRef?.value?.getFromValue();
