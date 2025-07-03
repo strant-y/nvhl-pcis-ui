@@ -337,9 +337,7 @@ const method = {
       cslstyp = "020004";
     };
     
-    dialogRef.value?.open(
-      "agentWorker",
-      {
+    dialogRef.value?.open("agentWorker",{
         type: "show",
         data: {
           CDptCde: sessionData.value?.cDptCde,
@@ -608,6 +606,10 @@ const method = {
         });
     }
   },
+  // change
+  cAgriMrkChange:(val:any)=>{
+      console.log('111',val)
+  }
 };
 
 // 绑定特殊验证器

@@ -39,12 +39,20 @@
                   }"
                 >
                   <tremTemplate
+                  
                     v-for="(i, index) in planData[k]['m']"
+                 
                     :key="index"
                     v-model="planData[k]['m'][index]"
                     :disabled-flag="disAbledFlag"
                     @delete="
                       (r) => {
+                        console.log(planData,k,r,index)
+                        // 如果是主条款不可以删除
+                        if(k ==='P1' &&index===0){
+                          ElMessage.warning('主条款不能删除!')
+                          return false;
+                        }
                         deleteData(k, r);
                       }
                     "
