@@ -1031,7 +1031,7 @@ const tableObj = {
             },
             {
                 prop: "tIssueTm",
-                inputtype: "rtdatepicker",
+                inputtype: "rtinput",
                 title: "签单日期",
                 minWidth: 180,
             },
