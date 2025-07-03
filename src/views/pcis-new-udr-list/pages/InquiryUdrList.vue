@@ -189,18 +189,18 @@
         //         { label: "批改申请单", value: "E" },
         //     ],
         // },
-        {
-            prop: "bsType",
-            inputtype: "rtSelectV2",
-            title: "申请单类型",
-            showKey: [2, 4, 5],
-            minWidth: 180,
-            loadData: [
-                { label: "投保单", value: "A" },
-                { label: "批改申请单", value: "E" },
-                { label: "方案", value: "P" },
-            ],
-        },
+        // {
+        //     prop: "bsType",
+        //     inputtype: "rtSelectV2",
+        //     title: "申请单类型",
+        //     showKey: [2, 4, 5],
+        //     minWidth: 180,
+        //     loadData: [
+        //         { label: "投保单", value: "A" },
+        //         { label: "批改申请单", value: "E" },
+        //         { label: "方案", value: "P" },
+        //     ],
+        // },
         // {
         //   prop: "cAppTyp",
         //   inputtype: "rtSelectV2",
