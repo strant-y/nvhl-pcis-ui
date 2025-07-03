@@ -18,7 +18,7 @@ const props = defineProps({
   }
 });
 
-const formPage = ref(new FormPage('enteringDtl'));
+const formPage = ref(new FormPage('reviewDtl'));
 const idxParam = reactive({
   formPage: formPage.value,
   param: { ...props.param, ...{}},

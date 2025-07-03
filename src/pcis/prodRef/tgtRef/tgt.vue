@@ -75,12 +75,9 @@ onMounted(async () => {
 
   console.log('------------',props.pageSchema)
   if(params.cProdNo === '045001'){
-    formconfig11.fromSchema?.forEach(item=>{
-      if(item['prop'] ==='Tgt.cInsuranceMethod'){
-        item['typeCode'] = 'InsuranceMethod045001';
-      }
-    })
+    setFormItem("Tgt.cInsuranceMethod", {typeCode: 'InsuranceMethod045001',});
   }
+  
   for(let i = 0; formconfig11.fromSchema && i < formconfig11.fromSchema.length; i++){
     // 遍历groupList数组把函数赋值给fromSchema
     if (formconfig11.fromSchema[i]["groupList"] && formconfig11.fromSchema[i]["groupList"].length>0) {
@@ -466,23 +463,7 @@ const method = {
     productStore.setCIsSingle(val)
   },
   funcInsuranceChange: (val) => {
-
-    if (params.cProdNo === '043009' || params.cProdNo === '045001'
-      ||params.cProdNo === '049035' || params.cProdNo === '049036'
-      ||params.cProdNo === '049037' || params.cProdNo === '049040'
-      ||params.cProdNo === '049041' 
-    ) {
-      let hd = true;
-      if(val !== '613001'){
-        hd = false;
-      }
-
-      formconfig1.fromUi.groupBy.forEach(item => {
-        if(item.id == 'group2'){
-          item.hidden = hd;
-        }
-      })
-    }
+    groupCheck();
     //根据投保方式得选择对应控制必填项
     if (val == '613002') {
       setFormItem("Tgt.nEngineeringCost", {
@@ -513,6 +494,9 @@ const method = {
     if (cvrgref.showFlush) {
       cvrgref.showFlush();
     }
+  },
+  industryTypeChange:(val:any)=>{
+    groupCheck();
   },
   wagesInfoBtn: () => {
 
@@ -903,6 +887,40 @@ function singChange(obj) {
     'Tgt.cProjectAddress': '',
   })
 }
+
+function groupCheck() {
+  if (params.cProdNo === '043009' || params.cProdNo === '045001'
+      ||params.cProdNo === '049035' || params.cProdNo === '049036'
+      ||params.cProdNo === '049037' || params.cProdNo === '049040'
+      ||params.cProdNo === '049041' 
+    ){
+    const cInsuranceMethod = getValue("Tgt.cInsuranceMethod");
+    const cIndustryType = getValue("Tgt.cIndustryType");
+    const plyBase = opertaor.getTableRefByKey('plyBase');
+    let subSidiary = null;
+    if(plyBase){
+      subSidiary = plyBase.getValue('Base.cDptCde');
+      subSidiary = subSidiary.substring(0,6);
+    }
+
+    let h = true;
+    if(cIndustryType === '15' && (subSidiary === '024101' || subSidiary === '026201' || subSidiary === '024201'
+      || subSidiary === '023702' || subSidiary === '026401' )){
+      h = false;
+    }else{
+      if(cInsuranceMethod !== '613001'){
+        h = false;
+      }
+    }
+
+    formconfig1.fromUi.groupBy.forEach(item => {
+      if(item.id == 'group2'){
+        item.hidden = h;
+      }
+    });
+  }
+}
+
 // 绑定特殊验证器
 const exRules = {};
 function getFromValue() {
@@ -942,6 +960,18 @@ function setFormItem(key: any, obj: any) {
     });
   }
 }
+const terms1 = ['00425000277','00425000278','00425000279','00425000282','00425000283'];
+const terms2 = ['00425000281','00425000280'];
+function change403009(v){
+  if(terms1.includes(v)){
+    setValue("Tgt.cInsuranceMethod", "613001");
+    setFormItem("Tgt.cInsuranceMethod",{disabled:true});
+  }
+  if(terms2.includes(v)){
+    setValue("Tgt.cInsuranceMethod", "613001");
+    setFormItem("Tgt.cInsuranceMethod",{disabled:true});
+  }
+}
 
 function getFormconfig() {
   return formconfig1;
@@ -954,6 +984,7 @@ defineExpose({
   setValue,
   getValue,
   getFormconfig,
+  change403009,
 });
 </script>
 

@@ -263,3 +263,28 @@ export function saveInquiry(queryParams: any): AxiosPromise<any> {
 export function submitInquiry(queryParams: any): AxiosPromise<any> {
     return post(`/inquiry/submit`, queryParams);
 }
+
+/**
+ * 询价-核保保存
+ * @param queryParams
+ */
+export function submitUnderwrite(queryParams: any): AxiosPromise<any> {
+    return post(`/inquiry/submitUnderwrite`, queryParams);
+}
+
+/**
+ * 综合查询-询价单查询
+ * @param queryParams
+ */
+export function getInquiryPolicyList(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/getInquiryPolicyList`, queryParams);
+}
+
+
+/**
+ * 综合查询-询价单删除
+ * @param queryParams
+ */
+export function delInquiryPolicy(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/delInquiryPolicy`, queryParams);
+}
