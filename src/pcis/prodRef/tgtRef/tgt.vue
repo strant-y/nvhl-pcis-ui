@@ -75,12 +75,9 @@ onMounted(async () => {
 
   console.log('------------',props.pageSchema)
   if(params.cProdNo === '045001'){
-    formconfig11.fromSchema?.forEach(item=>{
-      if(item['prop'] ==='Tgt.cInsuranceMethod'){
-        item['typeCode'] = 'InsuranceMethod045001';
-      }
-    })
+    setFormItem("Tgt.cInsuranceMethod", {typeCode: 'InsuranceMethod045001',});
   }
+  
   for(let i = 0; formconfig11.fromSchema && i < formconfig11.fromSchema.length; i++){
     // 遍历groupList数组把函数赋值给fromSchema
     if (formconfig11.fromSchema[i]["groupList"] && formconfig11.fromSchema[i]["groupList"].length>0) {
@@ -963,6 +960,13 @@ function setFormItem(key: any, obj: any) {
     });
   }
 }
+const terms = ['00425000277','00425000278','00425000279','00425000282','00425000283'];
+function change403009(v){
+  if(terms.includes(v)){
+    setValue("Tgt.cInsuranceMethod", "613001");
+    setFormItem("Tgt.cInsuranceMethod",{disabled:true});
+  }
+}
 
 function getFormconfig() {
   return formconfig1;
@@ -975,6 +979,7 @@ defineExpose({
   setValue,
   getValue,
   getFormconfig,
+  change403009,
 });
 </script>
 

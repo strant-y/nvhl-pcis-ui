@@ -89,6 +89,9 @@ onMounted(() => {
     setFormItem("Insured.cShareholderCategory", { hidden: true, rules: null });
   }
 
+  setFormItem("Insured.cSafetyStandardizationLevel", { hidden: true });
+  setFormItem("Insured.cCreditRating", { hidden: true });
+  setFormItem("Insured.cIsLargeMediumEnterprise", { hidden: true });
   // 处理邮编
   setFormItem("Insured.cZipCde", {
            'maxlength':6,
@@ -1248,6 +1251,16 @@ function handleFileChange(event: Event) {
   }
 }
 
+const terms = ['00425000277','00425000278','00425000279','00425000280','00425000281'];
+function change403009(v){
+if(terms.includes(v)){
+    setValue("Tgt.cInsuranceMethod", "613001");
+    setFormItem("Insured.cSafetyStandardizationLevel", { hidden: false });
+    setFormItem("Insured.cCreditRating", { hidden: false });
+    setFormItem("Insured.cIsLargeMediumEnterprise", { hidden: false });
+  }
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
@@ -1256,6 +1269,7 @@ defineExpose({
   getValue,
   getFormconfig,
   clearValidate,
+  change403009,
 });
 </script>
 
