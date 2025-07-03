@@ -2162,7 +2162,9 @@ const submitToUndrFn = async () => {
             console.log("submitToUndr-res", undr);
             if (undr["code"] == 200) {
               if(undr['cDecision'] !== '0'){
-                ElMessage.success(undr.msg);
+                ElMessage({
+                  showClose: true,message:undr.msg,duration:0,type: 'success'
+                });
                 // 申请核保成功后按钮设置为不可点击
                 const btn = getBtn("btn010103");
 
@@ -2178,7 +2180,9 @@ const submitToUndrFn = async () => {
               }else if(undr["cDecision"] == '0'){
                 ElMessage.error(undr.msg);
               }else{
-                ElMessage.success(undr.msg);
+                ElMessage({
+                  showClose: true,message:undr.msg,duration:0,type: 'success'
+                });
               }
                 btn.disabled = true;
               //关闭当前tab页面
