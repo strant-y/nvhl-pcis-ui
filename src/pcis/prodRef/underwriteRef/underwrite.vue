@@ -262,6 +262,16 @@
         return underwriteEditRef?.value?.getValue(key);
     }
     function getCUndrMrkUrlFn(prarm){
+        if(params.pageName === "priceInquiry") {
+            setFormItem("cUndrMrk", {
+                loadData: [
+                    {value: 'A', label: '同意'},
+                    {value: 'R', label: '上报'},
+                    {value: 'B', label: '退回给出单员'},
+                    {value: 'T', label: '退回至指定核保级别人员'}
+                ]
+            })
+        }
         getCUndrMrk(prarm).then((r: any) => {
             console.log(prarm)
             if (r.code !== 200) {

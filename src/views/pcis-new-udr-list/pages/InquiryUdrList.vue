@@ -1179,63 +1179,37 @@
         roles.value.forEach((role) => {
             roleCde = roleCde === "" ? role : `${roleCde},${role}`;
         });
-        roleCde = "ROLE_00000152";
-        if (!objId) {
-            // 查询时间段验证
-            if (udrType == "3" || udrType == "4" || udrType == "5") {
-            } else {
-                if (!date2) {
-                    ElMessage.warning("提核日期不能为空");
-                    return;
-                }
-                if (
-                    new Date(date2[1]).getTime() - new Date(date2[0]).getTime() >=
-                    7 * 1000 * 60 * 60 * 24
-                ) {
-                    ElMessage.warning("提核日期范围请控制在7天以内");
-                    return;
-                }
-            }
-        }
+        // roleCde = "ROLE_00000152";
         const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
         const s = freeEditRef.value?.getFromValue(); //获取表单数据
-        let params = {};
-
-        if (udrType !== "5") {
-            params = {
-                companyId: user.value.companyId,
-                roleCde: roleCde,
-                operId: user.value.opCde,
-                inNextDpt: freeEditRef.value?.getValue("inNextDpt"),
-                ...s,
-            };
-            if (udrType == "3" || udrType == "4") {
-            } else {
+        const params = {
+            ...s,
+            ...r,
+            isInquiry: "1",
+            operId: user.value.opCde,
+            companyId: user.value.companyId,
+            roleCde: roleCde,
+            udrType: String(udrType - 1)
+        }
+        if(udrType && (udrType === "1" || udrType === "2")) {
+            if (!date2) {
+                ElMessage.warning("提核日期不能为空");
+                return;
+            }
+            if (
+                new Date(date2[1]).getTime() - new Date(date2[0]).getTime() >=
+                7 * 1000 * 60 * 60 * 24
+            ) {
+                ElMessage.warning("提核日期范围请控制在7天以内");
+                return;
+            }
+            if(date2 && date2.length > 0) {
                 params.startCrtTm = date2[0];
                 params.TAppTmEnd = date2[1];
             }
-        } else {
-            params = Object.assign(
-                {
-                    sortField: "name",
-                    bsType: "A",
-                    CAppStatus: "4",
-                    // CUdrCde: this.user.opCde, // 已核保查询去掉人员限制
-                    sortOrder: null, // 存在问题_sortValue需要确认5个页面，每个tale具体哪些字段需要排序
-                    CurrentUser: user.value.opCde,
-                    CurrentUserOrg: user.value.companyId,
-                    CLoadSub: freeEditRef.value?.getValue("CLoadSub"),
-                },
-                s
-            );
-            params["findPlan"] = true;
         }
         delete params.tm2;
-        const querys = Object.assign(params, r);
-        const requestParam = cloneDeep(querys);
-        requestParam.udrType = String(requestParam.udrType - 1);
-        requestParam.isInquiry = "1";
-        const udrData = getInquiryNewUdrList(requestParam);
+        const udrData = getInquiryNewUdrList(params);
 
         udrData
             .then((res: any) => {
@@ -1343,7 +1317,6 @@
     // 查看详情
     function updateUdrDetail(row: any) {
         getBaseInfoByInquiryNo({ inquiryNo: row.objId }).then((r: any) => {
-            debugger
             if (r.code !== 200) {
                 ElMessage.error({ message: r.msg, duration: 6000 });
             } else {
