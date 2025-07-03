@@ -60,6 +60,8 @@ export const getData = () => {
 
     // 录单机构
     dataInit["Base.cDptCde"] = param.cDptCde;
+    // 涉农标志
+    dataInit["Base.cAgriMrk"] = "2";
     //联共保业务
     dataInit["Base.cCiMrk"] = "0";
     dataInit["Base.cIntroDptcde"] = param.cDptCde;
@@ -83,6 +85,7 @@ export const getData = () => {
     dataInit["Tgt.cInsuranceCurrency"] = "01";
     // “标的信息”中“车辆使用性质”默认值为营运
     dataInit["Tgt.cUsageNature"] = "364113098";
+
 
  
     return dataInit;
