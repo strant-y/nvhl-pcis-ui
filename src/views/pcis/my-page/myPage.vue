@@ -1558,6 +1558,14 @@ async function loadAfter() {
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
         }
         opertaor.setDataAll(ops);
+        
+        // 获取原投保单号下的清单列表数据
+        const distMap = formconfig1[0].pageInfo.filter((item:any) => {
+          return item.pageKey === "dist" || item.pageKey === "distSummary";
+        });
+        distMap.forEach((item:any) => {
+          getDistData(ops.plyBase['Base.cAppNo'], item)
+        });
         //获取单号
         getCAppNoFun();
       }
@@ -2342,7 +2350,7 @@ const savePlyInfo = async () => {
 
 
     saveFlag = true;
-    if(props.param?.pageType === "copy" && saveDistBatchFlag.value) {
+    if((props.param?.pageType === "copy" || props.param?.pageType === "template") && saveDistBatchFlag.value) {
       // 保存清单
       const appNo = plyBase["Base.cAppNo"];
       saveDist(appNo);
