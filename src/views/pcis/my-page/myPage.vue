@@ -2163,7 +2163,7 @@ const submitToUndrFn = async () => {
             if (undr["code"] == 200) {
               if(undr['cDecision'] !== '0'){
                 ElMessage({
-                  showClose: true,message:undr.msg,duration:0,type: 'success'
+                  showClose: true,message:undr.msg,duration:6000,type: 'success'
                 });
                 // 申请核保成功后按钮设置为不可点击
                 const btn = getBtn("btn010103");
@@ -2181,7 +2181,7 @@ const submitToUndrFn = async () => {
                 ElMessage.error(undr.msg);
               }else{
                 ElMessage({
-                  showClose: true,message:undr.msg,duration:0,type: 'success'
+                  showClose: true,message:undr.msg,duration:6000,type: 'success'
                 });
               }
                 btn.disabled = true;
