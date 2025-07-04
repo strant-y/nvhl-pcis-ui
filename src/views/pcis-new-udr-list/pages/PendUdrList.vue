@@ -96,7 +96,14 @@
     const udrTypeValue = ref<string>(); // 单据状态 值
     const undrClsListOptions = ref<Array<any>>([]); // 核保级别 下拉数据
     const selectData = ref([]); // 删除用户ID集合 用于批量删除
-
+    
+    // 默认核保机构
+    let loadOrgCde = ref([
+          {
+                        label: "永安保险总公司",
+                        value: "0200000000000",
+                    },
+    ]);
     watch(() => freeEditRef.value?.getValue("tm1"), (newVal,old) => {
       
     },{
@@ -141,6 +148,12 @@
                             if (res.type === "ok") {
                                 if (res.body) {
                                     freeEditRef.value?.setValue("orgCde", res.body.id);
+                                    loadOrgCde.value = [
+                                            {
+                                                label: res.body.name,
+                                                value: res.body.id,
+                                            },
+                                        ]
                                     setFormItem("orgCde", {
                                         loadData: [
                                             {
@@ -305,9 +318,10 @@
         {
             prop: "appCde",
             inputtype: "rtinput",
-            title: "投保人",
+            title: "投保人姓名",
             showKey: [1, 2, 3, 4],
             clearable: true,
+            placeholder: "请输入",
         },
         {
             prop: "tm1",
@@ -946,6 +960,24 @@
                     formObj.notWaitObj.fromSchema.value.push(item);
                 }
             });
+
+
+
+            // setFormItem("orgCde", {
+            //     loadData: [
+            //         {
+            //             label: "永安保险总公司",
+            //             value: "0200000000000",
+            //         },
+            //     ],
+            // });
+
+            // // 确保 loadData 设置完成后再设置表单值
+            // freeEditRef.value?.setValue(
+            //     'orgCde', "0200000000000",
+            // );
+
+
         });
     };
 
@@ -953,7 +985,7 @@
         () => freeEditRef.value?.getValue("udrType"),
         (n, o) => {
             udrTypeValue.value = n;
-            resetForm();
+       
             // 切换表格 数据列 显示/隐藏
             tableObj.notWaitObj.fromSchema.value = [];
             allTable.value.map((item: any, index: number) => {
@@ -980,6 +1012,10 @@
                     tableObj.notWaitObj.tableBtn.value.push(item);
                 });
             }
+            setTimeout(() => {
+                 resetForm();
+                
+            }, 0);
         },
         { deep: true }
     );
@@ -1014,9 +1050,15 @@
                 udrTypeValue.value == "4" ||
                 udrTypeValue.value == "5"
             ) {  
-                  
+                  console.log( udrTypeValue.value)
                 if (udrTypeValue.value == "1" || udrTypeValue.value == "2") {
                     freeEditRef.value?.setValue("inNextDpt", "1");
+                     setFormItem("orgCde", {
+                        loadData:  loadOrgCde.value
+                    });
+                    freeEditRef.value?.setValue(
+                        'orgCde',  loadOrgCde.value[0]['value'],
+                    );
                     freeEditRef.value?.setValue("tm2", [
                         moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
                             "YYYY-MM-DD 00:00:00"
@@ -1057,6 +1099,12 @@
 
                 if (udrTypeValue.value == "5") {
                     freeEditRef.value?.setValue("CLoadSub", 1);
+                      setFormItem("orgCde", {
+                        loadData:  loadOrgCde.value
+                    });
+                    freeEditRef.value?.setValue(
+                        'orgCde',  loadOrgCde.value[0]['value'],
+                    );
                         freeEditRef.value?.setValue("tm1", [
                         moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
                             "YYYY-MM-DD 00:00:00"
@@ -1090,21 +1138,21 @@
                 moment(new Date()).format("YYYY-MM-DD 23:59:59"),
             ],
         });
-        setTimeout(() => {
-            setFormItem("orgCde", {
-                loadData: [
-                    {
-                        label: "永安保险总公司",
-                        value: "0200000000000",
-                    },
-                ],
-            });
+        // setTimeout(() => {
+        //     setFormItem("orgCde", {
+        //         loadData: [
+        //             {
+        //                 label: "永安保险总公司",
+        //                 value: "0200000000000",
+        //             },
+        //         ],
+        //     });
 
-            // 确保 loadData 设置完成后再设置表单值
-            freeEditRef.value?.setValue(
-                'orgCde', "0200000000000",
-            );
-        }, 200);
+        //     // 确保 loadData 设置完成后再设置表单值
+        //     freeEditRef.value?.setValue(
+        //         'orgCde', "0200000000000",
+        //     );
+        // }, 200);
         
         // 初始化表单
         allForm.value.map((item: any, index: number) => {

@@ -46,7 +46,7 @@ const formData = ref<any[]>([]);
 const cClntAddr = ref<any>(null);
 import { useRoute } from "vue-router";
 const route = useRoute();
-const param = route.params.param;
+const param = opertaor.getParam();
 const fileInputRef = ref(null);
 const fileInputType = ref();
 import { readFile } from "@/api/file";
@@ -63,12 +63,12 @@ onMounted(() => {
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
     //是否小微企业，默认非必填、只读
-    setFormItem("Applicant.cIsMicroEntpris", {
-      rules: null,
-      disabled: true,
-    });
+    // setFormItem("Applicant.cIsMicroEntpris", {
+    //   rules: null,
+    //   disabled: true,
+    // });
     //【国民经济行业分类】初始化必填，只有法人时才必填，现在个人也是必填了（老系统需求：040001/042002/043004/043005/043011五款产品不区分法人个人投保，国民经济行业分类都必填，其他产品只有法人才必填）
-    const cProdNo = route.params.param?.cProdNo;
+    const cProdNo = param.cProdNo;
     if (
       cProdNo === "040001" ||
       cProdNo === "042002" ||
@@ -107,8 +107,12 @@ onMounted(() => {
     setFormItem("Applicant.cFax", { rules: [getRules("faxNumber", {})] });
 
     
-    setFormItem("Applicant.cGreenIndustryCustomers",{disabled: true});
-    setFormItem("Applicant.cGreenIndustryList",{disabled: true});
+    if(param.cProdNo === '043009'){
+      setFormItem("Applicant.cAgencyReason",{hidden: true});
+      setFormItem("Applicant.cLegalRepresentative",{hidden: true});
+      setFormItem("Applicant.cEnterpriseTel",{hidden: true});
+    }
+    
     setFormItem("Applicant.cGcidCode", {rules: [getRules("leiCode", {})]});
     // 关联交易审批单编号
     setFormItem("Applicant.cRelateNo", {rules: [getRules("txnApprovalNo", {})]});

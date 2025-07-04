@@ -152,32 +152,54 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
                 func: (val: any) => {
                     //根据产品大类再次请求条款接口
-                    codeListStore
-                        .queryCodeList(
-                            {
-                                codeListName: "PROD_LIST",
-                                codeListParam: {
-                                    cParCde: val,
-                                    cOperId: user.value.opCde,
-                                    cDptCde: user.value.companyId,
-                                },
+                    // codeListStore
+                    //     .queryCodeList(
+                    //         {
+                    //             codeListName: "PROD_LIST",
+                    //             codeListParam: {
+                    //                 cParCde: val,
+                    //                 cOperId: user.value.opCde,
+                    //                 cDptCde: user.value.companyId,
+                    //             },
+                    //         },
+                    //         false,
+                    //         false
+                    //     )
+                    //     .then((res) => {
+                    //         if (res && res.code == 200) {
+                    //             const codeValData = res.data;
+                    //             if (codeValData) {
+                    //                 //清空条款显示值，重置条款下拉值
+                    //                 freeEditRef.value?.setValue("prodNo", "");
+                    //                 setFormItem("prodNo", {
+                    //                     loadData: codeValData,
+                    //                 });
+                    //             }
+                    //         }
+                    //     });
+                    // freeEditRef.value?.setValue("prodNo", []); // 清空条款
+                    if(val){
+                        console.log(11,val)
+                        freeEditRef.value?.setValue('cProdNo',[]);
+
+                        setFormItem('cProdNo',{
+                            typeCode: "TERM_LIST_IN_GUIDE_NEW",
+                            codeParam: {
+                                cParCde: val,
+                                // cOperId: user.value.opCde,
+                                // cDptCde: user.value.companyId,
                             },
-                            false,
-                            false
-                        )
-                        .then((res) => {
-                            if (res && res.code == 200) {
-                                const codeValData = res.data;
-                                if (codeValData) {
-                                    //清空条款显示值，重置条款下拉值
-                                    freeEditRef.value?.setValue("prodNo", "");
-                                    setFormItem("prodNo", {
-                                        loadData: codeValData,
-                                    });
-                                }
-                            }
+                        })
+                    }else{
+                         console.log(2,val)
+                        freeEditRef.value?.setValue('cProdNo',[]);
+                            setFormItem("cProdNo", {
+                                typeCode: "",
+                                codeParam: {},
+                                loadData: [],
                         });
-                    freeEditRef.value?.setValue("prodNo", []); // 清空条款
+                    }
+                 
                 },
             },
             {
@@ -185,12 +207,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 inputtype: "rtselect",
                 title: "条款",
                 clearable: true,
-                typeCode: "TERM_LIST_IN_GUIDE_NEW",
-                params: {
-                    cParCde: "",
-                    cOperId: user.value.opCde,
-                    cDptCde: user.value.companyId,
-                },
+                // typeCode: "TERM_LIST_IN_GUIDE_NEW",
+                // params: {
+                //     cParCde: "",
+                //     cOperId: user.value.opCde,
+                //     cDptCde: user.value.companyId,
+                // },
             },
             {
                 prop: "cInsuredNme",
@@ -656,12 +678,16 @@ const changeRsnValue = (item) => {
     let detail = [];
     // const rsnTyp = routeData["rsnTyp"];
     let rsnTyp = "";
+    let urlStr = 'EDR_RSN_LIST_KIND';
     if (props.activeName === "一般批改") {
         rsnTyp = "1";
+        urlStr = 'EDR_RSN_LIST_KIND';
     } else if (props.activeName === "注销") {
         rsnTyp = "2";
+        urlStr = 'EDR_RSN_LIST_ZX';
     } else if (props.activeName === "退保") {
         rsnTyp = "3";
+         urlStr = 'EDR_RSN_LIST_TB';
     }
     routeData["rsnTyp"] = rsnTyp
     selected.value = item;
@@ -677,7 +703,7 @@ const changeRsnValue = (item) => {
         // 当缓存中无该产品的批改原因时
         if (rsnTyp === "1") {
             // 一般批改
-            getListByCode("EDR_RSN_LIST_KIND", {
+            getListByCode(urlStr, {
                 prodNo: prodNo,
                 kindNo: prodNo.substring(0, 2),
                 rsnTyp: rsnTyp,
@@ -705,7 +731,8 @@ const changeRsnValue = (item) => {
             );
         } else {
             // 退保注销
-            getListByCode("EDR_RSN_LIST_KIND", {
+            // getListByCode("EDR_RSN_LIST_KIND", {
+            getListByCode(urlStr, {
                 kindNo: prodNo.substring(0, 2),
                 rsnTyp: rsnTyp,
             }).then(
@@ -983,6 +1010,7 @@ const transferRsnDetail = (rsnDetail) => {
 };
 
 onMounted(() => {
+   
     freeEditRef.value?.setFormValue({
         tAppTm: [
             moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
@@ -1010,6 +1038,8 @@ onMounted(() => {
             ElMessage.error(res.msg);
         }
     });
+
+     handleQuery();  //查询
 });
 
 watch(dialogVisible, (newValue) => {
