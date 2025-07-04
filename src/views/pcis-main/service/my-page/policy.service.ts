@@ -208,9 +208,23 @@ export class PolicyService {
     submitUnderwritingEdr(underWriteParam) {
         return request.post('/policy/undrEdr', underWriteParam);
     }
-
+    /**
+     * 强制临分
+     */
     queryRiFacMrk(param) {
         return request.post('/reinsured/queryRiFacMrk', param);
+    }
+    /**
+     * 查询临分状态
+     */
+    queryCRiFacMrk(param) {
+        return request.post('/reinsured/queryCRiFacMrk', param);
+    }
+    /**
+     * 查询临分状态
+     */
+    queryFacSts(param) {
+        return request.post('/reinsured/queryFacSts', param);
     }
 
     /**
