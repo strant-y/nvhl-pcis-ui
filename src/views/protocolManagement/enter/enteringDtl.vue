@@ -98,6 +98,7 @@ function save() {
     ...allFromData,
     ...{},
     ...{user},
+    sence:'save'
   }).then((res: any) => {
     if(res.code === 200) {
       ElMessage.success('保存成功')
@@ -124,6 +125,7 @@ function submit() {
     ...allFromData,
     ...{},
     ...{user},
+    sence:'save'
   }).then((res: any) => {
     if(res.code === 200) {
       ElMessage.success('提交成功')
