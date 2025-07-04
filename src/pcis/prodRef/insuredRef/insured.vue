@@ -1269,6 +1269,7 @@ defineExpose({
   getValue,
   getFormconfig,
   clearValidate,
+  setFormItem,
   change403009,
 });
 </script>

@@ -170,7 +170,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 			{
 				prop: "AccDpt",
 				inputtype: "rtselect",
-				title: "机构部门",
+				title: "机构部门", 
 				btnWidth: 10,
 				itemWidth: 2,
 				// rules: [getRules("required", {

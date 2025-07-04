@@ -70,6 +70,9 @@ const formconfig1 = ref<AppFreeEditConfig>(
           const isValid = await freeEditRef.value?.validate();
           if(isValid){
             const s = freeEditRef.value?.getFromValue();
+
+            console.log('路由data‘',route.params)
+            // return false;
             const params = Object.assign(
               {
                 cProdNo: route.params.param.cProdNo,
@@ -105,7 +108,7 @@ const formconfig1 = ref<AppFreeEditConfig>(
     ],
   })
 );
-const distContactList:Array<string> = ['Dist.PartProp','Tgt.cSuffixAddr','Dist.Prop','Dist.cSuffixAddr','Dist.JingyingProp','Dist.cDetailedAddress']
+const distContactList:Array<string> = ['Dist.PartProp','Tgt.cSuffixAddr','Dist.Prop','Dist.cSuffixAddr','Dist.JingyingProp','Dist.cDetailedAddress','Dist.BusinessAllProp']
 
 onMounted(() => {
   // console.log(333)   distAdd
@@ -204,14 +207,18 @@ onMounted(() => {
     }
 
  
-
+    console.log('21116’“，',props.data.fromSchema[i]["groupList"] )
     // 遍历groupList数组把函数赋值给fromSchema
     if (props.data.fromSchema[i]["groupList"] && props.data.fromSchema[i]["groupList"].length>0) {
       props.data.fromSchema[i]["groupList"].forEach((data:any,index:number,arr:any) =>{
         //  040001经营场所地址 040005 学校地址 040021 经营场所地址 042003 学校地址 043013 标的坐落地址 043020 房屋所在地区 045001工程项目地址
         if(distContactList.includes(data.prop)){
+          console.log(333, item)
+          console.log(333, arr)
+          console.log(333, props.data.fromSchema)
           item["groupList"][index]['func'] = function (){
-            return setcDetailedAddress(arr,JSON.parse(JSON.stringify(props.data.fromSchema[i+1])))
+            // return setcDetailedAddress(arr,JSON.parse(JSON.stringify(props.data.fromSchema[i+1])))
+            return setcDetailedAddress(arr,JSON.parse(JSON.stringify(props.data.fromSchema[i])))
           }
         }
       })

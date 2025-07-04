@@ -2077,8 +2077,8 @@ const setCiInfo = (base: any) => {
 /**
  * 投保申请核保
  */
-const submitToUndrFn = async () => {
-  if (needCalc.value) {
+const submitToUndrFn = async () => {  
+ if (needCalc.value) {
     ElMessage.error("请先进行保费计算!");
     return;
   }
@@ -2134,6 +2134,8 @@ const submitToUndrFn = async () => {
       }
       //校验联共保信息
       const plyBasedata = opertaor.getTableRefByKey("plyBase").getFromValue();
+
+      
       if(plyBasedata["Base.cCiMrk"] !== "0") {
         const ciValue = opertaor.getTableRefByKey("ci")?.getFromValue() || '';
         const isCiValid = validateCiInfo();
@@ -2185,7 +2187,30 @@ const submitToUndrFn = async () => {
               // this.$router.back();
 
             } else {
-              ElMessage.error(undr.msg);
+
+              // 关联交易业务 时 股东客户改是  审批单号必填
+              if(undr.msg ==='该笔业务为关联交易业务，请上传【关联交易审批单】，并录入【关联交易审批单编号】！'){
+                    const appTabref = opertaor.getTableRefs()["applicant"];
+                    const insTabref = opertaor.getTableRefs()["insured"];
+  
+                    appTabref.setValue("Applicant.cStkMrk", '1');
+                    appTabref.setFormItem('Applicant.cRelateNo',{
+                      rules:  [{ required: true, message: '该项为必填项', trigger: 'blur' }]
+                    })
+                                  
+                    insTabref.setValue("Insured.cStkMrk", '1');
+                    insTabref.setFormItem('Insured.cRelateNo',{
+                      rules:  [{ required: true, message: '该项为必填项', trigger: 'blur' }]
+                    })
+                                  
+                ElMessage.error(undr.msg);
+              }else{
+                 ElMessage.error(undr.msg);
+              }
+              
+
+
+
             }
           } else {
             needCalc.value = true;
