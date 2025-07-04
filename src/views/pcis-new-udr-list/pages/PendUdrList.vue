@@ -318,9 +318,10 @@
         {
             prop: "appCde",
             inputtype: "rtinput",
-            title: "投保人",
+            title: "投保人姓名",
             showKey: [1, 2, 3, 4],
             clearable: true,
+            placeholder: "请输入",
         },
         {
             prop: "tm1",
