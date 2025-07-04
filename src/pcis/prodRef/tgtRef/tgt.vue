@@ -519,7 +519,15 @@ const method = {
 
     // 获取总额方式  没有数据给进行提示
     if (cRegisteredLogo == 1) {
-      selectDist({ cComponentTable: "EmployeeDist", cAppNo: cAppNo }).then((res: any) => {
+      const param = {
+        cComponentTable: "EmployeeDist",
+      }
+      if(route.params.param?.pageName === "priceInquiry") {
+        param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+      } else {
+        param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+      }
+      selectDist(param).then((res: any) => {
         const { code, data, msg } = res;
         if (code == 200) {
           if (data['data'].length > 0) {

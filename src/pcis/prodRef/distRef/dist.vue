@@ -289,6 +289,11 @@ const method = {
       cAppNo: app,
       ...queryParams
     };
+    if(route.params.param?.pageName === "priceInquiry") {
+      selData['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else {
+      selData['cAppNo'] = app;
+    }
     selectDist(selData).then((res: any) => {
       if (res.code === 200) {
         pageresult.list = [];

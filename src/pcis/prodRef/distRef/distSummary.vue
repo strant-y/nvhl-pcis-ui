@@ -295,11 +295,16 @@ const handleQuery = () => {
   } else {
     app = route.params.param?.cAppNo
   }
-  query({
+  const queryParam = {
     cComponentTable: distCompKey.value,
-    cAppNo: app,
     ...{isSummary: '1'}
-  });
+  }
+  if(route.params.param?.pageName === "priceInquiry") {
+    queryParam['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+  } else {
+    queryParam['cAppNo'] = app;
+  }
+  query(queryParam);
 }
 
 const query = (param: any) => {
