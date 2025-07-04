@@ -18,6 +18,9 @@ import { checkCdeptByCdptCde, getNmeByCde } from "@/api/prod/index";
 import { formInit } from "@/shared/from-init";
 import { codeListViewStore,dataOpertaor, useProductStore } from "@/store";
 import { useValidator } from "@/typings/useValidator";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
+import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
+const dzmodal = useDzModal();
 const { getRules } = useValidator();
 const dialog = ref<DialogMethod | null>(null);
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
@@ -71,9 +74,7 @@ function initComp() {
       }
     }
   });
-
 }
-
 // 绑定方法
 const method = {
   // func demo
@@ -91,6 +92,24 @@ const method = {
         cCiMrk: val
       });
     }
+  },
+  getcDptCde:(val)=>{
+    dzmodal
+        .open(DepartmentTree, { type: "Issuer", data: {} })
+        .then((res) => {
+          if (res.body) {
+            const selectObj = res.body;
+            baseEditRef.value?.setValue("ECargoBase.cDptCde", `${selectObj.id}${selectObj.name}`);
+            baseEditRef.value?.addCodeListMap({
+              "ECargoBase.cDptCde": [
+                {
+                  label: selectObj.name,
+                  value: selectObj.id,
+                },
+              ],
+            })
+          }
+        });
   },
   //业务来源大类change事件
   businessKindFunc: (val) => {
@@ -214,30 +233,29 @@ const method = {
   },
   //代理(经纪)人icon事件
   agentFunc: () => {
-    console.log("代理(经纪)人icon事件");
-    if (getValue("ECargoBase.cBsnsTyp") && getValue("ECargoBase.cBsnsTyp") !== "19001") {
-      dialogRef.value?.open(
+    // if (getValue("ECargoBase.cBsnsTyp") && getValue("ECargoBase.cBsnsTyp") !== "19001") {
+      dialog.value?.open(
         "agentPre",
         {
           type: "show",
           data: {
-            CDptCde: sessionData.value?.cDptCde, //机构
-            CProdNo: sessionData.value?.cProdNo, //产品
+            // CDptCde: sessionData.value?.cDptCde, //机构
+            // CProdNo: sessionData.value?.cProdNo, //产品
             cBsnsTyp: getValue("ECargoBase.cBsnsTyp"), //业务来源大类
             cChaType: getValue("ECargoBase.cChaType"), //业务来源中类
             cChaSubtype: getValue("ECargoBase.cChaSubtype"), //业务来源子类
           },
           method: {
             getSelected: (params) => {
-              setFormItem("ECargoBase.cBrkrCde", {
-                loadData: [{ value: params.CChaCde, label:params.CChaCde + params.CChaNme }],
-              });
+              // setFormItem("ECargoBase.cBrkrCde", {
+              //   loadData: [{ value: params.CChaCde, label:params.CChaCde + params.CChaNme }],
+              // });
               setValue("ECargoBase.cBrkrCde", params.CChaCde);
               setValue("ECargoBase.cAgtAgrNo", params.CAgtAgrNo);
 
               console.log("回显----", params);
 
-              dialogRef.value?.handleClose();
+              dialog.value?.handleClose();
             },
           },
         },
@@ -248,70 +266,163 @@ const method = {
         },
         { title: "代理查询", width: 85 }
       );
-    } else {
-      ElMessage.warning("渠道分类--请选择非直销业务!");
-    }
+    // } else {
+    //   ElMessage.warning("渠道分类--请选择非直销业务!");
+    // }
   },
     //代理业务员icon事件
   agentSaleFuncA: () => {
-    console.log("代理业务员icon事件");
-    if (!getValue("ECargoBase.cBrkrCde")) {
-      ElMessage.warning("请先选择代理(经济)人！");
-      return;
-    }
-    let cslstyp = "";
-    if (getValue("ECargoBase.cChaType") === "1900201") {
-      // 个人代理时
-      cslstyp = "020003";
-    } else if (
-      getValue("ECargoBase.cBsnsTyp") !== "19001" &&
-      getValue("ECargoBase.cChaType") !== "1900201"
-    ) {
-      // 非直销且非个人代理
-      cslstyp = "020004";
-    };
+    // if (!getValue("ECargoBase.cBrkrCde")) {
+    //   ElMessage.warning("请先选择代理(经济)人！");
+    //   return;
+    // }
+    // let cslstyp = "";
+    // if (getValue("ECargoBase.cChaType") === "1900201") {
+    //   // 个人代理时
+    //   cslstyp = "020003";
+    // } else if (
+    //   getValue("ECargoBase.cBsnsTyp") !== "19001" &&
+    //   getValue("ECargoBase.cChaType") !== "1900201"
+    // ) {
+    //   // 非直销且非个人代理
+    //   cslstyp = "020004";
+    // };
     
-    dialogRef.value?.open(
+    dialog.value?.open(
       "agentWorker",
       {
         type: "show",
         data: {
-          CDptCde: sessionData.value?.cDptCde,
+          // CDptCde: sessionData.value?.cDptCde,
           cBsnsTyp: getValue("ECargoBase.cBsnsTyp"),
           cChaType: getValue("ECargoBase.cChaType"),
           cChaSubtype: getValue("ECargoBase.cChaSubtype"),
           CSlsId: getValue("ECargoBase.CSlsId"), //业务员员工号
           CBrkrCde: getValue("ECargoBase.CBrkrCde"), //代理(经纪)人
           CDptAttr: getValue("ECargoBase.CDptAttr"), //投保单业务归属部门的部门类型(angular上被hidden的,逻辑赋值angular：guide.component.ts【324行】)
-          CSlsTyp: cslstyp,
+          // CSlsTyp: cslstyp,
           leading: "CBrkSlsCde",
         },
         method: {
           getSelected: (params) => {
-            setFormValue({
-              // "ECargoBase.cBrkSlsCde": params.CSlsCde, //代理业务员
-              "ECargoBase.cCertfNo": params.CCtfctNo, //代理业务执业证号
-              "ECargoBase.cBrkrDptcde": params.CDptCde, //代理业务员机构代码
-            });
+          //   setFormValue({
+          //     // "ECargoBase.cBrkSlsCde": params.CSlsCde, //代理业务员
+          //     "ECargoBase.cCertfNo": params.CCtfctNo, //代理业务执业证号
+          //     "ECargoBase.cBrkrDptcde": params.CDptCde, //代理业务员机构代码
+          //   });
 
-                   setFormItem("ECargoBase.cBrkSlsCde", {
-                    loadData: [
-                      {
-                        value:  params["CSlsCde"],
-                        label:params["CSlsCde"] + params['CSlsNme'],
-                      },
-                    ],
-                  });
-                  setValue("ECargoBase.cBrkSlsCde", params.CSlsCde);
+          //   setFormItem("ECargoBase.cBrkSlsCde", {
+          //   loadData: [
+          //     {
+          //       value:  params["CSlsCde"],
+          //       label:params["CSlsCde"] + params['CSlsNme'],
+          //     },
+          //   ],
+          // });
+          setValue("ECargoBase.cBrkSlsCde", params.CSlsCde);
             
-            dialogRef.value?.handleClose();
+            dialog.value?.handleClose();
           },
         },
       },
       { title: "业务员", width: 85 }
     );
   },
-    //项目类别大类change事件
+  // 业务员工号ICON事件
+  saleNoFunc: () => {
+    // let cslstyp = "";
+    // if (getValue("Base.cChaType") === "1900201") {
+    //   // 个人代理时
+    //   cslstyp = "020003";
+    // } else if (
+    //   getValue("Base.cBsnsTyp") !== "19001" &&
+    //   getValue("Base.cChaType") !== "1900201"
+    // ) {
+    //   // 非直销且非个人代理
+    //   cslstyp = "020004";
+    // }
+    dialog.value?.open(
+      "agentWorker",
+      {
+        type: "show",
+        data: {
+          // CDptCde: sessionData.value?.cDptCde,
+          cBsnsTyp: getValue("ECargoBase.cBsnsTyp"),
+          cChaType: getValue("ECargoBase.cChaType"),
+          cChaSubtype: getValue("ECargoBase.cChaSubtype"),
+          CSlsId: getValue("ECargoBase.CSlsId"), //业务员员工号
+          CBrkrCde: getValue("ECargoBase.CBrkrCde"), //代理(经纪)人
+          CDptAttr: getValue("ECargoBase.CDptAttr"), //投保单业务归属部门的部门类型(angular上被hidden的,逻辑赋值angular：guide.component.ts【324行】)
+          // CSlsTyp: cslstyp,
+          leading: "CSlsId",
+        },
+        method: {
+          getSelected: (params) => {
+            console.log('111Base.cSlsId',params)
+            setFormValue({
+              "ECargoBase.cSlsId": params.CSlsCde, //业务员员工号
+              "ECargoBase.cSlsNme": params.CSlsNme, //业务员名称
+              "ECargoBase.cSlsCde": params.CCtfctNo, //业务员执业证号
+              "ECargoBase.cSlsTel": params.CMobile, //业务员电话
+              "ECargoBase.cSlsDptcde": params.CDptCde, //业务员机构代码
+              "ECargoBase.cIntroDptcde": "", //清空服务机构值
+            });
+            const ops = {
+              code: "orgDpt",
+              val: params["CDptCde"],
+            };
+            getNmeByCde(ops).then((res) => {
+              if (res && res.code == 200) {
+                const codeValData = res.data;
+                if (codeValData) {
+                  setFormItem("ECargoBase.cIntroDptcde", {
+                    loadData: [
+                      {
+                        value: params["CDptCde"],
+                        label: codeValData["data"],
+                      },
+                    ],
+                  });
+                  setValue("ECargoBase.cIntroDptcde", params.CDptCde);
+                }
+              }
+            });
+            codeListStore
+              .queryCodeList(
+                {
+                  codeListName: "CSaleCde_List",
+                  codeListParam: {
+                    CSlsCde: params["CSlsCde"],
+                  },
+                },
+                false,
+                false
+              )
+              .then((res) => {
+                if (res && res.code == 200) {
+                  const codeValData = res.data;
+                  if (codeValData) {
+                    setFormItem("ECargoBase.cIntroSalecde", {
+                      loadData: codeValData,
+                    });
+                    // 当选择了业务员时，服务机构业务员默认为业务员
+                    setValue("ECargoBase.cIntroSalecde", params.CSlsCde);
+                  }
+                }
+              });
+            dialogRef.value?.handleClose();
+          },
+        },
+      },
+      {
+        isOk: (selectdata: any) => {
+          console.log("a", selectdata);
+        },
+      },
+      { title: "业务员", width: 85 }
+    );
+  },
+  //项目类别大类change事件
   cPrjCtgTypChange: (val) => {
     const p = opertaor.getParam();
     if (!p.initFlag) {
@@ -372,6 +483,7 @@ const method = {
     }
   },
 };
+
 
 function getCheckCdeptByCdptCde() {
   // const CDptCde = getValue("Base.cDptCde");

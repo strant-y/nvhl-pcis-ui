@@ -113,7 +113,51 @@ const method = {
   },
   funcreset: () => {
   },
+  funcNdustryCate: () => {
+    // const param = opertaor.getParam();
+    dialog.value?.open(
+      "ndustryCateModal",
+      {
+        type: "show",
+        method: {
+          getdbClickData: (data) => {
+            setFormItem("ECargoApplicant.cTrdCde", {
+              loadData: [{ label: data.cnm, value: data.cde }],
+            });
+           // setValue("Applicant.cTrdCde", data.cnm);
+            setValue("ECargoApplicant.cTrdCde", data.cde);
+            dialog.value?.handleClose();
+          },
+        },
+      },
+      {},
+      { title: "国民经济行业分类", width: 85 }
+    );
+  },
+  cOccupCdeChange: () => {
+    // const param = opertaor.getParam();
+    dialog.value?.open(
+      "cOccupCdeModal",
+      {
+        type: "show",
+        method: {
+          getdbClickData: (data) => {
+            setFormItem("ECargoApplicant.cOccupCde", {
+              loadData: [{ label: `${data.cde} ${data.cnm}`, value: data.cde }],
+            });
+            setValue("ECargoApplicant.cOccupCde", data.cde);
+            dialog.value?.handleClose();
+          },
+        },
+      },
+      {
+        isOk: (selectdata: any) => {},
+      },
+      { title: "职业", width: 85 }
+    );
+  },
 };
+
 
 
 function getFormValue() {
