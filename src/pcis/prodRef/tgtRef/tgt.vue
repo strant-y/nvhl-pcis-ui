@@ -110,7 +110,8 @@ onMounted(async () => {
 const wagesInfoModel = () => {
   let cRegisteredLogo = opertaor.getDataAll()['tgt']['Tgt.cRegisteredLogo'];  // 记名投保标志 是 获取清单汇总   否可以自己修改添加
   let cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];
-  dzmodal.open(wagesInfo, { type: "edit", data: { cAppNo: cAppNo, cRegisteredLogo: cRegisteredLogo } }).then((res: any) => {
+  let cInquiryNo = opertaor.getDataAll()['plyBase']['Base.cInquiryNo'];
+  dzmodal.open(wagesInfo, { type: "edit", data: { cAppNo: cAppNo, cRegisteredLogo: cRegisteredLogo, cInquiryNo: cInquiryNo, pageName: route.params.param?.pageName } }).then((res: any) => {
     if (res.type === "ok") {
       // setFormItem('Tgt.nTotalSalary',
       setValue("Tgt.nTotalSalary", res.body)
@@ -505,7 +506,14 @@ const method = {
 
     let cRegisteredLogo = opertaor.getDataAll()['tgt']['Tgt.cRegisteredLogo'];  // 记名投保标志 是 获取清单汇总   否可以自己修改添加
     // let cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];   //投保单号
-    let cAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'] || opertaor.getDataAll()['plyBase']['Base.cAppNo'];   //投保单号
+    let cAppNo = "";
+    if(route.params.param?.pageName === "priceInquiry") {
+      cAppNo = opertaor.getDataAll()['plyBase']['Base.cInquiryNo']
+    } else if (opertaor.getDataAll()['applicant'] && opertaor.getDataAll()['applicant']['Applicant.cAppNo']) {
+      cAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo']
+    } else {
+      cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];
+    }
 
     if (cRegisteredLogo !== "1" && cRegisteredLogo !== "0") {
       ElMessage.error('请选择“记名投保标志”！')
