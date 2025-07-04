@@ -9,7 +9,10 @@ import {
   AppGridEditMethod,
   createAppGridEditConfig,
 } from "@/shared/app-grid-edit-config";
+import { getProFactoryList } from "@/api/prod";
 import {ref} from "vue";
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
 import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
 const eCargoSelectTgtFix = defineAsyncComponent(
     () => import("./fix/SelectDistFix.vue")
@@ -28,6 +31,8 @@ const formPage = idxParam?.formPage;
 const dialog = ref<DialogMethod | null>(null);
 const cvrgEditRef = ref<AppGridEditMethod | null>(null);
 const formconfig1 = reactive(createAppGridEditConfig({}));
+const cClauseType = ref('');
+const eCargoTermNo = ref('');
 
 onMounted(() => {
   const tableConfig = props.pageSchema;
@@ -41,6 +46,7 @@ onMounted(() => {
       method,
       exRules
   );
+  
   Object.assign(formconfig1, formconfig11);
 });
 
@@ -105,6 +111,62 @@ const method = {
         },
         { title: "选择货物", width: 55 }
     );
+
+  },
+  //产品名称change
+  cProductChange:(val)=>{
+    eCargoTermNo.value = val;
+    // const rowData = cvrgEditRef.value?.getSelectRow();
+    // const rowId = rowData._dataId;
+    // codeListStore
+    //     .queryCodeList({
+    //       codeListName: "TERM_LIST_02",
+    //       codeListParam: { "cProdNo": val, cRdrTyp: "1" },
+    //     })
+    //     .then((res) => {
+    //       console.log('res', res)
+    //       cvrgEditRef.value?.addCodeListMap(
+    //           { code: "ECargoTerm.cClauseName"+rowId,
+    //             list: res,
+    //           }
+    //       );
+    //     });
+  },
+  //条款类型change
+  cClauseTypeChange:(val)=>{
+    // cClauseType.value = val;
+    const rowData = cvrgEditRef.value?.getSelectRow();
+    const rowId = rowData._dataId;
+    codeListStore
+        .queryCodeList({
+          codeListName: "TERM_LIST_02",
+          codeListParam: { "cProdNo": eCargoTermNo, cRdrTyp: val },
+        })
+        .then((res) => {
+          console.log('res', res)
+          cvrgEditRef.value?.addCodeListMap(
+              { code: "ECargoTerm.cClauseName"+rowId,
+                list: res,
+              }
+          );
+        });
+  },
+  //条款名称选择change
+  cClauseChange:(val)=>{
+    const rowData = cvrgEditRef.value?.getSelectRow();
+    const rowId = rowData._dataId;
+    codeListStore
+        .queryCodeList({
+          codeListName: "RISK_LIST_02",
+          codeListParam: { "cTermNo": val, },
+        })
+        .then((res) => {
+          cvrgEditRef.value?.addCodeListMap(
+              { code: "ECargoTerm.cRiskName"+rowId,
+                list: res,
+              }
+          );
+        })
 
   }
 };

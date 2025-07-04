@@ -906,6 +906,32 @@ const tableObj = {
                     });
                 },
             }),
+            createFreeButtonBase({
+                id: "score",
+                link: true,
+                tooltip: "询价转投保",
+                type: "primary",
+                size: "large",
+                icon: "RefreshRight",
+                hideBtns: (row: any) => {
+                    // 询价转投保按钮只在状态为"已出保单"时可见
+                    if (
+                        row.cAppStatus == "5"
+                    ) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                },
+                tableClick: (row) => {
+                    router.push({
+                        path: "/pcis/my-page",
+                        query: {
+                            param: JSON.stringify({ ...row, ...{ pageType: "inquiryToApp" } }),
+                        },
+                    });
+                },
+            }),
         ],
         fromSchema: [
             {

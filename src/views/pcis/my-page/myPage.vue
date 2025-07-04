@@ -334,6 +334,7 @@ import {
   saveInquiry,
   submitInquiry,
   submitUnderwrite,
+  getInquiryPolicy,
 } from "../../../api/query/index";
 import { checkFeeWindowType, selectDist, saveDistBatch, getReleaseInquiryPage } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
@@ -666,9 +667,9 @@ const copyPolicyNumber = () => {
   try {
     const successful = document.execCommand("copy");
     if (successful) {
-      ElMessage.success("投保单号已成功复制到剪贴板！");
+      ElMessage.success(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + '已成功复制到剪贴板！');
     } else {
-      ElMessage.error("投保单号复制失败，请手动复制。");
+      ElMessage.error(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + "复制失败，请手动复制。");
     }
   } catch (err) {
     ElMessage.error("当前浏览器不支持自动复制功能，请手动复制。");
@@ -1113,7 +1114,7 @@ function renderComponents() {
 async function loadAfter() {
   if (props.param.pageType === "app") {
     //获取单号
-    getCAppNoFun();
+    // getCAppNoFun();
     // 获取条款信息
     getPlanCvrg();
     if(props.param?.pageName === "priceInquiry") {
@@ -1152,7 +1153,7 @@ async function loadAfter() {
     });
   } else if (props.param.pageType === "TEMPORARY_DEPOSIT") {
     // 暂存单
-    const cAppNo = props.param.cAppNo;
+    const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
     await loadAppPlyInfo(cAppNo);
     if (props.param.cAppTyp == "E") {
       if (props.param.cEdrType == "1") {
@@ -1177,7 +1178,7 @@ async function loadAfter() {
     }
   } else if (props.param.pageType === "PLY_APP_MODIFY_BOUNCED_SCENE") {
     // 投保单核保退回
-    const cAppNo = props.param.cAppNo;
+    const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
     await loadAppPlyInfo(cAppNo);
     bthList.value = basicBtn;
   } else if (props.param.pageType === "EDR_APP_MODIFY_BOUNCED_SCENE") {
@@ -1202,7 +1203,7 @@ async function loadAfter() {
     nextTick(() => {
       opertaor.setDisabledAll();
     });
-    const cAppNo = props.param.cAppNo;
+    const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
     await loadAppPlyInfo(cAppNo);
     if (props.param.cAppTyp == "E") {
       edritem.value?.handleQuery();
@@ -1244,7 +1245,7 @@ async function loadAfter() {
     // });
     // console.log("getAppPlyInfoRes", getAppPlyInfoRes);
     // const data = getAppPlyInfoRes.data;
-    const cAppNo = props.param.cAppNo;
+    const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
     await loadAppPlyInfo(cAppNo);
     if (props.param.cAppTyp == "E") {
       edritem.value?.handleQuery();
@@ -1278,7 +1279,7 @@ async function loadAfter() {
     nextTick(() => {
       opertaor.setDisabledAll();
     });
-    const cAppNo = props.param.cAppNo;
+    const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
     await loadAppPlyInfo(cAppNo);
     if (props.param.cAppTyp == "E") {
       edritem.value?.handleQuery();
@@ -1319,7 +1320,7 @@ async function loadAfter() {
           getDistData(props.param?.cAppNo, item)
         });
         //获取单号
-        getCAppNoFun();
+        // getCAppNoFun();
       }
     });
     bthList.value.push(
@@ -1388,7 +1389,7 @@ async function loadAfter() {
       cAppNo: props.param.cAppNo,
     }).then((res) => {
       if (res) {
-        const ops = opertaor.convertData(res);
+        const ops = clearCAppNo(opertaor.convertData(res));
         // 保险期限 投保日期更新为当前日期 保险起期和保险止期重置为第二天0点至一年后
         if(ops.insrnc) {
           const beginTm = dayjs().add(1, 'day').format("YYYY-MM-DD 00:00:00")
@@ -1506,7 +1507,7 @@ async function loadAfter() {
         },
       })
     );
-  } else if(props.param?.pageType === "template") {
+  } else if (props.param?.pageType === "template") {
     policyService.getTemplate(props.param?.cPkId).then((res:any) => {
       if (res["code"] == "200") {
         ElMessage.success('模板加载完成');
@@ -1514,7 +1515,8 @@ async function loadAfter() {
         // this.cTplNme = result['res'].cTplNme;
         // this.cTplDesc = result['res'].cDesc;
         // this.TplPkId = result['res'].cPkId;
-        const ops = JSON.parse(cTplCtnt);
+        const parseData = JSON.parse(cTplCtnt);
+        const ops = clearCAppNo(JSON.parse(cTplCtnt));
         // 保险期限 投保日期更新为当前日期 保险起期和保险止期重置为第二天0点至一年后
         if(ops.insrnc) {
           const beginTm = dayjs().add(1, 'day').format("YYYY-MM-DD 00:00:00")
@@ -1559,8 +1561,15 @@ async function loadAfter() {
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
         }
         opertaor.setDataAll(ops);
+        // 获取原投保单号下的清单列表数据
+        const distMap = formconfig1[0].pageInfo.filter((item:any) => {
+          return item.pageKey === "dist" || item.pageKey === "distSummary";
+        });
+        distMap.forEach((item:any) => {
+          getDistData(parseData.plyBase['Base.cAppNo'], item)
+        });
         //获取单号
-        getCAppNoFun();
+        // getCAppNoFun();
       }
     }).catch((err:any) => {
       ElMessage.error(err);
@@ -1626,6 +1635,66 @@ async function loadAfter() {
         },
       })
     );
+  } else if (props.param?.pageType === "inquiryToApp") {
+    getInquiryPolicy({ cInquiryNo: props.param?.cInquiryNo }).then((res:any) => {
+      if (res["code"] == "200") {
+        const ops = opertaor.convertData(res);
+        // 保险期限 投保日期更新为当前日期 保险起期和保险止期重置为第二天0点至一年后
+        if(ops.insrnc) {
+          const beginTm = dayjs().add(1, 'day').format("YYYY-MM-DD 00:00:00")
+          const endTm = dayjs().add(1, 'year').format("YYYY-MM-DD 23:59:59")
+          ops.insrnc["Base.tInsrncBgnTm"] = beginTm;
+          ops.insrnc["Base.tInsrncEndTm"] = endTm;
+          ops.insrnc['Base.tAppTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")
+        }
+        // 条款信息中的cPkId删除
+        if(ops.cvrg && ops.cvrg.length > 0) {
+          ops.cvrg.forEach((item:any) => {
+            delete item['Term.cPkId']
+            item['Term.riskList'].forEach((i:any) => {
+              delete i['Term.cPkId']
+            })
+          })
+        }
+        // 承包基本信息中的保额和保费也初始化为0
+        if(ops.base) {
+          ops.base['Base.nPrm'] = 0
+          ops.base['Base.nAmt'] = 0
+        }
+        // 缴费计划列表清空
+        if(ops.payinfo && ops.payinfo.length > 0) {
+          ops.payinfo = []
+        }
+        // 特约信息
+        if(ops.SpecialAgreement && ops.SpecialAgreement.length > 0) {
+          ops.SpecialAgreement.forEach((item:any) => {
+            delete item['SpecialAgreement.cPkId']
+          })
+        }
+        // 免赔条件
+        if(ops.deductibleDist && ops.deductibleDist.length > 0) {
+          ops.deductibleDist.forEach((item:any) => {
+            delete item['DeductibleDist.cPkId']
+          })
+        }
+        // 保单基本信息 录单日期和签单日期默认为当前年月日
+        if(ops.plyBase) {
+          ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+          ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+        }
+        ops['plyBase']['Base.cPlyNo'] = ''
+        ops['plyBase']['Base.cAppStatus'] = ''
+        opertaor.setDataAll(ops);
+        // 获取原投保单号下的清单列表数据
+        const distMap = formconfig1[0].pageInfo.filter((item:any) => {
+          return item.pageKey === "dist" || item.pageKey === "distSummary";
+        });
+        distMap.forEach((item:any) => {
+          getDistData(props.param?.cInquiryNo, item)
+        });
+      }
+    })
+    bthList.value = basicBtn;
   }
   bthList.value.push(
     createFreeButtonBase({
@@ -1688,10 +1757,15 @@ function addOneYear(a:any) {
 const getDistData = (appNo:any, item: any) => {
   const selData = {
     cComponentTable: item.pageCode.slice(0, -6),
-    cAppNo: appNo,
+    // cAppNo: appNo,
   };
   if(item.pageKey === "distSummary") {
     selData.isSummary = '1';
+  }
+  if(props.param?.pageType === "inquiryToApp" || props.param?.pageName === "priceInquiry") {
+    selData.cInquiryNo = appNo;
+  } else {
+    selData.cAppNo = appNo;
   }
   selectDist(selData).then((res: any) => {
     if (res.code === 200) {
@@ -1762,8 +1836,8 @@ const loadAppPlyInfo = async (CAppNo) => {
   };
   if ("EDR_APP_NEW_SCENE" === props.param.pageType) {
     param["CPlyNo"] = CAppNo;
-  } else {
-    param["CAppNo"] = CAppNo;
+  } else if (props.param.pageName === "priceInquiry") {
+    param["cInquiryNo"] = CAppNo;
   }
   if(props.param?.cPkId) {// 查询模板明细
     const res = await policyService.getTemplate(props.param?.cPkId);
@@ -1809,6 +1883,24 @@ const loadAppPlyInfo = async (CAppNo) => {
         nAmt.value = ops["base"]["Base.nAmt"];
       }
       pageData.value = ops;
+    }
+  } else if(props.param?.cInquiryNo || props.param?.pageName === "priceInquiry") {
+    // 询价单
+    const res = await getInquiryPolicy(param);
+
+    if (res["code"] == "200") {
+      const ops = opertaor.convertData(res);
+      console.log("转换的数据", ops);
+      // 展示保费和保额金额
+      if (ops["base"]["Base.nPrm"] && ops["base"]["Base.nPrm"] > 0) {
+        nPrm.value = ops["base"]["Base.nPrm"];
+      }
+      if (ops["base"]["Base.nAmt"] && ops["base"]["Base.nAmt"] > 0) {
+        nAmt.value = ops["base"]["Base.nAmt"];
+      }
+      pageData.value = ops;
+      ElMessage.success(res.msg);
+      opertaor.setDataAll(ops);
     }
   } else {
     const res = await getAppPolicy(param);
@@ -2104,6 +2196,15 @@ const submitToUndrFn = async () => {
       console.log(opertaor.getTableRefByKey("plyBase").getFromValue());
       const base = opertaor.getTableRefByKey("plyBase").getFromValue();
       res["user"] = user;
+  
+      // 询价单申请核保参数
+      if(props.param?.pageName === "priceInquiry") {
+        res["taskId"] = 0;
+        res["openPolicy"] = null;
+        res["cInquiryNo"] = base["Base.cInquiryNo"];
+      } else {
+        res["appNo"] = base["Base.cAppNo"];
+      }
 
       // 询价单申请核保参数
       if(props.param?.pageName === "priceInquiry") {
@@ -2349,7 +2450,7 @@ const savePlyInfo = async () => {
 
 
     saveFlag = true;
-    if(props.param?.pageType === "copy" && saveDistBatchFlag.value) {
+    if((props.param?.pageType === "copy" || props.param?.pageType === "template") && saveDistBatchFlag.value) {
       // 保存清单
       const appNo = plyBase["Base.cAppNo"];
       saveDist(appNo);
@@ -2795,7 +2896,7 @@ const submitEdrToUndrFun = async () => {
 /**
  * 核保信息 提交
  */
-const submitUnderwritingFn = () => {
+const submitUnderwritingFn = async () => {
   // const btn = getBtn("btnUdr");
   // btn.loading = true;
   const res = underwrite.value.getFromValue();
@@ -2816,36 +2917,61 @@ const submitUnderwritingFn = () => {
     res["inquiryNo"] = props.param.cAppNo;
   }
   console.log(res);
-  // if(res.cUndrMrk === "A") {//核保选项为同意时，调用强制临分接口
-  //   const deductibleDist = opertaor.getTableRefByKey("deductibleDist")?.getTableData();
-  //   const insured = opertaor.getTableRefByKey("insured")?.getFromValue();
-  //   const applicant = opertaor.getTableRefByKey("applicant")?.getFromValue();
-  //   const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
-  //   const insrnc = opertaor.getTableRefByKey("insrnc")?.getFromValue();
-  //   const edrbase = opertaor.getTableRefByKey("edrbase")?.getFromValue();
-  //   const param = {
-  //     cAppNo: props.param?.cAppNo,// 保批单申请单号
-  //     cDductDesc: deductibleDist[0]?["DeductibleDist.cDeductibleContent"]:"",// 免赔约定
-  //     cDocTyp: props.param?.cAppTyp,// 单证类型 A 保单 E 批单
-  //     cDptCde: props.param?.cDptCde,// 机构代码
-  //     cInsrntNme: insured['Insured.cInsuredNme'],//被保人名称
-  //     cPlyNo: props.param?.plyNo,// 保单号
-  //     cProdNme: props.param?.cTermNme,// 产品名称
-  //     cProdNo: props.param?.cProdNo,//产品代码
-  //     cStockMrk: props.param?.cGrpMrk == "0" ? insured['Insured.cStkMrk'] : applicant['Applicant.cStkMrk'],// 股东业务标志(团单1取投保人标识，个单0取被保人标识)
-  //     // nAmtChgRate: "1.00",// 保额币种汇率
-  //     nEdrPrjNo: plyBase['Base.nEdrPrjNo'],// 批改序号
-  //     // nPrmChgRate: "1.00",// 保费币种汇率
-  //     tAppTm: insrnc['Base.tAppTm'],// 投保日期
-  //     tEdrBgnTm: edrbase?['EdrBase.tEdrBgnTm']:'',// 批改生效起期
-  //     // tEdrEndTm: "2025-05-07 13:57:37",// 批改生效止期
-  //     tInsrncBgnTm: insrnc['Base.tInsrncBgnTm'],// 保险起期
-  //     tInsrncEndTm: insrnc['Base.tInsrncEndTm'],// 保险止期
-  //   }
-  //   const queryRiFacMrk = policyService.queryRiFacMrk(param)
-  //   if(queryRiFacMrk && queryRiFacMrk.responseCode === '0') {
-  //     ElMessage.error(queryRiFacMrk.message);
-  //     return
+  // if(res.cUndrMrk === "A" && props.param?.pageName !== "priceInquiry") {//核保选项为同意时，调用强制临分接口
+  //   // 先查询临分状态
+  //   const queryCRiFacMrk = await policyService.queryCRiFacMrk({cAppNo: props.param?.cAppNo});
+  //   if(queryCRiFacMrk && queryCRiFacMrk.code === '200') {
+  //     const cRiFacMrk = queryCRiFacMrk.data.cRiFacMrk;
+  //     if(cRiFacMrk === '0') {
+  //       // 不需要临分
+  //     } else if(cRiFacMrk === '1') {
+  //       // 自主临分
+  //       const deductibleDist = opertaor.getTableRefByKey("deductibleDist")?.getTableData();
+  //       const insured = opertaor.getTableRefByKey("insured")?.getFromValue();
+  //       const applicant = opertaor.getTableRefByKey("applicant")?.getFromValue();
+  //       const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
+  //       const insrnc = opertaor.getTableRefByKey("insrnc")?.getFromValue();
+  //       const edrbase = opertaor.getTableRefByKey("edrbase")?.getFromValue();
+  //       const param = {
+  //         cAppNo: props.param?.cAppNo,// 保批单申请单号
+  //         cDductDesc: deductibleDist[0]?["DeductibleDist.cDeductibleContent"]:"",// 免赔约定
+  //         cDocTyp: props.param?.cAppTyp,// 单证类型 A 保单 E 批单
+  //         cDptCde: props.param?.cDptCde,// 机构代码
+  //         cInsrntNme: insured['Insured.cInsuredNme'],//被保人名称
+  //         cPlyNo: props.param?.plyNo,// 保单号
+  //         cProdNme: props.param?.cTermNme,// 产品名称
+  //         cProdNo: props.param?.cProdNo,//产品代码
+  //         cStockMrk: props.param?.cGrpMrk == "0" ? insured['Insured.cStkMrk'] : applicant['Applicant.cStkMrk'],// 股东业务标志(团单1取投保人标识，个单0取被保人标识)
+  //         // nAmtChgRate: "1.00",// 保额币种汇率
+  //         nEdrPrjNo: plyBase['Base.nEdrPrjNo'],// 批改序号
+  //         // nPrmChgRate: "1.00",// 保费币种汇率
+  //         tAppTm: insrnc['Base.tAppTm'],// 投保日期
+  //         tEdrBgnTm: edrbase?['EdrBase.tEdrBgnTm']:'',// 批改生效起期
+  //         // tEdrEndTm: "2025-05-07 13:57:37",// 批改生效止期
+  //         tInsrncBgnTm: insrnc['Base.tInsrncBgnTm'],// 保险起期
+  //         tInsrncEndTm: insrnc['Base.tInsrncEndTm'],// 保险止期
+  //       }
+  //       // const queryRiFacMrk = await policyService.queryRiFacMrk(param)
+  //       // if(queryRiFacMrk && queryRiFacMrk.responseCode === '0') {
+  //       //   ElMessage.error(queryRiFacMrk.message);
+  //       //   return
+  //       // }
+  //     } else if(cRiFacMrk === '2') {
+  //       // 强制临分 调用接口查询强制临分状态(0未报价 1未确认 2已确认 3账单已生成 4部分账单已传财务 5账单全部已传财务 6没有临分数据)
+  //       // 0和1阻断，其他继续核保
+  //       const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
+  //       const param = {
+  //         cAppNo: props.param?.cAppNo,
+  //         cAppTyp: props.param?.cAppTyp,
+  //         cPlyNo: props.param?.plyNo,
+  //         nEdrPrjNo: plyBase['Base.nEdrPrjNo']
+  //       }
+  //       const queryFacSts = await policyService.queryFacSts({cAppNo: props.param?.cAppNo});
+
+  //     }
+  //   } else {
+  //     ElMessage.error(queryCRiFacMrk.message);
+  //     return;
   //   }
   // }
   let submitUnder;
@@ -2856,7 +2982,7 @@ const submitUnderwritingFn = () => {
     submitUnder = submitUnderwriting(res);
   } else if (props.param?.cAppTyp === "E") submitUnder = submitUnderwritingEdr(res);
 
-  submitUnder?.then((res) => {
+  submitUnder?.then((res:any) => {
     console.log("submitUnderwriting-res", res);
     // btn.loading = false;
     if (res["code"] == "200") {
@@ -3242,6 +3368,36 @@ function replacecInquiryNo(res:any) {
     data = res
   }
   return data;
+}
+
+// 复制出单和模板出单清空原有的投保单号
+function clearCAppNo(res:any) {
+  if(res instanceof Array) {
+    res.forEach((item:any) => {
+      item = clearCAppNo(item)
+    })
+  } else if(res instanceof Object) {
+    for (const key in res) {
+      if(res[key] instanceof Object || res[key] instanceof Array) {
+        res[key] = clearCAppNo(res[key])
+      } else if (res.hasOwnProperty(key)) {
+        if(key.indexOf('.') !== -1) {
+          const k0 = key.split('.')[0];
+          const k1 = key.split('.')[1];
+          if(k1.indexOf('cAppNo') !== -1) {
+            res[`${k0}.cAppNo`] = null
+          }
+        } else {
+          if(key === "cAppNo") {
+            res[key] = null
+          }
+        }
+      }
+    }
+  } else {
+    res = null
+  }
+  return res;
 }
 </script>
 
