@@ -538,7 +538,15 @@ function deletePlan(plan: string) {
     cancelButtonText: "取消",
     type: "warning",
   }).then(() => {
-    delete planData.value[plan];
+    if (parparam.cEdrType) {
+      Object.keys(planData.value[plan]).forEach((item) => {
+        for (let i = 0; i < planData.value[plan][item].length; i++) {
+          tremTemplateRefs.value[plan+item+i].setCancel();
+        }
+      });
+    }else{
+      delete planData.value[plan];
+    }
     ElMessage({
       type: "success",
       message: "删除成功",
