@@ -1222,7 +1222,8 @@ defineExpose({
   setValue,
   getValue,
   getFormconfig,
-  clearValidate
+  clearValidate,
+  setFormItem
 });
 </script>
 

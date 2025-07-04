@@ -53,12 +53,10 @@ const rowData = ref(props.data);
  *
  *
  */
-console.log("rowData", rowData);
 onMounted(() => {
-  console.log("cNmeCnArray", cNmeCnArray.value);
-  console.log(rowData.value.editList)
   if(rowData.value.editList){
-      inputValues.value  = setEditList(inputValues.value,rowData.value.editList)
+      inputValues.value  = setEditList( cNmeCnArray.value,rowData.value.editList)
+      // inputValues.value  = setEditList(inputValues.value,rowData.value.editList)
   }
 
 });
@@ -66,16 +64,12 @@ onMounted(() => {
 // 使用正则表达式分割字符串，保留分隔符 ** 作为单独的数组项
   const cNmeCnArray = computed(() => rowData.value.cDeductibleContent.split(/(\*+)/));
   const inputValues = ref(
-      cNmeCnArray.value.map((item) => (item ==="*" ? "*" : item))
+      cNmeCnArray.value.map((item) => (/^\*+$/.test(item)? "" : item))
   );
-
 
 const updateCNmeCn = (index: number, value: string) => {
   inputValues.value[index] = value;
 };
-
-
-
 
 const handleCancel = () => {
   dialogVisible.value = false;
@@ -83,8 +77,9 @@ const handleCancel = () => {
 };
 const handleSave = () => {
   dialogVisible.value = false;
+
   rowData.value.editList = newListValue(cNmeCnArray.value,inputValues.value)
-  rowData.value.cDeductibleContent =inputValues.value.join("");
+  rowData.value.cDeductibleContent = joinWithAsterisks(inputValues.value)  
   // if(rowData.value['cIfMust'] !== "9") {
   //   const parts = cNmeCnArray.value.map((item, idx) =>
   //       item === "**" ? inputValues.value[idx] : item
@@ -94,6 +89,14 @@ const handleSave = () => {
   props.callback({type: 'ok', data: rowData.value});
   console.log('处理了====',rowData.value)
 };
+
+// 数组拼接
+function joinWithAsterisks(arr, replacement = '**') {
+  return arr.map(item => 
+    item === '' ? replacement : item
+  ).join('');
+}
+
 
 
 // 星号回显赋值
