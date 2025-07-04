@@ -1,14 +1,19 @@
 <!-- 风险单位划分 -->
 <template>
-  <el-card class="app-container">
+  <el-dialog
+    v-model="dialogVisible"
+    width="80%"
+    title="风险单位划分、风险累积及分保安排"
+    :before-close="handleBeforeClose"
+  >
+    <!-- <el-card class="app-container"> -->
     <app-free-edit :freeEditConfig="formconfig" ref="freeEditRef" />
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef1" />
-    
     <app-table
       :tableConfig="tableconfig1"
       v-model:pageresult="pageresult1"
       ref="tableRef1"
-      @row-click="handleRowClick1"
+      @selection-change="handleSelectionChange"
       @page-change="handleQuery1(false)"
     />
 
@@ -20,21 +25,26 @@
       @page-change="handleQuery2(false)"
     />
 
-    <div class="footer-button-container">
-      <span class="">
-        <el-button class="custom-button">返回</el-button>
-        <el-button type="primary" class="custom-button">保存</el-button>
+    <div class="footer-button-container" style="text-align: center">
+      <span>
+        <el-button
+          class="custom-button"
+          type="primary"
+          @click="handleBeforeClose"
+          >关闭</el-button
+        >
       </span>
     </div>
-  </el-card>
+    <!-- </el-card> -->
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
 import { useUserStore } from "@/store";
 import { useValidator } from "@/typings/useValidator";
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter, useRoute } from "vue-router";
 const userStore = useUserStore();
-const user = ref(userStore.user) || ref({ companyId: '',opCde: '' });
+const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
 const { getRules } = useValidator();
 
 import { ref } from "vue";
@@ -55,14 +65,29 @@ import {
 } from "@/shared/app-table-config";
 import { getBasicKindList } from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
-import moment from 'moment';
-import {BASE, BASEBEFORE} from '@/constants/tab-constants';
+import moment from "moment";
+import { BASE, BASEBEFORE } from "@/constants/tab-constants";
 import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
-import { getListByCode } from '@/api/code-list-service';
-const { tryCountInFoRI, saveData, riskUnitQuery } = NewUdrListService();
+import { getListByCode } from "@/api/code-list-service";
+const {
+  tryCountInFoRI,
+  saveData,
+  riskUnitQuery,
+  getReinsuredData,
+  saveRiskData,
+  riskQueryData,
+  queryComponentCodeList,
+} = NewUdrListService();
+import { descryptParameter } from "@/utils/encipher.ts";
+import { dataOpertaor } from "@/store/modules/data-opertaor";
+const opertaor = dataOpertaor();
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
 const dzmodal = useDzModal();
 const route = useRoute();
-const params = route.query.data ? JSON.parse(route.query.data) : {}
+const params = route.query.param
+  ? JSON.parse(descryptParameter(route.query.param))
+  : {};
 const tableRef1 = ref<AppTableMethod | null>(null);
 const tableRef2 = ref<AppTableMethod | null>(null);
 const ViewContInfoComponent = defineAsyncComponent(
@@ -73,252 +98,362 @@ const retLmtSet = ref<any>([]); // 自留额集合
 const index1 = ref(-1); // 第一个列表选中index
 const index2 = ref(-1); // 第一个列表选中index
 const selectRow1 = ref<any>({}); // 第一个列表选中行
-const selectRow2  = ref<any>({}); // 第一个列表选中行
+const selectRow2 = ref<any>({}); // 第一个列表选中行
 const CRiskLvlCde_Options = ref([]); // 风险等级列表
+const dialogVisible = ref(true);
+const cAmtCurOptions = ref([]);
+const cPrmCurOptions = ref([]);
+const saveFlag = ref(false); // 是否保存了风险单位
+const _dataSet = ref<any>([]);
+const cInwdMrk = ref(""); // 临分标识
+const addressOptions = ref([]); // 标的地址下拉选项
+let nAmtVarInit = ref(null); // 我司保额变化初始值
+let nPrmVarInit = ref(null); // 我司保费变化初始值
+
+const props = defineProps({
+  param: {
+    type: [Object],
+  },
+});
 
 const formconfig = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "基本信息",
     fromUi: {
-      cols: 2
+      cols: 2,
     },
     fromSchema: [
       {
-        prop: "a",
+        prop: "cCiMrk",
         inputtype: "rtselect",
         title: "共保标志",
         clearable: true,
+        typeCode: "Joint_Insurance_Business",
+        disabled: true,
       },
       {
-        prop: "b",
+        prop: "nCiShare",
         inputtype: "rtnumber",
         title: "我司占比",
+        precision: 2,
         clearable: true,
+        suffix: "%",
+        disabled: true,
       },
       {
-        prop: "c",
+        prop: "nAmt",
         inputtype: "rtnumber",
         title: "我司总保额",
         itemWidth: 0.5,
+        precision: 2,
         clearable: true,
+        disabled: true,
       },
       {
-        prop: "NContChgRate",
+        prop: "cAmtCur",
         inputtype: "rtselect",
         title: "",
         itemWidth: 0.5,
         clearable: true,
+        disabled: true,
+        typeCode: "FIN_CUR_CACHE",
       },
       {
-        prop: "d",
+        prop: "nPrm",
         inputtype: "rtnumber",
         title: "我司总保费",
         itemWidth: 0.5,
+        precision: 2,
         clearable: true,
+        disabled: true,
       },
       {
-        prop: "NContChgRate",
+        prop: "cPrmCur",
         inputtype: "rtselect",
         title: "",
         itemWidth: 0.5,
         clearable: true,
+        disabled: true,
+        typeCode: "FIN_CUR_CACHE",
       },
       {
-        prop: "e",
+        prop: "nAmtVar",
         inputtype: "rtnumber",
         title: "我司总保额变化量",
         itemWidth: 0.5,
+        precision: 2,
         clearable: true,
+        disabled: true,
+        defaultValue: "0",
       },
       {
-        prop: "NContChgRate",
+        prop: "cAmtCur",
         inputtype: "rtselect",
         title: "",
         itemWidth: 0.5,
         clearable: true,
+        disabled: true,
+        typeCode: "FIN_CUR_CACHE",
       },
       {
-        prop: "f",
+        prop: "nPrmVar",
         inputtype: "rtnumber",
         title: "我司总保费变化量",
         itemWidth: 0.5,
+        precision: 2,
         clearable: true,
+        disabled: true,
+        defaultValue: "0",
       },
       {
-        prop: "NContChgRate",
+        prop: "cPrmCur",
         inputtype: "rtselect",
         title: "",
         itemWidth: 0.5,
         clearable: true,
+        disabled: true,
+        typeCode: "FIN_CUR_CACHE",
       },
-    ]
+      {
+        prop: "nAddedTax",
+        inputtype: "rtnumber",
+        title: "增值税额",
+        precision: 2,
+        disabled: true,
+        hidden: true,
+      },
+      {
+        prop: "nAddedTaxVar",
+        inputtype: "rtnumber",
+        title: "增值税额变化值",
+        precision: 2,
+        disabled: true,
+        hidden: true,
+      },
+      {
+        prop: "nNotaxPrm",
+        inputtype: "rtnumber",
+        title: "不含税保费",
+        precision: 2,
+        hidden: true,
+      },
+      {
+        prop: "nNotaxPrmVar",
+        inputtype: "rtnumber",
+        title: "不含税保费变化值",
+        precision: 2,
+        hidden: true,
+      },
+      {
+        prop: "nCiAmt",
+        inputtype: "rtnumber",
+        title: "共保保额",
+        precision: 2,
+        hidden: true,
+      },
+      {
+        prop: "nCiPrm",
+        inputtype: "rtnumber",
+        title: "共保保费",
+        precision: 2,
+        hidden: true,
+      },
+    ],
   })
-)
+);
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "风险累积信息",
     fromUi: {
-      cols: 2
+      cols: 2,
     },
-    // endBtnsPosition: "right",
-    // endBtns: [
-    //   createFreeButtonBase({
-    //     type: "primary",
-    //     label: "查询",
-    //     func: async () => {
-    //       handleQuery1();
-    //     },
-    //   }),
-    //   createFreeButtonBase({
-    //     label: "重置",
-    //     func: () => {
-    //       freeEditRef1.value?.setFormValue({
-    //         cKindNo: "",
-    //         cStatus: "",
-    //       });
-    //       handleQuery1();
-    //       // freeEditRef.value?.resetForm();
-    //     },
-    //   }),
-    // ],
     fromSchema: [
       {
-        prop: "CRiskUnitNme",
+        prop: "cRiskUnitNme",
         inputtype: "rtinput",
         title: "风险单位名称",
         rules: [getRules("required", {})],
         clearable: true,
-        readOnly: true,
-        disabled: true,
-        func: (val) => {
-          if (val) {
-            // const nSeqNo = freeEditRef1.value?.getFromValue("NSeqNo");
-            // if (nSeqNo) editListData1(index1.value, 'CRiskUnitNme', val);
+        func: (val:any) => {
+          pageresult1.list.forEach(item => {
+            if(item.cPkId === selectRow1.value.cPkId) {
+              item.cRiskUnitNme = val;
+            }
+          })
+          if(selectRow1.value.cPkId) {
+            selectRow1.value.cRiskUnitNme = val
           }
         }
       },
       {
-        prop: "CRiskLvlCde",
+        prop: "cRiskLvlCde",
         inputtype: "rtselect",
         title: "风险等级",
         rules: [getRules("required", {})],
         clearable: true,
-        readOnly: true,
-        disabled: true,
-        func: (val) => {
-          if (val) {
-            // const nSeqNo = freeEditRef1.value?.getFromValue("NSeqNo");
-            // if (nSeqNo) {
-            //   editListData1(index1.value, 'CRiskLvlCde', val);
-            //   for (const retlmt of retLmtSet.value) {
-            //     if (retlmt.value === val) {
-            //       freeEditRef1.value?.setFormValue({
-            //         NRetAmt: retlmt.label,
-            //       })
-            //       pageresult1.list[index1.value].NRetAmt = retlmt.label;
-            //     }
-            //   }
-            // }
+        loadData: CRiskLvlCde_Options,
+        func: (val: any) => {
+          const selectedItem = CRiskLvlCde_Options.value.find(
+            (item: any) => item.value === val
+          );
+          const nRetLmt = selectedItem?.nRetLmt;
+          freeEditRef1.value?.setValue("nRetAmt", nRetLmt);
+          pageresult1.list.forEach(item => {
+            if(item.cPkId === selectRow1.value.cPkId) {
+              item.nRetAmt = nRetLmt;
+              item.cRiskLvlCde = val
+              item.cRiskLvlNme = val ? val + selectedItem?.label : ""
+            }
+          })
+          if(selectRow1.value.cPkId) {
+            selectRow1.value.nRetAmt = nRetLmt
+            selectRow1.value.cRiskLvlCde = val
+            selectRow1.value.cRiskLvlNme = val ? val + selectedItem?.label : ""
           }
-        }
+        },
       },
       {
-        prop: "NRetAmt",
+        prop: "nAmtVar",
         inputtype: "rtnumber",
         title: "我司保额变化",
         itemWidth: 0.5,
+        precision: 2,
         clearable: true,
+        disabled: true,
+        func: (val: any) => {
+          if(nAmtVarInit.value) {
+            changeNamt(val);
+            nAmtVarInit.value = val
+          } else if (val) {
+            nAmtVarInit.value = val
+          }
+        },
       },
       {
-        prop: "NContChgRate",
+        prop: "cAmtCur",
         inputtype: "rtselect",
         title: "",
         itemWidth: 0.5,
         clearable: true,
+        disabled: true,
+        typeCode: "FIN_CUR_CACHE",
       },
       {
-        prop: "NRetAmt",
-        inputtype: "rtinput",
+        prop: "nPrmVar",
+        inputtype: "rtnumber",
         title: "我司保费变化",
         itemWidth: 0.5,
+        precision: 2,
         clearable: true,
+        disabled: true,
+        func: (val: any) => {
+          if(nPrmVarInit.value) {
+            changePrm(val);
+            nPrmVarInit.value = val
+          } else if (val) {
+            nPrmVarInit.value = val
+          }
+        },
       },
       {
-        prop: "NContChgRate",
+        prop: "cPrmCur",
         inputtype: "rtselect",
         title: "",
         itemWidth: 0.5,
         clearable: true,
+        disabled: true,
+        typeCode: "FIN_CUR_CACHE",
       },
       {
-        prop: "NRetPrpt",
+        prop: "nAmt",
         inputtype: "rtnumber",
         title: "我司保额",
+        precision: 2,
         rules: [getRules("required", {})],
         clearable: true,
+        disabled: true,
       },
       {
-        prop: "NFacEnterRetLmt",
+        prop: "nPrm",
         inputtype: "rtnumber",
         title: "我司保费",
-        clearable: true,
-      },
-      {
-        prop: "NFacEnterRetLmt",
-        inputtype: "rtnumber",
-        title: "自留额",
+        precision: 2,
         rules: [getRules("required", {})],
         clearable: true,
+        disabled: true,
       },
       {
-        prop: "NFacEnterRetLmt",
+        prop: "nRetAmt",
+        inputtype: "rtnumber",
+        title: "自留额",
+        precision: 2,
+        rules: [getRules("required", {})],
+        clearable: true,
+        disabled: true,
+      },
+      {
+        prop: "nMaxRetAmt",
         inputtype: "rtnumber",
         title: "法定自留额",
+        precision: 2,
         clearable: true,
+        disabled: true,
       },
       {
-        prop: "NFacEnterRetLmt",
-        inputtype: "rtinput",
+        prop: "nCiAmt",
+        inputtype: "rtnumber",
         title: "共保保额",
         itemWidth: 0.5,
+        precision: 2,
         clearable: true,
+        disabled: true,
       },
       {
-        prop: "NContChgRate",
+        prop: "cCiAmtCur",
         inputtype: "rtselect",
         title: "",
         itemWidth: 0.5,
         clearable: true,
+        disabled: true,
+        typeCode: "FIN_CUR_CACHE",
       },
       {
-        prop: "NFacEnterRetLmt",
-        inputtype: "rtinput",
+        prop: "nCiPrm",
+        inputtype: "rtnumber",
         title: "共保保费",
         itemWidth: 0.5,
+        precision: 2,
         clearable: true,
+        disabled: true,
       },
       {
-        prop: "NContChgRate",
+        prop: "nCiPrmCur",
         inputtype: "rtselect",
         title: "",
         itemWidth: 0.5,
         clearable: true,
+        disabled: true,
+        typeCode: "FIN_CUR_CACHE",
       },
       {
-        prop: "NContaintaxPrmVar",
+        prop: "nCiAmtVar",
         inputtype: "rtnumber",
         title: "共保总保额变化量",
+        precision: 2,
         clearable: true,
+        disabled: true,
       },
       {
-        prop: "NContaintaxPrmVar",
+        prop: "nCiPrmVar",
         inputtype: "rtnumber",
         title: "共保总保费变化量",
+        precision: 2,
         clearable: true,
+        disabled: true,
       },
       {
-        prop: "CRemark",
+        prop: "cRemark",
         inputtype: "rtinput",
         title: "备注",
         type: "textarea",
@@ -326,22 +461,125 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         itemWidth: 2,
         clearable: true,
       },
+      {
+        prop: "nRmbChgRate",
+        inputtype: "rtinput",
+        title: "折人民币汇率",
+        hidden: true,
+      },
+      {
+        prop: "nRmbAmtVar",
+        inputtype: "rtinput",
+        title: "折人民币变化量",
+        hidden: true,
+      },
+      {
+        prop: "nRetPrpt",
+        inputtype: "rtinput",
+        title: "自留额比例",
+        hidden: true,
+      },
+      {
+        prop: "nRicurChgRate",
+        inputtype: "rtinput",
+        title: "折再保币种汇率",
+        hidden: true,
+      },
+      {
+        prop: "nNotaxPrm",
+        inputtype: "rtnumber",
+        title: "不含税保费",
+        precision: 2,
+        hidden: true,
+      },
+      {
+        prop: "nNotaxPrmVar",
+        inputtype: "rtnumber",
+        title: "不含税保费变化值",
+        precision: 2,
+        hidden: true,
+      },
+      {
+        prop: "nAddedTax",
+        inputtype: "rtnumber",
+        title: "增值税额",
+        precision: 2,
+        hidden: true,
+      },
+      {
+        prop: "nAddedTaxVar",
+        inputtype: "rtnumber",
+        title: "增值税额变化值",
+        precision: 2,
+        hidden: true,
+      },
+      {
+        prop: "nCiNotaxPrm",
+        inputtype: "rtnumber",
+        title: "共保不含税保费",
+        precision: 2,
+        hidden: true,
+      },
+      {
+        prop: "nCiNotaxPrmVar",
+        inputtype: "rtnumber",
+        title: "共保不含税保费变化值",
+        precision: 2,
+        hidden: true,
+      },
+      {
+        prop: "nCiAddedTax",
+        inputtype: "rtnumber",
+        title: "共保增值税额",
+        precision: 2,
+        hidden: true,
+      },
+      {
+        prop: "nCiAddedTaxVar",
+        inputtype: "rtnumber",
+        title: "共保增值税额变化值",
+        precision: 2,
+        hidden: true,
+      },
     ],
   })
 );
 
-
 // 风险单位信息 列表同步修改
-function editListData1(index: number,key: any,value: any) {
+function editListData1(index: number, key: any, value: any) {
   pageresult1.list[index][key] = value;
 }
 
 // 风险单位信息 修改表单项
-function setFromSchemaItem(key: any,rules: any, disabled: any) {
+function setFromSchemaItem(key: any, rules: any, disabled: any) {
   const items = freeEditRef1.value?.getFromSchemaItem(key);
-  if(!disabled) items.disabled = disabled;
-  if(rules) items.rules = rules;
+  if (!disabled) items.disabled = disabled;
+  if (rules) items.rules = rules;
 }
+
+//给表单下拉项赋值
+const setFormItem = (key: any, obj: any) => {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.loadData && obj.loadData) {
+          let newBtnItems = null;
+          if (obj.loadData.length != 0) {
+            for (let key in obj.loadData) {
+              item.loadData[key] = obj.loadData[key];
+            }
+          } else {
+            item.loadData = obj.loadData;
+          }
+          newBtnItems = item.loadData;
+          newBtnItems && (obj.loadData = newBtnItems);
+        }
+        Object.assign(item, obj);
+      }
+    });
+  }
+};
 
 // 风险单位信息 列表
 const pageresult1 = reactive<Pageresult>({
@@ -351,52 +589,40 @@ const pageresult1 = reactive<Pageresult>({
   /** 总数 */
   total: 0,
 });
-
 const tableconfig1 = reactive<AppTableConfig>(
   createTableEditConfig({
     title: "风险单位信息",
     editFlag: true,
+    editList: ["cDetailedAddressId","cRemarks"],
     tableBtnType: "btn",
+    showSelection: true,
     titleBtns: [
       createFreeButtonBase({
-        id: "score",
+        id: "btnSplit",
         label: "拆分",
         type: "success",
         func: () => {
-          if(index1.value == -1) return ElMessage.warning("请选择一条风险单位");
-          getListByCode('select_status_type_by_cProdNo', { cProdNo: params.value.CProdNo }).then((res: any) => {
-            if (res.code === 200) {
-              if (res.data[0].cStatusType === 'A' || res.data[0].cStatusType === 'B') {
-                ElMessage.error({ message: '每人保额或各险别的每人保额相同，不能拆分风险单位', duration: 3000 });
-                return;
-              } else {
-                confirm();
-              }
-            } else {
-              confirm();
-            }
-          });
+          if (!selectRow1.value.cPkId)
+            return ElMessage.warning("请选择一条风险单位");
+          split();
         },
       }),
       createFreeButtonBase({
-        id: "score",
+        id: "btnDelete",
         label: "删除",
         type: "success",
         func: () => {
-          if(index1.value == -1) return ElMessage.warning("请选择一条风险单位");
-          pageresult1.list.splice(index1.value, 1);
-          index1.value = -1;
-          // 只有选中才会有数据，所以删除需要重置表单
-          freeEditRef1.value?.resetFields();
+          if (!selectRow1.value.cPkId)
+            return ElMessage.warning("请选择一条风险单位");
+          deleteUnitList()
         },
       }),
       createFreeButtonBase({
-        id: "score",
+        id: "btnSave",
         label: "保存风险单位",
         type: "success",
         func: () => {
-          if(index1.value == -1) return ElMessage.warning("请选择一条风险单位");
-          saveDatas(pageresult1.list[index1.value])
+          saveDatas();
         },
       }),
       createFreeButtonBase({
@@ -404,64 +630,101 @@ const tableconfig1 = reactive<AppTableConfig>(
         label: "分保试算",
         type: "success",
         func: () => {
-          if(index1.value == -1) return ElMessage.warning("请选择一条风险单位");
-          tryCountInFoRIs(pageresult1.list[index1.value])
+          if (!selectRow1.value.cPkId)
+            return ElMessage.warning("请选择一条风险单位");
+          tryCountInFoRIs(selectRow1.value);
         },
       }),
       createFreeButtonBase({
         id: "score",
         label: "工程险三者信息",
         type: "success",
-        func: () => {
-          
-        },
+        disabled: true,
+        func: () => {},
       }),
     ],
     fromSchema: [
       {
-        prop: "NSeqNo",
+        prop: "nSeqNo",
         inputtype: "rtinput",
         title: "序号",
         minWidth: 70,
-        fixed: 'left',
+        fixed: "left",
         readOnly: true,
       },
       {
-        prop: "CRiskUnitNme",
+        prop: "cDetailedAddressId",
+        inputtype: "rtselect",
+        title: "标的地址",
+        minWidth: 300,
+        func: (val:any, row:any) => {
+          if(val) {
+            const item = addressOptions.value.find((i:any) => i.cPkId === val);
+            const sameItemList = addressOptions.value.filter((n:any) => n.cProvince === item.cProvince && n.cCity === item.cCity && n.cCounty === item.cCounty);
+            if(sameItemList.length > 1) {
+              ElMessageBox.alert('同一省、市、区/县下有多个地址是否合并', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+              })
+            }
+            row.cDetailedAddress = item.cDetailedAddress;
+            row.cCountry = item.cCountry;
+            row.cProvince = item.cProvince;
+            row.cCity = item.cCity;
+            row.cCounty = item.cCounty;
+            row.cSuffixAddr = item.cSuffixAddr;
+          } else {
+            row.cDetailedAddress = "";
+            row.cCountry = ""
+            row.cProvince = "";
+            row.cCity = "";
+            row.cCounty = "";
+            row.cSuffixAddr = "";
+          }
+        }
+      },
+      {
+        prop: "cRiskUnitNme",
         inputtype: "rtinput",
         title: "风险单位名称",
         minWidth: 180,
-        fixed: 'left',
+        fixed: "left",
         readOnly: true,
       },
       {
-        prop: "CRiskLvlCde",
+        prop: "cRiskLvlNme",
         inputtype: "rtinput",
         title: "风险等级",
         minWidth: 180,
-        loadData: CRiskLvlCde_Options,
-        readOnly: true,
+        hidden: true,
       },
       {
-        prop: "totalTaxAmt",
+        prop: "nAmt",
         inputtype: "rtnumber",
         title: "我司保额",
         minWidth: 180,
         readOnly: false,
       },
       {
-        prop: "NRates",
+        prop: "nPrm",
         inputtype: "rtinput",
         title: "我司保费",
         minWidth: 180,
         readOnly: false,
       },
       {
-        prop: "NContaintaxPrm",
+        prop: "nRetAmt",
         inputtype: "rtnumber",
         title: "自留额",
         minWidth: 180,
         readOnly: false,
+      },
+      {
+        prop: "cRemarks",
+        inputtype: "rtinput",
+        type: "textarea",
+        title: "备注",
+        minWidth: 180,
       },
     ],
   })
@@ -484,6 +747,7 @@ const tableconfig2 = reactive<AppTableConfig>(
         id: "score",
         label: "查看比例合约",
         type: "primary",
+        hidden: true,
         func: () => {
           viewContInfo();
         },
@@ -491,36 +755,36 @@ const tableconfig2 = reactive<AppTableConfig>(
     ],
     fromSchema: [
       {
-        prop: "CContId",
+        prop: "cId",
         inputtype: "rtinput",
         title: "合约标识号",
         minWidth: 180,
-        fixed: 'left',
+        fixed: "left",
         readOnly: true,
       },
       {
-        prop: "CContCde",
+        prop: "cCnm",
         inputtype: "rtinput",
         title: "合约名称",
         minWidth: 180,
         readOnly: true,
       },
       {
-        prop: "NCedAmt",
+        prop: "nAmt",
         inputtype: "rtnumber",
         title: "分出保额",
         minWidth: 180,
         readOnly: true,
       },
       {
-        prop: "NCedPrm",
+        prop: "nPrm",
         inputtype: "rtnumber",
         title: "分出保费(批单非临分分出保费仅供参考)",
         minWidth: 350,
         readOnly: true,
       },
       {
-        prop: "NCedPrpt",
+        prop: "nPrpt",
         inputtype: "rtinput",
         title: "分出比例(%)",
         minWidth: 180,
@@ -531,123 +795,63 @@ const tableconfig2 = reactive<AppTableConfig>(
 );
 
 onMounted(async () => {
-  pageresult1.list = [
-    {
-      // 设置全部假数据，基于表单
-      NSeqNo: 1,
-      CRiskUnitNme: '测试11111',
-      CRiskLvlCde: 'A',
-      NAmt: 1000000,
-      CAmtCur: 'CNY',
-      NPrm: 100000,
-      CPrmCur: 'CNY',
-      NRmbAmt: 1000000,
-      NRmbChgRate: 1,
-      CCedPrmWay: 'G',
-      NRiPrm: 100000,
-      CRiprmCur: 'CNY',
-      NRicurChgRate: 1,
-      NTaxAmt: 10000,
-      NAmtVar: 10000,
-      NPrmVar: 10000,
-      NRates: 10,
-      NCiPrm: 100000,
-      CVatMrk: '0',
-      CCiMrk: '0',
-      NCiAmt: 1000000,
-      NCiPrpt: 10,
-      totalTaxAmt: 10000,
-      NContaintaxPrm: 10000,
-      NContaintaxPrmVar: 10000,
-      NRetAmt: 100000,
-      NRetPrpt: 10,
-      CFacMrk: '0',
-      NFacEnterRetLmt: 100000,
-      CRemark: '备注',
-    },
-    {
-      // 设置全部假数据，基于表单
-      NSeqNo: 12,
-      CRiskUnitNme: '1231231211',
-      CRiskLvlCde: 'B',
-      NAmt: 1000000,
-      CAmtCur: 'CNY',
-      NPrm: 100000,
-      CPrmCur: 'CNY',
-      NRmbAmt: 1000000,
-      NRmbChgRate: 1,
-      CCedPrmWay: 'N',
-      NRiPrm: 100000,
-      CRiprmCur: 'CNY',
-      NRicurChgRate: 1,
-      NTaxAmt: 10000,
-      NAmtVar: 10000,
-      NPrmVar: 10000,
-      NRates: 10,
-      NCiPrm: 100000,
-      CVatMrk: '1',
-      CCiMrk: '1',
-      NCiAmt: 1000000,
-      NCiPrpt: 10,
-      totalTaxAmt: 10000,
-      NContaintaxPrm: 10000,
-      NContaintaxPrmVar: 10000,
-      NRetAmt: 100000,
-      NRetPrpt: 10,
-      CFacMrk: '0',
-      NFacEnterRetLmt: 100000,
-      CRemark: '备注',
-    }
-  ];
-  pageresult1.total = 1;
+  init();
+  // 获取基本信息
+  getContData();
 
-  pageresult2.list = [
-    {
-      NSeqNo: "1",
-      CRiskUnitNme: "合约1",
-      NCedAmt: "1000000",
-      NCedPrm: "100000",
-      NCedPrpt: "10",
-      CContFlag: 'CP1',
-    }
-  ];
-  pageresult2.total = 1;
-
-  CRiskLvlCde_Options.value = [];
-  // 挂账时间
-  let tDueTm;
-  if (params.value.CAppTyp === 'A') {
-    const beginTm = operator.getEditerByName(BASEBEFORE, 'Base.TInsrncBgnTm').value;
-    tDueTm = moment(beginTm).isBefore(moment(Date.now())) ? Date.now() : beginTm;
-  }
-  tDueTm = moment(tDueTm).format('YYYY/MM/DD');
-
-  const param = {
-    cAppNo: params.value.CAppNo,
-    cProdNo: params.value.CProdNo,
-    cDptCde: user.value.companyId,
-    tInsrncBgnTm: tDueTm,
-  };
-
-  riskUnitQuery(param).then((result: any) => {
-    if (result.code === '1' && result.data) {
-      dataSet.value = result.data.PlyRiskUnitList;
-      retLmtSet.value = result.data.cRiskLvlRetLmt; // 第二个 自留额集合
-      // codeListMap.value = result.data.codeList; //原文件没用到，先不用
-      CRiskLvlCde_Options.value = result.data.cRiskLvlCde;
-      Object.assign(freeEditRef1.value?.getFromValue() , result.data.totalMap);
-
-      dataSet.value.forEach((risks: any) => {
-        pageresult1.list.push(risks);
-      });
-    } else if (result.code === '0') {
-      ElMessage.error({ message: result.message, duration: 3000 });
-    }
-  }).catch((error: any) => {
-    console.log('出错了', error);
-    ElMessage.error({ message: '后台服务异常,请联系管理员', duration: 3000 });
-  });
+  // 获取风险单位划分列表数据
+  getRiskData();
+  // 查询风险等级
+  queryRiskUnit();
+  // 查询标的地址下拉选项
+  queryAddress()
 });
+
+function init() {
+  //批单不允许删除险位
+  if (params.cAppTyp === "E") {
+    tableconfig1.titleBtns.filter(
+      (item) => item.id === "btnDelete"
+    )[0].disabled = true;
+  }
+  //审核禁用拆分、删除、保存风险单位等按钮
+  if (params.cAppTyp === "A" && cInwdMrk.value == "1") {
+    tableconfig1.titleBtns?.forEach((item) => {
+      if (
+        item.id === "btnSplit" ||
+        item.id === "btnSave" ||
+        item.id === "btnDelete"
+      ) {
+        item.disabled = true;
+      }
+    });
+  }
+}
+
+function queryRiskUnit() {
+  const beginTm = opertaor.getDataAll('1')["insrnc"]["Base.tInsrncBgnTm"];
+  const param = {
+    cAppNo: params.cAppNo,
+    cProdNo: params.cProdNo,
+    cDptCde: user.value.companyId,
+    tInsrncBgnTm: beginTm,
+  };
+  riskUnitQuery(param)
+    .then((result: any) => {
+      if (result.code === "1" && result.data) {
+        CRiskLvlCde_Options.value = result.data.map((item: any) => ({
+          ...item,
+          label: item.cRiskUnitNme,
+          value: item.cRiskLvlCde,
+        }));
+      } else if (result.code === "0") {
+        ElMessage.error({ message: result.message, duration: 3000 });
+      }
+    })
+    .catch((error: any) => {
+      ElMessage.error({ message: "后台服务异常,请联系管理员", duration: 3000 });
+    });
+}
 
 // 绑定方法
 const method = {
@@ -668,62 +872,317 @@ const exRules = {
   },
 };
 
-/** 查询 */
-function handleQuery1(flag?: boolean) {
-  const r = tableRef1.value?.getPartnerPage(flag); //获取分页数据
-  const s = freeEditRef1.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(s, r);
-  getBasicKindList(param)
-    .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
-        pageresult1.list = [];
-        pageresult1.list = data.result;
-        pageresult1.total = data.total;
-      } else {
-        ElMessage.error(msg);
-      }
-    })
-    .finally(() => {});
+// 拆分
+function split() {
+  const freeEditRef1Value = freeEditRef1.value?.getFromValue();
+  const NAmt = freeEditRef1Value.nAmt; //当前保额
+  const NPrm = freeEditRef1Value.nPrm; //当前保费
+  const CCiMrk = freeEditRef1Value.cCiMrk; //共保类型
+  let NCiAmt = 0.0; ////当前险位全单的共保保额
+  let NCiPrm = 0.0; ////当前险位全单的共保保费
+  let NCiAmtVar = 0.0; //当前险位全单的共保保额变化量
+  let NCiPrmVar = 0.0; //当前险位全单的共保保费变化量
+
+  if (
+    CCiMrk == "1" ||
+    CCiMrk == "2" ||
+    CCiMrk == "3" ||
+    CCiMrk == "4" ||
+    CCiMrk == "5"
+  ) {
+    //共保
+    NCiAmt = freeEditRef1.value?.getValue("nCiAmt");
+    NCiPrm = freeEditRef1.value?.getValue("nCiPrm");
+    NCiAmtVar = freeEditRef1.value?.getValue("nCiAmtVar");
+    NCiPrmVar = freeEditRef1.value?.getValue("nCiPrmVar");
+  }
+  if (NAmt == "") {
+    ElMessage.error("保额不能为空!");
+    return;
+  }
+  if (NPrm == "") {
+    ElMessage.error("保费不能为空!");
+    return;
+  }
+  //判断风险单位
+  if (!checkEdrUnit()) {
+    return;
+  }
+  //没有被选中的其它记录
+  const arrData = pageresult1.list.filter(
+    (item) => item.cPkId != selectRow1.value.cPkId
+  );
+  let unTotalAmt = 0.0; //没被选中的总保额
+  let unTotalPrm = 0.0; //没被选中的总保费
+  let unTotalCiAmt = 0.0; //没被选中的基于险位全单的共保总保额
+  let unTotalCiPrm = 0.0; //没被选中的基于险位全单的共保总保费
+  let unTotalCiAmtVar = 0.0;
+  let unTotalCiPrmVar = 0.0;
+
+  for (var i = 0; i < arrData.length; i++) {
+    // var status = arrData[i].getAttribute("status");
+    // if(status=="CANCELED" || status=="DELETED") continue;
+    const oldAmt = arrData[i].nAmt;
+    unTotalAmt = parseFloat(unTotalAmt) + parseFloat(oldAmt);
+    var oldPrm = arrData[i].nPrm;
+    unTotalPrm = parseFloat(unTotalPrm) + parseFloat(oldPrm);
+  }
+
+  if (
+    CCiMrk == "1" ||
+    CCiMrk == "2" ||
+    CCiMrk == "3" ||
+    CCiMrk == "4" ||
+    CCiMrk == "5"
+  ) {
+    //共保
+    var oldCiAmt = arrData[i].nCiAmt;
+    unTotalCiAmt = parseFloat(unTotalCiAmt) + parseFloat(oldCiAmt);
+    var oldCiPrm = arrData[i].nCiPrm;
+    unTotalCiPrm = parseFloat(unTotalCiPrm) + parseFloat(oldCiPrm);
+    var oldCiAmtVar = arrData[i].nCiAmtVar;
+    unTotalCiAmtVar = parseFloat(unTotalCiAmtVar) + parseFloat(oldCiAmtVar);
+    var oldCiPrmVar = arrData[i].nCiPrmVar;
+    unTotalCiPrmVar = parseFloat(unTotalCiPrmVar) + parseFloat(oldCiPrmVar);
+  }
+
+  const allAmt = parseFloat(NAmt) + parseFloat(unTotalAmt); //所有记录的总保额
+  const allPrm = parseFloat(NPrm) + parseFloat(unTotalPrm); //所有记录的总保费
+
+  const totalAmt = freeEditRef.value?.getValue("nAmt");//总保额
+  const totalPrm = freeEditRef.value?.getValue("nPrm");//总保费
+
+  let totalCiAmt = 0.0; //整单的共保总保额
+  let totalCiPrm = 0.0; //整单的共保总保费
+  let allCiAmt = 0.0; //当前记录的共保总保额和未选中的共保总保额
+  let allCiPrm = 0.0; //当前记录的共保总保费和未选中的共保总保费
+  let totalCiAmtVar = 0.0;
+  let totalCiPrmVar = 0.0;
+  let allCiAmtVar = 0.0;
+  let allCiPrmVar = 0.0;
+
+  let totalCiNotaxPrm = 0.0;
+  let totalCiAddedTax = 0.0;
+  let allCiNotaxPrm = 0.0;
+  let allCiAddedTax = 0.0;
+  let totalCiNotaxPrmVar = 0.0;
+  let totalCiAddedTaxVar = 0.0;
+  let allCiNotaxPrmVar = 0.0;
+  let allCiAddedTaxVar = 0.0;
+
+  if (
+    CCiMrk == "1" ||
+    CCiMrk == "2" ||
+    CCiMrk == "3" ||
+    CCiMrk == "4" ||
+    CCiMrk == "5"
+  ) {
+    //共保
+    totalCiAmt = freeEditRef1.value?.getValue("nCiAmt");
+    totalCiPrm = freeEditRef1.value?.getValue("nCiPrm");
+    allCiAmt = parseFloat(NCiAmt) + unTotalCiAmt;
+    allCiPrm = parseFloat(NCiPrm) + unTotalCiPrm;
+    totalCiAmtVar = freeEditRef1.value?.getValue("nCiAmtVar");
+    totalCiPrmVar = freeEditRef1.value?.getValue("nCiPrmVar");
+    allCiAmtVar = parseFloat(NCiAmtVar) + unTotalCiAmtVar;
+    allCiPrmVar = parseFloat(NCiPrmVar) + unTotalCiPrmVar;
+
+    totalCiNotaxPrm = freeEditRef1.value?.getValue("nCiNotaxPrm");
+    totalCiAddedTax = freeEditRef1.value?.getValue("nCiAddedTax");
+    allCiNotaxPrm = parseFloat(NCiNotaxPrm) + unTotalCiNotaxPrm;
+    allCiAddedTax = parseFloat(NCiAddedTax) + unTotalCiAddedTax;
+    totalCiNotaxPrmVar = freeEditRef1.value?.getValue("nCiNotaxPrmVar");
+    totalCiAddedTaxVar = freeEditRef1.value?.getValue("nCiAddedTaxVar");
+    allCiNotaxPrmVar = parseFloat(NCiNotaxPrmVar) + unTotalCiNotaxPrmVar;
+    allCiAddedTaxVar = parseFloat(NCiAddedTaxVar) + unTotalCiAddedTaxVar;
+  }
+
+  if (parseFloat(allAmt) >= parseFloat(totalAmt)) {
+    //所有记录的总保额大于总保额时，不允许拆分
+    var tempAmt = parseFloat(totalAmt) - parseFloat(unTotalAmt);
+    ElMessage.error(
+      "当前要拆分的记录,保额不能大于:" + tempAmt.toFixed(2) + "！请您修改！"
+    );
+    return;
+  }
+  if (parseFloat(allPrm) >= parseFloat(totalPrm)) {
+    //所有记录的总保费大于总保费时，不允许拆分
+    var tempPrm = parseFloat(totalPrm) - parseFloat(unTotalPrm);
+    ElMessage.error(
+      "当前要拆分的记录,保费不能大于:" + tempPrm.toFixed(2) + "！请您修改！"
+    );
+    return;
+  }
+
+  //拆分时判断当前险位是否有输入风险单位名称及风险等级
+  var CRiskUnitNme = freeEditRef1.value?.getValue("cRiskUnitNme");
+  var CRiskLvlCde = freeEditRef1.value?.getValue("cRiskLvlCde");
+  if (CRiskUnitNme == "" || CRiskUnitNme == null) {
+    ElMessage.error("风险单位名称不能为空！！！");
+    return;
+  } else if (CRiskLvlCde == "" || CRiskLvlCde == null) {
+    ElMessage.error("风险等级不能为空！！！");
+    return;
+  }
+
+  const remAmt = (parseFloat(totalAmt) - parseFloat(allAmt)).toFixed(2);//要拆分的保额
+  const remPrm = (parseFloat(totalPrm) - parseFloat(allPrm)).toFixed(2);//要拆分的保费
+
+  const newRow = [{
+    ...selectRow1.value,
+    ...freeEditRef1.value?.getFromValue(),
+    nSeqNo: pageresult1.list.length + 1,
+    cPkId: `newcPkid${pageresult1.list.length + 1}`,
+    tCrtTm: "",
+    tUpdTm: "",
+    nAmt: remAmt,
+    nAmtVar: remAmt,
+    nPrm: remPrm,
+    nPrmVar: remPrm,
+    cRiskUnitNme: "",
+    cRiskLvlCde: null,
+    _dataId: `newRow${pageresult1.list.length + 1}`,
+    index: selectRow1.value.index + 1,
+    nRetAmt: 0.00,
+  }]
+  pageresult1.list = pageresult1.list.concat(newRow)
+  const table = tableRef1.value;
+  nextTick(() => {
+    table.clearSelection();
+    table.toggleRowSelection(newRow[0]);
+  })
 }
-function handleQuery2(flag?: boolean) {
-  const r = tableRef2.value?.getPartnerPage(flag); //获取分页数据
-  const s = freeEditRef1.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(s, r);
-  tryCountInFoRI(param)
-    .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
-        pageresult2.list = [];
-        pageresult2.list = data.result;
-        pageresult2.total = data.total;
-      } else {
-        ElMessage.error(msg);
-      }
-    })
-    .finally(() => {});
+
+/**
+ * 本次批单风险单位个数不能超过上一张报批单单的风险单位个数
+ */
+function checkEdrUnit() {
+  // if(params.cAppTyp === "E"){
+  //   tool.sendXmlByService(['<%=risk_unit%>'],"riskUnitBizAction","queryLastRiskUnit","<%=appNo%>");
+  //   var edrUnit=tool.getResultMsg();
+  //   if(edrUnit!=null){
+  //     var rows = tool.getDW(risk_unit ).getFacade().getAllVisibleRows();//得到所有可视行
+  //     if(rows.length>(edrUnit-1)){
+  //       tool.alert("不允许超过上一张保批单的风险单位个数！");
+  //       return false;
+  //     }
+  //     return true;
+  //   } else {
+  //     tool.alert("找不到上一次的保批单风险单位信息！");
+  //     return false;
+  //   }
+  // }
+  return true;
+}
+
+// 删除
+function deleteUnitList() {
+  const newList = pageresult1.list.filter((item:any) =>  item.cPkId != selectRow1.value.cPkId).map((item:any, index:any) => ({...item, nSeqNo: index + 1}))
+  if(newList.length > 1) {
+    // 如果删除后列表数据大于1条，重新计算最后一条的保额和保费
+    const totalAmt = freeEditRef.value?.getValue("nAmt")
+    const totalPrm = freeEditRef.value?.getValue("nPrm")
+    const middleTotalAmt = newList.filter((item, index) => index < newList.length - 1).map(item => parseFloat(item.nAmt)).reduce((sum, num) => sum + num, 0)
+    const middleTotalPrm = newList.filter((item, index) => index < newList.length - 1).map(item => parseFloat(item.nPrm)).reduce((sum, num) => sum + num, 0)
+    const lastAmt = parseFloat(totalAmt) - middleTotalAmt;
+    const lastPrm = parseFloat(totalPrm) - middleTotalPrm;
+    newList[newList.length - 1].nAmt = lastAmt
+    newList[newList.length - 1].nAmtVar = lastAmt
+    newList[newList.length - 1].nPrm = lastPrm
+    newList[newList.length - 1].nPrmVar = lastPrm
+  } else if(newList.length === 1) {
+    // 如果删除后列表数据等于1条，则列表中的保额和保费等于总保额和总保费
+    const totalAmt = freeEditRef.value?.getValue("nAmt")
+    const totalPrm = freeEditRef.value?.getValue("nPrm")
+    newList[0].nAmt = parseFloat(totalAmt)
+    newList[0].nAmtVar = parseFloat(totalAmt)
+    newList[0].nPrm = parseFloat(totalPrm)
+    newList[0].nPrmVar = parseFloat(totalPrm)
+  }
+  pageresult1.list = newList;
+  // 清空选中数据
+  selectRow1.value = {}
+  // 只有选中才会有数据，所以删除需要重置表单
+  freeEditRef1.value?.resetFields();
 }
 
 // 选中行
-function handleRowClick1(row: any) {
-  selectRow1.value = row;
-  index1.value = pageresult1.list.findIndex((item: any) => item.NSeqNo === row.NSeqNo);
-  freeEditRef1.value?.setFormValue(row);
-  setFromSchemaItem('CRiskUnitNme',null, false);
-  setFromSchemaItem('CRiskLvlCde',null, false);
-  setFromSchemaItem('NAmt',null, false);
-  setFromSchemaItem('NPrm',null, false); 
+function handleSelectionChange(selection: any) {
+  if (selection.length < 1) {
+    selectRow1.value = {};
+  } else if (selection.length > 1) {
+    const table = tableRef1.value;
+    if (table) {
+      // 清除所有选中
+      table.clearSelection();
+      // 只选中当前行
+      table.toggleRowSelection(selection[1], true);
+    }
+  } else {
+    selectRow1.value = selection[0];
+    freeEditRef1.value?.setFormValue({
+      ...selection[0],
+      nAmtVar: selection[0].nAmt,
+      nPrmVar: selection[0].nPrm,
+      cAmtCur: freeEditRef.value?.getValue("cAmtCur"),
+      cPrmCur: freeEditRef.value?.getValue("cPrmCur"),
+    });
+    setFormItem("nAmtVar", { disabled: false });
+    setFormItem("nPrmVar", { disabled: false });
+  }
 }
+
+// 查询标的地址下拉选项
+function queryAddress() {
+  const param = {
+    cAppNo: params.cAppNo,
+    cProdNo: params.cProdNo,
+    cDptCde: user.value.companyId,
+  }
+  queryComponentCodeList(param).then((res:any) => {
+    if(res.code === '200') {
+      addressOptions.value = res.data.map((item:any) => ({
+        ...item,
+        label: item.cDetailedAddress,
+        value: item.cPkId,
+      }))
+      tableconfig1.fromSchema[1].loadData = addressOptions.value
+    } else {
+      ElMessage.error(res.message)
+    }
+  }).catch(err => {
+    ElMessage.error(err)
+  })
+}
+
 function handleRowClick2(row: any) {
   selectRow2.value = row;
-  index2.value = pageresult2.list.findIndex((item: any) => item.NSeqNo === row.NSeqNo);
+  index2.value = pageresult2.list.findIndex(
+    (item: any) => item.NSeqNo === row.NSeqNo
+  );
 }
 
 async function checkData() {
-  setFromSchemaItem('NAmt', [{ required: true, message: '请输入保额!', trigger: 'blur' }], false); 
-  setFromSchemaItem('NPrm', [{ required: true, message: '请输入保费!', trigger: 'blur' }], false); 
-  setFromSchemaItem('CRiskUnitNme', [{ required: true, message: '请输入风险单位名称!', trigger: 'blur' }], false); 
-  setFromSchemaItem('CRiskLvlCde', [{ required: true, message: '请输入风险等级!', trigger: 'blur' }], false); 
+  setFromSchemaItem(
+    "NAmt",
+    [{ required: true, message: "请输入保额!", trigger: "blur" }],
+    false
+  );
+  setFromSchemaItem(
+    "NPrm",
+    [{ required: true, message: "请输入保费!", trigger: "blur" }],
+    false
+  );
+  setFromSchemaItem(
+    "CRiskUnitNme",
+    [{ required: true, message: "请输入风险单位名称!", trigger: "blur" }],
+    false
+  );
+  setFromSchemaItem(
+    "CRiskLvlCde",
+    [{ required: true, message: "请输入风险等级!", trigger: "blur" }],
+    false
+  );
 
   let flag;
   //freeEditRef1 校验表单 返回布尔值
@@ -734,258 +1193,578 @@ async function checkData() {
   return true;
 }
 
-
-// 拆分
-async function confirm() {
-  const flag = await checkData(); //校验
-  if (!flag) {
-    return;
-  }
-
-  const riskItems = pageresult1.list;
-  const nowRiskData = freeEditRef1.value?.getFromValue();
-
-  let sumPrm = 0.0;
-  let sumAmt = 0.0;
-  let sumTaxAmt = 0.0;
-  let sumContaintaxPrm = 0.0;
-  let sumContaintaxPrmVar = 0.0;
-
-  const nSeqNo = nowRiskData.NSeqNo;
-
-  riskItems.forEach((risk: any) => {
-    if (nSeqNo !== risk.NSeqNo) {
-      sumPrm += parseFloat(risk.NPrm);
-      sumAmt += Number(parseFloat(risk.NAmt));
-      sumTaxAmt += parseFloat(risk.NTaxAmt);
-      sumContaintaxPrm += parseFloat(risk.NContaintaxPrm);
-      sumContaintaxPrmVar += parseFloat(risk.NContaintaxPrmVar);
-    }
-  });
-  sumAmt += Number(parseFloat(nowRiskData.NAmt+''));
-  sumPrm += parseFloat(nowRiskData.NPrm+'');
-  sumTaxAmt += parseFloat(nowRiskData.NTaxAmt+'');
-  sumContaintaxPrm += parseFloat(nowRiskData.NContaintaxPrm+'');
-  sumContaintaxPrmVar += parseFloat(nowRiskData.NContaintaxPrmVar+'');
-
-  // 字段涉及的校验，之前的代码字段是2个，现在是1个，待核实
-  // const totalAmt = freeConfig.totalAmt; //总保额 totalAmt 之前有，现在没了
-  // const totalPrm = freeConfig.totalPrm; //净保费 totalPrm or NPrm
-  // const totalTaxAmt = freeConfig.totalTaxAmt; //增值税 totalTaxAmt or NTaxAmt
-  // const totalContaintaxPrm = freeConfig.totalContaintaxPrm; //毛保费 totalContaintaxPrm or NContaintaxPrm
-  // const totalContaintaxPrmVar = freeConfig.totalContaintaxPrmVar; //毛保费变化 totalContaintaxPrmVar 之前有，现在没了
-
-  // if (Number(totalAmt) <= sumAmt) {
-  //   ElMessage.info({ message: `当前要拆分的记录,保额不能大于:${sumAmt}！请您修改！`, duration: 3000 });
-  //   return;
-  // }
-
-  // if (Number(totalPrm) <= sumPrm) {
-  //   ElMessage.info({ message: `当前要拆分的记录,保额不能大于:${sumPrm}！请您修改！`, duration: 3000 });
-  //   return;
-  // }
-
-  // pageresult1.list[contractIndex.value] = nowRiskData;
-
-  pageresult1.list = [];
-  pageresult1.list = [...pageresult1.list];
-  pageresult1.list.splice(0, pageresult1.list.length);
-
-  for (const risks of pageresult1.list) {
-    pageresult1.list.push(risks);
-  }
-
-  const newRiskData = { ...nowRiskData };
-
-  // newRiskData.NAmt = Number((totalAmt - sumAmt).toFixed(2));
-  // newRiskData.NPrm = Number((totalPrm - sumPrm).toFixed(2));
-  // newRiskData.NTaxAmt = 0;
-  // newRiskData.NContaintaxPrm = Number((Number(totalContaintaxPrm) - sumContaintaxPrm).toFixed(2));
-  // newRiskData.NContaintaxPrmVar = Number((Number(totalContaintaxPrmVar) - sumContaintaxPrmVar).toFixed(2));
-
-  newRiskData.NSeqNo = riskItems.length + 1;
-  newRiskData.CRiskLvlCde = '';
-  newRiskData.CRiskUnitNme = '';
-  // newRiskData.CPkId = UUID();
-  newRiskData.CPkId = '';
-
-  // freeEditRef1.value.resetFields();
-
-  // changePrm();
-  // changeAmt();
-
-  pageresult1.list.push(newRiskData);
-}
-
-// 修改保费
-const changePrm = () => {
-  // // 分出方式
-  // const cCedPrmWay = freeEditRef2.value?.getValue('CCedPrmWay');
-  // // 净保费
-  // const nPrm = freeEditRef2.value?.getValue('NPrm');
-  // // 折人民币汇率
-  // const NRmbChgRate = freeEditRef1.value?.getValue('NRmbChgRate');
-  // if (cCedPrmWay === 'G') {
-  //   if (nPrm == null || nPrm === '') {
-  //     ElMessage.info({ message: '保费不能为空!', duration: 3000 });
-  //     return;
-  //   } else {
-  //     // 折再保币种保费
-  //     const nRiPrm = Number((parseFloat(nPrm+'') * parseFloat(NRmbChgRate)).toFixed(2));
-  //     freeEditRef2.value?.setValue('NRiPrm', nRiPrm);
-  //     if ('PLY_UW_PROCESS_SCENE' === params.value.scene) {
-  //       // 保费变化
-  //       const nPrmVar = parseFloat(nPrm+'');
-  //       // 折再保币种保费变化
-  //       const nRiPrmVar = Number((parseFloat(nPrm+'') * parseFloat(NRmbChgRate)).toFixed(2));
-  //       // 保费变化
-  //       freeEditRef2.value?.setValue('NPrmVar', nPrmVar);
-  //       // 折再保币种保费变化
-  //       freeEditRef2.value?.setValue('NRiPrmVar', nRiPrmVar);
-  //       // 设置净保费
-  //       freeEditRef2.value?.setValue('NNetPrm', nPrm);
-  //     }
-  //   }
-  // }
-
-  // 之前是两个form，现在是一个，这里有问题
-  // 计算增值税
-  // const NAllPrm = freeEditRef1.value?.getValue('totalPrm');// 整单保费
-  // const NAllTax = freeEditRef1.value?.getValue('totalTaxAmt');// 整单增值税
-  // const thisTax = (parseFloat(nPrm+'') / parseFloat(NAllPrm+'') * parseFloat(NAllTax+'')).toFixed(2);
-  // freeEditRef2.value?.setValue('NTaxAmt', thisTax);
-  // // 计算毛保费
-  // const NAllContaintaxPrm = freeEditRef1.value?.getValue('totalContaintaxPrm');// 整单毛保费
-  // const thisContaintaxPrm = (parseFloat(nPrm+'') / parseFloat(NAllPrm+'') * parseFloat(NAllContaintaxPrm+'')).toFixed(2);
-  // freeEditRef2.value?.setValue('NContaintaxPrm', thisContaintaxPrm);
-  // // 计算毛保费变化量
-  // const NAllContaintaxPrmVar = freeEditRef1.value?.getValue('totalContaintaxPrmVar');// 整单毛保费变化量
-  // const thisContaintaxPrmVar = (parseFloat(nPrm+'') / parseFloat(NAllPrm+'') * parseFloat(NAllContaintaxPrmVar+'')).toFixed(2);
-  // freeEditRef2.value?.setValue('NContaintaxPrmVar', thisContaintaxPrmVar);
-}
-
-
-// 修改保额
-function changeAmt() {
-  // const nAmt = freeEditRef2.value?.getValue('NAmt');
-  // if (!nAmt) {
-  //   ElMessage.info({ message: '保额不能为空!', duration: 3000 });
-  //   return;
-  // }
-
-  // // 折人民币汇率
-  // const nRmbChgRate = freeEditRef2.value?.getValue('NRmbChgRate');
-  // // 计算出折人民币保额
-  // const nRmbAmt = Number((parseFloat(nAmt+'') * parseFloat(nRmbChgRate)).toFixed(2));
-  // // 自留额
-  // const nRetAmt = freeEditRef2.value?.getValue('NRetAmt');
-  // // 折人民币保额变化
-  // freeEditRef2.value?.setValue('NRmbAmtVar', nRmbAmt);
-  // // 折人民币保额
-  // freeEditRef2.value?.setValue('nRmbAmt', nRmbAmt);
-
-  // let nRetPrpt = 1.00;
-  // if (Number(parseFloat(nRetAmt+'')) < Number(parseFloat(nRmbAmt+''))) {
-  //   nRetPrpt = Number((parseFloat(nRetAmt+'') / parseFloat(nRmbAmt+'')).toFixed(2));
-  // }
-  // // 设置自留额比例
-  // freeEditRef2.value?.setValue('NRetPrpt', nRetPrpt);
-
-  // if ('PLY_UW_PROCESS_SCENE' === params.value.scene) {
-  //   // 折人民币保额变化
-  //   const nRmbAmtVar = Number((nAmt * parseFloat(nRmbChgRate)).toFixed(2));
-  //   // 设置保额变化
-  //   freeEditRef2.value?.setValue('NAmtVar', nAmt);
-  //   // 设置折人民币保额变化
-  //   freeEditRef2.value?.setValue('NRmbAmtVar', nRmbAmtVar);
-  // }
-}
-
 // 分保试算
 function tryCountInFoRIs(row: any) {
   pageresult2.list = [];
+  const res = opertaor.getDataAll();
   const param = {
-    cAppNo: user.value.companyId,
-    nSeqNo: row.nSeqNo,
+    cDocTyp: row.cDocTyp,// 单证类型 A 保单 E 批单
+    cDptCde: row.cDptCde,// 机构代码
+    cAppNo: params.cAppNo,// 申请单号
+    nEdrPrjNo: row.nEdrPrjNo,// 批改序号
+    cProdNo: row.cProdNo,// 产品代码
+    nSplitSeq: row.nSeqNo,// 拆分序号
+    cRiskLvlCde: row.cRiskLvlCde,// 风险等级代码
+    cCiMrk: row.cCiMrk,// 共保方式
+    // nCiPrpt: "",// 共保比例
+    tInsrncBgnTm: res['insrnc']['Base.tInsrncBgnTm'],// 保险起期
+    tInsrncEndTm: res['insrnc']['Base.tInsrncEndTm'],// 保险止期
+    // tEdrBgnTm: "",// 批改生效起期 非必填
+    // tEdrEndTm: "",// 批改生效止期 非必填
+    cStockMrk: row.cStockMrk,// 股东业务标志
+    cFacMrk: res['plyBase']['Base.cRiFacMrk'],// 临分标志(0 不需要临分 1 自主临分 2 强制临分)
+    // cResvTxtl: "",// 是否农银代理业务(0 否 1 是)
+    cAmtCur: freeEditRef.value?.getValue("cAmtCur"),// 保额币种
+    nAmtChgRate: freeEditRef1.value?.getValue("nRmbChgRate"),// 保额币种汇率
+    cPrmCur: freeEditRef.value?.getValue("cPrmCur"),// 保费币种
+    nPrmChgRate: freeEditRef1.value?.getValue("nRmbChgRate"),// 保费币种汇率
+    nAmt: row.nAmt,// 保额
+    nAmtVar: row.nAmtVar,// 保额变化
+    nPrm: row.nPrm,// 保费
+    nPrmVar: row.nPrmVar,// 保费变化
+    nNotaxPrm: row.nNotaxPrm,// 不含税保费
+    // nNotaxPrmVar: row.nNotaxPrmVar || null,// 不含税保费变化值
+    cTaxTyp: row.cTaxTyp,// 税种
+    // cCollTyp: "",// 征收类型
+    // cTgtCde: "",// 二级标的代码
+    // cTgtCnm: "",// 二级标的名称
+    // cLatestMrk: "",// 是否最新 0 否 1 是 非必传
+    nRetLmt: row.nRetAmt,// 自留额
   };
-  tryCountInFoRI(param).then((result: any) => {
-    if (result.data) {
-      dataSet.value = result.data;
-      for (const contCed of dataSet.value) {
-        // contCed['CContCde'] = 'CP1;CS3  分出成数合约';
-        if (contCed.CContCde.indexOf(';') !== -1) {
-          const array = contCed.CContCde.split(';');
-          contCed.CContCde = array[1];
-          contCed.CContFlag = array[0];
+  tryCountInFoRI(param)
+    .then((result: any) => {
+      if (result.data) {
+        dataSet.value = result.data;
+        for (const contCed of dataSet.value) {
+          // contCed['CContCde'] = 'CP1;CS3  分出成数合约';
+          if (contCed.CContCde.indexOf(";") !== -1) {
+            const array = contCed.CContCde.split(";");
+            contCed.CContCde = array[1];
+            contCed.CContFlag = array[0];
+          }
+          pageresult2.list.push(contCed);
         }
-        pageresult2.list.push(contCed);
       }
-    }
-  }).catch((error: any) => {
-    console.log('出错了', error);
-    ElMessage.error({ message: '后台服务异常,请联系管理员', duration: 3000 });
-  });
+    })
+    .catch((error: any) => {
+      console.log("出错了", error);
+      ElMessage.error({ message: "后台服务异常,请联系管理员", duration: 3000 });
+    });
 }
 
 // 查看比例合约
 function viewContInfo() {
-  if(Object.keys(selectRow2.value).length == 0) return ElMessage.info({ message: '请选择一条合约信息', duration: 3000 });
-  if (selectRow2.value.CContFlag !== 'CP1' && selectRow2.value.CContFlag !== 'CP3') {
-    ElMessage.info({ message: '请选择比例合约', duration: 3000 });
-    return;
-  }
-  const data = {
-    CAppNo: params.value?.CAppNo,
-    param: params,
-    contCed: selectRow2,
-  }
-  console.log('data',data)
   dzmodal
-    .open(ViewContInfoComponent, { type: "Issuer", data })
+    .open(ViewContInfoComponent, { type: "Issuer", data: {} })
     .then((res: any) => {
       if (res.type === "ok") {
-
       }
     });
 }
 
 // 保存风险单位
-function saveDatas(row: any) {
-  const riskDataList = pageresult1.list;
-  let nAmt = 0.0;
-  let nPrm = 0.0;
-  riskDataList.forEach((data: any) => {
-    nAmt += parseFloat(data.NAmt);
-    nPrm += parseFloat(data.NPrm);
-  });
-  nPrm = Math.round(nPrm * 100) / 100;
-  // const totalAmt = freeConfig.totalAmt; // 总保额
-  // const totalPrm = freeConfig.totalPrm; // 净保费
-
-  // if (totalAmt !== nAmt || totalPrm !== nPrm) {
-  //   ElMessage.info({ message: '风险单位信息的保额或保费的总数需要与总保额或总保费相同才能进行保存操作' });
-  //   return;
-  // }
-
-  const paramsData = {
-    cAppNo: params.value.CAppNo,
-    items: riskDataList.map((item: any) => ({
-      ...item,
-      CUpdCde: user.value.opCde,
-      TUpdTm: new Date(),
-    })),
-  };
-
-  saveData(paramsData).then((result: any) => {
-    if (result.code) {
-      dataSet.value = result.data;
-      ElMessage.success({ message: result.message, duration: 3000 });
+function saveDatas() {
+  let rows = pageresult1.list;
+  let totalAmt = 0;
+  let totalPrm = 0;
+  let initCedWay = "";
+  let CCiMainNo;
+  let CCiMainMrk;
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    if(!row.cRiskUnitNme) {
+      ElMessage.error("风险单位名称不能为空")
+      return
     }
-  }).catch((error: any) => {
-    console.log('出错了', error);
-    ElMessage.error({ message: '后台服务异常,请联系管理员', duration: 3000 });
-  });
+    if(!row.cRiskLvlCde) {
+      ElMessage.error("风险等级不能为空")
+      return
+    }
+    if(row.cDetailedAddress && !row.cRemarks) {
+      ElMessage.error("备注不能为空")
+      return
+    }
+    const amt = row.nAmt;
+    const prm = row.nPrm;
+    totalAmt = parseFloat(totalAmt) + parseFloat(amt);
+    totalPrm = parseFloat(totalPrm) + parseFloat(prm);
+  }
+  var oldAmt = freeEditRef.value?.getValue("nAmt");
+  var oldPrm = freeEditRef.value?.getValue("nPrm");
+  if (
+    parseFloat(totalAmt).toFixed(2) != parseFloat(oldAmt).toFixed(2) &&
+    parseFloat(totalPrm).toFixed(2) != parseFloat(oldPrm).toFixed(2)
+  ) {
+    ElMessage.error(
+      "总保额:" +
+        oldAmt +
+        ",当前所有保单风险单位记录保额总和为:" +
+        totalAmt +
+        ";\n总保费:" +
+        oldPrm +
+        ",当前所有保单风险单位记录保费总和为:" +
+        totalPrm +
+        ";\n请确保总保额和记录保额总和相等;总保费和记录保费总和相等时才能保存!"
+    );
+  } else if (
+    parseFloat(totalAmt).toFixed(2) == parseFloat(oldAmt).toFixed(2) &&
+    parseFloat(totalPrm).toFixed(2) != parseFloat(oldPrm).toFixed(2)
+  ) {
+    ElMessage.error(
+      "总保费:" +
+        oldPrm +
+        ",当前所有保单风险单位记录保费总和为:" +
+        totalPrm +
+        ";\n请确保总保费和记录保费总和相等时才能保存!"
+    );
+  } else if (
+    parseFloat(totalAmt).toFixed(2) != parseFloat(oldAmt).toFixed(2) &&
+    parseFloat(totalPrm).toFixed(2) == parseFloat(oldPrm).toFixed(2)
+  ) {
+    ElMessage.error(
+      "总保额:" +
+        oldAmt +
+        ",当前所有保单风险单位记录保额总和为:" +
+        totalAmt +
+        ";\n请确保总保额和记录保额总和相等时才能保存!"
+    );
+  } else {
+    const param = opertaor.getFatherPage().getSaveDataParams();
+    param[0].plyRiskUnitCvrgObjList = pageresult1.list;
+
+    saveRiskData({ param })
+      .then((result: any) => {
+        if (result.code == "0") {
+          ElMessage.success(result.message);
+          // 更新是否保存标识
+          saveFlag.value = true
+          // 清空选中数据
+          selectRow1.value = {}
+          // 清空风险单位表单
+          freeEditRef1.value?.resetFields();
+          // 查询风险划分单位列表数据
+          getRiskData()
+        } else {
+          ElMessage.error(result.message);
+        }
+      })
+      .catch((error: any) => {
+        ElMessage.error({ message: error, duration: 3000 });
+      });
+  }
+
+  
+}
+
+function getContData() {
+  const param = {
+    cAppNo: params.cAppNo,
+    cCiMrk: params.cCiMrk,
+  };
+  getReinsuredData(param)
+    .then((res: any) => {
+      if (res.code === "200") {
+        if (res.data) {
+          console.log("getContData", res.data);
+          let data = {}
+          if(params.cCiMrk !== '0') {
+            data = {
+              ...res.data,
+              nAmt: res.data.nCiAmt,
+              nAmtVar: res.data.nCiAmtVar,
+              nPrm: res.data.nCiPrm,
+              nPrmVar: res.data.nCiPrmVar,
+            }
+          } else {
+            data = res.data
+          }
+          freeEditRef.value?.setFormValue(data);
+          cAmtCurOptions.value = [
+            { label: data.cAmtCur, value: rdata.cAmtCur },
+          ];
+          cPrmCurOptions.value = [
+            { label: data.cPrmCur, value: data.cPrmCur },
+          ];
+          nRmbChgRate(data.cAmtCur);
+        }
+      } else {
+        ElMessage.error(res.message);
+      }
+    })
+    .catch((error: any) => {
+      ElMessage.error(error);
+    });
+}
+
+// 获取风险单位划分列表数据
+function getRiskData() {
+  riskQueryData({ cAppNo: params.cAppNo })
+    .then((res: any) => {
+      if (res.code === "200") {
+        pageresult1.list = res.data.map((item: any, index: number) => ({
+          ...item,
+          index,
+        }));
+        _dataSet.value = res.data;
+      } else {
+        ElMessage.error(res.message);
+      }
+    })
+    .catch((err) => {
+      ElMessage.error(err);
+    });
+}
+
+// 关闭弹框
+const emit = defineEmits(['ok'])
+const handleBeforeClose = async (done:any) => {
+  // 关闭弹框时如果保存过风险单位，需要调用再保保存险位接口，接口会返回标识
+  if(saveFlag.value) {
+    // 调用再保险位接口
+    const { saveFlag, data } = await saveDataInfo()
+    if(!saveFlag) return
+    emit('ok', data)
+    done()
+  } else {
+    done()
+  }
+}
+
+const saveDataInfo = async () => {
+  let saveFlag = false;
+  let data = {};
+  const param = opertaor.getFatherPage().getSaveDataParams();
+  param[0].plyRiskUnitCvrgObjList = pageresult1.list;
+
+  const resInfo: any = await saveData({param});
+  if (resInfo["code"] === "1") {
+    saveFlag = true;
+    data = resInfo["data"]
+  } else {
+    ElMessage.error(resInfo["message"]);
+  }
+
+  return { saveFlag, data};
 };
+
+function getTotalNum(arr: any[]) {
+  return arr.reduce((acc, item) => {
+    return Number(acc) + Number(item);
+  }, 0);
+}
+
+/**
+ * 保额焦点失去事件
+ * 当保额为“”，则给用户一个提示，然后重新输入。
+ * 当当前总保额大于默认总保额时，则给用户一个提示并且重新输入。
+ * 当当前总保额小于或等于默认总保额时，则计算出折人民币保额，自留额比例，保额变化，折人民币保额变化然后分别设置其值。
+ * 注意  此处的参数nAmtVar 实际的意思为保额变化的值
+ */
+function changeNamt(nAmtVar: any, flag: any) {
+  if(!selectRow1.value.cPkId) return;
+  if (nAmtVar == null || nAmtVar == "") {
+    ElMessage.error("保额不能为空!");
+    return;
+  } else if (nAmtVar == 0) {
+    ElMessage.error("保额不能为0!");
+    return;
+  } else {
+    freeEditRef1.value?.setValue("nAmt", parseFloat(nAmtVar));
+    // 共保业务(计算保额和总保额的比例，根据比例计算共保保额的拆分金额)
+    let nCiAmt = 0;
+    if(params.cCiMrk !== "0") {
+      const totalAmt = freeEditRef.value?.getValue("nAmt") // 总保费
+      const totalCiAmt = freeEditRef.value?.getValue("nCiAmt") // 共保保费
+      const nPrmRatio = parseFloat((parseFloat(nAmtVar) / parseFloat(totalAmt)).toFixed(2)) // 保费变化值与总保费的比例
+      nCiAmt = parseFloat((parseFloat(totalCiAmt) * nPrmRatio).toFixed(2))
+      selectRow1.value.nCiAmt = nCiAmt;
+    }
+    pageresult1.list.forEach(item => {
+      if(item.cPkId === selectRow1.value.cPkId) {
+        item.nAmt = parseFloat(nAmtVar);
+        item.nAmtVar = parseFloat(nAmtVar);
+        if(params.cCiMrk !== "0") {
+          item.nCiPrm = nCiAmt
+        }
+      }
+    })
+    selectRow1.value.nAmt = parseFloat(nAmtVar);
+    selectRow1.value.nAmtVar = parseFloat(nAmtVar);
+  }
+}
+
+// 计算折人民币汇率
+function nRmbChgRate(val: any) {
+  if (val !== "CNY") {
+    codeListStore
+      .queryCodeList({
+        codeListName: "WEB_BAS_CHGRATE",
+        codeListParam: { value: val },
+      })
+      .then((res) => {
+        freeEditRef1.value?.setValue("nRmbChgRate", res[0].currency_rate);
+      });
+  } else {
+    freeEditRef1.value?.setValue("nRmbChgRate", "1.000000");
+  }
+}
+
+/**
+ * 当riConfirmMrk为1时表时该页码为只读页面
+ * 每选择一行时也应设置成只读
+ */
+function setRowReadOnly() {
+  const CProdNo = params.CProdNo; //产品
+  const CRiskLvlCde = freeEditRef1.value?.getValue("cRiskLvlCde");
+
+  if (params.cAppTyp == "A") {
+    // setFormItem('cRiskUnitNme',{ disabled: true })
+    // setFormItem('cRiskLvlCde',{ disabled: true })
+  }
+  if ("010002" == CProdNo && "01065" == CRiskLvlCde) {
+    freeEditRef1.value?.setDisabledAll();
+    tableconfig1.titleBtns?.forEach((item) => {
+      if (
+        item.id === "btnSplit" ||
+        item.id === "btnSave" ||
+        item.id === "btnDelete"
+      ) {
+        item.disabled = true;
+      }
+    });
+  }
+}
+
+/**
+ * 保费焦点失去事件
+ * 当保费为“”，则给用户一个提示，然后重新输入。
+ * 当当前总保费大于默认总保费时，则给用户一个提示并且重新输入。
+ * 当当前总保费小于或等于默认总保费时，则计算出折人民币保费。
+ * 如果分出方式是毛保费方式，则计算出保费变化和折再保币种保费变化并设置其值。
+ * 注意  新需求页面显示保费
+ * nPrmVar 的意思是保费变化值
+ */
+function changePrm(nPrmVar: any, flag: any) {
+  if(!selectRow1.value.cPkId) return;
+  if (nPrmVar == null || nPrmVar == "") {
+    ElMessage.error("保费不能为空!");
+    return;
+  } else if (nPrmVar == 0) {
+    ElMessage.error("保费不能为0!");
+    return;
+  } else {
+    freeEditRef1.value?.setValue("nPrm", parseFloat(nPrmVar));
+    // 共保业务(计算保费和总保费的比例，根据比例计算共保保费的拆分金额)
+    let nCiPrm = 0;
+    let nNotaxPrm = 0;// 不含税保费
+    let nAddedTax = 0;// 增值税
+
+    const totalPrm = freeEditRef.value?.getValue("nPrm") // 总保费
+    const totalNotaxPrm = freeEditRef.value?.getValue("nNotaxPrm") // 不含税保费
+    const totalAddedTax = freeEditRef.value?.getValue("nAddedTax") // 增值税
+    const nPrmRatio = parseFloat((parseFloat(nPrmVar) / parseFloat(totalPrm)).toFixed(2)) // 保费变化值与总保费的比例
+    nNotaxPrm = parseFloat((parseFloat(totalNotaxPrm) * nPrmRatio).toFixed(2)) // 计算后的不含税保费
+    nAddedTax = parseFloat((parseFloat(totalAddedTax) * nPrmRatio).toFixed(2)) // 计算后的增值税
+    if(params.cCiMrk !== "0") {
+      const totalCiPrm = freeEditRef.value?.getValue("nCiPrm") // 共保保费
+      nCiPrm = parseFloat((parseFloat(totalCiPrm) * nPrmRatio).toFixed(2))
+      selectRow1.value.nCiPrm = nCiPrm;
+    }
+    pageresult1.list.forEach(item => {
+      if(item.cPkId === selectRow1.value.cPkId) {
+        item.nPrm = parseFloat(nPrmVar);
+        item.nPrmVar = parseFloat(nPrmVar);
+        item.nNotaxPrm = nNotaxPrm;
+        item.nNotaxPrmVar = nNotaxPrm;
+        item.nAddedTax = nAddedTax;
+        item.nAddedTaxVar = nAddedTax;
+        if(params.cCiMrk !== "0") {
+          item.nCiPrm = nCiPrm
+        }
+      }
+    })
+    selectRow1.value.nPrm = parseFloat(nPrmVar);
+    selectRow1.value.nPrmVar = parseFloat(nPrmVar);
+    selectRow1.value.nNotaxPrm = nNotaxPrm;
+    selectRow1.value.nNotaxPrmVar = nNotaxPrm;
+    selectRow1.value.nAddedTax = nAddedTax;
+    selectRow1.value.nAddedTaxVar = nAddedTax;
+
+    //   if(nPrmVar == null || nPrmVar == '') {
+    //     ElMessage.error("保费不能为空!");
+    //     return;
+    //   }else {
+    //     const nRicurChgRate = freeEditRef1.value?.getValue("nRicurChgRate");//折再保币种汇率
+    //     const nRiPrmVar = parseFloat(nPrmVar)*parseFloat(nRicurChgRate);//折再保币种保费变化
+    //     freeEditRef1.value?.setValue("nRiPrmVar", nRiPrmVar);
+
+    //     //重新获取rowIndex 因为存在险位序号为1 但是在页面上第二行展示  这样做成数据错误
+    //     if(!selectRow1.value.nSeqNo){
+    //       ElMessage.error("请选择一条数据修改 ");
+    //       return  false;
+    //     }
+    //     const cCiMrk = freeEditRef.value?.getValue('cCiMrk');
+    //     const allPrm = freeEditRef.value?.getValue('nPrm');//全单保费
+    //     const allPrmVar = freeEditRef.value?.getValue('nPrmVar');//全单保费变化
+    //     let allCiPrm = 0.0;//全单共保保费
+    //     let allCiPrmVar = 0.0;//全单共保保费变化
+    //     //营改增
+    //     // var allNotaxPrm = tool.getAttrValue('<%=sum_unit%>','NNotaxPrm');//不含税保费
+    //     // var allAddedTax = tool.getAttrValue('<%=sum_unit%>','NAddedTax');//增值税额
+    //     // var allNotaxPrmVar = tool.getAttrValue('<%=sum_unit%>','NNotaxPrmVar');//不含税保费变化值
+    //     // var allAddedTaxVar = tool.getAttrValue('<%=sum_unit%>','NAddedTaxVar');//增值税额变化值
+    //     // var allCiNotaxPrm = tool.getAttrValue('<%=sum_unit%>','NCiNotaxPrm');//共保不含税保费
+    //     // var allCiAddedTax = tool.getAttrValue('<%=sum_unit%>','NCiAddedTax');//共保增值税额
+    //     // var allCiNotaxPrmVar = tool.getAttrValue('<%=sum_unit%>','NCiNotaxPrmVar');//共保不含税保费变化值
+    //     // var allCiAddedTaxVar = tool.getAttrValue('<%=sum_unit%>','NCiAddedTaxVar');//共保增值税额变化值
+
+    //     /* 营改增新增 */
+    //     // var allNRiTaxPrm = tool.getAttrValue('<%=sum_unit%>','NRiTaxPrm');//应税保费
+    //     // var allNRiTaxPrmVar = tool.getAttrValue('<%=sum_unit%>','NRiTaxPrmVar');//应税保费变化量
+    //     // var allNRiNotaxPrm = tool.getAttrValue('<%=sum_unit%>','NRiNotaxPrm');//免税保费
+    //     // var allNRiNotaxPrmVar = tool.getAttrValue('<%=sum_unit%>','NRiNotaxPrmVar');//免税保费变化量
+    //     // var allNRiCiTaxPrm = tool.getAttrValue('<%=sum_unit%>','NRiCiTaxPrm');//共保应税保费
+    //     // var allNRiCiTaxPrmVar = tool.getAttrValue('<%=sum_unit%>','NRiCiTaxPrmVar');//共保应税保费变化量
+    //     // var allNRiCiNotaxPrm = tool.getAttrValue('<%=sum_unit%>','NRiCiNotaxPrm');//共保免税保费
+    //     // var allNRiCiNotaxPrmVar = tool.getAttrValue('<%=sum_unit%>','NRiCiNotaxPrmVar');//共保免税保费变化量
+
+    //     if(cCiMrk == '1' || cCiMrk =='2'||cCiMrk == '3' || cCiMrk =='4'|| cCiMrk =='5'){
+    //       allCiPrm = freeEditRef1.value?.getValue('nCiPrm');
+    //       allCiPrmVar = freeEditRef1.value?.getValue('nCiPrmVar');
+    //     }
+    //     if(params.cAppTyp === "A"){ //表示投保
+    //       const nPrm = parseFloat(nPrmVar);//保费 = 保费变化
+    //       const nRiPrm = (nPrm*parseFloat(nRicurChgRate)).toFixed(2);//折再保币种保费
+
+    //       freeEditRef1.value?.setValue("nPrm",nPrm);
+    //       freeEditRef1.value?.setValue("nRiPrm",nRiPrm);
+    //       freeEditRef1.value?.setValue("nNetPrm",nPrm);//净保费
+
+    //       if(flag==1){}else{
+    //         if(cCiMrk == '1' || cCiMrk =='2'||cCiMrk == '3' || cCiMrk =='4'|| cCiMrk =='5'){
+    //           //险位共保保费 = 险位保费/我司总保费 * 全单共保总保费
+    //           const nCiPrm = (parseFloat(nPrm)/parseFloat(allPrm)*parseFloat(allCiPrm)).toFixed(2);
+    //           freeEditRef1.value?.setValue('nCiPrm',nCiPrm);
+    //           freeEditRef1.value?.setValue('nCiPrmVar',nCiPrm);
+    //           //营改增
+    //           // var NCiNotaxPrm = (parseFloat(nPrm)/parseFloat(allPrm)*parseFloat(allCiNotaxPrm)).toFixed(2);
+    //           // var NCiAddedTax = (parseFloat(nPrm)/parseFloat(allPrm)*parseFloat(allCiAddedTax)).toFixed(2);
+    //           // tool.setAttrValue(risk_unit,'NCiNotaxPrm',NCiNotaxPrm);
+    //           // tool.setAttrValue(risk_unit,'NCiNotaxPrmVar',NCiNotaxPrm);
+    //           // tool.setAttrValue(risk_unit,'NCiAddedTax',NCiAddedTax);
+    //           // tool.setAttrValue(risk_unit,'NCiAddedTaxVar',NCiAddedTax);
+    //           /*营改增新增 2018-07-13*/
+    //           // var NRiCiTaxPrm = (parseFloat(nPrm)/parseFloat(allPrm)*parseFloat(allNRiCiTaxPrm)).toFixed(2);
+    //           // var NRiCiNotaxPrm = (parseFloat(nPrm)/parseFloat(allPrm)*parseFloat(allNRiCiNotaxPrm)).toFixed(2);
+    //           // tool.setAttrValue(risk_unit,'NRiCiTaxPrm',NRiCiTaxPrm);
+    //           // tool.setAttrValue(risk_unit,'NRiCiTaxPrmVar',NRiCiTaxPrm);
+    //           // tool.setAttrValue(risk_unit,'NRiCiNotaxPrm',NRiCiNotaxPrm);
+    //           // tool.setAttrValue(risk_unit,'NRiCiNotaxPrmVar',NRiCiNotaxPrm);
+    //         }
+    //         //营改增
+    //         // var NNotaxPrm = (parseFloat(nPrm)/parseFloat(allPrm)*parseFloat(allNotaxPrm)).toFixed(2);
+    //         // var NAddedTax = (parseFloat(nPrm)/parseFloat(allPrm)*parseFloat(allAddedTax)).toFixed(2);
+    //         // tool.setAttrValue(risk_unit,'NNotaxPrmVar',NNotaxPrm);
+    //         // tool.setAttrValue(risk_unit,'NAddedTaxVar',NAddedTax);
+    //         // tool.setAttrValue(risk_unit,'NNotaxPrm',NNotaxPrm);
+    //         // tool.setAttrValue(risk_unit,'NAddedTax',NAddedTax);
+    //         /*营改增新增 2018-07-13*/
+    //         // var NRiTaxPrm = (parseFloat(nPrm)/parseFloat(allPrm)*parseFloat(allNRiTaxPrm)).toFixed(2);
+    //         // var NRiNotaxPrm = (parseFloat(nPrm)/parseFloat(allPrm)*parseFloat(allNRiNotaxPrm)).toFixed(2);
+    //         // tool.setAttrValue(risk_unit,'NRiTaxPrm',NRiTaxPrm);
+    //         // tool.setAttrValue(risk_unit,'NRiTaxPrmVar',NRiTaxPrm);
+    //         // tool.setAttrValue(risk_unit,'NRiNotaxPrm',NRiNotaxPrm);
+    //         // tool.setAttrValue(risk_unit,'NRiNotaxPrmVar',NRiNotaxPrm);
+    //       }
+
+    //     }else{//表示批改
+    // //       var oldNPrm = tool.getFieldOldValue(risk_unit, rowIndex, "NPrm");//原来保费值
+    // //           var oldNPrmVar = tool.getFieldOldValue(risk_unit, rowIndex, "NPrmVar");//保费变化
+    // //           oldNPrm = ("" == oldNPrm || null == oldNPrm) ? 0 : oldNPrm;
+    // //           oldNPrmVar = ("" == oldNPrmVar || null == oldNPrmVar) ? 0 : oldNPrmVar;
+
+    // //       //当前保费  = 现险位变化 - 原险位变化 + 原险位保费
+    // //       var nPrmEdr = parseFloat(nPrmVar)-parseFloat(oldNPrmVar)+parseFloat(oldNPrm);
+    // //       tool.setAttrValue(risk_unit,"NPrm",nPrmEdr);
+    // //       var nRiPrmEdr = (parseFloat(nPrmEdr)*parseFloat(nRicurChgRate)).toFixed(2);//折再保保费
+    // //       tool.setAttrValue(risk_unit,"NRiPrm",nRiPrmEdr);
+    // //       tool.setAttrValue(risk_unit,"NNetPrm",nPrmEdr);//净保费
+    // //       if(flag==1){}else{
+    // //         if(cCiMrk == '1' || cCiMrk =='2'||cCiMrk == '3' || cCiMrk =='4'|| cCiMrk =='5'){
+    // //           //共保保费变化 = 页面变动后的保费变化/我司总保费变化 * 共保总保费变化
+    // //           var nCiPrmVarEdr = (parseFloat(nPrmVar)/parseFloat(allPrmVar)*parseFloat(allCiPrmVar)).toFixed(2);
+    // //           tool.setAttrValue(risk_unit,'NCiPrmVar',nCiPrmVarEdr);
+    // //           //险位共保保费  = 变化后险位共保保费变化 - 原险位共保保费变化 + 险位原共保保费
+    // //           var oldCiPrmVar = tool.getFieldOldValue(risk_unit, rowIndex, "NCiPrmVar");
+    // //           var oldCiPrm = tool.getFieldOldValue(risk_unit, rowIndex, "NCiPrm");
+    // //           var nCiPrmEdr = parseFloat(nCiPrmVarEdr)-parseFloat(oldCiPrmVar)+parseFloat(oldCiPrm);
+    // //           tool.setAttrValue(risk_unit,"NCiPrm",nCiPrmEdr);
+
+    // //           var CiNotaxPrmVarEdr = (parseFloat(nPrmVar)/parseFloat(allPrmVar)*parseFloat(allCiNotaxPrmVar)).toFixed(2);
+    // //           tool.setAttrValue(risk_unit,'NCiNotaxPrmVar',CiNotaxPrmVarEdr);
+    // //           var oldCiNotaxPrmVar = tool.getFieldOldValue(risk_unit, rowIndex, "NCiNotaxPrmVar");
+    // //           var oldCiNotaxPrm = tool.getFieldOldValue(risk_unit, rowIndex, "NCiNotaxPrm");
+    // //           var CiNotaxPrmEdr = parseFloat(CiNotaxPrmVarEdr)-parseFloat(oldCiNotaxPrmVar)+parseFloat(oldCiNotaxPrm);
+    // //           tool.setAttrValue(risk_unit,"NCiNotaxPrm",CiNotaxPrmEdr);
+
+    // //           var CiNAddedTaxVarEdr = (parseFloat(nPrmVar)/parseFloat(allPrmVar)*parseFloat(allCiAddedTaxVar)).toFixed(2);
+
+    // //           tool.setAttrValue(risk_unit,'NCiAddedTaxVar',CiNAddedTaxVarEdr);
+    // //           var oldCiAddedTaxVar = tool.getFieldOldValue(risk_unit, rowIndex, "NCiAddedTaxVar");
+    // //           var oldCiAddedTax = tool.getFieldOldValue(risk_unit, rowIndex, "NCiAddedTax");
+    // //           var CiAddedTaxEdr = parseFloat(CiNAddedTaxVarEdr)-parseFloat(oldCiAddedTaxVar)+parseFloat(oldCiAddedTax);
+    // //           tool.setAttrValue(risk_unit,"NCiAddedTax",CiAddedTaxEdr);
+
+    // //           /*营改增 2018-07-13*/
+    // //           var NRiCiTaxPrmVarEdr = (parseFloat(nPrmVar)/parseFloat(allPrmVar)*parseFloat(allNRiCiTaxPrmVar)).toFixed(2);
+    // //           tool.setAttrValue(risk_unit,'NRiCiTaxPrmVar',NRiCiTaxPrmVarEdr);
+    // //           var oldNRiCiTaxPrmVar = tool.getFieldOldValue(risk_unit, rowIndex, "NRiCiTaxPrmVar");
+    // //           var oldNRiCiTaxPrm = tool.getFieldOldValue(risk_unit, rowIndex, "NRiCiTaxPrm");
+    // //           var NRiCiTaxPrmEdr = parseFloat(NRiCiTaxPrmVarEdr)-parseFloat(oldNRiCiTaxPrmVar)+parseFloat(oldNRiCiTaxPrm);
+    // //           tool.setAttrValue(risk_unit,"NRiCiTaxPrm",NRiCiTaxPrmEdr);
+
+    // //           var NRiCiNotaxPrmVarEdr = (parseFloat(nPrmVar)/parseFloat(allPrmVar)*parseFloat(allNRiCiNotaxPrmVar)).toFixed(2);
+    // //           tool.setAttrValue(risk_unit,'NRiCiNotaxPrmVar',NRiCiNotaxPrmVarEdr);
+    // //           var oldNRiCiNotaxPrmVar = tool.getFieldOldValue(risk_unit, rowIndex, "NRiCiNotaxPrmVar");
+    // //           var oldNRiCiNotaxPrm = tool.getFieldOldValue(risk_unit, rowIndex, "NRiCiNotaxPrm");
+    // //           var NRiCiNotaxPrmEdr = parseFloat(NRiCiNotaxPrmVarEdr)-parseFloat(oldNRiCiNotaxPrmVar)+parseFloat(oldNRiCiNotaxPrm);
+    // //           tool.setAttrValue(risk_unit,"NRiCiNotaxPrm",NRiCiNotaxPrmEdr);
+    // //         }
+    // //           //营改增
+    // //       var NotaxPrmVarEdr = (parseFloat(nPrmVar)/parseFloat(allPrmVar)*parseFloat(allNotaxPrmVar)).toFixed(2);
+    // //       tool.setAttrValue(risk_unit,'NNotaxPrmVar',NotaxPrmVarEdr);
+    // //       var oldNotaxPrmVar = tool.getFieldOldValue(risk_unit, rowIndex, "NNotaxPrmVar");
+    // //       var oldNotaxPrm = tool.getFieldOldValue(risk_unit, rowIndex, "NNotaxPrm");
+    // //       var NotaxPrmEdr = parseFloat(NotaxPrmVarEdr)-parseFloat(oldNotaxPrmVar)+parseFloat(oldNotaxPrm);
+    // //       tool.setAttrValue(risk_unit,"NNotaxPrm",NotaxPrmEdr);
+
+    // //       var NAddedTaxVarEdr = (parseFloat(nPrmVar)/parseFloat(allPrmVar)*parseFloat(allAddedTaxVar)).toFixed(2);
+    // //       tool.setAttrValue(risk_unit,'NAddedTaxVar',NAddedTaxVarEdr);
+    // //       var oldAddedTaxVar = tool.getFieldOldValue(risk_unit, rowIndex, "NAddedTaxVar");
+    // //       var oldAddedTax = tool.getFieldOldValue(risk_unit, rowIndex, "NAddedTax");
+    // //       var AddedTaxEdr = parseFloat(NAddedTaxVarEdr)-parseFloat(oldAddedTaxVar)+parseFloat(oldAddedTax);
+    // //       tool.setAttrValue(risk_unit,"NAddedTax",AddedTaxEdr);
+
+    // //       /* 营改增 2018-07-13*/
+    // //       var NRiTaxPrmVarEdr = (parseFloat(nPrmVar)/parseFloat(allPrmVar)*parseFloat(allNRiTaxPrmVar)).toFixed(2);
+    // //       tool.setAttrValue(risk_unit,'NRiTaxPrmVar',NRiTaxPrmVarEdr);
+    // //       var oldNRiTaxPrmVar = tool.getFieldOldValue(risk_unit, rowIndex, "NRiTaxPrmVar");
+    // //       var oldNRiTaxPrm = tool.getFieldOldValue(risk_unit, rowIndex, "NRiTaxPrm");
+    // //       var NRiTaxPrmEdr = parseFloat(NRiTaxPrmVarEdr)-parseFloat(oldNRiTaxPrmVar)+parseFloat(oldNRiTaxPrm);
+    // //       tool.setAttrValue(risk_unit,"NRiTaxPrm",NRiTaxPrmEdr);
+
+    // // var NRiNotaxPrmVarEdr = (parseFloat(nPrmVar)/parseFloat(allPrmVar)*parseFloat(allNRiNotaxPrmVar)).toFixed(2);
+    // //       tool.setAttrValue(risk_unit,'NRiNotaxPrmVar',NRiNotaxPrmVarEdr);
+    // //       var oldNRiNotaxPrmVar = tool.getFieldOldValue(risk_unit, rowIndex, "NRiNotaxPrmVar");
+    // //       var oldNRiNotaxPrm = tool.getFieldOldValue(risk_unit, rowIndex, "NRiNotaxPrm");
+    // //       var NRiNotaxPrmEdr = parseFloat(NRiNotaxPrmVarEdr)-parseFloat(oldNRiNotaxPrmVar)+parseFloat(oldNRiNotaxPrm);
+    // //       tool.setAttrValue(risk_unit,"NRiNotaxPrm",NRiNotaxPrmEdr);
+
+    // //       }
+    //     }
+    //     setRowReadOnly();
+  }
+}
 </script>
 
 <style scoped>
@@ -993,5 +1772,16 @@ function saveDatas(row: any) {
   text-align: right;
   padding: 10px 0 10px;
   margin-top: 20px;
+}
+:deep(form .el-col:nth-child(4) .el-form-item__label-wrap),
+:deep(form .el-col:nth-child(6) .el-form-item__label-wrap),
+:deep(form .el-col-6:nth-child(8) .el-form-item__label-wrap),
+:deep(form .el-col-6:nth-child(10) .el-form-item__label-wrap),
+:deep(form .el-col:nth-child(12) .el-form-item__label-wrap),
+:deep(form .el-col:nth-child(14) .el-form-item__label-wrap) {
+  margin-left: -20px !important;
+}
+:deep(.el-table__header-wrapper .el-table-column--selection .el-checkbox) {
+  display: none;
 }
 </style>

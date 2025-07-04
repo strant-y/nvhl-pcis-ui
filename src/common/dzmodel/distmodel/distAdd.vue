@@ -74,10 +74,15 @@ const formconfig1 = ref<AppFreeEditConfig>(
               {
                 cProdNo: route.params.param.cProdNo,
                 cComponentTable: cComponentTable.value,
-                cAppNo: appNo.value,
+                // cAppNo: appNo.value,
               },
               { dist: s }
             );
+            if(route.params.param?.pageName === "priceInquiry") {
+              params.cInquiryNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+            } else {
+              params.cAppNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+            }
             console.log('params', params)
             saveDist(params).then((res) => {
               if (res.code === 200) {

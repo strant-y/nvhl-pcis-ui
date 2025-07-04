@@ -4,23 +4,37 @@
     <el-container>
       <el-main>
         <el-container>
-          <el-aside width="150px">
+          <el-aside>
             <template v-for="(pageConfig, v) in formconfig1" :key="v">
-              <el-affix :offset="150">
-                <el-anchor :bound="120" :offset="80">
+              <el-affix :offset="0">
+                <el-anchor :bound="120" :offset="10" container="#main-container" ref="anchorRef">
                   <el-anchor-link
                     v-for="(k, i) in pageConfig?.pageInfo"
                     :key="i"
                     :href="`#${k.pageKey}`"
                   >
-                    {{ k.pageTtile }}
+                    <i :class="['icon','iconfont',iconMap[k.pageKey]]"></i>
+                    <div class="icon-title">
+                      <template v-if="k.pageTtile && k.pageTtile.length > 6">
+                        <el-tooltip
+                          effect="dark"
+                          :content="k.pageTtile"
+                          placement="top-start"
+                        >
+                          {{ k.pageTtile.substring(0, 6) + "..." }}
+                        </el-tooltip>
+                      </template>
+                      <template v-else>
+                        {{ k.pageTtile }}
+                      </template>
+                    </div>
                   </el-anchor-link>
                 </el-anchor>
               </el-affix>
             </template>
           </el-aside>
           <el-container>
-            <el-main>
+            <el-main id="main-container" style="padding: 10px;">
               <template v-for="(pageConfig, v) in formconfig1" :key="v">
                 <div
                   v-for="(k, i, index) in pageConfig?.pageInfo"
@@ -164,6 +178,7 @@ opertaor.setTableConfig([
 ]);
 
 const btns = {};
+const anchorRef = ref(null);
 onMounted(() => {
   formconfig1.forEach((ele) => {
     if (param.type !== "approve" || param.editType === "view") {
@@ -173,6 +188,11 @@ onMounted(() => {
     }
   });
   renderComponents();
+  nextTick(() => {
+    const keys = Object.keys(formconfig1[0].pageInfo)
+    const href = '#' + formconfig1[0].pageInfo[keys[0]]?.pageKey
+    anchorRef.value[0]?.scrollTo(href);
+  })
 });
 
 function renderComponents() {
@@ -228,6 +248,59 @@ function setData(datas: any) {
     ref.setFormValue(datas[k]);
   });
 }
+
+const iconMap = {
+  'prodInfo': 'icon-wenjianban1',
+  'relatedMainInsurance': 'icon-zaibaoxinxi',
+  'specialAgreement': 'icon-anjiantiaocha',
+  'relatedBusinessRules': 'icon-lishiyijian',
+  'relatedPremCalcuRules': 'icon-qitafeiyong',
+  'relatedPayOrderConf': 'icon-yufuxinxi',
+  'planConfigration': 'icon-xianbiexinxi',
+  'rateConfiguration': 'icon-jiaonafeiyong',
+  'InstituTaxRateAllocat': 'icon-jinetiaozheng',
+  'assoCorrPreCalculFormula': 'icon-yishoubaodan',
+  'prodComponent': 'icon-tiaoduxinxi',
+  'priceComponent': 'icon-tiaodumingxi',
+}
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped>
+.el-main {
+  padding: 0;
+  height: calc(100vh - 45px - 34px);
+  overflow: hidden;
+  overflow-y: auto;
+  .el-aside {
+    width: auto;
+    .el-affix {
+      height: 100%;
+      background: var(--el-color-primary);
+    }
+  }
+}
+:deep(.el-anchor) {
+  background: transparent;
+  .el-anchor__list {
+    padding: 10px 5px;
+    .el-anchor__item {
+      margin-bottom: 10px;
+      .el-anchor__link {
+        font-size: 12px;
+        color: #FFF;
+        text-align: center;
+        padding: 0;
+        opacity: 0.6;
+        &.is-active {
+          opacity: 1;
+        }
+        .iconfont {
+          font-size: 1.5rem;
+          color: #FFF;
+          margin: 5px 0;
+        }
+      }
+    }
+  }
+}
+</style>
