@@ -288,3 +288,11 @@ export function getInquiryPolicyList(queryParams: any): AxiosPromise<any> {
 export function delInquiryPolicy(queryParams: any): AxiosPromise<any> {
     return post(`/policy/delInquiryPolicy`, queryParams);
 }
+
+/**
+ * 询价-获取询价单数据
+ * @param queryParams
+ */
+export function getInquiryPolicy(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/getInquiryPolicy`, queryParams);
+}
