@@ -220,10 +220,16 @@ const method = {
     );
   },
   delmethod: (row: any) => {
-    deleteDist({
+    const param = {
       cComponentTable: cComponentTableValue,
       cPkId: [row['Dist.cPkId']],
-    }).then((res: any) => {
+    }
+    if(route.params.param?.pageName === "priceInquiry") {
+      param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else {
+      param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+    }
+    deleteDist(param).then((res: any) => {
       if (res.code === 200) {
         ElMessage.success("删除成功");
         const queryParams = distTableRef.value?.getPartnerPage(false);
@@ -234,10 +240,15 @@ const method = {
   //  042003 根据电梯条数反
   funcdistadd: () => {
     const alldata: any = opertaor.getDataAll();
-    let baseFlag = alldata['plyBase']["Base.cAppNo"];
+    const param = {};
+    if(route.params.param?.pageName === "priceInquiry") {
+      param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else {
+      param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+    }
 
     let fromSchema = tableconfig.value.fromSchema;
-    checkAppBase({ cAppNo: baseFlag }).then((res: any) => {
+    checkAppBase(param).then((res: any) => {
       if (res.code === 200) {
         dialog.value?.open(
             "distAdd",
@@ -351,8 +362,13 @@ const method = {
   //   });
   // },
   carInfoAdd: () => {
-    let baseFlag = opertaor.getDataAll().plyBase["Base.cAppNo"];
-    checkAppBase({ cAppNo: baseFlag }).then((res) => {
+    const param = {};
+    if(route.params.param?.pageName === "priceInquiry") {
+      param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else {
+      param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+    }
+    checkAppBase(param).then((res) => {
       if (res.code === 200) {
         dialog.value?.open(
             "distAdd",

@@ -539,8 +539,13 @@ const method = {
     // let baseFlag = alldata['plyBase']["Base.cAppNo"];
 
  
-
-    checkAppBase({ cAppNo: cAppNo }).then((res: any) => {
+    const param = {};
+    if(route.params.param?.pageName === "priceInquiry") {
+      param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else {
+      param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+    }
+    checkAppBase(param).then((res: any) => {
       if (res.code === 200) {
         wagesInfoModel();
       } else {
