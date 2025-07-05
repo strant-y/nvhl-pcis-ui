@@ -22,7 +22,33 @@
             "
             v-if="!item.group"
           >
-            <template v-if="item.inputtype === 'rtinputgroup'">
+            <template v-if="item.inputtype === 'rtButton'">
+              
+              <el-form-item
+                :rules="item.rules ? item.rules : undefined"
+                :prop="item.prop"
+                :label-position="
+                  item.inputtype === 'rttable' ? 'top' : undefined // table 组件,默认标题显示在top上
+                "
+              >
+              <template #label>
+                  <template v-if="item.title?.length > 8">
+                    <el-tooltip
+                      effect="dark"
+                      :content="item.title"
+                      placement="top-start"
+                    >
+                      {{ item.title.substring(0, 8) + "..." }}
+                    </el-tooltip>
+                  </template>
+                  <template v-else>
+                    {{ item.title }}
+                  </template>
+                </template>
+              <rtButton :item="item.btnItems" />
+            </el-form-item>
+            </template>
+            <template v-else-if="item.inputtype === 'rtinputgroup'">
               <el-form-item :required="checkRequired(item)">
                 <template #label>
                   <template v-if="item.title?.length > 8">
@@ -88,7 +114,7 @@
                     {{ item.title }}
                   </template>
                 </template>
-                <div :style="{ width: '100%' }">
+                <div :style="{width: ( item.propWidth ? item.propWidth : 100) + '%' }">
                   <div
                     :style="{
                       width:
@@ -117,7 +143,7 @@
                     >
                       <rt-button
                         :item="item.btnItems"
-                        :style="{ width: '100%', }"
+                        :style="{ width: '100%' }"
                         @closepopover="(rev) => setPopover(rev, item)"
                       />
                     </div>
@@ -242,7 +268,7 @@
                         {{ item.title }}
                       </template>
                     </template>
-                    <div :style="{ width: '100%' }">
+                    <div :style="{width: ( item.propWidth ? item.propWidth : 100) + '%' }">
                       <div
                         :style="{
                           width:
@@ -271,7 +297,7 @@
                         >
                           <rt-button
                             :item="item.btnItems"
-                            :style="{ width: '100%', }"
+                            :style="{ width: '100%' }"
                             @closepopover="(rev) => setPopover(rev, item)"
                           />
                         </div>
