@@ -1838,6 +1838,8 @@ const loadAppPlyInfo = async (CAppNo) => {
     param["CPlyNo"] = CAppNo;
   } else if (props.param.pageName === "priceInquiry") {
     param["cInquiryNo"] = CAppNo;
+  }else{
+     param["cAppNo"] = CAppNo;
   }
   if(props.param?.cPkId) {// 查询模板明细
     const res = await policyService.getTemplate(props.param?.cPkId);
