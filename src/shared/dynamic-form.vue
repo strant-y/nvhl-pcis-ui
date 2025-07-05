@@ -94,8 +94,6 @@
                       item.showExBtn && item.inputtype !== 'rttable' // 显示组件尾部按钮 table 组件不显示尾部按钮
                         ? (item.btnWidth ? 100 - item.btnWidth : 75) + '%'
                         : '100%',
-                    display: 'flex',
-                    alignItems: 'flex-start',
                   }"
                 >
                   <from-item
@@ -105,19 +103,20 @@
                     :parentFromUi="formUi"
                     @update-method="formsDataUpdate"
                   />
+                  <!---       显示组件尾部按钮       --->
+                  <template v-if="item.showExBtn">
+                    <rt-button
+                      v-if="item.inputtype !== 'rttable'"
+                      :style="{
+                        width: (item.btnWidth ? item.btnWidth : 25) + '%'
+                      }"
+                      :item="item.btnItems"
+                      @closepopover="(rev) => setPopover(rev, item)"
+                    />
+                  </template>
                 </div>
 
-                <!---       显示组件尾部按钮       --->
-                <template v-if="item.showExBtn">
-                  <rt-button
-                    v-if="item.inputtype !== 'rttable'"
-                    :style="{
-                      width: (item.btnWidth ? item.btnWidth : 25) + '%'
-                    }"
-                    :item="item.btnItems"
-                    @closepopover="(rev) => setPopover(rev, item)"
-                  />
-                </template>
+                
               </el-form-item>
             </template>
           </el-col>
@@ -239,11 +238,10 @@
                   </template>
                   <div
                     :style="{
-                      // width:
-                      //   item.showExBtn && item.inputtype !== 'rttable'
-                      //     ? (item.btnWidth ? 100 - item.btnWidth : 75) + '%'
-                      //     : '100%',
-                      flex: 1,
+                      width:
+                        item.showExBtn && item.inputtype !== 'rttable'
+                          ? (item.btnWidth ? 100 - item.btnWidth : 75) + '%'
+                          : '100%',
                     }"
                   >
                     <from-item
@@ -259,7 +257,7 @@
                   <rt-button
                     v-if="item.showExBtn && item.inputtype !== 'rttable'"
                     :style="{
-                      width: item.btnWidth ? item.btnWidth + '%' : 'auto',
+                      width: (item.btnWidth ? item.btnWidth : 25) + '%'
                     }"
                     :item="item.btnItems"
                   />
