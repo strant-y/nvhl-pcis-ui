@@ -636,6 +636,7 @@ defineExpose({
 .rt_group_title {
   font-weight: bold;
   font-size: 16px;
+  padding: 12px;
 }
 .rt_group_icon {
   float: right;
