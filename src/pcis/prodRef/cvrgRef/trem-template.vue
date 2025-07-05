@@ -399,13 +399,10 @@ const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
 function update() {
   let newData;
 
-  if (
-    termTitleConf.value.cFactorTabType === "grid" ||
-    termTitleConf.value.cFactorTabType === "table"
-  ) {
-    newData = termdata.value;
-  } else {
+  if( termTitleConf.value.cFactorTabType === "free" ){
     newData = termRef.value?.getFromValue();
+  } else {
+    newData = termdata.value;
   }
   const fromc = termFactormap.value?.filter(
     (v: any) => v.cPorpShowtitle === "1"
