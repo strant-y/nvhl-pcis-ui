@@ -318,10 +318,10 @@ defineExpose({
   border: 1px solid #ddd;
   box-shadow: 0 0 2px rgb(0 0 0 / 30%);
 }
-.card-title-style{
+/* .card-title-style{
   font-weight: 700;
   font-size: 20px;
   letter-spacing: 10px;
   margin-left: 8px;
-}
+} */
 </style>

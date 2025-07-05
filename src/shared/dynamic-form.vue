@@ -659,7 +659,7 @@ defineExpose({
   background: #f2f2f2;
   margin-bottom: 10px;
 }
-.rt_group_title {
+/* .rt_group_title {
   font-weight: bold;
   font-size: 16px;
   padding: 12px;
@@ -668,5 +668,5 @@ defineExpose({
   float: right;
   margin-right: 10px;
   cursor: pointer;
-}
+} */
 </style>
