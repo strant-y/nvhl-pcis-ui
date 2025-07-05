@@ -119,7 +119,7 @@
                     :style="{
                       width:
                         item.showExBtn && item.inputtype !== 'rttable' // 显示组件尾部按钮 table 组件不显示尾部按钮
-                          ? (item.btnWidth ? 100 - item.btnWidth : 75) + '%'
+                          ? (item.btnWidth ? 100 - item.btnWidth : 85) + '%'
                           : '100%',
                       display: 'inline-block',
                     }"
@@ -138,7 +138,7 @@
                       v-if="item.inputtype !== 'rttable'"
                       :style="{
                         display: 'inline-block',
-                        width: (item.btnWidth ? item.btnWidth : 25) + '%',
+                        width: (item.btnWidth ? item.btnWidth : 15) + '%',
                       }"
                     >
                       <rt-button
@@ -273,7 +273,7 @@
                         :style="{
                           width:
                             item.showExBtn && item.inputtype !== 'rttable' // 显示组件尾部按钮 table 组件不显示尾部按钮
-                              ? (item.btnWidth ? 100 - item.btnWidth : 75) + '%'
+                              ? (item.btnWidth ? 100 - item.btnWidth : 85) + '%'
                               : '100%',
                           display: 'inline-block',
                         }"
@@ -292,7 +292,7 @@
                           v-if="item.inputtype !== 'rttable'"
                           :style="{
                             display: 'inline-block',
-                            width: (item.btnWidth ? item.btnWidth : 25) + '%',
+                            width: (item.btnWidth ? item.btnWidth : 15) + '%',
                           }"
                         >
                           <rt-button
