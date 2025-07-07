@@ -18,6 +18,7 @@ const props = defineProps({
   }
 });
 const formPage = ref(new FormPage('enteringDtl'));
+const resData = ref({});
 const idxParam = reactive({
   formPage: formPage.value,
   param: { ...props.param, ...{}},
@@ -102,19 +103,22 @@ function save() {
   }).then((res: any) => {
     if(res.code === 200) {
       ElMessage.success('保存成功')
+      console.log('res', res);
+      // console.log('000', formPage.value.getComponentConfigById("AgreementBase"))
+      resData = res.res.composition["ECargoBase"]
+      // resData["ECargoBase.cEcAgrAppNo"]
+      console.log('resData', resData);
     }else {
       ElMessage.success(res.msg);
     }
   });
 
-  const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase');
-  console.log('AgreementBaseRef', agreementBaseRef);
+  
+  const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
+  console.log('AgreementBaseRef', agreementBaseRef,agreementBaseRef["ECargoBase.cChaType"]);
+  agreementBaseRef.setValue('ECargoBase.cOpenCoverNo', resData['ECargoBase.cEcAgrNo'])
   const agreementDistInsuredRef = formPage.value?.getComponentRefById('AgreementDistInsured');
   const agreementCvrgRef = formPage.value?.getComponentRefById('AgreementCvrg');
-
-  // const agreementDistGoodsRef = formPage.value?.getComponentRefById('AgreementSpecial');
-  // const formBtn = agreementDistGoodsRef.getFormBtn();
-  // const tableBtn = agreementCvrgRef.getTableBtn();
 }
 
 function submit() {
@@ -137,7 +141,65 @@ function submit() {
     }
   });
 }
+// 绑定特殊验证器
+const exRules = {};
 
+function getFormValue() {
+  return cvrgEditRef?.value?.getFromValue();
+}
+
+function setFormValue(value: any) {
+  cvrgEditRef?.value?.setFormValue(value);
+}
+
+function validate() {
+  return cvrgEditRef?.value?.validate();
+}
+
+function getTableValue(rowId: number, key: string) {
+  cvrgEditRef?.value?.getTableValue(rowId, key);
+}
+
+function getFormConfig() {
+  return formconfig1;
+}
+//给表单赋值
+function setFormItem(key: any, obj: any) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.btnItems && obj.btnItems) {
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
+          }
+        } else {
+          Object.assign(item, obj);
+        }
+      }
+    });
+  }
+}
+function getFormBtn() {
+  return cvrgEditRef?.value?.getFormBtn();
+}
+function getTableBtn() {
+  return cvrgEditRef?.value?.getTableBtn();
+}
+function setDisabledAll(isDisabled: boolean) {
+  cvrgEditRef?.value?.setDisabledAll(isDisabled);
+}
+defineExpose({
+  getFormValue,
+  setFormValue,
+  validate,
+  getTableValue,
+  getFormConfig,
+  setFormItem,
+  getFormBtn,
+  setDisabledAll,
+  getTableBtn
+});
 </script>
 <style lang="scss" scoped>
 </style>

@@ -294,6 +294,9 @@ const method = {
     } else {
       selData['cAppNo'] = app;
     }
+    if(route.params.param?.pageType && route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
+      selData.voType = "ply"
+    }
     selectDist(selData).then((res: any) => {
       if (res.code === 200) {
         pageresult.list = [];
@@ -403,6 +406,9 @@ const method = {
       cComponentTable: cComponentTableValue,
       cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
     });
+    if(route.params.param?.pageType && route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
+      paramitem.voType = "ply"
+    }
     policyService
         .exportDist(paramitem).then((res) => {
       if (res.size <= 0) {
@@ -543,6 +549,7 @@ const method = {
     const param = {
       ...formconfig1.value,
       cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
+      cComponentTable: cComponentTableValue,
     }
     policyService
         .downloadDistTemplateIncrement(param)

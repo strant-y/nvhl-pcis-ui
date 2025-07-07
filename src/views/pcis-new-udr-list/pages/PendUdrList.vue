@@ -199,7 +199,7 @@
         },
         {
             prop: "bsType",
-            inputtype: "rtradio",
+            inputtype: "rtcheckboxgroup",
             title: "申请单类型",
             showKey: [1],
             minWidth: 180,
