@@ -1901,6 +1901,13 @@ const loadAppPlyInfo = async (CAppNo) => {
       pageData.value = ops;
       ElMessage.success(res.msg);
       opertaor.setDataAll(ops);
+      // 获取原申请单号下的清单列表数据
+      const distMap = formconfig1[0].pageInfo.filter((item:any) => {
+        return item.pageKey === "dist" || item.pageKey === "distSummary";
+      });
+      distMap.forEach((item:any) => {
+        getDistData(ops.plyBase['Base.cInquiryNo'], item)
+      });
     }
   } else {
     const res = await getAppPolicy(param);
