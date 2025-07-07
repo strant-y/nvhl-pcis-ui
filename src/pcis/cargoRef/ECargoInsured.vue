@@ -69,8 +69,6 @@ let cComponentTableValue: string;
 
 // 封装获取 cComponentTableValue 的逻辑
 const getCComponentTableValue = (compKey: string): string => {
-
-
   return "";
 };
 
@@ -203,6 +201,7 @@ const method = {
     const idx = pageresult.list.findIndex((item: any) => row._dataId = item._dataId);
     pageresult.list.splice(idx, 1)
   },
+  
 
   // 同投保人按钮点击事件
   applicantToInsured: () => {

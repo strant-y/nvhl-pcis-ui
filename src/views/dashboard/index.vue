@@ -74,12 +74,6 @@
             </div> -->
           </div>
           <div class="content-charts-box">
-            <div class="tab-box">
-              <!-- <div class="tab-btns">
-                <rtButton :item="issueBtnItem"/>
-                <rtButton :item="nPrmBtnItem"/>
-              </div> -->
-            </div>
             <div class="echarts-box" style="display: flex;">
               <div ref="ecahrtsRef" class="echarts-container" :style="{ width: chartWidth, height: chartHeight }"></div>
               <div ref="ecahrtsRef1" class="echarts-container" :style="{ width: chartWidth, height: chartHeight }"></div>
@@ -289,7 +283,7 @@ const echartsOptions = reactive({
   grid: {
     left: '5%',
     right: '5%',
-    bottom: '25%',
+    bottom: '10%',
     top: '10%',
     // height: 150,
     containLabel: true
@@ -393,7 +387,7 @@ const echartsOptions1 = reactive({
   grid: {
     left: '5%',
     right: '5%',
-    bottom: '25%',
+    bottom: '10%',
     top: '10%',
     // height: 150,
     containLabel: true
@@ -1015,7 +1009,7 @@ window.addEventListener('resize', () => {
 
     .top-box {
       width: 100%;
-      margin-bottom: 1.5rem;
+      margin-bottom: 0.5rem;
 
       .top-title1 {
         width: 100%;
@@ -1028,12 +1022,12 @@ window.addEventListener('resize', () => {
       .top-title2 {
         font-size: .8rem;
         color: #333;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
       }
 
       .top-search {
         width: 100%;
-        height: 3.2rem;
+        height: 2.5rem;
         display: flex;
         align-items: center;
         background: #FFFFFF;
@@ -1049,7 +1043,7 @@ window.addEventListener('resize', () => {
 
       .top-menu {
         display: flex;
-        padding: 20px 0;
+        padding: 15px 0;
         color: #333;
         font-weight: bold;
         .menu-label {
@@ -1078,7 +1072,7 @@ window.addEventListener('resize', () => {
         background: #fff;
         box-shadow: 0 0 .4rem #0000001a;
         border-radius: 5px;
-        padding: 2rem;
+        padding: 1rem 1.5rem;
         display: flex;
         flex-direction: column;
 
@@ -1109,7 +1103,7 @@ window.addEventListener('resize', () => {
 
         .content-details-box {
           display: grid;
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: 1fr 1fr 1fr;
           color: #666;
 
           .content-details {
@@ -1127,6 +1121,7 @@ window.addEventListener('resize', () => {
           }
         }
         .content-charts-box {
+          margin-top: 10px;
           .tab-box {
             display: flex;
             justify-content: end;
@@ -1142,7 +1137,7 @@ window.addEventListener('resize', () => {
         background: #fff;
         box-shadow: 0 0 .4rem #0000001a;
         border-radius: 5px;
-        padding: 2rem 1rem;
+        padding: 1rem;
         display: flex;
         flex-direction: column;
         .user-box {

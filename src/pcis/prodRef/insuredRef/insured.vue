@@ -212,8 +212,8 @@ const method = {
     checkUser(); // 根据名称  被保人性质 证件类型 证件号码查询用户信息
   },
   funccopyvalue: () => {
-    const tabref = opertaor.getTableRefs();
-    const applicantValue = tabref["applicant"].getFromValue();
+    const tabref = opertaor.getTableRefByKey("applicant");
+    const applicantValue = tabref.getFromValue();
     console.log(applicantValue);
     let insuredValue: any = {};
     for (const k in applicantValue) {
@@ -230,8 +230,7 @@ const method = {
         insuredValue[nk] = applicantValue[k];
       }
     }
-    console.log(insuredValue);
-    tabref["insured"].setFormValue(insuredValue);
+    setFormValue(insuredValue);
   },
   funcquery: () => {
     const param = opertaor.getParam();
@@ -964,21 +963,23 @@ const method = {
     // productStore.$state.cClntMrk == "0";
     // setFormItem("Insured.cCntrNme", { hidden: false });
   },
+
+  
   //注册地址
   getProp: (val: any) => {
-    setRegisterAdd();
-  },
-  //常住地址
-  getAllProp: (val: any) => {
     setregistAdd();
-  },
-  //注册地址(input)
-  getcSuffixAddr: (val: any) => {
-    setRegisterAdd();
   },
   //常住地址(input)
-  getcRegisterSuffixAddr: (val: any) => {
+  getcSuffixAddr: (val: any) => {
     setregistAdd();
+  },
+  //注册地址
+  getAllProp: (val: any) => {
+    setRegisterAdd();
+  },
+  //注册地址(input)
+  getcRegisterSuffixAddr: (val: any) => {
+    setRegisterAdd();
   },
   // 读取身份证
   readIdCard: (val: any) => {
@@ -1079,9 +1080,9 @@ const method = {
 };
 
 function setregistAdd() {
-  const ads = insuredEditRef?.value?.getValue("Insured.AllProp");
+  const ads = insuredEditRef?.value?.getValue("Insured.ClntAddrProp");
   const a =
-    insuredEditRef?.value?.getValue("Insured.cRegisterSuffixAddr") || "";
+    insuredEditRef?.value?.getValue("Insured.cSuffixAddr") || "";
   if (ads) {
     getAddressStr({ address: ads }).then((res: any) => {
       const { code, data, msg } = res;
@@ -1096,8 +1097,8 @@ function setregistAdd() {
 }
 
 function setRegisterAdd() {
-  const ads = insuredEditRef?.value?.getValue("Insured.Prop");
-  const a = insuredEditRef?.value?.getValue("Insured.cSuffixAddr") || "";
+  const ads = insuredEditRef?.value?.getValue("Insured.RegisterProp");
+  const a = insuredEditRef?.value?.getValue("Insured.cRegisterSuffixAddr") || "";
   if (ads) {
     getAddressStr({ address: ads }).then((res: any) => {
       const { code, data, msg } = res;

@@ -54,11 +54,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     endBtnsPosition: "right",
     fromSchema: [
       {
-        title: "",
-        prop: "riskUnit",
+        inputtype: "rtButton",
         itemWidth: 2,
-        btnWidth: 30,
-        showExBtn: true,
+        btnWidth: 60,
         btnItems: {
           label: "风险单位划分、风险累积及分保安排",
           type: "primary",
@@ -81,6 +79,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "riFacMrk",
         inputtype: "rtcheckbox",
         title: "是否临分",
+        propWidth:35,
         loadData: [
           { value: "1", label: "是" },
           { value: "0", label: "否" },
@@ -101,7 +100,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           }
         },
         showExBtn: true,
-        btnWidth: 60,
+        btnWidth: 80,
         btnItems: {
           label: "自主临分提交",
           type: "primary",
@@ -122,9 +121,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               // nPrmChgRate: null,// 保费币种汇率
               tEdrBgnTm: props.pageData?.edrbase ? ["EdrBase.tEdrBgnTm"] : "", // 批改生效起期
               // tEdrEndTm: null,// 批改生效止期
-              cDductDesc: props.pageData?.deductibleDist ? props.pageData?.deductibleDist[0]["DeductibleDist.cDeductibleContent"] : "", // 免赔约定
               cLastOpn: underwriteEditRef.value?.getValue("riFacOpn"), // 临分意见
             };
+            if(params.cProdNo === "010001" || params.cProdNo === "010002" || params.cProdNo === "010003" || params.cProdNo === "010007") {
+              param.cDductDesc = props.pageData?.deductibleDist && props.pageData?.deductibleDist[0] ? props.pageData?.deductibleDist[0]["DeductibleDist.cDeductibleContent"] : ""; // 免赔约定
+            }
             policyService
               .checkLiberty(param)
               .then((res: any) => {
@@ -534,10 +535,10 @@ defineExpose({
 });
 </script>
 <style lang="scss" scoped>
-:deep(form .el-col:nth-child(1) .el-form-item__content div) {
-  width: 0px !important;
-}
-:deep(form .el-col:nth-child(2) .el-form-item__content div) {
-  width: 40px !important;
-}
+// :deep(form .el-col:nth-child(1) .el-form-item__content div) {
+//   width: 400px !important;
+// }
+// :deep(form .el-col:nth-child(2) .el-form-item__content div) {
+//   width: 200px !important;
+// }
 </style>

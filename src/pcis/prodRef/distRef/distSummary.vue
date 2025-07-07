@@ -304,6 +304,9 @@ const handleQuery = () => {
   } else {
     queryParam['cAppNo'] = app;
   }
+  if(route.params.param?.pageType && route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
+    queryParam['voType'] = "ply"
+  }
   query(queryParam);
 }
 

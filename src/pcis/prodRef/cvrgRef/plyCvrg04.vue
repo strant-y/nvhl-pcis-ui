@@ -751,4 +751,13 @@ defineExpose({
 ::v-deep .planInfo .el-card__header {
   padding: 2px 15px !important;
 }
+
+::v-deep .el-card__header {
+   padding: 10px 16px !important;
+ }
+
+::v-deep .el-card__body {
+   padding: 5px 10px !important;
+ }
+
 </style>

@@ -15,7 +15,8 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
-
+import { dataOpertaor } from "@/store/modules/data-opertaor";
+const opertaor = dataOpertaor();
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
 import { useValidator } from "@/typings/useValidator";
@@ -113,6 +114,23 @@ const method = {
   },
   funcreset: () => {
   },
+    // 证件号码change
+  cCertfCdeChange: (val) => {
+    debugger
+    const cCertfCls = formPage.getFormDataById("AgreementApplicant")["ECargoApplicant.cCertfCls"];
+    console.log(cCertfCls,"cCertfCls")
+    if (cCertfCls == "120001") {
+      if (val) {
+        const certfCde = applicantEditRef.value?.getValue(
+          "ECargoApplicant.cCertfCde"
+        );
+        if (certfCde && certfCde.length === 18) {
+            // idAnalysis(val)
+        }
+      }
+    }
+    checkUser();
+  },
   funcNdustryCate: () => {
     // const param = opertaor.getParam();
     dialog.value?.open(
@@ -158,6 +176,69 @@ const method = {
   },
 };
 
+
+//  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
+const checkUser = () => {
+  // 自定义录单 方案配置 模版 进入 可以查询用户信息  
+  // if (param.pageType !== "app" &&  param.pageType !== "copy" && param.pageType !== "template" && param.cAppStatus !=='1') {
+  //   return false;
+  // }
+const applicantValue = formPage.getFormDataById("AgreementApplicant")
+//  只要4个有值 去请求客户信息
+if (
+  applicantValue["ECargoApplicant.cAppNme"]&&
+  applicantValue["ECargoApplicant.cClntMrk"] !== null &&
+  applicantValue["ECargoApplicant.cCertfCde"] &&
+  applicantValue["ECargoApplicant.cCertfCls"]
+) {
+  const param = {
+    coustName: applicantValue["ECargoApplicant.cAppNme"],
+    coustMrk: applicantValue["ECargoApplicant.cClntMrk"],
+    coustType:applicantValue["ECargoApplicant.cCertfCls"],
+    coustCode: applicantValue["ECargoApplicant.cCertfCde"],
+    personnelType:"ECargoApplicant"
+  }
+  qryCustomer(param)
+    .then((res) => {
+      const { code, data, msg } = res;
+      if (200 === code) {
+        if(data){
+          console.log('客户数据', data)
+          //  tabref ['AgreementApplicant'].setFormValue(data[0])
+          let userId = getValue('ECargoApplicant.cCertfCde')
+          idAnalysis(userId)
+        }
+        
+            
+      
+      } else {
+        // ElMessage.error(msg);
+      }
+    })
+    .finally(() => {});
+  }
+};
+// 解析身份证
+const idAnalysis = (id:string)=>{
+      const applicantValue = formPage.getFormDataById("AgreementApplicant") //tabref["AgreementApplicant"].getFormValue();
+      if (  id.length !== 18 || applicantValue["ECargoApplicant.cCertfCls"] !=='120001') {
+        return false
+      }
+          const birthYear = parseInt(id.substring(6, 10), 10);
+          const birthMonth = parseInt(id.substring(10, 12), 10);
+          const birthDay = parseInt(id.substring(12, 14), 10);
+          const birthday = `${birthYear}-${birthMonth.toString().padStart(2, "0")}-${birthDay.toString().padStart(2, "0")}`;
+          const sexCode = parseInt(id.substring(16, 17), 10);
+          const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
+          const age = new Date().getFullYear() - birthYear;
+
+          setValue("ECargoApplicant.cNation", "1"); // 国籍
+          setValue("ECargoApplicant.tBirthday", birthday);
+          setValue("ECargoApplicant.nAge", age);
+          setValue("ECargoApplicant.cSex", sex);
+         
+          clearValidate('ECargoApplicant.cCertfCde')  
+}
 
 
 function getFormValue() {

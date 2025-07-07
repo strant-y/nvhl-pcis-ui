@@ -114,6 +114,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             if ( item.prop === "cPropHeight" ) {
               item.isShow = val === "table";
             }
+            if ( item.prop === "cPorpExtend" ) {
+              item.isShow = val === "table";
+            }
             if ( item.prop === "cPropIndent" || item.prop === "cFatherKey" ) {
               item.isShow = !h;
             }
@@ -196,7 +199,7 @@ function savegroupinfo() {
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     editFlag: true,
-    editList: ["cPorpRequired","cPorpShowtitle","cPorpDisabled","cPropHeight","cPropIndent","cFatherKey"],
+    editList: ["cPorpRequired","cPorpShowtitle","cPorpDisabled","cPropHeight","cPropIndent","cFatherKey","cPorpExtend"],
     showEdit: true,
     formconfig: {
       fromSchema: [
@@ -327,6 +330,15 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cFatherKey",
         inputtype: "rtinput",
         title: "父级key",
+      },
+      {
+        prop: "cPorpExtend",
+        inputtype: "rtswitch",
+        title: "是否折叠项",
+        keymap: {
+          y: "1",
+          n: "0",
+        },
       },
     ],
   })

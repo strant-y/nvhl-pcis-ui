@@ -925,31 +925,33 @@ const method = {
     }
     
     if (val == "1") {
-      const ads = applicantEditRef?.value?.getValue("Applicant.AllProp");
+      const ads = applicantEditRef?.value?.getValue("Applicant.ClntAddrProp");
       const a =
-        applicantEditRef?.value?.getValue("Applicant.cRegisterSuffixAddr") ||
+        applicantEditRef?.value?.getValue("Applicant.cSuffixAddr") ||
         "";
-
-      applicantEditRef?.value?.setValue("Applicant.Prop", ads);
-      applicantEditRef?.value?.setValue("Applicant.cSuffixAddr", a);
+        console.log(a);
+      applicantEditRef?.value?.setValue("Applicant.RegisterProp", ads);
+      applicantEditRef?.value?.setValue("Applicant.cRegisterSuffixAddr", a);
     } else {
     }
   },
-  //注册地址
-  getCountry: (val: any) => {
-    setRegisterAdd();
-  },
+  
   //常住地址
-  getAllProp: (val: any) => {
+  getCountry: (val: any) => {
     setregistAdd();
-  },
-  //注册地址(input)
-  getcSuffixAddr: (val: any) => {
-    setRegisterAdd();
   },
   //常住地址(input)
-  getcRegisterSuffixAddr: (val: any) => {
+  getcSuffixAddr: (val: any) => {
     setregistAdd();
+  },
+  
+  //常住地址
+  getAllProp: (val: any) => {
+    setRegisterAdd();
+  },
+  //注册地址(input)
+  getcRegisterSuffixAddr: (val: any) => {
+    setRegisterAdd();
   },
   // 读取身份证
   readIdCard: (val: any) => {
@@ -1051,9 +1053,8 @@ const method = {
 };
 
 function setregistAdd() {
-  const ads = applicantEditRef?.value?.getValue("Applicant.AllProp");
-  const a =
-    applicantEditRef?.value?.getValue("Applicant.cRegisterSuffixAddr") || "";
+  const ads = applicantEditRef?.value?.getValue("Applicant.ClntAddrProp");
+  const a = applicantEditRef?.value?.getValue("Applicant.cSuffixAddr") || "";
   if (ads) {
     getAddressStr({ address: ads }).then((res: any) => {
       const { code, data, msg } = res;
@@ -1068,13 +1069,14 @@ function setregistAdd() {
 }
 
 function setRegisterAdd() {
-  const ads = applicantEditRef?.value?.getValue("Applicant.Prop");
-  const a = applicantEditRef?.value?.getValue("Applicant.cSuffixAddr") || "";
+  const ads = applicantEditRef?.value?.getValue("Applicant.RegisterProp");
+  const a = applicantEditRef?.value?.getValue("Applicant.cRegisterSuffixAddr") || "";
   if (ads) {
     getAddressStr({ address: ads }).then((res: any) => {
       const { code, data, msg } = res;
       if (code === 200) {
         const b = (data ? data["addStr"] : "") + a;
+        console.log(b);
         setAddressStr("Applicant.cRegisteredcapDre", b);
       }
     });
