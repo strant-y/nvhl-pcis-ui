@@ -1767,6 +1767,10 @@ const getDistData = (appNo:any, item: any) => {
   } else {
     selData.cAppNo = appNo;
   }
+  if(props.param?.pageType && props.param?.pageType === "EDR_APP_NEW_SCENE") {
+    selData.voType = "ply"
+  }
+
   selectDist(selData).then((res: any) => {
     if (res.code === 200) {
       opertaor.getTableRefs()[item.pageCode].setTableData(res.data.data);
