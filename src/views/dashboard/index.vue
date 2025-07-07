@@ -198,7 +198,7 @@ const searchItem = {
   prop: "cQueryStr",
   inputtype: "rtinput",
   title: "",
-  placeholder: "输入申请单号进行查询",
+  placeholder: "输入投保单号进行查询",
   itemWidth: 2,
   prefixIcon: "Search"
 }

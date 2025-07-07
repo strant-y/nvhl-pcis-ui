@@ -241,7 +241,7 @@ onMounted(async () => {
         homeJumpData.value.TIssueTmEnd,
       ]);
       if (homeJumpData.value.hasOwnProperty("CAppNo")) {
-        //申请单号
+        //投保单号
         freeEditRef.value[1].value[0].setValue(
           "cAppNo",
           homeJumpData.value.CAppNo

@@ -1240,7 +1240,7 @@
     const exportDown = () => {
         const CAppNo = freeEditRef.value?.getValue("CAppNo");
         const CPlyNo = freeEditRef.value?.getValue("CPlyNo");
-        // 查询条件：申请单号，保单号任何一个有值时，都无需做其他查询条件校验
+        // 查询条件：投保单号，保单号任何一个有值时，都无需做其他查询条件校验
         if (!CAppNo && !CPlyNo) {
             // 查询时间段验证
             const date1 = freeEditRef.value?.getValue("tm1"); //投保日期
@@ -1368,12 +1368,20 @@
                 inNextDpt: freeEditRef.value?.getValue("inNextDpt"),
                 ...s,
             };
-            if (udrType == "3" || udrType == "4") {
+           
+        //     "startBsTm1": "2025-07-08 00:00:00",
+		// "endBsTm1": "2025-07-10 23:59:59",
+            if(udrType == "1"  || udrType == "2" ){
+                params.startBsTm1 = date1[0];
+                params.endBsTm1 = date1[1];
+                params.startCrtTm = date2[0];
+                params.tAppTmEnd = date2[1];
+            }else if (udrType == "3" || udrType == "4") {
                 params.startBsTm1 = date1[0];
                 params.endBsTm1 = date1[1];
             } else {
                 params.startCrtTm = date2[0];
-                params.TAppTmEnd = date2[1];
+                params.tAppTmEnd = date2[1];
             }
         } else {
             params = Object.assign(
@@ -1386,7 +1394,7 @@
                     CurrentUser: user.value.opCde,
                     CurrentUserOrg: user.value.companyId,
                     TAppTmStart: date1[0],
-                    TAppTmEnd: date1[1],
+                    tAppTmEnd: date1[1],
                     CLoadSub: freeEditRef.value?.getValue("CLoadSub"),
                 },
                 s
@@ -1395,6 +1403,7 @@
         }
         delete params.tm1;
         delete params.tm2;
+         console.log('32',udrType,params)
         const querys = Object.assign(params, r);
         const requestParam = cloneDeep(querys);
         requestParam.udrType = String(requestParam.udrType - 1);

@@ -309,7 +309,9 @@ function next() {
                 path: "/pcis/my-page",
                 query: {
                   param: JSON.stringify({ ...data, ...{ queryTyp: "orig" } }),
+                  title: "询价单录入" // 直接设置新标题
                 },
+             
               });
             } else {
               ElMessage.error(res.msg);
@@ -321,7 +323,9 @@ function next() {
           path: "/pcis/my-page",
           query: {
             param: JSON.stringify({ ...data, ...{ pageType: "app", pageName: "priceInquiry" } }),
+             title: "询价单录入" // 直接设置新标题
           },
+      
         });
       }
       sessionStorage.setItem(

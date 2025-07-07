@@ -392,7 +392,7 @@ onMounted(async () => {
 
 // 受益所有人table信息
 const getTableFun = async ()=>{
-	let CAppNo = opertaor.getDataAll()['insured']['Insured.cAppNo'];   // 申请单号
+	let CAppNo = opertaor.getDataAll()['insured']['Insured.cAppNo'];   // 投保单号
 	policyService.getAMLCusBnfcInfoByAppNo(CAppNo,'insured').then((response) => {
     if (response.code === 200) {
       if (response.data) {
@@ -408,7 +408,7 @@ const getTableFun = async ()=>{
 
 //  法人扩展信息 初始化查询
 const getAmlExtInfo = async ()=>{
-	let CAppNo = opertaor.getDataAll()['insured']['Insured.cAppNo'];   // 申请单号
+	let CAppNo = opertaor.getDataAll()['insured']['Insured.cAppNo'];   // 投保单号
 	policyService.getAMLExtendInfoByAppNo(CAppNo,'insured').then((response) => {
 		let {code, data} = response
     if (code === 200) {
