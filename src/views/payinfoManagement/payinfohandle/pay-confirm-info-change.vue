@@ -97,7 +97,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       },
       {
         prop: 'CAppNo',
-        title: '投保单号',
+        title: '申请单号',
         inputtype: "rtinput",
         disabled: true,
       },

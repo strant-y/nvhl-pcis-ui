@@ -484,7 +484,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           {
               prop: "cAppNo",
               inputtype: "rtinput",
-              title: "投保单号",
+              title: "申请单号",
               clearable: true,
           },
           {
@@ -961,16 +961,24 @@ const tableObj = {
         ],
         fromSchema: [
             {
+              prop: "policyInfo",
+              inputtype: "rtinput",
+              title: "保单",
+              minWidth: 180,
+            },
+            {
                 prop: "cAppNo",
                 inputtype: "rtinput",
-                title: "投保单号",
+                title: "申请单号",
                 minWidth: 180,
+                isShow:false
             },
             {
                 prop: "cPlyNo",
                 inputtype: "rtinput",
                 title: "保单号",
                 minWidth: 180,
+                isShow:false
             },
             {
                 prop: "cEdrNo",
@@ -1028,6 +1036,12 @@ const tableObj = {
                 inputtype: "rtinput",
                 title: "产品",
                 minWidth: 180,
+            },
+            {
+              prop: "InsurancePeriod",
+              inputtype: "rtinput",
+              title: "保险期间",
+              minWidth: 180,
             },
             {
                 prop: "tIssueTm",
@@ -1191,6 +1205,12 @@ function handleQuery(flag?: boolean) {
             if (200 === code) {
                 pageresult.list = [];
                 pageresult.list = data.result;
+              pageresult.list = data.result.map(item => ({
+                ...item,
+                // 创建一个新字段合并两个值
+                policyInfo: `${item.cAppNo || ''}\n${item.cPlyNo || ''}`,
+                InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
+              }));
                 pageresult.total = data.total;
             } else {
                 ElMessage.error(msg);

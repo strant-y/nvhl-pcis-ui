@@ -1106,7 +1106,7 @@ export class PolicyService {
     }
 
 /**
- * 根据投保单号获取发票信息数量
+ * 根据申请单号获取发票信息数量
  * @param appNo
  */
 // getTaxInfoNumByAppNo(appNo) {
@@ -1282,7 +1282,7 @@ getTaskVestige(ops) {
 
 }
 
-// 根据保单号查询原始投保单号
+// 根据保单号查询原始申请单号
 getCAppNoByPlyNo(ops) {
     return request.post(`/policy/getCAppNoByPlyNo`, ops)
 
@@ -1340,7 +1340,7 @@ updateImageUploadModeByPlyNo(data) {
     return request.post('/policy/updateImageUploadModeByPlyNo', data);
     }
 
-// 根据投保单号查询部分投保单基本信息
+// 根据申请单号查询部分投保单基本信息
 qryAppBaseInfoByAppNo(ops) {
     return request.post(`/policy/qryAppBaseInfoByAppNo`, ops)
 

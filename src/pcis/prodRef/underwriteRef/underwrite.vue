@@ -121,9 +121,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               // nPrmChgRate: null,// 保费币种汇率
               tEdrBgnTm: props.pageData?.edrbase ? ["EdrBase.tEdrBgnTm"] : "", // 批改生效起期
               // tEdrEndTm: null,// 批改生效止期
-              cDductDesc: props.pageData?.deductibleDist ? props.pageData?.deductibleDist[0]["DeductibleDist.cDeductibleContent"] : "", // 免赔约定
               cLastOpn: underwriteEditRef.value?.getValue("riFacOpn"), // 临分意见
             };
+            if(params.cProdNo === "010001" || params.cProdNo === "010002" || params.cProdNo === "010003" || params.cProdNo === "010007") {
+              param.cDductDesc = props.pageData?.deductibleDist && props.pageData?.deductibleDist[0] ? props.pageData?.deductibleDist[0]["DeductibleDist.cDeductibleContent"] : ""; // 免赔约定
+            }
             policyService
               .checkLiberty(param)
               .then((res: any) => {
