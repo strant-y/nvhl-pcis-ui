@@ -532,6 +532,9 @@ const method = {
       } else {
         param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
       }
+      if(route.params.param?.pageType && route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
+        param['voType'] = "ply"
+      }
       selectDist(param).then((res: any) => {
         const { code, data, msg } = res;
         if (code == 200) {
