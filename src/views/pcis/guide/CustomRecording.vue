@@ -468,6 +468,7 @@ function handleStarClick(item: any) {
     termNo: item.termNo,
     isPlan: "0",
   }
+  param.voType = "app";
   unUserUnUntionTerm(param).then((res:any) => {
     if (res.code == "1") {
       ElMessage.success(res.message);
@@ -483,6 +484,7 @@ function handleQuery() {
     pageSize: 9999,
     userId: JSON.parse(sessionStorage.getItem("user")).opCde,
     isPLan: formconfig1.value.cRecordType === 2 ? "1" : "0",
+    voType: "app",
   }).then((res: any) => {
     if (res.code == "1") {
       termList.value = res.result;
@@ -528,7 +530,7 @@ function showModal() {
   dzmodal
     .open(termDialog, { 
       type: "Issuer",
-      data: { updateQuery, type: formconfig1.value.cRecordType },
+      data: { updateQuery, type: formconfig1.value.cRecordType, voType: "app", },
       termList: termList.value,
     })
     .then((res: any) => {
