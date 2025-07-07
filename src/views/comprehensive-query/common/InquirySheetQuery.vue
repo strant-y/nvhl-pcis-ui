@@ -562,27 +562,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         //       },
         //   },
           {
-              prop: "tIssueTm",
-              inputtype: "rtdatepicker",
-              title: "询价日期",
-              format: "YYYY-MM-DD HH:mm:ss",
-              valueFormat: "YYYY-MM-DD HH:mm:ss",
-              clearable: true,
-              type: "datetimerange",
-          },
-          {
               prop: "tAppTm",
               inputtype: "rtdatepicker",
-              title: "投保日期",
-              format: "YYYY-MM-DD HH:mm:ss",
-              valueFormat: "YYYY-MM-DD HH:mm:ss",
-              clearable: true,
-              type: "datetimerange",
-          },
-          {
-              prop: "tEdrAppTm",
-              inputtype: "rtdatepicker",
-              title: "批改申请日期",
+              title: "询价日期",
               format: "YYYY-MM-DD HH:mm:ss",
               valueFormat: "YYYY-MM-DD HH:mm:ss",
               clearable: true,
@@ -1031,8 +1013,7 @@ tableconfig.fixed= true;
 onMounted(async () => {
     formconfig1.fromSchema?.forEach((item) => {
         if (
-            // item.prop === "tIssueTm"
-        item.prop === "tAppTm" ||
+            item.prop === "tIssueTm" ||
         item.prop === "tEdrAppTm"
         ) {
             item.hidden = true; // 隐藏所有日期字段
@@ -1049,7 +1030,7 @@ onMounted(async () => {
         ],
     });
     pageresult.list = [];
-    freeEditRef.value.setValue("tIssueTm", [
+    freeEditRef.value.setValue("tAppTm", [
         dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
     ]);
@@ -1093,50 +1074,36 @@ function handleQuery(flag?: boolean) {
         (s["cAppNme"] == null || s["cAppNme"] == "")
     ) {
         const startTemp =
-            s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[0] : null;
+            s.tAppTm && s.tAppTm.length > 1 ? s.tAppTm[0] : null;
         if (null == startTemp || undefined === startTemp) {
-            ElMessage.warning("签单日期不能为空");
+            ElMessage.warning("询价日期不能为空");
             return;
         }
         const start = dayjs(startTemp);
-        const endTemp = s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[1] : null;
+        const endTemp = s.tAppTm && s.tAppTm.length > 1 ? s.tAppTm[1] : null;
         if (null == endTemp || undefined === endTemp) {
-            ElMessage.warning("签单日期不能为空");
+            ElMessage.warning("询价日期不能为空");
             return;
         }
         const end = dayjs(endTemp);
         if (end.isBefore(start)) {
-            ElMessage.warning("签单日期起期不能大于签单日期止期");
+            ElMessage.warning("询价日期起期不能大于询价日期止期");
             return;
         }
         if (end.diff(start, "year", true) > 2) {
-            ElMessage.warning("签单日期时间范围请控制在两年内");
+            ElMessage.warning("询价日期时间范围请控制在两年内");
             return;
         }
     }
     // 提取投保日期的开始时间和结束时间
     const tAppTmStart = s.tAppTm && s.tAppTm.length > 1 ? s.tAppTm[0] : null;
     const tAppTmEnd = s.tAppTm && s.tAppTm.length > 1 ? s.tAppTm[1] : null;
-    // 提取批改申请日期的开始时间和结束时间
-    const tEdrAppTmStart =
-        s.tEdrAppTm && s.tEdrAppTm.length > 1 ? s.tEdrAppTm[0] : null;
-    const tEdrAppTmEnd =
-        s.tEdrAppTm && s.tEdrAppTm.length > 1 ? s.tEdrAppTm[1] : null;
-    // 提取签单日期的开始时间和结束时间
-    const tIssueTmStart =
-        s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[0] : null;
-    const tIssueTmEnd =
-        s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[1] : null;
 
     // if (currentTabKey.value == "0") {
     const param = Object.assign(s, r);
     param["pageNo"] = param["pageNum"];
     param["tAppTmStart"] = tAppTmStart; // 添加投保开始时间
     param["tAppTmEnd"] = tAppTmEnd; // 添加投保结束时间
-    param["tEdrAppTmStart"] = tEdrAppTmStart; // 添加批改开始时间
-    param["tEdrAppTmEnd"] = tEdrAppTmEnd; // 添加批改结束时间
-    param["tIssueTmStart"] = tIssueTmStart; // 添加签单开始时间
-    param["tIssueTmEnd"] = tIssueTmEnd; // 添加签单结束时间
     param["queryType"] = queryType.value;
     getInquiryPolicyList(param)
         .then((res) => {
