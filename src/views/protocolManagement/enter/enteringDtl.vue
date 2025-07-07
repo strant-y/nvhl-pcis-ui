@@ -105,8 +105,8 @@ function save() {
       ElMessage.success('保存成功')
       console.log('res', res);
       // console.log('000', formPage.value.getComponentConfigById("AgreementBase"))
-      resData = res.res.composition["ECargoBase"]
-      // resData["ECargoBase.cEcAgrAppNo"]
+      console.log('resss',res.res['composition']['ECargoBase'][0])
+      resData.value = res.res['composition']['ECargoBase'][0]
       console.log('resData', resData);
     }else {
       ElMessage.success(res.msg);
@@ -116,7 +116,8 @@ function save() {
   
   const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
   console.log('AgreementBaseRef', agreementBaseRef,agreementBaseRef["ECargoBase.cChaType"]);
-  agreementBaseRef.setValue('ECargoBase.cOpenCoverNo', resData['ECargoBase.cEcAgrNo'])
+  agreementBaseRef.setValue('ECargoBase.cOpenCoverNo', resData.value['ECargoBase.cEcAgrNo'])
+  agreementBaseRef.setValue('ECargoBase.cEcAgrAppNo', resData.value['ECargoBase.cEcAgrAppNo'])
   const agreementDistInsuredRef = formPage.value?.getComponentRefById('AgreementDistInsured');
   const agreementCvrgRef = formPage.value?.getComponentRefById('AgreementCvrg');
 }
@@ -125,6 +126,19 @@ function submit() {
   const allFromData = formPage.value?.getAllFormData();
   const user = JSON.parse(sessionStorage.getItem("user"));
   ElMessage.warning('提交');
+  // 从 resData 提取所需字段并合并进 AgreementBase
+  // const { 
+  //   'ECargoBase.cEcAgrNo': resData.value?.ECargoBase['ECargoBase.cEcAgrNo'],
+  //   'ECargoBase.cEcAgrAppNo': resData.value?.ECargoBase['ECargoBase.cEcAgrAppNo']
+  // } = resData.value?.ECargoBase || {}
+
+  // if (allFromData && allFromData.AgreementBase) {
+  //   allFromData.AgreementBase = {
+  //     ...allFromData.AgreementBase,
+  //     'ECargoBase.cEcAgrNo': resData.value?.['ECargoBase.cEcAgrNo'],
+  //     'ECargoBase.cEcAgrAppNo': resData.value?.['ECargoBase.cEcAgrAppNo']
+  //   };
+  // }
   cargoApi.submit({
     ...allFromData,
     ...{},
