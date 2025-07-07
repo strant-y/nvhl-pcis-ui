@@ -113,7 +113,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "CAppNo",
         inputtype: "rtinput",
-        title: "投保单号",
+        title: "申请单号",
         clearable: true,
         disabled: true,
         rules: [getRules("required", {})],
@@ -338,10 +338,10 @@ const isShow = () =>{
 }
 
 onMounted(() => {
-  //投保单号；这里逻辑有问题，angular路径src\app\routes\pcis-main\prodDef\common\invoice-info-model\invoice-info-model.component.ts
+  //申请单号；这里逻辑有问题，angular路径src\app\routes\pcis-main\prodDef\common\invoice-info-model\invoice-info-model.component.ts
   //     let CAppNo = freeEditRef.value?.getValue('CAppNo') 
  
-  let CAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];   // 投保单号
+  let CAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];   // 申请单号
    nextTick(()=>{
     freeEditRef.value?.setValue('CAppNo', CAppNo); 
     freeEditRef.value?.setValue('CGrpMrk', cGrpMrk); 

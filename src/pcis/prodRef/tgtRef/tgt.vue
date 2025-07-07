@@ -502,7 +502,7 @@ const method = {
   wagesInfoBtn: () => {
 
     let cRegisteredLogo = opertaor.getDataAll()['tgt']['Tgt.cRegisteredLogo'];  // 记名投保标志 是 获取清单汇总   否可以自己修改添加
-    // let cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];   //投保单号
+    // let cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];   //申请单号
     let cAppNo = "";
     if(route.params.param?.pageName === "priceInquiry") {
       cAppNo = opertaor.getDataAll()['plyBase']['Base.cInquiryNo']

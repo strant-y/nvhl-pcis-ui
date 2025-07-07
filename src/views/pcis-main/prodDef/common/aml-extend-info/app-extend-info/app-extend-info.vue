@@ -397,7 +397,7 @@ const tableconfig = reactive<AppGridEditConfig>(
 onMounted(async () => {
 
 	getTableFun();
-	let CAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];   // 投保单号
+	let CAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];   // 申请单号
 
 	policyService.getAMLExtendInfoByAppNo(CAppNo,'Applicant').then((response) => {
 		let {code, data} = response
@@ -445,7 +445,7 @@ onMounted(async () => {
 
 // 收益所有人table信息
 const getTableFun = async ()=>{
-	let CAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];   // 投保单号
+	let CAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];   // 申请单号
 	policyService.getAMLCusBnfcInfoByAppNo(CAppNo,'Applicant').then((response) => {
 		let {code , data} = response
     if (code === 200) {

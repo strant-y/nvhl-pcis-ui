@@ -108,7 +108,7 @@ const method = {
 };
 /** 保存 */
 const save = async () => {
-  let CAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];   // 投保单号
+  let CAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];   // 申请单号
   let CAppTyp =  props.data?.CAppTyp ?  props.data.CAppTyp: 'A'; // CAppTyp：投保单是A,批单是E
   let opCde = JSON.parse(sessionStorage.getItem("user")).opCde;
   let controlFlag = props.controlFlag; 
