@@ -56,7 +56,7 @@
 import moment from "moment";
 const props = defineProps({
   modelValue: {
-    type: [Number, String],
+    type: [Number, String, Array],
   },
   item: {
     type: Object as () => Record<string, any>,
