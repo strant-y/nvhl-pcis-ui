@@ -345,7 +345,7 @@ function handleQuery(flag?: boolean) {
         },
         ...freeEditRef.value?.getFromValue(),
       };
-      cargoApi.query(param)
+      cargoApi.queryEcargoList(param)
         .then((res: any) => {
           if (res && res.code === 200) {
             const pageData = res.data;

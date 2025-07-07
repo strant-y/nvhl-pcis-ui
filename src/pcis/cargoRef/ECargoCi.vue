@@ -619,15 +619,13 @@ const initCiInfo = (data: any) => {
   }
   nextTick(() => {
     freeEditRef?.value?.addRowByData( {
-      'Ci.nSeqNo': 1,
-      'Ci.nCiShare': '1.00000000',
-      'Ci.nPlyFeeRate': '0.00',
-      'Ci.nPlyFee': '0.00',
-      'Ci.cChiefMrk': cChiefMrk,
-      'Ci.cIssueMrk': '1',
-      'Ci.cCoinsurerCde': '327001',
-      // "Ci.cSubDptCde": param.dptCde,
-      // 'Ci.cDptCde': param.cDptCde,
+      // 'ECargoCi.nSeqNo': 1,
+      // 'ECargoCi.nCiShare': '1.00000000',
+      // 'ECargoCi.nPlyFeeRate': '0.00',
+      // 'ECargoCi.nPlyFee': '0.00',
+      // 'ECargoCi.cChiefMrk': cChiefMrk,
+      // 'ECargoCi.cIssueMrk': '1',
+      // 'ECargoCi.cCoinsurerCde': '327001',
     });
   });
 };

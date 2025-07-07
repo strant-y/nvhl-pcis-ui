@@ -168,7 +168,14 @@ const method = {
           );
         })
 
-  }
+  },
+  //原币保险金额change事件
+  nInsuranceAmountChange:(val)=>{
+
+  },
+  //费率change事件
+  nRateValChange:(val)=>{ 
+  },
 };
 
 // 绑定特殊验证器
