@@ -72,13 +72,12 @@ onMounted(async () => {
     method,
     exRules
   );
+
+  console.log('------------',props.pageSchema)
   if(params.cProdNo === '045001'){
-    formconfig11.fromSchema?.forEach(item=>{
-      if(item['prop'] ==='Tgt.cInsuranceMethod'){
-        item['typeCode'] = 'InsuranceMethod045001';
-      }
-    })
+    setFormItem("Tgt.cInsuranceMethod", {typeCode: 'InsuranceMethod045001',});
   }
+  
   for(let i = 0; formconfig11.fromSchema && i < formconfig11.fromSchema.length; i++){
     // 遍历groupList数组把函数赋值给fromSchema
     if (formconfig11.fromSchema[i]["groupList"] && formconfig11.fromSchema[i]["groupList"].length>0) {
@@ -99,12 +98,17 @@ onMounted(async () => {
   setFormItem("Tgt.nCarsNumber", {
     rules: [getRules("required", {'trigger':'blur'}),getRules("positiveNumber", {})],
   });
+
+  setFormItem("Tgt.cContactNumber", {
+    rules: [getRules("phoneNo", {})],
+  });
 });
 
 const wagesInfoModel = () => {
   let cRegisteredLogo = opertaor.getDataAll()['tgt']['Tgt.cRegisteredLogo'];  // 记名投保标志 是 获取清单汇总   否可以自己修改添加
   let cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];
-  dzmodal.open(wagesInfo, { type: "edit", data: { cAppNo: cAppNo, cRegisteredLogo: cRegisteredLogo } }).then((res: any) => {
+  let cInquiryNo = opertaor.getDataAll()['plyBase']['Base.cInquiryNo'];
+  dzmodal.open(wagesInfo, { type: "edit", data: { cAppNo: cAppNo, cRegisteredLogo: cRegisteredLogo, cInquiryNo: cInquiryNo, pageName: route.params.param?.pageName } }).then((res: any) => {
     if (res.type === "ok") {
       // setFormItem('Tgt.nTotalSalary',
       setValue("Tgt.nTotalSalary", res.body)
@@ -201,6 +205,10 @@ const setcDetailedAddress = (prop:any,aftProp:any)=> {
 };
 // 绑定方法
 const method = {
+  getcNavigationAreaChange:()=>{
+    dialog.value?.open('navigationAreaTips', null,
+        null,{width: 50,title:'航行区域提示'});
+  },
   getcInsuranceIndustryChange:(val:string)=>{
     if(val === '8'){
       setFormItem('Tgt.cIndustryRemarks', {
@@ -211,6 +219,14 @@ const method = {
         rules: null
       });
     }
+  },
+  getcIsExcludingChange:()=>{
+    dialog.value?.open('reinsuranceTips', null,
+        null,{width: 45,title:'水险再保提示'});
+  },
+  getcSanctionAreasChange:()=>{
+    dialog.value?.open('detailsKnows', null,
+        null,{width: 45,title:'战争及罢工险核保限制和运输地国家限制'});
   },
   gettCompletionYearChange:(val:string)=>{
     const currentYear = new Date().getFullYear();
@@ -448,23 +464,7 @@ const method = {
     productStore.setCIsSingle(val)
   },
   funcInsuranceChange: (val) => {
-
-    if (params.cProdNo === '043009' || params.cProdNo === '045001'
-      ||params.cProdNo === '049035' || params.cProdNo === '049036'
-      ||params.cProdNo === '049037' || params.cProdNo === '049040'
-      ||params.cProdNo === '049041' 
-    ) {
-      let hd = true;
-      if(val !== '613001'){
-        hd = false;
-      }
-
-      formconfig1.fromUi.groupBy.forEach(item => {
-        if(item.id == 'group2'){
-          item.hidden = hd;
-        }
-      })
-    }
+    groupCheck();
     //根据投保方式得选择对应控制必填项
     if (val == '613002') {
       setFormItem("Tgt.nEngineeringCost", {
@@ -496,11 +496,21 @@ const method = {
       cvrgref.showFlush();
     }
   },
+  industryTypeChange:(val:any)=>{
+    groupCheck();
+  },
   wagesInfoBtn: () => {
 
     let cRegisteredLogo = opertaor.getDataAll()['tgt']['Tgt.cRegisteredLogo'];  // 记名投保标志 是 获取清单汇总   否可以自己修改添加
-    // let cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];   //投保单号
-    let cAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'] || opertaor.getDataAll()['plyBase']['Base.cAppNo'];   //投保单号
+    // let cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];   //申请单号
+    let cAppNo = "";
+    if(route.params.param?.pageName === "priceInquiry") {
+      cAppNo = opertaor.getDataAll()['plyBase']['Base.cInquiryNo']
+    } else if (opertaor.getDataAll()['applicant'] && opertaor.getDataAll()['applicant']['Applicant.cAppNo']) {
+      cAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo']
+    } else {
+      cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];
+    }
 
     if (cRegisteredLogo !== "1" && cRegisteredLogo !== "0") {
       ElMessage.error('请选择“记名投保标志”！')
@@ -514,7 +524,15 @@ const method = {
 
     // 获取总额方式  没有数据给进行提示
     if (cRegisteredLogo == 1) {
-      selectDist({ cComponentTable: "EmployeeDist", cAppNo: cAppNo }).then((res: any) => {
+      const param = {
+        cComponentTable: "EmployeeDist",
+      }
+      if(route.params.param?.pageName === "priceInquiry") {
+        param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+      } else {
+        param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+      }
+      selectDist(param).then((res: any) => {
         const { code, data, msg } = res;
         if (code == 200) {
           if (data['data'].length > 0) {
@@ -534,8 +552,13 @@ const method = {
     // let baseFlag = alldata['plyBase']["Base.cAppNo"];
 
  
-
-    checkAppBase({ cAppNo: cAppNo }).then((res: any) => {
+    const param = {};
+    if(route.params.param?.pageName === "priceInquiry") {
+      param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else {
+      param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+    }
+    checkAppBase(param).then((res: any) => {
       if (res.code === 200) {
         wagesInfoModel();
       } else {
@@ -885,6 +908,40 @@ function singChange(obj) {
     'Tgt.cProjectAddress': '',
   })
 }
+
+function groupCheck() {
+  if (params.cProdNo === '043009' || params.cProdNo === '045001'
+      ||params.cProdNo === '049035' || params.cProdNo === '049036'
+      ||params.cProdNo === '049037' || params.cProdNo === '049040'
+      ||params.cProdNo === '049041' 
+    ){
+    const cInsuranceMethod = getValue("Tgt.cInsuranceMethod");
+    const cIndustryType = getValue("Tgt.cIndustryType");
+    const plyBase = opertaor.getTableRefByKey('plyBase');
+    let subSidiary = null;
+    if(plyBase){
+      subSidiary = plyBase.getValue('Base.cDptCde');
+      subSidiary = subSidiary.substring(0,6);
+    }
+
+    let h = true;
+    if(cIndustryType === '15' && (subSidiary === '024101' || subSidiary === '026201' || subSidiary === '024201'
+      || subSidiary === '023702' || subSidiary === '026401' )){
+      h = false;
+    }else{
+      if(cInsuranceMethod !== '613001'){
+        h = false;
+      }
+    }
+
+    formconfig1.fromUi.groupBy.forEach(item => {
+      if(item.id == 'group2'){
+        item.hidden = h;
+      }
+    });
+  }
+}
+
 // 绑定特殊验证器
 const exRules = {};
 function getFromValue() {
@@ -924,6 +981,18 @@ function setFormItem(key: any, obj: any) {
     });
   }
 }
+const terms1 = ['00425000277','00425000278','00425000279','00425000282','00425000283'];
+const terms2 = ['00425000281','00425000280'];
+function change403009(v){
+  if(terms1.includes(v)){
+    setValue("Tgt.cInsuranceMethod", "613001");
+    setFormItem("Tgt.cInsuranceMethod",{disabled:true});
+  }
+  if(terms2.includes(v)){
+    setValue("Tgt.cInsuranceMethod", "613001");
+    setFormItem("Tgt.cInsuranceMethod",{disabled:true});
+  }
+}
 
 function getFormconfig() {
   return formconfig1;
@@ -936,6 +1005,7 @@ defineExpose({
   setValue,
   getValue,
   getFormconfig,
+  change403009,
 });
 </script>
 

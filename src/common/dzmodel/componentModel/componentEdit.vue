@@ -270,7 +270,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           showFactorList.value = true;
           pageQuerySelect(true);
 
-          if (["dist", "distECargo"].includes(index)) {
+          if (["dist", "ECargoInsured", "ECargoTransportDist", "ECargoGoodsTgt"].includes(index)) {
             showEditBtnFlag.value = true;
           } else {
             showEditBtnFlag.value = false;
@@ -288,7 +288,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 
           tableconfig.fromSchema?.forEach((e: any) => {
             if (e.prop === "cShowLocation") {
-              if (["dist", "distECargo"].includes(index)) {
+              if (["dist", "ECargoInsured", "ECargoTransportDist", "ECargoGoodsTgt"].includes(index)) {
                 e.isShow = true;
               } else {
                 e.isShow = false;

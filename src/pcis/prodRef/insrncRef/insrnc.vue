@@ -45,15 +45,15 @@ onMounted(() => {
 // 根据时间更改 短期费率系数 接口
 const nRatioCoefFunc = () => {
   const tabref = opertaor.getTableRefs();
-  const baseBefore = tabref["insrnc"].getFromValue();
-  const baseBefore2 = tabref["base"].getFromValue();
-  let prodNo = route.params.param.cProdNo;
+  const baseBefore = tabref["insrnc"]?.getFromValue();
+  const baseBefore2 = tabref["base"]?.getFromValue();
+  let prodNo = route.params.param?.cProdNo;
 
   let param = {
     bgnTm: baseBefore["Base.tInsrncBgnTm"],
     endTm: baseBefore["Base.tInsrncEndTm"],
     prodNo,
-    ratioType: baseBefore2['Base.cRatioTyp']
+    ratioType: baseBefore2 ? baseBefore2['Base.cRatioTyp'] : null
   }
   policyRatio(param).then((res: any) => {
     const { code, data, msg } = res;
@@ -124,7 +124,7 @@ const method = {
   endTmFn: (v) => {
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["insrnc"].getFromValue();
-    if(route.params.param.cRsnCde != "46") {
+    if(route.params.param?.cRsnCde != "46") {
       // 如果批改原因是报停展期，保险止期延长报停起止期计算出的差值，保险期限维持不变
       const tm =   moment(v).add(1, 'second').diff(moment(baseBefore["Base.tInsrncBgnTm"]), "days");
       console.log('天',tm)
@@ -134,11 +134,11 @@ const method = {
     }
     nRatioCoefFunc()
     // 如果批改原因是免费延期，根据保险止期的变化计算出延长天数
-    if(route.params.param.cRsnCde == "FZ" && tInsrncEndTm.value) {
+    if(route.params.param?.cRsnCde == "FZ" && tInsrncEndTm.value) {
       const days =   moment(v).add(1, 'second').diff(moment(tInsrncEndTm.value), "days");
       opertaor.getFatherPage().setnDelayNum(days)
     }
-    if(route.params.param.cRsnCde == "FZ" && !tInsrncEndTm.value) {
+    if(route.params.param?.cRsnCde == "FZ" && !tInsrncEndTm.value) {
       tInsrncEndTm.value = baseBefore["Base.tInsrncEndTm"]
     }
   },
@@ -148,6 +148,8 @@ const method = {
     let cIsRetroSpect = getFromValue()['Base.cIsRetroSpect']      // 获取是否有追溯期/日期
     console.log(cIsRetroSpect)
     const p = opertaor.getParam();
+
+    console.log('数据---‘',getFromValue())
     if (!p.initFlag) {
       // setFormItem("Base.tRunBgnTm", { disabled: false }); //追溯/日落起期
       // setFormItem("Base.tRunEndTm", { disabled: false }); //追溯/日落止期
@@ -162,9 +164,9 @@ const method = {
         setFormItem("Base.tRunEndTm", { rules: [getRules("required", {})] }); //追溯/日落止期
       }
       
-      setValue('Base.nReportDays','')
-      setValue('Base.tRunBgnTm','')
-      setValue('Base.tRunEndTm','')
+      // setValue('Base.nReportDays','')
+      // setValue('Base.tRunBgnTm','')
+      // setValue('Base.tRunEndTm','')
 
 
 
@@ -172,14 +174,19 @@ const method = {
       setFormItem("Base.tRunEndTm", { rules: [getRules("required", {})] }); //追溯/日落止期
       setFormItem("Base.tRunBgnTm", {  hidden: false  }); //追溯/日落起期
       setFormItem("Base.tRunEndTm", {  hidden: false  }); //追溯/日落止期
+      setFormItem("Base.nTracingDays", {  hidden: false  }); //追溯/日落天数
+
+
       setFormItem("Base.tReportBgnTm", {  hidden: true  }); //延长报告期起始日期
       setFormItem("Base.tReportEndTm", {  hidden: true  }); //延长报告期终止日期
+      setFormItem("Base.nReportDays", {  hidden: true  }); //延长报告期天数
+
 
 
     } else if (val == "1") {
-      setValue('Base.nTracingDays','')    
-      setValue("Base.tReportBgnTm",'')
-      setValue("Base.tReportEndTm",'')  
+      // setValue('Base.nTracingDays','')    
+      // setValue("Base.tReportBgnTm",'')
+      // setValue("Base.tReportEndTm",'')  
       if (cIsRetroSpect !== '0') {
         console.log('1212')
         setFormItem("Base.tRunBgnTm", { rules: null }); //追溯/日落起期
@@ -191,8 +198,11 @@ const method = {
       setFormItem("Base.tReportEndTm", { rules: [getRules("required", {})] }); //延长报告期终止日期
       setFormItem("Base.tRunBgnTm", {  hidden: true  }); //追溯/日落起期
       setFormItem("Base.tRunEndTm", {  hidden: true  }); //追溯/日落止期
+      setFormItem("Base.nTracingDays", {  hidden: true  }); //追溯/日落天数
+
       setFormItem("Base.tReportBgnTm", {  hidden: false  }); //延长报告期起始日期
       setFormItem("Base.tReportEndTm", {  hidden: false  }); //延长报告期终止日期
+      setFormItem("Base.nReportDays", {  hidden: false  }); //延长报告期天数
     }
     setValue("Base.isRetroSpect", "");
   },
@@ -216,16 +226,7 @@ const method = {
         "Base.tRunEndTm": "",
         "Base.nTracingDays": "",
       });
-    } else {
-      // //是否有追溯期/日落期没有值时, 且索赔基础名称为内索赔制 时，追溯/日落起止期必填
-      // if (getValue("Base.claimName") == "0") {
-      //   setFormItem("Base.tRunBgnTm", { rules: [getRules("required", {})], disabled: false, }); //追溯/日落起期
-      //   setFormItem("Base.tRunEndTm", { rules: [getRules("required", {})], disabled: false, }); //追溯/日落止期
-      // } else {
-      //   setFormItem("Base.tRunBgnTm", { rules: null }); //追溯/日落起期
-      //   setFormItem("Base.tRunEndTm", { rules: null }); //追溯/日落止期
-      // }
-    }
+    } 
   },
   // 追溯起期
   tRunBgnTmFn: (v) => {

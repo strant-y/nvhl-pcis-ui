@@ -28,7 +28,6 @@ import {
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
-import { yesOrNo, size, inputtype } from "@/utils/utilKey";
 import {
   AppTableConfig,
   AppTableMethod,
@@ -53,7 +52,7 @@ const removeIds = ref([]); // 删除用户ID集合 用于批量删除
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
-import { getAppPolicyList, qryEndorseList, delTmpPolicy } from "@/api/query";
+import { getInquiryPolicyList, qryEndorseList, delInquiryPolicy } from "@/api/query";
 // 变更列
 const colChange = defineAsyncComponent(() => import("../modal/colChange.vue"));
 const props = defineProps({
@@ -281,7 +280,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               inputtype: "rtinput",
               title: "查询条件",
               placeholder:
-                  "申请单号 保单号 批单号 产品名称 被保人名称 被保人证件号码 手机号码 被保人地址 投保人名称",
+                  "询价单号 保单号 产品名称",
               btnWidth: 10,
               itemWidth: 2,
               showExBtn: true,
@@ -353,17 +352,17 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               title: "二级分公司",
               clearable: true,
           },
-          {
-              prop: "cDataTyp",
-              inputtype: "rtselect",
-              title: "列表类型",
-              clearable: true,
-              rules: [getRules("required", {})],
-              loadData: [
-                  { label: "全部", value: "app" },
-                  { label: "最新", value: "ply" },
-              ],
-          },
+        //   {
+        //       prop: "cDataTyp",
+        //       inputtype: "rtselect",
+        //       title: "列表类型",
+        //       clearable: true,
+        //       rules: [getRules("required", {})],
+        //       loadData: [
+        //           { label: "全部", value: "app" },
+        //           { label: "最新", value: "ply" },
+        //       ],
+        //   },
           // {
           //   prop: "cPlyNo",
           //   inputtype: "rtselect",
@@ -488,84 +487,84 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               ],
           },
           {
-              prop: "cAppNo",
+              prop: "cInquiryNo",
               inputtype: "rtinput",
-              title: "投保单号",
+              title: "询价单号",
               clearable: true,
           },
-          {
-              prop: "cPlyNo",
-              inputtype: "rtinput",
-              title: "保单号/批单号",
-              clearable: true,
-          },
-          {
-              prop: "cAppNme",
-              inputtype: "rtinput",
-              title: "投保人名称",
-              clearable: true,
-          },
-          {
-              prop: "cInsuredNme",
-              inputtype: "rtinput",
-              title: "被保人名称",
-              clearable: true,
-          },
+        //   {
+        //       prop: "cPlyNo",
+        //       inputtype: "rtinput",
+        //       title: "保单号/批单号",
+        //       clearable: true,
+        //   },
+        //   {
+        //       prop: "cAppNme",
+        //       inputtype: "rtinput",
+        //       title: "投保人名称",
+        //       clearable: true,
+        //   },
+        //   {
+        //       prop: "cInsuredNme",
+        //       inputtype: "rtinput",
+        //       title: "被保人名称",
+        //       clearable: true,
+        //   },
           // {
           //   prop: "appCde",
           //   inputtype: "rtinput",
           //   title: "询价单号",
           //   clearable: true,
           // },
-          {
-              prop: "cAppTyp",
-              inputtype: "rtselect",
-              title: "申请单类型",
-              minWidth: 180,
-              clearable: true,
-              loadData: [
-                  { label: "投保", value: "A" },
-                  { label: "批改", value: "E" },
-              ],
-              func: (val) => {
-                  if (val === "A") {
-                      // 投保
-                      formconfig1.fromSchema?.forEach((item) => {
-                          if (item.prop === "tAppTm") {
-                              item.hidden = false; // 显示投保日期
-                              item.rules = [getRules("required", {})]; // 设置必填规则
-                          } else if (item.prop == "tIssueTm" || item.prop == "tEdrAppTm") {
-                              item.hidden = true;
-                          }
-                      });
-                  } else if (val === "E") {
-                      // 批改
-                      formconfig1.fromSchema?.forEach((item) => {
-                          if (item.prop === "tEdrAppTm") {
-                              item.hidden = false; // 显示批改申请日期
-                              item.rules = [getRules("required", {})]; // 设置必填规则
-                          } else if (item.prop == "tAppTm") {
-                              item.hidden = true;
-                          } else if (item.prop == "tIssueTm") {
-                              item.hidden = true;
-                          }
-                      });
-                  } else if(!val) {
-                    // 清空选中值
-                    formconfig1.fromSchema?.forEach((item) => {
-                        if (item.prop === "tAppTm" || item.prop === "tEdrAppTm") {
-                            item.hidden = true; // 隐藏投保日期、批改申请日期
-                        } else if (item.prop == "tIssueTm") {
-                            item.hidden = false; // 显示签单日期
-                        }
-                    });
-                  }
-              },
-          },
+        //   {
+        //       prop: "cAppTyp",
+        //       inputtype: "rtselect",
+        //       title: "申请单类型",
+        //       minWidth: 180,
+        //       clearable: true,
+        //       loadData: [
+        //           { label: "投保", value: "A" },
+        //           { label: "批改", value: "E" },
+        //       ],
+        //       func: (val) => {
+        //           if (val === "A") {
+        //               // 投保
+        //               formconfig1.fromSchema?.forEach((item) => {
+        //                   if (item.prop === "tAppTm") {
+        //                       item.hidden = false; // 显示投保日期
+        //                       item.rules = [getRules("required", {})]; // 设置必填规则
+        //                   } else if (item.prop == "tIssueTm" || item.prop == "tEdrAppTm") {
+        //                       item.hidden = true;
+        //                   }
+        //               });
+        //           } else if (val === "E") {
+        //               // 批改
+        //               formconfig1.fromSchema?.forEach((item) => {
+        //                   if (item.prop === "tEdrAppTm") {
+        //                       item.hidden = false; // 显示批改申请日期
+        //                       item.rules = [getRules("required", {})]; // 设置必填规则
+        //                   } else if (item.prop == "tAppTm") {
+        //                       item.hidden = true;
+        //                   } else if (item.prop == "tIssueTm") {
+        //                       item.hidden = true;
+        //                   }
+        //               });
+        //           } else if(!val) {
+        //             // 清空选中值
+        //             formconfig1.fromSchema?.forEach((item) => {
+        //                 if (item.prop === "tAppTm" || item.prop === "tEdrAppTm") {
+        //                     item.hidden = true; // 隐藏投保日期、批改申请日期
+        //                 } else if (item.prop == "tIssueTm") {
+        //                     item.hidden = false; // 显示签单日期
+        //                 }
+        //             });
+        //           }
+        //       },
+        //   },
           {
               prop: "tIssueTm",
               inputtype: "rtdatepicker",
-              title: "签单日期",
+              title: "询价日期",
               format: "YYYY-MM-DD HH:mm:ss",
               valueFormat: "YYYY-MM-DD HH:mm:ss",
               clearable: true,
@@ -589,17 +588,17 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               clearable: true,
               type: "datetimerange",
           },
-          {
-              prop: "seeBilling",
-              inputtype: "rtselect",
-              title: "是否见费出单",
-              minWidth: 180,
-              clearable: true,
-              loadData: [
-                  { label: "是", value: "1" },
-                  { label: "否", value: "0" },
-              ],
-          },
+        //   {
+        //       prop: "seeBilling",
+        //       inputtype: "rtselect",
+        //       title: "是否见费出单",
+        //       minWidth: 180,
+        //       clearable: true,
+        //       loadData: [
+        //           { label: "是", value: "1" },
+        //           { label: "否", value: "0" },
+        //       ],
+        //   },
           {
               prop: "CEmployeeName",
               inputtype: "rtinput",
@@ -744,7 +743,7 @@ const modalForm = [
         title: "",
         itemWidth: 3,
         loadData: [
-            { label: "投保单", value: "cAppNo" },
+            { label: "询价单", value: "cInquiryNo" },
             { label: "保单", value: "cPlyNo" },
             { label: "批单", value: "cEdrNo" },
             { label: "批改序号", value: "c" },
@@ -765,10 +764,10 @@ const modalForm = [
 
 // 变更列数据
 const tableCol = ref<Array<any>>([
-    { title: "投保单", prop: "cAppNo", inputtype: "rtinput", minWidth: 180 },
+    { title: "询价单", prop: "cInquiryNo", inputtype: "rtinput", minWidth: 180 },
     { title: "保单", prop: "cPlyNo", inputtype: "rtinput", minWidth: 180 },
-    { title: "批单", prop: "cEdrNo", inputtype: "rtinput", minWidth: 180 },
-    { title: "批改序号", prop: "c", inputtype: "rtinput", minWidth: 180 },
+    // { title: "批单", prop: "cEdrNo", inputtype: "rtinput", minWidth: 180 },
+    // { title: "批改序号", prop: "c", inputtype: "rtinput", minWidth: 180 },
     { title: "机构", prop: "cDptCnm", inputtype: "rtinput", minWidth: 180 },
     {
         title: "二级分公司",
@@ -792,7 +791,7 @@ const tableCol = ref<Array<any>>([
     { title: "询价单号", prop: "n", inputtype: "rtinput", minWidth: 180 },
 ]);
 const tableObj = {
-    // 查询单 投保单 保单 批单
+    // 查询单 询价单 保单 批单
     notWaitObj: {
         // 默认好像就2个不参与显示/隐藏
         tableBtnType: "btn",
@@ -861,42 +860,8 @@ const tableObj = {
                             query: {
                                 param: JSON.stringify({
                                     ...data,
-                                    ...{ pageType: "TEMPORARY_DEPOSIT" },
+                                    ...{ pageType: "TEMPORARY_DEPOSIT", pageName: 'priceInquiry' },
                                 }),
-                            },
-                        });
-                    } else {
-                        ElMessage.warning("请检查表单！");
-                    }
-                },
-            }),
-            createFreeButtonBase({
-                id: "copy",
-                link: true,
-                iconColor: "#02D05F",
-                tooltip: "复制",
-                size: "large",
-                icon: "DocumentCopy",
-                hideBtns: (row: any) => {
-                  if (
-                    row.cAppStatus == "1" ||
-                    row.cAppStatus == "5"
-                  ) {
-                    return false;
-                  } else {
-                    return true;
-                  }
-                },
-                tableClick: async (row) => {
-                    console.log(row);
-                    const r = await row;
-                    if (r) {
-                        const data = row;
-                        console.log("0000000000000", data);
-                        router.push({
-                            path: "/pcis/my-page",
-                            query: {
-                                param: JSON.stringify({ ...data, ...{ pageType: "copy" } }),
                             },
                         });
                     } else {
@@ -912,10 +877,9 @@ const tableObj = {
                 size: "large",
                 icon: "Delete",
                 hideBtns: (row: any) => {
+                    // 删除按钮只在状态为"暂存"时可见
                     if (
-                        row.cAppStatus == "1" ||
-                        row.cAppStatus == "3" ||
-                        row.cAppStatus == "8"
+                        row.cAppStatus == "1"
                     ) {
                         return false;
                     } else {
@@ -928,7 +892,7 @@ const tableObj = {
                         cancelButtonText: "取消",
                         type: "warning",
                     }).then(function () {
-                        const delResult = delTmpPolicy({ cAppNo: row.cAppNo });
+                        const delResult = delInquiryPolicy({ cInquiryNo: row.cInquiryNo });
                         delResult.then((res: any) => {
                             if (null != res && null != res["code"]) {
                                 if (res["code"] === 200) {
@@ -942,24 +906,44 @@ const tableObj = {
                     });
                 },
             }),
+            createFreeButtonBase({
+                id: "score",
+                link: true,
+                tooltip: "询价转投保",
+                type: "primary",
+                size: "large",
+                icon: "RefreshRight",
+                hideBtns: (row: any) => {
+                    // 询价转投保按钮只在状态为"已出保单"时可见
+                    if (
+                        row.cAppStatus == "5"
+                    ) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                },
+                tableClick: (row) => {
+                    router.push({
+                        path: "/pcis/my-page",
+                        query: {
+                            param: JSON.stringify({ ...row, ...{ pageType: "inquiryToApp" } }),
+                        },
+                    });
+                },
+            }),
         ],
         fromSchema: [
             {
-                prop: "cAppNo",
+                prop: "cInquiryNo",
                 inputtype: "rtinput",
-                title: "投保单",
+                title: "询价单",
                 minWidth: 180,
             },
             {
                 prop: "cPlyNo",
                 inputtype: "rtinput",
                 title: "保单",
-                minWidth: 180,
-            },
-            {
-                prop: "cEdrNo",
-                inputtype: "rtinput",
-                title: "批单",
                 minWidth: 180,
             },
             {
@@ -1154,7 +1138,7 @@ function handleQuery(flag?: boolean) {
     param["tIssueTmStart"] = tIssueTmStart; // 添加签单开始时间
     param["tIssueTmEnd"] = tIssueTmEnd; // 添加签单结束时间
     param["queryType"] = queryType.value;
-    getAppPolicyList(param)
+    getInquiryPolicyList(param)
         .then((res) => {
             const { code, data, msg } = res;
             if (200 === code) {

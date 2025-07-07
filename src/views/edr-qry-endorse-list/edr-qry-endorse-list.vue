@@ -152,32 +152,54 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
                 func: (val: any) => {
                     //根据产品大类再次请求条款接口
-                    codeListStore
-                        .queryCodeList(
-                            {
-                                codeListName: "PROD_LIST",
-                                codeListParam: {
-                                    cParCde: val,
-                                    cOperId: user.value.opCde,
-                                    cDptCde: user.value.companyId,
-                                },
+                    // codeListStore
+                    //     .queryCodeList(
+                    //         {
+                    //             codeListName: "PROD_LIST",
+                    //             codeListParam: {
+                    //                 cParCde: val,
+                    //                 cOperId: user.value.opCde,
+                    //                 cDptCde: user.value.companyId,
+                    //             },
+                    //         },
+                    //         false,
+                    //         false
+                    //     )
+                    //     .then((res) => {
+                    //         if (res && res.code == 200) {
+                    //             const codeValData = res.data;
+                    //             if (codeValData) {
+                    //                 //清空条款显示值，重置条款下拉值
+                    //                 freeEditRef.value?.setValue("prodNo", "");
+                    //                 setFormItem("prodNo", {
+                    //                     loadData: codeValData,
+                    //                 });
+                    //             }
+                    //         }
+                    //     });
+                    // freeEditRef.value?.setValue("prodNo", []); // 清空条款
+                    if(val){
+                        console.log(11,val)
+                        freeEditRef.value?.setValue('cProdNo',[]);
+
+                        setFormItem('cProdNo',{
+                            typeCode: "TERM_LIST_IN_GUIDE_NEW",
+                            codeParam: {
+                                cParCde: val,
+                                // cOperId: user.value.opCde,
+                                // cDptCde: user.value.companyId,
                             },
-                            false,
-                            false
-                        )
-                        .then((res) => {
-                            if (res && res.code == 200) {
-                                const codeValData = res.data;
-                                if (codeValData) {
-                                    //清空条款显示值，重置条款下拉值
-                                    freeEditRef.value?.setValue("prodNo", "");
-                                    setFormItem("prodNo", {
-                                        loadData: codeValData,
-                                    });
-                                }
-                            }
+                        })
+                    }else{
+                         console.log(2,val)
+                        freeEditRef.value?.setValue('cProdNo',[]);
+                            setFormItem("cProdNo", {
+                                typeCode: "",
+                                codeParam: {},
+                                loadData: [],
                         });
-                    freeEditRef.value?.setValue("prodNo", []); // 清空条款
+                    }
+                 
                 },
             },
             {
@@ -185,12 +207,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 inputtype: "rtselect",
                 title: "条款",
                 clearable: true,
-                typeCode: "TERM_LIST_IN_GUIDE_NEW",
-                params: {
-                    cParCde: "",
-                    cOperId: user.value.opCde,
-                    cDptCde: user.value.companyId,
-                },
+                // typeCode: "TERM_LIST_IN_GUIDE_NEW",
+                // params: {
+                //     cParCde: "",
+                //     cOperId: user.value.opCde,
+                //     cDptCde: user.value.companyId,
+                // },
             },
             {
                 prop: "cInsuredNme",
@@ -380,18 +402,24 @@ const handleDateChange = (value) => {
         .format("YYYY-MM-DD HH:mm:ss");
 };
 const handleQuery = (flag = true) => {
-    submitForm(flag);
-};
-
-const submitForm = (flag) => {
-    freeEditRef.value?.validate().then((isValid) => {
+    // submitForm(flag);
+       freeEditRef.value?.validate().then((isValid) => {
         if (isValid) {
             refreshData(flag);
         }
     });
 };
 
+// const submitForm = (flag) => {
+//     freeEditRef.value?.validate().then((isValid) => {
+//         if (isValid) {
+//             refreshData(flag);
+//         }
+//     });
+// };
+
 const refreshData = (reset = true) => {
+ 
     const formData = freeEditRef.value?.getFromValue();
     if (!formData.cPlyNo) {
         const startTemp =
@@ -417,7 +445,7 @@ const refreshData = (reset = true) => {
             return;
         }
     }
-    console.log(props.activeName, "=====");
+    // console.log(props.activeName, "=====");
     const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
     const s = freeEditRef.value?.getFromValue(); //获取表单数据
     if (s.cLoadSub == null) {
@@ -438,20 +466,26 @@ const refreshData = (reset = true) => {
     };
     const params = Object.assign(s, r, obj);
     sessionStorage.setItem(AppKey.query.pcis_query_endorse, params);
-
+      
     pcisEdrQueryService.qryEndorseList(params).then((res: any) => {
-        if (null != res && null != res["code"]) {
-            if (res["code"] === 200) {
-                const pageData = res.data;
+        let{code , data }=res;
+ 
+        pageresult.list =[];
+        // if (null != res && null != res["code"]) {
+            if (code === 200) {
+              
+                const pageData = data;
                 if (pageData) {
+                  
                     pageresult.total = pageData.total;
                     pageData.result.forEach((item) => {
                         changeRsnValue(item);
                     });
                     pageresult.list = pageData.result;
+                   
                 }
             }
-        }
+        // }
     });
 };
 function handleRsnChange(val, row) {
@@ -641,15 +675,19 @@ const getDetailRsn = (item) => {
 
 // 批改原因处理
 const changeRsnValue = (item) => {
-    const detail = [];
+    let detail = [];
     // const rsnTyp = routeData["rsnTyp"];
     let rsnTyp = "";
+    let urlStr = 'EDR_RSN_LIST_KIND';
     if (props.activeName === "一般批改") {
         rsnTyp = "1";
+        urlStr = 'EDR_RSN_LIST_KIND';
     } else if (props.activeName === "注销") {
         rsnTyp = "2";
+        urlStr = 'EDR_RSN_LIST_ZX';
     } else if (props.activeName === "退保") {
         rsnTyp = "3";
+         urlStr = 'EDR_RSN_LIST_TB';
     }
     routeData["rsnTyp"] = rsnTyp
     selected.value = item;
@@ -657,6 +695,7 @@ const changeRsnValue = (item) => {
     const prodNo = item["cProdNo"];
     const isGrp = grpMrk !== "0" ? "1" : null;
     const isPer = grpMrk === "0" ? "1" : null;
+//    console.log(rsnTyp,grpMrk,prodNo,codeListMap.value[prodNo + item["id"]])
     if (
         undefined === codeListMap.value[prodNo + grpMrk] ||
         null === codeListMap.value[prodNo + grpMrk]
@@ -664,7 +703,7 @@ const changeRsnValue = (item) => {
         // 当缓存中无该产品的批改原因时
         if (rsnTyp === "1") {
             // 一般批改
-            getListByCode("EDR_RSN_LIST_KIND", {
+            getListByCode(urlStr, {
                 prodNo: prodNo,
                 kindNo: prodNo.substring(0, 2),
                 rsnTyp: rsnTyp,
@@ -692,7 +731,8 @@ const changeRsnValue = (item) => {
             );
         } else {
             // 退保注销
-            getListByCode("EDR_RSN_LIST_KIND", {
+            // getListByCode("EDR_RSN_LIST_KIND", {
+            getListByCode(urlStr, {
                 kindNo: prodNo.substring(0, 2),
                 rsnTyp: rsnTyp,
             }).then(
@@ -721,12 +761,16 @@ const changeRsnValue = (item) => {
         item["id"] = item["id"]
             ? item["id"]
             : codeListMap.value[prodNo + grpMrk][0]["value"];
-        if (
+
+
+            if (
             undefined === codeListMap.value[prodNo + item["id"] + grpMrk] ||
-            null === codeListMap.value[prodNo + item["id"] + grpMrk]
+            null === codeListMap.value[prodNo + item["id"] + grpMrk] 
+            || codeListMap.value[prodNo + item["id"] + grpMrk].length ===0
         ) {
             // 当缓存中无该产品批改原因详细时
             // 处理批改原因详细
+     
             getDetailRsn(item);
         } else {
             // 当缓存中有该产品批改原因详细时
@@ -734,17 +778,21 @@ const changeRsnValue = (item) => {
                 detail.push(
                     codeListMap.value[prodNo + item["id"] + grpMrk][0]["value"]
                 );
+             
                 setTimeout(() => {
                     item["iddetail"] = detail;
                     // 缓存批改原因
                     changeRsn(item["id"], item["cPlyNo"], item["iddetail"]);
                 }, 5);
+                
             } else {
+     
                 detail.push(item["id"]);
                 setTimeout(() => {
                     item["iddetail"] = detail;
                     // 缓存批改原因
                     changeRsn(item["id"], item["cPlyNo"], item["iddetail"]);
+                    
                 }, 5);
             }
         }
@@ -822,7 +870,6 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
             } else {
                 if (result["data"]) {
                     // debugger
-                    console.log("000000000", rsnCde.value[selected.value["cPlyNo"]], routeData["rsnTyp"]);
                     // 如果选的批改原因是变更影像上传方式
                     if ("DZ" === rsnCde.value[selected.value["cPlyNo"]]) {
                         modifyImageUploadMode(cPlyNo);
@@ -849,7 +896,7 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                             cJiMrk: selected.value["cJiMrk"],
                             cDptCde: selected.value["cDptCde"],
                             cDptCnm: selected.value["cDptCnm"],
-                            cEdrType: routeData["rsnTyp"],
+                            cEdrType: '2',
                             pageType: "EDR_APP_NEW_SCENE",
                             cTermNme: selected.value["cTermNme"],
                             cTermNo: selected.value["cTermNo"],
@@ -878,7 +925,7 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                             cJiMrk: selected.value["cJiMrk"],
                             cDptCde: selected.value["cDptCde"],
                             cDptCnm: selected.value["cDptCnm"],
-                            cEdrType: routeData["rsnTyp"],
+                            cEdrType: '3',
                             pageType: "EDR_APP_NEW_SCENE",
                             cTermNme: selected.value["cTermNme"],
                             cTermNo: selected.value["cTermNo"],
@@ -907,7 +954,7 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                             cJiMrk: selected.value["cJiMrk"],
                             cDptCde: selected.value["cDptCde"],
                             cDptCnm: selected.value["cDptCnm"],
-                            cEdrType: routeData["rsnTyp"],
+                            cEdrType: '1',
                             pageType: "EDR_APP_NEW_SCENE",
                             cTermNme: selected.value["cTermNme"],
                             cTermNo: selected.value["cTermNo"],
@@ -963,6 +1010,7 @@ const transferRsnDetail = (rsnDetail) => {
 };
 
 onMounted(() => {
+   
     freeEditRef.value?.setFormValue({
         tAppTm: [
             moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
@@ -990,6 +1038,8 @@ onMounted(() => {
             ElMessage.error(res.msg);
         }
     });
+
+     handleQuery();  //查询
 });
 
 watch(dialogVisible, (newValue) => {

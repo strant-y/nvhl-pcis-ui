@@ -70,14 +70,22 @@ const formconfig1 = ref<AppFreeEditConfig>(
           const isValid = await freeEditRef.value?.validate();
           if(isValid){
             const s = freeEditRef.value?.getFromValue();
+
+            console.log('路由data‘',route.params)
+            // return false;
             const params = Object.assign(
               {
                 cProdNo: route.params.param.cProdNo,
                 cComponentTable: cComponentTable.value,
-                cAppNo: appNo.value,
+                // cAppNo: appNo.value,
               },
               { dist: s }
             );
+            if(route.params.param?.pageName === "priceInquiry") {
+              params.cInquiryNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+            } else {
+              params.cAppNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+            }
             console.log('params', params)
             saveDist(params).then((res) => {
               if (res.code === 200) {
@@ -105,7 +113,7 @@ const formconfig1 = ref<AppFreeEditConfig>(
     ],
   })
 );
-const distContactList:Array<string> = ['Dist.PartProp','Tgt.cSuffixAddr','Dist.Prop','Dist.cSuffixAddr','Dist.JingyingProp','Dist.cDetailedAddress']
+const distContactList:Array<string> = ['Dist.PartProp','Tgt.cSuffixAddr','Dist.Prop','Dist.cSuffixAddr','Dist.JingyingProp','Dist.cDetailedAddress','Dist.BusinessAllProp']
 
 onMounted(() => {
   // console.log(333)   distAdd
@@ -120,6 +128,7 @@ onMounted(() => {
 
     // console.log('Dist.cPlateNumber',props.data.fromSchema)
     let item = JSON.parse(JSON.stringify(props.data.fromSchema[i]));
+       console.log(item) 
     if(['Dist.AllOccup'].includes(item.prop)) {
       item["func"] = getDistoccupType;
     }else if (props.data.fromSchema[i]["func"]) {
@@ -133,7 +142,7 @@ onMounted(() => {
     if(cIs == 1 && item.prop !=='Dist.nSeqNo'){
         item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
     }else if(cIs == 0 && (item.prop !=='Dist.cSchoolName' && item.prop !=='Dist.cSchoolAddress')){
-      item['rules'] =null;
+      // item['rules'] =null;
     }
     // item["disabled"] = false;
     if(item.cShowLocation === '1'){
@@ -154,11 +163,16 @@ onMounted(() => {
     }
     // 043009 关联被保人
     if(item.prop === 'Dist.cRelatedInsured'){
-      const insured =  opertaor.getDataAll()['insured'];
-      if(insured && insured['Insured.cInsuredCde']) {
-        setTimeout(() => {
-          setValue('Dist.cRelatedInsured', insured);
-        }, 100);
+      if(cGrpMrk.value === '1') {
+        const insured = opertaor.getDataAll()['insured'];
+        if (insured && insured['Insured.cInsuredCde']) {
+          setTimeout(() => {
+            setValue('Dist.cRelatedInsured', insured['Insured.cPkId']);
+          }, 100);
+        }
+      }else {
+        item['rules'] = [];
+        item["hidden"] = true;
       }
     }
     // 043009 实际用工地址关联 团单才展示
@@ -174,24 +188,42 @@ onMounted(() => {
           setValue('Dist.nAge', age);
         }
       }
+      item['rules'] = [getRules("idCard", {})];
     }
+
+        // 身份证类型自动回填年龄
+    if(item.prop =='Dist.cDocumentType'){
+      item['func'] =  cDocumentTypeChange;
+    }
+
 
     if(item.prop =='Dist.cSchoolName'){
       item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
     }
-    if(item.prop =='Dist.cIdentificationNumber'){
-      item['rules'] = [ getRules("idCard", {})];
+    if(item.prop =='Dist.HouseAreaProp'){
+      item?.groupList.forEach(data => {
+        data.rules = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+      })
+    }
+    // 040001产品 必填项问题
+    if(item.prop =='Dist.cPlanNo' ||item.prop =='Dist.tOpeningTime' ||item.prop =='Dist.cLocationSigns' ||item.prop =='Dist.cFacilitySigns' ||item.prop =='Dist.cVenueSign' || item.prop =='Dist.cBuildingStructure'  ){
+      console.log('进啊2=',item.prop)
+      item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];   
     }
 
-    console.log(item)
-
+ 
+    console.log('21116’“，',props.data.fromSchema[i]["groupList"] )
     // 遍历groupList数组把函数赋值给fromSchema
     if (props.data.fromSchema[i]["groupList"] && props.data.fromSchema[i]["groupList"].length>0) {
       props.data.fromSchema[i]["groupList"].forEach((data:any,index:number,arr:any) =>{
         //  040001经营场所地址 040005 学校地址 040021 经营场所地址 042003 学校地址 043013 标的坐落地址 043020 房屋所在地区 045001工程项目地址
         if(distContactList.includes(data.prop)){
+          console.log(333, item)
+          console.log(333, arr)
+          console.log(333, props.data.fromSchema)
           item["groupList"][index]['func'] = function (){
-            return setcDetailedAddress(arr,JSON.parse(JSON.stringify(props.data.fromSchema[i+1])))
+            // return setcDetailedAddress(arr,JSON.parse(JSON.stringify(props.data.fromSchema[i+1])))
+            return setcDetailedAddress(arr,JSON.parse(JSON.stringify(props.data.fromSchema[i])))
           }
         }
       })
@@ -242,6 +274,45 @@ const getDistoccupType = (val) => {
   });
 }
 
+// 证件类型change
+const cDocumentTypeChange =(val:any)=>{
+  console.log(val)
+   const item = freeEditRef.value?.getFromSchemaItem('Dist.cIdentificationNumber')
+    //  身份证
+    if (val == "120001") { 
+     item.itemConfig['rules'] = [ getRules("idCard", {})];
+    } else if ( val == "110007") {   
+      // 统一社会信用代码校验
+      item.itemConfig['rules'] = [getRules("socialCode", {})];
+    } else if(val == "19"){
+      // 外国人证件号
+      item.itemConfig['rules'] = [getRules("ariCard", {})];
+    } else if(val =='110001'){
+      // 组织机构编码校验
+      item.itemConfig['rules'] =[getRules("orgCode", {})];
+    } else {
+      item.itemConfig['rules'] = [ getRules("isNull", {})];
+    }
+}
+
+
+//给表单赋值
+function setFormItem(key: any, obj: any) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.btnItems && obj.btnItems) {
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
+          }
+        }else{
+          Object.assign(item, obj);
+        }
+      }
+    });
+  }
+}
 
 
 function getFromValue() {

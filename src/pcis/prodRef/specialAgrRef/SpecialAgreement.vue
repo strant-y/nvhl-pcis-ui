@@ -55,7 +55,7 @@ const props = defineProps({
 });
 
 const rttableFrom = ref<any>(null);
-
+const parparam = opertaor.getParam();
 const cardconfig = ref(creatCardConfig({}));
 const moveUpTimer = ref(null);
 const moveDownTimer = ref(null);
@@ -80,7 +80,7 @@ const tableconfig = reactive<AppTableConfig>(
       createFreeButtonBase({
         id: "score",
         link: true,
-        tooltip: "编辑",
+        tooltip: "编辑", 
         type: "success",
         size: "large",
         icon: "Edit",
@@ -108,9 +108,23 @@ const tableconfig = reactive<AppTableConfig>(
           dzmodal.open(specEdit, { type: "view", data: param,
           callback: (res: any) => {
               if (res.type === "ok") {
-                row.cSpecialContent = res.data.cSpecialContent
-                row['editList']= res.data['editList']
-              }
+                // row.cSpecialContent = res.data.cSpecialContent
+                // row['editList']= res.data['editList']
+
+
+
+                 let list = formData.value;
+                 const index = list.findIndex(
+                    item => item.cSpecialContent === row.cSpecialContent
+                  );
+                    if (index !== -1) {
+                      nextTick(()=>{
+                        list[index]['cSpecialContent'] = res.data.cSpecialContent;
+                        list[index]['editList'] =res.data['editList']
+                        formData.value = list
+                      })
+                    }      
+                }
             } })
           // .
           // then((res) => {
@@ -237,6 +251,10 @@ onMounted(async () => {
   formData.value.forEach((item, index) => {
     item.index = index + 1;
   });
+
+  // setTimeout(()=>{
+  //   setDisabledAll()
+  // })
 });
 
 
@@ -419,6 +437,9 @@ function setDisabledAll() {
       item.hidden = true;
     });
   }
+  tableconfig.tableBtn.forEach(element => {
+    element.hidden = true;
+  });
 }
 function setUnDisabledByKeyList(key: any) {
   cardconfig.value.endBtns?.forEach((item: any) => {
@@ -431,11 +452,29 @@ function setUnDisabledByKeyList(key: any) {
       item.hidden = false;
     }
   });
+
+  let r = false;
+  if(key === "Btn_getSpecial_btn"){
+    r = true;
+  }
+  
+  if(r){
+    tableconfig.tableBtn.forEach(element => {
+      element.hidden = false;
+    });
+  }
 }
+function getFormconfig() {
+  return {
+    fromType: "custom",
+  };
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
+  getFormconfig,
   setDisabledAll,
   setUnDisabledByKeyList
 });

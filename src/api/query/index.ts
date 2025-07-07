@@ -26,7 +26,7 @@ export function getAddressStr(queryParams: any): AxiosPromise<any> {
 }
 
 /**
- * 获取投保单号
+ * 获取申请单号
  * @param queryParams
  */
 export function generatelSingleNo(queryParams: any): AxiosPromise<any> {
@@ -246,4 +246,53 @@ export function calculatePremium(queryParams: any): AxiosPromise<any> {
  */
 export function getAppPolicyForCopy(queryParams: any): AxiosPromise<any> {
     return post(`/policy/getAppPolicyForCopy`, queryParams);
+}
+
+/**
+ * 询价-投保单保存
+ * @param queryParams
+ */
+export function saveInquiry(queryParams: any): AxiosPromise<any> {
+    return post(`/inquiry/save`, queryParams);
+}
+
+/**
+ * 询价-投保单申请核保
+ * @param queryParams
+ */
+export function submitInquiry(queryParams: any): AxiosPromise<any> {
+    return post(`/inquiry/submit`, queryParams);
+}
+
+/**
+ * 询价-核保保存
+ * @param queryParams
+ */
+export function submitUnderwrite(queryParams: any): AxiosPromise<any> {
+    return post(`/inquiry/submitUnderwrite`, queryParams);
+}
+
+/**
+ * 综合查询-询价单查询
+ * @param queryParams
+ */
+export function getInquiryPolicyList(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/getInquiryPolicyList`, queryParams);
+}
+
+
+/**
+ * 综合查询-询价单删除
+ * @param queryParams
+ */
+export function delInquiryPolicy(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/delInquiryPolicy`, queryParams);
+}
+
+/**
+ * 询价-获取询价单数据
+ * @param queryParams
+ */
+export function getInquiryPolicy(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/getInquiryPolicy`, queryParams);
 }

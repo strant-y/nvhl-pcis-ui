@@ -263,7 +263,7 @@ onMounted(async () => {
     await nextTick()
     // 给投保日期赋值
     freeEditRef.value.setValue('dateRange', [props.homeJumpData.startBsTm1, props.homeJumpData.endBsTm1])
-    if(props.homeJumpData.value.hasOwnProperty('objId')) { //申请单号
+    if(props.homeJumpData.hasOwnProperty('objId')) { //申请单号
       freeEditRef.value.setValue('objId', props.homeJumpData.value.objId)
     }
     await nextTick()

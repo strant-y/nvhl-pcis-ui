@@ -49,8 +49,13 @@ const method = {
   },
   // 影像上传管理
   imageUploadManage: () => {
-    let baseFlag = opertaor.getDataAll().plyBase["Base.cAppNo"];
-    checkAppBase({ cAppNo: baseFlag }).then((res) => {
+    const param = {};
+    if(route.params.param?.pageName === "priceInquiry") {
+      param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else {
+      param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+    }
+    checkAppBase(param).then((res) => {
       if (res.code === 200) {
         const tabref = opertaor.getTableRefs();
         const cEdrType = param.cEdrType;
@@ -122,8 +127,13 @@ const method = {
   },
   // 影像查看
   imageView: () => {
-    let baseFlag = opertaor.getDataAll().plyBase["Base.cAppNo"];
-    checkAppBase({ cAppNo: baseFlag }).then((res) => {
+    const param = {};
+    if(route.params.param?.pageName === "priceInquiry") {
+      param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else {
+      param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+    }
+    checkAppBase(param).then((res) => {
       if (res.code === 200) {
         showImagSys("manager");
       } else {

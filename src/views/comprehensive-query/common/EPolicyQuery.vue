@@ -167,7 +167,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             {
                 prop: 'CAppNo',
                 inputtype: 'rtinput',
-                title: '投保单号',
+                title: '申请单号',
                 clearable: true
             },
             {
@@ -289,7 +289,7 @@ const tableconfig = reactive<AppTableConfig>(
             {
                 prop: 'cAppNo',
                 inputtype: 'rtinput',
-                title: '投保单号'
+                title: '申请单号'
             },
             {
                 prop: 'cPlyNo',
@@ -609,7 +609,7 @@ function downloadEPolicy() {
     pcisQueryService
         .downloadEPolicy(data)
         .then((res: any) => {
-            if (res == '' || res == '500' || res.size <= 0) {
+            if (res == '' || res == '500' || res.data.size <= 3 ) {
                 ElMessage.error('下载出错，请核实是否有生成电子' + platTypeMap[plyTyp] + '！')
                 return
             }

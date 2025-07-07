@@ -91,11 +91,14 @@ function query() {
 
 function save() {
   const allFromData = formPage.value?.getAllFormData();
+  const user = JSON.parse(sessionStorage.getItem("user"));
   console.log('allFromData', allFromData);
   ElMessage.warning('保存');
   cargoApi.save({
     ...allFromData,
-    ...{}
+    ...{},
+    ...{user},
+    sence:'save'
   }).then((res: any) => {
     if(res.code === 200) {
       ElMessage.success('保存成功')
@@ -116,10 +119,13 @@ function save() {
 
 function submit() {
   const allFromData = formPage.value?.getAllFormData();
+  const user = JSON.parse(sessionStorage.getItem("user"));
   ElMessage.warning('提交');
   cargoApi.submit({
     ...allFromData,
-    ...{}
+    ...{},
+    ...{user},
+    sence:'save'
   }).then((res: any) => {
     if(res.code === 200) {
       ElMessage.success('提交成功')

@@ -1,6 +1,8 @@
 <template>
   <el-dialog v-model="dialogVisible" width="70%">
-    <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
+    <el-config-provider :locale="locale">
+      <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
+    </el-config-provider>
     <app-table
       :tableConfig="tableconfig"
       v-model:pageresult="pageresult"
@@ -33,6 +35,9 @@ import {
 } from "@/shared/app-table-config";
 import { listChrDepts } from "@/api/dept";
 import dayjs from "dayjs";
+import { useAppStore } from "@/store";
+const appStore = useAppStore();
+const locale = computed(() => appStore.locale);
 
 const props = defineProps({
   data: {
@@ -223,7 +228,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cAppNo",
         inputtype: "rtinput",
-        title: "投保单号",
+        title: "申请单号",
       },
       {
         prop: "cPlyNo",

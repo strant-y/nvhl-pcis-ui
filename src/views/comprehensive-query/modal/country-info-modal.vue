@@ -72,16 +72,6 @@ const formconfig = reactive<AppFreeEditConfig>(
     ],
     fromSchema: [
       {
-        prop: "countryCn",
-        inputtype: "rtinput",
-        title: "国家中文名称",
-      },
-      {
-        prop: "countryEn",
-        inputtype: "rtinput",
-        title: "国家英文名称",
-      },
-      {
         prop: "portCn",
         inputtype: "rtinput",
         title: "港口中文名称",
@@ -91,6 +81,17 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         title: "港口英文名称",
       },
+      {
+        prop: "countryCn",
+        inputtype: "rtinput",
+        title: "国家中文名称",
+      },
+      {
+        prop: "countryEn",
+        inputtype: "rtinput",
+        title: "国家英文名称",
+      },
+      
     ],
     fromUi: createFromUiConfig({
       cols: 3,

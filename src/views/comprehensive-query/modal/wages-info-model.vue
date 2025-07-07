@@ -227,7 +227,7 @@ onMounted(async () => {
     }
     getTableFun();
 
-    //     let CAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];   // 投保单号
+    //     let CAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];   // 申请单号
 
     //     policyService.getAMLExtendInfoByAppNo(CAppNo,'Applicant').then((response) => {
     //         let {code, data} = response
@@ -248,13 +248,16 @@ onMounted(async () => {
 
 // 收益所有人table信息
 const getTableFun = async (isSave=false) => {
-    let cAppNo = props.data.cAppNo;  // 投保单号
+    let cAppNo = props.data.cAppNo;  // 申请单号
     let cRegisteredLogo = props.data.cRegisteredLogo;   // 
     let param = {
-        cAppNo,
         cRegisteredLogo
-
     };
+    if(props.data?.pageName === 'priceInquiry'){
+        param.cInquiryNo = props.data.cInquiryNo;  // 询价单号
+    } else {
+        param.cAppNo = cAppNo
+    }
     policyService.selectTotalSalary(param).then((response) => {
         let { code, data, msg } = response
         if (code === 200) {
@@ -281,13 +284,18 @@ const getTableFun = async (isSave=false) => {
 
 // 保存
 const saveProdDataFun = () => {
-    let cAppNo = props.data.cAppNo;  // 投保单号
+    let cAppNo = props.data.cAppNo;  // 申请单号
     let cRegisteredLogo = props.data.cRegisteredLogo;
     let param = Object.assign({
-        cAppNo,
         cRegisteredLogo
 
     }, { data: getFromValue() });
+
+    if(props.data?.pageName === 'priceInquiry'){
+        param.cInquiryNo = props.data.cInquiryNo;  // 询价单号
+    } else {
+        param.cAppNo = cAppNo
+    }
 
     policyService.saveTotalSalary(param).then((response) => {
         let { code, data, msg } = response

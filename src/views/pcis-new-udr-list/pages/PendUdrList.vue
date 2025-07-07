@@ -96,6 +96,19 @@
     const udrTypeValue = ref<string>(); // 单据状态 值
     const undrClsListOptions = ref<Array<any>>([]); // 核保级别 下拉数据
     const selectData = ref([]); // 删除用户ID集合 用于批量删除
+    
+    // 默认核保机构
+    let loadOrgCde = ref([
+          {
+                        label: "永安保险总公司",
+                        value: "0200000000000",
+                    },
+    ]);
+    watch(() => freeEditRef.value?.getValue("tm1"), (newVal,old) => {
+      
+    },{
+         deep: true
+    });
     // 根据切换下拉数据显示/隐藏对应表单
     const allForm = ref<Array<any>>([
         {
@@ -123,7 +136,7 @@
             rules: [getRules("required", {})],
             showKey: [1, 2, 5],
             btnWidth: 10,
-            itemWidth: 2,
+            // itemWidth: 2,
             showExBtn: true,
             btnItems: {
                 icon: "Search",
@@ -135,6 +148,12 @@
                             if (res.type === "ok") {
                                 if (res.body) {
                                     freeEditRef.value?.setValue("orgCde", res.body.id);
+                                    loadOrgCde.value = [
+                                            {
+                                                label: res.body.name,
+                                                value: res.body.id,
+                                            },
+                                        ]
                                     setFormItem("orgCde", {
                                         loadData: [
                                             {
@@ -221,6 +240,7 @@
             typeCode: "KIND_LIST_GRT",
             params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
             clearable: true,
+            //  multiple:1,
             func: (val: any) => {
                 //根据产品大类再次请求条款接口
                 codeListStore
@@ -261,6 +281,7 @@
             title: "条款",
             showKey: [1, 2, 3, 4, 5],
             typeCode: "TERM_LIST_IN_GUIDE_NEW",
+            // multiple:1,
             params: {
                 cParCde: "",
                 cOperId: user.value.opCde,
@@ -273,8 +294,9 @@
             prop: "undrClsCde",
             inputtype: "rtSelectV2",
             title: "核保级别",
+             
             showKey: [1, 2],
-            typeCode: "WEB_SYS_STA_DICT",
+            typeCode: "UNDR_CLS_CDE",
             params: { cDptCde: user.value.companyId, cEmpCde: user.value.opCde },
             clearable: true,
             lodaData: undrClsListOptions,
@@ -296,9 +318,10 @@
         {
             prop: "appCde",
             inputtype: "rtinput",
-            title: "投保人",
+            title: "投保人姓名",
             showKey: [1, 2, 3, 4],
             clearable: true,
+            placeholder: "请输入",
         },
         {
             prop: "tm1",
@@ -311,11 +334,12 @@
             type: "datetimerange",
             format: "YYYY-MM-DD HH:mm:ss",
             valueFormat: "YYYY-MM-DD HH:mm:ss",
+            
         },
         {
             prop: "tm2",
             inputtype: "rtdatepicker",
-            title: "提核日期",
+            title: "申请核保时间",
             rules: [],
             itemWidth: 1,
             showKey: [1, 2],
@@ -509,7 +533,7 @@
         {
             prop: "appCde",
             inputtype: "rtinput",
-            title: "投保人",
+            title: "投保人名称",
             showKey: [1, 2, 3, 4],
             minWidth: 180,
         },
@@ -519,6 +543,9 @@
             title: "投保日期",
             showKey: [1, 2, 3, 4],
             minWidth: 180,
+            type: "datetimerange", // 显示日期和时间选择器
+            format: "YYYY-MM-DD HH:mm:ss", // 显示在界面上的格式
+            valueFormat: "YYYY-MM-DD HH:mm:ss" // 传递给后端的值格式
         },
         {
             prop: "preUserName",
@@ -540,6 +567,9 @@
             title: "提交时间",
             showKey: [1, 2, 3, 4],
             minWidth: 180,
+            type: "datetimerange", // 显示日期和时间选择器
+            format: "YYYY-MM-DD HH:mm:ss", // 显示在界面上的格式
+            valueFormat: "YYYY-MM-DD HH:mm:ss" // 传递给后端的值格式
         },
         {
             prop: "curtUserName",
@@ -895,7 +925,8 @@
     };
 
     const changeForm = (val: any) => {
-        freeEditRef.value?.resetFields();
+            console.log(val);
+        // freeEditRef.value?.resetFields();
         // resetForm();
         freeEditRef.value?.setFormValue({
             udrType: val,
@@ -917,7 +948,7 @@
             }
             allForm.value.map((item: any, index: number) => {
                 const isVal = item.showKey.findIndex((vals: any) => vals == val);
-                console.log(isVal);
+            
                 if (isVal !== -1) {
                     if (item.prop == "tm1") {
                         item.rules =
@@ -929,6 +960,24 @@
                     formObj.notWaitObj.fromSchema.value.push(item);
                 }
             });
+
+
+
+            // setFormItem("orgCde", {
+            //     loadData: [
+            //         {
+            //             label: "永安保险总公司",
+            //             value: "0200000000000",
+            //         },
+            //     ],
+            // });
+
+            // // 确保 loadData 设置完成后再设置表单值
+            // freeEditRef.value?.setValue(
+            //     'orgCde', "0200000000000",
+            // );
+
+
         });
     };
 
@@ -936,7 +985,7 @@
         () => freeEditRef.value?.getValue("udrType"),
         (n, o) => {
             udrTypeValue.value = n;
-            resetForm();
+       
             // 切换表格 数据列 显示/隐藏
             tableObj.notWaitObj.fromSchema.value = [];
             allTable.value.map((item: any, index: number) => {
@@ -963,6 +1012,10 @@
                     tableObj.notWaitObj.tableBtn.value.push(item);
                 });
             }
+            setTimeout(() => {
+                 resetForm();
+                
+            }, 0);
         },
         { deep: true }
     );
@@ -993,25 +1046,88 @@
             if (
                 udrTypeValue.value == "1" ||
                 udrTypeValue.value == "2" ||
+                udrTypeValue.value == "3" ||
+                udrTypeValue.value == "4" ||
                 udrTypeValue.value == "5"
-            ) {
+            ) {  
+                  console.log( udrTypeValue.value)
                 if (udrTypeValue.value == "1" || udrTypeValue.value == "2") {
                     freeEditRef.value?.setValue("inNextDpt", "1");
+                     setFormItem("orgCde", {
+                        loadData:  loadOrgCde.value
+                    });
+                    freeEditRef.value?.setValue(
+                        'orgCde',  loadOrgCde.value[0]['value'],
+                    );
                     freeEditRef.value?.setValue("tm2", [
-                        moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
+                        moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
+                            "YYYY-MM-DD 00:00:00"
+                        ),
+                        moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+                    ]);
+
+                       freeEditRef.value?.setValue("tm1", [
+                        moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
+                            "YYYY-MM-DD 00:00:00"
+                        ),
+                         moment().endOf('day').format('YYYY-MM-DD HH:mm:ss')
+                        // moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+                        // moment(new Date()).endOf('day').toDate()
+                        // .format("HH:mm:ss"),
+                        // .format("YYYY-MM-DD 23:59:58"),
+                    ]);
+                }
+                
+                 if (udrTypeValue.value == "3") {
+                    freeEditRef.value?.setValue("CLoadSub", 1);
+                        freeEditRef.value?.setValue("tm1", [
+                        moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
                             "YYYY-MM-DD 00:00:00"
                         ),
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
                     ]);
                 }
+                 if (udrTypeValue.value == "4") {
+                    freeEditRef.value?.setValue("CLoadSub", 1);
+                        freeEditRef.value?.setValue("tm1", [
+                        moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
+                            "YYYY-MM-DD 00:00:00"
+                        ),
+                        moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+                    ]);
+                }
+
                 if (udrTypeValue.value == "5") {
                     freeEditRef.value?.setValue("CLoadSub", 1);
+                      setFormItem("orgCde", {
+                        loadData:  loadOrgCde.value
+                    });
+                    freeEditRef.value?.setValue(
+                        'orgCde',  loadOrgCde.value[0]['value'],
+                    );
+                        freeEditRef.value?.setValue("tm1", [
+                        moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
+                            "YYYY-MM-DD 00:00:00"
+                        ),
+                        moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+                    ]);
                 }
             }
         });
     };
 
     onMounted(async () => {
+         freeEditRef.value?.setFormValue({
+            udrType: "1",
+            inNextDpt: "1",
+            tm1: [
+                moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
+                    "YYYY-MM-DD 00:00:00"
+                ),
+                moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+            ],
+        });
+
         freeEditRef.value?.setFormValue({
             udrType: "1",
             inNextDpt: "1",
@@ -1022,21 +1138,21 @@
                 moment(new Date()).format("YYYY-MM-DD 23:59:59"),
             ],
         });
-        setTimeout(() => {
-            setFormItem("orgCde", {
-                loadData: [
-                    {
-                        label: "永安保险公总司",
-                        value: "0200000000000",
-                    },
-                ],
-            });
+        // setTimeout(() => {
+        //     setFormItem("orgCde", {
+        //         loadData: [
+        //             {
+        //                 label: "永安保险总公司",
+        //                 value: "0200000000000",
+        //             },
+        //         ],
+        //     });
 
-            // 确保 loadData 设置完成后再设置表单值
-            freeEditRef.value?.setFormValue({
-                orgCde: "0200000000000",
-            });
-        }, 200);
+        //     // 确保 loadData 设置完成后再设置表单值
+        //     freeEditRef.value?.setValue(
+        //         'orgCde', "0200000000000",
+        //     );
+        // }, 200);
         
         // 初始化表单
         allForm.value.map((item: any, index: number) => {
@@ -1062,6 +1178,7 @@
                 //核保退回任务
                 changeForm("4"); //展示form表单不同的栏位
             }
+            console.log('123123',homeJumpData)
             // 投保日期
             freeEditRef.value.setValue("tm1", [
                 homeJumpData.startCrtTm,
@@ -1123,7 +1240,7 @@
     const exportDown = () => {
         const CAppNo = freeEditRef.value?.getValue("CAppNo");
         const CPlyNo = freeEditRef.value?.getValue("CPlyNo");
-        // 查询条件：投保单号，保单号任何一个有值时，都无需做其他查询条件校验
+        // 查询条件：申请单号，保单号任何一个有值时，都无需做其他查询条件校验
         if (!CAppNo && !CPlyNo) {
             // 查询时间段验证
             const date1 = freeEditRef.value?.getValue("tm1"); //投保日期
@@ -1151,7 +1268,7 @@
                 31 * 1000 * 60 * 60 * 24
             ) {
                 // this._loading = false;
-                ElMessage.warning("投保日期范围请控制在7天以内");
+                ElMessage.warning("投保日期范围请控制在30天以内");
                 return;
             }
         }
@@ -1219,10 +1336,10 @@
                 // }
                 if (
                     new Date(date1[1]).getTime() - new Date(date1[0]).getTime() >=
-                    7 * 1000 * 60 * 60 * 24
+                    31 * 1000 * 60 * 60 * 24
                 ) {
                     // loading.value = false;
-                    ElMessage.warning("投保日期范围请控制在7天以内");
+                    ElMessage.warning("投保日期范围请控制在30天以内");
                     return;
                 }
             } else {
@@ -1232,9 +1349,9 @@
                 }
                 if (
                     new Date(date2[1]).getTime() - new Date(date2[0]).getTime() >=
-                    7 * 1000 * 60 * 60 * 24
+                    31 * 1000 * 60 * 60 * 24
                 ) {
-                    ElMessage.warning("提核日期范围请控制在7天以内");
+                    ElMessage.warning("提核日期范围请控制在30天以内");
                     return;
                 }
             }

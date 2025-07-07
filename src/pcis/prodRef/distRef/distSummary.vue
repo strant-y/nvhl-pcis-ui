@@ -1,12 +1,10 @@
 <template>
   <div>
-    <myCard :cardConfig="cardconfig">
-      <app-table
-        :tableConfig="tableconfig"
-        v-model:pageresult="pageresult"
-        ref="distTableRef"
-      />
-    </myCard>
+    <app-table
+      :tableConfig="tableconfig"
+      v-model:pageresult="pageresult"
+      ref="distTableRef"
+    />
     <comDialog ref="dialog"></comDialog>
   </div>
 </template>
@@ -59,7 +57,6 @@ const pageresult = reactive<Pageresult>({
 });
 
 const distTableRef = ref<AppTableMethod | null>(null);
-const cardconfig = ref<CardConfig>(creatCardConfig({}));
 const formconfig1 = ref<Record<string, any>>({});
 const tableconfig = ref<AppTableConfig>(createTableEditConfig());
 
@@ -143,7 +140,6 @@ onMounted(async () => {
     exRules
   );
   Object.assign(formconfig1.value, formconfig11.value);
-  cardconfig.value.title = formconfig1.value.title;
   tableconfig.value.showEdit = true;
   tableconfig.value.fromSchema = formconfig1.value.fromSchema;
   tableconfig.value.formconfig = createAppGridEditConfig({
@@ -153,6 +149,7 @@ onMounted(async () => {
   tableconfig.value.tableBtnType = "btn";
   tableconfig.value.tableBtnWidth = 150;
   tableconfig.value.tableBtnPosition = "right";
+  tableconfig.value.title = formconfig1.value.title;
   if (formconfig11.value.editBtns && formconfig11.value.editBtns.length > 0) {
     let btns: any[] = [];
     btns = formconfig11.value.editBtns.filter((btn: any) => !btn.hidden);
@@ -162,7 +159,7 @@ onMounted(async () => {
   }
   // 初始化 cComponentTableValue
   cComponentTableValue = getCComponentTableValue(
-    route.params.param.cProdNo,
+    route.params.param?.cProdNo,
     formconfig1.value.title
   );
   nextTick(() => {
@@ -190,10 +187,16 @@ const method = {
     );
   },
   delmethod: (row: any) => {
-    deleteDist({
+    const param = {
       cComponentTable: cComponentTableValue,
       cPkId: [row.cPkId],
-    }).then((res: any) => {
+    }
+    if(route.params.param?.pageName === "priceInquiry") {
+      param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else {
+      param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+    }
+    deleteDist(param).then((res: any) => {
       if (res.code === 200) {
         ElMessage.success("删除成功");
         handleQuery();
@@ -201,8 +204,13 @@ const method = {
     });
   },
   funcdistadd: () => {
-    let baseFlag = opertaor.getDataAll().plyBase["Base.cAppNo"];
-    checkAppBase({ cAppNo: baseFlag }).then((res) => {
+    const param = {};
+    if(route.params.param?.pageName === "priceInquiry") {
+      param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else {
+      param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+    }
+    checkAppBase(param).then((res) => {
       if (res.code === 200) {
         dialog.value?.open(
           "distAdd",
@@ -229,8 +237,13 @@ const method = {
     });
   },
   carInfoAdd: () => {
-    let baseFlag = opertaor.getDataAll().plyBase["Base.cAppNo"];
-    checkAppBase({ cAppNo: baseFlag }).then((res) => {
+    const param = {};
+    if(route.params.param?.pageName === "priceInquiry") {
+      param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else {
+      param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+    }
+    checkAppBase(param).then((res) => {
       if (res.code === 200) {
         dialog.value?.open(
           "distAdd",
@@ -280,13 +293,18 @@ const handleQuery = () => {
   } else if(opertaor.getDataAll().plyBase["Base.cAppNo"]){
     app = opertaor.getDataAll().plyBase["Base.cAppNo"];
   } else {
-    app = route.params.param.cAppNo
+    app = route.params.param?.cAppNo
   }
-  query({
+  const queryParam = {
     cComponentTable: distCompKey.value,
-    cAppNo: app,
     ...{isSummary: '1'}
-  });
+  }
+  if(route.params.param?.pageName === "priceInquiry") {
+    queryParam['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+  } else {
+    queryParam['cAppNo'] = app;
+  }
+  query(queryParam);
 }
 
 const query = (param: any) => {

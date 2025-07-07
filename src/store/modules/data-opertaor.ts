@@ -45,6 +45,7 @@ export const dataOpertaor = (pageKey?: string) => {
             return tableRefs[key];
         };
         const init = () => {
+            Object.assign(param, {});
             Object.assign(tableConfig, {});
             Object.assign(tableRefs, {});
         };
@@ -123,7 +124,6 @@ export const dataOpertaor = (pageKey?: string) => {
                     })
                 }
             });
-            console.log(formconfig);
         }
         const setDisabledAll = () => {
             Object.keys(tableRefs).forEach(key => {
@@ -180,14 +180,13 @@ export const dataOpertaor = (pageKey?: string) => {
                                 if (conf.fromType === 'free') {  // 表单模式时,修改表单disabled实现只读
                                     if (conf.fromSchema && conf.fromSchema.length > 0) {
                                         conf.fromSchema.forEach(f => {
-                                            if (f.inputtype === 'rtinputgroup') {
+                                            if (f.prop === item) {
+                                                if (f.inputtype === 'rtinputgroup') {
+                                                console.log(f.inputtype);
                                                 f.groupList.forEach((gkey: any) => {
-                                                    if (gkey.prop === item) {
-                                                        gkey.disabled = false;
-                                                    }
+                                                    gkey.disabled = false;
                                                 });
-                                            } else {
-                                                if (f.prop === item) {
+                                                }else {
                                                     f.disabled = false;
                                                 }
                                             }

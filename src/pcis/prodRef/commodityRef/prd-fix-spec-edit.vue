@@ -59,7 +59,8 @@ onMounted(() => {
   console.log("cNmeCnArray", cNmeCnArray.value);
 
     if(rowData.value.editList){
-      inputValues.value  = setEditList(inputValues.value,rowData.value.editList)
+      // inputValues.value  = setEditList(inputValues.value,rowData.value.editList)
+         inputValues.value  = setEditList( cNmeCnArray.value,rowData.value.editList)
     }
 });
 
@@ -67,11 +68,9 @@ onMounted(() => {
 const cNmeCnArray = computed(() => rowData.value.cSpecialContent.split(/(\*+)/));
 // const inputValues = ref<string[]>([]);
 const inputValues = ref( //item.match(/^\*+$/)
-  cNmeCnArray.value.map((item) => (item === "*" ? "*" : item))
+  // cNmeCnArray.value.map((item) => (item === "*" ? "*" : item))
+   cNmeCnArray.value.map((item) => (/^\*+$/.test(item)? "" : item))
 );
-
-
- console.log(inputValues.value)
 
 const updateCNmeCn = (index: number, value: string) => {
   inputValues.value[index] = value;
@@ -82,8 +81,8 @@ const handleCancel = () => {
 const handleSave = () => {
   dialogVisible.value = false;
   rowData.value.editList = newListValue(cNmeCnArray.value,inputValues.value)
-  rowData.value.cSpecialContent =inputValues.value.join("");
-
+  // rowData.value.cSpecialContent =inputValues.value.join("");
+  rowData.value.cDeductibleContent = joinWithAsterisks(inputValues.value) 
   // const parts = cNmeCnArray.value.map((item, idx) =>
   //   item.match(/^\*+$/) ? inputValues.value[idx] : item
   // );
@@ -93,6 +92,12 @@ const handleSave = () => {
   props.callback({type: 'ok', data: rowData.value});
 };
 
+// 数组拼接
+function joinWithAsterisks(arr, replacement = '**') {
+  return arr.map(item => 
+    item === '' ? replacement : item
+  ).join('');
+}
 
 
 // 星号回显赋值

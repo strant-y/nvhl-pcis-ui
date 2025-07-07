@@ -10,7 +10,11 @@
       v-model="filterText" 
       style="width: 500px"
       placeholder="输入机构代码或者机构名称查询，机构名称查询不得少于5个字符"
-    />
+     >
+          <template #append>
+            <el-button icon="Search" @click="handleSearch(true)" />
+          </template>
+    </el-input>
     <el-tree
       ref="treeRef"
       style="max-width: 500px"
@@ -20,9 +24,11 @@
       :load="loadNode"
       :props="defaultProps"
       :filter-node-method="filterNode"
+    
       @node-click="handleNodeClick"
       :highlight-current="true"
     />
+      <!-- :default-expanded-keys="defaultExpandedKeys" -->
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="handleCancel" class="custom-button">取消</el-button>
@@ -32,13 +38,15 @@
       </span>
     </template>
   </el-dialog>
-</template>
+</template> 
 
 <script lang="ts" setup>
 import { ref, watch } from "vue";
 import { ElTree } from "element-plus";
 import { useUserStore } from "@/store/modules/user";
 import { SysOperatorMgrService } from "@/views/sys-right-basic/service/sys-operator-mgr.service";
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
 const sysOperatorMgrService = new SysOperatorMgrService();
 interface Tree {
   [key: string]: any;
@@ -56,19 +64,18 @@ const defaultProps = {
   label: "name",
   isLeaf: "leaf",
 };
-
 const emits = defineEmits(["ok"]);
-
-watch(filterText, (val) => {
-  treeRef.value!.filter(val);
-});
-
 const filterNode = (value: string, data: Tree) => {
   if (!value) return true;
   return data.name.includes(value);
 };
 const handleNodeClick = (data: Tree) => {
-  selectedNode.value = data;
+ 
+    selectedNode.value = data;
+    if( selectedNode.value.id ==='search'){
+      // ElMessage.warning('请选择实际机构节点')
+      return false;
+    }
     emits("ok", selectedNode.value);
     dialogVisible.value = false;
 };
@@ -76,18 +83,70 @@ const handleCancel = () => {
   dialogVisible.value = false;
 };
 const handleSave = () => {
+  if(selectedNode.value && selectedNode.value.id ==='search'){
+      ElMessage.warning('请选择实际机构节点')
+      return false;
+    }
   if (selectedNode.value) {
-    console.log("选中的节点", selectedNode.value);
     emits("ok", selectedNode.value);
-  }
+  } 
   dialogVisible.value = false; 
-};
+};   
+
+// 搜索按钮
+const handleSearch = ()=>{
+      if (!filterText.value.trim()) {
+        if(_nodes.value[0].id ==="0200000000000")
+        return false;
+        _nodes.value = [];
+        initDptTreeList();
+        return;
+      }else if(filterText.value.trim().length<5){
+            ElMessage.warning('查询条件不得少于五个字符！');
+            return;
+      }
+      try {
+        // 调用搜索接口
+        const params = {
+         SCDptCnm: filterText.value.trim(),
+         CDptCde:"0200000000000"
+        };
+
+   
+       codeListStore
+      .queryCodeList(
+        {
+          codeListName: "CDptCde_List_base",
+          codeListParam: params ,
+        },
+      )
+      .then((res) => {
+       const searchResultNode = {
+              id: 'search',
+              name: `搜索结果（${res.length}个）`,
+              leaf: false,
+              children: res.map(item => ({
+                id: item.id,
+                name: item.name,
+                leaf: !item.hasChildren,
+                children: [],
+                expanded: true // 确保搜索结果节点展开
+              })),
+              expanded: true // 确保根节点展开
+            };
+            
+            _nodes.value = [searchResultNode];
+      });
+      } catch (error) {
+        ElMessage.error('搜索失败，请稍后再试');
+   
+      } finally {
+      }
+ 
+}
 
 const initDptTreeList = () => {
   let root = user.value['companyId'];
-  // if (user.value && user.value.companyId) {
-  //   root = user.value.companyId;
-  // }
   const params = {
     pId: root,
   };
@@ -100,25 +159,71 @@ const initDptTreeList = () => {
         }
         const data = res["data"];
         if (res["data"]) {
-          _nodes.value.push({
+          const rootNode = {
             id: root,
             name: res["data"]["name"],
             leaf: false,
-          });
-        }
+            expanded: true,
+            children: [] // 确保有 children 属性用于存放子节点
+          };
+          
+          _nodes.value.push(rootNode);
+          nextTick(()=>{
+              expandRootNode();
+          })
+          }
       }
     })
     .catch((error) => {
-      ElMessage.error("后台服务异常,请联系管理员");
+      ElMessage.error("后台服务异常,请联系管理员1");
     });
 };
 
+// 只加载直接子节点（第二级）
+const loadChildNodes = (parentNode: any) => {
+  // 创建模拟节点对象（level 为 1 表示根节点的子节点）
+  const mockNode = {
+    level: 1,
+    data: parentNode,
+    childNodes: []
+  };
+  
+  // 调用 loadNode 加载子节点
+  loadNode(mockNode, (children) => {
+    // 将子节点添加到父节点
+    parentNode.children = children;
+    
+    // 为子节点添加 children 属性，确保结构一致性
+    children.forEach(child => {
+      child.children = [];
+    });
+  });
+};
+
+// 展开根节点并触发子节点加载
+const expandRootNode = () => {
+  const rootNode = treeRef.value.getNode(_nodes.value[0] );
+  if (rootNode) {
+    rootNode.expanded = true;
+    // 等待子节点加载完成后执行后续操作
+    setTimeout(() => {
+      loadChildNodes(_nodes.value[0]);
+    }, 100); // 根据接口响应时间调整
+  }
+};
+
 const loadNode = (node, resolve) => {
-  if (node.level === 0) {
+  console.log('node0',node.data)
+  if(node.data.id ==='search'){
+
+     return resolve(node.data.children);
+
+  }
+  if (   node.level === 0) {
     return resolve([]);
   }
   const params = {
-    cDptCde: node.data.id,
+    cDptCde: node.data.id || '0200000000000',
   };
   sysOperatorMgrService
     .getOrgDptTreeListByPid(params)
@@ -135,9 +240,11 @@ const loadNode = (node, resolve) => {
             id: item["id"],
             name: item["name"],
             leaf: !item.hasChildren,
+            expanded: true // 关
           });
         });
       }
+      console.log( _nodes.value)
       resolve(dto);
     })
     .catch((error) => {
@@ -155,30 +262,4 @@ filter-tree {
   border-right: 1px solid #ccc;
 }
 
-/* .custom-dialog {
-  padding: 20px;
-}
-
-.custom-input {
-  margin-bottom: 20px;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.custom-tree {
-  margin-top: 10px;
-}
-
-.custom-tree .el-tree-node__content:hover {
-  background-color: #1a310e; 
-}
-
-.custom-tree .el-tree-node.is-current .el-tree-node__content {
-  background-color: #e1f3d8; 
-}
-
-.custom-button {
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-} */
 </style>

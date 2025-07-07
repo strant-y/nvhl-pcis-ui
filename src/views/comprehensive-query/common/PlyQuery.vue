@@ -484,7 +484,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           {
               prop: "cAppNo",
               inputtype: "rtinput",
-              title: "投保单号",
+              title: "申请单号",
               clearable: true,
           },
           {
@@ -739,8 +739,8 @@ const modalForm = [
         itemWidth: 3,
         loadData: [
             { label: "投保单", value: "cAppNo" },
-            { label: "保单", value: "cPlyNo" },
-            { label: "批单", value: "cEdrNo" },
+            { label: "保单号", value: "cPlyNo" },
+            { label: "批单号", value: "cEdrNo" },
             { label: "批改序号", value: "c" },
             { label: "承保机构", value: "cDptCnm" },
             { label: "二级分公司", value: "cSecondDptCnm" },
@@ -760,8 +760,8 @@ const modalForm = [
 // 变更列数据
 const tableCol = ref<Array<any>>([
     { title: "投保单", prop: "cAppNo", inputtype: "rtinput", minWidth: 180 },
-    { title: "保单", prop: "cPlyNo", inputtype: "rtinput", minWidth: 180 },
-    { title: "批单", prop: "cEdrNo", inputtype: "rtinput", minWidth: 180 },
+    { title: "保单号", prop: "cPlyNo", inputtype: "rtinput", minWidth: 180 },
+    { title: "批单号", prop: "cEdrNo", inputtype: "rtinput", minWidth: 180 },
     { title: "批改序号", prop: "c", inputtype: "rtinput", minWidth: 180 },
     { title: "机构", prop: "cDptCnm", inputtype: "rtinput", minWidth: 180 },
     {
@@ -961,21 +961,29 @@ const tableObj = {
         ],
         fromSchema: [
             {
+              prop: "policyInfo",
+              inputtype: "rtinput",
+              title: "保单",
+              minWidth: 180,
+            },
+            {
                 prop: "cAppNo",
                 inputtype: "rtinput",
-                title: "投保单",
+                title: "申请单号",
                 minWidth: 180,
+                isShow:false
             },
             {
                 prop: "cPlyNo",
                 inputtype: "rtinput",
-                title: "保单",
+                title: "保单号",
                 minWidth: 180,
+                isShow:false
             },
             {
                 prop: "cEdrNo",
                 inputtype: "rtinput",
-                title: "批单",
+                title: "批单号",
                 minWidth: 180,
             },
           {
@@ -1012,6 +1020,12 @@ const tableObj = {
                 minWidth: 180,
             },
             {
+              prop: "cAppNme",
+              inputtype: "rtinput",
+              title: "投保人名称",
+              minWidth: 180,
+            },
+            {
                 prop: "cSecondDptCnm",
                 inputtype: "rtinput",
                 title: "二级分公司",
@@ -1024,8 +1038,14 @@ const tableObj = {
                 minWidth: 180,
             },
             {
+              prop: "InsurancePeriod",
+              inputtype: "rtinput",
+              title: "保险期间",
+              minWidth: 180,
+            },
+            {
                 prop: "tIssueTm",
-                inputtype: "rtdatepicker",
+                inputtype: "rtinput",
                 title: "签单日期",
                 minWidth: 180,
             },
@@ -1185,6 +1205,12 @@ function handleQuery(flag?: boolean) {
             if (200 === code) {
                 pageresult.list = [];
                 pageresult.list = data.result;
+              pageresult.list = data.result.map(item => ({
+                ...item,
+                // 创建一个新字段合并两个值
+                policyInfo: `${item.cAppNo || ''}\n${item.cPlyNo || ''}`,
+                InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
+              }));
                 pageresult.total = data.total;
             } else {
                 ElMessage.error(msg);

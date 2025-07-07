@@ -107,9 +107,8 @@ onMounted(async () => {
         setFormItem("Base.cPlyNo", { hidden: false });
       }else if(data.pageType && data.pageType === "orig") {
         //续保时，保单号隐藏
-        setFormItem("Base.cPlyNo", { hidden: true });
         setFormItem("Base.cOrigPlyNo", { hidden: false });
-        setValue('Base.cOrigPlyNo',param.cPlyNo)
+        setValue('Base.cOrigPlyNo',param?.cPlyNo)
       }
       sessionData.value = data;
     }
@@ -338,9 +337,7 @@ const method = {
       cslstyp = "020004";
     };
     
-    dialogRef.value?.open(
-      "agentWorker",
-      {
+    dialogRef.value?.open("agentWorker",{
         type: "show",
         data: {
           CDptCde: sessionData.value?.cDptCde,
@@ -609,6 +606,10 @@ const method = {
         });
     }
   },
+  // change
+  cAgriMrkChange:(val:any)=>{
+      console.log('111',val)
+  }
 };
 
 // 绑定特殊验证器

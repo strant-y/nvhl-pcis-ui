@@ -137,7 +137,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                         }
                         let CAppNos = ''; // 所选项的流水号组合
                         let CProdNos = ''; // 所选项的流水号组合
-                        let plyNo =''; //投保单号
+                        let plyNo =''; //申请单号
                         multipleSelection.value.forEach(item => {
                             CAppNos = CAppNos === '' ? item['cAppNo'] : CAppNos + ',' + item['cAppNo'];
                             CProdNos = CProdNos === '' ? item['cProdNo'] : CProdNos + ',' + item['cProdNo'];
@@ -170,7 +170,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 			{
 				prop: "AccDpt",
 				inputtype: "rtselect",
-				title: "机构部门",
+				title: "机构部门", 
 				btnWidth: 10,
 				itemWidth: 2,
 				// rules: [getRules("required", {
@@ -191,7 +191,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                                     setFormItem("AccDpt", {
                                         loadData: [
                                             {
-                                                label: selectObj.name,
+                                                label: selectObj.id + ' ' + selectObj.name,
                                                 value: selectObj.id,
                                             },
                                         ],
@@ -268,7 +268,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				prop: "CBillTyp",
 				inputtype: "rtselect",
 				title: "单据类型",
-				loadData :[{value: '1', label: '投保单号'},
+				loadData :[{value: '1', label: '申请单号'},
 				  {value: '3', label: '支票号'},
 				  {value: '4', label: '保单号'},
 				  {value: '5', label: '交易号'},
@@ -498,77 +498,84 @@ const tableconfig = reactive<AppTableConfig>(
 							ElMessage.warning('所选记录为空！');
 							return ;
 						}
-                        let CAppNos = '';
-                        let CProdNos = '';
-                        let CUniqueNos = ''; // 所选项的流水号组合
-                        let CRelAppNos = '';
-                        let isOpen =  false;
-                        let message = '';
-                        multipleSelection.value.forEach(item => {
-                            CUniqueNos = CUniqueNos === '' ? item['cUniqueNo'] : CUniqueNos + ',' + item['cUniqueNo'];
-                            CProdNos = CProdNos === '' ? item['cProdNo'] : CProdNos + ',' + item['cProdNo'];
-                            let cRelAppNo = '';
-                            if (!!item['cRelAppNo']) {
-                                cRelAppNo = item['cRelAppNo'];
-                            }
-                            CRelAppNos = CRelAppNos === '' ? cRelAppNo : CRelAppNos + '#' + cRelAppNo;
-                            if (!!item['cPaySequence']) {
-                                isOpen = true;
-                                message = '该单存在支付号，不允许退回！\n【申请单号=' + item['cAppNo'] + '】';
-                                return;
-                            }
-                            if ('00' === item['cCheckSts'] && '0' === item['cPayStatus']) {
-                                CAppNos = CAppNos === '' ? item['cAppNo'] : CAppNos + '#' + item['cAppNo'];
-                            } else if ('6' === item['cCheckSts'] && '0' === item['cPayStatus']) {
-                                CAppNos = CAppNos === '' ? item['cAppNo'] : CAppNos + '#' + item['cAppNo'];
-                            } else {
-                                isOpen = true;
-                                const cPayTypArry = [{"label": "刷卡缴费", "value": "1"},{ "label": "在线支付","value": "18"},{"label": "支票缴费","value": "2"}].filter(x => x.value === item['cPayTyp']);
-                                const cPayTypCnm = cPayTypArry[0]['label'];
-                                const cCheckStsArry = cCheckStsList.filter(x => x.value === item['cCheckSts']);
-                                const cCheckStsCnm = cCheckStsArry[0]['label'];
-                                const cPayStatusArry = cPayStatusList.filter(x => x.value === item['cPayStatus']);
-                                const cPayStatusCnm = cPayStatusArry[0]['label'];
-
-                                message = '该单缴费类型:' + cPayTypCnm + ',处理状态:' + cCheckStsCnm + ',缴费状态:' + cPayStatusCnm + '，不允许退回！\n【申请单号=' + item['cAppNo'] + ',期次=' + item['nTms'] + '】';
-                                return;
-                            }
-                            // if (!!CRelAppNos) {
-                            //     if (item['cProdNo'] === '060038') {
-                            //         isOpen = true;
-                            //         message = '所选记录包含联合单中的关联人身险单，不允许退回！\n联合单退回请操作087001财产险单【关联单号：' + item['cRelAppNo'] + '】';
-                            //         return;
-                            //     }
-                            // }
-                            // if (item['cRiFacMrk'] === '1' && item['cAppTyp'] === 'A') {
-                            //     isOpen = true;
-                            //     message = '申请单已进入再保流程，不允许进行‘见费出单退回’操作，如需退回，请线下联系再保部告知投保单号!！\n【申请单号=' + item['cAppNo'] + '】';
-                            //     return;
-                            // }
-                        });
-
-                   
-
-                        if (isOpen) {
-                            ElMessage.warning(message);
-                            return;
-                        }
-                        const param = {
-                            "CAppNos": CAppNos,
-                            "CUniqueNos": CUniqueNos,
-                        };
-                        console.log(param)
-                        pcisQueryService.needFeeToBack(param)
-                            .then((res) => {
-                                const { code, data, msg } = res;
-                                if (200 === code) {
-                                    ElMessage.success(msg);
-                                    handleQuery();
-                                } else {
-                                    ElMessage.error(msg);
+                        ElMessageBox.confirm("确定做退回操作？", "提示", {
+                            confirmButtonText: "确定",
+                            cancelButtonText: "取消",
+                            type: "warning",
+                            lockScroll: false,
+                        }).then(() => {
+                            let CAppNos = '';
+                            let CProdNos = '';
+                            let CUniqueNos = ''; // 所选项的流水号组合
+                            let CRelAppNos = '';
+                            let isOpen =  false;
+                            let message = '';
+                            multipleSelection.value.forEach(item => {
+                                CUniqueNos = CUniqueNos === '' ? item['cUniqueNo'] : CUniqueNos + ',' + item['cUniqueNo'];
+                                CProdNos = CProdNos === '' ? item['cProdNo'] : CProdNos + ',' + item['cProdNo'];
+                                let cRelAppNo = '';
+                                if (!!item['cRelAppNo']) {
+                                    cRelAppNo = item['cRelAppNo'];
                                 }
-                            })
-                            .finally(() => { });
+                                CRelAppNos = CRelAppNos === '' ? cRelAppNo : CRelAppNos + '#' + cRelAppNo;
+                                if (!!item['cPaySequence']) {
+                                    isOpen = true;
+                                    message = '该单存在支付号，不允许退回！\n【申请单号=' + item['cAppNo'] + '】';
+                                    return;
+                                }
+                                if ('00' === item['cCheckSts'] && '0' === item['cPayStatus']) {
+                                    CAppNos = CAppNos === '' ? item['cAppNo'] : CAppNos + '#' + item['cAppNo'];
+                                } else if ('6' === item['cCheckSts'] && '0' === item['cPayStatus']) {
+                                    CAppNos = CAppNos === '' ? item['cAppNo'] : CAppNos + '#' + item['cAppNo'];
+                                } else {
+                                    isOpen = true;
+                                    const cPayTypArry = [{"label": "刷卡缴费", "value": "1"},{ "label": "在线支付","value": "18"},{"label": "支票缴费","value": "2"}].filter(x => x.value === item['cPayTyp']);
+                                    const cPayTypCnm = cPayTypArry[0]['label'];
+                                    const cCheckStsArry = cCheckStsList.filter(x => x.value === item['cCheckSts']);
+                                    const cCheckStsCnm = cCheckStsArry[0]['label'];
+                                    const cPayStatusArry = cPayStatusList.filter(x => x.value === item['cPayStatus']);
+                                    const cPayStatusCnm = cPayStatusArry[0]['label'];
+
+                                    message = '该单缴费类型:' + cPayTypCnm + ',处理状态:' + cCheckStsCnm + ',缴费状态:' + cPayStatusCnm + '，不允许退回！\n【申请单号=' + item['cAppNo'] + ',期次=' + item['nTms'] + '】';
+                                    return;
+                                }
+                                // if (!!CRelAppNos) {
+                                //     if (item['cProdNo'] === '060038') {
+                                //         isOpen = true;
+                                //         message = '所选记录包含联合单中的关联人身险单，不允许退回！\n联合单退回请操作087001财产险单【关联单号：' + item['cRelAppNo'] + '】';
+                                //         return;
+                                //     }
+                                // }
+                                // if (item['cRiFacMrk'] === '1' && item['cAppTyp'] === 'A') {
+                                //     isOpen = true;
+                                //     message = '申请单已进入再保流程，不允许进行‘见费出单退回’操作，如需退回，请线下联系再保部告知申请单号!！\n【申请单号=' + item['cAppNo'] + '】';
+                                //     return;
+                                // }
+                            });
+
+                    
+
+                            if (isOpen) {
+                                ElMessage.warning(message);
+                                return;
+                            }
+                            const param = {
+                                "CAppNos": CAppNos,
+                                "CUniqueNos": CUniqueNos,
+                            };
+                            console.log(param)
+                            pcisQueryService.needFeeToBack(param)
+                                .then((res) => {
+                                    const { code, data, msg } = res;
+                                    if (200 === code) {
+                                        ElMessage.success(msg);
+                                        handleQuery();
+                                    } else {
+                                        ElMessage.error(msg);
+                                    }
+                                })
+                                .finally(() => { });
+                        }).catch(() => {});
 					},
 				}),
 				createFreeButtonBase({
@@ -731,7 +738,7 @@ const tableconfig = reactive<AppTableConfig>(
 			{
 				prop: "cAppNo",
 				inputtype: "rtinput",
-				title: "投保单号",
+				title: "申请单号",
                 width: 200,
 			},
 			{
@@ -843,7 +850,7 @@ onMounted(async () => {
     setFormItem("AccDpt", {
       loadData: [
           {
-              label: user.value['companyCnm'],
+              label: user.value['companyId'] + ' ' + user.value['companyCnm'],
               value: user.value['companyId'],
           },
       ], 

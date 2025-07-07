@@ -95,7 +95,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   setFormItem("AccDpt", {
                     loadData: [
                       {
-                        label: selectObj.name,
+                        label: selectObj.id + ' ' + selectObj.name,
                         value: selectObj.id,
                       },
                     ],
@@ -150,7 +150,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "单据类型",
         clearable:true,
         loadData: [
-          { label: "投保单号", value: "1" },
+          { label: "申请单号", value: "1" },
           { label: "交易号", value: "3" },
         ],
         defaultValue: "3",
@@ -319,7 +319,7 @@ onMounted(async () => {
     setFormItem("AccDpt", {
       loadData: [
         {
-          label: user.value['companyCnm'],
+          label: user.value['companyId'] + ' ' + user.value['companyCnm'],
           value: user.value['companyId'],
         },
       ],

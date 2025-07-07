@@ -17,7 +17,7 @@ const props = defineProps({
     type: String
   }
 });
-const formPage = ref(new FormPage('enteringDtl'));
+const formPage = ref(new FormPage('correctionDtl'));
 const idxParam = reactive({
   formPage: formPage.value,
   param: { ...props.param, ...{}},

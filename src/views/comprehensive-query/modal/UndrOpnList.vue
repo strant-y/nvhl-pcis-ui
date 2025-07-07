@@ -95,7 +95,8 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "TUpdTm",
-        inputtype: "rtdatepicker",
+        // inputtype: "rtdatepicker", 
+        inputtype: "rtinput",
         title: "核保时间",
         minWidth: 180,
       },

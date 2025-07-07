@@ -39,12 +39,20 @@
                   }"
                 >
                   <tremTemplate
+                  
                     v-for="(i, index) in planData[k]['m']"
+                 
                     :key="index"
                     v-model="planData[k]['m'][index]"
                     :disabled-flag="disAbledFlag"
                     @delete="
                       (r) => {
+                        console.log(planData,k,r,index)
+                        // 如果是主条款不可以删除
+                        if(k ==='P1' &&index===0){
+                          ElMessage.warning('主条款不能删除!')
+                          return false;
+                        }
                         deleteData(k, r);
                       }
                     "
@@ -111,7 +119,7 @@
                     "
                     :ref="
                       (res) => {
-                        tremTemplateRefs[k + 'a2' + index] = res;
+                        tremTemplateRefs[k + 'a2'] = res;
                       }
                     "
                   />
@@ -136,7 +144,7 @@
                     "
                     :ref="
                       (res) => {
-                        tremTemplateRefs[k + 'a3' + index] = res;
+                        tremTemplateRefs[k + 'a3'] = res;
                       }
                     "
                   />
@@ -173,7 +181,28 @@ import { qryProdRelTermRiskList } from "@/api/prod";
 import { getEdrRsnTermItem } from "@/api/query";
 const codeListStore = codeListViewStore();
 const disAbledFlag = ref(false);
+const codeListMap = ref<any>({});
+provide('codeListMap', codeListMap.value);
 
+
+const allTermMap = [
+'00425000281','00425000282','00425000283','00425000277','00425000279',
+'00425000278','00425000092','00425000280'
+];
+
+const cAddTermNo = ref('');
+watch(() => cAddTermNo.value, (val) => { 
+  if(allTermMap.includes(val)){
+    const tgt = opertaor.getTableRefByKey('tgt');
+    if(tgt){
+      tgt.change403009(val);
+    }
+    const insured = opertaor.getTableRefByKey('insured');
+    if(insured){
+      insured.change403009(val);
+    }
+  }
+})
 const opertaor = dataOpertaor();
 const parparam = opertaor.getParam();
 const terconfig = terConfig();
@@ -269,7 +298,12 @@ onMounted(async () => {
   );
   Object.assign(cardconfig.value, formconfig11);
   if (parparam.pageType === "app") {
-    addPlanMethod();
+    addAndinitData();
+  }
+});
+
+function addAndinitData() { 
+  const pl = addPlanMethod();
     const param = {
       cProdNo: parparam.cProdNo,
       cTermNo: parparam.cTermNo,
@@ -295,15 +329,15 @@ onMounted(async () => {
           if (item.cRdrTyp === "1") {
             data["Term.cClauseCategory"] = item.cClauseCategory;
           }
+          cAddTermNo.value = item.cUniqueTermNo;
           plans.push(data);
         });
-        refushData("P1", plans);
+        refushData(pl, plans);
       } else {
         ElMessage.error(msg);
       }
     });
-  }
-});
+}
 
 const edrItem = ref<[key: string, value: Array<any>] | any>({});
 function updateEdrItem(terms: any[]) {
@@ -374,7 +408,7 @@ const method = {
         return;
       }
     }
-    addPlanMethod();
+    addAndinitData();
   },
 };
 
@@ -388,6 +422,7 @@ function addPlanMethod() {
     });
     const planKey = "P" + (maxindex + 1);
     planData.value[planKey] = [];
+    return planKey;
 }
 
 function isHidden(pl: any) {
@@ -403,7 +438,6 @@ function changeHidden(pl: any) {
 }
 // 绑定特殊验证器
 const exRules = {};
-
 function addTermData(PlanNo: string) {
   const param = opertaor.getParam();
   const sp = planData.value[PlanNo];
@@ -411,14 +445,18 @@ function addTermData(PlanNo: string) {
   Object.keys(sp).forEach((k: any) => {
     seld.push(...sp[k]);
   });
+  let parmdata = {
+    cProdNo: param.cProdNo,
+    isselectData: seld,
+  }
+  if(allTermMap.includes(cAddTermNo.value)){
+    parmdata.cTermNo = cAddTermNo.value;
+  }
   dialog.value?.open(
     "addtremView",
     {
       type: "show",
-      data: {
-        cProdNo: param.cProdNo,
-        isselectData: seld,
-      },
+      data: parmdata,
     },
     {
       isOk: (selectdata: any) => {
@@ -500,7 +538,15 @@ function deletePlan(plan: string) {
     cancelButtonText: "取消",
     type: "warning",
   }).then(() => {
-    delete planData.value[plan];
+    if (parparam.cEdrType) {
+      Object.keys(planData.value[plan]).forEach((item) => {
+        for (let i = 0; i < planData.value[plan][item].length; i++) {
+          tremTemplateRefs.value[plan+item+i].setCancel();
+        }
+      });
+    }else{
+      delete planData.value[plan];
+    }
     ElMessage({
       type: "success",
       message: "删除成功",
@@ -644,6 +690,7 @@ function setDisabledAll() {
   Object.keys(btnItem.value).forEach((k: any) => {
     btnItem.value[k].hidden = true;
   });
+  
   Object.keys(tremTemplateRefs.value).forEach((item) => {
     tremTemplateRefs.value[item].setDisabledAll();
   });
@@ -669,6 +716,24 @@ const faters = ref({
   getndisAbleConfig: getndisAbleConfig,
 });
 
+function calcCheck(){
+  let r = true;
+  let m = "";
+  Object.keys(planData.value).forEach((k)=>{
+    if(planData.value[k].length === 0){
+      r = false;
+      m = k;
+    }
+  });
+  let res = {};
+  res['res'] = r;
+  res['msg'] = '验证通过';
+  if(!r){
+    res['msg'] =m + '方案未添加条款!请先添加条款!';
+  }
+  return res;
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
@@ -678,6 +743,7 @@ defineExpose({
   getFormconfig,
   setDisabledAll,
   setUnDisabledByKeyList,
+  calcCheck
 });
 </script>
 
@@ -685,4 +751,13 @@ defineExpose({
 ::v-deep .planInfo .el-card__header {
   padding: 2px 15px !important;
 }
+
+::v-deep .el-card__header {
+   padding: 10px 16px !important;
+ }
+
+::v-deep .el-card__body {
+   padding: 5px 10px !important;
+ }
+
 </style>

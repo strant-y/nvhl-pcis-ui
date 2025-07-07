@@ -14,7 +14,7 @@
             >
               <el-row justify="space-between">
                 <el-col :span="4" v-if="!freeEditConfig.production">
-                  {{ freeEditConfig.title }}
+                  <span class="card-title-style">{{ freeEditConfig.title }}</span>
                 </el-col>
                 <el-col :span="4" v-if="freeEditConfig.production">
                   <el-tooltip :content="freeEditConfig.productionTitle">
@@ -58,7 +58,7 @@
                 </el-col>
               </el-row> 
             </template>
-            <div class="form-inner" v-if="showMyfrom">
+            <div class="form-inner" v-show="showMyfrom">
               <dynamic-forms
                 :fromSchema="freeEditConfig.fromSchema"
                 :fromUi="freeEditConfig.fromUi"
@@ -318,4 +318,10 @@ defineExpose({
   border: 1px solid #ddd;
   box-shadow: 0 0 2px rgb(0 0 0 / 30%);
 }
+/* .card-title-style{
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 10px;
+  margin-left: 8px;
+} */
 </style>

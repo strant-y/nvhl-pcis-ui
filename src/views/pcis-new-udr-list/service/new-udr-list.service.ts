@@ -396,6 +396,42 @@ export const NewUdrListService = () => {
     }
   }
 
+  // 询价查询（待核保）
+  const getInquiryNewUdrList = async (ops: any) => {
+    try {
+      return post(`underwriting/query/newUdrInquiryList`, ops);
+    } catch (error) {
+      return handleError(error);
+    }
+  }
+
+  // 询价查询根据询价单号查询基本信息
+  const getBaseInfoByInquiryNo = async (ops: any) => {
+    try {
+      return post(`policy/getBaseInfoByInquiryNo`, ops);
+    } catch (error) {
+      return handleError(error);
+    }
+  }
+  
+  // 询价查询（核保退回）
+  const backInquiryUdrList = async (ops: any) => {
+    try {
+      return post(`underwriting/query/backInquiryUdrList`, ops);
+    } catch (error) {
+      return handleError(error);
+    }
+  }
+
+  // 询价查询（核保通过）
+  const getInquiryPolicyList = async (ops: any) => {
+    try {
+      return post(`policy/getInquiryPolicyList`, ops);
+    } catch (error) {
+      return handleError(error);
+    }
+  }
+
   return {
     getNewUdrList,
     getBackUdrList,
@@ -432,5 +468,9 @@ export const NewUdrListService = () => {
     saveRiskData,
     riskQueryData,
     queryComponentCodeList,
+    getInquiryNewUdrList,
+    getBaseInfoByInquiryNo,
+    backInquiryUdrList,
+    getInquiryPolicyList,
   };
 }

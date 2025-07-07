@@ -42,7 +42,7 @@ import {
   associationSpec,
   getUnbindSpecRefProd,
 } from "@/api/prod";
-import { ref, reactive, defineEmits, defineProps } from "vue";
+import {ref, reactive, defineEmits, defineProps, onMounted} from "vue";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const emits = defineEmits(["ok", "cancel"]);
 const opertaor = dataOpertaor();
@@ -142,19 +142,20 @@ const tableConfig = reactive<AppTableConfig>(
         title: "是否可编辑",
         inputtype: "rtcheckbox",
         width: "100",
-        func: (val) => {
-          return val == "true" ? "1" : "0";
-          console.log("改变状态的row", val);
-        },
+        keymap:{
+          y:"1",
+          n:'0'
+        }
       },
       {
         prop: "cIfMust",
         title: "是否必选",
         inputtype: "rtcheckbox",
         width: "100",
-        func: (val, row) => {
-          return val == "true" ? "1" : "0";
-        },
+        keymap:{
+          y:"1",
+          n:'0'
+        }
       },
     ],
   })
@@ -189,7 +190,11 @@ function handleQuery(flag?: boolean) {
 function handleSelectionChange(rows: any[]) {
   // selectedRows.value = rows;
 }
-
+onMounted(() => {
+  nextTick(()=>{
+    handleQuery()
+  })
+});
 const handleConfirm = () => {
   // if (selectedRows.value.length === 0) {
   //   ElMessage.warning("请选择至少一项");

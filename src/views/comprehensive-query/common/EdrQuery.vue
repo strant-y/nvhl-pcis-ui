@@ -482,7 +482,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           {
               prop: "cAppNo",
               inputtype: "rtinput",
-              title: "投保单号",
+              title: "申请单号",
               clearable: true,
           },
           {
@@ -737,8 +737,8 @@ const modalForm = [
         itemWidth: 3,
         loadData: [
             { label: "投保单", value: "cAppNo" },
-            { label: "保单", value: "cPlyNo" },
-            { label: "批单", value: "cEdrNo" },
+            { label: "保单号", value: "cPlyNo" },
+            { label: "批单号", value: "cEdrNo" },
             { label: "批改序号", value: "c" },
             { label: "机构", value: "cDptCnm" },
             { label: "二级分公司", value: "cSecondDptCnm" },
@@ -758,8 +758,8 @@ const modalForm = [
 // 变更列数据
 const tableCol = ref<Array<any>>([
     { title: "投保单", prop: "cAppNo", inputtype: "rtinput", minWidth: 180 },
-    { title: "保单", prop: "cPlyNo", inputtype: "rtinput", minWidth: 180 },
-    { title: "批单", prop: "cEdrNo", inputtype: "rtinput", minWidth: 180 },
+    { title: "保单号", prop: "cPlyNo", inputtype: "rtinput", minWidth: 180 },
+    { title: "批单号", prop: "cEdrNo", inputtype: "rtinput", minWidth: 180 },
     { title: "批改序号", prop: "c", inputtype: "rtinput", minWidth: 180 },
     { title: "机构", prop: "cDptCnm", inputtype: "rtinput", minWidth: 180 },
     {
@@ -963,19 +963,19 @@ const tableObj = {
             {
                 prop: "cAppNo",
                 inputtype: "rtinput",
-                title: "投保单",
+                title: "申请单号",
                 minWidth: 180,
             },
             {
                 prop: "cPlyNo",
                 inputtype: "rtinput",
-                title: "保单",
+                title: "保单号",
                 minWidth: 180,
             },
             {
                 prop: "cEdrNo",
                 inputtype: "rtinput",
-                title: "批单",
+                title: "批单号",
                 minWidth: 180,
             },
             {

@@ -153,7 +153,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cAppNo",
         inputtype: "rtinput",
-        title: "投保单号",
+        title: "申请单号",
         clearable: true,
       },
       {
@@ -232,7 +232,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cAppNo",
         inputtype: "rtinput",
-        title: "投保单号",
+        title: "申请单号",
         minWidth: 180,
       },
       {
@@ -248,7 +248,7 @@ const tableconfig = reactive<AppTableConfig>(
         minWidth: 180,
       },
       {
-        prop: "cClauseCode",
+        prop: "cTermNo",
         inputtype: "rtinput",
         title: "条款",
         minWidth: 180,
@@ -316,7 +316,7 @@ const getRenewal = (row:any)=>{
           router.push({
             path: "/pcis/my-page",
             query: {
-              param: JSON.stringify({ ...handleArray(data.composition.plyBase[0] ), ...{ pageType: "orig" } }),
+              param: JSON.stringify({ ...handleArray(data.composition.plyBase[0] ),...{cDptCnm:row.cDptCnm,cTermNme:row.cTermNme,cTermNo:row.cTermNo}, ...{ pageType: "orig" } }),
             },
           });
           sessionStorage.setItem(
