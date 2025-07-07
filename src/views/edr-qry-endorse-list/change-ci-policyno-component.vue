@@ -145,7 +145,7 @@ onMounted(async () => {
 // 收益所有人table信息
 const getTableFun = async (isSave = false) => {
     let cAppNo = props.cAppNo;  // 申请单号
-    let cPlyNo = props.cPlyNo;  // 申请单号
+    let cPlyNo = props.cPlyNo;  // 投保单号
     let param = {
         cAppNo,
         cPlyNo
@@ -177,7 +177,7 @@ const getTableFun = async (isSave = false) => {
 const saveProdDataFun = () => {
     const user = JSON.parse(sessionStorage.getItem("user") || "{}");
     let cAppNo = props.cAppNo;  // 申请单号
-    let cPlyNo = props.cPlyNo;  // 申请单号
+    let cPlyNo = props.cPlyNo;  // 投保单号
     let listS = pageresult.list;
 
     listS.forEach((item) => {

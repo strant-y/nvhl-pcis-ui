@@ -102,7 +102,7 @@ const tableconfig = reactive<AppTableConfig>(
             {
                 prop: 'cAppNo',
                 inputtype: 'rtinput',
-                title: '申请单号'
+                title: '投保单号'
             },
             {
                 prop: 'cPlyNo',

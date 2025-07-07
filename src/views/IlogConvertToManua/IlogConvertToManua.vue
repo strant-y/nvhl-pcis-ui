@@ -145,7 +145,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "b",
         inputtype: "rtinput",
-        title: "申请单号",
+        title: "投保单号",
         minWidth: 180,
       },
       {

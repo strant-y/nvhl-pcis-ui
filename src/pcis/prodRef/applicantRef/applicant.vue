@@ -815,6 +815,8 @@ const method = {
       });
       setFormItem("Applicant.cTel", { rules: [getRules("phone", {})] });
     }
+
+    setValue('Applicant.cEnterpriseTel',val)
   },
   // 固定电话
   cTelChange: (val) => {

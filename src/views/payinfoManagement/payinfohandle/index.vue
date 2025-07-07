@@ -137,7 +137,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                         }
                         let CAppNos = ''; // 所选项的流水号组合
                         let CProdNos = ''; // 所选项的流水号组合
-                        let plyNo =''; //申请单号
+                        let plyNo =''; //投保单号
                         multipleSelection.value.forEach(item => {
                             CAppNos = CAppNos === '' ? item['cAppNo'] : CAppNos + ',' + item['cAppNo'];
                             CProdNos = CProdNos === '' ? item['cProdNo'] : CProdNos + ',' + item['cProdNo'];
@@ -268,7 +268,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				prop: "CBillTyp",
 				inputtype: "rtselect",
 				title: "单据类型",
-				loadData :[{value: '1', label: '申请单号'},
+				loadData :[{value: '1', label: '投保单号'},
 				  {value: '3', label: '支票号'},
 				  {value: '4', label: '保单号'},
 				  {value: '5', label: '交易号'},
@@ -548,7 +548,7 @@ const tableconfig = reactive<AppTableConfig>(
                                 // }
                                 // if (item['cRiFacMrk'] === '1' && item['cAppTyp'] === 'A') {
                                 //     isOpen = true;
-                                //     message = '申请单已进入再保流程，不允许进行‘见费出单退回’操作，如需退回，请线下联系再保部告知申请单号!！\n【申请单号=' + item['cAppNo'] + '】';
+                                //     message = '申请单已进入再保流程，不允许进行‘见费出单退回’操作，如需退回，请线下联系再保部告知投保单号!！\n【申请单号=' + item['cAppNo'] + '】';
                                 //     return;
                                 // }
                             });
@@ -653,6 +653,9 @@ const tableconfig = reactive<AppTableConfig>(
                             ElMessage.warning('所选记录为空！');
                             return ;
                         }
+
+                        
+
                         let cPaySequences = ''; // 所选项的支付号
                         let isOpen =  false;
                         let message = '';
@@ -664,6 +667,7 @@ const tableconfig = reactive<AppTableConfig>(
 						  	}
                             cPaySequences = cPaySequences === '' ? item['cPaySequence'] : cPaySequences + ',' + item['cPaySequence'];
                         });
+
                         if (isOpen) {
                             ElMessage.warning(message);
                             return;
@@ -738,7 +742,7 @@ const tableconfig = reactive<AppTableConfig>(
 			{
 				prop: "cAppNo",
 				inputtype: "rtinput",
-				title: "申请单号",
+				title: "投保单号",
                 width: 200,
 			},
 			{

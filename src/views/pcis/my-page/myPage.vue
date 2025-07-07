@@ -260,7 +260,7 @@
               <span id="policyNumber" style="margin-left: 5px; margin-right: 8px; font-weight: bold;">
               {{ props.param?.pageName === "priceInquiry" ? opertaor.getTableRefByKey('plyBase')?.getValue('Base.cInquiryNo') || '暂无' : opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || '暂无' }}
               </span>
-              <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '申请单号'}`" placement="top">
+              <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号'}`" placement="top">
                 <el-button @click="copyPolicyNumber" circle size="small" style="color: red;">
                   <rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />
                 </el-button>
@@ -362,6 +362,10 @@ const amlExtendInfo = defineAsyncComponent(
 //历史赔案
 const historyClaimcaseModel = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/history-claimcase-model.vue")
+);
+//发起风勘
+const windExplorationModel = defineAsyncComponent(
+  () => import("@/views/comprehensive-query/modal/wind-exploration-model.vue")
 );
 
 // 核保信息
@@ -583,6 +587,18 @@ const historyClaimcaseFun = () => {
       }
     });
 };
+
+// 发起风勘 方法
+const startWindExploration = ()=>{
+    dzmodal
+    .open(windExplorationModel, { type: "Issuer", data: {} })
+    .then((res: any) => {
+      if (res.type === "ok") {
+      }
+    });
+}
+
+
 //  复制保单
 const copyPolicyFun = () => {
   dzmodal.open(copyPlyModel, { type: "", data: {...props.param,...opertaor.getDataAll()} }).then((res: any) => {
@@ -623,7 +639,7 @@ const copyPolicyFun = () => {
   //     );
 };
 
-// 复制申请单号
+// 复制投保单号
 const copyPolicyNumber = () => {
   const policyNumberElement = document.getElementById("policyNumber");
   if (!policyNumberElement) return;
@@ -640,9 +656,9 @@ const copyPolicyNumber = () => {
   try {
     const successful = document.execCommand("copy");
     if (successful) {
-      ElMessage.success(props.param?.pageName === 'priceInquiry' ? '询价单号' : '申请单号' + '已成功复制到剪贴板！');
+      ElMessage.success(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + '已成功复制到剪贴板！');
     } else {
-      ElMessage.error(props.param?.pageName === 'priceInquiry' ? '询价单号' : '申请单号' + "复制失败，请手动复制。");
+      ElMessage.error(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + "复制失败，请手动复制。");
     }
   } catch (err) {
     ElMessage.error("当前浏览器不支持自动复制功能，请手动复制。");
@@ -715,6 +731,16 @@ const basicBtn = [
       openLimit();
     },
   }),
+  //  createFreeButtonBase({
+  //   label: "发起风勘",
+  //   type: "primary",
+  //   func: () => {
+  //     startWindExploration(); 
+  //     //startWindExploration
+  //     // historyClaimcaseFun();
+  //     // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
+  //   },
+  // }),
   // createFreeButtonBase({
   //   label: "历史赔案",
   //   type: "primary",
@@ -767,6 +793,7 @@ const edrBtn = [
       submitEdrToUndrFun();
     },
   }),
+ 
 ];
 /**
  * （退保/注销） 按钮
@@ -871,14 +898,7 @@ const uwBtn = [
         });
     },
   }),
-  // createFreeButtonBase({
-  //   label: "历史赔案",
-  //   type: "primary",
-  //   func: () => {
-  //     historyClaimcaseFun();
-  //     // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
-  //   },
-  // }),
+
   createFreeButtonBase({
     label: "任务痕迹",
     type: "primary",
@@ -906,6 +926,7 @@ const uwBtn = [
         });
     },
   }),
+
 ];
 /**
  * 数据初始化
@@ -1285,7 +1306,7 @@ async function loadAfter() {
             "days"
         );
         opertaor.setDataAll(ops);
-        // 获取原申请单号下的清单列表数据
+        // 获取原投保单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
           return item.pageKey === "dist" || item.pageKey === "distSummary";
         });
@@ -1408,7 +1429,7 @@ async function loadAfter() {
         }
         ops['plyBase']['Base.cPlyNo'] = ''
         opertaor.setDataAll(ops);
-        // 获取原申请单号下的清单列表数据
+        // 获取原投保单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
           return item.pageKey === "dist" || item.pageKey === "distSummary";
         });
@@ -1534,7 +1555,7 @@ async function loadAfter() {
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
         }
         opertaor.setDataAll(ops);
-        // 获取原申请单号下的清单列表数据
+        // 获取原投保单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
           return item.pageKey === "dist" || item.pageKey === "distSummary";
         });
@@ -1658,7 +1679,7 @@ async function loadAfter() {
         ops['plyBase']['Base.cPlyNo'] = ''
         ops['plyBase']['Base.cAppStatus'] = ''
         opertaor.setDataAll(ops);
-        // 获取原申请单号下的清单列表数据
+        // 获取原投保单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
           return item.pageKey === "dist" || item.pageKey === "distSummary";
         });
@@ -3225,7 +3246,7 @@ function clearCAppNoAndCPkId(res:any) {
     if (res[k] instanceof Object) {
       res[k] = clearCAppNoAndCPkId(res[k]);
     } else {
-      // 清空申请单号, 主键,保单标志,续保\复制单号 签单日期 录单日期  投保日期,主共保，联共保标志清空，联保号，开口保单协议号
+      // 清空投保单号, 主键,保单标志,续保\复制单号 签单日期 录单日期  投保日期,主共保，联共保标志清空，联保号，开口保单协议号
       if (k.indexOf('NCiOwnPrm') !== -1 || k.indexOf('NCiOwnAmt') !== -1 || k.indexOf('NCiJntPrm') !== -1 || k.indexOf('NCiJntAmt') !== -1 || k.indexOf('COcAgrEdrNo') !== -1 || k.indexOf('TAgreeStopTm') !== -1 || k.indexOf('TAgreeStartTm') !== -1 || k.indexOf('COcAgrNo') !== -1 || k.indexOf('CJiAgtNo') !== -1 || k.indexOf('CCiMrk') !== -1 || k.indexOf('CAppNo') !== -1 || k.indexOf('CPkId') !== -1 || k === 'Base.CRenewMrk' || k === 'Base.COrigPlyNo' || k === 'Base.TIssueTm' || k === 'Base.TOprTm' || k === 'Base.TAppTm' || k === 'Base.CTmSysCde' || k === 'Base.TInsrncBgnTm' || k === 'Base.TInsrncEndTm' || k === 'Base.TCrtTm' || k === 'Base.TUpdTm' || k === 'Base.CPrePlyNo') {
         res[k] = null;
       }
@@ -3374,7 +3395,7 @@ function replacecInquiryNo(res:any) {
   return data;
 }
 
-// 复制出单和模板出单清空原有的申请单号
+// 复制出单和模板出单清空原有的投保单号
 function clearCAppNo(res:any) {
   if(res instanceof Array) {
     res.forEach((item:any) => {

@@ -209,7 +209,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cDptCnm",
         inputtype: "rtinput",
-        title: "申请单号",
+        title: "投保单号",
         fixed: "left",
       },
       {
