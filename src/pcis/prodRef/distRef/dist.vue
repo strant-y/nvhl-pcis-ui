@@ -565,8 +565,8 @@ const method = {
           });
           saveAs(blob, fileName);
         })
-        .catch(() => {
-          ElMessage.error("增量模板下载失败");
+        .catch((err) => {
+          ElMessage.error(err.msg || "增量模板下载失败");
         });
   },
   setregistAdd(){
