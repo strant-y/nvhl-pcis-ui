@@ -333,4 +333,10 @@ defineExpose({
 .el-card__header .el-row {
   align-items: center;
 }
+:deep(.el-select__wrapper) {
+  min-height: 28px;
+}
+:deep(.el-input__wrapper) {
+  height: 28px;
+}
 </style>
