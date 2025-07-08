@@ -912,7 +912,7 @@ const tableObj = {
                 tooltip: "询价转投保",
                 type: "primary",
                 size: "large",
-                icon: "RefreshRight",
+                icon: "Right",
                 hideBtns: (row: any) => {
                     // 询价转投保按钮只在状态为"已出保单"时可见
                     if (
