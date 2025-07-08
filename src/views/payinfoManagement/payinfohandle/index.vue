@@ -653,6 +653,9 @@ const tableconfig = reactive<AppTableConfig>(
                             ElMessage.warning('所选记录为空！');
                             return ;
                         }
+
+                        
+
                         let cPaySequences = ''; // 所选项的支付号
                         let isOpen =  false;
                         let message = '';
@@ -664,6 +667,7 @@ const tableconfig = reactive<AppTableConfig>(
 						  	}
                             cPaySequences = cPaySequences === '' ? item['cPaySequence'] : cPaySequences + ',' + item['cPaySequence'];
                         });
+
                         if (isOpen) {
                             ElMessage.warning(message);
                             return;

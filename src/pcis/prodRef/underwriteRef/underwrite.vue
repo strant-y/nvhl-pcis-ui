@@ -522,11 +522,11 @@ function queryRiskCodelistFn() {
       if (res.code === '200') {
         contRiskInfo.value = res.data?.cResv1 || null;
       } else {
-        ElMessage.error(res.msg);
+        // ElMessage.error(res.msg || res.message);
       }
     })
     .catch((error: any) => {
-      ElMessage.error(error);
+      // ElMessage.error(error);
     });
 }
 

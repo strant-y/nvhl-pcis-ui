@@ -590,7 +590,7 @@
     // 下拉 核保通过任务
     const table5 = ref<any>([
         {
-            prop: "cAppNo",
+            prop: "cInquiryNo",
             inputtype: "rtinput",
             title: "询价单号",
             minWidth: 180,

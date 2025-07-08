@@ -171,7 +171,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         valueFormat: "YYYY-MM-DD HH:mm:ss",
         rules: [getRules("required", {})],
         func: (val) => {
-          handleDateChange(val);
+          if(val){
+            handleDateChange(val);
+          }
         },
       },
     ],

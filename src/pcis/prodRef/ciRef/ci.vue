@@ -157,7 +157,7 @@ const method = {
                 res
             );
           });
-        setFormItem("Ci.cDptCde", { rules: [getRules("required", {})] });
+        // setFormItem("Ci.cDptCde", { rules: [getRules("required", {})] });
         setFormItem("Ci.cDptCde", { disabled: false });
         setFormItem("Ci.nComm", { disabled: false});
         setFormItem("Ci.cBrkrCde", { disabled: false});
@@ -215,10 +215,10 @@ const method = {
               }
           );
         });
-        // freeEditRef.value?.setRowFieldProp(
-        //         rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
-        // );
-        setFormItem("Ci.cDptCde", { rules: [getRules("required", {})] });
+        freeEditRef.value?.setRowFieldProp(
+                rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
+        );
+        // setFormItem("Ci.cDptCde", { rules: [getRules("required", {})] });
         setFormItem("Ci.cDptCde", { disabled: false });
         setFormItem("Ci.nComm", { disabled: false});
         setFormItem("Ci.cBrkrCde", { disabled: false});

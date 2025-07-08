@@ -91,4 +91,7 @@ watchEffect(() => {
 .el-message { 
   top: 50% !important; /* 垂直居中 */
 }
+.el-message__content,.el-message__icon {
+  font-size: 16px!important;
+}
 </style>

@@ -199,7 +199,7 @@
         },
         {
             prop: "bsType",
-            inputtype: "rtradio",
+            inputtype: "rtcheckboxgroup",
             title: "申请单类型",
             showKey: [1],
             minWidth: 180,
@@ -1368,12 +1368,20 @@
                 inNextDpt: freeEditRef.value?.getValue("inNextDpt"),
                 ...s,
             };
-            if (udrType == "3" || udrType == "4") {
+           
+        //     "startBsTm1": "2025-07-08 00:00:00",
+		// "endBsTm1": "2025-07-10 23:59:59",
+            if(udrType == "1"  || udrType == "2" ){
+                params.startBsTm1 = date1[0];
+                params.endBsTm1 = date1[1];
+                params.startCrtTm = date2[0];
+                params.tAppTmEnd = date2[1];
+            }else if (udrType == "3" || udrType == "4") {
                 params.startBsTm1 = date1[0];
                 params.endBsTm1 = date1[1];
             } else {
                 params.startCrtTm = date2[0];
-                params.TAppTmEnd = date2[1];
+                params.tAppTmEnd = date2[1];
             }
         } else {
             params = Object.assign(
@@ -1386,7 +1394,7 @@
                     CurrentUser: user.value.opCde,
                     CurrentUserOrg: user.value.companyId,
                     TAppTmStart: date1[0],
-                    TAppTmEnd: date1[1],
+                    tAppTmEnd: date1[1],
                     CLoadSub: freeEditRef.value?.getValue("CLoadSub"),
                 },
                 s
@@ -1395,6 +1403,7 @@
         }
         delete params.tm1;
         delete params.tm2;
+         console.log('32',udrType,params)
         const querys = Object.assign(params, r);
         const requestParam = cloneDeep(querys);
         requestParam.udrType = String(requestParam.udrType - 1);

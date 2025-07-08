@@ -78,13 +78,13 @@
                   /> -->
                   <i :class="['icon','iconfont',iconMap[k.pageKey]]"></i>
                   <span class="icon-title" v-if="NavigaShow">
-                    <template v-if="k.pageTtile && k.pageTtile.length > 6">
+                    <template v-if="k.pageTtile && k.pageTtile.length > 7">
                       <el-tooltip
                         effect="dark"
                         :content="k.pageTtile"
                         placement="top-start"
                       >
-                        {{ k.pageTtile.substring(0, 6) + "..." }}
+                        {{ k.pageTtile.substring(0, 7) + "..." }}
                       </el-tooltip>
                     </template>
                     <template v-else>
@@ -144,10 +144,7 @@
         <!-- </el-affix> -->
       </el-aside>
       <el-main class="main-container">
-        <el-affix
-          :offset="80"
-          class="affix-main-header"
-        >
+        <div class="main-header">
           <div class="tp" style="background: #ebedfc">
             <span class="font-weight-500">条款：</span
             ><span class="publicStyle"
@@ -173,6 +170,7 @@
           <div class="btm" style="background: #ebedfc">
             <span class="font-weight-500">保险期限：</span
             ><span class="publicStyle">{{ tmDay }}</span
+            >&nbsp;<span class="font-weight-500">天</span
             >&nbsp;|&nbsp;<span class="font-weight-500">保额：</span
             ><span class="publicStyle">{{ nAmt }}</span
             >&nbsp;<span class="font-weight-500">元</span>&nbsp;|&nbsp;<span
@@ -181,113 +179,86 @@
             ><span class="publicStyle">{{ nPrm }}</span
             >&nbsp;<span class="font-weight-500">元</span>
           </div>
-        </el-affix>
-        <div
-          id="underwriteurl"
-          v-if="underwriteFlag"
-          style="margin-bottom: 10px"
-        >
-          <underwriteRef ref="underwrite" :pageData="pageData"></underwriteRef>
         </div>
-
-        <div id="edrbase" v-if="edrbaseFlag" style="margin-bottom: 10px">
-          <edrbaseRef ref="edrbase"></edrbaseRef>
-        </div>
-        <div id="edritem" v-if="edritemFlag" style="margin-bottom: 10px">
-          <edritemRef ref="edritem"></edritemRef>
-        </div>
-        <template v-for="(pageConfig, v) in formconfig1" :key="v">
+        <div class="main-content">
           <div
-            class="card_"
-            v-for="(k, i) in pageConfig?.pageInfo"
-            :key="i"
-            :id="
-              k.pageKey === 'dist' || k.pageKey === 'distSummary'
-                ? k.pageCode
-                : k.pageKey
-            "
-            v-show="
-              k.pageKey !== 'acctinfo'
-                ? ['ciMasterAgreement', 'ci', 'ourCompanyCiShare'].includes(
-                    k.pageKey
-                  )
-                  ? isCiJiMrk
-                  : acctinfoFlag
-                : true
-            "
+            id="underwriteurl"
+            v-if="underwriteFlag"
+            style="margin-bottom: 10px"
           >
-         <!-- {{ k.pageKey }} -->
-            <component
-              v-if="currentIndex >= i"
-              :ref="
-                (res) => {
-                  const pageK =
-                    k.pageKey === 'dist' || k.pageKey === 'distSummary'
-                      ? k.pageCode
-                      : k.pageKey;
-                  opertaor.addTableRef(pageK, res);
-                }
-              "
-              :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
-              :pageSchema="k.pageSchema"
-              :compKey="k.pageCode"
-            />
+            <underwriteRef ref="underwrite" :pageData="pageData"></underwriteRef>
           </div>
-        </template>
-        <div id="ci" v-if="ciFlag" style="margin-bottom: 10px">
-          <ciRef ref="ci"></ciRef>
-        </div>
-        <div
-          id="ciMasterAgreement"
-          v-if="ciMasterAgreementFlag"
-          style="margin-bottom: 10px"
-        >
-          <ciMasterAgreementRef ref="ciMasterAgreement"></ciMasterAgreementRef>
-        </div>
-        <div
-          id="ourCompanyCiShare"
-          v-if="ourCompanyCiShareFlag"
-          style="margin-bottom: 10px"
-        >
-          <ourCompanyCiShareRef ref="ourCompanyCiShare"></ourCompanyCiShareRef>
-        </div>
-        <el-backtop :target="'.el-main'" :right="100" :bottom="150" />
-        <el-affix position="bottom" :offset="10">
-          <div class="bottom-items">
-            <!--新增的投保单号显示和复制按钮-->
-            <div style="margin-right: 20px; width: 100%; display: flex; justify-content: flex-end; align-items: center;" v-if="pageLoaded">
-              <div style="display: flex; align-items: center; background: #fff; padding: 6px 12px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap;">
-                {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "投保单号:" }}
-                <span id="policyNumber" style="margin-left: 5px; margin-right: 8px; font-weight: bold;">
-                {{ props.param?.pageName === "priceInquiry" ? opertaor.getTableRefByKey('plyBase')?.getValue('Base.cInquiryNo') || '暂无' : opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || '暂无' }}
-                </span>
-                <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号'}`" placement="top">
-                  <el-button @click="copyPolicyNumber" circle size="small" style="color: red;">
-                    <rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />
-                  </el-button>
-                </el-tooltip>
-              </div>
-            </div>
-            <rt-button
-              v-for="(bth, idx) in bthList"
-              :item="bth"
-              :key="idx"
-              :loading="bth.loading"
-            />
-          </div>
-        </el-affix>
-      </el-main>
-    </el-container>
 
-    <!-- <el-footer>
-      <el-affix position="bottom" :offset="10">
-        <div class="bottom-items"> -->
-          <!--新增的投保单号显示和复制按钮-->
-          <!-- <div style="margin-right: 20px; width: 100%; display: flex; justify-content: flex-end; align-items: center;">
-            <div style="display: flex; align-items: center; background: #fff; padding: 6px 12px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
-              {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "投保单号:" }}
+          <div id="edrbase" v-if="edrbaseFlag" style="margin-bottom: 10px">
+            <edrbaseRef ref="edrbase"></edrbaseRef>
+          </div>
+          <div id="edritem" v-if="edritemFlag" style="margin-bottom: 10px">
+            <edritemRef ref="edritem"></edritemRef>
+          </div>
+          <template v-for="(pageConfig, v) in formconfig1" :key="v">
+            <div
+              class="card_"
+              v-for="(k, i) in pageConfig?.pageInfo"
+              :key="i"
+              :id="
+                k.pageKey === 'dist' || k.pageKey === 'distSummary'
+                  ? k.pageCode
+                  : k.pageKey
+              "
+              v-show="
+                k.pageKey !== 'acctinfo'
+                  ? ['ciMasterAgreement', 'ci', 'ourCompanyCiShare'].includes(
+                      k.pageKey
+                    )
+                    ? isCiJiMrk
+                    : acctinfoFlag
+                  : true
+              "
+            >
+          <!-- {{ k.pageKey }} -->
+              <component
+                v-if="currentIndex >= i"
+                :ref="
+                  (res) => {
+                    const pageK =
+                      k.pageKey === 'dist' || k.pageKey === 'distSummary'
+                        ? k.pageCode
+                        : k.pageKey;
+                    opertaor.addTableRef(pageK, res);
+                  }
+                "
+                :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
+                :pageSchema="k.pageSchema"
+                :compKey="k.pageCode"
+              />
+            </div>
+          </template>
+          <div id="ci" v-if="ciFlag" style="margin-bottom: 10px">
+            <ciRef ref="ci"></ciRef>
+          </div>
+          <div
+            id="ciMasterAgreement"
+            v-if="ciMasterAgreementFlag"
+            style="margin-bottom: 10px"
+          >
+            <ciMasterAgreementRef ref="ciMasterAgreement"></ciMasterAgreementRef>
+          </div>
+          <div
+            id="ourCompanyCiShare"
+            v-if="ourCompanyCiShareFlag"
+            style="margin-bottom: 10px"
+          >
+            <ourCompanyCiShareRef ref="ourCompanyCiShare"></ourCompanyCiShareRef>
+          </div>
+          <el-backtop :target="'.el-main'" :right="100" :bottom="150" />
+        </div>
+        <div class="bottom-items">
+          <!--新增的申请单号显示和复制按钮-->
+          <div style="margin-right: 20px; width: 100%; display: flex; justify-content: flex-end; align-items: center;" v-if="pageLoaded">
+            <div style="display: flex; align-items: center; background: #fff; padding: 6px 12px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap;">
+              {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "申请单号:" }}
               <span id="policyNumber" style="margin-left: 5px; margin-right: 8px; font-weight: bold;">
-               {{ opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || '暂无' }}
+              {{ props.param?.pageName === "priceInquiry" ? opertaor.getTableRefByKey('plyBase')?.getValue('Base.cInquiryNo') || '暂无' : opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || '暂无' }}
               </span>
               <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号'}`" placement="top">
                 <el-button @click="copyPolicyNumber" circle size="small" style="color: red;">
@@ -303,8 +274,9 @@
             :loading="bth.loading"
           />
         </div>
-      </el-affix>
-    </el-footer> -->
+      </el-main>
+      <div style="padding: 0 5%;"></div>
+    </el-container>
   </div>
 </template>
 
@@ -389,6 +361,10 @@ const amlExtendInfo = defineAsyncComponent(
 //历史赔案
 const historyClaimcaseModel = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/history-claimcase-model.vue")
+);
+//发起风勘
+const windExplorationModel = defineAsyncComponent(
+  () => import("@/views/comprehensive-query/modal/wind-exploration-model.vue")
 );
 
 // 核保信息
@@ -610,6 +586,18 @@ const historyClaimcaseFun = () => {
       }
     });
 };
+
+// 发起风勘 方法
+const startWindExploration = ()=>{
+    dzmodal
+    .open(windExplorationModel, { type: "Issuer", data: {} })
+    .then((res: any) => {
+      if (res.type === "ok") {
+      }
+    });
+}
+
+
 //  复制保单
 const copyPolicyFun = () => {
   dzmodal.open(copyPlyModel, { type: "", data: {...props.param,...opertaor.getDataAll()} }).then((res: any) => {
@@ -742,6 +730,16 @@ const basicBtn = [
       openLimit();
     },
   }),
+  //  createFreeButtonBase({
+  //   label: "发起风勘",
+  //   type: "primary",
+  //   func: () => {
+  //     startWindExploration(); 
+  //     //startWindExploration
+  //     // historyClaimcaseFun();
+  //     // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
+  //   },
+  // }),
   // createFreeButtonBase({
   //   label: "历史赔案",
   //   type: "primary",
@@ -794,6 +792,7 @@ const edrBtn = [
       submitEdrToUndrFun();
     },
   }),
+ 
 ];
 /**
  * （退保/注销） 按钮
@@ -839,8 +838,8 @@ const edrSurrenderBtn = [
  */
 const uwBtn = [
   createFreeButtonBase({
-    label: props.param?.pageName === "priceInquiry" ? "提交" : "保存",
-    type: "primary",
+    label: "提交",
+    type: "warning",
     id: "btnUdr",
     func: () => {
       underwrite.value?.validate().then((isValid) => {
@@ -898,14 +897,7 @@ const uwBtn = [
         });
     },
   }),
-  // createFreeButtonBase({
-  //   label: "历史赔案",
-  //   type: "primary",
-  //   func: () => {
-  //     historyClaimcaseFun();
-  //     // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
-  //   },
-  // }),
+
   createFreeButtonBase({
     label: "任务痕迹",
     type: "primary",
@@ -933,6 +925,7 @@ const uwBtn = [
         });
     },
   }),
+
 ];
 /**
  * 数据初始化
@@ -1907,6 +1900,13 @@ const loadAppPlyInfo = async (CAppNo) => {
       pageData.value = ops;
       ElMessage.success(res.msg);
       opertaor.setDataAll(ops);
+      // 获取原申请单号下的清单列表数据
+      const distMap = formconfig1[0].pageInfo.filter((item:any) => {
+        return item.pageKey === "dist" || item.pageKey === "distSummary";
+      });
+      distMap.forEach((item:any) => {
+        getDistData(ops.plyBase['Base.cInquiryNo'], item)
+      });
     }
   } else {
     const res = await getAppPolicy(param);
@@ -3477,6 +3477,7 @@ function clearCAppNo(res:any) {
 
 .el-anchor {
   background: transparent;
+  width: 110px;
   :deep(.el-anchor__list) {
     padding: 10px 5px;
   } 
@@ -3517,17 +3518,38 @@ function clearCAppNo(res:any) {
 .font-weight-500 {
   font-weight: 500;
 }
-.affix-main-header {
-  position: absolute;
-  top: 0;
-  text-align: center;
-  // padding: 5px;
-  background: #ebedfc;
-  width: calc(100% - 20px)!important;
-  font-size: 16px;
-}
 .main-container {
-  position: relative;
-  padding-top: 58px;
+  display: flex;
+  flex-direction: column;
+  .main-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: -10px;
+  }
+  .main-content {
+    flex: 1;
+    overflow: hidden;
+    overflow-y: auto;
+  }
 }
+:deep(.el-card__header) {
+  padding: 10px 20px!important;
+  .el-row {
+    align-items: center;
+    &:first-child {
+      font-size: 16px;
+      font-weight: 500;
+    }
+  }
+}
+.card-title-style {
+  font-size: 16px;
+  font-weight: 500;
+}
+:deep(.el-card__body) {
+  padding: 10px 20px;
+}
+
 </style>
