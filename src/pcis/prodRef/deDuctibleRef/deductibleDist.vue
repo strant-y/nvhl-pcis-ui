@@ -212,6 +212,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cDeductibleContent",
         inputtype: "rtinput",
         title: "免赔内容",
+        align: "left",
       },
     ],
   })
