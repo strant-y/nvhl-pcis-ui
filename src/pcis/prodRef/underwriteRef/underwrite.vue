@@ -452,9 +452,13 @@ onMounted(() => {
       cProdNo: params.cProdNo,
       opCde: user.opCde,
       companyId: user.companyId,
-      cAppNo: params.cAppNo,
       cPlanNo: params.cPlanNo,
     };
+    if(params.pageName === "priceInquiry") {
+      param.cInquiryNo = params.cAppNo
+    } else {
+      param.cAppNo = params.cAppNo
+    }
     getCUndrMrkUrlFn(param);
     loadUwTabData();
     queryRiskCodelistFn();

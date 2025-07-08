@@ -806,7 +806,7 @@ const tableObj = {
                         router.push({
                             path: "/pcis/my-page",
                             query: {
-                                param: JSON.stringify({ ...data, ...{ pageType: "readonly" } }),
+                                param: JSON.stringify({ ...data, ...{ pageType: "readonly", pageName: 'priceInquiry' } }),
                             },
                         });
                     } else {
@@ -894,7 +894,7 @@ const tableObj = {
                 tooltip: "询价转投保",
                 type: "primary",
                 size: "large",
-                icon: "RefreshRight",
+                icon: "Right",
                 hideBtns: (row: any) => {
                     // 询价转投保按钮只在状态为"已出保单"时可见
                     if (

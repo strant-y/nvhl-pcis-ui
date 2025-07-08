@@ -94,7 +94,7 @@ function save() {
   const allFromData = formPage.value?.getAllFormData();
   const user = JSON.parse(sessionStorage.getItem("user"));
   console.log('allFromData', allFromData);
-  ElMessage.warning('保存');
+  // ElMessage.warning('保存');
   cargoApi.save({
     ...allFromData,
     ...{},
@@ -107,7 +107,7 @@ function save() {
       // console.log('000', formPage.value.getComponentConfigById("AgreementBase"))
       console.log('resss',res.res['composition']['ECargoBase'][0])
       resData.value = res.res['composition']['ECargoBase'][0]
-      console.log('resData', resData);
+      console.log('resData', resData.value);
     }else {
       ElMessage.success(res.msg);
     }
@@ -125,20 +125,22 @@ function save() {
 function submit() {
   const allFromData = formPage.value?.getAllFormData();
   const user = JSON.parse(sessionStorage.getItem("user"));
-  ElMessage.warning('提交');
-  // 从 resData 提取所需字段并合并进 AgreementBase
-  // const { 
-  //   'ECargoBase.cEcAgrNo': resData.value?.ECargoBase['ECargoBase.cEcAgrNo'],
-  //   'ECargoBase.cEcAgrAppNo': resData.value?.ECargoBase['ECargoBase.cEcAgrAppNo']
-  // } = resData.value?.ECargoBase || {}
+  // ElMessage.warning('提交');
 
-  // if (allFromData && allFromData.AgreementBase) {
-  //   allFromData.AgreementBase = {
-  //     ...allFromData.AgreementBase,
-  //     'ECargoBase.cEcAgrNo': resData.value?.['ECargoBase.cEcAgrNo'],
-  //     'ECargoBase.cEcAgrAppNo': resData.value?.['ECargoBase.cEcAgrAppNo']
-  //   };
-  // }
+  // console.log("000",resData.value.ECargoBase);
+  // 从 resData 提取所需字段并合并进 AgreementBase
+  const { 
+    'ECargoBase.cEcAgrNo': cEcAgrNo,
+    'ECargoBase.cEcAgrAppNo': cEcAgrAppNo,
+  } = resData.value?.ECargoBase || {}
+
+  if (allFromData && allFromData.AgreementBase) {
+    allFromData.AgreementBase = {
+      ...allFromData.AgreementBase,
+      'ECargoBase.cEcAgrNo': cEcAgrNo,
+      'ECargoBase.cEcAgrAppNo': cEcAgrAppNo,
+    };
+  }
   cargoApi.submit({
     ...allFromData,
     ...{},

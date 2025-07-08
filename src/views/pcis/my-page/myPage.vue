@@ -78,13 +78,13 @@
                   /> -->
                   <i :class="['icon','iconfont',iconMap[k.pageKey]]"></i>
                   <span class="icon-title" v-if="NavigaShow">
-                    <template v-if="k.pageTtile && k.pageTtile.length > 6">
+                    <template v-if="k.pageTtile && k.pageTtile.length > 7">
                       <el-tooltip
                         effect="dark"
                         :content="k.pageTtile"
                         placement="top-start"
                       >
-                        {{ k.pageTtile.substring(0, 6) + "..." }}
+                        {{ k.pageTtile.substring(0, 7) + "..." }}
                       </el-tooltip>
                     </template>
                     <template v-else>
@@ -275,8 +275,7 @@
           />
         </div>
       </el-main>
-      <el-aside width="10%"></el-aside>
-      <div style="width: 10%;"></div>
+      <div style="padding: 0 5%;"></div>
     </el-container>
   </div>
 </template>
@@ -3478,6 +3477,7 @@ function clearCAppNo(res:any) {
 
 .el-anchor {
   background: transparent;
+  width: 110px;
   :deep(.el-anchor__list) {
     padding: 10px 5px;
   } 
@@ -3534,4 +3534,22 @@ function clearCAppNo(res:any) {
     overflow-y: auto;
   }
 }
+:deep(.el-card__header) {
+  padding: 10px 20px!important;
+  .el-row {
+    align-items: center;
+    &:first-child {
+      font-size: 16px;
+      font-weight: 500;
+    }
+  }
+}
+.card-title-style {
+  font-size: 16px;
+  font-weight: 500;
+}
+:deep(.el-card__body) {
+  padding: 10px 20px;
+}
+
 </style>

@@ -293,6 +293,7 @@
                                         ]
                                       )
                                     "
+                                    :style="{'justify-content': colinfo.cColTitle === '责任名称' ? 'right' : 'center'}"
                                   >
                                     <from-item
                                       v-model="
@@ -1083,6 +1084,9 @@ defineExpose({
 }
 .table-title {
   background-color: #e6e6e6;
+  th {
+    text-align: center;
+  }
 }
 table {
   border-collapse: collapse; /* 合并边框 */
