@@ -324,4 +324,13 @@ defineExpose({
   letter-spacing: 10px;
   margin-left: 8px;
 } */
+:deep(.el-form-item) {
+  margin-bottom: 5px;
+}
+:deep(.el-form-item__label-wrap) {
+  margin-left: 0px;
+}
+.el-card__header .el-row {
+  align-items: center;
+}
 </style>

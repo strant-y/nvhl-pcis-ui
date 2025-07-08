@@ -382,4 +382,10 @@ defineExpose({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+:deep(.el-card__header) {
+  padding: 10px 20px!important;
+  font-size: 16px;
+  font-weight: 500;
+} 
+</style>
