@@ -6,6 +6,7 @@
         v-model:pageresult="pageresult"
         ref="distTableRef"
         @pageChange="method.handleQuery($event, true)"
+        @selection-change="handleSelectionChange"
       />
     </myCard>
     <comDialog ref="dialog"></comDialog>
@@ -111,6 +112,7 @@ onMounted(async () => {
   Object.assign(formconfig1.value, formconfig11.value);
   cardconfig.value.title = formconfig1.value.title;
   tableconfig.value.showEdit = true;
+  tableconfig.value.showSelection = true;
   formconfig1.value.fromSchema.forEach((e: any)=>{  // 隐藏不需要显示在表格内的数据
     if(e.cShowLocation === '0'){
       e.isShow = false
@@ -404,10 +406,17 @@ const method = {
   exportExcel: () => {
     let paramitem  = Object.assign(formconfig1.value, {
       cComponentTable: cComponentTableValue,
-      cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
     });
     if(route.params.param?.pageType && route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
       paramitem.voType = "ply"
+    }
+    if(route.params.param?.pageName === "priceInquiry") {
+      paramitem['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else {
+      paramitem['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+    }
+    if(selectedRows.value.length > 0) {
+      paramitem['cPkId'] = selectedRows.value.map((row: any) => row['Dist.cPkId']);
     }
     policyService
         .exportDist(paramitem).then((res) => {
@@ -446,8 +455,12 @@ const method = {
             ...formconfig1.value,
             file: base64String, // ✅ 正确传入
             cComponentTable: cComponentTableValue,
-            cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
           };
+          if(route.params.param?.pageName === "priceInquiry") {
+            params['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+          } else {
+            params['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+          }
 
           policyService.importDist(params).then((res) => {
             if (res.code === 200) {
@@ -494,8 +507,12 @@ const method = {
             ...formconfig1.value,
             file: base64String, // ✅ 正确传入
             cComponentTable: cComponentTableValue,
-            cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
           };
+          if(route.params.param?.pageName === "priceInquiry") {
+            params['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+          } else {
+            params['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+          }
 
           policyService.importDistIncrement(params).then((res) => {
             if (res.code === 200) {
@@ -524,7 +541,11 @@ const method = {
   downloadTemp: () => {
     const param = {
       ...formconfig1.value,
-      cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
+    }
+    if(route.params.param?.pageName === "priceInquiry") {
+      param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else {
+      param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
     }
     policyService
         .downloadDistTemplate(param)
@@ -541,15 +562,19 @@ const method = {
           saveAs(blob, fileName);
         })
         .catch(() => {
-          ElMessage.error("全量模板下载失败");
+          ElMessage.error("模板下载失败");
         });
   },
   // 增量模板下载
   downloadIncrement: () => {
     const param = {
       ...formconfig1.value,
-      cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
       cComponentTable: cComponentTableValue,
+    }
+    if(route.params.param?.pageName === "priceInquiry") {
+      param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else {
+      param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
     }
     policyService
         .downloadDistTemplateIncrement(param)
@@ -566,7 +591,7 @@ const method = {
           saveAs(blob, fileName);
         })
         .catch((err) => {
-          ElMessage.error(err.msg || "增量模板下载失败");
+          ElMessage.error(err.msg || "异常数据下载失败");
         });
   },
   setregistAdd(){
@@ -585,9 +610,48 @@ const method = {
     }
     console.log("清单级联事件触发")
   },
-
+  // 批量删除
+  batchDelete() {
+    if (selectedRows.value.length === 0) {
+      ElMessage.warning("请先选择要删除的数据");
+      return;
+    }
+    ElMessageBox.confirm(
+      "是否确认删除选中的数据？",
+      "提示",
+      {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }
+    ).then(() => {
+      const param = {
+        cComponentTable: cComponentTableValue,
+        cPkId: selectedRows.value.map((row: any) => row['Dist.cPkId']),
+      }
+      if(route.params.param?.pageName === "priceInquiry") {
+        param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+      } else {
+        param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+      }
+      deleteDist(param).then((res: any) => {
+        if (res.code === 200) {
+          ElMessage.success("删除成功");
+          const queryParams = distTableRef.value?.getPartnerPage(false);
+          method.handleQuery(queryParams, true);
+        }
+      });
+    });
+  }
 
 };
+
+// 复选框选中
+const selectedRows = ref<any[]>([]);
+function handleSelectionChange(selection: any) {
+  selectedRows.value = selection;
+  console.log("选中数据", selection);
+}
 
 function setUnDisabledByKeyList(key: any) {
   tableconfig.value.formconfig.endBtns?.forEach((item: any) => {
