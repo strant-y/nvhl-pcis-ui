@@ -200,9 +200,6 @@ if (
           let userId = getValue('Applicant.cCertfCde')
           idAnalysis(userId)
         }
-        
-            
-      
       } else {
         // ElMessage.error(msg);
       }

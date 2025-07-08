@@ -55,24 +55,24 @@ onMounted(() => {
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
     //是否小微企业，默认非必填、只读
-    setFormItem("Applicant.cIsMicroEntpris", {
+    setFormItem("ECargoApplicant.cIsMicroEntpris", {
       rules: null,
       disabled: true,
     });
     // 处理邮编
-    setFormItem("Applicant.cZipCde", {
+    setFormItem("ECargoApplicant.cZipCde", {
       rules: [
         getRules("signlessInt", {}),
         getRules("specifyLength", { len: 6 }),
       ],
     });
     //移动手机校验
-    setFormItem("Applicant.cMobile", { rules: [getRules("phoneNo", {})] });
+    setFormItem("ECargoApplicant.cMobile", { rules: [getRules("phoneNo", {})] });
     // 传真校验
-    setFormItem("Applicant.cFax", { rules: [getRules("faxNumber", {})] });
+    setFormItem("ECargoApplicant.cFax", { rules: [getRules("faxNumber", {})] });
 
-    setFormItem("Applicant.cGreenIndustryCustomers",{disabled: true});
-    setFormItem("Applicant.cGreenIndustryList",{disabled: true});
+    setFormItem("ECargoApplicant.cGreenIndustryCustomers",{disabled: true});
+    setFormItem("ECargoApplicant.cGreenIndustryList",{disabled: true});
 
   });
 });
@@ -116,7 +116,6 @@ const method = {
   },
     // 证件号码change
   cCertfCdeChange: (val) => {
-    debugger
     const cCertfCls = formPage.getFormDataById("AgreementApplicant")["ECargoApplicant.cCertfCls"];
     console.log(cCertfCls,"cCertfCls")
     if (cCertfCls == "120001") {
@@ -173,6 +172,23 @@ const method = {
       },
       { title: "职业", width: 85 }
     );
+  },
+    //常住地址
+  getCountry: (val: any) => {
+    setregistAdd();
+  },
+  //常住地址(input)
+  getcSuffixAddr: (val: any) => {
+    setregistAdd();
+  },
+  
+  //常住地址
+  getAllProp: (val: any) => {
+    setRegisterAdd();
+  },
+  //注册地址(input)
+  getcRegisterSuffixAddr: (val: any) => {
+    setRegisterAdd();
   },
 };
 
@@ -239,7 +255,41 @@ const idAnalysis = (id:string)=>{
          
           clearValidate('ECargoApplicant.cCertfCde')  
 }
+function setregistAdd() {
+  const ads = applicantEditRef?.value?.getValue("ECargoApplicant.ClntAddrProp");
+  const a = applicantEditRef?.value?.getValue("ECargoApplicant.cSuffixAddr") || "";
+  if (ads) {
+    getAddressStr({ address: ads }).then((res: any) => {
+      const { code, data, msg } = res;
+      if (code === 200) {
+        const b = (data ? data["addStr"] : "") + a;
+        setAddressStr("ECargoApplicant.cClntAddr", b);
+      }
+    });
+  } else {
+    setAddressStr("ECargoApplicant.cClntAddr", a);
+  }
+}
 
+function setRegisterAdd() {
+  const ads = applicantEditRef?.value?.getValue("ECargoApplicant.RegisterProp");
+  const a = applicantEditRef?.value?.getValue("ECargoApplicant.cRegisterSuffixAddr") || "";
+  if (ads) {
+    getAddressStr({ address: ads }).then((res: any) => {
+      const { code, data, msg } = res;
+      if (code === 200) {
+        const b = (data ? data["addStr"] : "") + a;
+        console.log(b);
+        setAddressStr("ECargoApplicant.cRegisteredcapDre", b);
+      }
+    });
+  } else {
+    setAddressStr("ECargoApplicant.cRegisteredcapDre", a);
+  }
+}
+function setAddressStr(key: any, data: any) {
+  applicantEditRef?.value?.setValue(key, data);
+}
 
 function getFormValue() {
   return applicantEditRef?.value?.getFromValue();
