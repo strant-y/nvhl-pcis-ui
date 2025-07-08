@@ -590,7 +590,7 @@
     // 下拉 核保通过任务
     const table5 = ref<any>([
         {
-            prop: "cAppNo",
+            prop: "cInquiryNo",
             inputtype: "rtinput",
             title: "询价单号",
             minWidth: 180,
@@ -1188,7 +1188,7 @@
     const exportDown = () => {
         const CAppNo = freeEditRef.value?.getValue("CAppNo");
         const CPlyNo = freeEditRef.value?.getValue("CPlyNo");
-        // 查询条件：申请单号，保单号任何一个有值时，都无需做其他查询条件校验
+        // 查询条件：投保单号，保单号任何一个有值时，都无需做其他查询条件校验
         if (!CAppNo && !CPlyNo) {
             // 查询时间段验证
             const date1 = freeEditRef.value?.getValue("tm1"); //投保日期

@@ -201,7 +201,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "objId",
         inputtype: "rtinput",
-        title: "申请单号",
+        title: "投保单号",
       },
       {
         prop: "uwDptName",

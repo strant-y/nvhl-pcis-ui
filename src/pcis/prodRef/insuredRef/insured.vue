@@ -731,6 +731,7 @@ const method = {
       });
       setFormItem("Insured.cTel", { rules: [getRules("phone", {})] });
     }
+     setValue('Insured.cEnterpriseTel',val)
   },
   // 固定电话
   cTelChange: (val) => {

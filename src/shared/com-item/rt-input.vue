@@ -1,112 +1,118 @@
 <template>
   <template v-if="!showLabel">
-    <el-input
-      ref="inputRef"
-      :placeholder="item.placeholder"
-      :size="item.size"
-      :type="
-        item.type === 'color' || item.type === 'number' ? 'text' : item.type
-      "
-      :class="isReQuired() ? 're-quired-flag' : '' "
-      :showPassword="item.showPassword"
-      :rows="item.rows"
-      :style="
-        item.type === 'color'
-          ? { width: 'calc(100% - 32px)' }
-          : item.type === 'icon'
-            ? { width: 'calc(100% - 48px)' }
-            : { width: '100%' }
-      "
-      :maxlength="item.maxlength"
-      :minlength="item.minlength"
-      :readonly="
-        item.type === 'color' || item.type === 'icon'
-          ? true
-          : item.readonly
-            ? typeof item.readonly === 'boolean'
-              ? item.readonly
-              : item.readonly === 1 || item.readonly === '1'
+    <el-tooltip
+      :content="vInput"
+      :disabled="vInput ? false : true"
+      placement="top"
+    >
+      <el-input
+        ref="inputRef"
+        :placeholder="item.placeholder"
+        :size="item.size"
+        :type="
+          item.type === 'color' || item.type === 'number' ? 'text' : item.type
+        "
+        :class="isReQuired() ? 're-quired-flag' : '' "
+        :showPassword="item.showPassword"
+        :rows="item.rows"
+        :style="
+          item.type === 'color'
+            ? { width: 'calc(100% - 32px)' }
+            : item.type === 'icon'
+              ? { width: 'calc(100% - 48px)' }
+              : { width: '100%' }
+        "
+        :maxlength="item.maxlength"
+        :minlength="item.minlength"
+        :readonly="
+          item.type === 'color' || item.type === 'icon'
+            ? true
+            : item.readonly
+              ? typeof item.readonly === 'boolean'
+                ? item.readonly
+                : item.readonly === 1 || item.readonly === '1'
+                  ? true
+                  : false
+              : false
+        "
+        :disabled="
+          item.disabled
+            ? typeof item.disabled === 'boolean'
+              ? item.disabled
+              : item.disabled === 1 || item.disabled === '1'
                 ? true
                 : false
             : false
-      "
-      :disabled="
-        item.disabled
-          ? typeof item.disabled === 'boolean'
-            ? item.disabled
-            : item.disabled === 1 || item.disabled === '1'
-              ? true
-              : false
-          : false
-      "
-      :autosize="item.autosize"
-      :clearable="
-        item.clearable
-          ? typeof item.clearable === 'boolean'
-            ? item.clearable
-            : item.clearable === 1 || item.clearable === '1'
-              ? true
-              : false
-          : false
-      "
-      :formatter="
-        item.type === 'number'
-          ? (value) => {
-              if (value == null) return '';
-              let num = value.replace(/[^0-9.-]/g, '');
-              const parts = `${num}`.split('.');
-              const integerPart = parts[0].replace(
-                /\B(?=(\d{3})+(?!\d))/g,
-                ','
-              );
-              const decimalPart = parts.length > 1 ? `.${parts[1]}` : '';
-              return integerPart + decimalPart;
+        "
+        :autosize="item.autosize"
+        :clearable="
+          item.clearable
+            ? typeof item.clearable === 'boolean'
+              ? item.clearable
+              : item.clearable === 1 || item.clearable === '1'
+                ? true
+                : false
+            : false
+        "
+        :formatter="
+          item.type === 'number'
+            ? (value) => {
+                if (value == null) return '';
+                let num = value.replace(/[^0-9.-]/g, '');
+                const parts = `${num}`.split('.');
+                const integerPart = parts[0].replace(
+                  /\B(?=(\d{3})+(?!\d))/g,
+                  ','
+                );
+                const decimalPart = parts.length > 1 ? `.${parts[1]}` : '';
+                return integerPart + decimalPart;
+              }
+            : (value) => value
+        "
+        :parser="
+          item.type === 'number'
+            ? (value) => {
+              return value?.replace(/,/g, '') ?? ''
             }
-          : (value) => value
-      "
-      :parser="
-        item.type === 'number'
-          ? (value) => {
-            return value?.replace(/,/g, '') ?? ''
-          }
-          : (value) => value
-      "
-      v-model="vInput"
-      @change="handleChange"
-    >
-      <template #suffix v-if="item.suffix">
-        {{ item.suffix }}
-      </template>
-      <template #suffix v-else-if="item.suffixIcon">
-        <el-icon>
-          <component :is="renderIcon(item.suffixIcon)" />
-        </el-icon>
-      </template>
-      <template #prefix v-if="item.prefix">
-        {{ item.prefix }}
-      </template>
-      <template #prefix v-else-if="item.prefixIcon">
-        <el-icon>
-          <component :is="renderIcon(item.prefixIcon)" />
-        </el-icon>
-      </template>
-      <template #prepend v-if="item.prepend">
-        {{ item.prepend }}
-      </template>
-      <template #prepend v-else-if="item.prependIcon">
-        <el-icon>
-          <component :is="renderIcon(item.prependIcon)" />
-        </el-icon>
-      </template>
-      <template #append v-else-if="item.append">
-        {{ item.append }}
-      </template>
-      <template #append v-else-if="item.appendIcon">
-        <el-icon>
-          <component :is="renderIcon(item.appendIcon)" />
-        </el-icon>
-      </template>
-    </el-input>
+            : (value) => value
+        "
+        v-model="vInput"
+        @change="handleChange"
+      >
+        <template #suffix v-if="item.suffix">
+          {{ item.suffix }}
+        </template>
+        <template #suffix v-else-if="item.suffixIcon">
+          <el-icon>
+            <component :is="renderIcon(item.suffixIcon)" />
+          </el-icon>
+        </template>
+        <template #prefix v-if="item.prefix">
+          {{ item.prefix }}
+        </template>
+        <template #prefix v-else-if="item.prefixIcon">
+          <el-icon>
+            <component :is="renderIcon(item.prefixIcon)" />
+          </el-icon>
+        </template>
+        <template #prepend v-if="item.prepend">
+          {{ item.prepend }}
+        </template>
+        <template #prepend v-else-if="item.prependIcon">
+          <el-icon>
+            <component :is="renderIcon(item.prependIcon)" />
+          </el-icon>
+        </template>
+        <template #append v-else-if="item.append">
+          {{ item.append }}
+        </template>
+        <template #append v-else-if="item.appendIcon">
+          <el-icon>
+            <component :is="renderIcon(item.appendIcon)" />
+          </el-icon>
+        </template>
+      </el-input>
+    </el-tooltip>
 
     <template v-if="item.type === 'color'">
       <el-color-picker v-model="vInput" @change="handleChange" />

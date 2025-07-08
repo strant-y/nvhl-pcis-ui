@@ -16,6 +16,9 @@ export function setupPermission() {
 
   router.beforeEach(async (to, from, next) => {
     NProgress.start();
+       // 设置页面标题
+    // setPageTitle(to);
+
     const hasToken = sessionStorage.getItem("token");
     if (hasToken) {
       if (to.path === "/login") {
@@ -60,11 +63,20 @@ export function setupPermission() {
               }
             } else {
               isEncrypted.value = false;
+            
               if (to.meta.title) {
                 const data = descryptParameterToQuery(query);
+                  let dynamicTitle = to.meta.title;
+                  if (data.ParseParams && data.ParseParams.title) {
+                    dynamicTitle = data.ParseParams.title;
+                  } else if (query.title) {
+                    dynamicTitle = query.title;
+                  }
+
                 const view = {
                   name: to.name as string,
-                  title: to.meta.title,
+                  // title: to.meta.title,
+                  title: dynamicTitle,
                   path: to.path,
                   fullPath: to.fullPath,
                   affix: to.meta?.affix,
@@ -123,6 +135,34 @@ export function setupPermission() {
       }
     }
   });
+
+  // 独立的标题设置函数
+const setPageTitle = (to) => {
+  let title = "";
+    console.log(1111,to.query)
+  // 1. 优先从query参数中获取动态标题
+  if (to.query && to.query.title) {
+    title = to.query.title;
+  } 
+  // 2. 其次使用路由配置中的meta.title
+  else if (to.meta && to.meta.title) {
+    title = to.meta.title;
+  } 
+  // 3. 使用默认标题
+  else {
+    title = "默认标题";
+  }
+  
+  // 设置浏览器标题
+  // document.title = title;
+  
+  // 如果需要更新标签页标题，在这里处理
+  const tagsViewStore = useTagsViewStore();
+  if (to.meta.title && tagsViewStore.currentTag && tagsViewStore.currentTag.path === to.path) {
+    tagsViewStore.updateTagTitle(to.path, title);
+  }
+};
+
 
   router.afterEach((to) => {
     // Decrypt route parameters 路由参数解密

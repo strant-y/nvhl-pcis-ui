@@ -26,7 +26,7 @@ export function getAddressStr(queryParams: any): AxiosPromise<any> {
 }
 
 /**
- * 获取申请单号
+ * 获取投保单号
  * @param queryParams
  */
 export function generatelSingleNo(queryParams: any): AxiosPromise<any> {
