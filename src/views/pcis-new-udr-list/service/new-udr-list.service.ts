@@ -137,7 +137,11 @@ export const NewUdrListService = () => {
   // 获取核保选项
   const getCUndrMrk = async (ops: any) => {
     try {
-      return post(`${getCUndrMrkUrl}`, ops);
+      if(ops.cInquiryNo) {// 询价核保
+        return post(`inquiry/getCUndrMrk`, ops);
+      } else {
+        return post(`${getCUndrMrkUrl}`, ops);
+      }
     } catch (error) {
       return handleError(error);
     }
