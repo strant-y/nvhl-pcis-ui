@@ -839,8 +839,8 @@ const edrSurrenderBtn = [
  */
 const uwBtn = [
   createFreeButtonBase({
-    label: props.param?.pageName === "priceInquiry" ? "提交" : "保存",
-    type: "primary",
+    label: "提交",
+    type: "warning",
     id: "btnUdr",
     func: () => {
       underwrite.value?.validate().then((isValid) => {
