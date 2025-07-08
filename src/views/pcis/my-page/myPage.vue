@@ -78,13 +78,13 @@
                   /> -->
                   <i :class="['icon','iconfont',iconMap[k.pageKey]]"></i>
                   <span class="icon-title" v-if="NavigaShow">
-                    <template v-if="k.pageTtile && k.pageTtile.length > 6">
+                    <template v-if="k.pageTtile && k.pageTtile.length > 7">
                       <el-tooltip
                         effect="dark"
                         :content="k.pageTtile"
                         placement="top-start"
                       >
-                        {{ k.pageTtile.substring(0, 6) + "..." }}
+                        {{ k.pageTtile.substring(0, 7) + "..." }}
                       </el-tooltip>
                     </template>
                     <template v-else>
@@ -275,8 +275,7 @@
           />
         </div>
       </el-main>
-      <el-aside width="10%"></el-aside>
-      <div style="width: 10%;"></div>
+      <div style="padding: 0 5%;"></div>
     </el-container>
   </div>
 </template>
@@ -862,8 +861,8 @@ const edrSurrenderBtn = [
  */
 const uwBtn = [
   createFreeButtonBase({
-    label: props.param?.pageName === "priceInquiry" ? "提交" : "保存",
-    type: "primary",
+    label: "提交",
+    type: "warning",
     id: "btnUdr",
     func: () => {
       underwrite.value?.validate().then((isValid) => {
@@ -1924,6 +1923,13 @@ const loadAppPlyInfo = async (CAppNo) => {
       pageData.value = ops;
       ElMessage.success(res.msg);
       opertaor.setDataAll(ops);
+      // 获取原申请单号下的清单列表数据
+      const distMap = formconfig1[0].pageInfo.filter((item:any) => {
+        return item.pageKey === "dist" || item.pageKey === "distSummary";
+      });
+      distMap.forEach((item:any) => {
+        getDistData(ops.plyBase['Base.cInquiryNo'], item)
+      });
     }
   } else {
     const res = await getAppPolicy(param);
@@ -3529,6 +3535,7 @@ function clearCAppNo(res:any) {
 
 .el-anchor {
   background: transparent;
+  width: 110px;
   :deep(.el-anchor__list) {
     padding: 10px 5px;
   } 
@@ -3585,4 +3592,22 @@ function clearCAppNo(res:any) {
     overflow-y: auto;
   }
 }
+:deep(.el-card__header) {
+  padding: 10px 20px!important;
+  .el-row {
+    align-items: center;
+    &:first-child {
+      font-size: 16px;
+      font-weight: 500;
+    }
+  }
+}
+.card-title-style {
+  font-size: 16px;
+  font-weight: 500;
+}
+:deep(.el-card__body) {
+  padding: 10px 20px;
+}
+
 </style>

@@ -293,6 +293,7 @@
                                         ]
                                       )
                                     "
+                                    :style="{'justify-content': colinfo.cColTitle === '责任名称' ? 'right' : 'center'}"
                                   >
                                     <from-item
                                       v-model="
@@ -809,12 +810,20 @@ function exChangeFunc() {
   }
   // 045001个性化配置
   if (pageparam.cProdNo === "045001") {
-    if(data["tgt"]["Tgt.cRegisteredLogo"] && data["tgt"]["Tgt.cRegisteredLogo"] === '0'){
-      const term = termFactormap.value.filter(
-        (r) => r["prop"] !== "Term.nInsuredCount"
-      );
-      termFactormap.value = term;
-    }
+    // if(data["tgt"]["Tgt.cInsuranceMethod"] && data["tgt"]["Tgt.cInsuranceMethod"] === '0'){
+      
+    // }
+
+    const term = termFactormap.value.filter(
+      (r) => r["prop"] !== "Term.nRateVal" && r["prop"] !== "Term.nInsuranceFee"
+    );
+    const ex = termFactormap.value.filter(
+      (r) =>
+        r["prop"] === "Term.nRateVal" || r["prop"] === "Term.nInsuranceFee"
+    );
+
+    termFactormap.value = term;
+    extermConf.value = ex;
   }
    // 040002个性化配置
   if (pageparam.cProdNo === "040002") {
@@ -1075,6 +1084,9 @@ defineExpose({
 }
 .table-title {
   background-color: #e6e6e6;
+  th {
+    text-align: center;
+  }
 }
 table {
   border-collapse: collapse; /* 合并边框 */

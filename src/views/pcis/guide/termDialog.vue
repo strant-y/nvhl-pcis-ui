@@ -45,6 +45,7 @@
           :pNode="pNode"
           :termList="props.termList"
           :type="props.data.type"
+          :voType="props.data.voType"
           @updateTerm="updateTermlist"
         />
       </el-col>

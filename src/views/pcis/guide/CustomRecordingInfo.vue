@@ -65,6 +65,10 @@ const props = defineProps({
   type: {
     type: Number,
     default: 1,
+  },
+  voType: {
+    type: String,
+    default: "",
   }
 });
 const { datas } = toRefs(props);
@@ -113,6 +117,7 @@ const tableconfig = reactive<AppTableConfig>(
             pageSize: 9999,
             userId: JSON.parse(sessionStorage.getItem("user")).opCde,
             isPLan: isPlan,
+            voType: props.voType,
           }).then((res: any) => {
               countNum.value = res.total;
               if(countNum.value >=9){
@@ -127,12 +132,14 @@ const tableconfig = reactive<AppTableConfig>(
                     prodCnm: props.pNode.parent.data.value,
                     prodNo: props.pNode.parent.data.code,
                     isPlan: isPlan,
+                    voType: props.voType,
                   } : {
                     termNo: row.code,
                     termCnm: row.value,
                     prodCnm: props.pNode.parent.data.value,
                     prodNo: props.pNode.parent.data.code,
                     isPlan: isPlan,
+                    voType: props.voType,
                   };
                 userUnionTerm(params).then((res:any) => {
                   if (res.code == "1") {
@@ -146,9 +153,11 @@ const tableconfig = reactive<AppTableConfig>(
                 const param = props.type === 2 ? {
                   planNo: row.code,
                   isPlan: isPlan,
+                  voType: props.voType,
                 } : {
                   termNo: row.code,
-                  isPlan: isPlan
+                  isPlan: isPlan,
+                  voType: props.voType,
                 };
                 unUserUnUntionTerm(param).then((res:any) => {
                   if (res.code == "1") {

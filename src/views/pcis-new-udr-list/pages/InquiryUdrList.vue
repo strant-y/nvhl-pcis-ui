@@ -749,7 +749,7 @@
                     data = { objId: row.objId, sysType: row.objExt };
                 } else {
                     data = {
-                        objId: row.cAppNo,
+                        objId: row.cInquiryNo,
                         sysType:
                             !!row["bsType"] && ("A" === row["bsType"] || "P" === row["bsType"])
                                 ? "U"
@@ -826,7 +826,7 @@
                     data = { objId: row.objId, sysType: row.objExt };
                 } else {
                     data = {
-                        objId: row.cAppNo,
+                        objId: row.cInquiryNo,
                         sysType:
                             !!row["bsType"] && ("A" === row["bsType"] || "P" === row["bsType"])
                                 ? "U"
@@ -1143,20 +1143,6 @@
             }
         }
         //首页跳转过来的逻辑 End
-
-        // handleQuery(true);
-        // 下面是测试数据
-        // pageresult.list = [
-        //   { CAppNo: 1, cAppStatus: 1, },
-        //   { CAppNo: 2, cAppStatus: 2, },
-        //   { CAppNo: 3, cAppStatus: 3, },
-        //   { CAppNo: 4, cAppStatus: 4 },
-        //   { CAppNo: 5, cAppStatus: 5, },
-        //   { CAppNo: 6, cAppStatus: 6, },
-        //   { CAppNo: 7, cAppStatus: 7, },
-        //   { CAppNo: 8, cAppStatus: 8, },
-        // ];
-        // pageresult.total = 1;
     });
 
     onUnmounted(() => {
@@ -1186,7 +1172,7 @@
 
     // 导出
     const exportDown = () => {
-        const CAppNo = freeEditRef.value?.getValue("CAppNo");
+        const CAppNo = freeEditRef.value?.getValue("cInquiryNo");
         const CPlyNo = freeEditRef.value?.getValue("CPlyNo");
         // 查询条件：投保单号，保单号任何一个有值时，都无需做其他查询条件校验
         if (!CAppNo && !CPlyNo) {
@@ -1471,7 +1457,7 @@
                 if (row.bsType === "A") {
                     const en = JSON.stringify({
                         // scene: SCENE_PLY_UW_PROCESS,
-                        cAppNo: row.objId,
+                        cInquiryNo: row.objId,
                         taskId: row.curtTask,
                         cAppTyp: row.bsType,
                         cProdNo: row.prodNo,
@@ -1499,7 +1485,7 @@
                             r.data.cEdrRsnBundleCde === "BL"
                                 ? SCENE_PLY_UW_PROCESSBEARER
                                 : SCENE_PLY_UW_PROCESS,
-                        cAppNo: row.objId,
+                        cInquiryNo: row.objId,
                         taskId: row.curtTask,
                         cAppTyp: row.bsType,
                         cProdNo: row.prodNo,
@@ -1515,6 +1501,7 @@
                         cTermNo:row.cTermNo,
                         cTermNme:row.cTermNme,
                         cProdNmeCn: row.prodName,
+                        pageName: 'priceInquiry',
                     });
                     router.push({
                         path: "/pcis/my-page",
@@ -1694,7 +1681,7 @@
         if (cAppTyp === "P") {
             if (row.cProdNo === "000000") {
                 const param = {
-                    CPlanNo: row.cAppNo,
+                    CPlanNo: row.cInquiryNo,
                     CPlanMrk: row.cPlanMrk,
                     scene: SCENE_PLAN_READ,
                 };
@@ -1705,7 +1692,7 @@
                 });
             } else {
                 const en = JSON.stringify({
-                    CPlanNo: row.cAppNo,
+                    CPlanNo: row.cInquiryNo,
                     // 'Base.CProdNo': plan['PrdProdPlan.CProdNo'],
                     // 'Base.CGrpMrk': plan['PrdProdPlan.CGrpMrk'],
                     CPlanMrk: row.cPlanMrk,
@@ -1719,14 +1706,14 @@
                 });
             }
         } else {
-            getBaseInfoByInquiryNo({ inquiryNo: row.objId ? row.objId : row.cAppNo }).then((r: any) => {
+            getBaseInfoByInquiryNo({ inquiryNo: row.objId ? row.objId : row.cInquiryNo }).then((r: any) => {
                 if (r.code !== 200) {
                     ElMessage.error({ message: r.msg, duration: 6000 });
                 } else {
                     if (cAppTyp === "A") {
                         const en = JSON.stringify({
                             // scene: SCENE_PLY_UW_PROCESS,
-                            cAppNo: row.objId ? row.objId : row.cAppNo,
+                            cInquiryNo: row.objId ? row.objId : row.cInquiryNo,
                             taskId: row.curtTask,
                             cAppTyp: row.bsType? row.bsType: row.cAppTyp,
                             cProdNo: row.prodNo? row.prodNo: row.cProdNo,
@@ -1738,6 +1725,7 @@
                             cTermNme:row.cTermNme,
                             cTermNo:row.cTermNo,
                             cProdNmeCn: row.prodName,
+                            pageName: 'priceInquiry',
                         });
                         router.push({
                             path: "/pcis/my-page",
@@ -1747,7 +1735,7 @@
                         });
                     } else {
                         const en = JSON.stringify({
-                            cAppNo: row.objId ? row.objId : row.cAppNo,
+                            cInquiryNo: row.objId ? row.objId : row.cInquiryNo,
                             taskId: row.curtTask,
                             cAppTyp: row.bsType? row.bsType: row.cAppTyp,
                             cProdNo: row.prodNo? row.prodNo: row.cProdNo,
@@ -1761,6 +1749,7 @@
                             cTermNme:row.cTermNme,
                             cTermNo:row.cTermNo,
                             cProdNmeCn: row.prodName,
+                            pageName: 'priceInquiry',
                         });
                         router.push({
                             path: "/pcis/my-page",
@@ -1786,7 +1775,7 @@
         }
         const en = JSON.stringify({
             scene: scene,
-            cAppNo: row.objId,
+            cInquiryNo: row.objId,
             cProdNo: row.prodNo,
             cAppTyp: row.bsType,
             cJiMrk: row.cJiMrk,
@@ -1799,6 +1788,7 @@
             cTermNo:row.cTermNo,
             pageType: "PLY_UW_PROCESS_SCENE",
             cProdNmeCn: row.prodName,
+            pageName: 'priceInquiry',
         });
         router.push({
             path: "/pcis/my-page",
@@ -1815,7 +1805,7 @@
             cancelButtonText: "取消",
             type: "warning",
         }).then(function () {
-            const delResult = pcisQueryService.delTmpPolicy({ cAppNo: id });
+            const delResult = pcisQueryService.delTmpPolicy({ cInquiryNo: id });
             delResult.then((res: any) => {
                 if (null != res && null != res["code"]) {
                     if (res["code"] === 200) {

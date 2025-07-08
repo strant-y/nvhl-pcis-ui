@@ -235,6 +235,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cSpecialContent",
         inputtype: "rtinput",
         title: "特约内容",
+        align: "left",
       },
     ],
   })

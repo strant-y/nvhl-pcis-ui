@@ -32,7 +32,7 @@
                 "
               >
               <template #label>
-                  <template v-if="item.title?.length > 8">
+                  <!-- <template v-if="item.title?.length > 8">
                     <el-tooltip
                       effect="dark"
                       :content="item.title"
@@ -41,9 +41,9 @@
                       {{ item.title.substring(0, 8) + "..." }}
                     </el-tooltip>
                   </template>
-                  <template v-else>
+                  <template v-else> -->
                     {{ item.title }}
-                  </template>
+                  <!-- </template> -->
                 </template>
               <rtButton :item="item.btnItems" />
             </el-form-item>
@@ -51,7 +51,7 @@
             <template v-else-if="item.inputtype === 'rtinputgroup'">
               <el-form-item :required="checkRequired(item)">
                 <template #label>
-                  <template v-if="item.title?.length > 8">
+                  <!-- <template v-if="item.title?.length > 8">
                     <el-tooltip
                       effect="dark"
                       :content="item.title"
@@ -60,9 +60,9 @@
                       {{ item.title.substring(0, 8) + "..." }}
                     </el-tooltip>
                   </template>
-                  <template v-else>
+                  <template v-else> -->
                     {{ item.title }}
-                  </template>
+                  <!-- </template> -->
                 </template>
                 <div
                   :style="{
@@ -101,7 +101,7 @@
                 "
               >
                 <template #label>
-                  <template v-if="item.title?.length > 8">
+                  <!-- <template v-if="item.title?.length > 8">
                     <el-tooltip
                       effect="dark"
                       :content="item.title"
@@ -110,9 +110,9 @@
                       {{ item.title.substring(0, 8) + "..." }}
                     </el-tooltip>
                   </template>
-                  <template v-else>
+                  <template v-else> -->
                     {{ item.title }}
-                  </template>
+                  <!-- </template> -->
                 </template>
                 <div :style="{width: ( item.propWidth ? item.propWidth : 100) + '%' }">
                   <div
@@ -208,7 +208,7 @@
                 <template v-if="item.inputtype === 'rtinputgroup'">
                   <el-form-item :required="checkRequired(item)">
                     <template #label>
-                      <template v-if="item.title?.length > 8">
+                      <!-- <template v-if="item.title?.length > 8">
                         <el-tooltip
                           effect="dark"
                           :content="item.title"
@@ -217,9 +217,9 @@
                           {{ item.title.substring(0, 8) + "..." }}
                         </el-tooltip>
                       </template>
-                      <template v-else>
+                      <template v-else> -->
                         {{ item.title }}
-                      </template>
+                      <!-- </template> -->
                     </template>
                     <div
                       :style="{
@@ -255,7 +255,7 @@
                     :prop="item.prop"
                   >
                     <template #label>
-                      <template v-if="item.title?.length > 9">
+                      <!-- <template v-if="item.title?.length > 9">
                         <el-tooltip
                           effect="dark"
                           :content="item.title"
@@ -264,9 +264,9 @@
                           {{ item.title.substring(0, 9) + "..." }}
                         </el-tooltip>
                       </template>
-                      <template v-else>
+                      <template v-else> -->
                         {{ item.title }}
-                      </template>
+                      <!-- </template> -->
                     </template>
                     <div :style="{width: ( item.propWidth ? item.propWidth : 100) + '%' }">
                       <div

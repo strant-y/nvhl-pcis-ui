@@ -452,9 +452,13 @@ onMounted(() => {
       cProdNo: params.cProdNo,
       opCde: user.opCde,
       companyId: user.companyId,
-      cAppNo: params.cAppNo,
       cPlanNo: params.cPlanNo,
     };
+    if(params.pageName === "priceInquiry") {
+      param.cInquiryNo = params.cAppNo
+    } else {
+      param.cAppNo = params.cAppNo
+    }
     getCUndrMrkUrlFn(param);
     loadUwTabData();
     queryRiskCodelistFn();
@@ -518,11 +522,11 @@ function queryRiskCodelistFn() {
       if (res.code === '200') {
         contRiskInfo.value = res.data?.cResv1 || null;
       } else {
-        ElMessage.error(res.msg);
+        // ElMessage.error(res.msg || res.message);
       }
     })
     .catch((error: any) => {
-      ElMessage.error(error);
+      // ElMessage.error(error);
     });
 }
 

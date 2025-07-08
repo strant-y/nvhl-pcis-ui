@@ -49,13 +49,13 @@
 
         <el-tooltip placement="top">
           <template #content>
-            可用鼠标左键，按住常用{{ labelNm }}卡片<br />自由拖动常用{{ labelNm }}排序<br />
+            可用鼠标左键，按住常用条款卡片<br />自由拖动常用条款排序<br />
           </template>
           <h4
             style="margin: 10px 20px; width: 200px"
             v-if="formconfig1.cRenewMrk !== '1'"
           >
-            常用{{ labelNm }}
+            常用条款
             <el-icon size="20" style="vertical-align: middle; color: red"
               ><InfoFilled
             /></el-icon>
@@ -91,15 +91,14 @@
                       ><StarFilled
                     /></el-icon>
                   </p>
-                  <p class="txt" v-if="formconfig1.cRecordType == 1">{{ item.termNo }} - {{ item.termCnm }}</p>
-                  <p class="txt" v-else>{{ item.planNo }} - {{ item.planCnm }}</p>
+                  <p class="txt">{{ item.termNo }} - {{ item.termCnm }}</p>
                 </el-card>
               </VueDraggable>
             </div>
           </el-col>
           <el-col :span="24">
             <el-form-item
-              :label="`${labelNm}名称`"
+              label="条款名称"
               prop="cTermNme"
               :rules="[getRules('required', {})]"
             >
@@ -366,12 +365,10 @@ function handleClick(item: any, index: number) {
 }
 //取消常用条款
 function handleStarClick(item: any) {
-  const param = formconfig1.value.cRecordType === 2 ? {
-    planNo: item.planNo,
-    isPlan: "1",
-  } : {
-    termNo: item.planNo,
+  const param = {
+    planNo: item.termNo,
     isPlan: "0",
+    voType: "inquiry",
   }
   unUserUnUntionTerm(param).then((res:any) => {
     if (res.code == "1") {
@@ -387,7 +384,8 @@ function handleQuery() {
     pageNum: 1,
     pageSize: 9999,
     userId: JSON.parse(sessionStorage.getItem("user")).opCde,
-    isPLan: formconfig1.value.cRecordType === 2 ? "1" : "0",
+    isPLan: "0",
+    voType: "inquiry",
   }).then((res: any) => {
     if (res.code == "1") {
       termList.value = res.result;
@@ -433,7 +431,7 @@ function showModal() {
   dzmodal
     .open(termDialog, { 
       type: "Issuer",
-      data: { updateQuery, type: formconfig1.value.cRecordType },
+      data: { updateQuery, type: formconfig1.value.cRecordType, voType: "inquiry", },
       termList: termList.value,
     })
     .then((res: any) => {
@@ -455,15 +453,9 @@ function handleRecordTypeChange(val:any) {
   formconfig1.value.cTermNme = "";
   formconfig1.value.cGrpMrk = "0";
   formconfig1.value.cRenewMrk = "0";
-  if (val == "2") {
-    loadOptions(2);
-    labelNm.value = "方案";
-    formconfig1.value.cIsPlan = '1';
-  } else {
-    loadOptions();
-    labelNm.value = "条款";
-    formconfig1.value.cIsPlan = '0';
-  }
+  loadOptions();
+  labelNm.value = "条款";
+  formconfig1.value.cIsPlan = '0';
   handleQuery()
   formconfig1.value.cTermNme = "";
   formconfig1.value.cTermNo = "";
