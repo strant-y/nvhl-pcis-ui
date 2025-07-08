@@ -649,30 +649,64 @@ const tableconfig = reactive<AppTableConfig>(
 					type: "primary",
 					label: "在线缴费",
 					func: async () => {
+                        console.log(652,multipleSelection.value)
                         if (multipleSelection.value.length < 1 ) {
                             ElMessage.warning('所选记录为空！');
                             return ;
                         }
-
-                        
-
                         let cPaySequences = ''; // 所选项的支付号
                         let isOpen =  false;
-                        let message = '';
-                        multipleSelection.value.forEach(item => {
+                        let message = ''; 
+                        let CAppNos = '';
+                        let CUniqueNos = '';  
+                        const CCombinationFlag = new Set();
+                        let combinationNo = '';
+                        multipleSelection.value.forEach((item,i) => {
                             if ('18' !== item['cPayTyp']) {
-								isOpen = true;
+                                isOpen = true;
                                 message='该单缴费类型错误，只能对在线支付的单进行在线缴费！ 【申请单号='+item['cAppNo']+'】'
-								return;
-						  	}
-                            cPaySequences = cPaySequences === '' ? item['cPaySequence'] : cPaySequences + ',' + item['cPaySequence'];
-                        });
+                                return;
+                            }
+                             multipleSelection.value.forEach((itemT,j) => {
+                                // 校验多个单据币种是否相同
+                                if (item['cCurNo'] !== itemT['cCurNo']  ) {
+                                    isOpen = true;
+                                    message='币种为同类型，才可以进行在线支付！【申请单号='+item['cAppNo']+'】'
+                                    return ;
+                                }
+                                
+                                 // 校验多个 支付号是否相同
+                                if (item['cPaySequence'] !== itemT['cPaySequence']  ) {
+                                    isOpen = true;
+                                    message='相同[支付号]才可进行在线支付！申请单号：【申请单号='+item['cAppNo']+'】'
+                                    return ;
+                                }
+                                // 校验是否相同单位  
+                                if (item['cDptCde'] !== itemT['cDptCde']  ) {
+                                    isOpen = true;
+                                    message='不同分公司下单据不支持在线支付！【申请单号='+item['cAppNo']+'】'
+                                    return ;
+                                }
+
+                             })
+                            CAppNos = CAppNos === '' ? item['cAppNo'] : CAppNos + ',' + item['cAppNo'];
+                            CUniqueNos = CUniqueNos === '' ? item['cUniqueNo'] : CUniqueNos + ',' + item['cUniqueNo'];
+                            combinationNo = !!item['cCombinationNo'] ? item['cCombinationNo'] : 'noCombination';
+                            CCombinationFlag.add(combinationNo);
+                        }); 
+ 
+                       if (CCombinationFlag.size > 1) {
+                           ElMessage.warning('组合产品不能和其他产品单据同时缴费');
+                            return;
+                        }
 
                         if (isOpen) {
                             ElMessage.warning(message);
                             return;
                         }
-						window.open('http://t.yaic.com.cn:12003/02/'+cPaySequences)
+
+                         cPaySequences = multipleSelection.value[0]['cPaySequence'];
+        				window.open('http://t.yaic.com.cn:12003/02/'+cPaySequences)
 					},
 				}),
 			// createFreeButtonBase({
@@ -843,6 +877,22 @@ const tableconfig = reactive<AppTableConfig>(
 		],
 	})
 );
+
+
+const checkBatch = (cBatchNo : any)=> {
+        if (cBatchNo === '' || cBatchNo === null) {
+            return true;
+        }
+        const re = new RegExp('^[a-z]|[A-Z]$');
+        const cBatchNoF = cBatchNo.substring(0, 1);
+        if (re.test(cBatchNoF)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
 onMounted(async () => {
   nextTick(()=>{
     freeEditRef.value?.setValue('CPayStatus', '0')

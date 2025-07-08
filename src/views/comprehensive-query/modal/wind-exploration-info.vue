@@ -1,8 +1,9 @@
-<!-- 发起风勘-编辑 -->
+<!-- 发起风勘-查询 -->
 <template>
   <div>
-    <el-dialog v-model="maindialogVisible" width="70%" title="人工发起风勘">
+    <el-dialog v-model="maindialogVisible" width="70%" title="风勘查询">
       <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
+        <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef" />
     </el-dialog>
   </div>
 </template>
@@ -39,63 +40,98 @@ const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 const { getRules } = useValidator();
 const maindialogVisible = ref(true)
+const pageresult = reactive<Pageresult>({
+  result: "",
+  /** 数据列表 */
+  list: [],
+  /** 总数 */
+  total: 0,
+});
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
         type: "primary",
-        label: "发起",
+        label: "查询",
         func: async () => {
           // loadData()
 
           windSave();
         },
       }),
-      createFreeButtonBase({
-        type: "info",
-        label: "返回",
+    //   createFreeButtonBase({
+    //     type: "info",
+    //     label: "返回",
 
-        func: async () => {
-          handleReturn()
-        },
-      }),
+    //     func: async () => {
+    //       handleReturn()
+    //     },
+    //   }),
     ],
  
     fromSchema: [
             {
                 prop: "DistSummary.cPlanNo",
-              inputtype: "rtdatepicker",
-                title: "发起时间",
-  
-                // valueFormat: "YYYY-MM-DD HH:mm:ss",
-                // format: "YYYY-MM-DD HH:mm:ss",
+                inputtype: "rtinput",
+                title: "风勘号",
             },
             {
                 prop: "DistSummary.nInsuredHeadcount",
-                inputtype: "rtdatepicker",
-                title: "结束时间",
-                       format: "YYYY-MM-DD HH:mm:ss",
+                inputtype: "rtinput",
+                title: "投保人",
             },
 
             {
                 prop: "DistSummary.nAnnualSalary",
                 inputtype: "rtinput",
-                title: "联系人",
+                title: "被保人",
                 // rules:[getRules("required", {})]
                 // rules: [getRules("idCard", {})],
             },
-            {
-                prop: "DistSummary.cJobRole",
-                inputtype: "rtinput",
-                title: "联系电话",
-            },
-             {
-                prop: "DistSummary.cJobRole",
-                inputtype: "rtinput",
-                title: "备注",
-            }
         ],
+  })
+);
+
+const tableconfig = reactive<AppTableConfig>(
+  createTableEditConfig({
+    isPage: false,
+    showSelection: false,
+    tableBtnType: "btn",
+    tableBtnWidth: 110,
+    tableBtnPosition: "right",
+    tableBtnTitle: '详情',
+    tableBtn: [
+      createFreeButtonBase({
+        id: "score",
+        link: true,
+        tooltip: "查看报告",
+        type: "success",
+        size: "large",
+        icon: "View",
+        tableClick: (row) => {
+          viewDetails(row)
+        },
+      }),
+    ],
+    fromSchema: [
+      {
+        prop: "year",
+        inputtype: 'rtinput',
+        title: "序号",
+      },
+      {
+        prop: "nPrm",
+        inputtype: 'rtinput',
+        title: "风勘时间",
+      },
+      {
+        prop: "claimAmount",
+        inputtype: 'rtinput',
+        title: "环节",
+      },
+       
+    ],
   })
 );
 

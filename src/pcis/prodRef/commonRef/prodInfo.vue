@@ -210,12 +210,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         // },
       },
       {
-        prop: "tAdbTm",
-        inputtype: "rtdatepicker",
-        title: " 失效日期",
-        rules: [getRules("required", { change: "失效日期不能为空" })],
-        valueFormat: "YYYY-MM-DD HH:mm:ss",
-        format: "YYYY-MM-DD HH:mm:ss",
+          prop: "tAdbTm",
+          inputtype: "rtdatepicker",
+          title: " 失效日期",
+          rules: [getRules("required", { change: "失效日期不能为空" })],
+          valueFormat: "YYYY-MM-DD HH:mm:ss",
+          format: "YYYY-MM-DD HH:mm:ss",
       },
       {
         prop: "cSepaCvrgFlag",

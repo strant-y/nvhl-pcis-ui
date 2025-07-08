@@ -367,6 +367,10 @@ const historyClaimcaseModel = defineAsyncComponent(
 const windExplorationModel = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/wind-exploration-model.vue")
 );
+// 风勘查询
+const windExplorationInfo = defineAsyncComponent(
+  () => import("@/views/comprehensive-query/modal/wind-exploration-info.vue")
+);
 
 // 核保信息
 const UndrOpnList = defineAsyncComponent(
@@ -597,6 +601,15 @@ const startWindExploration = ()=>{
       }
     });
 }
+// 风勘查询
+const getWindExploration = ()=>{
+    dzmodal
+    .open(windExplorationInfo, { type: "Issuer", data: {} })
+    .then((res: any) => {
+      if (res.type === "ok") {
+      }
+    });
+}
 
 
 //  复制保单
@@ -736,6 +749,16 @@ const basicBtn = [
   //   type: "primary",
   //   func: () => {
   //     startWindExploration(); 
+  //     //startWindExploration
+  //     // historyClaimcaseFun();
+  //     // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
+  //   },
+  // }),
+  //  createFreeButtonBase({
+  //   label: "风勘查询",
+  //   type: "primary",
+  //   func: () => {
+  //     getWindExploration(); 
   //     //startWindExploration
   //     // historyClaimcaseFun();
   //     // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
@@ -2166,10 +2189,45 @@ const setCiInfo = (base: any) => {
   ciList.push(ci)
   return ciList;
 };
+
+
+// 风勘校验方法
+function getFKFunc() {
+  
+ const param = {
+    scene: "EDR_APP_NEW_SCENE",
+    CPlyNo: opertaor.getTableRefByKey("plyBase").getValue("Base.cPlyNo"),
+  };
+  getAppPolicy(param).then((res: any) => {
+    console.log("投保单明细", res.code);
+    ElMessage.error("风勘未结束，不允许询价提核！");
+    return false;
+    // if(res.code ==500){
+    //    return true;
+    // }else{
+
+    // }
+    
+     
+  });
+  // return true;
+}
+
+
 /**
  * 投保申请核保
  */
 const submitToUndrFn = async () => {  
+
+   // 风勘校验
+ if( props.param?.pageName === "priceInquiry" ){
+    // const startData = await initMultiCodeList({});
+    // console.log(1212,res);
+    // if(res.code ===500){
+    //    ElMessage.error("风勘未结束，不允许询价提核！");
+    //   return false;
+    // }
+ }
  if (needCalc.value) {
     ElMessage.error("请先进行保费计算!");
     return;

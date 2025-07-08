@@ -25,6 +25,7 @@ import { useProductStore } from "@/store/modules/prod";
 const productStore = useProductStore();
 const dialog = ref<DialogMethod | null>(null);
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
+import { set } from "lodash";
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -159,58 +160,58 @@ const idAnalysis = (id:string)=>{
           setValue("Applicant.cSex", sex);
          
           clearValidate('Applicant.cCertfCde')  
-}
-
-
-
-//  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
-const checkUser = () => {
-  console.log('param',param)
-// if (param.cRecordType !== 1 && param.cRecordType !== 2 ) {
-//     return false;
-//   }
- 
-  // 自定义录单 方案配置 模版 进入 可以查询用户信息  
-  if (param.pageType !== "app" &&  param.pageType !== "copy" && param.pageType !== "template" && param.cAppStatus !=='1') {
-    return false;
-  }
-const tabref = opertaor.getTableRefs();
-const applicantValue = tabref["applicant"].getFromValue();
-//  只要4个有值 去请求客户信息
-if (
-  applicantValue["Applicant.cAppNme"]&&
-  applicantValue["Applicant.cClntMrk"] !== null &&
-  applicantValue["Applicant.cCertfCde"] &&
-  applicantValue["Applicant.cCertfCls"]
-) {
-  const param = {
-    coustName: applicantValue["Applicant.cAppNme"],
-    coustMrk: applicantValue["Applicant.cClntMrk"],
-    coustType:applicantValue["Applicant.cCertfCls"],
-    coustCode: applicantValue["Applicant.cCertfCde"],
-    personnelType:"Applicant"
-  }
-  qryCustomer(param)
-    .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
-        if(data){
-           tabref ['applicant'].setFormValue(data[0])
-
-          let userId = getValue('Applicant.cCertfCde')
-          idAnalysis(userId)
-        }
-        
-            
-      
-      } else {
-        // ElMessage.error(msg);
-      }
-    })
-    .finally(() => {});
-}
 };
 
+    // 防抖定时器
+let debounceTimer = null;
+//  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
+const checkUser = () => {
+      if (param.pageType !== "app" &&  param.pageType !== "copy" && param.pageType !== "template" && param.cAppStatus !=='1') {
+          return false;
+        }
+      if (debounceTimer) {
+        clearTimeout(debounceTimer);
+      }
+
+        debounceTimer = setTimeout(() => {
+          // 自定义录单 方案配置 模版 进入 可以查询用户信息  
+    
+        const tabref = opertaor.getTableRefs();
+        const applicantValue = tabref["applicant"].getFromValue();
+        //  只要4个有值 去请求客户信息
+        if (
+          applicantValue["Applicant.cAppNme"]&&
+          applicantValue["Applicant.cClntMrk"] !== null &&
+          applicantValue["Applicant.cCertfCde"] &&
+          applicantValue["Applicant.cCertfCls"]
+        ) {
+          const param = {
+            coustName: applicantValue["Applicant.cAppNme"],
+            coustMrk: applicantValue["Applicant.cClntMrk"],
+            coustType:applicantValue["Applicant.cCertfCls"],
+            coustCode: applicantValue["Applicant.cCertfCde"],
+            personnelType:"Applicant"
+          }
+          qryCustomer(param)
+            .then((res) => {
+              const { code, data, msg } = res;
+              if (200 === code) {
+                if(data){
+                  tabref ['applicant'].setFormValue(data[0])
+                  let userId = getValue('Applicant.cCertfCde')
+                  idAnalysis(userId)
+                }
+              } else {
+              
+              }
+            })
+            .finally(() => {});
+        }
+
+      }, 500); // 防抖延迟500ms
+  
+   };
+ 
 // 绑定方法
 const method = {
   // func demo
@@ -993,7 +994,7 @@ const method = {
     console.log(val)
     // 清除报错信息
     clearValidate('Applicant.cOperaterCertfCde')  
-
+                 
     //  身份证
     if (val == "120001") { 
         setFormItem("Applicant.cOperaterCertfCde", {
@@ -1021,7 +1022,7 @@ const method = {
               rules: [getRules("orgCode", {}),],
             });
     } else {
-           setFormItem("Insured.cOperaterCertfCde", {
+           setFormItem("Applicant.cOperaterCertfCde", {
               rules: [],
             });
     }

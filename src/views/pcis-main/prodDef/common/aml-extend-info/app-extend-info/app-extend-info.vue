@@ -108,7 +108,7 @@ const formconfigData = {
 			title: '证件号码',
 			rules: [getRules("required", {}),getRules("idCard", {})],
 			inputtype: "rtinput",
-      clearable: true,
+      		clearable: true,
 		},
 		{
 			prop: 'TCertfBgnTm_A',
@@ -196,7 +196,7 @@ const formconfigData3 = {
 			prop: 'CCertfCde_C',
 			title: '证件号码',
 			rules: [getRules("required", {}),getRules("idCard", {})],
-      clearable: true,
+      		clearable: true,
 			inputtype: "rtinput"
 		},
 		{
@@ -215,6 +215,10 @@ const formconfigData3 = {
 		}
 	]
 }
+
+
+
+
 const formconfigData4 = {
 	fromUi: {
 		cols: 2
@@ -225,7 +229,7 @@ const formconfigData4 = {
 			prop: 'CCusNme_D',
 			title: '姓名',
 			inputtype: "rtinput",
-      rules: [getRules("required", {})],
+      		rules: [getRules("required", {})],
 			clearable: true,
 		},
 		{
@@ -233,22 +237,27 @@ const formconfigData4 = {
 			title: '证件类型',
 			inputtype: "rtselect",
 			typeCode: "NATURAL_CERTIFICATE_ALL",
-      rules: [getRules("required", {})],
+      		rules: [getRules("required", {})],
 			clearable: true,
+			func:(val:any)=>{
+				 // 清除报错信息
+						// clearValidate('Insured.cOperaterCertfCde')  
+						// setFieldValidationRules("CCertfCde_D", value, formRef);
+			}
 		},
 		{
 			prop: 'CCertfCde_D',
 			title: '证件号码',
 			rules: [getRules("required", {}),getRules("idCard", {})],
 			inputtype: "rtinput",
-      clearable: true,
+      		clearable: true,
 		},
 		{
 			prop: 'TCertfBgnTm_D',
 			title: '认证有效起期',
 			inputtype: "rtdatepicker",
-      rules: [getRules("required", {})],
-      clearable: true,
+			rules: [getRules("required", {})],
+			clearable: true,
 		},
 		{
 			prop: 'TCertfEndTm_D',
@@ -287,6 +296,34 @@ const pageresult = reactive<Pageresult>({
 	/** 总数 */
 	total: 0,
 });
+
+
+// 身份校验封装
+const setFieldValidationRules = (
+	field: string,
+  	value: string,
+  	formRef: { value?: { clearValidate: (field: string) => void } } | null
+) => {
+  // 清除该字段的现有校验
+  formRef?.value?.clearValidate(field);
+  
+  // 根据val值映射对应的校验规则类型
+  const ruleTypeMap = {
+    "120001": "idCard",       // 身份证
+    "110007": "socialCode",   // 统一社会信用代码
+    "19": "ariCard",          // 外国人证件号
+    "120002": "passPort",     // 护照
+    "110001": "orgCode"       // 组织机构编码
+  };
+  
+  // 获取对应的规则类型，默认无规则
+  const ruleType = ruleTypeMap[val];
+  
+  // 设置字段的校验规则
+  setFormItem(field, {
+    rules: ruleType ? [getRules(ruleType, {})] : []
+  });
+};
 
 
 

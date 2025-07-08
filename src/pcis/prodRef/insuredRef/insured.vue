@@ -160,16 +160,24 @@ const idAnalysis = (id:string)=>{
 
 }
 
-
-
+    // 防抖定时器
+let debounceTimer = null;
 //  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
 const checkUser = () => {
- 
-  // 自定义录单 方案配置 模版 进入 可以查询用户信息  
+  console.log(77,param)
+    // 自定义录单 方案配置 模版 进入 可以查询用户信息  
   if (param.pageType !== "app" &&  param.pageType !== "copy" && param.pageType !== "template" && param.cAppStatus !=='1') {
     return false;
   }
   
+      if (debounceTimer) {
+        clearTimeout(debounceTimer);
+      }
+
+        debounceTimer = setTimeout(() => {
+
+ 
+
   const tabref = opertaor.getTableRefs();
   const insuredValue = tabref["insured"].getFromValue();
   //  只要4个有值 去请求客户信息
@@ -202,6 +210,7 @@ const checkUser = () => {
       })
       .finally(() => { });
   }
+},500)
 };
 
 // 绑定方法
