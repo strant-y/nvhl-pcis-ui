@@ -293,6 +293,7 @@
                                         ]
                                       )
                                     "
+                                    :style="{'justify-content': colinfo.cColTitle === '责任名称' ? 'right' : 'center'}"
                                   >
                                     <from-item
                                       v-model="
