@@ -254,7 +254,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "textarea",
         title: "批改公式",
         rows: 4,
-        itemWidth: 2,
+        itemWidth: 3,
       },
       {
         prop: "EdrBase.cEdrCtnt",
@@ -262,7 +262,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "textarea",
         title: "批文",
         rows: 6,
-        itemWidth: 2,
+        itemWidth: 3,
         rules: [getRules("maxLength", {len:2000})],
       },
       {
@@ -277,7 +277,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       },
     ],
     fromUi: createFromUiConfig({
-      cols: 2,
+      cols: 3,
     }),
   })
 );
