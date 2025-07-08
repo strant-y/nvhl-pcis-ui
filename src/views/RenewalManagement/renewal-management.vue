@@ -165,7 +165,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "tAppTm",
         inputtype: "rtdatepicker",
-        title: "保险起止期",
+        title: "保险止期",
         type: "datetimerange",
         format: "YYYY-MM-DD HH:mm:ss",
         valueFormat: "YYYY-MM-DD HH:mm:ss",
