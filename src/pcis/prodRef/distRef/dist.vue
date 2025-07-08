@@ -579,8 +579,8 @@ const method = {
     policyService
         .downloadDistTemplateIncrement(param)
         .then((res) => {
-          if (res.size <= 0) {
-            ElMessage.error({ message: "下载出错", duration: 3000 });
+          if (res.data.size  <= 0) {
+            ElMessage.error({ message: "未发现导入失败的异常数据！", duration: 3000 });
             return;
           }
           const fileName = decodeURIComponent(res.headers['content-disposition'].split('filename=')[1]);
