@@ -824,7 +824,7 @@ const tableObj = {
                         router.push({
                             path: "/pcis/my-page",
                             query: {
-                                param: JSON.stringify({ ...data, ...{ pageType: "readonly" } }),
+                                param: JSON.stringify({ ...data, ...{ pageType: "readonly", pageName: 'priceInquiry' } }),
                             },
                         });
                     } else {
