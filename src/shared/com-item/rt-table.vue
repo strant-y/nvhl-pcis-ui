@@ -34,7 +34,7 @@
       <el-table-column
         type="expand"
         :index="indexMethod"
-        v-show="item.showExpand ? item.showExpand : false"
+        v-if="item.showExpand ? item.showExpand : false"
         :align="item.align ? item.align : 'center'"
       >
         <template #default="props">
