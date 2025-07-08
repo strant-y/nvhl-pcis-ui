@@ -335,19 +335,19 @@ const tableconfig = reactive<AppTableConfig>(
                 prop: "cAppNo",
                 inputtype: "rtinput",
                 title: "申请单号",
-                width: 155,
+                width: 180,
             },
             {
                 prop: "cPlyNo",
                 inputtype: "rtinput",
                 title: "保单号",
-                width: 155,
+                width: 180,
             },
             {
                 prop: "cEdrNo",
                 inputtype: "rtinput",
                 title: "批单号",
-                width: 155,
+                width: 180,
             },
             {
                 prop: "cAppNme",
@@ -359,6 +359,7 @@ const tableconfig = reactive<AppTableConfig>(
                 inputtype: "rtinput",
                 title: "投保日期",
                 sortable: "custom",
+                width: 160
             },
             {
                 prop: "cProdNmeCn",
@@ -378,7 +379,7 @@ const tableconfig = reactive<AppTableConfig>(
                 prop: "id",
                 inputtype: "rtSelectV2",
                 title: "批改原因",
-                minWidth: 180,
+                minWidth: 140,
                 func: (val, row) => {
                     handleRsnChange(val, row);
                 },
@@ -388,6 +389,7 @@ const tableconfig = reactive<AppTableConfig>(
                 inputtype: "rtinput",
                 title: "批改原因详细",
                 disabled: true,
+                minWidth: 140,
             },
         ],
     })
