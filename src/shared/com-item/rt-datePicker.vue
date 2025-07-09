@@ -91,7 +91,7 @@ const vInputShow = computed(()=> {
   }
 });
 watch([() => props.modelValue], ([newModelValue]) => {
-  vInput.value = newModelValue;
+  vInput.value = moment(newModelValue).format(getValueFormat());
 });
 function blur(v: any) {
   const value = v.target.value;
