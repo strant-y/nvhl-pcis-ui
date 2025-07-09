@@ -210,6 +210,11 @@ onMounted(() => {
         data.rules = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
       })
     }
+    if(item.prop =='Dist.PropertyLocationProp'){
+      item?.groupList.forEach(data => {
+        data.rules = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+      })
+    }
     // 040001产品 必填项问题
     if(item.prop =='Dist.cPlanNo' ||item.prop =='Dist.tOpeningTime' ||item.prop =='Dist.cLocationSigns' ||item.prop =='Dist.cFacilitySigns' ||item.prop =='Dist.cVenueSign' || item.prop =='Dist.cBuildingStructure'  ){
       console.log('进啊2=',item.prop)
