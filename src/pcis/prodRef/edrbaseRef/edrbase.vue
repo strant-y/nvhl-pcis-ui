@@ -90,6 +90,21 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
       },
       {
+        prop: "EdrBase.NSurrRate",
+        inputtype: "rtnumber",
+        title: "手续费比例",
+        clearable: true,
+        hidden: params["cEdrType"] ==='1',
+        func: (v:any) => {
+          if(v){
+            if(v<0 || v>1){
+              ElMessage.warning("批改信息的手续费比例 必须为0~1.0之间!")
+              setValue('EdrBase.NSurrRate',0)
+            }
+          }
+        },
+      },
+      {
         prop: "EdrBase.cRatioTyp",
         inputtype: "rtselect",
         title: "短期费率类型",
@@ -192,6 +207,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         format:"YYYY-MM-DD HH:mm:ss",
         type :"datetime",
         title: "批单生效起期",
+        func: (v:any) => {
+          if(v){
+            debugger
+            console.log(v,params)
+          }
+        },
       },
       {
         prop: "EdrBase.cAppPrsnNme",
