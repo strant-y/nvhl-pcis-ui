@@ -254,7 +254,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "textarea",
         title: "批改公式",
         rows: 4,
-        itemWidth: 2,
+        itemWidth: 3,
       },
       {
         prop: "EdrBase.cEdrCtnt",
@@ -262,7 +262,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "textarea",
         title: "批文",
         rows: 6,
-        itemWidth: 2,
+        itemWidth: 3,
         rules: [getRules("maxLength", {len:2000})],
       },
       {
@@ -277,7 +277,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       },
     ],
     fromUi: createFromUiConfig({
-      cols: 2,
+      cols: 3,
     }),
   })
 );
@@ -287,7 +287,16 @@ function getFromValue() {
 }
 
 function setFormValue(value: any) {
-  edrbaseEditRef?.value?.setFormValue(value);
+  const val = {
+    ...value,
+    "EdrBase.nBefEdrAmt": value["EdrBase.nBefEdrAmt"].toLocaleString(),
+    "EdrBase.nAmt": value["EdrBase.nAmt"].toLocaleString(),
+    "EdrBase.nAmtVar": value["EdrBase.nAmtVar"].toLocaleString(),
+    "EdrBase.nBefEdrPrm": value["EdrBase.nBefEdrPrm"].toLocaleString(),
+    "EdrBase.nPrm": value["EdrBase.nPrm"].toLocaleString(),
+    "EdrBase.nPrmVar": value["EdrBase.nPrmVar"].toLocaleString(),
+  }
+  edrbaseEditRef?.value?.setFormValue(val);
 }
 
 function validate() {
@@ -295,7 +304,17 @@ function validate() {
 }
 
 function setValue(key: string, value: any) {
-  edrbaseEditRef?.value?.setValue(key, value);
+  if(key === "EdrBase.nBefEdrAmt" ||
+    key === "EdrBase.nAmt" || 
+    key === "EdrBase.nAmtVar" || 
+    key === "EdrBase.nBefEdrPrm" || 
+    key === "EdrBase.nPrm" || 
+    key === "EdrBase.nPrmVar"
+  ) {
+    edrbaseEditRef?.value?.setValue(key, value.toLocaleString());
+  } else {
+    edrbaseEditRef?.value?.setValue(key, value);
+  }
 }
 
 function getValue(key: string) {
