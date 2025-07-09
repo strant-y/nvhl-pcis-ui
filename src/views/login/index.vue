@@ -39,8 +39,8 @@
                 :placeholder="$t('login.username')"
                 name="username"
                 size="large"
-                :disabled="verifyFlag"
                 @keyup.enter="handleLogin"
+                @change="handleLoginChange"
               />
             </div>
           </el-form-item>
@@ -58,7 +58,7 @@
                 @keyup.enter="handleLogin"
                 size="large"
                 show-password
-                :disabled="verifyFlag"
+                @change="handleLoginChange"
               />
             </div>
           </el-form-item>
@@ -527,6 +527,13 @@ watchEffect(() => {
 });
 
 onMounted(() => {});
+
+function handleLoginChange() {
+  verifyFlag.value = false;
+  if(loginData.value.captchaCode) {
+    loginData.value.captchaCode = "";
+  }
+}
 </script>
 
 <style lang="scss" scoped>
