@@ -322,7 +322,7 @@ const cDocumentTypeChange =(val:any)=>{
 //给表单赋值
 function setFormItem(key: any, obj: any) {
   if (obj && Object.keys(obj).length) {
-    formconfig1.fromSchema?.forEach((item) => {
+    formconfig1.value.fromSchema?.forEach((item) => {
       if (item.prop === key) {
         //控制尾部按钮的
         if (item.btnItems && obj.btnItems) {

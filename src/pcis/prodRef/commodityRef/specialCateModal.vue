@@ -77,7 +77,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           title: "特种设备门类",
           clearable:true,
           typeCode: "Equipment_Type_Level_One",
-          codeParam: { cParCde: "hangyefenlei2" },
+          codeParam: { cParCde: "teshushebeibianma" },
           func: (val) => {
             setValue("cClassGroup", "");
             setValue("cSubclassType", "");
@@ -97,7 +97,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           },
         },
         {
-          prop: " cClassGroup",
+          prop: "cClassGroup",
           inputtype: "rtselect",
           title: "特种设备大类",
           rules: [getRules("required", {'message':'请选择特种设备大类'})],
@@ -121,7 +121,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           },
         },
         {
-          prop: " cSubclassType",
+          prop: "cSubclassType",
           inputtype: "rtselect",
           rules: [getRules("required", {'message':'请选择特种设备中类'})],
           title: "特种设备中类",
@@ -227,7 +227,7 @@ function setDisa() {}
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const c = { codeListName: "Equipment_Type_Level_One" };
+  const c = { codeListName: "Search_Equipment_List" };
   const param = Object.assign(c, {
     codeListParam: s,
     r,
