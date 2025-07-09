@@ -80,10 +80,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtcheckbox",
         title: "是否临分",
         propWidth:35,
-        loadData: [
-          { value: "1", label: "是" },
-          { value: "0", label: "否" },
-        ],
+        keymap: {
+          'y': "1",
+          'n': "0",
+        },
         defaultValue: "0",
         rules: [getRules("required", {})],
         disabled: params.cAppTyp === "E", // 批单不允许进行自主临分
