@@ -960,17 +960,28 @@ function setDisabledAll() {
 }
 
 function isrequired(i: any) {
-  if (i.required === "1" || i.required === 1 || i.required === true ||
-    i.cPropRequired === "1" || i.cPropRequired === 1 || i.cPropRequired === true 
-  ) {
+
+  if(i.cPropRequired === "1" || i.cPropRequired === 1 || i.cPropRequired === true){
+    return true;
+  }
+  if(i.cPropRequired === "0" || i.cPropRequired === 0 || i.cPropRequired === false ){
+    return false;
+  }
+
+  if (i.required === "1" || i.required === 1 || i.required === true) {
     return true;
   }
   return false;
 }
 function isdisabled(i: any) {
-  if (i.disabled === "1" || i.disabled === 1 || i.disabled === true ||
-    i.cPropDisabled === "1" || i.cPropDisabled === 1 || i.cPropDisabled === true 
-  ) {
+  if(i.cPropDisabled === "1" || i.cPropDisabled === 1 || i.cPropDisabled === true ){
+    return true;
+  }
+  if(i.cPropDisabled === "0" || i.cPropDisabled === 0 || i.cPropDisabled === false ){
+    return false;
+  }
+  
+  if (i.disabled === "1" || i.disabled === 1 || i.disabled === true ) {
     return true;
   }
   return false;
