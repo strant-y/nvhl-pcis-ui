@@ -650,7 +650,28 @@ const method = {
 const selectedRows = ref<any[]>([]);
 function handleSelectionChange(selection: any) {
   selectedRows.value = selection;
-  console.log("选中数据", selection);
+}
+
+watch(
+  () => pageresult.list,
+  (item) => {
+    if(params.cProdNo === '040003' && cardconfig.value.title === "销售区域清单" && item.length > 0) {
+      getSummary()
+    }
+  }
+)
+const getSummary = async () => {
+  let money = 0;
+  let num = 0;
+  await policyService.getEstimatedSalesAndEstimatedSalesQuantity({cAppNo: route.params.param?.cAppNo}).then((res:any) => {
+    if(res.code === 200) {
+      money = res.data.nEstimatedSales
+      num = res.data.nEstimatedSalesQuantity
+    }
+  })
+  const sums = ['','汇总','','',`总预计销售额 ${money}元`,`总预计销售量 ${num}件`]
+  tableconfig.value.showSummary = true;
+  tableconfig.value.summaryMethod = () => sums;
 }
 
 function setUnDisabledByKeyList(key: any) {

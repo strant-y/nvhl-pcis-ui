@@ -612,8 +612,11 @@ const tableconfig1 = reactive<AppTableConfig>(
         label: "删除",
         type: "success",
         func: () => {
-          if (!selectRow1.value.cPkId)
+          if (!selectRow1.value.cPkId) {
             return ElMessage.warning("请选择一条风险单位");
+          } else if(pageresult1.list.length === 1) {
+            return ElMessage.warning("风险单位数量剩余1条时不能删除");
+          }
           deleteUnitList()
         },
       }),

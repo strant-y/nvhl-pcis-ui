@@ -23,6 +23,9 @@
       @expand-change="expandChange"
       @selection-change="handleSelectionChange"
       @status-change="handleStatusChange"
+      :show-summary="item.showSummary ? item.showSummary : false"
+      :sum-text="item.sumText ? item.sumText : '合计'"
+      :summary-method="item.summaryMethod ? item.summaryMethod : null"
     >
       <!-- 其他列定义 -->
       <el-table-column
