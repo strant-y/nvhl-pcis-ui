@@ -832,7 +832,7 @@ function init() {
 }
 
 function queryRiskUnit() {
-  const beginTm = opertaor.getDataAll('1')["insrnc"]["Base.tInsrncBgnTm"];
+  const beginTm = props.param?.insrnc["Base.tInsrncBgnTm"];
   const param = {
     cAppNo: params.cAppNo,
     cProdNo: params.cProdNo,
@@ -1383,7 +1383,7 @@ function getContData() {
           }
           freeEditRef.value?.setFormValue(data);
           cAmtCurOptions.value = [
-            { label: data.cAmtCur, value: rdata.cAmtCur },
+            { label: data.cAmtCur, value: data.cAmtCur },
           ];
           cPrmCurOptions.value = [
             { label: data.cPrmCur, value: data.cPrmCur },

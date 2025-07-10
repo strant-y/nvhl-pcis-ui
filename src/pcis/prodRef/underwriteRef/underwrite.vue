@@ -48,6 +48,9 @@ const params = opertaor.getParam();
 const contRiskInfo = ref("");
 const cProdNoMap = ['059011','059012','059013','059016','059017','059018','059019','059020'];
 const cUndrMrkOptions = ref([])
+const riskunitDisabled = computed(() => {
+  return cProdNoMap.indexOf(params.cProdNo) != -1 || params.cAppTyp === "E"
+})
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "核保信息",
@@ -60,10 +63,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         btnItems: {
           label: "风险单位划分、风险累积及分保安排",
           type: "primary",
-          disabled: cProdNoMap.indexOf(params.cProdNo) != -1,
+          disabled: riskunitDisabled,
           func: () => {
             //  触发临分后不能改变风险等级，临分退回后可以改变。
-            dzmodal.open(RiskunitA, { type: "", param: {} }).then((res:any) => {
+            dzmodal.open(RiskunitA, { type: "", param: {insrnc: opertaor.getDataAll()["insrnc"]} }).then((res:any) => {
               if (res.type === "ok" && res.body) {
                 // cReadOnly 是否可编辑 0 否 1 是
                 if(res.body.cReadOnly === "1") {
