@@ -2481,7 +2481,7 @@ const savePlyInfo = async () => {
 
 
     saveFlag = true;
-    if((props.param?.pageType === "copy" || props.param?.pageType === "template") && saveDistBatchFlag.value) {
+    if((props.param?.pageType === "copy" || props.param?.pageType === "template" || props.param?.pageType === "inquiryToApp") && saveDistBatchFlag.value) {
       // 保存清单
       const appNo = plyBase["Base.cAppNo"];
       saveDist(appNo);
