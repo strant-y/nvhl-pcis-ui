@@ -658,4 +658,16 @@ export class PcisQueryService {
     getCvrgByAppNo(ops: any): AxiosPromise<any> {
         return post(`policy/getCvrgByAppNo`, ops);
     }
+
+
+    // 发起风勘 
+    sendTaskCreat(ops: any): AxiosPromise<any> {
+        return post(`risk/sendTaskCreat`, ops);
+    }
+    // 风勘查询
+    getTaskList(ops: any): AxiosPromise<any> {
+        return post(`risk/getTaskList`, ops);
+    }
+
+
 }

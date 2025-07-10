@@ -1,8 +1,9 @@
-<!-- 发起风勘-编辑 -->
+<!-- 发起风勘-查询 -->
 <template>
   <div>
-    <el-dialog v-model="maindialogVisible" width="80%" title="人工发起风勘">
+    <el-dialog v-model="maindialogVisible" width="70%" title="风勘查询">
       <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
+        <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef" />
     </el-dialog>
   </div>
 </template>
@@ -39,86 +40,107 @@ const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 const { getRules } = useValidator();
 const maindialogVisible = ref(true)
+const pageresult = reactive<Pageresult>({
+  result: "",
+  /** 数据列表 */
+  list: [],
+  /** 总数 */
+  total: 0,
+});
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
         type: "primary",
-        label: "发起",
+        label: "查询",
         func: async () => {
           // loadData()
 
           windSave();
         },
       }),
-      createFreeButtonBase({
-        type: "info",
-        label: "返回",
+    //   createFreeButtonBase({
+    //     type: "info",
+    //     label: "返回",
 
-        func: async () => {
-          handleReturn()
-        },
-      }),
+    //     func: async () => {
+    //       handleReturn()
+    //     },
+    //   }),
     ],
  
     fromSchema: [
             {
-                prop: "tSurveyStart",
-                inputtype: "rtdatepicker",
-                title: "开始时间",
-                format: "YYYY-MM-DD HH:mm:ss",
-                rules:[getRules("required", {})],
-                type: "datetime",
-                 itemWidth:1.5
+                prop: "DistSummary.cPlanNo",
+                inputtype: "rtinput",
+                title: "风勘号",
             },
             {
-                prop: "tSurveyEnd",
-                inputtype: "rtdatepicker",
-                title: "结束时间",
-                format: "YYYY-MM-DD HH:mm:ss",
-                type: "datetime",
-                rules:[getRules("required", {})],
-                  itemWidth:1.5
+                prop: "DistSummary.nInsuredHeadcount",
+                inputtype: "rtinput",
+                title: "投保人",
             },
 
             {
-                prop: "cRespondent",
+                prop: "DistSummary.nAnnualSalary",
                 inputtype: "rtinput",
-                 itemWidth:1.5,
-                title: "联系人",
+                title: "被保人",
+                // rules:[getRules("required", {})]
+                // rules: [getRules("idCard", {})],
             },
-            {
-                prop: "cRespondentPon",
-                inputtype: "rtinput",
-                title: "联系电话",
-                 itemWidth:1.5,
-                rules: [getRules("phoneNo", {})], 
-            },
-             {
-                prop: "cNotes",
-                inputtype: "rtinput",
-                title: "备注",
-                 type: "textarea",
-                 rows: 4,
-                itemWidth: 3, 
-                // itemWidth:2
-            }
         ],
   })
 );
 
-// cInquiryNumber	String	255	Y		询价单号	
-// tSurveyStart	Date	255	Y		发起时间	
-// tSurveyEnd	Date	255	Y		结束时间	
-// cRespondent	String	255	N		联系人	
-// cRespondentPon	String	255	N		联系人电话	
-// cNotes
+const tableconfig = reactive<AppTableConfig>(
+  createTableEditConfig({
+    isPage: false,
+    showSelection: false,
+    tableBtnType: "btn",
+    tableBtnWidth: 110,
+    tableBtnPosition: "right",
+    tableBtnTitle: '详情',
+    tableBtn: [
+      createFreeButtonBase({
+        id: "score",
+        link: true,
+        tooltip: "查看报告",
+        type: "success",
+        size: "large",
+        icon: "View",
+        tableClick: (row) => {
+          viewDetails(row)
+        },
+      }),
+    ],
+    fromSchema: [
+      {
+        prop: "year",
+        inputtype: 'rtinput',
+        title: "序号",
+      },
+      {
+        prop: "nPrm",
+        inputtype: 'rtinput',
+        title: "风勘时间",
+      },
+      {
+        prop: "claimAmount",
+        inputtype: 'rtinput',
+        title: "环节",
+      },
+       
+    ],
+  })
+);
+
+
 
 
 onMounted(() => {
 
-
+console.log(opertaor.getDataAll())
 let DataAll = opertaor.getDataAll()['applicant']
 nextTick(() => {
 
@@ -130,18 +152,12 @@ nextTick(() => {
 
 // 请求接口
 const windSave = () => {
-
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const cinquiry = opertaor.getDataAll()['plyBase'];
-  console.log(cinquiry['Base.cInquiryNo'], opertaor.getDataAll())
-// :   Base.cInquiryNo cinquiry['Base.cInquiryNo']
-// "121012504000000009"
-  let params = {  
-    cInquiryNumber: cinquiry['Base.cInquiryNo'],
-    ...s }
-    console.log('params', params)
+ 
+  let params = { ...s }
+  console.log('params', params)
   pcisQueryService.sendTaskCreat(params).then((res: any) => {
-    console.log('数据---‘',res)
+  //   console.log('数据---‘',res)
   //   if (res.code === 200) {
   //     if(res.data !==null){
          

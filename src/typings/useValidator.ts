@@ -266,37 +266,6 @@ export const useValidator = () => {
   };
   //统一社会信用编码校验
   const socialCode = () => {
-    // const isEmptyInputValue = (value) => {
-    //   return value === null || value === undefined || value === '';
-    // };
-
-    // const isUpperCase = (str) => {
-    //   return str === str.toUpperCase();
-    // };
-
-    // return {
-    //   validator: (rule, value, callback) => {
-    //     if (isEmptyInputValue(value)) {
-    //       callback();
-    //       return;
-    //     }
-    //     // 输入转换大写
-    //     let socialCode = value;
-    //     if (!isUpperCase(socialCode)) {
-    //       socialCode = socialCode.toUpperCase();
-    //     }
-    //     const patrn = /^(11|12|13|19|51|52|53|59|91|92|93|Y1)[A-Z0-9]{3,18}$/;
-    //     // 18位校验及大写校验
-    //     if ((socialCode.length !== 18) || (!patrn.test(socialCode))) {
-    //       callback(new Error('不是有效的统一社会信用编码！'));
-    //     } else {
-    //       callback();
-    //     }
-    //   },
-    //   message: '不是有效的统一社会信用编码！',
-    //   trigger: 'blur'
-    // };
-
       return {
       pattern: /^[123456789ANY][0-9A-HJ-NPQRTUWXY]{17}$/,
       // message: "不是有效的统一社会信用编码！",

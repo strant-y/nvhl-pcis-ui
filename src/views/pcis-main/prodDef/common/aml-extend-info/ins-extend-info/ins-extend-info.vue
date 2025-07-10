@@ -96,15 +96,19 @@ const formconfigData = {
 			title: '证件类型',
 			inputtype: "rtselect",
 			typeCode: "NATURAL_CERTIFICATE_ALL",
-      clearable: true,
-      rules: [getRules("required", {})]
-			
+			clearable: true,
+			rules: [getRules("required", {})],
+			func:(val:any)=>{
+				if(val){
+						setFieldRules('CCertfCde_A',val,freeEditRef1,formconfig1)
+				}
+			}
 		},
 		{
 			prop: 'CCertfCde_A',
 			title: '证件号码',
 			inputtype: "rtinput",
-			rules: [getRules("idCard", {})],
+			   rules: [getRules("required", {})]
 		},
 		{
 			prop: 'TCertfBgnTm_A',
@@ -141,22 +145,27 @@ const formconfigData2 = {
 			title: '证件类型',
 			inputtype: "rtselect",
 			typeCode: "NATURAL_CERTIFICATE_ALL",
-      clearable: true,
-      rules: [getRules("required", {})]
+			clearable: true,
+			rules: [getRules("required", {})],
+			func:(val:any)=>{
+				if(val){
+						setFieldRules('CCertfCde_B',val,freeEditRef2,formconfig2)
+				}
+			}
 		},
 		{
 			prop: 'CCertfCde_B',
 			title: '证件号码',
-			rules: [getRules("required", {}),getRules("idCard", {})],
+			rules: [getRules("required", {})],
 			inputtype: "rtinput",
-      clearable: true,
+    	    clearable: true,
 		},
 		{
 			prop: 'TCertfBgnTm_B',
 			title: '认证有效起期',
 			inputtype: "rtdatepicker",
-      clearable: true,
-      rules: [getRules("required", {})]
+			clearable: true,
+			rules: [getRules("required", {})]
 		},
 		{
 			prop: 'TCertfEndTm_B',
@@ -185,15 +194,20 @@ const formconfigData3 = {
 			title: '证件类型',
 			inputtype: "rtselect",
 			typeCode: "NATURAL_CERTIFICATE_ALL",
-      clearable: true,
-      rules: [getRules("required", {})]
+			clearable: true,
+			rules: [getRules("required", {})],
+			func:(val:any)=>{
+				if(val){
+						setFieldRules('CCertfCde_C',val,freeEditRef3,formconfig3)
+				}
+			}
 		},
 		{
 			prop: 'CCertfCde_C',
 			title: '证件号码',
-			rules: [getRules("required", {}),getRules("idCard", {})],
+			rules: [getRules("required", {})],
 			inputtype: "rtinput",
-      clearable: true,
+      		clearable: true,
 		},
 		{
 			prop: 'TCertfBgnTm_C',
@@ -229,13 +243,18 @@ const formconfigData4 = {
 			title: '证件类型',
 			inputtype: "rtselect",
 			typeCode: "NATURAL_CERTIFICATE_ALL",
-      clearable: true,
-      rules: [getRules("required", {})]
+			clearable: true,
+			rules: [getRules("required", {})],
+			func:(val:any)=>{
+				if(val){
+						setFieldRules('CCertfCde_D',val,freeEditRef4,formconfig4)
+				}
+			}
 		},
 		{
 			prop: 'CCertfCde_D',
 			title: '证件号码',
-			rules: [getRules("required", {}),getRules("idCard", {})],
+			rules: [getRules("required", {})],
 			inputtype: "rtinput",
       clearable: true
 		},
@@ -334,25 +353,31 @@ const tableconfig = reactive<AppGridEditConfig>(
 				typeCode: "NATURAL_CERTIFICATE_ALL",
 				title: "证件类型",
 				rules: [getRules("required", {})], 
-				func:(val:any)=>{
+			    func:(val:any)=>{
 					console.log('----',val)
-					 if (val == "120001") {
-						     setFormItem("cCerftCde", {
-								rules: [getRules("required", {}), getRules("idCard", {
-								})],
-							});
+					if(val){
+						setFieldRules('cCerftCde',val, tableRef)
+						// setFieldRules('CCertfCde_A',val,freeEditRef1,formconfig1)
+				    }
+				// func:(val:any)=>{
+				// 	console.log('----',val)
+				// 	 if (val == "120001") {
+				// 		     setFormItem("cCerftCde", {
+				// 				rules: [getRules("required", {}), getRules("idCard", {
+				// 				})],
+				// 			});
 
-					 }else  if (val == "110007") {
-						// 统一社会信用代码
-						setFormItem("cCerftCde", {
-							rules: [getRules("required", {}),getRules("socialCode", {})],
-						});
-					 }else if(val =='120002'){
-						// 护照 
-						setFormItem("cCerftCde", {
-							rules: [getRules("required", {}),getRules("passPort", {})],
-						});
-					 }
+				// 	 }else  if (val == "110007") {
+				// 		// 统一社会信用代码
+				// 		setFormItem("cCerftCde", {
+				// 			rules: [getRules("required", {}),getRules("socialCode", {})],
+				// 		});
+				// 	 }else if(val =='120002'){
+				// 		// 护照 
+				// 		setFormItem("cCerftCde", {
+				// 			rules: [getRules("required", {}),getRules("passPort", {})],
+				// 		});
+				// 	 }
 				}	
 			},
 			{
@@ -385,6 +410,39 @@ const tableconfig = reactive<AppGridEditConfig>(
 	})
 );
 
+const ruleTypeMap: Record<string, string> = {
+	"110001": "orgCode",      // 组织机构编码
+	"110007": "socialCode",   // 统一社会信用代码
+    "120001": "idCard",       // 身份证
+  	"120002": "passPort",     // 护照
+    "19": "ariCard",          // 外国人证件号
+};
+
+// 类型守卫函数
+const isValidRuleType = (value: string): value is keyof typeof ruleTypeMap => {
+  return ruleTypeMap.hasOwnProperty(value);
+};
+
+// 身份校验封装
+const setFieldRules  = (
+	field: string,
+  	value: string,
+  	formRef: any,
+	fconfig:any
+) => {
+  // 清除该字段的现有校验
+    if(fconfig){
+	  formRef?.value?.clearValidate(field);
+  }
+
+ 
+
+ const ruleType = isValidRuleType(value) ? ruleTypeMap[value] : undefined;
+
+  setFormItem(field, {
+    rules: ruleType ? [getRules(ruleType, {}),getRules("required", {})] : [getRules("required", {})]
+  }, fconfig);
+};
 onMounted(async () => {
 	getTableFun();
 	getAmlExtInfo();
@@ -519,9 +577,10 @@ function handleQuery(flag?: boolean) {
 		.finally(() => { });
 }
 
-function setFormItem(key: any, obj: any) {
+function setFormItem(key: any, obj: any,tabName:any) {
   if (obj && Object.keys(obj).length) {
-    tableconfig.fromSchema?.forEach((item) => {
+	tabName = tabName? tabName?.fromSchema :  tableconfig.fromSchema;
+    tabName?.forEach((item) => {
       if (item.prop === key) {
         //控制尾部按钮的
         if (item.btnItems && obj.btnItems) {
