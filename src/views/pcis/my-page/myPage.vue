@@ -2945,7 +2945,7 @@ const submitUnderwritingFn = async () => {
   res["backUndrClsCde"] = parts[1]; // 退回指定核保级别编码
   res["backUndrDptCnm"] = parts[2]; // 退回指定核保人员名称
   if(props.param?.pageName === "priceInquiry") {
-    res["inquiryNo"] = props.param.cAppNo;
+    res["inquiryNo"] = props.param.cInquiryNo;
   }
   console.log(res);
   // if(res.cUndrMrk === "A" && props.param?.pageName !== "priceInquiry") {//核保选项为同意时，调用强制临分接口
