@@ -156,7 +156,7 @@ const windSave = () => {
  
   let params = { ...s }
   console.log('params', params)
-  // pcisQueryService.qryHistoryClaimYearAll(params).then((res: any) => {
+  pcisQueryService.sendTaskCreat(params).then((res: any) => {
   //   console.log('数据---‘',res)
   //   if (res.code === 200) {
   //     if(res.data !==null){
@@ -167,7 +167,7 @@ const windSave = () => {
   //   } else {
   //     ElMessage.error({ message: res.msg, duration: 3000 });
   //   }
-  // });
+  });
 
 }
 

@@ -19,6 +19,10 @@ import { useRoute } from "vue-router";
 const route = useRoute();
 import { ratio } from "@/api/prod"
 import dayjs from "dayjs";
+
+import { useValidator } from "@/typings/useValidator";
+const { getRules } = useValidator();
+
 const opertaor = dataOpertaor();
 const dialogRef = ref<DialogMethod | null>(null);
 const props = defineProps({
@@ -133,11 +137,13 @@ const method = {
   },
   //争议处理选择事件
   cDisptSttlCdeChange(val){
+    console.log('aaa',val)
     if(val=='A'){
-      setFormItem("Base.cDisptSttlOrg", { disabled: false });
+      // setFormItem("Base.cDisptSttlOrg", { disabled: false,rules: [getRules("required", {})] });
+      setFormItem("Base.cDisptSttlOrg", { rules: [getRules("required", {})] });
       setValue("Base.cDisptSttlOrg", "提交____仲裁委员会");
     }else{
-      setFormItem("Base.cDisptSttlOrg", { disabled: true });
+      setFormItem("Base.cDisptSttlOrg", {rules: [] });
       setValue("Base.cDisptSttlOrg", "");   
     }
     

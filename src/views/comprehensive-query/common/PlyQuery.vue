@@ -56,7 +56,11 @@ import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 import { getAppPolicyList, qryEndorseList, delTmpPolicy } from "@/api/query";
 // 变更列
 const colChange = defineAsyncComponent(() => import("../modal/colChange.vue"));
-const PrintView = defineAsyncComponent(() => import("../modal/PrintView.vue"))
+const PrintView = defineAsyncComponent(() => import("../modal/PrintView.vue"));
+
+
+let cTermNoList = ref([]);  // 条款数据
+let cTermNo = '';    // 条款编码
 
 const props = defineProps({
   refreshData: {
@@ -78,6 +82,13 @@ let addrowArr = [
     "tUdrTm",
 ];
 const cPard = ref(null);
+
+function extractCode(str:string) {
+  // 匹配 "P+数字" 或 "纯数字"
+  const pattern = /^(P\d+|\d+)/;
+  return str.match(pattern)?.[0] || "";
+}
+
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -424,6 +435,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     },
                     })
                     .then((res) => {
+                        cTermNoList.value = res;
                         setFormItem("cProdNo", {
                             loadData: res,
                         });
@@ -438,13 +450,21 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               rules: [{ type: "required" }],
               filterable: true,
               clearable: true,
-            //   typeCode: "TERM_LIST_IN_GUIDE_NEW",
-            //   codeParam: {
-            //       cParCde: cPard.value,
-            //       cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
-            //       cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
-            //   },
-              func: (val) => {
+    
+              func: (val:any) => {
+
+                if(val){
+                        if(cTermNoList.value.length>0){
+                            cTermNoList.value.forEach((ele) => {
+                                if(ele['value']  === val){
+                                    cTermNo =extractCode(ele['label'])
+                                }
+                            });
+                        }
+                       
+                }
+                 
+                  console.log('条款编码',cTermNo)
                   formconfig1.fromSchema?.forEach((item) => {
                       if (
                           item.prop === "CEmployeeName" ||
@@ -1199,6 +1219,8 @@ function handleQuery(flag?: boolean) {
     param["tIssueTmStart"] = tIssueTmStart; // 添加签单开始时间
     param["tIssueTmEnd"] = tIssueTmEnd; // 添加签单结束时间
     param["queryType"] = queryType.value;
+    param["cTermNo"] = cTermNo;        // 条款编码
+
     getAppPolicyList(param)
         .then((res) => {
             const { code, data, msg } = res;

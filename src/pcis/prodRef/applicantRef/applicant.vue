@@ -77,7 +77,8 @@ onMounted(() => {
       cProdNo === "043005" ||
       cProdNo === "043011"
     ) {
-      setFormItem("Applicant.cTrdCde", { rules: null });
+      setFormItem("Applicant.cTrdCde", { rules: [getRules("required", {})], });
+      
     }
     if (!cProdNo.startsWith("05")) {
       setFormItem("Applicant.cShareholderName", { hidden: true, rules: null });
@@ -163,7 +164,7 @@ const idAnalysis = (id:string)=>{
 };
 
     // 防抖定时器
-let debounceTimer = null;
+let debounceTimer = <any>null ;
 //  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
 const checkUser = () => {
       if (param.pageType !== "app" &&  param.pageType !== "copy" && param.pageType !== "template" && param.cAppStatus !=='1') {
@@ -601,9 +602,24 @@ const method = {
 
       setFormItem("Applicant.cCntrCertfCde", { rules: null });
 
+
+      // 国民行业分类  
+      const cProdNo = param.cProdNo;
+      if (
+      cProdNo === "040001" ||
+      cProdNo === "042002" ||
+      cProdNo === "043004" ||
+      cProdNo === "043005" ||
+      cProdNo === "043011"
+    ) {
+      setFormItem("Applicant.cTrdCde", { rules: [getRules("required", {})], });
+      
+    }else{
       setFormItem("Applicant.cTrdCde", {
         rules: [],
       });
+    }
+    
 
       //实名认证方式
       setFormItem("Applicant.cRealnameAuthType", {

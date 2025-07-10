@@ -743,26 +743,7 @@ const basicBtn = [
       openLimit();
     },
   }),
-  //  createFreeButtonBase({
-  //   label: "发起风勘",
-  //   type: "primary",
-  //   func: () => {
-  //     startWindExploration(); 
-  //     //startWindExploration
-  //     // historyClaimcaseFun();
-  //     // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
-  //   },
-  // }),
-  //  createFreeButtonBase({
-  //   label: "风勘查询",
-  //   type: "primary",
-  //   func: () => {
-  //     getWindExploration(); 
-  //     //startWindExploration
-  //     // historyClaimcaseFun();
-  //     // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
-  //   },
-  // }),
+
   // createFreeButtonBase({
   //   label: "历史赔案",
   //   type: "primary",
@@ -1160,6 +1141,26 @@ async function loadAfter() {
             submitToUndrFn();
           },
         }),
+           createFreeButtonBase({
+            label: "发起风勘",
+            type: "primary",
+            func: () => {
+              startWindExploration(); 
+              //startWindExploration
+              // historyClaimcaseFun();
+              // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
+            },
+          }),
+          createFreeButtonBase({
+            label: "风勘查询",
+            type: "primary",
+            func: () => {
+              getWindExploration(); 
+              //startWindExploration
+              // historyClaimcaseFun();
+              // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
+            },
+          }),
       );
     } else {
       bthList.value = basicBtn;
@@ -1882,7 +1883,7 @@ const loadAppPlyInfo = async (CAppNo) => {
         }
         console.log("EdrBaseData", EdrBaseData);
         if ("EDR_APP_NEW_SCENE" === props.param.pageType) {
-          res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"] = "1";
+          res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"] = "2";
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrType"] =
             props.param["cEdrType"];
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnBundleCde"] =
@@ -1953,7 +1954,7 @@ const loadAppPlyInfo = async (CAppNo) => {
         }
         console.log("EdrBaseData", EdrBaseData);
         if ("EDR_APP_NEW_SCENE" === props.param.pageType) {
-          res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"] = "1";
+          res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"] = "2";
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrType"] =
             props.param["cEdrType"];
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnBundleCde"] =
@@ -3311,7 +3312,8 @@ function clearCAppNoAndCPkId(res:any) {
       res[k] = clearCAppNoAndCPkId(res[k]);
     } else {
       // 清空投保单号, 主键,保单标志,续保\复制单号 签单日期 录单日期  投保日期,主共保，联共保标志清空，联保号，开口保单协议号
-      if (k.indexOf('NCiOwnPrm') !== -1 || k.indexOf('NCiOwnAmt') !== -1 || k.indexOf('NCiJntPrm') !== -1 || k.indexOf('NCiJntAmt') !== -1 || k.indexOf('COcAgrEdrNo') !== -1 || k.indexOf('TAgreeStopTm') !== -1 || k.indexOf('TAgreeStartTm') !== -1 || k.indexOf('COcAgrNo') !== -1 || k.indexOf('CJiAgtNo') !== -1 || k.indexOf('CCiMrk') !== -1 || k.indexOf('CAppNo') !== -1 || k.indexOf('CPkId') !== -1 || k === 'Base.CRenewMrk' || k === 'Base.COrigPlyNo' || k === 'Base.TIssueTm' || k === 'Base.TOprTm' || k === 'Base.TAppTm' || k === 'Base.CTmSysCde' || k === 'Base.TInsrncBgnTm' || k === 'Base.TInsrncEndTm' || k === 'Base.TCrtTm' || k === 'Base.TUpdTm' || k === 'Base.CPrePlyNo') {
+      if (k.indexOf('NCiOwnPrm') !== -1 || k.indexOf('NCiOwnAmt') !== -1 ||
+       k.indexOf('NCiJntPrm') !== -1 || k.indexOf('NCiJntAmt') !== -1 || k.indexOf('COcAgrEdrNo') !== -1 || k.indexOf('TAgreeStopTm') !== -1 || k.indexOf('TAgreeStartTm') !== -1 || k.indexOf('COcAgrNo') !== -1 || k.indexOf('CJiAgtNo') !== -1 || k.indexOf('CCiMrk') !== -1 || k.indexOf('CAppNo') !== -1 || k.indexOf('CPkId') !== -1 || k === 'Base.CRenewMrk' || k === 'Base.COrigPlyNo' || k === 'Base.TIssueTm' || k === 'Base.TOprTm' || k === 'Base.TAppTm' || k === 'Base.CTmSysCde' || k === 'Base.TInsrncBgnTm' || k === 'Base.TInsrncEndTm' || k === 'Base.TCrtTm' || k === 'Base.TUpdTm' || k === 'Base.CPrePlyNo') {
         res[k] = null;
       }
       if (props.param?.pageType !== "PLY_APP_NEW_PLAN_SCENE" && props.param?.pageType !== "PLY_APP_UPDATE_PLAN_SCENE" && (k === 'Base.CDptCde' || k === 'Base.CCiMrk' || k === 'Base.CGrpMrk')) {

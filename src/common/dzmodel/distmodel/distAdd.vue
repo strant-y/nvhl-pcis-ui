@@ -29,6 +29,7 @@ import {calculateAgeFromIdCard} from "@/utils/common";
 const opertaor = dataOpertaor();
 const param = ref({});
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
+
 const { getRules } = useValidator();
 const tableRef = ref<MyTableMethod | null>(null);
 const codeListStore = codeListViewStore();
@@ -205,6 +206,13 @@ onMounted(() => {
         data.rules = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
       })
     }
+
+    // 电话校验
+    if(item.prop =='Dist.cContactNumber'){
+        item['rules'] = [getRules("phoneNo", {})];
+    }
+
+
     // 040001产品 必填项问题
     if(item.prop =='Dist.cPlanNo' ||item.prop =='Dist.tOpeningTime' ||item.prop =='Dist.cLocationSigns' ||item.prop =='Dist.cFacilitySigns' ||item.prop =='Dist.cVenueSign' || item.prop =='Dist.cBuildingStructure'  ){
       console.log('进啊2=',item.prop)

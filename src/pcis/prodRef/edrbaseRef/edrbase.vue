@@ -101,6 +101,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         typeCode: "CRATIO_TYPE_CACHE",
         rules: [getRules("required", {})],
         clearable: true,
+        defaultValue: "2",
         func: (v) => {},
       },
       {
@@ -126,7 +127,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "EdrBase.cPlyNo",
         inputtype: "rtinput",
         title: "保单号",
-       disabled:true
+        disabled:true
       },
       {
         prop: "EdrBase.cAppNo",

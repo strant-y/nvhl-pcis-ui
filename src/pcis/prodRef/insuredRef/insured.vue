@@ -80,7 +80,7 @@ onMounted(() => {
     cProdNo === "043005" ||
     cProdNo === "043011"
   ) {
-    setFormItem("Insured.cTrdCde", { rules: null });
+    setFormItem("Insured.cTrdCde", { rules: [getRules("required", {})], });
   }
   if (!cProdNo.startsWith("05")) {
     setFormItem("Insured.cShareholderNature", { hidden: true, rules: null });
@@ -501,9 +501,21 @@ const method = {
       setFormItem("Insured.cCntrCertfCde", { rules: null });
 
       // 为法人 国民经济行业必填
-      setFormItem("Insured.cTrdCde", {
-        rules: null,
-      });
+     const cProdNo = route.params.param?.cProdNo;
+      if (
+        cProdNo === "040001" ||
+        cProdNo === "042002" ||
+        cProdNo === "043004" ||
+        cProdNo === "043005" ||
+        cProdNo === "043011"
+      ) {
+        setFormItem("Insured.cTrdCde", { rules: [getRules("required", {})], });
+      }else{
+        setFormItem("Insured.cTrdCde", {
+            rules: null,
+          });
+      }
+    
       // 是否分支机构
       setValue("Insured.cIsBranch", "1");
 

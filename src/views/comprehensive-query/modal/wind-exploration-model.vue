@@ -1,7 +1,7 @@
 <!-- 发起风勘-编辑 -->
 <template>
   <div>
-    <el-dialog v-model="maindialogVisible" width="70%" title="人工发起风勘">
+    <el-dialog v-model="maindialogVisible" width="80%" title="人工发起风勘">
       <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
     </el-dialog>
   </div>
@@ -64,47 +64,61 @@ const formconfig1 = reactive<AppFreeEditConfig>(
  
     fromSchema: [
             {
-                prop: "DistSummary.cPlanNo",
-              inputtype: "rtdatepicker",
-                title: "发起时间",
-  
-                // valueFormat: "YYYY-MM-DD HH:mm:ss",
-                // format: "YYYY-MM-DD HH:mm:ss",
+                prop: "tSurveyStart",
+                inputtype: "rtdatepicker",
+                title: "开始时间",
+                format: "YYYY-MM-DD HH:mm:ss",
+                rules:[getRules("required", {})],
+                type: "datetime",
+                 itemWidth:1.5
             },
             {
-                prop: "DistSummary.nInsuredHeadcount",
+                prop: "tSurveyEnd",
                 inputtype: "rtdatepicker",
                 title: "结束时间",
-                       format: "YYYY-MM-DD HH:mm:ss",
+                format: "YYYY-MM-DD HH:mm:ss",
+                type: "datetime",
+                rules:[getRules("required", {})],
+                  itemWidth:1.5
             },
 
             {
-                prop: "DistSummary.nAnnualSalary",
+                prop: "cRespondent",
                 inputtype: "rtinput",
+                 itemWidth:1.5,
                 title: "联系人",
-                // rules:[getRules("required", {})]
-                // rules: [getRules("idCard", {})],
             },
             {
-                prop: "DistSummary.cJobRole",
+                prop: "cRespondentPon",
                 inputtype: "rtinput",
                 title: "联系电话",
+                 itemWidth:1.5,
+                rules: [getRules("phoneNo", {})], 
             },
              {
-                prop: "DistSummary.cJobRole",
+                prop: "cNotes",
                 inputtype: "rtinput",
                 title: "备注",
+                 type: "textarea",
+                 rows: 4,
+                itemWidth: 3, 
+                // itemWidth:2
             }
         ],
   })
 );
 
-
+// cInquiryNumber	String	255	Y		询价单号	
+// tSurveyStart	Date	255	Y		发起时间	
+// tSurveyEnd	Date	255	Y		结束时间	
+// cRespondent	String	255	N		联系人	
+// cRespondentPon	String	255	N		联系人电话	
+// cNotes
 
 
 onMounted(() => {
 
-console.log(opertaor.getDataAll())
+
 let DataAll = opertaor.getDataAll()['applicant']
 nextTick(() => {
 
@@ -116,12 +130,18 @@ nextTick(() => {
 
 // 请求接口
 const windSave = () => {
+
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
- 
-  let params = { ...s }
-  console.log('params', params)
-  // pcisQueryService.qryHistoryClaimYearAll(params).then((res: any) => {
-  //   console.log('数据---‘',res)
+  const cinquiry = opertaor.getDataAll()['plyBase'];
+  console.log(cinquiry['Base.cInquiryNo'], opertaor.getDataAll())
+// :   Base.cInquiryNo cinquiry['Base.cInquiryNo']
+// "121012504000000009"
+  let params = {  
+    cInquiryNumber: cinquiry['Base.cInquiryNo'],
+    ...s }
+    console.log('params', params)
+  pcisQueryService.sendTaskCreat(params).then((res: any) => {
+    console.log('数据---‘',res)
   //   if (res.code === 200) {
   //     if(res.data !==null){
          
@@ -131,7 +151,7 @@ const windSave = () => {
   //   } else {
   //     ElMessage.error({ message: res.msg, duration: 3000 });
   //   }
-  // });
+  });
 
 }
 
