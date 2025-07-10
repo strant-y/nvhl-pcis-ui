@@ -1601,6 +1601,16 @@ listImage(data) {
     return request.post('image/listImage', data);
 }
 
+// 获取销售区域清单汇总数据
+getEstimatedSalesAndEstimatedSalesQuantity(param){
+    return request.post('/policy/getEstimatedSalesAndEstimatedSalesQuantity', param);
+}
+
+// 删除险位
+delRisk(param){
+    return request.post('/reinsured/delRisk', param);
+}
+
 
 
 // 工资总额列表
