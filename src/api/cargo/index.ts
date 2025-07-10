@@ -10,8 +10,8 @@ function getECargoPageView(queryParams: any): AxiosPromise<any> {
 }
 
 //协议查询
-function query(queryParams: any): AxiosPromise<any> {
-    return post(`${PageBaseUrl}/query`, queryParams);
+function queryEcargoList(queryParams: any): AxiosPromise<any> {
+    return post(`${PageBaseUrl}/queryEcargoList`, queryParams);
 }
 
 //新增清单保存
@@ -68,7 +68,7 @@ export default {
     checkInit,
     editInit,
     // init,
-    query,
+    queryEcargoList,
     getECargoPageView
 }
 

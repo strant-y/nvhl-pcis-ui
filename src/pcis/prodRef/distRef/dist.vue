@@ -6,6 +6,7 @@
         v-model:pageresult="pageresult"
         ref="distTableRef"
         @pageChange="method.handleQuery($event, true)"
+        @selection-change="handleSelectionChange"
       />
     </myCard>
     <comDialog ref="dialog"></comDialog>
@@ -111,6 +112,7 @@ onMounted(async () => {
   Object.assign(formconfig1.value, formconfig11.value);
   cardconfig.value.title = formconfig1.value.title;
   tableconfig.value.showEdit = true;
+  tableconfig.value.showSelection = true;
   formconfig1.value.fromSchema.forEach((e: any)=>{  // 隐藏不需要显示在表格内的数据
     if(e.cShowLocation === '0'){
       e.isShow = false
@@ -220,10 +222,16 @@ const method = {
     );
   },
   delmethod: (row: any) => {
-    deleteDist({
+    const param = {
       cComponentTable: cComponentTableValue,
       cPkId: [row['Dist.cPkId']],
-    }).then((res: any) => {
+    }
+    if(route.params.param?.pageName === "priceInquiry") {
+      param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else {
+      param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+    }
+    deleteDist(param).then((res: any) => {
       if (res.code === 200) {
         ElMessage.success("删除成功");
         const queryParams = distTableRef.value?.getPartnerPage(false);
@@ -234,10 +242,15 @@ const method = {
   //  042003 根据电梯条数反
   funcdistadd: () => {
     const alldata: any = opertaor.getDataAll();
-    let baseFlag = alldata['plyBase']["Base.cAppNo"];
+    const param = {};
+    if(route.params.param?.pageName === "priceInquiry") {
+      param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else {
+      param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+    }
 
     let fromSchema = tableconfig.value.fromSchema;
-    checkAppBase({ cAppNo: baseFlag }).then((res: any) => {
+    checkAppBase(param).then((res: any) => {
       if (res.code === 200) {
         dialog.value?.open(
             "distAdd",
@@ -278,6 +291,14 @@ const method = {
       cAppNo: app,
       ...queryParams
     };
+    if(route.params.param?.pageName === "priceInquiry") {
+      selData['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else {
+      selData['cAppNo'] = app;
+    }
+    if(route.params.param?.pageType && route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
+      selData.voType = "ply"
+    }
     selectDist(selData).then((res: any) => {
       if (res.code === 200) {
         pageresult.list = [];
@@ -351,8 +372,13 @@ const method = {
   //   });
   // },
   carInfoAdd: () => {
-    let baseFlag = opertaor.getDataAll().plyBase["Base.cAppNo"];
-    checkAppBase({ cAppNo: baseFlag }).then((res) => {
+    const param = {};
+    if(route.params.param?.pageName === "priceInquiry") {
+      param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else {
+      param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+    }
+    checkAppBase(param).then((res) => {
       if (res.code === 200) {
         dialog.value?.open(
             "distAdd",
@@ -380,8 +406,18 @@ const method = {
   exportExcel: () => {
     let paramitem  = Object.assign(formconfig1.value, {
       cComponentTable: cComponentTableValue,
-      cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
     });
+    if(route.params.param?.pageType && route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
+      paramitem.voType = "ply"
+    }
+    if(route.params.param?.pageName === "priceInquiry") {
+      paramitem['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else {
+      paramitem['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+    }
+    if(selectedRows.value.length > 0) {
+      paramitem['cPkId'] = selectedRows.value.map((row: any) => row['Dist.cPkId']);
+    }
     policyService
         .exportDist(paramitem).then((res) => {
       if (res.size <= 0) {
@@ -419,8 +455,12 @@ const method = {
             ...formconfig1.value,
             file: base64String, // ✅ 正确传入
             cComponentTable: cComponentTableValue,
-            cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
           };
+          if(route.params.param?.pageName === "priceInquiry") {
+            params['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+          } else {
+            params['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+          }
 
           policyService.importDist(params).then((res) => {
             if (res.code === 200) {
@@ -467,8 +507,12 @@ const method = {
             ...formconfig1.value,
             file: base64String, // ✅ 正确传入
             cComponentTable: cComponentTableValue,
-            cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
           };
+          if(route.params.param?.pageName === "priceInquiry") {
+            params['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+          } else {
+            params['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+          }
 
           policyService.importDistIncrement(params).then((res) => {
             if (res.code === 200) {
@@ -497,7 +541,11 @@ const method = {
   downloadTemp: () => {
     const param = {
       ...formconfig1.value,
-      cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
+    }
+    if(route.params.param?.pageName === "priceInquiry") {
+      param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else {
+      param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
     }
     policyService
         .downloadDistTemplate(param)
@@ -514,20 +562,25 @@ const method = {
           saveAs(blob, fileName);
         })
         .catch(() => {
-          ElMessage.error("全量模板下载失败");
+          ElMessage.error("模板下载失败");
         });
   },
   // 增量模板下载
   downloadIncrement: () => {
     const param = {
       ...formconfig1.value,
-      cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
+      cComponentTable: cComponentTableValue,
+    }
+    if(route.params.param?.pageName === "priceInquiry") {
+      param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else {
+      param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
     }
     policyService
         .downloadDistTemplateIncrement(param)
         .then((res) => {
-          if (res.size <= 0) {
-            ElMessage.error({ message: "下载出错", duration: 3000 });
+          if (res.data.size  <= 0) {
+            ElMessage.error({ message: "未发现导入失败的异常数据！", duration: 3000 });
             return;
           }
           const fileName = decodeURIComponent(res.headers['content-disposition'].split('filename=')[1]);
@@ -537,8 +590,8 @@ const method = {
           });
           saveAs(blob, fileName);
         })
-        .catch(() => {
-          ElMessage.error("增量模板下载失败");
+        .catch((err) => {
+          ElMessage.error(err.msg || "异常数据下载失败");
         });
   },
   setregistAdd(){
@@ -557,9 +610,48 @@ const method = {
     }
     console.log("清单级联事件触发")
   },
-
+  // 批量删除
+  batchDelete() {
+    if (selectedRows.value.length === 0) {
+      ElMessage.warning("请先选择要删除的数据");
+      return;
+    }
+    ElMessageBox.confirm(
+      "是否确认删除选中的数据？",
+      "提示",
+      {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }
+    ).then(() => {
+      const param = {
+        cComponentTable: cComponentTableValue,
+        cPkId: selectedRows.value.map((row: any) => row['Dist.cPkId']),
+      }
+      if(route.params.param?.pageName === "priceInquiry") {
+        param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+      } else {
+        param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+      }
+      deleteDist(param).then((res: any) => {
+        if (res.code === 200) {
+          ElMessage.success("删除成功");
+          const queryParams = distTableRef.value?.getPartnerPage(false);
+          method.handleQuery(queryParams, true);
+        }
+      });
+    });
+  }
 
 };
+
+// 复选框选中
+const selectedRows = ref<any[]>([]);
+function handleSelectionChange(selection: any) {
+  selectedRows.value = selection;
+  console.log("选中数据", selection);
+}
 
 function setUnDisabledByKeyList(key: any) {
   tableconfig.value.formconfig.endBtns?.forEach((item: any) => {

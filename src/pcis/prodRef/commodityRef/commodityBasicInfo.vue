@@ -565,6 +565,7 @@ onMounted(() => {
   nextTick(() => {
     freeEditRef.value?.setValue('tBgnTm', startTm)
     freeEditRef.value?.setValue('tEndTm', endTm)
+    freeEditRef.value?.setValue('cAutoUdr', '1')
   })
 
   const user = JSON.parse(sessionStorage.getItem("user")).opCde;

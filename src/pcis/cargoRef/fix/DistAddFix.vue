@@ -82,7 +82,6 @@ const formconfig1 = ref<AppFreeEditConfig>(
 const distContactList:Array<string> = ['DistECargo.PartProp','Tgt.cSuffixAddr','DistECargo.Prop','DistECargo.cSuffixAddr','DistECargo.JingyingProp','DistECargo.cDetailedAddress']
 
 onMounted(() => {
-
   dataParams.value = formPage.getAllFormData();
 
   let newSchema = [];
@@ -164,7 +163,28 @@ const getDistoccupType = (val) => {
     //给表单下拉项赋值
     item.itemConfig.loadData = res
   });
-}
+};
+const funcNdustryCate = () => {
+    // const param = opertaor.getParam();
+    dialog.value?.open(
+      "ndustryCateModal",
+      {
+        type: "show",
+        method: {
+          getdbClickData: (data) => {
+            setFormItem("ECargoApplicant.cTrdCde", {
+              loadData: [{ label: data.cnm, value: data.cde }],
+            });
+           // setValue("Applicant.cTrdCde", data.cnm);
+            setValue("ECargoApplicant.cTrdCde", data.cde);
+            dialog.value?.handleClose();
+          },
+        },
+      },
+      {},
+      { title: "国民经济行业分类", width: 85 }
+    );
+  };
 
 
 

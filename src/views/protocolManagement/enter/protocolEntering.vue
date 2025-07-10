@@ -19,6 +19,7 @@ import { useRouter, useRoute } from "vue-router";
 const { getRules } = useValidator();
 const route = useRoute();
 const router = useRouter();
+import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 import { ref } from "vue";
 import {
   AppFreeEditConfig,
@@ -86,14 +87,33 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         showExBtn: true,
         btnItems: {
             icon: "Search",
-            type: "primary"
+            type: "primary",
+            func: (val: string) => {
+            dzmodal
+                .open(DepartmentTree, { type: "Issuer", data: {} })
+                .then((res) => {
+                  if (res.body) {
+                    const selectObj = res.body;
+                    freeEditRef.value?.setValue("cDptCde", `${selectObj.id}${selectObj.name}`);
+                    freeEditRef.value?.addCodeListMap({
+                      "cDptCde": [
+                        {
+                          label: selectObj.name,
+                          value: selectObj.id,
+                        },
+                      ],
+                    })
+                  }
+                });
+            },
         },
-        loadData: [
-            {
-            "label": "永安保险总公司",
-            "value": "0200000000000"
-            }
-        ]
+        
+        // loadData: [
+        //     {
+        //     "label": "永安保险总公司",
+        //     "value": "0200000000000"
+        //     }
+        // ]
       },
       {
         prop: "CLoadSub",
@@ -325,7 +345,7 @@ function handleQuery(flag?: boolean) {
         },
         ...freeEditRef.value?.getFromValue(),
       };
-      cargoApi.query(param)
+      cargoApi.queryEcargoList(param)
         .then((res: any) => {
           if (res && res.code === 200) {
             const pageData = res.data;

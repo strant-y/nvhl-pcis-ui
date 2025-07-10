@@ -110,8 +110,10 @@
               <table style="width: 100%">
                 <thead>
                   <tr class="table-title">
+                    <th v-if="checkExtendshow" width="20px">
+                    </th>
                     <template v-for="(item, k) in termFactormap" :key="k">
-                      <th v-if="item.cPorpShowtitle !== '1'" :style="{ width: item.cPropHeight?item.cPropHeight+'px':null }">
+                      <th v-if="item.cPorpShowtitle !== '1' && item.cPorpExtend !== '1' " :style="{ width: item.cPropHeight?item.cPropHeight+'px':null }">
                         <el-text
                           v-if="isrequired(item)"
                           class="mx-1"
@@ -125,8 +127,15 @@
                 </thead>
                 <tbody>
                   <tr>
+                      <th v-if="checkExtendshow">
+                        <a style="margin-right: 5px" @click="showExtend = !showExtend">
+                          <el-icon v-if="!showExtend"><ArrowRightBold /></el-icon>
+                          <el-icon v-if="showExtend"><ArrowDownBold /></el-icon>
+                        </a>
+                        
+                      </th>
                     <template v-for="(item, k) in termFactormap" :key="k">
-                      <td v-if="item.cPorpShowtitle !== '1'">
+                      <td v-if="item.cPorpShowtitle !== '1' && item.cPorpExtend !== '1'">
                         <el-form-item
                           :rules="isrequired(item) ? getRequired() : undefined"
                           :prop="item.prop"
@@ -140,6 +149,31 @@
                       </td>
                     </template>
                   </tr>
+                  <template v-if="checkExtendshow">
+                    <tr v-show="showExtend" >
+                      <td :colspan="termFactormap.length" >
+                        <el-row :gutter="20">
+                        <template v-for="(item, k) in termFactormap" :key="k">
+                          <template v-if="item.cPorpExtend === '1'">
+                            <el-col style="margin-top: 5px" :span="12">
+                              <el-form-item
+                                :rules="isrequired(item) ? getRequired() : undefined"
+                                :prop="item.prop"
+                                :label="item.title" 
+                                :label-width ="120">
+                                <from-item
+                                  v-model="termdata[item.prop]"
+                                  @update:modelValue="update()"
+                                  :item="item"
+                                />
+                              </el-form-item>
+                            </el-col>
+                          </template>
+                        </template>
+                      </el-row>
+                      </td>
+                    </tr>
+                  </template>
                 </tbody>
               </table>
             </template>
@@ -259,6 +293,7 @@
                                         ]
                                       )
                                     "
+                                    :style="{'justify-content': colinfo.cColTitle === '责任名称' ? 'right' : 'center'}"
                                   >
                                     <from-item
                                       v-model="
@@ -365,13 +400,10 @@ const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
 function update() {
   let newData;
 
-  if (
-    termTitleConf.value.cFactorTabType === "grid" ||
-    termTitleConf.value.cFactorTabType === "table"
-  ) {
-    newData = termdata.value;
-  } else {
+  if( termTitleConf.value.cFactorTabType === "free" ){
     newData = termRef.value?.getFromValue();
+  } else {
+    newData = termdata.value;
   }
   const fromc = termFactormap.value?.filter(
     (v: any) => v.cPorpShowtitle === "1"
@@ -527,6 +559,18 @@ function getRowConfig(groupId: string, riskNo: string) {
   );
   return colMap;
 }
+
+const showExtend = ref(false);
+const checkExtendshow = computed(() => { 
+  let r = false;
+  termFactormap.value.forEach((item) => { 
+    if(item.cPorpExtend === '1'){
+      r = true && showExtend;
+    }
+  });
+  console.log(r);
+  return r;
+});
 
 function maxNum(groupId: string, riskNo: string) {
   let sumKey: { [key: string]: number } = {};
@@ -766,12 +810,20 @@ function exChangeFunc() {
   }
   // 045001个性化配置
   if (pageparam.cProdNo === "045001") {
-    if(data["tgt"]["Tgt.cRegisteredLogo"] && data["tgt"]["Tgt.cRegisteredLogo"] === '0'){
-      const term = termFactormap.value.filter(
-        (r) => r["prop"] !== "Term.nInsuredCount"
-      );
-      termFactormap.value = term;
-    }
+    // if(data["tgt"]["Tgt.cInsuranceMethod"] && data["tgt"]["Tgt.cInsuranceMethod"] === '0'){
+      
+    // }
+
+    const term = termFactormap.value.filter(
+      (r) => r["prop"] !== "Term.nRateVal" && r["prop"] !== "Term.nInsuranceFee"
+    );
+    const ex = termFactormap.value.filter(
+      (r) =>
+        r["prop"] === "Term.nRateVal" || r["prop"] === "Term.nInsuranceFee"
+    );
+
+    termFactormap.value = term;
+    extermConf.value = ex;
   }
    // 040002个性化配置
   if (pageparam.cProdNo === "040002") {
@@ -1032,6 +1084,9 @@ defineExpose({
 }
 .table-title {
   background-color: #e6e6e6;
+  th {
+    text-align: center;
+  }
 }
 table {
   border-collapse: collapse; /* 合并边框 */

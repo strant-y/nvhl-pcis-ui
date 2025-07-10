@@ -14,7 +14,7 @@
             >
               <el-row justify="space-between">
                 <el-col :span="4" v-if="!freeEditConfig.production">
-                  {{ freeEditConfig.title }}
+                  <span class="card-title-style">{{ freeEditConfig.title }}</span>
                 </el-col>
                 <el-col :span="4" v-if="freeEditConfig.production">
                   <el-tooltip :content="freeEditConfig.productionTitle">
@@ -317,5 +317,33 @@ defineExpose({
 .searchbar {
   border: 1px solid #ddd;
   box-shadow: 0 0 2px rgb(0 0 0 / 30%);
+}
+/* .card-title-style{
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 10px;
+  margin-left: 8px;
+} */
+:deep(.el-form-item) {
+  margin-bottom: 5px;
+}
+:deep(.el-form-item__label-wrap) {
+  margin-left: 0px;
+}
+.el-card__header .el-row {
+  align-items: center;
+}
+:deep(.el-select__wrapper) {
+  height: 28px;
+  min-height: 28px;
+}
+:deep(.el-input__wrapper) {
+  height: 28px;
+}
+:deep(.el-form-item__content .el-row) {
+  align-items: baseline;
+}
+:deep(.el-form-item__content .el-button) {
+  height: 28px;
 }
 </style>

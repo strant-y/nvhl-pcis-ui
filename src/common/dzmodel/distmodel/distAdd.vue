@@ -1,6 +1,7 @@
 <template>
   <div>
     <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+    <comDialog ref="dialog"></comDialog>
   </div>
 </template>
 
@@ -26,9 +27,11 @@ import { codeListViewStore } from "@/store";
 import {getAddressStr} from "@/api/query";
 import {eventBus} from "@/utils/event-bus";
 import {calculateAgeFromIdCard} from "@/utils/common";
+import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
 const opertaor = dataOpertaor();
 const param = ref({});
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
+const dialog = ref<DialogMethod | null>(null);
 const { getRules } = useValidator();
 const tableRef = ref<MyTableMethod | null>(null);
 const codeListStore = codeListViewStore();
@@ -70,14 +73,22 @@ const formconfig1 = ref<AppFreeEditConfig>(
           const isValid = await freeEditRef.value?.validate();
           if(isValid){
             const s = freeEditRef.value?.getFromValue();
+
+            console.log('路由data‘',route.params)
+            // return false;
             const params = Object.assign(
               {
                 cProdNo: route.params.param.cProdNo,
                 cComponentTable: cComponentTable.value,
-                cAppNo: appNo.value,
+                // cAppNo: appNo.value,
               },
               { dist: s }
             );
+            if(route.params.param?.pageName === "priceInquiry") {
+              params.cInquiryNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+            } else {
+              params.cAppNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+            }
             console.log('params', params)
             saveDist(params).then((res) => {
               if (res.code === 200) {
@@ -105,7 +116,7 @@ const formconfig1 = ref<AppFreeEditConfig>(
     ],
   })
 );
-const distContactList:Array<string> = ['Dist.PartProp','Tgt.cSuffixAddr','Dist.Prop','Dist.cSuffixAddr','Dist.JingyingProp','Dist.cDetailedAddress']
+const distContactList:Array<string> = ['Dist.PartProp','Tgt.cSuffixAddr','Dist.Prop','Dist.cSuffixAddr','Dist.JingyingProp','Dist.cDetailedAddress','Dist.BusinessAllProp']
 
 onMounted(() => {
   // console.log(333)   distAdd
@@ -182,7 +193,9 @@ onMounted(() => {
       }
       item['rules'] = [getRules("idCard", {})];
     }
-
+    if(item.prop =='Dist.cEquipmentTypes'){
+      item['btnItems']['func'] =  cEquipmentTypesFunc;
+    }
         // 身份证类型自动回填年龄
     if(item.prop =='Dist.cDocumentType'){
       item['func'] =  cDocumentTypeChange;
@@ -197,6 +210,11 @@ onMounted(() => {
         data.rules = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
       })
     }
+    if(item.prop =='Dist.PropertyLocationProp'){
+      item?.groupList.forEach(data => {
+        data.rules = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+      })
+    }
     // 040001产品 必填项问题
     if(item.prop =='Dist.cPlanNo' ||item.prop =='Dist.tOpeningTime' ||item.prop =='Dist.cLocationSigns' ||item.prop =='Dist.cFacilitySigns' ||item.prop =='Dist.cVenueSign' || item.prop =='Dist.cBuildingStructure'  ){
       console.log('进啊2=',item.prop)
@@ -204,14 +222,18 @@ onMounted(() => {
     }
 
  
-
+    console.log('21116’“，',props.data.fromSchema[i]["groupList"] )
     // 遍历groupList数组把函数赋值给fromSchema
     if (props.data.fromSchema[i]["groupList"] && props.data.fromSchema[i]["groupList"].length>0) {
       props.data.fromSchema[i]["groupList"].forEach((data:any,index:number,arr:any) =>{
         //  040001经营场所地址 040005 学校地址 040021 经营场所地址 042003 学校地址 043013 标的坐落地址 043020 房屋所在地区 045001工程项目地址
         if(distContactList.includes(data.prop)){
+          console.log(333, item)
+          console.log(333, arr)
+          console.log(333, props.data.fromSchema)
           item["groupList"][index]['func'] = function (){
-            return setcDetailedAddress(arr,JSON.parse(JSON.stringify(props.data.fromSchema[i+1])))
+            // return setcDetailedAddress(arr,JSON.parse(JSON.stringify(props.data.fromSchema[i+1])))
+            return setcDetailedAddress(arr,JSON.parse(JSON.stringify(props.data.fromSchema[i])))
           }
         }
       })
@@ -261,7 +283,25 @@ const getDistoccupType = (val) => {
     item.itemConfig.loadData = res
   });
 }
-
+const cEquipmentTypesFunc = ()=>{
+  dialog.value?.open(
+      "specialCateModal",
+      {
+        type: "show",
+        method: {
+          getdbClickData: (data) => {
+            setFormItem("Dist.cEquipmentTypes", {
+              loadData: [{ label: data.cnm, value: data.cde }],
+            });
+            setValue("Dist.cEquipmentTypes", data.cde);
+            dialog.value?.handleClose();
+          },
+        },
+      },
+      {},
+      {  width: 85 }
+  );
+}
 // 证件类型change
 const cDocumentTypeChange =(val:any)=>{
   console.log(val)
@@ -287,7 +327,7 @@ const cDocumentTypeChange =(val:any)=>{
 //给表单赋值
 function setFormItem(key: any, obj: any) {
   if (obj && Object.keys(obj).length) {
-    formconfig1.fromSchema?.forEach((item) => {
+    formconfig1.value.fromSchema?.forEach((item) => {
       if (item.prop === key) {
         //控制尾部按钮的
         if (item.btnItems && obj.btnItems) {

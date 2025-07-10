@@ -157,7 +157,7 @@ const method = {
                 res
             );
           });
-        setFormItem("Ci.cDptCde", { rules: [getRules("required", {})] });
+        // setFormItem("Ci.cDptCde", { rules: [getRules("required", {})] });
         setFormItem("Ci.cDptCde", { disabled: false });
         setFormItem("Ci.nComm", { disabled: false});
         setFormItem("Ci.cBrkrCde", { disabled: false});
@@ -215,10 +215,10 @@ const method = {
               }
           );
         });
-        // freeEditRef.value?.setRowFieldProp(
-        //         rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
-        // );
-        setFormItem("Ci.cDptCde", { rules: [getRules("required", {})] });
+        freeEditRef.value?.setRowFieldProp(
+                rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
+        );
+        // setFormItem("Ci.cDptCde", { rules: [getRules("required", {})] });
         setFormItem("Ci.cDptCde", { disabled: false });
         setFormItem("Ci.nComm", { disabled: false});
         setFormItem("Ci.cBrkrCde", { disabled: false});
@@ -734,8 +734,6 @@ const onChiefMrkChange = () => {
     freeEditRef?.value?.setValueByRowKey("Ci.cSelfMrk", rowData._dataId, cSelfMrkVal );
     freeEditRef?.value?.setValueByRowKey("Ci.cJiMrk", rowData._dataId, cJiMrkVal );
     freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowData._dataId, cChiefMrkVal );
-
-    console.log("8988888888888888888888",getFromValue())
 };
 //给表单下拉项赋值
 const setFormItem = (key, obj) => {

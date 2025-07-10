@@ -5,7 +5,7 @@
         <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
       </el-col>
       <el-col :span="24">
-        <rt-mytable :tableConfig="tableconfig" ref="tableRef" />
+        <rt-mytable :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"  @pageChange="getDictFormData(false)"/>
       </el-col>
     </el-row>
     <el-row>
@@ -62,6 +62,11 @@ function getuuid() {
   return uuidv4().replace(/-/g, "");
 }
 const emits = defineEmits(["handleClose"]);
+const pageresult = reactive<Pageresult>({
+  result: "",
+  list: [],
+  total: 0,
+});
 
 const factorList = ref<any>([]);
 
@@ -109,6 +114,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             if ( item.prop === "cPropHeight" ) {
               item.isShow = val === "table";
             }
+            if ( item.prop === "cPorpExtend" ) {
+              item.isShow = val === "table";
+            }
             if ( item.prop === "cPropIndent" || item.prop === "cFatherKey" ) {
               item.isShow = !h;
             }
@@ -134,8 +142,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 );
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
-function getDictFormData() {
-  getTermFactorInfo({ termNo: props.data.data.cTermNo, tabKey: "cvrg" }).then(
+function getDictFormData(fl = true) {
+  const paraParam = tableRef.value?.getPartnerPage(fl);
+  const fromp = tableRef.value?.getFormData();
+  const p = Object.assign({ termNo: props.data.data.cTermNo, tabKey: "cvrg" }, paraParam, fromp );
+
+  getTermFactorInfo(p).then(
     (res: any) => {
       const { code, data, msg } = res;
       if (200 === code) {
@@ -147,6 +159,7 @@ function getDictFormData() {
           });
         }
         tableRef.value?.setFormValue(data.datalist);
+        pageresult.total = data.total;
         if (data.confs) {
           const conf = data.confs;
           const c = JSON.parse(conf.CCnm);
@@ -186,7 +199,33 @@ function savegroupinfo() {
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     editFlag: true,
-    editList: ["cPorpRequired","cPorpShowtitle","cPorpDisabled","cPropHeight","cPropIndent","cFatherKey"],
+    editList: ["cPorpRequired","cPorpShowtitle","cPorpDisabled","cPropHeight","cPropIndent","cFatherKey","cPorpExtend"],
+    showEdit: true,
+    formconfig: {
+      fromSchema: [
+        {
+          prop: "cFactorKey",
+          inputtype: "rtinput",
+          title: "要素key",
+        },
+        {
+          prop: "cFactorTitle",
+          inputtype: "rtinput",
+          title: "要素名称",
+        },
+      ],
+    },
+    titleBtns:[
+      createFreeButtonBase({
+        link:true,
+        type: "primary",
+        label:"查询", 
+        icon: "Search",
+        func: () => {
+          getDictFormData(true);
+        },
+      }),
+    ],
     fromSchema: [
       {
         prop: "icon",
@@ -291,6 +330,15 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cFatherKey",
         inputtype: "rtinput",
         title: "父级key",
+      },
+      {
+        prop: "cPorpExtend",
+        inputtype: "rtswitch",
+        title: "是否折叠项",
+        keymap: {
+          y: "1",
+          n: "0",
+        },
       },
     ],
   })

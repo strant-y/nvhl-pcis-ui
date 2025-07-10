@@ -91,7 +91,7 @@ function query() {
 function save() {
   const allFromData = formPage.value?.getAllFormData();
   console.log('allFromData', allFromData);
-  ElMessage.warning('保存');
+  // ElMessage.warning('保存');
   cargoApi.save({
     ...allFromData,
     ...{}
@@ -131,7 +131,65 @@ function submit() {
     }
   });
 }
+// 绑定特殊验证器
+const exRules = {};
 
+function getFormValue() {
+  return cvrgEditRef?.value?.getFromValue();
+}
+
+function setFormValue(value: any) {
+  cvrgEditRef?.value?.setFormValue(value);
+}
+
+function validate() {
+  return cvrgEditRef?.value?.validate();
+}
+
+function getTableValue(rowId: number, key: string) {
+  cvrgEditRef?.value?.getTableValue(rowId, key);
+}
+
+function getFormConfig() {
+  return formconfig1;
+}
+//给表单赋值
+function setFormItem(key: any, obj: any) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.btnItems && obj.btnItems) {
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
+          }
+        } else {
+          Object.assign(item, obj);
+        }
+      }
+    });
+  }
+}
+function getFormBtn() {
+  return cvrgEditRef?.value?.getFormBtn();
+}
+function getTableBtn() {
+  return cvrgEditRef?.value?.getTableBtn();
+}
+function setDisabledAll(isDisabled: boolean) {
+  cvrgEditRef?.value?.setDisabledAll(isDisabled);
+}
+defineExpose({
+  getFormValue,
+  setFormValue,
+  validate,
+  getTableValue,
+  getFormConfig,
+  setFormItem,
+  getFormBtn,
+  setDisabledAll,
+  getTableBtn
+});
 </script>
 <style lang="scss" scoped>
 </style>

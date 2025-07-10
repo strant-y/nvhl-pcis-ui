@@ -538,7 +538,15 @@ function deletePlan(plan: string) {
     cancelButtonText: "取消",
     type: "warning",
   }).then(() => {
-    delete planData.value[plan];
+    if (parparam.cEdrType) {
+      Object.keys(planData.value[plan]).forEach((item) => {
+        for (let i = 0; i < planData.value[plan][item].length; i++) {
+          tremTemplateRefs.value[plan+item+i].setCancel();
+        }
+      });
+    }else{
+      delete planData.value[plan];
+    }
     ElMessage({
       type: "success",
       message: "删除成功",
@@ -743,4 +751,13 @@ defineExpose({
 ::v-deep .planInfo .el-card__header {
   padding: 2px 15px !important;
 }
+
+::v-deep .el-card__header {
+   padding: 10px 16px !important;
+ }
+
+::v-deep .el-card__body {
+   padding: 5px 10px !important;
+ }
+
 </style>

@@ -64,6 +64,8 @@
         hasReceived,
         getInquiryNewUdrList,
         getBaseInfoByInquiryNo,
+        backInquiryUdrList,
+        getInquiryPolicyList,
     } = NewUdrListService();
     import moment from "moment";
     import { Row } from "element-plus/es/components/table-v2/src/components";
@@ -96,6 +98,20 @@
     const udrTypeValue = ref<string>(); // 单据状态 值
     const undrClsListOptions = ref<Array<any>>([]); // 核保级别 下拉数据
     const selectData = ref([]); // 删除用户ID集合 用于批量删除
+    
+    // 默认核保机构
+    let loadOrgCde = ref([
+        {
+            label: "永安保险总公司",
+            value: "0200000000000",
+        },
+    ]);
+    watch(() => freeEditRef.value?.getValue("tm1"), (newVal,old) => {
+      
+    },{
+         deep: true
+    });
+
     // 根据切换下拉数据显示/隐藏对应表单
     const allForm = ref<Array<any>>([
         {
@@ -292,6 +308,19 @@
             title: "保单号",
             showKey: [5],
             clearable: true,
+        },
+        {
+            prop: "tm1",
+            inputtype: "rtdatepicker",
+            title: "询价日期",
+            rules: [],
+            itemWidth: 1,
+            showKey: [1, 2, 3, 4, 5],
+            clearable: true,
+            type: "datetimerange",
+            format: "YYYY-MM-DD HH:mm:ss",
+            valueFormat: "YYYY-MM-DD HH:mm:ss",
+            
         },
         {
             prop: "tm2",
@@ -497,7 +526,7 @@
         {
             prop: "bsTm1",
             inputtype: "rtdatepicker",
-            title: "投保日期",
+            title: "询价日期",
             showKey: [1, 2, 3, 4],
             minWidth: 180,
         },
@@ -561,7 +590,7 @@
     // 下拉 核保通过任务
     const table5 = ref<any>([
         {
-            prop: "cAppNo",
+            prop: "cInquiryNo",
             inputtype: "rtinput",
             title: "询价单号",
             minWidth: 180,
@@ -720,7 +749,7 @@
                     data = { objId: row.objId, sysType: row.objExt };
                 } else {
                     data = {
-                        objId: row.cAppNo,
+                        objId: row.cInquiryNo,
                         sysType:
                             !!row["bsType"] && ("A" === row["bsType"] || "P" === row["bsType"])
                                 ? "U"
@@ -797,7 +826,7 @@
                     data = { objId: row.objId, sysType: row.objExt };
                 } else {
                     data = {
-                        objId: row.cAppNo,
+                        objId: row.cInquiryNo,
                         sysType:
                             !!row["bsType"] && ("A" === row["bsType"] || "P" === row["bsType"])
                                 ? "U"
@@ -974,21 +1003,80 @@
             ) {
                 if (udrTypeValue.value == "1" || udrTypeValue.value == "2") {
                     freeEditRef.value?.setValue("inNextDpt", "1");
+                    freeEditRef.value?.setValue("inNextDpt", "1");
+                     setFormItem("orgCde", {
+                        loadData:  loadOrgCde.value
+                    });
+                    freeEditRef.value?.setValue(
+                        'orgCde',  loadOrgCde.value[0]['value'],
+                    );
                     freeEditRef.value?.setValue("tm2", [
                         moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
                             "YYYY-MM-DD 00:00:00"
                         ),
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
                     ]);
+                    freeEditRef.value?.setValue("tm1", [
+                        moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
+                            "YYYY-MM-DD 00:00:00"
+                        ),
+                         moment().endOf('day').format('YYYY-MM-DD HH:mm:ss')
+                        // moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+                        // moment(new Date()).endOf('day').toDate()
+                        // .format("HH:mm:ss"),
+                        // .format("YYYY-MM-DD 23:59:58"),
+                    ]);
                 }
+                
+                 if (udrTypeValue.value == "3") {
+                    freeEditRef.value?.setValue("CLoadSub", 1);
+                        freeEditRef.value?.setValue("tm1", [
+                        moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
+                            "YYYY-MM-DD 00:00:00"
+                        ),
+                        moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+                    ]);
+                }
+                 if (udrTypeValue.value == "4") {
+                    freeEditRef.value?.setValue("CLoadSub", 1);
+                        freeEditRef.value?.setValue("tm1", [
+                        moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
+                            "YYYY-MM-DD 00:00:00"
+                        ),
+                        moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+                    ]);
+                }
+
                 if (udrTypeValue.value == "5") {
                     freeEditRef.value?.setValue("CLoadSub", 1);
+                      setFormItem("orgCde", {
+                        loadData:  loadOrgCde.value
+                    });
+                    freeEditRef.value?.setValue(
+                        'orgCde',  loadOrgCde.value[0]['value'],
+                    );
+                        freeEditRef.value?.setValue("tm1", [
+                        moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
+                            "YYYY-MM-DD 00:00:00"
+                        ),
+                        moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+                    ]);
                 }
             }
         });
     };
 
     onMounted(async () => {
+        freeEditRef.value?.setFormValue({
+            udrType: "1",
+            inNextDpt: "1",
+            tm1: [
+                moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
+                    "YYYY-MM-DD 00:00:00"
+                ),
+                moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+            ],
+        });
         freeEditRef.value?.setFormValue({
             udrType: "1",
             inNextDpt: "1",
@@ -999,21 +1087,21 @@
                 moment(new Date()).format("YYYY-MM-DD 23:59:59"),
             ],
         });
-        setTimeout(() => {
-            setFormItem("orgCde", {
-                loadData: [
-                    {
-                        label: "永安保险公总司",
-                        value: "0200000000000",
-                    },
-                ],
-            });
+        // setTimeout(() => {
+        //     setFormItem("orgCde", {
+        //         loadData: [
+        //             {
+        //                 label: "永安保险公总司",
+        //                 value: "0200000000000",
+        //             },
+        //         ],
+        //     });
 
-            // 确保 loadData 设置完成后再设置表单值
-            freeEditRef.value?.setFormValue({
-                orgCde: "0200000000000",
-            });
-        }, 200);
+        //     // 确保 loadData 设置完成后再设置表单值
+        //     freeEditRef.value?.setFormValue({
+        //         orgCde: "0200000000000",
+        //     });
+        // }, 200);
         
         // 初始化表单
         allForm.value.map((item: any, index: number) => {
@@ -1039,6 +1127,11 @@
                 //核保退回任务
                 changeForm("4"); //展示form表单不同的栏位
             }
+            // 投保日期
+            freeEditRef.value.setValue("tm1", [
+                homeJumpData.startCrtTm,
+                homeJumpData.TAppTmEnd,
+            ]);
             // 提核日期
             freeEditRef.value.setValue("tm2", [
                 homeJumpData.startBsTm1,
@@ -1050,20 +1143,6 @@
             }
         }
         //首页跳转过来的逻辑 End
-
-        // handleQuery(true);
-        // 下面是测试数据
-        // pageresult.list = [
-        //   { CAppNo: 1, cAppStatus: 1, },
-        //   { CAppNo: 2, cAppStatus: 2, },
-        //   { CAppNo: 3, cAppStatus: 3, },
-        //   { CAppNo: 4, cAppStatus: 4 },
-        //   { CAppNo: 5, cAppStatus: 5, },
-        //   { CAppNo: 6, cAppStatus: 6, },
-        //   { CAppNo: 7, cAppStatus: 7, },
-        //   { CAppNo: 8, cAppStatus: 8, },
-        // ];
-        // pageresult.total = 1;
     });
 
     onUnmounted(() => {
@@ -1093,7 +1172,7 @@
 
     // 导出
     const exportDown = () => {
-        const CAppNo = freeEditRef.value?.getValue("CAppNo");
+        const CAppNo = freeEditRef.value?.getValue("cInquiryNo");
         const CPlyNo = freeEditRef.value?.getValue("CPlyNo");
         // 查询条件：投保单号，保单号任何一个有值时，都无需做其他查询条件校验
         if (!CAppNo && !CPlyNo) {
@@ -1171,6 +1250,7 @@
 
     /** 查询 */
     function refreshData(flag?: boolean) {
+        const date1 = freeEditRef.value?.getValue("tm1"); //询价日期
         const date2 = freeEditRef.value?.getValue("tm2"); //提核日期
         const objId = freeEditRef.value?.getValue("objId"); //申请单号
         const udrType = freeEditRef.value?.getValue("udrType"); //单据状态
@@ -1180,36 +1260,90 @@
             roleCde = roleCde === "" ? role : `${roleCde},${role}`;
         });
         // roleCde = "ROLE_00000152";
+        if (!objId) {
+            // 查询时间段验证
+            if (udrType == "3" || udrType == "4" || udrType == "5") {
+                // if (!date1) {
+                //   // loading.value = false;
+                //   ElMessage.warning('投保日期不能为空');
+                //   return;
+                // }
+                if ( date1 && 
+                    (new Date(date1[1]).getTime() - new Date(date1[0]).getTime() >=
+                    31 * 1000 * 60 * 60 * 24)
+                ) {
+                    // loading.value = false;
+                    ElMessage.warning("询价日期范围请控制在30天以内");
+                    return;
+                }
+            } else {
+                if (!date2) {
+                    ElMessage.warning("提核日期不能为空");
+                    return;
+                }
+                if (
+                    new Date(date2[1]).getTime() - new Date(date2[0]).getTime() >=
+                    31 * 1000 * 60 * 60 * 24
+                ) {
+                    ElMessage.warning("提核日期范围请控制在30天以内");
+                    return;
+                }
+            }
+        }
         const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
         const s = freeEditRef.value?.getFromValue(); //获取表单数据
-        const params = {
-            ...s,
-            ...r,
-            isInquiry: "1",
-            operId: user.value.opCde,
-            companyId: user.value.companyId,
-            roleCde: roleCde,
-            udrType: String(udrType - 1)
-        }
-        if(udrType && (udrType === "1" || udrType === "2")) {
-            if (!date2) {
-                ElMessage.warning("提核日期不能为空");
-                return;
-            }
-            if (
-                new Date(date2[1]).getTime() - new Date(date2[0]).getTime() >=
-                7 * 1000 * 60 * 60 * 24
-            ) {
-                ElMessage.warning("提核日期范围请控制在7天以内");
-                return;
-            }
-            if(date2 && date2.length > 0) {
+        let params = {};
+
+        if (udrType !== "5") {
+            params = {
+                companyId: user.value.companyId,
+                roleCde: roleCde,
+                operId: user.value.opCde,
+                inNextDpt: freeEditRef.value?.getValue("inNextDpt"),
+                ...s,
+                isInquiry: "1"
+            };
+            if ((udrType == "3" || udrType == "4") && date1) {
+                params.startBsTm1 = date1[0];
+                params.endBsTm1 = date1[1];
+            } else {
                 params.startCrtTm = date2[0];
                 params.TAppTmEnd = date2[1];
             }
+        } else {
+            params = Object.assign(
+                {
+                    sortField: "name",
+                    bsType: "A",
+                    CAppStatus: "4",
+                    // CUdrCde: this.user.opCde, // 已核保查询去掉人员限制
+                    sortOrder: null, // 存在问题_sortValue需要确认5个页面，每个tale具体哪些字段需要排序
+                    CurrentUser: user.value.opCde,
+                    CurrentUserOrg: user.value.companyId,
+                    TAppTmStart: date1[0],
+                    TAppTmEnd: date1[1],
+                    CLoadSub: freeEditRef.value?.getValue("CLoadSub"),
+                    isInquiry: "1"
+                },
+                s
+            );
+            params["findPlan"] = true;
         }
+        delete params.tm1;
         delete params.tm2;
-        const udrData = getInquiryNewUdrList(params);
+        const querys = Object.assign(params, r);
+        const requestParam = cloneDeep(querys);
+        requestParam.udrType = String(requestParam.udrType - 1);
+        let udrData;
+        if (udrType !== "5") {
+            if (udrType === "4") {
+                udrData = backInquiryUdrList(requestParam);
+            } else {
+                udrData = getInquiryNewUdrList(requestParam);
+            }
+        } else {
+            udrData = getInquiryPolicyList(requestParam);
+        }
 
         udrData
             .then((res: any) => {
@@ -1323,7 +1457,7 @@
                 if (row.bsType === "A") {
                     const en = JSON.stringify({
                         // scene: SCENE_PLY_UW_PROCESS,
-                        cAppNo: row.objId,
+                        cInquiryNo: row.objId,
                         taskId: row.curtTask,
                         cAppTyp: row.bsType,
                         cProdNo: row.prodNo,
@@ -1351,7 +1485,7 @@
                             r.data.cEdrRsnBundleCde === "BL"
                                 ? SCENE_PLY_UW_PROCESSBEARER
                                 : SCENE_PLY_UW_PROCESS,
-                        cAppNo: row.objId,
+                        cInquiryNo: row.objId,
                         taskId: row.curtTask,
                         cAppTyp: row.bsType,
                         cProdNo: row.prodNo,
@@ -1367,6 +1501,7 @@
                         cTermNo:row.cTermNo,
                         cTermNme:row.cTermNme,
                         cProdNmeCn: row.prodName,
+                        pageName: 'priceInquiry',
                     });
                     router.push({
                         path: "/pcis/my-page",
@@ -1546,7 +1681,7 @@
         if (cAppTyp === "P") {
             if (row.cProdNo === "000000") {
                 const param = {
-                    CPlanNo: row.cAppNo,
+                    CPlanNo: row.cInquiryNo,
                     CPlanMrk: row.cPlanMrk,
                     scene: SCENE_PLAN_READ,
                 };
@@ -1557,7 +1692,7 @@
                 });
             } else {
                 const en = JSON.stringify({
-                    CPlanNo: row.cAppNo,
+                    CPlanNo: row.cInquiryNo,
                     // 'Base.CProdNo': plan['PrdProdPlan.CProdNo'],
                     // 'Base.CGrpMrk': plan['PrdProdPlan.CGrpMrk'],
                     CPlanMrk: row.cPlanMrk,
@@ -1571,14 +1706,14 @@
                 });
             }
         } else {
-            getBaseInfoByInquiryNo({ inquiryNo: row.objId ? row.objId : row.cAppNo }).then((r: any) => {
+            getBaseInfoByInquiryNo({ inquiryNo: row.objId ? row.objId : row.cInquiryNo }).then((r: any) => {
                 if (r.code !== 200) {
                     ElMessage.error({ message: r.msg, duration: 6000 });
                 } else {
                     if (cAppTyp === "A") {
                         const en = JSON.stringify({
                             // scene: SCENE_PLY_UW_PROCESS,
-                            cAppNo: row.objId ? row.objId : row.cAppNo,
+                            cInquiryNo: row.objId ? row.objId : row.cInquiryNo,
                             taskId: row.curtTask,
                             cAppTyp: row.bsType? row.bsType: row.cAppTyp,
                             cProdNo: row.prodNo? row.prodNo: row.cProdNo,
@@ -1590,6 +1725,7 @@
                             cTermNme:row.cTermNme,
                             cTermNo:row.cTermNo,
                             cProdNmeCn: row.prodName,
+                            pageName: 'priceInquiry',
                         });
                         router.push({
                             path: "/pcis/my-page",
@@ -1599,7 +1735,7 @@
                         });
                     } else {
                         const en = JSON.stringify({
-                            cAppNo: row.objId ? row.objId : row.cAppNo,
+                            cInquiryNo: row.objId ? row.objId : row.cInquiryNo,
                             taskId: row.curtTask,
                             cAppTyp: row.bsType? row.bsType: row.cAppTyp,
                             cProdNo: row.prodNo? row.prodNo: row.cProdNo,
@@ -1613,6 +1749,7 @@
                             cTermNme:row.cTermNme,
                             cTermNo:row.cTermNo,
                             cProdNmeCn: row.prodName,
+                            pageName: 'priceInquiry',
                         });
                         router.push({
                             path: "/pcis/my-page",
@@ -1638,7 +1775,7 @@
         }
         const en = JSON.stringify({
             scene: scene,
-            cAppNo: row.objId,
+            cInquiryNo: row.objId,
             cProdNo: row.prodNo,
             cAppTyp: row.bsType,
             cJiMrk: row.cJiMrk,
@@ -1651,6 +1788,7 @@
             cTermNo:row.cTermNo,
             pageType: "PLY_UW_PROCESS_SCENE",
             cProdNmeCn: row.prodName,
+            pageName: 'priceInquiry',
         });
         router.push({
             path: "/pcis/my-page",
@@ -1667,7 +1805,7 @@
             cancelButtonText: "取消",
             type: "warning",
         }).then(function () {
-            const delResult = pcisQueryService.delTmpPolicy({ cAppNo: id });
+            const delResult = pcisQueryService.delTmpPolicy({ cInquiryNo: id });
             delResult.then((res: any) => {
                 if (null != res && null != res["code"]) {
                     if (res["code"] === 200) {

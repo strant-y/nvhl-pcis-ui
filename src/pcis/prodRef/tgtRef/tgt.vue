@@ -74,9 +74,6 @@ onMounted(async () => {
   );
 
   console.log('------------',props.pageSchema)
-  if(params.cProdNo === '045001'){
-    setFormItem("Tgt.cInsuranceMethod", {typeCode: 'InsuranceMethod045001',});
-  }
   
   for(let i = 0; formconfig11.fromSchema && i < formconfig11.fromSchema.length; i++){
     // 遍历groupList数组把函数赋值给fromSchema
@@ -91,6 +88,9 @@ onMounted(async () => {
     }
   }
   Object.assign(formconfig1, formconfig11);
+  if(params.cProdNo === '045001'){
+    setFormItem("Tgt.cInsuranceMethod", {typeCode: 'InsuranceMethod045001'});
+  }
   // 约定保期内服务次数正整数
   setFormItem("Tgt.nAgreeFrequency", {
     rules: [getRules("signlessInt", {})],
@@ -107,7 +107,8 @@ onMounted(async () => {
 const wagesInfoModel = () => {
   let cRegisteredLogo = opertaor.getDataAll()['tgt']['Tgt.cRegisteredLogo'];  // 记名投保标志 是 获取清单汇总   否可以自己修改添加
   let cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];
-  dzmodal.open(wagesInfo, { type: "edit", data: { cAppNo: cAppNo, cRegisteredLogo: cRegisteredLogo } }).then((res: any) => {
+  let cInquiryNo = opertaor.getDataAll()['plyBase']['Base.cInquiryNo'];
+  dzmodal.open(wagesInfo, { type: "edit", data: { cAppNo: cAppNo, cRegisteredLogo: cRegisteredLogo, cInquiryNo: cInquiryNo, pageName: route.params.param?.pageName } }).then((res: any) => {
     if (res.type === "ok") {
       // setFormItem('Tgt.nTotalSalary',
       setValue("Tgt.nTotalSalary", res.body)
@@ -502,7 +503,14 @@ const method = {
 
     let cRegisteredLogo = opertaor.getDataAll()['tgt']['Tgt.cRegisteredLogo'];  // 记名投保标志 是 获取清单汇总   否可以自己修改添加
     // let cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];   //投保单号
-    let cAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'] || opertaor.getDataAll()['plyBase']['Base.cAppNo'];   //投保单号
+    let cAppNo = "";
+    if(route.params.param?.pageName === "priceInquiry") {
+      cAppNo = opertaor.getDataAll()['plyBase']['Base.cInquiryNo']
+    } else if (opertaor.getDataAll()['applicant'] && opertaor.getDataAll()['applicant']['Applicant.cAppNo']) {
+      cAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo']
+    } else {
+      cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];
+    }
 
     if (cRegisteredLogo !== "1" && cRegisteredLogo !== "0") {
       ElMessage.error('请选择“记名投保标志”！')
@@ -516,7 +524,18 @@ const method = {
 
     // 获取总额方式  没有数据给进行提示
     if (cRegisteredLogo == 1) {
-      selectDist({ cComponentTable: "EmployeeDist", cAppNo: cAppNo }).then((res: any) => {
+      const param = {
+        cComponentTable: "EmployeeDist",
+      }
+      if(route.params.param?.pageName === "priceInquiry") {
+        param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+      } else {
+        param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+      }
+      if(route.params.param?.pageType && route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
+        param['voType'] = "ply"
+      }
+      selectDist(param).then((res: any) => {
         const { code, data, msg } = res;
         if (code == 200) {
           if (data['data'].length > 0) {
@@ -536,8 +555,13 @@ const method = {
     // let baseFlag = alldata['plyBase']["Base.cAppNo"];
 
  
-
-    checkAppBase({ cAppNo: cAppNo }).then((res: any) => {
+    const param = {};
+    if(route.params.param?.pageName === "priceInquiry") {
+      param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else {
+      param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+    }
+    checkAppBase(param).then((res: any) => {
       if (res.code === 200) {
         wagesInfoModel();
       } else {

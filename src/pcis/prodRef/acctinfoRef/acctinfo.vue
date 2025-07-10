@@ -333,6 +333,7 @@ defineExpose({
   setValue,
   getValue,
   getFormconfig,
+  setFormItem
 });
 </script>
 

@@ -370,7 +370,8 @@ function selectMainTerm(isselect = true) {
     });
   }
 
-  data3.value = selectNode;
+  // data3.value = selectNode;
+  flushSelectData();
 }
 
 function setAdditionNode() {
@@ -417,7 +418,8 @@ function setAdditionNode() {
         selectNode.push(seterm);
       }
     });
-    data3.value.push(...selectNode);
+    // data3.value.push(...selectNode);
+    flushSelectData();
   });
 }
 
@@ -510,7 +512,70 @@ function selectAdditionTerm() {
       selectNode.push(seterm);
     }
   });
-  data3.value.push(...selectNode);
+  // data3.value.push(...selectNode);
+  flushSelectData();
+}
+
+function flushSelectData() { 
+  let selectNode: any[] = [];
+
+  const tree = mainRef.value?.getCheckedNodes(false, true);
+  tree?.forEach((item: any) => {
+    // 获取选中的主条款信息
+    if (item.cTermNo) {
+      let seterm = Object.assign({}, item);
+      let childnode: any[] = [];
+
+      item.children?.forEach((child: any) => {
+        const issel = childnode?.filter(
+          (node: any) => node.cRiskNo === child.cRiskNo
+        );
+        if (issel != null && issel.length > 0) {
+          return;
+        }
+        const f = tree?.filter(
+          (child2: any) => child2.cRiskNo === child.cRiskNo
+        );
+        if (f !== null && f.length > 0) {
+          childnode.push(...f);
+        }
+      });
+      seterm.cRdrTyp = "0";
+      seterm.children = childnode;
+      selectNode.push(seterm);
+    }
+  });
+
+  const addtree = additionalRef.value?.getCheckedNodes(false, true);
+
+  addtree?.forEach((item: any) => {
+    // 获取选中的主条款信息
+    if (item.cTermNo) {
+      let seterm = Object.assign({}, item);
+      let childnode: any[] = [];
+      item.children?.forEach((child: any) => {
+        const issel = childnode?.filter(
+          (node: any) => node.cRiskNo === child.cRiskNo
+        );
+        if (issel != null && issel.length > 0) {
+          return;
+        }
+        const f = addtree?.filter(
+          (child2: any) => child2.cRiskNo === child.cRiskNo
+        );
+        if (f !== null && f.length > 0) {
+          childnode.push(...f);
+        }
+      });
+      seterm.cRdrTyp = "1";
+      seterm.children = childnode;
+      selectNode.push(seterm);
+    }
+  });
+
+  // selectNode.push(addtree);
+
+  data3.value = selectNode;
 }
 
 async function selectOne() {
