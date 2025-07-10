@@ -74,9 +74,6 @@ onMounted(async () => {
   );
 
   console.log('------------',props.pageSchema)
-  if(params.cProdNo === '045001'){
-    setFormItem("Tgt.cInsuranceMethod", {typeCode: 'InsuranceMethod045001',});
-  }
   
   for(let i = 0; formconfig11.fromSchema && i < formconfig11.fromSchema.length; i++){
     // 遍历groupList数组把函数赋值给fromSchema
@@ -91,6 +88,9 @@ onMounted(async () => {
     }
   }
   Object.assign(formconfig1, formconfig11);
+  if(params.cProdNo === '045001'){
+    setFormItem("Tgt.cInsuranceMethod", {typeCode: 'InsuranceMethod045001'});
+  }
   // 约定保期内服务次数正整数
   setFormItem("Tgt.nAgreeFrequency", {
     rules: [getRules("signlessInt", {})],

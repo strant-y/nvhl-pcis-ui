@@ -172,11 +172,11 @@
             ><span class="publicStyle">{{ tmDay }}</span
             >&nbsp;<span class="font-weight-500">天</span
             >&nbsp;|&nbsp;<span class="font-weight-500">保额：</span
-            ><span class="publicStyle">{{ nAmt }}</span
+            ><span class="publicStyle">{{ nAmt.toLocaleString() }}</span
             >&nbsp;<span class="font-weight-500">元</span>&nbsp;|&nbsp;<span
               class="font-weight-500"
               >保费为: </span
-            ><span class="publicStyle">{{ nPrm }}</span
+            ><span class="publicStyle">{{ nPrm.toLocaleString() }}</span
             >&nbsp;<span class="font-weight-500">元</span>
           </div>
         </div>
