@@ -73,7 +73,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         {
           prop: "cEquipmentCategory",
           inputtype: "rtselect",
-          rules: [getRules("required", {'message':'请选择特种设备门类'})],
+          // rules: [getRules("required", {'message':'请选择特种设备门类'})],
           title: "特种设备门类",
           clearable:true,
           typeCode: "Equipment_Type_Level_One",
@@ -100,11 +100,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           prop: "cClassGroup",
           inputtype: "rtselect",
           title: "特种设备大类",
-          rules: [getRules("required", {'message':'请选择特种设备大类'})],
+          // rules: [getRules("required", {'message':'请选择特种设备大类'})],
           loadData: [],
           clearable:true,
           func: (val) => {
-            setValue("cSubclassType", "");
+            // setValue("cSubclassType", "");
             if (val) {
               codeListStore
                   .queryCodeList({
@@ -115,30 +115,30 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     const objDate = {
                       loadData: res,
                     };
-                    setFormItem("cSubclassType", objDate);
+                    // setFormItem("cSubclassType", objDate);
                   });
             }
           },
         },
-        {
-          prop: "cSubclassType",
-          inputtype: "rtselect",
-          rules: [getRules("required", {'message':'请选择特种设备中类'})],
-          title: "特种设备中类",
-          loadData: [],
-          clearable:true
+        // {
+        //   prop: "cSubclassType",
+        //   inputtype: "rtselect",
+        //   // rules: [getRules("required", {'message':'请选择特种设备中类'})],
+        //   title: "特种设备中类",
+        //   loadData: [],
+        //   clearable:true
 
-        },
-        {
-          prop: "cUsageNumber",
-          inputtype: "rtinput",
-          title: "特种设备编码",
-        },
-        {
-          prop: "cSpecialEquipment",
-          inputtype: "rtinput",
-          title: "特种设备名称",
-        },
+        // },
+        // {
+        //   prop: "cUsageNumber",
+        //   inputtype: "rtinput",
+        //   title: "特种设备编码",
+        // },
+        // {
+        //   prop: "cSpecialEquipment",
+        //   inputtype: "rtinput",
+        //   title: "特种设备名称",
+        // },
       ],
       fromUi: createFromUiConfig({
         cols: 3,
@@ -231,7 +231,7 @@ function handleQuery(flag?: boolean) {
   const param = Object.assign(c, {
     codeListParam: s,
     r,
-    parCde: s.cMidCde,
+    parCde: s.setFormItem,
   });
   getPageList(param)
       .then((res) => {

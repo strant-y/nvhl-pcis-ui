@@ -434,6 +434,11 @@ const method = {
   },
   //全量导入
   importExcel() {
+    const cappNo  = opertaor.getDataAll().plyBase["Base.cAppNo"];
+    if (cappNo == '' || cappNo == undefined) {
+      ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
+      return;
+    }
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.xlsx, .xls, .xlsm'; // 支持的文件类型
@@ -461,7 +466,7 @@ const method = {
           } else {
             params['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
           }
-
+          
           policyService.importDist(params).then((res) => {
             if (res.code === 200) {
               ElMessage.success(`导入完成：${res.data.msg}`);
@@ -486,6 +491,11 @@ const method = {
   },
   // 增量导入
   importExcelIncrement: () => {
+    const cappNo  = opertaor.getDataAll().plyBase["Base.cAppNo"];
+    if (cappNo == '' || cappNo == undefined) {
+      ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
+      return;
+    }
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.xlsx, .xls, .xlsm'; // 支持的文件类型
