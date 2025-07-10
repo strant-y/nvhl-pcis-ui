@@ -66,7 +66,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           disabled: riskunitDisabled,
           func: () => {
             //  触发临分后不能改变风险等级，临分退回后可以改变。
-            dzmodal.open(RiskunitA, { type: "", param: {} }).then((res:any) => {
+            dzmodal.open(RiskunitA, { type: "", param: {insrnc: opertaor.getDataAll()["insrnc"]} }).then((res:any) => {
               if (res.type === "ok" && res.body) {
                 // cReadOnly 是否可编辑 0 否 1 是
                 if(res.body.cReadOnly === "1") {
