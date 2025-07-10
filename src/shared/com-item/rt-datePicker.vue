@@ -91,7 +91,11 @@ const vInputShow = computed(()=> {
   }
 });
 watch([() => props.modelValue], ([newModelValue]) => {
-  vInput.value = newModelValue;
+  if(typeof newModelValue === "number") {
+    vInput.value = moment(newModelValue).format(getValueFormat());
+  } else {
+    vInput.value = newModelValue;
+  }
 });
 function blur(v: any) {
   const value = v.target.value;

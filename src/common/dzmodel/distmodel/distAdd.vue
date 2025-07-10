@@ -1,6 +1,7 @@
 <template>
   <div>
     <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+    <comDialog ref="dialog"></comDialog>
   </div>
 </template>
 
@@ -26,10 +27,11 @@ import { codeListViewStore } from "@/store";
 import {getAddressStr} from "@/api/query";
 import {eventBus} from "@/utils/event-bus";
 import {calculateAgeFromIdCard} from "@/utils/common";
+import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
 const opertaor = dataOpertaor();
 const param = ref({});
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
-
+const dialog = ref<DialogMethod | null>(null);
 const { getRules } = useValidator();
 const tableRef = ref<MyTableMethod | null>(null);
 const codeListStore = codeListViewStore();
@@ -191,7 +193,9 @@ onMounted(() => {
       }
       item['rules'] = [getRules("idCard", {})];
     }
-
+    if(item.prop =='Dist.cEquipmentTypes'){
+      item['btnItems']['func'] =  cEquipmentTypesFunc;
+    }
         // 身份证类型自动回填年龄
     if(item.prop =='Dist.cDocumentType'){
       item['func'] =  cDocumentTypeChange;
@@ -213,6 +217,11 @@ onMounted(() => {
     }
 
 
+    if(item.prop =='Dist.PropertyLocationProp'){
+      item?.groupList.forEach(data => {
+        data.rules = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+      })
+    }
     // 040001产品 必填项问题
     if(item.prop =='Dist.cPlanNo' ||item.prop =='Dist.tOpeningTime' ||item.prop =='Dist.cLocationSigns' ||item.prop =='Dist.cFacilitySigns' ||item.prop =='Dist.cVenueSign' || item.prop =='Dist.cBuildingStructure'  ){
       console.log('进啊2=',item.prop)
@@ -281,7 +290,25 @@ const getDistoccupType = (val) => {
     item.itemConfig.loadData = res
   });
 }
-
+const cEquipmentTypesFunc = ()=>{
+  dialog.value?.open(
+      "specialCateModal",
+      {
+        type: "show",
+        method: {
+          getdbClickData: (data) => {
+            setFormItem("Dist.cEquipmentTypes", {
+              loadData: [{ label: data.cnm, value: data.cde }],
+            });
+            setValue("Dist.cEquipmentTypes", `${data.cde}${data.cnm}`);
+            dialog.value?.handleClose();
+          },
+        },
+      },
+      {},
+      {  width: 85 }
+  );
+}
 // 证件类型change
 const cDocumentTypeChange =(val:any)=>{
   console.log(val)
@@ -307,7 +334,7 @@ const cDocumentTypeChange =(val:any)=>{
 //给表单赋值
 function setFormItem(key: any, obj: any) {
   if (obj && Object.keys(obj).length) {
-    formconfig1.fromSchema?.forEach((item) => {
+    formconfig1.value.fromSchema?.forEach((item) => {
       if (item.prop === key) {
         //控制尾部按钮的
         if (item.btnItems && obj.btnItems) {

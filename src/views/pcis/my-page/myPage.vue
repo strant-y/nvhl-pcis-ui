@@ -172,11 +172,11 @@
             ><span class="publicStyle">{{ tmDay }}</span
             >&nbsp;<span class="font-weight-500">天</span
             >&nbsp;|&nbsp;<span class="font-weight-500">保额：</span
-            ><span class="publicStyle">{{ nAmt }}</span
+            ><span class="publicStyle">{{ nAmt.toLocaleString() }}</span
             >&nbsp;<span class="font-weight-500">元</span>&nbsp;|&nbsp;<span
               class="font-weight-500"
               >保费为: </span
-            ><span class="publicStyle">{{ nPrm }}</span
+            ><span class="publicStyle">{{ nPrm.toLocaleString() }}</span
             >&nbsp;<span class="font-weight-500">元</span>
           </div>
         </div>
@@ -1655,7 +1655,7 @@ async function loadAfter() {
   } else if (props.param?.pageType === "inquiryToApp") {
     getInquiryPolicy({ cInquiryNo: props.param?.cInquiryNo }).then((res:any) => {
       if (res["code"] == "200") {
-        const ops = opertaor.convertData(res);
+        const ops = clearCAppNo(opertaor.convertData(res));
         // 保险期限 投保日期更新为当前日期 保险起期和保险止期重置为第二天0点至一年后
         if(ops.insrnc) {
           const beginTm = dayjs().add(1, 'day').format("YYYY-MM-DD 00:00:00")
@@ -2540,7 +2540,7 @@ const savePlyInfo = async () => {
 
 
     saveFlag = true;
-    if((props.param?.pageType === "copy" || props.param?.pageType === "template") && saveDistBatchFlag.value) {
+    if((props.param?.pageType === "copy" || props.param?.pageType === "template" || props.param?.pageType === "inquiryToApp") && saveDistBatchFlag.value) {
       // 保存清单
       const appNo = plyBase["Base.cAppNo"];
       saveDist(appNo);
@@ -3004,7 +3004,7 @@ const submitUnderwritingFn = async () => {
   res["backUndrClsCde"] = parts[1]; // 退回指定核保级别编码
   res["backUndrDptCnm"] = parts[2]; // 退回指定核保人员名称
   if(props.param?.pageName === "priceInquiry") {
-    res["inquiryNo"] = props.param.cAppNo;
+    res["inquiryNo"] = props.param.cInquiryNo;
   }
   console.log(res);
   // if(res.cUndrMrk === "A" && props.param?.pageName !== "priceInquiry") {//核保选项为同意时，调用强制临分接口
@@ -3064,6 +3064,21 @@ const submitUnderwritingFn = async () => {
   //     return;
   //   }
   // }
+  // 如果退回给出单员，调用接口删除险位
+  if(res.cUndrMrk === "B" && props.param?.pageName !== "priceInquiry") {
+    const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
+    const param = {
+      cDocTyp: props.param?.cAppTyp,// 单证类型 A 保单 E 批单
+      cAppNo: props.param?.cAppNo,// 申请单号
+      cPlyNo: props.param?.plyNo,// 保单号
+      nEdrPrjNo: plyBase['Base.nEdrPrjNo'],// 批改序号
+    }
+    const delRisk = await policyService.delRisk(param);
+    if(delRisk && delRisk.code !== 200) {
+      ElMessage.error(delRisk.msg);
+      return;
+    }
+  }
   let submitUnder;
   // 询价单
   if (props.param?.pageName === "priceInquiry") {
@@ -3462,6 +3477,7 @@ function replacecInquiryNo(res:any) {
 }
 
 // 复制出单和模板出单清空原有的投保单号
+const clearKeyMap = ["cPkId","cAppNo","tUpdTm","cEdrNo","cLatestMrk","nEdrPrjNo","tCrtTm"]
 function clearCAppNo(res:any) {
   if(res instanceof Array) {
     res.forEach((item:any) => {
@@ -3475,8 +3491,8 @@ function clearCAppNo(res:any) {
         if(key.indexOf('.') !== -1) {
           const k0 = key.split('.')[0];
           const k1 = key.split('.')[1];
-          if(k1.indexOf('cAppNo') !== -1) {
-            res[`${k0}.cAppNo`] = null
+          if(clearKeyMap.indexOf(k1) !== -1) {
+            res[`${k0}.${k1}`] = null
           }
         } else {
           if(key === "cAppNo") {

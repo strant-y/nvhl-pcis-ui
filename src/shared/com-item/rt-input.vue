@@ -197,7 +197,7 @@ watch([() => props.modelValue], ([newModelValue]) => {
     if(props.item.precision && newModelValue){
       n = Number(newModelValue).toFixed(props.item.precision);
     }else{
-      n = newModelValue;
+      n = newModelValue + "";
     }
   }else{
     n = newModelValue;
@@ -209,7 +209,7 @@ watch([() => props.modelValue], ([newModelValue]) => {
 function handleChange(val?: string | undefined | null) {
   let nv = 0;
   if (props.item.type === "number") {
-    nv = val ? Number(val.replace(/[^\d.-]/g, '')) : 0;
+    nv = val ? Number(val.replace(/[^\d.-]/g, '')) : null;
     let Max = 99999999999;
     if(props.item.max || props.item.max === 0){
       Max = props.item.max;

@@ -2,7 +2,8 @@
 <template>
     <div class="app-container">
         <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
-        <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef" @page-change="handleQuery(false)" />
+        <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
+            @page-change="handleQuery(false)" />
         <comDialog ref="dialogRef"></comDialog>
     </div>
 </template>
@@ -80,11 +81,29 @@ const buttonList = [
     createFreeButtonBase({
         label: '重置',
         func: () => {
-            freeEditRef.value?.setFormValue({
+            const freeEditRefs = freeEditRef.value;
+            const s = freeEditRefs?.getFromValue(); //获取表单数据
+            for (const k in s) {
+                s[k] = null;
+            }
+            freeEditRefs?.setFormValue({
+                ...s,
                 CDptCde: user.value.companyId,
-                CLoadSub: 1
+                CLoadSub: '1',
+                CPlyTyp: 'PLY',
+                TIssueTm: [
+                    dayjs(new Date()).subtract(1, 'month').format('YYYY-MM-DD 00:00:00'),
+                    moment(new Date()).format('YYYY-MM-DD 23:59:59'),
+                ]
             })
-            handleQuery(true)
+            setFormItem('CDptCde', {
+                loadData: [
+                    {
+                        label: user.value.companyCnm,
+                        value: user.value.companyId
+                    }
+                ]
+            })
         }
     })
 ]
@@ -466,7 +485,7 @@ function handleQuery(flag?: boolean) {
                         pageresult.total = data.total
                     }
                 })
-                .finally(() => {})
+                .finally(() => { })
         }
     })
 }
@@ -609,7 +628,7 @@ function downloadEPolicy() {
     pcisQueryService
         .downloadEPolicy(data)
         .then((res: any) => {
-            if (res == '' || res == '500' || res.data.size <= 3 ) {
+            if (res == '' || res == '500' || res.data.size <= 3) {
                 ElMessage.error('下载出错，请核实是否有生成电子' + platTypeMap[plyTyp] + '！')
                 return
             }

@@ -85,31 +85,17 @@ const method = {
     }
     // 新增行前计算剩余比例
     const remaining = (1 - totalCiShare).toFixed(8);
-    
-    freeEditRef?.value?.addRow();
     const cChiefMrk = ['1', '3'].includes(cCiMrkFlag) ? '1' : '0';
-    if(val.length ==1){
-      // const newRowId = val[val.length - 1]?._dataId;
-      // freeEditRef?.value?.setValueByRowKey('Ci.cCoinsurerCde', val[val.length - 1]?._dataId, '327001');
-      val.forEach((key,index) => { 
-          key['Ci.nSeqNo']=index+1
-          key['Ci.nPlyFeeRate']= '0.00'
-          key['Ci.nPlyFee']= '0.00'
-          key['Ci.nComm']= '0.00'
-          // key['Ci.cIssueMrk']= '0'
-          key['Ci.cChiefMrk']= cChiefMrk
-          key['Ci.cCoinsurerCde']= '327001'
-          key['Ci.cSubDptCde']= param.dptCde
-          key['Ci.cDptCde']= param.cDptCde
-      });
-    }else{
-      val.forEach((key,index) => { 
-          key['Ci.nSeqNo']=index+1
-          key['Ci.nPlyFeeRate']= '0.00'
-          key['Ci.nPlyFee']= '0.00'
-      });
-    }
-    
+    freeEditRef?.value?.addRowByData({
+      'Ci.nSeqNo': val.length + 1,
+      'Ci.nPlyFeeRate': '0.00',
+      'Ci.nPlyFee': '0.00',
+      'Ci.nComm': '0.00',
+      'Ci.cChiefMrk': cChiefMrk,
+      // 'Ci.cCoinsurerCde': '327001',
+      // 'Ci.cSubDptCde': param.dptCde,
+      // 'Ci.cDptCde': param.cDptCde
+    });
     if(cCiMrkFlag == "2" || cCiMrkFlag == "4"){
       formconfig1.fromSchema?.forEach((item) => {
         if(item.prop == "Ci.nCiPrm"){
@@ -181,6 +167,7 @@ const method = {
       setFormItem("Ci.cSlsCde", { disabled: true});
       setFormItem("Ci.cSlsCde", { rules: []});
     }
+    updateMasterAgreementValues()
   },
 
   cCoinsurerCdeChange:(val)=>{
@@ -239,7 +226,7 @@ const method = {
       // 非永安保险，设置默认值和其他数据
       freeEditRef.value?.addCodeListMap(
           {code: "Ci.cSubDptCde"+rowId,
-          list: [{ value: '1', label: '其他' }]
+           list: [{ value: '1', label: '其他' }]
           }
       );
       freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "1");
@@ -421,10 +408,18 @@ const method = {
     const rowDatas = freeEditRef.value?.getSelectRow();
     const rowId = rowDatas?._dataId;
     // 校验输入是否合法
-    if (val > 1 || val <= 0) {
-      ElMessage.warning("联共保比例必须大于0且不能超过1");
-      freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, parseFloat('1').toFixed(8));
-      return;
+    const floatValue = parseFloat(val);
+    if (!isNaN(floatValue) && isFinite(floatValue)) {
+      // 判断是否是合法数字且不是 Infinity
+      if (floatValue < 0 || floatValue > 1) {
+        ElMessage.warning("联共保比例必须大于等于0且小于等于1");
+        return;
+      }
+      const limitedValue = floatValue.toFixed(8); // 最多保留8位小数
+      freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, limitedValue);
+    } else {
+      ElMessage.error("请输入合法的数字");
+      freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, "");
     }
     // 计算当前所有行的总和（排除当前行）
     const allRows = getFromValue();
@@ -619,7 +614,6 @@ const updateMasterAgreementValues = () => {
   let totalPrm = 0;
   // 遍历所有行，只处理 Ci.cCoinsurerCde === "327001" 的行
   const res = opertaor.getDataAll();
-  console.log("res",res)
   allRows.forEach(row => {
     if (row["Ci.cCoinsurerCde"] === "327001") {
       const share = parseFloat(row["Ci.nCiShare"]) || 0;
