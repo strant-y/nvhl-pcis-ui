@@ -11,7 +11,8 @@ import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
 import { useProductStore } from "@/store/modules/prod";
-import { fa } from "element-plus/es/locale";
+import { useValidator } from "@/typings/useValidator";
+const { getRules } = useValidator();
 const productStore = useProductStore();
 const props = defineProps({
   pageSchema: {
@@ -57,6 +58,7 @@ watchEffect(() => {
           item.hidden = false;
         })
       }
+    
 });
 
 const tgtobjEditRef = ref<AppFreeEditMethod | null>(null);
@@ -77,6 +79,19 @@ onMounted(() => {
 const method = {
   // func demo
   func1: () => {},
+  cJiAgtNoChange: (val) => {
+    const isPositiveInteger = /^\d+$/.test(val); // 是否为正整数（不含小数点、负号）
+    const isValidLength = val.length <= 20;      // 长度不超过20
+
+    if (!isPositiveInteger || !isValidLength) {
+      ElMessage.error("请输入不超过20位的正整数");
+      // 清空当前字段的值
+      tgtobjEditRef.value?.setValue("Base.cJiAgtNo", "");
+    }
+  },
+  cCiAgtNoChange: (val) => {
+    setFormItem("Applicant.cCiAgtNo", { rules: [getRules("signlessInt", {})] });
+  },
 };
 // 绑定特殊验证器
 const exRules = {};

@@ -237,7 +237,7 @@ if (
 // 解析身份证
 const idAnalysis = (id:string)=>{
       const applicantValue = formPage.getFormDataById("AgreementApplicant") //tabref["AgreementApplicant"].getFormValue();
-      if (  id.length !== 18 || applicantValue["ECargoApplicant.cCertfCls"] !=='120001') {
+      if (  id.length !== 18 || (applicantValue["ECargoApplicant.cCertfCls"] !=='120001' && applicantValue["ECargoApplicant.cCertfCls"] !=='19')) {
         return false
       }
           const birthYear = parseInt(id.substring(6, 10), 10);

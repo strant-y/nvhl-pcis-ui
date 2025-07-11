@@ -96,6 +96,7 @@ const method = {
       // 'Ci.cSubDptCde': param.dptCde,
       // 'Ci.cDptCde': param.cDptCde
     });
+
     if(cCiMrkFlag == "2" || cCiMrkFlag == "4"){
       formconfig1.fromSchema?.forEach((item) => {
         if(item.prop == "Ci.nCiPrm"){

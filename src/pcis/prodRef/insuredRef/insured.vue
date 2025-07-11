@@ -140,7 +140,7 @@ function setFormItem(key: any, obj: any) {
 const idAnalysis = (id:string)=>{
     const tabref = opertaor.getTableRefs();
     const insuredValue = tabref["insured"].getFromValue();
-      if ( !validateIdCard(id) || insuredValue["Insured.cCertfCls"] !=='120001') {
+      if ( !validateIdCard(id) || (insuredValue["Insured.cCertfCls"] !=='120001' && insuredValue["Insured.cCertfCls"] !=='19')) {
         return false
       }
  

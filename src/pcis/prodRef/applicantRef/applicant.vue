@@ -144,8 +144,8 @@ function setFormItem(key: any, obj: any) {
 const idAnalysis = (id:string)=>{
       const tabref = opertaor.getTableRefs();
       const applicantValue = tabref["applicant"].getFromValue();
- 
-      if ( !validateIdCard(id) || applicantValue["Applicant.cCertfCls"] !=='120001') {
+
+      if (  !validateIdCard(id)  || (applicantValue["Applicant.cCertfCls"] !=='120001' && applicantValue["Applicant.cCertfCls"] !=='19')) {
         return false
       }
           const birthYear = parseInt(id.substring(6, 10), 10);
