@@ -265,6 +265,19 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           { value: "2", label: "否" },
         ],
         clearable: true,
+        func: (val:any) => {
+          if(val === "1") {
+            setFormItem("cUndrMrk", {
+              loadData: [{value: 'B', label: '退回给出单员'}],
+            });
+            setValue("cUndrMrk", "B");
+          } else {
+            setFormItem("cUndrMrk", {
+              loadData: cUndrMrkOptions.value,
+            });
+            setValue("cUndrMrk", "");
+          }
+        }
       },
       {
         prop: "cUndrMrk",
