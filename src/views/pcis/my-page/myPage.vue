@@ -12,19 +12,6 @@
             >
               <el-anchor :bound="120" :offset="80">
                 <el-anchor-link
-                  v-if="underwriteFlag"
-                  @click="handleAnchorClick($event, `#underwriteurl`)"
-                  class="isActive"
-                >
-                  <!-- <rt-icon
-                    :item="{ icon: 'Tickets' }"
-                  /> -->
-                  <i :class="['icon','iconfont',iconMap['underwriteurl']]"></i>
-                  <span class="icon-title" v-if="NavigaShow"
-                    >核保处理</span
-                  >
-                </el-anchor-link>
-                <el-anchor-link
                   v-if="edrbaseFlag"
                   @click="handleAnchorClick($event, `#edrbase`)"
                   class="isActive"
@@ -66,7 +53,7 @@
                       : true
                   "
                   @click="handleAnchorClick($event, `#${k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey}`)"
-                  :class="!underwriteFlag && !edrbaseFlag && !edritemFlag && i === 0 ? 'isActive' : ''"
+                  :class="!edrbaseFlag && !edritemFlag && i === 0 ? 'isActive' : ''"
                 >
                   <!-- <rt-icon
                     :item="{
@@ -126,6 +113,22 @@
                     >我司联共保信息</span
                   >
                 </el-anchor-link>
+                <el-anchor-link
+                  v-if="underwriteFlag"
+                  @click="handleAnchorClick($event, `#underwriteurl`)"
+                  style="opacity: 1;font-weight: 500;"
+                >
+                  <!-- <rt-icon
+                    :item="{ icon: 'Tickets' }"
+                  /> -->
+                  <i :class="['icon','iconfont',iconMap['underwriteurl']]" style="color: var(--el-color-warning);"></i>
+                  <span
+                    class="icon-title"
+                    v-if="NavigaShow"
+                    style="color: var(--el-color-warning)"
+                  >核保处理</span
+                  >
+                </el-anchor-link>
               </el-anchor>
             </div>
             <!-- <div class="NavigaList_card" style="margin-left: 5px">
@@ -181,14 +184,6 @@
           </div>
         </div>
         <div class="main-content">
-          <div
-            id="underwriteurl"
-            v-if="underwriteFlag"
-            style="margin-bottom: 10px"
-          >
-            <underwriteRef ref="underwrite" :pageData="pageData"></underwriteRef>
-          </div>
-
           <div id="edrbase" v-if="edrbaseFlag" style="margin-bottom: 10px">
             <edrbaseRef ref="edrbase"></edrbaseRef>
           </div>
@@ -249,6 +244,13 @@
             style="margin-bottom: 10px"
           >
             <ourCompanyCiShareRef ref="ourCompanyCiShare"></ourCompanyCiShareRef>
+          </div>
+          <div
+            id="underwriteurl"
+            v-if="underwriteFlag"
+            style="margin-bottom: 10px"
+          >
+            <underwriteRef ref="underwrite" :pageData="pageData"></underwriteRef>
           </div>
           <el-backtop :target="'.el-main'" :right="100" :bottom="150" />
         </div>
@@ -3553,14 +3555,13 @@ function clearCAppNo(res:any) {
 
 .el-anchor {
   background: transparent;
-  width: 110px;
+  // width: 130px;
   :deep(.el-anchor__list) {
-    padding: 10px 5px;
+    padding: 20px 10px;
   } 
   .el-anchor__item {
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     padding-left: 0;
-    border-radius: 8px;
     opacity: .6;
     &.isActive,&:hover {
       opacity: 1;
@@ -3568,7 +3569,7 @@ function clearCAppNo(res:any) {
     }
     :deep(a) {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
       color: #FFFFFF;
       padding: 0;
@@ -3577,12 +3578,12 @@ function clearCAppNo(res:any) {
         margin: 0 0 10px 0;
       }
       .iconfont {
-        font-size: 1.5rem;
+        font-size: 1.2rem;
         color: #FFF;
-        margin: 5px 0;
+        margin-right: 5px;
       }
       .icon-title {
-        font-size: 12px;
+        font-size: 14px;
       }
     }
   }
