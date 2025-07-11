@@ -282,22 +282,23 @@ const iconMap = {
 :deep(.el-anchor) {
   background: transparent;
   .el-anchor__list {
-    padding: 10px 5px;
+    padding: 20px 10px;
     .el-anchor__item {
-      margin-bottom: 10px;
+      margin-bottom: 20px;
       .el-anchor__link {
-        font-size: 12px;
+        font-size: 14px;
         color: #FFF;
         text-align: center;
         padding: 0;
         opacity: 0.6;
-        &.is-active {
+        display: flex;
+        &.is-active,&:hover {
           opacity: 1;
         }
         .iconfont {
-          font-size: 1.5rem;
+          font-size: 1.2rem;
           color: #FFF;
-          margin: 5px 0;
+          margin-right: 5px;
         }
       }
     }

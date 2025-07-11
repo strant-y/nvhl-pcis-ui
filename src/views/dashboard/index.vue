@@ -180,6 +180,12 @@ const shortMenuDialog = defineAsyncComponent(() =>
   import("./components/shortMenuDialog.vue")
 );
 import {getShortcutDataList, updateShortRoute} from "@/api/menu";
+import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
+const { hasReceived, getBaseInfoByAppNo } = NewUdrListService();
+import {
+  SCENE_PLY_APP_MODIFY_BOUNCED
+} from '@/constants/tab-constants';
+import {deleteFactorBykey, exportRenewalInsurance, findRenewalInsurance, getBasicKindList, getPolicy} from "@/api/prod";
 
 
 defineOptions({
@@ -833,38 +839,140 @@ const toQuery = (url: string) => {
 };
 //table的row-click事件
 const toQuery2 = (data: any) => {
+  const row = {...data}
   console.log('toQuery2', data)
   if (isOperate.value) { //出单员
     if (currentTabName.value === '暂存任务') {
-      const param = Object.assign({
-        CurrentUser: user.opCde,
-        CurrentUserOrg: user.companyId,
-        CAppNo: data['cAppNo'],
-        TIssueTmStart: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-        TIssueTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+      // const param = Object.assign({
+      //   CurrentUser: user.opCde,
+      //   CurrentUserOrg: user.companyId,
+      //   CAppNo: data['cAppNo'],
+      //   TIssueTmStart: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
+      //   TIssueTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+      // });
+      // sessionStorage.setItem(AppKey.query.pcis_query_app, JSON.stringify(param));
+      // router.push({ path: '/query/application-querys' });
+      if(data['cEdrRsnBundleCde']){
+        row.cRsnCde = data['cEdrRsnBundleCde'];
+      }
+      router.push({
+        path: "/pcis/my-page",
+        query: {
+          param: JSON.stringify({
+            ...row,
+            ...{ pageType: "TEMPORARY_DEPOSIT" },
+          }),
+        },
       });
-      sessionStorage.setItem(AppKey.query.pcis_query_app, JSON.stringify(param));
-      router.push({ path: '/query/application-querys' });
     } else if (currentTabName.value === '待修改任务') {
-      const param = Object.assign({
-        CurrentUser: user.opCde,
-        CurrentUserOrg: user.companyId,
-        objId: data['cAppNo'],
-        startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-        endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+      // const param = Object.assign({
+      //   CurrentUser: user.opCde,
+      //   CurrentUserOrg: user.companyId,
+      //   objId: data['cAppNo'],
+      //   startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
+      //   endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+      // });
+      // sessionStorage.setItem(AppKey.query.pcis_query_returnudrlist, JSON.stringify(param));
+      // router.push({ path: '/query/application-querys' });
+      const { objId, curtTask, state, prodNo, bsType } = row;
+      const param = {
+        taskId: curtTask,
+        user: user,
+      };
+      hasReceived(param).then((result: any) => {
+        if (result.code !== 200) {
+          ElMessage.error({ message: result.msg, duration: 6000 });
+        } else {
+          if (result.msg === '成功') {
+            getBaseInfoByAppNo({ appNo: objId }).then((r:any) => {
+              if(r.code !== 200) {
+                ElMessage.error({ message: r.msg, duration: 6000 });
+              }else{
+                if(bsType === 'A') {
+                  const en = JSON.stringify({
+                    scene: SCENE_PLY_APP_MODIFY_BOUNCED,
+                    cAppNo: objId,
+                    cProdNo: prodNo,
+                    taskId: curtTask,
+                    cAppTyp: bsType,
+                    cCiMrk: r.data.cCiMrk,
+                    cGrpMrk: r.data.cGrpMrk,
+                    cDptCde: r.data.cDptCde,
+                    cDptCnm:row.uwDptName,
+                    isPlan: r.data.cCardPlanNo ? 'Y' : null,
+                    pageType:'PLY_APP_MODIFY_BOUNCED_SCENE'
+                  });
+                  router.push({
+                      path: "/pcis/my-page",
+                      query: {
+                          param: en,
+                      },
+                  });
+                }else{
+                  const en = JSON.stringify({
+                    // scene: SCENE_EDR_APP_MODIFY_BOUNCED,
+                    cAppNo: objId,
+                    cProdNo: prodNo,
+                    taskId: curtTask,
+                    cAppTyp: bsType,
+                    cCiMrk: r.data.cCiMrk,
+                    cRsnCde: r.data.cEdrRsnBundleCde,
+                    cEdrType: r.data.cEdrType,
+                    cGrpMrk: r.data.cGrpMrk,
+                    cDptCde: r.data.cDptCde,
+                    cDptCnm:row.uwDptName,
+                    isPlan: r.data.cCardPlanNo ? 'Y' : null,
+                    pageType:'EDR_APP_MODIFY_BOUNCED_SCENE'
+                  });
+                    router.push({
+                        path: "/pcis/my-page",
+                        query: {
+                            param: en,
+                        },
+                    });
+                }
+              }
+            })
+          } else {
+            ElMessage.warning({ message: result.msg, duration: 6000 });
+          }
+        }
+      }).catch((error: any) => {
+        console.log('出错了', error);
+        ElMessage.error({ message: '后台服务异常,请联系管理员', duration: 3000 });
       });
-      sessionStorage.setItem(AppKey.query.pcis_query_returnudrlist, JSON.stringify(param));
-      router.push({ path: '/query/application-querys' });
     } else if (currentTabName.value === '待续保') {
-      const param = Object.assign({
-        CurrentUser: user.opCde,
-        CurrentUserOrg: user.companyId,
-        objId: data['cAppNo'],
-        startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-        endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-      });
-      sessionStorage.setItem('renewPolicy', JSON.stringify(param));
-      router.push({ path: '/RenewalManagement/renewal-management' });
+      // const param = Object.assign({
+      //   CurrentUser: user.opCde,
+      //   CurrentUserOrg: user.companyId,
+      //   objId: data['cAppNo'],
+      //   startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
+      //   endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+      // });
+      // sessionStorage.setItem('renewPolicy', JSON.stringify(param));
+      // router.push({ path: '/RenewalManagement/renewal-management' });
+      getPolicy({cPlyNo:row.cPlyNo,queryTyp: "orig"})
+        .then((res:any) => {
+          const { code, res:data, msg } = res;
+          if (200 === code) {
+            router.push({
+              path: "/pcis/my-page",
+              query: {
+                param: JSON.stringify({ ...handleArray(data.composition.plyBase[0] ),...{cDptCnm:row.cDptCnm,cTermNme:row.cTermNme,cTermNo:row.cTermNo}, ...{ pageType: "orig" } }),
+              },
+            });
+            sessionStorage.setItem(
+                "toMyPageData",
+                JSON.stringify({
+                  ...JSON.parse(sessionStorage.getItem("toMyPageData")),
+                  ...{ pageType: "orig" },
+                })
+            );
+          } else {
+            ElMessage.error(msg);
+          }
+        })
+        .finally(() => {});
     }
   } else if (isAudit.value) { //核保员
     if (currentTabName.value === '暂存任务') {
@@ -977,6 +1085,19 @@ function getShortMenuList() {
       })
     }
   })
+}
+
+const handleArray = (obj:any)=>{
+  // 创建一个新的对象，并移除"Base."前缀
+  let newObj = {};
+  for (let key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      // 通过字符串操作去掉前缀
+      let newKey = key.replace('Base.', '');
+      newObj[newKey] = obj[key];
+    }
+  }
+  return newObj
 }
 
 // 窗口大小变化时重置图表
@@ -1283,5 +1404,10 @@ window.addEventListener('resize', () => {
   position: absolute;
   top: var(--el-card-padding);
   right: var(--el-card-padding);
+}
+
+:deep(.el-table__body .el-table__row td:nth-child(1)) {
+  color: var(--el-color-primary);
+  cursor: pointer;
 }
 </style>

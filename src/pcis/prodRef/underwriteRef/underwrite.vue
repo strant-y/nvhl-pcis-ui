@@ -149,7 +149,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         type: "textarea",
         title: "临分意见",
-        rows: 4,
+        rows: 3,
         itemWidth: 2,
       },
       {
@@ -157,7 +157,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         type: "textarea",
         title: "临分反馈意见",
-        rows: 4,
+        rows: 3,
         itemWidth: 2,
         disabled: true,
       },
@@ -166,7 +166,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         type: "textarea",
         title: "预约分保意见",
-        rows: 4,
+        rows: 3,
         itemWidth: 2,
         disabled: true,
       },
@@ -241,7 +241,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         type: "textarea",
         title: "核保意见",
-        rows: 4,
+        rows: 3,
         itemWidth: 2,
       },
       {
@@ -265,6 +265,19 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           { value: "2", label: "否" },
         ],
         clearable: true,
+        func: (val:any) => {
+          if(val === "1") {
+            setFormItem("cUndrMrk", {
+              loadData: [{value: 'B', label: '退回给出单员'}],
+            });
+            setValue("cUndrMrk", "B");
+          } else {
+            setFormItem("cUndrMrk", {
+              loadData: cUndrMrkOptions.value,
+            });
+            setValue("cUndrMrk", "");
+          }
+        }
       },
       {
         prop: "cUndrMrk",

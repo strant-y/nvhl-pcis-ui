@@ -199,19 +199,18 @@ function handleAnchorClick(event: any, targetId: string) {
 .el-anchor {
   background: transparent;
   :deep(.el-anchor__list) {
-    padding: 10px 5px;
+    padding: 20px 10px;
   }
   .el-anchor__item {
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     padding-left: 0;
-    border-radius: 8px;
     opacity: .6;
     &.isActive,&:hover {
       opacity: 1;
     }
     :deep(a) {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
       color: #FFFFFF;
       padding: 0;
@@ -220,12 +219,12 @@ function handleAnchorClick(event: any, targetId: string) {
         margin: 0 0 10px 0;
       }
       .iconfont {
-        font-size: 1.5rem;
+        font-size: 1.2rem;
         color: #FFF;
-        margin: 5px 0;
+        margin-right: 5px;
       }
       .icon-title {
-        font-size: 12px;
+        font-size: 14px;
       }
     }
   }

@@ -337,18 +337,18 @@ const tableconfig = reactive<AppTableConfig>(
                 title: "申请单号",
                 width: 180,
             },
-            {
-                prop: "cPlyNo",
-                inputtype: "rtinput",
-                title: "保单号",
-                width: 180,
-            },
-            {
-                prop: "cEdrNo",
-                inputtype: "rtinput",
-                title: "批单号",
-                width: 180,
-            },
+            // {
+            //     prop: "cPlyNo",
+            //     inputtype: "rtinput",
+            //     title: "保单号",
+            //     width: 180,
+            // },
+            // {
+            //     prop: "cEdrNo",
+            //     inputtype: "rtinput",
+            //     title: "批单号",
+            //     width: 180,
+            // },
             {
                 prop: "cAppNme",
                 inputtype: "rtinput",
@@ -384,13 +384,13 @@ const tableconfig = reactive<AppTableConfig>(
                     handleRsnChange(val, row);
                 },
             },
-            {
-                prop: "iddetail",
-                inputtype: "rtinput",
-                title: "批改原因详细",
-                disabled: true,
-                minWidth: 140,
-            },
+            // {
+            //     prop: "iddetail",
+            //     inputtype: "rtinput",
+            //     title: "批改原因详细",
+            //     disabled: true,
+            //     minWidth: 140,
+            // },
         ],
     })
 );
@@ -482,6 +482,9 @@ const refreshData = (reset = true) => {
                     pageresult.total = pageData.total;
                     pageData.result.forEach((item) => {
                         changeRsnValue(item);
+                        if(item.cPlyNo) {
+                            item.cAppNo = `${item.cAppNo || ''}\n${item.cPlyNo || ''}`
+                        }
                     });
                     pageresult.list = pageData.result;
                    

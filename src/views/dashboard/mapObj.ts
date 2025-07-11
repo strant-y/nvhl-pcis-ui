@@ -38,13 +38,13 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "操作员",
       },
-      {
-        prop: "cAppStatus",
-        title: "状态",
-        inputtype: "rtselect",
-        typeCode: "RECEIVE_BANK_CATEGORY",
-        codeParam: { cParCde: "shenqingdanzhuangtai" },
-      },
+      // {
+      //   prop: "cAppStatus",
+      //   title: "状态",
+      //   inputtype: "rtselect",
+      //   typeCode: "RECEIVE_BANK_CATEGORY",
+      //   codeParam: { cParCde: "shenqingdanzhuangtai" },
+      // },
     ],
   },
   // 出单--待修改任务
@@ -86,13 +86,13 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "操作员",
       },
-      {
-        prop: "cAppStatus",
-        title: "状态",
-        inputtype: "rtselect",
-        typeCode: "RECEIVE_BANK_CATEGORY",
-        codeParam: { cParCde: "shenqingdanzhuangtai" },
-      },
+      // {
+      //   prop: "cAppStatus",
+      //   title: "状态",
+      //   inputtype: "rtselect",
+      //   typeCode: "RECEIVE_BANK_CATEGORY",
+      //   codeParam: { cParCde: "shenqingdanzhuangtai" },
+      // },
     ],
   },
 
@@ -152,7 +152,7 @@ export const tableObj = {
       {
         prop: "prodName",
         inputtype: "rtinput",
-        title: "险种",
+        title: "条款",
       },
       {
         prop: "objId",
