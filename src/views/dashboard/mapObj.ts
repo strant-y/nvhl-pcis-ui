@@ -152,7 +152,7 @@ export const tableObj = {
       {
         prop: "prodName",
         inputtype: "rtinput",
-        title: "险种",
+        title: "条款",
       },
       {
         prop: "objId",
