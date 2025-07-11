@@ -275,7 +275,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         type: "textarea",
         title: "批改公式",
-        rows: 4,
+        rows: 1,
         itemWidth: 3,
       },
       {
@@ -283,7 +283,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         type: "textarea",
         title: "批文",
-        rows: 6,
+        rows: 4,
         itemWidth: 3,
         rules: [getRules("maxLength", {len:2000})],
       },
