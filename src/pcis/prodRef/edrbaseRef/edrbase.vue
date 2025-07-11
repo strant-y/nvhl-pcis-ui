@@ -210,7 +210,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "批单生效起期",
         func: (v:any) => {
           if(v){
-            debugger
+            // debugger
             console.log(v,params)
           }
         },
@@ -360,6 +360,7 @@ function setFormItem(key: any, obj: any) {
   }
 }
 onMounted(() => {
+  console.log('1111',params.cRsnCde)
   nextTick(() => {
     setFormItem("EdrBase.cDptCde", {
         loadData: [

@@ -409,9 +409,13 @@ const method = {
     }
   },
   getcShippingTypeChange:(val:string)=>{
-    if(val === '582006'){
+    if(val === '04'){
       setFormItem("Tgt.cRailwayMode", {
         rules: [getRules("required", {})],
+      });
+    }else{
+      setFormItem("Tgt.cRailwayMode", {
+        rules: [],
       });
     }
   },
@@ -847,10 +851,8 @@ const method = {
   },
     // 证件有效起期
   tStartDateDisable:(date:any)=>{
-    const fs = tgtEditRef?.value?.getFromValue();
-    if (JSON.stringify(fs) !== '{}') {
-    // if (JSON.stringify(fs) !== '{}') {
- 
+    const fs = tgtEditRef?.value?.getFromValue(); 
+    if (fs && JSON.stringify(fs) !== '{}') {
       const endDate = new Date(fs["Tgt.tEndDate"] || '')   // 结束时间 
       let minDate = dayjs(endDate).valueOf();
       return   date.getTime() > minDate
@@ -861,9 +863,8 @@ const method = {
   // 证件有效止期
   tEndDateDisable:(date:any)=>{
     const fs = tgtEditRef?.value?.getFromValue();
-    if (JSON.stringify(fs) !== '{}') {
+    if (  fs && JSON.stringify(fs) !== '{}') {
       const startDate = new Date(fs["Tgt.tStartDate"] || '')   // 开始时间   
-
       let maxDate = dayjs(startDate).valueOf();
         return   date.getTime() < maxDate
     }else{
