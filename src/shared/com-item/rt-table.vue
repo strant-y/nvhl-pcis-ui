@@ -227,7 +227,7 @@
       </template>
       <el-table-column
         :label="item.tableBtnTitle"
-        v-if="!isHidden(item)"
+        v-if="!isHidden(item) && item.tableBtnPosition !== 'left'"
         :width="item.tableBtnWidth ? item.tableBtnWidth : 100"
         :align="item.align ? item.align : 'center'"
         :fixed="
