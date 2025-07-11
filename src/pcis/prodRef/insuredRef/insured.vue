@@ -23,6 +23,7 @@ import { getAddressStr, qryCustomer } from "@/api/query";
 
 import { descryptParameter, encryptParameter } from "@/utils/encipher";
 import { useRouter, useRoute } from 'vue-router';
+import { validateIdCard } from "@/typings/method-public";
 const route = useRoute();
 const query = ref(route.query);
 const router = useRouter();
@@ -139,7 +140,7 @@ function setFormItem(key: any, obj: any) {
 const idAnalysis = (id:string)=>{
     const tabref = opertaor.getTableRefs();
     const insuredValue = tabref["insured"].getFromValue();
-      if (  id.length !== 18 || (insuredValue["Insured.cCertfCls"] !=='120001' && insuredValue["Insured.cCertfCls"] !=='19')) {
+      if ( !validateIdCard(id) || (insuredValue["Insured.cCertfCls"] !=='120001' && insuredValue["Insured.cCertfCls"] !=='19')) {
         return false
       }
  
