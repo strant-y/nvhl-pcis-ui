@@ -35,7 +35,7 @@ const dialog = ref<DialogMethod | null>(null);
 const { getRules } = useValidator();
 const tableRef = ref<MyTableMethod | null>(null);
 const codeListStore = codeListViewStore();
-
+const params = opertaor.getParam();
 const props = defineProps({
   data: {
     type: Object,
@@ -244,6 +244,9 @@ onMounted(() => {
           }
         }
       })
+    }
+    if(params.cEdrType === '1'){
+      item.disabled = false;
     }
     newSchema.push(item);
   }
