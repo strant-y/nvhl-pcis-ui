@@ -361,6 +361,10 @@ function setFormItem(key: any, obj: any) {
 }
 onMounted(() => {
   nextTick(() => {
+    // 非涉费批改批改公式文本框隐藏
+    if(params.cRsnCde === "FZ") {
+      setFormItem("EdrBase.edrFormula", { hidden: true })
+    }
     setFormItem("EdrBase.cDptCde", {
         loadData: [
             { value: params.cDptCde, label: `${params.cDptCde} ${params.cDptCnm}` },
