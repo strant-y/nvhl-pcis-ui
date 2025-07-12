@@ -145,11 +145,11 @@ const method = {
             );
           });
         // setFormItem("Ci.cDptCde", { rules: [getRules("required", {})] });
-        setFormItem("Ci.cDptCde", { disabled: false });
+        // setFormItem("Ci.cDptCde", { disabled: false });
         setFormItem("Ci.nComm", { disabled: false});
         setFormItem("Ci.cBrkrCde", { disabled: false});
         setFormItem("Ci.cBrkSlsCde", { disabled: false});
-        setFormItem("Ci.cSlsCde", { rules: [getRules("required", {})] });
+        // setFormItem("Ci.cSlsCde", { rules: [getRules("required", {})] });
         setFormItem("Ci.cSlsCde", { disabled: false});
       // updateMasterAgreementValues();
     } else {
@@ -161,7 +161,7 @@ const method = {
           [{ value: '1', label: '其他' }]
       );
       setFormItem("Ci.cDptCde", { rules: [] });
-      setFormItem("Ci.cDptCde", { disabled: true });
+      // setFormItem("Ci.cDptCde", { disabled: true });
       setFormItem("Ci.nComm", { disabled: true});
       setFormItem("Ci.cBrkrCde", { disabled: true});
       setFormItem("Ci.cBrkSlsCde", { disabled: true});
@@ -186,7 +186,10 @@ const method = {
       }
       freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "");
       if(plyBasedata["Base.cBsnsTyp"] === '19001'){
-        setFormItem("Ci.cDptCde", { rules: [getRules("required", {})] });
+        // setFormItem("Ci.cDptCde", { rules: [getRules("required", {})] });
+        freeEditRef.value?.setRowFieldProp(
+                rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
+        );
       }
     }
     if (val === "327001") {
@@ -211,7 +214,7 @@ const method = {
         setFormItem("Ci.nComm", { disabled: false});
         setFormItem("Ci.cBrkrCde", { disabled: false});
         setFormItem("Ci.cBrkSlsCde", { disabled: false});
-        setFormItem("Ci.cSlsCde", { rules: [getRules("required", {})] });
+        // setFormItem("Ci.cSlsCde", { rules: [getRules("required", {})] });
         setFormItem("Ci.cSlsCde", { disabled: false});
         if (plyBasedata["Base.cCiMrk"] === "3" || plyBasedata["Base.cCiMrk"] === "4") {
           const isYonganAlreadyPresent = formTableData.some(
@@ -232,7 +235,7 @@ const method = {
       );
       freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "1");
       setFormItem("Ci.cDptCde", { rules: [] });
-      setFormItem("Ci.cDptCde", { disabled: true });
+      // setFormItem("Ci.cDptCde", { disabled: true });
       setFormItem("Ci.nComm", { disabled: true});
       setFormItem("Ci.cBrkrCde", { disabled: true});
       setFormItem("Ci.cBrkSlsCde", { disabled: true});
