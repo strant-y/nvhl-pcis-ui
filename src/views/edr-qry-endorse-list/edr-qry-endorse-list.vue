@@ -332,7 +332,7 @@ const tableconfig = reactive<AppTableConfig>(
         ],
         fromSchema: [
             {
-                prop: "cAppNo",
+                prop: "cAppNoAndPlyNo",
                 inputtype: "rtinput",
                 title: "申请单号",
                 width: 180,
@@ -483,7 +483,9 @@ const refreshData = (reset = true) => {
                     pageData.result.forEach((item) => {
                         changeRsnValue(item);
                         if(item.cPlyNo) {
-                            item.cAppNo = `${item.cAppNo || ''}\n${item.cPlyNo || ''}`
+                            item.cAppNoAndPlyNo = `${item.cAppNo || ''}\n${item.cPlyNo || ''}`
+                        } else {
+                            item.cAppNoAndPlyNo = item.cAppNo || ''
                         }
                     });
                     pageresult.list = pageData.result;

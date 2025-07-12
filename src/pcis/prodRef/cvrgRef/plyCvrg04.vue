@@ -3,7 +3,7 @@
     <myCard :cardConfig="cardconfig">
       <div>
         <div v-for="(v, k) in planData" :key="k" class="planInfo">
-          <el-card>
+          <el-card class="planCard">
             <template #header>
               <el-row :gutter="16">
                 <el-col :span="4">
@@ -760,4 +760,7 @@ defineExpose({
    padding: 5px 10px !important;
  }
 
+:deep(.planCard > .el-card__header:first-child) {
+  background: #bfe0f5;
+}
 </style>
