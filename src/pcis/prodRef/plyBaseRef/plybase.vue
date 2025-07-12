@@ -127,6 +127,12 @@ onMounted(async () => {
         }
       }
     });
+    // 涉农标志除了169001、169002两个产品，其他产品都不可编辑
+    if(param.cProdNo !== '169001' && param.cProdNo !== '169002') {
+      setFormItem('Base.cAgriMrk',{
+        disabled:  true
+      })
+    }
   });
 });
 
