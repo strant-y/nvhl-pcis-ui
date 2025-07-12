@@ -3,7 +3,7 @@ import { post } from "@/utils/http";
 
 const DistBaseUrl: string = "/cargoDist";
 const PageBaseUrl: string = "/ecargo";
-
+const distBaseUrl:string = '/beauty-api'
 // 获取EAcrgo页面配置
 function getECargoPageView(queryParams: any): AxiosPromise<any> {
     return post(`/prod/getECargoPageView`, queryParams);
@@ -56,8 +56,17 @@ function editInit(queryParams: any): AxiosPromise<any> {
 function checkInit(queryParams: any): AxiosPromise<any> {
     return post(`${PageBaseUrl}/checkInit`, queryParams);
 }
-
+//协议l录入标的信息
+function saveDistNew(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/saveDist`, queryParams);
+}
+//协议录入标的信息查询
+function selectDistNew(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/selectDist`, queryParams);
+}
 export default {
+    selectDistNew,
+    saveDistNew,
     saveDist,
     selectDist,
     deleteDist,
@@ -67,7 +76,7 @@ export default {
     checkSubmit,
     checkInit,
     editInit,
-    // init,
+    init,
     queryEcargoList,
     getECargoPageView
 }
