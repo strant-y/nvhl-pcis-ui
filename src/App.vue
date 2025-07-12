@@ -94,4 +94,14 @@ watchEffect(() => {
 .el-message__content,.el-message__icon {
   font-size: 16px!important;
 }
+// 成功提示消息背景色和字体颜色
+.el-message--success {
+  background: var(--el-color-primary-light-9);
+  .el-message__content {
+    color: var(--el-color-primary);
+  }
+  .el-message-icon--success {
+    color: var(--el-color-primary);
+  }
+}
 </style>
