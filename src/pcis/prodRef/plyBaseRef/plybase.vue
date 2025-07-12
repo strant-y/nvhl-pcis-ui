@@ -615,6 +615,20 @@ const method = {
   // change
   cAgriMrkChange:(val:any)=>{
       console.log('111',val)
+  },
+  // 是否见费出单
+  cNeedfeeFlagChange:(val:any)=>{
+    // 选择是 隐藏不见费出单原因、特殊不见费出单
+    if(val === '1') {
+      setValue("Base.cCanclfeeFlg", 0)
+      nextTick(() => {
+        setFormItem("Base.cCanclfeersnCde", { hidden: true });
+        setFormItem("Base.cCanclfeeFlg", { hidden: true });
+      })
+    } else {
+      setFormItem("Base.cCanclfeersnCde", { hidden: false });
+      setFormItem("Base.cCanclfeeFlg", { hidden: false });
+    }
   }
 };
 
