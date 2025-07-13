@@ -3118,6 +3118,7 @@ const submitUnderwritingFn = async () => {
  * 投保申请核保时校验联共保信息
  */
 const validateCiInfo = () => {
+  const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue()['Base.cCiMrk']
   const ciData = opertaor.getTableRefByKey("ci").getFromValue()
   if (ciData.length > 0) {
       let NCiShare = 0;
@@ -3149,10 +3150,10 @@ const validateCiInfo = () => {
         ElMessage.error("主共保信息只允许增加一条!");
         return false;
       }
-      // if (CCoinsurerCdeNum <= 1) {
-      //   ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
-      //   return false;
-      // }
+      if (cCiMrk == "1" && CCoinsurerCdeNum <= 1) {
+        ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
+        return false;
+      }
     } else {
       ElMessage.error("请录入共保信息!");
       return false;
