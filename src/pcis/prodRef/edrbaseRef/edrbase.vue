@@ -118,6 +118,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable: true,
         defaultValue: "2",
         func: (v) => {},
+        hidden: params["cRsnCde"] === "c1" || params["cRsnCde"] === "s1"
       },
       {
         prop: "EdrBase.cDptCde",

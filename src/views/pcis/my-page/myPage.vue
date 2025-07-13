@@ -256,14 +256,14 @@
         </div>
         <div class="bottom-items">
           <!--新增的申请单号显示和复制按钮-->
-          <div style="margin-right: 20px; width: 100%; display: flex; justify-content: flex-end; align-items: center;" v-if="pageLoaded">
-            <div style="display: flex; align-items: center; background: #fff; padding: 6px 12px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap;">
+          <div style="margin-right: 5px; width: 100%; display: flex; justify-content: flex-end; align-items: center;" v-if="pageLoaded">
+            <div style="display: flex; align-items: center; background: #fff; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap;">
               {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "申请单号:" }}
-              <span id="policyNumber" style="margin-left: 5px; margin-right: 8px; font-weight: bold;">
+              <span id="policyNumber" style="margin-left: 5px; margin-right: 5px; font-weight: bold;">
               {{ props.param?.pageName === "priceInquiry" ? opertaor.getTableRefByKey('plyBase')?.getValue('Base.cInquiryNo') || '暂无' : opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || '暂无' }}
               </span>
               <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号'}`" placement="top">
-                <el-button @click="copyPolicyNumber" circle size="small" style="color: red;">
+                <el-button @click="copyPolicyNumber" circle size="small" style="color: red;margin-right: 0;">
                   <rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />
                 </el-button>
               </el-tooltip>
@@ -3518,7 +3518,12 @@ function clearCAppNo(res:any) {
   display: flex;
   justify-content: end;
   align-items: center;
-  padding-right: 20px;
+  // padding-right: 20px;
+  .el-button {
+    padding: 8px;
+    margin-right: 8px;
+    margin-left: 0;
+  }
 }
 .NavigaList_card {
   display: inline-block; /* 设置为行内块元素 */
