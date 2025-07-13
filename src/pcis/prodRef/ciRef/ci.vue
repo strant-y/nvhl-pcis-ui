@@ -154,11 +154,10 @@ const method = {
       // updateMasterAgreementValues();
     } else {
       // 非永安保险，设置默认值和其他数据
-      freeEditRef.value?.setRowFieldProp(
-          rowId,
-          "Ci.cSubDptCde",
-          "loadData",
-          [{ value: '1', label: '其他' }]
+      freeEditRef.value?.addCodeListMap(
+          {code: "Ci.cSubDptCde"+rowId,
+           list: [{ label: '其他',value: '1',  }]
+          }
       );
       setFormItem("Ci.cDptCde", { rules: [] });
       // setFormItem("Ci.cDptCde", { disabled: true });
@@ -230,7 +229,7 @@ const method = {
       // 非永安保险，设置默认值和其他数据
       freeEditRef.value?.addCodeListMap(
           {code: "Ci.cSubDptCde"+rowId,
-           list: [{ value: '1', label: '其他' }]
+           list: [{ label: '其他',value: '1',  }]
           }
       );
       freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "1");
@@ -258,12 +257,18 @@ const method = {
             codeListParam: { "CDptCde": value },
           })
           .then((res) => {
-            freeEditRef.value?.setRowFieldProp(
-                rowId,
-                "Ci.cDptCde",
-                "loadData",
-                res,
+            freeEditRef.value?.addCodeListMap(
+              {
+                code: "Ci.cDptCde"+rowId,
+                list: res
+              }
             );
+            // freeEditRef.value?.setRowFieldProp(
+            //     rowId,
+            //     "Ci.cDptCde",
+            //     "loadData",
+            //     res,
+            // );
           });
     }
   },
@@ -280,12 +285,18 @@ const method = {
         })
         .then((res) => {
           freeEditRef?.value?.setValueByRowKey("Ci.cDptCde", rowId, "");
-          freeEditRef.value?.setRowFieldProp(
-            rowId,
-            "Ci.cDptCde",
-            "loadData",
-            res,
-          );
+          // freeEditRef.value?.setRowFieldProp(
+          //   rowId,
+          //   "Ci.cDptCde",
+          //   "loadData",
+          //   res,
+          // );
+          freeEditRef.value?.addCodeListMap(
+             {
+                code: "Ci.cDptCde"+rowId,
+                list: res
+              }
+          )
         });
     }
     // 新增逻辑：判断当前选择的分公司是否在其他行中已经存在且共保公司为永安保险
