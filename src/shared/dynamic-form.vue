@@ -114,15 +114,9 @@
                     {{ item.title }}
                   <!-- </template> -->
                 </template>
-                <div :style="{width: ( item.propWidth ? item.propWidth : 100) + '%' }">
+                <div :style="{width: ( item.propWidth ? item.propWidth : 100) + '%', display: 'flex' }">
                   <div
-                    :style="{
-                      width:
-                        item.showExBtn && item.inputtype !== 'rttable' // 显示组件尾部按钮 table 组件不显示尾部按钮
-                          ? (item.btnWidth ? 100 - item.btnWidth : 85) + '%'
-                          : '100%',
-                      display: 'inline-block',
-                    }"
+                    :style="item.showExBtn && item.inputtype !== 'rttable' ? {flex: 1} : {width: '100%'}"
                   >
                     <from-item
                       ref="fromListRef"
@@ -138,7 +132,7 @@
                       v-if="item.inputtype !== 'rttable'"
                       :style="{
                         display: 'inline-block',
-                        width: (item.btnWidth ? item.btnWidth : 15) + '%',
+                        'min-width': item.btnWidth ? item.btnWidth + '%' : 'auto',
                       }"
                     >
                       <rt-button
@@ -268,15 +262,9 @@
                         {{ item.title }}
                       <!-- </template> -->
                     </template>
-                    <div :style="{width: ( item.propWidth ? item.propWidth : 100) + '%' }">
+                    <div :style="{width: ( item.propWidth ? item.propWidth : 100) + '%', display: 'flex' }">
                       <div
-                        :style="{
-                          width:
-                            item.showExBtn && item.inputtype !== 'rttable' // 显示组件尾部按钮 table 组件不显示尾部按钮
-                              ? (item.btnWidth ? 100 - item.btnWidth : 85) + '%'
-                              : '100%',
-                          display: 'inline-block',
-                        }"
+                        :style="item.showExBtn && item.inputtype !== 'rttable' ? {flex: 1} : {width: '100%'}"
                       >
                         <from-item
                           ref="fromListRef"
@@ -292,7 +280,7 @@
                           v-if="item.inputtype !== 'rttable'"
                           :style="{
                             display: 'inline-block',
-                            width: (item.btnWidth ? item.btnWidth : 15) + '%',
+                            'min-width': item.btnWidth ? item.btnWidth + '%' : 'auto',
                           }"
                         >
                           <rt-button
