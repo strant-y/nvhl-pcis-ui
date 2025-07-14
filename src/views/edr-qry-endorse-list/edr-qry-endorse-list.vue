@@ -98,6 +98,23 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 label: "重置",
                 func: () => {
                     freeEditRef.value?.resetFields();
+                    freeEditRef.value?.setFormValue({
+                        tAppTm: [
+                            moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
+                                "YYYY-MM-DD 00:00:00"
+                            ),
+                            moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+                        ],
+                        cDptCde: "0200000000000",
+                    });
+                    setFormItem("cDptCde", {
+                        loadData: [
+                            {
+                                label: "0200000000000永安保险公总司",
+                                value: "0200000000000",
+                            },
+                        ],
+                    });
                 },
             }),
         ],
