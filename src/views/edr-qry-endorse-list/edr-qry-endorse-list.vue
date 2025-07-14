@@ -817,21 +817,33 @@ function setTableFormItem(key, obj) {
 }
 
 const showDetails = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
-    if (null == selected.value["cPlyNo"] || "" === selected.value["cPlyNo"]) {
-        ElMessage.warning("请选择一条记录");
-        return;
-    }
-    if (!selected.value["cPlyNo"]) return;
+    // if (null == selected.value["cPlyNo"] || "" === selected.value["cPlyNo"]) {
+    //     ElMessage.warning("请选择一条记录");
+    //     return;
+    // }
+    // if (!selected.value["cPlyNo"]) return;
+    // const en = JSON.stringify({
+    //     // scene: SCENE_PLY_APP_READ,
+    //     cAppNo: selected.value["cAppNo"],
+    //     cOrgAppNo: cAppNo,
+    //     cCiMrk: selected.value["cCiMrk"],
+    //     cProdNo: selected.value["cProdNo"],
+    //     cAppTyp: selected.value["cAppTyp"],
+    //     cGrpMrk: selected.value["cGrpMrk"],
+    //     cDptCde: selected.value["cDptCde"],
+    //     cDptCnm: selected.value["cDptCnm"],
+    //     pageType: "readonly",
+    // });
     const en = JSON.stringify({
         // scene: SCENE_PLY_APP_READ,
-        cAppNo: selected.value["cAppNo"],
+        cAppNo,
         cOrgAppNo: cAppNo,
-        cCiMrk: selected.value["cCiMrk"],
-        cProdNo: selected.value["cProdNo"],
-        cAppTyp: selected.value["cAppTyp"],
-        cGrpMrk: selected.value["cGrpMrk"],
-        cDptCde: selected.value["cDptCde"],
-        cDptCnm: selected.value["cDptCnm"],
+        cCiMrk: data.cCiMrk,
+        cProdNo,
+        cAppTyp: data.cAppTyp,
+        cGrpMrk: data.cGrpMrk,
+        cDptCde: data.cDptCde,
+        cDptCnm: data.cDptCnm,
         pageType: "readonly",
     });
     router.push({
