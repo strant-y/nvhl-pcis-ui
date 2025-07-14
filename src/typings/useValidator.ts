@@ -551,6 +551,57 @@ const txnApprovalNo = () => {
     }
   };
 
+  /**
+ * 地址校验
+ * 1. 长度5-200个字符
+ * 2. 包含中文
+ * 3. 不包含特殊符号
+ */
+const valiAddress = (options = {}) => {
+  const { 
+    required = true,           // 是否必填
+    minLength = 5,           // 最小长度
+    maxLength = 200,         // 最大长度
+    enhanced = false,        // 是否使用增强校验
+    message = '请输入有效的地址信息' // 默认错误提示
+  } = options;
+  // 基础地址格式正则
+  const basicPattern = /^(.*[省市县])(.*[路街乡镇村组号].*)$/;
+  
+  // 增强版地址格式正则（包含省市区街道等层级）
+  const enhancedPattern = /^(.*省|.*自治区|.*市)(.*市|.*自治州|.*地区|.*盟)?(.*区|.*县|.*市|.*旗)?(.*街道|.*镇|.*乡)?(.*村|.*路|.*街|.*巷|.*号).*$/;
+  return {
+    validator: (rule, value, callback) => {
+     if (value === null || value === '' || value ===undefined) {
+          callback();
+          return;
+        }
+      const trimmedValue = value.trim();
+      
+      // 长度校验
+      if (trimmedValue.length < minLength) {
+        return callback(new Error(`地址长度不能少于${minLength}个字符`));
+      }
+      
+      if (trimmedValue.length > maxLength) {
+        return callback(new Error(`地址长度不能超过${maxLength}个字符`));
+      }
+      
+      // 格式校验
+      const isValid = enhanced 
+        ? enhancedPattern.test(trimmedValue) 
+        : basicPattern.test(trimmedValue);
+      
+      if (!isValid) {
+        return callback(new Error(message));
+      }
+      
+      // 校验通过
+      callback();
+    },
+    trigger: 'blur'
+  };
+};
 
 
   const getRules = (type: any, param: any) => {
@@ -631,6 +682,9 @@ const txnApprovalNo = () => {
     }
     if(type == 'isNull') {
       return isNull()
+    }
+    if(type == 'valiAddress') {
+      return valiAddress()
     }
 
   };

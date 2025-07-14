@@ -30,7 +30,6 @@ export interface AppTableConfig {
   showEdit?: boolean; //是否显示查询表单
   formconfig?: AppGridEditConfig | null;  //表单配置
   maxHeight?: string;
-
   rowDbClickFun?: (rowData) => void;
 }
 

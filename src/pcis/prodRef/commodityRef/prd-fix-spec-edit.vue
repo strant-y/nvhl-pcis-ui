@@ -56,7 +56,7 @@ const rowData = ref(props.data);
  */
 console.log("rowData", rowData);
 onMounted(() => {
-  console.log("cNmeCnArray", cNmeCnArray.value);
+  // console.log("cNmeCnArray", cNmeCnArray.value);
 
     if(rowData.value.editList){
       // inputValues.value  = setEditList(inputValues.value,rowData.value.editList)
@@ -65,11 +65,13 @@ onMounted(() => {
 });
 
 // 使用正则表达式分割字符串，保留分隔符 ** 作为单独的数组项
-const cNmeCnArray = computed(() => rowData.value.cSpecialContent.split(/(\*+)/));
+
+const cNmeCnArray = computed(() => rowData.value.cSpecialContent?.split(/(\*+)/) );
+// console.log(1212,cNmeCnArray)
 // const inputValues = ref<string[]>([]);
 const inputValues = ref( //item.match(/^\*+$/)
   // cNmeCnArray.value.map((item) => (item === "*" ? "*" : item))
-   cNmeCnArray.value.map((item) => (/^\*+$/.test(item)? "" : item))
+   cNmeCnArray.value?.map((item) => (/^\*+$/.test(item)? "" : item))
 );
 
 const updateCNmeCn = (index: number, value: string) => {
@@ -82,7 +84,7 @@ const handleSave = () => {
   dialogVisible.value = false;
   rowData.value.editList = newListValue(cNmeCnArray.value,inputValues.value)
   // rowData.value.cSpecialContent =inputValues.value.join("");
-  rowData.value.cDeductibleContent = joinWithAsterisks(inputValues.value) 
+  rowData.value.cSpecialContent = joinWithAsterisks(inputValues.value) 
   // const parts = cNmeCnArray.value.map((item, idx) =>
   //   item.match(/^\*+$/) ? inputValues.value[idx] : item
   // );

@@ -118,9 +118,9 @@ onMounted(() => {
     setFormItem("Applicant.cGcidCode", {rules: [getRules("leiCode", {})]});
     // 关联交易审批单编号
     setFormItem("Applicant.cRelateNo", {rules: [getRules("txnApprovalNo", {})]});
-   
-
-  });
+    // 经常居住地校验
+    setFormItem("Applicant.cHabitualResidence", {rules: [getRules("valiAddress", {})]});
+   });
 });
 //给表单下拉项赋值
 function setFormItem(key: any, obj: any) {
