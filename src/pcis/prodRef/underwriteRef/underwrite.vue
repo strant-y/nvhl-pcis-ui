@@ -471,7 +471,7 @@ onMounted(() => {
       cPlanNo: params.cPlanNo,
     };
     if(params.pageName === "priceInquiry") {
-      param.cInquiryNo = params.cAppNo
+      param.cInquiryNo = params.cInquiryNo
     } else {
       param.cAppNo = params.cAppNo
     }
