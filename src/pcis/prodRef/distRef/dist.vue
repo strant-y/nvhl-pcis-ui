@@ -95,6 +95,10 @@ onMounted(async () => {
       method,
       exRules
   );
+  // 如果团个单标识为团单则展示关联被保险人，否则隐藏
+  if(route.params.param?.cGrpMrk !== '1') {
+    formconfig11.value.fromSchema = formconfig11.value.fromSchema.filter((item:any) => item.prop !== 'Dist.cRelatedInsured')
+  }
   if(params.cProdNo === '040003'){
     formconfig11.value.fromSchema?.forEach(item=>{
       if(item['prop'] ==='Dist.cProductType'){
@@ -202,7 +206,10 @@ const method = {
   },
 
   editmethod: (row: any) => {
-    dialog.value?.open(
+    if(route.params.param?.pageType === "E"){
+      ElMessage.error("请先保存申请单!");
+    }else{
+      dialog.value?.open(
         "distAdd",
         {
           fromSchema: tableconfig.value.fromSchema,
@@ -220,6 +227,8 @@ const method = {
         },
         { width: "60" }
     );
+    }
+    
   },
   delmethod: (row: any) => {
     const param = {
@@ -379,7 +388,7 @@ const method = {
       param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
     }
     checkAppBase(param).then((res) => {
-      if (res.code === 200) {
+      if (res.code === 200 || route.params.param?.pageType === "E") {
         dialog.value?.open(
             "distAdd",
             {
@@ -435,7 +444,7 @@ const method = {
   //全量导入
   importExcel() {
     const cappNo  = opertaor.getDataAll().plyBase["Base.cAppNo"];
-    if (cappNo == '' || cappNo == undefined) {
+    if (cappNo == '' || cappNo == undefined || route.params.param?.pageType === "E") {
       ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
       return;
     }
@@ -492,7 +501,7 @@ const method = {
   // 增量导入
   importExcelIncrement: () => {
     const cappNo  = opertaor.getDataAll().plyBase["Base.cAppNo"];
-    if (cappNo == '' || cappNo == undefined) {
+    if (cappNo == '' || cappNo == undefined ||route.params.param?.pageType === "E") {
       ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
       return;
     }

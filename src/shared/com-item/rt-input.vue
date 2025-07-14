@@ -1,7 +1,7 @@
 <template>
   <template v-if="!showLabel">
     <el-tooltip
-      :content="vInput"
+      :content="vInput + ''"
       :disabled="vInput ? false : true"
       placement="top"
     >
@@ -216,7 +216,7 @@ function handleChange(val?: string | undefined | null) {
     }
     if(nv > Max){
       nv = Max;
-      vInput.value = nv;
+      vInput.value = nv + "";
     }
     let Min = 0;
     if(props.item.min || props.item.min === 0){
@@ -224,7 +224,7 @@ function handleChange(val?: string | undefined | null) {
     }
     if(nv < Min){
       nv = Min;
-      vInput.value = nv;
+      vInput.value = nv + "";
     }
     emits("valueChange", nv);
     emits("update:modelValue", nv);
@@ -236,7 +236,12 @@ function handleChange(val?: string | undefined | null) {
 }
 
 onMounted(() => {
-  vInput.value = props.modelValue;
+  if (props.item.type === "number") {
+      vInput.value = props.modelValue + "";
+    }else{
+      vInput.value = props.modelValue;
+    }
+  
 });
 
 const renderIcon = (iconName: string) => {

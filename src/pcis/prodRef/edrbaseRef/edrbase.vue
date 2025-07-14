@@ -118,6 +118,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable: true,
         defaultValue: "2",
         func: (v) => {},
+        hidden: params["cRsnCde"] === "c1" || params["cRsnCde"] === "s1"
       },
       {
         prop: "EdrBase.cDptCde",
@@ -275,7 +276,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         type: "textarea",
         title: "批改公式",
-        rows: 4,
+        rows: 1,
         itemWidth: 3,
       },
       {
@@ -283,7 +284,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         type: "textarea",
         title: "批文",
-        rows: 6,
+        rows: 4,
         itemWidth: 3,
         rules: [getRules("maxLength", {len:2000})],
       },
@@ -362,6 +363,10 @@ function setFormItem(key: any, obj: any) {
 onMounted(() => {
   console.log('1111',params.cRsnCde)
   nextTick(() => {
+    // 非涉费批改批改公式文本框隐藏
+    if(params.cRsnCde === "FZ") {
+      setFormItem("EdrBase.edrFormula", { hidden: true })
+    }
     setFormItem("EdrBase.cDptCde", {
         loadData: [
             { value: params.cDptCde, label: `${params.cDptCde} ${params.cDptCnm}` },
