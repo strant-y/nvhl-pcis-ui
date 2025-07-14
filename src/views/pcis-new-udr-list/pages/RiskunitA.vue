@@ -391,6 +391,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
         clearable: true,
         disabled: true,
+        max: 999999999999999
       },
       {
         prop: "nMaxRetAmt",
