@@ -117,8 +117,9 @@ onMounted(() => {
   
   // 组织机构代码
   setFormItem("Insured.cOrganizationCode", {rules: [getRules("socialCode", {})]});
-
-});
+  // 经常居住地校验
+  setFormItem("Insured.cHabitualResidence", {rules: [getRules("valiAddress", {})]});
+});             
 function setFormItem(key: any, obj: any) {
   if (obj && Object.keys(obj).length) {
     formconfig1.fromSchema?.forEach((item) => {

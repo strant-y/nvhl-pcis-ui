@@ -301,6 +301,7 @@ const tableconfig = reactive<AppTableConfig>(
                 size: "large",
                 icon: "Edit",
                 tableClick: (row) => {
+                    console.log(1212,row)
                     // if ("DP" === row.id) {
                     //     ciCoopCorrect(row)
                     // }else{

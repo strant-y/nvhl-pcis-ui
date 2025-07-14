@@ -160,6 +160,8 @@ function add() {
     cIfEdit: "1", //是否可修改
     cIfFix: "2", //是否固定特约，查寻特约模板接口查出来的1，自定义添加的为0
   });
+
+  console.log('12',addTableData)
 }
 
 //点击确定按钮时把选中的数据派发给父组件
@@ -170,6 +172,7 @@ const returnData = () => {
       tempData.push(item);
     }
   }
+  console.log('测试护具',tempData)
   props.method.getSelected(tempData);
   close();
 };

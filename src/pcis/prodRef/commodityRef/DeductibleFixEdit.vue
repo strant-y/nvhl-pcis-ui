@@ -58,12 +58,13 @@ onMounted(() => {
       inputValues.value  = setEditList( cNmeCnArray.value,rowData.value.editList)
       // inputValues.value  = setEditList(inputValues.value,rowData.value.editList)
   }
-
+  
 });
 
-// 使用正则表达式分割字符串，保留分隔符 ** 作为单独的数组项
+// 使用正则表达式分割字符串，保留分隔符 ** 作为单独的数组项  
+console.log('dada',rowData)
   const cNmeCnArray = computed(() => rowData.value.cDeductibleContent.split(/(\*+)/));
-  const inputValues = ref(
+  const inputValues = ref( 
       cNmeCnArray.value.map((item) => (/^\*+$/.test(item)? "" : item))
   );
 
@@ -80,6 +81,7 @@ const handleSave = () => {
 
   rowData.value.editList = newListValue(cNmeCnArray.value,inputValues.value)
   rowData.value.cDeductibleContent = joinWithAsterisks(inputValues.value)  
+  // rowData.value.cDeductibleCode = inputValues.value.cDeductibleClass || inputValues.value.cDeductibleCode
   // if(rowData.value['cIfMust'] !== "9") {
   //   const parts = cNmeCnArray.value.map((item, idx) =>
   //       item === "**" ? inputValues.value[idx] : item

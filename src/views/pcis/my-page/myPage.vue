@@ -460,7 +460,6 @@ let detailcodeArray = [
   "渠道信息变更",
   "增减方案",
   "变更投保数量",
-  "增加保费",
   "变更每亩保费",
   "减少保费",
   "费率调整",
@@ -483,12 +482,50 @@ let detailcodeArray = [
   "当期退",
   "分期失效",
 ];
+const detailcodeList = [
+  { id: "01", name: "变更投保数量" },
+  { id: "05", name: "保费调整" },
+  { id: "06", name: "赔款后保额恢复" },
+  { id: "07", name: "增加保额" },
+  { id: "08", name: "减少保额" },
+  { id: "09", name: "增加险别" },
+  { id: "10", name: "变更清单信息" },
+  { id: "11", name: "减少险别" },
+  { id: "12", name: "变更保险期限" },
+  { id: "13", name: "更改客户信息" },
+  { id: "17", name: "赔款后保额冲减" },
+  { id: "20", name: "变更车辆信息" },
+  { id: "26", name: "减少保费" },
+  { id: "45", name: "费率调整" },
+  { id: "46", name: "报停展期" },
+  { id: "59", name: "增加销售额" },
+  { id: "60", name: "减少销售额" },
+  { id: "61", name: "增加保费" },
+  { id: "ZQ", name: "增加清单信息" },
+  { id: "c1", name: "全单注销" },
+  { id: "s1", name: "全单退保" },
+  { id: "s2", name: "一般退保" },
+  { id: "JQ", name: "减少清单信息" },
+  { id: "25", name: "货物明细表批改" },
+  { id: "25", name: "增加保费" },
+  { id: "27", name: "变更赔偿限额" },
+];
+
+
+
 // 用来处理 账户信息 哪些场景显示
+// const isDetailCde = () => {
+//   return detailcodeArray.includes(props.param.cRsnDetailCde);
+// };
 const isDetailCde = () => {
-  return detailcodeArray.includes(props.param.cRsnDetailCde);
+  let cRsnCde = props.param['cRsnCde']? props.param['cRsnCde']: props.param['cEdrRsnBundleCde'];  // 判断 批改的用批改ID   综合查询的用cEdrRsnBundleCde
+  // 使用 some 方法检查数组中是否存在匹配的 id
+  return detailcodeList.some(item => item.id === cRsnCde);
 };
 
+
 onMounted(() => {
+  console.log('param 路由---', props.param )
   initPage();
 });
 // watchEffect(() => {
@@ -1013,6 +1050,12 @@ const initPage = async () => {
       (item) => item.pageTtile !== "账户信息"
     );
   }
+//   let isDetailcdeType = isDetailCde();
+// if (!isDetailcdeType) {
+//   formconfig11[0].pageInfo = formconfig11[0].pageInfo.filter(
+//     (item) => item.pageTtile !== "账户信息"
+//   );
+// }
 
   console.log("页面初始化返回数据", formconfig11);
   if (props.param?.cAppTyp == "E") {
@@ -2631,9 +2674,30 @@ const getPlyPolicyFun = () => {
  *批改单保费计算
  ***/
 const calcPremiumEdr = () => {
+    const res = opertaor.getDataAll();
+  console.log('保费计算',props.param)
+  console.log('保费计算2',res)
+  
+ 
+  // 条款
+  const totalNum =  res['cvrg'].reduce((sum, item) => sum + (item['Term.nInsuranceAmount'] || 0), 0);
+
+  console.log('1212 ',props.param,res['base']['Base.nAmt'] ,totalNum)
+  //  08 减少  
+  if(props.param?.cRsnCde === '08'  && totalNum > res['base']['Base.nAmt'] ){
+    ElMessage.warning("批改原因为“减少保额”，累计赔偿限额不能大于原有“保额”！");
+    // 增加保额，
+    return false;
+  }
+  //  07增加 
+  if(props.param?.cRsnCde === '07'  && totalNum < res['base']['Base.nAmt'] ){
+       ElMessage.warning("批改原因为“增加保额”，累计赔偿限额不能小于原有“保额”！");
+    return false;
+  }
+ 
   const btn = getBtn("btnCalEdr");
   btn.loading = true;
-  const res = opertaor.getDataAll();
+  // const res = opertaor.getDataAll();
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
@@ -2645,6 +2709,9 @@ const calcPremiumEdr = () => {
     res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
       res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   }
+
+  
+
   console.log(res);
   calcEdr(res).then((res) => {
     btn.loading = false;

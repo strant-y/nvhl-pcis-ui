@@ -66,10 +66,26 @@ onMounted(()=>{
     exRules
   );
   Object.assign(cardconfig.value, formconfig11);
-  formData.value = [];
-  formData.value.forEach((item, index) => {
-    item.nSeqNo = index + 1;
-  });
+  // setTimeout(()=>{
+      // formData.value = [];
+      // formData.value.forEach((item, index) => {
+      //     item.nSeqNo = index + 1;
+      // });
+
+  // },2000)
+
+  console.log('初始化--’',formData)
+  setTimeout(()=>{
+    if(formData.value.length>0){
+            formData.value.forEach((item, index) => {
+              item.nSeqNo = index + 1;
+              item.cDeductibleClass = item.cDeductibleCode;
+                // prop: "cDeductibleClass",
+        // prop: "cDeductibleCode",
+          });
+       }
+  },3000)
+
   initOriginalData();
 })
 
@@ -92,17 +108,24 @@ const tableconfig = reactive<AppTableConfig>(
           return row.cIfEdit !== '1';
         },
         tableClick: (row) => {
+          console.log(11,row)
           let param = {};
-          if(row['cIfMust'] !== '9') {
-            const f = originalData.value.find(f => row.cDeductibleClass === f.cDeductibleClass);
+          if(row['cIfMust'] !== '9') {               // cDeductibleContent
+            let rid = row.cDeductibleCode|| row.cDeductibleClass
+            const f = originalData.value.find(f => rid === f.cDeductibleClass);
             Object.assign(param, f);
+            console.log(1,f)
+            console.log(1,originalData.value)
           }else {
             Object.assign(param, row)
+              console.log(2)
           }
 
           if(row.editList && row.editList.length>0){
             param['editList'] = row.editList
           }
+
+          console.log('ddd',param)
           dzmodal.open(deductibleFixEdit, { 
             type: "view", 
             data: param, 
@@ -204,6 +227,7 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "cDeductibleClass",
+        // prop: "cDeductibleCode",
         inputtype: "rtinput",
         title: "免赔条件ID",
         width: 180,
@@ -228,6 +252,7 @@ const initOriginalData = ()=> {
   }
   console.log(332,)
   getPrdDeductible(param).then((res) => {
+    console.log(12312,res)
     if (res.data.result) {
       pageresult.list = [];
       originalData.value = res.data.result.map((item: any) => {
@@ -312,12 +337,15 @@ const method = {
               const aInB = a.filter(item => bkeys.has(item.cDeductibleClass));
               const bNotInA = b.filter(item => !akeys.has(item.cDeductibleClass));
               const merged = [...aInB, ...bNotInA];
+
+              console.log('分别是什么',akeys,bkeys,aInB,bNotInA,merged)
               return merged.map((item: any, index: number) => ({
                 ...item,
                 nSeqNo: index + 1
               }));
             }
             formData.value = mergeAndNumberArraysPreserveOrder(formData.value, selectdata);
+            console.log('66',formData.value)
           },
         }, 
         { title: "添加免赔条件", width: 85 });
