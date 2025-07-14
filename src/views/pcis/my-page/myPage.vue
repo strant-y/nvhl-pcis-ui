@@ -12,19 +12,6 @@
             >
               <el-anchor :bound="120" :offset="80">
                 <el-anchor-link
-                  v-if="underwriteFlag"
-                  @click="handleAnchorClick($event, `#underwriteurl`)"
-                  class="isActive"
-                >
-                  <!-- <rt-icon
-                    :item="{ icon: 'Tickets' }"
-                  /> -->
-                  <i :class="['icon','iconfont',iconMap['underwriteurl']]"></i>
-                  <span class="icon-title" v-if="NavigaShow"
-                    >核保处理</span
-                  >
-                </el-anchor-link>
-                <el-anchor-link
                   v-if="edrbaseFlag"
                   @click="handleAnchorClick($event, `#edrbase`)"
                   class="isActive"
@@ -66,7 +53,7 @@
                       : true
                   "
                   @click="handleAnchorClick($event, `#${k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey}`)"
-                  :class="!underwriteFlag && !edrbaseFlag && !edritemFlag && i === 0 ? 'isActive' : ''"
+                  :class="!edrbaseFlag && !edritemFlag && i === 0 ? 'isActive' : ''"
                 >
                   <!-- <rt-icon
                     :item="{
@@ -126,6 +113,22 @@
                     >我司联共保信息</span
                   >
                 </el-anchor-link>
+                <el-anchor-link
+                  v-if="underwriteFlag"
+                  @click="handleAnchorClick($event, `#underwriteurl`)"
+                  style="opacity: 1;font-weight: 500;"
+                >
+                  <!-- <rt-icon
+                    :item="{ icon: 'Tickets' }"
+                  /> -->
+                  <i :class="['icon','iconfont',iconMap['underwriteurl']]" style="color: var(--el-color-warning);"></i>
+                  <span
+                    class="icon-title"
+                    v-if="NavigaShow"
+                    style="color: var(--el-color-warning)"
+                  >核保处理</span
+                  >
+                </el-anchor-link>
               </el-anchor>
             </div>
             <!-- <div class="NavigaList_card" style="margin-left: 5px">
@@ -181,14 +184,6 @@
           </div>
         </div>
         <div class="main-content">
-          <div
-            id="underwriteurl"
-            v-if="underwriteFlag"
-            style="margin-bottom: 10px"
-          >
-            <underwriteRef ref="underwrite" :pageData="pageData"></underwriteRef>
-          </div>
-
           <div id="edrbase" v-if="edrbaseFlag" style="margin-bottom: 10px">
             <edrbaseRef ref="edrbase"></edrbaseRef>
           </div>
@@ -250,18 +245,25 @@
           >
             <ourCompanyCiShareRef ref="ourCompanyCiShare"></ourCompanyCiShareRef>
           </div>
+          <div
+            id="underwriteurl"
+            v-if="underwriteFlag"
+            style="margin-bottom: 10px"
+          >
+            <underwriteRef ref="underwrite" :pageData="pageData"></underwriteRef>
+          </div>
           <el-backtop :target="'.el-main'" :right="100" :bottom="150" />
         </div>
         <div class="bottom-items">
           <!--新增的申请单号显示和复制按钮-->
-          <div style="margin-right: 20px; width: 100%; display: flex; justify-content: flex-end; align-items: center;" v-if="pageLoaded">
-            <div style="display: flex; align-items: center; background: #fff; padding: 6px 12px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap;">
+          <div style="margin-right: 5px; width: 100%; display: flex; justify-content: flex-end; align-items: center;" v-if="pageLoaded">
+            <div style="display: flex; align-items: center; background: #fff; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap;">
               {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "申请单号:" }}
-              <span id="policyNumber" style="margin-left: 5px; margin-right: 8px; font-weight: bold;">
+              <span id="policyNumber" style="margin-left: 5px; margin-right: 5px; font-weight: bold;">
               {{ props.param?.pageName === "priceInquiry" ? opertaor.getTableRefByKey('plyBase')?.getValue('Base.cInquiryNo') || '暂无' : opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || '暂无' }}
               </span>
               <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号'}`" placement="top">
-                <el-button @click="copyPolicyNumber" circle size="small" style="color: red;">
+                <el-button @click="copyPolicyNumber" circle size="small" style="color: red;margin-right: 0;">
                   <rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />
                 </el-button>
               </el-tooltip>
@@ -317,6 +319,7 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 import { useRouter, useRoute } from "vue-router";
 import { getData } from "@/pcis/prodRef/dataInit";
+
 import { iconMap } from './iconMap';
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
@@ -3115,6 +3118,7 @@ const submitUnderwritingFn = async () => {
  * 投保申请核保时校验联共保信息
  */
 const validateCiInfo = () => {
+  const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue()['Base.cCiMrk']
   const ciData = opertaor.getTableRefByKey("ci").getFromValue()
   if (ciData.length > 0) {
       let NCiShare = 0;
@@ -3146,10 +3150,10 @@ const validateCiInfo = () => {
         ElMessage.error("主共保信息只允许增加一条!");
         return false;
       }
-      // if (CCoinsurerCdeNum <= 1) {
-      //   ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
-      //   return false;
-      // }
+      if (cCiMrk == "1" && CCoinsurerCdeNum <= 1) {
+        ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
+        return false;
+      }
     } else {
       ElMessage.error("请录入共保信息!");
       return false;
@@ -3515,7 +3519,12 @@ function clearCAppNo(res:any) {
   display: flex;
   justify-content: end;
   align-items: center;
-  padding-right: 20px;
+  // padding-right: 20px;
+  .el-button {
+    padding: 8px;
+    margin-right: 8px;
+    margin-left: 0;
+  }
 }
 .NavigaList_card {
   display: inline-block; /* 设置为行内块元素 */
@@ -3553,14 +3562,13 @@ function clearCAppNo(res:any) {
 
 .el-anchor {
   background: transparent;
-  width: 110px;
+  // width: 130px;
   :deep(.el-anchor__list) {
-    padding: 10px 5px;
+    padding: 20px 10px;
   } 
   .el-anchor__item {
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     padding-left: 0;
-    border-radius: 8px;
     opacity: .6;
     &.isActive,&:hover {
       opacity: 1;
@@ -3568,7 +3576,7 @@ function clearCAppNo(res:any) {
     }
     :deep(a) {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
       color: #FFFFFF;
       padding: 0;
@@ -3577,12 +3585,12 @@ function clearCAppNo(res:any) {
         margin: 0 0 10px 0;
       }
       .iconfont {
-        font-size: 1.5rem;
+        font-size: 1.2rem;
         color: #FFF;
-        margin: 5px 0;
+        margin-right: 5px;
       }
       .icon-title {
-        font-size: 12px;
+        font-size: 14px;
       }
     }
   }

@@ -2,7 +2,7 @@
 <template>
   <el-menu
     :default-active="currentRoute.path"
-    :collapse="!appStore.sidebar.opened"
+    :collapse="false"
     :background-color="variables['menu-background']"
     :text-color="variables['menu-text']"
     :active-text-color="variables['menu-active-text']"

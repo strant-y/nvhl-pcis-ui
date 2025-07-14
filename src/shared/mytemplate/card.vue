@@ -1,7 +1,7 @@
 <template>
   <div class="freeedit">
     <div class="searchbar">
-      <el-card>
+      <el-card :class="cardConfig.title === '主条款信息' ? 'mainTitle' : ''">
         <template #header>
           <el-row justify="space-between">
             <el-col :span="6" v-if="!cardConfig.production">
@@ -127,5 +127,8 @@ function initEditConfig(){
 .searchbar {
   border: 1px solid #ddd;
   box-shadow: 0 0 2px rgb(0 0 0 / 30%);
+}
+:deep(.mainTitle .el-card__header) {
+  background: #d1e7f7;
 }
 </style>

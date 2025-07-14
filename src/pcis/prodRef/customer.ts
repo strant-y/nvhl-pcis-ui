@@ -9,3 +9,5 @@ export function formatDateTime(date) {
 
   return `${year}-${month}-${day}`;
 }
+
+

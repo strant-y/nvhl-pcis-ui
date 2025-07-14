@@ -198,6 +198,13 @@
             clearable: true,
         },
         {
+            prop: "cPlyNo",
+            inputtype: "rtinput",
+            title: "保单号",
+            showKey: [1, 2, 3, 4, 5],
+            clearable: true,
+        },
+        {
             prop: "bsType",
             inputtype: "rtcheckboxgroup",
             title: "申请单类型",
@@ -318,7 +325,7 @@
         {
             prop: "appCde",
             inputtype: "rtinput",
-            title: "投保人姓名",
+            title: "投被保人姓名",
             showKey: [1, 2, 3, 4],
             clearable: true,
             placeholder: "请输入",

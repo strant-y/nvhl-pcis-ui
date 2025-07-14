@@ -145,23 +145,22 @@ const method = {
             );
           });
         // setFormItem("Ci.cDptCde", { rules: [getRules("required", {})] });
-        setFormItem("Ci.cDptCde", { disabled: false });
+        // setFormItem("Ci.cDptCde", { disabled: false });
         setFormItem("Ci.nComm", { disabled: false});
         setFormItem("Ci.cBrkrCde", { disabled: false});
         setFormItem("Ci.cBrkSlsCde", { disabled: false});
-        setFormItem("Ci.cSlsCde", { rules: [getRules("required", {})] });
+        // setFormItem("Ci.cSlsCde", { rules: [getRules("required", {})] });
         setFormItem("Ci.cSlsCde", { disabled: false});
       // updateMasterAgreementValues();
     } else {
       // 非永安保险，设置默认值和其他数据
-      freeEditRef.value?.setRowFieldProp(
-          rowId,
-          "Ci.cSubDptCde",
-          "loadData",
-          [{ value: '1', label: '其他' }]
+      freeEditRef.value?.addCodeListMap(
+          {code: "Ci.cSubDptCde"+rowId,
+           list: [{ label: '其他',value: '1',  }]
+          }
       );
       setFormItem("Ci.cDptCde", { rules: [] });
-      setFormItem("Ci.cDptCde", { disabled: true });
+      // setFormItem("Ci.cDptCde", { disabled: true });
       setFormItem("Ci.nComm", { disabled: true});
       setFormItem("Ci.cBrkrCde", { disabled: true});
       setFormItem("Ci.cBrkSlsCde", { disabled: true});
@@ -186,7 +185,10 @@ const method = {
       }
       freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "");
       if(plyBasedata["Base.cBsnsTyp"] === '19001'){
-        setFormItem("Ci.cDptCde", { rules: [getRules("required", {})] });
+        // setFormItem("Ci.cDptCde", { rules: [getRules("required", {})] });
+        freeEditRef.value?.setRowFieldProp(
+                rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
+        );
       }
     }
     if (val === "327001") {
@@ -211,7 +213,7 @@ const method = {
         setFormItem("Ci.nComm", { disabled: false});
         setFormItem("Ci.cBrkrCde", { disabled: false});
         setFormItem("Ci.cBrkSlsCde", { disabled: false});
-        setFormItem("Ci.cSlsCde", { rules: [getRules("required", {})] });
+        // setFormItem("Ci.cSlsCde", { rules: [getRules("required", {})] });
         setFormItem("Ci.cSlsCde", { disabled: false});
         if (plyBasedata["Base.cCiMrk"] === "3" || plyBasedata["Base.cCiMrk"] === "4") {
           const isYonganAlreadyPresent = formTableData.some(
@@ -227,12 +229,12 @@ const method = {
       // 非永安保险，设置默认值和其他数据
       freeEditRef.value?.addCodeListMap(
           {code: "Ci.cSubDptCde"+rowId,
-           list: [{ value: '1', label: '其他' }]
+           list: [{ label: '其他',value: '1',  }]
           }
       );
       freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "1");
       setFormItem("Ci.cDptCde", { rules: [] });
-      setFormItem("Ci.cDptCde", { disabled: true });
+      // setFormItem("Ci.cDptCde", { disabled: true });
       setFormItem("Ci.nComm", { disabled: true});
       setFormItem("Ci.cBrkrCde", { disabled: true});
       setFormItem("Ci.cBrkSlsCde", { disabled: true});
@@ -255,12 +257,18 @@ const method = {
             codeListParam: { "CDptCde": value },
           })
           .then((res) => {
-            freeEditRef.value?.setRowFieldProp(
-                rowId,
-                "Ci.cDptCde",
-                "loadData",
-                res,
+            freeEditRef.value?.addCodeListMap(
+              {
+                code: "Ci.cDptCde"+rowId,
+                list: res
+              }
             );
+            // freeEditRef.value?.setRowFieldProp(
+            //     rowId,
+            //     "Ci.cDptCde",
+            //     "loadData",
+            //     res,
+            // );
           });
     }
   },
@@ -277,12 +285,18 @@ const method = {
         })
         .then((res) => {
           freeEditRef?.value?.setValueByRowKey("Ci.cDptCde", rowId, "");
-          freeEditRef.value?.setRowFieldProp(
-            rowId,
-            "Ci.cDptCde",
-            "loadData",
-            res,
-          );
+          // freeEditRef.value?.setRowFieldProp(
+          //   rowId,
+          //   "Ci.cDptCde",
+          //   "loadData",
+          //   res,
+          // );
+          freeEditRef.value?.addCodeListMap(
+             {
+                code: "Ci.cDptCde"+rowId,
+                list: res
+              }
+          )
         });
     }
     // 新增逻辑：判断当前选择的分公司是否在其他行中已经存在且共保公司为永安保险

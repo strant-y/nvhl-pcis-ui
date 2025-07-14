@@ -95,6 +95,10 @@ onMounted(async () => {
       method,
       exRules
   );
+  // 如果团个单标识为团单则展示关联被保险人，否则隐藏
+  if(route.params.param?.cGrpMrk !== '1') {
+    formconfig11.value.fromSchema = formconfig11.value.fromSchema.filter((item:any) => item.prop !== 'Dist.cRelatedInsured')
+  }
   if(params.cProdNo === '040003'){
     formconfig11.value.fromSchema?.forEach(item=>{
       if(item['prop'] ==='Dist.cProductType'){
