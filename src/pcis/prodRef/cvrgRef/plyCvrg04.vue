@@ -39,9 +39,7 @@
                   }"
                 >
                   <tremTemplate
-                  
                     v-for="(i, index) in planData[k]['m']"
-                 
                     :key="index"
                     v-model="planData[k]['m'][index]"
                     :disabled-flag="disAbledFlag"
@@ -237,7 +235,7 @@ const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
 
 const cardconfig = ref(creatCardConfig({}));
 const cvrgFormfef = ref("cvrgFormfef");
-let planData = ref<{ [key: string]: { [key: string]: any } }>({});
+const planData = ref<{ [key: string]: { [key: string]: any } }>({});
 const hiddenFlag = ref<any[]>([]);
 const showTitleMap = ref<{ [key: string]: string }>({});
 
@@ -324,6 +322,7 @@ function addAndinitData() {
             "Term.cRdrTyp": item.cRdrTyp,
             "Term.cUniqueTermNo": item.cUniqueTermNo,
             "Term.NSeqNo":1,
+            "Term.CPlanNo":pl,
             riskList: riskList,
           };
           if (item.cRdrTyp === "1") {
@@ -495,6 +494,7 @@ function addTermData(PlanNo: string) {
               "Term.cRdrTyp": item.cRdrTyp,
               "Term.cUniqueTermNo": item.cUniqueTermNo,
               "Term.NSeqNo": index+1,
+              "Term.CPlanNo":PlanNo,
             };
           }
           data.riskList = riskList;
@@ -734,6 +734,11 @@ function calcCheck(){
   return res;
 }
 
+
+function setTermData(param: any, value: any){
+  console.log(1111);
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
@@ -743,7 +748,8 @@ defineExpose({
   getFormconfig,
   setDisabledAll,
   setUnDisabledByKeyList,
-  calcCheck
+  calcCheck,
+  setTermData
 });
 </script>
 

@@ -143,7 +143,8 @@ const method = {
     console.log(getRules);
   },
   //联共保下拉change
-  cCiMrkChange: (val) => {
+  cCiMrkChange: (val:any) => {
+    console.log(111,val, opertaor.getParam())
     productStore.setcCiMrk(val);
     if (!!val && !opertaor.getParam().initFlag) {
       const ciRef = opertaor.getTableRefs()['ci'];
@@ -153,6 +154,16 @@ const method = {
         });
       }
     }
+
+    // 录单人联系方式
+    if(val=='1'|| val=='2'||val=='5'){
+      // Base.cCiOprRel
+          setFormItem("Base.cCiOprRel", { rules: [getRules("required", {})] }); //代理合作协议
+    }else{
+           setFormItem("Base.cCiOprRel", { rules: [] });
+    }
+
+
   },
   //业务来源大类
   businessKindFunc: (val) => {

@@ -62,6 +62,7 @@ onBeforeMount(async () => {
   // 页面初始化
   formPage.value?.setFormConfig(config);
   query();
+  console.log('页面初始化',formPage.value)
 });
 
 onMounted(() => {
@@ -107,19 +108,14 @@ function save() {
       // console.log('000', formPage.value.getComponentConfigById("AgreementBase"))
       console.log('resss',res.res['composition']['ECargoBase'][0])
       resData.value = res.res['composition']['ECargoBase'][0]
+      const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
+      agreementBaseRef.setValue('ECargoBase.cEcAgrNo', resData.value['ECargoBase.cEcAgrNo'])
+      agreementBaseRef.setValue('ECargoBase.cEcAgrAppNo', resData.value['ECargoBase.cEcAgrAppNo'])
       console.log('resData', resData.value);
     }else {
       ElMessage.success(res.msg);
     }
   });
-
-  
-  const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
-  console.log('AgreementBaseRef', agreementBaseRef,agreementBaseRef["ECargoBase.cChaType"]);
-  agreementBaseRef.setValue('ECargoBase.cOpenCoverNo', resData.value['ECargoBase.cEcAgrNo'])
-  agreementBaseRef.setValue('ECargoBase.cEcAgrAppNo', resData.value['ECargoBase.cEcAgrAppNo'])
-  const agreementDistInsuredRef = formPage.value?.getComponentRefById('AgreementDistInsured');
-  const agreementCvrgRef = formPage.value?.getComponentRefById('AgreementCvrg');
 }
 
 function submit() {

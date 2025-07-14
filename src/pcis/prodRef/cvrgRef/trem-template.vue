@@ -390,7 +390,6 @@ const termdata = ref<{ [key: string]: any }>({});
 const riskList = ref<{ [key: string]: any }>({});
 
 const pageInit = ref(false);
-
 const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
   delete: {
     label: "删除",
@@ -568,7 +567,6 @@ const checkExtendshow = computed(() => {
       r = true && showExtend;
     }
   });
-  console.log(r);
   return r;
 });
 
@@ -600,18 +598,37 @@ function getProp(col: any) {
   const factorId = col["cFactorId"];
   let fact: any = JSON.parse(JSON.stringify(factormap.value[factorId]));
   // 将方法回填到item中
-  Object.keys(factormap.value[factorId]).forEach((k: any) => {
-    if (factormap.value[factorId][k]["func"]) {
-      fact[k]["func"] = factormap.value[factorId][k]["func"];
+  if (factormap.value[factorId]["func"]) {
+    fact["func"] = factormap.value[factorId]["func"];
+  }
+  if (factormap.value[factorId]["tableClick"]) {
+    fact["tableClick"] = factormap.value[factorId]["tableClick"];
+  }
+  if(col['cFatherKey']){
+    if(col['numberMax']){
+      fact.max = col["numberMax"];
+    }else{
+      fact.max = 0;
     }
-    if (factormap.value[factorId][k]["tableClick"]) {
-      fact[k]["tableClick"] = factormap.value[factorId][k]["tableClick"];
-    }
-  });
+  }
+  
+  fact.cRiskNo = col["cRiskNo"];
+  fact.cGroupId = col["cGroupId"];
+  fact.cColId = col["cColId"];
   fact.disabled = col["cPorpDisabled"];
   fact.required = col["cPorpRequired"];
   fact.Indent = col["cPropIndent"];  // 缩进
   return fact;
+}
+
+function getTermData(){
+  let newData;
+  if( termTitleConf.value.cFactorTabType === "free" ){
+    newData = termRef.value?.getFromValue();
+  } else {
+    newData = termdata.value;
+  }
+  return newData;
 }
 /*
 条款下载
@@ -650,10 +667,8 @@ function dataInit() {
       }
       if (newKey === "cLiabCode") {
         p["cRiskNo"] = v;
-      } else {
-        p[newKey] = v;
+        queryKey += v;
       }
-      queryKey += v;
     });
     queryList.push(p);
   });
@@ -661,8 +676,9 @@ function dataInit() {
     cTermNo: props.modelValue["Term.cClauseCode"],
     riskList: queryList,
   };
-  const d = terconfig.getConfig(queryKey);
-  if (d) {
+  const r = terconfig.getConfig(queryKey);
+  if (r) {
+    const d = JSON.parse(r);
     collist.value = d.collist;
     factormap.value = d.factormap;
     colInfo.value = d.colInfo;
@@ -670,6 +686,7 @@ function dataInit() {
     term.value = d.term;
     termFactormap.value = d.termFactormap;
     methodLink(termFactormap.value);
+    riskMethodLink(factormap.value);
     initshowConfig();
     const fromc = termFactormap.value?.filter(
       (v: any) => v.cPorpShowtitle !== "1"
@@ -693,6 +710,7 @@ function dataInit() {
     getTRFactorJson(param).then((res: any) => {
       const { code, data, msg } = res;
       if (200 === code) {
+        terconfig.addConfig(queryKey, JSON.stringify(data.data));
         collist.value = data.data.collist;
         factormap.value = data.data.factormap;
         colInfo.value = data.data.colInfo;
@@ -701,6 +719,7 @@ function dataInit() {
         termFactormap.value = data.data.termFactormap;
 
         methodLink(termFactormap.value);
+        riskMethodLink(factormap.value);
         initshowConfig();
         const fromc = termFactormap.value?.filter(
           (v: any) => v.cPorpShowtitle !== "1"
@@ -709,7 +728,6 @@ function dataInit() {
         if (data.data.termTitleConf?.CCnm) {
           termTitleConf.value = JSON.parse(data.data.termTitleConf.CCnm);
         }
-        terconfig.addConfig(queryKey, data.data);
       } else {
         ElMessage.error(msg);
       }
@@ -999,6 +1017,18 @@ function methodLink(items: any) {
     }
   }
 }
+/**
+ * 条择标方法绑定
+ */
+function riskMethodLink(items: any) {
+  if (items) {
+    Object.keys(items).forEach((k: any) => {
+      if (items[k]["func"] && typeof items[k]["func"] === "string") {
+        items[k]["func"] = methodMap[items[k]["func"]];
+      }
+    });
+  }
+}
 
 const methodMap = {
   unifiedPremiumChange: (val: any) => {
@@ -1037,7 +1067,6 @@ const methodMap = {
       const trems = opertaor.getTableRefByKey('cvrg');
       const data = trems.getFromValue();
       const cocyData = {};
-      console.log(data);
       data.forEach((item: any) => {
         if(item['Term.cClauseCode'] === '00425000085'){
           Object.keys(copyMaps).forEach((key: any) => { 
@@ -1064,8 +1093,41 @@ const methodMap = {
         }
       }
     });
+  },
+
+  /**
+   * 用于条则标父级向子集校验,修改子集可输入的最大值
+   */
+  RiskFathersCheck:(val:any,row:any,item:any)=>{
+    for (const key in collist.value) {
+      if(collist.value[key].cFatherKey === item.prop && collist.value[key].cRiskNo === item.cRiskNo){
+        collist.value[key].numberMax = val;
+      }
+    }
+    nextTick(()=>{
+      checkData(val,item);
+    });
   }
 };
+
+const checkData = (v :nay,item:any) => {
+    const cf = groupconf.value[item.cGroupId]['riskList'][item.cRiskNo]['rowConfig'][item.cColId];
+    if(cf){
+      const fk = item.prop
+      cf.forEach((c)=>{
+        if(c.cFatherKey === fk){
+          c.factorItem.max = v;
+          
+          if(riskList.value[c.cRiskNo][c.factorItem['prop']]){
+            if(v < riskList.value[c.cRiskNo][c.factorItem['prop']]){
+              riskList.value[c.cRiskNo][c.factorItem['prop']] = v;
+            }
+          }
+        }
+      });
+      update();
+    }
+}
 
 const copyMaps = ['Term.nAccidentLimit','Term.nInsuranceAmount','Term.nLegalAccident','Term.nLegalTotal','Term.nRateVal',
 'Term.nResponsePer','Term.nResponseTotal','Term.nSeatLimit','Term.nSeatMedical','Term.nSeatPremium','Term.nSeatProperty',

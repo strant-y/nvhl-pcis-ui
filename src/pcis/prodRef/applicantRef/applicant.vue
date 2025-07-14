@@ -26,6 +26,7 @@ const productStore = useProductStore();
 const dialog = ref<DialogMethod | null>(null);
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { set } from "lodash";
+import { validateIdCard } from "@/typings/method-public";
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -60,7 +61,6 @@ onMounted(() => {
     method,
     getRules
   );
-  console.log(3838, formconfig11);
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
     //是否小微企业，默认非必填、只读
@@ -144,7 +144,8 @@ function setFormItem(key: any, obj: any) {
 const idAnalysis = (id:string)=>{
       const tabref = opertaor.getTableRefs();
       const applicantValue = tabref["applicant"].getFromValue();
-      if (  id.length !== 18 || applicantValue["Applicant.cCertfCls"] !=='120001') {
+
+      if (  !validateIdCard(id)  || (applicantValue["Applicant.cCertfCls"] !=='120001' && applicantValue["Applicant.cCertfCls"] !=='19')) {
         return false
       }
           const birthYear = parseInt(id.substring(6, 10), 10);
@@ -160,7 +161,7 @@ const idAnalysis = (id:string)=>{
           setValue("Applicant.nAge", age);
           setValue("Applicant.cSex", sex);
          
-          clearValidate('Applicant.cCertfCde')  
+          // clearValidate('Applicant.cCertfCde')  
 };
 
     // 防抖定时器

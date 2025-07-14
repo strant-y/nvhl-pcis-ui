@@ -71,6 +71,7 @@
               "
                 :is="getConmpName(k)"
                 :pageSchema="k.pageSchema"
+                :compKey="k.pageKey"
             />
           </div>
         </template>

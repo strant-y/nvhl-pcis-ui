@@ -97,8 +97,15 @@ onMounted(() => {
     if (props.data.fromSchema[i]["tableClick"]) {
       item["tableClick"] = props.data.fromSchema[i]["tableClick"];
     }
-
-
+    if(['ECargoGoodsTgt.nGoodsValue'].includes(item.prop)) {
+      item["func"] = goodsValue;
+    }
+    if(['ECargoGoodsTgt.nAdditiveRatio'].includes(item.prop)) {
+      item["func"] = bonusRatio;
+    }
+    if(['ECargoGoodsTgt.cPrmCur'].includes(item.prop)) {
+      item["func"] = cAmtCurChange;
+    }
     if(item.prop !=='DistECargo.nSeqNo'){
         item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
     }else if(item.prop !=='DistECargo.cSchoolName' && item.prop !=='DistECargo.cSchoolAddress'){
@@ -151,7 +158,38 @@ const setcDetailedAddress = (prop:any,aftProp:any)=> {
     freeEditRef?.value?.setValue(aftProp.prop, a);
   }
 };
-
+//总保额币种下拉事件
+const cAmtCurChange = (val: any)=>{
+  if (val !== "CNY") {
+    codeListStore
+        .queryCodeList({
+          codeListName: "WEB_BAS_CHGRATE",
+          codeListParam: { value: val },
+        })
+        .then((res) => {
+          console.log("0000000", res);
+          setValue("ECargoGoodsTgt.nAmtExch", res[0].currency_rate);
+          setValue('ECargoGoodsTgt.nRmbLimit',Number(getValue('ECargoGoodsTgt.nInsuranceAmount'))*getValue('ECargoGoodsTgt.nAmtExch'))
+        });
+  } else {
+    setValue("ECargoGoodsTgt.nAmtExch", "1.000000");
+    setValue('ECargoGoodsTgt.nRmbLimit',Number(getValue('ECargoGoodsTgt.nInsuranceAmount')))
+  }
+}
+const bonusRatio = (val:any)=>{
+  const bonusRatioData =  getValue('ECargoGoodsTgt.nAdditiveRatio')
+  const goodsValueData = getValue('ECargoGoodsTgt.nGoodsValue')
+ if(bonusRatioData && goodsValueData){
+    setValue('ECargoGoodsTgt.nInsuranceAmount',goodsValueData * (1 + bonusRatioData/100))
+ }
+}
+const goodsValue = (val:any)=>{
+  const bonusRatioData =  getValue('ECargoGoodsTgt.nAdditiveRatio')
+  const goodsValueData = getValue('ECargoGoodsTgt.nGoodsValue')
+  if(bonusRatioData && goodsValueData){
+    setValue('ECargoGoodsTgt.nInsuranceAmount',goodsValueData * (1 + bonusRatioData/100))
+  }
+}
   //根据获取的职业类别查询职业等级并绑定下拉框
 const getDistoccupType = (val) => {
   if(!val || val.length < 3) return;

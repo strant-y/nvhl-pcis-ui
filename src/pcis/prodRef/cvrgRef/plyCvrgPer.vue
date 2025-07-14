@@ -189,6 +189,7 @@ onMounted(async () => {
             "Term.cRdrTyp": item.cRdrTyp,
             "Term.cUniqueTermNo": item.cUniqueTermNo,
             "Term.NSeqNo":1,
+            "Term.CPlanNo":'P1',
             riskList: riskList,
           };
           if (item.cRdrTyp === "1") {
@@ -299,6 +300,7 @@ function addTermData() {
               "Term.cRdrTyp": item.cRdrTyp,
               "Term.cUniqueTermNo": item.cUniqueTermNo,
               "Term.NSeqNo": index+1,
+              "Term.CPlanNo":'P1',
             };
           }
           if (item.cRdrTyp === "1") {
@@ -516,8 +518,30 @@ function getndisAbleConfig(key: any) {
   return edrItem.value[key];
 }
 
+function setTermData(param: any, value: any){
+
+  const prop: string = param.factorProp;
+  const riskNo: string = param.riskNo;
+
+  Object.keys(formData.value).forEach((item) => {
+    formData.value[item].forEach((d: any) => {
+      if(!prop.startsWith('TermRisktgt')){
+        d[prop] = value;
+      }
+      if (d.riskList && d.riskList.length > 0) {
+        d.riskList.forEach((r: any)=>{
+          if(r['TermRisktgt.cLiabCode'] === riskNo){
+            r[param.factorProp] = value;
+          }
+        })
+      }
+    });
+  });
+}
+
 const faters = ref({
   getndisAbleConfig: getndisAbleConfig,
+  setTermData:setTermData
 });
 
 
@@ -538,6 +562,7 @@ defineExpose({
   setDisabledAll,
   setUnDisabledByKeyList,
   calcCheck,
+  setTermData
 });
 </script>
 
