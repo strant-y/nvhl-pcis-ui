@@ -656,31 +656,38 @@ const copyPolicyFun = () => {
 
 // 复制投保单号
 const copyPolicyNumber = () => {
-  const policyNumberElement = document.getElementById("policyNumber");
-  if (!policyNumberElement) return;
+  // const policyNumberElement = document.getElementById("policyNumber")?.innerText;
+  // if (!policyNumberElement) return;
 
-  const range = document.createRange();
-  range.selectNode(policyNumberElement);
+  // const range = document.createRange();
+  // range.selectNode(policyNumberElement);
 
-  const selection = window.getSelection();
-  if (!selection) return;
+  // const selection = window.getSelection();
+  // if (!selection) return;
 
-  selection.removeAllRanges();
-  selection.addRange(range);
+  // selection.removeAllRanges();
+  // selection.addRange(range);
 
-  try {
-    const successful = document.execCommand("copy");
-    if (successful) {
-      ElMessage.success(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + '已成功复制到剪贴板！');
-    } else {
-      ElMessage.error(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + "复制失败，请手动复制。");
-    }
-  } catch (err) {
-    ElMessage.error("当前浏览器不支持自动复制功能，请手动复制。");
-  }
+  // try {
+  //   const successful = document.execCommand("copy");
+  //   if (successful) {
+  //     ElMessage.success(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + '已成功复制到剪贴板！');
+  //   } else {
+  //     ElMessage.error(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + "复制失败，请手动复制。");
+  //   }
+  // } catch (err) {
+  //   ElMessage.error("当前浏览器不支持自动复制功能，请手动复制。");
+  // }
 
   // 清除选中内容
-  selection.removeAllRanges();
+  // selection.removeAllRanges();
+  const text = document.getElementById("policyNumber")?.innerText;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(res => {
+    ElMessage.success(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + '已成功复制到剪贴板！');
+  }).catch(err => {
+    ElMessage.error(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + "复制失败，请手动复制。");
+  })
 };
 
 /**

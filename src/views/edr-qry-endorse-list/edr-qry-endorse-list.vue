@@ -98,6 +98,23 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 label: "重置",
                 func: () => {
                     freeEditRef.value?.resetFields();
+                    freeEditRef.value?.setFormValue({
+                        tAppTm: [
+                            moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
+                                "YYYY-MM-DD 00:00:00"
+                            ),
+                            moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+                        ],
+                        cDptCde: "0200000000000",
+                    });
+                    setFormItem("cDptCde", {
+                        loadData: [
+                            {
+                                label: "0200000000000永安保险公总司",
+                                value: "0200000000000",
+                            },
+                        ],
+                    });
                 },
             }),
         ],
@@ -335,7 +352,7 @@ const tableconfig = reactive<AppTableConfig>(
                 prop: "cAppNoAndPlyNo",
                 inputtype: "rtinput",
                 title: "申请单号",
-                width: 180,
+                width: 220
             },
             // {
             //     prop: "cPlyNo",
@@ -817,21 +834,33 @@ function setTableFormItem(key, obj) {
 }
 
 const showDetails = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
-    if (null == selected.value["cPlyNo"] || "" === selected.value["cPlyNo"]) {
-        ElMessage.warning("请选择一条记录");
-        return;
-    }
-    if (!selected.value["cPlyNo"]) return;
+    // if (null == selected.value["cPlyNo"] || "" === selected.value["cPlyNo"]) {
+    //     ElMessage.warning("请选择一条记录");
+    //     return;
+    // }
+    // if (!selected.value["cPlyNo"]) return;
+    // const en = JSON.stringify({
+    //     // scene: SCENE_PLY_APP_READ,
+    //     cAppNo: selected.value["cAppNo"],
+    //     cOrgAppNo: cAppNo,
+    //     cCiMrk: selected.value["cCiMrk"],
+    //     cProdNo: selected.value["cProdNo"],
+    //     cAppTyp: selected.value["cAppTyp"],
+    //     cGrpMrk: selected.value["cGrpMrk"],
+    //     cDptCde: selected.value["cDptCde"],
+    //     cDptCnm: selected.value["cDptCnm"],
+    //     pageType: "readonly",
+    // });
     const en = JSON.stringify({
         // scene: SCENE_PLY_APP_READ,
-        cAppNo: selected.value["cAppNo"],
+        cAppNo,
         cOrgAppNo: cAppNo,
-        cCiMrk: selected.value["cCiMrk"],
-        cProdNo: selected.value["cProdNo"],
-        cAppTyp: selected.value["cAppTyp"],
-        cGrpMrk: selected.value["cGrpMrk"],
-        cDptCde: selected.value["cDptCde"],
-        cDptCnm: selected.value["cDptCnm"],
+        cCiMrk: data.cCiMrk,
+        cProdNo,
+        cAppTyp: data.cAppTyp,
+        cGrpMrk: data.cGrpMrk,
+        cDptCde: data.cDptCde,
+        cDptCnm: data.cDptCnm,
         pageType: "readonly",
     });
     router.push({
@@ -1067,5 +1096,8 @@ watch(dialogVisible, (newValue) => {
         margin-right: 10px;
         cursor: pointer;
     }
+}
+:deep(.el-table__body .el-table__row .el-table__cell:first-child .cell) {
+    white-space: break-spaces;
 }
 </style>
