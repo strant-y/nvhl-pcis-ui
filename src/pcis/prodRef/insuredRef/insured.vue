@@ -973,12 +973,12 @@ const method = {
     }
     
     if (val == "1") {
-      const ads = insuredEditRef?.value?.getValue("Insured.AllProp");
+      const ads = insuredEditRef?.value?.getValue("Insured.ClntAddrProp");
       const a =
-        insuredEditRef?.value?.getValue("Insured.cRegisterSuffixAddr") || "";
+        insuredEditRef?.value?.getValue("Insured.cSuffixAddr") || "";
 
-      insuredEditRef?.value?.setValue("Insured.Prop", ads);
-      insuredEditRef?.value?.setValue("Insured.cSuffixAddr", a);
+      insuredEditRef?.value?.setValue("Insured.RegisterProp", ads);
+      insuredEditRef?.value?.setValue("Insured.cRegisterSuffixAddr", a);
     }
   },
   hidPerson: () => {
