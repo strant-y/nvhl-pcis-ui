@@ -27,12 +27,12 @@
 
     <div class="footer-button-container" style="text-align: center">
       <span>
-        <el-button
+        <!-- <el-button
           class="custom-button"
           type="primary"
           @click="handleBeforeClose"
           >关闭</el-button
-        >
+        > -->
       </span>
     </div>
     <!-- </el-card> -->
@@ -460,6 +460,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rows: 4,
         itemWidth: 2,
         clearable: true,
+        hidden: true,
       },
       {
         prop: "nRmbChgRate",
@@ -881,6 +882,8 @@ function split() {
   const NAmt = freeEditRef1Value.nAmt; //当前保额
   const NPrm = freeEditRef1Value.nPrm; //当前保费
   const CCiMrk = freeEditRef1Value.cCiMrk; //共保类型
+  const NotaxPrm = freeEditRef1Value.nNotaxPrm; //当前不含税保费
+  const AddedTax = freeEditRef1Value.nAddedTax; //当前不含税保费
   let NCiAmt = 0.0; ////当前险位全单的共保保额
   let NCiPrm = 0.0; ////当前险位全单的共保保费
   let NCiAmtVar = 0.0; //当前险位全单的共保保额变化量
@@ -921,14 +924,20 @@ function split() {
   let unTotalCiPrm = 0.0; //没被选中的基于险位全单的共保总保费
   let unTotalCiAmtVar = 0.0;
   let unTotalCiPrmVar = 0.0;
+  let unTotalNotaxPrm = 0.0;
+  let unTotalAddedTax = 0.0;
 
   for (var i = 0; i < arrData.length; i++) {
     // var status = arrData[i].getAttribute("status");
     // if(status=="CANCELED" || status=="DELETED") continue;
     const oldAmt = arrData[i].nAmt;
     unTotalAmt = parseFloat(unTotalAmt) + parseFloat(oldAmt);
-    var oldPrm = arrData[i].nPrm;
+    const oldPrm = arrData[i].nPrm;
     unTotalPrm = parseFloat(unTotalPrm) + parseFloat(oldPrm);
+    const oldNotaxPrm = arrData[i].nNotaxPrm;
+    unTotalNotaxPrm = parseFloat(unTotalNotaxPrm) + parseFloat(oldNotaxPrm);
+    const oldAddedTax = arrData[i].nAddedTax;
+    unTotalAddedTax = parseFloat(unTotalAddedTax) + parseFloat(oldAddedTax);
   }
 
   if (
@@ -951,9 +960,13 @@ function split() {
 
   const allAmt = parseFloat(NAmt) + parseFloat(unTotalAmt); //所有记录的总保额
   const allPrm = parseFloat(NPrm) + parseFloat(unTotalPrm); //所有记录的总保费
+  const allNotaxPrm = parseFloat(NotaxPrm) + parseFloat(unTotalNotaxPrm); //所有记录的不含税保费
+  const allAddedTax = parseFloat(AddedTax) + parseFloat(unTotalAddedTax); //所有记录的增值税费
 
   const totalAmt = freeEditRef.value?.getValue("nAmt");//总保额
   const totalPrm = freeEditRef.value?.getValue("nPrm");//总保费
+  const totalNotaxPrm = freeEditRef.value?.getValue("nNotaxPrm");//总不含税保费
+  const totalAddedTax = freeEditRef.value?.getValue("nAddedTax");//总增值税费
 
   let totalCiAmt = 0.0; //整单的共保总保额
   let totalCiPrm = 0.0; //整单的共保总保费
@@ -1030,6 +1043,8 @@ function split() {
 
   const remAmt = (parseFloat(totalAmt) - parseFloat(allAmt)).toFixed(2);//要拆分的保额
   const remPrm = (parseFloat(totalPrm) - parseFloat(allPrm)).toFixed(2);//要拆分的保费
+  const remNotaxPrm = (parseFloat(totalNotaxPrm) - parseFloat(allNotaxPrm)).toFixed(2);//要拆分的不含税保费
+  const remAddedTax = (parseFloat(totalAddedTax) - parseFloat(allAddedTax)).toFixed(2);//要拆分的增值税
 
   const newRow = [{
     ...selectRow1.value,
@@ -1042,6 +1057,10 @@ function split() {
     nAmtVar: remAmt,
     nPrm: remPrm,
     nPrmVar: remPrm,
+    nNotaxPrm: remNotaxPrm,
+    nNotaxPrmVar: remNotaxPrm,
+    nAddedTax: remAddedTax,
+    nAddedTaxVar: remAddedTax,
     cRiskUnitNme: "",
     cRiskLvlCde: null,
     _dataId: `newRow${pageresult1.list.length + 1}`,
@@ -1478,7 +1497,7 @@ function changeNamt(nAmtVar: any, flag: any) {
     if(params.cCiMrk !== "0") {
       const totalAmt = freeEditRef.value?.getValue("nAmt") // 总保费
       const totalCiAmt = freeEditRef.value?.getValue("nCiAmt") // 共保保费
-      const nPrmRatio = parseFloat((parseFloat(nAmtVar) / parseFloat(totalAmt)).toFixed(2)) // 保费变化值与总保费的比例
+      const nPrmRatio = parseFloat((parseFloat(nAmtVar) / parseFloat(totalAmt))) // 保费变化值与总保费的比例
       nCiAmt = parseFloat((parseFloat(totalCiAmt) * nPrmRatio).toFixed(2))
       selectRow1.value.nCiAmt = nCiAmt;
     }
@@ -1565,9 +1584,13 @@ function changePrm(nPrmVar: any, flag: any) {
     const totalPrm = freeEditRef.value?.getValue("nPrm") // 总保费
     const totalNotaxPrm = freeEditRef.value?.getValue("nNotaxPrm") // 不含税保费
     const totalAddedTax = freeEditRef.value?.getValue("nAddedTax") // 增值税
-    const nPrmRatio = parseFloat((parseFloat(nPrmVar) / parseFloat(totalPrm)).toFixed(2)) // 保费变化值与总保费的比例
+    const nPrmRatio = parseFloat((parseFloat(nPrmVar) / parseFloat(totalPrm))) // 保费变化值与总保费的比例
     nNotaxPrm = parseFloat((parseFloat(totalNotaxPrm) * nPrmRatio).toFixed(2)) // 计算后的不含税保费
     nAddedTax = parseFloat((parseFloat(totalAddedTax) * nPrmRatio).toFixed(2)) // 计算后的增值税
+    freeEditRef1.value?.setValue("nNotaxPrm", nNotaxPrm);
+    freeEditRef1.value?.setValue("nNotaxPrmVar", nNotaxPrm);
+    freeEditRef1.value?.setValue("nAddedTax", nAddedTax);
+    freeEditRef1.value?.setValue("nAddedTaxVar", nAddedTax);
     if(params.cCiMrk !== "0") {
       const totalCiPrm = freeEditRef.value?.getValue("nCiPrm") // 共保保费
       nCiPrm = parseFloat((parseFloat(totalCiPrm) * nPrmRatio).toFixed(2))
