@@ -335,7 +335,7 @@ const tableconfig = reactive<AppTableConfig>(
                 prop: "cAppNoAndPlyNo",
                 inputtype: "rtinput",
                 title: "申请单号",
-                width: 180,
+                width: 220
             },
             // {
             //     prop: "cPlyNo",
@@ -1067,5 +1067,8 @@ watch(dialogVisible, (newValue) => {
         margin-right: 10px;
         cursor: pointer;
     }
+}
+:deep(.el-table__body .el-table__row .el-table__cell:first-child .cell) {
+    white-space: break-spaces;
 }
 </style>
