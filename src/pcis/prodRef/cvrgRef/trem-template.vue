@@ -605,10 +605,11 @@ function getProp(col: any) {
     fact["tableClick"] = factormap.value[factorId]["tableClick"];
   }
   if(col['cFatherKey']){
-    if(col['numberMax']){
-      fact.max = col["numberMax"];
-    }else{
-      fact.max = 0;
+    fact.max = 0;
+
+    const da = riskList.value[col['cRiskNo']][col['cFatherKey']];
+    if(da){
+      fact.max = da;
     }
   }
   
