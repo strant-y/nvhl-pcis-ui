@@ -40,6 +40,7 @@ const dzmodal = useDzModal();
 // );
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 import moment from 'moment';
+import { descryptParameter } from "@/utils/encipher.ts";
 import { useUserStore } from "@/store/modules/user";
 const userStore = useUserStore();
 const user = ref(userStore.user);
@@ -52,6 +53,7 @@ const cPayStatusList = [
   {value: '2', label: '修改缴费'},
 ];
 const router = useRouter();
+const route = useRoute();
 const cCheckStsList = [
     {value: '00', label: '待缴费'},
     {value: '0', label: '待登记'},
@@ -892,6 +894,10 @@ const checkBatch = (cBatchNo : any)=> {
         }
     }
 
+    
+const params = route.query.param
+  ? JSON.parse(descryptParameter(route.query.param))
+  : {};
 
 onMounted(async () => {
   nextTick(()=>{
@@ -910,6 +916,11 @@ onMounted(async () => {
       ], 
     });
     freeEditRef.value?.setValue('CBillTyp', '1');
+    if(params.cAppNo) {
+        freeEditRef.value?.setValue('CBillNoStart', params.cAppNo)
+        freeEditRef.value?.setValue('CBillNoEnd', params.cAppNo)
+        handleQuery()
+    }
   })  
   getListByCode('WEB_BAS_CODELIST', {
       'cParCde': 'shoufeifangshi',

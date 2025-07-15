@@ -186,6 +186,18 @@ import {
   SCENE_PLY_APP_MODIFY_BOUNCED
 } from '@/constants/tab-constants';
 import {deleteFactorBykey, exportRenewalInsurance, findRenewalInsurance, getBasicKindList, getPolicy} from "@/api/prod";
+import { getListByCode } from '@/api/code-list-service';
+import {
+    SCENE_EDR_APP_MODIFY_UNSUBMIT,
+    SCENE_PLAN_READ,
+    SCENE_PLY_APP_MODIFY_UNSUBMIT,
+    SCENE_PLY_APP_READ,
+    SCENE_PLY_APP_READBEARER,
+    SCENE_TEMPORARY_DEPOSITBEARER,
+    SCENE_PLAN_UW_PROCESS,
+    SCENE_PLY_UW_PROCESS,
+    SCENE_PLY_UW_PROCESSBEARER,
+} from "@/constants/tab-constants";
 
 
 defineOptions({
@@ -257,6 +269,7 @@ const moreurl = ref('');
 const shortListData = ref(null)  // 第二模块tabl列表数据
 const headIcon = `/src/assets/images/${userStore.user.cCssStyle === '2' ? '0' : '1'}_.png`
 const shorMenuList = ref([])// 快捷菜单列表
+const cPayTypList = ref([])
 
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -648,6 +661,7 @@ onMounted(() => {
   initRoles()
   getNoticeData()
   getShortMenuList()
+  getCpayTypList()
 });
 
 const initRoles = () => {
@@ -973,34 +987,44 @@ const toQuery2 = (data: any) => {
           }
         })
         .finally(() => {});
+    } else if(currentTabName.value === "待缴费") {
+      router.push({
+        path: "/payinfoManagement/payinfohandle",
+        query: {
+          param: JSON.stringify({ cAppNo: data.cAppNo }),
+        },
+      });
     }
   } else if (isAudit.value) { //核保员
     if (currentTabName.value === '暂存任务') {
-      const param = Object.assign({
-        type: 'temp',
-        CurrentUser: user.opCde,
-        CurrentUserOrg: user.companyId,
-        objId: data['cAppNo'],
-        startCrtTm: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-        TAppTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-        startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-        endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-      });
-      sessionStorage.setItem(AppKey.query.pcis_query_newudrlist, param);
-      router.push({ path: '/pcis-new-udr-list/PendUdrList' });
-    } else if (currentTabName.value === '修改单') {
-      const param = Object.assign({
-        type: 'edit',
-        CurrentUser: user.opCde,
-        CurrentUserOrg: user.companyId,
-        objId: data['cAppNo'],
-        startCrtTm: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-        TAppTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-        startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-        endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-      });
-      sessionStorage.setItem(AppKey.query.pcis_query_newudrlist, param);
-      router.push({ path: '/pcis-new-udr-list/PendUdrList' });
+      // const param = Object.assign({
+      //   type: 'temp',
+      //   CurrentUser: user.opCde,
+      //   CurrentUserOrg: user.companyId,
+      //   objId: data['cAppNo'],
+      //   startCrtTm: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
+      //   TAppTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+      //   startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
+      //   endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+      // });
+      // sessionStorage.setItem(AppKey.query.pcis_query_newudrlist, param);
+      // router.push({ path: '/pcis-new-udr-list/PendUdrList' });
+      updateUdrDetail(row)
+    } else if (currentTabName.value === '待修改任务') {
+      // const param = Object.assign({
+      //   type: 'edit',
+      //   CurrentUser: user.opCde,
+      //   CurrentUserOrg: user.companyId,
+      //   objId: data['cAppNo'],
+      //   startCrtTm: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
+      //   TAppTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+      //   startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
+      //   endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+      // });
+      // sessionStorage.setItem(AppKey.query.pcis_query_newudrlist, param);
+      // router.push({ path: '/pcis-new-udr-list/PendUdrList' });
+    } else if (currentTabName.value === '已核保任务') {
+      showDetails(row)
     }
   }
 };
@@ -1098,6 +1122,168 @@ const handleArray = (obj:any)=>{
     }
   }
   return newObj
+}
+
+function getCpayTypList() {
+  getListByCode('WEB_BAS_CODELIST', {
+      'cParCde': 'shoufeifangshi',
+      'cIsValid': '1'
+  }).then(res => {
+    if (!!res && !!res['data']) {
+      cPayTypList.value = res['data'];
+    }
+  }, error => {
+      console.log('出错了', error);
+      // ElMessage.error('后台服务异常,请联系管理员');
+  });
+}
+
+function updateUdrDetail(row: any) {
+  getBaseInfoByAppNo({ appNo: row.objId }).then((r: any) => {
+      if (r.code !== 200) {
+          ElMessage.error({ message: r.msg, duration: 6000 });
+      } else {
+          if (row.bsType === "A") {
+              const en = JSON.stringify({
+                  // scene: SCENE_PLY_UW_PROCESS,
+                  cAppNo: row.objId,
+                  taskId: row.curtTask,
+                  cAppTyp: row.bsType,
+                  cProdNo: row.prodNo,
+                  cCiMrk: r.data.cCiMrk,
+                  cGrpMrk: r.data.cGrpMrk,
+                  cDptCde: r.data.cDptCde,
+                  cDptCnm:row.uwDptName,
+                  pageType: "PLY_UW_PROCESS_SCENE",
+                  sysType:row.objExt,
+                  plyNo: row.plyNo === "*" ? "" : row.plyNo,
+                  cTermNo:row.cTermNo,
+                  cTermNme:row.cTermNme,
+                  cProdNmeCn: row.prodName,
+              });
+              router.push({
+                  path: "/pcis/my-page",
+                  query: {
+                      param: en,
+                  },
+              });
+          } else {
+              const en = JSON.stringify({
+                  scene:
+                      r.data.cEdrRsnBundleCde === "BL"
+                          ? SCENE_PLY_UW_PROCESSBEARER
+                          : SCENE_PLY_UW_PROCESS,
+                  cAppNo: row.objId,
+                  taskId: row.curtTask,
+                  cAppTyp: row.bsType,
+                  cProdNo: row.prodNo,
+                  cCiMrk: r.data.cCiMrk,
+                  cRsnCde: r.data.cEdrRsnBundleCde,
+                  cEdrType: r.data.cEdrType,
+                  cGrpMrk: r.data.cGrpMrk,
+                  cDptCde: r.data.cDptCde,
+                  cDptCnm:row.uwDptName,
+                  pageType: "PLY_UW_PROCESS_SCENE",
+                  sysType: row.objExt,
+                  plyNo: row.plyNo,
+                  cTermNo:row.cTermNo,
+                  cTermNme:row.cTermNme,
+                  cProdNmeCn: row.prodName,
+              });
+              router.push({
+                  path: "/pcis/my-page",
+                  query: {
+                      param: en,
+                  },
+              });
+          }
+      }
+  });
+}
+
+function showDetails(row: any) {
+  let cAppTyp= row.bsType? row.bsType: row.cAppTyp;
+  if (cAppTyp === "P") {
+      if (row.cProdNo === "000000") {
+          const param = {
+              CPlanNo: row.cAppNo,
+              CPlanMrk: row.cPlanMrk,
+              scene: SCENE_PLAN_READ,
+          };
+          const en = JSON.stringify(param);
+          router.push({
+              path: "/index/pcis-combination/configPlan/combination-main",
+              query: { data: en },
+          });
+      } else {
+          const en = JSON.stringify({
+              CPlanNo: row.cAppNo,
+              // 'Base.CProdNo': plan['PrdProdPlan.CProdNo'],
+              // 'Base.CGrpMrk': plan['PrdProdPlan.CGrpMrk'],
+              CPlanMrk: row.cPlanMrk,
+              "Base.CProdNo": row.cProdNo,
+              "Base.CGrpMrk": row.cGrpMrk,
+              scene: SCENE_PLAN_READ,
+          });
+          router.push({
+              path: "/index/sys-right-basic/configPlan/detail",
+              query: { data: en },
+          });
+      }
+  } else {
+      getBaseInfoByAppNo({ appNo: row.objId ? row.objId : row.cAppNo }).then((r: any) => {
+          if (r.code !== 200) {
+              ElMessage.error({ message: r.msg, duration: 6000 });
+          } else {
+              if (cAppTyp === "A") {
+                  const en = JSON.stringify({
+                      // scene: SCENE_PLY_UW_PROCESS,
+                      cAppNo: row.objId ? row.objId : row.cAppNo,
+                      taskId: row.curtTask,
+                      cAppTyp: row.bsType? row.bsType: row.cAppTyp,
+                      cProdNo: row.prodNo? row.prodNo: row.cProdNo,
+                      cCiMrk: r.data.cCiMrk,
+                      cGrpMrk: r.data.cGrpMrk,
+                      cDptCde: r.data.cDptCde,
+                      cDptCnm:row.uwDptName?row.uwDptName:row.cDptCnm,
+                      pageType: "UW_READ_SCENE",
+                      cTermNme:row.cTermNme,
+                      cTermNo:row.cTermNo,
+                      cProdNmeCn: row.prodName,
+                  });
+                  router.push({
+                      path: "/pcis/my-page",
+                      query: {
+                          param: en,
+                      },
+                  });
+              } else {
+                  const en = JSON.stringify({
+                      cAppNo: row.objId ? row.objId : row.cAppNo,
+                      taskId: row.curtTask,
+                      cAppTyp: row.bsType? row.bsType: row.cAppTyp,
+                      cProdNo: row.prodNo? row.prodNo: row.cProdNo,
+                      cCiMrk: r.data.cCiMrk,
+                      cRsnCde: r.data.cEdrRsnBundleCde,
+                      cEdrType: r.data.cEdrType,
+                      cGrpMrk: r.data.cGrpMrk,
+                      cDptCde: r.data.cDptCde,
+                      cDptCnm:row.uwDptName?row.uwDptName:row.cDptCnm,
+                      pageType: "UW_READ_SCENE",
+                      cTermNme:row.cTermNme,
+                      cTermNo:row.cTermNo,
+                      cProdNmeCn: row.prodName,
+                  });
+                  router.push({
+                      path: "/pcis/my-page",
+                      query: {
+                          param: en,
+                      },
+                  });
+              }
+          }
+      });
+  }
 }
 
 // 窗口大小变化时重置图表
