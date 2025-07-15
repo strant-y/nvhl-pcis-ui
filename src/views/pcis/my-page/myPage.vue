@@ -771,6 +771,13 @@ const basicBtn = [
     type: "warning",
     id: "btn010103",
     func: () => {
+      /**
+       * 联共保判断
+       */
+      const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk')
+      if ('1' === CiMrk || '2' === CiMrk || '5' === CiMrk) {
+          const validCi = JointInsuranceCheck();
+      }
       submitToUndrFn();
     },
   }),
@@ -3182,6 +3189,23 @@ const validateCiInfo = () => {
     }
   return true;
 };
+const JointInsuranceCheck = ()=> {
+    const ciData = opertaor.getTableRefByKey("ci").getFromValue()
+    if (ciData && ciData.length > 0) {
+        let CCoinsurerCdeNum = 0; // 分公司份额
+        for (const ciRow of ciData) {
+            if ("327001" === ciRow["Ci.cCoinsurerCde"]) {
+                CCoinsurerCdeNum++;
+            }
+        }
+        console.log(CCoinsurerCdeNum);
+        if (CCoinsurerCdeNum <= 1) {
+            ElMessage.error("联共保时必须录入永安两个以上分公司份额！")
+            return;
+        }
+    }
+    
+}
 // 将对象的属性首字母转换为小写
 function lowercaseKeys<T extends object>(
   obj: T
