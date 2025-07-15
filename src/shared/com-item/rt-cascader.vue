@@ -102,7 +102,7 @@ const cascprops: CascaderProps = {
         codeListParam.rsnTyp = value.split('-')[0]
         codeListParam.kindNo = value.split('-')[1]
       } else {
-        codeListParam.cParCde = val
+        codeListParam.cParCde = value
       }
       codeListStore
         .queryCodeList(
