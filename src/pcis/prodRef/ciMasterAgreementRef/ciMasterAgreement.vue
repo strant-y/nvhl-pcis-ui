@@ -90,7 +90,14 @@ const method = {
     }
   },
   cCiAgtNoChange: (val) => {
-    setFormItem("Applicant.cCiAgtNo", { rules: [getRules("signlessInt", {})] });
+    const isPositiveInteger = /^\d+$/.test(val); // 是否为正整数（不含小数点、负号）
+    const isValidLength = val.length <= 20;      // 长度不超过20
+
+    if (!isPositiveInteger || !isValidLength) {
+      ElMessage.error("请输入不超过20位的正整数");
+      // 清空当前字段的值
+      tgtobjEditRef.value?.setValue("Base.cCiAgtNo", "");
+    }
   },
 };
 // 绑定特殊验证器
