@@ -385,19 +385,17 @@ function handleQuery(cid:any) {
   const r = tableRef.value?.getPartnerPage(); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const c = tabref.getFromValue()['cCommodityNo'];
-  // if(!c){
-    
-  //   return false
-  // }
   const param = Object.assign(s, r, { cCommodityNo: cid? cid: c });
-  if (c == !null) {
+
+  console.log(1212,c,cid)
+  if (c == null &&  cid ==null) {
     ElMessage.error("商品编号为空,请保存后操作!");
     return;
   } else {
     queryCommodityPlanList(param)
       .then((res) => {
         const { code, data, msg } = res;
-        console.log(data, '1212')
+       
         if (200 === code) {
           pageresult.list = data.result;
           pageresult.total = data.length;

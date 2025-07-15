@@ -580,9 +580,9 @@ onMounted(() => {
     setFormItem('cProdNo', {
       disabled: true,
     })
-    setFormItem('cAutoUdr', {
-      disabled: true,
-    })
+    // setFormItem('cAutoUdr', {
+    //   disabled: true,
+    // })
     setFormItem('cAffiliatedMrk', {
       disabled: true,
     })
