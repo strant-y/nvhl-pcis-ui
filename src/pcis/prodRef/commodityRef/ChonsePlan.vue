@@ -9,7 +9,7 @@
 
   <el-dialog v-model="dialogVisible" @update:visible="handleVisibleUpdate" width="90%" title="方案详情">
     <div>
-      <planInfo :goodsData="rowData" :goodsType='"goods"'></planInfo>
+      <planInfo :goodsData="rowData" :goodsType='"goods"' ></planInfo>
     </div>
 
   </el-dialog>
@@ -158,49 +158,49 @@ const tableconfig = reactive<AppTableConfig>(
           rowData.value = row
           dialogVisible.value = true;
 
-          let ss = {
-            ss: new Date().getTime(),
-            cAccessType: "1",
-            cCalcFormula: null,
-            cCiMrk: null,
-            cCriterionTimeUnit: null,
-            cCrtCde: "cd0000001",
-            cDptCde: null,
-            cEnableStatus: "1",
-            cGrpMrk: "0",
-            cKindNme: "责任险",
-            cKindNo: "04",
-            cOldPlanNo: null,
-            cOperId: null,
-            cOperNme: null,
-            cOrigin: null,
-            cPkId: null,
-            cPlanCn: "040001测试方案",
-            cPlanEn: null,
-            cPlanNo: "P25000034",
-            cProdNme: "公众责任保险",
-            cProdNo: "040001",
-            cRationType: "0110",
-            cRemark: null,
-            cShowDpt: null,
-            cSpecContent: null,
-            cSpecMrk: null,
-            cSpecNo: null,
-            cSubmitId: null,
-            cSubmitNme: null,
-            cTyp: "1",
-            cUndrDesc: null,
-            cUndrStatus: "2",
-            cUpdCde: null,
-            nCriterionTime: 0,
-            nLowInsureDays: 0,
-            nTopInsureDays: 0,
-            tBgnTm: "2025-05-26 00:00:00",
-            tCrtTm: null,
-            tEndTm: "2026-05-14 00:00:00",
-            tUpdTm: null,
-            _dataId: "c4bede5cda0c4cb9ae682d76e7f29638",
-          }
+          // let ss = {
+          //   ss: new Date().getTime(),
+          //   cAccessType: "1",
+          //   cCalcFormula: null,
+          //   cCiMrk: null,
+          //   cCriterionTimeUnit: null,
+          //   cCrtCde: "cd0000001",
+          //   cDptCde: null,
+          //   cEnableStatus: "1",
+          //   cGrpMrk: "0",
+          //   cKindNme: "责任险",
+          //   cKindNo: "04",
+          //   cOldPlanNo: null,
+          //   cOperId: null,
+          //   cOperNme: null,
+          //   cOrigin: null,
+          //   cPkId: null,
+          //   cPlanCn: "040001测试方案",
+          //   cPlanEn: null,
+          //   cPlanNo: "P25000034",
+          //   cProdNme: "公众责任保险",
+          //   cProdNo: "040001",
+          //   cRationType: "0110",
+          //   cRemark: null,
+          //   cShowDpt: null,
+          //   cSpecContent: null,
+          //   cSpecMrk: null,
+          //   cSpecNo: null,
+          //   cSubmitId: null,
+          //   cSubmitNme: null,
+          //   cTyp: "1",
+          //   cUndrDesc: null,
+          //   cUndrStatus: "2",
+          //   cUpdCde: null,
+          //   nCriterionTime: 0,
+          //   nLowInsureDays: 0,
+          //   nTopInsureDays: 0,
+          //   tBgnTm: "2025-05-26 00:00:00",
+          //   tCrtTm: null,
+          //   tEndTm: "2026-05-14 00:00:00",
+          //   tUpdTm: null,
+          //   _dataId: "c4bede5cda0c4cb9ae682d76e7f29638",
+          // }
 
 
           
@@ -230,8 +230,7 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "删除",
         icon: "Delete",
         link: true,
-        hideBtns: (row: any) => {
-            console.log(param.editType === "view"  )
+        hideBtns: (row: any) => { 
           if (param.editType === 'add' ||  param.editType === 'edit'|| !param.editType ) {
             return false;
           } else {
@@ -385,7 +384,11 @@ function getTableValue() {
 function handleQuery(cid:any) {
   const r = tableRef.value?.getPartnerPage(); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const c = tabref.getFromValue().cCommodityNo;
+  const c = tabref.getFromValue()['cCommodityNo'];
+  // if(!c){
+    
+  //   return false
+  // }
   const param = Object.assign(s, r, { cCommodityNo: cid? cid: c });
   if (c == !null) {
     ElMessage.error("商品编号为空,请保存后操作!");
