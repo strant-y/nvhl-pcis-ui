@@ -260,7 +260,7 @@
             <div style="display: flex; align-items: center; background: #fff; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap;">
               {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "申请单号:" }}
               <span id="policyNumber" style="margin-left: 5px; margin-right: 5px; font-weight: bold;">
-              {{ props.param?.pageName === "priceInquiry" ? opertaor.getTableRefByKey('plyBase')?.getValue('Base.cInquiryNo') || '暂无' : opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || '暂无' }}
+              {{ getNo }}
               </span>
               <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号'}`" placement="top">
                 <el-button @click="copyPolicyNumber" circle size="small" style="color: red;margin-right: 0;">
@@ -490,6 +490,10 @@ const isDetailCde = () => {
   return detailcodeArray.includes(props.param.cRsnDetailCde);
 };
 
+const getNo = computed(() => {
+  return edrbaseFlag.value ? edrbase.value?.getValue('EdrBase.cAppNo') : props.param?.pageName === "priceInquiry" ? opertaor.getTableRefByKey('plyBase')?.getValue('Base.cInquiryNo') || '暂无' : opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || '暂无'
+})
+
 onMounted(() => {
   initPage();
 });
@@ -682,7 +686,7 @@ const copyPolicyNumber = () => {
   // 清除选中内容
   // selection.removeAllRanges();
   const text = document.getElementById("policyNumber")?.innerText;
-  if (!text) return;
+  if (!text || text === "暂无") return;
   navigator.clipboard.writeText(text).then(res => {
     ElMessage.success(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + '已成功复制到剪贴板！');
   }).catch(err => {
