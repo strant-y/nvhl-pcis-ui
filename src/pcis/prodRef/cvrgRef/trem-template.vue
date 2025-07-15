@@ -759,8 +759,10 @@ function initshowConfig() {
     item.disabled = isdisabled(item);
 
     if (item.cFatherKey ) {  //如果存在上级,则将上限设置成0,等待父级修改后,再修改自己的上限
-      if(!item.max){
-        item.max = 0;
+      const mx = getTermData()[item.cFatherKey];
+      item.max = 0;
+      if(mx){
+        item.max = mx;
       }
     }
   });
@@ -1099,6 +1101,7 @@ const methodMap = {
         }
       }
     });
+    update();
   },
 
   /**
