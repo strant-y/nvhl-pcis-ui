@@ -96,9 +96,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             setFormItem("riFacOpn", {
               rules: [getRules("required", {})],
             });
+            setFormItem("riFacMrk", {
+              btnItems: {disabled: params.cAppTyp !== "E" ? false : true},
+            });
           } else {
             setFormItem("riFacOpn", {
               rules: [],
+            });
+            setFormItem("riFacMrk", {
+              btnItems: {disabled: true},
             });
           }
         },
@@ -107,7 +113,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         btnItems: {
           label: "自主临分提交",
           type: "primary",
-          disabled: params.cAppTyp === "E", // 批单不允许进行自主临分
+          disabled: true, // 批单不允许进行自主临分
           func: () => {
             const param = {
               cDocTyp: params.cAppTyp, // 单证类型 A 保单 E 批单
@@ -471,7 +477,7 @@ onMounted(() => {
       cPlanNo: params.cPlanNo,
     };
     if(params.pageName === "priceInquiry") {
-      param.cInquiryNo = params.cAppNo
+      param.cInquiryNo = params.cInquiryNo
     } else {
       param.cAppNo = params.cAppNo
     }

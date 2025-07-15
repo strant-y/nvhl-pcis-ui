@@ -260,7 +260,7 @@
             <div style="display: flex; align-items: center; background: #fff; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap;">
               {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "申请单号:" }}
               <span id="policyNumber" style="margin-left: 5px; margin-right: 5px; font-weight: bold;">
-              {{ props.param?.pageName === "priceInquiry" ? opertaor.getTableRefByKey('plyBase')?.getValue('Base.cInquiryNo') || '暂无' : opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || '暂无' }}
+              {{ getNo }}
               </span>
               <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号'}`" placement="top">
                 <el-button @click="copyPolicyNumber" circle size="small" style="color: red;margin-right: 0;">
@@ -525,6 +525,9 @@ const isDetailCde = () => {
   return detailcodeList.some(item => item.id === cRsnCde);
 };
 
+const getNo = computed(() => {
+  return edrbaseFlag.value ? edrbase.value?.getValue('EdrBase.cAppNo') : props.param?.pageName === "priceInquiry" ? opertaor.getTableRefByKey('plyBase')?.getValue('Base.cInquiryNo') || '暂无' : opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || '暂无'
+})
 
 onMounted(() => {
   console.log('param 路由---', props.param )
@@ -693,31 +696,38 @@ const copyPolicyFun = () => {
 
 // 复制投保单号
 const copyPolicyNumber = () => {
-  const policyNumberElement = document.getElementById("policyNumber");
-  if (!policyNumberElement) return;
+  // const policyNumberElement = document.getElementById("policyNumber")?.innerText;
+  // if (!policyNumberElement) return;
 
-  const range = document.createRange();
-  range.selectNode(policyNumberElement);
+  // const range = document.createRange();
+  // range.selectNode(policyNumberElement);
 
-  const selection = window.getSelection();
-  if (!selection) return;
+  // const selection = window.getSelection();
+  // if (!selection) return;
 
-  selection.removeAllRanges();
-  selection.addRange(range);
+  // selection.removeAllRanges();
+  // selection.addRange(range);
 
-  try {
-    const successful = document.execCommand("copy");
-    if (successful) {
-      ElMessage.success(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + '已成功复制到剪贴板！');
-    } else {
-      ElMessage.error(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + "复制失败，请手动复制。");
-    }
-  } catch (err) {
-    ElMessage.error("当前浏览器不支持自动复制功能，请手动复制。");
-  }
+  // try {
+  //   const successful = document.execCommand("copy");
+  //   if (successful) {
+  //     ElMessage.success(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + '已成功复制到剪贴板！');
+  //   } else {
+  //     ElMessage.error(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + "复制失败，请手动复制。");
+  //   }
+  // } catch (err) {
+  //   ElMessage.error("当前浏览器不支持自动复制功能，请手动复制。");
+  // }
 
   // 清除选中内容
-  selection.removeAllRanges();
+  // selection.removeAllRanges();
+  const text = document.getElementById("policyNumber")?.innerText;
+  if (!text || text === "暂无") return;
+  navigator.clipboard.writeText(text).then(res => {
+    ElMessage.success(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + '已成功复制到剪贴板！');
+  }).catch(err => {
+    ElMessage.error(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + "复制失败，请手动复制。");
+  })
 };
 
 /**

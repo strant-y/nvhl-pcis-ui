@@ -1341,4 +1341,8 @@ defineExpose({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+:deep(.el-table__body .el-table__row .el-table__cell:first-child .cell) {
+    white-space: break-spaces;
+}
+</style>

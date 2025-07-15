@@ -199,7 +199,14 @@ const checkUser = () => {
               const { code, data, msg } = res;
               if (200 === code) {
                 if(data){
-                  tabref ['applicant'].setFormValue(data[0])
+                  if(data && data.length > 0){
+                    Object.keys(data[0]).forEach((key) => { 
+                      if(data[0][key]){
+                        setValue(key, data[0][key]);
+                      }
+                    });
+                  }
+                  // tabref ['applicant'].setFormValue(data[0])
                   let userId = getValue('Applicant.cCertfCde')
                   idAnalysis(userId)
                 }

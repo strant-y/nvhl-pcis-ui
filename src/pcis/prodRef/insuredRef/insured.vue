@@ -202,8 +202,13 @@ const checkUser = () => {
         if (200 === code) {
           console.log('客户数据', res)
           if (data) {
-            tabref['insured'].setFormValue(data[0])
-            
+            if(data && data.length > 0){
+              Object.keys(data[0]).forEach((key) => { 
+                if(data[0][key]){
+                  setValue(key, data[0][key]);
+                }
+              });
+            }
             let userId = getValue('Insured.cCertfCde')
             idAnalysis(userId)
           }
@@ -974,12 +979,12 @@ const method = {
     }
     
     if (val == "1") {
-      const ads = insuredEditRef?.value?.getValue("Insured.AllProp");
+      const ads = insuredEditRef?.value?.getValue("Insured.ClntAddrProp");
       const a =
-        insuredEditRef?.value?.getValue("Insured.cRegisterSuffixAddr") || "";
+        insuredEditRef?.value?.getValue("Insured.cSuffixAddr") || "";
 
-      insuredEditRef?.value?.setValue("Insured.Prop", ads);
-      insuredEditRef?.value?.setValue("Insured.cSuffixAddr", a);
+      insuredEditRef?.value?.setValue("Insured.RegisterProp", ads);
+      insuredEditRef?.value?.setValue("Insured.cRegisterSuffixAddr", a);
     }
   },
   hidPerson: () => {
