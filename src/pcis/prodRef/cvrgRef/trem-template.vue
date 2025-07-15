@@ -605,10 +605,11 @@ function getProp(col: any) {
     fact["tableClick"] = factormap.value[factorId]["tableClick"];
   }
   if(col['cFatherKey']){
-    if(col['numberMax']){
-      fact.max = col["numberMax"];
-    }else{
-      fact.max = 0;
+    fact.max = 0;
+
+    const da = riskList.value[col['cRiskNo']][col['cFatherKey']];
+    if(da){
+      fact.max = da;
     }
   }
   
@@ -651,6 +652,11 @@ watch(() => props.modelValue, (newv,oldv)=>{
   initData(newv);
   dataInit();
 });
+
+function dataFlash(){
+  initData(props.modelValue);
+  dataInit();
+}
 
 function dataInit() {
   let queryList: { [k: string]: any }[] = [];
@@ -753,8 +759,10 @@ function initshowConfig() {
     item.disabled = isdisabled(item);
 
     if (item.cFatherKey ) {  //如果存在上级,则将上限设置成0,等待父级修改后,再修改自己的上限
-      if(!item.max){
-        item.max = 0;
+      const mx = getTermData()[item.cFatherKey];
+      item.max = 0;
+      if(mx){
+        item.max = mx;
       }
     }
   });
@@ -1088,11 +1096,12 @@ const methodMap = {
         item.max = val;
       }
       if(termdata.value[item.prop]){
-        if(item.max < termdata.value[item.prop]){
-          termdata.value[item.prop] = item.max;
+        if(val < termdata.value[item.prop]){
+          termdata.value[item.prop] = val;
         }
       }
     });
+    update();
   },
 
   /**
@@ -1139,6 +1148,7 @@ function setCancel(){
 }
 
 defineExpose({
+  dataFlash,
   dataInit,
   setDisabledAll,
   setCancel,

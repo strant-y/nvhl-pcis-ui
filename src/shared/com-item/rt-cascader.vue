@@ -170,7 +170,7 @@ watch(
 function handleChange(val?: string | number | Array<any> | undefined) {
   emits("valueChange", val);
   emits("update:modelValue", val);
-  props.item.func ? props.item.func(val) : null;
+  props.item.func ? props.item.func(val, props.row, codeListMap) : null;
 }
 
 function uploadOption() {

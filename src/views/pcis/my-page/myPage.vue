@@ -657,38 +657,40 @@ const copyPolicyFun = () => {
 
 // 复制投保单号
 const copyPolicyNumber = () => {
-  // const policyNumberElement = document.getElementById("policyNumber")?.innerText;
-  // if (!policyNumberElement) return;
+  const policyNumberElement = document.getElementById("policyNumber");
+  if (!policyNumberElement) return;
 
-  // const range = document.createRange();
-  // range.selectNode(policyNumberElement);
+  if(navigator.clipboard) {
+    const text = policyNumberElement.innerText;
+    navigator.clipboard.writeText(text).then(res => {
+      ElMessage.success(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + '已成功复制到剪贴板！');
+    }).catch(err => {
+      ElMessage.error(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + "复制失败，请手动复制。");
+    })
+  } else {
+    const range = document.createRange();
+    range.selectNodeContents(policyNumberElement);
 
-  // const selection = window.getSelection();
-  // if (!selection) return;
+    const selection = window.getSelection();
+    if (!selection) return;
 
-  // selection.removeAllRanges();
-  // selection.addRange(range);
+    selection.removeAllRanges();
+    selection.addRange(range);
 
-  // try {
-  //   const successful = document.execCommand("copy");
-  //   if (successful) {
-  //     ElMessage.success(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + '已成功复制到剪贴板！');
-  //   } else {
-  //     ElMessage.error(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + "复制失败，请手动复制。");
-  //   }
-  // } catch (err) {
-  //   ElMessage.error("当前浏览器不支持自动复制功能，请手动复制。");
-  // }
+    try {
+      const successful = document.execCommand("copy");
+      if (successful) {
+        ElMessage.success(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + '已成功复制到剪贴板！');
+      } else {
+        ElMessage.error(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + "复制失败，请手动复制。");
+      }
+    } catch (err) {
+      ElMessage.error("当前浏览器不支持自动复制功能，请手动复制。");
+    }
 
-  // 清除选中内容
-  // selection.removeAllRanges();
-  const text = document.getElementById("policyNumber")?.innerText;
-  if (!text || text === "暂无") return;
-  navigator.clipboard.writeText(text).then(res => {
-    ElMessage.success(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + '已成功复制到剪贴板！');
-  }).catch(err => {
-    ElMessage.error(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + "复制失败，请手动复制。");
-  })
+    // 清除选中内容
+    selection.removeAllRanges();
+  }
 };
 
 /**
@@ -730,6 +732,13 @@ const basicBtn = [
     type: "warning",
     id: "btn010103",
     func: () => {
+      /**
+       * 联共保判断
+       */
+      const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk')
+      if ('1' === CiMrk || '2' === CiMrk || '5' === CiMrk) {
+          const validCi = JointInsuranceCheck();
+      }
       submitToUndrFn();
     },
   }),
@@ -3160,6 +3169,23 @@ const validateCiInfo = () => {
     }
   return true;
 };
+const JointInsuranceCheck = ()=> {
+    const ciData = opertaor.getTableRefByKey("ci").getFromValue()
+    if (ciData && ciData.length > 0) {
+        let CCoinsurerCdeNum = 0; // 分公司份额
+        for (const ciRow of ciData) {
+            if ("327001" === ciRow["Ci.cCoinsurerCde"]) {
+                CCoinsurerCdeNum++;
+            }
+        }
+        console.log(CCoinsurerCdeNum);
+        if (CCoinsurerCdeNum <= 1) {
+            ElMessage.error("联共保时必须录入永安两个以上分公司份额！")
+            return;
+        }
+    }
+    
+}
 // 将对象的属性首字母转换为小写
 function lowercaseKeys<T extends object>(
   obj: T
