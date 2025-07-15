@@ -521,20 +521,25 @@ function getndisAbleConfig(key: any) {
 function setTermData(param: any, value: any){
 
   const prop: string = param.factorProp;
+  const termNo: string = param.termNo;
   const riskNo: string = param.riskNo;
 
   Object.keys(formData.value).forEach((item) => {
     formData.value[item].forEach((d: any) => {
-      if(!prop.startsWith('TermRisktgt')){
-        d[prop] = value;
+      
+      if(d['Term.cUniqueTermNo'] === termNo){
+        if(!prop.startsWith('TermRisktgt')){
+          d[prop] = value;
+        }
+        if (d.riskList && d.riskList.length > 0) {
+          d.riskList.forEach((r: any)=>{
+            if(r['TermRisktgt.cLiabCode'] === riskNo){
+              r[param.factorProp] = value;
+            }
+          })
+        }
       }
-      if (d.riskList && d.riskList.length > 0) {
-        d.riskList.forEach((r: any)=>{
-          if(r['TermRisktgt.cLiabCode'] === riskNo){
-            r[param.factorProp] = value;
-          }
-        })
-      }
+      
     });
   });
   showFlush();
