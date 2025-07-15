@@ -30,6 +30,14 @@ provide('idxParam', idxParam);
 
 const bthList = ref<FreeButtonBase[]>([
   createFreeButtonBase({
+    label: "保费计算",
+    type: "primary",
+    id: "save",
+    func: () => {
+      premiumCalculation();
+    },
+  }),
+  createFreeButtonBase({
     label: "保存",
     type: "primary",
     id: "save",
@@ -90,7 +98,41 @@ function query() {
     saveBtn.disabled = true;
   }
 }
-
+function isAllAValuesSame(arr:any,key:any) {
+  if (arr.length === 0) return true;
+  const firstValue = arr[0][key];
+  return arr.every(obj => obj.A === firstValue);
+}
+const premiumCalculation = ()=>{
+  //协议费用
+  const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn');
+  const allFromData = formPage.value?.getAllFormData();
+  // 条款
+  const AgreementCvrg = allFromData['AgreementCvrg']
+  if(AgreementCvrg.length > 0){
+    if(isAllAValuesSame(AgreementCvrg,'ECargoTerm.cFeeCurrency')){
+      AgreementFeeWarn.setFormItem('ECargoBase.PrmProp',{hidden: false})
+      AgreementFeeWarn.setValue('ECargoBase.cPrmCur',AgreementCvrg[0]['ECargoTerm.cFeeCurrency'])
+      const sum = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nInsuranceFee'], 0);
+      AgreementFeeWarn.setValue('ECargoBase.nPrm',sum)
+      const sum1 = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nRmbFee'], 0);
+      AgreementFeeWarn.setValue('ECargoBase.nRmbPrm',sum1)
+    }else{
+      AgreementFeeWarn.setFormItem('ECargoBase.PrmProp',{hidden: true})
+    }
+    if(isAllAValuesSame(AgreementCvrg,'ECargoTerm.cAmountCurrency')){
+      AgreementFeeWarn.setFormItem('ECargoBase.AmtProp',{hidden: false})
+      AgreementFeeWarn.setValue('ECargoBase.cAmtCur',AgreementCvrg[0]['ECargoBase.cAmtCur'])
+      const sum = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nInsuranceAmount'], 0);
+      AgreementFeeWarn.setValue('ECargoBase.nAmt',sum)
+      const sum1 = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nRmbAmount'], 0);
+      AgreementFeeWarn.setValue('ECargoBase.nRmbAmt',sum1)
+    }else{
+      AgreementFeeWarn.setFormItem('ECargoBase.AmtProp',{hidden: false})
+    }
+  }
+  console.log('allFromData',allFromData['AgreementCvrg'])
+}
 function save() {
   const allFromData = formPage.value?.getAllFormData();
   const user = JSON.parse(sessionStorage.getItem("user"));
