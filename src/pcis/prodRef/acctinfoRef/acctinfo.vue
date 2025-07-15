@@ -402,6 +402,9 @@ function getValue(key: string) {
 function getFormconfig() {
   return formconfig1;
 }
+function setDisabledAll(isDisabled: boolean) {
+  tgtobjEditRef?.value?.setDisabledAll(isDisabled);
+}
 
 defineExpose({
   getFromValue,
@@ -410,7 +413,8 @@ defineExpose({
   setValue,
   getValue,
   getFormconfig,
-  setFormItem
+  setFormItem,
+  setDisabledAll
 });
 </script>
 

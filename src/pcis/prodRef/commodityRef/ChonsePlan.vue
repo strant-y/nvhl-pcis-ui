@@ -381,25 +381,29 @@ function getTableValue() {
 }
 
 /** 查询 */
-function handleQuery(cid:any) {
-  const r = tableRef.value?.getPartnerPage(); //获取分页数据
+function handleQuery(flag?: boolean) {
+  const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const c = tabref.getFromValue()['cCommodityNo'];
-  const param = Object.assign(s, r, { cCommodityNo: cid? cid: c });
+  // param.cCommodityNo
+  
+  const params = Object.assign(s, r, { cCommodityNo: param.cCommodityNo? param.cCommodityNo: c });
 
-  console.log(1212,c,cid)
-  if (c == null &&  cid ==null) {
+  console.log(1212,c,param['cCommodityNo'])
+  if (c == null &&  param.cCommodityNo ==null) {
     ElMessage.error("商品编号为空,请保存后操作!");
     return;
   } else {
-    queryCommodityPlanList(param)
+    queryCommodityPlanList(params)
       .then((res) => {
         const { code, data, msg } = res;
        
         if (200 === code) {
           pageresult.list = data.result;
-          pageresult.total = data.length;
+          pageresult.total = data.total;
 
+          //           pageresult.total = pageData.total;
+          // pageresult.list = pageData.result;
 
 
         } else {
@@ -422,7 +426,7 @@ const handleVisibleUpdate = (value: boolean) => {
 onMounted(() => {
   console.log('path')
   if (param.editType!== 'add' && param.editType) {
-    handleQuery(param.cCommodityNo)
+    handleQuery()
   }
 
 

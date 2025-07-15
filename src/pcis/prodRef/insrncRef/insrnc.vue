@@ -49,12 +49,14 @@ const nRatioCoefFunc = () => {
   const baseBefore2 = tabref["base"]?.getFromValue();
   let prodNo = route.params.param?.cProdNo;
 
+  console.log(1212,baseBefore,baseBefore["Base.tInsrncBgnTm"],baseBefore["Base.tInsrncEndTm"])
   let param = {
     bgnTm: baseBefore["Base.tInsrncBgnTm"],
     endTm: baseBefore["Base.tInsrncEndTm"],
     prodNo,
     ratioType: baseBefore2 ? baseBefore2['Base.cRatioTyp'] : null
   }
+  console.log('传参打印',param)
   policyRatio(param).then((res: any) => {
     const { code, data, msg } = res;
     if (code === 200) {

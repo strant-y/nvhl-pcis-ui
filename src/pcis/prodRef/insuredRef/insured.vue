@@ -232,6 +232,34 @@ const method = {
     const applicantValue = tabref.getFromValue();
     console.log(applicantValue);
     let insuredValue: any = {};
+
+    // 同投保人时 客户信息需要禁用   客户名称 被保人性质 证件类型 证件号码  证件有效起 止期
+    // insuredValue["Insured.cInsuredNme"] &&
+    // insuredValue["Insured.cClntMrk"] !== null &&
+    // insuredValue["Insured.cCertfCde"] &&
+    // insuredValue["Insured.cCertfCls"]
+    setFormItem('Insured.cInsuredNme',{
+      disabled:true
+    })
+    setFormItem('Insured.cClntMrk',{
+      disabled:true
+    })
+    setFormItem('Insured.cCertfCde',{
+      disabled:true
+    })
+    setFormItem('Insured.cCertfCls',{
+      disabled:true
+    })
+    setFormItem('Insured.tCertfBgnDate',{
+      disabled:true
+    })
+    setFormItem('Insured.tCertfEndDate',{
+      disabled:true
+    })
+    setFormItem('Insured.cLongendTyp',{
+      disabled:true
+    })
+
     for (const k in applicantValue) {
       if (k === "Applicant.cCertfCls") {
         setTimeout(() => {
@@ -246,6 +274,8 @@ const method = {
         insuredValue[nk] = applicantValue[k];
       }
     }
+
+
     setFormValue(insuredValue);
   },
   funcquery: () => {
@@ -682,6 +712,15 @@ const method = {
       setFormItem("Insured.cCertfCde", {
         disabled: false,
       });
+      setFormItem('Insured.tCertfBgnDate',{
+        disabled:false
+      })
+      setFormItem('Insured.tCertfEndDate',{
+        disabled:false
+      })
+      setFormItem('Insured.cLongendTyp',{
+        disabled:false
+      })
     }
 
     tCertfDate.value = [];

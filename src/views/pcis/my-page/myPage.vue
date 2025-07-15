@@ -63,6 +63,7 @@
                           : 'Tickets',
                     }"
                   /> -->
+                  
                   <i :class="['icon','iconfont',iconMap[k.pageKey]]"></i>
                   <span class="icon-title" v-if="NavigaShow">
                     <template v-if="k.pageTtile && k.pageTtile.length > 7">
@@ -448,51 +449,15 @@ const pageData = ref({}); // 页面数据
 let controlFlag = ""; // 用来处理反洗钱 页面窜窜以及显示
 
 // 存所有可显示账户信息场景
-let detailcodeArray = [
-  "保费调整",
-  "赔款后保额冲减",
-  "赔款后保额恢复",
-  "增加保额",
-  "减少保额",
-  "增加险别",
-  "变更清单信息",
-  "减少险别",
-  "变更保险期限",
-  "变更车辆信息",
-  "渠道信息变更",
-  "增减方案",
-  "变更投保数量",
-  "变更每亩保费",
-  "减少保费",
-  "费率调整",
-  "报停展期",
-  "增加销售额",
-  "减少销售额",
-  "增加保费",
-  "其他",
-  "更改客户信息",
-  "变更工程造价",
-  "减少被保险人",
-  "变更建筑面积",
-  "收费延期",
-  "增加被保险人",
-  "增加清单信息",
-  "不记名补录被保险人",
-  "全单注销",
-  "全单退保",
-  "一般退保",
-  "当期退",
-  "分期失效",
-];
 const detailcodeList = [
   { id: "01", name: "变更投保数量" },
   { id: "05", name: "保费调整" },
   { id: "06", name: "赔款后保额恢复" },
   { id: "07", name: "增加保额" },
   { id: "08", name: "减少保额" },
-  { id: "09", name: "增加险别" },
+  { id: "09", name: "增加条款" },
   { id: "10", name: "变更清单信息" },
-  { id: "11", name: "减少险别" },
+  { id: "11", name: "减少条款" },
   { id: "12", name: "变更保险期限" },
   { id: "13", name: "更改客户信息" },
   { id: "17", name: "赔款后保额冲减" },
@@ -516,12 +481,8 @@ const detailcodeList = [
 
 
 // 用来处理 账户信息 哪些场景显示
-// const isDetailCde = () => {
-//   return detailcodeArray.includes(props.param.cRsnDetailCde);
-// };
 const isDetailCde = () => {
   let cRsnCde = props.param['cRsnCde']? props.param['cRsnCde']: props.param['cEdrRsnBundleCde'];  // 判断 批改的用批改ID   综合查询的用cEdrRsnBundleCde
-  // 使用 some 方法检查数组中是否存在匹配的 id
   return detailcodeList.some(item => item.id === cRsnCde);
 };
 
@@ -1309,6 +1270,8 @@ async function loadAfter() {
       }
       nextTick(() => {
         opertaor.setDisabledAll();
+
+
         getEdrRsnItemFun(
           props.param["cProdNo"],
           props.param["cDptCde"],
@@ -1317,6 +1280,23 @@ async function loadAfter() {
           props.param["cEdrType"],
           props.param["cGrpMrk"]
         );
+
+        console.log('3333',opertaor.getTableRefByKey('acctinfo'))
+        // 用于处理 账户信息
+        let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
+        if(acctinfoInfo){
+            acctinfoInfo.setDisabledAll(false);  
+            acctinfoInfo.setFormItem('Acctinfo.cAcctNme',{
+              disabled: true
+            })
+            acctinfoInfo.setFormItem('Acctinfo.cBankCnaps',{
+              disabled: true
+            })
+
+        }
+        //   CAcctNme
+            // ?.value?.setDisabledAll(isDisabled);
+
       });
       bthList.value = edrBtn;
     } else {
