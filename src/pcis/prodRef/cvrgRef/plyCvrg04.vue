@@ -271,7 +271,7 @@ function updateTitle() {
       }
 
       const filledString = fillTemplate(str, {
-        sumPrm: sumprm,
+        sumPrm: sumprm.toFixed(2),
         sumObjs: sumobj,
       });
       showTitleMap.value[k] = filledString;
