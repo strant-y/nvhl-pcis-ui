@@ -201,8 +201,13 @@ const checkUser = () => {
         if (200 === code) {
           console.log('客户数据', res)
           if (data) {
-            tabref['insured'].setFormValue(data[0])
-            
+            if(data && data.length > 0){
+              Object.keys(data[0]).forEach((key) => { 
+                if(data[0][key]){
+                  setValue(key, data[0][key]);
+                }
+              });
+            }
             let userId = getValue('Insured.cCertfCde')
             idAnalysis(userId)
           }

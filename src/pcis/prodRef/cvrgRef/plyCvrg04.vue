@@ -530,6 +530,7 @@ function refushData(planNo: string, datas: any) {
     // nextTick(() => {
     //   showFlush();
     // });
+    updateTitle();
   }, 100);
 }
 function deletePlan(plan: string) {
