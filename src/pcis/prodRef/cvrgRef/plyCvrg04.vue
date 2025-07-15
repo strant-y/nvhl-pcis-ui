@@ -329,6 +329,7 @@ function addAndinitData() {
             data["Term.cClauseCategory"] = item.cClauseCategory;
           }
           cAddTermNo.value = item.cUniqueTermNo;
+          initTermData(item,data);
           plans.push(data);
         });
         refushData(pl, plans);
@@ -502,6 +503,7 @@ function addTermData(PlanNo: string) {
             data["Term.cClauseCategory"] = item.cClauseCategory;
             // data["Term.cClaiminclude"] = '0';
           }
+          initTermData(item,data);
           plans.push(data);
         });
         refushData(PlanNo, plans);
@@ -735,6 +737,15 @@ function calcCheck(){
   return res;
 }
 
+function initTermData(item: any,data:any){
+  if(parparam.cProdNo === '043009'){
+    if(data.riskList && data.riskList.length > 0){
+      data.riskList.forEach((r)=>{
+        r['TermRisktgt.cDeductibleMethod'] = '01';
+      })
+    }
+  }
+}
 
 function setTermData(param: any, value: any){
 

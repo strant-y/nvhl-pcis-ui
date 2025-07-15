@@ -311,7 +311,6 @@ function addTermData() {
           data.riskList = riskList;
           plans.push(data);
         });
-        console.log('2121',plans)
         refushData(plans);
       },
     },
@@ -324,7 +323,6 @@ function initTermData(item: any,data:any){
     data["Term.nAdjustFactor"] = 100;
   }
   if(item.cUniqueTermNo === "00425000179"){
-    console.log(data);
     data['Term.cClaimInclude'] = '0';
   }
 }
