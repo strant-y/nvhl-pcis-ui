@@ -1054,7 +1054,9 @@ const initPage = async () => {
   let codeparam = [];
   
   Object.keys(codeinit).forEach(res =>{
-    codeparam.push(codeinit[res]);
+    if(res !== "Occupt_ZYLB") {
+      codeparam.push(codeinit[res]);
+    }
   });
   await getInitParam(codeparam);
   // if(productStore.$state.cCiMrk == "0"){
