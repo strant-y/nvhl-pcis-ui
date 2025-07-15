@@ -52,11 +52,12 @@ onMounted(() => {
   console.log(3838, formconfig11);
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
-    //是否小微企业，默认非必填、只读
-    setFormItem("Applicant.cIsMicroEntpris", {
-      rules: null,
-      disabled: true,
-    });
+    const list:Array<string>= ["ECargoBase.nAmtRmbExch","ECargoBase.cInsExchCde", "ECargoBase.nPrmRmbExch","ECargoBase.cPremExchCde"]
+     list.forEach(item =>{
+       setFormItem(item, {
+         hidden: true,
+       });
+     })
   });
 });
 
@@ -101,6 +102,22 @@ function handleFileChange() {
 
 // 绑定方法
 const method = {
+  cPayWayChange:(val:any)=>{
+    const list:Array<string>= ["ECargoBase.nLowPrm","ECargoBase.nReceivedPrm","ECargoBase.cReceivedRmb","ECargoBase.nReceivedRate","ECargoBase.nRmbReceivedPrm"]
+    if(val !== '01'){
+      list.forEach(item => {
+        setFormItem(item, {
+          hidden: true,
+        });
+      })
+    }else {
+      list.forEach(item => {
+        setFormItem(item, {
+          hidden: false,
+        });
+      })
+    }
+  }
   // func demo
 
 }
@@ -153,6 +170,7 @@ function setDisabledAll(isDisabled: boolean) {
   applicantEditRef?.value?.setDisabledAll(isDisabled);
 }
 defineExpose({
+  setFormItem,
   getFormValue,
   setFormValue,
   validate,
