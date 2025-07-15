@@ -235,6 +235,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "特约内容",
         align: "left",
+        //  width: 210,
       },
     ],
   })

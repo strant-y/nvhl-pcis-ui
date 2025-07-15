@@ -25,7 +25,7 @@
       <review-info ref="reviewInfoRef"></review-info>
     </el-card>
     <div style="text-align: right;margin-top: 20px;" v-if="!isAdd ">
-      <div style="text-align: right;margin-top: 20px;" v-if="routeQryParams.type !== 'view'">
+      <div style="text-align: right;margin-top: 20px;" v-if="routeQryParams?.type !== 'view'">
         <el-button type="primary" @click="save">保存</el-button>
         <el-button type="primary" @click="saveAndSubmit">保存并提交审核</el-button>
         <el-button @click="goBack">返回</el-button>
@@ -90,7 +90,7 @@ const props = defineProps({
 });
 
 const routeQryParams: any = props.data;
-const isAdd = ref((routeQryParams.type !== 'add' && routeQryParams.type !== 'update' && routeQryParams.type !== 'view'))
+const isAdd = ref((routeQryParams?.type !== 'add' && routeQryParams?.type !== 'update' && routeQryParams?.type !== 'view'))
 const user = ref(userStore.user);
 const reviewInfoRef = ref(null);
 const policyService = new PolicyService();
@@ -121,11 +121,11 @@ watch(
   }
 );
 
-opertaor.setParam(routeQryParams.rowData);
+opertaor.setParam(routeQryParams?.rowData);
 onBeforeMount(() => {
   console.log("routeQryParams", routeQryParams);
-  console.log("路由参数routeQryParams.rowData", routeQryParams.rowData);
-  if(routeQryParams.rowData){
+  console.log("路由参数routeQryParams.rowData", routeQryParams?.rowData);
+  if(routeQryParams?.rowData){
     initPage();
   }
 });
@@ -145,8 +145,8 @@ const initPage = async () => {
     }
   }else{
     param = {
-      CProdNo: routeQryParams.rowData.cProdNo,
-      CGrpMrk: routeQryParams.rowData.cGrpMrk,
+      CProdNo: routeQryParams?.rowData.cProdNo,
+      CGrpMrk: routeQryParams?.rowData.cGrpMrk,
     }
   }
 
@@ -859,7 +859,7 @@ const submit = () => {
   const s = reviewInfoRef.value.getFromValue(); //获取表单数据
   const res = Object.assign(s);
   res['cRelNo'] = freeEditRef.value?.getValue("cPlanNo");
-  res['id'] = routeQryParams.rowData.cPkId;
+  res['id'] = routeQryParams?.rowData.cPkId;
   res['cType'] = 'PLAN';
   console.log(res)
   policyService.processApprove(res).then(result => {
@@ -877,10 +877,10 @@ const submit = () => {
 
 onMounted(() => {
   console.log('-----------------',props.goodsData == null ,props.goodsType)
-  if (routeQryParams.type == 'add') {
+  if (routeQryParams?.type == 'add') {
     nextTick(() => {
-      freeEditRef.value?.setValue("cKindNo", routeQryParams.rowData.cKindNo);
-      freeEditRef.value?.setValue("cProdNo", routeQryParams.rowData.cProdNo);
+      freeEditRef.value?.setValue("cKindNo", routeQryParams?.rowData.cKindNo);
+      freeEditRef.value?.setValue("cProdNo", routeQryParams?.rowData.cProdNo);
     });
   } else {
     console.log('-----router=-=',routeQryParams)
@@ -919,7 +919,7 @@ onMounted(() => {
   }
   // || props.type == 'goods'
   nextTick(() => {
-    if (routeQryParams.type == 'view' || routeQryParams.type == 'under' ||props.goodsType=='goods' ) {
+    if (routeQryParams?.type == 'view' || routeQryParams?.type == 'under' ||props.goodsType=='goods' ) {
       freeEditRef.value.setDisabledAll();
       opertaor.setDisabledAll();
     }
