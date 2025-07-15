@@ -84,6 +84,9 @@ const formconfig1 = ref<AppFreeEditConfig>(
               },
               { dist: s }
             );
+            if(params.dist['Dist.ProjectDesignProp']) {
+              params.dist['Dist.cProjectAddress'] = params.dist['Dist.ProjectDesignProp']
+            }
             if(route.params.param?.pageName === "priceInquiry") {
               params.cInquiryNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
             } else {
