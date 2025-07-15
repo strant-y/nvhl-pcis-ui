@@ -41,7 +41,7 @@ const rowData = ref(null)
 const freeEditRef = ref<AppGridEditMethod | null>(null);
 const formconfig1 = reactive(createAppGridEditConfig({}));
 const initFlag = computed(() => opertaor.getParam().initFlag);
-
+let bankRelTypeArr: any[] = []; // 收款银行大类分解
 onMounted(async () => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
@@ -473,7 +473,7 @@ const method = {
   //开户行大类改变
   cBankRelTypChange:(val)=>{
     const rowDatas = freeEditRef.value?.getSelectRow();
-    const bankRelTypeArr = val.split('_')
+    bankRelTypeArr = val.split('_')
     freeEditRef.value?.setValueByRowKey("Ci.cBankAddr",rowDatas._dataId,bankRelTypeArr[1])
     freeEditRef.value?.setRowFieldProp(rowDatas._dataId, "Ci.cBankPro", "rules", [getRules("required", {})]);
     freeEditRef.value?.setRowFieldProp(rowDatas._dataId, "Ci.cBankArea", "rules", [getRules("required", {})]);
@@ -504,29 +504,57 @@ const method = {
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData._dataId;
     freeEditRef?.value?.setValueByRowKey("Ci.cCountryCde",rowId,"")
-    codeListStore
-        .queryCodeList({
+
+         codeListStore
+      .queryCodeList(
+        {
           codeListName: "CBankCountyList",
-          codeListParam: { "areaprovince": rowData['Ci.cBankArea'],"areaname":val },
-        })
-        .then((res) => {
-          freeEditRef.value?.setRowFieldProp(
+          codeListParam: {
+            areaname: val
+          },
+        },
+      )
+      .then((res) => {
+       freeEditRef.value?.setRowFieldProp(
             rowId,
             "Ci.cBankCounty",
             "loadData",
             res,
           );
-        });
+        // freeEditRef.value?.addCodeListMap({
+        //   code: "Ci.cBankCounty",
+        //   list: res
+        // })
+        // setFormItem("Acctinfo.cBankCounty", {
+        //   disabled: false,
+        //   // rules: [getRules("required", {})],
+        // });
+      });
+    // codeListStore
+    //     .queryCodeList({
+    //       codeListName: "CBankCountyList",
+    //       codeListParam: { "areaprovince": rowData['Ci.cBankArea'],"areaname":val },
+    //     })
+    //     .then((res) => {
+    //       freeEditRef.value?.setRowFieldProp(
+    //         rowId,
+    //         "Ci.cBankCounty",
+    //         "loadData",
+    //         res,
+    //       );
+    //     });
   },
   //开户行县改变
   cCountyChange:(val) => { 
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData._dataId;
     freeEditRef?.value?.setValueByRowKey("Ci.cBankCde",rowId,"")
+    console.log('11113', rowData)
     codeListStore
         .queryCodeList({
-          codeListName: "CBankCountyList",
-          codeListParam: { "areaprovince": rowData['Ci.cBankCounty'],"areaname":val },
+          codeListName: "CBankCdeList",
+          codeListParam: { "banktypecod":bankRelTypeArr[3],"areacode":val },
+          // codeListParam: { "areaprovince": rowData['Ci.cBankCounty'],"areaname":val },
         })
         .then((res) => {
           freeEditRef.value?.addCodeListMap({
@@ -540,6 +568,36 @@ const method = {
           //   res,
           // );
         });
+
+        // codeListStore
+        // .queryCodeList(
+        //   {
+        //     codeListName: "CBankCdeList",
+        //     codeListParam: {
+        //       'banktypecod': para[3], 'areacode': val
+        //     },
+        //   },
+        // )
+        // .then((res) => {
+        //   tgtobjEditRef.value?.addCodeListMap({
+        //     code: "Acctinfo.cBankCde",
+        //     list: res
+        //   })
+        //   // setFormItem("Acctinfo.cBankCde", {
+        //   //   disabled: false,
+        //   //   rules: [getRules("required", {})],
+        //   // });
+        // });
+        
+  },
+    // 开户行    CNAPS号 开户行地址
+  cBankCdeChange: (val: any) => {
+    console.log(val, '开户行')
+    if (val) {
+      let backAddr = val.split('_');
+      // setValue('Ci.cBankCnaps', backAddr[0])
+      // setValue('Ci.cBankAddr', backAddr[1])
+    }
   },
   //代理/经纪人
   cBrkrCdeChange:()=>{

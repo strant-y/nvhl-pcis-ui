@@ -443,7 +443,7 @@ const method = {
   },
   //全量导入
   importExcel() {
-    const cappNo  = opertaor.getDataAll().plyBase["Base.cAppNo"];
+    const cappNo  = route.params.param?.pageName === "priceInquiry" ? opertaor.getDataAll().plyBase["Base.cInquiryNo"] : opertaor.getDataAll().plyBase["Base.cAppNo"];
     if (cappNo == '' || cappNo == undefined || route.params.param?.pageType === "E") {
       ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
       return;
@@ -500,7 +500,7 @@ const method = {
   },
   // 增量导入
   importExcelIncrement: () => {
-    const cappNo  = opertaor.getDataAll().plyBase["Base.cAppNo"];
+    const cappNo  = route.params.param?.pageName === "priceInquiry" ? opertaor.getDataAll().plyBase["Base.cInquiryNo"] : opertaor.getDataAll().plyBase["Base.cAppNo"];
     if (cappNo == '' || cappNo == undefined ||route.params.param?.pageType === "E") {
       ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
       return;
@@ -682,7 +682,13 @@ watch(
 const getSummary = async () => {
   let money = 0;
   let num = 0;
-  await policyService.getEstimatedSalesAndEstimatedSalesQuantity({cAppNo: route.params.param?.cAppNo}).then((res:any) => {
+  const param = {};
+  if(route.params.param?.pageName === "priceInquiry") {
+    param.cInquiryNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+  } else {
+    param.cAppNo = route.params.param?.cAppNo
+  }
+  await policyService.getEstimatedSalesAndEstimatedSalesQuantity(param).then((res:any) => {
     if(res.code === 200) {
       money = res.data.nEstimatedSales
       num = res.data.nEstimatedSalesQuantity

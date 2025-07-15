@@ -8,7 +8,7 @@
     :placeholder="item.placeholder"
     :disabled="isDisabled()"
     :min="item.min!=null && item.min !=undefined ?  item.min : 0"
-    :max="item.max!=null && item.max !=undefined ?  item.max : 9999999999"
+    :max="item.max!=null && item.max !=undefined ?  item.max : 99999999999999999999"
     :step="item.step"
     :step-strictly="item.stepStrictly"
     :size="item.size"

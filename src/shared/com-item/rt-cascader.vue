@@ -96,11 +96,19 @@ const cascprops: CascaderProps = {
         resolve(list);
         return;
       }
+      const codeListParam = {};
+      // 批改原因级联
+      if(props.item.typeCode === "EDR_RSN_LIST_NEW") {
+        codeListParam.rsnTyp = value.split('-')[0]
+        codeListParam.kindNo = value.split('-')[1]
+      } else {
+        codeListParam.cParCde = value
+      }
       codeListStore
         .queryCodeList(
           {
             codeListName: props.item.typeCode,
-            codeListParam: { cParCde: value },
+            codeListParam: codeListParam,
           },
           props.unAuthor,
           props.item.cache ? props.item.cache : true
@@ -110,9 +118,15 @@ const cascprops: CascaderProps = {
             typeof props.item.cascaderprops === "string"
               ? JSON.parse(props.item.cascaderprops)
               : props.item.cascaderprops;
-          res.forEach((e: any) => {
-            e.leaf = level >= (l && l.length > 0 ? l.length - 1 : 5);
-          });
+          if(props.item.typeCode === "EDR_RSN_LIST_NEW") {
+            res.forEach((e: any) => {
+              e.leaf = level >= 1;
+            });
+          } else {
+            res.forEach((e: any) => {
+              e.leaf = level >= (l && l.length > 0 ? l.length - 1 : 5);
+            });
+          }
           codeListMap[`${props.item.typeCode}-${level}-${value}`] = res;
           resolve(res);
         })

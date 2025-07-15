@@ -42,22 +42,40 @@ const method = {
 
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["base"].getFromValue();
+    const applicantBefore = tabref["applicant"].getFromValue();
+    const insrncBefore = tabref["insrnc"].getFromValue();
     const val = getFromValue()
-    console.log(1111111,baseBefore['Base.cInstMrk'])
-    
-
     if(baseBefore['Base.cInstMrk'] ==='0' && val.length === 1){
       ElMessage.error('付费约定为一次交清，只能录入一条！');
       return false;
     }
-    payinfoEditRef?.value?.addRow();
-  
+    if(val.length>=12){
+      ElMessage.error('“缴费计划”不能超过12期！');
+      return false;
+    }
 
-    console.log(val)
+    
+
+
+    payinfoEditRef?.value?.addRow();
     if (val) {
-      val.forEach((key, index) => {
-        key['Pay.nTms'] = index + 1
-      });
+      let obj = {
+          'Pay.nTms': val.length,
+          'Pay.cPayorCde':applicantBefore['Applicant.cAppCde'] || null,
+          'Pay.cPayorNme': applicantBefore['Applicant.cAppNme'] || null,
+          'Pay.tPayBgnTm': insrncBefore['Base.tInsrncBgnTm'],
+          'Pay.tPayEndTm':insrncBefore['Base.tInsrncEndTm'],
+          'Pay.nOwnPrm': baseBefore['Base.nPrm'],
+      }
+     val[val.length -1] = {...val[val.length -1],...obj}
+    //   val.forEach((key, index) => {
+    //     key['Pay.nTms'] = index + 1
+    //     key['Pay.cPayorCde'] =applicantBefore['Applicant.cAppCde'] || null ;
+    //     key['Pay.cPayorNme'] = applicantBefore['Applicant.cAppNme'] || null;
+    //     key['Pay.tPayBgnTm'] = insrncBefore['Base.tInsrncBgnTm'];
+    //     key['Pay.tPayEndTm'] = insrncBefore['Base.tInsrncEndTm'];
+    //     // key['Pay.nOwnPrm'] = baseBefore['Base.nPrm'];
+      // });
     }
 
   },
@@ -68,10 +86,14 @@ const method = {
       return;
     }
     const editIndex = selData['_dataId']
+
     payinfoEditRef?.value?.delRow(editIndex);
     const val = getFromValue()
     val.forEach((key, index) => {
-      key['Pay.nTms'] = index + 1
+      key['Pay.nTms'] = index + 1;
+      
+   
+
     });
   },
   //缴费止期控制
