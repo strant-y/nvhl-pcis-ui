@@ -1096,8 +1096,8 @@ const methodMap = {
         item.max = val;
       }
       if(termdata.value[item.prop]){
-        if(item.max < termdata.value[item.prop]){
-          termdata.value[item.prop] = item.max;
+        if(val < termdata.value[item.prop]){
+          termdata.value[item.prop] = val;
         }
       }
     });
