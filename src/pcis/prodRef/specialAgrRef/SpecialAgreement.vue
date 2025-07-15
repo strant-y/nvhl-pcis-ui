@@ -32,8 +32,10 @@ import {
 } from "@/shared/app-table-config";
 import { deleteFactorBykey, getBasicKindList } from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
+import { eventBus } from '@/utils/event-bus'
 const opertaor = dataOpertaor();
 const formData = ref<any[]>([]);
+// const formData = reactive([]);
 const dzmodal = useDzModal();
 const dialog = ref<DialogMethod | null>(null);
 const tableRef = ref<MyTableMethod | null>(null);
@@ -89,11 +91,19 @@ const tableconfig = reactive<AppTableConfig>(
            return row.cIfEdit !== '1';
         },
         tableClick: (row) => {
-
+          if(originalData.value.length==0){
+              originalData.value =    deepClone(formData.value)
+          }
+         
+          console.log('row',row)
+          console.log('1212', originalData.value )
           let param = {};
           if(row['cIfMust'] !== '9') {
-            const f = originalData.value.find(f => row.cSpecialCode === f.cSpecialCode);
+                let rid = row.cSpecialCode|| row.cSpecialCode
+            const f = originalData.value.find(f => rid === f.cSpecialCode);
+            // cSpecialContent
             Object.assign(param, f);
+            
           }else {
             Object.assign(param, row)
           }
@@ -101,10 +111,7 @@ const tableconfig = reactive<AppTableConfig>(
           if(row.editList && row.editList.length>0){
             param['editList'] = row.editList
           }
-
-          console.log(param)
-          console.log('dd0',row)
-          console.log('dd1',originalData.value)
+          console.log('param',param)
           dzmodal.open(specEdit, { type: "view", data: param,
           callback: (res: any) => {
               if (res.type === "ok") {
@@ -115,7 +122,7 @@ const tableconfig = reactive<AppTableConfig>(
 
                  let list = formData.value;
                  const index = list.findIndex(
-                    item => item.cSpecialContent === row.cSpecialContent
+                    item => item.cSpecialCode === row.cSpecialCode
                   );
                     if (index !== -1) {
                       nextTick(()=>{
@@ -126,14 +133,6 @@ const tableconfig = reactive<AppTableConfig>(
                     }      
                 }
             } })
-          // .
-          // then((res) => {
-          //   console.log('000kkk',res)
-          //   if (res.type === "ok") {
-          //       row.cSpecialContent = res.data.cSpecialContent
-
-          //   }
-          // });
         },
       }),
       createFreeButtonBase({
@@ -241,7 +240,31 @@ const tableconfig = reactive<AppTableConfig>(
   })
 );
 
+const addData =()=>{
+  let obj = [];
+  let isAdd = true;
+    formData.value.forEach((item)=>{
+      if(item.add){
+        isAdd = false;
+      }
+    })
+    if(isAdd){
+      obj =[...formData.value, {
+        addIndex: 1,
+        cIfEdit: "0",
+        cIfFix: "2",
+        cIfMust: "2",
+        cSpecialCode: "",
+        add:true,
+        cSpecialContent: "各期保费应在约定的缴费止期前缴纳，超过约定止期未支付当期保费的，在未支付保费的期间发生保险事故的，本公司按照已缴纳保费及未到缴费期应交保费之和占总保费的比例进行赔偿。",
+        // index: formData.value.length+1
+      }]
+       setFormValue(obj)
+    } 
+}
+
 onMounted(async () => {
+    eventBus.on('add-special', addData)
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
     method,
@@ -253,17 +276,20 @@ onMounted(async () => {
     item.index = index + 1;
   });
 
-  // setTimeout(()=>{
-  //   setDisabledAll()
-  // })
+  setTimeout(()=>{
+    // setDisabledAll()
+     
+  })
 });
-
+// 组件卸载时移除事件监听（避免内存泄漏）
+onUnmounted(() => {
+  eventBus.off('add-special', addData)
+})
 
 
 // 绑定方法
 const method = {
   func1: () => {
-    console.log(getRules);
   },
   //获取特约按钮
   getSpecialAgree: () => {
@@ -285,7 +311,6 @@ const method = {
             });
             originalData.value =    deepClone(sel)
             formData.value = sel
-            console.log(sel)
           },
       },
       { title: "添加特约", width: 85 }

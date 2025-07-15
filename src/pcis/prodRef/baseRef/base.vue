@@ -19,6 +19,7 @@ import { useRoute } from "vue-router";
 const route = useRoute();
 import { ratio } from "@/api/prod"
 import dayjs from "dayjs";
+import { eventBus } from '@/utils/event-bus'
 
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
@@ -37,11 +38,10 @@ const props = defineProps({
 });
 
 const baseEditRef = ref<AppFreeEditMethod | null>(null);
-
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 const sessionData = ref();
 const fixSpecData = ref([]); //存储已选择的特别约定数据
-
+let specialAdd = true;
 onMounted(async () => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
@@ -71,6 +71,14 @@ const method = {
       return false
     }
     if(getValue("Base.nPayNumber")!=''){
+      if(specialAdd){
+        ElMessage.warning("分期付费业务，需在特别约定中增加及时缴纳保费的提示信息");
+  
+        specialAdd = false;
+      }
+       eventBus.emit('add-special')
+  // eventBus.on('add-special', queryCBsnsTyp)
+
       const totalAmount = Number(getValue("Base.nPrm"));
       const splitCount = Number(getValue("Base.nPayNumber"));
 
