@@ -111,10 +111,13 @@ const handleSelectionChange = (selection) => {
 };
 
 const refreshData = () => {
+  console.log(props.data,"0000000")
   const cProdNo = props.data.cProdNo;
+  const cDptCde = props.data.cDptCde;
   // 查询列表数据
   getpSpecialAgreement({
     cProdNo: cProdNo,
+    cDptCde: cDptCde,
     pageNum: 1,
     pageSize: 999,
   }).then((res) => {
