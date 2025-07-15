@@ -196,6 +196,12 @@ function getPartnerPage(flag = true) {
   }
   return queryParams;
 }
+function setPartnerPage(params: PageQuery) {
+  if (params) {
+    queryParams.pageNum = params.pageNum ? params.pageNum : 1;
+    queryParams.pageSize = params.pageSize ? params.pageSize : 10;
+  }
+}
 function getFromValue() {
   if (dynamicForm.value) {
     return dynamicForm?.value.getFromValue();
@@ -265,7 +271,7 @@ defineExpose({
   setValueByRowKey,
   getselectionData,
   getRowAllItemRefById,
-
+  setPartnerPage,
   clearSelection,
   toggleRowSelection,
   getFormBtn,

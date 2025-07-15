@@ -1,3 +1,23 @@
+const cCheckStsList = [
+  {value: '00', label: '待缴费'},
+  {value: '0', label: '待登记'},
+  {value: '1', label: '待审核'},
+  {value: '2', label: '待修改'},
+  {value: '3', label: '审核通过'},
+  {value: '4', label: '缴费成功'},
+  {value: '5', label: '刷卡成功待重复确认'},
+  {value: '6', label: '待确认'},
+  {value: '7', label: '已登记'},
+  {value: '9', label: '重复投保'},
+];
+const statusList = [
+  { label: "待核保任务", value: "1" },
+  { label: "暂存任务", value: "2" },
+  { label: "已上报任务", value: "3" },
+  { label: "核保退回任务", value: "4" },
+  { label: "核保通过任务", value: "5" },
+]
+                
 export const tableObj = {
   // 出单--暂存任务
   notWaitObj: {
@@ -136,9 +156,60 @@ export const tableObj = {
       },
     ],
   },
+  // 出单-待缴费
+  waitPayObj: {
+    fromSchema: [
+			{
+				prop: "cAppNo",
+				inputtype: "rtinput",
+				title: "投保单号",
+			},
+			{
+				prop: "cAppNmeInvest",
+				inputtype: "rtinput",
+				title: "投保人名称",
+			},
+			{
+				prop: "cPayTyp",
+				inputtype: "rtselect",
+				title: "缴费类型",
+        typeCode: "CHARGE_TYPE_CACHE",
+        param: {'cCde': [ '2', '3', '5',  '99']},
+				formatter: (val)=>{
+				  const result = cPayTypList.value.find(item => item.value === val);
+				  return result ? result.label : val;
+				}
+			},
+			{
+				prop: "nPrm",
+				inputtype: "rtinput",
+				title: "保费金额",
+			},
+			{
+				prop: "nPayAmt",
+				inputtype: "rtinput",
+				title: "应缴金额",
+			},
+			{
+				prop: "cCheckSts",
+				inputtype: "rtselect",
+				title: "处理状态",
+				loadData:cCheckStsList,
+				formatter: (val)=>{
+				  const result = cCheckStsList.find(item => item.value === val);
+				  return result ? result.label : val;
+				}
+			},
+    ]
+  },
   //核保员-暂存任务
   saveObj: {
     fromSchema: [
+      {
+        prop: "objId",
+        inputtype: "rtinput",
+        title: "申请单号",
+      },
       {
         prop: "uwDptName",
         inputtype: "rtinput",
@@ -154,30 +225,25 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "条款",
       },
-      {
-        prop: "objId",
-        inputtype: "rtinput",
-        title: "申请单号",
-      }
     ],
   },
   //核保员-修改单
   editObj: {
     fromSchema: [
       {
-        prop: "uwDptName",
-        inputtype: "rtinput",
-        title: "出单机构",
-      },
-      {
         prop: "appCde",
         inputtype: "rtinput",
         title: "申请单号",
       },
       {
+        prop: "uwDptName",
+        inputtype: "rtinput",
+        title: "出单机构",
+      },
+      {
         prop: "prodName",
         inputtype: "rtinput",
-        title: "险种",
+        title: "条款",
       },
       {
         prop: "cAppStatus",
@@ -185,6 +251,35 @@ export const tableObj = {
         title: "状态",
       }
     ],
+  },
+  //核保员-已核保单
+  udrObj: {
+    fromSchema: [
+      {
+        prop: "objId",
+        inputtype: "rtinput",
+        title: "申请单号",
+      },
+      {
+        prop: "uwDptName",
+        inputtype: "rtinput",
+        title: "出单机构",
+      },
+      {
+        prop: "prodName",
+        inputtype: "rtinput",
+        title: "条款",
+      },
+      {
+        prop: "cAppStatus",
+        inputtype: "rtinput",
+        title: "状态",
+				formatter: (val)=>{
+				  const result = statusList.find(item => item.value === val);
+				  return result ? result.label : val;
+				}
+      }
+    ]
   }
 }
 // 出岗 tab
@@ -205,6 +300,12 @@ export const tab1 = [{
   refName: 'renewalList',
   tableObj: 'waitObj',
   url: '/RenewalManagement/renewal-management',
+},
+{
+  name: '待缴费',
+  refName: 'pendingPaymentList',
+  tableObj: 'waitPayObj',
+  url: '/RenewalManagement/renewal-management',
 }
 ]
 
@@ -219,6 +320,12 @@ export const tab2 = [{
   name: '待修改任务',
   refName: 'udrReturnList',
   tableObj: "editObj",
+  url: '/pcis-new-udr-list/PendUdrList',
+},
+{
+  name: '已核保任务',
+  refName: 'underwritingAlreadyList',
+  tableObj: "udrObj",
   url: '/pcis-new-udr-list/PendUdrList',
 }
 ]

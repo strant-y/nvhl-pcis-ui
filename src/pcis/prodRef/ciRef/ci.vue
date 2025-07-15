@@ -21,7 +21,6 @@ import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 import { useProductStore } from "@/store/modules/prod";
 import CostInformation from "@/views/pcis-new-udr-list/pages/CostInformation.vue";
-import { set } from "lodash";
 const productStore = useProductStore();
 const dialogRef = ref<DialogMethod | null>(null);
 
@@ -144,6 +143,7 @@ const method = {
                 res
             );
           });
+        // freeEditRef.value?.setRowFieldProp()
         // setFormItem("Ci.cDptCde", { rules: [getRules("required", {})] });
         // setFormItem("Ci.cDptCde", { disabled: false });
         setFormItem("Ci.nComm", { disabled: false});
@@ -169,7 +169,6 @@ const method = {
     }
     updateMasterAgreementValues()
   },
-
   cCoinsurerCdeChange:(val)=>{
     const rowData = freeEditRef.value?.getSelectRow();
     const formTableData = getFromValue();
@@ -177,7 +176,6 @@ const method = {
     if (!rowData) return;
     const rowId = rowData._dataId;
     if(!initFlag.value){
-      
       if (plyBasedata["Base.cCiMrk"] === "5" && val !== "327001") {
         freeEditRef?.value?.setValueByRowKey("Ci.cCoinsurerCde", rowId, "");
         ElMessage.error("司内联保，不能录入除永安以外的其他公司！");
@@ -205,15 +203,13 @@ const method = {
               }
           );
         });
-        freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
-        );
-        // setFormItem("Ci.cDptCde", { rules: [getRules("required", {})] });
-        setFormItem("Ci.cDptCde", { disabled: false });
+        // freeEditRef.value?.setRowFieldProp(
+        //         rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
+        // );
+        // setFormItem("Ci.cDptCde", { disabled: false });
         setFormItem("Ci.nComm", { disabled: false});
         setFormItem("Ci.cBrkrCde", { disabled: false});
         setFormItem("Ci.cBrkSlsCde", { disabled: false});
-        // setFormItem("Ci.cSlsCde", { rules: [getRules("required", {})] });
         setFormItem("Ci.cSlsCde", { disabled: false});
         if (plyBasedata["Base.cCiMrk"] === "3" || plyBasedata["Base.cCiMrk"] === "4") {
           const isYonganAlreadyPresent = formTableData.some(
@@ -229,9 +225,10 @@ const method = {
       // 非永安保险，设置默认值和其他数据
       freeEditRef.value?.addCodeListMap(
           {code: "Ci.cSubDptCde"+rowId,
-           list: [{ label: '其他',value: '1',  }]
+            list: [{ label: '其他',value: '1',  }]
           }
       );
+      // freeEditRef.value?.setRowFieldProp(rowData._dataId, "Ci.cDptCde", "rules", []);
       freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "1");
       setFormItem("Ci.cDptCde", { rules: [] });
       // setFormItem("Ci.cDptCde", { disabled: true });
@@ -549,7 +546,6 @@ const method = {
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData._dataId;
     freeEditRef?.value?.setValueByRowKey("Ci.cBankCde",rowId,"")
-    console.log('11113', rowData)
     codeListStore
         .queryCodeList({
           codeListName: "CBankCdeList",
@@ -561,12 +557,6 @@ const method = {
             code:"Ci.cBankCde"+rowId,
             data:res
           })
-          // freeEditRef.value?.setRowFieldProp(
-          //   rowId,
-          //   "Ci.cBankCde",
-          //   "loadData",
-          //   res,
-          // );
         });
 
         // codeListStore
@@ -704,6 +694,8 @@ const updateMasterAgreementValues = () => {
       totalPrm += ciPrm;
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntAmt", totalAmt.toFixed(2));  //联保总保额
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm", totalPrm.toFixed(2)); //联保总保费
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntAmt", totalAmt.toFixed(2));  //共保总保额
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntPrm", totalPrm.toFixed(2)); //共保总保费
     }else{
       // 非永安保险公司：仅更新该行的 Ci.nCiAmt 和 Ci.nCiPrm，不参与总和计算
       const share = parseFloat(row["Ci.nCiShare"]) || 0;
@@ -724,8 +716,8 @@ const updateMasterAgreementValues = () => {
       console.log(totalAmt,"totalAmt")
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntAmt", totalAmt.toFixed(2));  //联保总保额
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm", totalPrm.toFixed(2)); //联保总保费
-      // opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntAmt", totalAmt.toFixed(2));  //共保总保额
-      // opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntPrm", totalPrm.toFixed(2));  //共保总保费
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntAmt", totalAmt.toFixed(2));  //共保总保额
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntPrm", totalPrm.toFixed(2));  //共保总保费
       opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnAmt", totalAmt.toFixed(2));  //我司分额保额
       opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnPrm", totalPrm.toFixed(2));  //我司份额保费
     }
@@ -828,9 +820,6 @@ const setFormItem = (key, obj) => {
   }
 };
 
-
-
-
 // 初始化联共保信息
 const initCiInfo = (data: any) => {
   const {cCiMrk} = data;
@@ -856,10 +845,8 @@ const initCiInfo = (data: any) => {
   });
 };
 
-
 // 绑定特殊验证器
 const exRules = {};
-
 function getFromValue() {
   return freeEditRef?.value?.getFromValue();
 }

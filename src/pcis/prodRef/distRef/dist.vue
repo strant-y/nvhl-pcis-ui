@@ -285,7 +285,8 @@ const method = {
   },
 
   handleQuery: (queryParams: any = { pageNum: 1, pageSize: 10 }, isChange: boolean = false) => {
-    let tgtRef = opertaor.getTableRefByKey('tgt')
+    distTableRef.value?.setPartnerPage(queryParams);
+    let tgtRef = opertaor.getTableRefByKey('tgt');
     const param = opertaor.getParam();
     let app = "";
     if (param.cOrgAppNo) {

@@ -204,6 +204,9 @@
                   />
                 </el-form-item>
               </template>
+              <template v-else-if="i.formatter">
+                {{ i.formatter(scope.row[i.prop]) }}
+              </template>
               <template v-else>
                 <el-form-item
                   :prop="[scope.$index, i.prop]"
