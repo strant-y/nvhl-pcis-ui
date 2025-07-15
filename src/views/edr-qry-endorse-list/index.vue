@@ -1,6 +1,7 @@
 <template>
   <div class="app-container">
-    <el-tabs v-model="activeName" type="border-card" @tab-click="handleClick">
+    <EdrQryEndorseList></EdrQryEndorseList>
+    <!-- <el-tabs v-model="activeName" type="border-card" @tab-click="handleClick">
       <el-tab-pane label="一般批改" name="first">
         <EdrQryEndorseList v-if="activeName==='first'" activeName="一般批改"></EdrQryEndorseList>
       </el-tab-pane>
@@ -10,7 +11,7 @@
       <el-tab-pane label="退保" name="third">
         <EdrQryEndorseList v-if="activeName==='third'" activeName="退保"></EdrQryEndorseList>
       </el-tab-pane>
-    </el-tabs>
+    </el-tabs> -->
   </div>
 </template>
 

@@ -85,6 +85,7 @@ const treeNodes = ref<any>([]);
 
 const formconfig1 = reactive<AppFreeEditConfig>(
     createAppFreeEditConfig({
+        title: "一般批改",
         endBtnsPosition: "right",
         endBtns: [
             createFreeButtonBase({
@@ -395,11 +396,15 @@ const tableconfig = reactive<AppTableConfig>(
             },
             {
                 prop: "id",
-                inputtype: "rtSelectV2",
+                inputtype: "rtcascader",
                 title: "批改原因",
                 minWidth: 140,
-                func: (val, row) => {
-                    handleRsnChange(val, row);
+                typeCode: 'EDR_RSN_LIST_NEW',
+                checkStrictly: false,
+                func: (val, row, codeListMap) => {
+                    if(val && val[1] && codeListMap['EDR_RSN_LIST_NEW-1-' + val[0]]) {
+                        row["iddetail"] = codeListMap['EDR_RSN_LIST_NEW-1-' + val[0]].find((item:any) => item.value === val[1]);
+                    }
                 },
             },
             // {
@@ -477,12 +482,12 @@ const refreshData = (reset = true) => {
         CurrentUser: user["opCde"],
         CurrentUserOrg: user["companyId"],
         cCommodityType: null,
-        rsnTyp:
-            props.activeName === "一般批改"
-                ? "1"
-                : props.activeName === "注销"
-                    ? "2"
-                    : "3",
+        // rsnTyp:
+        //     props.activeName === "一般批改"
+        //         ? "1"
+        //         : props.activeName === "注销"
+        //             ? "2"
+        //             : "3",
     };
     const params = Object.assign(s, r, obj);
     sessionStorage.setItem(AppKey.query.pcis_query_endorse, params);
@@ -499,7 +504,14 @@ const refreshData = (reset = true) => {
                   
                     pageresult.total = pageData.total;
                     pageData.result.forEach((item) => {
-                        changeRsnValue(item);
+                        // changeRsnValue(item);
+                        setTableFormItem("id", {
+                            loadData: [
+                                { label: '一般批改', value: `1-${item.cProdNo.slice(0,2)}` },
+                                { label: '注销', value: `2-${item.cProdNo.slice(0,2)}` },
+                                { label: '退保', value: `3-${item.cProdNo.slice(0,2)}` },
+                            ],
+                        });
                         if(item.cPlyNo) {
                             item.cAppNoAndPlyNo = `${item.cAppNo || ''}\n${item.cPlyNo || ''}`
                         } else {
@@ -874,19 +886,31 @@ const showDetails = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
 
 const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
     handleRowClick(data);
-    if (null == selected.value["cPlyNo"] || "" === selected.value["cPlyNo"]) {
+    const rsnTyp = data['id'] && data['id'].length > 0 ? data['id'][0]?.split('-')[0] : null;
+    if (null == data["cPlyNo"] || "" === data["cPlyNo"]) {
         ElMessage.warning("请选择一条记录");
         return;
     }
-    if (
-        null == rsnCde.value[selected.value["cPlyNo"]] ||
-        "" === rsnCde.value[selected.value["cPlyNo"]]
-    ) {
+    // if (
+    //     null == rsnCde.value[selected.value["cPlyNo"]] ||
+    //     "" === rsnCde.value[selected.value["cPlyNo"]]
+    // ) {
+    //     ElMessage.warning("请选择批改原因");
+    //     return;
+    // }
+    if(!data['id'] || data['id'].length < 2) {
         ElMessage.warning("请选择批改原因");
         return;
     }
+    // if (
+    //     DEFERRED_CORRECTION === rsnCde.value[selected.value["cPlyNo"]] &&
+    //     "020027" === cProdNo
+    // ) {
+    //     ElMessage.warning("此产品暂不支持延期批改，请选择通用批改");
+    //     return;
+    // }
     if (
-        DEFERRED_CORRECTION === rsnCde.value[selected.value["cPlyNo"]] &&
+        DEFERRED_CORRECTION === data['id'][1] &&
         "020027" === cProdNo
     ) {
         ElMessage.warning("此产品暂不支持延期批改，请选择通用批改");
@@ -895,9 +919,9 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
     // if(rsnCde.value[selected.value["cPlyNo"]] == ""){}
     const param = {
         plyNo: cPlyNo,
-        edrType: routeData["rsnTyp"],
+        edrType: rsnTyp,
         prodNo: cProdNo,
-        edrRsnCde: rsnCde.value[selected.value["cPlyNo"]],
+        edrRsnCde: data['id'][1],
     };
 
     pcisEdrQueryService.validEndorse(param).then(
@@ -908,25 +932,23 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                 if (result["data"]) {
                     // debugger
                     // 如果选的批改原因是变更影像上传方式
-                    if ("DZ" === rsnCde.value[selected.value["cPlyNo"]]) {
+                    if ("DZ" === data['id'][1]) {
                         modifyImageUploadMode(cPlyNo);
                         return;
-                    } else if ("DP" === rsnCde.value[selected.value["cPlyNo"]]) {
+                    } else if ("DP" === data['id'][1]) {
                         const cCiMrk = selected.value["cCiMrk"]
                             if (cCiMrk ==='0' || cCiMrk ==='5'){
                                 ElMessage.error('非共保或司内联保保单不可以进行补充共保保单编号批改！');
                                 return false;
                             }
                              ciCoopCorrect(cAppNo, cPlyNo)
-                    } else if ("2" === routeData["rsnTyp"]) {
+                    } else if ("2" === rsnTyp) {
                         //注销
                         const en = JSON.stringify({
                             cAppNo: selected.value["cPlyNo"],
                             cOrgAppNo: cAppNo,
-                            cRsnCde: rsnCde.value[selected.value["cPlyNo"]],
-                            cRsnDetailCde: transferRsnDetail(
-                                rsnDetail.value[selected.value["cPlyNo"]]
-                            ),
+                            cRsnCde: data['id'][1],
+                            cRsnDetailCde: data['iddetail'],
                             cProdNo: selected.value["cProdNo"],
                             cCiMrk: selected.value["cCiMrk"],
                             cGrpMrk: selected.value["cGrpMrk"],
@@ -946,16 +968,14 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                                 param: en,
                             },
                         });
-                    } else if ("3" === routeData["rsnTyp"]) {
+                    } else if ("3" === rsnTyp) {
                         console.log("退保", selected.value);
                         //退保
                         const en = JSON.stringify({
                             cAppNo: selected.value["cPlyNo"],
                             cOrgAppNo: cAppNo,
-                            cRsnCde: rsnCde.value[selected.value["cPlyNo"]],
-                            cRsnDetailCde: transferRsnDetail(
-                                rsnDetail.value[selected.value["cPlyNo"]]
-                            ),
+                            cRsnCde: data['id'][1],
+                            cRsnDetailCde: data['iddetail'],
                             cProdNo: selected.value["cProdNo"],
                             cCiMrk: selected.value["cCiMrk"],
                             cGrpMrk: selected.value["cGrpMrk"],
@@ -975,16 +995,14 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                                 param: en,
                             },
                         });
-                    } else if ("1" === routeData["rsnTyp"]) {
+                    } else if ("1" === rsnTyp) {
                         //一般批改
                         const en = JSON.stringify({
                             // scene: SCENE_EDR_APP_NEW,
                             cAppNo: selected.value["cPlyNo"],
                             cOrgAppNo: cAppNo,
-                            cRsnCde: rsnCde.value[selected.value["cPlyNo"]],
-                            cRsnDetailCde: transferRsnDetail(
-                                rsnDetail.value[selected.value["cPlyNo"]]
-                            ),
+                            cRsnCde: data['id'][1],
+                            cRsnDetailCde: data['iddetail'],
                             cProdNo: selected.value["cProdNo"],
                             cCiMrk: selected.value["cCiMrk"],
                             cGrpMrk: selected.value["cGrpMrk"],
