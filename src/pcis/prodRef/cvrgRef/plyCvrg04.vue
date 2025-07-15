@@ -664,7 +664,7 @@ async function validate() {
 function showFlush() {
   updateTitle();
   Object.keys(tremTemplateRefs.value).forEach((item) => {
-    tremTemplateRefs.value[item].dataInit();
+    tremTemplateRefs.value[item].dataFlash();
   });
   updateBtn();
 }
@@ -737,7 +737,47 @@ function calcCheck(){
 
 
 function setTermData(param: any, value: any){
-  console.log(1111);
+
+  const planNo: string = param.planNo;
+  const prop: string = param.factorProp;
+  const riskNo: string = param.riskNo;
+
+  const formData = planData.value[planNo];
+
+  Object.keys(formData).forEach((item) => {
+      formData[item].forEach((d: any) => {
+        console.log(d);
+
+        if(!prop.startsWith('TermRisktgt')){
+          d[prop] = value;
+        }
+
+        if (d.riskList && d.riskList.length > 0) {
+          d.riskList.forEach((r: any)=>{
+            if(r['TermRisktgt.cLiabCode'] === riskNo){
+              r[prop] = value;
+            }
+          });
+        }
+      });
+    });
+  
+  // Object.keys(formData).forEach((item) => {
+  //   formData[item].forEach((d: any) => {
+  //     if(!prop.startsWith('TermRisktgt')){
+  //       d[prop] = value;
+  //     }
+  //     if (d.riskList && d.riskList.length > 0) {
+  //       d.riskList.forEach((r: any)=>{
+  //         if(r['TermRisktgt.cLiabCode'] === riskNo){
+  //           r[param.factorProp] = value;
+  //         }
+  //       })
+  //     }
+  //   });
+  // });
+  console.log(planData.value);
+  showFlush();
 }
 
 defineExpose({

@@ -652,6 +652,11 @@ watch(() => props.modelValue, (newv,oldv)=>{
   dataInit();
 });
 
+function dataFlash(){
+  initData(props.modelValue);
+  dataInit();
+}
+
 function dataInit() {
   let queryList: { [k: string]: any }[] = [];
   let queryKey = props.modelValue["Term.cClauseCode"];
@@ -1139,6 +1144,7 @@ function setCancel(){
 }
 
 defineExpose({
+  dataFlash,
   dataInit,
   setDisabledAll,
   setCancel,

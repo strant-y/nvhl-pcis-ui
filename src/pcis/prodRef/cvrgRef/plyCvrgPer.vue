@@ -452,7 +452,7 @@ async function validate() {
 function showFlush() {
   Object.keys(tremTemplateRefs.value).forEach((item: any) => {
     if (tremTemplateRefs.value[item]) {
-      tremTemplateRefs.value[item].dataInit();
+      tremTemplateRefs.value[item].dataFlash();
     }
   });
   updateBtn();
@@ -537,6 +537,7 @@ function setTermData(param: any, value: any){
       }
     });
   });
+  showFlush();
 }
 
 const faters = ref({
