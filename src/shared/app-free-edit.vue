@@ -180,10 +180,10 @@ function getFromValue() {
   freeEditConfig.value?.fromSchema?.forEach((item: any) => {
     if(item?.inputtype === "rtinputgroup") {
       const groupList = item.groupList
-      if(groupList) {
-        const input = getFromSchemaItem(groupList[0].prop).itemRef
-        if(input){
-          let text = input.getTextValue().replaceAll(' / ', '')
+      const comp = getFromSchemaItem(groupList[0].prop);
+      if(groupList && comp) {
+        if(comp.itemRef && 'getTextValue' in comp.itemRef) {
+          let text = comp.itemRef.getTextValue()?.replaceAll(' / ', '')
           if(groupList[1]?.prop) {
              text += d[groupList[1]?.prop]
           }
