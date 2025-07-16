@@ -339,6 +339,7 @@ const { saveData } = NewUdrListService();
 import {useUserStore} from "@/store";
 import { pa } from "element-plus/es/locale";
 import { initMultiCodeList } from "@/api/code-list-service";
+import { forEach } from "lodash";
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -2109,7 +2110,7 @@ const calcPremium = () => {
     btn.loading = false;
     return;
   }
-// 校验标的信息中核定座位总数和投保座位数总数不一致！
+  // 校验标的信息中核定座位总数和投保座位数总数不一致！
   const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue() || '';
   if(tgtValue && tgtValue["Tgt.nSeatCapacity"] !== tgtValue["Tgt.nSeatsNumber"]) {
     ElMessage.error("核定座位总数和投保座位数总数不一致！");
@@ -2141,7 +2142,6 @@ const calcPremium = () => {
       const nPrmVal = ops["base"]["Base.nPrm"];
       const nPrmRmbExch = ops["base"]["Base.nPrmRmbExch"];
 
-//
       productStore.setnPrm(nPrmVal);
       productStore.setnAmt(nAmtVal);
       if(opertaor.getTableRefByKey("ciMasterAgreement")) {
@@ -2737,22 +2737,44 @@ const calcPremiumEdr = () => {
         );
       edrbase.value?.setFormValue(EdrBaseData);
       const nPrmVar = ops["plyBase"]["Base.nPrmVar"]  || 0;
-      const payInfo = setPayInfoEdr(
+      let payInfo = setPayInfoEdr(
         ops["payinfo"],
         ops["base"],
         ops["applicant"],
         nPrmVar,
-        ops["plyBase"]
+        ops["plyBase"],
+        // isCorrect:true,
       );
       console.log("生成缴费计划内容", payInfo);
-      // opertaor.getTableRefs()["payinfo"].setFormValue(payInfo);
+      // opertaor.getTableRefs()["payinfo"].setFormValue(payInfo); 
       const payinfoRef = opertaor.getTableRefs()["payinfo"];
       if (payinfoRef && payinfoRef.setFormValue) {
-        const currentPayList = [...payinfoRef.getFromValue()]; // 获取当前列表
+    
+        // payInfo  = {...payInfo,...{isCorrect:true}}
+        let currentPayList = [...payinfoRef.getFromValue()]; // 获取当前列表
+        currentPayList = currentPayList.filter(item => {
+          // 检查 item.Pay 是否存在，且包含 cAppNo 字段
+          return item['Pay.cAppNo'] && item.hasOwnProperty('Pay.cAppNo');
+        });
+
+        // const lastShowIndex = currentPayList.reduce((lastIndex, item, index) => {
+        //     return item.hasOwnProperty('Pay.cAppNo') ? index : lastIndex;
+        //   }, -1);
+
+        //   // 如果找到，则删除该元素
+        //   if (lastShowIndex !== -1) {
+        //     currentPayList.splice(lastShowIndex, 1);
+        //   }
+ 
+        console.log('data--' ,currentPayList)
+        console.log('data2--' ,payInfo)
         currentPayList.push(payInfo); // 插入新条目
         payinfoRef.setFormValue(currentPayList); // 更新表单数据
       }
       needCalc.value = false;
+
+
+
     } else {
       ElMessage.error(res.msg);
     }
