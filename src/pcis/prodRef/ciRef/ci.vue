@@ -85,17 +85,30 @@ const method = {
     // 新增行前计算剩余比例
     const remaining = (1 - totalCiShare).toFixed(8);
     const cChiefMrk = ['1', '3'].includes(cCiMrkFlag) ? '1' : '0';
-    freeEditRef?.value?.addRowByData({
-      'Ci.nSeqNo': val.length + 1,
-      'Ci.nPlyFeeRate': '0.00',
-      'Ci.nPlyFee': '0.00',
-      'Ci.nComm': '0.00',
-      'Ci.cChiefMrk': cChiefMrk,
-      // 'Ci.cCoinsurerCde': '327001',
-      // 'Ci.cSubDptCde': param.dptCde,
-      // 'Ci.cDptCde': param.cDptCde
-    });
-
+    // const cSlsCde = opertaor.getTableRefByKey('plyBase').getValue('Base.cSlsId')
+    if(dataList.length == 0){
+        freeEditRef?.value?.addRowByData({
+          'Ci.nSeqNo': val.length + 1,
+          'Ci.nPlyFeeRate': '0.00',
+          'Ci.nPlyFee': '0.00',
+          'Ci.nComm': '0.00',
+          'Ci.cChiefMrk': cChiefMrk,
+          'Ci.cCoinsurerCde': '327001',
+          'Ci.cSubDptCde': param.dptCde,
+          'Ci.cDptCde': param.cDptCde,
+      });
+    }else{
+      freeEditRef?.value?.addRowByData({
+          'Ci.nSeqNo': val.length + 1,
+          'Ci.nPlyFeeRate': '0.00',
+          'Ci.nPlyFee': '0.00',
+          'Ci.nComm': '0.00',
+          'Ci.cChiefMrk': cChiefMrk,
+          // 'Ci.cCoinsurerCde': '327001',
+          // 'Ci.cSubDptCde': param.dptCde,
+          // 'Ci.cDptCde': param.cDptCde,
+      });
+    }
     if(cCiMrkFlag == "2" || cCiMrkFlag == "4"){
       formconfig1.fromSchema?.forEach((item) => {
         if(item.prop == "Ci.nCiPrm"){
@@ -593,17 +606,18 @@ const method = {
   cBrkrCdeChange:()=>{
     // if (getValue("Base.cBsnsTyp") && getValue("Base.cBsnsTyp") !== "19001") {
       dialogRef.value?.open(
-        "agentPre",
+        "ciagentPre",
         {
           type: "show",
           data: {
+            rowData:rowData,
           },
           method: {
             getSelected: (params) => {
-              // setFormItem("Ci.cBrkrCde", {
-              //   loadData: [{ value: params.CChaCde, label: params.CChaNme }],
-              // });
-              // freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData","")
+              setFormItem("Ci.cBrkrCde", {
+                loadData: [{ value: params.CChaCde, label: params.CChaNme }],
+              });
+              freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData","")
               dialogRef.value?.handleClose();
             },
           },
@@ -624,14 +638,18 @@ const method = {
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData?._dataId;
     dialogRef.value?.open(
-      "agentWorker",
+      "ciagentWorker",
       {
         type: "show",
-        data: {},
+        data: {
+          rowData: rowData,
+        },
         method: {
           getSelected: (params) => {
             freeEditRef.value?.setRowFieldProp(rowId,"Ci.cSlsCde","loadData",[{ label: params.CSlsNme, value: params.CSlsCde }])
             freeEditRef?.value?.setValueByRowKey("Ci.cSlsCde", rowId, params.CSlsCde);
+            freeEditRef?.value?.setValueByRowKey("Ci.cSlsNme", rowId, params.CSlsNme);
+
             dialogRef.value?.handleClose();
           },
         },
@@ -649,11 +667,11 @@ const method = {
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData?._dataId;
     dialogRef.value?.open(
-      "agentWorker",
+      "ciagentWorker",
       {
         type: "show",
         data: {
-
+          rowData: rowData,
         },
         method: {
           getSelected: (params) => {
