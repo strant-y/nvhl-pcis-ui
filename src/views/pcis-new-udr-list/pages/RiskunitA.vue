@@ -99,7 +99,7 @@ const index1 = ref(-1); // 第一个列表选中index
 const index2 = ref(-1); // 第一个列表选中index
 const selectRow1 = ref<any>({}); // 第一个列表选中行
 const selectRow2 = ref<any>({}); // 第一个列表选中行
-const CRiskLvlCde_Options = ref([]); // 风险等级列表
+const CRiskLvlCde_Options = ref<any>([]); // 风险等级列表
 const dialogVisible = ref(true);
 const cAmtCurOptions = ref([]);
 const cPrmCurOptions = ref([]);
@@ -847,11 +847,12 @@ function queryRiskUnit() {
   riskUnitQuery(param)
     .then((result: any) => {
       if (result.code === "1" && result.data) {
-        CRiskLvlCde_Options.value = result.data.map((item: any) => ({
-          ...item,
-          label: item.cRiskLvlCde + item.cRiskUnitNme,
-          value: item.cRiskLvlCde,
-        }));
+        const optionsItem = [{
+          ...result.data,
+          label: result.data.cRiskLvlCde + result.data.cRiskUnitNme,
+          value: result.data.cRiskLvlCde,
+        }]
+        CRiskLvlCde_Options.value = optionsItem;
       } else if (result.code === "0") {
         ElMessage.error({ message: result.message, duration: 3000 });
       }
