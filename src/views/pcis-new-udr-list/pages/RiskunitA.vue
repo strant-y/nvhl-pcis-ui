@@ -723,6 +723,9 @@ const tableconfig1 = reactive<AppTableConfig>(
         title: "自留额",
         minWidth: 180,
         readOnly: false,
+        formatter:(val:any) => {
+          return val ? val.toFixed(2) : ""
+        }
       },
       {
         prop: "cRemarks",
@@ -846,7 +849,7 @@ function queryRiskUnit() {
       if (result.code === "1" && result.data) {
         CRiskLvlCde_Options.value = result.data.map((item: any) => ({
           ...item,
-          label: item.cRiskUnitNme,
+          label: item.cRiskLvlCde + item.cRiskUnitNme,
           value: item.cRiskLvlCde,
         }));
       } else if (result.code === "0") {
