@@ -156,15 +156,6 @@ const method = {
                 res
             );
           });
-        // freeEditRef.value?.setRowFieldProp()
-        // setFormItem("Ci.cDptCde", { rules: [getRules("required", {})] });
-        // setFormItem("Ci.cDptCde", { disabled: false });
-        setFormItem("Ci.nComm", { disabled: false});
-        setFormItem("Ci.cBrkrCde", { disabled: false});
-        setFormItem("Ci.cBrkSlsCde", { disabled: false});
-        // setFormItem("Ci.cSlsCde", { rules: [getRules("required", {})] });
-        setFormItem("Ci.cSlsCde", { disabled: false});
-      // updateMasterAgreementValues();
     } else {
       // 非永安保险，设置默认值和其他数据
       freeEditRef.value?.addCodeListMap(
@@ -172,13 +163,6 @@ const method = {
            list: [{ label: '其他',value: '1',  }]
           }
       );
-      setFormItem("Ci.cDptCde", { rules: [] });
-      // setFormItem("Ci.cDptCde", { disabled: true });
-      setFormItem("Ci.nComm", { disabled: true});
-      setFormItem("Ci.cBrkrCde", { disabled: true});
-      setFormItem("Ci.cBrkSlsCde", { disabled: true});
-      setFormItem("Ci.cSlsCde", { disabled: true});
-      setFormItem("Ci.cSlsCde", { rules: []});
     }
     updateMasterAgreementValues()
   },
@@ -243,13 +227,6 @@ const method = {
       );
       // freeEditRef.value?.setRowFieldProp(rowData._dataId, "Ci.cDptCde", "rules", []);
       freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "1");
-      setFormItem("Ci.cDptCde", { rules: [] });
-      // setFormItem("Ci.cDptCde", { disabled: true });
-      setFormItem("Ci.nComm", { disabled: true});
-      setFormItem("Ci.cBrkrCde", { disabled: true});
-      setFormItem("Ci.cBrkSlsCde", { disabled: true});
-      setFormItem("Ci.cSlsCde", { disabled: true});
-      setFormItem("Ci.cSlsCde", { rules: []});
       freeEditRef.value?.setValueByRowKey("Ci.cDptCde", rowId, "");
     }
     updateMasterAgreementValues()
@@ -273,12 +250,6 @@ const method = {
                 list: res
               }
             );
-            // freeEditRef.value?.setRowFieldProp(
-            //     rowId,
-            //     "Ci.cDptCde",
-            //     "loadData",
-            //     res,
-            // );
           });
     }
   },
@@ -514,8 +485,7 @@ const method = {
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData._dataId;
     freeEditRef?.value?.setValueByRowKey("Ci.cCountryCde",rowId,"")
-
-         codeListStore
+    codeListStore
       .queryCodeList(
         {
           codeListName: "CBankCountyList",
@@ -531,28 +501,7 @@ const method = {
             "loadData",
             res,
           );
-        // freeEditRef.value?.addCodeListMap({
-        //   code: "Ci.cBankCounty",
-        //   list: res
-        // })
-        // setFormItem("Acctinfo.cBankCounty", {
-        //   disabled: false,
-        //   // rules: [getRules("required", {})],
-        // });
       });
-    // codeListStore
-    //     .queryCodeList({
-    //       codeListName: "CBankCountyList",
-    //       codeListParam: { "areaprovince": rowData['Ci.cBankArea'],"areaname":val },
-    //     })
-    //     .then((res) => {
-    //       freeEditRef.value?.setRowFieldProp(
-    //         rowId,
-    //         "Ci.cBankCounty",
-    //         "loadData",
-    //         res,
-    //       );
-    //     });
   },
   //开户行县改变
   cCountyChange:(val) => { 
@@ -571,27 +520,6 @@ const method = {
             data:res
           })
         });
-
-        // codeListStore
-        // .queryCodeList(
-        //   {
-        //     codeListName: "CBankCdeList",
-        //     codeListParam: {
-        //       'banktypecod': para[3], 'areacode': val
-        //     },
-        //   },
-        // )
-        // .then((res) => {
-        //   tgtobjEditRef.value?.addCodeListMap({
-        //     code: "Acctinfo.cBankCde",
-        //     list: res
-        //   })
-        //   // setFormItem("Acctinfo.cBankCde", {
-        //   //   disabled: false,
-        //   //   rules: [getRules("required", {})],
-        //   // });
-        // });
-        
   },
     // 开户行    CNAPS号 开户行地址
   cBankCdeChange: (val: any) => {
