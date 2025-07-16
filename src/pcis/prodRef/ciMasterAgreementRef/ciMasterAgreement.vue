@@ -26,7 +26,7 @@ const props = defineProps({
 });
 // 监听 cCiMrk 的变化并更新本地变量
 watchEffect(() => {
-  const cCiMrkValue = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
+  const cCiMrkValue = opertaor.getTableRefByKey("plyBase")?.getValue("Base.cCiMrk");
     if (cCiMrkValue === "3" || cCiMrkValue === "4") {
       formconfig1.fromSchema?.forEach((item) => {
         const prop = item.prop;
