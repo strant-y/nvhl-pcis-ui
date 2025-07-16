@@ -70,7 +70,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             {
                 prop: "CDptCnm",
                 inputtype: "rtinput",
-                title: "机构部门",
+                title: "机构编码",
                 disabled: true,
             },
             {
@@ -166,7 +166,7 @@ function handleQuery(flag?: boolean) {
         CurrentUser: user.opCde,
         CurrentUserOrg: user.companyId,
         CBsnsTyp: props.data.data['CBsnsTyp'],
-        CDptCde: routeParam.cDptCde,
+        CDptCde:  props.data.data.rowData['Ci.cDptCde'],
         CBrkrCde: props.data.data['CBrkrCde'],
         CSlsTyp: props.data.data['CSlsTyp'],
         CChaType: props.data.data['CChaType'],
@@ -190,10 +190,10 @@ function handleQuery(flag?: boolean) {
 }
 
 onMounted(() => {
-    console.log('param', props.data)
+    console.log('rowData', props.data.data.rowData)
     nextTick(() => {
         // setValue('CDptCde', props.data.data.CDptCde)
-        setValue('CDptCnm',routeParam.cDptCnm)
+        setValue('CDptCnm',props.data.data.rowData['Ci.cDptCde'])
     })
 });
 

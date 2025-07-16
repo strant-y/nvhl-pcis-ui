@@ -303,8 +303,13 @@ function getParam() {
   }
 }
 
+function getTextValue() {
+  return displayText.value;
+}
+
 defineExpose({
   updateOption,
+  getTextValue
 });
 </script>
 <style lang="scss">

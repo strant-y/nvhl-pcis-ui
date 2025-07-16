@@ -34,6 +34,19 @@ const formconfig1 = reactive(createAppGridEditConfig({}));
 const cClauseType = ref('');
 const eCargoTermNo = ref('');
 
+const handelCalculate = (row:any,selectData:any)=>{
+  if(selectData.length > 0) {
+    const nSeqNoJoin = selectData.map((item: any) => item['ECargoGoodsTgt.nSeqNo']).join(',')
+    cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nCargoSeq',row['_dataId'] , nSeqNoJoin)
+    const sum = selectData.reduce((total, current) => total + current['ECargoGoodsTgt.nRmbLimit'], 0);
+    cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nInsuranceAmount',row['_dataId'] , sum)
+    cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbAmount',row['_dataId'] , sum * row['ECargoTerm.nOriginalRate'])
+    if(row['ECargoTerm.nRateVal']){
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nInsuranceFee',row['_dataId'] , (row['ECargoTerm.nInsuranceAmount'] * row['ECargoTerm.nRateVal'])/1000)
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbFee',row['_dataId'] , ((row['ECargoTerm.nInsuranceAmount'] * row['ECargoTerm.nRateVal'])/1000) * row['ECargoTerm.nFeeRate'])
+    }
+  }
+}
 onMounted(() => {
   const tableConfig = props.pageSchema;
   tableConfig.fromSchema.forEach((item: any) => {
@@ -52,15 +65,72 @@ onMounted(() => {
 
 // 绑定方法
 const method = {
-  // func demo
-  func1: () => { },
+  cAmountCurrencyChange:(val:any,row:any)=>{
+    console.log(val,row)
+    if (val !== "CNY") {
+      codeListStore
+          .queryCodeList({
+            codeListName: "WEB_BAS_CHGRATE",
+            codeListParam: { value: val },
+          })
+          .then((res) => {
+            cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nOriginalRate',row['_dataId'] , res[0].currency_rate)
+            cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbAmount',row['_dataId'] , row['ECargoTerm.nInsuranceAmount'] * res[0].currency_rate)
+          });
+    } else {
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nOriginalRate',row['_dataId'] , "1.000000")
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbAmount',row['_dataId'] , row['ECargoTerm.nInsuranceAmount'] * 1)
+    }
+  },
+  nOriginalRateChange:(val:any,row:any)=>{
+    if(val && row['ECargoTerm.nInsuranceAmount']){
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbAmount',row['_dataId'] , row['ECargoTerm.nInsuranceAmount'] * val)
+    }
+  },
+  nFeeRateChange:(val:any,row:any)=>{
+    if(val && row['ECargoTerm.nInsuranceFee']){
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbFee',row['_dataId'] , row['ECargoTerm.nInsuranceFee'] * val)
+    }
+  },
+  cFeeCurrencyChange:(val:any,row:any)=>{
+    console.log(val,row)
+    if (val !== "CNY") {
+      codeListStore
+          .queryCodeList({
+            codeListName: "WEB_BAS_CHGRATE",
+            codeListParam: { value: val },
+          })
+          .then((res) => {
+            cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nFeeRate',row['_dataId'] , res[0].currency_rate)
+            cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbFee',row['_dataId'] , row['ECargoTerm.nInsuranceFee'] * res[0].currency_rate)
+          });
+    } else {
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nFeeRate',row['_dataId'] , "1.000000")
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbFee',row['_dataId'] , row['ECargoTerm.nInsuranceFee'] * 1)
+    }
+  },
+  cInsExchCdeChange:(val:any,row:any)=>{
+    val === '1' ? cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.nOriginalRate", 'disabled', true) :cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.nOriginalRate", 'disabled', false)
+  },
+  cPremExchCdeChange:(val:any,row:any)=>{
+    val === '1' ? cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.nFeeRate", 'disabled', true) :cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.nFeeRate", 'disabled', false)
+  },
   funcCvrgCargoAdd: () => {
-    console.log('funcCvrgCargoAdd')
     cvrgEditRef?.value?.addRow();
     const val = getFormValue();
+    nextTick(()=>{
+      val[val.length -1]['ECargoTerm.cAmountCurrency'] = 'CNY'
+      val[val.length -1]['ECargoTerm.cFeeCurrency'] = 'CNY'
+      val[val.length -1]['ECargoTerm.nOriginalRate'] = "1.000000"
+      val[val.length -1]['ECargoTerm.nFeeRate'] = "1.000000"
+      val[val.length -1]['ECargoTerm.cInsExchCde'] = "1"
+      val[val.length -1]['ECargoTerm.cPremExchCde'] = "1"
+      cvrgEditRef.value?.setFormSchema(val[val.length -1]._dataId, "ECargoTerm.nOriginalRate", 'disabled', true)
+      cvrgEditRef.value?.setFormSchema(val[val.length -1]._dataId, "ECargoTerm.nFeeRate", 'disabled', true)
+    })
     console.log('val', val)
     val.forEach((key: string, index: number) => {
-      key['Term.nSeqNo'] = index + 1
+      key['ECargoTerm.nSeqNo'] = index + 1
     });
   },
   funcCvrgCargoDel: () => {
@@ -80,9 +150,10 @@ const method = {
       ElMessage.warning("请选择一条数据!");
       return;
     }
+    // debugger
     const cvrgList = cvrgEditRef?.value?.getFromValue();
     const list = cvrgList.filter((f: any) => f._dataId != row._dataId);
-    const selectList = list.map((m: any) => m['Term.nCargoSeq']).join(',').split(',');
+    const selectList = list.map((m: any) => m['ECargoTerm.nCargoSeq']).join(',').split(',');
     dialog.value?.open(
         eCargoSelectTgtFix,
         {
@@ -92,24 +163,12 @@ const method = {
         {
           getSelected(selectdata: any) {
             if(selectdata) {
-              const nSeqNoJoin = selectdata.map((item: any) => item['DistECargo.nSeqNo']).join(',')
-              cvrgEditRef?.value?.setValueByRowKey('Term.nCargoSeq',row['_dataId'] , nSeqNoJoin)
+              handelCalculate(row,selectdata)
+              dialog.value?.handleClose()
             }
-
-            // let len = formData.value.length;
-            // let sel : any[] = [];
-            // selectdata.forEach((item: any,index:number) => {
-            //   item.index = len + 1;
-            //   sel.push(item);
-            //   len++;
-            // });
-            //
-            // sel.forEach((item) => {
-            //   rttableFrom.value.addRowByData(item);
-            // });
-          },
+          }
         },
-        { title: "选择货物", width: 55 }
+        {  width: 65 }
     );
 
   },
@@ -174,7 +233,11 @@ const method = {
 
   },
   //费率change事件
-  nRateValChange:(val)=>{ 
+  nRateValChange:(val:any,row:any)=>{
+    if(val){
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nInsuranceFee',row['_dataId'] , (row['ECargoTerm.nInsuranceAmount'] * val)/1000)
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbFee',row['_dataId'] , ((row['ECargoTerm.nInsuranceAmount'] * val)/1000) * row['ECargoTerm.nFeeRate'])
+    }
   },
 };
 

@@ -179,7 +179,7 @@
             :label="i.title"
             :width="i.width ? i.width : null"
             :align="item.align ? item.align : i.align ? i.align : 'center'"
-            :min-width="getColumnWidth(i.title,i.prop,tableDatas)"
+            :min-width="getColumnWidth(i.title,i.prop,tableDatas,i.minWidth,i.width)"
           >
             <template #header="header">
               <el-text
@@ -678,6 +678,7 @@ function setRowFieldProp(
   prop: string,
   value: any
 ) {
+  console.log("setRowFieldProp", formItems,rowId, field, prop, value);
   if (formItems.value[rowId] && formItems.value[rowId][field]) {
     // 使用 Vue.set 确保响应式更新
     formItems.value[rowId][field] = {
@@ -687,7 +688,7 @@ function setRowFieldProp(
   } else {
     console.warn(`Field ${field} or row ${rowId} not found.`);
   }
-  console.log(formItems.value);
+  console.log("formItem",formItems.value);
 }
 function getRowById(rowId: any) {
   return tableDatas.value?.find((item) => {
@@ -696,7 +697,9 @@ function getRowById(rowId: any) {
     }
   });
 }
-
+// function getItemsRowId(rowId: any){
+//   return formItems.value[rowId]
+// }
 function getselectionData() {
   if (props.item.showSelection) {
     return tableRef.value?.getSelectionRows();
@@ -705,12 +708,13 @@ function getselectionData() {
   }
 }
 
-function getColumnWidth(label, prop, tableData) {
+function getColumnWidth(label, prop, tableData, itemMinWidth, itemWidth) {
   //label表头名称
   //prop对应的内容
   //tableData表格数据
  
-  const minWidth = 80 // 最小宽度
+  const width = itemWidth || 0 // 列表属性宽度
+  const minWidth = itemMinWidth || 80 // 最小宽度
   const padding = 10 // 列内边距
   let arr = tableData.map(item => item[prop])
   arr.push(label)//拼接内容和表头数据
@@ -720,7 +724,7 @@ function getColumnWidth(label, prop, tableData) {
     return textWidth + padding
   })
   const maxWidth = Math.max(...contentWidths)
-  return Math.max(minWidth, maxWidth)
+  return Math.max(minWidth, maxWidth, width)
 }
 
 function getTextWidth(text) {
@@ -767,6 +771,7 @@ defineExpose({
   clearSelection,
   toggleRowSelection,
   setRowFieldProp,
+  // getItemsRowId
 });
 function isrequired(i: any) {
   if (i.rules) {

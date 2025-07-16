@@ -53,6 +53,68 @@ const props = defineProps({
 
 const cComponentTable = computed(() => props.data.compKey ? props.data.compKey.replace(/\d+/g, '') : "");
 
+const mapAddr = {
+  "AddressDist040001": {
+    "Dist.JingyingAddress": "Dist.cDetailedAddress"
+  },
+  "AddressDist040005": {
+    "Dist.SchoolAddressProp": "Dist.cDetailedAddress"
+  },
+  "AddressDist041001": {
+    "Dist.JingYingAddress043009": "Dist.cDetailedAddress"
+  },
+  "AddressDist043020": {},
+  "AdvertisementDist043011": {
+    "Dist.JingyingAddress": "Dist.cDetailedAddress"
+  },
+  "ChargingDist049026": {
+    "Dist.DetailAddrProp": "Dist.cDetailedAddress"
+  },
+  "DesignDist": {
+    "Dist.ProjectDesignProp": "Dist.cProjectAddress"
+  },
+  "ParkingDist043005": {
+    "Dist.JingyingAddress": "Dist.cDetailedAddress"
+  },
+  "PollutionDist043013": {
+    "Dist.PropertyLocationProp": "Dist.cDetailedAddress"
+  },
+  "PortDist040021": {
+    "Dist.JingyingAddress": "Dist.cDetailedAddress"
+  },
+  "ProjectDist043009": {
+    "Dist.JingYingAddress043009": "Dist.cDetailedAddress"
+  },
+  "ProjectDist045001": {
+    "Dist.EngineeringAddressProp": "Dist.cDetailedAddress"
+  },
+  "ProjectDist049035": {},
+  "PropertyaddressDist010001": {
+    "Dist.TgtAddressProp": "Dist.cPropertyAddress"
+  },
+  "PropertyaddressDist010004": {
+    "Dist.TgtAddressProp": "Dist.cPropertyAddress"
+  },
+  "PropertyaddressDist010006": {
+    "Dist.TgtAddressProp": "Dist.cPropertyAddress"
+  },
+  "PropertyaddressDist010021": {
+    "Dist.cShowAddr": "Dist.cShowAddr"
+  },
+  "PropertyaddressDist080002": {
+    "Dist.FamilyAddressAllProp": "Dist.cFamilyAddr"
+  },
+  "PropertyaddressDist080003": {
+    "Dist.TgtAddressProp": "Dist.cPropertyAddress"
+  },
+  "PropertyaddressDist080027": {
+    "Dist.TgtAddressProp": "Dist.cPropertyAddress"
+  },
+  "PropertyaddressDist089005": {
+    "Dist.HomeAllProp": "Dist.cDetailedAddress"
+  }
+};
+
 const dataParams = ref({});
 const appNo = ref("");
 const cGrpMrk = ref("");
@@ -84,10 +146,24 @@ const formconfig1 = ref<AppFreeEditConfig>(
               },
               { dist: s }
             );
+            if(params.dist['Dist.ProjectDesignProp']) {
+              params.dist['Dist.cProjectAddress'] = params.dist['Dist.ProjectDesignProp']
+            }
             if(route.params.param?.pageName === "priceInquiry") {
               params.cInquiryNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
             } else {
               params.cAppNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+            }
+
+            // 级联地址表格显示问题处理
+            if(Object.keys(mapAddr).includes(props.data.compKey)) {
+              const addrInput = mapAddr[props.data.compKey];
+              const keys = Object.keys(addrInput)
+              if(keys && keys.length>0) {
+                const inputGroupKey = keys[0];
+                const addrValueKey = addrInput[inputGroupKey];
+                params.dist[addrValueKey] = params.dist[inputGroupKey];
+              }
             }
             console.log('params', params)
             saveDist(params).then((res) => {
@@ -116,7 +192,6 @@ const formconfig1 = ref<AppFreeEditConfig>(
     ],
   })
 );
-const distContactList:Array<string> = ['Dist.PartProp','Tgt.cSuffixAddr','Dist.Prop','Dist.cSuffixAddr','Dist.JingyingProp','Dist.cDetailedAddress','Dist.BusinessAllProp']
 
 onMounted(() => {
   // console.log(333)   distAdd
@@ -228,23 +303,6 @@ onMounted(() => {
       item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];   
     }
 
- 
-    console.log('21116’“，',props.data.fromSchema[i]["groupList"] )
-    // 遍历groupList数组把函数赋值给fromSchema
-    if (props.data.fromSchema[i]["groupList"] && props.data.fromSchema[i]["groupList"].length>0) {
-      props.data.fromSchema[i]["groupList"].forEach((data:any,index:number,arr:any) =>{
-        //  040001经营场所地址 040005 学校地址 040021 经营场所地址 042003 学校地址 043013 标的坐落地址 043020 房屋所在地区 045001工程项目地址
-        if(distContactList.includes(data.prop)){
-          console.log(333, item)
-          console.log(333, arr)
-          console.log(333, props.data.fromSchema)
-          item["groupList"][index]['func'] = function (){
-            // return setcDetailedAddress(arr,JSON.parse(JSON.stringify(props.data.fromSchema[i+1])))
-            return setcDetailedAddress(arr,JSON.parse(JSON.stringify(props.data.fromSchema[i])))
-          }
-        }
-      })
-    }
     if(params.cEdrType === '1'){
       item.disabled = false;
     }
@@ -265,21 +323,6 @@ onMounted(() => {
     freeEditRef.value?.setCodeListMap(props.data.codeListMap);
   })
 });
-const setcDetailedAddress = (prop:any,aftProp:any)=> {
-  const ads = freeEditRef?.value?.getValue(prop[0].prop);
-  const a = freeEditRef?.value?.getValue(prop[1].prop) || "";
-  if (ads) {
-    getAddressStr({ address: ads }).then((res: any) => {
-      const { code, data, msg } = res;
-      if (code === 200) {
-        const b = (data ? data["addStr"] : "") + a;
-        freeEditRef?.value?.setValue(aftProp.prop, b);
-      }
-    });
-  } else {
-    freeEditRef?.value?.setValue(aftProp.prop, a);
-  }
-};
 
   //根据获取的职业类别查询职业等级并绑定下拉框
 const getDistoccupType = (val) => {
