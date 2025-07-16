@@ -52,6 +52,12 @@ onMounted(() => {
   console.log(3838, formconfig11);
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
+    if(!getValue('ECargoBase.cWhInsExchCde')){
+      setValue('ECargoBase.cWhInsExchCde','1')
+    }
+    if(!getValue('ECargoBase.cWhPremExchCde')){
+      setValue('ECargoBase.cWhPremExchCde','1')
+    }
     const list:Array<string>= ["ECargoBase.nAmtRmbExch","ECargoBase.cInsExchCde", "ECargoBase.nPrmRmbExch","ECargoBase.cPremExchCde"]
      list.forEach(item =>{
        setFormItem(item, {
@@ -117,7 +123,106 @@ const method = {
         });
       })
     }
-  }
+  },
+  cReceivedRmbChange:(val:any)=>{
+    if (val !== "CNY") {
+      codeListStore
+          .queryCodeList({
+            codeListName: "WEB_BAS_CHGRATE",
+            codeListParam: { value: val },
+          })
+          .then((res) => {
+            setValue('ECargoBase.nReceivedRate',res[0].currency_rate)
+            setValue('ECargoBase.nRmbReceivedPrm',getValue('ECargoBase.nReceivedPrm') * res[0].currency_rate)
+          });
+    } else {
+      setValue('ECargoBase.nReceivedRate',"1.000000")
+      setValue('ECargoBase.nRmbReceivedPrm',getValue('ECargoBase.nReceivedPrm') * 1)
+    }
+  },
+  nReceivedPrmChange:(val:any)=>{
+    if(val && getValue('ECargoBase.nReceivedRate')){
+      setValue('ECargoBase.nRmbReceivedPrm',val * getValue('ECargoBase.nReceivedRate'))
+    }
+  },
+  nWhAmtChange:(val:any)=>{
+    if(val && getValue('ECargoBase.nWhAmtRmbExch')){
+      setValue('ECargoBase.nWhRmbAmt',val * getValue('ECargoBase.nWhAmtRmbExch'))
+      if(getValue('ECargoBase.nRmbAmt')){
+         setValue('ECargoBase.nRecRemEstAmt',getValue('ECargoBase.nRmbAmt') - getValue('ECargoBase.nWhRmbAmt') )
+      }
+    }
+  },
+  cWhAmtCurChange:(val:any)=>{
+    if (val !== "CNY") {
+      codeListStore
+          .queryCodeList({
+            codeListName: "WEB_BAS_CHGRATE",
+            codeListParam: { value: val },
+          })
+          .then((res) => {
+            setValue('ECargoBase.nWhAmtRmbExch',res[0].currency_rate)
+            setValue('ECargoBase.nWhRmbAmt',getValue('ECargoBase.nWhAmt') * res[0].currency_rate)
+            if(getValue('ECargoBase.nRmbAmt')){
+              setValue('ECargoBase.nRecRemEstAmt',getValue('ECargoBase.nRmbAmt') - getValue('ECargoBase.nWhRmbAmt') )
+            }
+          });
+    } else {
+      setValue('ECargoBase.nWhAmtRmbExch',"1.000000")
+      setValue('ECargoBase.nWhRmbAmt',getValue('ECargoBase.nWhAmt') * 1)
+      if(getValue('ECargoBase.nRmbAmt')){
+        setValue('ECargoBase.nRecRemEstAmt',getValue('ECargoBase.nRmbAmt') - getValue('ECargoBase.nWhRmbAmt') )
+      }
+    }
+  },
+  nWhAmtRmbExchChange:(val:any)=>{
+    if(val && getValue('ECargoBase.nWhAmt')){
+      setValue('ECargoBase.nWhRmbAmt',val * getValue('ECargoBase.nWhAmt'))
+      if(getValue('ECargoBase.nRmbAmt')){
+        setValue('ECargoBase.nRecRemEstAmt',getValue('ECargoBase.nRmbAmt') - getValue('ECargoBase.nWhRmbAmt') )
+      }
+    }
+  },
+  nWhPrmChange:(val:any)=>{
+  if(val && getValue('ECargoBase.nWhPrmRmbExch')){
+    setValue('ECargoBase.nWhRmbPrm',val * getValue('ECargoBase.nWhPrmRmbExch'))
+   }
+  },
+  cWhPrmCurChange:(val:any)=>{
+    if (val !== "CNY") {
+      codeListStore
+          .queryCodeList({
+            codeListName: "WEB_BAS_CHGRATE",
+            codeListParam: { value: val },
+          })
+          .then((res) => {
+            setValue('ECargoBase.nWhPrmRmbExch',res[0].currency_rate)
+            setValue('ECargoBase.nWhRmbPrm',getValue('ECargoBase.nWhPrm') * res[0].currency_rate)
+          });
+    } else {
+      setValue('ECargoBase.nWhPrmRmbExch',"1.000000")
+      setValue('ECargoBase.nWhRmbPrm',getValue('ECargoBase.nWhPrm') * 1)
+    }
+  },
+  cPremExchCdeChange:(val:any)=>{
+    if(val === '1'){
+      setFormItem('ECargoBase.nWhPrmRmbExch',{'disabled': true})
+    }else {
+      setFormItem('ECargoBase.nWhPrmRmbExch',{'disabled': false})
+    }
+  },
+  nWhPrmRmbExchChange:(val:any)=>{
+    if(val && getValue('ECargoBase.nWhPrm')){
+      setValue('ECargoBase.nWhRmbPrm',val * getValue('ECargoBase.nWhPrm'))
+    }
+  },
+  cWhInsExchCdeChange:(val:any)=>{
+    if(val === '1'){
+      setFormItem('ECargoBase.nWhAmtRmbExch',{'disabled': true})
+    }else {
+      setFormItem('ECargoBase.nWhAmtRmbExch',{'disabled': false})
+    }
+  },
   // func demo
 
 }

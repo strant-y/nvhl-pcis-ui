@@ -69,7 +69,7 @@ onBeforeMount(async () => {
   config[0].pageInfo = config[0].pageInfo.sort((a, b) => a.sort - b.sort)
   // 页面初始化
   formPage.value?.setFormConfig(config);
-  query();
+  // query();
   console.log('页面初始化',formPage.value)
 });
 
@@ -99,9 +99,8 @@ function query() {
   }
 }
 function isAllAValuesSame(arr:any,key:any) {
-  if (arr.length === 0) return true;
   const firstValue = arr[0][key];
-  return arr.every(obj => obj.A === firstValue);
+  return arr.every(obj => obj[key] === firstValue);
 }
 const premiumCalculation = ()=>{
   //协议费用
@@ -122,11 +121,14 @@ const premiumCalculation = ()=>{
     }
     if(isAllAValuesSame(AgreementCvrg,'ECargoTerm.cAmountCurrency')){
       AgreementFeeWarn.setFormItem('ECargoBase.AmtProp',{hidden: false})
-      AgreementFeeWarn.setValue('ECargoBase.cAmtCur',AgreementCvrg[0]['ECargoBase.cAmtCur'])
+      AgreementFeeWarn.setValue('ECargoBase.cAmtCur',AgreementCvrg[0]['ECargoTerm.cAmountCurrency'])
       const sum = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nInsuranceAmount'], 0);
       AgreementFeeWarn.setValue('ECargoBase.nAmt',sum)
       const sum1 = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nRmbAmount'], 0);
       AgreementFeeWarn.setValue('ECargoBase.nRmbAmt',sum1)
+      if(AgreementFeeWarn.getValue('ECargoBase.nWhRmbAmt')){
+        AgreementFeeWarn.setValue('ECargoBase.nRecRemEstAmt',sum1 - AgreementFeeWarn.getValue('ECargoBase.nWhRmbAmt'))
+      }
     }else{
       AgreementFeeWarn.setFormItem('ECargoBase.AmtProp',{hidden: false})
     }
