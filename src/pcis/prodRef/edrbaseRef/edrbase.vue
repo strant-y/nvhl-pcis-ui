@@ -161,39 +161,45 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "EdrBase.nBefEdrAmt",
         inputtype: "rtinput",
         title: "原保额",
-        disabled:true
+        disabled:true,
+        suffix: "元"
       },
       {
         prop: "EdrBase.nAmt",
         inputtype: "rtinput",
         title: "现保额",
-        disabled:true
+        disabled:true,
+        suffix: "元"
       },
       {
         prop: "EdrBase.nAmtVar",
         inputtype: "rtinput",
         min:-999999999999,
         title: "保额变化",
-        disabled:true
+        disabled:true,
+        suffix: "元"
       },
       {
         prop: "EdrBase.nBefEdrPrm",
         inputtype: "rtinput",
         title: "原保费",
-        disabled:true
+        disabled:true,
+        suffix: "元"
       },
       {
         prop: "EdrBase.nPrm",
         inputtype: "rtinput",
         title: "现保费",
-        disabled:true
+        disabled:true,
+        suffix: "元"
       },
       {
         prop: "EdrBase.nPrmVar",
         inputtype: "rtinput",
         min:-999999999999,
         title: "保费变化",
-        disabled:true
+        disabled:true,
+        suffix: "元"
       },
       {
         prop: "EdrBase.tEdrAppTm",
