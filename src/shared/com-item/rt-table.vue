@@ -678,6 +678,7 @@ function setRowFieldProp(
   prop: string,
   value: any
 ) {
+  console.log("setRowFieldProp", formItems,rowId, field, prop, value);
   if (formItems.value[rowId] && formItems.value[rowId][field]) {
     // 使用 Vue.set 确保响应式更新
     formItems.value[rowId][field] = {
@@ -687,7 +688,7 @@ function setRowFieldProp(
   } else {
     console.warn(`Field ${field} or row ${rowId} not found.`);
   }
-  console.log(formItems.value);
+  console.log("formItem",formItems.value);
 }
 function getRowById(rowId: any) {
   return tableDatas.value?.find((item) => {
@@ -696,7 +697,9 @@ function getRowById(rowId: any) {
     }
   });
 }
-
+// function getItemsRowId(rowId: any){
+//   return formItems.value[rowId]
+// }
 function getselectionData() {
   if (props.item.showSelection) {
     return tableRef.value?.getSelectionRows();
@@ -768,6 +771,7 @@ defineExpose({
   clearSelection,
   toggleRowSelection,
   setRowFieldProp,
+  // getItemsRowId
 });
 function isrequired(i: any) {
   if (i.rules) {
