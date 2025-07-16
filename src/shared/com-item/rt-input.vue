@@ -1,9 +1,9 @@
 <template>
   <template v-if="!showLabel">
     <el-tooltip
-      :content="vInput + ''"
-      :disabled="vInput ? false : true"
-      placement="top"
+        :content= "(vInput !== 'undefined' && vInput !== null) ? `${vInput}` : ''"
+        :disabled = "(vInput === 'undefined' || vInput===undefined  || vInput === null || vInput === '' || vInput === '0')"
+        placement="top"
     >
       <el-input
         ref="inputRef"
