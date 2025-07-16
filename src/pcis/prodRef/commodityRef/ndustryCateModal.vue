@@ -51,7 +51,7 @@ const pageresult = reactive<Pageresult>({
 });
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    title: "国民经济行业分类",
+    // title: "国民经济行业分类",
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
