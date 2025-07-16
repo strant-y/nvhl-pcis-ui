@@ -323,6 +323,7 @@ function addAndinitData() {
             "Term.cUniqueTermNo": item.cUniqueTermNo,
             "Term.NSeqNo":1,
             "Term.CPlanNo":pl,
+            "Term.cDeductibleMethod": "01",
             riskList: riskList,
           };
           if (item.cRdrTyp === "1") {
