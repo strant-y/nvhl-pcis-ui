@@ -3148,21 +3148,6 @@ const submitUnderwritingFn = async () => {
   //     return;
   //   }
   // }
-  // 如果退回给出单员，调用接口删除险位
-  if(res.cUndrMrk === "B" && props.param?.pageName !== "priceInquiry") {
-    const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
-    const param = {
-      cDocTyp: props.param?.cAppTyp,// 单证类型 A 保单 E 批单
-      cAppNo: props.param?.cAppNo,// 申请单号
-      cPlyNo: props.param?.plyNo,// 保单号
-      nEdrPrjNo: plyBase['Base.nEdrPrjNo'],// 批改序号
-    }
-    const delRisk = await policyService.delRisk(param);
-    if(delRisk && delRisk.code !== 200) {
-      ElMessage.error(delRisk.msg);
-      return;
-    }
-  }
   let submitUnder;
   // 询价单
   if (props.param?.pageName === "priceInquiry") {
