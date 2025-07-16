@@ -179,7 +179,7 @@
             :label="i.title"
             :width="i.width ? i.width : null"
             :align="item.align ? item.align : i.align ? i.align : 'center'"
-            :min-width="getColumnWidth(i.title,i.prop,tableDatas)"
+            :min-width="getColumnWidth(i.title,i.prop,tableDatas,i.minWidth,i.width)"
           >
             <template #header="header">
               <el-text
@@ -705,12 +705,13 @@ function getselectionData() {
   }
 }
 
-function getColumnWidth(label, prop, tableData) {
+function getColumnWidth(label, prop, tableData, itemMinWidth, itemWidth) {
   //label表头名称
   //prop对应的内容
   //tableData表格数据
  
-  const minWidth = 80 // 最小宽度
+  const width = itemWidth || 0 // 列表属性宽度
+  const minWidth = itemMinWidth || 80 // 最小宽度
   const padding = 10 // 列内边距
   let arr = tableData.map(item => item[prop])
   arr.push(label)//拼接内容和表头数据
@@ -720,7 +721,7 @@ function getColumnWidth(label, prop, tableData) {
     return textWidth + padding
   })
   const maxWidth = Math.max(...contentWidths)
-  return Math.max(minWidth, maxWidth)
+  return Math.max(minWidth, maxWidth, width)
 }
 
 function getTextWidth(text) {
