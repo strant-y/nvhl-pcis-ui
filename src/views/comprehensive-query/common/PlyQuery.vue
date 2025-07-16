@@ -1011,7 +1011,7 @@ const tableObj = {
             prop: "cAppStatus",
             inputtype: "rtselect",
             title: "状态",
-            minWidth: 100,
+            minWidth: 110,
             loadData: [
               { label: "暂存", value: "1" },
               { label: "已提核", value: "2" },
