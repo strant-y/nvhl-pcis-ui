@@ -6,6 +6,8 @@
     :label-width="formUi.labelWidth"
     :size="formUi.size"
     :label-position="formUi.labelPosition"
+    :span-method="objectSpanMethod"
+    @current-change="currentChange"
   >
     <el-table
       ref="tableRef"
@@ -740,6 +742,18 @@ function getTextWidth(text) {
   return width
 }
 
+const objectSpanMethod = (object: any) => {
+  if(props.item && props.item.spanMethod && typeof props.item.spanMethod === 'function') {
+    const res = props.item.spanMethod(object)
+    return res
+  }
+  return { rowspan: 1, colspan: 1 }
+};
+const currentChange = (currentRow: any, oldCurrentRow: any) => {
+  if(props.item && props.item.currentChange && typeof props.item.currentChange === 'function') {
+    return props.item.currentChange(currentRow, oldCurrentRow)
+  }
+}
 /**
  * 获取指定行所有列组件的ref
  * @param id 行id
