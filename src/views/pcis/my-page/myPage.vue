@@ -211,7 +211,7 @@
                   : true
               "
             >
-          <!-- {{ k.pageKey }} -->
+          {{ k.pageKey }} 
               <component
                 v-if="currentIndex >= i"
                 :ref="
@@ -2272,8 +2272,9 @@ function getFKFunc() {
  * 投保申请核保
  */
 const submitToUndrFn = async () => {  
+ 
 
-   // 风勘校验
+  // 风勘校验 
  if( props.param?.pageName === "priceInquiry" ){
     // const startData = await initMultiCodeList({});
     // console.log(1212,res);
@@ -2291,6 +2292,17 @@ const submitToUndrFn = async () => {
     return;
   }
   if (!checkNAmt()) return;
+
+   //  042001  是否单项工程逻辑
+   if(props.param?.cProdNo==='042001'){
+      let tableLenght = opertaor.getTableRefByKey("DesignDist").getTableData().length;  // 清单条数
+      let cIsSingle =  opertaor.getTableRefByKey("tgt").getValue('Tgt.cIsSingle');      // 是否单项工程
+      if(tableLenght ==0 && cIsSingle==0){
+        ElMessage.warning("“是否单项工程”为否时，设计工程项目清单不能为空！");  
+        return false;
+      }
+   }
+
   const f = await savePlyInfo(); // 提交核保,需要默认执行一次保存操作
   if (f) {
     const btn = getBtn("btn010103");
@@ -2678,6 +2690,8 @@ const getPlyPolicyFun = () => {
  ***/
 const calcPremiumEdr = () => {
     const res = opertaor.getDataAll();
+    const dataAll = opertaor.getDataAll();
+ 
   console.log('保费计算',props.param)
   console.log('保费计算2',res)
   
@@ -2700,7 +2714,7 @@ const calcPremiumEdr = () => {
  
   const btn = getBtn("btnCalEdr");
   btn.loading = true;
-  // const res = opertaor.getDataAll();
+
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
@@ -2713,9 +2727,6 @@ const calcPremiumEdr = () => {
       res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   }
 
-  
-
-  console.log(res);
   calcEdr(res).then((res) => {
     btn.loading = false;
     console.log("批改计算", res);
@@ -2739,44 +2750,44 @@ const calcPremiumEdr = () => {
         );
       edrbase.value?.setFormValue(EdrBaseData);
       const nPrmVar = ops["plyBase"]["Base.nPrmVar"]  || 0;
-      let payInfo = setPayInfoEdr(
-        ops["payinfo"],
-        ops["base"],
-        ops["applicant"],
-        nPrmVar,
-        ops["plyBase"],
-        // isCorrect:true,
-      );
-      console.log("生成缴费计划内容", payInfo);
-      // opertaor.getTableRefs()["payinfo"].setFormValue(payInfo); 
-      const payinfoRef = opertaor.getTableRefs()["payinfo"];
-      if (payinfoRef && payinfoRef.setFormValue) {
+
     
-        // payInfo  = {...payInfo,...{isCorrect:true}}
+      const payinfoRef = opertaor.getTableRefs()["payinfo"];
+
+      // 保费变化率 批改时 原始数据为0  （批改申请核保时用）
+      payinfoRef.getFromValue().forEach((item:any)=>{
+            item['Pay.nPrmVar'] = 0;
+      })
+
+      if (payinfoRef && payinfoRef.setFormValue) {
         let currentPayList = [...payinfoRef.getFromValue()]; // 获取当前列表
-        currentPayList = currentPayList.filter(item => {
-          // 检查 item.Pay 是否存在，且包含 cAppNo 字段
-          return item['Pay.cAppNo'] && item.hasOwnProperty('Pay.cAppNo');
-        });
+        //  缴费期数   + 批改次数
 
-        // const lastShowIndex = currentPayList.reduce((lastIndex, item, index) => {
-        //     return item.hasOwnProperty('Pay.cAppNo') ? index : lastIndex;
-        //   }, -1);
-
-        //   // 如果找到，则删除该元素
-        //   if (lastShowIndex !== -1) {
-        //     currentPayList.splice(lastShowIndex, 1);
-        //   }
- 
-        console.log('data--' ,currentPayList)
-        console.log('data2--' ,payInfo)
-        currentPayList.push(payInfo); // 插入新条目
-        payinfoRef.setFormValue(currentPayList); // 更新表单数据
-      }
+        // Base.nPayNumber
+        let infoLength = dataAll['base']['Base.nPayNumber']+res['res']['composition']["EdrBase"][0]['EdrBase.nEdrPrjNo'];
+                console.log('条数',infoLength ,currentPayList.length)
+    
+        if(currentPayList.length >=infoLength){
+          currentPayList.pop();
+        }
+        // 处理 批改是保存多条问题 （需要再次修改 不成熟的改法）
+        // currentPayList = currentPayList.filter(item => {
+        //   return item['Pay.cAppNo'] && item.hasOwnProperty('Pay.cAppNo');
+        // });
+                let payInfo = setPayInfoEdr(
+                ops["payinfo"],
+                ops["base"],
+                ops["applicant"],
+                nPrmVar,
+                ops["plyBase"],
+                currentPayList.length+1
+              );
+            console.log('data--' ,currentPayList)
+            console.log('data2--' ,payInfo)
+            currentPayList.push(payInfo); // 插入新条目
+            payinfoRef.setFormValue(currentPayList); // 更新表单数据
+          }
       needCalc.value = false;
-
-
-
     } else {
       ElMessage.error(res.msg);
     }
@@ -2784,7 +2795,7 @@ const calcPremiumEdr = () => {
     // history.back();
   });
 };
-const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase) => {
+const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase,nTms) => {
   // const payListNew = [];
   const payListNew = [...payList];
   const pay = {};
@@ -2800,13 +2811,13 @@ const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase) => {
   pay["Pay.tPayEndTm"] = plyBase["Base.tEdrBgnTm"];
   pay["Pay.nOwnPrm"] = nPrmVar;
   pay["Pay.cProdNo"] = base["Base.cProdNo"];
-  pay["Pay.nPrmVar"] = nPrmVar;
+  pay["Pay.nPrmVar"] = nPrmVar ;
   // for (const i in payList) {
   //   if (!!payList[i]["Pay.cPkId"]) {
   //     payListNew.push(payList[i]);
   //   }
   // }
-  pay["Pay.nTms"] = payListNew.length + 1;
+  pay["Pay.nTms"] = nTms ||plyBase.length+1 ;
   // payListNew.push(pay);
   // return payListNew;
   return pay;
@@ -2973,6 +2984,8 @@ const submitEdrToUndrSurrender = async () => {
  * 批改单保存
  * **/
 const saveEdrPlyInfo = () => {
+      const dataALl = opertaor.getDataAll();
+  console.log('批改单保存', dataALl  )
   const btn = getBtn("saveEdr");
   btn.loading = true;
   const res = opertaor.getDataAll();

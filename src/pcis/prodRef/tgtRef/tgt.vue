@@ -276,7 +276,9 @@ const method = {
       });
     }
   },
+  // 是否单项工程 
   getcIsSingleChange:(val:string)=>{
+    console.log(val)
     if(val=== '1'){
       setFormItem('Tgt.nTotalCost', {
         rules: [getRules("required", {})],
@@ -290,7 +292,32 @@ const method = {
       setFormItem('Tgt.cSuffixAddr', {
         rules: [getRules("required", {})],
       });
+
+       if(params.cProdNo==='042001'){
+          setFormItem('Tgt.cProjectName', {
+             hidden: false,
+           rules: [getRules("required", {})],
+          });
+    
+          setFormItem('Tgt.nTotalCost', {
+          hidden: false,
+           rules: [getRules("required", {})],
+          });
+    
+          setFormItem('Tgt.nTotalDesign', {
+          hidden: false,
+           rules: [getRules("required", {})],
+          });
+          setFormItem('Tgt.ProjectAddress', {
+          hidden: false,
+           rules: [getRules("required", {})],
+          });
+      }
+
     }else {
+
+      // Tgt.cProjectName
+
       setFormItem('Tgt.nTotalCost', {
         rules: null
       });
@@ -302,8 +329,33 @@ const method = {
       });
       setFormItem('Tgt.cSuffixAddr', {
         rules: null
-      });
+      }); 
+
+
+      if(params.cProdNo==='042001' && val=== '0'){
+          setFormItem('Tgt.cProjectName', {
+             hidden: true,
+             rules: null
+          });
+    
+          setFormItem('Tgt.nTotalCost', {
+            hidden: true,
+            rules: null
+          });
+    
+          setFormItem('Tgt.nTotalDesign', {
+            hidden: true,
+            rules: null
+          });
+          setFormItem('Tgt.ProjectAddress', {
+            hidden: true,
+            rules: null
+          });
+      }
+      
+ 
     }
+    
   },
   getcTransportationToolsChange:(val:string)=>{
     if(val=== '02'){
@@ -451,6 +503,8 @@ const method = {
   },
   //是否单项工程change事件
   cIsSingleFunc: (val) => {
+    console.log('123123',vals)
+
     if (val == '1') {
       let obj = {
         rules: [getRules("required", {})],
