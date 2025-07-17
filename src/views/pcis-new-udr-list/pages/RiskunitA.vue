@@ -1050,7 +1050,7 @@ function split() {
   const remAddedTax = (parseFloat(totalAddedTax) - parseFloat(allAddedTax)).toFixed(2);//要拆分的增值税
 
   const newRow = [{
-    ...selectRow1.value,
+    // ...selectRow1.value,
     ...freeEditRef1.value?.getFromValue(),
     nSeqNo: pageresult1.list.length + 1,
     cPkId: `newcPkid${pageresult1.list.length + 1}`,
@@ -1165,7 +1165,7 @@ function queryAddress() {
     cDptCde: user.value.companyId,
   }
   queryComponentCodeList(param).then((res:any) => {
-    if(res.code === '200') {
+    if(res.code === '1') {
       addressOptions.value = res.data.map((item:any) => ({
         ...item,
         label: item.cDetailedAddress,
