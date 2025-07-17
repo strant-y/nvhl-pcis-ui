@@ -135,6 +135,9 @@ const formconfig1 = ref<AppFreeEditConfig>(
           const isValid = await freeEditRef.value?.validate();
           if(isValid){
             const s = freeEditRef.value?.getFromValue();
+            if(s['Dist.JingYingAddress043009'].indexOf('undefined') !== -1) {
+              s['Dist.JingYingAddress043009'] = s['Dist.JingYingAddress043009'].replace('undefined', '')
+            }
 
             console.log('路由data‘',route.params)
             // return false;
