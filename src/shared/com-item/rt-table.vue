@@ -26,6 +26,8 @@
       :show-summary="item.showSummary ? item.showSummary : false"
       :sum-text="item.sumText ? item.sumText : '合计'"
       :summary-method="item.summaryMethod ? item.summaryMethod : null"
+      :span-method="objectSpanMethod"
+      @current-change="currentChange"
     >
       <!-- 其他列定义 -->
       <el-table-column
@@ -179,7 +181,7 @@
             :label="i.title"
             :width="i.width ? i.width : null"
             :align="item.align ? item.align : i.align ? i.align : 'center'"
-            :min-width="getColumnWidth(i.title,i.prop,tableDatas,i.minWidth,i.width)"
+            :min-width="getColumnWidth(i.title,i.prop,tableDatas,i.minWidth,i.width, i.maxWidth || item.maxWidth)"
           >
             <template #header="header">
               <el-text
@@ -188,7 +190,8 @@
                 style="margin-right: 2px"
                 type="danger"
                 >*</el-text
-              >{{ header.column.label }}
+              >
+              {{ header.column.label }}
             </template>
             <template #default="scope">
               <template v-if="item.editFlag">
@@ -199,7 +202,7 @@
                   <from-item
                     v-model="scope.row[i.prop]"
                     :item="formItems[scope.row._dataId][i.prop]"
-                    :showLabel="editIndex !== scope.row._dataId"
+                    :showLabel="formItems[scope.row._dataId][i.prop]?.disableColEdit || editIndex !== scope.row._dataId"
                     :row="scope.row"
                   />
                 </el-form-item>
@@ -216,6 +219,7 @@
                     v-model="scope.row[i.prop]"
                     :item="formItems[scope.row._dataId][i.prop]"
                     :showLabel="
+                      formItems[scope.row._dataId][i.prop]?.disableColEdit ||
                       !(props.item.editList && props.item.editList.length > 0
                         ? props.item.editList?.includes(i.prop)
                         : false)
@@ -300,6 +304,16 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-button
+        v-if="props.item.bottomBtn && props.item.bottomBtn.show"
+        class="mt-4"
+        :type="props.item.bottomBtn.type ? props.item.bottomBtn.type : 'info'"
+        :plain="props.item.bottomBtn.plain"
+        :style="props.item.bottomBtn.style ? props.item.bottomBtn.style : {width: '100%'}"
+        @click="props.item.bottomBtn.click"
+    >
+      {{props.item.bottomBtn.label}}
+    </el-button>
   </el-form>
 </template>
 
@@ -708,7 +722,7 @@ function getselectionData() {
   }
 }
 
-function getColumnWidth(label, prop, tableData, itemMinWidth, itemWidth) {
+function getColumnWidth(label, prop, tableData, itemMinWidth, itemWidth, itemMaxWidth = 800) {
   //label表头名称
   //prop对应的内容
   //tableData表格数据
@@ -723,7 +737,7 @@ function getColumnWidth(label, prop, tableData, itemMinWidth, itemWidth) {
     const textWidth = getTextWidth(value)
     return textWidth + padding
   })
-  const maxWidth = Math.max(...contentWidths)
+  const maxWidth = Math.max(...contentWidths) > itemMaxWidth ? itemMaxWidth : Math.max(...contentWidths)
   return Math.max(minWidth, maxWidth, width)
 }
 
@@ -740,6 +754,18 @@ function getTextWidth(text) {
   return width
 }
 
+const objectSpanMethod = (object: any) => {
+  if(props.item && props.item.spanMethod && typeof props.item.spanMethod === 'function') {
+    const res = props.item.spanMethod(object)
+    return res
+  }
+  return { rowspan: 1, colspan: 1 }
+};
+const currentChange = (currentRow: any, oldCurrentRow: any) => {
+  if(props.item && props.item.currentChange && typeof props.item.currentChange === 'function') {
+    return props.item.currentChange(currentRow, oldCurrentRow)
+  }
+}
 /**
  * 获取指定行所有列组件的ref
  * @param id 行id
@@ -794,5 +820,8 @@ function isrequired(i: any) {
 }
 :deep(.el-table .cell) {
   white-space: nowrap;
+}
+:deep(.el-table td.el-table__cell div) {
+  white-space: normal;
 }
 </style>

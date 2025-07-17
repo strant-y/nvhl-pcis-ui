@@ -140,6 +140,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               .then((res: any) => {
                 if (res.code === '1') {
                   ElMessage.success("自主临分提交成功");
+                  setFormItem("riFacMrk", {
+                    disabled: true
+                  });
                 } else {
                   ElMessage.error(res.message);
                 }
@@ -481,6 +484,7 @@ onMounted(() => {
     } else {
       param.cAppNo = params.cAppNo
     }
+    // 获取核保选项
     getCUndrMrkUrlFn(param);
     loadUwTabData();
     queryRiskCodelistFn();

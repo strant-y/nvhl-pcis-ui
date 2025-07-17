@@ -21,6 +21,7 @@ import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 import { useProductStore } from "@/store/modules/prod";
 import CostInformation from "@/views/pcis-new-udr-list/pages/CostInformation.vue";
+import { fa } from "element-plus/es/locale";
 const productStore = useProductStore();
 const dialogRef = ref<DialogMethod | null>(null);
 
@@ -66,9 +67,10 @@ onMounted(async () => {
 
 // 绑定方法
 const method = {
+  
   ciAdd: () => {
     const dataList = getFromValue();
-    const plyBaseData = opertaor.getTableRefByKey("plyBase").getValue("Base.cBsnsTyp")
+    const cBsnsTyp = opertaor.getTableRefByKey("plyBase").getValue("Base.cBsnsTyp")
     const cCiMrkFlag = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
     const val=getFromValue()
     const nCiAmt = parseFloat(productStore.nAmt)
@@ -156,22 +158,24 @@ const method = {
                 res
             );
           });
-          freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
-          );
-          freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cSlsCde", "disabled", true
-          );
-          freeEditRef.value?.setRowFieldProp(
-                  rowData._dataId, "Ci.cBrkrCde", "disabled", true
-          );
-          freeEditRef.value?.setRowFieldProp(
+          nextTick(()=>{
+            freeEditRef.value?.setRowFieldProp(
+                  rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
+              );
+            freeEditRef.value?.setRowFieldProp(
+                    rowData._dataId, "Ci.cSlsCde", "disabled", true
+              );
+            freeEditRef.value?.setRowFieldProp(
+                    rowData._dataId, "Ci.cBrkrCde", "disabled", true
+              );
+            freeEditRef.value?.setRowFieldProp(
                   rowData._dataId, "Ci.cBrkSlsCde", "disabled", true
-          );
-          const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
-          rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
-          rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
-          rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
+              );
+            const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+            rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
+            rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
+            rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
+          })
     } else {
       // 非永安保险，设置默认值和其他数据
       freeEditRef.value?.addCodeListMap(
@@ -231,22 +235,25 @@ const method = {
               }
           );
         });
-        freeEditRef.value?.setRowFieldProp(
+        nextTick(()=>{
+          freeEditRef.value?.setRowFieldProp(
                 rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
-        );
-        freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cSlsCde", "disabled", true
-        );
-        freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cBrkrCde", "disabled", true
-        );
-        freeEditRef.value?.setRowFieldProp(
+            );
+          freeEditRef.value?.setRowFieldProp(
+                  rowData._dataId, "Ci.cSlsCde", "disabled", true
+            );
+          freeEditRef.value?.setRowFieldProp(
+                  rowData._dataId, "Ci.cBrkrCde", "disabled", true
+            );
+          freeEditRef.value?.setRowFieldProp(
                 rowData._dataId, "Ci.cBrkSlsCde", "disabled", true
-        );
-        const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
-        rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
-        rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
-        rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
+            );
+          const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+          rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
+          rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
+          rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
+        })
+        
         if (plyBasedata["Base.cCiMrk"] === "3" || plyBasedata["Base.cCiMrk"] === "4") {
           const isYonganAlreadyPresent = formTableData.some(
             (row) => row._dataId !== rowId && row['Ci.cCoinsurerCde'] === "327001"
@@ -358,7 +365,6 @@ const method = {
   //出单机构下拉事件
   cDptCdeChange:(val)=>{
     onChiefMrkChange()
-    console.log("出单机构下拉事件",val);
     const rowData = freeEditRef.value?.getSelectRow();
     // if (!rowData || !initFlag.value) return;
     const rowId = rowData._dataId;
@@ -568,7 +574,7 @@ const method = {
         });
   },
     // 开户行    CNAPS号 开户行地址
-  cBankCdeChange: (val: any) => {
+  cBrkrCdeChange: (val: any) => {
     console.log(val, '开户行')
     if (val) {
       let backAddr = val.split('_');
@@ -664,7 +670,6 @@ const method = {
     );
   },
 };
-
 const updateMasterAgreementValues = () => {
   const allRows = getFromValue(); // 获取所有行数据
   let totalAmt = 0;

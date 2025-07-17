@@ -44,7 +44,7 @@
                   </el-button-group>
                   <a
                     style="margin-left: 20px"
-                    @click="changeMyfrom()"
+                    @click="showMyfrom = !showMyfrom"
                     v-if="
                       freeEditConfig.showMyfromBtm
                         ? freeEditConfig.showMyfromBtm
@@ -143,12 +143,7 @@ function updateDatas(newDatas: any) {
   formData.value = newDatas;
   emits("updateDatas", newDatas);
 }
-function changeMyfrom() {
-  showMyfrom.value = !showMyfrom.value;
-  nextTick(() => {
-    dynamicForm.value?.setFormValue(formData.value);
-  });
-}
+
 const showMyfrom = ref(false);
 showMyfrom.value = props.freeEditConfig?.showMyfrom
   ? props.freeEditConfig?.showMyfrom
@@ -351,8 +346,12 @@ defineExpose({
   align-items: center;
 }
 :deep(.el-select__wrapper) {
-  height: 28px;
+  /* height: 28px; */
   min-height: 28px;
+  line-height: 28px;
+}
+:deep(.el-select__input) {
+  height: 20px;
 }
 :deep(.el-input__wrapper) {
   height: 28px;

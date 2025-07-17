@@ -99,7 +99,7 @@ const index1 = ref(-1); // 第一个列表选中index
 const index2 = ref(-1); // 第一个列表选中index
 const selectRow1 = ref<any>({}); // 第一个列表选中行
 const selectRow2 = ref<any>({}); // 第一个列表选中行
-const CRiskLvlCde_Options = ref([]); // 风险等级列表
+const CRiskLvlCde_Options = ref<any>([]); // 风险等级列表
 const dialogVisible = ref(true);
 const cAmtCurOptions = ref([]);
 const cPrmCurOptions = ref([]);
@@ -595,7 +595,7 @@ const tableconfig1 = reactive<AppTableConfig>(
   createTableEditConfig({
     title: "风险单位信息",
     editFlag: true,
-    editList: ["cDetailedAddressId","cRemarks"],
+    editList: ["cDetailedAddress","cRemarks"],
     tableBtnType: "btn",
     showSelection: true,
     titleBtns: [
@@ -658,13 +658,13 @@ const tableconfig1 = reactive<AppTableConfig>(
         readOnly: true,
       },
       {
-        prop: "cDetailedAddressId",
+        prop: "cDetailedAddress",
         inputtype: "rtselect",
         title: "标的地址",
         minWidth: 300,
         func: (val:any, row:any) => {
           if(val) {
-            const item = addressOptions.value.find((i:any) => i.cPkId === val);
+            const item = addressOptions.value.find((i:any) => i.cDetailedAddress === val);
             const sameItemList = addressOptions.value.filter((n:any) => n.cProvince === item.cProvince && n.cCity === item.cCity && n.cCounty === item.cCounty);
             if(sameItemList.length > 1) {
               ElMessageBox.alert('同一省、市、区/县下有多个地址是否合并', '提示', {
@@ -672,14 +672,12 @@ const tableconfig1 = reactive<AppTableConfig>(
                 cancelButtonText: '取消',
               })
             }
-            row.cDetailedAddress = item.cDetailedAddress;
             row.cCountry = item.cCountry;
             row.cProvince = item.cProvince;
             row.cCity = item.cCity;
             row.cCounty = item.cCounty;
             row.cSuffixAddr = item.cSuffixAddr;
           } else {
-            row.cDetailedAddress = "";
             row.cCountry = ""
             row.cProvince = "";
             row.cCity = "";
@@ -723,6 +721,9 @@ const tableconfig1 = reactive<AppTableConfig>(
         title: "自留额",
         minWidth: 180,
         readOnly: false,
+        formatter:(val:any) => {
+          return val ? val.toFixed(2) : ""
+        }
       },
       {
         prop: "cRemarks",
@@ -844,11 +845,12 @@ function queryRiskUnit() {
   riskUnitQuery(param)
     .then((result: any) => {
       if (result.code === "1" && result.data) {
-        CRiskLvlCde_Options.value = result.data.map((item: any) => ({
-          ...item,
-          label: item.cRiskUnitNme,
-          value: item.cRiskLvlCde,
-        }));
+        const optionsItem = [{
+          ...result.data,
+          label: result.data.cRiskLvlCde + result.data.cRiskUnitNme,
+          value: result.data.cRiskLvlCde,
+        }]
+        CRiskLvlCde_Options.value = optionsItem;
       } else if (result.code === "0") {
         ElMessage.error({ message: result.message, duration: 3000 });
       }
@@ -1048,7 +1050,7 @@ function split() {
   const remAddedTax = (parseFloat(totalAddedTax) - parseFloat(allAddedTax)).toFixed(2);//要拆分的增值税
 
   const newRow = [{
-    ...selectRow1.value,
+    // ...selectRow1.value,
     ...freeEditRef1.value?.getFromValue(),
     nSeqNo: pageresult1.list.length + 1,
     cPkId: `newcPkid${pageresult1.list.length + 1}`,
@@ -1163,11 +1165,11 @@ function queryAddress() {
     cDptCde: user.value.companyId,
   }
   queryComponentCodeList(param).then((res:any) => {
-    if(res.code === '200') {
+    if(res.code === '1') {
       addressOptions.value = res.data.map((item:any) => ({
         ...item,
         label: item.cDetailedAddress,
-        value: item.cPkId,
+        value: item.cDetailedAddress,
       }))
       tableconfig1.fromSchema[1].loadData = addressOptions.value
     } else {
@@ -1389,18 +1391,18 @@ function getContData() {
       if (res.code === "200") {
         if (res.data) {
           console.log("getContData", res.data);
-          let data = {}
-          if(params.cCiMrk !== '0') {
-            data = {
-              ...res.data,
-              nAmt: res.data.nCiAmt,
-              nAmtVar: res.data.nCiAmtVar,
-              nPrm: res.data.nCiPrm,
-              nPrmVar: res.data.nCiPrmVar,
-            }
-          } else {
-            data = res.data
-          }
+          let data = {...res.data}
+          // if(params.cCiMrk !== '0') {
+          //   data = {
+          //     ...res.data,
+          //     nAmt: res.data.nCiAmt,
+          //     nAmtVar: res.data.nCiAmtVar,
+          //     nPrm: res.data.nCiPrm,
+          //     nPrmVar: res.data.nCiPrmVar,
+          //   }
+          // } else {
+          //   data = res.data
+          // }
           freeEditRef.value?.setFormValue(data);
           cAmtCurOptions.value = [
             { label: data.cAmtCur, value: data.cAmtCur },
