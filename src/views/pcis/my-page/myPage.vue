@@ -3215,7 +3215,8 @@ const validateCiInfo = () => {
         }
       }
       if (chiefMrkM === 0 || chiefMrkS === 0) {
-        ElMessage.error("主/从共保信息不完整!");
+        // ElMessage.error("主/从共保信息不完整!");
+        ElMessage.error("主共方有且仅有一个！");
         return false;
       }
       if (NCiShare !== 1) {
