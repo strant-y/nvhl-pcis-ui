@@ -1393,18 +1393,18 @@ function getContData() {
       if (res.code === "200") {
         if (res.data) {
           console.log("getContData", res.data);
-          let data = {}
-          if(params.cCiMrk !== '0') {
-            data = {
-              ...res.data,
-              nAmt: res.data.nCiAmt,
-              nAmtVar: res.data.nCiAmtVar,
-              nPrm: res.data.nCiPrm,
-              nPrmVar: res.data.nCiPrmVar,
-            }
-          } else {
-            data = res.data
-          }
+          let data = {...res.data}
+          // if(params.cCiMrk !== '0') {
+          //   data = {
+          //     ...res.data,
+          //     nAmt: res.data.nCiAmt,
+          //     nAmtVar: res.data.nCiAmtVar,
+          //     nPrm: res.data.nCiPrm,
+          //     nPrmVar: res.data.nCiPrmVar,
+          //   }
+          // } else {
+          //   data = res.data
+          // }
           freeEditRef.value?.setFormValue(data);
           cAmtCurOptions.value = [
             { label: data.cAmtCur, value: data.cAmtCur },
