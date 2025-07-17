@@ -235,6 +235,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "特约内容",
         align: "left",
+        //  width: 210,
       },
     ],
   })
@@ -298,6 +299,7 @@ const method = {
       "prdFixSpec",
       {
           cProdNo: param.cProdNo,
+          cDptCde:param.cDptCde,
           selectedData: formData.value, //需要把自定义的过滤掉，只传过去从模板中选择的
         },
       {

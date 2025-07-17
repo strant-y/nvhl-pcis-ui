@@ -174,6 +174,9 @@ function getRowById(dataId: string) {
 function setRowFieldProp(rowId: string, field: string, prop: string, value: any) {
   return rttableFrom.value?.setRowFieldProp(rowId, field, prop, value);
 }
+function getRowAllItemRefById(rowId:string){
+  return rttableFrom.value?.getRowAllItemRefById(rowId);
+}
 
 function getFormBtn() {
   return btnMap.value
@@ -223,7 +226,8 @@ defineExpose({
   getTableBtn,
   getCodeListMap,
   setCodeListMap,
-  addCodeListMap
+  addCodeListMap,
+  getRowAllItemRefById
 });
 </script>
 

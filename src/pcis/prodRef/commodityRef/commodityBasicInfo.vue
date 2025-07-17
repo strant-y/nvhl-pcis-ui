@@ -212,7 +212,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         typeCode: "WEB_SYS_STA_DICT",
         codeParam: { cParCde: "yes_no" },
         defaultValue: '1',
-        disabled: true,
+        // disabled: true,
 
       },
       {
@@ -580,9 +580,9 @@ onMounted(() => {
     setFormItem('cProdNo', {
       disabled: true,
     })
-    setFormItem('cAutoUdr', {
-      disabled: true,
-    })
+    // setFormItem('cAutoUdr', {
+    //   disabled: true,
+    // })
     setFormItem('cAffiliatedMrk', {
       disabled: true,
     })

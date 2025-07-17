@@ -1,3 +1,4 @@
+<!-- 选择方案 弹框 -->
 <template>
   <el-dialog v-model="dialogVisible" title="选择方案" width="80%" @update:model-value="handleVisibleUpdate">
     <app-free-edit v-model:freeEditConfig="formconfig" ref="freeEditRef" />
@@ -251,7 +252,7 @@ function handleQuery() {
 
         if (data !== null) {
           pageresult.list = data;
-          pageresult.total = data.length;
+          // pageresult.total = data.length;
 
           nextTick();
           setDefaultSelection();

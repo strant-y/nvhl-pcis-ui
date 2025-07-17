@@ -176,6 +176,23 @@ superFromState.value = props.freeEditConfig?.showSuperior
 
 function getFromValue() {
   const d = dynamicForm.value?.getFromValue();
+  // 级联地址 表格显示问题处理
+  freeEditConfig.value?.fromSchema?.forEach((item: any) => {
+    if(item?.inputtype === "rtinputgroup") {
+      const groupList = item.groupList
+      const comp = getFromSchemaItem(groupList[0].prop);
+      if(groupList && comp) {
+        if(comp.itemRef && 'getTextValue' in comp.itemRef) {
+          let text = comp.itemRef.getTextValue()?.replaceAll(' / ', '')
+          if(groupList[1]?.prop) {
+             text += d[groupList[1]?.prop]
+          }
+          d[item.prop] = text
+        }
+      }
+    }
+  });
+
   if (superDynamicForm.value) {
     return {
       ...d,

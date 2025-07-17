@@ -76,7 +76,8 @@ defineExpose({
   updateOption,
   key,
   value,
-  itemConfig
+  itemConfig,
+  itemRef
 });
 
 onMounted(() => {

@@ -330,6 +330,7 @@ function addAndinitData() {
             data["Term.cClauseCategory"] = item.cClauseCategory;
           }
           cAddTermNo.value = item.cUniqueTermNo;
+          initTermData(item,data);
           plans.push(data);
         });
         refushData(pl, plans);
@@ -503,6 +504,7 @@ function addTermData(PlanNo: string) {
             data["Term.cClauseCategory"] = item.cClauseCategory;
             // data["Term.cClaiminclude"] = '0';
           }
+          initTermData(item,data);
           plans.push(data);
         });
         refushData(PlanNo, plans);
@@ -531,6 +533,7 @@ function refushData(planNo: string, datas: any) {
     // nextTick(() => {
     //   showFlush();
     // });
+    updateTitle();
   }, 100);
 }
 function deletePlan(plan: string) {
@@ -664,7 +667,7 @@ async function validate() {
 function showFlush() {
   updateTitle();
   Object.keys(tremTemplateRefs.value).forEach((item) => {
-    tremTemplateRefs.value[item].dataInit();
+    tremTemplateRefs.value[item].dataFlash();
   });
   updateBtn();
 }
@@ -735,9 +738,58 @@ function calcCheck(){
   return res;
 }
 
+function initTermData(item: any,data:any){
+  if(parparam.cProdNo === '043009'){
+    if(data.riskList && data.riskList.length > 0){
+      data.riskList.forEach((r)=>{
+        r['TermRisktgt.cDeductibleMethod'] = '01';
+      })
+    }
+  }
+}
 
 function setTermData(param: any, value: any){
-  console.log(1111);
+
+  const planNo: string = param.planNo;
+  const prop: string = param.factorProp;
+  const termNo: string = param.termNo;
+  const riskNo: string = param.riskNo;
+
+  const formData = planData.value[planNo];
+
+  Object.keys(formData).forEach((item) => {
+      formData[item].forEach((d: any) => {
+        if(d['Term.cUniqueTermNo'] === termNo){
+          if(!prop.startsWith('TermRisktgt')){
+            d[prop] = value;
+          }
+          if (d.riskList && d.riskList.length > 0) {
+            d.riskList.forEach((r: any)=>{
+              if(r['TermRisktgt.cLiabCode'] === riskNo){
+                r[param.factorProp] = value;
+              }
+            })
+          }
+        }
+      });
+    });
+  
+  // Object.keys(formData).forEach((item) => {
+  //   formData[item].forEach((d: any) => {
+  //     if(!prop.startsWith('TermRisktgt')){
+  //       d[prop] = value;
+  //     }
+  //     if (d.riskList && d.riskList.length > 0) {
+  //       d.riskList.forEach((r: any)=>{
+  //         if(r['TermRisktgt.cLiabCode'] === riskNo){
+  //           r[param.factorProp] = value;
+  //         }
+  //       })
+  //     }
+  //   });
+  // });
+  console.log(planData.value);
+  showFlush();
 }
 
 defineExpose({

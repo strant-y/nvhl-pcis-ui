@@ -49,6 +49,7 @@ export interface AppGridEditMethod {
   getCodeListMap: () => any;
   setCodeListMap: (map: any) => void;
   addCodeListMap: (data: any) => void;
+  getRowAllItemRefById: (rowId: string) => any;
 }
 
 export function createAppGridEditConfig(

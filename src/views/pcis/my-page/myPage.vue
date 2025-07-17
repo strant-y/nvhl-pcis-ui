@@ -63,6 +63,7 @@
                           : 'Tickets',
                     }"
                   /> -->
+                  
                   <i :class="['icon','iconfont',iconMap[k.pageKey]]"></i>
                   <span class="icon-title" v-if="NavigaShow">
                     <template v-if="k.pageTtile && k.pageTtile.length > 7">
@@ -338,6 +339,7 @@ const { saveData } = NewUdrListService();
 import {useUserStore} from "@/store";
 import { pa } from "element-plus/es/locale";
 import { initMultiCodeList } from "@/api/code-list-service";
+import { forEach } from "lodash";
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -448,51 +450,15 @@ const pageData = ref({}); // 页面数据
 let controlFlag = ""; // 用来处理反洗钱 页面窜窜以及显示
 
 // 存所有可显示账户信息场景
-let detailcodeArray = [
-  "保费调整",
-  "赔款后保额冲减",
-  "赔款后保额恢复",
-  "增加保额",
-  "减少保额",
-  "增加险别",
-  "变更清单信息",
-  "减少险别",
-  "变更保险期限",
-  "变更车辆信息",
-  "渠道信息变更",
-  "增减方案",
-  "变更投保数量",
-  "变更每亩保费",
-  "减少保费",
-  "费率调整",
-  "报停展期",
-  "增加销售额",
-  "减少销售额",
-  "增加保费",
-  "其他",
-  "更改客户信息",
-  "变更工程造价",
-  "减少被保险人",
-  "变更建筑面积",
-  "收费延期",
-  "增加被保险人",
-  "增加清单信息",
-  "不记名补录被保险人",
-  "全单注销",
-  "全单退保",
-  "一般退保",
-  "当期退",
-  "分期失效",
-];
 const detailcodeList = [
   { id: "01", name: "变更投保数量" },
   { id: "05", name: "保费调整" },
   { id: "06", name: "赔款后保额恢复" },
   { id: "07", name: "增加保额" },
   { id: "08", name: "减少保额" },
-  { id: "09", name: "增加险别" },
+  { id: "09", name: "增加条款" },
   { id: "10", name: "变更清单信息" },
-  { id: "11", name: "减少险别" },
+  { id: "11", name: "减少条款" },
   { id: "12", name: "变更保险期限" },
   { id: "13", name: "更改客户信息" },
   { id: "17", name: "赔款后保额冲减" },
@@ -516,12 +482,8 @@ const detailcodeList = [
 
 
 // 用来处理 账户信息 哪些场景显示
-// const isDetailCde = () => {
-//   return detailcodeArray.includes(props.param.cRsnDetailCde);
-// };
 const isDetailCde = () => {
   let cRsnCde = props.param['cRsnCde']? props.param['cRsnCde']: props.param['cEdrRsnBundleCde'];  // 判断 批改的用批改ID   综合查询的用cEdrRsnBundleCde
-  // 使用 some 方法检查数组中是否存在匹配的 id
   return detailcodeList.some(item => item.id === cRsnCde);
 };
 
@@ -771,6 +733,13 @@ const basicBtn = [
     type: "warning",
     id: "btn010103",
     func: () => {
+      /**
+       * 联共保判断
+       */
+      const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk')
+      if ('1' === CiMrk || '2' === CiMrk || '5' === CiMrk) {
+          const validCi = JointInsuranceCheck();
+      }
       submitToUndrFn();
     },
   }),
@@ -1302,6 +1271,8 @@ async function loadAfter() {
       }
       nextTick(() => {
         opertaor.setDisabledAll();
+
+
         getEdrRsnItemFun(
           props.param["cProdNo"],
           props.param["cDptCde"],
@@ -1310,6 +1281,23 @@ async function loadAfter() {
           props.param["cEdrType"],
           props.param["cGrpMrk"]
         );
+
+        console.log('3333',opertaor.getTableRefByKey('acctinfo'))
+        // 用于处理 账户信息
+        let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
+        if(acctinfoInfo){
+            acctinfoInfo.setDisabledAll(false);  
+            acctinfoInfo.setFormItem('Acctinfo.cAcctNme',{
+              disabled: true
+            })
+            acctinfoInfo.setFormItem('Acctinfo.cBankCnaps',{
+              disabled: true
+            })
+
+        }
+        //   CAcctNme
+            // ?.value?.setDisabledAll(isDisabled);
+
       });
       bthList.value = edrBtn;
     } else {
@@ -2124,7 +2112,7 @@ const calcPremium = () => {
     btn.loading = false;
     return;
   }
-// 校验标的信息中核定座位总数和投保座位数总数不一致！
+  // 校验标的信息中核定座位总数和投保座位数总数不一致！
   const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue() || '';
   if(tgtValue && tgtValue["Tgt.nSeatCapacity"] !== tgtValue["Tgt.nSeatsNumber"]) {
     ElMessage.error("核定座位总数和投保座位数总数不一致！");
@@ -2156,7 +2144,6 @@ const calcPremium = () => {
       const nPrmVal = ops["base"]["Base.nPrm"];
       const nPrmRmbExch = ops["base"]["Base.nPrmRmbExch"];
 
-//
       productStore.setnPrm(nPrmVal);
       productStore.setnAmt(nAmtVal);
       if(opertaor.getTableRefByKey("ciMasterAgreement")) {
@@ -2752,22 +2739,44 @@ const calcPremiumEdr = () => {
         );
       edrbase.value?.setFormValue(EdrBaseData);
       const nPrmVar = ops["plyBase"]["Base.nPrmVar"]  || 0;
-      const payInfo = setPayInfoEdr(
+      let payInfo = setPayInfoEdr(
         ops["payinfo"],
         ops["base"],
         ops["applicant"],
         nPrmVar,
-        ops["plyBase"]
+        ops["plyBase"],
+        // isCorrect:true,
       );
       console.log("生成缴费计划内容", payInfo);
-      // opertaor.getTableRefs()["payinfo"].setFormValue(payInfo);
+      // opertaor.getTableRefs()["payinfo"].setFormValue(payInfo); 
       const payinfoRef = opertaor.getTableRefs()["payinfo"];
       if (payinfoRef && payinfoRef.setFormValue) {
-        const currentPayList = [...payinfoRef.getFromValue()]; // 获取当前列表
+    
+        // payInfo  = {...payInfo,...{isCorrect:true}}
+        let currentPayList = [...payinfoRef.getFromValue()]; // 获取当前列表
+        currentPayList = currentPayList.filter(item => {
+          // 检查 item.Pay 是否存在，且包含 cAppNo 字段
+          return item['Pay.cAppNo'] && item.hasOwnProperty('Pay.cAppNo');
+        });
+
+        // const lastShowIndex = currentPayList.reduce((lastIndex, item, index) => {
+        //     return item.hasOwnProperty('Pay.cAppNo') ? index : lastIndex;
+        //   }, -1);
+
+        //   // 如果找到，则删除该元素
+        //   if (lastShowIndex !== -1) {
+        //     currentPayList.splice(lastShowIndex, 1);
+        //   }
+ 
+        console.log('data--' ,currentPayList)
+        console.log('data2--' ,payInfo)
         currentPayList.push(payInfo); // 插入新条目
         payinfoRef.setFormValue(currentPayList); // 更新表单数据
       }
       needCalc.value = false;
+
+
+
     } else {
       ElMessage.error(res.msg);
     }
@@ -3084,9 +3093,10 @@ const submitUnderwritingFn = async () => {
   res["cIsTransaction"] = "0"; //反洗钱风险
   res["CRiBesprakMrk"] = "0"; // 预约分保标志
   const parts = res["cBckOp"].split("-");
-  res["backUndrDptCde"] = parts[0]; // 退回指定核保级别机构编码
-  res["backUndrClsCde"] = parts[1]; // 退回指定核保级别编码
-  res["backUndrDptCnm"] = parts[2]; // 退回指定核保人员名称
+  res["backUndrClsCde"] = parts[0]; // 退回指定核保级别编码
+  res["backUndrDptCde"] = parts[1]; // 退回指定核保级别机构编码
+  res["backUndrDptCnm"] = parts[3]; // 退回机构名称
+
   if(props.param?.pageName === "priceInquiry") {
     res["inquiryNo"] = props.param.cInquiryNo;
   }
@@ -3163,7 +3173,7 @@ const submitUnderwritingFn = async () => {
       // const ops = opertaor.convertData(res);
       // console.log("转换的数据", ops);
       ElMessage.success(res.msg);
-      btn.disabled = true;
+      // btn.disabled = true;
       if(res['cDecision'] === '1' || res['cDecision'] === '2'){
         tagsViewStore.delView({"name": "my-page",
           "title": "申请单录入",
@@ -3226,6 +3236,23 @@ const validateCiInfo = () => {
     }
   return true;
 };
+const JointInsuranceCheck = ()=> {
+    const ciData = opertaor.getTableRefByKey("ci").getFromValue()
+    if (ciData && ciData.length > 0) {
+        let CCoinsurerCdeNum = 0; // 分公司份额
+        for (const ciRow of ciData) {
+            if ("327001" === ciRow["Ci.cCoinsurerCde"]) {
+                CCoinsurerCdeNum++;
+            }
+        }
+        console.log(CCoinsurerCdeNum);
+        if (CCoinsurerCdeNum <= 1) {
+            ElMessage.error("联共保时必须录入永安两个以上分公司份额！")
+            return;
+        }
+    }
+    
+}
 // 将对象的属性首字母转换为小写
 function lowercaseKeys<T extends object>(
   obj: T
