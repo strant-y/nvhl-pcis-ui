@@ -179,7 +179,7 @@
             :label="i.title"
             :width="i.width ? i.width : null"
             :align="item.align ? item.align : i.align ? i.align : 'center'"
-            :min-width="getColumnWidth(i.title,i.prop,tableDatas,i.minWidth,i.width)"
+            :min-width="getColumnWidth(i.title,i.prop,tableDatas,i.minWidth,i.width, i.maxWidth || item.maxWidth)"
           >
             <template #header="header">
               <el-text
@@ -708,7 +708,7 @@ function getselectionData() {
   }
 }
 
-function getColumnWidth(label, prop, tableData, itemMinWidth, itemWidth) {
+function getColumnWidth(label, prop, tableData, itemMinWidth, itemWidth, itemMaxWidth = 800) {
   //label表头名称
   //prop对应的内容
   //tableData表格数据
@@ -723,7 +723,7 @@ function getColumnWidth(label, prop, tableData, itemMinWidth, itemWidth) {
     const textWidth = getTextWidth(value)
     return textWidth + padding
   })
-  const maxWidth = Math.max(...contentWidths)
+  const maxWidth = Math.max(...contentWidths) > itemMaxWidth ? itemMaxWidth : Math.max(...contentWidths)
   return Math.max(minWidth, maxWidth, width)
 }
 
@@ -794,5 +794,8 @@ function isrequired(i: any) {
 }
 :deep(.el-table .cell) {
   white-space: nowrap;
+}
+:deep(.el-table td.el-table__cell div) {
+  white-space: normal;
 }
 </style>
