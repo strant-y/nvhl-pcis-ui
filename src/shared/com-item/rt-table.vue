@@ -6,8 +6,6 @@
     :label-width="formUi.labelWidth"
     :size="formUi.size"
     :label-position="formUi.labelPosition"
-    :span-method="objectSpanMethod"
-    @current-change="currentChange"
   >
     <el-table
       ref="tableRef"
@@ -28,6 +26,8 @@
       :show-summary="item.showSummary ? item.showSummary : false"
       :sum-text="item.sumText ? item.sumText : '合计'"
       :summary-method="item.summaryMethod ? item.summaryMethod : null"
+      :span-method="objectSpanMethod"
+      @current-change="currentChange"
     >
       <!-- 其他列定义 -->
       <el-table-column
@@ -190,7 +190,8 @@
                 style="margin-right: 2px"
                 type="danger"
                 >*</el-text
-              >{{ header.column.label }}
+              >
+              {{ header.column.label }}
             </template>
             <template #default="scope">
               <template v-if="item.editFlag">
@@ -201,7 +202,7 @@
                   <from-item
                     v-model="scope.row[i.prop]"
                     :item="formItems[scope.row._dataId][i.prop]"
-                    :showLabel="editIndex !== scope.row._dataId"
+                    :showLabel="formItems[scope.row._dataId][i.prop]?.disableColEdit || editIndex !== scope.row._dataId"
                     :row="scope.row"
                   />
                 </el-form-item>
@@ -218,6 +219,7 @@
                     v-model="scope.row[i.prop]"
                     :item="formItems[scope.row._dataId][i.prop]"
                     :showLabel="
+                      formItems[scope.row._dataId][i.prop]?.disableColEdit ||
                       !(props.item.editList && props.item.editList.length > 0
                         ? props.item.editList?.includes(i.prop)
                         : false)
@@ -302,6 +304,16 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-button
+        v-if="props.item.bottomBtn && props.item.bottomBtn.show"
+        class="mt-4"
+        :type="props.item.bottomBtn.type ? props.item.bottomBtn.type : 'info'"
+        :plain="props.item.bottomBtn.plain"
+        :style="props.item.bottomBtn.style ? props.item.bottomBtn.style : {width: '100%'}"
+        @click="props.item.bottomBtn.click"
+    >
+      {{props.item.bottomBtn.label}}
+    </el-button>
   </el-form>
 </template>
 
