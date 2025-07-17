@@ -1099,12 +1099,14 @@ const methodMap = {
     termFactormap.value.forEach((item: any) => {
       if(item.cFatherKey === fk){
         item.max = val;
-      }
-      if(termdata.value[item.prop]){
-        if(val < termdata.value[item.prop]){
-          termdata.value[item.prop] = val;
+
+        if(termdata.value[item.prop] ){
+          if(val < termdata.value[item.prop]){
+            termdata.value[item.prop] = val;
+          }
         }
       }
+      
     });
     update();
   },
