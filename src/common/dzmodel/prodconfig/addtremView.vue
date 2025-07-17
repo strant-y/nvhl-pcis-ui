@@ -345,18 +345,25 @@ function selectMainTerm(isselect = true) {
     let additionStr = selectmainterm.join("@&");
     qryRelTermList({ cTermNo: additionStr }).then((res: any) => {
       const { code, data, msg } = res;
+      const cClauseCategoryMap = {
+        "1": "扩展类",
+        "2": "限制类",
+        "3": "规范类",
+      }
       if (200 === code) {
         data2.value = data;
-        data2.value.forEach((item: any) => { 
-        selectAdditionNodes.value.forEach(v=>{
-          if(v.cRowId && v.cTermNo === item.cTermNo){
-            item.disabled = true;
-            item.children?.forEach((i: any) => {
-              i.disabled = true;
-            });
-          }
-        })
-      });
+        data2.value.forEach((item: any) => {
+          const cClauseCategory = item.cClauseCategory ? cClauseCategoryMap[item.cClauseCategory] : "";
+          item.label = cClauseCategory ? item.label + '_' + cClauseCategory : item.label;
+          selectAdditionNodes.value.forEach(v=>{
+            if(v.cRowId && v.cTermNo === item.cTermNo){
+              item.disabled = true;
+              item.children?.forEach((i: any) => {
+                i.disabled = true;
+              });
+            }
+          })
+        });
         const addtree = additionalRef.value?.getCheckedNodes(false, true);
         if (addtree && addtree.length !== 0) {
           selectAdditionNodes.value = addtree;

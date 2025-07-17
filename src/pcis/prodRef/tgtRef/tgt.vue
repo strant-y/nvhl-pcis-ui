@@ -494,10 +494,20 @@ const method = {
       cvrgref.showFlush();
     }
   },
-  cDeterminingChange: () => {
+  cDeterminingChange: (val:any) => {
     const cvrgref = opertaor.getTableRefByKey("cvrg");
     if (cvrgref.showFlush) {
       cvrgref.showFlush();
+    }
+    // 直接限额制 投保雇员年工资总额非必填
+    if(val === "0") {
+      setFormItem("Tgt.nTotalSalary", {
+        rules: [],
+      });
+    } else {
+      setFormItem("Tgt.nTotalSalary", {
+        rules: [getRules("required", { blur: true })],
+      });
     }
   },
   industryTypeChange:(val:any)=>{
