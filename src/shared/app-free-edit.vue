@@ -351,8 +351,12 @@ defineExpose({
   align-items: center;
 }
 :deep(.el-select__wrapper) {
-  height: 28px;
+  /* height: 28px; */
   min-height: 28px;
+  line-height: 28px;
+}
+:deep(.el-select__input) {
+  height: 20px;
 }
 :deep(.el-input__wrapper) {
   height: 28px;
