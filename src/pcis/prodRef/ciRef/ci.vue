@@ -574,13 +574,37 @@ const method = {
         });
   },
     // 开户行    CNAPS号 开户行地址
-  cBrkrCdeChange: (val: any) => {
-    console.log(val, '开户行')
-    if (val) {
-      let backAddr = val.split('_');
+  cBankCdeChange: (val: any) => {
+    debugger
+    // if (val) {
+      // let backAddr = val.split('_');
       // setValue('Ci.cBankCnaps', backAddr[0])
       // setValue('Ci.cBankAddr', backAddr[1])
-    }
+    // }
+    dialogRef.value?.open(
+        "cBrkrCdeModal",
+        {
+          type: "show",
+          data: {
+            rowData:rowData,
+          },
+          method: {
+            getSelected: (params) => {
+              // setFormItem("Ci.cBrkrCde", {
+              //   loadData: [{ value: params.CChaCde, label: params.CChaNme }],
+              // });
+              // freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData","")
+              dialogRef.value?.handleClose();
+            },
+          },
+        },
+        {
+          isOk: (selectdata: any) => {
+            console.log("a", selectdata);
+          },
+        },
+        { title: "银行信息", width: 85 }
+      );
   },
   //代理/经纪人
   cBrkrCdeChange:()=>{
