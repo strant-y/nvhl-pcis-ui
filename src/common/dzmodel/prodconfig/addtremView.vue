@@ -227,15 +227,15 @@ onMounted(async () => {
           const risks = tremMap.value[item.cUniqueTermNo];
           item.children?.forEach((i: any) => {
               if(risks.includes(i.cRiskNo)){
-                i.disabled = true;
+                i.disabled = param.type !== 'ECargo';
               }
           });
         }
         selectAdditionNodes.value.forEach(v=>{
           if(v.cRowId && v.cTermNo === item.cTermNo){
-            item.disabled = true;
+            item.disabled = param.type !== 'ECargo';
             item.children?.forEach((i: any) => {
-              i.disabled = true;
+              i.disabled = param.type !== 'ECargo';
             });
           }
         })
@@ -357,9 +357,9 @@ function selectMainTerm(isselect = true) {
           item.label = cClauseCategory ? item.label + '_' + cClauseCategory : item.label;
           selectAdditionNodes.value.forEach(v=>{
             if(v.cRowId && v.cTermNo === item.cTermNo){
-              item.disabled = true;
+              item.disabled = props.data.data.type !== 'ECargo';
               item.children?.forEach((i: any) => {
-                i.disabled = true;
+                i.disabled = props.data.data.type !== 'ECargo';
               });
             }
           })
