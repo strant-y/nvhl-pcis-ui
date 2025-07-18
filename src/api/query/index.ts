@@ -296,3 +296,19 @@ export function delInquiryPolicy(queryParams: any): AxiosPromise<any> {
 export function getInquiryPolicy(queryParams: any): AxiosPromise<any> {
     return post(`/policy/getInquiryPolicy`, queryParams);
 }
+
+/**
+ * 询价-风勘之后判断是否可以核保
+ * @param queryParams
+ */
+export function getisAllDone(queryParams: any): AxiosPromise<any> {
+	return post(`/risk/isAllDone`, queryParams);
+}
+
+/**
+ * 询价/录单-申请核保根据单号判断是否灰黑名单
+ * @param queryParams
+ */
+export function isUndrClsBlackList(queryParams: any): AxiosPromise<any> {
+	return post(`risk/isUndrClsBlackList`, queryParams);
+}

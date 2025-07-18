@@ -133,13 +133,10 @@ const premiumCalculation = ()=>{
       AgreementFeeWarn.setFormItem('ECargoBase.AmtProp',{hidden: false})
     }
   }
-  console.log('allFromData',allFromData['AgreementCvrg'])
 }
 function save() {
   const allFromData = formPage.value?.getAllFormData();
   const user = JSON.parse(sessionStorage.getItem("user"));
-  console.log('allFromData', allFromData);
-  // ElMessage.warning('保存');
   cargoApi.save({
     ...allFromData,
     ...{},
@@ -147,15 +144,11 @@ function save() {
     sence:'save'
   }).then((res: any) => {
     if(res.code === 200) {
-      ElMessage.success('保存成功')
-      console.log('res', res);
-      // console.log('000', formPage.value.getComponentConfigById("AgreementBase"))
-      console.log('resss',res.res['composition']['ECargoBase'][0])
+      ElMessage.success(res.msg)
       resData.value = res.res['composition']['ECargoBase'][0]
       const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
       agreementBaseRef.setValue('ECargoBase.cEcAgrNo', resData.value['ECargoBase.cEcAgrNo'])
       agreementBaseRef.setValue('ECargoBase.cEcAgrAppNo', resData.value['ECargoBase.cEcAgrAppNo'])
-      console.log('resData', resData.value);
     }else {
       ElMessage.success(res.msg);
     }
@@ -165,30 +158,27 @@ function save() {
 function submit() {
   const allFromData = formPage.value?.getAllFormData();
   const user = JSON.parse(sessionStorage.getItem("user"));
-  // ElMessage.warning('提交');
+  // const { 
+  //   'ECargoBase.cEcAgrNo': cEcAgrNo,
+  //   'ECargoBase.cEcAgrAppNo': cEcAgrAppNo,
+  // } = resData.value?.ECargoBase || {}
 
-  // console.log("000",resData.value.ECargoBase);
-  // 从 resData 提取所需字段并合并进 AgreementBase
-  const { 
-    'ECargoBase.cEcAgrNo': cEcAgrNo,
-    'ECargoBase.cEcAgrAppNo': cEcAgrAppNo,
-  } = resData.value?.ECargoBase || {}
-
-  if (allFromData && allFromData.AgreementBase) {
-    allFromData.AgreementBase = {
-      ...allFromData.AgreementBase,
-      'ECargoBase.cEcAgrNo': cEcAgrNo,
-      'ECargoBase.cEcAgrAppNo': cEcAgrAppNo,
-    };
-  }
+  // if (allFromData && allFromData.AgreementBase) {
+  //   allFromData.AgreementBase = {
+  //     ...allFromData.AgreementBase,
+  //     'ECargoBase.cEcAgrNo': cEcAgrNo,
+  //     'ECargoBase.cEcAgrAppNo': cEcAgrAppNo,
+  //   };
+  // }
+  console.log('allFromData', allFromData);
   cargoApi.submit({
     ...allFromData,
     ...{},
     ...{user},
-    sence:'save'
+    sence:'arraigned'
   }).then((res: any) => {
     if(res.code === 200) {
-      ElMessage.success('提交成功')
+      ElMessage.success(res.msg)
       formPage.value.setPageReadOnly(true);
       const submitBtn = formPage.value.getPageBtnRefById('submit')?.getConfig();
       submitBtn.disabled = true;

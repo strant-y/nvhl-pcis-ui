@@ -15,6 +15,7 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { checkCdeptByCdptCde, getNmeByCde } from "@/api/prod/index";
+import { queryEcargoDetails } from "@/api/cargo";
 import { formInit } from "@/shared/from-init";
 import { codeListViewStore,dataOpertaor, useProductStore } from "@/store";
 import { useValidator } from "@/typings/useValidator";

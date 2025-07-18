@@ -248,6 +248,7 @@
                                 :class="{
                                     'custom-indent':riskdata.rowConfig[colinfo.cColId]?.[n - 1]?.cPorpType === 'text' &&  riskdata.rowConfig[colinfo.cColId]?.[n - 1]?.factorItem?.Indent === '1',
                                  }"
+                                 style="white-space: nowrap;"
                               >
                                 <template
                                   v-if="
@@ -446,6 +447,10 @@ function initData(data: any) {
       termTitleConf.value.cFactorTabType !== "table"
     ) {
       termRef.value?.setFormValue(termdata.value, true);
+    }
+    // 解决组件初始化时是否统扯保费反显为是的时候医生每人保费、护士/医技人员每人保费没有置灰
+    if(newData['Term.cUnifiedPremium']) {
+      methodMap.unifiedPremiumChange(newData['Term.cUnifiedPremium'])
     }
   });
 }
