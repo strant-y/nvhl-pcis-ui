@@ -248,6 +248,7 @@
                                 :class="{
                                     'custom-indent':riskdata.rowConfig[colinfo.cColId]?.[n - 1]?.cPorpType === 'text' &&  riskdata.rowConfig[colinfo.cColId]?.[n - 1]?.factorItem?.Indent === '1',
                                  }"
+                                 style="white-space: nowrap;"
                               >
                                 <template
                                   v-if="
