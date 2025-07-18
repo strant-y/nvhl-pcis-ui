@@ -133,7 +133,8 @@ export const useValidator = () => {
       validator: (rule, value, callback) => {
         if(value && value.length > num) {
           callback(`最多输入${num}个字符`);
-          return;
+        } else {
+          callback();
         }
       },
       trigger: 'blur'
