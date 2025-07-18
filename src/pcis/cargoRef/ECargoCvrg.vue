@@ -444,11 +444,11 @@ const calculateSpans = (key: string, expandRowKeys: string[]) => {
       } else if(key === 'cGroupIdx'){
         mergedAction(isMerged('ECargoTerm.cGroupIdx', item, list[index - 1]), index)
       } else if(key === 'cProdNo'){
-        mergedAction(isMerged('ECargoTerm.cProdNo', item, list[index - 1]), index)
+        mergedAction(isMerged('ECargoTerm.cProdNo', item, list[index - 1], item['ECargoTerm.cGroupIdx'] === list[index - 1]['ECargoTerm.cGroupIdx']), index)
       }else if(key === 'cClauseType'){
         mergedAction(isMerged('ECargoTerm.cClauseType', item, list[index - 1], item['ECargoTerm.cGroupIdx'] === list[index - 1]['ECargoTerm.cGroupIdx']), index)
       }else if(key === 'cClauseName'){
-        mergedAction(isMerged('ECargoTerm.cClauseName', item, list[index - 1], item['ECargoTerm.cGroupIdx'] === list[index - 1]['ECargoTerm.cGroupIdx']), index)
+        mergedAction(isMerged('ECargoTerm.cClauseName', item, list[index - 1], item['ECargoTerm.cGroupIdx'] === list[index - 1]['ECargoTerm.cGroupIdx'] && item['ECargoTerm.cClauseType'] === list[index - 1]['ECargoTerm.cClauseType']), index)
       }
     })
   }
