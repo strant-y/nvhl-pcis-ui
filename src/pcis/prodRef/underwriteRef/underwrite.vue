@@ -29,7 +29,7 @@ const props = defineProps({
     type: [Object],
   },
 });
-const { getCUndrMrk, getBackClsList, queryRiskCodelist } = NewUdrListService();
+const { getCUndrMrk, getBackClsList, queryRiskCodelist, riskQueryData } = NewUdrListService();
 const undrOpnMap = {
   "0": "经过审核，同意承保该业务。",
   "1": "经过审核，该业务缺少如下必要信息，请补充后再提交：",
@@ -48,8 +48,9 @@ const params = opertaor.getParam();
 const contRiskInfo = ref("");
 const cProdNoMap = ['059011','059012','059013','059016','059017','059018','059019','059020'];
 const cUndrMrkOptions = ref([])
+const riskunitDisabledFlag = ref(false)
 const riskunitDisabled = computed(() => {
-  return cProdNoMap.indexOf(params.cProdNo) != -1 || params.cAppTyp === "E"
+  return cProdNoMap.indexOf(params.cProdNo) != -1 || params.cAppTyp === "E" || riskunitDisabledFlag.value
 })
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -72,6 +73,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 if(res.body.cReadOnly === "1") {
                   setFormItem('cBckOp1', { disabled: false })
                   setValue('cBckOp1', res.body.cExc)
+                }
+                // 如果是多险位，则不能进行自主临分
+                if(res.body.tableList && res.body.tableList.lengt > 1) {
+                  setFormItem("riFacMrk", {
+                    disabled: true
+                  });
                 }
               }
             });
@@ -140,9 +147,22 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               .then((res: any) => {
                 if (res.code === '1') {
                   ElMessage.success("自主临分提交成功");
+                  // 自主临分成功后，是否临分、风险单位划分不可编辑，不能核保退回
                   setFormItem("riFacMrk", {
                     disabled: true
                   });
+                  riskunitDisabledFlag.value = true
+                  setFormItem("cUndrMrk",{ loadData: cUndrMrkOptions.value.filter((item:any) => item.value != "B" && item.value != "T") })
+                  setValue("cUndrMrk", "")
+                } else if(res.code === '2') {
+                  ElMessage.error("满足强制临分，不能自主临分");
+                  // 满足强制临分，不能自主临分
+                  setFormItem("riFacMrk", {
+                    disabled: true
+                  });
+                  riskunitDisabledFlag.value = true
+                  setFormItem("cUndrMrk",{ loadData: cUndrMrkOptions.value.filter((item:any) => item.value != "B" && item.value != "T") })
+                  setValue("cUndrMrk", "")
                 } else {
                   ElMessage.error(res.message);
                 }
@@ -469,7 +489,7 @@ onMounted(() => {
     // 触发强制临分之后   不能做风险单位划分 不能做核保退回  核保通过时得再保部确认才能核保通过
     if(props.pageData?.plyBase) {
       if(props.pageData?.plyBase['Base.cRiFacMrk'] == "1" || props.pageData?.plyBase['Base.cRiFacMrk'] == "2") {// 1 自主临分 2 强制临分 3 不需要临分
-        setFormItem("riskUnit", { disabled: true })
+        riskunitDisabledFlag.value = true
         setFormItem("cUndrMrk",{ loadData: cUndrMrkOptions.value.filter((item:any) => item.value != "B" && item.value != "T") })
       }
     }
@@ -487,7 +507,10 @@ onMounted(() => {
     // 获取核保选项
     getCUndrMrkUrlFn(param);
     loadUwTabData();
+    // 查询合同除外责任
     queryRiskCodelistFn();
+    // 获取风险单位划分列表数据，判断是否是多险位，多险位不能自主临分
+    getRiskData();
   });
 });
 
@@ -554,6 +577,20 @@ function queryRiskCodelistFn() {
     .catch((error: any) => {
       // ElMessage.error(error);
     });
+}
+
+// 获取风险单位划分列表数据
+function getRiskData() {
+  riskQueryData({ cAppNo: params.cAppNo })
+    .then((res: any) => {
+      if (res.code === "200") {
+        if(res.data && res.data.length > 1) {
+          setFormItem("riFacMrk", {
+            disabled: true
+          });
+        }
+      }
+    })
 }
 
 defineExpose({
