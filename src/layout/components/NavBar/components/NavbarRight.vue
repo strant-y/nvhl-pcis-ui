@@ -118,9 +118,11 @@
       </div>
       <template #dropdown>
         <el-dropdown-menu>
-          <el-dropdown-item @click="openDialog" v-if="userStore.user.src == null">修改密码</el-dropdown-item>
+          <el-dropdown-item @click="openDialog" v-if="userStore.user.src == null"> <el-icon><Lock /></el-icon>
+            <span>修改密码</span></el-dropdown-item>
           <el-dropdown-item @click="clearRedisCache" v-if="showRedisCache">清除redis缓存</el-dropdown-item>
-          <el-dropdown-item @click="logout">退出登录</el-dropdown-item>
+          <el-dropdown-item @click="logout"> <el-icon><SwitchButton /></el-icon>
+            <span>退出登录</span></el-dropdown-item>
         </el-dropdown-menu>
       </template>
     </el-dropdown>
