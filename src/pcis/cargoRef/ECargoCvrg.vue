@@ -164,18 +164,23 @@ const method = {
       return;
     }
     const atGroupIdxList = [...getFormValue()].filter((f: any) => f['ECargoTerm.cGroupIdx'] === selData['ECargoTerm.cGroupIdx']);
+    const del = () => {
+      atGroupIdxList.forEach((item: any) => {
+        cvrgEditRef?.value?.delRow(item['_dataId']);
+      })
+    }
     if(atGroupIdxList.length > 1) {
       ElMessageBox.confirm('当前操作将会删除整个组的数据，是否删除？', {
         confirmButtonText: "删除",
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {
-        atGroupIdxList.forEach((item: any) => {
-          cvrgEditRef?.value?.delRow(item['_dataId']);
-        })
+        del()
       }).catch(() => {
         // catch error
       })
+    }else {
+      del()
     }
   },
   selecedTgt: () => {
