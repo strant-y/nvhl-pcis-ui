@@ -2,7 +2,7 @@ import { AxiosPromise } from 'axios'
 import { post } from '@/utils/http'
 import request from '@/utils/request'
 import { del } from '@/utils/http'
-import { get } from 'lodash'
+
 /**
  * 查询服务
  */
@@ -668,6 +668,8 @@ export class PcisQueryService {
     getTaskList(ops: any): AxiosPromise<any> {
         return post(`risk/getTaskList`, ops);
     }
-
-
+    // 风勘查询-获取风勘任务详情
+    getTaskUrl(ops: any): AxiosPromise<any> {
+        return post(`risk/getTaskUrl`, ops);
+    }
 }

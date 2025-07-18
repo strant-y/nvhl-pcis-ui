@@ -32,7 +32,15 @@ import { defineEmits, onMounted } from "vue";
 
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
-
+const props = defineProps({
+  data: {
+    type: Object,
+    required: true,
+    default: () => {{
+      return {};
+    }},
+  },
+});
 const emits = defineEmits(["ok", "cancel"]);
 const pcisQueryService = new PcisQueryService();
 
@@ -55,41 +63,27 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "primary",
         label: "查询",
         func: async () => {
-          // loadData()
-
           windSave();
         },
       }),
-    //   createFreeButtonBase({
-    //     type: "info",
-    //     label: "返回",
-
-    //     func: async () => {
-    //       handleReturn()
-    //     },
-    //   }),
     ],
- 
     fromSchema: [
-            {
-                prop: "DistSummary.cPlanNo",
-                inputtype: "rtinput",
-                title: "风勘号",
-            },
-            {
-                prop: "DistSummary.nInsuredHeadcount",
-                inputtype: "rtinput",
-                title: "投保人",
-            },
-
-            {
-                prop: "DistSummary.nAnnualSalary",
-                inputtype: "rtinput",
-                title: "被保人",
-                // rules:[getRules("required", {})]
-                // rules: [getRules("idCard", {})],
-            },
-        ],
+			{
+				prop: "cAppNme",
+				inputtype: "rtinput",
+				title: "投保人",
+			},
+			{
+				prop: "cInsuredNme",
+				inputtype: "rtinput",
+				title: "被保人",
+			},
+			{
+				prop: "taskNo",
+				inputtype: "rtinput",
+				title: "任务号",
+			},
+		],
   })
 );
 
@@ -116,78 +110,82 @@ const tableconfig = reactive<AppTableConfig>(
     ],
     fromSchema: [
       {
-        prop: "year",
+        prop: "nSeqNo",
         inputtype: 'rtinput',
         title: "序号",
       },
       {
-        prop: "nPrm",
+        prop: "time",
         inputtype: 'rtinput',
         title: "风勘时间",
       },
       {
-        prop: "claimAmount",
-        inputtype: 'rtinput',
+        prop: "cSegment",
+        inputtype: 'rtselect',
         title: "环节",
+				typeCode: 'Segment',
       },
        
     ],
   })
 );
 
-
-
-
 onMounted(() => {
-
-console.log(opertaor.getDataAll())
-let DataAll = opertaor.getDataAll()['applicant']
-nextTick(() => {
-
-
-  // handleQuery();
-})
-
+	nextTick(() => {
+		windSave()
+	})
 });
 
-// 请求接口
+// 查询风勘任务
 const windSave = () => {
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
- 
-  let params = { ...s }
+  let params = { ...s, cInquiryNumber: props.data.plyBase['Base.cInquiryNo'] }
   console.log('params', params)
-  pcisQueryService.sendTaskCreat(params).then((res: any) => {
-  //   console.log('数据---‘',res)
-  //   if (res.code === 200) {
-  //     if(res.data !==null){
-         
-  //     }else{
-  //         ElMessage.success(res.msg )
-  //     }
-  //   } else {
-  //     ElMessage.error({ message: res.msg, duration: 3000 });
-  //   }
+  pcisQueryService.getTaskList(params).then((res: any) => {
+    console.log('数据---‘',res)
+		const { code, data, msg } = res;
+    if (code == 200) {
+      if(data !== null){
+				data.forEach((item: any, index: number) => {
+          item.nSeqNo = index + 1;
+					item.time = item.tSurveyStart + ' - ' + item.tSurveyEnd
+        });
+        pageresult.list = data;
+        pageresult.total = data.total;
+      }else{
+				pageresult.list = [];
+        pageresult.total = 0;
+        ElMessage.warning(msg)
+      }
+    } else {
+			pageresult.list = [];
+      pageresult.total = 0;
+      ElMessage.error({ message: msg, duration: 3000 });
+    }
   });
-
 }
 
-
-
-
+// 关闭弹窗
 const handleReturn = () => {
   maindialogVisible.value = false
 };
-const closeDetailDialog = () => {
-  dialogVisible.value = false
-}
-const closeClaimCaseDetailDialog = () => {
-  dialogVisibleDetail.value = false
-}
 
+// 风勘查询---获取风勘任务详情
+const viewDetails = (row: any) => {
+  console.log(row);
+  let params = {
+    taskNo: row.taskNo,
+  }
 
-
-
-
+  pcisQueryService.getTaskUrl(params).then((res: any) => {
+    console.log('详情数据', res)
+    if (res.code == 200 && !!res.data) {
+			window.open(res.data, '_blank');
+    } else {
+      ElMessage.error({ message: res.msg, duration: 3000 });
+    }
+  });
+};
 </script>
 
 <style scoped lang="scss">

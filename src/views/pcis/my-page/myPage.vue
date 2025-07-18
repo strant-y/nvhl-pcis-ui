@@ -310,6 +310,8 @@ import {
   submitInquiry,
   submitUnderwrite,
   getInquiryPolicy,
+	getisAllDone,
+	isUndrClsBlackList,
 } from "../../../api/query/index";
 import { checkFeeWindowType, selectDist, saveDistBatch, getReleaseInquiryPage } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
@@ -598,7 +600,7 @@ const historyClaimcaseFun = () => {
 // 发起风勘 方法
 const startWindExploration = ()=>{
     dzmodal
-    .open(windExplorationModel, { type: "Issuer", data: {} })
+    .open(windExplorationModel, { type: "Issuer", data: {...opertaor.getDataAll()} })
     .then((res: any) => {
       if (res.type === "ok") {
       }
@@ -607,7 +609,7 @@ const startWindExploration = ()=>{
 // 风勘查询
 const getWindExploration = ()=>{
     dzmodal
-    .open(windExplorationInfo, { type: "Issuer", data: {} })
+    .open(windExplorationInfo, { type: "Issuer", data: {...opertaor.getDataAll()} })
     .then((res: any) => {
       if (res.type === "ok") {
       }
@@ -949,7 +951,6 @@ const uwBtn = [
         });
     },
   }),
-
 ];
 /**
  * 数据初始化
@@ -1169,26 +1170,17 @@ async function loadAfter() {
             submitToUndrFn();
           },
         }),
-           createFreeButtonBase({
-            label: "发起风勘",
-            type: "primary",
-            func: () => {
-              startWindExploration(); 
-              //startWindExploration
-              // historyClaimcaseFun();
-              // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
-            },
-          }),
-          createFreeButtonBase({
-            label: "风勘查询",
-            type: "primary",
-            func: () => {
-              getWindExploration(); 
-              //startWindExploration
-              // historyClaimcaseFun();
-              // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
-            },
-          }),
+        createFreeButtonBase({
+          label: "发起风勘",
+          type: "primary",
+					func: () => {
+						if (getNo.value == '暂无') {
+							ElMessage.error('询价单号为空,请保存后操作!');
+							return false;
+						}
+						startWindExploration(); 
+					},
+        }),
       );
     } else {
       bthList.value = basicBtn;
@@ -1258,6 +1250,18 @@ async function loadAfter() {
       });
     }
     bthList.value = uwBtn;
+		// 核保只有询价单才展示风勘查询按钮
+		if(props.param?.pageName === "priceInquiry") {
+			bthList.value.push(
+				createFreeButtonBase({
+					label: "风勘查询",
+					type: "primary",
+					func: () => {
+						getWindExploration(); 
+					},
+				}),
+			)
+		}
   } else if (props.param.pageType === "EDR_APP_NEW_SCENE") {
     // 批改申请-新增
     const cAppNo = props.param.cAppNo;
@@ -1760,6 +1764,7 @@ async function loadAfter() {
     })
     bthList.value = basicBtn;
   }
+
   bthList.value.push(
     createFreeButtonBase({
     label: "历史赔案",
@@ -2272,22 +2277,43 @@ function getFKFunc() {
  * 投保申请核保
  */
 const submitToUndrFn = async () => {  
-
-   // 风勘校验
- if( props.param?.pageName === "priceInquiry" ){
-    // const startData = await initMultiCodeList({});
-    // console.log(1212,res);
-    // if(res.code ===500){
-    //    ElMessage.error("风勘未结束，不允许询价提核！");
-    //   return false;
-    // }
- }
- if (needCalc.value) {
+ 	if (needCalc.value) {
     ElMessage.error("请先进行保费计算!");
     return;
   }
+	// 申请核保前判断是否灰黑名单
+	const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
+	const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
+	console.log('cInquiryNumbercInquiryNumbercInquiryNumber', cInquiryNumber);
+	console.log('cAppNocAppNocAppNocAppNo', cAppNo);
+	
+	const res: any = await isUndrClsBlackList({ cInquiryNumber, cAppNo});
+	console.log('判断是否灰黑名单返回的res', res);
+	if(res.code == 200){
+		if(res.msg != '校验通过'){
+			ElMessage.warning(res.msg);
+			return false;
+		}
+	} else {
+		ElMessage.error({ message: res.msg, duration: 3000 });
+		return false;
+	}
+	// 风勘校验
+ 	if( props.param?.pageName === "priceInquiry" ){
+		// const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
+    const res: any = await getisAllDone({ cInquiryNumber });
+    console.log('判断是否可以核保返回的res', res);
+    if(res.code == 200){
+			if(res.data == false){
+				ElMessage.warning("风勘未结束，不允许询价提核！");
+      	return false;
+			}
+    } else {
+			ElMessage.error({ message: res.msg, duration: 3000 });
+			return false;
+		}
+ 	}
   if (!baseValite()) {
-    btn.loading = false;
     return;
   }
   if (!checkNAmt()) return;
