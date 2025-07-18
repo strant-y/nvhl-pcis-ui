@@ -13,6 +13,10 @@ function getECargoPageView(queryParams: any): AxiosPromise<any> {
 function queryEcargoList(queryParams: any): AxiosPromise<any> {
     return post(`${PageBaseUrl}/queryEcargoList`, queryParams);
 }
+//协议详情
+function queryEcargoDetails(queryParams: any): AxiosPromise<any> {
+    return post(`${PageBaseUrl}/queryEcargoDetails`, queryParams);
+}
 
 //新增清单保存
 function saveDist(queryParams: any): AxiosPromise<any> {

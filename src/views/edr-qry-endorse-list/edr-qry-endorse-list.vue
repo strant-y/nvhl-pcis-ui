@@ -82,6 +82,15 @@ const commodityOptions = ref<any>([]);
 const kindOptions = ref<any>([]);
 const prodOptions = ref<any>([]);
 const treeNodes = ref<any>([]);
+let cTermNoList = ref<any>([]);  // 条款数据
+let cTermNo = '';    // 条款编码
+
+// 截取条款请求
+function extractCode(str:string) {
+  // 匹配 "P+数字" 或 "纯数字"
+  const pattern = /^(P\d+|\d+)/;
+  return str.match(pattern)?.[0] || "";
+}
 
 const formconfig1 = reactive<AppFreeEditConfig>(
     createAppFreeEditConfig({
@@ -198,16 +207,31 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     // freeEditRef.value?.setValue("prodNo", []); // 清空条款
                     if(val){
                         console.log(11,val)
-                        freeEditRef.value?.setValue('cProdNo',[]);
-
-                        setFormItem('cProdNo',{
-                            typeCode: "TERM_LIST_IN_GUIDE_NEW",
-                            codeParam: {
+                        // freeEditRef.value?.setValue('cProdNo',[]);
+                        // setFormItem('cProdNo',{
+                        //     typeCode: "TERM_LIST_IN_GUIDE_NEW",
+                        //     codeParam: {
+                        //         cParCde: val,
+                        //         // cOperId: user.value.opCde,
+                        //         // cDptCde: user.value.companyId,
+                        //     },
+                        // })
+                           codeListStore
+                            .queryCodeList({
+                                codeListName: "TERM_LIST_IN_GUIDE_NEW",
+                                codeListParam:{
                                 cParCde: val,
-                                // cOperId: user.value.opCde,
-                                // cDptCde: user.value.companyId,
+                                cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+                                cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
                             },
-                        })
+                            })
+                            .then((res) => {
+                                cTermNoList.value = res;
+                                setFormItem("cProdNo", {
+                                    loadData: res,
+                                });
+                            });
+
                     }else{
                          console.log(2,val)
                         freeEditRef.value?.setValue('cProdNo',[]);
@@ -225,6 +249,19 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 inputtype: "rtselect",
                 title: "条款",
                 clearable: true,
+                func:(val:any)=>{
+                    
+                    if(val){
+                            if(cTermNoList.value.length>0){
+                                cTermNoList.value.forEach((ele) => {
+                                    if(ele['value']  === val){
+                                        cTermNo =extractCode(ele['label'])
+                                    }
+                                });
+                            }
+                        
+                    }
+                }
                 // typeCode: "TERM_LIST_IN_GUIDE_NEW",
                 // params: {
                 //     cParCde: "",
@@ -490,6 +527,8 @@ const refreshData = (reset = true) => {
         //             : "3",
     };
     const params = Object.assign(s, r, obj);
+    params["cTermNo"] = cTermNo;        // 条款编码
+    console.log('参数1',params)
     sessionStorage.setItem(AppKey.query.pcis_query_endorse, params);
       
     pcisEdrQueryService.qryEndorseList(params).then((res: any) => {
