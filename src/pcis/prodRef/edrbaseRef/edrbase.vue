@@ -292,7 +292,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "批文",
         rows: 4,
         itemWidth: 3,
-        rules: [getRules("maxLength", {len:2000})],
+        rules: [getRules("maxLength", {len:5000})],
       },
       {
           prop: "EdrBase.cEdrType",
