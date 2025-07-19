@@ -1,4 +1,4 @@
-<!-- ECargo 协议录入 -->
+<!-- ECargo 协议批改 -->
 <template>
   <div class="app-container">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
@@ -50,6 +50,17 @@ const planSet = ref<any>([]); //结果集
 
 const selectedRows = ref<any[]>([]);
 const btnTitle = ref<any>([{ label: "" }, { label: "" }]);
+const appStatusOptions = ref([
+  { label: "暂存", value: "1" },
+  { label: "已提核", value: "2" },
+  { label: "核保退回/撤回", value: "3" },
+  { label: "核保通过", value: "4" },
+  { label: "已出保单", value: "5" },
+  { label: "已做失效操作", value: "6" },
+  { label: "已提交未接收", value: "7" },
+  { label: "见费出单退回", value: "8" },
+])
+const departmentTree = defineAsyncComponent(() => import("@/pcis/prodRef/commodityRef/DepartmentTree.vue"))
 const formconfig1 = reactive<AppFreeEditConfig>(
     createAppFreeEditConfig({
       endBtnsPosition: "right",
@@ -65,8 +76,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           label: "重置",
           func: () => {
             freeEditRef.value?.setFormValue({
-              cKindNo: "",
-              cStatus: "",
+              cDptCde: null,
+              cLoadSub: 1,
+              cKindNo: null,
+              cTermNo: null,
+              cAppNme: "",
+              insuredNme: "",
+              Tm: [
+                moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00"),
+                moment(new Date()).format("YYYY-MM-DD 23:59:59")
+              ]
             });
             handleQuery(true);
             // freeEditRef.value?.resetForm();
@@ -84,7 +103,28 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           showExBtn: true,
           btnItems: {
             icon: "Search",
-            type: "primary"
+            type: "primary",
+            func:() => {
+              dzmodal
+                .open(departmentTree, { type: "Issuer", data: {} })
+                .then((res:any) => {
+                  if (res.type === "ok") {
+                    const selectObj = res.body;
+                    freeEditRef.value?.setValue(
+                      "cDptCde",
+                      selectObj.id
+                    );
+                    setFormItem("cDptCde", {
+                      loadData: [
+                        {
+                          label: `${selectObj.id}${selectObj.name}`,
+                          value: selectObj.id,
+                        },
+                      ],
+                    });
+                  }
+                });
+            }
           },
           loadData: [
             {
@@ -94,7 +134,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           ]
         },
         {
-          prop: "CLoadSub",
+          prop: "cLoadSub",
           inputtype: "rtcheckbox",
           title: "是否包含下级",
           defaultValue: 1,
@@ -136,7 +176,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           },
         },
         {
-          prop: "cProdNo",
+          prop: "cTermNo",
           inputtype: "rtselect",
           title: "条款",
           itemWidth: 1,
@@ -152,21 +192,21 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           func: (val: string) => {},
         },
         {
-          prop: "CAppNme",
+          prop: "cAppNme",
           inputtype: "rtinput",
-          title: "投保人名称",
+          title: "投保人客户名称",
           clearable: true,
         },
         {
-          prop: "CInsuredNme",
+          prop: "insuredNme",
           inputtype: "rtinput",
-          title: "被保人姓名",
+          title: "被保险人名称",
           clearable: true,
         },
         {
-          prop: "TEffectTm",
+          prop: "Tm",
           inputtype: "rtdatepicker",
-          title: "生效日期",
+          title: "保险日期",
           itemWidth: 1,
           clearable: true,
           type: "datetimerange",
@@ -224,55 +264,60 @@ const tableconfig = reactive<AppTableConfig>(
       tableBtnType: "btn",
       fromSchema: [
         {
-          prop: "cAgreementNo",
+          prop: "cEcAgrNo",
           inputtype: "rtinput",
           title: "协议号",
           minWidth: 180,
         },
         {
-          prop: "cClientNo",
+          prop: "cAppId",
           inputtype: "rtinput",
           title: "客户编号",
           minWidth: 180,
         },
         {
-          prop: "cClientNme",
+          prop: "cAppNme",
           inputtype: "rtinput",
           title: "客户名称",
           minWidth: 180,
         },
         {
-          prop: "cDptCde",
+          prop: "cDptCnm",
           inputtype: "rtinput",
           title: "出单机构",
           minWidth: 120,
         },
         {
-          prop: "tEffectTm",
+          prop: "tInsrncBgnTm",
           inputtype: "rtinput",
-          title: "生效日期",
+          title: "协议起期",
           minWidth: 120,
         },
         {
-          prop: "tExpireTm",
+          prop: "tInsrncEndTm",
           inputtype: "rtinput",
           title: "协议止期",
           minWidth: 120,
         },
         {
-          prop: "cStatus",
-          inputtype: "rtinput",
+          prop: "cAppStatus",
+          inputtype: "rtselect",
           title: "协议状态",
           minWidth: 120,
+          loadData: appStatusOptions.value
         },
         {
-          prop: "cIsValid",
-          inputtype: "rtinput",
+          prop: "cPlySts",
+          inputtype: "rtselect",
           title: "有效",
           minWidth: 180,
+          loadData: [
+            { label: '有效', value: 'I' },
+            { label: '无效', value: 'T' }
+          ]
         },
         {
-          prop: "nPayBalance",
+          prop: "nPrm",
           inputtype: "rtinput",
           title: "缴费余额",
           minWidth: 120,
@@ -282,7 +327,10 @@ const tableconfig = reactive<AppTableConfig>(
 );
 
 onMounted(async () => {
-
+  freeEditRef.value?.setValue('Tm',[
+    moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00"),
+    moment(new Date()).format("YYYY-MM-DD 23:59:59")]
+  )
 });
 
 function toDtl(row: any, type: string) {
@@ -304,55 +352,55 @@ const exRules = {};
 function handleQuery(flag?: boolean) {
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
+      const tm = freeEditRef.value?.getFromValue().Tm;
       const param = {
-        ...{
-          queryTab: "correction",
-          CurrentUser: user.value?.opCde,
-          CurrentUserOrg: user.value?.companyId,
-        },
+        sence: "3",// 1 协议录入 2 协议审核 3 协议批改
         ...freeEditRef.value?.getFromValue(),
+        ...tableRef.value?.getPartnerPage(flag),//获取分页数据
       };
-      cargoApi.query(param)
-          .then((res: any) => {
-            if (res && res.code === 200) {
-              const pageData = res.data;
-              if (pageData) {
-                pageresult.list = pageData.list;
-                pageresult.total = pageData.total;
-              }
-            }
-          })
-          .catch((err: any) => {
-            ElMessage.error({
-              message: "后台服务异常,请联系管理员",
-              duration: 3000,
-            });
-          });
+      if(tm && tm.length > 1) {
+        param.tInsrncBgnTm = tm[0]
+        param.tInsrncEndTm = tm[1]
+      }
+      delete param.Tm
+      cargoApi.queryEcargoList(param).then((res: any) => {
+        if (res && res.code === 200) {
+          const pageData = res.data;
+          if (pageData) {
+            pageresult.list = pageData.data;
+            pageresult.total = pageData.total;
+          }
+        } else {
+          ElMessage.error(res.msg);
+        }
+      }).catch((err: any) => {
+        ElMessage.error(err.msg);
+      });
     }
 
-    pageresult.list = [
-      {
-        cAgreementNo: '1234567890',
-        cClientNo: '222',
-        cClientNme: '张三',
-        cDptCde: '0200000000000',
-        tEffectTm: '2025-01-01 00:00:00',
-        tExpireTm: '2026-01-01 00:00:00',
-        cStatus: '正常',
-        nPayBalance: 100,
-      },
-      {
-        cAgreementNo: '1234567890',
-        cClientNo: '222',
-        cClientNme: '张三',
-        cDptCde: '0200000000000',
-        tEffectTm: '2025-01-01 00:00:00',
-        tExpireTm: '2026-01-01 00:00:00',
-        cStatus: '正常',
-        nPayBalance: 100,
-      },
-    ]
-    pageresult.total = 2;
+    // pageresult.list = [
+    //   {
+    //     cAgreementNo: '1234567890',
+    //     cClientNo: '222',
+    //     cClientNme: '张三',
+    //     cDptCde: '0200000000000',
+    //     tEffectTm: '2025-01-01 00:00:00',
+    //     tExpireTm: '2026-01-01 00:00:00',
+    //     cStatus: '正常',
+    //     nPayBalance: 100,
+    //   },
+    //   {
+    //     cAgreementNo: '1234567890',
+    //     cClientNo: '222',
+    //     cClientNme: '张三',
+    //     cDptCde: '0200000000000',
+    //     tEffectTm: '2025-01-01 00:00:00',
+    //     tExpireTm: '2026-01-01 00:00:00',
+    //     cStatus: '正常',
+    //     nPayBalance: 100,
+    //   },
+    // ]
+    // pageresult.total = 2;
   });
 }
 
