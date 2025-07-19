@@ -521,33 +521,32 @@ function validate() {
 
   // 检查是否有表格数据需要验证
   if (tableDatas.value?.length > 0) {
-    // 存储验证规则的对象
-    let rules = <any>{};
-
-    // 遍历表格架构，提取验证规则
-    for (const schama in props.item.fromSchema) {
-      // 如果当前列有验证规则，则将其添加到规则对象中
-      if (props.item.fromSchema[schama].rules) {
-        let rul = props.item.fromSchema[schama].rules;
-        if (
-          props.item.fromSchema[schama].inputtype === "rtnumber" ||
-          (props.item.fromSchema[schama].inputtype === "rtinput" &&
-            props.item.fromSchema[schama].type)
-        ) {
-          if (rul && rul.length > 0) {
-            rul.forEach((item: any) => {
-              item.type = "number";
-            });
-          }
-        }
-        rules[props.item.fromSchema[schama].prop] = rul;
-      }
-    }
 
     // 遍历表格数据，对每行数据进行验证
     for (const rowNum in tableDatas.value) {
       // 当前行的数据
       const rowData = tableDatas.value[rowNum];
+      // 存储验证规则的对象
+      let rules = <any>{};
+      const itemSchama = formItems.value[rowData._dataId];
+      for (const schama in itemSchama) {
+        // 如果当前列有验证规则，则将其添加到规则对象中
+        if (itemSchama[schama].rules) {
+          let rul = itemSchama[schama].rules;
+          if (
+            itemSchama[schama].inputtype === "rtnumber" ||
+            (itemSchama[schama].inputtype === "rtinput" &&
+              itemSchama[schama].type)
+          ) {
+            if (rul && rul.length > 0) {
+              rul.forEach((item: any) => {
+                item.type = "number";
+              });
+            }
+          }
+          rules[itemSchama[schama].prop] = rul;
+        }
+      }
       // 创建验证器实例
       const validator = new Validator(rules);
 
