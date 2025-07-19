@@ -139,6 +139,10 @@ onMounted(async () => {
     method,
     exRules
   );
+  // 如果团个单标识为团单则展示关联被保险人，否则隐藏
+  if(route.params.param?.cGrpMrk !== '1') {
+    formconfig11.value.fromSchema = formconfig11.value.fromSchema.filter((item:any) => item.prop !== 'DistSummary.cRelatedInsured')
+  }
   Object.assign(formconfig1.value, formconfig11.value);
   tableconfig.value.showEdit = true;
   tableconfig.value.fromSchema = formconfig1.value.fromSchema;
