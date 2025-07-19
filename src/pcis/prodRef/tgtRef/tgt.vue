@@ -276,8 +276,10 @@ const method = {
       });
     }
   },
+  // 是否单项工程
   getcIsSingleChange:(val:string)=>{
     if(val=== '1'){
+      // 工程总造价 （元）
       setFormItem('Tgt.nTotalCost', {
         rules: [getRules("required", {})],
       });
@@ -288,6 +290,19 @@ const method = {
         rules: [getRules("required", {})],
       });
       setFormItem('Tgt.cSuffixAddr', {
+        rules: [getRules("required", {})],
+      });
+      formconfig1.fromUi.groupBy[1].hidden = false
+      // 工程名称
+      setFormItem('Tgt.cProjectName', {
+        rules: [getRules("required", {})],
+      });
+      // 设计总价（元）
+      setFormItem('Tgt.nTotalDesign', {
+        rules: [getRules("required", {})],
+      });
+      // 工程地址
+      setFormItem('Tgt.ProjectAddress', {
         rules: [getRules("required", {})],
       });
     }else {
@@ -303,6 +318,7 @@ const method = {
       setFormItem('Tgt.cSuffixAddr', {
         rules: null
       });
+      formconfig1.fromUi.groupBy[1].hidden = true
     }
   },
   getcTransportationToolsChange:(val:string)=>{
