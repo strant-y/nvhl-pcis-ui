@@ -322,7 +322,7 @@ function initTermData(item: any,data:any){
   if(item.cUniqueTermNo === "00425000137"){
     data["Term.nAdjustFactor"] = 100;
   }
-  if(item.cUniqueTermNo === "00425000179"){
+  if(item.cUniqueTermNo === "00425000179" || item.cUniqueTermNo === "00425000250" || item.cUniqueTermNo === "00425000087"){
     data['Term.cClaimInclude'] = '0';
   }
 }
