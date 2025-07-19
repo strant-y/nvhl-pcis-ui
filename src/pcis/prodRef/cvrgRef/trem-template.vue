@@ -8,7 +8,7 @@
               <el-col :span="10">
                 <div style="display: flex; align-items: center;">
                   <a style="margin-right: 5px" @click="showData = !showData">
-                    <el-icon v-if="!showData"><ArrowRightBold /></el-icon>
+                    <el-icon v-if="!showData"><ArrowUpBold /></el-icon>
                     <el-icon v-if="showData"><ArrowDownBold /></el-icon>
                   </a>
 
@@ -129,7 +129,7 @@
                   <tr>
                       <th v-if="checkExtendshow">
                         <a style="margin-right: 5px" @click="showExtend = !showExtend">
-                          <el-icon v-if="!showExtend"><ArrowRightBold /></el-icon>
+                          <el-icon v-if="!showExtend"><ArrowUpBold /></el-icon>
                           <el-icon v-if="showExtend"><ArrowDownBold /></el-icon>
                         </a>
                         
@@ -192,7 +192,7 @@
                   style="margin-right: 5px"
                   @click="ginfo.hidden = !ginfo.hidden"
                 >
-                  <el-icon v-if="ginfo.hidden"><ArrowRightBold /></el-icon>
+                  <el-icon v-if="ginfo.hidden"><ArrowUpBold /></el-icon>
                   <el-icon v-if="!ginfo.hidden"><ArrowDownBold /></el-icon>
                 </a>
                 <span>

@@ -106,13 +106,13 @@ onMounted(async () => {
       }
     })
   }
-  if(params.cProdNo === '043009'){
-    formconfig11.value.fromSchema?.forEach(item=>{
-      if(item['prop'] ==='Dist.cEmploymentAddress' && route.params.param?.cGrpMrk !== '1'){
-        item.isShow = false;
-      }
-    })
-  }
+  // if(params.cProdNo === '043009'){
+  //   formconfig11.value.fromSchema?.forEach(item=>{
+  //     if(item['prop'] ==='Dist.cEmploymentAddress' && route.params.param?.cGrpMrk !== '1'){
+  //       item.isShow = false;
+  //     }
+  //   })
+  // }
   Object.assign(formconfig1.value, formconfig11.value);
   cardconfig.value.title = formconfig1.value.title;
   tableconfig.value.showEdit = true;

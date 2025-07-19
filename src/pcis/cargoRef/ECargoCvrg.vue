@@ -88,11 +88,12 @@ onMounted(() => {
             }
           }
           return true
-        },
-        distinguishCancelAndClose: true // 区分取消和关闭
-      }).then(({ value }) => {
-        addGroup(value)
-      }).catch(() => {
+        }
+      }).then(({ value }) => { // 确认
+        cvrgEditRef.value?.addRowByData(buildRow({
+          cGroupIdx: value
+        }));
+      }).catch(() => { // 取消
 
       });
     }
@@ -384,15 +385,6 @@ function setOptions(key: string, rowId: string, codeListName: string, codeListPa
     });
   });
 }
-
-const addGroup = (groupIdx: string) => {
-  const list = [...getFormValue()];
-  const addRow = buildRow({
-    cGroupIdx: groupIdx
-  });
-  list.push(addRow);
-  setFormValue(listSort(list));
-};
 
 const buildRow = (data: any) => {
   const res: any = {};

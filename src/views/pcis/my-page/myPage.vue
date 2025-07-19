@@ -416,6 +416,7 @@ const amlInfoRef = ref(null);
 
 const historyClaRef = ref(null);
 const sliceSide = ref([]);
+const bottomBtnColor1 = "#3498DB";
 
 const props = defineProps({
   param: {
@@ -703,6 +704,7 @@ const basicBtn = [
   createFreeButtonBase({
     label: "保存模板",
     type: "primary",
+    buttonColor: bottomBtnColor1,
     func: () => {
       handleSaveTemplate()
     },
@@ -710,6 +712,7 @@ const basicBtn = [
   createFreeButtonBase({
     label: "复制出单",
     type: "primary",
+    buttonColor: bottomBtnColor1,
     func: () => {
       copyPolicyFun();
     },
@@ -748,6 +751,7 @@ const basicBtn = [
   createFreeButtonBase({
     label: "发票信息",
     type: "primary",
+    buttonColor: bottomBtnColor1,
     func: () => {
       setTaxInfo();
     },
@@ -755,6 +759,7 @@ const basicBtn = [
   createFreeButtonBase({
     label: "反洗钱扩展信息",
     type: "primary",
+    buttonColor: bottomBtnColor1,
     func: () => {
       setCusBenefitInfo();
     },
@@ -762,6 +767,7 @@ const basicBtn = [
   createFreeButtonBase({
     label: "额度明细",
     type: "primary",
+    buttonColor: bottomBtnColor1,
     func: () => {
       openLimit();
     },
@@ -1396,6 +1402,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "保存模板",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           handleSaveTemplate()
         },
@@ -1403,6 +1410,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "复制出单",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           copyPolicyFun();
         },
@@ -1434,6 +1442,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "发票信息",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           setTaxInfo();
         },
@@ -1441,6 +1450,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "反洗钱扩展信息",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           setCusBenefitInfo();
         },
@@ -1448,6 +1458,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "额度明细",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           openLimit();
         },
@@ -1519,6 +1530,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "保存模板",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           handleSaveTemplate()
         },
@@ -1526,6 +1538,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "复制出单",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           copyPolicyFun();
         },
@@ -1557,6 +1570,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "发票信息",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           setTaxInfo();
         },
@@ -1564,6 +1578,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "反洗钱扩展信息",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           setCusBenefitInfo();
         },
@@ -1571,6 +1586,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "额度明细",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           openLimit();
         },
@@ -1647,6 +1663,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "保存模板",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           handleSaveTemplate()
         },
@@ -1654,6 +1671,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "复制出单",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           copyPolicyFun();
         },
@@ -1685,6 +1703,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "发票信息",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           setTaxInfo();
         },
@@ -1692,6 +1711,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "反洗钱扩展信息",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           setCusBenefitInfo();
         },
@@ -1699,6 +1719,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "额度明细",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           openLimit();
         },
@@ -1770,6 +1791,7 @@ async function loadAfter() {
     createFreeButtonBase({
     label: "历史赔案",
     type: "primary",
+    buttonColor: bottomBtnColor1,
     func: () => {
       historyClaimcaseFun();
       // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
