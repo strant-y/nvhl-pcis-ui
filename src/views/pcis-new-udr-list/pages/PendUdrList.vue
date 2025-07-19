@@ -1428,14 +1428,14 @@
         udrData
             .then((res: any) => {
                 // loading.value = false;
-                if (res && res.code === 200 && res.data) {
+                if (res && res.code === 200) {
                     ElMessage.success({ message: "查询完毕！", duration: 3000 });
                     if (udrType !== "5") {
-                        pageresult.list = res.data;
-                        pageresult.total = res.totalCount;
+                        pageresult.list = res.data || [];
+                        pageresult.total = res.totalCount || 0;
                     } else {
-                        pageresult.list = res.data.result;
-                        pageresult.total = res.data.total;
+                        pageresult.list = res.data.result || [];
+                        pageresult.total = res.data.total || 0;
                     }
                 } else {
                     ElMessage.error({ message: res.msg, duration: 3000 });
