@@ -1447,7 +1447,7 @@ const handleBeforeClose = async (done:any) => {
     // 调用再保险位接口
     const { saveFlag, data } = await saveDataInfo()
     if(!saveFlag) return
-    emit('ok', data)
+    emit('ok', {...data, tableList: pageresult1.list})
     done()
   } else {
     done()
