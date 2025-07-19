@@ -123,12 +123,22 @@ export const useValidator = () => {
   }
 
   const maxLength = (num) => {
-    const regex = new RegExp(`^.{0,${num}}$`);
+    // const regex = new RegExp(`^.{0,${num}}$`);
+    // return {
+    //   pattern: regex,
+    //   message: `最多输入${num}个字符`,
+    //   trigger: "blur",
+    // }
     return {
-      pattern: regex,
-      message: `最多输入${num}个字符`,
-      trigger: "blur",
-    }
+      validator: (rule, value, callback) => {
+        if(value && value.length > num) {
+          callback(`最多输入${num}个字符`);
+        } else {
+          callback();
+        }
+      },
+      trigger: 'blur'
+    };
   }
 
   /**

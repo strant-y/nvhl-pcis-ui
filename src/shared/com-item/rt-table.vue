@@ -13,7 +13,7 @@
       style="width: 100%"
       :border="item.border ? item.border : true"
       :fit="item.fit ? item.fit : true"
-      :stripe="item.stripe ? item.stripe : true"
+      :stripe="item.stripe === undefined ? true : item.stripe"
       :size="item.size ? item.size : 'default'"
       :show-header="item.showHeader ? item.showHeader : true"
       @row-click="rowClick"
@@ -39,7 +39,7 @@
       <el-table-column
         type="expand"
         :index="indexMethod"
-        v-if="item.showExpand ? item.showExpand : false"
+        v-if="item.showExpand"
         :align="item.align ? item.align : 'center'"
       >
         <template #default="props">
@@ -755,7 +755,7 @@ function getTextWidth(text) {
 
 const objectSpanMethod = (object: any) => {
   if(props.item && props.item.spanMethod && typeof props.item.spanMethod === 'function') {
-    const res = props.item.spanMethod(object)
+    const res = props.item.spanMethod(object, expandRowKeys.value)
     return res
   }
   return { rowspan: 1, colspan: 1 }

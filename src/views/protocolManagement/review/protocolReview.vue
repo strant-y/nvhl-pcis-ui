@@ -228,31 +228,31 @@ const tableconfig = reactive<AppTableConfig>(
       tableBtnType: "btn",
       fromSchema: [
         {
-          prop: "cAgreementNo",
+          prop: "cEcAgrNo",
           inputtype: "rtinput",
           title: "协议号",
           minWidth: 180,
         },
         {
-          prop: "cPlyNo",
+          prop: "cAppId",
           inputtype: "rtinput",
           title: "客户编号",
           minWidth: 180,
         },
         {
-          prop: "cEdrNo",
-          inputtype: "rtinput",
+          prop: "cAppNme",
+          inputtype: "rtselect",
           title: "客户名称",
           minWidth: 180,
         },
         {
-          prop: "cAgreementDptCde",
+          prop: "tInsrncBgnTm",
           inputtype: "rtinput",
           title: "出单机构",
           minWidth: 120,
         },
         {
-          prop: "tEffectTm",
+          prop: "tInsrncEndTm",
           inputtype: "rtinput",
           title: "生效日期",
           minWidth: 120,
@@ -264,23 +264,23 @@ const tableconfig = reactive<AppTableConfig>(
           minWidth: 120,
         },
         {
-          prop: "cStatus",
+          prop: "cAppStatus",
           inputtype: "rtinput",
           title: "协议状态",
           minWidth: 120,
         },
-        {
-          prop: "cIsValid",
-          inputtype: "rtinput",
-          title: "有效",
-          minWidth: 180,
-        },
-        {
-          prop: "nPayBalance",
-          inputtype: "rtinput",
-          title: "缴费余额",
-          minWidth: 120,
-        },
+        // {
+        //   prop: "cIsValid",
+        //   inputtype: "rtinput",
+        //   title: "有效",
+        //   minWidth: 180,
+        // },
+        // {
+        //   prop: "nPayBalance",
+        //   inputtype: "rtinput",
+        //   title: "缴费余额",
+        //   minWidth: 120,
+        // },
       ],
     })
 );
@@ -310,17 +310,19 @@ function handleQuery(flag?: boolean) {
       const param = {
         ...{
           queryTab: "review",
-          CurrentUser: user.value?.opCde,
-          CurrentUserOrg: user.value?.companyId,
+          currentUser: user.value?.opCde,
+          currentUserOrg: user.value?.companyId,
+          
         },
         ...freeEditRef.value?.getFromValue(),
+        ...tableRef.value?.getPartnerPage(flag),//获取分页数据
       };
-      cargoApi.query(param)
+      cargoApi.queryEcargoList(param)
           .then((res: any) => {
             if (res && res.code === 200) {
               const pageData = res.data;
               if (pageData) {
-                pageresult.list = pageData.list;
+                pageresult.list = pageData.data;
                 pageresult.total = pageData.total;
               }
             }
@@ -333,29 +335,29 @@ function handleQuery(flag?: boolean) {
           });
     }
   });
-  pageresult.list = [
-    {
-      cAgreementNo: '1234567890',
-      cClientNo: '222',
-      cClientNme: '张三',
-      cDptCde: '0200000000000',
-      tEffectTm: '2025-01-01 00:00:00',
-      tExpireTm: '2026-01-01 00:00:00',
-      cStatus: '正常',
-      nPayBalance: 100,
-    },
-    {
-      cAgreementNo: '1234567890',
-      cClientNo: '222',
-      cClientNme: '张三',
-      cDptCde: '0200000000000',
-      tEffectTm: '2025-01-01 00:00:00',
-      tExpireTm: '2026-01-01 00:00:00',
-      cStatus: '正常',
-      nPayBalance: 100,
-    },
-  ]
-  pageresult.total = 2;
+  // pageresult.list = [
+  //   {
+  //     cAgreementNo: '1234567890',
+  //     cClientNo: '222',
+  //     cClientNme: '张三',
+  //     cDptCde: '0200000000000',
+  //     tEffectTm: '2025-01-01 00:00:00',
+  //     tExpireTm: '2026-01-01 00:00:00',
+  //     cStatus: '正常',
+  //     nPayBalance: 100,
+  //   },
+  //   {
+  //     cAgreementNo: '1234567890',
+  //     cClientNo: '222',
+  //     cClientNme: '张三',
+  //     cDptCde: '0200000000000',
+  //     tEffectTm: '2025-01-01 00:00:00',
+  //     tExpireTm: '2026-01-01 00:00:00',
+  //     cStatus: '正常',
+  //     nPayBalance: 100,
+  //   },
+  // ]
+  // pageresult.total = 2;
 }
 
 // 选中事件

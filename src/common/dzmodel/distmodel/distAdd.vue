@@ -135,7 +135,8 @@ const formconfig1 = ref<AppFreeEditConfig>(
           const isValid = await freeEditRef.value?.validate();
           if(isValid){
             const s = freeEditRef.value?.getFromValue();
-            if(s['Dist.JingYingAddress043009'].indexOf('undefined') !== -1) {
+            // 经营地址只选择省市区不输入详细地址获取表单值会带有undefined，这里处理一下
+            if(s['Dist.JingYingAddress043009'] && s['Dist.JingYingAddress043009'].indexOf('undefined') !== -1) {
               s['Dist.JingYingAddress043009'] = s['Dist.JingYingAddress043009'].replace('undefined', '')
             }
 

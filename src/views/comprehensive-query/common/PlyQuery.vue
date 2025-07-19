@@ -59,7 +59,7 @@ const colChange = defineAsyncComponent(() => import("../modal/colChange.vue"));
 const PrintView = defineAsyncComponent(() => import("../modal/PrintView.vue"));
 
 
-let cTermNoList = ref([]);  // 条款数据
+let cTermNoList = ref<any>([]);  // 条款数据
 let cTermNo = '';    // 条款编码
 
 const props = defineProps({

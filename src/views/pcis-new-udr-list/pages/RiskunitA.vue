@@ -845,12 +845,11 @@ function queryRiskUnit() {
   riskUnitQuery(param)
     .then((result: any) => {
       if (result.code === "1" && result.data) {
-        const optionsItem = [{
-          ...result.data,
-          label: result.data.cRiskLvlCde + result.data.cRiskUnitNme,
-          value: result.data.cRiskLvlCde,
-        }]
-        CRiskLvlCde_Options.value = optionsItem;
+        CRiskLvlCde_Options.value = result.data.map((item: any) => ({
+          ...item,
+          label: item.cRiskLvlCde + item.cRiskUnitNme,
+          value: item.cRiskLvlCde,
+        }));
       } else if (result.code === "0") {
         ElMessage.error({ message: result.message, duration: 3000 });
       }

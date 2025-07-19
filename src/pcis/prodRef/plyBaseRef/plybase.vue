@@ -61,6 +61,12 @@ onMounted(async () => {
     method,
     exRules
   );
+  // 隐藏保单来源、是否互联网、手工出单标志
+  formconfig11.fromSchema.forEach((item:any) => {
+    if(item.prop === "Base.cPolicySource" || item.prop === "Base.cIsNet" || item.prop === "Base.cManualMrk") {
+      item.hidden = true
+    }
+  })
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
     setForSelectFilterable(); //给下拉框设置可搜索

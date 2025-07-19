@@ -123,7 +123,12 @@ onMounted(async () => {
     }
     return e;
   });
-  tableconfig.value.fromSchema = formconfig1.value.fromSchema;
+  tableconfig.value.fromSchema = formconfig1.value.fromSchema.map((item:any) => {
+    if(item.prop === "Dist.nSeqNo" || item.title === "序号") {
+      item.width = 60
+    }
+    return item;
+  });
   tableconfig.value.formconfig = createAppGridEditConfig({
     titleBtns: formconfig1.value.titleBtns,
     fromSchema: formconfig1.value.distSchema,
@@ -416,6 +421,9 @@ const method = {
   },
   //导出
   exportExcel: () => {
+
+    console.log(getTableData())
+    return false
     let paramitem  = Object.assign(formconfig1.value, {
       cComponentTable: cComponentTableValue,
     });
