@@ -368,7 +368,7 @@ function deleteTermByNo(t: any) {
       if (formData.value[item][i]["Term.cClauseCode"] === t) {
 
         // 批改的情况下，标记该单为删除状态
-        if (parparam.cEdrType && planData.value[plan][item][i]['Term.cRowId'] ) {
+        if (parparam.cEdrType && formData.value[item][i]['Term.cRowId'] ) {
           tremTemplateRefs.value[item+i].setCancel();
         } else {
           deleindex = i;

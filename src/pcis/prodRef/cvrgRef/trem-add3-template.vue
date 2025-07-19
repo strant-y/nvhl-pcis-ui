@@ -116,8 +116,12 @@ onMounted(() => {
 });
 
 function dataInit() {}
+function dataFlash() {}
+
+
 defineExpose({
   dataInit,
+  dataFlash,
   setDisabledAll,
   setCancel
 });

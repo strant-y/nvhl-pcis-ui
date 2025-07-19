@@ -82,7 +82,7 @@ function getRequired() {
 const notList = ["040019", "047002", "049025", "043002", "040005", "040006"];
 onMounted(() => {
   if (param.cProdNo.startsWith("04")) {
-    if (!notList.includes(param.cProdNo)) {
+    if (notList.includes(param.cProdNo)) {
       formcof.value.nMainRate.suffix = "%";
       formcof.value.nMainRate.required = true;
     }
@@ -193,6 +193,8 @@ function isdisabled(i: any) {
 
 function dataInit() {}
 
+function dataFlash() {}
+
 function setCancel() {
   props.planData["Term.cCancelMrk"] = "1";
 }
@@ -226,6 +228,7 @@ onMounted(() => {
 
 defineExpose({
   dataInit,
+  dataFlash,
   setDisabledAll,
   setCancel,
 });
