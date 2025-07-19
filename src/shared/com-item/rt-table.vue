@@ -43,24 +43,25 @@
         :align="item.align ? item.align : 'center'"
       >
         <template #default="props">
-          <el-row :gutter="20">
-            <template v-for="(i, index) in getfromSchema()" :key="index">
-              <el-col
-                :span="i.itemWidth ? i.itemWidth * formUi.span : formUi.span"
-                style="margin-top: 5px"
-              >
-                <el-form-item
-                  :prop="[props.$index, i.prop]"
-                  :rules="formItems[props.row._dataId][i.prop].rules ? formItems[props.row._dataId][i.prop].rules : undefined"
-                  :label="i.title"
-                  :label-position="
+          <div style="margin: -5px 5px -5px 5px;background-color: rgba(228,204,164,0.2);">
+            <el-row :gutter="20">
+              <template v-for="(i, index) in getfromSchema()" :key="index">
+                <el-col
+                    :span="i.itemWidth ? i.itemWidth * formUi.span : formUi.span"
+                    style="margin-top: 5px"
+                >
+                  <el-form-item
+                      :prop="[props.$index, i.prop]"
+                      :rules="formItems[props.row._dataId][i.prop].rules ? formItems[props.row._dataId][i.prop].rules : undefined"
+                      :label="i.title"
+                      :label-position="
                     i.inputtype === 'table' ? 'top' : formUi.labelPosition // table 组件,默认标题显示在top上
                   "
-                  style="margin-bottom: 18px"
-                >
-                  <div style="display: flex;">
-                    <div
-                    :style="{
+                      style="margin-bottom: 18px"
+                  >
+                    <div style="display: flex;">
+                      <div
+                          :style="{
                       width:
                         formItems[props.row._dataId][i.prop].showExBtn &&
                         formItems[props.row._dataId][i.prop].inputtype !==
@@ -73,39 +74,40 @@
                       display: 'flex',
                       alignItems: 'flex-start',
                     }"
-                  >
-                    <from-item
-                      v-model="props.row[i.prop]"
-                      :item="formItems[props.row._dataId][i.prop]"
-                      :showLabel="editIndex !== props.row._dataId"
-                      :row="props.row"
-                    />
-                  </div>
+                      >
+                        <from-item
+                            v-model="props.row[i.prop]"
+                            :item="formItems[props.row._dataId][i.prop]"
+                            :showLabel="editIndex !== props.row._dataId"
+                            :row="props.row"
+                        />
+                      </div>
 
-                  <!---       显示组件尾部按钮       --->
-                  <template
-                    v-if="formItems[props.row._dataId][i.prop].showExBtn"
-                  >
-                    <rt-button
-                      v-if="
+                      <!---       显示组件尾部按钮       --->
+                      <template
+                          v-if="formItems[props.row._dataId][i.prop].showExBtn"
+                      >
+                        <rt-button
+                            v-if="
                         formItems[props.row._dataId][i.prop].inputtype !==
                         'rttable'
                       "
-                      :style="{
+                            :style="{
                         width:
                           (formItems[props.row._dataId][i.prop].btnWidth
                             ? formItems[props.row._dataId][i.prop].btnWidth
                             : 25) + '%',
                         height: '100%',
                       }"
-                      :item="formItems[props.row._dataId][i.prop].btnItems"
-                    />
-                  </template>
-                  </div>
-                </el-form-item>
-              </el-col>
-            </template>
-          </el-row>
+                            :item="formItems[props.row._dataId][i.prop].btnItems"
+                        />
+                      </template>
+                    </div>
+                  </el-form-item>
+                </el-col>
+              </template>
+            </el-row>
+          </div>
         </template>
       </el-table-column>
       <el-table-column
