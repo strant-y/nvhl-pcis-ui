@@ -211,7 +211,7 @@
                   : true
               "
             >
-          <!-- {{ k.pageKey }} -->
+          <!-- {{ k.pageKey }}  -->
               <component
                 v-if="currentIndex >= i"
                 :ref="
@@ -310,6 +310,8 @@ import {
   submitInquiry,
   submitUnderwrite,
   getInquiryPolicy,
+	getisAllDone,
+	isUndrClsBlackList,
 } from "../../../api/query/index";
 import { checkFeeWindowType, selectDist, saveDistBatch, getReleaseInquiryPage } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
@@ -600,7 +602,7 @@ const historyClaimcaseFun = () => {
 // 发起风勘 方法
 const startWindExploration = ()=>{
     dzmodal
-    .open(windExplorationModel, { type: "Issuer", data: {} })
+    .open(windExplorationModel, { type: "Issuer", data: {...opertaor.getDataAll()} })
     .then((res: any) => {
       if (res.type === "ok") {
       }
@@ -609,7 +611,7 @@ const startWindExploration = ()=>{
 // 风勘查询
 const getWindExploration = ()=>{
     dzmodal
-    .open(windExplorationInfo, { type: "Issuer", data: {} })
+    .open(windExplorationInfo, { type: "Issuer", data: {...opertaor.getDataAll()} })
     .then((res: any) => {
       if (res.type === "ok") {
       }
@@ -956,7 +958,6 @@ const uwBtn = [
         });
     },
   }),
-
 ];
 /**
  * 数据初始化
@@ -1176,26 +1177,17 @@ async function loadAfter() {
             submitToUndrFn();
           },
         }),
-           createFreeButtonBase({
-            label: "发起风勘",
-            type: "primary",
-            func: () => {
-              startWindExploration(); 
-              //startWindExploration
-              // historyClaimcaseFun();
-              // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
-            },
-          }),
-          createFreeButtonBase({
-            label: "风勘查询",
-            type: "primary",
-            func: () => {
-              getWindExploration(); 
-              //startWindExploration
-              // historyClaimcaseFun();
-              // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
-            },
-          }),
+        createFreeButtonBase({
+          label: "发起风勘",
+          type: "primary",
+					func: () => {
+						if (getNo.value == '暂无') {
+							ElMessage.error('询价单号为空,请保存后操作!');
+							return false;
+						}
+						startWindExploration(); 
+					},
+        }),
       );
     } else {
       bthList.value = basicBtn;
@@ -1265,6 +1257,18 @@ async function loadAfter() {
       });
     }
     bthList.value = uwBtn;
+		// 核保只有询价单才展示风勘查询按钮
+		if(props.param?.pageName === "priceInquiry") {
+			bthList.value.push(
+				createFreeButtonBase({
+					label: "风勘查询",
+					type: "primary",
+					func: () => {
+						getWindExploration(); 
+					},
+				}),
+			)
+		}
   } else if (props.param.pageType === "EDR_APP_NEW_SCENE") {
     // 批改申请-新增
     const cAppNo = props.param.cAppNo;
@@ -1782,6 +1786,7 @@ async function loadAfter() {
     })
     bthList.value = basicBtn;
   }
+
   bthList.value.push(
     createFreeButtonBase({
     label: "历史赔案",
@@ -2294,25 +2299,57 @@ function getFKFunc() {
  * 投保申请核保
  */
 const submitToUndrFn = async () => {  
-
-   // 风勘校验
- if( props.param?.pageName === "priceInquiry" ){
-    // const startData = await initMultiCodeList({});
-    // console.log(1212,res);
-    // if(res.code ===500){
-    //    ElMessage.error("风勘未结束，不允许询价提核！");
-    //   return false;
-    // }
- }
- if (needCalc.value) {
+ 	if (needCalc.value) {
     ElMessage.error("请先进行保费计算!");
     return;
   }
+	// 申请核保前判断是否灰黑名单
+	const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
+	const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
+	console.log('cInquiryNumbercInquiryNumbercInquiryNumber', cInquiryNumber);
+	console.log('cAppNocAppNocAppNocAppNo', cAppNo);
+	
+	const res: any = await isUndrClsBlackList({ cInquiryNumber, cAppNo});
+	console.log('判断是否灰黑名单返回的res', res);
+	if(res.code == 200){
+		if(res.msg != '校验通过'){
+			ElMessage.warning(res.msg);
+			return false;
+		}
+	} else {
+		ElMessage.error({ message: res.msg, duration: 3000 });
+		return false;
+	}
+	// 风勘校验
+ 	if( props.param?.pageName === "priceInquiry" ){
+		// const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
+    const res: any = await getisAllDone({ cInquiryNumber });
+    console.log('判断是否可以核保返回的res', res);
+    if(res.code == 200){
+			if(res.data == false){
+				ElMessage.warning("风勘未结束，不允许询价提核！");
+      	return false;
+			}
+    } else {
+			ElMessage.error({ message: res.msg, duration: 3000 });
+			return false;
+		}
+ 	}
   if (!baseValite()) {
-    btn.loading = false;
     return;
   }
   if (!checkNAmt()) return;
+
+   //  042001  是否单项工程逻辑
+   if(props.param?.cProdNo==='042001'){
+      let tableLenght = opertaor.getTableRefByKey("DesignDist").getTableData().length;  // 清单条数
+      let cIsSingle =  opertaor.getTableRefByKey("tgt").getValue('Tgt.cIsSingle');      // 是否单项工程
+      if(tableLenght ==0 && cIsSingle==0){
+        ElMessage.warning("“是否单项工程”为否时，设计工程项目清单不能为空！");  
+        return false;
+      }
+   }
+
   const f = await savePlyInfo(); // 提交核保,需要默认执行一次保存操作
   if (f) {
     const btn = getBtn("btn010103");
@@ -2700,6 +2737,8 @@ const getPlyPolicyFun = () => {
  ***/
 const calcPremiumEdr = () => {
     const res = opertaor.getDataAll();
+    const dataAll = opertaor.getDataAll();
+ 
   console.log('保费计算',props.param)
   console.log('保费计算2',res)
   
@@ -2722,7 +2761,7 @@ const calcPremiumEdr = () => {
  
   const btn = getBtn("btnCalEdr");
   btn.loading = true;
-  // const res = opertaor.getDataAll();
+
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
@@ -2735,9 +2774,6 @@ const calcPremiumEdr = () => {
       res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   }
 
-  
-
-  console.log(res);
   calcEdr(res).then((res) => {
     btn.loading = false;
     console.log("批改计算", res);
@@ -2761,44 +2797,44 @@ const calcPremiumEdr = () => {
         );
       edrbase.value?.setFormValue(EdrBaseData);
       const nPrmVar = ops["plyBase"]["Base.nPrmVar"]  || 0;
-      let payInfo = setPayInfoEdr(
-        ops["payinfo"],
-        ops["base"],
-        ops["applicant"],
-        nPrmVar,
-        ops["plyBase"],
-        // isCorrect:true,
-      );
-      console.log("生成缴费计划内容", payInfo);
-      // opertaor.getTableRefs()["payinfo"].setFormValue(payInfo); 
-      const payinfoRef = opertaor.getTableRefs()["payinfo"];
-      if (payinfoRef && payinfoRef.setFormValue) {
+
     
-        // payInfo  = {...payInfo,...{isCorrect:true}}
+      const payinfoRef = opertaor.getTableRefs()["payinfo"];
+
+      // 保费变化率 批改时 原始数据为0  （批改申请核保时用）
+      payinfoRef.getFromValue().forEach((item:any)=>{
+            item['Pay.nPrmVar'] = 0;
+      })
+
+      if (payinfoRef && payinfoRef.setFormValue) {
         let currentPayList = [...payinfoRef.getFromValue()]; // 获取当前列表
-        currentPayList = currentPayList.filter(item => {
-          // 检查 item.Pay 是否存在，且包含 cAppNo 字段
-          return item['Pay.cAppNo'] && item.hasOwnProperty('Pay.cAppNo');
-        });
+        //  缴费期数   + 批改次数
 
-        // const lastShowIndex = currentPayList.reduce((lastIndex, item, index) => {
-        //     return item.hasOwnProperty('Pay.cAppNo') ? index : lastIndex;
-        //   }, -1);
-
-        //   // 如果找到，则删除该元素
-        //   if (lastShowIndex !== -1) {
-        //     currentPayList.splice(lastShowIndex, 1);
-        //   }
- 
-        console.log('data--' ,currentPayList)
-        console.log('data2--' ,payInfo)
-        currentPayList.push(payInfo); // 插入新条目
-        payinfoRef.setFormValue(currentPayList); // 更新表单数据
-      }
+        // Base.nPayNumber
+        let infoLength = dataAll['base']['Base.nPayNumber']+res['res']['composition']["EdrBase"][0]['EdrBase.nEdrPrjNo'];
+                console.log('条数',infoLength ,currentPayList.length)
+    
+        if(currentPayList.length >=infoLength){
+          currentPayList.pop();
+        }
+        // 处理 批改是保存多条问题 （需要再次修改 不成熟的改法）
+        // currentPayList = currentPayList.filter(item => {
+        //   return item['Pay.cAppNo'] && item.hasOwnProperty('Pay.cAppNo');
+        // });
+                let payInfo = setPayInfoEdr(
+                ops["payinfo"],
+                ops["base"],
+                ops["applicant"],
+                nPrmVar,
+                ops["plyBase"],
+                currentPayList.length+1
+              );
+            console.log('data--' ,currentPayList)
+            console.log('data2--' ,payInfo)
+            currentPayList.push(payInfo); // 插入新条目
+            payinfoRef.setFormValue(currentPayList); // 更新表单数据
+          }
       needCalc.value = false;
-
-
-
     } else {
       ElMessage.error(res.msg);
     }
@@ -2806,7 +2842,7 @@ const calcPremiumEdr = () => {
     // history.back();
   });
 };
-const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase) => {
+const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase,nTms) => {
   // const payListNew = [];
   const payListNew = [...payList];
   const pay = {};
@@ -2822,13 +2858,13 @@ const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase) => {
   pay["Pay.tPayEndTm"] = plyBase["Base.tEdrBgnTm"];
   pay["Pay.nOwnPrm"] = nPrmVar;
   pay["Pay.cProdNo"] = base["Base.cProdNo"];
-  pay["Pay.nPrmVar"] = nPrmVar;
+  pay["Pay.nPrmVar"] = nPrmVar ;
   // for (const i in payList) {
   //   if (!!payList[i]["Pay.cPkId"]) {
   //     payListNew.push(payList[i]);
   //   }
   // }
-  pay["Pay.nTms"] = payListNew.length + 1;
+  pay["Pay.nTms"] = nTms ||plyBase.length+1 ;
   // payListNew.push(pay);
   // return payListNew;
   return pay;
@@ -2999,6 +3035,7 @@ const saveEdrPlyInfo = async () => {
   const btn = getBtn("saveEdr");
   btn.loading = true;
   const res = opertaor.getDataAll();
+  const dataALl = opertaor.getDataAll();
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
@@ -3299,7 +3336,8 @@ const validateCiInfo = () => {
         }
       }
       if (chiefMrkM === 0 || chiefMrkS === 0) {
-        ElMessage.error("主/从共保信息不完整!");
+        // ElMessage.error("主/从共保信息不完整!");
+        ElMessage.error("主共方有且仅有一个！");
         return false;
       }
       if (NCiShare !== 1) {

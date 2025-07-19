@@ -841,20 +841,25 @@ function exChangeFunc() {
   }
   // 045001个性化配置
   if (pageparam.cProdNo === "045001") {
-    // if(data["tgt"]["Tgt.cInsuranceMethod"] && data["tgt"]["Tgt.cInsuranceMethod"] === '0'){
-      
-    // }
+    if(data["tgt"]["Tgt.cInsuranceMethod"] && data["tgt"]["Tgt.cInsuranceMethod"] !== '613001'){
+      const term = termFactormap.value.filter(
+        (r) => r["prop"] !== "Term.nRateVal" && r["prop"] !== "Term.nInsuranceFee" && r["prop"] !== "Term.nPersonPremium"
+      );
+      const ex = termFactormap.value.filter(
+        (r) =>
+          r["prop"] === "Term.nRateVal" || r["prop"] === "Term.nInsuranceFee"
+      );
 
-    const term = termFactormap.value.filter(
-      (r) => r["prop"] !== "Term.nRateVal" && r["prop"] !== "Term.nInsuranceFee"
-    );
-    const ex = termFactormap.value.filter(
-      (r) =>
-        r["prop"] === "Term.nRateVal" || r["prop"] === "Term.nInsuranceFee"
-    );
+      termFactormap.value = term;
+      extermConf.value = ex;
+    }else{
+      const term = termFactormap.value.filter(
+        (r) => r["prop"] !== "Term.nRateVal" 
+      );
 
-    termFactormap.value = term;
-    extermConf.value = ex;
+      termFactormap.value = term;
+    }
+    
   }
    // 040002个性化配置
   if (pageparam.cProdNo === "040002") {
@@ -1099,12 +1104,14 @@ const methodMap = {
     termFactormap.value.forEach((item: any) => {
       if(item.cFatherKey === fk){
         item.max = val;
-      }
-      if(termdata.value[item.prop]){
-        if(val < termdata.value[item.prop]){
-          termdata.value[item.prop] = val;
+
+        if(termdata.value[item.prop] ){
+          if(val < termdata.value[item.prop]){
+            termdata.value[item.prop] = val;
+          }
         }
       }
+      
     });
     update();
   },

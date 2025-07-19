@@ -276,8 +276,9 @@ const method = {
       });
     }
   },
-  // 是否单项工程
+  // 是否单项工程 
   getcIsSingleChange:(val:string)=>{
+    console.log(val)
     if(val=== '1'){
       // 工程总造价 （元）
       setFormItem('Tgt.nTotalCost', {
@@ -292,20 +293,33 @@ const method = {
       setFormItem('Tgt.cSuffixAddr', {
         rules: [getRules("required", {})],
       });
-      formconfig1.fromUi.groupBy[1].hidden = false
-      // 工程名称
-      setFormItem('Tgt.cProjectName', {
-        rules: [getRules("required", {})],
-      });
-      // 设计总价（元）
-      setFormItem('Tgt.nTotalDesign', {
-        rules: [getRules("required", {})],
-      });
-      // 工程地址
-      setFormItem('Tgt.ProjectAddress', {
-        rules: [getRules("required", {})],
-      });
+
+       if(params.cProdNo==='042001'){
+        formconfig1.fromUi.groupBy[1].hidden = false
+          setFormItem('Tgt.cProjectName', {
+             hidden: false,
+           rules: [getRules("required", {})],
+          });
+    
+          setFormItem('Tgt.nTotalCost', {
+          hidden: false,
+           rules: [getRules("required", {})],
+          });
+    
+          setFormItem('Tgt.nTotalDesign', {
+          hidden: false,
+           rules: [getRules("required", {})],
+          });
+          setFormItem('Tgt.ProjectAddress', {
+          hidden: false,
+           rules: [getRules("required", {})],
+          });
+      }
+
     }else {
+
+      // Tgt.cProjectName
+
       setFormItem('Tgt.nTotalCost', {
         rules: null
       });
@@ -317,9 +331,34 @@ const method = {
       });
       setFormItem('Tgt.cSuffixAddr', {
         rules: null
-      });
-      formconfig1.fromUi.groupBy[1].hidden = true
+      }); 
+
+
+      if(params.cProdNo==='042001' && val=== '0'){
+        formconfig1.fromUi.groupBy[1].hidden = true
+          setFormItem('Tgt.cProjectName', {
+             hidden: true,
+             rules: null
+          });
+    
+          setFormItem('Tgt.nTotalCost', {
+            hidden: true,
+            rules: null
+          });
+    
+          setFormItem('Tgt.nTotalDesign', {
+            hidden: true,
+            rules: null
+          });
+          setFormItem('Tgt.ProjectAddress', {
+            hidden: true,
+            rules: null
+          });
+      }
+      
+ 
     }
+    
   },
   getcTransportationToolsChange:(val:string)=>{
     if(val=== '02'){
@@ -467,6 +506,8 @@ const method = {
   },
   //是否单项工程change事件
   cIsSingleFunc: (val) => {
+    console.log('123123',vals)
+
     if (val == '1') {
       let obj = {
         rules: [getRules("required", {})],

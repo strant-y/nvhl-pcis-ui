@@ -149,11 +149,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "单据类型",
         clearable:true,
+        // defaultValue: 3,
         loadData: [
           { label: "投保单号", value: "1" },
           { label: "交易号", value: "3" },
         ],
-        defaultValue: "3",
+      
       },
       {
         prop: "CBillNoStart",
@@ -325,6 +326,7 @@ onMounted(async () => {
       ],
     });
     freeEditRef.value?.setValue("LoadSub", 1);
+    freeEditRef.value?.setValue("CBillTyp", '3');
   });
   // handleQuery(true);
 });
@@ -366,6 +368,8 @@ function handleQuery(flag?: boolean) {
 
       const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
       const s = freeEditRef.value?.getFromValue(); //获取表单数据
+      let ss = freeEditRef.value?.getValue('CBillTyp');
+      console.log('参数---',ss ,s)
 
       const param = Object.assign(
         {

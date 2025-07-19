@@ -88,6 +88,11 @@ onMounted(() => {
     setFormItem("Insured.cShareholderCode", { hidden: true, rules: null });
     setFormItem("Insured.cShareholderName", { hidden: true, rules: null });
     setFormItem("Insured.cShareholderCategory", { hidden: true, rules: null });
+  }else{
+    setFormItem("Insured.cShareholderNature", { rules: [getRules("required", {})] });
+    setFormItem("Insured.cShareholderCode", { rules: [getRules("required", {})] });
+    setFormItem("Insured.cShareholderName", { rules: [getRules("required", {})] });
+    setFormItem("Insured.cShareholderCategory", { rules: [getRules("required", {})] });
   }
 
   setFormItem("Insured.cSafetyStandardizationLevel", { hidden: true });

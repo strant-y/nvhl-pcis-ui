@@ -457,7 +457,6 @@ onMounted(() => {
     const paramSub = {
       CChaType: props.data.data.cChaType,
       flag: 1,
-
       scene: "PLY_APP_NEW_SCENE",
     };
     getChaSubtypList(paramSub).then((res) => {

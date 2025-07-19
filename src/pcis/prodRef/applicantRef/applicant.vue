@@ -91,6 +91,11 @@ onMounted(() => {
         hidden: true,
         rules: null,
       });
+    }else{
+      setFormItem("Applicant.cShareholderName", { rules: [getRules("required", {})] });
+      setFormItem("Applicant.cShareholderCode", { rules: [getRules("required", {})] });
+      setFormItem("Applicant.cShareholderNature", { rules: [getRules("required", {})] });
+      setFormItem("Applicant.cShareholderCategory", { rules: [getRules("required", {})] });
     }
 
     // 处理邮编
