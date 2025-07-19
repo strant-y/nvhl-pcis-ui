@@ -247,7 +247,7 @@ const method = {
   },
   //条款类型change
   cClauseTypeChange:(val, row)=>{
-    setOptions("ECargoTerm.cClauseName", row._dataId, "TERM_LIST_02", { cProdNo:  row['ECargoTerm.cProdNo'], cRdrTyp: val });
+    setOptions("ECargoTerm.cClauseName", row._dataId, row['ECargoTerm.cClauseType'] === '0' ? "TERM_LIST_02" : "TERM_LIST_EX", { cProdNo:  row['ECargoTerm.cProdNo'], cRdrTyp: val });
   },
   //条款名称选择change
   cClauseChange:(val, row)=>{
@@ -258,7 +258,7 @@ const method = {
     if (!value || !rowData || !config || !itemRef) return;
     const cProdNo = rowData['ECargoTerm.cProdNo'];
     const cClauseType = rowData['ECargoTerm.cClauseType'];
-    setOptions("ECargoTerm.cClauseName", rowData._dataId, "TERM_LIST_02", { cProdNo: cProdNo, cRdrTyp: cClauseType });
+    setOptions("ECargoTerm.cClauseName", rowData._dataId, cClauseType === '0' ? "TERM_LIST_02" : "TERM_LIST_EX", { cProdNo: cProdNo, cRdrTyp: cClauseType });
     setOptions("ECargoTerm.cRiskNo", rowData._dataId, "RISK_LIST_02", { "cTermNo": value});
   },
   // 责任初始化事件
