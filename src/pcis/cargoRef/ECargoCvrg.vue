@@ -74,7 +74,27 @@ onMounted(() => {
       color: '#999'
     },
     click: () => {
-      method.addGroup()
+      ElMessageBox.prompt('','请输入组名', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        inputValidator: (value: string) => {
+          if (!value || value.length < 2) {
+            return '长度不小于2'
+          }else{
+            const list = [...getFormValue()];
+            const f = list.filter((item: any) => item['ECargoTerm.cGroupIdx'] === value);
+            if(f && f.length > 0) {
+              return '组名已存在'
+            }
+          }
+          return true
+        },
+        distinguishCancelAndClose: true // 区分取消和关闭
+      }).then(({ value }) => {
+        addGroup(value)
+      }).catch(() => {
+
+      });
     }
   };
   Object.assign(formconfig1, formconfig11);
@@ -131,31 +151,6 @@ const method = {
   },
   cPremExchCdeChange:(val:any,row:any)=>{
     val === '1' ? cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.nFeeRate", 'disabled', true) :cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.nFeeRate", 'disabled', false)
-  },
-  addGroup: () => {
-    cvrgEditRef?.value?.addRow();
-    const val = getFormValue();
-    const getGroupIdx = () => {
-      const bottomRow = val[val.length -2]
-      if(bottomRow && bottomRow['ECargoTerm.cGroupIdx']) {
-        const str = bottomRow['ECargoTerm.cGroupIdx'].replace('组', '');
-        return `组${(Number.parseInt(str) + 1)}` ;
-      }else {
-        return '组1'
-      }
-    }
-    nextTick(()=>{
-      val[val.length -1]['ECargoTerm.cAmountCurrency'] = 'CNY'
-      val[val.length -1]['ECargoTerm.cFeeCurrency'] = 'CNY'
-      val[val.length -1]['ECargoTerm.nOriginalRate'] = "1.000000"
-      val[val.length -1]['ECargoTerm.nFeeRate'] = "1.000000"
-      val[val.length -1]['ECargoTerm.cInsExchCde'] = "1"
-      val[val.length -1]['ECargoTerm.cPremExchCde'] = "1"
-      val[val.length -1]['ECargoTerm.cGroupIdx'] = getGroupIdx()
-      val[val.length -1]['ECargoTerm.nSeqNo'] = val.length;
-      cvrgEditRef.value?.setFormSchema(val[val.length -1]._dataId, "ECargoTerm.nOriginalRate", 'disabled', true)
-      cvrgEditRef.value?.setFormSchema(val[val.length -1]._dataId, "ECargoTerm.nFeeRate", 'disabled', true)
-    });
   },
   funcCvrgCargoDel: () => {
     const selData = cvrgEditRef?.value?.getSelectRow()
@@ -363,14 +358,7 @@ const method = {
             // 替换数据
             const index = list.findIndex((f: any) => atGroupIdxList[0]['_dataId'] === f['_dataId']);
             list.splice(index, atGroupIdxList.length, ...addList);
-            // 排序 保证合并单元格的规则正常进行
-            list.sort((x, y) => {
-              if (x.cGroupIdx !== y.cGroupIdx) {
-                return x.cGroupIdx - y.cGroupIdx;  // 先按 groupIdx 升序
-              }
-              return x.cClauseType - y.cClauseType;
-            })
-            setFormValue(list)
+            setFormValue(listSort(list))
           },
         },
         { title: "添加条款", width: 85 }
@@ -397,6 +385,14 @@ function setOptions(key: string, rowId: string, codeListName: string, codeListPa
   });
 }
 
+const addGroup = (groupIdx: string) => {
+  const list = [...getFormValue()];
+  const addRow = buildRow({
+    cGroupIdx: groupIdx
+  });
+  list.push(addRow);
+  setFormValue(listSort(list));
+};
 
 const buildRow = (data: any) => {
   const res: any = {};
@@ -412,6 +408,19 @@ const buildRow = (data: any) => {
   res['ECargoTerm.cGroupIdx'] = data.cGroupIdx
   res['ECargoTerm.cRiskNo'] = data.cRiskNo
   return res;
+};
+
+const listSort = (list: any[]) => {
+  // 创建比较器提高性能（特别对大数组）
+  const collator = new Intl.Collator('zh-CN');
+  // 排序 保证合并单元格的规则正常进行
+  return list.sort((x, y) => {
+    const groupCompare = collator.compare(x['ECargoTerm.cGroupIdx'], y['ECargoTerm.cGroupIdx'])
+    if(groupCompare !== 0) {
+      return 1;
+    }
+    return Number(x['ECargoTerm.cClauseType']) - Number(y['ECargoTerm.cClauseType'])
+  })
 };
 
 // 计算合并行数
@@ -444,11 +453,11 @@ const calculateSpans = (key: string, expandRowKeys: string[]) => {
       } else if(key === 'cGroupIdx'){
         mergedAction(isMerged('ECargoTerm.cGroupIdx', item, list[index - 1]), index)
       } else if(key === 'cProdNo'){
-        mergedAction(isMerged('ECargoTerm.cProdNo', item, list[index - 1]), index)
+        mergedAction(isMerged('ECargoTerm.cProdNo', item, list[index - 1], item['ECargoTerm.cGroupIdx'] === list[index - 1]['ECargoTerm.cGroupIdx']), index)
       }else if(key === 'cClauseType'){
         mergedAction(isMerged('ECargoTerm.cClauseType', item, list[index - 1], item['ECargoTerm.cGroupIdx'] === list[index - 1]['ECargoTerm.cGroupIdx']), index)
       }else if(key === 'cClauseName'){
-        mergedAction(isMerged('ECargoTerm.cClauseName', item, list[index - 1], item['ECargoTerm.cGroupIdx'] === list[index - 1]['ECargoTerm.cGroupIdx']), index)
+        mergedAction(isMerged('ECargoTerm.cClauseName', item, list[index - 1], item['ECargoTerm.cGroupIdx'] === list[index - 1]['ECargoTerm.cGroupIdx'] && item['ECargoTerm.cClauseType'] === list[index - 1]['ECargoTerm.cClauseType']), index)
       }
     })
   }
@@ -481,7 +490,7 @@ const spanMethod = (obj: any, expandRowKeys: string[]) => {
  */
 const currentChange = (currentRow: any, oldCurrentRow: any) => {
   const list = getFormValue();
-  setFormValue(list)
+  setFormValue(listSort(list))
 }
 
 // 绑定特殊验证器
