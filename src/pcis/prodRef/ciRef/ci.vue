@@ -199,7 +199,9 @@ const method = {
             freeEditRef.value?.setRowFieldProp(
                   rowData._dataId, "Ci.cBrkSlsCde", "disabled", true
               );
-            
+            freeEditRef.value?.setRowFieldProp(
+                  rowData._dataId, "Ci.cSlsCde", "rules", [getRules("required", {})]
+              );
             // const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
             // rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
             // rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
@@ -224,6 +226,9 @@ const method = {
           freeEditRef.value?.setRowFieldProp(
                   rowData._dataId, "Ci.cBrkSlsCde", "disabled", false
           );
+          freeEditRef.value?.setRowFieldProp(
+                  rowData._dataId, "Ci.cSlsCde", "rules", []
+              );
           const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
           rowItem['Ci.cSlsCde']['btnItems'].disabled = false;
           rowItem['Ci.cBrkrCde']['btnItems'].disabled = false;
@@ -277,7 +282,7 @@ const method = {
           freeEditRef.value?.setRowFieldProp(
                 rowData._dataId, "Ci.cBrkSlsCde", "disabled", true
             );
-          // freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cSlsCde","rules",[])
+          freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cSlsCde","rules",[getRules("required", {})])
           const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
           rowItem['Ci.cSlsCde']['btnItems'].disabled = false;
           rowItem['Ci.cBrkrCde']['btnItems'].disabled = false;
@@ -756,6 +761,8 @@ const updateMasterAgreementValues = () => {
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm", totalPrm.toFixed(2)); //联保总保费
       // opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntAmt", totalAmt.toFixed(2));  //共保总保额
       // opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntPrm", totalPrm.toFixed(2));  //共保总保费
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiOwnAmt", totalAmt.toFixed(2));  //我司分额保额
+      opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiOwnPrm", totalPrm.toFixed(2));  //我司份额保费
       opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnAmt", totalAmt.toFixed(2));  //我司分额保额
       opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnPrm", totalPrm.toFixed(2));  //我司份额保费
     }
@@ -889,21 +896,20 @@ const valideRequired = ()=>{
   const cBsnsTyp = opertaor.getTableRefByKey('plyBase').getValue('Base.cBsnsTyp')
   const rowItems = getFromValue()
   for(const rowData of rowItems){
-    if((cBsnsTyp !=null || cBsnsTyp !='') && cBsnsTyp == '19001'){
+    if(cBsnsTyp == '19001' && rowItems['Ci.cCoinsurerCde'] =='327001'){
         // rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
         // rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
         // rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
-        freeEditRef.value?.setRowFieldProp(
+          freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.cSlsCde", "rules", [getRules("required", {})]
-        );
-        freeEditRef.value?.setRowFieldProp(
+          );
+          freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.cBrkrCde", "rules", []
-        );
-        freeEditRef.value?.setRowFieldProp(
-            rowData._dataId, "Ci.cBrkSlsCde", "rules", []
-        );
-      }else if(cBsnsTyp == '19002' || cBsnsTyp == '19003'){
-        
+          );
+          freeEditRef.value?.setRowFieldProp(
+              rowData._dataId, "Ci.cBrkSlsCde", "rules", []
+          );
+      }else if((cBsnsTyp == '19002' || cBsnsTyp == '19003') && rowItems['Ci.cCoinsurerCde'] =='327001'){
         freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.cBrkrCde", "rules", [getRules("required", {})]
         );
@@ -914,7 +920,6 @@ const valideRequired = ()=>{
             rowData._dataId, "Ci.cBrkSlsCde", "rules", [getRules("required", {})]
         );
       }
-
   }
 }
 /**
