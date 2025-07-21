@@ -424,9 +424,6 @@ const method = {
   },
   //导出
   exportExcel: () => {
-
-    console.log(getTableData())
-    return false
     let paramitem  = Object.assign(formconfig1.value, {
       cComponentTable: cComponentTableValue,
     });
