@@ -277,10 +277,10 @@ const method = {
           freeEditRef.value?.setRowFieldProp(
                 rowData._dataId, "Ci.cBrkSlsCde", "disabled", true
             );
-          // const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
-          // rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
-          // rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
-          // rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
+          const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+          rowItem['Ci.cSlsCde']['btnItems'].disabled = false;
+          rowItem['Ci.cBrkrCde']['btnItems'].disabled = false;
+          rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = false;
         })
         
         if (plyBasedata["Base.cCiMrk"] === "3" || plyBasedata["Base.cCiMrk"] === "4") {
@@ -310,10 +310,11 @@ const method = {
         freeEditRef.value?.setRowFieldProp(
                 rowData._dataId, "Ci.cBrkSlsCde", "disabled", false
         );
-        // const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
-        // rowItem['Ci.cSlsCde']['btnItems'].disabled = false;
-        // rowItem['Ci.cBrkrCde']['btnItems'].disabled = false;
-        // rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = false;
+        debugger
+        const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+        rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
+        rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
+        rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
       freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "1");
       freeEditRef.value?.setValueByRowKey("Ci.cDptCde", rowId, "");
     }
@@ -887,15 +888,11 @@ const initCiInfo = (data: any) => {
 const valideRequired = ()=>{
   const cBsnsTyp = opertaor.getTableRefByKey('plyBase').getValue('Base.cBsnsTyp')
   const rowItems = getFromValue()
-  console.log("rowItems",rowItems)
-  // rowItems.forEach(rowdata => {
-    
-  // });
   for(const rowData of rowItems){
     if((cBsnsTyp !=null || cBsnsTyp !='') && cBsnsTyp == '19001'){
-          // rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
-          // rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
-          // rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
+        // rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
+        // rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
+        // rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
         freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.cSlsCde", "rules", [getRules("required", {})]
         );
