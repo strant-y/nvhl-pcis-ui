@@ -841,17 +841,18 @@ function exChangeFunc() {
   }
   // 045001个性化配置
   if (pageparam.cProdNo === "045001") {
+    console.log(data["tgt"]);
     if(data["tgt"]["Tgt.cInsuranceMethod"] && data["tgt"]["Tgt.cInsuranceMethod"] !== '613001'){
       const term = termFactormap.value.filter(
-        (r) => r["prop"] !== "Term.nRateVal" && r["prop"] !== "Term.nInsuranceFee" && r["prop"] !== "Term.nPersonPremium"
+        (r) => r["prop"] !== "Term.nPersonPremium"
       );
-      const ex = termFactormap.value.filter(
-        (r) =>
-          r["prop"] === "Term.nRateVal" || r["prop"] === "Term.nInsuranceFee"
-      );
+      // const ex = termFactormap.value.filter(
+      //   (r) =>
+      //     r["prop"] === "Term.nRateVal" || r["prop"] === "Term.nInsuranceFee"
+      // );
 
       termFactormap.value = term;
-      extermConf.value = ex;
+      // extermConf.value = ex;
     }else{
       const term = termFactormap.value.filter(
         (r) => r["prop"] !== "Term.nRateVal" 
