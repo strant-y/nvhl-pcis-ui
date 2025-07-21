@@ -140,6 +140,9 @@ function delRow(editIndex: any) {
 function addRowByData(data: any) {
   rttableFrom.value?.addRowByData(data);
 }
+function spliceTableData(index: number, delCount: number, list: any[]) {
+  rttableFrom.value?.spliceTableData(index, delCount, list);
+}
 
 function setDisabledAll(isDisabled: boolean = true) {
   if (
@@ -227,7 +230,8 @@ defineExpose({
   getCodeListMap,
   setCodeListMap,
   addCodeListMap,
-  getRowAllItemRefById
+  getRowAllItemRefById,
+  spliceTableData
 });
 </script>
 
