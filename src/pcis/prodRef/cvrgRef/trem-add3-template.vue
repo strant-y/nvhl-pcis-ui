@@ -7,7 +7,7 @@
           <th v-for="(item, k) in formcof" :key="k" :style="{width: item.width?item.width+'px':null}">
             {{ item.title + (k === 'nMainRate' ? item.suffix : '') }}
           </th>
-          <th v-if="checkShowBtn" style="width: 100px">操作</th>
+          <th style="width: 100px">操作</th>
         </tr>
       </thead>
       <tbody>
@@ -18,12 +18,12 @@
           <td v-for="(it, kk) in formcof" :key="kk">
             <from-item
               v-model="item['Term.'+kk]"
-              :item="it"
+              :item="getterm(it,item)"
             />
           </td>
-          <td v-if="checkShowBtn" >
+          <td>
             <rtButton
-              v-if="!btnConf.delete.hidden"
+              v-if="checkShowBtn(item)"
               @click="
                 () => {
                   emit('delete', item);
@@ -43,7 +43,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { terConfig } from "@/store/modules/term-config";
 const emit = defineEmits(["update:modelValue", "delete"]);
 const opertaor = dataOpertaor();
-
+const param = opertaor.getParam();
 const terconfig = terConfig();
 
 const props = defineProps({
@@ -86,13 +86,17 @@ function setDisabledAll() {
   });
 }
 
-const checkShowBtn = computed(()=>{ 
+function checkShowBtn( data: any ){ 
   let r = true;
   Object.keys(btnConf.value).forEach((k: any) => {
     r = r && !btnConf.value[k].hidden;
   });
+  if(param.cEdrType && !data['Term.cRowId']){
+    r = true;
+  }
+  console.log(r );
   return r;
-}) ;
+};
 
 function changeBtn() { 
   Object.keys(formcof.value).forEach((k: any) => {
@@ -103,7 +107,12 @@ function changeBtn() {
   });
 }
 
-
+function getterm(it: any,termdata: any){
+  if(param.cEdrType && !termdata['Term.cRowId']){
+    it.disabled = false;
+  }
+  return it;
+}
 function setCancel(){
   props.planData['Term.cCancelMrk'] = '1';
 }

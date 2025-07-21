@@ -20,7 +20,7 @@
               (k === "nMainRate" || k === "nDeductibleRate" ? item.suffix : "")
             }}
           </th>
-          <th v-if="checkShowBtn" style="width: 100px">操作</th>
+          <th style="width: 100px">操作</th>
         </tr>
       </thead>
       <tbody>
@@ -33,12 +33,12 @@
               :prop="[k, item.prop]"
               :rules="isrequired(item) ? getRequired() : undefined"
             >
-              <from-item v-model="item['Term.' + kk]" :item="it" />
+              <from-item v-model="item['Term.' + kk]" :item="getterm(it,item)" />
             </el-form-item>
           </td>
-          <td v-if="checkShowBtn" >
+          <td>
             <rtButton
-              v-if="!btnConf.delete.hidden"
+              v-if="checkShowBtn(item)"
               @click="
                 () => {
                   emit('delete', item);
@@ -191,6 +191,13 @@ function isdisabled(i: any) {
   return false;
 }
 
+function getterm(it: any,termdata: any){
+  if(param.cEdrType && !termdata['Term.cRowId']){
+    it.disabled = false;
+  }
+  return it;
+}
+
 function dataInit() {}
 
 function dataFlash() {}
@@ -198,15 +205,19 @@ function dataFlash() {}
 function setCancel() {
   props.planData["Term.cCancelMrk"] = "1";
 }
-const checkShowBtn = computed(()=>{ 
+function checkShowBtn( data: any ){ 
   let r = true;
   Object.keys(btnConf.value).forEach((k: any) => {
     r = r && !btnConf.value[k].hidden;
   });
+  if(param.cEdrType && !data['Term.cRowId']){
+    r = true;
+  }
+  console.log(r );
   return r;
-}) ;
+};
 
-function changeBtn() { 
+function changeBtn() {
   Object.keys(formcof.value).forEach((k: any) => {
     formcof.value[k].disabled = props.disabledFlag;
   });
