@@ -3548,8 +3548,13 @@ opertaor.setFatherPage({
   getcacheKey: getcacheKey,
   setTmDay: setTmDay,
   setnDelayNum: setnDelayNum,
-  getSaveDataParams: getSaveDataParams
+  getSaveDataParams: getSaveDataParams,
+  getEdrbaseValue: getEdrbaseValue
 });
+
+function getEdrbaseValue(key:any) {
+  return edrbase.value
+}
 
 // 保存模板
 function handleSaveTemplate() {
