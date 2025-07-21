@@ -380,17 +380,23 @@ const method = {
               "Base.cCertfNo": params.CCtfctNo, //代理业务执业证号
               "Base.cBrkrDptcde": params.CDptCde, //代理业务员机构代码
             });
-
-                   setFormItem("Base.cBrkSlsCde", {
-                    loadData: [
-                      {
-                        value:  params["CSlsCde"],
-                        label:params["CSlsCde"] + params['CSlsNme'],
-                      },
-                    ],
-                  });
-                  setValue("Base.cBrkSlsCde", params.CSlsCde);
-            
+              setFormItem("Base.cBrkSlsCde", {
+              loadData: [
+                {
+                  value:  params["CSlsCde"],
+                  label:params["CSlsCde"] + params['CSlsNme'],
+                },
+              ],
+            });
+            const ciRef = opertaor.getTableRefs()['ci'];
+            if (!!ciRef) {
+              ciRef.initProxySales({
+                cSlsId: params.CSlsCde, //业务员员工号
+                cSlsNme: params.CSlsNme, //业务员名称
+                loadData:{value:  params["CSlsCde"],label:params["CSlsCde"] + params['CSlsNme']},
+              });
+            }
+            setValue("Base.cBrkSlsCde", params.CSlsCde);
             dialogRef.value?.handleClose();
           },
         },

@@ -1219,6 +1219,21 @@ async function loadAfter() {
       }
     } else if (props.param.cAppTyp == "A") {
       bthList.value = basicBtn;
+			if(props.param?.pageName === "priceInquiry") {
+				bthList.value.push(
+					createFreeButtonBase({
+						label: "发起风勘",
+						type: "primary",
+						func: () => {
+							if (getNo.value == '暂无') {
+								ElMessage.error('询价单号为空,请保存后操作!');
+								return false;
+							}
+							startWindExploration(); 
+						},
+					}),
+				)
+			}
     }
   } else if (props.param.pageType === "PLY_APP_MODIFY_BOUNCED_SCENE") {
     // 投保单核保退回
@@ -2430,7 +2445,9 @@ const submitToUndrFn = async () => {
           const newOp: any = opertaor.convertData(calcres);
           const newPrm = newOp.base["Base.nPrm"];
           const oldPrm = calcData.base["Base.nPrm"];
-          if (newPrm === oldPrm) {
+          const newAmt = newOp.base["Base.nAmt"];
+          const oldAmt = calcData.base["Base.nAmt"];
+          if (newPrm === oldPrm && newAmt === oldAmt) {
             const undr: any = props.param?.pageName === "priceInquiry" ? await submitInquiry(res) : await submitToUndr(res);
             btn.loading = false;
             console.log("submitToUndr-res", undr);
@@ -2490,7 +2507,7 @@ const submitToUndrFn = async () => {
             }
           } else {
             needCalc.value = true;
-            ElMessage.error("保费发生变化,请重新进行保费计算!");
+            ElMessage.error("保额或保费发生变化,请重新进行保费计算!");
           }
         }
       } catch (err) {
@@ -3315,6 +3332,7 @@ const submitUnderwritingFn = async () => {
  * 投保申请核保时校验联共保信息
  */
 const validateCiInfo = () => {
+  const targetNPrm = parseFloat(nPrm.value) || 0; //当前保单总保费
   const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue()['Base.cCiMrk']
   const ciData = opertaor.getTableRefByKey("ci").getFromValue()
   if (ciData.length > 0) {
@@ -3322,6 +3340,7 @@ const validateCiInfo = () => {
       let chiefMrkM = 0; // 主
       let chiefMrkS = 0; // 从
       let CCoinsurerCdeNum = 0; // 分公司份额
+      let cNciprmCount = 0;  //所有保司保费总额
       for (const ciRow of ciData) {
         if (ciRow) {
           NCiShare = numAdd(NCiShare, parseFloat(ciRow["Ci.nCiShare"] || 0));
@@ -3333,7 +3352,18 @@ const validateCiInfo = () => {
           } else {
             chiefMrkS++;
           }
+          if(ciRow['Ci.nCiPrm'] !=''){
+            cNciprmCount = numAdd(cNciprmCount, parseFloat(ciRow['Ci.nCiPrm'])); // 累加每一行的 Ci.nCiPrm 值
+          }
         }
+      }
+      // 计算差值
+      const difference = targetNPrm - cNciprmCount;
+      if (Math.abs(difference) > 0 && ciData.length > 0) {
+        // 将差值追加到最后一行对象的 Ci.nCiPrm 上
+        const lastRow = ciData[ciData.length - 1];
+        lastRow['Ci.nCiPrm'] = parseFloat(ciData[ciData.length - 1]['Ci.nCiPrm']) + parseFloat(difference.toFixed(2));
+        console.log("lastRow['Ci.nCiPrm']",lastRow['Ci.nCiPrm'])
       }
       if (chiefMrkM === 0 || chiefMrkS === 0) {
         // ElMessage.error("主/从共保信息不完整!");

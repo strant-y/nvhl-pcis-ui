@@ -50,6 +50,7 @@ export interface AppGridEditMethod {
   setCodeListMap: (map: any) => void;
   addCodeListMap: (data: any) => void;
   getRowAllItemRefById: (rowId: string) => any;
+  spliceTableData: (index: number, delCount: number, list: any[]) => any[];
 }
 
 export function createAppGridEditConfig(

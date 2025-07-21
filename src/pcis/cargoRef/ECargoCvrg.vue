@@ -358,8 +358,7 @@ const method = {
             const list: any[] = [...getFormValue()];
             // 替换数据
             const index = list.findIndex((f: any) => atGroupIdxList[0]['_dataId'] === f['_dataId']);
-            list.splice(index, atGroupIdxList.length, ...addList);
-            setFormValue(listSort(list))
+            cvrgEditRef.value?.spliceTableData(index, atGroupIdxList.length, listSort(addList));
           },
         },
         { title: "添加条款", width: 85 }

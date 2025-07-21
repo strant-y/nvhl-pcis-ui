@@ -665,6 +665,31 @@ function addRowByData(data: any) {
   editIndex.value = rowId;
 }
 
+function spliceTableData(index: number, delCount: number, list: any[]) {
+  const addNum = !!list ? list.length : 0;
+  if(addNum > 0) {
+    const keys = Object.keys(formItems.value);
+    for (let i = 0; i < addNum; i ++) {
+      const rowData = list[i];
+      const nextIdx = index + i;
+      const delNum = i < delCount ? 1 : 0;
+      if(rowData['_dataId'] && keys.includes(rowData['_dataId'])) {
+        // 行id已存在直接替换数据
+        tableDatas.value?.splice(nextIdx, delNum, rowData);
+      } else {
+        const rowId = getuuid();
+        rowData['_dataId'] = rowId;
+        tableDatas.value?.splice(nextIdx, delNum, rowData);
+        formItems.value[rowId] = creatItem(schamaconf.value);
+      }
+    }
+  }
+  if(delCount > addNum) {
+    tableDatas.value?.splice(index + addNum, delCount - addNum);
+  }
+  return tableDatas.value;
+}
+
 function getSelectRow() {
   const sele = tableDatas.value?.find((item) => {
     if (item._dataId === editIndex.value) {
@@ -798,6 +823,7 @@ defineExpose({
   clearSelection,
   toggleRowSelection,
   setRowFieldProp,
+  spliceTableData,
   // getItemsRowId
 });
 function isrequired(i: any) {
