@@ -59,15 +59,15 @@ const formconfig1 = ref<AppFreeEditConfig>(
         type: "primary",
         label: "确定",
         func: async () => {
-          const isValid = await freeEditRef.value?.validate();
-          if(isValid){
+          // const isValid = await freeEditRef.value?.validate();
+          // if(isValid){
             const s = freeEditRef.value?.getFromValue();
             if(typeof props.method.isOk == 'function'){
               props.method.isOk(s);
               emits("handleClose");
               return;
             }
-          }
+          // }
         },
       }),
       createFreeButtonBase({
