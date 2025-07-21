@@ -2430,7 +2430,9 @@ const submitToUndrFn = async () => {
           const newOp: any = opertaor.convertData(calcres);
           const newPrm = newOp.base["Base.nPrm"];
           const oldPrm = calcData.base["Base.nPrm"];
-          if (newPrm === oldPrm) {
+          const newAmt = newOp.base["Base.nAmt"];
+          const oldAmt = calcData.base["Base.nAmt"];
+          if (newPrm === oldPrm && newAmt === oldAmt) {
             const undr: any = props.param?.pageName === "priceInquiry" ? await submitInquiry(res) : await submitToUndr(res);
             btn.loading = false;
             console.log("submitToUndr-res", undr);
@@ -2490,7 +2492,7 @@ const submitToUndrFn = async () => {
             }
           } else {
             needCalc.value = true;
-            ElMessage.error("保费发生变化,请重新进行保费计算!");
+            ElMessage.error("保额或保费发生变化,请重新进行保费计算!");
           }
         }
       } catch (err) {
