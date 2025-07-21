@@ -895,8 +895,9 @@ const initCiInfo = (data: any) => {
 const valideRequired = ()=>{
   const cBsnsTyp = opertaor.getTableRefByKey('plyBase').getValue('Base.cBsnsTyp')
   const rowItems = getFromValue()
+  debugger
   for(const rowData of rowItems){
-    if(cBsnsTyp == '19001' && rowItems['Ci.cCoinsurerCde'] =='327001'){
+    if(cBsnsTyp == '19001' && rowData['Ci.cCoinsurerCde'] =='327001'){
         // rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
         // rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
         // rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
@@ -909,7 +910,7 @@ const valideRequired = ()=>{
           freeEditRef.value?.setRowFieldProp(
               rowData._dataId, "Ci.cBrkSlsCde", "rules", []
           );
-      }else if((cBsnsTyp == '19002' || cBsnsTyp == '19003') && rowItems['Ci.cCoinsurerCde'] =='327001'){
+      }else if((cBsnsTyp == '19002' || cBsnsTyp == '19003') && rowData['Ci.cCoinsurerCde'] =='327001'){
         freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.cBrkrCde", "rules", [getRules("required", {})]
         );
@@ -949,6 +950,30 @@ const initcbusiner = (row:any) =>{
     freeEditRef.value?.addCodeListMap({
       code:'Ci.cSlsCde'+rowId,
       list:row.loadData,
+    })
+  }
+}
+//更新代理业务员选中值到联共保代理业务员
+const initProxySales = (row:any)=>{
+  const rowData = getFromValue()
+  if(rowData.length>0){
+    const rowId = rowData[0]._dataId;
+    setValueByRowKey('Ci.cBrkSlsCde',rowId,row.cBrkSlsCde)
+    freeEditRef.value?.addCodeListMap({
+      code:'Ci.cBrkSlsCde'+rowId,
+      list:row.loadData,
+    })
+  }
+}
+//更新代理经纪人选中值到联共保代理经纪人
+const intiAgentBroker = (any:any)=>{
+  const rowData = getFromValue()
+  if(rowData.length>0){
+    const rowId = rowData[0]._dataId;
+    setValueByRowKey('Ci.cBrkrCde',rowId,row.cBrkrCde);
+    freeEditRef.value?.addCodeListMap({
+      code:'Ci.cBrkrCde'+rowId,
+      list:rowData.loadData,
     })
   }
 }
@@ -995,6 +1020,8 @@ defineExpose({
   setRowFieldProp,
   initCiInfo,
   initcbusiner,
+  initProxySales,
+  intiAgentBroker,
 });
 </script>
 
