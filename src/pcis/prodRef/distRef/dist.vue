@@ -256,9 +256,12 @@ const method = {
   //  042003 根据电梯条数反
   funcdistadd: () => {
     const alldata: any = opertaor.getDataAll();
+    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
     const param = {};
     if(route.params.param?.pageName === "priceInquiry") {
       param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else if (route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
+      param['cAppNo'] = edrbase.getFromValue()["EdrBase.cAppNo"]
     } else {
       param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
     }
@@ -421,9 +424,6 @@ const method = {
   },
   //导出
   exportExcel: () => {
-
-    console.log(getTableData())
-    return false
     let paramitem  = Object.assign(formconfig1.value, {
       cComponentTable: cComponentTableValue,
     });

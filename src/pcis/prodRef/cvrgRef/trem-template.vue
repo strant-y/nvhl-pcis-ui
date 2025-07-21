@@ -448,10 +448,6 @@ function initData(data: any) {
     ) {
       termRef.value?.setFormValue(termdata.value, true);
     }
-    // 解决组件初始化时是否统扯保费反显为是的时候医生每人保费、护士/医技人员每人保费没有置灰
-    if(newData['Term.cUnifiedPremium']) {
-      methodMap.unifiedPremiumChange(newData['Term.cUnifiedPremium'])
-    }
   });
 }
 
@@ -717,6 +713,10 @@ function dataInit() {
     if (props.disabledFlag) {
       setDisabledAll();
     }
+    // 解决组件初始化时是否统扯保费反显为是的时候医生每人保费、护士/医技人员每人保费没有置灰
+    if(termdata.value['Term.cUnifiedPremium']) {
+      methodMap.unifiedPremiumChange(termdata.value['Term.cUnifiedPremium'])
+    }
   } else {
     getTRFactorJson(param).then((res: any) => {
       const { code, data, msg } = res;
@@ -752,6 +752,10 @@ function dataInit() {
       }
       if (props.disabledFlag) {
         setDisabledAll();
+      }
+      // 解决组件初始化时是否统扯保费反显为是的时候医生每人保费、护士/医技人员每人保费没有置灰
+      if(termdata.value['Term.cUnifiedPremium']) {
+        methodMap.unifiedPremiumChange(termdata.value['Term.cUnifiedPremium'])
       }
     });
   }
