@@ -312,6 +312,7 @@ import {
   getInquiryPolicy,
 	getisAllDone,
 	isUndrClsBlackList,
+  queryTermRateLimit,
 } from "../../../api/query/index";
 import { checkFeeWindowType, selectDist, saveDistBatch, getReleaseInquiryPage } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
@@ -722,7 +723,8 @@ const basicBtn = [
     type: "primary",
     id: "btn010101",
     func: () => {
-      calcPremium();
+      // calcPremium()
+      queryTermRateLimitFun(calcPremium)
     },
   }),
   createFreeButtonBase({
@@ -798,7 +800,8 @@ const edrBtn = [
     type: "primary",
     id: "btnCalEdr",
     func: () => {
-      calcPremiumEdr();
+      // calcPremiumEdr();
+      queryTermRateLimitFun(calcPremiumEdr)
     },
   }),
   createFreeButtonBase({
@@ -837,7 +840,8 @@ const edrSurrenderBtn = [
     label: "保费计算",
     type: "primary",
     func: () => {
-      calcPremiumEdrSurrender();
+      // calcPremiumEdrSurrender();
+      queryTermRateLimitFun(calcPremiumEdrSurrender)
     },
   }),
   createFreeButtonBase({
@@ -1158,7 +1162,8 @@ async function loadAfter() {
           type: "primary",
           id: "btn010101",
           func: () => {
-            calcPremium();
+            // calcPremium();
+            queryTermRateLimitFun(calcPremium)
           },
         }),
         createFreeButtonBase({
@@ -1420,7 +1425,8 @@ async function loadAfter() {
         type: "primary",
         id: "btn010101",
         func: () => {
-          calcPremium();
+          // calcPremium();
+          queryTermRateLimitFun(calcPremium)
         },
       }),
       createFreeButtonBase({
@@ -1548,7 +1554,8 @@ async function loadAfter() {
         type: "primary",
         id: "btn010101",
         func: () => {
-          calcPremium();
+          // calcPremium();
+          queryTermRateLimitFun(calcPremium)
         },
       }),
       createFreeButtonBase({
@@ -1681,7 +1688,8 @@ async function loadAfter() {
         type: "primary",
         id: "btn010101",
         func: () => {
-          calcPremium();
+          // calcPremium();
+          queryTermRateLimitFun(calcPremium)
         },
       }),
       createFreeButtonBase({
@@ -3738,6 +3746,57 @@ function clearCAppNo(res:any) {
     res = null
   }
   return res;
+}
+
+
+/**
+ * 保费计算前校验费率上限
+ */
+const queryTermRateLimitFun = (calcFun: any) => {
+  const res = opertaor.getDataAll();
+  res["user"] = user;
+  debugger
+  // 批改:注销退保保费计算
+  if(calcFun === calcPremiumEdrSurrender) {
+    res["EdrBase"] = edrbase.value?.getFromValue();
+    if (
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"] != ""
+    ) {
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
+        res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+    }
+  } else if(calcFun === calcPremium) {
+    res["plyBase"]["Base.cDptCde"] = props.param?.cDptCde;
+    res["plyBase"]["Base.cProdNo"] = props.param?.cProdNo;
+  } else if(calcFun === calcPremiumEdr) { // 批改单保费计算
+    res["plyBase"]["Base.cDptCde"] = props.param?.cDptCde;
+    res["plyBase"]["Base.cProdNo"] = props.param?.cProdNo;
+    res["EdrBase"] = edrbase.value?.getFromValue();
+    if (
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"] != ""
+    ) {
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
+        res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+    }
+  }
+  queryTermRateLimit(res).then((r:any) => {
+    if(r.code === 200) {
+      calcFun()
+    } else if(r.msg || r.message) {
+      ElMessageBox.confirm(r.msg || r.message, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+        lockScroll: false,
+      }).then(() => {
+        calcFun()
+      })
+    }
+  }).catch((err:any) => {
+    ElMessage.error(err)
+  })
 }
 </script>
 
