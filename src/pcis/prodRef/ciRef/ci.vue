@@ -277,6 +277,7 @@ const method = {
           freeEditRef.value?.setRowFieldProp(
                 rowData._dataId, "Ci.cBrkSlsCde", "disabled", true
             );
+          // freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cSlsCde","rules",[])
           const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
           rowItem['Ci.cSlsCde']['btnItems'].disabled = false;
           rowItem['Ci.cBrkrCde']['btnItems'].disabled = false;
@@ -310,7 +311,7 @@ const method = {
         freeEditRef.value?.setRowFieldProp(
                 rowData._dataId, "Ci.cBrkSlsCde", "disabled", false
         );
-        debugger
+        freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cSlsCde","rules",[])
         const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
         rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
         rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
@@ -592,7 +593,6 @@ const method = {
   },
     // 开户行    CNAPS号 开户行地址
   cBankCdeChange: (val: any) => {
-    debugger
     // if (val) {
       // let backAddr = val.split('_');
       // setValue('Ci.cBankCnaps', backAddr[0])
@@ -903,7 +903,7 @@ const valideRequired = ()=>{
             rowData._dataId, "Ci.cBrkSlsCde", "rules", []
         );
       }else if(cBsnsTyp == '19002' || cBsnsTyp == '19003'){
-        debugger
+        
         freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.cBrkrCde", "rules", [getRules("required", {})]
         );
