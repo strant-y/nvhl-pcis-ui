@@ -2,6 +2,31 @@
   <app-free-edit :freeEditConfig="formconfig1" ref="insuredEditRef" />
   <comDialog ref="dialog"></comDialog>
   <input type="file" ref="fileInputRef" style="display: none" @change="handleFileChange" />
+	<el-dialog v-model="maindialogVisible" title="OCR识别">
+    <el-form
+        :model="formconfig"
+        label-width="180px"
+        :inline="true"
+      >
+				<el-form-item
+					label="OCR识别类型"
+					prop="fileInputType"
+					:rules="[getRules('required', {})]"
+				>
+					<el-radio-group v-model="formconfig.fileInputType">
+						<el-radio value="1">身份证</el-radio>
+						<el-radio value="2">外国人永久居留身份证</el-radio>
+						<el-radio value="3">营业执照</el-radio>
+					</el-radio-group>
+				</el-form-item>
+		</el-form>
+		<template #footer>
+      <div class="dialog-footer">
+        <el-button @click="cancel">取消</el-button>
+        <el-button type="primary" @click="ok">确认</el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
@@ -49,13 +74,16 @@ const insuredEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 // import { useRoute } from "vue-router";
 // const route = useRoute();
-const fileInputRef = ref(null);
-const fileInputType = ref();
+const fileInputRef: any = ref(null);
+const formconfig = ref({
+  fileInputType: ""
+});
 import { readFile } from "@/api/file";
 import { dataParam } from "@/store/modules/dataParam";
 const user = JSON.parse(sessionStorage.getItem("user"));
 const tCertfDate = ref<any[]>([]);
 const  cWorkDptList =['310','320','330','340','350','360']  // 单位性质带企业的ID
+const maindialogVisible = ref(false) // ocr识别弹框打开
 
 onMounted(() => {
   const formconfig11 = formInit(
@@ -1050,13 +1078,14 @@ const method = {
   },
   // 读取身份证
   readIdCard: (val: any) => {
-    fileInputRef.value?.click();
-    fileInputType.value = "1";
+		maindialogVisible.value = true
+    // fileInputRef.value?.click();
+    // formconfig.value.fileInputType = "1";
   },
   // 读取外国人永久居留身份证
   readGreenCard: (val: any) => {
     fileInputRef.value?.click();
-    fileInputType.value = "2";
+    formconfig.value.fileInputType = "2";
   },
     // 单位性质
   cWorkDptChange:(val:any)=>{
@@ -1221,17 +1250,17 @@ function handleFileChange(event: Event) {
     // 处理文件上传逻辑
     const param = {
       file: file,
-      type: fileInputType.value,
+      type: formconfig.value.fileInputType,
     };
     readFile(param)
       .then((res: any) => {
         if (res.code === 200 && res.data && res.data.result) {
           tCertfDate.value = [];
-          if (fileInputType.value === "1") {
+          if (formconfig.value.fileInputType === "1") {
             // 身份证
             const result = res.data.result.item_list;
             const keys = result.map((item: any) => item.key);
-            let cardInfo = {};
+            let cardInfo: any = {};
             keys.forEach((key: any) => {
               const value = result.find((item: any) => item.key === key).value;
               cardInfo[key] = value;
@@ -1272,7 +1301,7 @@ function handleFileChange(event: Event) {
               if (cardInfo["id_number"])
               idAnalysis(cardInfo["id_number"])
           }
-          if (fileInputType.value === "2") {
+          if (formconfig.value.fileInputType === "2") {
             // 外国人永久居留身份证
             const cardInfo = res.data.result.details;
             setValue(
@@ -1310,10 +1339,45 @@ function handleFileChange(event: Event) {
             setValue("Insured.cCertfCls", "19");
             setValue("Insured.cClntMrk", "1");
           }
+					if (formconfig.value.fileInputType === "3"){
+						// 营业执照
+            const result = res.data.result.item_list;
+            const keys = result.map((item: any) => item.key);
+            let cardInfo: any = {};
+            keys.forEach((key: any) => {
+              const value = result.find((item: any) => item.key === key).value;
+              cardInfo[key] = value;
+            });
+            console.log('营业执照’，',cardInfo )
+            if (cardInfo["BizLicenseCreditCode"])
+              setValue("Insured.cCertfCde", cardInfo["BizLicenseCreditCode"]); // // 证件号码
+            if (cardInfo["BizLicenseCompanyName"])
+              setValue("Insured.cInsuredNme", cardInfo["BizLicenseCompanyName"]); // 客户名称
+            if (cardInfo["BizLicenseOperatingPeriod"]) {
+              tCertfDate.value = cardInfo["BizLicenseOperatingPeriod"].split("至");
+              setValue(
+                "Insured.tCertfBgnDate",
+                cardInfo["BizLicenseOperatingPeriod"].split("至")[0]
+              );
+              if (cardInfo["BizLicenseOperatingPeriod"].split("至")[1] === "长期") {
+                setValue("Insured.cLongendTyp", "1");
+              } else {
+                setValue("Insured.cLongendTyp", "0");
+                setValue(
+                  "Insured.tCertfEndDate",
+                  cardInfo["BizLicenseOperatingPeriod"].split("至")[1]
+                );
+              }
+            }
+            setValue("Insured.cCertfCls", "110007");
+            setValue("Insured.cClntMrk", "0");
+					}
           checkUser();
+					 formconfig.value.fileInputType = ""
         }
       })
       .catch((err) => {
+				formconfig.value.fileInputType = ""
         ElMessage.error(err);
       });
     fileInputRef.value.value = ""; // 清空文件输入框的值
@@ -1322,12 +1386,28 @@ function handleFileChange(event: Event) {
 
 const terms = ['00425000277','00425000278','00425000279','00425000280','00425000281'];
 function change403009(v){
-if(terms.includes(v)){
+	if(terms.includes(v)){
     setValue("Tgt.cInsuranceMethod", "613001");
     setFormItem("Insured.cSafetyStandardizationLevel", { hidden: false });
     setFormItem("Insured.cCreditRating", { hidden: false });
     setFormItem("Insured.cIsLargeMediumEnterprise", { hidden: false });
   }
+}
+
+// OCR识别弹框确认
+function ok(){
+	if(formconfig.value.fileInputType == ""){
+		ElMessage.warning("请先选择OCR识别类型");
+		return false
+	}
+	maindialogVisible.value = false
+	fileInputRef.value?.click();
+}
+
+// OCR识别弹框取消
+function cancel(){
+	formconfig.value.fileInputType = ""
+	maindialogVisible.value = false
 }
 
 defineExpose({
