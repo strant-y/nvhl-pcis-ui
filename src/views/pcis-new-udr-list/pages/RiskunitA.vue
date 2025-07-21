@@ -303,13 +303,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             if(item.cPkId === selectRow1.value.cPkId) {
               item.nRetAmt = nRetLmt;
               item.cRiskLvlCde = val
-              item.cRiskLvlNme = val ? val + selectedItem?.label : ""
+              item.cRiskLvlNme = selectedItem?.label
             }
           })
           if(selectRow1.value.cPkId) {
             selectRow1.value.nRetAmt = nRetLmt
             selectRow1.value.cRiskLvlCde = val
-            selectRow1.value.cRiskLvlNme = val ? val + selectedItem?.label : ""
+            selectRow1.value.cRiskLvlNme = selectedItem?.label
           }
         },
       },
@@ -790,7 +790,7 @@ const tableconfig2 = reactive<AppTableConfig>(
         readOnly: true,
       },
       {
-        prop: "nPrpt",
+        prop: "nprpt",
         inputtype: "rtinput",
         title: "分出比例(%)",
         minWidth: 180,
@@ -1165,12 +1165,16 @@ function queryAddress() {
   }
   queryComponentCodeList(param).then((res:any) => {
     if(res.code === '1') {
-      addressOptions.value = res.data.map((item:any) => ({
-        ...item,
-        label: item.cDetailedAddress,
-        value: item.cDetailedAddress,
-      }))
-      tableconfig1.fromSchema[1].loadData = addressOptions.value
+      if(res.data && res.data.length > 0) {
+        addressOptions.value = res.data.map((item:any) => ({
+          ...item,
+          label: item.cDetailedAddress,
+          value: item.cDetailedAddress,
+        }))
+        tableconfig1.fromSchema[1].loadData = addressOptions.value
+      } else {
+        ElMessage.info(res.message)
+      }
     } else {
       ElMessage.error(res.message)
     }
@@ -1219,6 +1223,18 @@ async function checkData() {
 
 // 分保试算
 function tryCountInFoRIs(row: any) {
+  if(!row.cRiskUnitNme) {
+    ElMessage.error("风险单位名称不能为空")
+    return
+  }
+  if(!row.cRiskLvlCde) {
+    ElMessage.error("风险等级不能为空")
+    return
+  }
+  if(row.cDetailedAddress && !row.cRemarks) {
+    ElMessage.error("备注不能为空")
+    return
+  }
   pageresult2.list = [];
   const res = opertaor.getDataAll();
   const param = {
@@ -1257,22 +1273,17 @@ function tryCountInFoRIs(row: any) {
   };
   tryCountInFoRI(param)
     .then((result: any) => {
-      if (result.data) {
-        dataSet.value = result.data;
-        for (const contCed of dataSet.value) {
-          // contCed['CContCde'] = 'CP1;CS3  分出成数合约';
-          if (contCed.CContCde.indexOf(";") !== -1) {
-            const array = contCed.CContCde.split(";");
-            contCed.CContCde = array[1];
-            contCed.CContFlag = array[0];
-          }
-          pageresult2.list.push(contCed);
-        }
+      if(result.code === "1" && result.data && result.data.item) {
+        result.data.item.forEach((item:any) => {
+          Object.assign(pageresult2.list, item.value || [])
+        })
+      } else {
+        ElMessage.error(result.message)
       }
     })
     .catch((error: any) => {
       console.log("出错了", error);
-      ElMessage.error({ message: "后台服务异常,请联系管理员", duration: 3000 });
+      ElMessage.error({ message: error.message, duration: 3000 });
     });
 }
 
