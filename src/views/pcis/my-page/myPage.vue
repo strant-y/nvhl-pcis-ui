@@ -3064,6 +3064,13 @@ const saveEdrPlyInfo = async () => {
     //   );    //影响二次批改报错,先注释掉待调整
     edrbase.value?.setFormValue(EdrBaseData);
     saveEdrFlag = true;
+    // 清单列表数据
+    const distMap = formconfig1[0].pageInfo.filter((item:any) => {
+      return item.pageKey === "dist" || item.pageKey === "distSummary";
+    });
+    distMap.forEach((item:any) => {
+      getDistData(EdrBaseData['EdrBase.cAppNo'], item)
+    });
   } else {
     ElMessage.error(edrInfo.msg);
   }
