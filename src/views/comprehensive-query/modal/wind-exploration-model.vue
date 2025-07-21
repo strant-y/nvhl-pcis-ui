@@ -159,8 +159,8 @@ onMounted(() => {
 			cInquiryNumber: props.data.plyBase['Base.cInquiryNo'],
 			tSurveyStart: moment().format("YYYY-MM-DD 00:00:00"),
 			tSurveyEnd: "",
-			cRespondent: props.data.insured['Insured.cInsuredNme'] || "",
-			cRespondentPon: props.data.insured['Insured.cMobile'] || "",
+			cRespondent: props.data.insured? props.data.insured['Insured.cInsuredNme'] : "",
+			cRespondentPon: props.data.insured? props.data.insured['Insured.cMobile'] : "",
 			cNotes: "",
 		});
 	});
