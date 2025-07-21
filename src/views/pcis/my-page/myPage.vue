@@ -3079,6 +3079,13 @@ const saveEdrPlyInfo = async () => {
     //   );    //影响二次批改报错,先注释掉待调整
     edrbase.value?.setFormValue(EdrBaseData);
     saveEdrFlag = true;
+    // 清单列表数据
+    const distMap = formconfig1[0].pageInfo.filter((item:any) => {
+      return item.pageKey === "dist" || item.pageKey === "distSummary";
+    });
+    distMap.forEach((item:any) => {
+      getDistData(EdrBaseData['EdrBase.cAppNo'], item)
+    });
   } else {
     ElMessage.error(edrInfo.msg);
   }
@@ -3548,8 +3555,13 @@ opertaor.setFatherPage({
   getcacheKey: getcacheKey,
   setTmDay: setTmDay,
   setnDelayNum: setnDelayNum,
-  getSaveDataParams: getSaveDataParams
+  getSaveDataParams: getSaveDataParams,
+  getEdrbaseValue: getEdrbaseValue
 });
+
+function getEdrbaseValue(key:any) {
+  return edrbase.value
+}
 
 // 保存模板
 function handleSaveTemplate() {
