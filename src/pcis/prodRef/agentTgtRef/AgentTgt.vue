@@ -1,17 +1,15 @@
 <template>
-  <app-free-edit :freeEditConfig="formconfig1" ref="transportEditRef" />
+  <app-free-edit :freeEditConfig="formconfig1" ref="agentTgtEditRef" />
 </template>
 
 <script setup lang="ts">
-import {
-  AppFreeEditMethod,
-  createAppFreeEditConfig,
-} from "@/shared/app-free-edit-config";
-import { formInit } from "@/shared/from-init";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
+import {AppFreeEditMethod, createAppFreeEditConfig,} from "@/shared/app-free-edit-config";
+import {formInit} from "@/shared/from-init";
+import {dataOpertaor} from "@/store/modules/data-opertaor";
+import {useProductStore} from "@/store/modules/prod";
+import {useValidator} from "@/typings/useValidator";
+
 const opertaor = dataOpertaor();
-import { useProductStore } from "@/store/modules/prod";
-import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 const productStore = useProductStore();
 const props = defineProps({
@@ -25,7 +23,7 @@ const props = defineProps({
   },
 });
 
-const transportEditRef = ref<AppFreeEditMethod | null>(null);
+const agentTgtEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 
@@ -42,29 +40,28 @@ onMounted(() => {
 const method = {
   // func demo
   func1: () => {},
-
 };
 // 绑定特殊验证器
 const exRules = {};
 
 function getFromValue() {
-  return transportEditRef?.value?.getFromValue();
+  return agentTgtEditRef?.value?.getFromValue();
 }
 
 function setFormValue(value: any) {
-  transportEditRef?.value?.setFormValue(value);
+  agentTgtEditRef?.value?.setFormValue(value);
 }
 
 function validate() {
-  return transportEditRef?.value?.validate();
+  return agentTgtEditRef?.value?.validate();
 }
 
 function setValue(key: string, value: any) {
-  transportEditRef?.value?.setValue(key, value);
+  agentTgtEditRef?.value?.setValue(key, value);
 }
 
 function getValue(key: string) {
-  return transportEditRef?.value?.getValue(key);
+  return agentTgtEditRef?.value?.getValue(key);
 }
 const setFormItem = (key, obj) => {
   if (obj && Object.keys(obj).length) {
