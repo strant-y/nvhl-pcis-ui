@@ -80,7 +80,7 @@ import detailsKnows from "./commodityRef/DetailsKnows.vue" //标的信息知识�
 import reinsuranceTips from "./commodityRef/ReinsuranceTips.vue" //水险再保提示详情
 import navigationAreaTips from "./commodityRef/NavigationAreaTips.vue" //航行区域提示详情
 import  specialCateModal  from "./commodityRef/specialCateModal.vue";
-import agentTgt from "./AgentTgtRef/agentTgt.vue"
+import agentTgtRef from "./AgentTgtRef/agentTgt.vue"
 import trnnsportinfo from "./transportinfoRef/transportinfo.vue";
 
 /**用于动态组件的映射生成 */
@@ -164,7 +164,7 @@ const componentMap = {
   reinsuranceTips:reinsuranceTips,
   navigationAreaTips:navigationAreaTips,
   specialCateModal:specialCateModal,
-  agentTgt:agentTgt,
+  agentTgtRef:agentTgtRef,
   trnnsportinfo:trnnsportinfo,
 };
 
