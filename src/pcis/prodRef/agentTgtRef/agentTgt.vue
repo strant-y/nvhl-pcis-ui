@@ -42,7 +42,6 @@ onMounted(() => {
 const method = {
   // func demo
   func1: () => {},
-
 };
 // 绑定特殊验证器
 const exRules = {};
