@@ -1,6 +1,6 @@
 <!-- ECargo协议录入-->
 <template>
-  <detail-component :bth-list="bthList"/>
+  <detail-component :bth-list="bthList" :page-type =props.type ref="mainRef" />
 </template>
 <script setup lang="ts">
 import cargoApi from '@/api/cargo';
@@ -8,7 +8,10 @@ import {createFreeButtonBase, FreeButtonBase} from "@/shared/button-config";
 import {FormPage} from "@/views/protocolManagement/utils/form-page";
 import detailComponent from "../components/detail-component.vue";
 import {EnteringCompList} from "@/views/protocolManagement/utils/types";
-
+import {useTagsViewStore} from "@/store";
+import {useRouter} from "vue-router";
+const tagsViewStore = useTagsViewStore();
+const router = useRouter();
 const props = defineProps({
   param: {
     type: Object,
@@ -24,15 +27,18 @@ const idxParam = reactive({
   param: { ...props.param, ...{}},
   user: JSON.parse(sessionStorage.getItem("user")),
   ciJiMrk: '0',
-  readonly: computed(() => ['view'].includes(props.type)),
+  readonly: computed(() => ['view','audit'].includes(props.type)),
 });
 provide('idxParam', idxParam);
+const mainRef = ref(null);
+const bthList = ref<Array<FreeButtonBase>>([]);
 
-const bthList = ref<FreeButtonBase[]>([
+//投保页面
+const basicBtn = [
   createFreeButtonBase({
     label: "保费计算",
     type: "primary",
-    id: "save",
+    id: "count",
     func: () => {
       premiumCalculation();
     },
@@ -53,8 +59,66 @@ const bthList = ref<FreeButtonBase[]>([
       submit();
     },
   }),
-]);
+]
+/**
+ * 核保按钮
+ * @type {FormButton[]}
+ */
+const uwBtn = [
+  createFreeButtonBase({
+    label: "提交",
+    type: "warning",
+    id: "btnUdr",
+    func: () => {
+      console.log('props',props.param)
+      mainRef.value?.getUnderwriteRef().then((isValid) => {
+        if (isValid) {
+          const user = JSON.parse(sessionStorage.getItem("user"));
+          let param = mainRef.value?.getUnderwriteValue()
+          let sence = param.cUndrMrk === 'A' ? 'audit' : 'bounced'
+          cargoApi.save({
+            ...param,
+            cEcAgrAppNo:props?.param?.cEcAgrAppNo,
+            ...{user},
+            sence
+          }).then((res: any) => {
+            if(res.code === 200) {
+              ElMessage.success(res.msg)
+              tagsViewStore.delView({"name": "enteringDtl",
+                "title": "录入明细",
+                "path": "/protocolManagement/enteringDtl",
+                "fullPath": "/protocolManagement/enteringDtl"}).then((res: any) => {
+                router.replace({ path: "/dashboard" });
+              });
+            }else {
+              ElMessage.success(res.msg);
+            }
+          });
 
+        } else {
+          ElMessage.error("请填写必填项");
+        }
+      })
+    },
+  }),
+
+  createFreeButtonBase({
+    label: "任务痕迹",
+    type: "primary",
+    id:"trace",
+    func: () => {
+
+    },
+  }),
+  createFreeButtonBase({
+    label: "核保信息",
+    type: "primary",
+    id:"underwriting",
+    func: () => {
+
+    },
+  }),
+];
 onBeforeMount(async () => {
   const res = await cargoApi.getECargoPageView({
       'compKeyList': EnteringCompList.map(item => item.tab)
@@ -69,7 +133,27 @@ onBeforeMount(async () => {
   config[0].pageInfo = config[0].pageInfo.sort((a, b) => a.sort - b.sort)
   // 页面初始化
   formPage.value?.setFormConfig(config);
-  // query();
+  if( ['add','edit'].includes(props.type)){
+    bthList.value = basicBtn
+  }
+  if(props.type === 'audit'){
+    bthList.value = uwBtn
+  }
+  if(['view','edit','audit'].includes(props.type)){
+    nextTick(()=>{
+      query();
+    })
+
+  }
+  bthList.value.push(
+      createFreeButtonBase({
+        label: "返回",
+        id:'back',
+        func: () => {
+          history.back();
+        },
+      }),
+  );
   console.log('页面初始化',formPage.value)
 });
 
@@ -84,18 +168,22 @@ function query() {
     ...{}
   }).then((res: any) => {
     if(res.code === 200) {
+      console.log('res........',res)
       ElMessage.success('查询成功');
-      formPage.value?.setAllFormData(res.data);
+      formPage.value?.setAllFormData({...res.data.composition,AgreementBase:res.data.composition?.AgreementBase[0],AgreementApplicant:res.data.composition?.AgreementApplicant[0],AgreementFeeWarn:res.data.composition?.AgreementBase[0]});
     }else {
       ElMessage.error(res.msg);
     }
   });
   if(idxParam.readonly === true) {
     formPage.value?.setPageReadOnly(true);
-    const submitBtn = formPage.value?.getPageBtnRefById('submit')?.getConfig();
-    submitBtn.disabled = true;
-    const saveBtn = formPage.value?.getPageBtnRefById('save')?.getConfig();
-    saveBtn.disabled = true;
+    if(props.type !== 'audit'){
+      bthList.value.forEach((item:any)=>{
+        if (item.id === 'back') return
+        let submitBtn = formPage.value?.getPageBtnRefById(item?.id)?.getConfig();
+        submitBtn.disabled = true;
+      })
+    }
   }
 }
 function isAllAValuesSame(arr:any,key:any) {
@@ -137,8 +225,10 @@ const premiumCalculation = ()=>{
 function save() {
   const allFromData = formPage.value?.getAllFormData();
   const user = JSON.parse(sessionStorage.getItem("user"));
+  console.log('allFromData',allFromData)
   cargoApi.save({
     ...allFromData,
+    AgreementDistGoods:null,
     ...{},
     ...{user},
     sence:'save'
@@ -171,11 +261,13 @@ function submit() {
   //   };
   // }
   console.log('allFromData', allFromData);
+  const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
   cargoApi.submit({
     ...allFromData,
     ...{},
     ...{user},
-    sence:'arraigned'
+    sence:'arraigned',
+    cEcAgrAppNo:agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
   }).then((res: any) => {
     if(res.code === 200) {
       ElMessage.success(res.msg)

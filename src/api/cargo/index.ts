@@ -50,7 +50,7 @@ function checkSubmit(queryParams: any): AxiosPromise<any> {
 
 //协议录入页面 初始化
 function init(queryParams: any): AxiosPromise<any> {
-    return post(`${PageBaseUrl}/init`, queryParams);
+    return post(`${PageBaseUrl}/queryEcargoDetails`, queryParams);
 }
 //协议批改页面 初始化
 function editInit(queryParams: any): AxiosPromise<any> {
