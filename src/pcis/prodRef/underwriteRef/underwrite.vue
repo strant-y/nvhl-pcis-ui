@@ -598,12 +598,17 @@ function getRiskData() {
     })
 }
 
+function setRiskunitDisabled() {
+  riskunitDisabledFlag.value = true
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   setValue,
   getValue,
+  setRiskunitDisabled,
 });
 </script>
 <style lang="scss" scoped>

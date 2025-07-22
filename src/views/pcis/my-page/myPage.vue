@@ -3358,6 +3358,7 @@ const submitUnderwritingFn = async () => {
         });
       }
       // opertaor.setDataAll(ops);
+      underwrite.value?.setRiskunitDisabled()
     } else {
       ElMessage.error(res.msg);
     }
