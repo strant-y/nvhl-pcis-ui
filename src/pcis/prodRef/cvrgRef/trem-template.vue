@@ -713,10 +713,7 @@ function dataInit() {
     if (props.disabledFlag) {
       setDisabledAll();
     }
-    // 解决组件初始化时是否统扯保费反显为是的时候医生每人保费、护士/医技人员每人保费没有置灰
-    if(termdata.value['Term.cUnifiedPremium']) {
-      methodMap.unifiedPremiumChange(termdata.value['Term.cUnifiedPremium'])
-    }
+    initMethod();
   } else {
     getTRFactorJson(param).then((res: any) => {
       const { code, data, msg } = res;
@@ -753,12 +750,17 @@ function dataInit() {
       if (props.disabledFlag) {
         setDisabledAll();
       }
-      // 解决组件初始化时是否统扯保费反显为是的时候医生每人保费、护士/医技人员每人保费没有置灰
-      if(termdata.value['Term.cUnifiedPremium']) {
-        methodMap.unifiedPremiumChange(termdata.value['Term.cUnifiedPremium'])
-      }
+      initMethod();
     });
   }
+}
+
+/** 初始化需要执行的方法,手动触发 */
+function initMethod(){
+  // 解决组件初始化时是否统扯保费反显为是的时候医生每人保费、护士/医技人员每人保费没有置灰
+    if(termdata.value['Term.cUnifiedPremium'] && !pageparam.cEdrType ) {
+      methodMap.unifiedPremiumChange(termdata.value['Term.cUnifiedPremium'])
+    }
 }
 
 function initshowConfig() {
@@ -998,6 +1000,7 @@ function setDisabledAll() {
       });
     });
   });
+  console.log(termFactormap.value);
 }
 
 function isrequired(i: any) {
