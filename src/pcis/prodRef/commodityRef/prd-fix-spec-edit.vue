@@ -7,7 +7,7 @@
     </div>
     <!-- 特别约定名称 -->
     <div class="form-item">
-      <span>特别约定名称：</span>
+      <!-- <span>特别约定名称：</span> -->
       <span>{{ rowData.cSpecialName }}</span>
     </div>
     <el-divider></el-divider>
@@ -21,6 +21,7 @@
           class="content-item"
         >
           <el-input
+            type="number"
             v-if="item.match(/^\*+$/)"
             v-model="inputValues[index]"
             @input="updateCNmeCn(index, $event)"

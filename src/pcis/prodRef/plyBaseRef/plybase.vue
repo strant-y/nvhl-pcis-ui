@@ -678,6 +678,7 @@ function getCheckCdeptByCdptCde() {
       (res) => {
         if (res["code"] === 200) {
           if (res.data) {
+            console.log('11112',res)
             subDptCde.value = res.data;
             //查询项目类别大类数据
             codeListStore

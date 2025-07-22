@@ -77,18 +77,13 @@ const method = {
         specialAdd = false;
       }
        eventBus.emit('add-special')
-  // eventBus.on('add-special', queryCBsnsTyp)
-
       const totalAmount = Number(getValue("Base.nPrm"));
       const splitCount = Number(getValue("Base.nPayNumber"));
-
       const totalCent = Math.round(totalAmount * 100);
       const result = ref<number[]>([]);
       const quotient = Math.floor(totalCent / splitCount) ;
       const remainder = totalCent % splitCount;
-
       result.value = Array(splitCount).fill(quotient);
-      // result.value = result.value.map(cent => parseFloat((cent / 100).toFixed(2)))
       if (remainder > 0) {
         result.value[0] += remainder;
       }
@@ -119,10 +114,10 @@ const method = {
             "Pay.cPayorCde": opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppCde"),
             "Pay.tPayBgnTm": tInsrncBgnTm,
             "Pay.tPayEndTm": tPayEndTm,
-            "Pay.nOwnPrm": result.value[i], 
+            "Pay.nOwnPrm": result.value[i] || 0 , 
             "Pay.cPayorNme":opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppNme"),
-            "Pay.nPayablePrm": result.value[i], 
-            "Pay.nPrmVar": result.value[i] 
+            "Pay.nPayablePrm": result.value[i] || 0, 
+            "Pay.nPrmVar": result.value[i]  
           }
           valArr.push(val)
       }
@@ -139,8 +134,10 @@ const method = {
     // setValue("Base.nPayNumber", '1');
     if(val=='5'){
       setFormItem("Base.nPayNumber", { disabled: false ,  max:12});
-    }else{
-      setFormItem("Base.nPayNumber", { disabled: true });
+    }else if(val=='0'){
+      setFormItem("Base.nPayNumber", { disabled: true, });
+      setValue('Base.nPayNumber',1)
+      
     }
   },
   //争议处理选择事件
