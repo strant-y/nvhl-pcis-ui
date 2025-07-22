@@ -80,7 +80,7 @@ import detailsKnows from "./commodityRef/DetailsKnows.vue" //标的信息知识�
 import reinsuranceTips from "./commodityRef/ReinsuranceTips.vue" //水险再保提示详情
 import navigationAreaTips from "./commodityRef/NavigationAreaTips.vue" //航行区域提示详情
 import  specialCateModal  from "./commodityRef/specialCateModal.vue";
-import AgentTgtRef from "./agentTgtRef/AgentTgt.vue"
+import AgentTgtRef from "./agentTgtRef/agentTgt.vue"
 import TransportinfoRef from "./transportinfoRef/Transportinfo.vue";
 
 /**用于动态组件的映射生成 */
