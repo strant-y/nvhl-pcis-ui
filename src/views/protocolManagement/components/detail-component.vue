@@ -38,6 +38,21 @@
                     </template>
                   </span>
                 </el-anchor-link>
+                <el-anchor-link
+                    v-if="underwriteFlag"
+                    @click="handleAnchorClick($event, `#underwriteurl`)"
+                    style="opacity: 1;font-weight: 500;"
+                >
+                  <!-- <rt-icon
+                    :item="{ icon: 'Tickets' }"
+                  /> -->
+                  <i :class="['icon','iconfont',iconMap['underwriteurl']]" style="color: var(--el-color-warning);"></i>
+                  <span
+                      class="icon-title"
+                      style="color: var(--el-color-warning)"
+                  >核保处理</span
+                  >
+                </el-anchor-link>
               </el-anchor>
             </div>
             <!-- <div class="NavigaList_card" style="margin-left: 5px">
@@ -75,6 +90,13 @@
             />
           </div>
         </template>
+        <div
+            id="underwriteurl"
+            v-if="underwriteFlag"
+            style="margin-bottom: 10px"
+        >
+          <auditwriteRef ref="underwrite" :pageData="pageData"></auditwriteRef>
+        </div>
         <el-backtop :target="'.el-main'" :right="100" :bottom="150" />
         <el-affix position="bottom" :offset="10">
         <div class="bottom-items">
@@ -117,18 +139,32 @@ import { iconMap } from './iconMap';
 const props = defineProps({
   bthList: {
     type: Array,
-  }
+  },
+  pageType:String
 });
-
+let underwriteFlag = ref(false);
 const idxParam = inject('idxParam');
 const formPage = idxParam?.formPage;
 const isCiJiMrk = computed(() => !!idxParam.ciJiMrk && idxParam.ciJiMrk !== '0');
-
+const pageData = ref({}); // 页面数据
 const getConmpName = (k: any) => {
   return k.pageCode + '-ref';
 }
 const NavigaShow = ref(true);
-
+const underwrite = ref(null);
+onMounted(()=>{
+  if (props.pageType === "audit") {
+    underwriteFlag.value = true;
+  } else {
+    underwriteFlag.value = false;
+  }
+})
+function  getUnderwriteRef (){
+  return  underwrite.value?.validate()
+}
+function getUnderwriteValue(){
+  return underwrite.value?.getFromValue()
+}
 /**
  * 锚点点击事件重写
  * 避免触发路由
@@ -154,6 +190,10 @@ function handleAnchorClick(event: any, targetId: string) {
   }
   event.currentTarget.classList.add('isActive')
 }
+defineExpose({
+  getUnderwriteRef,
+  getUnderwriteValue
+});
 </script>
 <style lang="scss" scoped>
 .bottom-items {
