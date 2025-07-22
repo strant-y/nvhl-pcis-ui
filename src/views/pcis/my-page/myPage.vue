@@ -2761,7 +2761,22 @@ const calcPremiumEdr = () => {
   
  
   // 条款
-  const totalNum =  res['cvrg'].reduce((sum, item) => sum + (item['Term.nInsuranceAmount'] || 0), 0);
+  // const totalNum =  res['cvrg'].reduce((sum, item) => sum + (item['Term.nInsuranceAmount'] || 0), 0);
+  const nInsuranceAmount:any = [];
+  res['cvrg'].forEach((item:any) => {
+    if(item['Term.cRdrTyp'] === '0') {// 主险 riskList不为空则取riskList里的nInsuranceAmount累加，否则取Term.nInsuranceAmount
+      if(item['Term.riskList'] && item['Term.riskList'].length > 0) {
+        item['Term.riskList'].forEach((i:any) => {
+          nInsuranceAmount.push(i['TermRisktgt.nInsuranceAmount'] || 0)
+        })
+      } else {
+        nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
+      }
+    } else if(item['Term.cClaimInclude'] === "1") {// 非主险 是否计入累计赔偿限额值为是则计入否则不计入
+      nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
+    }
+  })
+  const totalNum = nInsuranceAmount.reduce((sum, item) => sum + item, 0);
 
   console.log('1212 ',props.param,res['base']['Base.nAmt'] ,totalNum)
   //  08 减少  
@@ -3343,6 +3358,7 @@ const submitUnderwritingFn = async () => {
         });
       }
       // opertaor.setDataAll(ops);
+      underwrite.value?.setRiskunitDisabled()
     } else {
       ElMessage.error(res.msg);
     }
