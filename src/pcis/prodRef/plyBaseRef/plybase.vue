@@ -380,17 +380,23 @@ const method = {
               "Base.cCertfNo": params.CCtfctNo, //代理业务执业证号
               "Base.cBrkrDptcde": params.CDptCde, //代理业务员机构代码
             });
-
-                   setFormItem("Base.cBrkSlsCde", {
-                    loadData: [
-                      {
-                        value:  params["CSlsCde"],
-                        label:params["CSlsCde"] + params['CSlsNme'],
-                      },
-                    ],
-                  });
-                  setValue("Base.cBrkSlsCde", params.CSlsCde);
-            
+              setFormItem("Base.cBrkSlsCde", {
+              loadData: [
+                {
+                  value:  params["CSlsCde"],
+                  label:params["CSlsCde"] + params['CSlsNme'],
+                },
+              ],
+            });
+            const ciRef = opertaor.getTableRefs()['ci'];
+            if (!!ciRef) {
+              ciRef.initProxySales({
+                cSlsId: params.CSlsCde, //业务员员工号
+                cSlsNme: params.CSlsNme, //业务员名称
+                loadData:{value:  params["CSlsCde"],label:params["CSlsCde"] + params['CSlsNme']},
+              });
+            }
+            setValue("Base.cBrkSlsCde", params.CSlsCde);
             dialogRef.value?.handleClose();
           },
         },
@@ -469,17 +475,28 @@ const method = {
                 false
               )
               .then((res) => {
-                if (res && res.code == 200) {
-                  const codeValData = res.data;
+                console.log("业务员返回值",res)
+                if (res) {
+                  const codeValData = res;
                   if (codeValData) {
                     setFormItem("Base.cIntroSalecde", {
                       loadData: codeValData,
                     });
+                    const ciRef = opertaor.getTableRefs()['ci'];
+                    if (!!ciRef) {
+                      ciRef.initcbusiner({
+                        cSlsId: params.CSlsCde, //业务员员工号
+                        cSlsNme: params.CSlsNme, //业务员名称
+                        loadData:codeValData,
+                      });
+                    }
+                    console.log("业务员下拉值",codeValData)
                     // 当选择了业务员时，服务机构业务员默认为业务员
                     setValue("Base.cIntroSalecde", params.CSlsCde);
                   }
                 }
               });
+              
             dialogRef.value?.handleClose();
           },
         },

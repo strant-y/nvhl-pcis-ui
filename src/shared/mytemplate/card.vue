@@ -10,7 +10,7 @@
                 @click="showMyfrom = !showMyfrom"
                 v-if="cardConfig.showInTitle ? cardConfig.showInTitle : false"
               >
-                <el-icon v-if="!showMyfrom"><ArrowRightBold /></el-icon>
+                <el-icon v-if="!showMyfrom"><ArrowUpBold /></el-icon>
                 <el-icon v-if="showMyfrom"><ArrowDownBold /></el-icon>
               </a>
               {{ cardConfig.title }}

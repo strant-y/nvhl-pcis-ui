@@ -7,7 +7,16 @@
         ref="distTableRef"
         @pageChange="method.handleQuery($event, true)"
         @selection-change="handleSelectionChange"
-      />
+      >
+        <template #title-info v-if="titleInfo">
+          <div style="display: flex; align-items: end;margin-bottom: 5px">
+            <span>成功：</span>
+            <el-text class="mx-1" type="success">{{titleInfo.successes}}</el-text>
+            <span style="margin-left: 10px">失败：</span>
+            <el-text class="mx-1" type="danger">{{titleInfo.fails}}</el-text>
+          </div>
+        </template>
+      </app-table>
     </myCard>
     <comDialog ref="dialog"></comDialog>
   </div>
@@ -75,6 +84,7 @@ const formconfig1 = ref<Record<string, any>>({});
 const tableconfig = ref<AppTableConfig>(createTableEditConfig());
 const idxParam = inject('idxParam');
 let fileBase: string;
+const titleInfo = ref<any>();
 // 声明全局变量
 let cComponentTableValue: string;
 
@@ -106,13 +116,13 @@ onMounted(async () => {
       }
     })
   }
-  if(params.cProdNo === '043009'){
-    formconfig11.value.fromSchema?.forEach(item=>{
-      if(item['prop'] ==='Dist.cEmploymentAddress' && route.params.param?.cGrpMrk !== '1'){
-        item.isShow = false;
-      }
-    })
-  }
+  // if(params.cProdNo === '043009'){
+  //   formconfig11.value.fromSchema?.forEach(item=>{
+  //     if(item['prop'] ==='Dist.cEmploymentAddress' && route.params.param?.cGrpMrk !== '1'){
+  //       item.isShow = false;
+  //     }
+  //   })
+  // }
   Object.assign(formconfig1.value, formconfig11.value);
   cardconfig.value.title = formconfig1.value.title;
   tableconfig.value.showEdit = true;
@@ -123,7 +133,12 @@ onMounted(async () => {
     }
     return e;
   });
-  tableconfig.value.fromSchema = formconfig1.value.fromSchema;
+  tableconfig.value.fromSchema = formconfig1.value.fromSchema.map((item:any) => {
+    if(item.prop === "Dist.nSeqNo" || item.title === "序号") {
+      item.width = 60
+    }
+    return item;
+  });
   tableconfig.value.formconfig = createAppGridEditConfig({
     titleBtns: formconfig1.value.titleBtns,
     fromSchema: formconfig1.value.distSchema,
@@ -251,9 +266,12 @@ const method = {
   //  042003 根据电梯条数反
   funcdistadd: () => {
     const alldata: any = opertaor.getDataAll();
+    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
     const param = {};
     if(route.params.param?.pageName === "priceInquiry") {
       param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else if (route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
+      param['cAppNo'] = edrbase.getFromValue()["EdrBase.cAppNo"]
     } else {
       param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
     }
@@ -416,9 +434,6 @@ const method = {
   },
   //导出
   exportExcel: () => {
-
-    console.log(getTableData())
-    return false
     let paramitem  = Object.assign(formconfig1.value, {
       cComponentTable: cComponentTableValue,
     });
@@ -484,6 +499,10 @@ const method = {
           
           policyService.importDist(params).then((res) => {
             if (res.code === 200) {
+              titleInfo.value = {
+                successes: res.data.successes,
+                fails: res.data.fails,
+              };
               ElMessage.success(`导入完成：${res.data.msg}`);
               method.handleQuery();
             } else {
@@ -541,6 +560,10 @@ const method = {
 
           policyService.importDistIncrement(params).then((res) => {
             if (res.code === 200) {
+              titleInfo.value = {
+                successes: res.data.successes,
+                fails: res.data.fails,
+              };
               ElMessage.success(`导入完成：${res.data.msg}`);
               method.handleQuery();
             } else {

@@ -8,7 +8,7 @@
               <el-col :span="10">
                 <div style="display: flex; align-items: center;">
                   <a style="margin-right: 5px" @click="showData = !showData">
-                    <el-icon v-if="!showData"><ArrowRightBold /></el-icon>
+                    <el-icon v-if="!showData"><ArrowUpBold /></el-icon>
                     <el-icon v-if="showData"><ArrowDownBold /></el-icon>
                   </a>
 
@@ -129,7 +129,7 @@
                   <tr>
                       <th v-if="checkExtendshow">
                         <a style="margin-right: 5px" @click="showExtend = !showExtend">
-                          <el-icon v-if="!showExtend"><ArrowRightBold /></el-icon>
+                          <el-icon v-if="!showExtend"><ArrowUpBold /></el-icon>
                           <el-icon v-if="showExtend"><ArrowDownBold /></el-icon>
                         </a>
                         
@@ -192,7 +192,7 @@
                   style="margin-right: 5px"
                   @click="ginfo.hidden = !ginfo.hidden"
                 >
-                  <el-icon v-if="ginfo.hidden"><ArrowRightBold /></el-icon>
+                  <el-icon v-if="ginfo.hidden"><ArrowUpBold /></el-icon>
                   <el-icon v-if="!ginfo.hidden"><ArrowDownBold /></el-icon>
                 </a>
                 <span>
@@ -447,10 +447,6 @@ function initData(data: any) {
       termTitleConf.value.cFactorTabType !== "table"
     ) {
       termRef.value?.setFormValue(termdata.value, true);
-    }
-    // 解决组件初始化时是否统扯保费反显为是的时候医生每人保费、护士/医技人员每人保费没有置灰
-    if(newData['Term.cUnifiedPremium']) {
-      methodMap.unifiedPremiumChange(newData['Term.cUnifiedPremium'])
     }
   });
 }
@@ -717,6 +713,10 @@ function dataInit() {
     if (props.disabledFlag) {
       setDisabledAll();
     }
+    // 解决组件初始化时是否统扯保费反显为是的时候医生每人保费、护士/医技人员每人保费没有置灰
+    if(termdata.value['Term.cUnifiedPremium']) {
+      methodMap.unifiedPremiumChange(termdata.value['Term.cUnifiedPremium'])
+    }
   } else {
     getTRFactorJson(param).then((res: any) => {
       const { code, data, msg } = res;
@@ -752,6 +752,10 @@ function dataInit() {
       }
       if (props.disabledFlag) {
         setDisabledAll();
+      }
+      // 解决组件初始化时是否统扯保费反显为是的时候医生每人保费、护士/医技人员每人保费没有置灰
+      if(termdata.value['Term.cUnifiedPremium']) {
+        methodMap.unifiedPremiumChange(termdata.value['Term.cUnifiedPremium'])
       }
     });
   }
@@ -841,17 +845,18 @@ function exChangeFunc() {
   }
   // 045001个性化配置
   if (pageparam.cProdNo === "045001") {
+    console.log(data["tgt"]);
     if(data["tgt"]["Tgt.cInsuranceMethod"] && data["tgt"]["Tgt.cInsuranceMethod"] !== '613001'){
       const term = termFactormap.value.filter(
-        (r) => r["prop"] !== "Term.nRateVal" && r["prop"] !== "Term.nInsuranceFee" && r["prop"] !== "Term.nPersonPremium"
+        (r) => r["prop"] !== "Term.nPersonPremium"
       );
-      const ex = termFactormap.value.filter(
-        (r) =>
-          r["prop"] === "Term.nRateVal" || r["prop"] === "Term.nInsuranceFee"
-      );
+      // const ex = termFactormap.value.filter(
+      //   (r) =>
+      //     r["prop"] === "Term.nRateVal" || r["prop"] === "Term.nInsuranceFee"
+      // );
 
       termFactormap.value = term;
-      extermConf.value = ex;
+      // extermConf.value = ex;
     }else{
       const term = termFactormap.value.filter(
         (r) => r["prop"] !== "Term.nRateVal" 

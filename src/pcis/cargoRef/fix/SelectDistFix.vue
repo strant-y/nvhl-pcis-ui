@@ -82,17 +82,18 @@ const selectedRows = ref<any[]>([]);
 function handleSelectionChange(selection: any) {
   const selectList = props.data.selectList;
   let filteredArray:any = []
-  selection.forEach((item2) => {
-    const f = selectList.find( f => f === item2["ECargoGoodsTgt.nSeqNo"]+'' );
-    if(f){
-      ElMessage.warning("本条数据已被使用不可选");
-      distTableRef.value?.toggleRowSelection(item2,false)
-    }
-  })
-  filteredArray = selection.filter((item:any)=>
-      !selectList.includes(item['ECargoGoodsTgt.nSeqNo']+'')
-  );
-  selectedRows.value = filteredArray;
+  // selection.forEach((item2) => {
+  //   const f = selectList.find( f => f === item2["ECargoGoodsTgt.nSeqNo"]+'' );
+  //   if(f){
+  //     ElMessage.warning("本条数据已被使用不可选");
+  //     distTableRef.value?.toggleRowSelection(item2,false)
+  //   }
+  // })
+  // filteredArray = selection.filter((item:any)=>
+  //     !selectList.includes(item['ECargoGoodsTgt.nSeqNo']+'')
+  // );
+  // selectedRows.value = filteredArray;
+  selectedRows.value = selection;
 }
 function setSelected() {
   const lastSelected = props.data.selectedData;

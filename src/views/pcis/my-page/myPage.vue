@@ -416,6 +416,7 @@ const amlInfoRef = ref(null);
 
 const historyClaRef = ref(null);
 const sliceSide = ref([]);
+const bottomBtnColor1 = "#3498DB";
 
 const props = defineProps({
   param: {
@@ -703,6 +704,7 @@ const basicBtn = [
   createFreeButtonBase({
     label: "保存模板",
     type: "primary",
+    buttonColor: bottomBtnColor1,
     func: () => {
       handleSaveTemplate()
     },
@@ -710,6 +712,7 @@ const basicBtn = [
   createFreeButtonBase({
     label: "复制出单",
     type: "primary",
+    buttonColor: bottomBtnColor1,
     func: () => {
       copyPolicyFun();
     },
@@ -748,6 +751,7 @@ const basicBtn = [
   createFreeButtonBase({
     label: "发票信息",
     type: "primary",
+    buttonColor: bottomBtnColor1,
     func: () => {
       setTaxInfo();
     },
@@ -755,6 +759,7 @@ const basicBtn = [
   createFreeButtonBase({
     label: "反洗钱扩展信息",
     type: "primary",
+    buttonColor: bottomBtnColor1,
     func: () => {
       setCusBenefitInfo();
     },
@@ -762,6 +767,7 @@ const basicBtn = [
   createFreeButtonBase({
     label: "额度明细",
     type: "primary",
+    buttonColor: bottomBtnColor1,
     func: () => {
       openLimit();
     },
@@ -1213,6 +1219,21 @@ async function loadAfter() {
       }
     } else if (props.param.cAppTyp == "A") {
       bthList.value = basicBtn;
+			if(props.param?.pageName === "priceInquiry") {
+				bthList.value.push(
+					createFreeButtonBase({
+						label: "发起风勘",
+						type: "primary",
+						func: () => {
+							if (getNo.value == '暂无') {
+								ElMessage.error('询价单号为空,请保存后操作!');
+								return false;
+							}
+							startWindExploration(); 
+						},
+					}),
+				)
+			}
     }
   } else if (props.param.pageType === "PLY_APP_MODIFY_BOUNCED_SCENE") {
     // 投保单核保退回
@@ -1396,6 +1417,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "保存模板",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           handleSaveTemplate()
         },
@@ -1403,6 +1425,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "复制出单",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           copyPolicyFun();
         },
@@ -1434,6 +1457,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "发票信息",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           setTaxInfo();
         },
@@ -1441,6 +1465,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "反洗钱扩展信息",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           setCusBenefitInfo();
         },
@@ -1448,6 +1473,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "额度明细",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           openLimit();
         },
@@ -1519,6 +1545,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "保存模板",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           handleSaveTemplate()
         },
@@ -1526,6 +1553,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "复制出单",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           copyPolicyFun();
         },
@@ -1557,6 +1585,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "发票信息",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           setTaxInfo();
         },
@@ -1564,6 +1593,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "反洗钱扩展信息",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           setCusBenefitInfo();
         },
@@ -1571,6 +1601,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "额度明细",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           openLimit();
         },
@@ -1647,6 +1678,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "保存模板",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           handleSaveTemplate()
         },
@@ -1654,6 +1686,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "复制出单",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           copyPolicyFun();
         },
@@ -1685,6 +1718,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "发票信息",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           setTaxInfo();
         },
@@ -1692,6 +1726,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "反洗钱扩展信息",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           setCusBenefitInfo();
         },
@@ -1699,6 +1734,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "额度明细",
         type: "primary",
+        buttonColor: bottomBtnColor1,
         func: () => {
           openLimit();
         },
@@ -1770,6 +1806,7 @@ async function loadAfter() {
     createFreeButtonBase({
     label: "历史赔案",
     type: "primary",
+    buttonColor: bottomBtnColor1,
     func: () => {
       historyClaimcaseFun();
       // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
@@ -2408,7 +2445,9 @@ const submitToUndrFn = async () => {
           const newOp: any = opertaor.convertData(calcres);
           const newPrm = newOp.base["Base.nPrm"];
           const oldPrm = calcData.base["Base.nPrm"];
-          if (newPrm === oldPrm) {
+          const newAmt = newOp.base["Base.nAmt"];
+          const oldAmt = calcData.base["Base.nAmt"];
+          if (newPrm === oldPrm && newAmt === oldAmt) {
             const undr: any = props.param?.pageName === "priceInquiry" ? await submitInquiry(res) : await submitToUndr(res);
             btn.loading = false;
             console.log("submitToUndr-res", undr);
@@ -2468,7 +2507,7 @@ const submitToUndrFn = async () => {
             }
           } else {
             needCalc.value = true;
-            ElMessage.error("保费发生变化,请重新进行保费计算!");
+            ElMessage.error("保额或保费发生变化,请重新进行保费计算!");
           }
         }
       } catch (err) {
@@ -2722,7 +2761,22 @@ const calcPremiumEdr = () => {
   
  
   // 条款
-  const totalNum =  res['cvrg'].reduce((sum, item) => sum + (item['Term.nInsuranceAmount'] || 0), 0);
+  // const totalNum =  res['cvrg'].reduce((sum, item) => sum + (item['Term.nInsuranceAmount'] || 0), 0);
+  const nInsuranceAmount:any = [];
+  res['cvrg'].forEach((item:any) => {
+    if(item['Term.cRdrTyp'] === '0') {// 主险 riskList不为空则取riskList里的nInsuranceAmount累加，否则取Term.nInsuranceAmount
+      if(item['Term.riskList'] && item['Term.riskList'].length > 0) {
+        item['Term.riskList'].forEach((i:any) => {
+          nInsuranceAmount.push(i['TermRisktgt.nInsuranceAmount'] || 0)
+        })
+      } else {
+        nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
+      }
+    } else if(item['Term.cClaimInclude'] === "1") {// 非主险 是否计入累计赔偿限额值为是则计入否则不计入
+      nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
+    }
+  })
+  const totalNum = nInsuranceAmount.reduce((sum, item) => sum + item, 0);
 
   console.log('1212 ',props.param,res['base']['Base.nAmt'] ,totalNum)
   //  08 减少  
@@ -3040,6 +3094,13 @@ const saveEdrPlyInfo = async () => {
     //   );    //影响二次批改报错,先注释掉待调整
     edrbase.value?.setFormValue(EdrBaseData);
     saveEdrFlag = true;
+    // 清单列表数据
+    const distMap = formconfig1[0].pageInfo.filter((item:any) => {
+      return item.pageKey === "dist" || item.pageKey === "distSummary";
+    });
+    distMap.forEach((item:any) => {
+      getDistData(EdrBaseData['EdrBase.cAppNo'], item)
+    });
   } else {
     ElMessage.error(edrInfo.msg);
   }
@@ -3111,7 +3172,22 @@ const submitEdrToUndrFun = async () => {
     setTimeout(async () => {
       try {
         const calcData = opertaor.getDataAll();
-        const totalNum =  calcData['cvrg'].reduce((sum, item) => sum + (item['Term.nInsuranceAmount'] || 0), 0);
+        // const totalNum =  calcData['cvrg'].reduce((sum, item) => sum + (item['Term.nInsuranceAmount'] || 0), 0);
+        const nInsuranceAmount:any = [];
+        calcData['cvrg'].forEach((item:any) => {
+          if(item['Term.cRdrTyp'] === '0') {// 主险 riskList不为空则取riskList里的nInsuranceAmount累加，否则取Term.nInsuranceAmount
+            if(item['Term.riskList'] && item['Term.riskList'].length > 0) {
+              item['Term.riskList'].forEach((i:any) => {
+                nInsuranceAmount.push(i['TermRisktgt.nInsuranceAmount'] || 0)
+              })
+            } else {
+              nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
+            }
+          } else if(item['Term.cClaimInclude'] === "1") {// 非主险 是否计入累计赔偿限额值为是则计入否则不计入
+            nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
+          }
+        })
+        const totalNum = nInsuranceAmount.reduce((sum, item) => sum + item, 0);
         //  08 减少  
         if(props.param?.cRsnCde === '08'  && totalNum > calcData['base']['Base.nAmt'] ){
           ElMessage.warning("批改原因为“减少保额”，累计赔偿限额不能大于原有“保额”！");
@@ -3282,6 +3358,7 @@ const submitUnderwritingFn = async () => {
         });
       }
       // opertaor.setDataAll(ops);
+      underwrite.value?.setRiskunitDisabled()
     } else {
       ElMessage.error(res.msg);
     }
@@ -3293,6 +3370,7 @@ const submitUnderwritingFn = async () => {
  * 投保申请核保时校验联共保信息
  */
 const validateCiInfo = () => {
+  const targetNPrm = parseFloat(nPrm.value) || 0; //当前保单总保费
   const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue()['Base.cCiMrk']
   const ciData = opertaor.getTableRefByKey("ci").getFromValue()
   if (ciData.length > 0) {
@@ -3300,6 +3378,7 @@ const validateCiInfo = () => {
       let chiefMrkM = 0; // 主
       let chiefMrkS = 0; // 从
       let CCoinsurerCdeNum = 0; // 分公司份额
+      let cNciprmCount = 0;  //所有保司保费总额
       for (const ciRow of ciData) {
         if (ciRow) {
           NCiShare = numAdd(NCiShare, parseFloat(ciRow["Ci.nCiShare"] || 0));
@@ -3311,7 +3390,18 @@ const validateCiInfo = () => {
           } else {
             chiefMrkS++;
           }
+          if(ciRow['Ci.nCiPrm'] !=''){
+            cNciprmCount = numAdd(cNciprmCount, parseFloat(ciRow['Ci.nCiPrm'])); // 累加每一行的 Ci.nCiPrm 值
+          }
         }
+      }
+      // 计算差值
+      const difference = targetNPrm - cNciprmCount;
+      if (Math.abs(difference) > 0 && ciData.length > 0) {
+        // 将差值追加到最后一行对象的 Ci.nCiPrm 上
+        const lastRow = ciData[ciData.length - 1];
+        lastRow['Ci.nCiPrm'] = parseFloat(ciData[ciData.length - 1]['Ci.nCiPrm']) + parseFloat(difference.toFixed(2));
+        console.log("lastRow['Ci.nCiPrm']",lastRow['Ci.nCiPrm'])
       }
       if (chiefMrkM === 0 || chiefMrkS === 0) {
         // ElMessage.error("主/从共保信息不完整!");
@@ -3496,8 +3586,13 @@ opertaor.setFatherPage({
   getcacheKey: getcacheKey,
   setTmDay: setTmDay,
   setnDelayNum: setnDelayNum,
-  getSaveDataParams: getSaveDataParams
+  getSaveDataParams: getSaveDataParams,
+  getEdrbaseValue: getEdrbaseValue
 });
+
+function getEdrbaseValue(key:any) {
+  return edrbase.value
+}
 
 // 保存模板
 function handleSaveTemplate() {

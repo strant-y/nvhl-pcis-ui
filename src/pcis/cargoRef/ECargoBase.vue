@@ -100,11 +100,11 @@ const method = {
         .then((res) => {
           if (res.body) {
             const selectObj = res.body;
-            baseEditRef.value?.setValue("ECargoBase.cDptCde", `${selectObj.id}${selectObj.name}`);
+            baseEditRef.value?.setValue("ECargoBase.cDptCde", selectObj.id);
             baseEditRef.value?.addCodeListMap({
-              "ECargoBase.cDptCde": [
+              code:"ECargoBase.cDptCde", list:[
                 {
-                  label: selectObj.name,
+                  label: `${selectObj.id}${selectObj.name}`,
                   value: selectObj.id,
                 },
               ],

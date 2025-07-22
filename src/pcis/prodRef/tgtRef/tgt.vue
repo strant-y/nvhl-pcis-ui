@@ -280,6 +280,7 @@ const method = {
   getcIsSingleChange:(val:string)=>{
     console.log(val)
     if(val=== '1'){
+      // 工程总造价 （元）
       setFormItem('Tgt.nTotalCost', {
         rules: [getRules("required", {})],
       });
@@ -294,6 +295,7 @@ const method = {
       });
 
        if(params.cProdNo==='042001'){
+        formconfig1.fromUi.groupBy[1].hidden = false
           setFormItem('Tgt.cProjectName', {
              hidden: false,
            rules: [getRules("required", {})],
@@ -333,6 +335,7 @@ const method = {
 
 
       if(params.cProdNo==='042001' && val=== '0'){
+        formconfig1.fromUi.groupBy[1].hidden = true
           setFormItem('Tgt.cProjectName', {
              hidden: true,
              rules: null
@@ -964,9 +967,33 @@ getcInsuranceIndustryChange:(val:any)=>{
           rules:[]
        })
     }
-}
+},
+// 工程地址级联change
+getPropChange:(val:any) => {
+  setregistAdd()
+},
+// 工程地址输入框change
+getcSuffixAddrChange:(val:any) => {
+  setregistAdd()
+},
 
 };
+
+function setregistAdd() {
+  const ads = tgtEditRef?.value?.getValue("Tgt.Prop");
+  const a = tgtEditRef?.value?.getValue("Tgt.cSuffixAddr") || "";
+  if (ads) {
+    getAddressStr({ address: ads }).then((res: any) => {
+      const { code, data, msg } = res;
+      if (code === 200) {
+        const b = (data ? data["addStr"] : "") + a;
+        setValue("Tgt.cProjectAddress", b);
+      }
+    });
+  } else {
+    setValue("Tgt.cProjectAddress", a);
+  }
+}
 
 function singChange(obj) {
   setFormItem("Tgt.cProjectName", obj) //工程名称

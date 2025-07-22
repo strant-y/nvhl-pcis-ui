@@ -70,6 +70,7 @@ import cBrkrCdeModal from "./commodityRef/cBrkrCdeModal.vue"; //开户行
 import prdFixSpec from "./commodityRef/prd-fix-spec.vue" //特别约定
 import deductibleFix from "./commodityRef/DeductibleFix.vue" //免赔条件选择
 import underwriteRef from "./underwriteRef/underwrite.vue"
+import auditwriteRef from "./auditwriteRef/auditwrite.vue"
 import edrbaseRef from "./edrbaseRef/edrbase.vue"
 import edritemRef from "./edritemRef/edritem.vue"
 import imageRef from "./commonRef/image.vue"; //影像信息
@@ -80,6 +81,8 @@ import detailsKnows from "./commodityRef/DetailsKnows.vue" //标的信息知识�
 import reinsuranceTips from "./commodityRef/ReinsuranceTips.vue" //水险再保提示详情
 import navigationAreaTips from "./commodityRef/NavigationAreaTips.vue" //航行区域提示详情
 import  specialCateModal  from "./commodityRef/specialCateModal.vue";
+import AgentTgtRef from "./agentTgtRef/AgentTgt.vue"
+import TransportinfoRef from "./transportinfoRef/Transportinfo.vue";
 
 /**用于动态组件的映射生成 */
 const componentMap = {
@@ -111,7 +114,7 @@ const componentMap = {
   edrbaseRef: edrbaseRef, //录单页面中的批改信息组件
   edritemRef: edritemRef, //录单页面中的批改比较项组件
   imageRef:imageRef,
-
+  auditwriteRef:auditwriteRef,
 
   prodInfoRef: prodInfo,
   // prodauditRef: prodaudit,
@@ -161,7 +164,9 @@ const componentMap = {
   detailsKnows:detailsKnows,
   reinsuranceTips:reinsuranceTips,
   navigationAreaTips:navigationAreaTips,
-  specialCateModal:specialCateModal
+  specialCateModal:specialCateModal,
+  AgentTgtRef:AgentTgtRef,
+  TransportinfoRef:TransportinfoRef,
 };
 
 const install = (Vue) => {

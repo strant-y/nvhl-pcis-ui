@@ -43,24 +43,25 @@
         :align="item.align ? item.align : 'center'"
       >
         <template #default="props">
-          <el-row :gutter="20">
-            <template v-for="(i, index) in getfromSchema()" :key="index">
-              <el-col
-                :span="i.itemWidth ? i.itemWidth * formUi.span : formUi.span"
-                style="margin-top: 5px"
-              >
-                <el-form-item
-                  :prop="[props.$index, i.prop]"
-                  :rules="formItems[props.row._dataId][i.prop].rules ? formItems[props.row._dataId][i.prop].rules : undefined"
-                  :label="i.title"
-                  :label-position="
+          <div style="margin: -5px 5px -5px 5px;background-color: rgba(228,204,164,0.2);">
+            <el-row :gutter="20">
+              <template v-for="(i, index) in getfromSchema()" :key="index">
+                <el-col
+                    :span="i.itemWidth ? i.itemWidth * formUi.span : formUi.span"
+                    style="margin-top: 5px"
+                >
+                  <el-form-item
+                      :prop="[props.$index, i.prop]"
+                      :rules="formItems[props.row._dataId][i.prop].rules ? formItems[props.row._dataId][i.prop].rules : undefined"
+                      :label="i.title"
+                      :label-position="
                     i.inputtype === 'table' ? 'top' : formUi.labelPosition // table 组件,默认标题显示在top上
                   "
-                  style="margin-bottom: 18px"
-                >
-                  <div style="display: flex;">
-                    <div
-                    :style="{
+                      style="margin-bottom: 18px"
+                  >
+                    <div style="display: flex;">
+                      <div
+                          :style="{
                       width:
                         formItems[props.row._dataId][i.prop].showExBtn &&
                         formItems[props.row._dataId][i.prop].inputtype !==
@@ -73,39 +74,40 @@
                       display: 'flex',
                       alignItems: 'flex-start',
                     }"
-                  >
-                    <from-item
-                      v-model="props.row[i.prop]"
-                      :item="formItems[props.row._dataId][i.prop]"
-                      :showLabel="editIndex !== props.row._dataId"
-                      :row="props.row"
-                    />
-                  </div>
+                      >
+                        <from-item
+                            v-model="props.row[i.prop]"
+                            :item="formItems[props.row._dataId][i.prop]"
+                            :showLabel="editIndex !== props.row._dataId"
+                            :row="props.row"
+                        />
+                      </div>
 
-                  <!---       显示组件尾部按钮       --->
-                  <template
-                    v-if="formItems[props.row._dataId][i.prop].showExBtn"
-                  >
-                    <rt-button
-                      v-if="
+                      <!---       显示组件尾部按钮       --->
+                      <template
+                          v-if="formItems[props.row._dataId][i.prop].showExBtn"
+                      >
+                        <rt-button
+                            v-if="
                         formItems[props.row._dataId][i.prop].inputtype !==
                         'rttable'
                       "
-                      :style="{
+                            :style="{
                         width:
                           (formItems[props.row._dataId][i.prop].btnWidth
                             ? formItems[props.row._dataId][i.prop].btnWidth
                             : 25) + '%',
                         height: '100%',
                       }"
-                      :item="formItems[props.row._dataId][i.prop].btnItems"
-                    />
-                  </template>
-                  </div>
-                </el-form-item>
-              </el-col>
-            </template>
-          </el-row>
+                            :item="formItems[props.row._dataId][i.prop].btnItems"
+                        />
+                      </template>
+                    </div>
+                  </el-form-item>
+                </el-col>
+              </template>
+            </el-row>
+          </div>
         </template>
       </el-table-column>
       <el-table-column
@@ -521,33 +523,32 @@ function validate() {
 
   // 检查是否有表格数据需要验证
   if (tableDatas.value?.length > 0) {
-    // 存储验证规则的对象
-    let rules = <any>{};
-
-    // 遍历表格架构，提取验证规则
-    for (const schama in props.item.fromSchema) {
-      // 如果当前列有验证规则，则将其添加到规则对象中
-      if (props.item.fromSchema[schama].rules) {
-        let rul = props.item.fromSchema[schama].rules;
-        if (
-          props.item.fromSchema[schama].inputtype === "rtnumber" ||
-          (props.item.fromSchema[schama].inputtype === "rtinput" &&
-            props.item.fromSchema[schama].type)
-        ) {
-          if (rul && rul.length > 0) {
-            rul.forEach((item: any) => {
-              item.type = "number";
-            });
-          }
-        }
-        rules[props.item.fromSchema[schama].prop] = rul;
-      }
-    }
 
     // 遍历表格数据，对每行数据进行验证
     for (const rowNum in tableDatas.value) {
       // 当前行的数据
       const rowData = tableDatas.value[rowNum];
+      // 存储验证规则的对象
+      let rules = <any>{};
+      const itemSchama = formItems.value[rowData._dataId];
+      for (const schama in itemSchama) {
+        // 如果当前列有验证规则，则将其添加到规则对象中
+        if (itemSchama[schama].rules) {
+          let rul = itemSchama[schama].rules;
+          if (
+            itemSchama[schama].inputtype === "rtnumber" ||
+            (itemSchama[schama].inputtype === "rtinput" &&
+              itemSchama[schama].type)
+          ) {
+            if (rul && rul.length > 0) {
+              rul.forEach((item: any) => {
+                item.type = "number";
+              });
+            }
+          }
+          rules[itemSchama[schama].prop] = rul;
+        }
+      }
       // 创建验证器实例
       const validator = new Validator(rules);
 
@@ -662,6 +663,31 @@ function addRowByData(data: any) {
   tableDatas.value?.push({ _dataId: rowId, ...data });
   formItems.value[rowId] = creatItem(schamaconf.value);
   editIndex.value = rowId;
+}
+
+function spliceTableData(index: number, delCount: number, list: any[]) {
+  const addNum = !!list ? list.length : 0;
+  if(addNum > 0) {
+    const keys = Object.keys(formItems.value);
+    for (let i = 0; i < addNum; i ++) {
+      const rowData = list[i];
+      const nextIdx = index + i;
+      const delNum = i < delCount ? 1 : 0;
+      if(rowData['_dataId'] && keys.includes(rowData['_dataId'])) {
+        // 行id已存在直接替换数据
+        tableDatas.value?.splice(nextIdx, delNum, rowData);
+      } else {
+        const rowId = getuuid();
+        rowData['_dataId'] = rowId;
+        tableDatas.value?.splice(nextIdx, delNum, rowData);
+        formItems.value[rowId] = creatItem(schamaconf.value);
+      }
+    }
+  }
+  if(delCount > addNum) {
+    tableDatas.value?.splice(index + addNum, delCount - addNum);
+  }
+  return tableDatas.value;
 }
 
 function getSelectRow() {
@@ -797,6 +823,7 @@ defineExpose({
   clearSelection,
   toggleRowSelection,
   setRowFieldProp,
+  spliceTableData,
   // getItemsRowId
 });
 function isrequired(i: any) {

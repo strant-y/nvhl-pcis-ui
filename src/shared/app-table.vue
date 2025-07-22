@@ -78,6 +78,7 @@
         </el-row>
       </template>
       <div class="form-inner">
+        <slot name="title-info"/>
         <rttable
           v-model="dataList"
           :item="appgrideditConfig"
