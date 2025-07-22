@@ -3755,7 +3755,6 @@ function clearCAppNo(res:any) {
 const queryTermRateLimitFun = (calcFun: any) => {
   const res = opertaor.getDataAll();
   res["user"] = user;
-  debugger
   // 批改:注销退保保费计算
   if(calcFun === calcPremiumEdrSurrender) {
     res["EdrBase"] = edrbase.value?.getFromValue();
@@ -3785,7 +3784,30 @@ const queryTermRateLimitFun = (calcFun: any) => {
     if(r.code === 200) {
       calcFun()
     } else if(r.msg || r.message) {
-      ElMessageBox.confirm(r.msg || r.message, "提示", {
+      const tableHtml = r.data.map((row:any) => {
+        return `<tr><td style="border: 1px solid #000000;">${row.cPlanNo}</td>
+        <td style="border: 1px solid #000000;">${row.cTermName}</td>
+        <td style="border: 1px solid #000000;">${row.cRiskName}</td>
+        <td style="border: 1px solid #000000;">${row.nRateVal}</td>
+        <td style="border: 1px solid #000000;">${row.cRateRange}</td></tr>`;
+      }).join(''); // 将所有行合并成一个字符串
+      const htmlContent = `
+        <table border="1" style="text-align:center;border-collapse: collapse;">
+          <thead>
+            <tr><th style="border: 1px solid #000000;">方案号</th>
+            <th style="border: 1px solid #000000;">条款</th
+            ><th style="border: 1px solid #000000;">责任</th>
+            <th style="border: 1px solid #000000;">费率</th>
+            <th style="border: 1px solid #000000;">建议费率区间</th></tr>
+          </thead>
+          <tbody>
+            ${tableHtml}
+          </tbody>
+        </table>
+        <div>${r.msg || r.message}</div>
+      `;
+      ElMessageBox.confirm(htmlContent, "提示", {
+        dangerouslyUseHTMLString: true,
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
