@@ -241,25 +241,13 @@ const tableconfig = reactive<AppTableConfig>(
         createFreeButtonBase({
           id: "score",
           link: true,
-          tooltip: "查看",
-          type: "danger",
-          size: "large",
-          icon: "View",
-          tableClick: (row) => {
-            console.log(row);
-            toDtl(row, 'view');
-          },
-        }),
-        createFreeButtonBase({
-          id: "score",
-          link: true,
           tooltip: "编辑",
           type: "success",
           size: "large",
           icon: "Edit",
           tableClick: (row) => {
             console.log(row);
-            toDtl(row, 'edit');
+            toDtl(row, 'audit');
           },
         }),
       ],
@@ -334,7 +322,7 @@ onMounted(async () => {
 });
 
 function toDtl(row: any, type: string) {
-  router.push({path: "/protocolManagement/reviewDtl", query: {param: JSON.stringify(row), type: type}});
+  router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify(row), type: type}});
 }
 
 // 绑定方法
