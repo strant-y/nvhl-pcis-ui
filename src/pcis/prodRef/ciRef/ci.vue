@@ -763,8 +763,8 @@ const updateMasterAgreementValues = () => {
       // opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntPrm", totalPrm.toFixed(2));  //共保总保费
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiOwnAmt", totalAmt.toFixed(2));  //我司分额保额
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiOwnPrm", totalPrm.toFixed(2));  //我司份额保费
-      opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnAmt", totalAmt.toFixed(2));  //我司分额保额
-      opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnPrm", totalPrm.toFixed(2));  //我司份额保费
+      // opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnAmt", totalAmt.toFixed(2));  //我司分额保额
+      // opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnPrm", totalPrm.toFixed(2));  //我司份额保费
     }
   });
 };
@@ -895,7 +895,6 @@ const initCiInfo = (data: any) => {
 const valideRequired = ()=>{
   const cBsnsTyp = opertaor.getTableRefByKey('plyBase').getValue('Base.cBsnsTyp')
   const rowItems = getFromValue()
-  debugger
   for(const rowData of rowItems){
     if(cBsnsTyp == '19001' && rowData['Ci.cCoinsurerCde'] =='327001'){
         // rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
