@@ -3157,7 +3157,22 @@ const submitEdrToUndrFun = async () => {
     setTimeout(async () => {
       try {
         const calcData = opertaor.getDataAll();
-        const totalNum =  calcData['cvrg'].reduce((sum, item) => sum + (item['Term.nInsuranceAmount'] || 0), 0);
+        // const totalNum =  calcData['cvrg'].reduce((sum, item) => sum + (item['Term.nInsuranceAmount'] || 0), 0);
+        const nInsuranceAmount:any = [];
+        calcData['cvrg'].forEach((item:any) => {
+          if(item['Term.cRdrTyp'] === '0') {// 主险 riskList不为空则取riskList里的nInsuranceAmount累加，否则取Term.nInsuranceAmount
+            if(item['Term.riskList'] && item['Term.riskList'].length > 0) {
+              item['Term.riskList'].forEach((i:any) => {
+                nInsuranceAmount.push(i['TermRisktgt.nInsuranceAmount'] || 0)
+              })
+            } else {
+              nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
+            }
+          } else if(item['Term.cClaimInclude'] === "1") {// 非主险 是否计入累计赔偿限额值为是则计入否则不计入
+            nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
+          }
+        })
+        const totalNum = nInsuranceAmount.reduce((sum, item) => sum + item, 0);
         //  08 减少  
         if(props.param?.cRsnCde === '08'  && totalNum > calcData['base']['Base.nAmt'] ){
           ElMessage.warning("批改原因为“减少保额”，累计赔偿限额不能大于原有“保额”！");
