@@ -1275,7 +1275,7 @@ function tryCountInFoRIs(row: any) {
     .then((result: any) => {
       if(result.code === "1" && result.data && result.data.item) {
         result.data.item.forEach((item:any) => {
-          Object.assign(pageresult2.list, item.value || [])
+          pageresult2.list = pageresult2.list.concat(item.value || [])
         })
       } else {
         ElMessage.error(result.message)
