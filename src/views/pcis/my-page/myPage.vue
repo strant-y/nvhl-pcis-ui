@@ -3794,11 +3794,11 @@ const queryTermRateLimitFun = (calcFun: any) => {
       const htmlContent = `
         <table border="1" style="text-align:center;border-collapse: collapse;">
           <thead>
-            <tr><th style="border: 1px solid #000000;">方案号</th>
+            <tr><th style="border: 1px solid #000000;width:50px;">方案号</th>
             <th style="border: 1px solid #000000;">条款</th
             ><th style="border: 1px solid #000000;">责任</th>
-            <th style="border: 1px solid #000000;">费率</th>
-            <th style="border: 1px solid #000000;">建议费率区间</th></tr>
+            <th style="border: 1px solid #000000;width:40px;">费率</th>
+            <th style="border: 1px solid #000000;width:90px;">建议费率区间</th></tr>
           </thead>
           <tbody>
             ${tableHtml}
