@@ -93,6 +93,7 @@ function handleSelectionChange(selection: any) {
   //     !selectList.includes(item['ECargoGoodsTgt.nSeqNo']+'')
   // );
   // selectedRows.value = filteredArray;
+  selectedRows.value = selection;
 }
 function setSelected() {
   const lastSelected = props.data.selectedData;
