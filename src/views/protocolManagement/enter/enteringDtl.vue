@@ -261,11 +261,13 @@ function submit() {
   //   };
   // }
   console.log('allFromData', allFromData);
+  const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
   cargoApi.submit({
     ...allFromData,
     ...{},
     ...{user},
-    sence:'arraigned'
+    sence:'arraigned',
+    cEcAgrAppNo:agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
   }).then((res: any) => {
     if(res.code === 200) {
       ElMessage.success(res.msg)
