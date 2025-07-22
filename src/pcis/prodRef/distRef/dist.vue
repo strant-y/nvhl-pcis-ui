@@ -7,7 +7,16 @@
         ref="distTableRef"
         @pageChange="method.handleQuery($event, true)"
         @selection-change="handleSelectionChange"
-      />
+      >
+        <template #title-info v-if="titleInfo">
+          <div style="display: flex; align-items: end;margin-bottom: 5px">
+            <span>成功：</span>
+            <el-text class="mx-1" type="success">{{titleInfo.successes}}</el-text>
+            <span style="margin-left: 10px">失败：</span>
+            <el-text class="mx-1" type="danger">{{titleInfo.fails}}</el-text>
+          </div>
+        </template>
+      </app-table>
     </myCard>
     <comDialog ref="dialog"></comDialog>
   </div>
@@ -75,6 +84,7 @@ const formconfig1 = ref<Record<string, any>>({});
 const tableconfig = ref<AppTableConfig>(createTableEditConfig());
 const idxParam = inject('idxParam');
 let fileBase: string;
+const titleInfo = ref<any>();
 // 声明全局变量
 let cComponentTableValue: string;
 
@@ -489,6 +499,10 @@ const method = {
           
           policyService.importDist(params).then((res) => {
             if (res.code === 200) {
+              titleInfo.value = {
+                successes: res.data.successes,
+                fails: res.data.fails,
+              };
               ElMessage.success(`导入完成：${res.data.msg}`);
               method.handleQuery();
             } else {
@@ -546,6 +560,10 @@ const method = {
 
           policyService.importDistIncrement(params).then((res) => {
             if (res.code === 200) {
+              titleInfo.value = {
+                successes: res.data.successes,
+                fails: res.data.fails,
+              };
               ElMessage.success(`导入完成：${res.data.msg}`);
               method.handleQuery();
             } else {
