@@ -1743,7 +1743,8 @@ async function loadAfter() {
   } else if (props.param?.pageType === "inquiryToApp") {
     getInquiryPolicy({ cInquiryNo: props.param?.cInquiryNo }).then((res:any) => {
       if (res["code"] == "200") {
-        const ops = clearCAppNo(opertaor.convertData(res));
+        const clearKey = clearKeyMap.filter((item:any) => item !== "cAppNo")
+        const ops = clearCAppNo(opertaor.convertData(res), clearKey);
         // 保险期限 投保日期更新为当前日期 保险起期和保险止期重置为第二天0点至一年后
         if(ops.insrnc) {
           const beginTm = dayjs().add(1, 'day').format("YYYY-MM-DD 00:00:00")
@@ -2626,13 +2627,8 @@ const savePlyInfo = async () => {
     btn.loading = false;
     return false;
   }
-  // 询价单需要把cAppNo换成cInquiryNo
-  let priceInquiryParam;
-  if(props.param?.pageName === "priceInquiry") {
-    priceInquiryParam = replacecInquiryNo(res)
-  }
 
-  const resInfo: any = props.param?.pageName === "priceInquiry" ? await saveInquiry(priceInquiryParam) : await saveAppPlyInfo(res);
+  const resInfo: any = props.param?.pageName === "priceInquiry" ? await saveInquiry(res) : await saveAppPlyInfo(res);
   console.log("saveAppPlyInfo-res", resInfo);
   btn.loading = false;
   if (resInfo["code"] == "200") {
@@ -3784,20 +3780,20 @@ function replacecInquiryNo(res:any) {
 
 // 复制出单和模板出单清空原有的投保单号
 const clearKeyMap = ["cPkId","cAppNo","tUpdTm","cEdrNo","cLatestMrk","nEdrPrjNo","tCrtTm"]
-function clearCAppNo(res:any) {
+function clearCAppNo(res:any, mapList:any = clearKeyMap) {
   if(res instanceof Array) {
     res.forEach((item:any) => {
-      item = clearCAppNo(item)
+      item = clearCAppNo(item, mapList)
     })
   } else if(res instanceof Object) {
     for (const key in res) {
       if(res[key] instanceof Object || res[key] instanceof Array) {
-        res[key] = clearCAppNo(res[key])
+        res[key] = clearCAppNo(res[key], mapList)
       } else if (res.hasOwnProperty(key)) {
         if(key.indexOf('.') !== -1) {
           const k0 = key.split('.')[0];
           const k1 = key.split('.')[1];
-          if(clearKeyMap.indexOf(k1) !== -1) {
+          if(mapList.indexOf(k1) !== -1) {
             res[`${k0}.${k1}`] = null
           }
         } else {
