@@ -385,6 +385,7 @@ const formconfig1:any = ref({
 	cEcAgrAppNo: '', // 协议申请单号
 	cInsuredCde: '', // 被保人编码
 	cInsuredNme: '', // 被保人名称
+	cNeedfeeFlag: '', // 是否见费出单
 });
 const selectTreeItem = ref({});
 const labelNm = ref("条款")
@@ -727,6 +728,7 @@ function getProtocolNumber (){
         formconfig1.value.cDptCnm = selectedTerm.cDptCnm; // 机构名称
         formconfig1.value.cDptCde = selectedTerm.cDptCde; // 机构代码
         formconfig1.value.cEcAgrAppNo = selectedTerm.cEcAgrAppNo; // 协议申请单号
+        formconfig1.value.cNeedfeeFlag = selectedTerm.cNeedfeeFlag; // 是否见费出单
 				getCDptCdeList(selectedTerm.cDptRelCde)
       }
     });
