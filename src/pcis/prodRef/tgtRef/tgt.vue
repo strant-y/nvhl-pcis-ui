@@ -763,6 +763,7 @@ const method = {
     if(val=='01'){ //rules: [getRules("required", {})]
        setFormItem('Tgt.cShipClassTwo', {disabled:true,rules: null});
        setFormItem('Tgt.cShipClassThree',{disabled:false,rules: [getRules("required", {})]})
+       
     }else{
       setFormItem('Tgt.cShipClassTwo', {disabled:false,rules: [getRules("required", {})]});
     
@@ -770,18 +771,35 @@ const method = {
     if(val=='02'){
       setFormItem('Tgt.cShipClassThree',{disabled:true,rules: null})
       setFormItem('Tgt.cShipClassTwo', {codeParam:{classone:'level1'},typeCode:'Ship_Class_Level2'});
+            setFormValue({
+          
+          "Tgt.cShipClassThree": null,
+        });
     }
     if(val=='03'){
       setFormItem('Tgt.cShipClassThree',{disabled:true,rules: null})
       setFormItem('Tgt.cShipClassTwo', {codeParam:{classone:'level2'},typeCode:'Ship_Class_Level2',});
+
+      // Tgt.cShipClassTwo
+     
+      console.log('2222', getValue('Tgt.cShipClassTwo'))
+        setFormValue({
+          "Tgt.cShipClassThree": null,
+        });
     }
+
+ 
   },
   cShipClassTwoChange:(val:any)=>{
      clearValidate('Tgt.cShipClassThree');
     if(val==='15'){
         setFormItem('Tgt.cShipClassThree',{disabled:false,rules: [getRules("required", {})]})
+        
     }else if(val){
        setFormItem('Tgt.cShipClassThree',{disabled:true,rules:null})
+        setFormValue({
+          "Tgt.cShipClassThree": null,
+        });
     }
   },
   // 核定座位总数

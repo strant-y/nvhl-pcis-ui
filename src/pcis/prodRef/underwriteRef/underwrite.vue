@@ -252,71 +252,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           },
         },
       },
-      {
-        prop: "cUndrOpnList",
-        inputtype: "rtselect",
-        title: "核保意见选项",
-        loadData: [
-          { label: "审核通过", value: "0" },
-          { label: "缺少必要信息", value: "1" },
-          { label: "修改承保条件", value: "2" },
-          { label: "费用超标", value: "3" },
-          { label: "拒绝承保", value: "4" },
-          { label: "提交上级", value: "5" },
-        ],
-        rules: [getRules("required", {})],
-        itemWidth: 1,
-        valueSpan: 10,
-        clearable: true,
-        func: (val: any) => {
-          const data = val ? undrOpnMap[val] : "";
-          underwriteEditRef.value?.setValue("undrOpn", data);
-        },
-      },
-      {
-        prop: "undrOpn",
-        inputtype: "rtinput",
-        type: "textarea",
-        title: "核保意见",
-        rows: 3,
-        itemWidth: 2,
-      },
-      {
-        prop: "cRpt",
-        inputtype: "rtselect",
-        title: "关联交易确认",
-        rules: [{ type: "required" }],
-        loadData: [
-          { value: "1", label: "是" },
-          { value: "2", label: "否" },
-        ],
-        clearable: true,
-      },
-      {
-        prop: "cIsRiskExp",
-        inputtype: "rtselect",
-        title: "是否需要风险查勘",
-        rules: [{ type: "required" }],
-        loadData: [
-          { value: "1", label: "是" },
-          { value: "2", label: "否" },
-        ],
-        clearable: true,
-        func: (val:any) => {
-          if(val === "1") {
-            setFormItem("cUndrMrk", {
-              loadData: [{value: 'B', label: '退回给出单员'}],
-            });
-            setValue("cUndrMrk", "B");
-          } else {
-            setFormItem("cUndrMrk", {
-              loadData: cUndrMrkOptions.value,
-            });
-            setValue("cUndrMrk", "");
-          }
-        }
-      },
-      {
+            {
         prop: "cUndrMrk",
         inputtype: "rtselect",
         title: "核保选项",
@@ -393,6 +329,71 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           }
         },
       },
+      {
+        prop: "cUndrOpnList",
+        inputtype: "rtselect",
+        title: "核保意见选项",
+        loadData: [
+          { label: "审核通过", value: "0" },
+          { label: "缺少必要信息", value: "1" },
+          { label: "修改承保条件", value: "2" },
+          { label: "费用超标", value: "3" },
+          { label: "拒绝承保", value: "4" },
+          { label: "提交上级", value: "5" },
+        ],
+        rules: [getRules("required", {})],
+        itemWidth: 1,
+        valueSpan: 10,
+        clearable: true,
+        func: (val: any) => {
+          const data = val ? undrOpnMap[val] : "";
+          underwriteEditRef.value?.setValue("undrOpn", data);
+        },
+      },
+      {
+        prop: "undrOpn",
+        inputtype: "rtinput",
+        type: "textarea",
+        title: "核保意见",
+        rows: 3,
+        itemWidth: 2,
+      },
+      {
+        prop: "cRpt",
+        inputtype: "rtselect",
+        title: "关联交易确认",
+        rules: [{ type: "required" }],
+        loadData: [
+          { value: "1", label: "是" },
+          { value: "2", label: "否" },
+        ],
+        clearable: true,
+      },
+      {
+        prop: "cIsRiskExp",
+        inputtype: "rtselect",
+        title: "是否需要风险查勘",
+        rules: [{ type: "required" }],
+        loadData: [
+          { value: "1", label: "是" },
+          { value: "2", label: "否" },
+        ],
+        clearable: true,
+        func: (val:any) => {
+          if(val === "1") {
+            setFormItem("cUndrMrk", {
+              loadData: [{value: 'B', label: '退回给出单员'}],
+            });
+            setValue("cUndrMrk", "B");
+          } else {
+            setFormItem("cUndrMrk", {
+              loadData: cUndrMrkOptions.value,
+            });
+            setValue("cUndrMrk", "");
+          }
+        }
+      },
+
       {
         prop: "cBckOp",
         inputtype: "rtselect",
