@@ -73,6 +73,8 @@ import underwriteRef from "./underwriteRef/underwrite.vue"
 import auditwriteRef from "./auditwriteRef/auditwrite.vue"
 import edrbaseRef from "./edrbaseRef/edrbase.vue"
 import edritemRef from "./edritemRef/edritem.vue"
+import xyedrbaseRef from "./xyedrbaseRef/xyedrbase.vue"
+import xyedritemRef from "./xyedritemRef/xyedritem.vue"
 import imageRef from "./commonRef/image.vue"; //影像信息
 import priceComponent from "./commonRef/priceComponent.vue";//询价页面配置
 import epolicyWorker from './commodityRef/EPolicyWorker.vue' //在保证明
@@ -113,6 +115,8 @@ const componentMap = {
   underwriteRef: underwriteRef, //录单页面中的核保组件
   edrbaseRef: edrbaseRef, //录单页面中的批改信息组件
   edritemRef: edritemRef, //录单页面中的批改比较项组件
+  xyedrbaseRef: xyedrbaseRef, //协议录单页面中的批改信息组件
+  xyedritemRef: xyedritemRef, //协议录单页面中的批改比较项组件
   imageRef:imageRef,
   auditwriteRef:auditwriteRef,
 
