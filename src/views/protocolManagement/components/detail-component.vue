@@ -11,6 +11,31 @@
             >
               <el-anchor :bound="120" :offset="80">
                 <el-anchor-link
+                    v-if="edrbaseFlag"
+                    @click="handleAnchorClick($event, `#edrbase`)"
+                    class="isActive"
+                >
+                  <!-- <rt-icon
+                    :item="{ icon: 'Tickets' }"
+                  /> -->
+                  <i :class="['icon','iconfont',iconMap['edrbase']]"></i>
+                  <span class="icon-title" v-if="NavigaShow"
+                  >批改信息</span
+                  >
+                </el-anchor-link>
+                <el-anchor-link
+                    v-if="edritemFlag"
+                    @click="handleAnchorClick($event, `#edritem`)"
+                >
+                  <!-- <rt-icon
+                    :item="{ icon: 'Tickets' }"
+                  /> -->
+                  <i :class="['icon','iconfont',iconMap['edritem']]"></i>
+                  <span class="icon-title" v-if="NavigaShow"
+                  >批改比较项</span
+                  >
+                </el-anchor-link>
+                <el-anchor-link
                     v-for="(k, i) in pageConfig?.pageInfo"
                     :key="i"
                     :custom="true"
@@ -71,6 +96,12 @@
         <!-- </el-affix> -->
       </el-aside>
       <el-main>
+        <div id="edrbase" v-if="edrbaseFlag" style="margin-bottom: 10px">
+          <xyedrbaseRef ref="edrbase"></xyedrbaseRef>
+        </div>
+        <div id="edritem" v-if="edritemFlag" style="margin-bottom: 10px">
+          <xyedritemRef ref="edritem"></xyedritemRef>
+        </div>
         <template v-for="(pageConfig, v) in formPage.config" :key="v">
           <div
               class="card_"
@@ -152,11 +183,20 @@ const getConmpName = (k: any) => {
 }
 const NavigaShow = ref(true);
 const underwrite = ref(null);
+let edrbaseFlag = ref(false);
+let edritemFlag = ref(false);
 onMounted(()=>{
   if (props.pageType === "audit") {
     underwriteFlag.value = true;
   } else {
     underwriteFlag.value = false;
+  }
+  if(props.pageType === "EDR_APP_NEW_SCENE"){
+    edrbaseFlag.value =true
+    edritemFlag.value =true
+  }else {
+    edrbaseFlag.value =false
+    edritemFlag.value =false
   }
 })
 function  getUnderwriteRef (){

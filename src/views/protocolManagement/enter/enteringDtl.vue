@@ -18,6 +18,9 @@ const props = defineProps({
   },
   type: {
     type: String
+  },
+  cEdrType: {
+    type: String
   }
 });
 const formPage = ref(new FormPage('enteringDtl'));
@@ -119,6 +122,89 @@ const uwBtn = [
     },
   }),
 ];
+/**
+ * 一般批改按钮
+ */
+const edrBtn = [
+  createFreeButtonBase({
+    label: "原保单查看",
+    type: "primary",
+    func: () => {
+
+    },
+  }),
+  createFreeButtonBase({
+    label: "保费计算",
+    type: "primary",
+    id: "btnCalEdr",
+    func: () => {
+
+    },
+  }),
+  createFreeButtonBase({
+    label: "保存",
+    type: "primary",
+    id: "saveEdr",
+    func: () => {
+
+    },
+  }),
+  createFreeButtonBase({
+    label: "比较/生成批文",
+    type: "primary",
+    id: "btnCompare",
+    func: () => {
+
+    },
+  }),
+  createFreeButtonBase({
+    label: "申请核保",
+    type: "primary",
+    id: "btnSubmitEdr",
+    func: () => {
+
+    },
+  }),
+
+];
+/**
+ * （退保/注销） 按钮
+ * @type {FormButton[]}
+ */
+const edrSurrenderBtn = [
+  createFreeButtonBase({
+    id: "btn010101",
+    label: "保费计算",
+    type: "primary",
+    func: () => {
+
+    },
+  }),
+  createFreeButtonBase({
+    id: "btn010102",
+    label: "保存",
+    type: "primary",
+    func: () => {
+
+    },
+  }),
+  createFreeButtonBase({
+    id: "btnCompare",
+    label: "比较/生成批文",
+    type: "primary",
+    func: () => {
+
+    },
+  }),
+  createFreeButtonBase({
+    id: "btn010103",
+    label: "申请核保",
+    type: "primary",
+    func: () => {
+
+    },
+  }),
+];
 onBeforeMount(async () => {
   const res = await cargoApi.getECargoPageView({
       'compKeyList': EnteringCompList.map(item => item.tab)
@@ -139,7 +225,15 @@ onBeforeMount(async () => {
   if(props.type === 'audit'){
     bthList.value = uwBtn
   }
-  if(['view','edit','audit'].includes(props.type)){
+  //批改
+  if(props.type === 'EDR_APP_NEW_SCENE'){
+    if(props.cEdrType === '1'){
+      bthList.value = edrBtn
+    }else{
+      bthList.value = edrSurrenderBtn
+    }
+  }
+  if(['view','edit','audit','EDR_APP_NEW_SCENE'].includes(props.type)){
     nextTick(()=>{
       query();
     })
