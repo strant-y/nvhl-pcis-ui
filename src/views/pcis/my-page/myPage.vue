@@ -181,7 +181,12 @@
               class="font-weight-500"
               >保费为: </span
             ><span class="publicStyle">{{ nPrm.toLocaleString() }}</span
-            >&nbsp;<span class="font-weight-500">元</span>
+            >&nbsp;<span class="font-weight-500">元</span>&nbsp;
+						<template v-if="props.param?.cRecordType === 4">
+							|&nbsp;<span class="font-weight-500">剩余预收保费为: </span
+							><span class="publicStyle">{{ nRecRemPrm.toLocaleString() }}</span
+							>&nbsp;<span class="font-weight-500">元</span>
+						</template>
           </div>
         </div>
         <div class="main-content">
@@ -312,6 +317,7 @@ import {
   getInquiryPolicy,
 	getisAllDone,
 	isUndrClsBlackList,
+	queryEcargoRelevancePolicyDetails
 } from "../../../api/query/index";
 import { checkFeeWindowType, selectDist, saveDistBatch, getReleaseInquiryPage } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
@@ -418,7 +424,7 @@ const historyClaRef = ref(null);
 const sliceSide = ref([]);
 const bottomBtnColor1 = "#3498DB";
 
-const props = defineProps({
+const props:any = defineProps({
   param: {
     type: Object,
   },
@@ -445,6 +451,7 @@ const userString = sessionStorage.getItem("user");
 const user = userString ? JSON.parse(userString) : {};
 const nAmt = ref("0.00");
 const nPrm = ref("0.00");
+const nRecRemPrm = ref("0.00");
 const tmDay = ref(0);
 const dzmodal = useDzModal();
 const cacheKey = ref();
@@ -1117,7 +1124,7 @@ if (
   }
 }
 
-const dataInit = ref({});
+const dataInit:any = ref({});
 /**
  * 逐个渲染组件
  */
@@ -1192,6 +1199,37 @@ async function loadAfter() {
     } else {
       bthList.value = basicBtn;
     }
+		// 协议出单请求被保人信息和条款信息,见费出单跟协议号返回的走并且不可修改，展示剩余预收保费字段
+		if(props.param.cRecordType === 4){
+			let params = {
+				cEcAgrAppNo: props.param.cEcAgrAppNo, // 协议申请单号
+				cProdNo: props.param.cProdNo, // 产品代码
+				cTermNo: props.param.cTermNo, // 条款代码
+				cInsuredCde: props.param.cInsuredCde, // 被保人代码
+			}
+			const res: any = await queryEcargoRelevancePolicyDetails(params);
+			if(res["code"] == 200){
+				if(!!res.data.policyApplication?.composition){
+					dataInit.value.insured = res.data.policyApplication?.composition?.insured[0];
+					dataInit.value.cvrg = res.data.policyApplication?.composition?.cvrg;
+					dataInit.value.plyBase["Base.cNeedfeeFlag"] = props.param.cNeedfeeFlag
+					dataInit.value.plyBase["Base.cEcAgrNo"] = props.param.cEcAgrNo
+					let plyBase = opertaor.getTableRefByKey('plyBase')
+					if(plyBase){
+						const getFormconfig = plyBase.getFormconfig();
+						getFormconfig.fromSchema?.forEach((item:any) => {
+							if(item.prop == "Base.cNeedfeeFlag"){
+								item.disabled = true;
+							}
+						});
+					}
+					nRecRemPrm.value = res.data.policyApplication.nRecRemPrm 
+				}
+			} else {
+				ElMessage.error({ message: res.msg, duration: 3000 });
+				return false;
+			}
+		}
     nextTick(() => {
       opertaor.setDataAll(dataInit.value);
     });
