@@ -2765,7 +2765,10 @@ const calcPremiumEdr = () => {
         let num = 0;
         item['Term.riskList'].forEach((i:any) => {
           // nInsuranceAmount.push(i['TermRisktgt.nInsuranceAmount'] || 0)
-          num = num + (i['TermRisktgt.nInsuranceAmount'] || 0)
+          // 是否条款自带条则，0：否，1：是
+          if(i['TermRisktgt.selfTermRisk'] === "1") {
+            num = num + (i['TermRisktgt.nInsuranceAmount'] || 0)
+          }
         })
         if(num > 0) {
           nInsuranceAmount.push(num)
@@ -3183,7 +3186,10 @@ const submitEdrToUndrFun = async () => {
               let num = 0;
               item['Term.riskList'].forEach((i:any) => {
                 // nInsuranceAmount.push(i['TermRisktgt.nInsuranceAmount'] || 0)
-                num = num + (i['TermRisktgt.nInsuranceAmount'] || 0)
+                // 是否条款自带条则，0：否，1：是
+                if(i['TermRisktgt.selfTermRisk'] === "1") {
+                  num = num + (i['TermRisktgt.nInsuranceAmount'] || 0)
+                }
               })
               if(num > 0) {
                 nInsuranceAmount.push(num)
