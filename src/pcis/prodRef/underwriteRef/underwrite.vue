@@ -81,9 +81,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 // 如果是多险位，则不能进行自主临分
                 if(res.body.tableList && res.body.tableList.lengt > 1) {
                   setFormItem("riFacMrk", {
-                    disabled: true,
                     btnItems: {disabled: true}
                   });
+                  checkboxDisabledFlag.value = true
                 }
               }
             });
@@ -154,9 +154,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   ElMessage.success("自主临分提交成功");
                   // 自主临分成功后，是否临分、风险单位划分不可编辑，不能核保退回
                   setFormItem("riFacMrk", {
-                    disabled: true,
                     btnItems: {disabled: true}
                   });
+                  checkboxDisabledFlag.value = true
                   riskunitDisabledFlag.value = true
                   setFormItem("cUndrMrk",{ loadData: cUndrMrkOptions.value.filter((item:any) => item.value != "B" && item.value != "T") })
                   setValue("cUndrMrk", "")
@@ -164,9 +164,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   ElMessage.error("满足强制临分，不能自主临分");
                   // 满足强制临分，不能自主临分
                   setFormItem("riFacMrk", {
-                    disabled: true,
                     btnItems: {disabled: true}
                   });
+                  checkboxDisabledFlag.value = true
                   riskunitDisabledFlag.value = true
                   setFormItem("cUndrMrk",{ loadData: cUndrMrkOptions.value.filter((item:any) => item.value != "B" && item.value != "T") })
                   setValue("cUndrMrk", "")
@@ -219,9 +219,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         func: (val: any) => {
           if (val === "1") {
             setFormItem("riFacMrk", {
-              disabled: true,
               btnItems: {disabled: true}
             });
+            checkboxDisabledFlag.value = true
             if (!bzFlag.value) {
               ElMessageBox.confirm(
                 "该业务认定为非水险比例分保合同除外业务，是否查看该险种合同除外责任并进一步确认。",
@@ -594,9 +594,9 @@ function getRiskData() {
       if (res.code === "200") {
         if(res.data && res.data.length > 1) {
           setFormItem("riFacMrk", {
-            disabled: true,
             btnItems: {disabled: true}
           });
+          checkboxDisabledFlag.value = true
         }
       }
     })
