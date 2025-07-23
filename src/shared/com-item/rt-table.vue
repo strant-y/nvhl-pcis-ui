@@ -25,6 +25,7 @@
       @status-change="handleStatusChange"
       :show-summary="item.showSummary ? item.showSummary : false"
       :sum-text="item.sumText ? item.sumText : '合计'"
+			empty-text="暂无数据"
       :summary-method="item.summaryMethod ? item.summaryMethod : null"
       :span-method="objectSpanMethod"
       @current-change="currentChange"

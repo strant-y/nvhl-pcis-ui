@@ -1,17 +1,16 @@
-<!-- 发起风勘-查询 -->
+<!-- 协议号-查询 -->
 <template>
   <div>
-    <el-dialog v-model="maindialogVisible" width="70%" title="风勘查询">
+    <el-dialog v-model="maindialogVisible" width="70%" title="协议号查询">
       <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
-        <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef" />
+        <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef" @page-change="handleQuery(false)" />
     </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useValidator } from "@/typings/useValidator";
-import { defineComponent, ref } from 'vue';
-import { ElForm, ElFormItem, ElInput, ElButton, ElTabs, ElTabPane, ElTable, ElTableColumn } from 'element-plus';
+import { defineComponent, ref, defineEmits, onMounted  } from 'vue';
 
 import {
   AppFreeEditConfig,
@@ -20,7 +19,6 @@ import {
 } from "@/shared/app-free-edit-config";
 
 import { createFreeButtonBase } from "@/shared/button-config";
-import { yesOrNo, size, inputtype } from "@/utils/utilKey";
 import {
   AppTableConfig,
   AppTableMethod,
@@ -28,10 +26,7 @@ import {
 } from "@/shared/app-table-config";
 
 import { PcisQueryService } from "@/views/payinfoManagement/service/pcis-query-service";
-import { defineEmits, onMounted } from "vue";
 
-import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
 const props = defineProps({
   data: {
     type: Object,
@@ -63,25 +58,32 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "primary",
         label: "查询",
         func: async () => {
-          windSave();
+          handleQuery();
+        },
+      }),
+			createFreeButtonBase({
+        label: "重置",
+        func: () => {
+          freeEditRef.value?.resetFields();
+          handleQuery(true);
         },
       }),
     ],
     fromSchema: [
 			{
+				prop: "cEcAgrNo",
+				inputtype: "rtinput",
+				title: "协议单号",
+			},
+			{
 				prop: "cAppNme",
 				inputtype: "rtinput",
-				title: "投保人",
+				title: "投保人客户名称",
 			},
 			{
-				prop: "cInsuredNme",
+				prop: "insuredNme",
 				inputtype: "rtinput",
-				title: "被保人",
-			},
-			{
-				prop: "taskNo",
-				inputtype: "rtinput",
-				title: "任务号",
+				title: "被保险人名称",
 			},
 		],
   })
@@ -89,25 +91,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
-    isPage: false,
-    showSelection: false,
     tableBtnType: "btn",
     tableBtnWidth: 110,
     tableBtnPosition: "right",
     tableBtnTitle: '详情',
-    tableBtn: [
-      createFreeButtonBase({
-        id: "score",
-        link: true,
-        tooltip: "查看报告",
-        type: "success",
-        size: "large",
-        icon: "View",
-        tableClick: (row) => {
-          viewDetails(row)
-        },
-      }),
-    ],
+    tableBtn: [],
     fromSchema: [
       {
         prop: "nSeqNo",
@@ -115,76 +103,54 @@ const tableconfig = reactive<AppTableConfig>(
         title: "序号",
       },
       {
-        prop: "time",
+        prop: "cEcAgrNo",
         inputtype: 'rtinput',
-        title: "风勘时间",
+        title: "协议号",
       },
       {
-        prop: "cSegment",
-        inputtype: 'rtselect',
-        title: "环节",
-				typeCode: 'Segment',
-      },
-       
+        prop: "cAppNme",
+        inputtype: 'rtinput',
+        title: "投保人客户名称",
+      }
     ],
+		rowDbClickFun:(row: any)=>{
+      emits("ok", row);
+      maindialogVisible.value = false
+    }
   })
 );
 
 onMounted(() => {
 	nextTick(() => {
-		windSave()
+		handleQuery()
 	})
 });
 
-// 查询风勘任务
-const windSave = () => {
+// 查询协议号
+const handleQuery = (flag?: boolean) => {
+	const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  let params = { ...s, cInquiryNumber: props.data.plyBase['Base.cInquiryNo'] }
+  const params = Object.assign(s,r);
   console.log('params', params)
-  pcisQueryService.getTaskList(params).then((res: any) => {
+  pcisQueryService.queryEcargoRelevancePolicy(params).then((res: any) => {
     console.log('数据---‘',res)
 		const { code, data, msg } = res;
-    if (code == 200) {
-      if(data !== null){
-				data.forEach((item: any, index: number) => {
+    if (200 === code) {
+				data.data.forEach((item: any, index: number) => {
           item.nSeqNo = index + 1;
-					item.time = item.tSurveyStart?.split(' ')[0] + ' - ' + item.tSurveyEnd?.split(' ')[0]
         });
-        pageresult.list = data;
+        pageresult.list = [];
+        pageresult.list = data.data;
         pageresult.total = data.total;
-      }else{
-				pageresult.list = [];
-        pageresult.total = 0;
-        ElMessage.warning(msg)
+      } else {
+        ElMessage.error(msg);
       }
-    } else {
-			pageresult.list = [];
-      pageresult.total = 0;
-      ElMessage.error({ message: msg, duration: 3000 });
-    }
-  });
+  }).finally(() => {});
 }
 
 // 关闭弹窗
 const handleReturn = () => {
   maindialogVisible.value = false
-};
-
-// 风勘查询---获取风勘任务详情
-const viewDetails = (row: any) => {
-  console.log(row);
-  let params = {
-    taskNo: row.taskNo,
-  }
-
-  pcisQueryService.getTaskUrl(params).then((res: any) => {
-    console.log('详情数据', res)
-    if (res.code == 200 && !!res.data) {
-			window.open(res.data, '_blank');
-    } else {
-      ElMessage.error({ message: res.msg, duration: 3000 });
-    }
-  });
 };
 </script>
 
