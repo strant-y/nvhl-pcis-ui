@@ -195,6 +195,8 @@ onMounted(() => {
         // setValue('CDptCde', props.data.data.CDptCde)
         setValue('CDptCnm',routeParam.cDptCnm)
     })
+  // 页面加载时触发一次查询
+    handleQuery();
 });
 
 defineExpose({
