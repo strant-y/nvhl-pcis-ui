@@ -73,7 +73,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         format: "YYYY-MM-DD",
         valueFormat: 'YYYY-MM-DD 00:00:00',
         rules: [getRules("required", {})],
-        type: "datetime",
+        type: "date",
         itemWidth: 1.5,
 				disabledDate: (time: Date) => {
 					const today = new Date();
@@ -98,7 +98,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "结束时间",
         format: "YYYY-MM-DD",
         valueFormat: 'YYYY-MM-DD 00:00:00',
-        type: "datetime",
+        type: "date",
         rules: [getRules("required", {})],
         itemWidth: 1.5,
 				disabledDate: (time: Date) => {
