@@ -672,4 +672,24 @@ export class PcisQueryService {
     getTaskUrl(ops: any): AxiosPromise<any> {
         return post(`risk/getTaskUrl`, ops);
     }
+		/**
+		 * 协议号查询
+		 */
+		queryEcargoRelevancePolicy(ops: any): AxiosPromise<any> {
+			return post(`/ecargo/queryEcargoRelevancePolicy`, ops);
+		}
+		/**
+		 * 产品代码查询
+		 */
+		queryEcargoRelevancePolicyTermProd(ops: any): AxiosPromise<any> {
+			return post(`ecargo/queryEcargoRelevancePolicyTermProd`, ops);
+		}
+		/**
+		 * 被保人查询
+		 */
+		queryEcargoRelevancePolicyInsured(ops: any): AxiosPromise<any> {
+			return post(`ecargo/queryEcargoRelevancePolicyInsured`, ops);
+		}
+	
+	
 }

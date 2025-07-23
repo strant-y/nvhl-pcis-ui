@@ -52,6 +52,10 @@ const riskunitDisabledFlag = ref(false)
 const riskunitDisabled = computed(() => {
   return cProdNoMap.indexOf(params.cProdNo) != -1 || params.cAppTyp === "E" || riskunitDisabledFlag.value
 })
+const checkboxDisabledFlag = ref(false)
+const riFacMrkDisabled = computed(() => {
+  return params.cAppTyp === "E" || checkboxDisabledFlag.value
+})
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "核保信息",
@@ -97,7 +101,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
         defaultValue: "0",
         rules: [getRules("required", {})],
-        disabled: params.cAppTyp === "E", // 批单不允许进行自主临分
+        disabled: riFacMrkDisabled, // 批单不允许进行自主临分
         func: (val: any) => {
           if (val == "1") {
             // 勾选临分时，临分意见必填
@@ -600,7 +604,14 @@ function getRiskData() {
 }
 
 function setRiskunitDisabled() {
+  // 风险单位划分按钮置灰
   riskunitDisabledFlag.value = true
+  // 自主临分按钮置灰
+  setFormItem("riFacMrk", {
+    btnItems: {disabled: true},
+  });
+  // 是否临分复选框置灰
+  checkboxDisabledFlag.value = true
 }
 
 defineExpose({

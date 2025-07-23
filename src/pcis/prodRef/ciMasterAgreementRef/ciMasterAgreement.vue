@@ -28,12 +28,19 @@ const props = defineProps({
 watchEffect(() => {
   const cCiMrkValue = opertaor.getTableRefByKey("plyBase")?.getValue("Base.cCiMrk");
     if (cCiMrkValue === "3" || cCiMrkValue === "4") {
+      debugger
       formconfig1.fromSchema?.forEach((item) => {
         const prop = item.prop;
         if (
           prop === "Base.cCiAgtNo" ||
           prop === "Base.nCiJntAmt" ||
-          prop === "Base.nCiJntPrm"
+          prop === "Base.nCiJntPrm" ||
+          prop === "Base.nCiOwnAmt" ||
+          prop === "Base.nCiOwnPrm" ||
+          prop === "Base.cCiInpTyp" ||
+          prop === "Base.cCiPriTyp" || 
+          prop === "Base.cReceiptTitleNme" ||
+          prop === "Base.cReceiptTitleCde"
         ) {
           item.hidden = false; // 显示共保字段
         } else {
@@ -46,7 +53,12 @@ watchEffect(() => {
           if (
             prop === "Base.cJiAgtNo" ||
             prop === "Base.nJiJntAmt" ||
-            prop === "Base.nJiJntPrm"
+            prop === "Base.nJiJntPrm" ||
+            prop === "Base.nCiOwnPrm" ||
+            prop === "Base.cCiInpTyp" ||
+            prop === "Base.cCiPriTyp" || 
+            prop === "Base.cReceiptTitleNme" ||
+            prop === "Base.cReceiptTitleCde"
           ) {
             item.hidden = false; // 显示联保字段
           } else {

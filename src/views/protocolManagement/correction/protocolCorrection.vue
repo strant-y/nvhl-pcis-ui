@@ -233,6 +233,9 @@ const pageresult = reactive<Pageresult>({
 
 const tableconfig = reactive<AppTableConfig>(
     createTableEditConfig({
+      showSelection: false,
+      editFlag: true,
+      editList: ["id", "iddetail"],
       tableBtn: [
         createFreeButtonBase({
           id: "score",
@@ -255,7 +258,28 @@ const tableconfig = reactive<AppTableConfig>(
           icon: "Edit",
           tableClick: (row) => {
             console.log(row);
-            toDtl(row, 'edit');
+            let cEdrType:string = ''
+            const rsnTyp = row['id'] && row['id'].length > 0 ? row['id'][0]?.split('-')[0] : null;
+              if(!row['id'] || row['id'].length < 2) {
+                ElMessage.warning("请选择批改原因");
+                return;
+              }
+            // 如果选的批改原因是变更影像上传方式
+            if ("DZ" === row['id'][1]) {
+              return;
+            } else if ("DP" === row['id'][1]) {
+
+            } else if ("2" === rsnTyp) {
+              //注销
+              cEdrType = '2'
+            } else if ("3" === rsnTyp) {
+              //退保
+              cEdrType = '3'
+            } else if ("1" === rsnTyp) {
+              //一般批改
+              cEdrType = '1'
+            }
+            toDtl(row, 'EDR_APP_NEW_SCENE',cEdrType);
           },
         }),
       ],
@@ -322,6 +346,19 @@ const tableconfig = reactive<AppTableConfig>(
           title: "缴费余额",
           minWidth: 120,
         },
+        {
+          prop: "id",
+          inputtype: "rtcascader",
+          title: "批改原因",
+          minWidth: 220,
+          typeCode: 'EDR_RSN_LIST_NEW',
+          checkStrictly: false,
+          func: (val, row, codeListMap) => {
+            if(val && val[1] && codeListMap['EDR_RSN_LIST_NEW-1-' + val[0]]) {
+              row["iddetail"] = codeListMap['EDR_RSN_LIST_NEW-1-' + val[0]].find((item:any) => item.value === val[1]);
+            }
+          },
+        },
       ],
     })
 );
@@ -333,8 +370,8 @@ onMounted(async () => {
   )
 });
 
-function toDtl(row: any, type: string) {
-  router.push({path: "/protocolManagement/correctionDtl", query: {param: JSON.stringify(row), type: type}});
+function toDtl(row: any, type: string,cEdrType = '') {
+  router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify(row), type,cEdrType}});
 }
 
 
@@ -369,6 +406,15 @@ function handleQuery(flag?: boolean) {
           if (pageData) {
             pageresult.list = pageData.data;
             pageresult.total = pageData.total;
+            pageData.data.forEach((item) => {
+              setTableFormItem("id", {
+                loadData: [
+                  { label: '一般批改', value: `1-${'029900'.slice(0,2)}` },
+                  { label: '注销', value: `2-${'029900'.slice(0,2)}` },
+                  { label: '退保', value: `3-${'029900'.slice(0,2)}` },
+                ],
+              })
+            });
           }
         } else {
           ElMessage.error(res.msg);

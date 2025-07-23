@@ -12,41 +12,7 @@
         :inline="true"
       >
         <h4 style="margin: 10px 20px">投保向导</h4>
-        <el-form-item
-          v-if="isZGS"
-          label="分公司"
-          prop="dptCde"
-          style="width: 400px"
-          :rules="[getRules('required', {})]"
-        >
-            <el-select-v2
-                v-model="formconfig1.dptCde"
-                :options="dptCdeList"
-                placeholder="分公司"
-                size="large"
-                filterable
-                @change="getCDptCdeList"
-            />
-        </el-form-item>
-        <el-form-item
-          label="承保机构"
-          prop="cDptCde"
-          style="width: 650px"
-          :rules="[getRules('required', {})]"
-        >
-            <el-select-v2
-                v-model="formconfig1.cDptCde"
-                :options="cDptCdeList"
-                placeholder="承保机构"
-                size="large"
-                style="width: 500px"
-                :loading="cDptCdeLoading"
-                filterable
-                clearable
-                @change="selectedItem"
-            />
-        </el-form-item>
-        <el-form-item
+				<el-form-item
           label="录单方式"
           prop="cRecordType"
           style="width: 600px"
@@ -56,10 +22,10 @@
             <el-radio :value="1">自定义录单</el-radio>
             <el-radio :value="2">方案录单</el-radio>
             <el-radio :value="3">模板出单</el-radio>
+            <el-radio :value="4">协议出单</el-radio>
           </el-radio-group>
         </el-form-item>
-
-        <el-form-item
+				<el-form-item
           v-if="formconfig1.cRecordType === 3"
           label="选择模板"
           prop="tpl"
@@ -75,8 +41,7 @@
             @change="selectedTpl"
           />
         </el-form-item>
-
-        <el-form-item
+				<el-form-item
           v-if="formconfig1.cRecordType === 3"
           label="模板描述"
           prop="seldef"
@@ -84,10 +49,46 @@
         >
           <div>{{ formconfig1.seldef }}</div>
         </el-form-item>
-
-        <template v-if="formconfig1.cRecordType == 1">
+				<div>
+					<el-form-item
+						v-if="isZGS"
+						label="分公司"
+						prop="dptCde"
+						style="width: 400px"
+						:rules="[getRules('required', {})]"
+					>
+						<el-select-v2
+							v-model="formconfig1.dptCde"
+							:options="dptCdeList"
+							placeholder="分公司"
+							size="large"
+							filterable
+							@change="getCDptCdeList"
+						/>
+					</el-form-item>
+					<el-form-item
+						label="承保机构"
+						prop="cDptCde"
+						style="width: 650px"
+						:rules="[getRules('required', {})]"
+					>
+						<el-select-v2
+							v-model="formconfig1.cDptCde"
+							:options="cDptCdeList"
+							placeholder="承保机构"
+							size="large"
+							style="width: 500px"
+							:loading="cDptCdeLoading"
+							filterable
+							clearable
+							@change="selectedItem"
+						/>
+					</el-form-item>
+				</div>
+        <template v-if="formconfig1.cRecordType == 1 || formconfig1.cRecordType == 4">
           <h4 style="margin: 10px 20px">投保信息</h4>
           <el-form-item
+						v-if="formconfig1.cRecordType == '1'"
             label="投保标识"
             prop="cRenewMrk"
             :rules="[getRules('required', {})]"
@@ -110,99 +111,191 @@
             >
             </el-input>
           </el-form-item>
+					<!-- 协议出单需要展示的字段 -->
+					<el-row v-if="formconfig1.cRecordType == '4'">
+						<el-col :span="24">
+							<el-form-item
+								label="协议号"
+								prop="cEcAgrNo"
+								:rules="[getRules('required', {})]"
+							>
+								<el-input style="width: 500px" v-model="formconfig1.cEcAgrNo" disabled />
+								<el-button
+									@click="getProtocolNumber"
+									icon="Search"
+									type="primary"
+								></el-button>
+							</el-form-item>
+						</el-col>
+					</el-row>
+					<el-row v-if="formconfig1.cRecordType == '4'">
+						<el-col :span="24">
+							<el-form-item
+								label="产品代码"
+								prop="cProdNme"
+								:rules="[getRules('required', {})]"
+							>
+								<el-select
+									style="width: 500px"
+									v-model="formconfig1.cProdNme"
+									placeholder="请选择"
+									clearable
+									:disabled="true"
+								>
+									<el-option
+										v-for="item in options"
+										:label="item.cNmeCn"
+										:value="item.cTermNo"
+									/>
+								</el-select>
+								<el-button
+									@click="getBeToOrgan"
+									icon="Search"
+									type="primary"
+								></el-button>
+							</el-form-item>
+						</el-col>
+					</el-row>
+					<el-row v-if="formconfig1.cRecordType == '4'">
+						<el-col :span="24">
+							<el-form-item
+								label="条款代码"
+								prop="cTermNme"
+								:rules="[getRules('required', {})]"
+							>
+								<el-select
+									style="width: 500px"
+									v-model="formconfig1.cTermNme"
+									placeholder="请选择"
+									clearable
+									:disabled="true"
+								>
+									<el-option
+										v-for="item in options"
+										:label="item.cNmeCn"
+										:value="item.cTermNo"
+									/>
+								</el-select>
+								<el-button
+									@click="getTermNme"
+									icon="Search"
+									type="primary"
+								></el-button>
+							</el-form-item>
+						</el-col>
+					</el-row>
+					<el-row v-if="formconfig1.cRecordType == '4'">
+						<el-col :span="24">
+							<el-form-item
+								label="被保人"
+								prop="cInsuredNme"
+								:rules="[getRules('required', {})]"
+							>
+								<el-input style="width: 500px" v-model="formconfig1.cInsuredNme" disabled />
+								<el-button
+									@click="getInsuredName"
+									icon="Search"
+									type="primary"
+								></el-button>
+							</el-form-item>
+						</el-col>
+					</el-row>
         </template>
+				<template v-if="formconfig1.cRecordType != 4">
+					<h4 style="margin: 10px 20px">选择{{ labelNm }}</h4>
+					<el-form-item
+						label="团个属性"
+						prop="cGrpMrk"
+						:rules="[getRules('required', {})]"
+					>
+						<el-radio-group v-model="formconfig1.cGrpMrk">
+							<el-radio value="0">个单</el-radio>
+							<!-- <el-radio value="1">团单</el-radio> -->
+						</el-radio-group>
+					</el-form-item>
+				</template>
+				<template v-if="formconfig1.cRecordType != 4">
+					<el-tooltip placement="top">
+						<template #content>
+							可用鼠标左键，按住常用{{ labelNm }}卡片<br />自由拖动常用{{ labelNm }}排序<br />
+						</template>
+						<h4
+							style="margin: 10px 20px; width: 200px"
+							v-if="formconfig1.cRenewMrk !== '1'"
+						>
+							常用{{ labelNm }}
+							<el-icon size="20" style="vertical-align: middle; color: red"
+								><InfoFilled
+							/></el-icon>
+						</h4>
+					</el-tooltip>
+					<el-row v-if="formconfig1.cRenewMrk !== '1'">
+						<el-col :span="24">
+							<div>
+								<VueDraggable
+									class="eachCon"
+									v-model="termList"
+									:animation="150"
+									@update="updateOptionAll"
+								>
+									<el-card
+										v-for="(item, index) in termList"
+										:key="index"
+										:class="item.checked ? 'checked eachItems' : 'eachItems'"
+										shadow="hover"
+										@click="handleClick(item, index)"
+									>
+										<p class="titles">
+											<el-icon size="20" style="vertical-align: middle"
+												><Fold
+											/></el-icon>
+											<span :title="item.prodCnm" class="">
+												{{ item.prodCnm }}
+											</span>
+											<el-icon
+												:size="25"
+												style="color: rgb(250, 219, 20)"
+												@click.stop="handleStarClick(item)"
+												><StarFilled
+											/></el-icon>
+										</p>
+										<p class="txt" v-if="formconfig1.cRecordType == 1 || formconfig1.cRecordType == 3">{{ item.termNo }} - {{ item.termCnm }}</p>
+										<p class="txt" v-else>{{ item.planNo }} - {{ item.planCnm }}</p>
+									</el-card>
+								</VueDraggable>
+							</div>
+						</el-col>
+						<el-col :span="24">
+							<el-form-item
+								:label="`${labelNm}名称`"
+								prop="cTermNme"
+								:rules="[getRules('required', {})]"
+							>
+								<el-select
+									style="width: 500px"
+									v-model="formconfig1.cTermNme"
+									placeholder="请选择"
+									@change="handleChange"
+									@clear="handleClear"
+									clearable
+									:disabled="true"
+								>
+									<el-option
+										v-for="item in options"
+										:label="item.cNmeCn"
+										:value="item.cTermNo"
+									/>
+								</el-select>
+								<el-button
+									@click="showModal"
+									icon="Search"
+									type="primary"
+								></el-button>
+							</el-form-item>
+						</el-col>
+					</el-row>
+				</template>
 
-        <h4 style="margin: 10px 20px">选择{{ labelNm }}</h4>
-        <el-form-item
-          label="团个属性"
-          prop="cGrpMrk"
-          :rules="[getRules('required', {})]"
-        >
-          <el-radio-group v-model="formconfig1.cGrpMrk">
-            <el-radio value="0">个单</el-radio>
-            <!-- <el-radio value="1">团单</el-radio> -->
-          </el-radio-group>
-        </el-form-item>
-
-        <el-tooltip placement="top">
-          <template #content>
-            可用鼠标左键，按住常用{{ labelNm }}卡片<br />自由拖动常用{{ labelNm }}排序<br />
-          </template>
-          <h4
-            style="margin: 10px 20px; width: 200px"
-            v-if="formconfig1.cRenewMrk !== '1'"
-          >
-            常用{{ labelNm }}
-            <el-icon size="20" style="vertical-align: middle; color: red"
-              ><InfoFilled
-            /></el-icon>
-          </h4>
-        </el-tooltip>
-        <el-row v-if="formconfig1.cRenewMrk !== '1'">
-          <el-col :span="24">
-            <div>
-              <VueDraggable
-                class="eachCon"
-                v-model="termList"
-                :animation="150"
-                @update="updateOptionAll"
-              >
-                <el-card
-                  v-for="(item, index) in termList"
-                  :key="index"
-                  :class="item.checked ? 'checked eachItems' : 'eachItems'"
-                  shadow="hover"
-                  @click="handleClick(item, index)"
-                >
-                  <p class="titles">
-                    <el-icon size="20" style="vertical-align: middle"
-                      ><Fold
-                    /></el-icon>
-                    <span :title="item.prodCnm" class="">
-                      {{ item.prodCnm }}
-                    </span>
-                    <el-icon
-                      :size="25"
-                      style="color: rgb(250, 219, 20)"
-                      @click.stop="handleStarClick(item)"
-                      ><StarFilled
-                    /></el-icon>
-                  </p>
-                  <p class="txt" v-if="formconfig1.cRecordType == 1 || formconfig1.cRecordType == 3">{{ item.termNo }} - {{ item.termCnm }}</p>
-                  <p class="txt" v-else>{{ item.planNo }} - {{ item.planCnm }}</p>
-                </el-card>
-              </VueDraggable>
-            </div>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item
-              :label="`${labelNm}名称`"
-              prop="cTermNme"
-              :rules="[getRules('required', {})]"
-            >
-              <el-select
-                style="width: 500px"
-                v-model="formconfig1.cTermNme"
-                placeholder="请选择"
-                @change="handleChange"
-                @clear="handleClear"
-                clearable
-                :disabled="true"
-              >
-                <el-option
-                  v-for="item in options"
-                  :label="item.cNmeCn"
-                  :value="item.cTermNo"
-                />
-              </el-select>
-              <el-button
-                @click="showModal"
-                icon="Search"
-                type="primary"
-              ></el-button>
-            </el-form-item>
-          </el-col>
-        </el-row>
       </el-form>
     </div>
     <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
@@ -274,20 +367,25 @@ const departmentTree = defineAsyncComponent(
   () => import("@/components/common/DepartmentTree.vue")
 );
 const termDialog = defineAsyncComponent(() => import("./termDialog.vue"));
-const formconfig1 = ref({
+const formconfig1:any = ref({
   cDptCde: "",
   cDptCnm: "",
   cRenewMrk: "0",
   cGrpMrk: "0",
   dptCde:  "",
   // cNmeCn: "",
-  cTermNme: "",
-  cTermNo: "",
-  cProdNo: "",
-  cProdNme: "",
+  cTermNme: "", // 条款名称
+  cTermNo: "", // 条款代码
+  cProdNo: "", // 产品编码
+  cProdNme: "", // 产品名称
   cPlyNo: "",
   cRecordType: 1,
   cIsPlan:'0',
+	cEcAgrNo: '', // 协议号
+	cEcAgrAppNo: '', // 协议申请单号
+	cInsuredCde: '', // 被保人编码
+	cInsuredNme: '', // 被保人名称
+	cNeedfeeFlag: '', // 是否见费出单
 });
 const selectTreeItem = ref({});
 const labelNm = ref("条款")
@@ -365,7 +463,7 @@ onMounted(async () => {
 const method = {};
 
 //当前选中的机构item
-function selectedItem(value) {
+function selectedItem(value: any) {
     const item = cDptCdeList.value.filter(f => f.value === value)[0];
     selectTreeItem.value = item;
     formconfig1.value.cDptCnm = item?.label;
@@ -602,13 +700,118 @@ function getTplOptions() {
 // 选择模板
 function selectedTpl(value:any) {
   if(value) {
-    const item = tplOptions.value.filter(f => f.value === value)[0];
+    const item: any = tplOptions.value.filter(f => f.value === value)[0];
     formconfig1.value.seldef = item?.desc;
     formconfig1.value.cPkId = value;
   } else {
     formconfig1.value.seldef = "";
     formconfig1.value.cPkId = "";
   }
+}
+/**
+ * 协议号
+ */
+
+// 协议出单-协议号查询弹窗页面引入
+const protocolNumberInfo = defineAsyncComponent(
+  () => import("@/views/pcis/my-page/components/rotocol-number-info.vue")
+);
+// 协议出单-协议号弹窗打开
+function getProtocolNumber (){
+	dzmodal
+    .open(protocolNumberInfo, { type: "Issuer", data: {} })
+    .then((res: any) => {
+      if (res.type === "ok") {
+				const selectedTerm = res.body;
+        formconfig1.value.cEcAgrNo = selectedTerm.cEcAgrNo; // 协议号
+        formconfig1.value.dptCde = selectedTerm.cDptRelCde; // 分公司编码
+        formconfig1.value.cDptCnm = selectedTerm.cDptCnm; // 机构名称
+        formconfig1.value.cDptCde = selectedTerm.cDptCde; // 机构代码
+        formconfig1.value.cEcAgrAppNo = selectedTerm.cEcAgrAppNo; // 协议申请单号
+        formconfig1.value.cNeedfeeFlag = selectedTerm.cNeedfeeFlag; // 是否见费出单
+				getCDptCdeList(selectedTerm.cDptRelCde)
+      }
+    });
+}
+
+/**
+ * 产品代码
+ */
+// 协议出单-产品代码查询弹窗页面引入
+const productCodeInfo = defineAsyncComponent(
+  () => import("@/views/pcis/my-page/components/product-code-info.vue")
+);
+
+// 协议出单-产品代码查询弹窗打开
+function getBeToOrgan (){
+	if(!formconfig1.value.cEcAgrNo && !formconfig1.value.cEcAgrAppNo){
+		ElMessage.warning("请先选择协议号！");
+		return false
+	}
+	dzmodal
+    .open(productCodeInfo, { type: "Issuer", data: {cEcAgrAppNo:formconfig1.value.cEcAgrAppNo} })
+    .then((res: any) => {
+      if (res.type === "ok") {
+				const selectedTerm = res.body;
+				formconfig1.value.cProdNo = selectedTerm.code;
+				formconfig1.value.cProdNme = selectedTerm.value;
+				termCodeList.value = selectedTerm.list
+      }
+    });
+}
+
+/**
+ * 条款代码
+ */
+const termCodeList = ref(null) // 条款下拉值
+// 协议出单-条款代码查询弹窗页面引入
+const termCodeInfo = defineAsyncComponent(
+  () => import("@/views/pcis/my-page/components/term-code-info.vue")
+);
+
+// 协议出单-条款代码查询弹窗打开
+function getTermNme (){
+	if(!formconfig1.value.cEcAgrNo && !formconfig1.value.cEcAgrAppNo){
+		ElMessage.warning("请先选择协议号！");
+		return false
+	}
+	if(!formconfig1.value.cProdNo && !formconfig1.value.cProdNme){
+		ElMessage.warning("请先选择产品代码！");
+		return false
+	}
+	dzmodal
+    .open(termCodeInfo, { type: "Issuer", data: {codelist: termCodeList.value} })
+    .then((res: any) => {
+      if (res.type === "ok") {
+				const selectedTerm = res.body;
+				formconfig1.value.cTermNo = selectedTerm.code;
+				formconfig1.value.cTermNme = selectedTerm.value;
+      }
+    });
+}
+/**
+ * 被保人编码
+ */
+// 协议出单-被保人编码查询弹窗页面引入
+const insuredNameInfo = defineAsyncComponent(
+  () => import("@/views/pcis/my-page/components/insured-name-info.vue")
+);
+
+// 协议出单-被保人编码查询弹窗打开
+function getInsuredName (){
+	if(!formconfig1.value.cEcAgrNo && !formconfig1.value.cEcAgrAppNo){
+		ElMessage.warning("请先选择协议号！");
+		return false
+	}
+	dzmodal
+    .open(insuredNameInfo, { type: "Issuer", data: {cEcAgrAppNo:formconfig1.value.cEcAgrAppNo} })
+    .then((res: any) => {
+      if (res.type === "ok") {
+				const selectedTerm = res.body;
+				formconfig1.value.cInsuredCde = selectedTerm.cInsuredCde;
+				formconfig1.value.cInsuredNme = selectedTerm.cInsuredNme;
+      }
+    });
 }
 
 watch(

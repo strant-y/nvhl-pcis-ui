@@ -221,7 +221,7 @@ const method = {
           item['ECargoTerm.nFeeRate'] = "1.000000"
           item['ECargoTerm.cInsExchCde'] = "1"
           item['ECargoTerm.cPremExchCde'] = "1"
-          item['ECargoTerm.cClauseName'] = ""
+          item['ECargoTerm.cClauseCode'] = ""
           item['ECargoTerm.cRiskNo'] = ""
         }else if(item['_dataId'] !== row['_dataId']) {
           // 产品变更后 删除同一个组内的其它行数据
@@ -247,25 +247,13 @@ const method = {
   },
   //条款类型change
   cClauseTypeChange:(val, row)=>{
-    setOptions("ECargoTerm.cClauseName", row._dataId, row['ECargoTerm.cClauseType'] === '0' ? "TERM_LIST_02" : "TERM_LIST_EX", { cProdNo:  row['ECargoTerm.cProdNo'], cRdrTyp: val });
-  },
-  //条款名称选择change
-  cClauseChange:(val, row)=>{
-    setOptions("ECargoTerm.cRiskNo", row._dataId, "RISK_LIST_02", { "cTermNo": val, });
-  },
-  cClauseNameOnInit:  (data: any) => {
-    const {value, rowData, config, itemRef} = data;
-    if (!value || !rowData || !config || !itemRef) return;
-    const cProdNo = rowData['ECargoTerm.cProdNo'];
-    const cClauseType = rowData['ECargoTerm.cClauseType'];
-    setOptions("ECargoTerm.cClauseName", rowData._dataId, cClauseType === '0' ? "TERM_LIST_02" : "TERM_LIST_EX", { cProdNo: cProdNo, cRdrTyp: cClauseType });
-    setOptions("ECargoTerm.cRiskNo", rowData._dataId, "RISK_LIST_02", { "cTermNo": value});
+    setOptions("ECargoTerm.cClauseCode", row._dataId, row['ECargoTerm.cClauseType'] === '0' ? "TERM_LIST_02" : "TERM_LIST_EX", { cProdNo:  row['ECargoTerm.cProdNo'], cRdrTyp: val });
   },
   // 责任初始化事件
   cRiskNoOnInit: (data: any) => {
     const {value, rowData, config, itemRef} = data;
     if (!value || !rowData || !config || !itemRef) return;
-    setOptions("ECargoTerm.cRiskNo", rowData._dataId, "RISK_LIST_02", { "cTermNo": rowData['ECargoTerm.cClauseName']});
+    setOptions("ECargoTerm.cRiskNo", rowData._dataId, "RISK_LIST_02", { "cTermNo": rowData['ECargoTerm.cClauseCode']});
   },
   //原币保险金额change事件
   nInsuranceAmountChange:(val)=>{
@@ -296,18 +284,18 @@ const method = {
     const clauseList: any[] = [mainTerm];
     atGroupIdxList.forEach((item: any) => {
       const cClauseType = item['ECargoTerm.cClauseType']
-      const cClauseName = item['ECargoTerm.cClauseName']
+      const cClauseCode = item['ECargoTerm.cClauseCode']
       const cRiskNo = item['ECargoTerm.cRiskNo']
       const rowId = item['_dataId']
       if(cClauseType === '0' && !!cRiskNo) {
         mainTerm['Term.cRdrTyp'] = cClauseType;
-        mainTerm['Term.cClauseCode'] = cClauseName;
+        mainTerm['Term.cClauseCode'] = cClauseCode;
         mainTerm['Term.cRowId'] = rowId;
         mainTerm.riskList.push({ "TermRisktgt.cLiabCode": cRiskNo });
       }else {
         clauseList.push({
           "Term.cRdrTyp": cClauseType,
-          "Term.cClauseCode": cClauseName,
+          "Term.cClauseCode": cClauseCode,
           "Term.cRowId": rowId,
         });
       }
@@ -323,12 +311,12 @@ const method = {
           },
         },
         {
-          isOk: (selectdata: any) => {
+          isOk: async (selectdata: any) => {
             const addList: any[] = [];
             selectdata.forEach((item: any) => {
               if(item.children && item.children.length > 0) {
                 for(const risk of item.children) {
-                  const find = atGroupIdxList.find((d: any) => d['ECargoTerm.cClauseName'] === item.cTermNo && d['ECargoTerm.cRiskNo'] === risk.cRiskNo);
+                  const find = atGroupIdxList.find((d: any) => d['ECargoTerm.cClauseCode'] === item.cTermNo && d['ECargoTerm.cRiskNo'] === risk.cRiskNo);
                   if(find) {
                     addList.push(find)
                   }else {
@@ -336,20 +324,20 @@ const method = {
                       cProdNo: row['ECargoTerm.cProdNo'],
                       cRiskNo: risk.cRiskNo,
                       cClauseType: item.cRdrTyp,
-                      cClauseName: item.cTermNo,
+                      cClauseCode: item.cTermNo,
                       cGroupIdx: row['ECargoTerm.cGroupIdx'],
                     }))
                   }
                 }
               }else {
-                const find = atGroupIdxList.find((d: any) => d['ECargoTerm.cClauseName'] === item.cTermNo && d['ECargoTerm.cClauseType'] === item.cRdrTyp);
+                const find = atGroupIdxList.find((d: any) => d['ECargoTerm.cClauseCode'] === item.cTermNo && d['ECargoTerm.cClauseType'] === item.cRdrTyp);
                 if(find) {
                   addList.push(find)
                 }else {
                   addList.push(buildRow({
                     cProdNo: row['ECargoTerm.cProdNo'],
                     cClauseType: item.cRdrTyp,
-                    cClauseName: item.cTermNo,
+                    cClauseCode: item.cTermNo,
                     cGroupIdx: row['ECargoTerm.cGroupIdx'],
                   }))
                 }
@@ -358,6 +346,24 @@ const method = {
             const list: any[] = [...getFormValue()];
             // 替换数据
             const index = list.findIndex((f: any) => atGroupIdxList[0]['_dataId'] === f['_dataId']);
+
+            const getClauseName = (rowData: any) => {
+              return new Promise((resolve, reject) => {
+                const cProdNo = rowData['ECargoTerm.cProdNo'];
+                const cClauseType = rowData['ECargoTerm.cClauseType'];
+                const cClauseCode = rowData['ECargoTerm.cClauseCode'];
+                codeListStore.queryCodeList({
+                  codeListName: cClauseType === '0' ? "TERM_LIST_02" : "TERM_LIST_EX",
+                  codeListParam: { cProdNo: cProdNo, cRdrTyp: cClauseType },
+                }).then((res) => {
+                  resolve(res.find(f => f['value'] === cClauseCode)?.label)
+                });
+              })
+            }
+            for(const rowData of addList) {
+              const name = await getClauseName(rowData)
+              rowData['ECargoTerm.cClauseName'] = name;
+            }
             cvrgEditRef.value?.spliceTableData(index, atGroupIdxList.length, listSort(addList));
           },
         },
@@ -394,7 +400,7 @@ const buildRow = (data: any) => {
   res['ECargoTerm.cInsExchCde'] = "1"
   res['ECargoTerm.cPremExchCde'] = "1"
   res['ECargoTerm.cProdNo'] = data.cProdNo
-  res['ECargoTerm.cClauseName'] = data.cClauseName
+  res['ECargoTerm.cClauseCode'] = data.cClauseCode
   res['ECargoTerm.cClauseType'] = data.cClauseType
   res['ECargoTerm.cGroupIdx'] = data.cGroupIdx
   res['ECargoTerm.cRiskNo'] = data.cRiskNo
@@ -447,8 +453,8 @@ const calculateSpans = (key: string, expandRowKeys: string[]) => {
         mergedAction(isMerged('ECargoTerm.cProdNo', item, list[index - 1], item['ECargoTerm.cGroupIdx'] === list[index - 1]['ECargoTerm.cGroupIdx']), index)
       }else if(key === 'cClauseType'){
         mergedAction(isMerged('ECargoTerm.cClauseType', item, list[index - 1], item['ECargoTerm.cGroupIdx'] === list[index - 1]['ECargoTerm.cGroupIdx']), index)
-      }else if(key === 'cClauseName'){
-        mergedAction(isMerged('ECargoTerm.cClauseName', item, list[index - 1], item['ECargoTerm.cGroupIdx'] === list[index - 1]['ECargoTerm.cGroupIdx'] && item['ECargoTerm.cClauseType'] === list[index - 1]['ECargoTerm.cClauseType']), index)
+      }else if(key === 'cClauseCode'){
+        mergedAction(isMerged('ECargoTerm.cClauseCode', item, list[index - 1], item['ECargoTerm.cGroupIdx'] === list[index - 1]['ECargoTerm.cGroupIdx'] && item['ECargoTerm.cClauseType'] === list[index - 1]['ECargoTerm.cClauseType']), index)
       }
     })
   }
@@ -465,7 +471,7 @@ const spanMethod = (obj: any, expandRowKeys: string[]) => {
   }else if (columnIndex === 3) {
     list = calculateSpans('cClauseType', expandRowKeys);
   }else if (columnIndex === 4) {
-    list = calculateSpans('cClauseName', expandRowKeys);
+    list = calculateSpans('cClauseCode', expandRowKeys);
   }
   if(list && list.length > 0) {
     const idx = list[rowIndex]

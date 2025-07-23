@@ -113,7 +113,7 @@ const handleSelectionChange = (selection) => {
 const refreshData = () => {
   console.log(props.data,"0000000")
   const cProdNo = props.data.cProdNo;
-  const cDptCde = props.data.cDptCde;
+  const cDptCde = props.data.cDptCde || '';
   // 查询列表数据
   getpSpecialAgreement({
     cProdNo: cProdNo,
