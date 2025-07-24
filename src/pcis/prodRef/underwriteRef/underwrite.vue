@@ -81,9 +81,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 // 如果是多险位，则不能进行自主临分
                 if(res.body.tableList && res.body.tableList.lengt > 1) {
                   setFormItem("riFacMrk", {
-                    disabled: true,
                     btnItems: {disabled: true}
                   });
+                  checkboxDisabledFlag.value = true
                 }
               }
             });
@@ -154,9 +154,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   ElMessage.success("自主临分提交成功");
                   // 自主临分成功后，是否临分、风险单位划分不可编辑，不能核保退回
                   setFormItem("riFacMrk", {
-                    disabled: true,
                     btnItems: {disabled: true}
                   });
+                  checkboxDisabledFlag.value = true
                   riskunitDisabledFlag.value = true
                   setFormItem("cUndrMrk",{ loadData: cUndrMrkOptions.value.filter((item:any) => item.value != "B" && item.value != "T") })
                   setValue("cUndrMrk", "")
@@ -164,9 +164,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   ElMessage.error("满足强制临分，不能自主临分");
                   // 满足强制临分，不能自主临分
                   setFormItem("riFacMrk", {
-                    disabled: true,
                     btnItems: {disabled: true}
                   });
+                  checkboxDisabledFlag.value = true
                   riskunitDisabledFlag.value = true
                   setFormItem("cUndrMrk",{ loadData: cUndrMrkOptions.value.filter((item:any) => item.value != "B" && item.value != "T") })
                   setValue("cUndrMrk", "")
@@ -219,9 +219,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         func: (val: any) => {
           if (val === "1") {
             setFormItem("riFacMrk", {
-              disabled: true,
               btnItems: {disabled: true}
             });
+            checkboxDisabledFlag.value = true
             if (!bzFlag.value) {
               ElMessageBox.confirm(
                 "该业务认定为非水险比例分保合同除外业务，是否查看该险种合同除外责任并进一步确认。",
@@ -488,20 +488,34 @@ function showContRiskInfo(text: any) {
     },
   });
 }
-onMounted(() => {
-  nextTick(() => {
-    console.log(cUndrMrkOptions)
-    setValue("cIsRiskExp", "2");
-    // Base.cRiFacMrk
-    setValue("riFacMrk", "0")
+
+watch(
+  () => props.pageData,
+  (newVal) => {
     // 触发自主临分之后  不能做风险单位划分 不能做核保退回  可以做核保通过
     // 触发强制临分之后   不能做风险单位划分 不能做核保退回  核保通过时得再保部确认才能核保通过
     if(props.pageData?.plyBase) {
       if(props.pageData?.plyBase['Base.cRiFacMrk'] == "1" || props.pageData?.plyBase['Base.cRiFacMrk'] == "2") {// 1 自主临分 2 强制临分 3 不需要临分
         riskunitDisabledFlag.value = true
         setFormItem("cUndrMrk",{ loadData: cUndrMrkOptions.value.filter((item:any) => item.value != "B" && item.value != "T") })
+        checkboxDisabledFlag.value = true
+        setFormItem("riFacMrk", {
+          btnItems: {disabled: true}
+        });
       }
     }
+  },
+  {
+    deep: true,
+  }
+);
+
+onMounted(() => {
+  nextTick(() => {
+    console.log(cUndrMrkOptions)
+    setValue("cIsRiskExp", "2");
+    // Base.cRiFacMrk
+    setValue("riFacMrk", "0")
     const param = {
       cProdNo: params.cProdNo,
       opCde: user.opCde,
@@ -595,9 +609,9 @@ function getRiskData() {
       if (res.code === "200") {
         if(res.data && res.data.length > 1) {
           setFormItem("riFacMrk", {
-            disabled: true,
             btnItems: {disabled: true}
           });
+          checkboxDisabledFlag.value = true
         }
       }
     })
