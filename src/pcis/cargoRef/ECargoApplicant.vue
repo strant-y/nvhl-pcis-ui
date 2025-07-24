@@ -586,13 +586,21 @@ if (
       if (200 === code) {
         if(data){
           console.log('客户数据', data)
-					for (const key in data[0]) {
-  					const newKey = key.replace('Applicant', 'ECargoApplicant');
-  					data[0][newKey] = data[0][key];
+					const result:any = {};
+  				for (const key in data[0]) {
+						if (data[0].hasOwnProperty(key)) {
+							// 仅替换以 "Applicant." 开头的键
+							if (key.startsWith('Applicant.')) {
+								const newKey = key.replace('Applicant.', 'ECargoApplicant.');
+								result[newKey] = data[0][key];
+							} else {
+								result[key] = data[0][key];
+							}
+						}
 					}
-					Object.keys(data[0]).forEach((key) => { 
-						if(data[0][key]){
-							setValue(key, data[0][key]);
+					Object.keys(result).forEach((key) => { 
+						if(result[key]){
+							setValue(key, result[key]);
 						}
 					});
           // tabref ['AgreementApplicant'].setFormValue(data[0])
