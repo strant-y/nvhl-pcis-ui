@@ -848,7 +848,7 @@ function isrequired(i: any) {
 :deep(.el-table .cell) {
   white-space: nowrap;
 }
-:deep(.el-table td.el-table__cell div) {
+:deep(.el-table td.el-table__cell div.cell) {
   white-space: normal;
 }
 </style>
