@@ -258,7 +258,7 @@
           >
             <underwriteRef ref="underwrite" :pageData="pageData"></underwriteRef>
           </div>
-          <el-backtop :target="'.el-main'" :right="100" :bottom="150" />
+          <el-backtop :target="'.main-content'" :right="100" :bottom="150" />
         </div>
         <div class="bottom-items">
           <!--新增的申请单号显示和复制按钮-->
@@ -2813,17 +2813,22 @@ const calcPremiumEdr = () => {
   const nInsuranceAmount:any = [];
   res['cvrg'].forEach((item:any) => {
     if(item['Term.cRdrTyp'] === '0') {// 主险 riskList不为空则取riskList里的nInsuranceAmount累加，否则取Term.nInsuranceAmount
-      if(item['Term.riskList'] && item['Term.riskList'].length > 0) {
-        let num = 0;
-        item['Term.riskList'].forEach((i:any) => {
-          // nInsuranceAmount.push(i['TermRisktgt.nInsuranceAmount'] || 0)
-          // 是否条款自带条则，0：否，1：是
-          if(i['TermRisktgt.selfTermRisk'] === true) {
-            num = num + (i['TermRisktgt.nInsuranceAmount'] || 0)
+      // 02系列产品 ? 从责任列表取nInsuranceAmount累加 : 只取条款里的nInsuranceAmount值
+      if(props.param.cProdNo.slice(0,2) === "02") {
+        if(item['Term.riskList'] && item['Term.riskList'].length > 0) {
+          let num = 0;
+          item['Term.riskList'].forEach((i:any) => {
+            // nInsuranceAmount.push(i['TermRisktgt.nInsuranceAmount'] || 0)
+            // 是否条款自带条则，0：否，1：是
+            if(i['TermRisktgt.selfTermRisk'] === true) {
+              num = num + (i['TermRisktgt.nInsuranceAmount'] || 0)
+            }
+          })
+          if(num > 0) {
+            nInsuranceAmount.push(num)
+          } else {
+            nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
           }
-        })
-        if(num > 0) {
-          nInsuranceAmount.push(num)
         } else {
           nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
         }
@@ -2858,7 +2863,8 @@ const calcPremiumEdr = () => {
   res["EdrBase"] = edrbase.value?.getFromValue();
   if (
     res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
-    res["EdrBase"]["EdrBase.cEdrRsnDetail"] != ""
+    res["EdrBase"]["EdrBase.cEdrRsnDetail"] != "" &&
+    Array.isArray(res["EdrBase"]["EdrBase.cEdrRsnDetail"])
   ) {
     res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
       res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
@@ -2970,7 +2976,8 @@ const calcPremiumEdrSurrender = () => {
   res["EdrBase"] = edrbase.value?.getFromValue();
   if (
     res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
-    res["EdrBase"]["EdrBase.cEdrRsnDetail"] != ""
+    res["EdrBase"]["EdrBase.cEdrRsnDetail"] != "" &&
+    Array.isArray(res["EdrBase"]["EdrBase.cEdrRsnDetail"])
   ) {
     res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
       res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
@@ -3234,17 +3241,22 @@ const submitEdrToUndrFun = async () => {
         const nInsuranceAmount:any = [];
         calcData['cvrg'].forEach((item:any) => {
           if(item['Term.cRdrTyp'] === '0') {// 主险 riskList不为空则取riskList里的nInsuranceAmount累加，否则取Term.nInsuranceAmount
-            if(item['Term.riskList'] && item['Term.riskList'].length > 0) {
-              let num = 0;
-              item['Term.riskList'].forEach((i:any) => {
-                // nInsuranceAmount.push(i['TermRisktgt.nInsuranceAmount'] || 0)
-                // 是否条款自带条则，0：否，1：是
-                if(i['TermRisktgt.selfTermRisk'] === true) {
-                  num = num + (i['TermRisktgt.nInsuranceAmount'] || 0)
+            // 02系列产品 ? 从责任列表取nInsuranceAmount累加 : 只取条款里的nInsuranceAmount值
+            if(props.param.cProdNo.slice(0,2) === "02") {
+              if(item['Term.riskList'] && item['Term.riskList'].length > 0) {
+                let num = 0;
+                item['Term.riskList'].forEach((i:any) => {
+                  // nInsuranceAmount.push(i['TermRisktgt.nInsuranceAmount'] || 0)
+                  // 是否条款自带条则，0：否，1：是
+                  if(i['TermRisktgt.selfTermRisk'] === true) {
+                    num = num + (i['TermRisktgt.nInsuranceAmount'] || 0)
+                  }
+                })
+                if(num > 0) {
+                  nInsuranceAmount.push(num)
+                } else {
+                  nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
                 }
-              })
-              if(num > 0) {
-                nInsuranceAmount.push(num)
               } else {
                 nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
               }
