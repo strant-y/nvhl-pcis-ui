@@ -268,6 +268,10 @@ function setRowFieldProp(rowId: string, field: string, prop: string, value: any)
   return rttableFrom.value?.setRowFieldProp(rowId, field, prop, value);
 }
 
+function getTableValues(){
+  return rttableFrom.value?.getTableValues();
+}
+
 defineExpose({
   getPartnerPage,
   getFromValue,
@@ -283,7 +287,8 @@ defineExpose({
   getCodeListMap,
   addCodeListMap,
   setCodeListMap,
-  setRowFieldProp
+  setRowFieldProp,
+  getTableValues,
 });
 </script>
 

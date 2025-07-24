@@ -808,6 +808,9 @@ function clearSelection() {
 function toggleRowSelection(row: any, selected: boolean) {
   tableRef.value?.toggleRowSelection(row, selected);
 }
+function getTableValues() { 
+  return tableDatas.value;
+}
 
 defineExpose({
   tableExvalidate,
@@ -825,6 +828,7 @@ defineExpose({
   toggleRowSelection,
   setRowFieldProp,
   spliceTableData,
+  getTableValues,
   // getItemsRowId
 });
 function isrequired(i: any) {
