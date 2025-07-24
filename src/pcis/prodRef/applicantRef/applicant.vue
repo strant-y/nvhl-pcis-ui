@@ -76,7 +76,7 @@ const route = useRoute();
 const param = opertaor.getParam();
 const fileInputRef:any = ref(null);
 const formconfig = ref({
-  fileInputType: ""
+  fileInputType: "1"
 });
 import { readFile } from "@/api/file";
 const tCertfDate = ref<any[]>([]);
