@@ -58,6 +58,9 @@ onMounted(() => {
     if(!getValue('ECargoBase.cWhPremExchCde')){
       setValue('ECargoBase.cWhPremExchCde','1')
     }
+    if(!getValue('ECargoBase.cPayWay')){
+      setValue('ECargoBase.cPayWay','01')
+    }
     const list:Array<string>= ["ECargoBase.nAmtRmbExch","ECargoBase.cInsExchCde", "ECargoBase.nPrmRmbExch","ECargoBase.cPremExchCde"]
      list.forEach(item =>{
        setFormItem(item, {
@@ -223,6 +226,30 @@ const method = {
       setFormItem('ECargoBase.nWhAmtRmbExch',{'disabled': false})
     }
   },
+  //折人民币协议预收保费
+  nRmbReceivedPrmChange:(val:any)=>{
+   //ECargoBase.nWhRmbPrm
+    const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
+    if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') && agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo').slice(0,2) === 'YY'){
+       setValue('ECargoBase.nRecRemPrm',val - getValue('ECargoBase.nWhRmbPrm'))
+    }
+  },
+  //折人民币预扣保费
+  nWhRmbPrmChange:(val:any)=>{
+    //ECargoBase.nRmbReceivedPrm
+    const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
+    if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') && agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo').slice(0,2) === 'YY'){
+      setValue('ECargoBase.nRecRemPrm',getValue('ECargoBase.nRmbReceivedPrm') - val )
+    }else if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') && agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo').slice(0,2) === 'AY') {
+      setValue('ECargoBase.nRecRemPrm',getValue('ECargoBase.nRmbPrm') - val )
+    }
+  },
+  nRmbPrmChange:(val:any)=>{
+    const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
+    if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') && agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo')?.slice(0,2) === 'AY'){
+      setValue('ECargoBase.nRecRemPrm', val - getValue('ECargoBase.nWhRmbPrm') )
+    }
+  }
   // func demo
 
 }
