@@ -14,13 +14,13 @@ import { useValidator } from "@/typings/useValidator";
 import { saveCommodityBase, getCommodityBase } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
-
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
 import { useRoute } from "vue-router";
 import { cp } from "fs";
 const route = useRoute();
 const router = useRouter();
 const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
 
 const { getRules } = useValidator();
 const selectedKindNo = ref<string | null>(null);

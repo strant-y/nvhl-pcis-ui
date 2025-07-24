@@ -10,6 +10,7 @@ import detailComponent from "../components/detail-component.vue";
 import {EnteringCompList} from "@/views/protocolManagement/utils/types";
 import {useTagsViewStore} from "@/store";
 import {useRouter} from "vue-router";
+import { getECargoData } from "@/pcis/prodRef/dataInit";
 const tagsViewStore = useTagsViewStore();
 const router = useRouter();
 const props = defineProps({
@@ -238,6 +239,13 @@ onBeforeMount(async () => {
       query();
     })
 
+  }
+	if (props.type === "add") {
+    const idata = getECargoData();
+		nextTick(()=>{
+			formPage.value?.setFormDataById('AgreementBase',idata)
+			formPage.value?.setFormDataById('AgreementFeeWarn',{"ECargoBase.cPayWay":"01"})
+		})
   }
   bthList.value.push(
       createFreeButtonBase({

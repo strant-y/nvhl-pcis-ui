@@ -158,14 +158,27 @@ const tableconfig = reactive<AppTableConfig>(
         type: "danger",
         size: "large",
         icon: "Delete",
-        tableClick: (row) => {
-          const list = formData.value;
-          const i = list.findIndex((item) => item.cSpecNo === row.cSpecNo);
-          rttableFrom.value.delRow(row._dataId);
-          // if (i !== -1) list.splice(i, 1);
-          formData.value.forEach((item, index) => {
-            item.nSeqNo = index + 1;
+        tableClick: (row) => { 
+    
+              ElMessageBox.confirm(
+            "是否确认删除数据？",
+            "提示",
+            {
+              confirmButtonText: "确定",
+              cancelButtonText: "取消",
+              type: "warning",
+            }
+          ).then(() => {
+            const list = formData.value;
+            const i = list.findIndex((item) => item.cSpecNo === row.cSpecNo);
+            rttableFrom.value.delRow(row._dataId);
+            formData.value.forEach((item, index) => {
+              item.nSeqNo = index + 1;
+            });
+ 
           });
+
+
         },
       }),
       createFreeButtonBase({
