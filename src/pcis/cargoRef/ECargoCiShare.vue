@@ -36,18 +36,22 @@ onMounted(() => {
   );
   Object.assign(formconfig1, formconfig11);
   watchEffect(() => {
-    const cCiMrk = formPage.getFormDataById('AgreementBase')['ECargoECargoBase.cCiMrk'];
-    if(cCiMrk === "1"){
-      setValue("ECargoBase.cCiInpTyp", '600001');
-    }else if(cCiMrk === "2"){
-      setValue("ECargoBase.cCiInpTyp", '600004');
-    }else if(cCiMrk === "3"){
-      setValue("ECargoBase.cCiInpTyp", '600001');
-    }else if(cCiMrk === "4"){
-      setValue("ECargoBase.cCiInpTyp", '600004');
-    }else if(cCiMrk === "5"){
-      setValue("ECargoBase.cCiInpTyp", '600005');
-    }
+		const AgreementBase = formPage.getFormDataById('AgreementBase')
+		if(AgreementBase && Object.keys(AgreementBase).length > 0){
+			const cCiMrk = AgreementBase['ECargoECargoBase.cCiMrk'];
+			if(cCiMrk === "1"){
+				setValue("ECargoBase.cCiInpTyp", '600001');
+			}else if(cCiMrk === "2"){
+				setValue("ECargoBase.cCiInpTyp", '600004');
+			}else if(cCiMrk === "3"){
+				setValue("ECargoBase.cCiInpTyp", '600001');
+			}else if(cCiMrk === "4"){
+				setValue("ECargoBase.cCiInpTyp", '600004');
+			}else if(cCiMrk === "5"){
+				setValue("ECargoBase.cCiInpTyp", '600005');
+			}
+		}
+    
   })
 });
 
