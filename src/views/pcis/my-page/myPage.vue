@@ -1328,10 +1328,6 @@ async function loadAfter() {
     });
     edritem.value?.handleQuery();
   } else if (props.param.pageType === "PLY_UW_PROCESS_SCENE") {
-    //核保处理
-    nextTick(() => {
-      opertaor.setDisabledAll();
-    });
     const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
     await loadAppPlyInfo(cAppNo);
     if (props.param.cAppTyp == "E") {
@@ -1354,6 +1350,10 @@ async function loadAfter() {
 				}),
 			)
 		}
+    //核保处理
+    nextTick(() => {
+      opertaor.setDisabledAll();
+    });
   } else if (props.param.pageType === "EDR_APP_NEW_SCENE" || props.param.pageType === "TEMPORARY_DEPOSIT" ) {
     // 批改申请-新增
     const cAppNo = props.param.cAppNo;
