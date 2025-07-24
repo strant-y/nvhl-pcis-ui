@@ -24,7 +24,13 @@
                   />
                   <rt-button
                     v-if="!btnItem.delPlan.hidden"
-                    @click="deletePlan(k)"
+                    @click="()=>{
+                      if(Object.keys(planData).length === 1){
+                        ElMessage.error('仅剩1个方案时,不能删除!');
+                        return;
+                      }
+                      deletePlan(k);
+                    }"
                     :item="btnItem.delPlan"
                   />
                 </el-col>
@@ -45,11 +51,9 @@
                     :disabled-flag="disAbledFlag"
                     @delete="
                       (r) => {
-                        console.log(planData,k,r,index)
-                        // 如果是主条款不可以删除
-                        if(k ==='P1' &&index===0){
-                          ElMessage.warning('主条款不能删除!')
-                          return false;
+                        if(planData[k]['m'].length === 1){
+                          ElMessage.error('仅剩1条主条款时,不能删除!');
+                          return ;
                         }
                         deleteData(k, r);
                       }
