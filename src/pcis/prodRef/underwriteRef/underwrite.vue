@@ -497,6 +497,10 @@ watch(
       if(props.pageData?.plyBase['Base.cRiFacMrk'] == "1" || props.pageData?.plyBase['Base.cRiFacMrk'] == "2") {// 1 自主临分 2 强制临分 3 不需要临分
         riskunitDisabledFlag.value = true
         setFormItem("cUndrMrk",{ loadData: cUndrMrkOptions.value.filter((item:any) => item.value != "B" && item.value != "T") })
+        checkboxDisabledFlag.value = true
+        setFormItem("riFacMrk", {
+          btnItems: {disabled: true}
+        });
       }
     }
   },
