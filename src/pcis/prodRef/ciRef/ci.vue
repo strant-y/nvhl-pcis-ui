@@ -644,6 +644,7 @@ const method = {
                 loadData: [{ value: params.CChaCde, label: params.CChaNme }],
               });
               freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData","")
+              setFormItem("Ci.nComm", {"disabled":false});
               dialogRef.value?.handleClose();
             },
           },
@@ -675,7 +676,7 @@ const method = {
             freeEditRef.value?.setRowFieldProp(rowId,"Ci.cSlsCde","loadData",[{ label: params.CSlsNme, value: params.CSlsCde }])
             freeEditRef?.value?.setValueByRowKey("Ci.cSlsCde", rowId, params.CSlsCde);
             freeEditRef?.value?.setValueByRowKey("Ci.cSlsNme", rowId, params.CSlsNme);
-
+            setFormItem("Ci.nComm", {"disabled":true});
             dialogRef.value?.handleClose();
           },
         },
@@ -703,6 +704,7 @@ const method = {
           getSelected: (params) => {
             freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkSlsCde","loadData",[{ label: params.CSlsNme, value: params.CSlsCde }])
             freeEditRef?.value?.setValueByRowKey("Ci.cBrkSlsCde", rowId, params.CSlsCde);
+            setFormItem("Ci.nComm", {"disabled":false});
             dialogRef.value?.handleClose();
           },
         },
