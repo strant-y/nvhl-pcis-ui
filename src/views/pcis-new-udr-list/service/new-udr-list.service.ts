@@ -436,6 +436,60 @@ export const NewUdrListService = () => {
     }
   }
 
+  //查询风险单位划分-询价
+  const riskQueryDataXJ = async (ops: any) => {
+    try {
+      return post(`/reinsured/riskQueryDataXJ`, ops);
+    } catch (error) {
+      return handleError(error);
+    }
+  }
+  
+  // 获取风险责任划分弹框基本信息-询价
+  const getReinsuredDataXJ = async (ops: any) => {
+    try {
+      return post(`/reinsured/queryContDataXJ`, ops);
+    } catch (error) {
+      return handleError(error);
+    }
+  };
+
+  // 再保比例分保合同除外责任接口-询价
+  const queryRiskCodelistXJ = async (ops: any) => {
+    try {
+      return post(`/reinsured/queryRiskCodelistXJ`, ops);
+    } catch (error) {
+      return handleError(error);
+    }
+  }
+
+  // 分保试算-询价
+  const tryCountInFoRIXJ = async (ops: any) => {
+    try {
+      return post(`/reinsured/tryCountXJ`, ops);
+    } catch (error) {
+      return handleError(error);
+    }
+  }
+
+  // 查询标的地址下拉选项-询价
+  const queryComponentCodeListXJ = async (ops: any) => {
+    try {
+      return post(`reinsured/queryComponentCodeListXJ`, ops);
+    } catch (error) {
+      return handleError(error);
+    }
+  }
+
+  // 点击划分风险单位按钮调用再保接口-询价
+  const riskUnitQueryXJ = async (ops: any) => {
+    try {
+      return post(`reinsured/riskUnitQueryXJ`, ops);
+    } catch (error) {
+      return handleError(error);
+    }
+  }
+
   return {
     getNewUdrList,
     getBackUdrList,
@@ -476,5 +530,11 @@ export const NewUdrListService = () => {
     getBaseInfoByInquiryNo,
     backInquiryUdrList,
     getInquiryPolicyList,
+    riskQueryDataXJ,
+    getReinsuredDataXJ,
+    queryRiskCodelistXJ,
+    tryCountInFoRIXJ,
+    queryComponentCodeListXJ,
+    riskUnitQueryXJ,
   };
 }

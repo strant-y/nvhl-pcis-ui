@@ -1611,6 +1611,41 @@ delRisk(param){
     return request.post('/reinsured/delRisk', param);
 }
 
+/**
+ * 查询临分状态-询价核保
+ */
+queryCRiFacMrkXJ(param) {
+    return request.post('/reinsured/queryCRiFacMrkXJ', param);
+}
+
+/**
+ * 强制临分-询价
+ */
+queryRiFacMrkXJ(param) {
+    return request.post('/reinsured/queryRiFacMrkXJ', param);
+}
+
+/**
+ * 查询临分状态-询价
+ */
+queryFacStsXJ(param) {
+    return request.post('/reinsured/queryFacStsXJ', param);
+}
+
+// 删除险位-询价
+delRiskXJ(param){
+    return request.post('/reinsured/delRiskXJ', param);
+}
+
+/**
+ * 批单随原保单临分时核保通过调用临分提交-询价
+ * @param param
+ */
+checkLibertyXJ(ops) {
+    return request.post('reinsured/checkLibertyXJ', ops);
+}
+
+
 
 
 // 工资总额列表

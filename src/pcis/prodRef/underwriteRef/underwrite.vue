@@ -29,7 +29,7 @@ const props = defineProps({
     type: [Object],
   },
 });
-const { getCUndrMrk, getBackClsList, queryRiskCodelist, riskQueryData } = NewUdrListService();
+const { getCUndrMrk, getBackClsList, queryRiskCodelist, riskQueryData, riskQueryDataXJ, queryRiskCodelistXJ } = NewUdrListService();
 const undrOpnMap = {
   "0": "经过审核，同意承保该业务。",
   "1": "经过审核，该业务缺少如下必要信息，请补充后再提交：",
@@ -126,7 +126,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           label: "自主临分提交",
           type: "primary",
           disabled: true, // 批单不允许进行自主临分
-          func: () => {
+          func: async () => {
             const param = {
               cDocTyp: params.cAppTyp, // 单证类型 A 保单 E 批单
               cAppNo: params.cAppNo, // 保批单申请单号
@@ -147,36 +147,30 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             if(params.cProdNo === "010001" || params.cProdNo === "010002" || params.cProdNo === "010003" || params.cProdNo === "010007") {
               param.cDductDesc = props.pageData?.deductibleDist && props.pageData?.deductibleDist[0] ? props.pageData?.deductibleDist[0]["DeductibleDist.cDeductibleContent"] : ""; // 免赔约定
             }
-            policyService
-              .checkLiberty(param)
-              .then((res: any) => {
-                if (res.code === '1') {
-                  ElMessage.success("自主临分提交成功");
-                  // 自主临分成功后，是否临分、风险单位划分不可编辑，不能核保退回
-                  setFormItem("riFacMrk", {
-                    btnItems: {disabled: true}
-                  });
-                  checkboxDisabledFlag.value = true
-                  riskunitDisabledFlag.value = true
-                  setFormItem("cUndrMrk",{ loadData: cUndrMrkOptions.value.filter((item:any) => item.value != "B" && item.value != "T") })
-                  setValue("cUndrMrk", "")
-                } else if(res.code === '2') {
-                  ElMessage.error("满足强制临分，不能自主临分");
-                  // 满足强制临分，不能自主临分
-                  setFormItem("riFacMrk", {
-                    btnItems: {disabled: true}
-                  });
-                  checkboxDisabledFlag.value = true
-                  riskunitDisabledFlag.value = true
-                  setFormItem("cUndrMrk",{ loadData: cUndrMrkOptions.value.filter((item:any) => item.value != "B" && item.value != "T") })
-                  setValue("cUndrMrk", "")
-                } else {
-                  ElMessage.error(res.message);
-                }
-              })
-              .catch((error: any) => {
-                ElMessage.error(error);
+            const checkLibertyInfo = params.pageName === "priceInquiry" ? await policyService.checkLibertyXJ(param) : await policyService.checkLiberty(param);
+            if(checkLibertyInfo && checkLibertyInfo.code === '1') {
+              ElMessage.success("自主临分提交成功");
+              // 自主临分成功后，是否临分、风险单位划分不可编辑，不能核保退回
+              setFormItem("riFacMrk", {
+                btnItems: {disabled: true}
               });
+              checkboxDisabledFlag.value = true
+              riskunitDisabledFlag.value = true
+              setFormItem("cUndrMrk",{ loadData: cUndrMrkOptions.value.filter((item:any) => item.value != "B" && item.value != "T") })
+              setValue("cUndrMrk", "")
+            } else if(checkLibertyInfo && checkLibertyInfo.code === '2') {
+              ElMessage.error("满足强制临分，不能自主临分");
+              // 满足强制临分，不能自主临分
+              setFormItem("riFacMrk", {
+                btnItems: {disabled: true}
+              });
+              checkboxDisabledFlag.value = true
+              riskunitDisabledFlag.value = true
+              setFormItem("cUndrMrk",{ loadData: cUndrMrkOptions.value.filter((item:any) => item.value != "B" && item.value != "T") })
+              setValue("cUndrMrk", "")
+            } else {
+              ElMessage.error(checkLibertyInfo.message);
+            }
           },
         },
       },
@@ -588,33 +582,24 @@ function loadUwTabData() {
   }
 }
 
-function queryRiskCodelistFn() {
-  queryRiskCodelist({ cProdNo: params.cProdNo })
-    .then((res: any) => {
-      if (res.code === '200') {
-        contRiskInfo.value = res.data?.cResv1 || null;
-      } else {
-        // ElMessage.error(res.msg || res.message);
-      }
-    })
-    .catch((error: any) => {
-      // ElMessage.error(error);
-    });
+async function queryRiskCodelistFn() {
+  const queryRiskCodelistInfo = params.pageName === "priceInquiry" ? await queryRiskCodelistXJ({ cProdNo: params.cProdNo }) : await queryRiskCodelist({ cProdNo: params.cProdNo })
+  if(queryRiskCodelistInfo && queryRiskCodelistInfo.code === "200") {
+    contRiskInfo.value = queryRiskCodelistInfo.data?.cResv1 || null;
+  }
 }
 
 // 获取风险单位划分列表数据
-function getRiskData() {
-  riskQueryData({ cAppNo: params.cAppNo })
-    .then((res: any) => {
-      if (res.code === "200") {
-        if(res.data && res.data.length > 1) {
-          setFormItem("riFacMrk", {
-            btnItems: {disabled: true}
-          });
-          checkboxDisabledFlag.value = true
-        }
-      }
-    })
+async function getRiskData() {
+  const riskQueryInfo = params.pageName === "priceInquiry" ? await riskQueryDataXJ({ cAppNo: params.cAppNo }) : await riskQueryData({ cAppNo: params.cAppNo })
+  if(riskQueryInfo && riskQueryInfo.code === "200") {
+    if(riskQueryInfo.data && riskQueryInfo.data.length > 1) {
+      setFormItem("riFacMrk", {
+        btnItems: {disabled: true}
+      });
+      checkboxDisabledFlag.value = true
+    }
+  }
 }
 
 function setRiskunitDisabled() {
