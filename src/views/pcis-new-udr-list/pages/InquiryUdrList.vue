@@ -1472,6 +1472,7 @@
                         cTermNme:row.cTermNme,
                         cProdNmeCn: row.prodName,
                         pageName: 'priceInquiry',
+                        cAppNo: row.cAppNo,
                     });
                     router.push({
                         path: "/pcis/my-page",
@@ -1502,6 +1503,7 @@
                         cTermNme:row.cTermNme,
                         cProdNmeCn: row.prodName,
                         pageName: 'priceInquiry',
+                        cAppNo: row.cAppNo,
                     });
                     router.push({
                         path: "/pcis/my-page",
