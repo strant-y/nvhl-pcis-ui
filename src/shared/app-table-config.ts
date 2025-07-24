@@ -46,6 +46,7 @@ export interface AppTableMethod {
   getTableValues:() => any;
   setCodeListMap: (map: any) => void;
   addCodeListMap: (data: any) => void;
+  setRowFieldProp: (rowId: string, field: string, prop: string, value: any) => void;
 }
 export interface MyTableMethod {
   addRow: (arg: any) => any;

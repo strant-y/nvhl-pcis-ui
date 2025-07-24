@@ -363,7 +363,7 @@ const tableconfig = reactive<AppTableConfig>(
     })
 );
 
-onMounted(async () => {
+onMounted(() => {
   freeEditRef.value?.setValue('Tm',[
     moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00"),
     moment(new Date()).format("YYYY-MM-DD 23:59:59")]
@@ -384,7 +384,9 @@ const method = {
 
 // 绑定特殊验证器
 const exRules = {};
-
+function setRowFieldProp(rowId: string, field: string, prop: string, value: any) {
+  return tableRef.value?.setRowFieldProp(rowId, field, prop, value);
+}
 /** 查询 */
 function handleQuery(flag?: boolean) {
   freeEditRef.value?.validate().then((isValid) => {
@@ -415,6 +417,19 @@ function handleQuery(flag?: boolean) {
                 ],
               })
             });
+            nextTick(()=>{
+              pageresult.list.forEach((item:any ) =>{
+               if(item.cEdrFlag === 'YY'){
+                  console.log('tableRef.value',tableRef.value)
+                  setRowFieldProp(
+                      item['_dataId'],
+                      "id",
+                      "typeCode",
+                      'EDR_RSN_LIST_YY',
+                  );
+                 }
+               })
+            })
           }
         } else {
           ElMessage.error(res.msg);
