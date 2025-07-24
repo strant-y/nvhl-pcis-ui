@@ -548,6 +548,9 @@ const setCusBenefitInfo = () => {
   const AppcClntMrk = tabref["applicant"].getFromValue()["Applicant.cClntMrk"]; // 投保人 法人01
   const InscClntMrk = tabref["insured"].getFromValue()["Insured.cClntMrk"]; // 被保人  法人01
   const baseValue = opertaor.getTableRefByKey("base").getFromValue()["Base.nRmbPrm"];//承保基本信息 折合人民币总保费
+  const basePrmCur = opertaor.getTableRefByKey("base").getFromValue()["Base.cPrmCur"];//承保基本信息 总保费币种
+  const basePrm = opertaor.getTableRefByKey("base").getFromValue()["Base.nPrm"];//承保基本信息 总保费
+	
   //  单据保存才有 单据编号
   if (!appNo) {
     ElMessage.error("请先保存单据");
@@ -571,12 +574,23 @@ const setCusBenefitInfo = () => {
     );
     return;
   }
-  if (baseValue < 200000) {
-    ElMessage.error(
-        "根据反洗钱相关规定，当前保单保费折合人民币大于等于20万元，才允许录入反洗钱扩展信息！"
-    );
-    return;
-  }
+	// 币种为美元，大于2万可以录入反洗钱扩展信息，其他币种判断折合人民币大于20万
+	if(basePrmCur == "USD"){
+		if (basePrm < 20000) {
+			ElMessage.error(
+					"根据反洗钱相关规定，当前保单保费大于等于2万元，才允许录入反洗钱扩展信息！"
+			);
+			return;
+		}
+	} else {
+		if (baseValue < 200000) {
+			ElMessage.error(
+					"根据反洗钱相关规定，当前保单保费折合人民币大于等于20万元，才允许录入反洗钱扩展信息！"
+			);
+			return;
+		}
+	}
+
 
   //  显示标志   1：投保人 2：被保人  3：都展示
   if (AppcClntMrk == "0" && InscClntMrk == "0") {
