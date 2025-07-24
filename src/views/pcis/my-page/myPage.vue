@@ -253,7 +253,7 @@
           >
             <underwriteRef ref="underwrite" :pageData="pageData"></underwriteRef>
           </div>
-          <el-backtop :target="'.el-main'" :right="100" :bottom="150" />
+          <el-backtop :target="'.main-content'" :right="100" :bottom="150" />
         </div>
         <div class="bottom-items">
           <!--新增的申请单号显示和复制按钮-->
