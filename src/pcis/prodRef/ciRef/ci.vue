@@ -52,16 +52,19 @@ onMounted(async () => {
   //一般批改，部分要素可编辑
   const cCiMrkValue =  opertaor.getTableRefByKey("plyBase")
   setTimeout(() => {
-    if (param?.pageType === "EDR_APP_NEW_SCENE" &&   cCiMrkValue !== "0") {
-    formconfig1.editFlag = true;
-    formconfig1.fromSchema?.forEach((item) => {
-      if (item.prop === 'Ci.cChiefMrk' || item.prop === 'Ci.cIssueMrk') {
-        item.disabled = true; // 设置为不可编辑
-      } else {
-        item.disabled = false; // 其他字段可以编辑
-      }
+    if (param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && param.cRsnDetailCde.value == "FZ") {
+      formconfig1.editFlag = true;
+      formconfig1.fromSchema?.forEach((item) => {
+        item.disabled = true;
+        // if (item.prop === 'Ci.cChiefMrk' || item.prop === 'Ci.cIssueMrk') {
+        //   item.disabled = true; // 设置为不可编辑
+        // } else {
+        //   item.disabled = false; // 其他字段可以编辑
+        // }
     });
-  }
+  }else if(param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && param.cRsnDetailCde.value == "47"){
+    return false
+    }
   }, 800);
 });
 
@@ -168,6 +171,9 @@ const method = {
             freeEditRef.value?.setRowFieldProp(
                   rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
               );
+            freeEditRef.value?.setRowFieldProp(
+                  rowData._dataId, "Ci.cDptCde", "disabled",false
+              );
             // const cBsnsTyp = opertaor.getTableRefByKey('plyBase').getValue('Base.cBsnsTyp')
             // if((cBsnsTyp !=null || cBsnsTyp !='') && cBsnsTyp == '19001'){
             //   freeEditRef.value?.setRowFieldProp(
@@ -218,21 +224,24 @@ const method = {
                 rowData._dataId, "Ci.cDptCde", "rules", []
       );
       freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cSlsCde", "disabled", false
+                rowData._dataId, "Ci.cDptCde", "disabled", true
+      );
+      freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cSlsCde", "disabled", false
+      );
+      freeEditRef.value?.setRowFieldProp(
+              rowData._dataId, "Ci.cBrkrCde", "disabled", false
+      );
+      freeEditRef.value?.setRowFieldProp(
+              rowData._dataId, "Ci.cBrkSlsCde", "disabled", false
+      );
+      freeEditRef.value?.setRowFieldProp(
+              rowData._dataId, "Ci.cSlsCde", "rules", []
           );
-          freeEditRef.value?.setRowFieldProp(
-                  rowData._dataId, "Ci.cBrkrCde", "disabled", false
-          );
-          freeEditRef.value?.setRowFieldProp(
-                  rowData._dataId, "Ci.cBrkSlsCde", "disabled", false
-          );
-          freeEditRef.value?.setRowFieldProp(
-                  rowData._dataId, "Ci.cSlsCde", "rules", []
-              );
-          const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
-          rowItem['Ci.cSlsCde']['btnItems'].disabled = false;
-          rowItem['Ci.cBrkrCde']['btnItems'].disabled = false;
-          rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = false;
+      const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+      rowItem['Ci.cSlsCde']['btnItems'].disabled = false;
+      rowItem['Ci.cBrkrCde']['btnItems'].disabled = false;
+      rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = false;
     }
     updateMasterAgreementValues()
   },
@@ -274,6 +283,9 @@ const method = {
                 rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
             );
           freeEditRef.value?.setRowFieldProp(
+                rowData._dataId, "Ci.cDptCde", "disabled", false
+           );
+          freeEditRef.value?.setRowFieldProp(
                   rowData._dataId, "Ci.cSlsCde", "disabled", true
             );
           freeEditRef.value?.setRowFieldProp(
@@ -307,6 +319,7 @@ const method = {
           }
       );
       freeEditRef.value?.setRowFieldProp(rowData._dataId, "Ci.cDptCde", "rules", []);
+      freeEditRef.value?.setRowFieldProp(rowData._dataId, "Ci.cDptCde", "disabled", true);
       freeEditRef.value?.setRowFieldProp(
                 rowData._dataId, "Ci.cSlsCde", "disabled", false
         );
@@ -644,7 +657,6 @@ const method = {
                 loadData: [{ value: params.CChaCde, label: params.CChaNme }],
               });
               freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData","")
-              setFormItem("Ci.nComm", {"disabled":false});
               dialogRef.value?.handleClose();
             },
           },
@@ -676,7 +688,6 @@ const method = {
             freeEditRef.value?.setRowFieldProp(rowId,"Ci.cSlsCde","loadData",[{ label: params.CSlsNme, value: params.CSlsCde }])
             freeEditRef?.value?.setValueByRowKey("Ci.cSlsCde", rowId, params.CSlsCde);
             freeEditRef?.value?.setValueByRowKey("Ci.cSlsNme", rowId, params.CSlsNme);
-            setFormItem("Ci.nComm", {"disabled":true});
             dialogRef.value?.handleClose();
           },
         },
@@ -704,7 +715,6 @@ const method = {
           getSelected: (params) => {
             freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkSlsCde","loadData",[{ label: params.CSlsNme, value: params.CSlsCde }])
             freeEditRef?.value?.setValueByRowKey("Ci.cBrkSlsCde", rowId, params.CSlsCde);
-            setFormItem("Ci.nComm", {"disabled":false});
             dialogRef.value?.handleClose();
           },
         },
@@ -902,6 +912,7 @@ const valideRequired = ()=>{
         // rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
         // rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
         // rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
+        // setFormItem("Ci.nComm",{'disabled':true})
           freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.cSlsCde", "rules", [getRules("required", {})]
           );
@@ -912,6 +923,7 @@ const valideRequired = ()=>{
               rowData._dataId, "Ci.cBrkSlsCde", "rules", []
           );
       }else if((cBsnsTyp == '19002' || cBsnsTyp == '19003') && rowData['Ci.cCoinsurerCde'] =='327001'){
+        setFormItem("Ci.nComm",{'disabled':false})
         freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.cBrkrCde", "rules", [getRules("required", {})]
         );
