@@ -264,6 +264,13 @@ function setCodeListMap(map: any) {
     Object.assign(codeListMap.value, map);
   }
 }
+function setRowFieldProp(rowId: string, field: string, prop: string, value: any) {
+  return rttableFrom.value?.setRowFieldProp(rowId, field, prop, value);
+}
+
+function getTableValues(){
+  return rttableFrom.value?.getTableValues();
+}
 
 defineExpose({
   getPartnerPage,
@@ -279,7 +286,9 @@ defineExpose({
   getTableBtn,
   getCodeListMap,
   addCodeListMap,
-  setCodeListMap
+  setCodeListMap,
+  setRowFieldProp,
+  getTableValues,
 });
 </script>
 

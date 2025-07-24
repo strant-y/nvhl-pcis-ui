@@ -808,6 +808,9 @@ function clearSelection() {
 function toggleRowSelection(row: any, selected: boolean) {
   tableRef.value?.toggleRowSelection(row, selected);
 }
+function getTableValues() { 
+  return tableDatas.value;
+}
 
 defineExpose({
   tableExvalidate,
@@ -825,6 +828,7 @@ defineExpose({
   toggleRowSelection,
   setRowFieldProp,
   spliceTableData,
+  getTableValues,
   // getItemsRowId
 });
 function isrequired(i: any) {
@@ -849,7 +853,7 @@ function isrequired(i: any) {
 :deep(.el-table .cell) {
   white-space: nowrap;
 }
-:deep(.el-table td.el-table__cell div) {
+:deep(.el-table td.el-table__cell div.cell) {
   white-space: normal;
 }
 </style>

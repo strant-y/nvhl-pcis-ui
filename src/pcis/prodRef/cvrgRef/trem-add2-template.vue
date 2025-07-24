@@ -114,6 +114,7 @@ const formcof = ref<{ [key: string]: { [key: string]: any } }>({
     inputtype: "rtnumber",
     suffix: "元",
     title: "保费",
+    disabled:true,
   },
   cRemarkInfo: {
     inputtype: "rtinput",
@@ -143,6 +144,7 @@ if (param.cProdNo.startsWith("02")) {
       inputtype: "rtnumber",
       suffix: "元",
       title: "保费",
+      disabled:true,
     },
     nDeductibleAmount: {
       inputtype: "rtnumber",
@@ -195,6 +197,7 @@ function getterm(it: any,termdata: any){
   if(param.cEdrType && !termdata['Term.cRowId']){
     it.disabled = false;
   }
+  console.log(it);
   return it;
 }
 
@@ -213,7 +216,6 @@ function checkShowBtn( data: any ){
   if(param.cEdrType && !data['Term.cRowId']){
     r = true;
   }
-  console.log(r );
   return r;
 };
 

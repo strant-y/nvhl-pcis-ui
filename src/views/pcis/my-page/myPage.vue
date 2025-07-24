@@ -258,7 +258,7 @@
           >
             <underwriteRef ref="underwrite" :pageData="pageData"></underwriteRef>
           </div>
-          <el-backtop :target="'.el-main'" :right="100" :bottom="150" />
+          <el-backtop :target="'.main-content'" :right="100" :bottom="150" />
         </div>
         <div class="bottom-items">
           <!--新增的申请单号显示和复制按钮-->
@@ -548,6 +548,9 @@ const setCusBenefitInfo = () => {
   const AppcClntMrk = tabref["applicant"].getFromValue()["Applicant.cClntMrk"]; // 投保人 法人01
   const InscClntMrk = tabref["insured"].getFromValue()["Insured.cClntMrk"]; // 被保人  法人01
   const baseValue = opertaor.getTableRefByKey("base").getFromValue()["Base.nRmbPrm"];//承保基本信息 折合人民币总保费
+  const basePrmCur = opertaor.getTableRefByKey("base").getFromValue()["Base.cPrmCur"];//承保基本信息 总保费币种
+  const basePrm = opertaor.getTableRefByKey("base").getFromValue()["Base.nPrm"];//承保基本信息 总保费
+	
   //  单据保存才有 单据编号
   if (!appNo) {
     ElMessage.error("请先保存单据");
@@ -571,12 +574,23 @@ const setCusBenefitInfo = () => {
     );
     return;
   }
-  if (baseValue < 200000) {
-    ElMessage.error(
-        "根据反洗钱相关规定，当前保单保费折合人民币大于等于20万元，才允许录入反洗钱扩展信息！"
-    );
-    return;
-  }
+	// 币种为美元，大于2万可以录入反洗钱扩展信息，其他币种判断折合人民币大于20万
+	if(basePrmCur == "USD"){
+		if (basePrm < 20000) {
+			ElMessage.error(
+					"根据反洗钱相关规定，当前保单保费大于等于2万元，才允许录入反洗钱扩展信息！"
+			);
+			return;
+		}
+	} else {
+		if (baseValue < 200000) {
+			ElMessage.error(
+					"根据反洗钱相关规定，当前保单保费折合人民币大于等于20万元，才允许录入反洗钱扩展信息！"
+			);
+			return;
+		}
+	}
+
 
   //  显示标志   1：投保人 2：被保人  3：都展示
   if (AppcClntMrk == "0" && InscClntMrk == "0") {
@@ -1250,6 +1264,20 @@ async function loadAfter() {
             props.param["cEdrType"],
             props.param["cGrpMrk"]
           );
+
+          // 用于处理 账户信息
+          let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
+          console.log('669',acctinfoInfo)
+          if(acctinfoInfo){
+              console.log('670',acctinfoInfo)
+              acctinfoInfo.setDisabledAll(false);  
+              acctinfoInfo.setFormItem('Acctinfo.cAcctNme',{
+                disabled: true
+              })
+              acctinfoInfo.setFormItem('Acctinfo.cBankCnaps',{
+                disabled: true
+              })
+          }  
         });
         edritem.value?.handleQuery();
       } else {
@@ -1273,6 +1301,10 @@ async function loadAfter() {
 				)
 			}
     }
+
+     
+
+
   } else if (props.param.pageType === "PLY_APP_MODIFY_BOUNCED_SCENE") {
     // 投保单核保退回
     const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
@@ -1322,7 +1354,7 @@ async function loadAfter() {
 				}),
 			)
 		}
-  } else if (props.param.pageType === "EDR_APP_NEW_SCENE") {
+  } else if (props.param.pageType === "EDR_APP_NEW_SCENE" || props.param.pageType === "TEMPORARY_DEPOSIT" ) {
     // 批改申请-新增
     const cAppNo = props.param.cAppNo;
     await loadAppPlyInfo(cAppNo);
@@ -2799,17 +2831,22 @@ const calcPremiumEdr = () => {
   const nInsuranceAmount:any = [];
   res['cvrg'].forEach((item:any) => {
     if(item['Term.cRdrTyp'] === '0') {// 主险 riskList不为空则取riskList里的nInsuranceAmount累加，否则取Term.nInsuranceAmount
-      if(item['Term.riskList'] && item['Term.riskList'].length > 0) {
-        let num = 0;
-        item['Term.riskList'].forEach((i:any) => {
-          // nInsuranceAmount.push(i['TermRisktgt.nInsuranceAmount'] || 0)
-          // 是否条款自带条则，0：否，1：是
-          if(i['TermRisktgt.selfTermRisk'] === true) {
-            num = num + (i['TermRisktgt.nInsuranceAmount'] || 0)
+      // 02系列产品 ? 从责任列表取nInsuranceAmount累加 : 只取条款里的nInsuranceAmount值
+      if(props.param.cProdNo.slice(0,2) === "02") {
+        if(item['Term.riskList'] && item['Term.riskList'].length > 0) {
+          let num = 0;
+          item['Term.riskList'].forEach((i:any) => {
+            // nInsuranceAmount.push(i['TermRisktgt.nInsuranceAmount'] || 0)
+            // 是否条款自带条则，0：否，1：是
+            if(i['TermRisktgt.selfTermRisk'] === true) {
+              num = num + (i['TermRisktgt.nInsuranceAmount'] || 0)
+            }
+          })
+          if(num > 0) {
+            nInsuranceAmount.push(num)
+          } else {
+            nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
           }
-        })
-        if(num > 0) {
-          nInsuranceAmount.push(num)
         } else {
           nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
         }
@@ -2844,7 +2881,8 @@ const calcPremiumEdr = () => {
   res["EdrBase"] = edrbase.value?.getFromValue();
   if (
     res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
-    res["EdrBase"]["EdrBase.cEdrRsnDetail"] != ""
+    res["EdrBase"]["EdrBase.cEdrRsnDetail"] != "" &&
+    Array.isArray(res["EdrBase"]["EdrBase.cEdrRsnDetail"])
   ) {
     res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
       res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
@@ -2956,7 +2994,8 @@ const calcPremiumEdrSurrender = () => {
   res["EdrBase"] = edrbase.value?.getFromValue();
   if (
     res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
-    res["EdrBase"]["EdrBase.cEdrRsnDetail"] != ""
+    res["EdrBase"]["EdrBase.cEdrRsnDetail"] != "" &&
+    Array.isArray(res["EdrBase"]["EdrBase.cEdrRsnDetail"])
   ) {
     res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
       res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
@@ -3196,6 +3235,15 @@ const submitEdrToUndrFun = async () => {
     ElMessage.warning("请填写批改信息中的必填项")
     return
   }
+
+  // 账户信息校验
+   let acctinfoValidate =await opertaor.getTableRefByKey('acctinfo')?.validate()  // 账户信息 必填校验
+   let isAcctinfo = isDetailCde(); // 是否有账户信息
+    if(!acctinfoValidate && isAcctinfo) {
+      ElMessage.warning("请填写账户信息中的必填项")
+      return
+    }
+
   if (!checkNAmt()) return;
   const f = await saveEdrPlyInfo(); // 提交核保,需要默认执行一次保存操作
   if (f) {
@@ -3220,17 +3268,22 @@ const submitEdrToUndrFun = async () => {
         const nInsuranceAmount:any = [];
         calcData['cvrg'].forEach((item:any) => {
           if(item['Term.cRdrTyp'] === '0') {// 主险 riskList不为空则取riskList里的nInsuranceAmount累加，否则取Term.nInsuranceAmount
-            if(item['Term.riskList'] && item['Term.riskList'].length > 0) {
-              let num = 0;
-              item['Term.riskList'].forEach((i:any) => {
-                // nInsuranceAmount.push(i['TermRisktgt.nInsuranceAmount'] || 0)
-                // 是否条款自带条则，0：否，1：是
-                if(i['TermRisktgt.selfTermRisk'] === true) {
-                  num = num + (i['TermRisktgt.nInsuranceAmount'] || 0)
+            // 02系列产品 ? 从责任列表取nInsuranceAmount累加 : 只取条款里的nInsuranceAmount值
+            if(props.param.cProdNo.slice(0,2) === "02") {
+              if(item['Term.riskList'] && item['Term.riskList'].length > 0) {
+                let num = 0;
+                item['Term.riskList'].forEach((i:any) => {
+                  // nInsuranceAmount.push(i['TermRisktgt.nInsuranceAmount'] || 0)
+                  // 是否条款自带条则，0：否，1：是
+                  if(i['TermRisktgt.selfTermRisk'] === true) {
+                    num = num + (i['TermRisktgt.nInsuranceAmount'] || 0)
+                  }
+                })
+                if(num > 0) {
+                  nInsuranceAmount.push(num)
+                } else {
+                  nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
                 }
-              })
-              if(num > 0) {
-                nInsuranceAmount.push(num)
               } else {
                 nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
               }

@@ -66,6 +66,11 @@ onMounted(async () => {
     return false
     }
   }, 800);
+  formconfig1.fromSchema?.forEach((item:any) => {
+    if(item.prop === 'Ci.cCoinsurerCde') {
+      item.minWidth = 200
+    }
+  })
 });
 
 // 绑定方法

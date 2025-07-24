@@ -37,13 +37,14 @@ import {
 } from "@/shared/app-table-config";
 import { useRoute } from "vue-router";
 import { createFreeButtonBase } from "@/shared/button-config";
-
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
 
 
 const publicProblem = defineAsyncComponent(() => import("./PublicProblem.vue"));
 const route = useRoute();
 const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+
+const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}"); 
 
 
 import {
