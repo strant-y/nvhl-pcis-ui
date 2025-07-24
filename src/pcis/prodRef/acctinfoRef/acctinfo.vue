@@ -250,8 +250,14 @@ const method = {
     //   codeParam: { areaprovince: e },
     //   rules: [getRules("required", {})],
     // });
+    const p = opertaor.getParam();
+    console.log('开户',p)
+    if (!p.initFlag) {
+        setValue("Acctinfo.cBankArea", "");
+    }
+
     if(e){
-          setValue("Acctinfo.cBankArea", "");
+      
           // setValue("Acctinfo.cBankCounty", "");  
           codeListStore
           .queryCodeList(

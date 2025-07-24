@@ -1264,6 +1264,20 @@ async function loadAfter() {
             props.param["cEdrType"],
             props.param["cGrpMrk"]
           );
+
+          // 用于处理 账户信息
+          let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
+          console.log('669',acctinfoInfo)
+          if(acctinfoInfo){
+              console.log('670',acctinfoInfo)
+              acctinfoInfo.setDisabledAll(false);  
+              acctinfoInfo.setFormItem('Acctinfo.cAcctNme',{
+                disabled: true
+              })
+              acctinfoInfo.setFormItem('Acctinfo.cBankCnaps',{
+                disabled: true
+              })
+          }  
         });
         edritem.value?.handleQuery();
       } else {
@@ -1287,6 +1301,10 @@ async function loadAfter() {
 				)
 			}
     }
+
+     
+
+
   } else if (props.param.pageType === "PLY_APP_MODIFY_BOUNCED_SCENE") {
     // 投保单核保退回
     const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
@@ -1336,7 +1354,7 @@ async function loadAfter() {
 				}),
 			)
 		}
-  } else if (props.param.pageType === "EDR_APP_NEW_SCENE") {
+  } else if (props.param.pageType === "EDR_APP_NEW_SCENE" || props.param.pageType === "TEMPORARY_DEPOSIT" ) {
     // 批改申请-新增
     const cAppNo = props.param.cAppNo;
     await loadAppPlyInfo(cAppNo);
@@ -3217,6 +3235,15 @@ const submitEdrToUndrFun = async () => {
     ElMessage.warning("请填写批改信息中的必填项")
     return
   }
+
+  // 账户信息校验
+   let acctinfoValidate =await opertaor.getTableRefByKey('acctinfo')?.validate()  // 账户信息 必填校验
+   let isAcctinfo = isDetailCde(); // 是否有账户信息
+    if(!acctinfoValidate && isAcctinfo) {
+      ElMessage.warning("请填写账户信息中的必填项")
+      return
+    }
+
   if (!checkNAmt()) return;
   const f = await saveEdrPlyInfo(); // 提交核保,需要默认执行一次保存操作
   if (f) {
