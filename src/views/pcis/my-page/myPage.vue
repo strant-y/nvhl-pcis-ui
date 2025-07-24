@@ -2806,7 +2806,8 @@ const calcPremiumEdr = () => {
   res["EdrBase"] = edrbase.value?.getFromValue();
   if (
     res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
-    res["EdrBase"]["EdrBase.cEdrRsnDetail"] != ""
+    res["EdrBase"]["EdrBase.cEdrRsnDetail"] != "" &&
+    Array.isArray(res["EdrBase"]["EdrBase.cEdrRsnDetail"])
   ) {
     res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
       res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
@@ -2918,7 +2919,8 @@ const calcPremiumEdrSurrender = () => {
   res["EdrBase"] = edrbase.value?.getFromValue();
   if (
     res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
-    res["EdrBase"]["EdrBase.cEdrRsnDetail"] != ""
+    res["EdrBase"]["EdrBase.cEdrRsnDetail"] != "" &&
+    Array.isArray(res["EdrBase"]["EdrBase.cEdrRsnDetail"])
   ) {
     res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
       res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
