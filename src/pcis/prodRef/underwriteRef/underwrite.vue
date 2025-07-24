@@ -487,12 +487,10 @@ function showContRiskInfo(text: any) {
     },
   });
 }
-onMounted(() => {
-  nextTick(() => {
-    console.log(cUndrMrkOptions)
-    setValue("cIsRiskExp", "2");
-    // Base.cRiFacMrk
-    setValue("riFacMrk", "0")
+
+watch(
+  () => props.pageData,
+  (newVal) => {
     // 触发自主临分之后  不能做风险单位划分 不能做核保退回  可以做核保通过
     // 触发强制临分之后   不能做风险单位划分 不能做核保退回  核保通过时得再保部确认才能核保通过
     if(props.pageData?.plyBase) {
@@ -501,6 +499,18 @@ onMounted(() => {
         setFormItem("cUndrMrk",{ loadData: cUndrMrkOptions.value.filter((item:any) => item.value != "B" && item.value != "T") })
       }
     }
+  },
+  {
+    deep: true,
+  }
+);
+
+onMounted(() => {
+  nextTick(() => {
+    console.log(cUndrMrkOptions)
+    setValue("cIsRiskExp", "2");
+    // Base.cRiFacMrk
+    setValue("riFacMrk", "0")
     const param = {
       cProdNo: params.cProdNo,
       opCde: user.opCde,
