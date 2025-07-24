@@ -697,7 +697,7 @@ const getSummary = async () => {
   if(route.params.param?.pageName === "priceInquiry") {
     param.cInquiryNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
   } else {
-    param.cAppNo = route.params.param?.cAppNo
+    param.cAppNo = route.params.param?.cAppNo || opertaor.getDataAll().plyBase["Base.cAppNo"]
   }
   await policyService.getEstimatedSalesAndEstimatedSalesQuantity(param).then((res:any) => {
     if(res.code === 200) {
