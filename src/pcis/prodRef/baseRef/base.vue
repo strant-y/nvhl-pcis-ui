@@ -66,6 +66,17 @@ const method = {
 
   //缴费拆分按钮事件
   splitPayNumber() {
+    // needCalc
+    const tabref = opertaor.getTableRefs();
+    const baseBefore = tabref["base"].getFromValue();
+    const baseData = opertaor.getDataAll()['base']['needCalc'];
+    console.log('opertaor',baseData,opertaor.getDataAll(),baseBefore)
+
+    if (!baseData) {
+      ElMessage.error("请先进行保费计算!");
+      return false
+    }
+
     if (Number(getValue("Base.nPayNumber"))>12) {
       ElMessage.warning("拆分最多为12期！");
       return false

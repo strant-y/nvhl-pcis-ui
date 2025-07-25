@@ -231,6 +231,7 @@
                 :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
                 :pageSchema="k.pageSchema"
                 :compKey="k.pageCode"
+           
               />
             </div>
           </template>
@@ -2238,6 +2239,8 @@ const calcPremium = () => {
     console.log("appCalc-res", res);
     if (res["code"] == "200") {
       const ops: any = opertaor.convertData(res);
+      ops.needCalc = true;
+       ops["base"]["needCalc"] = true
       console.log("保费计算转换的数据", ops);
       if (
         ops["base"]["Base.nPrm"] != undefined &&
