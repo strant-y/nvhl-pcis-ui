@@ -1404,7 +1404,7 @@ async function loadAfter() {
         opertaor.setDataAll(ops);
         // 获取原投保单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
-          return item.pageKey === "dist" || item.pageKey === "distSummary";
+          return item.pageKey === "dist";
         });
         distMap.forEach((item:any) => {
           getDistData(props.param?.cAppNo, item)
@@ -1532,7 +1532,7 @@ async function loadAfter() {
         opertaor.setDataAll(ops);
         // 获取原投保单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
-          return item.pageKey === "dist" || item.pageKey === "distSummary";
+          return item.pageKey === "dist";
         });
         distMap.forEach((item:any) => {
           getDistData(props.param?.cAppNo, item)
@@ -1793,7 +1793,7 @@ async function loadAfter() {
         opertaor.setDataAll(ops);
         // 获取原投保单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
-          return item.pageKey === "dist" || item.pageKey === "distSummary";
+          return item.pageKey === "dist"
         });
         distMap.forEach((item:any) => {
           getDistData(props.param?.cInquiryNo, item)
@@ -1913,7 +1913,7 @@ const saveDistBatchFlag = ref(true);
 // 批量保存清单
 const saveDist = (appNo:any) => {
   const distMap = formconfig1[0].pageInfo.filter((item:any) => {
-    return item.pageKey === "dist" || item.pageKey === "distSummary";
+    return item.pageKey === "dist";
   });
   distMap.forEach((item:any) => {
     if(item.pageKey === "dist") {
@@ -2028,7 +2028,7 @@ const loadAppPlyInfo = async (CAppNo) => {
       opertaor.setDataAll(ops);
       // 获取原申请单号下的清单列表数据
       const distMap = formconfig1[0].pageInfo.filter((item:any) => {
-        return item.pageKey === "dist" || item.pageKey === "distSummary";
+        return item.pageKey === "dist";
       });
       distMap.forEach((item:any) => {
         getDistData(ops.plyBase['Base.cInquiryNo'], item)
@@ -3120,7 +3120,7 @@ const saveEdrPlyInfo = async () => {
     saveEdrFlag = true;
     // 清单列表数据
     const distMap = formconfig1[0].pageInfo.filter((item:any) => {
-      return item.pageKey === "dist" || item.pageKey === "distSummary";
+      return item.pageKey === "dist";
     });
     distMap.forEach((item:any) => {
       getDistData(EdrBaseData['EdrBase.cAppNo'], item)
