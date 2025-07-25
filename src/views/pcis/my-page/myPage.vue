@@ -3785,20 +3785,20 @@ const queryTermRateLimitFun = (calcFun: any) => {
       calcFun()
     } else if(r.msg || r.message) {
       const tableHtml = r.data.map((row:any) => {
-        return `<tr><td style="border: 1px solid #000000;">${row.cPlanNo}</td>
-        <td style="border: 1px solid #000000;">${row.cTermName}</td>
-        <td style="border: 1px solid #000000;">${row.cRiskName}</td>
-        <td style="border: 1px solid #000000;">${row.nRateVal}</td>
-        <td style="border: 1px solid #000000;">${row.cRateRange}</td></tr>`;
+        return `<tr><td>${row.cPlanNo}</td>
+        <td>${row.cTermName}</td>
+        <td>${row.cRiskName}</td>
+        <td style="color:red;">${row.nRateVal}</td>
+        <td>${row.cRateRange}</td></tr>`;
       }).join(''); // 将所有行合并成一个字符串
       const htmlContent = `
-        <table border="1" style="text-align:center;border-collapse: collapse;">
+        <table border="1" class="messageBoxTable">
           <thead>
-            <tr><th style="border: 1px solid #000000;width:50px;">方案号</th>
-            <th style="border: 1px solid #000000;">条款</th
-            ><th style="border: 1px solid #000000;">责任</th>
-            <th style="border: 1px solid #000000;width:40px;">费率</th>
-            <th style="border: 1px solid #000000;width:90px;">建议费率区间</th></tr>
+            <tr><th>方案号</th>
+            <th>条款</th
+            ><th>责任</th>
+            <th>费率</th>
+            <th>建议费率区间</th></tr>
           </thead>
           <tbody>
             ${tableHtml}
@@ -3812,6 +3812,7 @@ const queryTermRateLimitFun = (calcFun: any) => {
         cancelButtonText: "取消",
         type: "warning",
         lockScroll: false,
+        customClass: 'queryTermRateMessage'
       }).then(() => {
         calcFun()
       })
@@ -3946,4 +3947,22 @@ const queryTermRateLimitFun = (calcFun: any) => {
   padding: 10px 20px;
 }
 
+</style>
+<style>
+.queryTermRateMessage {
+  max-width: 80%;
+  width: auto;
+}
+.queryTermRateMessage .el-message-box__message p {
+  overflow-x: auto;
+}
+.queryTermRateMessage .messageBoxTable {
+  text-align: center;
+  border-collapse: collapse;
+}
+.queryTermRateMessage .messageBoxTable td,.queryTermRateMessage .messageBoxTable th {
+  white-space: nowrap;
+  border: 1px solid #000000;
+  padding: 0 5px;
+}
 </style>
