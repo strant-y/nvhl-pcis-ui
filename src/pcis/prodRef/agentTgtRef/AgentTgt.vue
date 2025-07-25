@@ -8,6 +8,11 @@ import {formInit} from "@/shared/from-init";
 import {dataOpertaor} from "@/store/modules/data-opertaor";
 import {useProductStore} from "@/store/modules/prod";
 import {useValidator} from "@/typings/useValidator";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
+const dzmodal = useDzModal();
+const surveyInfo = defineAsyncComponent(
+  () => import("@/views/comprehensive-query/modal/survey-info-modal.vue")
+);
 
 const opertaor = dataOpertaor();
 const { getRules } = useValidator();
@@ -40,6 +45,18 @@ onMounted(() => {
 const method = {
   // func demo
   func1: () => {},
+  cCheckerCdeFunc: () => {
+    dzmodal.open(surveyInfo, { type: "departure", data: {} }).then((res: any) => {
+      if (res.type === "ok") {
+        setValue("Tgt.cCheckerCde",res.body.cSryDoc);   // 代理人
+        setValue("Tgt.cAddr",res.body.cAddr);   // 大洲
+        // setValue("Tgt.cCountry",res.body.id);  // ?国家
+        setValue("Tgt.cAraCde",res.body.cAraCde); // ?国家
+        setValue("Tgt.cCtyCnm", res.body.cCtyCnm);  // 城市
+        setValue("Tgt.cCode",  res.body.cSrvyCde);  // 城市
+      };
+    });
+  },
 };
 // 绑定特殊验证器
 const exRules = {};
