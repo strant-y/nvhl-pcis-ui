@@ -98,7 +98,7 @@ const cascprops: CascaderProps = {
       }
       const codeListParam = {};
       // 批改原因级联
-      if(props.item.typeCode === "EDR_RSN_LIST_NEW") {
+      if(props.item.typeCode === "EDR_RSN_LIST_NEW" || props.item.typeCode ==='EDR_RSN_LIST_YY' || props.item.typeCode ==='EDR_RSN_LIST_AY') {
         codeListParam.rsnTyp = value.split('-')[0]
         codeListParam.kindNo = value.split('-')[1]
       } else {
@@ -118,7 +118,7 @@ const cascprops: CascaderProps = {
             typeof props.item.cascaderprops === "string"
               ? JSON.parse(props.item.cascaderprops)
               : props.item.cascaderprops;
-          if(props.item.typeCode === "EDR_RSN_LIST_NEW") {
+          if(props.item.typeCode === "EDR_RSN_LIST_NEW" || props.item.typeCode ==='EDR_RSN_LIST_YY' ||  props.item.typeCode ==='EDR_RSN_LIST_AY') {
             res.forEach((e: any) => {
               e.leaf = level >= 1;
             });

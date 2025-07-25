@@ -8,9 +8,10 @@ import {createFreeButtonBase, FreeButtonBase} from "@/shared/button-config";
 import {FormPage} from "@/views/protocolManagement/utils/form-page";
 import detailComponent from "../components/detail-component.vue";
 import {EnteringCompList} from "@/views/protocolManagement/utils/types";
-import {useTagsViewStore} from "@/store";
+import {dataOpertaor, useTagsViewStore} from "@/store";
 import {useRouter} from "vue-router";
 import { getECargoData } from "@/pcis/prodRef/dataInit";
+import {getEdrRsnItem} from "@/api/query/index"
 const tagsViewStore = useTagsViewStore();
 const router = useRouter();
 const props = defineProps({
@@ -27,16 +28,20 @@ const props = defineProps({
 const formPage = ref(new FormPage('enteringDtl'));
 const resData = ref({});
 const idxParam = reactive({
+  opertaorId: 'enteringDtl',
   formPage: formPage.value,
   param: { ...props.param, ...{}},
   user: JSON.parse(sessionStorage.getItem("user")),
   ciJiMrk: '0',
   readonly: computed(() => ['view','audit'].includes(props.type)),
 });
+
 provide('idxParam', idxParam);
 const mainRef = ref(null);
 const bthList = ref<Array<FreeButtonBase>>([]);
-
+const opertaor = dataOpertaor(idxParam.opertaorId);
+opertaor.init();
+opertaor.setParam(props.param);
 //投保页面
 const basicBtn = [
   createFreeButtonBase({
@@ -223,11 +228,13 @@ onBeforeMount(async () => {
   if( ['add','edit'].includes(props.type)){
     bthList.value = basicBtn
   }
+  //审核
   if(props.type === 'audit'){
     bthList.value = uwBtn
   }
   //批改
   if(props.type === 'EDR_APP_NEW_SCENE'){
+
     if(props.cEdrType === '1'){
       bthList.value = edrBtn
     }else{
@@ -235,8 +242,8 @@ onBeforeMount(async () => {
     }
   }
   if(['view','edit','audit','EDR_APP_NEW_SCENE'].includes(props.type)){
-    nextTick(()=>{
-      query();
+    nextTick(async ()=>{
+     await query();
     })
 
   }
@@ -262,8 +269,47 @@ onBeforeMount(async () => {
 onMounted(() => {
   console.log(idxParam.readonly);
 });
-
-
+/**
+ * 获取批改项
+ * **/
+const getEdrRsnItemFun = (
+    cProdNo: any,
+    cDptCde: any,
+    cRsnCde: any,
+    cRsnDetailCde: any,
+    cEdrType: any,
+    cGrpMrk: any
+) => {
+  const res = {
+    CProdNo: cProdNo,
+    CDptCde: cDptCde,
+    CRsnCde: cRsnCde,
+    CRsnDetailCde: cRsnDetailCde,
+    CEdrType: cEdrType,
+    CGrpMrk: cGrpMrk,
+  };
+  getEdrRsnItem(res).then((res: any) => {
+    if (res["code"] == "200") {
+      const result = res["data"]["result"];
+      const edrList: any[] = [];
+      result.forEach((key: any) => {
+        if (key["cOperTyp"] === "M") {
+          edrList.push(key["cEdrItem"]);
+        } else if (key["cOperTyp"] === "B") {
+          edrList.push("Btn_" + key["cEdrItem"]);
+        }
+      });
+      debugger
+      console.log('formPage.value',formPage.value)
+      // console.log('edrList',edrList)
+      // formPage.value?.setUnDisabledByKeyList(edrList)
+      // opertaor.setUnDisabledByKeyList(edrList); // 根据list集合,放开需要的要素
+      ElMessage.success(res.msg);
+    } else {
+      ElMessage.error(res.msg);
+    }
+  });
+};
 function query() {
   cargoApi.init({
     ...idxParam.param,
@@ -273,6 +319,67 @@ function query() {
       console.log('res........',res)
       ElMessage.success('查询成功');
       formPage.value?.setAllFormData({...res.data.composition,AgreementBase:res.data.composition?.AgreementBase[0],AgreementApplicant:res.data.composition?.AgreementApplicant[0],AgreementFeeWarn:res.data.composition?.AgreementBase[0]});
+      if(props.type === 'EDR_APP_NEW_SCENE'){
+        console.log('props.param',props.param)
+        if (
+            res["data"]["composition"]["AgreementBase"][0]["ECargoBase.cEdrRsnDetail"] !=
+            "" &&
+            res["data"]["composition"]["AgreementBase"][0]["ECargoBase.cEdrRsnDetail"] !=
+            null
+        ) {
+          res["data"]["composition"]["AgreementBase"][0]["ECargoBase.cEdrRsnDetail"] =
+              res["data"]["composition"]["AgreementBase"][0][
+                  "ECargoBase.cEdrRsnDetail"
+                  ].split(",");
+        }
+        res["data"]["composition"]["AgreementBase"][0]["ECargoBase.cRatioTyp"] = "2";
+        res["data"]["composition"]["AgreementBase"][0]["ECargoBase.cEdrType"] =
+            props.param["cEdrType"];
+        res["data"]["composition"]["AgreementBase"][0]["ECargoBase.cEdrRsnBundleCde"] =
+            props.param["cRsnCde"];
+        if (props.param.cEdrType != "1") {
+          res["data"]["composition"]["AgreementBase"][0]["ECargoBase.cEdrRsnDetail"] = [
+            props.param["cRsnCde"],
+          ];
+        }
+        const EdrBaseData = res["data"]["composition"]["AgreementBase"][0];
+        mainRef.value?.setxyedrbaseRefData(EdrBaseData)
+        if (props.param?.cEdrType == "1") {
+          if (props.param["cRsnCde"] != "FZ") {
+            mainRef.value?.setxyedrbaseRefValue("EdrBase.cEdrRsnDetail", [
+              props.param["cRsnCde"],
+            ]);
+          }
+          nextTick(() => {
+            // opertaor.setDisabledAll();
+            formPage.value?.setPageReadOnly(true)
+
+            getEdrRsnItemFun(
+                "029900",
+                props.param["cDptCde"],
+                props.param["cRsnCde"],
+                props.param["cRsnCde"],
+                props.param["cEdrType"],
+                "0"
+            )
+            //
+            // console.log('3333',opertaor.getTableRefByKey('acctinfo'))
+            // // 用于处理 账户信息
+            // let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
+            // if(acctinfoInfo){
+            //   acctinfoInfo.setDisabledAll(false);
+            //   acctinfoInfo.setFormItem('Acctinfo.cAcctNme',{
+            //     disabled: true
+            //   })
+            //   acctinfoInfo.setFormItem('Acctinfo.cBankCnaps',{
+            //     disabled: true
+            //   })
+            //
+            // }
+
+          });
+        }
+      }
     }else {
       ElMessage.error(res.msg);
     }

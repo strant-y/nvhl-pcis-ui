@@ -41,6 +41,7 @@ const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
 import cargoApi from '@/api/cargo'
+import {PcisEdrQueryService} from "@/views/edr-qry-endorse-list/service/pcis-edr-query-service";
 
 const codeListStore = codeListViewStore();
 
@@ -230,7 +231,7 @@ const pageresult = reactive<Pageresult>({
   /** 总数 */
   total: 0,
 });
-
+const pcisEdrQueryService = new PcisEdrQueryService();
 const tableconfig = reactive<AppTableConfig>(
     createTableEditConfig({
       showSelection: false,
@@ -264,22 +265,59 @@ const tableconfig = reactive<AppTableConfig>(
                 ElMessage.warning("请选择批改原因");
                 return;
               }
-            // 如果选的批改原因是变更影像上传方式
-            if ("DZ" === row['id'][1]) {
-              return;
-            } else if ("DP" === row['id'][1]) {
-
-            } else if ("2" === rsnTyp) {
-              //注销
-              cEdrType = '2'
-            } else if ("3" === rsnTyp) {
-              //退保
-              cEdrType = '3'
-            } else if ("1" === rsnTyp) {
-              //一般批改
-              cEdrType = '1'
-            }
-            toDtl(row, 'EDR_APP_NEW_SCENE',cEdrType);
+            const param = {
+              plyNo: row.cEcAgrAppNo,
+              edrType: rsnTyp,
+              prodNo: '029900',
+              edrRsnCde: row['id'][1],
+            };
+            pcisEdrQueryService.validEndorsexy(param).then(
+                async (result) => {
+                  if (200 !== result["code"]) {
+                    ElMessage.error(result["msg"]);
+                  } else {
+                    if (result["data"]) {
+                      let en:any
+                      if ("2" === rsnTyp) {
+                        //注销
+                        en = {
+                          ...row,
+                          cRsnCde: row['id'][1],
+                          cEdrType: '2',
+                          pageType: "EDR_APP_NEW_SCENE",
+                        }
+                        //预留跳转路径
+                        cEdrType = '2'
+                      } else if ("3" === rsnTyp) {
+                        //退保
+                        en = {
+                          ...row,
+                          cRsnCde: row['id'][1],
+                          cEdrType: '3',
+                          pageType: "EDR_APP_NEW_SCENE",
+                        }
+                        cEdrType = '3'
+                      } else if ("1" === rsnTyp) {
+                        //一般批改
+                        en = {
+                          ...row,
+                          cRsnCde: row['id'][1],
+                          cEdrType: '1',
+                          pageType: "EDR_APP_NEW_SCENE",
+                        }
+                        cEdrType = '1'
+                      }
+                      toDtl(en, 'EDR_APP_NEW_SCENE',cEdrType);
+                    } else {
+                      ElMessage.error(result["msg"]);
+                    }
+                  }
+                },
+                (error) => {
+                  console.log("err: ", error);
+                  ElMessage.error("连接失败！" + error);
+                }
+            );
           },
         }),
       ],
@@ -363,7 +401,7 @@ const tableconfig = reactive<AppTableConfig>(
     })
 );
 
-onMounted(async () => {
+onMounted(() => {
   freeEditRef.value?.setValue('Tm',[
     moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00"),
     moment(new Date()).format("YYYY-MM-DD 23:59:59")]
@@ -384,7 +422,9 @@ const method = {
 
 // 绑定特殊验证器
 const exRules = {};
-
+function setRowFieldProp(rowId: string, field: string, prop: string, value: any) {
+  return tableRef.value?.setRowFieldProp(rowId, field, prop, value);
+}
 /** 查询 */
 function handleQuery(flag?: boolean) {
   freeEditRef.value?.validate().then((isValid) => {
@@ -406,15 +446,44 @@ function handleQuery(flag?: boolean) {
           if (pageData) {
             pageresult.list = pageData.data;
             pageresult.total = pageData.total;
-            pageData.data.forEach((item) => {
-              setTableFormItem("id", {
-                loadData: [
-                  { label: '一般批改', value: `1-${'029900'.slice(0,2)}` },
-                  { label: '注销', value: `2-${'029900'.slice(0,2)}` },
-                  { label: '退保', value: `3-${'029900'.slice(0,2)}` },
-                ],
-              })
-            });
+            nextTick(()=>{
+              tableRef.value?.getTableValues().forEach((item:any ) =>{
+                if(item.cEdrFlag === 'YY'){
+                  setRowFieldProp(
+                      item['_dataId'],
+                      "id",
+                      "typeCode",
+                      'EDR_RSN_LIST_YY',
+                  );
+                  setRowFieldProp(
+                      item['_dataId'],
+                      "id",
+                      "loadData",
+                      [
+                        { label: '一般批改', value: `1-${'029900'.slice(0,2)}` },
+                        { label: '注销', value: `2-${'029900'.slice(0,2)}` },
+                        { label: '退保', value: `3-${'029900'.slice(0,2)}` },
+                      ],
+                  );
+                }else {
+                  setRowFieldProp(
+                      item['_dataId'],
+                      "id",
+                      "typeCode",
+                      'EDR_RSN_LIST_AY',
+                  );
+                  setRowFieldProp(
+                      item['_dataId'],
+                      "id",
+                      "loadData",
+                      [
+                        { label: '一般批改', value: `1-${'029900'.slice(0,2)}` },
+                        { label: '注销', value: `2-${'029900'.slice(0,2)}` }
+                      ],
+                  );
+                }
+               })
+            })
           }
         } else {
           ElMessage.error(res.msg);
