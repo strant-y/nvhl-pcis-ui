@@ -3306,7 +3306,7 @@ const submitUnderwritingFn = async () => {
   console.log(res);
   if(res.cUndrMrk === "A") {//核保选项为同意时，调用强制临分接口
     // 先查询临分标识
-    const queryCRiFacMrk = props.param?.pageName !== "priceInquiry" ? await policyService.queryCRiFacMrkXJ({cAppNo: props.param?.cAppNo}) : await policyService.queryCRiFacMrk({cAppNo: props.param?.cAppNo});
+    const queryCRiFacMrk = props.param?.pageName === "priceInquiry" ? await policyService.queryCRiFacMrkXJ({cAppNo: props.param?.cAppNo}) : await policyService.queryCRiFacMrk({cAppNo: props.param?.cAppNo});
     if(queryCRiFacMrk && queryCRiFacMrk.code === '200') {
       const cRiFacMrk = queryCRiFacMrk.data.cRiFacMrk;
       if(cRiFacMrk === '0') {
@@ -3338,7 +3338,7 @@ const submitUnderwritingFn = async () => {
           tInsrncBgnTm: insrnc['Base.tInsrncBgnTm'],// 保险起期
           tInsrncEndTm: insrnc['Base.tInsrncEndTm'],// 保险止期
         }
-        const queryRiFacMrk = props.param?.pageName !== "priceInquiry" ? await policyService.queryRiFacMrkXJ(param) : await policyService.queryRiFacMrk(param);
+        const queryRiFacMrk = props.param?.pageName === "priceInquiry" ? await policyService.queryRiFacMrkXJ(param) : await policyService.queryRiFacMrk(param);
         if(queryRiFacMrk && queryRiFacMrk.responseCode === '0') {
           ElMessage.error(queryRiFacMrk.message);
           return
@@ -3353,7 +3353,7 @@ const submitUnderwritingFn = async () => {
           cPlyNo: props.param?.plyNo,
           nEdrPrjNo: plyBase['Base.nEdrPrjNo']
         }
-        const queryFacSts = props.param?.pageName !== "priceInquiry" ? await policyService.queryFacStsXJ(param) : await policyService.queryFacSts(param);
+        const queryFacSts = props.param?.pageName === "priceInquiry" ? await policyService.queryFacStsXJ(param) : await policyService.queryFacSts(param);
         if(queryFacSts && queryFacSts.responseCode && (queryFacSts.responseCode === "0" || queryFacSts.responseCode === "1" || queryFacSts.responseCode === "6")) {
           ElMessage.error(queryFacSts.message);
           return
