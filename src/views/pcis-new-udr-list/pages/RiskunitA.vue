@@ -1419,7 +1419,7 @@ async function getContData() {
 
 // 获取风险单位划分列表数据
 async function getRiskData() {
-  const riskQueryInfo = await params.pageName === "priceInquiry" ? riskQueryDataXJ({ cAppNo: params.cAppNo }) : riskQueryData({ cAppNo: params.cAppNo })
+  const riskQueryInfo = params.pageName === "priceInquiry" ? await riskQueryDataXJ({ cAppNo: params.cAppNo }) : await riskQueryData({ cAppNo: params.cAppNo })
   if(riskQueryInfo && riskQueryInfo.code === "200") {
     pageresult1.list = riskQueryInfo.data.map((item: any, index: number) => ({
       ...item,
