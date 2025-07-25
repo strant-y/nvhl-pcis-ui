@@ -473,6 +473,7 @@ onMounted(() => {
     });
   }
   nextTick(() => {
+    console.log("子类数据", props.data.data.rowData["Ci.cDptCde"]);
     setValue("CDptCde", props.data.data.rowData["Ci.cDptCde"]);
   });
 });
