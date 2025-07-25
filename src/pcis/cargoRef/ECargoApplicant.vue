@@ -577,8 +577,8 @@ if (
     coustMrk: applicantValue["ECargoApplicant.cClntMrk"],
     coustType:applicantValue["ECargoApplicant.cCertfCls"],
     coustCode: applicantValue["ECargoApplicant.cCertfCde"],
-    // personnelType:"ECargoApplicant"
-    personnelType:"Applicant"
+    personnelType:"ECargoApplicant"
+    // personnelType:"Applicant"
   }
   qryCustomer(param)
     .then((res:any) => {
@@ -587,23 +587,24 @@ if (
         if(data){
           console.log('客户数据', data)
 					const result:any = {};
-  				for (const key in data[0]) {
-						if (data[0].hasOwnProperty(key)) {
+  				// for (const key in data[0]) {
+					// 	if (data[0].hasOwnProperty(key)) {
 							// 仅替换以 "Applicant." 开头的键
-							if (key.startsWith('Applicant.')) {
-								const newKey = key.replace('Applicant.', 'ECargoApplicant.');
-								result[newKey] = data[0][key];
-							} else {
-								result[key] = data[0][key];
-							}
-						}
-					}
+							// if (key.startsWith('Applicant.')) {
+							// 	const newKey = key.replace('Applicant.', 'ECargoApplicant.');
+							// 	result[newKey] = data[0][key];
+							// } else {
+							// 	result[key] = data[0][key];
+							// }
+					// 	}
+					// }
 					Object.keys(result).forEach((key) => { 
 						if(result[key]){
 							setValue(key, result[key]);
 						}
 					});
-          // tabref ['AgreementApplicant'].setFormValue(data[0])
+          
+          setValue('ECargoApplicant.cAppCde', data[0]['ECargoApplicant.cCargoAppCde']);
           let userId = getValue('ECargoApplicant.cCertfCde')
           idAnalysis(userId)
         }
