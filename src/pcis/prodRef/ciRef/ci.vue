@@ -972,7 +972,7 @@ const initcbusiner = (row:any) =>{
   const rowdata = getFromValue();
   if(rowdata.length >0){
     const rowId = rowdata[0]._dataId;
-    setValueByRowKey('Ci.cSlsCde',rowId,row.cSlsId)
+    setValueByRowKey('Ci.cSlsCde',rowId,`${row.cSlsId}${row.cSlsNme}`)
     freeEditRef.value?.addCodeListMap({
       code:'Ci.cSlsCde'+rowId,
       list:row.loadData,
