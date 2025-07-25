@@ -8,7 +8,7 @@ import {createFreeButtonBase, FreeButtonBase} from "@/shared/button-config";
 import {FormPage} from "@/views/protocolManagement/utils/form-page";
 import detailComponent from "../components/detail-component.vue";
 import {EnteringCompList} from "@/views/protocolManagement/utils/types";
-import {dataOpertaor, useTagsViewStore} from "@/store";
+import {useTagsViewStore} from "@/store";
 import {useRouter} from "vue-router";
 import { getECargoData } from "@/pcis/prodRef/dataInit";
 import {getEdrRsnItem} from "@/api/query/index"
@@ -39,9 +39,6 @@ const idxParam = reactive({
 provide('idxParam', idxParam);
 const mainRef = ref(null);
 const bthList = ref<Array<FreeButtonBase>>([]);
-const opertaor = dataOpertaor(idxParam.opertaorId);
-opertaor.init();
-opertaor.setParam(props.param);
 //投保页面
 const basicBtn = [
   createFreeButtonBase({
@@ -299,11 +296,9 @@ const getEdrRsnItemFun = (
           edrList.push("Btn_" + key["cEdrItem"]);
         }
       });
-      debugger
-      console.log('formPage.value',formPage.value)
+      console.log('edrList', edrList)
       // console.log('edrList',edrList)
-      // formPage.value?.setUnDisabledByKeyList(edrList)
-      // opertaor.setUnDisabledByKeyList(edrList); // 根据list集合,放开需要的要素
+      formPage.value?.setUnDisabledByKeyList(edrList); // 根据list集合,放开需要的要素
       ElMessage.success(res.msg);
     } else {
       ElMessage.error(res.msg);
@@ -351,8 +346,7 @@ function query() {
             ]);
           }
           nextTick(() => {
-            // opertaor.setDisabledAll();
-            formPage.value?.setPageReadOnly(true)
+            formPage.value?.setPageReadOnly(true);
 
             getEdrRsnItemFun(
                 "029900",
@@ -491,62 +485,6 @@ function submit() {
 // 绑定特殊验证器
 const exRules = {};
 
-function getFormValue() {
-  return cvrgEditRef?.value?.getFromValue();
-}
-
-function setFormValue(value: any) {
-  cvrgEditRef?.value?.setFormValue(value);
-}
-
-function validate() {
-  return cvrgEditRef?.value?.validate();
-}
-
-function getTableValue(rowId: number, key: string) {
-  cvrgEditRef?.value?.getTableValue(rowId, key);
-}
-
-function getFormConfig() {
-  return formconfig1;
-}
-//给表单赋值
-function setFormItem(key: any, obj: any) {
-  if (obj && Object.keys(obj).length) {
-    formconfig1.fromSchema?.forEach((item) => {
-      if (item.prop === key) {
-        //控制尾部按钮的
-        if (item.btnItems && obj.btnItems) {
-          for (let key in obj.btnItems) {
-            item.btnItems[key] = obj.btnItems[key];
-          }
-        } else {
-          Object.assign(item, obj);
-        }
-      }
-    });
-  }
-}
-function getFormBtn() {
-  return cvrgEditRef?.value?.getFormBtn();
-}
-function getTableBtn() {
-  return cvrgEditRef?.value?.getTableBtn();
-}
-function setDisabledAll(isDisabled: boolean) {
-  cvrgEditRef?.value?.setDisabledAll(isDisabled);
-}
-defineExpose({
-  getFormValue,
-  setFormValue,
-  validate,
-  getTableValue,
-  getFormConfig,
-  setFormItem,
-  getFormBtn,
-  setDisabledAll,
-  getTableBtn
-});
 </script>
 <style lang="scss" scoped>
 </style>
