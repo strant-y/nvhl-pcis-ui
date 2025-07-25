@@ -229,7 +229,7 @@ const method = {
   //折人民币协议预收保费
   nRmbReceivedPrmChange:(val:any)=>{
    //ECargoBase.nWhRmbPrm
-    const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
+    const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
     if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') && agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo').slice(0,2) === 'YY'){
        setValue('ECargoBase.nRecRemPrm',val - getValue('ECargoBase.nWhRmbPrm'))
     }
@@ -237,7 +237,7 @@ const method = {
   //折人民币预扣保费
   nWhRmbPrmChange:(val:any)=>{
     //ECargoBase.nRmbReceivedPrm
-    const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
+    const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
     if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') && agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo').slice(0,2) === 'YY'){
       setValue('ECargoBase.nRecRemPrm',getValue('ECargoBase.nRmbReceivedPrm') - val )
     }else if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') && agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo').slice(0,2) === 'AY') {
@@ -245,10 +245,12 @@ const method = {
     }
   },
   nRmbPrmChange:(val:any)=>{
-    const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
-    if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') && agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo')?.slice(0,2) === 'AY'){
-      setValue('ECargoBase.nRecRemPrm', val - getValue('ECargoBase.nWhRmbPrm') )
-    }
+    nextTick(()=>{
+      const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
+      if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') && agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo')?.slice(0,2) === 'AY'){
+        setValue('ECargoBase.nRecRemPrm', val - getValue('ECargoBase.nWhRmbPrm') )
+      }
+    })
   }
   // func demo
 

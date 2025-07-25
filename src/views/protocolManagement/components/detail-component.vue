@@ -97,7 +97,7 @@
       </el-aside>
       <el-main>
         <div id="edrbase" v-if="edrbaseFlag" style="margin-bottom: 10px">
-          <xyedrbaseRef ref="edrbase"></xyedrbaseRef>
+          <xyedrbaseRef ref="xyedrbase"></xyedrbaseRef>
         </div>
         <div id="edritem" v-if="edritemFlag" style="margin-bottom: 10px">
           <xyedritemRef ref="edritem"></xyedritemRef>
@@ -183,6 +183,7 @@ const getConmpName = (k: any) => {
 }
 const NavigaShow = ref(true);
 const underwrite = ref(null);
+const xyedrbase = ref(null)
 let edrbaseFlag = ref(false);
 let edritemFlag = ref(false);
 onMounted(()=>{
@@ -204,6 +205,12 @@ function  getUnderwriteRef (){
 }
 function getUnderwriteValue(){
   return underwrite.value?.getFromValue()
+}
+function setxyedrbaseRefData(val:any){
+  return xyedrbase.value?.setFormValue(val)
+}
+function setxyedrbaseRefValue(key:any,val:any){
+  return xyedrbase.value?.setValue(key,val)
 }
 /**
  * 锚点点击事件重写
@@ -232,7 +239,9 @@ function handleAnchorClick(event: any, targetId: string) {
 }
 defineExpose({
   getUnderwriteRef,
-  getUnderwriteValue
+  getUnderwriteValue,
+  setxyedrbaseRefData,
+  setxyedrbaseRefValue
 });
 </script>
 <style lang="scss" scoped>

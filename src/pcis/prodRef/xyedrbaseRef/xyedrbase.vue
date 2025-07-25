@@ -18,7 +18,7 @@ import { codeListViewStore } from "@/store";
 import dayjs from "dayjs";
 import { debug } from "console";
 const codeListStore = codeListViewStore();
-const opertaor = dataOpertaor();
+const opertaor = dataOpertaor('enteringDtl');
 const { getRules } = useValidator();
 const props = defineProps({
   // param: {
@@ -35,7 +35,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     endBtnsPosition: "right",
     fromSchema: [
       {
-        prop: "EdrBase.tRepStopExtBgnTm",
+        prop: "ECargoBase.tRepStopExtBgnTm",
         inputtype: "rtdatepicker",
         type: "datetime",
         title: "报停起期",
@@ -47,10 +47,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           return time.getTime() < new Date(tInsrncBgnTm).getTime()
         },
         func: (v) => {
-          const tRepStopExtEndTm = getValue("EdrBase.tRepStopExtEndTm")
+          const tRepStopExtEndTm = getValue("ECargoBase.tRepStopExtEndTm")
           if(v && tRepStopExtEndTm && new Date(v).getTime() > new Date(tRepStopExtEndTm).getTime()) {
             ElMessage.warning("报停起期不能晚于报停止期")
-            setValue("EdrBase.tRepStopExtBgnTm", null)
+            setValue("ECargoBase.tRepStopExtBgnTm", null)
           } else if(v && tRepStopExtEndTm) {
             // 根据报停起期和止期计算相差天数，然后延长保险止期相应天数
             const time = dayjs(tRepStopExtEndTm).diff(dayjs(v))
@@ -59,7 +59,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
       },
       {
-        prop: "EdrBase.tRepStopExtEndTm",
+        prop: "ECargoBase.tRepStopExtEndTm",
         inputtype: "rtdatepicker",
         type: "datetime",
         title: "报停止期",
@@ -71,10 +71,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           return time.getTime() > new Date(tInsrncEndTm).getTime()
         },
         func: (v) => {
-          const tRepStopExtBgnTm = getValue("EdrBase.tRepStopExtBgnTm")
+          const tRepStopExtBgnTm = getValue("ECargoBase.tRepStopExtBgnTm")
           if(v && tRepStopExtBgnTm && new Date(v).getTime() < new Date(tRepStopExtBgnTm).getTime()) {
             ElMessage.warning("报停止期不能早于报停起期")
-            setValue("EdrBase.tRepStopExtEndTm", null)
+            setValue("ECargoBase.tRepStopExtEndTm", null)
           } else if(v && tRepStopExtBgnTm) {
             // 根据报停起期和止期计算相差天数，然后延长保险止期相应天数
             const time = dayjs(v).diff(dayjs(tRepStopExtBgnTm))
@@ -83,7 +83,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
       },
       {
-        prop: "EdrBase.NSurrRate",
+        prop: "ECargoBase.NSurrRate",
         inputtype: "rtnumber",
         title: "手续费比例",
         clearable: true,
@@ -92,27 +92,27 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           if(v){
             if(v<0 || v>1){
               ElMessage.warning("批改信息的手续费比例 必须为0~1.0之间!")
-              setValue('EdrBase.NSurrRate',0)
+              setValue('ECargoBase.NSurrRate',0)
             }
           }
         },
       },
       {
-        prop: "EdrBase.nBefEdrPrm",
+        prop: "ECargoBase.nBefEdrPrm",
         inputtype: "rtinput",
         title: "原保费",
         disabled:true,
         suffix: "元"
       },
       {
-        prop: "EdrBase.nPrm",
+        prop: "ECargoBase.nPrm",
         inputtype: "rtinput",
         title: "现保费",
         disabled:true,
         suffix: "元"
       },
       {
-        prop: "EdrBase.nPrmVar",
+        prop: "ECargoBase.nPrmVar",
         inputtype: "rtinput",
         min:-999999999999,
         title: "保费变化",
@@ -120,7 +120,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         suffix: "元"
       },
       {
-        prop: "EdrBase.tEdrAppTm",
+        prop: "ECargoBase.tEdrAppTm",
         inputtype: "rtdatepicker",
         format:"YYYY-MM-DD HH:mm:ss",
         type :"datetime",
@@ -128,7 +128,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         disabled:true
       },
       {
-        prop: "EdrBase.tEdrBgnTm",
+        prop: "ECargoBase.tEdrBgnTm",
         inputtype: "rtdatepicker",
         format:"YYYY-MM-DD HH:mm:ss",
         type :"datetime",
@@ -141,7 +141,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
       },
       {
-        prop: "EdrBase.cEdrMrk",
+        prop: "ECargoBase.cEdrMrk",
         inputtype: "rtselect",
         title: "申请类型",
         loadData: [
@@ -155,7 +155,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         func: (v) => {},
       },
       {
-        prop: "EdrBase.cEdrRsnBundleCde",
+        prop: "ECargoBase.cEdrRsnBundleCde",
         inputtype: "rtselect",
         title: "批改原因",
         typeCode: "EDR_RSN_LIST",
@@ -166,7 +166,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         func: (v) => {},
       },
       {
-        prop: "EdrBase.cEdrRsnDetail",
+        prop: "ECargoBase.cEdrRsnDetail",
         inputtype: "rtcheckboxgroup",
         title: "批改原因详细",
         itemWidth: 2,
@@ -191,7 +191,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         // ],
       },
       {
-        prop: "EdrBase.edrFormula",
+        prop: "ECargoBase.edrFormula",
         inputtype: "rtinput",
         type: "textarea",
         title: "批改公式",
@@ -199,7 +199,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         itemWidth: 3,
       },
       {
-        prop: "EdrBase.cEdrCtnt",
+        prop: "ECargoBase.cEdrCtnt",
         inputtype: "rtinput",
         type: "textarea",
         title: "批文",
@@ -208,12 +208,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("maxLength", {len:5000})],
       },
       {
-          prop: "EdrBase.cEdrType",
+          prop: "ECargoBase.cEdrType",
           inputtype: "rtinput",
           hidden:true,
       },
       {
-          prop: "EdrBase.cacheKey",
+          prop: "ECargoBase.cacheKey",
           inputtype: "rtinput",
           hidden:true,
       },
@@ -231,12 +231,12 @@ function getFromValue() {
 function setFormValue(value: any) {
   const val = {
     ...value,
-    "EdrBase.nBefEdrAmt": value["EdrBase.nBefEdrAmt"].toLocaleString(),
-    "EdrBase.nAmt": value["EdrBase.nAmt"].toLocaleString(),
-    "EdrBase.nAmtVar": value["EdrBase.nAmtVar"].toLocaleString(),
-    "EdrBase.nBefEdrPrm": value["EdrBase.nBefEdrPrm"].toLocaleString(),
-    "EdrBase.nPrm": value["EdrBase.nPrm"].toLocaleString(),
-    "EdrBase.nPrmVar": value["EdrBase.nPrmVar"].toLocaleString(),
+    "ECargoBase.nBefEdrAmt": value["ECargoBase.nBefEdrAmt"]?.toLocaleString(),
+    "ECargoBase.nAmt": value["ECargoBase.nAmt"]?.toLocaleString(),
+    "ECargoBase.nAmtVar": value["ECargoBase.nAmtVar"]?.toLocaleString(),
+    "ECargoBase.nBefEdrPrm": value["ECargoBase.nBefEdrPrm"]?.toLocaleString(),
+    "ECargoBase.nPrm": value["ECargoBase.nPrm"]?.toLocaleString(),
+    "ECargoBase.nPrmVar": value["ECargoBase.nPrmVar"]?.toLocaleString(),
   }
   edrbaseEditRef?.value?.setFormValue(val);
 }
@@ -246,12 +246,12 @@ function validate() {
 }
 
 function setValue(key: string, value: any) {
-  if(key === "EdrBase.nBefEdrAmt" ||
-    key === "EdrBase.nAmt" || 
-    key === "EdrBase.nAmtVar" || 
-    key === "EdrBase.nBefEdrPrm" || 
-    key === "EdrBase.nPrm" || 
-    key === "EdrBase.nPrmVar"
+  if(key === "ECargoBase.nBefEdrAmt" ||
+    key === "ECargoBase.nAmt" || 
+    key === "ECargoBase.nAmtVar" || 
+    key === "ECargoBase.nBefEdrPrm" || 
+    key === "ECargoBase.nPrm" || 
+    key === "ECargoBase.nPrmVar"
   ) {
     edrbaseEditRef?.value?.setValue(key, value.toLocaleString());
   } else {
@@ -284,25 +284,25 @@ onMounted(() => {
   nextTick(() => {
     // 非涉费批改批改公式文本框隐藏
     if(params.cRsnCde === "FZ") {
-      setFormItem("EdrBase.edrFormula", { hidden: true })
+      setFormItem("ECargoBase.edrFormula", { hidden: true })
     }
-    setFormItem("EdrBase.cDptCde", {
+    setFormItem("ECargoBase.cDptCde", {
         loadData: [
             { value: params.cDptCde, label: `${params.cDptCde} ${params.cDptCnm}` },
         ],
     });
     if(params["cEdrType"]!='1'){
         if(params["cEdrType"]=='3'){
-            setFormItem("EdrBase.cEdrRsnDetail", { loadData: [{value:'s1',label:'全单退保'},{value:'s2',label:'一般退保'}] });
+            setFormItem("ECargoBase.cEdrRsnDetail", { loadData: [{value:'s1',label:'全单退保'},{value:'s2',label:'一般退保'}] });
         }else if(params["cEdrType"]=='2'){
-            setFormItem("EdrBase.cEdrRsnDetail", { loadData: [{value:'c1',label:'全单注销'}] });
+            setFormItem("ECargoBase.cEdrRsnDetail", { loadData: [{value:'c1',label:'全单注销'}] });
         }
-        setFormItem("EdrBase.cEdrRsnBundleCde", {typeCode:'', codeParam:'',loadData: [{value:'s1',label:'全单退保'},{value:'s2',label:'一般退保'},{value:'c1',label:'全单注销'}] });
+        setFormItem("ECargoBase.cEdrRsnBundleCde", {typeCode:'', codeParam:'',loadData: [{value:'s1',label:'全单退保'},{value:'s2',label:'一般退保'},{value:'c1',label:'全单注销'}] });
     }else{
         const isGrp = params["cGrpMrk"] === "1" ? "1" : null;
         const isPer = params["CGrpMrk"] === "1" ? "1" : null;
         const param = {
-            prodNo: params["cProdNo"],
+            prodNo: "029900",
             rsnTyp: params["cEdrType"],
             isGrp: isGrp,
             isPer: isPer,
@@ -320,7 +320,7 @@ onMounted(() => {
                 codeListParam: param,
             })
             .then((res) => {
-                setFormItem("EdrBase.cEdrRsnDetail", { loadData: res });
+                setFormItem("ECargoBase.cEdrRsnDetail", { loadData: res });
             });
     }
   });
