@@ -63,7 +63,7 @@
 
         <div class="form-inner" v-show="showMyfrom">
           <div v-if="cardConfig.showEdit">
-            <app-free-edit :freeEditConfig="formconfig" ref="EditRef" />
+            <app-free-edit :freeEditConfig="formconfig" ref="editRef" />
           </div>
           <slot />
           <div
@@ -90,6 +90,7 @@ const showMyfrom = ref(true);
 
 const formconfig = ref(createAppGridEditConfig({}));
 
+const editRef = ref<AppFreeEditMethod | null>();
 defineOptions({
   name: "MyCard",
   inheritAttrs: false,
@@ -116,6 +117,15 @@ function initEditConfig(){
     formconfig.value = props.cardConfig.formconfig;
   }
 }
+
+function getFromValue() { 
+  return editRef.value?.getFromValue();
+}
+
+defineExpose({
+  getFromValue,
+});
+
 </script>
 
 <style scoped>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <myCard :cardConfig="cardconfig">
+    <myCard :cardConfig="cardconfig" ref="cardRef">
       <app-table
         :tableConfig="tableconfig"
         v-model:pageresult="pageresult"
@@ -49,12 +49,12 @@ import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 const policyService = new PolicyService();
-import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
+import { CardConfig, creatCardConfig, MyCardMethod } from "@/shared/mytemplate/card-config";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { useRoute } from "vue-router";
 import { runInThisContext } from "vm";
-import { AppFreeEditMethod } from "@/shared/app-free-edit-config";
+import { AppFreeEditMethod, createAppFreeEditConfig } from "@/shared/app-free-edit-config";
 import {eventBus} from "@/utils/event-bus";
 const route = useRoute();
 const dialog = ref<DialogMethod | null>(null);
@@ -69,6 +69,8 @@ const props = defineProps({
     type: String
   }
 });
+
+const cardRef = ref<MyCardMethod | null>(null);
 
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -125,6 +127,29 @@ onMounted(async () => {
   // }
   Object.assign(formconfig1.value, formconfig11.value);
   cardconfig.value.title = formconfig1.value.title;
+  if(formconfig1.value.distSchema&& formconfig1.value.distSchema.length > 0){
+    cardconfig.value.formconfig = createAppFreeEditConfig({
+      fromSchema:formconfig1.value.distSchema,
+      endBtnsPosition: "right",
+      endBtns: [
+        {
+          label: "查询",
+          type: "primary",
+          func: () => {
+            cardQueryFn();
+          },
+        },
+        {
+          label: "重置",
+          type: "primary",
+          func: () => {
+            cardResetFn();
+          },
+        },
+      ],
+    });
+    cardconfig.value.showEdit = true;
+  }
   tableconfig.value.showEdit = true;
   tableconfig.value.showSelection = true;
   formconfig1.value.fromSchema.forEach((e: any)=>{  // 隐藏不需要显示在表格内的数据
@@ -141,7 +166,7 @@ onMounted(async () => {
   });
   tableconfig.value.formconfig = createAppGridEditConfig({
     titleBtns: formconfig1.value.titleBtns,
-    fromSchema: formconfig1.value.distSchema,
+    // fromSchema: formconfig1.value.distSchema,
   });
   tableconfig.value.fromSchema.forEach( r => {
     if(r['prop'] === 'Dist.cVinCode'){  //调整车架号列宽
@@ -199,6 +224,14 @@ onMounted(async () => {
 //         }
 //     });
 // }  Tgt.nEngineeringCost nEngineeringCostChange
+
+function cardQueryFn(){
+  console.log(cardRef.value?.getFromValue());
+}
+
+function cardResetFn(){
+  console.log(cardRef.value?.getFromValue());
+}
 
 // 绑定方法
 const method = {

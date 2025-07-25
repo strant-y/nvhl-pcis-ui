@@ -6,11 +6,7 @@
           <el-card>
             <template
               #header
-              v-if="
-                freeEditConfig.fromUi.showTitleBar
-                  ? freeEditConfig.fromUi.showTitleBar
-                  : true
-              "
+              v-if=" freeEditConfig.fromUi.showTitleBar "
             >
               <el-row justify="space-between">
                 <el-col :span="4" v-if="!freeEditConfig.production">
