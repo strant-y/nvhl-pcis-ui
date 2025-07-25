@@ -405,23 +405,6 @@ const method = {
           }
         });
     }
-    // 新增逻辑：判断当前选择的分公司是否在其他行中已经存在且共保公司为永安保险
-    const allRows = getFromValue(); // 获取所有行数据
-    // 查找当前行的分公司值
-    const currentSubDptCde = val;
-    // 遍历所有行，检查是否有其他行选择了相同的分公司且共保公司是永安保险
-    // const isDuplicate = allRows.some((row) => {
-    //   return row._dataId !== rowId &&
-    //         row["Ci.cCoinsurerCde"] === "327001" && // 共保公司是永安保险
-    //         row["Ci.cSubDptCde"] === currentSubDptCde; // 分公司相同
-    // });
-
-    // if (isDuplicate) {
-    //   ElMessage.error("联保子公司不能重复选择！");
-    //   freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "");
-    //   return;
-    // }
-
     onChiefMrkChange()
   },
   cContactTypChange:(val)=>{

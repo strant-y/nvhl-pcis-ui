@@ -119,6 +119,13 @@ const method = {
       tgtobjEditRef.value?.setValue("Base.cCiAgtNo", "");
     }
   },
+  cReceiTitleCdeChange:(val)=>{
+    if(val === '3127001'){
+      setFormItem("Base.cReceiptTitleNme", {disabled: true})
+    }else{
+      setFormItem("Base.cReceiptTitleNme", {disabled: false})
+    }
+  },
 };
 // 绑定特殊验证器
 const exRules = {};
