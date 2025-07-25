@@ -137,15 +137,30 @@ const method = {
           .then((res) => {
             setValue('ECargoBase.nReceivedRate',res[0].currency_rate)
             setValue('ECargoBase.nRmbReceivedPrm',getValue('ECargoBase.nReceivedPrm') * res[0].currency_rate)
+            // 协议剩余预收保费（人民币）
+            const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
+            if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') && agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo').slice(0,2) === 'YY'){
+              setValue('ECargoBase.nRecRemPrm',val * getValue('ECargoBase.nReceivedRate'))
+            }
           });
     } else {
       setValue('ECargoBase.nReceivedRate',"1.000000")
       setValue('ECargoBase.nRmbReceivedPrm',getValue('ECargoBase.nReceivedPrm') * 1)
+      // 协议剩余预收保费（人民币）
+      const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
+      if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') && agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo').slice(0,2) === 'YY'){
+        setValue('ECargoBase.nRecRemPrm',val * getValue('ECargoBase.nReceivedRate'))
+      }
     }
   },
   nReceivedPrmChange:(val:any)=>{
     if(val && getValue('ECargoBase.nReceivedRate')){
       setValue('ECargoBase.nRmbReceivedPrm',val * getValue('ECargoBase.nReceivedRate'))
+      // 协议剩余预收保费（人民币）
+      const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
+      if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') && agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo').slice(0,2) === 'YY'){
+        setValue('ECargoBase.nRecRemPrm',val * getValue('ECargoBase.nReceivedRate'))
+      }
     }
   },
   nWhAmtChange:(val:any)=>{

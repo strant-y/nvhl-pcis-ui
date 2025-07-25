@@ -394,6 +394,7 @@ function isAllAValuesSame(arr:any,key:any) {
   return arr.every(obj => obj[key] === firstValue);
 }
 const premiumCalculation = ()=>{
+  const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
   //协议费用
   const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn');
   const allFromData = formPage.value?.getAllFormData();
@@ -406,8 +407,20 @@ const premiumCalculation = ()=>{
       const sum = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nInsuranceFee'], 0);
       AgreementFeeWarn.setValue('ECargoBase.nPrm',sum)
       const sum1 = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nRmbFee'], 0);
+      //折人民币预估保费
       AgreementFeeWarn.setValue('ECargoBase.nRmbPrm',sum1)
+      //协议剩余预收保费(人民币)
+      if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') && agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo').slice(0,2) === 'AY'){
+        AgreementFeeWarn.setValue('ECargoBase.nRecRemPrm',sum1)
+      }
     }else{
+      const sum1 = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nRmbFee'], 0);
+      //折人民币预估保费
+      AgreementFeeWarn.setValue('ECargoBase.nRmbPrm',sum1)
+      //协议剩余预收保费(人民币)
+      if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') && agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo').slice(0,2) === 'AY'){
+        AgreementFeeWarn.setValue('ECargoBase.nRecRemPrm',sum1)
+      }
       AgreementFeeWarn.setFormItem('ECargoBase.PrmProp',{hidden: true})
     }
     if(isAllAValuesSame(AgreementCvrg,'ECargoTerm.cAmountCurrency')){
@@ -416,11 +429,19 @@ const premiumCalculation = ()=>{
       const sum = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nInsuranceAmount'], 0);
       AgreementFeeWarn.setValue('ECargoBase.nAmt',sum)
       const sum1 = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nRmbAmount'], 0);
+      // 折人民币预估保额
       AgreementFeeWarn.setValue('ECargoBase.nRmbAmt',sum1)
+      //协议剩余实收（预估）保额（人民币）
+        AgreementFeeWarn.setValue('ECargoBase.nRecRemEstAmt', sum1)
       if(AgreementFeeWarn.getValue('ECargoBase.nWhRmbAmt')){
         AgreementFeeWarn.setValue('ECargoBase.nRecRemEstAmt',sum1 - AgreementFeeWarn.getValue('ECargoBase.nWhRmbAmt'))
       }
     }else{
+      const sum1 = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nRmbAmount'], 0);
+      // 折人民币预估保额
+      AgreementFeeWarn.setValue('ECargoBase.nRmbAmt',sum1)
+      //协议剩余实收（预估）保额（人民币）
+        AgreementFeeWarn.setValue('ECargoBase.nRecRemEstAmt', sum1)
       AgreementFeeWarn.setFormItem('ECargoBase.AmtProp',{hidden: false})
     }
   }
