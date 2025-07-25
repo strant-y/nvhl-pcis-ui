@@ -290,7 +290,7 @@
 
 <script setup lang="ts">
 import { createFreeButtonBase, FreeButtonBase } from "@/shared/button-config";
-import { getProductPage, getRenewalAppPolicy } from "../../../api/prod/index";
+import { getProductPage, getRenewalAppPolicy, distMapCollectCompKey } from "../../../api/prod/index";
 import {
   getAppPlyInfoByAppNo,
   saveAppPlyInfo,
@@ -1474,7 +1474,7 @@ async function loadAfter() {
         opertaor.setDataAll(ops);
         // 获取原投保单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
-          return item.pageKey === "dist" || item.pageKey === "distSummary";
+          return item.pageKey === "dist";
         });
         distMap.forEach((item:any) => {
           getDistData(props.param?.cAppNo, item)
@@ -1602,7 +1602,7 @@ async function loadAfter() {
         opertaor.setDataAll(ops);
         // 获取原投保单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
-          return item.pageKey === "dist" || item.pageKey === "distSummary";
+          return item.pageKey === "dist";
         });
         distMap.forEach((item:any) => {
           getDistData(props.param?.cAppNo, item)
@@ -1733,7 +1733,7 @@ async function loadAfter() {
         opertaor.setDataAll(ops);
         // 获取原投保单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
-          return item.pageKey === "dist" || item.pageKey === "distSummary";
+          return item.pageKey === "dist";
         });
         distMap.forEach((item:any) => {
           getDistData(parseData.plyBase['Base.cAppNo'], item)
@@ -1863,7 +1863,7 @@ async function loadAfter() {
         opertaor.setDataAll(ops);
         // 获取原投保单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
-          return item.pageKey === "dist" || item.pageKey === "distSummary";
+          return item.pageKey === "dist"
         });
         distMap.forEach((item:any) => {
           getDistData(props.param?.cInquiryNo, item)
@@ -1937,9 +1937,6 @@ const getDistData = (appNo:any, item: any) => {
     cComponentTable: item.pageCode.slice(0, -6),
     // cAppNo: appNo,
   };
-  if(item.pageKey === "distSummary") {
-    selData.isSummary = '1';
-  }
   if(props.param?.pageType === "inquiryToApp" || props.param?.pageName === "priceInquiry") {
     selData.cInquiryNo = appNo;
   } else {
@@ -1952,6 +1949,20 @@ const getDistData = (appNo:any, item: any) => {
   selectDist(selData).then((res: any) => {
     if (res.code === 200) {
       opertaor.getTableRefs()[item.pageCode].setTableData(res.data.data);
+    }
+  });
+  // 调用接口查询清单对应的汇总的pageCode
+  distMapCollectCompKey({
+    cProdNo: route.params.param?.cProdNo,
+    cComponentKey: item.pageCode,
+  }).then((res) => {
+    if(res) {
+      // 根据获得的汇总的pageCode来查询汇总列表数据，如果没有返回值代表此清单没有对应的汇总列表
+      selectDist({ ...selData, isSummary: '1'}).then((r: any) => {
+        if (r.code === 200) {
+          opertaor.getTableRefs()[res].setTableData(r.data.data);
+        }
+      });
     }
   });
 }
@@ -1972,7 +1983,7 @@ const saveDistBatchFlag = ref(true);
 // 批量保存清单
 const saveDist = (appNo:any) => {
   const distMap = formconfig1[0].pageInfo.filter((item:any) => {
-    return item.pageKey === "dist" || item.pageKey === "distSummary";
+    return item.pageKey === "dist";
   });
   distMap.forEach((item:any) => {
     if(item.pageKey === "dist") {
@@ -2087,7 +2098,7 @@ const loadAppPlyInfo = async (CAppNo) => {
       opertaor.setDataAll(ops);
       // 获取原申请单号下的清单列表数据
       const distMap = formconfig1[0].pageInfo.filter((item:any) => {
-        return item.pageKey === "dist" || item.pageKey === "distSummary";
+        return item.pageKey === "dist";
       });
       distMap.forEach((item:any) => {
         getDistData(ops.plyBase['Base.cInquiryNo'], item)
@@ -2821,7 +2832,7 @@ const getPlyPolicyFun = () => {
 const calcPremiumEdr = () => {
     const res = opertaor.getDataAll();
     const dataAll = opertaor.getDataAll();
- 
+    const edrbaseData = edrbase.value?.getFromValue();
   console.log('保费计算',props.param)
   console.log('保费计算2',res)
   
@@ -2858,16 +2869,23 @@ const calcPremiumEdr = () => {
     }
   })
   const totalNum = nInsuranceAmount.reduce((sum, item) => sum + item, 0);
+  let originalnAmt = 0;
+  if(edrbaseData['EdrBase.nBefEdrAmt'] && typeof edrbaseData['EdrBase.nBefEdrAmt'] === 'number') {
+    originalnAmt = edrbaseData['EdrBase.nBefEdrAmt']
+  }
+  if(edrbaseData['EdrBase.nBefEdrAmt'] && typeof edrbaseData['EdrBase.nBefEdrAmt'] === 'string') {
+    originalnAmt = Number(edrbaseData['EdrBase.nBefEdrAmt'].replaceAll(',',''))
+  }
 
-  console.log('1212 ',props.param,res['base']['Base.nAmt'] ,totalNum)
+  console.log('1212 ',originalnAmt ,totalNum)
   //  08 减少  
-  if(props.param?.cRsnCde === '08'  && totalNum > res['base']['Base.nAmt'] ){
+  if(props.param?.cRsnCde === '08'  && totalNum > originalnAmt ){
     ElMessage.warning("批改原因为“减少保额”，累计赔偿限额不能大于原有“保额”！");
     // 增加保额，
     return false;
   }
   //  07增加 
-  if(props.param?.cRsnCde === '07'  && totalNum < res['base']['Base.nAmt'] ){
+  if(props.param?.cRsnCde === '07'  && totalNum < originalnAmt ){
        ElMessage.warning("批改原因为“增加保额”，累计赔偿限额不能小于原有“保额”！");
     return false;
   }
@@ -3179,7 +3197,7 @@ const saveEdrPlyInfo = async () => {
     saveEdrFlag = true;
     // 清单列表数据
     const distMap = formconfig1[0].pageInfo.filter((item:any) => {
-      return item.pageKey === "dist" || item.pageKey === "distSummary";
+      return item.pageKey === "dist";
     });
     distMap.forEach((item:any) => {
       getDistData(EdrBaseData['EdrBase.cAppNo'], item)
@@ -3264,6 +3282,7 @@ const submitEdrToUndrFun = async () => {
     setTimeout(async () => {
       try {
         const calcData = opertaor.getDataAll();
+        const edrbaseData = edrbase.value?.getFromValue();
         // const totalNum =  calcData['cvrg'].reduce((sum, item) => sum + (item['Term.nInsuranceAmount'] || 0), 0);
         const nInsuranceAmount:any = [];
         calcData['cvrg'].forEach((item:any) => {
@@ -3295,14 +3314,21 @@ const submitEdrToUndrFun = async () => {
           }
         })
         const totalNum = nInsuranceAmount.reduce((sum, item) => sum + item, 0);
+        let originalnAmt = 0;
+        if(edrbaseData['EdrBase.nBefEdrAmt'] && typeof edrbaseData['EdrBase.nBefEdrAmt'] === 'number') {
+          originalnAmt = edrbaseData['EdrBase.nBefEdrAmt']
+        }
+        if(edrbaseData['EdrBase.nBefEdrAmt'] && typeof edrbaseData['EdrBase.nBefEdrAmt'] === 'string') {
+          originalnAmt = Number(edrbaseData['EdrBase.nBefEdrAmt'].replaceAll(',',''))
+        }
         //  08 减少  
-        if(props.param?.cRsnCde === '08'  && totalNum > calcData['base']['Base.nAmt'] ){
+        if(props.param?.cRsnCde === '08'  && totalNum > originalnAmt ){
           ElMessage.warning("批改原因为“减少保额”，累计赔偿限额不能大于原有“保额”！");
           // 增加保额，
           return false;
         }
         //  07增加 
-        if(props.param?.cRsnCde === '07'  && totalNum < calcData['base']['Base.nAmt'] ){
+        if(props.param?.cRsnCde === '07'  && totalNum < originalnAmt ){
             ElMessage.warning("批改原因为“增加保额”，累计赔偿限额不能小于原有“保额”！");
           return false;
         }
