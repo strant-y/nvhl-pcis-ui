@@ -2762,7 +2762,7 @@ const getPlyPolicyFun = () => {
 const calcPremiumEdr = () => {
     const res = opertaor.getDataAll();
     const dataAll = opertaor.getDataAll();
- 
+    const edrbaseData = edrbase.value?.getFromValue();
   console.log('保费计算',props.param)
   console.log('保费计算2',res)
   
@@ -2799,16 +2799,23 @@ const calcPremiumEdr = () => {
     }
   })
   const totalNum = nInsuranceAmount.reduce((sum, item) => sum + item, 0);
+  let originalnAmt = 0;
+  if(edrbaseData['EdrBase.nBefEdrAmt'] && typeof edrbaseData['EdrBase.nBefEdrAmt'] === 'number') {
+    originalnAmt = edrbaseData['EdrBase.nBefEdrAmt']
+  }
+  if(edrbaseData['EdrBase.nBefEdrAmt'] && typeof edrbaseData['EdrBase.nBefEdrAmt'] === 'string') {
+    originalnAmt = Number(edrbaseData['EdrBase.nBefEdrAmt'].replaceAll(',',''))
+  }
 
-  console.log('1212 ',props.param,res['base']['Base.nAmt'] ,totalNum)
+  console.log('1212 ',originalnAmt ,totalNum)
   //  08 减少  
-  if(props.param?.cRsnCde === '08'  && totalNum > res['base']['Base.nAmt'] ){
+  if(props.param?.cRsnCde === '08'  && totalNum > originalnAmt ){
     ElMessage.warning("批改原因为“减少保额”，累计赔偿限额不能大于原有“保额”！");
     // 增加保额，
     return false;
   }
   //  07增加 
-  if(props.param?.cRsnCde === '07'  && totalNum < res['base']['Base.nAmt'] ){
+  if(props.param?.cRsnCde === '07'  && totalNum < originalnAmt ){
        ElMessage.warning("批改原因为“增加保额”，累计赔偿限额不能小于原有“保额”！");
     return false;
   }
@@ -3196,6 +3203,7 @@ const submitEdrToUndrFun = async () => {
     setTimeout(async () => {
       try {
         const calcData = opertaor.getDataAll();
+        const edrbaseData = edrbase.value?.getFromValue();
         // const totalNum =  calcData['cvrg'].reduce((sum, item) => sum + (item['Term.nInsuranceAmount'] || 0), 0);
         const nInsuranceAmount:any = [];
         calcData['cvrg'].forEach((item:any) => {
@@ -3227,14 +3235,21 @@ const submitEdrToUndrFun = async () => {
           }
         })
         const totalNum = nInsuranceAmount.reduce((sum, item) => sum + item, 0);
+        let originalnAmt = 0;
+        if(edrbaseData['EdrBase.nBefEdrAmt'] && typeof edrbaseData['EdrBase.nBefEdrAmt'] === 'number') {
+          originalnAmt = edrbaseData['EdrBase.nBefEdrAmt']
+        }
+        if(edrbaseData['EdrBase.nBefEdrAmt'] && typeof edrbaseData['EdrBase.nBefEdrAmt'] === 'string') {
+          originalnAmt = Number(edrbaseData['EdrBase.nBefEdrAmt'].replaceAll(',',''))
+        }
         //  08 减少  
-        if(props.param?.cRsnCde === '08'  && totalNum > calcData['base']['Base.nAmt'] ){
+        if(props.param?.cRsnCde === '08'  && totalNum > originalnAmt ){
           ElMessage.warning("批改原因为“减少保额”，累计赔偿限额不能大于原有“保额”！");
           // 增加保额，
           return false;
         }
         //  07增加 
-        if(props.param?.cRsnCde === '07'  && totalNum < calcData['base']['Base.nAmt'] ){
+        if(props.param?.cRsnCde === '07'  && totalNum < originalnAmt ){
             ElMessage.warning("批改原因为“增加保额”，累计赔偿限额不能小于原有“保额”！");
           return false;
         }
