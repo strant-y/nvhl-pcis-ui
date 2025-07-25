@@ -19,5 +19,5 @@ export const iconMap = {
   'edrbase': 'icon-shujuxiuzheng',
   'edritem': 'icon-zhongkaian',
   'acctinfo': 'icon-yonghutousuxinxi',
-  'AgentTgt': 'icon-jiwangpeian',
+  'AgentTgt': 'icon-lisuandanzheng',
 }
