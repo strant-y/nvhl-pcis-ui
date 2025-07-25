@@ -200,4 +200,81 @@ export class FormPage {
         return allFormData;
     }
 
+    /**
+     * 设置批改项
+     * @param list
+     */
+    setUnDisabledByKeyList(list: any[]){
+        if (list && list.length > 0) {
+            for(const item of list) {
+                const keys = this.componentRefMap.keys();
+                for(const key of keys) {
+                    const comp = this.componentRefMap.get(key);
+                    if (comp && comp.getFormConfig) {
+                        const conf = comp.getFormConfig();
+                        if (!item.startsWith('Btn_')) { // 非按钮控制
+                            if (conf.fromType === 'free') {  // 表单模式时,修改表单disabled实现只读
+                                if (conf.fromSchema && conf.fromSchema.length > 0) {
+                                    conf.fromSchema.forEach(f => {
+                                        if (f.prop === item) {
+                                            if (f.inputtype === 'rtinputgroup') {
+                                                console.log(f.inputtype);
+                                                f.groupList.forEach((gkey: any) => {
+                                                    gkey.disabled = false;
+                                                });
+                                            }else {
+                                                f.disabled = false;
+                                            }
+                                        }
+                                    });
+                                }
+                            } else if (conf.fromType === 'grid') { // 表格模式时,修改表格属性,实现只读
+                                if (conf.fromSchema && conf.fromSchema.length > 0) {
+                                    conf.fromSchema.forEach(gf => {
+                                        if (gf.prop === item) {
+                                            conf.editList.push(gf.prop);
+                                        }
+                                    });
+                                }
+                            }
+                        } else {// 按钮控制
+                            if (conf.fromType !== 'custom') {
+                                if (
+                                    conf.titleBtns &&
+                                    conf.titleBtns.length > 0
+                                ) {
+                                    conf.titleBtns.forEach((t) => {
+                                        if ('Btn_' + t.id === item) {
+                                            t.hidden = false;
+                                        }
+                                    });
+                                }
+                                if (conf.endBtns && conf.endBtns.length > 0) {
+                                    conf.endBtns.forEach((t) => {
+                                        if ('Btn_' + t.id === item) {
+                                            t.hidden = false;
+                                        }
+                                    });
+                                }
+                            } else {
+                                comp.setUnDisabledByKeyList(item);
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            const keys = this.componentRefMap.keys();
+            for(const key of keys) {
+                const comp = this.componentRefMap.get(key);
+                if (comp && comp.getFormConfig) {
+                    const conf = comp.getFormConfig();
+                    if (conf.fromType === 'custom') {
+                        comp.setUnDisabledByKeyList();
+                    }
+                }
+            }
+        }
+    }
+
 }

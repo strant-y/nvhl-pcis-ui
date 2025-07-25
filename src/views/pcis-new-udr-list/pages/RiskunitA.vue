@@ -600,7 +600,7 @@ const tableconfig1 = reactive<AppTableConfig>(
   createTableEditConfig({
     title: "风险单位信息",
     editFlag: true,
-    editList: ["cDetailedAddress","cRemarks"],
+    editList: ["cDetailedAddress","cRemark"],
     tableBtnType: "btn",
     showSelection: true,
     titleBtns: [
@@ -731,7 +731,7 @@ const tableconfig1 = reactive<AppTableConfig>(
         }
       },
       {
-        prop: "cRemarks",
+        prop: "cRemark",
         inputtype: "rtinput",
         type: "textarea",
         title: "备注",
@@ -1228,7 +1228,7 @@ async function tryCountInFoRIs(row: any) {
     ElMessage.error("风险等级不能为空")
     return
   }
-  if(row.cDetailedAddress && !row.cRemarks) {
+  if(row.cDetailedAddress && !row.cRemark) {
     ElMessage.error("备注不能为空")
     return
   }
@@ -1306,7 +1306,7 @@ function saveDatas() {
       ElMessage.error("风险等级不能为空")
       return
     }
-    if(row.cDetailedAddress && !row.cRemarks) {
+    if(row.cDetailedAddress && !row.cRemark) {
       ElMessage.error("备注不能为空")
       return
     }

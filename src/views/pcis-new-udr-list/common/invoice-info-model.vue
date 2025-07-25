@@ -286,7 +286,7 @@ const saveTaxInfo = () => {
         ElMessage.success('保存成功');
         close('save');
       } else {
-        ElMessage.error('保存失败！');
+        ElMessage.error(response.msg );
       }
     }).catch((error) => {
       ElMessage.error('连接失败！' + error);

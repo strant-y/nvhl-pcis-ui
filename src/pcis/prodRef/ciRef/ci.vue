@@ -22,6 +22,7 @@ const { getRules } = useValidator();
 import { useProductStore } from "@/store/modules/prod";
 import CostInformation from "@/views/pcis-new-udr-list/pages/CostInformation.vue";
 import { fa } from "element-plus/es/locale";
+import { constantRoutes } from "@/router";
 const productStore = useProductStore();
 const dialogRef = ref<DialogMethod | null>(null);
 
@@ -50,22 +51,34 @@ onMounted(async () => {
   );
   Object.assign(formconfig1, formconfig11);
   //一般批改，部分要素可编辑
-  const cCiMrkValue =  opertaor.getTableRefByKey("plyBase")
+  const cCiMrkValue =  opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
   setTimeout(() => {
-    if (param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && param.cRsnDetailCde.value == "FZ") {
+    if (param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && cCiMrkValue =='5' && param.cRsnDetailCde.value == "FZ") {
       formconfig1.editFlag = true;
       formconfig1.fromSchema?.forEach((item) => {
         item.disabled = true;
-        // if (item.prop === 'Ci.cChiefMrk' || item.prop === 'Ci.cIssueMrk') {
-        //   item.disabled = true; // 设置为不可编辑
-        // } else {
-        //   item.disabled = false; // 其他字段可以编辑
-        // }
     });
-  }else if(param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && param.cRsnDetailCde.value == "47"){
-    return false
+  }else if(param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && cCiMrkValue !=='5' && param.cRsnDetailCde.value == "47"){
+    const tableList = getFromValue();
+    freeEditRef.value?.getRowAllItemRefById()
+    tableList.forEach((item:any) => {
+      const rowItem  =  freeEditRef.value?.getRowAllItemRefById(item._dataId)
+      debugger
+      if(item['Ci.cChiefMrk'] == '1'){
+        rowItem['Ci.nCiShare'].disabled = false
+      }
+      if(item['Ci.cChiefMrk'] == '0' && item['Ci.cCoinsurerCde'] !== '327001'){
+        rowItem['Ci.nCiShare'].disabled = false
+        rowItem['Ci.nPlyFeeRate'].disabled = false
+        rowItem['Ci.cCoinsurerCde'].disabled = false
+      }
+      if(item['Ci.cChiefMrk'] == '0'){
+        rowItem['Ci.nCiShare'].disabled = false
+        rowItem['Ci.nPlyFeeRate'].disabled = false
+      }
+    })
     }
-  }, 800);
+  }, 5000);
   formconfig1.fromSchema?.forEach((item:any) => {
     if(item.prop === 'Ci.cCoinsurerCde') {
       item.minWidth = 200
@@ -174,11 +187,11 @@ const method = {
           });
           nextTick(()=>{
             freeEditRef.value?.setRowFieldProp(
-                  rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
-              );
+                rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
+            );
             freeEditRef.value?.setRowFieldProp(
-                  rowData._dataId, "Ci.cDptCde", "disabled",false
-              );
+                rowData._dataId, "Ci.cDptCde", "disabled",false
+            );
             // const cBsnsTyp = opertaor.getTableRefByKey('plyBase').getValue('Base.cBsnsTyp')
             // if((cBsnsTyp !=null || cBsnsTyp !='') && cBsnsTyp == '19001'){
             //   freeEditRef.value?.setRowFieldProp(
@@ -467,6 +480,11 @@ const method = {
           }
         }
       }
+      // if(val === "1"){
+      //   freeEditRef?.value?.setValueByRowKey("Ci.nPlyFeeRate", rowId, "disabled",true);
+      // }else{
+      //   freeEditRef?.value?.setValueByRowKey("Ci.nPlyFeeRate", rowId, "disabled",false);
+      // }
   },
   //主共标志下拉事件
   cChiefMrkChange:(val)=>{
@@ -631,6 +649,7 @@ const method = {
   },
   //代理/经纪人
   cBrkrCdeChange:()=>{
+    debugger
     // if (getValue("Base.cBsnsTyp") && getValue("Base.cBsnsTyp") !== "19001") {
       dialogRef.value?.open(
         "ciagentPre",
@@ -886,6 +905,12 @@ const initCiInfo = (data: any) => {
       "Ci.cSubDptCde": param.dptCde,
       'Ci.cDptCde': param.cDptCde,
     });
+    // const dataList = getFromValue()
+    // dataList.forEach(item => { 
+    //   if(item.cChiefMrk === '1'){
+
+    //   }
+    // });
     valideRequired()
     onChiefMrkChange()
   });

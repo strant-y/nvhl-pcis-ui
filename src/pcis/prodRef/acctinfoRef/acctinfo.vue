@@ -36,8 +36,6 @@ let para: any[] = [];
 onMounted(() => {
   const routeData = route.params; // 获取路由参数
   console.log("路由参数props.param1212", routeData);
-  // console.log('pay form' ,props.pageSchema.fromSchema[2].disabled = false)
-
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
     method,
@@ -47,8 +45,7 @@ onMounted(() => {
 
   canOperateForm();
 
-  setTimeout(() => {
-    setValue('Acctinfo.cAcctNme', opertaor.getDataAll()['applicant']['Applicant.cAppNme'])
+  nextTick(() => {
     setFormItem('Acctinfo.cBankRelTyp',{
         rules: [],
         clearable: true, 
@@ -67,7 +64,16 @@ onMounted(() => {
     setFormItem('Acctinfo.cPubPri',{
         clearable: true, 
     })
-  }, 1000)
+  })
+
+ 
+  let timer =  setInterval(()=>{
+        setValue('Acctinfo.cAcctNme', opertaor.getDataAll()['applicant']['Applicant.cAppNme'])
+        let cAcctNme =  getValue('Acctinfo.cAcctNme')
+        if (cAcctNme) {
+          clearInterval(timer); //清除定时器
+        }
+      }, 1000)
 });
 
 // 可以操作的配置项处理  身份认真里面的几项
