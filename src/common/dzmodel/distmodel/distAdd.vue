@@ -224,6 +224,7 @@ onMounted(() => {
 
 
     if(cIs == 1 && item.prop !=='Dist.nSeqNo'){
+   
         item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
     }else if(cIs == 0 && (item.prop !=='Dist.cSchoolName' && item.prop !=='Dist.cSchoolAddress')){
       // item['rules'] =null;
@@ -272,7 +273,13 @@ onMounted(() => {
           setValue('Dist.nAge', age);
         }
       }
-      item['rules'] = [getRules("idCard", {})];
+
+      if(cIs == 1){
+          item['rules'] = [getRules("idCard", {}),{ required: true, message: '该项为必填项', trigger: 'blur' }];
+      }else{
+          item['rules'] = [getRules("idCard", {})];
+      }
+    
     }
     if(item.prop =='Dist.cEquipmentTypes'){
       item['btnItems']['func'] =  cEquipmentTypesFunc;
@@ -315,6 +322,7 @@ onMounted(() => {
     newSchema.push(item);
   }
 
+  console.log('身份证号----‘',newSchema)
   formconfig1.value.fromSchema = newSchema;
   
   formconfig1.value.title = props.data.title;

@@ -1118,39 +1118,28 @@ const method = {
   },
   // 办理人员证件种类
   cOperaterCertfTypChange:(val: any)=>{
-    // 清除报错信息
-    clearValidate('Insured.cOperaterCertfCde')  
+  // 清除报错信息
+   clearValidate('Insured.cOperaterCertfCde')  
+   let cClntMrk = getValue('Insured.cClntMrk');  // 投保人性质 
+   let baseRules:any[]= [];
+   type RuleType = "orgCode" | "socialCode" | "idCard" | "passPort" | "ariCard" | "required";
+    const ruleMap: Record<string, RuleType> = {
+      "110001": "orgCode",
+      "110007": "socialCode",
+      "120001": "idCard",
+      "120002": "passPort",
+      "19": "ariCard",
+    };
+     baseRules = ruleMap[val] ? [getRules(ruleMap[val])] : [];
+     console.log(22,baseRules)
 
-    //  身份证
-    if (val == "120001") { 
-        setFormItem("Insured.cOperaterCertfCde", {
-              rules: [getRules("idCard", {}),],
-            });
-    } else if ( val == "110007") {   
-      // 统一社会信用代码校验
-           setFormItem("Insured.cOperaterCertfCde", {
-              rules: [getRules("socialCode", {}),],
-            });
-    } else if(val == "19"){
-      // 外国人证件号
-           setFormItem("Insured.cOperaterCertfCde", {
-              rules: [getRules("ariCard", {}),],
-            });
-    } else if (val == "120002") {
-      // 护照
-        setFormItem("Insured.cOperaterCertfCde", {
-              rules: [getRules("passPort", {}),],
-            });
-    }else if(val =='110001'){
-      // 组织机构编码校验
-           setFormItem("Insured.cOperaterCertfCde", {
-              rules: [getRules("orgCode", {}),],
-            });
-    } else {
-           setFormItem("Insured.cOperaterCertfCde", {
-              rules: [],
-            });
+    if (cClntMrk == '0') {
+      baseRules = [getRules("required", {}), ...baseRules]
     }
+    
+    setFormItem("Insured.cOperaterCertfCde", {
+       rules:baseRules,
+     });
   },
     // 证件有效起期
   tCertfBgnDateDisable:(date:any)=>{
