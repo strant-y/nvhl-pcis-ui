@@ -911,7 +911,7 @@ const tableObj = {
                         router.push({
                             path: "/pcis/my-page",
                             query: {
-                                param: JSON.stringify({ ...data, ...{ pageType: "copy" } }),
+                                param: JSON.stringify({ ...data, ...{ pageType: "copy", cAppTyp: 'A' } }),
                             },
                         });
                     } else {
