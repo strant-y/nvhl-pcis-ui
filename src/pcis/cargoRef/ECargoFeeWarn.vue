@@ -114,12 +114,24 @@ const method = {
   cPayWayChange:(val:any)=>{
     const list:Array<string>= ["ECargoBase.nLowPrm","ECargoBase.nReceivedPrm","ECargoBase.cReceivedRmb","ECargoBase.nReceivedRate","ECargoBase.nRmbReceivedPrm"]
     if(val !== '01'){
+      if(getValue('ECargoBase.nRmbAmt')){
+        setValue('ECargoBase.nRecRemEstAmt',getValue('ECargoBase.nRmbAmt'))
+      }
+      if(getValue('ECargoBase.nRmbPrm')){
+        setValue('ECargoBase.nRecRemPrm',getValue('ECargoBase.nRmbPrm'))
+      }
       list.forEach(item => {
         setFormItem(item, {
           hidden: true,
         });
       })
     }else {
+      if(getValue('ECargoBase.nRmbAmt')){
+        setValue('ECargoBase.nRecRemEstAmt',getValue('ECargoBase.nRmbAmt'))
+      }
+      if(getValue('ECargoBase.nRmbReceivedPrm')){
+        setValue('ECargoBase.nRecRemPrm',getValue('ECargoBase.nRmbReceivedPrm'))
+      }
       list.forEach(item => {
         setFormItem(item, {
           hidden: false,
@@ -139,7 +151,7 @@ const method = {
             setValue('ECargoBase.nRmbReceivedPrm',getValue('ECargoBase.nReceivedPrm') * res[0].currency_rate)
             // 协议剩余预收保费（人民币）
             const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
-            if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') && agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo').slice(0,2) === 'YY'){
+            if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') === '01'){
               setValue('ECargoBase.nRecRemPrm',val * getValue('ECargoBase.nReceivedRate'))
             }
           });
@@ -148,7 +160,7 @@ const method = {
       setValue('ECargoBase.nRmbReceivedPrm',getValue('ECargoBase.nReceivedPrm') * 1)
       // 协议剩余预收保费（人民币）
       const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
-      if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') && agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo').slice(0,2) === 'YY'){
+      if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') === '01'){
         setValue('ECargoBase.nRecRemPrm',val * getValue('ECargoBase.nReceivedRate'))
       }
     }
@@ -158,7 +170,7 @@ const method = {
       setValue('ECargoBase.nRmbReceivedPrm',val * getValue('ECargoBase.nReceivedRate'))
       // 协议剩余预收保费（人民币）
       const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
-      if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') && agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo').slice(0,2) === 'YY'){
+      if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') === '01'){
         setValue('ECargoBase.nRecRemPrm',val * getValue('ECargoBase.nReceivedRate'))
       }
     }
@@ -245,7 +257,7 @@ const method = {
   nRmbReceivedPrmChange:(val:any)=>{
    //ECargoBase.nWhRmbPrm
     const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
-    if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') && agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo').slice(0,2) === 'YY'){
+    if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') === '01'){
        setValue('ECargoBase.nRecRemPrm',val - getValue('ECargoBase.nWhRmbPrm'))
     }
   },
@@ -253,16 +265,16 @@ const method = {
   nWhRmbPrmChange:(val:any)=>{
     //ECargoBase.nRmbReceivedPrm
     const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
-    if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') && agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo').slice(0,2) === 'YY'){
+    if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') === '01'){
       setValue('ECargoBase.nRecRemPrm',getValue('ECargoBase.nRmbReceivedPrm') - val )
-    }else if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') && agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo').slice(0,2) === 'AY') {
+    }else {
       setValue('ECargoBase.nRecRemPrm',getValue('ECargoBase.nRmbPrm') - val )
     }
   },
   nRmbPrmChange:(val:any)=>{
     nextTick(()=>{
       const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
-      if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') && agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo')?.slice(0,2) === 'AY'){
+      if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') !== '01'){
         setValue('ECargoBase.nRecRemPrm', val - getValue('ECargoBase.nWhRmbPrm') )
       }
     })

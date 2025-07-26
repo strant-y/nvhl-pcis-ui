@@ -142,6 +142,7 @@ onMounted(() => {
       freeEditRef.value?.setDisabledAll();
     }, 100);
   }
+  console.log(' formconfig1.value', formconfig1.value)
 });
 const setcDetailedAddress = (prop:any,aftProp:any)=> {
   const ads = freeEditRef?.value?.getValue(prop[0].prop);
