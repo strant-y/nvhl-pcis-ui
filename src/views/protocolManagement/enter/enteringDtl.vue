@@ -157,7 +157,7 @@ const edrBtn = [
     type: "primary",
     id: "btnCompare",
     func: () => {
-
+      generateEndorse()
     },
   }),
   createFreeButtonBase({
@@ -231,8 +231,7 @@ onBeforeMount(async () => {
   }
   //批改
   if(props.type === 'EDR_APP_NEW_SCENE'){
-
-    if(props.cEdrType === '1'){
+    if(props.cEdrType == '1'){
       bthList.value = edrBtn
     }else{
       bthList.value = edrSurrenderBtn
@@ -299,6 +298,53 @@ const getEdrRsnItemFun = (
       console.log('edrList', edrList)
       // console.log('edrList',edrList)
       formPage.value?.setUnDisabledByKeyList(edrList); // 根据list集合,放开需要的要素
+      ElMessage.success(res.msg);
+    } else {
+      ElMessage.error(res.msg);
+    }
+  });
+};
+const tempFindBtn: any[] = [];
+const userString = sessionStorage.getItem("user");
+const user = userString ? JSON.parse(userString) : {};
+/**
+ * 获取button
+ * @param id
+ */
+const getBtn = (id) => {
+  if (tempFindBtn.length === 0) {
+    for (const btnArr of bthList.value) {
+      tempFindBtn.push(btnArr);
+    }
+  }
+  return tempFindBtn.find((item) => {
+    return id === item.id;
+  });
+};
+/**
+ * 生成批文
+ * **/
+const generateEndorse = () => {
+  const btn = getBtn("btnCompare");
+  btn.loading = true;
+  const res = formPage.value?.getAllFormData();
+  res["user"] = user;
+  res["plyBase"] = {'Base.cDptCde':'','Base.cProdNo':''}
+  res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
+  res["plyBase"]["Base.cProdNo"] = '029900';
+  res["EdrBase"] = mainRef.value?.getxyedrbaseRefValue();
+  console.log(res);
+  cargoApi.getEcargoEndorseChange(res).then((res) => {
+    btn.loading = false;
+    if (res["code"] == "200") {
+      debugger
+      // const cEdrCtnt = res["data"]["data"]["cEdrCtnt"]; //批文
+      // const edrRsn = res["data"]["data"]["edrRsn"]; //批文
+      // cacheKey.value = res["data"]["data"]["cacheKey"];
+      // edrbase.value?.setValue("EdrBase.cEdrCtnt", cEdrCtnt);
+      // edrbase.value?.setValue("EdrBase.cacheKey", cacheKey.value);
+      // edrbase.value?.setValue("EdrBase.cEdrRsnDetail", edrRsn);
+      // edritem.value?.handleQuery();
       ElMessage.success(res.msg);
     } else {
       ElMessage.error(res.msg);
