@@ -763,6 +763,10 @@ function initMethod(){
     }
 }
 
+/**
+ * 条款初始化判断
+ * @param item 
+ */
 function initTermsData(item: any) {
   if(item.prop === 'Term.cClaimInclude'){ //是否计入累计赔偿限额 默认选择否
     if(!termdata.value[item.prop]){
@@ -770,6 +774,24 @@ function initTermsData(item: any) {
       return true;
     }
   }
+  return false;
+}
+
+/**条则标数据初始化判断 */
+function initTermRiskData(item: any){
+  if (pageparam.cProdNo === "040002" || parparam.cProdNo === '043009') {
+    if(item.cPorpType != 'text'){
+      const faitem = factormap.value[item['cFactorId']];
+      if(faitem.prop === 'TermRisktgt.cDeductibleMethod'){
+        // 预留后期遇到了使用
+        // console.log(faitem);
+        // console.log(item);
+        // console.log(riskList.value);
+        // riskList.value[item['cRiskNo']][faitem.prop] = '01';
+      }
+    }
+  }
+
   return false;
 }
 
@@ -790,6 +812,10 @@ function initshowConfig() {
       }
     }
   });
+
+  collist.value.forEach((item)=>{
+    reflash = reflash || initTermRiskData(item);
+  })
   if(reflash){  // 如果存在初始化数据,则将初始化数据反馈给父级
     update();
   }

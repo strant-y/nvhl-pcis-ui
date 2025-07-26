@@ -762,7 +762,7 @@ function calcCheck(){
 }
 
 function initTermData(item: any,data:any){
-  if(parparam.cProdNo === '043009'){
+  if(parparam.cProdNo === '043009' || parparam.cProdNo === "040002"){
     if(data.riskList && data.riskList.length > 0){
       data.riskList.forEach((r)=>{
         r['TermRisktgt.cDeductibleMethod'] = '01';
