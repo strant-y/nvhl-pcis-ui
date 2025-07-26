@@ -121,8 +121,9 @@ defineOptions({
   inheritAttrs: false,
 });
 const codeListMap = ref<any>({});
+const customMap = ref<any>({});
 provide('codeListMap', codeListMap.value);
-
+provide('customMap', customMap.value);
 const btnMap = ref({});
 const emits = defineEmits(["pageChange", "selection-change", "status-change", "rowClick"]); // 父组件监听事件，同步子组件值的变化给父组件
 

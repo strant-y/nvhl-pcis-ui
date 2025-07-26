@@ -82,9 +82,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                         .then((res) => {
                             const { code, data, msg } = res;
                             if (200 === code) {
-                                emits("ok", {});
-                                ElMessage.success(msg);
                                 // dialogVisible.value = false;
+                                ElMessage.success(msg);
+                                emits("ok", {});
                             } else {
                                 ElMessage.error(msg);
                             }
@@ -109,8 +109,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                             const { code, data, msg } = res;
                             if (200 === code) {
                                 emits("ok", {});
+                                dialogVisible.value = false;
                                 ElMessage.success(msg);
-                                // dialogVisible.value = false;
                             } else {
                                 ElMessage.error(msg);
                             }

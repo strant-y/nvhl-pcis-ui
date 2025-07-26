@@ -34,16 +34,18 @@ const props = defineProps({
     required: false,
   },
 });
-const itemRef = ref("itemRef");
+const itemRef = ref();
 const value = ref<any>();
 const key = computed(() => props.item.prop );
 const itemConfig = computed(() => props.item );
 const initFlag = ref(false);
+const customMap = inject<any>('customMap', {});
 
 const emits = defineEmits(["update:modelValue", "updateMethod"]); // 父组件监听事件，同步子组件值的变化给父组件
 function handleChange(val?: any) {
   emits("update:modelValue", val);
   emits("updateMethod");
+  compareValueChangeColor(val)
 }
 
 watch([() => props.modelValue], ([newModelValue]) => {
@@ -69,6 +71,37 @@ function updateOption(newOption: any) {
 
 function getcomRef(type: any) {
   return shared.componentMap[type];
+}
+
+async function compareValueChangeColor(value?: any) {
+  try {
+    if (customMap.primevalForm) {
+      const primevalForm = customMap.primevalForm;
+      if (itemRef?.value['setCustomClass'] && typeof itemRef.value['setCustomClass'] === 'function') {
+        const getPrimevalValue = () => {
+          const val = primevalForm[props.item.prop];
+          if(props.item.type === "date") {
+            return val ? val.replace(' 00:00:00', '') : null;
+          }else {
+            return val
+          }
+        };
+        if (getPrimevalValue() !== value) {
+          setCustomClass(['form-item-change']);
+        } else {
+          setCustomClass(['form-item-unchange']);
+        }
+      }
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function setCustomClass(classs: string[]) {
+  if(itemRef.value && itemRef.value.setCustomClass) {
+    itemRef.value.setCustomClass(classs);
+  }
 }
 
 defineExpose({

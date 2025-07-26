@@ -3,7 +3,10 @@
     ref="datepickerRef"
     v-if="!showLabel"
     v-model="vInput"
-    :class="isReQuired() ? 're-quired-flag' : ''"
+    :class="[
+        ...customClass,
+        ...[isReQuired() ? 're-quired-flag' : '']
+    ]"
     :type="item.type ? item.type : 'date'"
     :readonly="
       item.readonly
@@ -79,6 +82,7 @@ const props = defineProps({
 
 const emits = defineEmits(["update:modelValue", "valueChange"]); // 父组件监听事件，同步子组件值的变化给父组件
 const vInput = ref<number | string>();
+const customClass = ref<string[]>([]);
 const vInputShow = computed(()=> {
   const value = props.modelValue;
   const format = props.item.valueFormat
@@ -176,7 +180,13 @@ function isReQuired() {
 onMounted(() => {
   vInput.value = props.modelValue;
 });
-onMounted(() => {});
+
+function setCustomClass(classs: string[]) {
+  customClass.value = classs;
+}
+defineExpose({
+  setCustomClass
+});
 </script>
 
 <style>

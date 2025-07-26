@@ -96,7 +96,9 @@ const props = defineProps({
   },
 });
 const codeListMap = ref<any>({});
+const customMap = ref<any>({});
 provide('codeListMap', codeListMap.value);
+provide('customMap', customMap.value);
 const btnMap = ref({});
 const { gridEditConfig } = toRefs(props);
 
@@ -210,6 +212,9 @@ function setCodeListMap(map: any) {
     Object.assign(codeListMap.value, map);
   }
 }
+const addProvide = <T>(key: InjectionKey<T> | string, value: T) => {
+  customMap.value[key] = value;
+}
 
 defineExpose({
   getFromValue,
@@ -231,7 +236,8 @@ defineExpose({
   setCodeListMap,
   addCodeListMap,
   getRowAllItemRefById,
-  spliceTableData
+  spliceTableData,
+  addProvide
 });
 </script>
 

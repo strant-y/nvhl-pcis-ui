@@ -1145,6 +1145,14 @@ const dataInit:any = ref({});
  */
 function renderComponents() {
   const interval = setInterval(() => {
+		if (props.param.pageType === "app") {
+			const idata = getData();
+			dataInit.value = opertaor.mapSetData(idata);
+			// setTimeout(() => {
+			//   // 基本信息预加载，降低空窗期
+			//   opertaor.setDataAll(dataInit.value);
+			// }, 100);
+  	}
     if (currentIndex.value < formconfig1[0]?.pageInfo.length - 1) {
       currentIndex.value++;
     } else {
@@ -1152,15 +1160,7 @@ function renderComponents() {
       clearInterval(interval);
     }
   }, 50); // 延迟组件渲染,增加页面响应效率
-  
-  if (props.param.pageType === "app") {
-    const idata = getData();
-    dataInit.value = opertaor.mapSetData(idata);
-    setTimeout(() => {
-      // 基本信息预加载，降低空窗期
-      opertaor.setDataAll(dataInit.value);
-    }, 100);
-  }
+
 }
 
 /**
@@ -2413,7 +2413,11 @@ const submitToUndrFn = async () => {
 	console.log('判断是否灰黑名单返回的res', res);
 	if(res.code == 200){
 		if(res.msg != '校验通过'){
-			ElMessage.warning(res.msg);
+			ElMessage({
+				message: res.msg.replace(/\n/g, '<br>'),
+				dangerouslyUseHTMLString: true,
+				type: 'warning'
+			});
 			return false;
 		}
 	} else {
@@ -3413,14 +3417,14 @@ const submitUnderwritingFn = async () => {
   }
   console.log(res);
   if(res.cUndrMrk === "A") {//核保选项为同意时，调用强制临分接口
-    // 先查询临分标识
-    const queryCRiFacMrk = props.param?.pageName === "priceInquiry" ? await policyService.queryCRiFacMrkXJ({cAppNo: props.param?.cAppNo}) : await policyService.queryCRiFacMrk({cAppNo: props.param?.cAppNo});
-    if(queryCRiFacMrk && queryCRiFacMrk.code === '200') {
-      const cRiFacMrk = queryCRiFacMrk.data.cRiFacMrk;
-      if(cRiFacMrk === '0') {
-        // 不需要临分
-      } else if(cRiFacMrk === '1') {
-        // 自主临分
+    // // 先查询临分标识
+    // const queryCRiFacMrk = props.param?.pageName === "priceInquiry" ? await policyService.queryCRiFacMrkXJ({cAppNo: props.param?.cAppNo}) : await policyService.queryCRiFacMrk({cAppNo: props.param?.cAppNo});
+    // if(queryCRiFacMrk && queryCRiFacMrk.code === '200') {
+    //   const cRiFacMrk = queryCRiFacMrk.data.cRiFacMrk;
+    //   if(cRiFacMrk === '0') {
+    //     // 不需要临分
+    //   } else if(cRiFacMrk === '1') {
+    //     // 自主临分
         const deductibleDist = opertaor.getTableRefByKey("deductibleDist")?.getTableData();
         const insured = opertaor.getTableRefByKey("insured")?.getFromValue();
         const applicant = opertaor.getTableRefByKey("applicant")?.getFromValue();
@@ -3429,7 +3433,7 @@ const submitUnderwritingFn = async () => {
         const edrbase = opertaor.getTableRefByKey("edrbase")?.getFromValue();
         const param = {
           cAppNo: props.param?.cAppNo,// 保批单申请单号
-          cDductDesc: deductibleDist[0]?["DeductibleDist.cDeductibleContent"]:"",// 免赔约定
+          cDductDesc: deductibleDist && deductibleDist[0] ? deductibleDist[0]["DeductibleDist.cDeductibleContent"] : "",// 免赔约定
           cDocTyp: props.param?.cAppTyp,// 单证类型 A 保单 E 批单
           cDptCde: props.param?.cDptCde,// 机构代码
           cInsrntNme: insured['Insured.cInsuredNme'],//被保人名称
@@ -3447,30 +3451,30 @@ const submitUnderwritingFn = async () => {
           tInsrncEndTm: insrnc['Base.tInsrncEndTm'],// 保险止期
         }
         const queryRiFacMrk = props.param?.pageName === "priceInquiry" ? await policyService.queryRiFacMrkXJ(param) : await policyService.queryRiFacMrk(param);
-        if(queryRiFacMrk && queryRiFacMrk.responseCode === '0') {
+        if(queryRiFacMrk && queryRiFacMrk.code === '0') {
           ElMessage.error(queryRiFacMrk.message);
           return
         }
-      } else if(cRiFacMrk === '2') {
-        // 强制临分 调用接口查询强制临分状态(0未报价 1未确认 2已确认 3账单已生成 4部分账单已传财务 5账单全部已传财务 6没有临分数据)
-        // 0、1、6阻断，其他继续核保
-        const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
-        const param = {
-          cAppNo: props.param?.cAppNo,
-          cAppTyp: props.param?.cAppTyp,
-          cPlyNo: props.param?.plyNo,
-          nEdrPrjNo: plyBase['Base.nEdrPrjNo']
-        }
-        const queryFacSts = props.param?.pageName === "priceInquiry" ? await policyService.queryFacStsXJ(param) : await policyService.queryFacSts(param);
-        if(queryFacSts && queryFacSts.responseCode && (queryFacSts.responseCode === "0" || queryFacSts.responseCode === "1" || queryFacSts.responseCode === "6")) {
-          ElMessage.error(queryFacSts.message);
-          return
-        }
-      }
-    } else {
-      ElMessage.error(queryCRiFacMrk.message);
-      return;
-    }
+    //   } else if(cRiFacMrk === '2') {
+    //     // 强制临分 调用接口查询强制临分状态(0未报价 1未确认 2已确认 3账单已生成 4部分账单已传财务 5账单全部已传财务 6没有临分数据)
+    //     // 0、1、6阻断，其他继续核保
+    //     const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
+    //     const param = {
+    //       cAppNo: props.param?.cAppNo,
+    //       cAppTyp: props.param?.cAppTyp,
+    //       cPlyNo: props.param?.plyNo,
+    //       nEdrPrjNo: plyBase['Base.nEdrPrjNo']
+    //     }
+    //     const queryFacSts = props.param?.pageName === "priceInquiry" ? await policyService.queryFacStsXJ(param) : await policyService.queryFacSts(param);
+    //     if(queryFacSts && queryFacSts.responseCode && (queryFacSts.responseCode === "0" || queryFacSts.responseCode === "1" || queryFacSts.responseCode === "6")) {
+    //       ElMessage.error(queryFacSts.message);
+    //       return
+    //     }
+    //   }
+    // } else {
+    //   ElMessage.error(queryCRiFacMrk.message);
+    //   return;
+    // }
   }
   let submitUnder;
   // 询价单
