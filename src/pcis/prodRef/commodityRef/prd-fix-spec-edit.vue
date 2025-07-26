@@ -24,7 +24,7 @@
             type="number"
             v-if="item.match(/^\*+$/)"
             v-model="inputValues[index]"
-            @input="updateCNmeCn(index, $event)"
+            @input="updateCNmeCn(index, $event)" 
             :class="`input-${index}`"
             placeholder="请输入"
           ></el-input>
