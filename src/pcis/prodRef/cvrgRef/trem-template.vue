@@ -862,18 +862,18 @@ function exChangeFunc() {
       termFactormap.value = term;
     }
   }
+  
+    console.log(pageparam.cProdNo);
   // 045001个性化配置
   if (pageparam.cProdNo === "045001") {
-    console.log(data["tgt"]);
     if(data["tgt"]["Tgt.cInsuranceMethod"] && data["tgt"]["Tgt.cInsuranceMethod"] !== '613001'){
       const term = termFactormap.value.filter(
-        (r) => r["prop"] !== "Term.nPersonPremium"
+        (r) => (r["prop"] !== "Term.nPersonPremium" && r["prop"] !== "Term.nInsuredCount")  //不是按人数投保,不显示投保人数以及每人保费
       );
       // const ex = termFactormap.value.filter(
       //   (r) =>
       //     r["prop"] === "Term.nRateVal" || r["prop"] === "Term.nInsuranceFee"
       // );
-
       termFactormap.value = term;
       // extermConf.value = ex;
     }else{
