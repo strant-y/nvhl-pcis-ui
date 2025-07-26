@@ -708,6 +708,7 @@ const method = {
       setFormItem("Insured.cOccupCde", {
         rules: [getRules("required", {})],
       });
+			setFormItem("Insured.cOccupCde", {btnItems:{disabled: false}});
       setFormItem("Insured.cTrdCde", {
         rules: [getRules("required", {})],
       });
@@ -715,6 +716,7 @@ const method = {
       setFormItem("Insured.cOccupCde", {
         rules: [],
       });
+			setFormItem("Insured.cOccupCde", {btnItems:{disabled: true}});
       setFormItem("Insured.cTrdCde", {
         rules: [],
       });

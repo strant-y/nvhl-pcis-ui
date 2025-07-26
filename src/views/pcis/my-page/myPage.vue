@@ -1145,6 +1145,14 @@ const dataInit:any = ref({});
  */
 function renderComponents() {
   const interval = setInterval(() => {
+		if (props.param.pageType === "app") {
+			const idata = getData();
+			dataInit.value = opertaor.mapSetData(idata);
+			// setTimeout(() => {
+			//   // 基本信息预加载，降低空窗期
+			//   opertaor.setDataAll(dataInit.value);
+			// }, 100);
+  	}
     if (currentIndex.value < formconfig1[0]?.pageInfo.length - 1) {
       currentIndex.value++;
     } else {
@@ -1152,15 +1160,7 @@ function renderComponents() {
       clearInterval(interval);
     }
   }, 50); // 延迟组件渲染,增加页面响应效率
-  
-  if (props.param.pageType === "app") {
-    const idata = getData();
-    dataInit.value = opertaor.mapSetData(idata);
-    setTimeout(() => {
-      // 基本信息预加载，降低空窗期
-      opertaor.setDataAll(dataInit.value);
-    }, 100);
-  }
+
 }
 
 /**
@@ -2413,7 +2413,11 @@ const submitToUndrFn = async () => {
 	console.log('判断是否灰黑名单返回的res', res);
 	if(res.code == 200){
 		if(res.msg != '校验通过'){
-			ElMessage.warning(res.msg);
+			ElMessage({
+				message: res.msg.replace(/\n/g, '<br>'),
+				dangerouslyUseHTMLString: true,
+				type: 'warning'
+			});
 			return false;
 		}
 	} else {
