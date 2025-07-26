@@ -862,8 +862,6 @@ function exChangeFunc() {
       termFactormap.value = term;
     }
   }
-  
-    console.log(pageparam.cProdNo);
   // 045001个性化配置
   if (pageparam.cProdNo === "045001") {
     if(data["tgt"]["Tgt.cInsuranceMethod"] && data["tgt"]["Tgt.cInsuranceMethod"] !== '613001'){

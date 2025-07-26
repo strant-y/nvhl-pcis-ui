@@ -16,10 +16,21 @@
             {{ k + 1 }}
           </td>
           <td v-for="(it, kk) in formcof" :key="kk">
-            <from-item
-              v-model="item['Term.'+kk]"
-              :item="getterm(it,item)"
-            />
+            <template v-if = "it['inputtype'] === 'rttag'">
+              <el-badge value="退" class="term_badge" :hidden="item['Term.cCancelMrk'] !== '1'" >
+                <from-item
+                v-model="item['Term.'+kk]"
+                :item="getterm(it,item)"
+              />
+              </el-badge>
+            </template>
+            <template v-else>
+              <from-item
+                v-model="item['Term.'+kk]"
+                :item="getterm(it,item)"
+              />
+            </template>
+            
           </td>
           <td>
             <rtButton
@@ -102,9 +113,12 @@ function changeBtn() {
   Object.keys(formcof.value).forEach((k: any) => {
     formcof.value[k].disabled = props.disabledFlag;
   });
-  Object.keys(btnConf.value).forEach((k: any) => {
-    btnConf.value[k].hidden = props.disabledFlag;
-  });
+  
+  if(param.cRsnCde !== '11'){
+    Object.keys(btnConf.value).forEach((k: any) => {
+      btnConf.value[k].hidden = props.disabledFlag;
+    });
+  }
 }
 
 function getterm(it: any,termdata: any){
@@ -149,5 +163,8 @@ td {
   border: 1px solid #f5f5f5; /* 设置边框样式 */
   padding: 2px;
   text-align: left;
+}
+::v-deep .term_badge .el-badge__content{
+  top: 5px !important;
 }
 </style>

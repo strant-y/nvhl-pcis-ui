@@ -370,7 +370,11 @@ function deleteTermByNo(t: any) {
 
         // 批改的情况下，标记该单为删除状态
         if (parparam.cEdrType && formData.value[item][i]['Term.cRowId'] ) {
-          tremTemplateRefs.value[item+i].setCancel();
+          if(formData.value[item][i]['Term.cRdrTyp'] !== '0' && formData.value[item][i]['Term.cClauseCategory'] !== '1'){ // 规范类，限制类，退保状态只标记
+            formData.value[item][i]['Term.cCancelMrk'] = '1';
+          }else{
+            tremTemplateRefs.value[item+i].setCancel();
+          }
         } else {
           deleindex = i;
         }
