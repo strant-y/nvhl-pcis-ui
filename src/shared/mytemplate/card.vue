@@ -84,6 +84,7 @@
 </template>
 
 <script setup lang="ts">
+import { createAppFreeEditConfig } from "../app-free-edit-config";
 import { createAppGridEditConfig } from "../app-grid-edit-config";
 import { CardConfig } from "./card-config";
 const showMyfrom = ref(true);
@@ -114,7 +115,7 @@ watch(
 
 function initEditConfig(){
   if(props.cardConfig.formconfig){
-    formconfig.value = props.cardConfig.formconfig;
+    formconfig.value = createAppFreeEditConfig(props.cardConfig.formconfig);
   }
 }
 
