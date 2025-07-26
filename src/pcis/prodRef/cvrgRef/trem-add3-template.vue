@@ -105,14 +105,13 @@ function checkShowBtn( data: any ){
   if(param.cEdrType && !data['Term.cRowId']){
     r = true;
   }
-  console.log(r );
   return r;
 };
 
 function changeBtn() { 
-  Object.keys(formcof.value).forEach((k: any) => {
-    formcof.value[k].disabled = props.disabledFlag;
-  });
+  // Object.keys(formcof.value).forEach((k: any) => {
+  //   formcof.value[k].disabled = props.disabledFlag || formcof.value[k].disabled;
+  // });
   
   if(param.cRsnCde !== '11'){
     Object.keys(btnConf.value).forEach((k: any) => {
@@ -123,8 +122,11 @@ function changeBtn() {
 
 function getterm(it: any,termdata: any){
   if(param.cEdrType && !termdata['Term.cRowId']){
-    it.disabled = false;
+    it.disabled = false || it.disabled ;
+  }else{
+    it.disabled = props.disabledFlag || it.disabled;
   }
+  console.log(it);
   return it;
 }
 function setCancel(){

@@ -204,7 +204,9 @@ function isdisabled(i: any) {
 
 function getterm(it: any,termdata: any){
   if(param.cEdrType && !termdata['Term.cRowId']){
-    it.disabled = false;
+    it.disabled = false || it.disabled ;
+  }else{
+    it.disabled = props.disabledFlag || it.disabled;
   }
   return it;
 }
@@ -228,9 +230,9 @@ function checkShowBtn( data: any ){
 };
 
 function changeBtn() {
-  Object.keys(formcof.value).forEach((k: any) => {
-    formcof.value[k].disabled = props.disabledFlag || formcof.value[k].disabled;
-  });
+  // Object.keys(formcof.value).forEach((k: any) => {
+  //   formcof.value[k].disabled = props.disabledFlag || formcof.value[k].disabled;
+  // });
   if(param.cRsnCde === '45'){ // 费率调整,放开费率字段编辑
       formcof.value['nMainRate'].disabled = false;
   }
