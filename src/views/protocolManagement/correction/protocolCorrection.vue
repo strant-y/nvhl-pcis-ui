@@ -271,84 +271,84 @@ const tableconfig = reactive<AppTableConfig>(
               prodNo: '029900',
               edrRsnCde: row['id'][1],
             };
-            // let en:any
-            // if ("2" === rsnTyp) {
-            //   //注销
-            //   en = {
-            //     ...row,
-            //     cRsnCde: row['id'][1],
-            //     cEdrType: '2',
-            //     pageType: "EDR_APP_NEW_SCENE",
-            //   }
-            //   //预留跳转路径
-            //   cEdrType = '2'
-            // } else if ("3" === rsnTyp) {
-            //   //退保
-            //   en = {
-            //     ...row,
-            //     cRsnCde: row['id'][1],
-            //     cEdrType: '3',
-            //     pageType: "EDR_APP_NEW_SCENE",
-            //   }
-            //   cEdrType = '3'
-            // } else if ("1" === rsnTyp) {
-            //   //一般批改
-            //   en = {
-            //     ...row,
-            //     cRsnCde: row['id'][1],
-            //     cEdrType: '1',
-            //     pageType: "EDR_APP_NEW_SCENE",
-            //   }
-            //   cEdrType = '1'
-            // }
-            // toDtl(en, 'EDR_APP_NEW_SCENE',cEdrType);
-            pcisEdrQueryService.validEndorsexy(param).then(
-                async (result) => {
-                  if (200 !== result["code"]) {
-                    ElMessage.error(result["msg"]);
-                  } else {
-                    if (result["data"]) {
-                      let en:any
-                      if ("2" === rsnTyp) {
-                        //注销
-                        en = {
-                          ...row,
-                          cRsnCde: row['id'][1],
-                          cEdrType: '2',
-                          pageType: "EDR_APP_NEW_SCENE",
-                        }
-                        //预留跳转路径
-                        cEdrType = '2'
-                      } else if ("3" === rsnTyp) {
-                        //退保
-                        en = {
-                          ...row,
-                          cRsnCde: row['id'][1],
-                          cEdrType: '3',
-                          pageType: "EDR_APP_NEW_SCENE",
-                        }
-                        cEdrType = '3'
-                      } else if ("1" === rsnTyp) {
-                        //一般批改
-                        en = {
-                          ...row,
-                          cRsnCde: row['id'][1],
-                          cEdrType: '1',
-                          pageType: "EDR_APP_NEW_SCENE",
-                        }
-                        cEdrType = '1'
-                      }
-                      toDtl(en, 'EDR_APP_NEW_SCENE',cEdrType);
-                    } else {
-                      ElMessage.error(result["msg"]);
-                    }
-                  }
-                },
-                (error) => {
-                  console.log("err: ", error);
-                  ElMessage.error("连接失败！" + error);
-                }
-            );
+            let en:any
+            if ("2" === rsnTyp) {
+              //注销
+              en = {
+                ...row,
+                cRsnCde: row['id'][1],
+                cEdrType: '2',
+                pageType: "EDR_APP_NEW_SCENE",
+              }
+              //预留跳转路径
+              cEdrType = '2'
+            } else if ("3" === rsnTyp) {
+              //退保
+              en = {
+                ...row,
+                cRsnCde: row['id'][1],
+                cEdrType: '3',
+                pageType: "EDR_APP_NEW_SCENE",
+              }
+              cEdrType = '3'
+            } else if ("1" === rsnTyp) {
+              //一般批改
+              en = {
+                ...row,
+                cRsnCde: row['id'][1],
+                cEdrType: '1',
+                pageType: "EDR_APP_NEW_SCENE",
+              }
+              cEdrType = '1'
+            }
+            toDtl(en, 'EDR_APP_NEW_SCENE',cEdrType);
+            // pcisEdrQueryService.validEndorsexy(param).then(
+            //     async (result) => {
+            //       if (200 !== result["code"]) {
+            //         ElMessage.error(result["msg"]);
+            //       } else {
+            //         if (result["data"]) {
+            //           let en:any
+            //           if ("2" === rsnTyp) {
+            //             //注销
+            //             en = {
+            //               ...row,
+            //               cRsnCde: row['id'][1],
+            //               cEdrType: '2',
+            //               pageType: "EDR_APP_NEW_SCENE",
+            //             }
+            //             //预留跳转路径
+            //             cEdrType = '2'
+            //           } else if ("3" === rsnTyp) {
+            //             //退保
+            //             en = {
+            //               ...row,
+            //               cRsnCde: row['id'][1],
+            //               cEdrType: '3',
+            //               pageType: "EDR_APP_NEW_SCENE",
+            //             }
+            //             cEdrType = '3'
+            //           } else if ("1" === rsnTyp) {
+            //             //一般批改
+            //             en = {
+            //               ...row,
+            //               cRsnCde: row['id'][1],
+            //               cEdrType: '1',
+            //               pageType: "EDR_APP_NEW_SCENE",
+            //             }
+            //             cEdrType = '1'
+            //           }
+            //           toDtl(en, 'EDR_APP_NEW_SCENE',cEdrType);
+            //         } else {
+            //           ElMessage.error(result["msg"]);
+            //         }
+            //       }
+            //     },
+            //     (error) => {
+            //       console.log("err: ", error);
+            //       ElMessage.error("连接失败！" + error);
+            //     }
+            // );
           },
         }),
       ],
