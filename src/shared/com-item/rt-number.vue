@@ -3,7 +3,10 @@
     v-if="!showLabel"
     ref="inputNumberRef"
     v-model="vInput"
-    :class="isReQuired() ? 're-quired-flag' : ''"
+    :class="[
+        ...customClass,
+        ...[isReQuired() ? 're-quired-flag' : '']
+    ]"
     :readonly="isReadonly()"
     :placeholder="item.placeholder"
     :disabled="isDisabled()"
@@ -58,7 +61,7 @@ const props = defineProps({
     required: false,
   },
 });
-
+const customClass = ref<string[]>([]);
 const vInput = ref<number | undefined>();
 watch([() => props.modelValue], ([newModelValue]) => {
   vInput.value = newModelValue !== null && newModelValue != undefined ? Number(newModelValue) : undefined;
@@ -117,7 +120,12 @@ onMounted(() => {
   vInput.value = props.modelValue ? Number(props.modelValue) : undefined;
 });
 
-onMounted(() => {});
+function setCustomClass(classs: string[]) {
+  customClass.value = classs;
+}
+defineExpose({
+  setCustomClass
+});
 </script>
 
 <style scoped>

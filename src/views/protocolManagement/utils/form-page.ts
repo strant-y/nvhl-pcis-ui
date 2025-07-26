@@ -139,11 +139,12 @@ export class FormPage {
 
     /**
      * 设置页面只读模式
-     * @param id
+     * @param isDisabled
      * @param noSet 不需要设置只读的组件key数组
+     * @param callback
      */
-    setPageReadOnly(isDisabled: boolean, noSet: any[] = []) {
-        setTimeout(() => {
+    setPageReadOnly(isDisabled: boolean, noSet: any[] = [], callback: any = undefined) {
+        try{
             const keys = this.componentRefMap.keys();
             for (const key of keys) {
                 if (noSet.includes(key)) continue;
@@ -158,28 +159,49 @@ export class FormPage {
             //         btnConfig.disabled = true;
             //     }
             // }
-
-        }, 250);
+            if (callback && callback.success && typeof callback.success === 'function') {
+                callback.success()
+            }
+        } catch (e) {
+            if(callback && callback.error && typeof callback.error === 'function') {
+                callback.error(e);
+            }else {
+                throw e;
+            }
+        }
     }
 
 
     /**
      * set所有指定组件的数据
      * @param AllData
+     * @param callback
      */
-    setAllFormData(AllData: any) {
-        nextTick(() => {
+    setAllFormData(AllData: any, callback: any = undefined) {
+        try {
             const keys = Object.keys(AllData);
-            for(const key of keys) {
+            for (const key of keys) {
                 const comp = this.componentRefMap.get(key);
-                if(comp) {
+                if (comp) {
                     comp.setFormValue(AllData[key]);
-                }else {
+                    if (comp.addProvide) {
+                        comp.addProvide('primevalForm', AllData[key])
+                    }
+                } else {
                     console.error('Could not find componentRef for id ' + key)
                 }
             }
             this.initial = false;
-        })
+            if (callback && callback.success && typeof callback.success === 'function') {
+                callback.success(this.getAllFormData())
+            }
+        } catch (e) {
+            if(callback && callback.error && typeof callback.error === 'function') {
+                callback.error(e);
+            }else {
+                throw e;
+            }
+        }
     }
 
     /**

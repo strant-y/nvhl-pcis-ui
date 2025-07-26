@@ -359,67 +359,77 @@ function query() {
     if(res.code === 200) {
       console.log('res........',res)
       ElMessage.success('查询成功');
-      formPage.value?.setAllFormData({...res.data.composition,AgreementBase:res.data.composition?.AgreementBase[0],AgreementApplicant:res.data.composition?.AgreementApplicant[0],AgreementFeeWarn:res.data.composition?.AgreementBase[0]});
-      if(props.type === 'EDR_APP_NEW_SCENE'){
-        console.log('props.param',props.param)
-        if (
-            res["data"]["composition"]["AgreementBase"][0]["ECargoBase.cEdrRsnDetail"] !=
-            "" &&
-            res["data"]["composition"]["AgreementBase"][0]["ECargoBase.cEdrRsnDetail"] !=
-            null
-        ) {
-          res["data"]["composition"]["AgreementBase"][0]["ECargoBase.cEdrRsnDetail"] =
-              res["data"]["composition"]["AgreementBase"][0][
-                  "ECargoBase.cEdrRsnDetail"
-                  ].split(",");
-        }
-        res["data"]["composition"]["AgreementBase"][0]["ECargoBase.cRatioTyp"] = "2";
-        res["data"]["composition"]["AgreementBase"][0]["ECargoBase.cEdrType"] =
-            props.param["cEdrType"];
-        res["data"]["composition"]["AgreementBase"][0]["ECargoBase.cEdrRsnBundleCde"] =
-            props.param["cRsnCde"];
-        if (props.param.cEdrType != "1") {
-          res["data"]["composition"]["AgreementBase"][0]["ECargoBase.cEdrRsnDetail"] = [
-            props.param["cRsnCde"],
-          ];
-        }
-        const EdrBaseData = res["data"]["composition"]["AgreementBase"][0];
-        mainRef.value?.setxyedrbaseRefData(EdrBaseData)
-        if (props.param?.cEdrType == "1") {
-          if (props.param["cRsnCde"] != "FZ") {
-            mainRef.value?.setxyedrbaseRefValue("EdrBase.cEdrRsnDetail", [
-              props.param["cRsnCde"],
-            ]);
+
+      const pageInit = () => {
+        if (props.type === 'EDR_APP_NEW_SCENE') {
+          console.log('props.param', props.param)
+          if (
+              res["data"]["composition"]["AgreementBase"][0]["ECargoBase.cEdrRsnDetail"] !=
+              "" &&
+              res["data"]["composition"]["AgreementBase"][0]["ECargoBase.cEdrRsnDetail"] !=
+              null
+          ) {
+            res["data"]["composition"]["AgreementBase"][0]["ECargoBase.cEdrRsnDetail"] =
+                res["data"]["composition"]["AgreementBase"][0][
+                    "ECargoBase.cEdrRsnDetail"
+                    ].split(",");
           }
-          nextTick(() => {
-            formPage.value?.setPageReadOnly(true);
-
-            getEdrRsnItemFun(
-                "029900",
-                props.param["cDptCde"],
+          res["data"]["composition"]["AgreementBase"][0]["ECargoBase.cRatioTyp"] = "2";
+          res["data"]["composition"]["AgreementBase"][0]["ECargoBase.cEdrType"] =
+              props.param["cEdrType"];
+          res["data"]["composition"]["AgreementBase"][0]["ECargoBase.cEdrRsnBundleCde"] =
+              props.param["cRsnCde"];
+          if (props.param.cEdrType != "1") {
+            res["data"]["composition"]["AgreementBase"][0]["ECargoBase.cEdrRsnDetail"] = [
+              props.param["cRsnCde"],
+            ];
+          }
+          const EdrBaseData = res["data"]["composition"]["AgreementBase"][0];
+          mainRef.value?.setxyedrbaseRefData(EdrBaseData)
+          if (props.param?.cEdrType == "1") {
+            if (props.param["cRsnCde"] != "FZ") {
+              mainRef.value?.setxyedrbaseRefValue("EdrBase.cEdrRsnDetail", [
                 props.param["cRsnCde"],
-                props.param["cRsnCde"],
-                props.param["cEdrType"],
-                "0"
-            )
-            //
-            // console.log('3333',opertaor.getTableRefByKey('acctinfo'))
-            // // 用于处理 账户信息
-            // let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
-            // if(acctinfoInfo){
-            //   acctinfoInfo.setDisabledAll(false);
-            //   acctinfoInfo.setFormItem('Acctinfo.cAcctNme',{
-            //     disabled: true
-            //   })
-            //   acctinfoInfo.setFormItem('Acctinfo.cBankCnaps',{
-            //     disabled: true
-            //   })
-            //
-            // }
-
-          });
+              ]);
+            }
+            formPage.value?.setPageReadOnly(true, [], {
+              success: (pageData: any) => {
+                getEdrRsnItemFun(
+                    "029900",
+                    props.param["cDptCde"],
+                    props.param["cRsnCde"],
+                    props.param["cRsnCde"],
+                    props.param["cEdrType"],
+                    "0"
+                )
+                //
+                // console.log('3333',opertaor.getTableRefByKey('acctinfo'))
+                // // 用于处理 账户信息
+                // let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
+                // if(acctinfoInfo){
+                //   acctinfoInfo.setDisabledAll(false);
+                //   acctinfoInfo.setFormItem('Acctinfo.cAcctNme',{
+                //     disabled: true
+                //   })
+                //   acctinfoInfo.setFormItem('Acctinfo.cBankCnaps',{
+                //     disabled: true
+                //   })
+                //
+                // }
+              }
+            });
+          }
         }
       }
+      formPage.value?.setAllFormData(
+          {...res.data.composition,AgreementBase:res.data.composition?.AgreementBase[0],AgreementApplicant:res.data.composition?.AgreementApplicant[0],AgreementFeeWarn:res.data.composition?.AgreementBase[0]},
+          {
+            success: (pageData: any) => {
+              pageInit()
+            }
+          }
+      );
+
     }else {
       ElMessage.error(res.msg);
     }

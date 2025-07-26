@@ -707,6 +707,9 @@ function getFormConfig(){
 function setDisabledAll(isDisabled: boolean) {
   applicantEditRef?.value?.setDisabledAll(isDisabled);
 }
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  applicantEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFormValue,
   setFormValue,
@@ -714,7 +717,8 @@ defineExpose({
   setValue,
   getValue,
   getFormConfig,
-  setDisabledAll
+  setDisabledAll,
+  addProvide
 });
 </script>
 

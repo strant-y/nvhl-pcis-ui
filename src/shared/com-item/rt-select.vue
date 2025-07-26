@@ -8,7 +8,10 @@
     >
       <el-select
         ref="selectRef"
-        :class="isReQuired() ? 're-quired-flag' : ''"
+        :class="[
+            ...customClass,
+            ...[isReQuired() ? 're-quired-flag' : '']
+        ]"
         v-model="selectedValue"
         :placeholder="item.placeholder ? item.placeholder : '请选择'"
         :disabled="isReadonly() || isDisabled()"
@@ -120,6 +123,8 @@ const props = defineProps({
     required: false,
   },
 });
+
+const customClass = ref<string[]>([]);
 
 interface OptionTypeBySelect extends OptionType {
   color?: string;
@@ -406,7 +411,11 @@ function getParam() {
   return p;
 }
 
+function setCustomClass(classs: string[]) {
+  customClass.value = classs;
+}
 defineExpose({
   updateOption,
+  setCustomClass
 });
 </script>

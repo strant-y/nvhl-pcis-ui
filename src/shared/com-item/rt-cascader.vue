@@ -5,8 +5,11 @@
     <el-cascader
       ref="cascaderRef"
       v-model="selectedValue"
-      class="cascader_"
-      :class="isReQuired() ? 're-quired-flag' : ''"
+      :class="[
+        'cascader_',
+        ...customClass,
+        ...[isReQuired() ? 're-quired-flag' : '']
+      ]"
       :props="cascprops"
       :placeholder="item.placeholder ? item.placeholder : '请选择'"
       :options="options"
@@ -78,6 +81,8 @@ const emits = defineEmits(["update:item", "update:modelValue", "valueChange"]); 
 const selectedValue = ref<string | number | Array<any> | undefined>();
 
 const displayText = computed(() => cascaderRef.value?.presentText);
+
+const customClass = ref<string[]>([]);
 
 const cascprops: CascaderProps = {
   lazy: true,
@@ -306,10 +311,14 @@ function getParam() {
 function getTextValue() {
   return displayText.value;
 }
+function setCustomClass(classs: string[]) {
+  customClass.value = classs;
+}
 
 defineExpose({
   updateOption,
-  getTextValue
+  getTextValue,
+  setCustomClass
 });
 </script>
 <style lang="scss">

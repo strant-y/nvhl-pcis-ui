@@ -12,7 +12,10 @@
         :type="
           item.type === 'color' || item.type === 'number' ? 'text' : item.type
         "
-        :class="isReQuired() ? 're-quired-flag' : '' "
+        :class="[
+            ...customClass,
+            ...[isReQuired() ? 're-quired-flag' : '']
+        ]"
         :showPassword="item.showPassword"
         :rows="item.rows"
         :style="
@@ -191,6 +194,7 @@ function isReQuired(){
 }
 const emits = defineEmits(["update:modelValue", "valueChange"]); // 父组件监听事件，同步子组件值的变化给父组件
 const vInput = ref<string | Number | undefined>();
+const customClass = ref<string[]>([]);
 watch([() => props.modelValue], ([newModelValue]) => {
   let n = null;
   if (props.item.type === "number") {
@@ -251,4 +255,10 @@ const renderIcon = (iconName: string) => {
   }
   return null;
 };
+function setCustomClass(classs: string[]) {
+  customClass.value = classs;
+}
+defineExpose({
+  setCustomClass
+});
 </script>

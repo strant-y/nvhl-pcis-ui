@@ -9,7 +9,10 @@
       <el-select-v2
         ref="selectV2Ref"
         v-model="selectedValue"
-        :class="isReQuired() ? 're-quired-flag' : ''"
+        :class="[
+          ...customClass,
+          ...[isReQuired() ? 're-quired-flag' : '']
+        ]"
         :placeholder="item.placeholder ? item.placeholder : '请选择'"
         :disabled="isReadonly() || isDisabled()"
         :clearable="isClearable()"
@@ -151,6 +154,8 @@ function getColor(v) {
     return undefined;
   }
 }
+
+const customClass = ref<string[]>([]);
 
 watch([() => props.modelValue], ([newModelValue]) => {
   // if (options.value == null || options.value.length === 0) return; // 下拉数据源加载未完成不回显
@@ -411,4 +416,11 @@ function getParam() {
   }
   return p;
 }
+
+function setCustomClass(classs: string[]) {
+  customClass.value = classs;
+}
+defineExpose({
+  setCustomClass,
+})
 </script>

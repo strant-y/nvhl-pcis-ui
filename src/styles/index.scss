@@ -115,6 +115,19 @@
   position: initial !important;
 }
 
+.form-item-change .el-input__wrapper{
+  border: 1px solid #e32828 !important;
+}
+.form-item-change .el-select__wrapper{
+  border: 1px solid #e32828 !important;
+}
+.form-item-unchange .el-input__wrapper{
+  border: 1px solid transparent !important;
+}
+.form-item-unchange .el-select__wrapper{
+  border: 1px solid transparent !important;
+}
+
 // .el-form-item--default {
 //   margin-bottom: 6px !important;
 // }
