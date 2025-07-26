@@ -410,7 +410,7 @@ const premiumCalculation = ()=>{
       //折人民币预估保费
       AgreementFeeWarn.setValue('ECargoBase.nRmbPrm',sum1)
       //协议剩余预收保费(人民币)
-      if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') && agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo').slice(0,2) === 'AY'){
+      if(AgreementFeeWarn.getValue('ECargoBase.cPayWay') && AgreementFeeWarn.getValue('ECargoBase.cPayWay') !== '01'){
         AgreementFeeWarn.setValue('ECargoBase.nRecRemPrm',sum1)
       }
     }else{
@@ -418,7 +418,7 @@ const premiumCalculation = ()=>{
       //折人民币预估保费
       AgreementFeeWarn.setValue('ECargoBase.nRmbPrm',sum1)
       //协议剩余预收保费(人民币)
-      if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') && agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo').slice(0,2) === 'AY'){
+      if(AgreementFeeWarn.getValue('ECargoBase.cPayWay') && AgreementFeeWarn.getValue('ECargoBase.cPayWay') !== '01'){
         AgreementFeeWarn.setValue('ECargoBase.nRecRemPrm',sum1)
       }
       AgreementFeeWarn.setFormItem('ECargoBase.PrmProp',{hidden: true})

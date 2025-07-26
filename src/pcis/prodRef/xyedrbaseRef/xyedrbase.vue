@@ -25,7 +25,8 @@ const props = defineProps({
   //   type: [Object],
   // },
 });
-const params=opertaor.getParam();
+const idxParam = inject('idxParam');
+const params= idxParam?.param
 const { getCUndrMrk, getBackClsList } = NewUdrListService();
 const edrbaseEditRef = ref<AppFreeEditMethod | null>(null);
 const user = JSON.parse(sessionStorage.getItem("user"));
