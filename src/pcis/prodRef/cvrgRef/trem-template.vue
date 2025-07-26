@@ -813,7 +813,7 @@ function initshowConfig() {
     }
   });
 
-  collist.value.forEach((item)=>{
+  collist.value?.forEach((item)=>{
     reflash = reflash || initTermRiskData(item);
   })
   if(reflash){  // 如果存在初始化数据,则将初始化数据反馈给父级
