@@ -170,7 +170,7 @@ const method = {
       // 协议剩余预收保费（人民币）
       if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') === '01'){
         console.log('val',val * getValue('ECargoBase.nReceivedRate'))
-        setValue('ECargoBase.nRecRemPrm',val * getValue('ECargoBase.nReceivedRate'))
+        setValue('ECargoBase.nRecRemPrm',getValue('ECargoBase.nRmbReceivedPrm'))
       }
     }
   },
@@ -263,16 +263,16 @@ const method = {
     //ECargoBase.nRmbReceivedPrm
     const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
     if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') === '01'){
-      setValue('ECargoBase.nRecRemPrm',getValue('ECargoBase.nRmbReceivedPrm') - val )
+      setValue('ECargoBase.nRecRemPrm',getValue('ECargoBase.nRmbReceivedPrm'))
     }else {
-      setValue('ECargoBase.nRecRemPrm',getValue('ECargoBase.nRmbPrm') - val )
+      setValue('ECargoBase.nRecRemPrm',getValue('ECargoBase.nRmbPrm'))
     }
   },
   nRmbPrmChange:(val:any)=>{
     nextTick(()=>{
       const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
       if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') !== '01'){
-        setValue('ECargoBase.nRecRemPrm', val - getValue('ECargoBase.nWhRmbPrm') )
+        setValue('ECargoBase.nRecRemPrm', getValue('ECargoBase.nRmbPrm'))
       }
     })
   }
