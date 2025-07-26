@@ -70,7 +70,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "CDptCde",
         inputtype: "rtinput",
-        title: "机构编码",
+        title: "机构部门",
         disabled: true,
       },
       {
@@ -418,6 +418,7 @@ function getAgencyBusinessList(param?: any) {
 // }
 
 onMounted(() => {
+  debugger
   if (sessionStorage.getItem("toMyPageData")) {
     const data = JSON.parse(sessionStorage.getItem("toMyPageData"));
     //业务来源大类下拉数据
@@ -457,6 +458,7 @@ onMounted(() => {
     const paramSub = {
       CChaType: props.data.data.cChaType,
       flag: 1,
+
       scene: "PLY_APP_NEW_SCENE",
     };
     getChaSubtypList(paramSub).then((res) => {
@@ -473,8 +475,7 @@ onMounted(() => {
     });
   }
   nextTick(() => {
-    console.log("子类数据", props.data.data.rowData["Ci.cDptCde"]);
-    setValue("CDptCde", props.data.data.rowData["Ci.cDptCde"]);
+    setValue("CDptCde", props.data.data.CDptCde);
   });
 });
 

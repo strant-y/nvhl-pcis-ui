@@ -224,6 +224,10 @@ const method = {
             plyBaseEditRef.value?.clearValidate("Base.cBrkSlsCde");
           });
         }
+        const ciRef = opertaor.getTableRefs()['ci'];
+        if (!!ciRef) {
+          ciRef.valideRequired();
+        }
       });
     }
   },
@@ -375,6 +379,7 @@ const method = {
         },
         method: {
           getSelected: (params) => {
+            console.log("代理业务员回显", params);
             setFormValue({
               // "Base.cBrkSlsCde": params.CSlsCde, //代理业务员
               "Base.cCertfNo": params.CCtfctNo, //代理业务执业证号
@@ -393,7 +398,7 @@ const method = {
               ciRef.initProxySales({
                 cSlsId: params.CSlsCde, //业务员员工号
                 cSlsNme: params.CSlsNme, //业务员名称
-                loadData:{value:  params["CSlsCde"],label:params["CSlsCde"] + params['CSlsNme']},
+                loadData:[{value:  params["CSlsCde"],label:params["CSlsCde"] + params['CSlsNme']}],
               });
             }
             setValue("Base.cBrkSlsCde", params.CSlsCde);

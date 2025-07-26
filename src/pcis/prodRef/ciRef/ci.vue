@@ -23,6 +23,7 @@ import { useProductStore } from "@/store/modules/prod";
 import CostInformation from "@/views/pcis-new-udr-list/pages/CostInformation.vue";
 import { fa } from "element-plus/es/locale";
 import { constantRoutes } from "@/router";
+import { chownSync } from "fs";
 const productStore = useProductStore();
 const dialogRef = ref<DialogMethod | null>(null);
 
@@ -88,7 +89,6 @@ onMounted(async () => {
 
 // 绑定方法
 const method = {
-  
   ciAdd: () => {
     const dataList = getFromValue();
     // const cBsnsTyp = opertaor.getTableRefByKey("plyBase").getValue("Base.cBsnsTyp")
@@ -186,83 +186,62 @@ const method = {
             );
           });
           nextTick(()=>{
-            freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
-            );
-            freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cDptCde", "disabled",false
-            );
-            // const cBsnsTyp = opertaor.getTableRefByKey('plyBase').getValue('Base.cBsnsTyp')
-            // if((cBsnsTyp !=null || cBsnsTyp !='') && cBsnsTyp == '19001'){
-            //   freeEditRef.value?.setRowFieldProp(
+            // freeEditRef.value?.setRowFieldProp(
+            //     rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
+            // );
+            // freeEditRef.value?.setRowFieldProp(
+            //     rowData._dataId, "Ci.cDptCde", "disabled",false
+            // );
+            // freeEditRef.value?.setRowFieldProp(
+            //         rowData._dataId, "Ci.cSlsCde", "disabled", true
+            //   );
+            // freeEditRef.value?.setRowFieldProp(
+            //         rowData._dataId, "Ci.cBrkrCde", "disabled", true
+            //   );
+            // freeEditRef.value?.setRowFieldProp(
+            //       rowData._dataId, "Ci.cBrkSlsCde", "disabled", true
+            //   );
+            // freeEditRef.value?.setRowFieldProp(
             //       rowData._dataId, "Ci.cSlsCde", "rules", [getRules("required", {})]
             //   );
-            //   freeEditRef.value?.setRowFieldProp(
-            //       rowData._dataId, "Ci.cBrkrCde", "rules", []
-            //   );
-            //   freeEditRef.value?.setRowFieldProp(
-            //       rowData._dataId, "Ci.cBrkSlsCde", "rules", []
-            //   );
-            // }else if(cBsnsTyp == '19002' || cBsnsTyp == '19003'){
-            //   freeEditRef.value?.setRowFieldProp(
-            //       rowData._dataId, "Ci.cBrkrCde", "rules", [getRules("required", {})]
-            //   );
-            //   freeEditRef.value?.setRowFieldProp(
-            //       rowData._dataId, "Ci.cBrkrCde", "rules", []
-            //   );
-            //   freeEditRef.value?.setRowFieldProp(
-            //       rowData._dataId, "Ci.cBrkSlsCde", "rules", [getRules("required", {})]
-            //   );
-            // }
-            freeEditRef.value?.setRowFieldProp(
-                    rowData._dataId, "Ci.cSlsCde", "disabled", true
-              );
-            freeEditRef.value?.setRowFieldProp(
-                    rowData._dataId, "Ci.cBrkrCde", "disabled", true
-              );
-            freeEditRef.value?.setRowFieldProp(
-                  rowData._dataId, "Ci.cBrkSlsCde", "disabled", true
-              );
-            freeEditRef.value?.setRowFieldProp(
-                  rowData._dataId, "Ci.cSlsCde", "rules", [getRules("required", {})]
-              );
-            // const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
-            // rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
-            // rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
-            // rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
+                // const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+                // rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
+                // rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
+                // rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
           })
     } else {
       // 非永安保险，设置默认值和其他数据
-      freeEditRef.value?.addCodeListMap(
-          {code: "Ci.cSubDptCde"+rowId,
-           list: [{ label: '其他',value: '1',  }]
-          }
-      );
-      freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cDptCde", "rules", []
-      );
-      freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cDptCde", "disabled", true
-      );
-      freeEditRef.value?.setRowFieldProp(
-            rowData._dataId, "Ci.cSlsCde", "disabled", false
-      );
-      freeEditRef.value?.setRowFieldProp(
-              rowData._dataId, "Ci.cBrkrCde", "disabled", false
-      );
-      freeEditRef.value?.setRowFieldProp(
-              rowData._dataId, "Ci.cBrkSlsCde", "disabled", false
-      );
-      freeEditRef.value?.setRowFieldProp(
-              rowData._dataId, "Ci.cSlsCde", "rules", []
-          );
-      const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
-      rowItem['Ci.cSlsCde']['btnItems'].disabled = false;
-      rowItem['Ci.cBrkrCde']['btnItems'].disabled = false;
-      rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = false;
+      // freeEditRef.value?.addCodeListMap(
+      //     {code: "Ci.cSubDptCde"+rowId,
+      //      list: [{ label: '其他',value: '1',  }]
+      //     }
+      // );
+      // freeEditRef.value?.setRowFieldProp(
+      //           rowData._dataId, "Ci.cDptCde", "rules", []
+      // );
+      // freeEditRef.value?.setRowFieldProp(
+      //           rowData._dataId, "Ci.cDptCde", "disabled", true
+      // );
+      // freeEditRef.value?.setRowFieldProp(
+      //       rowData._dataId, "Ci.cSlsCde", "disabled", false
+      // );
+      // freeEditRef.value?.setRowFieldProp(
+      //         rowData._dataId, "Ci.cBrkrCde", "disabled", false
+      // );
+      // freeEditRef.value?.setRowFieldProp(
+      //         rowData._dataId, "Ci.cBrkSlsCde", "disabled", false
+      // );
+      // freeEditRef.value?.setRowFieldProp(
+      //         rowData._dataId, "Ci.cSlsCde", "rules", []
+      //     );
+      // const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+      // rowItem['Ci.cSlsCde']['btnItems'].disabled = false;
+      // rowItem['Ci.cBrkrCde']['btnItems'].disabled = false;
+      // rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = false;
     }
     updateMasterAgreementValues()
   },
+  // 共保公司改变事件
   cCoinsurerCdeChange:(val)=>{
     const rowData = freeEditRef.value?.getSelectRow();
     const formTableData = getFromValue();
@@ -283,6 +262,7 @@ const method = {
       }
     }
     if (val === "327001") {
+      valideRequired()
       // 如果选择的是永安保险，加载对应的分公司列表
       codeListStore
         .queryCodeList({
@@ -297,26 +277,26 @@ const method = {
           );
         });
         nextTick(()=>{
-          freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
-            );
-          freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cDptCde", "disabled", false
-           );
-          freeEditRef.value?.setRowFieldProp(
-                  rowData._dataId, "Ci.cSlsCde", "disabled", true
-            );
-          freeEditRef.value?.setRowFieldProp(
-                  rowData._dataId, "Ci.cBrkrCde", "disabled", true
-            );
-          freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cBrkSlsCde", "disabled", true
-            );
-          freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cSlsCde","rules",[getRules("required", {})])
-          const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
-          rowItem['Ci.cSlsCde']['btnItems'].disabled = false;
-          rowItem['Ci.cBrkrCde']['btnItems'].disabled = false;
-          rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = false;
+          // freeEditRef.value?.setRowFieldProp(
+          //       rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
+          //   );
+          // freeEditRef.value?.setRowFieldProp(
+          //       rowData._dataId, "Ci.cDptCde", "disabled", false
+          //  );
+          // freeEditRef.value?.setRowFieldProp(
+          //         rowData._dataId, "Ci.cSlsCde", "disabled", true
+          //   );
+          // freeEditRef.value?.setRowFieldProp(
+          //         rowData._dataId, "Ci.cBrkrCde", "disabled", true
+          //   );
+          // freeEditRef.value?.setRowFieldProp(
+          //       rowData._dataId, "Ci.cBrkSlsCde", "disabled", true
+          //   );
+          // freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cSlsCde","rules",[getRules("required", {})])
+          // const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+          // rowItem['Ci.cSlsCde']['btnItems'].disabled = false;
+          // rowItem['Ci.cBrkrCde']['btnItems'].disabled = false;
+          // rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = false;
         })
         
         if (plyBasedata["Base.cCiMrk"] === "3" || plyBasedata["Base.cCiMrk"] === "4") {
@@ -336,25 +316,26 @@ const method = {
             list: [{ label: '其他',value: '1',  }]
           }
       );
-      freeEditRef.value?.setRowFieldProp(rowData._dataId, "Ci.cDptCde", "rules", []);
-      freeEditRef.value?.setRowFieldProp(rowData._dataId, "Ci.cDptCde", "disabled", true);
-      freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cSlsCde", "disabled", false
-        );
-        freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cBrkrCde", "disabled", false
-        );
-        freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cBrkSlsCde", "disabled", false
-        );
-        freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cSlsCde","rules",[])
-        const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
-        rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
-        rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
-        rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
+      // freeEditRef.value?.setRowFieldProp(rowData._dataId, "Ci.cDptCde", "rules", []);
+      // freeEditRef.value?.setRowFieldProp(rowData._dataId, "Ci.cDptCde", "disabled", true);
+      // freeEditRef.value?.setRowFieldProp(
+      //           rowData._dataId, "Ci.cSlsCde", "disabled", false
+      //   );
+      //   freeEditRef.value?.setRowFieldProp(
+      //           rowData._dataId, "Ci.cBrkrCde", "disabled", false
+      //   );
+      //   freeEditRef.value?.setRowFieldProp(
+      //           rowData._dataId, "Ci.cBrkSlsCde", "disabled", false
+      //   );
+      //   freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cSlsCde","rules",[])
+      //   const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+      //   rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
+      //   rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
+      //   rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
       freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "1");
       freeEditRef.value?.setValueByRowKey("Ci.cDptCde", rowId, "");
     }
+    valideRequired()
     updateMasterAgreementValues()
   },
 
@@ -647,38 +628,6 @@ const method = {
         { title: "银行信息", width: 85 }
       );
   },
-  //代理/经纪人
-  cBrkrCdeChange:()=>{
-    debugger
-    // if (getValue("Base.cBsnsTyp") && getValue("Base.cBsnsTyp") !== "19001") {
-      dialogRef.value?.open(
-        "ciagentPre",
-        {
-          type: "show",
-          data: {
-            rowData:rowData,
-          },
-          method: {
-            getSelected: (params) => {
-              setFormItem("Ci.cBrkrCde", {
-                loadData: [{ value: params.CChaCde, label: params.CChaNme }],
-              });
-              freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData","")
-              dialogRef.value?.handleClose();
-            },
-          },
-        },
-        {
-          isOk: (selectdata: any) => {
-            console.log("a", selectdata);
-          },
-        },
-        { title: "代理查询", width: 85 }
-      );
-    // } else {
-    //   ElMessage.warning("渠道分类--请选择非直销业务!");
-    // }
-  },
   //业务员
   cSlsCdeChange:()=>{
     const rowData = freeEditRef.value?.getSelectRow();
@@ -692,7 +641,7 @@ const method = {
         },
         method: {
           getSelected: (params) => {
-            freeEditRef.value?.setRowFieldProp(rowId,"Ci.cSlsCde","loadData",[{ label: params.CSlsNme, value: params.CSlsCde }])
+            freeEditRef.value?.setRowFieldProp(rowId,"Ci.cSlsCde","loadData",[{ label: `${params.CSlsCde}${params.CSlsNme}`, value: params.CSlsCde }])
             freeEditRef?.value?.setValueByRowKey("Ci.cSlsCde", rowId, params.CSlsCde);
             freeEditRef?.value?.setValueByRowKey("Ci.cSlsNme", rowId, params.CSlsNme);
             dialogRef.value?.handleClose();
@@ -705,6 +654,37 @@ const method = {
         },
       },
       { title: "业务员", width: 85 }
+    );
+  },
+  //代理/经纪人
+  cBrkrCdeChange:()=>{
+    const rowData = freeEditRef.value?.getSelectRow();
+    const rowId = rowData?._dataId;
+    console.log("rowData", rowData);
+    dialogRef.value?.open(
+      "ciagentPer",
+      {
+        type: "show",
+        data: {
+          rowData:rowData,
+        },
+        method: {
+          getSelected: (params) => {
+            // setFormItem("Ci.cBrkrCde", {
+            //   loadData: [{ value: params.CChaCde, label: params.CChaNme }],
+            // });
+            freeEditRef?.value?.setValueByRowKey("Ci.cBrkrCde", rowId, params.CChaCde);
+            freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData","")
+            dialogRef.value?.handleClose();
+          },
+        },
+      },
+      {
+        isOk: (selectdata: any) => {
+          console.log("a", selectdata);
+        },
+      },
+      { title: "代理查询", width: 85 }
     );
   },
   //代理业务员
@@ -893,6 +873,8 @@ const initCiInfo = (data: any) => {
     setFormValue([]);
   }
   nextTick(() => {
+    const cSlsId = opertaor.getTableRefByKey('plyBase').getValue('Base.cSlsId')
+    const cBrkSlsCde = opertaor.getTableRefByKey('plyBase').getValue('Base.cBrkSlsCde')
     freeEditRef?.value?.addRowByData( {
       'Ci.nSeqNo': 1,
       'Ci.nCiShare': '1.00000000',
@@ -904,13 +886,9 @@ const initCiInfo = (data: any) => {
       'Ci.cCoinsurerCde': '327001',
       "Ci.cSubDptCde": param.dptCde,
       'Ci.cDptCde': param.cDptCde,
+      'Ci.cSlsCde': cSlsId,
+      'Ci.cBrkSlsCde': cBrkSlsCde,
     });
-    // const dataList = getFromValue()
-    // dataList.forEach(item => { 
-    //   if(item.cChiefMrk === '1'){
-
-    //   }
-    // });
     valideRequired()
     onChiefMrkChange()
   });
@@ -919,13 +897,11 @@ const initCiInfo = (data: any) => {
 //
 const valideRequired = ()=>{
   const cBsnsTyp = opertaor.getTableRefByKey('plyBase').getValue('Base.cBsnsTyp')
-  const rowItems = getFromValue()
+  setTimeout(()=>{ 
+      const rowItems = getFromValue()
   for(const rowData of rowItems){
-    if(cBsnsTyp == '19001' && rowData['Ci.cCoinsurerCde'] =='327001'){
-        // rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
-        // rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
-        // rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
-        // setFormItem("Ci.nComm",{'disabled':true})
+    if(cBsnsTyp == '19001'){
+          freeEditRef.value?.setRowFieldProp(rowData._dataId, 'Ci.nComm', 'disabled', true)
           freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.cSlsCde", "rules", [getRules("required", {})]
           );
@@ -935,8 +911,11 @@ const valideRequired = ()=>{
           freeEditRef.value?.setRowFieldProp(
               rowData._dataId, "Ci.cBrkSlsCde", "rules", []
           );
-      }else if((cBsnsTyp == '19002' || cBsnsTyp == '19003') && rowData['Ci.cCoinsurerCde'] =='327001'){
-        setFormItem("Ci.nComm",{'disabled':false})
+          freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
+          );
+      }else if(cBsnsTyp == '19002' || cBsnsTyp == '19003'){
+        freeEditRef.value?.setRowFieldProp(rowData._dataId, 'Ci.nComm', 'disabled', false)
         freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.cBrkrCde", "rules", [getRules("required", {})]
         );
@@ -947,7 +926,50 @@ const valideRequired = ()=>{
             rowData._dataId, "Ci.cBrkSlsCde", "rules", [getRules("required", {})]
         );
       }
+      if(rowData['Ci.cCoinsurerCde'] !=='327001'){
+        freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cDptCde", "rules", []
+        );
+        freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cDptCde", "disabled", true
+        );
+        freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cSlsCde", "disabled", true
+        );
+        freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cBrkSlsCde", "disabled", true
+        );
+        freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cBrkrCde", "disabled", true
+        );
+        const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+        rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
+        rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
+        rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
+      }else{
+        freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
+        );
+        freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cDptCde", "disabled", false
+        );
+        freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cSlsCde", "disabled", false
+        );
+        freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cBrkSlsCde", "disabled", false
+        );
+        freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cBrkrCde", "disabled", false
+        );
+        const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+        rowItem['Ci.cSlsCde']['btnItems'].disabled = false;
+        rowItem['Ci.cBrkrCde']['btnItems'].disabled = false;
+        rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = false;
+      }
+
   }
+  },500)
 }
 /**
  * 设置下拉列表
@@ -984,7 +1006,11 @@ const initProxySales = (row:any)=>{
   const rowData = getFromValue()
   if(rowData.length>0){
     const rowId = rowData[0]._dataId;
-    setValueByRowKey('Ci.cBrkSlsCde',rowId,row.cBrkSlsCde)
+    setValueByRowKey('Ci.cBrkSlsCde',rowId,row.cSlsId)
+    console.log('代理业务员',{
+      code:'Ci.cBrkSlsCde'+rowId,
+      list:row.loadData,
+    })
     freeEditRef.value?.addCodeListMap({
       code:'Ci.cBrkSlsCde'+rowId,
       list:row.loadData,
@@ -1004,6 +1030,7 @@ const intiAgentBroker = (any:any)=>{
   }
 }
 
+
 // 绑定特殊验证器
 const exRules = {};
 function getFromValue() {
@@ -1012,9 +1039,27 @@ function getFromValue() {
 function getSelectRow() {
   return freeEditRef?.value?.getSelectRow();
 }
+
 function setFormValue(value: any) {
   freeEditRef?.value?.setFormValue(value);
-  valideRequired()
+  setTimeout(() => {
+    const tableValue = getFromValue()
+    tableValue.forEach(elem => {
+      if(!!elem["Ci.cSlsCde"] && elem["Ci.cSlsCde"] !== ""){
+        console.log("保费计算完毕",{
+        code:"Ci.cSlsCde"+elem['_dataId'],
+        list:[{value:elem['Ci.cSlsCde'],label:`${elem['Ci.cSlsCde']}${elem['Ci.cSlsNme']}`}]
+        })
+        freeEditRef.value?.addCodeListMap({
+        code:"Ci.cSlsCde"+elem['_dataId'],
+        list:[{value:elem['Ci.cSlsCde'],label:`${elem['Ci.cSlsCde']}${elem['Ci.cSlsNme']}`}]
+        })
+      }
+    });
+  console.log('保费计算后',tableValue)
+    valideRequired()
+  }, 300);
+  
 }
 function setValueByRowKey(props:string ,rowId: any, value:any){
   return freeEditRef?.value?.setValueByRowKey(props,rowId,value);
@@ -1048,6 +1093,7 @@ defineExpose({
   initcbusiner,
   initProxySales,
   intiAgentBroker,
+  valideRequired,
 });
 </script>
 
