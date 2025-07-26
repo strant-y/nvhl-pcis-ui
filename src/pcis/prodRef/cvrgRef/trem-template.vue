@@ -763,12 +763,25 @@ function initMethod(){
     }
 }
 
+function initTermsData(item: any) {
+  if(item.prop === 'Term.cClaimInclude'){ //是否计入累计赔偿限额 默认选择否
+    if(!termdata.value[item.prop]){
+      termdata.value[item.prop] = '0';
+      return true;
+    }
+  }
+  return false;
+}
+
+
 function initshowConfig() {
   // 条款组件遍历,对一些个性化操作进行处理
+  let reflash = false;
   termFactormap.value.forEach((item) => { 
     item.required = isrequired(item);
     item.disabled = isdisabled(item);
 
+    reflash = reflash || initTermsData(item);
     if (item.cFatherKey ) {  //如果存在上级,则将上限设置成0,等待父级修改后,再修改自己的上限
       const mx = getTermData()[item.cFatherKey];
       item.max = 0;
@@ -777,6 +790,10 @@ function initshowConfig() {
       }
     }
   });
+  if(reflash){  // 如果存在初始化数据,则将初始化数据反馈给父级
+    update();
+  }
+
   let grouplist: { [k: string]: any } = {};
   if (groupInfo.value) {
     exChangeFunc();
@@ -1000,7 +1017,6 @@ function setDisabledAll() {
       });
     });
   });
-  console.log(termFactormap.value);
 }
 
 function isrequired(i: any) {
