@@ -177,7 +177,7 @@ const tabs = ref<Array<any>>([
     key: "1",
   },
   {
-    name: "投保单",
+    name: "申请单",
     key: "2",
   },
   {
