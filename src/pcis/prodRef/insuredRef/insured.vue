@@ -585,9 +585,12 @@ const method = {
             rules: null,
           });
       }
+      
+      //是否分支机构
+      if(!getValue('Insured.cIsBranch')){
+          setValue("Insured.cIsBranch", "1");
+      }
     
-      // 是否分支机构
-      setValue("Insured.cIsBranch", "1");
 
       // 个人 移动电话必填  
       setFormItem("Insured.cMobile", {
@@ -1405,7 +1408,9 @@ function cancel(){
 	formconfig.value.fileInputType = ""
 	maindialogVisible.value = false
 }
-
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  insuredEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
@@ -1416,6 +1421,7 @@ defineExpose({
   clearValidate,
   setFormItem,
   change403009,
+  addProvide
 });
 </script>
 

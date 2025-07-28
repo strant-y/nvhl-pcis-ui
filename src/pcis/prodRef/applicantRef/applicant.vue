@@ -449,7 +449,7 @@ const method = {
     }
   },
   //投保人性质(0是法人 1是个人)
-  InsureChange: async (val) => {
+  InsureChange: (val) => {
     console.log('vvvvvvv',val)
     const param = opertaor.getParam();
 
@@ -634,7 +634,10 @@ const method = {
  
       setValue("Applicant.cIsMicroEntpris", "");
       //是否分支机构
-      setValue("Applicant.cIsBranch", "1");
+      if(!getValue('Applicant.cIsBranch')){
+          setValue("Applicant.cIsBranch", "1");
+      }
+    
 
       setFormItem("Applicant.cCntrNme", { rules: null });
       setFormItem("Applicant.tOperaterCertfEndTm", { rules: null });
@@ -1313,7 +1316,9 @@ function cancel(){
 	formconfig.value.fileInputType = ""
 	maindialogVisible.value = false
 }
-
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  applicantEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
@@ -1322,7 +1327,8 @@ defineExpose({
   getValue,
   getFormconfig,
   clearValidate,
-  setFormItem
+  setFormItem,
+  addProvide
 });
 </script>
 

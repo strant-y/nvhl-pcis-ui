@@ -177,14 +177,17 @@ const method = {
             codeListParam: { "CParCde": "subdpt", cParCde: "327001" },
           })
           .then((res) => {
-            freeEditRef.value?.setRowFieldProp(
-                rowId,
-                "Ci.cSubDptCde",
-                "loadData",
-                res
-            );
+            freeEditRef.value?.addCodeListMap({
+              code:"Ci.cSubDptCde"+rowId,
+              list:res,
+            })
           });
     } else {
+      freeEditRef.value?.addCodeListMap({
+            code: "Ci.cSubDptCde"+rowId,
+            list: [{ label: '其他',value: '1',  }]
+          }
+      );
     }
     updateMasterAgreementValues()
   },
@@ -973,8 +976,8 @@ function setFormValue(value: any) {
         list:[{value:elem['Ci.cSlsCde'],label:`${elem['Ci.cSlsCde']}${elem['Ci.cSlsNme']}`}]
         })
         freeEditRef.value?.addCodeListMap({
-        code:"Ci.cSlsCde"+elem['_dataId'],
-        list:[{value:elem['Ci.cSlsCde'],label:`${elem['Ci.cSlsCde']}${elem['Ci.cSlsNme']}`}]
+          code:"Ci.cSlsCde"+elem['_dataId'],
+          list:[{value:elem['Ci.cSlsCde'],label:`${elem['Ci.cSlsCde']}${elem['Ci.cSlsNme']}`}]
         })
       }
     });
@@ -1001,6 +1004,9 @@ function getTableValue(rowId: number, key: string) {
 function getFormconfig(){
   return formconfig1;
 }
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  freeEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
@@ -1016,6 +1022,7 @@ defineExpose({
   initProxySales,
   intiAgentBroker,
   valideRequired,
+  addProvide
 });
 </script>
 

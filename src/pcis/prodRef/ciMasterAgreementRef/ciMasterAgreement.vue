@@ -174,13 +174,17 @@ const setFormItem = (key, obj) => {
 function getFormconfig(){
   return formconfig1;
 }
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  tgtobjEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   setValue,
   getValue,
-  getFormconfig
+  getFormconfig,
+  addProvide
 });
 </script>
 

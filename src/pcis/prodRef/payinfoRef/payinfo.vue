@@ -39,7 +39,6 @@ const method = {
   // func demo
   func1: () => { },
   funcpayadd: () => {
-
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["base"].getFromValue();
     const applicantBefore = tabref["applicant"].getFromValue();
@@ -141,14 +140,17 @@ function setFormItem(key: any, obj: any) {
     });
   }
 }
-
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  payinfoEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   getTableValue,
   getFormconfig,
-  setFormItem
+  setFormItem,
+  addProvide
 });
 </script>
 

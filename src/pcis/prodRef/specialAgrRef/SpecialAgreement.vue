@@ -197,7 +197,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "index",
         inputtype: "rtinput",
         title: "序号",
-        width: 100,
+        width: 55,
       },
       // {
       //   prop: "cIfEdit",
@@ -219,7 +219,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cIfMust",
         inputtype: "rttag",
         title: "Tag",
-        width: 110,
+        width: 80,
         loadData: [
           {
             label: "可选",
@@ -256,18 +256,19 @@ const addData =()=>{
   let obj = [];
   let isAdd = true;
     formData.value.forEach((item)=>{
-      if(item.add){
+      if(item.cSpecialCode === "00000001"){
         isAdd = false;
       }
     })
+    console.log('数据ccc',formData.value)
     if(isAdd){
-      obj =[...formData.value, {
+      obj =[...formData.value, { 
         addIndex: 1,
         cIfEdit: "0",
         cIfFix: "2",
         cIfMust: "2",
-        cSpecialCode: "",
-        add:true,
+        cSpecialCode: "00000001",
+        isAdd:true,
         cSpecialContent: "各期保费应在约定的缴费止期前缴纳，超过约定止期未支付当期保费的，在未支付保费的期间发生保险事故的，本公司按照已缴纳保费及未到缴费期应交保费之和占总保费的比例进行赔偿。",
         // index: formData.value.length+1
       }]

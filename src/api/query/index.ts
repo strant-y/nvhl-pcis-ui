@@ -58,6 +58,14 @@ export function getAppPolicyList(queryParams: any): AxiosPromise<any> {
 }
 
 /**
+ * es查询
+ * @param queryParams
+ */
+export function queryInsuredList(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/queryInsuredList`, queryParams);
+}
+
+/**
  * 保单列表查询
  * @param queryParams
  */

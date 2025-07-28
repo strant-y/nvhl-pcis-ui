@@ -99,6 +99,7 @@ const codeListMap = ref<any>({});
 const customMap = ref<any>({});
 provide('codeListMap', codeListMap.value);
 provide('customMap', customMap.value);
+const idxParam = inject('idxParam', {});
 const btnMap = ref({});
 const { gridEditConfig } = toRefs(props);
 
@@ -119,8 +120,16 @@ function setFormValue(data: any) {
   tableDatas.value = data;
 }
 function validate() {
-  const pro = rttableFrom.value?.tableExvalidate();
-  return pro;
+  return new Promise((resolve) => {
+    rttableFrom.value?.tableExvalidate().then((valid: any) => {
+      if(!valid) {
+        if(idxParam && idxParam.handleAnchorClick && customMap.value?.domId) {
+          idxParam.handleAnchorClick(undefined,`#${customMap.value?.domId}`)
+        }
+      }
+      resolve(valid);
+    });
+  });
 }
 
 function handleRowClick(row: any) {

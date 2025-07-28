@@ -416,7 +416,9 @@ onMounted(() => {
 function getFormconfig() {
   return formconfig1;
 }
-
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  edrbaseEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
@@ -424,5 +426,6 @@ defineExpose({
   setValue,
   getValue,
   getFormconfig,
+  addProvide
 });
 </script>

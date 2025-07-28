@@ -1,16 +1,16 @@
 <template>
   <div>
     <el-row>
-      <el-col :span="24">
-        <div style="background-color: #f3f3f3">
+      <el-col :span="7">
+        <div style="background-color: #f3f3f3;line-height:32px;">
           <span style="font-size: 18px; margin-left: 15px"
             >必须选择至少一项主条款</span
           >
         </div>
       </el-col>
-      <el-col :span="12">
+      <el-col :span="7">
         <div class="search-btn">
-          <div style="width: 50%; float: right">
+          <div style="float: right">
             <div class="inline-block-div" style="width: 75%">
               <rtinput v-model="query.main" :item="{ placeholder: '请输入主条款名称或编码' }" />
             </div>
@@ -25,9 +25,9 @@
           </div>
         </div>
       </el-col>
-      <el-col :span="12">
+      <el-col :span="10">
         <div class="search-btn">
-          <span style="font-size: 16px"> 请选择附加条款责任 </span>
+          <span style="font-size: 16px;line-height: 32px;"> 请选择附加条款责任 </span>
           <div style="width: 50%; float: right">
             <div class="inline-block-div" style="width: 75%">
               <rtinput v-model="query.sub" :item="{ placeholder: '请输入附加条款名称或编码' }" />

@@ -2,7 +2,7 @@
   <div class="dashboard-container">
     <div class="home">
       <div class="top-box">
-        <div class="top-title1">财险承保系统</div>
+        <div class="top-title1">财产险承保系统</div>
         <div class="top-title2">智能高效助力承保，精准把控风险，让财险业务开展更顺畅无忧</div>
         <div class="top-search">
           <rtinput v-model="searchValue" :item="searchItem" />

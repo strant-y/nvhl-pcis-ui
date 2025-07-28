@@ -57,17 +57,9 @@ onMounted(async () => {
   setValue("Base.nPrmRmbExch", "1.000000");
 });
 
-// 绑定方法
-const method = {
-  // func demo
-  func1: () => {
-    console.log(getRules);
-  },
-
-  //缴费拆分按钮事件
-  splitPayNumber() {
-    // needCalc
-    const tabref = opertaor.getTableRefs();
+// 拆分事件
+const nPayNumberFun = (isAdd=false)=>{
+        const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["base"].getFromValue();
     const baseData = opertaor.getDataAll()['base']['needCalc'];
     console.log('opertaor',baseData,opertaor.getDataAll(),baseBefore)
@@ -82,12 +74,16 @@ const method = {
       return false
     }
     if(getValue("Base.nPayNumber")!=''){
-      if(specialAdd){
+      if(specialAdd  && isAdd){
         ElMessage.warning("分期付费业务，需在特别约定中增加及时缴纳保费的提示信息");
-  
         specialAdd = false;
       }
-       eventBus.emit('add-special')
+
+      // 用来添加特约信息
+      if(isAdd){
+         eventBus.emit('add-special')
+      }
+     
       const totalAmount = Number(getValue("Base.nPrm"));
       const splitCount = Number(getValue("Base.nPayNumber"));
       const totalCent = Math.round(totalAmount * 100);
@@ -135,10 +131,21 @@ const method = {
 
       console.log('数据',valArr)
       opertaor.getTableRefByKey("payinfo").setFormValue(valArr); 
+    }
+ } 
 
-      
-  } 
-},
+// 绑定方法
+const method = {
+  // func demo
+  func1: () => {
+    console.log(getRules);
+  },
+
+  //缴费拆分按钮事件
+  splitPayNumber() {
+      nPayNumberFun(true);
+ 
+  },
   //付费约定下拉事件
   cInstMrkChange(val: any) {
     console.log(val)
@@ -384,14 +391,18 @@ function numMulti(num1, num2) {
   }
   return Number(num1.toString().replace('.', '')) * Number(num2.toString().replace('.', '')) / Math.pow(10, baseNum);
 }
-
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  baseEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   setValue,
   getValue,
-  getFormconfig
+  getFormconfig,
+  nPayNumberFun,
+  addProvide
 });
 </script>
 

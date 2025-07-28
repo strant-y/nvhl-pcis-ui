@@ -191,10 +191,22 @@
         </div>
         <div class="main-content">
           <div id="edrbase" v-if="edrbaseFlag" style="margin-bottom: 10px">
-            <edrbaseRef ref="edrbase"></edrbaseRef>
+            <edrbaseRef :ref="(res: any) => {
+              if(res && res.addProvide){
+                res.addProvide('domId', 'edrbase');
+              }
+              edrbase = res
+            }"></edrbaseRef>
           </div>
           <div id="edritem" v-if="edritemFlag" style="margin-bottom: 10px">
-            <edritemRef ref="edritem"></edritemRef>
+            <edritemRef
+              :ref="(res: any) => {
+                if(res && res.addProvide){
+                  res.addProvide('domId', 'edritem');
+                }
+                edritem = res
+              }"
+            ></edritemRef>
           </div>
           <template v-for="(pageConfig, v) in formconfig1" :key="v">
             <div
@@ -220,12 +232,15 @@
               <component
                 v-if="currentIndex >= i"
                 :ref="
-                  (res) => {
+                  (res: any) => {
                     const pageK =
                       k.pageKey === 'dist' || k.pageKey === 'distSummary'
                         ? k.pageCode
                         : k.pageKey;
                     opertaor.addTableRef(pageK, res);
+                    if(res && res.addProvide){
+                      res.addProvide('domId',  k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey);
+                    }
                   }
                 "
                 :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
@@ -236,21 +251,42 @@
             </div>
           </template>
           <div id="ci" v-if="ciFlag" style="margin-bottom: 10px">
-            <ciRef ref="ci"></ciRef>
+            <ciRef
+              :ref="(res: any) => {
+                ci = res
+                if(res && res.addProvide){
+                  res.addProvide('domId', 'ci');
+                }
+              }"
+            ></ciRef>
           </div>
           <div
             id="ciMasterAgreement"
             v-if="ciMasterAgreementFlag"
             style="margin-bottom: 10px"
           >
-            <ciMasterAgreementRef ref="ciMasterAgreement"></ciMasterAgreementRef>
+            <ciMasterAgreementRef
+              :ref="(res: any) => {
+                if(res && res.addProvide){
+                  res.addProvide('domId', 'ciMasterAgreement');
+                }
+                ciMasterAgreement = res
+              }"
+            />
           </div>
           <div
             id="ourCompanyCiShare"
             v-if="ourCompanyCiShareFlag"
             style="margin-bottom: 10px"
           >
-            <ourCompanyCiShareRef ref="ourCompanyCiShare"></ourCompanyCiShareRef>
+            <ourCompanyCiShareRef
+              :ref="(res: any) => {
+                if(res && res.addProvide){
+                  res.addProvide('domId', 'ourCompanyCiShare');
+                }
+                ourCompanyCiShare = res
+              }"
+            />
           </div>
           <div
             id="underwriteurl"
@@ -501,6 +537,8 @@ const isDetailCde = () => {
 const getNo = computed(() => {
   return edrbaseFlag.value ? edrbase.value?.getValue('EdrBase.cAppNo') : props.param?.pageName === "priceInquiry" ? opertaor.getTableRefByKey('plyBase')?.getValue('Base.cInquiryNo') || '暂无' : opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || '暂无'
 })
+// 储存原始组件配置信息
+const oldProductResData = ref({})
 
 onMounted(() => {
   console.log('param 路由---', props.param )
@@ -1040,6 +1078,7 @@ const initPage = async () => {
   }
   // 页面初始化
   const formconfig11 = JSON.parse(getProductRes.data);
+  oldProductResData.value = JSON.parse(getProductRes.data);
   // 初始化全页面下拉选一次性获取,解决页面响应效率
   const codeinit = getAllcodelist(formconfig11);
   let codeparam = [];
@@ -2318,6 +2357,7 @@ const calcPremium = () => {
       // const ciInfo = setCiInfo(ops["base"]);
       // opertaor.getTableRefs()["ci"].setFormValue(ciInfo); //生产联共保信息
       needCalc.value = false;
+      opertaor.getTableRefByKey("base").nPayNumberFun();
 
 //  opertaor.getTableRefs()["base"].setValue("Base.groupPrmCur", 122);
 
@@ -2674,10 +2714,10 @@ const savePlyInfo = async () => {
   if(payList && payList.length>0){
       let numS =0;
         payList.forEach((item) => {
-        numS+= item['Pay.nPayablePrm']
-      });
-      if(numS>res['base']['Base.nPrm']){
-
+              numS+= item['Pay.nPayablePrm']
+          });
+      let formattedSum = Number(numS.toFixed(2));
+      if(formattedSum>res['base']['Base.nPrm']){
         ElMessage.error('缴费计划“应收保费”之和大于整单保费！')
          btn.loading = false;
         return false;
@@ -3260,7 +3300,10 @@ const submitEdrToUndrFun = async () => {
     ElMessage.warning("请填写批改信息中的必填项")
     return
   }
-
+  // const rv = await opertaor.validateAll();
+  // if (!rv) {
+  //   return;
+  // }
   // 账户信息校验
    let acctinfoValidate =await opertaor.getTableRefByKey('acctinfo')?.validate()  // 账户信息 必填校验
    let isAcctinfo = isDetailCde(); // 是否有账户信息
@@ -3720,7 +3763,9 @@ function handleAnchorClick(event: any, targetId: string) {
       item.classList.remove('isActive')
     })
   }
-  event.currentTarget.classList.add('isActive')
+  if(event) {
+    event.currentTarget.classList.add('isActive')
+  }
 }
 
 opertaor.setFatherPage({
@@ -3730,11 +3775,16 @@ opertaor.setFatherPage({
   setTmDay: setTmDay,
   setnDelayNum: setnDelayNum,
   getSaveDataParams: getSaveDataParams,
-  getEdrbaseValue: getEdrbaseValue
+  getEdrbaseValue: getEdrbaseValue,
+  getOldProductResData: getOldProductResData,
 });
 
 function getEdrbaseValue(key:any) {
   return edrbase.value
+}
+
+function getOldProductResData() {
+  return oldProductResData.value;
 }
 
 // 保存模板

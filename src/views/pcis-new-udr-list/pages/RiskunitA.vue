@@ -800,6 +800,11 @@ const tableconfig2 = reactive<AppTableConfig>(
         title: "分出比例(%)",
         minWidth: 180,
         readOnly: true,
+        formatter:(val:any) => {
+          if(val) {
+            return val + '%'
+          }
+        }
       },
     ],
   })

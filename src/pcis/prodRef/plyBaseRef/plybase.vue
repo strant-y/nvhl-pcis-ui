@@ -80,9 +80,6 @@ onMounted(async () => {
       });
     }
 
-    //
-    // setValue("Base.cCiOprRel", 123);
-
     // 查询承保机构所属分公司和项目类别大类数据
     getCheckCdeptByCdptCde();
     //回显机构部门数据
@@ -164,11 +161,10 @@ const method = {
     // 录单人联系方式
     if(val=='1'|| val=='2'||val=='5'){
       // Base.cCiOprRel
-          setFormItem("Base.cCiOprRel", { rules: [getRules("required", {})] }); //代理合作协议
+          setFormItem("Base.cCiOprRel", { rules: [getRules("required", {}),getRules("phoneNo", {})] }); 
     }else{
-           setFormItem("Base.cCiOprRel", { rules: [] });
+           setFormItem("Base.cCiOprRel", { rules: [getRules("phoneNo", {})] });
     }
-
 
   },
   //业务来源大类
@@ -814,6 +810,9 @@ function setForSelectFilterable() {
 function getFormconfig() {
   return formconfig1;
 }
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  plyBaseEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
@@ -821,6 +820,7 @@ defineExpose({
   setValue,
   getValue,
   getFormconfig,
+  addProvide
 });
 </script>
 
