@@ -203,13 +203,13 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "nSeqNo",
         inputtype: "rtinput",
         title: "序号",
-        width: 100,
+        width: 55,
       },
       {
         prop: "cIfMust",
         inputtype: "rttag",
         title: "是否可选",
-        width: 110,
+        width: 85,
         loadData: [
           {
             label: "可选",
@@ -225,13 +225,13 @@ const tableconfig = reactive<AppTableConfig>(
           },
         ],
       },
-      {
-        prop: "cDeductibleClass",
-        // prop: "cDeductibleCode",
-        inputtype: "rtinput",
-        title: "免赔条件ID",
-        width: 180,
-      },
+      // {
+      //   prop: "cDeductibleClass",
+      //   // prop: "cDeductibleCode",
+      //   inputtype: "rtinput",
+      //   title: "免赔条件ID",
+      //   width: 180,
+      // },
       {
         prop: "cDeductibleContent",
         inputtype: "rtinput",
