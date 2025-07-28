@@ -721,11 +721,10 @@ const method = {
             ...formconfig1.value,
             file: base64String, // ✅ 正确传入
             cComponentTable: cComponentTableValue,
+            cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
           };
           if(route.params.param?.pageName === "priceInquiry") {
             params['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
-          } else {
-            params['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
           }
 
           policyService.importDistIncrement(params).then((res) => {
