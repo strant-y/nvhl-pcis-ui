@@ -845,7 +845,7 @@ const valideRequired = ()=>{
         freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.cDptCde", "disabled", true
         );
-        // freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cSlsCde","rules",[])
+        freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cSlsCde","rules",[])
         freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cBrkSlsCde","rules",[])
         freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cBrkrCde","rules",[])
         freeEditRef.value?.setRowFieldProp(
