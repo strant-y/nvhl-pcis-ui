@@ -64,7 +64,6 @@ onMounted(async () => {
     freeEditRef.value?.getRowAllItemRefById()
     tableList.forEach((item:any) => {
       const rowItem  =  freeEditRef.value?.getRowAllItemRefById(item._dataId)
-      debugger
       if(item['Ci.cChiefMrk'] == '1'){
         rowItem['Ci.nCiShare'].disabled = false
       }
@@ -185,59 +184,7 @@ const method = {
                 res
             );
           });
-          nextTick(()=>{
-            // freeEditRef.value?.setRowFieldProp(
-            //     rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
-            // );
-            // freeEditRef.value?.setRowFieldProp(
-            //     rowData._dataId, "Ci.cDptCde", "disabled",false
-            // );
-            // freeEditRef.value?.setRowFieldProp(
-            //         rowData._dataId, "Ci.cSlsCde", "disabled", true
-            //   );
-            // freeEditRef.value?.setRowFieldProp(
-            //         rowData._dataId, "Ci.cBrkrCde", "disabled", true
-            //   );
-            // freeEditRef.value?.setRowFieldProp(
-            //       rowData._dataId, "Ci.cBrkSlsCde", "disabled", true
-            //   );
-            // freeEditRef.value?.setRowFieldProp(
-            //       rowData._dataId, "Ci.cSlsCde", "rules", [getRules("required", {})]
-            //   );
-                // const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
-                // rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
-                // rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
-                // rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
-          })
     } else {
-      // 非永安保险，设置默认值和其他数据
-      // freeEditRef.value?.addCodeListMap(
-      //     {code: "Ci.cSubDptCde"+rowId,
-      //      list: [{ label: '其他',value: '1',  }]
-      //     }
-      // );
-      // freeEditRef.value?.setRowFieldProp(
-      //           rowData._dataId, "Ci.cDptCde", "rules", []
-      // );
-      // freeEditRef.value?.setRowFieldProp(
-      //           rowData._dataId, "Ci.cDptCde", "disabled", true
-      // );
-      // freeEditRef.value?.setRowFieldProp(
-      //       rowData._dataId, "Ci.cSlsCde", "disabled", false
-      // );
-      // freeEditRef.value?.setRowFieldProp(
-      //         rowData._dataId, "Ci.cBrkrCde", "disabled", false
-      // );
-      // freeEditRef.value?.setRowFieldProp(
-      //         rowData._dataId, "Ci.cBrkSlsCde", "disabled", false
-      // );
-      // freeEditRef.value?.setRowFieldProp(
-      //         rowData._dataId, "Ci.cSlsCde", "rules", []
-      //     );
-      // const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
-      // rowItem['Ci.cSlsCde']['btnItems'].disabled = false;
-      // rowItem['Ci.cBrkrCde']['btnItems'].disabled = false;
-      // rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = false;
     }
     updateMasterAgreementValues()
   },
@@ -276,29 +223,6 @@ const method = {
               }
           );
         });
-        nextTick(()=>{
-          // freeEditRef.value?.setRowFieldProp(
-          //       rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
-          //   );
-          // freeEditRef.value?.setRowFieldProp(
-          //       rowData._dataId, "Ci.cDptCde", "disabled", false
-          //  );
-          // freeEditRef.value?.setRowFieldProp(
-          //         rowData._dataId, "Ci.cSlsCde", "disabled", true
-          //   );
-          // freeEditRef.value?.setRowFieldProp(
-          //         rowData._dataId, "Ci.cBrkrCde", "disabled", true
-          //   );
-          // freeEditRef.value?.setRowFieldProp(
-          //       rowData._dataId, "Ci.cBrkSlsCde", "disabled", true
-          //   );
-          // freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cSlsCde","rules",[getRules("required", {})])
-          // const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
-          // rowItem['Ci.cSlsCde']['btnItems'].disabled = false;
-          // rowItem['Ci.cBrkrCde']['btnItems'].disabled = false;
-          // rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = false;
-        })
-        
         if (plyBasedata["Base.cCiMrk"] === "3" || plyBasedata["Base.cCiMrk"] === "4") {
           const isYonganAlreadyPresent = formTableData.some(
             (row) => row._dataId !== rowId && row['Ci.cCoinsurerCde'] === "327001"
@@ -316,22 +240,6 @@ const method = {
             list: [{ label: '其他',value: '1',  }]
           }
       );
-      // freeEditRef.value?.setRowFieldProp(rowData._dataId, "Ci.cDptCde", "rules", []);
-      // freeEditRef.value?.setRowFieldProp(rowData._dataId, "Ci.cDptCde", "disabled", true);
-      // freeEditRef.value?.setRowFieldProp(
-      //           rowData._dataId, "Ci.cSlsCde", "disabled", false
-      //   );
-      //   freeEditRef.value?.setRowFieldProp(
-      //           rowData._dataId, "Ci.cBrkrCde", "disabled", false
-      //   );
-      //   freeEditRef.value?.setRowFieldProp(
-      //           rowData._dataId, "Ci.cBrkSlsCde", "disabled", false
-      //   );
-      //   freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cSlsCde","rules",[])
-      //   const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
-      //   rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
-      //   rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
-      //   rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
       freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "1");
       freeEditRef.value?.setValueByRowKey("Ci.cDptCde", rowId, "");
     }
@@ -461,11 +369,14 @@ const method = {
           }
         }
       }
-      // if(val === "1"){
-      //   freeEditRef?.value?.setValueByRowKey("Ci.nPlyFeeRate", rowId, "disabled",true);
-      // }else{
-      //   freeEditRef?.value?.setValueByRowKey("Ci.nPlyFeeRate", rowId, "disabled",false);
-      // }
+      allRows.forEach((item:any) => {
+        const rowItem  =  freeEditRef.value?.getRowAllItemRefById(item._dataId)
+        if(item['Ci.cIssueMrk'] == '1'){
+          rowItem['Ci.nPlyFeeRate'].disabled = true
+        }else{
+          rowItem['Ci.nPlyFeeRate'].disabled = false
+        }
+      })
   },
   //主共标志下拉事件
   cChiefMrkChange:(val)=>{
@@ -670,11 +581,12 @@ const method = {
         },
         method: {
           getSelected: (params) => {
-            // setFormItem("Ci.cBrkrCde", {
-            //   loadData: [{ value: params.CChaCde, label: params.CChaNme }],
-            // });
+            setFormItem("Ci.cBrkrCde", {
+              loadData: [{ value: params.CChaCde, label: params.CChaNme }],
+            });
             freeEditRef?.value?.setValueByRowKey("Ci.cBrkrCde", rowId, params.CChaCde);
-            freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData","")
+            // freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData",[{ label: `${params.CChaCde}${params.CSlsNme}`, value: params.CChaCde }])
+            freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData",[])
             dialogRef.value?.handleClose();
           },
         },
@@ -967,7 +879,13 @@ const valideRequired = ()=>{
         rowItem['Ci.cBrkrCde']['btnItems'].disabled = false;
         rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = false;
       }
-
+      if(rowData['Ci.cIssueMrk'] == '1'){
+        freeEditRef.value?.setRowFieldProp(
+        rowData._dataId, "Ci.nPlyFeeRate", "disabled", true );
+      }else{
+        freeEditRef.value?.setRowFieldProp(
+        rowData._dataId, "Ci.nPlyFeeRate", "disabled", false );
+      }
   }
   },500)
 }
@@ -1039,7 +957,6 @@ function getFromValue() {
 function getSelectRow() {
   return freeEditRef?.value?.getSelectRow();
 }
-
 function setFormValue(value: any) {
   freeEditRef?.value?.setFormValue(value);
   setTimeout(() => {
