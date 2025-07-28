@@ -113,6 +113,9 @@ const cascprops: CascaderProps = {
       if(props.item.typeCode === "EDR_RSN_LIST_NEW" || props.item.typeCode ==='EDR_RSN_LIST_YY' || props.item.typeCode ==='EDR_RSN_LIST_AY') {
         codeListParam.rsnTyp = value.split('-')[0]
         codeListParam.kindNo = value.split('-')[1]
+        if (props.row && props.row.cProdNo) {
+          codeListParam.prodNo = props.row.cProdNo;
+        }
       } else {
         codeListParam.cParCde = value
       }
