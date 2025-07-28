@@ -2,8 +2,8 @@
   <!-- 下拉选择框-->
   <template v-if="!showLabel">
     <el-tooltip
-      :content="getLabel"
-      :disabled="getLabel ? false : true"
+      :content="changeContent ? changeContent : getLabel()"
+      :disabled="!changeContent && (getLabel() ? false : true)"
       placement="top"
     >
       <el-select
@@ -88,7 +88,7 @@
       >
     </template>
     <template v-else>
-      {{ getLabel }}
+      {{ getLabel() }}
     </template>
   </span>
 </template>
@@ -125,6 +125,7 @@ const props = defineProps({
 });
 
 const customClass = ref<string[]>([]);
+const changeContent = ref<string | undefined>();
 
 interface OptionTypeBySelect extends OptionType {
   color?: string;
@@ -327,20 +328,24 @@ function isDisabled() {
 }
 
 function handleChange(val?: string | number | Array<any> | undefined) {
-  const option = options.value.find((item) => item.value === val);
+  // const option = options.value.find((item) => item.value === val);
   emits("valueChange", val);
   emits("update:modelValue", val);
   // props.item.func ? props.item.func(val, option) : null;
 }
-const getLabel = computed(() =>  {
+function getLabel(val: any = undefined) {
+  let values = val;
+  if(!values) {
+    values = selectedValue.value
+  }
   getCodeListMapToOption();
   if (options.value && options.value.length > 0) {
-    const se = options.value.find((item) => item.value === selectedValue.value);
+    const se = options.value.find((item) => item.value === values);
     if (se) {
       return se.label;
     }
   }
-});
+};
 
 onMounted(() => {
   // 初始化组件数据
@@ -414,8 +419,16 @@ function getParam() {
 function setCustomClass(classs: string[]) {
   customClass.value = classs;
 }
+function setChangeInfo(content: any) {
+  if(content) {
+    changeContent.value = (content.text ? getLabel(content.text) : '') + ' 变更为 ' +  getLabel();
+  }else {
+    changeContent.value = undefined;
+  }
+}
 defineExpose({
   updateOption,
-  setCustomClass
+  setCustomClass,
+  setChangeInfo
 });
 </script>
