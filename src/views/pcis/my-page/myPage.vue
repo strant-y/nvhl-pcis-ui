@@ -537,6 +537,8 @@ const isDetailCde = () => {
 const getNo = computed(() => {
   return edrbaseFlag.value ? edrbase.value?.getValue('EdrBase.cAppNo') : props.param?.pageName === "priceInquiry" ? opertaor.getTableRefByKey('plyBase')?.getValue('Base.cInquiryNo') || '暂无' : opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || '暂无'
 })
+// 储存原始组件配置信息
+const oldProductResData = ref({})
 
 onMounted(() => {
   console.log('param 路由---', props.param )
@@ -1076,6 +1078,7 @@ const initPage = async () => {
   }
   // 页面初始化
   const formconfig11 = JSON.parse(getProductRes.data);
+  oldProductResData.value = JSON.parse(getProductRes.data);
   // 初始化全页面下拉选一次性获取,解决页面响应效率
   const codeinit = getAllcodelist(formconfig11);
   let codeparam = [];
@@ -3772,11 +3775,16 @@ opertaor.setFatherPage({
   setTmDay: setTmDay,
   setnDelayNum: setnDelayNum,
   getSaveDataParams: getSaveDataParams,
-  getEdrbaseValue: getEdrbaseValue
+  getEdrbaseValue: getEdrbaseValue,
+  getOldProductResData: getOldProductResData,
 });
 
 function getEdrbaseValue(key:any) {
   return edrbase.value
+}
+
+function getOldProductResData() {
+  return oldProductResData.value;
 }
 
 // 保存模板
