@@ -44,12 +44,12 @@ const fixSpecData = ref([]); //存储已选择的特别约定数据
 let specialAdd = true;
 onMounted(async () => {
   const formconfig11 = formInit(
-    JSON.stringify(props.pageSchema),
-    method,
-    exRules
+      JSON.stringify(props.pageSchema),
+      method,
+      exRules
   );
   Object.assign(formconfig1, formconfig11);
-  
+
   if (sessionStorage.getItem("toMyPageData")) {
     sessionData.value = JSON.parse(sessionStorage.getItem("toMyPageData"));
   }
@@ -84,10 +84,10 @@ const method = {
     if(getValue("Base.nPayNumber")!=''){
       if(specialAdd){
         ElMessage.warning("分期付费业务，需在特别约定中增加及时缴纳保费的提示信息");
-  
+
         specialAdd = false;
       }
-       eventBus.emit('add-special')
+      eventBus.emit('add-special')
       const totalAmount = Number(getValue("Base.nPrm"));
       const splitCount = Number(getValue("Base.nPayNumber"));
       const totalCent = Math.round(totalAmount * 100);
@@ -100,45 +100,45 @@ const method = {
       }
 
       result.value = result.value.map(cent => parseFloat((cent / 100).toFixed(2)));
-       
+
       console.log('12123,',result)
       let val= {}
       let valArr=[]
       for (let i = 0; i < Number(getValue("Base.nPayNumber")); i++) {
         let BgnTmDate = new Date(opertaor.getTableRefs()["insrnc"].getValue("Base.tInsrncBgnTm"))   // 开始时间
-        let startDate = new Date(BgnTmDate); 
+        let startDate = new Date(BgnTmDate);
         let endDate = new Date(BgnTmDate)
         if (getValue("Base.cInstMrk")=='5') {
-          startDate.setDate(BgnTmDate.getDate() + i * 15); 
-          endDate.setDate(BgnTmDate.getDate() + (i + 1) * 15); 
+          startDate.setDate(BgnTmDate.getDate() + i * 15);
+          endDate.setDate(BgnTmDate.getDate() + (i + 1) * 15);
         } else {
-          startDate.setDate(BgnTmDate.getDate() + i * 30); 
-          endDate.setDate(BgnTmDate.getDate() + (i + 1) * 30); 
+          startDate.setDate(BgnTmDate.getDate() + i * 30);
+          endDate.setDate(BgnTmDate.getDate() + (i + 1) * 30);
         }
 
         let tInsrncBgnTm = formatDate(startDate, 'yyyy-MM-dd HH:mm:ss')
         // let tPayEndTm = formatDate(endDate,'yyyy-MM-dd HH:mm:ss')
- 
+
         let tPayEndTm = dayjs(endDate).add(-1,'second').format("YYYY-MM-DD HH:mm:ss")
-           val= { "_dataId": "",
-            "Pay.nTms":i+1 ,
-            "Pay.cPayorCde": opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppCde"),
-            "Pay.tPayBgnTm": tInsrncBgnTm,
-            "Pay.tPayEndTm": tPayEndTm,
-            "Pay.nOwnPrm": result.value[i] || 0 , 
-            "Pay.cPayorNme":opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppNme"),
-            "Pay.nPayablePrm": result.value[i] || 0, 
-            "Pay.nPrmVar": result.value[i]  
-          }
-          valArr.push(val)
+        val= { "_dataId": "",
+          "Pay.nTms":i+1 ,
+          "Pay.cPayorCde": opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppCde"),
+          "Pay.tPayBgnTm": tInsrncBgnTm,
+          "Pay.tPayEndTm": tPayEndTm,
+          "Pay.nOwnPrm": result.value[i] || 0 ,
+          "Pay.cPayorNme":opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppNme"),
+          "Pay.nPayablePrm": result.value[i] || 0,
+          "Pay.nPrmVar": result.value[i]
+        }
+        valArr.push(val)
       }
 
       console.log('数据',valArr)
-      opertaor.getTableRefByKey("payinfo").setFormValue(valArr); 
+      opertaor.getTableRefByKey("payinfo").setFormValue(valArr);
 
-      
-  } 
-},
+
+    }
+  },
   //付费约定下拉事件
   cInstMrkChange(val: any) {
     console.log(val)
@@ -148,7 +148,7 @@ const method = {
     }else if(val=='0'){
       setFormItem("Base.nPayNumber", { disabled: true, });
       setValue('Base.nPayNumber',1)
-      
+
     }
   },
   //争议处理选择事件
@@ -160,21 +160,21 @@ const method = {
       setValue("Base.cDisptSttlOrg", "提交____仲裁委员会");
     }else{
       setFormItem("Base.cDisptSttlOrg", {rules: [] });
-      setValue("Base.cDisptSttlOrg", "");   
+      setValue("Base.cDisptSttlOrg", "");
     }
-    
+
   },
   //总保费下拉事件
   cPrmCurChange: (val: any) => {
     if (val !== "CNY") {
       codeListStore
-        .queryCodeList({
-          codeListName: "WEB_BAS_CHGRATE",
-          codeListParam: { value: val },
-        })
-        .then((res) => {
-          setValue("Base.nPrmRmbExch", res[0].currency_rate);
-        });
+          .queryCodeList({
+            codeListName: "WEB_BAS_CHGRATE",
+            codeListParam: { value: val },
+          })
+          .then((res) => {
+            setValue("Base.nPrmRmbExch", res[0].currency_rate);
+          });
     } else {
       setValue("Base.nPrmRmbExch", "1.000000");
     }
@@ -183,14 +183,14 @@ const method = {
   cAmtCurChange(val: any) {
     if (val !== "CNY") {
       codeListStore
-        .queryCodeList({
-          codeListName: "WEB_BAS_CHGRATE",
-          codeListParam: { value: val },
-        })
-        .then((res) => {
-          console.log("0000000", res);
-          setValue("Base.nAmtRmbExch", res[0].currency_rate);
-        });
+          .queryCodeList({
+            codeListName: "WEB_BAS_CHGRATE",
+            codeListParam: { value: val },
+          })
+          .then((res) => {
+            console.log("0000000", res);
+            setValue("Base.nAmtRmbExch", res[0].currency_rate);
+          });
     } else {
       setValue("Base.nAmtRmbExch", "1.000000");
     }
@@ -224,40 +224,40 @@ const method = {
   // 特别约定ICON事件
   selectCUnfixSpc: () => {
     dialogRef.value?.open(
-      "prdFixSpec",
-      {
-        type: "show",
-        data: {
-          cProdNo: sessionData.value?.cProdNo,
-          fixSpecData: fixSpecData.value, //之前选中的数据数组
-        },
-        method: {
-          getSelected: (params) => {
-            if (params && params.length) {
-              fixSpecData.value = params;
-              let i = 1;
-              // let cSpecNo = '';
-              let cUnfixSpc = "";
-              params.forEach((value) => {
-                // cSpecNo = '' === cSpecNo ? value['PrdFixSpec.CSpecNo'] : cSpecNo + '$$' + value['PrdFixSpec.CSpecNo'];
-                cUnfixSpc =
-                  "" === cUnfixSpc
-                    ? i + "." + value["PrdFixSpec.CNmeCn"]
-                    : cUnfixSpc + "\n" + i + "." + value["PrdFixSpec.CNmeCn"];
-                setValue("Base.cUnfixSpc", cUnfixSpc);
-                i++;
-              });
-            }
-            dialogRef.value?.handleClose();
+        "prdFixSpec",
+        {
+          type: "show",
+          data: {
+            cProdNo: sessionData.value?.cProdNo,
+            fixSpecData: fixSpecData.value, //之前选中的数据数组
+          },
+          method: {
+            getSelected: (params) => {
+              if (params && params.length) {
+                fixSpecData.value = params;
+                let i = 1;
+                // let cSpecNo = '';
+                let cUnfixSpc = "";
+                params.forEach((value) => {
+                  // cSpecNo = '' === cSpecNo ? value['PrdFixSpec.CSpecNo'] : cSpecNo + '$$' + value['PrdFixSpec.CSpecNo'];
+                  cUnfixSpc =
+                      "" === cUnfixSpc
+                          ? i + "." + value["PrdFixSpec.CNmeCn"]
+                          : cUnfixSpc + "\n" + i + "." + value["PrdFixSpec.CNmeCn"];
+                  setValue("Base.cUnfixSpc", cUnfixSpc);
+                  i++;
+                });
+              }
+              dialogRef.value?.handleClose();
+            },
           },
         },
-      },
-      {
-        isOk: (selectdata: any) => {
-          console.log("a", selectdata);
+        {
+          isOk: (selectdata: any) => {
+            console.log("a", selectdata);
+          },
         },
-      },
-      { title: "特别约定", width: 85 }
+        { title: "特别约定", width: 85 }
     );
   },
   // 短期费率类型
@@ -272,10 +272,10 @@ const method = {
       ratioType:val
     }
     policyRatio(param).then((res: any) => {
-      const { code, data, msg } = res;      
+      const { code, data, msg } = res;
       if (code === 200) {
         setValue("Base.nRatioCoef",Number(data).toFixed(6));
-        }
+      }
     });
   },
   // 总保额(累计赔偿限额)change事件
@@ -301,9 +301,9 @@ const method = {
   aAmtChange:(val:any)=>{
     const namtExch = getValue('Base.nAmtRmbExch');
     if (!!namtExch) {
-        // 计算折人民币保额
-        setValue("Base.nRmbAmt", numMulti(namtExch, val));
-      }
+      // 计算折人民币保额
+      setValue("Base.nRmbAmt", numMulti(namtExch, val));
+    }
   },
   // 总保额(累计赔偿限额)汇率change事件
   nAmtRmbExchChange: (val: any) => {
@@ -384,17 +384,14 @@ function numMulti(num1, num2) {
   }
   return Number(num1.toString().replace('.', '')) * Number(num2.toString().replace('.', '')) / Math.pow(10, baseNum);
 }
-function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
-  baseEditRef?.value?.addProvide(key, value);
-}
+
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   setValue,
   getValue,
-  getFormconfig,
-  addProvide
+  getFormconfig
 });
 </script>
 

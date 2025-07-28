@@ -39,7 +39,6 @@ const method = {
   // func demo
   func1: () => { },
   funcpayadd: () => {
-
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["base"].getFromValue();
     const applicantBefore = tabref["applicant"].getFromValue();

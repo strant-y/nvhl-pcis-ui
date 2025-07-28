@@ -74,7 +74,7 @@ export const getData = () => {
     dataInit["Insured.cCustRiskRank"] = "925104";
     //设置是否单项工程默认值：是
     dataInit["Tgt.cIsSingle"] = "1";
-    dataInit["Tgt.cContractCurrency"] = "01";
+    dataInit["Tgt.cContractCurrency"] = "CNY";
     //光船租赁标志程、船舶抵押标志、保赔协会成员标志默认值：否
     dataInit["Tgt.cRentalLogo"] = "0";
     dataInit["Tgt.cMortgageMark"] = "0";

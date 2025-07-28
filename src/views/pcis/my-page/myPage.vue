@@ -2354,6 +2354,7 @@ const calcPremium = () => {
       // const ciInfo = setCiInfo(ops["base"]);
       // opertaor.getTableRefs()["ci"].setFormValue(ciInfo); //生产联共保信息
       needCalc.value = false;
+      opertaor.getTableRefByKey("base").nPayNumberFun();
 
 //  opertaor.getTableRefs()["base"].setValue("Base.groupPrmCur", 122);
 
@@ -2710,10 +2711,10 @@ const savePlyInfo = async () => {
   if(payList && payList.length>0){
       let numS =0;
         payList.forEach((item) => {
-        numS+= item['Pay.nPayablePrm']
-      });
-      if(numS>res['base']['Base.nPrm']){
-
+              numS+= item['Pay.nPayablePrm']
+          });
+      let formattedSum = Number(numS.toFixed(2));
+      if(formattedSum>res['base']['Base.nPrm']){
         ElMessage.error('缴费计划“应收保费”之和大于整单保费！')
          btn.loading = false;
         return false;
