@@ -157,6 +157,7 @@ const formconfig1 = ref<AppFreeEditConfig>(
             }
             if(route.params.param?.pageName === "priceInquiry") {
               params.cInquiryNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+              params.dist['Dist.cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"];
             } else {
               params.cAppNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
             }
