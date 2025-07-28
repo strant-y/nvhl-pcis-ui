@@ -1004,6 +1004,9 @@ function getTableValue(rowId: number, key: string) {
 function getFormconfig(){
   return formconfig1;
 }
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  freeEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
@@ -1019,6 +1022,7 @@ defineExpose({
   initProxySales,
   intiAgentBroker,
   valideRequired,
+  addProvide
 });
 </script>
 

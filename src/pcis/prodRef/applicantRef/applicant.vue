@@ -1313,7 +1313,9 @@ function cancel(){
 	formconfig.value.fileInputType = ""
 	maindialogVisible.value = false
 }
-
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  applicantEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
@@ -1322,7 +1324,8 @@ defineExpose({
   getValue,
   getFormconfig,
   clearValidate,
-  setFormItem
+  setFormItem,
+  addProvide
 });
 </script>
 

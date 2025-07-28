@@ -383,14 +383,17 @@ function setFormItem(key: any, obj: any) {
 function getFormconfig() {
   return formconfig1;
 }
-
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  insrncEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   setValue,
   getValue,
-  getFormconfig
+  getFormconfig,
+  addProvide
 });
 </script>
 

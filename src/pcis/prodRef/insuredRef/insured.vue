@@ -1405,7 +1405,9 @@ function cancel(){
 	formconfig.value.fileInputType = ""
 	maindialogVisible.value = false
 }
-
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  insuredEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
@@ -1416,6 +1418,7 @@ defineExpose({
   clearValidate,
   setFormItem,
   change403009,
+  addProvide
 });
 </script>
 

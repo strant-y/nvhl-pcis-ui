@@ -814,6 +814,9 @@ function setForSelectFilterable() {
 function getFormconfig() {
   return formconfig1;
 }
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  plyBaseEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
@@ -821,6 +824,7 @@ defineExpose({
   setValue,
   getValue,
   getFormconfig,
+  addProvide
 });
 </script>
 

@@ -141,14 +141,17 @@ function setFormItem(key: any, obj: any) {
     });
   }
 }
-
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  payinfoEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   getTableValue,
   getFormconfig,
-  setFormItem
+  setFormItem,
+  addProvide
 });
 </script>
 

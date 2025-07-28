@@ -191,10 +191,22 @@
         </div>
         <div class="main-content">
           <div id="edrbase" v-if="edrbaseFlag" style="margin-bottom: 10px">
-            <edrbaseRef ref="edrbase"></edrbaseRef>
+            <edrbaseRef :ref="(res: any) => {
+              if(res && res.addProvide){
+                res.addProvide('domId', 'edrbase');
+              }
+              edrbase = res
+            }"></edrbaseRef>
           </div>
           <div id="edritem" v-if="edritemFlag" style="margin-bottom: 10px">
-            <edritemRef ref="edritem"></edritemRef>
+            <edritemRef
+              :ref="(res: any) => {
+                if(res && res.addProvide){
+                  res.addProvide('domId', 'edritem');
+                }
+                edritem = res
+              }"
+            ></edritemRef>
           </div>
           <template v-for="(pageConfig, v) in formconfig1" :key="v">
             <div
@@ -220,12 +232,15 @@
               <component
                 v-if="currentIndex >= i"
                 :ref="
-                  (res) => {
+                  (res: any) => {
                     const pageK =
                       k.pageKey === 'dist' || k.pageKey === 'distSummary'
                         ? k.pageCode
                         : k.pageKey;
                     opertaor.addTableRef(pageK, res);
+                    if(res && res.addProvide){
+                      res.addProvide('domId',  k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey);
+                    }
                   }
                 "
                 :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
@@ -236,21 +251,42 @@
             </div>
           </template>
           <div id="ci" v-if="ciFlag" style="margin-bottom: 10px">
-            <ciRef ref="ci"></ciRef>
+            <ciRef
+              :ref="(res: any) => {
+                ci = res
+                if(res && res.addProvide){
+                  res.addProvide('domId', 'ci');
+                }
+              }"
+            ></ciRef>
           </div>
           <div
             id="ciMasterAgreement"
             v-if="ciMasterAgreementFlag"
             style="margin-bottom: 10px"
           >
-            <ciMasterAgreementRef ref="ciMasterAgreement"></ciMasterAgreementRef>
+            <ciMasterAgreementRef
+              :ref="(res: any) => {
+                if(res && res.addProvide){
+                  res.addProvide('domId', 'ciMasterAgreement');
+                }
+                ciMasterAgreement = res
+              }"
+            />
           </div>
           <div
             id="ourCompanyCiShare"
             v-if="ourCompanyCiShareFlag"
             style="margin-bottom: 10px"
           >
-            <ourCompanyCiShareRef ref="ourCompanyCiShare"></ourCompanyCiShareRef>
+            <ourCompanyCiShareRef
+              :ref="(res: any) => {
+                if(res && res.addProvide){
+                  res.addProvide('domId', 'ourCompanyCiShare');
+                }
+                ourCompanyCiShare = res
+              }"
+            />
           </div>
           <div
             id="underwriteurl"
@@ -3260,7 +3296,10 @@ const submitEdrToUndrFun = async () => {
     ElMessage.warning("请填写批改信息中的必填项")
     return
   }
-
+  // const rv = await opertaor.validateAll();
+  // if (!rv) {
+  //   return;
+  // }
   // 账户信息校验
    let acctinfoValidate =await opertaor.getTableRefByKey('acctinfo')?.validate()  // 账户信息 必填校验
    let isAcctinfo = isDetailCde(); // 是否有账户信息
@@ -3720,7 +3759,9 @@ function handleAnchorClick(event: any, targetId: string) {
       item.classList.remove('isActive')
     })
   }
-  event.currentTarget.classList.add('isActive')
+  if(event) {
+    event.currentTarget.classList.add('isActive')
+  }
 }
 
 opertaor.setFatherPage({
