@@ -61,7 +61,7 @@ onMounted(() => {
     if(!getValue('ECargoBase.cPayWay')){
       setValue('ECargoBase.cPayWay','01')
     }
-    const list:Array<string>= ["ECargoBase.nAmtRmbExch","ECargoBase.cInsExchCde", "ECargoBase.nPrmRmbExch","ECargoBase.cPremExchCde"]
+    const list:Array<string>= ["ECargoBase.nAmtRmbExch","ECargoBase.cInsExchCde", "ECargoBase.nPrmRmbExch","ECargoBase.cPremExchCde",'ECargoBase.nWhPrmRmbExch','ECargoBase.nWhAmtRmbExch']
      list.forEach(item =>{
        setFormItem(item, {
          hidden: true,
@@ -151,6 +151,8 @@ const method = {
             setValue('ECargoBase.nRmbReceivedPrm',getValue('ECargoBase.nReceivedPrm') * res[0].currency_rate)
             // 协议剩余预收保费（人民币）
             if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') === '01'){
+              setValue('ECargoBase.nWhPrmRmbExch',res[0].currency_rate)
+              setValue('ECargoBase.cWhPrmCur',val)
               setValue('ECargoBase.nRecRemPrm',getValue('ECargoBase.nRmbReceivedPrm')- (getValue('ECargoBase.nWhRmbPrm') || 0))
             }
           });
@@ -160,6 +162,8 @@ const method = {
       // 协议剩余预收保费（人民币）
       const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
       if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') === '01'){
+        setValue('ECargoBase.nWhPrmRmbExch',"1.000000")
+        setValue('ECargoBase.cWhPrmCur',val)
         setValue('ECargoBase.nRecRemPrm',getValue('ECargoBase.nRmbReceivedPrm')- (getValue('ECargoBase.nWhRmbPrm') || 0))
       }
     }
@@ -195,12 +199,20 @@ const method = {
             if(getValue('ECargoBase.nRmbAmt')){
               setValue('ECargoBase.nRecRemEstAmt',getValue('ECargoBase.nRmbAmt') - getValue('ECargoBase.nWhRmbAmt') )
             }
+            if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') === '01'){
+              setValue('ECargoBase.nWhAmtRmbExch',res[0].currency_rate)
+              setValue('ECargoBase.cWhAmtCur',val)
+            }
           });
     } else {
       setValue('ECargoBase.nWhAmtRmbExch',"1.000000")
       setValue('ECargoBase.nWhRmbAmt',getValue('ECargoBase.nWhAmt') * 1)
       if(getValue('ECargoBase.nRmbAmt')){
         setValue('ECargoBase.nRecRemEstAmt',getValue('ECargoBase.nRmbAmt') - getValue('ECargoBase.nWhRmbAmt') )
+      }
+      if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') === '01'){
+        setValue('ECargoBase.nWhAmtRmbExch','1.000000')
+        setValue('ECargoBase.cWhAmtCur',val)
       }
     }
   },
