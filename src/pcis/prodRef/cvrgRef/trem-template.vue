@@ -779,7 +779,7 @@ function initTermsData(item: any) {
 
 /**条则标数据初始化判断 */
 function initTermRiskData(item: any){
-  if (pageparam.cProdNo === "040002" || parparam.cProdNo === '043009') {
+  if (pageparam.cProdNo === "040002" || pageparam.cProdNo === '043009') {
     if(item.cPorpType != 'text'){
       const faitem = factormap.value[item['cFactorId']];
       if(faitem.prop === 'TermRisktgt.cDeductibleMethod'){
