@@ -348,7 +348,7 @@ const method = {
   cardTypeChange: (val) => {
 
        const tabref = opertaor.getTableRefs();
-    const applicantValue = tabref["applicant"].getFromValue();
+    const applicantValue = tabref["applicant"]?.getFromValue();
     console.log(val,applicantValue)
     checkUser();
     // 清除报错信息
@@ -773,6 +773,7 @@ const method = {
       setFormItem("Applicant.cOccupCde", {
         rules: [getRules("required", {})],
       });
+			setFormItem("Applicant.cOccupCde", {btnItems:{disabled: false}});
       setFormItem("Applicant.cTrdCde", {
         rules: [getRules("required", {})],
       });
@@ -780,6 +781,7 @@ const method = {
       setFormItem("Applicant.cOccupCde", {
         rules: [],
       });
+			setFormItem("Applicant.cOccupCde", {btnItems:{disabled: true}});
       setFormItem("Applicant.cTrdCde", {
         rules: [],
       });

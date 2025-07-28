@@ -64,7 +64,7 @@ import  cOccupCdeModal  from "./commodityRef/cOccupCdeModal.vue";
 
 import agentPre from "./commodityRef/agentPer.vue" //代理(经济)人
 import agentWorker from "./commodityRef/agentWorker.vue" //代理业务员
-import ciagentPre from "./commodityRef/ciagentWorker.vue" //代理(经济)人
+import ciagentPer from "./commodityRef/ciagentPer.vue" //代理(经济)人
 import ciagentWorker from "./commodityRef/ciagentWorker.vue" //代理业务员
 import cBrkrCdeModal from "./commodityRef/cBrkrCdeModal.vue"; //开户行
 import prdFixSpec from "./commodityRef/prd-fix-spec.vue" //特别约定
@@ -156,7 +156,7 @@ const componentMap = {
 
   agentPre: agentPre,
   agentWorker: agentWorker,
-  ciagentPre: ciagentPre,
+  ciagentPer: ciagentPer,
   cBrkrCdeModal:cBrkrCdeModal,
   ciagentWorker: ciagentWorker,
   ndustryCateModal:ndustryCateModal,

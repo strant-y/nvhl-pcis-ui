@@ -81,7 +81,7 @@ export function createFromUiConfig(config: FromUiConfig = {showTitleBar: true}):
     size: config.size || "default",
     showMessage: config.showMessage || "1",
     groupBy: config.groupBy || [],
-    showTitleBar: config.showTitleBar,
+    showTitleBar: config.showTitleBar ===null || config.showTitleBar === undefined ? true : config.showTitleBar,
   };
 }
 

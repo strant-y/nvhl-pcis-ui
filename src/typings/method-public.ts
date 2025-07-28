@@ -133,7 +133,24 @@ function verifyCheckCode(idCard) {
   return expectedCode === actualCode;
 }
 
+// 检查传入的数字，是否有效日期
+function isValidDateFlag(year, month, day) {
+	// 检查输入的有效性
+	if (year < 1900 || year > new Date().getFullYear() || month < 1 || month > 12) return false;
+	
+	var monthDays = [31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+	
+	if (day < 1 || day > monthDays[month - 1]) return false;
+
+	return true;
+
+	function isLeapYear(year) {
+			return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+	}
+}
+
 
 export {
-  validateIdCard
+	validateIdCard,
+	isValidDateFlag
 };

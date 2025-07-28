@@ -1,30 +1,38 @@
 <!-- 多级的级联选择器，如省市区 -->
 <template>
   <!-- 下拉选择框-->
-  <div class="cascader_" v-show="!props.showLabel">
-    <el-cascader
-      ref="cascaderRef"
-      v-model="selectedValue"
-      class="cascader_"
-      :class="isReQuired() ? 're-quired-flag' : ''"
-      :props="cascprops"
-      :placeholder="item.placeholder ? item.placeholder : '请选择'"
-      :options="options"
-      :show-all-levels="false"
-      :disabled="isReadonly() || isDisabled() || showLabel"
-      :clearable="isClearable()"
-      :size="item.size"
-      :filterable="item.filterable"
-      :showAllLevels="item.showAllLevels"
-      :multiple="isMultiple()"
-      @change="handleChange"
-    >
-      <template #empty>
-        {{ "暂无数据" }}
-      </template>
-    </el-cascader>
-  </div>
-
+  <el-tooltip
+      :content="changeContent"
+      :disabled="!changeContent"
+      placement="top"
+  >
+    <div class="cascader_" v-show="!props.showLabel">
+      <el-cascader
+        ref="cascaderRef"
+        v-model="selectedValue"
+        :class="[
+          'cascader_',
+          ...customClass,
+          ...[isReQuired() ? 're-quired-flag' : '']
+        ]"
+        :props="cascprops"
+        :placeholder="item.placeholder ? item.placeholder : '请选择'"
+        :options="options"
+        :show-all-levels="false"
+        :disabled="isReadonly() || isDisabled() || showLabel"
+        :clearable="isClearable()"
+        :size="item.size"
+        :filterable="item.filterable"
+        :showAllLevels="item.showAllLevels"
+        :multiple="isMultiple()"
+        @change="handleChange"
+      >
+        <template #empty>
+          {{ "暂无数据" }}
+        </template>
+      </el-cascader>
+    </div>
+  </el-tooltip>
   <div v-if="props.showLabel">
     <span>{{ displayText }}</span>
   </div>
@@ -78,6 +86,10 @@ const emits = defineEmits(["update:item", "update:modelValue", "valueChange"]); 
 const selectedValue = ref<string | number | Array<any> | undefined>();
 
 const displayText = computed(() => cascaderRef.value?.presentText);
+
+const customClass = ref<string[]>([]);
+
+const changeContent = ref<string | undefined>();
 
 const cascprops: CascaderProps = {
   lazy: true,
@@ -306,10 +318,24 @@ function getParam() {
 function getTextValue() {
   return displayText.value;
 }
+function setCustomClass(classs: string[]) {
+  customClass.value = classs;
+}
+function setChangeInfo(content: any) {
+  if(content) {
+    let text = content.text;
+    // TODO 将content.text code值翻译为label
+    changeContent.value = (text ? text : '') + ' 变更为 ' +  getTextValue();
+  }else {
+    changeContent.value = undefined;
+  }
+}
 
 defineExpose({
   updateOption,
-  getTextValue
+  getTextValue,
+  setCustomClass,
+  setChangeInfo
 });
 </script>
 <style lang="scss">

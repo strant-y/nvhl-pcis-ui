@@ -13,21 +13,21 @@
           <el-table-column
             type="selection"
             :selectable="selectable"
-            width="55"
+            width="40"
           />
           <el-table-column type="index" label="序号" width="55" />
-          <el-table-column label="是否可选" width="100">
+          <el-table-column label="是否可选" width="80">
             <template #default="scope">
               <el-tag type="primary">{{
                 scope.row["cIfMust"] == "1" ? "必选" : "可选"
               }}</el-tag>
             </template>
           </el-table-column>
-          <el-table-column
+          <!-- <el-table-column
             property="cSpecialCode"
             label="特约代码"
             width="160"
-          />
+          /> -->
           <el-table-column property="cSpecialContent" label="特别约定内容" />
         </el-table>
       </el-tab-pane>
@@ -38,14 +38,14 @@
           style="width: 100%"
         >
           <el-table-column property="addIndex" label="序号" width="55" />
-          <el-table-column property="cSpecialCode" label="特约代码" width="300">
+          <!-- <el-table-column property="cSpecialCode" label="特约代码" width="300">
             <template #default="scope">
               <el-input
                 v-model="scope.row['cSpecialCode']"
                 disabled="true"
               ></el-input>
             </template>
-          </el-table-column>
+          </el-table-column> -->
           <el-table-column property="cSpecialContent" label="特别约定内容">
             <template #default="scope">
               <el-input v-model="scope.row['cSpecialContent']"></el-input>

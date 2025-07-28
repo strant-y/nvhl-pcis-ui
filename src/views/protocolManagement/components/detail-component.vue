@@ -212,6 +212,9 @@ function setxyedrbaseRefData(val:any){
 function setxyedrbaseRefValue(key:any,val:any){
   return xyedrbase.value?.setValue(key,val)
 }
+function getxyedrbaseRefValue(key:any,val:any){
+  return xyedrbase.value?.getFromValue()
+}
 /**
  * 锚点点击事件重写
  * 避免触发路由
@@ -241,7 +244,8 @@ defineExpose({
   getUnderwriteRef,
   getUnderwriteValue,
   setxyedrbaseRefData,
-  setxyedrbaseRefValue
+  setxyedrbaseRefValue,
+  getxyedrbaseRefValue
 });
 </script>
 <style lang="scss" scoped>

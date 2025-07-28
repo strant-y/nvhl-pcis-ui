@@ -1,8 +1,8 @@
 <template>
   <template v-if="!showLabel">
     <el-tooltip
-        :content= "(vInput !== 'undefined' && vInput !== null) ? `${vInput}` : ''"
-        :disabled = "(vInput === 'undefined' || vInput===undefined  || vInput === null || vInput === '' || vInput === '0')"
+        :content="!!changeContent ? changeContent : (!!vInput && vInput !== 'undefined' ? vInput : '')"
+        :disabled="!changeContent && (!vInput || vInput === 'undefined' || vInput === '' || vInput === '0')"
         placement="top"
     >
       <el-input
@@ -12,7 +12,10 @@
         :type="
           item.type === 'color' || item.type === 'number' ? 'text' : item.type
         "
-        :class="isReQuired() ? 're-quired-flag' : '' "
+        :class="[
+            ...customClass,
+            ...[isReQuired() ? 're-quired-flag' : '']
+        ]"
         :showPassword="item.showPassword"
         :rows="item.rows"
         :style="
@@ -191,6 +194,8 @@ function isReQuired(){
 }
 const emits = defineEmits(["update:modelValue", "valueChange"]); // 父组件监听事件，同步子组件值的变化给父组件
 const vInput = ref<string | Number | undefined>();
+const customClass = ref<string[]>([]);
+const changeContent = ref<string | undefined>();
 watch([() => props.modelValue], ([newModelValue]) => {
   let n = null;
   if (props.item.type === "number") {
@@ -251,4 +256,19 @@ const renderIcon = (iconName: string) => {
   }
   return null;
 };
+function setCustomClass(classs: string[]) {
+  customClass.value = classs;
+}
+function setChangeInfo(content: any) {
+  if(content) {
+    changeContent.value = (content.text ? content.text : '') + ' 变更为 ' + vInput.value;
+  }else {
+    changeContent.value = undefined;
+  }
+}
+
+defineExpose({
+  setCustomClass,
+  setChangeInfo
+});
 </script>

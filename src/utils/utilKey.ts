@@ -261,6 +261,53 @@ const dateType = [
     value: "month",
   },
 ];
+
+const JBPMState = [
+{
+  value: "0",
+  label: "未接收",
+},
+{
+  value: "1",
+  label: "已接收",
+},
+{
+  value: "2",
+  label: "暂存",
+},
+{
+  value: "3",
+  label: "已完成",
+},
+{
+  value: "4",
+  label: "已撤回",
+},
+{
+  value: "5",
+  label: "已解除接收",
+},
+{
+  value: "6",
+  label: "已退回",
+},
+{
+  value: "7",
+  label: "已申请改派",
+},
+{
+  value: "8",
+  label: "已委托",
+},
+{
+  value: "10",
+  label: "已重做",
+},
+{
+  value: "11",
+  label: "已上报",
+},
+];
 export {
   yesOrNo,
   size,
@@ -272,4 +319,5 @@ export {
   position,
   showtype,
   showLocation,
+  JBPMState,
 };

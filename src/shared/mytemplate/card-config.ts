@@ -14,7 +14,19 @@ export interface CardConfig {
   tableBtn?: Array<FreeButtonBase>; //表格内按钮
   endBtns?: Array<FreeButtonBase>; //结尾处按钮
   endBtnsPosition?: "left" | "right" | "center"; // 结尾处按钮位置
-  formconfig?:AppGridEditConfig | null;  //表单配置
+  showTitleBar?: boolean;// 是否显示title层
+  formconfig?:AppEditEditConfig | null;  //表单配置
+}
+
+export interface MyCardMethod {
+  getFromValue: () => any;
+  setFormValue: (data: any,noupdate?: boolean) => void; // 设置表单值 noupdate:限制不触发update方法
+  validate: () => any;
+  setValue: (key: any, value: any) => void;
+  getValue: (key: any) => any;
+  clearValidate: (key: string | null ) => any;
+  setDisabledAll: (isDisabled: boolean) => void;
+  resetFields: () => void;
 }
 
 export function creatCardConfig(
@@ -35,6 +47,7 @@ export function creatCardConfig(
     superFromClose: config.superFromClose || "点击折叠",
     titleBtns: config.titleBtns || [],
     endBtns: config.endBtns || [],
+    showTitleBar: config.showTitleBar || true,
     endBtnsPosition: config.endBtnsPosition || "center",
     formconfig: config.formconfig || null,
   };
