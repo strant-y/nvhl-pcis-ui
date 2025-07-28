@@ -618,6 +618,9 @@ function setFormItem(key: any, obj: any) {
     });
   }
 }
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  baseEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFormValue,
   setFormValue,
@@ -626,7 +629,8 @@ defineExpose({
   getValue,
   getFormBtn,
   getFormConfig,
-  setDisabledAll
+  setDisabledAll,
+  addProvide
 });
 </script>
 

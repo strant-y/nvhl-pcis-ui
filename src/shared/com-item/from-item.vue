@@ -75,22 +75,32 @@ function getcomRef(type: any) {
 
 async function compareValueChangeColor(value?: any) {
   try {
-    if (customMap.primevalForm) {
-      const primevalForm = customMap.primevalForm;
-      if (itemRef?.value['setCustomClass'] && typeof itemRef.value['setCustomClass'] === 'function') {
-        const getPrimevalValue = () => {
-          const val = primevalForm[props.item.prop];
-          if(props.item.type === "date") {
-            return val ? val.replace(' 00:00:00', '') : null;
-          }else {
-            return val
-          }
-        };
-        if (getPrimevalValue() !== value) {
-          setCustomClass(['form-item-change']);
-        } else {
-          setCustomClass(['form-item-unchange']);
+    let primevalForm: any = undefined;
+    if(!!props.row && customMap.primevalForm && Array.isArray(customMap.primevalForm) && customMap.primevalForm.length > 0) {
+      // grid表格模式处理
+      const getIsRowData = (item: any) => {
+        const keys = ['cPkId'];
+        const key = keys.find(f => Object.keys(customMap.primevalForm[0]).includes(f));
+        return props.row[key] === item[key];
+      }
+      primevalForm = customMap.primevalForm.find((f: any) => getIsRowData(f))
+      // TODO 在primevalForm中 找到相同行数据 ？ 没找到就是新增了一行 ，否则 判断当前要素是否修改值
+    }else if (customMap.primevalForm && Object.keys(customMap.primevalForm).length > 0) {
+      primevalForm = customMap.primevalForm;
+    }
+    if(primevalForm) {
+      const getPrimevalValue = () => {
+        const val = primevalForm[props.item.prop];
+        if(props.item.type === "date") {
+          return val ? val.substring(0, 10) : null;
+        }else {
+          return val
         }
+      };
+      if (getPrimevalValue() !== value) {
+        setChangeInfo(['form-item-change'], getPrimevalValue());
+      } else {
+        setChangeInfo(['form-item-unchange'], undefined);
       }
     }
   } catch (e) {
@@ -98,9 +108,14 @@ async function compareValueChangeColor(value?: any) {
   }
 }
 
-function setCustomClass(classs: string[]) {
-  if(itemRef.value && itemRef.value.setCustomClass) {
+function setChangeInfo(classs: string[], text: any) {
+  if(itemRef.value && itemRef.value.setCustomClass && typeof itemRef.value.setCustomClass === 'function') {
     itemRef.value.setCustomClass(classs);
+  }
+  if(itemRef.value && itemRef.value.setChangeInfo  && typeof itemRef.value.setCustomClass === 'function') {
+    itemRef.value.setChangeInfo(!text ? text : {
+      text: text,
+    });
   }
 }
 
