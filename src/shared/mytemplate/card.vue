@@ -123,8 +123,13 @@ function getFromValue() {
   return editRef.value?.getFromValue();
 }
 
+function setFormValue(value: any) {
+  editRef?.value?.setFormValue(value);
+}
+
 defineExpose({
   getFromValue,
+	setFormValue
 });
 
 </script>
