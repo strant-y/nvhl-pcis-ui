@@ -86,6 +86,7 @@ const getCComponentTableValue = (): string => {
 const distSummaryRef = ref(); // 汇总组件对象
 const collectCompKey = ref(); // 汇总组件key
 const formconfig11 = ref<any>({});
+const oldPageSchema = ref<any>({});
 onMounted(async () => {
   // 初始化 cComponentTableValue
   cComponentTableValue = getCComponentTableValue();
@@ -172,6 +173,10 @@ onMounted(async () => {
   }
   if(distTableRef.value) {
     eventBus.on(`setMap-${props.compKey}`, addCodeListMap);
+  }
+  // 获取页面初始化的时候获取的组件配置信息
+  if(opertaor.getFatherPage() && opertaor.getFatherPage().getOldProductResData() && opertaor.getFatherPage().getOldProductResData()[0]?.pageInfo) {
+    oldPageSchema.value = opertaor.getFatherPage().getOldProductResData()[0]?.pageInfo.find((item: any) => item.pageCode === props.compKey).pageSchema || {};
   }
 });
 
@@ -424,7 +429,7 @@ const method = {
   },
   //导出
   exportExcel: () => {
-    let paramitem  = Object.assign(formconfig1.value, {
+    let paramitem  = Object.assign(oldPageSchema.value, {
       cComponentTable: cComponentTableValue,
     });
     if(route.params.param?.pageType && route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
@@ -477,7 +482,7 @@ const method = {
 
           // 构建参数并请求接口
           const params = {
-            ...formconfig1.value,
+            ...oldPageSchema.value,
             file: base64String, // ✅ 正确传入
             cComponentTable: cComponentTableValue,
           };
@@ -569,7 +574,7 @@ const method = {
   //全量模板下载
   downloadTemp: () => {
     const param = {
-      ...formconfig1.value,
+      ...oldPageSchema.value,
     }
     if(route.params.param?.pageName === "priceInquiry") {
       param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
