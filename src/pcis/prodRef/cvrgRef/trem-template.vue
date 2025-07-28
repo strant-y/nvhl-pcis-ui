@@ -770,7 +770,12 @@ function initMethod(){
 function initTermsData(item: any) {
   if(item.prop === 'Term.cClaimInclude'){ //是否计入累计赔偿限额 默认选择否
     if(!termdata.value[item.prop]){
-      termdata.value[item.prop] = '0';
+      if(pageparam.cProdNo === "040003"){
+        termdata.value[item.prop] = '1';
+      }else{
+        termdata.value[item.prop] = '0';
+      }
+      
       return true;
     }
   }
