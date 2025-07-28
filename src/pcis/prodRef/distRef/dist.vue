@@ -95,6 +95,68 @@ const getCComponentTableValue = (): string => {
   return props.compKey ? props.compKey.replace(/\d+/g, '') : "";
 };
 
+const mapAddr = {
+  "AddressDist040001": {
+    "Dist.JingyingAddress": "Dist.cDetailedAddress"
+  },
+  "AddressDist040005": {
+    "Dist.SchoolAddressProp": "Dist.cDetailedAddress"
+  },
+  "AddressDist041001": {
+    "Dist.JingYingAddress043009": "Dist.cDetailedAddress"
+  },
+  "AddressDist043020": {},
+  "AdvertisementDist043011": {
+    "Dist.JingyingAddress": "Dist.cDetailedAddress"
+  },
+  "ChargingDist049026": {
+    "Dist.DetailAddrProp": "Dist.cDetailedAddress"
+  },
+  "DesignDist": {
+    "Dist.ProjectDesignProp": "Dist.cProjectAddress"
+  },
+  "ParkingDist043005": {
+    "Dist.JingyingAddress": "Dist.cDetailedAddress"
+  },
+  "PollutionDist043013": {
+    "Dist.PropertyLocationProp": "Dist.cDetailedAddress"
+  },
+  "PortDist040021": {
+    "Dist.JingyingAddress": "Dist.cDetailedAddress"
+  },
+  "ProjectDist043009": {
+    "Dist.JingYingAddress043009": "Dist.cDetailedAddress"
+  },
+  "ProjectDist045001": {
+    "Dist.EngineeringAddressProp": "Dist.cDetailedAddress"
+  },
+  "ProjectDist049035": {},
+  "PropertyaddressDist010001": {
+    "Dist.TgtAddressProp": "Dist.cPropertyAddress"
+  },
+  "PropertyaddressDist010004": {
+    "Dist.TgtAddressProp": "Dist.cPropertyAddress"
+  },
+  "PropertyaddressDist010006": {
+    "Dist.TgtAddressProp": "Dist.cPropertyAddress"
+  },
+  "PropertyaddressDist010021": {
+    "Dist.cShowAddr": "Dist.cShowAddr"
+  },
+  "PropertyaddressDist080002": {
+    "Dist.FamilyAddressAllProp": "Dist.cFamilyAddr"
+  },
+  "PropertyaddressDist080003": {
+    "Dist.TgtAddressProp": "Dist.cPropertyAddress"
+  },
+  "PropertyaddressDist080027": {
+    "Dist.TgtAddressProp": "Dist.cPropertyAddress"
+  },
+  "PropertyaddressDist089005": {
+    "Dist.HomeAllProp": "Dist.cDetailedAddress"
+  }
+};
+
 const distSummaryRef = ref(); // 汇总组件对象
 const collectCompKey = ref(); // 汇总组件key
 const formconfig11 = ref<any>({});
@@ -225,12 +287,87 @@ onMounted(async () => {
 //     });
 // }  Tgt.nEngineeringCost nEngineeringCostChange
 
-function cardQueryFn(){
-  console.log(cardRef.value?.getFromValue());
+function cardQueryFn(flag?: boolean){
+	console.log(cardRef.value?.getFromValue());
+	const queryParams = distTableRef.value?.getPartnerPage(flag);
+	const s = cardRef.value?.getFromValue();
+	// 经营地址只选择省市区不输入详细地址获取表单值会带有undefined，这里处理一下
+	for (let k in s) {
+		if(s[k] && typeof s[k] === 'string' && s[k].indexOf('undefined') !== -1) {
+			s[k] = s[k].replace('undefined', '')
+		}
+	}
+
+	console.log('路由data‘',route.params)
+	const params = Object.assign(
+		{
+			cProdNo: route.params.param.cProdNo,
+			cComponentTable: cComponentTableValue,
+		},
+		{ dist: s },
+		formconfig1.value,
+		queryParams
+	);
+	if(params.dist['Dist.ProjectDesignProp']) {
+		params.dist['Dist.cProjectAddress'] = params.dist['Dist.ProjectDesignProp']
+	}
+	if(route.params.param?.pageName === "priceInquiry") {
+		params.cInquiryNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+		if(!params.cInquiryNo){
+			ElMessage.warning("请先保存申请单!");
+			return false
+		}
+	} else {
+		params.cAppNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+		if(!params.cAppNo){
+			ElMessage.warning("请先保存申请单!");
+			return false
+		}
+	}
+
+	// 级联地址表格显示问题处理
+	if(Object.keys(mapAddr).includes(props.compKey)) {
+		const addrInput = mapAddr[props.compKey];
+		const keys = Object.keys(addrInput)
+		if(keys && keys.length>0) {
+			const inputGroupKey = keys[0];
+			const addrValueKey = addrInput[inputGroupKey];
+			params.dist[addrValueKey] = params.dist[inputGroupKey];
+		}
+	}
+	console.log('params', params)
+	selectDist(params).then((res: any) => {
+		if (res.code === 200) {
+			pageresult.list = [];
+			pageresult.total = res.data.total;
+			pageresult.list = res.data.data.map((item, index) => {
+				return{
+					... item,
+					... {
+						// 序号全部由后端处理
+						// 'Dist.nSeqNo': ((queryParams.pageNum - 1) * queryParams.pageSize) + index + 1,
+						tOpeningTime: item['Dist.tOpeningTime']
+								? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
+								: null,
+						'Dist.AllOccup': [
+							item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
+						],
+					}
+				};
+			});
+		}
+	});
 }
 
 function cardResetFn(){
   console.log(cardRef.value?.getFromValue());
+	const tableEditRefs = cardRef.value;
+	const s = tableEditRefs?.getFromValue(); //获取表单数据
+	for (const k in s) {
+			s[k] = null;
+	}
+	tableEditRefs?.setFormValue({...s})
+	cardQueryFn(true)
 }
 
 // 绑定方法
