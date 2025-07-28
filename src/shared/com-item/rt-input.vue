@@ -1,10 +1,25 @@
 <template>
   <template v-if="!showLabel">
     <el-tooltip
-        :content="!!changeContent ? changeContent : (!!vInput && vInput !== 'undefined' ? vInput : '')"
         :disabled="!changeContent && (!vInput || vInput === 'undefined' || vInput === '' || vInput === '0')"
         placement="top"
     >
+      <template #content>
+        <div style="display: flex;align-items: center;font-size: 13px">
+          <span v-if="changeContent">{{`${changeContent} &nbsp; 变更为 &nbsp; ${vInput}`}}</span>
+          <span v-else>{{!!vInput && vInput !== 'undefined' ? vInput : ''}}</span>
+          <el-icon
+            v-if="changeContent"
+            style="margin-left: 10px;"
+            size="17"
+            title="恢复"
+            color="orange"
+            @click="tooltipIconClick"
+          >
+            <RefreshLeft />
+          </el-icon>
+        </div>
+      </template>
       <el-input
         ref="inputRef"
         :placeholder="item.placeholder"
@@ -260,13 +275,16 @@ function setCustomClass(classs: string[]) {
   customClass.value = classs;
 }
 function setChangeInfo(content: any) {
-  if(content) {
-    changeContent.value = (content.text ? content.text : '') + ' 变更为 ' + vInput.value;
-  }else {
-    changeContent.value = undefined;
-  }
+    changeContent.value = content ? content.text : undefined;
 }
-
+function tooltipIconClick() {
+  const text = changeContent.value;
+  changeContent.value = undefined;
+  vInput.value = undefined;
+  nextTick(() => {
+    handleChange(text);
+  })
+}
 defineExpose({
   setCustomClass,
   setChangeInfo
