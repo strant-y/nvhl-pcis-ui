@@ -585,9 +585,12 @@ const method = {
             rules: null,
           });
       }
+      
+      //是否分支机构
+      if(!getValue('Insured.cIsBranch')){
+          setValue("Insured.cIsBranch", "1");
+      }
     
-      // 是否分支机构
-      setValue("Insured.cIsBranch", "1");
 
       // 个人 移动电话必填  
       setFormItem("Insured.cMobile", {
