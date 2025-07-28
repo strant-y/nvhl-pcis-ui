@@ -53,7 +53,7 @@ const removeIds = ref([]); // 删除用户ID集合 用于批量删除
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
-import { getAppPolicyList, qryEndorseList, delTmpPolicy } from "@/api/query";
+import {getAppPolicyList, qryEndorseList, delTmpPolicy, queryInsuredList} from "@/api/query";
 // 变更列
 const colChange = defineAsyncComponent(() => import("../modal/colChange.vue"));
 const PrintView = defineAsyncComponent(() => import("../modal/PrintView.vue"));
@@ -303,7 +303,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   label: "搜索",
                   type: "primary",
                   func: () => {
-                      handleQuery(true);
+                    esSearch(true);
                   },
               },
           },
@@ -1158,6 +1158,96 @@ const exRules = {
     }
   },
 };
+
+function esSearch(flag?: boolean) {
+  const tableRefs = tableRef.value;
+  const freeEditRefs = freeEditRef.value;
+  const r = tableRefs.getPartnerPage(flag); //获取分页数据
+  const s = freeEditRefs.getFromValue(); //获取表单数据
+
+  if (!s.cQueryStr || !s.cQueryStr.trim()) {
+    ElMessage.warning("查询条件不能为空");
+    return;
+  }
+
+  if (s.cLoadSub == null) {
+    s.cLoadSub = "1";
+  }
+  pageresult.list = [];
+  if (
+      (s["cAppNo"] == null || s["cAppNo"] == "") &&
+      (s["cPlyNo"] == null || s["cPlyNo"] == "") &&
+      (s["cAppNme"] == null || s["cAppNme"] == "")
+  ) {
+    const startTemp =
+        s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[0] : null;
+    if (null == startTemp || undefined === startTemp) {
+      ElMessage.warning("签单日期不能为空");
+      return;
+    }
+    const start = dayjs(startTemp);
+    const endTemp = s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[1] : null;
+    if (null == endTemp || undefined === endTemp) {
+      ElMessage.warning("签单日期不能为空");
+      return;
+    }
+    const end = dayjs(endTemp);
+    if (end.isBefore(start)) {
+      ElMessage.warning("签单日期起期不能大于签单日期止期");
+      return;
+    }
+    if (end.diff(start, "year", true) > 2) {
+      ElMessage.warning("签单日期时间范围请控制在两年内");
+      return;
+    }
+  }
+  // 提取投保日期的开始时间和结束时间
+  const tAppTmStart = s.tAppTm && s.tAppTm.length > 1 ? s.tAppTm[0] : null;
+  const tAppTmEnd = s.tAppTm && s.tAppTm.length > 1 ? s.tAppTm[1] : null;
+  // 提取批改申请日期的开始时间和结束时间
+  const tEdrAppTmStart =
+      s.tEdrAppTm && s.tEdrAppTm.length > 1 ? s.tEdrAppTm[0] : null;
+  const tEdrAppTmEnd =
+      s.tEdrAppTm && s.tEdrAppTm.length > 1 ? s.tEdrAppTm[1] : null;
+  // 提取签单日期的开始时间和结束时间
+  const tIssueTmStart =
+      s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[0] : null;
+  const tIssueTmEnd =
+      s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[1] : null;
+
+  // if (currentTabKey.value == "0") {
+  const param = Object.assign(s, r);
+  param["pageNo"] = param["pageNum"];
+  param["tAppTmStart"] = tAppTmStart; // 添加投保开始时间
+  param["tAppTmEnd"] = tAppTmEnd; // 添加投保结束时间
+  param["tEdrAppTmStart"] = tEdrAppTmStart; // 添加批改开始时间
+  param["tEdrAppTmEnd"] = tEdrAppTmEnd; // 添加批改结束时间
+  param["tIssueTmStart"] = tIssueTmStart; // 添加签单开始时间
+  param["tIssueTmEnd"] = tIssueTmEnd; // 添加签单结束时间
+  param["queryType"] = queryType.value;
+  param["cTermNo"] = cTermNo;        // 条款编码
+  param["IndexName"] = 'ply_insured_ik';        // es
+  param["IndexType"] = 'ply_insured_info';       // es
+
+  queryInsuredList(param)
+      .then((res) => {
+        const { code, data, msg } = res;
+        if (200 === code) {
+          pageresult.list = [];
+          pageresult.list = data.result;
+          pageresult.list = data.result.map(item => ({
+            ...item,
+            // 创建一个新字段合并两个值
+            policyInfo: `${item.cAppNo || ''}\n${item.cPlyNo || ''}`,
+            InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
+          }));
+          pageresult.total = data.total;
+        } else {
+          ElMessage.error(msg);
+        }
+      })
+      .finally(() => {});
+}
 
 /** 查询 */
 function handleQuery(flag?: boolean) {
