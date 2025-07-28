@@ -845,6 +845,9 @@ const valideRequired = ()=>{
         freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.cDptCde", "disabled", true
         );
+        // freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cSlsCde","rules",[])
+        freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cBrkSlsCde","rules",[])
+        freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cBrkrCde","rules",[])
         freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.cSlsCde", "disabled", true
         );
@@ -868,6 +871,7 @@ const valideRequired = ()=>{
         freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.cSlsCde", "disabled", false
         );
+        
         freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.cBrkSlsCde", "disabled", false
         );
@@ -924,7 +928,7 @@ const initProxySales = (row:any)=>{
   const rowData = getFromValue()
   if(rowData.length>0){
     const rowId = rowData[0]._dataId;
-    setValueByRowKey('Ci.cBrkSlsCde',rowId,row.cSlsId)
+    setValueByRowKey('Ci.cBrkSlsCde',rowId,`${row.cSlsId}${row.cSlsNme}`)
     console.log('代理业务员',{
       code:'Ci.cBrkSlsCde'+rowId,
       list:row.loadData,
@@ -936,11 +940,12 @@ const initProxySales = (row:any)=>{
   }
 }
 //更新代理经纪人选中值到联共保代理经纪人
-const intiAgentBroker = (any:any)=>{
+const intiAgentBroker = (row:any)=>{
   const rowData = getFromValue()
   if(rowData.length>0){
     const rowId = rowData[0]._dataId;
-    setValueByRowKey('Ci.cBrkrCde',rowId,row.cBrkrCde);
+    console.log("00000000000000",row)
+    setValueByRowKey('Ci.cBrkrCde',rowId,`${row.CChaCde}${row.CChaNme}`);
     freeEditRef.value?.addCodeListMap({
       code:'Ci.cBrkrCde'+rowId,
       list:rowData.loadData,

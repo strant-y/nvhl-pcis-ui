@@ -329,7 +329,14 @@ const method = {
               setValue("Base.cAgtAgrNo", params.CAgtAgrNo);
 
               console.log("回显----", params);
-
+              const ciRef = opertaor.getTableRefs()['ci'];
+              if (!!ciRef) {
+                ciRef.intiAgentBroker({
+                  CChaCde: params.CChaCde, //代理经纪人代码
+                  CChaNme: params.CChaNme, //代理经纪人名称
+                  loadData:[{value:  params["CChaCde"],label:params["CChaCde"] + params['CChaNme']}],
+                });
+              }
               dialogRef.value?.handleClose();
             },
           },
