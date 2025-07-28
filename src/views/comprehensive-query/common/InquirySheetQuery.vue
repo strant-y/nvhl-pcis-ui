@@ -106,7 +106,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     ...s,
                     cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
                     cLoadSub: 1,
-                    tIssueTm: [
+                    tAppTm: [
                         dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
                     ]
