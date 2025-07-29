@@ -35,20 +35,20 @@
                   >批改比较项</span
                   >
                 </el-anchor-link>
-                <el-anchor-link
-                    v-for="(k, i) in pageConfig?.pageInfo"
-                    :key="i"
-                    :custom="true"
-                    v-show="['AgreementCiShare', 'AgreementCi', 'AgreementCiTcp'].includes(k.pageCode) ? isCiJiMrk : true"
-                    @click="handleAnchorClick($event, `#${k.pageCode}`)"
-                    :class="i === 0 ? 'isActive' : ''"
-                >
-                  <!-- <rt-icon
-                      style="margin-right: 14px"
-                      :item="{ icon: k.icon && k.icon !== 'null' && k.icon !== '' ? k.icon : 'Tickets', }"
-                  /> -->
-                  <i :class="['icon','iconfont',iconMap[k.pageKey]]"></i>
-                  <span class="icon-title" v-if="NavigaShow">
+                  <el-anchor-link
+                      v-for="(k, i) in pageConfig?.pageInfo"
+                      :key="i"
+                      :custom="true"
+                      v-show="k.pageKey !== 'acctinfo' ? ['AgreementCiShare', 'AgreementCi', 'AgreementCiTcp'].includes(k.pageCode) ? isCiJiMrk :acctinfoFlag :true"
+                      @click="handleAnchorClick($event, `#${k.pageCode}`)"
+                      :class="i === 0 ? 'isActive' : ''"
+                  >
+                    <!-- <rt-icon
+                        style="margin-right: 14px"
+                        :item="{ icon: k.icon && k.icon !== 'null' && k.icon !== '' ? k.icon : 'Tickets', }"
+                    /> -->
+                    <i :class="['icon','iconfont',iconMap[k.pageKey]]"></i>
+                    <span class="icon-title" v-if="NavigaShow">
                     <template v-if="k.pageTtile && k.pageTtile.length > 6">
                       <el-tooltip
                           effect="dark"
@@ -62,7 +62,7 @@
                       {{ k.pageTtile }}
                     </template>
                   </span>
-                </el-anchor-link>
+                  </el-anchor-link>
                 <el-anchor-link
                     v-if="underwriteFlag"
                     @click="handleAnchorClick($event, `#underwriteurl`)"
@@ -102,25 +102,25 @@
         <div id="edritem" v-if="edritemFlag" style="margin-bottom: 10px">
           <xyedritemRef ref="xyedritem"></xyedritemRef>
         </div>
-        <template v-for="(pageConfig, v) in formPage.config" :key="v">
-          <div
-              class="card_"
-              v-for="(k, i) in pageConfig?.pageInfo"
-              :key="i"
-              :id="k.pageCode"
-              v-show="['AgreementCiShare', 'AgreementCi', 'AgreementCiTcp'].includes(k.pageCode) ? isCiJiMrk : true"
-          >
-            <component
-                :ref="(res: any) => {
+          <template v-for="(pageConfig, v) in formPage.config" :key="v">
+            <div
+                class="card_"
+                v-for="(k, i) in pageConfig?.pageInfo"
+                :key="i"
+                :id="k.pageCode"
+                v-show="k.pageKey !== 'acctinfo' ? ['AgreementCiShare', 'AgreementCi', 'AgreementCiTcp'].includes(k.pageCode) ? isCiJiMrk : acctinfoFlag : true"
+            >
+              <component
+                  :ref="(res: any) => {
                   formPage.setComponentRef(k.pageCode, res);
                 }
               "
-                :is="getConmpName(k)"
-                :pageSchema="k.pageSchema"
-                :compKey="k.pageKey"
-            />
-          </div>
-        </template>
+                  :is="getConmpName(k)"
+                  :pageSchema="k.pageSchema"
+                  :compKey="k.pageKey"
+              />
+            </div>
+          </template>
         <div
             id="underwriteurl"
             v-if="underwriteFlag"
@@ -144,22 +144,6 @@
       </el-affix>
       </el-main>
     </el-container>
-
-    <!-- <el-footer>
-      <el-affix position="bottom" :offset="10">
-        <div class="bottom-items">
-          <rt-button
-              v-for="(bth, idx) in props.bthList"
-              :item="bth"
-              :key="idx"
-              :loading="bth.loading"
-              :ref="(res: any) => {
-                formPage.setButtonRef(bth?.id as string, res);
-              }"
-          />
-        </div>
-      </el-affix>
-    </el-footer> -->
   </div>
 </template>
 
@@ -177,6 +161,7 @@ let underwriteFlag = ref(false);
 const idxParam = inject('idxParam');
 const formPage = idxParam?.formPage;
 const isCiJiMrk = computed(() => !!idxParam.ciJiMrk && idxParam.ciJiMrk !== '0');
+const acctinfoFlag = computed(() => !!(idxParam.param.acctinfoFlag));
 const pageData = ref({}); // 页面数据
 const getConmpName = (k: any) => {
   return k.pageCode + '-ref';
