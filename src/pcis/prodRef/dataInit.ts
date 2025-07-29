@@ -82,7 +82,7 @@ export const getData = () => {
     //自航标志默认是
     dataInit["Tgt.cNavigationMark"] = "1";
     //保险价值币种 默认人民币
-    dataInit["Tgt.cInsuranceCurrency"] = "01";
+    dataInit["Tgt.cInsuranceCurrency"] = "CNY";
     // “标的信息”中“车辆使用性质”默认值为营运
     dataInit["Tgt.cUsageNature"] = "364113098";
 

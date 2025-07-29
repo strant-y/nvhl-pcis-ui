@@ -256,7 +256,7 @@ const addData =()=>{
   let obj = [];
   let isAdd = true;
     formData.value.forEach((item)=>{
-      if(item.cSpecialCode === "00000001"){
+      if(item.cSpecialCode === "fenqi01"){
         isAdd = false;
       }
     })
@@ -265,9 +265,9 @@ const addData =()=>{
       obj =[...formData.value, { 
         addIndex: 1,
         cIfEdit: "0",
-        cIfFix: "2",
-        cIfMust: "2",
-        cSpecialCode: "00000001",
+        cIfFix: "1",
+        cIfMust: "1",
+        cSpecialCode: "fenqi01",
         isAdd:true,
         cSpecialContent: "各期保费应在约定的缴费止期前缴纳，超过约定止期未支付当期保费的，在未支付保费的期间发生保险事故的，本公司按照已缴纳保费及未到缴费期应交保费之和占总保费的比例进行赔偿。",
         // index: formData.value.length+1
@@ -278,7 +278,7 @@ const addData =()=>{
 
 onMounted(async () => {
     eventBus.on('add-special', addData)
-  const formconfig11 = formInit(
+    const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
     method,
     exRules
@@ -307,6 +307,7 @@ const method = {
   //获取特约按钮
   getSpecialAgree: () => {
     const param = opertaor.getParam();
+    console.log('数据---',param)
     dialog.value?.open(
       "prdFixSpec",
       {
