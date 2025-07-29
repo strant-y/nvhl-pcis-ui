@@ -1273,12 +1273,13 @@ async function loadAfter() {
 				cProdNo: props.param.cProdNo, // 产品代码
 				cTermNo: props.param.cTermNo, // 条款代码
 				cInsuredCde: props.param.cInsuredCde, // 被保人代码
+				insuredNme: props.param.cInsuredNme, // 被保人名称
 			}
 			const res: any = await queryEcargoRelevancePolicyDetails(params);
 			if(res["code"] == 200){
 				if(!!res.data.policyApplication?.composition){
-					dataInit.value.insured = res.data.policyApplication?.composition?.insured[0];
-					dataInit.value.cvrg = res.data.policyApplication?.composition?.cvrg;
+					dataInit.value.insured = res.data.policyApplication?.composition?.insured[0] || {};
+					dataInit.value.cvrg = res.data.policyApplication?.composition?.cvrg || {};
 					dataInit.value.plyBase["Base.cNeedfeeFlag"] = props.param.cNeedfeeFlag
 					dataInit.value.plyBase["Base.cEcAgrNo"] = props.param.cEcAgrNo
 					let plyBase = opertaor.getTableRefByKey('plyBase')
