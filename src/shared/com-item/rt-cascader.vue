@@ -30,6 +30,9 @@
         <template #empty>
           {{ "暂无数据" }}
         </template>
+        <template #default="{ node, data }">
+          <span :style="{'font-weight': data.value === 'FZ' ? 'bold' : 'normal'}">{{ data.label }}</span>
+        </template>
       </el-cascader>
     </div>
   </el-tooltip>
@@ -109,17 +112,25 @@ const cascprops: CascaderProps = {
         return;
       }
       const codeListParam = {};
+      let codeListName = props.item.typeCode; // 默认使用配置的typeCode
       // 批改原因级联
       if(props.item.typeCode === "EDR_RSN_LIST_NEW" || props.item.typeCode ==='EDR_RSN_LIST_YY' || props.item.typeCode ==='EDR_RSN_LIST_AY') {
         codeListParam.rsnTyp = value.split('-')[0]
         codeListParam.kindNo = value.split('-')[1]
+        if (props.row && props.row.cProdNo) {
+          codeListParam.prodNo = props.row.cProdNo;
+        }
+        if(codeListParam.rsnTyp == '2' || codeListParam.rsnTyp == '3'){
+          codeListName = "EDR_RSN_LIST_CANCEL";
+        }
       } else {
         codeListParam.cParCde = value
       }
       codeListStore
         .queryCodeList(
           {
-            codeListName: props.item.typeCode,
+            // codeListName: props.item.typeCode,
+            codeListName: codeListName,
             codeListParam: codeListParam,
           },
           props.unAuthor,

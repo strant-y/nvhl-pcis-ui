@@ -624,15 +624,15 @@ const method = {
         rules: null,
         disabled: true,
       });
-      setValue("Applicant.cGreenIndustryCustomers", "");
-      setValue("Applicant.cGreenIndustryList", "");
+      // setValue("Applicant.cGreenIndustryCustomers", "");
+      // setValue("Applicant.cGreenIndustryList", "");
 
       // 为法人  企业成立日期
       setFormItem("Applicant.tEstablishingDate", {
         rules: null,
       });
  
-      setValue("Applicant.cIsMicroEntpris", "");
+      // setValue("Applicant.cIsMicroEntpris", "");
       //是否分支机构
       if(!getValue('Applicant.cIsBranch')){
           setValue("Applicant.cIsBranch", "1");
@@ -1316,7 +1316,9 @@ function cancel(){
 	formconfig.value.fileInputType = ""
 	maindialogVisible.value = false
 }
-
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  applicantEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
@@ -1325,7 +1327,8 @@ defineExpose({
   getValue,
   getFormconfig,
   clearValidate,
-  setFormItem
+  setFormItem,
+  addProvide
 });
 </script>
 

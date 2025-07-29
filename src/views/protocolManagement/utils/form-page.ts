@@ -215,7 +215,13 @@ export class FormPage {
             let formData = undefined;
             if (comp) {
                 const data = comp.getFormValue();
-                formData = data ? markRaw(data) : undefined;
+                if(data) {
+                    if(Array.isArray(data)) {
+                        formData = [...data];
+                    }else {
+                        formData = {...data};
+                    }
+                }
             }
             allFormData[key] = formData;
         }

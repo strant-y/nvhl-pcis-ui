@@ -393,7 +393,9 @@ function numMulti(num1, num2) {
   }
   return Number(num1.toString().replace('.', '')) * Number(num2.toString().replace('.', '')) / Math.pow(10, baseNum);
 }
-
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  baseEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
@@ -402,6 +404,7 @@ defineExpose({
   getValue,
   getFormconfig,
   nPayNumberFun,
+  addProvide
 });
 </script>
 

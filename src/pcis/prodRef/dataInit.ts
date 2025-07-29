@@ -32,7 +32,7 @@ export const getData = () => {
     // tmDay.value = tm;
     dataInit["Base.cRenewMrk"] = "0";
     dataInit["Base.cIsNet"] = "0";
-    dataInit["Base.cPolicySource"] = "1";
+    // dataInit["Base.cPolicySource"] = '1';
     dataInit["Base.cJuriCde"] =
       "本保单受中华人民共和国司法管辖（港、澳、台除外）";
     dataInit["Base.nRatioCoef"] = "1.000000";

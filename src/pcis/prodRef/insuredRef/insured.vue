@@ -563,9 +563,9 @@ const method = {
       setFormItem("Insured.cRealnameAuthType", {
         rules: [],
       });
-      setValue("Insured.cGreenIndustryCustomers", "");
-      setValue('Insured.cGreenIndustryList','')
-      setValue("Insured.cIsMicroEntpris", "");
+      // setValue("Insured.cGreenIndustryCustomers", "");
+      // setValue('Insured.cGreenIndustryList','')
+      // setValue("Insured.cIsMicroEntpris", "");
       // setValue("Insured.cCertfCls", "");
       setFormItem("Insured.cCntrNme", { rules: null });
       setFormItem("Insured.cCntrCertfCde", { rules: null });
@@ -1408,7 +1408,9 @@ function cancel(){
 	formconfig.value.fileInputType = ""
 	maindialogVisible.value = false
 }
-
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  insuredEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
@@ -1419,6 +1421,7 @@ defineExpose({
   clearValidate,
   setFormItem,
   change403009,
+  addProvide
 });
 </script>
 
