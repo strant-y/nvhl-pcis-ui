@@ -171,7 +171,7 @@ onMounted(async () => {
     exRules
   );
   Object.assign(cardconfig.value, formconfig11);
-  if (parparam.pageType === "app") {
+  if (parparam.pageType === "app" && parparam.cRecordType != 4) {
     // 新建保单时,初始化条款信息
     const param = {
       cProdNo: parparam.cProdNo,

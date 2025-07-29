@@ -624,15 +624,15 @@ const method = {
         rules: null,
         disabled: true,
       });
-      setValue("Applicant.cGreenIndustryCustomers", "");
-      setValue("Applicant.cGreenIndustryList", "");
+      // setValue("Applicant.cGreenIndustryCustomers", "");
+      // setValue("Applicant.cGreenIndustryList", "");
 
       // 为法人  企业成立日期
       setFormItem("Applicant.tEstablishingDate", {
         rules: null,
       });
  
-      setValue("Applicant.cIsMicroEntpris", "");
+      // setValue("Applicant.cIsMicroEntpris", "");
       //是否分支机构
       setValue("Applicant.cIsBranch", "1");
 

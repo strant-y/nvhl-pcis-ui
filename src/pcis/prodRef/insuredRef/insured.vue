@@ -563,9 +563,9 @@ const method = {
       setFormItem("Insured.cRealnameAuthType", {
         rules: [],
       });
-      setValue("Insured.cGreenIndustryCustomers", "");
-      setValue('Insured.cGreenIndustryList','')
-      setValue("Insured.cIsMicroEntpris", "");
+      // setValue("Insured.cGreenIndustryCustomers", "");
+      // setValue('Insured.cGreenIndustryList','')
+      // setValue("Insured.cIsMicroEntpris", "");
       // setValue("Insured.cCertfCls", "");
       setFormItem("Insured.cCntrNme", { rules: null });
       setFormItem("Insured.cCntrCertfCde", { rules: null });
