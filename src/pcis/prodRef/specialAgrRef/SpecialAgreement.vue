@@ -143,12 +143,23 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Delete",
         tableClick: (row) => {
-          const list = formData.value;
-          const i = list.findIndex((item) => item.cSpecNo === row.cSpecNo);
-          rttableFrom.value.delRow(row._dataId);
-          // if (i !== -1) list.splice(i, 1);
-          formData.value.forEach((item, index) => {
-            item.index = index + 1;
+
+           ElMessageBox.confirm(
+            "是否确认删除数据？",
+            "提示",
+            {
+              confirmButtonText: "确定",
+              cancelButtonText: "取消",
+              type: "warning",
+            }
+          ).then(() => {
+              const list = formData.value;
+              const i = list.findIndex((item) => item.cSpecNo === row.cSpecNo);
+              rttableFrom.value.delRow(row._dataId);
+              // if (i !== -1) list.splice(i, 1);
+              formData.value.forEach((item, index) => {
+                item.index = index + 1;
+              });
           });
         },
       }),
@@ -245,18 +256,19 @@ const addData =()=>{
   let obj = [];
   let isAdd = true;
     formData.value.forEach((item)=>{
-      if(item.add){
+      if(item.cSpecialCode === "00000001"){
         isAdd = false;
       }
     })
+    console.log('数据ccc',formData.value)
     if(isAdd){
-      obj =[...formData.value, {
+      obj =[...formData.value, { 
         addIndex: 1,
         cIfEdit: "0",
         cIfFix: "2",
         cIfMust: "2",
-        cSpecialCode: "",
-        add:true,
+        cSpecialCode: "00000001",
+        isAdd:true,
         cSpecialContent: "各期保费应在约定的缴费止期前缴纳，超过约定止期未支付当期保费的，在未支付保费的期间发生保险事故的，本公司按照已缴纳保费及未到缴费期应交保费之和占总保费的比例进行赔偿。",
         // index: formData.value.length+1
       }]

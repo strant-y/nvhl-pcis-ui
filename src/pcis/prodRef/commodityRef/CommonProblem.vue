@@ -37,12 +37,13 @@ const relatedCommonProblem = defineAsyncComponent(
   () => import("./RelatedCommonProblem.vue")
 );
 import { query, getRiskList, saveCvrgRiskRel } from "@/api/prod";
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
 const dzmodal = useDzModal();
 
 import { useRoute } from "vue-router";
 const route = useRoute();
 const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
 
 const { getRules } = useValidator();
 

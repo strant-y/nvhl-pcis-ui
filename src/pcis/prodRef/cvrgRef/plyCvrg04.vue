@@ -23,8 +23,14 @@
                     :item="btnItem.addPlan"
                   />
                   <rt-button
-                    v-if="!btnItem.delPlan.hidden"
-                    @click="deletePlan(k)"
+                    v-if="showPlanDelete(k,btnItem.delPlan)"
+                    @click="()=>{
+                      if(Object.keys(planData).length === 1){
+                        ElMessage.error('仅剩1个方案时,不能删除!');
+                        return;
+                      }
+                      deletePlan(k);
+                    }"
                     :item="btnItem.delPlan"
                   />
                 </el-col>
@@ -45,11 +51,9 @@
                     :disabled-flag="disAbledFlag"
                     @delete="
                       (r) => {
-                        console.log(planData,k,r,index)
-                        // 如果是主条款不可以删除
-                        if(k ==='P1' &&index===0){
-                          ElMessage.warning('主条款不能删除!')
-                          return false;
+                        if(planData[k]['m'].length === 1){
+                          ElMessage.error('仅剩1条主条款时,不能删除!');
+                          return ;
                         }
                         deleteData(k, r);
                       }
@@ -413,6 +417,19 @@ const method = {
   },
 };
 
+/** 判断删除按钮是否显示 */
+function showPlanDelete(pl: any){
+  let r =  !btnItem.value.delPlan.hidden;
+  if(parparam.cRsnCde === '09'){    // 增加条款时,如果新增的条款, 可以正常显示删除按钮
+    if(planData.value[pl]['m']){
+      const rowId = planData.value[pl]['m'][0]['Term.cRowId'];
+      if(!rowId){     // 如果不存在rowId,则是新增条款,正常显示删除按钮
+        r = true;
+      }
+    }
+  }
+  return r;
+}
 function addPlanMethod() {
   let maxindex = 0;
     const l = Object.keys(planData.value).forEach((k: any) => {
@@ -543,11 +560,17 @@ function deletePlan(plan: string) {
     type: "warning",
   }).then(() => {
     if (parparam.cEdrType) {
-      Object.keys(planData.value[plan]).forEach((item) => {
-        for (let i = 0; i < planData.value[plan][item].length; i++) {
-          tremTemplateRefs.value[plan+item+i].setCancel();
-        }
-      });
+
+      const rowId = planData.value[plan]['m'][0]['Term.cRowId'];
+      if(!rowId){   //如果不存在行RowId,则是新增条款,直接删除即可
+        delete planData.value[plan];
+      }else{
+        Object.keys(planData.value[plan]).forEach((item) => {
+          for (let i = 0; i < planData.value[plan][item].length; i++) {
+            tremTemplateRefs.value[plan+item+i].setCancel();
+          }
+        });
+      }
     }else{
       delete planData.value[plan];
     }
@@ -739,7 +762,7 @@ function calcCheck(){
 }
 
 function initTermData(item: any,data:any){
-  if(parparam.cProdNo === '043009'){
+  if(parparam.cProdNo === '043009' || parparam.cProdNo === "040002"){
     if(data.riskList && data.riskList.length > 0){
       data.riskList.forEach((r)=>{
         r['TermRisktgt.cDeductibleMethod'] = '01';

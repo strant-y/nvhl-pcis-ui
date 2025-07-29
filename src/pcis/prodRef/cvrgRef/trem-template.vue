@@ -713,10 +713,7 @@ function dataInit() {
     if (props.disabledFlag) {
       setDisabledAll();
     }
-    // 解决组件初始化时是否统扯保费反显为是的时候医生每人保费、护士/医技人员每人保费没有置灰
-    if(termdata.value['Term.cUnifiedPremium']) {
-      methodMap.unifiedPremiumChange(termdata.value['Term.cUnifiedPremium'])
-    }
+    initMethod();
   } else {
     getTRFactorJson(param).then((res: any) => {
       const { code, data, msg } = res;
@@ -753,20 +750,65 @@ function dataInit() {
       if (props.disabledFlag) {
         setDisabledAll();
       }
-      // 解决组件初始化时是否统扯保费反显为是的时候医生每人保费、护士/医技人员每人保费没有置灰
-      if(termdata.value['Term.cUnifiedPremium']) {
-        methodMap.unifiedPremiumChange(termdata.value['Term.cUnifiedPremium'])
-      }
+      initMethod();
     });
   }
 }
 
+/** 初始化需要执行的方法,手动触发 */
+function initMethod(){
+  // 解决组件初始化时是否统扯保费反显为是的时候医生每人保费、护士/医技人员每人保费没有置灰
+    if(termdata.value['Term.cUnifiedPremium'] && !pageparam.cEdrType ) {
+      methodMap.unifiedPremiumChange(termdata.value['Term.cUnifiedPremium'])
+    }
+}
+
+/**
+ * 条款初始化判断
+ * @param item 
+ */
+function initTermsData(item: any) {
+  if(item.prop === 'Term.cClaimInclude'){ //是否计入累计赔偿限额 默认选择否
+    if(!termdata.value[item.prop]){
+      if(pageparam.cProdNo === "040003"){
+        termdata.value[item.prop] = '1';
+      }else{
+        termdata.value[item.prop] = '0';
+      }
+      
+      return true;
+    }
+  }
+  return false;
+}
+
+/**条则标数据初始化判断 */
+function initTermRiskData(item: any){
+  if (pageparam.cProdNo === "040002" || pageparam.cProdNo === '043009') {
+    if(item.cPorpType != 'text'){
+      const faitem = factormap.value[item['cFactorId']];
+      if(faitem.prop === 'TermRisktgt.cDeductibleMethod'){
+        // 预留后期遇到了使用
+        // console.log(faitem);
+        // console.log(item);
+        // console.log(riskList.value);
+        // riskList.value[item['cRiskNo']][faitem.prop] = '01';
+      }
+    }
+  }
+
+  return false;
+}
+
+
 function initshowConfig() {
   // 条款组件遍历,对一些个性化操作进行处理
+  let reflash = false;
   termFactormap.value.forEach((item) => { 
     item.required = isrequired(item);
     item.disabled = isdisabled(item);
 
+    reflash = reflash || initTermsData(item);
     if (item.cFatherKey ) {  //如果存在上级,则将上限设置成0,等待父级修改后,再修改自己的上限
       const mx = getTermData()[item.cFatherKey];
       item.max = 0;
@@ -775,6 +817,14 @@ function initshowConfig() {
       }
     }
   });
+
+  collist.value?.forEach((item)=>{
+    reflash = reflash || initTermRiskData(item);
+  })
+  if(reflash){  // 如果存在初始化数据,则将初始化数据反馈给父级
+    update();
+  }
+
   let grouplist: { [k: string]: any } = {};
   if (groupInfo.value) {
     exChangeFunc();
@@ -845,16 +895,14 @@ function exChangeFunc() {
   }
   // 045001个性化配置
   if (pageparam.cProdNo === "045001") {
-    console.log(data["tgt"]);
     if(data["tgt"]["Tgt.cInsuranceMethod"] && data["tgt"]["Tgt.cInsuranceMethod"] !== '613001'){
       const term = termFactormap.value.filter(
-        (r) => r["prop"] !== "Term.nPersonPremium"
+        (r) => (r["prop"] !== "Term.nPersonPremium" && r["prop"] !== "Term.nInsuredCount")  //不是按人数投保,不显示投保人数以及每人保费
       );
       // const ex = termFactormap.value.filter(
       //   (r) =>
       //     r["prop"] === "Term.nRateVal" || r["prop"] === "Term.nInsuranceFee"
       // );
-
       termFactormap.value = term;
       // extermConf.value = ex;
     }else{

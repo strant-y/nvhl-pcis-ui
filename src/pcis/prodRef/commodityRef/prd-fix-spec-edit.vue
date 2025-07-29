@@ -7,7 +7,7 @@
     </div>
     <!-- 特别约定名称 -->
     <div class="form-item">
-      <span>特别约定名称：</span>
+      <!-- <span>特别约定名称：</span> -->
       <span>{{ rowData.cSpecialName }}</span>
     </div>
     <el-divider></el-divider>
@@ -21,9 +21,10 @@
           class="content-item"
         >
           <el-input
+            type="number"
             v-if="item.match(/^\*+$/)"
             v-model="inputValues[index]"
-            @input="updateCNmeCn(index, $event)"
+            @input="updateCNmeCn(index, $event)" 
             :class="`input-${index}`"
             placeholder="请输入"
           ></el-input>
@@ -44,9 +45,12 @@
 
 <script lang="ts" setup>
 import { ref, watch, onMounted, computed } from "vue";
+import { isValidDateFlag } from "@/typings/method-public";
+import { dataOpertaor } from "@/store/modules/data-opertaor";
 const dialogVisible = ref(true);
 const props = defineProps(["data","callback"]);
 const rowData = ref(props.data);
+const opertaor = dataOpertaor();
 //rowData当前行数据
 /**
  * 拿到特约内容字段，通过***分割为数组，然后在html部分直接循环该数组，
@@ -81,14 +85,41 @@ const handleCancel = () => {
   dialogVisible.value = false;
 };
 const handleSave = () => {
-  dialogVisible.value = false;
   rowData.value.editList = newListValue(cNmeCnArray.value,inputValues.value)
   // rowData.value.cSpecialContent =inputValues.value.join("");
-  rowData.value.cSpecialContent = joinWithAsterisks(inputValues.value) 
   // const parts = cNmeCnArray.value.map((item, idx) =>
   //   item.match(/^\*+$/) ? inputValues.value[idx] : item
   // );
+	// 本保单启运日期为：**年**月**日。
+	if(rowData.value.cSpecialCode == "34201709"){
+		if(rowData.value.editList[0] != "" && rowData.value.editList[1] != "" && rowData.value.editList[2] != ""){
+			let flag = isValidDateFlag(rowData.value.editList[0],rowData.value.editList[1],rowData.value.editList[2])
+			if(flag){
+				const insrnc = opertaor.getTableRefByKey( "insrnc").getFromValue()
+				if(!!insrnc && insrnc["Base.tAppTm"]){
+					const BaseAppTm:Date = new Date(insrnc["Base.tAppTm"]);
+					BaseAppTm.setHours(0, 0, 0, 0); // 清除时间部分
 
+					let time = `${rowData.value.editList[0] + '-' + rowData.value.editList[1]+'-'+rowData.value.editList[2]}`
+					const selected = new Date(time);
+					selected.setHours(0, 0, 0, 0);
+					if(BaseAppTm > selected) {
+            ElMessage.warning("保单启运日期不能早于投保时间")
+						return false
+          }
+				}
+				console.log(insrnc);
+			} else {
+				ElMessage.warning("请输入正确的保单启运日期！");
+				return false
+			}
+		} else {
+			ElMessage.warning("本保单启运日期不能为空！");
+			return false
+		}
+	}
+  dialogVisible.value = false;
+  rowData.value.cSpecialContent = joinWithAsterisks(inputValues.value) 
   // rowData.value.cSpecialContent = parts.join("");
   console.log("提交的数据:", rowData.value);
   props.callback({type: 'ok', data: rowData.value});

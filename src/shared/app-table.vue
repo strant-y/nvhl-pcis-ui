@@ -78,6 +78,7 @@
         </el-row>
       </template>
       <div class="form-inner">
+        <slot name="title-info"/>
         <rttable
           v-model="dataList"
           :item="appgrideditConfig"
@@ -120,8 +121,9 @@ defineOptions({
   inheritAttrs: false,
 });
 const codeListMap = ref<any>({});
+const customMap = ref<any>({});
 provide('codeListMap', codeListMap.value);
-
+provide('customMap', customMap.value);
 const btnMap = ref({});
 const emits = defineEmits(["pageChange", "selection-change", "status-change", "rowClick"]); // 父组件监听事件，同步子组件值的变化给父组件
 
@@ -263,6 +265,13 @@ function setCodeListMap(map: any) {
     Object.assign(codeListMap.value, map);
   }
 }
+function setRowFieldProp(rowId: string, field: string, prop: string, value: any) {
+  return rttableFrom.value?.setRowFieldProp(rowId, field, prop, value);
+}
+
+function getTableValues(){
+  return rttableFrom.value?.getTableValues();
+}
 
 defineExpose({
   getPartnerPage,
@@ -278,7 +287,9 @@ defineExpose({
   getTableBtn,
   getCodeListMap,
   addCodeListMap,
-  setCodeListMap
+  setCodeListMap,
+  setRowFieldProp,
+  getTableValues,
 });
 </script>
 

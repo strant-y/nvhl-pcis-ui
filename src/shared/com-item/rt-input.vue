@@ -1,10 +1,25 @@
 <template>
   <template v-if="!showLabel">
     <el-tooltip
-        :content= "(vInput !== 'undefined' && vInput !== null) ? `${vInput}` : ''"
-        :disabled = "(vInput === 'undefined' || vInput===undefined  || vInput === null || vInput === '' || vInput === '0')"
+        :disabled="!changeContent && (!vInput || vInput === 'undefined' || vInput === '' || vInput === '0')"
         placement="top"
     >
+      <template #content>
+        <div style="display: flex;align-items: center;font-size: 13px">
+          <span v-if="changeContent">{{`${changeContent} &nbsp; 变更为 &nbsp; ${vInput}`}}</span>
+          <span v-else>{{!!vInput && vInput !== 'undefined' ? vInput : ''}}</span>
+          <el-icon
+            v-if="changeContent"
+            style="margin-left: 10px;"
+            size="17"
+            title="恢复"
+            color="orange"
+            @click="tooltipIconClick"
+          >
+            <RefreshLeft />
+          </el-icon>
+        </div>
+      </template>
       <el-input
         ref="inputRef"
         :placeholder="item.placeholder"
@@ -12,7 +27,10 @@
         :type="
           item.type === 'color' || item.type === 'number' ? 'text' : item.type
         "
-        :class="isReQuired() ? 're-quired-flag' : '' "
+        :class="[
+            ...customClass,
+            ...[isReQuired() ? 're-quired-flag' : '']
+        ]"
         :showPassword="item.showPassword"
         :rows="item.rows"
         :style="
@@ -191,6 +209,8 @@ function isReQuired(){
 }
 const emits = defineEmits(["update:modelValue", "valueChange"]); // 父组件监听事件，同步子组件值的变化给父组件
 const vInput = ref<string | Number | undefined>();
+const customClass = ref<string[]>([]);
+const changeContent = ref<string | undefined>();
 watch([() => props.modelValue], ([newModelValue]) => {
   let n = null;
   if (props.item.type === "number") {
@@ -251,4 +271,22 @@ const renderIcon = (iconName: string) => {
   }
   return null;
 };
+function setCustomClass(classs: string[]) {
+  customClass.value = classs;
+}
+function setChangeInfo(content: any) {
+    changeContent.value = content ? content.text : undefined;
+}
+function tooltipIconClick() {
+  const text = changeContent.value;
+  changeContent.value = undefined;
+  vInput.value = undefined;
+  nextTick(() => {
+    handleChange(text);
+  })
+}
+defineExpose({
+  setCustomClass,
+  setChangeInfo
+});
 </script>

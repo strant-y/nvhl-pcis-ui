@@ -99,10 +99,10 @@
     
     // 默认核保机构
     let loadOrgCde = ref([
-          {
-                        label: "永安保险总公司",
-                        value: "0200000000000",
-                    },
+      {
+        label: user.value.companyCnm,
+        value: user.value.companyId,
+      },
     ]);
     watch(() => freeEditRef.value?.getValue("tm1"), (newVal,old) => {
       
@@ -303,6 +303,7 @@
             title: "核保级别",
              
             showKey: [1, 2],
+            // typeCode: "WEB_UNDR_CLS",
             typeCode: "UNDR_CLS_CDE",
             params: { cDptCde: user.value.companyId, cEmpCde: user.value.opCde },
             clearable: true,

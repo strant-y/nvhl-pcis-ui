@@ -68,7 +68,15 @@ function saveDistNew(queryParams: any): AxiosPromise<any> {
 function selectDistNew(queryParams: any): AxiosPromise<any> {
     return post(`/policy/selectDist`, queryParams);
 }
+/**
+ * 协议一般批改生成批文
+ * @param queryParams
+ */
+function getEcargoEndorseChange(queryParams: any): AxiosPromise<any> {
+    return post(`/edr/getEcargoEndorseChange`, queryParams);
+}
 export default {
+    getEcargoEndorseChange,
     selectDistNew,
     saveDistNew,
     saveDist,

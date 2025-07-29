@@ -74,7 +74,7 @@ export const getData = () => {
     dataInit["Insured.cCustRiskRank"] = "925104";
     //设置是否单项工程默认值：是
     dataInit["Tgt.cIsSingle"] = "1";
-    dataInit["Tgt.cContractCurrency"] = "01";
+    dataInit["Tgt.cContractCurrency"] = "CNY";
     //光船租赁标志程、船舶抵押标志、保赔协会成员标志默认值：否
     dataInit["Tgt.cRentalLogo"] = "0";
     dataInit["Tgt.cMortgageMark"] = "0";
@@ -103,5 +103,82 @@ export const getData = () => {
     diy["Tgt.cDeterminingMethod"] = "0";//赔偿限额确定方式 页面初始化为直接限额制
   }
   const defultData = Object.assign(diy, di);
+  return defultData;
+};
+
+export const getECargoData = () => {
+  const user = JSON.parse(sessionStorage.getItem("user"));
+  const opertaor = dataOpertaor();
+  const param = opertaor.getParam();
+
+  const defultdata = () => {
+    // 默认全量初始化数据
+    //保单基本信息初始化
+    const dataInit = {};
+    dataInit["ECargoBase.tAppTm"] = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
+    dataInit["ECargoBase.tInsrncBgnTm"] = moment(
+      new Date(Date.now() + 1 * 1000 * 60 * 60 * 24)
+    ).format("YYYY-MM-DD 00:00:00");
+
+    // let maxDate = new Date( dataInit["Base.tInsrncBgnTm"]);  // 创建开始时间副本
+    // maxDate.setDate(maxDate.getDate() + 365);  // 设置为今天起365天后的日期
+    // maxDate.setSeconds(maxDate.getSeconds() - 1);
+
+    dataInit["ECargoBase.tInsrncEndTm"] = dayjs().add(1,'year').format("YYYY-MM-DD 23:59:59");
+    // console.log('666',dataInit["Base.tInsrncEndTm"])
+    // moment(maxDate).format("YYYY-MM-DD HH:mm:ss")
+    
+    const tm = moment(dataInit["ECargoBase.tInsrncEndTm"]).add(1, 'second').diff(
+      moment(dataInit["ECargoBase.tInsrncBgnTm"]),
+      "days"
+    );
+    dataInit["ECargoBase.cTmSysCde"] = tm;
+    // tmDay.value = tm;
+    dataInit["ECargoBase.cRenewMrk"] = "0";
+    dataInit["ECargoBase.cIsNet"] = "0";
+    dataInit["ECargoBase.cPolicySource"] = "1";
+    dataInit["ECargoBase.cJuriCde"] =
+      "本保单受中华人民共和国司法管辖（港、澳、台除外）";
+    dataInit["ECargoBase.nRatioCoef"] = "1.000000";
+    dataInit["ECargoBase.cRatioTyp"] = "2";
+    dataInit["ECargoBase.cInstMrk"] = "0";
+    dataInit["ECargoBase.cDisptSttlCde"] = "B";
+    dataInit["ECargoBase.cInsExchCde"] = "1";
+    dataInit["ECargoBase.cPremExchCde"] = "1";
+    dataInit["ECargoBase.cPrmCur"] = "CNY";
+    dataInit["ECargoBase.cAmtCur"] = "CNY";
+
+    // 录单日期、签单日期默认值
+    dataInit["ECargoBase.tOprTm"] = moment(new Date()).format("YYYY-MM-DD");
+    dataInit["ECargoBase.tIssueTm"] = moment(new Date()).format("YYYY-MM-DD");
+    // 是否见费出单 默认值
+    dataInit["ECargoBase.cNeedfeeFlag"] = "1";
+    //是否可疑交易，默认否
+    dataInit["ECargoBase.cSusBusiness"] = "0";
+    //录单人 默认系统操作员..
+    dataInit["ECargoBase.cOprCde"] = user.userName;
+    //录单人联系方式  默认操作员的
+    if (user.phoneNO !== null && user.phoneNO !== "") {
+      dataInit["ECargoBase.cCiOprRel"] = user.phoneNO;
+    }
+
+    // 录单机构
+    dataInit["ECargoBase.cDptCde"] = param.cDptCde;
+    // 涉农标志
+    dataInit["ECargoBase.cAgriMrk"] = "2";
+    //联共保业务
+    dataInit["ECargoBase.cCiMrk"] = "0";
+    dataInit["ECargoBase.cIntroDptcde"] = param.cDptCde;
+    dataInit["ECargoBase.cCiMrk"] = param.cCiMrk || "0";
+    dataInit["ECargoBase.nPayNumber"] = '1'; //缴费期数
+
+    // dataInit["ECargoApplicant.cStkMrk"] = "0";
+    // dataInit["ECargoApplicant.cCustRiskRank"] = "925104";
+    // dataInit["ECargoInsuredDist.cStkMrk"] = "0";
+    // dataInit["ECargoInsuredDist.cCustRiskRank"] = "925104";
+    return dataInit;
+  };
+
+  const defultData = defultdata();
   return defultData;
 };

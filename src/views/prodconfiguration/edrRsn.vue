@@ -34,10 +34,10 @@ import { useRoute } from "vue-router";
 import { ref, reactive, onMounted } from "vue";
 import { qryProdTermList, changeProdEdrRsnStatus } from "@/api/prod";
 import { inputtype } from "@/utils/utilKey";
-
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
 const route = useRoute();
 const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
 
 const { getRules } = useValidator();
 

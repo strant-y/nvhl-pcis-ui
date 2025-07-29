@@ -113,7 +113,7 @@ const handleSelectionChange = (selection) => {
 const refreshData = () => {
   console.log(props.data,"0000000")
   const cProdNo = props.data.cProdNo;
-  const cDptCde = props.data.cDptCde;
+  const cDptCde = props.data.cDptCde || '';
   // 查询列表数据
   getpSpecialAgreement({
     cProdNo: cProdNo,
@@ -160,7 +160,7 @@ function add() {
     cSpecialCode: "",
     cSpecialContent: "",
     cIfMust: "2", //是否必选
-    cIfEdit: "1", //是否可修改
+    cIfEdit: "0", //是否可修改
     cIfFix: "2", //是否固定特约，查寻特约模板接口查出来的1，自定义添加的为0
   });
 

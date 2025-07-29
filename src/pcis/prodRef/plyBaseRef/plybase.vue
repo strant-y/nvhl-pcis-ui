@@ -80,9 +80,6 @@ onMounted(async () => {
       });
     }
 
-    //
-    // setValue("Base.cCiOprRel", 123);
-
     // 查询承保机构所属分公司和项目类别大类数据
     getCheckCdeptByCdptCde();
     //回显机构部门数据
@@ -164,11 +161,10 @@ const method = {
     // 录单人联系方式
     if(val=='1'|| val=='2'||val=='5'){
       // Base.cCiOprRel
-          setFormItem("Base.cCiOprRel", { rules: [getRules("required", {})] }); //代理合作协议
+          setFormItem("Base.cCiOprRel", { rules: [getRules("required", {}),getRules("phoneNo", {})] }); 
     }else{
-           setFormItem("Base.cCiOprRel", { rules: [] });
+           setFormItem("Base.cCiOprRel", { rules: [getRules("phoneNo", {})] });
     }
-
 
   },
   //业务来源大类
@@ -223,6 +219,10 @@ const method = {
           nextTick(() => {
             plyBaseEditRef.value?.clearValidate("Base.cBrkSlsCde");
           });
+        }
+        const ciRef = opertaor.getTableRefs()['ci'];
+        if (!!ciRef) {
+          ciRef.valideRequired();
         }
       });
     }
@@ -325,7 +325,14 @@ const method = {
               setValue("Base.cAgtAgrNo", params.CAgtAgrNo);
 
               console.log("回显----", params);
-
+              const ciRef = opertaor.getTableRefs()['ci'];
+              if (!!ciRef) {
+                ciRef.intiAgentBroker({
+                  CChaCde: params.CChaCde, //代理经纪人代码
+                  CChaNme: params.CChaNme, //代理经纪人名称
+                  loadData:[{value:  params["CChaCde"],label:params["CChaCde"] + params['CChaNme']}],
+                });
+              }
               dialogRef.value?.handleClose();
             },
           },
@@ -375,6 +382,7 @@ const method = {
         },
         method: {
           getSelected: (params) => {
+            console.log("代理业务员回显", params);
             setFormValue({
               // "Base.cBrkSlsCde": params.CSlsCde, //代理业务员
               "Base.cCertfNo": params.CCtfctNo, //代理业务执业证号
@@ -393,7 +401,7 @@ const method = {
               ciRef.initProxySales({
                 cSlsId: params.CSlsCde, //业务员员工号
                 cSlsNme: params.CSlsNme, //业务员名称
-                loadData:{value:  params["CSlsCde"],label:params["CSlsCde"] + params['CSlsNme']},
+                loadData:[{value:  params["CSlsCde"],label:params["CSlsCde"] + params['CSlsNme']}],
               });
             }
             setValue("Base.cBrkSlsCde", params.CSlsCde);
@@ -678,6 +686,7 @@ function getCheckCdeptByCdptCde() {
       (res) => {
         if (res["code"] === 200) {
           if (res.data) {
+            console.log('11112',res)
             subDptCde.value = res.data;
             //查询项目类别大类数据
             codeListStore
@@ -801,6 +810,9 @@ function setForSelectFilterable() {
 function getFormconfig() {
   return formconfig1;
 }
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  plyBaseEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
@@ -808,6 +820,7 @@ defineExpose({
   setValue,
   getValue,
   getFormconfig,
+  addProvide
 });
 </script>
 

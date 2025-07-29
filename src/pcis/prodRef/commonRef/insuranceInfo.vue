@@ -14,12 +14,12 @@ import { useValidator } from "@/typings/useValidator";
 import { saveProdInfo } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useRoute } from "vue-router";
-
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
 const opertaor = dataOpertaor();
 
 const route = useRoute();
 const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
 
 const { getRules } = useValidator();
 

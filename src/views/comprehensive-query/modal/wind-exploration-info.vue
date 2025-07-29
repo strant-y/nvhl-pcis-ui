@@ -148,7 +148,7 @@ const windSave = () => {
       if(data !== null){
 				data.forEach((item: any, index: number) => {
           item.nSeqNo = index + 1;
-					item.time = item.tSurveyStart + ' - ' + item.tSurveyEnd
+					item.time = item.tSurveyStart?.split(' ')[0] + ' - ' + item.tSurveyEnd?.split(' ')[0]
         });
         pageresult.list = data;
         pageresult.total = data.total;

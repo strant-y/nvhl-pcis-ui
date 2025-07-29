@@ -9,8 +9,9 @@
           class="content-item"
         >
           <el-input
+           type="number"
             v-if="item.match(/^\*+$/)"
-            v-model="inputValues[index]"
+            v-model="inputValues[index]" 
             @input="updateCNmeCn(index, $event)"
             :class="`input-${index}`"
             placeholder="请输入"

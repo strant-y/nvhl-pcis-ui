@@ -38,11 +38,11 @@ const props = defineProps({
     required: false,
   },
 });
-
+import {FormPage} from "@/views/protocolManagement/utils/form-page";
 const rttableFrom = ref<any>(null);
 
 const idxParam = inject('idxParam');
-const formPage = idxParam?.formPage;
+const formPage: FormPage = idxParam?.formPage;
 
 const cardconfig = ref(creatCardConfig({}));
 const moveUpTimer = ref(null);
@@ -204,11 +204,16 @@ const method = {
   },
   //获取特约按钮
   getSpecialAgree: () => {
+    const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
+    if(!agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo')){
+      return ElMessage.warning('请先保存');
+    }
     dialog.value?.open(
         "prdFixSpec",
         {
-          cProdNo: null,
+          cProdNo: '029900',
           selectedData: formData.value, //需要把自定义的过滤掉，只传过去从模板中选择的
+          cDptCde:agreementBaseRef.getValue('ECargoBase.cDptCde') || ''
         },
         {
           getSelected(selectdata: any) {

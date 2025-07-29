@@ -25,6 +25,7 @@
       @status-change="handleStatusChange"
       :show-summary="item.showSummary ? item.showSummary : false"
       :sum-text="item.sumText ? item.sumText : '合计'"
+			empty-text="暂无数据"
       :summary-method="item.summaryMethod ? item.summaryMethod : null"
       :span-method="objectSpanMethod"
       @current-change="currentChange"
@@ -807,6 +808,9 @@ function clearSelection() {
 function toggleRowSelection(row: any, selected: boolean) {
   tableRef.value?.toggleRowSelection(row, selected);
 }
+function getTableValues() { 
+  return tableDatas.value;
+}
 
 defineExpose({
   tableExvalidate,
@@ -824,6 +828,7 @@ defineExpose({
   toggleRowSelection,
   setRowFieldProp,
   spliceTableData,
+  getTableValues,
   // getItemsRowId
 });
 function isrequired(i: any) {

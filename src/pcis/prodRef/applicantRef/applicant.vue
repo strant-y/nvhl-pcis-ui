@@ -76,7 +76,7 @@ const route = useRoute();
 const param = opertaor.getParam();
 const fileInputRef:any = ref(null);
 const formconfig = ref({
-  fileInputType: ""
+  fileInputType: "1"
 });
 import { readFile } from "@/api/file";
 const tCertfDate = ref<any[]>([]);
@@ -348,7 +348,7 @@ const method = {
   cardTypeChange: (val) => {
 
        const tabref = opertaor.getTableRefs();
-    const applicantValue = tabref["applicant"].getFromValue();
+    const applicantValue = tabref["applicant"]?.getFromValue();
     console.log(val,applicantValue)
     checkUser();
     // 清除报错信息
@@ -449,7 +449,7 @@ const method = {
     }
   },
   //投保人性质(0是法人 1是个人)
-  InsureChange: async (val) => {
+  InsureChange: (val) => {
     console.log('vvvvvvv',val)
     const param = opertaor.getParam();
 
@@ -634,7 +634,10 @@ const method = {
  
       setValue("Applicant.cIsMicroEntpris", "");
       //是否分支机构
-      setValue("Applicant.cIsBranch", "1");
+      if(!getValue('Applicant.cIsBranch')){
+          setValue("Applicant.cIsBranch", "1");
+      }
+    
 
       setFormItem("Applicant.cCntrNme", { rules: null });
       setFormItem("Applicant.tOperaterCertfEndTm", { rules: null });
@@ -770,6 +773,7 @@ const method = {
       setFormItem("Applicant.cOccupCde", {
         rules: [getRules("required", {})],
       });
+			setFormItem("Applicant.cOccupCde", {btnItems:{disabled: false}});
       setFormItem("Applicant.cTrdCde", {
         rules: [getRules("required", {})],
       });
@@ -777,6 +781,7 @@ const method = {
       setFormItem("Applicant.cOccupCde", {
         rules: [],
       });
+			setFormItem("Applicant.cOccupCde", {btnItems:{disabled: true}});
       setFormItem("Applicant.cTrdCde", {
         rules: [],
       });
@@ -1049,41 +1054,26 @@ const method = {
   },
    // 办理人员证件种类
   cOperaterCertfTypChange:(val: any)=>{
-    console.log(val)
     // 清除报错信息
     clearValidate('Applicant.cOperaterCertfCde')  
-                 
-    //  身份证
-    if (val == "120001") { 
-        setFormItem("Applicant.cOperaterCertfCde", {
-              rules: [getRules("idCard", {}),],
-            });
-    } else if ( val == "110007") {   
-      // 统一社会信用代码校验
-           setFormItem("Applicant.cOperaterCertfCde", {
-              rules: [getRules("socialCode", {}),],
-            });
-    } else if(val == "19"){
-      // 外国人证件号
-           setFormItem("Applicant.cOperaterCertfCde", {
-              rules: [getRules("ariCard", {}),],
-            });
-    } else if (val == "120002") {
-      // 护照
-   
+    let cClntMrk = getValue('Applicant.cClntMrk');  // 投保人性质 
+    let baseRules:any[]= [];
+    type RuleType = "orgCode" | "socialCode" | "idCard" | "passPort" | "ariCard" | "required";
+      const ruleMap: Record<string, RuleType> = {
+        "110001": "orgCode",
+        "110007": "socialCode",
+        "120001": "idCard",
+        "120002": "passPort",
+        "19": "ariCard",
+      };
+      baseRules = ruleMap[val] ? [getRules(ruleMap[val])] : [];
+      if (cClntMrk == '0') {
+        baseRules = [getRules("required", {}), ...baseRules]
+      }
+      
       setFormItem("Applicant.cOperaterCertfCde", {
-              rules: [getRules("passPort", {}),],
-            });
-    }else if(val =='110001'){
-      // 组织机构编码校验
-           setFormItem("Applicant.cOperaterCertfCde", {
-              rules: [getRules("orgCode", {}),],
-            });
-    } else {
-           setFormItem("Applicant.cOperaterCertfCde", {
-              rules: [],
-            });
-    }
+        rules:baseRules,
+      });
   },
   // 证件有效起期
   tCertfBgnDateDisable:(date:any)=>{
@@ -1326,7 +1316,9 @@ function cancel(){
 	formconfig.value.fileInputType = ""
 	maindialogVisible.value = false
 }
-
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  applicantEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
@@ -1335,7 +1327,8 @@ defineExpose({
   getValue,
   getFormconfig,
   clearValidate,
-  setFormItem
+  setFormItem,
+  addProvide
 });
 </script>
 

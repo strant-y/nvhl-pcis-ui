@@ -34,13 +34,14 @@
     () => import("./relatedancillaryAdd.vue")
   );
   import { saveCvrgRiskRel, queryCommodityPlanList } from "@/api/prod";
+  import { descryptParameter, encryptParameter } from "@/utils/encipher";
   const dzmodal = useDzModal();
   const tabref = opertaor.getTableRefByKey("commodityBasicInfo");
   import { useRoute } from "vue-router";
   import { c } from "vite/dist/node/types.d-aGj9QkWt";
   const route = useRoute();
   const query = ref(route.query);
-  const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+  const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
   
   const { getRules } = useValidator();
   

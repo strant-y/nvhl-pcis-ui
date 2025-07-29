@@ -156,7 +156,8 @@
                 props.param.cTermNme
               }}</span
             >&nbsp;|&nbsp;<span class="font-weight-500">出单方式：</span
-            ><span class="publicStyle">核心页面出单</span>&nbsp;|
+            ><span class="publicStyle">{{ getRecordTypeText(props.param.cRecordType)
+             }}</span>&nbsp;|
             <span class="publicStyle">{{productStore.cCiMrk === '0' ? '非共保业务' 
               : productStore.cCiMrk == '1' ? '外部共保我方主共_主联'
               : productStore.cCiMrk == '2' ? '外部共保我方从共_主联'
@@ -181,15 +182,32 @@
               class="font-weight-500"
               >保费为: </span
             ><span class="publicStyle">{{ nPrm.toLocaleString() }}</span
-            >&nbsp;<span class="font-weight-500">元</span>
+            >&nbsp;<span class="font-weight-500">元</span>&nbsp;
+						<template v-if="props.param?.cRecordType === 4">
+							|&nbsp;<span class="font-weight-500">剩余预收保费为: </span
+							><span class="publicStyle">{{ nRecRemPrm.toLocaleString() }}</span
+							>&nbsp;<span class="font-weight-500">元</span>
+						</template>
           </div>
         </div>
         <div class="main-content">
           <div id="edrbase" v-if="edrbaseFlag" style="margin-bottom: 10px">
-            <edrbaseRef ref="edrbase"></edrbaseRef>
+            <edrbaseRef :ref="(res: any) => {
+              if(res && res.addProvide){
+                res.addProvide('domId', 'edrbase');
+              }
+              edrbase = res
+            }"></edrbaseRef>
           </div>
           <div id="edritem" v-if="edritemFlag" style="margin-bottom: 10px">
-            <edritemRef ref="edritem"></edritemRef>
+            <edritemRef
+              :ref="(res: any) => {
+                if(res && res.addProvide){
+                  res.addProvide('domId', 'edritem');
+                }
+                edritem = res
+              }"
+            ></edritemRef>
           </div>
           <template v-for="(pageConfig, v) in formconfig1" :key="v">
             <div
@@ -211,40 +229,65 @@
                   : true
               "
             >
-          <!-- {{ k.pageKey }}  -->
+          <!-- {{ k.pageKey }} || {{ k.pageCode }} -->
               <component
                 v-if="currentIndex >= i"
                 :ref="
-                  (res) => {
+                  (res: any) => {
                     const pageK =
                       k.pageKey === 'dist' || k.pageKey === 'distSummary'
                         ? k.pageCode
                         : k.pageKey;
                     opertaor.addTableRef(pageK, res);
+                    if(res && res.addProvide){
+                      res.addProvide('domId',  k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey);
+                    }
                   }
                 "
                 :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
                 :pageSchema="k.pageSchema"
                 :compKey="k.pageCode"
+           
               />
             </div>
           </template>
           <div id="ci" v-if="ciFlag" style="margin-bottom: 10px">
-            <ciRef ref="ci"></ciRef>
+            <ciRef
+              :ref="(res: any) => {
+                ci = res
+                if(res && res.addProvide){
+                  res.addProvide('domId', 'ci');
+                }
+              }"
+            ></ciRef>
           </div>
           <div
             id="ciMasterAgreement"
             v-if="ciMasterAgreementFlag"
             style="margin-bottom: 10px"
           >
-            <ciMasterAgreementRef ref="ciMasterAgreement"></ciMasterAgreementRef>
+            <ciMasterAgreementRef
+              :ref="(res: any) => {
+                if(res && res.addProvide){
+                  res.addProvide('domId', 'ciMasterAgreement');
+                }
+                ciMasterAgreement = res
+              }"
+            />
           </div>
           <div
             id="ourCompanyCiShare"
             v-if="ourCompanyCiShareFlag"
             style="margin-bottom: 10px"
           >
-            <ourCompanyCiShareRef ref="ourCompanyCiShare"></ourCompanyCiShareRef>
+            <ourCompanyCiShareRef
+              :ref="(res: any) => {
+                if(res && res.addProvide){
+                  res.addProvide('domId', 'ourCompanyCiShare');
+                }
+                ourCompanyCiShare = res
+              }"
+            />
           </div>
           <div
             id="underwriteurl"
@@ -312,6 +355,7 @@ import {
   getInquiryPolicy,
 	getisAllDone,
 	isUndrClsBlackList,
+	queryEcargoRelevancePolicyDetails
 } from "../../../api/query/index";
 import { checkFeeWindowType, selectDist, saveDistBatch, getReleaseInquiryPage } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
@@ -418,7 +462,7 @@ const historyClaRef = ref(null);
 const sliceSide = ref([]);
 const bottomBtnColor1 = "#3498DB";
 
-const props = defineProps({
+const props:any = defineProps({
   param: {
     type: Object,
   },
@@ -445,6 +489,7 @@ const userString = sessionStorage.getItem("user");
 const user = userString ? JSON.parse(userString) : {};
 const nAmt = ref("0.00");
 const nPrm = ref("0.00");
+const nRecRemPrm = ref("0.00");
 const tmDay = ref(0);
 const dzmodal = useDzModal();
 const cacheKey = ref();
@@ -500,6 +545,18 @@ onMounted(() => {
   console.log('param 路由---', props.param )
   initPage();
 });
+const getRecordTypeText = computed(() => {
+  return (recordType: string) => {
+    const recordTypeMap: { [key: string]: string } = {
+      '1': '自定义录单',
+      '2': '方案录单',
+      '3': '模板录单',
+      '4': '协议出单'
+    };
+    return recordTypeMap[recordType] || '未知录单方式';
+  };
+});
+
 // watchEffect(() => {
 //   const isShow = productStore.$state.cCiMrk !== "0";
 //   ciMasterAgreementFlag.value = isShow;
@@ -543,6 +600,9 @@ const setCusBenefitInfo = () => {
   const AppcClntMrk = tabref["applicant"].getFromValue()["Applicant.cClntMrk"]; // 投保人 法人01
   const InscClntMrk = tabref["insured"].getFromValue()["Insured.cClntMrk"]; // 被保人  法人01
   const baseValue = opertaor.getTableRefByKey("base").getFromValue()["Base.nRmbPrm"];//承保基本信息 折合人民币总保费
+  const basePrmCur = opertaor.getTableRefByKey("base").getFromValue()["Base.cPrmCur"];//承保基本信息 总保费币种
+  const basePrm = opertaor.getTableRefByKey("base").getFromValue()["Base.nPrm"];//承保基本信息 总保费
+	
   //  单据保存才有 单据编号
   if (!appNo) {
     ElMessage.error("请先保存单据");
@@ -566,12 +626,23 @@ const setCusBenefitInfo = () => {
     );
     return;
   }
-  if (baseValue < 200000) {
-    ElMessage.error(
-        "根据反洗钱相关规定，当前保单保费折合人民币大于等于20万元，才允许录入反洗钱扩展信息！"
-    );
-    return;
-  }
+	// 币种为美元，大于2万可以录入反洗钱扩展信息，其他币种判断折合人民币大于20万
+	if(basePrmCur == "USD"){
+		if (basePrm < 20000) {
+			ElMessage.error(
+					"根据反洗钱相关规定，当前保单保费大于等于2万元，才允许录入反洗钱扩展信息！"
+			);
+			return;
+		}
+	} else {
+		if (baseValue < 200000) {
+			ElMessage.error(
+					"根据反洗钱相关规定，当前保单保费折合人民币大于等于20万元，才允许录入反洗钱扩展信息！"
+			);
+			return;
+		}
+	}
+
 
   //  显示标志   1：投保人 2：被保人  3：都展示
   if (AppcClntMrk == "0" && InscClntMrk == "0") {
@@ -1120,12 +1191,20 @@ if (
   }
 }
 
-const dataInit = ref({});
+const dataInit:any = ref({});
 /**
  * 逐个渲染组件
  */
 function renderComponents() {
   const interval = setInterval(() => {
+		if (props.param.pageType === "app") {
+			const idata = getData();
+			dataInit.value = opertaor.mapSetData(idata);
+			// setTimeout(() => {
+			//   // 基本信息预加载，降低空窗期
+			//   opertaor.setDataAll(dataInit.value);
+			// }, 100);
+  	}
     if (currentIndex.value < formconfig1[0]?.pageInfo.length - 1) {
       currentIndex.value++;
     } else {
@@ -1133,15 +1212,7 @@ function renderComponents() {
       clearInterval(interval);
     }
   }, 50); // 延迟组件渲染,增加页面响应效率
-  
-  if (props.param.pageType === "app") {
-    const idata = getData();
-    dataInit.value = opertaor.mapSetData(idata);
-    setTimeout(() => {
-      // 基本信息预加载，降低空窗期
-      opertaor.setDataAll(dataInit.value);
-    }, 100);
-  }
+
 }
 
 /**
@@ -1195,6 +1266,37 @@ async function loadAfter() {
     } else {
       bthList.value = basicBtn;
     }
+		// 协议出单请求被保人信息和条款信息,见费出单跟协议号返回的走并且不可修改，展示剩余预收保费字段
+		if(props.param.cRecordType === 4){
+			let params = {
+				cEcAgrAppNo: props.param.cEcAgrAppNo, // 协议申请单号
+				cProdNo: props.param.cProdNo, // 产品代码
+				cTermNo: props.param.cTermNo, // 条款代码
+				cInsuredCde: props.param.cInsuredCde, // 被保人代码
+			}
+			const res: any = await queryEcargoRelevancePolicyDetails(params);
+			if(res["code"] == 200){
+				if(!!res.data.policyApplication?.composition){
+					dataInit.value.insured = res.data.policyApplication?.composition?.insured[0];
+					dataInit.value.cvrg = res.data.policyApplication?.composition?.cvrg;
+					dataInit.value.plyBase["Base.cNeedfeeFlag"] = props.param.cNeedfeeFlag
+					dataInit.value.plyBase["Base.cEcAgrNo"] = props.param.cEcAgrNo
+					let plyBase = opertaor.getTableRefByKey('plyBase')
+					if(plyBase){
+						const getFormconfig = plyBase.getFormconfig();
+						getFormconfig.fromSchema?.forEach((item:any) => {
+							if(item.prop == "Base.cNeedfeeFlag"){
+								item.disabled = true;
+							}
+						});
+					}
+					nRecRemPrm.value = res.data.policyApplication.nRecRemPrm 
+				}
+			} else {
+				ElMessage.error({ message: res.msg, duration: 3000 });
+				return false;
+			}
+		}
     nextTick(() => {
       opertaor.setDataAll(dataInit.value);
     });
@@ -1215,6 +1317,20 @@ async function loadAfter() {
             props.param["cEdrType"],
             props.param["cGrpMrk"]
           );
+
+          // 用于处理 账户信息
+          let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
+          console.log('669',acctinfoInfo)
+          if(acctinfoInfo){
+              console.log('670',acctinfoInfo)
+              acctinfoInfo.setDisabledAll(false);  
+              acctinfoInfo.setFormItem('Acctinfo.cAcctNme',{
+                disabled: true
+              })
+              acctinfoInfo.setFormItem('Acctinfo.cBankCnaps',{
+                disabled: true
+              })
+          }  
         });
         edritem.value?.handleQuery();
       } else {
@@ -1238,6 +1354,10 @@ async function loadAfter() {
 				)
 			}
     }
+
+     
+
+
   } else if (props.param.pageType === "PLY_APP_MODIFY_BOUNCED_SCENE") {
     // 投保单核保退回
     const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
@@ -1261,10 +1381,6 @@ async function loadAfter() {
     });
     edritem.value?.handleQuery();
   } else if (props.param.pageType === "PLY_UW_PROCESS_SCENE") {
-    //核保处理
-    nextTick(() => {
-      opertaor.setDisabledAll();
-    });
     const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
     await loadAppPlyInfo(cAppNo);
     if (props.param.cAppTyp == "E") {
@@ -1287,7 +1403,11 @@ async function loadAfter() {
 				}),
 			)
 		}
-  } else if (props.param.pageType === "EDR_APP_NEW_SCENE") {
+    //核保处理
+    nextTick(() => {
+      opertaor.setDisabledAll();
+    });
+  } else if (props.param.pageType === "EDR_APP_NEW_SCENE" || props.param.pageType === "TEMPORARY_DEPOSIT" ) {
     // 批改申请-新增
     const cAppNo = props.param.cAppNo;
     await loadAppPlyInfo(cAppNo);
@@ -2182,6 +2302,8 @@ const calcPremium = () => {
     console.log("appCalc-res", res);
     if (res["code"] == "200") {
       const ops: any = opertaor.convertData(res);
+      ops.needCalc = true;
+       ops["base"]["needCalc"] = true
       console.log("保费计算转换的数据", ops);
       if (
         ops["base"]["Base.nPrm"] != undefined &&
@@ -2248,6 +2370,7 @@ const calcPremium = () => {
       // const ciInfo = setCiInfo(ops["base"]);
       // opertaor.getTableRefs()["ci"].setFormValue(ciInfo); //生产联共保信息
       needCalc.value = false;
+      opertaor.getTableRefByKey("base").nPayNumberFun();
 
 //  opertaor.getTableRefs()["base"].setValue("Base.groupPrmCur", 122);
 
@@ -2343,7 +2466,11 @@ const submitToUndrFn = async () => {
 	console.log('判断是否灰黑名单返回的res', res);
 	if(res.code == 200){
 		if(res.msg != '校验通过'){
-			ElMessage.warning(res.msg);
+			ElMessage({
+				message: res.msg.replace(/\n/g, '<br>'),
+				dangerouslyUseHTMLString: true,
+				type: 'warning'
+			});
 			return false;
 		}
 	} else {
@@ -2600,10 +2727,10 @@ const savePlyInfo = async () => {
   if(payList && payList.length>0){
       let numS =0;
         payList.forEach((item) => {
-        numS+= item['Pay.nPayablePrm']
-      });
-      if(numS>res['base']['Base.nPrm']){
-
+              numS+= item['Pay.nPayablePrm']
+          });
+      let formattedSum = Number(numS.toFixed(2));
+      if(formattedSum>res['base']['Base.nPrm']){
         ElMessage.error('缴费计划“应收保费”之和大于整单保费！')
          btn.loading = false;
         return false;
@@ -3186,6 +3313,18 @@ const submitEdrToUndrFun = async () => {
     ElMessage.warning("请填写批改信息中的必填项")
     return
   }
+  // const rv = await opertaor.validateAll();
+  // if (!rv) {
+  //   return;
+  // }
+  // 账户信息校验
+   let acctinfoValidate =await opertaor.getTableRefByKey('acctinfo')?.validate()  // 账户信息 必填校验
+   let isAcctinfo = isDetailCde(); // 是否有账户信息
+    if(!acctinfoValidate && isAcctinfo) {
+      ElMessage.warning("请填写账户信息中的必填项")
+      return
+    }
+
   if (!checkNAmt()) return;
   const f = await saveEdrPlyInfo(); // 提交核保,需要默认执行一次保存操作
   if (f) {
@@ -3637,7 +3776,9 @@ function handleAnchorClick(event: any, targetId: string) {
       item.classList.remove('isActive')
     })
   }
-  event.currentTarget.classList.add('isActive')
+  if(event) {
+    event.currentTarget.classList.add('isActive')
+  }
 }
 
 opertaor.setFatherPage({

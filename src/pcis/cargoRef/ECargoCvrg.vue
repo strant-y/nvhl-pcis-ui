@@ -31,7 +31,7 @@ const formPage = idxParam?.formPage;
 const dialog = ref<DialogMethod | null>(null);
 const cvrgEditRef = ref<AppGridEditMethod | null>(null);
 const formconfig1 = reactive(createAppGridEditConfig({}));
-const cClauseType = ref('');
+const cRdrTyp = ref('');
 const eCargoTermNo = ref('');
 
 const handelCalculate = (row:any,selectData:any)=>{
@@ -50,7 +50,7 @@ const handelCalculate = (row:any,selectData:any)=>{
 onMounted(() => {
   const tableConfig = props.pageSchema;
   tableConfig.fromSchema.forEach((item: any) => {
-    if(['ECargoTerm.cGroupIdx'].includes(item.prop)) {
+    if(['ECargoTerm.cPlanNo'].includes(item.prop)) {
       item.disableColEdit = true;
     }
   });
@@ -82,7 +82,7 @@ onMounted(() => {
             return '长度不小于2'
           }else{
             const list = [...getFormValue()];
-            const f = list.filter((item: any) => item['ECargoTerm.cGroupIdx'] === value);
+            const f = list.filter((item: any) => item['ECargoTerm.cPlanNo'] === value);
             if(f && f.length > 0) {
               return '组名已存在'
             }
@@ -91,7 +91,7 @@ onMounted(() => {
         }
       }).then(({ value }) => { // 确认
         cvrgEditRef.value?.addRowByData(buildRow({
-          cGroupIdx: value
+          cPlanNo: value
         }));
       }).catch(() => { // 取消
 
@@ -159,7 +159,7 @@ const method = {
       ElMessage.warning("请选择要删除的数据!");
       return;
     }
-    const atGroupIdxList = [...getFormValue()].filter((f: any) => f['ECargoTerm.cGroupIdx'] === selData['ECargoTerm.cGroupIdx']);
+    const atGroupIdxList = [...getFormValue()].filter((f: any) => f['ECargoTerm.cPlanNo'] === selData['ECargoTerm.cPlanNo']);
     const del = () => {
       atGroupIdxList.forEach((item: any) => {
         cvrgEditRef?.value?.delRow(item['_dataId']);
@@ -210,7 +210,7 @@ const method = {
   },
   //产品名称change
   cProductChange:(val: string, row: any)=>{
-    const atGroupIdxList = [...getFormValue()].filter((f: any) => f['ECargoTerm.cGroupIdx'] === row['ECargoTerm.cGroupIdx']);
+    const atGroupIdxList = [...getFormValue()].filter((f: any) => f['ECargoTerm.cPlanNo'] === row['ECargoTerm.cPlanNo']);
     const executeChange = () => {
       atGroupIdxList.forEach((item: any) => {
         if(item['_dataId'] === row['_dataId']) {
@@ -221,7 +221,7 @@ const method = {
           item['ECargoTerm.nFeeRate'] = "1.000000"
           item['ECargoTerm.cInsExchCde'] = "1"
           item['ECargoTerm.cPremExchCde'] = "1"
-          item['ECargoTerm.cClauseName'] = ""
+          item['ECargoTerm.cClauseCode'] = ""
           item['ECargoTerm.cRiskNo'] = ""
         }else if(item['_dataId'] !== row['_dataId']) {
           // 产品变更后 删除同一个组内的其它行数据
@@ -246,26 +246,14 @@ const method = {
     }
   },
   //条款类型change
-  cClauseTypeChange:(val, row)=>{
-    setOptions("ECargoTerm.cClauseName", row._dataId, row['ECargoTerm.cClauseType'] === '0' ? "TERM_LIST_02" : "TERM_LIST_EX", { cProdNo:  row['ECargoTerm.cProdNo'], cRdrTyp: val });
-  },
-  //条款名称选择change
-  cClauseChange:(val, row)=>{
-    setOptions("ECargoTerm.cRiskNo", row._dataId, "RISK_LIST_02", { "cTermNo": val, });
-  },
-  cClauseNameOnInit:  (data: any) => {
-    const {value, rowData, config, itemRef} = data;
-    if (!value || !rowData || !config || !itemRef) return;
-    const cProdNo = rowData['ECargoTerm.cProdNo'];
-    const cClauseType = rowData['ECargoTerm.cClauseType'];
-    setOptions("ECargoTerm.cClauseName", rowData._dataId, cClauseType === '0' ? "TERM_LIST_02" : "TERM_LIST_EX", { cProdNo: cProdNo, cRdrTyp: cClauseType });
-    setOptions("ECargoTerm.cRiskNo", rowData._dataId, "RISK_LIST_02", { "cTermNo": value});
+  cRdrTypChange:(val, row)=>{
+    setOptions("ECargoTerm.cClauseCode", row._dataId, row['ECargoTerm.cRdrTyp'] === '0' ? "TERM_LIST_02" : "TERM_LIST_EX", { cProdNo:  row['ECargoTerm.cProdNo'], cRdrTyp: val });
   },
   // 责任初始化事件
   cRiskNoOnInit: (data: any) => {
     const {value, rowData, config, itemRef} = data;
     if (!value || !rowData || !config || !itemRef) return;
-    setOptions("ECargoTerm.cRiskNo", rowData._dataId, "RISK_LIST_02", { "cTermNo": rowData['ECargoTerm.cClauseName']});
+    setOptions("ECargoTerm.cRiskNo", rowData._dataId, "RISK_LIST_02", { "cTermNo": rowData['ECargoTerm.cClauseCode']});
   },
   //原币保险金额change事件
   nInsuranceAmountChange:(val)=>{
@@ -289,25 +277,25 @@ const method = {
       ElMessage.warning("请先选择产品!");
       return;
     }
-    const atGroupIdxList = [...getFormValue()].filter((f: any) => f['ECargoTerm.cGroupIdx'] === row['ECargoTerm.cGroupIdx']);
+    const atGroupIdxList = [...getFormValue()].filter((f: any) => f['ECargoTerm.cPlanNo'] === row['ECargoTerm.cPlanNo']);
     const mainTerm: any = {
       riskList: [],
     };
     const clauseList: any[] = [mainTerm];
     atGroupIdxList.forEach((item: any) => {
-      const cClauseType = item['ECargoTerm.cClauseType']
-      const cClauseName = item['ECargoTerm.cClauseName']
+      const cRdrTyp = item['ECargoTerm.cRdrTyp']
+      const cClauseCode = item['ECargoTerm.cClauseCode']
       const cRiskNo = item['ECargoTerm.cRiskNo']
       const rowId = item['_dataId']
-      if(cClauseType === '0' && !!cRiskNo) {
-        mainTerm['Term.cRdrTyp'] = cClauseType;
-        mainTerm['Term.cClauseCode'] = cClauseName;
+      if(cRdrTyp === '0' && !!cRiskNo) {
+        mainTerm['Term.cRdrTyp'] = cRdrTyp;
+        mainTerm['Term.cClauseCode'] = cClauseCode;
         mainTerm['Term.cRowId'] = rowId;
         mainTerm.riskList.push({ "TermRisktgt.cLiabCode": cRiskNo });
       }else {
         clauseList.push({
-          "Term.cRdrTyp": cClauseType,
-          "Term.cClauseCode": cClauseName,
+          "Term.cRdrTyp": cRdrTyp,
+          "Term.cClauseCode": cClauseCode,
           "Term.cRowId": rowId,
         });
       }
@@ -323,34 +311,34 @@ const method = {
           },
         },
         {
-          isOk: (selectdata: any) => {
+          isOk: async (selectdata: any) => {
             const addList: any[] = [];
             selectdata.forEach((item: any) => {
               if(item.children && item.children.length > 0) {
                 for(const risk of item.children) {
-                  const find = atGroupIdxList.find((d: any) => d['ECargoTerm.cClauseName'] === item.cTermNo && d['ECargoTerm.cRiskNo'] === risk.cRiskNo);
+                  const find = atGroupIdxList.find((d: any) => d['ECargoTerm.cClauseCode'] === item.cTermNo && d['ECargoTerm.cRiskNo'] === risk.cRiskNo);
                   if(find) {
                     addList.push(find)
                   }else {
                     addList.push(buildRow({
                       cProdNo: row['ECargoTerm.cProdNo'],
                       cRiskNo: risk.cRiskNo,
-                      cClauseType: item.cRdrTyp,
-                      cClauseName: item.cTermNo,
-                      cGroupIdx: row['ECargoTerm.cGroupIdx'],
+                      cRdrTyp: item.cRdrTyp,
+                      cClauseCode: item.cTermNo,
+                      cPlanNo: row['ECargoTerm.cPlanNo'],
                     }))
                   }
                 }
               }else {
-                const find = atGroupIdxList.find((d: any) => d['ECargoTerm.cClauseName'] === item.cTermNo && d['ECargoTerm.cClauseType'] === item.cRdrTyp);
+                const find = atGroupIdxList.find((d: any) => d['ECargoTerm.cClauseCode'] === item.cTermNo && d['ECargoTerm.cRdrTyp'] === item.cRdrTyp);
                 if(find) {
                   addList.push(find)
                 }else {
                   addList.push(buildRow({
                     cProdNo: row['ECargoTerm.cProdNo'],
-                    cClauseType: item.cRdrTyp,
-                    cClauseName: item.cTermNo,
-                    cGroupIdx: row['ECargoTerm.cGroupIdx'],
+                    cRdrTyp: item.cRdrTyp,
+                    cClauseCode: item.cTermNo,
+                    cPlanNo: row['ECargoTerm.cPlanNo'],
                   }))
                 }
               }
@@ -358,6 +346,24 @@ const method = {
             const list: any[] = [...getFormValue()];
             // 替换数据
             const index = list.findIndex((f: any) => atGroupIdxList[0]['_dataId'] === f['_dataId']);
+
+            const getClauseName = (rowData: any) => {
+              return new Promise((resolve, reject) => {
+                const cProdNo = rowData['ECargoTerm.cProdNo'];
+                const cRdrTyp = rowData['ECargoTerm.cRdrTyp'];
+                const cClauseCode = rowData['ECargoTerm.cClauseCode'];
+                codeListStore.queryCodeList({
+                  codeListName: cRdrTyp === '0' ? "TERM_LIST_02" : "TERM_LIST_EX",
+                  codeListParam: { cProdNo: cProdNo, cRdrTyp: cRdrTyp },
+                }).then((res) => {
+                  resolve(res.find(f => f['value'] === cClauseCode)?.label)
+                });
+              })
+            }
+            for(const rowData of addList) {
+              const name = await getClauseName(rowData)
+              rowData['ECargoTerm.cClauseName'] = name;
+            }
             cvrgEditRef.value?.spliceTableData(index, atGroupIdxList.length, listSort(addList));
           },
         },
@@ -394,9 +400,9 @@ const buildRow = (data: any) => {
   res['ECargoTerm.cInsExchCde'] = "1"
   res['ECargoTerm.cPremExchCde'] = "1"
   res['ECargoTerm.cProdNo'] = data.cProdNo
-  res['ECargoTerm.cClauseName'] = data.cClauseName
-  res['ECargoTerm.cClauseType'] = data.cClauseType
-  res['ECargoTerm.cGroupIdx'] = data.cGroupIdx
+  res['ECargoTerm.cClauseCode'] = data.cClauseCode
+  res['ECargoTerm.cRdrTyp'] = data.cRdrTyp
+  res['ECargoTerm.cPlanNo'] = data.cPlanNo
   res['ECargoTerm.cRiskNo'] = data.cRiskNo
   return res;
 };
@@ -406,11 +412,11 @@ const listSort = (list: any[]) => {
   const collator = new Intl.Collator('zh-CN');
   // 排序 保证合并单元格的规则正常进行
   return list.sort((x, y) => {
-    const groupCompare = collator.compare(x['ECargoTerm.cGroupIdx'], y['ECargoTerm.cGroupIdx'])
+    const groupCompare = collator.compare(x['ECargoTerm.cPlanNo'], y['ECargoTerm.cPlanNo'])
     if(groupCompare !== 0) {
       return 1;
     }
-    return Number(x['ECargoTerm.cClauseType']) - Number(y['ECargoTerm.cClauseType'])
+    return Number(x['ECargoTerm.cRdrTyp']) - Number(y['ECargoTerm.cRdrTyp'])
   })
 };
 
@@ -441,14 +447,14 @@ const calculateSpans = (key: string, expandRowKeys: string[]) => {
     list.forEach((item: any, index: number) => {
       if (index === 0) {
         idxArr.push(1)
-      } else if(key === 'cGroupIdx'){
-        mergedAction(isMerged('ECargoTerm.cGroupIdx', item, list[index - 1]), index)
+      } else if(key === 'cPlanNo'){
+        mergedAction(isMerged('ECargoTerm.cPlanNo', item, list[index - 1]), index)
       } else if(key === 'cProdNo'){
-        mergedAction(isMerged('ECargoTerm.cProdNo', item, list[index - 1], item['ECargoTerm.cGroupIdx'] === list[index - 1]['ECargoTerm.cGroupIdx']), index)
-      }else if(key === 'cClauseType'){
-        mergedAction(isMerged('ECargoTerm.cClauseType', item, list[index - 1], item['ECargoTerm.cGroupIdx'] === list[index - 1]['ECargoTerm.cGroupIdx']), index)
-      }else if(key === 'cClauseName'){
-        mergedAction(isMerged('ECargoTerm.cClauseName', item, list[index - 1], item['ECargoTerm.cGroupIdx'] === list[index - 1]['ECargoTerm.cGroupIdx'] && item['ECargoTerm.cClauseType'] === list[index - 1]['ECargoTerm.cClauseType']), index)
+        mergedAction(isMerged('ECargoTerm.cProdNo', item, list[index - 1], item['ECargoTerm.cPlanNo'] === list[index - 1]['ECargoTerm.cPlanNo']), index)
+      }else if(key === 'cRdrTyp'){
+        mergedAction(isMerged('ECargoTerm.cRdrTyp', item, list[index - 1], item['ECargoTerm.cPlanNo'] === list[index - 1]['ECargoTerm.cPlanNo']), index)
+      }else if(key === 'cClauseCode'){
+        mergedAction(isMerged('ECargoTerm.cClauseCode', item, list[index - 1], item['ECargoTerm.cPlanNo'] === list[index - 1]['ECargoTerm.cPlanNo'] && item['ECargoTerm.cRdrTyp'] === list[index - 1]['ECargoTerm.cRdrTyp']), index)
       }
     })
   }
@@ -459,13 +465,13 @@ const spanMethod = (obj: any, expandRowKeys: string[]) => {
   const { row, column, rowIndex, columnIndex } = obj;
   let list;
   if (columnIndex === 1) {
-    list = calculateSpans('cGroupIdx', expandRowKeys)
+    list = calculateSpans('cPlanNo', expandRowKeys)
   }else if (columnIndex === 2) {
     list = calculateSpans('cProdNo', expandRowKeys);
   }else if (columnIndex === 3) {
-    list = calculateSpans('cClauseType', expandRowKeys);
+    list = calculateSpans('cRdrTyp', expandRowKeys);
   }else if (columnIndex === 4) {
-    list = calculateSpans('cClauseName', expandRowKeys);
+    list = calculateSpans('cClauseCode', expandRowKeys);
   }
   if(list && list.length > 0) {
     const idx = list[rowIndex]

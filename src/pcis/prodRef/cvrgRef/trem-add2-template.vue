@@ -33,7 +33,16 @@
               :prop="[k, item.prop]"
               :rules="isrequired(item) ? getRequired() : undefined"
             >
+            
+            <template v-if = "it['inputtype'] === 'rttag'">
+              <el-badge value="退" class="term_badge" :hidden="item['Term.cCancelMrk'] !== '1'">
+                <from-item v-model="item['Term.' + kk]" :item="getterm(it,item)" />
+              </el-badge>
+            </template>
+            <template v-else>
               <from-item v-model="item['Term.' + kk]" :item="getterm(it,item)" />
+            </template>
+            
             </el-form-item>
           </td>
           <td>
@@ -114,6 +123,7 @@ const formcof = ref<{ [key: string]: { [key: string]: any } }>({
     inputtype: "rtnumber",
     suffix: "元",
     title: "保费",
+    disabled:true,
   },
   cRemarkInfo: {
     inputtype: "rtinput",
@@ -143,6 +153,7 @@ if (param.cProdNo.startsWith("02")) {
       inputtype: "rtnumber",
       suffix: "元",
       title: "保费",
+      disabled:true,
     },
     nDeductibleAmount: {
       inputtype: "rtnumber",
@@ -193,7 +204,9 @@ function isdisabled(i: any) {
 
 function getterm(it: any,termdata: any){
   if(param.cEdrType && !termdata['Term.cRowId']){
-    it.disabled = false;
+    it.disabled = false || it.disabled ;
+  }else{
+    it.disabled = props.disabledFlag || it.disabled;
   }
   return it;
 }
@@ -213,20 +226,21 @@ function checkShowBtn( data: any ){
   if(param.cEdrType && !data['Term.cRowId']){
     r = true;
   }
-  console.log(r );
   return r;
 };
 
 function changeBtn() {
-  Object.keys(formcof.value).forEach((k: any) => {
-    formcof.value[k].disabled = props.disabledFlag;
-  });
+  // Object.keys(formcof.value).forEach((k: any) => {
+  //   formcof.value[k].disabled = props.disabledFlag || formcof.value[k].disabled;
+  // });
   if(param.cRsnCde === '45'){ // 费率调整,放开费率字段编辑
       formcof.value['nMainRate'].disabled = false;
   }
-  Object.keys(btnConf.value).forEach((k: any) => {
-    btnConf.value[k].hidden = props.disabledFlag;
-  });
+  if(param.cRsnCde !== '11'){
+    Object.keys(btnConf.value).forEach((k: any) => {
+      btnConf.value[k].hidden = props.disabledFlag;
+    });
+  }
 }
 
 watch(() => props.disabledFlag, (val) => { 
@@ -266,5 +280,9 @@ td {
 }
 ::v-deep .el-form-item {
   margin-bottom: 0px !important; /* 使内容显示更近紧促 */
+}
+
+::v-deep .term_badge .el-badge__content{
+  top: 10px !important;
 }
 </style>
