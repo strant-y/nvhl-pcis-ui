@@ -22,7 +22,6 @@ const { getRules } = useValidator();
 import { useProductStore } from "@/store/modules/prod";
 import CostInformation from "@/views/pcis-new-udr-list/pages/CostInformation.vue";
 import { constantRoutes } from "@/router";
-import { chownSync } from "fs";
 const productStore = useProductStore();
 const dialogRef = ref<DialogMethod | null>(null);
 
@@ -53,6 +52,15 @@ onMounted(async () => {
   //一般批改，部分要素可编辑
   const cCiMrkValue =  opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
   setTimeout(() => {
+    if(param?.cAppTyp == 'A'){ //核保
+      const tableList = getFromValue();
+      tableList.forEach((item:any) => {
+        const rowItem  =  freeEditRef.value?.getRowAllItemRefById(item._dataId)
+        rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
+        rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
+        rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
+      })
+    }
     if (param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && cCiMrkValue =='5' && param.cRsnDetailCde.value == "FZ") {
       formconfig1.editFlag = true;
       formconfig1.fromSchema?.forEach((item) => {
@@ -77,7 +85,7 @@ onMounted(async () => {
       }
     })
     }
-  }, 5000);
+  }, 1000);
   formconfig1.fromSchema?.forEach((item:any) => {
     if(item.prop === 'Ci.cCoinsurerCde') {
       item.minWidth = 200
@@ -580,8 +588,9 @@ const method = {
         },
         method: {
           getSelected: (params) => {
-            freeEditRef?.value?.setValueByRowKey("Ci.cBrkrCde", rowId, params.CChaCde);
-            // freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData",[{ label: `${params.CChaCde}${params.CSlsNme}`, value: params.CChaCde }])
+            // freeEditRef?.value?.setValueByRowKey("Ci.cBrkrCde", rowId, params.CChaCde);
+            freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData",[{ label: `${params.CChaCde}${params.CSlsNme}`, value: params.CChaCde }])
+            freeEditRef.value?.setRowFieldProp("Ci.cBrkrCde",rowId,params.CChaCde)
             freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData",[])
             dialogRef.value?.handleClose();
           },
@@ -873,7 +882,8 @@ const initcbusiner = (row:any) =>{
   if(rowdata.length >0){
     const rowId = rowdata[0]._dataId;
     setValueByRowKey('Ci.cSlsCde',rowId, `${row.cSlsId}${row.cSlsNme}`)
-    // setValueByRowKey('Ci.cSlsCde',rowId,row.cSlsId)
+    setValueByRowKey('Ci.cSlsCde',rowId,row.cSlsId)
+    setValueByRowKey('Ci.cSlsNme',rowId,row.cSlsNme)
     freeEditRef.value?.addCodeListMap({
       code:'Ci.cSlsCde'+rowId,
       list:row.loadData,
@@ -886,6 +896,8 @@ const initProxySales = (row:any)=>{
   if(rowData.length>0){
     const rowId = rowData[0]._dataId;
     setValueByRowKey('Ci.cBrkSlsCde',rowId,`${row.cSlsId}${row.cSlsNme}`)
+    setValueByRowKey('Ci.cBrkSlsCde',rowId,row.cSlsId)
+    // setValueByRowKey('Ci.cSlsNme',rowId,row.cSlsNme)
     console.log('代理业务员',{
       code:'Ci.cBrkSlsCde'+rowId,
       list:row.loadData,
@@ -901,7 +913,6 @@ const intiAgentBroker = (row:any)=>{
   const rowData = getFromValue()
   if(rowData.length>0){
     const rowId = rowData[0]._dataId;
-    console.log("00000000000000",row)
     setValueByRowKey('Ci.cBrkrCde',rowId,`${row.CChaCde}${row.CChaNme}`);
     freeEditRef.value?.addCodeListMap({
       code:'Ci.cBrkrCde'+rowId,
@@ -925,19 +936,35 @@ function setFormValue(value: any) {
     const tableValue = getFromValue()
      tableValue.forEach(async elem => {
       if(!!elem["Ci.cSlsCde"] && elem["Ci.cSlsCde"] !== ""){
-        console.log("保费计算完毕",{
-        code:"Ci.cSlsCde"+elem['_dataId'],
-        list:[{value:elem['Ci.cSlsCde'],label:`${elem['Ci.cSlsCde']}${elem['Ci.cSlsNme']}`}]
-        })
        const res = await codeListStore.queryCodeList({codeListName: "CSaleCde_List",
                   codeListParam: {
                     CSlsCde: elem['Ci.cSlsCde'],
                   },
                 },)
+                console.log("保费计算完毕",{
+        code:"Ci.cSlsCde"+elem['_dataId'],
+        list:res
+        })
         freeEditRef.value?.addCodeListMap({
           code:"Ci.cSlsCde"+elem['_dataId'],
           list:res,
         })
+      }else if(!!ele['Ci.cBrkSlsCde'] && elem['Ci.cBrkSlsCde'] !==""){
+        // const cbRes = await codeListStore.queryCodeList({codeListName:"AGENCY_BUSINESS_LIST",
+        //   codeListParam:{
+        //     CDptCde:elem['Ci.cBrkSlsCde'],
+        //   }
+        // })
+        // freeEditRef.value?.addCodeListMap({
+        //   code:"Ci.cBrkSlsCde"+elem['_dataId'],
+        //   list:cbRes,
+        // })
+      }else if(!!ele['Ci.cBrkrCde'] && elem['Ci.cBrkrCde'] !==""){
+        // const cdeRes = await codeListStore.queryCodeList({codeListName:"AGENCY_BUSINESS_LIST",
+        //   codeListParam:{
+        //     CDptCde:elem['Ci.cBrkrCde'],
+        //   }
+        // })
       }
     });
   console.log('保费计算后',tableValue)
