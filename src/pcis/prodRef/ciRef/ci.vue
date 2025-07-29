@@ -21,7 +21,6 @@ import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 import { useProductStore } from "@/store/modules/prod";
 import CostInformation from "@/views/pcis-new-udr-list/pages/CostInformation.vue";
-import { fa } from "element-plus/es/locale";
 import { constantRoutes } from "@/router";
 import { chownSync } from "fs";
 const productStore = useProductStore();
@@ -526,9 +525,6 @@ const method = {
           },
           method: {
             getSelected: (params) => {
-              // setFormItem("Ci.cBrkrCde", {
-              //   loadData: [{ value: params.CChaCde, label: params.CChaNme }],
-              // });
               // freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData","")
               dialogRef.value?.handleClose();
             },
@@ -584,9 +580,6 @@ const method = {
         },
         method: {
           getSelected: (params) => {
-            setFormItem("Ci.cBrkrCde", {
-              loadData: [{ value: params.CChaCde, label: params.CChaNme }],
-            });
             freeEditRef?.value?.setValueByRowKey("Ci.cBrkrCde", rowId, params.CChaCde);
             // freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData",[{ label: `${params.CChaCde}${params.CSlsNme}`, value: params.CChaCde }])
             freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData",[])
@@ -682,22 +675,6 @@ const updateMasterAgreementValues = () => {
     }
   });
 };
-const updateValidationRule = (row, field, targetField, conditionValue) => {
-  const rowId = row._dataId;
-  if (!rowId) return;
-  // 获取当前字段的值
-  const fieldValue = row[field];
-  // 根据条件值判断是否添加必填校验
-  if (fieldValue === conditionValue) {
-    setFormItem(targetField, {
-      rules: [getRules("required", {})], // 添加必填校验
-    });
-  } else {
-    setFormItem(targetField, {
-      rules: [], // 清除校验规则
-    });
-  }
-};
 /**
  * 主共保标识、主联保标识、我司标识变化
  */
@@ -755,30 +732,6 @@ const onChiefMrkChange = () => {
     freeEditRef?.value?.setValueByRowKey("Ci.cJiMrk", rowData._dataId, cJiMrkVal );
     freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowData._dataId, cChiefMrkVal );
 };
-//给表单下拉项赋值
-const setFormItem = (key, obj) => {
-  if (obj && Object.keys(obj).length) {
-    formconfig1.fromSchema?.forEach((item) => {
-      if (item.prop === key) {
-        //控制尾部按钮的
-        if (item.loadData && obj.loadData) {
-          let newBtnItems = null;
-          if (obj.loadData.length != 0) {
-            for (let key in obj.loadData) {
-              item.loadData[key] = obj.loadData[key];
-            }
-          } else {
-            item.loadData = obj.loadData;
-          }
-          newBtnItems = item.loadData;
-          newBtnItems && (obj.loadData = newBtnItems);
-        }
-        Object.assign(item, obj);
-      }
-    });
-  }
-};
-
 // 初始化联共保信息
 const initCiInfo = (data: any) => {
   const {cCiMrk} = data;
@@ -919,7 +872,8 @@ const initcbusiner = (row:any) =>{
   const rowdata = getFromValue();
   if(rowdata.length >0){
     const rowId = rowdata[0]._dataId;
-    setValueByRowKey('Ci.cSlsCde',rowId,`${row.cSlsId}${row.cSlsNme}`)
+    setValueByRowKey('Ci.cSlsCde',rowId, `${row.cSlsId}${row.cSlsNme}`)
+    // setValueByRowKey('Ci.cSlsCde',rowId,row.cSlsId)
     freeEditRef.value?.addCodeListMap({
       code:'Ci.cSlsCde'+rowId,
       list:row.loadData,
@@ -969,22 +923,26 @@ function setFormValue(value: any) {
   freeEditRef?.value?.setFormValue(value);
   setTimeout(() => {
     const tableValue = getFromValue()
-    tableValue.forEach(elem => {
+     tableValue.forEach(async elem => {
       if(!!elem["Ci.cSlsCde"] && elem["Ci.cSlsCde"] !== ""){
         console.log("保费计算完毕",{
         code:"Ci.cSlsCde"+elem['_dataId'],
         list:[{value:elem['Ci.cSlsCde'],label:`${elem['Ci.cSlsCde']}${elem['Ci.cSlsNme']}`}]
         })
+       const res = await codeListStore.queryCodeList({codeListName: "CSaleCde_List",
+                  codeListParam: {
+                    CSlsCde: elem['Ci.cSlsCde'],
+                  },
+                },)
         freeEditRef.value?.addCodeListMap({
           code:"Ci.cSlsCde"+elem['_dataId'],
-          list:[{value:elem['Ci.cSlsCde'],label:`${elem['Ci.cSlsCde']}${elem['Ci.cSlsNme']}`}]
+          list:res,
         })
       }
     });
   console.log('保费计算后',tableValue)
     valideRequired()
   }, 300);
-  
 }
 function setValueByRowKey(props:string ,rowId: any, value:any){
   return freeEditRef?.value?.setValueByRowKey(props,rowId,value);
