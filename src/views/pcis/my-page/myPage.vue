@@ -321,7 +321,16 @@
           />
         </div>
       </el-main>
-      <div style="padding: 0 5%;"></div>
+      <div class="right-btns">
+        <div class="btns-content" v-if="rightBtnList.length > 0">
+          <rt-button
+            v-for="(bth, idx) in rightBtnList"
+            :item="bth"
+            :key="idx"
+            :loading="bth.loading"
+          />
+        </div>
+      </div>
     </el-container>
   </div>
 </template>
@@ -475,6 +484,7 @@ const currentIndex = ref(0);
 const NavigaShow = ref(true);
 const formconfig1 = opertaor.getTableConfig();
 const bthList = ref<Array<FreeButtonBase>>([]);
+const rightBtnList = ref<Array<FreeButtonBase>>([]);
 const tempFindBtn: any[] = [];
 let underwriteFlag = ref(false);
 let edrbaseFlag = ref(false);
@@ -775,22 +785,6 @@ const copyPolicyNumber = () => {
  */
 const basicBtn = [
   createFreeButtonBase({
-    label: "保存模板",
-    type: "primary",
-    buttonColor: bottomBtnColor1,
-    func: () => {
-      handleSaveTemplate()
-    },
-  }),
-  createFreeButtonBase({
-    label: "复制出单",
-    type: "primary",
-    buttonColor: bottomBtnColor1,
-    func: () => {
-      copyPolicyFun();
-    },
-  }),
-  createFreeButtonBase({
     label: "保费计算",
     type: "primary",
     id: "btn010101",
@@ -837,14 +831,6 @@ const basicBtn = [
       setCusBenefitInfo();
     },
   }),
-  createFreeButtonBase({
-    label: "额度明细",
-    type: "primary",
-    buttonColor: bottomBtnColor1,
-    func: () => {
-      openLimit();
-    },
-  }),
 
   // createFreeButtonBase({
   //   label: "历史赔案",
@@ -855,6 +841,35 @@ const basicBtn = [
   //   },
   // }),
 ];
+const basicRightBtn = [
+  createFreeButtonBase({
+    label: "保存模板",
+    type: "primary",
+    buttonColor: bottomBtnColor1,
+    icon: "Memo",
+    func: () => {
+      handleSaveTemplate()
+    },
+  }),
+  createFreeButtonBase({
+    label: "复制出单",
+    type: "primary",
+    buttonColor: bottomBtnColor1,
+    icon: "CopyDocument",
+    func: () => {
+      copyPolicyFun();
+    },
+  }),
+  createFreeButtonBase({
+    label: "额度明细",
+    type: "primary",
+    buttonColor: bottomBtnColor1,
+    icon: "Tickets",
+    func: () => {
+      openLimit();
+    },
+  }),
+]
 /**
  * 一般批改按钮
  */
@@ -1265,6 +1280,7 @@ async function loadAfter() {
       );
     } else {
       bthList.value = basicBtn;
+      rightBtnList.value = basicRightBtn;
     }
 		// 协议出单请求被保人信息和条款信息,见费出单跟协议号返回的走并且不可修改，展示剩余预收保费字段
 		if(props.param.cRecordType === 4){
@@ -1339,6 +1355,7 @@ async function loadAfter() {
       }
     } else if (props.param.cAppTyp == "A") {
       bthList.value = basicBtn;
+      rightBtnList.value = basicRightBtn;
 			if(props.param?.pageName === "priceInquiry") {
 				bthList.value.push(
 					createFreeButtonBase({
@@ -1364,6 +1381,7 @@ async function loadAfter() {
     const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
     await loadAppPlyInfo(cAppNo);
     bthList.value = basicBtn;
+    rightBtnList.value = basicRightBtn;
   } else if (props.param.pageType === "EDR_APP_MODIFY_BOUNCED_SCENE") {
     // 批改单核保退回
     const cAppNo = props.param.cAppNo;
@@ -1800,22 +1818,6 @@ async function loadAfter() {
     });
     bthList.value.push(
       createFreeButtonBase({
-        label: "保存模板",
-        type: "primary",
-        buttonColor: bottomBtnColor1,
-        func: () => {
-          handleSaveTemplate()
-        },
-      }),
-      createFreeButtonBase({
-        label: "复制出单",
-        type: "primary",
-        buttonColor: bottomBtnColor1,
-        func: () => {
-          copyPolicyFun();
-        },
-      }),
-      createFreeButtonBase({
         label: "保费计算",
         type: "primary",
         id: "btn010101",
@@ -1855,6 +1857,24 @@ async function loadAfter() {
           setCusBenefitInfo();
         },
       }),
+    );
+    rightBtnList.value.push(
+      createFreeButtonBase({
+        label: "保存模板",
+        type: "primary",
+        buttonColor: bottomBtnColor1,
+        func: () => {
+          handleSaveTemplate()
+        },
+      }),
+      createFreeButtonBase({
+        label: "复制出单",
+        type: "primary",
+        buttonColor: bottomBtnColor1,
+        func: () => {
+          copyPolicyFun();
+        },
+      }),
       createFreeButtonBase({
         label: "额度明细",
         type: "primary",
@@ -1863,7 +1883,7 @@ async function loadAfter() {
           openLimit();
         },
       })
-    );
+    )
   } else if (props.param?.pageType === "inquiryToApp") {
     getInquiryPolicy({ cInquiryNo: props.param?.cInquiryNo }).then((res:any) => {
       if (res["code"] == "200") {
@@ -1925,18 +1945,10 @@ async function loadAfter() {
       }
     })
     bthList.value = basicBtn;
+    rightBtnList.value = basicRightBtn;
   }
 
   bthList.value.push(
-    createFreeButtonBase({
-    label: "历史赔案",
-    type: "primary",
-    buttonColor: bottomBtnColor1,
-    func: () => {
-      historyClaimcaseFun();
-      // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
-    },
-  }),
     createFreeButtonBase({
       label: "返回",
       func: () => {
@@ -1945,6 +1957,18 @@ async function loadAfter() {
     }),
   
   );
+  rightBtnList.value.push(
+    createFreeButtonBase({
+      label: "历史赔案",
+      type: "primary",
+      buttonColor: bottomBtnColor1,
+      icon: "Histogram",
+      func: () => {
+        historyClaimcaseFun();
+        // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
+      },
+    }),
+  )
 
   if(props.param?.showBtn === false){
     bthList.value = [];
@@ -4148,4 +4172,71 @@ function clearCAppNo(res:any, mapList:any = clearKeyMap) {
   padding: 10px 20px;
 }
 
+.right-btns {
+  padding: 0 3rem;
+  margin-top: 42px;
+  min-width: calc(150px + 6rem);
+  .btns-content {
+    background: #FFFFFF;
+    padding: 10px;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    width: 150px;
+    .el-button {
+      margin: 0 0 12px 0;
+      border: none;
+      background-color: transparent!important;
+      color: #333;
+      padding: 0;
+      :deep(.el-icon) {
+        width: 32px;
+        height: 32px;
+        padding: 6px;
+        border-radius: 2px;
+        margin-right: 10px!important;
+        svg {
+          width: 20px;
+          height: 20px;
+        }
+      }
+      &:last-child {
+        margin-bottom: 0;
+      }
+      &:nth-child(1) {
+        :deep(.el-icon) {
+          background-color: rgb(253, 222, 212);
+          svg {
+            color: #ff3e00;
+          }
+        }
+      }
+      &:nth-child(2) {
+        :deep(.el-icon) {
+          background-color: rgb(238, 244, 254);
+          svg {
+            color: #0060ff;
+          }
+        }
+      }
+      &:nth-child(3) {
+        :deep(.el-icon) {
+          background-color: rgb(255, 242, 212);
+          svg {
+            color: #ffb200;
+          }
+        }
+      }
+      &:nth-child(4) {
+        :deep(.el-icon) {
+          background-color: rgb(230, 251, 234);
+          svg {
+            color: #00ff31;
+          }
+        }
+      }
+    }
+  }
+}
 </style>
