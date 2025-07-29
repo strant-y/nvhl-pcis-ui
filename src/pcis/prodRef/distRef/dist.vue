@@ -400,8 +400,19 @@ const method = {
   },
 
   editmethod: (row: any) => {
-    if(route.params.param?.pageType === "E"){
-      ElMessage.error("请先保存申请单!");
+    let cappNo = '';
+    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+    // 判断有无批改类型参数，有则是批单
+    if(route.params.param?.cEdrType) {
+      cappNo = edrbase['EdrBase.cAppNo'];
+    } else if(route.params.param?.pageName === "priceInquiry") {
+      cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+    } else {
+      cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+    }
+    if (!cappNo) {
+      ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
+      return;
     }else{
       dialog.value?.open(
         "distAdd",
@@ -425,6 +436,20 @@ const method = {
     
   },
   delmethod: (row: any) => {
+    let cappNo = '';
+    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+    // 判断有无批改类型参数，有则是批单
+    if(route.params.param?.cEdrType) {
+      cappNo = edrbase['EdrBase.cAppNo'];
+    } else if(route.params.param?.pageName === "priceInquiry") {
+      cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+    } else {
+      cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+    }
+    if (!cappNo) {
+      ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
+      return;
+    }
     const param = {
       cComponentTable: cComponentTableValue,
       cPkId: [row['Dist.cPkId']],
@@ -613,6 +638,20 @@ const method = {
   },
   //导出
   exportExcel: () => {
+    let cappNo = '';
+    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+    // 判断有无批改类型参数，有则是批单
+    if(route.params.param?.cEdrType) {
+      cappNo = edrbase['EdrBase.cAppNo'];
+    } else if(route.params.param?.pageName === "priceInquiry") {
+      cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+    } else {
+      cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+    }
+    if (!cappNo) {
+      ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
+      return;
+    }
     let paramitem  = Object.assign(oldPageSchema.value, {
       cComponentTable: cComponentTableValue,
     });
@@ -643,9 +682,18 @@ const method = {
   },
   //全量导入
   importExcel() {
-    const cappNo  = route.params.param?.pageName === "priceInquiry" ? opertaor.getDataAll().plyBase["Base.cInquiryNo"] : opertaor.getDataAll().plyBase["Base.cAppNo"];
-    if (cappNo == '' || cappNo == undefined || route.params.param?.pageType === "E") {
-      ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
+    let cappNo = '';
+    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+    // 判断有无批改类型参数，有则是批单
+    if(route.params.param?.cEdrType) {
+      cappNo = edrbase['EdrBase.cAppNo'];
+    } else if(route.params.param?.pageName === "priceInquiry") {
+      cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+    } else {
+      cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+    }
+    if (!cappNo) {
+      ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
       return;
     }
     const input = document.createElement('input');
@@ -704,9 +752,18 @@ const method = {
   },
   // 增量导入
   importExcelIncrement: () => {
-    const cappNo  = route.params.param?.pageName === "priceInquiry" ? opertaor.getDataAll().plyBase["Base.cInquiryNo"] : opertaor.getDataAll().plyBase["Base.cAppNo"];
-    if (cappNo == '' || cappNo == undefined ||route.params.param?.pageType === "E") {
-      ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
+    let cappNo = '';
+    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+    // 判断有无批改类型参数，有则是批单
+    if(route.params.param?.cEdrType) {
+      cappNo = edrbase['EdrBase.cAppNo'];
+    } else if(route.params.param?.pageName === "priceInquiry") {
+      cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+    } else {
+      cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+    }
+    if (!cappNo) {
+      ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
       return;
     }
     const input = document.createElement('input');
@@ -838,6 +895,20 @@ const method = {
   },
   // 批量删除
   batchDelete() {
+    let cappNo = '';
+    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+    // 判断有无批改类型参数，有则是批单
+    if(route.params.param?.cEdrType) {
+      cappNo = edrbase['EdrBase.cAppNo'];
+    } else if(route.params.param?.pageName === "priceInquiry") {
+      cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+    } else {
+      cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+    }
+    if (!cappNo) {
+      ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
+      return;
+    }
     if (selectedRows.value.length === 0) {
       ElMessage.warning("请先选择要删除的数据");
       return;
