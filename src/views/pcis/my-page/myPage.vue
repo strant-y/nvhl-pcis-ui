@@ -156,7 +156,8 @@
                 props.param.cTermNme
               }}</span
             >&nbsp;|&nbsp;<span class="font-weight-500">出单方式：</span
-            ><span class="publicStyle">核心页面出单</span>&nbsp;|
+            ><span class="publicStyle">{{ getRecordTypeText(props.param.cRecordType)
+             }}</span>&nbsp;|
             <span class="publicStyle">{{productStore.cCiMrk === '0' ? '非共保业务' 
               : productStore.cCiMrk == '1' ? '外部共保我方主共_主联'
               : productStore.cCiMrk == '2' ? '外部共保我方从共_主联'
@@ -544,6 +545,18 @@ onMounted(() => {
   console.log('param 路由---', props.param )
   initPage();
 });
+const getRecordTypeText = computed(() => {
+  return (recordType: string) => {
+    const recordTypeMap: { [key: string]: string } = {
+      '1': '自定义录单',
+      '2': '方案录单',
+      '3': '模板录单',
+      '4': '协议出单'
+    };
+    return recordTypeMap[recordType] || '未知录单方式';
+  };
+});
+
 // watchEffect(() => {
 //   const isShow = productStore.$state.cCiMrk !== "0";
 //   ciMasterAgreementFlag.value = isShow;
@@ -1260,12 +1273,13 @@ async function loadAfter() {
 				cProdNo: props.param.cProdNo, // 产品代码
 				cTermNo: props.param.cTermNo, // 条款代码
 				cInsuredCde: props.param.cInsuredCde, // 被保人代码
+				insuredNme: props.param.cInsuredNme, // 被保人名称
 			}
 			const res: any = await queryEcargoRelevancePolicyDetails(params);
 			if(res["code"] == 200){
 				if(!!res.data.policyApplication?.composition){
-					dataInit.value.insured = res.data.policyApplication?.composition?.insured[0];
-					dataInit.value.cvrg = res.data.policyApplication?.composition?.cvrg;
+					dataInit.value.insured = res.data.policyApplication?.composition?.insured[0] || {};
+					dataInit.value.cvrg = res.data.policyApplication?.composition?.cvrg || {};
 					dataInit.value.plyBase["Base.cNeedfeeFlag"] = props.param.cNeedfeeFlag
 					dataInit.value.plyBase["Base.cEcAgrNo"] = props.param.cEcAgrNo
 					let plyBase = opertaor.getTableRefByKey('plyBase')
