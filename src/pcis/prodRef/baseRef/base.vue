@@ -59,7 +59,7 @@ onMounted(async () => {
 
 // 拆分事件
 const nPayNumberFun = (isAdd=false)=>{
-        const tabref = opertaor.getTableRefs();
+    const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["base"].getFromValue();
     const baseData = opertaor.getDataAll()['base']['needCalc'];
     console.log('opertaor',baseData,opertaor.getDataAll(),baseBefore)
@@ -74,13 +74,15 @@ const nPayNumberFun = (isAdd=false)=>{
       return false
     }
     if(getValue("Base.nPayNumber")!=''){
-      if(specialAdd  && isAdd){
+        let cinstmrk = getValue('Base.cInstMrk');
+      if(specialAdd  && isAdd && cinstmrk =='5'){
         ElMessage.warning("分期付费业务，需在特别约定中增加及时缴纳保费的提示信息");
         specialAdd = false;
       }
-
+    
+      console.log('财富 ---‘',cinstmrk)
       // 用来添加特约信息
-      if(isAdd){
+      if(isAdd  && cinstmrk =='5'){
          eventBus.emit('add-special')
       }
      

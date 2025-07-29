@@ -2404,6 +2404,10 @@ const submitToUndrFn = async () => {
     ElMessage.error("请先进行保费计算!");
     return;
   }
+
+  console.log('座位总数',opertaor.getTableRefByKey("tgt"))
+  console.log('座位总数', opertaor.getDataAll())
+
 	// 申请核保前判断是否灰黑名单
 	const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
 	const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
@@ -2454,6 +2458,19 @@ const submitToUndrFn = async () => {
         return false;
       }
    }
+
+   if(props.param?.cProdNo==='043002'){
+      let tgtRef = opertaor.getTableRefByKey("tgt");
+      let num1 = tgtRef.getValue('Tgt.nTotalInsured'); 
+      let num2 = tgtRef.getValue('Tgt.nInsuredcompanySeats'); 
+      let sum = tgtRef.getValue('Tgt.nSeatCapacity');
+      console.log('总数',num1 + num2  !== sum,props.param?.cProdNo,num1,num2,sum)
+      if(num1 + num2  !== sum){
+        ElMessage.error("投保座位总数 = 投保乘客座位总数+投保司乘人员座位总数，请核对");
+        return;
+      }
+    }
+
 
   const f = await savePlyInfo(); // 提交核保,需要默认执行一次保存操作
   if (f) {
