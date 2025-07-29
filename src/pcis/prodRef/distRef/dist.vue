@@ -612,10 +612,18 @@ const method = {
     });
   },
   //导出
-  exportExcel: () => {
-    let paramitem  = Object.assign(oldPageSchema.value, {
+  exportExcel: () => {		
+		const s = cardRef.value?.getFromValue(); // 查询参数
+		// 经营地址只选择省市区不输入详细地址获取表单值会带有undefined，这里处理一下
+		for (let k in s) {
+			if(s[k] && typeof s[k] === 'string' && s[k].indexOf('undefined') !== -1) {
+				s[k] = s[k].replace('undefined', '')
+			}
+		}
+    let paramitem  = Object.assign(formconfig1.value, {
       cComponentTable: cComponentTableValue,
-    });
+    },
+		{ dist: s });
     if(route.params.param?.pageType && route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
       paramitem.voType = "ply"
     }
@@ -627,6 +635,23 @@ const method = {
     if(selectedRows.value.length > 0) {
       paramitem['cPkId'] = selectedRows.value.map((row: any) => row['Dist.cPkId']);
     }
+
+
+		if(paramitem.dist['Dist.ProjectDesignProp']) {
+			paramitem.dist['Dist.cProjectAddress'] = paramitem.dist['Dist.ProjectDesignProp']
+		}
+
+		// 级联地址表格显示问题处理
+		if(Object.keys(mapAddr).includes(props.compKey)) {
+			const addrInput = mapAddr[props.compKey];
+			const keys = Object.keys(addrInput)
+			if(keys && keys.length>0) {
+				const inputGroupKey = keys[0];
+				const addrValueKey = addrInput[inputGroupKey];
+				paramitem.dist[addrValueKey] = paramitem.dist[inputGroupKey];
+			}
+		}
+		console.log('paramitemparamitem', paramitem)
     policyService
         .exportDist(paramitem).then((res) => {
       if (res.size <= 0) {
