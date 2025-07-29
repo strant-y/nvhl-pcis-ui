@@ -30,6 +30,9 @@
         <template #empty>
           {{ "暂无数据" }}
         </template>
+        <template #default="{ node, data }">
+          <span :style="{'font-weight': data.value === 'FZ' ? 'bold' : 'normal'}">{{ data.label }}</span>
+        </template>
       </el-cascader>
     </div>
   </el-tooltip>
