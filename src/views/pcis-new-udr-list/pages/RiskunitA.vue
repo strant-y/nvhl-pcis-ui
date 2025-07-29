@@ -1158,6 +1158,7 @@ function handleSelectionChange(selection: any) {
     });
     setFormItem("nAmtVar", { disabled: false });
     setFormItem("nPrmVar", { disabled: false });
+    pageresult2.list = [];
   }
 }
 
