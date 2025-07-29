@@ -100,7 +100,7 @@
           <xyedrbaseRef ref="xyedrbase"></xyedrbaseRef>
         </div>
         <div id="edritem" v-if="edritemFlag" style="margin-bottom: 10px">
-          <xyedritemRef ref="edritem"></xyedritemRef>
+          <xyedritemRef ref="xyedritem"></xyedritemRef>
         </div>
         <template v-for="(pageConfig, v) in formPage.config" :key="v">
           <div
@@ -184,6 +184,7 @@ const getConmpName = (k: any) => {
 const NavigaShow = ref(true);
 const underwrite = ref(null);
 const xyedrbase = ref(null)
+const xyedritem = ref(null)
 let edrbaseFlag = ref(false);
 let edritemFlag = ref(false);
 onMounted(()=>{
@@ -215,6 +216,9 @@ function setxyedrbaseRefValue(key:any,val:any){
 function getxyedrbaseRefValue(key:any,val:any){
   return xyedrbase.value?.getFromValue()
 }
+function getxyedritemValue(){
+  return xyedritem.value?.handleQuery()
+}
 /**
  * 锚点点击事件重写
  * 避免触发路由
@@ -241,6 +245,7 @@ function handleAnchorClick(event: any, targetId: string) {
   event.currentTarget.classList.add('isActive')
 }
 defineExpose({
+  getxyedritemValue,
   getUnderwriteRef,
   getUnderwriteValue,
   setxyedrbaseRefData,

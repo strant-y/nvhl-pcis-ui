@@ -27,10 +27,11 @@ const props = defineProps({
 });
 const formPage = ref(new FormPage('enteringDtl'));
 const resData = ref({});
-const idxParam = reactive({
+const cacheKey = ref();
+let idxParam = reactive({
   opertaorId: 'enteringDtl',
   formPage: formPage.value,
-  param: { ...props.param, ...{}},
+  param: { ...props.param, ...{cacheKey:cacheKey.value}},
   user: JSON.parse(sessionStorage.getItem("user")),
   ciJiMrk: '0',
   readonly: computed(() => ['view','audit'].includes(props.type)),
@@ -149,7 +150,7 @@ const edrBtn = [
     type: "primary",
     id: "saveEdr",
     func: () => {
-
+      saveEdrPlyInfo()
     },
   }),
   createFreeButtonBase({
@@ -322,6 +323,45 @@ const getBtn = (id) => {
   });
 };
 /**
+ * 批改单保存
+ * **/
+const saveEdrPlyInfo = async () => {
+  let saveEdrFlag = false;
+  const btn = getBtn("saveEdr");
+  btn.loading = true;
+  const res = formPage.value?.getAllFormData();
+  res["user"] = user;
+  res["plyBase"] = {'Base.cDptCde':'','Base.cProdNo':''}
+  res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
+  res["plyBase"]["Base.cProdNo"] = "029900";
+  res["EdrEcargoBase"] = mainRef.value?.getxyedrbaseRefValue();
+  if (
+      res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"] != null &&
+      res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"] != "" &&
+      Array.isArray(res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"])
+  ) {
+    res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"] =
+        res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"].join();
+  }
+  const edrInfo: any = await cargoApi.saveEdrEcargo({
+    ...res,
+    AgreementDistGoods:null,
+    ...{},
+    ...{user},
+    sence:'save'
+  })
+  btn.loading = false;
+  if(edrInfo["code"] == "200") {
+    ElMessage.success(edrInfo.msg);
+    const EdrBaseData = edrInfo["res"]["composition"]["EdrBase"][0];
+    mainRef.value?.setxyedrbaseRefData(EdrBaseData);
+    saveEdrFlag = true;
+  } else {
+    ElMessage.error(edrInfo.msg);
+  }
+  return saveEdrFlag;
+};
+/**
  * 生成批文
  * **/
 const generateEndorse = () => {
@@ -333,18 +373,21 @@ const generateEndorse = () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = '029900';
   res["EdrEcargoBase"] = mainRef.value?.getxyedrbaseRefValue();
+  res["EdrEcargoBase"]['EdrECargoBase.cProdNo'] = '029900';
+  res["EdrEcargoBase"]['EdrECargoBase.cEdrType'] = props.param?.cEdrType
   console.log(res);
   cargoApi.getEcargoEndorseChange(res).then((res) => {
     btn.loading = false;
     if (res["code"] == "200") {
-      debugger
-      // const cEdrCtnt = res["data"]["data"]["cEdrCtnt"]; //批文
-      // const edrRsn = res["data"]["data"]["edrRsn"]; //批文
-      // cacheKey.value = res["data"]["data"]["cacheKey"];
-      // edrbase.value?.setValue("EdrBase.cEdrCtnt", cEdrCtnt);
-      // edrbase.value?.setValue("EdrBase.cacheKey", cacheKey.value);
-      // edrbase.value?.setValue("EdrBase.cEdrRsnDetail", edrRsn);
-      // edritem.value?.handleQuery();
+      const cEdrCtnt = res["data"]["data"]["cEdrCtnt"]; //批文
+      const edrRsn = res["data"]["data"]["edrRsn"]; //批文
+      cacheKey.value = res["data"]["data"]["cacheKey"];
+      mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrCtnt", cEdrCtnt);
+      mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cacheKey", cacheKey.value);
+      mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnDetail", edrRsn);
+      mainRef.value?.setxyedrbaseRefValue("cacheKey", cacheKey);
+      idxParam.param.cacheKey = cacheKey.value
+      mainRef.value?.getxyedritemValue();
       ElMessage.success(res.msg);
     } else {
       ElMessage.error(res.msg);

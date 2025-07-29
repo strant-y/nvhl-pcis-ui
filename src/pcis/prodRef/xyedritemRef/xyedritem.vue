@@ -18,19 +18,8 @@ import { useValidator } from "@/typings/useValidator";
 import {
     getedrcmpitembyedrappnoorcachekey
 } from "../../../api/query/index";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
-const props = defineProps({
-  // data: {
-  //     type: Object,
-  //     default: () => ({}),
-  // },
-  // method: {
-  //     type: Object,
-  //     default: () => ({}),
-  // },
-});
-const opertaor = dataOpertaor();
-const params=opertaor.getParam()
+const idxParam = inject('idxParam');
+const params= idxParam?.param
 const edritemEditRef = ref<AppTableMethod | null>(null);
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -96,13 +85,13 @@ function setDisa() {}
 
 /** 查询 */
 function handleQuery(flag?: boolean) {
-  const cacheKey=opertaor.getFatherPage().getcacheKey()
+  const cacheKey=params?.cacheKey
   const r = edritemEditRef.value?.getPartnerPage(flag); //获取分页数据
   let param;
   if(cacheKey){
       param = Object.assign({pageNo:r['pageNum'],CurrentUser:user.opCde,CurrentUserOrg:user.companyId,cacheKey:cacheKey}, r);
   }else{
-      param = Object.assign({pageNo:r['pageNum'],CurrentUser:user.opCde,CurrentUserOrg:user.companyId,appNo:params.cAppNo}, r);
+      param = Object.assign({pageNo:r['pageNum'],CurrentUser:user.opCde,CurrentUserOrg:user.companyId,appNo:params.cEcAgrAppNo}, r);
   }
   console.log(param)
   getedrcmpitembyedrappnoorcachekey(param)

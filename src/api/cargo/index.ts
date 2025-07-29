@@ -35,6 +35,10 @@ function deleteDist(queryParams: any): AxiosPromise<any> {
 function save(queryParams: any): AxiosPromise<any> {
     return post(`${PageBaseUrl}/saveEcargo`, queryParams);
 }
+//协议批改、批改页面 保存
+function saveEdrEcargo(queryParams: any): AxiosPromise<any> {
+    return post(`${PageBaseUrl}/saveEdrEcargo`, queryParams);
+}
 //协议录入页面 提交
 function submit(queryParams: any): AxiosPromise<any> {
     return post(`${PageBaseUrl}/saveEcargo`, queryParams);
@@ -76,6 +80,7 @@ function getEcargoEndorseChange(queryParams: any): AxiosPromise<any> {
     return post(`/edr/getEcargoEndorseChange`, queryParams);
 }
 export default {
+    saveEdrEcargo,
     getEcargoEndorseChange,
     selectDistNew,
     saveDistNew,
