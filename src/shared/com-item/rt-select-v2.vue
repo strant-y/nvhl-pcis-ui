@@ -25,6 +25,7 @@
         :max-collapse-tags="isMultiple() ? 3 : null"
         :options="options"
         @change="handleChange"
+        style="min-width: 100px;"
       >
         <template
           #label="{ label, value }"

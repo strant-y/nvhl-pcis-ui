@@ -38,7 +38,7 @@
             ? { width: 'calc(100% - 32px)' }
             : item.type === 'icon'
               ? { width: 'calc(100% - 48px)' }
-              : { width: '100%' }
+              : { width: '100%', minWidth: item.minWidth || '100px' }
         "
         :maxlength="item.maxlength"
         :minlength="item.minlength"
