@@ -139,6 +139,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         title: "联系电话",
         itemWidth: 1.5,
+				rules: [getRules("phoneNo", {})],
       },
       {
         prop: "cNotes",
