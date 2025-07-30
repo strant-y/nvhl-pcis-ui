@@ -74,7 +74,9 @@ onMounted(() => {
 
     setFormItem("ECargoApplicant.cGreenIndustryCustomers",{disabled: true});
     setFormItem("ECargoApplicant.cGreenIndustryList",{disabled: true});
-
+    if(!getValue('ECargoApplicant.cCustRiskRank')){
+      setValue('ECargoApplicant.cCustRiskRank','925104')
+    }
   });
 });
 //给表单下拉项赋值
