@@ -157,7 +157,7 @@
       <rt-icon :item="{ icon: vInput }" />
     </template>
     <template v-else>
-      {{ vInput }}
+      {{!!vInput && vInput !== 'undefined' ? vInput : ''}}
     </template>
   </span>
 </template>
