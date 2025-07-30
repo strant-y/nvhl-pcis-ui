@@ -255,7 +255,7 @@ const method = {
     const {value, rowData, config, itemRef} = data;
     // if(!rowData || !config || !itemRef) return;
     const rowId = rowData._dataId;
-    if(value !=""){
+    if(value && value !== ""){
       codeListStore
           .queryCodeList({
             codeListName: "CDptCde_List",
