@@ -2,7 +2,9 @@
 <template>
   <div>
     <el-dialog v-model="maindialogVisible" width="80%" title="人工发起风勘">
-      <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
+			<el-config-provider :locale="enLocale">
+      	<app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
+			</el-config-provider>
     </el-dialog>
   </div>
 </template>
@@ -25,12 +27,15 @@ import { PcisQueryService } from "@/views/payinfoManagement/service/pcis-query-s
 import { defineEmits, onMounted } from "vue";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { getListByCode } from '@/api/code-list-service';
+// 引入 ConfigProvider 组件
+import { ElConfigProvider } from 'element-plus';
+import zhCn from "element-plus/es/locale/lang/zh-cn";
 import moment from "moment";
 const opertaor = dataOpertaor();
 
 const emits = defineEmits(["ok", "cancel"]);
 const pcisQueryService = new PcisQueryService();
-
+const enLocale = zhCn; // 在 script setup 中直接使用
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 const { getRules } = useValidator();
