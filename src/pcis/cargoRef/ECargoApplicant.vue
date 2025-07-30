@@ -41,6 +41,7 @@ const route = useRoute();
 const fileInputRef = ref(null);
 const fileInputType = ref();
 import { readFile } from "@/api/file";
+import moment from "moment/moment";
 const tCertfDate = ref<any[]>([]);
 const idxParam = inject('idxParam');
 const formPage = idxParam?.formPage;
@@ -97,6 +98,19 @@ function setFormItem(key: any, obj: any) {
 
 // 绑定方法
 const method = {
+  tCertMrkChecked:(val:any)=>{
+    if (val == "1") {
+      setValue(
+          "ECargoApplicant.tCertfEndDate",
+          moment(new Date("2099-12-31")).format("YYYY-MM-DD HH:mm:ss")
+      );
+      setFormItem("ECargoApplicant.tCertfEndDate", { disabled: true });
+
+    } else {
+        setValue("ECargoApplicant.tCertfEndDate", "");
+       setFormItem("ECargoApplicant.tCertfEndDate", { disabled: false });
+    }
+  },
   // func demo
   funcquery: () => {},
   // 客户姓名
@@ -179,16 +193,16 @@ const method = {
     setregistAdd();
   },
   //常住地址(input)
-  getcRegisterSuffixAddr: (val: any) => {
+  getcSuffixAddr: (val: any) => {
     setregistAdd();
   },
   
-  //常住地址
+  //注册地址
   getAllProp: (val: any) => {
     setRegisterAdd();
   },
   //注册地址(input)
-  getcSuffixAddr: (val: any) => {
+  getcRegisterSuffixAddr: (val: any) => {
     setRegisterAdd();
   },
 	//投保人性质(0是法人 1是个人)
@@ -638,7 +652,7 @@ const idAnalysis = (id:string)=>{
 }
 function setregistAdd() {
   const ads = applicantEditRef?.value?.getValue("ECargoApplicant.Prop");
-  const a = applicantEditRef?.value?.getValue("ECargoApplicant.cRegisterSuffixAddr") || "";
+  const a = applicantEditRef?.value?.getValue("ECargoApplicant.cSuffixAddr") || "";
   if (ads) {
     getAddressStr({ address: ads }).then((res: any) => {
       const { code, data, msg } = res;
@@ -654,7 +668,7 @@ function setregistAdd() {
 
 function setRegisterAdd() {
   const ads = applicantEditRef?.value?.getValue("ECargoApplicant.RegisterProp");
-  const a = applicantEditRef?.value?.getValue("ECargoApplicant.cSuffixAddr") || "";
+  const a = applicantEditRef?.value?.getValue("ECargoApplicant.cRegisterSuffixAddr") || "";
   if (ads) {
     getAddressStr({ address: ads }).then((res: any) => {
       const { code, data, msg } = res;
