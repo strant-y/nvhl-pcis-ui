@@ -715,7 +715,7 @@ const method = {
       });
 			setFormItem("Insured.cOccupCde", {btnItems:{disabled: false}});
       setFormItem("Insured.cTrdCde", {
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {})],btnItems:{disabled: false}
       });
     } else if (val == "0") {
       setFormItem("Insured.cOccupCde", {
@@ -723,8 +723,10 @@ const method = {
       });
 			setFormItem("Insured.cOccupCde", {btnItems:{disabled: true}});
       setFormItem("Insured.cTrdCde", {
-        rules: [],
+        rules: [],btnItems:{disabled: true}
       });
+      setValue("Insured.cOccupCde", null);
+      setValue("Insured.cTrdCde", null);
     }
   },
   funcreset: () => {

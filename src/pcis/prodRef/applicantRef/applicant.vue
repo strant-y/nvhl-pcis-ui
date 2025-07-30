@@ -777,7 +777,7 @@ const method = {
       });
 			setFormItem("Applicant.cOccupCde", {btnItems:{disabled: false}});
       setFormItem("Applicant.cTrdCde", {
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {})],btnItems:{disabled: false}
       });
     } else if(val == "0") {
       setFormItem("Applicant.cOccupCde", {
@@ -785,8 +785,10 @@ const method = {
       });
 			setFormItem("Applicant.cOccupCde", {btnItems:{disabled: true}});
       setFormItem("Applicant.cTrdCde", {
-        rules: [],
+        rules: [],btnItems:{disabled: true}
       });
+      setValue("Applicant.cOccupCde", null);
+      setValue("Applicant.cTrdCde", null);
     }
   },
   funcNdustryCate: () => {
