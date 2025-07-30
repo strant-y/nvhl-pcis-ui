@@ -3272,10 +3272,15 @@ const saveEdrPlyInfo = async () => {
 /**
  * 生成批文
  * **/
-const generateEndorse = () => {
+const generateEndorse = async () => {
+  const res = opertaor.getDataAll();
+	let isAcctinfo = isDetailCde(); // 是否有账户信息
+	if(isAcctinfo && !res["acctinfo"]["Acctinfo.cAcctNo"]) {
+		ElMessage.warning("账户信息的收款人账号不能为空！")
+		return
+	}
   const btn = getBtn("btnCompare");
   btn.loading = true;
-  const res = opertaor.getDataAll();
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
