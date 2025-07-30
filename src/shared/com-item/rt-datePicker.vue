@@ -55,6 +55,7 @@
             :valueFormat="item.valueFormat ? item.valueFormat : getValueFormat()"
             @change="handleChange"
             @blur="blur"
+            :style="{'min-width': item.type === 'datetime' ? '180px' : '120px'}"
         />
       </div>
     </el-tooltip>

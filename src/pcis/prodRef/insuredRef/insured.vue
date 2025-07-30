@@ -152,6 +152,8 @@ onMounted(() => {
   setFormItem("Insured.cOrganizationCode", {rules: [getRules("socialCode", {})]});
   // 经常居住地校验
   setFormItem("Insured.cHabitualResidence", {rules: [getRules("valiAddress", {})]});
+  // 证件号码
+  setFormItem("Insured.cCertfCde", {minWidth: '165px'});
 });             
 function setFormItem(key: any, obj: any) {
   if (obj && Object.keys(obj).length) {
