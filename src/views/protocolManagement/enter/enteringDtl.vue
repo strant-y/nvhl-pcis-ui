@@ -237,9 +237,8 @@ onBeforeMount(async () => {
   }
   if(['view','edit','audit','EDR_APP_NEW_SCENE'].includes(props.type)){
     nextTick(async ()=>{
-     await query();
+      await query();
     })
-
   }
 	if (props.type === "add") {
     const idata = getECargoData();
@@ -358,6 +357,14 @@ const submitEdrToUndrFun = async () => {
 const saveEdrPlyInfo = async () => {
   let saveEdrFlag = false;
   const btn = getBtn("saveEdr");
+
+  const validateAll = await formPage.value?.validateAll();
+  console.log('validateAll', validateAll);
+  if(!validateAll.flag) {
+    ElMessage.warning(validateAll.msg);
+    return;
+  }
+
   btn.loading = true;
   const res = formPage.value?.getAllFormData();
   res["user"] = user;
@@ -424,12 +431,13 @@ const generateEndorse = () => {
   });
 };
 function query() {
+  lastDataQuery();
   cargoApi.init({
     ...idxParam.param,
     ...{}
   }).then((res: any) => {
     if(res.code === 200) {
-      console.log('res........',res)
+      console.log('query-res',res)
       ElMessage.success('查询成功');
 
       const pageInit = () => {
@@ -466,21 +474,17 @@ function query() {
           });
         }
       }
-       let dataForm:any ={...res.data.composition,AgreementBase:res.data.composition?.AgreementBase[0],AgreementApplicant:res.data.composition?.AgreementApplicant[0],AgreementFeeWarn:res.data.composition?.AgreementBase[0]}
-        delete dataForm.AgreementEdrEcargoBase
-        delete dataForm.AgreementFeeWarn['ECargoBase.cEcAgrAppNo']
-        if(props.type === 'EDR_APP_NEW_SCENE'){
-          dataForm['AgreementBase']['ECargoBase.cEcAgrAppNo'] = ''
+      let dataForm:any ={...res.data.composition,AgreementBase:res.data.composition?.AgreementBase[0],AgreementApplicant:res.data.composition?.AgreementApplicant[0],AgreementFeeWarn:res.data.composition?.AgreementBase[0]}
+      delete dataForm.AgreementEdrEcargoBase
+      delete dataForm.AgreementFeeWarn['ECargoBase.cEcAgrAppNo']
+      if(props.type === 'EDR_APP_NEW_SCENE'){
+      dataForm['AgreementBase']['ECargoBase.cEcAgrAppNo'] = ''
+      }
+      formPage.value?.setAllFormData( dataForm, {
+        success: (pageData: any) => {
+          pageInit()
         }
-          formPage.value?.setAllFormData(
-              dataForm,
-              {
-              success: (pageData: any) => {
-                pageInit()
-              }
-          }
-      );
-
+      });
     }else {
       ElMessage.error(res.msg);
     }
@@ -494,6 +498,19 @@ function query() {
         submitBtn.disabled = true;
       })
     }
+  }
+}
+function lastDataQuery() {
+  if (props.type === 'EDR_APP_NEW_SCENE') {
+    cargoApi.queryEcargoDetailsLast({
+      ...idxParam.param,
+    }).then((res: any) => {
+      console.log('lastDataQuery-res', res)
+      if(res.code === 200) {
+        const dataForm:any ={...res.data.composition,AgreementBase:res.data.composition?.AgreementBase[0],AgreementApplicant:res.data.composition?.AgreementApplicant[0],AgreementFeeWarn:res.data.composition?.AgreementBase[0]}
+        formPage.value?.setAllCompPrimevalData(dataForm)
+      }
+    });
   }
 }
 function isAllAValuesSame(arr:any,key:any) {

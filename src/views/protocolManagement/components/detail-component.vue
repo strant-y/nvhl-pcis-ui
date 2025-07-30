@@ -97,10 +97,24 @@
       </el-aside>
       <el-main>
         <div id="edrbase" v-if="edrbaseFlag" style="margin-bottom: 10px">
-          <xyedrbaseRef ref="xyedrbase"></xyedrbaseRef>
+          <xyedrbaseRef
+              :ref="(res: any) => {
+                if(res && res.addProvide){
+                  res.addProvide('domId', 'xyedrbase');
+                }
+                xyedrbase = res
+              }"
+          />
         </div>
         <div id="edritem" v-if="edritemFlag" style="margin-bottom: 10px">
-          <xyedritemRef ref="xyedritem"></xyedritemRef>
+          <xyedritemRef
+            :ref="(res: any) => {
+              if(res && res.addProvide){
+                res.addProvide('domId', 'xyedritem');
+              }
+              xyedritem = res
+            }"
+          />
         </div>
           <template v-for="(pageConfig, v) in formPage.config" :key="v">
             <div
@@ -111,13 +125,15 @@
                 v-show="k.pageKey !== 'acctinfo' ? ['AgreementCiShare', 'AgreementCi', 'AgreementCiTcp'].includes(k.pageCode) ? isCiJiMrk : acctinfoFlag : true"
             >
               <component
-                  :ref="(res: any) => {
+                :ref="(res: any) => {
                   formPage.setComponentRef(k.pageCode, res);
-                }
-              "
-                  :is="getConmpName(k)"
-                  :pageSchema="k.pageSchema"
-                  :compKey="k.pageKey"
+                  if(res && res.addProvide){
+                    res.addProvide('domId', k.pageCode);
+                  }
+                }"
+                :is="getConmpName(k)"
+                :pageSchema="k.pageSchema"
+                :compKey="k.pageKey"
               />
             </div>
           </template>
@@ -126,7 +142,15 @@
             v-if="underwriteFlag"
             style="margin-bottom: 10px"
         >
-          <auditwriteRef ref="underwrite" :pageData="pageData"></auditwriteRef>
+          <auditwriteRef
+            :pageData="pageData"
+            :ref="(res: any) => {
+              if(res && res.addProvide){
+                res.addProvide('domId', 'underwrite');
+              }
+              underwrite = res
+            }"
+          />
         </div>
         <el-backtop :target="'.el-main'" :right="100" :bottom="150" />
         <el-affix position="bottom" :offset="10">
@@ -158,8 +182,10 @@ const props = defineProps({
   pageType:String
 });
 let underwriteFlag = ref(false);
-const idxParam = inject('idxParam');
+const idxParam = inject<any>('idxParam', {});
 const formPage = idxParam?.formPage;
+idxParam.handleAnchorClick = handleAnchorClick;
+
 const isCiJiMrk = computed(() => !!idxParam.ciJiMrk && idxParam.ciJiMrk !== '0');
 const acctinfoFlag = computed(() => !!(idxParam.param.acctinfoFlag));
 const pageData = ref({}); // 页面数据
@@ -210,7 +236,9 @@ function getxyedritemValue(){
  */
 function handleAnchorClick(event: any, targetId: string) {
   // 阻止默认的路由跳转行为
-  event.preventDefault();
+  if(event) {
+    event.preventDefault();
+  }
   // 获取目标元素的ID
   if (targetId) {
     // 手动实现平滑滚动效果
@@ -227,7 +255,9 @@ function handleAnchorClick(event: any, targetId: string) {
       item.classList.remove('isActive')
     })
   }
-  event.currentTarget.classList.add('isActive')
+  if(event) {
+    event.currentTarget.classList.add('isActive')
+  }
 }
 defineExpose({
   getxyedritemValue,

@@ -79,6 +79,13 @@ function selectDistNew(queryParams: any): AxiosPromise<any> {
 function getEcargoEndorseChange(queryParams: any): AxiosPromise<any> {
     return post(`/edr/getEcargoEndorseChange`, queryParams);
 }
+
+// 查询最新协议落地数据
+function queryEcargoDetailsLast(queryParams: any): AxiosPromise<any> {
+    return post(`${PageBaseUrl}/queryEcargoDetailsLast`, queryParams);
+}
+
+
 export default {
     saveEdrEcargo,
     getEcargoEndorseChange,
@@ -95,6 +102,7 @@ export default {
     editInit,
     init,
     queryEcargoList,
-    getECargoPageView
+    getECargoPageView,
+    queryEcargoDetailsLast
 }
 
