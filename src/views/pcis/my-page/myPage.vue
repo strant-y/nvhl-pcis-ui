@@ -2956,7 +2956,7 @@ const calcPremiumEdr = () => {
             }
           })
           if(num > 0) {
-            nInsuranceAmount.push(num)
+            c.push(num)
           } else {
             nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
           }
@@ -3022,7 +3022,7 @@ const calcPremiumEdr = () => {
           ops["plyBase"]["Base.nPrmVar"]
       );
       opertaor.setDataAll(ops);
-      nAmt.value = ops["base"]["Base.nAmt"] ? ops["base"]["Base.nAmt"] : 0;
+      nAmt.value = ops["base"]["Base.nAmt"] ? ops["base"]["Base.nAmt"]  : 0;
       nPrm.value = ops["base"]["Base.nPrm"] ? ops["base"]["Base.nPrm"] : 0;
       const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
       res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
@@ -3055,6 +3055,7 @@ const calcPremiumEdr = () => {
         // currentPayList = currentPayList.filter(item => {
         //   return item['Pay.cAppNo'] && item.hasOwnProperty('Pay.cAppNo');
         // });
+       
                 let payInfo = setPayInfoEdr(
                 ops["payinfo"],
                 ops["base"],
@@ -3063,6 +3064,7 @@ const calcPremiumEdr = () => {
                 ops["plyBase"],
                 currentPayList.length+1
               );
+               console.log(3034,payInfo)
             console.log('data--' ,currentPayList)
             console.log('data2--' ,payInfo)
             currentPayList.push(payInfo); // 插入新条目
@@ -3087,12 +3089,12 @@ const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase,nTms) => {
     pay["Pay.cPayorCde"] = "";
     pay["Pay.cPayorNme"] = "";
   }
-  pay["Pay.nPayablePrm"] = nPrmVar;
+  pay["Pay.nPayablePrm"] = nPrmVar >0? nPrmVar : 0;
   pay["Pay.tPayBgnTm"] = plyBase["Base.tEdrAppTm"];
   pay["Pay.tPayEndTm"] = plyBase["Base.tEdrBgnTm"];
-  pay["Pay.nOwnPrm"] = nPrmVar;
+  pay["Pay.nOwnPrm"] = nPrmVar >0? nPrmVar : 0;
   pay["Pay.cProdNo"] = base["Base.cProdNo"];
-  pay["Pay.nPrmVar"] = nPrmVar ;
+  pay["Pay.nPrmVar"] = nPrmVar >0? nPrmVar : 0;
   // for (const i in payList) {
   //   if (!!payList[i]["Pay.cPkId"]) {
   //     payListNew.push(payList[i]);
@@ -3250,6 +3252,8 @@ const submitEdrToUndrSurrender = async () => {
   res["data"] = opertaor.getDataAll();
   res["data"]["EdrBase"] = edrbase.value?.getFromValue();
   console.log(res);
+
+  
   submitEdrSurrender(res).then((res) => {
     btn.loading = false;
     console.log("申请核保(退保、注销)", res);
@@ -3346,7 +3350,59 @@ const generateEndorse = async () => {
 /**
  * 批单申请核保
  */
+
+    /**
+     * 验证账户信息表单
+     */
+  const validateAcctinfo = async () => {  
+      let prmVar =  opertaor.getDataAll()['plyBase']['Base.nPrmVar']
+        // 保费变化量 < 0 说明批改之后保费减少, 此时需要设置账户信息
+        if (!!prmVar && prmVar < 0) {
+            const acctinfoRef =opertaor.getTableRefs()["acctinfo"];
+             let acctinfoValidate =await opertaor.getTableRefByKey('acctinfo')?.validate()  // 账户信息 必填校验
+              let isAcctinfo = isDetailCde(); // 是否有账户信息
+                if(!acctinfoValidate && isAcctinfo) {
+                  ElMessage.warning("请填写账户信息中的必填项")
+                  return false;
+                }
+            // 收款人账号
+            const CAcctNo = acctinfoRef.getValue('Acctinfo.cAcctNo')
+            if (!!CAcctNo) {
+            } else {
+                ElMessage.error("收款人账号不能为空!");
+                return false;
+            }
+
+            // 收款人户名
+            const CAcctNme = acctinfoRef.getValue('Acctinfo.cAcctNme')
+            if (!!CAcctNme) {
+            } else {
+                ElMessage.error("收款人户名不能为空!");
+                return false;
+            }
+
+            // 收款银行大类
+            const CBankRelTyp = acctinfoRef.getValue('Acctinfo.cBankRelTyp')
+            if (!!CBankRelTyp) {
+            } else {
+                ElMessage.error("收款银行大类不能为空!");
+                return false;
+            }
+        }
+        return true;
+    }
+
+
 const submitEdrToUndrFun = async () => {
+  // await validateAcctinfo()
+
+    const isAcctValid = await validateAcctinfo();
+    console.log('1212',isAcctValid)
+  if (!isAcctValid) {
+    // 可以在这里添加错误提示（如果validateAcctinfo内部没做的话）
+    // ElMessage.error("账户信息校验不通过，请检查");
+    return; // 直接返回，中断后续操作
+  }
   if (needCalc.value) {
     ElMessage.error("请先进行保费计算!");
     return;
@@ -3365,12 +3421,12 @@ const submitEdrToUndrFun = async () => {
   //   return;
   // }
   // 账户信息校验
-   let acctinfoValidate =await opertaor.getTableRefByKey('acctinfo')?.validate()  // 账户信息 必填校验
-   let isAcctinfo = isDetailCde(); // 是否有账户信息
-    if(!acctinfoValidate && isAcctinfo) {
-      ElMessage.warning("请填写账户信息中的必填项")
-      return
-    }
+  //  let acctinfoValidate =await opertaor.getTableRefByKey('acctinfo')?.validate()  // 账户信息 必填校验
+  //  let isAcctinfo = isDetailCde(); // 是否有账户信息
+  //   if(!acctinfoValidate && isAcctinfo) {
+  //     ElMessage.warning("请填写账户信息中的必填项")
+  //     return
+  //   }
 
   if (!checkNAmt()) return;
   const f = await saveEdrPlyInfo(); // 提交核保,需要默认执行一次保存操作
