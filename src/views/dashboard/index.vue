@@ -531,7 +531,8 @@ function getOrderInfo() {
    getAnalysis({type:'ply_total'}).then((res:any) => {
     if(res.code === 200) {
       tabDataMap.value = res.dataMap;
-      const keys = Object.keys(res.dataMap);
+      const keys = Object.keys(res.dataMap).filter((item:any) => item === '核心页面出单' || item === '复制出单' || item === '模板出单' || item === '方案出单' || item === '询报价转投保');
+      keys.splice(0, 0, keys.splice(keys.indexOf('核心页面出单'), 1)[0]);
       currentTab.value = keys[0];
       statisticTabList.value = keys
       handleRefreshEcharts()

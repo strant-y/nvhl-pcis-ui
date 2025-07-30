@@ -21,9 +21,7 @@ import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 import { useProductStore } from "@/store/modules/prod";
 import CostInformation from "@/views/pcis-new-udr-list/pages/CostInformation.vue";
-import { fa } from "element-plus/es/locale";
 import { constantRoutes } from "@/router";
-import { chownSync } from "fs";
 const productStore = useProductStore();
 const dialogRef = ref<DialogMethod | null>(null);
 
@@ -54,6 +52,15 @@ onMounted(async () => {
   //一般批改，部分要素可编辑
   const cCiMrkValue =  opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
   setTimeout(() => {
+    if(param?.cAppTyp == 'A'){ //核保
+      const tableList = getFromValue();
+      tableList.forEach((item:any) => {
+        const rowItem  =  freeEditRef.value?.getRowAllItemRefById(item._dataId)
+        rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
+        rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
+        rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
+      })
+    }
     if (param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && cCiMrkValue =='5' && param.cRsnDetailCde.value == "FZ") {
       formconfig1.editFlag = true;
       formconfig1.fromSchema?.forEach((item) => {
@@ -78,7 +85,7 @@ onMounted(async () => {
       }
     })
     }
-  }, 5000);
+  }, 1000);
   formconfig1.fromSchema?.forEach((item:any) => {
     if(item.prop === 'Ci.cCoinsurerCde') {
       item.minWidth = 200
@@ -526,9 +533,6 @@ const method = {
           },
           method: {
             getSelected: (params) => {
-              // setFormItem("Ci.cBrkrCde", {
-              //   loadData: [{ value: params.CChaCde, label: params.CChaNme }],
-              // });
               // freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData","")
               dialogRef.value?.handleClose();
             },
@@ -584,11 +588,9 @@ const method = {
         },
         method: {
           getSelected: (params) => {
-            setFormItem("Ci.cBrkrCde", {
-              loadData: [{ value: params.CChaCde, label: params.CChaNme }],
-            });
-            freeEditRef?.value?.setValueByRowKey("Ci.cBrkrCde", rowId, params.CChaCde);
-            // freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData",[{ label: `${params.CChaCde}${params.CSlsNme}`, value: params.CChaCde }])
+            // freeEditRef?.value?.setValueByRowKey("Ci.cBrkrCde", rowId, params.CChaCde);
+            freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData",[{ label: `${params.CChaCde}${params.CSlsNme}`, value: params.CChaCde }])
+            freeEditRef.value?.setRowFieldProp("Ci.cBrkrCde",rowId,params.CChaCde)
             freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData",[])
             dialogRef.value?.handleClose();
           },
@@ -682,22 +684,6 @@ const updateMasterAgreementValues = () => {
     }
   });
 };
-const updateValidationRule = (row, field, targetField, conditionValue) => {
-  const rowId = row._dataId;
-  if (!rowId) return;
-  // 获取当前字段的值
-  const fieldValue = row[field];
-  // 根据条件值判断是否添加必填校验
-  if (fieldValue === conditionValue) {
-    setFormItem(targetField, {
-      rules: [getRules("required", {})], // 添加必填校验
-    });
-  } else {
-    setFormItem(targetField, {
-      rules: [], // 清除校验规则
-    });
-  }
-};
 /**
  * 主共保标识、主联保标识、我司标识变化
  */
@@ -755,30 +741,6 @@ const onChiefMrkChange = () => {
     freeEditRef?.value?.setValueByRowKey("Ci.cJiMrk", rowData._dataId, cJiMrkVal );
     freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowData._dataId, cChiefMrkVal );
 };
-//给表单下拉项赋值
-const setFormItem = (key, obj) => {
-  if (obj && Object.keys(obj).length) {
-    formconfig1.fromSchema?.forEach((item) => {
-      if (item.prop === key) {
-        //控制尾部按钮的
-        if (item.loadData && obj.loadData) {
-          let newBtnItems = null;
-          if (obj.loadData.length != 0) {
-            for (let key in obj.loadData) {
-              item.loadData[key] = obj.loadData[key];
-            }
-          } else {
-            item.loadData = obj.loadData;
-          }
-          newBtnItems = item.loadData;
-          newBtnItems && (obj.loadData = newBtnItems);
-        }
-        Object.assign(item, obj);
-      }
-    });
-  }
-};
-
 // 初始化联共保信息
 const initCiInfo = (data: any) => {
   const {cCiMrk} = data;
@@ -919,7 +881,9 @@ const initcbusiner = (row:any) =>{
   const rowdata = getFromValue();
   if(rowdata.length >0){
     const rowId = rowdata[0]._dataId;
-    setValueByRowKey('Ci.cSlsCde',rowId,`${row.cSlsId}${row.cSlsNme}`)
+    setValueByRowKey('Ci.cSlsCde',rowId, `${row.cSlsId}${row.cSlsNme}`)
+    setValueByRowKey('Ci.cSlsCde',rowId,row.cSlsId)
+    setValueByRowKey('Ci.cSlsNme',rowId,row.cSlsNme)
     freeEditRef.value?.addCodeListMap({
       code:'Ci.cSlsCde'+rowId,
       list:row.loadData,
@@ -932,6 +896,8 @@ const initProxySales = (row:any)=>{
   if(rowData.length>0){
     const rowId = rowData[0]._dataId;
     setValueByRowKey('Ci.cBrkSlsCde',rowId,`${row.cSlsId}${row.cSlsNme}`)
+    setValueByRowKey('Ci.cBrkSlsCde',rowId,row.cSlsId)
+    // setValueByRowKey('Ci.cSlsNme',rowId,row.cSlsNme)
     console.log('代理业务员',{
       code:'Ci.cBrkSlsCde'+rowId,
       list:row.loadData,
@@ -947,7 +913,6 @@ const intiAgentBroker = (row:any)=>{
   const rowData = getFromValue()
   if(rowData.length>0){
     const rowId = rowData[0]._dataId;
-    console.log("00000000000000",row)
     setValueByRowKey('Ci.cBrkrCde',rowId,`${row.CChaCde}${row.CChaNme}`);
     freeEditRef.value?.addCodeListMap({
       code:'Ci.cBrkrCde'+rowId,
@@ -969,22 +934,42 @@ function setFormValue(value: any) {
   freeEditRef?.value?.setFormValue(value);
   setTimeout(() => {
     const tableValue = getFromValue()
-    tableValue.forEach(elem => {
+     tableValue.forEach(async elem => {
       if(!!elem["Ci.cSlsCde"] && elem["Ci.cSlsCde"] !== ""){
-        console.log("保费计算完毕",{
+       const res = await codeListStore.queryCodeList({codeListName: "CSaleCde_List",
+                  codeListParam: {
+                    CSlsCde: elem['Ci.cSlsCde'],
+                  },
+                },)
+                console.log("保费计算完毕",{
         code:"Ci.cSlsCde"+elem['_dataId'],
-        list:[{value:elem['Ci.cSlsCde'],label:`${elem['Ci.cSlsCde']}${elem['Ci.cSlsNme']}`}]
+        list:res
         })
         freeEditRef.value?.addCodeListMap({
           code:"Ci.cSlsCde"+elem['_dataId'],
-          list:[{value:elem['Ci.cSlsCde'],label:`${elem['Ci.cSlsCde']}${elem['Ci.cSlsNme']}`}]
+          list:res,
         })
+      }else if(!!ele['Ci.cBrkSlsCde'] && elem['Ci.cBrkSlsCde'] !==""){
+        // const cbRes = await codeListStore.queryCodeList({codeListName:"AGENCY_BUSINESS_LIST",
+        //   codeListParam:{
+        //     CDptCde:elem['Ci.cBrkSlsCde'],
+        //   }
+        // })
+        // freeEditRef.value?.addCodeListMap({
+        //   code:"Ci.cBrkSlsCde"+elem['_dataId'],
+        //   list:cbRes,
+        // })
+      }else if(!!ele['Ci.cBrkrCde'] && elem['Ci.cBrkrCde'] !==""){
+        // const cdeRes = await codeListStore.queryCodeList({codeListName:"AGENCY_BUSINESS_LIST",
+        //   codeListParam:{
+        //     CDptCde:elem['Ci.cBrkrCde'],
+        //   }
+        // })
       }
     });
   console.log('保费计算后',tableValue)
     valideRequired()
   }, 300);
-  
 }
 function setValueByRowKey(props:string ,rowId: any, value:any){
   return freeEditRef?.value?.setValueByRowKey(props,rowId,value);

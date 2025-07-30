@@ -53,13 +53,19 @@
               <el-input
                 v-model="loginData.password"
                 :placeholder="$t('login.password')"
-                type="password"
+                :type="passwordType"
                 name="password"
                 @keyup.enter="handleLogin"
                 size="large"
-                show-password
                 @change="handleLoginChange"
-              />
+              >
+                <template #suffix>
+                  <span @mousedown="showPassword" @mouseup="hidePassword" @mouseleave="hidePassword">
+                    <el-icon v-if="passwordType === 'text'"><View /></el-icon>
+                    <el-icon v-else><Hide /></el-icon>
+                  </span>
+                </template>
+              </el-input>
             </div>
           </el-form-item>
           <!-- 验证码 -->
@@ -273,6 +279,18 @@ const isCapslock = ref(false); // 是否大写锁定
 const captchaBase64 = ref(); // 验证码图片Base64字符串
 const loginFormRef = ref(ElForm); // 登录表单ref
 const { height } = useWindowSize();
+const passwordType = ref("password"); // 密码类型
+const isMouseDown = ref(false); // 鼠标按下状态
+const showPassword = () => {
+  passwordType.value = "text";
+  isMouseDown.value = true
+};
+const hidePassword = () => {
+  if(isMouseDown.value) {
+    passwordType.value = "password";
+    isMouseDown.value = false
+  }
+};
 
 const loginData = ref<LoginData>({
   username: "",

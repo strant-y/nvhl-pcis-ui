@@ -111,9 +111,9 @@ const handleSelectionChange = (selection) => {
 };
 
 const refreshData = () => {
-  console.log(props.data,"0000000")
   const cProdNo = props.data.cProdNo;
   const cDptCde = props.data.cDptCde || '';
+
   // 查询列表数据
   getpSpecialAgreement({
     cProdNo: cProdNo,
@@ -122,7 +122,6 @@ const refreshData = () => {
     pageSize: 999,
   }).then((res) => {
     if (res.data.result) {
-      console.log("res.data.result", res.data.result);
       pageresult.list = [];
       res.data.result.forEach((item, index) => {
         pageresult.list.push({
@@ -159,24 +158,42 @@ function add() {
     addIndex: addTableData.length + 1, //序号
     cSpecialCode: "",
     cSpecialContent: "",
-    cIfMust: "2", //是否必选
     cIfEdit: "0", //是否可修改
-    cIfFix: "2", //是否固定特约，查寻特约模板接口查出来的1，自定义添加的为0
+    cIfMust: "2", //是否必选
+    cIfFix: "0", //是否固定特约，查寻特约模板接口查出来的1，自定义添加的为0
   });
 
-  console.log('12',addTableData)
+  console.log('12',addTableData) 
 }
 
 //点击确定按钮时把选中的数据派发给父组件
 const returnData = () => {
+  let selectedData = props.data.selectedData;
   let tempData = multipleTableRef.value.getSelectionRows();
   if(addTableData) {
     for (const item of addTableData) {
       tempData.push(item);
     }
   }
-  console.log('测试护具',tempData)
-  props.method.getSelected(tempData);
+
+  const processedNewItems = tempData.map(item2 => {
+  const matchedItem1 = selectedData.find(item1 => 
+        item1.cIfEdit === '1' && item1.cSpecialCode === item2.cSpecialCode
+  );
+  return matchedItem1 ? matchedItem1 : item2;
+});
+
+const oldFenqiItem = selectedData.find(item => item.cSpecialCode === 'fenqi01');
+const result = oldFenqiItem 
+  ? [...processedNewItems, oldFenqiItem]  // 包含fenqi01
+  : processedNewItems;   
+
+
+
+  console.log('addTableData,’',addTableData)
+  console.log('id----11',selectedData)
+  console.log('id----22',result)
+  props.method.getSelected(result);
   close();
 };
 const close = () => {
@@ -185,7 +202,6 @@ const close = () => {
 
 function setSelected() {
   const lastSelected = props.data.selectedData;
-  console.log("lastSelected", lastSelected);
   if (lastSelected && lastSelected.length) {
     lastSelected.forEach((item) => {
       pageresult.list.forEach((item2) => {
@@ -199,7 +215,16 @@ function setSelected() {
 }
 
 onMounted(() => {
-  refreshData();
+    let selectedData = props.data.selectedData;
+    const addList = selectedData.filter(item => item.cIfFix==0 in item);
+    if(addList.length >0){
+        addList.forEach((item,index) => {
+            item.addIndex = index+1;
+            addTableData.push(item);
+        });
+    }
+    console.log('12addList',selectedData)
+    refreshData();
 });
 </script>
 

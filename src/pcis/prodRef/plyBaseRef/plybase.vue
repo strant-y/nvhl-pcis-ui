@@ -92,6 +92,9 @@ onMounted(async () => {
     setFormItem("Base.cCanclfeersnCde", { disabled: true });
     //禁用保单来源
     // setFormItem("Base.cPolicySource", {disabled: true});
+    //保单来源赋值
+    console.log("param.cRecordType", param.cRecordType)
+    setFormValue({"Base.cPolicySource":param.cRecordType})
 
     // 服务机构默认值
     setFormItem("Base.cIntroDptcde", {

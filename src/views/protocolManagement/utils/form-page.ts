@@ -100,14 +100,12 @@ export class FormPage {
      * @param formData 组件绑定的值
      */
     setFormDataById(id: string, formData: any) {
-        nextTick(() => {
             const comp = this.componentRefMap.get(id);
             if (comp) {
                 comp.setFormValue(formData)
             } else {
                 console.error('Could not find componentRef for id ' + id)
             }
-        })
     }
 
     /**
