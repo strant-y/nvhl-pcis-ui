@@ -101,6 +101,9 @@ const method = {
         .then((res:any) => {
           if (res.body) {
             const selectObj = res.body;
+            if(selectObj.children.length > 0){
+              return ElMessage.error('请选择有效机构！');
+            }
             baseEditRef.value?.setValue("ECargoBase.cDptCde", selectObj.id);
             baseEditRef.value?.setValue("ECargoBase.cDptCnm", selectObj.name);
             baseEditRef.value?.addCodeListMap({
@@ -204,9 +207,9 @@ const method = {
           },
         };
         if (!p.initFlag) {
-          // setFormItem("ECargoBase.cSlsId", obj); //业务员工号
+          setFormItem("ECargoBase.cSlsId", obj); //业务员工号
         }
-        // setFormItem("ECargoBase.cSlsId", { rules: [getRules("required", {})] }); //业务员工号
+        setFormItem("ECargoBase.cSlsId", { rules: [getRules("required", {})] }); //业务员工号
       }
 
       getChaSubtypList(params).then((res) => {

@@ -25,6 +25,7 @@ const props = defineProps({
     type: String
   }
 });
+const cEcAgrAppNo = ref('')
 const formPage = ref(new FormPage('enteringDtl'));
 const resData = ref({});
 const cacheKey = ref();
@@ -134,7 +135,7 @@ const edrBtn = [
     label: "原保单查看",
     type: "primary",
     func: () => {
-
+      getPlyPolicyFun()
     },
   }),
   createFreeButtonBase({
@@ -352,6 +353,16 @@ const submitEdrToUndrFun = async () => {
   }
 }
 /**
+ * 原保单查看
+ * **/
+const getPlyPolicyFun = () => {
+      const query = new URLSearchParams({ param: JSON.stringify({cEcAgrAppNo:cEcAgrAppNo.value}),type: "view" });
+      const url =window.location.origin + "/#/protocolManagement/enteringDtl?" + query.toString();
+       console.log('url',url)
+      window.open(url, "_blank");
+
+};
+/**
  * 批改单保存
  * **/
 const saveEdrPlyInfo = async () => {
@@ -392,6 +403,7 @@ const saveEdrPlyInfo = async () => {
     formPage.value?.setFormDataById('AgreementBase',EdrBaseData)
     formPage.value?.setFormDataById('AgreementFeeWarn',{"ECargoBase.cEcAgrAppNo":EdrBaseData['ECargoBase.cEcAgrAppNo']})
     saveEdrFlag = true;
+    cEcAgrAppNo.value = EdrBaseData['ECargoBase.cEcAgrAppNo']
   } else {
     ElMessage.error(edrInfo.msg);
   }
@@ -439,7 +451,7 @@ function query() {
     if(res.code === 200) {
       console.log('query-res',res)
       ElMessage.success('查询成功');
-
+      cEcAgrAppNo.value = res["data"]["composition"]["AgreementBase"][0]['ECargoBase.cEcAgrAppNo'] || ''
       const pageInit = () => {
         if (props.type === 'EDR_APP_NEW_SCENE') {
           if (res["data"]["composition"]["AgreementEdrEcargoBase"]) {
@@ -518,116 +530,131 @@ function isAllAValuesSame(arr:any,key:any) {
   return arr.every(obj => obj[key] === firstValue);
 }
 const premiumCalculation = ()=>{
-  const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
-  //协议费用
-  const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn');
-  const allFromData = formPage.value?.getAllFormData();
-  // 条款
-  const AgreementCvrg = allFromData['AgreementCvrg']
-  if(AgreementCvrg.length > 0){
-    if(isAllAValuesSame(AgreementCvrg,'ECargoTerm.cFeeCurrency')){
-      AgreementFeeWarn.setFormItem('ECargoBase.PrmProp',{hidden: false})
-      AgreementFeeWarn.setValue('ECargoBase.cPrmCur',AgreementCvrg[0]['ECargoTerm.cFeeCurrency'])
-      const sum = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nInsuranceFee'], 0);
-      AgreementFeeWarn.setValue('ECargoBase.nPrm',sum)
-      const sum1 = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nRmbFee'], 0);
-      //折人民币预估保费
-      AgreementFeeWarn.setValue('ECargoBase.nRmbPrm',sum1)
-      //协议剩余预收保费(人民币)
-      if(AgreementFeeWarn.getValue('ECargoBase.cPayWay') && AgreementFeeWarn.getValue('ECargoBase.cPayWay') !== '01'){
-        AgreementFeeWarn.setValue('ECargoBase.nWhPrmRmbExch',AgreementCvrg[0]['ECargoTerm.nFeeRate'])
-        AgreementFeeWarn.setValue('ECargoBase.cWhPrmCur',AgreementCvrg[0]['ECargoTerm.cFeeCurrency'])
-        AgreementFeeWarn.setValue('ECargoBase.nRecRemPrm',sum1 - (AgreementFeeWarn.getValue('ECargoBase.nWhRmbPrm') || 0))
+  let isSuccess = false
+  try {
+    const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
+    //协议费用
+    const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn');
+    const allFromData = formPage.value?.getAllFormData();
+    // 条款
+    const AgreementCvrg = allFromData['AgreementCvrg']
+    if(AgreementCvrg.length > 0){
+      if(isAllAValuesSame(AgreementCvrg,'ECargoTerm.cFeeCurrency')){
+        AgreementFeeWarn.setFormItem('ECargoBase.PrmProp',{hidden: false})
+        AgreementFeeWarn.setValue('ECargoBase.cPrmCur',AgreementCvrg[0]['ECargoTerm.cFeeCurrency'])
+        const sum = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nInsuranceFee'], 0);
+        AgreementFeeWarn.setValue('ECargoBase.nPrm',sum)
+        const sum1 = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nRmbFee'], 0);
+        //折人民币预估保费
+        AgreementFeeWarn.setValue('ECargoBase.nRmbPrm',sum1)
+        //协议剩余预收保费(人民币)
+        if(AgreementFeeWarn.getValue('ECargoBase.cPayWay') && AgreementFeeWarn.getValue('ECargoBase.cPayWay') !== '01'){
+          AgreementFeeWarn.setValue('ECargoBase.nWhPrmRmbExch',AgreementCvrg[0]['ECargoTerm.nFeeRate'])
+          AgreementFeeWarn.setValue('ECargoBase.cWhPrmCur',AgreementCvrg[0]['ECargoTerm.cFeeCurrency'])
+          AgreementFeeWarn.setValue('ECargoBase.nRecRemPrm',sum1 - (AgreementFeeWarn.getValue('ECargoBase.nWhRmbPrm') || 0))
+        }
+      }else{
+        const sum1 = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nRmbFee'], 0);
+        //折人民币预估保费
+        AgreementFeeWarn.setValue('ECargoBase.nRmbPrm',sum1)
+        //协议剩余预收保费(人民币)
+        if(AgreementFeeWarn.getValue('ECargoBase.cPayWay') && AgreementFeeWarn.getValue('ECargoBase.cPayWay') !== '01'){
+          AgreementFeeWarn.setValue('ECargoBase.nRecRemPrm',sum1 - (AgreementFeeWarn.getValue('ECargoBase.nWhRmbPrm') || 0))
+        }
+        AgreementFeeWarn.setFormItem('ECargoBase.PrmProp',{hidden: true})
       }
-    }else{
-      const sum1 = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nRmbFee'], 0);
-      //折人民币预估保费
-      AgreementFeeWarn.setValue('ECargoBase.nRmbPrm',sum1)
-      //协议剩余预收保费(人民币)
-      if(AgreementFeeWarn.getValue('ECargoBase.cPayWay') && AgreementFeeWarn.getValue('ECargoBase.cPayWay') !== '01'){
-        AgreementFeeWarn.setValue('ECargoBase.nRecRemPrm',sum1 - (AgreementFeeWarn.getValue('ECargoBase.nWhRmbPrm') || 0))
-      }
-      AgreementFeeWarn.setFormItem('ECargoBase.PrmProp',{hidden: true})
-    }
-    if(isAllAValuesSame(AgreementCvrg,'ECargoTerm.cAmountCurrency')){
-      AgreementFeeWarn.setFormItem('ECargoBase.AmtProp',{hidden: false})
-      AgreementFeeWarn.setValue('ECargoBase.cAmtCur',AgreementCvrg[0]['ECargoTerm.cAmountCurrency'])
-      const sum = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nInsuranceAmount'], 0);
-      AgreementFeeWarn.setValue('ECargoBase.nAmt',sum)
-      const sum1 = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nRmbAmount'], 0);
-      // 折人民币预估保额
-      AgreementFeeWarn.setValue('ECargoBase.nRmbAmt',sum1)
-      //协议剩余实收（预估）保额（人民币）
+      if(isAllAValuesSame(AgreementCvrg,'ECargoTerm.cAmountCurrency')){
+        AgreementFeeWarn.setFormItem('ECargoBase.AmtProp',{hidden: false})
+        AgreementFeeWarn.setValue('ECargoBase.cAmtCur',AgreementCvrg[0]['ECargoTerm.cAmountCurrency'])
+        const sum = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nInsuranceAmount'], 0);
+        AgreementFeeWarn.setValue('ECargoBase.nAmt',sum)
+        const sum1 = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nRmbAmount'], 0);
+        // 折人民币预估保额
+        AgreementFeeWarn.setValue('ECargoBase.nRmbAmt',sum1)
+        //协议剩余实收（预估）保额（人民币）
         AgreementFeeWarn.setValue('ECargoBase.nRecRemEstAmt', sum1)
-      if(AgreementFeeWarn.getValue('ECargoBase.nWhRmbAmt')){
-        AgreementFeeWarn.setValue('ECargoBase.nRecRemEstAmt',sum1 - AgreementFeeWarn.getValue('ECargoBase.nWhRmbAmt'))
-      }
-      if(AgreementFeeWarn.getValue('ECargoBase.cPayWay') && AgreementFeeWarn.getValue('ECargoBase.cPayWay') !== '01'){
-        AgreementFeeWarn.setValue('ECargoBase.nWhPrmRmbExch',AgreementCvrg[0]['ECargoTerm.nOriginalRate'])
-        AgreementFeeWarn.setValue('ECargoBase.cWhPrmCur',AgreementCvrg[0]['ECargoTerm.cAmountCurrency'])
-      }
-    }else{
-      const sum1 = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nRmbAmount'], 0);
-      // 折人民币预估保额
-      AgreementFeeWarn.setValue('ECargoBase.nRmbAmt',sum1)
-      //协议剩余实收（预估）保额（人民币）
+        if(AgreementFeeWarn.getValue('ECargoBase.nWhRmbAmt')){
+          AgreementFeeWarn.setValue('ECargoBase.nRecRemEstAmt',sum1 - AgreementFeeWarn.getValue('ECargoBase.nWhRmbAmt'))
+        }
+        if(AgreementFeeWarn.getValue('ECargoBase.cPayWay') && AgreementFeeWarn.getValue('ECargoBase.cPayWay') !== '01'){
+          AgreementFeeWarn.setValue('ECargoBase.nWhPrmRmbExch',AgreementCvrg[0]['ECargoTerm.nOriginalRate'])
+          AgreementFeeWarn.setValue('ECargoBase.cWhPrmCur',AgreementCvrg[0]['ECargoTerm.cAmountCurrency'])
+        }
+      }else{
+        const sum1 = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nRmbAmount'], 0);
+        // 折人民币预估保额
+        AgreementFeeWarn.setValue('ECargoBase.nRmbAmt',sum1)
+        //协议剩余实收（预估）保额（人民币）
         AgreementFeeWarn.setValue('ECargoBase.nRecRemEstAmt', sum1)
-      AgreementFeeWarn.setFormItem('ECargoBase.AmtProp',{hidden: false})
+        AgreementFeeWarn.setFormItem('ECargoBase.AmtProp',{hidden: false})
+      }
     }
+    isSuccess = true
+  }catch (err:any){
+    isSuccess = false
   }
+  return isSuccess
 }
-function save() {
+async function save() {
+  let isOk = false
   const allFromData = formPage.value?.getAllFormData();
   const user = JSON.parse(sessionStorage.getItem("user"));
   console.log('allFromData',allFromData)
-  cargoApi.save({
+ const res = await cargoApi.save({
     ...allFromData,
     AgreementDistGoods:null,
+   AgreementDistInsured:null,
+   AgreementDistTransport:null,
     ...{},
     ...{user},
     sence:'save'
-  }).then((res: any) => {
+  })
     if(res.code === 200) {
+      isOk = true
       ElMessage.success(res.msg)
       resData.value = res.res['composition']['ECargoBase'][0]
       const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
       agreementBaseRef.setValue('ECargoBase.cEcAgrNo', resData.value['ECargoBase.cEcAgrNo'])
       agreementBaseRef.setValue('ECargoBase.cEcAgrAppNo', resData.value['ECargoBase.cEcAgrAppNo'])
     }else {
+      isOk = false
       ElMessage.success(res.msg);
     }
-  });
+    return isOk
 }
 
-function submit() {
-  const allFromData = formPage.value?.getAllFormData();
+async function  submit() {
+  const isSuccess = premiumCalculation()
+  if(!isSuccess){
+    return  ElMessage.error('请先进行保费计算')
+  }
+  const isOk =  await save()
+  if(!isOk) return
+  const rv = await formPage.value?.validateAll()
+  if(!rv.flag){
+   return  ElMessage.error(rv.msg);
+  }
+  const btn = getBtn("submit");
+  btn.loading = true;
   const user = JSON.parse(sessionStorage.getItem("user"));
-  // const { 
-  //   'ECargoBase.cEcAgrNo': cEcAgrNo,
-  //   'ECargoBase.cEcAgrAppNo': cEcAgrAppNo,
-  // } = resData.value?.ECargoBase || {}
-
-  // if (allFromData && allFromData.AgreementBase) {
-  //   allFromData.AgreementBase = {
-  //     ...allFromData.AgreementBase,
-  //     'ECargoBase.cEcAgrNo': cEcAgrNo,
-  //     'ECargoBase.cEcAgrAppNo': cEcAgrAppNo,
-  //   };
-  // }
-  console.log('allFromData', allFromData);
   const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
   cargoApi.submit({
-    ...allFromData,
-    ...{},
     ...{user},
     sence:'arraigned',
     cEcAgrAppNo:agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
   }).then((res: any) => {
     if(res.code === 200) {
+      btn.loading = false;
       ElMessage.success(res.msg)
       formPage.value.setPageReadOnly(true);
       const submitBtn = formPage.value.getPageBtnRefById('submit')?.getConfig();
       submitBtn.disabled = true;
+      tagsViewStore.delView({"name": "enteringDtl",
+        "title": "录入明细",
+        "path": "/protocolManagement/enteringDtl",
+        "fullPath": "/protocolManagement/enteringDtl"}).then((res: any) => {
+        router.replace({ path: "/protocolManagement/protocolEntering" });
+      });
     }else {
       ElMessage.success(res.msg);
     }

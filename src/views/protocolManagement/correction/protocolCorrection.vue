@@ -84,8 +84,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               cAppNme: "",
               insuredNme: "",
               Tm: [
-                moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00"),
-                moment(new Date()).format("YYYY-MM-DD 23:59:59")
+                moment(new Date()).format("YYYY-MM-DD 00:00:00"),
+                moment(new Date(Date.now() + (6 * 1000 * 60 * 60 * 24))).format(
+                    "YYYY-MM-DD 23:59:59"
+                )
               ]
             });
             handleQuery(true);
@@ -193,6 +195,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           func: (val: string) => {},
         },
         {
+          prop: "cEcAgrAppNo",
+          inputtype: "rtinput",
+          title: "申请单号",
+          clearable: true,
+        },
+        {
           prop: "cAppNme",
           inputtype: "rtinput",
           title: "投保人客户名称",
@@ -214,10 +222,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           format: "YYYY-MM-DD HH:mm:ss",
           valueFormat: "YYYY-MM-DD HH:mm:ss",
           defaultValue: [
-            moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
-                "YYYY-MM-DD 00:00:00"
-            ),
-            moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+            moment(new Date()).format("YYYY-MM-DD 00:00:00"),
+            moment(new Date(Date.now() + (6 * 1000 * 60 * 60 * 24))).format(
+                "YYYY-MM-DD 23:59:59"
+            )
           ],
         }
       ],
@@ -357,6 +365,12 @@ const tableconfig = reactive<AppTableConfig>(
       tableBtnType: "btn",
       fromSchema: [
         {
+          prop: "cEcAgrAppNo",
+          inputtype: "rtinput",
+          title: "申请单号",
+          minWidth: 180,
+        },
+        {
           prop: "cEcAgrNo",
           inputtype: "rtinput",
           title: "协议号",
@@ -434,8 +448,11 @@ const tableconfig = reactive<AppTableConfig>(
 
 onMounted(() => {
   freeEditRef.value?.setValue('Tm',[
-    moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00"),
-    moment(new Date()).format("YYYY-MM-DD 23:59:59")]
+        moment(new Date()).format("YYYY-MM-DD 00:00:00"),
+        moment(new Date(Date.now() + (6 * 1000 * 60 * 60 * 24))).format(
+            "YYYY-MM-DD 23:59:59"
+        )
+      ]
   )
 });
 
