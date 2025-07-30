@@ -175,11 +175,11 @@ const method = {
     );
   },
   //常住地址
-  getCountry: (val: any) => {
+  getCountry: (val: any,row:any) => {
     setregistAdd();
   },
   //常住地址(input)
-  getcSuffixAddr: (val: any) => {
+  getcRegisterSuffixAddr: (val: any) => {
     setregistAdd();
   },
   
@@ -188,7 +188,7 @@ const method = {
     setRegisterAdd();
   },
   //注册地址(input)
-  getcRegisterSuffixAddr: (val: any) => {
+  getcSuffixAddr: (val: any) => {
     setRegisterAdd();
   },
 	//投保人性质(0是法人 1是个人)
@@ -637,8 +637,8 @@ const idAnalysis = (id:string)=>{
           clearValidate('ECargoApplicant.cCertfCde')  
 }
 function setregistAdd() {
-  const ads = applicantEditRef?.value?.getValue("ECargoApplicant.ClntAddrProp");
-  const a = applicantEditRef?.value?.getValue("ECargoApplicant.cSuffixAddr") || "";
+  const ads = applicantEditRef?.value?.getValue("ECargoApplicant.Prop");
+  const a = applicantEditRef?.value?.getValue("ECargoApplicant.cRegisterSuffixAddr") || "";
   if (ads) {
     getAddressStr({ address: ads }).then((res: any) => {
       const { code, data, msg } = res;
@@ -654,7 +654,7 @@ function setregistAdd() {
 
 function setRegisterAdd() {
   const ads = applicantEditRef?.value?.getValue("ECargoApplicant.RegisterProp");
-  const a = applicantEditRef?.value?.getValue("ECargoApplicant.cRegisterSuffixAddr") || "";
+  const a = applicantEditRef?.value?.getValue("ECargoApplicant.cSuffixAddr") || "";
   if (ads) {
     getAddressStr({ address: ads }).then((res: any) => {
       const { code, data, msg } = res;

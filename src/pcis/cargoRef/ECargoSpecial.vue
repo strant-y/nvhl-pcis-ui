@@ -315,7 +315,7 @@ function getFormValue() {
     const prefixedItem: { [key: string]: any } = {};
     for (const key in item) {
       if (item.hasOwnProperty(key)) {
-        prefixedItem[`SpecialAgreement.${key}`] = item[key];
+        prefixedItem[`ECargoSpecialAgreement.${key}`] = item[key];
       }
     }
     return prefixedItem;
@@ -329,7 +329,7 @@ function setFormValue(value: any) {
     let ind = 1;
     value.forEach(e => {
       Object.keys(e).forEach(key => {
-        const newKey = key.replace('SpecialAgreement.', '');
+        const newKey = key.replace('ECargoSpecialAgreement.', '');
         const v = e[key];
         delete e[key];
         e[newKey] = v;
