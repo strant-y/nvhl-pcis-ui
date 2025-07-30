@@ -257,7 +257,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: 'CChequeNo',
         title: '支票号',
         inputtype: "rtinput",
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {}),getRules("chequeNumberValidation",{})],
       },
       // {
       //   prop: 'TPayConfTm',

@@ -16,6 +16,7 @@ import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { ref } from "vue";
+import { getpSpecialAgreement } from "@/api/prod";
 import {
   AppFreeEditConfig,
   AppFreeEditMethod,
@@ -276,6 +277,39 @@ const addData =()=>{
     } 
 }
 
+// 获取默认信息
+
+const refreshData = () => {
+   const param = opertaor.getParam();
+  const cProdNo =param.cProdNo;
+  const cDptCde =param.cDptCde || '';
+
+  // 查询列表数据
+  getpSpecialAgreement({
+    cProdNo: cProdNo,
+    cDptCde: cDptCde,
+    pageNum: 1,
+    pageSize: 999,
+  }).then((res) => {
+    if (res.data.result) {
+            let len = 0;
+            let sel : any[] = [];
+            res.data.result.forEach((item: any,index:number) => {
+              if(item["cIfMust"] == "1"){
+                  item.index = len + 1;
+                  sel.push(item);
+                  len++;
+              }
+            });
+            originalData.value =    deepClone(sel)
+            formData.value = sel
+
+
+
+    }
+  });
+};
+
 onMounted(async () => {
     eventBus.on('add-special', addData)
     const formconfig11 = formInit(
@@ -288,6 +322,11 @@ onMounted(async () => {
   formData.value.forEach((item, index) => {
     item.index = index + 1;
   });
+
+  console.log('数据-=---',parparam)
+  if (!parparam.initFlag) {
+      refreshData();
+  }
 
   setTimeout(()=>{
     // setDisabledAll()
