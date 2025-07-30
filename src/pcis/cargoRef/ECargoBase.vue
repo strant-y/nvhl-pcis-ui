@@ -58,6 +58,9 @@ onMounted(() => {
     initComp();
     // 查询承保机构所属分公司和项目类别大类数据
     getCheckCdeptByCdptCde();
+    setFormItem('ECargoBase.cEcAgrAppNo', {
+      hidden: true,
+    });
   })
 });
 
@@ -101,9 +104,6 @@ const method = {
         .then((res:any) => {
           if (res.body) {
             const selectObj = res.body;
-            if(selectObj.children.length > 0){
-              return ElMessage.error('请选择有效机构！');
-            }
             baseEditRef.value?.setValue("ECargoBase.cDptCde", selectObj.id);
             baseEditRef.value?.setValue("ECargoBase.cDptCnm", selectObj.name);
             baseEditRef.value?.addCodeListMap({

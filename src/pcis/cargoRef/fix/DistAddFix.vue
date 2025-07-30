@@ -16,6 +16,7 @@ import { createFreeButtonBase } from "@/shared/button-config";
 import { codeListViewStore, dataOpertaor } from "@/store";
 import {getAddressStr} from "@/api/query";
 import {FormPage} from "@/views/protocolManagement/utils/form-page";
+import moment from "moment";
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 
@@ -60,15 +61,15 @@ const formconfig1 = ref<AppFreeEditConfig>(
         type: "primary",
         label: "确定",
         func: async () => {
-          // const isValid = await freeEditRef.value?.validate();
-          // if(isValid){
+          const isValid = await freeEditRef.value?.validate();
+          if(isValid){
             const s = freeEditRef.value?.getFromValue();
             if(typeof props.method.isOk == 'function'){
               props.method.isOk(s);
               emits("handleClose");
               return;
             }
-          // }
+          }
         },
       }),
       createFreeButtonBase({
@@ -115,6 +116,9 @@ onMounted(() => {
     }
     if(['ECargoInsuredDist.cCertfCde'].includes(item.prop)) {
       item["func"] = cCertfCdeChange;
+    }
+    if(['ECargoInsuredDist.cLongendTyp'].includes(item.prop)) {
+      item["func"] = tCertMrkChecked;
     }
     if(['EcargoInsuredDist.cRegisterAddress'].includes(item.prop)) {
       if(item.groupList.length>0){
@@ -180,6 +184,19 @@ const setcDetailedAddress = (prop:any,aftProp:any)=> {
     freeEditRef?.value?.setValue(aftProp.prop, a);
   }
 };
+const tCertMrkChecked = (val:any)=>{
+  if (val == "1") {
+    setValue(
+        "ECargoInsuredDist.tCertfEndDate",
+        moment(new Date("2099-12-31")).format("YYYY-MM-DD HH:mm:ss")
+    );
+    setFormItem("ECargoInsuredDist.tCertfEndDate", { disabled: true });
+
+  } else {
+    setValue("ECargoInsuredDist.tCertfEndDate", "");
+    setFormItem("ECargoInsuredDist.tCertfEndDate", { disabled: false });
+  }
+}
 //  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
 const checkUser = () => {
   // 自定义录单 方案配置 模版 进入 可以查询用户信息
@@ -376,7 +393,23 @@ const funcNdustryCate = () => {
   };
 
 
-
+//给表单下拉项赋值
+function setFormItem(key: any, obj: any) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.value.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.btnItems && obj.btnItems) {
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
+          }
+        } else {
+          Object.assign(item, obj);
+        }
+      }
+    });
+  }
+}
 function getFromValue() {
   return freeEditRef?.value?.getFromValue();
 }
