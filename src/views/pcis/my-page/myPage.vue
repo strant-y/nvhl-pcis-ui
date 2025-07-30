@@ -3616,60 +3616,71 @@ const submitUnderwritingFn = async () => {
  * 投保申请核保时校验联共保信息
  */
 const validateCiInfo = () => {
-  const targetNPrm = parseFloat(nPrm.value) || 0; //当前保单总保费
-  const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue()['Base.cCiMrk']
-  const ciData = opertaor.getTableRefByKey("ci").getFromValue()
-  if (ciData.length > 0) {
-      let NCiShare = 0;
-      let chiefMrkM = 0; // 主
-      let chiefMrkS = 0; // 从
-      let CCoinsurerCdeNum = 0; // 分公司份额
-      let cNciprmCount = 0;  //所有保司保费总额
-      for (const ciRow of ciData) {
-        if (ciRow) {
-          NCiShare = numAdd(NCiShare, parseFloat(ciRow["Ci.nCiShare"] || 0));
-          if ("327001" === ciRow["Ci.cCoinsurerCde"]) {
-            CCoinsurerCdeNum++;
-          }
-          if ("1" === ciRow["Ci.cChiefMrk"]) {
-            chiefMrkM++;
-          } else {
-            chiefMrkS++;
-          }
-          if(ciRow['Ci.nCiPrm'] !=''){
-            cNciprmCount = numAdd(cNciprmCount, parseFloat(ciRow['Ci.nCiPrm'])); // 累加每一行的 Ci.nCiPrm 值
-          }
-        }
-      }
-      // 计算差值
-      const difference = targetNPrm - cNciprmCount;
-      if (Math.abs(difference) > 0 && ciData.length > 0) {
-        // 将差值追加到最后一行对象的 Ci.nCiPrm 上
-        const lastRow = ciData[ciData.length - 1];
-        lastRow['Ci.nCiPrm'] = parseFloat(ciData[ciData.length - 1]['Ci.nCiPrm']) + parseFloat(difference.toFixed(2));
-        console.log("lastRow['Ci.nCiPrm']",lastRow['Ci.nCiPrm'])
-      }
-      if (chiefMrkM === 0 || chiefMrkS === 0) {
-        // ElMessage.error("主/从共保信息不完整!");
-        ElMessage.error("主共方有且仅有一个！");
-        return false;
-      }
-      if (NCiShare !== 1) {
-        ElMessage.error("共保比例和应为1!");
-        return false;
-      }
-      if (chiefMrkM > 1) {
-        ElMessage.error("主共保信息只允许增加一条!");
-        return false;
-      }
-      if (cCiMrk == "1" && CCoinsurerCdeNum <= 1) {
-        ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
-        return false;
-      }
-    } else {
-      ElMessage.error("请录入共保信息!");
+  const ciData = opertaor.getTableRefByKey("ci").getFromValue();
+  const plyBaseData = opertaor.getTableRefByKey("plyBase").getFromValue();
+  const cCiMrk = plyBaseData["Base.cCiMrk"];
+  
+  // 检查是否有共保信息
+  if (!ciData || ciData.length === 0) {
+    ElMessage.error("请录入共保信息!");
+    return false;
+  }
+  
+  // 统计永安保险公司的数量
+  const yonganCount = ciData.filter(item => item['Ci.cCoinsurerCde'] === '327001').length;
+  
+  // 验证主共主联场景（cCiMrk为1）
+  if (cCiMrk === "1") {
+    // 检查是否所有共保公司都是永安（不允许全部为永安）
+    const allYongan = ciData.every(item => item['Ci.cCoinsurerCde'] === '327001');
+    if (allYongan) {
+      ElMessage.error("主共主联共保时，至少要有一条非永安的共保公司！");
       return false;
     }
+    
+    // 检查永安分公司数量（必须录入两个以上）
+    if (yonganCount <= 1) {
+      ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
+      return false;
+    }
+  } 
+  // 验证其他场景
+  else if (cCiMrk == "1" && yonganCount <= 1) {
+    ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
+    return false;
+  }
+  
+  // 验证主/从共保信息完整性
+  let chiefMrkM = 0; // 主共保数量
+  let chiefMrkS = 0; // 从共保数量
+  let NCiShare = 0;  // 共保比例总和
+  
+  ciData.forEach(item => {
+    if (item['Ci.cChiefMrk'] === '1') {
+      chiefMrkM++;
+    } else {
+      chiefMrkS++;
+    }
+    NCiShare += parseFloat(item['Ci.nCiShare'] || 0);
+  });
+  
+  // 主共保信息验证
+  if (chiefMrkM === 0 || chiefMrkS === 0) {
+    ElMessage.error("主共方有且仅有一个！");
+    return false;
+  }
+  
+  if (chiefMrkM > 1) {
+    ElMessage.error("主共保信息只允许增加一条!");
+    return false;
+  }
+  
+  // 共保比例总和验证
+  if (Math.abs(NCiShare - 1) > 0.000001) { // 使用容差比较
+    ElMessage.error("共保比例和应为1!");
+    return false;
+  }
+  
   return true;
 };
 const JointInsuranceCheck = ()=> {
