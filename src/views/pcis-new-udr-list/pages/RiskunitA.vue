@@ -672,7 +672,7 @@ const tableconfig1 = reactive<AppTableConfig>(
             const item = addressOptions.value.find((i:any) => i.cDetailedAddress === val);
             const sameItemList = addressOptions.value.filter((n:any) => n.cProvince === item.cProvince && n.cCity === item.cCity && n.cCounty === item.cCounty);
             if(sameItemList.length > 1) {
-              ElMessageBox.alert('同一省、市、区/县下有多个地址是否合并', '提示', {
+              ElMessageBox.alert('同一省、市、区/县下有多个相同标的地址，请确认是否合并', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
               })
