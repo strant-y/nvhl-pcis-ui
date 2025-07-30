@@ -349,7 +349,9 @@ function getFormBtn() {
   }
   return r.value;
 }
-
+function getFormConfig(){
+  return tableconfig;
+}
 function setDisabledAll(isDisabled: boolean, noSet: string[] = []) {
   const tableBtn = tableconfig.tableBtn;
   if(tableBtn && tableBtn.length > 0) {
@@ -373,7 +375,8 @@ defineExpose({
   setFormValue,
   validate,
   getFormBtn,
-  setDisabledAll
+  setDisabledAll,
+  getFormConfig
 });
 </script>
 

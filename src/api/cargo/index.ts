@@ -35,6 +35,10 @@ function deleteDist(queryParams: any): AxiosPromise<any> {
 function save(queryParams: any): AxiosPromise<any> {
     return post(`${PageBaseUrl}/saveEcargo`, queryParams);
 }
+//协议批改、批改页面 保存
+function saveEdrEcargo(queryParams: any): AxiosPromise<any> {
+    return post(`${PageBaseUrl}/saveEdrEcargo`, queryParams);
+}
 //协议录入页面 提交
 function submit(queryParams: any): AxiosPromise<any> {
     return post(`${PageBaseUrl}/saveEcargo`, queryParams);
@@ -75,7 +79,15 @@ function selectDistNew(queryParams: any): AxiosPromise<any> {
 function getEcargoEndorseChange(queryParams: any): AxiosPromise<any> {
     return post(`/edr/getEcargoEndorseChange`, queryParams);
 }
+
+// 查询最新协议落地数据
+function queryEcargoDetailsLast(queryParams: any): AxiosPromise<any> {
+    return post(`${PageBaseUrl}/queryEcargoDetailsLast`, queryParams);
+}
+
+
 export default {
+    saveEdrEcargo,
     getEcargoEndorseChange,
     selectDistNew,
     saveDistNew,
@@ -90,6 +102,7 @@ export default {
     editInit,
     init,
     queryEcargoList,
-    getECargoPageView
+    getECargoPageView,
+    queryEcargoDetailsLast
 }
 
