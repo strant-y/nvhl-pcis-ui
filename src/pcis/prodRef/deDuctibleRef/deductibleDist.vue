@@ -96,6 +96,7 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtnWidth: 220,
     tableBtnPosition: "right",
     align: "left",
+    fixed: true,
     tableBtn: [
       createFreeButtonBase({
         id: "score",
