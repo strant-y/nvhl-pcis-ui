@@ -999,6 +999,7 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                             cTermNme: selected.value["cTermNme"],
                             cTermNo: selected.value["cTermNo"],
                             cProdNmeCn: selected.value["cProdNmeCn"],
+                            cPolicySource: selected.value["cPolicySource"],
                         });
                         //预留跳转路径
                         router.push({
@@ -1026,6 +1027,7 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                             cTermNme: selected.value["cTermNme"],
                             cTermNo: selected.value["cTermNo"],
                             cProdNmeCn: selected.value["cProdNmeCn"],
+                            cPolicySource: selected.value["cPolicySource"],
                         });
                         //预留跳转路径
                         router.push({
@@ -1055,6 +1057,7 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                             cProdNmeCn: selected.value["cProdNmeCn"],
                             tInsrncBgnTm: selected.value["tInsrncBgnTm"],
                             tInsrncEndTm: selected.value["tInsrncEndTm"],
+                            cPolicySource: selected.value["cPolicySource"],
                         });
                         console.log(en);
                         router.push({
