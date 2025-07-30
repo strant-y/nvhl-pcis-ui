@@ -630,9 +630,13 @@ async function  submit() {
   }
   const isOk =  await save()
   if(!isOk) return
-  const allFromData = formPage.value?.getAllFormData();
+  const rv = await formPage.value?.validateAll()
+  if(!rv.flag){
+   return  ElMessage.error(rv.msg);
+  }
+  const btn = getBtn("submit");
+  btn.loading = true;
   const user = JSON.parse(sessionStorage.getItem("user"));
-  console.log('allFromData', allFromData);
   const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
   cargoApi.submit({
     ...{user},
@@ -640,10 +644,17 @@ async function  submit() {
     cEcAgrAppNo:agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
   }).then((res: any) => {
     if(res.code === 200) {
+      btn.loading = false;
       ElMessage.success(res.msg)
       formPage.value.setPageReadOnly(true);
       const submitBtn = formPage.value.getPageBtnRefById('submit')?.getConfig();
       submitBtn.disabled = true;
+      tagsViewStore.delView({"name": "enteringDtl",
+        "title": "录入明细",
+        "path": "/protocolManagement/enteringDtl",
+        "fullPath": "/protocolManagement/enteringDtl"}).then((res: any) => {
+        router.replace({ path: "/protocolManagement/protocolEntering" });
+      });
     }else {
       ElMessage.success(res.msg);
     }
