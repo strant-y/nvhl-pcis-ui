@@ -471,6 +471,12 @@ const method = {
     }
     updateMasterAgreementValues();
     onChiefMrkChange()
+    //根据新的联共保保费和出单费比例重新计算出单费用
+    const updatedRowData = freeEditRef.value?.getSelectRow();
+    const nPlyFeeRate = parseFloat(updatedRowData["Ci.nPlyFeeRate"] || 0);
+    const nCiPrm = parseFloat(updatedRowData["Ci.nCiPrm"] || 0);
+    const nPlyFee = nPlyFeeRate * nCiPrm;
+    freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", updatedRowData._dataId, nPlyFee.toFixed(2));
   },
   //出单费比例
   nPlyFeeRateChange:(val)=>{
