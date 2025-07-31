@@ -819,8 +819,9 @@ const method = {
         type: "show",
         method: {
           getdbClickData: (data) => {
-            setFormItem("Applicant.cOccupCde", {
-              loadData: [{ label: `${data.cde} ${data.cnm}`, value: data.cde }],
+            applicantEditRef.value?.addCodeListMap({
+              code: 'Applicant.cOccupCde',
+              list: [{ label: `${data.cde} ${data.cnm}`, value: data.cde }]
             });
             setValue("Applicant.cOccupCde", data.cde);
             dialog.value?.handleClose();
@@ -1322,6 +1323,9 @@ function cancel(){
 function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
   applicantEditRef?.value?.addProvide(key, value);
 }
+function getCodeListMap() {
+  return applicantEditRef.value?.getCodeListMap();
+}
 defineExpose({
   getFromValue,
   setFormValue,
@@ -1331,7 +1335,8 @@ defineExpose({
   getFormconfig,
   clearValidate,
   setFormItem,
-  addProvide
+  addProvide,
+  getCodeListMap
 });
 </script>
 
