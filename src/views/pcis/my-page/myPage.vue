@@ -420,7 +420,7 @@ const amlExtendInfo = defineAsyncComponent(
 
 //历史赔案
 const historyClaimcaseModel = defineAsyncComponent(
-  () => import("@/views/comprehensive-query/modal/history-claimcase-model.vue")
+  () => import("../../comprehensive-query/modal/history-claimcase-model.vue")
 );
 //发起风勘
 const windExplorationModel = defineAsyncComponent(
