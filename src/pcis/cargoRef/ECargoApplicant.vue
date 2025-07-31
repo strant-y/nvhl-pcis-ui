@@ -100,6 +100,18 @@ function setFormItem(key: any, obj: any) {
 
 // 绑定方法
 const method = {
+  //注册地市是否同上
+   isSameChange : (val:any) => {
+    if (val == "1") {
+      const ads = getValue("ECargoApplicant.Prop");
+      const a = getValue("ECargoApplicant.cSuffixAddr") || "";
+      const b = getValue("ECargoApplicant.cClntAddr") || '';
+
+      setValue("ECargoApplicant.RegisterProp", ads);
+      setValue("ECargoApplicant.cRegisterSuffixAddr", a);
+      setValue("ECargoApplicant.cRegisteredcapDre", b);
+    }
+  },
   tCertMrkChecked:(val:any)=>{
     if (val == "1") {
       setValue(
