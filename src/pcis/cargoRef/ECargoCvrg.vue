@@ -34,8 +34,40 @@ const formconfig1 = reactive(createAppGridEditConfig({}));
 const cRdrTyp = ref('');
 const eCargoTermNo = ref('');
 
+function isAllAValuesSame(arr:any,key:any) {
+  const firstValue = arr[0][key];
+  return arr.every(obj => obj[key] === firstValue);
+}
 const handelCalculate = (row:any,selectData:any)=>{
   if(selectData.length > 0) {
+    if(isAllAValuesSame(selectData,'ECargoGoodsTgt.cPrmCur')){
+
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.cFeeCurrency',row['_dataId'] , selectData[0]['ECargoGoodsTgt.cPrmCur'])
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.cAmountCurrency',row['_dataId'] , selectData[0]['ECargoGoodsTgt.cPrmCur'])
+
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nFeeRate',row['_dataId'] , selectData[0]['ECargoGoodsTgt.nAmtExch'])
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nOriginalRate',row['_dataId'] , selectData[0]['ECargoGoodsTgt.nAmtExch'])
+
+      cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.cFeeCurrency", 'hidden', false)
+      cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.cAmountCurrency", 'hidden', false)
+      cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.nFeeRate", 'hidden', false)
+      cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.nOriginalRate", 'hidden', false)
+    }else {
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nInsuranceAmount',row['_dataId'] , '')
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nInsuranceFee',row['_dataId'] , '')
+
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.cFeeCurrency',row['_dataId'] , '')
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.cAmountCurrency',row['_dataId'] , '')
+
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nFeeRate',row['_dataId'] , '')
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nOriginalRate',row['_dataId'] , '')
+
+      cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.cFeeCurrency", 'hidden', true)
+      cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.cAmountCurrency", 'hidden', true)
+      cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.nFeeRate", 'hidden', true)
+      cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.nOriginalRate", 'hidden', true)
+
+    }
     const nSeqNoJoin = selectData.map((item: any) => item['ECargoGoodsTgt.nSeqNo']).join(',')
     cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nCargoSeq',row['_dataId'] , nSeqNoJoin)
     const sum = selectData.reduce((total, current) => total + current['ECargoGoodsTgt.nRmbLimit'], 0);
