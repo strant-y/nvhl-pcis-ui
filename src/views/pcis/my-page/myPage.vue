@@ -816,13 +816,7 @@ const basicBtn = [
     type: "warning",
     id: "btn010103",
     func: () => {
-      /**
-       * 联共保判断
-       */
-      const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk')
-      if ('1' === CiMrk || '2' === CiMrk || '5' === CiMrk) {
-          const validCi = JointInsuranceCheck();
-      }
+      
       submitToUndrFn();
     },
   }),
@@ -2495,7 +2489,13 @@ const submitToUndrFn = async () => {
 
   console.log('座位总数',opertaor.getTableRefByKey("tgt"))
   console.log('座位总数', opertaor.getDataAll())
-
+  /**
+   * 联共保判断
+   */
+  const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk')
+  if ('1' === CiMrk || '2' === CiMrk || '5' === CiMrk) {
+      const validCi = JointInsuranceCheck();
+  }
 	// 申请核保前判断是否灰黑名单
 	const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
 	const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
@@ -2772,6 +2772,14 @@ const savePlyInfo = async () => {
   const btn = getBtn("btn010102");
   btn.loading = true;
   const res = opertaor.getDataAll();
+  if(res['ci'] && res['ci'].length>0){
+    res['ci'].forEach((item:any)=>{
+      if(item['Ci.nCiShare']){
+        item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
+      }
+    })
+  }
+
 
   console.log('保费====',res)
   let payList = res.payinfo;

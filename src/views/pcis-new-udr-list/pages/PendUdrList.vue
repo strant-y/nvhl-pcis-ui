@@ -506,18 +506,25 @@
             minWidth: 180,
         },
         {
-            prop: "udrClsCde",
-            inputtype: "rtinput",
-            title: "核保级别",
-            showKey: [1, 2],
-            minWidth: 180,
+          prop: "udrClsCde",
+          inputtype: "rtinput",
+          title: "当前核保级别",
+          showKey: [1, 2],
+          minWidth: 180,
+        },
+        {
+          prop: "cMinUndrCls",
+          inputtype: "rtinput",
+          title: "最终审核级别",
+          showKey: [1, 2],
+          minWidth: 180,
         },
         {
             prop: "bsType",
             inputtype: "rtSelectV2",
             title: "业务类型",
             showKey: [1, 2],
-            minWidth: 180,
+            minWidth: 80,
             loadData: [
                 { label: "承保", value: "A" },
                 { label: "批改", value: "E" },
@@ -536,7 +543,7 @@
             inputtype: "rtnumber",
             title: "保费",
             showKey: [1, 2, 3, 4],
-            minWidth: 180,
+            minWidth: 120,
         },
         {
             prop: "appCde",
@@ -560,7 +567,7 @@
             inputtype: "rtinput",
             title: "任务提交人",
             showKey: [1, 2, 3, 4],
-            minWidth: 180,
+            minWidth: 150,
         },
         {
             prop: "preDptName",
@@ -591,7 +598,7 @@
             inputtype: "rtselect",
             title: "任务状态",
             showKey: [1, 2, 3, 4],
-            minWidth: 180,
+            minWidth: 120,
             loadData: [
                 { label: "未接收", value: "0" },
                 { label: "已接收", value: "1" },

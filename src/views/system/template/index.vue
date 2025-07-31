@@ -148,6 +148,7 @@ function handleDelete(typeId?: string) {
             v-model="queryParams.cKindNo"
             @change="changecKindNo(queryParams.cKindNo)"
             placeholder="请选择"
+            filterable
             clearable>
             <el-option v-for="item in cKindNoList" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
@@ -156,6 +157,7 @@ function handleDelete(typeId?: string) {
           <el-select
             v-model="queryParams.cProdNo"
             placeholder="产品"
+            filterable
             clearable>
             <el-option v-for="item in cProdNoList" :key="item.value" :label="item.label" :value="item.value"/>
           </el-select>
