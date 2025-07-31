@@ -488,9 +488,8 @@ function query() {
       }
       let dataForm:any ={...res.data.composition,AgreementBase:res.data.composition?.AgreementBase[0],AgreementApplicant:res.data.composition?.AgreementApplicant[0],AgreementFeeWarn:res.data.composition?.AgreementBase[0]}
       delete dataForm.AgreementEdrEcargoBase
-      delete dataForm.AgreementFeeWarn['ECargoBase.cEcAgrAppNo']
       if(props.type === 'EDR_APP_NEW_SCENE'){
-      dataForm['AgreementBase']['ECargoBase.cEcAgrAppNo'] = ''
+        dataForm['AgreementBase']['ECargoBase.cEcAgrAppNo'] = ''
       }
       formPage.value?.setAllFormData( dataForm, {
         success: (pageData: any) => {

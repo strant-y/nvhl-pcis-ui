@@ -266,6 +266,15 @@ const method = {
     const tabref = opertaor.getTableRefByKey("applicant");
     const applicantValue = tabref.getFromValue();
     console.log(applicantValue);
+
+    const applicantCodeListMap = tabref?.getCodeListMap();
+    if(applicantCodeListMap) {
+      insuredEditRef.value?.addCodeListMap({
+        code: 'Insured.cOccupCde',
+        list: applicantCodeListMap['Applicant.cOccupCde']
+      });
+    }
+
     let insuredValue: any = {};
 
     // 同投保人时 客户信息需要禁用   客户名称 被保人性质 证件类型 证件号码  证件有效起 止期
@@ -708,25 +717,23 @@ const method = {
   },
   // 是否个体工商户
   cIsIndvduBizChange: (val: any) => {
-    console.log("111", val);
+    console.log("是否个体工商户", val);
     if (val == "1") {
-      setFormItem("Insured.cOccupCde", {
-        rules: [getRules("required", {})],
-      });
+			setFormItem("Insured.cOccupCde", { rules: [getRules("required", {})]});
 			setFormItem("Insured.cOccupCde", {btnItems:{disabled: false}});
-      setFormItem("Insured.cTrdCde", {
-        rules: [getRules("required", {})],btnItems:{disabled: false}
-      });
-    } else if (val == "0") {
-      setFormItem("Insured.cOccupCde", {
-        rules: [],
-      });
-			setFormItem("Insured.cOccupCde", {btnItems:{disabled: true}});
-      setFormItem("Insured.cTrdCde", {
-        rules: [],btnItems:{disabled: true}
-      });
+      setFormItem("Insured.cTrdCde", {rules: [getRules("required", {})]});
+      setFormItem("Insured.cTrdCde", {btnItems:{disabled: false}});
+    } else if(val == "0") {
+      setFormItem("Insured.cOccupCde", {rules: []});
+      setFormItem("Insured.cTrdCde", {rules: []});
+			setFormItem("Insured.cOccupCde", { btnItems:{disabled: true}});
+      setFormItem("Insured.cTrdCde", {btnItems:{disabled: true}});
       setValue("Insured.cOccupCde", null);
       setValue("Insured.cTrdCde", null);
+    }else{
+      setFormItem("Insured.cOccupCde", {btnItems:{disabled: false}});
+      setFormItem("Insured.cTrdCde", {btnItems:{disabled: false}});
+      setFormItem("Insured.cTrdCde", {rules: [getRules("required", {})]})
     }
   },
   funcreset: () => {

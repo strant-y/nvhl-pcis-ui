@@ -275,7 +275,7 @@ const tableconfig = reactive<AppTableConfig>(
           {
             "label": "专业代理",
             "value": "1900203001"
-          },{
+          }, {
             "label": "永安销售公司",
             "value": "1900203002"
           }
@@ -418,6 +418,7 @@ function getAgencyBusinessList(param?: any) {
 // }
 
 onMounted(() => {
+  console.log('log');
   if (sessionStorage.getItem("toMyPageData")) {
     const data = JSON.parse(sessionStorage.getItem("toMyPageData"));
     //业务来源大类下拉数据
@@ -473,6 +474,29 @@ onMounted(() => {
       }
     });
   }
+
+
+  // 回显中类
+  if (props.data.data.cChaType) {
+    let timer2 = setInterval(() => {
+      setValue('Base.cChaType', props.data.data.cChaType)
+      let cChaType = getValue('Base.cChaType')
+      if (cChaType) {
+        clearInterval(timer2); //清除定时器
+      }
+    }, 1000)
+  }
+  // 回显子类
+  if (props.data.data.cChaSubtype) {
+    let timer3 = setInterval(() => {
+      setValue('Base.cChaSubtype', props.data.data.cChaSubtype)
+      let cChaSubtype = getValue('Base.cChaSubtype')
+      if (cChaSubtype) {
+        clearInterval(timer3); //清除定时器
+      }
+    }, 1000)
+  }
+
   nextTick(() => {
     setValue("CDptCde", props.data.data.CDptCde);
   });

@@ -503,7 +503,7 @@
             inputtype: "rtinput",
             title: "承保机构",
             showKey: [1, 2, 3, 4],
-            minWidth: 180,
+            minWidth: 80,
         },
         {
           prop: "udrClsCde",
@@ -532,12 +532,34 @@
             ],
         },
         {
+          prop: "cCiMrk",
+          inputtype: "rtSelectV2",
+          title: "共保方式",
+          showKey: [1, 2],
+          minWidth: 80,
+          loadData: [
+            { label: "非共保业务", value: "0" },
+            { label: "外部共保我方主共_主联", value: "1" },
+            { label: "外部共保我方从共_主联", value: "2" },
+            { label: "外部共保我方主共_无联保", value: "3" },
+            { label: "外部共保我方从共_无联保", value: "4" },
+            { label: "司内联保_主联", value: "5" },
+          ],
+        },
+        {
             prop: "prodName",
             inputtype: "rtinput",
             title: "产品名称",
             showKey: [1, 2, 3, 4],
             minWidth: 180,
         },
+      {
+        prop: "timeDiffHMS",
+        inputtype: "rtinput",
+        title: "等待时长",
+        showKey: [1, 2, 3, 4],
+        minWidth: 180,
+      },
         {
             prop: "nPrm",
             inputtype: "rtnumber",
