@@ -495,10 +495,13 @@ const method = {
   },
   //开户行省改变
   cProvinceChange:(val,row)=>{
+    setValueByRowKey("Ci.cBankArea",row._dataId,"")
+    setValueByRowKey("Ci.cBankCounty",row._dataId,"")
     setOptions('Ci.cBankArea',row._dataId,'CBankAreaList',{ "areaprovince": val })
   },
   //开户行市改变
   cCityChange:(val,row)=>{
+    setValueByRowKey("Ci.cBankCounty",row._dataId,"")
     setOptions('Ci.cBankCounty',row._dataId,'CBankCountyList',{ "areaname": val })
   },
   //开户行县改变
