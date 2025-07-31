@@ -1552,6 +1552,7 @@
                         cTermNo:row.cTermNo,
                         cTermNme:row.cTermNme,
                         cProdNmeCn: row.prodName,
+                        cPolicySource: row.cPolicySource,
                     });
                     router.push({
                         path: "/pcis/my-page",
@@ -1581,6 +1582,7 @@
                         cTermNo:row.cTermNo,
                         cTermNme:row.cTermNme,
                         cProdNmeCn: row.prodName,
+                        cPolicySource: row.cPolicySource,
                     });
                     router.push({
                         path: "/pcis/my-page",
@@ -1623,6 +1625,7 @@
                                 cTermNo:row.cTermNo,
                                 cTermNme:row.cTermNme,
                                 cProdNmeCn: row.prodName,
+                                cPolicySource:row.cPolicySource,
                             });
                             router.push({
                                 path: "/pcis/my-page",
@@ -1709,6 +1712,7 @@
                             cAppTyp: row.bsType,
                             cTermNme:row.cTermNme,
                             cTermNo:row.cTermNo,
+                            cPolicySource:row.cPolicySource,
                         };
                         const en = JSON.stringify(data);
                         router.push({
@@ -1804,6 +1808,7 @@
                             cTermNme:row.cTermNme,
                             cTermNo:row.cTermNo,
                             cProdNmeCn: row.prodName,
+                            cPolicySource: row.cPolicySource,
                         });
                         router.push({
                             path: "/pcis/my-page",
@@ -1827,6 +1832,7 @@
                             cTermNme:row.cTermNme,
                             cTermNo:row.cTermNo,
                             cProdNmeCn: row.prodName,
+                            cPolicySource: row.cPolicySource,
                         });
                         router.push({
                             path: "/pcis/my-page",
@@ -1865,6 +1871,7 @@
             cTermNo:row.cTermNo,
             pageType: "PLY_UW_PROCESS_SCENE",
             cProdNmeCn: row.prodName,
+            cPolicySource: row.cPolicySource,
         });
         router.push({
             path: "/pcis/my-page",

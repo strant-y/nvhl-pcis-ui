@@ -3695,10 +3695,12 @@ const validateCiInfo = () => {
   // 统计永安保险公司的数量
   const yonganCount = ciData.filter(item => item['Ci.cCoinsurerCde'] === '327001').length;
   // 新增校验：统计非永安保险公司的数量
-  const nonYonganCount = ciData.filter(item => item['Ci.cCoinsurerCde'] !== '327001').length;
-  // 判断非永安保险公司的数量是否超过一条
-  if (nonYonganCount > 1) {
-    ElMessage.error("不能添加两条共保公司相同的非永安的数据！");
+  const nonYonganCompanies = ciData.filter(item => item['Ci.cCoinsurerCde'] !== '327001')
+    .map(item => item['Ci.cCoinsurerCde']);
+  // 检查是否有重复的非永安共保公司代码
+  const uniqueNonYongan = [...new Set(nonYonganCompanies)];
+  if (nonYonganCompanies.length !== uniqueNonYongan.length) {
+    ElMessage.error("不能添加两条共保公司相同的非永安数据！");
     return false;
   }
   // 验证主共主联场景（cCiMrk为1）
