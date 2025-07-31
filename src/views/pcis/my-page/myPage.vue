@@ -563,9 +563,15 @@ const getRecordTypeText = computed(() => {
     const actualRecordType = props.param.cPolicySource ?? props.param.cRecordType ?? cRecordType;
     const recordTypeMap: { [key: string]: string } = {
       '1': '自定义录单',
-      '2': '方案录单',
-      '3': '模板录单',
-      '4': '协议出单'
+      '5': '方案录单',
+      '7': '模板录单',
+      '9': '协议出单',
+      '2':'核心导入',
+      '3':'移动端出单',
+      '4':'取到出单',
+      '6':'询报价转投保',
+      '8':'复制出单',
+      '10':'组合出单',
     };
     return recordTypeMap[cRecordType] || '未知录单方式';
   };

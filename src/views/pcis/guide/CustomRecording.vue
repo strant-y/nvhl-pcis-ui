@@ -20,13 +20,13 @@
         >
           <el-radio-group v-model="formconfig1.cRecordType" @change="handleRecordTypeChange">
             <el-radio :value="1">自定义录单</el-radio>
-            <el-radio :value="2">方案录单</el-radio>
-            <el-radio :value="3">模板出单</el-radio>
-            <el-radio :value="4">协议出单</el-radio>
+            <el-radio :value="5">方案录单</el-radio>
+            <el-radio :value="7">模板出单</el-radio>
+            <el-radio :value="9">协议出单</el-radio>
           </el-radio-group>
         </el-form-item>
 				<el-form-item
-          v-if="formconfig1.cRecordType === 3"
+          v-if="formconfig1.cRecordType === 7"
           label="选择模板"
           prop="tpl"
           style="width: 400px"
@@ -42,7 +42,7 @@
           />
         </el-form-item>
 				<el-form-item
-          v-if="formconfig1.cRecordType === 3"
+          v-if="formconfig1.cRecordType === 7"
           label="模板描述"
           prop="seldef"
           style="width: 600px"
@@ -85,7 +85,7 @@
 						/>
 					</el-form-item>
 				</div>
-        <template v-if="formconfig1.cRecordType == 1 || formconfig1.cRecordType == 4">
+        <template v-if="formconfig1.cRecordType == 1 || formconfig1.cRecordType == 9">
           <h4 style="margin: 10px 20px">投保信息</h4>
           <el-form-item
 						v-if="formconfig1.cRecordType == '1'"
@@ -112,7 +112,7 @@
             </el-input>
           </el-form-item>
 					<!-- 协议出单需要展示的字段 -->
-					<el-row v-if="formconfig1.cRecordType == '4'">
+					<el-row v-if="formconfig1.cRecordType == '9'">
 						<el-col :span="24">
 							<el-form-item
 								label="协议号"
@@ -128,7 +128,7 @@
 							</el-form-item>
 						</el-col>
 					</el-row>
-					<el-row v-if="formconfig1.cRecordType == '4'">
+					<el-row v-if="formconfig1.cRecordType == '9'">
 						<el-col :span="24">
 							<el-form-item
 								label="产品代码"
@@ -156,7 +156,7 @@
 							</el-form-item>
 						</el-col>
 					</el-row>
-					<el-row v-if="formconfig1.cRecordType == '4'">
+					<el-row v-if="formconfig1.cRecordType == '9'">
 						<el-col :span="24">
 							<el-form-item
 								label="条款代码"
@@ -184,7 +184,7 @@
 							</el-form-item>
 						</el-col>
 					</el-row>
-					<el-row v-if="formconfig1.cRecordType == '4'">
+					<el-row v-if="formconfig1.cRecordType == '9'">
 						<el-col :span="24">
 							<el-form-item
 								label="被保人"
@@ -201,7 +201,7 @@
 						</el-col>
 					</el-row>
         </template>
-				<template v-if="formconfig1.cRecordType != 4">
+				<template v-if="formconfig1.cRecordType != 9">
 					<h4 style="margin: 10px 20px">选择{{ labelNm }}</h4>
 					<el-form-item
 						label="团个属性"
@@ -214,7 +214,7 @@
 						</el-radio-group>
 					</el-form-item>
 				</template>
-				<template v-if="formconfig1.cRecordType != 4">
+				<template v-if="formconfig1.cRecordType != 9">
 					<el-tooltip placement="top">
 						<template #content>
 							可用鼠标左键，按住常用{{ labelNm }}卡片<br />自由拖动常用{{ labelNm }}排序<br />
@@ -259,7 +259,7 @@
 												><StarFilled
 											/></el-icon>
 										</p>
-										<p class="txt" v-if="formconfig1.cRecordType == 1 || formconfig1.cRecordType == 3">{{ item.termNo }} - {{ item.termCnm }}</p>
+										<p class="txt" v-if="formconfig1.cRecordType == 1 || formconfig1.cRecordType == 7">{{ item.termNo }} - {{ item.termCnm }}</p>
 										<p class="txt" v-else>{{ item.planNo }} - {{ item.planCnm }}</p>
 									</el-card>
 								</VueDraggable>
@@ -391,7 +391,7 @@ const selectTreeItem = ref({});
 const labelNm = ref("条款")
 const tplOptions = ref([])
 // 条款下拉数据
-function loadOptions(type:number = 1) {// 条款 1 方案 2 模板 3
+function loadOptions(type:number = 1) {// 条款 1 方案 5 模板 7
   console.log('pppp',type)
   const param = { pageNo: 1, pageSize: 999, CEnableFlag: "1", level: 2, type };
 
@@ -434,7 +434,7 @@ const getDptCdeList = ()=> {
 const cDptCdeLoading = ref(false);
 const getCDptCdeList = (data: any)=> {
     cDptCdeLoading.value = true;
-    listChrDepts({cDptRelCde: data,cSignDptMrk: '1',cDptCls: '2'}).then(({data, code}) => {
+    listChrDepts({cDptRelCde: data,cSignDptMrk: '1',cDptCls: '5'}).then(({data, code}) => {
         if (code === 200) {
             cDptCdeList.value = data.map((item) => ({
                 value: item.cDptCde,
@@ -505,7 +505,7 @@ function next() {
             }
           }
         );
-      } else if (formconfig1.value.cRecordType == 3) {// 模板出单
+      } else if (formconfig1.value.cRecordType == 7) {// 模板出单
         router.push({
           path: "/pcis/my-page",
           query: {
@@ -559,7 +559,7 @@ function handleClick(item: any, index: number) {
 //取消常用条款
 function handleStarClick(item: any) {
   console.log("0000000",item);
-  const param = formconfig1.value.cRecordType === 2 ? {
+  const param = formconfig1.value.cRecordType === 5 ? {
     planNo: item.planNo,
     isPlan: "1",
   } : {
@@ -581,7 +581,7 @@ function handleQuery() {
     pageNum: 1,
     pageSize: 9999,
     userId: JSON.parse(sessionStorage.getItem("user")).opCde,
-    isPLan: formconfig1.value.cRecordType === 2 ? "1" : "0",
+    isPLan: formconfig1.value.cRecordType === 5 ? "1" : "0",
     voType: "app",
   }).then((res: any) => {
     if (res.code == "1") {
@@ -650,8 +650,8 @@ function handleRecordTypeChange(val:any) {
   formconfig1.value.cTermNme = "";
   formconfig1.value.cGrpMrk = "0";
   formconfig1.value.cRenewMrk = "0";
-  if (val == "2") {
-    loadOptions(2);
+  if (val == "5") {
+    loadOptions(5);
     labelNm.value = "方案";
     formconfig1.value.cIsPlan = '1';
   } else if (val == "1") {
@@ -659,7 +659,7 @@ function handleRecordTypeChange(val:any) {
     labelNm.value = "条款";
     formconfig1.value.cIsPlan = '0';
   } else {
-    loadOptions(3);
+    loadOptions(7);
     labelNm.value = "条款";
     formconfig1.value.cIsPlan = '0';
   }
@@ -817,7 +817,7 @@ function getInsuredName (){
 watch(
   () => formconfig1.value.cTermNme,
   (newVal) => {
-    if(formconfig1.value.cRecordType == 3) {
+    if(formconfig1.value.cRecordType == 7) {
       if(newVal) {
         getTplOptions();
       } else {
