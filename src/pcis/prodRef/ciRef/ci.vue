@@ -955,7 +955,7 @@ function setFormValue(value: any) {
           code:"Ci.cSlsCde"+elem['_dataId'],
           list:res,
         })
-      }else if(!!ele['Ci.cBrkSlsCde'] && elem['Ci.cBrkSlsCde'] !==""){
+      }else if(!!elem['Ci.cBrkSlsCde'] && elem['Ci.cBrkSlsCde'] !==""){
         // const cbRes = await codeListStore.queryCodeList({codeListName:"AGENCY_BUSINESS_LIST",
         //   codeListParam:{
         //     CDptCde:elem['Ci.cBrkSlsCde'],
@@ -965,7 +965,7 @@ function setFormValue(value: any) {
         //   code:"Ci.cBrkSlsCde"+elem['_dataId'],
         //   list:cbRes,
         // })
-      }else if(!!ele['Ci.cBrkrCde'] && elem['Ci.cBrkrCde'] !==""){
+      }else if(!!elem['Ci.cBrkrCde'] && elem['Ci.cBrkrCde'] !==""){
         // const cdeRes = await codeListStore.queryCodeList({codeListName:"AGENCY_BUSINESS_LIST",
         //   codeListParam:{
         //     CDptCde:elem['Ci.cBrkrCde'],
