@@ -486,12 +486,11 @@ function showContRiskInfo(text: any) {
 watch(
   () => props.pageData,
   (newVal) => {
-    // 触发自主临分之后  不能做风险单位划分 不能做核保退回  可以做核保通过
-    // 触发强制临分之后   不能做风险单位划分 不能做核保退回  核保通过时得再保部确认才能核保通过
+    // 触发自主临分之后  不能做风险单位划分  可以做核保通过 核保退回需要再保部确认
+    // 触发强制临分之后   不能做风险单位划分  核保通过时得再保部确认才能核保通过 核保退回需要再保部确认
     if(props.pageData?.plyBase) {
       if(props.pageData?.plyBase['Base.cRiFacMrk'] == "1" || props.pageData?.plyBase['Base.cRiFacMrk'] == "2") {// 1 自主临分 2 强制临分 3 不需要临分
         riskunitDisabledFlag.value = true
-        setFormItem("cUndrMrk",{ loadData: cUndrMrkOptions.value.filter((item:any) => item.value != "B" && item.value != "T") })
         checkboxDisabledFlag.value = true
         setFormItem("riFacMrk", {
           btnItems: {disabled: true}
