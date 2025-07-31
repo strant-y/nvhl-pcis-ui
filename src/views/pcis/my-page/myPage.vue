@@ -446,7 +446,7 @@ const copyPlyModel = defineAsyncComponent(
 );
 // 保存模板
 const templateDialog = defineAsyncComponent(
-  () => import("@/views/pcis/my-page/templateDialog.vue")
+  () => import("./templateDialog.vue")
 );
 
 const idxParam = {
