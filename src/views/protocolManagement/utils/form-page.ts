@@ -173,11 +173,14 @@ export class FormPage {
     /**
      * 校验所有表单
      */
-    validateAll(): Promise<any> {
+    validateAll(filter: string[] = []): Promise<any> {
         return new Promise<any>(async (resolve, reject) => {
             try {
                 const compKeys = this.componentRefMap.keys();
                 for (const key of compKeys) {
+                    if(filter.includes(key)) {
+                        continue;
+                    }
                     const comp = this.componentRefMap.get(key);
                     if (comp && comp.validate) {
                         const validate = await comp.validate();

@@ -630,7 +630,13 @@ async function  submit() {
   }
   const isOk =  await save()
   if(!isOk) return
-  const rv = await formPage.value?.validateAll()
+  const allFromData = formPage.value?.getAllFormData()
+  const base = allFromData['AgreementBase'];
+  const filter = [];
+  if(base['ECargoBase.cCiMrk'] === '0') {
+    filter.push(...['AgreementCiTcp', 'AgreementCiShare', 'AgreementCi']);
+  }
+  const rv = await formPage.value?.validateAll(filter)
   if(!rv.flag){
    return  ElMessage.error(rv.msg);
   }

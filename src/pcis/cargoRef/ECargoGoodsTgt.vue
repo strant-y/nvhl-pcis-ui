@@ -469,9 +469,6 @@ const method = {
 // 绑定特殊验证器
 const exRules = {};
 
-function validate() {
-  return true;
-}
 function setValue(key: string, value: any) {
   distTableRef?.value?.setValue(key, value);
 }
@@ -515,6 +512,15 @@ function setTableData(data: any) {
   });
 }
 
+function validate() {
+  return new Promise(resolve => {
+    if(!pageresult.list || pageresult.list.length === 0) {
+      resolve(false);
+    }
+    resolve(true);
+  })
+}
+
 function setAddressStr(key: any, data: any) {
   applicantEditRef?.value?.setValue(key, data);
 }
@@ -526,9 +532,8 @@ function getFormValue() {
 function setFormValue(value: any) {
   setTableData(value);
 }
-
 function getFormConfig(){
-  return formconfig1;
+  return formconfig1.value;
 }
 function getFormBtn() {
   return distTableRef?.value?.getFormBtn();
@@ -560,6 +565,7 @@ defineExpose({
   getFormValue,
   setFormValue,
   getFormConfig,
+  validate,
   setUnDisabledByKeyList,
   handleQuery: method.handleQuery,
   setTableData,

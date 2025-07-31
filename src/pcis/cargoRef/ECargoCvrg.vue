@@ -502,7 +502,14 @@ function setFormValue(value: any) {
 }
 
 function validate() {
-  return cvrgEditRef?.value?.validate();
+  return new Promise(async resolve => {
+    const list = getFormValue();
+    if(!list || list.length === 0) {
+      resolve(false);
+    }
+    const flag = await cvrgEditRef?.value?.validate();
+    resolve(flag);
+  })
 }
 
 function getTableValue(rowId: number, key: string) {

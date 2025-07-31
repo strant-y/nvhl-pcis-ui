@@ -57,7 +57,7 @@ const pageresult = reactive<Pageresult>({
 
 const tableconfig = reactive<AppTableConfig>(
     createTableEditConfig({
-      // title: "特约信息",
+      title: "特约信息",
       tableBtnType: "btn",
       tableBtnWidth: 220,
       tableBtnPosition: "right",
@@ -308,7 +308,14 @@ function handleQuery(flag?: boolean) {
   //   .finally(() => {});
 }
 
-function validate() {}
+function validate() {
+  return new Promise(resolve => {
+    if(!formData.value || formData.value.length === 0) {
+      resolve(false);
+    }
+    resolve(true);
+  })
+}
 
 function getFormValue() {
   return formData.value.map((item) => {
