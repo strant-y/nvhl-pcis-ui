@@ -586,11 +586,15 @@ const premiumCalculation = ()=>{
         AgreementFeeWarn.setValue('ECargoBase.nRmbAmt',sum1)
         //协议剩余实收（预估）保额（人民币）
         AgreementFeeWarn.setValue('ECargoBase.nRecRemEstAmt', sum1)
-        AgreementFeeWarn.setFormItem('ECargoBase.AmtProp',{hidden: false})
+        AgreementFeeWarn.setFormItem('ECargoBase.AmtProp',{hidden: true})
       }
+      ElMessage.success('保费计算成功')
+    }else {
+      ElMessage.error('保费计算失败！')
     }
     isSuccess = true
   }catch (err:any){
+    ElMessage.error('保费计算失败！')
     isSuccess = false
   }
   return isSuccess
