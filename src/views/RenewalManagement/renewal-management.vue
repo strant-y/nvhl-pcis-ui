@@ -311,7 +311,7 @@ const handleArray = (obj:any)=>{
 
 const getRenewal = (row:any)=>{
    console.log('一键续保。。。',row.cPlyNo)
-  getPolicy({cPlyNo:row.cPlyNo,queryTyp: "orig"})
+  getPolicy({cPlyNo:row.cPlyNo,queryTyp: "orig", cRenewMrk: "1",})
       .then((res) => {
         const { code, res:data, msg } = res;
         if (200 === code) {

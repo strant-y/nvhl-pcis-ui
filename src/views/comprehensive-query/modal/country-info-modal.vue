@@ -91,6 +91,16 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         title: "国家英文名称",
       },
+        {
+        prop: "portEn",
+        inputtype: "rtinput",
+        title: "港口英文名称",
+         showExBtn: true,
+        btnItems: {
+          "icon": "Search",
+          "type": "primary"
+        },
+      },
       
     ],
     fromUi: createFromUiConfig({
@@ -139,6 +149,8 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "港口英文名称",
       },
+
+     
     ],
     rowDbClickFun(rowData) {
       dialogVisible.value = false;
@@ -148,10 +160,49 @@ const tableconfig = reactive<AppTableConfig>(
   })
 );
 
+// 添加校验
+const validateForm = (formData) => {
+  const chinesePattern = /^[\u4e00-\u9fa50-9()（）,，.。、\- ]+$/;
+  const englishPattern = /^[a-zA-Z0-9(),. \-]+$/;
+
+  for (const field of formconfig.fromSchema) {
+    const { prop, title } = field;
+    let value = formData[prop]; 
+    if (value === null || value === undefined) {
+      value = '';
+    }
+    const trimmedValue = String(value).trim(); // 转为字符串并去空格
+
+    // 条件1：检查是否有有效值（null/空字符串/纯空格都算无效）
+    if (!trimmedValue) {
+      ElMessage.error(`请填写${title}`);
+      return false;
+    }
+
+    if (prop.endsWith('Cn')) {
+      // 中文校验
+      if (!chinesePattern.test(trimmedValue)) {
+        ElMessage.error(`${title}包含无效字符，请使用中文及常见符号`);
+        return false;
+      }
+    } else if (prop.endsWith('En')) {
+      // 英文校验
+      if (!englishPattern.test(trimmedValue)) {
+        ElMessage.error(`${title}包含无效字符，请使用英文及常见符号`);
+        return false;
+      }
+    }
+  }
+
+  // 所有校验通过
+  return true;
+};
+
+
 // 新增
 const addFunc = () => {
-  // ;addCountryPort
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
+  if ( validateForm(s)) {
   const param = { ...s }
   addCountryPort(param)
     .then((res) => {
@@ -163,6 +214,9 @@ const addFunc = () => {
       }
     })
     .finally(() => { });
+
+     }
+  
 }
 
 
@@ -173,7 +227,8 @@ function handleQuery(reset = true) {
   // const param = {...r,...s }
   const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(s, r);
+  console.log(r,s)
+  let param = Object.assign(s, r);
 
   console.log('查询-----分页',param)
 
@@ -192,7 +247,10 @@ function handleQuery(reset = true) {
 }
 
 onMounted(() => {
-
+  nextTick(()=>{
+handleQuery()
+  })
+    
 });
 
 //给表单下拉项赋值

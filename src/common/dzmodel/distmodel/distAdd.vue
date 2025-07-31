@@ -32,6 +32,7 @@ const opertaor = dataOpertaor();
 const param = ref({});
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const dialog = ref<DialogMethod | null>(null);
+
 const { getRules } = useValidator();
 const tableRef = ref<MyTableMethod | null>(null);
 const codeListStore = codeListViewStore();
@@ -228,11 +229,15 @@ console.log( route.params.param.cProdNo)
       console.log('进啊2=',item.prop)
       item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];   
     }
+    if( route.params.param.cProdNo == '042003' && item.prop =='Dist.cPlanNo' ){
+             item['rules'] = [];
+    }
  
     if(cIs == 1 && item.prop !=='Dist.nSeqNo'){
         item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
     }else if(cIs == 0 && (item.prop !=='Dist.cSchoolName' && item.prop !=='Dist.cSchoolAddress')){
       item['rules'] =[];
+      
     }
     // item["disabled"] = false;
     if(item.cShowLocation === '1'){

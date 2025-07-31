@@ -102,6 +102,9 @@ onMounted(async () => {
   setFormItem("Tgt.cContactNumber", {
     rules: [getRules("phoneNo", {})],
   });
+  setFormItem("Tgt.cLicenseNumber", {
+    rules: [getRules("vehiclePlate", {})],
+  });
 });
 
 const wagesInfoModel = () => {

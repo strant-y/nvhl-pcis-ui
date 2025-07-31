@@ -708,25 +708,23 @@ const method = {
   },
   // 是否个体工商户
   cIsIndvduBizChange: (val: any) => {
-    console.log("111", val);
+    console.log("是否个体工商户", val);
     if (val == "1") {
-      setFormItem("Insured.cOccupCde", {
-        rules: [getRules("required", {})],
-      });
+			setFormItem("Insured.cOccupCde", { rules: [getRules("required", {})]});
 			setFormItem("Insured.cOccupCde", {btnItems:{disabled: false}});
-      setFormItem("Insured.cTrdCde", {
-        rules: [getRules("required", {})],btnItems:{disabled: false}
-      });
-    } else if (val == "0") {
-      setFormItem("Insured.cOccupCde", {
-        rules: [],
-      });
-			setFormItem("Insured.cOccupCde", {btnItems:{disabled: true}});
-      setFormItem("Insured.cTrdCde", {
-        rules: [],btnItems:{disabled: true}
-      });
+      setFormItem("Insured.cTrdCde", {rules: [getRules("required", {})]});
+      setFormItem("Insured.cTrdCde", {btnItems:{disabled: false}});
+    } else if(val == "0") {
+      setFormItem("Insured.cOccupCde", {rules: []});
+      setFormItem("Insured.cTrdCde", {rules: []});
+			setFormItem("Insured.cOccupCde", { btnItems:{disabled: true}});
+      setFormItem("Insured.cTrdCde", {btnItems:{disabled: true}});
       setValue("Insured.cOccupCde", null);
       setValue("Insured.cTrdCde", null);
+    }else{
+      setFormItem("Insured.cOccupCde", {btnItems:{disabled: false}});
+      setFormItem("Insured.cTrdCde", {btnItems:{disabled: false}});
+      setFormItem("Insured.cTrdCde", {rules: [getRules("required", {})]})
     }
   },
   funcreset: () => {

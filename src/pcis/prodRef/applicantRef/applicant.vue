@@ -772,23 +772,22 @@ const method = {
   cIsIndvduBizChange: (val: any) => {
     console.log('触发了',val)
     if (val == "1") {
-      setFormItem("Applicant.cOccupCde", {
-        rules: [getRules("required", {})],
-      });
+
+			setFormItem("Applicant.cOccupCde", { rules: [getRules("required", {})]});
 			setFormItem("Applicant.cOccupCde", {btnItems:{disabled: false}});
-      setFormItem("Applicant.cTrdCde", {
-        rules: [getRules("required", {})],btnItems:{disabled: false}
-      });
+      setFormItem("Applicant.cTrdCde", {rules: [getRules("required", {})]});
+      setFormItem("Applicant.cTrdCde", {btnItems:{disabled: false}});
     } else if(val == "0") {
-      setFormItem("Applicant.cOccupCde", {
-        rules: [],
-      });
-			setFormItem("Applicant.cOccupCde", {btnItems:{disabled: true}});
-      setFormItem("Applicant.cTrdCde", {
-        rules: [],btnItems:{disabled: true}
-      });
+      setFormItem("Applicant.cOccupCde", {rules: []});
+      setFormItem("Applicant.cTrdCde", {rules: []});
+			setFormItem("Applicant.cOccupCde", { btnItems:{disabled: true}});
+      setFormItem("Applicant.cTrdCde", {btnItems:{disabled: true}});
       setValue("Applicant.cOccupCde", null);
       setValue("Applicant.cTrdCde", null);
+    }else{
+      setFormItem("Applicant.cOccupCde", {btnItems:{disabled: false}});
+      setFormItem("Applicant.cTrdCde", {btnItems:{disabled: false}});
+      setFormItem("Applicant.cTrdCde", {rules: [getRules("required", {})]})
     }
   },
   funcNdustryCate: () => {
