@@ -35,20 +35,20 @@
                   >批改比较项</span
                   >
                 </el-anchor-link>
-                <el-anchor-link
-                    v-for="(k, i) in pageConfig?.pageInfo"
-                    :key="i"
-                    :custom="true"
-                    v-show="['AgreementCiShare', 'AgreementCi', 'AgreementCiTcp'].includes(k.pageCode) ? isCiJiMrk : true"
-                    @click="handleAnchorClick($event, `#${k.pageCode}`)"
-                    :class="i === 0 ? 'isActive' : ''"
-                >
-                  <!-- <rt-icon
-                      style="margin-right: 14px"
-                      :item="{ icon: k.icon && k.icon !== 'null' && k.icon !== '' ? k.icon : 'Tickets', }"
-                  /> -->
-                  <i :class="['icon','iconfont',iconMap[k.pageKey]]"></i>
-                  <span class="icon-title" v-if="NavigaShow">
+                  <el-anchor-link
+                      v-for="(k, i) in pageConfig?.pageInfo"
+                      :key="i"
+                      :custom="true"
+                      v-show="k.pageKey !== 'acctinfo' ? ['AgreementCiShare', 'AgreementCi', 'AgreementCiTcp'].includes(k.pageCode) ? isCiJiMrk :acctinfoFlag :true"
+                      @click="handleAnchorClick($event, `#${k.pageCode}`)"
+                      :class="i === 0 ? 'isActive' : ''"
+                  >
+                    <!-- <rt-icon
+                        style="margin-right: 14px"
+                        :item="{ icon: k.icon && k.icon !== 'null' && k.icon !== '' ? k.icon : 'Tickets', }"
+                    /> -->
+                    <i :class="['icon','iconfont',iconMap[k.pageKey]]"></i>
+                    <span class="icon-title" v-if="NavigaShow">
                     <template v-if="k.pageTtile && k.pageTtile.length > 6">
                       <el-tooltip
                           effect="dark"
@@ -62,7 +62,7 @@
                       {{ k.pageTtile }}
                     </template>
                   </span>
-                </el-anchor-link>
+                  </el-anchor-link>
                 <el-anchor-link
                     v-if="underwriteFlag"
                     @click="handleAnchorClick($event, `#underwriteurl`)"
@@ -97,36 +97,60 @@
       </el-aside>
       <el-main>
         <div id="edrbase" v-if="edrbaseFlag" style="margin-bottom: 10px">
-          <xyedrbaseRef ref="xyedrbase"></xyedrbaseRef>
+          <xyedrbaseRef
+              :ref="(res: any) => {
+                if(res && res.addProvide){
+                  res.addProvide('domId', 'xyedrbase');
+                }
+                xyedrbase = res
+              }"
+          />
         </div>
         <div id="edritem" v-if="edritemFlag" style="margin-bottom: 10px">
-          <xyedritemRef ref="edritem"></xyedritemRef>
+          <xyedritemRef
+            :ref="(res: any) => {
+              if(res && res.addProvide){
+                res.addProvide('domId', 'xyedritem');
+              }
+              xyedritem = res
+            }"
+          />
         </div>
-        <template v-for="(pageConfig, v) in formPage.config" :key="v">
-          <div
-              class="card_"
-              v-for="(k, i) in pageConfig?.pageInfo"
-              :key="i"
-              :id="k.pageCode"
-              v-show="['AgreementCiShare', 'AgreementCi', 'AgreementCiTcp'].includes(k.pageCode) ? isCiJiMrk : true"
-          >
-            <component
+          <template v-for="(pageConfig, v) in formPage.config" :key="v">
+            <div
+                class="card_"
+                v-for="(k, i) in pageConfig?.pageInfo"
+                :key="i"
+                :id="k.pageCode"
+                v-show="k.pageKey !== 'acctinfo' ? ['AgreementCiShare', 'AgreementCi', 'AgreementCiTcp'].includes(k.pageCode) ? isCiJiMrk : acctinfoFlag : true"
+            >
+              <component
                 :ref="(res: any) => {
                   formPage.setComponentRef(k.pageCode, res);
-                }
-              "
+                  if(res && res.addProvide){
+                    res.addProvide('domId', k.pageCode);
+                  }
+                }"
                 :is="getConmpName(k)"
                 :pageSchema="k.pageSchema"
                 :compKey="k.pageKey"
-            />
-          </div>
-        </template>
+              />
+            </div>
+          </template>
         <div
             id="underwriteurl"
             v-if="underwriteFlag"
             style="margin-bottom: 10px"
         >
-          <auditwriteRef ref="underwrite" :pageData="pageData"></auditwriteRef>
+          <auditwriteRef
+            :pageData="pageData"
+            :ref="(res: any) => {
+              if(res && res.addProvide){
+                res.addProvide('domId', 'underwrite');
+              }
+              underwrite = res
+            }"
+          />
         </div>
         <el-backtop :target="'.el-main'" :right="100" :bottom="150" />
         <el-affix position="bottom" :offset="10">
@@ -144,22 +168,6 @@
       </el-affix>
       </el-main>
     </el-container>
-
-    <!-- <el-footer>
-      <el-affix position="bottom" :offset="10">
-        <div class="bottom-items">
-          <rt-button
-              v-for="(bth, idx) in props.bthList"
-              :item="bth"
-              :key="idx"
-              :loading="bth.loading"
-              :ref="(res: any) => {
-                formPage.setButtonRef(bth?.id as string, res);
-              }"
-          />
-        </div>
-      </el-affix>
-    </el-footer> -->
   </div>
 </template>
 
@@ -174,9 +182,12 @@ const props = defineProps({
   pageType:String
 });
 let underwriteFlag = ref(false);
-const idxParam = inject('idxParam');
+const idxParam = inject<any>('idxParam', {});
 const formPage = idxParam?.formPage;
+idxParam.handleAnchorClick = handleAnchorClick;
+
 const isCiJiMrk = computed(() => !!idxParam.ciJiMrk && idxParam.ciJiMrk !== '0');
+const acctinfoFlag = computed(() => !!(idxParam.param.acctinfoFlag));
 const pageData = ref({}); // 页面数据
 const getConmpName = (k: any) => {
   return k.pageCode + '-ref';
@@ -184,6 +195,7 @@ const getConmpName = (k: any) => {
 const NavigaShow = ref(true);
 const underwrite = ref(null);
 const xyedrbase = ref(null)
+const xyedritem = ref(null)
 let edrbaseFlag = ref(false);
 let edritemFlag = ref(false);
 onMounted(()=>{
@@ -215,13 +227,18 @@ function setxyedrbaseRefValue(key:any,val:any){
 function getxyedrbaseRefValue(key:any,val:any){
   return xyedrbase.value?.getFromValue()
 }
+function getxyedritemValue(){
+  return xyedritem.value?.handleQuery()
+}
 /**
  * 锚点点击事件重写
  * 避免触发路由
  */
 function handleAnchorClick(event: any, targetId: string) {
   // 阻止默认的路由跳转行为
-  event.preventDefault();
+  if(event) {
+    event.preventDefault();
+  }
   // 获取目标元素的ID
   if (targetId) {
     // 手动实现平滑滚动效果
@@ -238,9 +255,12 @@ function handleAnchorClick(event: any, targetId: string) {
       item.classList.remove('isActive')
     })
   }
-  event.currentTarget.classList.add('isActive')
+  if(event) {
+    event.currentTarget.classList.add('isActive')
+  }
 }
 defineExpose({
+  getxyedritemValue,
   getUnderwriteRef,
   getUnderwriteValue,
   setxyedrbaseRefData,

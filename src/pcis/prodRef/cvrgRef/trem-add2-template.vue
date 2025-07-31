@@ -130,8 +130,7 @@ const formcof = ref<{ [key: string]: { [key: string]: any } }>({
     title: "备注",
   },
 });
-
-if (param.cProdNo.startsWith("02")) {
+if (param.cProdNo?.startsWith("02")) {
   formcof.value = {
     cClauseCode: {
       inputtype: "rttag",

@@ -197,7 +197,10 @@ function getFormBtn() {
 }
 
 function getTableBtn() {
-  const btnMap = ref({});
+  const btnMap = ref<any>({});
+  if(gridEditConfig.value?.bottomBtn) {
+    btnMap.value['bottomBtn'] = gridEditConfig?.value.bottomBtn
+  }
   gridEditConfig.value.tableBtn?.forEach((btn: any) => {
     if(btn.id) {
       btnMap.value[btn.id] = btn

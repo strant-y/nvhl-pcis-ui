@@ -89,7 +89,7 @@
       >
     </template>
     <template v-else>
-      {{ getLabel() }}
+      {{ selectLabel }}
     </template>
   </span>
 </template>
@@ -334,6 +334,9 @@ function handleChange(val?: string | number | Array<any> | undefined) {
   emits("update:modelValue", val);
   // props.item.func ? props.item.func(val, option) : null;
 }
+const selectLabel = computed(() => {
+  return getLabel();
+})
 function getLabel(val: any = undefined) {
   let values = val;
   if(!values) {

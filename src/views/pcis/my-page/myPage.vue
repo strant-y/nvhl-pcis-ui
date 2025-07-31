@@ -156,8 +156,7 @@
                 props.param.cTermNme
               }}</span
             >&nbsp;|&nbsp;<span class="font-weight-500">出单方式：</span
-            ><span class="publicStyle">{{ getRecordTypeText(props.param.cRecordType)
-             }}</span>&nbsp;|
+            ><span class="publicStyle">{{ getRecordTypeText(props.param.cPolicySource ?? props.param.cRecordType) }}</span>&nbsp;|
             <span class="publicStyle">{{productStore.cCiMrk === '0' ? '非共保业务' 
               : productStore.cCiMrk == '1' ? '外部共保我方主共_主联'
               : productStore.cCiMrk == '2' ? '外部共保我方从共_主联'
@@ -183,7 +182,7 @@
               >保费为: </span
             ><span class="publicStyle">{{ nPrm.toLocaleString() }}</span
             >&nbsp;<span class="font-weight-500">元</span>&nbsp;
-						<template v-if="props.param?.cRecordType === 4">
+						<template v-if="props.param?.cRecordType === 9">
 							|&nbsp;<span class="font-weight-500">剩余预收保费为: </span
 							><span class="publicStyle">{{ nRecRemPrm.toLocaleString() }}</span
 							>&nbsp;<span class="font-weight-500">元</span>
@@ -555,17 +554,29 @@ onMounted(() => {
   console.log('param 路由---', props.param )
   initPage();
 });
+const getActualRecordType = computed(() => {
+  // 优先使用 cPolicySource，如果不存在则使用 cRecordType
+  return props.param.cPolicySource ?? props.param.cRecordType ?? '';
+});
 const getRecordTypeText = computed(() => {
-  return (recordType: string) => {
+  return (cRecordType: string) => {
+    const actualRecordType = props.param.cPolicySource ?? props.param.cRecordType ?? cRecordType;
     const recordTypeMap: { [key: string]: string } = {
-      '1': '自定义录单',
-      '2': '方案录单',
-      '3': '模板录单',
-      '4': '协议出单'
+      '1': '核心页面出单',
+      '5': '方案录单',
+      '7': '模板录单',
+      '9': '协议出单',
+      '2':'核心导入',
+      '3':'移动端出单',
+      '4':'取到出单',
+      '6':'询报价转投保',
+      '8':'复制出单',
+      '10':'组合出单',
     };
-    return recordTypeMap[recordType] || '未知录单方式';
+    return recordTypeMap[cRecordType] || '未知录单方式';
   };
 });
+
 
 // watchEffect(() => {
 //   const isShow = productStore.$state.cCiMrk !== "0";
@@ -805,13 +816,7 @@ const basicBtn = [
     type: "warning",
     id: "btn010103",
     func: () => {
-      /**
-       * 联共保判断
-       */
-      const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk')
-      if ('1' === CiMrk || '2' === CiMrk || '5' === CiMrk) {
-          const validCi = JointInsuranceCheck();
-      }
+      
       submitToUndrFn();
     },
   }),
@@ -1283,7 +1288,7 @@ async function loadAfter() {
       rightBtnList.value = basicRightBtn;
     }
 		// 协议出单请求被保人信息和条款信息,见费出单跟协议号返回的走并且不可修改，展示剩余预收保费字段
-		if(props.param.cRecordType === 4){
+		if(props.param.cRecordType === 9){
 			let params = {
 				cEcAgrAppNo: props.param.cEcAgrAppNo, // 协议申请单号
 				cProdNo: props.param.cProdNo, // 产品代码
@@ -1521,9 +1526,12 @@ async function loadAfter() {
       });
     }
   } else if (props.param.pageType === "orig") {
+    console.log('续保复制----')
+    // 续保复制
     getAppPolicy({
       cAppNo: props.param.cAppNo,
       queryTyp: props.param.pageType,
+     
     }).then((res) => {
       if (res) {
         const ops = opertaor.convertData(res);
@@ -2544,6 +2552,16 @@ const submitToUndrFn = async () => {
     ElMessage.error("请先进行保费计算!");
     return;
   }
+
+  console.log('座位总数',opertaor.getTableRefByKey("tgt"))
+  console.log('座位总数', opertaor.getDataAll())
+  /**
+   * 联共保判断
+   */
+  const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk')
+  if ('1' === CiMrk || '2' === CiMrk || '5' === CiMrk) {
+      const validCi = JointInsuranceCheck();
+  }
 	// 申请核保前判断是否灰黑名单
 	const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
 	const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
@@ -2594,6 +2612,19 @@ const submitToUndrFn = async () => {
         return false;
       }
    }
+
+   if(props.param?.cProdNo==='043002'){
+      let tgtRef = opertaor.getTableRefByKey("tgt");
+      let num1 = tgtRef.getValue('Tgt.nTotalInsured'); 
+      let num2 = tgtRef.getValue('Tgt.nInsuredcompanySeats'); 
+      let sum = tgtRef.getValue('Tgt.nSeatCapacity');
+      console.log('总数',num1 + num2  !== sum,props.param?.cProdNo,num1,num2,sum)
+      if(num1 + num2  !== sum){
+        ElMessage.error("投保座位总数 = 投保乘客座位总数+投保司乘人员座位总数，请核对");
+        return;
+      }
+    }
+
 
   const f = await savePlyInfo(); // 提交核保,需要默认执行一次保存操作
   if (f) {
@@ -3017,7 +3048,7 @@ const calcPremiumEdr = () => {
             }
           })
           if(num > 0) {
-            nInsuranceAmount.push(num)
+            c.push(num)
           } else {
             nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
           }
@@ -3097,7 +3128,7 @@ const calcPremiumEdr = () => {
         })
       }
       opertaor.setDataAll(ops);
-      nAmt.value = ops["base"]["Base.nAmt"] ? ops["base"]["Base.nAmt"] : 0;
+      nAmt.value = ops["base"]["Base.nAmt"] ? ops["base"]["Base.nAmt"]  : 0;
       nPrm.value = ops["base"]["Base.nPrm"] ? ops["base"]["Base.nPrm"] : 0;
       const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
       res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
@@ -3130,6 +3161,7 @@ const calcPremiumEdr = () => {
         // currentPayList = currentPayList.filter(item => {
         //   return item['Pay.cAppNo'] && item.hasOwnProperty('Pay.cAppNo');
         // });
+       
                 let payInfo = setPayInfoEdr(
                 ops["payinfo"],
                 ops["base"],
@@ -3138,6 +3170,7 @@ const calcPremiumEdr = () => {
                 ops["plyBase"],
                 currentPayList.length+1
               );
+               console.log(3034,payInfo)
             console.log('data--' ,currentPayList)
             console.log('data2--' ,payInfo)
             currentPayList.push(payInfo); // 插入新条目
@@ -3162,12 +3195,12 @@ const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase,nTms) => {
     pay["Pay.cPayorCde"] = "";
     pay["Pay.cPayorNme"] = "";
   }
-  pay["Pay.nPayablePrm"] = nPrmVar;
+  pay["Pay.nPayablePrm"] = nPrmVar >0? nPrmVar : 0;
   pay["Pay.tPayBgnTm"] = plyBase["Base.tEdrAppTm"];
   pay["Pay.tPayEndTm"] = plyBase["Base.tEdrBgnTm"];
-  pay["Pay.nOwnPrm"] = nPrmVar;
+  pay["Pay.nOwnPrm"] = nPrmVar >0? nPrmVar : 0;
   pay["Pay.cProdNo"] = base["Base.cProdNo"];
-  pay["Pay.nPrmVar"] = nPrmVar ;
+  pay["Pay.nPrmVar"] = nPrmVar >0? nPrmVar : 0;
   // for (const i in payList) {
   //   if (!!payList[i]["Pay.cPkId"]) {
   //     payListNew.push(payList[i]);
@@ -3346,6 +3379,8 @@ const submitEdrToUndrSurrender = async () => {
   res["data"] = opertaor.getDataAll();
   res["data"]["EdrBase"] = edrbase.value?.getFromValue();
   console.log(res);
+
+  
   submitEdrSurrender(res).then((res) => {
     btn.loading = false;
     console.log("申请核保(退保、注销)", res);
@@ -3423,10 +3458,15 @@ const saveEdrPlyInfo = async () => {
 /**
  * 生成批文
  * **/
-const generateEndorse = () => {
+const generateEndorse = async () => {
+  const res = opertaor.getDataAll();
+  const isAcctValid = await validateAcctinfo();
+  // 账户信息校验
+  if (!isAcctValid) {
+    return; 
+  }
   const btn = getBtn("btnCompare");
   btn.loading = true;
-  const res = opertaor.getDataAll();
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
@@ -3458,7 +3498,56 @@ const generateEndorse = () => {
 /**
  * 批单申请核保
  */
+
+    /**
+     * 验证账户信息表单
+     */
+  const validateAcctinfo = async () => {  
+      let prmVar =  opertaor.getDataAll()['plyBase']['Base.nPrmVar']
+        // 保费变化量 < 0 说明批改之后保费减少, 此时需要设置账户信息
+        if (!!prmVar && prmVar < 0) {
+            const acctinfoRef =opertaor.getTableRefs()["acctinfo"];
+             let acctinfoValidate =await opertaor.getTableRefByKey('acctinfo')?.validate()  // 账户信息 必填校验
+              let isAcctinfo = isDetailCde(); // 是否有账户信息
+                if(!acctinfoValidate && isAcctinfo) {
+                  ElMessage.warning("请填写账户信息中的必填项")
+                  return false;
+                }
+            // 收款人账号
+            const CAcctNo = acctinfoRef.getValue('Acctinfo.cAcctNo')
+            if (!!CAcctNo) {
+            } else {
+                ElMessage.error("收款人账号不能为空!");
+                return false;
+            }
+
+            // 收款人户名
+            const CAcctNme = acctinfoRef.getValue('Acctinfo.cAcctNme')
+            if (!!CAcctNme) {
+            } else {
+                ElMessage.error("收款人户名不能为空!");
+                return false;
+            }
+
+            // 收款银行大类
+            const CBankRelTyp = acctinfoRef.getValue('Acctinfo.cBankRelTyp')
+            if (!!CBankRelTyp) {
+            } else {
+                ElMessage.error("收款银行大类不能为空!");
+                return false;
+            }
+        }
+        return true;
+    }
+
+
 const submitEdrToUndrFun = async () => {
+
+  const isAcctValid = await validateAcctinfo();
+    // 账户信息校验
+  if (!isAcctValid) {
+    return; 
+  }
   if (needCalc.value) {
     ElMessage.error("请先进行保费计算!");
     return;
@@ -3477,12 +3566,12 @@ const submitEdrToUndrFun = async () => {
   //   return;
   // }
   // 账户信息校验
-   let acctinfoValidate =await opertaor.getTableRefByKey('acctinfo')?.validate()  // 账户信息 必填校验
-   let isAcctinfo = isDetailCde(); // 是否有账户信息
-    if(!acctinfoValidate && isAcctinfo) {
-      ElMessage.warning("请填写账户信息中的必填项")
-      return
-    }
+  //  let acctinfoValidate =await opertaor.getTableRefByKey('acctinfo')?.validate()  // 账户信息 必填校验
+  //  let isAcctinfo = isDetailCde(); // 是否有账户信息
+  //   if(!acctinfoValidate && isAcctinfo) {
+  //     ElMessage.warning("请填写账户信息中的必填项")
+  //     return
+  //   }
 
   if (!checkNAmt()) return;
   const f = await saveEdrPlyInfo(); // 提交核保,需要默认执行一次保存操作
@@ -3738,60 +3827,74 @@ const submitUnderwritingFn = async () => {
  * 投保申请核保时校验联共保信息
  */
 const validateCiInfo = () => {
-  const targetNPrm = parseFloat(nPrm.value) || 0; //当前保单总保费
-  const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue()['Base.cCiMrk']
-  const ciData = opertaor.getTableRefByKey("ci").getFromValue()
-  if (ciData.length > 0) {
-      let NCiShare = 0;
-      let chiefMrkM = 0; // 主
-      let chiefMrkS = 0; // 从
-      let CCoinsurerCdeNum = 0; // 分公司份额
-      let cNciprmCount = 0;  //所有保司保费总额
-      for (const ciRow of ciData) {
-        if (ciRow) {
-          NCiShare = numAdd(NCiShare, parseFloat(ciRow["Ci.nCiShare"] || 0));
-          if ("327001" === ciRow["Ci.cCoinsurerCde"]) {
-            CCoinsurerCdeNum++;
-          }
-          if ("1" === ciRow["Ci.cChiefMrk"]) {
-            chiefMrkM++;
-          } else {
-            chiefMrkS++;
-          }
-          if(ciRow['Ci.nCiPrm'] !=''){
-            cNciprmCount = numAdd(cNciprmCount, parseFloat(ciRow['Ci.nCiPrm'])); // 累加每一行的 Ci.nCiPrm 值
-          }
-        }
-      }
-      // 计算差值
-      const difference = targetNPrm - cNciprmCount;
-      if (Math.abs(difference) > 0 && ciData.length > 0) {
-        // 将差值追加到最后一行对象的 Ci.nCiPrm 上
-        const lastRow = ciData[ciData.length - 1];
-        lastRow['Ci.nCiPrm'] = parseFloat(ciData[ciData.length - 1]['Ci.nCiPrm']) + parseFloat(difference.toFixed(2));
-        console.log("lastRow['Ci.nCiPrm']",lastRow['Ci.nCiPrm'])
-      }
-      if (chiefMrkM === 0 || chiefMrkS === 0) {
-        // ElMessage.error("主/从共保信息不完整!");
-        ElMessage.error("主共方有且仅有一个！");
-        return false;
-      }
-      if (NCiShare !== 100) {
-        ElMessage.error("共保比例和应为100!");
-        return false;
-      }
-      if (chiefMrkM > 1) {
-        ElMessage.error("主共保信息只允许增加一条!");
-        return false;
-      }
-      if (cCiMrk == "1" && CCoinsurerCdeNum <= 1) {
-        ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
-        return false;
-      }
-    } else {
-      ElMessage.error("请录入共保信息!");
+  const ciData = opertaor.getTableRefByKey("ci").getFromValue();
+  const plyBaseData = opertaor.getTableRefByKey("plyBase").getFromValue();
+  const cCiMrk = plyBaseData["Base.cCiMrk"];
+
+  // 检查是否有共保信息
+  if (!ciData || ciData.length === 0) {
+    ElMessage.error("请录入共保信息!");
+    return false;
+  }
+  // 统计永安保险公司的数量
+  const yonganCount = ciData.filter(item => item['Ci.cCoinsurerCde'] === '327001').length;
+  // 新增校验：统计非永安保险公司的数量
+  const nonYonganCompanies = ciData.filter(item => item['Ci.cCoinsurerCde'] !== '327001')
+    .map(item => item['Ci.cCoinsurerCde']);
+  // 检查是否有重复的非永安共保公司代码
+  const uniqueNonYongan = [...new Set(nonYonganCompanies)];
+  if (nonYonganCompanies.length !== uniqueNonYongan.length) {
+    ElMessage.error("不能添加两条共保公司相同的非永安数据！");
+    return false;
+  }
+  // 验证主共主联场景（cCiMrk为1）
+  if (cCiMrk === "1") {
+    // 检查是否所有共保公司都是永安（不允许全部为永安）
+    const allYongan = ciData.every(item => item['Ci.cCoinsurerCde'] === '327001');
+    if (allYongan) {
+      ElMessage.error("主共主联共保时，至少要有一条非永安的共保公司！");
       return false;
     }
+    // 检查永安分公司数量（必须录入两个以上）
+    // if (yonganCount <= 1) {
+    //   ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
+    //   return false;
+    // }
+  } 
+  // 验证其他场景
+  else if (cCiMrk == "1" && yonganCount <= 1) {
+    ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
+    return false;
+  }
+
+  // 验证主/从共保信息完整性
+  let chiefMrkM = 0; // 主共保数量
+  let chiefMrkS = 0; // 从共保数量
+  let NCiShare = 0;  // 共保比例总和
+  
+  ciData.forEach(item => {
+    if (item['Ci.cChiefMrk'] === '1') {
+      chiefMrkM++;
+    } else {
+      chiefMrkS++;
+    }
+    NCiShare += parseFloat(item['Ci.nCiShare'] || 0);
+  });
+  
+  // 主共保信息验证
+  if (chiefMrkM === 0 || chiefMrkS === 0) {
+    ElMessage.error("主共方有且仅有一个！");
+    return false;
+  }
+  if (chiefMrkM > 1) {
+    ElMessage.error("主共保信息只允许增加一条!");
+    return false;
+  }
+  // 共保比例总和验证
+  if (Math.abs(NCiShare - 100) > 0.000001) { // 使用容差比较
+    ElMessage.error("共保比例和应为100!");
+    return false;
+  }
   return true;
 };
 const JointInsuranceCheck = ()=> {

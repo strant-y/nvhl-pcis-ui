@@ -109,17 +109,13 @@ const tableconfig = reactive<AppTableConfig>(
           return row.cIfEdit !== '1';
         },
         tableClick: (row) => {
-          console.log(11,row)
           let param = {};
           if(row['cIfMust'] !== '9') {               // cDeductibleContent
-            let rid = row.cDeductibleCode|| row.cDeductibleClass
+            let rid = row.cDeductibleCode || row.cDeductibleClass
             const f = originalData.value.find(f => rid === f.cDeductibleClass);
             Object.assign(param, f);
-            console.log(1,f)
-            console.log(1,originalData.value)
           }else {
             Object.assign(param, row)
-              console.log(2)
           }
 
           if(row.editList && row.editList.length>0){
@@ -132,18 +128,15 @@ const tableconfig = reactive<AppTableConfig>(
             data: param, 
             callback: (res: any) => {
               if (res.type === "ok") {
-                // row.cDeductibleContent = res.data.cDeductibleContent
-                // row['editList']= res.data['editList']
-
                  let list = formData.value;
                  const index = list.findIndex(
-                    item => item.cDeductibleClass === row.cDeductibleClass
+                    item => item._dataId === row._dataId
                   );
                   if (index !== -1) {
                     nextTick(()=>{
                       list[index]['cDeductibleContent'] = res.data.cDeductibleContent;
                       list[index]['editList'] =res.data['editList']
-                      formData.value = list
+                      formData.value = list;
                     })
                   }      
 
@@ -264,9 +257,7 @@ const initOriginalData = ()=> {
     pageNum: 1,
     pageSize: 999,
   }
-  console.log(332,)
   getPrdDeductible(param).then((res) => {
-    console.log(12312,res)
     if (res.data.result) {
       pageresult.list = [];
       originalData.value = res.data.result.map((item: any) => {
@@ -397,7 +388,6 @@ function setFormValue(value: any) {
       })
     });
   }
-  rttableFrom?.value?.setFormValue(value);
   // Object.assign(formData.value, value);
   formData.value = value;
 }

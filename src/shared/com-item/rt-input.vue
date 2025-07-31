@@ -1,7 +1,7 @@
 <template>
   <template v-if="!showLabel">
     <el-tooltip
-        :disabled="!changeContent && (!vInput || vInput === 'undefined' || vInput === '' || vInput === '0')"
+        :disabled="!changeContent && (!vInput || vInput === 'undefined' || vInput === '' || vInput === '0' || vInput === 'null')"
         placement="top"
     >
       <template #content>
@@ -157,7 +157,7 @@
       <rt-icon :item="{ icon: vInput }" />
     </template>
     <template v-else>
-      {{!!vInput && vInput !== 'undefined' ? vInput : ''}}
+      {{vInput !== 'undefined' ? vInput : ''}}
     </template>
   </span>
 </template>

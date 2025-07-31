@@ -503,26 +503,48 @@
             inputtype: "rtinput",
             title: "承保机构",
             showKey: [1, 2, 3, 4],
-            minWidth: 180,
+            minWidth: 80,
         },
         {
-            prop: "udrClsCde",
-            inputtype: "rtinput",
-            title: "核保级别",
-            showKey: [1, 2],
-            minWidth: 180,
+          prop: "udrClsCde",
+          inputtype: "rtinput",
+          title: "当前核保级别",
+          showKey: [1, 2],
+          minWidth: 180,
+        },
+        {
+          prop: "cMinUndrCls",
+          inputtype: "rtinput",
+          title: "最终审核级别",
+          showKey: [1, 2],
+          minWidth: 180,
         },
         {
             prop: "bsType",
             inputtype: "rtSelectV2",
             title: "业务类型",
             showKey: [1, 2],
-            minWidth: 180,
+            minWidth: 80,
             loadData: [
                 { label: "承保", value: "A" },
                 { label: "批改", value: "E" },
                 { label: "方案", value: "P" },
             ],
+        },
+        {
+          prop: "cCiMrk",
+          inputtype: "rtSelectV2",
+          title: "共保方式",
+          showKey: [1, 2],
+          minWidth: 80,
+          loadData: [
+            { label: "非共保业务", value: "0" },
+            { label: "外部共保我方主共_主联", value: "1" },
+            { label: "外部共保我方从共_主联", value: "2" },
+            { label: "外部共保我方主共_无联保", value: "3" },
+            { label: "外部共保我方从共_无联保", value: "4" },
+            { label: "司内联保_主联", value: "5" },
+          ],
         },
         {
             prop: "prodName",
@@ -531,12 +553,19 @@
             showKey: [1, 2, 3, 4],
             minWidth: 180,
         },
+      {
+        prop: "timeDiffHMS",
+        inputtype: "rtinput",
+        title: "等待时长",
+        showKey: [1, 2, 3, 4],
+        minWidth: 180,
+      },
         {
             prop: "nPrm",
             inputtype: "rtnumber",
             title: "保费",
             showKey: [1, 2, 3, 4],
-            minWidth: 180,
+            minWidth: 120,
         },
         {
             prop: "appCde",
@@ -560,7 +589,7 @@
             inputtype: "rtinput",
             title: "任务提交人",
             showKey: [1, 2, 3, 4],
-            minWidth: 180,
+            minWidth: 150,
         },
         {
             prop: "preDptName",
@@ -591,7 +620,7 @@
             inputtype: "rtselect",
             title: "任务状态",
             showKey: [1, 2, 3, 4],
-            minWidth: 180,
+            minWidth: 120,
             loadData: [
                 { label: "未接收", value: "0" },
                 { label: "已接收", value: "1" },
@@ -714,7 +743,7 @@
             showKey: [2],
             type: "info",
             size: "large",
-            icon: "Message",
+            icon: "Release",
             tableClick: (row) => {
                 handleWorkFlow(row, "removeReceived");
             },
@@ -1560,6 +1589,7 @@
                         cTermNo:row.cTermNo,
                         cTermNme:row.cTermNme,
                         cProdNmeCn: row.prodName,
+                        cPolicySource: row.cPolicySource,
                     });
                     router.push({
                         path: "/pcis/my-page",
@@ -1589,6 +1619,7 @@
                         cTermNo:row.cTermNo,
                         cTermNme:row.cTermNme,
                         cProdNmeCn: row.prodName,
+                        cPolicySource: row.cPolicySource,
                     });
                     router.push({
                         path: "/pcis/my-page",
@@ -1631,6 +1662,7 @@
                                 cTermNo:row.cTermNo,
                                 cTermNme:row.cTermNme,
                                 cProdNmeCn: row.prodName,
+                                cPolicySource:row.cPolicySource,
                             });
                             router.push({
                                 path: "/pcis/my-page",
@@ -1717,6 +1749,7 @@
                             cAppTyp: row.bsType,
                             cTermNme:row.cTermNme,
                             cTermNo:row.cTermNo,
+                            cPolicySource:row.cPolicySource,
                         };
                         const en = JSON.stringify(data);
                         router.push({
@@ -1812,6 +1845,7 @@
                             cTermNme:row.cTermNme,
                             cTermNo:row.cTermNo,
                             cProdNmeCn: row.prodName,
+                            cPolicySource: row.cPolicySource,
                         });
                         router.push({
                             path: "/pcis/my-page",
@@ -1835,6 +1869,7 @@
                             cTermNme:row.cTermNme,
                             cTermNo:row.cTermNo,
                             cProdNmeCn: row.prodName,
+                            cPolicySource: row.cPolicySource,
                         });
                         router.push({
                             path: "/pcis/my-page",
@@ -1873,6 +1908,7 @@
             cTermNo:row.cTermNo,
             pageType: "PLY_UW_PROCESS_SCENE",
             cProdNmeCn: row.prodName,
+            cPolicySource: row.cPolicySource,
         });
         router.push({
             path: "/pcis/my-page",

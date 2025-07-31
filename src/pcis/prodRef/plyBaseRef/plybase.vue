@@ -92,6 +92,10 @@ onMounted(async () => {
     setFormItem("Base.cCanclfeersnCde", { disabled: true });
     //禁用保单来源
     // setFormItem("Base.cPolicySource", {disabled: true});
+    //保单来源赋值
+    console.log("param.cRecordType", param.cRecordType)
+    // setFormValue({"Base.cPolicySource":param.cRecordType})
+    setValue("Base.cPolicySource", param.cRecordType)
 
     // 服务机构默认值
     setFormItem("Base.cIntroDptcde", {
@@ -161,9 +165,9 @@ const method = {
     // 录单人联系方式
     if(val=='1'|| val=='2'||val=='5'){
       // Base.cCiOprRel
-          setFormItem("Base.cCiOprRel", { rules: [getRules("required", {}),getRules("phoneNo", {})] }); 
+          setFormItem("Base.cCiOprRel", { hidden: false, rules: [getRules("required", {}),getRules("phoneNo", {})] }); 
     }else{
-           setFormItem("Base.cCiOprRel", { rules: [getRules("phoneNo", {})] });
+           setFormItem("Base.cCiOprRel", { hidden: true, rules: [getRules("phoneNo", {})] });
     }
 
   },
@@ -253,6 +257,7 @@ const method = {
         }
         setFormItem("Base.cSlsId", { rules: null }); //业务员工号
         setValue("Base.cSlsId", "");
+        setValue("Base.cSlsNme", "");
       } else {
         const obj = {
           rules: [getRules("required", {})],

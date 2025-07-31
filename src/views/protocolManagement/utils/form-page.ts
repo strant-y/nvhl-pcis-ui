@@ -100,14 +100,12 @@ export class FormPage {
      * @param formData 组件绑定的值
      */
     setFormDataById(id: string, formData: any) {
-        nextTick(() => {
-            const comp = this.componentRefMap.get(id);
-            if (comp) {
-                comp.setFormValue(formData)
-            } else {
-                console.error('Could not find componentRef for id ' + id)
-            }
-        })
+        const comp = this.componentRefMap.get(id);
+        if (comp) {
+            comp.setFormValue(formData)
+        } else {
+            console.error('Could not find componentRef for id ' + id)
+        }
     }
 
     /**
@@ -173,6 +171,60 @@ export class FormPage {
 
 
     /**
+     * 校验所有表单
+     */
+    validateAll(filter: string[] = []): Promise<any> {
+        return new Promise<any>(async (resolve, reject) => {
+            try {
+                const compKeys = this.componentRefMap.keys();
+                for (const key of compKeys) {
+                    if(filter.includes(key)) {
+                        continue;
+                    }
+                    const comp = this.componentRefMap.get(key);
+                    if (comp && comp.validate) {
+                        const validate = await comp.validate();
+                        if (!validate) {
+                            const cfg = comp.getFormConfig();
+                            resolve({
+                                flag: false,
+                                msg: `校验失败，请检查 ${cfg.title} ！`
+                            });
+                            return;
+                        }
+                    }
+                }
+                resolve({
+                    flag: true
+                })
+            } catch (e) {
+                resolve({
+                    flag: false,
+                    msg: `校验异常: ${e} ！`
+                })
+            }
+        });
+    }
+
+    /**
+     * 给所有组件set要比对的数据
+     * @param AllData
+     */
+    setAllCompPrimevalData(AllData: any) {
+        try {
+            const keys = Object.keys(AllData);
+            for (const key of keys) {
+                const comp = this.componentRefMap.get(key);
+                if (comp != null && comp != undefined && comp.addProvide) {
+                    comp.addProvide('primevalForm', AllData[key])
+                }
+            }
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    /**
      * set所有指定组件的数据
      * @param AllData
      * @param callback
@@ -184,9 +236,6 @@ export class FormPage {
                 const comp = this.componentRefMap.get(key);
                 if (comp) {
                     comp.setFormValue(AllData[key]);
-                    if (comp.addProvide) {
-                        comp.addProvide('primevalForm', AllData[key])
-                    }
                 } else {
                     console.error('Could not find componentRef for id ' + key)
                 }

@@ -54,6 +54,7 @@ watch([() => props.modelValue], ([newModelValue]) => {
     init(true)
   }
   props.item.func ? props.item.func(newModelValue, props.row, props.item) : null;
+  compareValueChangeColor(newModelValue);
 });
 function tableExvalidate() {
   if (typeof itemRef.value.tableExvalidate === "function") {
@@ -89,15 +90,34 @@ async function compareValueChangeColor(value?: any) {
       primevalForm = customMap.primevalForm;
     }
     if(primevalForm) {
+      const isUndefined = (val: any) => {
+        if(val === null || val === undefined || val === '' || (Array.isArray(val) && val.length === 0)) {
+          return true;
+        }
+        return false;
+      };
       const getPrimevalValue = () => {
         const val = primevalForm[props.item.prop];
+        if(isUndefined(val)) {
+          return undefined;
+        }
         if(props.item.type === "date") {
           return val ? val.substring(0, 10) : null;
         }else {
           return val
         }
       };
-      if (getPrimevalValue() !== value) {
+      const getValue = () => {
+        if(isUndefined(value)) {
+          return undefined;
+        }
+        if(props.item.type === "date") {
+          return value ? value.substring(0, 10) : null;
+        }else {
+          return value
+        }
+      }
+      if (getPrimevalValue() !== getValue()) {
         setChangeInfo(['form-item-change'], getPrimevalValue());
       } else {
         setChangeInfo(['form-item-unchange'], undefined);

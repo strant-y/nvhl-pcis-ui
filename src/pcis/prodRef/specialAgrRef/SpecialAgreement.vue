@@ -16,6 +16,7 @@ import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { ref } from "vue";
+import { getpSpecialAgreement } from "@/api/prod";
 import {
   AppFreeEditConfig,
   AppFreeEditMethod,
@@ -256,7 +257,7 @@ const addData =()=>{
   let obj = [];
   let isAdd = true;
     formData.value.forEach((item)=>{
-      if(item.cSpecialCode === "00000001"){
+      if(item.cSpecialCode === "fenqi01"){
         isAdd = false;
       }
     })
@@ -265,9 +266,9 @@ const addData =()=>{
       obj =[...formData.value, { 
         addIndex: 1,
         cIfEdit: "0",
-        cIfFix: "2",
-        cIfMust: "2",
-        cSpecialCode: "00000001",
+        cIfFix: "1",
+        cIfMust: "1",
+        cSpecialCode: "fenqi01",
         isAdd:true,
         cSpecialContent: "各期保费应在约定的缴费止期前缴纳，超过约定止期未支付当期保费的，在未支付保费的期间发生保险事故的，本公司按照已缴纳保费及未到缴费期应交保费之和占总保费的比例进行赔偿。",
         // index: formData.value.length+1
@@ -276,9 +277,42 @@ const addData =()=>{
     } 
 }
 
+// 获取默认信息
+
+const refreshData = () => {
+   const param = opertaor.getParam();
+  const cProdNo =param.cProdNo;
+  const cDptCde =param.cDptCde || '';
+
+  // 查询列表数据
+  getpSpecialAgreement({
+    cProdNo: cProdNo,
+    cDptCde: cDptCde,
+    pageNum: 1,
+    pageSize: 999,
+  }).then((res) => {
+    if (res.data.result) {
+            let len = 0;
+            let sel : any[] = [];
+            res.data.result.forEach((item: any,index:number) => {
+              if(item["cIfMust"] == "1"){
+                  item.index = len + 1;
+                  sel.push(item);
+                  len++;
+              }
+            });
+            originalData.value =    deepClone(sel)
+            formData.value = sel
+
+
+
+    }
+  });
+};
+
 onMounted(async () => {
     eventBus.on('add-special', addData)
-  const formconfig11 = formInit(
+    const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
     method,
     exRules
@@ -288,6 +322,11 @@ onMounted(async () => {
   formData.value.forEach((item, index) => {
     item.index = index + 1;
   });
+
+  console.log('数据-=---',parparam)
+  if (!parparam.initFlag) {
+      refreshData();
+  }
 
   setTimeout(()=>{
     // setDisabledAll()
@@ -307,6 +346,7 @@ const method = {
   //获取特约按钮
   getSpecialAgree: () => {
     const param = opertaor.getParam();
+    console.log('数据---',param)
     dialog.value?.open(
       "prdFixSpec",
       {

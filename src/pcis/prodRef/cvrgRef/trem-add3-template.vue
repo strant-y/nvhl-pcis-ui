@@ -126,7 +126,6 @@ function getterm(it: any,termdata: any){
   }else{
     it.disabled = props.disabledFlag || it.disabled;
   }
-  console.log(it);
   return it;
 }
 function setCancel(){

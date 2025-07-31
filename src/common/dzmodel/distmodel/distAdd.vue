@@ -32,6 +32,7 @@ const opertaor = dataOpertaor();
 const param = ref({});
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const dialog = ref<DialogMethod | null>(null);
+
 const { getRules } = useValidator();
 const tableRef = ref<MyTableMethod | null>(null);
 const codeListStore = codeListViewStore();
@@ -207,7 +208,7 @@ onMounted(() => {
   cGrpMrk.value = route.params.param.cGrpMrk;
   let newSchema = [];
   let cIs= opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered']  //  是否记名投保
-
+console.log( route.params.param.cProdNo)
   for(let i = 0; props.data.fromSchema && i < props.data.fromSchema.length; i++){
 
 
@@ -223,12 +224,20 @@ onMounted(() => {
       item["tableClick"] = props.data.fromSchema[i]["tableClick"];
     }
 
-
+    // 040001产品 必填项问题
+    if(item.prop =='Dist.cPlanNo' ||item.prop =='Dist.tOpeningTime' ||item.prop =='Dist.cLocationSigns' ||item.prop =='Dist.cFacilitySigns' ||item.prop =='Dist.cVenueSign' || item.prop =='Dist.cBuildingStructure'  ){
+      console.log('进啊2=',item.prop)
+      item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];   
+    }
+    if( route.params.param.cProdNo == '042003' && item.prop =='Dist.cPlanNo' ){
+             item['rules'] = [];
+    }
+ 
     if(cIs == 1 && item.prop !=='Dist.nSeqNo'){
-   
         item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
     }else if(cIs == 0 && (item.prop !=='Dist.cSchoolName' && item.prop !=='Dist.cSchoolAddress')){
-      // item['rules'] =null;
+      item['rules'] =[];
+      
     }
     // item["disabled"] = false;
     if(item.cShowLocation === '1'){
@@ -311,11 +320,7 @@ onMounted(() => {
         data.rules = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
       })
     }
-    // 040001产品 必填项问题
-    if(item.prop =='Dist.cPlanNo' ||item.prop =='Dist.tOpeningTime' ||item.prop =='Dist.cLocationSigns' ||item.prop =='Dist.cFacilitySigns' ||item.prop =='Dist.cVenueSign' || item.prop =='Dist.cBuildingStructure'  ){
-      console.log('进啊2=',item.prop)
-      item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];   
-    }
+
 
     if(params.cEdrType === '1'){
       item.disabled = false;

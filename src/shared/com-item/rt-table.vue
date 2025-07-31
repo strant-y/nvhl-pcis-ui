@@ -50,6 +50,7 @@
                 <el-col
                     :span="i.itemWidth ? i.itemWidth * formUi.span : formUi.span"
                     style="margin-top: 5px"
+                    v-if = 'formItems[props.row._dataId][i.prop].hidden !== true'
                 >
                   <el-form-item
                       :prop="[props.$index, i.prop]"
@@ -421,6 +422,9 @@ function creatItem(d: any) {
             sc[k]['btnItems'][k3] = schamaconf.value[k]['btnItems'][k3];
           }
         });
+        if(!props.item.editFlag){
+          schamaconf.value[k]['btnItems']['disabled'] = true;
+        }
       }else if (typeof schamaconf.value[k][k2] === "function") {
         sc[k][k2] = schamaconf.value[k][k2];
       }
@@ -719,7 +723,6 @@ function setRowFieldProp(
   prop: string,
   value: any
 ) {
-  console.log("setRowFieldProp", formItems,rowId, field, prop, value);
   if (formItems.value[rowId] && formItems.value[rowId][field]) {
     // 使用 Vue.set 确保响应式更新
     formItems.value[rowId][field] = {
@@ -729,7 +732,6 @@ function setRowFieldProp(
   } else {
     console.warn(`Field ${field} or row ${rowId} not found.`);
   }
-  console.log("formItem",formItems.value);
 }
 function getRowById(rowId: any) {
   return tableDatas.value?.find((item) => {

@@ -135,10 +135,8 @@ const loadData = (flag = true)=>{
     let param = Object.assign({cComponentTable:cComponentTableValue,cEcAgrAppNo:agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''}, r);
       cargoApi.selectDistNew(param).then((res: any) => {
         if(res.code === 200) {
-          if(res.data.data.length > 0 ){
             pageresult.list = res.data.data
             pageresult.total = res.data.total
-          }
         }else {
           ElMessage.success(res.msg);
         }
@@ -375,18 +373,28 @@ const method = {
   },
   // 删除
   delmethod: (row: any) => {
-    const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
-    const param = {
-      cComponentTable: cComponentTableValue,
-      cPkId: [row['ECargoGoodsTgt.cPkId']],
-      cEcAgrAppNo:agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
-    }
-    deleteDist(param).then((res: any) => {
-      if (res.code === 200) {
-        ElMessage.success("删除成功");
-        loadData()
-      }
-    });
+		ElMessageBox.confirm(
+        "是否确认删除当前数据？",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+    ).then(() => {
+			const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
+			const param = {
+				cComponentTable: cComponentTableValue,
+				cPkId: [row['ECargoGoodsTgt.cPkId']],
+				cEcAgrAppNo:agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
+			}
+			deleteDist(param).then((res: any) => {
+				if (res.code === 200) {
+					ElMessage.success("删除成功");
+					loadData()
+				}
+			});
+		}).catch(()=>{})
   },
 
   // 同投保人按钮点击事件
@@ -469,9 +477,6 @@ const method = {
 // 绑定特殊验证器
 const exRules = {};
 
-function validate() {
-  return true;
-}
 function setValue(key: string, value: any) {
   distTableRef?.value?.setValue(key, value);
 }
@@ -515,6 +520,18 @@ function setTableData(data: any) {
   });
 }
 
+function validate() {
+  return new Promise(resolve => {
+    if(!pageresult.list || pageresult.list.length === 0) {
+      if(idxParam && idxParam.handleAnchorClick) {
+        idxParam.handleAnchorClick(undefined,`#${props.compKey}`)
+      }
+      resolve(false);
+    }
+    resolve(true);
+  })
+}
+
 function setAddressStr(key: any, data: any) {
   applicantEditRef?.value?.setValue(key, data);
 }
@@ -526,9 +543,8 @@ function getFormValue() {
 function setFormValue(value: any) {
   setTableData(value);
 }
-
 function getFormConfig(){
-  return formconfig1;
+  return formconfig1.value;
 }
 function getFormBtn() {
   return distTableRef?.value?.getFormBtn();
@@ -560,6 +576,7 @@ defineExpose({
   getFormValue,
   setFormValue,
   getFormConfig,
+  validate,
   setUnDisabledByKeyList,
   handleQuery: method.handleQuery,
   setTableData,
