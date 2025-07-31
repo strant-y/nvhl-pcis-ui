@@ -135,10 +135,8 @@ const loadData = (flag = true)=>{
     let param = Object.assign({cComponentTable:cComponentTableValue,cEcAgrAppNo:agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''}, r);
       cargoApi.selectDistNew(param).then((res: any) => {
         if(res.code === 200) {
-          if(res.data.data.length > 0 ){
             pageresult.list = res.data.data
             pageresult.total = res.data.total
-          }
         }else {
           ElMessage.success(res.msg);
         }
