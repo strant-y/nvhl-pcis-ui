@@ -2772,6 +2772,14 @@ const savePlyInfo = async () => {
   const btn = getBtn("btn010102");
   btn.loading = true;
   const res = opertaor.getDataAll();
+  if(res['ci'] && res['ci'].length>0){
+    res['ci'].forEach((item:any)=>{
+      if(item['Ci.nCiShare']){
+        item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
+      }
+    })
+  }
+
 
   console.log('保费====',res)
   let payList = res.payinfo;

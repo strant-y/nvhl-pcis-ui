@@ -99,7 +99,7 @@ onMounted(async () => {
   }, 2000);
   formconfig1.fromSchema?.forEach((item:any) => {
     if(item.prop === 'Ci.cCoinsurerCde') {
-      item.minWidth = 200
+      item.minWidth = 240
     }
   })
 });
@@ -117,12 +117,12 @@ const method = {
     }
     const totalCiShare = dataList.reduce((sum, row) => sum + parseFloat(row['Ci.nCiShare'] || 0), 0);
     // 判断总和是否等于 1
-    if (totalCiShare >= 1) {
+    if (totalCiShare >= 100) {
       ElMessage.warning("共保总保额已被全部分完!不能新增");
       return;
     }
     // 新增行前计算剩余比例
-    const remaining = (1 - totalCiShare).toFixed(8);
+    const remaining = (100 - totalCiShare).toFixed(8);
     const cChiefMrk = ['1', '3'].includes(cCiMrkFlag) ? '1' : '0';
     // const cSlsCde = opertaor.getTableRefByKey('plyBase').getValue('Base.cSlsId')
     if(dataList.length == 0){
@@ -443,8 +443,9 @@ const method = {
     const floatValue = parseFloat(val);
     if (!isNaN(floatValue) && isFinite(floatValue)) {
       // 判断是否是合法数字且不是 Infinity
-      if (floatValue < 0 || floatValue > 1) {
-        ElMessage.warning("联共保比例必须大于等于0且小于等于1");
+      if (floatValue < 0 || floatValue > 100) {
+        ElMessage.warning("联共保比例必须大于等于0且小于等于100");
+        freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, "");
         return;
       }
       const limitedValue = floatValue.toFixed(8); // 最多保留8位小数
@@ -458,9 +459,9 @@ const method = {
     const totalOther = allRows
       .filter(row => row._dataId !== rowId)
       .reduce((sum, row) => sum + parseFloat(row["Ci.nCiShare"] || 0), 0);
-    // 如果当前值 + 其他行 >= 1，则限制当前行最大值为 1 - 其他行总和
-    if (parseFloat(val) + totalOther > 1) {
-      const maxVal = (1 - totalOther).toFixed(8);
+    // 如果当前值 + 其他行 >= 100，则限制当前行最大值为 100 - 其他行总和
+    if (parseFloat(val) + totalOther > 100) {
+      const maxVal = (100 - totalOther).toFixed(8);
       freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, maxVal);
       return;
     }
@@ -660,7 +661,7 @@ const updateMasterAgreementValues = () => {
   const res = opertaor.getDataAll();
   allRows.forEach(row => {
     if (row["Ci.cCoinsurerCde"] === "327001") {
-      const share = parseFloat(row["Ci.nCiShare"]) || 0;
+      const share = parseFloat(row["Ci.nCiShare"])/100 || 0;
       const nAmt = res["base"]["Base.nAmt"] ? parseFloat(res["base"]["Base.nAmt"]) : 0;
       const nPrm = res["base"]["Base.nPrm"] ? parseFloat(res["base"]["Base.nPrm"]) : 0;
       const ciAmt = share * nAmt;
@@ -677,7 +678,7 @@ const updateMasterAgreementValues = () => {
       // opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntPrm", totalPrm.toFixed(2)); //共保总保费
     }else{
       // 非永安保险公司：仅更新该行的 Ci.nCiAmt 和 Ci.nCiPrm，不参与总和计算
-      const share = parseFloat(row["Ci.nCiShare"]) || 0;
+      const share = parseFloat(row["Ci.nCiShare"])/100 || 0;
       const nAmt = res["base"]["Base.nAmt"] ? parseFloat(res["base"]["Base.nAmt"]) : 0;
       const nPrm = res["base"]["Base.nPrm"] ? parseFloat(res["base"]["Base.nPrm"]) : 0;
 
@@ -774,7 +775,7 @@ const initCiInfo = (data: any) => {
     const cBrkSlsCde = opertaor.getTableRefByKey('plyBase').getValue('Base.cBrkSlsCde')
     freeEditRef?.value?.addRowByData( {
       'Ci.nSeqNo': 1,
-      'Ci.nCiShare': '1.00000000',
+      'Ci.nCiShare': '100.00000000',
       'Ci.nPlyFeeRate': '0.00',
       'Ci.nPlyFee': '0.00',
       'Ci.nComm':'0.00',
