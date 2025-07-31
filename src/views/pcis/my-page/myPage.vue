@@ -3556,6 +3556,20 @@ const submitUnderwritingFn = async () => {
     //   ElMessage.error(queryCRiFacMrk.message);
     //   return;
     // }
+  } else if(res.cUndrMrk === "B") {// 核保选项为退回给出单员时，如果已经触发自主临分，则提示需要再保确认并阻断，其他则直接提交核保
+    // 先查询临分标识
+    const queryCRiFacMrk = props.param?.pageName === "priceInquiry" ? await policyService.queryCRiFacMrkXJ({cAppNo: props.param?.cAppNo}) : await policyService.queryCRiFacMrk({cAppNo: props.param?.cAppNo});
+    if(queryCRiFacMrk && queryCRiFacMrk.code === '200') {
+      const cRiFacMrk = queryCRiFacMrk.data.cRiFacMrk;
+      if(cRiFacMrk === '1' || cRiFacMrk === '2') {// 自主临分或强制临分
+        // 自主临分
+        ElMessage.warning("该申请单已进入再保流程，核保意见不允许选择‘退回’，如需退回，请线下联系再保部告知投保单号");
+        return;
+      }
+    } else {
+      ElMessage.error(queryCRiFacMrk.message);
+      return;
+    }
   }
   let submitUnder;
   // 询价单
