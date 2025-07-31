@@ -1,6 +1,7 @@
 <template>
   <div>
     <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+		<comDialog ref="dialog"></comDialog>
   </div>
 </template>
 
@@ -17,6 +18,8 @@ import { codeListViewStore, dataOpertaor } from "@/store";
 import {getAddressStr} from "@/api/query";
 import {FormPage} from "@/views/protocolManagement/utils/form-page";
 import moment from "moment";
+const dialog = ref<DialogMethod | null>(null);
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 
@@ -120,7 +123,10 @@ onMounted(() => {
     if(['ECargoInsuredDist.cLongendTyp'].includes(item.prop)) {
       item["func"] = tCertMrkChecked;
     }
-    if(['EcargoInsuredDist.cRegisterAddress'].includes(item.prop)) {
+    if(['ECargoInsuredDist.cIsSame'].includes(item.prop)) {
+      item["func"] = isSameChange;
+    }
+    if(['ECargoInsuredDist.cRegisterAddress'].includes(item.prop)) {
       if(item.groupList.length>0){
         item.groupList[0]["func"] = getCountryInsured
         item.groupList[1]["func"] = getcSuffixAddr
@@ -131,6 +137,14 @@ onMounted(() => {
         item.groupList[0]["func"] = getAllPropInsured
         item.groupList[1]["func"] = getcRegisterSuffixAddr
       }
+    }
+		if(['ECargoInsuredDist.cOccupCde'].includes(item.prop)) {
+      item["btnItems"]["func"] = cOccupCdeChange;
+      item["btnItems"]["disabled"] = false;
+    }
+    if(['ECargoInsuredDist.cTrdCde'].includes(item.prop)) {
+      item["btnItems"]["func"] = funcNdustryCate;
+			item["btnItems"]["disabled"] = false;
     }
     // if(item.prop !=='DistECargo.nSeqNo'){
     //     item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
@@ -167,6 +181,12 @@ onMounted(() => {
       freeEditRef.value?.setDisabledAll();
     }, 100);
   }
+	setTimeout(() => {
+		let cCustRiskRank = getValue("ECargoInsuredDist.cCustRiskRank")
+		if(!cCustRiskRank){
+			setValue("ECargoInsuredDist.cCustRiskRank","925104");
+		}
+	}, 100);
   console.log(' formconfig1.value', formconfig1.value)
 });
 const setcDetailedAddress = (prop:any,aftProp:any)=> {
@@ -254,7 +274,7 @@ const checkUser = () => {
 };
 // 解析身份证
 const idAnalysis = (id:string)=>{
-  const applicantValue = formPage.getFormDataById("AgreementDistInsured") //tabref["AgreementApplicant"].getFormValue();
+  const applicantValue = freeEditRef.value?.getFromValue() //tabref["AgreementApplicant"].getFormValue();
   if (  id.length !== 18 || (applicantValue["ECargoInsuredDist.cCertfCls"] !=='120001' && applicantValue["ECargoInsuredDist.cCertfCls"] !=='19')) {
     return false
   }
@@ -296,7 +316,7 @@ const getcRegisterSuffixAddr = (val)=>{
 }
 function setregistAdd() {
   const ads = getValue("ECargoInsuredDist.Prop");
-  const a = getValue("EcargoInsuredDist.cSuffixAddr") || "";
+  const a = getValue("ECargoInsuredDist.cSuffixAddr") || "";
   if (ads) {
     getAddressStr({ address: ads }).then((res: any) => {
       const { code, data, msg } = res;
@@ -309,10 +329,20 @@ function setregistAdd() {
     setValue("ECargoInsuredDist.cClntAddr", a);
   }
 }
+//注册地市是否同上
+const isSameChange = (val:any) => {
+	if (val == "1") {
+		const ads = getValue("ECargoInsuredDist.Prop");
+		const a = getValue("ECargoInsuredDist.cSuffixAddr") || "";
+
+		setValue("ECargoInsuredDist.RegisterProp", ads);
+		setValue("ECargoInsuredDist.cRegisterSuffixAddr", a);
+	}
+}
 
 function setRegisterAdd() {
-  const ads = getValue("EcargoInsuredDist.RegisterProp");
-  const a = getValue("EcargoInsuredDist.cRegisterSuffixAddr") || "";
+  const ads = getValue("ECargoInsuredDist.RegisterProp");
+  const a = getValue("ECargoInsuredDist.cRegisterSuffixAddr") || "";
   if (ads) {
     getAddressStr({ address: ads }).then((res: any) => {
       const { code, data, msg } = res;
@@ -378,11 +408,11 @@ const funcNdustryCate = () => {
         type: "show",
         method: {
           getdbClickData: (data) => {
-            setFormItem("ECargoApplicant.cTrdCde", {
+            setFormItem("ECargoInsuredDist.cTrdCde", {
               loadData: [{ label: data.cnm, value: data.cde }],
             });
            // setValue("Applicant.cTrdCde", data.cnm);
-            setValue("ECargoApplicant.cTrdCde", data.cde);
+            setValue("ECargoInsuredDist.cTrdCde", data.cde);
             dialog.value?.handleClose();
           },
         },
@@ -390,8 +420,29 @@ const funcNdustryCate = () => {
       {},
       { title: "国民经济行业分类", width: 85 }
     );
-  };
-
+};
+const cOccupCdeChange = () => {
+    // const param = opertaor.getParam();
+    dialog.value?.open(
+      "cOccupCdeModal",
+      {
+        type: "show",
+        method: {
+          getdbClickData: (data:any) => {
+            setFormItem("ECargoInsuredDist.cOccupCde", {
+              loadData: [{ label: `${data.cde} ${data.cnm}`, value: data.cde }],
+            });
+            setValue("ECargoInsuredDist.cOccupCde", data.cde);
+            dialog.value?.handleClose();
+          },
+        },
+      },
+      {
+        isOk: (selectdata: any) => {},
+      },
+      { title: "职业", width: 85 }
+    );
+}
 
 //给表单下拉项赋值
 function setFormItem(key: any, obj: any) {
