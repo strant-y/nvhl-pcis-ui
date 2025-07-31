@@ -946,13 +946,9 @@ const initProxySales = (row:any)=>{
   console.log("代理业务员",row)
   if(rowData.length>0){
     const rowId = rowData[0]._dataId;
-    setValueByRowKey('Ci.cBrkSlsCde',rowId,`${row.CSlsCde}${row.CSlsNme}`)
-    setValueByRowKey('Ci.cBrkSlsCde',rowId,row.CSlsCde)
+    setValueByRowKey('Ci.cBrkSlsCde',rowId,`${row.cSlsId}${row.CSlsNme}`)
+    setValueByRowKey('Ci.cBrkSlsCde',rowId,row.cSlsId)
     setValueByRowKey('Ci.cSlsNme',rowId,row.CSlsNme)
-    console.log('代理业务员',{
-      code:'Ci.cBrkSlsCde'+rowId,
-      list:row.loadData,
-    })
     freeEditRef.value?.addCodeListMap({
       code:'Ci.cBrkSlsCde'+rowId,
       list:row.loadData,
@@ -1001,11 +997,14 @@ function setFormValue(value: any) {
           list:res,
         })
       }else if(!!elem['Ci.cBrkSlsCde'] && elem['Ci.cBrkSlsCde'] !==""){
-        const cbRes = await codeListStore.queryCodeList({codeListName:"AGENCY_BUSINESS_LIST",
-          codeListParam:{
-            CDptCde:elem['Ci.cBrkSlsCde'],
-          }
-        })
+        const cbRes = await codeListStore.queryCodeList(
+          {
+            codeListName:"AGENCY_BUSINESS_LIST",
+            codeListParam:{CDptCde:elem['Ci.cBrkSlsCde']}
+          },)
+          console.log("保费计算完毕",{
+            code:"Ci.cBrkSlsCde"+elem['_dataId'],
+            list:cbRes})
         freeEditRef.value?.addCodeListMap({
           code:"Ci.cBrkSlsCde"+elem['_dataId'],
           list:cbRes,
