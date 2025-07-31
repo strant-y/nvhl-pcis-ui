@@ -743,7 +743,7 @@
             showKey: [2],
             type: "info",
             size: "large",
-            icon: "Message",
+            icon: "Release",
             tableClick: (row) => {
                 handleWorkFlow(row, "removeReceived");
             },
