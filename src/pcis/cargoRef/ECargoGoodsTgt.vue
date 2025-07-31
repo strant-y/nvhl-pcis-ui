@@ -375,18 +375,28 @@ const method = {
   },
   // 删除
   delmethod: (row: any) => {
-    const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
-    const param = {
-      cComponentTable: cComponentTableValue,
-      cPkId: [row['ECargoGoodsTgt.cPkId']],
-      cEcAgrAppNo:agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
-    }
-    deleteDist(param).then((res: any) => {
-      if (res.code === 200) {
-        ElMessage.success("删除成功");
-        loadData()
-      }
-    });
+		ElMessageBox.confirm(
+        "是否确认删除当前数据？",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+    ).then(() => {
+			const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
+			const param = {
+				cComponentTable: cComponentTableValue,
+				cPkId: [row['ECargoGoodsTgt.cPkId']],
+				cEcAgrAppNo:agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
+			}
+			deleteDist(param).then((res: any) => {
+				if (res.code === 200) {
+					ElMessage.success("删除成功");
+					loadData()
+				}
+			});
+		}).catch(()=>{})
   },
 
   // 同投保人按钮点击事件

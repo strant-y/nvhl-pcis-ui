@@ -240,17 +240,27 @@ const method = {
       ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
       return;
     }
-    const param = {
-      cComponentTable: cComponentTableValue,
-      cPkId: [row['ECargoTransportDist.cPkId']],
-      cEcAgrAppNo:agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
-    }
-    deleteDist(param).then((res: any) => {
-      if (res.code === 200) {
-        ElMessage.success("删除成功");
-        loadData()
-      }
-    });
+		ElMessageBox.confirm(
+        "是否确认删除当前数据？",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+    ).then(() => {
+			const param = {
+				cComponentTable: cComponentTableValue,
+				cPkId: [row['ECargoTransportDist.cPkId']],
+				cEcAgrAppNo:agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
+			}
+			deleteDist(param).then((res: any) => {
+				if (res.code === 200) {
+					ElMessage.success("删除成功");
+					loadData()
+				}
+			});
+		}).catch(()=>{})
   },
 	// 批量删除
   batchDelete() {

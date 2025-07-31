@@ -150,6 +150,9 @@ const loadData = (flag = true)=>{
 			if(res.data.data.length > 0 ){
 				pageresult.list = res.data.data
 				pageresult.total = res.data.total
+			} else {
+				pageresult.list = []
+				pageresult.total = 0
 			}
 		}else {
 			ElMessage.success(res.msg);
@@ -188,7 +191,7 @@ const method = {
           compKey: props.pageSchema.compKey
         },
 				{},
-        {width: "60"}
+        {width: "85"}
     );
   },
 	// 新增
@@ -213,7 +216,7 @@ const method = {
             saveTgt(res)
           },
         },
-        {width: "60"}
+        {width: "85"}
     );
   },
 	// 编辑
@@ -238,7 +241,7 @@ const method = {
             saveTgt(res)
           },
         },
-        {width: "60"}
+        {width: "85"}
     );
   },
   // 删除
@@ -249,18 +252,28 @@ const method = {
       ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
       return;
     }
-    const param = {
-			// cComponentTable:cComponentTableValue,
-			cComponentTable: "ECargoInsuredDist",
-      cPkId: [row['ECargoInsuredDist.cPkId']],
-      cEcAgrAppNo:agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
-    }
-    deleteDist(param).then((res: any) => {
-      if (res.code === 200) {
-        ElMessage.success("删除成功");
-        loadData()
-      }
-    });
+		ElMessageBox.confirm(
+        "是否确认删除当前数据？",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+    ).then(() => {
+			const param = {
+				// cComponentTable:cComponentTableValue,
+				cComponentTable: "ECargoInsuredDist",
+				cPkId: [row['ECargoInsuredDist.cPkId']],
+				cEcAgrAppNo:agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
+			}
+			deleteDist(param).then((res: any) => {
+				if (res.code === 200) {
+					ElMessage.success("删除成功");
+					loadData()
+				}
+			});
+		}).catch(()=>{})
   },
 	// 批量删除
   batchDelete() {
