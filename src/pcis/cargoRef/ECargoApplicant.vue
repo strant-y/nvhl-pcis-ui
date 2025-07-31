@@ -41,6 +41,7 @@ const route = useRoute();
 const fileInputRef = ref(null);
 const fileInputType = ref();
 import { readFile } from "@/api/file";
+import moment from "moment/moment";
 const tCertfDate = ref<any[]>([]);
 const idxParam = inject('idxParam');
 const formPage = idxParam?.formPage;
@@ -73,7 +74,9 @@ onMounted(() => {
 
     setFormItem("ECargoApplicant.cGreenIndustryCustomers",{disabled: true});
     setFormItem("ECargoApplicant.cGreenIndustryList",{disabled: true});
-
+    if(!getValue('ECargoApplicant.cCustRiskRank')){
+      setValue('ECargoApplicant.cCustRiskRank','925104')
+    }
   });
 });
 //给表单下拉项赋值
@@ -97,6 +100,31 @@ function setFormItem(key: any, obj: any) {
 
 // 绑定方法
 const method = {
+  //注册地市是否同上
+   isSameChange : (val:any) => {
+    if (val == "1") {
+      const ads = getValue("ECargoApplicant.Prop");
+      const a = getValue("ECargoApplicant.cSuffixAddr") || "";
+      const b = getValue("ECargoApplicant.cClntAddr") || '';
+
+      setValue("ECargoApplicant.RegisterProp", ads);
+      setValue("ECargoApplicant.cRegisterSuffixAddr", a);
+      setValue("ECargoApplicant.cRegisteredcapDre", b);
+    }
+  },
+  tCertMrkChecked:(val:any)=>{
+    if (val == "1") {
+      setValue(
+          "ECargoApplicant.tCertfEndDate",
+          moment(new Date("2099-12-31")).format("YYYY-MM-DD HH:mm:ss")
+      );
+      setFormItem("ECargoApplicant.tCertfEndDate", { disabled: true });
+
+    } else {
+        setValue("ECargoApplicant.tCertfEndDate", "");
+       setFormItem("ECargoApplicant.tCertfEndDate", { disabled: false });
+    }
+  },
   // func demo
   funcquery: () => {},
   // 客户姓名
@@ -175,7 +203,7 @@ const method = {
     );
   },
   //常住地址
-  getCountry: (val: any) => {
+  getCountry: (val: any,row:any) => {
     setregistAdd();
   },
   //常住地址(input)
@@ -183,7 +211,7 @@ const method = {
     setregistAdd();
   },
   
-  //常住地址
+  //注册地址
   getAllProp: (val: any) => {
     setRegisterAdd();
   },
@@ -637,7 +665,7 @@ const idAnalysis = (id:string)=>{
           clearValidate('ECargoApplicant.cCertfCde')  
 }
 function setregistAdd() {
-  const ads = applicantEditRef?.value?.getValue("ECargoApplicant.ClntAddrProp");
+  const ads = applicantEditRef?.value?.getValue("ECargoApplicant.Prop");
   const a = applicantEditRef?.value?.getValue("ECargoApplicant.cSuffixAddr") || "";
   if (ads) {
     getAddressStr({ address: ads }).then((res: any) => {

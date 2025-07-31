@@ -506,18 +506,25 @@
             minWidth: 180,
         },
         {
-            prop: "udrClsCde",
-            inputtype: "rtinput",
-            title: "核保级别",
-            showKey: [1, 2],
-            minWidth: 180,
+          prop: "udrClsCde",
+          inputtype: "rtinput",
+          title: "当前核保级别",
+          showKey: [1, 2],
+          minWidth: 180,
+        },
+        {
+          prop: "cMinUndrCls",
+          inputtype: "rtinput",
+          title: "最终审核级别",
+          showKey: [1, 2],
+          minWidth: 180,
         },
         {
             prop: "bsType",
             inputtype: "rtSelectV2",
             title: "业务类型",
             showKey: [1, 2],
-            minWidth: 180,
+            minWidth: 80,
             loadData: [
                 { label: "承保", value: "A" },
                 { label: "批改", value: "E" },
@@ -536,7 +543,7 @@
             inputtype: "rtnumber",
             title: "保费",
             showKey: [1, 2, 3, 4],
-            minWidth: 180,
+            minWidth: 120,
         },
         {
             prop: "appCde",
@@ -560,7 +567,7 @@
             inputtype: "rtinput",
             title: "任务提交人",
             showKey: [1, 2, 3, 4],
-            minWidth: 180,
+            minWidth: 150,
         },
         {
             prop: "preDptName",
@@ -591,7 +598,7 @@
             inputtype: "rtselect",
             title: "任务状态",
             showKey: [1, 2, 3, 4],
-            minWidth: 180,
+            minWidth: 120,
             loadData: [
                 { label: "未接收", value: "0" },
                 { label: "已接收", value: "1" },
@@ -667,9 +674,17 @@
         },
         {
             prop: "cAppStatus",
-            inputtype: "rtinput",
+            inputtype: "rtselect",
             title: "状态",
             minWidth: 180,
+            loadData: [
+                { label: "暂存", value: '1' },
+                { label: "已提核", value: '2' },
+                { label: "核保退回", value: '3' },
+                { label: "已核保", value: '4' },
+                { label: "已签发保单", value: '5' },
+                { label: "见费出单退回", value: '8' },
+            ]
         },
     ]);
     // 根据下拉切换显示表格操作列 通用控制
@@ -1552,6 +1567,7 @@
                         cTermNo:row.cTermNo,
                         cTermNme:row.cTermNme,
                         cProdNmeCn: row.prodName,
+                        cPolicySource: row.cPolicySource,
                     });
                     router.push({
                         path: "/pcis/my-page",
@@ -1581,6 +1597,7 @@
                         cTermNo:row.cTermNo,
                         cTermNme:row.cTermNme,
                         cProdNmeCn: row.prodName,
+                        cPolicySource: row.cPolicySource,
                     });
                     router.push({
                         path: "/pcis/my-page",
@@ -1623,6 +1640,7 @@
                                 cTermNo:row.cTermNo,
                                 cTermNme:row.cTermNme,
                                 cProdNmeCn: row.prodName,
+                                cPolicySource:row.cPolicySource,
                             });
                             router.push({
                                 path: "/pcis/my-page",
@@ -1709,6 +1727,7 @@
                             cAppTyp: row.bsType,
                             cTermNme:row.cTermNme,
                             cTermNo:row.cTermNo,
+                            cPolicySource:row.cPolicySource,
                         };
                         const en = JSON.stringify(data);
                         router.push({
@@ -1804,6 +1823,7 @@
                             cTermNme:row.cTermNme,
                             cTermNo:row.cTermNo,
                             cProdNmeCn: row.prodName,
+                            cPolicySource: row.cPolicySource,
                         });
                         router.push({
                             path: "/pcis/my-page",
@@ -1827,6 +1847,7 @@
                             cTermNme:row.cTermNme,
                             cTermNo:row.cTermNo,
                             cProdNmeCn: row.prodName,
+                            cPolicySource: row.cPolicySource,
                         });
                         router.push({
                             path: "/pcis/my-page",
@@ -1865,6 +1886,7 @@
             cTermNo:row.cTermNo,
             pageType: "PLY_UW_PROCESS_SCENE",
             cProdNmeCn: row.prodName,
+            cPolicySource: row.cPolicySource,
         });
         router.push({
             path: "/pcis/my-page",

@@ -150,6 +150,9 @@ const loadData = (flag = true)=>{
 			if(res.data.data.length > 0 ){
 				pageresult.list = res.data.data
 				pageresult.total = res.data.total
+			} else {
+				pageresult.list = []
+				pageresult.total = 0
 			}
 		}else {
 			ElMessage.success(res.msg);
@@ -188,7 +191,7 @@ const method = {
           compKey: props.pageSchema.compKey
         },
 				{},
-        {width: "60"}
+        {width: "85"}
     );
   },
 	// 新增
@@ -213,7 +216,7 @@ const method = {
             saveTgt(res)
           },
         },
-        {width: "60"}
+        {width: "85"}
     );
   },
 	// 编辑
@@ -238,7 +241,7 @@ const method = {
             saveTgt(res)
           },
         },
-        {width: "60"}
+        {width: "85"}
     );
   },
   // 删除
@@ -249,18 +252,28 @@ const method = {
       ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
       return;
     }
-    const param = {
-			// cComponentTable:cComponentTableValue,
-			cComponentTable: "ECargoInsuredDist",
-      cPkId: [row['ECargoInsuredDist.cPkId']],
-      cEcAgrAppNo:agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
-    }
-    deleteDist(param).then((res: any) => {
-      if (res.code === 200) {
-        ElMessage.success("删除成功");
-        loadData()
-      }
-    });
+		ElMessageBox.confirm(
+        "是否确认删除当前数据？",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+    ).then(() => {
+			const param = {
+				// cComponentTable:cComponentTableValue,
+				cComponentTable: "ECargoInsuredDist",
+				cPkId: [row['ECargoInsuredDist.cPkId']],
+				cEcAgrAppNo:agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
+			}
+			deleteDist(param).then((res: any) => {
+				if (res.code === 200) {
+					ElMessage.success("删除成功");
+					loadData()
+				}
+			});
+		}).catch(()=>{})
   },
 	// 批量删除
   batchDelete() {
@@ -508,9 +521,6 @@ const method = {
 // 绑定特殊验证器
 const exRules = {};
 
-function validate() {
-  return true;
-}
 function setValue(key: string, value: any) {
   distTableRef?.value?.setValue(key, value);
 }
@@ -558,6 +568,18 @@ function setAddressStr(key: any, data: any) {
   applicantEditRef?.value?.setValue(key, data);
 }
 
+function validate() {
+  return new Promise(resolve => {
+    if(!pageresult.list || pageresult.list.length === 0) {
+      if(idxParam && idxParam.handleAnchorClick) {
+        idxParam.handleAnchorClick(undefined,`#${props.compKey}`)
+      }
+      resolve(false);
+    }
+    resolve(true);
+  })
+}
+
 function getFormValue() {
   return pageresult.list;
 }
@@ -567,7 +589,7 @@ function setFormValue(value: any) {
 }
 
 function getFormConfig(){
-  return formconfig1;
+  return formconfig1.value;
 }
 function getFormBtn() {
   return distTableRef?.value?.getFormBtn();
@@ -599,6 +621,7 @@ defineExpose({
   getFormValue,
   setFormValue,
   getFormConfig,
+  validate,
   setUnDisabledByKeyList,
   handleQuery: method.handleQuery,
   setTableData,

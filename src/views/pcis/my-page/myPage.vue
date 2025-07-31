@@ -156,8 +156,7 @@
                 props.param.cTermNme
               }}</span
             >&nbsp;|&nbsp;<span class="font-weight-500">出单方式：</span
-            ><span class="publicStyle">{{ getRecordTypeText(props.param.cRecordType)
-             }}</span>&nbsp;|
+            ><span class="publicStyle">{{ getRecordTypeText(props.param.cPolicySource ?? props.param.cRecordType) }}</span>&nbsp;|
             <span class="publicStyle">{{productStore.cCiMrk === '0' ? '非共保业务' 
               : productStore.cCiMrk == '1' ? '外部共保我方主共_主联'
               : productStore.cCiMrk == '2' ? '外部共保我方从共_主联'
@@ -420,7 +419,7 @@ const amlExtendInfo = defineAsyncComponent(
 
 //历史赔案
 const historyClaimcaseModel = defineAsyncComponent(
-  () => import("@/views/comprehensive-query/modal/history-claimcase-model.vue")
+  () => import("../../comprehensive-query/modal/history-claimcase-model.vue")
 );
 //发起风勘
 const windExplorationModel = defineAsyncComponent(
@@ -446,7 +445,7 @@ const copyPlyModel = defineAsyncComponent(
 );
 // 保存模板
 const templateDialog = defineAsyncComponent(
-  () => import("@/views/pcis/my-page/templateDialog.vue")
+  () => import("./templateDialog.vue")
 );
 
 const idxParam = {
@@ -555,17 +554,29 @@ onMounted(() => {
   console.log('param 路由---', props.param )
   initPage();
 });
+const getActualRecordType = computed(() => {
+  // 优先使用 cPolicySource，如果不存在则使用 cRecordType
+  return props.param.cPolicySource ?? props.param.cRecordType ?? '';
+});
 const getRecordTypeText = computed(() => {
-  return (recordType: string) => {
+  return (cRecordType: string) => {
+    const actualRecordType = props.param.cPolicySource ?? props.param.cRecordType ?? cRecordType;
     const recordTypeMap: { [key: string]: string } = {
-      '1': '自定义录单',
-      '2': '方案录单',
-      '3': '模板录单',
-      '4': '协议出单'
+      '1': '核心页面出单',
+      '5': '方案录单',
+      '7': '模板录单',
+      '9': '协议出单',
+      '2':'核心导入',
+      '3':'移动端出单',
+      '4':'取到出单',
+      '6':'询报价转投保',
+      '8':'复制出单',
+      '10':'组合出单',
     };
-    return recordTypeMap[recordType] || '未知录单方式';
+    return recordTypeMap[cRecordType] || '未知录单方式';
   };
 });
+
 
 // watchEffect(() => {
 //   const isShow = productStore.$state.cCiMrk !== "0";
@@ -805,13 +816,7 @@ const basicBtn = [
     type: "warning",
     id: "btn010103",
     func: () => {
-      /**
-       * 联共保判断
-       */
-      const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk')
-      if ('1' === CiMrk || '2' === CiMrk || '5' === CiMrk) {
-          const validCi = JointInsuranceCheck();
-      }
+      
       submitToUndrFn();
     },
   }),
@@ -2487,7 +2492,13 @@ const submitToUndrFn = async () => {
 
   console.log('座位总数',opertaor.getTableRefByKey("tgt"))
   console.log('座位总数', opertaor.getDataAll())
-
+  /**
+   * 联共保判断
+   */
+  const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk')
+  if ('1' === CiMrk || '2' === CiMrk || '5' === CiMrk) {
+      const validCi = JointInsuranceCheck();
+  }
 	// 申请核保前判断是否灰黑名单
 	const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
 	const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
@@ -2764,6 +2775,14 @@ const savePlyInfo = async () => {
   const btn = getBtn("btn010102");
   btn.loading = true;
   const res = opertaor.getDataAll();
+  if(res['ci'] && res['ci'].length>0){
+    res['ci'].forEach((item:any)=>{
+      if(item['Ci.nCiShare']){
+        item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
+      }
+    })
+  }
+
 
   console.log('保费====',res)
   let payList = res.payinfo;
@@ -3575,65 +3594,68 @@ const submitUnderwritingFn = async () => {
     res["inquiryNo"] = props.param.cInquiryNo;
   }
   console.log(res);
-  if(res.cUndrMrk === "A") {//核保选项为同意时，调用强制临分接口
-    // // 先查询临分标识
-    // const queryCRiFacMrk = props.param?.pageName === "priceInquiry" ? await policyService.queryCRiFacMrkXJ({cAppNo: props.param?.cAppNo}) : await policyService.queryCRiFacMrk({cAppNo: props.param?.cAppNo});
-    // if(queryCRiFacMrk && queryCRiFacMrk.code === '200') {
-    //   const cRiFacMrk = queryCRiFacMrk.data.cRiFacMrk;
-    //   if(cRiFacMrk === '0') {
-    //     // 不需要临分
-    //   } else if(cRiFacMrk === '1') {
-    //     // 自主临分
-        const deductibleDist = opertaor.getTableRefByKey("deductibleDist")?.getTableData();
-        const insured = opertaor.getTableRefByKey("insured")?.getFromValue();
-        const applicant = opertaor.getTableRefByKey("applicant")?.getFromValue();
-        const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
-        const insrnc = opertaor.getTableRefByKey("insrnc")?.getFromValue();
-        const edrbase = opertaor.getTableRefByKey("edrbase")?.getFromValue();
+  if(res.cUndrMrk === "A") {//核保选项为同意时
+    const deductibleDist = opertaor.getTableRefByKey("deductibleDist")?.getTableData();
+    const insured = opertaor.getTableRefByKey("insured")?.getFromValue();
+    const applicant = opertaor.getTableRefByKey("applicant")?.getFromValue();
+    const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
+    const insrnc = opertaor.getTableRefByKey("insrnc")?.getFromValue();
+    const edrbase = opertaor.getTableRefByKey("edrbase")?.getFromValue();
+    if(props.param?.cAppTyp === 'E') {// 批单
+      if(plyBase['Base.cRiFacMrk'] === '2' && plyBase['Base.cRiMrk'] === '1') {//如果临分标识为2，cRiMrk值为1时，需要调查询临分状态接口，返回值为0,1,6阻断，其他继续核保
+        // 调用接口查询临分状态(0未报价 1未确认 2已确认 3账单已生成 4部分账单已传财务 5账单全部已传财务 6没有临分数据)
         const param = {
-          cAppNo: props.param?.cAppNo,// 保批单申请单号
-          cDductDesc: deductibleDist && deductibleDist[0] ? deductibleDist[0]["DeductibleDist.cDeductibleContent"] : "",// 免赔约定
-          cDocTyp: props.param?.cAppTyp,// 单证类型 A 保单 E 批单
-          cDptCde: props.param?.cDptCde,// 机构代码
-          cInsrntNme: insured['Insured.cInsuredNme'],//被保人名称
-          cPlyNo: props.param?.plyNo,// 保单号
-          cProdNme: props.param?.cTermNme,// 产品名称
-          cProdNo: props.param?.cProdNo,//产品代码
-          cStockMrk: props.param?.cGrpMrk == "0" ? insured['Insured.cStkMrk'] : applicant['Applicant.cStkMrk'],// 股东业务标志(团单1取投保人标识，个单0取被保人标识)
-          // nAmtChgRate: "1.00",// 保额币种汇率
-          nEdrPrjNo: plyBase['Base.nEdrPrjNo'],// 批改序号
-          // nPrmChgRate: "1.00",// 保费币种汇率
-          tAppTm: insrnc['Base.tAppTm'],// 投保日期
-          tEdrBgnTm: edrbase?['EdrBase.tEdrBgnTm']:'',// 批改生效起期
-          // tEdrEndTm: "2025-05-07 13:57:37",// 批改生效止期
-          tInsrncBgnTm: insrnc['Base.tInsrncBgnTm'],// 保险起期
-          tInsrncEndTm: insrnc['Base.tInsrncEndTm'],// 保险止期
+          cAppNo: props.param?.cAppNo,
+          cAppTyp: props.param?.cAppTyp,
+          cPlyNo: props.param?.plyNo,
+          nEdrPrjNo: plyBase['Base.nEdrPrjNo']
         }
-        const queryRiFacMrk = props.param?.pageName === "priceInquiry" ? await policyService.queryRiFacMrkXJ(param) : await policyService.queryRiFacMrk(param);
-        if(queryRiFacMrk && queryRiFacMrk.code === '0') {
-          ElMessage.error(queryRiFacMrk.message);
+        const queryFacSts = props.param?.pageName === "priceInquiry" ? await policyService.queryFacStsXJ(param) : await policyService.queryFacSts(param);
+        if(queryFacSts && queryFacSts.responseCode && (queryFacSts.responseCode === "0" || queryFacSts.responseCode === "1" || queryFacSts.responseCode === "6")) {
+          ElMessage.error(queryFacSts.message);
           return
         }
-    //   } else if(cRiFacMrk === '2') {
-    //     // 强制临分 调用接口查询强制临分状态(0未报价 1未确认 2已确认 3账单已生成 4部分账单已传财务 5账单全部已传财务 6没有临分数据)
-    //     // 0、1、6阻断，其他继续核保
-    //     const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
-    //     const param = {
-    //       cAppNo: props.param?.cAppNo,
-    //       cAppTyp: props.param?.cAppTyp,
-    //       cPlyNo: props.param?.plyNo,
-    //       nEdrPrjNo: plyBase['Base.nEdrPrjNo']
-    //     }
-    //     const queryFacSts = props.param?.pageName === "priceInquiry" ? await policyService.queryFacStsXJ(param) : await policyService.queryFacSts(param);
-    //     if(queryFacSts && queryFacSts.responseCode && (queryFacSts.responseCode === "0" || queryFacSts.responseCode === "1" || queryFacSts.responseCode === "6")) {
-    //       ElMessage.error(queryFacSts.message);
-    //       return
-    //     }
-    //   }
-    // } else {
-    //   ElMessage.error(queryCRiFacMrk.message);
-    //   return;
-    // }
+      }
+    }
+    const param = {
+      cAppNo: props.param?.cAppNo,// 保批单申请单号
+      cDductDesc: deductibleDist && deductibleDist[0] ? deductibleDist[0]["DeductibleDist.cDeductibleContent"] : "",// 免赔约定
+      cDocTyp: props.param?.cAppTyp,// 单证类型 A 保单 E 批单
+      cDptCde: props.param?.cDptCde,// 机构代码
+      cInsrntNme: insured['Insured.cInsuredNme'],//被保人名称
+      cPlyNo: props.param?.plyNo,// 保单号
+      cProdNme: props.param?.cTermNme,// 产品名称
+      cProdNo: props.param?.cProdNo,//产品代码
+      cStockMrk: props.param?.cGrpMrk == "0" ? insured['Insured.cStkMrk'] : applicant['Applicant.cStkMrk'],// 股东业务标志(团单1取投保人标识，个单0取被保人标识)
+      // nAmtChgRate: "1.00",// 保额币种汇率
+      nEdrPrjNo: plyBase['Base.nEdrPrjNo'],// 批改序号
+      // nPrmChgRate: "1.00",// 保费币种汇率
+      tAppTm: insrnc['Base.tAppTm'],// 投保日期
+      tEdrBgnTm: edrbase?['EdrBase.tEdrBgnTm']:'',// 批改生效起期
+      // tEdrEndTm: "2025-05-07 13:57:37",// 批改生效止期
+      tInsrncBgnTm: insrnc['Base.tInsrncBgnTm'],// 保险起期
+      tInsrncEndTm: insrnc['Base.tInsrncEndTm'],// 保险止期
+    }
+    // 调用强制临分
+    const queryRiFacMrk = props.param?.pageName === "priceInquiry" ? await policyService.queryRiFacMrkXJ(param) : await policyService.queryRiFacMrk(param);
+    if(queryRiFacMrk && queryRiFacMrk.code === '0') {
+      ElMessage.error(queryRiFacMrk.message);
+      return
+    }
+  } else if(res.cUndrMrk === "B") {// 核保选项为退回给出单员时，如果已经触发自主临分，则提示需要再保确认并阻断，其他则直接提交核保
+    // 先查询临分标识
+    const queryCRiFacMrk = props.param?.pageName === "priceInquiry" ? await policyService.queryCRiFacMrkXJ({cAppNo: props.param?.cAppNo}) : await policyService.queryCRiFacMrk({cAppNo: props.param?.cAppNo});
+    if(queryCRiFacMrk && queryCRiFacMrk.code === '200') {
+      const cRiFacMrk = queryCRiFacMrk.data.cRiFacMrk;
+      if(cRiFacMrk === '1' || cRiFacMrk === '2') {// 自主临分或强制临分
+        // 自主临分
+        ElMessage.warning("该申请单已进入再保流程，核保意见不允许选择‘退回’，如需退回，请线下联系再保部告知投保单号");
+        return;
+      }
+    } else {
+      ElMessage.error(queryCRiFacMrk.message);
+      return;
+    }
   }
   let submitUnder;
   // 询价单
@@ -3675,16 +3697,23 @@ const validateCiInfo = () => {
   const ciData = opertaor.getTableRefByKey("ci").getFromValue();
   const plyBaseData = opertaor.getTableRefByKey("plyBase").getFromValue();
   const cCiMrk = plyBaseData["Base.cCiMrk"];
-  
+
   // 检查是否有共保信息
   if (!ciData || ciData.length === 0) {
     ElMessage.error("请录入共保信息!");
     return false;
   }
-  
   // 统计永安保险公司的数量
   const yonganCount = ciData.filter(item => item['Ci.cCoinsurerCde'] === '327001').length;
-  
+  // 新增校验：统计非永安保险公司的数量
+  const nonYonganCompanies = ciData.filter(item => item['Ci.cCoinsurerCde'] !== '327001')
+    .map(item => item['Ci.cCoinsurerCde']);
+  // 检查是否有重复的非永安共保公司代码
+  const uniqueNonYongan = [...new Set(nonYonganCompanies)];
+  if (nonYonganCompanies.length !== uniqueNonYongan.length) {
+    ElMessage.error("不能添加两条共保公司相同的非永安数据！");
+    return false;
+  }
   // 验证主共主联场景（cCiMrk为1）
   if (cCiMrk === "1") {
     // 检查是否所有共保公司都是永安（不允许全部为永安）
@@ -3693,19 +3722,18 @@ const validateCiInfo = () => {
       ElMessage.error("主共主联共保时，至少要有一条非永安的共保公司！");
       return false;
     }
-    
     // 检查永安分公司数量（必须录入两个以上）
-    if (yonganCount <= 1) {
-      ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
-      return false;
-    }
+    // if (yonganCount <= 1) {
+    //   ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
+    //   return false;
+    // }
   } 
   // 验证其他场景
   else if (cCiMrk == "1" && yonganCount <= 1) {
     ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
     return false;
   }
-  
+
   // 验证主/从共保信息完整性
   let chiefMrkM = 0; // 主共保数量
   let chiefMrkS = 0; // 从共保数量
@@ -3725,18 +3753,15 @@ const validateCiInfo = () => {
     ElMessage.error("主共方有且仅有一个！");
     return false;
   }
-  
   if (chiefMrkM > 1) {
     ElMessage.error("主共保信息只允许增加一条!");
     return false;
   }
-  
   // 共保比例总和验证
   if (Math.abs(NCiShare - 1) > 0.000001) { // 使用容差比较
     ElMessage.error("共保比例和应为1!");
     return false;
   }
-  
   return true;
 };
 const JointInsuranceCheck = ()=> {

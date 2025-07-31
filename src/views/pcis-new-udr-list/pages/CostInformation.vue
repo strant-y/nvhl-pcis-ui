@@ -214,7 +214,7 @@ const tableconfig = reactive<AppTableConfig>(
     editList: ["nFeeProp","nFee","cFeeFlag"],
     fromSchema: [
       {
-        prop: "cTypCde",
+        prop: "cFeetypCde",
         inputtype: "rtinput",
         title: "费用类型",
         minWidth: 180,

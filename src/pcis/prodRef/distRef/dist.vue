@@ -1003,6 +1003,8 @@ const getSummary = async () => {
   const param = {};
   if(route.params.param?.pageName === "priceInquiry") {
     param.cInquiryNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+  } else if(route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
+    param.cAppNo = route.params.param?.cOrgAppNo;
   } else {
     param.cAppNo = route.params.param?.cAppNo || opertaor.getDataAll().plyBase["Base.cAppNo"]
   }

@@ -18,6 +18,8 @@ import {AppFreeEditConfig,AppFreeEditMethod,createAppFreeEditConfig} from "@/sha
 import { useValidator } from "@/typings/useValidator";
 import { createFreeButtonBase } from "@/shared/button-config";
 import {AppTableConfig,AppTableMethod,createTableEditConfig,MyTableMethod} from "@/shared/app-table-config";
+import dayjs from "dayjs";
+import moment from "moment";
 import cargoApi from '@/api/cargo'
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 
@@ -44,7 +46,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         func: () => {
           freeEditRef.value?.resetFields();
 					reset()
-					handleQuery(true)
         },
       }),
     ],
@@ -100,6 +101,49 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "被保人名称",
         clearable: true,
       },
+			{
+				prop: "cEcAgrNo",
+				inputtype: "rtinput",
+				title: "预约协议号",
+				clearable: true,
+			},
+			{
+				prop: "cAppStatus",
+				inputtype: "rtselect",
+				title: "协议状态",
+				minWidth: 180,
+				clearable: true,
+				loadData: [
+						{ label: "暂存", value: 1 },
+						{ label: "已提核", value: 2 },
+						{ label: "核保退回", value: 3 },
+						{ label: "已核保", value: 4 },
+				]
+			},
+			{
+				prop: "tInsrncTm",
+				inputtype: "rtdatepicker",
+				title: "生效日期",
+				format: "YYYY-MM-DD HH:mm:ss",
+				valueFormat: "YYYY-MM-DD HH:mm:ss",
+				clearable: true,
+				type: "datetimerange",
+				func: (val:any) => {
+          handleDateChange(val, "1");
+        },
+			},
+			{
+				prop: "tAppTm",
+				inputtype: "rtdatepicker",
+				title: "录入日期",
+				format: "YYYY-MM-DD HH:mm:ss",
+				valueFormat: "YYYY-MM-DD HH:mm:ss",
+				type: "datetimerange",
+				rules: [getRules("required", {})],
+				func: (val:any) => {
+          handleDateChange(val, "2");
+        },
+			},
     ],
   })
 );
@@ -256,12 +300,15 @@ const refreshData = (reset = true) => {
 
 onMounted(() => {
 	reset()
-  refreshData();
 });
 
 function reset (){
 	freeEditRef.value?.setFormValue({
 		cDptCde: "0200000000000",
+		tAppTm: [
+			moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00"),
+			moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+		],
 	});
 	setFormItem("cDptCde", {
 		loadData: [
@@ -271,12 +318,33 @@ function reset (){
 			},
 		],
 	});
+	handleQuery(true)
 }
 
 
 function toDtl(row: any, type: string) {
   router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify(row), type: type}});
 }
+
+// 日期change事件
+const handleDateChange = (value:any, num:String) => {
+  let startDate,
+      endDate = "";
+  startDate = moment(new Date(value[0])).format("YYYY-MM-DD 00:00:00");
+  endDate = moment(new Date(value[1])).endOf("day").format("YYYY-MM-DD HH:mm:ss");
+	// 生效日期
+	if(num == "1"){
+		freeEditRef.value?.setFormValue({
+			tInsrncBgnTm: startDate, // 生效日期起期
+			tInsrncEndTm: endDate, // 生效日期止期
+		});
+	} else if(num == "2"){ // 录入日期
+		freeEditRef.value?.setFormValue({
+			tAppBgnTm: startDate, // 录入日期起期
+			tAppEndTm: endDate, // 录入日期止期
+		});
+	}
+};
 
 //给表单下拉项赋值
 function setFormItem(key: any, obj: any) {
