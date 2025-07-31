@@ -515,6 +515,9 @@ function setTableData(data: any) {
 function validate() {
   return new Promise(resolve => {
     if(!pageresult.list || pageresult.list.length === 0) {
+      if(idxParam && idxParam.handleAnchorClick) {
+        idxParam.handleAnchorClick(undefined,`#${props.compKey}`)
+      }
       resolve(false);
     }
     resolve(true);
