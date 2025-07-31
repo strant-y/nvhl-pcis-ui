@@ -562,7 +562,7 @@ const getRecordTypeText = computed(() => {
   return (cRecordType: string) => {
     const actualRecordType = props.param.cPolicySource ?? props.param.cRecordType ?? cRecordType;
     const recordTypeMap: { [key: string]: string } = {
-      '1': '核心页面录单',
+      '1': '核心页面出单',
       '5': '方案录单',
       '7': '模板录单',
       '9': '协议出单',
