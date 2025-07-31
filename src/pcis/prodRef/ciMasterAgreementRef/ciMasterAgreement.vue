@@ -122,6 +122,7 @@ const method = {
   cReceiTitleCdeChange:(val)=>{
     if(val === '3127001'){
       setFormItem("Base.cReceiptTitleNme", {disabled: true})
+      setValue("Base.cReceiptTitleNme","")
     }else{
       setFormItem("Base.cReceiptTitleNme", {disabled: false})
     }
