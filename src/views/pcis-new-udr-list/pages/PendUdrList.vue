@@ -667,9 +667,17 @@
         },
         {
             prop: "cAppStatus",
-            inputtype: "rtinput",
+            inputtype: "rtselect",
             title: "状态",
             minWidth: 180,
+            loadData: [
+                { label: "暂存", value: '1' },
+                { label: "已提核", value: '2' },
+                { label: "核保退回", value: '3' },
+                { label: "已核保", value: '4' },
+                { label: "已签发保单", value: '5' },
+                { label: "见费出单退回", value: '8' },
+            ]
         },
     ]);
     // 根据下拉切换显示表格操作列 通用控制

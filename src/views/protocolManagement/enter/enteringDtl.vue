@@ -369,12 +369,12 @@ const saveEdrPlyInfo = async () => {
   let saveEdrFlag = false;
   const btn = getBtn("saveEdr");
 
-  const validateAll = await formPage.value?.validateAll();
-  console.log('validateAll', validateAll);
-  if(!validateAll.flag) {
-    ElMessage.warning(validateAll.msg);
-    return;
-  }
+  // const validateAll = await formPage.value?.validateAll();
+  // console.log('validateAll', validateAll);
+  // if(!validateAll.flag) {
+  //   ElMessage.warning(validateAll.msg);
+  //   return;
+  // }
 
   btn.loading = true;
   const res = formPage.value?.getAllFormData();
@@ -634,7 +634,9 @@ async function  submit() {
   const base = allFromData['AgreementBase'];
   const filter = [];
   if(base['ECargoBase.cCiMrk'] === '0') {
-    filter.push(...['AgreementCiTcp', 'AgreementCiShare', 'AgreementCi']);
+    filter.push(...['AgreementCiTcp', 'AgreementCiShare', 'AgreementCi'
+        , 'AgreementCvrg'  // 临时关闭体条款校验
+    ]);
   }
   const rv = await formPage.value?.validateAll(filter)
   if(!rv.flag){
