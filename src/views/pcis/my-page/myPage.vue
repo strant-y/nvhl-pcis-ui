@@ -1551,6 +1551,13 @@ async function loadAfter() {
             moment(ops['insrnc']['Base.tInsrncBgnTm']),
             "days"
         );
+        if(ops['ci'] && ops['ci'].length>0){
+          ops['ci'].forEach((item:any)=>{
+            if(item['Ci.nCiShare']){
+              item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
+            }
+          })
+        }
         opertaor.setDataAll(ops);
         // 获取原投保单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
@@ -1679,6 +1686,13 @@ async function loadAfter() {
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
         }
         ops['plyBase']['Base.cPlyNo'] = ''
+        if(ops['ci'] && ops['ci'].length>0){
+          ops['ci'].forEach((item:any)=>{
+            if(item['Ci.nCiShare']){
+              item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
+            }
+          })
+        }
         opertaor.setDataAll(ops);
         // 获取原投保单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
@@ -1809,6 +1823,13 @@ async function loadAfter() {
         if(ops.plyBase) {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+        }
+        if(ops['ci'] && ops['ci'].length>0){
+          ops['ci'].forEach((item:any)=>{
+            if(item['Ci.nCiShare']){
+              item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
+            }
+          })
         }
         opertaor.setDataAll(ops);
         // 获取原投保单号下的清单列表数据
@@ -1942,6 +1963,13 @@ async function loadAfter() {
         }
         ops['plyBase']['Base.cPlyNo'] = ''
         ops['plyBase']['Base.cAppStatus'] = ''
+        if(ops['ci'] && ops['ci'].length>0){
+          ops['ci'].forEach((item:any)=>{
+            if(item['Ci.nCiShare']){
+              item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
+            }
+          })
+        }
         opertaor.setDataAll(ops);
         // 获取原投保单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
@@ -2155,6 +2183,13 @@ const loadAppPlyInfo = async (CAppNo) => {
         edrbase.value?.setFormValue(EdrBaseData);
       }
       ElMessage.success(res.msg);
+      if(ops['ci'] && ops['ci'].length>0){
+        ops['ci'].forEach((item:any)=>{
+          if(item['Ci.nCiShare']){
+            item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
+          }
+        })
+      }
       opertaor.setDataAll(ops);
       // 展示保费和保额金额
       if (ops["base"]["Base.nPrm"] && ops["base"]["Base.nPrm"] > 0) {
@@ -2181,6 +2216,13 @@ const loadAppPlyInfo = async (CAppNo) => {
       }
       pageData.value = ops;
       ElMessage.success(res.msg);
+      if(ops['ci'] && ops['ci'].length>0){
+        ops['ci'].forEach((item:any)=>{
+          if(item['Ci.nCiShare']){
+            item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
+          }
+        })
+      }
       opertaor.setDataAll(ops);
       // 获取原申请单号下的清单列表数据
       const distMap = formconfig1[0].pageInfo.filter((item:any) => {
@@ -2259,6 +2301,13 @@ const loadAppPlyInfo = async (CAppNo) => {
       if (ops["base"]["Base.nAmt"] && ops["base"]["Base.nAmt"] > 0) {
         nAmt.value = ops["base"]["Base.nAmt"];
       }
+      if(ops['ci'] && ops['ci'].length>0){
+        ops['ci'].forEach((item:any)=>{
+          if(item['Ci.nCiShare']){
+            item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
+          }
+        })
+      }
       pageData.value = ops;
       ElMessage.success(res.msg);
       opertaor.setDataAll(ops);
@@ -2303,6 +2352,13 @@ const calcPremium = () => {
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
+  if(res['ci'] && res['ci'].length>0){
+    res['ci'].forEach((item:any)=>{
+      if(item['Ci.nCiShare']){
+        item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
+      }
+    })
+  }
   console.log(res);
   if (res["cvrg"].length == 0) {
     ElMessage.error("请录入条款信息");
@@ -2345,6 +2401,13 @@ const calcPremium = () => {
         ElMessage.success(res.msg + "保费为：" + ops["base"]["Base.nPrm"]);
       } else {
         ElMessage.success(res.msg + "保费为：0");
+      }
+      if(ops['ci'] && ops['ci'].length>0){
+        ops['ci'].forEach((item:any)=>{
+          if(item['Ci.nCiShare']){
+            item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
+          }
+        })
       }
 
       opertaor.setDataAll(ops);
@@ -2633,6 +2696,13 @@ const submitToUndrFn = async () => {
       calcData["user"] = user;
       calcData["plyBase"]["Base.cDptCde"] = params.cDptCde;
       calcData["plyBase"]["Base.cProdNo"] = params.cProdNo;
+      if(calcData['ci'] && calcData['ci'].length>0){
+        calcData['ci'].forEach((item:any)=>{
+          if(item['Ci.nCiShare']){
+            item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
+          }
+        })
+      }
       console.log(calcData);
       // 重新进行保费计算
       const calBtn = getBtn("btn010101");
@@ -3029,6 +3099,13 @@ const calcPremiumEdr = () => {
     res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
       res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   }
+  if(res['ci'] && res['ci'].length>0){
+    res['ci'].forEach((item:any)=>{
+      if(item['Ci.nCiShare']){
+        item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
+      }
+    })
+  }
 
   calcEdr(res).then((res) => {
     btn.loading = false;
@@ -3043,6 +3120,13 @@ const calcPremiumEdr = () => {
           "; 保费变化量为：" +
           ops["plyBase"]["Base.nPrmVar"]
       );
+      if(ops['ci'] && ops['ci'].length>0){
+        ops['ci'].forEach((item:any)=>{
+          if(item['Ci.nCiShare']){
+            item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
+          }
+        })
+      }
       opertaor.setDataAll(ops);
       nAmt.value = ops["base"]["Base.nAmt"] ? ops["base"]["Base.nAmt"]  : 0;
       nPrm.value = ops["base"]["Base.nPrm"] ? ops["base"]["Base.nPrm"] : 0;
@@ -3144,6 +3228,13 @@ const calcPremiumEdrSurrender = () => {
     res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
       res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   }
+  if(res['ci'] && res['ci'].length>0){
+    res['ci'].forEach((item:any)=>{
+      if(item['Ci.nCiShare']){
+        item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
+      }
+    })
+  }
   console.log(res);
   calcSurrenEdr(res).then((res: any) => {
     btn.loading = false;
@@ -3163,6 +3254,13 @@ const calcPremiumEdrSurrender = () => {
         ? res["res"]["composition"]["EdrBase"][0]["EdrBase.nPrm"]
         : 0;
       const ops = opertaor.convertData(res);
+      if(ops['ci'] && ops['ci'].length>0){
+        ops['ci'].forEach((item:any)=>{
+          if(item['Ci.nCiShare']){
+            item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
+          }
+        })
+      }
       opertaor.setDataAll(ops);
       if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
@@ -3211,6 +3309,13 @@ const saveApplicationEdr = () => {
     console.log("退保保存", res);
     if (res["code"] == "200") {
       const ops = opertaor.convertData(res);
+      if(ops['ci'] && ops['ci'].length>0){
+        ops['ci'].forEach((item:any)=>{
+          if(item['Ci.nCiShare']){
+            item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
+          }
+        })
+      }
       opertaor.setDataAll(ops);
       if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
@@ -3309,12 +3414,26 @@ const saveEdrPlyInfo = async () => {
     res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
       res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   }
+  if(res['ci'] && res['ci'].length>0){
+    res['ci'].forEach((item:any)=>{
+      if(item['Ci.nCiShare']){
+        item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
+      }
+    })
+  }
   const edrInfo: any = await saveEdrAppPlyInfo(res)
   btn.loading = false;
   if(edrInfo["code"] == "200") {
     const ops = opertaor.convertData(edrInfo);
     console.log("转换的数据", ops);
     ElMessage.success(edrInfo.msg);
+    if(ops['ci'] && ops['ci'].length>0){
+      ops['ci'].forEach((item:any)=>{
+        if(item['Ci.nCiShare']){
+          item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
+        }
+      })
+    }
     opertaor.setDataAll(ops);
     const EdrBaseData = edrInfo["res"]["composition"]["EdrBase"][0];
     // res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
@@ -3352,6 +3471,13 @@ const generateEndorse = async () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
   res["EdrBase"] = edrbase.value?.getFromValue();
+  if(res['ci'] && res['ci'].length>0){
+    res['ci'].forEach((item:any)=>{
+      if(item['Ci.nCiShare']){
+        item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
+      }
+    })
+  }
   console.log(res);
   getEndorseChange(res).then((res) => {
     btn.loading = false;
@@ -3528,6 +3654,13 @@ const submitEdrToUndrFun = async () => {
         ) {
           calcData["EdrBase"]["EdrBase.cEdrRsnDetail"] =
             calcData["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+        }
+        if(calcData['ci'] && calcData['ci'].length>0){
+          calcData['ci'].forEach((item:any)=>{
+            if(item['Ci.nCiShare']){
+              item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
+            }
+          })
         }
         const calcres: any = await calcEdr(calcData)
         if (calcres.code == "200") {
@@ -3758,8 +3891,8 @@ const validateCiInfo = () => {
     return false;
   }
   // 共保比例总和验证
-  if (Math.abs(NCiShare - 1) > 0.000001) { // 使用容差比较
-    ElMessage.error("共保比例和应为1!");
+  if (Math.abs(NCiShare - 100) > 0.000001) { // 使用容差比较
+    ElMessage.error("共保比例和应为100!");
     return false;
   }
   return true;
