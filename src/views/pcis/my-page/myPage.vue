@@ -3715,10 +3715,10 @@ const validateCiInfo = () => {
       return false;
     }
     // 检查永安分公司数量（必须录入两个以上）
-    if (yonganCount <= 1) {
-      ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
-      return false;
-    }
+    // if (yonganCount <= 1) {
+    //   ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
+    //   return false;
+    // }
   } 
   // 验证其他场景
   else if (cCiMrk == "1" && yonganCount <= 1) {
