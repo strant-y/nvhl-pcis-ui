@@ -464,13 +464,11 @@ const method = {
     if(route.params.param?.pageName === "priceInquiry") {
       selData['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
 			if(!selData['cInquiryNo']){
-				ElMessage.warning("请先保存申请单!");
 				return false
 			}
     } else {
       selData['cAppNo'] = app;
 			if(!selData['cAppNo']){
-				ElMessage.warning("请先保存申请单!");
 				return false
 			}
     }
