@@ -133,7 +133,7 @@
                 }"
                 :is="getConmpName(k)"
                 :pageSchema="k.pageSchema"
-                :compKey="k.pageCode"
+                :compKey="k.pageKey"
               />
             </div>
           </template>
