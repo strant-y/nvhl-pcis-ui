@@ -182,7 +182,7 @@
               >保费为: </span
             ><span class="publicStyle">{{ nPrm.toLocaleString() }}</span
             >&nbsp;<span class="font-weight-500">元</span>&nbsp;
-						<template v-if="props.param?.cRecordType === 4">
+						<template v-if="props.param?.cRecordType === 9">
 							|&nbsp;<span class="font-weight-500">剩余预收保费为: </span
 							><span class="publicStyle">{{ nRecRemPrm.toLocaleString() }}</span
 							>&nbsp;<span class="font-weight-500">元</span>
@@ -1288,7 +1288,7 @@ async function loadAfter() {
       rightBtnList.value = basicRightBtn;
     }
 		// 协议出单请求被保人信息和条款信息,见费出单跟协议号返回的走并且不可修改，展示剩余预收保费字段
-		if(props.param.cRecordType === 4){
+		if(props.param.cRecordType === 9){
 			let params = {
 				cEcAgrAppNo: props.param.cEcAgrAppNo, // 协议申请单号
 				cProdNo: props.param.cProdNo, // 产品代码
