@@ -984,7 +984,7 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                     } else if ("2" === rsnTyp) {
                         //注销
                         const en = JSON.stringify({
-                            cAppNo: selected.value["cPlyNo"],
+                            cAppNo: selected.value["cAppNo"],
                             cOrgAppNo: cAppNo,
                             cRsnCde: data['id'][1],
                             cRsnDetailCde: data['iddetail'],
@@ -1012,7 +1012,7 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                         console.log("退保", selected.value);
                         //退保
                         const en = JSON.stringify({
-                            cAppNo: selected.value["cPlyNo"],
+                            cAppNo: selected.value["cAppNo"],
                             cOrgAppNo: cAppNo,
                             cRsnCde: data['id'][1],
                             cRsnDetailCde: data['iddetail'],
@@ -1040,7 +1040,7 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                         //一般批改
                         const en = JSON.stringify({
                             // scene: SCENE_EDR_APP_NEW,
-                            cAppNo: selected.value["cPlyNo"],
+                            cAppNo: selected.value["cAppNo"],
                             cOrgAppNo: cAppNo,
                             cRsnCde: data['id'][1],
                             cRsnDetailCde: data['iddetail'],
