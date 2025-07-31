@@ -1521,9 +1521,12 @@ async function loadAfter() {
       });
     }
   } else if (props.param.pageType === "orig") {
+    console.log('续保复制----')
+    // 续保复制
     getAppPolicy({
       cAppNo: props.param.cAppNo,
       queryTyp: props.param.pageType,
+     
     }).then((res) => {
       if (res) {
         const ops = opertaor.convertData(res);
@@ -3319,11 +3322,11 @@ const saveEdrPlyInfo = async () => {
  * **/
 const generateEndorse = async () => {
   const res = opertaor.getDataAll();
-	let isAcctinfo = isDetailCde(); // 是否有账户信息
-	if(isAcctinfo && !res["acctinfo"]["Acctinfo.cAcctNo"]) {
-		ElMessage.warning("账户信息的收款人账号不能为空！")
-		return
-	}
+  const isAcctValid = await validateAcctinfo();
+  // 账户信息校验
+  if (!isAcctValid) {
+    return; 
+  }
   const btn = getBtn("btnCompare");
   btn.loading = true;
   res["user"] = user;
@@ -3394,14 +3397,11 @@ const generateEndorse = async () => {
 
 
 const submitEdrToUndrFun = async () => {
-  // await validateAcctinfo()
 
-    const isAcctValid = await validateAcctinfo();
-    console.log('1212',isAcctValid)
+  const isAcctValid = await validateAcctinfo();
+    // 账户信息校验
   if (!isAcctValid) {
-    // 可以在这里添加错误提示（如果validateAcctinfo内部没做的话）
-    // ElMessage.error("账户信息校验不通过，请检查");
-    return; // 直接返回，中断后续操作
+    return; 
   }
   if (needCalc.value) {
     ElMessage.error("请先进行保费计算!");

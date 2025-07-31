@@ -56,6 +56,8 @@ import { useRoute } from "vue-router";
 import { runInThisContext } from "vm";
 import { AppFreeEditMethod, createAppFreeEditConfig } from "@/shared/app-free-edit-config";
 import {eventBus} from "@/utils/event-bus";
+import { useValidator } from "@/typings/useValidator";
+const { getRules } = useValidator();
 const route = useRoute();
 const dialog = ref<DialogMethod | null>(null);
 const opertaor = dataOpertaor();
@@ -181,6 +183,9 @@ onMounted(async () => {
       }
     })
   }
+
+console.log('dist -----',formconfig11.value)
+  
   // if(params.cProdNo === '043009'){
   //   formconfig11.value.fromSchema?.forEach(item=>{
   //     if(item['prop'] ==='Dist.cEmploymentAddress' && route.params.param?.cGrpMrk !== '1'){
@@ -191,6 +196,13 @@ onMounted(async () => {
   Object.assign(formconfig1.value, formconfig11.value);
   cardconfig.value.title = formconfig1.value.title;
   if(formconfig1.value.distSchema&& formconfig1.value.distSchema.length > 0){
+         formconfig1.value.distSchema.forEach((item:any)=>{
+            console.log(666,item)
+            if(item['prop'] === 'cPlateNumber'){
+                item['rules'] = [getRules("vehiclePlate", {})];
+            }
+          
+      })
     cardconfig.value.formconfig = createAppFreeEditConfig({
       fromSchema:formconfig1.value.distSchema,
       endBtnsPosition: "right",
@@ -212,6 +224,9 @@ onMounted(async () => {
       ],
     });
     cardconfig.value.showEdit = true;
+
+ 
+
   }
   tableconfig.value.showEdit = true;
   tableconfig.value.showSelection = true;
