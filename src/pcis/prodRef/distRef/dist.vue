@@ -418,7 +418,7 @@ const method = {
     if(route.params.param?.pageName === "priceInquiry") {
       param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
     } else if (route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
-      param['cAppNo'] = edrbase.getFromValue()["EdrBase.cAppNo"]
+      param['cAppNo'] = edrbase["EdrBase.cAppNo"]
     } else {
       param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
     }

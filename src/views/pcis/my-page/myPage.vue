@@ -4065,7 +4065,7 @@ opertaor.setFatherPage({
 });
 
 function getEdrbaseValue(key:any) {
-  return edrbase.value
+  return edrbase.value?.getFromValue() || {};
 }
 
 function getOldProductResData() {
