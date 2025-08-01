@@ -977,80 +977,6 @@ const uwBtn = [
       });
     },
   }),
-  createFreeButtonBase({
-    label: "费用信息",
-    type: "primary",
-    id: "modFee",
-    func: () => {
-      //获取费用信息类型接口（缺少渠道，保费，当前表单提交校验待后续补充）
-      checkFeeWindowType({ CAppNo: props.param.cAppNo }).then((res: any) => {
-        if (200 !== res["code"]) {
-          ElMessage.error(res["msg"]);
-        } else {
-          if (!!res["data"]) {
-            //typeFlag = res['data'];
-          } else {
-            ElMessage.error(res["msg"]);
-          }
-        }
-      });
-      dzmodal
-        .open(CostInformation, { type: "Issuer", data: props.param })
-        .then((res: any) => {
-          if (res.type === "ok") {
-          }
-        });
-    },
-  }),
-  createFreeButtonBase({
-    label: "历次批单",
-    type: "primary",
-    id: "preOrder",
-    func: () => {
-      if (props.param?.cAppTyp === "A") {
-        ElMessage.warning("这是一张承保申请单，无法查看【本保单历次批单】");
-        return;
-      }
-      dzmodal
-        .open(PreviousdrOpnList, {
-          type: "Issuer",
-          objId: props.param?.plyNo,
-          prodNo: props.param?.cProdNo,
-        })
-        .then((res: any) => {
-          if (res.type === "ok") {
-          }
-        });
-    },
-  }),
-
-  createFreeButtonBase({
-    label: "任务痕迹",
-    type: "primary",
-    func: () => {
-      dzmodal
-        .open(TaskListVestige, {
-          type: "Issuer",
-          data: { objId: props.param?.cAppNo, sysType: props.param?.sysType },
-        })
-        .then((res: any) => {
-          if (res.type === "ok") {
-          }
-        });
-    },
-  }),
-  createFreeButtonBase({
-    label: "核保信息",
-    type: "primary",
-    func: () => {
-      dzmodal
-        .open(UndrOpnList, { type: "", CAppNo: props.param?.cAppNo })
-        .then((res: any) => {
-          if (res.type === "ok") {
-          }
-        });
-    },
-  }),
 ];
 /**
  * 数据初始化
@@ -1415,6 +1341,87 @@ async function loadAfter() {
       });
     }
     bthList.value = uwBtn;
+    rightBtnList.value = [
+      createFreeButtonBase({
+        label: "费用信息",
+        type: "primary",
+        id: "modFee",
+        icon: "Money",
+        func: () => {
+          //获取费用信息类型接口（缺少渠道，保费，当前表单提交校验待后续补充）
+          checkFeeWindowType({ CAppNo: props.param.cAppNo }).then((res: any) => {
+            if (200 !== res["code"]) {
+              ElMessage.error(res["msg"]);
+            } else {
+              if (!!res["data"]) {
+                //typeFlag = res['data'];
+              } else {
+                ElMessage.error(res["msg"]);
+              }
+            }
+          });
+          dzmodal
+            .open(CostInformation, { type: "Issuer", data: props.param })
+            .then((res: any) => {
+              if (res.type === "ok") {
+              }
+            });
+        },
+      }),
+      createFreeButtonBase({
+        label: "历次批单",
+        type: "primary",
+        id: "preOrder",
+        icon: "Document",
+        func: () => {
+          if (props.param?.cAppTyp === "A") {
+            ElMessage.warning("这是一张承保申请单，无法查看【本保单历次批单】");
+            return;
+          }
+          dzmodal
+            .open(PreviousdrOpnList, {
+              type: "Issuer",
+              objId: props.param?.plyNo,
+              prodNo: props.param?.cProdNo,
+            })
+            .then((res: any) => {
+              if (res.type === "ok") {
+              }
+            });
+        },
+      }),
+      createFreeButtonBase({
+        label: "任务痕迹",
+        type: "primary",
+        id: "taskVestige",
+        icon: "SetUp",
+        func: () => {
+          dzmodal
+            .open(TaskListVestige, {
+              type: "Issuer",
+              data: { objId: props.param?.cAppNo, sysType: props.param?.sysType },
+            })
+            .then((res: any) => {
+              if (res.type === "ok") {
+              }
+            });
+        },
+      }),
+      createFreeButtonBase({
+        label: "核保信息",
+        type: "primary",
+        id: "undrInfo",
+        icon: "DocumentChecked",
+        func: () => {
+          dzmodal
+            .open(UndrOpnList, { type: "", CAppNo: props.param?.cAppNo })
+            .then((res: any) => {
+              if (res.type === "ok") {
+              }
+            });
+        },
+      }),
+    ]
 		// 核保只有询价单才展示风勘查询按钮
 		if(props.param?.pageName === "priceInquiry") {
 			bthList.value.push(
@@ -4277,8 +4284,17 @@ function clearCAppNo(res:any, mapList:any = clearKeyMap) {
   return res;
 }
 </script>
-
 <style lang="scss" scoped>
+$btn-icon-color-1: #ff3e00;
+$btn-icon-color-2: #0060ff;
+$btn-icon-color-3: #4500ff;
+$btn-icon-color-4: #ffb200;
+$btn-icon-color-5: #00ff31;
+$btn-icon-bg-color-1: rgb(253, 222, 212);
+$btn-icon-bg-color-2: rgb(238, 244, 254);
+$btn-icon-bg-color-3: rgb(234, 227, 253);
+$btn-icon-bg-color-4: rgb(255, 242, 212);
+$btn-icon-bg-color-5: rgb(230, 251, 234);
 .bottom-items {
   height: 45px;
   background-color: #fff;
@@ -4434,35 +4450,43 @@ function clearCAppNo(res:any, mapList:any = clearKeyMap) {
       &:last-child {
         margin-bottom: 0;
       }
-      &:nth-child(1) {
+      &:nth-child(5n + 1) {
         :deep(.el-icon) {
-          background-color: rgb(253, 222, 212);
+          background-color: $btn-icon-bg-color-1;
           svg {
-            color: #ff3e00;
+            color: $btn-icon-color-1;
           }
         }
       }
-      &:nth-child(2) {
+      &:nth-child(5n + 2) {
         :deep(.el-icon) {
-          background-color: rgb(238, 244, 254);
+          background-color: $btn-icon-bg-color-2;
           svg {
-            color: #0060ff;
+            color: $btn-icon-color-2;
           }
         }
       }
-      &:nth-child(3) {
+      &:nth-child(5n + 3) {
         :deep(.el-icon) {
-          background-color: rgb(255, 242, 212);
+          background-color: $btn-icon-bg-color-3;
           svg {
-            color: #ffb200;
+            color: $btn-icon-color-3;
           }
         }
       }
-      &:nth-child(4) {
+      &:nth-child(5n + 4) {
         :deep(.el-icon) {
-          background-color: rgb(230, 251, 234);
+          background-color: $btn-icon-bg-color-4;
           svg {
-            color: #00ff31;
+            color: $btn-icon-color-4;
+          }
+        }
+      }
+      &:nth-child(5n + 5) {
+        :deep(.el-icon) {
+          background-color: $btn-icon-bg-color-5;
+          svg {
+            color: $btn-icon-color-5;
           }
         }
       }
