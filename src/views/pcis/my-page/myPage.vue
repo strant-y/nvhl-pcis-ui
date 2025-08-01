@@ -3741,20 +3741,18 @@ const submitUnderwritingFn = async () => {
     const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
     const insrnc = opertaor.getTableRefByKey("insrnc")?.getFromValue();
     const edrbase = opertaor.getTableRefByKey("edrbase")?.getFromValue();
-    if(props.param?.cAppTyp === 'E') {// 批单
-      if(plyBase['Base.cRiFacMrk'] === '2' && plyBase['Base.cRiMrk'] === '1') {//如果临分标识为2，cRiMrk值为1时，需要调查询临分状态接口，返回值为0,1,6阻断，其他继续核保
-        // 调用接口查询临分状态(0未报价 1未确认 2已确认 3账单已生成 4部分账单已传财务 5账单全部已传财务 6没有临分数据)
-        const param = {
-          cAppNo: props.param?.cAppNo,
-          cAppTyp: props.param?.cAppTyp,
-          cPlyNo: props.param?.plyNo,
-          nEdrPrjNo: plyBase['Base.nEdrPrjNo']
-        }
-        const queryFacSts = props.param?.pageName === "priceInquiry" ? await policyService.queryFacStsXJ(param) : await policyService.queryFacSts(param);
-        if(queryFacSts && queryFacSts.responseCode && (queryFacSts.responseCode === "0" || queryFacSts.responseCode === "1" || queryFacSts.responseCode === "6")) {
-          ElMessage.error(queryFacSts.message);
-          return
-        }
+    if(plyBase['Base.cRiFacMrk'] === '2' && plyBase['Base.cRiMrk'] === '1') {//如果临分标识为2，cRiMrk值为1时，需要调查询临分状态接口，返回值为0,1,6阻断，其他继续核保
+      // 调用接口查询临分状态(0未报价 1未确认 2已确认 3账单已生成 4部分账单已传财务 5账单全部已传财务 6没有临分数据)
+      const param = {
+        cAppNo: props.param?.cAppNo,
+        cAppTyp: props.param?.cAppTyp,
+        cPlyNo: props.param?.plyNo,
+        nEdrPrjNo: plyBase['Base.nEdrPrjNo']
+      }
+      const queryFacSts = props.param?.pageName === "priceInquiry" ? await policyService.queryFacStsXJ(param) : await policyService.queryFacSts(param);
+      if(queryFacSts && queryFacSts.code && (queryFacSts.code === "0" || queryFacSts.code === "1" || queryFacSts.code === "6")) {
+        ElMessage.error(queryFacSts.message);
+        return
       }
     }
     const param = {
