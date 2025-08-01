@@ -58,9 +58,6 @@ onMounted(() => {
     initComp();
     // 查询承保机构所属分公司和项目类别大类数据
     getCheckCdeptByCdptCde();
-    setFormItem('ECargoBase.cEcAgrAppNo', {
-      hidden: true,
-    });
   })
 });
 
