@@ -201,13 +201,13 @@ function isdisabled(i: any) {
   return false;
 }
 
-function getterm(it: any,termdata: any,itkey: any){
+function getterm(it: any,termdata: any, itkey: any){
   if(param.cEdrType && !termdata['Term.cRowId']){
     it.disabled = false || it.disabled ;
   }else{
     it.disabled = props.disabledFlag || it.disabled;
   }
-  if(param.cRsnCde === '45' && itkey === 'nMainRate'){ // 费率调整,放开费率字段编辑
+  if(param.cRsnCde === '45' && itkey === 'nMainRate'){
       it.disabled = false;
   }
   return it;
