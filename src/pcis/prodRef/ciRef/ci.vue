@@ -201,11 +201,23 @@ const method = {
             })
           });
     } else {
-      freeEditRef.value?.addCodeListMap({
-            code: "Ci.cSubDptCde"+rowId,
-            list: [{ label: '其他',value: '1',  }]
-          }
-      );
+      codeListStore
+        .queryCodeList({
+          codeListName: "CDptJointCde_List",
+          codeListParam: {},
+        })
+        .then((res) => {
+          freeEditRef.value?.addCodeListMap(
+              {code: "Ci.cSubDptCde"+rowId,
+                list: res.map((item:any) => ({label: item.c_cnm, value: item.c_cde}))
+              }
+          );
+        });
+      // freeEditRef.value?.addCodeListMap({
+      //       code: "Ci.cSubDptCde"+rowId,
+      //       list: [{ label: '其他',value: '1',  }]
+      //     }
+      // );
     }
     updateMasterAgreementValues()
   },
@@ -993,12 +1005,12 @@ const valideRequired = ()=>{
           if(rowItem && rowData['Ci.cChiefMrk'] == '1'){
             rowItem['Ci.nCiShare'].disabled = false
           }
-          if(rowItem && rowData['Ci.cChiefMrk'] == '0' && rowData['Ci.cCoinsurerCde'] !== '327001'){
+          else if(rowItem && rowData['Ci.cChiefMrk'] == '0' && rowData['Ci.cCoinsurerCde'] !== '327001'){
             rowItem['Ci.nCiShare'].disabled = false
             rowItem['Ci.nPlyFeeRate'].disabled = false
             rowItem['Ci.cCoinsurerCde'].disabled = false
           }
-          if(rowItem && rowData['Ci.cChiefMrk'] == '0'){
+          else if(rowItem && rowData['Ci.cChiefMrk'] == '0'){
             rowItem['Ci.nCiShare'].disabled = false
             rowItem['Ci.nPlyFeeRate'].disabled = false
           }
