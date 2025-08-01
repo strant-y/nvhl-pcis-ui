@@ -52,50 +52,8 @@ onMounted(async () => {
   //一般批改，部分要素可编辑
   const cCiMrkValue =  opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
   setTimeout(() => {
-    // if(param?.cAppTyp == 'A'){ //核保
-    //   const tableList = getFromValue();
-    //   tableList.forEach((item:any) => {
-    //     const rowItem  =  freeEditRef.value?.getRowAllItemRefById(item._dataId)
-    //     rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
-    //     rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
-    //     rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
-    //   })
-    // }
-  //   if (param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && cCiMrkValue =='5' && param.cRsnDetailCde.value == "FZ") {
-  //     formconfig1.editFlag = true;
-  //     formconfig1.fromSchema?.forEach((item) => {
-  //       item.disabled = true;
-  //   });
-  // }else if(param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && cCiMrkValue !=='5' && param.cRsnDetailCde.value == "47"){
-  //   const tableList = getFromValue();
-  //   freeEditRef.value?.getRowAllItemRefById()
-  //   tableList.forEach((item:any) => {
-  //     const rowItem  =  freeEditRef.value?.getRowAllItemRefById(item._dataId)
-  //     if(item['Ci.cChiefMrk'] == '1'){
-  //       rowItem['Ci.nCiShare'].disabled = false
-  //     }
-  //     if(item['Ci.cChiefMrk'] == '0' && item['Ci.cCoinsurerCde'] !== '327001'){
-  //       rowItem['Ci.nCiShare'].disabled = false
-  //       rowItem['Ci.nPlyFeeRate'].disabled = false
-  //       rowItem['Ci.cCoinsurerCde'].disabled = false
-  //     }
-  //     if(item['Ci.cChiefMrk'] == '0'){
-  //       rowItem['Ci.nCiShare'].disabled = false
-  //       rowItem['Ci.nPlyFeeRate'].disabled = false
-  //     }
-  //   })
-  //   }
-  }, 1000);
-  setTimeout(() => {
-    // if(param?.cAppTyp == 'A'){ //核保
-    //   const tableList = getFromValue();
-    //   tableList.forEach((item:any) => {
-    //     const rowItem  =  freeEditRef.value?.getRowAllItemRefById(item._dataId)
-    //     rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
-    //     rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
-    //     rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
-    //   })
-    // }
+    valideRequired();
+    handleEdrAppNewSceneRules(); // 添加这行来确保规则被应用
   }, 2000);
   formconfig1.fromSchema?.forEach((item:any) => {
     if(item.prop === 'Ci.cCoinsurerCde') {
@@ -999,25 +957,52 @@ const valideRequired = ()=>{
             item.disabled = true;
           });
         }
-        
-        if(param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && cCiMrkValue !=='5' && param.cRsnDetailCde.value == "47"){
-          const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
-          if(rowItem && rowData['Ci.cChiefMrk'] == '1'){
-            rowItem['Ci.nCiShare'].disabled = false
-          }
-          else if(rowItem && rowData['Ci.cChiefMrk'] == '0' && rowData['Ci.cCoinsurerCde'] !== '327001'){
-            rowItem['Ci.nCiShare'].disabled = false
-            rowItem['Ci.nPlyFeeRate'].disabled = false
-            rowItem['Ci.cCoinsurerCde'].disabled = false
-          }
-          else if(rowItem && rowData['Ci.cChiefMrk'] == '0'){
-            rowItem['Ci.nCiShare'].disabled = false
-            rowItem['Ci.nPlyFeeRate'].disabled = false
-          }
-        }
+        handleEdrAppNewSceneRules()
+        // if(param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && cCiMrkValue !=='5' && param.cRsnDetailCde.value == "47"){
+        //   const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+        //   if(rowItem && rowData['Ci.cChiefMrk'] == '1'){
+        //     rowItem['Ci.nCiShare'].disabled = false
+        //   }
+        //   else if(rowItem && rowData['Ci.cChiefMrk'] == '0' && rowData['Ci.cCoinsurerCde'] !== '327001'){
+        //     rowItem['Ci.nCiShare'].disabled = false
+        //     rowItem['Ci.nPlyFeeRate'].disabled = false
+        //     rowItem['Ci.cCoinsurerCde'].disabled = false
+        //   }
+        //   else if(rowItem && rowData['Ci.cChiefMrk'] == '0'){
+        //     rowItem['Ci.nCiShare'].disabled = false
+        //     rowItem['Ci.nPlyFeeRate'].disabled = false
+        //   }
+        // }
       }
   },500)
 }
+/**
+ * 处理EDR_APP_NEW_SCENE页面类型的特殊规则
+ */
+const handleEdrAppNewSceneRules = () => {
+  const cCiMrkValue = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
+  
+  if (param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && cCiMrkValue !== '5' && param.cRsnDetailCde?.value == "47") {
+    const tableList = getFromValue();
+    tableList.forEach((rowData: any) => {
+      const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId);
+      if (rowItem) {
+        if (rowData['Ci.cChiefMrk'] == '1') {
+          rowItem['Ci.nCiShare'].disabled = false;
+        }
+        else if (rowData['Ci.cChiefMrk'] == '0' && rowData['Ci.cCoinsurerCde'] !== '327001') {
+          rowItem['Ci.nCiShare'].disabled = false;
+          rowItem['Ci.nPlyFeeRate'].disabled = false;
+          rowItem['Ci.cCoinsurerCde'].disabled = false;
+        }
+        else if (rowData['Ci.cChiefMrk'] == '0') {
+          rowItem['Ci.nCiShare'].disabled = false;
+          rowItem['Ci.nPlyFeeRate'].disabled = false;
+        }
+      }
+    });
+  }
+};
 /**
  * 设置下拉列表
  * @param key
