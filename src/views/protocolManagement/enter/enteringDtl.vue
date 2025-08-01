@@ -84,25 +84,45 @@ const uwBtn = [
           const user = JSON.parse(sessionStorage.getItem("user"));
           let param = mainRef.value?.getUnderwriteValue()
           let sence = param.cUndrMrk === 'A' ? 'audit' : 'bounced'
-          cargoApi.save({
-            ...param,
-            cEcAgrAppNo:props?.param?.cEcAgrAppNo,
-            ...{user},
-            sence
-          }).then((res: any) => {
-            if(res.code === 200) {
-              ElMessage.success(res.msg)
-              tagsViewStore.delView({"name": "enteringDtl",
-                "title": "录入明细",
-                "path": "/protocolManagement/enteringDtl",
-                "fullPath": "/protocolManagement/enteringDtl"}).then((res: any) => {
-                router.replace({ path: "/dashboard" });
-              });
-            }else {
-              ElMessage.success(res.msg);
-            }
-          });
-
+          if(props.param?.cAppTyp === 'A'){
+            cargoApi.save({
+              ...param,
+              cEcAgrAppNo:props?.param?.cEcAgrAppNo,
+              ...{user},
+              sence
+            }).then((res: any) => {
+              if(res.code === 200) {
+                ElMessage.success(res.msg)
+                tagsViewStore.delView({"name": "enteringDtl",
+                  "title": "录入明细",
+                  "path": "/protocolManagement/enteringDtl",
+                  "fullPath": "/protocolManagement/enteringDtl"}).then((res: any) => {
+                  router.replace({ path: "/dashboard" });
+                });
+              }else {
+                ElMessage.success(res.msg);
+              }
+            });
+          }else {
+            cargoApi.saveEdrEcargo({
+              ...param,
+              cEcAgrAppNo:props?.param?.cEcAgrAppNo,
+              ...{user},
+              sence
+            }).then((res: any) => {
+              if(res.code === 200) {
+                ElMessage.success(res.msg)
+                tagsViewStore.delView({"name": "enteringDtl",
+                  "title": "录入明细",
+                  "path": "/protocolManagement/enteringDtl",
+                  "fullPath": "/protocolManagement/enteringDtl"}).then((res: any) => {
+                  router.replace({ path: "/dashboard" });
+                });
+              }else {
+                ElMessage.success(res.msg);
+              }
+            });
+          }
         } else {
           ElMessage.error("请填写必填项");
         }
