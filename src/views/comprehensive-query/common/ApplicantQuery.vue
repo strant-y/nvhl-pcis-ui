@@ -888,6 +888,7 @@ const tableObj = {
                     console.log(row);
                     const r = await row;
                     if (r) {
+                        row.cPolicySource = '8'
                         const data = row;
                         router.push({
                             path: "/pcis/my-page",
