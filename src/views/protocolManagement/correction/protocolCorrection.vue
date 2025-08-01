@@ -198,7 +198,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         {
           prop: "cEcAgrAppNo",
           inputtype: "rtinput",
-          title: "申请单号",
+          title: "预约协议申请单号",
           clearable: true,
         },
 				{
@@ -374,7 +374,7 @@ const tableconfig = reactive<AppTableConfig>(
         {
           prop: "cEcAgrAppNo",
           inputtype: "rtinput",
-          title: "申请单号",
+          title: "预约协议申请单号",
           minWidth: 180,
         },
         {
