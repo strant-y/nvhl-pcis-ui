@@ -54,7 +54,7 @@ onMounted(async () => {
   setTimeout(() => {
     valideRequired();
     handleEdrAppNewSceneRules(); // 添加这行来确保规则被应用
-  }, 2000);
+  }, 3000);
   formconfig1.fromSchema?.forEach((item:any) => {
     if(item.prop === 'Ci.cCoinsurerCde') {
       item.minWidth = 240
