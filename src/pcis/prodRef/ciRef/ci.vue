@@ -256,13 +256,25 @@ const method = {
         }
     } else {
       // 非永安保险，设置默认值和其他数据
-      freeEditRef.value?.addCodeListMap(
-          {code: "Ci.cSubDptCde"+rowId,
-            list: [{ label: '其他',value: '1',  }]
-          }
-      );
-      freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "1");
-      freeEditRef.value?.setValueByRowKey("Ci.cDptCde", rowId, "");
+      // freeEditRef.value?.addCodeListMap(
+      //     {code: "Ci.cSubDptCde"+rowId,
+      //       list: [{ label: '其他',value: '1',  }]
+      //     }
+      // );
+      // freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "1");
+      // freeEditRef.value?.setValueByRowKey("Ci.cDptCde", rowId, "");
+      codeListStore
+        .queryCodeList({
+          codeListName: "CDptJointCde_List",
+          codeListParam: {},
+        })
+        .then((res) => {
+          freeEditRef.value?.addCodeListMap(
+              {code: "Ci.cSubDptCde"+rowId,
+                list: res.map((item:any) => ({label: item.c_cnm, value: item.c_cde}))
+              }
+          );
+        });
     }
     valideRequired()
     updateMasterAgreementValues()
