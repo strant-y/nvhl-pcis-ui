@@ -387,7 +387,7 @@ const exRules = {};
 
 function toDtl(row: any, type: string) {
   if(row.cAppTyp === 'E'){
-    router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify(row), type: 'EDR_APP_NEW_SCENE'}});
+    router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify(row), type: 'EDR_APP_NEW_SCENE',isActive:'1'}});
   }else {
     router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify(row), type: type}});
   }
