@@ -102,9 +102,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable: true,
       },
 			{
+        prop: "cEcAgrAppNo",
+        inputtype: "rtinput",
+        title: "申请单号",
+        clearable: true,
+      },
+			{
 				prop: "cEcAgrNo",
 				inputtype: "rtinput",
-				title: "预约协议号",
+				title: "协议单号",
 				clearable: true,
 			},
 			{
@@ -179,6 +185,12 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "序号",
         showIndex: true,
+        fixed: "left",
+      },
+			{
+        prop: "cEcAgrAppNo",
+        inputtype: "rtinput",
+        title: "申请单号",
         fixed: "left",
       },
       {
@@ -308,9 +320,10 @@ onMounted(() => {
 function reset (){
 	freeEditRef.value?.setFormValue({
 		cDptCde: "0200000000000",
+		cAppStatus: 4,
 		tAppTm: [
-			moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00"),
-			moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+			moment(new Date(Date.now() - 5 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00"),
+			moment(new Date(Date.now() + 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 23:59:59"),
 		],
 	});
 	setFormItem("cDptCde", {
