@@ -452,7 +452,7 @@ const method = {
   handleQuery: (queryParams: any = { pageNum: 1, pageSize: 10 }, isChange: boolean = false) => {
     distTableRef.value?.setPartnerPage(queryParams);
     let tgtRef = opertaor.getTableRefByKey('tgt');
-		const s = cardRef.value?.getFromValue();
+		const s = cardRef.value?.getFromValue() || {};
 		// 经营地址只选择省市区不输入详细地址获取表单值会带有undefined，这里处理一下
 		for (let k in s) {
 			if(s[k] && typeof s[k] === 'string' && s[k].indexOf('undefined') !== -1) {
