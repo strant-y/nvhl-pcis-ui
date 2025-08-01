@@ -283,6 +283,9 @@ const submitForm = (flag: boolean) => {
 const refreshData = (reset = true) => {
   const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
   const s = freeEditRef.value?.getFromValue();
+	if (s.cLoadSub == null) {
+        s.cLoadSub = "1";
+  }
   const params = Object.assign(s, r);
   cargoApi.queryEcargoList(params).then((res: any) => {
     if (res.code === 200) {
