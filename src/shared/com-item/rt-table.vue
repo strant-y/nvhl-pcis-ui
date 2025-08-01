@@ -184,6 +184,7 @@
             :prop="i.prop"
             :label="i.title"
             :width="i.width ? i.width : null"
+            :fixed="i.fixed ? i.fixed : null"
             :align="item.align ? item.align : i.align ? i.align : 'center'"
             :min-width="getColumnWidth(i.title,i.prop,tableDatas,i.minWidth,i.width, i.maxWidth || item.maxWidth)"
           >

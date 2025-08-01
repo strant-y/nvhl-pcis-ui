@@ -495,8 +495,8 @@
             inputtype: "rtinput",
             title: "申请单号",
             showKey: [1, 2, 3, 4],
-            minWidth: 180,
-            fixed: "left",
+            maxWidth: 180,
+            fixed: 'left' 
         },
         {
             prop: "uwDptName",

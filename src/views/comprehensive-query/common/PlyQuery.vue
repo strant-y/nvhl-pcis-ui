@@ -987,6 +987,7 @@ const tableObj = {
               inputtype: "rtinput",
               title: "保单",
               minWidth: 180,
+              fixed: "left",
             },
             {
                 prop: "cAppNo",
@@ -1039,7 +1040,7 @@ const tableObj = {
                 prop: "cDptCnm",
                 inputtype: "rtinput",
                 title: "承保机构",
-                minWidth: 180,
+                maxWidth: 180,
             },
             {
               prop: "cAppNme",
@@ -1081,7 +1082,7 @@ const tableObj = {
                 prop: "cUdrNme",
                 inputtype: "rtinput",
                 title: "核保人",
-                minWidth: 180,
+                maxWidth: 120,
             },
             {
                 prop: "tUdrTm",
