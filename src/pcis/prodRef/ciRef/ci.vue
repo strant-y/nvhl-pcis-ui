@@ -469,14 +469,15 @@ const method = {
     const updatedRowData = freeEditRef.value?.getSelectRow();
     const nPlyFeeRate = parseFloat(updatedRowData["Ci.nPlyFeeRate"] || 0);
     const nCiPrm = parseFloat(updatedRowData["Ci.nCiPrm"] || 0);
-    const nPlyFee = nPlyFeeRate * nCiPrm;
+    const nPlyFee = nPlyFeeRate/100 * nCiPrm;
     freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", updatedRowData._dataId, nPlyFee.toFixed(2));
   },
   //出单费比例
-  nPlyFeeRateChange:(val)=>{
-    const rowDatas = freeEditRef.value?.getSelectRow();
-    const nPlyFee = val * rowDatas["Ci.nCiPrm"]
-    freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee",rowDatas._dataId,nPlyFee.toFixed(2))
+  nPlyFeeRateChange:(val,row)=>{
+    debugger
+    // const rowDatas = freeEditRef.value?.getSelectRow();
+    const nPlyFee = val/100 * row["Ci.nCiPrm"]
+    freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee",row._dataId,nPlyFee.toFixed(2))
   },
   //开户行大类改变
   cBankRelTypChange:(val)=>{
