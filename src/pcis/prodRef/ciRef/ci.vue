@@ -799,111 +799,198 @@ const valideRequired = ()=>{
   setTimeout(()=>{ 
       const rowItems = getFromValue()
       for(const rowData of rowItems){
+        // 处理业务类型为19001（直销业务）的情况
         if(cBsnsTyp == '19001'){
-              freeEditRef.value?.setRowFieldProp(rowData._dataId, 'Ci.nComm', 'disabled', true)
-              freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cSlsCde", "rules", [getRules("required", {})]
-              );
-              freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cBrkrCde", "rules", []
-              );
-              freeEditRef.value?.setRowFieldProp(
-                  rowData._dataId, "Ci.cBrkSlsCde", "rules", []
-              );
-              freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
-              );
-          }else if(cBsnsTyp == '19002' || cBsnsTyp == '19003'){
-            freeEditRef.value?.setRowFieldProp(rowData._dataId, 'Ci.nComm', 'disabled', false)
-            freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cBrkrCde", "rules", [getRules("required", {})]
-            );
-            freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cSlsCde", "rules", []
-            );
-            freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cBrkSlsCde", "rules", [getRules("required", {})]
-            );
+          freeEditRef.value?.setRowFieldProp(rowData._dataId, 'Ci.nComm', 'disabled', true)
+          // 直销业务：业务员必填
+          freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cSlsCde", "rules", [getRules("required", {})]
+          );
+          freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cSlsCde", "disabled", false
+          );
+          // 直销业务：代理经纪人和代理业务员非必填且禁用
+          freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cBrkrCde", "rules", []
+          );
+          freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cBrkSlsCde", "rules", []
+          );
+          freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cBrkrCde", "disabled", true
+          );
+          freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cBrkSlsCde", "disabled", true
+          );
+          const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+          if (rowItem) {
+            rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
+            rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
           }
-          if(rowData['Ci.cCoinsurerCde'] !=='327001'){
-            freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cDptCde", "rules", []
-            );
-            freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cDptCde", "disabled", true
-            );
-            freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cSlsCde","rules",[])
-            freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cBrkSlsCde","rules",[])
-            freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cBrkrCde","rules",[])
-            freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cSlsCde", "disabled", true
-            );
-            freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cBrkSlsCde", "disabled", true
-            );
-            freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cBrkrCde", "disabled", true
-            );
-            const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+        }
+        // 处理非直销业务（19002或19003）的情况
+        else if(cBsnsTyp == '19002' || cBsnsTyp == '19003'){
+          freeEditRef.value?.setRowFieldProp(rowData._dataId, 'Ci.nComm', 'disabled', false)
+          // 非直销业务：代理经纪人和代理业务员必填
+          freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cBrkrCde", "rules", [getRules("required", {})]
+          );
+          freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cBrkSlsCde", "rules", [getRules("required", {})]
+          );
+          // 非直销业务：业务员非必填且禁用
+          freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cSlsCde", "rules", []
+          );
+          freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cSlsCde", "disabled", true
+          );
+          const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+          if (rowItem) {
+            rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
+          }
+        }
+        
+        // 处理共保公司非永安（327001）的情况
+        if(rowData['Ci.cCoinsurerCde'] !=='327001'){
+          // 业务员、代理业务员、代理经纪人都禁用且非必填
+          freeEditRef.value?.setRowFieldProp(rowData._dataId, "Ci.cSlsCde", "rules", [])
+          freeEditRef.value?.setRowFieldProp(rowData._dataId, "Ci.cBrkSlsCde", "rules", [])
+          freeEditRef.value?.setRowFieldProp(rowData._dataId, "Ci.cBrkrCde", "rules", [])
+          freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cSlsCde", "disabled", true
+          );
+          freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cBrkSlsCde", "disabled", true
+          );
+          freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cBrkrCde", "disabled", true
+          );
+          
+          // 出单机构非必填且禁用
+          freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cDptCde", "rules", []
+          );
+          freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cDptCde", "disabled", true
+          );
+          
+          const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+          if (rowItem) {
             rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
             rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
             rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
-          }else{
-            freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
-            );
-            freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cDptCde", "disabled", false
-            );
-            freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cSlsCde", "disabled", false
-            );
-            
-            freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cBrkSlsCde", "disabled", false
-            );
-            freeEditRef.value?.setRowFieldProp(
-                rowData._dataId, "Ci.cBrkrCde", "disabled", false
-            );
-            const rowItem =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
-            rowItem['Ci.cSlsCde']['btnItems'].disabled = false;
-            rowItem['Ci.cBrkrCde']['btnItems'].disabled = false;
-            rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = false;
           }
-          if(rowData['Ci.cIssueMrk'] == '1'){
+        }
+        // 处理共保公司为永安（327001）的情况
+        else{
+          // 只有在共保公司为永安时，才根据业务类型设置不同的规则
+          if (cBsnsTyp == '19001') {
+            // 直销业务：业务员必填且可编辑
             freeEditRef.value?.setRowFieldProp(
+              rowData._dataId, "Ci.cSlsCde", "rules", [getRules("required", {})]
+            );
+            freeEditRef.value?.setRowFieldProp(
+              rowData._dataId, "Ci.cSlsCde", "disabled", false
+            );
+            // 代理经纪人和代理业务员非必填且禁用
+            freeEditRef.value?.setRowFieldProp(
+              rowData._dataId, "Ci.cBrkrCde", "rules", []
+            );
+            freeEditRef.value?.setRowFieldProp(
+              rowData._dataId, "Ci.cBrkSlsCde", "rules", []
+            );
+            freeEditRef.value?.setRowFieldProp(
+              rowData._dataId, "Ci.cBrkrCde", "disabled", true
+            );
+            freeEditRef.value?.setRowFieldProp(
+              rowData._dataId, "Ci.cBrkSlsCde", "disabled", true
+            );
+            const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+            if (rowItem) {
+              rowItem['Ci.cSlsCde']['btnItems'].disabled = false; // 放大镜按钮可编辑
+              rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
+              rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
+            }
+          } else {
+            // 非直销业务：代理经纪人和代理业务员必填且可编辑
+            freeEditRef.value?.setRowFieldProp(
+              rowData._dataId, "Ci.cBrkrCde", "rules", [getRules("required", {})]
+            );
+            freeEditRef.value?.setRowFieldProp(
+              rowData._dataId, "Ci.cBrkSlsCde", "rules", [getRules("required", {})]
+            );
+            freeEditRef.value?.setRowFieldProp(
+              rowData._dataId, "Ci.cBrkrCde", "disabled", false
+            );
+            freeEditRef.value?.setRowFieldProp(
+              rowData._dataId, "Ci.cBrkSlsCde", "disabled", false
+            );
+            // 业务员非必填且禁用
+            freeEditRef.value?.setRowFieldProp(
+              rowData._dataId, "Ci.cSlsCde", "rules", []
+            );
+            freeEditRef.value?.setRowFieldProp(
+              rowData._dataId, "Ci.cSlsCde", "disabled", true
+            );
+            const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+            if (rowItem) {
+              rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
+              rowItem['Ci.cBrkrCde']['btnItems'].disabled = false;
+              rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = false;
+            }
+          }
+          
+          // 出单机构必填且可编辑
+          freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
+          );
+          freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cDptCde", "disabled", false
+          );
+        }
+        
+        // 出单标志处理
+        if(rowData['Ci.cIssueMrk'] == '1'){
+          freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.nPlyFeeRate", "disabled", true );
-          }else{
-            freeEditRef.value?.setRowFieldProp(
+        }else{
+          freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.nPlyFeeRate", "disabled", false );
-          }
-          if(param?.cAppTyp == 'A'){ //核保
-            const rowItem  =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+        }
+        
+        // 核保状态下禁用相关字段
+        if(param?.cAppTyp == 'A'){ //核保
+          const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+          if (rowItem) {
             rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
             rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
             rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
           }
-          if (param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && cCiMrkValue =='5' && param.cRsnDetailCde.value == "FZ") {
-            // formconfig1.editFlag = true;
-            formconfig1.fromSchema?.forEach((item) => {
-              item.disabled = true;
-            });
+        }
+        
+        // 特殊页面类型处理
+        if (param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && cCiMrkValue =='5' && param.cRsnDetailCde.value == "FZ") {
+          formconfig1.fromSchema?.forEach((item) => {
+            item.disabled = true;
+          });
+        }
+        
+        if(param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && cCiMrkValue !=='5' && param.cRsnDetailCde.value == "47"){
+          const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+          if(rowItem && rowData['Ci.cChiefMrk'] == '1'){
+            rowItem['Ci.nCiShare'].disabled = false
           }
-          if(param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && cCiMrkValue !=='5' && param.cRsnDetailCde.value == "47"){
-              const rowItem  =  freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
-              if(rowData['Ci.cChiefMrk'] == '1'){
-                rowItem['Ci.nCiShare'].disabled = false
-              }
-              if(rowData['Ci.cChiefMrk'] == '0' && rowData['Ci.cCoinsurerCde'] !== '327001'){
-                rowItem['Ci.nCiShare'].disabled = false
-                rowItem['Ci.nPlyFeeRate'].disabled = false
-                rowItem['Ci.cCoinsurerCde'].disabled = false
-              }
-              if(rowData['Ci.cChiefMrk'] == '0'){
-                rowItem['Ci.nCiShare'].disabled = false
-                rowItem['Ci.nPlyFeeRate'].disabled = false
-              }
+          if(rowItem && rowData['Ci.cChiefMrk'] == '0' && rowData['Ci.cCoinsurerCde'] !== '327001'){
+            rowItem['Ci.nCiShare'].disabled = false
+            rowItem['Ci.nPlyFeeRate'].disabled = false
+            rowItem['Ci.cCoinsurerCde'].disabled = false
           }
+          if(rowItem && rowData['Ci.cChiefMrk'] == '0'){
+            rowItem['Ci.nCiShare'].disabled = false
+            rowItem['Ci.nPlyFeeRate'].disabled = false
+          }
+        }
       }
   },500)
 }
