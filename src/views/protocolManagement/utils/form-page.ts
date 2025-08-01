@@ -240,9 +240,11 @@ export class FormPage {
                     console.error('Could not find componentRef for id ' + key)
                 }
             }
-            this.initial = false;
             if (callback && callback.success && typeof callback.success === 'function') {
                 callback.success(this.getAllFormData())
+                setTimeout(() => {
+                    this.initial = false;
+                }, 3000)
             }
         } catch (e) {
             if(callback && callback.error && typeof callback.error === 'function') {
