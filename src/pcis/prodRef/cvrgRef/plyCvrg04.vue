@@ -24,8 +24,18 @@
                   />
                   <rt-button
                     v-if="showPlanDelete(k,btnItem.delPlan)"
-                    @click="()=>{
-                      if(Object.keys(planData).length === 1){
+                    @click="()=>{ 
+                      let cancount = 0;
+                      Object.keys(planData).forEach(item =>{
+                        if(planData[item]['m'] && planData[item]['m'].length > 0){    //计算未退保主条款数
+                          planData[item]['m'].forEach( m =>{
+                            if(m['Term.cCancelMrk'] !== '1'){
+                              cancount++;
+                            }
+                          })
+                        }
+                      })
+                      if(cancount <= 1){
                         ElMessage.error('仅剩1个方案时,不能删除!');
                         return;
                       }
@@ -567,7 +577,15 @@ function deletePlan(plan: string) {
       }else{
         Object.keys(planData.value[plan]).forEach((item) => {
           for (let i = 0; i < planData.value[plan][item].length; i++) {
-            tremTemplateRefs.value[plan+item+i].setCancel();
+            if(item === 'a1' || item === 'm'){
+              tremTemplateRefs.value[plan+item+i].setCancel();
+            }else{
+              if(planData.value[plan][item] && planData.value[plan][item].length > 0){
+                planData.value[plan][item].forEach(e => {
+                  e['Term.cCancelMrk'] = '1';
+                });
+              }
+            }
           }
         });
       }
@@ -622,7 +640,11 @@ function deleteTermByNo(plan: any, t: any) {
       if (planData.value[plan][item][i]["Term.cClauseCode"] === t) {
         // 批改的情况下，标记该单为删除状态
         if (parparam.cEdrType && planData.value[plan][item][i]['Term.cRowId']) {
-          tremTemplateRefs.value[plan+item+i].setCancel();
+          if( planData.value[plan][item][i]['Term.cRdrTyp'] !== '0' && planData.value[plan][item][i]['Term.cClauseCategory'] !== '1'){
+            planData.value[plan][item][i]['Term.cCancelMrk'] = '1';
+          }else{
+            tremTemplateRefs.value[plan+item+i].setCancel();
+          }
         } else {
           deleindex = i;
         }
