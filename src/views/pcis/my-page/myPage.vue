@@ -3192,9 +3192,37 @@ const calcPremiumEdr = () => {
     // history.back();
   });
 };
+
+// 获取我司比例
+const getOwnShare =()=>{
+   let ownShare = 0;
+   const data = opertaor.getDataAll();
+   let ciArr = data['ci']
+  //  const cCiMrk = data.plyBase?.['Base.cCiMrk'];
+  if(ciArr && ciArr.length>0){
+    ciArr.forEach((item:any)=>{
+      const CDptMrk = item['Ci.cCoinsurerCde']
+      if(!!CDptMrk && CDptMrk ==="327001"){
+        ownShare = numAdd(ownShare,item['Ci.nCiShare'])
+      } 
+   })
+  }
+  return ownShare;
+}
+
 const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase,nTms) => {
   // const payListNew = [];
   const payListNew = [...payList];
+  const data = opertaor.getDataAll();
+  const cCiMrk = data.plyBase?.['Base.cCiMrk'];
+  const nCiOwnPrm = ['1', '2', '3','4'].includes(cCiMrk)
+  let nCiShare= 100;
+  // console.log('nCiOwnPrm ',nCiOwnPrm,data)
+  // console.log('nCiOwnPrm ',data.ci)
+  // debugger 
+  if(nCiOwnPrm){
+       nCiShare = Number(getOwnShare()) || 100 ;
+  }
   const pay = {};
   if (applicant) {
     pay["Pay.cPayorCde"] = applicant["Applicant.cAppCde"];
@@ -3206,7 +3234,13 @@ const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase,nTms) => {
   pay["Pay.nPayablePrm"] = nPrmVar >0? nPrmVar : 0;
   pay["Pay.tPayBgnTm"] = plyBase["Base.tEdrAppTm"];
   pay["Pay.tPayEndTm"] = plyBase["Base.tEdrBgnTm"];
-  pay["Pay.nOwnPrm"] = nPrmVar >0? nPrmVar : 0;
+
+
+
+  pay["Pay.nOwnPrm"] = nPrmVar >0?  parseFloat((nPrmVar * (nCiShare/100)).toFixed(2))  : 0;
+debugger
+
+
   pay["Pay.cProdNo"] = base["Base.cProdNo"];
   pay["Pay.nPrmVar"] = nPrmVar >0? nPrmVar : 0;
   // for (const i in payList) {
@@ -3368,6 +3402,11 @@ const getSurrenderPrecisFun = () => {
  * 批改单申请核保(退保、注销)
  */
 const submitEdrToUndrSurrender = async () => {
+    const isAcctValid = await validateAcctinfo();
+    // 账户信息校验
+  if (!isAcctValid) {
+    return; 
+  }
   if (needCalc.value) {
     ElMessage.error("请先进行保费计算!");
     return;
@@ -3503,17 +3542,15 @@ const generateEndorse = async () => {
     }
   });
 };
-/**
- * 批单申请核保
- */
 
     /**
      * 验证账户信息表单
      */
   const validateAcctinfo = async () => {  
       let prmVar =  opertaor.getDataAll()['plyBase']['Base.nPrmVar']
+      let refundInsurance  = ['s1','s2'].includes(props.param?.cRsnCde);  // 一般退保 全额退保也要验证
         // 保费变化量 < 0 说明批改之后保费减少, 此时需要设置账户信息
-        if (!!prmVar && prmVar < 0) {
+        if ((!!prmVar && prmVar < 0 ) || refundInsurance ) {
             const acctinfoRef =opertaor.getTableRefs()["acctinfo"];
              let acctinfoValidate =await opertaor.getTableRefByKey('acctinfo')?.validate()  // 账户信息 必填校验
               let isAcctinfo = isDetailCde(); // 是否有账户信息
@@ -3526,7 +3563,7 @@ const generateEndorse = async () => {
             if (!!CAcctNo) {
             } else {
                 ElMessage.error("收款人账号不能为空!");
-                return false;
+                return false; 
             }
 
             // 收款人户名
@@ -3548,7 +3585,9 @@ const generateEndorse = async () => {
         return true;
     }
 
-
+/**
+ * 批单申请核保
+ */
 const submitEdrToUndrFun = async () => {
 
   const isAcctValid = await validateAcctinfo();

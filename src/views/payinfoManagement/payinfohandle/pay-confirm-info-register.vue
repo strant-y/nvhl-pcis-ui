@@ -183,7 +183,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: 'CSeqNo',
         title: '出票人账号',
         inputtype: "rtinput",
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {}),getRules("accountValidation", {})],
       },
       {
         prop: 'TBgnTm',
@@ -332,7 +332,7 @@ const formconfigMany= ref( [
         prop: 'CSeqNo',
         title: '出票人账号',
         inputtype: "rtinput",
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {}),getRules("accountValidation", {})],
       },
       {
         prop: 'NPayAmt',

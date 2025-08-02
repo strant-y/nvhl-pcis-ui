@@ -85,8 +85,15 @@ const nPayNumberFun = (isAdd=false)=>{
       if(isAdd  && cinstmrk =='5'){
          eventBus.emit('add-special')
       }
-     
-      const totalAmount = Number(getValue("Base.nPrm"));
+
+      const data = opertaor.getDataAll();
+      const cCiMrk = data.plyBase?.['Base.cCiMrk'];
+      const nCiOwnPrm = ['1', '2', '3','4'].includes(cCiMrk) ? data.ciMasterAgreement?.['Base.nCiOwnPrm'] : getValue("Base.nPrm");
+      
+
+      // if() data.ciMasterAgreement?.['Base.nCiOwnPrm'] 
+      // console.log('拆------------‘',data.plyBase?.['Base.cCiMrk'])
+      const totalAmount = Number(nCiOwnPrm);
       const splitCount = Number(getValue("Base.nPayNumber"));
       const totalCent = Math.round(totalAmount * 100);
       const result = ref<number[]>([]);
