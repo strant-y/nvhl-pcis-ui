@@ -1009,6 +1009,12 @@ const tableObj = {
                 title: "批单号",
                 minWidth: 180,
             },
+            {
+              prop: "nEdrPrjNo",
+              inputtype: "rtinput",
+              title: "批改次数",
+              maxWidth: 100,
+            },
           {
             prop: "cAppStatus",
             inputtype: "rtselect",
