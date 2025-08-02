@@ -157,7 +157,20 @@
       <rt-icon :item="{ icon: vInput }" />
     </template>
     <template v-else>
-      {{vInput !== 'undefined' ? vInput : ''}}
+       <!-- 添加图标显示 -->
+    <el-icon v-if="item.prefixIcon" >
+      <component :is="renderIcon(item.prefixIcon)" />
+    </el-icon>
+       <span v-if="item.prefix">{{ item.prefix }}</span>
+        {{vInput !== 'undefined' ? vInput : ''}}
+      <!-- 添加复制图标 -->
+    <el-icon
+        v-if="item.showCopyIcon"
+        style="margin-left: 5px; cursor: pointer; color: #409eff;"
+        @click="copyToClipboard(vInput)"
+    >
+      <CopyDocument />
+    </el-icon>
     </template>
   </span>
 </template>
@@ -284,6 +297,61 @@ function tooltipIconClick() {
   nextTick(() => {
     handleChange(text);
   })
+}
+
+// 复制到剪贴板方法
+function copyToClipboard(text:any) {
+  if (!text) {
+    // 如果文本为空，给出提示
+    alert('没有可复制的内容');
+    return;
+  }
+
+  try {
+    // 使用 Clipboard API（现代浏览器）
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => {
+        ElMessage.success('复制成功');
+      }).catch(() => {
+        // 如果 Clipboard API 失败，使用备选方案
+        fallbackCopyTextToClipboard(text);
+      });
+    } else {
+      // 旧版浏览器使用备选方案
+      fallbackCopyTextToClipboard(text);
+    }
+  } catch (error) {
+    ElMessage.error('复制失败');
+  }
+}
+
+// 备选复制方法
+function fallbackCopyTextToClipboard(text:any) {
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+
+  // 避免滚动到底部
+  textArea.style.top = "0";
+  textArea.style.left = "0";
+  textArea.style.position = "fixed";
+  textArea.style.opacity = "0";
+
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+
+  try {
+    const successful = document.execCommand('copy');
+    if (successful) {
+      ElMessage.success('复制成功');
+    } else {
+      ElMessage.error('复制失败');
+    }
+  } catch (err) {
+    ElMessage.error('复制失败');
+  }
+
+  document.body.removeChild(textArea);
 }
 defineExpose({
   setCustomClass,

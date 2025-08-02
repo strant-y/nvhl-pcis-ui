@@ -86,7 +86,11 @@
           @selection-change="handleSelectionChange"
           @status-change="handleStatusChange"
           @row-click="handleRowClick"
-        />
+        >
+          <template v-for="(_, slotName) in $slots" #[slotName]="slotData">
+            <slot :name="slotName" v-bind="slotData" />
+          </template>
+        </rttable>
         <el-pagination
           v-model:current-page="queryParams.pageNum"
           v-model:page-size="queryParams.pageSize"

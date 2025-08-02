@@ -6,12 +6,24 @@
       v-model:pageresult="pageresult"
       ref="tableRef"
     />
-    <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" /> 
-   <app-table
-      :tableConfig="tableconfig1"
-      v-model:pageresult="pageresult1"
-      ref="tableRef1"
-    />
+    <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
+    <app-table
+        :tableConfig="tableconfig1"
+        v-model:pageresult="pageresult1"
+        ref="tableRef1"
+    >
+      <template #column-cChgVal="{ row, column, index }">
+        <div style="display: flex; align-items: center;">
+          <span>{{ row.cChgVal }}</span>
+          <el-icon v-if="row.cChgVal && parseFloat(row.cChgVal) > 0" style="margin-left: 5px; color: #ef4747;">
+            <Top />
+          </el-icon>
+          <el-icon v-else-if="row.cChgVal && parseFloat(row.cChgVal) < 0" style="margin-left: 5px; color: #00b19d;">
+            <Bottom />
+          </el-icon>
+        </div>
+      </template>
+    </app-table>
     <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
       <rt-button
         :item="{
@@ -288,19 +300,20 @@ const tableconfig1 = reactive<AppTableConfig>(
         minWidth: 60,
       },
       {
-        prop: "cChgVal",
-        inputtype: "rtinput",
-        title: "变化值",
-        clearable: true,
-        minWidth: 60,
-      },
-      {
         prop: "cNewVal",
         inputtype: "rtinput",
         title: "新值",
         clearable: true,
         minWidth: 60,
       },
+      {
+        prop: "cChgVal",
+        inputtype: "rtinput",
+        title: "变化值",
+        clearable: true,
+        minWidth: 60,
+        slotName: "cChgVal"
+      }
     ],
   })
 );

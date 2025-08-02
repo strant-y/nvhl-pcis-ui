@@ -13,6 +13,7 @@
       >
         <h4 style="margin: 10px 20px">投保向导</h4>
 				<el-form-item
+          id="cRecordType"
           label="录单方式"
           prop="cRecordType"
           style="width: 600px"
@@ -26,6 +27,7 @@
           </el-radio-group>
         </el-form-item>
 				<el-form-item
+          id="tpl"
           v-if="formconfig1.cRecordType === 7"
           label="选择模板"
           prop="tpl"
@@ -42,6 +44,7 @@
           />
         </el-form-item>
 				<el-form-item
+          id="seldef"
           v-if="formconfig1.cRecordType === 7"
           label="模板描述"
           prop="seldef"
@@ -51,6 +54,7 @@
         </el-form-item>
 				<div>
 					<el-form-item
+            id="dptCde"
 						v-if="isZGS"
 						label="分公司"
 						prop="dptCde"
@@ -67,6 +71,7 @@
 						/>
 					</el-form-item>
 					<el-form-item
+            id="cDptCde"
 						label="承保机构"
 						prop="cDptCde"
 						style="width: 650px"
@@ -88,6 +93,7 @@
         <template v-if="formconfig1.cRecordType == 1 || formconfig1.cRecordType == 9">
           <h4 style="margin: 10px 20px">投保信息</h4>
           <el-form-item
+            id="cRenewMrk"
 						v-if="formconfig1.cRecordType == '1'"
             label="投保标识"
             prop="cRenewMrk"
@@ -99,6 +105,7 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item
+            id="cPlyNo"
             v-if="formconfig1.cRenewMrk == '1'"
             label="上年保单号"
             prop="cPlyNo"
@@ -115,6 +122,7 @@
 					<el-row v-if="formconfig1.cRecordType == '9'">
 						<el-col :span="24">
 							<el-form-item
+                id="cEcAgrNo"
 								label="协议号"
 								prop="cEcAgrNo"
 								:rules="[getRules('required', {})]"
@@ -131,6 +139,7 @@
 					<el-row v-if="formconfig1.cRecordType == '9'">
 						<el-col :span="24">
 							<el-form-item
+                id="cProdNme"
 								label="产品代码"
 								prop="cProdNme"
 								:rules="[getRules('required', {})]"
@@ -159,6 +168,7 @@
 					<el-row v-if="formconfig1.cRecordType == '9'">
 						<el-col :span="24">
 							<el-form-item
+                id="cTermNme"
 								label="条款代码"
 								prop="cTermNme"
 								:rules="[getRules('required', {})]"
@@ -187,6 +197,7 @@
 					<el-row v-if="formconfig1.cRecordType == '9'">
 						<el-col :span="24">
 							<el-form-item
+                id="cInsuredNme"
 								label="被保人"
 								prop="cInsuredNme"
 								:rules="[getRules('required', {})]"
@@ -204,6 +215,7 @@
 				<template v-if="formconfig1.cRecordType != 9">
 					<h4 style="margin: 10px 20px">选择{{ labelNm }}</h4>
 					<el-form-item
+            id="cGrpMrk"
 						label="团个属性"
 						prop="cGrpMrk"
 						:rules="[getRules('required', {})]"
@@ -343,6 +355,7 @@ import { getListByCode } from "@/api/code-list-service";
 import {useUserStore} from "@/store";
 import { listChrDepts } from "@/api/dept";
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
+import {scrollByDomId} from "@/utils/common";
 const policyService = new PolicyService();
 
 const router = useRouter();
@@ -531,6 +544,11 @@ function next() {
     }
     step.value = step.value == "0" ? "1" : "0";
     title.value = step.value == "0" ? "自定义录单" : "选择条款";
+  }).catch((err: any) => {
+    const ids = Object.keys(err);
+    if(ids) {
+      scrollByDomId( `#${ids[0]}`, "center")
+    }
   });
 }
 // 上一步
