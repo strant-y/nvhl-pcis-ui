@@ -266,6 +266,15 @@ const method = {
     const tabref = opertaor.getTableRefByKey("applicant");
     const applicantValue = tabref.getFromValue();
     console.log(applicantValue);
+
+    const applicantCodeListMap = tabref?.getCodeListMap();
+    if(applicantCodeListMap) {
+      insuredEditRef.value?.addCodeListMap({
+        code: 'Insured.cOccupCde',
+        list: applicantCodeListMap['Applicant.cOccupCde']
+      });
+    }
+
     let insuredValue: any = {};
 
     // 同投保人时 客户信息需要禁用   客户名称 被保人性质 证件类型 证件号码  证件有效起 止期

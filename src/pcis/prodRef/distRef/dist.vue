@@ -211,7 +211,7 @@ console.log('dist -----',formconfig11.value)
           label: "查询",
           type: "primary",
           func: () => {
-            cardQueryFn();
+						handleQuery()
           },
         },
         {
@@ -311,78 +311,6 @@ console.log('dist -----',formconfig11.value)
 //     });
 // }  Tgt.nEngineeringCost nEngineeringCostChange
 
-function cardQueryFn(flag?: boolean){
-	console.log(cardRef.value?.getFromValue());
-	const queryParams = distTableRef.value?.getPartnerPage(flag);
-	const s = cardRef.value?.getFromValue();
-	// 经营地址只选择省市区不输入详细地址获取表单值会带有undefined，这里处理一下
-	for (let k in s) {
-		if(s[k] && typeof s[k] === 'string' && s[k].indexOf('undefined') !== -1) {
-			s[k] = s[k].replace('undefined', '')
-		}
-	}
-
-	console.log('路由data‘',route.params)
-	const params = Object.assign(
-		{
-			cProdNo: route.params.param.cProdNo,
-			cComponentTable: cComponentTableValue,
-		},
-		{ dist: s },
-		formconfig1.value,
-		queryParams
-	);
-	if(params.dist['Dist.ProjectDesignProp']) {
-		params.dist['Dist.cProjectAddress'] = params.dist['Dist.ProjectDesignProp']
-	}
-	if(route.params.param?.pageName === "priceInquiry") {
-		params.cInquiryNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
-		if(!params.cInquiryNo){
-			ElMessage.warning("请先保存申请单!");
-			return false
-		}
-	} else {
-		params.cAppNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
-		if(!params.cAppNo){
-			ElMessage.warning("请先保存申请单!");
-			return false
-		}
-	}
-
-	// 级联地址表格显示问题处理
-	if(Object.keys(mapAddr).includes(props.compKey)) {
-		const addrInput = mapAddr[props.compKey];
-		const keys = Object.keys(addrInput)
-		if(keys && keys.length>0) {
-			const inputGroupKey = keys[0];
-			const addrValueKey = addrInput[inputGroupKey];
-			params.dist[addrValueKey] = params.dist[inputGroupKey];
-		}
-	}
-	console.log('params', params)
-	selectDist(params).then((res: any) => {
-		if (res.code === 200) {
-			pageresult.list = [];
-			pageresult.total = res.data.total;
-			pageresult.list = res.data.data.map((item, index) => {
-				return{
-					... item,
-					... {
-						// 序号全部由后端处理
-						// 'Dist.nSeqNo': ((queryParams.pageNum - 1) * queryParams.pageSize) + index + 1,
-						tOpeningTime: item['Dist.tOpeningTime']
-								? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
-								: null,
-						'Dist.AllOccup': [
-							item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
-						],
-					}
-				};
-			});
-		}
-	});
-}
-
 function cardResetFn(){
   console.log(cardRef.value?.getFromValue());
 	const tableEditRefs = cardRef.value;
@@ -391,7 +319,7 @@ function cardResetFn(){
 			s[k] = null;
 	}
 	tableEditRefs?.setFormValue({...s})
-	cardQueryFn(true)
+	handleQuery()
 }
 
 // 绑定方法
@@ -490,7 +418,7 @@ const method = {
     if(route.params.param?.pageName === "priceInquiry") {
       param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
     } else if (route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
-      param['cAppNo'] = edrbase.getFromValue()["EdrBase.cAppNo"]
+      param['cAppNo'] = edrbase["EdrBase.cAppNo"]
     } else {
       param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
     }
@@ -524,6 +452,13 @@ const method = {
   handleQuery: (queryParams: any = { pageNum: 1, pageSize: 10 }, isChange: boolean = false) => {
     distTableRef.value?.setPartnerPage(queryParams);
     let tgtRef = opertaor.getTableRefByKey('tgt');
+		const s = cardRef.value?.getFromValue() || {};
+		// 经营地址只选择省市区不输入详细地址获取表单值会带有undefined，这里处理一下
+		for (let k in s) {
+			if(s[k] && typeof s[k] === 'string' && s[k].indexOf('undefined') !== -1) {
+				s[k] = s[k].replace('undefined', '')
+			}
+		}
     const param = opertaor.getParam();
     let app = "";
     if (param.cOrgAppNo) {
@@ -534,18 +469,38 @@ const method = {
       app = route.params.param?.cAppNo
     }
     const selData = {
-      cComponentTable: cComponentTableValue,
       cAppNo: app,
-      ...queryParams
+			cProdNo: route.params.param.cProdNo,
+			cComponentTable: cComponentTableValue,
+			...formconfig1.value,
+			...queryParams
     };
+		selData.dist = JSON.parse(JSON.stringify(s))
     if(route.params.param?.pageName === "priceInquiry") {
       selData['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+			if(!selData['cInquiryNo']){
+				return false
+			}
     } else {
       selData['cAppNo'] = app;
+			if(!selData['cAppNo']){
+				return false
+			}
     }
     if(route.params.param?.pageType && route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
       selData.voType = "ply"
     }
+		// 级联地址表格显示问题处理
+		if(Object.keys(mapAddr).includes(props.compKey)) {
+			const addrInput = mapAddr[props.compKey];
+			const keys = Object.keys(addrInput)
+			if(keys && keys.length>0) {
+				const inputGroupKey = keys[0];
+				const addrValueKey = addrInput[inputGroupKey];
+				selData.dist[addrValueKey] = selData.dist[inputGroupKey];
+			}
+		}
+		console.log('selDataselData', selData)
     selectDist(selData).then((res: any) => {
       if (res.code === 200) {
         pageresult.list = [];

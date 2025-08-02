@@ -885,6 +885,7 @@ const tableObj = {
                     console.log(row);
                     const r = await row;
                     if (r) {
+                        row.cPolicySource = '8'
                         const data = row;
                         console.log("0000000000000", data);
                         router.push({

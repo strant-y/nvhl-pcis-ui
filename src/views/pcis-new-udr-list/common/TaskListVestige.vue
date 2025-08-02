@@ -4,7 +4,7 @@
     v-model="dialogVisible"
     title="任务痕迹列表"
     custom-class="custom-dialog"
-    width="80%"
+    width="70%"
   >
     <div class="app-container">
       <app-table

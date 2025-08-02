@@ -170,6 +170,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         format: "YYYY-MM-DD HH:mm:ss",
         valueFormat: "YYYY-MM-DD HH:mm:ss",
         rules: [getRules("required", {})],
+        disabledDate : (time:Date) => {
+          const today = new Date();
+          const sixMonthsAgo = new Date();
+          sixMonthsAgo.setMonth(today.getMonth() - 6);
+
+          // 限制只能选择今天及之前的时间，并且不能早于 6 个月前
+          return time.getTime() > today.getTime() || time.getTime() < sixMonthsAgo.getTime();
+        },
         func: (val) => {
           if(val){
             handleDateChange(val);

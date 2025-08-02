@@ -128,3 +128,20 @@ export function useScrollDetection(delay = 50) {
 
   return isScrolling.value;
 }
+
+/**
+ * 滚动到指定#id
+ */
+export function scrollByDomId(targetId: string, location: "center" | "end" | "nearest" | "start" = "start") {
+  // 获取目标元素的ID
+  if (targetId) {
+    // 手动实现平滑滚动效果
+    const targetElement = document.querySelector(targetId);
+    if (targetElement) {
+      targetElement.scrollIntoView({
+        behavior: 'smooth',
+        block: location
+      });
+    }
+  }
+}

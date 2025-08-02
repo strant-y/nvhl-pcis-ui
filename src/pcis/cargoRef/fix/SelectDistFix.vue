@@ -120,7 +120,7 @@ function setSelected() {
 }
 onMounted(async () => {
   const formconfig11 = formPage.getComponentRefById('AgreementDistGoods').getFormConfig()
-  Object.assign(formconfig1.value, formconfig11.value);
+  Object.assign(formconfig1.value, formconfig11);
   tableconfig.value.title =formconfig1.value.title;
   tableconfig.value.titleBtnPosition = 'right';
   tableconfig.value.showEdit = true;

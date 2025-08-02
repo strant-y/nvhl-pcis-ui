@@ -13,6 +13,7 @@
 
 <script setup lang="ts">
 import shared from "../shared";
+import {CommonConstants} from "@/constants/CommonConstants";
 const props = defineProps({
   modelValue: {
     type: [Object, String, Number, Boolean, Array],
@@ -80,7 +81,7 @@ async function compareValueChangeColor(value?: any) {
     if(!!props.row && customMap.primevalForm && Array.isArray(customMap.primevalForm) && customMap.primevalForm.length > 0) {
       // grid表格模式处理
       const getIsRowData = (item: any) => {
-        const keys = ['cPkId'];
+        const keys = [customMap[CommonConstants.FORM_DATA_KEY]];
         const key = keys.find(f => Object.keys(customMap.primevalForm[0]).includes(f));
         return props.row[key] === item[key];
       }
@@ -118,9 +119,9 @@ async function compareValueChangeColor(value?: any) {
         }
       }
       if (getPrimevalValue() !== getValue()) {
-        setChangeInfo(['form-item-change'], getPrimevalValue());
+        setChangeInfo([CommonConstants.ITEM_CHANGE_CLASS_NAME], getPrimevalValue());
       } else {
-        setChangeInfo(['form-item-unchange'], undefined);
+        setChangeInfo([CommonConstants.ITEM_UNCHANGE_CLASS_NAME], undefined);
       }
     }
   } catch (e) {
@@ -129,10 +130,10 @@ async function compareValueChangeColor(value?: any) {
 }
 
 function setChangeInfo(classs: string[], text: any) {
-  if(itemRef.value && itemRef.value.setCustomClass && typeof itemRef.value.setCustomClass === 'function') {
+  if(itemRef.value && itemRef.value.setCustomClass && typeof itemRef.value.setCustomClass === CommonConstants.TYPE_OF_FUNCTION) {
     itemRef.value.setCustomClass(classs);
   }
-  if(itemRef.value && itemRef.value.setChangeInfo  && typeof itemRef.value.setCustomClass === 'function') {
+  if(itemRef.value && itemRef.value.setChangeInfo  && typeof itemRef.value.setCustomClass === CommonConstants.TYPE_OF_FUNCTION) {
     itemRef.value.setChangeInfo(!text ? text : {
       text: text,
     });

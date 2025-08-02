@@ -80,14 +80,23 @@
         </div>
       </el-col>
       <el-col :span="24">
-        <div style="overflow-y: auto; max-height: 150px">
+        <div style="overflow-y: auto; max-height: 250px">
           <el-tree
             style="max-width: 600px"
             :props="dataprops"
             node-key="id"
             :data="data3"
             :default-expand-all="true"
-          />
+          >
+            <template #default="{ node, data }">
+              <div class="custom-tree-node">
+                <span v-for="(level, index) in node.level - 1" :key="index" class="tree-indent"></span>
+                <span v-if="node.level > 1" class="tree-line"></span>
+                <span v-if="node.level > 1" class="tree-line-vertical"></span>
+                <span class="node-label">{{ node.label }}</span>
+              </div>
+            </template>
+          </el-tree>
         </div>
       </el-col>
       <el-col :span="24">
@@ -624,4 +633,37 @@ function fail() {
   height: 45px;
   background-color: #f3f3f3;
 }
+.custom-tree-node {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.tree-indent {
+  width: 24px;
+  height: 1px;
+}
+
+.tree-line {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 24px;
+  height: 1px;
+  border-top: 1px solid #ccc;
+}
+
+.tree-line-vertical {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  border-left: 1px solid #ccc;
+}
+
+.node-label {
+  margin-left: 8px;
+}
+
 </style>

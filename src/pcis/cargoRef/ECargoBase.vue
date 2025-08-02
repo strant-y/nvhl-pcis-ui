@@ -58,9 +58,6 @@ onMounted(() => {
     initComp();
     // 查询承保机构所属分公司和项目类别大类数据
     getCheckCdeptByCdptCde();
-    setFormItem('ECargoBase.cEcAgrAppNo', {
-      hidden: true,
-    });
   })
 });
 
@@ -119,8 +116,7 @@ const method = {
   },
   //业务来源大类change事件
   businessKindFunc: (val:any) => {
-    const p = opertaor.getParam();
-    if (!p.initFlag) {
+    if (!formPage.init) {
       setValue("ECargoBase.cChaType", "");
       setValue("ECargoBase.cChaSubtype", "");
     }
@@ -161,7 +157,7 @@ const method = {
           setFormItem("ECargoBase.cBrkSlsCde", obj); //代理业务员
 
           setFormItem("ECargoBase.cAgtAgrNo", { rules: null }); //代理合作协议
-          if (!p.initFlag) {
+          if (!formPage.init) {
             setValue("ECargoBase.cBrkrCde", "");
             setValue("ECargoBase.cBrkSlsCde", "");
             setValue("ECargoBase.cAgtAgrNo", "");
@@ -175,11 +171,9 @@ const method = {
   },
     //业务来源中类
   businessFunc: (val) => {
-    const p = opertaor.getParam();
-    if (!p.initFlag) {
+    if (!formPage.init) {
       setValue("ECargoBase.cChaSubtype", "");
     }
-
     if (val) {
       const params = {
         CChaType: val,
@@ -194,7 +188,7 @@ const method = {
             disabled: true,
           },
         };
-        if (!p.initFlag) {
+        if (!formPage.init) {
           // setFormItem("ECargoBase.cSlsId", obj); //业务员工号
         }
         // setFormItem("ECargoBase.cSlsId", { rules: null }); //业务员工号
@@ -206,7 +200,7 @@ const method = {
             disabled: false,
           },
         };
-        if (!p.initFlag) {
+        if (!formPage.init) {
           setFormItem("ECargoBase.cSlsId", obj); //业务员工号
         }
         setFormItem("ECargoBase.cSlsId", { rules: [getRules("required", {})] }); //业务员工号

@@ -40,4 +40,10 @@ const returnBtn = createFreeButtonBase({
 :deep(.bottom-items) {
   display: none;
 }
+.mypage-app {
+  position: relative;
+  :deep(.right-btns) {
+    display: none;
+  }
+}
 </style>

@@ -208,7 +208,6 @@ onMounted(() => {
   cGrpMrk.value = route.params.param.cGrpMrk;
   let newSchema = [];
   let cIs= opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered']  //  是否记名投保
-console.log( route.params.param.cProdNo)
   for(let i = 0; props.data.fromSchema && i < props.data.fromSchema.length; i++){
 
 
@@ -341,10 +340,13 @@ console.log( route.params.param.cProdNo)
       })
     }
 
-  
-
     if(params.cEdrType === '1'){
       item.disabled = false;
+      if(item.inputtype === 'rtinputgroup'){
+        item.groupList.forEach(data => {
+          data.disabled = false;
+        })
+      }
     }
     newSchema.push(item);
   }
