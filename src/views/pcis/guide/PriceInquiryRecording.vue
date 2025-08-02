@@ -13,6 +13,7 @@
       >
         <h4 style="margin: 10px 20px">投保向导</h4>
         <el-form-item
+          id="dptCde"
           v-if="isZGS"
           label="分公司"
           prop="dptCde"
@@ -29,6 +30,7 @@
             />
         </el-form-item>
         <el-form-item
+          id="cDptCde"
           label="承保机构"
           prop="cDptCde"
           style="width: 650px"
@@ -176,6 +178,7 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { getListByCode } from "@/api/code-list-service";
 import {useUserStore} from "@/store";
 import { listChrDepts } from "@/api/dept";
+import {scrollByDomId} from "@/utils/common";
 
 const router = useRouter();
 const dialogVisible = ref(true);
@@ -338,6 +341,11 @@ function next() {
     }
     step.value = step.value == "0" ? "1" : "0";
     title.value = step.value == "0" ? "自定义录单" : "选择条款";
+  }).catch((err: any) => {
+    const ids = Object.keys(err);
+    if(ids) {
+      scrollByDomId( `#${ids[0]}`, "center")
+    }
   });
 }
 // 上一步

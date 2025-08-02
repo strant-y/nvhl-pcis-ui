@@ -188,6 +188,7 @@
 <script setup lang="ts">
 import {computed} from "vue";
 import { iconMap } from './iconMap';
+import {scrollByDomId} from "@/utils/common";
 
 const props = defineProps({
   bthList: {
@@ -296,14 +297,7 @@ function handleAnchorClick(event: any, targetId: string) {
   }
   // 获取目标元素的ID
   if (targetId) {
-    // 手动实现平滑滚动效果
-    const targetElement = document.querySelector(targetId);
-    if (targetElement) {
-      targetElement.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start' // 可选值：'start', 'center', 'end', 'nearest'
-      });
-    }
+    scrollByDomId(targetId, "start");
   }
   if(document.querySelectorAll('.el-anchor__item') && document.querySelectorAll('.el-anchor__item').length > 0) {
     document.querySelectorAll('.el-anchor__item').forEach((item:any) => {
