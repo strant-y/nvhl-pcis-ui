@@ -22,6 +22,9 @@ const { getRules } = useValidator();
 import { useProductStore } from "@/store/modules/prod";
 import CostInformation from "@/views/pcis-new-udr-list/pages/CostInformation.vue";
 import { constantRoutes } from "@/router";
+import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
+import { saveAs } from "file-saver";
+const policyService = new PolicyService();
 const productStore = useProductStore();
 const dialogRef = ref<DialogMethod | null>(null);
 
@@ -40,9 +43,20 @@ const sessionData = ref(null);
 const rowData = ref(null)
 const freeEditRef = ref<AppGridEditMethod | null>(null);
 const formconfig1 = reactive(createAppGridEditConfig({}));
+const oldPageSchema = ref<any>({});
 const initFlag = computed(() => opertaor.getParam().initFlag);
 let bankRelTypeArr: any[] = []; // 收款银行大类分解
+
+// 声明全局变量
+let cComponentTableValue: string;
+
+// 封装获取 cComponentTableValue 的逻辑
+const getCComponentTableValue = (): string => {
+  return props.compKey ? props.compKey.replace(/\d+/g, '') : "";
+};
 onMounted(async () => {
+	// 初始化 cComponentTableValue
+  cComponentTableValue = getCComponentTableValue();
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
     method,
@@ -60,6 +74,14 @@ onMounted(async () => {
       item.minWidth = 240
     }
   })
+	// 获取页面初始化的时候获取的组件配置信息
+  if(opertaor.getFatherPage() && opertaor.getFatherPage().getOldProductResData() && opertaor.getFatherPage().getOldProductResData()[0]?.pageInfo) {
+    oldPageSchema.value = opertaor.getFatherPage().getOldProductResData()[0]?.pageInfo.find((item: any) => item.pageCode === props.compKey).pageSchema || {};
+    // 如果团个单标识为团单则展示关联被保险人，否则隐藏
+    if(route.params.param?.cGrpMrk !== '1') {
+      oldPageSchema.value.fromSchema = oldPageSchema.value.fromSchema.filter((item:any) => item.prop !== 'Dist.cRelatedInsured')
+    }
+  }
 });
 
 // 绑定方法
@@ -635,6 +657,93 @@ const method = {
       { title: "业务员", width: 85 }
     );
   },
+	// 联共保信息模板下载
+	downloadCiTemplate:() =>{
+		let param = {
+      ...oldPageSchema.value,
+    }
+    if(route.params.param?.pageName === "priceInquiry") {
+      param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else {
+      param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+    }
+    policyService
+        .downloadCiTemplate(param)
+        .then((res:any) => {
+          if (res.size <= 0) {
+            ElMessage.error({ message: "下载出错", duration: 3000 });
+            return;
+          }
+          const fileName = decodeURIComponent(res.headers['content-disposition'].split('filename=')[1]);
+          const blob = new Blob([res.data], {
+            responseType:res.headers["content-type"]
+            // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
+          });
+          saveAs(blob, fileName);
+        })
+        .catch(() => {
+          ElMessage.error("模板下载失败");
+        });
+	},
+	// 联共保信息导入
+	importCi:()=>{
+		let cappNo = '';
+    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+    // 判断有无批改类型参数，有则是批单
+    if(route.params.param?.cEdrType) {
+      cappNo = edrbase['EdrBase.cAppNo'];
+    } else if(route.params.param?.pageName === "priceInquiry") {
+      cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+    } else {
+      cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+    }
+    if (!cappNo) {
+      ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
+      return;
+    }
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.xlsx, .xls, .xlsm'; // 支持的文件类型
+    input.onchange = () => {
+      if (input.files?.length) {
+        const file = input.files[0];
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+          const base64String = e.target?.result as string;
+          // 构建参数并请求接口
+          const params = {
+						...oldPageSchema.value,
+            file: base64String, // ✅ 正确传入
+            cComponentTable: cComponentTableValue,
+            cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
+          };
+          if(route.params.param?.pageName === "priceInquiry") {
+            params['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+          }
+
+          policyService.importCi(params).then((res:any) => {
+            if (res.code === 200) {
+              debugger
+            } else {
+              ElMessage.error(res.msg || "增量导入失败");
+            }
+          }).catch((error) => {
+            ElMessage.error("导入出错，请检查文件格式或内容");
+            console.error("导入错误：", error);
+          });
+        };
+
+        reader.onerror = (e) => {
+          console.error("文件读取失败", e);
+          ElMessage.error("文件读取失败");
+        };
+
+        reader.readAsDataURL(file); // 启动读取
+      }
+    };
+    input.click(); // 触发文件选择对话框
+	}
 };
 const updateMasterAgreementValues = () => {
   const allRows = getFromValue(); // 获取所有行数据
