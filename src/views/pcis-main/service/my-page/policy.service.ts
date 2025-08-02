@@ -1577,6 +1577,12 @@ downloadDistTemplate(data) {
       responseType: 'blob'
   });
 }
+//联共保信息模板下载
+downloadCiTemplate(data) {
+  return request.post(`/policy/downloadCiTemplate`, data, {
+      responseType: 'blob'
+  });
+}
 //清单增量模板下载
 downloadDistTemplateIncrement(data) {
     return request.post(`/policy/downloadDistTemplateIncrement`, data, {
@@ -1596,6 +1602,10 @@ importDist(data) {
 //清单全量导入
 importDistIncrement(param){
     return request.post('/policy/importDistIncrement', param);
+}
+//联共保信息导入
+importCi(param){
+	return request.post('/policy/importCi', param);
 }
 listImage(data) {
     return request.post('image/listImage', data);

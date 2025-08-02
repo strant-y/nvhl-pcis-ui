@@ -461,15 +461,15 @@ const method = {
 		}
     const param = opertaor.getParam();
     let app = "";
-    if (param.cOrgAppNo) {
+    if (opertaor.getDataAll().plyBase["Base.cAppNo"]) {
+      app = opertaor.getDataAll().plyBase["Base.cAppNo"];   
+    } else if(param.cOrgAppNo){
       app = param.cOrgAppNo;
-    } else if(opertaor.getDataAll().plyBase["Base.cAppNo"]){
-      app = opertaor.getDataAll().plyBase["Base.cAppNo"];
     } else {
       app = route.params.param?.cAppNo
     }
     const selData = {
-      cAppNo: app,
+      cAppNo: "",
 			cProdNo: route.params.param.cProdNo,
 			cComponentTable: cComponentTableValue,
 			...formconfig1.value,
@@ -779,7 +779,7 @@ const method = {
 
           // 构建参数并请求接口
           const params = {
-            ...formconfig1.value,
+						...oldPageSchema.value,
             file: base64String, // ✅ 正确传入
             cComponentTable: cComponentTableValue,
             cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
