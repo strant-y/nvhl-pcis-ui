@@ -199,7 +199,10 @@
               {{ header.column.label }}
             </template>
             <template #default="scope">
-              <template v-if="item.editFlag">
+              <template v-if="i.slotName">
+                <slot :name="`column-${i.slotName}`" v-bind="scope" />
+              </template>
+              <template v-else-if="item.editFlag">
                 <el-form-item
                   :prop="[scope.$index, i.prop]"
                   :rules="i.rules ? i.rules : undefined"

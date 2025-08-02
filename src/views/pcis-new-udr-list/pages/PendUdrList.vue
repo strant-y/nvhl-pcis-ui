@@ -495,8 +495,9 @@
             inputtype: "rtinput",
             title: "申请单号",
             showKey: [1, 2, 3, 4],
-            maxWidth: 180,
-            fixed: 'left' 
+            maxWidth: 200,
+            fixed: 'left',
+            showCopyIcon: true
         },
         {
             prop: "uwDptName",
@@ -553,19 +554,20 @@
             showKey: [1, 2, 3, 4],
             minWidth: 80,
         },
-      {
-        prop: "timeDiffHMS",
-        inputtype: "rtinput",
-        title: "等待时长",
-        showKey: [1, 2, 3, 4],
-        maxWidth: 180,
-      },
+        {
+          prop: "timeDiffHMS",
+          inputtype: "rtinput",
+          title: "等待时长",
+          showKey: [1, 2, 3, 4],
+          maxWidth: 180,
+        },
         {
             prop: "nPrm",
-            inputtype: "rtnumber",
+            inputtype: "rtinput",
             title: "保费",
             showKey: [1, 2, 3, 4],
             minWidth: 120,
+            prefix: "¥ ",
         },
         {
             prop: "appCde",
