@@ -20,8 +20,9 @@
           :key="index"
           class="content-item"
         >
+         <!-- type="number" -->
           <el-input
-            type="number"
+           
             v-if="item.match(/^\*+$/)"
             v-model="inputValues[index]"
             @input="updateCNmeCn(index, $event)" 

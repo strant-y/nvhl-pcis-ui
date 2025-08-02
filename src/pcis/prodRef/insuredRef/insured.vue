@@ -491,19 +491,19 @@ const method = {
       });
 
       // cCntrNme 办理人  cOperaterCertfTyp办理证件  cOperaterCertfCde 办理人员证件号码  tOperaterCertfEndTm有效期
-      setFormItem("Insured.cCntrNme", {
-        hidden: true,
-      });
-      setFormItem("Insured.cOperaterCertfTyp", {
-        hidden: true,
-      });
-      setFormItem("Insured.cOperaterCertfCde", {
-        hidden: true,
-      });
+      // setFormItem("Insured.cCntrNme", {
+      //   hidden: true,
+      // });
+      // setFormItem("Insured.cOperaterCertfTyp", {
+      //   hidden: true,
+      // });
+      // setFormItem("Insured.cOperaterCertfCde", {
+      //   hidden: true,
+      // });
 
-      setFormItem("Insured.tOperaterCertfEndTm", {
-        hidden: true,
-      });
+      // setFormItem("Insured.tOperaterCertfEndTm", {
+      //   hidden: true,
+      // });
     } else {
       setFormItem("Insured.tBirthday", {
         rules: [getRules("required", {})],
@@ -637,20 +637,20 @@ const method = {
             rules: [getRules("required", {})],
           });
         });
-      // 处理办理人
-      setFormItem("Insured.cCntrNme", {
-        hidden: false,
-      });
-      setFormItem("Insured.cOperaterCertfTyp", {
-        hidden: false,
-      });
-      setFormItem("Insured.cOperaterCertfCde", {
-        hidden: false,
-      });
+      // // 处理办理人  隐藏  
+      // setFormItem("Insured.cCntrNme", {
+      //   hidden: false,
+      // });
+      // setFormItem("Insured.cOperaterCertfTyp", {
+      //   hidden: false,
+      // });
+      // setFormItem("Insured.cOperaterCertfCde", {
+      //   hidden: false,
+      // });
 
-      setFormItem("Insured.tOperaterCertfEndTm", {
-        hidden: false,
-      });
+      // setFormItem("Insured.tOperaterCertfEndTm", {
+      //   hidden: false,
+      // });
     }
   },
   //大股东性质change事件

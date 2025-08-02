@@ -800,7 +800,7 @@ const valideRequired = ()=>{
       const rowItems = getFromValue()
       for(const rowData of rowItems){
         if(cBsnsTyp == '19001'){
-          debugger
+          // debugger
               freeEditRef.value?.setRowFieldProp(rowData._dataId, 'Ci.nComm', 'disabled', true)
               freeEditRef.value?.setRowFieldProp(
                 rowData._dataId, "Ci.cSlsCde", "rules", [getRules("required", {})]
