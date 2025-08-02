@@ -157,7 +157,12 @@
       <rt-icon :item="{ icon: vInput }" />
     </template>
     <template v-else>
-      {{vInput !== 'undefined' ? vInput : ''}}
+       <!-- 添加图标显示 -->
+    <el-icon v-if="item.prefixIcon" >
+      <component :is="renderIcon(item.prefixIcon)" />
+    </el-icon>
+       <span v-if="item.prefix">{{ item.prefix }}</span>
+        {{vInput !== 'undefined' ? vInput : ''}}
     </template>
   </span>
 </template>

@@ -1107,6 +1107,7 @@ const tableObj = {
                 inputtype: "rtinput",
                 title: "保费",
                 minWidth: 100,
+                prefix: "¥ ",
             },
 
         ],
