@@ -7,7 +7,25 @@
       v-model:pageresult="pageresult"
       ref="tableRef"
       @page-change="handleQuery(false)"
-    />
+    >
+      <!-- policyInfo 列的具名插槽 -->
+      <template #column-policyInfo="{ row, column, index }">
+        <div class="policy-info-cell">
+          <div v-if="row.cAppNo" class="policy-number-row">
+            <span>{{ row.cAppNo }}</span>
+            <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
+              <DocumentCopy />
+            </el-icon>
+          </div>
+          <div v-if="row.cPlyNo" class="policy-number-row">
+            <span>{{ row.cPlyNo }}</span>
+            <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
+              <DocumentCopy />
+            </el-icon>
+          </div>
+        </div>
+      </template>
+    </app-table>
   </div>
 </template>
 
@@ -16,6 +34,7 @@ import { AppKey } from "@/constants/api";
 import { useUserStore } from "@/store";
 import { useValidator } from "@/typings/useValidator";
 import { useRouter, useRoute } from "vue-router";
+import { DocumentCopy } from "@element-plus/icons-vue";
 const { getRules } = useValidator();
 const router = useRouter();
 const route = useRoute();
@@ -988,6 +1007,7 @@ const tableObj = {
               title: "保单",
               minWidth: 180,
               fixed: "left",
+              slotName: "policyInfo"
             },
             {
                 prop: "cAppNo",
@@ -1009,12 +1029,12 @@ const tableObj = {
                 title: "批单号",
                 minWidth: 180,
             },
-            {
-              prop: "nEdrPrjNo",
-              inputtype: "rtinput",
-              title: "批改次数",
-              maxWidth: 100,
-            },
+          {
+            prop: "nEdrPrjNo",
+            inputtype: "rtinput",
+            title: "批改次数",
+            maxWidth: 90,
+          },
           {
             prop: "cAppStatus",
             inputtype: "rtselect",
@@ -1058,7 +1078,7 @@ const tableObj = {
                 prop: "cSecondDptCnm",
                 inputtype: "rtinput",
                 title: "二级分公司",
-                minWidth: 180,
+                minWidth: 150,
             },
             {
                 prop: "cProdNmeCn",
@@ -1085,6 +1105,19 @@ const tableObj = {
                 minWidth: 180,
             },
             {
+              prop: "nAmt",
+              inputtype: "rtinput",
+              title: "保额",
+              minWidth: 100,
+            },
+            {
+              prop: "nPrm",
+              inputtype: "rtinput",
+              title: "保费",
+              minWidth: 100,
+              prefix: "¥ ",
+            },
+            {
                 prop: "cUdrNme",
                 inputtype: "rtinput",
                 title: "核保人",
@@ -1096,20 +1129,6 @@ const tableObj = {
                 title: "核保通过日期",
                 minWidth: 180,
             },
-            {
-                prop: "nAmt",
-                inputtype: "rtinput",
-                title: "保额",
-                minWidth: 100,
-            },
-            {
-                prop: "nPrm",
-                inputtype: "rtinput",
-                title: "保费",
-                minWidth: 100,
-                prefix: "¥ ",
-            },
-
         ],
     },
 };
@@ -1427,6 +1446,24 @@ function setFormItem(key: any, obj: any) {
     });
   }
 }
+
+// 添加 copyText 方法
+const copyText = (text) => {
+  if (!text) {
+    ElMessage.warning('没有可复制的内容');
+    return;
+  }
+  
+  navigator.clipboard.writeText(text).then(
+    () => {
+      ElMessage.success('复制成功');
+    },
+    () => {
+      ElMessage.error('复制失败');
+    }
+  );
+};
+
 function setValue(key: string, value: any) {
     freeEditRef?.value?.setValue(key, value);
 }
@@ -1441,6 +1478,28 @@ defineExpose({
 </script>
 
 <style scoped>
+.copy-icon {
+  margin-left: 5px;
+  cursor: pointer;
+  color: #409eff;
+}
+
+.policy-info-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.policy-number-row {
+  display: flex;
+  align-items: center;
+}
+
+.policy-number-row span {
+  flex: 1;
+}
+
+
 :deep(.el-table__body .el-table__row .el-table__cell:first-child .cell) {
     white-space: break-spaces;
 }
