@@ -3056,7 +3056,7 @@ const calcPremiumEdr = () => {
             }
           })
           if(num > 0) {
-            c.push(num)
+            nInsuranceAmount.push(num)
           } else {
             nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
           }
