@@ -469,6 +469,7 @@ const amlInfoRef = ref(null);
 const historyClaRef = ref(null);
 const sliceSide = ref([]);
 const bottomBtnColor1 = "#3498DB";
+const parseData = ref({})
 
 const props:any = defineProps({
   param: {
@@ -1786,7 +1787,7 @@ async function loadAfter() {
         // this.cTplNme = result['res'].cTplNme;
         // this.cTplDesc = result['res'].cDesc;
         // this.TplPkId = result['res'].cPkId;
-        const parseData = JSON.parse(cTplCtnt);
+        parseData.value = JSON.parse(cTplCtnt);
         const ops = clearCAppNo(JSON.parse(cTplCtnt));
         // 保险期限 投保日期更新为当前日期 保险起期和保险止期重置为第二天0点至一年后
         if(ops.insrnc) {
@@ -1844,7 +1845,7 @@ async function loadAfter() {
           return item.pageKey === "dist";
         });
         distMap.forEach((item:any) => {
-          getDistData(parseData.plyBase['Base.cAppNo'], item)
+          getDistData(parseData.value.plyBase['Base.cAppNo'], item)
         });
         //获取单号
         // getCAppNoFun();
@@ -2106,38 +2107,57 @@ const saveDist = (appNo:any) => {
   const distMap = formconfig1[0].pageInfo.filter((item:any) => {
     return item.pageKey === "dist";
   });
-  distMap.forEach((item:any) => {
-    if(item.pageKey === "dist") {
-      const data = opertaor.getTableRefs()[item.pageCode].getTableData();
-      
-      if(data && data.length > 0) {
-        const param = {
-          cComponentTable: item.pageCode.slice(0, -6),
-          cAppNo: appNo,
-          dist: data.map((item:any) => {
-            return {
-              ...item,
-              'Dist.tOpeningTime': item['Dist.tOpeningTime'] ? dayjs(item['Dist.tOpeningTime']).format('YYYY-MM-DD') : null,
-              'Dist.tCrtTm': item['Dist.tCrtTm'] ? dayjs(item['Dist.tCrtTm']).format('YYYY-MM-DD') : null,
-              'Dist.tUpdTm': item['Dist.tUpdTm'] ? dayjs(item['Dist.tUpdTm']).format('YYYY-MM-DD') : null,
-              'Dist.tValidityPeriod': item['Dist.tValidityPeriod'] ? dayjs(item['Dist.tUpdTm']).format('YYYY-MM-DD HH:mm:ss') : null
-            };
-          }),
-        }
-        saveDistBatch(param).then((res:any) => {
-          if(res.code === 200) {
-            // 批量保存清单成功后再查询一遍清单
-            distMap.forEach((item:any) => {
-              opertaor.getTableRefs()[item.pageCode].handleQuery();
-            });
-            saveDistBatchFlag.value = false;
-          } else {
-            ElMessage.error(res.msg);
-          }
-        }).catch((err:any) => {
-          ElMessage.error(err);
-        });
+  const selData = {
+    pageSize: 999,
+    pageNum: 1,
+  };
+  if(props.param?.pageType === "copy") {
+    selData.cAppNo = props.param.cAppNo
+  }
+  if(props.param?.pageType === "template") {
+    selData.cAppNo = parseData.value.plyBase['Base.cAppNo']
+  }
+  if(props.param?.pageType === "inquiryToApp") {
+    selData.cInquiryNo = props.param?.cInquiryNo
+  }
+  distMap.forEach(async (item:any) => {
+    selData.cComponentTable = "";
+    let data = [];
+
+    selData.cComponentTable = item.pageCode.replace(/\d+/g, '')
+    // 如果清单数据过多涉及分页，则批量保存时需要查询全量的清单数据进行保存
+    const queryAllDist = await selectDist(selData);
+    if(queryAllDist && queryAllDist.data && queryAllDist.data.data && queryAllDist.data.data.length > 0) {
+      data = queryAllDist.data.data
+    }
+    
+    if(data && data.length > 0) {
+      const param = {
+        cComponentTable: item.pageCode.slice(0, -6),
+        cAppNo: appNo,
+        dist: data.map((item:any) => {
+          return {
+            ...item,
+            'Dist.tOpeningTime': item['Dist.tOpeningTime'] ? dayjs(item['Dist.tOpeningTime']).format('YYYY-MM-DD') : null,
+            'Dist.tCrtTm': item['Dist.tCrtTm'] ? dayjs(item['Dist.tCrtTm']).format('YYYY-MM-DD') : null,
+            'Dist.tUpdTm': item['Dist.tUpdTm'] ? dayjs(item['Dist.tUpdTm']).format('YYYY-MM-DD') : null,
+            'Dist.tValidityPeriod': item['Dist.tValidityPeriod'] ? dayjs(item['Dist.tUpdTm']).format('YYYY-MM-DD HH:mm:ss') : null
+          };
+        }),
       }
+      saveDistBatch(param).then((res:any) => {
+        if(res.code === 200) {
+          // 批量保存清单成功后再查询一遍清单
+          distMap.forEach((item:any) => {
+            opertaor.getTableRefs()[item.pageCode].handleQuery();
+          });
+          saveDistBatchFlag.value = false;
+        } else {
+          ElMessage.error(res.msg);
+        }
+      }).catch((err:any) => {
+        ElMessage.error(err);
+      });
     }
   });
 }
