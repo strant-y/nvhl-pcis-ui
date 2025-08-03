@@ -28,6 +28,7 @@ import {getAddressStr} from "@/api/query";
 import {eventBus} from "@/utils/event-bus";
 import {calculateAgeFromIdCard} from "@/utils/common";
 import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
+import moment from "moment";
 const opertaor = dataOpertaor();
 const param = ref({});
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
@@ -163,6 +164,9 @@ const formconfig1 = ref<AppFreeEditConfig>(
               params.cAppNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
             }
 
+						if(params.dist['Dist.tSalesTime']) {
+              params.dist['Dist.tSalesTime'] = moment(params.dist['Dist.tSalesTime']).format("YYYY-MM-DD")
+            }
             // 级联地址表格显示问题处理
             if(Object.keys(mapAddr).includes(props.data.compKey)) {
               const addrInput = mapAddr[props.data.compKey];

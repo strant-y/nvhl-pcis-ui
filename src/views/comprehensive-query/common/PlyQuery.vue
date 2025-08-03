@@ -523,7 +523,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           {
               prop: "cAppNo",
               inputtype: "rtinput",
-              title: "投保单号",
+              title: "申请单号",
               clearable: true,
           },
           {
@@ -1012,7 +1012,7 @@ const tableObj = {
             {
                 prop: "cAppNo",
                 inputtype: "rtinput",
-                title: "投保单号",
+                title: "申请单号",
                 minWidth: 180,
                 isShow:false
             },

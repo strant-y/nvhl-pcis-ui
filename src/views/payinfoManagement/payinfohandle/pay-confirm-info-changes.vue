@@ -231,7 +231,7 @@ const tableconfig = reactive<AppGridEditConfig>(
                 prop: "cAppNo",
                 expand: true,
                 inputtype: "rtinput",
-                title: "投保单号：",
+                title: "申请单号",
                 readOnly: true,
                 disabled: true,
                 // type: 'text',
@@ -401,7 +401,7 @@ onMounted(async () => {
 
     })
     // pageresult.total  =2;
-    //     let CAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];   // 投保单号
+    //     let CAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];   // 申请单号
 
     //     policyService.getAMLExtendInfoByAppNo(CAppNo,'Applicant').then((response) => {
     //         let {code, data} = response
@@ -422,7 +422,7 @@ onMounted(async () => {
 
 // 收益所有人table信息
 const getTableFun = async (isSave = false) => {
-    let cAppNo = props.data.cAppNo;  // 投保单号
+    let cAppNo = props.data.cAppNo;  // 申请单号
     let cRegisteredLogo = props.data.cRegisteredLogo;   // 
     let param = {
         cAppNo,
