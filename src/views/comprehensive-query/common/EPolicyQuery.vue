@@ -186,7 +186,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             {
                 prop: 'CAppNo',
                 inputtype: 'rtinput',
-                title: '投保单号',
+                title: '申请单号',
                 clearable: true
             },
             {
@@ -308,7 +308,7 @@ const tableconfig = reactive<AppTableConfig>(
             {
                 prop: 'cAppNo',
                 inputtype: 'rtinput',
-                title: '投保单号'
+                title: '申请单号'
             },
             {
                 prop: 'cPlyNo',

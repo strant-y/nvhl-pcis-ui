@@ -151,7 +151,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable:true,
         // defaultValue: 3,
         loadData: [
-          { label: "投保单号", value: "1" },
+          { label: "申请单号", value: "1" },
           { label: "交易号", value: "3" },
         ],
       

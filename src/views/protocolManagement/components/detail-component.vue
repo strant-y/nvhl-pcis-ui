@@ -231,7 +231,7 @@ onMounted(()=>{
     edritemFlag.value =false
   }
 })
-// 复制投保单号
+// 复制申请单号
 const copyPolicyNumber = () => {
   const policyNumberElement = document.getElementById("policyNumber");
   if (!policyNumberElement) return;
