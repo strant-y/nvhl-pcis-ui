@@ -2111,7 +2111,7 @@ const saveDist = (appNo:any) => {
     return item.pageKey === "dist";
   });
   const selData = {
-    pageSize: 999,
+    pageSize: 99999,
     pageNum: 1,
   };
   if(props.param?.pageType === "copy") {
