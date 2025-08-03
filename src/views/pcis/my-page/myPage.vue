@@ -305,7 +305,7 @@
               <span id="policyNumber" style="margin-left: 5px; margin-right: 5px; font-weight: bold;">
               {{ getNo }}
               </span>
-              <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号'}`" placement="top">
+              <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '申请单号'}`" placement="top">
                 <el-button @click="copyPolicyNumber" circle size="small" style="color: red;margin-right: 0;">
                   <rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />
                 </el-button>
@@ -754,7 +754,7 @@ const copyPolicyFun = () => {
   //     );
 };
 
-// 复制投保单号
+// 复制申请单号
 const copyPolicyNumber = () => {
   const policyNumberElement = document.getElementById("policyNumber");
   if (!policyNumberElement) return;
@@ -762,9 +762,9 @@ const copyPolicyNumber = () => {
   if(navigator.clipboard) {
     const text = policyNumberElement.innerText;
     navigator.clipboard.writeText(text).then(res => {
-      ElMessage.success(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + '已成功复制到剪贴板！');
+      ElMessage.success(props.param?.pageName === 'priceInquiry' ? '询价单号' : '申请单号' + '已成功复制到剪贴板！');
     }).catch(err => {
-      ElMessage.error(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + "复制失败，请手动复制。");
+      ElMessage.error(props.param?.pageName === 'priceInquiry' ? '询价单号' : '申请单号' + "复制失败，请手动复制。");
     })
   } else {
     const range = document.createRange();
@@ -779,9 +779,9 @@ const copyPolicyNumber = () => {
     try {
       const successful = document.execCommand("copy");
       if (successful) {
-        ElMessage.success(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + '已成功复制到剪贴板！');
+        ElMessage.success(props.param?.pageName === 'priceInquiry' ? '询价单号' : '申请单号' + '已成功复制到剪贴板！');
       } else {
-        ElMessage.error(props.param?.pageName === 'priceInquiry' ? '询价单号' : '投保单号' + "复制失败，请手动复制。");
+        ElMessage.error(props.param?.pageName === 'priceInquiry' ? '询价单号' : '申请单号' + "复制失败，请手动复制。");
       }
     } catch (err) {
       ElMessage.error("当前浏览器不支持自动复制功能，请手动复制。");
@@ -1567,7 +1567,7 @@ async function loadAfter() {
           })
         }
         opertaor.setDataAll(ops);
-        // 获取原投保单号下的清单列表数据
+        // 获取原申请单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
           return item.pageKey === "dist";
         });
@@ -1702,7 +1702,7 @@ async function loadAfter() {
           })
         }
         opertaor.setDataAll(ops);
-        // 获取原投保单号下的清单列表数据
+        // 获取原申请单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
           return item.pageKey === "dist";
         });
@@ -1840,7 +1840,7 @@ async function loadAfter() {
           })
         }
         opertaor.setDataAll(ops);
-        // 获取原投保单号下的清单列表数据
+        // 获取原申请单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
           return item.pageKey === "dist";
         });
@@ -1979,7 +1979,7 @@ async function loadAfter() {
           })
         }
         opertaor.setDataAll(ops);
-        // 获取原投保单号下的清单列表数据
+        // 获取原申请单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
           return item.pageKey === "dist"
         });
@@ -4136,7 +4136,7 @@ function clearCAppNoAndCPkId(res:any) {
     if (res[k] instanceof Object) {
       res[k] = clearCAppNoAndCPkId(res[k]);
     } else {
-      // 清空投保单号, 主键,保单标志,续保\复制单号 签单日期 录单日期  投保日期,主共保，联共保标志清空，联保号，开口保单协议号
+      // 清空申请单号, 主键,保单标志,续保\复制单号 签单日期 录单日期  投保日期,主共保，联共保标志清空，联保号，开口保单协议号
       if (k.indexOf('NCiOwnPrm') !== -1 || k.indexOf('NCiOwnAmt') !== -1 ||
        k.indexOf('NCiJntPrm') !== -1 || k.indexOf('NCiJntAmt') !== -1 || k.indexOf('COcAgrEdrNo') !== -1 || k.indexOf('TAgreeStopTm') !== -1 || k.indexOf('TAgreeStartTm') !== -1 || k.indexOf('COcAgrNo') !== -1 || k.indexOf('CJiAgtNo') !== -1 || k.indexOf('CCiMrk') !== -1 || k.indexOf('CAppNo') !== -1 || k.indexOf('CPkId') !== -1 || k === 'Base.CRenewMrk' || k === 'Base.COrigPlyNo' || k === 'Base.TIssueTm' || k === 'Base.TOprTm' || k === 'Base.TAppTm' || k === 'Base.CTmSysCde' || k === 'Base.TInsrncBgnTm' || k === 'Base.TInsrncEndTm' || k === 'Base.TCrtTm' || k === 'Base.TUpdTm' || k === 'Base.CPrePlyNo') {
         res[k] = null;
@@ -4286,7 +4286,7 @@ function replacecInquiryNo(res:any) {
   return data;
 }
 
-// 复制出单和模板出单清空原有的投保单号
+// 复制出单和模板出单清空原有的申请单号
 const clearKeyMap = ["cPkId","cAppNo","tUpdTm","cEdrNo","cLatestMrk","nEdrPrjNo","tCrtTm"]
 function clearCAppNo(res:any, mapList:any = clearKeyMap) {
   if(res instanceof Array) {

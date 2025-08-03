@@ -309,14 +309,14 @@ export class PcisQueryService {
     }
 
     /**
-     * 获取最新投保单号
+     * 获取最新申请单号
      */
     getLastAppNo(param) {
         return post('smartbi/getLastAppNo', { source: JSON.stringify(param) });
     }
 
     /**
-     * 获取原始投保单号
+     * 获取原始申请单号
      */
     getOldAppNo(param) {
         return post('smartbi/getOldAppNo', { source: JSON.stringify(param) });
