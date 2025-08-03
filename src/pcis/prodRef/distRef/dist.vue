@@ -507,18 +507,18 @@ const method = {
         pageresult.list = [];
         pageresult.total = res.data.total;
         pageresult.list = res.data.data.map((item, index) => {
+					let data:any = {}
+					if(!!item['Dist.cMajorCategories'] || !!item['Dist.cMediumClassification'] || !!item['Dist.cOccupationalSubcategory']){
+						data['Dist.AllOccup'] = [
+                item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
+            ]
+					}
+					if(!!item['Dist.tOpeningTime']){
+						data['tOpeningTime'] = item['Dist.tOpeningTime']? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD"): null
+					}
           return{
             ... item,
-            ... {
-              // 序号全部由后端处理
-              // 'Dist.nSeqNo': ((queryParams.pageNum - 1) * queryParams.pageSize) + index + 1,
-              tOpeningTime: item['Dist.tOpeningTime']
-                  ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
-                  : null,
-              'Dist.AllOccup': [
-                item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
-              ],
-            }
+            ... data
           };
         });
 
@@ -1031,16 +1031,20 @@ function getTableData() {
 
 function setTableData(data: any) {
   pageresult.list = data.map((item: any, index: any) => {
+		let dataNew:any = {}
+		if(!!item['Dist.cMajorCategories'] || !!item['Dist.cMediumClassification'] || !!item['Dist.cOccupationalSubcategory']){
+			dataNew['Dist.AllOccup'] = [
+					item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
+			]
+		}
+		if(!!item['Dist.tOpeningTime']){
+			dataNew['tOpeningTime'] = item['Dist.tOpeningTime']? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD"): null
+		}
     return{
       ... item,
+			... dataNew,
       ... {
         nSeqNo: index + 1,
-        tOpeningTime: item['Dist.tOpeningTime']
-            ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
-            : null,
-        'Dist.AllOccup': [
-          item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
-        ],
       }
     };
   });
