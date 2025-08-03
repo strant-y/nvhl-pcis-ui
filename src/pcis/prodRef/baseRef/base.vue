@@ -57,6 +57,26 @@ onMounted(async () => {
   setValue("Base.nPrmRmbExch", "1.000000");
 });
 
+
+// 获取我司比例
+const getOwnShare =()=>{
+   let ownShare = 0;
+   const data = opertaor.getDataAll();
+   let ciArr = data['ci']
+  //  const cCiMrk = data.plyBase?.['Base.cCiMrk'];
+  if(ciArr && ciArr.length>0){
+    ciArr.forEach((item:any)=>{
+      const CDptMrk = item['Ci.cCoinsurerCde']
+      if(!!CDptMrk && CDptMrk ==="327001"){
+        console.log(ownShare,item['Ci.nCiShare'])
+        ownShare =+ Number(item['Ci.nCiShare'])
+      } 
+   })
+  }
+  return ownShare;
+}
+
+
 // 拆分事件
 const nPayNumberFun = (isAdd=false)=>{
     const tabref = opertaor.getTableRefs();
@@ -88,23 +108,27 @@ const nPayNumberFun = (isAdd=false)=>{
 
       const data = opertaor.getDataAll();
       const cCiMrk = data.plyBase?.['Base.cCiMrk'];
-      const nCiOwnPrm = ['1', '2', '3','4'].includes(cCiMrk) ? data.ciMasterAgreement?.['Base.nCiOwnPrm'] : getValue("Base.nPrm");
+      // const nCiOwnPrm = ['1', '2', '3','4'].includes(cCiMrk) ? data.ciMasterAgreement?.['Base.nCiOwnPrm'] : getValue("Base.nPrm");
       
+      let nCiShare = Number(getOwnShare()) || 100 ;
+            const totalAmount = Number(data['base']['Base.nPrm']);  
+            const splitCount =Number(data.base?.['Base.nPayNumber']) 
 
       // if() data.ciMasterAgreement?.['Base.nCiOwnPrm'] 
       // console.log('拆------------‘',data.plyBase?.['Base.cCiMrk'])
-      const totalAmount = Number(nCiOwnPrm);
-      const splitCount = Number(getValue("Base.nPayNumber"));
+      // const totalAmount = Number(nCiOwnPrm);
+      // const splitCount = Number(getValue("Base.nPayNumber"));
       const totalCent = Math.round(totalAmount * 100);
       const result = ref<number[]>([]);
       const quotient = Math.floor(totalCent / splitCount) ;
       const remainder = totalCent % splitCount;
       result.value = Array(splitCount).fill(quotient);
       if (remainder > 0) {
-        result.value[0] += remainder;
+        result.value[splitCount-1] += remainder;
       }
 
-      result.value = result.value.map(cent => parseFloat((cent / 100).toFixed(2)));
+      // result.value = result.value.map(cent => parseFloat((cent / 100).toFixed(2)));
+      result.value = result.value.map(cent => parseFloat((cent / 100 * (nCiShare/100)).toFixed(8)));
        
       console.log('12123,',result)
       let val= {}

@@ -77,7 +77,7 @@ export const dataOpertaor = (pageKey?: string) => {
                         res[key] = JSON.parse(JSON.stringify(tableRefs[key].getFromValue()));
                     }
                 } catch (error) {
-                    console.log('方法不存在或出现错误，跳过执行');
+                    // console.log('方法不存在或出现错误，跳过执行');
                 }
             });
             return res;

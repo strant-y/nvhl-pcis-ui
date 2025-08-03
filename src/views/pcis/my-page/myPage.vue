@@ -3268,8 +3268,8 @@ const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase,nTms) => {
 
 
 
-  pay["Pay.nOwnPrm"] = nPrmVar >0?  parseFloat((nPrmVar * (nCiShare/100)).toFixed(2))  : 0;
-debugger
+  pay["Pay.nOwnPrm"] = nPrmVar >0?  parseFloat((nPrmVar * (nCiShare/100)).toFixed(8))  : 0;
+// debugger
 
 
   pay["Pay.cProdNo"] = base["Base.cProdNo"];

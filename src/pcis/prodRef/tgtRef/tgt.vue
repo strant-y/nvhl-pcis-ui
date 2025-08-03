@@ -386,10 +386,14 @@ const method = {
         },{width: 45});
   },
   getcMemberLogoChange:(val:string)=>{
+    console.log('val',val)
     if(val=== '1'){
       setFormItem('Tgt.cBareboatLessee', {
         rules: [getRules("required", {})],
       });
+      // setFormItem('Tgt.cBareboatLessee', {
+      //   rules: [getRules("required", {})],
+      // });
     }else {
       setFormItem('Tgt.cBareboatLessee', {
         rules: null
