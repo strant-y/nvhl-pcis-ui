@@ -286,14 +286,6 @@ console.log('dist -----',formconfig11.value)
   if(distTableRef.value) {
     eventBus.on(`setMap-${props.compKey}`, addCodeListMap);
   }
-  // 获取页面初始化的时候获取的组件配置信息
-  if(opertaor.getFatherPage() && opertaor.getFatherPage().getOldProductResData() && opertaor.getFatherPage().getOldProductResData()[0]?.pageInfo) {
-    oldPageSchema.value = opertaor.getFatherPage().getOldProductResData()[0]?.pageInfo.find((item: any) => item.pageCode === props.compKey).pageSchema || {};
-    // 如果团个单标识为团单则展示关联被保险人，否则隐藏
-    if(route.params.param?.cGrpMrk !== '1') {
-      oldPageSchema.value.fromSchema = oldPageSchema.value.fromSchema.filter((item:any) => item.prop !== 'Dist.cRelatedInsured')
-    }
-  }
 });
 
 // const  modifyRules = (data, fieldValue)=> {
@@ -692,6 +684,7 @@ const method = {
       ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
       return;
     }
+    getFatherPageOldProductResData();
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.xlsx, .xls, .xlsm'; // 支持的文件类型
@@ -818,6 +811,7 @@ const method = {
   },
   //全量模板下载
   downloadTemp: () => {
+    getFatherPageOldProductResData();
     const param = {
       ...oldPageSchema.value,
     }
@@ -1061,6 +1055,17 @@ const exRules = {};
 onUnmounted(() => {
   eventBus.off(`setMap-${props.compKey}`, addCodeListMap);
 });
+
+// 获取页面初始化的时候获取的组件配置信息
+function getFatherPageOldProductResData() {
+  if(opertaor.getFatherPage() && opertaor.getFatherPage().getOldProductResData() && opertaor.getFatherPage().getOldProductResData()[0]?.pageInfo) {
+    oldPageSchema.value = opertaor.getFatherPage().getOldProductResData()[0]?.pageInfo.find((item: any) => item.pageCode === props.compKey).pageSchema || {};
+    // 如果团个单标识为团单则展示关联被保险人，否则隐藏
+    if(route.params.param?.cGrpMrk !== '1') {
+      oldPageSchema.value.fromSchema = oldPageSchema.value.fromSchema.filter((item:any) => item.prop !== 'Dist.cRelatedInsured')
+    }
+  }
+}
 
 defineExpose({
   getValue,

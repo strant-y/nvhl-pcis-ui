@@ -4138,7 +4138,20 @@ function getEdrbaseValue(key:any) {
 }
 
 function getOldProductResData() {
-  return oldProductResData.value;
+  // 043010 记名投保选“是”，人员清单导入未校验所有字段必填
+  if(props.param?.cProdNo === "043010" && opertaor.getDataAll()['tgt'] && opertaor.getDataAll()['tgt']['Tgt.cIsinsuranceRegistered'] === '1') {
+    const data = deepClone(oldProductResData.value);
+    data[0]['pageInfo'].forEach((item:any) => {
+      if(item.pageCode === "EducatorDist043010") {
+        item.pageSchema.fromSchema.forEach((item:any) => {
+          item.rules = [{type: 'required'}]
+        })
+      }
+    })
+    return data;
+  } else {
+    return oldProductResData.value;
+  }
 }
 
 // 保存模板
@@ -4346,6 +4359,33 @@ function clearCAppNo(res:any, mapList:any = clearKeyMap) {
   return res;
 }
 
+// 深拷贝
+const  deepClone =(obj:any)=> {
+  // 处理原始值和 null
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+  
+  // 处理日期对象
+  if (obj instanceof Date) {
+    return new Date(obj.getTime());
+  }
+  
+  // 处理数组
+  if (obj instanceof Array) {
+    return obj.map(item => deepClone(item));
+  }
+  
+  // 处理普通对象
+  const clone = {};
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      clone[key] = deepClone(obj[key]);
+    }
+  }
+  
+  return clone;
+}
 
 /**
  * 保费计算前校验费率上限
