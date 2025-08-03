@@ -96,7 +96,10 @@ const props = defineProps({
   },
 });
 const codeListMap = ref<any>({});
+const customMap = ref<any>({});
 provide('codeListMap', codeListMap.value);
+provide('customMap', customMap.value);
+const idxParam = inject('idxParam', {});
 const btnMap = ref({});
 const { gridEditConfig } = toRefs(props);
 
@@ -117,8 +120,16 @@ function setFormValue(data: any) {
   tableDatas.value = data;
 }
 function validate() {
-  const pro = rttableFrom.value?.tableExvalidate();
-  return pro;
+  return new Promise((resolve) => {
+    rttableFrom.value?.tableExvalidate().then((valid: any) => {
+      if(!valid) {
+        if(idxParam && idxParam.handleAnchorClick && customMap.value?.domId) {
+          idxParam.handleAnchorClick(undefined,`#${customMap.value?.domId}`)
+        }
+      }
+      resolve(valid);
+    });
+  });
 }
 
 function handleRowClick(row: any) {
@@ -139,6 +150,9 @@ function delRow(editIndex: any) {
 
 function addRowByData(data: any) {
   rttableFrom.value?.addRowByData(data);
+}
+function spliceTableData(index: number, delCount: number, list: any[]) {
+  rttableFrom.value?.spliceTableData(index, delCount, list);
 }
 
 function setDisabledAll(isDisabled: boolean = true) {
@@ -183,7 +197,10 @@ function getFormBtn() {
 }
 
 function getTableBtn() {
-  const btnMap = ref({});
+  const btnMap = ref<any>({});
+  if(gridEditConfig.value?.bottomBtn) {
+    btnMap.value['bottomBtn'] = gridEditConfig?.value.bottomBtn
+  }
   gridEditConfig.value.tableBtn?.forEach((btn: any) => {
     if(btn.id) {
       btnMap.value[btn.id] = btn
@@ -207,6 +224,9 @@ function setCodeListMap(map: any) {
     Object.assign(codeListMap.value, map);
   }
 }
+const addProvide = <T>(key: InjectionKey<T> | string, value: T) => {
+  customMap.value[key] = value;
+}
 
 defineExpose({
   getFromValue,
@@ -227,7 +247,9 @@ defineExpose({
   getCodeListMap,
   setCodeListMap,
   addCodeListMap,
-  getRowAllItemRefById
+  getRowAllItemRefById,
+  spliceTableData,
+  addProvide
 });
 </script>
 

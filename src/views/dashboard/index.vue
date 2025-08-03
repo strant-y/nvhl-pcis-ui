@@ -2,7 +2,7 @@
   <div class="dashboard-container">
     <div class="home">
       <div class="top-box">
-        <div class="top-title1">财险承保系统</div>
+        <div class="top-title1">财产险承保系统</div>
         <div class="top-title2">智能高效助力承保，精准把控风险，让财险业务开展更顺畅无忧</div>
         <div class="top-search">
           <rtinput v-model="searchValue" :item="searchItem" />
@@ -210,7 +210,7 @@ const searchItem = {
   prop: "cQueryStr",
   inputtype: "rtinput",
   title: "",
-  placeholder: "输入投保单号进行查询",
+  placeholder: "输入申请单号进行查询",
   itemWidth: 2,
   prefixIcon: "Search"
 }
@@ -531,7 +531,8 @@ function getOrderInfo() {
    getAnalysis({type:'ply_total'}).then((res:any) => {
     if(res.code === 200) {
       tabDataMap.value = res.dataMap;
-      const keys = Object.keys(res.dataMap);
+      const keys = Object.keys(res.dataMap).filter((item:any) => item === '核心页面出单' || item === '复制出单' || item === '模板出单' || item === '方案出单' || item === '询报价转投保');
+      keys.splice(0, 0, keys.splice(keys.indexOf('核心页面出单'), 1)[0]);
       currentTab.value = keys[0];
       statisticTabList.value = keys
       handleRefreshEcharts()

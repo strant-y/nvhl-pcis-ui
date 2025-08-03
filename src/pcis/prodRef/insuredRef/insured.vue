@@ -2,6 +2,31 @@
   <app-free-edit :freeEditConfig="formconfig1" ref="insuredEditRef" />
   <comDialog ref="dialog"></comDialog>
   <input type="file" ref="fileInputRef" style="display: none" @change="handleFileChange" />
+	<el-dialog v-model="maindialogVisible" title="OCR识别">
+    <el-form
+        :model="formconfig"
+        label-width="180px"
+        :inline="true"
+      >
+				<el-form-item
+					label="OCR识别类型"
+					prop="fileInputType"
+					:rules="[getRules('required', {})]"
+				>
+					<el-radio-group v-model="formconfig.fileInputType">
+						<el-radio value="1">身份证</el-radio>
+						<el-radio value="2">外国人永久居留身份证</el-radio>
+						<el-radio value="3">营业执照</el-radio>
+					</el-radio-group>
+				</el-form-item>
+		</el-form>
+		<template #footer>
+      <div class="dialog-footer">
+        <el-button @click="cancel">取消</el-button>
+        <el-button type="primary" @click="ok">确认</el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
@@ -49,13 +74,16 @@ const insuredEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 // import { useRoute } from "vue-router";
 // const route = useRoute();
-const fileInputRef = ref(null);
-const fileInputType = ref();
+const fileInputRef: any = ref(null);
+const formconfig = ref({
+  fileInputType: ""
+});
 import { readFile } from "@/api/file";
 import { dataParam } from "@/store/modules/dataParam";
 const user = JSON.parse(sessionStorage.getItem("user"));
 const tCertfDate = ref<any[]>([]);
 const  cWorkDptList =['310','320','330','340','350','360']  // 单位性质带企业的ID
+const maindialogVisible = ref(false) // ocr识别弹框打开
 
 onMounted(() => {
   const formconfig11 = formInit(
@@ -124,6 +152,8 @@ onMounted(() => {
   setFormItem("Insured.cOrganizationCode", {rules: [getRules("socialCode", {})]});
   // 经常居住地校验
   setFormItem("Insured.cHabitualResidence", {rules: [getRules("valiAddress", {})]});
+  // 证件号码
+  setFormItem("Insured.cCertfCde", {minWidth: '165px'});
 });             
 function setFormItem(key: any, obj: any) {
   if (obj && Object.keys(obj).length) {
@@ -236,6 +266,15 @@ const method = {
     const tabref = opertaor.getTableRefByKey("applicant");
     const applicantValue = tabref.getFromValue();
     console.log(applicantValue);
+
+    const applicantCodeListMap = tabref?.getCodeListMap();
+    if(applicantCodeListMap) {
+      insuredEditRef.value?.addCodeListMap({
+        code: 'Insured.cOccupCde',
+        list: applicantCodeListMap['Applicant.cOccupCde']
+      });
+    }
+
     let insuredValue: any = {};
 
     // 同投保人时 客户信息需要禁用   客户名称 被保人性质 证件类型 证件号码  证件有效起 止期
@@ -461,19 +500,19 @@ const method = {
       });
 
       // cCntrNme 办理人  cOperaterCertfTyp办理证件  cOperaterCertfCde 办理人员证件号码  tOperaterCertfEndTm有效期
-      setFormItem("Insured.cCntrNme", {
-        hidden: true,
-      });
-      setFormItem("Insured.cOperaterCertfTyp", {
-        hidden: true,
-      });
-      setFormItem("Insured.cOperaterCertfCde", {
-        hidden: true,
-      });
+      // setFormItem("Insured.cCntrNme", {
+      //   hidden: true,
+      // });
+      // setFormItem("Insured.cOperaterCertfTyp", {
+      //   hidden: true,
+      // });
+      // setFormItem("Insured.cOperaterCertfCde", {
+      //   hidden: true,
+      // });
 
-      setFormItem("Insured.tOperaterCertfEndTm", {
-        hidden: true,
-      });
+      // setFormItem("Insured.tOperaterCertfEndTm", {
+      //   hidden: true,
+      // });
     } else {
       setFormItem("Insured.tBirthday", {
         rules: [getRules("required", {})],
@@ -535,9 +574,9 @@ const method = {
       setFormItem("Insured.cRealnameAuthType", {
         rules: [],
       });
-      setValue("Insured.cGreenIndustryCustomers", "");
-      setValue('Insured.cGreenIndustryList','')
-      setValue("Insured.cIsMicroEntpris", "");
+      // setValue("Insured.cGreenIndustryCustomers", "");
+      // setValue('Insured.cGreenIndustryList','')
+      // setValue("Insured.cIsMicroEntpris", "");
       // setValue("Insured.cCertfCls", "");
       setFormItem("Insured.cCntrNme", { rules: null });
       setFormItem("Insured.cCntrCertfCde", { rules: null });
@@ -557,9 +596,12 @@ const method = {
             rules: null,
           });
       }
+      
+      //是否分支机构
+      if(!getValue('Insured.cIsBranch')){
+          setValue("Insured.cIsBranch", "1");
+      }
     
-      // 是否分支机构
-      setValue("Insured.cIsBranch", "1");
 
       // 个人 移动电话必填  
       setFormItem("Insured.cMobile", {
@@ -604,20 +646,20 @@ const method = {
             rules: [getRules("required", {})],
           });
         });
-      // 处理办理人
-      setFormItem("Insured.cCntrNme", {
-        hidden: false,
-      });
-      setFormItem("Insured.cOperaterCertfTyp", {
-        hidden: false,
-      });
-      setFormItem("Insured.cOperaterCertfCde", {
-        hidden: false,
-      });
+      // // 处理办理人  隐藏  
+      // setFormItem("Insured.cCntrNme", {
+      //   hidden: false,
+      // });
+      // setFormItem("Insured.cOperaterCertfTyp", {
+      //   hidden: false,
+      // });
+      // setFormItem("Insured.cOperaterCertfCde", {
+      //   hidden: false,
+      // });
 
-      setFormItem("Insured.tOperaterCertfEndTm", {
-        hidden: false,
-      });
+      // setFormItem("Insured.tOperaterCertfEndTm", {
+      //   hidden: false,
+      // });
     }
   },
   //大股东性质change事件
@@ -675,21 +717,23 @@ const method = {
   },
   // 是否个体工商户
   cIsIndvduBizChange: (val: any) => {
-    console.log("111", val);
+    console.log("是否个体工商户", val);
     if (val == "1") {
-      setFormItem("Insured.cOccupCde", {
-        rules: [getRules("required", {})],
-      });
-      setFormItem("Insured.cTrdCde", {
-        rules: [getRules("required", {})],
-      });
-    } else if (val == "0") {
-      setFormItem("Insured.cOccupCde", {
-        rules: [],
-      });
-      setFormItem("Insured.cTrdCde", {
-        rules: [],
-      });
+			setFormItem("Insured.cOccupCde", { rules: [getRules("required", {})]});
+			setFormItem("Insured.cOccupCde", {btnItems:{disabled: false}});
+      setFormItem("Insured.cTrdCde", {rules: [getRules("required", {})]});
+      setFormItem("Insured.cTrdCde", {btnItems:{disabled: false}});
+    } else if(val == "0") {
+      setFormItem("Insured.cOccupCde", {rules: []});
+      setFormItem("Insured.cTrdCde", {rules: []});
+			setFormItem("Insured.cOccupCde", { btnItems:{disabled: true}});
+      setFormItem("Insured.cTrdCde", {btnItems:{disabled: true}});
+      setValue("Insured.cOccupCde", null);
+      setValue("Insured.cTrdCde", null);
+    }else{
+      setFormItem("Insured.cOccupCde", {btnItems:{disabled: false}});
+      setFormItem("Insured.cTrdCde", {btnItems:{disabled: false}});
+      setFormItem("Insured.cTrdCde", {rules: [getRules("required", {})]})
     }
   },
   funcreset: () => {
@@ -1055,13 +1099,14 @@ const method = {
   },
   // 读取身份证
   readIdCard: (val: any) => {
-    fileInputRef.value?.click();
-    fileInputType.value = "1";
+		maindialogVisible.value = true
+    // fileInputRef.value?.click();
+    // formconfig.value.fileInputType = "1";
   },
   // 读取外国人永久居留身份证
   readGreenCard: (val: any) => {
     fileInputRef.value?.click();
-    fileInputType.value = "2";
+    formconfig.value.fileInputType = "2";
   },
     // 单位性质
   cWorkDptChange:(val:any)=>{
@@ -1089,39 +1134,28 @@ const method = {
   },
   // 办理人员证件种类
   cOperaterCertfTypChange:(val: any)=>{
-    // 清除报错信息
-    clearValidate('Insured.cOperaterCertfCde')  
+  // 清除报错信息
+   clearValidate('Insured.cOperaterCertfCde')  
+   let cClntMrk = getValue('Insured.cClntMrk');  // 投保人性质 
+   let baseRules:any[]= [];
+   type RuleType = "orgCode" | "socialCode" | "idCard" | "passPort" | "ariCard" | "required";
+    const ruleMap: Record<string, RuleType> = {
+      "110001": "orgCode",
+      "110007": "socialCode",
+      "120001": "idCard",
+      "120002": "passPort",
+      "19": "ariCard",
+    };
+     baseRules = ruleMap[val] ? [getRules(ruleMap[val])] : [];
+     console.log(22,baseRules)
 
-    //  身份证
-    if (val == "120001") { 
-        setFormItem("Insured.cOperaterCertfCde", {
-              rules: [getRules("idCard", {}),],
-            });
-    } else if ( val == "110007") {   
-      // 统一社会信用代码校验
-           setFormItem("Insured.cOperaterCertfCde", {
-              rules: [getRules("socialCode", {}),],
-            });
-    } else if(val == "19"){
-      // 外国人证件号
-           setFormItem("Insured.cOperaterCertfCde", {
-              rules: [getRules("ariCard", {}),],
-            });
-    } else if (val == "120002") {
-      // 护照
-        setFormItem("Insured.cOperaterCertfCde", {
-              rules: [getRules("passPort", {}),],
-            });
-    }else if(val =='110001'){
-      // 组织机构编码校验
-           setFormItem("Insured.cOperaterCertfCde", {
-              rules: [getRules("orgCode", {}),],
-            });
-    } else {
-           setFormItem("Insured.cOperaterCertfCde", {
-              rules: [],
-            });
+    if (cClntMrk == '0') {
+      baseRules = [getRules("required", {}), ...baseRules]
     }
+    
+    setFormItem("Insured.cOperaterCertfCde", {
+       rules:baseRules,
+     });
   },
     // 证件有效起期
   tCertfBgnDateDisable:(date:any)=>{
@@ -1226,17 +1260,17 @@ function handleFileChange(event: Event) {
     // 处理文件上传逻辑
     const param = {
       file: file,
-      type: fileInputType.value,
+      type: formconfig.value.fileInputType,
     };
     readFile(param)
       .then((res: any) => {
         if (res.code === 200 && res.data && res.data.result) {
           tCertfDate.value = [];
-          if (fileInputType.value === "1") {
+          if (formconfig.value.fileInputType === "1") {
             // 身份证
             const result = res.data.result.item_list;
             const keys = result.map((item: any) => item.key);
-            let cardInfo = {};
+            let cardInfo: any = {};
             keys.forEach((key: any) => {
               const value = result.find((item: any) => item.key === key).value;
               cardInfo[key] = value;
@@ -1277,7 +1311,7 @@ function handleFileChange(event: Event) {
               if (cardInfo["id_number"])
               idAnalysis(cardInfo["id_number"])
           }
-          if (fileInputType.value === "2") {
+          if (formconfig.value.fileInputType === "2") {
             // 外国人永久居留身份证
             const cardInfo = res.data.result.details;
             setValue(
@@ -1315,10 +1349,45 @@ function handleFileChange(event: Event) {
             setValue("Insured.cCertfCls", "19");
             setValue("Insured.cClntMrk", "1");
           }
+					if (formconfig.value.fileInputType === "3"){
+						// 营业执照
+            const result = res.data.result.item_list;
+            const keys = result.map((item: any) => item.key);
+            let cardInfo: any = {};
+            keys.forEach((key: any) => {
+              const value = result.find((item: any) => item.key === key).value;
+              cardInfo[key] = value;
+            });
+            console.log('营业执照’，',cardInfo )
+            if (cardInfo["BizLicenseCreditCode"])
+              setValue("Insured.cCertfCde", cardInfo["BizLicenseCreditCode"]); // // 证件号码
+            if (cardInfo["BizLicenseCompanyName"])
+              setValue("Insured.cInsuredNme", cardInfo["BizLicenseCompanyName"]); // 客户名称
+            if (cardInfo["BizLicenseOperatingPeriod"]) {
+              tCertfDate.value = cardInfo["BizLicenseOperatingPeriod"].split("至");
+              setValue(
+                "Insured.tCertfBgnDate",
+                cardInfo["BizLicenseOperatingPeriod"].split("至")[0]
+              );
+              if (cardInfo["BizLicenseOperatingPeriod"].split("至")[1] === "长期") {
+                setValue("Insured.cLongendTyp", "1");
+              } else {
+                setValue("Insured.cLongendTyp", "0");
+                setValue(
+                  "Insured.tCertfEndDate",
+                  cardInfo["BizLicenseOperatingPeriod"].split("至")[1]
+                );
+              }
+            }
+            setValue("Insured.cCertfCls", "110007");
+            setValue("Insured.cClntMrk", "0");
+					}
           checkUser();
+					 formconfig.value.fileInputType = ""
         }
       })
       .catch((err) => {
+				formconfig.value.fileInputType = ""
         ElMessage.error(err);
       });
     fileInputRef.value.value = ""; // 清空文件输入框的值
@@ -1327,7 +1396,7 @@ function handleFileChange(event: Event) {
 
 const terms = ['00425000277','00425000278','00425000279','00425000280','00425000281'];
 function change403009(v){
-if(terms.includes(v)){
+	if(terms.includes(v)){
     setValue("Tgt.cInsuranceMethod", "613001");
     setFormItem("Insured.cSafetyStandardizationLevel", { hidden: false });
     setFormItem("Insured.cCreditRating", { hidden: false });
@@ -1335,6 +1404,24 @@ if(terms.includes(v)){
   }
 }
 
+// OCR识别弹框确认
+function ok(){
+	if(formconfig.value.fileInputType == ""){
+		ElMessage.warning("请先选择OCR识别类型");
+		return false
+	}
+	maindialogVisible.value = false
+	fileInputRef.value?.click();
+}
+
+// OCR识别弹框取消
+function cancel(){
+	formconfig.value.fileInputType = ""
+	maindialogVisible.value = false
+}
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  insuredEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
@@ -1345,6 +1432,7 @@ defineExpose({
   clearValidate,
   setFormItem,
   change403009,
+  addProvide
 });
 </script>
 

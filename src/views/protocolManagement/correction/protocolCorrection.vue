@@ -41,6 +41,7 @@ const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
 import cargoApi from '@/api/cargo'
+import {PcisEdrQueryService} from "@/views/edr-qry-endorse-list/service/pcis-edr-query-service";
 
 const codeListStore = codeListViewStore();
 
@@ -76,15 +77,17 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           label: "重置",
           func: () => {
             freeEditRef.value?.setFormValue({
-              cDptCde: null,
+              cDptCde: "0200000000000",
               cLoadSub: 1,
               cKindNo: null,
               cTermNo: null,
+							cEcAgrAppNo: "",
+							cEcAgrNo: "",
               cAppNme: "",
               insuredNme: "",
               Tm: [
-                moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00"),
-                moment(new Date()).format("YYYY-MM-DD 23:59:59")
+                moment(new Date(Date.now() - 5 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00"),
+								moment(new Date(Date.now() + 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 23:59:59"),
               ]
             });
             handleQuery(true);
@@ -99,7 +102,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           title: "承保机构",
           btnWidth: 20,
           itemWidth: 1,
-          rules: [{ "type": "required" }],
+          disabled: true,
+        	rules: [getRules("required", {})],
           showExBtn: true,
           btnItems: {
             icon: "Search",
@@ -128,9 +132,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           },
           loadData: [
             {
-              "label": "永安保险总公司",
-              "value": "0200000000000"
-            }
+							label: "0200000000000永安保险公总司",
+							value: "0200000000000",
+						},
           ]
         },
         {
@@ -142,7 +146,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             y: 1,
             n: 0,
           },
-          itemWidth: 2,
+          itemWidth: 1,
         },
         {
           prop: "cKindNo",
@@ -169,7 +173,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   },
                 })
                 .then((res) => {
-                  setFormItem("cProdNo", {
+                  setFormItem("cTermNo", {
                     loadData: res,
                   });
                 });
@@ -192,6 +196,18 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           func: (val: string) => {},
         },
         {
+          prop: "cEcAgrAppNo",
+          inputtype: "rtinput",
+          title: "预约协议申请单号",
+          clearable: true,
+        },
+				{
+					prop: "cEcAgrNo",
+					inputtype: "rtinput",
+					title: "协议单号",
+					clearable: true,
+				},
+        {
           prop: "cAppNme",
           inputtype: "rtinput",
           title: "投保人客户名称",
@@ -213,10 +229,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           format: "YYYY-MM-DD HH:mm:ss",
           valueFormat: "YYYY-MM-DD HH:mm:ss",
           defaultValue: [
-            moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
-                "YYYY-MM-DD 00:00:00"
-            ),
-            moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+            moment(new Date()).format("YYYY-MM-DD 00:00:00"),
+            moment(new Date(Date.now() + (6 * 1000 * 60 * 60 * 24))).format(
+                "YYYY-MM-DD 23:59:59"
+            )
           ],
         }
       ],
@@ -230,9 +246,12 @@ const pageresult = reactive<Pageresult>({
   /** 总数 */
   total: 0,
 });
-
+const pcisEdrQueryService = new PcisEdrQueryService();
 const tableconfig = reactive<AppTableConfig>(
     createTableEditConfig({
+      showSelection: false,
+      editFlag: true,
+      editList: ["id", "iddetail"],
       tableBtn: [
         createFreeButtonBase({
           id: "score",
@@ -255,7 +274,96 @@ const tableconfig = reactive<AppTableConfig>(
           icon: "Edit",
           tableClick: (row) => {
             console.log(row);
-            toDtl(row, 'edit');
+            let cEdrType:string = ''
+            const rsnTyp = row['id'] && row['id'].length > 0 ? row['id'][0]?.split('-')[0] : null;
+              if(!row['id'] || row['id'].length < 2) {
+                ElMessage.warning("请选择批改原因");
+                return;
+              }
+            const param = {
+              plyNo: row.cEcAgrAppNo,
+              edrType: rsnTyp,
+              prodNo: '029900',
+              edrRsnCde: row['id'][1],
+            };
+            let en:any
+            if ("2" === rsnTyp) {
+              //注销
+              en = {
+                ...row,
+                cRsnCde: row['id'][1],
+                cEdrType: '2',
+                pageType: "EDR_APP_NEW_SCENE",
+              }
+              //预留跳转路径
+              cEdrType = '2'
+            } else if ("3" === rsnTyp) {
+              //退保
+              en = {
+                ...row,
+                cRsnCde: row['id'][1],
+                cEdrType: '3',
+                pageType: "EDR_APP_NEW_SCENE",
+              }
+              cEdrType = '3'
+            } else if ("1" === rsnTyp) {
+              //一般批改
+              en = {
+                ...row,
+                cRsnCde: row['id'][1],
+                cEdrType: '1',
+                pageType: "EDR_APP_NEW_SCENE",
+              }
+              cEdrType = '1'
+            }
+            toDtl(en, 'EDR_APP_NEW_SCENE',cEdrType);
+            // pcisEdrQueryService.validEndorsexy(param).then(
+            //     async (result) => {
+            //       if (200 !== result["code"]) {
+            //         ElMessage.error(result["msg"]);
+            //       } else {
+            //         if (result["data"]) {
+            //           let en:any
+            //           if ("2" === rsnTyp) {
+            //             //注销
+            //             en = {
+            //               ...row,
+            //               cRsnCde: row['id'][1],
+            //               cEdrType: '2',
+            //               pageType: "EDR_APP_NEW_SCENE",
+            //             }
+            //             //预留跳转路径
+            //             cEdrType = '2'
+            //           } else if ("3" === rsnTyp) {
+            //             //退保
+            //             en = {
+            //               ...row,
+            //               cRsnCde: row['id'][1],
+            //               cEdrType: '3',
+            //               pageType: "EDR_APP_NEW_SCENE",
+            //             }
+            //             cEdrType = '3'
+            //           } else if ("1" === rsnTyp) {
+            //             //一般批改
+            //             en = {
+            //               ...row,
+            //               cRsnCde: row['id'][1],
+            //               cEdrType: '1',
+            //               pageType: "EDR_APP_NEW_SCENE",
+            //             }
+            //             cEdrType = '1'
+            //           }
+            //           toDtl(en, 'EDR_APP_NEW_SCENE',cEdrType);
+            //         } else {
+            //           ElMessage.error(result["msg"]);
+            //         }
+            //       }
+            //     },
+            //     (error) => {
+            //       console.log("err: ", error);
+            //       ElMessage.error("连接失败！" + error);
+            //     }
+            // );
           },
         }),
       ],
@@ -263,6 +371,12 @@ const tableconfig = reactive<AppTableConfig>(
       tableBtnPosition: "right",
       tableBtnType: "btn",
       fromSchema: [
+        {
+          prop: "cEcAgrAppNo",
+          inputtype: "rtinput",
+          title: "预约协议申请单号",
+          minWidth: 180,
+        },
         {
           prop: "cEcAgrNo",
           inputtype: "rtinput",
@@ -322,19 +436,42 @@ const tableconfig = reactive<AppTableConfig>(
           title: "缴费余额",
           minWidth: 120,
         },
+        {
+          prop: "id",
+          inputtype: "rtcascader",
+          title: "批改原因",
+          minWidth: 220,
+          typeCode: 'EDR_RSN_LIST_NEW',
+          checkStrictly: false,
+          func: (val, row, codeListMap) => {
+            if(val && val[1] && codeListMap['EDR_RSN_LIST_NEW-1-' + val[0]]) {
+              row["iddetail"] = codeListMap['EDR_RSN_LIST_NEW-1-' + val[0]].find((item:any) => item.value === val[1]);
+            }
+          },
+        },
       ],
     })
 );
 
-onMounted(async () => {
-  freeEditRef.value?.setValue('Tm',[
-    moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00"),
-    moment(new Date()).format("YYYY-MM-DD 23:59:59")]
-  )
+onMounted(() => {
+	freeEditRef.value?.setFormValue({
+		cDptCde: "0200000000000",
+		cLoadSub: 1,
+		cKindNo: null,
+		cTermNo: null,
+		cEcAgrAppNo: "",
+		cEcAgrNo: "",
+		cAppNme: "",
+		insuredNme: "",
+		Tm: [
+			moment(new Date(Date.now() - 5 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00"),
+			moment(new Date(Date.now() + 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 23:59:59"),
+		]
+	});
 });
 
-function toDtl(row: any, type: string) {
-  router.push({path: "/protocolManagement/correctionDtl", query: {param: JSON.stringify(row), type: type}});
+function toDtl(row: any, type: string,cEdrType = '') {
+  router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify(row), type,cEdrType}});
 }
 
 
@@ -347,7 +484,9 @@ const method = {
 
 // 绑定特殊验证器
 const exRules = {};
-
+function setRowFieldProp(rowId: string, field: string, prop: string, value: any) {
+  return tableRef.value?.setRowFieldProp(rowId, field, prop, value);
+}
 /** 查询 */
 function handleQuery(flag?: boolean) {
   freeEditRef.value?.validate().then((isValid) => {
@@ -369,6 +508,44 @@ function handleQuery(flag?: boolean) {
           if (pageData) {
             pageresult.list = pageData.data;
             pageresult.total = pageData.total;
+            nextTick(()=>{
+              tableRef.value?.getTableValues().forEach((item:any ) =>{
+                if(item.cEdrFlag === 'YY'){
+                  setRowFieldProp(
+                      item['_dataId'],
+                      "id",
+                      "typeCode",
+                      'EDR_RSN_LIST_YY',
+                  );
+                  setRowFieldProp(
+                      item['_dataId'],
+                      "id",
+                      "loadData",
+                      [
+                        { label: '一般批改', value: `1-${'029900'.slice(0,2)}` },
+                        { label: '注销', value: `2-${'029900'.slice(0,2)}` },
+                        { label: '退保', value: `3-${'029900'.slice(0,2)}` },
+                      ],
+                  );
+                }else {
+                  setRowFieldProp(
+                      item['_dataId'],
+                      "id",
+                      "typeCode",
+                      'EDR_RSN_LIST_AY',
+                  );
+                  setRowFieldProp(
+                      item['_dataId'],
+                      "id",
+                      "loadData",
+                      [
+                        { label: '一般批改', value: `1-${'029900'.slice(0,2)}` },
+                        { label: '注销', value: `2-${'029900'.slice(0,2)}` }
+                      ],
+                  );
+                }
+               })
+            })
           }
         } else {
           ElMessage.error(res.msg);

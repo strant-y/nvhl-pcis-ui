@@ -57,38 +57,49 @@ onMounted(async () => {
   setValue("Base.nPrmRmbExch", "1.000000");
 });
 
-// 绑定方法
-const method = {
-  // func demo
-  func1: () => {
-    console.log(getRules);
-  },
+// 拆分事件
+const nPayNumberFun = (isAdd=false)=>{
+    const tabref = opertaor.getTableRefs();
+    const baseBefore = tabref["base"].getFromValue();
+    const baseData = opertaor.getDataAll()['base']['needCalc'];
+    console.log('opertaor',baseData,opertaor.getDataAll(),baseBefore)
 
-  //缴费拆分按钮事件
-  splitPayNumber() {
+    if (!baseData) {
+      ElMessage.error("请先进行保费计算!");
+      return false
+    }
+
     if (Number(getValue("Base.nPayNumber"))>12) {
       ElMessage.warning("拆分最多为12期！");
       return false
     }
     if(getValue("Base.nPayNumber")!=''){
-      if(specialAdd){
+        let cinstmrk = getValue('Base.cInstMrk');
+      if(specialAdd  && isAdd && cinstmrk =='5'){
         ElMessage.warning("分期付费业务，需在特别约定中增加及时缴纳保费的提示信息");
-  
         specialAdd = false;
       }
-       eventBus.emit('add-special')
-  // eventBus.on('add-special', queryCBsnsTyp)
+    
+      console.log('财富 ---‘',cinstmrk)
+      // 用来添加特约信息
+      if(isAdd  && cinstmrk =='5'){
+         eventBus.emit('add-special')
+      }
 
-      const totalAmount = Number(getValue("Base.nPrm"));
+      const data = opertaor.getDataAll();
+      const cCiMrk = data.plyBase?.['Base.cCiMrk'];
+      const nCiOwnPrm = ['1', '2', '3','4'].includes(cCiMrk) ? data.ciMasterAgreement?.['Base.nCiOwnPrm'] : getValue("Base.nPrm");
+      
+
+      // if() data.ciMasterAgreement?.['Base.nCiOwnPrm'] 
+      // console.log('拆------------‘',data.plyBase?.['Base.cCiMrk'])
+      const totalAmount = Number(nCiOwnPrm);
       const splitCount = Number(getValue("Base.nPayNumber"));
-
       const totalCent = Math.round(totalAmount * 100);
       const result = ref<number[]>([]);
       const quotient = Math.floor(totalCent / splitCount) ;
       const remainder = totalCent % splitCount;
-
       result.value = Array(splitCount).fill(quotient);
-      // result.value = result.value.map(cent => parseFloat((cent / 100).toFixed(2)))
       if (remainder > 0) {
         result.value[0] += remainder;
       }
@@ -119,28 +130,41 @@ const method = {
             "Pay.cPayorCde": opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppCde"),
             "Pay.tPayBgnTm": tInsrncBgnTm,
             "Pay.tPayEndTm": tPayEndTm,
-            "Pay.nOwnPrm": result.value[i], 
+            "Pay.nOwnPrm": result.value[i] || 0 , 
             "Pay.cPayorNme":opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppNme"),
-            "Pay.nPayablePrm": result.value[i], 
-            "Pay.nPrmVar": result.value[i] 
+            "Pay.nPayablePrm": result.value[i] || 0, 
+            "Pay.nPrmVar": result.value[i]  
           }
           valArr.push(val)
       }
 
       console.log('数据',valArr)
       opertaor.getTableRefByKey("payinfo").setFormValue(valArr); 
+    }
+ } 
 
-      
-  } 
-},
+// 绑定方法
+const method = {
+  // func demo
+  func1: () => {
+    console.log(getRules);
+  },
+
+  //缴费拆分按钮事件
+  splitPayNumber() {
+      nPayNumberFun(true);
+ 
+  },
   //付费约定下拉事件
   cInstMrkChange(val: any) {
     console.log(val)
     // setValue("Base.nPayNumber", '1');
     if(val=='5'){
       setFormItem("Base.nPayNumber", { disabled: false ,  max:12});
-    }else{
-      setFormItem("Base.nPayNumber", { disabled: true });
+    }else if(val=='0'){
+      setFormItem("Base.nPayNumber", { disabled: true, });
+      setValue('Base.nPayNumber',1)
+      
     }
   },
   //争议处理选择事件
@@ -376,14 +400,18 @@ function numMulti(num1, num2) {
   }
   return Number(num1.toString().replace('.', '')) * Number(num2.toString().replace('.', '')) / Math.pow(10, baseNum);
 }
-
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  baseEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   setValue,
   getValue,
-  getFormconfig
+  getFormconfig,
+  nPayNumberFun,
+  addProvide
 });
 </script>
 

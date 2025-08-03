@@ -1,13 +1,22 @@
 <template>
   <div>
-    <myCard :cardConfig="cardconfig">
+    <myCard :cardConfig="cardconfig" ref="cardRef">
       <app-table
         :tableConfig="tableconfig"
         v-model:pageresult="pageresult"
         ref="distTableRef"
         @pageChange="method.handleQuery($event, true)"
         @selection-change="handleSelectionChange"
-      />
+      >
+        <template #title-info v-if="titleInfo">
+          <div style="display: flex; align-items: end;margin-bottom: 5px">
+            <span>成功：</span>
+            <el-text class="mx-1" type="success">{{titleInfo.successes}}</el-text>
+            <span style="margin-left: 10px">失败：</span>
+            <el-text class="mx-1" type="danger">{{titleInfo.fails}}</el-text>
+          </div>
+        </template>
+      </app-table>
     </myCard>
     <comDialog ref="dialog"></comDialog>
   </div>
@@ -40,13 +49,15 @@ import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 const policyService = new PolicyService();
-import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
+import { CardConfig, creatCardConfig, MyCardMethod } from "@/shared/mytemplate/card-config";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { useRoute } from "vue-router";
 import { runInThisContext } from "vm";
-import { AppFreeEditMethod } from "@/shared/app-free-edit-config";
+import { AppFreeEditMethod, createAppFreeEditConfig } from "@/shared/app-free-edit-config";
 import {eventBus} from "@/utils/event-bus";
+import { useValidator } from "@/typings/useValidator";
+const { getRules } = useValidator();
 const route = useRoute();
 const dialog = ref<DialogMethod | null>(null);
 const opertaor = dataOpertaor();
@@ -60,6 +71,8 @@ const props = defineProps({
     type: String
   }
 });
+
+const cardRef = ref<MyCardMethod | null>(null);
 
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -75,6 +88,7 @@ const formconfig1 = ref<Record<string, any>>({});
 const tableconfig = ref<AppTableConfig>(createTableEditConfig());
 const idxParam = inject('idxParam');
 let fileBase: string;
+const titleInfo = ref<any>();
 // 声明全局变量
 let cComponentTableValue: string;
 
@@ -83,9 +97,72 @@ const getCComponentTableValue = (): string => {
   return props.compKey ? props.compKey.replace(/\d+/g, '') : "";
 };
 
+const mapAddr = {
+  "AddressDist040001": {
+    "Dist.JingyingAddress": "Dist.cDetailedAddress"
+  },
+  "AddressDist040005": {
+    "Dist.SchoolAddressProp": "Dist.cDetailedAddress"
+  },
+  "AddressDist041001": {
+    "Dist.JingYingAddress043009": "Dist.cDetailedAddress"
+  },
+  "AddressDist043020": {},
+  "AdvertisementDist043011": {
+    "Dist.JingyingAddress": "Dist.cDetailedAddress"
+  },
+  "ChargingDist049026": {
+    "Dist.DetailAddrProp": "Dist.cDetailedAddress"
+  },
+  "DesignDist": {
+    "Dist.ProjectDesignProp": "Dist.cProjectAddress"
+  },
+  "ParkingDist043005": {
+    "Dist.JingyingAddress": "Dist.cDetailedAddress"
+  },
+  "PollutionDist043013": {
+    "Dist.PropertyLocationProp": "Dist.cDetailedAddress"
+  },
+  "PortDist040021": {
+    "Dist.JingyingAddress": "Dist.cDetailedAddress"
+  },
+  "ProjectDist043009": {
+    "Dist.JingYingAddress043009": "Dist.cDetailedAddress"
+  },
+  "ProjectDist045001": {
+    "Dist.EngineeringAddressProp": "Dist.cDetailedAddress"
+  },
+  "ProjectDist049035": {},
+  "PropertyaddressDist010001": {
+    "Dist.TgtAddressProp": "Dist.cPropertyAddress"
+  },
+  "PropertyaddressDist010004": {
+    "Dist.TgtAddressProp": "Dist.cPropertyAddress"
+  },
+  "PropertyaddressDist010006": {
+    "Dist.TgtAddressProp": "Dist.cPropertyAddress"
+  },
+  "PropertyaddressDist010021": {
+    "Dist.cShowAddr": "Dist.cShowAddr"
+  },
+  "PropertyaddressDist080002": {
+    "Dist.FamilyAddressAllProp": "Dist.cFamilyAddr"
+  },
+  "PropertyaddressDist080003": {
+    "Dist.TgtAddressProp": "Dist.cPropertyAddress"
+  },
+  "PropertyaddressDist080027": {
+    "Dist.TgtAddressProp": "Dist.cPropertyAddress"
+  },
+  "PropertyaddressDist089005": {
+    "Dist.HomeAllProp": "Dist.cDetailedAddress"
+  }
+};
+
 const distSummaryRef = ref(); // 汇总组件对象
 const collectCompKey = ref(); // 汇总组件key
 const formconfig11 = ref<any>({});
+const oldPageSchema = ref<any>({});
 onMounted(async () => {
   // 初始化 cComponentTableValue
   cComponentTableValue = getCComponentTableValue();
@@ -106,6 +183,9 @@ onMounted(async () => {
       }
     })
   }
+
+console.log('dist -----',formconfig11.value)
+  
   // if(params.cProdNo === '043009'){
   //   formconfig11.value.fromSchema?.forEach(item=>{
   //     if(item['prop'] ==='Dist.cEmploymentAddress' && route.params.param?.cGrpMrk !== '1'){
@@ -115,6 +195,39 @@ onMounted(async () => {
   // }
   Object.assign(formconfig1.value, formconfig11.value);
   cardconfig.value.title = formconfig1.value.title;
+  if(formconfig1.value.distSchema&& formconfig1.value.distSchema.length > 0){
+         formconfig1.value.distSchema.forEach((item:any)=>{
+            console.log(666,item)
+            if(item['prop'] === 'cPlateNumber'){
+                item['rules'] = [getRules("vehiclePlate", {})];
+            }
+          
+      })
+    cardconfig.value.formconfig = createAppFreeEditConfig({
+      fromSchema:formconfig1.value.distSchema,
+      endBtnsPosition: "right",
+      endBtns: [
+        {
+          label: "查询",
+          type: "primary",
+          func: () => {
+						handleQuery()
+          },
+        },
+        {
+          label: "重置",
+          type: "primary",
+          func: () => {
+            cardResetFn();
+          },
+        },
+      ],
+    });
+    cardconfig.value.showEdit = true;
+
+ 
+
+  }
   tableconfig.value.showEdit = true;
   tableconfig.value.showSelection = true;
   formconfig1.value.fromSchema.forEach((e: any)=>{  // 隐藏不需要显示在表格内的数据
@@ -131,7 +244,7 @@ onMounted(async () => {
   });
   tableconfig.value.formconfig = createAppGridEditConfig({
     titleBtns: formconfig1.value.titleBtns,
-    fromSchema: formconfig1.value.distSchema,
+    // fromSchema: formconfig1.value.distSchema,
   });
   tableconfig.value.fromSchema.forEach( r => {
     if(r['prop'] === 'Dist.cVinCode'){  //调整车架号列宽
@@ -173,6 +286,14 @@ onMounted(async () => {
   if(distTableRef.value) {
     eventBus.on(`setMap-${props.compKey}`, addCodeListMap);
   }
+  // 获取页面初始化的时候获取的组件配置信息
+  if(opertaor.getFatherPage() && opertaor.getFatherPage().getOldProductResData() && opertaor.getFatherPage().getOldProductResData()[0]?.pageInfo) {
+    oldPageSchema.value = opertaor.getFatherPage().getOldProductResData()[0]?.pageInfo.find((item: any) => item.pageCode === props.compKey).pageSchema || {};
+    // 如果团个单标识为团单则展示关联被保险人，否则隐藏
+    if(route.params.param?.cGrpMrk !== '1') {
+      oldPageSchema.value.fromSchema = oldPageSchema.value.fromSchema.filter((item:any) => item.prop !== 'Dist.cRelatedInsured')
+    }
+  }
 });
 
 // const  modifyRules = (data, fieldValue)=> {
@@ -189,6 +310,17 @@ onMounted(async () => {
 //         }
 //     });
 // }  Tgt.nEngineeringCost nEngineeringCostChange
+
+function cardResetFn(){
+  console.log(cardRef.value?.getFromValue());
+	const tableEditRefs = cardRef.value;
+	const s = tableEditRefs?.getFromValue(); //获取表单数据
+	for (const k in s) {
+			s[k] = null;
+	}
+	tableEditRefs?.setFormValue({...s})
+	handleQuery()
+}
 
 // 绑定方法
 const method = {
@@ -211,8 +343,19 @@ const method = {
   },
 
   editmethod: (row: any) => {
-    if(route.params.param?.pageType === "E"){
-      ElMessage.error("请先保存申请单!");
+    let cappNo = '';
+    // 判断有无批改类型参数，有则是批单
+    if(route.params.param?.cEdrType) {
+    	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+      cappNo = edrbase['EdrBase.cAppNo'];
+    } else if(route.params.param?.pageName === "priceInquiry") {
+      cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+    } else {
+      cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+    }
+    if (!cappNo) {
+      ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
+      return;
     }else{
       dialog.value?.open(
         "distAdd",
@@ -236,6 +379,21 @@ const method = {
     
   },
   delmethod: (row: any) => {
+    let cappNo = '';
+    
+    // 判断有无批改类型参数，有则是批单
+    if(route.params.param?.cEdrType) {
+			const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+      cappNo = edrbase['EdrBase.cAppNo'];
+    } else if(route.params.param?.pageName === "priceInquiry") {
+      cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+    } else {
+      cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+    }
+    if (!cappNo) {
+      ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
+      return;
+    }
     const param = {
       cComponentTable: cComponentTableValue,
       cPkId: [row['Dist.cPkId']],
@@ -256,12 +414,12 @@ const method = {
   //  042003 根据电梯条数反
   funcdistadd: () => {
     const alldata: any = opertaor.getDataAll();
-    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
-    const param = {};
+    const param:any = {};
     if(route.params.param?.pageName === "priceInquiry") {
       param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
     } else if (route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
-      param['cAppNo'] = edrbase.getFromValue()["EdrBase.cAppNo"]
+    	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+      param['cAppNo'] = edrbase["EdrBase.cAppNo"]
     } else {
       param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
     }
@@ -295,45 +453,72 @@ const method = {
   handleQuery: (queryParams: any = { pageNum: 1, pageSize: 10 }, isChange: boolean = false) => {
     distTableRef.value?.setPartnerPage(queryParams);
     let tgtRef = opertaor.getTableRefByKey('tgt');
+		const s = cardRef.value?.getFromValue() || {};
+		// 经营地址只选择省市区不输入详细地址获取表单值会带有undefined，这里处理一下
+		for (let k in s) {
+			if(s[k] && typeof s[k] === 'string' && s[k].indexOf('undefined') !== -1) {
+				s[k] = s[k].replace('undefined', '')
+			}
+		}
     const param = opertaor.getParam();
     let app = "";
-    if (param.cOrgAppNo) {
+    if (opertaor.getDataAll().plyBase["Base.cAppNo"]) {
+      app = opertaor.getDataAll().plyBase["Base.cAppNo"];   
+    } else if(param.cOrgAppNo){
       app = param.cOrgAppNo;
-    } else if(opertaor.getDataAll().plyBase["Base.cAppNo"]){
-      app = opertaor.getDataAll().plyBase["Base.cAppNo"];
     } else {
       app = route.params.param?.cAppNo
     }
     const selData = {
-      cComponentTable: cComponentTableValue,
-      cAppNo: app,
-      ...queryParams
+      cAppNo: "",
+			cProdNo: route.params.param.cProdNo,
+			cComponentTable: cComponentTableValue,
+			...formconfig1.value,
+			...queryParams
     };
+		selData.dist = JSON.parse(JSON.stringify(s))
     if(route.params.param?.pageName === "priceInquiry") {
       selData['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+			if(!selData['cInquiryNo']){
+				return false
+			}
     } else {
       selData['cAppNo'] = app;
+			if(!selData['cAppNo']){
+				return false
+			}
     }
     if(route.params.param?.pageType && route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
       selData.voType = "ply"
     }
+		// 级联地址表格显示问题处理
+		if(Object.keys(mapAddr).includes(props.compKey)) {
+			const addrInput = mapAddr[props.compKey];
+			const keys = Object.keys(addrInput)
+			if(keys && keys.length>0) {
+				const inputGroupKey = keys[0];
+				const addrValueKey = addrInput[inputGroupKey];
+				selData.dist[addrValueKey] = selData.dist[inputGroupKey];
+			}
+		}
+		console.log('selDataselData', selData)
     selectDist(selData).then((res: any) => {
       if (res.code === 200) {
         pageresult.list = [];
         pageresult.total = res.data.total;
         pageresult.list = res.data.data.map((item, index) => {
+					let data:any = {}
+					if(!!item['Dist.cMajorCategories'] || !!item['Dist.cMediumClassification'] || !!item['Dist.cOccupationalSubcategory']){
+						data['Dist.AllOccup'] = [
+                item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
+            ]
+					}
+					if(!!item['Dist.tOpeningTime']){
+						data['tOpeningTime'] = item['Dist.tOpeningTime']? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD"): null
+					}
           return{
             ... item,
-            ... {
-              // 序号全部由后端处理
-              // 'Dist.nSeqNo': ((queryParams.pageNum - 1) * queryParams.pageSize) + index + 1,
-              tOpeningTime: item['Dist.tOpeningTime']
-                  ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
-                  : null,
-              'Dist.AllOccup': [
-                item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
-              ],
-            }
+            ... data
           };
         });
 
@@ -424,12 +609,31 @@ const method = {
   },
   //导出
   exportExcel: () => {
-
-    console.log(getTableData())
-    return false
+    let cappNo = '';
+    // 判断有无批改类型参数，有则是批单
+    if(route.params.param?.cEdrType) {
+			const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+      cappNo = edrbase['EdrBase.cAppNo'];
+    } else if(route.params.param?.pageName === "priceInquiry") {
+      cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+    } else {
+      cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+    }
+    if (!cappNo) {
+      ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
+      return;
+    }
+		const s = cardRef.value?.getFromValue(); // 查询参数
+		// 经营地址只选择省市区不输入详细地址获取表单值会带有undefined，这里处理一下
+		for (let k in s) {
+			if(s[k] && typeof s[k] === 'string' && s[k].indexOf('undefined') !== -1) {
+				s[k] = s[k].replace('undefined', '')
+			}
+		}
     let paramitem  = Object.assign(formconfig1.value, {
       cComponentTable: cComponentTableValue,
-    });
+    },
+		{ dist: s });
     if(route.params.param?.pageType && route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
       paramitem.voType = "ply"
     }
@@ -441,6 +645,23 @@ const method = {
     if(selectedRows.value.length > 0) {
       paramitem['cPkId'] = selectedRows.value.map((row: any) => row['Dist.cPkId']);
     }
+
+
+		if(paramitem.dist['Dist.ProjectDesignProp']) {
+			paramitem.dist['Dist.cProjectAddress'] = paramitem.dist['Dist.ProjectDesignProp']
+		}
+
+		// 级联地址表格显示问题处理
+		if(Object.keys(mapAddr).includes(props.compKey)) {
+			const addrInput = mapAddr[props.compKey];
+			const keys = Object.keys(addrInput)
+			if(keys && keys.length>0) {
+				const inputGroupKey = keys[0];
+				const addrValueKey = addrInput[inputGroupKey];
+				paramitem.dist[addrValueKey] = paramitem.dist[inputGroupKey];
+			}
+		}
+		console.log('paramitemparamitem', paramitem)
     policyService
         .exportDist(paramitem).then((res) => {
       if (res.size <= 0) {
@@ -457,9 +678,18 @@ const method = {
   },
   //全量导入
   importExcel() {
-    const cappNo  = route.params.param?.pageName === "priceInquiry" ? opertaor.getDataAll().plyBase["Base.cInquiryNo"] : opertaor.getDataAll().plyBase["Base.cAppNo"];
-    if (cappNo == '' || cappNo == undefined || route.params.param?.pageType === "E") {
-      ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
+    let cappNo = '';
+    // 判断有无批改类型参数，有则是批单
+    if(route.params.param?.cEdrType) {
+    	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+      cappNo = edrbase['EdrBase.cAppNo'];
+    } else if(route.params.param?.pageName === "priceInquiry") {
+      cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+    } else {
+      cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+    }
+    if (!cappNo) {
+      ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
       return;
     }
     const input = document.createElement('input');
@@ -480,7 +710,7 @@ const method = {
 
           // 构建参数并请求接口
           const params = {
-            ...formconfig1.value,
+            ...oldPageSchema.value,
             file: base64String, // ✅ 正确传入
             cComponentTable: cComponentTableValue,
           };
@@ -492,6 +722,10 @@ const method = {
           
           policyService.importDist(params).then((res) => {
             if (res.code === 200) {
+              titleInfo.value = {
+                successes: res.data.successes,
+                fails: res.data.fails,
+              };
               ElMessage.success(`导入完成：${res.data.msg}`);
               method.handleQuery();
             } else {
@@ -514,9 +748,18 @@ const method = {
   },
   // 增量导入
   importExcelIncrement: () => {
-    const cappNo  = route.params.param?.pageName === "priceInquiry" ? opertaor.getDataAll().plyBase["Base.cInquiryNo"] : opertaor.getDataAll().plyBase["Base.cAppNo"];
-    if (cappNo == '' || cappNo == undefined ||route.params.param?.pageType === "E") {
-      ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
+    let cappNo = '';
+    // 判断有无批改类型参数，有则是批单
+    if(route.params.param?.cEdrType) {
+    	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+      cappNo = edrbase['EdrBase.cAppNo'];
+    } else if(route.params.param?.pageName === "priceInquiry") {
+      cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+    } else {
+      cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+    }
+    if (!cappNo) {
+      ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
       return;
     }
     const input = document.createElement('input');
@@ -537,18 +780,21 @@ const method = {
 
           // 构建参数并请求接口
           const params = {
-            ...formconfig1.value,
+						...oldPageSchema.value,
             file: base64String, // ✅ 正确传入
             cComponentTable: cComponentTableValue,
+            cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
           };
           if(route.params.param?.pageName === "priceInquiry") {
             params['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
-          } else {
-            params['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
           }
 
           policyService.importDistIncrement(params).then((res) => {
             if (res.code === 200) {
+              titleInfo.value = {
+                successes: res.data.successes,
+                fails: res.data.fails,
+              };
               ElMessage.success(`导入完成：${res.data.msg}`);
               method.handleQuery();
             } else {
@@ -573,7 +819,7 @@ const method = {
   //全量模板下载
   downloadTemp: () => {
     const param = {
-      ...formconfig1.value,
+      ...oldPageSchema.value,
     }
     if(route.params.param?.pageName === "priceInquiry") {
       param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
@@ -645,6 +891,20 @@ const method = {
   },
   // 批量删除
   batchDelete() {
+    let cappNo = '';
+    // 判断有无批改类型参数，有则是批单
+    if(route.params.param?.cEdrType) {
+    	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+      cappNo = edrbase['EdrBase.cAppNo'];
+    } else if(route.params.param?.pageName === "priceInquiry") {
+      cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+    } else {
+      cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+    }
+    if (!cappNo) {
+      ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
+      return;
+    }
     if (selectedRows.value.length === 0) {
       ElMessage.warning("请先选择要删除的数据");
       return;
@@ -699,8 +959,10 @@ const getSummary = async () => {
   const param = {};
   if(route.params.param?.pageName === "priceInquiry") {
     param.cInquiryNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+  } else if(route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
+    param.cAppNo = route.params.param?.cOrgAppNo;
   } else {
-    param.cAppNo = route.params.param?.cAppNo
+    param.cAppNo = route.params.param?.cAppNo || opertaor.getDataAll().plyBase["Base.cAppNo"]
   }
   await policyService.getEstimatedSalesAndEstimatedSalesQuantity(param).then((res:any) => {
     if(res.code === 200) {
@@ -769,16 +1031,20 @@ function getTableData() {
 
 function setTableData(data: any) {
   pageresult.list = data.map((item: any, index: any) => {
+		let dataNew:any = {}
+		if(!!item['Dist.cMajorCategories'] || !!item['Dist.cMediumClassification'] || !!item['Dist.cOccupationalSubcategory']){
+			dataNew['Dist.AllOccup'] = [
+					item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
+			]
+		}
+		if(!!item['Dist.tOpeningTime']){
+			dataNew['tOpeningTime'] = item['Dist.tOpeningTime']? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD"): null
+		}
     return{
       ... item,
+			... dataNew,
       ... {
         nSeqNo: index + 1,
-        tOpeningTime: item['Dist.tOpeningTime']
-            ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
-            : null,
-        'Dist.AllOccup': [
-          item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
-        ],
       }
     };
   });

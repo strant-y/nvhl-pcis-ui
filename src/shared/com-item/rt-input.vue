@@ -1,10 +1,25 @@
 <template>
   <template v-if="!showLabel">
     <el-tooltip
-        :content= "(vInput !== 'undefined' && vInput !== null) ? `${vInput}` : ''"
-        :disabled = "(vInput === 'undefined' || vInput===undefined  || vInput === null || vInput === '' || vInput === '0')"
+        :disabled="!changeContent && (!vInput || vInput === 'undefined' || vInput === '' || vInput === '0' || vInput === 'null')"
         placement="top"
     >
+      <template #content>
+        <div style="display: flex;align-items: center;font-size: 13px">
+          <span v-if="changeContent">{{`${changeContent} &nbsp; 变更为 &nbsp; ${vInput}`}}</span>
+          <span v-else>{{!!vInput && vInput !== 'undefined' ? vInput : ''}}</span>
+          <el-icon
+            v-if="changeContent"
+            style="margin-left: 10px;"
+            size="17"
+            title="恢复"
+            color="orange"
+            @click="tooltipIconClick"
+          >
+            <RefreshLeft />
+          </el-icon>
+        </div>
+      </template>
       <el-input
         ref="inputRef"
         :placeholder="item.placeholder"
@@ -12,7 +27,10 @@
         :type="
           item.type === 'color' || item.type === 'number' ? 'text' : item.type
         "
-        :class="isReQuired() ? 're-quired-flag' : '' "
+        :class="[
+            ...customClass,
+            ...[isReQuired() ? 're-quired-flag' : '']
+        ]"
         :showPassword="item.showPassword"
         :rows="item.rows"
         :style="
@@ -20,7 +38,7 @@
             ? { width: 'calc(100% - 32px)' }
             : item.type === 'icon'
               ? { width: 'calc(100% - 48px)' }
-              : { width: '100%' }
+              : { width: '100%', minWidth: item.minWidth || '100px' }
         "
         :maxlength="item.maxlength"
         :minlength="item.minlength"
@@ -139,7 +157,20 @@
       <rt-icon :item="{ icon: vInput }" />
     </template>
     <template v-else>
-      {{ vInput }}
+       <!-- 添加图标显示 -->
+    <el-icon v-if="item.prefixIcon" >
+      <component :is="renderIcon(item.prefixIcon)" />
+    </el-icon>
+       <span v-if="item.prefix">{{ item.prefix }}</span>
+        {{vInput !== 'undefined' ? vInput : ''}}
+      <!-- 添加复制图标 -->
+    <el-icon
+        v-if="item.showCopyIcon"
+        style="margin-left: 5px; cursor: pointer; color: #409eff;"
+        @click="copyToClipboard(vInput)"
+    >
+      <CopyDocument />
+    </el-icon>
     </template>
   </span>
 </template>
@@ -191,6 +222,8 @@ function isReQuired(){
 }
 const emits = defineEmits(["update:modelValue", "valueChange"]); // 父组件监听事件，同步子组件值的变化给父组件
 const vInput = ref<string | Number | undefined>();
+const customClass = ref<string[]>([]);
+const changeContent = ref<string | undefined>();
 watch([() => props.modelValue], ([newModelValue]) => {
   let n = null;
   if (props.item.type === "number") {
@@ -251,4 +284,77 @@ const renderIcon = (iconName: string) => {
   }
   return null;
 };
+function setCustomClass(classs: string[]) {
+  customClass.value = classs;
+}
+function setChangeInfo(content: any) {
+    changeContent.value = content ? content.text : undefined;
+}
+function tooltipIconClick() {
+  const text = changeContent.value;
+  changeContent.value = undefined;
+  vInput.value = undefined;
+  nextTick(() => {
+    handleChange(text);
+  })
+}
+
+// 复制到剪贴板方法
+function copyToClipboard(text:any) {
+  if (!text) {
+    // 如果文本为空，给出提示
+    alert('没有可复制的内容');
+    return;
+  }
+
+  try {
+    // 使用 Clipboard API（现代浏览器）
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => {
+        ElMessage.success('复制成功');
+      }).catch(() => {
+        // 如果 Clipboard API 失败，使用备选方案
+        fallbackCopyTextToClipboard(text);
+      });
+    } else {
+      // 旧版浏览器使用备选方案
+      fallbackCopyTextToClipboard(text);
+    }
+  } catch (error) {
+    ElMessage.error('复制失败');
+  }
+}
+
+// 备选复制方法
+function fallbackCopyTextToClipboard(text:any) {
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+
+  // 避免滚动到底部
+  textArea.style.top = "0";
+  textArea.style.left = "0";
+  textArea.style.position = "fixed";
+  textArea.style.opacity = "0";
+
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+
+  try {
+    const successful = document.execCommand('copy');
+    if (successful) {
+      ElMessage.success('复制成功');
+    } else {
+      ElMessage.error('复制失败');
+    }
+  } catch (err) {
+    ElMessage.error('复制失败');
+  }
+
+  document.body.removeChild(textArea);
+}
+defineExpose({
+  setCustomClass,
+  setChangeInfo
+});
 </script>

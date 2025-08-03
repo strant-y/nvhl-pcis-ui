@@ -38,11 +38,11 @@ const props = defineProps({
     required: false,
   },
 });
-
+import {FormPage} from "@/views/protocolManagement/utils/form-page";
 const rttableFrom = ref<any>(null);
 
 const idxParam = inject('idxParam');
-const formPage = idxParam?.formPage;
+const formPage: FormPage = idxParam?.formPage;
 
 const cardconfig = ref(creatCardConfig({}));
 const moveUpTimer = ref(null);
@@ -57,7 +57,7 @@ const pageresult = reactive<Pageresult>({
 
 const tableconfig = reactive<AppTableConfig>(
     createTableEditConfig({
-      // title: "特约信息",
+      title: "特约信息",
       tableBtnType: "btn",
       tableBtnWidth: 220,
       tableBtnPosition: "right",
@@ -88,13 +88,22 @@ const tableconfig = reactive<AppTableConfig>(
           size: "large",
           icon: "Delete",
           tableClick: (row) => {
-            const list = formData.value;
-            const i = list.findIndex((item) => item.cSpecNo === row.cSpecNo);
-            rttableFrom.value.delRow(row._dataId);
-            // if (i !== -1) list.splice(i, 1);
-            formData.value.forEach((item, index) => {
-              item.index = index + 1;
-            });
+            ElMessageBox.confirm("此操作将删除该特约, 是否继续?", "提示", {
+              confirmButtonText: "确定",
+              cancelButtonText: "取消",
+              type: "warning",
+            }).then(() => {
+                  const list = formData.value;
+                  const i = list.findIndex((item) => item.cSpecNo === row.cSpecNo);
+                  rttableFrom.value.delRow(row._dataId);
+                  // if (i !== -1) list.splice(i, 1);
+                  formData.value.forEach((item, index) => {
+                    item.index = index + 1;
+                  });
+                })
+                .catch(() => {
+                  // 取消删除
+              });
           },
         }),
         createFreeButtonBase({
@@ -204,11 +213,16 @@ const method = {
   },
   //获取特约按钮
   getSpecialAgree: () => {
+    const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
+    if(!agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo')){
+      return ElMessage.warning('请先保存');
+    }
     dialog.value?.open(
         "prdFixSpec",
         {
-          cProdNo: null,
+          cProdNo: '029900',
           selectedData: formData.value, //需要把自定义的过滤掉，只传过去从模板中选择的
+          cDptCde:agreementBaseRef.getValue('ECargoBase.cDptCde') || ''
         },
         {
           getSelected(selectdata: any) {
@@ -303,14 +317,21 @@ function handleQuery(flag?: boolean) {
   //   .finally(() => {});
 }
 
-function validate() {}
+function validate() {
+  return new Promise(resolve => {
+    if(!formData.value || formData.value.length === 0) {
+      resolve(false);
+    }
+    resolve(true);
+  })
+}
 
 function getFormValue() {
   return formData.value.map((item) => {
     const prefixedItem: { [key: string]: any } = {};
     for (const key in item) {
       if (item.hasOwnProperty(key)) {
-        prefixedItem[`SpecialAgreement.${key}`] = item[key];
+        prefixedItem[`ECargoSpecialAgreement.${key}`] = item[key];
       }
     }
     return prefixedItem;
@@ -324,7 +345,7 @@ function setFormValue(value: any) {
     let ind = 1;
     value.forEach(e => {
       Object.keys(e).forEach(key => {
-        const newKey = key.replace('SpecialAgreement.', '');
+        const newKey = key.replace('ECargoSpecialAgreement.', '');
         const v = e[key];
         delete e[key];
         e[newKey] = v;
@@ -344,7 +365,9 @@ function getFormBtn() {
   }
   return r.value;
 }
-
+function getFormConfig(){
+  return tableconfig;
+}
 function setDisabledAll(isDisabled: boolean, noSet: string[] = []) {
   const tableBtn = tableconfig.tableBtn;
   if(tableBtn && tableBtn.length > 0) {
@@ -368,7 +391,8 @@ defineExpose({
   setFormValue,
   validate,
   getFormBtn,
-  setDisabledAll
+  setDisabledAll,
+  getFormConfig
 });
 </script>
 

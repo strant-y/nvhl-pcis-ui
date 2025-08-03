@@ -1,29 +1,39 @@
 <template>
-  <el-input-number
-    v-if="!showLabel"
-    ref="inputNumberRef"
-    v-model="vInput"
-    :class="isReQuired() ? 're-quired-flag' : ''"
-    :readonly="isReadonly()"
-    :placeholder="item.placeholder"
-    :disabled="isDisabled()"
-    :min="item.min!=null && item.min !=undefined ?  item.min : 0"
-    :max="item.max!=null && item.max !=undefined ?  item.max : 99999999999999999999"
-    :step="item.step"
-    :step-strictly="item.stepStrictly"
-    :size="item.size"
-    :precision="item.precision"
-    :controls="item.controls ? item.controls : false"
-    controls-position="right"
-    @change="handleChange"
-  >
-    <template #prefix v-if="item.prefix">
-      <span>{{ item.prefix }}</span>
-    </template>
-    <template #suffix v-if="item.suffix">
-      <span>{{ item.suffix }}</span>
-    </template>
-  </el-input-number>
+  <template v-if="!showLabel">
+    <el-tooltip
+        :content="changeContent"
+        :disabled="!changeContent"
+        placement="top"
+    >
+      <el-input-number
+          ref="inputNumberRef"
+          v-model="vInput"
+          :class="[
+          ...customClass,
+          ...[isReQuired() ? 're-quired-flag' : '']
+      ]"
+          :readonly="isReadonly()"
+          :placeholder="item.placeholder"
+          :disabled="isDisabled()"
+          :min="item.min!=null && item.min !=undefined ?  item.min : 0"
+          :max="item.max!=null && item.max !=undefined ?  item.max : 99999999999999999999"
+          :step="item.step"
+          :step-strictly="item.stepStrictly"
+          :size="item.size"
+          :precision="item.precision"
+          :controls="item.controls ? item.controls : false"
+          controls-position="right"
+          @change="handleChange"
+      >
+        <template #prefix v-if="item.prefix">
+          <span>{{ item.prefix }}</span>
+        </template>
+        <template #suffix v-if="item.suffix">
+          <span>{{ item.suffix }}</span>
+        </template>
+      </el-input-number>
+    </el-tooltip>
+  </template>
   <span v-else>
     {{
       (item.prefix ? item.prefix : "") +
@@ -58,7 +68,8 @@ const props = defineProps({
     required: false,
   },
 });
-
+const customClass = ref<string[]>([]);
+const changeContent = ref<string | undefined>();
 const vInput = ref<number | undefined>();
 watch([() => props.modelValue], ([newModelValue]) => {
   vInput.value = newModelValue !== null && newModelValue != undefined ? Number(newModelValue) : undefined;
@@ -117,7 +128,20 @@ onMounted(() => {
   vInput.value = props.modelValue ? Number(props.modelValue) : undefined;
 });
 
-onMounted(() => {});
+function setCustomClass(classs: string[]) {
+  customClass.value = classs;
+}
+function setChangeInfo(content: any) {
+  if(content) {
+    changeContent.value = (content.text ? content.text : '') + ' 变更为 ' + vInput.value;
+  }else {
+    changeContent.value = undefined;
+  }
+}
+defineExpose({
+  setCustomClass,
+  setChangeInfo
+});
 </script>
 
 <style scoped>

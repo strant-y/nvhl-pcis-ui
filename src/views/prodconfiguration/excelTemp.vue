@@ -33,10 +33,10 @@ import {
 import { useRoute } from "vue-router";
 import { ref, reactive, onMounted } from "vue";
 import { inputtype } from "@/utils/utilKey";
-
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
 const route = useRoute();
 const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
 
 const { getRules } = useValidator();
 
@@ -251,7 +251,7 @@ function handleQuery(flag?: boolean) {
     .then((res) => {
       // const { code, data, msg } = res;
       if (res.code == "200") {
-        debugger;
+        // debugger;
         pageresult.list = res.data.result;
         pageresult.total = res.data.total;
       } else {

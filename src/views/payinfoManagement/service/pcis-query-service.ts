@@ -309,14 +309,14 @@ export class PcisQueryService {
     }
 
     /**
-     * 获取最新投保单号
+     * 获取最新申请单号
      */
     getLastAppNo(param) {
         return post('smartbi/getLastAppNo', { source: JSON.stringify(param) });
     }
 
     /**
-     * 获取原始投保单号
+     * 获取原始申请单号
      */
     getOldAppNo(param) {
         return post('smartbi/getOldAppNo', { source: JSON.stringify(param) });
@@ -672,4 +672,24 @@ export class PcisQueryService {
     getTaskUrl(ops: any): AxiosPromise<any> {
         return post(`risk/getTaskUrl`, ops);
     }
+		/**
+		 * 协议号查询
+		 */
+		queryEcargoRelevancePolicy(ops: any): AxiosPromise<any> {
+			return post(`/ecargo/queryEcargoRelevancePolicy`, ops);
+		}
+		/**
+		 * 产品代码查询
+		 */
+		queryEcargoRelevancePolicyTermProd(ops: any): AxiosPromise<any> {
+			return post(`ecargo/queryEcargoRelevancePolicyTermProd`, ops);
+		}
+		/**
+		 * 被保人查询
+		 */
+		queryEcargoRelevancePolicyInsured(ops: any): AxiosPromise<any> {
+			return post(`ecargo/queryEcargoRelevancePolicyInsured`, ops);
+		}
+	
+	
 }

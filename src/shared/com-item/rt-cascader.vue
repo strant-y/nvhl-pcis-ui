@@ -1,30 +1,41 @@
 <!-- 多级的级联选择器，如省市区 -->
 <template>
   <!-- 下拉选择框-->
-  <div class="cascader_" v-show="!props.showLabel">
-    <el-cascader
-      ref="cascaderRef"
-      v-model="selectedValue"
-      class="cascader_"
-      :class="isReQuired() ? 're-quired-flag' : ''"
-      :props="cascprops"
-      :placeholder="item.placeholder ? item.placeholder : '请选择'"
-      :options="options"
-      :show-all-levels="false"
-      :disabled="isReadonly() || isDisabled() || showLabel"
-      :clearable="isClearable()"
-      :size="item.size"
-      :filterable="item.filterable"
-      :showAllLevels="item.showAllLevels"
-      :multiple="isMultiple()"
-      @change="handleChange"
-    >
-      <template #empty>
-        {{ "暂无数据" }}
-      </template>
-    </el-cascader>
-  </div>
-
+  <el-tooltip
+      :content="changeContent"
+      :disabled="!changeContent"
+      placement="top"
+  >
+    <div class="cascader_" v-show="!props.showLabel">
+      <el-cascader
+        ref="cascaderRef"
+        v-model="selectedValue"
+        :class="[
+          'cascader_',
+          ...customClass,
+          ...[isReQuired() ? 're-quired-flag' : '']
+        ]"
+        :props="cascprops"
+        :placeholder="item.placeholder ? item.placeholder : '请选择'"
+        :options="options"
+        :show-all-levels="false"
+        :disabled="isReadonly() || isDisabled() || showLabel"
+        :clearable="isClearable()"
+        :size="item.size"
+        :filterable="item.filterable"
+        :showAllLevels="item.showAllLevels"
+        :multiple="isMultiple()"
+        @change="handleChange"
+      >
+        <template #empty>
+          {{ "暂无数据" }}
+        </template>
+        <template #default="{ node, data }">
+          <span :style="{'font-weight': data.value === 'FZ' ? 'bold' : 'normal'}">{{ data.label }}</span>
+        </template>
+      </el-cascader>
+    </div>
+  </el-tooltip>
   <div v-if="props.showLabel">
     <span>{{ displayText }}</span>
   </div>
@@ -79,6 +90,10 @@ const selectedValue = ref<string | number | Array<any> | undefined>();
 
 const displayText = computed(() => cascaderRef.value?.presentText);
 
+const customClass = ref<string[]>([]);
+
+const changeContent = ref<string | undefined>();
+
 const cascprops: CascaderProps = {
   lazy: true,
   checkStrictly: props.item.checkStrictly
@@ -97,17 +112,25 @@ const cascprops: CascaderProps = {
         return;
       }
       const codeListParam = {};
+      let codeListName = props.item.typeCode; // 默认使用配置的typeCode
       // 批改原因级联
-      if(props.item.typeCode === "EDR_RSN_LIST_NEW") {
+      if(props.item.typeCode === "EDR_RSN_LIST_NEW" || props.item.typeCode ==='EDR_RSN_LIST_YY' || props.item.typeCode ==='EDR_RSN_LIST_AY') {
         codeListParam.rsnTyp = value.split('-')[0]
         codeListParam.kindNo = value.split('-')[1]
+        if (props.row && props.row.cProdNo) {
+          codeListParam.prodNo = props.row.cProdNo;
+        }
+        if(codeListParam.rsnTyp == '2' || codeListParam.rsnTyp == '3'){
+          codeListName = "EDR_RSN_LIST_CANCEL";
+        }
       } else {
         codeListParam.cParCde = value
       }
       codeListStore
         .queryCodeList(
           {
-            codeListName: props.item.typeCode,
+            // codeListName: props.item.typeCode,
+            codeListName: codeListName,
             codeListParam: codeListParam,
           },
           props.unAuthor,
@@ -118,7 +141,7 @@ const cascprops: CascaderProps = {
             typeof props.item.cascaderprops === "string"
               ? JSON.parse(props.item.cascaderprops)
               : props.item.cascaderprops;
-          if(props.item.typeCode === "EDR_RSN_LIST_NEW") {
+          if(props.item.typeCode === "EDR_RSN_LIST_NEW" || props.item.typeCode ==='EDR_RSN_LIST_YY' ||  props.item.typeCode ==='EDR_RSN_LIST_AY') {
             res.forEach((e: any) => {
               e.leaf = level >= 1;
             });
@@ -306,10 +329,24 @@ function getParam() {
 function getTextValue() {
   return displayText.value;
 }
+function setCustomClass(classs: string[]) {
+  customClass.value = classs;
+}
+function setChangeInfo(content: any) {
+  if(content) {
+    let text = content.text;
+    // TODO 将content.text code值翻译为label
+    changeContent.value = (text ? text : '') + ' 变更为 ' +  getTextValue();
+  }else {
+    changeContent.value = undefined;
+  }
+}
 
 defineExpose({
   updateOption,
-  getTextValue
+  getTextValue,
+  setCustomClass,
+  setChangeInfo
 });
 </script>
 <style lang="scss">

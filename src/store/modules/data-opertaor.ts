@@ -182,11 +182,14 @@ export const dataOpertaor = (pageKey?: string) => {
                                         conf.fromSchema.forEach(f => {
                                             if (f.prop === item) {
                                                 if (f.inputtype === 'rtinputgroup') {
-                                                console.log(f.inputtype);
                                                 f.groupList.forEach((gkey: any) => {
                                                     gkey.disabled = false;
                                                 });
-                                                }else {
+                                                }else if(f.btnItems){
+                                                    f.btnItems.disabled = false;
+                                                }
+                                                else{
+                                                    console.log(f);
                                                     f.disabled = false;
                                                 }
                                             }

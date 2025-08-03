@@ -29,7 +29,7 @@ const props = defineProps({
     type: [Object],
   },
 });
-const { getCUndrMrk, getBackClsList, queryRiskCodelist, riskQueryData } = NewUdrListService();
+const { getCUndrMrk, getBackClsList, queryRiskCodelist, riskQueryData, riskQueryDataXJ, queryRiskCodelistXJ } = NewUdrListService();
 const undrOpnMap = {
   "0": "经过审核，同意承保该业务。",
   "1": "经过审核，该业务缺少如下必要信息，请补充后再提交：",
@@ -51,6 +51,10 @@ const cUndrMrkOptions = ref([])
 const riskunitDisabledFlag = ref(false)
 const riskunitDisabled = computed(() => {
   return cProdNoMap.indexOf(params.cProdNo) != -1 || params.cAppTyp === "E" || riskunitDisabledFlag.value
+})
+const checkboxDisabledFlag = ref(false)
+const riFacMrkDisabled = computed(() => {
+  return params.cAppTyp === "E" || checkboxDisabledFlag.value
 })
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -77,9 +81,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 // 如果是多险位，则不能进行自主临分
                 if(res.body.tableList && res.body.tableList.lengt > 1) {
                   setFormItem("riFacMrk", {
-                    disabled: true,
                     btnItems: {disabled: true}
                   });
+                  checkboxDisabledFlag.value = true
                 }
               }
             });
@@ -97,7 +101,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
         defaultValue: "0",
         rules: [getRules("required", {})],
-        disabled: params.cAppTyp === "E", // 批单不允许进行自主临分
+        disabled: riFacMrkDisabled, // 批单不允许进行自主临分
         func: (val: any) => {
           if (val == "1") {
             // 勾选临分时，临分意见必填
@@ -122,7 +126,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           label: "自主临分提交",
           type: "primary",
           disabled: true, // 批单不允许进行自主临分
-          func: () => {
+          func: async () => {
             const param = {
               cDocTyp: params.cAppTyp, // 单证类型 A 保单 E 批单
               cAppNo: params.cAppNo, // 保批单申请单号
@@ -143,36 +147,30 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             if(params.cProdNo === "010001" || params.cProdNo === "010002" || params.cProdNo === "010003" || params.cProdNo === "010007") {
               param.cDductDesc = props.pageData?.deductibleDist && props.pageData?.deductibleDist[0] ? props.pageData?.deductibleDist[0]["DeductibleDist.cDeductibleContent"] : ""; // 免赔约定
             }
-            policyService
-              .checkLiberty(param)
-              .then((res: any) => {
-                if (res.code === '1') {
-                  ElMessage.success("自主临分提交成功");
-                  // 自主临分成功后，是否临分、风险单位划分不可编辑，不能核保退回
-                  setFormItem("riFacMrk", {
-                    disabled: true,
-                    btnItems: {disabled: true}
-                  });
-                  riskunitDisabledFlag.value = true
-                  setFormItem("cUndrMrk",{ loadData: cUndrMrkOptions.value.filter((item:any) => item.value != "B" && item.value != "T") })
-                  setValue("cUndrMrk", "")
-                } else if(res.code === '2') {
-                  ElMessage.error("满足强制临分，不能自主临分");
-                  // 满足强制临分，不能自主临分
-                  setFormItem("riFacMrk", {
-                    disabled: true,
-                    btnItems: {disabled: true}
-                  });
-                  riskunitDisabledFlag.value = true
-                  setFormItem("cUndrMrk",{ loadData: cUndrMrkOptions.value.filter((item:any) => item.value != "B" && item.value != "T") })
-                  setValue("cUndrMrk", "")
-                } else {
-                  ElMessage.error(res.message);
-                }
-              })
-              .catch((error: any) => {
-                ElMessage.error(error);
+            const checkLibertyInfo = params.pageName === "priceInquiry" ? await policyService.checkLibertyXJ(param) : await policyService.checkLiberty(param);
+            if(checkLibertyInfo && checkLibertyInfo.code === '1') {
+              ElMessage.success("自主临分提交成功");
+              // 自主临分成功后，是否临分、风险单位划分不可编辑，不能核保退回
+              setFormItem("riFacMrk", {
+                btnItems: {disabled: true}
               });
+              checkboxDisabledFlag.value = true
+              riskunitDisabledFlag.value = true
+              setFormItem("cUndrMrk",{ loadData: cUndrMrkOptions.value.filter((item:any) => item.value != "B" && item.value != "T") })
+              setValue("cUndrMrk", "")
+            } else if(checkLibertyInfo && checkLibertyInfo.code === '2') {
+              ElMessage.error("满足强制临分，不能自主临分");
+              // 满足强制临分，不能自主临分
+              setFormItem("riFacMrk", {
+                btnItems: {disabled: true}
+              });
+              checkboxDisabledFlag.value = true
+              riskunitDisabledFlag.value = true
+              setFormItem("cUndrMrk",{ loadData: cUndrMrkOptions.value.filter((item:any) => item.value != "B" && item.value != "T") })
+              setValue("cUndrMrk", "")
+            } else {
+              ElMessage.error(checkLibertyInfo.message);
+            }
           },
         },
       },
@@ -215,9 +213,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         func: (val: any) => {
           if (val === "1") {
             setFormItem("riFacMrk", {
-              disabled: true,
               btnItems: {disabled: true}
             });
+            checkboxDisabledFlag.value = true
             if (!bzFlag.value) {
               ElMessageBox.confirm(
                 "该业务认定为非水险比例分保合同除外业务，是否查看该险种合同除外责任并进一步确认。",
@@ -248,71 +246,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           },
         },
       },
-      {
-        prop: "cUndrOpnList",
-        inputtype: "rtselect",
-        title: "核保意见选项",
-        loadData: [
-          { label: "审核通过", value: "0" },
-          { label: "缺少必要信息", value: "1" },
-          { label: "修改承保条件", value: "2" },
-          { label: "费用超标", value: "3" },
-          { label: "拒绝承保", value: "4" },
-          { label: "提交上级", value: "5" },
-        ],
-        rules: [getRules("required", {})],
-        itemWidth: 1,
-        valueSpan: 10,
-        clearable: true,
-        func: (val: any) => {
-          const data = val ? undrOpnMap[val] : "";
-          underwriteEditRef.value?.setValue("undrOpn", data);
-        },
-      },
-      {
-        prop: "undrOpn",
-        inputtype: "rtinput",
-        type: "textarea",
-        title: "核保意见",
-        rows: 3,
-        itemWidth: 2,
-      },
-      {
-        prop: "cRpt",
-        inputtype: "rtselect",
-        title: "关联交易确认",
-        rules: [{ type: "required" }],
-        loadData: [
-          { value: "1", label: "是" },
-          { value: "2", label: "否" },
-        ],
-        clearable: true,
-      },
-      {
-        prop: "cIsRiskExp",
-        inputtype: "rtselect",
-        title: "是否需要风险查勘",
-        rules: [{ type: "required" }],
-        loadData: [
-          { value: "1", label: "是" },
-          { value: "2", label: "否" },
-        ],
-        clearable: true,
-        func: (val:any) => {
-          if(val === "1") {
-            setFormItem("cUndrMrk", {
-              loadData: [{value: 'B', label: '退回给出单员'}],
-            });
-            setValue("cUndrMrk", "B");
-          } else {
-            setFormItem("cUndrMrk", {
-              loadData: cUndrMrkOptions.value,
-            });
-            setValue("cUndrMrk", "");
-          }
-        }
-      },
-      {
+            {
         prop: "cUndrMrk",
         inputtype: "rtselect",
         title: "核保选项",
@@ -389,6 +323,101 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           }
         },
       },
+      {
+        prop: "cUndrOpnList",
+        inputtype: "rtselect",
+        title: "核保意见选项",
+        loadData: [
+          { label: "审核通过", value: "0" },
+          { label: "缺少必要信息", value: "1" },
+          { label: "修改承保条件", value: "2" },
+          { label: "费用超标", value: "3" },
+          { label: "拒绝承保", value: "4" },
+          { label: "提交上级", value: "5" },
+        ],
+        rules: [getRules("required", {})],
+        itemWidth: 1,
+        valueSpan: 10,
+        clearable: true,
+        func: (val: any) => {
+          const data = val ? undrOpnMap[val] : "";
+          underwriteEditRef.value?.setValue("undrOpn", data);
+        },
+      },
+      {
+        prop: "undrOpn",
+        inputtype: "rtinput",
+        type: "textarea",
+        title: "核保意见",
+        rows: 3,
+        itemWidth: 2,
+      },
+      {
+        prop: "cRpt",
+        inputtype: "rtselect",
+        title: "关联交易确认",
+        rules: [{ type: "required" }],
+         itemWidth: 1,
+        loadData: [
+          { value: "1", label: "是" },
+          { value: "2", label: "否" },
+        ],
+        clearable: true,
+        func:(val:any)=>{
+            if(val ==='1'){
+                setFormItem("cRelateNo",{ hidden: false})
+                setFormItem("cUploadSign",{ hidden: false})
+            }else{
+                setFormItem("cRelateNo",{ hidden: true})
+                setFormItem("cUploadSign",{ hidden: true})
+            }
+        }
+      },
+
+      {
+        prop: "cRelateNo",
+        inputtype: "rtinput",
+        title: "关联交易审批单编号",
+        hidden: true,
+         itemWidth: 0.5,
+      },
+      {
+        prop: "cUploadSign",
+        inputtype: "rtcheckbox",
+        title: "是否上传关联交易审批单",
+         itemWidth: 0.5,
+         hidden: true,
+        keymap: {
+          y: "1",
+          n: "2",
+        },
+      },
+
+      {
+        prop: "cIsRiskExp",
+        inputtype: "rtselect",
+        title: "是否需要风险查勘",
+        rules: [{ type: "required" }],
+        loadData: [
+          { value: "1", label: "是" },
+          { value: "2", label: "否" },
+        ],
+        clearable: true,
+        func: (val:any) => {
+          if(val === "1") {
+            setFormItem("cUndrMrk", {
+              loadData: [{value: 'B', label: '退回给出单员'}],
+            });
+            setValue("cUndrMrk", "B");
+          } else {
+            setFormItem("cUndrMrk", {
+              loadData: cUndrMrkOptions.value,
+            });
+            setValue("cUndrMrk", "");
+          }
+        }
+      },
+
       {
         prop: "cBckOp",
         inputtype: "rtselect",
@@ -483,20 +512,33 @@ function showContRiskInfo(text: any) {
     },
   });
 }
+
+watch(
+  () => props.pageData,
+  (newVal) => {
+    // 触发自主临分之后  不能做风险单位划分  可以做核保通过 核保退回需要再保部确认
+    // 触发强制临分之后   不能做风险单位划分  核保通过时得再保部确认才能核保通过 核保退回需要再保部确认
+    if(props.pageData?.plyBase) {
+      if(props.pageData?.plyBase['Base.cRiFacMrk'] == "1" || props.pageData?.plyBase['Base.cRiFacMrk'] == "2") {// 1 自主临分 2 强制临分 3 不需要临分
+        riskunitDisabledFlag.value = true
+        checkboxDisabledFlag.value = true
+        setFormItem("riFacMrk", {
+          btnItems: {disabled: true}
+        });
+      }
+    }
+  },
+  {
+    deep: true,
+  }
+);
+
 onMounted(() => {
   nextTick(() => {
     console.log(cUndrMrkOptions)
     setValue("cIsRiskExp", "2");
     // Base.cRiFacMrk
     setValue("riFacMrk", "0")
-    // 触发自主临分之后  不能做风险单位划分 不能做核保退回  可以做核保通过
-    // 触发强制临分之后   不能做风险单位划分 不能做核保退回  核保通过时得再保部确认才能核保通过
-    if(props.pageData?.plyBase) {
-      if(props.pageData?.plyBase['Base.cRiFacMrk'] == "1" || props.pageData?.plyBase['Base.cRiFacMrk'] == "2") {// 1 自主临分 2 强制临分 3 不需要临分
-        riskunitDisabledFlag.value = true
-        setFormItem("cUndrMrk",{ loadData: cUndrMrkOptions.value.filter((item:any) => item.value != "B" && item.value != "T") })
-      }
-    }
     const param = {
       cProdNo: params.cProdNo,
       opCde: user.opCde,
@@ -569,33 +611,35 @@ function loadUwTabData() {
   }
 }
 
-function queryRiskCodelistFn() {
-  queryRiskCodelist({ cProdNo: params.cProdNo })
-    .then((res: any) => {
-      if (res.code === '200') {
-        contRiskInfo.value = res.data?.cResv1 || null;
-      } else {
-        // ElMessage.error(res.msg || res.message);
-      }
-    })
-    .catch((error: any) => {
-      // ElMessage.error(error);
-    });
+async function queryRiskCodelistFn() {
+  const queryRiskCodelistInfo = params.pageName === "priceInquiry" ? await queryRiskCodelistXJ({ cProdNo: params.cProdNo }) : await queryRiskCodelist({ cProdNo: params.cProdNo })
+  if(queryRiskCodelistInfo && queryRiskCodelistInfo.code === "200") {
+    contRiskInfo.value = queryRiskCodelistInfo.data?.cResv1 || null;
+  }
 }
 
 // 获取风险单位划分列表数据
-function getRiskData() {
-  riskQueryData({ cAppNo: params.cAppNo })
-    .then((res: any) => {
-      if (res.code === "200") {
-        if(res.data && res.data.length > 1) {
-          setFormItem("riFacMrk", {
-            disabled: true,
-            btnItems: {disabled: true}
-          });
-        }
-      }
-    })
+async function getRiskData() {
+  const riskQueryInfo = params.pageName === "priceInquiry" ? await riskQueryDataXJ({ cAppNo: params.cAppNo }) : await riskQueryData({ cAppNo: params.cAppNo })
+  if(riskQueryInfo && riskQueryInfo.code === "200") {
+    if(riskQueryInfo.data && riskQueryInfo.data.length > 1) {
+      setFormItem("riFacMrk", {
+        btnItems: {disabled: true}
+      });
+      checkboxDisabledFlag.value = true
+    }
+  }
+}
+
+function setRiskunitDisabled() {
+  // 风险单位划分按钮置灰
+  riskunitDisabledFlag.value = true
+  // 自主临分按钮置灰
+  setFormItem("riFacMrk", {
+    btnItems: {disabled: true},
+  });
+  // 是否临分复选框置灰
+  checkboxDisabledFlag.value = true
 }
 
 defineExpose({
@@ -604,6 +648,7 @@ defineExpose({
   validate,
   setValue,
   getValue,
+  setRiskunitDisabled,
 });
 </script>
 <style lang="scss" scoped>

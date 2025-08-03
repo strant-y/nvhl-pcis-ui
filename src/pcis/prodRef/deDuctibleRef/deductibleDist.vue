@@ -96,6 +96,7 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtnWidth: 220,
     tableBtnPosition: "right",
     align: "left",
+    fixed: true,
     tableBtn: [
       createFreeButtonBase({
         id: "score",
@@ -108,17 +109,13 @@ const tableconfig = reactive<AppTableConfig>(
           return row.cIfEdit !== '1';
         },
         tableClick: (row) => {
-          console.log(11,row)
           let param = {};
           if(row['cIfMust'] !== '9') {               // cDeductibleContent
-            let rid = row.cDeductibleCode|| row.cDeductibleClass
+            let rid = row.cDeductibleCode || row.cDeductibleClass
             const f = originalData.value.find(f => rid === f.cDeductibleClass);
             Object.assign(param, f);
-            console.log(1,f)
-            console.log(1,originalData.value)
           }else {
             Object.assign(param, row)
-              console.log(2)
           }
 
           if(row.editList && row.editList.length>0){
@@ -131,18 +128,15 @@ const tableconfig = reactive<AppTableConfig>(
             data: param, 
             callback: (res: any) => {
               if (res.type === "ok") {
-                // row.cDeductibleContent = res.data.cDeductibleContent
-                // row['editList']= res.data['editList']
-
                  let list = formData.value;
                  const index = list.findIndex(
-                    item => item.cDeductibleClass === row.cDeductibleClass
+                    item => item._dataId === row._dataId
                   );
                   if (index !== -1) {
                     nextTick(()=>{
                       list[index]['cDeductibleContent'] = res.data.cDeductibleContent;
                       list[index]['editList'] =res.data['editList']
-                      formData.value = list
+                      formData.value = list;
                     })
                   }      
 
@@ -158,14 +152,27 @@ const tableconfig = reactive<AppTableConfig>(
         type: "danger",
         size: "large",
         icon: "Delete",
-        tableClick: (row) => {
-          const list = formData.value;
-          const i = list.findIndex((item) => item.cSpecNo === row.cSpecNo);
-          rttableFrom.value.delRow(row._dataId);
-          // if (i !== -1) list.splice(i, 1);
-          formData.value.forEach((item, index) => {
-            item.nSeqNo = index + 1;
+        tableClick: (row) => { 
+    
+              ElMessageBox.confirm(
+            "是否确认删除数据？",
+            "提示",
+            {
+              confirmButtonText: "确定",
+              cancelButtonText: "取消",
+              type: "warning",
+            }
+          ).then(() => {
+            const list = formData.value;
+            const i = list.findIndex((item) => item.cSpecNo === row.cSpecNo);
+            rttableFrom.value.delRow(row._dataId);
+            formData.value.forEach((item, index) => {
+              item.nSeqNo = index + 1;
+            });
+ 
           });
+
+
         },
       }),
       createFreeButtonBase({
@@ -203,13 +210,13 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "nSeqNo",
         inputtype: "rtinput",
         title: "序号",
-        width: 100,
+        width: 55,
       },
       {
         prop: "cIfMust",
         inputtype: "rttag",
         title: "是否可选",
-        width: 110,
+        width: 85,
         loadData: [
           {
             label: "可选",
@@ -225,13 +232,13 @@ const tableconfig = reactive<AppTableConfig>(
           },
         ],
       },
-      {
-        prop: "cDeductibleClass",
-        // prop: "cDeductibleCode",
-        inputtype: "rtinput",
-        title: "免赔条件ID",
-        width: 180,
-      },
+      // {
+      //   prop: "cDeductibleClass",
+      //   // prop: "cDeductibleCode",
+      //   inputtype: "rtinput",
+      //   title: "免赔条件ID",
+      //   width: 180,
+      // },
       {
         prop: "cDeductibleContent",
         inputtype: "rtinput",
@@ -250,9 +257,7 @@ const initOriginalData = ()=> {
     pageNum: 1,
     pageSize: 999,
   }
-  console.log(332,)
   getPrdDeductible(param).then((res) => {
-    console.log(12312,res)
     if (res.data.result) {
       pageresult.list = [];
       originalData.value = res.data.result.map((item: any) => {
@@ -383,7 +388,6 @@ function setFormValue(value: any) {
       })
     });
   }
-  rttableFrom?.value?.setFormValue(value);
   // Object.assign(formData.value, value);
   formData.value = value;
 }

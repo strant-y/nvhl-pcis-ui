@@ -235,6 +235,9 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "c_father_key",
         inputtype: "rtinput",
         title: "父级key",
+        func: (v: any) => {
+          getFactorConf();
+        },
       },
     ],
   })
@@ -313,6 +316,7 @@ function getFactorConf() {
 function saveTitleFactor() {
   const fromValue = freeEditRef.value?.getFromValue();
 
+  console.log(colList.value);
   const param = {
     colInfo: colList.value,
     ...fromValue,

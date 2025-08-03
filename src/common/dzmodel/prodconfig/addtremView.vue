@@ -1,16 +1,16 @@
 <template>
   <div>
     <el-row>
-      <el-col :span="24">
-        <div style="background-color: #f3f3f3">
+      <el-col :span="7">
+        <div style="background-color: #f3f3f3;line-height:43px;">
           <span style="font-size: 18px; margin-left: 15px"
             >必须选择至少一项主条款</span
           >
         </div>
       </el-col>
-      <el-col :span="12">
-        <div class="search-btn">
-          <div style="width: 50%; float: right">
+      <el-col :span="7">
+        <div class="search-btn" style="line-height: 45px;">
+          <div style="float: right;">
             <div class="inline-block-div" style="width: 75%">
               <rtinput v-model="query.main" :item="{ placeholder: '请输入主条款名称或编码' }" />
             </div>
@@ -25,10 +25,10 @@
           </div>
         </div>
       </el-col>
-      <el-col :span="12">
-        <div class="search-btn">
-          <span style="font-size: 16px"> 请选择附加条款责任 </span>
-          <div style="width: 50%; float: right">
+      <el-col :span="10">
+        <div class="search-btn" style="display: flex;align-items: center;">
+          <span style="font-size: 16px;line-height: 32px;"> 请选择附加条款责任 </span>
+          <div style="width: 50%; float: right;flex: 1; display: flex; justify-content: end;">
             <div class="inline-block-div" style="width: 75%">
               <rtinput v-model="query.sub" :item="{ placeholder: '请输入附加条款名称或编码' }" />
             </div>
@@ -80,14 +80,23 @@
         </div>
       </el-col>
       <el-col :span="24">
-        <div style="overflow-y: auto; max-height: 150px">
+        <div style="overflow-y: auto; max-height: 250px">
           <el-tree
             style="max-width: 600px"
             :props="dataprops"
             node-key="id"
             :data="data3"
             :default-expand-all="true"
-          />
+          >
+            <template #default="{ node, data }">
+              <div class="custom-tree-node">
+                <span v-for="(level, index) in node.level - 1" :key="index" class="tree-indent"></span>
+                <span v-if="node.level > 1" class="tree-line"></span>
+                <span v-if="node.level > 1" class="tree-line-vertical"></span>
+                <span class="node-label">{{ node.label }}</span>
+              </div>
+            </template>
+          </el-tree>
         </div>
       </el-col>
       <el-col :span="24">
@@ -624,4 +633,37 @@ function fail() {
   height: 45px;
   background-color: #f3f3f3;
 }
+.custom-tree-node {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.tree-indent {
+  width: 24px;
+  height: 1px;
+}
+
+.tree-line {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 24px;
+  height: 1px;
+  border-top: 1px solid #ccc;
+}
+
+.tree-line-vertical {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  border-left: 1px solid #ccc;
+}
+
+.node-label {
+  margin-left: 8px;
+}
+
 </style>

@@ -27,6 +27,10 @@
               :faters="faters"
               @delete="
                 (r) => {
+                  if(formData['m'].length === 1){
+                    ElMessage.error('仅剩1条主条款时,不能删除!');
+                    return ;
+                  }
                   deleteData(r);
                 }
               "
@@ -167,7 +171,7 @@ onMounted(async () => {
     exRules
   );
   Object.assign(cardconfig.value, formconfig11);
-  if (parparam.pageType === "app") {
+  if (parparam.pageType === "app" && parparam.cRecordType != 4) {
     // 新建保单时,初始化条款信息
     const param = {
       cProdNo: parparam.cProdNo,
@@ -322,9 +326,6 @@ function initTermData(item: any,data:any){
   if(item.cUniqueTermNo === "00425000137"){
     data["Term.nAdjustFactor"] = 100;
   }
-  if(item.cUniqueTermNo === "00425000179"){
-    data['Term.cClaimInclude'] = '0';
-  }
 }
 function deleteData(term: any) {
   ElMessageBox.confirm("是否继续删除?", "提示", {
@@ -368,8 +369,12 @@ function deleteTermByNo(t: any) {
       if (formData.value[item][i]["Term.cClauseCode"] === t) {
 
         // 批改的情况下，标记该单为删除状态
-        if (parparam.cEdrType && planData.value[plan][item][i]['Term.cRowId'] ) {
-          tremTemplateRefs.value[item+i].setCancel();
+        if (parparam.cEdrType && formData.value[item][i]['Term.cRowId'] ) {
+          if(formData.value[item][i]['Term.cRdrTyp'] !== '0' && formData.value[item][i]['Term.cClauseCategory'] !== '1'){ // 规范类，限制类，退保状态只标记
+            formData.value[item][i]['Term.cCancelMrk'] = '1';
+          }else{
+            tremTemplateRefs.value[item+i].setCancel();
+          }
         } else {
           deleindex = i;
         }

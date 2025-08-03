@@ -6,11 +6,7 @@
           <el-card>
             <template
               #header
-              v-if="
-                freeEditConfig.fromUi.showTitleBar
-                  ? freeEditConfig.fromUi.showTitleBar
-                  : true
-              "
+              v-if=" freeEditConfig.fromUi.showTitleBar "
             >
               <el-row justify="space-between">
                 <el-col :span="4" v-if="!freeEditConfig.production">
@@ -121,6 +117,7 @@
 <script setup lang="ts">
 import { AppFreeEditConfig, AppFreeEditMethod } from "./app-free-edit-config";
 import {ref} from "vue";
+import {useScrollDetection} from "@/utils/common";
 defineOptions({
   name: "AppFreeEdit",
   inheritAttrs: false,
@@ -133,7 +130,10 @@ const props = defineProps({
   },
 });
 const codeListMap = ref<any>({});
+const customMap = ref<any>({});
 provide('codeListMap', codeListMap.value);
+provide('customMap', customMap.value);
+const idxParam = inject('idxParam', {});
 const btnMap = ref({});
 const { freeEditConfig } = toRefs(props);
 const emits = defineEmits(["updateDatas"]); // 父组件监听事件，同步子组件值的变化给父组件
@@ -219,7 +219,17 @@ function setFormValue(data: any, noupdate = false) {
   }
 }
 function validate() {
-  return dynamicForm.value?.validate();
+  return new Promise((resolve) => {
+    dynamicForm.value?.validate().then((valid: any) => {
+      if(!valid) {
+        const isScroll = useScrollDetection();
+        if(idxParam && idxParam.handleAnchorClick && customMap.value?.domId && !isScroll) {
+          idxParam.handleAnchorClick(undefined,`#${customMap.value?.domId}`)
+        }
+      }
+      resolve(valid);
+    });
+  });
 }
 
 //只清空报错信息
@@ -275,6 +285,10 @@ function getFromSchemaItem(id: string) {
   }
 }
 
+const addProvide = <T>(key: InjectionKey<T> | string, value: T) => {
+  customMap.value[key] = value;
+}
+
 watch(
   () => freeEditConfig,
   (newVal) => {
@@ -316,7 +330,8 @@ defineExpose({
   getFormBtn,
   getCodeListMap,
   setCodeListMap,
-  addCodeListMap
+  addCodeListMap,
+  addProvide
 });
 </script>
 

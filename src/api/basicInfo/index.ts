@@ -9,3 +9,23 @@ import {del} from "@/utils/http";
 export function getSysRoleList(queryParams: any): AxiosPromise<any> {
     return post(`/role/getSysRoleList`, queryParams);
 }
+
+/**
+ * 模板查询信息列表
+ *
+ * @param queryParams
+ */
+export function getTemplateList(queryParams: any): AxiosPromise<any> {
+    return post(`/template/list`, queryParams);
+}
+
+/**
+ * 模板删除
+ *
+ * @param queryParams
+ */
+export function deleteTemplate(queryParams: any): AxiosPromise<any> {
+    return post(`/template/delete`, queryParams);
+}
+
+

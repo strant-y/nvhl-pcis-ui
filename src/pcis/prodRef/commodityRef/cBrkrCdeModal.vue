@@ -157,13 +157,12 @@ function setDisa() {}
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const c = { codeListName: "S_AREACODE" };
+  const c = { codeListName: "CBankCdeList" };
   const param = Object.assign(c, {
     codeListParam: s,
     r,
   });
-  getPageList(param)
-    .then((res) => {
+  getPageList(param).then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
         pageresult.list = data;

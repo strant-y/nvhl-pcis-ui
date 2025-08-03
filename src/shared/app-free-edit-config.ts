@@ -36,6 +36,7 @@ export interface AppFreeEditMethod {
   getCodeListMap: () => any;
   setCodeListMap: (map: any) => void;
   addCodeListMap: (data: any) => void;
+  addProvide: <T> (key: InjectionKey<T> | string, value: T) => void;
 }
 export function createAppFreeEditConfig(
   config: AppFreeEditConfig = {}
@@ -81,7 +82,7 @@ export function createFromUiConfig(config: FromUiConfig = {showTitleBar: true}):
     size: config.size || "default",
     showMessage: config.showMessage || "1",
     groupBy: config.groupBy || [],
-    showTitleBar: config.showTitleBar,
+    showTitleBar: config.showTitleBar ===null || config.showTitleBar === undefined ? true : config.showTitleBar,
   };
 }
 

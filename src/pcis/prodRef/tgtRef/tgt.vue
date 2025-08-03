@@ -102,6 +102,9 @@ onMounted(async () => {
   setFormItem("Tgt.cContactNumber", {
     rules: [getRules("phoneNo", {})],
   });
+  setFormItem("Tgt.cLicenseNumber", {
+    rules: [getRules("vehiclePlate", {})],
+  });
 });
 
 const wagesInfoModel = () => {
@@ -573,7 +576,7 @@ const method = {
   wagesInfoBtn: () => {
 
     let cRegisteredLogo = opertaor.getDataAll()['tgt']['Tgt.cRegisteredLogo'];  // 记名投保标志 是 获取清单汇总   否可以自己修改添加
-    // let cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];   //投保单号
+    // let cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];   //申请单号
     let cAppNo = "";
     if(route.params.param?.pageName === "priceInquiry") {
       cAppNo = opertaor.getDataAll()['plyBase']['Base.cInquiryNo']
@@ -749,6 +752,8 @@ const method = {
   },
 
   ShipClassOneChange:(val: any)=>{
+    console.log(val)
+    clearValidate('Tgt.cShipClassThree');
     const param = opertaor.getParam();
     if(!param.initFlag){
       if(val=='01'){
@@ -758,26 +763,46 @@ const method = {
         });
       }
     }
-    if(val=='01'){
-      setFormItem('Tgt.cShipClassTwo', {disabled:true});
-       setFormItem('Tgt.cShipClassThree',{disabled:false})
+    if(val=='01'){ //rules: [getRules("required", {})]
+       setFormItem('Tgt.cShipClassTwo', {disabled:true,rules: null});
+       setFormItem('Tgt.cShipClassThree',{disabled:false,rules: [getRules("required", {})]})
+       
     }else{
-      setFormItem('Tgt.cShipClassTwo', {disabled:false});
-    }
+      setFormItem('Tgt.cShipClassTwo', {disabled:false,rules: [getRules("required", {})]});
+    
+    } 
     if(val=='02'){
-      setFormItem('Tgt.cShipClassThree',{disabled:true})
+      setFormItem('Tgt.cShipClassThree',{disabled:true,rules: null})
       setFormItem('Tgt.cShipClassTwo', {codeParam:{classone:'level1'},typeCode:'Ship_Class_Level2'});
+            setFormValue({
+          
+          "Tgt.cShipClassThree": null,
+        });
     }
     if(val=='03'){
-      setFormItem('Tgt.cShipClassThree',{disabled:true})
+      setFormItem('Tgt.cShipClassThree',{disabled:true,rules: null})
       setFormItem('Tgt.cShipClassTwo', {codeParam:{classone:'level2'},typeCode:'Ship_Class_Level2',});
+
+      // Tgt.cShipClassTwo
+     
+      console.log('2222', getValue('Tgt.cShipClassTwo'))
+        setFormValue({
+          "Tgt.cShipClassThree": null,
+        });
     }
+
+ 
   },
   cShipClassTwoChange:(val:any)=>{
+     clearValidate('Tgt.cShipClassThree');
     if(val==='15'){
-        setFormItem('Tgt.cShipClassThree',{disabled:false})
+        setFormItem('Tgt.cShipClassThree',{disabled:false,rules: [getRules("required", {})]})
+        
     }else if(val){
-       setFormItem('Tgt.cShipClassThree',{disabled:true})
+       setFormItem('Tgt.cShipClassThree',{disabled:true,rules:null})
+        setFormValue({
+          "Tgt.cShipClassThree": null,
+        });
     }
   },
   // 核定座位总数
@@ -1058,6 +1083,9 @@ function setValue(key: string, value: any) {
 function getValue(key: string) {
   return tgtEditRef?.value?.getValue(key);
 }
+function clearValidate(key=null) {
+  tgtEditRef?.value?.clearValidate(key);
+}
 
 //给表单下拉项赋值
 function setFormItem(key: any, obj: any) {
@@ -1093,6 +1121,7 @@ function getFormconfig() {
   return formconfig1;
 }
 
+
 defineExpose({
   getFromValue,
   setFormValue,
@@ -1101,6 +1130,7 @@ defineExpose({
   getValue,
   getFormconfig,
   change403009,
+  clearValidate,
 });
 </script>
 

@@ -21,9 +21,10 @@ import { ref, reactive } from "vue";
 import { ElMessage } from "element-plus";
 import { saveHealthNotify } from "@/api/prod";
 import { useRoute } from "vue-router";
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
 const route = useRoute();
 const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
 const props = defineProps<{
   data: Object;
   type: string;

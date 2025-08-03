@@ -1,6 +1,6 @@
 <!-- 核保信息 -->
 <template>
-  <el-dialog v-model="dialogVisible" width="90%" title="核保信息">
+  <el-dialog v-model="dialogVisible" width="60%" title="核保信息">
     <div>
       <app-table
         :tableConfig="tableconfig"
@@ -73,20 +73,20 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "CUndrCnm",
         inputtype: "rtinput",
         title: "核保人名称",
-        minWidth: 180,
+        minWidth: 80,
         fixed: "left",
       },
       {
         prop: "CUndrMrk",
         inputtype: "rtinput",
         title: "核保选项",
-        minWidth: 180,
+        minWidth: 80,
       },
       {
         prop: "CAntiLnderRisk",
         inputtype: "rtselect",
         title: "反洗钱风险",
-        minWidth: 180,
+        minWidth: 80,
         loadData: [
           { value: "0", label: "低" },
           { value: "1", label: "中" },
@@ -98,7 +98,7 @@ const tableconfig = reactive<AppTableConfig>(
         // inputtype: "rtdatepicker", 
         inputtype: "rtinput",
         title: "核保时间",
-        minWidth: 180,
+        minWidth: 80,
       },
       {
         prop: "CUndrOpn",

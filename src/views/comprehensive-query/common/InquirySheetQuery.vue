@@ -53,6 +53,8 @@ const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 import { getInquiryPolicyList, qryEndorseList, delInquiryPolicy } from "@/api/query";
+import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
+const policyService = new PolicyService();
 // 变更列
 const colChange = defineAsyncComponent(() => import("../modal/colChange.vue"));
 const props = defineProps({
@@ -104,7 +106,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     ...s,
                     cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
                     cLoadSub: 1,
-                    tIssueTm: [
+                    tAppTm: [
                         dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
                     ]
@@ -873,7 +875,21 @@ const tableObj = {
                         confirmButtonText: "确定",
                         cancelButtonText: "取消",
                         type: "warning",
-                    }).then(function () {
+                    }).then(async function () {
+                        // 删除时除了暂存单，其他要调险位删除接口，如果返回失败要阻断
+                        if(row.cAppStatus !== "1") {
+                            const param = {
+                                cDocTyp: row.cAppTyp,// 单证类型 A 保单 E 批单
+                                cAppNo: row.cAppNo,// 申请单号
+                                cPlyNo: row.plyNo,// 保单号
+                                nEdrPrjNo: row.nEdrPrjNo,// 批改序号
+                            }
+                            const delRisk = await policyService.delRiskXJ(param);
+                            if(delRisk && delRisk.code !== 200) {
+                                ElMessage.error(delRisk.msg);
+                                return;
+                            }
+                        }
                         const delResult = delInquiryPolicy({ cInquiryNo: row.cInquiryNo });
                         delResult.then((res: any) => {
                             if (null != res && null != res["code"]) {

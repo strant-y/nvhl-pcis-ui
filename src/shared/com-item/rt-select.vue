@@ -2,13 +2,16 @@
   <!-- 下拉选择框-->
   <template v-if="!showLabel">
     <el-tooltip
-      :content="getLabel"
-      :disabled="getLabel ? false : true"
+      :content="changeContent ? changeContent : getLabel()"
+      :disabled="!changeContent && (getLabel() ? false : true)"
       placement="top"
     >
       <el-select
         ref="selectRef"
-        :class="isReQuired() ? 're-quired-flag' : ''"
+        :class="[
+            ...customClass,
+            ...[isReQuired() ? 're-quired-flag' : '']
+        ]"
         v-model="selectedValue"
         :placeholder="item.placeholder ? item.placeholder : '请选择'"
         :disabled="isReadonly() || isDisabled()"
@@ -20,6 +23,7 @@
         :collapse-tags-tooltip="isMultiple()"
         :max-collapse-tags="isMultiple() ? 3 : null"
         @change="handleChange"
+        style="min-width: 100px;"
       >
         <template
           #label="{ label, value }"
@@ -85,7 +89,7 @@
       >
     </template>
     <template v-else>
-      {{ getLabel }}
+      {{ selectLabel }}
     </template>
   </span>
 </template>
@@ -120,6 +124,9 @@ const props = defineProps({
     required: false,
   },
 });
+
+const customClass = ref<string[]>([]);
+const changeContent = ref<string | undefined>();
 
 interface OptionTypeBySelect extends OptionType {
   color?: string;
@@ -322,20 +329,27 @@ function isDisabled() {
 }
 
 function handleChange(val?: string | number | Array<any> | undefined) {
-  const option = options.value.find((item) => item.value === val);
+  // const option = options.value.find((item) => item.value === val);
   emits("valueChange", val);
   emits("update:modelValue", val);
   // props.item.func ? props.item.func(val, option) : null;
 }
-const getLabel = computed(() =>  {
+const selectLabel = computed(() => {
+  return getLabel();
+})
+function getLabel(val: any = undefined) {
+  let values = val;
+  if(!values) {
+    values = selectedValue.value
+  }
   getCodeListMapToOption();
   if (options.value && options.value.length > 0) {
-    const se = options.value.find((item) => item.value === selectedValue.value);
+    const se = options.value.find((item) => item.value === values);
     if (se) {
       return se.label;
     }
   }
-});
+};
 
 onMounted(() => {
   // 初始化组件数据
@@ -406,7 +420,19 @@ function getParam() {
   return p;
 }
 
+function setCustomClass(classs: string[]) {
+  customClass.value = classs;
+}
+function setChangeInfo(content: any) {
+  if(content) {
+    changeContent.value = (content.text ? getLabel(content.text) : '') + ' 变更为 ' +  getLabel();
+  }else {
+    changeContent.value = undefined;
+  }
+}
 defineExpose({
   updateOption,
+  setCustomClass,
+  setChangeInfo
 });
 </script>

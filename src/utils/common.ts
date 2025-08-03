@@ -94,3 +94,54 @@ export function calculateAgeFromIdCard(idCard: string): number {
 
   return age;
 }
+
+/**
+ * 检测页面是否在滚动
+ * @param delay
+ */
+export function useScrollDetection(delay = 50) {
+  const isScrolling = ref(false);
+  let scrollTimeout: number | null = null;
+
+  const handleScroll = () => {
+    isScrolling.value = true;
+
+    if (scrollTimeout) {
+      clearTimeout(scrollTimeout);
+    }
+
+    scrollTimeout = window.setTimeout(() => {
+      isScrolling.value = false;
+    }, delay);
+  };
+
+  onMounted(() => {
+    window.addEventListener('scroll', handleScroll);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener('scroll', handleScroll);
+    if (scrollTimeout) {
+      clearTimeout(scrollTimeout);
+    }
+  });
+
+  return isScrolling.value;
+}
+
+/**
+ * 滚动到指定#id
+ */
+export function scrollByDomId(targetId: string, location: "center" | "end" | "nearest" | "start" = "start") {
+  // 获取目标元素的ID
+  if (targetId) {
+    // 手动实现平滑滚动效果
+    const targetElement = document.querySelector(targetId);
+    if (targetElement) {
+      targetElement.scrollIntoView({
+        behavior: 'smooth',
+        block: location
+      });
+    }
+  }
+}

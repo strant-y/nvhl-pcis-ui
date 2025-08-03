@@ -2,14 +2,17 @@
   <!-- 重构为v2版本的下拉选择框-->
   <template v-if="!showLabel">
     <el-tooltip
-      :content="getLabel"
-      :disabled="getLabel ? false : true"
+      :content="changeContent ? changeContent : getLabel()"
+      :disabled="!changeContent && (getLabel() ? false : true)"
       placement="top"
     >
       <el-select-v2
         ref="selectV2Ref"
         v-model="selectedValue"
-        :class="isReQuired() ? 're-quired-flag' : ''"
+        :class="[
+          ...customClass,
+          ...[isReQuired() ? 're-quired-flag' : '']
+        ]"
         :placeholder="item.placeholder ? item.placeholder : '请选择'"
         :disabled="isReadonly() || isDisabled()"
         :clearable="isClearable()"
@@ -22,6 +25,7 @@
         :max-collapse-tags="isMultiple() ? 3 : null"
         :options="options"
         @change="handleChange"
+        style="min-width: 100px;"
       >
         <template
           #label="{ label, value }"
@@ -76,7 +80,7 @@
       >
     </template>
     <template v-else>
-      {{ getLabel }}
+      {{ selectLabel }}
     </template>
   </span>
 </template>
@@ -151,6 +155,9 @@ function getColor(v) {
     return undefined;
   }
 }
+
+const customClass = ref<string[]>([]);
+const changeContent = ref<string | undefined>();
 
 watch([() => props.modelValue], ([newModelValue]) => {
   // if (options.value == null || options.value.length === 0) return; // 下拉数据源加载未完成不回显
@@ -274,19 +281,26 @@ function handleChange(val?: string | number | Array<any> | undefined) {
   emits("update:modelValue", val);
   // props.item.func ? props.item.func(val, option) : null;
 }
-const getLabel = computed(() =>  {
+const selectLabel = computed(() => {
+  return getLabel();
+})
+function getLabel(val: any = undefined): any {
+  let values = val;
+  if(!values) {
+    values = selectedValue.value;
+  }
   getCodeListMapToOption();
   if (options.value && options.value.length > 0) {
     let se = null;
-    if(!Array.isArray(selectedValue.value)){
-      const s = options.value.find((item) => item.value === selectedValue.value);
+    if(!Array.isArray(values)){
+      const s = options.value.find((item) => item.value === values);
       if (s) {
-      se = s.label;
-    }
+        se = s.label;
+      }
     }else{
-      if(selectedValue.value && selectedValue.value.length > 0){
+      if(values && values.length > 0){
         let str = "";
-        selectedValue.value.forEach((i) => {
+        values.forEach((i) => {
           const s = options.value.find((item) => {
             return item.value === i
           });
@@ -302,7 +316,8 @@ const getLabel = computed(() =>  {
       return null;
     }
   }
-});
+}
+
 onMounted(() => {
   // 初始化组件数据
   if (props.item) {
@@ -411,4 +426,19 @@ function getParam() {
   }
   return p;
 }
+
+function setCustomClass(classs: string[]) {
+  customClass.value = classs;
+}
+function setChangeInfo(content: any) {
+  if(content) {
+    changeContent.value = (content.text ? getLabel(content.text) : '') + ' 变更为 ' +  getLabel();
+  }else {
+    changeContent.value = undefined;
+  }
+}
+defineExpose({
+  setCustomClass,
+  setChangeInfo
+})
 </script>

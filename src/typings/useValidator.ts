@@ -561,34 +561,33 @@ const txnApprovalNo = () => {
     }
   };
 
-  /**
- * 地址校验
- * 1. 长度5-200个字符
- * 2. 包含中文
- * 3. 不包含特殊符号
- */
 const valiAddress = (options = {}) => {
   const { 
-    required = true,           // 是否必填
-    minLength = 5,           // 最小长度
-    maxLength = 200,         // 最大长度
-    enhanced = false,        // 是否使用增强校验
-    message = '请输入有效的地址信息' // 默认错误提示
+    required = true,
+    minLength = 5,
+    maxLength = 200,
+    enhanced = false,
+    message = '请输入有效的地址信息'
   } = options;
-  // 基础地址格式正则
-  const basicPattern = /^(.*[省市县])(.*[路街乡镇村组号].*)$/;
   
-  // 增强版地址格式正则（包含省市区街道等层级）
-  const enhancedPattern = /^(.*省|.*自治区|.*市)(.*市|.*自治州|.*地区|.*盟)?(.*区|.*县|.*市|.*旗)?(.*街道|.*镇|.*乡)?(.*村|.*路|.*街|.*巷|.*号).*$/;
+  // 基础地址字符合法性校验
+  const basicPattern = /^[\u4e00-\u9fa5a-zA-Z0-9()（）\-\.\/\s,，号楼单元层]+$/;
+  
+  // 修复后的增强版正则：
+  // 1. 支持直辖市（如北京市、上海市）、省、自治区、特别行政区
+  // 2. 允许中间层级（市/区/县）可选（适应直辖市无地级市的情况）
+  // 3. 放宽街道乡镇级的匹配
+  const enhancedPattern = /^(.*?(省|自治区|直辖市|特别行政区)|北京市|上海市|天津市|重庆市)(.*?(市|区|县|旗|自治州|地区|盟))?(.*?(街道|镇|乡|苏木|民族乡))?(.*?(村|社区|路|街|巷|胡同|弄|号|小区|大厦|楼)).*$/;
+  
   return {
     validator: (rule, value, callback) => {
-     if (value === null || value === '' || value ===undefined) {
-          callback();
-          return;
-        }
+      if ((value === null || value === '' || value === undefined)) {
+   
+        return callback();
+      }
+      
       const trimmedValue = value.trim();
       
-      // 长度校验
       if (trimmedValue.length < minLength) {
         return callback(new Error(`地址长度不能少于${minLength}个字符`));
       }
@@ -597,20 +596,38 @@ const valiAddress = (options = {}) => {
         return callback(new Error(`地址长度不能超过${maxLength}个字符`));
       }
       
-      // 格式校验
-      const isValid = enhanced 
-        ? enhancedPattern.test(trimmedValue) 
-        : basicPattern.test(trimmedValue);
-      
-      if (!isValid) {
-        return callback(new Error(message));
+      if (!basicPattern.test(trimmedValue)) {
+        return callback(new Error('地址包含不支持的特殊字符'));
       }
       
-      // 校验通过
+      // 增强模式校验（修复后可通过"北京市海淀区..."这类地址）
+      if (enhanced && !enhancedPattern.test(trimmedValue)) {
+        return callback(new Error('请输入包含省/市、区/县、街道/乡镇及详细地址的完整信息'));
+      }
+      
       callback();
     },
     trigger: 'blur'
   };
+};
+
+
+// 支票号正则校验
+const chequeNumberValidation = () => {
+  return {
+      pattern: /^\d{8}(\d{2})?$/,
+      message: "支票号应为8位或10位数字（仅支持纯数字）",
+      trigger: "blur"
+    }
+};
+ 
+// 非法字符校验
+const accountValidation = () => {
+  return {
+      pattern: /^[^\!@#\$%\^&\*\(\)_\+\{\}\|:"\<\>\?`~\\\[\];',./]+$/,
+      message: '请输入正确号码',
+      trigger: "blur"
+    }
 };
 
 
@@ -695,6 +712,12 @@ const valiAddress = (options = {}) => {
     }
     if(type == 'valiAddress') {
       return valiAddress()
+    }
+    if(type == 'chequeNumberValidation') {
+      return chequeNumberValidation()
+    }
+    if(type == 'accountValidation') {
+      return accountValidation()
     }
 
   };

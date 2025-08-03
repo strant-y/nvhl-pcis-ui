@@ -153,7 +153,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cAppNo",
         inputtype: "rtinput",
-        title: "投保单号",
+        title: "申请单号",
         clearable: true,
       },
       {
@@ -170,6 +170,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         format: "YYYY-MM-DD HH:mm:ss",
         valueFormat: "YYYY-MM-DD HH:mm:ss",
         rules: [getRules("required", {})],
+        disabledDate : (time:Date) => {
+          const today = new Date();
+          const sixMonthsAgo = new Date();
+          sixMonthsAgo.setMonth(today.getMonth() - 6);
+
+          // 限制只能选择今天及之前的时间，并且不能早于 6 个月前
+          return time.getTime() > today.getTime() || time.getTime() < sixMonthsAgo.getTime();
+        },
         func: (val) => {
           if(val){
             handleDateChange(val);
@@ -234,7 +242,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cAppNo",
         inputtype: "rtinput",
-        title: "投保单号",
+        title: "申请单号",
         minWidth: 180,
       },
       {
@@ -311,7 +319,7 @@ const handleArray = (obj:any)=>{
 
 const getRenewal = (row:any)=>{
    console.log('一键续保。。。',row.cPlyNo)
-  getPolicy({cPlyNo:row.cPlyNo,queryTyp: "orig"})
+  getPolicy({cPlyNo:row.cPlyNo,queryTyp: "orig", cRenewMrk: "1",})
       .then((res) => {
         const { code, res:data, msg } = res;
         if (200 === code) {

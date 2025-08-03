@@ -177,7 +177,7 @@ const tabs = ref<Array<any>>([
     key: "1",
   },
   {
-    name: "投保单",
+    name: "申请单",
     key: "2",
   },
   {
@@ -192,22 +192,22 @@ const tabs = ref<Array<any>>([
     name: "投保待撤回任务",
     key: "5",
   },
-  {
-    name: "待修改单查询",
-    key: "6",
-  },
+  // {
+  //   name: "待修改单查询",
+  //   key: "6",
+  // },
   {
     name: "保单到期查询",
     key: "7",
   },
-  {
-    name: "批量导入查询",
-    key: "8",
-  },
-  {
-    name: "产品组合出单查询",
-    key: "9",
-  },
+  // {
+  //   name: "批量导入查询",
+  //   key: "8",
+  // },
+  // {
+  //   name: "产品组合出单查询",
+  //   key: "9",
+  // },
   {
     name: "生成电子保单查询",
     key: "10",
@@ -241,7 +241,7 @@ onMounted(async () => {
         homeJumpData.value.TIssueTmEnd,
       ]);
       if (homeJumpData.value.hasOwnProperty("CAppNo")) {
-        //投保单号
+        //申请单号
         freeEditRef.value[1].value[0].setValue(
           "cAppNo",
           homeJumpData.value.CAppNo

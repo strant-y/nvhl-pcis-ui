@@ -70,7 +70,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "CDptCde",
         inputtype: "rtinput",
-        title: "机构编码",
+        title: "机构部门",
         disabled: true,
       },
       {
@@ -457,6 +457,7 @@ onMounted(() => {
     const paramSub = {
       CChaType: props.data.data.cChaType,
       flag: 1,
+
       scene: "PLY_APP_NEW_SCENE",
     };
     getChaSubtypList(paramSub).then((res) => {
@@ -473,7 +474,7 @@ onMounted(() => {
     });
   }
   nextTick(() => {
-    setValue("CDptCde", props.data.data.rowData["Ci.cDptCde"]);
+    setValue("CDptCde", props.data.data.rowData['Ci.cDptCde']);
   });
 });
 

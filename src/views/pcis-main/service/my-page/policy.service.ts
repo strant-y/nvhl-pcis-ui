@@ -1106,7 +1106,7 @@ export class PolicyService {
     }
 
 /**
- * 根据投保单号获取发票信息数量
+ * 根据申请单号获取发票信息数量
  * @param appNo
  */
 // getTaxInfoNumByAppNo(appNo) {
@@ -1282,7 +1282,7 @@ getTaskVestige(ops) {
 
 }
 
-// 根据保单号查询原始投保单号
+// 根据保单号查询原始申请单号
 getCAppNoByPlyNo(ops) {
     return request.post(`/policy/getCAppNoByPlyNo`, ops)
 
@@ -1340,7 +1340,7 @@ updateImageUploadModeByPlyNo(data) {
     return request.post('/policy/updateImageUploadModeByPlyNo', data);
     }
 
-// 根据投保单号查询部分投保单基本信息
+// 根据申请单号查询部分投保单基本信息
 qryAppBaseInfoByAppNo(ops) {
     return request.post(`/policy/qryAppBaseInfoByAppNo`, ops)
 
@@ -1577,6 +1577,12 @@ downloadDistTemplate(data) {
       responseType: 'blob'
   });
 }
+//联共保信息模板下载
+downloadCiTemplate(data) {
+  return request.post(`/policy/downloadCiTemplate`, data, {
+      responseType: 'blob'
+  });
+}
 //清单增量模板下载
 downloadDistTemplateIncrement(data) {
     return request.post(`/policy/downloadDistTemplateIncrement`, data, {
@@ -1597,6 +1603,10 @@ importDist(data) {
 importDistIncrement(param){
     return request.post('/policy/importDistIncrement', param);
 }
+//联共保信息导入
+importCi(param){
+	return request.post('/policy/importCi', param);
+}
 listImage(data) {
     return request.post('image/listImage', data);
 }
@@ -1610,6 +1620,41 @@ getEstimatedSalesAndEstimatedSalesQuantity(param){
 delRisk(param){
     return request.post('/reinsured/delRisk', param);
 }
+
+/**
+ * 查询临分状态-询价核保
+ */
+queryCRiFacMrkXJ(param) {
+    return request.post('/reinsured/queryCRiFacMrkXJ', param);
+}
+
+/**
+ * 强制临分-询价
+ */
+queryRiFacMrkXJ(param) {
+    return request.post('/reinsured/queryRiFacMrkXJ', param);
+}
+
+/**
+ * 查询临分状态-询价
+ */
+queryFacStsXJ(param) {
+    return request.post('/reinsured/queryFacStsXJ', param);
+}
+
+// 删除险位-询价
+delRiskXJ(param){
+    return request.post('/reinsured/delRiskXJ', param);
+}
+
+/**
+ * 批单随原保单临分时核保通过调用临分提交-询价
+ * @param param
+ */
+checkLibertyXJ(ops) {
+    return request.post('reinsured/checkLibertyXJ', ops);
+}
+
 
 
 

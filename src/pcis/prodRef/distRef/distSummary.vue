@@ -329,6 +329,27 @@ const query = (param: any) => {
             }
         };
       });
+      
+      console.log('数据---',pageresult.list)
+       
+      let cProdNo = route.params.param?.cProdNo;
+      if (cProdNo == "040002") {
+          const termref = opertaor.getTableRefByKey("cvrg");
+    
+          interface Item {
+            nInsuredHeadcount?: number | null | string;
+          }
+          const countNumber: number = (pageresult.list as Item[]).reduce((sum, item) => {
+            const value = Number(item['DistSummary.nInsuredHeadcount'] ?? 0);
+            return sum + (isNaN(value) ? 0 : value);
+          }, 0);
+          termref.setTermData({
+            termNo:'00425000091',
+            planNo:'P1',
+            factorProp: 'Term.nInsuredCount',
+          },countNumber);   
+     
+      }
     }
   });
 }

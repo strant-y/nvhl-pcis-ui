@@ -76,7 +76,12 @@ const {
   getReinsuredData,
   saveRiskData,
   riskQueryData,
+  riskQueryDataXJ,
   queryComponentCodeList,
+  getReinsuredDataXJ,
+  tryCountInFoRIXJ,
+  queryComponentCodeListXJ,
+  riskUnitQueryXJ,
 } = NewUdrListService();
 import { descryptParameter } from "@/utils/encipher.ts";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
@@ -595,7 +600,7 @@ const tableconfig1 = reactive<AppTableConfig>(
   createTableEditConfig({
     title: "风险单位信息",
     editFlag: true,
-    editList: ["cDetailedAddress","cRemarks"],
+    editList: ["cDetailedAddress","cRemark"],
     tableBtnType: "btn",
     showSelection: true,
     titleBtns: [
@@ -667,7 +672,7 @@ const tableconfig1 = reactive<AppTableConfig>(
             const item = addressOptions.value.find((i:any) => i.cDetailedAddress === val);
             const sameItemList = addressOptions.value.filter((n:any) => n.cProvince === item.cProvince && n.cCity === item.cCity && n.cCounty === item.cCounty);
             if(sameItemList.length > 1) {
-              ElMessageBox.alert('同一省、市、区/县下有多个地址是否合并', '提示', {
+              ElMessageBox.alert('同一省、市、区/县下有多个相同标的地址，请确认是否合并', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
               })
@@ -726,7 +731,7 @@ const tableconfig1 = reactive<AppTableConfig>(
         }
       },
       {
-        prop: "cRemarks",
+        prop: "cRemark",
         inputtype: "rtinput",
         type: "textarea",
         title: "备注",
@@ -795,6 +800,11 @@ const tableconfig2 = reactive<AppTableConfig>(
         title: "分出比例(%)",
         minWidth: 180,
         readOnly: true,
+        formatter:(val:any) => {
+          if(val) {
+            return (val * 100) + '%'
+          }
+        }
       },
     ],
   })
@@ -834,7 +844,7 @@ function init() {
   }
 }
 
-function queryRiskUnit() {
+async function queryRiskUnit() {
   const beginTm = props.param?.insrnc["Base.tInsrncBgnTm"];
   const param = {
     cAppNo: params.cAppNo,
@@ -842,21 +852,16 @@ function queryRiskUnit() {
     cDptCde: user.value.companyId,
     tInsrncBgnTm: beginTm,
   };
-  riskUnitQuery(param)
-    .then((result: any) => {
-      if (result.code === "1" && result.data) {
-        CRiskLvlCde_Options.value = result.data.map((item: any) => ({
-          ...item,
-          label: item.cRiskLvlCde + item.cRiskUnitNme,
-          value: item.cRiskLvlCde,
-        }));
-      } else if (result.code === "0") {
-        ElMessage.error({ message: result.message, duration: 3000 });
-      }
-    })
-    .catch((error: any) => {
-      ElMessage.error({ message: "后台服务异常,请联系管理员", duration: 3000 });
-    });
+  const riskUnitQueryInfo = params.pageName === "priceInquiry" ? await riskUnitQueryXJ(param) : await riskUnitQuery(param);
+  if(riskUnitQueryInfo && riskUnitQueryInfo.code === "1" && riskUnitQueryInfo.data) {
+    CRiskLvlCde_Options.value = riskUnitQueryInfo.data.map((item: any) => ({
+      ...item,
+      label: item.cRiskLvlCde + item.cRiskUnitNme,
+      value: item.cRiskLvlCde,
+    }));
+  } else {
+    ElMessage.error({ message: riskUnitQueryInfo.message, duration: 3000 });
+  }
 }
 
 // 绑定方法
@@ -1068,6 +1073,7 @@ function split() {
     _dataId: `newRow${pageresult1.list.length + 1}`,
     index: selectRow1.value.index + 1,
     nRetAmt: 0.00,
+    cRemark: '',
   }]
   pageresult1.list = pageresult1.list.concat(newRow)
   const table = tableRef1.value;
@@ -1153,34 +1159,32 @@ function handleSelectionChange(selection: any) {
     });
     setFormItem("nAmtVar", { disabled: false });
     setFormItem("nPrmVar", { disabled: false });
+    pageresult2.list = [];
   }
 }
 
 // 查询标的地址下拉选项
-function queryAddress() {
+async function queryAddress() {
   const param = {
     cAppNo: params.cAppNo,
     cProdNo: params.cProdNo,
     cDptCde: user.value.companyId,
   }
-  queryComponentCodeList(param).then((res:any) => {
-    if(res.code === '1') {
-      if(res.data && res.data.length > 0) {
-        addressOptions.value = res.data.map((item:any) => ({
-          ...item,
-          label: item.cDetailedAddress,
-          value: item.cDetailedAddress,
-        }))
-        tableconfig1.fromSchema[1].loadData = addressOptions.value
-      } else {
-        ElMessage.info(res.message)
-      }
+  const queryComponentCodeInfo = params.pageName === "priceInquiry" ? await queryComponentCodeListXJ(param) : await queryComponentCodeList(param);
+  if(queryComponentCodeInfo && queryComponentCodeInfo.code === '1') {
+    if(queryComponentCodeInfo.data && queryComponentCodeInfo.data.length > 0) {
+      addressOptions.value = queryComponentCodeInfo.data.map((item:any) => ({
+        ...item,
+        label: item.cDetailedAddress,
+        value: item.cDetailedAddress,
+      }))
+      tableconfig1.fromSchema[1].loadData = addressOptions.value
     } else {
-      ElMessage.error(res.message)
+      ElMessage.info(queryComponentCodeInfo.message)
     }
-  }).catch(err => {
-    ElMessage.error(err)
-  })
+  } else {
+    ElMessage.error(queryComponentCodeInfo.message)
+  }
 }
 
 function handleRowClick2(row: any) {
@@ -1222,7 +1226,7 @@ async function checkData() {
 }
 
 // 分保试算
-function tryCountInFoRIs(row: any) {
+async function tryCountInFoRIs(row: any) {
   if(!row.cRiskUnitNme) {
     ElMessage.error("风险单位名称不能为空")
     return
@@ -1231,7 +1235,7 @@ function tryCountInFoRIs(row: any) {
     ElMessage.error("风险等级不能为空")
     return
   }
-  if(row.cDetailedAddress && !row.cRemarks) {
+  if(row.cDetailedAddress && !row.cRemark) {
     ElMessage.error("备注不能为空")
     return
   }
@@ -1271,20 +1275,14 @@ function tryCountInFoRIs(row: any) {
     // cLatestMrk: "",// 是否最新 0 否 1 是 非必传
     nRetLmt: row.nRetAmt,// 自留额
   };
-  tryCountInFoRI(param)
-    .then((result: any) => {
-      if(result.code === "1" && result.data && result.data.item) {
-        result.data.item.forEach((item:any) => {
-          Object.assign(pageresult2.list, item.value || [])
-        })
-      } else {
-        ElMessage.error(result.message)
-      }
+  const tryCountInfo = params.pageName === "priceInquiry" ? await tryCountInFoRIXJ(param) : await tryCountInFoRI(param);
+  if(tryCountInfo && tryCountInfo.code === "1" && tryCountInfo.data && tryCountInfo.data.item) {
+    tryCountInfo.data.item.forEach((item:any) => {
+      pageresult2.list = pageresult2.list.concat(item.value || [])
     })
-    .catch((error: any) => {
-      console.log("出错了", error);
-      ElMessage.error({ message: error.message, duration: 3000 });
-    });
+  } else {
+    ElMessage.error({ message: tryCountInfo.message, duration: 3000 });
+  }
 }
 
 // 查看比例合约
@@ -1315,7 +1313,7 @@ function saveDatas() {
       ElMessage.error("风险等级不能为空")
       return
     }
-    if(row.cDetailedAddress && !row.cRemarks) {
+    if(row.cDetailedAddress && !row.cRemark) {
       ElMessage.error("备注不能为空")
       return
     }
@@ -1391,63 +1389,53 @@ function saveDatas() {
   
 }
 
-function getContData() {
+async function getContData() {
   const param = {
     cAppNo: params.cAppNo,
     cCiMrk: params.cCiMrk,
   };
-  getReinsuredData(param)
-    .then((res: any) => {
-      if (res.code === "200") {
-        if (res.data) {
-          console.log("getContData", res.data);
-          let data = {...res.data}
-          // if(params.cCiMrk !== '0') {
-          //   data = {
-          //     ...res.data,
-          //     nAmt: res.data.nCiAmt,
-          //     nAmtVar: res.data.nCiAmtVar,
-          //     nPrm: res.data.nCiPrm,
-          //     nPrmVar: res.data.nCiPrmVar,
-          //   }
-          // } else {
-          //   data = res.data
-          // }
-          freeEditRef.value?.setFormValue(data);
-          cAmtCurOptions.value = [
-            { label: data.cAmtCur, value: data.cAmtCur },
-          ];
-          cPrmCurOptions.value = [
-            { label: data.cPrmCur, value: data.cPrmCur },
-          ];
-          nRmbChgRate(data.cAmtCur);
-        }
-      } else {
-        ElMessage.error(res.message);
-      }
-    })
-    .catch((error: any) => {
-      ElMessage.error(error);
-    });
+  const getReinsuredDataInfo = params.pageName === "priceInquiry" ? await getReinsuredDataXJ(param) : await getReinsuredData(param);
+  if(getReinsuredDataInfo && getReinsuredDataInfo.code === "200") {
+    if (getReinsuredDataInfo.data) {
+      console.log("getContData", getReinsuredDataInfo.data);
+      let data = {...getReinsuredDataInfo.data}
+      // if(params.cCiMrk !== '0') {
+      //   data = {
+      //     ...res.data,
+      //     nAmt: res.data.nCiAmt,
+      //     nAmtVar: res.data.nCiAmtVar,
+      //     nPrm: res.data.nCiPrm,
+      //     nPrmVar: res.data.nCiPrmVar,
+      //   }
+      // } else {
+      //   data = res.data
+      // }
+      freeEditRef.value?.setFormValue(data);
+      cAmtCurOptions.value = [
+        { label: data.cAmtCur, value: data.cAmtCur },
+      ];
+      cPrmCurOptions.value = [
+        { label: data.cPrmCur, value: data.cPrmCur },
+      ];
+      nRmbChgRate(data.cAmtCur);
+    }
+  } else {
+    ElMessage.error(getReinsuredDataInfo.message);
+  }
 }
 
 // 获取风险单位划分列表数据
-function getRiskData() {
-  riskQueryData({ cAppNo: params.cAppNo })
-    .then((res: any) => {
-      if (res.code === "200") {
-        pageresult1.list = res.data.map((item: any, index: number) => ({
-          ...item,
-          index,
-        }));
-        _dataSet.value = res.data;
-      } else {
-        ElMessage.error(res.message);
-      }
-    })
-    .catch((err) => {
-      ElMessage.error(err);
-    });
+async function getRiskData() {
+  const riskQueryInfo = params.pageName === "priceInquiry" ? await riskQueryDataXJ({ cAppNo: params.cAppNo }) : await riskQueryData({ cAppNo: params.cAppNo })
+  if(riskQueryInfo && riskQueryInfo.code === "200") {
+    pageresult1.list = riskQueryInfo.data.map((item: any, index: number) => ({
+      ...item,
+      index,
+    }));
+    _dataSet.value = riskQueryInfo.data;
+  } else {
+    ElMessage.error(riskQueryInfo.message);
+  }
 }
 
 // 关闭弹框

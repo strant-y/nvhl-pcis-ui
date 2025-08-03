@@ -186,7 +186,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             {
                 prop: 'CAppNo',
                 inputtype: 'rtinput',
-                title: '投保单号',
+                title: '申请单号',
                 clearable: true
             },
             {
@@ -308,7 +308,7 @@ const tableconfig = reactive<AppTableConfig>(
             {
                 prop: 'cAppNo',
                 inputtype: 'rtinput',
-                title: '投保单号'
+                title: '申请单号'
             },
             {
                 prop: 'cPlyNo',
@@ -493,6 +493,15 @@ function handleQuery(flag?: boolean) {
  * 在保证明
  */
 function genZBZMEPolicy() {
+    const prodNo = freeEditRef.value?.getValue('CProdNo')
+    if (prodNo == null || prodNo == undefined) {
+        ElMessage.warning('请选择产品!')
+        return
+    }
+    if (prodNo != '040002') {
+        ElMessage.warning('非雇主责任险不可操作!')
+        return
+    }
     dialogRef.value?.open(
         'epolicyWorker',
         {

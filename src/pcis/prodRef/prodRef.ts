@@ -64,14 +64,17 @@ import  cOccupCdeModal  from "./commodityRef/cOccupCdeModal.vue";
 
 import agentPre from "./commodityRef/agentPer.vue" //代理(经济)人
 import agentWorker from "./commodityRef/agentWorker.vue" //代理业务员
-import ciagentPre from "./commodityRef/ciagentWorker.vue" //代理(经济)人
+import ciagentPer from "./commodityRef/ciagentPer.vue" //代理(经济)人
 import ciagentWorker from "./commodityRef/ciagentWorker.vue" //代理业务员
 import cBrkrCdeModal from "./commodityRef/cBrkrCdeModal.vue"; //开户行
 import prdFixSpec from "./commodityRef/prd-fix-spec.vue" //特别约定
 import deductibleFix from "./commodityRef/DeductibleFix.vue" //免赔条件选择
 import underwriteRef from "./underwriteRef/underwrite.vue"
+import auditwriteRef from "./auditwriteRef/auditwrite.vue"
 import edrbaseRef from "./edrbaseRef/edrbase.vue"
 import edritemRef from "./edritemRef/edritem.vue"
+import xyedrbaseRef from "./xyedrbaseRef/xyedrbase.vue"
+import xyedritemRef from "./xyedritemRef/xyedritem.vue"
 import imageRef from "./commonRef/image.vue"; //影像信息
 import priceComponent from "./commonRef/priceComponent.vue";//询价页面配置
 import epolicyWorker from './commodityRef/EPolicyWorker.vue' //在保证明
@@ -80,6 +83,8 @@ import detailsKnows from "./commodityRef/DetailsKnows.vue" //标的信息知识�
 import reinsuranceTips from "./commodityRef/ReinsuranceTips.vue" //水险再保提示详情
 import navigationAreaTips from "./commodityRef/NavigationAreaTips.vue" //航行区域提示详情
 import  specialCateModal  from "./commodityRef/specialCateModal.vue";
+import AgentTgtRef from "./agentTgtRef/AgentTgt.vue"
+import TransportinfoRef from "./transportinfoRef/Transportinfo.vue";
 
 /**用于动态组件的映射生成 */
 const componentMap = {
@@ -110,8 +115,10 @@ const componentMap = {
   underwriteRef: underwriteRef, //录单页面中的核保组件
   edrbaseRef: edrbaseRef, //录单页面中的批改信息组件
   edritemRef: edritemRef, //录单页面中的批改比较项组件
+  xyedrbaseRef: xyedrbaseRef, //协议录单页面中的批改信息组件
+  xyedritemRef: xyedritemRef, //协议录单页面中的批改比较项组件
   imageRef:imageRef,
-
+  auditwriteRef:auditwriteRef,
 
   prodInfoRef: prodInfo,
   // prodauditRef: prodaudit,
@@ -149,7 +156,7 @@ const componentMap = {
 
   agentPre: agentPre,
   agentWorker: agentWorker,
-  ciagentPre: ciagentPre,
+  ciagentPer: ciagentPer,
   cBrkrCdeModal:cBrkrCdeModal,
   ciagentWorker: ciagentWorker,
   ndustryCateModal:ndustryCateModal,
@@ -161,7 +168,9 @@ const componentMap = {
   detailsKnows:detailsKnows,
   reinsuranceTips:reinsuranceTips,
   navigationAreaTips:navigationAreaTips,
-  specialCateModal:specialCateModal
+  specialCateModal:specialCateModal,
+  AgentTgtRef:AgentTgtRef,
+  TransportinfoRef:TransportinfoRef,
 };
 
 const install = (Vue) => {

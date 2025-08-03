@@ -105,3 +105,9 @@ watchEffect(() => {
   }
 }
 </style>
+<style>
+.el-popper .el-menu--horizontal.el-menu--popup-container {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+</style>

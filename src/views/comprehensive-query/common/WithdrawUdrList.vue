@@ -26,7 +26,7 @@ import {
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
-import { yesOrNo, size, inputtype } from "@/utils/utilKey";
+import { yesOrNo, size, inputtype, JBPMState } from "@/utils/utilKey";
 import {
   AppTableConfig,
   AppTableMethod,
@@ -201,7 +201,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "objId",
         inputtype: "rtinput",
-        title: "投保单号",
+        title: "申请单号",
       },
       {
         prop: "uwDptName",
@@ -246,8 +246,9 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "state",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "任务状态",
+        loadData: JBPMState,
       },
     ],
   })

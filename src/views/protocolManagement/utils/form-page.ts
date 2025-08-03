@@ -2,6 +2,7 @@ import {FreeButtonBase} from "@/shared/button-config";
 import {AppFreeEditMethod} from "@/shared/app-free-edit-config";
 import {AppGridEditMethod} from "@/shared/app-grid-edit-config";
 import {AppTableMethod, MyTableMethod} from "@/shared/app-table-config";
+import {CommonConstants} from "@/constants/CommonConstants";
 
 export class FormPage {
 
@@ -100,14 +101,12 @@ export class FormPage {
      * @param formData 组件绑定的值
      */
     setFormDataById(id: string, formData: any) {
-        nextTick(() => {
-            const comp = this.componentRefMap.get(id);
-            if (comp) {
-                comp.setFormValue(formData)
-            } else {
-                console.error('Could not find componentRef for id ' + id)
-            }
-        })
+        const comp = this.componentRefMap.get(id);
+        if (comp) {
+            comp.setFormValue(formData)
+        } else {
+            console.error('Could not find componentRef for id ' + id)
+        }
     }
 
     /**
@@ -139,11 +138,12 @@ export class FormPage {
 
     /**
      * 设置页面只读模式
-     * @param id
+     * @param isDisabled
      * @param noSet 不需要设置只读的组件key数组
+     * @param callback
      */
-    setPageReadOnly(isDisabled: boolean, noSet: any[] = []) {
-        setTimeout(() => {
+    setPageReadOnly(isDisabled: boolean, noSet: any[] = [], callback: any = undefined) {
+        try{
             const keys = this.componentRefMap.keys();
             for (const key of keys) {
                 if (noSet.includes(key)) continue;
@@ -158,28 +158,102 @@ export class FormPage {
             //         btnConfig.disabled = true;
             //     }
             // }
-
-        }, 250);
+            if (callback && callback.success && typeof callback.success === CommonConstants.TYPE_OF_FUNCTION) {
+                callback.success()
+            }
+        } catch (e) {
+            if(callback && callback.error && typeof callback.error === CommonConstants.TYPE_OF_FUNCTION) {
+                callback.error(e);
+            }else {
+                throw e;
+            }
+        }
     }
 
 
     /**
-     * set所有指定组件的数据
+     * 校验所有表单
+     */
+    validateAll(filter: string[] = []): Promise<any> {
+        return new Promise<any>(async (resolve, reject) => {
+            try {
+                const compKeys = this.componentRefMap.keys();
+                for (const key of compKeys) {
+                    if(filter.includes(key)) {
+                        continue;
+                    }
+                    const comp = this.componentRefMap.get(key);
+                    if (comp && comp.validate) {
+                        const validate = await comp.validate();
+                        if (!validate) {
+                            const cfg = comp.getFormConfig();
+                            resolve({
+                                flag: false,
+                                msg: `校验失败，请检查 ${cfg.title} ！`
+                            });
+                            return;
+                        }
+                    }
+                }
+                resolve({
+                    flag: true
+                })
+            } catch (e) {
+                resolve({
+                    flag: false,
+                    msg: `校验异常: ${e} ！`
+                })
+            }
+        });
+    }
+
+    /**
+     * 给所有组件set要比对的数据
      * @param AllData
      */
-    setAllFormData(AllData: any) {
-        nextTick(() => {
+    setAllCompPrimevalData(AllData: any) {
+        try {
             const keys = Object.keys(AllData);
-            for(const key of keys) {
+            for (const key of keys) {
                 const comp = this.componentRefMap.get(key);
-                if(comp) {
+                if (comp != null && comp != undefined && comp.addProvide) {
+                    comp.addProvide(CommonConstants.PRIMEVAL_FORM_DAT_KEY, AllData[key])
+                }
+            }
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    /**
+     * set所有指定组件的数据
+     * @param AllData
+     * @param callback
+     */
+    setAllFormData(AllData: any, callback: any = undefined) {
+        try {
+            const keys = Object.keys(AllData);
+            for (const key of keys) {
+                const comp = this.componentRefMap.get(key);
+                if (comp) {
                     comp.setFormValue(AllData[key]);
-                }else {
+                } else {
                     console.error('Could not find componentRef for id ' + key)
                 }
             }
-            this.initial = false;
-        })
+            if (callback && callback.success && typeof callback.success === CommonConstants.TYPE_OF_FUNCTION) {
+                callback.success(this.getAllFormData())
+                setTimeout(() => {
+                    this.initial = false;
+                }, 3000)
+            }
+        } catch (e) {
+            if(callback && callback.error && typeof callback.error === CommonConstants.TYPE_OF_FUNCTION) {
+                callback.error(e);
+            }else {
+                throw e;
+            }
+        }
     }
 
     /**
@@ -193,11 +267,94 @@ export class FormPage {
             let formData = undefined;
             if (comp) {
                 const data = comp.getFormValue();
-                formData = data ? markRaw(data) : undefined;
+                if(data) {
+                    if(Array.isArray(data)) {
+                        formData = [...data];
+                    }else {
+                        formData = {...data};
+                    }
+                }
             }
             allFormData[key] = formData;
         }
         return allFormData;
+    }
+
+    /**
+     * 设置批改项
+     * @param list
+     */
+    setUnDisabledByKeyList(list: any[]){
+        if (list && list.length > 0) {
+            for(const item of list) {
+                const keys = this.componentRefMap.keys();
+                for(const key of keys) {
+                    const comp = this.componentRefMap.get(key);
+                    if (comp && comp.getFormConfig) {
+                        const conf = comp.getFormConfig();
+                        if (!item.startsWith('Btn_')) { // 非按钮控制
+                            if (conf.fromType === CommonConstants.FORM_EDIT_TYPE_FREE) {  // 表单模式时,修改表单disabled实现只读
+                                if (conf.fromSchema && conf.fromSchema.length > 0) {
+                                    conf.fromSchema.forEach(f => {
+                                        if (f.prop === item) {
+                                            if (f.inputtype === CommonConstants.RT_ITEM_TYPE_INPUTGROUP) {
+                                                console.log(f.inputtype);
+                                                f.groupList.forEach((gkey: any) => {
+                                                    gkey.disabled = false;
+                                                });
+                                            }else {
+                                                f.disabled = false;
+                                            }
+                                        }
+                                    });
+                                }
+                            } else if (conf.fromType === CommonConstants.FORM_EDIT_TYPE_GRID) { // 表格模式时,修改表格属性,实现只读
+                                if (conf.fromSchema && conf.fromSchema.length > 0) {
+                                    conf.fromSchema.forEach(gf => {
+                                        if (gf.prop === item) {
+                                            conf.editList.push(gf.prop);
+                                        }
+                                    });
+                                }
+                            }
+                        } else {// 按钮控制
+                            if (conf.fromType !== CommonConstants.FORM_EDIT_TYPE_CUSTOM) {
+                                if (
+                                    conf.titleBtns &&
+                                    conf.titleBtns.length > 0
+                                ) {
+                                    conf.titleBtns.forEach((t) => {
+                                        if ('Btn_' + t.id === item) {
+                                            t.hidden = false;
+                                        }
+                                    });
+                                }
+                                if (conf.endBtns && conf.endBtns.length > 0) {
+                                    conf.endBtns.forEach((t) => {
+                                        if ('Btn_' + t.id === item) {
+                                            t.hidden = false;
+                                        }
+                                    });
+                                }
+                            } else {
+                                comp.setUnDisabledByKeyList(item);
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            const keys = this.componentRefMap.keys();
+            for(const key of keys) {
+                const comp = this.componentRefMap.get(key);
+                if (comp && comp.getFormConfig) {
+                    const conf = comp.getFormConfig();
+                    if (conf.fromType === CommonConstants.FORM_EDIT_TYPE_CUSTOM) {
+                        comp.setUnDisabledByKeyList();
+                    }
+                }
+            }
+        }
     }
 
 }

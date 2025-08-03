@@ -245,8 +245,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "EdrBase.cEdrRsnBundleCde",
         inputtype: "rtselect",
         title: "批改原因",
-        typeCode: "EDR_RSN_LIST",
-        codeParam: { prodNo: params["cProdNo"] ,rsnTyp: params["cEdrType"],isGrp:params["cGrpMrk"] === "1" ? "1" : null,isPer: params["CGrpMrk"] === "1" ? "1" : null,calcMrk:params["cGrpMrk"]},
+        typeCode: "EDR_RSN_LIST_NEW",
+        codeParam: {kindNo:params["cProdNo"].slice(0, 2), prodNo: params["cProdNo"] ,rsnTyp: params["cEdrType"],isGrp:params["cGrpMrk"] === "1" ? "1" : null,isPer: params["CGrpMrk"] === "1" ? "1" : null,calcMrk:params["cGrpMrk"]},
         rules: [getRules("required", {})],
         clearable: true,
         disabled: true,
@@ -416,7 +416,9 @@ onMounted(() => {
 function getFormconfig() {
   return formconfig1;
 }
-
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  edrbaseEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
@@ -424,5 +426,6 @@ defineExpose({
   setValue,
   getValue,
   getFormconfig,
+  addProvide
 });
 </script>

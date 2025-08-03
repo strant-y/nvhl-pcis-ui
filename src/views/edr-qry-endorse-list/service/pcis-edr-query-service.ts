@@ -7,6 +7,7 @@ export class PcisEdrQueryService {
 
   qryEndorseUrl = '/edr/qryEndorseList'; // 待批改单查询URL
   validEndorseUrl = '/edr/validEndorse'; // 批改前的验证
+  xyvalidEndorseUrl = '/edr/ecargoValidEndorse'; // 协议批改前的验证
   validAddRecordUrl = '/edr/validAddRecord'; // 补录前的验证
   validAddNoRecordUrl = '/edr/validAddNoRecord'; // 补录前的验证
   findTInsrncBgnTmUrl = '/edr/findTInsrncBgnTm'; // 不记名补录前的时间查询
@@ -41,7 +42,12 @@ export class PcisEdrQueryService {
   validEndorse(ops) {
     return request.post(`${this.validEndorseUrl}`, { source: JSON.stringify(ops) })
   }
-
+  /**
+   * 协议批改前的验证
+   */
+  validEndorsexy(ops) {
+    return request.post(`${this.xyvalidEndorseUrl}`, { source: JSON.stringify(ops) })
+  }
   findTInsrncBgnTm(ops) {
     return request.post(`${this.findTInsrncBgnTmUrl}`, { source: JSON.stringify(ops) })
   }

@@ -1,54 +1,67 @@
 <template>
-  <el-date-picker
-    ref="datepickerRef"
-    v-if="!showLabel"
-    v-model="vInput"
-    :class="isReQuired() ? 're-quired-flag' : ''"
-    :type="item.type ? item.type : 'date'"
-    :readonly="
-      item.readonly
-        ? typeof item.readonly === 'boolean'
-          ? item.readonly
-          : item.readonly === 1
-            ? true
-            : false
-        : false
-    "
-    :disabled="
-      item.disabled
-        ? typeof item.disabled === 'boolean'
-          ? item.disabled
-          : item.disabled === 1
-            ? true
-            : false
-        : false
-    "
-    :placeholder="item.placeholder"
-    :disabledDate="
-      item.disabledDate && typeof item.disabledDate === 'function'
-        ? item.disabledDate
-        : (data) => false
-    "
-    :shortcuts="item.shortcuts"
-    :size="item.size"
-    :format="item.format ? item.format : getValueFormat()"
-    :clearable="
-      item.clearable
-        ? typeof item.clearable === 'boolean'
-          ? item.clearable
-          : item.clearable === 1
-            ? true
-            : false
-        : false
-    "
-    :dateFormat="'YYYY-MM-DD'"
-    :timeFormat="'HH:mm:ss'"
-    :valueFormat="item.valueFormat ? item.valueFormat : getValueFormat()"
-    @change="handleChange"
-    @blur="blur"
-  />
+  <template v-if="!showLabel">
+    <el-tooltip
+        :content="changeContent"
+        :disabled="!changeContent"
+        placement="top"
+    >
+      <div>
+        <el-date-picker
+            ref="datepickerRef"
+            v-model="vInput"
+            :class="[
+            ...customClass,
+            ...[isReQuired() ? 're-quired-flag' : '']
+          ]"
+            :type="item.type ? item.type : 'date'"
+            :readonly="
+            item.readonly
+              ? typeof item.readonly === 'boolean'
+                ? item.readonly
+                : item.readonly === 1
+                  ? true
+                  : false
+              : false
+          "
+            :disabled="
+            item.disabled
+              ? typeof item.disabled === 'boolean'
+                ? item.disabled
+                : item.disabled === 1
+                  ? true
+                  : false
+              : false
+          "
+            :placeholder="item.placeholder"
+            :disabledDate="
+            item.disabledDate && typeof item.disabledDate === 'function'
+              ? item.disabledDate
+              : (data) => false
+          "
+            :shortcuts="item.shortcuts"
+            :size="item.size"
+            :format="item.format ? item.format : getValueFormat()"
+            :clearable="
+            item.clearable
+              ? typeof item.clearable === 'boolean'
+                ? item.clearable
+                : item.clearable === 1
+                  ? true
+                  : false
+              : false
+          "
+            :dateFormat="'YYYY-MM-DD'"
+            :timeFormat="'HH:mm:ss'"
+            :valueFormat="item.valueFormat ? item.valueFormat : getValueFormat()"
+            @change="handleChange"
+            @blur="blur"
+            :style="{'min-width': item.type === 'datetime' ? '180px' : '120px'}"
+        />
+      </div>
+    </el-tooltip>
+  </template>
   <span v-else>
-    {{ vInputShow }}
+    {{ vInputShow() }}
   </span>
 </template>
 
@@ -79,7 +92,9 @@ const props = defineProps({
 
 const emits = defineEmits(["update:modelValue", "valueChange"]); // 父组件监听事件，同步子组件值的变化给父组件
 const vInput = ref<number | string>();
-const vInputShow = computed(()=> {
+const customClass = ref<string[]>([]);
+const changeContent = ref<string | undefined>();
+const vInputShow = ()=> {
   const value = props.modelValue;
   const format = props.item.valueFormat
     ? props.item.valueFormat
@@ -89,7 +104,7 @@ const vInputShow = computed(()=> {
   } else {
     return "";
   }
-});
+};
 watch([() => props.modelValue], ([newModelValue]) => {
   if(typeof newModelValue === "number") {
     vInput.value = moment(newModelValue).format(getValueFormat());
@@ -176,11 +191,26 @@ function isReQuired() {
 onMounted(() => {
   vInput.value = props.modelValue;
 });
-onMounted(() => {});
+
+function setCustomClass(classs: string[]) {
+  customClass.value = classs;
+}
+function setChangeInfo(content: any) {
+  if(content) {
+    changeContent.value = (content.text ? content.text : '') + ' 变更为 ' +  vInputShow();
+  }else {
+    changeContent.value = undefined;
+  }
+}
+defineExpose({
+  setCustomClass,
+  setChangeInfo
+});
 </script>
 
 <style>
 .el-date-editor {
   width: 100% !important;
 }
+.el-tooltip__popper { z-index: 9999 !important; }
 </style>

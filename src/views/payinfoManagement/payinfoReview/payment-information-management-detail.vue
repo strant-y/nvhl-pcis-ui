@@ -134,7 +134,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cAppNo",
         inputtype: "rtinput",
-        title: "投保单号",
+        title: "申请单号",
         rules: [getRules("required", {})],
         disabled: true,
       },
@@ -414,6 +414,7 @@ function passInfo() {
           if (res.code !== 200) {
             ElMessage.error({ message: res.msg, duration: 3000 });
           } else {
+						dialogVisible.value = false
             ElMessage.success({
               message: "审核通过，" + res.msg,
               duration: 3000,
@@ -444,6 +445,7 @@ function backInfo() {
           if (res.code !== 200) {
             ElMessage.error({ message: res.msg, duration: 3000 });
           } else {
+						dialogVisible.value = false
             ElMessage.success({ message: "支票退回成功", duration: 3000 });
             emits("ok", {});
           }

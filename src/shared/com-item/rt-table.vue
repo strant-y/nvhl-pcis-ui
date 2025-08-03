@@ -25,6 +25,7 @@
       @status-change="handleStatusChange"
       :show-summary="item.showSummary ? item.showSummary : false"
       :sum-text="item.sumText ? item.sumText : '合计'"
+			empty-text="暂无数据"
       :summary-method="item.summaryMethod ? item.summaryMethod : null"
       :span-method="objectSpanMethod"
       @current-change="currentChange"
@@ -43,24 +44,26 @@
         :align="item.align ? item.align : 'center'"
       >
         <template #default="props">
-          <el-row :gutter="20">
-            <template v-for="(i, index) in getfromSchema()" :key="index">
-              <el-col
-                :span="i.itemWidth ? i.itemWidth * formUi.span : formUi.span"
-                style="margin-top: 5px"
-              >
-                <el-form-item
-                  :prop="[props.$index, i.prop]"
-                  :rules="formItems[props.row._dataId][i.prop].rules ? formItems[props.row._dataId][i.prop].rules : undefined"
-                  :label="i.title"
-                  :label-position="
+          <div style="margin: -5px 5px -5px 5px;background-color: rgba(228,204,164,0.2);">
+            <el-row :gutter="20">
+              <template v-for="(i, index) in getfromSchema()" :key="index">
+                <el-col
+                    :span="i.itemWidth ? i.itemWidth * formUi.span : formUi.span"
+                    style="margin-top: 5px"
+                    v-if = 'formItems[props.row._dataId][i.prop].hidden !== true'
+                >
+                  <el-form-item
+                      :prop="[props.$index, i.prop]"
+                      :rules="formItems[props.row._dataId][i.prop].rules ? formItems[props.row._dataId][i.prop].rules : undefined"
+                      :label="i.title"
+                      :label-position="
                     i.inputtype === 'table' ? 'top' : formUi.labelPosition // table 组件,默认标题显示在top上
                   "
-                  style="margin-bottom: 18px"
-                >
-                  <div style="display: flex;">
-                    <div
-                    :style="{
+                      style="margin-bottom: 18px"
+                  >
+                    <div style="display: flex;">
+                      <div
+                          :style="{
                       width:
                         formItems[props.row._dataId][i.prop].showExBtn &&
                         formItems[props.row._dataId][i.prop].inputtype !==
@@ -73,39 +76,40 @@
                       display: 'flex',
                       alignItems: 'flex-start',
                     }"
-                  >
-                    <from-item
-                      v-model="props.row[i.prop]"
-                      :item="formItems[props.row._dataId][i.prop]"
-                      :showLabel="editIndex !== props.row._dataId"
-                      :row="props.row"
-                    />
-                  </div>
+                      >
+                        <from-item
+                            v-model="props.row[i.prop]"
+                            :item="formItems[props.row._dataId][i.prop]"
+                            :showLabel="editIndex !== props.row._dataId"
+                            :row="props.row"
+                        />
+                      </div>
 
-                  <!---       显示组件尾部按钮       --->
-                  <template
-                    v-if="formItems[props.row._dataId][i.prop].showExBtn"
-                  >
-                    <rt-button
-                      v-if="
+                      <!---       显示组件尾部按钮       --->
+                      <template
+                          v-if="formItems[props.row._dataId][i.prop].showExBtn"
+                      >
+                        <rt-button
+                            v-if="
                         formItems[props.row._dataId][i.prop].inputtype !==
                         'rttable'
                       "
-                      :style="{
+                            :style="{
                         width:
                           (formItems[props.row._dataId][i.prop].btnWidth
                             ? formItems[props.row._dataId][i.prop].btnWidth
                             : 25) + '%',
                         height: '100%',
                       }"
-                      :item="formItems[props.row._dataId][i.prop].btnItems"
-                    />
-                  </template>
-                  </div>
-                </el-form-item>
-              </el-col>
-            </template>
-          </el-row>
+                            :item="formItems[props.row._dataId][i.prop].btnItems"
+                        />
+                      </template>
+                    </div>
+                  </el-form-item>
+                </el-col>
+              </template>
+            </el-row>
+          </div>
         </template>
       </el-table-column>
       <el-table-column
@@ -180,6 +184,7 @@
             :prop="i.prop"
             :label="i.title"
             :width="i.width ? i.width : null"
+            :fixed="i.fixed ? i.fixed : null"
             :align="item.align ? item.align : i.align ? i.align : 'center'"
             :min-width="getColumnWidth(i.title,i.prop,tableDatas,i.minWidth,i.width, i.maxWidth || item.maxWidth)"
           >
@@ -194,7 +199,10 @@
               {{ header.column.label }}
             </template>
             <template #default="scope">
-              <template v-if="item.editFlag">
+              <template v-if="i.slotName">
+                <slot :name="`column-${i.slotName}`" v-bind="scope" />
+              </template>
+              <template v-else-if="item.editFlag">
                 <el-form-item
                   :prop="[scope.$index, i.prop]"
                   :rules="i.rules ? i.rules : undefined"
@@ -418,6 +426,9 @@ function creatItem(d: any) {
             sc[k]['btnItems'][k3] = schamaconf.value[k]['btnItems'][k3];
           }
         });
+        if(!props.item.editFlag){
+          schamaconf.value[k]['btnItems']['disabled'] = true;
+        }
       }else if (typeof schamaconf.value[k][k2] === "function") {
         sc[k][k2] = schamaconf.value[k][k2];
       }
@@ -663,6 +674,31 @@ function addRowByData(data: any) {
   editIndex.value = rowId;
 }
 
+function spliceTableData(index: number, delCount: number, list: any[]) {
+  const addNum = !!list ? list.length : 0;
+  if(addNum > 0) {
+    const keys = Object.keys(formItems.value);
+    for (let i = 0; i < addNum; i ++) {
+      const rowData = list[i];
+      const nextIdx = index + i;
+      const delNum = i < delCount ? 1 : 0;
+      if(rowData['_dataId'] && keys.includes(rowData['_dataId'])) {
+        // 行id已存在直接替换数据
+        tableDatas.value?.splice(nextIdx, delNum, rowData);
+      } else {
+        const rowId = getuuid();
+        rowData['_dataId'] = rowId;
+        tableDatas.value?.splice(nextIdx, delNum, rowData);
+        formItems.value[rowId] = creatItem(schamaconf.value);
+      }
+    }
+  }
+  if(delCount > addNum) {
+    tableDatas.value?.splice(index + addNum, delCount - addNum);
+  }
+  return tableDatas.value;
+}
+
 function getSelectRow() {
   const sele = tableDatas.value?.find((item) => {
     if (item._dataId === editIndex.value) {
@@ -691,7 +727,6 @@ function setRowFieldProp(
   prop: string,
   value: any
 ) {
-  console.log("setRowFieldProp", formItems,rowId, field, prop, value);
   if (formItems.value[rowId] && formItems.value[rowId][field]) {
     // 使用 Vue.set 确保响应式更新
     formItems.value[rowId][field] = {
@@ -701,7 +736,6 @@ function setRowFieldProp(
   } else {
     console.warn(`Field ${field} or row ${rowId} not found.`);
   }
-  console.log("formItem",formItems.value);
 }
 function getRowById(rowId: any) {
   return tableDatas.value?.find((item) => {
@@ -780,6 +814,9 @@ function clearSelection() {
 function toggleRowSelection(row: any, selected: boolean) {
   tableRef.value?.toggleRowSelection(row, selected);
 }
+function getTableValues() { 
+  return tableDatas.value;
+}
 
 defineExpose({
   tableExvalidate,
@@ -796,6 +833,8 @@ defineExpose({
   clearSelection,
   toggleRowSelection,
   setRowFieldProp,
+  spliceTableData,
+  getTableValues,
   // getItemsRowId
 });
 function isrequired(i: any) {
@@ -820,7 +859,7 @@ function isrequired(i: any) {
 :deep(.el-table .cell) {
   white-space: nowrap;
 }
-:deep(.el-table td.el-table__cell div) {
+:deep(.el-table td.el-table__cell div.cell) {
   white-space: normal;
 }
 </style>

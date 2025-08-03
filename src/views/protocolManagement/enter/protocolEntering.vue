@@ -79,16 +79,18 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         label: "重置",
         func: () => {
           freeEditRef.value?.setFormValue({
-            cDptCde: null,
+            cDptCde: "0200000000000",
             cLoadSub: 1,
             cKindNo: null,
             cTermNo: null,
             cAppNme: "",
             insuredNme: "",
+						cEcAgrNo: "",
+						cEcAgrAppNo: "",
             Tm: [
-              moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00"),
-              moment(new Date()).format("YYYY-MM-DD 23:59:59")
-            ]
+							moment(new Date(Date.now() - 5 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00"),
+							moment(new Date(Date.now() + 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 23:59:59"),
+          	],
           });
           handleQuery(true);
           // freeEditRef.value?.resetForm();
@@ -102,7 +104,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "承保机构",
         btnWidth: 20,
         itemWidth: 1,
-        rules: [{ "type": "required" }],
+        disabled: true,
+        rules: [getRules("required", {})],
         showExBtn: true,
         btnItems: {
             icon: "Search",
@@ -131,9 +134,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
         loadData: [
           {
-            "label": "永安保险总公司",
-            "value": "0200000000000"
-          }
+						label: "0200000000000永安保险公总司",
+						value: "0200000000000",
+					},
         ]
       },
       {
@@ -145,7 +148,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           y: 1,
           n: 0,
         },
-        itemWidth: 2,
+        itemWidth: 1,
       },
       {
         prop: "cKindNo",
@@ -172,7 +175,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             },
             })
             .then((res) => {
-                setFormItem("cProdNo", {
+                setFormItem("cTermNo", {
                     loadData: res,
                 });
             });
@@ -195,6 +198,18 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         func: (val: string) => {},
       },
       {
+        prop: "cEcAgrAppNo",
+        inputtype: "rtinput",
+        title: "预约协议申请单号",
+        clearable: true,
+      },
+			{
+				prop: "cEcAgrNo",
+				inputtype: "rtinput",
+				title: "协议单号",
+				clearable: true,
+			},
+      {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人客户名称",
@@ -216,10 +231,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         format: "YYYY-MM-DD HH:mm:ss",
         valueFormat: "YYYY-MM-DD HH:mm:ss",
         defaultValue: [
-          moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
-            "YYYY-MM-DD 00:00:00"
-          ),
-          moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+          moment(new Date()).format("YYYY-MM-DD 00:00:00"),
+          moment(new Date(Date.now() + (6 * 1000 * 60 * 60 * 24))).format(
+              "YYYY-MM-DD 23:59:59"
+          )
         ],
       }
     ],
@@ -278,9 +293,15 @@ const tableconfig = reactive<AppTableConfig>(
     ],
     fromSchema: [
       {
+        prop: "cEcAgrAppNo",
+        inputtype: "rtinput",
+        title: "预约协议申请单号",
+        minWidth: 180,
+      },
+      {
         prop: "cEcAgrNo",
         inputtype: "rtinput",
-        title: "协议号",
+        title: "协议单号",
         minWidth: 180,
       },
       {
@@ -337,10 +358,20 @@ const tableconfig = reactive<AppTableConfig>(
 );
 
 onMounted(async () => {
-  freeEditRef.value?.setValue('Tm',[
-    moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00"),
-    moment(new Date()).format("YYYY-MM-DD 23:59:59")]
-  )
+	freeEditRef.value?.setFormValue({
+		cDptCde: "0200000000000",
+		cLoadSub: 1,
+		cKindNo: null,
+		cTermNo: null,
+		cAppNme: "",
+		insuredNme: "",
+		cEcAgrNo: "",
+		cEcAgrAppNo: "",
+		Tm: [
+			moment(new Date(Date.now() - 5 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00"),
+			moment(new Date(Date.now() + 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 23:59:59"),
+		],
+	})
 });
 
 // 绑定方法
@@ -355,7 +386,11 @@ const exRules = {};
 
 
 function toDtl(row: any, type: string) {
-  router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify(row), type: type}});
+  if(row.cAppTyp === 'E'){
+    router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify(row), type: 'EDR_APP_NEW_SCENE',isActive:'1'}});
+  }else {
+    router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify(row), type: type}});
+  }
 }
 
 /** 查询 */

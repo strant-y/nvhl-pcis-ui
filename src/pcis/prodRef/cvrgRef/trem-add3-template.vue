@@ -7,7 +7,7 @@
           <th v-for="(item, k) in formcof" :key="k" :style="{width: item.width?item.width+'px':null}">
             {{ item.title + (k === 'nMainRate' ? item.suffix : '') }}
           </th>
-          <th v-if="checkShowBtn" style="width: 100px">操作</th>
+          <th style="width: 100px">操作</th>
         </tr>
       </thead>
       <tbody>
@@ -16,14 +16,25 @@
             {{ k + 1 }}
           </td>
           <td v-for="(it, kk) in formcof" :key="kk">
-            <from-item
-              v-model="item['Term.'+kk]"
-              :item="it"
-            />
+            <template v-if = "it['inputtype'] === 'rttag'">
+              <el-badge value="退" class="term_badge" :hidden="item['Term.cCancelMrk'] !== '1'" >
+                <from-item
+                v-model="item['Term.'+kk]"
+                :item="getterm(it,item)"
+              />
+              </el-badge>
+            </template>
+            <template v-else>
+              <from-item
+                v-model="item['Term.'+kk]"
+                :item="getterm(it,item)"
+              />
+            </template>
+            
           </td>
-          <td v-if="checkShowBtn" >
+          <td>
             <rtButton
-              v-if="!btnConf.delete.hidden"
+              v-if="checkShowBtn(item)"
               @click="
                 () => {
                   emit('delete', item);
@@ -43,7 +54,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { terConfig } from "@/store/modules/term-config";
 const emit = defineEmits(["update:modelValue", "delete"]);
 const opertaor = dataOpertaor();
-
+const param = opertaor.getParam();
 const terconfig = terConfig();
 
 const props = defineProps({
@@ -86,24 +97,37 @@ function setDisabledAll() {
   });
 }
 
-const checkShowBtn = computed(()=>{ 
+function checkShowBtn( data: any ){ 
   let r = true;
   Object.keys(btnConf.value).forEach((k: any) => {
     r = r && !btnConf.value[k].hidden;
   });
+  if(param.cEdrType && !data['Term.cRowId']){
+    r = true;
+  }
   return r;
-}) ;
+};
 
 function changeBtn() { 
-  Object.keys(formcof.value).forEach((k: any) => {
-    formcof.value[k].disabled = props.disabledFlag;
-  });
-  Object.keys(btnConf.value).forEach((k: any) => {
-    btnConf.value[k].hidden = props.disabledFlag;
-  });
+  // Object.keys(formcof.value).forEach((k: any) => {
+  //   formcof.value[k].disabled = props.disabledFlag || formcof.value[k].disabled;
+  // });
+  
+  if(param.cRsnCde !== '11'){
+    Object.keys(btnConf.value).forEach((k: any) => {
+      btnConf.value[k].hidden = props.disabledFlag;
+    });
+  }
 }
 
-
+function getterm(it: any,termdata: any){
+  if(param.cEdrType && !termdata['Term.cRowId']){
+    it.disabled = false || it.disabled ;
+  }else{
+    it.disabled = props.disabledFlag || it.disabled;
+  }
+  return it;
+}
 function setCancel(){
   props.planData['Term.cCancelMrk'] = '1';
 }
@@ -116,8 +140,12 @@ onMounted(() => {
 });
 
 function dataInit() {}
+function dataFlash() {}
+
+
 defineExpose({
   dataInit,
+  dataFlash,
   setDisabledAll,
   setCancel
 });
@@ -136,5 +164,8 @@ td {
   border: 1px solid #f5f5f5; /* 设置边框样式 */
   padding: 2px;
   text-align: left;
+}
+::v-deep .term_badge .el-badge__content{
+  top: 5px !important;
 }
 </style>

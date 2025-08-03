@@ -639,9 +639,17 @@
         },
         {
             prop: "cAppStatus",
-            inputtype: "rtinput",
+            inputtype: "rtselect",
             title: "状态",
             minWidth: 180,
+            loadData: [
+                { label: "暂存", value: '1' },
+                { label: "已提核", value: '2' },
+                { label: "核保退回", value: '3' },
+                { label: "已核保", value: '4' },
+                { label: "已签发保单", value: '5' },
+                { label: "见费出单退回", value: '8' },
+            ]
         },
     ]);
     // 根据下拉切换显示表格操作列 通用控制
@@ -1174,7 +1182,7 @@
     const exportDown = () => {
         const CAppNo = freeEditRef.value?.getValue("cInquiryNo");
         const CPlyNo = freeEditRef.value?.getValue("CPlyNo");
-        // 查询条件：投保单号，保单号任何一个有值时，都无需做其他查询条件校验
+        // 查询条件：申请单号，保单号任何一个有值时，都无需做其他查询条件校验
         if (!CAppNo && !CPlyNo) {
             // 查询时间段验证
             const date1 = freeEditRef.value?.getValue("tm1"); //投保日期
@@ -1472,6 +1480,7 @@
                         cTermNme:row.cTermNme,
                         cProdNmeCn: row.prodName,
                         pageName: 'priceInquiry',
+                        cAppNo: row.cAppNo,
                     });
                     router.push({
                         path: "/pcis/my-page",
@@ -1502,6 +1511,7 @@
                         cTermNme:row.cTermNme,
                         cProdNmeCn: row.prodName,
                         pageName: 'priceInquiry',
+                        cAppNo: row.cAppNo,
                     });
                     router.push({
                         path: "/pcis/my-page",

@@ -166,7 +166,7 @@ function handleQuery(flag?: boolean) {
         CurrentUser: user.opCde,
         CurrentUserOrg: user.companyId,
         CBsnsTyp: props.data.data['CBsnsTyp'],
-        CDptCde: routeParam.cDptCde,
+        CDptCde: routeParam.cDptCde || props.data.data['cDptCde'],
         CBrkrCde: props.data.data['CBrkrCde'],
         CSlsTyp: props.data.data['CSlsTyp'],
         CChaType: props.data.data['CChaType'],
@@ -193,8 +193,10 @@ onMounted(() => {
     console.log('param', props.data)
     nextTick(() => {
         // setValue('CDptCde', props.data.data.CDptCde)
-        setValue('CDptCnm',routeParam.cDptCnm)
+        setValue('CDptCnm',routeParam.cDptCnm || props.data.data['cDptCnm'])
     })
+  // 页面加载时触发一次查询
+    handleQuery();
 });
 
 defineExpose({

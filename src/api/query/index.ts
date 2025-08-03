@@ -26,7 +26,7 @@ export function getAddressStr(queryParams: any): AxiosPromise<any> {
 }
 
 /**
- * 获取投保单号
+ * 获取申请单号
  * @param queryParams
  */
 export function generatelSingleNo(queryParams: any): AxiosPromise<any> {
@@ -55,6 +55,14 @@ export function submitToUndr(queryParams: any): AxiosPromise<any> {
  */
 export function getAppPolicyList(queryParams: any): AxiosPromise<any> {
     return post(`/policy/getAppPolicyList`, queryParams);
+}
+
+/**
+ * es查询
+ * @param queryParams
+ */
+export function queryInsuredList(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/queryInsuredList`, queryParams);
 }
 
 /**
@@ -314,7 +322,15 @@ export function isUndrClsBlackList(queryParams: any): AxiosPromise<any> {
 }
 
 /**
- * 保费计算前校验费率上限接口
+ * 协议/录单-根据协议号、产品代码、条款代码、被保人id查询被保人信息和条款信息
+ * @param queryParams
+ */
+export function queryEcargoRelevancePolicyDetails(queryParams: any): AxiosPromise<any> {
+	return post(`/ecargo/queryEcargoRelevancePolicyDetails`, queryParams);
+}
+
+/**
+* 保费计算前校验费率上限接口
  * @param queryParams
  */
 export function queryTermRateLimit(queryParams: any): AxiosPromise<any> {

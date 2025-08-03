@@ -27,9 +27,10 @@ import {
 import { useRoute } from "vue-router";
 import { createFreeButtonBase } from "@/shared/button-config";
 const publicProblem = defineAsyncComponent(() => import("./PublicProblem.vue"));
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
 const route = useRoute();
 const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
 import {
   AppFreeEditConfig,
   AppFreeEditMethod,

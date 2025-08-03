@@ -120,6 +120,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
         itemWidth: 3,
         func: (value: any) => {
+
+           setFormItem('cPrnNo',{btnItems:{ disabled:true,}})
+          console.log(value)
           setPrnTemplate();
           const CPrnNo = freeEditRef.value?.getValue("cPrnNo");
           const CPlyType = freeEditRef.value?.getValue("cPlyType");
@@ -147,8 +150,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             if ("P" === value) {
               // 服务卡销号开始
               flag.value = true;
+                setFormItem('cPrnNo',{btnItems:{  disabled:false,}})
               // 服务卡结束
             } else if ("E" === value) {
+                setFormItem('cPrnNo',{btnItems:{  disabled:false,}})
               if (
                 props.data?.cEdrRsnBundleCde === "Z1" ||
                 props.data?.cEdrRsnBundleCde === "22"
@@ -167,6 +172,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           } else {
             flag.value = false;
             flagCancle.value = false;
+            if ("P" === value) {
+                setFormItem('cPrnNo',{btnItems:{  disabled:false,}})
+            } else if ("E" === value) {
+                setFormItem('cPrnNo',{btnItems:{  disabled:false,}})
+            }
           }
           check060024FlagCancle(value);
         },
@@ -245,6 +255,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         showExBtn: true,
         btnWidth: 30,
         btnItems: {
+        
           label: "获取最小印刷号",
           type: "plain",
           func: () => {
@@ -599,15 +610,34 @@ function check060024FlagCancle(CPrnType: any) {
 }
 
 //给表单下拉项赋值
-function setFormItem(key, obj) {
+// function setFormItem(key, obj) {
+//   if (obj && Object.keys(obj).length) {
+//     formconfig1.fromSchema?.forEach((item) => {
+//       if (item.prop === key) {
+//         Object.assign(item, obj);
+//       }
+//     });
+//   }
+// }
+
+//给表单下拉项赋值
+function setFormItem(key: any, obj: any) {
   if (obj && Object.keys(obj).length) {
     formconfig1.fromSchema?.forEach((item) => {
       if (item.prop === key) {
-        Object.assign(item, obj);
+        //控制尾部按钮的
+        if (item.btnItems && obj.btnItems) {
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
+          }
+        } else {
+          Object.assign(item, obj);
+        }
       }
     });
   }
 }
+
 function getFormItem(key:any, prop:any) {
   const item = formconfig1.fromSchema?.find((item) => item.prop === key);
   return item ? item[prop] : null;

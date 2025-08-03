@@ -10,4 +10,7 @@ export const iconMap = {
   'ECargoTransportDist': 'icon-anjian',
   'ECargoGoodsTgt': 'icon-lishicaozuojilu',
   'ECargoTerm': 'icon-chakanmingxi',
+  'underwriteurl': 'icon-shenhexinxi',
+  'edrbase': 'icon-shujuxiuzheng',
+  'edritem': 'icon-zhongkaian',
 }

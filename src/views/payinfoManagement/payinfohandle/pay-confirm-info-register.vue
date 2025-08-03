@@ -82,9 +82,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                         .then((res) => {
                             const { code, data, msg } = res;
                             if (200 === code) {
-                                emits("ok", {});
-                                ElMessage.success(msg);
                                 // dialogVisible.value = false;
+                                ElMessage.success(msg);
+                                emits("ok", {});
                             } else {
                                 ElMessage.error(msg);
                             }
@@ -109,8 +109,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                             const { code, data, msg } = res;
                             if (200 === code) {
                                 emits("ok", {});
+                                dialogVisible.value = false;
                                 ElMessage.success(msg);
-                                // dialogVisible.value = false;
                             } else {
                                 ElMessage.error(msg);
                             }
@@ -183,7 +183,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: 'CSeqNo',
         title: '出票人账号',
         inputtype: "rtinput",
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {}),getRules("accountValidation", {})],
       },
       {
         prop: 'TBgnTm',
@@ -257,7 +257,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: 'CChequeNo',
         title: '支票号',
         inputtype: "rtinput",
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {}),getRules("chequeNumberValidation",{})],
       },
       // {
       //   prop: 'TPayConfTm',
@@ -269,7 +269,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: 'CAppNo',
         disabled: true,
-        title: '投保单号',
+        title: '申请单号',
         inputtype: "rtinput",
       },
       {
@@ -332,7 +332,7 @@ const formconfigMany= ref( [
         prop: 'CSeqNo',
         title: '出票人账号',
         inputtype: "rtinput",
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {}),getRules("accountValidation", {})],
       },
       {
         prop: 'NPayAmt',
@@ -355,7 +355,7 @@ const formconfigMany= ref( [
       {
         prop: 'CAppNo',
         disabled: true,
-        title: '投保单号',
+        title: '申请单号',
         inputtype: "rtinput",
       },
       {

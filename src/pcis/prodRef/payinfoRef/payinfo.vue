@@ -5,11 +5,14 @@
 <script setup lang="ts">
 import { formInit } from "@/shared/from-init"; 
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { useRoute } from "vue-router";
+const route = useRoute();
 const opertaor = dataOpertaor();
 import {
   AppGridEditMethod,
   createAppGridEditConfig,
 } from "@/shared/app-grid-edit-config";
+import { numAdd } from "@/utils/Math";
 
 const props = defineProps({
   pageSchema: {
@@ -24,6 +27,83 @@ const props = defineProps({
 
 const payinfoEditRef = ref<AppGridEditMethod | null>(null);
 const formconfig1 = reactive(createAppGridEditConfig({}));
+// Base.cCiMrk  联共保 字段   0 5非共保    1 2 主联   3 4 无联保  
+  // Base.nCiOwnPrm   我司保费
+
+const watchSource = computed(() => {
+  const data = opertaor.getDataAll();
+  const cCiMrk = data.plyBase?.['Base.cCiMrk'];
+  const nCiOwnPrm = ['1', '2', '3','4'].includes(cCiMrk) ? data.ciMasterAgreement?.['Base.nCiOwnPrm'] : data.base?.['Base.nPrm'];
+  // 返回“值类型”组合（而非新对象），避免引用变化导致的误触发
+  return [cCiMrk, nCiOwnPrm];
+});
+
+watch(
+  watchSource,
+  ([newCCiMrk, newNCiOwnPrm], [oldCCiMrk, oldNCiOwnPrm]) => {
+    if (newCCiMrk === oldCCiMrk && newNCiOwnPrm === oldNCiOwnPrm) {
+      return; // 值没变，直接退出，不执行后续逻辑
+    }
+    nextTick(()=>{
+      nPrmFun();
+    })
+  },
+  { deep: false, immediate: false }
+);
+
+// 我司保费变化后进行处理
+const nPrmFun = ()=>{
+    if(getFromValue()?.length > 0){
+         
+            const data = opertaor.getDataAll();
+            // 比例
+            let nCiShare = Number(getOwnShare()) || 100 ;
+            const totalAmount = Number(data['base']['Base.nPrm']);  
+            const splitCount =Number(data.base?.['Base.nPayNumber']) 
+
+            const totalCent = Math.round(totalAmount * 100);
+            const result = ref<number[]>([]);
+            const quotient = Math.floor(totalCent / splitCount) ;
+            const remainder = totalCent % splitCount;
+            result.value = Array(splitCount).fill(quotient);
+            if (remainder > 0) {
+              result.value[0] += remainder;
+            }
+
+           result.value = result.value.map(cent => parseFloat((cent / 100 * (nCiShare/100)).toFixed(2)));
+
+          const formArray = getFromValue(); 
+          const limitLength = Number(data['base']['Base.nPayNumber']) || 0; // 示例: 3
+          const modifiedArray = formArray.map((item:any, index:any) => {
+                // 超出限制长度的元素：直接返回原对象（不修改）
+                  if (index >= limitLength) {
+                    return item;
+                  }
+                  return {
+                    ...item, // 保留原有其他属性
+                     "Pay.nOwnPrm":result.value[index],
+                  };
+                });
+              setFormValue(modifiedArray )
+    } 
+}
+
+// 获取我司比例
+const getOwnShare =()=>{
+   let ownShare = 0;
+   const data = opertaor.getDataAll();
+   let ciArr = data['ci']
+  //  const cCiMrk = data.plyBase?.['Base.cCiMrk'];
+  if(ciArr && ciArr.length>0){
+    ciArr.forEach((item:any)=>{
+      const CDptMrk = item['Ci.cCoinsurerCde']
+      if(!!CDptMrk && CDptMrk ==="327001"){
+        ownShare = numAdd(ownShare,item['Ci.nCiShare'])
+      } 
+   })
+  }
+  return ownShare;
+}
 
 onMounted(() => {
   const formconfig11 = formInit(
@@ -39,7 +119,6 @@ const method = {
   // func demo
   func1: () => { },
   funcpayadd: () => {
-
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["base"].getFromValue();
     const applicantBefore = tabref["applicant"].getFromValue();
@@ -96,6 +175,24 @@ const method = {
 
     });
   },
+  // 缴费计划
+  nPayablePrmFun:(val:any)=>{
+    const tabref = opertaor.getTableRefs();
+    const payinfoBefore = tabref["payinfo"].getFromValue();
+    const data = opertaor.getDataAll();
+    const cCiMrk =  ['0', '5'].includes(data.plyBase?.['Base.cCiMrk']);
+    // const nCiOwnPrm = ['0', '5'].includes(cCiMrk)  
+    // 0 5 就同步更改我司保费
+    if(cCiMrk){
+         getFromValue().forEach((item:any) =>{
+              item['Pay.nOwnPrm']  = item['Pay.nPayablePrm']
+         })
+    }  
+    console.log('val',val,cCiMrk)
+    console.log('777777,‘',getFromValue())
+
+  }
+  // Pay.nPayablePrm
   //缴费止期控制
   // tPayEndTmDisabled: (date: any) => {
   //   return  date.getTime() <new Date( opertaor.getTableRefs()["insrnc"].getValue("Base.tInsrncEndTm").replace(/-/g, '/')).getTime()
@@ -141,14 +238,18 @@ function setFormItem(key: any, obj: any) {
     });
   }
 }
-
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  payinfoEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   getTableValue,
   getFormconfig,
-  setFormItem
+  setFormItem,
+  // splitnPrm,
+  addProvide
 });
 </script>
 

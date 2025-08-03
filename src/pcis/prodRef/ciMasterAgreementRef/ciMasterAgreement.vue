@@ -27,13 +27,30 @@ const props = defineProps({
 // 监听 cCiMrk 的变化并更新本地变量
 watchEffect(() => {
   const cCiMrkValue = opertaor.getTableRefByKey("plyBase")?.getValue("Base.cCiMrk");
+    if(cCiMrkValue === "1"){
+        setValue("Base.cCiInpTyp", '600001');
+      }else if(cCiMrkValue === "2"){
+        setValue("Base.cCiInpTyp", '600004');
+      }else if(cCiMrkValue === "3"){
+        setValue("Base.cCiInpTyp", '600001');
+      }else if(cCiMrkValue === "4"){
+        setValue("Base.cCiInpTyp", '600004');
+      }else if(cCiMrkValue === "5"){
+        setValue("Base.cCiInpTyp", '600005');
+      }
     if (cCiMrkValue === "3" || cCiMrkValue === "4") {
       formconfig1.fromSchema?.forEach((item) => {
         const prop = item.prop;
         if (
           prop === "Base.cCiAgtNo" ||
           prop === "Base.nCiJntAmt" ||
-          prop === "Base.nCiJntPrm"
+          prop === "Base.nCiJntPrm" ||
+          prop === "Base.nCiOwnAmt" ||
+          prop === "Base.nCiOwnPrm" ||
+          prop === "Base.cCiInpTyp" ||
+          prop === "Base.cCiPriTyp" || 
+          prop === "Base.cReceiptTitleNme" ||
+          prop === "Base.cReceiptTitleCde"
         ) {
           item.hidden = false; // 显示共保字段
         } else {
@@ -46,7 +63,12 @@ watchEffect(() => {
           if (
             prop === "Base.cJiAgtNo" ||
             prop === "Base.nJiJntAmt" ||
-            prop === "Base.nJiJntPrm"
+            prop === "Base.nJiJntPrm" ||
+            prop === "Base.nCiOwnPrm" ||
+            prop === "Base.cCiInpTyp" ||
+            prop === "Base.cCiPriTyp" || 
+            prop === "Base.cReceiptTitleNme" ||
+            prop === "Base.cReceiptTitleCde"
           ) {
             item.hidden = false; // 显示联保字段
           } else {
@@ -97,6 +119,14 @@ const method = {
       tgtobjEditRef.value?.setValue("Base.cCiAgtNo", "");
     }
   },
+  cReceiTitleCdeChange:(val)=>{
+    if(val === '3127001'){
+      setFormItem("Base.cReceiptTitleNme", {disabled: true})
+      setValue("Base.cReceiptTitleNme","")
+    }else{
+      setFormItem("Base.cReceiptTitleNme", {disabled: false})
+    }
+  },
 };
 // 绑定特殊验证器
 const exRules = {};
@@ -145,13 +175,17 @@ const setFormItem = (key, obj) => {
 function getFormconfig(){
   return formconfig1;
 }
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  tgtobjEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   setValue,
   getValue,
-  getFormconfig
+  getFormconfig,
+  addProvide
 });
 </script>
 
