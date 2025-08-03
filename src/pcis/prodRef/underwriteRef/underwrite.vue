@@ -525,6 +525,8 @@ watch(
         setFormItem("riFacMrk", {
           btnItems: {disabled: true}
         });
+        // 临分标识如果是1，则是否临分复选框设置勾选状态
+        setValue("riFacMrk", props.pageData?.plyBase['Base.cRiFacMrk'] == "1" ? "1" : "0");
       }
     }
   },

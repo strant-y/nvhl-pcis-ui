@@ -1235,6 +1235,10 @@ async function tryCountInFoRIs(row: any) {
     ElMessage.error("风险等级不能为空")
     return
   }
+  if(addressOptions.value.length > 0 && !row.cDetailedAddress) {
+    ElMessage.error("标的地址不能为空")
+    return
+  }
   if(row.cDetailedAddress && !row.cRemark) {
     ElMessage.error("备注不能为空")
     return
@@ -1311,6 +1315,10 @@ function saveDatas() {
     }
     if(!row.cRiskLvlCde) {
       ElMessage.error("风险等级不能为空")
+      return
+    }
+    if(addressOptions.value.length > 0 && !row.cDetailedAddress) {
+      ElMessage.error("标的地址不能为空")
       return
     }
     if(row.cDetailedAddress && !row.cRemark) {
