@@ -484,7 +484,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           {
               prop: "cAppNo",
               inputtype: "rtinput",
-              title: "投保单号",
+              title: "申请单号",
               clearable: true,
           },
           {
@@ -888,6 +888,7 @@ const tableObj = {
                     console.log(row);
                     const r = await row;
                     if (r) {
+                        row.cPolicySource = '8'
                         const data = row;
                         router.push({
                             path: "/pcis/my-page",
@@ -979,7 +980,7 @@ const tableObj = {
             {
                 prop: "cAppNo",
                 inputtype: "rtinput",
-                title: "投保单号",
+                title: "申请单号",
                 minWidth: 180,
             },
             {

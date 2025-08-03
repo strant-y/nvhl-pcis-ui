@@ -192,10 +192,10 @@ const tabs = ref<Array<any>>([
     name: "投保待撤回任务",
     key: "5",
   },
-  {
-    name: "待修改单查询",
-    key: "6",
-  },
+  // {
+  //   name: "待修改单查询",
+  //   key: "6",
+  // },
   {
     name: "保单到期查询",
     key: "7",
@@ -241,7 +241,7 @@ onMounted(async () => {
         homeJumpData.value.TIssueTmEnd,
       ]);
       if (homeJumpData.value.hasOwnProperty("CAppNo")) {
-        //投保单号
+        //申请单号
         freeEditRef.value[1].value[0].setValue(
           "cAppNo",
           homeJumpData.value.CAppNo

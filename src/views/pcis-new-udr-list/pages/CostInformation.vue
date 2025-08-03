@@ -1,17 +1,29 @@
 <!-- 核保任务查询 费用信息 -->
 <template>
-  <el-dialog v-model="dialogVisible" width="90%" title="费用信息">
+  <el-dialog v-model="dialogVisible" width="50%" title="费用信息">
     <app-table
       :tableConfig="tableconfig"
       v-model:pageresult="pageresult"
       ref="tableRef"
     />
-    <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" /> 
-   <app-table
-      :tableConfig="tableconfig1"
-      v-model:pageresult="pageresult1"
-      ref="tableRef1"
-    />
+    <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
+    <app-table
+        :tableConfig="tableconfig1"
+        v-model:pageresult="pageresult1"
+        ref="tableRef1"
+    >
+      <template #column-cChgVal="{ row, column, index }">
+        <div style="display: flex; align-items: center;">
+          <span>{{ row.cChgVal }}</span>
+          <el-icon v-if="row.cChgVal && parseFloat(row.cChgVal) > 0" style="margin-left: 5px; color: #ef4747;">
+            <Top />
+          </el-icon>
+          <el-icon v-else-if="row.cChgVal && parseFloat(row.cChgVal) < 0" style="margin-left: 5px; color: #00b19d;">
+            <Bottom />
+          </el-icon>
+        </div>
+      </template>
+    </app-table>
     <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
       <rt-button
         :item="{
@@ -217,13 +229,13 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cFeetypCde",
         inputtype: "rtinput",
         title: "费用类型",
-        minWidth: 180,
+        minWidth: 40,
       },
       {
         prop: "nFeeProp",
         inputtype: "rtinput",
         title: "比例(%)",
-        minWidth: 180,
+        minWidth: 80,
         func: (v: any,row:any) => {
           getNFeeList(row)
           //onFeePropKeyDown(row)
@@ -233,7 +245,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "nFee",
         inputtype: "rtinput",
         title: "金额",
-        minWidth: 180,
+        minWidth: 80,
         disabled:true,
       },
       {
@@ -241,7 +253,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtselect",
         title: "ILOG系统费用计算提示信息",
         clearable: true,
-        minWidth: 260,
+        minWidth: 100,
         disabled:true,
         loadData:  [{ value: 0, label: '成功' }, { value: 1, label: '无规则匹配' }, { value: 9, label: '规则引擎异常' }]
       },
@@ -260,47 +272,48 @@ const tableconfig1 = reactive<AppTableConfig>(
         prop: "nSeqNo",
         inputtype: "rtinput",
         title: "序号",
-        minWidth: 180,
+        minWidth: 20,
       },
       {
         prop: "cFldNme",
         inputtype: "rtinput",
         title: "批改对象",
-        minWidth: 180,
+        minWidth: 100,
       },
       {
         prop: "cRelTableNme",
         inputtype: "rtinput",
         title: "批改项目",
-        minWidth: 180,
+        minWidth: 100,
       },
       {
         prop: "cRelFldNme",
         inputtype: "rtinput",
         title: "类型",
-        minWidth: 180,
+        minWidth: 80,
       },
       {
         prop: "cOldVal",
         inputtype: "rtinput",
         title: "原值",
         clearable: true,
-        minWidth: 260,
-      },
-      {
-        prop: "cChgVal",
-        inputtype: "rtinput",
-        title: "变化值",
-        clearable: true,
-        minWidth: 260,
+        minWidth: 60,
       },
       {
         prop: "cNewVal",
         inputtype: "rtinput",
         title: "新值",
         clearable: true,
-        minWidth: 260,
+        minWidth: 60,
       },
+      {
+        prop: "cChgVal",
+        inputtype: "rtinput",
+        title: "变化值",
+        clearable: true,
+        minWidth: 60,
+        slotName: "cChgVal"
+      }
     ],
   })
 );

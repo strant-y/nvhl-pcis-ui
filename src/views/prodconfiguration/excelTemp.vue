@@ -251,7 +251,7 @@ function handleQuery(flag?: boolean) {
     .then((res) => {
       // const { code, data, msg } = res;
       if (res.code == "200") {
-        debugger;
+        // debugger;
         pageresult.list = res.data.result;
         pageresult.total = res.data.total;
       } else {

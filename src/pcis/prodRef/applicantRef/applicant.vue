@@ -501,6 +501,15 @@ const method = {
       setFormItem("Applicant.cGreenIndustryCustomers", {
         disabled: false,
       });
+
+          console.log('33',getValue('Applicant.cGreenIndustryCustomers'))
+      // 绿色客户 如果为时就放开
+      if(getValue('Applicant.cGreenIndustryCustomers') == '1'){
+        setFormItem("Applicant.cGreenIndustryList", {
+            rules: [getRules("required", {})],
+            disabled: false,
+         });
+      }
       }
       setFormItem("Applicant.cWorkDpt", {
         rules: [getRules("required", {})],
@@ -511,7 +520,7 @@ const method = {
       setFormItem("Applicant.cGreenIndustryCustomers", {
         rules: [getRules("required", {})],
       });
-
+  
       // 参加社会统筹标志
       setFormItem("Applicant.cParticiinsocTyp", {
         rules: [getRules("required", {})],
@@ -954,6 +963,7 @@ const method = {
   handleClose: (val) => {},
   // 是否绿色产业客户change
   ApplicantIsGreen: (val) => {
+    console.log(val)
     // 控制绿色产业细分列表是否必填
     if (val == "1") {
       setFormItem("Applicant.cGreenIndustryList", {
@@ -961,7 +971,8 @@ const method = {
         disabled: false,
       });
     } else {
-      setFormItem("Applicant.cGreenIndustryList", { rules: null,  disabled: true, });
+      setFormItem("Applicant.cGreenIndustryList", { rules: [] });
+      setFormItem("Applicant.cGreenIndustryList", { disabled: true   });
       setValue('Applicant.cGreenIndustryList','')
     }
   },

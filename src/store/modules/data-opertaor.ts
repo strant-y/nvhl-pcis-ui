@@ -77,7 +77,7 @@ export const dataOpertaor = (pageKey?: string) => {
                         res[key] = JSON.parse(JSON.stringify(tableRefs[key].getFromValue()));
                     }
                 } catch (error) {
-                    console.log('方法不存在或出现错误，跳过执行');
+                    // console.log('方法不存在或出现错误，跳过执行');
                 }
             });
             return res;
@@ -182,11 +182,14 @@ export const dataOpertaor = (pageKey?: string) => {
                                         conf.fromSchema.forEach(f => {
                                             if (f.prop === item) {
                                                 if (f.inputtype === 'rtinputgroup') {
-                                                console.log(f.inputtype);
                                                 f.groupList.forEach((gkey: any) => {
                                                     gkey.disabled = false;
                                                 });
-                                                }else {
+                                                }else if(f.btnItems){
+                                                    f.btnItems.disabled = false;
+                                                }
+                                                else{
+                                                    console.log(f);
                                                     f.disabled = false;
                                                 }
                                             }

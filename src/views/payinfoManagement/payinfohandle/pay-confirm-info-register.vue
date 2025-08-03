@@ -183,7 +183,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: 'CSeqNo',
         title: '出票人账号',
         inputtype: "rtinput",
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {}),getRules("accountValidation", {})],
       },
       {
         prop: 'TBgnTm',
@@ -269,7 +269,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: 'CAppNo',
         disabled: true,
-        title: '投保单号',
+        title: '申请单号',
         inputtype: "rtinput",
       },
       {
@@ -332,7 +332,7 @@ const formconfigMany= ref( [
         prop: 'CSeqNo',
         title: '出票人账号',
         inputtype: "rtinput",
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {}),getRules("accountValidation", {})],
       },
       {
         prop: 'NPayAmt',
@@ -355,7 +355,7 @@ const formconfigMany= ref( [
       {
         prop: 'CAppNo',
         disabled: true,
-        title: '投保单号',
+        title: '申请单号',
         inputtype: "rtinput",
       },
       {

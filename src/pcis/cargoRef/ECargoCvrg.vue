@@ -14,6 +14,7 @@ import {ref} from "vue";
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
 import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
+import {CommonConstants} from "@/constants/CommonConstants";
 const eCargoSelectTgtFix = defineAsyncComponent(
     () => import("./fix/SelectDistFix.vue")
 );
@@ -131,6 +132,7 @@ onMounted(() => {
     }
   };
   Object.assign(formconfig1, formconfig11);
+  addProvide(CommonConstants.FORM_DATA_KEY, 'ECargoTerm.cPkId')
 });
 
 // 绑定方法
@@ -577,6 +579,9 @@ function getTableBtn() {
 function setDisabledAll(isDisabled: boolean) {
   cvrgEditRef?.value?.setDisabledAll(isDisabled);
 }
+function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+  cvrgEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFormValue,
   setFormValue,
@@ -586,7 +591,8 @@ defineExpose({
   setFormItem,
   getFormBtn,
   setDisabledAll,
-  getTableBtn
+  getTableBtn,
+  addProvide
 });
 </script>
 

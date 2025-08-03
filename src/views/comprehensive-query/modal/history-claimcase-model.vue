@@ -1,7 +1,7 @@
 <!-- 综合查询-历史赔案 -->
 <template>
   <div>
-    <el-dialog v-model="maindialogVisible" width="90%" title="历史赔案">
+    <el-dialog v-model="maindialogVisible" width="65%" title="历史赔案">
 
       <el-tabs v-model="tabS" class="tabsSty" @tab-change="tabChangeTb">
         <el-tab-pane label="投保人" name="01">

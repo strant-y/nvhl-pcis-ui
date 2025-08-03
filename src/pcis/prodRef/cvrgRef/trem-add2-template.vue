@@ -36,11 +36,11 @@
             
             <template v-if = "it['inputtype'] === 'rttag'">
               <el-badge value="退" class="term_badge" :hidden="item['Term.cCancelMrk'] !== '1'">
-                <from-item v-model="item['Term.' + kk]" :item="getterm(it,item)" />
+                <from-item v-model="item['Term.' + kk]" :item="getterm(it,item,kk)" />
               </el-badge>
             </template>
             <template v-else>
-              <from-item v-model="item['Term.' + kk]" :item="getterm(it,item)" />
+              <from-item v-model="item['Term.' + kk]" :item="getterm(it,item,kk)" />
             </template>
             
             </el-form-item>
@@ -201,11 +201,14 @@ function isdisabled(i: any) {
   return false;
 }
 
-function getterm(it: any,termdata: any){
+function getterm(it: any,termdata: any, itkey: any){
   if(param.cEdrType && !termdata['Term.cRowId']){
     it.disabled = false || it.disabled ;
   }else{
     it.disabled = props.disabledFlag || it.disabled;
+  }
+  if(param.cRsnCde === '45' && itkey === 'nMainRate'){
+      it.disabled = false;
   }
   return it;
 }
@@ -232,9 +235,6 @@ function changeBtn() {
   // Object.keys(formcof.value).forEach((k: any) => {
   //   formcof.value[k].disabled = props.disabledFlag || formcof.value[k].disabled;
   // });
-  if(param.cRsnCde === '45'){ // 费率调整,放开费率字段编辑
-      formcof.value['nMainRate'].disabled = false;
-  }
   if(param.cRsnCde !== '11'){
     Object.keys(btnConf.value).forEach((k: any) => {
       btnConf.value[k].hidden = props.disabledFlag;

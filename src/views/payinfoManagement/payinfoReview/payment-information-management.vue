@@ -138,7 +138,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "单据类型",
         loadData: [
-          { label: "投保单号", value: "1" },
+          { label: "申请单号", value: "1" },
           { label: "交易号", value: "3" },
         ],
         defaultValue: "3",
