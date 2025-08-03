@@ -1900,6 +1900,7 @@ async function loadAfter() {
         label: "保存模板",
         type: "primary",
         buttonColor: bottomBtnColor1,
+        icon: "Memo",
         func: () => {
           handleSaveTemplate()
         },
@@ -1908,6 +1909,7 @@ async function loadAfter() {
         label: "复制出单",
         type: "primary",
         buttonColor: bottomBtnColor1,
+        icon: "CopyDocument",
         func: () => {
           copyPolicyFun();
         },
@@ -1916,6 +1918,7 @@ async function loadAfter() {
         label: "额度明细",
         type: "primary",
         buttonColor: bottomBtnColor1,
+        icon: "Tickets",
         func: () => {
           openLimit();
         },
