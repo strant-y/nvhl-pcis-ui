@@ -363,6 +363,7 @@ import {
   getInquiryPolicy,
 	getisAllDone,
 	isUndrClsBlackList,
+  queryTermRateLimit,
 	queryEcargoRelevancePolicyDetails
 } from "../../../api/query/index";
 import { checkFeeWindowType, selectDist, saveDistBatch, getReleaseInquiryPage } from "@/api/prod";
@@ -801,7 +802,8 @@ const basicBtn = [
     type: "primary",
     id: "btn010101",
     func: () => {
-      calcPremium();
+      // calcPremium()
+      queryTermRateLimitFun(calcPremium)
     },
   }),
   createFreeButtonBase({
@@ -892,7 +894,8 @@ const edrBtn = [
     type: "primary",
     id: "btnCalEdr",
     func: () => {
-      calcPremiumEdr();
+      // calcPremiumEdr();
+      queryTermRateLimitFun(calcPremiumEdr)
     },
   }),
   createFreeButtonBase({
@@ -931,7 +934,8 @@ const edrSurrenderBtn = [
     label: "保费计算",
     type: "primary",
     func: () => {
-      calcPremiumEdrSurrender();
+      // calcPremiumEdrSurrender();
+      queryTermRateLimitFun(calcPremiumEdrSurrender)
     },
   }),
   createFreeButtonBase({
@@ -1179,7 +1183,8 @@ async function loadAfter() {
           type: "primary",
           id: "btn010101",
           func: () => {
-            calcPremium();
+            // calcPremium();
+            queryTermRateLimitFun(calcPremium)
           },
         }),
         createFreeButtonBase({
@@ -1600,7 +1605,8 @@ async function loadAfter() {
         type: "primary",
         id: "btn010101",
         func: () => {
-          calcPremium();
+          // calcPremium();
+          queryTermRateLimitFun(calcPremium)
         },
       }),
       createFreeButtonBase({
@@ -1735,7 +1741,8 @@ async function loadAfter() {
         type: "primary",
         id: "btn010101",
         func: () => {
-          calcPremium();
+          // calcPremium();
+          queryTermRateLimitFun(calcPremium)
         },
       }),
       createFreeButtonBase({
@@ -1859,7 +1866,8 @@ async function loadAfter() {
         type: "primary",
         id: "btn010101",
         func: () => {
-          calcPremium();
+          // calcPremium();
+          queryTermRateLimitFun(calcPremium)
         },
       }),
       createFreeButtonBase({
@@ -4316,6 +4324,80 @@ function clearCAppNo(res:any, mapList:any = clearKeyMap) {
   }
   return res;
 }
+
+
+/**
+ * 保费计算前校验费率上限
+ */
+const queryTermRateLimitFun = (calcFun: any) => {
+  const res = opertaor.getDataAll();
+  res["user"] = user;
+  // 批改:注销退保保费计算
+  if(calcFun === calcPremiumEdrSurrender) {
+    res["EdrBase"] = edrbase.value?.getFromValue();
+    if (
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"] != ""
+    ) {
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
+        res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+    }
+  } else if(calcFun === calcPremium) {
+    res["plyBase"]["Base.cDptCde"] = props.param?.cDptCde;
+    res["plyBase"]["Base.cProdNo"] = props.param?.cProdNo;
+  } else if(calcFun === calcPremiumEdr) { // 批改单保费计算
+    res["plyBase"]["Base.cDptCde"] = props.param?.cDptCde;
+    res["plyBase"]["Base.cProdNo"] = props.param?.cProdNo;
+    res["EdrBase"] = edrbase.value?.getFromValue();
+    if (
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"] != ""
+    ) {
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
+        res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+    }
+  }
+  queryTermRateLimit(res).then((r:any) => {
+    if(r.code === 200) {
+      calcFun()
+    } else if(r.msg || r.message) {
+      const tableHtml = r.data.map((row:any) => {
+        return `<tr><td>${row.cPlanNo}</td>
+        <td>${row.cTermName}</td>
+        <td>${row.cRiskName}</td>
+        <td style="color:red;">${row.nRateVal}</td>
+        <td>${row.cRateRange}</td></tr>`;
+      }).join(''); // 将所有行合并成一个字符串
+      const htmlContent = `
+        <table border="1" class="messageBoxTable">
+          <thead>
+            <tr><th>方案号</th>
+            <th>条款</th
+            ><th>责任</th>
+            <th>费率</th>
+            <th>建议费率区间</th></tr>
+          </thead>
+          <tbody>
+            ${tableHtml}
+          </tbody>
+        </table>
+        <div>${r.msg || r.message}</div>
+      `;
+      ElMessageBox.confirm(htmlContent, "提示", {
+        dangerouslyUseHTMLString: true,
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+        lockScroll: false,
+        customClass: 'queryTermRateMessage'
+      }).then(() => {
+        calcFun()
+      })
+    }
+  }).catch((err:any) => {
+    ElMessage.error(err)
+  })
+}
 </script>
 <style lang="scss" scoped>
 $btn-icon-color-1: #ff3e00;
@@ -4525,5 +4607,23 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
       }
     }
   }
+}
+</style>
+<style>
+.queryTermRateMessage {
+  max-width: 80%;
+  width: auto;
+}
+.queryTermRateMessage .el-message-box__message p {
+  overflow-x: auto;
+}
+.queryTermRateMessage .messageBoxTable {
+  text-align: center;
+  border-collapse: collapse;
+}
+.queryTermRateMessage .messageBoxTable td,.queryTermRateMessage .messageBoxTable th {
+  white-space: nowrap;
+  border: 1px solid #000000;
+  padding: 0 5px;
 }
 </style>

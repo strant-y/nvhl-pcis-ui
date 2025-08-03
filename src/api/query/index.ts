@@ -328,3 +328,11 @@ export function isUndrClsBlackList(queryParams: any): AxiosPromise<any> {
 export function queryEcargoRelevancePolicyDetails(queryParams: any): AxiosPromise<any> {
 	return post(`/ecargo/queryEcargoRelevancePolicyDetails`, queryParams);
 }
+
+/**
+* 保费计算前校验费率上限接口
+ * @param queryParams
+ */
+export function queryTermRateLimit(queryParams: any): AxiosPromise<any> {
+	return post(`/policy/queryTermRateLimit`, queryParams);
+}
