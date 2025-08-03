@@ -867,6 +867,7 @@ const method = {
     if (val == "1") {
       setFormItem("Insured.cGreenIndustryList", {
         rules: [getRules("required", {})],
+        disabled: false,
       });
     } else {
       setFormItem("Insured.cGreenIndustryList", { rules: null,  disabled: true, });
