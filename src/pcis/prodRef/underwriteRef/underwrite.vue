@@ -531,6 +531,9 @@ watch(
         // 临分标识如果是1，则是否临分复选框设置勾选状态
         setValue("riFacMrk", props.pageData?.plyBase['Base.cRiFacMrk'] == "1" ? "1" : "0");
       }
+      if(props.pageData?.plyBase['Base.cRiFacOpn']) {
+        setValue("riFacOpn", props.pageData?.plyBase['Base.cRiFacOpn']);
+      }
     }
   },
   {
