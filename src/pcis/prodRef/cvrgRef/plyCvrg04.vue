@@ -817,7 +817,7 @@ function setDisabledAll() {
   });
   
   Object.keys(tremTemplateRefs.value).forEach((item) => {
-    tremTemplateRefs.value[item].setDisabledAll();
+    tremTemplateRefs.value[item]?.setDisabledAll();
   });
 }
 function setUnDisabledByKeyList(key: any) {
