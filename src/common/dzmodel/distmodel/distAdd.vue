@@ -297,11 +297,11 @@ onMounted(() => {
       }
     
     }
-    // 043009 实际用工地址关联 团单才展示
-    if(item.prop === 'Dist.cEmploymentAddress' && cGrpMrk.value !== '1'){
-      item['rules'] = [];
-      item["hidden"] = true;
-    }
+    // 043009 实际用工地址关联 团单才展示（和杜倩确认关联实际用工地址不分团单和个单，都展示）
+    // if(item.prop === 'Dist.cEmploymentAddress' && cGrpMrk.value !== '1'){
+    //   item['rules'] = [];
+    //   item["hidden"] = true;
+    // }
 
     // 043010 实习岗位为必填
     if( route.params.param.cProdNo == '043010' && item.prop =='Dist.cJobType' ){
