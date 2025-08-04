@@ -352,6 +352,18 @@ onMounted(() => {
         })
       }
     }
+
+    // 实际用工地址清单新增 经营地址
+    if(item.prop =='Dist.JingYingAddress043009'){
+      item.groupList.forEach((data:any) => {
+        if(data.prop === 'Dist.Prop') {
+          data['func'] = setregistAdd;
+        }
+        if(data.prop === 'Dist.cSuffixAddr') {
+          data['func'] = setregistAdd;
+        }
+      })
+    }
     newSchema.push(item);
   }
 
@@ -424,6 +436,21 @@ const cDocumentTypeChange =(val:any)=>{
     }
 }
 
+function setregistAdd() {
+  const ads = freeEditRef?.value?.getValue("Dist.Prop");
+  const a = freeEditRef?.value?.getValue("Dist.cSuffixAddr") || "";
+  if (ads) {
+    getAddressStr({ address: ads }).then((res: any) => {
+      const { code, data, msg } = res;
+      if (code === 200) {
+        const b = (data ? data["addStr"] : "") + a;
+        setValue("Dist.cDetailedAddress", b);
+      }
+    });
+  } else {
+    setValue("Dist.cDetailedAddress", a);
+  }
+}
 
 //给表单赋值
 function setFormItem(key: any, obj: any) {

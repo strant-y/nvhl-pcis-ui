@@ -173,8 +173,9 @@ onMounted(async () => {
       exRules
   );
   // 如果团个单标识为团单则展示关联被保险人，否则隐藏
+  // 如果是团单则展示关联实际用工地址，否则隐藏
   if(route.params.param?.cGrpMrk !== '1') {
-    formconfig11.value.fromSchema = formconfig11.value.fromSchema.filter((item:any) => item.prop !== 'Dist.cRelatedInsured')
+    formconfig11.value.fromSchema = formconfig11.value.fromSchema.filter((item:any) => item.prop !== 'Dist.cRelatedInsured' && item.prop !== 'Dist.cEmploymentAddress')
   }
   if(params.cProdNo === '040003'){
     formconfig11.value.fromSchema?.forEach(item=>{
@@ -249,6 +250,14 @@ console.log('dist -----',formconfig11.value)
   tableconfig.value.fromSchema.forEach( r => {
     if(r['prop'] === 'Dist.cVinCode'){  //调整车架号列宽
       r.width = '160';
+    }
+    // 关联实际用工地址列表展示
+    if(r['prop'] === 'Dist.cEmploymentAddress'){
+      eventBus.on('setMap-EmployeeDist043009', (data: any) => {
+        if(data.list && data.list.length > 0) {
+          r.loadData = data.list
+        }
+      })
     }
   });
   tableconfig.value.tableBtnType = "btn";
@@ -650,6 +659,7 @@ const method = {
       ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
       return;
     }
+    getFatherPageOldProductResData();
 		const s = cardRef.value?.getFromValue(); // 查询参数
 		// 经营地址只选择省市区不输入详细地址获取表单值会带有undefined，这里处理一下
 		for (let k in s) {
@@ -657,7 +667,7 @@ const method = {
 				s[k] = s[k].replace('undefined', '')
 			}
 		}
-    let paramitem  = Object.assign(formconfig1.value, {
+    let paramitem  = Object.assign({...oldPageSchema.value}, {
       cComponentTable: cComponentTableValue,
     },
 		{ dist: s });
@@ -790,6 +800,7 @@ const method = {
       ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
       return;
     }
+    getFatherPageOldProductResData();
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.xlsx, .xls, .xlsm'; // 支持的文件类型
@@ -875,8 +886,9 @@ const method = {
   },
   // 增量模板下载
   downloadIncrement: () => {
+    getFatherPageOldProductResData();
     const param = {
-      ...formconfig1.value,
+      ...oldPageSchema.value,
       cComponentTable: cComponentTableValue,
     }
     if(route.params.param?.pageName === "priceInquiry") {
