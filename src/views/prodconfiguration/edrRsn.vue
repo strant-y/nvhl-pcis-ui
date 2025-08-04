@@ -68,7 +68,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cKindNo",
         inputtype: "rtselect",
-        // typeCode: "KIND_LIST_CACHE",
+        // typeCode: "KIND_LIST_GRT",
         typeCode: "KIND_LIST_GRT",
         codeParam: {
           cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
@@ -166,7 +166,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cKindNo",
         title: "险类",
         inputtype: "rtselect",
-        typeCode: "KIND_LIST_CACHE",
+        typeCode: "KIND_LIST_GRT",
         codeParam: { codeListParam: "" },
       },
       {

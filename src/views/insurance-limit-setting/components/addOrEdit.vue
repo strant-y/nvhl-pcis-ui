@@ -70,7 +70,7 @@ if (props.pageType === 'one') {
       inputtype: "rtcascader",
       title: "产品大类",
       clearable: true,
-      typeCode: "KIND_LIST_CACHE",
+      typeCode: "KIND_LIST_GRT",
       params: { cOperId: user.value['opCde'], cDptCde: user.value['companyId'] },
       func: (val) => {
         const item = freeEditRef.value.getFromSchemaItem('clauseCode')

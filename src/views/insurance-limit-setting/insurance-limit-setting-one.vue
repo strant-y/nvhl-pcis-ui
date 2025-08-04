@@ -465,7 +465,7 @@ const deleteData = (id) => {
 onMounted(() => {
   // 产品大类
 	codeListStore.queryCodeList({
-		codeListName: 'KIND_LIST_CACHE',
+		codeListName: 'KIND_LIST_GRT',
 		codeListParam: { cOperId: user.value['opCde'], cDptCde: user.value['companyId'] }
 	}, false, true).then(res => {
 		if (res) {
