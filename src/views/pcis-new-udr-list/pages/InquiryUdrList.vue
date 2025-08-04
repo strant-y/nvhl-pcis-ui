@@ -69,7 +69,7 @@
     } = NewUdrListService();
     import moment from "moment";
     import { Row } from "element-plus/es/components/table-v2/src/components";
-    import { submitUnderwriting } from "../../../api/query/index";
+    import { submitUnderwrite } from "../../../api/query/index";
     // import { saveAs } from 'file-saver';
     const userStore = useUserStore();
     const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
@@ -386,9 +386,9 @@
                         res["backUndrDptCnm"] = null; // 退回指定核保人员名称
                         console.log(res);
                         let submitUnder;
-                        submitUnder = submitUnderwriting(res);
+                        submitUnder = submitUnderwrite(res);
                         submitUnder.then((res) => {
-                            console.log("submitUnderwriting-res", res);
+                            console.log("submitUnderwrite-res", res);
                             if (res["code"] == "200") {
                                 ElMessage.success(res.msg);
                                 handleQuery();
@@ -706,7 +706,7 @@
                 res["undrMrk"] = "W";
                 res["user"] = JSON.parse(sessionStorage.getItem("user"));
                 res["user"]["opRelCde"] = "10030892";
-                res["appNo"] = row.objId;
+                res["inquiryNo"] = row.objId;
                 res["taskId"] = row.curtTask;
                 res["appTyp"] = row.bsType;
                 res["cAntiLnderRisk"] = "0"; //关联交易确认
@@ -719,9 +719,9 @@
                     ]; // 退回指定核保人员名称
                 console.log(res);
                 let submitUnder;
-                submitUnder = submitUnderwriting(res);
+                submitUnder = submitUnderwrite(res);
                 submitUnder.then((res) => {
-                    console.log("submitUnderwriting-res", res);
+                    console.log("submitUnderwrite-res", res);
                     if (res["code"] == "200") {
                         ElMessage.success(res.msg);
                         handleQuery();
