@@ -353,8 +353,8 @@ onMounted(() => {
       }
     }
 
-    // 实际用工地址清单新增 经营地址
-    if(item.prop =='Dist.JingYingAddress043009'){
+    // 实际用工地址清单新增 经营地址/房屋清单 房屋所在地址
+    if(item.prop === 'Dist.JingYingAddress043009' || item.prop === 'Dist.HouseAreaProp'){
       item.groupList.forEach((data:any) => {
         if(data.prop === 'Dist.Prop') {
           data['func'] = setregistAdd;
