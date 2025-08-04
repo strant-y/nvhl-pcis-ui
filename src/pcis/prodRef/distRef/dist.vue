@@ -451,8 +451,7 @@ const method = {
     });
   },
 
-  handleQuery: async(queryParams: any = { pageNum: 1, pageSize: 10 }, isChange: boolean = false) => {
-    return new Promise((resolve, reject) => {
+  handleQuery: (queryParams: any = { pageNum: 1, pageSize: 10 }, isChange: boolean = false) => {
     distTableRef.value?.setPartnerPage(queryParams);
     let tgtRef = opertaor.getTableRefByKey('tgt');
 		const s = cardRef.value?.getFromValue() || {};
@@ -592,9 +591,7 @@ const method = {
             });
         }
       }
-      resolve(res)
     });
-    })
   },
   // distSummeryQuery: () => {
   //   syncDist({
@@ -972,39 +969,11 @@ const method = {
         if (res.code === 200) {
           ElMessage.success("删除成功");
           const queryParams = distTableRef.value?.getPartnerPage(false);
-          // 获取 selectDist 接口的返回结果
-          let queryRes = await method.handleQuery(queryParams, true);
-          const termref = opertaor.getTableRefByKey("cvrg");
-          // 获取删除前条款信息的数组信息
-          let beforeDelArr = termref.getFromValue();
-          // 将删除前的数组格式转化为对象格式，beforeDelObj的demo  {'P1':true,'P2':true}
-          let beforeDelObj = {}
-          beforeDelArr.forEach(item=>{
-            beforeDelObj[item['Term.cPlanNo']]=true
-          })
-          // 遍历 queryRes ,和 beforeDelObj 进行对比，计算出来待删除项目
-          // queryRes相当于删除后的条款信息,遍历它，删掉beforeDelObj对应的值，表示这一项删除前后都存在，没必要删
-          // 比如 clauseValues 中有 P1，那么就从 beforeDelObj 中删除 P1
-          // 剩下的就是需要删除的计划（因为它们在 beforeDelObj 中存在但在 clauseValues 中不存在）
-          queryRes.data.clauseValues.forEach(item=>{
-            delete beforeDelObj[item.planNo]
-          })
-          // 经过对比后，过滤出来 beforeDelObj 中的key，表示待删除项
-          let needDelArr=Object.keys(beforeDelObj)
-          // needDelArr 的demo ['P1','P2','P3']
-          for (let i = needDelArr.length; i > 0; i--) {
-            termref.deletePlanByNo(needDelArr[i-1])
-          }
-          // 如果queryRes.data.clauseValues的长度为0，需要留下来1条条款信息
-          // 实际上是全部删除掉，然后添加1条数据即可
-          if(queryRes.data.clauseValues.length===0){
-            termref.addAndinitData()
-          }
+          method.handleQuery(queryParams, true);
         }
       });
     });
   }
-
 };
 
 // 复选框选中
