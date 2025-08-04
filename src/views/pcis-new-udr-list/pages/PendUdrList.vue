@@ -495,36 +495,37 @@
             inputtype: "rtinput",
             title: "申请单号",
             showKey: [1, 2, 3, 4],
-            minWidth: 180,
-            fixed: "left",
+            maxWidth: 200,
+            fixed: 'left',
+            showCopyIcon: true
         },
         {
             prop: "uwDptName",
             inputtype: "rtinput",
             title: "承保机构",
             showKey: [1, 2, 3, 4],
-            minWidth: 80,
+            maxWidth: 180,
         },
         {
           prop: "udrClsCde",
           inputtype: "rtinput",
           title: "当前核保级别",
           showKey: [1, 2],
-          minWidth: 180,
+          maxWidth: 200,
         },
         {
           prop: "cMinUndrCls",
           inputtype: "rtinput",
           title: "最终审核级别",
           showKey: [1, 2],
-          minWidth: 180,
+          maxWidth: 200,
         },
         {
             prop: "bsType",
             inputtype: "rtSelectV2",
             title: "业务类型",
             showKey: [1, 2],
-            minWidth: 80,
+            maxWidth: 100,
             loadData: [
                 { label: "承保", value: "A" },
                 { label: "批改", value: "E" },
@@ -551,21 +552,22 @@
             inputtype: "rtinput",
             title: "产品名称",
             showKey: [1, 2, 3, 4],
-            minWidth: 180,
+            minWidth: 80,
         },
-      {
-        prop: "timeDiffHMS",
-        inputtype: "rtinput",
-        title: "等待时长",
-        showKey: [1, 2, 3, 4],
-        minWidth: 180,
-      },
+        {
+          prop: "timeDiffHMS",
+          inputtype: "rtinput",
+          title: "等待时长",
+          showKey: [1, 2, 3, 4],
+          maxWidth: 180,
+        },
         {
             prop: "nPrm",
-            inputtype: "rtnumber",
+            inputtype: "rtinput",
             title: "保费",
             showKey: [1, 2, 3, 4],
             minWidth: 120,
+            prefix: "¥ ",
         },
         {
             prop: "appCde",
@@ -1285,7 +1287,7 @@
     const exportDown = () => {
         const CAppNo = freeEditRef.value?.getValue("CAppNo");
         const CPlyNo = freeEditRef.value?.getValue("CPlyNo");
-        // 查询条件：投保单号，保单号任何一个有值时，都无需做其他查询条件校验
+        // 查询条件：申请单号，保单号任何一个有值时，都无需做其他查询条件校验
         if (!CAppNo && !CPlyNo) {
             // 查询时间段验证
             const date1 = freeEditRef.value?.getValue("tm1"); //投保日期

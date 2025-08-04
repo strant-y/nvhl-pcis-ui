@@ -184,6 +184,7 @@
             :prop="i.prop"
             :label="i.title"
             :width="i.width ? i.width : null"
+            :fixed="i.fixed ? i.fixed : null"
             :align="item.align ? item.align : i.align ? i.align : 'center'"
             :min-width="getColumnWidth(i.title,i.prop,tableDatas,i.minWidth,i.width, i.maxWidth || item.maxWidth)"
           >
@@ -198,7 +199,10 @@
               {{ header.column.label }}
             </template>
             <template #default="scope">
-              <template v-if="item.editFlag">
+              <template v-if="i.slotName">
+                <slot :name="`column-${i.slotName}`" v-bind="scope" />
+              </template>
+              <template v-else-if="item.editFlag">
                 <el-form-item
                   :prop="[scope.$index, i.prop]"
                   :rules="i.rules ? i.rules : undefined"

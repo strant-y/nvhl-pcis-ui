@@ -345,9 +345,9 @@ const method = {
 
   editmethod: (row: any) => {
     let cappNo = '';
-    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
     // 判断有无批改类型参数，有则是批单
     if(route.params.param?.cEdrType) {
+    	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       cappNo = edrbase['EdrBase.cAppNo'];
     } else if(route.params.param?.pageName === "priceInquiry") {
       cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
@@ -381,9 +381,10 @@ const method = {
   },
   delmethod: (row: any) => {
     let cappNo = '';
-    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+    
     // 判断有无批改类型参数，有则是批单
     if(route.params.param?.cEdrType) {
+			const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       cappNo = edrbase['EdrBase.cAppNo'];
     } else if(route.params.param?.pageName === "priceInquiry") {
       cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
@@ -414,11 +415,11 @@ const method = {
   //  042003 根据电梯条数反
   funcdistadd: () => {
     const alldata: any = opertaor.getDataAll();
-    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
-    const param = {};
+    const param:any = {};
     if(route.params.param?.pageName === "priceInquiry") {
       param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
     } else if (route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
+    	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       param['cAppNo'] = edrbase["EdrBase.cAppNo"]
     } else {
       param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
@@ -453,7 +454,7 @@ const method = {
   handleQuery: (queryParams: any = { pageNum: 1, pageSize: 10 }, isChange: boolean = false) => {
     distTableRef.value?.setPartnerPage(queryParams);
     let tgtRef = opertaor.getTableRefByKey('tgt');
-		const s = cardRef.value?.getFromValue();
+		const s = cardRef.value?.getFromValue() || {};
 		// 经营地址只选择省市区不输入详细地址获取表单值会带有undefined，这里处理一下
 		for (let k in s) {
 			if(s[k] && typeof s[k] === 'string' && s[k].indexOf('undefined') !== -1) {
@@ -462,15 +463,15 @@ const method = {
 		}
     const param = opertaor.getParam();
     let app = "";
-    if (param.cOrgAppNo) {
+    if (opertaor.getDataAll().plyBase["Base.cAppNo"]) {
+      app = opertaor.getDataAll().plyBase["Base.cAppNo"];   
+    } else if(param.cOrgAppNo){
       app = param.cOrgAppNo;
-    } else if(opertaor.getDataAll().plyBase["Base.cAppNo"]){
-      app = opertaor.getDataAll().plyBase["Base.cAppNo"];
     } else {
       app = route.params.param?.cAppNo
     }
     const selData = {
-      cAppNo: app,
+      cAppNo: "",
 			cProdNo: route.params.param.cProdNo,
 			cComponentTable: cComponentTableValue,
 			...formconfig1.value,
@@ -507,18 +508,18 @@ const method = {
         pageresult.list = [];
         pageresult.total = res.data.total;
         pageresult.list = res.data.data.map((item, index) => {
+					let data:any = {}
+					if(!!item['Dist.cMajorCategories'] || !!item['Dist.cMediumClassification'] || !!item['Dist.cOccupationalSubcategory']){
+						data['Dist.AllOccup'] = [
+                item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
+            ]
+					}
+					if(!!item['Dist.tOpeningTime']){
+						data['tOpeningTime'] = item['Dist.tOpeningTime']? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD"): null
+					}
           return{
             ... item,
-            ... {
-              // 序号全部由后端处理
-              // 'Dist.nSeqNo': ((queryParams.pageNum - 1) * queryParams.pageSize) + index + 1,
-              tOpeningTime: item['Dist.tOpeningTime']
-                  ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
-                  : null,
-              'Dist.AllOccup': [
-                item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
-              ],
-            }
+            ... data
           };
         });
 
@@ -610,9 +611,9 @@ const method = {
   //导出
   exportExcel: () => {
     let cappNo = '';
-    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
     // 判断有无批改类型参数，有则是批单
     if(route.params.param?.cEdrType) {
+			const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       cappNo = edrbase['EdrBase.cAppNo'];
     } else if(route.params.param?.pageName === "priceInquiry") {
       cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
@@ -680,9 +681,9 @@ const method = {
   //全量导入
   importExcel() {
     let cappNo = '';
-    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
     // 判断有无批改类型参数，有则是批单
     if(route.params.param?.cEdrType) {
+    	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       cappNo = edrbase['EdrBase.cAppNo'];
     } else if(route.params.param?.pageName === "priceInquiry") {
       cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
@@ -751,9 +752,9 @@ const method = {
   // 增量导入
   importExcelIncrement: () => {
     let cappNo = '';
-    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
     // 判断有无批改类型参数，有则是批单
     if(route.params.param?.cEdrType) {
+    	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       cappNo = edrbase['EdrBase.cAppNo'];
     } else if(route.params.param?.pageName === "priceInquiry") {
       cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
@@ -783,7 +784,7 @@ const method = {
 
           // 构建参数并请求接口
           const params = {
-            ...oldPageSchema.value,
+						...oldPageSchema.value,
             file: base64String, // ✅ 正确传入
             cComponentTable: cComponentTableValue,
             cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
@@ -897,9 +898,9 @@ const method = {
   // 批量删除
   batchDelete() {
     let cappNo = '';
-    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
     // 判断有无批改类型参数，有则是批单
     if(route.params.param?.cEdrType) {
+    	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       cappNo = edrbase['EdrBase.cAppNo'];
     } else if(route.params.param?.pageName === "priceInquiry") {
       cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
@@ -1036,16 +1037,20 @@ function getTableData() {
 
 function setTableData(data: any) {
   pageresult.list = data.map((item: any, index: any) => {
+		let dataNew:any = {}
+		if(!!item['Dist.cMajorCategories'] || !!item['Dist.cMediumClassification'] || !!item['Dist.cOccupationalSubcategory']){
+			dataNew['Dist.AllOccup'] = [
+					item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
+			]
+		}
+		if(!!item['Dist.tOpeningTime']){
+			dataNew['tOpeningTime'] = item['Dist.tOpeningTime']? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD"): null
+		}
     return{
       ... item,
+			... dataNew,
       ... {
         nSeqNo: index + 1,
-        tOpeningTime: item['Dist.tOpeningTime']
-            ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
-            : null,
-        'Dist.AllOccup': [
-          item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
-        ],
       }
     };
   });

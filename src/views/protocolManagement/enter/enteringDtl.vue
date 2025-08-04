@@ -18,6 +18,10 @@ const props = defineProps({
   param: {
     type: Object,
   },
+  isActive: {
+    type: String,
+    default: '0' // 直接指定默认值
+  },
   type: {
     type: String
   },
@@ -84,25 +88,45 @@ const uwBtn = [
           const user = JSON.parse(sessionStorage.getItem("user"));
           let param = mainRef.value?.getUnderwriteValue()
           let sence = param.cUndrMrk === 'A' ? 'audit' : 'bounced'
-          cargoApi.save({
-            ...param,
-            cEcAgrAppNo:props?.param?.cEcAgrAppNo,
-            ...{user},
-            sence
-          }).then((res: any) => {
-            if(res.code === 200) {
-              ElMessage.success(res.msg)
-              tagsViewStore.delView({"name": "enteringDtl",
-                "title": "录入明细",
-                "path": "/protocolManagement/enteringDtl",
-                "fullPath": "/protocolManagement/enteringDtl"}).then((res: any) => {
-                router.replace({ path: "/dashboard" });
-              });
-            }else {
-              ElMessage.success(res.msg);
-            }
-          });
-
+          if(props.param?.cAppTyp === 'A'){
+            cargoApi.save({
+              ...param,
+              cEcAgrAppNo:props?.param?.cEcAgrAppNo,
+              ...{user},
+              sence
+            }).then((res: any) => {
+              if(res.code === 200) {
+                ElMessage.success(res.msg)
+                tagsViewStore.delView({"name": "enteringDtl",
+                  "title": "录入明细",
+                  "path": "/protocolManagement/enteringDtl",
+                  "fullPath": "/protocolManagement/enteringDtl"}).then((res: any) => {
+                  router.replace({ path: "/dashboard" });
+                });
+              }else {
+                ElMessage.success(res.msg);
+              }
+            });
+          }else {
+            cargoApi.saveEdrEcargo({
+              ...param,
+              cEcAgrAppNo:props?.param?.cEcAgrAppNo,
+              ...{user},
+              sence
+            }).then((res: any) => {
+              if(res.code === 200) {
+                ElMessage.success(res.msg)
+                tagsViewStore.delView({"name": "enteringDtl",
+                  "title": "录入明细",
+                  "path": "/protocolManagement/enteringDtl",
+                  "fullPath": "/protocolManagement/enteringDtl"}).then((res: any) => {
+                  router.replace({ path: "/dashboard" });
+                });
+              }else {
+                ElMessage.success(res.msg);
+              }
+            });
+          }
         } else {
           ElMessage.error("请填写必填项");
         }
@@ -225,7 +249,7 @@ onBeforeMount(async () => {
   }
   //批改
   if(props.type === 'EDR_APP_NEW_SCENE'){
-    if(props.cEdrType == '1'){
+    if(props.param.cEdrType == '1'){
       bthList.value = edrBtn
     }else{
       bthList.value = edrSurrenderBtn
@@ -488,7 +512,7 @@ function query() {
       }
       let dataForm:any ={...res.data.composition,AgreementBase:res.data.composition?.AgreementBase[0],AgreementApplicant:res.data.composition?.AgreementApplicant[0],AgreementFeeWarn:res.data.composition?.AgreementBase[0]}
       delete dataForm.AgreementEdrEcargoBase
-      if(props.type === 'EDR_APP_NEW_SCENE'){
+      if(props.type === 'EDR_APP_NEW_SCENE' && props.isActive === '0'){
         dataForm['AgreementBase']['ECargoBase.cEcAgrAppNo'] = ''
       }
       formPage.value?.setAllFormData( dataForm, {
@@ -667,8 +691,11 @@ async function  submit() {
         router.replace({ path: "/protocolManagement/protocolEntering" });
       });
     }else {
+      btn.loading = false;
       ElMessage.success(res.msg);
     }
+  }).finally(() => {
+    btn.loading = false;
   });
 }
 // 绑定特殊验证器

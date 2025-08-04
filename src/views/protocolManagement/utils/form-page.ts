@@ -2,6 +2,7 @@ import {FreeButtonBase} from "@/shared/button-config";
 import {AppFreeEditMethod} from "@/shared/app-free-edit-config";
 import {AppGridEditMethod} from "@/shared/app-grid-edit-config";
 import {AppTableMethod, MyTableMethod} from "@/shared/app-table-config";
+import {CommonConstants} from "@/constants/CommonConstants";
 
 export class FormPage {
 
@@ -157,11 +158,11 @@ export class FormPage {
             //         btnConfig.disabled = true;
             //     }
             // }
-            if (callback && callback.success && typeof callback.success === 'function') {
+            if (callback && callback.success && typeof callback.success === CommonConstants.TYPE_OF_FUNCTION) {
                 callback.success()
             }
         } catch (e) {
-            if(callback && callback.error && typeof callback.error === 'function') {
+            if(callback && callback.error && typeof callback.error === CommonConstants.TYPE_OF_FUNCTION) {
                 callback.error(e);
             }else {
                 throw e;
@@ -216,7 +217,7 @@ export class FormPage {
             for (const key of keys) {
                 const comp = this.componentRefMap.get(key);
                 if (comp != null && comp != undefined && comp.addProvide) {
-                    comp.addProvide('primevalForm', AllData[key])
+                    comp.addProvide(CommonConstants.PRIMEVAL_FORM_DAT_KEY, AllData[key])
                 }
             }
         } catch (e) {
@@ -240,12 +241,14 @@ export class FormPage {
                     console.error('Could not find componentRef for id ' + key)
                 }
             }
-            this.initial = false;
-            if (callback && callback.success && typeof callback.success === 'function') {
+            if (callback && callback.success && typeof callback.success === CommonConstants.TYPE_OF_FUNCTION) {
                 callback.success(this.getAllFormData())
+                setTimeout(() => {
+                    this.initial = false;
+                }, 3000)
             }
         } catch (e) {
-            if(callback && callback.error && typeof callback.error === 'function') {
+            if(callback && callback.error && typeof callback.error === CommonConstants.TYPE_OF_FUNCTION) {
                 callback.error(e);
             }else {
                 throw e;
@@ -290,11 +293,11 @@ export class FormPage {
                     if (comp && comp.getFormConfig) {
                         const conf = comp.getFormConfig();
                         if (!item.startsWith('Btn_')) { // 非按钮控制
-                            if (conf.fromType === 'free') {  // 表单模式时,修改表单disabled实现只读
+                            if (conf.fromType === CommonConstants.FORM_EDIT_TYPE_FREE) {  // 表单模式时,修改表单disabled实现只读
                                 if (conf.fromSchema && conf.fromSchema.length > 0) {
                                     conf.fromSchema.forEach(f => {
                                         if (f.prop === item) {
-                                            if (f.inputtype === 'rtinputgroup') {
+                                            if (f.inputtype === CommonConstants.RT_ITEM_TYPE_INPUTGROUP) {
                                                 console.log(f.inputtype);
                                                 f.groupList.forEach((gkey: any) => {
                                                     gkey.disabled = false;
@@ -305,7 +308,7 @@ export class FormPage {
                                         }
                                     });
                                 }
-                            } else if (conf.fromType === 'grid') { // 表格模式时,修改表格属性,实现只读
+                            } else if (conf.fromType === CommonConstants.FORM_EDIT_TYPE_GRID) { // 表格模式时,修改表格属性,实现只读
                                 if (conf.fromSchema && conf.fromSchema.length > 0) {
                                     conf.fromSchema.forEach(gf => {
                                         if (gf.prop === item) {
@@ -315,7 +318,7 @@ export class FormPage {
                                 }
                             }
                         } else {// 按钮控制
-                            if (conf.fromType !== 'custom') {
+                            if (conf.fromType !== CommonConstants.FORM_EDIT_TYPE_CUSTOM) {
                                 if (
                                     conf.titleBtns &&
                                     conf.titleBtns.length > 0
@@ -346,7 +349,7 @@ export class FormPage {
                 const comp = this.componentRefMap.get(key);
                 if (comp && comp.getFormConfig) {
                     const conf = comp.getFormConfig();
-                    if (conf.fromType === 'custom') {
+                    if (conf.fromType === CommonConstants.FORM_EDIT_TYPE_CUSTOM) {
                         comp.setUnDisabledByKeyList();
                     }
                 }
