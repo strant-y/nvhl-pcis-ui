@@ -137,7 +137,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         disabled: true,
       },
       {
-        prop: "nCiShare",
+        prop: "nCiShareInteger",
         inputtype: "rtnumber",
         title: "我司占比",
         precision: 2,
@@ -261,6 +261,15 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtnumber",
         title: "共保保费",
         precision: 2,
+        hidden: true,
+      },
+      {
+        prop: "nCiShare",
+        inputtype: "rtnumber",
+        title: "我司占比",
+        precision: 2,
+        clearable: true,
+        suffix: "%",
         hidden: true,
       },
     ],
@@ -1406,7 +1415,10 @@ async function getContData() {
   if(getReinsuredDataInfo && getReinsuredDataInfo.code === "200") {
     if (getReinsuredDataInfo.data) {
       console.log("getContData", getReinsuredDataInfo.data);
-      let data = {...getReinsuredDataInfo.data}
+      let data = {
+        ...getReinsuredDataInfo.data,
+        nCiShareInteger: getReinsuredDataInfo.data.cCiMrk !== "0" ? Number(getReinsuredDataInfo.data.nCiShare) * 100 : getReinsuredDataInfo.data.nCiShare,
+      }
       // if(params.cCiMrk !== '0') {
       //   data = {
       //     ...res.data,

@@ -196,6 +196,8 @@ const disAbledFlag = ref(false);
 const codeListMap = ref<any>({});
 provide('codeListMap', codeListMap.value);
 
+// 添加一个标志位来标识是否通过funcadd方法调用
+const isFuncAddCalled = ref(false);
 
 const allTermMap = [
 '00425000281','00425000282','00425000283','00425000277','00425000279',
@@ -314,9 +316,8 @@ onMounted(async () => {
   }
 });
 
-async function addAndinitData(keyText) { 
-  return new Promise((resolve, reject) => {
-    const pl = addPlanMethod(keyText);
+function addAndinitData() { 
+    const pl = addPlanMethod();
     const param = {
       cProdNo: parparam.cProdNo,
       cTermNo: parparam.cTermNo,
@@ -349,14 +350,14 @@ async function addAndinitData(keyText) {
           plans.push(data);
         });
         refushData(pl, plans);
+        // 仅在通过funcadd方法调用时显示提示信息
+        if (isFuncAddCalled.value) {
+          ElMessage.success(`方案${pl}添加成功`);
+        }
       } else {
         ElMessage.error(msg);
       }
-      setTimeout(()=>{
-        resolve()
-      },120)
     });
-  })
 }
 
 const edrItem = ref<[key: string, value: Array<any>] | any>({});
@@ -428,6 +429,7 @@ const method = {
         return;
       }
     }
+    isFuncAddCalled.value = true;
     addAndinitData();
   },
 };
@@ -445,20 +447,15 @@ function showPlanDelete(pl: any){
   }
   return r;
 }
-function addPlanMethod(keyText) {
-    let planKey 
-    if(keyText){
-      planKey = keyText
-    }else{
-      let maxindex = 0;
+function addPlanMethod() {
+    let maxindex = 0;
       const l = Object.keys(planData.value).forEach((k: any) => {
       const numberPart = parseInt(k.replace(/\D/g, ""), 10);
       if (numberPart > maxindex) {
         maxindex = numberPart;
       }
     });
-    planKey = "P" + (maxindex + 1);
-    }
+    const planKey = "P" + (maxindex + 1);
     planData.value[planKey] = [];
     return planKey;
 }
@@ -571,6 +568,45 @@ function refushData(planNo: string, datas: any) {
     //   showFlush();
     // });
     updateTitle();
+    
+    // 仅在通过funcadd方法调用时执行滚动操作
+    if (isFuncAddCalled.value) {
+      // 在数据更新完成后执行滚动操作
+      nextTick(() => {
+        // 延迟一小段时间确保DOM完全渲染后再执行滚动
+        setTimeout(() => {
+          // 使用方案的特定键值来定位元素，更加精确
+          const element = document.querySelector(`.planInfo[data-plan-key="${planNo}"]`);
+          if (element) {
+            // 滚动到元素位置，使用scrollIntoView
+            element.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'start'
+            });
+            
+            // 添加偏移量以避免被顶部固定元素遮挡
+            const offset = 100;
+            window.scrollBy(0, -offset);
+          } else {
+            // 备用方案：滚动到最后一个.planInfo元素
+            const lastElement = document.querySelector('.planInfo:last-child');
+            if (lastElement) {
+              lastElement.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start'
+              });
+              
+              // 添加偏移量以避免被顶部固定元素遮挡
+              const offset = 100;
+              window.scrollBy(0, -offset);
+            }
+          }
+          
+          // 滚动完成后重置标志位
+          isFuncAddCalled.value = false;
+        }, 100);
+      });
+    }
   }, 100);
 }
 function deletePlan(plan: string) {
@@ -579,53 +615,34 @@ function deletePlan(plan: string) {
     cancelButtonText: "取消",
     type: "warning",
   }).then(() => {
-    deletePlanByNo(plan,true)
+    if (parparam.cEdrType) {
+
+      const rowId = planData.value[plan]['m'][0]['Term.cRowId'];
+      if(!rowId){   //如果不存在行RowId,则是新增条款,直接删除即可
+        delete planData.value[plan];
+      }else{
+        Object.keys(planData.value[plan]).forEach((item) => {
+          for (let i = 0; i < planData.value[plan][item].length; i++) {
+            if(item === 'a1' || item === 'm'){
+              tremTemplateRefs.value[plan+item+i].setCancel();
+            }else{
+              if(planData.value[plan][item] && planData.value[plan][item].length > 0){
+                planData.value[plan][item].forEach(e => {
+                  e['Term.cCancelMrk'] = '1';
+                });
+              }
+            }
+          }
+        });
+      }
+    }else{
+      delete planData.value[plan];
+    }
     ElMessage({
       type: "success",
       message: "删除成功",
     });
   });
-}
-
-function deletePlanByNo(plan: string,showMessage: boolean){
-  if(showMessage){
-    let cancount = 0;
-    Object.keys(planData.value).forEach(item =>{
-      if(planData.value[item]['m'] && planData.value[item]['m'].length > 0){    //计算未退保主条款数
-        planData.value[item]['m'].forEach( m =>{
-          if(m['Term.cCancelMrk'] !== '1'){
-            cancount++;
-          }
-        })
-      }
-    })
-    if(cancount <= 1){
-      ElMessage.error('仅剩1个方案时,不能删除!');
-      return;
-    }
-  }
-  if (parparam.cEdrType) {
-  const rowId = planData.value[plan]['m'][0]['Term.cRowId'];
-  if(!rowId){   //如果不存在行RowId,则是新增条款,直接删除即可
-    delete planData.value[plan];
-  }else{
-    Object.keys(planData.value[plan]).forEach((item) => {
-      for (let i = 0; i < planData.value[plan][item].length; i++) {
-        if(item === 'a1' || item === 'm'){
-          tremTemplateRefs.value[plan+item+i].setCancel();
-        }else{
-          if(planData.value[plan][item] && planData.value[plan][item].length > 0){
-            planData.value[plan][item].forEach(e => {
-              e['Term.cCancelMrk'] = '1';
-            });
-          }
-        }
-      }
-    });
-  }
-  }else{
-    delete planData.value[plan];
-  }
 }
 
 function deleteData(plan: string, term: any) {
@@ -771,7 +788,7 @@ function setDisabledAll() {
   });
   
   Object.keys(tremTemplateRefs.value).forEach((item) => {
-    tremTemplateRefs.value[item].setDisabledAll();
+    tremTemplateRefs.value[item]?.setDisabledAll();
   });
 }
 function setUnDisabledByKeyList(key: any) {
@@ -823,16 +840,12 @@ function initTermData(item: any,data:any){
   }
 }
 
-async function setTermData(param: any, value: any){
+function setTermData(param: any, value: any){
   const planNo: string = param.planNo;
   const prop: string = param.factorProp;
   const termNo: string = param.termNo;
   const riskNo: string = param.riskNo;
-  let formData = planData.value[planNo];
-  if(!formData){
-    let res = await addAndinitData(planNo)
-    formData = planData.value[planNo];
-  }
+  const formData = planData.value[planNo];
     formData&&Object.keys(formData).forEach((item) => {
         formData[item].forEach((d: any) => {
           if(d['Term.cUniqueTermNo'] === termNo){
@@ -878,8 +891,6 @@ defineExpose({
   setDisabledAll,
   setUnDisabledByKeyList,
   calcCheck,
-  deletePlanByNo,
-  addAndinitData,
   setTermData
 });
 </script>
