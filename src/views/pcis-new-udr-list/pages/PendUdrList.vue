@@ -303,7 +303,7 @@
             title: "核保级别",
             showKey: [1, 2],
             // typeCode: "WEB_UNDR_CLS",
-            typeCode: "UNDR_CLS_CDE",
+            typeCode: "undrClsList",
             codeParam: { cDptCde: user.value.companyId, cEmpCde: user.value.opCde},
             clearable: true,
         },
