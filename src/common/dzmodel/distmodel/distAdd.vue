@@ -177,7 +177,6 @@ const formconfig1 = ref<AppFreeEditConfig>(
                 params.dist[addrValueKey] = params.dist[inputGroupKey];
               }
             }
-            console.log('params', params)
             saveDist(params).then((res) => {
               if (res.code === 200) {
                 ElMessage.success(res.msg);
@@ -217,7 +216,6 @@ onMounted(() => {
 
     // console.log('Dist.cPlateNumber',props.data.fromSchema)
     let item = JSON.parse(JSON.stringify(props.data.fromSchema[i]));
-       console.log(item) 
     if(['Dist.AllOccup'].includes(item.prop)) {
       item["func"] = getDistoccupType;
     }else if (props.data.fromSchema[i]["func"]) {
@@ -229,7 +227,6 @@ onMounted(() => {
 
     // 040001产品 必填项问题
     if(item.prop =='Dist.cPlanNo' ||item.prop =='Dist.tOpeningTime' ||item.prop =='Dist.cLocationSigns' ||item.prop =='Dist.cFacilitySigns' ||item.prop =='Dist.cVenueSign' || item.prop =='Dist.cBuildingStructure'  ){
-      console.log('进啊2=',item.prop)
       item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];   
     }
     if( route.params.param.cProdNo == '042003' && item.prop =='Dist.cPlanNo' ){
@@ -367,7 +364,7 @@ onMounted(() => {
     newSchema.push(item);
   }
 
-  console.log('身份证号----‘',newSchema)
+  console.log('最终实现表单',newSchema)
   formconfig1.value.fromSchema = newSchema;
   
   formconfig1.value.title = props.data.title;
