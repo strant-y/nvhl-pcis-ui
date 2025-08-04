@@ -784,7 +784,8 @@ const initCiInfo = (data: any) => {
       'Ci.cSlsCde': cSlsId,
       'Ci.cBrkSlsCde': cBrkSlsCde,
     });
-    valideRequired()
+    // 联保机构下拉选项查询
+    ciJiDptOptionsQuery('327001', getFromValue()[0]);
     onChiefMrkChange()
   });
 };
