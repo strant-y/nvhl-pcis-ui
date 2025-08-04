@@ -139,7 +139,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                         }
                         let CAppNos = ''; // 所选项的流水号组合
                         let CProdNos = ''; // 所选项的流水号组合
-                        let plyNo =''; //投保单号
+                        let plyNo =''; //保单号
                         multipleSelection.value.forEach(item => {
                             CAppNos = CAppNos === '' ? item['cAppNo'] : CAppNos + ',' + item['cAppNo'];
                             CProdNos = CProdNos === '' ? item['cProdNo'] : CProdNos + ',' + item['cProdNo'];
@@ -270,7 +270,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				prop: "CBillTyp",
 				inputtype: "rtselect",
 				title: "单据类型",
-				loadData :[{value: '1', label: '投保单号'},
+				loadData :[{value: '1', label: '申请单号'},
 				  {value: '3', label: '支票号'},
 				  {value: '4', label: '保单号'},
 				  {value: '5', label: '交易号'},
@@ -764,6 +764,8 @@ const tableconfig = reactive<AppTableConfig>(
                         cGrpMrk: row['cGrpMrk'],
                         cDptCde: row['cDptCde'],
                         pageType: "readonly",
+                        cTermNo:row['cTermNo'],
+                        cTermNme:row['cTermNme'],
                     });
                     router.push({
                         path: "/pcis/my-page",
@@ -778,7 +780,7 @@ const tableconfig = reactive<AppTableConfig>(
 			{
 				prop: "cAppNo",
 				inputtype: "rtinput",
-				title: "投保单号",
+				title: "申请单号",
                 width: 200,
 			},
 			{

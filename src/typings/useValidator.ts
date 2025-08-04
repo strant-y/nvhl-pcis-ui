@@ -620,6 +620,15 @@ const chequeNumberValidation = () => {
       trigger: "blur"
     }
 };
+ 
+// 非法字符校验
+const accountValidation = () => {
+  return {
+      pattern: /^[^\!@#\$%\^&\*\(\)_\+\{\}\|:"\<\>\?`~\\\[\];',./]+$/,
+      message: '请输入正确号码',
+      trigger: "blur"
+    }
+};
 
 
   const getRules = (type: any, param: any) => {
@@ -706,6 +715,9 @@ const chequeNumberValidation = () => {
     }
     if(type == 'chequeNumberValidation') {
       return chequeNumberValidation()
+    }
+    if(type == 'accountValidation') {
+      return accountValidation()
     }
 
   };

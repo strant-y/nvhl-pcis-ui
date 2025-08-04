@@ -28,6 +28,7 @@ import {getAddressStr} from "@/api/query";
 import {eventBus} from "@/utils/event-bus";
 import {calculateAgeFromIdCard} from "@/utils/common";
 import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
+import moment from "moment";
 const opertaor = dataOpertaor();
 const param = ref({});
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
@@ -163,6 +164,9 @@ const formconfig1 = ref<AppFreeEditConfig>(
               params.cAppNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
             }
 
+						if(params.dist['Dist.tSalesTime']) {
+              params.dist['Dist.tSalesTime'] = moment(params.dist['Dist.tSalesTime']).format("YYYY-MM-DD")
+            }
             // 级联地址表格显示问题处理
             if(Object.keys(mapAddr).includes(props.data.compKey)) {
               const addrInput = mapAddr[props.data.compKey];
@@ -231,6 +235,17 @@ onMounted(() => {
     if( route.params.param.cProdNo == '042003' && item.prop =='Dist.cPlanNo' ){
              item['rules'] = [];
     }
+    
+    
+    if(item.prop =='Dist.cSchoolName'){
+      item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+    }
+
+    // 043010 学校非必填
+    if( route.params.param.cProdNo == '043010' && item.prop =='Dist.cSchoolName' ){
+          item['rules'] = [];
+    }
+
  
     if(cIs == 1 && item.prop !=='Dist.nSeqNo'){
         item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
@@ -269,12 +284,8 @@ onMounted(() => {
         item["hidden"] = true;
       }
     }
-    // 043009 实际用工地址关联 团单才展示
-    if(item.prop === 'Dist.cEmploymentAddress' && cGrpMrk.value !== '1'){
-      item['rules'] = [];
-      item["hidden"] = true;
-    }
-    // 身份证类型自动回填年龄
+
+        // 身份证类型自动回填年龄
     if(item.prop =='Dist.cIdentificationNumber'){
       item['func'] = (val: string) => {
         if(val && val.length === 18 && getValue('Dist.cDocumentType') === '120001') {
@@ -282,7 +293,6 @@ onMounted(() => {
           setValue('Dist.nAge', age);
         }
       }
-
       if(cIs == 1){
           item['rules'] = [getRules("idCard", {}),{ required: true, message: '该项为必填项', trigger: 'blur' }];
       }else{
@@ -290,6 +300,22 @@ onMounted(() => {
       }
     
     }
+    // 043009 实际用工地址关联 团单才展示
+    if(item.prop === 'Dist.cEmploymentAddress' && cGrpMrk.value !== '1'){
+      item['rules'] = [];
+      item["hidden"] = true;
+    }
+
+    // 043010 实习岗位为必填
+    if( route.params.param.cProdNo == '043010' && item.prop =='Dist.cJobType' ){
+        item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+    }
+    // 040016 身份证必填
+    if( route.params.param.cProdNo == '040016' && item.prop =='Dist.cIdentificationNumber' ){
+        item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+    }
+
+
     if(item.prop =='Dist.cEquipmentTypes'){
       item['btnItems']['func'] =  cEquipmentTypesFunc;
     }
@@ -299,9 +325,7 @@ onMounted(() => {
     }
 
 
-    if(item.prop =='Dist.cSchoolName'){
-      item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
-    }
+  
     if(item.prop =='Dist.HouseAreaProp'){
       item?.groupList.forEach(data => {
         data.rules = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
@@ -382,20 +406,21 @@ const cEquipmentTypesFunc = ()=>{
 const cDocumentTypeChange =(val:any)=>{
   console.log(val)
    const item = freeEditRef.value?.getFromSchemaItem('Dist.cIdentificationNumber')
+   console.log(11123,item.itemConfig['rules'])
     //  身份证
     if (val == "120001") { 
-     item.itemConfig['rules'] = [ getRules("idCard", {})];
+     item.itemConfig['rules'] = [ getRules("idCard", {}),...item.itemConfig['rules']];
     } else if ( val == "110007") {   
       // 统一社会信用代码校验
-      item.itemConfig['rules'] = [getRules("socialCode", {})];
+      item.itemConfig['rules'] = [getRules("socialCode", {}),...item.itemConfig['rules']];
     } else if(val == "19"){
       // 外国人证件号
-      item.itemConfig['rules'] = [getRules("ariCard", {})];
+      item.itemConfig['rules'] = [getRules("ariCard", {}),...item.itemConfig['rules']];
     } else if(val =='110001'){
       // 组织机构编码校验
-      item.itemConfig['rules'] =[getRules("orgCode", {})];
+      item.itemConfig['rules'] =[getRules("orgCode", {}),...item.itemConfig['rules']];
     } else {
-      item.itemConfig['rules'] = [ getRules("isNull", {})];
+      item.itemConfig['rules'] = [ getRules("isNull", {}),...item.itemConfig['rules']];
     }
 }
 

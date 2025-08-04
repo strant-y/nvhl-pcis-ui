@@ -26,7 +26,7 @@ export function getAddressStr(queryParams: any): AxiosPromise<any> {
 }
 
 /**
- * 获取投保单号
+ * 获取申请单号
  * @param queryParams
  */
 export function generatelSingleNo(queryParams: any): AxiosPromise<any> {
@@ -327,4 +327,12 @@ export function isUndrClsBlackList(queryParams: any): AxiosPromise<any> {
  */
 export function queryEcargoRelevancePolicyDetails(queryParams: any): AxiosPromise<any> {
 	return post(`/ecargo/queryEcargoRelevancePolicyDetails`, queryParams);
+}
+
+/**
+* 保费计算前校验费率上限接口
+ * @param queryParams
+ */
+export function queryTermRateLimit(queryParams: any): AxiosPromise<any> {
+	return post(`/policy/queryTermRateLimit`, queryParams);
 }

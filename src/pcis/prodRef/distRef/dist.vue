@@ -286,14 +286,6 @@ console.log('dist -----',formconfig11.value)
   if(distTableRef.value) {
     eventBus.on(`setMap-${props.compKey}`, addCodeListMap);
   }
-  // 获取页面初始化的时候获取的组件配置信息
-  if(opertaor.getFatherPage() && opertaor.getFatherPage().getOldProductResData() && opertaor.getFatherPage().getOldProductResData()[0]?.pageInfo) {
-    oldPageSchema.value = opertaor.getFatherPage().getOldProductResData()[0]?.pageInfo.find((item: any) => item.pageCode === props.compKey).pageSchema || {};
-    // 如果团个单标识为团单则展示关联被保险人，否则隐藏
-    if(route.params.param?.cGrpMrk !== '1') {
-      oldPageSchema.value.fromSchema = oldPageSchema.value.fromSchema.filter((item:any) => item.prop !== 'Dist.cRelatedInsured')
-    }
-  }
 });
 
 // const  modifyRules = (data, fieldValue)=> {
@@ -344,9 +336,9 @@ const method = {
 
   editmethod: (row: any) => {
     let cappNo = '';
-    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
     // 判断有无批改类型参数，有则是批单
     if(route.params.param?.cEdrType) {
+    	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       cappNo = edrbase['EdrBase.cAppNo'];
     } else if(route.params.param?.pageName === "priceInquiry") {
       cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
@@ -380,9 +372,10 @@ const method = {
   },
   delmethod: (row: any) => {
     let cappNo = '';
-    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+    
     // 判断有无批改类型参数，有则是批单
     if(route.params.param?.cEdrType) {
+			const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       cappNo = edrbase['EdrBase.cAppNo'];
     } else if(route.params.param?.pageName === "priceInquiry") {
       cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
@@ -413,11 +406,11 @@ const method = {
   //  042003 根据电梯条数反
   funcdistadd: () => {
     const alldata: any = opertaor.getDataAll();
-    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
-    const param = {};
+    const param:any = {};
     if(route.params.param?.pageName === "priceInquiry") {
       param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
     } else if (route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
+    	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       param['cAppNo'] = edrbase["EdrBase.cAppNo"]
     } else {
       param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
@@ -449,7 +442,8 @@ const method = {
     });
   },
 
-  handleQuery: (queryParams: any = { pageNum: 1, pageSize: 10 }, isChange: boolean = false) => {
+  handleQuery: async(queryParams: any = { pageNum: 1, pageSize: 10 }, isChange: boolean = false) => {
+    return new Promise((resolve, reject) => {
     distTableRef.value?.setPartnerPage(queryParams);
     let tgtRef = opertaor.getTableRefByKey('tgt');
 		const s = cardRef.value?.getFromValue() || {};
@@ -461,17 +455,19 @@ const method = {
 		}
     const param = opertaor.getParam();
     let app = "";
-    if (param.cOrgAppNo) {
+    if (opertaor.getDataAll().plyBase["Base.cAppNo"]) {
+      app = opertaor.getDataAll().plyBase["Base.cAppNo"];   
+    } else if(param.cOrgAppNo){
       app = param.cOrgAppNo;
-    } else if(opertaor.getDataAll().plyBase["Base.cAppNo"]){
-      app = opertaor.getDataAll().plyBase["Base.cAppNo"];
     } else {
       app = route.params.param?.cAppNo
     }
     const selData = {
-      cAppNo: app,
+      cAppNo: "",
 			cProdNo: route.params.param.cProdNo,
 			cComponentTable: cComponentTableValue,
+            cClauseCode: route.params.param.cTermNo, //条款编码  
+            cProdNo: route.params.param.cProdNo,  //产品号
 			...formconfig1.value,
 			...queryParams
     };
@@ -506,18 +502,18 @@ const method = {
         pageresult.list = [];
         pageresult.total = res.data.total;
         pageresult.list = res.data.data.map((item, index) => {
+					let data:any = {}
+					if(!!item['Dist.cMajorCategories'] || !!item['Dist.cMediumClassification'] || !!item['Dist.cOccupationalSubcategory']){
+						data['Dist.AllOccup'] = [
+                item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
+            ]
+					}
+					if(!!item['Dist.tOpeningTime']){
+						data['tOpeningTime'] = item['Dist.tOpeningTime']? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD"): null
+					}
           return{
             ... item,
-            ... {
-              // 序号全部由后端处理
-              // 'Dist.nSeqNo': ((queryParams.pageNum - 1) * queryParams.pageSize) + index + 1,
-              tOpeningTime: item['Dist.tOpeningTime']
-                  ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
-                  : null,
-              'Dist.AllOccup': [
-                item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
-              ],
-            }
+            ... data
           };
         });
 
@@ -556,8 +552,40 @@ const method = {
         if(idxParam && isChange) { // 保存清单表格在屏幕中间
           idxParam.handleAnchorClick(undefined, `#${props.compKey}`);
         }
+        // 刷新条款表格
+        const termref = opertaor.getTableRefByKey("cvrg");
+        console.log('termref22-----', toRaw(termref));
+        const hasRel = res.data.hasRel;
+        const hasPlan = res.data.hasPlan;
+        const clauseValues = res.data.clauseValues;
+
+        if(hasRel == false){
+            return;
+        }
+        if(clauseValues.length == 0){
+            return;
+        }
+        // 区分方案
+        if(hasPlan){
+            clauseValues.forEach(item => {
+                termref.setTermData({
+                    termNo: route.params.param.cTermNo,
+                    planNo: item.planNo,
+                    factorProp: item.field,
+                }, item.countNumber);
+            });
+        } else{
+            clauseValues.forEach(item => {
+                termref.setTermData({
+                    termNo: route.params.param.cTermNo,
+                    factorProp: item.field,
+                }, item.countNumber);
+            });
+        }
       }
+      resolve(res)
     });
+    })
   },
   // distSummeryQuery: () => {
   //   syncDist({
@@ -609,9 +637,9 @@ const method = {
   //导出
   exportExcel: () => {
     let cappNo = '';
-    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
     // 判断有无批改类型参数，有则是批单
     if(route.params.param?.cEdrType) {
+			const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       cappNo = edrbase['EdrBase.cAppNo'];
     } else if(route.params.param?.pageName === "priceInquiry") {
       cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
@@ -678,9 +706,9 @@ const method = {
   //全量导入
   importExcel() {
     let cappNo = '';
-    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
     // 判断有无批改类型参数，有则是批单
     if(route.params.param?.cEdrType) {
+    	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       cappNo = edrbase['EdrBase.cAppNo'];
     } else if(route.params.param?.pageName === "priceInquiry") {
       cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
@@ -691,6 +719,7 @@ const method = {
       ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
       return;
     }
+    getFatherPageOldProductResData();
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.xlsx, .xls, .xlsm'; // 支持的文件类型
@@ -748,9 +777,9 @@ const method = {
   // 增量导入
   importExcelIncrement: () => {
     let cappNo = '';
-    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
     // 判断有无批改类型参数，有则是批单
     if(route.params.param?.cEdrType) {
+    	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       cappNo = edrbase['EdrBase.cAppNo'];
     } else if(route.params.param?.pageName === "priceInquiry") {
       cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
@@ -779,7 +808,7 @@ const method = {
 
           // 构建参数并请求接口
           const params = {
-            ...formconfig1.value,
+						...oldPageSchema.value,
             file: base64String, // ✅ 正确传入
             cComponentTable: cComponentTableValue,
             cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
@@ -817,6 +846,7 @@ const method = {
   },
   //全量模板下载
   downloadTemp: () => {
+    getFatherPageOldProductResData();
     const param = {
       ...oldPageSchema.value,
     }
@@ -891,9 +921,9 @@ const method = {
   // 批量删除
   batchDelete() {
     let cappNo = '';
-    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
     // 判断有无批改类型参数，有则是批单
     if(route.params.param?.cEdrType) {
+    	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       cappNo = edrbase['EdrBase.cAppNo'];
     } else if(route.params.param?.pageName === "priceInquiry") {
       cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
@@ -926,11 +956,38 @@ const method = {
       } else {
         param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
       }
-      deleteDist(param).then((res: any) => {
+      deleteDist(param).then(async(res: any) => {
         if (res.code === 200) {
           ElMessage.success("删除成功");
           const queryParams = distTableRef.value?.getPartnerPage(false);
-          method.handleQuery(queryParams, true);
+          // 获取 selectDist 接口的返回结果
+          let queryRes = await method.handleQuery(queryParams, true);
+          const termref = opertaor.getTableRefByKey("cvrg");
+          // 获取删除前条款信息的数组信息
+          let beforeDelArr = termref.getFromValue();
+          // 将删除前的数组格式转化为对象格式，beforeDelObj的demo  {'P1':true,'P2':true}
+          let beforeDelObj = {}
+          beforeDelArr.forEach(item=>{
+            beforeDelObj[item['Term.cPlanNo']]=true
+          })
+          // 遍历 queryRes ,和 beforeDelObj 进行对比，计算出来待删除项目
+          // queryRes相当于删除后的条款信息,遍历它，删掉beforeDelObj对应的值，表示这一项删除前后都存在，没必要删
+          // 比如 clauseValues 中有 P1，那么就从 beforeDelObj 中删除 P1
+          // 剩下的就是需要删除的计划（因为它们在 beforeDelObj 中存在但在 clauseValues 中不存在）
+          queryRes.data.clauseValues.forEach(item=>{
+            delete beforeDelObj[item.planNo]
+          })
+          // 经过对比后，过滤出来 beforeDelObj 中的key，表示待删除项
+          let needDelArr=Object.keys(beforeDelObj)
+          // needDelArr 的demo ['P1','P2','P3']
+          for (let i = needDelArr.length; i > 0; i--) {
+            termref.deletePlanByNo(needDelArr[i-1])
+          }
+          // 如果queryRes.data.clauseValues的长度为0，需要留下来1条条款信息
+          // 实际上是全部删除掉，然后添加1条数据即可
+          if(queryRes.data.clauseValues.length===0){
+            termref.addAndinitData()
+          }
         }
       });
     });
@@ -1030,16 +1087,20 @@ function getTableData() {
 
 function setTableData(data: any) {
   pageresult.list = data.map((item: any, index: any) => {
+		let dataNew:any = {}
+		if(!!item['Dist.cMajorCategories'] || !!item['Dist.cMediumClassification'] || !!item['Dist.cOccupationalSubcategory']){
+			dataNew['Dist.AllOccup'] = [
+					item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
+			]
+		}
+		if(!!item['Dist.tOpeningTime']){
+			dataNew['tOpeningTime'] = item['Dist.tOpeningTime']? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD"): null
+		}
     return{
       ... item,
+			... dataNew,
       ... {
         nSeqNo: index + 1,
-        tOpeningTime: item['Dist.tOpeningTime']
-            ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
-            : null,
-        'Dist.AllOccup': [
-          item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
-        ],
       }
     };
   });
@@ -1056,6 +1117,17 @@ const exRules = {};
 onUnmounted(() => {
   eventBus.off(`setMap-${props.compKey}`, addCodeListMap);
 });
+
+// 获取页面初始化的时候获取的组件配置信息
+function getFatherPageOldProductResData() {
+  if(opertaor.getFatherPage() && opertaor.getFatherPage().getOldProductResData() && opertaor.getFatherPage().getOldProductResData()[0]?.pageInfo) {
+    oldPageSchema.value = opertaor.getFatherPage().getOldProductResData()[0]?.pageInfo.find((item: any) => item.pageCode === props.compKey).pageSchema || {};
+    // 如果团个单标识为团单则展示关联被保险人，否则隐藏
+    if(route.params.param?.cGrpMrk !== '1') {
+      oldPageSchema.value.fromSchema = oldPageSchema.value.fromSchema.filter((item:any) => item.prop !== 'Dist.cRelatedInsured')
+    }
+  }
+}
 
 defineExpose({
   getValue,

@@ -227,7 +227,7 @@ onMounted(async () => {
     }
     getTableFun();
 
-    //     let CAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];   // 投保单号
+    //     let CAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];   // 申请单号
 
     //     policyService.getAMLExtendInfoByAppNo(CAppNo,'Applicant').then((response) => {
     //         let {code, data} = response
@@ -248,7 +248,7 @@ onMounted(async () => {
 
 // 收益所有人table信息
 const getTableFun = async (isSave=false) => {
-    let cAppNo = props.data.cAppNo;  // 投保单号
+    let cAppNo = props.data.cAppNo;  // 申请单号
     let cRegisteredLogo = props.data.cRegisteredLogo;   // 
     let param = {
         cRegisteredLogo
@@ -284,7 +284,7 @@ const getTableFun = async (isSave=false) => {
 
 // 保存
 const saveProdDataFun = () => {
-    let cAppNo = props.data.cAppNo;  // 投保单号
+    let cAppNo = props.data.cAppNo;  // 申请单号
     let cRegisteredLogo = props.data.cRegisteredLogo;
     let param = Object.assign({
         cRegisteredLogo

@@ -357,12 +357,42 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "关联交易确认",
         rules: [{ type: "required" }],
+         itemWidth: 1,
         loadData: [
           { value: "1", label: "是" },
           { value: "2", label: "否" },
         ],
         clearable: true,
+        func:(val:any)=>{
+            if(val ==='1'){
+                setFormItem("cRelateNo",{ hidden: false})
+                setFormItem("cUploadSign",{ hidden: false})
+            }else{
+                setFormItem("cRelateNo",{ hidden: true})
+                setFormItem("cUploadSign",{ hidden: true})
+            }
+        }
       },
+
+      {
+        prop: "cRelateNo",
+        inputtype: "rtinput",
+        title: "关联交易审批单编号",
+        hidden: true,
+         itemWidth: 0.5,
+      },
+      {
+        prop: "cUploadSign",
+        inputtype: "rtcheckbox",
+        title: "是否上传关联交易审批单",
+         itemWidth: 0.5,
+         hidden: true,
+        keymap: {
+          y: "1",
+          n: "2",
+        },
+      },
+
       {
         prop: "cIsRiskExp",
         inputtype: "rtselect",
@@ -495,6 +525,8 @@ watch(
         setFormItem("riFacMrk", {
           btnItems: {disabled: true}
         });
+        // 临分标识如果是1，则是否临分复选框设置勾选状态
+        setValue("riFacMrk", props.pageData?.plyBase['Base.cRiFacMrk'] == "1" ? "1" : "0");
       }
     }
   },
