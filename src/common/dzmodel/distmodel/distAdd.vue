@@ -326,11 +326,11 @@ onMounted(() => {
 
 
   
-    if(item.prop =='Dist.HouseAreaProp'){
-      item?.groupList.forEach(data => {
-        data.rules = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
-      })
-    }
+    // if(item.prop =='Dist.HouseAreaProp'){
+    //   item?.groupList.forEach(data => {
+    //     data.rules = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+    //   })
+    // }
 
     // 电话校验
     if(item.prop =='Dist.cContactNumber'){
