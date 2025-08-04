@@ -102,6 +102,10 @@ const showLocation = [
     label: "表单中",
     value: "0",
   },
+  {
+    label: "隐藏",
+    value: "2",
+  },
 ];
 const position = [
   {
@@ -147,20 +151,6 @@ const freeCol = [
     value: 12,
   },
 ];
-const componentType = [
-  {
-    label: "表单",
-    value: "free",
-  },
-  {
-    label: "表格",
-    value: "grid",
-  },
-  {
-    label: "自定义",
-    value: "custom",
-  },
-];
 const size = [
   {
     label: "large",
@@ -173,6 +163,20 @@ const size = [
   {
     label: "small",
     value: "small",
+  },
+];
+const componentType = [
+  {
+    label: "表单",
+    value: "free",
+  },
+  {
+    label: "表格",
+    value: "grid",
+  },
+  {
+    label: "自定义",
+    value: "custom",
   },
 ];
 const showtype = [

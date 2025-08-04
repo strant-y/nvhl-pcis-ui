@@ -51,6 +51,7 @@
                     :span="i.itemWidth ? i.itemWidth * formUi.span : formUi.span"
                     style="margin-top: 5px"
                     v-if = 'formItems[props.row._dataId][i.prop].hidden !== true'
+                    v-show="[undefined, '1'].includes(formItems[props.row._dataId][i.prop].cShowLocation)"
                 >
                   <el-form-item
                       :prop="[props.$index, i.prop]"

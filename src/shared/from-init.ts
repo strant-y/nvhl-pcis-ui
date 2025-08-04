@@ -75,6 +75,12 @@ export function formInit(
         const onInitKey = propName + 'OnInit';
         parent.onInit = method[onInitKey as keyof typeof method];
       }
+      if(['rtcascader'].includes(parent.inputtype) && !!parent.prop && !parent.lazyLoad) {
+        const propArr = parent.prop.split('\.');
+        const propName = propArr.length > 1 ? propArr[propArr.length - 1] : propArr[0] ;
+        const lazyLoadKey = propName + 'LazyLoad';
+        parent.lazyLoad = method[lazyLoadKey as keyof typeof method];
+      }
       // 确保 value 是 method 对象的键之一
       const funcKey = value as keyof typeof method;
       return method[funcKey];

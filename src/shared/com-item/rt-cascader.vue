@@ -44,6 +44,7 @@
 <script setup lang="ts">
 import { codeListViewStore } from "@/store";
 import { CascaderProps } from "element-plus";
+import {CommonConstants} from "@/constants/CommonConstants";
 
 const codeListStore = codeListViewStore();
 const props = defineProps({
@@ -78,7 +79,7 @@ interface OptionTypeBySelect extends OptionType {
   disabled?: boolean;
 }
 
-const codeListMap = inject<any>('codeListMap');
+const codeListMap = inject<any>('codeListMap', {});
 
 const options: Ref<OptionTypeBySelect[]> = ref([]); // 字典下拉数据源
 
@@ -104,61 +105,10 @@ const cascprops: CascaderProps = {
         : false
     : false,
   lazyLoad(node, resolve) {
-    const { level, value } = node;
-    if (level !== 0 && !!value) {
-      const list = codeListMap[`${props.item.typeCode}-${level}-${value}`];
-      if(list) {
-        resolve(list);
-        return;
-      }
-      const codeListParam = {};
-      let codeListName = props.item.typeCode; // 默认使用配置的typeCode
-      // 批改原因级联
-      if(props.item.typeCode === "EDR_RSN_LIST_NEW" || props.item.typeCode ==='EDR_RSN_LIST_YY' || props.item.typeCode ==='EDR_RSN_LIST_AY') {
-        codeListParam.rsnTyp = value.split('-')[0]
-        codeListParam.kindNo = value.split('-')[1]
-        if (props.row && props.row.cProdNo) {
-          codeListParam.prodNo = props.row.cProdNo;
-        }
-        if(codeListParam.rsnTyp == '2' || codeListParam.rsnTyp == '3'){
-          codeListName = "EDR_RSN_LIST_CANCEL";
-        }
-      } else {
-        codeListParam.cParCde = value
-      }
-      codeListStore
-        .queryCodeList(
-          {
-            // codeListName: props.item.typeCode,
-            codeListName: codeListName,
-            codeListParam: codeListParam,
-          },
-          props.unAuthor,
-          props.item.cache ? props.item.cache : true
-        )
-        .then((res: any) => {
-          const l =
-            typeof props.item.cascaderprops === "string"
-              ? JSON.parse(props.item.cascaderprops)
-              : props.item.cascaderprops;
-          if(props.item.typeCode === "EDR_RSN_LIST_NEW" || props.item.typeCode ==='EDR_RSN_LIST_YY' ||  props.item.typeCode ==='EDR_RSN_LIST_AY') {
-            res.forEach((e: any) => {
-              e.leaf = level >= 1;
-            });
-          } else {
-            res.forEach((e: any) => {
-              e.leaf = level >= (l && l.length > 0 ? l.length - 1 : 5);
-            });
-          }
-          codeListMap[`${props.item.typeCode}-${level}-${value}`] = res;
-          resolve(res);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    } else {
-      // 初始化不在这里懒加载
-      resolve([]);
+    if(props.item.lazyLoad && typeof props.item.lazyLoad === CommonConstants.TYPE_OF_FUNCTION) {
+      props.item.lazyLoad(node, resolve, props.row);
+    }else {
+      lazyLoadFun(node, resolve);
     }
   },
 };
@@ -180,16 +130,23 @@ watch([options, () => props.modelValue], ([newOptions, newModelValue]) => {
  */
 watch(
   [() => props.item.loadData, () => props.item.typeCode],
-  ([newloadData, newtypeCode]) => {
+  ([newloadData, newtypeCode],[oldloadData, oldtypeCode]) => {
     if (newloadData) {
-      options.value = newloadData;
+      updateOption(newloadData);
     }
-    if (newtypeCode) {
+    if (newtypeCode !== oldtypeCode) {
       uploadOption();
     }
   },
   { deep: true }
 );
+
+watch(codeListMap, (newOptions, oldOptions) => {
+  if(newOptions) {
+    getCodeListMapToOption();
+  }
+});
+
 function handleChange(val?: string | number | Array<any> | undefined) {
   emits("valueChange", val);
   emits("update:modelValue", val);
@@ -197,7 +154,10 @@ function handleChange(val?: string | number | Array<any> | undefined) {
 }
 
 function uploadOption() {
-  if (!getParam() || Object.keys(getParam()).length === 0) return;
+  clearCheckedNodes();
+  if(getCodeListMapToOption()) {
+    // 优先查 codeListMap.value
+  } else if (!getParam() || Object.keys(getParam()).length === 0) return;
   codeListStore
     .queryCodeList(
       {
@@ -218,7 +178,9 @@ onMounted(() => {
   selectedValue.value = props.modelValue;
   // 初始化组件数据
   if (props.item) {
-    if (props.item.loadData) {
+    if(getCodeListMapToOption()) {
+      // 优先查 codeListMap.value
+    } else if (props.item.loadData) {
       options.value = props.item.loadData;
     } else if (
       props.item.typeCode &&
@@ -245,6 +207,65 @@ onMounted(() => {
     }
   }
 });
+
+function lazyLoadFun(node: any, resolve: Function) {
+  const { level, value } = node;
+  if (level !== 0 && !!value) {
+    const list = codeListMap[`${props.item.typeCode}-${level}-${value}`];
+    if(list) {
+      resolve(list);
+      return;
+    }
+    const codeListParam = {};
+    let codeListName = props.item.typeCode; // 默认使用配置的typeCode
+    // 批改原因级联
+    if(props.item.typeCode === "EDR_RSN_LIST_NEW" || props.item.typeCode ==='EDR_RSN_LIST_YY' || props.item.typeCode ==='EDR_RSN_LIST_AY') {
+      codeListParam.rsnTyp = value.split('-')[0]
+      codeListParam.kindNo = value.split('-')[1]
+      if (props.row && props.row.cProdNo) {
+        codeListParam.prodNo = props.row.cProdNo;
+      }
+      if(codeListParam.rsnTyp == '2' || codeListParam.rsnTyp == '3'){
+        codeListName = "EDR_RSN_LIST_CANCEL";
+      }
+    } else {
+      codeListParam.cParCde = value
+    }
+    codeListStore
+        .queryCodeList(
+            {
+              // codeListName: props.item.typeCode,
+              codeListName: codeListName,
+              codeListParam: codeListParam,
+            },
+            props.unAuthor,
+            props.item.cache ? props.item.cache : true
+        )
+        .then((res: any) => {
+          const l =
+              typeof props.item.cascaderprops === "string"
+                  ? JSON.parse(props.item.cascaderprops)
+                  : props.item.cascaderprops;
+          if(props.item.typeCode === "EDR_RSN_LIST_NEW" || props.item.typeCode ==='EDR_RSN_LIST_YY' ||  props.item.typeCode ==='EDR_RSN_LIST_AY') {
+            res.forEach((e: any) => {
+              e.leaf = level >= 1;
+            });
+          } else {
+            res.forEach((e: any) => {
+              e.leaf = level >= (l && l.length > 0 ? l.length - 1 : 5);
+            });
+          }
+          codeListMap[`${props.item.typeCode}-${level}-${value}`] = res;
+          resolve(res);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+  } else {
+    // 初始化不在这里懒加载
+    resolve([]);
+  }
+}
 
 function isReQuired() {
   // 如果是禁用状态,默认带底色
@@ -314,10 +335,29 @@ function isMultiple(){
     return false;
   }
 }
+// 清空选中的节点
+function clearCheckedNodes() {
+  if(cascaderRef.value && cascaderRef.value.cascaderPanelRef) {
+    cascaderRef.value.cascaderPanelRef?.clearCheckedNodes();
+  }
+}
 function updateOption(newOption: any) {
+  clearCheckedNodes();
   options.value = newOption;
 }
-
+function getCodeListMapToOption(): boolean {
+  const rowId = props.row && props.row._dataId ? props.row._dataId : '';
+  if(!!codeListMap) {
+    if(!!codeListMap[props.item.typeCode + rowId]) {
+      options.value = codeListMap[props.item.typeCode + rowId];
+      return true;
+    }else if(!!codeListMap[props.item.prop + rowId]) {
+      options.value = codeListMap[props.item.prop + rowId];
+      return true;
+    }
+  }
+  return false;
+}
 function getParam() {
   if (props.item.codeParam && typeof props.item.codeParam === "string") {
     return JSON.parse(props.item.codeParam);
@@ -346,7 +386,8 @@ defineExpose({
   updateOption,
   getTextValue,
   setCustomClass,
-  setChangeInfo
+  setChangeInfo,
+  clearCheckedNodes
 });
 </script>
 <style lang="scss">
