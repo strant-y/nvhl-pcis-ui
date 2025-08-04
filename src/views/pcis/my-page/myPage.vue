@@ -3852,6 +3852,7 @@ const submitUnderwritingFn = async () => {
     const queryRiFacMrk = props.param?.pageName === "priceInquiry" ? await policyService.queryRiFacMrkXJ(param) : await policyService.queryRiFacMrk(param);
     if(queryRiFacMrk && queryRiFacMrk.code === '0') {
       ElMessage.error(queryRiFacMrk.message);
+      underwrite.value?.setRiskunitDisabled()
       return
     }
   } else if(res.cUndrMrk === "B") {// 核保选项为退回给出单员时，如果已经触发自主临分，则提示需要再保确认并阻断，其他则直接提交核保
