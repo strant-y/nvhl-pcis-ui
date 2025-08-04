@@ -34,7 +34,7 @@ onMounted(() => {
 
 const refreshData = () => {
   const param = {
-    codeListName: "KIND_LIST_CACHE",
+    codeListName: "KIND_LIST_GRT",
     codeListParam: null
   }
   // 查询列表数据
