@@ -79,11 +79,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   setValue('cBckOp1', res.body.cExc)
                 }
                 // 如果是多险位，则不能进行自主临分
-                if(res.body.tableList && res.body.tableList.lengt > 1) {
+                if(res.body.tableList && res.body.tableList.length > 1) {
                   setFormItem("riFacMrk", {
                     btnItems: {disabled: true}
                   });
+                  // 是否临分复选框置灰
                   checkboxDisabledFlag.value = true
+                  // 风险单位划分按钮置灰
+                  riskunitDisabledFlag.value = true
                 }
               }
             });
@@ -629,6 +632,7 @@ async function getRiskData() {
         btnItems: {disabled: true}
       });
       checkboxDisabledFlag.value = true
+      riskunitDisabledFlag.value = true
     }
   }
 }
