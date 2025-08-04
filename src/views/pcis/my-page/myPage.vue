@@ -1533,6 +1533,9 @@ async function loadAfter() {
         item.disabled = true;
       });
     }
+    nextTick(() => {
+      opertaor.setDisabledAll();
+    });
   } else if (props.param.pageType === "orig") {
     console.log('续保复制----')
     // 续保复制
