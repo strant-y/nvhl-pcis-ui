@@ -152,10 +152,10 @@ const method = {
         });
 
         // 开户行
-        setFormItem("Acctinfo.cBankCde", {
-          disabled: true,
-          rules: [],
-        });
+        // setFormItem("Acctinfo.cBankCde", {
+        //   disabled: true,
+        //   rules: [],
+        // });
 
       } else  if (isdefault === "0")  {
         setFormItem("Acctinfo.cBankPro", {
@@ -177,10 +177,10 @@ const method = {
         });
 
         // 开户行
-        setFormItem("Acctinfo.cBankCde", {
-          disabled: false,
-          rules: [],
-        });
+        // setFormItem("Acctinfo.cBankCde", {
+        //   disabled: false,
+        //   rules: [],
+        // });
       }
 
       // 清空开户行
@@ -204,6 +204,28 @@ const method = {
           setValue("Acctinfo.cBankAddr", nameCBankCde);
           setValue("Acctinfo.cBankCnaps", codeCBankCde);
         }
+      }
+
+          if(para[3]){
+      codeListStore
+        .queryCodeList(
+          {
+            codeListName: "CBankCdeList",
+            codeListParam: {
+              'banktypecod': para[3], 'areacode': val
+            },
+          },
+        )
+        .then((res) => {
+          tgtobjEditRef.value?.addCodeListMap({
+            code: "Acctinfo.cBankCde",
+            list: res
+          })
+          // setFormItem("Acctinfo.cBankCde", {
+          //   disabled: false,
+          //   rules: [getRules("required", {})],
+          // });
+        });
       }
     }else{
         // setValue("Acctinfo.cBankPro", "");
@@ -241,6 +263,8 @@ const method = {
           rules: [],
         });
     }
+
+
   },
   // 开户行省Acctinfo.cBankPro 
   // 市  Acctinfo.cBankArea
@@ -258,9 +282,9 @@ const method = {
     // });
     const p = opertaor.getParam();
     console.log('开户',p)
-    if (!p.initFlag) {
-        setValue("Acctinfo.cBankArea", "");
-    }
+    // if (!p.initFlag) {
+    //     setValue("Acctinfo.cBankArea", "");
+    // }
 
     if(e){
       
@@ -297,7 +321,7 @@ const method = {
     //   disabled: false,
     //   rules: [getRules("required", {})],
     // });
-    if(3){
+    if(e){
       codeListStore
       .queryCodeList(
         {
@@ -329,7 +353,7 @@ const method = {
     //   codeParam: { banktypecod: para[3], areacode: val },
     //   rules: [getRules("required", {})],
     // });
-     if(3){
+     if(val && para[3]){
       codeListStore
         .queryCodeList(
           {

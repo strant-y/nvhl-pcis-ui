@@ -294,9 +294,19 @@ const tableconfig = reactive<AppTableConfig>(
 const openEdit = (type: string, row) => {
   console.log(111111, type, row)
   router.push({
-    path: '/plan-config/plan-info',
+    // path: '/plan-config/plan-info',
+    path:'plan-info',
     query: { data: JSON.stringify({ type, rowData: row }) }
   })
+
+      // router.push({
+      //           path: "/pcis/my-page",
+      //           // query: {
+      //           //   // param: JSON.stringify({ ...data, ...{ queryTyp: "orig" } }),
+      //           //   title: "询价单录入" // 直接设置新标题
+      //           // },
+             
+      //         });
 };
 
 //查看详情

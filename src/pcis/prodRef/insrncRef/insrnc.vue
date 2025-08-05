@@ -164,31 +164,19 @@ const method = {
       if (cIsRetroSpect !== '0') {
         setFormItem("Base.tRunBgnTm", { rules: [getRules("required", {})] }); //追溯/日落起期
         setFormItem("Base.tRunEndTm", { rules: [getRules("required", {})] }); //追溯/日落止期
+      }else{
+        setFormItem("Base.tRunBgnTm", { rules: [] }); //追溯/日落起期
+        setFormItem("Base.tRunEndTm", { rules: [] }); //追溯/日落止期
       }
       
-      // setValue('Base.nReportDays','')
-      // setValue('Base.tRunBgnTm','')
-      // setValue('Base.tRunEndTm','')
-
-
-
-      setFormItem("Base.tRunBgnTm", { rules: [getRules("required", {})] }); //追溯/日落起期
-      setFormItem("Base.tRunEndTm", { rules: [getRules("required", {})] }); //追溯/日落止期
+      
       setFormItem("Base.tRunBgnTm", {  hidden: false  }); //追溯/日落起期
       setFormItem("Base.tRunEndTm", {  hidden: false  }); //追溯/日落止期
       setFormItem("Base.nTracingDays", {  hidden: false  }); //追溯/日落天数
-
-
       setFormItem("Base.tReportBgnTm", {  hidden: true  }); //延长报告期起始日期
       setFormItem("Base.tReportEndTm", {  hidden: true  }); //延长报告期终止日期
       setFormItem("Base.nReportDays", {  hidden: true  }); //延长报告期天数
-
-
-
     } else if (val == "1") {
-      // setValue('Base.nTracingDays','')    
-      // setValue("Base.tReportBgnTm",'')
-      // setValue("Base.tReportEndTm",'')  
       if (cIsRetroSpect !== '0') {
         console.log('1212')
         setFormItem("Base.tRunBgnTm", { rules: null }); //追溯/日落起期
@@ -214,6 +202,7 @@ const method = {
     if (val == "1") {
       //选择 是 且索赔基础名称为内索赔制 时，追溯/日落起止期必填  期内索赔制  放开并且必填
       if (cIsRetroSpect == '0') {
+
         setFormItem("Base.tRunBgnTm", { rules: [getRules("required", {})], disabled: false, }); //追溯/日落起期
         setFormItem("Base.tRunEndTm", { rules: [getRules("required", {})], disabled: false, }); //追溯/日落止期
       } else {

@@ -3,19 +3,9 @@
     <el-tabs v-model="activeName" type="card" class="demo-tabs">
       <el-tab-pane label="添加免赔条件" name="first">
         <div class="totalBox">已选择 {{ selected.length }} 项</div>
-        <el-table
-          ref="multipleTableRef"
-          :data="pageresult.list"
-          style="width: 100%"
-          row-key="cDeductibleClass"
-          :row-class-name="tableRowClassName"
-          @selection-change="handleSelectionChange"
-        >
-          <el-table-column
-            type="selection"
-            :selectable="selectable"
-            width="40"
-          />
+        <el-table ref="multipleTableRef" :data="pageresult.list" style="width: 100%" row-key="cDeductibleClass"
+          :row-class-name="tableRowClassName" @selection-change="handleSelectionChange">
+          <el-table-column type="selection" :selectable="selectable" width="40" />
           <el-table-column type="index" label="序号" width="55" />
           <!-- <el-table-column property="cDeductibleClass" label="ID" width="100"/> -->
           <el-table-column label="是否可选" width="80">
@@ -29,12 +19,8 @@
         </el-table>
       </el-tab-pane>
       <el-tab-pane label="添加其他免赔条件" name="second">
-        <el-table
-          ref="multipleTableOtherRef"
-          :data="addTableData"
-          style="width: 100%"
-        >
-          <el-table-column property="index" label="序号" width="55"/>
+        <el-table ref="multipleTableOtherRef" :data="addTableData" style="width: 100%">
+          <el-table-column property="index" label="序号" width="55" />
           <!-- <el-table-column property="cDeductibleClass" label="ID" width="100"/> -->
           <el-table-column property="cDeductibleContent" label="免赔内容">
             <template #default="scope">
@@ -42,13 +28,8 @@
             </template>
           </el-table-column>
           <el-table-column label="操作" width="55">
-            <template #default="{row}">
-              <el-button
-                  type="danger"
-                  link
-                  size="small"
-                  @click="delAdd(row)"
-              ><i-ep-delete />
+            <template #default="{ row }">
+              <el-button type="danger" link size="small" @click="delAdd(row)"><i-ep-delete />
               </el-button>
             </template>
           </el-table-column>
@@ -68,7 +49,7 @@ import { ref, reactive, onMounted } from "vue";
 import { Plus } from "@element-plus/icons-vue";
 import { codeListViewStore } from "@/store";
 import { getPrdDeductible } from "@/api/prod";
-import {MyTableMethod} from "@/shared/app-table-config";
+import { MyTableMethod } from "@/shared/app-table-config";
 const codeListStore = codeListViewStore();
 const props = defineProps({
   data: {
@@ -91,6 +72,7 @@ const pageresult = reactive<Pageresult>({
   list: [],
 });
 const addTableData = ref<Array<any>>([]); //添加其他特约
+// const addTableData = reactive([]); //添加其他特约 //添加其他免赔
 const activeName = ref("first");
 const selectable = (row) => row["cIfMust"] != "1"; //这里调用是把必选的置灰
 const tableRowClassName = ({ row, rowIndex }) => {
@@ -123,7 +105,7 @@ const refreshData = () => {
           cStatus: item.cStatus, //是否必选
           cIfMust: item.cIfMust, //是否必选
           cIfEdit: item.cIfEdit, //是否可修改
-          cIfFix: "1", 
+          cIfFix: "1",
         });
       });
       nextTick(() => {
@@ -150,24 +132,39 @@ function add() {
   const idx = addTableData.value.length + 1;
   addTableData.value.push({
     index: idx, //序号
-    cDeductibleClass: ( idx < 10 ? "other_0" : "other_" ) + idx,
+    cDeductibleClass: (idx < 10 ? "other_0" : "other_") + idx,
     cDeductibleContent: "",
     cStatus: "",
-    cIfEdit: "1", // 是否可修改
+    cIfEdit: "0", // 是否可修改
     cIfMust: "9", // 是否必选 9 其他
     cYuliu1: "",
+    cIfFix: "0", //是否固定特约，查寻特约模板接口查出来的1，自定义添加的为0
   });
 }
 
 //点击确定按钮时把选中的数据派发给父组件
 const returnData = () => {
-  const tempData = multipleTableRef.value?.getSelectionRows();
-  if(addTableData.value) {
-    for (const item of addTableData.value) {
+  let selectedData = props.data.selectedData;
+  let tempData = multipleTableRef.value.getSelectionRows();
+  let newAddTable = Object.assign([],addTableData.value)
+  console.log('newAddTable',newAddTable)
+  
+  if (newAddTable) {
+    for (const item of newAddTable) {
       tempData.push(item);
     }
   }
-  props.method.getSelected(tempData);
+
+  const processedNewItems = tempData.map(item2 => {
+    const matchedItem1 = selectedData.find(item1 =>
+      item1.cIfEdit === '1' && item1.cDeductibleClass === item2.cDeductibleClass
+    );
+    return matchedItem1 ? matchedItem1 : item2;
+  });
+  console.log('addTableData,’', addTableData.value)
+  console.log('id----11', selectedData)
+  console.log('id----22', processedNewItems)
+  props.method.getSelected(processedNewItems);
   close();
 };
 const close = () => {
@@ -177,32 +174,51 @@ const close = () => {
 function setSelected() {
   const lastSelected = props.data.selectedData;
   if (lastSelected && lastSelected.length) {
-    const sarr = lastSelected.map( (f: any) => f["cDeductibleClass"]);
-    pageresult.list.forEach(f => { 
-      if(sarr.includes(f["cDeductibleClass"])){
+    const sarr = lastSelected.map((f: any) => f["cDeductibleClass"]);
+    pageresult.list.forEach(f => {
+      if (sarr.includes(f["cDeductibleClass"])) {
         multipleTableRef.value!.toggleRowSelection(f, true, true);
       }
     })
   }
-  addTableData.value =  lastSelected.filter(f => f['cIfMust'] === '9');
+  addTableData.value = lastSelected.filter(f => f['cIfMust'] === '9');
 }
 
 function delAdd(row: any) {
   const list = addTableData.value.filter(f => f['cDeductibleClass'] !== row['cDeductibleClass']);
-  const newAddList = list.map(m => {
-    const idx = list.length;
+  const newAddList = list.map((m,idx) => {
+    // const idx = list.length;
     return {
       ...m,
       ...{
-        index: idx,
-        cDeductibleClass: ( idx < 10 ? "other_0" : "other_" ) + idx,
+        index: idx+1,
+        // cDeductibleClass: (idx < 10 ? "other_0" : "other_") + idx +1,
       }
     }
   });
-  addTableData.value = newAddList;
+  console.log('newAddList',newAddList)
+  console.log('addTableData',addTableData)
+
+  // if(newAddList){
+      // addTableData.length = 0; // 清空原有内容（保持响应式引用）
+      addTableData.value=newAddList; // 展开新数组，批量添加
+  // }
+
+  // addTableData.value = newAddList;
 }
 
-onMounted(() => {
+onMounted(() => { 
+  
+    let selectedData = props.data.selectedData;
+    const addList = selectedData.filter(item => item.cIfFix==0 in item);
+    if(addList.length >0){
+        addList.forEach((item,index) => {
+            item.addIndex = index+1;
+            addTableData.value.push(item);
+        });
+    }
+    console.log('12addList',selectedData)
+  
   refreshData();
 });
 </script>
@@ -212,6 +228,7 @@ onMounted(() => {
   text-align: right;
   margin-top: 10px;
 }
+
 .totalBox {
   width: 100%;
   height: 40px;
@@ -221,9 +238,11 @@ onMounted(() => {
   border: 1px solid #f3e4b9;
   margin-bottom: 10px;
 }
+
 :deep .el-table .checkedSty {
   background-color: #ffe8e6;
 }
+
 .addSty {
   border: 1px dashed #ccc;
   width: 100%;
