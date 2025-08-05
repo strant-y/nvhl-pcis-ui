@@ -22,6 +22,7 @@
             <tremTemplate
               v-for="(i, index) in formData['m']"
               :key="index"
+              :rowIndex="index"
               v-model="formData['m'][index]"
               :disabled-flag="disAbledFlag"
               :faters="faters"
@@ -58,6 +59,7 @@
               <tremTemplate
                 v-for="(i, index) in formData['a1']"
                 :key="index"
+                :rowIndex="index"
                 v-model="formData['a1'][index]"
                 :disabled-flag="disAbledFlag"
                 :faters="faters"
@@ -196,7 +198,6 @@ onMounted(async () => {
           item.children?.forEach((e: any) => {
             riskList.push({
               "TermRisktgt.cLiabCode": e.cRiskNo,
-              '_dataId': getRowId()
             });
           });
           let data: { [key: string]: any } = {
@@ -231,7 +232,7 @@ const method = {
     dialog.value?.open(
         selectTgtFix,
         {
-          selectedData: selectedRow.value, //需要把自定义的过滤掉，只传过去从模板中选择的
+          selectedData: selectedRow.value.data, //需要把自定义的过滤掉，只传过去从模板中选择的
           selectList: [],
         },
         {
@@ -308,24 +309,21 @@ function addTermData() {
             (em) => em["Term.cClauseCode"] === item.cTermNo
           );
           item.children?.forEach((e: any) => {
-            const id = {_dataId: getRowId()}
             if (se.length > 0) {
               const seri = se[0].riskList.filter(
                 (er: { [x: string]: any }) =>
                   er["TermRisktgt.cLiabCode"] === e.cRiskNo
               );
               if (seri.length > 0) {
-                riskList.push({...seri[0], ...id});
+                riskList.push(seri[0]);
               } else {
                 riskList.push({
                   "TermRisktgt.cLiabCode": e.cRiskNo,
-                  ...id
                 });
               }
             } else {
               riskList.push({
                 "TermRisktgt.cLiabCode": e.cRiskNo,
-                ...id
               });
             }
           });
@@ -451,7 +449,6 @@ function getFromValue() {
       const i = JSON.parse(JSON.stringify(d));
       if (i["riskList"]) {
         i["Term.riskList"] = i["riskList"].map((m: any) => {
-          delete m['_dataId'];
           return m;
         });
         delete i["riskList"];
@@ -602,14 +599,16 @@ function calcCheck(){
   };
 }
 const setCargoSeq = (value: string) => {
+  const {index, data} = selectedRow.value;
   if(formData.value['m'] && formData.value['m'].length > 0) {
-    if(selectedRow.value['Term.cClauseCode']) {
-      formData.value['m'][0]['Term.nCargoSeq'] = value;
+    if(data['Term.cClauseCode']) {
+      formData.value['m'][index]['Term.nCargoSeq'] = value;
+      selectedRow.value.data = formData.value['m'][index];
     }else {
-      formData.value['m'][0]['riskList'].forEach((item: any) => {
-        if(item['_dataId'] === selectedRow.value['_dataId']) {
+      formData.value['m'][index]['riskList'].forEach((item: any) => {
+        if(item['TermRisktgt.cLiabCode'] === data['TermRisktgt.cLiabCode']) {
           item['TermRisktgt.nCargoSeq'] = value;
-          selectedRow.value = item;
+          selectedRow.value.data = item;
         }
       });
     }
