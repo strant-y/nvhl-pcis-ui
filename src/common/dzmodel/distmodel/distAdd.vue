@@ -353,8 +353,8 @@ onMounted(() => {
       }
     }
 
-    // 实际用工地址清单新增 经营地址/房屋清单 房屋所在地址
-    if(item.prop === 'Dist.JingYingAddress043009' || item.prop === 'Dist.HouseAreaProp'){
+    // 实际用工地址清单新增 经营地址/房屋清单 房屋所在地址/营业场所地址清单043013 标的坐落地址
+    if(item.prop === 'Dist.JingYingAddress043009' || item.prop === 'Dist.HouseAreaProp' || item.prop === 'Dist.PropertyLocationProp'){
       item.groupList.forEach((data:any) => {
         if(data.prop === 'Dist.Prop') {
           data['func'] = setregistAdd;
