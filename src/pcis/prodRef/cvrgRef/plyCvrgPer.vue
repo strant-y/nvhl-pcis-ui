@@ -450,8 +450,9 @@ function getFromValue() {
     formData.value[item].forEach((d: any) => {
       const i = JSON.parse(JSON.stringify(d));
       if (i["riskList"]) {
-        i["Term.riskList"] = i["riskList"].forEach((m: any) => {
-          delete m['_dataId']
+        i["Term.riskList"] = i["riskList"].map((m: any) => {
+          delete m['_dataId'];
+          return m;
         });
         delete i["riskList"];
       }
