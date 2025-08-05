@@ -36,6 +36,10 @@ const cRdrTyp = ref('');
 const eCargoTermNo = ref('');
 
 function isAllAValuesSame(arr:any,key:any) {
+  // 检查是否有null或undefined和空的key
+  if (arr.some(obj => obj[key] === null || obj[key] === undefined || obj[key] === '')) {
+    return false;
+  }
   const firstValue = arr[0][key];
   return arr.every(obj => obj[key] === firstValue);
 }

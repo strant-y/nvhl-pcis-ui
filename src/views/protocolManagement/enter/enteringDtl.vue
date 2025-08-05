@@ -39,7 +39,7 @@ let idxParam = reactive({
   param: { ...props.param, ...{cacheKey:cacheKey.value,acctinfoFlag:true}},
   user: JSON.parse(sessionStorage.getItem("user")),
   ciJiMrk: '0',
-  readonly: computed(() => ['view','audit'].includes(props.type)),
+  readonly: computed(() => ['view','audit'].includes(props?.type) || (props.type === 'EDR_APP_NEW_SCENE' &&  ['2','3'].includes(props.param?.cEdrType) )),
 });
 
 provide('idxParam', idxParam);
@@ -527,6 +527,7 @@ function query() {
   if(idxParam.readonly === true) {
     formPage.value?.setPageReadOnly(true);
     if(props.type !== 'audit'){
+      if(props.type === 'EDR_APP_NEW_SCENE' &&  ['2','3'].includes(props.param?.cEdrType)) return
       bthList.value.forEach((item:any)=>{
         if (item.id === 'back') return
         let submitBtn = formPage.value?.getPageBtnRefById(item?.id)?.getConfig();
@@ -549,6 +550,10 @@ function lastDataQuery() {
   }
 }
 function isAllAValuesSame(arr:any,key:any) {
+  // 检查是否有null或undefined和空的key
+  if (arr.some(obj => obj[key] === null || obj[key] === undefined || obj[key] === '')) {
+    return false;
+  }
   const firstValue = arr[0][key];
   return arr.every(obj => obj[key] === firstValue);
 }

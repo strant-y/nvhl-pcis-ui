@@ -39,7 +39,7 @@
                       v-for="(k, i) in pageConfig?.pageInfo"
                       :key="i"
                       :custom="true"
-                      v-show="k.pageKey !== 'acctinfo' ? ['AgreementCiShare', 'AgreementCi', 'AgreementCiTcp'].includes(k.pageCode) ? isCiJiMrk :acctinfoFlag :true"
+                      v-show="k.pageKey !== 'acctinfo' ? ['AgreementCiShare', 'AgreementCi', 'AgreementCiTcp'].includes(k.pageCode) ? isCiJiMrk :true :true"
                       @click="handleAnchorClick($event, `#${k.pageCode}`)"
                       :class="i === 0 ? 'isActive' : ''"
                   >
@@ -122,7 +122,7 @@
                 v-for="(k, i) in pageConfig?.pageInfo"
                 :key="i"
                 :id="k.pageCode"
-                v-show="k.pageKey !== 'acctinfo' ? ['AgreementCiShare', 'AgreementCi', 'AgreementCiTcp'].includes(k.pageCode) ? isCiJiMrk : acctinfoFlag : true"
+                v-show="k.pageKey !== 'acctinfo' ? ['AgreementCiShare', 'AgreementCi', 'AgreementCiTcp'].includes(k.pageCode) ? isCiJiMrk : true : true"
             >
               <component
                 :ref="(res: any) => {
