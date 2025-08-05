@@ -840,6 +840,14 @@ function initTermData(item: any,data:any){
   }
 }
 
+function getPlanNo(){
+    const resultArray = Object.keys(planData.value).map((key, index) => ({
+        label: key,
+        value: key, 
+    }));
+    return resultArray;
+}
+
 function setTermData(param: any, value: any){
   const planNo: string = param.planNo;
   const prop: string = param.factorProp;
@@ -891,7 +899,8 @@ defineExpose({
   setDisabledAll,
   setUnDisabledByKeyList,
   calcCheck,
-  setTermData
+  setTermData,
+  getPlanNo
 });
 </script>
 

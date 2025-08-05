@@ -232,8 +232,14 @@ onMounted(() => {
     if( route.params.param.cProdNo == '042003' && item.prop =='Dist.cPlanNo' ){
              item['rules'] = [];
     }
-    
-    
+    // 方案号下拉值
+    if(item.prop == 'Dist.cPlanNo'){
+      const termref = opertaor.getTableRefByKey("cvrg");
+      
+      item.typeCode = null;
+      item.loadData = termref.getPlanNo();
+    }
+
     if(item.prop =='Dist.cSchoolName'){
       item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
     }
@@ -321,8 +327,6 @@ onMounted(() => {
       item['func'] =  cDocumentTypeChange;
     }
 
-
-  
     // if(item.prop =='Dist.HouseAreaProp'){
     //   item?.groupList.forEach(data => {
     //     data.rules = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
