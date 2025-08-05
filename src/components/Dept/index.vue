@@ -114,7 +114,7 @@ async function setDpt(t) {
   if (code == 200) {
     let newLsit = data.map((item) => ({
       value: item.cDptCde,
-      label: item.cDptCnm,
+      label: item.cDptCde+item.cDptCnm,
       children: [], // 初始时，所有项都没有子项
     }));
     return newLsit;
@@ -130,11 +130,11 @@ const dpetData = {
     let result = node.data;
     if (result) {
       if (node.level != 4) {
-        listChrDepts({cDptCde: result.value}).then((res) => {
+        listChrDepts({cDptCde: result.value}).then((res:any) => {
           if (res.code == 200) {
             let newLsit = res.data.map((item) => ({
               value: item.cDptCde,
-              label: item.cDptCnm,
+              label: item.cDptCde+item.cDptCnm,
               children: [],
               leaf: item.leaf,
             }));
@@ -158,7 +158,7 @@ function findItemInTree(tree, value) {
     // 检查当前节点的值是否等于目标值
     if (item.value === value) {
       return {
-        label: item.label,
+        label: item.value+item.label,
         value: item.value,
       };
     }
@@ -168,7 +168,7 @@ function findItemInTree(tree, value) {
       const found = findItemInTree(item.children, value);
       if (found) {
         return {
-          label: found.label,
+          label: found.value+found.label,
           value: found.value,
         };
       }
