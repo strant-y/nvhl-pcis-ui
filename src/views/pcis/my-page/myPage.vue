@@ -1237,6 +1237,7 @@ async function loadAfter() {
 			if(res["code"] == 200){
 				if(!!res.data.policyApplication?.composition){
 					dataInit.value.insured = res.data.policyApplication?.composition?.insured[0] || {};
+					dataInit.value.applicant = res.data.policyApplication?.composition?.applicant[0] || {};
 					dataInit.value.cvrg = res.data.policyApplication?.composition?.cvrg || {};
 					dataInit.value.plyBase["Base.cNeedfeeFlag"] = props.param.cNeedfeeFlag
 					dataInit.value.plyBase["Base.cEcAgrNo"] = props.param.cEcAgrNo

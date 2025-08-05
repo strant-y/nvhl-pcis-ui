@@ -8,7 +8,25 @@
         ref="tableRef"
         @page-change="handleQuery(false)"
         @selection-change="handleSelectionChange"
-    />
+    >
+			<!-- policyInfo 列的具名插槽 -->
+			<template #column-policyInfo="{ row, column, index }">
+				<div class="policy-info-cell">
+					<div v-if="row.cEcAgrAppNo" class="policy-number-row">
+						<span>{{ row.cEcAgrAppNo }}</span>
+						<el-icon class="copy-icon" @click="copyText(row.cEcAgrAppNo)">
+							<DocumentCopy />
+						</el-icon>
+					</div>
+					<div v-if="row.cEcAgrNo" class="policy-number-row">
+						<span>{{ row.cEcAgrNo }}</span>
+						<el-icon class="copy-icon" @click="copyText(row.cEcAgrNo)">
+							<DocumentCopy />
+						</el-icon>
+					</div>
+				</div>
+			</template>
+		</app-table>
   </div>
 </template>
 
@@ -42,6 +60,7 @@ const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
 import cargoApi from '@/api/cargo'
 import {PcisEdrQueryService} from "@/views/edr-qry-endorse-list/service/pcis-edr-query-service";
+import { DocumentCopy } from "@element-plus/icons-vue";
 
 const codeListStore = codeListViewStore();
 
@@ -371,17 +390,26 @@ const tableconfig = reactive<AppTableConfig>(
       tableBtnPosition: "right",
       tableBtnType: "btn",
       fromSchema: [
+				{
+					prop: "policyInfo",
+					inputtype: "rtinput",
+					title: "协议号",
+					minWidth: 180,
+					slotName: "policyInfo"
+				},
         {
           prop: "cEcAgrAppNo",
           inputtype: "rtinput",
           title: "预约协议申请单号",
           minWidth: 180,
+        	isShow: false
         },
         {
           prop: "cEcAgrNo",
           inputtype: "rtinput",
           title: "协议号",
           minWidth: 180,
+        	isShow: false
         },
         {
           prop: "cAppId",
@@ -401,18 +429,24 @@ const tableconfig = reactive<AppTableConfig>(
           title: "出单机构",
           minWidth: 120,
         },
-        {
-          prop: "tInsrncBgnTm",
-          inputtype: "rtinput",
-          title: "协议起期",
-          minWidth: 120,
-        },
-        {
-          prop: "tInsrncEndTm",
-          inputtype: "rtinput",
-          title: "协议止期",
-          minWidth: 120,
-        },
+				{
+					prop: "InsurancePeriod",
+					inputtype: "rtinput",
+					title: "协议期间",
+					minWidth: 120,
+				},
+        // {
+        //   prop: "tInsrncBgnTm",
+        //   inputtype: "rtinput",
+        //   title: "协议起期",
+        //   minWidth: 120,
+        // },
+        // {
+        //   prop: "tInsrncEndTm",
+        //   inputtype: "rtinput",
+        //   title: "协议止期",
+        //   minWidth: 120,
+        // },
         {
           prop: "cAppStatus",
           inputtype: "rtselect",
@@ -506,7 +540,14 @@ function handleQuery(flag?: boolean) {
         if (res && res.code === 200) {
           const pageData = res.data;
           if (pageData) {
+            pageresult.list = []
             pageresult.list = pageData.data;
+						pageresult.list = pageData.data.map((item) => ({
+							...item,
+							// 创建一个新字段合并两个值
+							policyInfo: `${item.cEcAgrAppNo || ''}\n${item.cEcAgrNo || ''}`,
+							InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
+						}))
             pageresult.total = pageData.total;
             nextTick(()=>{
               tableRef.value?.getTableValues().forEach((item:any ) =>{
@@ -617,7 +658,69 @@ function setTableFormItem(key: any, obj: any) {
     });
   }
 }
+// 添加 copyText 方法
+const copyText = (text: any) => {
+  if (!text) {
+    ElMessage.warning('没有可复制的内容');
+    return;
+  }
 
+  // 检查 navigator.clipboard 是否存在
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(
+        () => {
+          ElMessage.success('复制成功');
+        },
+        () => {
+          ElMessage.error('复制失败');
+        }
+    );
+  } else {
+    // 使用 document.execCommand('copy') 方法作为备选方案
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      const result = document.execCommand('copy');
+      if (result) {
+        ElMessage.success('复制成功');
+      } else {
+        ElMessage.error('复制失败');
+      }
+    } catch (err) {
+      ElMessage.error('复制失败，请稍后再试');
+    } finally {
+      document.body.removeChild(textarea); // 清理创建的 textarea 元素
+    }
+  }
+};
 </script>
 
-<style scoped></style>
+<style scoped>
+.copy-icon {
+  margin-left: 5px;
+  cursor: pointer;
+  color: #409eff;
+}
+
+.policy-info-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.policy-number-row {
+  display: flex;
+  align-items: center;
+}
+
+.policy-number-row span {
+  flex: 1;
+}
+
+:deep(.el-table td.el-table__cell div.cell) {
+    white-space: pre-line;
+}
+</style>
+

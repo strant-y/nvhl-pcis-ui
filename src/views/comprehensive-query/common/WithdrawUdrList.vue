@@ -7,7 +7,19 @@
       v-model:pageresult="pageresult"
       ref="tableRef"
       @page-change="handleQuery(false)"
-    />
+    >
+			<!-- objId 列的具名插槽 -->
+      <template #column-objId="{ row, column, index }">
+        <div class="policy-info-cell">
+          <div v-if="row.objId" class="policy-number-row">
+            <span>{{ row.objId }}</span>
+            <el-icon class="copy-icon" @click="copyText(row.objId)">
+              <DocumentCopy />
+            </el-icon>
+          </div>
+        </div>
+      </template>
+		</app-table>
   </div>
 </template>
 
@@ -36,6 +48,7 @@ import { deleteFactorBykey, getBasicKindList } from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import moment from 'moment';
 import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
+import { DocumentCopy } from "@element-plus/icons-vue";
 const { withdraw, getBackUdrList, getReturnUdrList, getWithdrawUdrList, getNewUdrList } = NewUdrListService();
 const userStore = useUserStore() || ref({});
 const user = ref(userStore.user) || ref({ companyId:'', opCde:'' })
@@ -136,7 +149,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "dateRange",
         inputtype: "rtdatepicker",
         title: "投保日期",
-        itemWidth: 2,
         clearable: true,
         type: "datetimerange",
         format: "YYYY-MM-DD HH:mm:ss",
@@ -202,6 +214,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "objId",
         inputtype: "rtinput",
         title: "申请单号",
+        slotName: "objId"
       },
       {
         prop: "uwDptName",
@@ -406,6 +419,44 @@ function setFormItem(key: any, obj: any) {
     });
   }
 }
+
+// 添加 copyText 方法
+const copyText = (text: any) => {
+  if (!text) {
+    ElMessage.warning('没有可复制的内容');
+    return;
+  }
+
+  // 检查 navigator.clipboard 是否存在
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(
+        () => {
+          ElMessage.success('复制成功');
+        },
+        () => {
+          ElMessage.error('复制失败');
+        }
+    );
+  } else {
+    // 使用 document.execCommand('copy') 方法作为备选方案
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      const result = document.execCommand('copy');
+      if (result) {
+        ElMessage.success('复制成功');
+      } else {
+        ElMessage.error('复制失败');
+      }
+    } catch (err) {
+      ElMessage.error('复制失败，请稍后再试');
+    } finally {
+      document.body.removeChild(textarea); // 清理创建的 textarea 元素
+    }
+  }
+};
 function setValue(key: string, value: any) {
     freeEditRef?.value?.setValue(key, value);
 }
@@ -419,4 +470,25 @@ defineExpose({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.copy-icon {
+  margin-left: 5px;
+  cursor: pointer;
+  color: #409eff;
+}
+
+.policy-info-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.policy-number-row {
+  display: flex;
+  align-items: center;
+}
+
+.policy-number-row span {
+  flex: 1;
+}
+</style>

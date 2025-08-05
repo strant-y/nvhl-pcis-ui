@@ -7,7 +7,19 @@
       v-model:pageresult="pageresult"
       ref="tableRef"
       @page-change="handleQuery(false)"
-    />
+    >
+			<!-- policyInfo 列的具名插槽 -->
+      <template #column-cInquiryNo="{ row, column, index }">
+        <div class="policy-info-cell">
+          <div v-if="row.cInquiryNo" class="policy-number-row">
+            <span>{{ row.cInquiryNo }}</span>
+            <el-icon class="copy-icon" @click="copyText(row.cInquiryNo)">
+              <DocumentCopy />
+            </el-icon>
+          </div>
+        </div>
+      </template>
+		</app-table>
   </div>
 </template>
 
@@ -16,6 +28,7 @@ import { AppKey } from "@/constants/api";
 import { useUserStore } from "@/store";
 import { useValidator } from "@/typings/useValidator";
 import { useRouter, useRoute } from "vue-router";
+import { DocumentCopy } from "@element-plus/icons-vue";
 const { getRules } = useValidator();
 const router = useRouter();
 const route = useRoute();
@@ -937,6 +950,7 @@ const tableObj = {
                 inputtype: "rtinput",
                 title: "询价单",
                 minWidth: 180,
+								slotName: "cInquiryNo"
             },
             {
                 prop: "cPlyNo",
@@ -1040,7 +1054,7 @@ onMounted(async () => {
     setFormItem("cDptCde", {
         loadData: [
             {
-                label: JSON.parse(sessionStorage.getItem("user")).companyCnm,
+                label: JSON.parse(sessionStorage.getItem("user")).companyId+JSON.parse(sessionStorage.getItem("user")).companyCnm,
                 value: JSON.parse(sessionStorage.getItem("user")).companyId,
             },
         ],
@@ -1221,6 +1235,44 @@ function setFormItem(key: any, obj: any) {
     });
   }
 }
+
+// 添加 copyText 方法
+const copyText = (text: any) => {
+  if (!text) {
+    ElMessage.warning('没有可复制的内容');
+    return;
+  }
+
+  // 检查 navigator.clipboard 是否存在
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(
+        () => {
+          ElMessage.success('复制成功');
+        },
+        () => {
+          ElMessage.error('复制失败');
+        }
+    );
+  } else {
+    // 使用 document.execCommand('copy') 方法作为备选方案
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      const result = document.execCommand('copy');
+      if (result) {
+        ElMessage.success('复制成功');
+      } else {
+        ElMessage.error('复制失败');
+      }
+    } catch (err) {
+      ElMessage.error('复制失败，请稍后再试');
+    } finally {
+      document.body.removeChild(textarea); // 清理创建的 textarea 元素
+    }
+  }
+};
 function setValue(key: string, value: any) {
     freeEditRef?.value?.setValue(key, value);
 }
@@ -1234,4 +1286,25 @@ defineExpose({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.copy-icon {
+  margin-left: 5px;
+  cursor: pointer;
+  color: #409eff;
+}
+
+.policy-info-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.policy-number-row {
+  display: flex;
+  align-items: center;
+}
+
+.policy-number-row span {
+  flex: 1;
+}
+</style>
