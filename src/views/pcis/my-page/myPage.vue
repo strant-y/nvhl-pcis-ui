@@ -896,7 +896,12 @@ const edrBtn = [
     id: "btnCalEdr",
     func: () => {
       // calcPremiumEdr();
-      queryTermRateLimitFun(calcPremiumEdr)
+      // 批改原因是否是费率变更
+      if(props.param.cRsnCde === '45') {
+        queryTermRateLimitFun(calcPremiumEdr)
+      } else {
+        calcPremiumEdr();
+      }
     },
   }),
   createFreeButtonBase({
@@ -935,8 +940,7 @@ const edrSurrenderBtn = [
     label: "保费计算",
     type: "primary",
     func: () => {
-      // calcPremiumEdrSurrender();
-      queryTermRateLimitFun(calcPremiumEdrSurrender)
+      calcPremiumEdrSurrender();
     },
   }),
   createFreeButtonBase({
@@ -1356,7 +1360,14 @@ async function loadAfter() {
         icon: "Money",
         func: () => {
           //获取费用信息类型接口（缺少渠道，保费，当前表单提交校验待后续补充）
-          checkFeeWindowType({ CAppNo: props.param.cAppNo }).then((res: any) => {
+          const params = {};
+          if(props.param.pageName === "priceInquiry") {
+            params["CInquiryNo"] = props.param.cInquiryNo;
+            params["type"] = "inquiry";
+          } else {
+            params["CAppNo"] = props.param.cAppNo;
+          }
+          checkFeeWindowType(params).then((res: any) => {
             if (200 !== res["code"]) {
               ElMessage.error(res["msg"]);
             } else {
