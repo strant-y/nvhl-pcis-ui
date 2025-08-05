@@ -187,7 +187,7 @@ import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { terConfig } from "@/store/modules/term-config";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
-import { prodTemple } from "./titleTemple";
+import { prodTemple,prodAllPrm } from "./titleTemple";
 import { codeListViewStore } from "@/store";
 import { qryProdRelTermRiskList } from "@/api/prod";
 import { getEdrRsnTermItem } from "@/api/query";
@@ -257,10 +257,13 @@ const showTitleMap = ref<{ [key: string]: string }>({});
 
 function updateTitle() {
   Object.keys(planData.value).forEach((k: any) => {
-    if (parparam.cProdNo === "043009") {
+    if (parparam.cProdNo === "043009" || parparam.cProdNo === "040003") {
       const terms = planData.value[k];
       // 获取模版字符串
-      const str = prodTemple.value.default;
+      let str = prodTemple.value.default;
+      if(parparam.cProdNo === "040003"){
+        str = prodTemple.value.allPrm;
+      }
       let sumobj = 0;
       let sumprm = 0;
       const m = terms["m"]; // 主条款
