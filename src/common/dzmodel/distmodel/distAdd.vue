@@ -361,6 +361,11 @@ onMounted(() => {
         }
       })
     }
+    if(item.prop === 'Dist.JingyingAddress' && item.inputtype === 'rtinputgroup'){  // 040001 地址新增更新操作
+      item.groupList.forEach((data:any) => {
+        data['func'] = setregistByMapAdd;
+      })
+    }
     newSchema.push(item);
   }
 
@@ -433,6 +438,41 @@ const cDocumentTypeChange =(val:any)=>{
     }
 }
 
+const prodMap = {
+  '040001':'Dist.cDetailedAddress'
+}
+function setregistByMapAdd() {
+  let a = '';
+  let b = '';
+  if(!prodMap[params.cProdNo]){
+    return ;
+  }
+  
+  formconfig1.value.fromSchema?.forEach(item=>{
+    if(item.inputtype === 'rtinputgroup'){
+      
+      item.groupList.forEach(data=>{
+        if(data.inputtype === 'rtcascader'){
+          a = freeEditRef?.value?.getValue(data.prop);
+        }
+        if(data.inputtype === 'rtinput'){
+          b = freeEditRef?.value?.getValue(data.prop);
+        }
+      })
+    }
+  })
+  if(a){
+    getAddressStr({ address: a }).then((res: any) => {
+      const { code, data, msg } = res;
+      if (code === 200) {
+        const c = (data ? data["addStr"] : "") + (b?b:'');
+        setValue(prodMap[params.cProdNo], c);
+      }
+    });
+  }else{
+    setValue(prodMap[params.cProdNo], b);
+  }
+}
 function setregistAdd() {
   const ads = freeEditRef?.value?.getValue("Dist.Prop");
   const a = freeEditRef?.value?.getValue("Dist.cSuffixAddr") || "";
