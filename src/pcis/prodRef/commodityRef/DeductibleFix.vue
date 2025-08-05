@@ -208,6 +208,7 @@ function delAdd(row: any) {
 }
 
 onMounted(() => { 
+  
     let selectedData = props.data.selectedData;
     const addList = selectedData.filter(item => item.cIfFix==0 in item);
     if(addList.length >0){
@@ -217,7 +218,7 @@ onMounted(() => {
         });
     }
     console.log('12addList',selectedData)
-    refreshData();
+  
   refreshData();
 });
 </script>
