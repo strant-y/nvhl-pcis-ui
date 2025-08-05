@@ -238,6 +238,14 @@ watch(
   { deep: true }
 );
 
+watch(() => props.showLabel ,
+  (newShowLabel) => {
+    if (!newShowLabel && props.item.typeCode && Object.keys(getParam()).length > 0) {
+      uploadOption();
+    }
+  }
+);
+
 function getCodeListMapToOption(): boolean {
   const rowId = props.row && props.row._dataId ? props.row._dataId : '';
   if(!!codeListMap) {

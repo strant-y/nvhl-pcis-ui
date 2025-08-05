@@ -57,6 +57,7 @@
                   <tremTemplate
                     v-for="(i, index) in planData[k]['m']"
                     :key="index"
+                    :rowIndex="i['Term.CPlanNo']"
                     v-model="planData[k]['m'][index]"
                     :disabled-flag="disAbledFlag"
                     @delete="
@@ -95,6 +96,7 @@
                     <tremTemplate
                       v-for="(i, index) in planData[k]['a1']"
                       :key="index"
+                      :rowIndex="i['Term.CPlanNo']"
                       v-model="planData[k]['a1'][index]"
                       :disabled-flag="disAbledFlag"
                       @delete="

@@ -6,7 +6,10 @@ export const terConfig = defineStore(
   "termConfig",
   () => {
     const config = reactive<Record<string, any>>({});
-    const selectedRow = ref<any>();
+    const selectedRow = ref<any>({
+        index: undefined,
+        data: undefined
+    });
 
     const getConfig = (key: string) => {
       return config[key];

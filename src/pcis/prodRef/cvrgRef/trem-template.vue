@@ -387,6 +387,9 @@ const props = defineProps({
   faters: {
     type: Object,
   },
+  rowIndex: {
+    type: [Number, String],
+  },
 });
 
 const emit = defineEmits(["update:modelValue", "delete"]);
@@ -1224,19 +1227,20 @@ function setCancel(){
 }
 
 const isSelected = (key: any) => {
+  if(!selectedRow.value.data || selectedRow.value.index !== props.rowIndex) return false;
   if(typeof key === CommonConstants.TYPE_OF_STRING) {
     const row = riskList.value[key];
-    return selectedRow.value?._dataId === row._dataId;
+    return selectedRow.value.data['TermRisktgt.cLiabCode'] === row['TermRisktgt.cLiabCode'];
   }else {
-    if(!selectedRow.value) return false;
-    return key['Term.cClauseCode'] === selectedRow.value['Term.cClauseCode'];
+    return key['Term.cClauseCode'] === selectedRow.value.data['Term.cClauseCode'];
   }
 };
 const selectRow = (key: any) => {
+  selectedRow.value.index = props.rowIndex;
   if(typeof key === CommonConstants.TYPE_OF_STRING){
-    selectedRow.value = riskList.value[key];
+    selectedRow.value.data = riskList.value[key];
   } else {
-    selectedRow.value = key;
+    selectedRow.value.data = key;
   }
 };
 

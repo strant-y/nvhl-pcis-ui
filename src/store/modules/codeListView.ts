@@ -182,7 +182,7 @@ function queryOnce(typeList: string[] = undefined){
       if(res.code == 200){
         const options = res.data.list.map(item => ({
           value: item.cDptCde,
-          label: item.cDptCnm,
+          label: item.cDptCde+item.cDptCnm,
           children: [], // 初始时，所有项都没有子项
         }));
         setOptionsToCacheMap('QueryFormDeptType', options);

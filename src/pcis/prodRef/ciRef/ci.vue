@@ -92,7 +92,7 @@ const method = {
     const cCiMrkFlag = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
     const nCiAmt = parseFloat(productStore.nAmt)
     if(nCiAmt =="0"){
-      ElMessage.warning("总保额为0");
+      ElMessage.warning("总保额为0,请先进行保费计算!");
       return;
     }
     const totalCiShare = dataList.reduce((sum, row) => sum + parseFloat(row['Ci.nCiShare'] || 0), 0);
@@ -103,7 +103,7 @@ const method = {
     }
     // 新增行前计算剩余比例
     const remaining = (100 - totalCiShare).toFixed(8);
-    const cChiefMrk = ['1', '3'].includes(cCiMrkFlag) ? '1' : '0';
+    const cChiefMrk = ['1', '3','5'].includes(cCiMrkFlag) ? '1' : '0';
     // const cSlsCde = opertaor.getTableRefByKey('plyBase').getValue('Base.cSlsId')
     if(dataList.length == 0){
         freeEditRef?.value?.addRowByData({
@@ -114,9 +114,9 @@ const method = {
           'Ci.cSlsCde':"",
           "Ci.cBrkrCde":"",
           "Ci.cBrkSlsCde":"",
-          'Ci.cChiefMrk': cChiefMrk,
+          'Ci.cChiefMrk': '',
           'Ci.cCoinsurerCde': '327001',
-          'Ci.cSubDptCde': param.dptCde,
+          'Ci.cCiSubComp': param.dptCde,
           'Ci.cDptCde': param.cDptCde,
       });
     }else{
@@ -128,9 +128,9 @@ const method = {
           'Ci.cSlsCde':"",
           "Ci.cBrkrCde":"",
           "Ci.cBrkSlsCde":"",
-          'Ci.cChiefMrk': cChiefMrk,
+          'Ci.cChiefMrk': '',
           // 'Ci.cCoinsurerCde': '327001',
-          // 'Ci.cSubDptCde': param.dptCde,
+          // 'Ci.cCiSubComp': param.dptCde,
           // 'Ci.cDptCde': param.cDptCde,
       });
     }
@@ -177,7 +177,7 @@ const method = {
     const rowId = rowData._dataId;
 
     freeEditRef?.value?.setValueByRowKey("dptCascader", rowId, []);
-    freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, undefined);
+    freeEditRef?.value?.setValueByRowKey("Ci.cCiSubComp", rowId, undefined);
     freeEditRef.value?.setValueByRowKey("Ci.cDptCde", rowId, undefined);
     // 联保机构下拉选项查询
     ciJiDptOptionsQuery(val, row);
@@ -188,7 +188,7 @@ const method = {
         ElMessage.error("司内联保，不能录入除永安以外的其他公司！");
         return false;
       }
-      freeEditRef?.value?.setValueByRowKey("Ci.cSubDptCde", rowId, "");
+      freeEditRef?.value?.setValueByRowKey("Ci.cCiSubComp", rowId, "");
       if(plyBasedata["Base.cBsnsTyp"] === '19001'){
         freeEditRef.value?.setRowFieldProp(
                 rowData._dataId, "Ci.cDptCde", "rules", [getRules("required", {})]
@@ -232,19 +232,19 @@ const method = {
     if(value && value.length > 0){
       const subDptCde = value[0]; // 分公司代码
       const dptCde = value[1]; // 出单机构代码
-      freeEditRef.value?.setValueByRowKey("Ci.cSubDptCde", rowId, subDptCde);
+      freeEditRef.value?.setValueByRowKey("Ci.cCiSubComp", rowId, subDptCde);
       freeEditRef.value?.setValueByRowKey("Ci.cDptCde", rowId, dptCde);
 
       // 校验
       onChiefMrkChange();
       // 获取所有行数据
       const allRows = getFromValue();
-      // 校验是否存在重复的 Ci.cCoinsurerCde, Ci.cSubDptCde, Ci.cDptCde 组合
+      // 校验是否存在重复的 Ci.cCoinsurerCde, Ci.cCiSubComp, Ci.cDptCde 组合
       const isDuplicate = allRows.some((row: any) => {
         // 排除当前行自身
         return row._dataId !== rowId &&
             row["Ci.cCoinsurerCde"] === rowData["Ci.cCoinsurerCde"] &&
-            row["Ci.cSubDptCde"] === rowData["Ci.cSubDptCde"] &&
+            row["Ci.cCiSubComp"] === rowData["Ci.cCiSubComp"] &&
             row["Ci.cDptCde"] === dptCde;
       });
       if (isDuplicate) {
@@ -255,7 +255,7 @@ const method = {
         return;
       }
     } else {
-      freeEditRef.value?.setValueByRowKey("Ci.cSubDptCde", rowId, undefined);
+      freeEditRef.value?.setValueByRowKey("Ci.cCiSubComp", rowId, undefined);
       freeEditRef.value?.setValueByRowKey("Ci.cDptCde", rowId, undefined);
     }
   },
@@ -711,7 +711,7 @@ const onChiefMrkChange = () => {
   const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue();
   if (!rowData || !rowId) return;
   const cCoinsurerCde = rowData["Ci.cCoinsurerCde"];  //获取当前行的联共保公司编码
-  const cSubDptCde = rowData["Ci.cSubDptCde"];     //获取当前行的分公司
+  const cSubDptCde = rowData["Ci.cCiSubComp"];     //获取当前行的分公司
   const cDptCde = param.cDptCde;   // 获取出单机构编码(cDptCnm:浙江电网销团队)
   let cSelfMrkVal = '0';   // 本公司标识
   let cJiMrkVal = '0';     // 联保标识
@@ -779,7 +779,7 @@ const initCiInfo = (data: any) => {
       'Ci.cChiefMrk': cChiefMrk,
       'Ci.cIssueMrk': '1',
       'Ci.cCoinsurerCde': '327001',
-      "Ci.cSubDptCde": param.dptCde,
+      "Ci.cCiSubComp": param.dptCde,
       'Ci.cDptCde': param.cDptCde,
       'Ci.cSlsCde': cSlsId,
       'Ci.cBrkSlsCde': cBrkSlsCde,
@@ -974,21 +974,6 @@ const valideRequired = ()=>{
           });
         }
         handleEdrAppNewSceneRules()
-        // if(param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && cCiMrkValue !=='5' && param.cRsnDetailCde.value == "47"){
-        //   const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
-        //   if(rowItem && rowData['Ci.cChiefMrk'] == '1'){
-        //     rowItem['Ci.nCiShare'].disabled = false
-        //   }
-        //   else if(rowItem && rowData['Ci.cChiefMrk'] == '0' && rowData['Ci.cCoinsurerCde'] !== '327001'){
-        //     rowItem['Ci.nCiShare'].disabled = false
-        //     rowItem['Ci.nPlyFeeRate'].disabled = false
-        //     rowItem['Ci.cCoinsurerCde'].disabled = false
-        //   }
-        //   else if(rowItem && rowData['Ci.cChiefMrk'] == '0'){
-        //     rowItem['Ci.nCiShare'].disabled = false
-        //     rowItem['Ci.nPlyFeeRate'].disabled = false
-        //   }
-        // }
       }
   },500)
 }
@@ -1159,9 +1144,9 @@ function setFormValue(value: any) {
       }
 
       // 联保机构、出单机构 转 级联组件初始化
-      if(elem['Ci.cSubDptCde']) {
+      if(elem['Ci.cCiSubComp']) {
         const dptList = [];
-        dptList.push(elem['Ci.cSubDptCde']);
+        dptList.push(elem['Ci.cCiSubComp']);
         if(elem['Ci.cDptCde']) {
           dptList.push(elem['Ci.cDptCde']);
         }
