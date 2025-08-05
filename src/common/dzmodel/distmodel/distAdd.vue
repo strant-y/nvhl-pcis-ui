@@ -316,6 +316,8 @@ onMounted(() => {
     }
 
 
+
+
     if(item.prop =='Dist.cEquipmentTypes'){
       item['btnItems']['func'] =  cEquipmentTypesFunc;
     }
@@ -334,6 +336,10 @@ onMounted(() => {
 
     // 电话校验
     if(item.prop =='Dist.cContactNumber'){
+        item['rules'] = [getRules("phoneNo", {})];
+    }
+    // 联系方式
+    if(item.prop =='Dist.cContactInformation'){
         item['rules'] = [getRules("phoneNo", {})];
     }
 
