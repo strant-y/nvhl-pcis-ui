@@ -544,7 +544,14 @@ watchEffect(() => {
   }
 });
 
-onMounted(() => {});
+onMounted(() => {
+  // 从平台过来的
+  const href = window.location.href;
+  const code = href.slice(href.indexOf("?") + 1, href.indexOf("&")).split("=")[1];
+  if(code) {
+    userStore.verifyCode(code)
+  }
+});
 
 function handleLoginChange() {
   verifyFlag.value = false;
