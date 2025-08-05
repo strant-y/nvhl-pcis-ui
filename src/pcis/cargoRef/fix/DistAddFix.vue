@@ -151,7 +151,7 @@ onMounted(() => {
     // }else if(item.prop !=='DistECargo.cSchoolName' && item.prop !=='DistECargo.cSchoolAddress'){
     //   item['rules'] =null;
     // }
-    item["disabled"] = false;
+    // item["disabled"] = false;
     if(item.cShowLocation === '1'){
       item["hidden"] = true;
     }
