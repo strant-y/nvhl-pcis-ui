@@ -130,11 +130,16 @@
 <script setup lang="ts">
 import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
 const tremTemplate = defineAsyncComponent(() => import("./trem-template.vue"));
+import { v4 as uuidv4 } from "uuid";
+
 const tremAddTemplate2 = defineAsyncComponent(
   () => import("./trem-add2-template.vue")
 );
 const tremAddTemplate3 = defineAsyncComponent(
   () => import("./trem-add3-template.vue")
+);
+const selectTgtFix = defineAsyncComponent(
+  () => import("./selectTgt.vue")
 );
 const dialog = ref<DialogMethod | null>(null);
 import { formInit } from "@/shared/from-init";
@@ -143,9 +148,14 @@ import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { codeListViewStore } from "@/store";
 import { qryProdRelTermRiskList } from "@/api/prod";
 import { getEdrRsnTermItem } from "@/api/query";
+import { terConfig } from "@/store/modules/term-config";
+
 const codeListStore = codeListViewStore();
 const opertaor = dataOpertaor();
 const parparam = opertaor.getParam();
+const termConfig = terConfig();
+const {selectedRow} = storeToRefs(termConfig);
+
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -186,6 +196,7 @@ onMounted(async () => {
           item.children?.forEach((e: any) => {
             riskList.push({
               "TermRisktgt.cLiabCode": e.cRiskNo,
+              '_dataId': getRowId()
             });
           });
           let data: { [key: string]: any } = {
@@ -216,6 +227,26 @@ const method = {
   funcadd: () => {
     addTermData();
   },
+  selectTgt: () => {
+    dialog.value?.open(
+        selectTgtFix,
+        {
+          selectedData: selectedRow.value, //需要把自定义的过滤掉，只传过去从模板中选择的
+          selectList: [],
+        },
+        {
+          getSelected(selectdata: any) {
+            if(selectdata) {
+              const ids = selectdata.map(item => item['Dist.nSeqNo']).join(',');
+              setCargoSeq(ids);
+              tremTemplateRefs.value['m0'].dataFlash();
+              dialog.value?.handleClose()
+            }
+          }
+        },
+        {title: '选择货物',  width: 65 }
+    );
+  }
 };
 
 const edrItem = ref<[key: string, value: Array<any>] | any>({});
@@ -277,21 +308,24 @@ function addTermData() {
             (em) => em["Term.cClauseCode"] === item.cTermNo
           );
           item.children?.forEach((e: any) => {
+            const id = {_dataId: getRowId()}
             if (se.length > 0) {
               const seri = se[0].riskList.filter(
                 (er: { [x: string]: any }) =>
                   er["TermRisktgt.cLiabCode"] === e.cRiskNo
               );
               if (seri.length > 0) {
-                riskList.push(seri[0]);
+                riskList.push({...seri[0], ...id});
               } else {
                 riskList.push({
                   "TermRisktgt.cLiabCode": e.cRiskNo,
+                  ...id
                 });
               }
             } else {
               riskList.push({
                 "TermRisktgt.cLiabCode": e.cRiskNo,
+                ...id
               });
             }
           });
@@ -416,7 +450,9 @@ function getFromValue() {
     formData.value[item].forEach((d: any) => {
       const i = JSON.parse(JSON.stringify(d));
       if (i["riskList"]) {
-        i["Term.riskList"] = i["riskList"];
+        i["Term.riskList"] = i["riskList"].forEach((m: any) => {
+          delete m['_dataId']
+        });
         delete i["riskList"];
       }
       redata.push(i);
@@ -521,6 +557,10 @@ function getndisAbleConfig(key: any) {
   return edrItem.value[key];
 }
 
+const getRowId = () :string => {
+  return uuidv4().replace(/-/g, "")
+};
+
 function setTermData(param: any, value: any){
 
   const prop: string = param.factorProp;
@@ -560,6 +600,27 @@ function calcCheck(){
     msg: "验证通过",
   };
 }
+const setCargoSeq = (value: string) => {
+  if(formData.value['m'] && formData.value['m'].length > 0) {
+    if(selectedRow.value['Term.cClauseCode']) {
+      formData.value['m'][0]['Term.nCargoSeq'] = value;
+    }else {
+      formData.value['m'][0]['riskList'].forEach((item: any) => {
+        if(item['_dataId'] === selectedRow.value['_dataId']) {
+          item['TermRisktgt.nCargoSeq'] = value;
+          selectedRow.value = item;
+        }
+      });
+    }
+  }
+};
+
+onActivated(() => {
+  console.log('keep-alive -> onActivated')
+});
+onDeactivated(() => {
+  console.log('keep-alive -> onDeactivated')
+});
 
 defineExpose({
   getFromValue,

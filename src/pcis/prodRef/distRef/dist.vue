@@ -173,9 +173,8 @@ onMounted(async () => {
       exRules
   );
   // 如果团个单标识为团单则展示关联被保险人，否则隐藏
-  // 如果是团单则展示关联实际用工地址，否则隐藏
   if(route.params.param?.cGrpMrk !== '1') {
-    formconfig11.value.fromSchema = formconfig11.value.fromSchema.filter((item:any) => item.prop !== 'Dist.cRelatedInsured' && item.prop !== 'Dist.cEmploymentAddress')
+    formconfig11.value.fromSchema = formconfig11.value.fromSchema.filter((item:any) => item.prop !== 'Dist.cRelatedInsured')
   }
   if(params.cProdNo === '040003'){
     formconfig11.value.fromSchema?.forEach(item=>{
@@ -852,7 +851,7 @@ const method = {
     };
     input.click(); // 触发文件选择对话框
   },
-  //全量模板下载
+  //全量模板下载-模板下载
   downloadTemp: () => {
     getFatherPageOldProductResData();
     const param = {
@@ -1107,9 +1106,23 @@ function getFatherPageOldProductResData() {
     if(route.params.param?.cGrpMrk !== '1') {
       oldPageSchema.value.fromSchema = oldPageSchema.value.fromSchema.filter((item:any) => item.prop !== 'Dist.cRelatedInsured')
     }
+    // 关联实际用工地址添加下拉选项
+    if(props.compKey === 'EmployeeDist043009') {
+      oldPageSchema.value.fromSchema.forEach((item: any) => {
+        if(item.prop === 'Dist.cEmploymentAddress') {
+          const list = opertaor.getTableRefByKey('ProjectDist043009')?.getTableData()
+          item.loadData = list.length > 0 ? list.map((i:any) => ({
+            label: i['Dist.cDetailedAddress'],
+            value: i['Dist.cPkId']
+          })) : []
+        }
+      });
+    }
   }
 }
-
+function getFormConfig() {
+  return tableconfig.value;
+}
 defineExpose({
   getValue,
   setValue,
@@ -1120,6 +1133,7 @@ defineExpose({
   handleQuery,
   getTableData,
   setTableData,
+  getFormConfig
 });
 </script>
 
