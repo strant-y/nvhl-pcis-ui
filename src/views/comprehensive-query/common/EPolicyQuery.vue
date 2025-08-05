@@ -3,7 +3,26 @@
     <div class="app-container">
         <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
         <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
-            @page-change="handleQuery(false)" />
+            @page-change="handleQuery(false)"     
+				>
+					<!-- policyInfo 列的具名插槽 -->
+					<template #column-policyInfo="{ row, column, index }">
+						<div class="policy-info-cell">
+							<div v-if="row.cAppNo" class="policy-number-row">
+								<span>{{ row.cAppNo }}</span>
+								<el-icon class="copy-icon" @click="copyText(row.cAppNo)">
+									<DocumentCopy />
+								</el-icon>
+							</div>
+							<div v-if="row.cPlyNo" class="policy-number-row">
+								<span>{{ row.cPlyNo }}</span>
+								<el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
+									<DocumentCopy />
+								</el-icon>
+							</div>
+						</div>
+					</template>
+				</app-table>
         <comDialog ref="dialogRef"></comDialog>
     </div>
 </template>
@@ -27,13 +46,14 @@ import { SCENE_PLY_APP_READ } from '@/constants/tab-constants'
 import { PcisQueryService } from '@/views/payinfoManagement/service/pcis-query-service'
 import { rsaEncoder, base64encoder } from '@/utils/encipher'
 import { DialogMethod } from '@/common/dzmodel/ComDialogConf'
+import { DocumentCopy } from "@element-plus/icons-vue";
 // @ts-ignore
 import { saveAs } from 'file-saver'
 import dayjs from 'dayjs'
 import moment from 'moment'
 const pcisQueryService = new PcisQueryService()
 const userStore = useUserStore()
-const user = ref(userStore.user) || ref({ companyId: '', opCde: '', companyCnm: '' })
+const user:any = ref(userStore.user) || ref({ companyId: '', opCde: '', companyCnm: '' })
 const dzmodal = useDzModal()
 const tableRef = ref<AppTableMethod | null>(null)
 const departmentTree = defineAsyncComponent(() => import('@/pcis/prodRef/commodityRef/DepartmentTree.vue'))
@@ -99,7 +119,7 @@ const buttonList = [
             setFormItem('CDptCde', {
                 loadData: [
                     {
-                        label: user.value.companyCnm,
+                        label: user.value.companyId+user.value.companyCnm,
                         value: user.value.companyId
                     }
                 ]
@@ -305,25 +325,36 @@ const tableconfig = reactive<AppTableConfig>(
         tableBtnPosition: 'right',
         showSelection: true,
         fromSchema: [
+					  {
+              prop: "policyInfo",
+              inputtype: "rtinput",
+              title: "保单",
+              minWidth: 180,
+              slotName: "policyInfo"
+            },
             {
                 prop: 'cAppNo',
                 inputtype: 'rtinput',
-                title: '申请单号'
+                title: '申请单号',
+                isShow: false
             },
             {
                 prop: 'cPlyNo',
                 inputtype: 'rtinput',
-                title: '保单号'
+                title: '保单号',
+                isShow: false
             },
             {
                 prop: 'cEdrNo',
                 inputtype: 'rtinput',
-                title: '批单号'
+                title: '批单号',
+              	minWidth: 180,
             },
             {
                 prop: 'cAppNme',
                 inputtype: 'rtinput',
-                title: '投保人名称'
+                title: '投保人名称',
+              	minWidth: 180,
             },
             {
                 prop: 'nPrm',
@@ -346,14 +377,9 @@ const tableconfig = reactive<AppTableConfig>(
                 title: '投保申请日期'
             },
             {
-                prop: 'tInsrncBgnTm',
-                inputtype: 'rtinput',
-                title: '保险起期'
-            },
-            {
-                prop: 'tInsrncEndTm',
-                inputtype: 'rtinput',
-                title: '保险止期'
+              	prop: "InsurancePeriod",
+              	inputtype: "rtinput",
+              	title: "保险期间",
             },
             {
                 prop: 'tUdrTm',
@@ -372,7 +398,7 @@ onMounted(async () => {
         setFormItem('CDptCde', {
             loadData: [
                 {
-                    label: user.value.companyCnm,
+                    label: user.value.companyId+user.value.companyCnm,
                     value: user.value.companyId
                 }
             ]
@@ -394,11 +420,11 @@ watch(
     () => props.refreshData,
     (n, o) => {
         // 自动刷新列表获取数据
-        pageresult.list = [{}, {}]
-        pageresult.total = 2
+        // pageresult.list = []
+        // pageresult.total = 0
         // 上面代码是仅用于本地调试
         if (n) {
-            // handleQuery(true);
+            handleQuery(true);
         }
     },
     {
@@ -482,6 +508,12 @@ function handleQuery(flag?: boolean) {
                     if (200 === code) {
                         pageresult.list = []
                         pageresult.list = data.result
+												pageresult.list = data.result.map((item) => ({
+													...item,
+													// 创建一个新字段合并两个值
+													policyInfo: `${item.cAppNo || ''}\n${item.cPlyNo || ''}`,
+                					InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
+												}))
                         pageresult.total = data.total
                     }
                 })
@@ -685,6 +717,70 @@ const getBtn = (id: any) => {
         return id === item.id
     })
 }
+
+// 添加 copyText 方法
+const copyText = (text: any) => {
+  if (!text) {
+    ElMessage.warning('没有可复制的内容');
+    return;
+  }
+
+  // 检查 navigator.clipboard 是否存在
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(
+        () => {
+          ElMessage.success('复制成功');
+        },
+        () => {
+          ElMessage.error('复制失败');
+        }
+    );
+  } else {
+    // 使用 document.execCommand('copy') 方法作为备选方案
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      const result = document.execCommand('copy');
+      if (result) {
+        ElMessage.success('复制成功');
+      } else {
+        ElMessage.error('复制失败');
+      }
+    } catch (err) {
+      ElMessage.error('复制失败，请稍后再试');
+    } finally {
+      document.body.removeChild(textarea); // 清理创建的 textarea 元素
+    }
+  }
+};
 </script>
 
-<style scoped></style>
+<style scoped>
+.copy-icon {
+  margin-left: 5px;
+  cursor: pointer;
+  color: #409eff;
+}
+
+.policy-info-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.policy-number-row {
+  display: flex;
+  align-items: center;
+}
+
+.policy-number-row span {
+  flex: 1;
+}
+
+:deep(.el-table__body .el-table__row .el-table__cell:first-child .cell) {
+    white-space: break-spaces;
+}
+</style>
+

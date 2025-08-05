@@ -1153,7 +1153,7 @@ onMounted(async () => {
     setFormItem("cDptCde", {
         loadData: [
             {
-                label: JSON.parse(sessionStorage.getItem("user")).companyCnm,
+                label: JSON.parse(sessionStorage.getItem("user")).companyId+JSON.parse(sessionStorage.getItem("user")).companyCnm,
                 value: JSON.parse(sessionStorage.getItem("user")).companyId,
             },
         ],
