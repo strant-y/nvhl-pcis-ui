@@ -4155,10 +4155,18 @@ function getEdrbaseValue(key:any) {
 
 function getOldProductResData() {
   // 043010 记名投保选“是”，人员清单导入未校验所有字段必填
-  if(props.param?.cProdNo === "043010" && opertaor.getDataAll()['tgt'] && opertaor.getDataAll()['tgt']['Tgt.cIsinsuranceRegistered'] === '1') {
+  if(opertaor.getDataAll()['tgt'] && opertaor.getDataAll()['tgt']['Tgt.cIsinsuranceRegistered'] === '1') {
     const data = deepClone(oldProductResData.value);
     data[0]['pageInfo'].forEach((item:any) => {
-      if(item.pageCode === "EducatorDist043010") {
+      if(
+        item.pageCode === "EducatorDist043010" || 
+        item.pageCode === "DoctorDist049031" || 
+        item.pageCode === "EducatorDist042003" || 
+        item.pageCode === "EmployeeDist040007" || 
+        item.pageCode === "PersonnelDist040020" || 
+        item.pageCode === "PersonnelDist041001" || 
+        item.pageCode === "PersonnelDist049024"
+      ) {
         item.pageSchema.fromSchema.forEach((item:any) => {
           item.rules = [{type: 'required'}]
         })
