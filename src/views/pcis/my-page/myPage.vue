@@ -896,7 +896,12 @@ const edrBtn = [
     id: "btnCalEdr",
     func: () => {
       // calcPremiumEdr();
-      queryTermRateLimitFun(calcPremiumEdr)
+      // 批改原因是否是费率变更
+      if(props.param.cRsnCde === '45') {
+        queryTermRateLimitFun(calcPremiumEdr)
+      } else {
+        calcPremiumEdr();
+      }
     },
   }),
   createFreeButtonBase({
@@ -935,8 +940,7 @@ const edrSurrenderBtn = [
     label: "保费计算",
     type: "primary",
     func: () => {
-      // calcPremiumEdrSurrender();
-      queryTermRateLimitFun(calcPremiumEdrSurrender)
+      calcPremiumEdrSurrender();
     },
   }),
   createFreeButtonBase({
