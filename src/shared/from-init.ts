@@ -75,6 +75,12 @@ export function formInit(
         const onInitKey = propName + 'OnInit';
         parent.onInit = method[onInitKey as keyof typeof method];
       }
+      if(['rtcascader'].includes(parent.inputtype) && !!parent.prop && !parent.lazyLoad) {
+        const propArr = parent.prop.split('\.');
+        const propName = propArr.length > 1 ? propArr[propArr.length - 1] : propArr[0] ;
+        const lazyLoadKey = propName + 'LazyLoad';
+        parent.lazyLoad = method[lazyLoadKey as keyof typeof method];
+      }
       // 确保 value 是 method 对象的键之一
       const funcKey = value as keyof typeof method;
       return method[funcKey];
@@ -84,7 +90,35 @@ export function formInit(
 
   if(newObj.fromSchema && newObj.fromSchema.length>0){
     newObj.fromSchema = newObj.fromSchema.map(item=>{
-      if(item.rules && item.rules.length>0){
+      if(item.inputtype === 'rtinputgroup' ){
+        if(item.groupList && item.groupList.length>0){
+          item.groupList = item.groupList.map(gitem=>{
+            if(gitem.rules && gitem.rules.length>0){
+              const rules = [];
+              for (let i = 0; i < gitem.rules.length; i++) {
+                const rulesItem = gitem.rules[i];
+                // 如果有自定义规则,则使用自定义规则,否则去规则库查找
+                if (exRules[rulesItem.type]) {
+                  rules.push({
+                    validator: exRules[rulesItem.type],
+                    trigger: rulesItem.trigger,
+                  });
+                } else {
+                  if(gitem.inputtype === 'rtinput' || gitem.inputtype === 'rtnumber' ){
+                    rulesItem.trigger = 'blur';
+                  }
+                  const rul = getRules(rulesItem.type, rulesItem);
+                  if (rul) {
+                    rules.push(rul);
+                  }
+                } 
+              }
+              gitem.rules = rules;
+            }
+            return gitem;
+          })
+        }
+      }else if(item.rules && item.rules.length>0){
           const rules = [];
           for (let i = 0; i < item.rules.length; i++) {
             const rulesItem = item.rules[i];

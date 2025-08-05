@@ -11,7 +11,7 @@ export class CommonConstants {
     /**
      * 变量类型 string
      */
-    static readonly TYPE_OF_string: string = 'string';
+    static readonly TYPE_OF_STRING: string = 'string';
     /**
      * 变量类型 number
      */

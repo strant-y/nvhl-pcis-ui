@@ -63,7 +63,7 @@ onMounted(async () => {
   );
   // 隐藏保单来源、是否互联网、手工出单标志
   formconfig11.fromSchema.forEach((item:any) => {
-    if(item.prop === "Base.cPolicySource" || item.prop === "Base.cIsNet" || item.prop === "Base.cManualMrk") {
+    if( item.prop === "Base.cIsNet" || item.prop === "Base.cManualMrk") {
       item.hidden = true
     }
   })
@@ -93,9 +93,10 @@ onMounted(async () => {
     //禁用保单来源
     // setFormItem("Base.cPolicySource", {disabled: true});
     //保单来源赋值
-    console.log("param.cRecordType", param.cRecordType)
+    console.log("param.cRecordType",param, param.cRecordType)
     // setFormValue({"Base.cPolicySource":param.cRecordType})
     setValue("Base.cPolicySource", param.cRecordType)
+    
 
     // 服务机构默认值
     setFormItem("Base.cIntroDptcde", {

@@ -911,16 +911,16 @@ const tableObj = {
                 size: "large",
                 
                 icon: "DocumentCopy",
-                hideBtns: (row: any) => {
-                  if (
-                    row.cAppStatus == "1" ||
-                    row.cAppStatus == "5"
-                  ) {
-                    return false;
-                  } else {
-                    return true;
-                  }
-                },
+                // hideBtns: (row: any) => {
+                //   if (
+                //     row.cAppStatus == "1" ||
+                //     row.cAppStatus == "5"
+                //   ) {
+                //     return false;
+                //   } else {
+                //     return true;
+                //   }
+                // },
                 tableClick: async (row) => {
                     console.log(row);
                     const r = await row;
@@ -1153,7 +1153,7 @@ onMounted(async () => {
     setFormItem("cDptCde", {
         loadData: [
             {
-                label: JSON.parse(sessionStorage.getItem("user")).companyCnm,
+                label: JSON.parse(sessionStorage.getItem("user")).companyId+JSON.parse(sessionStorage.getItem("user")).companyCnm,
                 value: JSON.parse(sessionStorage.getItem("user")).companyId,
             },
         ],

@@ -78,13 +78,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   setFormItem('cBckOp1', { disabled: false })
                   setValue('cBckOp1', res.body.cExc)
                 }
-                // 如果是多险位，则不能进行自主临分
-                if(res.body.tableList && res.body.tableList.lengt > 1) {
-                  setFormItem("riFacMrk", {
-                    btnItems: {disabled: true}
-                  });
-                  checkboxDisabledFlag.value = true
-                }
               }
             });
           },
@@ -127,6 +120,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           type: "primary",
           disabled: true, // 批单不允许进行自主临分
           func: async () => {
+            if(!getRiskDataIsMultiple()) {
+              ElMessage.warning("多险位不可以自主临分，请检查险位信息。");
+              return;
+            }
             const param = {
               cDocTyp: params.cAppTyp, // 单证类型 A 保单 E 批单
               cAppNo: params.cAppNo, // 保批单申请单号
@@ -528,6 +525,9 @@ watch(
         // 临分标识如果是1，则是否临分复选框设置勾选状态
         setValue("riFacMrk", props.pageData?.plyBase['Base.cRiFacMrk'] == "1" ? "1" : "0");
       }
+      if(props.pageData?.plyBase['Base.cRiFacOpn']) {
+        setValue("riFacOpn", props.pageData?.plyBase['Base.cRiFacOpn']);
+      }
     }
   },
   {
@@ -557,8 +557,6 @@ onMounted(() => {
     loadUwTabData();
     // 查询合同除外责任
     queryRiskCodelistFn();
-    // 获取风险单位划分列表数据，判断是否是多险位，多险位不能自主临分
-    getRiskData();
   });
 });
 
@@ -620,17 +618,16 @@ async function queryRiskCodelistFn() {
   }
 }
 
-// 获取风险单位划分列表数据
-async function getRiskData() {
+// 获取风险单位划分列表数据是否多险位
+const getRiskDataIsMultiple = async () => {
+  let flag = false;
   const riskQueryInfo = params.pageName === "priceInquiry" ? await riskQueryDataXJ({ cAppNo: params.cAppNo }) : await riskQueryData({ cAppNo: params.cAppNo })
   if(riskQueryInfo && riskQueryInfo.code === "200") {
     if(riskQueryInfo.data && riskQueryInfo.data.length > 1) {
-      setFormItem("riFacMrk", {
-        btnItems: {disabled: true}
-      });
-      checkboxDisabledFlag.value = true
+      flag =  true
     }
   }
+  return flag;
 }
 
 function setRiskunitDisabled() {

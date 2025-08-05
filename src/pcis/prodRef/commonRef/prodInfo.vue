@@ -79,7 +79,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "大类代码",
         rules: [getRules("required", {})],
-        typeCode: "KIND_LIST_ALL",
+        typeCode: "KIND_LIST_GRT",
         codeParam: { cStatus: "1" },
         clearable: true,
       },

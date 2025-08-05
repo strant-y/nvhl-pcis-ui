@@ -215,7 +215,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "客户证件类型",
         formatter: (val, row) => {
           let tempData = []
-          if(row.customerNature == '1') { //个人
+          if(row?.customerNature == '1') { //个人
             tempData = codeListMap['persionType']
           } else {
             tempData = codeListMap['companyType']
@@ -249,7 +249,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "股东证件类型",
         formatter: (val, row) => {
           let tempData = []
-          if(row.shareholderNature == '1') { //个人
+          if(row?.shareholderNature == '1') { //个人
             tempData = codeListMap['persionType']
           } else {
             tempData = codeListMap['companyType']

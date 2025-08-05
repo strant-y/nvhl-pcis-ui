@@ -6,7 +6,25 @@
       v-model:pageresult="pageresult"
       ref="tableRef"
       @page-change="handleQuery(false)"
-    />
+        >
+			<!-- policyInfo 列的具名插槽 -->
+			<template #column-policyInfo="{ row, column, index }">
+				<div class="policy-info-cell">
+					<div v-if="row.cEcAgrAppNo" class="policy-number-row">
+						<span>{{ row.cEcAgrAppNo }}</span>
+						<el-icon class="copy-icon" @click="copyText(row.cEcAgrAppNo)">
+							<DocumentCopy />
+						</el-icon>
+					</div>
+					<div v-if="row.cEcAgrNo" class="policy-number-row">
+						<span>{{ row.cEcAgrNo }}</span>
+						<el-icon class="copy-icon" @click="copyText(row.cEcAgrNo)">
+							<DocumentCopy />
+						</el-icon>
+					</div>
+				</div>
+			</template>
+		</app-table>
   </div>
 </template>
 
@@ -21,6 +39,7 @@ import {AppTableConfig,AppTableMethod,createTableEditConfig,MyTableMethod} from 
 import dayjs from "dayjs";
 import moment from "moment";
 import cargoApi from '@/api/cargo'
+import { DocumentCopy } from "@element-plus/icons-vue";
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 
 const { getRules } = useValidator();
@@ -188,16 +207,25 @@ const tableconfig = reactive<AppTableConfig>(
         fixed: "left",
       },
 			{
+				prop: "policyInfo",
+				inputtype: "rtinput",
+				title: "协议号",
+        fixed: "left",
+				slotName: "policyInfo"
+			},
+			{
         prop: "cEcAgrAppNo",
         inputtype: "rtinput",
         title: "申请单号",
         fixed: "left",
+        isShow: false
       },
       {
         prop: "cEcAgrNo",
         inputtype: "rtinput",
         title: "协议单号",
         fixed: "left",
+        isShow: false
       },
       {
         prop: "cAppNme",
@@ -209,16 +237,21 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "被保人名称",
       },
-      {
-        prop: "tInsrncBgnTm",
-        inputtype: "rtinput",
-        title: "协议起期",
-      },
-      {
-        prop: "tInsrncEndTm",
-        inputtype: "rtinput",
-        title: "协议止期",
-      },
+			{
+				prop: "InsurancePeriod",
+				inputtype: "rtinput",
+				title: "协议期间",
+			},
+      // {
+      //   prop: "tInsrncBgnTm",
+      //   inputtype: "rtinput",
+      //   title: "协议起期",
+      // },
+      // {
+      //   prop: "tInsrncEndTm",
+      //   inputtype: "rtinput",
+      //   title: "协议止期",
+      // },
       {
         prop: "nRmbPrm",
         inputtype: "rtinput",
@@ -306,8 +339,14 @@ const refreshData = (reset = true) => {
 				pageData.data.forEach((item: any, index: number) => {
           item.nSeqNo = index + 1;
         });
-        pageresult.total = pageData.total;
         pageresult.list = pageData.data;
+				pageresult.list = pageData.data.map((item) => ({
+					...item,
+					// 创建一个新字段合并两个值
+					policyInfo: `${item.cEcAgrAppNo || ''}\n${item.cEcAgrNo || ''}`,
+					InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
+				}))
+        pageresult.total = pageData.total;
       }
     }
   });
@@ -379,6 +418,44 @@ function setFormItem(key: any, obj: any) {
         });
     }
 }
+
+// 添加 copyText 方法
+const copyText = (text: any) => {
+  if (!text) {
+    ElMessage.warning('没有可复制的内容');
+    return;
+  }
+
+  // 检查 navigator.clipboard 是否存在
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(
+        () => {
+          ElMessage.success('复制成功');
+        },
+        () => {
+          ElMessage.error('复制失败');
+        }
+    );
+  } else {
+    // 使用 document.execCommand('copy') 方法作为备选方案
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      const result = document.execCommand('copy');
+      if (result) {
+        ElMessage.success('复制成功');
+      } else {
+        ElMessage.error('复制失败');
+      }
+    } catch (err) {
+      ElMessage.error('复制失败，请稍后再试');
+    } finally {
+      document.body.removeChild(textarea); // 清理创建的 textarea 元素
+    }
+  }
+};
 </script>
 
 <style scoped lang="scss">
@@ -423,5 +500,30 @@ function setFormItem(key: any, obj: any) {
 }
 ::v-deep(.el-form){
   padding: 5px 30px;
+}
+
+.copy-icon {
+  margin-left: 5px;
+  cursor: pointer;
+  color: #409eff;
+}
+
+.policy-info-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.policy-number-row {
+  display: flex;
+  align-items: center;
+}
+
+.policy-number-row span {
+  flex: 1;
+}
+
+:deep(.el-table td.el-table__cell div.cell) {
+    white-space: pre-line;
 }
 </style>

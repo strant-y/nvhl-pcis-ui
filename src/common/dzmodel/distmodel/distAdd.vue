@@ -177,7 +177,6 @@ const formconfig1 = ref<AppFreeEditConfig>(
                 params.dist[addrValueKey] = params.dist[inputGroupKey];
               }
             }
-            console.log('params', params)
             saveDist(params).then((res) => {
               if (res.code === 200) {
                 ElMessage.success(res.msg);
@@ -217,7 +216,6 @@ onMounted(() => {
 
     // console.log('Dist.cPlateNumber',props.data.fromSchema)
     let item = JSON.parse(JSON.stringify(props.data.fromSchema[i]));
-       console.log(item) 
     if(['Dist.AllOccup'].includes(item.prop)) {
       item["func"] = getDistoccupType;
     }else if (props.data.fromSchema[i]["func"]) {
@@ -229,14 +227,19 @@ onMounted(() => {
 
     // 040001产品 必填项问题
     if(item.prop =='Dist.cPlanNo' ||item.prop =='Dist.tOpeningTime' ||item.prop =='Dist.cLocationSigns' ||item.prop =='Dist.cFacilitySigns' ||item.prop =='Dist.cVenueSign' || item.prop =='Dist.cBuildingStructure'  ){
-      console.log('进啊2=',item.prop)
       item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];   
     }
     if( route.params.param.cProdNo == '042003' && item.prop =='Dist.cPlanNo' ){
              item['rules'] = [];
     }
-    
-    
+    // 方案号下拉值
+    if(item.prop == 'Dist.cPlanNo'){
+      const termref = opertaor.getTableRefByKey("cvrg");
+      
+      item.typeCode = null;
+      item.loadData = termref.getPlanNo();
+    }
+
     if(item.prop =='Dist.cSchoolName'){
       item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
     }
@@ -300,11 +303,11 @@ onMounted(() => {
       }
     
     }
-    // 043009 实际用工地址关联 团单才展示
-    if(item.prop === 'Dist.cEmploymentAddress' && cGrpMrk.value !== '1'){
-      item['rules'] = [];
-      item["hidden"] = true;
-    }
+    // 043009 实际用工地址关联 团单才展示（和杜倩确认关联实际用工地址不分团单和个单，都展示）
+    // if(item.prop === 'Dist.cEmploymentAddress' && cGrpMrk.value !== '1'){
+    //   item['rules'] = [];
+    //   item["hidden"] = true;
+    // }
 
     // 043010 实习岗位为必填
     if( route.params.param.cProdNo == '043010' && item.prop =='Dist.cJobType' ){
@@ -326,13 +329,11 @@ onMounted(() => {
       item['func'] =  cDocumentTypeChange;
     }
 
-
-  
-    if(item.prop =='Dist.HouseAreaProp'){
-      item?.groupList.forEach(data => {
-        data.rules = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
-      })
-    }
+    // if(item.prop =='Dist.HouseAreaProp'){
+    //   item?.groupList.forEach(data => {
+    //     data.rules = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+    //   })
+    // }
 
     // 电话校验
     if(item.prop =='Dist.cContactNumber'){
@@ -358,10 +359,27 @@ onMounted(() => {
         })
       }
     }
+
+    // 实际用工地址清单新增 经营地址/房屋清单 房屋所在地址/营业场所地址清单043013 标的坐落地址
+    if(item.prop === 'Dist.JingYingAddress043009' || item.prop === 'Dist.HouseAreaProp' || item.prop === 'Dist.PropertyLocationProp'){
+      item.groupList.forEach((data:any) => {
+        if(data.prop === 'Dist.Prop') {
+          data['func'] = setregistAdd;
+        }
+        if(data.prop === 'Dist.cSuffixAddr') {
+          data['func'] = setregistAdd;
+        }
+      })
+    }
+    if(item.prop === 'Dist.JingyingAddress' && item.inputtype === 'rtinputgroup'){  // 040001 地址新增更新操作
+      item.groupList.forEach((data:any) => {
+        data['func'] = setregistByMapAdd;
+      })
+    }
     newSchema.push(item);
   }
 
-  console.log('身份证号----‘',newSchema)
+  console.log('最终实现表单',newSchema)
   formconfig1.value.fromSchema = newSchema;
   
   formconfig1.value.title = props.data.title;
@@ -430,6 +448,56 @@ const cDocumentTypeChange =(val:any)=>{
     }
 }
 
+const prodMap = {
+  '040001':'Dist.cDetailedAddress'
+}
+function setregistByMapAdd() {
+  let a = '';
+  let b = '';
+  if(!prodMap[params.cProdNo]){
+    return ;
+  }
+  
+  formconfig1.value.fromSchema?.forEach(item=>{
+    if(item.inputtype === 'rtinputgroup'){
+      
+      item.groupList.forEach(data=>{
+        if(data.inputtype === 'rtcascader'){
+          a = freeEditRef?.value?.getValue(data.prop);
+        }
+        if(data.inputtype === 'rtinput'){
+          b = freeEditRef?.value?.getValue(data.prop);
+        }
+      })
+    }
+  })
+  if(a){
+    getAddressStr({ address: a }).then((res: any) => {
+      const { code, data, msg } = res;
+      if (code === 200) {
+        const c = (data ? data["addStr"] : "") + (b?b:'');
+        setValue(prodMap[params.cProdNo], c);
+      }
+    });
+  }else{
+    setValue(prodMap[params.cProdNo], b);
+  }
+}
+function setregistAdd() {
+  const ads = freeEditRef?.value?.getValue("Dist.Prop");
+  const a = freeEditRef?.value?.getValue("Dist.cSuffixAddr") || "";
+  if (ads) {
+    getAddressStr({ address: ads }).then((res: any) => {
+      const { code, data, msg } = res;
+      if (code === 200) {
+        const b = (data ? data["addStr"] : "") + a;
+        setValue("Dist.cDetailedAddress", b);
+      }
+    });
+  } else {
+    setValue("Dist.cDetailedAddress", a);
+  }
+}
 
 //给表单赋值
 function setFormItem(key: any, obj: any) {

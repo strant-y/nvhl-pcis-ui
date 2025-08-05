@@ -187,6 +187,12 @@ onMounted(() => {
 			setValue("ECargoInsuredDist.cCustRiskRank","925104");
 		}
 	}, 100);
+  setTimeout(() => {
+    let cCustRiskRank = getValue("ECargoGoodsTgt.cPrmCur")
+    if(!cCustRiskRank){
+      setValue("ECargoGoodsTgt.cPrmCur","CNY");
+    }
+  }, 100);
   console.log(' formconfig1.value', formconfig1.value)
 });
 const setcDetailedAddress = (prop:any,aftProp:any)=> {
@@ -380,12 +386,18 @@ const bonusRatio = (val:any)=>{
  if(bonusRatioData && goodsValueData){
     setValue('ECargoGoodsTgt.nInsuranceAmount',goodsValueData * (1 + bonusRatioData/100))
  }
+  if(getValue('ECargoGoodsTgt.nInsuranceAmount')){
+    setValue('ECargoGoodsTgt.nRmbLimit',Number(getValue('ECargoGoodsTgt.nInsuranceAmount'))*getValue('ECargoGoodsTgt.nAmtExch'))
+  }
 }
 const goodsValue = (val:any)=>{
   const bonusRatioData =  getValue('ECargoGoodsTgt.nAdditiveRatio')
   const goodsValueData = getValue('ECargoGoodsTgt.nGoodsValue')
   if(bonusRatioData && goodsValueData){
     setValue('ECargoGoodsTgt.nInsuranceAmount',goodsValueData * (1 + bonusRatioData/100))
+  }
+  if(getValue('ECargoGoodsTgt.nInsuranceAmount')){
+    setValue('ECargoGoodsTgt.nRmbLimit',Number(getValue('ECargoGoodsTgt.nInsuranceAmount'))*getValue('ECargoGoodsTgt.nAmtExch'))
   }
 }
   //根据获取的职业类别查询职业等级并绑定下拉框

@@ -175,7 +175,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 inputtype: "rtSelectV2",
                 title: "产品大类",
                 clearable: true,
-                typeCode: "KIND_LIST_CACHE",
+                typeCode: "KIND_LIST_GRT",
                 params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
                 func: (val: any) => {
                     //根据产品大类再次请求条款接口

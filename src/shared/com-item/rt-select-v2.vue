@@ -24,6 +24,7 @@
         :collapse-tags-tooltip="isMultiple()"
         :max-collapse-tags="isMultiple() ? 3 : null"
         :options="options"
+        @visible-change="showOptions"
         @change="handleChange"
         style="min-width: 100px;"
       >
@@ -237,6 +238,14 @@ watch(
   { deep: true }
 );
 
+watch(() => props.showLabel ,
+  (newShowLabel) => {
+    if (!newShowLabel && props.item.typeCode && Object.keys(getParam()).length > 0) {
+      uploadOption();
+    }
+  }
+);
+
 function getCodeListMapToOption(): boolean {
   const rowId = props.row && props.row._dataId ? props.row._dataId : '';
   if(!!codeListMap) {
@@ -318,18 +327,29 @@ function getLabel(val: any = undefined): any {
   }
 }
 
+function showOptions(visible: boolean){
+  if(visible){
+    if (props.item.typeCode && options.value.length === 0) {
+      uploadOption();
+    } else if (props.item.typeCode && props.item.disabled) {
+      // 如果是禁用项,则固定刷新下拉选
+      uploadOption();
+    }
+  }
+}
+
 onMounted(() => {
   // 初始化组件数据
   if (props.item) {
     if(getCodeListMapToOption()) return;
     if (!props.item.loadData && !props.item.typeCode) {
       options.value = [];
-    } else if (!props.item.loadData && !!props.item.typeCode) {
+    } else if (!!props.item.typeCode) {
       if (props.item.disabled) {
         //如果属性被标记为不可读,则初始化不自动加载下拉选,但是值变更的时候,再额外触发下拉选
         return;
       }
-      uploadOption();
+      // uploadOption();
     } else {
       options.value = props.item.loadData;
     }
@@ -417,7 +437,7 @@ function getParam() {
     }
   }
 
-  if (props.item.disabled) {
+  if (props.item.disabled || props.showLabel) {
     if (!p) {
       p = { value: selectedValue.value };
     } else {

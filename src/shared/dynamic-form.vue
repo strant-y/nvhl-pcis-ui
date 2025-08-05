@@ -556,11 +556,11 @@ function checkRequired(item: any) {
       }
       const rule = g.rules;
       if (rule && rule.length > 0) {
-        for (const key in rule) {
-          if (rule[key].required) {
+        rule.forEach((rule: any) => {
+          if (rule.required) {
             re = true;
           }
-        }
+        });
       }
     }
   }

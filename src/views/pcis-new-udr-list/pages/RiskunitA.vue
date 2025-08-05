@@ -137,7 +137,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         disabled: true,
       },
       {
-        prop: "nCiShare",
+        prop: "nCiShareInteger",
         inputtype: "rtnumber",
         title: "我司占比",
         precision: 2,
@@ -261,6 +261,15 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtnumber",
         title: "共保保费",
         precision: 2,
+        hidden: true,
+      },
+      {
+        prop: "nCiShare",
+        inputtype: "rtnumber",
+        title: "我司占比",
+        precision: 2,
+        clearable: true,
+        suffix: "%",
         hidden: true,
       },
     ],
@@ -1108,26 +1117,94 @@ function checkEdrUnit() {
 // 删除
 function deleteUnitList() {
   const newList = pageresult1.list.filter((item:any) =>  item.cPkId != selectRow1.value.cPkId).map((item:any, index:any) => ({...item, nSeqNo: index + 1}))
+  const freeEditRef1Value = freeEditRef1.value?.getFromValue();
+  const CCiMrk = freeEditRef1Value.cCiMrk; //共保类型
   if(newList.length > 1) {
+    if (
+      CCiMrk == "1" ||
+      CCiMrk == "2" ||
+      CCiMrk == "3" ||
+      CCiMrk == "4" ||
+      CCiMrk == "5"
+    ) {
+      //共保
+      const totalCiAmt = freeEditRef.value?.getValue("nCiAmt")
+      const totalCiPrm = freeEditRef.value?.getValue("nCiPrm")
+      const totalCiNotaxPrm = freeEditRef.value?.getValue("nCiNotaxPrm")
+      const totalCiAddedTax = freeEditRef.value?.getValue("nCiAddedTax")
+      const middleTotalCiAmt = newList.filter((item, index) => index < newList.length - 1).map(item => parseFloat(item.nCiAmt)).reduce((sum, num) => sum + num, 0)
+      const middleTotalCiPrm = newList.filter((item, index) => index < newList.length - 1).map(item => parseFloat(item.nCiPrm)).reduce((sum, num) => sum + num, 0)
+      const middleTotalCiNotaxPrm = newList.filter((item, index) => index < newList.length - 1).map(item => parseFloat(item.nCiNotaxPrm)).reduce((sum, num) => sum + num, 0)
+      const middleTotalCiAddedTax = newList.filter((item, index) => index < newList.length - 1).map(item => parseFloat(item.nCiAddedTax)).reduce((sum, num) => sum + num, 0)
+      const lastCiAmt = parseFloat(totalCiAmt) - middleTotalCiAmt;
+      const lastCiPrm = parseFloat(totalCiPrm) - middleTotalCiPrm;
+      const lastCiNotaxPrm = parseFloat(totalCiNotaxPrm) - middleTotalCiNotaxPrm;
+      const lastCiAddedTax = parseFloat(totalCiAddedTax) - middleTotalCiAddedTax;
+      newList[newList.length - 1].nCiAmt = lastCiAmt
+      newList[newList.length - 1].nCiAmtVar = lastCiAmt
+      newList[newList.length - 1].nCiPrm = lastCiPrm
+      newList[newList.length - 1].nCiPrmVar = lastCiPrm
+      newList[newList.length - 1].nCiNotaxPrm = lastCiNotaxPrm
+      newList[newList.length - 1].nCiNotaxPrmVar = lastCiNotaxPrm
+      newList[newList.length - 1].nCiAddedTax = lastCiAddedTax
+      newList[newList.length - 1].nCiAddedTaxVar = lastCiAddedTax;
+    }
     // 如果删除后列表数据大于1条，重新计算最后一条的保额和保费
     const totalAmt = freeEditRef.value?.getValue("nAmt")
     const totalPrm = freeEditRef.value?.getValue("nPrm")
+    const totalNotaxPrm = freeEditRef.value?.getValue("nNotaxPrm")
+    const totalAddedTax = freeEditRef.value?.getValue("nAddedTax")
     const middleTotalAmt = newList.filter((item, index) => index < newList.length - 1).map(item => parseFloat(item.nAmt)).reduce((sum, num) => sum + num, 0)
     const middleTotalPrm = newList.filter((item, index) => index < newList.length - 1).map(item => parseFloat(item.nPrm)).reduce((sum, num) => sum + num, 0)
+    const middleTotalNotaxPrm = newList.filter((item, index) => index < newList.length - 1).map(item => parseFloat(item.nNotaxPrm)).reduce((sum, num) => sum + num, 0)
+    const middleTotalAddedTax = newList.filter((item, index) => index < newList.length - 1).map(item => parseFloat(item.nAddedTax)).reduce((sum, num) => sum + num, 0)
     const lastAmt = parseFloat(totalAmt) - middleTotalAmt;
     const lastPrm = parseFloat(totalPrm) - middleTotalPrm;
+    const lastNotaxPrm = parseFloat(totalNotaxPrm) - middleTotalNotaxPrm;
+    const lastAddedTax = parseFloat(totalAddedTax) - middleTotalAddedTax;
     newList[newList.length - 1].nAmt = lastAmt
     newList[newList.length - 1].nAmtVar = lastAmt
     newList[newList.length - 1].nPrm = lastPrm
     newList[newList.length - 1].nPrmVar = lastPrm
+    newList[newList.length - 1].nNotaxPrm = lastNotaxPrm
+    newList[newList.length - 1].nNotaxPrmVar = lastNotaxPrm
+    newList[newList.length - 1].nAddedTax = lastAddedTax
+    newList[newList.length - 1].nAddedTaxVar = lastAddedTax
   } else if(newList.length === 1) {
     // 如果删除后列表数据等于1条，则列表中的保额和保费等于总保额和总保费
+    if (
+      CCiMrk == "1" ||
+      CCiMrk == "2" ||
+      CCiMrk == "3" ||
+      CCiMrk == "4" ||
+      CCiMrk == "5"
+    ) {
+      // 共保
+      const totalCiAmt = freeEditRef.value?.getValue("nCiAmt")
+      const totalCiPrm = freeEditRef.value?.getValue("nCiPrm")
+      const totalCiNotaxPrm = freeEditRef.value?.getValue("nCiNotaxPrm")
+      const totalCiAddedTax = freeEditRef.value?.getValue("nCiAddedTax")
+      newList[0].nCiAmt = parseFloat(totalCiAmt)
+      newList[0].nCiAmtVar = parseFloat(totalCiAmt)
+      newList[0].nCiPrm = parseFloat(totalCiPrm)
+      newList[0].nCiPrmVar = parseFloat(totalCiPrm)
+      newList[0].nCiNotaxPrm = parseFloat(totalCiNotaxPrm)
+      newList[0].nCiNotaxPrmVar = parseFloat(totalCiNotaxPrm)
+      newList[0].nCiAddedTax = parseFloat(totalCiAddedTax)
+      newList[0].nCiAddedTaxVar = parseFloat(totalCiAddedTax);
+    }
     const totalAmt = freeEditRef.value?.getValue("nAmt")
     const totalPrm = freeEditRef.value?.getValue("nPrm")
+    const totalNotaxPrm = freeEditRef.value?.getValue("nNotaxPrm")
+    const totalAddedTax = freeEditRef.value?.getValue("nAddedTax")
     newList[0].nAmt = parseFloat(totalAmt)
     newList[0].nAmtVar = parseFloat(totalAmt)
     newList[0].nPrm = parseFloat(totalPrm)
     newList[0].nPrmVar = parseFloat(totalPrm)
+    newList[0].nNotaxPrm = parseFloat(totalNotaxPrm)
+    newList[0].nNotaxPrmVar = parseFloat(totalNotaxPrm)
+    newList[0].nAddedTax = parseFloat(totalAddedTax)
+    newList[0].nAddedTaxVar = parseFloat(totalAddedTax)
   }
   pageresult1.list = newList;
   // 清空选中数据
@@ -1406,7 +1483,10 @@ async function getContData() {
   if(getReinsuredDataInfo && getReinsuredDataInfo.code === "200") {
     if (getReinsuredDataInfo.data) {
       console.log("getContData", getReinsuredDataInfo.data);
-      let data = {...getReinsuredDataInfo.data}
+      let data = {
+        ...getReinsuredDataInfo.data,
+        nCiShareInteger: getReinsuredDataInfo.data.cCiMrk !== "0" ? Number(getReinsuredDataInfo.data.nCiShare) * 100 : getReinsuredDataInfo.data.nCiShare,
+      }
       // if(params.cCiMrk !== '0') {
       //   data = {
       //     ...res.data,

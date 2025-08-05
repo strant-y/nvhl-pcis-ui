@@ -22,6 +22,7 @@
             <tremTemplate
               v-for="(i, index) in formData['m']"
               :key="index"
+              :rowIndex="index"
               v-model="formData['m'][index]"
               :disabled-flag="disAbledFlag"
               :faters="faters"
@@ -58,6 +59,7 @@
               <tremTemplate
                 v-for="(i, index) in formData['a1']"
                 :key="index"
+                :rowIndex="index"
                 v-model="formData['a1'][index]"
                 :disabled-flag="disAbledFlag"
                 :faters="faters"
@@ -130,11 +132,16 @@
 <script setup lang="ts">
 import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
 const tremTemplate = defineAsyncComponent(() => import("./trem-template.vue"));
+import { v4 as uuidv4 } from "uuid";
+
 const tremAddTemplate2 = defineAsyncComponent(
   () => import("./trem-add2-template.vue")
 );
 const tremAddTemplate3 = defineAsyncComponent(
   () => import("./trem-add3-template.vue")
+);
+const selectTgtFix = defineAsyncComponent(
+  () => import("./selectTgt.vue")
 );
 const dialog = ref<DialogMethod | null>(null);
 import { formInit } from "@/shared/from-init";
@@ -143,9 +150,14 @@ import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { codeListViewStore } from "@/store";
 import { qryProdRelTermRiskList } from "@/api/prod";
 import { getEdrRsnTermItem } from "@/api/query";
+import { terConfig } from "@/store/modules/term-config";
+
 const codeListStore = codeListViewStore();
 const opertaor = dataOpertaor();
 const parparam = opertaor.getParam();
+const termConfig = terConfig();
+const {selectedRow} = storeToRefs(termConfig);
+
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -216,6 +228,26 @@ const method = {
   funcadd: () => {
     addTermData();
   },
+  selectTgt: () => {
+    dialog.value?.open(
+        selectTgtFix,
+        {
+          selectedData: selectedRow.value.data, //需要把自定义的过滤掉，只传过去从模板中选择的
+          selectList: [],
+        },
+        {
+          getSelected(selectdata: any) {
+            if(selectdata) {
+              const ids = selectdata.map(item => item['Dist.nSeqNo']).join(',');
+              setCargoSeq(ids);
+              tremTemplateRefs.value['m0'].dataFlash();
+              dialog.value?.handleClose()
+            }
+          }
+        },
+        {title: '选择货物',  width: 65 }
+    );
+  }
 };
 
 const edrItem = ref<[key: string, value: Array<any>] | any>({});
@@ -416,7 +448,9 @@ function getFromValue() {
     formData.value[item].forEach((d: any) => {
       const i = JSON.parse(JSON.stringify(d));
       if (i["riskList"]) {
-        i["Term.riskList"] = i["riskList"];
+        i["Term.riskList"] = i["riskList"].map((m: any) => {
+          return m;
+        });
         delete i["riskList"];
       }
       redata.push(i);
@@ -521,6 +555,10 @@ function getndisAbleConfig(key: any) {
   return edrItem.value[key];
 }
 
+const getRowId = () :string => {
+  return uuidv4().replace(/-/g, "")
+};
+
 function setTermData(param: any, value: any){
 
   const prop: string = param.factorProp;
@@ -560,6 +598,29 @@ function calcCheck(){
     msg: "验证通过",
   };
 }
+const setCargoSeq = (value: string) => {
+  const {index, data} = selectedRow.value;
+  if(formData.value['m'] && formData.value['m'].length > 0) {
+    if(data['Term.cClauseCode']) {
+      formData.value['m'][index]['Term.nCargoSeq'] = value;
+      selectedRow.value.data = formData.value['m'][index];
+    }else {
+      formData.value['m'][index]['riskList'].forEach((item: any) => {
+        if(item['TermRisktgt.cLiabCode'] === data['TermRisktgt.cLiabCode']) {
+          item['TermRisktgt.nCargoSeq'] = value;
+          selectedRow.value.data = item;
+        }
+      });
+    }
+  }
+};
+
+onActivated(() => {
+  console.log('keep-alive -> onActivated')
+});
+onDeactivated(() => {
+  console.log('keep-alive -> onDeactivated')
+});
 
 defineExpose({
   getFromValue,

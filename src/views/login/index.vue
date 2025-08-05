@@ -17,7 +17,7 @@
       </div>
     </div>
       <div class="login-container-form" >
-        <el-card class="login-card">
+        <el-card class="login-card" v-show="showLoginCard">
             <h2>账号登录</h2>
         <el-form
           v-if="inside"
@@ -291,6 +291,7 @@ const hidePassword = () => {
     isMouseDown.value = false
   }
 };
+const showLoginCard = ref(true); // 是否显示登录卡片
 
 const loginData = ref<LoginData>({
   username: "",
@@ -544,7 +545,15 @@ watchEffect(() => {
   }
 });
 
-onMounted(() => {});
+onMounted(() => {
+  // 从平台过来的 隐藏登陆卡片
+  const href = window.location.href;
+  const code = href.slice(href.indexOf("?") + 1, href.indexOf("&")).split("=")[1];
+  if(code) {
+    showLoginCard.value = false;
+    userStore.verifyCode(code)
+  }
+});
 
 function handleLoginChange() {
   verifyFlag.value = false;

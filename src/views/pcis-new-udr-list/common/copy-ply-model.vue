@@ -154,7 +154,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cKindNo",
         inputtype: "rtselect",
         title: "产品大类",
-        typeCode: "KIND_LIST_CACHE",
+        typeCode: "KIND_LIST_GRT",
         codeParam: { cOperId: user["opCde"], cDptCde: user["companyId"] },
         rules: [getRules("required", {})],
         clearable: true,

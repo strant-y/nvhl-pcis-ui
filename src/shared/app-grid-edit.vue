@@ -169,6 +169,10 @@ function setDisabledAll(isDisabled: boolean = true) {
       item.hidden = isDisabled;
     });
   }
+	
+  if (props.gridEditConfig.bottomBtn && Object.keys(props.gridEditConfig.bottomBtn).length > 0) {
+    props.gridEditConfig.bottomBtn.show = !isDisabled;
+  }
   gridEditConfig.value.editFlag = !isDisabled;
 }
 

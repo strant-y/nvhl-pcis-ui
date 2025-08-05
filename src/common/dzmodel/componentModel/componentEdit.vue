@@ -145,7 +145,7 @@ const dzmodal = useDzModal();
 const jsonArrayEdit = defineAsyncComponent(
   () => import("@/common/dzmodel/jsonArrayEdit.vue")
 );
-
+const showLocationList = ref<any[]>(showLocation);
 const props = defineProps({
   data: {
     type: Object,
@@ -255,6 +255,22 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "组件类型",
         loadData: componentType,
+        func: (val: string) => {
+          if(val) {
+            showLocationList.value = [];
+          }
+          if(val === 'free') {
+            const list = [showLocation[1], showLocation[2]];
+            showLocationList.value.push(...list);
+          }
+          if(val === 'grid') {
+            showLocationList.value.push(...showLocation);
+          }
+          if(val === 'custom') {
+            const list = [showLocation[2]];
+            showLocationList.value.push(...list);
+          }
+        }
       },
       {
         prop: "componentTab",
@@ -287,13 +303,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           });
 
           tableconfig.fromSchema?.forEach((e: any) => {
-            if (e.prop === "cShowLocation") {
-              if (["dist", "ECargoInsured", "ECargoTransportDist", "ECargoGoodsTgt"].includes(index)) {
-                e.isShow = true;
-              } else {
-                e.isShow = false;
-              }
-            }
+            // if (e.prop === "cShowLocation") {
+            //   if (["dist", "ECargoInsured", "ECargoTransportDist", "ECargoGoodsTgt"].includes(index)) {
+            //     e.isShow = true;
+            //   } else {
+            //     e.isShow = false;
+            //   }
+            // }
           });
         },
       },
@@ -441,7 +457,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cShowLocation",
         inputtype: "rtselect",
         title: "显示位置",
-        loadData: showLocation,
+        loadData: showLocationList,
       },
     ],
   })

@@ -26,9 +26,16 @@ export function loginApi(data: LoginData): AxiosPromise<LoginResult> {
  * @returns
  */
 export function verifyCodeApi(data): AxiosPromise<LoginResult> {
-  return post('/verifyCode',
-    {source: data}
-  );
+  const href = window.location.href;
+  if(href.indexOf("code=") > 0) {
+    return post('/unifiedPlatform',
+      {source: {key: 'source', value: data}}
+    );
+  } else {
+    return post('/verifyCode',
+      {source: data}
+    );
+  }
 }
 
 

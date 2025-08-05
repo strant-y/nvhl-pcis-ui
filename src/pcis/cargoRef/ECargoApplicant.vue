@@ -22,6 +22,7 @@ const codeListStore = codeListViewStore();
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 import { useProductStore } from "@/store/modules/prod";
+const productStore = useProductStore();
 const dialog = ref<DialogMethod | null>(null);
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 const props = defineProps({
@@ -45,7 +46,7 @@ import moment from "moment/moment";
 const tCertfDate = ref<any[]>([]);
 const idxParam = inject('idxParam');
 const formPage = idxParam?.formPage;
-
+const  cWorkDptList =['310','320','330','340','350','360']  // 单位性质带企业的ID
 onMounted(() => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
@@ -263,9 +264,9 @@ const method = {
       setFormItem("ECargoApplicant.cIsMicroEntpris", {
         disabled: false,
       });
-      setFormItem("ECargoApplicant.cIsIndvduBiz", {
-        disabled: true,
-      });
+      // setFormItem("ECargoApplicant.cIsIndvduBiz", {
+      //   disabled: true,
+      // });
       // 是否绿色产业客户
       setFormItem("ECargoApplicant.cGreenIndustryCustomers", {
         disabled: false,
@@ -274,8 +275,6 @@ const method = {
       setFormItem("ECargoApplicant.cWorkDpt", {
         rules: [getRules("required", {})],
       });
-      //是否个体工商户
-      setValue("ECargoApplicant.cIsIndvduBiz", "");
       // 是否绿色产业客户
       setFormItem("ECargoApplicant.cGreenIndustryCustomers", {
         rules: [getRules("required", {})],
@@ -301,7 +300,10 @@ const method = {
             rules: [],
           });
       }
-   
+   		// 是否个体工商户
+      setFormItem("ECargoApplicant.cIsIndvduBiz", {rules: []});
+      setValue("ECargoApplicant.cIsIndvduBiz", "");
+
  
    
       let cMobile = getValue('ECargoApplicant.cMobile');  // 移动 
@@ -317,11 +319,6 @@ const method = {
         setFormItem("ECargoApplicant.cTel", { rules: [getRules("required", {}),getRules("phone", {})] });
         setFormItem("ECargoApplicant.cMobile", { rules: [ getRules("phoneNo", {})]})
       }
-
-      // 是否个体工商户
-      setFormItem("ECargoApplicant.cIsIndvduBiz", {
-        rules: [],
-      });
          // 为法人 国民经济行业必填
       setFormItem("ECargoApplicant.cTrdCde", {
         rules: [getRules("required", {})],
@@ -381,9 +378,9 @@ const method = {
       //注册地址
       setFormItem("ECargoApplicant.cRegisteredcapDre", { rules: null });
       //是否个体工商户
-      setFormItem("ECargoApplicant.cIsIndvduBiz", {
-        disabled: false,
-      });
+      // setFormItem("ECargoApplicant.cIsIndvduBiz", {
+      //   disabled: false,
+      // });
       // 是否绿色产业客户
       setFormItem("ECargoApplicant.cGreenIndustryCustomers", {
         rules: null,

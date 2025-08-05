@@ -38,7 +38,6 @@ const props = defineProps({
 });
 const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
-import { v4 as uuidv4 } from "uuid";
 import { conforms, forEach } from "lodash";
 const showBtnConfig = ref(false);
 const showView = ref(false);
@@ -134,6 +133,28 @@ const tableconfig = reactive<AppTableConfig>(
                 title: "保单编号",
                 clearable: true,
                 minWidth: 260,
+                func: (val: string, row: any) => {
+                    if (val) {
+                        // 检查是否只包含数字
+                        if (!/^\d+$/.test(val)) {
+                            ElMessage.warning('保单编号只能输入数字');
+                            // 清空当前输入值
+                            if (row && row._dataId) {
+                                tableRef.value?.setValueByRowKey("cPolicyNo", row._dataId, "");
+                            }
+                            return;
+                        }
+                        // 检查长度是否超过20位
+                        if (val.length > 20) {
+                            ElMessage.warning('保单编号不能超过20位');
+                            // 清空当前输入值
+                            if (row && row._dataId) {
+                                tableRef.value?.setValueByRowKey("cPolicyNo", row._dataId, "");
+                            }
+                            return;
+                        }
+                    }
+                },
             },
         ],
     })

@@ -22,6 +22,7 @@
         :collapse-tags="isMultiple()"
         :collapse-tags-tooltip="isMultiple()"
         :max-collapse-tags="isMultiple() ? 3 : null"
+        @visible-change="showOptions"
         @change="handleChange"
         style="min-width: 100px;"
       >
@@ -170,7 +171,7 @@ function getColor(v) {
 
 watch([() => props.modelValue], ([newModelValue]) => {
   // if (options.value == null || options.value.length === 0) return; // 下拉数据源加载未完成不回显
-  if (newModelValue == undefined) {
+  if (newModelValue == undefined || newModelValue === null ) {
     selectedValue.value = undefined;
     return;
   }
@@ -205,7 +206,6 @@ watch(
       //如果true 改 false,则做一次重新option获取
       nextTick(() => {
         if (props.item.typeCode) {
-          console.log(getParam());
           uploadOption();
         }
       });
@@ -355,19 +355,25 @@ onMounted(() => {
   // 初始化组件数据
   if (props.item) {
     if(getCodeListMapToOption()) return;
-    if (!props.item.loadData && !props.item.typeCode) {
-      options.value = [];
-    } else if (!props.item.loadData && !!props.item.typeCode) {
-      if (props.item.disabled) {
-        //如果属性被标记为不可读,则初始化不自动加载下拉选,但是值变更的时候,再额外触发下拉选
-        return;
-      }
-      uploadOption();
-    } else {
+    options.value = [];
+    if (props.item.typeCode) {
+      // uploadOption();  //组件初始化,不再加载下拉选,改为自主触发下拉选或者代码预加载下拉选
+    } else if(props.item.loadData){
       options.value = props.item.loadData;
     }
   }
 });
+
+function showOptions(visible: boolean){   //点击显示下拉选时,如果没有下拉选,再获取相应的下拉选
+  if(visible){
+    if (props.item.typeCode && options.value.length === 0) {
+      uploadOption();
+    } else if (props.item.typeCode && props.item.disabled) {
+      // 如果是禁用项,则固定刷新下拉选
+      uploadOption();
+    }
+  }
+}
 
 function updateOption(newOption: any) {
   options.value = newOption;
@@ -410,7 +416,7 @@ function getParam() {
     }
   }
 
-  if (props.item.disabled) {
+  if (props.item.disabled || props.showLabel) {
     if (!p) {
       p = { value: selectedValue.value };
     } else {

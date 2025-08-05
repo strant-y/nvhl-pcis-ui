@@ -250,6 +250,14 @@ console.log('dist -----',formconfig11.value)
     if(r['prop'] === 'Dist.cVinCode'){  //调整车架号列宽
       r.width = '160';
     }
+    // 关联实际用工地址列表展示
+    if(r['prop'] === 'Dist.cEmploymentAddress'){
+      eventBus.on('setMap-EmployeeDist043009', (data: any) => {
+        if(data.list && data.list.length > 0) {
+          r.loadData = data.list
+        }
+      })
+    }
   });
   tableconfig.value.tableBtnType = "btn";
   tableconfig.value.tableBtnWidth = 150;
@@ -285,14 +293,6 @@ console.log('dist -----',formconfig11.value)
   }
   if(distTableRef.value) {
     eventBus.on(`setMap-${props.compKey}`, addCodeListMap);
-  }
-  // 获取页面初始化的时候获取的组件配置信息
-  if(opertaor.getFatherPage() && opertaor.getFatherPage().getOldProductResData() && opertaor.getFatherPage().getOldProductResData()[0]?.pageInfo) {
-    oldPageSchema.value = opertaor.getFatherPage().getOldProductResData()[0]?.pageInfo.find((item: any) => item.pageCode === props.compKey).pageSchema || {};
-    // 如果团个单标识为团单则展示关联被保险人，否则隐藏
-    if(route.params.param?.cGrpMrk !== '1') {
-      oldPageSchema.value.fromSchema = oldPageSchema.value.fromSchema.filter((item:any) => item.prop !== 'Dist.cRelatedInsured')
-    }
   }
 });
 
@@ -473,6 +473,8 @@ const method = {
       cAppNo: "",
 			cProdNo: route.params.param.cProdNo,
 			cComponentTable: cComponentTableValue,
+            cClauseCode: route.params.param.cTermNo, //条款编码  
+            cProdNo: route.params.param.cProdNo,  //产品号
 			...formconfig1.value,
 			...queryParams
     };
@@ -557,6 +559,36 @@ const method = {
         if(idxParam && isChange) { // 保存清单表格在屏幕中间
           idxParam.handleAnchorClick(undefined, `#${props.compKey}`);
         }
+        // 刷新条款表格
+        const termref = opertaor.getTableRefByKey("cvrg");
+        console.log('termref22-----', toRaw(termref));
+        const hasRel = res.data.hasRel;
+        const hasPlan = res.data.hasPlan;
+        const clauseValues = res.data.clauseValues;
+
+        if(hasRel == false){
+            return;
+        }
+        if(clauseValues.length == 0){
+            return;
+        }
+        // 区分方案
+        if(hasPlan){
+            clauseValues.forEach(item => {
+                termref.setTermData({
+                    termNo: route.params.param.cTermNo,
+                    planNo: item.planNo,
+                    factorProp: item.field,
+                }, item.countNumber);
+            });
+        } else{
+            clauseValues.forEach(item => {
+                termref.setTermData({
+                    termNo: route.params.param.cTermNo,
+                    factorProp: item.field,
+                }, item.countNumber);
+            });
+        }
       }
     });
   },
@@ -623,6 +655,7 @@ const method = {
       ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
       return;
     }
+    getFatherPageOldProductResData();
 		const s = cardRef.value?.getFromValue(); // 查询参数
 		// 经营地址只选择省市区不输入详细地址获取表单值会带有undefined，这里处理一下
 		for (let k in s) {
@@ -630,7 +663,7 @@ const method = {
 				s[k] = s[k].replace('undefined', '')
 			}
 		}
-    let paramitem  = Object.assign(formconfig1.value, {
+    let paramitem  = Object.assign({...oldPageSchema.value}, {
       cComponentTable: cComponentTableValue,
     },
 		{ dist: s });
@@ -692,6 +725,7 @@ const method = {
       ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
       return;
     }
+    getFatherPageOldProductResData();
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.xlsx, .xls, .xlsm'; // 支持的文件类型
@@ -762,6 +796,7 @@ const method = {
       ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
       return;
     }
+    getFatherPageOldProductResData();
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.xlsx, .xls, .xlsm'; // 支持的文件类型
@@ -816,8 +851,9 @@ const method = {
     };
     input.click(); // 触发文件选择对话框
   },
-  //全量模板下载
+  //全量模板下载-模板下载
   downloadTemp: () => {
+    getFatherPageOldProductResData();
     const param = {
       ...oldPageSchema.value,
     }
@@ -846,8 +882,9 @@ const method = {
   },
   // 增量模板下载
   downloadIncrement: () => {
+    getFatherPageOldProductResData();
     const param = {
-      ...formconfig1.value,
+      ...oldPageSchema.value,
       cComponentTable: cComponentTableValue,
     }
     if(route.params.param?.pageName === "priceInquiry") {
@@ -927,7 +964,7 @@ const method = {
       } else {
         param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
       }
-      deleteDist(param).then((res: any) => {
+      deleteDist(param).then(async(res: any) => {
         if (res.code === 200) {
           ElMessage.success("删除成功");
           const queryParams = distTableRef.value?.getPartnerPage(false);
@@ -936,7 +973,6 @@ const method = {
       });
     });
   }
-
 };
 
 // 复选框选中
@@ -1062,6 +1098,31 @@ onUnmounted(() => {
   eventBus.off(`setMap-${props.compKey}`, addCodeListMap);
 });
 
+// 获取页面初始化的时候获取的组件配置信息
+function getFatherPageOldProductResData() {
+  if(opertaor.getFatherPage() && opertaor.getFatherPage().getOldProductResData() && opertaor.getFatherPage().getOldProductResData()[0]?.pageInfo) {
+    oldPageSchema.value = opertaor.getFatherPage().getOldProductResData()[0]?.pageInfo.find((item: any) => item.pageCode === props.compKey).pageSchema || {};
+    // 如果团个单标识为团单则展示关联被保险人，否则隐藏
+    if(route.params.param?.cGrpMrk !== '1') {
+      oldPageSchema.value.fromSchema = oldPageSchema.value.fromSchema.filter((item:any) => item.prop !== 'Dist.cRelatedInsured')
+    }
+    // 关联实际用工地址添加下拉选项
+    if(props.compKey === 'EmployeeDist043009') {
+      oldPageSchema.value.fromSchema.forEach((item: any) => {
+        if(item.prop === 'Dist.cEmploymentAddress') {
+          const list = opertaor.getTableRefByKey('ProjectDist043009')?.getTableData()
+          item.loadData = list.length > 0 ? list.map((i:any) => ({
+            label: i['Dist.cDetailedAddress'],
+            value: i['Dist.cPkId']
+          })) : []
+        }
+      });
+    }
+  }
+}
+function getFormConfig() {
+  return tableconfig.value;
+}
 defineExpose({
   getValue,
   setValue,
@@ -1072,6 +1133,7 @@ defineExpose({
   handleQuery,
   getTableData,
   setTableData,
+  getFormConfig
 });
 </script>
 

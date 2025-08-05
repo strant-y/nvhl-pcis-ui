@@ -7,7 +7,19 @@
       v-model:pageresult="pageresult"
       ref="tableRef"
       @page-change="handleQuery(false)"
-    />
+    >
+			<!-- policyInfo 列的具名插槽 -->
+      <template #column-cPlyNo="{ row, column, index }">
+        <div class="policy-info-cell">
+          <div v-if="row.cPlyNo" class="policy-number-row">
+            <span>{{ row.cPlyNo }}</span>
+            <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
+              <DocumentCopy />
+            </el-icon>
+          </div>
+        </div>
+      </template>
+		</app-table>
   </div>
 </template>
 
@@ -29,6 +41,7 @@ import {
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
+import { DocumentCopy } from "@element-plus/icons-vue";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
 import {
   AppTableConfig,
@@ -38,14 +51,12 @@ import {
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { SCENE_PLY_APP_READ } from "@/constants/tab-constants";
 import { PcisQueryService } from "@/views/payinfoManagement/service/pcis-query-service";
+import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 const pcisQueryService = new PcisQueryService();
 const userStore = useUserStore();
-const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
+const user:any = ref(userStore.user) || ref({ companyId: "", opCde: "" });
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
-const departmentTree = defineAsyncComponent(
-  () => import("@/components/common/DepartmentTree.vue")
-);
 const TaskListVestige = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/TaskListVestige.vue")
 );
@@ -71,7 +82,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         label: "重置",
         func: () => {
           freeEditRef.value?.setFormValue({
-            NExpirationDays: "",
+            NExpirationDays: "3",
             orgCde: user.value.companyId,
             CLoadSub: 1,
             cKindNo: null,
@@ -79,7 +90,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             CPlyNo: null
           });
           setFormItem("orgCde", {loadData: [{
-            label: user.value.companyCnm,
+            label: user.value.companyId+user.value.companyCnm,
             value: user.value.companyId,
           }]});
           handleQuery(true);
@@ -94,7 +105,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "核保机构",
         btnWidth: 10,
         itemWidth: 2,
-        defaultValue: user.value.companyId,
         rules: [{ type: "required" }],
         showExBtn: true,
         btnItems: {
@@ -102,15 +112,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           type: "primary",
           func: () => {
             dzmodal
-              .open(departmentTree, { type: "Issuer", data: {} })
+              .open(DepartmentTree, { type: "Issuer", data: {} })
               .then((res:any) => {
                 if (res.body) {
                   const selectObj = res.body;
                   let obj = {
                     loadData: [
                       {
-                        label: selectObj.label,
-                        value: selectObj.id,
+                        label: `${selectObj.id}${selectObj.name}`,
+                      	value: selectObj.id,
                       },
                     ],
                   };
@@ -266,6 +276,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cPlyNo",
         inputtype: "rtinput",
         title: "保单号",
+        slotName: "cPlyNo"
       },
       {
         prop: "cDptCnm",
@@ -286,7 +297,20 @@ const tableconfig = reactive<AppTableConfig>(
   })
 );
 
-onMounted(async () => {});
+onMounted(async () => {
+	freeEditRef.value?.setFormValue({
+		NExpirationDays: "3",
+		orgCde: user.value.companyId,
+		CLoadSub: 1,
+		cKindNo: null,
+		cProdNo: null,
+		CPlyNo: null
+	});
+	setFormItem("orgCde", {loadData: [{
+		label: user.value.companyId + user.value.companyCnm,
+		value: user.value.companyId,
+	}]});
+});
 
 // 绑定方法
 const method = {
@@ -391,6 +415,44 @@ function setFormItem(key: any, obj: any) {
     });
   }
 }
+
+// 添加 copyText 方法
+const copyText = (text: any) => {
+  if (!text) {
+    ElMessage.warning('没有可复制的内容');
+    return;
+  }
+
+  // 检查 navigator.clipboard 是否存在
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(
+        () => {
+          ElMessage.success('复制成功');
+        },
+        () => {
+          ElMessage.error('复制失败');
+        }
+    );
+  } else {
+    // 使用 document.execCommand('copy') 方法作为备选方案
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      const result = document.execCommand('copy');
+      if (result) {
+        ElMessage.success('复制成功');
+      } else {
+        ElMessage.error('复制失败');
+      }
+    } catch (err) {
+      ElMessage.error('复制失败，请稍后再试');
+    } finally {
+      document.body.removeChild(textarea); // 清理创建的 textarea 元素
+    }
+  }
+};
 function setValue(key: string, value: any) {
     freeEditRef?.value?.setValue(key, value);
 }
@@ -404,4 +466,26 @@ defineExpose({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.copy-icon {
+  margin-left: 5px;
+  cursor: pointer;
+  color: #409eff;
+}
+
+.policy-info-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.policy-number-row {
+  display: flex;
+  align-items: center;
+}
+
+.policy-number-row span {
+  flex: 1;
+}
+</style>
+
