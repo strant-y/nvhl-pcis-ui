@@ -85,8 +85,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   });
                   // 是否临分复选框置灰
                   checkboxDisabledFlag.value = true
-                  // 风险单位划分按钮置灰
-                  riskunitDisabledFlag.value = true
                 }
               }
             });
@@ -635,7 +633,6 @@ async function getRiskData() {
         btnItems: {disabled: true}
       });
       checkboxDisabledFlag.value = true
-      riskunitDisabledFlag.value = true
     }
   }
 }
