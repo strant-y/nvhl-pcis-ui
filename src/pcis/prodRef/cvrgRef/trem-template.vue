@@ -765,6 +765,9 @@ function dataInit() {
 
 /** 初始化需要执行的方法,手动触发 */
 function initMethod(){
+  if(pageparam.pageType === 'PLY_UW_PROCESS_SCENE' || pageparam.pageType === "readonly"){
+    return ;
+  }
   // 解决组件初始化时是否统扯保费反显为是的时候医生每人保费、护士/医技人员每人保费没有置灰
     if(termdata.value['Term.cUnifiedPremium'] && !pageparam.cEdrType ) {
       methodMap.unifiedPremiumChange(termdata.value['Term.cUnifiedPremium'])
