@@ -24,6 +24,7 @@ import CostInformation from "@/views/pcis-new-udr-list/pages/CostInformation.vue
 import { constantRoutes } from "@/router";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 import { saveAs } from "file-saver";
+import { fa } from "element-plus/es/locale";
 const policyService = new PolicyService();
 const productStore = useProductStore();
 const dialogRef = ref<DialogMethod | null>(null);
@@ -229,12 +230,15 @@ const method = {
   // 联保机构、出单机构 级联选择change事件
   dptCascaderChange: (value: any[], rowData: any) => {
     const rowId = rowData._dataId;
+
+    const oldSubDptCde = rowData["Ci.cCiSubComp"]; // 原始分公司代码
+    const oldDptCde = rowData["Ci.cDptCde"];
+
     if(value && value.length > 0){
       const subDptCde = value[0]; // 分公司代码
       const dptCde = value[1]; // 出单机构代码
       freeEditRef.value?.setValueByRowKey("Ci.cCiSubComp", rowId, subDptCde);
       freeEditRef.value?.setValueByRowKey("Ci.cDptCde", rowId, dptCde);
-
       // 校验
       onChiefMrkChange();
       // 获取所有行数据
@@ -258,6 +262,18 @@ const method = {
       freeEditRef.value?.setValueByRowKey("Ci.cCiSubComp", rowId, undefined);
       freeEditRef.value?.setValueByRowKey("Ci.cDptCde", rowId, undefined);
     }
+    // 如果级联选择器的值发生变化（分公司或出单机构任意一个发生变化），则清空当前行的业务员信息
+    if (oldSubDptCde !== value?.[0] || oldDptCde !== value?.[1]) {
+      // 清空业务员相关信息
+      freeEditRef?.value?.setValueByRowKey("Ci.cSlsCde", rowId, "");
+      freeEditRef?.value?.setValueByRowKey("Ci.cSlsNme", rowId, "");
+      freeEditRef?.value?.setValueByRowKey("Ci.cBrkrCde", rowId, "");
+      freeEditRef?.value?.setValueByRowKey("Ci.cBrkSlsCde", rowId, "");
+      
+      // 重新校验必填规则
+      valideRequired();
+    }
+
   },
   dptCascaderOnInit: (data: any) =>{
     const {value, rowData, config, itemRef} = data;
@@ -404,6 +420,24 @@ const method = {
     // const rowDatas = freeEditRef.value?.getSelectRow();
     const nPlyFee = val/100 * row["Ci.nCiPrm"]
     freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee",row._dataId,nPlyFee.toFixed(2))
+  },
+  //保单编号change事件
+  cPolicyNoChange:(val, row)=>{
+    // 校验保单编号只能包含数字和大写字母
+    if (val) {
+      // 使用正则表达式校验，只允许数字和大写字母
+      const validPattern = /^[A-Z0-9]*$/;
+      if (!validPattern.test(val)) {
+        // 如果包含非法字符，提示错误并清除非法字符
+        ElMessage.warning("保单编号只能包含数字和大写字母");
+        // 清除非法字符，只保留数字和大写字母
+        const cleanedValue = val.replace(/[^A-Z0-9]/g, '');
+        // 更新当前行的保单编号字段
+        const rowId = row._dataId;
+        freeEditRef?.value?.setValueByRowKey("Ci.cPolicyNo", rowId, cleanedValue);
+        return;
+      }
+    }
   },
   //开户行大类改变
   cBankRelTypChange:(val)=>{
@@ -871,7 +905,7 @@ const valideRequired = ()=>{
           freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.cDptCde", "disabled", true
           );
-          
+          freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cPolicyNo","disabled",false)
           const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
           if (rowItem) {
             rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
@@ -945,6 +979,7 @@ const valideRequired = ()=>{
           freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.cDptCde", "disabled", false
           );
+          freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cPolicyNo","disabled",true)
         }
         
         // 出单标志处理
