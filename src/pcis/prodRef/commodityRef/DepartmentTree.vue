@@ -223,9 +223,7 @@ const loadNode = (node, resolve) => {
     return resolve([]);
   }
   const params = {
-    cDptCde: node.data.id || '0200000000000',
-    // cSignDptMrk:'1'
-
+    cDptCde: node.data.id || '0200000000000'
   };
   sysOperatorMgrService
     .getOrgDptTreeListByPid(params)
@@ -239,6 +237,7 @@ const loadNode = (node, resolve) => {
       if (result["data"] && result["data"].length > 0) {
         result["data"].forEach((item) => {
           dto.push({
+            cSignDptMrk:item["cSignDptMrk"],
             id: item["id"],
             name: item["name"],
             leaf: !item.hasChildren,

@@ -83,21 +83,21 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           }
         },
       },
-      {
-        prop: "EdrECargoBase.NSurrRate",
-        inputtype: "rtnumber",
-        title: "手续费比例",
-        clearable: true,
-        hidden: params["cEdrType"] ==='1',
-        func: (v:any) => {
-          if(v){
-            if(v<0 || v>1){
-              ElMessage.warning("批改信息的手续费比例 必须为0~1.0之间!")
-              setValue('EdrECargoBase.NSurrRate',0)
-            }
-          }
-        },
-      },
+      // {
+      //   prop: "EdrECargoBase.NSurrRate",
+      //   inputtype: "rtnumber",
+      //   title: "手续费比例",
+      //   clearable: true,
+      //   hidden: params["cEdrType"] ==='1',
+      //   func: (v:any) => {
+      //     if(v){
+      //       if(v<0 || v>1){
+      //         ElMessage.warning("批改信息的手续费比例 必须为0~1.0之间!")
+      //         setValue('EdrECargoBase.NSurrRate',0)
+      //       }
+      //     }
+      //   },
+      // },
       {
         prop: "EdrECargoBase.nBefEdrPrm",
         inputtype: "rtinput",
@@ -284,9 +284,9 @@ onMounted(() => {
   console.log('1111',params.cRsnCde)
   nextTick(() => {
     // 非涉费批改批改公式文本框隐藏
-    if(params.cRsnCde === "FZ") {
+    // if(params.cRsnCde === "FZ") {
       setFormItem("EdrECargoBase.edrFormula", { hidden: true })
-    }
+    // }
     setFormItem("EdrECargoBase.cDptCde", {
         loadData: [
             { value: params.cDptCde, label: `${params.cDptCde} ${params.cDptCnm}` },
