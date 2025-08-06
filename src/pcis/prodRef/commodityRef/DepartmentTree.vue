@@ -224,6 +224,8 @@ const loadNode = (node, resolve) => {
   }
   const params = {
     cDptCde: node.data.id || '0200000000000',
+    // cSignDptMrk:'1'
+
   };
   sysOperatorMgrService
     .getOrgDptTreeListByPid(params)
