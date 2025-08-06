@@ -101,6 +101,10 @@ const method = {
         .then((res:any) => {
           if (res.body) {
             const selectObj = res.body;
+            // debugger
+            // if(selectObj.disabled){
+            //   return 	ElMessage.warning("所选机构不是出单机构");
+            // }
             baseEditRef.value?.setValue("ECargoBase.cDptCde", selectObj.id);
             baseEditRef.value?.setValue("ECargoBase.cDptCnm", selectObj.name);
             baseEditRef.value?.addCodeListMap({

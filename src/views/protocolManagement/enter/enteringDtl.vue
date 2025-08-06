@@ -214,7 +214,7 @@ const edrSurrenderBtn = [
     label: "比较/生成批文",
     type: "primary",
     func: () => {
-
+      getSurrenderPrecisFun();
     },
   }),
   createFreeButtonBase({
@@ -466,6 +466,36 @@ const generateEndorse = () => {
     }
   });
 };
+const getSurrenderPrecisFun = ()=>{
+  const btn = getBtn("btnCompare");
+  btn.loading = true;
+  const res = formPage.value?.getAllFormData();
+  res["user"] = user;
+  res["plyBase"] = {'Base.cDptCde':'','Base.cProdNo':''}
+  res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
+  res["plyBase"]["Base.cProdNo"] = '029900';
+  res["EdrEcargoBase"] = mainRef.value?.getxyedrbaseRefValue();
+  res["EdrEcargoBase"]['EdrECargoBase.cProdNo'] = '029900';
+  res["EdrEcargoBase"]['EdrECargoBase.cEdrType'] = props.param?.cEdrType
+  console.log(res);
+  cargoApi.getEcargoEndorseChange(res).then((res) => {
+    btn.loading = false;
+    if (res["code"] == "200") {
+      const cEdrCtnt = res["data"]["data"]["cEdrCtnt"]; //批文
+      const edrRsn = res["data"]["data"]["edrRsn"]; //批文
+      cacheKey.value = res["data"]["data"]["cacheKey"];
+      mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrCtnt", cEdrCtnt);
+      mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cacheKey", cacheKey.value);
+      mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnDetail", edrRsn);
+      mainRef.value?.setxyedrbaseRefValue("cacheKey", cacheKey);
+      idxParam.param.cacheKey = cacheKey.value
+      mainRef.value?.getxyedritemValue();
+      ElMessage.success(res.msg);
+    } else {
+      ElMessage.error(res.msg);
+    }
+  });
+}
 function query() {
   lastDataQuery();
   cargoApi.init({
@@ -669,6 +699,9 @@ async function  submit() {
     filter.push(...['AgreementCiTcp', 'AgreementCiShare', 'AgreementCi'
         , 'AgreementCvrg'  // 临时关闭体条款校验
     ]);
+  }
+  if(props.type === 'add' || props.type === 'edit'  || (props.type === 'EDR_APP_NEW_SCENE' && props?.param?.cEdrType == '1') ){
+    filter.push('AgreementAcctinfo')
   }
   const rv = await formPage.value?.validateAll(filter)
   if(!rv.flag){

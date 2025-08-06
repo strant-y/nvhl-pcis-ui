@@ -234,6 +234,12 @@ onMounted(()=>{
   if(props.pageType === "EDR_APP_NEW_SCENE"){
     edrbaseFlag.value =true
     edritemFlag.value =true
+    if (
+        (props.pageType === "EDR_APP_NEW_SCENE" &&
+            (idxParam.param.cEdrType == "3" || idxParam.param.param == "2"))
+    ) {
+      edritemFlag.value = false;
+    }
   }else {
     edrbaseFlag.value =false
     edritemFlag.value =false
