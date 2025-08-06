@@ -353,7 +353,7 @@ const B1_value: any = ref('');
 let params: any = {
       typeFlag: 1,
       scene: props.data?.pageType,//  场景
-      appNo: props.data?.cAppNo,
+      appNo: props.data?.pageName === 'priceInquiry' ? props.data?.cInquiryNo : props.data?.cAppNo,
       prodNo: props.data?.cProdNo,
       dptCde: props.data?.cDptCde,
       bsnsTyp:'19001',
@@ -650,7 +650,7 @@ function compareAppFee(saveFlag:any) {
               if (res.code === 200) {
                 ElMessage.success('费用信息保存:' + res['msg']);
                 const paramStr2 = {
-                  appNo: props.data?.cAppNo,
+                  appNo: props.data?.pageName === 'priceInquiry' ? props.data?.cInquiryNo : props.data?.cAppNo,
                   A1_value:String(freeEditRef.value?.getValue("A1_value")),
                   B1_value:String(freeEditRef.value?.getValue("B1_value")),
                   Coper: JSON.parse(String(sessionStorage.getItem("user"))).opCde,
@@ -685,7 +685,7 @@ function compareAppFee(saveFlag:any) {
         if (res.code === 200) {
           ElMessage.success('费用信息保存:' + res['msg']);
           const paramStr2 = {
-            appNo: props.data?.cAppNo,
+            appNo: props.data?.pageName === 'priceInquiry' ? props.data?.cInquiryNo : props.data?.cAppNo,
             A1_value:String(freeEditRef.value?.getValue("A1_value")),
             B1_value:String(freeEditRef.value?.getValue("B1_value")),
             Coper: JSON.parse(String(sessionStorage.getItem("user"))).opCde,
@@ -717,7 +717,7 @@ function compareAppFee(saveFlag:any) {
 
 //查询费用信息中的费率上下限
 function findFeeBetween() {
-    getAppFeeBetwNew({ appNo: props.data?.cAppNo})
+    getAppFeeBetwNew({ appNo: props.data?.pageName === 'priceInquiry' ? props.data?.cInquiryNo : props.data?.cAppNo})
     .then((res:any) => {
       if (null != res && null != res.code) {
                 if (res.code === 200) {
@@ -763,7 +763,7 @@ function findFeeBetween() {
 
 //根据申请单号获取获取ilog原始C1 
 function findIlogC1(){  
-    getIlogC1({ appNo: props.data?.cAppNo })
+    getIlogC1({ appNo: props.data?.pageName === 'priceInquiry' ? props.data?.cInquiryNo : props.data?.cAppNo })
     .then((res:any) => {
       if (null != res && null != res.code) {
               if (null != res && null != res.code) {
@@ -805,7 +805,7 @@ function handleQuery(flag?: boolean) {
     .finally(() => { });
 
     //根据申请单号获取费用信息 
-    getAppFee({ appNo: props.data?.cAppNo })
+    getAppFee({ appNo: props.data?.pageName === 'priceInquiry' ? props.data?.cInquiryNo : props.data?.cAppNo })
     .then((res:any) => {
       if (null != res && null != res.code) {
           if (res.code=== 200) {
