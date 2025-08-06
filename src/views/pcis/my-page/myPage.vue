@@ -896,7 +896,12 @@ const edrBtn = [
     id: "btnCalEdr",
     func: () => {
       // calcPremiumEdr();
-      queryTermRateLimitFun(calcPremiumEdr)
+      // 批改原因是否是费率变更
+      if(props.param.cRsnCde === '45') {
+        queryTermRateLimitFun(calcPremiumEdr)
+      } else {
+        calcPremiumEdr();
+      }
     },
   }),
   createFreeButtonBase({
@@ -935,8 +940,7 @@ const edrSurrenderBtn = [
     label: "保费计算",
     type: "primary",
     func: () => {
-      // calcPremiumEdrSurrender();
-      queryTermRateLimitFun(calcPremiumEdrSurrender)
+      calcPremiumEdrSurrender();
     },
   }),
   createFreeButtonBase({
@@ -1233,6 +1237,7 @@ async function loadAfter() {
 			if(res["code"] == 200){
 				if(!!res.data.policyApplication?.composition){
 					dataInit.value.insured = res.data.policyApplication?.composition?.insured[0] || {};
+					dataInit.value.applicant = res.data.policyApplication?.composition?.applicant[0] || {};
 					dataInit.value.cvrg = res.data.policyApplication?.composition?.cvrg || {};
 					dataInit.value.plyBase["Base.cNeedfeeFlag"] = props.param.cNeedfeeFlag
 					dataInit.value.plyBase["Base.cEcAgrNo"] = props.param.cEcAgrNo
@@ -1356,7 +1361,14 @@ async function loadAfter() {
         icon: "Money",
         func: () => {
           //获取费用信息类型接口（缺少渠道，保费，当前表单提交校验待后续补充）
-          checkFeeWindowType({ CAppNo: props.param.cAppNo }).then((res: any) => {
+          const params = {};
+          if(props.param.pageName === "priceInquiry") {
+            params["CInquiryNo"] = props.param.cInquiryNo;
+            params["type"] = "inquiry";
+          } else {
+            params["CAppNo"] = props.param.cAppNo;
+          }
+          checkFeeWindowType(params).then((res: any) => {
             if (200 !== res["code"]) {
               ElMessage.error(res["msg"]);
             } else {
@@ -2557,7 +2569,7 @@ const setCiInfo = (base: any) => {
   ci["Ci.nPlyFee"]="0.00"
   ci["Ci.nPlyFeeRate"]="0.00"
   ci["Ci.cCoinsurerCde"] = "327001"
-  ci["Ci.cSubDptCde"] = props.param.cDptCde
+  ci["Ci.cCiSubComp"] = props.param.cDptCde
   ciList.push(ci)
   return ciList;
 };
@@ -4143,10 +4155,18 @@ function getEdrbaseValue(key:any) {
 
 function getOldProductResData() {
   // 043010 记名投保选“是”，人员清单导入未校验所有字段必填
-  if(props.param?.cProdNo === "043010" && opertaor.getDataAll()['tgt'] && opertaor.getDataAll()['tgt']['Tgt.cIsinsuranceRegistered'] === '1') {
+  if(opertaor.getDataAll()['tgt'] && opertaor.getDataAll()['tgt']['Tgt.cIsinsuranceRegistered'] === '1') {
     const data = deepClone(oldProductResData.value);
     data[0]['pageInfo'].forEach((item:any) => {
-      if(item.pageCode === "EducatorDist043010") {
+      if(
+        item.pageCode === "EducatorDist043010" || 
+        item.pageCode === "DoctorDist049031" || 
+        item.pageCode === "EducatorDist042003" || 
+        item.pageCode === "EmployeeDist040007" || 
+        item.pageCode === "PersonnelDist040020" || 
+        item.pageCode === "PersonnelDist041001" || 
+        item.pageCode === "PersonnelDist049024"
+      ) {
         item.pageSchema.fromSchema.forEach((item:any) => {
           item.rules = [{type: 'required'}]
         })

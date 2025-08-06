@@ -8,7 +8,25 @@
       ref="tableRef"
       @selection-change="handleSelectionChange"
       @page-change="handleQuery(false)"
-    />
+		>
+			<!-- policyInfo 列的具名插槽 -->
+			<template #column-policyInfo="{ row, column, index }">
+				<div class="policy-info-cell">
+					<div v-if="row.cAppNo" class="policy-number-row">
+						<span>{{ row.cAppNo }}</span>
+						<el-icon class="copy-icon" @click="copyText(row.cAppNo)">
+							<DocumentCopy />
+						</el-icon>
+					</div>
+					<div v-if="row.cPlyNo" class="policy-number-row">
+						<span>{{ row.cPlyNo }}</span>
+						<el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
+							<DocumentCopy />
+						</el-icon>
+					</div>
+				</div>
+			</template>
+		</app-table>
   </div>
 </template>
 
@@ -33,6 +51,7 @@ import {
 } from "@/shared/app-table-config";
 import {deleteFactorBykey, exportRenewalInsurance, findRenewalInsurance, getBasicKindList, getPolicy} from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
+import { DocumentCopy } from "@element-plus/icons-vue";
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 const dzmodal = useDzModal();
 const kindEdit = defineAsyncComponent(() => import("./kindEdit.vue"));
@@ -65,6 +84,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         label: "重置",
         func: () => {
           freeEditRef.value?.resetFields();
+					freeEditRef.value?.setFormValue({
+						tAppTm: [
+							moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
+									"YYYY-MM-DD 00:00:00"
+							),
+							moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+						],
+						cDptCde: "0200000000000",
+						cLoadSub:1
+  				});
         },
       }),
       createFreeButtonBase({
@@ -98,7 +127,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     setFormItem("cDptCde", {
                       loadData: [
                         {
-                          label: selectObj.name,
+                          label: selectObj.id+selectObj.name,
                           value: selectObj.id,
                         },
                       ],
@@ -239,17 +268,26 @@ const tableconfig = reactive<AppTableConfig>(
         title: "三级机构",
         minWidth: 180,
       },
+			{
+				prop: "policyInfo",
+				inputtype: "rtinput",
+				title: "保单",
+				minWidth: 180,
+				slotName: "policyInfo"
+			},
       {
         prop: "cAppNo",
         inputtype: "rtinput",
         title: "申请单号",
         minWidth: 180,
+        isShow: false
       },
       {
         prop: "cPlyNo",
         inputtype: "rtinput",
         title: "保单号",
         minWidth: 180,
+        isShow: false
       },
       {
         prop: "cAppNme",
@@ -269,18 +307,23 @@ const tableconfig = reactive<AppTableConfig>(
         title: "保额",
         minWidth: 180,
       },
-      {
-        prop: "tInsrncBgnTm",
-        inputtype: "rtinput",
-        title: "保险起期",
-        minWidth: 180,
-      },
-      {
-        prop: "tInsrncEndTm",
-        inputtype: "rtinput",
-        title: "保险止期",
-        minWidth: 180,
-      },
+			{
+				prop: "InsurancePeriod",
+				inputtype: "rtinput",
+				title: "保险期间",
+			},
+      // {
+      //   prop: "tInsrncBgnTm",
+      //   inputtype: "rtinput",
+      //   title: "保险起期",
+      //   minWidth: 180,
+      // },
+      // {
+      //   prop: "tInsrncEndTm",
+      //   inputtype: "rtinput",
+      //   title: "保险止期",
+      //   minWidth: 180,
+      // },
     ],
   })
 );
@@ -298,7 +341,7 @@ onMounted(async () => {
   setFormItem("cDptCde", {
     loadData: [
       {
-        label: JSON.parse(sessionStorage.getItem("user")).companyCnm,
+        label: JSON.parse(sessionStorage.getItem("user")).companyId+JSON.parse(sessionStorage.getItem("user")).companyCnm,
         value: JSON.parse(sessionStorage.getItem("user")).companyId,
       },
     ],
@@ -404,6 +447,12 @@ function refreshData(flag?: boolean) {
       if (200 === code) {
         pageresult.list = [];
         pageresult.list = data.result;
+				pageresult.list = data.result.map((item) => ({
+					...item,
+					// 创建一个新字段合并两个值
+					policyInfo: `${item.cAppNo || ''}\n${item.cPlyNo || ''}`,
+					InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
+				}))
         pageresult.total = data.total;
       } else {
         ElMessage.error(msg);
@@ -433,6 +482,70 @@ function setFormItem(key: any, obj: any) {
     });
   }
 }
+
+
+// 添加 copyText 方法
+const copyText = (text: any) => {
+  if (!text) {
+    ElMessage.warning('没有可复制的内容');
+    return;
+  }
+
+  // 检查 navigator.clipboard 是否存在
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(
+        () => {
+          ElMessage.success('复制成功');
+        },
+        () => {
+          ElMessage.error('复制失败');
+        }
+    );
+  } else {
+    // 使用 document.execCommand('copy') 方法作为备选方案
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      const result = document.execCommand('copy');
+      if (result) {
+        ElMessage.success('复制成功');
+      } else {
+        ElMessage.error('复制失败');
+      }
+    } catch (err) {
+      ElMessage.error('复制失败，请稍后再试');
+    } finally {
+      document.body.removeChild(textarea); // 清理创建的 textarea 元素
+    }
+  }
+};
 </script>
 
-<style scoped></style>
+<style scoped>
+.copy-icon {
+  margin-left: 5px;
+  cursor: pointer;
+  color: #409eff;
+}
+
+.policy-info-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.policy-number-row {
+  display: flex;
+  align-items: center;
+}
+
+.policy-number-row span {
+  flex: 1;
+}
+
+:deep(.el-table td.el-table__cell div.cell) {
+    white-space: pre-line;
+}
+</style>

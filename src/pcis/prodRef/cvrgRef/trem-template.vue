@@ -126,7 +126,10 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
+                  <tr
+                      :class="{'selected': isSelected(termdata)}"
+                      @click="selectRow(termdata)"
+                  >
                       <th v-if="checkExtendshow">
                         <a style="margin-right: 5px" @click="showExtend = !showExtend">
                           <el-icon v-if="!showExtend"><ArrowUpBold /></el-icon>
@@ -219,14 +222,15 @@
                 <tbody>
                   <template v-if="groupconf[ginfo.cGroupId]">
                     <template
-                      v-for="(riskdata, k, ri) in groupconf[ginfo.cGroupId]
-                        .riskList"
+                      v-for="(riskdata, k, ri) in groupconf[ginfo.cGroupId].riskList"
                       :key="k"
                     >
                       <template v-if="riskdata.maxNum > 0">
                         <tr
                           v-for="n in riskdata.maxNum"
                           :key="`${ginfo.cGroupId}-${k}-${n}`"
+                          :class="{'selected': isSelected(k)}"
+                          @click="selectRow(k)"
                         >
                           <template
                             v-for="colinfo in riskdata.col"
@@ -363,6 +367,8 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { terConfig } from "@/store/modules/term-config";
 import { useValidator } from "@/typings/useValidator";
 import { useRoute } from "vue-router";
+import { v4 as uuidv4 } from "uuid";
+import {CommonConstants} from "@/constants/CommonConstants";
 const route = useRoute();
 const templateRef = ref();
 const opertaor = dataOpertaor();
@@ -381,6 +387,9 @@ const props = defineProps({
   faters: {
     type: Object,
   },
+  rowIndex: {
+    type: [Number, String],
+  },
 });
 
 const emit = defineEmits(["update:modelValue", "delete"]);
@@ -396,6 +405,8 @@ const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
     label: "删除",
   },
 });
+
+const {selectedRow} = storeToRefs(terconfig);
 
 function update() {
   let newData;
@@ -757,6 +768,9 @@ function dataInit() {
 
 /** 初始化需要执行的方法,手动触发 */
 function initMethod(){
+  if(pageparam.pageType === 'PLY_UW_PROCESS_SCENE' || pageparam.pageType === "readonly"){
+    return ;
+  }
   // 解决组件初始化时是否统扯保费反显为是的时候医生每人保费、护士/医技人员每人保费没有置灰
     if(termdata.value['Term.cUnifiedPremium'] && !pageparam.cEdrType ) {
       methodMap.unifiedPremiumChange(termdata.value['Term.cUnifiedPremium'])
@@ -1184,7 +1198,7 @@ const methodMap = {
   }
 };
 
-const checkData = (v :nay,item:any) => {
+const checkData = (v :any,item:any) => {
     const cf = groupconf.value[item.cGroupId]['riskList'][item.cRiskNo]['rowConfig'][item.cColId];
     if(cf){
       const fk = item.prop
@@ -1211,6 +1225,24 @@ function setCancel(){
   termdata.value['Term.cCancelMrk'] = '1';
   update();
 }
+
+const isSelected = (key: any) => {
+  if(!selectedRow.value.data || selectedRow.value.index !== props.rowIndex) return false;
+  if(typeof key === CommonConstants.TYPE_OF_STRING) {
+    const row = riskList.value[key];
+    return selectedRow.value.data['TermRisktgt.cLiabCode'] === row['TermRisktgt.cLiabCode'];
+  }else {
+    return key['Term.cClauseCode'] === selectedRow.value.data['Term.cClauseCode'];
+  }
+};
+const selectRow = (key: any) => {
+  selectedRow.value.index = props.rowIndex;
+  if(typeof key === CommonConstants.TYPE_OF_STRING){
+    selectedRow.value.data = riskList.value[key];
+  } else {
+    selectedRow.value.data = key;
+  }
+};
 
 defineExpose({
   dataFlash,
@@ -1265,5 +1297,13 @@ td {
 }
 ::v-deep .el-form-item {
   margin-bottom: 0px !important; /* 使内容显示更近紧促 */
+}
+.table tr:hover {
+  background-color: #f5f5f5;
+  cursor: pointer;
+}
+
+.selected {
+  background-color: rgba(146, 209, 232, 0.5) !important;
 }
 </style>

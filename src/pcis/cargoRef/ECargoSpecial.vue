@@ -15,13 +15,14 @@ import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { ref } from "vue";
-
+import { getpSpecialAgreement } from "@/api/prod";
 import { createFreeButtonBase } from "@/shared/button-config";
 import {
   AppTableConfig,
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
+
 const formData = ref<any[]>([]);
 const dzmodal = useDzModal();
 const dialog = ref<DialogMethod | null>(null);
@@ -193,6 +194,41 @@ const tableconfig = reactive<AppTableConfig>(
     })
 );
 
+
+// 获取默认信息
+
+const refreshData = () => {
+
+  const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
+  const cProdNo = '029900';
+  const cDptCde =agreementBaseRef.getValue('ECargoBase.cDptCde')
+
+  // 查询列表数据
+  getpSpecialAgreement({
+    cProdNo: cProdNo,
+    cDptCde: cDptCde,
+    pageNum: 1,
+    pageSize: 999,
+  }).then((res) => {
+    if (res.data.result) {
+            let len = 0;
+            let sel : any[] = [];
+            res.data.result.forEach((item: any,index:number) => {
+              if(item["cIfMust"] == "1"){
+                  item.index = len + 1;
+                  sel.push(item);
+                  len++;
+              }
+            });
+            // originalData.value =    deepClone(sel)
+            formData.value = sel
+    }
+  });
+};
+
+
+
+
 onMounted(async () => {
   const formconfig11 = formInit(
       JSON.stringify(props.pageSchema),
@@ -204,6 +240,10 @@ onMounted(async () => {
   formData.value.forEach((item, index) => {
     item.index = index + 1;
   });
+
+ refreshData();
+
+
 });
 
 // 绑定方法
@@ -213,7 +253,10 @@ const method = {
   },
   //获取特约按钮
   getSpecialAgree: () => {
+      console.log('11111111',idxParam)
+  
     const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
+        console.log('11111111',agreementBaseRef.getFormValue())
     if(!agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo')){
       return ElMessage.warning('请先保存');
     }
@@ -385,6 +428,33 @@ function setDisabledAll(isDisabled: boolean, noSet: string[] = []) {
       }
     });
   }
+}
+// 深拷贝
+const  deepClone =(obj:any)=> {
+  // 处理原始值和 null
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+  
+  // 处理日期对象
+  if (obj instanceof Date) {
+    return new Date(obj.getTime());
+  }
+  
+  // 处理数组
+  if (obj instanceof Array) {
+    return obj.map(item => deepClone(item));
+  }
+  
+  // 处理普通对象
+  const clone = {};
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      clone[key] = deepClone(obj[key]);
+    }
+  }
+  
+  return clone;
 }
 defineExpose({
   getFormValue,

@@ -288,7 +288,7 @@ const tableconfig = reactive<AppTableConfig>(
 //处理
 const openEdit = (type: string, row) => {
   router.push({
-    path: '/plan-config/plan-info',
+    path: 'plan-info',
     query: { data: JSON.stringify({ type, rowData: row }) }
   })
 };

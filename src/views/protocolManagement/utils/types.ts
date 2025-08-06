@@ -11,6 +11,8 @@ const EnteringCompList = [
     {sort: 8, tab: 'AgreementCiTcp'},
     {sort: 9, tab: 'AgreementCi'},
     {sort: 10, tab: 'AgreementCiShare'},
+    {sort: 11, tab: 'AgreementAcctinfo'},
+    {sort: 12, tab: 'AgreementImagedInformation'},
 ];
 
 // 批改
@@ -26,6 +28,8 @@ const CorrectionCompList = [
     {sort: 8, tab: 'AgreementCiTcp'},
     {sort: 9, tab: 'AgreementCi'},
     {sort: 10, tab: 'AgreementCiShare'},
+    {sort: 11, tab: 'AgreementAcctinfo'},
+    {sort: 12, tab: 'AgreementImagedInformation'},
 ];
 
 // 审核
@@ -41,7 +45,9 @@ const ReviewCompList = [
     {sort: 8, tab: 'AgreementCiTcp'},
     {sort: 9, tab: 'AgreementCi'},
     {sort: 10, tab: 'AgreementCiShare'},
-    {sort: 11, tab: 'AgreementReview'},
+    {sort: 11, tab: 'AgreementAcctinfo'},
+    {sort: 12, tab: 'AgreementImagedInformation'},
+    {sort: 13, tab: 'AgreementReview'},
 ];
 
 export {

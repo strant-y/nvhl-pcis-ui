@@ -262,20 +262,32 @@ export class FormPage {
     getAllFormData() {
         const allFormData: any = {};
         const compKeys = this.componentRefMap.keys();
-        for (const key of compKeys) {
-            const comp = this.componentRefMap.get(key);
-            let formData = undefined;
-            if (comp) {
-                const data = comp.getFormValue();
-                if(data) {
-                    if(Array.isArray(data)) {
-                        formData = [...data];
-                    }else {
-                        formData = {...data};
+        try {
+            for (const key of compKeys) {
+                try {
+                    const comp = this.componentRefMap.get(key);
+                    let formData = undefined;
+                    if (comp && typeof comp.getFormValue === CommonConstants.TYPE_OF_FUNCTION) {
+                        const data = comp.getFormValue();
+                        if (data) {
+                            if (Array.isArray(data)) {
+                                formData = [...data];
+                            } else {
+                                formData = {...data};
+                            }
+                        }
+                    } else {
+                        throw new Error(' comp is undefined or getFormValue is not defined');
                     }
+                    allFormData[key] = formData;
+                } catch (e) {
+                    console.error(e);
+                    throw new Error('compKey for ' + key + e?.message)
                 }
             }
-            allFormData[key] = formData;
+        } catch (e) {
+            ElMessage.error("加载异常，"+e?.message);
+            throw e;
         }
         return allFormData;
     }

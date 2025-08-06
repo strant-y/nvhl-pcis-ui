@@ -125,7 +125,7 @@ const method = {
           hidden: true,
         });
       })
-      setFormItem('ECargoBase.nReceivedPrm',{rules: null })
+      setFormItem('ECargoBase.nReceivedPrmEx',{rules: null })
     }else {
       setFormItem('ECargoBase.nReceivedPrmEx',{ rules: [getRules("required", {})] })
       if(getValue('ECargoBase.nRmbAmt')){
@@ -304,11 +304,12 @@ function setFormItem(key: any, obj: any) {
           for (let key in obj.btnItems) {
             item.btnItems[key] = obj.btnItems[key];
           }
-        }else if(item.inputtype==='rtinputgroup'){
-          Object.assign(item.groupList[0], obj);
-          Object.assign(item.groupList[1], obj);
         }else {
           Object.assign(item, obj);
+          if(item.inputtype==='rtinputgroup'){
+              Object.assign(item.groupList[0], obj);
+              Object.assign(item.groupList[1], obj);
+          }
         }
       }
     });

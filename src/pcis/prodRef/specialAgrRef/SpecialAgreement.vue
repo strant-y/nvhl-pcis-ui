@@ -95,12 +95,9 @@ const tableconfig = reactive<AppTableConfig>(
           if(originalData.value.length==0){
               originalData.value =    deepClone(formData.value)
           }
-         
-          console.log('row',row)
-          console.log('1212', originalData.value )
           let param = {};
           if(row['cIfMust'] !== '9') {
-                let rid = row.cSpecialCode|| row.cSpecialCode
+            let rid = row.cSpecialCode|| row.cSpecialCode
             const f = originalData.value.find(f => rid === f.cSpecialCode);
             // cSpecialContent
             Object.assign(param, f);
@@ -351,7 +348,7 @@ const method = {
       "prdFixSpec",
       {
           cProdNo: param.cProdNo,
-          cDptCde:param.cDptCde,
+          cDptCde:param.cDptCde, 
           selectedData: formData.value, //需要把自定义的过滤掉，只传过去从模板中选择的
         },
       {

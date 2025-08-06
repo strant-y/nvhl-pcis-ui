@@ -317,6 +317,34 @@ const moveDown = (index) => {
 };
 
 
+// 深拷贝
+const  deepClone =(obj:any)=> {
+  // 处理原始值和 null
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+  
+  // 处理日期对象
+  if (obj instanceof Date) {
+    return new Date(obj.getTime());
+  }
+  
+  // 处理数组
+  if (obj instanceof Array) {
+    return obj.map(item => deepClone(item));
+  }
+  
+  // 处理普通对象
+  const clone = {};
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      clone[key] = deepClone(obj[key]);
+    }
+  }
+  
+  return clone;
+}
+
 // 绑定方法
 const method = {
   // func demo
@@ -349,8 +377,7 @@ const method = {
                 nSeqNo: index + 1
               }));
             }
-            formData.value = mergeAndNumberArraysPreserveOrder(formData.value, selectdata);
-            console.log('66',formData.value)
+            formData.value = mergeAndNumberArraysPreserveOrder(formData.value, selectdata); 
           },
         }, 
         { title: "添加免赔条件", width: 85 });

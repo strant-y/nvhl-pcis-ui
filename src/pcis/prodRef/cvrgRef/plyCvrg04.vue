@@ -57,6 +57,7 @@
                   <tremTemplate
                     v-for="(i, index) in planData[k]['m']"
                     :key="index"
+                    :rowIndex="i['Term.CPlanNo']"
                     v-model="planData[k]['m'][index]"
                     :disabled-flag="disAbledFlag"
                     @delete="
@@ -95,6 +96,7 @@
                     <tremTemplate
                       v-for="(i, index) in planData[k]['a1']"
                       :key="index"
+                      :rowIndex="i['Term.CPlanNo']"
                       v-model="planData[k]['a1'][index]"
                       :disabled-flag="disAbledFlag"
                       @delete="
@@ -187,7 +189,7 @@ import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { terConfig } from "@/store/modules/term-config";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
-import { prodTemple } from "./titleTemple";
+import { prodTemple,prodAllPrm } from "./titleTemple";
 import { codeListViewStore } from "@/store";
 import { qryProdRelTermRiskList } from "@/api/prod";
 import { getEdrRsnTermItem } from "@/api/query";
@@ -257,10 +259,13 @@ const showTitleMap = ref<{ [key: string]: string }>({});
 
 function updateTitle() {
   Object.keys(planData.value).forEach((k: any) => {
-    if (parparam.cProdNo === "043009") {
+    if (parparam.cProdNo === "043009" || parparam.cProdNo === "040003") {
       const terms = planData.value[k];
       // 获取模版字符串
-      const str = prodTemple.value.default;
+      let str = prodTemple.value.default;
+      if(parparam.cProdNo === "040003"){
+        str = prodTemple.value.allPrm;
+      }
       let sumobj = 0;
       let sumprm = 0;
       const m = terms["m"]; // 主条款
@@ -831,13 +836,19 @@ function calcCheck(){
 }
 
 function initTermData(item: any,data:any){
-  if(parparam.cProdNo === '043009' || parparam.cProdNo === "040002"){
-    if(data.riskList && data.riskList.length > 0){
-      data.riskList.forEach((r)=>{
-        r['TermRisktgt.cDeductibleMethod'] = '01';
-      })
-    }
+  if(data.riskList && data.riskList.length > 0){
+    data.riskList.forEach((r)=>{
+      r['TermRisktgt.cDeductibleMethod'] = '01';
+    })
   }
+}
+
+function getPlanNo(){
+    const resultArray = Object.keys(planData.value).map((key, index) => ({
+        label: key,
+        value: key, 
+    }));
+    return resultArray;
 }
 
 function setTermData(param: any, value: any){
@@ -891,7 +902,8 @@ defineExpose({
   setDisabledAll,
   setUnDisabledByKeyList,
   calcCheck,
-  setTermData
+  setTermData,
+  getPlanNo
 });
 </script>
 

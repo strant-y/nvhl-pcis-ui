@@ -1120,7 +1120,9 @@ function getFatherPageOldProductResData() {
     }
   }
 }
-
+function getFormConfig() {
+  return tableconfig.value;
+}
 defineExpose({
   getValue,
   setValue,
@@ -1131,6 +1133,7 @@ defineExpose({
   handleQuery,
   getTableData,
   setTableData,
+  getFormConfig
 });
 </script>
 

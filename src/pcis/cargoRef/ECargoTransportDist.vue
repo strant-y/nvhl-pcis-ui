@@ -144,6 +144,9 @@ const loadData = (flag = true)=>{
 			if(res.data.data.length > 0 ){
 				pageresult.list = res.data.data
 				pageresult.total = res.data.total
+			} else {
+				pageresult.list = []
+				pageresult.total = 0
 			}
 		}else {
 			ElMessage.success(res.msg);

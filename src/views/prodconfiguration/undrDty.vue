@@ -116,15 +116,18 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             dzmodal.open(DepartmentTree, {}).then((res) => {
               if (res.body) {
                 const selectObj = res.body;
-                let obj = {
-                  loadData: [
-                    {
-                      label: selectObj.name,
-                      value: selectObj.id,
-                    },
-                  ],
-                };
-                freeEditRef.value?.setValue("cDptCde", selectObj.name);
+								freeEditRef.value?.setValue(
+									"cDptCde",
+									selectObj.id
+								);
+								setFormItem("cDptCde", {
+									loadData: [
+										{
+											label: `${selectObj.id}${selectObj.name}`,
+											value: selectObj.id,
+										},
+									],
+								});
               }
             });
           },
@@ -367,6 +370,24 @@ function handleQuery(flag?: boolean) {
       }
     })
     .finally(() => {});
+}
+
+//给表单下拉项赋值
+function setFormItem(key: any, obj: any) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.btnItems && obj.btnItems) {
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
+          }
+        }else{
+          Object.assign(item, obj);
+        }
+      }
+    });
+  }
 }
 </script>
 
