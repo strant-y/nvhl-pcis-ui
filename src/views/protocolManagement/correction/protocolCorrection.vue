@@ -300,7 +300,7 @@ const tableconfig = reactive<AppTableConfig>(
                 return;
               }
             const param = {
-              plyNo: row.cEcAgrAppNo,
+              cEcAgrAppNo: row.cEcAgrAppNo,
               edrType: rsnTyp,
               prodNo: '029900',
               edrRsnCde: row['id'][1],

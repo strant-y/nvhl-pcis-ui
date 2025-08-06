@@ -206,7 +206,7 @@ const edrSurrenderBtn = [
     label: "保存",
     type: "primary",
     func: () => {
-
+      saveApplicationEdr()
     },
   }),
   createFreeButtonBase({
@@ -387,6 +387,47 @@ const getPlyPolicyFun = () => {
 
 };
 /**
+ * 退保保存
+ * **/
+const saveApplicationEdr = async  () => {
+  let saveEdrFlag = false;
+  const btn = getBtn("btn010102");
+  btn.loading = true;
+  const res = formPage.value?.getAllFormData();
+  res["user"] = user;
+  res["EdrEcargoBase"] = mainRef.value?.getxyedrbaseRefValue();
+  res["EdrEcargoBase"]['EdrECargoBase.cEdrType'] = props.param?.cEdrType
+  if (
+      res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"] != null &&
+      res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"] != "" &&
+      Array.isArray(res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"])
+  ) {
+    res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"] =
+        res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"].join();
+  }
+  const edrInfo: any = await cargoApi.saveEdrEcargo({
+    ...res,
+    AgreementDistGoods:null,
+    AgreementDistInsured:null,
+    AgreementDistTransport:null,
+    ...{},
+    ...{user},
+    sence:'save'
+  })
+  btn.loading = false;
+  if(edrInfo["code"] == "200") {
+    ElMessage.success(edrInfo.msg);
+    const EdrBaseData = edrInfo["res"]["composition"]["ECargoBase"][0];
+    formPage.value?.setFormDataById('AgreementBase',EdrBaseData)
+    formPage.value?.setFormDataById('AgreementFeeWarn',{"ECargoBase.cEcAgrAppNo":EdrBaseData['ECargoBase.cEcAgrAppNo']})
+    saveEdrFlag = true;
+    cEcAgrAppNo.value = EdrBaseData['ECargoBase.cEcAgrAppNo']
+  } else {
+    ElMessage.error(edrInfo.msg);
+  }
+  return saveEdrFlag;
+}
+/**
  * 批改单保存
  * **/
 const saveEdrPlyInfo = async () => {
@@ -416,6 +457,8 @@ const saveEdrPlyInfo = async () => {
   const edrInfo: any = await cargoApi.saveEdrEcargo({
     ...res,
     AgreementDistGoods:null,
+    AgreementDistInsured:null,
+    AgreementDistTransport:null,
     ...{},
     ...{user},
     sence:'save'
@@ -662,6 +705,9 @@ async function save() {
   const allFromData = formPage.value?.getAllFormData();
   const user = JSON.parse(sessionStorage.getItem("user"));
   console.log('allFromData',allFromData)
+  if(!(allFromData['AgreementBase'] && allFromData['AgreementBase']['ECargoBase.cDptCde'])){
+     return ElMessage.warning("请选择出单机构")
+  }
  const res = await cargoApi.save({
     ...allFromData,
     AgreementDistGoods:null,
