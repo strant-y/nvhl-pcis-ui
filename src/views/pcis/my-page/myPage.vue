@@ -3509,8 +3509,10 @@ const saveEdrPlyInfo = async () => {
     //   );    //影响二次批改报错,先注释掉待调整
     edrbase.value?.setFormValue(EdrBaseData);
     saveEdrFlag = true;
-    // 复制保单清单信息到批单中
-    saveDist(EdrBaseData['EdrBase.cAppNo'], props.param?.cRsnCde)
+    if(props.param.pageType === "EDR_APP_NEW_SCENE" && saveDistBatchFlag.value) {
+      // 复制保单清单信息到批单中
+      saveDist(EdrBaseData['EdrBase.cAppNo'], props.param?.cRsnCde)
+    }
   } else {
     ElMessage.error(edrInfo.msg);
   }

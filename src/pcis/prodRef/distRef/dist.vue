@@ -258,6 +258,12 @@ console.log('dist -----',formconfig11.value)
         }
       })
     }
+    // 方案号
+    if(r['prop'] == 'Dist.cPlanNo'){
+      const termref = opertaor.getTableRefByKey("cvrg");
+      r.typeCode = null;
+      r.loadData = termref.getPlanNo();
+    }
   });
   tableconfig.value.tableBtnType = "btn";
   tableconfig.value.tableBtnWidth = 150;
