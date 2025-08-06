@@ -417,9 +417,37 @@ const method = {
   },
   //出单费比例
   nPlyFeeRateChange:(val,row)=>{
-    // const rowDatas = freeEditRef.value?.getSelectRow();
-    const nPlyFee = val/100 * row["Ci.nCiPrm"]
-    freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee",row._dataId,nPlyFee.toFixed(2))
+    // 校验输入是否为有效数字
+    if (val === "" || val === null || val === undefined) {
+      freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", row._dataId, "");
+      return;
+    }
+    
+    // 将输入值转换为浮点数
+    const floatValue = parseFloat(val);
+    // 校验是否为有效数字
+    if (isNaN(floatValue)) {
+      ElMessage.warning("请输入有效的数字");
+      // 重置为0
+      freeEditRef?.value?.setValueByRowKey("Ci.nPlyFeeRate", row._dataId, "0.000000");
+      freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", row._dataId, "0.00");
+      return;
+    }
+    // 限制出单费比例范围（0-100）
+    if (floatValue < 0 || floatValue > 100) {
+      ElMessage.warning("出单费比例应在0-100之间");
+      freeEditRef?.value?.setValueByRowKey("Ci.nPlyFeeRate", row._dataId, "");
+      freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", row._dataId, "0.00");
+      return;
+    }
+    // 格式化出单费比例为6位小数
+    // const formattedRate = floatValue.toFixed(6);
+    // freeEditRef?.value?.setValueByRowKey("Ci.nPlyFeeRate", row._dataId, formattedRate);
+    // 根据新的出单费比例和共保保费计算出单费用
+    const nCiPrm = parseFloat(row["Ci.nCiPrm"] || 0);
+    const nPlyFee = (floatValue / 100) * nCiPrm;
+    // 出单费用保留2位小数
+    freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", row._dataId, nPlyFee.toFixed(2));
   },
   //保单编号change事件
   cPolicyNoChange:(val, row)=>{
