@@ -62,6 +62,7 @@ const route = useRoute();
 const dialog = ref<DialogMethod | null>(null);
 const opertaor = dataOpertaor();
 const params = opertaor.getParam(); 
+
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -71,6 +72,36 @@ const props = defineProps({
     type: String
   }
 });
+// const 
+watch(
+    () => opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered'],
+    (n, o) => {
+        // 自动刷新列表获取数据
+        // pageresult.list = []
+        // pageresult.total = 0
+        // 上面代码是仅用于本地调试
+        if (n) {
+          console.log('投保值' ,n,o)
+          // 学生岗位 Dist.cJobType
+            if(params.cProdNo === '043010'){
+                  formconfig11.value.fromSchema?.forEach(item=>{
+                          if(n == 1 && item.prop !=='Dist.nSeqNo'){
+                            item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+                          }else if(item.prop !=='Dist.nSeqNo' && item.prop !=='Dist.cJobType') {
+                            item['rules'] =[];
+                          }
+                  })
+            }
+        }
+    },
+    {
+        deep: true,
+        immediate: true
+    }
+)
+
+
+
 
 const cardRef = ref<MyCardMethod | null>(null);
 
@@ -185,7 +216,8 @@ onMounted(async () => {
   }
 
 console.log('dist -----',formconfig11.value)
-  
+console.log('dist2 -----',formconfig11.value.fromSchema)
+ 
   // if(params.cProdNo === '043009'){
   //   formconfig11.value.fromSchema?.forEach(item=>{
   //     if(item['prop'] ==='Dist.cEmploymentAddress' && route.params.param?.cGrpMrk !== '1'){
