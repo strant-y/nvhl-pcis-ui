@@ -4154,6 +4154,18 @@ function getEdrbaseValue(key:any) {
 }
 
 function getOldProductResData() {
+  oldProductResData.value[0]['pageInfo'].forEach((i:any) => {
+    if(i.pageKey === "dist") {
+      i.pageSchema.fromSchema.forEach((item:any) => {
+        // 方案号下拉值
+        if(item.prop == 'Dist.cPlanNo'){
+          const termref = opertaor.getTableRefByKey("cvrg");
+          item.typeCode = null;
+          item.loadData = termref.getPlanNo();
+        }
+      })
+    }
+  })
   // 043010 记名投保选“是”，人员清单导入未校验所有字段必填
   if(opertaor.getDataAll()['tgt'] && opertaor.getDataAll()['tgt']['Tgt.cIsinsuranceRegistered'] === '1') {
     const data = deepClone(oldProductResData.value);
