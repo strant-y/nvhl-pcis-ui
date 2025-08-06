@@ -1065,7 +1065,7 @@ function getTableData() {
   return pageresult.list
 }
 
-function setTableData(data: any) {
+function setTableData(data: any, total:any) {
   pageresult.list = data.map((item: any, index: any) => {
 		let dataNew:any = {}
 		if(!!item['Dist.cMajorCategories'] || !!item['Dist.cMediumClassification'] || !!item['Dist.cOccupationalSubcategory']){
@@ -1084,6 +1084,7 @@ function setTableData(data: any) {
       }
     };
   });
+  pageresult.total = total || 0;
 }
 
 function handleQuery() {
