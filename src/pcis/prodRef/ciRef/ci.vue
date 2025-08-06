@@ -368,16 +368,24 @@ const method = {
     const floatValue = parseFloat(val);
     if (!isNaN(floatValue) && isFinite(floatValue)) {
       // 判断是否是合法数字且不是 Infinity
-      if (floatValue < 0 || floatValue > 100) {
-        ElMessage.warning("联共保比例必须大于等于0且小于等于100");
+      // 修改范围为1-100之间
+      if (floatValue < 1 || floatValue > 100) {
+        ElMessage.warning("联共保比例必须大于等于1且小于等于100");
         freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, "");
         return;
       }
-      const limitedValue = floatValue.toFixed(8); // 最多保留8位小数
+      // 保留8位小数
+      const limitedValue = floatValue.toFixed(8);
       freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, limitedValue);
     } else {
+      // 如果输入为空或其他非数字情况
+      if (val === "" || val === null || val === undefined) {
+        freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, "");
+        return;
+      }
       ElMessage.error("请输入合法的数字");
       freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, "");
+      return;
     }
     // 计算当前所有行的总和（排除当前行）
     const allRows = getFromValue();
