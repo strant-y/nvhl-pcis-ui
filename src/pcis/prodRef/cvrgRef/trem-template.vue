@@ -1245,6 +1245,12 @@ table {
 }
 .custom-indent {
   padding-left: 30px; /* 空三格 */
+  position: relative;
+}
+.custom-indent::before {
+  content: "-";
+  position: absolute;
+  left: 10px;
 }
 
 .custom-left {
