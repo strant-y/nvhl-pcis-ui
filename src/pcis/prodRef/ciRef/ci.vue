@@ -401,7 +401,6 @@ const method = {
   },
   //出单费比例
   nPlyFeeRateChange:(val,row)=>{
-    debugger
     // const rowDatas = freeEditRef.value?.getSelectRow();
     const nPlyFee = val/100 * row["Ci.nCiPrm"]
     freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee",row._dataId,nPlyFee.toFixed(2))
@@ -519,10 +518,11 @@ const method = {
         },
         method: {
           getSelected: (params) => {
+            console.log("00000",params)
             // freeEditRef?.value?.setValueByRowKey("Ci.cBrkrCde", rowId, params.CChaCde);
-            freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData",[{ label: `${params.CChaCde}${params.CSlsNme}`, value: params.CChaCde }])
+            freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData",[{ label: `${params.CChaCde}${params.CChaNme}`, value: params.CChaCde }])
             freeEditRef.value?.setRowFieldProp("Ci.cBrkrCde",rowId,params.CChaCde)
-            freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData",[])
+            // freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData",[])
             dialogRef.value?.handleClose();
           },
         },
@@ -629,7 +629,6 @@ const method = {
 
           policyService.importCi(params).then((res:any) => {
             if (res.code === 200) {
-              debugger
             } else {
               ElMessage.error(res.msg || "增量导入失败");
             }
@@ -958,14 +957,14 @@ const valideRequired = ()=>{
         }
         
         // 核保状态下禁用相关字段
-        if(param?.cAppTyp == 'A'){ //核保
-          const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
-          if (rowItem) {
-            rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
-            rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
-            rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
-          }
-        }
+        // if(param?.cAppTyp == 'A'){ //核保
+        //   const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+        //   if (rowItem) {
+        //     rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
+        //     rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
+        //     rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
+        //   }
+        // }
         
         // 特殊页面类型处理
         if (param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && cCiMrkValue =='5' && param.cRsnDetailCde.value == "FZ") {
