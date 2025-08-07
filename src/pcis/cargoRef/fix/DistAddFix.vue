@@ -111,6 +111,14 @@ onMounted(() => {
     if(['ECargoGoodsTgt.cPrmCur'].includes(item.prop)) {
       item["func"] = cAmtCurChange;
     }
+		// 运输信息-币种 添加change事件
+    if(['ECargoTransportDist.cCurrency'].includes(item.prop)) {
+      item["func"] = cAmtCurChange1;
+    }
+		// 运输信息-航次运输限额 添加change事件
+    if(['ECargoTransportDist.nTransportLimit'].includes(item.prop)) {
+      item["func"] = nTransportLimitchange
+    }
     if(['ECargoInsuredDist.cInsuredNme'].includes(item.prop)) {
       item["func"] = funCheckUser;
     }
@@ -151,7 +159,7 @@ onMounted(() => {
     // }else if(item.prop !=='DistECargo.cSchoolName' && item.prop !=='DistECargo.cSchoolAddress'){
     //   item['rules'] =null;
     // }
-    item["disabled"] = false;
+    // item["disabled"] = false;
     if(item.cShowLocation === '1'){
       item["hidden"] = true;
     }
@@ -380,6 +388,34 @@ const cAmtCurChange = (val: any)=>{
     setValue('ECargoGoodsTgt.nRmbLimit',Number(getValue('ECargoGoodsTgt.nInsuranceAmount')))
   }
 }
+// 运输信息币种change事件
+const cAmtCurChange1 = (val: any)=>{
+  if (val !== "CNY") {
+    codeListStore
+        .queryCodeList({
+          codeListName: "WEB_BAS_CHGRATE",
+          codeListParam: { value: val },
+        })
+        .then((res) => {
+          console.log("0000000", res);
+          setValue("ECargoTransportDist.nAmtExch", res[0].currency_rate);
+          setValue('ECargoTransportDist.nRmbLimit',
+						Number(getValue('ECargoTransportDist.nTransportLimit')*getValue('ECargoTransportDist.nAmtExch'))
+					)
+        });
+  } else {
+    setValue("ECargoTransportDist.nAmtExch", "1.000000");
+    setValue('ECargoTransportDist.nRmbLimit', Number(getValue('ECargoTransportDist.nTransportLimit')))
+  }
+}
+// 运输信息航次运输限额change事件
+const nTransportLimitchange = (val:any)=>{
+  const goodsValueData = getValue('ECargoTransportDist.nAmtExch')
+  if(goodsValueData){
+    setValue('ECargoTransportDist.nRmbLimit',Number(goodsValueData * val))
+  }
+}
+
 const bonusRatio = (val:any)=>{
   const bonusRatioData =  getValue('ECargoGoodsTgt.nAdditiveRatio')
   const goodsValueData = getValue('ECargoGoodsTgt.nGoodsValue')

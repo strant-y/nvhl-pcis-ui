@@ -262,20 +262,32 @@ export class FormPage {
     getAllFormData() {
         const allFormData: any = {};
         const compKeys = this.componentRefMap.keys();
-        for (const key of compKeys) {
-            const comp = this.componentRefMap.get(key);
-            let formData = undefined;
-            if (comp) {
-                const data = comp.getFormValue();
-                if(data) {
-                    if(Array.isArray(data)) {
-                        formData = [...data];
-                    }else {
-                        formData = {...data};
+        try {
+            for (const key of compKeys) {
+                try {
+                    const comp = this.componentRefMap.get(key);
+                    let formData = undefined;
+                    if (comp && typeof comp.getFormValue === CommonConstants.TYPE_OF_FUNCTION) {
+                        const data = comp.getFormValue();
+                        if (data) {
+                            if (Array.isArray(data)) {
+                                formData = [...data];
+                            } else {
+                                formData = {...data};
+                            }
+                        }
+                    } else {
+                        throw new Error(' comp is undefined or getFormValue is not defined');
                     }
+                    allFormData[key] = formData;
+                } catch (e) {
+                    console.error(e);
+                    throw new Error('compKey for ' + key + e?.message)
                 }
             }
-            allFormData[key] = formData;
+        } catch (e) {
+            ElMessage.error("加载异常，"+e?.message);
+            throw e;
         }
         return allFormData;
     }
@@ -286,58 +298,63 @@ export class FormPage {
      */
     setUnDisabledByKeyList(list: any[]){
         if (list && list.length > 0) {
-            for(const item of list) {
-                const keys = this.componentRefMap.keys();
-                for(const key of keys) {
-                    const comp = this.componentRefMap.get(key);
-                    if (comp && comp.getFormConfig) {
-                        const conf = comp.getFormConfig();
-                        if (!item.startsWith('Btn_')) { // 非按钮控制
-                            if (conf.fromType === CommonConstants.FORM_EDIT_TYPE_FREE) {  // 表单模式时,修改表单disabled实现只读
-                                if (conf.fromSchema && conf.fromSchema.length > 0) {
-                                    conf.fromSchema.forEach(f => {
-                                        if (f.prop === item) {
-                                            if (f.inputtype === CommonConstants.RT_ITEM_TYPE_INPUTGROUP) {
-                                                console.log(f.inputtype);
-                                                f.groupList.forEach((gkey: any) => {
-                                                    gkey.disabled = false;
-                                                });
-                                            }else {
-                                                f.disabled = false;
-                                            }
+            for(const edrItem of list) {
+                const item = edrItem["cEdrItem"];
+                const itemType = edrItem["cOperTyp"];
+                const key = edrItem["cComponentKey"];
+                const comp = this.componentRefMap.get(key);
+                if (comp && comp.getFormConfig) {
+                    const conf = comp.getFormConfig();
+                    if (itemType === "M") { // 非按钮控制
+                        if (conf.fromType === CommonConstants.FORM_EDIT_TYPE_FREE) {  // 表单模式时,修改表单disabled实现只读
+                            if (conf.fromSchema && conf.fromSchema.length > 0) {
+                                conf.fromSchema.forEach(f => {
+                                    if (f.prop === item) {
+                                        if (f.inputtype === CommonConstants.RT_ITEM_TYPE_INPUTGROUP) {
+                                            console.log(f.inputtype);
+                                            f.groupList.forEach((gkey: any) => {
+                                                gkey.disabled = false;
+                                            });
+                                        }else {
+                                            f.disabled = false;
                                         }
-                                    });
-                                }
-                            } else if (conf.fromType === CommonConstants.FORM_EDIT_TYPE_GRID) { // 表格模式时,修改表格属性,实现只读
-                                if (conf.fromSchema && conf.fromSchema.length > 0) {
-                                    conf.fromSchema.forEach(gf => {
-                                        if (gf.prop === item) {
-                                            conf.editList.push(gf.prop);
-                                        }
-                                    });
-                                }
+                                    }
+                                });
                             }
-                        } else {// 按钮控制
-                            if (conf.fromType !== CommonConstants.FORM_EDIT_TYPE_CUSTOM) {
-                                if (
-                                    conf.titleBtns &&
-                                    conf.titleBtns.length > 0
-                                ) {
-                                    conf.titleBtns.forEach((t) => {
-                                        if ('Btn_' + t.id === item) {
-                                            t.hidden = false;
-                                        }
-                                    });
-                                }
-                                if (conf.endBtns && conf.endBtns.length > 0) {
-                                    conf.endBtns.forEach((t) => {
-                                        if ('Btn_' + t.id === item) {
-                                            t.hidden = false;
-                                        }
-                                    });
-                                }
-                            } else {
+                        } else if (conf.fromType === CommonConstants.FORM_EDIT_TYPE_GRID) { // 表格模式时,修改表格属性,实现只读
+                            if (conf.fromSchema && conf.fromSchema.length > 0) {
+                                conf.fromSchema.forEach(gf => {
+                                    if (gf.prop === item) {
+                                        conf.editList.push(gf.prop);
+                                    }
+                                });
+                            }
+                        }
+                    } else if(itemType === "B"){ // 按钮控制
+                        if (conf.fromType === CommonConstants.FORM_EDIT_TYPE_CUSTOM) {
+                            if(comp.setUnDisabledByKeyList) {
                                 comp.setUnDisabledByKeyList(item);
+                            }else {
+                                console.warn(key,' comp setUnDisabledByKeyList function is not defined');
+                            }
+                        }else {
+                            if(comp.getFormBtn) {
+                                const formBtn = comp.getFormBtn();
+                                console.log('formBtn ', key, formBtn);
+                                if (formBtn && formBtn[item]) {
+                                    formBtn[item].hidden = false;
+                                }
+                            }else if([CommonConstants.FORM_EDIT_TYPE_FREE].includes(conf.fromType)) {
+                                console.warn(key,' comp getFormBtn function is not defined');
+                            }
+                            if(comp.getTableBtn) {
+                                const tableBtn = comp.getTableBtn();
+                                console.log('tableBtn ', key, tableBtn);
+                                if (tableBtn && tableBtn[item]) {
+                                    tableBtn[item].hidden = false;
+                                }
+                            }else if([CommonConstants.FORM_EDIT_TYPE_TABLE].includes(conf.fromType)){
+                                console.warn(key,' comp getTableBtn function is not defined');
                             }
                         }
                     }

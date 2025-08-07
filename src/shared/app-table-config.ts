@@ -67,6 +67,7 @@ export function createTableEditConfig(
   config: AppTableConfig = {}
 ): AppTableConfig {
   return {
+    fromType: 'table',
     id: config.id || `ID${new Date().getTime()}`,
     title: config.title || null,
     showBtn: config.showBtn || true,

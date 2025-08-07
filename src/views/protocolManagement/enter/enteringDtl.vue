@@ -206,7 +206,7 @@ const edrSurrenderBtn = [
     label: "保存",
     type: "primary",
     func: () => {
-
+      saveApplicationEdr()
     },
   }),
   createFreeButtonBase({
@@ -214,7 +214,7 @@ const edrSurrenderBtn = [
     label: "比较/生成批文",
     type: "primary",
     func: () => {
-
+      getSurrenderPrecisFun();
     },
   }),
   createFreeButtonBase({
@@ -309,17 +309,8 @@ const getEdrRsnItemFun = (
   getEdrRsnItem(res).then((res: any) => {
     if (res["code"] == "200") {
       const result = res["data"]["result"];
-      const edrList: any[] = [];
-      result.forEach((key: any) => {
-        if (key["cOperTyp"] === "M") {
-          edrList.push(key["cEdrItem"]);
-        } else if (key["cOperTyp"] === "B") {
-          edrList.push("Btn_" + key["cEdrItem"]);
-        }
-      });
-      console.log('edrList', edrList)
-      // console.log('edrList',edrList)
-      formPage.value?.setUnDisabledByKeyList(edrList); // 根据list集合,放开需要的要素
+      console.log('edrList', result)
+      formPage.value?.setUnDisabledByKeyList(result); // 根据list集合,放开需要的要素
       ElMessage.success(res.msg);
     } else {
       ElMessage.error(res.msg);
@@ -387,6 +378,47 @@ const getPlyPolicyFun = () => {
 
 };
 /**
+ * 退保保存
+ * **/
+const saveApplicationEdr = async  () => {
+  let saveEdrFlag = false;
+  const btn = getBtn("btn010102");
+  btn.loading = true;
+  const res = formPage.value?.getAllFormData();
+  res["user"] = user;
+  res["EdrEcargoBase"] = mainRef.value?.getxyedrbaseRefValue();
+  res["EdrEcargoBase"]['EdrECargoBase.cEdrType'] = props.param?.cEdrType
+  if (
+      res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"] != null &&
+      res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"] != "" &&
+      Array.isArray(res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"])
+  ) {
+    res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"] =
+        res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"].join();
+  }
+  const edrInfo: any = await cargoApi.saveEdrEcargo({
+    ...res,
+    AgreementDistGoods:null,
+    AgreementDistInsured:null,
+    AgreementDistTransport:null,
+    ...{},
+    ...{user},
+    sence:'save'
+  })
+  btn.loading = false;
+  if(edrInfo["code"] == "200") {
+    ElMessage.success(edrInfo.msg);
+    const EdrBaseData = edrInfo["res"]["composition"]["ECargoBase"][0];
+    formPage.value?.setFormDataById('AgreementBase',EdrBaseData)
+    formPage.value?.setFormDataById('AgreementFeeWarn',{"ECargoBase.cEcAgrAppNo":EdrBaseData['ECargoBase.cEcAgrAppNo']})
+    saveEdrFlag = true;
+    cEcAgrAppNo.value = EdrBaseData['ECargoBase.cEcAgrAppNo']
+  } else {
+    ElMessage.error(edrInfo.msg);
+  }
+  return saveEdrFlag;
+}
+/**
  * 批改单保存
  * **/
 const saveEdrPlyInfo = async () => {
@@ -416,6 +448,8 @@ const saveEdrPlyInfo = async () => {
   const edrInfo: any = await cargoApi.saveEdrEcargo({
     ...res,
     AgreementDistGoods:null,
+    AgreementDistInsured:null,
+    AgreementDistTransport:null,
     ...{},
     ...{user},
     sence:'save'
@@ -466,6 +500,36 @@ const generateEndorse = () => {
     }
   });
 };
+const getSurrenderPrecisFun = ()=>{
+  const btn = getBtn("btnCompare");
+  btn.loading = true;
+  const res = formPage.value?.getAllFormData();
+  res["user"] = user;
+  res["plyBase"] = {'Base.cDptCde':'','Base.cProdNo':''}
+  res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
+  res["plyBase"]["Base.cProdNo"] = '029900';
+  res["EdrEcargoBase"] = mainRef.value?.getxyedrbaseRefValue();
+  res["EdrEcargoBase"]['EdrECargoBase.cProdNo'] = '029900';
+  res["EdrEcargoBase"]['EdrECargoBase.cEdrType'] = props.param?.cEdrType
+  console.log(res);
+  cargoApi.getEcargoEndorseChange(res).then((res) => {
+    btn.loading = false;
+    if (res["code"] == "200") {
+      const cEdrCtnt = res["data"]["data"]["cEdrCtnt"]; //批文
+      const edrRsn = res["data"]["data"]["edrRsn"]; //批文
+      cacheKey.value = res["data"]["data"]["cacheKey"];
+      mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrCtnt", cEdrCtnt);
+      mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cacheKey", cacheKey.value);
+      mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnDetail", edrRsn);
+      mainRef.value?.setxyedrbaseRefValue("cacheKey", cacheKey);
+      idxParam.param.cacheKey = cacheKey.value
+      mainRef.value?.getxyedritemValue();
+      ElMessage.success(res.msg);
+    } else {
+      ElMessage.error(res.msg);
+    }
+  });
+}
 function query() {
   lastDataQuery();
   cargoApi.init({
@@ -632,6 +696,9 @@ async function save() {
   const allFromData = formPage.value?.getAllFormData();
   const user = JSON.parse(sessionStorage.getItem("user"));
   console.log('allFromData',allFromData)
+  if(!(allFromData['AgreementBase'] && allFromData['AgreementBase']['ECargoBase.cDptCde'])){
+     return ElMessage.warning("请选择出单机构")
+  }
  const res = await cargoApi.save({
     ...allFromData,
     AgreementDistGoods:null,
@@ -669,6 +736,9 @@ async function  submit() {
     filter.push(...['AgreementCiTcp', 'AgreementCiShare', 'AgreementCi'
         , 'AgreementCvrg'  // 临时关闭体条款校验
     ]);
+  }
+  if(props.type === 'add' || props.type === 'edit'  || (props.type === 'EDR_APP_NEW_SCENE' && props?.param?.cEdrType == '1') ){
+    filter.push('AgreementAcctinfo')
   }
   const rv = await formPage.value?.validateAll(filter)
   if(!rv.flag){

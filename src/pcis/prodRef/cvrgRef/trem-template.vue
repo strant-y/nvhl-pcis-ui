@@ -411,10 +411,10 @@ const {selectedRow} = storeToRefs(terconfig);
 function update() {
   let newData;
 
-  if( termTitleConf.value.cFactorTabType === "free" ){
-    newData = termRef.value?.getFromValue();
-  } else {
+  if( termTitleConf.value.cFactorTabType === "table" ||  termTitleConf.value.cFactorTabType === 'grid' ){
     newData = termdata.value;
+  } else {
+    newData = termRef.value?.getFromValue();
   }
   const fromc = termFactormap.value?.filter(
     (v: any) => v.cPorpShowtitle === "1"
@@ -474,7 +474,7 @@ const extermConf = ref<any>([]); // 个性化扩展槽
 const formconfig1 = reactive(
   createAppFreeEditConfig({
     fromUi: {
-      cols: 2,
+      cols: 3,
       showTitleBar: false,
     },
   })
@@ -1277,6 +1277,12 @@ table {
 }
 .custom-indent {
   padding-left: 30px; /* 空三格 */
+  position: relative;
+}
+.custom-indent::before {
+  content: "-";
+  position: absolute;
+  left: 10px;
 }
 
 .custom-left {

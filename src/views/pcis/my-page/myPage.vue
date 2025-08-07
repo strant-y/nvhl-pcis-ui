@@ -1,150 +1,203 @@
-<!-- 用户管理 -->
+<!-- 投保页面 -->
 <template>
   <div class="mypage-app">
     <el-container class="dynamic-container" ref="scrollContainer">
-      <el-aside :width="(NavigaShow ? 200 : 100) + 'px'">
+      <el-aside :width="NavigaShow ? '200px' : '70px'" class="mypage-aside">
         <!-- <el-affix :offset="100"> -->
-          <div class="navi_container">
-            <div
-              v-for="(pageConfig, v) in formconfig1"
-              :key="v"
-              class="NavigaList_card"
-            >
-              <el-anchor :bound="120" :offset="80">
-                <el-anchor-link
-                  v-if="edrbaseFlag"
-                  @click="handleAnchorClick($event, `#edrbase`)"
-                  class="isActive"
+        <div class="navi_container">
+          <div
+            v-for="(pageConfig, v) in formconfig1"
+            :key="v"
+            class="NavigaList_card"
+          >
+            <el-anchor :bound="120" :offset="80">
+              <el-anchor-link
+                v-if="edrbaseFlag"
+                @click="handleAnchorClick($event, `#edrbase`)"
+                class="isActive"
+              >
+                <!-- <rt-icon
+                  :item="{ icon: 'Tickets' }"
+                /> -->
+                <el-tooltip
+                  effect="dark"
+                  content="批改信息"
+                  placement="right"
+                  :disabled="NavigaShow"
                 >
-                  <!-- <rt-icon
-                    :item="{ icon: 'Tickets' }"
-                  /> -->
                   <i :class="['icon','iconfont',iconMap['edrbase']]"></i>
-                  <span class="icon-title" v-if="NavigaShow"
-                    >批改信息</span
-                  >
-                </el-anchor-link>
-                <el-anchor-link
-                  v-if="edritemFlag"
-                  @click="handleAnchorClick($event, `#edritem`)"
+                </el-tooltip>
+                <span class="icon-title" v-if="NavigaShow"
+                  >批改信息</span
                 >
-                  <!-- <rt-icon
-                    :item="{ icon: 'Tickets' }"
-                  /> -->
+              </el-anchor-link>
+              <el-anchor-link
+                v-if="edritemFlag"
+                @click="handleAnchorClick($event, `#edritem`)"
+              >
+                <!-- <rt-icon
+                  :item="{ icon: 'Tickets' }"
+                /> -->
+                <el-tooltip
+                  effect="dark"
+                  content="批改比较项"
+                  placement="right"
+                  :disabled="NavigaShow"
+                >
                   <i :class="['icon','iconfont',iconMap['edritem']]"></i>
-                  <span class="icon-title" v-if="NavigaShow"
-                    >批改比较项</span
-                  >
-                </el-anchor-link>
-
-                <el-anchor-link
-                  v-for="(k, i) in pageConfig?.pageInfo"
-                  :key="i"
-                  :custom="true"
-                  v-show="
-                    k.pageKey !== 'acctinfo'
-                      ? [
-                          'ciMasterAgreement',
-                          'ci',
-                          'ourCompanyCiShare',
-                        ].includes(k.pageKey)
-                        ? isCiJiMrk
-                        : acctinfoFlag
-                      : true
-                  "
-                  @click="handleAnchorClick($event, `#${k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey}`)"
-                  :class="!edrbaseFlag && !edritemFlag && i === 0 ? 'isActive' : ''"
+                </el-tooltip>
+                <span class="icon-title" v-if="NavigaShow"
+                  >批改比较项</span
                 >
-                  <!-- <rt-icon
-                    :item="{
-                      icon:
-                        k.icon && k.icon !== 'null' && k.icon !== ''
-                          ? k.icon
-                          : 'Tickets',
-                    }"
-                  /> -->
-                  
+              </el-anchor-link>
+
+              <el-anchor-link
+                v-for="(k, i) in pageConfig?.pageInfo"
+                :key="i"
+                :custom="true"
+                v-show="
+                  k.pageKey !== 'acctinfo'
+                    ? [
+                        'ciMasterAgreement',
+                        'ci',
+                        'ourCompanyCiShare',
+                      ].includes(k.pageKey)
+                      ? isCiJiMrk
+                      : acctinfoFlag
+                    : true
+                "
+                @click="handleAnchorClick($event, `#${k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey}`)"
+                :class="!edrbaseFlag && !edritemFlag && i === 0 ? 'isActive' : ''"
+              >
+                <!-- <rt-icon
+                  :item="{
+                    icon:
+                      k.icon && k.icon !== 'null' && k.icon !== ''
+                        ? k.icon
+                        : 'Tickets',
+                  }"
+                /> -->
+                <el-tooltip
+                  effect="dark"
+                  :content="k.pageTtile"
+                  placement="right"
+                  :disabled="NavigaShow"
+                >
                   <i :class="['icon','iconfont',iconMap[k.pageKey]]"></i>
-                  <span class="icon-title" v-if="NavigaShow">
-                    <template v-if="k.pageTtile && k.pageTtile.length > 7">
-                      <el-tooltip
-                        effect="dark"
-                        :content="k.pageTtile"
-                        placement="top-start"
-                      >
-                        {{ k.pageTtile.substring(0, 7) + "..." }}
-                      </el-tooltip>
-                    </template>
-                    <template v-else>
-                      {{ k.pageTtile }}
-                    </template>
-                  </span>
-                </el-anchor-link>
+                </el-tooltip>
+                <span class="icon-title" v-if="NavigaShow">
+                  <template v-if="k.pageTtile && k.pageTtile.length > 7">
+                    <el-tooltip
+                      effect="dark"
+                      :content="k.pageTtile"
+                      placement="top-start"
+                    >
+                      {{ k.pageTtile.substring(0, 7) + "..." }}
+                    </el-tooltip>
+                  </template>
+                  <template v-else>
+                    {{ k.pageTtile }}
+                  </template>
+                </span>
+              </el-anchor-link>
 
-                <el-anchor-link
-                  :href="`#ciMasterAgreement`"
-                  v-if="ciMasterAgreementFlag && isCiJiMrk"
+              <el-anchor-link
+                :href="`#ciMasterAgreement`"
+                v-if="ciMasterAgreementFlag && isCiJiMrk"
+              >
+                <!-- <rt-icon
+                  :item="{ icon: 'Tickets' }"
+                /> -->
+                <el-tooltip
+                  effect="dark"
+                  content="联共保主协议信息"
+                  placement="right"
+                  :disabled="NavigaShow"
                 >
-                  <!-- <rt-icon
-                    :item="{ icon: 'Tickets' }"
-                  /> -->
                   <i :class="['icon','iconfont',iconMap['ciMasterAgreement']]"></i>
-                  <span class="icon-title" v-if="NavigaShow"
-                    >联共保主协议信息</span
-                  >
-                </el-anchor-link>
-                <el-anchor-link :href="`#ci`" v-if="ciFlag && isCiJiMrk">
-                  <!-- <rt-icon
-                    :item="{ icon: 'Tickets' }"
-                  /> -->
+                </el-tooltip>
+                <span class="icon-title" v-if="NavigaShow"
+                  >联共保主协议信息</span
+                >
+              </el-anchor-link>
+              <el-anchor-link :href="`#ci`" v-if="ciFlag && isCiJiMrk">
+                <!-- <rt-icon
+                  :item="{ icon: 'Tickets' }"
+                /> -->
+                <el-tooltip
+                  effect="dark"
+                  content="联共保信息"
+                  placement="right"
+                  :disabled="NavigaShow"
+                >
                   <i :class="['icon','iconfont',iconMap['ci']]"></i>
-                  <span class="icon-title" v-if="NavigaShow"
-                    >联共保信息</span
-                  >
-                </el-anchor-link>
-                <el-anchor-link
-                  :href="`#ourCompanyCiShare`"
-                  v-if="ourCompanyCiShareFlag && isCiJiMrk"
+                </el-tooltip>
+                <span class="icon-title" v-if="NavigaShow"
+                  >联共保信息</span
                 >
-                  <!-- <rt-icon
-                    :item="{ icon: 'Tickets' }"
-                  /> -->
+              </el-anchor-link>
+              <el-anchor-link
+                :href="`#ourCompanyCiShare`"
+                v-if="ourCompanyCiShareFlag && isCiJiMrk"
+              >
+                <!-- <rt-icon
+                  :item="{ icon: 'Tickets' }"
+                /> -->
+                <el-tooltip
+                  effect="dark"
+                  content="我司联共保信息"
+                  placement="right"
+                  :disabled="NavigaShow"
+                >
                   <i :class="['icon','iconfont',iconMap['ourCompanyCiShare']]"></i>
-                  <span class="icon-title" v-if="NavigaShow"
-                    >我司联共保信息</span
-                  >
-                </el-anchor-link>
-                <el-anchor-link
-                  v-if="underwriteFlag"
-                  @click="handleAnchorClick($event, `#underwriteurl`)"
-                  style="opacity: 1;font-weight: 500;"
+                </el-tooltip>
+                <span class="icon-title" v-if="NavigaShow"
+                  >我司联共保信息</span
                 >
-                  <!-- <rt-icon
-                    :item="{ icon: 'Tickets' }"
-                  /> -->
+              </el-anchor-link>
+              <el-anchor-link
+                v-if="underwriteFlag"
+                @click="handleAnchorClick($event, `#underwriteurl`)"
+                style="opacity: 1;font-weight: 500;"
+              >
+                <!-- <rt-icon
+                  :item="{ icon: 'Tickets' }"
+                /> -->
+                <el-tooltip
+                  effect="dark"
+                  content="核保处理"
+                  placement="right"
+                  :disabled="NavigaShow"
+                >
                   <i :class="['icon','iconfont',iconMap['underwriteurl']]" style="color: var(--el-color-warning);"></i>
-                  <span
-                    class="icon-title"
-                    v-if="NavigaShow"
-                    style="color: var(--el-color-warning)"
-                  >核保处理</span
-                  >
-                </el-anchor-link>
-              </el-anchor>
-            </div>
-            <!-- <div class="NavigaList_card" style="margin-left: 5px">
-              <rt-icon
-                @click="NavigaShow = !NavigaShow"
-                v-if="!NavigaShow"
-                :item="{ icon: 'DArrowRight' }"
-              />
-              <rt-icon
-                @click="NavigaShow = !NavigaShow"
-                v-if="NavigaShow"
-                :item="{ icon: 'DArrowLeft' }"
-              />
-            </div> -->
+                </el-tooltip>
+                <span
+                  class="icon-title"
+                  v-if="NavigaShow"
+                  style="color: var(--el-color-warning)"
+                >核保处理</span
+                >
+              </el-anchor-link>
+            </el-anchor>
           </div>
+          <div class="NavigaList_card toggle-button">
+            <el-tooltip
+              effect="dark"
+              :content="NavigaShow ? '收起导航' : '展开导航'"
+              placement="right"
+            >
+              <el-button 
+                circle 
+                @click="NavigaShow = !NavigaShow" 
+                class="toggle-nav-button"
+              >
+                <rt-icon 
+                  :item="{ icon: NavigaShow ? 'DArrowLeft' : 'DArrowRight' }" 
+                />
+              </el-button>
+            </el-tooltip>
+          </div>
+        </div>
         <!-- </el-affix> -->
       </el-aside>
       <el-main class="main-container">
@@ -366,7 +419,7 @@ import {
   queryTermRateLimit,
 	queryEcargoRelevancePolicyDetails
 } from "../../../api/query/index";
-import { checkFeeWindowType, selectDist, saveDistBatch, getReleaseInquiryPage } from "@/api/prod";
+import { checkFeeWindowType, selectDist, saveDistBatch, getReleaseInquiryPage, copyDist } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
 import moment from "moment";
 import {numAdd, numComparison, numMulti, numSubp, tool_fix} from "@/utils/Math";
@@ -2097,7 +2150,7 @@ const getDistData = (appNo:any, item: any) => {
 
   selectDist(selData).then((res: any) => {
     if (res.code === 200) {
-      opertaor.getTableRefs()[item.pageCode].setTableData(res.data.data);
+      opertaor.getTableRefs()[item.pageCode].setTableData(res.data.data, res.data.total);
     }
   });
   // 调用接口查询清单对应的汇总的pageCode
@@ -2130,63 +2183,37 @@ const getCAppNoFun = () => {
 };
 const saveDistBatchFlag = ref(true);
 // 批量保存清单
-const saveDist = (appNo:any) => {
+const saveDist = (appNo:any, cRsnCde?:any) => {
   const distMap = formconfig1[0].pageInfo.filter((item:any) => {
     return item.pageKey === "dist";
   });
-  const selData = {
-    pageSize: 99999,
-    pageNum: 1,
-  };
-  if(props.param?.pageType === "copy") {
-    selData.cAppNo = props.param.cAppNo
+  const params = {};
+  if(cRsnCde) {
+    params['cRsnCde'] = cRsnCde;
+    params['cAppNo'] = props.param?.cOrgAppNo;
+    params['targetNo'] = appNo;
+  } else if(props.param?.pageType === "template") {
+    params['cAppNo'] = parseData.value.plyBase['Base.cAppNo'];
+    params['targetNo'] = appNo;
+  } else if(props.param?.pageType === "inquiryToApp") {
+    params['cInquiryNo'] = props.param?.cInquiryNo;
+    params['targetNo'] = appNo;
+  } else {
+    params['cAppNo'] = props.param?.cAppNo;
+    params['targetNo'] = appNo;
   }
-  if(props.param?.pageType === "template") {
-    selData.cAppNo = parseData.value.plyBase['Base.cAppNo']
-  }
-  if(props.param?.pageType === "inquiryToApp") {
-    selData.cInquiryNo = props.param?.cInquiryNo
-  }
-  distMap.forEach(async (item:any) => {
-    selData.cComponentTable = "";
-    let data = [];
-
-    selData.cComponentTable = item.pageCode.replace(/\d+/g, '')
-    // 如果清单数据过多涉及分页，则批量保存时需要查询全量的清单数据进行保存
-    const queryAllDist = await selectDist(selData);
-    if(queryAllDist && queryAllDist.data && queryAllDist.data.data && queryAllDist.data.data.length > 0) {
-      data = queryAllDist.data.data
-    }
-    
-    if(data && data.length > 0) {
-      const param = {
-        cComponentTable: item.pageCode.slice(0, -6),
-        cAppNo: appNo,
-        dist: data.map((item:any) => {
-          return {
-            ...item,
-            'Dist.tOpeningTime': item['Dist.tOpeningTime'] ? dayjs(item['Dist.tOpeningTime']).format('YYYY-MM-DD') : null,
-            'Dist.tCrtTm': item['Dist.tCrtTm'] ? dayjs(item['Dist.tCrtTm']).format('YYYY-MM-DD') : null,
-            'Dist.tUpdTm': item['Dist.tUpdTm'] ? dayjs(item['Dist.tUpdTm']).format('YYYY-MM-DD') : null,
-            'Dist.tValidityPeriod': item['Dist.tValidityPeriod'] ? dayjs(item['Dist.tUpdTm']).format('YYYY-MM-DD HH:mm:ss') : null
-          };
-        }),
-      }
-      saveDistBatch(param).then((res:any) => {
-        if(res.code === 200) {
-          // 批量保存清单成功后再查询一遍清单
-          distMap.forEach((item:any) => {
-            opertaor.getTableRefs()[item.pageCode].handleQuery();
-          });
-          saveDistBatchFlag.value = false;
-        } else {
-          ElMessage.error(res.msg);
-        }
-      }).catch((err:any) => {
-        ElMessage.error(err);
+  copyDist(params).then((res:any) => {
+    if(res && res.code === 200) {
+      distMap.forEach((item:any) => {
+        opertaor.getTableRefs()[item.pageCode].handleQuery();
       });
+      saveDistBatchFlag.value = false;
+    } else {
+      ElMessage.error(res.msg);
     }
-  });
+  }).catch((err:any) => {
+    ElMessage.error(err.msg);
+  })
 }
 /**
  * 加载投保单明细
@@ -2615,6 +2642,10 @@ const submitToUndrFn = async () => {
   const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk')
   if ('1' === CiMrk || '2' === CiMrk || '5' === CiMrk) {
       const validCi = JointInsuranceCheck();
+      // 如果联共保校验不通过，则不继续执行后续逻辑
+      if (!validCi) {
+          return false;
+      }
   }
 	// 申请核保前判断是否灰黑名单
 	const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
@@ -3535,13 +3566,10 @@ const saveEdrPlyInfo = async () => {
     //   );    //影响二次批改报错,先注释掉待调整
     edrbase.value?.setFormValue(EdrBaseData);
     saveEdrFlag = true;
-    // 清单列表数据
-    const distMap = formconfig1[0].pageInfo.filter((item:any) => {
-      return item.pageKey === "dist";
-    });
-    distMap.forEach((item:any) => {
-      getDistData(EdrBaseData['EdrBase.cAppNo'], item)
-    });
+    if(props.param.pageType === "EDR_APP_NEW_SCENE" && saveDistBatchFlag.value) {
+      // 复制保单清单信息到批单中
+      saveDist(EdrBaseData['EdrBase.cAppNo'], props.param?.cRsnCde)
+    }
   } else {
     ElMessage.error(edrInfo.msg);
   }
@@ -3939,7 +3967,6 @@ const validateCiInfo = () => {
     ElMessage.error("不能添加两条共保公司相同的非永安数据！");
     return false;
   }
-  // 验证主共主联场景（cCiMrk为1）
   if (cCiMrk === "1") {
     // 检查是否所有共保公司都是永安（不允许全部为永安）
     const allYongan = ciData.every(item => item['Ci.cCoinsurerCde'] === '327001');
@@ -3947,17 +3974,12 @@ const validateCiInfo = () => {
       ElMessage.error("主共主联共保时，至少要有一条非永安的共保公司！");
       return false;
     }
-    // 检查永安分公司数量（必须录入两个以上）
-    // if (yonganCount <= 1) {
-    //   ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
-    //   return false;
-    // }
   } 
   // 验证其他场景
-  else if (cCiMrk == "1" && yonganCount <= 1) {
-    ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
-    return false;
-  }
+  // else if (cCiMrk == "1" && yonganCount <= 1) {
+  //   ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
+  //   return false;
+  // }
 
   // 验证主/从共保信息完整性
   let chiefMrkM = 0; // 主共保数量
@@ -3989,23 +4011,23 @@ const validateCiInfo = () => {
   }
   return true;
 };
-const JointInsuranceCheck = ()=> {
-    const ciData = opertaor.getTableRefByKey("ci").getFromValue()
-    if (ciData && ciData.length > 0) {
-        let CCoinsurerCdeNum = 0; // 分公司份额
-        for (const ciRow of ciData) {
-            if ("327001" === ciRow["Ci.cCoinsurerCde"]) {
-                CCoinsurerCdeNum++;
-            }
+const JointInsuranceCheck = () => {
+    try {
+        const ciData = opertaor.getTableRefByKey("ci")?.getFromValue();
+        if (!ciData) {
+            return true;
         }
-        console.log(CCoinsurerCdeNum);
-        if (CCoinsurerCdeNum <= 1) {
-            ElMessage.error("联共保时必须录入永安两个以上分公司份额！")
-            return;
+        const isValid = validateCiInfo(); // 使用已存在的校验函数
+        if (!isValid) {
+            ElMessage.error("联共保信息校验不通过，请检查联共保相关信息");
+            return false;
         }
+        return true;
+    } catch (error) {
+        ElMessage.error("联共保信息校验异常");
+        return false;
     }
-    
-}
+};
 // 将对象的属性首字母转换为小写
 function lowercaseKeys<T extends object>(
   obj: T
@@ -4154,11 +4176,31 @@ function getEdrbaseValue(key:any) {
 }
 
 function getOldProductResData() {
+  oldProductResData.value[0]['pageInfo'].forEach((i:any) => {
+    if(i.pageKey === "dist") {
+      i.pageSchema.fromSchema.forEach((item:any) => {
+        // 方案号下拉值
+        if(item.prop == 'Dist.cPlanNo'){
+          const termref = opertaor.getTableRefByKey("cvrg");
+          item.typeCode = null;
+          item.loadData = termref.getPlanNo();
+        }
+      })
+    }
+  })
   // 043010 记名投保选“是”，人员清单导入未校验所有字段必填
-  if(props.param?.cProdNo === "043010" && opertaor.getDataAll()['tgt'] && opertaor.getDataAll()['tgt']['Tgt.cIsinsuranceRegistered'] === '1') {
+  if(opertaor.getDataAll()['tgt'] && opertaor.getDataAll()['tgt']['Tgt.cIsinsuranceRegistered'] === '1') {
     const data = deepClone(oldProductResData.value);
     data[0]['pageInfo'].forEach((item:any) => {
-      if(item.pageCode === "EducatorDist043010") {
+      if(
+        item.pageCode === "EducatorDist043010" || 
+        item.pageCode === "DoctorDist049031" || 
+        item.pageCode === "EducatorDist042003" || 
+        item.pageCode === "EmployeeDist040007" || 
+        item.pageCode === "PersonnelDist040020" || 
+        item.pageCode === "PersonnelDist041001" || 
+        item.pageCode === "PersonnelDist049024"
+      ) {
         item.pageSchema.fromSchema.forEach((item:any) => {
           item.rules = [{type: 'required'}]
         })
@@ -4176,6 +4218,13 @@ function handleSaveTemplate() {
   for (const key in res) {
     if (res[key]) {
       res[key] = clearCAppNoAndCPkId(res[key]);
+      if(key === 'ci' && res[key].length > 0) {
+        res[key].forEach((item:any)=>{
+          if(item['Ci.nCiShare']){
+            item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
+          }
+        })
+      }
     }
   }
   dzmodal
@@ -4511,6 +4560,10 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 /* 用于包含行内块元素的容器 */
 .navi_container {
   line-height: 50px; /* 与容器的高度相同，实现垂直居中 */
+  position: relative;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 :deep(.el-main) {
   padding: 10px 10px 10px 10px;
@@ -4536,6 +4589,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 
 .el-anchor {
   background: transparent;
+  flex: 1;
   // width: 130px;
   :deep(.el-anchor__list) {
     padding: 20px 10px;
@@ -4562,16 +4616,51 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
         font-size: 1.2rem;
         color: #FFF;
         margin-right: 5px;
+        min-width: 24px;
+        text-align: center;
       }
       .icon-title {
         font-size: 14px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
     }
   }
 }
+
+.toggle-button {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 0 !important;
+}
+
+.toggle-nav-button {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: none !important;
+  color: white !important;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  padding: 0;
+}
+
+.toggle-nav-button:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+
+.toggle-nav-button :deep(.el-icon) {
+  color: white !important;
+  font-weight: bold;
+}
+
 .el-aside {
   width: auto;
   background: var(--el-color-primary);
+  position: relative;
+  transition: width 0.3s ease;
 }
 .font-weight-500 {
   font-weight: 500;

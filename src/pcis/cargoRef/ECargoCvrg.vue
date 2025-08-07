@@ -102,7 +102,7 @@ onMounted(() => {
   formconfig1.currentChange = currentChange;
   formconfig1.showPosition = 'right';
   formconfig1.bottomBtn = {
-    show: true,
+    hidden: false,
     plain: true,
     type: 'primary',
     label: '新增分组',

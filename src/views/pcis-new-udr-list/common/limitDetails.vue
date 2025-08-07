@@ -175,14 +175,16 @@ function handleQuery(flag?: boolean) {
           NRelatePrm.value = data.NRelatePrm;
         } else {
           ElMessageBox.confirm(msg, "提示", {
+            showCancelButton: false,
           confirmButtonText: "确定",
-          cancelButtonText: "取消",
           type: "warning",
         })
           .then(() => {
+            dialogVisible.value = false
           })
           .catch(() => {
             // 取消
+            dialogVisible.value = false
           });
         }
       } else {

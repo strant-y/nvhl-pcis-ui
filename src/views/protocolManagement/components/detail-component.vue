@@ -39,7 +39,7 @@
                       v-for="(k, i) in pageConfig?.pageInfo"
                       :key="i"
                       :custom="true"
-                      v-show="k.pageKey !== 'acctinfo' ? ['AgreementCiShare', 'AgreementCi', 'AgreementCiTcp'].includes(k.pageCode) ? isCiJiMrk :true :true"
+                      v-show="showComponent(k.pageKey, k.pageCode)"
                       @click="handleAnchorClick($event, `#${k.pageCode}`)"
                       :class="i === 0 ? 'isActive' : ''"
                   >
@@ -122,7 +122,7 @@
                 v-for="(k, i) in pageConfig?.pageInfo"
                 :key="i"
                 :id="k.pageCode"
-                v-show="k.pageKey !== 'acctinfo' ? ['AgreementCiShare', 'AgreementCi', 'AgreementCiTcp'].includes(k.pageCode) ? isCiJiMrk : true : true"
+                v-show="showComponent(k.pageKey, k.pageCode)"
             >
               <component
                 :ref="(res: any) => {
@@ -207,6 +207,14 @@ const pageData = ref({}); // 页面数据
 const getConmpName = (k: any) => {
   return k.pageCode + '-ref';
 }
+const showComponent = (compKey: string, compCode: string): boolean => {
+  if(['AgreementCiShare', 'AgreementCi', 'AgreementCiTcp'].includes(compCode)) {
+    return isCiJiMrk.value
+  }else if(['AgreementAcctinfo'].includes(compCode)) {
+    return ['2', '3'].includes(idxParam?.param?.cEdrType) // 注销 退保显示账户组件
+  }
+  return true;
+};
 const NavigaShow = ref(true);
 const underwrite = ref(null);
 const xyedrbase = ref(null)
@@ -226,6 +234,12 @@ onMounted(()=>{
   if(props.pageType === "EDR_APP_NEW_SCENE"){
     edrbaseFlag.value =true
     edritemFlag.value =true
+    if (
+        (props.pageType === "EDR_APP_NEW_SCENE" &&
+            (idxParam.param.cEdrType == "3" || idxParam.param.param == "2"))
+    ) {
+      edritemFlag.value = false;
+    }
   }else {
     edrbaseFlag.value =false
     edritemFlag.value =false

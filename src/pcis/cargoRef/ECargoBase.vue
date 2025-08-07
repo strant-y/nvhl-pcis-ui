@@ -101,6 +101,9 @@ const method = {
         .then((res:any) => {
           if (res.body) {
             const selectObj = res.body;
+            if(!(selectObj.cSignDptMrk) ||  selectObj.cSignDptMrk === '' || selectObj.cSignDptMrk === null || selectObj.cSignDptMrk === undefined || selectObj.cSignDptMrk === '0'){
+              return 	ElMessage.warning("所选机构不是出单机构");
+            }
             baseEditRef.value?.setValue("ECargoBase.cDptCde", selectObj.id);
             baseEditRef.value?.setValue("ECargoBase.cDptCnm", selectObj.name);
             baseEditRef.value?.addCodeListMap({

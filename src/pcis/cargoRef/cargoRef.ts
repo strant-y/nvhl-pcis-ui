@@ -10,6 +10,8 @@ import ECargoReview from '@/pcis/cargoRef/ECargoReview.vue';
 import ECargoSpecial from "@/pcis/cargoRef/ECargoSpecial.vue"; //
 import AgreementDistInsured from "@/pcis/cargoRef/ECargoInsured.vue"; //
 import AgreementDistTransport from "@/pcis/cargoRef/ECargoTransportDist.vue"; //
+import ECargoAcctinfo from "@/pcis/cargoRef/ECargoAcctinfo.vue"; //
+import ECargoImagedInformation from "@/pcis/cargoRef/ECargoImagedInformation.vue"; //
 
 /**用于动态组件的映射生成 */
 const componentMap = {
@@ -24,6 +26,8 @@ const componentMap = {
   AgreementSpecialRef:  markRaw(ECargoSpecial),
   AgreementDistInsuredRef:  markRaw(AgreementDistInsured),
   AgreementDistGoodsRef: markRaw(ECargoGoodsTgt),
+  AgreementAcctinfoRef: markRaw(ECargoAcctinfo),
+  AgreementImagedInformationRef: markRaw(ECargoImagedInformation),
   AgreementDistTransportRef:  markRaw(AgreementDistTransport),
 };
 
