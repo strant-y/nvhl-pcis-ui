@@ -120,7 +120,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           type: "primary",
           disabled: true, // 批单不允许进行自主临分
           func: async () => {
-            if(!getRiskDataIsMultiple()) {
+            if(getRiskDataIsMultiple()) {
               ElMessage.warning("多险位不可以自主临分，请检查险位信息。");
               return;
             }
