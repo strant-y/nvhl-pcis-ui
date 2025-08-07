@@ -216,7 +216,7 @@ onMounted(async () => {
             "Term.cRdrTyp": item.cRdrTyp,
             "Term.cUniqueTermNo": item.cUniqueTermNo,
             "Term.NSeqNo":1,
-            "Term.CPlanNo":'P1',
+            "Term.cPlanNo":'P1',
             riskList: riskList,
           };
           if (item.cRdrTyp === "1") {
@@ -347,7 +347,7 @@ function addTermData() {
               "Term.cRdrTyp": item.cRdrTyp,
               "Term.cUniqueTermNo": item.cUniqueTermNo,
               "Term.NSeqNo": index+1,
-              "Term.CPlanNo":'P1',
+              "Term.cPlanNo":'P1',
             };
           }
           if (item.cRdrTyp === "1") {
