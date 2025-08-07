@@ -165,7 +165,13 @@ const formconfig11 = ref<any>({});
 const oldPageSchema = ref<any>({});
 // 列表数据反显时，方案号的下拉选项渲染需要条款加载后根据条款获取，所以通过计算属性获取getPlanNo的值
 // 有值的时候再填充到方案号的loadData中
-const cvrg = computed(() => opertaor.getTableRefByKey("cvrg")?.getPlanNo())
+const cvrg = computed(() => {
+  if(opertaor.getTableRefByKey("cvrg") && opertaor.getTableRefByKey("cvrg").getPlanNo) {
+    return opertaor.getTableRefByKey("cvrg")?.getPlanNo()
+  } else {
+    return "";
+  }
+})
 watch(cvrg, (val) => {
   if(val && val.length > 0) {
     tableconfig.value.fromSchema.forEach( r => {

@@ -3120,7 +3120,7 @@ const calcPremiumEdr = () => {
   // const totalNum =  res['cvrg'].reduce((sum, item) => sum + (item['Term.nInsuranceAmount'] || 0), 0);
   const nInsuranceAmount:any = [];
   res['cvrg'].forEach((item:any) => {
-    if(item['Term.cRdrTyp'] === '0') {// 主险 riskList不为空则取riskList里的nInsuranceAmount累加，否则取Term.nInsuranceAmount
+    if(item['Term.cRdrTyp'] === '0') {// 主险 riskList不为空则取riskList里的nInsuranceAmount累加，否则取Term.nInsuranceAmount或Term.nAccidentLimit
       // 02系列产品 ? 从责任列表取nInsuranceAmount累加 : 只取条款里的nInsuranceAmount值
       if(props.param.cProdNo.slice(0,2) === "02") {
         if(item['Term.riskList'] && item['Term.riskList'].length > 0) {
@@ -3135,13 +3135,13 @@ const calcPremiumEdr = () => {
           if(num > 0) {
             nInsuranceAmount.push(num)
           } else {
-            nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
+            nInsuranceAmount.push(item['Term.nInsuranceAmount'] || item['Term.nAccidentLimit'] || 0)
           }
         } else {
-          nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
+          nInsuranceAmount.push(item['Term.nInsuranceAmount'] || item['Term.nAccidentLimit'] || 0)
         }
       } else {
-        nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
+        nInsuranceAmount.push(item['Term.nInsuranceAmount'] || item['Term.nAccidentLimit'] || 0)
       }
     } else if(item['Term.cClaimInclude'] === "1") {// 非主险 是否计入累计赔偿限额值为是则计入否则不计入
       nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
@@ -3733,13 +3733,13 @@ const submitEdrToUndrFun = async () => {
                 if(num > 0) {
                   nInsuranceAmount.push(num)
                 } else {
-                  nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
+                  nInsuranceAmount.push(item['Term.nInsuranceAmount'] || item['Term.nAccidentLimit'] || 0)
                 }
               } else {
-                nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
+                nInsuranceAmount.push(item['Term.nInsuranceAmount'] || item['Term.nAccidentLimit'] || 0)
               }
             } else {
-              nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
+              nInsuranceAmount.push(item['Term.nInsuranceAmount'] || item['Term.nAccidentLimit'] || 0)
             }
           } else if(item['Term.cClaimInclude'] === "1") {// 非主险 是否计入累计赔偿限额值为是则计入否则不计入
             nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
