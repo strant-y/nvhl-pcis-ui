@@ -474,7 +474,7 @@ const extermConf = ref<any>([]); // 个性化扩展槽
 const formconfig1 = reactive(
   createAppFreeEditConfig({
     fromUi: {
-      cols: 2,
+      cols: 3,
       showTitleBar: false,
     },
   })
