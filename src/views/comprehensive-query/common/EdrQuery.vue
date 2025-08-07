@@ -72,10 +72,14 @@ const removeIds = ref([]); // 删除用户ID集合 用于批量删除
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
-import { getAppPolicyList, qryEndorseList, delTmpPolicy } from "@/api/query";
+import { getAppPolicyList, qryEndorseList, delTmpPolicy, queryInsuredList } from "@/api/query";
 // 变更列
 const colChange = defineAsyncComponent(() => import("../modal/colChange.vue"));
 const PrintView = defineAsyncComponent(() => import("../modal/PrintView.vue"))
+
+let cTermNoList = ref<any>([]);  // 条款数据
+let cTermNo = '';    // 条款编码
+
 const props = defineProps({
   refreshData: {
     type: Boolean,
@@ -310,7 +314,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   label: "搜索",
                   type: "primary",
                   func: () => {
-                      handleQuery(true);
+                    esSearch(true);
                   },
               },
           },
@@ -441,6 +445,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     },
                     })
                     .then((res) => {
+                        cTermNoList.value = res;
                         setFormItem("cProdNo", {
                             loadData: res,
                         });
@@ -455,13 +460,21 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               rules: [{ type: "required" }],
               filterable: true,
               clearable: true,
-            //   typeCode: "TERM_LIST_IN_GUIDE_NEW",
-            //   codeParam: {
-            //       cParCde: cPard.value,
-            //       cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
-            //       cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
-            //   },
-              func: (val) => {
+    
+              func: (val:any) => {
+
+                if(val){
+                        if(cTermNoList.value.length>0){
+                            cTermNoList.value.forEach((ele) => {
+                                if(ele['value']  === val){
+                                    cTermNo =extractCode(ele['label'])
+                                }
+                            });
+                        }
+                       
+                }
+                 
+                  console.log('条款编码',cTermNo)
                   formconfig1.fromSchema?.forEach((item) => {
                       if (
                           item.prop === "CEmployeeName" ||
@@ -802,6 +815,209 @@ const tableCol = ref<Array<any>>([
     { title: "项目子类", prop: "m", inputtype: "rtinput", minWidth: 180 },
     { title: "询价单号", prop: "n", inputtype: "rtinput", minWidth: 180 },
 ]);
+
+// 定义两套列配置
+const esSearchColumns = [
+   {
+    prop: "policyInfo",
+    inputtype: "rtinput",
+    title: "保单",
+    minWidth: 180,
+    fixed: "left",
+   },
+   {
+    prop: "c_ply_no",
+    inputtype: "rtinput",
+    title: "批单",
+    minWidth: 180,
+   },
+   {
+    prop: "n_edr_prj_no",
+    inputtype: "rtinput",
+    title: "批改序号",
+    minWidth: 180,
+   },
+   {
+    prop: "c_nme_cn",
+    inputtype: "rtinput",
+    title: "产品名称",
+    minWidth: 180,
+   },
+   {
+    prop: "c_insured_nme",
+    inputtype: "rtinput",
+    title: "被保人名称",
+    minWidth: 180,
+   },
+   {
+    prop: "c_insured_cde",
+    inputtype: "rtinput",
+    title: "被保人证件号码",
+    minWidth: 180,
+   },
+   {
+    prop: "c_mobile",
+    inputtype: "rtinput",
+    title: "手机号码",
+    minWidth: 180,
+   },
+   {
+    prop: "c_clnt_addr",
+    inputtype: "rtinput",
+    title: "被保人地址",
+    minWidth: 180,
+   },
+   {
+    prop: "c_app_nme",
+    inputtype: "rtinput",
+    title: "投保人名称",
+    minWidth: 180,
+   },
+   {
+    prop: "t_udr_tm",
+    inputtype: "rtinput",
+    title: "核保日期",
+    minWidth: 180,
+   },
+   {
+    prop: "InsurancePeriod",
+    inputtype: "rtinput",
+    title: "保险期间",
+    minWidth: 180,
+   },
+   {
+    prop: "c_app_status",
+    inputtype: "rtselect",
+    title: "保单状态",
+    minWidth: 110,
+    loadData: [
+        { label: "暂存", value: "1" },
+        { label: "已提核", value: "2" },
+        { label: "核保退回/撤回", value: "3" },
+        { label: "核保通过", value: "4" },
+        { label: "已出保单", value: "5" },
+        { label: "已做失效操作", value: "6" },
+        { label: "已提交未接收", value: "7" },
+        { label: "见费出单退回", value: "8" },
+    ],
+    hideBtns: (row: any) => {
+        if (
+            queryType.value == "2" ||
+            queryType.value == "3" ||
+            queryType.value == "4"
+        ) {
+          return false;
+        } else {
+          return true;
+        }
+    },
+    },
+];
+const normalQueryColumns = [
+        {
+            prop: "policyInfo",
+            inputtype: "rtinput",
+            title: "保单",
+            minWidth: 180,
+            fixed: "left",
+            slotName: "policyInfo"
+        },
+        {
+            prop: "cAppNo",
+            inputtype: "rtinput",
+            title: "申请单号",
+            minWidth: 180,
+            isShow:false
+        },
+        {
+            prop: "cPlyNo",
+            inputtype: "rtinput",
+            title: "保单号",
+            minWidth: 180,
+            isShow:false
+        },
+        {
+            prop: "cEdrNo",
+            inputtype: "rtinput",
+            title: "批单号",
+            minWidth: 180,
+        },
+        {
+            prop: "cDptCnm",
+            inputtype: "rtinput",
+            title: "机构",
+            minWidth: 180,
+        },
+        {
+            prop: "cSecondDptCnm",
+            inputtype: "rtinput",
+            title: "二级分公司",
+            minWidth: 180,
+        },
+        {
+            prop: "cProdNmeCn",
+            inputtype: "rtinput",
+            title: "产品",
+            minWidth: 180,
+        },
+        {
+            prop: "cTermNo",
+            inputtype: "rtinput",
+            title: "条款",
+            minWidth: 180,
+        },
+        {
+            prop: "cUdrNme",
+            inputtype: "rtinput",
+            title: "核保人",
+            minWidth: 180,
+        },
+        {
+            prop: "tUdrTm",
+            inputtype: "rtinput",
+            title: "核保通过日期",
+            minWidth: 180,
+        },
+        {
+            prop: "nAmt",
+            inputtype: "rtinput",
+            title: "保额",
+            minWidth: 100,
+        },
+        {
+            prop: "nPrm",
+            inputtype: "rtinput",
+            title: "保费",
+            minWidth: 100,
+        },
+        {
+            prop: "cAppStatus",
+            inputtype: "rtselect",
+            title: "状态",
+            minWidth: 100,
+            loadData: [
+                { label: "暂存", value: "1" },
+                { label: "已提核", value: "2" },
+                { label: "核保退回/撤回", value: "3" },
+                { label: "核保通过", value: "4" },
+                { label: "已出保单", value: "5" },
+                { label: "已做失效操作", value: "6" },
+                { label: "已提交未接收", value: "7" },
+                { label: "见费出单退回", value: "8" },
+            ],
+            hideBtns: (row: any) => {
+                if (
+                    queryType.value == "2" ||
+                    queryType.value == "3" ||
+                    queryType.value == "4"
+                ) {
+                    return false;
+                } else {
+                    return true;
+                }
+            },
+        },
+];
 const tableObj = {
     // 查询单 投保单 保单 批单
     notWaitObj: {
@@ -979,111 +1195,6 @@ const tableObj = {
                 },
             }),
         ],
-        fromSchema: [
-						{
-              prop: "policyInfo",
-              inputtype: "rtinput",
-              title: "保单",
-              minWidth: 180,
-              fixed: "left",
-              slotName: "policyInfo"
-            },
-            {
-                prop: "cAppNo",
-                inputtype: "rtinput",
-                title: "申请单号",
-                minWidth: 180,
-                isShow:false
-            },
-            {
-                prop: "cPlyNo",
-                inputtype: "rtinput",
-                title: "保单号",
-                minWidth: 180,
-                isShow:false
-            },
-            {
-                prop: "cEdrNo",
-                inputtype: "rtinput",
-                title: "批单号",
-                minWidth: 180,
-            },
-            {
-                prop: "cDptCnm",
-                inputtype: "rtinput",
-                title: "机构",
-                minWidth: 180,
-            },
-            {
-                prop: "cSecondDptCnm",
-                inputtype: "rtinput",
-                title: "二级分公司",
-                minWidth: 180,
-            },
-            {
-                prop: "cProdNmeCn",
-                inputtype: "rtinput",
-                title: "产品",
-                minWidth: 180,
-            },
-            {
-                prop: "cTermNo",
-                inputtype: "rtinput",
-                title: "条款",
-                minWidth: 180,
-            },
-            {
-                prop: "cUdrNme",
-                inputtype: "rtinput",
-                title: "核保人",
-                minWidth: 180,
-            },
-            {
-                prop: "tUdrTm",
-                inputtype: "rtinput",
-                title: "核保通过日期",
-                minWidth: 180,
-            },
-            {
-                prop: "nAmt",
-                inputtype: "rtinput",
-                title: "保额",
-                minWidth: 100,
-            },
-            {
-                prop: "nPrm",
-                inputtype: "rtinput",
-                title: "保费",
-                minWidth: 100,
-            },
-            {
-                prop: "cAppStatus",
-                inputtype: "rtselect",
-                title: "状态",
-                minWidth: 100,
-                loadData: [
-                    { label: "暂存", value: "1" },
-                    { label: "已提核", value: "2" },
-                    { label: "核保退回/撤回", value: "3" },
-                    { label: "核保通过", value: "4" },
-                    { label: "已出保单", value: "5" },
-                    { label: "已做失效操作", value: "6" },
-                    { label: "已提交未接收", value: "7" },
-                    { label: "见费出单退回", value: "8" },
-                ],
-                hideBtns: (row: any) => {
-                    if (
-                        queryType.value == "2" ||
-                        queryType.value == "3" ||
-                        queryType.value == "4"
-                    ) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                },
-            },
-        ],
     },
 };
 let tableconfig = reactive<AppTableConfig>(
@@ -1092,6 +1203,8 @@ let tableconfig = reactive<AppTableConfig>(
 tableconfig.fixed= true;
 
 onMounted(async () => {
+    // 初始设置为普通查询列
+    setTableColumns(false);
     formconfig1.fromSchema?.forEach((item) => {
         if (
             // item.prop === "tIssueTm"
@@ -1116,10 +1229,7 @@ onMounted(async () => {
         dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
     ]);
-
 });
-
-
 
 // 绑定方法
 const method = {
@@ -1140,8 +1250,115 @@ const exRules = {
   },
 };
 
+function setTableColumns(isEsSearch: boolean) {
+  const newColumns = isEsSearch ? esSearchColumns : normalQueryColumns;
+  
+  // 创建新的配置对象
+  const newConfig = {
+    ...tableObj.notWaitObj,
+    fromSchema: newColumns
+  };
+  // 重新赋值触发响应式更新
+  Object.assign(tableconfig, newConfig);
+}
+
+// ES查询
+function esSearch(flag?: boolean) {
+  const tableRefs = tableRef.value;
+  const freeEditRefs = freeEditRef.value;
+  const r = tableRefs.getPartnerPage(flag); //获取分页数据
+  const s = freeEditRefs.getFromValue(); //获取表单数据
+
+  if (!s.cQueryStr || !s.cQueryStr.trim()) {
+    ElMessage.warning("查询条件不能为空");
+    return;
+  }
+  // ES搜索的列配置
+  setTableColumns(true);
+
+  if (s.cLoadSub == null) {
+    s.cLoadSub = "1";
+  }
+  pageresult.list = [];
+  if (
+      (s["cAppNo"] == null || s["cAppNo"] == "") &&
+      (s["cPlyNo"] == null || s["cPlyNo"] == "") &&
+      (s["cAppNme"] == null || s["cAppNme"] == "")
+  ) {
+    const startTemp =
+        s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[0] : null;
+    if (null == startTemp || undefined === startTemp) {
+      ElMessage.warning("签单日期不能为空");
+      return;
+    }
+    const start = dayjs(startTemp);
+    const endTemp = s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[1] : null;
+    if (null == endTemp || undefined === endTemp) {
+      ElMessage.warning("签单日期不能为空");
+      return;
+    }
+    const end = dayjs(endTemp);
+    if (end.isBefore(start)) {
+      ElMessage.warning("签单日期起期不能大于签单日期止期");
+      return;
+    }
+    if (end.diff(start, "year", true) > 2) {
+      ElMessage.warning("签单日期时间范围请控制在两年内");
+      return;
+    }
+  }
+  // 提取投保日期的开始时间和结束时间
+  const tAppTmStart = s.tAppTm && s.tAppTm.length > 1 ? s.tAppTm[0] : null;
+  const tAppTmEnd = s.tAppTm && s.tAppTm.length > 1 ? s.tAppTm[1] : null;
+  // 提取批改申请日期的开始时间和结束时间
+  const tEdrAppTmStart =
+      s.tEdrAppTm && s.tEdrAppTm.length > 1 ? s.tEdrAppTm[0] : null;
+  const tEdrAppTmEnd =
+      s.tEdrAppTm && s.tEdrAppTm.length > 1 ? s.tEdrAppTm[1] : null;
+  // 提取签单日期的开始时间和结束时间
+  const tIssueTmStart =
+      s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[0] : null;
+  const tIssueTmEnd =
+      s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[1] : null;
+
+  // if (currentTabKey.value == "0") {
+  const param = Object.assign(s, r);
+  param["pageNo"] = param["pageNum"];
+  param["tAppTmStart"] = tAppTmStart; // 添加投保开始时间
+  param["tAppTmEnd"] = tAppTmEnd; // 添加投保结束时间
+  param["tEdrAppTmStart"] = tEdrAppTmStart; // 添加批改开始时间
+  param["tEdrAppTmEnd"] = tEdrAppTmEnd; // 添加批改结束时间
+  param["tIssueTmStart"] = tIssueTmStart; // 添加签单开始时间
+  param["tIssueTmEnd"] = tIssueTmEnd; // 添加签单结束时间
+  param["queryType"] = queryType.value;
+  param["cTermNo"] = cTermNo;        // 条款编码
+  param["IndexName"] = 'ply_insured_ik';        // es
+  param["IndexType"] = 'ply_insured_info';       // es
+
+  queryInsuredList(param)
+      .then((res) => {
+        const { code, data, msg } = res;
+        if (200 === code) {
+          pageresult.list = [];
+          pageresult.list = data.result;
+          pageresult.list = data.result.map(item => ({
+            ...item,
+            // 创建一个新字段合并两个值
+            policyInfo: `${item.c_app_no || ''}\n${item.c_ply_no || ''}`,
+            InsurancePeriod: `${item.t_insrnc_bgn_tm || ''}\n${item.t_insrnc_end_tm || ''}`,
+          }));
+          pageresult.total = data.total;
+        } else {
+          ElMessage.error(msg);
+        }
+      })
+      .finally(() => {});
+}
+
 /** 查询 */
 function handleQuery(flag?: boolean) {
+    // 设置查询的列配置
+    setTableColumns(false);
     const tableRefs = tableRef.value;
     const freeEditRefs = freeEditRef.value;
     const r = tableRefs.getPartnerPage(flag); //获取分页数据
