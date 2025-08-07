@@ -90,6 +90,8 @@ let addrowArr = [
     "tUdrTm",
 ];
 const cPard = ref(null);
+let cTermNoList = ref<any>([]);  // 条款数据
+let cTermNo = '';    // 条款编码
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -443,6 +445,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                         // setFormItem("Applicant.cCertfCls", {
                         //     loadData: [],
                         // });
+                          cTermNoList.value = res;
                         setFormItem("cProdNo", {
                             loadData: res,
                         });
@@ -465,6 +468,17 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             //       cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
             //   },
               func: (val) => {
+                if(val){
+                        if(cTermNoList.value.length>0){
+                            cTermNoList.value.forEach((ele) => {
+                                if(ele['value']  === val){
+                                    cTermNo =extractCode(ele['label'])
+                                }
+                            });
+                        }
+                       
+                }
+
                   formconfig1.fromSchema?.forEach((item) => {
                       if (
                           item.prop === "CEmployeeName" ||
@@ -758,6 +772,15 @@ const modalForm = [
         ],
     },
 ];
+
+
+// 获取满足条款 方法
+function extractCode(str:string) {
+  // 匹配 "P+数字" 或 "纯数字"
+  const pattern = /^(P\d+|\d+)/;
+  return str.match(pattern)?.[0] || "";
+}
+
 
 // 变更列数据
 const tableCol = ref<Array<any>>([
@@ -1129,12 +1152,17 @@ function handleQuery(flag?: boolean) {
     const tAppTmStart = s.tAppTm && s.tAppTm.length > 1 ? s.tAppTm[0] : null;
     const tAppTmEnd = s.tAppTm && s.tAppTm.length > 1 ? s.tAppTm[1] : null;
 
+    console.log(3233,s)
     // if (currentTabKey.value == "0") {
     const param = Object.assign(s, r);
     param["pageNo"] = param["pageNum"];
     param["tAppTmStart"] = tAppTmStart; // 添加投保开始时间
     param["tAppTmEnd"] = tAppTmEnd; // 添加投保结束时间
     param["queryType"] = queryType.value;
+    param["cTermNo"] = cTermNo;        // 条款编码
+    // param["cTermNo"] = 'queryType.value;';
+    console.log('查询 参数',param)
+    console.log('查询 参数2',props.refreshData)
     getInquiryPolicyList(param)
         .then((res) => {
             const { code, data, msg } = res;

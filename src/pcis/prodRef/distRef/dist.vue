@@ -215,7 +215,7 @@ onMounted(async () => {
     })
   }
 
-console.log('dist -----',formconfig11.value)
+console.log('dist -----',formconfig11.value,)
 console.log('dist2 -----',formconfig11.value.fromSchema)
  
   // if(params.cProdNo === '043009'){
