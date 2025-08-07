@@ -548,11 +548,18 @@ function validate() {
           if (
             itemSchama[schama].inputtype === "rtnumber" ||
             (itemSchama[schama].inputtype === "rtinput" &&
-              itemSchama[schama].type)
+              itemSchama[schama].type === 'number')
           ) {
             if (rul && rul.length > 0) {
               rul.forEach((item: any) => {
                 item.type = "number";
+              });
+            }
+          }
+          if(itemSchama[schama].inputtype === "rtcascader"){
+            if (rul && rul.length > 0) {
+              rul.forEach((item: any) => {
+                item.type = "array";
               });
             }
           }
