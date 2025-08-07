@@ -308,7 +308,7 @@ const method = {
         return;
       }
       if (val === "0") {
-        if(cCiMrk["Base.cCiMrk"] == '1' || cCiMrk["Base.cCiMrk"] == '5'){
+        if(cCiMrk["Base.cCiMrk"] == '1' ||cCiMrk["Base.cCiMrk"] == '2'|| cCiMrk["Base.cCiMrk"] == '5'){
           if(rowData['Ci.cDptCde'] == param.cDptCde){
             ElMessage.error("联保单出单方必须是主联单的分公司！");
             freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
@@ -400,19 +400,19 @@ const method = {
     }
     const cCiMrk = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
     if (cCiMrk === "2" || cCiMrk === "4") {
-      updateMasterAgreementValues();
-      const allData =  getFromValue();
-      for (let i = 1; i < allData.length; i++) {
-        const currentRow = allData[i];
-        const previousRow = allData[i - 1];
-        const currentPremium = parseFloat(currentRow["Ci.nCiPrm"] || 0);
-        const previousPremium = parseFloat(previousRow["Ci.nCiPrm"] || 0);
-        const diff = Math.abs(currentPremium - previousPremium);
-        if (diff > 1) {
-          ElMessage.error('联共保保费之间的误差不能大于1');
-          break;
-        }
-      }
+      // updateMasterAgreementValues();
+      // const allData =  getFromValue();
+      // for (let i = 1; i < allData.length; i++) {
+      //   const currentRow = allData[i];
+      //   const previousRow = allData[i - 1];
+      //   const currentPremium = parseFloat(currentRow["Ci.nCiPrm"] || 0);
+      //   const previousPremium = parseFloat(previousRow["Ci.nCiPrm"] || 0);
+      //   const diff = Math.abs(currentPremium - previousPremium);
+      //   if (diff > 1) {
+      //     ElMessage.error('联共保保费之间的误差不能大于1');
+      //     break;
+      //   }
+      // }
     }
     updateMasterAgreementValues();
     onChiefMrkChange()

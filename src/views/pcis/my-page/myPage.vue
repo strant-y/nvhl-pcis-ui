@@ -2589,6 +2589,10 @@ const submitToUndrFn = async () => {
   const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk')
   if ('1' === CiMrk || '2' === CiMrk || '5' === CiMrk) {
       const validCi = JointInsuranceCheck();
+      // 如果联共保校验不通过，则不继续执行后续逻辑
+      if (!validCi) {
+          return false;
+      }
   }
 	// 申请核保前判断是否灰黑名单
 	const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
@@ -3910,7 +3914,6 @@ const validateCiInfo = () => {
     ElMessage.error("不能添加两条共保公司相同的非永安数据！");
     return false;
   }
-  // 验证主共主联场景（cCiMrk为1）
   if (cCiMrk === "1") {
     // 检查是否所有共保公司都是永安（不允许全部为永安）
     const allYongan = ciData.every(item => item['Ci.cCoinsurerCde'] === '327001');
@@ -3918,17 +3921,12 @@ const validateCiInfo = () => {
       ElMessage.error("主共主联共保时，至少要有一条非永安的共保公司！");
       return false;
     }
-    // 检查永安分公司数量（必须录入两个以上）
-    // if (yonganCount <= 1) {
-    //   ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
-    //   return false;
-    // }
   } 
   // 验证其他场景
-  else if (cCiMrk == "1" && yonganCount <= 1) {
-    ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
-    return false;
-  }
+  // else if (cCiMrk == "1" && yonganCount <= 1) {
+  //   ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
+  //   return false;
+  // }
 
   // 验证主/从共保信息完整性
   let chiefMrkM = 0; // 主共保数量
@@ -3960,23 +3958,23 @@ const validateCiInfo = () => {
   }
   return true;
 };
-const JointInsuranceCheck = ()=> {
-    const ciData = opertaor.getTableRefByKey("ci").getFromValue()
-    if (ciData && ciData.length > 0) {
-        let CCoinsurerCdeNum = 0; // 分公司份额
-        for (const ciRow of ciData) {
-            if ("327001" === ciRow["Ci.cCoinsurerCde"]) {
-                CCoinsurerCdeNum++;
-            }
+const JointInsuranceCheck = () => {
+    try {
+        const ciData = opertaor.getTableRefByKey("ci")?.getFromValue();
+        if (!ciData) {
+            return true;
         }
-        console.log(CCoinsurerCdeNum);
-        if (CCoinsurerCdeNum <= 1) {
-            ElMessage.error("联共保时必须录入永安两个以上分公司份额！")
-            return;
+        const isValid = validateCiInfo(); // 使用已存在的校验函数
+        if (!isValid) {
+            ElMessage.error("联共保信息校验不通过，请检查联共保相关信息");
+            return false;
         }
+        return true;
+    } catch (error) {
+        ElMessage.error("联共保信息校验异常");
+        return false;
     }
-    
-}
+};
 // 将对象的属性首字母转换为小写
 function lowercaseKeys<T extends object>(
   obj: T
