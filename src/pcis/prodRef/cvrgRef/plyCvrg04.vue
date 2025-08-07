@@ -57,7 +57,7 @@
                   <tremTemplate
                     v-for="(i, index) in planData[k]['m']"
                     :key="index"
-                    :rowIndex="i['Term.CPlanNo']"
+                    :rowIndex="i['Term.cPlanNo']"
                     v-model="planData[k]['m'][index]"
                     :disabled-flag="disAbledFlag"
                     @delete="
@@ -96,7 +96,7 @@
                     <tremTemplate
                       v-for="(i, index) in planData[k]['a1']"
                       :key="index"
-                      :rowIndex="i['Term.CPlanNo']"
+                      :rowIndex="i['Term.cPlanNo']"
                       v-model="planData[k]['a1'][index]"
                       :disabled-flag="disAbledFlag"
                       @delete="
@@ -259,7 +259,7 @@ const showTitleMap = ref<{ [key: string]: string }>({});
 
 function updateTitle() {
   Object.keys(planData.value).forEach((k: any) => {
-    if (parparam.cProdNo === "043009" || parparam.cProdNo === "040003") {
+    if (parparam.cProdNo === "043009" || parparam.cProdNo === "040003" || parparam.cProdNo === "042003") {
       const terms = planData.value[k];
       // 获取模版字符串
       let str = prodTemple.value.default;
@@ -343,7 +343,7 @@ function addAndinitData() {
             "Term.cRdrTyp": item.cRdrTyp,
             "Term.cUniqueTermNo": item.cUniqueTermNo,
             "Term.NSeqNo":1,
-            "Term.CPlanNo":pl,
+            "Term.cPlanNo":pl,
             "Term.cDeductibleMethod": "01",
             riskList: riskList,
           };
@@ -535,7 +535,7 @@ function addTermData(PlanNo: string) {
               "Term.cRdrTyp": item.cRdrTyp,
               "Term.cUniqueTermNo": item.cUniqueTermNo,
               "Term.NSeqNo": index+1,
-              "Term.CPlanNo":PlanNo,
+              "Term.cPlanNo":PlanNo,
             };
           }
           data.riskList = riskList;
