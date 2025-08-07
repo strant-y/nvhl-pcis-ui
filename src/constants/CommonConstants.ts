@@ -27,6 +27,10 @@ export class CommonConstants {
      */
     static readonly FORM_EDIT_TYPE_GRID: string = 'grid';
     /**
+     * 组件类型 table 表格
+     */
+    static readonly FORM_EDIT_TYPE_TABLE: string = 'table';
+    /**
      * 组件类型 CUSTOM 自定义
      */
     static readonly FORM_EDIT_TYPE_CUSTOM: string = 'custom';

@@ -309,17 +309,8 @@ const getEdrRsnItemFun = (
   getEdrRsnItem(res).then((res: any) => {
     if (res["code"] == "200") {
       const result = res["data"]["result"];
-      const edrList: any[] = [];
-      result.forEach((key: any) => {
-        if (key["cOperTyp"] === "M") {
-          edrList.push(key["cEdrItem"]);
-        } else if (key["cOperTyp"] === "B") {
-          edrList.push("Btn_" + key["cEdrItem"]);
-        }
-      });
-      console.log('edrList', edrList)
-      // console.log('edrList',edrList)
-      formPage.value?.setUnDisabledByKeyList(edrList); // 根据list集合,放开需要的要素
+      console.log('edrList', result)
+      formPage.value?.setUnDisabledByKeyList(result); // 根据list集合,放开需要的要素
       ElMessage.success(res.msg);
     } else {
       ElMessage.error(res.msg);

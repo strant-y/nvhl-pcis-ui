@@ -314,7 +314,7 @@
       </el-table-column>
     </el-table>
     <el-button
-        v-if="props.item.bottomBtn && props.item.bottomBtn.show"
+        v-if="props.item.bottomBtn && !props.item.bottomBtn.hidden"
         class="mt-4"
         :type="props.item.bottomBtn.type ? props.item.bottomBtn.type : 'info'"
         :plain="props.item.bottomBtn.plain"

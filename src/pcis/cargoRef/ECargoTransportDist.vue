@@ -564,7 +564,7 @@ function setFormValue(value: any) {
 }
 
 function getFormConfig(){
-  return formconfig1.value;
+  return tableconfig.value;
 }
 function validate() {
   return new Promise(resolve => {

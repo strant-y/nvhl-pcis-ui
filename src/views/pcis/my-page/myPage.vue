@@ -4167,6 +4167,13 @@ function handleSaveTemplate() {
   for (const key in res) {
     if (res[key]) {
       res[key] = clearCAppNoAndCPkId(res[key]);
+      if(key === 'ci' && res[key].length > 0) {
+        res[key].forEach((item:any)=>{
+          if(item['Ci.nCiShare']){
+            item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
+          }
+        })
+      }
     }
   }
   dzmodal

@@ -120,7 +120,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           type: "primary",
           disabled: true, // 批单不允许进行自主临分
           func: async () => {
-            if(!getRiskDataIsMultiple()) {
+            if(getRiskDataIsMultiple()) {
               ElMessage.warning("多险位不可以自主临分，请检查险位信息。");
               return;
             }
@@ -146,7 +146,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             }
             const checkLibertyInfo = params.pageName === "priceInquiry" ? await policyService.checkLibertyXJ(param) : await policyService.checkLiberty(param);
             if(checkLibertyInfo && checkLibertyInfo.code === '1') {
-              ElMessage.success("自主临分提交成功");
+              ElMessageBox.confirm("自主临分已提交，请线下向再保部提交临分申报材料！", "提示", {
+                showCancelButton: false,
+                confirmButtonText: "确定",
+                type: "warning",
+                lockScroll: false,
+              }).then(() => {});
               // 自主临分成功后，是否临分、风险单位划分不可编辑，不能核保退回
               setFormItem("riFacMrk", {
                 btnItems: {disabled: true}
