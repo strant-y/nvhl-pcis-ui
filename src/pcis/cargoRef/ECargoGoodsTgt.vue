@@ -544,7 +544,7 @@ function setFormValue(value: any) {
   setTableData(value);
 }
 function getFormConfig(){
-  return formconfig1.value;
+  return tableconfig.value;
 }
 function getFormBtn() {
   return distTableRef?.value?.getFormBtn();

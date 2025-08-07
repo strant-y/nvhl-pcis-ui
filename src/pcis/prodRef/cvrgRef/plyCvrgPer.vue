@@ -182,6 +182,17 @@ onMounted(async () => {
     method,
     exRules
   );
+  let deleteId = 0 ;
+  if(formconfig11.titleBtns){
+    formconfig11.titleBtns.forEach((item: any,index :number) => {
+      if(item.id === 'selectGoods'){
+        deleteId = index;
+      }
+    });
+  }
+  if(!parparam.cProdNo.startsWith("02") && deleteId > 0){ // 只有货运险,需要选择获取按钮
+    formconfig11.titleBtns?.splice(deleteId,1);
+  }
   Object.assign(cardconfig.value, formconfig11);
   if (parparam.pageType === "app" && parparam.cRecordType != 4) {
     // 新建保单时,初始化条款信息

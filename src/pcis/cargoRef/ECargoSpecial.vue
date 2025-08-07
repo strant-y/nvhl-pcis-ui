@@ -65,7 +65,7 @@ const tableconfig = reactive<AppTableConfig>(
       align: "left",
       tableBtn: [
         createFreeButtonBase({
-          id: "score",
+          id: "edit",
           link: true,
           tooltip: "编辑",
           type: "success",
@@ -82,7 +82,7 @@ const tableconfig = reactive<AppTableConfig>(
           },
         }),
         createFreeButtonBase({
-          id: "score",
+          id: "delete",
           link: true,
           tooltip: "删除",
           type: "danger",
@@ -108,7 +108,7 @@ const tableconfig = reactive<AppTableConfig>(
           },
         }),
         createFreeButtonBase({
-          id: "score",
+          id: "top",
           link: true,
           tooltip: "上移",
           type: "success",
@@ -122,7 +122,7 @@ const tableconfig = reactive<AppTableConfig>(
           },
         }),
         createFreeButtonBase({
-          id: "score",
+          id: "bottom",
           link: true,
           tooltip: "下移",
           type: "success",
@@ -456,13 +456,17 @@ const  deepClone =(obj:any)=> {
   
   return clone;
 }
+function getTableBtn() {
+  return tableconfig.tableBtn;
+}
 defineExpose({
   getFormValue,
   setFormValue,
   validate,
   getFormBtn,
   setDisabledAll,
-  getFormConfig
+  getFormConfig,
+  getTableBtn
 });
 </script>
 

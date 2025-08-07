@@ -366,7 +366,7 @@ import {
   queryTermRateLimit,
 	queryEcargoRelevancePolicyDetails
 } from "../../../api/query/index";
-import { checkFeeWindowType, selectDist, saveDistBatch, getReleaseInquiryPage } from "@/api/prod";
+import { checkFeeWindowType, selectDist, saveDistBatch, getReleaseInquiryPage, copyDist } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
 import moment from "moment";
 import {numAdd, numComparison, numMulti, numSubp, tool_fix} from "@/utils/Math";
@@ -2097,7 +2097,7 @@ const getDistData = (appNo:any, item: any) => {
 
   selectDist(selData).then((res: any) => {
     if (res.code === 200) {
-      opertaor.getTableRefs()[item.pageCode].setTableData(res.data.data);
+      opertaor.getTableRefs()[item.pageCode].setTableData(res.data.data, res.data.total);
     }
   });
   // 调用接口查询清单对应的汇总的pageCode
@@ -2130,63 +2130,37 @@ const getCAppNoFun = () => {
 };
 const saveDistBatchFlag = ref(true);
 // 批量保存清单
-const saveDist = (appNo:any) => {
+const saveDist = (appNo:any, cRsnCde?:any) => {
   const distMap = formconfig1[0].pageInfo.filter((item:any) => {
     return item.pageKey === "dist";
   });
-  const selData = {
-    pageSize: 99999,
-    pageNum: 1,
-  };
-  if(props.param?.pageType === "copy") {
-    selData.cAppNo = props.param.cAppNo
+  const params = {};
+  if(cRsnCde) {
+    params['cRsnCde'] = cRsnCde;
+    params['cAppNo'] = props.param?.cOrgAppNo;
+    params['targetNo'] = appNo;
+  } else if(props.param?.pageType === "template") {
+    params['cAppNo'] = parseData.value.plyBase['Base.cAppNo'];
+    params['targetNo'] = appNo;
+  } else if(props.param?.pageType === "inquiryToApp") {
+    params['cInquiryNo'] = props.param?.cInquiryNo;
+    params['targetNo'] = appNo;
+  } else {
+    params['cAppNo'] = props.param?.cAppNo;
+    params['targetNo'] = appNo;
   }
-  if(props.param?.pageType === "template") {
-    selData.cAppNo = parseData.value.plyBase['Base.cAppNo']
-  }
-  if(props.param?.pageType === "inquiryToApp") {
-    selData.cInquiryNo = props.param?.cInquiryNo
-  }
-  distMap.forEach(async (item:any) => {
-    selData.cComponentTable = "";
-    let data = [];
-
-    selData.cComponentTable = item.pageCode.replace(/\d+/g, '')
-    // 如果清单数据过多涉及分页，则批量保存时需要查询全量的清单数据进行保存
-    const queryAllDist = await selectDist(selData);
-    if(queryAllDist && queryAllDist.data && queryAllDist.data.data && queryAllDist.data.data.length > 0) {
-      data = queryAllDist.data.data
-    }
-    
-    if(data && data.length > 0) {
-      const param = {
-        cComponentTable: item.pageCode.slice(0, -6),
-        cAppNo: appNo,
-        dist: data.map((item:any) => {
-          return {
-            ...item,
-            'Dist.tOpeningTime': item['Dist.tOpeningTime'] ? dayjs(item['Dist.tOpeningTime']).format('YYYY-MM-DD') : null,
-            'Dist.tCrtTm': item['Dist.tCrtTm'] ? dayjs(item['Dist.tCrtTm']).format('YYYY-MM-DD') : null,
-            'Dist.tUpdTm': item['Dist.tUpdTm'] ? dayjs(item['Dist.tUpdTm']).format('YYYY-MM-DD') : null,
-            'Dist.tValidityPeriod': item['Dist.tValidityPeriod'] ? dayjs(item['Dist.tUpdTm']).format('YYYY-MM-DD HH:mm:ss') : null
-          };
-        }),
-      }
-      saveDistBatch(param).then((res:any) => {
-        if(res.code === 200) {
-          // 批量保存清单成功后再查询一遍清单
-          distMap.forEach((item:any) => {
-            opertaor.getTableRefs()[item.pageCode].handleQuery();
-          });
-          saveDistBatchFlag.value = false;
-        } else {
-          ElMessage.error(res.msg);
-        }
-      }).catch((err:any) => {
-        ElMessage.error(err);
+  copyDist(params).then((res:any) => {
+    if(res && res.code === 200) {
+      distMap.forEach((item:any) => {
+        opertaor.getTableRefs()[item.pageCode].handleQuery();
       });
+      saveDistBatchFlag.value = false;
+    } else {
+      ElMessage.error(res.msg);
     }
-  });
+  }).catch((err:any) => {
+    ElMessage.error(err.msg);
+  })
 }
 /**
  * 加载投保单明细
@@ -3535,13 +3509,10 @@ const saveEdrPlyInfo = async () => {
     //   );    //影响二次批改报错,先注释掉待调整
     edrbase.value?.setFormValue(EdrBaseData);
     saveEdrFlag = true;
-    // 清单列表数据
-    const distMap = formconfig1[0].pageInfo.filter((item:any) => {
-      return item.pageKey === "dist";
-    });
-    distMap.forEach((item:any) => {
-      getDistData(EdrBaseData['EdrBase.cAppNo'], item)
-    });
+    if(props.param.pageType === "EDR_APP_NEW_SCENE" && saveDistBatchFlag.value) {
+      // 复制保单清单信息到批单中
+      saveDist(EdrBaseData['EdrBase.cAppNo'], props.param?.cRsnCde)
+    }
   } else {
     ElMessage.error(edrInfo.msg);
   }
@@ -4154,6 +4125,18 @@ function getEdrbaseValue(key:any) {
 }
 
 function getOldProductResData() {
+  oldProductResData.value[0]['pageInfo'].forEach((i:any) => {
+    if(i.pageKey === "dist") {
+      i.pageSchema.fromSchema.forEach((item:any) => {
+        // 方案号下拉值
+        if(item.prop == 'Dist.cPlanNo'){
+          const termref = opertaor.getTableRefByKey("cvrg");
+          item.typeCode = null;
+          item.loadData = termref.getPlanNo();
+        }
+      })
+    }
+  })
   // 043010 记名投保选“是”，人员清单导入未校验所有字段必填
   if(opertaor.getDataAll()['tgt'] && opertaor.getDataAll()['tgt']['Tgt.cIsinsuranceRegistered'] === '1') {
     const data = deepClone(oldProductResData.value);
@@ -4184,6 +4167,13 @@ function handleSaveTemplate() {
   for (const key in res) {
     if (res[key]) {
       res[key] = clearCAppNoAndCPkId(res[key]);
+      if(key === 'ci' && res[key].length > 0) {
+        res[key].forEach((item:any)=>{
+          if(item['Ci.nCiShare']){
+            item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
+          }
+        })
+      }
     }
   }
   dzmodal

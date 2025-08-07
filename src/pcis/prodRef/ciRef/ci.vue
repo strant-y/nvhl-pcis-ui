@@ -24,6 +24,7 @@ import CostInformation from "@/views/pcis-new-udr-list/pages/CostInformation.vue
 import { constantRoutes } from "@/router";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 import { saveAs } from "file-saver";
+import { fa } from "element-plus/es/locale";
 const policyService = new PolicyService();
 const productStore = useProductStore();
 const dialogRef = ref<DialogMethod | null>(null);
@@ -229,12 +230,15 @@ const method = {
   // 联保机构、出单机构 级联选择change事件
   dptCascaderChange: (value: any[], rowData: any) => {
     const rowId = rowData._dataId;
+
+    const oldSubDptCde = rowData["Ci.cCiSubComp"]; // 原始分公司代码
+    const oldDptCde = rowData["Ci.cDptCde"];
+
     if(value && value.length > 0){
       const subDptCde = value[0]; // 分公司代码
       const dptCde = value[1]; // 出单机构代码
       freeEditRef.value?.setValueByRowKey("Ci.cCiSubComp", rowId, subDptCde);
       freeEditRef.value?.setValueByRowKey("Ci.cDptCde", rowId, dptCde);
-
       // 校验
       onChiefMrkChange();
       // 获取所有行数据
@@ -258,6 +262,18 @@ const method = {
       freeEditRef.value?.setValueByRowKey("Ci.cCiSubComp", rowId, undefined);
       freeEditRef.value?.setValueByRowKey("Ci.cDptCde", rowId, undefined);
     }
+    // 如果级联选择器的值发生变化（分公司或出单机构任意一个发生变化），则清空当前行的业务员信息
+    if (oldSubDptCde !== value?.[0] || oldDptCde !== value?.[1]) {
+      // 清空业务员相关信息
+      freeEditRef?.value?.setValueByRowKey("Ci.cSlsCde", rowId, "");
+      freeEditRef?.value?.setValueByRowKey("Ci.cSlsNme", rowId, "");
+      freeEditRef?.value?.setValueByRowKey("Ci.cBrkrCde", rowId, "");
+      freeEditRef?.value?.setValueByRowKey("Ci.cBrkSlsCde", rowId, "");
+      
+      // 重新校验必填规则
+      valideRequired();
+    }
+
   },
   dptCascaderOnInit: (data: any) =>{
     const {value, rowData, config, itemRef} = data;
@@ -352,16 +368,24 @@ const method = {
     const floatValue = parseFloat(val);
     if (!isNaN(floatValue) && isFinite(floatValue)) {
       // 判断是否是合法数字且不是 Infinity
-      if (floatValue < 0 || floatValue > 100) {
-        ElMessage.warning("联共保比例必须大于等于0且小于等于100");
+      // 修改范围为1-100之间
+      if (floatValue < 1 || floatValue > 100) {
+        ElMessage.warning("联共保比例必须大于等于1且小于等于100");
         freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, "");
         return;
       }
-      const limitedValue = floatValue.toFixed(8); // 最多保留8位小数
+      // 保留8位小数
+      const limitedValue = floatValue.toFixed(8);
       freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, limitedValue);
     } else {
+      // 如果输入为空或其他非数字情况
+      if (val === "" || val === null || val === undefined) {
+        freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, "");
+        return;
+      }
       ElMessage.error("请输入合法的数字");
       freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, "");
+      return;
     }
     // 计算当前所有行的总和（排除当前行）
     const allRows = getFromValue();
@@ -401,10 +425,55 @@ const method = {
   },
   //出单费比例
   nPlyFeeRateChange:(val,row)=>{
-    debugger
-    // const rowDatas = freeEditRef.value?.getSelectRow();
-    const nPlyFee = val/100 * row["Ci.nCiPrm"]
-    freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee",row._dataId,nPlyFee.toFixed(2))
+    // 校验输入是否为有效数字
+    if (val === "" || val === null || val === undefined) {
+      freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", row._dataId, "");
+      return;
+    }
+    
+    // 将输入值转换为浮点数
+    const floatValue = parseFloat(val);
+    // 校验是否为有效数字
+    if (isNaN(floatValue)) {
+      ElMessage.warning("请输入有效的数字");
+      // 重置为0
+      freeEditRef?.value?.setValueByRowKey("Ci.nPlyFeeRate", row._dataId, "0.000000");
+      freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", row._dataId, "0.00");
+      return;
+    }
+    // 限制出单费比例范围（0-100）
+    if (floatValue < 0 || floatValue > 100) {
+      ElMessage.warning("出单费比例应在0-100之间");
+      freeEditRef?.value?.setValueByRowKey("Ci.nPlyFeeRate", row._dataId, "");
+      freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", row._dataId, "0.00");
+      return;
+    }
+    // 格式化出单费比例为6位小数
+    // const formattedRate = floatValue.toFixed(6);
+    // freeEditRef?.value?.setValueByRowKey("Ci.nPlyFeeRate", row._dataId, formattedRate);
+    // 根据新的出单费比例和共保保费计算出单费用
+    const nCiPrm = parseFloat(row["Ci.nCiPrm"] || 0);
+    const nPlyFee = (floatValue / 100) * nCiPrm;
+    // 出单费用保留2位小数
+    freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", row._dataId, nPlyFee.toFixed(2));
+  },
+  //保单编号change事件
+  cPolicyNoChange:(val, row)=>{
+    // 校验保单编号只能包含数字和大写字母
+    if (val) {
+      // 使用正则表达式校验，只允许数字和大写字母
+      const validPattern = /^[A-Z0-9]*$/;
+      if (!validPattern.test(val)) {
+        // 如果包含非法字符，提示错误并清除非法字符
+        ElMessage.warning("保单编号只能包含数字和大写字母");
+        // 清除非法字符，只保留数字和大写字母
+        const cleanedValue = val.replace(/[^A-Z0-9]/g, '');
+        // 更新当前行的保单编号字段
+        const rowId = row._dataId;
+        freeEditRef?.value?.setValueByRowKey("Ci.cPolicyNo", rowId, cleanedValue);
+        return;
+      }
+    }
   },
   //开户行大类改变
   cBankRelTypChange:(val)=>{
@@ -519,10 +588,11 @@ const method = {
         },
         method: {
           getSelected: (params) => {
+            console.log("00000",params)
             // freeEditRef?.value?.setValueByRowKey("Ci.cBrkrCde", rowId, params.CChaCde);
-            freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData",[{ label: `${params.CChaCde}${params.CSlsNme}`, value: params.CChaCde }])
+            freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData",[{ label: `${params.CChaCde}${params.CChaNme}`, value: params.CChaCde }])
             freeEditRef.value?.setRowFieldProp("Ci.cBrkrCde",rowId,params.CChaCde)
-            freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData",[])
+            // freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData",[])
             dialogRef.value?.handleClose();
           },
         },
@@ -629,7 +699,6 @@ const method = {
 
           policyService.importCi(params).then((res:any) => {
             if (res.code === 200) {
-              debugger
             } else {
               ElMessage.error(res.msg || "增量导入失败");
             }
@@ -872,7 +941,7 @@ const valideRequired = ()=>{
           freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.cDptCde", "disabled", true
           );
-          
+          freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cPolicyNo","disabled",false)
           const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
           if (rowItem) {
             rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
@@ -946,6 +1015,7 @@ const valideRequired = ()=>{
           freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.cDptCde", "disabled", false
           );
+          freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cPolicyNo","disabled",true)
         }
         
         // 出单标志处理
@@ -958,14 +1028,14 @@ const valideRequired = ()=>{
         }
         
         // 核保状态下禁用相关字段
-        if(param?.cAppTyp == 'A'){ //核保
-          const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
-          if (rowItem) {
-            rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
-            rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
-            rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
-          }
-        }
+        // if(param?.cAppTyp == 'A'){ //核保
+        //   const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+        //   if (rowItem) {
+        //     rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
+        //     rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
+        //     rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
+        //   }
+        // }
         
         // 特殊页面类型处理
         if (param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && cCiMrkValue =='5' && param.cRsnDetailCde.value == "FZ") {

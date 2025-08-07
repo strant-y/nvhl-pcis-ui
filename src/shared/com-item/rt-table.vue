@@ -314,7 +314,7 @@
       </el-table-column>
     </el-table>
     <el-button
-        v-if="props.item.bottomBtn && props.item.bottomBtn.show"
+        v-if="props.item.bottomBtn && !props.item.bottomBtn.hidden"
         class="mt-4"
         :type="props.item.bottomBtn.type ? props.item.bottomBtn.type : 'info'"
         :plain="props.item.bottomBtn.plain"
@@ -548,11 +548,18 @@ function validate() {
           if (
             itemSchama[schama].inputtype === "rtnumber" ||
             (itemSchama[schama].inputtype === "rtinput" &&
-              itemSchama[schama].type)
+              itemSchama[schama].type === 'number')
           ) {
             if (rul && rul.length > 0) {
               rul.forEach((item: any) => {
                 item.type = "number";
+              });
+            }
+          }
+          if(itemSchama[schama].inputtype === "rtcascader"){
+            if (rul && rul.length > 0) {
+              rul.forEach((item: any) => {
+                item.type = "array";
               });
             }
           }

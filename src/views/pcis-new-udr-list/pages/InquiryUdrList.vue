@@ -702,8 +702,8 @@
             tableClick: (row) => {
                 // showDetails(row)
                 const res = {};
-                res["cUndrMrk"] = "W";
-                res["undrMrk"] = "W";
+                res["cUndrMrk"] = "RB";
+                res["undrMrk"] = "RB";
                 res["user"] = JSON.parse(sessionStorage.getItem("user"));
                 res["user"]["opRelCde"] = "10030892";
                 res["inquiryNo"] = row.objId;

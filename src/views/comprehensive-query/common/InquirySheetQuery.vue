@@ -818,6 +818,7 @@ const tableObj = {
                     const r = await row;
                     if (r) {
                         const data = row;
+                        data.cPolicySource = '6'
                         router.push({
                             path: "/pcis/my-page",
                             query: {
@@ -851,6 +852,7 @@ const tableObj = {
                     console.log(row);
                     const r = await row;
                     if (r) {
+                        r.cPolicySource = '6'
                         const data = row;
                         router.push({
                             path: "/pcis/my-page",
@@ -935,6 +937,7 @@ const tableObj = {
                     }
                 },
                 tableClick: (row) => {
+                    row.cPolicySource = '6'
                     router.push({
                         path: "/pcis/my-page",
                         query: {

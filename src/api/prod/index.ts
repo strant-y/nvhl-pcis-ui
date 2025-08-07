@@ -1534,3 +1534,13 @@ export function getEdrNmeByCde(queryParams: any): AxiosPromise<any> {
     return post(`/edr/getNmeByCde`, queryParams);
 }
 
+
+/**
+ * 复制清单信息
+ *
+ * @param queryParams
+ */
+export function copyDist(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/copyDist`, queryParams);
+}
+

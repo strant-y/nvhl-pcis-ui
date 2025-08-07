@@ -163,6 +163,20 @@ const distSummaryRef = ref(); // 汇总组件对象
 const collectCompKey = ref(); // 汇总组件key
 const formconfig11 = ref<any>({});
 const oldPageSchema = ref<any>({});
+// 列表数据反显时，方案号的下拉选项渲染需要条款加载后根据条款获取，所以通过计算属性获取getPlanNo的值
+// 有值的时候再填充到方案号的loadData中
+const cvrg = computed(() => opertaor.getTableRefByKey("cvrg")?.getPlanNo())
+watch(cvrg, (val) => {
+  if(val && val.length > 0) {
+    tableconfig.value.fromSchema.forEach( r => {
+      // 方案号
+      if(r['prop'] == 'Dist.cPlanNo'){
+        r.typeCode = null;
+        r.loadData = val;
+      }
+    });
+  }
+});
 onMounted(async () => {
   // 初始化 cComponentTableValue
   cComponentTableValue = getCComponentTableValue();
@@ -1065,7 +1079,7 @@ function getTableData() {
   return pageresult.list
 }
 
-function setTableData(data: any) {
+function setTableData(data: any, total:any) {
   pageresult.list = data.map((item: any, index: any) => {
 		let dataNew:any = {}
 		if(!!item['Dist.cMajorCategories'] || !!item['Dist.cMediumClassification'] || !!item['Dist.cOccupationalSubcategory']){
@@ -1084,6 +1098,7 @@ function setTableData(data: any) {
       }
     };
   });
+  pageresult.total = total || 0;
 }
 
 function handleQuery() {
