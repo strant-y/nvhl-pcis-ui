@@ -259,7 +259,7 @@ const showTitleMap = ref<{ [key: string]: string }>({});
 
 function updateTitle() {
   Object.keys(planData.value).forEach((k: any) => {
-    if (parparam.cProdNo === "043009" || parparam.cProdNo === "040003") {
+    if (parparam.cProdNo === "043009" || parparam.cProdNo === "040003" || parparam.cProdNo === "042003") {
       const terms = planData.value[k];
       // 获取模版字符串
       let str = prodTemple.value.default;
