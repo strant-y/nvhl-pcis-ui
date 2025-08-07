@@ -183,6 +183,7 @@ function handleQuery(flag?: boolean) {
     {
       CPlyNo: props.objId,
       CDataTyp: "claim",
+      endorsementFlag: 1,
       pageSize: 10,
       pageNum: 1,
     },

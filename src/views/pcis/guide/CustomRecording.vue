@@ -447,7 +447,7 @@ const getDptCdeList = ()=> {
 const cDptCdeLoading = ref(false);
 const getCDptCdeList = (data: any)=> {
     cDptCdeLoading.value = true;
-    listChrDepts({cDptRelCde: data,cSignDptMrk: '1',cDptCls: '5'}).then(({data, code}) => {
+    listChrDepts({cDptRelCde: data,cSignDptMrk: '1',cDptCls: '2'}).then(({data, code}) => {
         if (code === 200) {
             cDptCdeList.value = data.map((item) => ({
                 value: item.cDptCde,

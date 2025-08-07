@@ -391,6 +391,9 @@ const method = {
       setFormItem('Tgt.cBareboatLessee', {
         rules: [getRules("required", {})],
       });
+
+
+      setFormItem('Tgt.P&I_CLUB', {rules: [getRules("required", {})]})
       // setFormItem('Tgt.cBareboatLessee', {
       //   rules: [getRules("required", {})],
       // });
@@ -398,6 +401,7 @@ const method = {
       setFormItem('Tgt.cBareboatLessee', {
         rules: null
       });
+       setFormItem('Tgt.P&I_CLUB', {rules: []})
     }
   },
   getcRentalLogoChange:(val:string)=>{
@@ -814,6 +818,8 @@ const method = {
     // Tgt.nSeatsNumber 核定总数
     // Tgt.nSeatCapacity 投保总数
     // const start = getValue("Tgt.tPlannedDate");
+
+    // Tgt.P&I_CLUB
     const nSeatCapacity = getValue("Tgt.nSeatCapacity");
 
     if (v !== nSeatCapacity) {
