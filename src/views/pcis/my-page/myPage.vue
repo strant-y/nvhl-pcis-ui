@@ -1,150 +1,203 @@
-<!-- 用户管理 -->
+<!-- 投保页面 -->
 <template>
   <div class="mypage-app">
     <el-container class="dynamic-container" ref="scrollContainer">
-      <el-aside :width="(NavigaShow ? 200 : 100) + 'px'">
+      <el-aside :width="NavigaShow ? '200px' : '70px'" class="mypage-aside">
         <!-- <el-affix :offset="100"> -->
-          <div class="navi_container">
-            <div
-              v-for="(pageConfig, v) in formconfig1"
-              :key="v"
-              class="NavigaList_card"
-            >
-              <el-anchor :bound="120" :offset="80">
-                <el-anchor-link
-                  v-if="edrbaseFlag"
-                  @click="handleAnchorClick($event, `#edrbase`)"
-                  class="isActive"
+        <div class="navi_container">
+          <div
+            v-for="(pageConfig, v) in formconfig1"
+            :key="v"
+            class="NavigaList_card"
+          >
+            <el-anchor :bound="120" :offset="80">
+              <el-anchor-link
+                v-if="edrbaseFlag"
+                @click="handleAnchorClick($event, `#edrbase`)"
+                class="isActive"
+              >
+                <!-- <rt-icon
+                  :item="{ icon: 'Tickets' }"
+                /> -->
+                <el-tooltip
+                  effect="dark"
+                  content="批改信息"
+                  placement="right"
+                  :disabled="NavigaShow"
                 >
-                  <!-- <rt-icon
-                    :item="{ icon: 'Tickets' }"
-                  /> -->
                   <i :class="['icon','iconfont',iconMap['edrbase']]"></i>
-                  <span class="icon-title" v-if="NavigaShow"
-                    >批改信息</span
-                  >
-                </el-anchor-link>
-                <el-anchor-link
-                  v-if="edritemFlag"
-                  @click="handleAnchorClick($event, `#edritem`)"
+                </el-tooltip>
+                <span class="icon-title" v-if="NavigaShow"
+                  >批改信息</span
                 >
-                  <!-- <rt-icon
-                    :item="{ icon: 'Tickets' }"
-                  /> -->
+              </el-anchor-link>
+              <el-anchor-link
+                v-if="edritemFlag"
+                @click="handleAnchorClick($event, `#edritem`)"
+              >
+                <!-- <rt-icon
+                  :item="{ icon: 'Tickets' }"
+                /> -->
+                <el-tooltip
+                  effect="dark"
+                  content="批改比较项"
+                  placement="right"
+                  :disabled="NavigaShow"
+                >
                   <i :class="['icon','iconfont',iconMap['edritem']]"></i>
-                  <span class="icon-title" v-if="NavigaShow"
-                    >批改比较项</span
-                  >
-                </el-anchor-link>
-
-                <el-anchor-link
-                  v-for="(k, i) in pageConfig?.pageInfo"
-                  :key="i"
-                  :custom="true"
-                  v-show="
-                    k.pageKey !== 'acctinfo'
-                      ? [
-                          'ciMasterAgreement',
-                          'ci',
-                          'ourCompanyCiShare',
-                        ].includes(k.pageKey)
-                        ? isCiJiMrk
-                        : acctinfoFlag
-                      : true
-                  "
-                  @click="handleAnchorClick($event, `#${k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey}`)"
-                  :class="!edrbaseFlag && !edritemFlag && i === 0 ? 'isActive' : ''"
+                </el-tooltip>
+                <span class="icon-title" v-if="NavigaShow"
+                  >批改比较项</span
                 >
-                  <!-- <rt-icon
-                    :item="{
-                      icon:
-                        k.icon && k.icon !== 'null' && k.icon !== ''
-                          ? k.icon
-                          : 'Tickets',
-                    }"
-                  /> -->
-                  
+              </el-anchor-link>
+
+              <el-anchor-link
+                v-for="(k, i) in pageConfig?.pageInfo"
+                :key="i"
+                :custom="true"
+                v-show="
+                  k.pageKey !== 'acctinfo'
+                    ? [
+                        'ciMasterAgreement',
+                        'ci',
+                        'ourCompanyCiShare',
+                      ].includes(k.pageKey)
+                      ? isCiJiMrk
+                      : acctinfoFlag
+                    : true
+                "
+                @click="handleAnchorClick($event, `#${k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey}`)"
+                :class="!edrbaseFlag && !edritemFlag && i === 0 ? 'isActive' : ''"
+              >
+                <!-- <rt-icon
+                  :item="{
+                    icon:
+                      k.icon && k.icon !== 'null' && k.icon !== ''
+                        ? k.icon
+                        : 'Tickets',
+                  }"
+                /> -->
+                <el-tooltip
+                  effect="dark"
+                  :content="k.pageTtile"
+                  placement="right"
+                  :disabled="NavigaShow"
+                >
                   <i :class="['icon','iconfont',iconMap[k.pageKey]]"></i>
-                  <span class="icon-title" v-if="NavigaShow">
-                    <template v-if="k.pageTtile && k.pageTtile.length > 7">
-                      <el-tooltip
-                        effect="dark"
-                        :content="k.pageTtile"
-                        placement="top-start"
-                      >
-                        {{ k.pageTtile.substring(0, 7) + "..." }}
-                      </el-tooltip>
-                    </template>
-                    <template v-else>
-                      {{ k.pageTtile }}
-                    </template>
-                  </span>
-                </el-anchor-link>
+                </el-tooltip>
+                <span class="icon-title" v-if="NavigaShow">
+                  <template v-if="k.pageTtile && k.pageTtile.length > 7">
+                    <el-tooltip
+                      effect="dark"
+                      :content="k.pageTtile"
+                      placement="top-start"
+                    >
+                      {{ k.pageTtile.substring(0, 7) + "..." }}
+                    </el-tooltip>
+                  </template>
+                  <template v-else>
+                    {{ k.pageTtile }}
+                  </template>
+                </span>
+              </el-anchor-link>
 
-                <el-anchor-link
-                  :href="`#ciMasterAgreement`"
-                  v-if="ciMasterAgreementFlag && isCiJiMrk"
+              <el-anchor-link
+                :href="`#ciMasterAgreement`"
+                v-if="ciMasterAgreementFlag && isCiJiMrk"
+              >
+                <!-- <rt-icon
+                  :item="{ icon: 'Tickets' }"
+                /> -->
+                <el-tooltip
+                  effect="dark"
+                  content="联共保主协议信息"
+                  placement="right"
+                  :disabled="NavigaShow"
                 >
-                  <!-- <rt-icon
-                    :item="{ icon: 'Tickets' }"
-                  /> -->
                   <i :class="['icon','iconfont',iconMap['ciMasterAgreement']]"></i>
-                  <span class="icon-title" v-if="NavigaShow"
-                    >联共保主协议信息</span
-                  >
-                </el-anchor-link>
-                <el-anchor-link :href="`#ci`" v-if="ciFlag && isCiJiMrk">
-                  <!-- <rt-icon
-                    :item="{ icon: 'Tickets' }"
-                  /> -->
+                </el-tooltip>
+                <span class="icon-title" v-if="NavigaShow"
+                  >联共保主协议信息</span
+                >
+              </el-anchor-link>
+              <el-anchor-link :href="`#ci`" v-if="ciFlag && isCiJiMrk">
+                <!-- <rt-icon
+                  :item="{ icon: 'Tickets' }"
+                /> -->
+                <el-tooltip
+                  effect="dark"
+                  content="联共保信息"
+                  placement="right"
+                  :disabled="NavigaShow"
+                >
                   <i :class="['icon','iconfont',iconMap['ci']]"></i>
-                  <span class="icon-title" v-if="NavigaShow"
-                    >联共保信息</span
-                  >
-                </el-anchor-link>
-                <el-anchor-link
-                  :href="`#ourCompanyCiShare`"
-                  v-if="ourCompanyCiShareFlag && isCiJiMrk"
+                </el-tooltip>
+                <span class="icon-title" v-if="NavigaShow"
+                  >联共保信息</span
                 >
-                  <!-- <rt-icon
-                    :item="{ icon: 'Tickets' }"
-                  /> -->
+              </el-anchor-link>
+              <el-anchor-link
+                :href="`#ourCompanyCiShare`"
+                v-if="ourCompanyCiShareFlag && isCiJiMrk"
+              >
+                <!-- <rt-icon
+                  :item="{ icon: 'Tickets' }"
+                /> -->
+                <el-tooltip
+                  effect="dark"
+                  content="我司联共保信息"
+                  placement="right"
+                  :disabled="NavigaShow"
+                >
                   <i :class="['icon','iconfont',iconMap['ourCompanyCiShare']]"></i>
-                  <span class="icon-title" v-if="NavigaShow"
-                    >我司联共保信息</span
-                  >
-                </el-anchor-link>
-                <el-anchor-link
-                  v-if="underwriteFlag"
-                  @click="handleAnchorClick($event, `#underwriteurl`)"
-                  style="opacity: 1;font-weight: 500;"
+                </el-tooltip>
+                <span class="icon-title" v-if="NavigaShow"
+                  >我司联共保信息</span
                 >
-                  <!-- <rt-icon
-                    :item="{ icon: 'Tickets' }"
-                  /> -->
+              </el-anchor-link>
+              <el-anchor-link
+                v-if="underwriteFlag"
+                @click="handleAnchorClick($event, `#underwriteurl`)"
+                style="opacity: 1;font-weight: 500;"
+              >
+                <!-- <rt-icon
+                  :item="{ icon: 'Tickets' }"
+                /> -->
+                <el-tooltip
+                  effect="dark"
+                  content="核保处理"
+                  placement="right"
+                  :disabled="NavigaShow"
+                >
                   <i :class="['icon','iconfont',iconMap['underwriteurl']]" style="color: var(--el-color-warning);"></i>
-                  <span
-                    class="icon-title"
-                    v-if="NavigaShow"
-                    style="color: var(--el-color-warning)"
-                  >核保处理</span
-                  >
-                </el-anchor-link>
-              </el-anchor>
-            </div>
-            <!-- <div class="NavigaList_card" style="margin-left: 5px">
-              <rt-icon
-                @click="NavigaShow = !NavigaShow"
-                v-if="!NavigaShow"
-                :item="{ icon: 'DArrowRight' }"
-              />
-              <rt-icon
-                @click="NavigaShow = !NavigaShow"
-                v-if="NavigaShow"
-                :item="{ icon: 'DArrowLeft' }"
-              />
-            </div> -->
+                </el-tooltip>
+                <span
+                  class="icon-title"
+                  v-if="NavigaShow"
+                  style="color: var(--el-color-warning)"
+                >核保处理</span
+                >
+              </el-anchor-link>
+            </el-anchor>
           </div>
+          <div class="NavigaList_card toggle-button">
+            <el-tooltip
+              effect="dark"
+              :content="NavigaShow ? '收起导航' : '展开导航'"
+              placement="right"
+            >
+              <el-button 
+                circle 
+                @click="NavigaShow = !NavigaShow" 
+                class="toggle-nav-button"
+              >
+                <rt-icon 
+                  :item="{ icon: NavigaShow ? 'DArrowLeft' : 'DArrowRight' }" 
+                />
+              </el-button>
+            </el-tooltip>
+          </div>
+        </div>
         <!-- </el-affix> -->
       </el-aside>
       <el-main class="main-container">
@@ -4509,6 +4562,10 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 /* 用于包含行内块元素的容器 */
 .navi_container {
   line-height: 50px; /* 与容器的高度相同，实现垂直居中 */
+  position: relative;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 :deep(.el-main) {
   padding: 10px 10px 10px 10px;
@@ -4534,6 +4591,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 
 .el-anchor {
   background: transparent;
+  flex: 1;
   // width: 130px;
   :deep(.el-anchor__list) {
     padding: 20px 10px;
@@ -4560,16 +4618,51 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
         font-size: 1.2rem;
         color: #FFF;
         margin-right: 5px;
+        min-width: 24px;
+        text-align: center;
       }
       .icon-title {
         font-size: 14px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
     }
   }
 }
+
+.toggle-button {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 0 !important;
+}
+
+.toggle-nav-button {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: none !important;
+  color: white !important;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  padding: 0;
+}
+
+.toggle-nav-button:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+
+.toggle-nav-button :deep(.el-icon) {
+  color: white !important;
+  font-weight: bold;
+}
+
 .el-aside {
   width: auto;
   background: var(--el-color-primary);
+  position: relative;
+  transition: width 0.3s ease;
 }
 .font-weight-500 {
   font-weight: 500;
