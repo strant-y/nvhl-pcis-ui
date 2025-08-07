@@ -120,7 +120,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           type: "primary",
           disabled: true, // 批单不允许进行自主临分
           func: async () => {
-            if(getRiskDataIsMultiple()) {
+            const riskDataIsMultiple = await getRiskDataIsMultiple();
+            if(riskDataIsMultiple) {
               ElMessage.warning("多险位不可以自主临分，请检查险位信息。");
               return;
             }
@@ -629,7 +630,7 @@ const getRiskDataIsMultiple = async () => {
   const riskQueryInfo = params.pageName === "priceInquiry" ? await riskQueryDataXJ({ cAppNo: params.cAppNo }) : await riskQueryData({ cAppNo: params.cAppNo })
   if(riskQueryInfo && riskQueryInfo.code === "200") {
     if(riskQueryInfo.data && riskQueryInfo.data.length > 1) {
-      flag =  true
+      flag = true
     }
   }
   return flag;

@@ -431,6 +431,7 @@ const cDocumentTypeChange =(val:any)=>{
   console.log(val)
    const item = freeEditRef.value?.getFromSchemaItem('Dist.cIdentificationNumber')
    console.log(11123,item.itemConfig['rules'])
+       clearValidate('Dist.cIdentificationNumber')  
     //  身份证
     if (val == "120001") { 
      item.itemConfig['rules'] = [ getRules("idCard", {}),...item.itemConfig['rules']];
@@ -444,7 +445,7 @@ const cDocumentTypeChange =(val:any)=>{
       // 组织机构编码校验
       item.itemConfig['rules'] =[getRules("orgCode", {}),...item.itemConfig['rules']];
     } else {
-      item.itemConfig['rules'] = [ getRules("isNull", {}),...item.itemConfig['rules']];
+      item.itemConfig['rules'] = [ getRules("isNull", {})];
     }
 }
 
@@ -536,13 +537,16 @@ function setValue(key: string, value: any) {
 function getValue(key: string) {
   return freeEditRef?.value?.getValue(key);
 }
-
+function clearValidate(key=null) {
+  freeEditRef?.value?.clearValidate(key);
+}
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   setValue,
   getValue,
+  clearValidate
 });
 </script>
 

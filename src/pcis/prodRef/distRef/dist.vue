@@ -62,6 +62,7 @@ const route = useRoute();
 const dialog = ref<DialogMethod | null>(null);
 const opertaor = dataOpertaor();
 const params = opertaor.getParam(); 
+
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -71,6 +72,36 @@ const props = defineProps({
     type: String
   }
 });
+// const 
+watch(
+    () => opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered'],
+    (n, o) => {
+        // 自动刷新列表获取数据
+        // pageresult.list = []
+        // pageresult.total = 0
+        // 上面代码是仅用于本地调试
+        if (n) {
+          console.log('投保值' ,n,o)
+          // 学生岗位 Dist.cJobType
+            if(params.cProdNo === '043010'){
+                  formconfig11.value.fromSchema?.forEach(item=>{
+                          if(n == 1 && item.prop !=='Dist.nSeqNo'){
+                            item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+                          }else if(item.prop !=='Dist.nSeqNo' && item.prop !=='Dist.cJobType') {
+                            item['rules'] =[];
+                          }
+                  })
+            }
+        }
+    },
+    {
+        deep: true,
+        immediate: true
+    }
+)
+
+
+
 
 const cardRef = ref<MyCardMethod | null>(null);
 
@@ -165,7 +196,13 @@ const formconfig11 = ref<any>({});
 const oldPageSchema = ref<any>({});
 // 列表数据反显时，方案号的下拉选项渲染需要条款加载后根据条款获取，所以通过计算属性获取getPlanNo的值
 // 有值的时候再填充到方案号的loadData中
-const cvrg = computed(() => opertaor.getTableRefByKey("cvrg")?.getPlanNo())
+const cvrg = computed(() => {
+  if(opertaor.getTableRefByKey("cvrg") && opertaor.getTableRefByKey("cvrg").getPlanNo) {
+    return opertaor.getTableRefByKey("cvrg")?.getPlanNo()
+  } else {
+    return "";
+  }
+})
 watch(cvrg, (val) => {
   if(val && val.length > 0) {
     tableconfig.value.fromSchema.forEach( r => {
@@ -198,8 +235,9 @@ onMounted(async () => {
     })
   }
 
-console.log('dist -----',formconfig11.value)
-  
+console.log('dist -----',formconfig11.value,)
+console.log('dist2 -----',formconfig11.value.fromSchema)
+ 
   // if(params.cProdNo === '043009'){
   //   formconfig11.value.fromSchema?.forEach(item=>{
   //     if(item['prop'] ==='Dist.cEmploymentAddress' && route.params.param?.cGrpMrk !== '1'){
