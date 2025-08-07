@@ -90,13 +90,12 @@ onMounted(async () => {
     });
     //禁用不见费出单原因
     setFormItem("Base.cCanclfeersnCde", { disabled: true });
-    //禁用保单来源
-    // setFormItem("Base.cPolicySource", {disabled: true});
     //保单来源赋值
-    console.log("param.cRecordType",param, param.cRecordType)
-    // setFormValue({"Base.cPolicySource":param.cRecordType})
-    setValue("Base.cPolicySource", param.cRecordType)
-    
+    // console.log("param.pageType",param, param.pageType);
+    // const policySource = param?.pageType === "copy" 
+    //   ? "8" 
+    //   : (param?.cPolicySource ?? param?.cRecordType);
+    // setValue("Base.cPolicySource", policySource);
 
     // 服务机构默认值
     setFormItem("Base.cIntroDptcde", {
@@ -734,6 +733,13 @@ function getFromValue() {
 
 function setFormValue(value: any) {
   plyBaseEditRef?.value?.setFormValue(value);
+  setTimeout(() => {
+    const policySource = param?.pageType === "copy" 
+    ? "8" 
+    : (param?.cPolicySource ?? param?.cRecordType);
+  setValue("Base.cPolicySource", policySource);
+  }, 1000);
+  
 }
 
 function validate() {
