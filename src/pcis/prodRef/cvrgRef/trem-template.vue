@@ -411,10 +411,10 @@ const {selectedRow} = storeToRefs(terconfig);
 function update() {
   let newData;
 
-  if( termTitleConf.value.cFactorTabType === "free" ){
-    newData = termRef.value?.getFromValue();
-  } else {
+  if( termTitleConf.value.cFactorTabType === "table" ||  termTitleConf.value.cFactorTabType === 'grid' ){
     newData = termdata.value;
+  } else {
+    newData = termRef.value?.getFromValue();
   }
   const fromc = termFactormap.value?.filter(
     (v: any) => v.cPorpShowtitle === "1"
