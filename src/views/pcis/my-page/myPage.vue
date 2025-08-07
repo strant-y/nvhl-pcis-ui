@@ -4629,6 +4629,22 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   }
 }
 
+// 高亮图标和标题文字
+:deep(.el-anchor__item.is-active) ,
+:deep(.el-anchor__item.isActive) {
+  opacity: 1 !important;
+}
+
+:deep(.el-anchor__item.is-active a .iconfont),
+:deep(.el-anchor__item.isActive a .iconfont) {
+  color: #ffa940 !important; /* 橙色 */
+}
+
+:deep(.el-anchor__item.is-active a .icon-title),
+:deep(.el-anchor__item.isActive a .icon-title) {
+  color: #ffa940 !important; /* 橙色 */
+}
+
 .toggle-button {
   position: absolute;
   bottom: 20px;
