@@ -1527,7 +1527,7 @@
         } else {
             // 关联交易业务，接收时给出提示
             if (
-                row.cRelateBusi === "true" &&
+                row.cRelateBusi &&
                 row.cEdrRsnBundleCde !== "s1" &&
                 row.cEdrRsnBundleCde !== "s2" &&
                 row.cEdrRsnBundleCde !== "c1"
@@ -1709,24 +1709,18 @@
         } = row;
         // 关联交易业务，接收时给出提示
         if (
-            cRelateBusi === "true" &&
+            cRelateBusi &&
             cEdrRsnBundleCde !== "s1" &&
             cEdrRsnBundleCde !== "s2" &&
             cEdrRsnBundleCde !== "c1"
         ) {
-            ElMessageBox.confirm(
+            ElMessageBox.alert(
                 "该笔业务为关联交易业务，请检查是否已上传【关联交易审批单】！",
                 "提示",
                 {
                     confirmButtonText: "确认",
-                    cancelButtonText: "取消",
-                    type: "info",
                 }
             )
-                .then(() => {
-                    console.log("确定");
-                })
-                .catch(() => false);
         }
 
         if (bsType === "P") {
