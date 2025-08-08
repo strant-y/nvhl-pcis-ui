@@ -425,6 +425,19 @@ const tableconfig = reactive<AppTableConfig>(
 							ElMessage.warning('所选记录为空！');
 							return ;
 						}
+                            let CPaySequencesData = false;
+                            multipleSelection.value.forEach((item)=>{
+                                if(!item['cPaySequence']){
+                                 
+                                    CPaySequencesData = true;
+                                   
+                                }
+                            })
+                        if(CPaySequencesData){
+                               ElMessage.warning('选中单据没有支付号！');
+                               return false; 
+                        }
+
                         ElMessageBox.confirm("确认要作废支付号吗？", "提示", {
                             confirmButtonText: "确定",
                             cancelButtonText: "取消",

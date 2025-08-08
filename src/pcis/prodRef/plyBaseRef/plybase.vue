@@ -83,9 +83,10 @@ onMounted(async () => {
     // 查询承保机构所属分公司和项目类别大类数据
     getCheckCdeptByCdptCde();
     //回显机构部门数据
+    console.log('看看',param)
     setFormItem("Base.cDptCde", {
       loadData: [
-        { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm}` },
+        { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm|| ''}` },
       ],
     });
     //禁用不见费出单原因
@@ -100,7 +101,7 @@ onMounted(async () => {
     // 服务机构默认值
     setFormItem("Base.cIntroDptcde", {
       loadData: [
-        { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm}` },
+        { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm || ''}` },
       ],
     });
 
