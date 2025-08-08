@@ -302,14 +302,20 @@ const method = {
       const existingIssueMrk = allRows.some(
         (row) => row._dataId !== rowId && row["Ci.cIssueMrk"] === "1"
       );
-      if (val === "1" && existingIssueMrk) {
-        ElMessage.error("出单方有且只能有一个！");
-        // 回退当前行的值
-        freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
-        return;
-      }
+      // if (val === "1" && existingIssueMrk) {
+      //   ElMessage.error("出单方有且只能有一个！");
+      //   freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
+      //   return;
+      // }
       if (val === "0") {
-        if(cCiMrk["Base.cCiMrk"] == '1' ||cCiMrk["Base.cCiMrk"] == '2'|| cCiMrk["Base.cCiMrk"] == '5'){
+        if(cCiMrk["Base.cCiMrk"] == '1' || cCiMrk["Base.cCiMrk"] == '5'){
+          if(rowData['Ci.cDptCde'] == param.cDptCde){
+            ElMessage.error("联保单出单方必须是主联单的分公司！");
+            freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
+          }
+        }
+      }else if( val === '1'){
+        if(cCiMrk['Base.cCiMrk'] == '2'){
           if(rowData['Ci.cDptCde'] == param.cDptCde){
             ElMessage.error("联保单出单方必须是主联单的分公司！");
             freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
@@ -416,7 +422,7 @@ const method = {
       // }
     }
     updateMasterAgreementValues();
-    onChiefMrkChange()
+    // onChiefMrkChange()
     //根据新的联共保保费和出单费比例重新计算出单费用
     const updatedRowData = freeEditRef.value?.getSelectRow();
     const nPlyFeeRate = parseFloat(updatedRowData["Ci.nPlyFeeRate"] || 0);
@@ -1046,16 +1052,15 @@ const valideRequired = ()=>{
         }
         handleEdrAppNewSceneRules()
       }
-  },500)
+  },700)
 }
 /**
  * 处理EDR_APP_NEW_SCENE页面类型的特殊规则
  */
 const handleEdrAppNewSceneRules = () => {
   const cCiMrkValue = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
-  
+  const tableList = getFromValue();
   if (param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && cCiMrkValue !== '5' && param.cRsnDetailCde?.value == "47") {
-    const tableList = getFromValue();
     tableList.forEach((rowData: any) => {
       const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId);
       if (rowItem) {
@@ -1072,6 +1077,16 @@ const handleEdrAppNewSceneRules = () => {
           rowItem['Ci.nPlyFeeRate'].disabled = false;
         }
       }
+    });
+  }else if(param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue == '5' && param.cRsnDetailCde?.value == "47") {
+    formconfig1.fromSchema?.forEach((item) => {
+      item.disabled = true;
+    });
+    tableList.forEach((rowData:any) => {
+      const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId);
+      rowItem['Ci.nCiShare'].disabled = true;
+      rowItem['Ci.nPlyFeeRate'].disabled = true;
+      rowItem['Ci.cCoinsurerCde'].disabled = true;
     });
   }
 };
