@@ -98,7 +98,7 @@
 <script setup lang="ts">
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
-const codeListMap = inject<any>('codeListMap');
+const codeListMap = inject<any>('codeListMap', {});
 const props = defineProps({
   modelValue: {
     type: [String, Number, Array<any>, Boolean],
