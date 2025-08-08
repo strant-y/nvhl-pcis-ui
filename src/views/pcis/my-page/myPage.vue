@@ -2639,13 +2639,15 @@ const submitToUndrFn = async () => {
   /**
    * 联共保判断
    */
+  debugger
   const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk')
   if ('1' === CiMrk || '2' === CiMrk || '5' === CiMrk) {
-      const validCi = JointInsuranceCheck();
+      // const validCi = JointInsuranceCheck();
+      JointInsuranceCheck();
       // 如果联共保校验不通过，则不继续执行后续逻辑
-      if (!validCi) {
-          return false;
-      }
+      // if (!validCi) {
+      //     return false;
+      // }
   }
 	// 申请核保前判断是否灰黑名单
 	const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
