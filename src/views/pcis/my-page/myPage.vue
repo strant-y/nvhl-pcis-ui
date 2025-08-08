@@ -2639,7 +2639,6 @@ const submitToUndrFn = async () => {
   /**
    * 联共保判断
    */
-  debugger
   const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk')
   if ('1' === CiMrk || '2' === CiMrk || '5' === CiMrk) {
       // const validCi = JointInsuranceCheck();
