@@ -151,7 +151,7 @@ watch(codeListMap, (newOptions, oldOptions) => {
 function handleChange(val?: string | number | Array<any> | undefined) {
   emits("valueChange", val);
   emits("update:modelValue", val);
-  props.item.func ? props.item.func(val, props.row, codeListMap) : null;
+  // props.item.func ? props.item.func(val, props.row, codeListMap) : null;
 }
 function visibleChange(visible: boolean) {
   if (visible) {
