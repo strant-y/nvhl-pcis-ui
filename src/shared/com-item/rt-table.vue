@@ -217,7 +217,7 @@
                 </el-form-item>
               </template>
               <template v-else-if="i.formatter">
-                {{ i.formatter(scope.row[i.prop]) }}
+                {{ i.formatter(scope.row[i.prop], scope.row) }}
               </template>
               <template v-else>
                 <el-form-item

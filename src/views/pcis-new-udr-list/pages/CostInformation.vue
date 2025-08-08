@@ -83,6 +83,7 @@ import {
   updateIIogFee,
   gettypflag,
   compareAppFeeInfo,
+  getDpt,
 } from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { useFormLabelWidth } from "element-plus/es/components/form/src/utils";
@@ -100,6 +101,9 @@ const props = defineProps({
   data: Object,
   type: String,
 });
+const userInfo = JSON.parse(sessionStorage.getItem("user") || '{}');
+const DPT = userInfo.companyId?.substring(0,6);
+const dptTyp = ref("0"); // 0其他  1总共 2二级机构
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "投保单费用信息",
@@ -176,11 +180,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         itemWidth: 1,
         labelWidth: 200,
         clearable: true,
-        func: (v: any) => {
-          if (Number(v) > Number(A_value.value)) {
-            ElMessage.error('此费用比例不可大于总公司下发二级机构的费用政策比例' + A_value.value + '重新输入!');
-            freeEditRef.value?.setValue("A1_value", A1_value.value);
-           }
+        precision: 2,
+        // func: (v: any) => {
+        //   if (Number(v) > Number(A_value.value)) {
+        //     ElMessage.error('此费用比例不可大于总公司下发二级机构的费用政策比例' + A_value.value + '重新输入!');
+        //     freeEditRef.value?.setValue("A1_value", A1_value.value);
+        //    }
+        // }
+        func: (v:any) => {
+          changeUpdValue('A1_value')
         }
       },
       {
@@ -190,11 +198,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         itemWidth: 1,
         labelWidth: 200,
         clearable: true,
-        func: (v: any) => {
-          if (Number(v) > Number(B_value.value)) {
-            ElMessage.error('此费用比例不可大于二级机构下发三级机构的费用政策比例' + B_value.value + '重新输入!');
-            freeEditRef.value?.setValue("B1_value", B1_value.value);
-           }
+        precision: 2,
+        // func: (v: any) => {
+        //   if (Number(v) > Number(B_value.value)) {
+        //     ElMessage.error('此费用比例不可大于二级机构下发三级机构的费用政策比例' + B_value.value + '重新输入!');
+        //     freeEditRef.value?.setValue("B1_value", B1_value.value);
+        //    }
+        // }
+        func: (v:any) => {
+          changeUpdValue('B1_value')
         }
       },
     ],
@@ -226,10 +238,13 @@ const tableconfig = reactive<AppTableConfig>(
     editList: ["nFeeProp","nFee","cFeeFlag"],
     fromSchema: [
       {
-        prop: "cFeetypCde",
+        prop: "cTypCde",
         inputtype: "rtinput",
         title: "费用类型",
         minWidth: 40,
+        formatter: (val:any, row:any) => {
+          return `${row.cTypCde}(${row.cFeetypCde})`
+        },
       },
       {
         prop: "nFeeProp",
@@ -358,9 +373,9 @@ let params: any = {
       dptCde: props.data?.cDptCde,
       bsnsTyp:'19001',
       nPrm: '10000',
-      isReadOnly:"1",
+      isReadOnly: props.data?.pageType === "PLY_UW_PROCESS_SCENE" ? "2" : "1",// 核保页面打开的isReadOnly值为2
       updFlag: '1',
-      appTyp:''
+      appTyp: props.data?.cAppTyp,
   }
 let typ_flag: any;
 
@@ -742,16 +757,42 @@ function findFeeBetween() {
                         if (numComparison(values[5], '0')) {
                             B_value.value = '0.00';
                         }
-                        my_max_value.value = tool_fix(values[1] * 1, 3);    // 后台查询出来的是小数！ 应 乘以 100
-                        my_min_value.value  = tool_fix(values[0] * 1, 3);    // 手续费的 输入区间  如果后台没查询到 默认为 0.00  【区间】
-                        A1_value.value   = tool_fix(values[2] * 1, 3);
-                        B1_value.value   = tool_fix(values[3] * 1, 3);
-                        A_value.value   = tool_fix(values[4] * 1, 3);
-                        B_value.value = tool_fix(values[5] * 1, 3);
+                        my_max_value.value = tool_fix(values[1] * 1, 2);    // 后台查询出来的是小数！ 应 乘以 100
+                        my_min_value.value  = tool_fix(values[0] * 1, 2);    // 手续费的 输入区间  如果后台没查询到 默认为 0.00  【区间】
+                        A1_value.value   = tool_fix(values[2] * 1, 2);
+                        B1_value.value   = tool_fix(values[3] * 1, 2);
+                        A_value.value   = tool_fix(values[4] * 1, 2);
+                        B_value.value = tool_fix(values[5] * 1, 2);
                         freeEditRef.value?.setValue("max_value", my_max_value.value);
                         freeEditRef.value?.setValue("min_value", my_min_value.value);
                         freeEditRef.value?.setValue("A1_value", A1_value.value);
                         freeEditRef.value?.setValue("B1_value", B1_value.value);
+
+                        const appTyp = params.appTyp;
+                        if(appTyp=='A'){
+                          const readOnle_flag = params.isReadOnly;
+                          let butA = true;
+                          let butB = true;
+                          // 核保页面可以编辑
+                          if(readOnle_flag=='2'){
+                            if("false"==values[6]){
+                              butA=false;
+                              dptTyp.value = '1';
+                            }
+                            if("false"==values[7]){
+                              butB=false;
+                              dptTyp.value = '2';
+                            }
+                            formconfig1.fromSchema?.forEach((e) => {
+                              if (e.prop === "A1_value") {
+                                e.disabled = butA;
+                              }
+                              if (e.prop === "B1_value") {
+                                e.disabled = butB;
+                              }
+                            })
+                          }
+                        }
                     } else {
                       ElMessage.error('获取费用信息手续费区间失败！');
                     }
@@ -843,6 +884,61 @@ function  onFeePropKeyDown(row:any) {
     // event.returnValue = false;
     // }
   }
+
+function changeUpdValue(value:string){
+  const dptCde = params.dptCde;
+	let num =0.00;
+	var valueNme="总公司下发二级机构的费用政策比例";
+	let orgnum = A_value;
+
+	if('B1_value'==value){
+		valueNme='二级机构下发三级机构的费用政策比例';
+		orgnum = B_value;
+	} 
+	num = freeEditRef.value?.getValue(value);
+	if(!/^(\-|\+)?(\d+.?)\d{0,2}$/.test(num)){
+		ElMessage.error('只能输入数字，小数点后只能保留两位');
+    freeEditRef.value?.setValue(value, orgnum)
+		return ;
+	}
+	
+	if(parseFloat(num)<parseFloat(0)){
+		ElMessage.error(valueNme+"不能小于零！");
+    freeEditRef.value?.setValue(value, orgnum)
+		return ;
+	}
+  getDpt({ dpt: DPT }).then((res:any) => {
+    if(res.code === 200 && res.data && dptTyp.value !== '1') {
+      if(parseFloat(freeEditRef.value?.getValue('B1_value')) > parseFloat(freeEditRef.value?.getValue('A1_value'))){
+        ElMessageBox.confirm(
+          "二级机构下发三级机构的费用政策比例不能大于总公司下发二级机构的费用政策比例",
+          "提示",
+          {
+            confirmButtonText: "确定",
+            type: "warning",
+            showCancelButton: false
+          }
+        )
+        freeEditRef.value?.setValue('B1_value', freeEditRef.value?.getValue('A1_value'))
+				return ;
+			}
+    } else {
+			if(parseFloat(num)>parseFloat(orgnum)){
+        ElMessageBox.confirm(
+          valueNme+"不能大于"+orgnum,
+          "提示",
+          {
+            confirmButtonText: "确定",
+            type: "warning",
+            showCancelButton: false
+          }
+        )
+        freeEditRef.value?.setValue(value, orgnum)
+        return ;
+      }
+    }
+  })
+}
 </script>
 
 <style scoped></style>
