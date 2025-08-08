@@ -169,12 +169,12 @@
                   placement="right"
                   :disabled="NavigaShow"
                 >
-                  <i :class="['icon','iconfont',iconMap['underwriteurl']]" style="color: var(--el-color-warning);"></i>
+                  <i :class="['icon','iconfont',iconMap['underwriteurl']]" style="color: #00d8ff;"></i>
                 </el-tooltip>
                 <span
                   class="icon-title"
                   v-if="NavigaShow"
-                  style="color: var(--el-color-warning)"
+                  style="color: #00d8ff;"
                 >核保处理</span
                 >
               </el-anchor-link>
@@ -2643,9 +2643,9 @@ const submitToUndrFn = async () => {
   if ('1' === CiMrk || '2' === CiMrk || '5' === CiMrk) {
       const validCi = JointInsuranceCheck();
       // 如果联共保校验不通过，则不继续执行后续逻辑
-      if (!validCi) {
-          return false;
-      }
+       if (!validCi) {
+        return; // 校验失败则中断后续流程
+       }
   }
 	// 申请核保前判断是否灰黑名单
 	const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
@@ -3120,7 +3120,7 @@ const calcPremiumEdr = () => {
   // const totalNum =  res['cvrg'].reduce((sum, item) => sum + (item['Term.nInsuranceAmount'] || 0), 0);
   const nInsuranceAmount:any = [];
   res['cvrg'].forEach((item:any) => {
-    if(item['Term.cRdrTyp'] === '0') {// 主险 riskList不为空则取riskList里的nInsuranceAmount累加，否则取Term.nInsuranceAmount
+    if(item['Term.cRdrTyp'] === '0') {// 主险 riskList不为空则取riskList里的nInsuranceAmount累加，否则取Term.nInsuranceAmount或Term.nAccidentLimit
       // 02系列产品 ? 从责任列表取nInsuranceAmount累加 : 只取条款里的nInsuranceAmount值
       if(props.param.cProdNo.slice(0,2) === "02") {
         if(item['Term.riskList'] && item['Term.riskList'].length > 0) {
@@ -3135,13 +3135,13 @@ const calcPremiumEdr = () => {
           if(num > 0) {
             nInsuranceAmount.push(num)
           } else {
-            nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
+            nInsuranceAmount.push(item['Term.nInsuranceAmount'] || item['Term.nAccidentLimit'] || 0)
           }
         } else {
-          nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
+          nInsuranceAmount.push(item['Term.nInsuranceAmount'] || item['Term.nAccidentLimit'] || 0)
         }
       } else {
-        nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
+        nInsuranceAmount.push(item['Term.nInsuranceAmount'] || item['Term.nAccidentLimit'] || 0)
       }
     } else if(item['Term.cClaimInclude'] === "1") {// 非主险 是否计入累计赔偿限额值为是则计入否则不计入
       nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
@@ -3484,6 +3484,11 @@ const submitEdrToUndrSurrender = async () => {
   if (!isAcctValid) {
     return; 
   }
+  const edrBaseValidate = await edrbase.value?.validate();
+  if(!edrBaseValidate) {
+    ElMessage.error("请填写批改信息中的必填项")
+    return
+  }
   if (needCalc.value) {
     ElMessage.error("请先进行保费计算!");
     return;
@@ -3733,13 +3738,13 @@ const submitEdrToUndrFun = async () => {
                 if(num > 0) {
                   nInsuranceAmount.push(num)
                 } else {
-                  nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
+                  nInsuranceAmount.push(item['Term.nInsuranceAmount'] || item['Term.nAccidentLimit'] || 0)
                 }
               } else {
-                nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
+                nInsuranceAmount.push(item['Term.nInsuranceAmount'] || item['Term.nAccidentLimit'] || 0)
               }
             } else {
-              nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
+              nInsuranceAmount.push(item['Term.nInsuranceAmount'] || item['Term.nAccidentLimit'] || 0)
             }
           } else if(item['Term.cClaimInclude'] === "1") {// 非主险 是否计入累计赔偿限额值为是则计入否则不计入
             nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
@@ -3855,7 +3860,7 @@ const submitUnderwritingFn = async () => {
     const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
     const insrnc = opertaor.getTableRefByKey("insrnc")?.getFromValue();
     const edrbase = opertaor.getTableRefByKey("edrbase")?.getFromValue();
-    if(plyBase['Base.cRiFacMrk'] === '2' && plyBase['Base.cRiMrk'] === '1') {//如果临分标识为2，cRiMrk值为1时，需要调查询临分状态接口，返回值为0,1,6阻断，其他继续核保
+    if(plyBase['Base.cRiFacMrk'] === '2' && plyBase['Base.cRiFacCde'] === '1') {//如果临分标识为2，cRiFacCde值为1时，需要调查询临分状态接口，返回值为0,1,6阻断，其他继续核保
       // 调用接口查询临分状态(0未报价 1未确认 2已确认 3账单已生成 4部分账单已传财务 5账单全部已传财务 6没有临分数据)
       const param = {
         cAppNo: props.param?.cAppNo,
@@ -4012,21 +4017,21 @@ const validateCiInfo = () => {
   return true;
 };
 const JointInsuranceCheck = () => {
-    try {
-        const ciData = opertaor.getTableRefByKey("ci")?.getFromValue();
-        if (!ciData) {
-            return true;
-        }
-        const isValid = validateCiInfo(); // 使用已存在的校验函数
-        if (!isValid) {
-            ElMessage.error("联共保信息校验不通过，请检查联共保相关信息");
-            return false;
-        }
-        return true;
-    } catch (error) {
-        ElMessage.error("联共保信息校验异常");
-        return false;
+  const ciData=opertaor.getTableRefByKey("ci").getFromValue()
+  if(ciData && ciData.length>0){
+    let CCoinsurerCdeNum =0; //分公司份额
+    for(const ciRow of ciData){
+      if("327001"=== ciRow["Ci.cCoinsurerCde"])
+      { 
+        CCoinsurerCdeNum++;
+      }
     }
+      if(CCoinsurerCdeNum <= 1){
+        ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
+        return false;
+      }
+    }
+    return true;
 };
 // 将对象的属性首字母转换为小写
 function lowercaseKeys<T extends object>(
@@ -4627,6 +4632,22 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
       }
     }
   }
+}
+
+// 高亮图标和标题文字
+:deep(.el-anchor__item.is-active) ,
+:deep(.el-anchor__item.isActive) {
+  opacity: 1 !important;
+}
+
+:deep(.el-anchor__item.is-active a .iconfont),
+:deep(.el-anchor__item.isActive a .iconfont) {
+  color: #ffa940 !important; /* 橙色 */
+}
+
+:deep(.el-anchor__item.is-active a .icon-title),
+:deep(.el-anchor__item.isActive a .icon-title) {
+  color: #ffa940 !important; /* 橙色 */
 }
 
 .toggle-button {

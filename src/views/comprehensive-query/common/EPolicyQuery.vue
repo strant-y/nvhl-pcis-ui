@@ -511,7 +511,7 @@ function handleQuery(flag?: boolean) {
                             ...item,
                             // 创建一个新字段合并两个值
                             policyInfo: `${item.cAppNo || ''}\n${item.cPlyNo || ''}`,
-                            InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
+                            InsurancePeriod: `${item.tInsrncBgnTm || ''} - ${item.tInsrncEndTm || ''}`,
                         }))
                         pageresult.total = data.total
                         if (!!data.code && !!data.message && data.code == '0') {

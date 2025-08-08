@@ -1008,6 +1008,50 @@ getcSuffixAddrChange:(val:any) => {
   setregistAdd()
 },
 
+
+getAddressstr:(val:any, row: any, pitem: any) => {
+  let getv1 = '';  //集联地址
+  let getv2 = '';  //字符串地址
+  let setv = '';  //需要设置的目标地址
+
+  let r = false;
+  formconfig1.fromSchema?.forEach((item: any) => { 
+    if(r){
+      setv = item;
+      r = false;
+    }
+    if(item.inputtype === 'rtinputgroup'){
+      for(let i = 0 ; i<item.groupList.length ; i++ ){
+        if(pitem.prop === item.groupList[i].prop){
+          r = true;
+        }
+      }
+      if(r){
+        getv1 = item.groupList.filter((it: any)=> it.inputtype === 'rtcascader');
+        getv2 = item.groupList.filter((it: any)=> it.inputtype === 'rtinput');
+      }
+    }
+  })
+  setAddressBykey(getv1,getv2,setv);
+}
+};
+
+function setAddressBykey(getv1: any, getv2: any , setv: any) {
+   const a = tgtEditRef?.value?.getValue(getv1[0].prop);
+   const b = tgtEditRef?.value?.getValue(getv2[0].prop);
+
+   const setS = setv.prop;
+   if (a) {
+    getAddressStr({ address: a }).then((res: any) => {
+      const { code, data, msg } = res;
+      if (code === 200) {
+        const c = (data ? data["addStr"] : "") + (b ? b: "");
+        setValue(setS, c);
+      }
+    });
+   }else{
+    setValue(setS, b);
+   }
 };
 
 function setregistAdd() {
