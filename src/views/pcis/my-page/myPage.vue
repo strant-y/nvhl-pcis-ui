@@ -3427,6 +3427,11 @@ const submitEdrToUndrSurrender = async () => {
   if (!isAcctValid) {
     return; 
   }
+  const edrBaseValidate = await edrbase.value?.validate();
+  if(!edrBaseValidate) {
+    ElMessage.error("请填写批改信息中的必填项")
+    return
+  }
   if (needCalc.value) {
     ElMessage.error("请先进行保费计算!");
     return;
