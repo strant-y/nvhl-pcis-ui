@@ -1590,6 +1590,8 @@
                         cTermNme:row.cTermNme,
                         cProdNmeCn: row.prodName,
                         cPolicySource: row.cPolicySource,
+                        cRelateBusi: row.cRelateBusi,
+                        cEdrRsnBundleCde: row.cEdrRsnBundleCde,
                     });
                     router.push({
                         path: "/pcis/my-page",
@@ -1620,6 +1622,8 @@
                         cTermNme:row.cTermNme,
                         cProdNmeCn: row.prodName,
                         cPolicySource: row.cPolicySource,
+                        cRelateBusi: row.cRelateBusi,
+                        cEdrRsnBundleCde: row.cEdrRsnBundleCde,
                     });
                     router.push({
                         path: "/pcis/my-page",
@@ -1663,6 +1667,8 @@
                                 cTermNme:row.cTermNme,
                                 cProdNmeCn: row.prodName,
                                 cPolicySource:row.cPolicySource,
+                                cRelateBusi: row.cRelateBusi,
+                                cEdrRsnBundleCde: row.cEdrRsnBundleCde,
                             });
                             router.push({
                                 path: "/pcis/my-page",
@@ -1744,6 +1750,8 @@
                             cTermNme:row.cTermNme,
                             cTermNo:row.cTermNo,
                             cPolicySource:row.cPolicySource,
+                            cRelateBusi: row.cRelateBusi,
+                            cEdrRsnBundleCde: row.cEdrRsnBundleCde,
                         };
                         const en = JSON.stringify(data);
                         router.push({

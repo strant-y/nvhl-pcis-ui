@@ -1544,3 +1544,12 @@ export function copyDist(queryParams: any): AxiosPromise<any> {
   return post(`/policy/copyDist`, queryParams);
 }
 
+/**
+ * 额度信息获取机构
+ *
+ * @param queryParams
+ */
+export function getDpt(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/getDpt`, queryParams);
+}
+
