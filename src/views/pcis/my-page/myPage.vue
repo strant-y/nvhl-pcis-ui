@@ -2641,12 +2641,11 @@ const submitToUndrFn = async () => {
    */
   const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk')
   if ('1' === CiMrk || '2' === CiMrk || '5' === CiMrk) {
-      // const validCi = JointInsuranceCheck();
-      JointInsuranceCheck();
+      const validCi = JointInsuranceCheck();
       // 如果联共保校验不通过，则不继续执行后续逻辑
-      // if (!validCi) {
-      //     return false;
-      // }
+       if (!validCi) {
+        return; // 校验失败则中断后续流程
+       }
   }
 	// 申请核保前判断是否灰黑名单
 	const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
@@ -4029,9 +4028,10 @@ const JointInsuranceCheck = () => {
     }
       if(CCoinsurerCdeNum <= 1){
         ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
-        return ;
+        return false;
       }
     }
+    return true;
 };
 // 将对象的属性首字母转换为小写
 function lowercaseKeys<T extends object>(
