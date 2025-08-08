@@ -436,6 +436,14 @@ function setChangeInfo(content: any) {
     changeContent.value = undefined;
   }
 }
+
+onUnmounted(() => {
+  if(Object.keys(codeListMap).length > 0) {
+    const rowId = props.row && props.row._dataId ? props.row._dataId : '';
+    delete codeListMap[props.item.typeCode + rowId];
+    delete codeListMap[props.item.prop + rowId];
+  }
+});
 defineExpose({
   updateOption,
   setCustomClass,
