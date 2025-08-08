@@ -169,12 +169,12 @@
                   placement="right"
                   :disabled="NavigaShow"
                 >
-                  <i :class="['icon','iconfont',iconMap['underwriteurl']]" style="color: var(--el-color-warning);"></i>
+                  <i :class="['icon','iconfont',iconMap['underwriteurl']]" style="color: #00d8ff;"></i>
                 </el-tooltip>
                 <span
                   class="icon-title"
                   v-if="NavigaShow"
-                  style="color: var(--el-color-warning)"
+                  style="color: #00d8ff;"
                 >核保处理</span
                 >
               </el-anchor-link>
