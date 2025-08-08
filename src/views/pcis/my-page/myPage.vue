@@ -2639,13 +2639,15 @@ const submitToUndrFn = async () => {
   /**
    * 联共保判断
    */
+  debugger
   const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk')
   if ('1' === CiMrk || '2' === CiMrk || '5' === CiMrk) {
-      const validCi = JointInsuranceCheck();
+      // const validCi = JointInsuranceCheck();
+      JointInsuranceCheck();
       // 如果联共保校验不通过，则不继续执行后续逻辑
-      if (!validCi) {
-          return false;
-      }
+      // if (!validCi) {
+      //     return false;
+      // }
   }
 	// 申请核保前判断是否灰黑名单
 	const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
@@ -3484,6 +3486,11 @@ const submitEdrToUndrSurrender = async () => {
   if (!isAcctValid) {
     return; 
   }
+  const edrBaseValidate = await edrbase.value?.validate();
+  if(!edrBaseValidate) {
+    ElMessage.error("请填写批改信息中的必填项")
+    return
+  }
   if (needCalc.value) {
     ElMessage.error("请先进行保费计算!");
     return;
@@ -3855,7 +3862,7 @@ const submitUnderwritingFn = async () => {
     const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
     const insrnc = opertaor.getTableRefByKey("insrnc")?.getFromValue();
     const edrbase = opertaor.getTableRefByKey("edrbase")?.getFromValue();
-    if(plyBase['Base.cRiFacMrk'] === '2' && plyBase['Base.cRiMrk'] === '1') {//如果临分标识为2，cRiMrk值为1时，需要调查询临分状态接口，返回值为0,1,6阻断，其他继续核保
+    if(plyBase['Base.cRiFacMrk'] === '2' && plyBase['Base.cRiFacCde'] === '1') {//如果临分标识为2，cRiFacCde值为1时，需要调查询临分状态接口，返回值为0,1,6阻断，其他继续核保
       // 调用接口查询临分状态(0未报价 1未确认 2已确认 3账单已生成 4部分账单已传财务 5账单全部已传财务 6没有临分数据)
       const param = {
         cAppNo: props.param?.cAppNo,
@@ -4012,20 +4019,19 @@ const validateCiInfo = () => {
   return true;
 };
 const JointInsuranceCheck = () => {
-    try {
-        const ciData = opertaor.getTableRefByKey("ci")?.getFromValue();
-        if (!ciData) {
-            return true;
-        }
-        const isValid = validateCiInfo(); // 使用已存在的校验函数
-        if (!isValid) {
-            ElMessage.error("联共保信息校验不通过，请检查联共保相关信息");
-            return false;
-        }
-        return true;
-    } catch (error) {
-        ElMessage.error("联共保信息校验异常");
-        return false;
+  const ciData=opertaor.getTableRefByKey("ci").getFromValue()
+  if(ciData && ciData.length>0){
+    let CCoinsurerCdeNum =0; //分公司份额
+    for(const ciRow of ciData){
+      if("327001"=== ciRow["Ci.cCoinsurerCde"])
+      { 
+        CCoinsurerCdeNum++;
+      }
+    }
+      if(CCoinsurerCdeNum <= 1){
+        ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
+        return ;
+      }
     }
 };
 // 将对象的属性首字母转换为小写

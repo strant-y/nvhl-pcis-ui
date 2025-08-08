@@ -26,6 +26,7 @@
         :showAllLevels="item.showAllLevels"
         :multiple="isMultiple()"
         @change="handleChange"
+        @visible-change="visibleChange"
       >
         <template #empty>
           {{ "暂无数据" }}
@@ -151,6 +152,11 @@ function handleChange(val?: string | number | Array<any> | undefined) {
   emits("valueChange", val);
   emits("update:modelValue", val);
   props.item.func ? props.item.func(val, props.row, codeListMap) : null;
+}
+function visibleChange(visible: boolean) {
+  if (visible) {
+    getCodeListMapToOption();
+  }
 }
 
 function uploadOption() {
@@ -382,6 +388,14 @@ function setChangeInfo(content: any) {
   }
 }
 
+
+onUnmounted(() => {
+  if(Object.keys(codeListMap).length > 0) {
+    const rowId = props.row && props.row._dataId ? props.row._dataId : '';
+    delete codeListMap[props.item.typeCode + rowId];
+    delete codeListMap[props.item.prop + rowId];
+  }
+});
 defineExpose({
   updateOption,
   getTextValue,

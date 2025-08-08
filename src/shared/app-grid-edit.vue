@@ -117,6 +117,7 @@ function getFromValue() {
 }
 
 function setFormValue(data: any) {
+  codeListMap.value = {};
   tableDatas.value = data;
 }
 function validate() {

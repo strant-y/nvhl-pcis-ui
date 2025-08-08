@@ -1481,6 +1481,7 @@
                         cProdNmeCn: row.prodName,
                         pageName: 'priceInquiry',
                         cAppNo: row.cAppNo,
+                        cPolicySource: row.cPolicySource,
                     });
                     router.push({
                         path: "/pcis/my-page",
@@ -1512,6 +1513,7 @@
                         cProdNmeCn: row.prodName,
                         pageName: 'priceInquiry',
                         cAppNo: row.cAppNo,
+                        cPolicySource: row.cPolicySource,
                     });
                     router.push({
                         path: "/pcis/my-page",
@@ -1554,6 +1556,7 @@
                                 cTermNo:row.cTermNo,
                                 cTermNme:row.cTermNme,
                                 cProdNmeCn: row.prodName,
+                                cPolicySource: row.cPolicySource,
                             });
                             router.push({
                                 path: "/pcis/my-page",
@@ -1596,7 +1599,8 @@
             cEdrRsnBundleCde,
             plyNo,
             cTermNme,
-            cTermNo
+            cTermNo,
+            cPolicySource,
         } = row;
         // 关联交易业务，接收时给出提示
         if (
@@ -1640,6 +1644,7 @@
                             cAppTyp: row.bsType,
                             cTermNme:row.cTermNme,
                             cTermNo:row.cTermNo,
+                            cPolicySource:row.cPolicySource,
                         };
                         const en = JSON.stringify(data);
                         router.push({
@@ -1736,6 +1741,7 @@
                             cTermNo:row.cTermNo,
                             cProdNmeCn: row.prodName,
                             pageName: 'priceInquiry',
+                            cPolicySource: row.cPolicySource,
                         });
                         router.push({
                             path: "/pcis/my-page",
@@ -1760,6 +1766,7 @@
                             cTermNo:row.cTermNo,
                             cProdNmeCn: row.prodName,
                             pageName: 'priceInquiry',
+                            cPolicySource: row.cPolicySource,
                         });
                         router.push({
                             path: "/pcis/my-page",
@@ -1799,6 +1806,7 @@
             pageType: "PLY_UW_PROCESS_SCENE",
             cProdNmeCn: row.prodName,
             pageName: 'priceInquiry',
+            cPolicySource: row.cPolicySource,
         });
         router.push({
             path: "/pcis/my-page",
