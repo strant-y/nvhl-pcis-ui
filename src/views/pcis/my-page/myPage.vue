@@ -4015,15 +4015,16 @@ const JointInsuranceCheck = () => {
   const ciData=opertaor.getTableRefByKey("ci").getFromValue()
   if(ciData && ciData.length>0){
     let CCoinsurerCdeNum =0; //分公司份额
-    for(const ciRow of ciData)
+    for(const ciRow of ciData){
       if("327001"=== ciRow["Ci.cCoinsurerCde"])
       { 
         CCoinsurerCdeNum++;
       }
     }
-    if(CCoinsurerCdeNum <= 1){
-      ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
-      return ;
+      if(CCoinsurerCdeNum <= 1){
+        ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
+        return ;
+      }
     }
 };
 // 将对象的属性首字母转换为小写
