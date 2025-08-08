@@ -416,6 +416,9 @@ function update() {
   } else {
     newData = termRef.value?.getFromValue();
   }
+  if( !newData ){
+    newData = termdata.value;
+  }
   const fromc = termFactormap.value?.filter(
     (v: any) => v.cPorpShowtitle === "1"
   );
