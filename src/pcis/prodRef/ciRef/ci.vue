@@ -167,6 +167,7 @@ const method = {
   cCoinsurerCdeOnInit: (data: any) => {
     const {value, rowData, config, itemRef} = data;
     if(!rowData || !config || !itemRef) return;
+    ciJiDptOptionsQuery(value, rowData);
     updateMasterAgreementValues()
   },
   // 共保公司改变事件
@@ -1221,12 +1222,11 @@ function setFormValue(value: any) {
           dptList.push(elem['Ci.cDptCde']);
         }
         elem['dptCascader'] = dptList;
-        await ciJiDptOptionsQuery(elem['Ci.cCoinsurerCde'], elem)
       }
     });
   console.log('保费计算后',tableValue)
     valideRequired()
-  }, 300);
+  }, 500);
 }
 function setValueByRowKey(props:string ,rowId: any, value:any){
   return freeEditRef?.value?.setValueByRowKey(props,rowId,value);

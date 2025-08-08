@@ -89,7 +89,7 @@
 <script setup lang="ts">
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
-const codeListMap = inject<any>('codeListMap');
+const codeListMap = inject<any>('codeListMap', {});
 const props = defineProps({
   modelValue: {
     type: [String, Number, Array<any>, Boolean],
@@ -329,7 +329,8 @@ function getLabel(val: any = undefined): any {
 
 function showOptions(visible: boolean){
   if(visible){
-    if (props.item.typeCode && options.value.length === 0) {
+    if(getCodeListMapToOption()) {
+    }else if (props.item.typeCode && options.value.length === 0) {
       uploadOption();
     } else if (props.item.typeCode && props.item.disabled) {
       // 如果是禁用项,则固定刷新下拉选
@@ -457,6 +458,14 @@ function setChangeInfo(content: any) {
     changeContent.value = undefined;
   }
 }
+
+onUnmounted(() => {
+  if(Object.keys(codeListMap) > 0) {
+    const rowId = props.row && props.row._dataId ? props.row._dataId : '';
+    delete codeListMap[props.item.typeCode + rowId];
+    delete codeListMap[props.item.prop + rowId];
+  }
+});
 defineExpose({
   setCustomClass,
   setChangeInfo
