@@ -117,7 +117,6 @@ function getFromValue() {
 }
 
 function setFormValue(data: any) {
-  codeListMap.value = {};
   tableDatas.value = data;
 }
 function validate() {
@@ -172,7 +171,7 @@ function setDisabledAll(isDisabled: boolean = true) {
   }
 	
   if (props.gridEditConfig.bottomBtn && Object.keys(props.gridEditConfig.bottomBtn).length > 0) {
-    props.gridEditConfig.bottomBtn.hidden = !isDisabled;
+    props.gridEditConfig.bottomBtn.hidden = isDisabled;
   }
   gridEditConfig.value.editFlag = !isDisabled;
 }
