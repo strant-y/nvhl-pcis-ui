@@ -136,7 +136,16 @@ const formconfig1 = ref<AppFreeEditConfig>(
         func: async () => {
           const isValid = await freeEditRef.value?.validate();
           if(isValid){
+
+
+
             const s = freeEditRef.value?.getFromValue();
+
+            if(!isObjectValid(s)){
+              ElMessage.warning('所有字段都未填写请确认！')
+              return false;
+            }
+         
             // 经营地址只选择省市区不输入详细地址获取表单值会带有undefined，这里处理一下
             for (let k in s) {
               if(s[k] && typeof s[k] === 'string' && s[k].indexOf('undefined') !== -1) {
@@ -204,6 +213,20 @@ const formconfig1 = ref<AppFreeEditConfig>(
   })
 );
 
+
+// 确定 非空校验
+const isObjectValid = (obj:any) => {
+  if (Array.isArray(obj)) {
+    return true; 
+  }
+
+  if (!obj || typeof obj !== 'object' || !Object.keys(obj).length) {
+    return false;
+  }
+  return Object.values(obj).every(v => 
+    v != null && (typeof v !== 'string' || v.trim() !== '')
+  );
+};
 onMounted(() => {
   // console.log(333)   distAdd
   dataParams.value = opertaor.getDataAll();
