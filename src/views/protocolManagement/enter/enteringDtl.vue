@@ -1,6 +1,6 @@
 <!-- ECargo协议录入-->
 <template>
-  <detail-component :bth-list="bthList" :page-type =props.type ref="mainRef" />
+  <detail-component :bth-list="bthList" :page-type =props.type :page-way=props.way  ref="mainRef" />
 </template>
 <script setup lang="ts">
 import cargoApi from '@/api/cargo';
@@ -23,6 +23,9 @@ const props = defineProps({
     default: '0' // 直接指定默认值
   },
   type: {
+    type: String
+  },
+  payWay: {
     type: String
   },
   cEdrType: {
@@ -134,14 +137,14 @@ const uwBtn = [
     },
   }),
 
-  createFreeButtonBase({
-    label: "任务痕迹",
-    type: "primary",
-    id:"trace",
-    func: () => {
-
-    },
-  }),
+  // createFreeButtonBase({
+  //   label: "任务痕迹",
+  //   type: "primary",
+  //   id:"trace",
+  //   func: () => {
+  //
+  //   },
+  // }),
   createFreeButtonBase({
     label: "核保信息",
     type: "primary",
@@ -222,7 +225,7 @@ const edrSurrenderBtn = [
     label: "申请核保",
     type: "primary",
     func: () => {
-
+      submitEdrToUndrSurrender();
     },
   }),
 ];
@@ -267,9 +270,25 @@ onBeforeMount(async () => {
   }
 	if (props.type === "add") {
     const idata = getECargoData();
-		nextTick(()=>{
-			formPage.value?.setFormDataById('AgreementBase',idata)
-			formPage.value?.setFormDataById('AgreementFeeWarn',{"ECargoBase.cPayWay":"01"})
+        nextTick(()=>{
+			formPage.value?.setFormDataById('AgreementBase',idata);
+            // 新增选择预付
+            if(props.payWay && props.payWay == '01'){
+              // 设置默认值, 给表单下拉项赋值
+              formPage.value?.setFormDataById('AgreementFeeWarn',{"ECargoBase.cPayWay": props.payWay })
+              const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn')
+              AgreementFeeWarn.setFormItem("ECargoBase.cPayWay", {
+                typeCode: 'ECargo_Pay_Ways',
+                codeParam: { payway: 'prepay' }
+              })
+            }else{
+              formPage.value?.setFormDataById('AgreementFeeWarn',{"ECargoBase.cPayWay": props.payWay })
+              const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn')
+              AgreementFeeWarn.setFormItem("ECargoBase.cPayWay",  {
+                typeCode: 'ECargo_Pay_Ways',
+                codeParam: { payway: 'nonPrepay' }
+              })
+            }
 		})
   }
   bthList.value.push(
@@ -335,9 +354,76 @@ const getBtn = (id) => {
   });
 };
 /**
+ * 批单退保注销申请核保
+ */
+const submitEdrToUndrSurrender = async () => {
+  const result = await  mainRef.value?.getxyedrbaseValidate()
+  if(!result){
+    return ElMessage.error('请填写必填项')
+  }
+  const allFromData = formPage.value?.getAllFormData()
+  const base = allFromData['AgreementBase'];
+  const filter = [];
+  if(base['ECargoBase.cCiMrk'] === '0') {
+    filter.push(...['AgreementCiTcp', 'AgreementCiShare', 'AgreementCi'
+      , 'AgreementCvrg','AgreementAcctinfo','AgreementCiTcp'  // 临时关闭体条款校验
+    ]);
+  }
+  const validateAll = await formPage.value?.validateAll(filter);
+  if(!validateAll.flag) {
+    ElMessage.warning(validateAll.msg);
+    return;
+  }
+  const f = await saveEdrPlyInfo(); // 提交核保,需要默认执行一次保存操作
+  if(f){
+    const btn = getBtn("btnSubmitEdr");
+    btn.loading = true;
+    const res = {};
+    const base = formPage.value?.getFormDataById('AgreementBase');
+    res["user"] = user;
+    res["cEcAgrAppNo"] = base["ECargoBase.cEcAgrAppNo"];
+    res["cEcAgrNo"] = base["ECargoBase.cEcAgrNo"];
+    const edrInfo: any = await cargoApi.saveEdrEcargo({
+      ...res,
+      sence:'arraigned'
+    })
+    btn.loading = false;
+    if(edrInfo["code"] == "200"){
+      ElMessage.success(edrInfo.msg);
+      if(edrInfo['cDecision'] === '1' || edrInfo['cDecision'] === '2'){
+        tagsViewStore.delView({"name": "enteringDtl",
+          "title": "录入明细",
+          "path": "/protocolManagement/enteringDtl",
+          "fullPath": "/protocolManagement/enteringDtl"}).then((res: any) => {
+          router.replace({ path: "/protocolManagement/protocolCorrection" });
+        });
+      }
+    }else {
+      ElMessage.error(edrInfo.msg);
+    }
+  }
+}
+/**
  * 批单申请核保
  */
 const submitEdrToUndrFun = async () => {
+  const result = await  mainRef.value?.getxyedrbaseValidate()
+  if(!result){
+    return ElMessage.error('请填写必填项')
+  }
+  const allFromData = formPage.value?.getAllFormData()
+  const base = allFromData['AgreementBase'];
+  const filter = [];
+  if(base['ECargoBase.cCiMrk'] === '0') {
+    filter.push(...['AgreementCiTcp', 'AgreementCiShare', 'AgreementCi'
+      , 'AgreementCvrg','AgreementAcctinfo','AgreementCiTcp'  // 临时关闭体条款校验
+    ]);
+  }
+  const validateAll = await formPage.value?.validateAll(filter);
+  if(!validateAll.flag) {
+    ElMessage.warning(validateAll.msg);
+    return;
+  }
   const f = await saveEdrPlyInfo(); // 提交核保,需要默认执行一次保存操作
   if(f){
     const btn = getBtn("btnSubmitEdr");
@@ -734,12 +820,12 @@ async function  submit() {
   const filter = [];
   if(base['ECargoBase.cCiMrk'] === '0') {
     filter.push(...['AgreementCiTcp', 'AgreementCiShare', 'AgreementCi'
-        , 'AgreementCvrg'  // 临时关闭体条款校验
+        , 'AgreementCvrg','AgreementAcctinfo','AgreementCiTcp'  // 临时关闭体条款校验
     ]);
   }
-  if(props.type === 'add' || props.type === 'edit'  || (props.type === 'EDR_APP_NEW_SCENE' && props?.param?.cEdrType == '1') ){
-    filter.push('AgreementAcctinfo')
-  }
+  // if(props.type === 'add' || props.type === 'edit'  || (props.type === 'EDR_APP_NEW_SCENE' && props?.param?.cEdrType == '1') ){
+  //   filter.push('AgreementAcctinfo')
+  // }
   const rv = await formPage.value?.validateAll(filter)
   if(!rv.flag){
    return  ElMessage.error(rv.msg);

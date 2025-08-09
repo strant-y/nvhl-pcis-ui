@@ -357,17 +357,17 @@ const tableconfig = reactive<AppTableConfig>(
                 icon: "Edit",
                 tableClick: (row) => {
                     console.log(1212,row)
+                    if(row.cCiMrk === "5"){
+                        ElMessage.warning('出单方式为司内联保时,联共保信息不可批改!');
+                        return;
+                    }else{
+                        openEdr(row.cAppNo, row.cPlyNo, row.cProdNo, row.cKindNo, row);
+                    }
                     // if ("DP" === row.id) {
                     //     ciCoopCorrect(row)
                     // }else{
-                    openEdr(row.cAppNo, row.cPlyNo, row.cProdNo, row.cKindNo, row);
+                    
                     // }
-
-
-
-
-
-
                     // else if ("DP" === rsnCde.value[selected.value["cPlyNo"]]) {
                     //     ciCoopCorrect(selected.value["cPlyNo"])
                     //     console.log('数据====', result)

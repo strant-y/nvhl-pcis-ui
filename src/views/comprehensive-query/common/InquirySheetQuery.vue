@@ -947,7 +947,7 @@ const tableObj = {
                 hideBtns: (row: any) => {
                     // 询价转投保按钮只在状态为"已出保单"时可见
                     if (
-                        row.cAppStatus == "5"
+                        row.cAppStatus == "5" && row.canConvert === "1"
                     ) {
                         return false;
                     } else {

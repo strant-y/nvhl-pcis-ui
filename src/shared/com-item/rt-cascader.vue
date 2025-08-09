@@ -96,6 +96,9 @@ const customClass = ref<string[]>([]);
 
 const changeContent = ref<string | undefined>();
 
+// 添加一个标志，标识数据是否已加载
+const isDataLoaded = ref(false);
+
 const cascprops: CascaderProps = {
   lazy: true,
   checkStrictly: props.item.checkStrictly
@@ -188,28 +191,32 @@ onMounted(() => {
       // 优先查 codeListMap.value
     } else if (props.item.loadData) {
       options.value = props.item.loadData;
+      isDataLoaded.value = true;
     } else if (
       props.item.typeCode &&
       props.modelValue &&
       getParam() &&
       Object.keys(getParam()).length > 0
     ) {
-      codeListStore
-        .queryCodeList(
-          {
-            codeListName: props.item.typeCode,
-            codeListParam: getParam(),
-          },
-          props.unAuthor,
-          props.item.cache ? props.item.cache : true
-        )
-        .then((res) => {
-          options.value = res;
-        })
-        .catch((err) => {
-          console.error(err);
-          options.value = [];
-        });
+      // 只有在没有缓存数据且需要加载时才请求数据
+      if (!isDataLoaded.value) {
+        codeListStore
+          .queryCodeList(
+            {
+              codeListName: props.item.typeCode,
+              codeListParam: getParam(),
+            },
+            props.unAuthor,
+            props.item.cache ? props.item.cache : true
+          )
+          .then((res) => {
+            options.value = res;
+          })
+          .catch((err) => {
+            console.error(err);
+            options.value = [];
+          });
+        }
     }
   }
 });
@@ -389,19 +396,29 @@ function setChangeInfo(content: any) {
 }
 
 
-onUnmounted(() => {
+// onUnmounted(() => {
+//   if(Object.keys(codeListMap).length > 0) {
+//     const rowId = props.row && props.row._dataId ? props.row._dataId : '';
+//     delete codeListMap[props.item.typeCode + rowId];
+//     delete codeListMap[props.item.prop + rowId];
+//   }
+// });
+// 添加一个方法用于手动清除缓存（可选）
+function clearCache() {
   if(Object.keys(codeListMap).length > 0) {
     const rowId = props.row && props.row._dataId ? props.row._dataId : '';
     delete codeListMap[props.item.typeCode + rowId];
     delete codeListMap[props.item.prop + rowId];
   }
-});
+  isDataLoaded.value = false;
+}
 defineExpose({
   updateOption,
   getTextValue,
   setCustomClass,
   setChangeInfo,
-  clearCheckedNodes
+  clearCheckedNodes,
+  clearCache
 });
 </script>
 <style lang="scss">
