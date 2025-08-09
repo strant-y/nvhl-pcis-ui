@@ -236,7 +236,7 @@ onMounted(()=>{
     edritemFlag.value =true
     if (
         (props.pageType === "EDR_APP_NEW_SCENE" &&
-            (idxParam.param.cEdrType == "3" || idxParam.param.param == "2"))
+            (idxParam.param.cEdrType == "3" || idxParam.param.cEdrType == "2"))
     ) {
       edritemFlag.value = false;
     }
@@ -297,6 +297,9 @@ function setxyedrbaseRefValue(key:any,val:any){
 function getxyedrbaseRefValue(key:any,val:any){
   return xyedrbase.value?.getFromValue()
 }
+function getxyedrbaseValidate(key:any,val:any){
+  return xyedrbase.value?.validate()
+}
 function getxyedritemValue(){
   return xyedritem.value?.handleQuery()
 }
@@ -323,6 +326,7 @@ function handleAnchorClick(event: any, targetId: string) {
   }
 }
 defineExpose({
+  getxyedrbaseValidate,
   getxyedritemValue,
   getUnderwriteRef,
   getUnderwriteValue,

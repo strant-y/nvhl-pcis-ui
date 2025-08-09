@@ -222,7 +222,7 @@ const edrSurrenderBtn = [
     label: "申请核保",
     type: "primary",
     func: () => {
-
+      submitEdrToUndrSurrender();
     },
   }),
 ];
@@ -335,9 +335,60 @@ const getBtn = (id) => {
   });
 };
 /**
+ * 批单退保注销申请核保
+ */
+const submitEdrToUndrSurrender = async () => {
+  const result = await  mainRef.value?.getxyedrbaseValidate()
+  if(!result){
+    return ElMessage.error('请填写必填项')
+  }
+  const validateAll = await formPage.value?.validateAll();
+  if(!validateAll.flag) {
+    ElMessage.warning(validateAll.msg);
+    return;
+  }
+  const f = await saveEdrPlyInfo(); // 提交核保,需要默认执行一次保存操作
+  if(f){
+    const btn = getBtn("btnSubmitEdr");
+    btn.loading = true;
+    const res = {};
+    const base = formPage.value?.getFormDataById('AgreementBase');
+    res["user"] = user;
+    res["cEcAgrAppNo"] = base["ECargoBase.cEcAgrAppNo"];
+    res["cEcAgrNo"] = base["ECargoBase.cEcAgrNo"];
+    const edrInfo: any = await cargoApi.saveEdrEcargo({
+      ...res,
+      sence:'arraigned'
+    })
+    btn.loading = false;
+    if(edrInfo["code"] == "200"){
+      ElMessage.success(edrInfo.msg);
+      if(edrInfo['cDecision'] === '1' || edrInfo['cDecision'] === '2'){
+        tagsViewStore.delView({"name": "enteringDtl",
+          "title": "录入明细",
+          "path": "/protocolManagement/enteringDtl",
+          "fullPath": "/protocolManagement/enteringDtl"}).then((res: any) => {
+          router.replace({ path: "/protocolManagement/protocolCorrection" });
+        });
+      }
+    }else {
+      ElMessage.error(edrInfo.msg);
+    }
+  }
+}
+/**
  * 批单申请核保
  */
 const submitEdrToUndrFun = async () => {
+  const result = await  mainRef.value?.getxyedrbaseValidate()
+  if(!result){
+    return ElMessage.error('请填写必填项')
+  }
+  const validateAll = await formPage.value?.validateAll();
+  if(!validateAll.flag) {
+    ElMessage.warning(validateAll.msg);
+    return;
+  }
   const f = await saveEdrPlyInfo(); // 提交核保,需要默认执行一次保存操作
   if(f){
     const btn = getBtn("btnSubmitEdr");
