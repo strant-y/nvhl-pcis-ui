@@ -48,34 +48,36 @@ const handelCalculate = (row:any,selectData:any)=>{
     if(isAllAValuesSame(selectData,'ECargoGoodsTgt.cPrmCur')){
 
       cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.cFeeCurrency',row['_dataId'] , selectData[0]['ECargoGoodsTgt.cPrmCur'])
-      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.cAmountCurrency',row['_dataId'] , selectData[0]['ECargoGoodsTgt.cPrmCur'])
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.cOriginalCurrency',row['_dataId'] , selectData[0]['ECargoGoodsTgt.cPrmCur'])
 
       cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nFeeRate',row['_dataId'] , selectData[0]['ECargoGoodsTgt.nAmtExch'])
       cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nOriginalRate',row['_dataId'] , selectData[0]['ECargoGoodsTgt.nAmtExch'])
 
       cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.cFeeCurrency", 'hidden', false)
-      cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.cAmountCurrency", 'hidden', false)
+      cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.cOriginalCurrency", 'hidden', false)
       cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.nFeeRate", 'hidden', false)
       cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.nOriginalRate", 'hidden', false)
     }else {
+      ElMessage.error('请选择币种一样的货物')
+      return
       cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nInsuranceAmount',row['_dataId'] , '')
       cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nInsuranceFee',row['_dataId'] , '')
 
       cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.cFeeCurrency',row['_dataId'] , '')
-      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.cAmountCurrency',row['_dataId'] , '')
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.cOriginalCurrency',row['_dataId'] , '')
 
       cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nFeeRate',row['_dataId'] , '')
       cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nOriginalRate',row['_dataId'] , '')
 
       cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.cFeeCurrency", 'hidden', true)
-      cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.cAmountCurrency", 'hidden', true)
+      cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.cOriginalCurrency", 'hidden', true)
       cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.nFeeRate", 'hidden', true)
       cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.nOriginalRate", 'hidden', true)
 
     }
     const nSeqNoJoin = selectData.map((item: any) => item['ECargoGoodsTgt.nSeqNo']).join(',')
     cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nCargoSeq',row['_dataId'] , nSeqNoJoin)
-    const sum = selectData.reduce((total, current) => total + current['ECargoGoodsTgt.nRmbLimit'], 0);
+    const sum = selectData.reduce((total, current) => total + current['ECargoGoodsTgt.nInsuranceAmount'], 0);
     cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nInsuranceAmount',row['_dataId'] , sum)
     cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbAmount',row['_dataId'] , sum * row['ECargoTerm.nOriginalRate'])
     if(row['ECargoTerm.nRateVal']){
@@ -253,7 +255,7 @@ const method = {
       atGroupIdxList.forEach((item: any) => {
         if(item['_dataId'] === row['_dataId']) {
           // 保留当前行数据 清除字段值
-          item['ECargoTerm.cAmountCurrency'] = 'CNY'
+          item['ECargoTerm.cOriginalCurrency'] = 'CNY'
           item['ECargoTerm.cFeeCurrency'] = 'CNY'
           item['ECargoTerm.nOriginalRate'] = "1.000000"
           item['ECargoTerm.nFeeRate'] = "1.000000"
@@ -431,7 +433,7 @@ function setOptions(key: string, rowId: string, codeListName: string, codeListPa
 
 const buildRow = (data: any) => {
   const res: any = {};
-  res['ECargoTerm.cAmountCurrency'] = 'CNY'
+  res['ECargoTerm.cOriginalCurrency'] = 'CNY'
   res['ECargoTerm.cFeeCurrency'] = 'CNY'
   res['ECargoTerm.nOriginalRate'] = "1.000000"
   res['ECargoTerm.nFeeRate'] = "1.000000"
