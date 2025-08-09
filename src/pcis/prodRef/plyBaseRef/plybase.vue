@@ -22,9 +22,7 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { useValidator } from "@/typings/useValidator";
 import DepartmentTree from "../commodityRef/DepartmentTree.vue";
-import { get } from "lodash";
 import { codeListViewStore, dataOpertaor, useProductStore } from "@/store";
-import { de } from "element-plus/es/locale";
 const productStore = useProductStore();
 
 const codeListStore = codeListViewStore();
