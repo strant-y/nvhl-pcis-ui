@@ -1,6 +1,6 @@
 <!-- ECargo协议录入-->
 <template>
-  <detail-component :bth-list="bthList" :page-type =props.type ref="mainRef" />
+  <detail-component :bth-list="bthList" :page-type =props.type :page-way=props.way  ref="mainRef" />
 </template>
 <script setup lang="ts">
 import cargoApi from '@/api/cargo';
@@ -23,6 +23,9 @@ const props = defineProps({
     default: '0' // 直接指定默认值
   },
   type: {
+    type: String
+  },
+  payWay: {
     type: String
   },
   cEdrType: {
@@ -267,9 +270,25 @@ onBeforeMount(async () => {
   }
 	if (props.type === "add") {
     const idata = getECargoData();
-		nextTick(()=>{
-			formPage.value?.setFormDataById('AgreementBase',idata)
-			formPage.value?.setFormDataById('AgreementFeeWarn',{"ECargoBase.cPayWay":"01"})
+        nextTick(()=>{
+			formPage.value?.setFormDataById('AgreementBase',idata);
+            // 新增选择预付
+            if(props.payWay && props.payWay == '01'){
+              // 设置默认值, 给表单下拉项赋值
+              formPage.value?.setFormDataById('AgreementFeeWarn',{"ECargoBase.cPayWay": props.payWay })
+              const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn')
+              AgreementFeeWarn.setFormItem("ECargoBase.cPayWay", {
+                typeCode: 'ECargo_Pay_Ways',
+                codeParam: { payway: 'prepay' }
+              })
+            }else{
+              formPage.value?.setFormDataById('AgreementFeeWarn',{"ECargoBase.cPayWay": props.payWay })
+              const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn')
+              AgreementFeeWarn.setFormItem("ECargoBase.cPayWay",  {
+                typeCode: 'ECargo_Pay_Ways',
+                codeParam: { payway: 'nonPrepay' }
+              })
+            }
 		})
   }
   bthList.value.push(

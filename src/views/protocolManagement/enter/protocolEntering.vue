@@ -58,17 +58,18 @@ import { codeListViewStore } from "@/store";
 import cargoApi from '@/api/cargo'
 import { DocumentCopy } from "@element-plus/icons-vue";
 
-
 const userStore = useUserStore();
 const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
-
 const codeListStore = codeListViewStore();
 
 const params = route.query.data ? JSON.parse(route.query.data) : {};
 const dataSet = ref<any>([]); // 数据集合
 const planSet = ref<any>([]); //结果集
+
+const dialog = ref<DialogMethod | null>(null);
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 
 const selectedRows = ref<any[]>([]);
 const btnTitle = ref<any>([{ label: "" }, { label: "" }]);
@@ -83,6 +84,8 @@ const appStatusOptions = ref([
   { label: "见费出单退回", value: "8" },
 ])
 const departmentTree = defineAsyncComponent(() => import("@/pcis/prodRef/commodityRef/DepartmentTree.vue"))
+const paymentDialog = defineAsyncComponent(() => import("./paymentMethod.vue"));
+
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -277,7 +280,7 @@ const tableconfig = reactive<AppTableConfig>(
         label: "新增",
         icon: "Plus",
         func: () => {
-          toDtl({}, 'add');
+          showMethodModal()
         },
       }),
     ],
@@ -418,12 +421,22 @@ const method = {
 // 绑定特殊验证器
 const exRules = {};
 
+function showMethodModal() {
+  dzmodal
+    .open(paymentDialog)
+    .then((res: any) => {
+      if (res.type === "ok") {
+        const selectedPayment = res.body?.param;
+        toDtl({}, 'add', selectedPayment);
+      }
+    });
+};
 
-function toDtl(row: any, type: string) {
+function toDtl(row: any, type: string, payWay: string ) {
   if(row.cAppTyp === 'E'){
     router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify(row), type: 'EDR_APP_NEW_SCENE',isActive:'1'}});
   }else {
-    router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify(row), type: type}});
+    router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify(row), type: type, payWay: payWay}});
   }
 }
 
