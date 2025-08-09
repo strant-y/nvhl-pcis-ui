@@ -264,17 +264,18 @@ const method = {
       freeEditRef.value?.setValueByRowKey("Ci.cDptCde", rowId, undefined);
     }
     // 如果级联选择器的值发生变化（分公司或出单机构任意一个发生变化），则清空当前行的业务员信息
-    if (oldSubDptCde !== value?.[0] || oldDptCde !== value?.[1]) {
-      // 清空业务员相关信息
-      freeEditRef?.value?.setValueByRowKey("Ci.cSlsCde", rowId, "");
-      freeEditRef?.value?.setValueByRowKey("Ci.cSlsNme", rowId, "");
-      freeEditRef?.value?.setValueByRowKey("Ci.cBrkrCde", rowId, "");
-      freeEditRef?.value?.setValueByRowKey("Ci.cBrkSlsCde", rowId, "");
-      
-      // 重新校验必填规则
-      valideRequired();
+    if(!initFlag.value){
+      if (oldSubDptCde !== value?.[0] || oldDptCde !== value?.[1]) {
+        // 清空业务员相关信息
+        freeEditRef?.value?.setValueByRowKey("Ci.cSlsCde", rowId, "");
+        freeEditRef?.value?.setValueByRowKey("Ci.cSlsNme", rowId, "");
+        freeEditRef?.value?.setValueByRowKey("Ci.cBrkrCde", rowId, "");
+        freeEditRef?.value?.setValueByRowKey("Ci.cBrkSlsCde", rowId, "");
+        
+        // 重新校验必填规则
+        valideRequired();
+      }
     }
-
   },
   dptCascaderOnInit: (data: any) =>{
     const {value, rowData, config, itemRef} = data;
@@ -851,6 +852,14 @@ const initCiInfo = (data: any) => {
   nextTick(() => {
     const cSlsId = opertaor.getTableRefByKey('plyBase').getValue('Base.cSlsId')
     const cBrkSlsCde = opertaor.getTableRefByKey('plyBase').getValue('Base.cBrkSlsCde')
+    // 联保机构、出单机构 转 级联组件初始化
+    const dptList = [];
+    if(param['dptCde']) {
+      dptList.push(param['dptCde']);
+      if(param['cDptCde']) {
+        dptList.push(param['cDptCde']);
+      }
+    }
     freeEditRef?.value?.addRowByData( {
       'Ci.nSeqNo': 1,
       'Ci.nCiShare': '100.00000000',
@@ -864,7 +873,9 @@ const initCiInfo = (data: any) => {
       'Ci.cDptCde': param.cDptCde,
       'Ci.cSlsCde': cSlsId,
       'Ci.cBrkSlsCde': cBrkSlsCde,
+      'dptCascader' : dptList,
     });
+      
     // 联保机构下拉选项查询
     ciJiDptOptionsQuery('327001', getFromValue()[0]);
     onChiefMrkChange()
