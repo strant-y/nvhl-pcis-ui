@@ -84,9 +84,19 @@ function getEcargoEndorseChange(queryParams: any): AxiosPromise<any> {
 function queryEcargoDetailsLast(queryParams: any): AxiosPromise<any> {
     return post(`${PageBaseUrl}/queryEcargoDetailsLast`, queryParams);
 }
-
-
+function getRate(queryParams: any): AxiosPromise<any> {
+    return post(`${PageBaseUrl}/getRate`, queryParams);
+}
+function saveRate(queryParams: any): AxiosPromise<any> {
+    return post(`${PageBaseUrl}/saveRate`, queryParams);
+}
+function queryPlan(queryParams: any): AxiosPromise<any> {
+    return post(`/codelist/query`, queryParams);
+}
 export default {
+    saveRate,
+    queryPlan,
+    getRate,
     saveEdrEcargo,
     getEcargoEndorseChange,
     selectDistNew,
