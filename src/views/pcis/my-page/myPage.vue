@@ -2629,6 +2629,10 @@ function getFKFunc() {
  * 投保申请核保
  */
 const submitToUndrFn = async () => {  
+  console.log('数据----',opertaor.getTableRefByKey("base").getFromValue()['Base.nPrm'])
+  console.log('数据----',opertaor.getDataAll())
+    console.log('数据----3',opertaor.getTableRefByKey("payinfo").getFromValue())
+
  	if (needCalc.value) {
     ElMessage.error("请先进行保费计算!");
     return;
@@ -2709,6 +2713,22 @@ const submitToUndrFn = async () => {
         return;
       }
     }
+
+  // 判断应收保费是否同保费相同
+ 
+  let nPrm = opertaor.getTableRefByKey("base").getFromValue()['Base.nPrm'];
+  let nPayablePrmData = opertaor.getTableRefByKey("payinfo").getFromValue()  // 缴费计划数据  
+  let nPayAll = 0;
+  nPayablePrmData.forEach((item:any)=>{
+        console.log(item)
+        nPayAll+= item['Pay.nPayablePrm']
+  })
+  console.log('数',nPayAll)
+  if(nPayAll !== nPrm ){
+      ElMessage.warning('缴费计划“应收保费”不等于“总保费”请确认！')
+      return false;
+  }
+ 
 
 
   const f = await savePlyInfo(); // 提交核保,需要默认执行一次保存操作

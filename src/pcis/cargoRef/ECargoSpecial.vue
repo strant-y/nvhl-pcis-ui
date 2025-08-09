@@ -210,7 +210,7 @@ const refreshData = () => {
     pageNum: 1,
     pageSize: 999,
   }).then((res) => {
-    if (res.data.result) {
+    if (res.data?.result) {
             let len = 0;
             let sel : any[] = [];
             res.data.result.forEach((item: any,index:number) => {

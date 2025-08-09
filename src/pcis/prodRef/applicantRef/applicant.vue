@@ -981,18 +981,25 @@ const method = {
     }
   },
   // 证件号码change
-  cCertfCdeChange: (val) => {
-
+  cCertfCdeChange: (val:any) => {
+    console.log('身份证',val)
     const tabref = opertaor.getTableRefs();
     const cCertfCls = tabref["applicant"].getFromValue()["Applicant.cCertfCls"];
+
+
+
+
     if (cCertfCls == "120001") {
       if (val) {
         const certfCde = applicantEditRef.value?.getValue(
           "Applicant.cCertfCde"
         );
-        if (certfCde && certfCde.length === 18) {
-            // idAnalysis(val)
-        }
+        applicantEditRef.value?.validateField('Applicant.cCertfCde').then((isValid)=>{
+           
+            if(isValid){
+                idAnalysis(val)
+            }
+        })
       }
     }
 

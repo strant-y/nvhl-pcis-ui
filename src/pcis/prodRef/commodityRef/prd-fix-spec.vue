@@ -121,7 +121,7 @@ const refreshData = () => {
     pageNum: 1,
     pageSize: 999,
   }).then((res) => {
-    if (res.data.result) {
+    if (res.data?.result) {
       pageresult.list = [];
       res.data.result.forEach((item, index) => {
         pageresult.list.push({

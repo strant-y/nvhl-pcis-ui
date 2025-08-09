@@ -224,40 +224,40 @@ const checkUser = () => {
             ) {
 
           insuredEditRef.value?.validateField(fieldsToValidate).then((isValid)=>{
-                console.log('校验----',isValid)
+            
                 if(isValid){
 
-              debounceTimer = setTimeout(() => {
-             
-                    const param = {
-                      coustName: insuredValue["Insured.cInsuredNme"],
-                      coustMrk: insuredValue["Insured.cClntMrk"],
-                      coustType: insuredValue["Insured.cCertfCls"],
-                      coustCode: insuredValue["Insured.cCertfCde"],
-                      personnelType: "Insured"
-                    }
-                    qryCustomer(param)
-                      .then((res) => {
-                        const { code, data, msg } = res;
-                        if (200 === code) {
-                          console.log('客户数据', res)
-                          if (data) {
-                            if(data && data.length > 0){
-                              Object.keys(data[0]).forEach((key) => { 
-                                if(data[0][key]){
-                                  setValue(key, data[0][key]);
-                                }
-                              });
-                            }
-                            let userId = getValue('Insured.cCertfCde')
-                            idAnalysis(userId)
-                          }
-                        } else {
-                        }
-                      })
-                      .finally(() => { });
+                  debounceTimer = setTimeout(() => {
                 
-                },500)
+                        const param = {
+                          coustName: insuredValue["Insured.cInsuredNme"],
+                          coustMrk: insuredValue["Insured.cClntMrk"],
+                          coustType: insuredValue["Insured.cCertfCls"],
+                          coustCode: insuredValue["Insured.cCertfCde"],
+                          personnelType: "Insured"
+                        }
+                        qryCustomer(param)
+                          .then((res) => {
+                            const { code, data, msg } = res;
+                            if (200 === code) {
+                              console.log('客户数据', res)
+                              if (data) {
+                                if(data && data.length > 0){
+                                  Object.keys(data[0]).forEach((key) => { 
+                                    if(data[0][key]){
+                                      setValue(key, data[0][key]);
+                                    }
+                                  });
+                                }
+                                let userId = getValue('Insured.cCertfCde')
+                                idAnalysis(userId)
+                              }
+                            } else {
+                            }
+                          })
+                          .finally(() => { });
+                    
+                    },500)
               }
           })
         }
@@ -1058,9 +1058,11 @@ const method = {
     if (cCertfCls == "120001") {
       if (val) {
         const certfCde = tabref["insured"].getFromValue()["Insured.cCertfCde"];
-        if (certfCde && certfCde.length === 18) {
-          // idAnalysis(certfCde)
-        }
+          insuredEditRef.value?.validateField('Insured.cCertfCde').then((isValid)=>{
+            if(isValid){
+                idAnalysis(val)
+            }
+          })
       }
     }else if(cCertfCls =='110007'){
       setValue('Insured.cTaxRegistrationNo',val)
