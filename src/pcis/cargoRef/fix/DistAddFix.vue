@@ -20,7 +20,9 @@ import {FormPage} from "@/views/protocolManagement/utils/form-page";
 import moment from "moment";
 const dialog = ref<DialogMethod | null>(null);
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
-
+import cargoApi from "@/api/cargo";
+import {ElMessage} from "element-plus";
+import {ref} from "vue";
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 
 const props = defineProps({
@@ -85,8 +87,12 @@ const formconfig1 = ref<AppFreeEditConfig>(
   })
 );
 const distContactList:Array<string> = ['DistECargo.PartProp','Tgt.cSuffixAddr','DistECargo.Prop','DistECargo.cSuffixAddr','DistECargo.JingyingProp','DistECargo.cDetailedAddress']
-
-onMounted(() => {
+const rateDetail = ref({
+  cExchCde: '1',
+  nAmtExch:[],
+  cPrmCur:[]
+})
+onMounted(async  () => {
   dataParams.value = formPage.getAllFormData();
 
   let newSchema = [];
@@ -109,6 +115,16 @@ onMounted(() => {
       item["func"] = bonusRatio;
     }
     if(['ECargoGoodsTgt.cPrmCur'].includes(item.prop)) {
+      const result:any =  await cargoApi.getRate({cEcAgrAppNo:props.data.cEcAgrAppNo})
+      if(result?.code == 200){
+        rateDetail.value = {...result.data.data[0].rateDetail}
+        nextTick(()=>{
+          item['loadData'] = rateDetail.value?.cPrmCur
+        })
+      }else{
+        ElMessage.error(result.msg);
+        return
+      }
       item["func"] = cAmtCurChange;
     }
 		// 运输信息-币种 添加change事件
@@ -200,6 +216,9 @@ onMounted(() => {
     if(!cCustRiskRank){
       setValue("ECargoGoodsTgt.cPrmCur","CNY");
     }
+  }, 100);
+  setTimeout(() => {
+    setValue('ECargoGoodsTgt.cExchCde',rateDetail.value.cExchCde)
   }, 100);
   console.log(' formconfig1.value', formconfig1.value)
 });
@@ -372,21 +391,25 @@ function setRegisterAdd() {
 }
 //总保额币种下拉事件
 const cAmtCurChange = (val: any)=>{
-  if (val !== "CNY") {
-    codeListStore
-        .queryCodeList({
-          codeListName: "WEB_BAS_CHGRATE",
-          codeListParam: { value: val },
-        })
-        .then((res) => {
-          console.log("0000000", res);
-          setValue("ECargoGoodsTgt.nAmtExch", res[0].currency_rate);
-          setValue('ECargoGoodsTgt.nRmbLimit',Number(getValue('ECargoGoodsTgt.nInsuranceAmount'))*getValue('ECargoGoodsTgt.nAmtExch'))
-        });
-  } else {
-    setValue("ECargoGoodsTgt.nAmtExch", "1.000000");
-    setValue('ECargoGoodsTgt.nRmbLimit',Number(getValue('ECargoGoodsTgt.nInsuranceAmount')))
-  }
+  const foundItem:any = rateDetail.value.nAmtExch.find((item:any) => item.label === val);
+  setValue("ECargoGoodsTgt.nAmtExch", foundItem.value);
+  setValue('ECargoGoodsTgt.nRmbLimit',Number(getValue('ECargoGoodsTgt.nInsuranceAmount'))*getValue('ECargoGoodsTgt.nAmtExch'))
+  setValue('ECargoGoodsTgt.cExchCde',rateDetail.value.cExchCde)
+  // if (val !== "CNY") {
+  //   codeListStore
+  //       .queryCodeList({
+  //         codeListName: "WEB_BAS_CHGRATE",
+  //         codeListParam: { value: val },
+  //       })
+  //       .then((res) => {
+  //         console.log("0000000", res);
+  //         setValue("ECargoGoodsTgt.nAmtExch", res[0].currency_rate);
+  //         setValue('ECargoGoodsTgt.nRmbLimit',Number(getValue('ECargoGoodsTgt.nInsuranceAmount'))*getValue('ECargoGoodsTgt.nAmtExch'))
+  //       });
+  // } else {
+  //   setValue("ECargoGoodsTgt.nAmtExch", "1.000000");
+  //   setValue('ECargoGoodsTgt.nRmbLimit',Number(getValue('ECargoGoodsTgt.nInsuranceAmount')))
+  // }
 }
 // 运输信息币种change事件
 const cAmtCurChange1 = (val: any)=>{
