@@ -198,62 +198,66 @@ const idAnalysis = (id:string)=>{
          
           // clearValidate('Applicant.cCertfCde')  
 };
-
     // 防抖定时器
 let debounceTimer = <any>null ;
+
 //  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
 const checkUser = () => {
+      const fieldsToValidate = ['Applicant.cAppNme', 'Applicant.cClntMrk',"Applicant.cCertfCde","Applicant.cCertfCls"];
+      
+      // 自定义录单 方案配置 模版 进入 可以查询用户信息  
       if (param.pageType !== "app" &&  param.pageType !== "copy" && param.pageType !== "template" && param.cAppStatus !=='1') {
           return false;
         }
       if (debounceTimer) {
         clearTimeout(debounceTimer);
-      }
-
-        debounceTimer = setTimeout(() => {
-          // 自定义录单 方案配置 模版 进入 可以查询用户信息  
-    
-        const tabref = opertaor.getTableRefs();
-        const applicantValue = tabref["applicant"].getFromValue();
+      }     
+     const tabref = opertaor.getTableRefs();
+     const applicantValue = tabref["applicant"].getFromValue();
         //  只要4个有值 去请求客户信息
-        if (
-          applicantValue["Applicant.cAppNme"]&&
-          applicantValue["Applicant.cClntMrk"] !== null &&
-          applicantValue["Applicant.cCertfCde"] &&
-          applicantValue["Applicant.cCertfCls"]
-        ) {
-          const param = {
-            coustName: applicantValue["Applicant.cAppNme"],
-            coustMrk: applicantValue["Applicant.cClntMrk"],
-            coustType:applicantValue["Applicant.cCertfCls"],
-            coustCode: applicantValue["Applicant.cCertfCde"],
-            personnelType:"Applicant"
-          }
-          qryCustomer(param)
-            .then((res) => {
-              const { code, data, msg } = res;
-              if (200 === code) {
-                if(data){
-                  if(data && data.length > 0){
-                    Object.keys(data[0]).forEach((key) => { 
-                      if(data[0][key]){
-                        setValue(key, data[0][key]);
-                      }
-                    });
-                  }
-                  // tabref ['applicant'].setFormValue(data[0])
-                  let userId = getValue('Applicant.cCertfCde')
-                  idAnalysis(userId)
-                }
-              } else {
-              
-              }
-            })
-            .finally(() => {});
-        }
+     if (       applicantValue["Applicant.cAppNme"]&&
+       applicantValue["Applicant.cClntMrk"] !== null &&
+       applicantValue["Applicant.cCertfCde"] &&
+       applicantValue["Applicant.cCertfCls"]     ) {
 
-      }, 500); // 防抖延迟500ms
-  
+        applicantEditRef.value?.validateField(fieldsToValidate).then((isValid)=>{
+          console.log('校验----',isValid)
+          if(isValid){
+             debounceTimer = setTimeout(() => {
+                 const param = {
+                    coustName: applicantValue["Applicant.cAppNme"],
+                    coustMrk: applicantValue["Applicant.cClntMrk"],
+                    coustType:applicantValue["Applicant.cCertfCls"],
+                    coustCode: applicantValue["Applicant.cCertfCde"],
+                    personnelType:"Applicant"
+                  }
+                  qryCustomer(param)
+                    .then((res) => {
+                      const { code, data, msg } = res;
+                      if (200 === code) {
+                        if(data){
+                          if(data && data.length > 0){
+                            Object.keys(data[0]).forEach((key) => { 
+                              if(data[0][key]){
+                                setValue(key, data[0][key]);
+                              }
+                            });
+                          }
+                          // tabref ['applicant'].setFormValue(data[0])
+                          let userId = getValue('Applicant.cCertfCde')
+                          idAnalysis(userId)
+                        }
+                      } else {
+                      
+                      }
+                    })
+                    .finally(() => {});
+              
+
+              }, 500); // 防抖延迟500ms
+          }
+         })
+       }
    };
  
 // 绑定方法
@@ -1162,6 +1166,8 @@ function setFormValue(value: any) {
 function validate() {
   return applicantEditRef?.value?.validate();
 }
+
+
 
 function setValue(key: string, value: any) {
   applicantEditRef?.value?.setValue(key, value);

@@ -37,6 +37,7 @@ export interface AppFreeEditMethod {
   setCodeListMap: (map: any) => void;
   addCodeListMap: (data: any) => void;
   addProvide: <T> (key: InjectionKey<T> | string, value: T) => void;
+  validateField: (fields: string | string[]) => Promise<boolean>;
 }
 export function createAppFreeEditConfig(
   config: AppFreeEditConfig = {}
