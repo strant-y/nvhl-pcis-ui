@@ -265,7 +265,7 @@ const moreBtnItem = ref({
   }
 })
 const labelIcon = "/src/assets/img/9.svg";
-const QRCode = "/src/assets/img/dashbord/QRCode.png";
+import QRCode from '@/assets/img/dashbord/QRCode.png';
 const platformUrl = "https://yfpt-devops.yaic.com.cn:30011/plugin/Nq98Zt7s/3HjTkVPb/EXeviQzu/latest/modules/about-blank-Pv2J/index.html?orgUUID=Nq98Zt7s&teamUUID=3HjTkVPb&appID=EXeviQzu&origin=https%3A%2F%2Fyfpt-devops.yaic.com.cn%3A30011&formId=68633ed3e2156d0001578d68&projectId=Pi2GPKuRX7dZ4TCs&access_type=1";
 const ecahrtsRef = ref(null)
 let ecahrtsRefInstance: ECharts | null = null
