@@ -279,7 +279,8 @@ onBeforeMount(async () => {
               const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn')
               AgreementFeeWarn.setFormItem("ECargoBase.cPayWay", {
                 typeCode: 'ECargo_Pay_Ways',
-                codeParam: { payway: 'prepay' }
+                codeParam: { payway: 'prepay' },
+                disabled: true
               })
             }else{
               formPage.value?.setFormDataById('AgreementFeeWarn',{"ECargoBase.cPayWay": props.payWay })
