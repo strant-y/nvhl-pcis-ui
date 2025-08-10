@@ -115,7 +115,7 @@
               <div class="code-box">
                 <div class="code-inner-box">
                     <span class="title">移动端二维码：</span>
-                    <img class="code-img" :src="QRCode" alt="">
+                    <img class="code-img" src="@/assets/img/dashbord/QRCode.png" alt="">
                 </div>
                 <div class="code-inner-box">
                     <span class="title">在线缺陷平台: </span>
@@ -285,7 +285,6 @@ const shortListData = ref(null)  // 第二模块tabl列表数据
 const headIcon = `/src/assets/images/${userStore.user.cCssStyle === '2' ? '0' : '1'}_.png`;
 const shorMenuList = ref([]);// 快捷菜单列表
 const cPayTypList = ref([]);
-import QRCode from '@/assets/img/dashbord/QRCode.png';
 
 const pageresult = reactive<Pageresult>({
   result: "",
