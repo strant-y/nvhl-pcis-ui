@@ -265,7 +265,6 @@ const moreBtnItem = ref({
   }
 })
 const labelIcon = "/src/assets/img/9.svg";
-import QRCode from '@/assets/img/dashbord/QRCode.png';
 const platformUrl = "https://yfpt-devops.yaic.com.cn:30011/plugin/Nq98Zt7s/3HjTkVPb/EXeviQzu/latest/modules/about-blank-Pv2J/index.html?orgUUID=Nq98Zt7s&teamUUID=3HjTkVPb&appID=EXeviQzu&origin=https%3A%2F%2Fyfpt-devops.yaic.com.cn%3A30011&formId=68633ed3e2156d0001578d68&projectId=Pi2GPKuRX7dZ4TCs&access_type=1";
 const ecahrtsRef = ref(null)
 let ecahrtsRefInstance: ECharts | null = null
@@ -283,9 +282,10 @@ const isOperate = ref(false) //管理员 出单岗
 const isAudit = ref(false) //  核保岗
 const moreurl = ref('');
 const shortListData = ref(null)  // 第二模块tabl列表数据
-const headIcon = `/src/assets/images/${userStore.user.cCssStyle === '2' ? '0' : '1'}_.png`
-const shorMenuList = ref([])// 快捷菜单列表
-const cPayTypList = ref([])
+const headIcon = `/src/assets/images/${userStore.user.cCssStyle === '2' ? '0' : '1'}_.png`;
+const shorMenuList = ref([]);// 快捷菜单列表
+const cPayTypList = ref([]);
+import QRCode from '@/assets/img/dashbord/QRCode.png';
 
 const pageresult = reactive<Pageresult>({
   result: "",
