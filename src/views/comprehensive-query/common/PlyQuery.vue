@@ -76,7 +76,10 @@ import {getAppPolicyList, qryEndorseList, delTmpPolicy, queryInsuredList} from "
 // 变更列
 const colChange = defineAsyncComponent(() => import("../modal/colChange.vue"));
 const PrintView = defineAsyncComponent(() => import("../modal/PrintView.vue"));
-
+// 任务痕迹
+const TaskListVestige = defineAsyncComponent(
+    () => import("@/views/pcis-new-udr-list/common/TaskListVestige.vue")
+);
 let cTermNoList = ref<any>([]);  // 条款数据
 let cTermNo = '';    // 条款编码
 
@@ -1068,7 +1071,7 @@ const tableObj = {
     notWaitObj: {
         // 默认好像就2个不参与显示/隐藏
         tableBtnType: "btn",
-        tableBtnWidth: 220,
+        tableBtnWidth: 200,
         tableBtnPosition: "right",
         tableBtn: [
             createFreeButtonBase({
@@ -1148,7 +1151,6 @@ const tableObj = {
                 iconColor: "#02D05F",
                 tooltip: "复制",
                 size: "large",
-                
                 icon: "DocumentCopy",
                 // hideBtns: (row: any) => {
                 //   if (
@@ -1176,6 +1178,31 @@ const tableObj = {
                     } else {
                         ElMessage.warning("请检查表单！");
                     }
+                },
+            }),
+            createFreeButtonBase({
+                id: "taskVestige",
+                link: true,
+                tooltip: "任务痕迹",
+                type: "info",
+                size: "large",
+                icon: "SetUp",
+                hideBtns: (row:any) => {
+                    if(row.cAppStatus == '1') {
+                        return true
+                    } else {
+                        return false
+                    }
+                },
+                tableClick: (row) => {
+                    dzmodal
+                        .open(TaskListVestige, { type: "Issuer",
+                            data: { objId: row.cAppNo, sysType:!!row["cAppTyp"] && ("A" === row["cAppTyp"] )
+                                  ? "U"
+                                  : "E" } })
+                        .then((res:any) => {
+
+                        })
                 },
             }),
             createFreeButtonBase({
