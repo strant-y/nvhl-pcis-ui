@@ -209,6 +209,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           changeUpdValue('B1_value')
         }
       },
+      {
+        prop: "A6_value",
+        inputtype: "rtnumber",
+        title: "事故预防费用(A6)",
+        itemWidth: 1,
+        clearable: true,
+        precision: 2,
+      }
     ],
   })
 );
@@ -365,6 +373,7 @@ const A_value: any= ref('');
 const B_value: any= ref('');
 const A1_value: any= ref('');
 const B1_value: any = ref('');
+const A6_value: any = ref('');
 let params: any = {
       typeFlag: 1,
       scene: props.data?.pageType,//  场景
@@ -757,6 +766,9 @@ function findFeeBetween() {
                         if (numComparison(values[5], '0')) {
                             B_value.value = '0.00';
                         }
+                        if (numComparison(values[8], '0')) {
+                            A6_value.value = '0.00';
+                        }
                         my_max_value.value = tool_fix(values[1] * 1, 2);    // 后台查询出来的是小数！ 应 乘以 100
                         my_min_value.value  = tool_fix(values[0] * 1, 2);    // 手续费的 输入区间  如果后台没查询到 默认为 0.00  【区间】
                         A1_value.value   = tool_fix(values[2] * 1, 2);
@@ -767,6 +779,7 @@ function findFeeBetween() {
                         freeEditRef.value?.setValue("min_value", my_min_value.value);
                         freeEditRef.value?.setValue("A1_value", A1_value.value);
                         freeEditRef.value?.setValue("B1_value", B1_value.value);
+                        freeEditRef.value?.setValue("A6_value", A6_value.value);
 
                         const appTyp = params.appTyp;
                         if(appTyp=='A'){
@@ -889,11 +902,11 @@ function changeUpdValue(value:string){
   const dptCde = params.dptCde;
 	let num =0.00;
 	var valueNme="总公司下发二级机构的费用政策比例";
-	let orgnum = A_value;
+	let orgnum = A_value.value;
 
 	if('B1_value'==value){
 		valueNme='二级机构下发三级机构的费用政策比例';
-		orgnum = B_value;
+		orgnum = B_value.value;
 	} 
 	num = freeEditRef.value?.getValue(value);
 	if(!/^(\-|\+)?(\d+.?)\d{0,2}$/.test(num)){
@@ -908,8 +921,9 @@ function changeUpdValue(value:string){
 		return ;
 	}
   getDpt({ dpt: DPT }).then((res:any) => {
-    if(res.code === 200 && res.data && dptTyp.value !== '1') {
-      if(parseFloat(freeEditRef.value?.getValue('B1_value')) > parseFloat(freeEditRef.value?.getValue('A1_value'))){
+    if(res.code === 200 && dptTyp.value !== '1') {
+      // 修改B费用不能大于A的值，此提示目前适用于江苏、上海、广东，其他机构管控提示不能大于修改之前的值
+      if(res.data && (res.data.indexOf('江苏') > 0 || res.data.indexOf('上海') > 0 || res.data.indexOf('广东') > 0) && (parseFloat(freeEditRef.value?.getValue('B1_value')) > parseFloat(freeEditRef.value?.getValue('A1_value')))){
         ElMessageBox.confirm(
           "二级机构下发三级机构的费用政策比例不能大于总公司下发二级机构的费用政策比例",
           "提示",
