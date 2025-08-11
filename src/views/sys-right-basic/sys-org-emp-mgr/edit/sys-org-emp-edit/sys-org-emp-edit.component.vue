@@ -174,9 +174,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         typeCode: "NATURAL_CERTIFICATE_CACHE",
         disabled: isDisabled,
-        // func:(val)=> {
-        //   console.log(val)
-        // }
+   
       },
       {
         prop: 'cCtfctNo',
@@ -298,14 +296,9 @@ onMounted(async () => {
       freeEditRef.value?.setFormValue(props.data);
     })
   }
-  console.log('aaaa',props.type,props.type === "add")
   if(props.type === "add"){
     nextTick(()=>{
-      // let s = freeEditRef.value?.getFromSchemaItem('cDptCde')
-      // console.log('ssss',s)
       freeEditRef.value?.setValue('cDptCde', props.cDptCde);
-      // s['disabled'] = true
-      
     })
   }
 });
@@ -313,7 +306,6 @@ onMounted(async () => {
 // 绑定方法
 const method = {
   func1: () => {
-    console.log(getRules);
   },
 };
 /** 查询 */

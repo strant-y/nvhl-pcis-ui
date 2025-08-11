@@ -330,8 +330,6 @@ const query = (param: any) => {
         };
       });
       
-      console.log('数据---',pageresult.list)
-       
       let cProdNo = route.params.param?.cProdNo;
       if (cProdNo == "040002") {
           const termref = opertaor.getTableRefByKey("cvrg");

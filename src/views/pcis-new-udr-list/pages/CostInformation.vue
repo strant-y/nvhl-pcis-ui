@@ -937,20 +937,19 @@ function changeUpdValue(value:string){
         freeEditRef.value?.setValue('B1_value', freeEditRef.value?.getValue('A1_value'))
 				return ;
 			}
-    } else {
-			if(parseFloat(num)>parseFloat(orgnum)){
-        ElMessageBox.confirm(
-          valueNme+"不能大于"+orgnum,
-          "提示",
-          {
-            confirmButtonText: "确定",
-            type: "warning",
-            showCancelButton: false
-          }
-        )
-        freeEditRef.value?.setValue(value, orgnum)
-        return ;
-      }
+    }
+    if(parseFloat(num)>parseFloat(orgnum)){
+      ElMessageBox.confirm(
+        valueNme+"不能大于"+orgnum,
+        "提示",
+        {
+          confirmButtonText: "确定",
+          type: "warning",
+          showCancelButton: false
+        }
+      )
+      freeEditRef.value?.setValue(value, orgnum)
+      return ;
     }
   })
 }

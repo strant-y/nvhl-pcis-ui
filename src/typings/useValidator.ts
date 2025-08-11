@@ -629,6 +629,15 @@ const accountValidation = () => {
       trigger: "blur"
     }
 };
+// 税务登记号
+const taxValidation = () => {
+  return {
+   
+      pattern: /^[a-zA-Z0-9]{15,20}$/, 
+      message: "税务登记号应为15-20位数字或字母",
+      trigger: "blur"
+    }
+};
 
 
   const getRules = (type: any, param: any) => {
@@ -718,6 +727,9 @@ const accountValidation = () => {
     }
     if(type == 'accountValidation') {
       return accountValidation()
+    }
+    if(type == 'taxValidation') {
+      return taxValidation()
     }
 
   };

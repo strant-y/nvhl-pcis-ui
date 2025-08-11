@@ -281,17 +281,16 @@ function setFormItem(key: any, obj: any) {
   }
 }
 onMounted(() => {
-  console.log('1111',params.cRsnCde)
   nextTick(() => {
     // 非涉费批改批改公式文本框隐藏
     // if(params.cRsnCde === "FZ") {
       setFormItem("EdrECargoBase.edrFormula", { hidden: true })
     // }
-    setFormItem("EdrECargoBase.cDptCde", {
-        loadData: [
-            { value: params.cDptCde, label: `${params.cDptCde} ${params.cDptCnm}` },
-        ],
-    });
+    // setFormItem("EdrECargoBase.cDptCde", {
+    //     loadData: [
+    //         { value: params.cDptCde, label: `${params.cDptCde} ${params.cDptCnm}` },
+    //     ],
+    // });
     if(params["cEdrType"]!='1'){
         if(params["cEdrType"]=='3'){
             setFormItem("EdrECargoBase.cEdrRsnDetail", { loadData: [{value:'s1',label:'全单退保'},{value:'s2',label:'一般退保'}] });

@@ -419,12 +419,15 @@ function getAgencyBusinessList(param?: any) {
 
 onMounted(() => {
   console.log('log');
-  if (sessionStorage.getItem("toMyPageData")) {
-    const data = JSON.parse(sessionStorage.getItem("toMyPageData"));
+  // if (sessionStorage.getItem("toMyPageData")) {
+    const data = JSON.parse(sessionStorage.getItem("toMyPageData") || '{}') ;
+    const prData = props?.data.data;
+
+  
     //业务来源大类下拉数据
     const params = {
-      CDptCde: data["cDptCde"],
-      CKindNo: data["cKindNo"],
+      CDptCde: prData['cDptCde'] ||  data["cDptCde"] ,
+      // CKindNo: data["cKindNo"] || prData['cDptCde'],
     };
     //查询大类数据，用于默认回显
     getBsnsTypList(params).then((res) => {
@@ -473,29 +476,40 @@ onMounted(() => {
         }
       }
     });
-  }
+  // }
 
 
-  // 回显中类
-  if (props.data.data.cChaType) {
-    let timer2 = setInterval(() => {
-      setValue('Base.cChaType', props.data.data.cChaType)
-      let cChaType = getValue('Base.cChaType')
-      if (cChaType) {
-        clearInterval(timer2); //清除定时器
-      }
-    }, 1000)
-  }
-  // 回显子类
-  if (props.data.data.cChaSubtype) {
-    let timer3 = setInterval(() => {
-      setValue('Base.cChaSubtype', props.data.data.cChaSubtype)
-      let cChaSubtype = getValue('Base.cChaSubtype')
-      if (cChaSubtype) {
-        clearInterval(timer3); //清除定时器
-      }
-    }, 1000)
-  }
+    // 回显大类       
+  // if (props.data.data.cBsnsTyp) {
+  //   let timer1 = setInterval(() => {
+  //     setValue('Base.cBsnsTyp', props.data.data.cBsnsTyp)
+  //     let cChaType = getValue('Base.cBsnsTyp')
+  //     if (cChaType) {
+  //       clearInterval(timer1); //清除定时器
+  //     }
+  //   }, 1000)
+  // }
+
+  // // 回显中类
+  // if (props.data.data.cChaType) {
+  //   let timer2 = setInterval(() => {
+  //     setValue('Base.cChaType', props.data.data.cChaType)
+  //     let cChaType = getValue('Base.cChaType')
+  //     if (cChaType) {
+  //       clearInterval(timer2); //清除定时器
+  //     }
+  //   }, 1000)
+  // }
+  // // 回显子类
+  // if (props.data.data.cChaSubtype) {
+  //   let timer3 = setInterval(() => {
+  //     setValue('Base.cChaSubtype', props.data.data.cChaSubtype)
+  //     let cChaSubtype = getValue('Base.cChaSubtype')
+  //     if (cChaSubtype) {
+  //       clearInterval(timer3); //清除定时器
+  //     }
+  //   }, 1000)
+  // }
 
   nextTick(() => {
     setValue("CDptCde", props.data.data.CDptCde);

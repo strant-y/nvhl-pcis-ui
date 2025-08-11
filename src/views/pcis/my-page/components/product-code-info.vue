@@ -86,9 +86,7 @@ onMounted(() => {
 const handleQuery = (flag?: boolean) => {
 	const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const params = Object.assign({cEcAgrAppNo:props.data.cEcAgrAppNo},r);
-  console.log('params', params)
   pcisQueryService.queryEcargoRelevancePolicyTermProd(params).then((res: any) => {
-    console.log('数据---‘',res)
 		const { code, data, msg } = res;
     if (200 === code) {
 				data.data.forEach((item: any, index: number) => {

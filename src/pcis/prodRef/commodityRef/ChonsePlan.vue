@@ -388,8 +388,6 @@ function handleQuery(flag?: boolean) {
   // param.cCommodityNo
   
   const params = Object.assign(s, r, { cCommodityNo: param.cCommodityNo? param.cCommodityNo: c });
-
-  console.log(1212,c,param['cCommodityNo'])
   if (c == null &&  param.cCommodityNo ==null) {
     ElMessage.error("商品编号为空,请保存后操作!");
     return;
@@ -414,7 +412,6 @@ function handleQuery(flag?: boolean) {
   }
 }
 const handleCancel = () => {
-  console.log('1212')
   // dialogVisible.value = false;
 };
 

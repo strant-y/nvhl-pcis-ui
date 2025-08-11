@@ -484,7 +484,6 @@ function saveProdDataFun() {
             //     typeandno: typeandno,
             //     UserId: user.value['opCde']
             // };
-            console.log(params)
             pcisQueryService.changePayType(params)
                 .then((res) => {
                     const { code, data, msg } = res;
@@ -505,43 +504,13 @@ function saveProdDataFun() {
 
 
 function handleQuery(flag?: boolean) {
-    //   freeEditRef.value?.validate().then((isValid) => {
-    // if (!isValid) {
-    //   return false;
-    // } else {
-    console.log(333, props.data)
     const r = freeEditRef.value//获取分页数据
-    //   {"CUniqueNo":"R10235010043000202506000100000027,
-    //   R10235010043000202506000100000028","CurrentUser":"02000001",
-    //   "CurrentUserOrg":"0200000000000","pageNo":1,"pageSize":10}
-    //   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-    console.log(r)
-    console.log(getTableValue())
-    // 	console.log(s)
-    //   const start = Date.parse(s.cTimeStart);
-    //   const end = Date.parse(s.cTimeEnd);
-    //   if (start - end > 0) {
-    //       ElMessage.warning('日期起期不能大于日期止期');
-    //       return;
-    //   }
-    //   if (end - start >= 31 * 1000 * 60 * 60 * 24) {
-    //       ElMessage.warning('日期时间范围请控制在31天以内');
-    //       return;
-    //   }
-    //   const param = Object.assign(s, r, {
-    //     sortField: 'name',
-    //     _allow_anonymous: true,
-    //     CurrentUser: user.value['opCde'],
-    //     CurrentUserOrg: user.value['companyId'],
-    //     //codeListMap: this.codeListMap
-    //   });
     const param = {
         CUniqueNo: props.data?.CUniqueNos,
         'CurrentUser': user.value['opCde'],
         'CurrentUserOrg': user.value['companyId'],
         "pageNum": 1, "pageSize": 10
     }
-    console.log(param)
     pcisQueryService.getPayConfirmInfoList(param)
         .then((res) => {
             const { code, data, msg } = res;

@@ -80,7 +80,6 @@ onMounted(async () => {
     // 查询承保机构所属分公司和项目类别大类数据
     getCheckCdeptByCdptCde();
     //回显机构部门数据
-    console.log('看看',param)
     setFormItem("Base.cDptCde", {
       loadData: [
         { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm|| ''}` },
@@ -174,7 +173,6 @@ const method = {
   },
   //联共保下拉change
   cCiMrkChange: (val:any) => {
-    console.log(111,val, opertaor.getParam())
     productStore.setcCiMrk(val);
     if (!!val && !opertaor.getParam().initFlag) {
       const ciRef = opertaor.getTableRefs()['ci'];
@@ -338,8 +336,8 @@ const method = {
         {
           type: "show",
           data: {
-            CDptCde: sessionData.value?.cDptCde, //机构
-            CProdNo: sessionData.value?.cProdNo, //产品
+            CDptCde: sessionData.value?.cDptCde || param.cDptCde, //机构
+            CProdNo: sessionData.value?.cProdNo || param.cProdNo, //产品
             cBsnsTyp: getValue("Base.cBsnsTyp"), //业务来源大类
             cChaType: getValue("Base.cChaType"), //业务来源中类
             cChaSubtype: getValue("Base.cChaSubtype"), //业务来源子类
@@ -470,7 +468,6 @@ const method = {
         },
         method: {
           getSelected: (params) => {
-            console.log('111Base.cSlsId',params)
             setFormValue({
               "Base.cSlsId": params.CSlsCde, //业务员员工号
               "Base.cSlsNme": params.CSlsNme, //业务员名称
@@ -684,7 +681,6 @@ const method = {
   },
   // change
   cAgriMrkChange:(val:any)=>{
-      console.log('111',val)
   },
   // 是否见费出单
   cNeedfeeFlagChange:(val:any)=>{
@@ -714,7 +710,6 @@ function getCheckCdeptByCdptCde() {
       (res) => {
         if (res["code"] === 200) {
           if (res.data) {
-            console.log('11112',res)
             subDptCde.value = res.data;
             //查询项目类别大类数据
             codeListStore

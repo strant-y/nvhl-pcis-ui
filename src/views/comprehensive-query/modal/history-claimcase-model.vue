@@ -661,28 +661,19 @@ const tabChange = (name: any) => {
 
 
 const tabChangeTb = (name: any) => {
-  console.log('1111', name)
   
   tabS.value = name
   activeTab.value = '01';
 
   if (name == '02') {
     formconfig1.fromSchema = fromSchema.BBfromSchema
-    
     let DataAll = opertaor.getDataAll()['insured']
-    console.log(DataAll)
- 
-
       nextTick(() => {
         freeEditRef.value?.setValue("cInsuredNme", DataAll['Insured.cInsuredNme']);
         freeEditRef.value?.setValue("cCertfCls", DataAll['Insured.cCertfCls']);
         freeEditRef.value?.setValue("cCertfCde", DataAll['Insured.cCertfCde']);
         freeEditRef.value?.setValue("cClntMrk", DataAll['Insured.cClntMrk']);
       })
- 
- 
-
-
   } else {
     formconfig1.fromSchema = fromSchema.TBfromSchema
 

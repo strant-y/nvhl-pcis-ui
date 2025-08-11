@@ -171,12 +171,10 @@ const pageresult = reactive<Pageresult>({
 });
 
 const save = ()=> {
-  console.log("param", sessionStorage.getItem("user"));
   const newparam = { cCommodityNo: param.cCommodityNo };
   saveCommodityAttached(newparam)
     .then((res) => {
       const { code, data, msg } = res;
-      console.log('--数据---',data)
       if (200 === code) {
         // freeEditRef?.value?.setFormValue(data.data);
       } else {

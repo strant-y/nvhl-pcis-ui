@@ -183,7 +183,6 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Edit",
         tableClick: (row) => {
-          console.log(row);
           dzmodal
             .open(goodsRuleEdit, { type: "edit", data: row })
             .then((res) => {
@@ -315,7 +314,6 @@ const handleNodeClick = (data: any) => {
 
 const handleEdit = (index: number, row: any) => {
   // 编辑逻辑
-  console.log("编辑", row);
 };
 
 const handleDelete = (index: number, row: any) => {
@@ -359,53 +357,11 @@ function getOrgDptTreeList() {
       const { code, data, msg } = res;
       const dto = [];
       if (200 === code) {
-        console.log(data, "data+++++++++++++++++++++++++==");
-        // treeData.value = data;
-        // treeData.value.push({
-        //                   label:data.name,
-        //                   id: data.id ,
-        //                   children: [
-        //                       {
-        //                         label: "陕西西安分公司",
-        //                         id: "0200000000001",
-        //                         children: [
-        //                           {
-        //                             label: "碑林区分公司",
-        //                           },
-        //                         ],
-        //                       },
-        //                     ],
-        //                 });   const dto = [];
         treeData.value.push({
           id: data.id,
           name: root + '-' + data.name,
           leaf: false,
         });
-
-        // data.forEach(item => {
-        //   treeData.value.push({
-        //         id: item['id'],
-        //         name: item['id'] + '-' + item['name'],
-        //         leaf: !item.hasChildren,
-        //       })
-        // })
-   
-          // data.forEach(item => {
-          //     dto.push({
-          //       id: item['id'],
-          //       name: item['id'] + '-' + item['name'],
-          //       leaf: !item.hasChildren,
-          //     });
-          //   })
-     
-
- 
-          // resolve(dto);
-
-
-                                 // id: res['data']['id'],
-                            // name: res['data']['name'],
-                            // hasChildren: res['data']['hasChildren']
       } else {
         ElMessage.error(msg);
       }
@@ -415,20 +371,12 @@ function getOrgDptTreeList() {
 
 
 const initDptTreeList = () => {
-  // let root = '020000000000';
-  // if (user.value && user.value.companyId) {
-  //   root = user.value.companyId;
-  // }
-  // const params = {
-  //   pId: root,
-  // };
   let root = '0200000000000';
   if (treeNodeId.value == "" || treeNodeId.value == undefined) {
     treeNodeId.value = "0200000000000";
   } else {
     treeNodeId.value = treeNodeId.value;
   }
-  // const param = { pId: treeNodeId.value };
   const param = { pId:"0200000000000" };
   sysOperatorMgrService.getOrgDptTreeNodeById(param).then((res) => {
     if (res && res['data']) {
@@ -456,12 +404,7 @@ const loadNode = (node, resolve) => {
   }
   const params = {
     cDptCde:  node.data.id,
-    // cDptCde: '0200000000000',
-              // 0200000000000
-              // 0200000000000
   };
-  console.log(111,params)
- console.log(233,node.data.id.length)
   sysOperatorMgrService.getOrgDptTreeListByPid(params).then((result) => {
     const dto = [];
     if (200 !== result['code']) {
@@ -479,32 +422,16 @@ const loadNode = (node, resolve) => {
       })
     }
 
-    console.log('----------',resolve)
     resolve(dto);
   }).catch((error) => {
-    console.log('出错了', error);
     ElMessage.error('后台服务异常,请联系管理员');
   });
 };
-// const handleQuery = (flag) => {
-//   console.log('操作权限----1',flag)
-//   freeEditRef.value?.validate().then((isValid) => {
-//     if (isValid) {
-//       refreshData(flag);
-//     }
-//   })
-// };
+
 /** 查询 */
 function handleQuery(flag?: boolean) {
-  console.log( getFromValue().cDptCde)
- 
-
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
-    
-
-    // if(getFromValue())
-  
     const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
     const s = freeEditRef.value?.getFromValue(); //获取表单数据
     const param = Object.assign(s, r);
