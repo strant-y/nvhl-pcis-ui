@@ -975,7 +975,7 @@ const edrBtn = [
   }),
   createFreeButtonBase({
     label: "申请核保",
-    type: "primary",
+    type: "warning",
     id: "btnSubmitEdr",
     func: () => {
       submitEdrToUndrFun();
