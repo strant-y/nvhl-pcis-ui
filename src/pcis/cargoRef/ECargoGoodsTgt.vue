@@ -158,6 +158,22 @@ const saveTgt = async (res:any)=>{
   const result =  await cargoApi.saveDistNew(newRow)
   loadData()
 }
+function filterFromSchema(obj:any) {
+  // 如果对象不存在或者没有fromSchema属性，直接返回
+  if (!obj || !obj.fromSchema || !Array.isArray(obj.fromSchema)) {
+    return obj;
+  }
+
+  // 创建新对象的浅拷贝
+  const newObj = {...obj};
+
+  // 过滤fromSchema数组
+  newObj.fromSchema = newObj.fromSchema.filter(item => {
+    return !(item && typeof item === 'object' && 'prop' in item && item.prop === 'ECargoGoodsTgt.cExchCde');
+  });
+
+  return newObj;
+}
 // 绑定方法
 const method = {
   exchTemp:()=>{
@@ -181,11 +197,16 @@ const method = {
     );
   },
   downloadTemp:()=>{
+    const formconfig = filterFromSchema(formconfig1.value)
     const param = {
-      ...formconfig1.value,
+      ...formconfig,
     }
       const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
       param['cEcAgrAppNo'] = agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
+    if ( param['cEcAgrAppNo'] == '' ||  param['cEcAgrAppNo'] == undefined) {
+      ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
+      return;
+    }
     policyService
         .downloadDistTemplate(param)
         .then((res) => {
@@ -205,12 +226,16 @@ const method = {
   },
   //导出
   exportExcel: () => {
-    let paramitem  = Object.assign(formconfig1.value, {
+    const formconfig = filterFromSchema(formconfig1.value)
+    let paramitem  = Object.assign(formconfig, {
       cComponentTable: cComponentTableValue,
     });
       const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
      paramitem['cEcAgrAppNo'] = agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
-
+    if ( paramitem['cEcAgrAppNo'] == '' ||  paramitem['cEcAgrAppNo'] == undefined) {
+      ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
+      return;
+    }
     if(selectedRows.value.length > 0) {
       paramitem['cPkId'] = selectedRows.value.map((row: any) => row['ECargoGoodsTgt.cPkId']);
     }
@@ -284,6 +309,7 @@ const method = {
   },
   // 增量导入
   importExcelIncrement: () => {
+    const formconfig = filterFromSchema(formconfig1.value)
     const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
     const cappNo  = agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
     if (cappNo == '' || cappNo == undefined) {
@@ -308,7 +334,7 @@ const method = {
 
           // 构建参数并请求接口
           const params = {
-            ...formconfig1.value,
+            ...formconfig,
             file: base64String, // ✅ 正确传入
             cComponentTable: cComponentTableValue,
             cEcAgrAppNo:''
@@ -345,9 +371,16 @@ const method = {
   },
   viewmethod: (row: any) => {
     console.log('row', row)
+    const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
+    const cappNo  = agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
+    if (cappNo == '' || cappNo == undefined) {
+      ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
+      return;
+    }
     dialog.value?.open(
         cargoDistAdd,
         {
+          cEcAgrAppNo:cappNo,
           fromSchema: tableconfig.value.fromSchema,
           fromUi: tableconfig.value.fromUi,
           title: "详情",
@@ -383,10 +416,17 @@ const method = {
     );
   },
   editmethod: (row: any) => {
+    const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
+    const cappNo  = agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
+    if (cappNo == '' || cappNo == undefined) {
+      ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
+      return;
+    }
     const rowId = row._dataId;
     dialog.value?.open(
         cargoDistAdd,
         {
+          cEcAgrAppNo:cappNo,
           fromSchema: tableconfig.value.fromSchema,
           fromUi: tableconfig.value.fromUi,
           title: "编辑",
