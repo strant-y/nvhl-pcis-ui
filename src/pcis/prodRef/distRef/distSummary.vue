@@ -296,8 +296,8 @@ const handleQuery = () => {
     app = param.cOrgAppNo;
   } else if(opertaor.getDataAll().plyBase["Base.cAppNo"]){
     app = opertaor.getDataAll().plyBase["Base.cAppNo"];
-  } else {
-    // app = route.params.param?.cAppNo
+  } else if(param.pageType !== "copy") {
+    app = param.cAppNo
   }
   const queryParam = {
     cComponentTable: distCompKey.value,
