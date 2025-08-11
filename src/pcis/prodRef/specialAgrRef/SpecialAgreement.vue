@@ -76,16 +76,16 @@ const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     // title: "特约信息",
     tableBtnType: "btn",
-    tableBtnWidth: 220,
+    tableBtnWidth: 160,
     tableBtnPosition: "right",
-    align: "left",
+    fixed: true,
     tableBtn: [
       createFreeButtonBase({
         id: "score",
         link: true,
         tooltip: "编辑", 
         type: "success",
-        size: "large",
+        size: "default",
         icon: "Edit",
         hideBtns: (row) => {
           // if (!row.cSpecialContent.includes("*")) return true;
@@ -115,8 +115,6 @@ const tableconfig = reactive<AppTableConfig>(
                 // row.cSpecialContent = res.data.cSpecialContent
                 // row['editList']= res.data['editList']
 
-
-
                  let list = formData.value;
                  const index = list.findIndex(
                     item => item.cSpecialCode === row.cSpecialCode
@@ -137,7 +135,7 @@ const tableconfig = reactive<AppTableConfig>(
         link: true,
         tooltip: "删除",
         type: "danger",
-        size: "large",
+        size: "default",
         icon: "Delete",
         tableClick: (row) => {
 

@@ -356,7 +356,7 @@ const tableconfig = reactive<AppTableConfig>(
                 size: "large",
                 icon: "Edit",
                 tableClick: (row) => {
-                    if(row.cCiMrk === "5"){
+                    if(row.cCiMrk === "5" && row.id[1] === "47" ){
                         ElMessage.warning('出单方式为司内联保时,联共保信息不可批改!');
                         return;
                     }else{
@@ -506,7 +506,6 @@ const refreshData = (reset = true) => {
             return;
         }
     }
-    // console.log(props.activeName, "=====");
     const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
     const s = freeEditRef.value?.getFromValue(); //获取表单数据
     if (s.cLoadSub == null) {

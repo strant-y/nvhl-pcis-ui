@@ -80,6 +80,8 @@ const PrintView = defineAsyncComponent(() => import("../modal/PrintView.vue"));
 let cTermNoList = ref<any>([]);  // 条款数据
 let cTermNo = '';    // 条款编码
 
+let ESOriginalData = ref<any>([]);  // ES查询原始数据，转化成驼峰为适配操作列
+
 const props = defineProps({
   refreshData: {
     type: Boolean,
@@ -88,6 +90,8 @@ const props = defineProps({
 });
 const homeJumpData = ref({}); //接收首页的参数，用于查询条件回显
 const queryType = ref("1");
+import { FIELD_MAP } from '@/constants/fieldMaps';
+
 let addrowArr = [
     "cAppNo",
     "cPlyNo",
@@ -566,6 +570,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                           if (item.prop === "tAppTm") {
                               item.hidden = false; // 显示投保日期
                               item.rules = [getRules("required", {})]; // 设置必填规则
+                              // 设置默认值为最近15天
+                              const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
+                              const startDate = moment(new Date()).subtract(15, "days").format("YYYY-MM-DD 00:00:00");
+                              freeEditRef.value?.setValue("tAppTm", [startDate, endDate]);
                           } else if (item.prop == "tIssueTm" || item.prop == "tEdrAppTm") {
                               item.hidden = true;
                           }
@@ -576,6 +584,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                           if (item.prop === "tEdrAppTm") {
                               item.hidden = false; // 显示批改申请日期
                               item.rules = [getRules("required", {})]; // 设置必填规则
+                            // 设置默认值为最近15天
+                            const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
+                            const startDate = moment(new Date()).subtract(15, "days").format("YYYY-MM-DD 00:00:00");
+                            freeEditRef.value?.setValue("tEdrAppTm", [startDate, endDate]);
                           } else if (item.prop == "tAppTm") {
                               item.hidden = true;
                           } else if (item.prop == "tIssueTm") {
@@ -833,55 +845,55 @@ const esSearchColumns = [
     fixed: "left",
    },
    {
-    prop: "c_ply_no",
+    prop: "cPlyNo",
     inputtype: "rtinput",
     title: "批单",
     minWidth: 180,
    },
    {
-    prop: "n_edr_prj_no",
+    prop: "nEdrPrjNo",
     inputtype: "rtinput",
     title: "批改序号",
     minWidth: 180,
    },
    {
-    prop: "c_nme_cn",
+    prop: "cNmeCn",
     inputtype: "rtinput",
     title: "产品名称",
     minWidth: 180,
    },
    {
-    prop: "c_insured_nme",
+    prop: "cInsuredNme",
     inputtype: "rtinput",
     title: "被保人名称",
     minWidth: 180,
    },
    {
-    prop: "c_insured_cde",
+    prop: "cInsuredCde",
     inputtype: "rtinput",
     title: "被保人证件号码",
     minWidth: 180,
    },
    {
-    prop: "c_mobile",
+    prop: "cMobile",
     inputtype: "rtinput",
     title: "手机号码",
     minWidth: 180,
    },
    {
-    prop: "c_clnt_addr",
+    prop: "cClntAddr",
     inputtype: "rtinput",
     title: "被保人地址",
     minWidth: 180,
    },
    {
-    prop: "c_app_nme",
+    prop: "cAppNme",
     inputtype: "rtinput",
     title: "投保人名称",
     minWidth: 180,
    },
    {
-    prop: "t_udr_tm",
+    prop: "tUdrTm",
     inputtype: "rtinput",
     title: "核保日期",
     minWidth: 180,
@@ -893,7 +905,7 @@ const esSearchColumns = [
     minWidth: 180,
    },
    {
-    prop: "c_app_status",
+    prop: "cAppStatus",
     inputtype: "rtselect",
     title: "保单状态",
     minWidth: 110,
@@ -1373,13 +1385,28 @@ function esSearch(flag?: boolean) {
       .then((res) => {
         const { code, data, msg } = res;
         if (200 === code) {
+          let convertedData = [];
+          // ES查询原始数据，转化成驼峰为适配操作列
+          ESOriginalData.value = data.result;
+          convertedData = ESOriginalData.value.map(item => {
+            const newItem = {};
+             for (const key in item) {
+                if (FIELD_MAP[key]) {
+                   newItem[FIELD_MAP[key]] = item[key]; // 转换字段名
+                } else {
+                   newItem[key] = item[key]; // 部分保持原样
+                }
+            }
+            return newItem;
+          })
           pageresult.list = [];
-          pageresult.list = data.result;
-          pageresult.list = data.result.map(item => ({
+          pageresult.list = convertedData;
+
+          pageresult.list = convertedData.map(item => ({
             ...item,
             // 创建一个新字段合并两个值
-            policyInfo: `${item.c_app_no || ''}\n${item.c_ply_no || ''}`,
-            InsurancePeriod: `${item.t_insrnc_bgn_tm || ''}\n${item.t_insrnc_end_tm || ''}`,
+            policyInfo: `${item.cAppNo || ''}\n${item.cPlyNo || ''}`,
+            InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
           }));
           pageresult.total = data.total;
         } else {

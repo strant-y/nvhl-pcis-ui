@@ -2,7 +2,7 @@
     <el-dialog
       v-model="dialogVisible"
       width="55%"
-      title="选择结算方式"
+      title="选择付费方式"
       @close="closeDialog"
     >
     <div style="height:60px">
@@ -12,8 +12,8 @@
         :rules="rules"
         label-width="80px"
       >
-        <el-form-item label="结算方式" prop="paymentMethod">
-          <el-select v-model="formData.paymentMethod" placeholder="请选择结算方式">
+        <el-form-item label="付费方式" prop="paymentMethod">
+          <el-select v-model="formData.paymentMethod" placeholder="请选择付费方式">
             <el-option
                 v-for="(item, index) in paymentMethodList"
                 :key="index"
@@ -21,7 +21,6 @@
                 :label="item.label"
             />
           </el-select>
-         
         </el-form-item>
       </el-form>
     </div>
@@ -40,7 +39,10 @@ const { getRules } = useValidator();
 import { ref } from "vue";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
 import {codelistQuery} from "@/api/dict";
-const paymentMethodList = ref([]); // 所属单位下拉数据源
+const paymentMethodList = ref([
+    {label:'预付', value:'01'},
+    {label:'非预付', value:'02'}
+]);
 
 const emits = defineEmits(["ok", "cancel"]);
 const dialogVisible = ref(true);
@@ -62,26 +64,11 @@ const formData = reactive<DictTypeForm>({
 });
 
 const rules = reactive({
-  paymentMethod: [{ required: true, message: "请选择结算方式", trigger: "change" }],
+  paymentMethod: [{ required: true, message: "请选择付费方式", trigger: "change" }],
 });
 
-/**下拉框*/
-function getMethodList() {
-  const param = {
-    codeListName: "ECargo_Pay_Ways",
-    codeListParam: { payway: 'all' }
-  }
-  codelistQuery(param).then((response) => {
-    if (response.code === 200) {
-      paymentMethodList.value = response.data;
-    } else {
-      ElMessage.error(response.msg);
-    }
-  });
-};
-
 onMounted(() => {
-  getMethodList();
+  
 });
 
 

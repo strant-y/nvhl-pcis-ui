@@ -793,8 +793,8 @@
             link: true,
             tooltip: "查看",
             showKey: [3,4],
-            type: "danger",
-            size: "large",
+            type: "primary",
+            size: "default",
             icon: "View",
             tableClick: (row) => {
                 showDetails(row);
@@ -806,7 +806,7 @@
             tooltip: "承保流程",
             showKey: [3,4],
             type: "danger",
-            size: "large",
+            size: "default",
             icon: "Refresh",
             tableClick: (row) => {
                 let data;

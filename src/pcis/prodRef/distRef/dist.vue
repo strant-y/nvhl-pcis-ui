@@ -507,7 +507,7 @@ const method = {
     } else if(param.cOrgAppNo){
       app = param.cOrgAppNo;
     } else {
-      app = route.params.param?.cAppNo
+      // app = route.params.param?.cAppNo
     }
     const selData = {
       cAppNo: "",

@@ -77,32 +77,47 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "curtTaskName",
         inputtype: "rtinput",
         title: "任务名称",
-        minWidth: 180,
+        minWidth: 100,
         fixed: "left",
       },
       {
         prop: "type",
         inputtype: "rtinput",
         title: "任务类型",
-        minWidth: 180,
+        minWidth: 100,
+        formatter: (val: any) => {
+          if (val === '0') {
+            return "新任务";
+          } else if (val === '8') {
+            return "任务上报";
+          }else if (val === '7') {
+            return "任务退回";
+          } else {
+            return val;
+          }
+        }
       },
       {
         prop: "curtUserName",
         inputtype: "rtinput",
         title: "接收人",
-        minWidth: 180,
+        minWidth: 120,
       },
       {
         prop: "acptTm",
         inputtype: "rtdatepicker",
         title: "接收时间",
-        minWidth: 180,
+        minWidth: 150,
+        format: "YYYY-MM-DD HH:mm:ss",
+        type: "datetime",
       },
       {
         prop: "cmptTm",
         inputtype: "rtdatepicker",
         title: "完成时间",
-        minWidth: 180,
+        minWidth: 150,
+        format: "YYYY-MM-DD HH:mm:ss",
+        type: "datetime",
       },
       {
         prop: "preDptName",
@@ -114,13 +129,15 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "preUserName",
         inputtype: "rtinput",
         title: "任务分发人",
-        minWidth: 180,
+        minWidth: 120,
       },
       {
         prop: "crtTm",
         inputtype: "rtdatepicker",
         title: "任务分发时间",
-        minWidth: 180,
+        minWidth: 150,
+        format: "YYYY-MM-DD HH:mm:ss",
+        type: "datetime",
       },
       {
         prop: "dptName",
