@@ -367,7 +367,7 @@ const submitEdrToUndrSurrender = async () => {
   const filter = [];
   if(base['ECargoBase.cCiMrk'] === '0') {
     filter.push(...['AgreementCiTcp', 'AgreementCiShare', 'AgreementCi'
-      , 'AgreementCvrg','AgreementAcctinfo','AgreementCiTcp'  // 临时关闭体条款校验
+      ,'AgreementAcctinfo','AgreementCiTcp'  // 临时关闭体条款校验
     ]);
   }
   const validateAll = await formPage.value?.validateAll(filter);
@@ -417,7 +417,7 @@ const submitEdrToUndrFun = async () => {
   const filter = [];
   if(base['ECargoBase.cCiMrk'] === '0') {
     filter.push(...['AgreementCiTcp', 'AgreementCiShare', 'AgreementCi'
-      , 'AgreementCvrg','AgreementAcctinfo','AgreementCiTcp'  // 临时关闭体条款校验
+      ,'AgreementAcctinfo','AgreementCiTcp'  // 临时关闭体条款校验
     ]);
   }
   const validateAll = await formPage.value?.validateAll(filter);
@@ -821,7 +821,7 @@ async function  submit() {
   const filter = [];
   if(base['ECargoBase.cCiMrk'] === '0') {
     filter.push(...['AgreementCiTcp', 'AgreementCiShare', 'AgreementCi'
-        , 'AgreementCvrg','AgreementAcctinfo','AgreementCiTcp'  // 临时关闭体条款校验
+        ,'AgreementAcctinfo','AgreementCiTcp'  // 临时关闭体条款校验
     ]);
   }
   // if(props.type === 'add' || props.type === 'edit'  || (props.type === 'EDR_APP_NEW_SCENE' && props?.param?.cEdrType == '1') ){
