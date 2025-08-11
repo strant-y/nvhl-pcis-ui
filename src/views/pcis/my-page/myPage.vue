@@ -215,7 +215,8 @@
               : productStore.cCiMrk == '2' ? '外部共保我方从共_主联'
               : productStore.cCiMrk == '3' ? '外部共保我方主共_无联保'
               : productStore.cCiMrk == '4' ? '外部共保我方从共_无联保'
-              : '司内联保_主联' }}</span> |
+              : productStore.cCiMrk == '5' ? '司内联保_主联'
+              : '联保单' }}</span> |
             <span class="publicStyle">{{
               props.param.cGrpMrk == "0" ? "个单" : "团单"
             }}</span
