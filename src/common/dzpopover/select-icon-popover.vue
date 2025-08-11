@@ -77,7 +77,6 @@ function filterIcons() {
       : svgIcons;
   } else {
     // 过滤Element Plus图标逻辑
-    console.log(111);
     if (!searchText.value) {
       filteredEleIcons.value = elementGetAll();
     }

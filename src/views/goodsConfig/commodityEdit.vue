@@ -91,7 +91,8 @@ let isShowTest = ref(false)  // 用来控制显示审核信息模块
 let TestData = ref({});  // 审核状态 返回数据 
 let isShowReview = ref(false)  // 用来控制显示审核信息模块
 let ProcessData = ref({});  // 审核状态 返回数据 
-
+console.log(1,query.value?.param)
+console.log(2,descryptParameter(query.value?.param))
 const queryParam = JSON.parse(   query.value?.param ?  descryptParameter(query.value.param) : "{}");
 const formconfig1 = opertaor.getTableConfig();
 
@@ -253,12 +254,7 @@ function handleQuery() {
   const tabref3 = opertaor.getTableRefByKey("permissionAllo");  // 出单权限分配
   const tabref4 = opertaor.getTableRefByKey("InsuranceRules");  // 投保规则
   const tabref6 = opertaor.getTableRefByKey("TestReport");  // 测试规则
-
-
-  console.log("反显param", tabref);
   const newparam = { cCommodityNo: queryParam.cCommodityNo };
-
-  console.log('queryParam',queryParam)
   getCommodityBase(newparam)
     .then((res) => {
       const { code, data, msg } = res;
@@ -358,10 +354,8 @@ const save = (call, param: any) => {
       param['cStatus'] = '4'; // 二级审核
     }
   }
-  console.log('参数-----', param)
   saveCommodityBase(param).then((res) => {
     let { code, msg, data } = res;
-
     console.log('保存后返回的 save', res)
     if (code === 200) {
       ElMessage.success(msg);   // 保存成功

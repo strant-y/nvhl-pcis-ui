@@ -367,7 +367,6 @@ function setFormItem(key: any, obj: any) {
   }
 }
 onMounted(() => {
-  console.log('1111',params.cRsnCde)
   nextTick(() => {
     // 非涉费批改批改公式文本框隐藏
     if(params.cRsnCde === "FZ") {

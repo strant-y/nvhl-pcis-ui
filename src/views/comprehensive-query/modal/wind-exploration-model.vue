@@ -217,7 +217,6 @@ const windSave = async () => {
 		delete params.cRiskFlag1
 		console.log("params", params);
 		pcisQueryService.sendTaskCreat(params).then((res: any) => {
-			console.log("数据---‘", res);
 			if (res.code == 200) {
 				if(res.data !== null){
 					maindialogVisible.value = false;

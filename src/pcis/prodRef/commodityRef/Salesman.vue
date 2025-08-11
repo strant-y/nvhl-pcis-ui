@@ -93,8 +93,8 @@ const formconfig = reactive<AppFreeEditConfig>(
         type: "primary",
         label: "查询",
         func: () => {
-          // handleSave();
-          handleQuery();
+         
+             handleQuery(true);
         },
       }),
     ],
@@ -104,6 +104,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         // inputtype: "rtselect",
         inputtype: "rtinput",
         title: "机构代码",
+         disabled: true,
       },
       {
         prop: "CSlsCde",
@@ -124,45 +125,9 @@ const formconfig = reactive<AppFreeEditConfig>(
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
-    // titleBtns: [
-    //   createFreeButtonBase({
-    //     id: "add-responsibility",
-    //     label: "公共问题新增",
-    //     type: "success",
-    //     func: function () {
-    //       dzmodal.open(publicProblem, { type: "add", data: {} }).then((res) => {
-    //         if (res.type === "ok") {
-    //           handleQuery();
-    //         }
-    //       });
-    //     },
-    //   }),
-    // ],
     tableBtnType: "btn",
     tableBtnWidth: 220,
     tableBtnPosition: "right",
-    // tableBtn: [
-    //   createFreeButtonBase({
-    //     id: "score",
-    //     type: "danger",
-    //     tooltip: "删除",
-    //     icon: "Delete",
-    //     link: true,
-    //     tableClick: (row) => {
-    //       //   delRiskRel(row)
-    //       //     .then((res) => {
-    //       //       const { code, data, msg } = res;
-    //       //       if (200 === code) {
-    //       //         ElMessage.success("删除成功");
-    //       //         handleQuery();
-    //       //       } else {
-    //       //         ElMessage.error(msg);
-    //       //       }
-    //       //     })
-    //       //     .finally(() => {});
-    //     },
-    //   }),
-    // ],
     fromSchema: [
       {
         prop: "CSlsCde",
@@ -201,7 +166,6 @@ const tableconfig = reactive<AppTableConfig>(
       },
     ],
     rowDbClickFun(row) {
-          // console.log('111',row)
           emit("ok", row);
           dialogVisible.value = false;
         }
@@ -225,15 +189,18 @@ const pageresult = reactive<Pageresult>({
   total: 0,
 });
 
+onMounted(() => {
+    nextTick(()=>{
+        setValue('CDptCde',props.data['cDptCde'])
+        handleQuery(true);
+    })
+
+})
+// cDptCde
 /** 查询 */
-function handleQuery() {
-  const r = tableRef.value?.getPartnerPage(); //获取分页数据
+function handleQuery(flag?: boolean) {
+  const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-
-
-console.log(user.value)
-
-console.log(props.data)
 
 const obj = {
   CurrentUser: user.value ? user.value["opCde"] : "",   // 用户代码
@@ -259,7 +226,7 @@ const obj = {
 };
 const params = Object.assign(s, r, obj);
 
-console.log('参数',params)
+console.log('参数',params) 
 policyService.getWebOrgSelsList(params).then((res: any) => {
       if (res && res["code"] === 200) {
         const pageData = res.data;
@@ -267,12 +234,45 @@ policyService.getWebOrgSelsList(params).then((res: any) => {
           pageresult.total = pageData.total;
           pageresult.list = pageData.result;
         }
-     
-        // pageresult.total =2
-        // pageresult.list = [{CSlsCde:122,CSlsNme:"张三", },{CSlsCde:123,CSlsNme:"张三2"}];
       }
     });
 }
+
+//给表单下拉项赋值
+function setFormItem(key: any, obj: any) {
+  if (obj && Object.keys(obj).length) {
+    formconfig.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.btnItems && obj.btnItems) {
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
+          }
+        }else{
+          Object.assign(item, obj);
+        }
+      }
+    });
+  }
+}
+
+function getFromValue() {
+  return freeEditRef?.value?.getFromValue();
+}
+
+function setFormValue(value: any) {
+  freeEditRef?.value?.setFormValue(value);
+}
+
+function validate() {
+  return freeEditRef?.value?.validate();
+}
+
+function setValue(key: string, value: any) {
+  freeEditRef?.value?.setValue(key, value);
+}
+
+
 </script>
 
 <style scoped>

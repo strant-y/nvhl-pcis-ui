@@ -193,7 +193,6 @@ const onEvent = (data: any, node: any) => {
     listShow.value = true;
     datas.value = [data];
     pNode.value = node;
-    console.log("------", node);
     emits("ok", node);
   }
 };

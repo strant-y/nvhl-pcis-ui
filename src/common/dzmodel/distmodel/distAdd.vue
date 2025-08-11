@@ -267,19 +267,26 @@ onMounted(() => {
       item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
     }
 
-    // 043010 学校非必填
-    if( route.params.param.cProdNo == '043010' && item.prop =='Dist.cSchoolName' ){
-          item['rules'] = [];
+
+
+    if( route.params.param.cProdNo == '043010'){
+      if(item.prop =='Dist.cJobType'){
+        item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+      }else if(   cIs == 1 && item.prop !=='Dist.nSeqNo'){
+           item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+      }else{
+        item['rules'] = [];   
+      }
     }
 
  
-    if(cIs == 1 && item.prop !=='Dist.nSeqNo'){
-        item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
-    }else if(cIs == 0 && (item.prop !=='Dist.cSchoolName' && item.prop !=='Dist.cSchoolAddress')){
-      item['rules'] =[];
+    // if(cIs == 1 && item.prop !=='Dist.nSeqNo'){
       
-    }
-    // item["disabled"] = false;
+    // }else if(cIs == 0 && (item.prop !=='Dist.cSchoolName' && item.prop !=='Dist.cSchoolAddress')){
+    //   item['rules'] =[];
+      
+    // }
+ 
     if(item.cShowLocation === '1'){
       item["hidden"] = true;
     }
@@ -326,16 +333,7 @@ onMounted(() => {
       }
     
     }
-    // 043009 实际用工地址关联 团单才展示（和杜倩确认关联实际用工地址不分团单和个单，都展示）
-    // if(item.prop === 'Dist.cEmploymentAddress' && cGrpMrk.value !== '1'){
-    //   item['rules'] = [];
-    //   item["hidden"] = true;
-    // }
-
-    // 043010 实习岗位为必填
-    if( route.params.param.cProdNo == '043010' && item.prop =='Dist.cJobType' ){
-        item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
-    }
+ 
     // 040016 身份证必填
     if( route.params.param.cProdNo == '040016' && item.prop =='Dist.cIdentificationNumber' ){
         item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
@@ -453,7 +451,6 @@ const cEquipmentTypesFunc = ()=>{
 const cDocumentTypeChange =(val:any)=>{
   console.log(val)
    const item = freeEditRef.value?.getFromSchemaItem('Dist.cIdentificationNumber')
-   console.log(11123,item.itemConfig['rules'])
        clearValidate('Dist.cIdentificationNumber')  
     //  身份证
     if (val == "120001") { 

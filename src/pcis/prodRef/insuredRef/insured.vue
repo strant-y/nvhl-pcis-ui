@@ -152,6 +152,8 @@ onMounted(() => {
   setFormItem("Insured.cOrganizationCode", {rules: [getRules("socialCode", {})]});
   // 经常居住地校验
   setFormItem("Insured.cHabitualResidence", {rules: [getRules("valiAddress", {})]});
+  // 税务登记号
+  setFormItem("Insured.cTaxRegistrationNo", {rules: [getRules("taxValidation", {})]});
   // 证件号码
   setFormItem("Insured.cCertfCde", {minWidth: '165px'});
 });             
@@ -202,9 +204,7 @@ let debounceTimer = null;
 //  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
 const checkUser = () => {
     const fieldsToValidate = ['Insured.cInsuredNme', 'Insured.cClntMrk',"Insured.cCertfCde","Insured.cCertfCls"];
-      
-      console.log(77,param)
-        // 自定义录单 方案配置 模版 进入 可以查询用户信息  
+      // 自定义录单 方案配置 模版 进入 可以查询用户信息  
       if (param.pageType !== "app" &&  param.pageType !== "copy" && param.pageType !== "template" && param.cAppStatus !=='1') {
         return false;
       }
@@ -224,40 +224,39 @@ const checkUser = () => {
             ) {
 
           insuredEditRef.value?.validateField(fieldsToValidate).then((isValid)=>{
-                console.log('校验----',isValid)
+            
                 if(isValid){
 
-              debounceTimer = setTimeout(() => {
-             
-                    const param = {
-                      coustName: insuredValue["Insured.cInsuredNme"],
-                      coustMrk: insuredValue["Insured.cClntMrk"],
-                      coustType: insuredValue["Insured.cCertfCls"],
-                      coustCode: insuredValue["Insured.cCertfCde"],
-                      personnelType: "Insured"
-                    }
-                    qryCustomer(param)
-                      .then((res) => {
-                        const { code, data, msg } = res;
-                        if (200 === code) {
-                          console.log('客户数据', res)
-                          if (data) {
-                            if(data && data.length > 0){
-                              Object.keys(data[0]).forEach((key) => { 
-                                if(data[0][key]){
-                                  setValue(key, data[0][key]);
-                                }
-                              });
-                            }
-                            let userId = getValue('Insured.cCertfCde')
-                            idAnalysis(userId)
-                          }
-                        } else {
-                        }
-                      })
-                      .finally(() => { });
+                  debounceTimer = setTimeout(() => {
                 
-                },500)
+                        const param = {
+                          coustName: insuredValue["Insured.cInsuredNme"],
+                          coustMrk: insuredValue["Insured.cClntMrk"],
+                          coustType: insuredValue["Insured.cCertfCls"],
+                          coustCode: insuredValue["Insured.cCertfCde"],
+                          personnelType: "Insured"
+                        }
+                        qryCustomer(param)
+                          .then((res) => {
+                            const { code, data, msg } = res;
+                            if (200 === code) {
+                              if (data) {
+                                if(data && data.length > 0){
+                                  Object.keys(data[0]).forEach((key) => { 
+                                    if(data[0][key]){
+                                      setValue(key, data[0][key]);
+                                    }
+                                  });
+                                }
+                                let userId = getValue('Insured.cCertfCde')
+                                idAnalysis(userId)
+                              }
+                            } else {
+                            }
+                          })
+                          .finally(() => { });
+                    
+                    },500)
               }
           })
         }
@@ -273,8 +272,6 @@ const method = {
   funccopyvalue: () => {
     const tabref = opertaor.getTableRefByKey("applicant");
     const applicantValue = tabref.getFromValue();
-    console.log(applicantValue);
-
     const applicantCodeListMap = tabref?.getCodeListMap();
     if(applicantCodeListMap) {
       insuredEditRef.value?.addCodeListMap({
@@ -392,7 +389,6 @@ const method = {
     const param = opertaor.getParam();
     const tabref = opertaor.getTableRefs();
     const InsuredValue = tabref["insured"].getFromValue();
-    console.log("---------------", val);
     checkUser();
     // val  0法人 1个人
     if (val == "0") {
@@ -725,7 +721,6 @@ const method = {
   },
   // 是否个体工商户
   cIsIndvduBizChange: (val: any) => {
-    console.log("是否个体工商户", val);
     if (val == "1") {
 			setFormItem("Insured.cOccupCde", { rules: [getRules("required", {})]});
 			setFormItem("Insured.cOccupCde", {btnItems:{disabled: false}});
@@ -750,7 +745,6 @@ const method = {
     const tabref = opertaor.getTableRefs();
     const InsuredValue = tabref["insured"].getFromValue();
     for (const k in InsuredValue) {
-      console.log("---", k);
       // 反洗钱不清空
       if (k !== "Applicant.cCustRiskRank" && k !== "Insured.cCustRiskRank") {
         InsuredValue[k] = null;
@@ -885,12 +879,10 @@ const method = {
 
   //证件类型change
   InsuredCCertfCls: (val: any) => {
-    console.log(val)
     checkUser();
         // 清除报错信息
     clearValidate('Insured.cCertfCde')  
     const param = opertaor.getParam();
-    console.log(param)
     if (!param.initFlag) {
       setFormItem("Insured.cNation", {
         disabled: false,
@@ -1058,9 +1050,11 @@ const method = {
     if (cCertfCls == "120001") {
       if (val) {
         const certfCde = tabref["insured"].getFromValue()["Insured.cCertfCde"];
-        if (certfCde && certfCde.length === 18) {
-          // idAnalysis(certfCde)
-        }
+          insuredEditRef.value?.validateField('Insured.cCertfCde').then((isValid)=>{
+            if(isValid){
+                idAnalysis(val)
+            }
+          })
       }
     }else if(cCertfCls =='110007'){
       setValue('Insured.cTaxRegistrationNo',val)
@@ -1156,8 +1150,6 @@ const method = {
       "19": "ariCard",
     };
      baseRules = ruleMap[val] ? [getRules(ruleMap[val])] : [];
-     console.log(22,baseRules)
-
     if (cClntMrk == '0') {
       baseRules = [getRules("required", {}), ...baseRules]
     }

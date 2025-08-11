@@ -210,7 +210,7 @@ const refreshData = () => {
     pageNum: 1,
     pageSize: 999,
   }).then((res) => {
-    if (res.data.result) {
+    if (res.data?.result) {
             let len = 0;
             let sel : any[] = [];
             res.data.result.forEach((item: any,index:number) => {
@@ -253,10 +253,8 @@ const method = {
   },
   //获取特约按钮
   getSpecialAgree: () => {
-      console.log('11111111',idxParam)
   
     const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
-        console.log('11111111',agreementBaseRef.getFormValue())
     if(!agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo')){
       return ElMessage.warning('请先保存');
     }

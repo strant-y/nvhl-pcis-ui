@@ -130,8 +130,6 @@ onMounted(async () => {
     }
   }
   tableconfig.value.isPage = false;
-  console.log('tableconfig.value', tableconfig.value)
-  console.log('props.pageSchema', props.pageSchema)
   // 初始化 cComponentTableValue
   cComponentTableValue = getCComponentTableValue();
 });
@@ -139,7 +137,6 @@ onMounted(async () => {
 // 查询
 const loadData = (flag = true)=>{
   const r = distTableRef.value?.getPartnerPage(flag); //获取分页数据
-	console.log('分页---',r)
 	const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
 	let param = Object.assign({
 		// cComponentTable:cComponentTableValue,
