@@ -21,7 +21,7 @@
                 size="small"
               />
             </i>
-            热搜菜单:
+            <span class="hot-menu-label">热搜菜单:</span>
           </div>
           <div class="top-menu-list">
             <el-tag
@@ -677,7 +677,7 @@ onMounted(() => {
   initRoles()
   getNoticeData()
   getShortMenuList()
-  getCpayTypList()
+  getCpayTypList();
 });
 
 const initRoles = () => {
@@ -1371,6 +1371,10 @@ window.addEventListener('resize', () => {
         font-weight: bold;
         .menu-label {
           display: flex;
+          align-items: center;
+          .hot-menu-label {
+            margin-left: 5px;
+          }
         }
         .top-menu-list {
           span {
