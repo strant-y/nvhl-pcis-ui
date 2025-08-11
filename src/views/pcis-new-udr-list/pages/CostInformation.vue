@@ -628,7 +628,8 @@ function compareAppFee(saveFlag:any) {
     nUpdRateA:String(freeEditRef.value?.getValue("A1_value")) ,
     nUpdRateB: String(freeEditRef.value?.getValue("B1_value")),
     allFeeProp: String(freeEditRef.value?.getValue("nFeePropSum")),
-    allFee:String(freeEditRef.value?.getValue("nPrmSum"))
+    allFee:String(freeEditRef.value?.getValue("nPrmSum")),
+    nRateA6: String(freeEditRef.value?.getValue("A6_value")),
   };
   compareAppFeeInfo(paramStr)
     .then((res:any) => {
