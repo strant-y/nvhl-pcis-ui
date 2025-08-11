@@ -633,29 +633,13 @@ const getRecordTypeText = computed(() => {
   };
 });
 
-
-// watchEffect(() => {
-//   const isShow = productStore.$state.cCiMrk !== "0";
-//   ciMasterAgreementFlag.value = isShow;
-//   console.log(ciMasterAgreementFlag.value,"000000000")
-//   ciFlag.value = isShow;
-//   ourCompanyCiShareFlag.value = isShow;
-// });
 /**
  * 发票信息
  */
 const setTaxInfo = () => {
-  console.log("发票信息", opertaor.getTableRefs());
   const tabref = opertaor.getTableRefs();
   const appLicantValue = tabref["applicant"].getFromValue()["Applicant.cAppNo"]; // 单据编号
-  // const appLicantValue = tabref["plyBase"].getFromValue()["Base.cAppNo"]; // 单据编号
-  
-  console.log('Applicant.cAppNo',tabref["applicant"].getFromValue())
-  console.log('Applicant.cAppNo',tabref['plyBase'].getFromValue())
   if (!!appLicantValue) {
-    // invoiceRef.value?.isShow()
-    // invoiceShow.value = true;
-
     dzmodal
       .open(invoiceInfoModel, { type: "Issuer", data: {} })
       .then((res: any) => {
@@ -788,25 +772,6 @@ const copyPolicyFun = () => {
       }, 500);
     }
   });
-  // dialogRef.value?.open(
-  //       "copyPlyModel",
-  //       {
-  //         type: "show",
-  //         data: {
-  //         },
-  //         method: {
-  //           getSelected: (params) => {
-  //             dialogRef.value?.handleClose();
-  //           },
-  //         },
-  //       },
-  //       {
-  //         isOk: (selectdata: any) => {
-  //           console.log("a", selectdata);
-  //         },
-  //       },
-  //       { title: "复制保单", width: 85 }
-  //     );
 };
 
 // 复制申请单号
@@ -1125,12 +1090,6 @@ const initPage = async () => {
       (item) => item.pageTtile !== "账户信息"
     );
   }
-//   let isDetailcdeType = isDetailCde();
-// if (!isDetailcdeType) {
-//   formconfig11[0].pageInfo = formconfig11[0].pageInfo.filter(
-//     (item) => item.pageTtile !== "账户信息"
-//   );
-// }
 
   console.log("页面初始化返回数据", formconfig11);
   if (props.param?.cAppTyp == "E") {
@@ -1147,7 +1106,6 @@ const initPage = async () => {
     props.param?.pageType === "UW_READ_SCENE"
   ) {
     opertaor.setReadOnly(formconfig11);
-    console.log(77,formconfig11)
   }
 
   opertaor.setTableConfig(formconfig11);
@@ -1161,7 +1119,6 @@ async function getInitParam(codeparam){
       codeListStore.setOptionsToCacheMap(res.data[i]['key'],res.data[i]['data']);
     }
   }
-  console.log(res);
 }
 
 const exlist = ['acctinfo','ci','ourCompanyCiShare'];
@@ -1333,9 +1290,7 @@ async function loadAfter() {
 
           // 用于处理 账户信息
           let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
-          console.log('669',acctinfoInfo)
           if(acctinfoInfo){
-              console.log('670',acctinfoInfo)
               acctinfoInfo.setDisabledAll(false);  
               acctinfoInfo.setFormItem('Acctinfo.cAcctNme',{
                 disabled: true
@@ -1533,7 +1488,6 @@ async function loadAfter() {
           props.param["cGrpMrk"]
         );
 
-        console.log('3333',opertaor.getTableRefByKey('acctinfo'))
         // 用于处理 账户信息
         let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
         if(acctinfoInfo){
@@ -1556,11 +1510,6 @@ async function loadAfter() {
     }
   } else if (props.param.pageType === "readonly") {
     // 查询数据
-    // const getAppPlyInfoRes = await getAppPlyInfoByAppNo({
-    //   CAppNo: props.param.cAppNo,
-    // });
-    // console.log("getAppPlyInfoRes", getAppPlyInfoRes);
-    // const data = getAppPlyInfoRes.data;
     const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
     await loadAppPlyInfo(cAppNo);
     if (props.param.cAppTyp == "E") {
@@ -1608,7 +1557,6 @@ async function loadAfter() {
       opertaor.setDisabledAll();
     });
   } else if (props.param.pageType === "orig") {
-    console.log('续保复制----')
     // 续保复制
     getAppPolicy({
       cAppNo: props.param.cAppNo,
@@ -2440,7 +2388,6 @@ const calcPremium = () => {
       }
     })
   }
-  console.log(res);
   if (res["cvrg"].length == 0) {
     ElMessage.error("请录入条款信息");
     btn.loading = false;
@@ -2450,7 +2397,6 @@ const calcPremium = () => {
   const termref = opertaor.getTableRefByKey("cvrg");
   const calccheck = termref.calcCheck();
   if(!calccheck['res']){
-    console.log(calccheck);
     ElMessage.error(calccheck['msg']);
     btn.loading = false;
     return;
@@ -2510,28 +2456,8 @@ const calcPremium = () => {
           .getTableRefByKey("ciMasterAgreement")
           .setValue("Base.nCiJntPrm", nPrm.value);
       }
-      // opertaor
-      //   .getTableRefByKey("ciMasterAgreement")
-      //   .setValue("Base.nJiJntAmt", nAmt.value);
-      // opertaor
-      //   .getTableRefByKey("ciMasterAgreement")
-      //   .setValue("Base.nCiJntPrm", nPrm.value);
-      // opertaor
-      //   .getTableRefByKey("ciMasterAgreement")
-      //   .setValue("Base.nJiJntPrm", nPrm.value);
-      // opertaor
-      //   .getTableRefByKey("ourCompanyCiShare")
-      //   .setValue("Base.nCiOwnAmt", nAmt.value);
-      // opertaor
-      //   .getTableRefByKey("ourCompanyCiShare")
-      //   .setValue("Base.nCiOwnPrm", nPrm.value);
-
-        //承保 总保费  Base.nPrm * Base.nPrmRmbExch
-
-
         opertaor.getTableRefs()["base"].setValue("Base.nPrm", nPrm.value);
         opertaor.getTableRefs()["base"].setValue("Base.nRmbPrm", nPrmVal*nPrmRmbExch);
-        console.log('到————————', nPrm.value)
 
         //     opertaor
         // .getTableRefByKey("ourCompanyCiShare")
@@ -2629,17 +2555,11 @@ function getFKFunc() {
  * 投保申请核保
  */
 const submitToUndrFn = async () => {  
-  console.log('数据----',opertaor.getTableRefByKey("base").getFromValue()['Base.nPrm'])
-  console.log('数据----',opertaor.getDataAll())
-    console.log('数据----3',opertaor.getTableRefByKey("payinfo").getFromValue())
-
  	if (needCalc.value) {
     ElMessage.error("请先进行保费计算!");
     return;
   }
 
-  console.log('座位总数',opertaor.getTableRefByKey("tgt"))
-  console.log('座位总数', opertaor.getDataAll())
   /**
    * 联共保判断
    */
@@ -2654,11 +2574,8 @@ const submitToUndrFn = async () => {
 	// 申请核保前判断是否灰黑名单
 	const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
 	const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
-	console.log('cInquiryNumbercInquiryNumbercInquiryNumber', cInquiryNumber);
-	console.log('cAppNocAppNocAppNocAppNo', cAppNo);
 	
 	const res: any = await isUndrClsBlackList({ cInquiryNumber, cAppNo});
-	console.log('判断是否灰黑名单返回的res', res);
 	if(res.code == 200){
 		if(res.msg != '校验通过'){
 			ElMessage({
@@ -2707,7 +2624,6 @@ const submitToUndrFn = async () => {
       let num1 = tgtRef.getValue('Tgt.nTotalInsured'); 
       let num2 = tgtRef.getValue('Tgt.nInsuredcompanySeats'); 
       let sum = tgtRef.getValue('Tgt.nSeatCapacity');
-      console.log('总数',num1 + num2  !== sum,props.param?.cProdNo,num1,num2,sum)
       if(num1 + num2  !== sum){
         ElMessage.error("投保座位总数 = 投保乘客座位总数+投保司乘人员座位总数，请核对");
         return;
@@ -2720,10 +2636,8 @@ const submitToUndrFn = async () => {
   let nPayablePrmData = opertaor.getTableRefByKey("payinfo").getFromValue()  // 缴费计划数据  
   let nPayAll = 0;
   nPayablePrmData.forEach((item:any)=>{
-        console.log(item)
         nPayAll+= item['Pay.nPayablePrm']
   })
-  console.log('数',nPayAll)
   if(nPayAll !== nPrm ){
       ElMessage.warning('缴费计划“应收保费”不等于“总保费”请确认！')
       return false;
@@ -2745,7 +2659,6 @@ const submitToUndrFn = async () => {
       // const s = await saveDataInfo()
       // if(!s) return;
       btn.loading = true;
-      console.log(opertaor.getTableRefByKey("plyBase").getFromValue());
       const base = opertaor.getTableRefByKey("plyBase").getFromValue();
       res["user"] = user;
   
@@ -2767,7 +2680,6 @@ const submitToUndrFn = async () => {
         res["appNo"] = base["Base.cAppNo"];
       }
 
-      console.log("申请核保参数-----", res);
 
       const params = opertaor.getParam();
       //:TODO 进行一次保费计算,如果发生保费变化,则告知需要进行保费计算
@@ -2808,7 +2720,6 @@ const submitToUndrFn = async () => {
           }
         })
       }
-      console.log(calcData);
       // 重新进行保费计算
       const calBtn = getBtn("btn010101");
       try {
@@ -2823,7 +2734,6 @@ const submitToUndrFn = async () => {
           if (newPrm === oldPrm && newAmt === oldAmt) {
             const undr: any = props.param?.pageName === "priceInquiry" ? await submitInquiry(res) : await submitToUndr(res);
             btn.loading = false;
-            console.log("submitToUndr-res", undr);
             if (undr["code"] == 200) {
               if(undr['cDecision'] !== '0'){
                 ElMessage({
@@ -2959,7 +2869,6 @@ const savePlyInfo = async () => {
   }
 
 
-  console.log('保费====',res)
   let payList = res.payinfo;
   // Base.nPrm
   // payinfo
@@ -3001,7 +2910,6 @@ const savePlyInfo = async () => {
     });
   }
 
-  console.log("保存参数-----1", res);
   if (res["cvrg"].length == 0) {
     ElMessage.error("请录入条款信息");
     btn.loading = false;
@@ -3132,12 +3040,7 @@ const calcPremiumEdr = () => {
     const res = opertaor.getDataAll();
     const dataAll = opertaor.getDataAll();
     const edrbaseData = edrbase.value?.getFromValue();
-  console.log('保费计算',props.param)
-  console.log('保费计算2',res)
-  
- 
   // 条款
-  // const totalNum =  res['cvrg'].reduce((sum, item) => sum + (item['Term.nInsuranceAmount'] || 0), 0);
   const nInsuranceAmount:any = [];
   res['cvrg'].forEach((item:any) => {
     if(item['Term.cRdrTyp'] === '0') {// 主险 riskList不为空则取riskList里的nInsuranceAmount累加，否则取Term.nInsuranceAmount或Term.nAccidentLimit
@@ -3176,7 +3079,6 @@ const calcPremiumEdr = () => {
     originalnAmt = Number(edrbaseData['EdrBase.nBefEdrAmt'].replaceAll(',',''))
   }
 
-  console.log('1212 ',originalnAmt ,totalNum)
   //  08 减少  
   if(props.param?.cRsnCde === '08'  && totalNum > originalnAmt ){
     ElMessage.warning("批改原因为“减少保额”，累计赔偿限额不能大于原有“保额”！");
@@ -3257,8 +3159,6 @@ const calcPremiumEdr = () => {
 
         // Base.nPayNumber
         let infoLength = dataAll['base']['Base.nPayNumber']+res['res']['composition']["EdrBase"][0]['EdrBase.nEdrPrjNo'];
-                console.log('条数',infoLength ,currentPayList.length)
-    
         if(currentPayList.length >=infoLength){
           currentPayList.pop();
         }
@@ -3275,9 +3175,6 @@ const calcPremiumEdr = () => {
                 ops["plyBase"],
                 currentPayList.length+1
               );
-               console.log(3034,payInfo)
-            console.log('data--' ,currentPayList)
-            console.log('data2--' ,payInfo)
             currentPayList.push(payInfo); // 插入新条目
             payinfoRef.setFormValue(currentPayList); // 更新表单数据
           }
@@ -3314,9 +3211,6 @@ const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase,nTms) => {
   const cCiMrk = data.plyBase?.['Base.cCiMrk'];
   const nCiOwnPrm = ['1', '2', '3','4'].includes(cCiMrk)
   let nCiShare= 100;
-  // console.log('nCiOwnPrm ',nCiOwnPrm,data)
-  // console.log('nCiOwnPrm ',data.ci)
-  // debugger 
   if(nCiOwnPrm){
        nCiShare = Number(getOwnShare()) || 100 ;
   }
@@ -3374,7 +3268,6 @@ const calcPremiumEdrSurrender = () => {
       }
     })
   }
-  console.log(res);
   calcSurrenEdr(res).then((res: any) => {
     btn.loading = false;
     console.log("批改计算", res);
@@ -3442,7 +3335,6 @@ const saveApplicationEdr = () => {
   res["data"]["EdrBase"] = edrbase.value?.getFromValue();
   res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"] =
     res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
-  console.log(res);
   saveSurrenEdr(res).then((res) => {
     btn.loading = false;
     console.log("退保保存", res);
@@ -3482,7 +3374,6 @@ const getSurrenderPrecisFun = () => {
   const res = opertaor.getDataAll();
   res["user"] = user;
   res["EdrBase"] = edrbase.value?.getFromValue();
-  console.log(res);
   getSurrenderPrecis(res).then((res) => {
     btn.loading = false;
     if (res["code"] == "200") {
@@ -3527,8 +3418,6 @@ const submitEdrToUndrSurrender = async () => {
   res["taskId"] = props.param.taskId ? props.param.taskId : null;
   res["data"] = opertaor.getDataAll();
   res["data"]["EdrBase"] = edrbase.value?.getFromValue();
-  console.log(res);
-
   
   submitEdrSurrender(res).then((res) => {
     btn.loading = false;
@@ -3624,7 +3513,6 @@ const generateEndorse = async () => {
       }
     })
   }
-  console.log(res);
   getEndorseChange(res).then((res) => {
     btn.loading = false;
     if (res["code"] == "200") {
@@ -3732,7 +3620,6 @@ const submitEdrToUndrFun = async () => {
     res["appNo"] = base["Base.cAppNo"];
     res["plyNo"] = base["Base.cPlyNo"];
     res["taskId"] = props.param.taskId ? props.param.taskId : null;
-    console.log(res);
     //进行一次保费计算,如果发生保费变化,则告知需要进行保费计算
     const calBtn = getBtn("btnCalEdr");
     calBtn.loading = true;
@@ -3872,7 +3759,6 @@ const submitUnderwritingFn = async () => {
   if(props.param?.pageName === "priceInquiry") {
     res["inquiryNo"] = props.param.cInquiryNo;
   }
-  console.log(res);
   if(res.cUndrMrk === "A") {//核保选项为同意时
     const deductibleDist = opertaor.getTableRefByKey("deductibleDist")?.getTableData();
     const insured = opertaor.getTableRefByKey("insured")?.getFromValue();
@@ -3947,10 +3833,7 @@ const submitUnderwritingFn = async () => {
     console.log("submitUnderwriting-res", res);
     // btn.loading = false;
     if (res["code"] == "200") {
-      // const ops = opertaor.convertData(res);
-      // console.log("转换的数据", ops);
       ElMessage.success(res.msg);
-      // btn.disabled = true;
       if(res['cDecision'] === '1' || res['cDecision'] === '2'){
         tagsViewStore.delView({"name": "my-page",
           "title": "申请单录入",

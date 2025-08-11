@@ -451,7 +451,6 @@ const cEquipmentTypesFunc = ()=>{
 const cDocumentTypeChange =(val:any)=>{
   console.log(val)
    const item = freeEditRef.value?.getFromSchemaItem('Dist.cIdentificationNumber')
-   console.log(11123,item.itemConfig['rules'])
        clearValidate('Dist.cIdentificationNumber')  
     //  身份证
     if (val == "120001") { 

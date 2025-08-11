@@ -130,7 +130,6 @@ onMounted(async () => {
 });
 const loadData = (flag = true)=>{
     const r = distTableRef.value?.getPartnerPage(flag); //获取分页数据
-    console.log('分页---',r)
     const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
     let param = Object.assign({cComponentTable:cComponentTableValue,cEcAgrAppNo:agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''}, r);
       cargoApi.selectDistNew(param).then((res: any) => {

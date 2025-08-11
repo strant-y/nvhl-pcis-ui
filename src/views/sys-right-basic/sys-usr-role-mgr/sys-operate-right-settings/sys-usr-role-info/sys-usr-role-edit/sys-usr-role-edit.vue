@@ -121,7 +121,6 @@ const saveData = () => {
 
 const loadData = (flag = true) => {
      const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
-     console.log('分页---',r)
     let param = Object.assign({
      userId: props.COperId,
       CDptCde: props.CDptCde,

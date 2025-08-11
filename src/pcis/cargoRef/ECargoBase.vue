@@ -261,15 +261,12 @@ const method = {
               setValue("ECargoBase.cBrkrCde", params.CChaCde);
               setValue("ECargoBase.cAgtAgrNo", params.CAgtAgrNo);
 
-              console.log("回显----", params);
-
               dialog.value?.handleClose();
             },
           },
         },
         {
           isOk: (selectdata: any) => {
-            console.log("a", selectdata);
           },
         },
         { title: "代理查询", width: 85 }
@@ -380,7 +377,6 @@ const method = {
         },
         method: {
           getSelected: (params:any) => {
-            console.log('111Base.cSlsId',params)
             setFormValue({
               "ECargoBase.cSlsId": params.CSlsCde, //业务员员工号
               "ECargoBase.cSlsNme": params.CSlsNme, //业务员名称

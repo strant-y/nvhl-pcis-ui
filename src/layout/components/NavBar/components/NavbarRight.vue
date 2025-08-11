@@ -232,7 +232,6 @@ const loadMore = () => {
 };
 
 onMounted(() => {
-  console.log(3323, !!hasMoreItems)
   selectDpt.value = user.companyId;
   dptList.value = user.opOrgs;
   const rus = userStore.user.roles?.find(r => r === 'ROLE_00000007')
@@ -248,7 +247,6 @@ onMounted(() => {
 
 // 初始化 消息数据内容
 const loadData = () => {
-  console.log(user, 32)
   let param = {
     CReceiver: user.opCde,
     // roles: user.roles,
@@ -256,12 +254,8 @@ const loadData = () => {
     CType: '0',
     limit: currentIndex.value
   }
-  console.log('消息参数', param)
   pcisQueryService.getNotifyByReceiver(param).then((res: any) => {
-
-    console.log('消息数据', res.data.result)
     if (res && res.code === 200) {
-
       mesList.value = res.data.result;
       total.value = res.data.total;
 
@@ -273,16 +267,12 @@ const loadData = () => {
 }
 
 const showPopover = () => {
-
-  console.log(1232)
-
   unref(popoverRef).popperRef?.delayHide?.()
   // visible2.value = !visible2.value; // 切换弹出框显示
 };
 
 // 点击跳转查询
 const JumpClick = (row: any) => {
-  console.log(row,"0-000000")
   // router.push({
   //   // path: '/index/new-udr-list/newudrlist',
   //   name: `application-querys`,
@@ -365,8 +355,6 @@ const JumpClick = (row: any) => {
 
 // 修改消息状态
 const change = (param: any) => {
-
-    console.log('332.',param)
   pcisQueryService.changeStatus(param).then((res: any) => {
   // const notifyData = this.notifyService.changeStatus(param);
   // notifyData.subscribe((res: any) => {
@@ -430,7 +418,6 @@ function closeDialog() {
  * 弹框提交 确认
  * */
 function dialogSubmit() {
-  console.log(formData)
   if (!!formData.confirmPassword && !!formData.password) {
     if (formData.confirmPassword === formData.password) {
       updateUserPassword(formData).then((res) => {

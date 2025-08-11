@@ -253,10 +253,8 @@ const method = {
   },
   //获取特约按钮
   getSpecialAgree: () => {
-      console.log('11111111',idxParam)
   
     const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
-        console.log('11111111',agreementBaseRef.getFormValue())
     if(!agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo')){
       return ElMessage.warning('请先保存');
     }

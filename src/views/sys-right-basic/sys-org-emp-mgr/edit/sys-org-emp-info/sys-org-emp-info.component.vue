@@ -123,61 +123,6 @@ const pageresult = reactive<Pageresult>({
 	/** 总数 */
 	total: 0,
 });
-// const isIetableFromSchema = [
-// 	{
-// 		prop: "cEmpCde",
-// 		inputtype: "rtinput",
-// 		title: "员工代码"
-// 	},
-// 	{
-// 		prop: "cEmpCnm",
-// 		inputtype: "rtinput",
-// 		title: "员工名称",
-// 	},
-// 	{
-// 		prop: "cDptCnm",
-// 		inputtype: "rtinput",
-// 		title: "机构名称",
-// 	},
-// 	{
-// 		prop: "cDptMinCde",
-// 		inputtype: "rtinput",
-// 		title: "所属网点",
-//     formatter: (val)=>{
-//       const result = dptMinCde.find(item => item.value === val);
-//       return result ? result.label : val;
-//     }
-// 	},
-// 	{
-// 		prop: "cPositionCde",
-// 		inputtype: "rtinput",
-// 		title: "职位",
-//     formatter: (val)=>{
-//       const postCode = [{ value: '0', label: '出单员' }
-//             , { value: '1', label: '网点管理员' }
-//             , { value: '2', label: '退保专员' }
-//             , { value: '3', label: '渠道查询专员' }
-//             , { value: '8', label: '管理员' }]
-//       const result = postCode.find(item => item.value === val);
-//       return result ? result.label : val;
-//     }
-// 	},
-// 	{
-// 		prop: "cIsValid",
-// 		inputtype: "rtswitch",
-// 		title: "有效状态",
-// 		keymap: {
-// 			y: "1",
-// 			n: "0",
-// 		},
-// 		activeText: '有效',
-// 		inactiveText: '无效',
-// 		inlinePrompt: true,
-// 		func: (val) => {
-// 			console.log(val);
-// 		},
-// 	}
-// ]
 const tableFromSchema = [
 	{
 		prop: "cEmpCde",
@@ -242,7 +187,6 @@ const tableconfig = reactive<AppTableConfig>(
 				type: "success",
 				func: function () {
 					const CDptCde = freeEditRef.value?.getValue('cDptCde')
-					console.log('dddd----',CDptCde)
 					if(!CDptCde) {
 					  ElMessage.warning('请先选定机构,再进行操作！');
 					  return;            

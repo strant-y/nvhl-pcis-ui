@@ -81,7 +81,6 @@ watch(
         // pageresult.total = 0
         // 上面代码是仅用于本地调试
         if (n) {
-          console.log('投保值' ,n,o)
           // 学生岗位 Dist.cJobType
             if(params.cProdNo === '043010'){
                   formconfig11.value.fromSchema?.forEach(item=>{
@@ -235,21 +234,11 @@ onMounted(async () => {
     })
   }
 
-console.log('dist -----',formconfig11.value,)
-console.log('dist2 -----',formconfig11.value.fromSchema)
- 
-  // if(params.cProdNo === '043009'){
-  //   formconfig11.value.fromSchema?.forEach(item=>{
-  //     if(item['prop'] ==='Dist.cEmploymentAddress' && route.params.param?.cGrpMrk !== '1'){
-  //       item.isShow = false;
-  //     }
-  //   })
-  // }
+
   Object.assign(formconfig1.value, formconfig11.value);
   cardconfig.value.title = formconfig1.value.title;
   if(formconfig1.value.distSchema&& formconfig1.value.distSchema.length > 0){
          formconfig1.value.distSchema.forEach((item:any)=>{
-            console.log(666,item)
             if(item['prop'] === 'cPlateNumber'){
                 item['rules'] = [getRules("vehiclePlate", {})];
             }
@@ -364,7 +353,6 @@ console.log('dist2 -----',formconfig11.value.fromSchema)
 // }  Tgt.nEngineeringCost nEngineeringCostChange
 
 function cardResetFn(){
-  console.log(cardRef.value?.getFromValue());
 	const tableEditRefs = cardRef.value;
 	const s = tableEditRefs?.getFromValue(); //获取表单数据
 	for (const k in s) {
@@ -555,7 +543,6 @@ const method = {
 				selData.dist[addrValueKey] = selData.dist[inputGroupKey];
 			}
 		}
-		console.log('selDataselData', selData)
     selectDist(selData).then((res: any) => {
       if (res.code === 200) {
         pageresult.list = [];
@@ -613,7 +600,6 @@ const method = {
         }
         // 刷新条款表格
         const termref = opertaor.getTableRefByKey("cvrg");
-        console.log('termref22-----', toRaw(termref));
         const hasRel = res.data.hasRel;
         const hasPlan = res.data.hasPlan;
         const clauseValues = res.data.clauseValues;
@@ -746,7 +732,6 @@ const method = {
 				paramitem.dist[addrValueKey] = paramitem.dist[inputGroupKey];
 			}
 		}
-		console.log('paramitemparamitem', paramitem)
     policyService
         .exportDist(paramitem).then((res) => {
       if (res.size <= 0) {
@@ -894,7 +879,6 @@ const method = {
         };
 
         reader.onerror = (e) => {
-          console.error("文件读取失败", e);
           ElMessage.error("文件读取失败");
         };
 
@@ -976,7 +960,6 @@ const method = {
     } else {
       setAddressStr("Dist.cClntAddr", a);
     }
-    console.log("清单级联事件触发")
   },
   // 批量删除
   batchDelete() {

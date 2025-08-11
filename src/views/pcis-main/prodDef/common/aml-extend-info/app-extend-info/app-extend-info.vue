@@ -140,7 +140,6 @@ const tableconfig = reactive<AppGridEditConfig>(
 				title: "证件类型",
 				rules: [getRules("required", {})], 
 				func:(val:any)=>{
-					console.log('----',val)
 					if(val){
 						setFieldRules('cCerftCde',val, tableRef)
 
@@ -451,20 +450,8 @@ const setFieldRules  = (
   if(fconfig){
 	  formRef?.value?.clearValidate(field);
   }
-
-  
-  // 根据val值映射对应的校验规则类型
-//   const ruleTypeMap = {
-// 	"110001": "orgCode",      // 组织机构编码
-// 	"110007": "socialCode",   // 统一社会信用代码
-//     "120001": "idCard",       // 身份证
-//   	"120002": "passPort",     // 护照
-//     "19": "ariCard",          // 外国人证件号
-//   };
-  
  // 获取对应的规则类型，默认无规则
  const ruleType = isValidRuleType(value) ? ruleTypeMap[value] : undefined;
-  console.log('111',field,value,formRef,fconfig)
   // 设置字段的校验规则
   setFormItem(field, {
     rules: ruleType ? [getRules(ruleType, {}),getRules("required", {})] : [getRules("required", {})]

@@ -90,7 +90,6 @@ const method = {};
 
 // 确定
 function confirm() {
-    console.log('props-----',props)
   dataFormRef.value.validate((isValid: boolean) => {
     if (isValid) {
       const param = formData.paymentMethod;

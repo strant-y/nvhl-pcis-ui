@@ -23,8 +23,6 @@ import { useSettingsStore, usePermissionStore, useAppStore } from "@/store";
 const appStore = useAppStore();
 const settingsStore = useSettingsStore();
 const permissionStore = usePermissionStore();
-
-console.log(permissionStore);
 const sidebarLogo = computed(() => settingsStore.sidebarLogo);
 const layout = computed(() => settingsStore.layout);
 </script>
