@@ -1790,22 +1790,6 @@ async function loadAfter() {
     });
     bthList.value.push(
       createFreeButtonBase({
-        label: "保存模板",
-        type: "primary",
-        buttonColor: bottomBtnColor1,
-        func: () => {
-          handleSaveTemplate()
-        },
-      }),
-      createFreeButtonBase({
-        label: "复制出单",
-        type: "primary",
-        buttonColor: bottomBtnColor1,
-        func: () => {
-          copyPolicyFun();
-        },
-      }),
-      createFreeButtonBase({
         label: "保费计算",
         type: "primary",
         id: "btn010101",
@@ -1846,10 +1830,31 @@ async function loadAfter() {
           setCusBenefitInfo();
         },
       }),
+    );
+    rightBtnList.value.push(
+      createFreeButtonBase({
+        label: "保存模板",
+        type: "primary",
+        buttonColor: bottomBtnColor1,
+        icon: "Memo",
+        func: () => {
+          handleSaveTemplate()
+        },
+      }),
+      createFreeButtonBase({
+        label: "复制出单",
+        type: "primary",
+        buttonColor: bottomBtnColor1,
+        icon: "CopyDocument",
+        func: () => {
+          copyPolicyFun();
+        },
+      }),
       createFreeButtonBase({
         label: "额度明细",
         type: "primary",
         buttonColor: bottomBtnColor1,
+        icon: "Tickets",
         func: () => {
           openLimit();
         },
