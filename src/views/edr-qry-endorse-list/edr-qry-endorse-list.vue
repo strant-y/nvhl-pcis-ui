@@ -356,8 +356,8 @@ const tableconfig = reactive<AppTableConfig>(
                 size: "large",
                 icon: "Edit",
                 tableClick: (row) => {
-                    console.log(1212,row)
-                    if(row.cCiMrk === "5"){
+                    console.log(1212,row,row.id[1])
+                    if(row.cCiMrk === "5" && row.id[1] === "47" ){
                         ElMessage.warning('出单方式为司内联保时,联共保信息不可批改!');
                         return;
                     }else{

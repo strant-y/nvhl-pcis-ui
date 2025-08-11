@@ -301,11 +301,11 @@ const method = {
       const existingIssueMrk = allRows.some(
         (row) => row._dataId !== rowId && row["Ci.cIssueMrk"] === "1"
       );
-      // if (val === "1" && existingIssueMrk) {
-      //   ElMessage.error("出单方有且只能有一个！");
-      //   freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
-      //   return;
-      // }
+      if (val === "1" && existingIssueMrk) {
+        ElMessage.error("出单方有且只能有一个！");
+        freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
+        return;
+      }
       if (val === "0") {
         if(cCiMrk["Base.cCiMrk"] == '1' || cCiMrk["Base.cCiMrk"] == '5'){
           if(rowData['Ci.cDptCde'] == param.cDptCde){
@@ -319,9 +319,12 @@ const method = {
           }
         }
       }else if( val === '1'){
-        if(cCiMrk['Base.cCiMrk'] == '2'){
+        if(cCiMrk['Base.cCiMrk'] == '2' || cCiMrk['Base.cCiMrk'] === '1' || cCiMrk['Base.cCiMrk'] === '5'){
           if(rowData['Ci.cDptCde'] == param.cDptCde){
             ElMessage.error("联保单出单方必须是主联单的分公司！");
+            freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
+          }else if(rowData['Ci.cDptCde'] != param.cDptCde){
+            ElMessage.error("联保单出单方必须是主联单的分公司！")
             freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
           }
         }
@@ -537,6 +540,8 @@ const method = {
       // setValue('Ci.cBankCnaps', backAddr[0])
       // setValue('Ci.cBankAddr', backAddr[1])
     // }
+    const rowData = freeEditRef.value?.getSelectRow();
+    const rowId = rowData?._dataId;
     dialogRef.value?.open(
         "cBrkrCdeModal",
         {
@@ -546,7 +551,9 @@ const method = {
           },
           method: {
             getSelected: (params) => {
-              // freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData","")
+              console.log("params",params)
+              freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBankCde","loadData",[{ label: params.label, value: params.value }])
+              freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBankCde",params.value)
               dialogRef.value?.handleClose();
             },
           },
