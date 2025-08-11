@@ -75,8 +75,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               if (res.type === "ok" && res.body) {
                 // cReadOnly 是否可编辑 0 否 1 是
                 if(res.body.cReadOnly === "1") {
-                  setFormItem('cBckOp1', { disabled: false })
-                  setValue('cBckOp1', res.body.cExc)
+                  setFormItem('cIsExcluding', { disabled: false })
+                  setValue('cIsExcluding', res.body.cExc)
                 }
               }
             });
@@ -204,13 +204,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         disabled: true,
       },
       {
-        prop: "cBckOp1",
+        prop: "cIsExcluding",
         inputtype: "rtselect",
         title: "是否再保合约除外业务",
         rules: [{ type: "required" }],
         loadData: [
           { value: "1", label: "是" },
-          { value: "2", label: "否" },
+          { value: "0", label: "否" },
         ],
         disabled: true,
         func: (val: any) => {
@@ -356,29 +356,29 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         itemWidth: 2,
       },
       {
-        prop: "cRpt",
+        prop: "cIsTransaction",
         inputtype: "rtselect",
         title: "关联交易确认",
         rules: [{ type: "required" }],
          itemWidth: 1,
         loadData: [
           { value: "1", label: "是" },
-          { value: "2", label: "否" },
+          { value: "0", label: "否" },
         ],
         clearable: true,
         func:(val:any)=>{
             if(val ==='1'){
-                setFormItem("cRelateNo",{ hidden: false})
+                setFormItem("cRelationNo",{ hidden: false})
                 setFormItem("cUploadSign",{ hidden: false})
             }else{
-                setFormItem("cRelateNo",{ hidden: true})
+                setFormItem("cRelationNo",{ hidden: true})
                 setFormItem("cUploadSign",{ hidden: true})
             }
         }
       },
 
       {
-        prop: "cRelateNo",
+        prop: "cRelationNo",
         inputtype: "rtinput",
         title: "关联交易审批单编号",
         hidden: true,
@@ -392,7 +392,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
          hidden: true,
         keymap: {
           y: "1",
-          n: "2",
+          n: "0",
         },
       },
 
@@ -403,7 +403,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [{ type: "required" }],
         loadData: [
           { value: "1", label: "是" },
-          { value: "2", label: "否" },
+          { value: "0", label: "否" },
         ],
         clearable: true,
         func: (val:any) => {
@@ -549,7 +549,7 @@ watch(
 onMounted(() => {
   nextTick(() => {
     console.log(cUndrMrkOptions)
-    setValue("cIsRiskExp", "2");
+    setValue("cIsRiskExp", "0");
     // Base.cRiFacMrk
     setValue("riFacMrk", "0")
     const param = {
@@ -570,15 +570,15 @@ onMounted(() => {
       params.cEdrRsnBundleCde !== "s2" &&
       params.cEdrRsnBundleCde !== "c1"
     ) {
-      setFormItem("cRpt", {
+      setFormItem("cIsTransaction", {
         disabled: false,
       });
-      setValue("cRpt", "")
+      setValue("cIsTransaction", "")
     } else {
-      setFormItem("cRpt", {
+      setFormItem("cRcIsTransactionpt", {
         disabled: true,
       });
-      setValue("cRpt", "2")
+      setValue("cIsTransaction", "0")
     }
     // 获取核保选项
     getCUndrMrkUrlFn(param);
