@@ -184,7 +184,7 @@ const method = {
           fromSchema: tableconfig.value.fromSchema,
           fromUi: tableconfig.value.fromUi,
           title: "详情",
-          rowData: row,
+          rowData: {...row},
           compKey: props.pageSchema.compKey
         },
 				{},
@@ -230,7 +230,7 @@ const method = {
           fromSchema: tableconfig.value.fromSchema,
           fromUi: tableconfig.value.fromUi,
           title: "编辑",
-          rowData: row,
+          rowData: {...row},
           compKey: props.pageSchema.compKey
         },
         {

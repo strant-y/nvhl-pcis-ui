@@ -146,7 +146,7 @@ export const getECargoData = () => {
     }
 
     // 录单机构
-    dataInit["ECargoBase.cDptCde"] = param.cDptCde;
+    // dataInit["ECargoBase.cDptCde"] = param.cDptCde;
     // 涉农标志
     dataInit["ECargoBase.cAgriMrk"] = "2";
     //联共保业务
