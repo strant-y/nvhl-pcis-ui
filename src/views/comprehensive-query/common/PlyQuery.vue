@@ -566,6 +566,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                           if (item.prop === "tAppTm") {
                               item.hidden = false; // 显示投保日期
                               item.rules = [getRules("required", {})]; // 设置必填规则
+                              // 设置默认值为最近15天
+                              const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
+                              const startDate = moment(new Date()).subtract(15, "days").format("YYYY-MM-DD 00:00:00");
+                              freeEditRef.value?.setValue("tAppTm", [startDate, endDate]);
                           } else if (item.prop == "tIssueTm" || item.prop == "tEdrAppTm") {
                               item.hidden = true;
                           }
@@ -576,6 +580,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                           if (item.prop === "tEdrAppTm") {
                               item.hidden = false; // 显示批改申请日期
                               item.rules = [getRules("required", {})]; // 设置必填规则
+                            // 设置默认值为最近15天
+                            const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
+                            const startDate = moment(new Date()).subtract(15, "days").format("YYYY-MM-DD 00:00:00");
+                            freeEditRef.value?.setValue("tEdrAppTm", [startDate, endDate]);
                           } else if (item.prop == "tAppTm") {
                               item.hidden = true;
                           } else if (item.prop == "tIssueTm") {
