@@ -729,14 +729,10 @@ const method = {
     }
     if (tm < 0) {
       ElMessage.warning("竣工日期不能小于开工日期");
-      setFormValue({
-        "Tgt.tPlannedDate": null,
-      });
+      setValue("Tgt.tPlannedDate", null);
       return;
     }
-    setFormValue({
-      "Tgt.nContractDuration": tm,
-    })
+    setValue("Tgt.nContractDuration", tm);
 
   },
   // 计划竣工日期 
@@ -749,14 +745,10 @@ const method = {
     const tm = moment(v).diff(moment(start), "days");
     if (tm < 0) {
       ElMessage.warning("竣工日期不能小于开工日期");
-      setFormValue({
-        "Tgt.tPlannedCompletion": null,
-      });
+      setValue("Tgt.tPlannedCompletion", null);
       return;
     }
-    setFormValue({
-      "Tgt.nContractDuration": tm,
-    });
+    setValue("Tgt.nContractDuration", tm);
   },
 
   ShipClassOneChange:(val: any)=>{
@@ -765,10 +757,8 @@ const method = {
     const param = opertaor.getParam();
     if(!param.initFlag){
       if(val=='01'){
-        setFormValue({
-          "Tgt.cShipClassTwo": null,
-          "Tgt.cShipClassThree": null,
-        });
+        setValue("Tgt.cShipClassTwo", null);
+        setValue("Tgt.cShipClassThree", null);
       }
     }
     if(val=='01'){ //rules: [getRules("required", {})]
@@ -782,10 +772,7 @@ const method = {
     if(val=='02'){
       setFormItem('Tgt.cShipClassThree',{disabled:true,rules: null})
       setFormItem('Tgt.cShipClassTwo', {codeParam:{classone:'level1'},typeCode:'Ship_Class_Level2'});
-            setFormValue({
-          
-          "Tgt.cShipClassThree": null,
-        });
+        setValue("Tgt.cShipClassThree", null);
     }
     if(val=='03'){
       setFormItem('Tgt.cShipClassThree',{disabled:true,rules: null})
@@ -794,9 +781,7 @@ const method = {
       // Tgt.cShipClassTwo
      
       console.log('2222', getValue('Tgt.cShipClassTwo'))
-        setFormValue({
-          "Tgt.cShipClassThree": null,
-        });
+        setValue("Tgt.cShipClassThree", null);
     }
 
  
@@ -808,9 +793,7 @@ const method = {
         
     }else if(val){
        setFormItem('Tgt.cShipClassThree',{disabled:true,rules:null})
-        setFormValue({
-          "Tgt.cShipClassThree": null,
-        });
+        setValue("Tgt.cShipClassThree", null);
     }
   },
   // 核定座位总数
@@ -1075,12 +1058,10 @@ function singChange(obj) {
   setFormItem("Tgt.nTotalCost", obj) //工程总造价 （元）
   setFormItem("Tgt.nTotalDesign", obj) //设计总价（元）
   setFormItem("Tgt.cProjectAddress", obj) //工程地址
-  setFormValue({
-    'Tgt.cProjectName': '',
-    'Tgt.nTotalCost': '',
-    'Tgt.nTotalDesign': '',
-    'Tgt.cProjectAddress': '',
-  })
+  setValue('Tgt.cProjectName', '')
+  setValue('Tgt.nTotalCost', '')
+  setValue('Tgt.nTotalDesign', '')
+  setValue('Tgt.cProjectAddress', '')
 }
 
 function groupCheck() {
