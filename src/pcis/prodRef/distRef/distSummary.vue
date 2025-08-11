@@ -297,7 +297,7 @@ const handleQuery = () => {
   } else if(opertaor.getDataAll().plyBase["Base.cAppNo"]){
     app = opertaor.getDataAll().plyBase["Base.cAppNo"];
   } else {
-    app = route.params.param?.cAppNo
+    // app = route.params.param?.cAppNo
   }
   const queryParam = {
     cComponentTable: distCompKey.value,
