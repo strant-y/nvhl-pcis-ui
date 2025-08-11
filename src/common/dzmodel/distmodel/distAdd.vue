@@ -136,7 +136,16 @@ const formconfig1 = ref<AppFreeEditConfig>(
         func: async () => {
           const isValid = await freeEditRef.value?.validate();
           if(isValid){
+
+
+
             const s = freeEditRef.value?.getFromValue();
+
+            if(!isObjectValid(s)){
+              ElMessage.warning('所有字段都未填写请确认！')
+              return false;
+            }
+         
             // 经营地址只选择省市区不输入详细地址获取表单值会带有undefined，这里处理一下
             for (let k in s) {
               if(s[k] && typeof s[k] === 'string' && s[k].indexOf('undefined') !== -1) {
@@ -204,6 +213,20 @@ const formconfig1 = ref<AppFreeEditConfig>(
   })
 );
 
+
+// 确定 非空校验
+const isObjectValid = (obj:any) => {
+  if (Array.isArray(obj)) {
+    return true; 
+  }
+
+  if (!obj || typeof obj !== 'object' || !Object.keys(obj).length) {
+    return false;
+  }
+  return Object.values(obj).every(v => 
+    v != null && (typeof v !== 'string' || v.trim() !== '')
+  );
+};
 onMounted(() => {
   // console.log(333)   distAdd
   dataParams.value = opertaor.getDataAll();
@@ -361,19 +384,19 @@ onMounted(() => {
     }
 
     // 实际用工地址清单新增 经营地址/房屋清单 房屋所在地址/营业场所地址清单043013 标的坐落地址
-    if(item.prop === 'Dist.JingYingAddress043009' || item.prop === 'Dist.HouseAreaProp' || item.prop === 'Dist.PropertyLocationProp'){
+    // if(item.prop === 'Dist.JingYingAddress043009' || item.prop === 'Dist.HouseAreaProp' || item.prop === 'Dist.PropertyLocationProp'){
+    //   item.groupList.forEach((data:any) => {
+    //     if(data.prop === 'Dist.Prop') {
+    //       data['func'] = setregistAdd;
+    //     }
+    //     if(data.prop === 'Dist.cSuffixAddr') {
+    //       data['func'] = setregistAdd;
+    //     }
+    //   })
+    // }
+    if(item.inputtype === 'rtinputgroup' ){  // 地址组件,统一处理
       item.groupList.forEach((data:any) => {
-        if(data.prop === 'Dist.Prop') {
-          data['func'] = setregistAdd;
-        }
-        if(data.prop === 'Dist.cSuffixAddr') {
-          data['func'] = setregistAdd;
-        }
-      })
-    }
-    if(item.prop === 'Dist.JingyingAddress' && item.inputtype === 'rtinputgroup'){  // 040001 地址新增更新操作
-      item.groupList.forEach((data:any) => {
-        data['func'] = setregistByMapAdd;
+        data['func'] = getAddressstr;
       })
     }
     newSchema.push(item);
@@ -448,6 +471,50 @@ const cDocumentTypeChange =(val:any)=>{
       item.itemConfig['rules'] = [ getRules("isNull", {})];
     }
 }
+
+function getAddressstr(val:any, row: any, pitem: any){
+  let getv1 = '';  //集联地址
+  let getv2 = '';  //字符串地址
+  let setv = '';  //需要设置的目标地址
+
+  let r = false;
+  formconfig1.value.fromSchema?.forEach((item: any) => { 
+    if(r){
+      setv = item;
+      r = false;
+    }
+    if(item.inputtype === 'rtinputgroup'){
+      for(let i = 0 ; i<item.groupList.length ; i++ ){
+        if(pitem.prop === item.groupList[i].prop){
+          r = true;
+        }
+      }
+      if(r){
+        getv1 = item.groupList.filter((it: any)=> it.inputtype === 'rtcascader');
+        getv2 = item.groupList.filter((it: any)=> it.inputtype === 'rtinput');
+      }
+    }
+  })
+  setAddressBykey(getv1,getv2,setv);
+}
+
+function setAddressBykey(getv1: any, getv2: any , setv: any) {
+   const a = freeEditRef?.value?.getValue(getv1[0].prop);
+   const b = freeEditRef?.value?.getValue(getv2[0].prop);
+
+   const setS = setv.prop;
+   if (a) {
+    getAddressStr({ address: a }).then((res: any) => {
+      const { code, data, msg } = res;
+      if (code === 200) {
+        const c = (data ? data["addStr"] : "") + (b ? b: "");
+        setValue(setS, c);
+      }
+    });
+   }else{
+    setValue(setS, b);
+   }
+};
 
 const prodMap = {
   '040001':'Dist.cDetailedAddress'

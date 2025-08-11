@@ -112,8 +112,9 @@ function handleFileChange() {
 // 绑定方法
 const method = {
   cPayWayChange:(val:any)=>{
-    const list:Array<string>= ["ECargoBase.nLowPrm","ECargoBase.nReceivedPrm","ECargoBase.cReceivedRmb","ECargoBase.nReceivedRate","ECargoBase.nRmbReceivedPrm"]
+    const list:Array<string>= ["ECargoBase.nLowPrm","ECargoBase.nReceivedPrmEx","ECargoBase.nReceivedPrm","ECargoBase.cReceivedRmb","ECargoBase.nReceivedRate","ECargoBase.nRmbReceivedPrm"]
     if(val !== '01'){
+      setFormItem('ECargoBase.nReceivedPrmEx',{rules: null })
       if(getValue('ECargoBase.nRmbAmt')){
         setValue('ECargoBase.nRecRemEstAmt',getValue('ECargoBase.nRmbAmt'))
       }
@@ -125,7 +126,6 @@ const method = {
           hidden: true,
         });
       })
-      setFormItem('ECargoBase.nReceivedPrmEx',{rules: null })
     }else {
       setFormItem('ECargoBase.nReceivedPrmEx',{ rules: [getRules("required", {})] })
       if(getValue('ECargoBase.nRmbAmt')){

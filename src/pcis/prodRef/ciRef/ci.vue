@@ -231,10 +231,8 @@ const method = {
   // 联保机构、出单机构 级联选择change事件
   dptCascaderChange: (value: any[], rowData: any) => {
     const rowId = rowData._dataId;
-
     const oldSubDptCde = rowData["Ci.cCiSubComp"]; // 原始分公司代码
     const oldDptCde = rowData["Ci.cDptCde"];
-
     if(value && value.length > 0){
       const subDptCde = value[0]; // 分公司代码
       const dptCde = value[1]; // 出单机构代码
@@ -264,17 +262,18 @@ const method = {
       freeEditRef.value?.setValueByRowKey("Ci.cDptCde", rowId, undefined);
     }
     // 如果级联选择器的值发生变化（分公司或出单机构任意一个发生变化），则清空当前行的业务员信息
-    if (oldSubDptCde !== value?.[0] || oldDptCde !== value?.[1]) {
-      // 清空业务员相关信息
-      freeEditRef?.value?.setValueByRowKey("Ci.cSlsCde", rowId, "");
-      freeEditRef?.value?.setValueByRowKey("Ci.cSlsNme", rowId, "");
-      freeEditRef?.value?.setValueByRowKey("Ci.cBrkrCde", rowId, "");
-      freeEditRef?.value?.setValueByRowKey("Ci.cBrkSlsCde", rowId, "");
-      
-      // 重新校验必填规则
-      valideRequired();
+    if(!initFlag.value){
+      if (oldSubDptCde !== value?.[0] || oldDptCde !== value?.[1]) {
+        // 清空业务员相关信息
+        freeEditRef?.value?.setValueByRowKey("Ci.cSlsCde", rowId, "");
+        freeEditRef?.value?.setValueByRowKey("Ci.cSlsNme", rowId, "");
+        freeEditRef?.value?.setValueByRowKey("Ci.cBrkrCde", rowId, "");
+        freeEditRef?.value?.setValueByRowKey("Ci.cBrkSlsCde", rowId, "");
+        
+        // 重新校验必填规则
+        valideRequired();
+      }
     }
-
   },
   dptCascaderOnInit: (data: any) =>{
     const {value, rowData, config, itemRef} = data;
@@ -313,6 +312,11 @@ const method = {
             ElMessage.error("联保单出单方必须是主联单的分公司！");
             freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
           }
+        }else if(cCiMrk['Base.cCiMrk'] == '3'){
+          if(rowData['Ci.cDptCde'] == param.cDptCde){
+            ElMessage.error("联保单出单方必须是主联单的分公司！");
+            freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk",rowId,"")
+          }
         }
       }else if( val === '1'){
         if(cCiMrk['Base.cCiMrk'] == '2'){
@@ -339,6 +343,14 @@ const method = {
     const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue()
     if (!rowData || !rowId) return;
     const cCoinsurerCde = rowData["Ci.cCoinsurerCde"];
+    // 主共标志只能选否的条件
+    if (rowData['Ci.cDptCde'] !== param.cDptCde) {
+      if (val === "1") {
+        ElMessage.warning("司内联保时出单方必须是主联单的分公司！");
+        freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowId, "0");
+        return;
+      }
+    }
     // 我方主共或从共的情况
     if (cCiMrk["Base.cCiMrk"] === '2' || cCiMrk["Base.cCiMrk"] === '4') {
       // 情况1：如果选中的是“是”且是永安保险(327001)
@@ -374,7 +386,6 @@ const method = {
     // 校验输入是否合法
     const floatValue = parseFloat(val);
     if (!isNaN(floatValue) && isFinite(floatValue)) {
-      // 判断是否是合法数字且不是 Infinity
       // 修改范围为1-100之间
       if (floatValue < 1 || floatValue > 100) {
         ElMessage.warning("联共保比例必须大于等于1且小于等于100");
@@ -455,9 +466,6 @@ const method = {
       freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", row._dataId, "0.00");
       return;
     }
-    // 格式化出单费比例为6位小数
-    // const formattedRate = floatValue.toFixed(6);
-    // freeEditRef?.value?.setValueByRowKey("Ci.nPlyFeeRate", row._dataId, formattedRate);
     // 根据新的出单费比例和共保保费计算出单费用
     const nCiPrm = parseFloat(row["Ci.nCiPrm"] || 0);
     const nPlyFee = (floatValue / 100) * nCiPrm;
@@ -468,14 +476,12 @@ const method = {
   cPolicyNoChange:(val, row)=>{
     // 校验保单编号只能包含数字和大写字母
     if (val) {
-      // 使用正则表达式校验，只允许数字和大写字母
+      // 只允许数字和大写字母
       const validPattern = /^[A-Z0-9]*$/;
       if (!validPattern.test(val)) {
-        // 如果包含非法字符，提示错误并清除非法字符
         ElMessage.warning("保单编号只能包含数字和大写字母");
         // 清除非法字符，只保留数字和大写字母
         const cleanedValue = val.replace(/[^A-Z0-9]/g, '');
-        // 更新当前行的保单编号字段
         const rowId = row._dataId;
         freeEditRef?.value?.setValueByRowKey("Ci.cPolicyNo", rowId, cleanedValue);
         return;
@@ -747,8 +753,6 @@ const updateMasterAgreementValues = () => {
       totalPrm += ciPrm;
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntAmt", totalAmt.toFixed(2));  //联保总保额
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm", totalPrm.toFixed(2)); //联保总保费
-      // opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntAmt", totalAmt.toFixed(2));  //共保总保额
-      // opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntPrm", totalPrm.toFixed(2)); //共保总保费
     }else{
       // 非永安保险公司：仅更新该行的 Ci.nCiAmt 和 Ci.nCiPrm，不参与总和计算
       const share = parseFloat(row["Ci.nCiShare"])/100 || 0;
@@ -769,12 +773,8 @@ const updateMasterAgreementValues = () => {
       console.log(totalAmt,"totalAmt")
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntAmt", totalAmt.toFixed(2));  //联保总保额
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm", totalPrm.toFixed(2)); //联保总保费
-      // opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntAmt", totalAmt.toFixed(2));  //共保总保额
-      // opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiJntPrm", totalPrm.toFixed(2));  //共保总保费
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiOwnAmt", totalAmt.toFixed(2));  //我司分额保额
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiOwnPrm", totalPrm.toFixed(2));  //我司份额保费
-      // opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnAmt", totalAmt.toFixed(2));  //我司分额保额
-      // opertaor.getTableRefByKey("ourCompanyCiShare").setValue("Base.nCiOwnPrm", totalPrm.toFixed(2));  //我司份额保费
     }
   });
 };
@@ -808,6 +808,7 @@ const onChiefMrkChange = () => {
     switch (ciMrkValue) {
       case "3":
       case "1":
+      case "5":
         cChiefMrkVal = '1'; // 主共方
         break;
       default:
@@ -846,6 +847,14 @@ const initCiInfo = (data: any) => {
   nextTick(() => {
     const cSlsId = opertaor.getTableRefByKey('plyBase').getValue('Base.cSlsId')
     const cBrkSlsCde = opertaor.getTableRefByKey('plyBase').getValue('Base.cBrkSlsCde')
+    // 联保机构、出单机构 转 级联组件初始化
+    const dptList = [];
+    if(param['dptCde']) {
+      dptList.push(param['dptCde']);
+      if(param['cDptCde']) {
+        dptList.push(param['cDptCde']);
+      }
+    }
     freeEditRef?.value?.addRowByData( {
       'Ci.nSeqNo': 1,
       'Ci.nCiShare': '100.00000000',
@@ -859,7 +868,9 @@ const initCiInfo = (data: any) => {
       'Ci.cDptCde': param.cDptCde,
       'Ci.cSlsCde': cSlsId,
       'Ci.cBrkSlsCde': cBrkSlsCde,
+      'dptCascader' : dptList,
     });
+      
     // 联保机构下拉选项查询
     ciJiDptOptionsQuery('327001', getFromValue()[0]);
     onChiefMrkChange()
@@ -1228,7 +1239,6 @@ function setFormValue(value: any) {
         //   }
         // })
       }
-
       // 联保机构、出单机构 转 级联组件初始化
       if(elem['Ci.cCiSubComp']) {
         const dptList = [];

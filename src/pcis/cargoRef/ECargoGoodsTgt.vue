@@ -39,6 +39,9 @@ const policyService = new PolicyService();
 const cargoDistAdd = defineAsyncComponent(
     () => import("@/pcis/cargoRef/fix/DistAddFix.vue")
 );
+const GoodsSelectFix = defineAsyncComponent(
+    () => import("@/pcis/cargoRef/fix/GoodsSelectFix.vue")
+);
 
 const route = useRoute();
 const dialog = ref<DialogMethod | null>(null);
@@ -157,6 +160,26 @@ const saveTgt = async (res:any)=>{
 }
 // 绑定方法
 const method = {
+  exchTemp:()=>{
+    const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
+    const cappNo  = agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
+    if (cappNo == '' || cappNo == undefined) {
+      ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
+      return;
+    }
+    dialog.value?.open(
+        GoodsSelectFix,
+        {
+          cEcAgrAppNo:cappNo
+        },
+        {
+          isOk: async (res: any) => {
+            dialog.value?.handleClose();
+          },
+        },
+        {width: "30"}
+    );
+  },
   downloadTemp:()=>{
     const param = {
       ...formconfig1.value,
@@ -335,6 +358,12 @@ const method = {
     );
   },
   addmethod: (row: any) => {
+    const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
+    const cappNo  = agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
+    if (cappNo == '' || cappNo == undefined) {
+      ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
+      return;
+    }
     dialog.value?.open(
         cargoDistAdd,
         {
@@ -342,7 +371,8 @@ const method = {
           fromUi: tableconfig.value.fromUi,
           title: "新增",
           rowData: row,
-          compKey: props.pageSchema.compKey
+          compKey: props.pageSchema.compKey,
+          cEcAgrAppNo:cappNo
         },
         {
           isOk: async (res: any) => {

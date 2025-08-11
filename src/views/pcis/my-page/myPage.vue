@@ -1778,12 +1778,12 @@ async function loadAfter() {
         }
         opertaor.setDataAll(ops);
         // 获取原申请单号下的清单列表数据
-        const distMap = formconfig1[0].pageInfo.filter((item:any) => {
-          return item.pageKey === "dist";
-        });
-        distMap.forEach((item:any) => {
-          getDistData(props.param?.cAppNo, item)
-        });
+        // const distMap = formconfig1[0].pageInfo.filter((item:any) => {
+        //   return item.pageKey === "dist";
+        // });
+        // distMap.forEach((item:any) => {
+        //   getDistData(props.param?.cAppNo, item)
+        // });
         //获取单号
         // getCAppNoFun();
       }
@@ -1917,12 +1917,12 @@ async function loadAfter() {
         }
         opertaor.setDataAll(ops);
         // 获取原申请单号下的清单列表数据
-        const distMap = formconfig1[0].pageInfo.filter((item:any) => {
-          return item.pageKey === "dist";
-        });
-        distMap.forEach((item:any) => {
-          getDistData(parseData.value.plyBase['Base.cAppNo'], item)
-        });
+        // const distMap = formconfig1[0].pageInfo.filter((item:any) => {
+        //   return item.pageKey === "dist";
+        // });
+        // distMap.forEach((item:any) => {
+        //   getDistData(parseData.value.plyBase['Base.cAppNo'], item)
+        // });
         //获取单号
         // getCAppNoFun();
       }
@@ -2641,12 +2641,11 @@ const submitToUndrFn = async () => {
    */
   const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk')
   if ('1' === CiMrk || '2' === CiMrk || '5' === CiMrk) {
-      // const validCi = JointInsuranceCheck();
-      JointInsuranceCheck();
+      const validCi = JointInsuranceCheck();
       // 如果联共保校验不通过，则不继续执行后续逻辑
-      // if (!validCi) {
-      //     return false;
-      // }
+       if (!validCi) {
+        return; // 校验失败则中断后续流程
+       }
   }
 	// 申请核保前判断是否灰黑名单
 	const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
@@ -3020,7 +3019,7 @@ const savePlyInfo = async () => {
 
 
     saveFlag = true;
-    if((props.param?.pageType === "copy" || props.param?.pageType === "template" || props.param?.pageType === "inquiryToApp") && saveDistBatchFlag.value) {
+    if(props.param?.pageType === "inquiryToApp" && saveDistBatchFlag.value) {
       // 保存清单
       const appNo = plyBase["Base.cAppNo"];
       saveDist(appNo);
@@ -3874,32 +3873,33 @@ const submitUnderwritingFn = async () => {
         ElMessage.error(queryFacSts.message);
         return
       }
-    }
-    const param = {
-      cAppNo: props.param?.cAppNo,// 保批单申请单号
-      cDductDesc: deductibleDist && deductibleDist[0] ? deductibleDist[0]["DeductibleDist.cDeductibleContent"] : "",// 免赔约定
-      cDocTyp: props.param?.cAppTyp,// 单证类型 A 保单 E 批单
-      cDptCde: props.param?.cDptCde,// 机构代码
-      cInsrntNme: insured['Insured.cInsuredNme'],//被保人名称
-      cPlyNo: props.param?.plyNo,// 保单号
-      cProdNme: props.param?.cTermNme,// 产品名称
-      cProdNo: props.param?.cProdNo,//产品代码
-      cStockMrk: props.param?.cGrpMrk == "0" ? insured['Insured.cStkMrk'] : applicant['Applicant.cStkMrk'],// 股东业务标志(团单1取投保人标识，个单0取被保人标识)
-      // nAmtChgRate: "1.00",// 保额币种汇率
-      nEdrPrjNo: plyBase['Base.nEdrPrjNo'],// 批改序号
-      // nPrmChgRate: "1.00",// 保费币种汇率
-      tAppTm: insrnc['Base.tAppTm'],// 投保日期
-      tEdrBgnTm: edrbase?['EdrBase.tEdrBgnTm']:'',// 批改生效起期
-      // tEdrEndTm: "2025-05-07 13:57:37",// 批改生效止期
-      tInsrncBgnTm: insrnc['Base.tInsrncBgnTm'],// 保险起期
-      tInsrncEndTm: insrnc['Base.tInsrncEndTm'],// 保险止期
-    }
-    // 调用强制临分
-    const queryRiFacMrk = props.param?.pageName === "priceInquiry" ? await policyService.queryRiFacMrkXJ(param) : await policyService.queryRiFacMrk(param);
-    if(queryRiFacMrk && queryRiFacMrk.code === '0') {
-      ElMessage.error(queryRiFacMrk.message);
-      underwrite.value?.setRiskunitDisabled()
-      return
+    } else {
+      const param = {
+        cAppNo: props.param?.cAppNo,// 保批单申请单号
+        cDductDesc: deductibleDist && deductibleDist[0] ? deductibleDist[0]["DeductibleDist.cDeductibleContent"] : "",// 免赔约定
+        cDocTyp: props.param?.cAppTyp,// 单证类型 A 保单 E 批单
+        cDptCde: props.param?.cDptCde,// 机构代码
+        cInsrntNme: insured['Insured.cInsuredNme'],//被保人名称
+        cPlyNo: props.param?.plyNo,// 保单号
+        cProdNme: props.param?.cTermNme,// 产品名称
+        cProdNo: props.param?.cProdNo,//产品代码
+        cStockMrk: props.param?.cGrpMrk == "0" ? insured['Insured.cStkMrk'] : applicant['Applicant.cStkMrk'],// 股东业务标志(团单1取投保人标识，个单0取被保人标识)
+        // nAmtChgRate: "1.00",// 保额币种汇率
+        nEdrPrjNo: plyBase['Base.nEdrPrjNo'],// 批改序号
+        // nPrmChgRate: "1.00",// 保费币种汇率
+        tAppTm: insrnc['Base.tAppTm'],// 投保日期
+        tEdrBgnTm: edrbase?['EdrBase.tEdrBgnTm']:'',// 批改生效起期
+        // tEdrEndTm: "2025-05-07 13:57:37",// 批改生效止期
+        tInsrncBgnTm: insrnc['Base.tInsrncBgnTm'],// 保险起期
+        tInsrncEndTm: insrnc['Base.tInsrncEndTm'],// 保险止期
+      }
+      // 调用强制临分
+      const queryRiFacMrk = props.param?.pageName === "priceInquiry" ? await policyService.queryRiFacMrkXJ(param) : await policyService.queryRiFacMrk(param);
+      if(queryRiFacMrk && queryRiFacMrk.code === '0') {
+        ElMessage.error(queryRiFacMrk.message);
+        underwrite.value?.setRiskunitDisabled()
+        return
+      }
     }
   } else if(res.cUndrMrk === "B") {// 核保选项为退回给出单员时，如果已经触发自主临分，则提示需要再保确认并阻断，其他则直接提交核保
     // 先查询临分标识
@@ -4029,9 +4029,10 @@ const JointInsuranceCheck = () => {
     }
       if(CCoinsurerCdeNum <= 1){
         ElMessage.error("联共保时必须录入永安两个以上分公司份额！");
-        return ;
+        return false;
       }
     }
+    return true;
 };
 // 将对象的属性首字母转换为小写
 function lowercaseKeys<T extends object>(

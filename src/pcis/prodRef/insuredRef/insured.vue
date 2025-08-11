@@ -201,58 +201,66 @@ const idAnalysis = (id:string)=>{
 let debounceTimer = null;
 //  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
 const checkUser = () => {
-  console.log(77,param)
-    // 自定义录单 方案配置 模版 进入 可以查询用户信息  
-  if (param.pageType !== "app" &&  param.pageType !== "copy" && param.pageType !== "template" && param.cAppStatus !=='1') {
-    return false;
-  }
+    const fieldsToValidate = ['Insured.cInsuredNme', 'Insured.cClntMrk',"Insured.cCertfCde","Insured.cCertfCls"];
+      
+      console.log(77,param)
+        // 自定义录单 方案配置 模版 进入 可以查询用户信息  
+      if (param.pageType !== "app" &&  param.pageType !== "copy" && param.pageType !== "template" && param.cAppStatus !=='1') {
+        return false;
+      }
   
       if (debounceTimer) {
         clearTimeout(debounceTimer);
-      }
+      }   
 
-        debounceTimer = setTimeout(() => {
+          const tabref = opertaor.getTableRefs();
+          const insuredValue = tabref["insured"].getFromValue();
 
- 
+          //  只要4个有值 去请求客户信息
+            if (              insuredValue["Insured.cInsuredNme"] &&
+              insuredValue["Insured.cClntMrk"] !== null &&
+              insuredValue["Insured.cCertfCde"] &&
+              insuredValue["Insured.cCertfCls"]
+            ) {
 
-  const tabref = opertaor.getTableRefs();
-  const insuredValue = tabref["insured"].getFromValue();
-  //  只要4个有值 去请求客户信息
-  if (
-    insuredValue["Insured.cInsuredNme"] &&
-    insuredValue["Insured.cClntMrk"] !== null &&
-    insuredValue["Insured.cCertfCde"] &&
-    insuredValue["Insured.cCertfCls"]
-  ) {
-    const param = {
-      coustName: insuredValue["Insured.cInsuredNme"],
-      coustMrk: insuredValue["Insured.cClntMrk"],
-      coustType: insuredValue["Insured.cCertfCls"],
-      coustCode: insuredValue["Insured.cCertfCde"],
-      personnelType: "Insured"
-    }
-    qryCustomer(param)
-      .then((res) => {
-        const { code, data, msg } = res;
-        if (200 === code) {
-          console.log('客户数据', res)
-          if (data) {
-            if(data && data.length > 0){
-              Object.keys(data[0]).forEach((key) => { 
-                if(data[0][key]){
-                  setValue(key, data[0][key]);
-                }
-              });
-            }
-            let userId = getValue('Insured.cCertfCde')
-            idAnalysis(userId)
-          }
-        } else {
+          insuredEditRef.value?.validateField(fieldsToValidate).then((isValid)=>{
+                console.log('校验----',isValid)
+                if(isValid){
+
+              debounceTimer = setTimeout(() => {
+             
+                    const param = {
+                      coustName: insuredValue["Insured.cInsuredNme"],
+                      coustMrk: insuredValue["Insured.cClntMrk"],
+                      coustType: insuredValue["Insured.cCertfCls"],
+                      coustCode: insuredValue["Insured.cCertfCde"],
+                      personnelType: "Insured"
+                    }
+                    qryCustomer(param)
+                      .then((res) => {
+                        const { code, data, msg } = res;
+                        if (200 === code) {
+                          console.log('客户数据', res)
+                          if (data) {
+                            if(data && data.length > 0){
+                              Object.keys(data[0]).forEach((key) => { 
+                                if(data[0][key]){
+                                  setValue(key, data[0][key]);
+                                }
+                              });
+                            }
+                            let userId = getValue('Insured.cCertfCde')
+                            idAnalysis(userId)
+                          }
+                        } else {
+                        }
+                      })
+                      .finally(() => { });
+                
+                },500)
+              }
+          })
         }
-      })
-      .finally(() => { });
-  }
-},500)
 };
 
 // 绑定方法
