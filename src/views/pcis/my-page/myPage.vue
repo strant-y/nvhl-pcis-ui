@@ -3502,10 +3502,13 @@ const saveEdrPlyInfo = async () => {
  * **/
 const generateEndorse = async () => {
   const res = opertaor.getDataAll();
-  const isAcctValid = await validateAcctinfo();
-  // 账户信息校验
-  if (!isAcctValid) {
-    return; 
+  console.log("生成批文",res, props.param);
+  if (props.param.cRsnCde !== 'FZ') {
+    const isAcctValid = await validateAcctinfo();
+    // 账户信息校验
+    if (!isAcctValid) {
+      return; 
+    }
   }
   const btn = getBtn("btnCompare");
   btn.loading = true;
@@ -3546,6 +3549,7 @@ const generateEndorse = async () => {
         // 保费变化量 < 0 说明批改之后保费减少, 此时需要设置账户信息
         if ((!!prmVar && prmVar < 0 ) || refundInsurance ) {
             const acctinfoRef =opertaor.getTableRefs()["acctinfo"];
+            console.log("账户信息", acctinfoRef);
              let acctinfoValidate =await opertaor.getTableRefByKey('acctinfo')?.validate()  // 账户信息 必填校验
               let isAcctinfo = isDetailCde(); // 是否有账户信息
                 if(!acctinfoValidate && isAcctinfo) {

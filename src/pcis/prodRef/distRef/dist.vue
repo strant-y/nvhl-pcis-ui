@@ -502,12 +502,12 @@ const method = {
 		}
     const param = opertaor.getParam();
     let app = "";
-    if (opertaor.getDataAll().plyBase["Base.cAppNo"]) {
+    if (opertaor.getDataAll()?.plyBase["Base.cAppNo"]) {
       app = opertaor.getDataAll().plyBase["Base.cAppNo"];   
     } else if(param.cOrgAppNo){
       app = param.cOrgAppNo;
-    } else {
-      // app = route.params.param?.cAppNo
+    } else if(param.pageType !== "copy") {
+      app = param.cAppNo
     }
     const selData = {
       cAppNo: "",

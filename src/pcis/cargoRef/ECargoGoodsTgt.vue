@@ -157,7 +157,7 @@ const saveTgt = async (res:any)=>{
   const result =  await cargoApi.saveDistNew(newRow)
   loadData()
 }
-function filterFromSchema(obj:any) {
+async function filterFromSchema(obj:any) {
   // 如果对象不存在或者没有fromSchema属性，直接返回
   if (!obj || !obj.fromSchema || !Array.isArray(obj.fromSchema)) {
     return obj;
@@ -165,12 +165,30 @@ function filterFromSchema(obj:any) {
 
   // 创建新对象的浅拷贝
   const newObj = {...obj};
-
+  const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
+  const cEcAgrAppNo = agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
+  const result:any =  await cargoApi.getRate({cEcAgrAppNo:cEcAgrAppNo})
+  const cPrmCur =result.data.data[0].rateDetail.cPrmCur || []
+  const nAmtExch =result.data.data[0].rateDetail.nAmtExch || []
   // 过滤fromSchema数组
   newObj.fromSchema = newObj.fromSchema.filter(item => {
     return !(item && typeof item === 'object' && 'prop' in item && item.prop === 'ECargoGoodsTgt.cExchCde');
   });
-
+  newObj.fromSchema = newObj.fromSchema.map(item => {
+    if (item.prop === 'ECargoGoodsTgt.cPrmCur') {
+      return {
+        ...item,
+        loadData: cPrmCur
+      };
+    }
+    if (item.prop === 'ECargoGoodsTgt.nAmtExch') {
+      return {
+        ...item,
+        loadData: nAmtExch
+      };
+    }
+    return item;
+  });
   return newObj;
 }
 // 绑定方法
@@ -195,8 +213,8 @@ const method = {
         {width: "30"}
     );
   },
-  downloadTemp:()=>{
-    const formconfig = filterFromSchema(formconfig1.value)
+  downloadTemp:async ()=>{
+    const formconfig =await  filterFromSchema(formconfig1.value)
     const param = {
       ...formconfig,
     }
@@ -224,8 +242,8 @@ const method = {
         });
   },
   //导出
-  exportExcel: () => {
-    const formconfig = filterFromSchema(formconfig1.value)
+  exportExcel: async () => {
+    const formconfig =await filterFromSchema(formconfig1.value)
     let paramitem  = Object.assign(formconfig, {
       cComponentTable: cComponentTableValue,
     });
@@ -307,8 +325,8 @@ const method = {
     });
   },
   // 增量导入
-  importExcelIncrement: () => {
-    const formconfig = filterFromSchema(formconfig1.value)
+  importExcelIncrement: async () => {
+    const formconfig = await filterFromSchema(formconfig1.value)
     const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
     const cappNo  = agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
     if (cappNo == '' || cappNo == undefined) {
@@ -341,10 +359,14 @@ const method = {
           const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
           params['cEcAgrAppNo'] = agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
 
-          policyService.importDistIncrement(params).then((res) => {
+          policyService.importDistIncrement(params).then( async  (res) => {
             if (res.code === 200) {
               ElMessage.success(`导入完成：${res.data.msg}`);
-              loadData()
+              const result:any =  await cargoApi.getRate({cEcAgrAppNo:params['cEcAgrAppNo']})
+              if(result.code == 200){
+               await cargoApi.saveRate({cEcAgrAppNo:params['cEcAgrAppNo'],...result.data.data[0].rateDetail})
+              }
+               await loadData()
             } else {
               ElMessage.error(res.msg || "增量导入失败");
             }
