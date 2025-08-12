@@ -3016,7 +3016,7 @@ const savePlyInfo = async () => {
         })
       } else {
         queryParam['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
-        getInquiryPolicyList(queryParam).then((res:any) => {
+        getAppPolicyList(queryParam).then((res:any) => {
           if(res.data?.result && res.data?.result.length > 0) {
             const data = res.data?.result[0];
             router.replace({
