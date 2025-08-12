@@ -3121,6 +3121,7 @@ const calcPremiumEdr = () => {
   }
 
   calcEdr(res).then((res) => {
+    let nPrmValue = res.res.composition.plyBase[0]["Base.nPrm"];
     btn.loading = false;
     console.log("批改计算", res);
     if (res["code"] == "200") {
@@ -3129,7 +3130,7 @@ const calcPremiumEdr = () => {
       ElMessage.success(
         res.msg +
           "保费为：" +
-          ops["base"]["Base.nPrm"] +
+          nPrmValue +
           "; 保费变化量为：" +
           ops["plyBase"]["Base.nPrmVar"]
       );
