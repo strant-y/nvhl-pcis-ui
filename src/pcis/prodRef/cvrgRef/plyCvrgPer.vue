@@ -240,6 +240,10 @@ const method = {
     addTermData();
   },
   selectTgt: () => {
+    if(!selectedRow.value || !selectedRow.value.data) {
+      ElMessage.warning('请先选择一行条款数据!');
+      return;
+    }
     dialog.value?.open(
         selectTgtFix,
         {
