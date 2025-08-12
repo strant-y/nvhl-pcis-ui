@@ -1433,7 +1433,7 @@ async function loadAfter() {
             }
           });
           dzmodal
-            .open(CostInformation, { type: "Issuer", data: props.param })
+            .open(CostInformation, { type: "Issuer", data: {...props.param, nPrm: nPrm.value} })
             .then((res: any) => {
               if (res.type === "ok") {
               }
@@ -3530,6 +3530,7 @@ const submitEdrToUndrSurrender = async () => {
 /**
  * 批改单保存
  * **/
+const saveEdrState = ref(false);
 const saveEdrPlyInfo = async () => {
   let saveEdrFlag = false;
   const btn = getBtn("saveEdr");
@@ -3576,6 +3577,7 @@ const saveEdrPlyInfo = async () => {
     //   );    //影响二次批改报错,先注释掉待调整
     edrbase.value?.setFormValue(EdrBaseData);
     saveEdrFlag = true;
+    saveEdrState.value = true;
     if(props.param.pageType === "EDR_APP_NEW_SCENE" && saveDistBatchFlag.value) {
       // 复制保单清单信息到批单中
       saveDist(EdrBaseData['EdrBase.cAppNo'], props.param?.cRsnCde)
@@ -3595,6 +3597,11 @@ const generateEndorse = async () => {
   // 账户信息校验
   if (!isAcctValid) {
     return; 
+  }
+  // 批改原因和清单相关的需要提示先保存一下
+  if((props.param['cRsnCde'] === "ZQ" || props.param['cRsnCde'] === "JQ" || props.param['cRsnCde'] === "10") && saveEdrState.value === false) {
+    ElMessage.error("请先保存申请单")
+    return
   }
   const btn = getBtn("btnCompare");
   btn.loading = true;
