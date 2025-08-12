@@ -825,7 +825,8 @@ const tableconfig = reactive<AppTableConfig>(
 				inputtype: "rtinput",
 				title: "申请单号",
         width: 200,
-        slotName: "cAppNo"
+        slotName: "cAppNo",
+        fixed: "left"
 			},
 			{
 				prop: "nTms",

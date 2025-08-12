@@ -240,6 +240,10 @@ const method = {
     addTermData();
   },
   selectTgt: () => {
+    if(!selectedRow.value || !selectedRow.value.data) {
+      ElMessage.warning('请先选择一行条款数据!');
+      return;
+    }
     dialog.value?.open(
         selectTgtFix,
         {
@@ -263,7 +267,6 @@ const method = {
 
 const edrItem = ref<[key: string, value: Array<any>] | any>({});
 function updateEdrItem(terms: any[]) {
-  console.log(parparam);
   if (
     parparam.pageType === "EDR_APP_NEW_SCENE" ||
     parparam.pageType === "EDR_APP_MODIFY_BOUNCED_SCENE" ||
@@ -312,7 +315,6 @@ function addTermData() {
     },
     {
       isOk: (selectdata: any) => {
-        console.log('-------------',selectdata)
         let plans: any[] = [];
         selectdata.forEach((item: any, index:number) => {
           let riskList: { [key: string]: any }[] = [];

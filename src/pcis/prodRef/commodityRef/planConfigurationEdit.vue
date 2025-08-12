@@ -215,11 +215,9 @@ const handleSave =  () => {
         }
     }
 
-    console.log(param)
     saveCommodityPlanTermDisPlayNme(param)
     .then((res) => {
       const { code, data, msg } = res;
-      console.log(data)
  
       if (200 === code) {
         emits('ok',)
@@ -249,12 +247,10 @@ const pageresult = reactive<Pageresult>({
 });
 
 const save = ()=> {
-  console.log("param", sessionStorage.getItem("user"));
   const newparam = { cCommodityNo: param.cCommodityNo };
   saveCommodityAttached(newparam)
     .then((res) => {
       const { code, data, msg } = res;
-      console.log('--数据---',data)
       if (200 === code) {
         // freeEditRef?.value?.setFormValue(data.data);
       } else {
@@ -274,14 +270,8 @@ function handleQuery() {
     queryPlanTermByCommodityNo(param)
         .then((res) => {
             let {data,msg,code} = res;
-            // const { code, data, msg } = res;
-            // console.log('查询数据反显',res);
-            // setValue('CCommodityNo','123123')
             if(code == 200){
-                // freeEditRef2.value.setFromValue(data)
                 freeEditRef2.value.setFormValue(data);
-                // tableconfig2
-                // CCommodityNo
             }else{
                 ElMessage.error(msg);
             }
@@ -311,12 +301,7 @@ function getValue(key: string) {
 
 onMounted(() => {
     handleQuery(); 
-//    console.log( tabref.getFromValue(),tabref.getFromValue()['cCommodityNo']) cCommodityNo
-// console.log('----',props.data)
- 
- 
   nextTick(() => {
-    // setValue('CCommodityNo',tabref.getFromValue()['cCommodityNo'])
     setFormValue(props.data)
   });
 });

@@ -5,6 +5,7 @@
     v-model:pageresult="pageresult"
     ref="tableRef"
     @page-change="handleQuery(false)"
+    @row-click="handleRowClick" />
   />
 </template>
 
@@ -94,25 +95,26 @@ const tableconfig = reactive<AppTableConfig>(
         type: "danger",
         icon: "Check",
         tableClick: async (row) => {
-          props.data.method?.getdbClickData(row);
+          props.data.method.getSelected(row)
         },
       }),
     ],
 
     fromSchema: [
       {
-        prop: "bankNme",
+        prop: "label",
         inputtype: "rtinput",
         title: "开户行名称",
       },
       {
-        prop: "bankRelCde",
+        // prop: "bankRelCde",
+        prop: "value",
         inputtype: "rtinput",
         title: "银行联号",
       },
     ],
     rowDbClickFun(rowData) {
-      props.data.method?.getdbClickData(rowData);
+      props.data.method?.getSelected(rowData);
     },
   })
 );
@@ -159,8 +161,11 @@ function handleQuery(flag?: boolean) {
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const c = { codeListName: "CBankCdeList" };
   const param = Object.assign(c, {
-    codeListParam: s,
-    r,
+    codeListParam: {
+      bankNme:s.bankNme,
+      pageNum:1,
+      pageSize:10,
+    }
   });
   getPageList(param).then((res) => {
       const { code, data, msg } = res;

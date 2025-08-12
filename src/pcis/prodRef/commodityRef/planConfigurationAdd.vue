@@ -91,12 +91,9 @@ const handleSave = async () => {
     items: selValue.value
   }
 
-  console.log('参数---', param)
-  console.log('参数2---', param2)
   commodityBaseOperatorCheck(param)
     .then((res) => {
       const { code, data, msg } = res;
-      console.log(data)
       if (code === 200) {
         if (!!data && data.length>0) {
           ElMessage.error('方案号[' + data.map((obj) => obj.CPlanNo).join(', ') + ']存在无效的再保分保配置记录，若该类业务需分保，请联系再保部对该方案进行分保配置！');
@@ -114,7 +111,6 @@ const handleSave = async () => {
       dialogVisible.value = false;
       emits("ok", data)
       if (code == 200) {
-        console.log(data)
         ElMessage.success('保存成功！')
       } else {
         ElMessage.error(msg)
@@ -202,10 +198,7 @@ const tableconfig = reactive<AppTableConfig>(
 
 // 多选事件
 const handleSelectionChange = (selection: any) => {
-  console.log('selection', selection)
-  // selValue.value = selection.map((item: any) => item.CPlanNo);
   selValue.value = selection
-  console.log(selValue.value)
 }
 
 
@@ -267,18 +260,7 @@ function handleQuery() {
 }
 
 const setDefaultSelection = () => {
-  console.log(22)
-
   tableRef.value?.setValueByRowKey()
-
-  // pageresult.list.forEach(row => {
-  //   console.log(row.CPlanNo)
-  //   if (selectedIds.value.includes(row.CPlanNo)) {
-  //     console.log('进来了',row)
-  //     tableRef.value?.toggleRowSelection(row, true);
-
-  //   }
-  // });
 };
 
 function getFromValue() {

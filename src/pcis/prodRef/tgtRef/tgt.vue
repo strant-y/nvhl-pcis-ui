@@ -73,7 +73,6 @@ onMounted(async () => {
     exRules
   );
 
-  console.log('------------',props.pageSchema)
   
   for(let i = 0; formconfig11.fromSchema && i < formconfig11.fromSchema.length; i++){
     // 遍历groupList数组把函数赋值给fromSchema
@@ -281,7 +280,6 @@ const method = {
   },
   // 是否单项工程 
   getcIsSingleChange:(val:string)=>{
-    console.log(val)
     if(val=== '1'){
       // 工程总造价 （元）
       setFormItem('Tgt.nTotalCost', {
@@ -386,7 +384,6 @@ const method = {
         },{width: 45});
   },
   getcMemberLogoChange:(val:string)=>{
-    console.log('val',val)
     if(val=== '1'){
       setFormItem('Tgt.cBareboatLessee', {
         rules: [getRules("required", {})],
@@ -505,7 +502,6 @@ const method = {
   },
   // func demo
   func1: () => {
-    console.log(getRules);
   },
   //投保乘客座位总数改变事件
   changenTotalInsured: () => {
@@ -517,8 +513,6 @@ const method = {
   },
   //是否单项工程change事件
   cIsSingleFunc: (val) => {
-    console.log('123123',vals)
-
     if (val == '1') {
       let obj = {
         rules: [getRules("required", {})],
@@ -752,7 +746,6 @@ const method = {
   },
 
   ShipClassOneChange:(val: any)=>{
-    console.log(val)
     clearValidate('Tgt.cShipClassThree');
     const param = opertaor.getParam();
     if(!param.initFlag){
@@ -777,11 +770,9 @@ const method = {
     if(val=='03'){
       setFormItem('Tgt.cShipClassThree',{disabled:true,rules: null})
       setFormItem('Tgt.cShipClassTwo', {codeParam:{classone:'level2'},typeCode:'Ship_Class_Level2',});
-
-      // Tgt.cShipClassTwo
-     
-      console.log('2222', getValue('Tgt.cShipClassTwo'))
-        setValue("Tgt.cShipClassThree", null);
+        setFormValue({
+          "Tgt.cShipClassThree": null,
+        });
     }
 
  
@@ -971,7 +962,6 @@ cIsinsuranceRegisteredChange:(val:any)=>{
 },
 // 投保行业
 getcInsuranceIndustryChange:(val:any)=>{
-    console.log('val-=--',val)
     if(val ==='8'){
        setFormItem('Tgt.cIndustryRemarks',{
           rules:[getRules("required", {})]

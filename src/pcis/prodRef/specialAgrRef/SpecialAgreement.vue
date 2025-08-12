@@ -76,16 +76,16 @@ const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     // title: "特约信息",
     tableBtnType: "btn",
-    tableBtnWidth: 220,
+    tableBtnWidth: 160,
     tableBtnPosition: "right",
-    align: "left",
+    fixed: true,
     tableBtn: [
       createFreeButtonBase({
         id: "score",
         link: true,
         tooltip: "编辑", 
         type: "success",
-        size: "large",
+        size: "default",
         icon: "Edit",
         hideBtns: (row) => {
           // if (!row.cSpecialContent.includes("*")) return true;
@@ -109,14 +109,11 @@ const tableconfig = reactive<AppTableConfig>(
           if(row.editList && row.editList.length>0){
             param['editList'] = row.editList
           }
-          console.log('param',param)
           dzmodal.open(specEdit, { type: "view", data: param,
           callback: (res: any) => {
               if (res.type === "ok") {
                 // row.cSpecialContent = res.data.cSpecialContent
                 // row['editList']= res.data['editList']
-
-
 
                  let list = formData.value;
                  const index = list.findIndex(
@@ -138,7 +135,7 @@ const tableconfig = reactive<AppTableConfig>(
         link: true,
         tooltip: "删除",
         type: "danger",
-        size: "large",
+        size: "default",
         icon: "Delete",
         tableClick: (row) => {
 
@@ -258,7 +255,6 @@ const addData =()=>{
         isAdd = false;
       }
     })
-    console.log('数据ccc',formData.value)
     if(isAdd){
       obj =[...formData.value, { 
         addIndex: 1,
@@ -277,6 +273,11 @@ const addData =()=>{
 // 获取默认信息
 
 const refreshData = () => {
+  // && parparam.cAppStatus !=='1' 暂存的不处理
+  if (parparam.pageType !== "app" &&  parparam.pageType !== "copy" && parparam.pageType !== "template" ) {
+    console.log('不是新单子')
+    return false;
+  }
    const param = opertaor.getParam();
   const cProdNo =param.cProdNo;
   const cDptCde =param.cDptCde || '';
@@ -288,7 +289,7 @@ const refreshData = () => {
     pageNum: 1,
     pageSize: 999,
   }).then((res) => {
-    if (res.data.result) {
+    if (res.data?.result) {
             let len = 0;
             let sel : any[] = [];
             res.data.result.forEach((item: any,index:number) => {
@@ -319,16 +320,7 @@ onMounted(async () => {
   formData.value.forEach((item, index) => {
     item.index = index + 1;
   });
-
-  console.log('数据-=---',parparam)
-  if (!parparam.initFlag) {
-      refreshData();
-  }
-
-  setTimeout(()=>{
-    // setDisabledAll()
-     
-  })
+   refreshData();
 });
 // 组件卸载时移除事件监听（避免内存泄漏）
 onUnmounted(() => {
@@ -343,7 +335,6 @@ const method = {
   //获取特约按钮
   getSpecialAgree: () => {
     const param = opertaor.getParam();
-    console.log('数据---',param)
     dialog.value?.open(
       "prdFixSpec",
       {

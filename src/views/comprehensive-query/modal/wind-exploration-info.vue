@@ -140,9 +140,7 @@ onMounted(() => {
 const windSave = () => {
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   let params = { ...s, cInquiryNumber: props.data.plyBase['Base.cInquiryNo'] }
-  console.log('params', params)
   pcisQueryService.getTaskList(params).then((res: any) => {
-    console.log('数据---‘',res)
 		const { code, data, msg } = res;
     if (code == 200) {
       if(data !== null){
@@ -172,13 +170,11 @@ const handleReturn = () => {
 
 // 风勘查询---获取风勘任务详情
 const viewDetails = (row: any) => {
-  console.log(row);
   let params = {
     taskNo: row.taskNo,
   }
 
   pcisQueryService.getTaskUrl(params).then((res: any) => {
-    console.log('详情数据', res)
     if (res.code == 200 && !!res.data) {
 			window.open(res.data, '_blank');
     } else {

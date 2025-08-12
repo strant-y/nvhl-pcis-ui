@@ -49,14 +49,12 @@ const nRatioCoefFunc = () => {
   const baseBefore2 = tabref["base"]?.getFromValue();
   let prodNo = route.params.param?.cProdNo;
 
-  console.log(1212,baseBefore,baseBefore["Base.tInsrncBgnTm"],baseBefore["Base.tInsrncEndTm"])
   let param = {
     bgnTm: baseBefore["Base.tInsrncBgnTm"],
     endTm: baseBefore["Base.tInsrncEndTm"],
     prodNo,
     ratioType: baseBefore2 ? baseBefore2['Base.cRatioTyp'] : null
   }
-  console.log('传参打印',param)
   policyRatio(param).then((res: any) => {
     const { code, data, msg } = res;
     if (code === 200) {
@@ -129,7 +127,6 @@ const method = {
     if(route.params.param?.cRsnCde != "46") {
       // 如果批改原因是报停展期，保险止期延长报停起止期计算出的差值，保险期限维持不变
       const tm =   moment(v).add(1, 'second').diff(moment(baseBefore["Base.tInsrncBgnTm"]), "days");
-      console.log('天',tm)
       baseBefore["Base.cTmSysCde"] = tm;   // 列表里面的 保险
       opertaor.getFatherPage().setTmDay(tm)
       setFormValue(baseBefore);
@@ -146,12 +143,8 @@ const method = {
   },
   // 索赔基础名称change事件
   suopeiFunc: (val) => {
-    console.log(val)
     let cIsRetroSpect = getFromValue()['Base.cIsRetroSpect']      // 获取是否有追溯期/日期
-    console.log(cIsRetroSpect)
     const p = opertaor.getParam();
-
-    console.log('数据---‘',getFromValue())
     if (!p.initFlag) {
       // setFormItem("Base.tRunBgnTm", { disabled: false }); //追溯/日落起期
       // setFormItem("Base.tRunEndTm", { disabled: false }); //追溯/日落止期
@@ -178,7 +171,6 @@ const method = {
       setFormItem("Base.nReportDays", {  hidden: true  }); //延长报告期天数
     } else if (val == "1") {
       if (cIsRetroSpect !== '0') {
-        console.log('1212')
         setFormItem("Base.tRunBgnTm", { rules: null }); //追溯/日落起期
         setFormItem("Base.tRunEndTm", { rules: null }); //追溯/日落止期
       }
@@ -227,10 +219,8 @@ const method = {
     if (!end || !v) {
       return;
     }
-    console.log(moment(start),moment(start),moment(end))
     const tmDay = moment(end).diff(moment(start), "days");
     const tm = moment(end).diff(moment(start), "seconds")
-    console.log(tm,tmDay)
     if (tm < 0) {
       ElMessage.warning("追溯/日落止期不能小于追溯起期");
       setFormValue({
@@ -254,10 +244,8 @@ const method = {
     }
 
     const tm = moment(v).diff(moment(start), "days");
-    // const traceTime = moment(v).diff(moment(tInsrncBgnTm), "days")
 
     const startTime = moment(v).diff(moment(start), "days");
-    // console.log(traceTime)
     if (startTime < 0) {
       ElMessage.warning("追溯/日落止期不能小于追溯起期");
       setFormValue({

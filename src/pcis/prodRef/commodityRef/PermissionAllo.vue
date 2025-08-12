@@ -226,25 +226,33 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           icon: "Search",
           type: "primary",
           func: () => {
+ 
+              let cDptCde = getValue('cDptCde');
+              if(!cDptCde){
+                ElMessage.warning('出单机构不能为空！')
+                return false;
+              }
+ 
             dzmodal.open(salesman, { type: "sales", data: {...tabref.getFromValue(),...getFromValue()} }).then((res) => {
               console.log('业务员',res)
               if (res.type === "ok") {
                 const selectObj = res.body;
-                freeEditRef.value.setValue(
-                  "cSlsGroup",
-                  selectObj.CSlsNme
-                );
                 setFormItem("cSlsGroup", {
                   loadData: [
                     {
-                      label: selectObj.CSlsNme,
+                      label: selectObj.CSlsCde + selectObj.CSlsNme,
                       value: selectObj.CSlsCde,
                     },
                   ],
                 });
 
+                freeEditRef.value.setValue(
+                  "cSlsGroup",
+                  selectObj.CSlsCde
+                );
 
               }
+
             });
           },
         },

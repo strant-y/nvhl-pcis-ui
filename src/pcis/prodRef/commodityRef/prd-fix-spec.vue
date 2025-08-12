@@ -121,7 +121,7 @@ const refreshData = () => {
     pageNum: 1,
     pageSize: 999,
   }).then((res) => {
-    if (res.data.result) {
+    if (res.data?.result) {
       pageresult.list = [];
       res.data.result.forEach((item, index) => {
         pageresult.list.push({
@@ -162,8 +162,6 @@ function add() {
     cIfMust: "2", //是否必选
     cIfFix: "0", //是否固定特约，查寻特约模板接口查出来的1，自定义添加的为0
   });
-
-  console.log('12',addTableData) 
 }
 
 //点击确定按钮时把选中的数据派发给父组件
@@ -187,12 +185,6 @@ const oldFenqiItem = selectedData.find(item => item.cSpecialCode === 'fenqi01');
 const result = oldFenqiItem 
   ? [...processedNewItems, oldFenqiItem]  // 包含fenqi01
   : processedNewItems;   
-
-
-
-  console.log('addTableData,’',addTableData)
-  console.log('id----11',selectedData)
-  console.log('id----22',result)
   props.method.getSelected(result);
   close();
 };
@@ -223,7 +215,6 @@ onMounted(() => {
             addTableData.push(item);
         });
     }
-    console.log('12addList',selectedData)
     refreshData();
 });
 </script>

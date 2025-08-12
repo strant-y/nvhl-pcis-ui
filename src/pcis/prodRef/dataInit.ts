@@ -15,24 +15,14 @@ export const getData = () => {
     dataInit["Base.tInsrncBgnTm"] = moment(
       new Date(Date.now() + 1 * 1000 * 60 * 60 * 24)
     ).format("YYYY-MM-DD 00:00:00");
-
-    // let maxDate = new Date( dataInit["Base.tInsrncBgnTm"]);  // 创建开始时间副本
-    // maxDate.setDate(maxDate.getDate() + 365);  // 设置为今天起365天后的日期
-    // maxDate.setSeconds(maxDate.getSeconds() - 1);
-
     dataInit["Base.tInsrncEndTm"] = dayjs().add(1,'year').format("YYYY-MM-DD 23:59:59");
-    // console.log('666',dataInit["Base.tInsrncEndTm"])
-    // moment(maxDate).format("YYYY-MM-DD HH:mm:ss")
-    
     const tm = moment(dataInit["Base.tInsrncEndTm"]).add(1, 'second').diff(
       moment(dataInit["Base.tInsrncBgnTm"]),
       "days"
     );
     dataInit["Base.cTmSysCde"] = tm;
-    // tmDay.value = tm;
     dataInit["Base.cRenewMrk"] = "0";
     dataInit["Base.cIsNet"] = "0";
-    // dataInit["Base.cPolicySource"] = '1';
     dataInit["Base.cJuriCde"] =
       "本保单受中华人民共和国司法管辖（港、澳、台除外）";
     dataInit["Base.nRatioCoef"] = "1.000000";
@@ -119,14 +109,7 @@ export const getECargoData = () => {
     dataInit["ECargoBase.tInsrncBgnTm"] = moment(
       new Date(Date.now() + 1 * 1000 * 60 * 60 * 24)
     ).format("YYYY-MM-DD 00:00:00");
-
-    // let maxDate = new Date( dataInit["Base.tInsrncBgnTm"]);  // 创建开始时间副本
-    // maxDate.setDate(maxDate.getDate() + 365);  // 设置为今天起365天后的日期
-    // maxDate.setSeconds(maxDate.getSeconds() - 1);
-
     dataInit["ECargoBase.tInsrncEndTm"] = dayjs().add(1,'year').format("YYYY-MM-DD 23:59:59");
-    // console.log('666',dataInit["Base.tInsrncEndTm"])
-    // moment(maxDate).format("YYYY-MM-DD HH:mm:ss")
     
     const tm = moment(dataInit["ECargoBase.tInsrncEndTm"]).add(1, 'second').diff(
       moment(dataInit["ECargoBase.tInsrncBgnTm"]),
@@ -163,7 +146,7 @@ export const getECargoData = () => {
     }
 
     // 录单机构
-    dataInit["ECargoBase.cDptCde"] = param.cDptCde;
+    // dataInit["ECargoBase.cDptCde"] = param.cDptCde;
     // 涉农标志
     dataInit["ECargoBase.cAgriMrk"] = "2";
     //联共保业务

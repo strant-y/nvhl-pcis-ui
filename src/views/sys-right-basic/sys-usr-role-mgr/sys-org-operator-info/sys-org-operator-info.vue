@@ -103,11 +103,9 @@ const tableconfig = reactive<AppTableConfig>(
         label: "设置操作权限",
         type: "primary",
         func: function () {
-          console.log('操作权限----2',operatorData.value)
           if(operatorData.value ) {
             dzmodal.open(SysOperateRightSettings, { operatorData: operatorData }).then((res) => {
               if (res.type === "ok") {
-              
                 handleQuery();
               }
             });
@@ -178,7 +176,6 @@ const codeListMap = ref<any>({});
 const sysOperatorMgrService = new SysOperatorMgrService();
 
 const handleQuery = (flag) => {
-  console.log('操作权限----1',flag)
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
       refreshData(flag);
@@ -186,7 +183,6 @@ const handleQuery = (flag) => {
   })
 };
 function handleSelectionChange(selection: []) {
-  console.log('selection', selection[0]);
   operatorData.value = selection[0]
 }
 
@@ -203,7 +199,6 @@ const refreshData = (reset = true) => {
       }
     }
   }, (error) => {
-    console.log('出错了', error);
     ElMessage.error('后台服务异常,请联系管理员');
   });
 };
@@ -228,7 +223,6 @@ onMounted(() => {
       codeListMap.value.CSrc = res.data;
     }
   }, (error) => {
-    console.log('出错了', error);
     ElMessage.error('后台服务异常,请联系管理员');
   });
 });

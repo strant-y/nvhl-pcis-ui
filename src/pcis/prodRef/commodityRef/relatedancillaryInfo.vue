@@ -282,7 +282,6 @@
       queryCommodityPlanList(param)
         .then((res) => {
           const { code, data, msg } = res;
-          console.log(data,'1212')
           if (200 === code) {
             pageresult.list = data;
             pageresult.total = data.length;

@@ -72,7 +72,6 @@ onMounted(() => {
 // 使用正则表达式分割字符串，保留分隔符 ** 作为单独的数组项
 
 const cNmeCnArray = computed(() => rowData.value.cSpecialContent?.split(/(\*+)/) );
-// console.log(1212,cNmeCnArray)
 // const inputValues = ref<string[]>([]);
 const inputValues = ref( //item.match(/^\*+$/)
   // cNmeCnArray.value.map((item) => (item === "*" ? "*" : item))

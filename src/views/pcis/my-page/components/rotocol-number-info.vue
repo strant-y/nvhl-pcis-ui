@@ -131,9 +131,7 @@ const handleQuery = (flag?: boolean) => {
 	const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const params = Object.assign(s,r);
-  console.log('params', params)
   pcisQueryService.queryEcargoRelevancePolicy(params).then((res: any) => {
-    console.log('数据---‘',res)
 		const { code, data, msg } = res;
     if (200 === code) {
 				data.data.forEach((item: any, index: number) => {

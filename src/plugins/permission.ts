@@ -139,7 +139,6 @@ export function setupPermission() {
   // 独立的标题设置函数
 const setPageTitle = (to) => {
   let title = "";
-    console.log(1111,to.query)
   // 1. 优先从query参数中获取动态标题
   if (to.query && to.query.title) {
     title = to.query.title;

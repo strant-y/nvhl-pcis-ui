@@ -194,7 +194,8 @@ const props = defineProps({
   bthList: {
     type: Array,
   },
-  pageType:String
+  pageType:String,
+  pageWay:String,
 });
 let underwriteFlag = ref(false);
 const idxParam = inject<any>('idxParam', {});

@@ -22,9 +22,7 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { useValidator } from "@/typings/useValidator";
 import DepartmentTree from "../commodityRef/DepartmentTree.vue";
-import { get } from "lodash";
 import { codeListViewStore, dataOpertaor, useProductStore } from "@/store";
-import { de } from "element-plus/es/locale";
 const productStore = useProductStore();
 
 const codeListStore = codeListViewStore();
@@ -70,7 +68,6 @@ onMounted(async () => {
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
     setForSelectFilterable(); //给下拉框设置可搜索
-
     //录单人联系方式  默认操作员的
     if (user.phoneNO !== null && user.phoneNO !== "") {
     } else {
@@ -83,7 +80,6 @@ onMounted(async () => {
     // 查询承保机构所属分公司和项目类别大类数据
     getCheckCdeptByCdptCde();
     //回显机构部门数据
-    console.log('看看',param)
     setFormItem("Base.cDptCde", {
       loadData: [
         { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm|| ''}` },
@@ -141,9 +137,34 @@ onMounted(async () => {
         disabled:  true
       })
     }
+    // 添加处理 Base.cCiMrk 值为 6 时显示"从联单"的逻辑
+    handleCiMrkDisplay();
   });
 });
-
+// 添加处理联共保标识显示逻辑的函数
+const handleCiMrkDisplay = () => {
+  setTimeout(() => {
+    nextTick(() => {
+      const ciMrkValue = getValue("Base.cCiMrk");
+      console.log("ciMrkValue",ciMrkValue);
+      if (ciMrkValue === "6") {
+        // 当值为6时，设置下拉选项显示为"从联单"
+        setFormItem("Base.cCiMrk", {
+          loadData: [
+            { value: "0", label: "非共保业务" },
+            { value: "1", label: "外部共保我方主共_主联" },
+            { value: "2", label: "外部共保我方从共_主联" },
+            { value: "3", label: "外部共保我方主共_无联保" },
+            { value: "4", label: "外部共保我方从共_无联保" },
+            { value: "5", label: "司内联保_主联" },
+            { value: "6", label: "从联单" } // 添加值为6时的显示文本
+          ]
+        });
+      }
+    });
+  }, 500);
+  
+};
 // 绑定方法
 const method = {
   // func demo
@@ -152,7 +173,6 @@ const method = {
   },
   //联共保下拉change
   cCiMrkChange: (val:any) => {
-    console.log(111,val, opertaor.getParam())
     productStore.setcCiMrk(val);
     if (!!val && !opertaor.getParam().initFlag) {
       const ciRef = opertaor.getTableRefs()['ci'];
@@ -316,8 +336,8 @@ const method = {
         {
           type: "show",
           data: {
-            CDptCde: sessionData.value?.cDptCde, //机构
-            CProdNo: sessionData.value?.cProdNo, //产品
+            CDptCde: sessionData.value?.cDptCde || param.cDptCde, //机构
+            CProdNo: sessionData.value?.cProdNo || param.cProdNo, //产品
             cBsnsTyp: getValue("Base.cBsnsTyp"), //业务来源大类
             cChaType: getValue("Base.cChaType"), //业务来源中类
             cChaSubtype: getValue("Base.cChaSubtype"), //业务来源子类
@@ -448,7 +468,6 @@ const method = {
         },
         method: {
           getSelected: (params) => {
-            console.log('111Base.cSlsId',params)
             setFormValue({
               "Base.cSlsId": params.CSlsCde, //业务员员工号
               "Base.cSlsNme": params.CSlsNme, //业务员名称
@@ -662,7 +681,6 @@ const method = {
   },
   // change
   cAgriMrkChange:(val:any)=>{
-      console.log('111',val)
   },
   // 是否见费出单
   cNeedfeeFlagChange:(val:any)=>{
@@ -692,7 +710,6 @@ function getCheckCdeptByCdptCde() {
       (res) => {
         if (res["code"] === 200) {
           if (res.data) {
-            console.log('11112',res)
             subDptCde.value = res.data;
             //查询项目类别大类数据
             codeListStore

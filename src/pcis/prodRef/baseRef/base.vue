@@ -68,8 +68,7 @@ const getOwnShare =()=>{
     ciArr.forEach((item:any)=>{
       const CDptMrk = item['Ci.cCoinsurerCde']
       if(!!CDptMrk && CDptMrk ==="327001"){
-        console.log(ownShare,item['Ci.nCiShare'])
-        ownShare =+ Number(item['Ci.nCiShare'])
+        ownShare  += Number(item['Ci.nCiShare'])
       } 
    })
   }
@@ -100,24 +99,17 @@ const nPayNumberFun = (isAdd=false)=>{
         specialAdd = false;
       }
     
-      console.log('财富 ---‘',cinstmrk)
       // 用来添加特约信息
       if(isAdd  && cinstmrk =='5'){
          eventBus.emit('add-special')
       }
 
       const data = opertaor.getDataAll();
-      const cCiMrk = data.plyBase?.['Base.cCiMrk'];
-      // const nCiOwnPrm = ['1', '2', '3','4'].includes(cCiMrk) ? data.ciMasterAgreement?.['Base.nCiOwnPrm'] : getValue("Base.nPrm");
       
       let nCiShare = Number(getOwnShare()) || 100 ;
-            const totalAmount = Number(data['base']['Base.nPrm']);  
-            const splitCount =Number(data.base?.['Base.nPayNumber']) 
-
-      // if() data.ciMasterAgreement?.['Base.nCiOwnPrm'] 
-      // console.log('拆------------‘',data.plyBase?.['Base.cCiMrk'])
-      // const totalAmount = Number(nCiOwnPrm);
-      // const splitCount = Number(getValue("Base.nPayNumber"));
+      const totalAmount = Number(data['base']['Base.nPrm']);  
+      const splitCount =Number(data.base?.['Base.nPayNumber']) 
+   
       const totalCent = Math.round(totalAmount * 100);
       const result = ref<number[]>([]);
       const quotient = Math.floor(totalCent / splitCount) ;
@@ -128,9 +120,9 @@ const nPayNumberFun = (isAdd=false)=>{
       }
 
       // result.value = result.value.map(cent => parseFloat((cent / 100).toFixed(2)));
-      result.value = result.value.map(cent => parseFloat((cent / 100 * (nCiShare/100)).toFixed(8)));
-       
-      console.log('12123,',result)
+      // result.value = result.value.map(cent => parseFloat((cent / 100 * (nCiShare/100)).toFixed(8)));
+            result.value = result.value.map(cent => parseFloat((cent / 100 ).toFixed(8)));
+      // item['Pay.nPayablePrm']?  parseFloat((item['Pay.nPayablePrm'] * (nCiShare/100) ).toFixed(8)):0,
       let val= {}
       let valArr=[]
       for (let i = 0; i < Number(getValue("Base.nPayNumber")); i++) {
@@ -154,15 +146,18 @@ const nPayNumberFun = (isAdd=false)=>{
             "Pay.cPayorCde": opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppCde"),
             "Pay.tPayBgnTm": tInsrncBgnTm,
             "Pay.tPayEndTm": tPayEndTm,
-            "Pay.nOwnPrm": result.value[i] || 0 , 
+            "Pay.nOwnPrm":result.value[i]? parseFloat((result.value[i] * (nCiShare/100) ).toFixed(8)):0,   // 我司
+            // "Pay.nOwnPrm": result.value[i] || 0 ,   // 我司
             "Pay.cPayorNme":opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppNme"),
-            "Pay.nPayablePrm": result.value[i] || 0, 
-            "Pay.nPrmVar": result.value[i]  
+            "Pay.nPayablePrm": result.value[i] || 0, // 应收
+            "Pay.nPrmVar": result.value[i]     // 差额
           }
+
           valArr.push(val)
       }
 
       console.log('数据',valArr)
+   
       opertaor.getTableRefByKey("payinfo").setFormValue(valArr); 
     }
  } 
@@ -171,7 +166,6 @@ const nPayNumberFun = (isAdd=false)=>{
 const method = {
   // func demo
   func1: () => {
-    console.log(getRules);
   },
 
   //缴费拆分按钮事件
@@ -181,8 +175,6 @@ const method = {
   },
   //付费约定下拉事件
   cInstMrkChange(val: any) {
-    console.log(val)
-    // setValue("Base.nPayNumber", '1');
     if(val=='5'){
       setFormItem("Base.nPayNumber", { disabled: false ,  max:12});
     }else if(val=='0'){
@@ -193,7 +185,6 @@ const method = {
   },
   //争议处理选择事件
   cDisptSttlCdeChange(val){
-    console.log('aaa',val)
     if(val=='A'){
       // setFormItem("Base.cDisptSttlOrg", { disabled: false,rules: [getRules("required", {})] });
       setFormItem("Base.cDisptSttlOrg", { rules: [getRules("required", {})] });
@@ -228,7 +219,6 @@ const method = {
           codeListParam: { value: val },
         })
         .then((res) => {
-          console.log("0000000", res);
           setValue("Base.nAmtRmbExch", res[0].currency_rate);
         });
     } else {
@@ -294,7 +284,6 @@ const method = {
       },
       {
         isOk: (selectdata: any) => {
-          console.log("a", selectdata);
         },
       },
       { title: "特别约定", width: 85 }

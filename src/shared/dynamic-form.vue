@@ -413,9 +413,7 @@ function setPopover(v: any, item: any) {
 async function validate() {
   const promise = await fromRef.value?.validate((valid, fields) => {
     if (valid) {
-      console.log("submit!");
     } else {
-      console.log("error submit!", fields);
     }
   });
   let fromListbl = promise;
@@ -436,10 +434,8 @@ async function validateField(fields:any) {
   // 使用主表单的validateField方法校验指定字段
   await fromRef.value?.validateField(fields, (valid, invalidFields) => {
     if (valid) {
-      console.log("指定字段校验通过!");
       mainFormValid = true;
     } else {
-      console.log("指定字段校验失败!", invalidFields);
       mainFormValid = false;
     }
   });
