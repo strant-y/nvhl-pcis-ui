@@ -14,13 +14,13 @@
           <div v-if="row.cAppNo" class="policy-number-row">
             <span>{{ row.cAppNo }}</span>
             <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
-              <DocumentCopy />
+              <CopyDocument />
             </el-icon>
           </div>
           <div v-if="row.cPlyNo" class="policy-number-row">
             <span>{{ row.cPlyNo }}</span>
             <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
-              <DocumentCopy />
+              <CopyDocument />
             </el-icon>
           </div>
         </div>
