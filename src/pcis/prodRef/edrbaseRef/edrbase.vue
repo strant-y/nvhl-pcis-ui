@@ -117,6 +117,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
         clearable: true,
         defaultValue: "2",
+        disabled: shouldDisableRatioTyp(params),
         func: (v) => {},
         hidden: params["cRsnCde"] === "c1" || params["cRsnCde"] === "s1"
       },
@@ -310,6 +311,19 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     }),
   })
 );
+
+// 判断是否应该禁用短期费率类型下拉框
+function shouldDisableRatioTyp(params: any) {
+  // 指定产品代码列表
+  const specialProducts = [
+    "040016", "059014", "059015", "070002", "043021", 
+    "120008", "059018", "059017", "059016", "043020",
+    "049019", "049020"
+  ];
+  
+  // 判断当前产品是否在指定列表中且是批改场景
+  return specialProducts.includes(params.cProdNo) && params.pageType === "EDR_APP_NEW_SCENE";
+}
 
 function getFromValue() {
   return edrbaseEditRef?.value?.getFromValue();
