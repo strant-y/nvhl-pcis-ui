@@ -92,11 +92,13 @@ const tableconfig = reactive<AppTableConfig>(
            return row.cIfEdit !== '1';
         },
         tableClick: (row) => {
+  
           if(originalData.value.length==0){
               originalData.value =    deepClone(formData.value)
           }
           let param = {};
           if(row['cIfMust'] !== '9') {
+            
             let rid = row.cSpecialCode|| row.cSpecialCode
             const f = originalData.value.find(f => rid === f.cSpecialCode);
             // cSpecialContent
@@ -109,6 +111,7 @@ const tableconfig = reactive<AppTableConfig>(
           if(row.editList && row.editList.length>0){
             param['editList'] = row.editList
           }
+
           dzmodal.open(specEdit, { type: "view", data: param,
           callback: (res: any) => {
               if (res.type === "ok") {
@@ -273,8 +276,8 @@ const addData =()=>{
 // 获取默认信息
 
 const refreshData = () => {
-  // && parparam.cAppStatus !=='1' 暂存的不处理
-  if (parparam.pageType !== "app" &&  parparam.pageType !== "copy" && parparam.pageType !== "template" ) {
+  // && parparam.cAppStatus !=='1' 暂存的不处理  parparam.pageType !== "copy" && 
+  if (parparam.pageType !== "app" &&  parparam.pageType !== "template" ) {
     console.log('不是新单子')
     return false;
   }
