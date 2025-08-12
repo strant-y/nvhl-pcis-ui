@@ -2989,7 +2989,7 @@ const savePlyInfo = async () => {
     }
 
     // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
-    if(props.param?.pageType === "app" && !beforeSaveCappNo && plyBase["Base.cAppNo"]) {
+    if((props.param?.pageType === "app" || props.param?.pageType === "template" || props.param?.pageType === "copy" || props.param?.pageType === "inquiryToApp" || props.param.pageType === "orig") && !beforeSaveCappNo && plyBase["Base.cAppNo"]) {
       const queryParam = {
         pageSize: 10,
         pageNum: 1,
@@ -3000,9 +3000,7 @@ const savePlyInfo = async () => {
       }
       if(props.param?.pageName === "priceInquiry") {
         queryParam['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
-        getAppPolicyList({
-          cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
-        }).then((res:any) => {
+        getInquiryPolicyList(queryParam).then((res:any) => {
           if(res.data?.result && res.data?.result.length > 0) {
             const data = res.data?.result[0];
             router.replace({
@@ -3010,7 +3008,7 @@ const savePlyInfo = async () => {
               query: {
                 param: JSON.stringify({
                   ...data,
-                  ...{ pageType: "TEMPORARY_DEPOSIT" },
+                  ...{ pageType: "TEMPORARY_DEPOSIT", pageName: 'priceInquiry' },
                 }),
               },
             });
@@ -3026,7 +3024,7 @@ const savePlyInfo = async () => {
               query: {
                   param: JSON.stringify({
                       ...data,
-                      ...{ pageType: "TEMPORARY_DEPOSIT", pageName: 'priceInquiry' },
+                      ...{ pageType: "TEMPORARY_DEPOSIT" },
                   }),
               },
             });
@@ -3410,7 +3408,7 @@ const saveApplicationEdr = () => {
     res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   console.log(res);
   // 点击保存之前的申请单号
-  const beforeSaveCappNo = res["data"]["EdrBase"]["Base.cAppNo"];
+  const beforeSaveCappNo = res["data"]["EdrBase"]["EdrBase.cAppNo"];
   saveSurrenEdr(res).then((res) => {
     btn.loading = false;
     console.log("退保保存", res);
@@ -3431,36 +3429,36 @@ const saveApplicationEdr = () => {
             "EdrBase.cEdrRsnDetail"
           ].split(",");
         edrbase.value?.setFormValue(EdrBaseData);
+        // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
+        if(props.param.pageType === "EDR_APP_NEW_SCENE" && !beforeSaveCappNo && EdrBaseData["EdrBase.cAppNo"]) {
+          getAppPolicyList({
+            cAppNo: EdrBaseData["EdrBase.cAppNo"],
+            pageSize: 10,
+            pageNum: 1,
+            cDptCde: opertaor.getDataAll().plyBase["Base.cDptCde"],
+            cLoadSub: "1",
+            cDataTyp: "app",
+            queryType: "1"
+          }).then((res:any) => {
+            if(res.data?.result && res.data?.result.length > 0) {
+              const data = res.data?.result[0];
+              if(data['cEdrRsnBundleCde']){
+                  data.cRsnCde = data['cEdrRsnBundleCde'];
+              }
+              router.replace({
+                path: "/pcis/my-page",
+                query: {
+                  param: JSON.stringify({
+                    ...data,
+                    ...{ pageType: "TEMPORARY_DEPOSIT" },
+                  }),
+                },
+              });
+            }
+          })
+        }
       }
       ElMessage.success(res.msg);
-      // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
-      if(props.param.pageType === "EDR_APP_NEW_SCENE" && !beforeSaveCappNo && ops.EdrBase["Base.cAppNo"]) {
-        getAppPolicyList({
-          cAppNo: ops.EdrBase["Base.cAppNo"],
-          pageSize: 10,
-          pageNum: 1,
-          cDptCde: opertaor.getDataAll().plyBase["Base.cDptCde"],
-          cLoadSub: "1",
-          cDataTyp: "app",
-          queryType: "1"
-        }).then((res:any) => {
-          if(res.data?.result && res.data?.result.length > 0) {
-            const data = res.data?.result[0];
-            if(data['cEdrRsnBundleCde']){
-                data.cRsnCde = data['cEdrRsnBundleCde'];
-            }
-            router.replace({
-              path: "/pcis/my-page",
-              query: {
-                param: JSON.stringify({
-                  ...data,
-                  ...{ pageType: "TEMPORARY_DEPOSIT" },
-                }),
-              },
-            });
-          }
-        })
-      }
     } else {
       ElMessage.error(res.msg);
     }
@@ -3544,8 +3542,6 @@ const saveEdrPlyInfo = async () => {
   const btn = getBtn("saveEdr");
   btn.loading = true;
   const res = opertaor.getDataAll();
-  // 点击保存之前的申请单号
-  const beforeSaveCappNo = res["EdrBase"]["Base.cAppNo"];
   const dataALl = opertaor.getDataAll();
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
@@ -3566,6 +3562,8 @@ const saveEdrPlyInfo = async () => {
       }
     })
   }
+  // 点击保存之前的申请单号
+  const beforeSaveCappNo = res["EdrBase"]["EdrBase.cAppNo"];
   const edrInfo: any = await saveEdrAppPlyInfo(res)
   btn.loading = false;
   if(edrInfo["code"] == "200") {
@@ -3593,9 +3591,9 @@ const saveEdrPlyInfo = async () => {
       saveDist(EdrBaseData['EdrBase.cAppNo'], props.param?.cRsnCde)
     }
     // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
-    if(props.param.pageType === "EDR_APP_NEW_SCENE" && !beforeSaveCappNo && ops.EdrBase["Base.cAppNo"]) {
+    if(props.param.pageType === "EDR_APP_NEW_SCENE" && !beforeSaveCappNo && EdrBaseData["EdrBase.cAppNo"]) {
       getAppPolicyList({
-        cAppNo: ops.EdrBase["Base.cAppNo"],
+        cAppNo: EdrBaseData["EdrBase.cAppNo"],
         pageSize: 10,
         pageNum: 1,
         cDptCde: opertaor.getDataAll().plyBase["Base.cDptCde"],
