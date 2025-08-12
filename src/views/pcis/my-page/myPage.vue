@@ -2570,7 +2570,7 @@ const submitToUndrFn = async () => {
    * 联共保判断
    */
   const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk')
-  if ('1' === CiMrk || '2' === CiMrk || '5' === CiMrk) {
+  if ('1' === CiMrk  || '5' === CiMrk) {
       const validCi = JointInsuranceCheck();
       // 如果联共保校验不通过，则不继续执行后续逻辑
        if (!validCi) {
@@ -3914,6 +3914,7 @@ const validateCiInfo = () => {
     NCiShare += parseFloat(item['Ci.nCiShare'] || 0);
   });
   
+  debugger
   // 主共保信息验证
   if (chiefMrkM === 0 || chiefMrkS === 0) {
     ElMessage.error("主共方有且仅有一个！");

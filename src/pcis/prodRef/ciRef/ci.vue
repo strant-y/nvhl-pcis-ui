@@ -25,6 +25,7 @@ import { constantRoutes } from "@/router";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 import { saveAs } from "file-saver";
 import { fa } from "element-plus/es/locale";
+import { debugPort } from "process";
 const policyService = new PolicyService();
 const productStore = useProductStore();
 const dialogRef = ref<DialogMethod | null>(null);
@@ -301,31 +302,28 @@ const method = {
       const existingIssueMrk = allRows.some(
         (row) => row._dataId !== rowId && row["Ci.cIssueMrk"] === "1"
       );
-      if (val === "1" && existingIssueMrk) {
-        ElMessage.error("出单方有且只能有一个！");
-        freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
-        return;
-      }
+      // if (val === "1" && existingIssueMrk) {
+      //   ElMessage.error("出单方有且只能有一个！");
+      //   freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
+      //   return;
+      // }
       if (val === "0") {
-        if(cCiMrk["Base.cCiMrk"] == '1' || cCiMrk["Base.cCiMrk"] == '5'){
+        if(cCiMrk["Base.cCiMrk"] == '1' || cCiMrk["Base.cCiMrk"] == '5' || cCiMrk['Base.cCiMrk'] == '3'){
           if(rowData['Ci.cDptCde'] == param.cDptCde){
             ElMessage.error("联保单出单方必须是主联单的分公司！");
             freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
           }
-        }else if(cCiMrk['Base.cCiMrk'] == '3'){
-          if(rowData['Ci.cDptCde'] == param.cDptCde){
-            ElMessage.error("联保单出单方必须是主联单的分公司！");
+        }else if(cCiMrk['Base.cCiMrk'] == '2' || cCiMrk['Base.cCiMrk'] == '4'){
+          if(rowData['Ci.cDptCde'] !== param.cDptCde){
+            ElMessage.error("我方从共时，出单方不能是我司！")
             freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk",rowId,"")
           }
         }
-      }else if( val === '1'){
-        if(cCiMrk['Base.cCiMrk'] == '2' || cCiMrk['Base.cCiMrk'] === '1' || cCiMrk['Base.cCiMrk'] === '5'){
+      }else{
+        if(cCiMrk['Base.cCiMrk'] == '2' || cCiMrk['Base.cCiMrk'] == '4'){
           if(rowData['Ci.cDptCde'] == param.cDptCde){
-            ElMessage.error("联保单出单方必须是主联单的分公司！");
-            freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
-          }else if(rowData['Ci.cDptCde'] != param.cDptCde){
-            ElMessage.error("联保单出单方必须是主联单的分公司！")
-            freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
+            ElMessage.error("我方从共时，出单方不能是我司！")
+            freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk",rowId,"")
           }
         }
       }
@@ -856,10 +854,17 @@ const initCiInfo = (data: any) => {
     const cBrkSlsCde = opertaor.getTableRefByKey('plyBase').getValue('Base.cBrkSlsCde')
     // 联保机构、出单机构 转 级联组件初始化
     const dptList = [];
-    if(param['dptCde']) {
-      dptList.push(param['dptCde']);
+    if(param.cPolicySource === '8'){
+      dptList.push(param['cSecondDptCnm']);
       if(param['cDptCde']) {
         dptList.push(param['cDptCde']);
+      }
+    }else {
+      if(param['dptCde']) {
+        dptList.push(param['dptCde']);
+        if(param['cDptCde']) {
+          dptList.push(param['cDptCde']);
+        }
       }
     }
     freeEditRef?.value?.addRowByData( {
@@ -877,7 +882,6 @@ const initCiInfo = (data: any) => {
       'Ci.cBrkSlsCde': cBrkSlsCde,
       'dptCascader' : dptList,
     });
-      
     // 联保机构下拉选项查询
     ciJiDptOptionsQuery('327001', getFromValue()[0]);
     onChiefMrkChange()
@@ -1096,17 +1100,19 @@ const handleEdrAppNewSceneRules = () => {
         }
       }
     });
-  }else if(param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue == '5' && param.cRsnDetailCde?.value == "47") {
-    formconfig1.fromSchema?.forEach((item) => {
-      item.disabled = true;
-    });
-    tableList.forEach((rowData:any) => {
-      const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId);
-      rowItem['Ci.nCiShare'].disabled = true;
-      rowItem['Ci.nPlyFeeRate'].disabled = true;
-      rowItem['Ci.cCoinsurerCde'].disabled = true;
-    });
   }
+  //司内联保
+  // else if(param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue == '5' && param.cRsnDetailCde?.value == "47") {
+  //   formconfig1.fromSchema?.forEach((item) => {
+  //     item.disabled = true;
+  //   });
+  //   tableList.forEach((rowData:any) => {
+  //     const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId);
+  //     rowItem['Ci.nCiShare'].disabled = true;
+  //     rowItem['Ci.nPlyFeeRate'].disabled = true;
+  //     rowItem['Ci.cCoinsurerCde'].disabled = true;
+  //   });
+  // }
 };
 /**
  * 设置下拉列表
