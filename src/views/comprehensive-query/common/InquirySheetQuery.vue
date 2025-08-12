@@ -14,7 +14,7 @@
           <div v-if="row.cInquiryNo" class="policy-number-row">
             <span>{{ row.cInquiryNo }}</span>
             <el-icon class="copy-icon" @click="copyText(row.cInquiryNo)">
-              <DocumentCopy />
+              <CopyDocument />
             </el-icon>
           </div>
         </div>
@@ -1069,9 +1069,37 @@ const normalQueryColumns = [
     {
         prop: "cInquiryNo",
         inputtype: "rtinput",
-        title: "询价单",
+        title: "询价单号",
         minWidth: 180,
-        slotName: "cInquiryNo"
+        slotName: "cInquiryNo",
+        fixed: "left",
+    },
+    {
+      prop: "cAppStatus",
+      inputtype: "rtselect",
+      title: "状态",
+      minWidth: 100,
+      loadData: [
+        { label: "暂存", value: "1" },
+        { label: "已提核", value: "2" },
+        { label: "核保退回/撤回", value: "3" },
+        { label: "核保通过", value: "4" },
+        { label: "已出保单", value: "5" },
+        { label: "已做失效操作", value: "6" },
+        { label: "已提交未接收", value: "7" },
+        { label: "见费出单退回", value: "8" },
+      ],
+      hideBtns: (row: any) => {
+        if (
+            queryType.value == "2" ||
+            queryType.value == "3" ||
+            queryType.value == "4"
+        ) {
+          return false;
+        } else {
+          return true;
+        }
+      },
     },
     {
         prop: "cPlyNo",
@@ -1127,33 +1155,7 @@ const normalQueryColumns = [
         title: "保费",
         minWidth: 100,
     },
-    {
-        prop: "cAppStatus",
-        inputtype: "rtselect",
-        title: "状态",
-        minWidth: 100,
-        loadData: [
-            { label: "暂存", value: "1" },
-            { label: "已提核", value: "2" },
-            { label: "核保退回/撤回", value: "3" },
-            { label: "核保通过", value: "4" },
-            { label: "已出保单", value: "5" },
-            { label: "已做失效操作", value: "6" },
-            { label: "已提交未接收", value: "7" },
-            { label: "见费出单退回", value: "8" },
-        ],
-        hideBtns: (row: any) => {
-            if (
-                queryType.value == "2" ||
-                queryType.value == "3" ||
-                queryType.value == "4"
-            ) {
-                return false;
-            } else {
-                return true;
-            }
-        },
-    },
+
 ];
 
 let tableconfig = reactive<AppTableConfig>(
