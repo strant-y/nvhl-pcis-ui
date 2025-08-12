@@ -143,6 +143,7 @@ const method = {
   },
   // 索赔基础名称change事件
   suopeiFunc: (val) => {
+    console.log(val)
     let cIsRetroSpect = getFromValue()['Base.cIsRetroSpect']      // 获取是否有追溯期/日期
     const p = opertaor.getParam();
     if (!p.initFlag) {
@@ -171,13 +172,19 @@ const method = {
       setFormItem("Base.nReportDays", {  hidden: true  }); //延长报告期天数
     } else if (val == "1") {
       if (cIsRetroSpect !== '0') {
-        setFormItem("Base.tRunBgnTm", { rules: null }); //追溯/日落起期
-        setFormItem("Base.tRunEndTm", { rules: null }); //追溯/日落止期
+        setFormItem("Base.tReportEndTm", { rules: [getRules("required", {})],disabled: false, }); //延长报告期终止日期
+        setFormItem("Base.tReportBgnTm", { rules: [getRules("required", {})],disabled: false, }); //延长报告期起始日期
+
+      }else{
+        setFormItem("Base.tRunBgnTm", { rules: [] }); //追溯/日落起期
+        setFormItem("Base.tRunEndTm", { rules: [] }); //追溯/日落止期
+        setFormItem("Base.tReportEndTm", { rules: []}); //延长报告期终止日期
+        setFormItem("Base.tReportBgnTm", { rules: [] }); //延长报告期起始日期
       }
+      
 
       //期内发生制时，报告起始、终止日期必填
-      setFormItem("Base.tReportBgnTm", { rules: [getRules("required", {})] }); //延长报告期起始日期
-      setFormItem("Base.tReportEndTm", { rules: [getRules("required", {})] }); //延长报告期终止日期
+
       setFormItem("Base.tRunBgnTm", {  hidden: true  }); //追溯/日落起期
       setFormItem("Base.tRunEndTm", {  hidden: true  }); //追溯/日落止期
       setFormItem("Base.nTracingDays", {  hidden: true  }); //追溯/日落天数
@@ -186,7 +193,7 @@ const method = {
       setFormItem("Base.tReportEndTm", {  hidden: false  }); //延长报告期终止日期
       setFormItem("Base.nReportDays", {  hidden: false  }); //延长报告期天数
     }
-    setValue("Base.isRetroSpect", "");
+    // setValue("Base.cIsRetroSpect", "");
   },
   // 是否有追溯期/日落期 change事件
   isTermFunc: (val) => {
@@ -197,9 +204,15 @@ const method = {
 
         setFormItem("Base.tRunBgnTm", { rules: [getRules("required", {})], disabled: false, }); //追溯/日落起期
         setFormItem("Base.tRunEndTm", { rules: [getRules("required", {})], disabled: false, }); //追溯/日落止期
+        
+      
       } else {
         setFormItem("Base.tRunBgnTm", { rules: [], disabled: false, }); //追溯/日落起期
         setFormItem("Base.tRunEndTm", { rules: [], disabled: false, }); //追溯/日落止期
+
+        setFormItem("Base.tReportBgnTm", { rules: [getRules("required", {})], disabled: false, }); //延长报告期起始日期
+        setFormItem("Base.tReportEndTm", { rules: [getRules("required", {})], disabled: false, }); //延长报告期终止日期
+        
       }
     } else if (val == "0") {
       setFormItem("Base.tRunBgnTm", { rules: [], disabled: true }); //追溯/日落起期
@@ -208,6 +221,14 @@ const method = {
         "Base.tRunBgnTm": "",
         "Base.tRunEndTm": "",
         "Base.nTracingDays": "",
+      });
+
+      setFormItem("Base.tReportBgnTm", { rules: [], disabled: true }); //延长报告期起始日期
+      setFormItem("Base.tReportEndTm", { rules: [], disabled: true }); //延长报告期终止日期
+      setFormValue({
+        "Base.tReportBgnTm": "",
+        "Base.tReportEndTm": "",
+        "Base.nReportDays": "",
       });
     } 
   },
