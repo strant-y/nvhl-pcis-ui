@@ -50,7 +50,7 @@ import { isValidDateFlag } from "@/typings/method-public";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const dialogVisible = ref(true);
 const props = defineProps(["data","callback"]);
-const rowData = ref(props.data);
+const rowData = ref(props.data); 
 const opertaor = dataOpertaor();
 //rowData当前行数据
 /**

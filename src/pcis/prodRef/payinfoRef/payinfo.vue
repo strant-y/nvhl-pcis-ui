@@ -112,6 +112,7 @@ const nPrmFun = ()=>{
 
 // 获取我司比例
 const getOwnShare =()=>{
+   
    let ownShare = 0;
    const data = opertaor.getDataAll();
    let ciArr = data['ci']
@@ -124,6 +125,7 @@ const getOwnShare =()=>{
       } 
    })
   }
+    console.log('进来了--',ownShare)
   return ownShare;
 }
 
@@ -200,11 +202,13 @@ const method = {
   },
   // 缴费计划
   nPayablePrmFun:(val:any)=>{
+ 
     const data = opertaor.getDataAll();
     const cCiMrk =  ['0', '5'].includes(data.plyBase?.['Base.cCiMrk']);  // 是否   联共保
     let nCiShare = Number(getOwnShare()) || 100 ;
     let num = 0;
     getFromValue().forEach((item:any) =>{
+              item['Pay.nPayablePrm'] =  item['Pay.nPayablePrm'] || 0;
               item['Pay.nOwnPrm']  = item['Pay.nPayablePrm']?  parseFloat((item['Pay.nPayablePrm'] * (nCiShare/100) ).toFixed(8)):0
               num  +=item['Pay.nOwnPrm'] 
               //  "Pay.nOwnPrm": item['Pay.nPayablePrm']?  parseFloat((item['Pay.nPayablePrm'] * (nCiShare/100) ).toFixed(2)):0,

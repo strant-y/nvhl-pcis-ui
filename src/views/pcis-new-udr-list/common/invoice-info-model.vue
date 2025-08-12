@@ -40,14 +40,12 @@ const props = defineProps({
   },
 })
 
-const isVisible = computed(() => props.visible);
-// const props = defineProps({
-//   data: String,
-//   inititle: Array,
-// });
 
-let cGrpMrk =opertaor.getDataAll()['plyBase']['Base.cGrpMrk'];
-// let cGrpMrk =1;
+const isVisible = computed(() => props.visible);
+
+let cGrpMrk =opertaor.getDataAll()?.['plyBase']?.['Base.cGrpMrk'];
+
+let cCiMrk  = ref('0');   // 联共保  2 4显示
 
  console.log('999',cGrpMrk)
 
@@ -57,15 +55,6 @@ const { getRules } = useValidator();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const dialogVisible = ref(true)
 const policyService = new PolicyService();
-// const props = defineProps({
-//   modelValue: {
-//     type: Boolean,
-//     default: false,
-//   },
-// });
-
-
-// const dataOperator = new DataOperator();
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -74,12 +63,26 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     },
     endBtnsPosition: "right",
     title: '发票信息',
-    endBtns: [
+    endBtns:computed(() =>  [
       createFreeButtonBase({
         type: "primary",
         label: "保存",
         func: async () => {
           saveTaxInfo()
+        },
+      }),
+       createFreeButtonBase({
+        type: "primary",
+        label: "主共发票信息",
+        hidden: (cCiMrk.value !== '2' && cCiMrk.value !== '4'),
+        func: async () => {
+            let customerCode = '9'+ new Date().getTime();
+            setValue('CCustomerCode', customerCode);
+                  
+            setFormItem('CCustomerType',{disabled:false})
+            setFormItem('CCustomerNm',{disabled:false})
+            setFormItem('CCertfCls',{disabled:false})
+            setFormItem('CCertfCde',{disabled:false})
         },
       }),
       createFreeButtonBase({
@@ -105,7 +108,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           close('close')
         },
       }),
-    ],
+    ]),
     
 
 
@@ -143,8 +146,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable: true,
       },
       {
-        // codeParam: { cParCde: "RdrTyp" },
-        // {"codeListName":"RatioTyp_List","codeListParam":{"C_PAR_CDE":"InvoiceType"}}
         prop: "CInvoiceType",
         inputtype: "rtselect",
         title: "发票类型",
@@ -227,25 +228,13 @@ const saveTaxInfo = () => {
   let operAppDatas = opertaor.getDataAll()['applicant'];  // 投保人数据
   let operDatas = opertaor.getDataAll()['insured'];  // 被保人数据
 
-
   let formData  = freeEditRef.value?.getFromValue();
   freeEditRef.value?.validate().then((isValid) => {
     if (!isValid) {
       ElMessage.warning('请补全信息');
       return;
     }
-    
-    //  if(CIsFlag == "true" && !(ccimrk == '2' || ccimrk == '4') 
-    //  && ((CCertfCde !== insCCertfCde && CCertfCde !== appCCertfCde) 
-    // || (CCustomerNm !== insCInsuredNme && CCustomerNm !== appCAppNme) 
-    // || (CCertfCls !== insCCertfCls && CCertfCls !== appCCertfCls))){
-    //       //  tool.alert("发票信息与客户信息不一致，请点击 '同被保人' 或 '同投保人' 按钮 ！");
-    //        return;
-    //      }
-    //     freeEditRef.value?.setValue('CCertfCls',  operAppDatas['Applicant.cCertfCls']);
-    // freeEditRef.value?.setValue('CCertfCde',  operAppDatas['Applicant.cCertfCde']);
-
-    // 提取相关变量（根据实际场景替换获取方式）
+        // 提取相关变量（根据实际场景替换获取方式）
     const applicantCCustomerType = operAppDatas['Applicant.cClntMrk'];  // 客户类型
     const insuredCCustomerType = operDatas['Insured.cClntMrk'];
     const applicantCertfCls = operAppDatas['Applicant.cCertfCls'];  // 证件类型
@@ -277,9 +266,6 @@ const saveTaxInfo = () => {
       // freeEditRef.value?.setValue('CCertfCls', operAppDatas['Applicant.cCertfCls']);
       // freeEditRef.value?.setValue('CCertfCde', operAppDatas['Applicant.cCertfCde']);
     }
- 
-
-
     
     policyService.saveTaxInfo(formData).then((response) => {
       if (response.code === 200) {
@@ -296,13 +282,11 @@ const saveTaxInfo = () => {
 
 const copyInsured = () => {
   //根据tabs的名称获取tabs的实例，拿实例中的数据给这里的表单回显数据。使用该组件时再调整这里
-  // const insured = dataOperator.getTabByName(INSURED, route);
   let operDatas = opertaor.getDataAll()['insured'];  // 被保人数据
-  // ['applicant']['Applicant.cAppNo']; 
   console.log(operDatas)
 
   const insured = { content: null };
-  freeEditRef.value?.setValue('CInvoiceType', '');
+   freeEditRef.value?.setValue('CInvoiceType', '');
   // if (insured && insured.content) {
     freeEditRef.value?.setValue('CCustomerCode', '');
     freeEditRef.value?.setValue('CCustomerType', '');
@@ -319,60 +303,28 @@ const copyInsured = () => {
     freeEditRef.value?.setValue('CCertfCde',  operDatas['Insured.cCertfCde']);
     freeEditRef.value?.setValue('CTele',  operDatas['Insured.cMobile']);
     freeEditRef.value?.setValue('CEmail',  operDatas['Insured.cEmail']);
-
-
-
-    // formData.CCustomerCode = insured.content.freeEdit.myForm.controls['Insured.CInsuredCde'].value;
-    // formData.CCustomerType = insured.content.freeEdit.controls['Insured.CClntMrk'].value;
-    // formData.CCustomerNm = insured.content.freeEdit.controls['Insured.CInsuredNme'].value;
-    // formData.CCertfCls = insured.content.freeEdit.controls['Insured.CCertfCls'].value;
-    // formData.CCertfCde = insured.content.freeEdit.controls['Insured.CCertfCde'].value;
-    // let CMobile = insured.content.freeEdit.controls['Insured.CMobile'].value;
-    // if (CMobile === null) {
-    //   CMobile = insured.content.freeEdit.controls['Insured.CTel'].value;
-    // }
-    // freeEditRef.value?.setValue('CTele', CMobile);
-  // }
 };
 
 const copyApplicant = () => {
   //根据tabs的名称获取tabs的实例，拿实例中的数据给这里的表单回显数据。使用该组件时再调整这里
-  // const applicant = dataOperator.getTabByName(APPLICANT, route);
-  // const applicant = { content: null };
   let operAppDatas = opertaor.getDataAll()['applicant'];  // 投保人数据
   console.log('投保人数据',operAppDatas)
  
   freeEditRef.value?.setValue('CInvoiceType', '');
-  // if (applicant && applicant.content) {
-    freeEditRef.value?.setValue('CCustomerCode', '');   // 客户代码
-    freeEditRef.value?.setValue('CCustomerType', '');   //客户类型
-    freeEditRef.value?.setValue('CCustomerNm', '');    //客户名称
-    freeEditRef.value?.setValue('CCertfCls', '');    //  证件类型
-    freeEditRef.value?.setValue('CCertfCde', '');   // 证件号码
-    freeEditRef.value?.setValue('CTele', '');   // 电话
-    freeEditRef.value?.setValue('CEmail', '');   // 邮箱
-// Applicant.cAppCde
-
-
-    freeEditRef.value?.setValue('CCustomerCode', operAppDatas['Applicant.cAppCde']);
-    freeEditRef.value?.setValue('CCustomerType',  operAppDatas['Applicant.cClntMrk']);
-    freeEditRef.value?.setValue('CCustomerNm',  operAppDatas['Applicant.cAppNme']);
-    freeEditRef.value?.setValue('CCertfCls',  operAppDatas['Applicant.cCertfCls']);
-    freeEditRef.value?.setValue('CCertfCde',  operAppDatas['Applicant.cCertfCde']);
-    freeEditRef.value?.setValue('CTele',  operAppDatas['Applicant.cMobile']);
-    freeEditRef.value?.setValue('CEmail',  operAppDatas['Applicant.cEmail']);
-
-    // formData.CCustomerCode = applicant.content.freeEdit.controls['Applicant.CAppCde'].value;
-    // formData.CCustomerType = applicant.content.freeEdit.controls['Applicant.CClntMrk'].value;
-    // formData.CCustomerNm = applicant.content.freeEdit.controls['Applicant.CAppNme'].value;
-    // formData.CCertfCls = applicant.content.freeEdit.controls['Applicant.CCertfCls'].value;
-    // formData.CCertfCde = applicant.content.freeEdit.controls['Applicant.CCertfCde'].value;
-    // let CMobile = applicant.content.freeEdit.controls['Applicant.CMobile'].value;
-    // if (CMobile === null) {
-    //   CMobile = applicant.content.freeEdit.controls['Applicant.CTel'].value;
-    // }
-    // freeEditRef.value?.setValue('CTele', CMobile);
-  // }
+    setValue('CCustomerCode', '');   // 客户代码
+    setValue('CCustomerType', '');   //客户类型
+    setValue('CCustomerNm', '');    //客户名称
+    setValue('CCertfCls', '');    //  证件类型
+    setValue('CCertfCde', '');   // 证件号码
+    setValue('CTele', '');   // 电话
+    setValue('CEmail', '');   // 邮箱
+    setValue('CCustomerCode', operAppDatas['Applicant.cAppCde']);
+    setValue('CCustomerType',  operAppDatas['Applicant.cClntMrk']);
+    setValue('CCustomerNm',  operAppDatas['Applicant.cAppNme']);
+    setValue('CCertfCls',  operAppDatas['Applicant.cCertfCls']);
+    setValue('CCertfCde',  operAppDatas['Applicant.cCertfCde']);
+    setValue('CTele',  operAppDatas['Applicant.cMobile']);
+    setValue('CEmail',  operAppDatas['Applicant.cEmail']);
 };
 
 const close = (type) => {
@@ -392,28 +344,41 @@ onMounted(() => {
   //申请单号；这里逻辑有问题，angular路径src\app\routes\pcis-main\prodDef\common\invoice-info-model\invoice-info-model.component.ts
   //     let CAppNo = freeEditRef.value?.getValue('CAppNo') 
  
-  let CAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];   // 申请单号
+  cCiMrk.value =opertaor.getTableRefByKey("plyBase")?.getValue('Base.cCiMrk')
+  console.log(267,opertaor.getDataAll())
+  console.log(268, opertaor.getTableRefByKey("plyBase")?.getValue('Base.cCiMrk')  )
+  console.log(269,cCiMrk.value )
+  console.log(269,formconfig1 )
+  let CAppNo = opertaor.getDataAll()?.['applicant']?.['Applicant.cAppNo'];   // 申请单号
    nextTick(()=>{
     freeEditRef.value?.setValue('CAppNo', CAppNo); 
     freeEditRef.value?.setValue('CGrpMrk', cGrpMrk); 
+    
+       setFormItem('CCustomerType',{disabled:true})
+       setFormItem('CCustomerNm',{disabled:true})
+       setFormItem('CCertfCls',{disabled:true})
+       setFormItem('CCertfCde',{disabled:true})
   })
  
+
+  
   policyService.getTaxInfoByAppNo(CAppNo).then((response) => {
     if (response.code === 200) {
       // 未返回 发票数据自动同步投保人信息
       if (response.data) {
-        freeEditRef.value?.setValue('CCustomerCode', response.data.cCustomerCode);
-        freeEditRef.value?.setValue('CCustomerType', response.data.cCustomerType);
-        freeEditRef.value?.setValue('CCustomerNm', response.data.cCustomerNm);
-        freeEditRef.value?.setValue('CInvoiceType', response.data.cInvoiceType);
-        freeEditRef.value?.setValue('CTaxpayerId', response.data.cTaxpayerId);
-        freeEditRef.value?.setValue('CCertfCls', response.data.cCertfCls);
-        freeEditRef.value?.setValue('CCertfCde', response.data.cCertfCde);
-        freeEditRef.value?.setValue('CBank', response.data.cBank);
-        freeEditRef.value?.setValue('CAccountno', response.data.cAccountno);
-        freeEditRef.value?.setValue('CTele', response.data.cTele);
-        freeEditRef.value?.setValue('CEmail', response.data.cEmail);
-        freeEditRef.value?.setValue('CAddress', response.data.cAddress);
+       setValue('CCustomerCode', response.data.cCustomerCode);
+       setValue('CCustomerType', response.data.cCustomerType);
+       setValue('CCustomerNm', response.data.cCustomerNm);
+       setValue('CInvoiceType', response.data.cInvoiceType);
+       setValue('CTaxpayerId', response.data.cTaxpayerId);
+       setValue('CCertfCls', response.data.cCertfCls);
+       setValue('CCertfCde', response.data.cCertfCde);
+       setValue('CBank', response.data.cBank);
+       setValue('CAccountno', response.data.cAccountno);
+       setValue('CTele', response.data.cTele);
+       setValue('CEmail', response.data.cEmail);
+       setValue('CAddress', response.data.cAddress);
+
       }else{
         copyApplicant()
       }
@@ -425,6 +390,40 @@ onMounted(() => {
   });
 });
 
+
+//给表单赋值
+function setFormItem(key: any, obj: any) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.btnItems && obj.btnItems) {
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
+          }
+        }else{
+          Object.assign(item, obj);
+        }
+      }
+    });
+  }
+}
+
+function getFromValue() {
+  return freeEditRef?.value?.getFromValue();
+}
+
+function setFormValue(value: any) {
+  freeEditRef?.value?.setFormValue(value);
+}
+
+function setValue(key: string, value: any) {
+  freeEditRef?.value?.setValue(key, value);
+}
+
+function getValue(key: string) {
+  return freeEditRef?.value?.getValue(key);
+}
 </script>
 
 <style scoped lang="scss">

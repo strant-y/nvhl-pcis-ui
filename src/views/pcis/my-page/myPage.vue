@@ -2642,8 +2642,9 @@ const submitToUndrFn = async () => {
   let nPayablePrmData = opertaor.getTableRefByKey("payinfo").getFromValue()  // 缴费计划数据  
   let nPayAll = 0;
   nPayablePrmData.forEach((item:any)=>{
-        nPayAll+= item['Pay.nPayablePrm']
+        nPayAll+= item['Pay.nPayablePrm'] || 0
   })
+  console.log('111',nPayAll,nPrm)
   if(nPayAll !== nPrm ){
       ElMessage.warning('缴费计划“应收保费”不等于“总保费”请确认！')
       return false;
