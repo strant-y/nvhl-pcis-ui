@@ -101,6 +101,13 @@ function setFormItem(key: any, obj: any) {
 
 // 绑定方法
 const method = {
+  ApplicantIsGreen:(val:any)=>{
+    if(val === '1'){
+      setFormItem('ECargoApplicant.cGreenIndustryList',{rules: [getRules("required", {})],disabled: false })
+    }else {
+      setFormItem('ECargoApplicant.cGreenIndustryList',{rules: null,disabled: true })
+    }
+  },
   //注册地市是否同上
    isSameChange : (val:any) => {
     if (val == "1") {
