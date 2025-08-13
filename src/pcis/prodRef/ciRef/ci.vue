@@ -329,8 +329,9 @@ const method = {
         //     freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk",rowId,"")
         //   }
         // }
-        if(cCiMrk["Base.cCiMrk"] == '1' ){
-          if(rowData['Ci.cDptCde'] == param.cDptCde){
+        debugger
+        if(cCiMrk["Base.cCiMrk"] == '1' || cCiMrk["Base.cCiMrk"] == '5'){
+          if(rowData['Ci.cDptCde'] !== param.cDptCde){
             ElMessage.error("联保单出单方必须是主联单的分公司！");
             freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
           }
