@@ -194,6 +194,7 @@ onMounted(async () => {
     formconfig11.titleBtns?.splice(deleteId,1);
   }
   Object.assign(cardconfig.value, formconfig11);
+  selectedRow.value = {}; // 初始化清除选中的缓存数据
   if (parparam.pageType === "app" && parparam.cRecordType != 4) {
     // 新建保单时,初始化条款信息
     const param = {
