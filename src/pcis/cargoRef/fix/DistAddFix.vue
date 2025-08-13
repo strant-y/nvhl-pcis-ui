@@ -115,6 +115,7 @@ onMounted(async  () => {
       item["func"] = bonusRatio;
     }
     if(['ECargoGoodsTgt.cPrmCur'].includes(item.prop)) {
+      item["typeCode"] = ''
       const result:any =  await cargoApi.getRate({cEcAgrAppNo:props.data.cEcAgrAppNo})
       if(result?.code == 200){
         rateDetail.value = {...result.data.data[0].rateDetail}

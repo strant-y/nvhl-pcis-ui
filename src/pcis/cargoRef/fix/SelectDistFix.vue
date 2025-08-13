@@ -1,5 +1,9 @@
 <template>
   <div>
+    <div v-if="sumData" style="margin:10px;font-size:20px;">
+       <span>总保险金额:</span>
+       <span style="color: red;margin-left:10px">{{ sumData }}</span>
+    </div>
     <app-table
         :tableConfig="tableconfig"
         v-model:pageresult="pageresult"
@@ -79,6 +83,7 @@ const props = defineProps({
 const emits = defineEmits(["handleClose"]);
 // 复选框选中
 const selectedRows = ref<any[]>([]);
+const sumData = computed(() => selectedRows.value.reduce((sum, item) => sum + item['ECargoGoodsTgt.nInsuranceAmount'], 0) );
 function handleSelectionChange(selection: any) {
   const selectList = props.data.selectList;
   let filteredArray:any = []
