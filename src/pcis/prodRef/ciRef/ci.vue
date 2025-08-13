@@ -26,6 +26,7 @@ import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service"
 import { saveAs } from "file-saver";
 import { fa } from "element-plus/es/locale";
 import { debugPort } from "process";
+import { debug } from "console";
 const policyService = new PolicyService();
 const productStore = useProductStore();
 const dialogRef = ref<DialogMethod | null>(null);
@@ -302,28 +303,35 @@ const method = {
       const existingIssueMrk = allRows.some(
         (row) => row._dataId !== rowId && row["Ci.cIssueMrk"] === "1"
       );
-      // if (val === "1" && existingIssueMrk) {
-      //   ElMessage.error("出单方有且只能有一个！");
-      //   freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
-      //   return;
-      // }
+      if (val === "1" && existingIssueMrk) {
+        ElMessage.error("出单方有且只能有一个！");
+        freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
+        return;
+      }
       if (val === "0") {
-        if(cCiMrk["Base.cCiMrk"] == '1' || cCiMrk["Base.cCiMrk"] == '5' || cCiMrk['Base.cCiMrk'] == '3'){
+        if(cCiMrk["Base.cCiMrk"] == '1'|| cCiMrk["Base.cCiMrk"] == '5' || cCiMrk['Base.cCiMrk'] == '3'){
           if(rowData['Ci.cDptCde'] == param.cDptCde){
             ElMessage.error("联保单出单方必须是主联单的分公司！");
             freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
           }
-        }else if(cCiMrk['Base.cCiMrk'] == '2' || cCiMrk['Base.cCiMrk'] == '4'){
-          if(rowData['Ci.cDptCde'] !== param.cDptCde){
-            ElMessage.error("我方从共时，出单方不能是我司！")
-            freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk",rowId,"")
-          }
         }
+        // else if(cCiMrk['Base.cCiMrk'] == '2' || cCiMrk['Base.cCiMrk'] == '4'){
+        //   if(rowData['Ci.cDptCde'] !== param.cDptCde){
+        //     ElMessage.error("我方从共时，出单方不能是我司！")
+        //     freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk",rowId,"")
+        //   }
+        // }
       }else{
-        if(cCiMrk['Base.cCiMrk'] == '2' || cCiMrk['Base.cCiMrk'] == '4'){
-          if(rowData['Ci.cDptCde'] == param.cDptCde){
-            ElMessage.error("我方从共时，出单方不能是我司！")
-            freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk",rowId,"")
+        // if(cCiMrk['Base.cCiMrk'] == '2' || cCiMrk['Base.cCiMrk'] == '4'){
+        //   if(rowData['Ci.cDptCde'] == param.cDptCde){
+        //     ElMessage.error("我方从共时，出单方不能是我司！")
+        //     freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk",rowId,"")
+        //   }
+        // }
+        if(cCiMrk["Base.cCiMrk"] == '1' ){
+          if(rowData['Ci.cDptCde'] !== param.cDptCde){
+            ElMessage.error("联保单出单方必须是主联单的分公司！");
+            freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
           }
         }
       }
