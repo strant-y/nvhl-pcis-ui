@@ -256,12 +256,12 @@ onMounted(() => {
              item['rules'] = [];
     }
     // 方案号下拉值
-    if(item.prop == 'Dist.cPlanNo'){
-      const termref = opertaor.getTableRefByKey("cvrg");
+    // if(item.prop == 'Dist.cPlanNo'){
+    //   const termref = opertaor.getTableRefByKey("cvrg");
       
-      item.typeCode = null;
-      item.loadData = termref.getPlanNo();
-    }
+    //   item.typeCode = null;
+    //   item.loadData = termref.getPlanNo();
+    // }
 
     if(item.prop =='Dist.cSchoolName'){
       item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];

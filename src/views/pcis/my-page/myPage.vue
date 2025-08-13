@@ -3001,6 +3001,8 @@ const savePlyInfo = async () => {
       }
       if(props.param?.pageName === "priceInquiry") {
         queryParam['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+        queryParam['tAppTmStart'] = dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00")
+        queryParam['tAppTmEnd'] = dayjs(new Date()).format("YYYY-MM-DD 23:59:59")
         getInquiryPolicyList(queryParam).then((res:any) => {
           if(res.data?.result && res.data?.result.length > 0) {
             const data = res.data?.result[0];
@@ -4232,18 +4234,6 @@ function getEdrbaseValue(key:any) {
 }
 
 function getOldProductResData() {
-  oldProductResData.value[0]['pageInfo'].forEach((i:any) => {
-    if(i.pageKey === "dist") {
-      i.pageSchema.fromSchema.forEach((item:any) => {
-        // 方案号下拉值
-        if(item.prop == 'Dist.cPlanNo'){
-          const termref = opertaor.getTableRefByKey("cvrg");
-          item.typeCode = null;
-          item.loadData = termref.getPlanNo();
-        }
-      })
-    }
-  })
   // 043010 记名投保选“是”，人员清单导入未校验所有字段必填
   if(opertaor.getDataAll()['tgt'] && opertaor.getDataAll()['tgt']['Tgt.cIsinsuranceRegistered'] === '1') {
     const data = deepClone(oldProductResData.value);
