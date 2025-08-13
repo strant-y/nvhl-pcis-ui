@@ -292,10 +292,10 @@ const method = {
 const handleQuery = () => {
   const param = opertaor.getParam();
   let app = "";
-  if (param.cOrgAppNo) {
+  if (opertaor.getDataAll()?.plyBase["Base.cAppNo"]) {
+    app = opertaor.getDataAll().plyBase["Base.cAppNo"];   
+  } else if(param.cOrgAppNo){
     app = param.cOrgAppNo;
-  } else if(opertaor.getDataAll().plyBase["Base.cAppNo"]){
-    app = opertaor.getDataAll().plyBase["Base.cAppNo"];
   } else if(param.pageType !== "copy") {
     app = param.cAppNo
   }

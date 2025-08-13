@@ -139,6 +139,12 @@ onMounted(async () => {
     }
     // 添加处理 Base.cCiMrk 值为 6 时显示"从联单"的逻辑
     handleCiMrkDisplay();
+    // 询价录单 联共保业务暂时固定非共保业务，不允许选择联共保
+    if(param.pageName === "priceInquiry") {
+      setFormItem('Base.cCiMrk',{
+        disabled:  true
+      })
+    }
   });
 });
 // 添加处理联共保标识显示逻辑的函数

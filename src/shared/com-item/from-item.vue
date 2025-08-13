@@ -58,7 +58,7 @@ watch([() => props.modelValue], ([newModelValue]) => {
   compareValueChangeColor(newModelValue);
 });
 function tableExvalidate() {
-  if (typeof itemRef.value.tableExvalidate === "function") {
+  if (typeof itemRef.value?.tableExvalidate === "function") {
     return itemRef.value.tableExvalidate();
   } else {
     return null;

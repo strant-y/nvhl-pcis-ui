@@ -189,26 +189,6 @@ const distSummaryRef = ref(); // 汇总组件对象
 const collectCompKey = ref(); // 汇总组件key
 const formconfig11 = ref<any>({});
 const oldPageSchema = ref<any>({});
-// 列表数据反显时，方案号的下拉选项渲染需要条款加载后根据条款获取，所以通过计算属性获取getPlanNo的值
-// 有值的时候再填充到方案号的loadData中
-const cvrg = computed(() => {
-  if(opertaor.getTableRefByKey("cvrg") && opertaor.getTableRefByKey("cvrg").getPlanNo) {
-    return opertaor.getTableRefByKey("cvrg")?.getPlanNo()
-  } else {
-    return "";
-  }
-})
-watch(cvrg, (val) => {
-  if(val && val.length > 0) {
-    tableconfig.value.fromSchema.forEach( r => {
-      // 方案号
-      if(r['prop'] == 'Dist.cPlanNo'){
-        r.typeCode = null;
-        r.loadData = val;
-      }
-    });
-  }
-});
 onMounted(async () => {
   // 初始化 cComponentTableValue
   cComponentTableValue = getCComponentTableValue();
@@ -222,13 +202,13 @@ onMounted(async () => {
   if(route.params.param?.cGrpMrk !== '1') {
     formconfig11.value.fromSchema = formconfig11.value.fromSchema.filter((item:any) => item.prop !== 'Dist.cRelatedInsured')
   }
-  if(params.cProdNo === '040003'){
-    formconfig11.value.fromSchema?.forEach(item=>{
-      if(item['prop'] ==='Dist.cProductType'){
-        item['typeCode'] = 'Product_Type040003';
-      }
-    })
-  }
+  // if(params.cProdNo === '040003'){
+  //   formconfig11.value.fromSchema?.forEach(item=>{
+  //     if(item['prop'] ==='Dist.cProductType'){
+  //       item['typeCode'] = 'Product_Type040003';
+  //     }
+  //   })
+  // }
 
 
   Object.assign(formconfig1.value, formconfig11.value);
@@ -500,6 +480,8 @@ const method = {
     let app = "";
     if (opertaor.getDataAll()?.plyBase["Base.cAppNo"]) {
       app = opertaor.getDataAll().plyBase["Base.cAppNo"];   
+    } else if(route.params.param && route.params.param.cAppNo) {
+      app = route.params.param.cAppNo;
     } else if(param.cOrgAppNo){
       app = param.cOrgAppNo;
     } else if(param.pageType !== "copy") {

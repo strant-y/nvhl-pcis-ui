@@ -21,7 +21,7 @@
                 size="small"
               />
             </i>
-            <span class="hot-menu-label">热搜菜单:</span>
+            <span class="hot-menu-label">快捷菜单:</span>
           </div>
           <div class="top-menu-list">
             <el-tag

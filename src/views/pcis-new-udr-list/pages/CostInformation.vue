@@ -380,8 +380,8 @@ let params: any = {
       appNo: props.data?.pageName === 'priceInquiry' ? props.data?.cInquiryNo : props.data?.cAppNo,
       prodNo: props.data?.cProdNo,
       dptCde: props.data?.cDptCde,
-      bsnsTyp:'19001',
-      nPrm: '10000',
+      bsnsTyp: '19001',
+      nPrm: props.data?.nPrm,
       isReadOnly: props.data?.pageType === "PLY_UW_PROCESS_SCENE" ? "2" : "1",// 核保页面打开的isReadOnly值为2
       updFlag: '1',
       appTyp: props.data?.cAppTyp,
@@ -619,56 +619,60 @@ function readOnlyAB() {
 
 }
 //比较接口
-function compareAppFee(saveFlag:any) {
+async function compareAppFee(saveFlag:any) {
+  let requstFlag = false;
   const paramStr = {
     appNo: params['appNo'],//保单号
     nPrm: String(params['nPrm']),  
     saveFlag:saveFlag,
     feeList: pageresult.list,
-    nUpdRateA:String(freeEditRef.value?.getValue("A1_value")) ,
+    nUpdRateA:String(freeEditRef.value?.getValue("A1_value")),
     nUpdRateB: String(freeEditRef.value?.getValue("B1_value")),
     allFeeProp: String(freeEditRef.value?.getValue("nFeePropSum")),
     allFee:String(freeEditRef.value?.getValue("nPrmSum")),
     nRateA6: String(freeEditRef.value?.getValue("A6_value")),
   };
-  compareAppFeeInfo(paramStr)
+  await compareAppFeeInfo(paramStr)
     .then((res:any) => {
       if (res.code == 200) {
         //let result = JSON.parse(res.data);
         console.log("000000", res.data);
+        requstFlag = true;
         pageresult1.list = [];
-        pageresult1.list = res.data;
-        pageresult1.total = res.data.length;
+        pageresult1.list = res.data || [];
+        pageresult1.total = res.data?.length;
         pageresult1.list.forEach((item, index) => {
           item.nSeqNo = index + 1;
         });
-  
       } else {
         ElMessage.error(res.msg);
       }
     })
-    .finally(() => { });
-
+    return requstFlag;
     //pageresult1.list
 }
 //保存按钮
-  function saveFeeInfo() {
-    const items = pageresult.list;
-    const paramStr = {
-      feeList: items
-    };
-    if (items.length > 0) {
-        let my_node_name = '';
-      for (let i = 0; i < items.length; i++) { // 改用普通 for 循环
+async function saveFeeInfo() {
+  const items = pageresult.list;
+  const paramStr = {
+    feeList: items
+  };
+  if (items.length > 0) {
+    let my_node_name = '';
+    for (let i = 0; i < items.length; i++) { // 改用普通 for 循环
       const item = items[i];
-        const nfee = item['nFee'];
-        my_node_name = item['cFeetypCde'];
+      const nfee = item['nFee'];
+      my_node_name = item['cFeetypCde'];
       if (my_node_name === 'C1' && (nfee == 0.00 || nfee == 0)) {
         ElMessageBox.confirm('手续费为零确定保存吗？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
-        }).then(() => {
+        }).then(async () => {
+          const compareAppFeeFunc = await compareAppFee('1');
+          if(compareAppFeeFunc !== true) {
+            return;
+          }
           saveAppFeeInfo_new(paramStr)
           .then((res:any) => {
             if (null != res && null != res.code ) {
@@ -684,7 +688,6 @@ function compareAppFee(saveFlag:any) {
                 .then((res1:any) => {
                   if (null != res1 && null != res1['code']) {
                     if (res1['code'] === 200) {
-                      compareAppFee('1');
                       ElMessage.success('iLog费用信息同步:' + res1['msg'],);
                     } else {
                       ElMessage.error('iLog费用信息同步失败');
@@ -699,43 +702,45 @@ function compareAppFee(saveFlag:any) {
             }
           })
           .finally(() => { });
-              }).catch(() => {
-                // 取消时，可根据需求决定是否跳出循环（如直接 return 退出整个函数）
-                return;
-              });
+        }).catch(() => {
+          // 取消时，可根据需求决定是否跳出循环（如直接 return 退出整个函数）
+          return;
+        });
       } else {
+        const compareAppFeeFunc = await compareAppFee('1');
+        if(compareAppFeeFunc !== true) {
+          return;
+        }
         saveAppFeeInfo_new(paramStr)
-    .then((res:any) => {
-      if (null != res && null != res.code ) {
-        if (res.code === 200) {
-          ElMessage.success('费用信息保存:' + res['msg']);
-          const paramStr2 = {
-            appNo: props.data?.pageName === 'priceInquiry' ? props.data?.cInquiryNo : props.data?.cAppNo,
-            A1_value:String(freeEditRef.value?.getValue("A1_value")),
-            B1_value:String(freeEditRef.value?.getValue("B1_value")),
-            Coper: JSON.parse(String(sessionStorage.getItem("user"))).opCde,
-          };
-          updateIIogFee(paramStr2)
-          .then((res1:any) => {
-            if (null != res1 && null != res1['code']) {
-              if (res1['code'] === 200) {
-                compareAppFee('1');
-                ElMessage.success('iLog费用信息同步:' + res1['msg'],);
+          .then((res:any) => {
+            if (null != res && null != res.code ) {
+              if (res.code === 200) {
+                ElMessage.success('费用信息保存:' + res['msg']);
+                const paramStr2 = {
+                  appNo: props.data?.pageName === 'priceInquiry' ? props.data?.cInquiryNo : props.data?.cAppNo,
+                  A1_value:String(freeEditRef.value?.getValue("A1_value")),
+                  B1_value:String(freeEditRef.value?.getValue("B1_value")),
+                  Coper: JSON.parse(String(sessionStorage.getItem("user"))).opCde,
+                };
+                updateIIogFee(paramStr2)
+                .then((res1:any) => {
+                  if (null != res1 && null != res1['code']) {
+                    if (res1['code'] === 200) {
+                      ElMessage.success('iLog费用信息同步:' + res1['msg'],);
+                    } else {
+                      ElMessage.error('iLog费用信息同步失败');
+                    }
+                  }
+                })
+                .finally(() => { });
+
               } else {
-                ElMessage.error('iLog费用信息同步失败');
+                ElMessage.error('费用信息保存失败');
               }
             }
           })
-          .finally(() => { });
-
-        } else {
-          ElMessage.error('费用信息保存失败');
-        }
       }
-    })
-    .finally(() => { });
-        }
-        return;
+      return;
     }
   }
 }

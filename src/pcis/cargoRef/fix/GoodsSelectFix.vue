@@ -47,7 +47,7 @@
           <template #default="{ row }">
             <el-input-number
                 v-model="row.value"
-                :precision="4"
+                :precision="8"
                 :step="0.0001"
                 :min="0.0001"
                 controls-position="right"
