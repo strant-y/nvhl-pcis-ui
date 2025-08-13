@@ -3000,6 +3000,8 @@ const savePlyInfo = async () => {
       }
       if(props.param?.pageName === "priceInquiry") {
         queryParam['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+        queryParam['tAppTmStart'] = dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00")
+        queryParam['tAppTmEnd'] = dayjs(new Date()).format("YYYY-MM-DD 23:59:59")
         getInquiryPolicyList(queryParam).then((res:any) => {
           if(res.data?.result && res.data?.result.length > 0) {
             const data = res.data?.result[0];
