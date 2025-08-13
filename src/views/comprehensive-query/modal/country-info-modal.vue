@@ -91,16 +91,6 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         title: "国家英文名称",
       },
-        {
-        prop: "portEn",
-        inputtype: "rtinput",
-        title: "港口英文名称",
-         showExBtn: true,
-        btnItems: {
-          "icon": "Search",
-          "type": "primary"
-        },
-      },
       
     ],
     fromUi: createFromUiConfig({

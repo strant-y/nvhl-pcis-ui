@@ -92,9 +92,9 @@ const tableconfig = reactive<AppTableConfig>(
            return row.cIfEdit !== '1';
         },
         tableClick: (row) => {
-  
+            debugger
           if(originalData.value.length==0){
-              originalData.value =    deepClone(formData.value)
+              originalData.value  =    deepClone(formData.value)
           }
           let param = {};
           if(row['cIfMust'] !== '9') {
@@ -111,7 +111,7 @@ const tableconfig = reactive<AppTableConfig>(
           if(row.editList && row.editList.length>0){
             param['editList'] = row.editList
           }
-
+   debugger
           dzmodal.open(specEdit, { type: "view", data: param,
           callback: (res: any) => {
               if (res.type === "ok") {
@@ -276,11 +276,11 @@ const addData =()=>{
 // 获取默认信息
 
 const refreshData = () => {
-  // && parparam.cAppStatus !=='1' 暂存的不处理  parparam.pageType !== "copy" && 
-  if (parparam.pageType !== "app" &&  parparam.pageType !== "template" ) {
-    console.log('不是新单子')
-    return false;
-  }
+  // && parparam.cAppStatus !=='1' 暂存的不处理  parparam.pageType !== "copy" &&  
+  // if (parparam.pageType !== "app" &&   parparam.pageType !== "template" ) {
+  //   console.log('不是新单子')
+  //   return false;
+  // }
    const param = opertaor.getParam();
   const cProdNo =param.cProdNo;
   const cDptCde =param.cDptCde || '';
@@ -295,17 +295,23 @@ const refreshData = () => {
     if (res.data?.result) {
             let len = 0;
             let sel : any[] = [];
-            res.data.result.forEach((item: any,index:number) => {
-              if(item["cIfMust"] == "1"){
-                  item.index = len + 1;
-                  sel.push(item);
-                  len++;
+
+             if (parparam.pageType  == "app"   ) {
+                res.data.result.forEach((item: any,index:number) => {
+                  if(item["cIfMust"] == "1"){
+                      item.index = len + 1;
+                      sel.push(item);
+                      len++;
+                  }
+                });
+                originalData.value =    deepClone(sel)
+                formData.value = sel
+              }else{
+                 originalData.value =    deepClone(res.data.result)
               }
-            });
-            originalData.value =    deepClone(sel)
-            formData.value = sel
 
-
+            console.log('这是数据---1212',originalData.value)
+            console.log('这是数据---1213',formData.value)
 
     }
   });

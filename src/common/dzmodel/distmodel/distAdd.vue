@@ -134,17 +134,30 @@ const formconfig1 = ref<AppFreeEditConfig>(
         type: "primary",
         label: "确定",
         func: async () => {
-          const isValid = await freeEditRef.value?.validate();
-          if(isValid){
+            const productNo = route.params?.param?.cProdNo;
+            const idNumber = getValue('Dist.cIdentificationNumber'); // 证件号码
+            const tBirthDate = getValue('Dist.tBirthDate'); // 出生年月（假设字段名，需替换为实际字段）
+ 
+            // 针对049020、041007产品进行二选一校验
+            const targetProducts = ['049020', '041007'];
+            if (targetProducts.includes(productNo)) {
+              if (!idNumber && !tBirthDate) {
+                ElMessage.error('出生年月和证件号码需至少填写一项');
+                return; // 阻止后续保存逻辑
+                }
+            }
+
+            const isValid = await freeEditRef.value?.validate();
+            if(isValid){
 
 
 
             const s = freeEditRef.value?.getFromValue();
-
             if(!isObjectValid(s)){
               ElMessage.warning('所有字段都未填写请确认！')
               return false;
             }
+
          
             // 经营地址只选择省市区不输入详细地址获取表单值会带有undefined，这里处理一下
             for (let k in s) {
@@ -326,11 +339,11 @@ onMounted(() => {
           setValue('Dist.nAge', age);
         }
       }
-      if(cIs == 1){
-          item['rules'] = [getRules("idCard", {}),{ required: true, message: '该项为必填项', trigger: 'blur' }];
-      }else{
-          item['rules'] = [getRules("idCard", {})];
-      }
+      // if(cIs == 1){
+      //     item['rules'] = [getRules("idCard", {}),{ required: true, message: '该项为必填项', trigger: 'blur' }];
+      // }else{
+      //     item['rules'] = [getRules("idCard", {})];
+      // }
     
     }
  
@@ -338,10 +351,6 @@ onMounted(() => {
     if( route.params.param.cProdNo == '040016' && item.prop =='Dist.cIdentificationNumber' ){
         item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
     }
-
-
-
-
     if(item.prop =='Dist.cEquipmentTypes'){
       item['btnItems']['func'] =  cEquipmentTypesFunc;
     }
@@ -447,27 +456,30 @@ const cEquipmentTypesFunc = ()=>{
       {  width: 85 }
   );
 }
+
 // 证件类型change
-const cDocumentTypeChange =(val:any)=>{
-  console.log(val)
-   const item = freeEditRef.value?.getFromSchemaItem('Dist.cIdentificationNumber')
-       clearValidate('Dist.cIdentificationNumber')  
-    //  身份证
-    if (val == "120001") { 
-     item.itemConfig['rules'] = [ getRules("idCard", {}),...item.itemConfig['rules']];
-    } else if ( val == "110007") {   
-      // 统一社会信用代码校验
-      item.itemConfig['rules'] = [getRules("socialCode", {}),...item.itemConfig['rules']];
-    } else if(val == "19"){
-      // 外国人证件号
-      item.itemConfig['rules'] = [getRules("ariCard", {}),...item.itemConfig['rules']];
-    } else if(val =='110001'){
-      // 组织机构编码校验
-      item.itemConfig['rules'] =[getRules("orgCode", {}),...item.itemConfig['rules']];
-    } else {
-      item.itemConfig['rules'] = [ getRules("isNull", {})];
-    }
-}
+const cDocumentTypeChange = (val: any) => {
+  const cIs = opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered']; // 是否记名投保
+  const productNo = route.params?.param?.cProdNo; // 产品编号（兼容参数不存在的情况）
+
+  const baseRuleMap: Record<string, any[]> = {
+    "120001": [getRules("idCard", {})], // 身份证
+    "110007": [getRules("socialCode", {})], // 统一社会信用代码
+    "19": [getRules("ariCard", {})], // 外国人证件号
+    "110001": [getRules("orgCode", {})], // 组织机构编码
+    default: [] // 默认无规则
+  };
+
+  const baseRules = baseRuleMap[val] || baseRuleMap.default;
+  const isNonRequired =   productNo === '049020' ||   productNo === '041007' || cIs == '1';
+
+  const rules = isNonRequired 
+    ? baseRules // 非必填：仅基础规则
+    : [...baseRules, getRules("required", {})]; // 必填：基础规则+required
+
+  setFormItem('Dist.cIdentificationNumber', { rules });
+};
+
 
 function getAddressstr(val:any, row: any, pitem: any){
   let getv1 = '';  //集联地址
