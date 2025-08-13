@@ -69,6 +69,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
         clearable: true,
         func: (v:string) => {
+          setFormItem('cUndrOpnList',{disabled:false})
+          setFormItem('undrOpn',{disabled:false})
           if ("A" === v) {
             setValue("cUndrOpnList", "");
               setFormItem("cUndrOpnList", {
@@ -96,7 +98,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     }),
   })
 );
+onMounted(()=>{
+  setFormItem('cUndrOpnList',{disabled:true})
+  setFormItem('undrOpn',{disabled:true})
 
+})
 function getFromValue() {
   return underwriteEditRef?.value?.getFromValue();
 }

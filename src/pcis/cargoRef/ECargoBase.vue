@@ -76,9 +76,51 @@ function initComp() {
     }
   });
 }
+function getDaysBetweenDates(dateStr1, dateStr2) {
+  // 提取日期部分（忽略时间）
+  const extractDate = (str) => {
+    const datePart = str.split(' ')[0];
+    const [year, month, day] = datePart.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  };
+
+  // 转换为Date对象
+  const date1 = extractDate(dateStr1);
+  const date2 = extractDate(dateStr2);
+
+  // 计算时间差（毫秒）
+  const timeDiff = Math.abs(date2.getTime() - date1.getTime());
+
+  // 转换为天数
+  const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+
+  return daysDiff;
+}
 //给表单下拉项赋值
 // 绑定方法
 const method = {
+  tInsrncBgnTmChange:(val:any)=>{
+    if(getValue('ECargoBase.tInsrncBgnTm') && getValue('ECargoBase.tInsrncEndTm')){
+      if(new Date(getValue('ECargoBase.tInsrncBgnTm') ) > new Date(getValue('ECargoBase.tInsrncEndTm'))){
+        setValue('ECargoBase.tInsrncBgnTm','')
+        ElMessage.warning("协议开始时间不能晚于结束时间");
+        return
+      }else{
+        setValue( 'ECargoBase.cTmSysCde' ,getDaysBetweenDates(getValue('ECargoBase.tInsrncEndTm'),getValue('ECargoBase.tInsrncBgnTm')))
+      }
+    }
+  },
+  tInsrncEndTmChange:(val:any)=>{
+    if(getValue('ECargoBase.tInsrncBgnTm') && getValue('ECargoBase.tInsrncEndTm')){
+      if(new Date(getValue('ECargoBase.tInsrncBgnTm') ) > new Date(getValue('ECargoBase.tInsrncEndTm'))){
+        setValue('ECargoBase.tInsrncEndTm','')
+        ElMessage.warning("协议结束时间不能早于开始时间");
+        return
+      }else {
+        setValue( 'ECargoBase.cTmSysCde' ,getDaysBetweenDates(getValue('ECargoBase.tInsrncEndTm'),getValue('ECargoBase.tInsrncBgnTm')))
+      }
+    }
+  },
   // func demo
   funcquery: () => {},
 
