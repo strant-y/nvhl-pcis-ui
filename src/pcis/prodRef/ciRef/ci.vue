@@ -310,7 +310,7 @@ const method = {
         return;
       }
       if (val === "0") {
-        if( cCiMrk["Base.cCiMrk"] == '5' || cCiMrk['Base.cCiMrk'] == '3'){
+        if( cCiMrk["Base.cCiMrk"] == '5' ){
           if(rowData['Ci.cDptCde'] == param.cDptCde){
             ElMessage.error("联保单出单方必须是主联单的分公司！");
             freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
@@ -329,7 +329,6 @@ const method = {
         //     freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk",rowId,"")
         //   }
         // }
-        debugger
         if(cCiMrk["Base.cCiMrk"] == '1' || cCiMrk["Base.cCiMrk"] == '5'){
           if(rowData['Ci.cDptCde'] !== param.cDptCde){
             ElMessage.error("联保单出单方必须是主联单的分公司！");
@@ -377,11 +376,11 @@ const method = {
       const existingChief = allRows.some(
         (row) => row._dataId !== rowId && row["Ci.cChiefMrk"] === "1"
       );
-      if (val === "1" && existingChief) {
-        ElMessage.error("主共方只能有一个！");
-        freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowId, "");
-        return;
-      }
+      // if (val === "1" && existingChief) {
+      //   ElMessage.error("主共方只能有一个！");
+      //   freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowId, "");
+      //   return;
+      // }
     // 我方从共时，主共保方必须是我司
     if (cCiMrk["Base.cCiMrk"] === '1' || cCiMrk["Base.cCiMrk"] === '3') {
       if (val === "1" && cCoinsurerCde !== "327001") {
