@@ -26,6 +26,7 @@ const { getRules } = useValidator();
 
 const opertaor = dataOpertaor();
 const dialogRef = ref<DialogMethod | null>(null);
+const params = opertaor.getParam();
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -55,6 +56,19 @@ onMounted(async () => {
   }
   setValue("Base.nAmtRmbExch", "1.000000");
   setValue("Base.nPrmRmbExch", "1.000000");
+
+   // 短期费率类型,以下产品只支持按日的短期费率类型
+  const disabledProducts = [
+    "040016", "059014", "059015", "070002", "043021", 
+    "120008", "059018", "059017", "059016", "043020",
+    "049019", "049020"
+  ];
+  
+  const isDisabled = disabledProducts.includes(params.cProdNo);
+  setFormItem("Base.cRatioTyp", { 
+    disabled: isDisabled
+  });
+
 });
 
 
