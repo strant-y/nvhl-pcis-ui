@@ -2080,6 +2080,11 @@ async function loadAfter() {
   }
   pageLoaded.value = true;
 
+  // 此处为了解决出单时先保费计算再点进保存页面重新加载后点击申请核保又提示先进行保费计算
+  if(sessionStorage.getItem('needCalcValue') && JSON.parse(sessionStorage.getItem('needCalcValue') || '{}') === false) {
+    needCalc.value = false
+    sessionStorage.removeItem('needCalcValue')
+  }
 }
 function addOneYear(a:any) {
   // 将字符串转换为本地时间的日期对象
@@ -3005,6 +3010,7 @@ const savePlyInfo = async () => {
         queryParam['tAppTmEnd'] = dayjs(new Date()).format("YYYY-MM-DD 23:59:59")
         getInquiryPolicyList(queryParam).then((res:any) => {
           if(res.data?.result && res.data?.result.length > 0) {
+            sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
             const data = res.data?.result[0];
             router.replace({
               path: "/pcis/my-page",
@@ -3021,6 +3027,7 @@ const savePlyInfo = async () => {
         queryParam['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
         getAppPolicyList(queryParam).then((res:any) => {
           if(res.data?.result && res.data?.result.length > 0) {
+            sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
             const data = res.data?.result[0];
             router.replace({
               path: "/pcis/my-page",
@@ -3446,6 +3453,7 @@ const saveApplicationEdr = () => {
           }).then((res:any) => {
             if(res.data?.result && res.data?.result.length > 0) {
               const data = res.data?.result[0];
+              sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
               if(data['cEdrRsnBundleCde']){
                   data.cRsnCde = data['cEdrRsnBundleCde'];
               }
@@ -3607,6 +3615,7 @@ const saveEdrPlyInfo = async () => {
       }).then((res:any) => {
         if(res.data?.result && res.data?.result.length > 0) {
           const data = res.data?.result[0];
+          sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
           if(data['cEdrRsnBundleCde']){
               data.cRsnCde = data['cEdrRsnBundleCde'];
           }
