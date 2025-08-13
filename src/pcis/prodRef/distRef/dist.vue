@@ -72,14 +72,10 @@ const props = defineProps({
     type: String
   }
 });
-// const 
 watch(
-    () => opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered'],
+    () => opertaor.getTableRefs()['tgt']?.getFromValue()?.['Tgt.cIsinsuranceRegistered'],
     (n, o) => {
-        // 自动刷新列表获取数据
-        // pageresult.list = []
-        // pageresult.total = 0
-        // 上面代码是仅用于本地调试
+ 
         if (n) {
           // 学生岗位 Dist.cJobType
             if(params.cProdNo === '043010'){

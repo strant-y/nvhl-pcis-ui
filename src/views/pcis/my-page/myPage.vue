@@ -2612,8 +2612,20 @@ const submitToUndrFn = async () => {
 	// 申请核保前判断是否灰黑名单
 	const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
 	const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
-	
-	const res: any = await isUndrClsBlackList({ cInquiryNumber, cAppNo});
+	console.log('param 路由---', props.param )
+  let undrParam = {}
+  if(props.param.pageName && props.param.pageName == "priceInquiry"){
+      undrParam = {
+            cInquiryNumber
+      }
+  }else{
+      undrParam = {
+            cAppNo
+      }
+  }
+
+
+	const res: any = await isUndrClsBlackList(undrParam);
 	if(res.code == 200){
 		if(res.msg != '校验通过'){
 			ElMessage({

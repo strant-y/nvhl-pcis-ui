@@ -34,6 +34,9 @@ import { useRouter, useRoute } from 'vue-router';
 import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
 import dayjs from "dayjs";
 import {getAddressStr} from "@/api/query";
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
+
 const route = useRoute();
 const query = ref(route.query);
 const router = useRouter();
@@ -125,15 +128,60 @@ const tgtOtherMatterList:Array<string> = ["Tgt.cLicenseNumber","Tgt.cFrameNumber
 const tgtIsWaterMatterList:Array<string> = ["Tgt.cTowing","Tgt.cWholeShip","Tgt.cShipName","Tgt.cTransportVoyage","Tgt.nTotalTonnage","Tgt.nShipAge","Tgt.cTransportationName","Tgt.tConstructionYear","Tgt.nTransportationTotalTonnage","Tgt.cShipRegistration","Tgt.nTransportationShipAge","Tgt.cShipType","Tgt.cShipClassOne","Tgt.cShipClassTwo","Tgt.cShipClassThree","Tgt.cOldshipSurcharge"]
 const setIsRule = ()=>{
   if(getValue("Tgt.cTowing") === '1'){
-    setFormItem("Tgt.cShipType", {
-      typeCode: 'Ship_Type',
-      codeParam: { 'cMapCde': '1' },
-    });
+    // setFormItem("Tgt.cShipType", {
+    //   // typeCode: 'Ship_Type',
+    //   // codeParam: { remark: '1' },
+    //   // codeParam: { 'cMapCde': '1' },
+    //      loadData: [
+
+    //             {label: '半潜驳', value: '7', codeKind: 'codeKind'},
+    //             {label: '拖船', value: '8', codeKind: 'codeKind'}
+    //             ]  
+    // });
+ 
+        codeListStore
+          .queryCodeList(
+            {
+              codeListName: "Ship_Type",
+              codeListParam: {
+                remark: "1"
+              },
+            },
+          )
+          .then((res) => {
+            console.log(123123,res)
+            tgtEditRef.value?.addCodeListMap({
+              code: "Tgt.cShipType",
+              list: [
+
+                {label: '半潜驳', value: '7', codeKind: 'codeKind'},
+                {label: '拖船', value: '8', codeKind: 'codeKind'}
+                ]
+            })
+          });
+        
+
+    console.log('进来了？')
   }else {
-    setFormItem("Tgt.cShipType", {
-      typeCode: 'Ship_Type',
-      codeParam: { },
-    });
+    // setFormItem("Tgt.cShipType", {
+    //   typeCode: 'Ship_Type',
+    //   codeParam: { },
+    // });
+            codeListStore
+          .queryCodeList(
+            {
+              codeListName: "Ship_Type",
+              codeListParam: { }, 
+            },
+          )
+          .then((res) => {
+            
+            tgtEditRef.value?.addCodeListMap({
+              code: "Tgt.cShipType",
+              list:res
+            })
+          });
+        
   }
   if(getValue("Tgt.cTowing") === '1' || getValue("Tgt.cWholeShip") === '1'){
     tgtWaterMatterList.forEach(item =>{
@@ -434,7 +482,9 @@ const method = {
   setValue("Tgt.cVehicleAge",calculateCarAge(val))
   },
   getcShippingMethodChange:(val:string)=>{
-    if(val === 'NV591001'){
+    console.log('val',val)
+    // if(val === 'NV591001'){
+    if(val === '03'){
       tgtIsWaterMatterList.forEach(item =>{
         setFormItem(item, {
           hidden: false,
@@ -457,7 +507,8 @@ const method = {
         });
       })
     }
-    if(val === 'NV591003'){
+    // if(val === 'NV591003'){
+    if(val === '05'){
       tgtOtherMatterList.forEach(item =>{
         setFormItem(item, {
           rules: [getRules("required", {})],
@@ -471,7 +522,9 @@ const method = {
       })
     }
   },
+
   getcShippingTypeChange:(val:string)=>{
+    console.log(val);
     if(val === '04'){
       setFormItem("Tgt.cRailwayMode", {
         rules: [getRules("required", {})],
@@ -495,7 +548,21 @@ const method = {
     }
  },
   getcTowingChange:(val:string)=>{
-    setIsRule()
+        setIsRule()
+    // if(val){
+    //   setFormItem('Tgt.cShipType',{
+    //     typeCode: 'Ship_Type',
+    //     codeParam: { 'remark': '1' },
+    //   })
+
+    // }else{
+    //        setFormItem('Tgt.cShipType',{
+    //     typeCode: 'Ship_Type',
+    //     codeParam: { 'remark': '0' },
+    //   })
+    // }
+
+
  },
   getcWholeShipChange:(val:string)=>{
      setIsRule()

@@ -155,6 +155,10 @@ function setEditList(target, source, placeholderPattern = /^\*+$/) {
 
 // 星号修改赋新值
 function newListValue(original, modified, placeholderPattern = /^\*+$/) {
+  // console.log('043002',original)
+  if(!original){
+    return false;
+  }
   const result = [];
   for (let i = 0; i < original.length; i++) {
     // 如果原始位置是占位符
