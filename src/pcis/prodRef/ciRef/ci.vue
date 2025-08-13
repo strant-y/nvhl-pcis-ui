@@ -309,7 +309,7 @@ const method = {
         return;
       }
       if (val === "0") {
-        if(cCiMrk["Base.cCiMrk"] == '1'|| cCiMrk["Base.cCiMrk"] == '5' || cCiMrk['Base.cCiMrk'] == '3'){
+        if( cCiMrk["Base.cCiMrk"] == '5' || cCiMrk['Base.cCiMrk'] == '3'){
           if(rowData['Ci.cDptCde'] == param.cDptCde){
             ElMessage.error("联保单出单方必须是主联单的分公司！");
             freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
@@ -329,7 +329,7 @@ const method = {
         //   }
         // }
         if(cCiMrk["Base.cCiMrk"] == '1' ){
-          if(rowData['Ci.cDptCde'] !== param.cDptCde){
+          if(rowData['Ci.cDptCde'] == param.cDptCde){
             ElMessage.error("联保单出单方必须是主联单的分公司！");
             freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
           }
