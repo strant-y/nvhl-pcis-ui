@@ -206,13 +206,13 @@ onMounted(async () => {
   if(route.params.param?.cGrpMrk !== '1') {
     formconfig11.value.fromSchema = formconfig11.value.fromSchema.filter((item:any) => item.prop !== 'Dist.cRelatedInsured')
   }
-  if(params.cProdNo === '040003'){
-    formconfig11.value.fromSchema?.forEach(item=>{
-      if(item['prop'] ==='Dist.cProductType'){
-        item['typeCode'] = 'Product_Type040003';
-      }
-    })
-  }
+  // if(params.cProdNo === '040003'){
+  //   formconfig11.value.fromSchema?.forEach(item=>{
+  //     if(item['prop'] ==='Dist.cProductType'){
+  //       item['typeCode'] = 'Product_Type040003';
+  //     }
+  //   })
+  // }
 
 
   Object.assign(formconfig1.value, formconfig11.value);
