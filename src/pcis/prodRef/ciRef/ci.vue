@@ -357,7 +357,7 @@ const method = {
     // 主共标志只能选否的条件
     if (rowData['Ci.cDptCde'] !== param.cDptCde && cCiMrk["Base.cCiMrk"] == '5') {
       if (val === "1") {
-        ElMessage.warning("司内联保时出单方必须是主联单的分公司！");
+        ElMessage.error("司内联保时出单方必须是主联单的分公司！");
         freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowId, "0");
         return;
       }
