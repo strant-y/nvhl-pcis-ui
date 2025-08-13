@@ -322,7 +322,7 @@ function shouldDisableRatioTyp(params: any) {
   ];
   
   // 判断当前产品是否在指定列表中且是批改场景
-  return specialProducts.includes(params.cProdNo) && params.pageType === "EDR_APP_NEW_SCENE";
+  return specialProducts.includes(params.cProdNo);
 }
 
 function getFromValue() {
