@@ -575,7 +575,7 @@ onMounted(() => {
       });
       setValue("cIsTransaction", "")
     } else {
-      setFormItem("cRcIsTransactionpt", {
+      setFormItem("cIsTransaction", {
         disabled: true,
       });
       setValue("cIsTransaction", "0")
