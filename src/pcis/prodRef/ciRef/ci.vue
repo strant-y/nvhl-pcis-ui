@@ -293,6 +293,7 @@ const method = {
   },
   //出单标志下拉事件
   clssueMrkChange:  (val)=>{
+    //否0,是1
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData?._dataId;
     const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue()
@@ -339,6 +340,7 @@ const method = {
         const rowItem  =  freeEditRef.value?.getRowAllItemRefById(item._dataId)
         if(item['Ci.cIssueMrk'] == '1'){
           rowItem['Ci.nPlyFeeRate'].disabled = true
+          freeEditRef?.value?.setValueByRowKey("Ci.nPlyFeeRate",rowId,"");
         }else{
           rowItem['Ci.nPlyFeeRate'].disabled = false
         }
@@ -457,7 +459,6 @@ const method = {
       freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", row._dataId, "");
       return;
     }
-    
     // 将输入值转换为浮点数
     const floatValue = parseFloat(val);
     // 校验是否为有效数字
@@ -862,19 +863,12 @@ const initCiInfo = (data: any) => {
     const cBrkSlsCde = opertaor.getTableRefByKey('plyBase').getValue('Base.cBrkSlsCde')
     // 联保机构、出单机构 转 级联组件初始化
     const dptList = [];
-    if(param.cPolicySource === '8'){
-      dptList.push(param['cSecondDptCnm']);
-      if(param['cDptCde']) {
-        dptList.push(param['cDptCde']);
-      }
-    }else {
       if(param['dptCde']) {
         dptList.push(param['dptCde']);
         if(param['cDptCde']) {
           dptList.push(param['cDptCde']);
         }
       }
-    }
     freeEditRef?.value?.addRowByData( {
       'Ci.nSeqNo': 1,
       'Ci.nCiShare': '100.00000000',
