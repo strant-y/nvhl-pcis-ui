@@ -253,12 +253,14 @@ const method = {
         },
         {
           getSelected(selectdata: any) {
-            if(selectdata) {
+            if(selectdata && selectdata.length > 0) {
               const ids = selectdata.map(item => item['Dist.nSeqNo']).join(',');
               setCargoSeq(ids);
-              tremTemplateRefs.value['m0'].dataFlash();
-              dialog.value?.handleClose()
+            }else {
+              setCargoSeq('');
             }
+            tremTemplateRefs.value['m0'].dataFlash();
+            dialog.value?.handleClose()
           }
         },
         {title: '选择货物',  width: 65 }
