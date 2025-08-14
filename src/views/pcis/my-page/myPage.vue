@@ -556,7 +556,10 @@ const props:any = defineProps({
   },
 });
 
-opertaor.setParam(props.param);
+onBeforeMount(() => {
+  // onMounted() 之前
+  opertaor.setParam(props.param);
+});
 
 // 当前加载的组件索引
 const currentIndex = ref(0);
