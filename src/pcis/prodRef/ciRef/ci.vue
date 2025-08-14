@@ -71,6 +71,21 @@ onMounted(async () => {
   setTimeout(() => {
     valideRequired();
     handleEdrAppNewSceneRules(); // 添加这行来确保规则被应用
+  }, 2000);
+  setTimeout(() => {
+    //一般批改和注销
+    if(param?.pageType === "EDR_APP_NEW_SCENE" && (param?.cEdrType == '2' || param?.cEdrType == '3')){
+      const tableList = getFromValue();
+      tableList.forEach((rowD:any) => {
+        const rowItems = freeEditRef.value?.getRowAllItemRefById(rowD._dataId);
+        rowItems['Ci.cSlsCde']['btnItems'].disabled = true;
+        rowItems['Ci.cBrkrCde']['btnItems'].disabled = true;
+        rowItems['Ci.cBrkSlsCde']['btnItems'].disabled = true;
+      });
+      formconfig1.fromSchema?.forEach((item) => {
+        item.disabled = true;
+      });
+    }
   }, 3000);
   formconfig1.fromSchema?.forEach((item:any) => {
     if(item.prop === 'Ci.cCoinsurerCde') {
@@ -340,7 +355,7 @@ const method = {
         const rowItem  =  freeEditRef.value?.getRowAllItemRefById(item._dataId)
         if(item['Ci.cIssueMrk'] == '1'){
           rowItem['Ci.nPlyFeeRate'].disabled = true
-          freeEditRef?.value?.setValueByRowKey("Ci.nPlyFeeRate",rowId,"");
+          freeEditRef?.value?.setValueByRowKey("Ci.nPlyFeeRate",rowId,"0.00");
         }else{
           rowItem['Ci.nPlyFeeRate'].disabled = false
         }
@@ -1071,7 +1086,7 @@ const valideRequired = ()=>{
         // }
         
         // 特殊页面类型处理
-        if (param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && cCiMrkValue =='5' && param.cRsnDetailCde.value == "FZ") {
+        if (param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && cCiMrkValue =='5' && param.cRsnCde == "FZ") {
           formconfig1.fromSchema?.forEach((item) => {
             item.disabled = true;
           });
@@ -1086,7 +1101,7 @@ const valideRequired = ()=>{
 const handleEdrAppNewSceneRules = () => {
   const cCiMrkValue = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
   const tableList = getFromValue();
-  if (param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && cCiMrkValue !== '5' && param.cRsnDetailCde?.value == "47") {
+  if (param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && cCiMrkValue !== '5' && param.cRsnCde == "47") {
     tableList.forEach((rowData: any) => {
       const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId);
       if (rowItem) {
@@ -1105,18 +1120,7 @@ const handleEdrAppNewSceneRules = () => {
       }
     });
   }
-  //司内联保
-  // else if(param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue == '5' && param.cRsnDetailCde?.value == "47") {
-  //   formconfig1.fromSchema?.forEach((item) => {
-  //     item.disabled = true;
-  //   });
-  //   tableList.forEach((rowData:any) => {
-  //     const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId);
-  //     rowItem['Ci.nCiShare'].disabled = true;
-  //     rowItem['Ci.nPlyFeeRate'].disabled = true;
-  //     rowItem['Ci.cCoinsurerCde'].disabled = true;
-  //   });
-  // }
+
 };
 /**
  * 设置下拉列表
