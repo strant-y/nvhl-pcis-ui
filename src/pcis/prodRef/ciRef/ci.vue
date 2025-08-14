@@ -376,11 +376,13 @@ const method = {
       const existingChief = allRows.some(
         (row) => row._dataId !== rowId && row["Ci.cChiefMrk"] === "1"
       );
-      // if (val === "1" && existingChief) {
-      //   ElMessage.error("主共方只能有一个！");
-      //   freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowId, "");
-      //   return;
-      // }
+      if(cCiMrk["Base.cCiMrk"] === '1'){
+        if (val === "1" && existingChief) {
+          ElMessage.error("主共方只能有一个！");
+          freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowId, "");
+          return;
+        }
+      }
     // 我方从共时，主共保方必须是我司
     if (cCiMrk["Base.cCiMrk"] === '1' || cCiMrk["Base.cCiMrk"] === '3') {
       if (val === "1" && cCoinsurerCde !== "327001") {
