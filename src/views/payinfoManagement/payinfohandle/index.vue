@@ -616,7 +616,7 @@ const tableconfig = reactive<AppTableConfig>(
                                         ElMessage.success(msg);
                                         handleQuery();
                                     } else {
-                                        ElMessage.error(msg);
+                                        ElMessage.info(msg);
                                     }
                                 })
                                 .finally(() => { });
