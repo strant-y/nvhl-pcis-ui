@@ -222,6 +222,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             console.log(v,params)
           }
         },
+        disabledDate: (time: Date) => {
+          if(opertaor.getTableRefs().insrnc && opertaor.getTableRefs().insrnc?.getFromValue()) {
+            const beginTm = opertaor.getTableRefs().insrnc?.getFromValue()['Base.tInsrncBgnTm'];
+            const endTm = opertaor.getTableRefs().insrnc?.getFromValue()['Base.tInsrncEndTm'];
+            return time.getTime() > new Date(endTm).getTime() || time.getTime() < new Date(beginTm).getTime()
+          } else {
+            return false;
+          }
+        },
       },
       {
         prop: "EdrBase.cAppPrsnNme",
