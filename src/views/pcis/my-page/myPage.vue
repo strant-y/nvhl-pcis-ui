@@ -4192,7 +4192,8 @@ const validateCiInfo = () => {
   
   debugger
   // 主共保信息验证
-  if (chiefMrkM === 0 || chiefMrkS === 0) {
+  // if (chiefMrkM === 0 || chiefMrkS === 0) {
+  if ( chiefMrkS === 0) {
     ElMessage.error("主共方有且仅有一个！");
     return false;
   }
