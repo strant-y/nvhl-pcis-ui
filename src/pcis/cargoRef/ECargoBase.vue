@@ -46,7 +46,7 @@ const productStore = useProductStore();
 const codeListStore = codeListViewStore();
 const opertaor = dataOpertaor();
 const subDptCde = ref(); //所属分公司
-
+const initFlag = computed(() => formPage.init);
 onMounted(() => {
   const formconfig11 = formInit(
       JSON.stringify(props.pageSchema),
@@ -271,7 +271,7 @@ const method = {
   businessSubFunc: (val) => {
     // 清除代理(经纪)人、代理业务员的值
     const p = opertaor.getParam();
-    if (!p.initFlag) {
+    if (!initFlag.value) {
       setValue("ECargoBase.cBrkrCde", "");
       setValue("ECargoBase.cBrkSlsCde", "");
     }
@@ -492,8 +492,7 @@ const method = {
   },
   //项目类别大类change事件
   cPrjCtgTypChange: (val:any) => {
-    const p = opertaor.getParam();
-    if (!p.initFlag) {
+    if (!initFlag.value) {
       setValue("ECargoBase.cPrjCtgMidTyp", "");
       setValue("ECargoBase.cPrjCtgSubTyp", "");
     }
@@ -525,8 +524,7 @@ const method = {
   },
   //项目类别中类change事件
   cPrjCtgMidTypChange: (val:any) => {
-    const p = opertaor.getParam();
-    if (!p.initFlag) {
+    if (!initFlag.value) {
       setValue("ECargoBase.cPrjCtgSubTyp", "");
     }
     if (val) {

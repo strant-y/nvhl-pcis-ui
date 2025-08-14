@@ -23,6 +23,8 @@ import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import cargoApi from "@/api/cargo";
 import {ElMessage} from "element-plus";
 import {ref} from "vue";
+import {useValidator} from "@/typings/useValidator";
+const { getRules } = useValidator();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 
 const props = defineProps({
@@ -150,6 +152,12 @@ onMounted(async  () => {
     }
     if(['ECargoInsuredDist.cIsSame'].includes(item.prop)) {
       item["func"] = isSameChange;
+    }
+    if(['ECargoInsuredDist.cClntMrk'].includes(item.prop)) {
+      item["func"] = cClntMrkFunc;
+    }
+    if(['ECargoInsuredDist.cIsIndvduBiz'].includes(item.prop)) {
+      item["func"] = cIsIndvduBizChange;
     }
     if(['ECargoInsuredDist.cRegisterAddress'].includes(item.prop)) {
       if(item.groupList.length>0){
@@ -282,7 +290,7 @@ const checkUser = () => {
               // 	if (data[0].hasOwnProperty(key)) {
               // 仅替换以 "Applicant." 开头的键
               // if (key.startsWith('Applicant.')) {
-              // 	const newKey = key.replace('Applicant.', 'ECargoApplicant.');
+              // 	const newKey = key.replace('Applicant.', 'ECargoInsuredDist.');
               // 	result[newKey] = data[0][key];
               // } else {
               // 	result[key] = data[0][key];
@@ -329,8 +337,67 @@ const funCheckUser = (val:any)=>{
   checkUser();
 }
 // 证件类型change
- const InsuredCCertfCls =(val) => {
+ const InsuredCCertfCls =(val:any) => {
   checkUser();
+   if (val == "120001") {
+
+     // setValue('ECargoInsuredDist.cCertfCde','')  //选身份证时清空
+     setFormItem("ECargoInsuredDist.cCertfCde", {
+       rules: [getRules("required", {}), getRules("idCard", {})],
+     });
+     setFormItem("ECargoInsuredDist.tCertfBgnDate", {
+       rules: [getRules("required", {})],
+     });
+
+     setFormItem("ECargoInsuredDist.tCertfEndDate", {
+       rules: [getRules("required", {})],
+     });
+
+     setValue("ECargoInsuredDist.cNation", "1"); // 国籍
+
+   } else if (val == "110002") {
+     setFormItem("ECargoInsuredDist.tCertfEndDate", {
+       rules: [getRules("required", {})],
+     });
+     //证件类型是“营业执照”，参加社会统筹标志变化为必填
+     // 参加社会统筹标志
+     setFormItem("ECargoInsuredDist.cParticiinsocTyp", {
+       rules: [getRules("required", {})],
+     });
+
+   } else if ( val == "110007") {
+     setFormItem("ECargoInsuredDist.tCertfBgnDate", {
+       rules: [getRules("required", {})],
+     });
+     setFormItem("ECargoInsuredDist.tCertfEndDate", {
+       rules: [getRules("required", {})],
+     });
+
+     // 统一社会信用代码校验
+     setFormItem("ECargoInsuredDist.cCertfCde", {
+       rules: [getRules("required", {}),getRules("socialCode", {})],
+     });
+
+     // 为法人  企业成立日期
+     setFormItem("ECargoInsuredDist.tEstablishingDate", {
+       rules: [getRules("required", {})],
+     });
+   } else if(val == "19"){
+     // 外国人证件号
+     setFormItem("ECargoInsuredDist.cCertfCde", {
+       rules: [getRules("required", {}),getRules("ariCard", {})],
+     });
+   } else {
+     setFormItem("ECargoInsuredDist.cCertfCde", {
+       rules: [getRules("required", {})],
+     });
+     setFormItem("ECargoInsuredDist.tCertfBgnDate", { rules: null });
+     setFormItem("ECargoInsuredDist.tCertfEndDate", { rules: null });
+     // 参加社会统筹标志
+     setFormItem("ECargoInsuredDist.cParticiinsocTyp", {
+       rules: null,
+     });
+   }
 }
 // 证件号码change
 const cCertfCdeChange =(val) => {
@@ -363,6 +430,68 @@ function setregistAdd() {
     setValue("ECargoInsuredDist.cClntAddr", a);
   }
 }
+const cIsIndvduBizChange = (val:any)=>{
+  if(val === '1'){
+    setFormItem('ECargoInsuredDist.cTrdCde',{ rules: [getRules("required", {})]})
+  }else{
+    setFormItem('ECargoInsuredDist.cTrdCde',{ rules: null})
+  }
+}
+ const cClntMrkFunc = (val:any)=>{
+    if(val === '1'){
+      setFormItem('ECargoInsuredDist.tBirthday',{disabled:true})
+      setFormItem('ECargoInsuredDist.nAge',{disabled:true})
+      setFormItem('ECargoInsuredDist.cSex',{disabled:true})
+      setFormItem('ECargoInsuredDist.cNation',{disabled:true})
+      codeListStore
+          .queryCodeList({
+            codeListName: "NATURAL_CERTIFICATE_CACHE",
+            codeListParam: {},
+          })
+          .then((res) => {
+            if (
+                !res.some((item) =>
+                    Object.values(item).includes(getValue("ECargoInsuredDist.cCertfCls"))
+                )
+            ) {
+              setValue("ECargoInsuredDist.cCertfCls", "");
+            }
+            setFormItem("ECargoInsuredDist.cCertfCls", {
+              loadData: [],
+            });
+            setFormItem("ECargoInsuredDist.cCertfCls", {
+              loadData: res,
+              rules: [getRules("required", {})],
+            });
+          });
+    }else{
+      codeListStore
+          .queryCodeList({
+            codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
+            codeListParam: {},
+          })
+          .then((res) => {
+            if (
+                !res.some((item) =>
+                    Object.values(item).includes(getValue("ECargoInsuredDist.cCertfCls"))
+                )
+            ) {
+              setValue("ECargoInsuredDist.cCertfCls", "");
+            }
+            setFormItem("ECargoInsuredDist.cCertfCls", {
+              loadData: [],
+            });
+            setFormItem("ECargoInsuredDist.cCertfCls", {
+              loadData: res,
+              rules: [getRules("required", {})],
+            });
+          });
+      setFormItem('ECargoInsuredDist.tBirthday',{disabled:false})
+      setFormItem('ECargoInsuredDist.nAge',{disabled:false})
+      setFormItem('ECargoInsuredDist.cSex',{disabled:false})
+      setFormItem('ECargoInsuredDist.cNation',{disabled:false})
+    }
+  }
 //注册地市是否同上
 const isSameChange = (val:any) => {
 	if (val == "1") {
