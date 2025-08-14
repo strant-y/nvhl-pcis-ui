@@ -512,7 +512,9 @@ const templateDialog = defineAsyncComponent(
  * 锚点点击事件
  */
 const handleAnchorClick = (event, selector) => {
-  event.preventDefault();
+   if (event) {
+    event.preventDefault();
+  }
   // 先设置当前激活的锚点
   activeAnchor.value = selector.substring(1); // 去掉#号
   const target = document.querySelector(selector);
@@ -2717,7 +2719,7 @@ const submitToUndrFn = async () => {
     ElMessage.error("请先进行保费计算!");
     return;
   }
-
+debugger
   /**
    * 联共保判断
    */

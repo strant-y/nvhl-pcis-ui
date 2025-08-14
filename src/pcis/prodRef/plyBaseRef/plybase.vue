@@ -139,7 +139,7 @@ onMounted(async () => {
       })
     }
     // 添加处理 Base.cCiMrk 值为 6 时显示"从联单"的逻辑
-    handleCiMrkDisplay();
+    
     // 询价录单 联共保业务暂时固定非共保业务，不允许选择联共保
     if(param.pageName === "priceInquiry") {
       setFormItem('Base.cCiMrk',{
@@ -164,7 +164,7 @@ const handleCiMrkDisplay = () => {
             { value: "3", label: "外部共保我方主共_无联保" },
             { value: "4", label: "外部共保我方从共_无联保" },
             { value: "5", label: "司内联保_主联" },
-            { value: "6", label: "从联单" } // 添加值为6时的显示文本
+            { value: "6", label: "联保单" } // 添加值为6时的显示文本
           ]
         });
       }
@@ -828,6 +828,7 @@ function setFormValue(value: any) {
     ? "8" 
     : (param?.cPolicySource ?? param?.cRecordType);
   setValue("Base.cPolicySource", policySource);
+  handleCiMrkDisplay();
   }, 1000);
   
 }
