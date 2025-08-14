@@ -478,7 +478,7 @@
             editList: ["cStatus"],
             showSelection: true,
             tableBtnType: "btn",
-            tableBtnWidth: 200,
+            tableBtnWidth: 150,
             fixed:true,
             tableBtnPosition: ref<any>(""),
             tableBtnFixed: "right",

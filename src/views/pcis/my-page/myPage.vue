@@ -14,7 +14,7 @@
               <el-anchor-link
                 v-if="edrbaseFlag"
                 @click="handleAnchorClick($event, `#edrbase`)"
-                class="isActive"
+                :class="activeAnchor === 'edrbase' ? 'isActive' : ''"
               >
                 <!-- <rt-icon
                   :item="{ icon: 'Tickets' }"
@@ -34,6 +34,7 @@
               <el-anchor-link
                 v-if="edritemFlag"
                 @click="handleAnchorClick($event, `#edritem`)"
+                :class="activeAnchor === 'edritem' ? 'isActive' : ''"
               >
                 <!-- <rt-icon
                   :item="{ icon: 'Tickets' }"
@@ -67,7 +68,7 @@
                     : true
                 "
                 @click="handleAnchorClick($event, `#${k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey}`)"
-                :class="!edrbaseFlag && !edritemFlag && i === 0 ? 'isActive' : ''"
+                :class="activeAnchor === (k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey) ? 'isActive' : ''"
               >
                 <!-- <rt-icon
                   :item="{
@@ -243,7 +244,7 @@
 						</template>
           </div>
         </div>
-        <div class="main-content">
+        <div class="main-content" @scroll="handleScroll">
           <div id="edrbase" v-if="edrbaseFlag" style="margin-bottom: 10px">
             <edrbaseRef :ref="(res: any) => {
               if(res && res.addProvide){
@@ -389,6 +390,8 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, onUnmounted, ref } from 'vue';
+import { debounce } from 'lodash-es';
 import { createFreeButtonBase, FreeButtonBase } from "@/shared/button-config";
 import { getProductPage, getRenewalAppPolicy, distMapCollectCompKey } from "../../../api/prod/index";
 import {
@@ -505,6 +508,25 @@ const templateDialog = defineAsyncComponent(
   () => import("./templateDialog.vue")
 );
 
+/**
+ * 锚点点击事件
+ */
+const handleAnchorClick = (event, selector) => {
+  event.preventDefault();
+  // 先设置当前激活的锚点
+  activeAnchor.value = selector.substring(1); // 去掉#号
+  const target = document.querySelector(selector);
+  if (target) {
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent) {
+      mainContent.scrollTo({
+        top: target.offsetTop - 45, // 减去一些偏移量
+        behavior: 'smooth'
+      });
+    }
+  }
+};
+
 const idxParam = {
   opertaorId: 'my-page',
   handleAnchorClick: handleAnchorClick,
@@ -564,6 +586,31 @@ const pageData = ref({}); // 页面数据
 
 let controlFlag = ""; // 用来处理反洗钱 页面窜窜以及显示
 
+// 当前高亮的导航索引
+const activeAnchor = ref('');
+
+// 监听滚动事件
+const handleScroll = debounce(() => {
+  const sections = document.querySelectorAll('.card_, #edrbase, #edritem, #ci, #ciMasterAgreement, #ourCompanyCiShare, #underwriteurl');
+  const scrollPosition = document.querySelector('.main-content')?.scrollTop || 0;
+  // 确保sections存在且有长度
+  if (!sections || sections.length === 0) {
+    return;
+  }
+  sections.forEach((section) => {
+    const sectionTop = section.offsetTop;
+    const sectionHeight = section.clientHeight;
+    const sectionId = section.getAttribute('id');
+
+    if (
+        scrollPosition >= sectionTop - 100 &&
+        scrollPosition < sectionTop + sectionHeight - 100
+    ) {
+      activeAnchor.value = sectionId || '';
+    }
+  });
+}, 100); // 100ms 防抖
+
 // 存所有可显示账户信息场景
 const detailcodeList = [
   { id: "01", name: "变更投保数量" },
@@ -610,7 +657,77 @@ const oldProductResData = ref({})
 
 onMounted(() => {
   console.log('param 路由---', props.param )
-  initPage();
+    initPage().then(() => {
+      nextTick(() => {
+      const mainContent = document.querySelector('.main-content');
+      if (mainContent) {
+        nextTick(() => {
+          setTimeout(highlightFirstVisibleAnchor, 300);
+        });
+        mainContent.addEventListener('scroll', handleScroll);
+        // 初始触发一次
+          setTimeout(() => {
+            handleScroll();
+          }, 500); // 延迟确保所有组件已加载
+      }
+  }); // 延迟执行以确保DOM元素已经渲染
+    });
+});
+
+// 新增：更可靠的元素可见性检测
+const isElementVisible = (element: HTMLElement) => {
+  if (!element) return false;
+  return element.offsetParent !== null &&
+      element.offsetWidth > 0 &&
+      element.offsetHeight > 0;
+};
+
+// 高亮第一个可见锚点方法
+const highlightFirstVisibleAnchor = () => {
+  // 定义所有可能的锚点ID，按页面从上到下的顺序
+  const possibleAnchors = [];
+
+  // 添加批改信息锚点
+  if (edrbaseFlag.value) possibleAnchors.push('edrbase');
+  if (edritemFlag.value) possibleAnchors.push('edritem');
+
+  // 添加页面配置的锚点
+  if (formconfig1[0]?.pageInfo) {
+      formconfig1[0]?.pageInfo?.forEach(k => {
+        const id = k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey;
+        possibleAnchors.push(id);
+      });
+  }else {
+    console.log('formconfig1[0].pageInfo不存在或为空')
+  }
+
+  // 添加其他特殊锚点
+  if (ciFlag.value) possibleAnchors.push('ci');
+  if (ciMasterAgreementFlag.value) possibleAnchors.push('ciMasterAgreement');
+  if (ourCompanyCiShareFlag.value) possibleAnchors.push('ourCompanyCiShare');
+  if (underwriteFlag.value) possibleAnchors.push('underwriteurl');
+  console.log('possibleAnchors：',possibleAnchors);
+  // 查找第一个可见的锚点
+  for (const anchorId of possibleAnchors) {
+    const element = document.getElementById(anchorId);
+    if (element && isElementVisible(element)) {
+      activeAnchor.value = anchorId;
+      break;
+    }
+  }
+
+  // 如果还是没有高亮的，默认第一个
+  if (!activeAnchor.value && possibleAnchors.length > 0) {
+    activeAnchor.value = possibleAnchors[0];
+  }
+};
+
+// 移除滚动监听
+onUnmounted(() => {
+  const mainContent = document.querySelector('.main-content');
+  if (mainContent) {
+    mainContent.removeEventListener('scroll', handleScroll);
+  }
 });
 const getActualRecordType = computed(() => {
   // 优先使用 cPolicySource，如果不存在则使用 cRecordType
@@ -4216,28 +4333,7 @@ function getTotalNum(arr: any[]) {
   }, 0);
 }
 
-/**
- * 锚点点击事件重写 
- * 避免触发路由
- */
-function handleAnchorClick(event: any, targetId: string) {
-  // 阻止默认的路由跳转行为
-  if(event) {
-    event.preventDefault();
-  }
-  // 获取目标元素的ID
-  if (targetId) {
-    scrollByDomId(targetId, "start");
-  }
-  if(document.querySelectorAll('.el-anchor__item') && document.querySelectorAll('.el-anchor__item').length > 0) {
-    document.querySelectorAll('.el-anchor__item').forEach((item:any) => {
-      item.classList.remove('isActive')
-    })
-  }
-  if(event) {
-    event.currentTarget.classList.add('isActive')
-  }
-}
+
 
 opertaor.setFatherPage({
   currentIndex: currentIndex,
