@@ -4048,7 +4048,7 @@ const submitUnderwritingFn = async () => {
   if(props.param?.pageName === "priceInquiry") {
     res["inquiryNo"] = props.param.cInquiryNo;
   }
-  if(res.cUndrMrk === "A") {//核保选项为同意时
+  if(res.cUndrMrk === "A" && props.param?.cProdNo.slice(0,2) !== "04") {//核保选项为同意时(04产品核保同意直接走核保提交接口)
     const deductibleDist = opertaor.getTableRefByKey("deductibleDist")?.getTableData();
     const insured = opertaor.getTableRefByKey("insured")?.getFromValue();
     const applicant = opertaor.getTableRefByKey("applicant")?.getFromValue();
