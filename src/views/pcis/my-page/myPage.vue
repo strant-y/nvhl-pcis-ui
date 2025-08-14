@@ -454,6 +454,7 @@ import { initMultiCodeList } from "@/api/code-list-service";
 import { forEach } from "lodash";
 import {scrollByDomId} from "@/utils/common";
 import { getAppPolicyList, qryEndorseList, delTmpPolicy, queryInsuredList, getInquiryPolicyList} from "@/api/query";
+import {encryptRouterParam} from "@/router";
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -3231,19 +3232,22 @@ const getPlyPolicyFun = () => {
   getAppPolicy(param).then((res: any) => {
     console.log("投保单明细", res);
     if (res["code"] == "200") {
-      const en = JSON.stringify({
-        cAppNo: res["res"]["composition"]["plyBase"][0]["Base.cAppNo"],
-        cAppTyp: res["res"]["composition"]["plyBase"][0]["Base.cAppTyp"],
-        cCiMrk: res["res"]["composition"]["plyBase"][0]["Base.cCiMrk"],
-        cProdNo: res["res"]["composition"]["plyBase"][0]["Base.cProdNo"],
-        cGrpMrk: res["res"]["composition"]["plyBase"][0]["Base.cGrpMrk"],
-        cDptCde: res["res"]["composition"]["plyBase"][0]["Base.cDptCde"],
-        pageType: "readonly",
-        showBtn: false,
-      });
-      const query = new URLSearchParams({ param: en });
-      const url =
-        window.location.origin + "/#/pcis/my-page?" + query.toString();
+      const params: any = {
+        query: {
+          param:  JSON.stringify({
+            cAppNo: res["res"]["composition"]["plyBase"][0]["Base.cAppNo"],
+            cAppTyp: res["res"]["composition"]["plyBase"][0]["Base.cAppTyp"],
+            cCiMrk: res["res"]["composition"]["plyBase"][0]["Base.cCiMrk"],
+            cProdNo: res["res"]["composition"]["plyBase"][0]["Base.cProdNo"],
+            cGrpMrk: res["res"]["composition"]["plyBase"][0]["Base.cGrpMrk"],
+            cDptCde: res["res"]["composition"]["plyBase"][0]["Base.cDptCde"],
+            pageType: "readonly",
+            showBtn: false,
+          })
+        }
+      };
+      encryptRouterParam(params);
+      const url = window.location.origin + "/#/pcis/my-page?param=" + params.query.param;
       window.open(url, "_blank");
     }
   });

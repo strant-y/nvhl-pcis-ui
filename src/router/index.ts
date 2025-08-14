@@ -99,7 +99,7 @@ router.replace = function (location: RouteLocationRaw) {
 };
 
 // 路由参数加密
-function encryptRouterParam(location: RouteLocationRaw) {
+export function encryptRouterParam(location: RouteLocationRaw) {
   if(typeof location === CommonConstants.TYPE_OF_STRING || !location.query) {
     return;
   }
