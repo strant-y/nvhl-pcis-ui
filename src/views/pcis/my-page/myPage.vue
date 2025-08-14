@@ -14,7 +14,7 @@
               <el-anchor-link
                 v-if="edrbaseFlag"
                 @click="handleAnchorClick($event, `#edrbase`)"
-                class="isActive"
+                :class="activeAnchor === 'edrbase' ? 'isActive' : ''"
               >
                 <!-- <rt-icon
                   :item="{ icon: 'Tickets' }"
@@ -34,6 +34,7 @@
               <el-anchor-link
                 v-if="edritemFlag"
                 @click="handleAnchorClick($event, `#edritem`)"
+                :class="activeAnchor === 'edritem' ? 'isActive' : ''"
               >
                 <!-- <rt-icon
                   :item="{ icon: 'Tickets' }"
@@ -67,7 +68,7 @@
                     : true
                 "
                 @click="handleAnchorClick($event, `#${k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey}`)"
-                :class="!edrbaseFlag && !edritemFlag && i === 0 ? 'isActive' : ''"
+                :class="activeAnchor === (k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey) ? 'isActive' : ''"
               >
                 <!-- <rt-icon
                   :item="{
@@ -243,7 +244,7 @@
 						</template>
           </div>
         </div>
-        <div class="main-content">
+        <div class="main-content" @scroll="handleScroll">
           <div id="edrbase" v-if="edrbaseFlag" style="margin-bottom: 10px">
             <edrbaseRef :ref="(res: any) => {
               if(res && res.addProvide){
@@ -389,6 +390,8 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, onUnmounted, ref } from 'vue';
+import { debounce } from 'lodash-es';
 import { createFreeButtonBase, FreeButtonBase } from "@/shared/button-config";
 import { getProductPage, getRenewalAppPolicy, distMapCollectCompKey } from "../../../api/prod/index";
 import {
@@ -505,6 +508,27 @@ const templateDialog = defineAsyncComponent(
   () => import("./templateDialog.vue")
 );
 
+/**
+ * 锚点点击事件
+ */
+const handleAnchorClick = (event, selector) => {
+   if (event) {
+    event.preventDefault();
+  }
+  // 先设置当前激活的锚点
+  activeAnchor.value = selector.substring(1); // 去掉#号
+  const target = document.querySelector(selector);
+  if (target) {
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent) {
+      mainContent.scrollTo({
+        top: target.offsetTop - 45, // 减去一些偏移量
+        behavior: 'smooth'
+      });
+    }
+  }
+};
+
 const idxParam = {
   opertaorId: 'my-page',
   handleAnchorClick: handleAnchorClick,
@@ -534,7 +558,10 @@ const props:any = defineProps({
   },
 });
 
-opertaor.setParam(props.param);
+onBeforeMount(() => {
+  // onMounted() 之前
+  opertaor.setParam(props.param);
+});
 
 // 当前加载的组件索引
 const currentIndex = ref(0);
@@ -563,6 +590,31 @@ const cacheKey = ref();
 const pageData = ref({}); // 页面数据
 
 let controlFlag = ""; // 用来处理反洗钱 页面窜窜以及显示
+
+// 当前高亮的导航索引
+const activeAnchor = ref('');
+
+// 监听滚动事件
+const handleScroll = debounce(() => {
+  const sections = document.querySelectorAll('.card_, #edrbase, #edritem, #ci, #ciMasterAgreement, #ourCompanyCiShare, #underwriteurl');
+  const scrollPosition = document.querySelector('.main-content')?.scrollTop || 0;
+  // 确保sections存在且有长度
+  if (!sections || sections.length === 0) {
+    return;
+  }
+  sections.forEach((section) => {
+    const sectionTop = section.offsetTop;
+    const sectionHeight = section.clientHeight;
+    const sectionId = section.getAttribute('id');
+
+    if (
+        scrollPosition >= sectionTop - 100 &&
+        scrollPosition < sectionTop + sectionHeight - 100
+    ) {
+      activeAnchor.value = sectionId || '';
+    }
+  });
+}, 100); // 100ms 防抖
 
 // 存所有可显示账户信息场景
 const detailcodeList = [
@@ -610,7 +662,77 @@ const oldProductResData = ref({})
 
 onMounted(() => {
   console.log('param 路由---', props.param )
-  initPage();
+    initPage().then(() => {
+      nextTick(() => {
+      const mainContent = document.querySelector('.main-content');
+      if (mainContent) {
+        nextTick(() => {
+          setTimeout(highlightFirstVisibleAnchor, 300);
+        });
+        mainContent.addEventListener('scroll', handleScroll);
+        // 初始触发一次
+          setTimeout(() => {
+            handleScroll();
+          }, 500); // 延迟确保所有组件已加载
+      }
+  }); // 延迟执行以确保DOM元素已经渲染
+    });
+});
+
+// 新增：更可靠的元素可见性检测
+const isElementVisible = (element: HTMLElement) => {
+  if (!element) return false;
+  return element.offsetParent !== null &&
+      element.offsetWidth > 0 &&
+      element.offsetHeight > 0;
+};
+
+// 高亮第一个可见锚点方法
+const highlightFirstVisibleAnchor = () => {
+  // 定义所有可能的锚点ID，按页面从上到下的顺序
+  const possibleAnchors = [];
+
+  // 添加批改信息锚点
+  if (edrbaseFlag.value) possibleAnchors.push('edrbase');
+  if (edritemFlag.value) possibleAnchors.push('edritem');
+
+  // 添加页面配置的锚点
+  if (formconfig1[0]?.pageInfo) {
+      formconfig1[0]?.pageInfo?.forEach(k => {
+        const id = k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey;
+        possibleAnchors.push(id);
+      });
+  }else {
+    console.log('formconfig1[0].pageInfo不存在或为空')
+  }
+
+  // 添加其他特殊锚点
+  if (ciFlag.value) possibleAnchors.push('ci');
+  if (ciMasterAgreementFlag.value) possibleAnchors.push('ciMasterAgreement');
+  if (ourCompanyCiShareFlag.value) possibleAnchors.push('ourCompanyCiShare');
+  if (underwriteFlag.value) possibleAnchors.push('underwriteurl');
+  console.log('possibleAnchors：',possibleAnchors);
+  // 查找第一个可见的锚点
+  for (const anchorId of possibleAnchors) {
+    const element = document.getElementById(anchorId);
+    if (element && isElementVisible(element)) {
+      activeAnchor.value = anchorId;
+      break;
+    }
+  }
+
+  // 如果还是没有高亮的，默认第一个
+  if (!activeAnchor.value && possibleAnchors.length > 0) {
+    activeAnchor.value = possibleAnchors[0];
+  }
+};
+
+// 移除滚动监听
+onUnmounted(() => {
+  const mainContent = document.querySelector('.main-content');
+  if (mainContent) {
+    mainContent.removeEventListener('scroll', handleScroll);
+  }
 });
 const getActualRecordType = computed(() => {
   // 优先使用 cPolicySource，如果不存在则使用 cRecordType
@@ -2080,11 +2202,11 @@ async function loadAfter() {
   }
   pageLoaded.value = true;
 
-  // 此处为了解决出单时先保费计算再点进保存页面重新加载后点击申请核保又提示先进行保费计算
-  if(sessionStorage.getItem('needCalcValue') && JSON.parse(sessionStorage.getItem('needCalcValue') || '{}') === false) {
-    needCalc.value = false
-    sessionStorage.removeItem('needCalcValue')
-  }
+  // // 此处为了解决出单时先保费计算再点进保存页面重新加载后点击申请核保又提示先进行保费计算
+  // if(sessionStorage.getItem('needCalcValue') && JSON.parse(sessionStorage.getItem('needCalcValue') || '{}') === false) {
+  //   needCalc.value = false
+  //   sessionStorage.removeItem('needCalcValue')
+  // }
 }
 function addOneYear(a:any) {
   // 将字符串转换为本地时间的日期对象
@@ -2597,7 +2719,7 @@ const submitToUndrFn = async () => {
     ElMessage.error("请先进行保费计算!");
     return;
   }
-
+debugger
   /**
    * 联共保判断
    */
@@ -2911,8 +3033,8 @@ const savePlyInfo = async () => {
   const btn = getBtn("btn010102");
   btn.loading = true;
   const res = opertaor.getDataAll();
-  // 点击保存之前的申请单号
-  const beforeSaveCappNo = res["plyBase"]["Base.cAppNo"];
+  // // 点击保存之前的申请单号
+  // const beforeSaveCappNo = res["plyBase"]["Base.cAppNo"];
   if(res['ci'] && res['ci'].length>0){
     res['ci'].forEach((item:any)=>{
       if(item['Ci.nCiShare']){
@@ -3006,54 +3128,54 @@ const savePlyInfo = async () => {
       saveDist(appNo);
     }
 
-    // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
-    if((props.param?.pageType === "app" || props.param?.pageType === "template" || props.param?.pageType === "copy" || props.param?.pageType === "inquiryToApp" || props.param.pageType === "orig") && !beforeSaveCappNo && plyBase["Base.cAppNo"]) {
-      const queryParam = {
-        pageSize: 10,
-        pageNum: 1,
-        cDptCde: opertaor.getDataAll().plyBase["Base.cDptCde"],
-        cLoadSub: "1",
-        cDataTyp: "app",
-        queryType: "1"
-      }
-      if(props.param?.pageName === "priceInquiry") {
-        queryParam['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
-        queryParam['tAppTmStart'] = dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00")
-        queryParam['tAppTmEnd'] = dayjs(new Date()).format("YYYY-MM-DD 23:59:59")
-        getInquiryPolicyList(queryParam).then((res:any) => {
-          if(res.data?.result && res.data?.result.length > 0) {
-            sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
-            const data = res.data?.result[0];
-            router.replace({
-              path: "/pcis/my-page",
-              query: {
-                param: JSON.stringify({
-                  ...data,
-                  ...{ pageType: "TEMPORARY_DEPOSIT", pageName: 'priceInquiry' },
-                }),
-              },
-            });
-          }
-        })
-      } else {
-        queryParam['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
-        getAppPolicyList(queryParam).then((res:any) => {
-          if(res.data?.result && res.data?.result.length > 0) {
-            sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
-            const data = res.data?.result[0];
-            router.replace({
-              path: "/pcis/my-page",
-              query: {
-                  param: JSON.stringify({
-                      ...data,
-                      ...{ pageType: "TEMPORARY_DEPOSIT" },
-                  }),
-              },
-            });
-          }
-        })
-      }
-    }
+    // // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
+    // if((props.param?.pageType === "app" || props.param?.pageType === "template" || props.param?.pageType === "copy" || props.param?.pageType === "inquiryToApp" || props.param.pageType === "orig") && !beforeSaveCappNo && plyBase["Base.cAppNo"]) {
+    //   const queryParam = {
+    //     pageSize: 10,
+    //     pageNum: 1,
+    //     cDptCde: opertaor.getDataAll().plyBase["Base.cDptCde"],
+    //     cLoadSub: "1",
+    //     cDataTyp: "app",
+    //     queryType: "1"
+    //   }
+    //   if(props.param?.pageName === "priceInquiry") {
+    //     queryParam['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    //     queryParam['tAppTmStart'] = dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00")
+    //     queryParam['tAppTmEnd'] = dayjs(new Date()).format("YYYY-MM-DD 23:59:59")
+    //     getInquiryPolicyList(queryParam).then((res:any) => {
+    //       if(res.data?.result && res.data?.result.length > 0) {
+    //         sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
+    //         const data = res.data?.result[0];
+    //         router.replace({
+    //           path: "/pcis/my-page",
+    //           query: {
+    //             param: JSON.stringify({
+    //               ...data,
+    //               ...{ pageType: "TEMPORARY_DEPOSIT", pageName: 'priceInquiry' },
+    //             }),
+    //           },
+    //         });
+    //       }
+    //     })
+    //   } else {
+    //     queryParam['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+    //     getAppPolicyList(queryParam).then((res:any) => {
+    //       if(res.data?.result && res.data?.result.length > 0) {
+    //         sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
+    //         const data = res.data?.result[0];
+    //         router.replace({
+    //           path: "/pcis/my-page",
+    //           query: {
+    //               param: JSON.stringify({
+    //                   ...data,
+    //                   ...{ pageType: "TEMPORARY_DEPOSIT" },
+    //               }),
+    //           },
+    //         });
+    //       }
+    //     })
+    //   }
+    // }
     
   } else {
     ElMessage.error(resInfo.msg);
@@ -3430,8 +3552,8 @@ const saveApplicationEdr = () => {
   res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"] =
     res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   console.log(res);
-  // 点击保存之前的申请单号
-  const beforeSaveCappNo = res["data"]["EdrBase"]["EdrBase.cAppNo"];
+  // // 点击保存之前的申请单号
+  // const beforeSaveCappNo = res["data"]["EdrBase"]["EdrBase.cAppNo"];
   saveSurrenEdr(res).then((res) => {
     btn.loading = false;
     console.log("退保保存", res);
@@ -3452,35 +3574,35 @@ const saveApplicationEdr = () => {
             "EdrBase.cEdrRsnDetail"
           ].split(",");
         edrbase.value?.setFormValue(EdrBaseData);
-        // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
-        if(props.param.pageType === "EDR_APP_NEW_SCENE" && !beforeSaveCappNo && EdrBaseData["EdrBase.cAppNo"]) {
-          getAppPolicyList({
-            cAppNo: EdrBaseData["EdrBase.cAppNo"],
-            pageSize: 10,
-            pageNum: 1,
-            cDptCde: opertaor.getDataAll().plyBase["Base.cDptCde"],
-            cLoadSub: "1",
-            cDataTyp: "app",
-            queryType: "1"
-          }).then((res:any) => {
-            if(res.data?.result && res.data?.result.length > 0) {
-              const data = res.data?.result[0];
-              sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
-              if(data['cEdrRsnBundleCde']){
-                  data.cRsnCde = data['cEdrRsnBundleCde'];
-              }
-              router.replace({
-                path: "/pcis/my-page",
-                query: {
-                  param: JSON.stringify({
-                    ...data,
-                    ...{ pageType: "TEMPORARY_DEPOSIT" },
-                  }),
-                },
-              });
-            }
-          })
-        }
+        // // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
+        // if(props.param.pageType === "EDR_APP_NEW_SCENE" && !beforeSaveCappNo && EdrBaseData["EdrBase.cAppNo"]) {
+        //   getAppPolicyList({
+        //     cAppNo: EdrBaseData["EdrBase.cAppNo"],
+        //     pageSize: 10,
+        //     pageNum: 1,
+        //     cDptCde: opertaor.getDataAll().plyBase["Base.cDptCde"],
+        //     cLoadSub: "1",
+        //     cDataTyp: "app",
+        //     queryType: "1"
+        //   }).then((res:any) => {
+        //     if(res.data?.result && res.data?.result.length > 0) {
+        //       const data = res.data?.result[0];
+        //       sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
+        //       if(data['cEdrRsnBundleCde']){
+        //           data.cRsnCde = data['cEdrRsnBundleCde'];
+        //       }
+        //       router.replace({
+        //         path: "/pcis/my-page",
+        //         query: {
+        //           param: JSON.stringify({
+        //             ...data,
+        //             ...{ pageType: "TEMPORARY_DEPOSIT" },
+        //           }),
+        //         },
+        //       });
+        //     }
+        //   })
+        // }
       }
       ElMessage.success(res.msg);
     } else {
@@ -3586,8 +3708,8 @@ const saveEdrPlyInfo = async () => {
       }
     })
   }
-  // 点击保存之前的申请单号
-  const beforeSaveCappNo = res["EdrBase"]["EdrBase.cAppNo"];
+  // // 点击保存之前的申请单号
+  // const beforeSaveCappNo = res["EdrBase"]["EdrBase.cAppNo"];
   const edrInfo: any = await saveEdrAppPlyInfo(res)
   btn.loading = false;
   if(edrInfo["code"] == "200") {
@@ -3614,35 +3736,35 @@ const saveEdrPlyInfo = async () => {
       // 复制保单清单信息到批单中
       saveDist(EdrBaseData['EdrBase.cAppNo'], props.param?.cRsnCde)
     }
-    // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
-    if(props.param.pageType === "EDR_APP_NEW_SCENE" && !beforeSaveCappNo && EdrBaseData["EdrBase.cAppNo"]) {
-      getAppPolicyList({
-        cAppNo: EdrBaseData["EdrBase.cAppNo"],
-        pageSize: 10,
-        pageNum: 1,
-        cDptCde: opertaor.getDataAll().plyBase["Base.cDptCde"],
-        cLoadSub: "1",
-        cDataTyp: "app",
-        queryType: "1"
-      }).then((res:any) => {
-        if(res.data?.result && res.data?.result.length > 0) {
-          const data = res.data?.result[0];
-          sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
-          if(data['cEdrRsnBundleCde']){
-              data.cRsnCde = data['cEdrRsnBundleCde'];
-          }
-          router.replace({
-            path: "/pcis/my-page",
-            query: {
-              param: JSON.stringify({
-                ...data,
-                ...{ pageType: "TEMPORARY_DEPOSIT" },
-              }),
-            },
-          });
-        }
-      })
-    }
+    // // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
+    // if(props.param.pageType === "EDR_APP_NEW_SCENE" && !beforeSaveCappNo && EdrBaseData["EdrBase.cAppNo"]) {
+    //   getAppPolicyList({
+    //     cAppNo: EdrBaseData["EdrBase.cAppNo"],
+    //     pageSize: 10,
+    //     pageNum: 1,
+    //     cDptCde: opertaor.getDataAll().plyBase["Base.cDptCde"],
+    //     cLoadSub: "1",
+    //     cDataTyp: "app",
+    //     queryType: "1"
+    //   }).then((res:any) => {
+    //     if(res.data?.result && res.data?.result.length > 0) {
+    //       const data = res.data?.result[0];
+    //       sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
+    //       if(data['cEdrRsnBundleCde']){
+    //           data.cRsnCde = data['cEdrRsnBundleCde'];
+    //       }
+    //       router.replace({
+    //         path: "/pcis/my-page",
+    //         query: {
+    //           param: JSON.stringify({
+    //             ...data,
+    //             ...{ pageType: "TEMPORARY_DEPOSIT" },
+    //           }),
+    //         },
+    //       });
+    //     }
+    //   })
+    // }
 
   } else {
     ElMessage.error(edrInfo.msg);
@@ -3928,7 +4050,7 @@ const submitUnderwritingFn = async () => {
   if(props.param?.pageName === "priceInquiry") {
     res["inquiryNo"] = props.param.cInquiryNo;
   }
-  if(res.cUndrMrk === "A") {//核保选项为同意时
+  if(res.cUndrMrk === "A" && props.param?.cProdNo.slice(0,2) !== "04") {//核保选项为同意时(04产品核保同意直接走核保提交接口)
     const deductibleDist = opertaor.getTableRefByKey("deductibleDist")?.getTableData();
     const insured = opertaor.getTableRefByKey("insured")?.getFromValue();
     const applicant = opertaor.getTableRefByKey("applicant")?.getFromValue();
@@ -4075,7 +4197,8 @@ const validateCiInfo = () => {
   
   debugger
   // 主共保信息验证
-  if (chiefMrkM === 0 || chiefMrkS === 0) {
+  // if (chiefMrkM === 0 || chiefMrkS === 0) {
+  if ( chiefMrkS === 0) {
     ElMessage.error("主共方有且仅有一个！");
     return false;
   }
@@ -4216,28 +4339,7 @@ function getTotalNum(arr: any[]) {
   }, 0);
 }
 
-/**
- * 锚点点击事件重写 
- * 避免触发路由
- */
-function handleAnchorClick(event: any, targetId: string) {
-  // 阻止默认的路由跳转行为
-  if(event) {
-    event.preventDefault();
-  }
-  // 获取目标元素的ID
-  if (targetId) {
-    scrollByDomId(targetId, "start");
-  }
-  if(document.querySelectorAll('.el-anchor__item') && document.querySelectorAll('.el-anchor__item').length > 0) {
-    document.querySelectorAll('.el-anchor__item').forEach((item:any) => {
-      item.classList.remove('isActive')
-    })
-  }
-  if(event) {
-    event.currentTarget.classList.add('isActive')
-  }
-}
+
 
 opertaor.setFatherPage({
   currentIndex: currentIndex,

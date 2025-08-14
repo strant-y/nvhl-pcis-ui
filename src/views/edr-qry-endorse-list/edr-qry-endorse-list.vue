@@ -911,6 +911,7 @@ const showDetails = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
         cGrpMrk: data.cGrpMrk,
         cDptCde: data.cDptCde,
         cDptCnm: data.cDptCnm,
+        cPolicySource: data.cPolicySource,
         pageType: "readonly",
     });
     router.push({

@@ -479,9 +479,7 @@ const method = {
     const param = opertaor.getParam();
     let app = "";
     if (opertaor.getDataAll()?.plyBase["Base.cAppNo"]) {
-      app = opertaor.getDataAll().plyBase["Base.cAppNo"];   
-    } else if(route.params.param && route.params.param.cAppNo) {
-      app = route.params.param.cAppNo;
+      app = opertaor.getDataAll().plyBase["Base.cAppNo"];
     } else if(param.cOrgAppNo){
       app = param.cOrgAppNo;
     } else if(param.pageType !== "copy") {
