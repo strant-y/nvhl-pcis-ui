@@ -1,5 +1,3 @@
-
-
 export class FreeButtonBase {
   id?: string | undefined | null; // 按钮id
   label?: string | undefined | null; // 按钮名称
@@ -20,6 +18,7 @@ export class FreeButtonBase {
   position?: string; // 表示按钮的位置,默认是往右，设置为'btn-left'居左
   tooltip?: string | undefined | null;
   icon?: string | undefined | null;
+  svgIcon?: string | undefined | null; // 支持本地图标库
   link?: boolean; //是否为链接按钮
   iconSize?: string | undefined | null;
   buttonColor?: string | undefined | null;
@@ -42,6 +41,7 @@ export function createFreeButtonBase(
     type: config.type || "default",
     size: config.size || "default",
     icon: config.icon || null,
+    svgIcon: config.svgIcon || null, // 添加svgIcon支持
     iconSize: config.iconSize || "16",
     span: config.span || 2,
     func: typeof config.func === "function" ? config.func : () => {},
