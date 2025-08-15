@@ -227,12 +227,92 @@ const method = {
   getcRegisterSuffixAddr: (val: any) => {
     setRegisterAdd();
   },
+  funcShareholderNature:(val:any)=>{
+    if (val == "0") {
+      codeListStore
+          .queryCodeList({
+            codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
+            codeListParam: {},
+          })
+          .then((res) => {
+            if (
+                !res.some((item) =>
+                    Object.values(item).includes(getValue("ECargoApplicant.cCertfCls"))
+                )
+            ) {
+              setValue("ECargoApplicant.cShareholderCategory", "");
+            }
+            setFormItem("ECargoApplicant.cShareholderCategory", {
+              loadData: [],
+            });
+            setFormItem("ECargoApplicant.cShareholderCategory", {
+              loadData: res,
+              rules: [getRules("required", {})],
+            });
+          });
+    }else {
+      codeListStore
+          .queryCodeList({
+            codeListName: "NATURAL_CERTIFICATE_CACHE",
+            codeListParam: {},
+          })
+          .then((res) => {
+            if (
+                !res.some((item) =>
+                    Object.values(item).includes(getValue("ECargoApplicant.cCertfCls"))
+                )
+            ) {
+              setValue("ECargoApplicant.cShareholderCategory", "");
+            }
+            setFormItem("ECargoApplicant.cShareholderCategory", {
+              loadData: [],
+            });
+            setFormItem("ECargoApplicant.cShareholderCategory", {
+              loadData: res,
+              rules: [getRules("required", {})],
+            });
+          });
+    }
+  },
+  cIsBranch:(val:any)=>{
+    //ECargoApplicant.cClntMrk 投保人性质 ，ECargoApplicant.cIsBranch 分支机构  ECargoApplicant.cWorkDpt 企业单位性质
+    if ( (getValue('ECargoApplicant.cClntMrk') && getValue('ECargoApplicant.cClntMrk') === '0') && (getValue('ECargoApplicant.cIsBranch') && getValue('ECargoApplicant.cIsBranch') === '0') && (getValue('ECargoApplicant.cWorkDpt') && ['310','320','330','340','350','360'].includes(getValue('ECargoApplicant.cWorkDpt')))){
+      setFormItem("ECargoApplicant.nRegisteredCapital", {
+        rules: [getRules("required", {})],
+      });
+    }else {
+      setFormItem("ECargoApplicant.nRegisteredCapital", {
+        rules: null
+      });
+    }
+  },
+  cWorkDptChange:(val:any)=>{
+    //ECargoApplicant.cClntMrk 投保人性质 ，ECargoApplicant.cIsBranch 分支机构  ECargoApplicant.cWorkDpt 企业单位性质
+    if ( (getValue('ECargoApplicant.cClntMrk') && getValue('ECargoApplicant.cClntMrk') === '0') && (getValue('ECargoApplicant.cIsBranch') && getValue('ECargoApplicant.cIsBranch') === '0') && (getValue('ECargoApplicant.cWorkDpt') && ['310','320','330','340','350','360'].includes(getValue('ECargoApplicant.cWorkDpt')))){
+      setFormItem("ECargoApplicant.nRegisteredCapital", {
+        rules: [getRules("required", {})],
+      });
+    }else {
+      setFormItem("ECargoApplicant.nRegisteredCapital", {
+        rules: null
+      });
+    }
+  },
 	//投保人性质(0是法人 1是个人)
   InsureChange: async (val:any) => {
     console.log('vvvvvvv',val)
     const param = opertaor.getParam();
 
     if (val == "0") {
+      if ( (getValue('ECargoApplicant.cClntMrk') && getValue('ECargoApplicant.cClntMrk') === '0') && (getValue('ECargoApplicant.cIsBranch') && getValue('ECargoApplicant.cIsBranch') === '0') && (getValue('ECargoApplicant.cWorkDpt') && ['310','320','330','340','350','360'].includes(getValue('ECargoApplicant.cWorkDpt')))){
+        setFormItem("ECargoApplicant.nRegisteredCapital", {
+          rules: [getRules("required", {})],
+        });
+      }else {
+        setFormItem("ECargoApplicant.nRegisteredCapital", {
+          rules: null
+        });
+      }
       setFormItem("ECargoApplicant.tBirthday", {
         rules: null
       });

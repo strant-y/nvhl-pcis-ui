@@ -1,55 +1,36 @@
 <template>
   <section class="app-main">
-    <router-view v-if="!currentView?.mode || currentView?.mode === '1'">
+    <router-view v-if="isRouteView">
       <template #default="{ Component, route }">
         <transition
           enter-active-class="animate__animated animate__fadeIn"
           mode="out-in"
           name="expand"
         >
-          <!-- <keep-alive :include="cachedViews"> -->
-            <component :is="Component" :key="route.path"/>
-          <!-- </keep-alive> -->
+          <component :is="Component" :key="route.path"/>
         </transition>
       </template>
     </router-view>
-
-    <!-- 缓存组件状态模式-->
-    <!-- <div v-for="view in compViews" :key="view.compKey">
-      <transition name="expand" mode="out-in" enter-active-class="animate__animated animate__fadeIn">
-        <keep-alive max="6">
-          <component
-            v-if="isActive(view)"
-            :is="view.component"
-            :key="view.compKey"
-            :param="view.params?.param"
-          />
-        </keep-alive>
-      </transition>
-    </div> -->
-      <transition name="expand" mode="out-in" enter-active-class="animate__animated animate__fadeIn">
-        <keep-alive :max="4">
-          <component
-            v-if="isCompView"
+    <transition
+        enter-active-class="animate__animated animate__fadeIn"
+        mode="out-in"
+        name="expand"
+    >
+      <keep-alive :max="6">
+        <component
+            v-if="currentView"
             :is="currentView?.component"
-            :key="currentView?.compKey"
+            :key="currentView.componentKey"
             :param="currentView?.params?.param"
-          />
-        </keep-alive>
-      </transition>
-      <!-- 不活跃的标签完全卸载 -->
-    <component 
-      :is="currentView.component" 
-      :key="compKey + '-no-cache'" 
-      v-if="!isCompView"
-    />
+        />
+      </keep-alive>
+    </transition>
   </section>
 </template>
 
 <script setup lang="ts">
 import { useTagsViewStore } from "@/store";
 import { useRoute } from 'vue-router'
-import { getCompByName } from '@/typings/views-component'
 const route = useRoute();
 
 const tagsViewStore = useTagsViewStore()
@@ -57,17 +38,9 @@ const {
   visitedViews,  // 所有页面
   cachedViews,  // 缓存页面集合
 } = storeToRefs(tagsViewStore);
-
-const currentView = computed(() => visitedViews.value.find(f => f.path === route.path)); // 当前页面
-const compViews = computed(() => visitedViews.value.filter(f => f.mode === '2')); // 组件视图
-
-function isActive(view: TagView, idx: number) {
-  return currentView.value?.path === view.path
-}
-
-const isCompView = () => {
-  return compViews.value.some(f => f.compKey === currentView.value?.compKey)
-};
+const isRouteView = computed(() => !!visitedViews.value.find((v) => v.path === route.path && !v.keepAlive) );
+// 缓存页面时 当前页面
+const currentView = computed(() => cachedViews.value.find(f => f.path === route.path));
 
 </script>
 

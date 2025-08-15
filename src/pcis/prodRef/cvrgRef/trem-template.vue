@@ -784,6 +784,13 @@ function initMethod(){
     if(termdata.value['Term.cUnifiedPremium'] && !pageparam.cEdrType ) {
       methodMap.unifiedPremiumChange(termdata.value['Term.cUnifiedPremium'])
     }
+    // 主条款信息中免赔方式默认为绝对免赔
+    if(termFactormap.value.length > 0) {
+      const cDeductibleMethod = termFactormap.value.filter((item:any) => item.prop === 'Term.cDeductibleMethod')
+      if(cDeductibleMethod.length > 0) {
+        cDeductibleMethod[0]['defaultValue'] = "01"
+      }
+    }
 }
 
 /**
@@ -793,7 +800,7 @@ function initMethod(){
 function initTermsData(item: any) {
   if(item.prop === 'Term.cClaimInclude'){ //是否计入累计赔偿限额 默认选择否
     if(!termdata.value[item.prop]){
-      if(pageparam.cProdNo === "040003" || pageparam.cProdNo === "043002"){
+      if(pageparam.cProdNo === "040003" ){
         termdata.value[item.prop] = '1';
       }else{
         termdata.value[item.prop] = '0';

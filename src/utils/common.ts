@@ -1,5 +1,6 @@
 import Clipboard from "clipboard";
 import { descryptParameter, encryptParameter } from "@/utils/encipher";
+import {CommonConstants} from "@/constants/CommonConstants";
 
 /**
  * 复制功能
@@ -32,7 +33,7 @@ export function copyText (text: string, msg?: string) {
  * @param query 路由参数
  * @returns 
  */
-export function descryptParameterToQuery(query): any {
+export function descryptParameterToQuery(query: any): any {
   const isJsonString = (str: string): boolean => {
     try {
       JSON.parse(str);
@@ -40,8 +41,8 @@ export function descryptParameterToQuery(query): any {
     } catch (e) {
       return false;
     }
-  }
-  const data = {
+  };
+  const data: any = {
     JMquery: {}, // 加密后的路由参数
     JSONquery: {}, // json格式路由参数
     ParseParams: {} // 解析后的路由参数
@@ -49,11 +50,13 @@ export function descryptParameterToQuery(query): any {
   if(Object.keys(query).length === 0) return data;
   for (const key in query) {
     if (Object.prototype.hasOwnProperty.call(query, key)) {
-      if (key !== 'encrypted') {
-        const p = query[key];
-        const keyData = descryptParameter(query[key]);
+      if (!['encrypted'].includes(key) && query[key]) {
+        let keyData = query[key];
+        if(typeof keyData === CommonConstants.TYPE_OF_STRING && keyData.length > 1) {
+          keyData = descryptParameter(query[key]);
+        }
         if (!!keyData) {
-          data.JMquery[key] = p;
+          data.JMquery[key] = query[key];
           data.JSONquery[key] = keyData;
           data.ParseParams[key] = isJsonString(keyData) ? JSON.parse(keyData) : keyData;
         }

@@ -920,7 +920,7 @@ const normalQueryColumns = [
         {
             prop: "policyInfo",
             inputtype: "rtinput",
-            title: "保单",
+            title: "申请单号\n保单号",
             minWidth: 180,
             fixed: "left",
             slotName: "policyInfo"
@@ -1612,5 +1612,8 @@ defineExpose({
 
 .policy-number-row span {
   flex: 1;
+}
+:deep(.el-table th:nth-child(1) .cell) {
+    white-space: pre-line;
 }
 </style>

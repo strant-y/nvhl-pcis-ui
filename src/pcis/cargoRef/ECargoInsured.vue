@@ -172,7 +172,30 @@ const saveTgt = async (res:any)=>{
   const result =  await cargoApi.saveDistNew(newRow)
   loadData()
 }
-
+ function filterFromSchema(obj:any) {
+  // 如果对象不存在或者没有fromSchema属性，直接返回
+  if (!obj || !obj.fromSchema || !Array.isArray(obj.fromSchema)) {
+    return obj;
+  }
+  // 创建新对象的浅拷贝
+  const newObj = {...obj};
+  newObj.fromSchema = newObj.fromSchema.map(item => {
+    if (item.prop === 'ECargoInsuredDist.cCustRiskRank') {
+      return {
+        ...item,
+        loadData: [
+          {
+            "label": "低风险",
+            "value": "952104"
+          }
+        ],
+        disabled:'0'
+      };
+    }
+    return item;
+  });
+  return newObj;
+}
 // 绑定方法
 const method = {
 	// 详情
@@ -380,7 +403,8 @@ const method = {
   },
 	//导出
   exportExcel: () => {
-    let paramitem  = Object.assign(formconfig1.value, {
+    const formconfig = filterFromSchema(formconfig1.value)
+    let paramitem  = Object.assign(formconfig, {
 			// cComponentTable:cComponentTableValue,
 			cComponentTable: "ECargoInsuredDist",
     });
@@ -405,8 +429,9 @@ const method = {
   },
 	// 模板下载
 	downloadTemp: () => {
+    const formconfig = filterFromSchema(formconfig1.value)
     const param = {
-      ...formconfig1.value,
+      ...formconfig,
     }
     const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
     param['cEcAgrAppNo'] = agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
@@ -455,6 +480,7 @@ const method = {
   },
 	// 导入
   importExcelIncrement: () => {
+    const formconfig = filterFromSchema(formconfig1.value)
     const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
     const cappNo  = agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
     if (cappNo == '' || cappNo == undefined) {
@@ -479,7 +505,7 @@ const method = {
 
           // 构建参数并请求接口
           const params = {
-            ...formconfig1.value,
+            ...formconfig,
             file: base64String, // ✅ 正确传入
             // cComponentTable: cComponentTableValue,
             cComponentTable: "ECargoInsuredDist",

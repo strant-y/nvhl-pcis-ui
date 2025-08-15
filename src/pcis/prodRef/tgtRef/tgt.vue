@@ -93,6 +93,14 @@ onMounted(async () => {
   if(params.cProdNo === '045001'){
     setFormItem("Tgt.cInsuranceMethod", {typeCode: 'InsuranceMethod045001'});
   }
+// Tgt.cShippingType
+  // 运输方式  020011  020013 这两种产品 非必填
+  if(params.cProdNo === '020011' ||  params.cProdNo === '020013'){
+    setFormItem("Tgt.cShippingType", { rules: []});
+  }else{
+     setFormItem("Tgt.cShippingType", { rules: [getRules("required", {'trigger':'blur'})]});
+  }
+
   // 约定保期内服务次数正整数
   setFormItem("Tgt.nAgreeFrequency", {
     rules: [getRules("signlessInt", {})],
@@ -829,20 +837,39 @@ const method = {
       setFormItem('Tgt.cShipClassTwo', {disabled:false,rules: [getRules("required", {})]});
     
     } 
-    if(val=='02'){
+    if(val=='02' || val=='03'){
       setFormItem('Tgt.cShipClassThree',{disabled:true,rules: null})
-      setFormItem('Tgt.cShipClassTwo', {codeParam:{classone:'level1'},typeCode:'Ship_Class_Level2'});
+      let cShipClassTwo = getValue('Tgt.cShipClassTwo');
         setValue("Tgt.cShipClassThree", null);
-    }
-    if(val=='03'){
-      setFormItem('Tgt.cShipClassThree',{disabled:true,rules: null})
-      setFormItem('Tgt.cShipClassTwo', {codeParam:{classone:'level2'},typeCode:'Ship_Class_Level2',});
-        setFormValue({
-          "Tgt.cShipClassThree": null,
+        codeListStore
+        .queryCodeList(
+          {
+            codeListName: "Ship_Class_Level2",
+            codeListParam: {
+             classone: val=='02'?'level1' : 'level2'
+            },
+          },
+        )
+        .then((res) => {
+          tgtEditRef.value?.addCodeListMap({
+            code: "Tgt.cShipClassTwo",
+            list: res
+          })
+          if(res.length>0){
+            let delData = true;
+            res.forEach((item:any)=>{
+              if(item['value'] == cShipClassTwo){
+                  delData = false;
+              }
+            })
+            
+            // 判断是否有可以清空的数据
+            if(delData){
+              setValue('Tgt.cShipClassTwo',null)
+            }
+          }
         });
     }
-
- 
   },
   cShipClassTwoChange:(val:any)=>{
      clearValidate('Tgt.cShipClassThree');

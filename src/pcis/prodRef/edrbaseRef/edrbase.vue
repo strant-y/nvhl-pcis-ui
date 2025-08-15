@@ -90,7 +90,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
       },
       {
-        prop: "EdrBase.NSurrRate",
+        prop: "EdrBase.nSurrRate",
         inputtype: "rtnumber",
         title: "手续费比例",
         clearable: true,
@@ -99,7 +99,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           if(v){
             if(v<0 || v>1){
               ElMessage.warning("批改信息的手续费比例 必须为0~1.0之间!")
-              setValue('EdrBase.NSurrRate',0)
+              setValue('EdrBase.nSurrRate',0)
             }
           }
         },
@@ -220,6 +220,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           if(v){
             // debugger
             console.log(v,params)
+          }
+        },
+        disabledDate: (time: Date) => {
+          if(opertaor.getTableRefs().insrnc && opertaor.getTableRefs().insrnc?.getFromValue()) {
+            const beginTm = opertaor.getTableRefs().insrnc?.getFromValue()['Base.tInsrncBgnTm'];
+            const endTm = opertaor.getTableRefs().insrnc?.getFromValue()['Base.tInsrncEndTm'];
+            return time.getTime() > new Date(endTm).getTime() || time.getTime() < new Date(beginTm).getTime()
+          } else {
+            return false;
           }
         },
       },

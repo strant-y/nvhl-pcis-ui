@@ -454,6 +454,7 @@ import { initMultiCodeList } from "@/api/code-list-service";
 import { forEach } from "lodash";
 import {scrollByDomId} from "@/utils/common";
 import { getAppPolicyList, qryEndorseList, delTmpPolicy, queryInsuredList, getInquiryPolicyList} from "@/api/query";
+import {encryptRouterParam} from "@/router";
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -512,7 +513,9 @@ const templateDialog = defineAsyncComponent(
  * 锚点点击事件
  */
 const handleAnchorClick = (event, selector) => {
-  event.preventDefault();
+   if (event) {
+    event.preventDefault();
+  }
   // 先设置当前激活的锚点
   activeAnchor.value = selector.substring(1); // 去掉#号
   const target = document.querySelector(selector);
@@ -556,7 +559,10 @@ const props:any = defineProps({
   },
 });
 
-opertaor.setParam(props.param);
+onBeforeMount(() => {
+  // onMounted() 之前
+  opertaor.setParam(props.param);
+});
 
 // 当前加载的组件索引
 const currentIndex = ref(0);
@@ -881,7 +887,7 @@ const copyPolicyFun = () => {
         ...res.body
       }
       router.push({
-        path: "/pcis/my-page",
+        path: "/pcisapp/myPage",
         query: {
           param: JSON.stringify(param),
         },
@@ -1860,6 +1866,7 @@ async function loadAfter() {
         if(ops.plyBase) {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+          ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
         }
         ops['plyBase']['Base.cPlyNo'] = ''
         if(ops['ci'] && ops['ci'].length>0){
@@ -2005,6 +2012,7 @@ async function loadAfter() {
         if(ops.plyBase) {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+          ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
         }
         if(ops['ci'] && ops['ci'].length>0){
           ops['ci'].forEach((item:any)=>{
@@ -2146,6 +2154,7 @@ async function loadAfter() {
         if(ops.plyBase) {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+          ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
         }
         ops['plyBase']['Base.cPlyNo'] = ''
         ops['plyBase']['Base.cAppStatus'] = ''
@@ -2726,6 +2735,28 @@ const submitToUndrFn = async () => {
         return; // 校验失败则中断后续流程
        }
   }
+  // 新增校验：比较标的中的学生总数与条款中各条目的学生数总和是否一致
+  const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue();
+  const cvrgList = opertaor.getTableRefByKey("cvrg")?.getFromValue();
+  if(props.param.cProdNo === '043010'){
+      if (tgtValue && cvrgList && cvrgList.length > 0) {
+      const nStudentsNumber = tgtValue["Tgt.nStudentsNumber"];
+      const hasStudentFields = cvrgList.some(item => 
+        item.hasOwnProperty('Term.nStudentCount') && item['Term.nStudentCount'] !== undefined
+      );
+      if (nStudentsNumber !== undefined && hasStudentFields) {
+        const totalStudentCount = cvrgList.reduce((sum, item) => {
+          const studentCount = item['Term.nStudentCount'];
+          return sum + (studentCount ? Number(studentCount) : 0);
+        }, 0);
+        if (Number(nStudentsNumber) !== totalStudentCount) {
+          ElMessage.error(`条款中学生总数(${totalStudentCount})与标的信息中的学生总数(${nStudentsNumber})不一致，请核对！`);
+          return;
+        }
+      }
+    }
+  }
+  
 	// 申请核保前判断是否灰黑名单
 	const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
 	const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
@@ -2809,6 +2840,14 @@ const submitToUndrFn = async () => {
   if(nPayAll !== nPrm ){
       ElMessage.warning('缴费计划“应收保费”不等于“总保费”请确认！')
       return false;
+  }
+  // 电梯责任保险 每部电梯累计赔偿限额小于每部电梯每人赔偿限额时校验
+  if(props.param?.cProdNo==='043001') {
+    const cvrgValue = opertaor.getTableRefByKey("cvrg").getFromValue()[0];
+    if(cvrgValue && cvrgValue['Term.nElevatorTotal'] && cvrgValue['Term.nElevatorPerson'] && parseFloat(cvrgValue['Term.nElevatorTotal']) < parseFloat(cvrgValue['Term.nElevatorPerson'])) {
+      ElMessage.warning('“每部电梯累计赔偿限额”不得小于“每部电梯每人赔偿限额”请确认！')
+      return false;
+    }
   }
  
 
@@ -2913,8 +2952,8 @@ const submitToUndrFn = async () => {
                 if(undr['cDecision'] === '1' || undr['cDecision'] === '2'){
                   tagsViewStore.delView({"name": "my-page",
                     "title": "申请单录入",
-                    "path": "/pcis/my-page",
-                    "fullPath": "/pcis/my-page"}).then((res: any) => {
+                    "path": "/pcisapp/myPage",
+                    "fullPath": "/pcisapp/myPage"}).then((res: any) => {
                     router.replace({ path: "/dashboard" });
                   });
                 }
@@ -3226,19 +3265,22 @@ const getPlyPolicyFun = () => {
   getAppPolicy(param).then((res: any) => {
     console.log("投保单明细", res);
     if (res["code"] == "200") {
-      const en = JSON.stringify({
-        cAppNo: res["res"]["composition"]["plyBase"][0]["Base.cAppNo"],
-        cAppTyp: res["res"]["composition"]["plyBase"][0]["Base.cAppTyp"],
-        cCiMrk: res["res"]["composition"]["plyBase"][0]["Base.cCiMrk"],
-        cProdNo: res["res"]["composition"]["plyBase"][0]["Base.cProdNo"],
-        cGrpMrk: res["res"]["composition"]["plyBase"][0]["Base.cGrpMrk"],
-        cDptCde: res["res"]["composition"]["plyBase"][0]["Base.cDptCde"],
-        pageType: "readonly",
-        showBtn: false,
-      });
-      const query = new URLSearchParams({ param: en });
-      const url =
-        window.location.origin + "/#/pcis/my-page?" + query.toString();
+      const params: any = {
+        query: {
+          param:  JSON.stringify({
+            cAppNo: res["res"]["composition"]["plyBase"][0]["Base.cAppNo"],
+            cAppTyp: res["res"]["composition"]["plyBase"][0]["Base.cAppTyp"],
+            cCiMrk: res["res"]["composition"]["plyBase"][0]["Base.cCiMrk"],
+            cProdNo: res["res"]["composition"]["plyBase"][0]["Base.cProdNo"],
+            cGrpMrk: res["res"]["composition"]["plyBase"][0]["Base.cGrpMrk"],
+            cDptCde: res["res"]["composition"]["plyBase"][0]["Base.cDptCde"],
+            pageType: "readonly",
+            showBtn: false,
+          })
+        }
+      };
+      encryptRouterParam(params);
+      const url = window.location.origin + "/#/pcis/my-page?param=" + params.query.param;
       window.open(url, "_blank");
     }
   });
@@ -3998,8 +4040,8 @@ const submitEdrToUndrFun = async () => {
                 if(result['cDecision'] === '1' || result['cDecision'] === '2'){
                   tagsViewStore.delView({"name": "my-page",
                     "title": "申请单录入",
-                    "path": "/pcis/my-page",
-                    "fullPath": "/pcis/my-page"}).then((res: any) => {
+                    "path": "/pcisapp/myPage",
+                    "fullPath": "/pcisapp/myPage"}).then((res: any) => {
                     router.replace({ path: "/dashboard" });
                   });
                 }
@@ -4045,7 +4087,7 @@ const submitUnderwritingFn = async () => {
   if(props.param?.pageName === "priceInquiry") {
     res["inquiryNo"] = props.param.cInquiryNo;
   }
-  if(res.cUndrMrk === "A") {//核保选项为同意时
+  if(res.cUndrMrk === "A" && props.param?.cProdNo.slice(0,2) !== "04") {//核保选项为同意时(04产品核保同意直接走核保提交接口)
     const deductibleDist = opertaor.getTableRefByKey("deductibleDist")?.getTableData();
     const insured = opertaor.getTableRefByKey("insured")?.getFromValue();
     const applicant = opertaor.getTableRefByKey("applicant")?.getFromValue();
@@ -4124,8 +4166,8 @@ const submitUnderwritingFn = async () => {
       if(res['cDecision'] === '1' || res['cDecision'] === '2'){
         tagsViewStore.delView({"name": "my-page",
           "title": "申请单录入",
-          "path": "/pcis/my-page",
-          "fullPath": "/pcis/my-page"}).then((res: any) => {
+          "path": "/pcisapp/myPage",
+          "fullPath": "/pcisapp/myPage"}).then((res: any) => {
           router.replace({ path: "/dashboard" });
         });
       }
@@ -4190,9 +4232,9 @@ const validateCiInfo = () => {
     NCiShare += parseFloat(item['Ci.nCiShare'] || 0);
   });
   
-  debugger
   // 主共保信息验证
-  if (chiefMrkM === 0 || chiefMrkS === 0) {
+  // if (chiefMrkM === 0 || chiefMrkS === 0) {
+  if ( chiefMrkS === 0) {
     ElMessage.error("主共方有且仅有一个！");
     return false;
   }
