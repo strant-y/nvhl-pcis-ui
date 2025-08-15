@@ -4202,7 +4202,7 @@ const submitUnderwritingFn = async () => {
           "title": "申请单录入",
           "path": "/pcis/my-page",
           "fullPath": "/pcis/my-page"}).then((res: any) => {
-          router.replace({ path: "/dashboard" });
+          router.replace({ path: "/pcis-new-udr-list/PendUdrList" });
         });
       }
       // opertaor.setDataAll(ops);
