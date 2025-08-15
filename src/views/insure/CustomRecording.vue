@@ -261,7 +261,7 @@ function next() {
     } else {
       const data = formconfig1.value;
       router.push({
-        path: "/pcis/my-page",
+        path: "/pcisapp/myPage",
         query: {
           param: JSON.stringify({ ...data, ...{ pageType: "app" } }),
         },

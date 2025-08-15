@@ -53,7 +53,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           if (r) {
             const data = freeEditRef.value?.getFromValue();
             router.push({
-              path: "/pcis/my-page",
+              path: "/pcisapp/myPage",
               query: {
                 param: JSON.stringify({ ...data, ...{ pageType: "app" } }),
               },

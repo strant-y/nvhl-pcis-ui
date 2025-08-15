@@ -6,15 +6,21 @@
 			@page-change="handleQuery(false)" @selection-change="handleSelectionChange">
 			<!-- policyInfo 列的具名插槽 -->
 			<template #column-cAppNo="{ row, column, index }">
-				<div class="policy-info-cell">
-					<div v-if="row.cAppNo" class="policy-number-row">
-						<span>{{ row.cAppNo }}</span>
-						<el-icon class="copy-icon" @click="copyText(row.cAppNo)">
-							<DocumentCopy />
-						</el-icon>
-					</div>
-				</div>
-			</template>
+                <div class="policy-info-cell">
+                    <div v-if="row.combinedAppPlyNo && row.combinedAppPlyNo.cAppNo" class="policy-number-row">
+                    <span>{{ row.combinedAppPlyNo.cAppNo }}</span>
+                    <el-icon class="copy-icon" @click="copyText(row.combinedAppPlyNo.cAppNo)">
+                        <DocumentCopy />
+                    </el-icon>
+                    </div>
+                    <div v-if="row.combinedAppPlyNo && row.combinedAppPlyNo.cPlyNo" class="policy-number-row">
+                    <span>{{ row.combinedAppPlyNo.cPlyNo }}</span>
+                    <el-icon class="copy-icon" @click="copyText(row.combinedAppPlyNo.cPlyNo)">
+                        <DocumentCopy />
+                    </el-icon>
+                    </div>
+                </div>
+            </template>
 		</app-table>
 	</div>
 </template>
@@ -815,7 +821,7 @@ const tableconfig = reactive<AppTableConfig>(
                         cTermNme:row['cTermNme'],
                     });
                     router.push({
-                        path: "/pcis/my-page",
+                        path: "/pcisapp/myPage",
                         query: {
                             param: en,
                         },
@@ -827,10 +833,23 @@ const tableconfig = reactive<AppTableConfig>(
 			{
 				prop: "cAppNo",
 				inputtype: "rtinput",
-				title: "申请单号",
-        width: 200,
-        slotName: "cAppNo",
-        fixed: "left"
+				title: "申请单号/保单号",
+                width: 200,
+                slotName: "cAppNo",
+                fixed: "left",
+                formatter: (val: any) => {
+                    // 格式化显示内容，将申请单号和保单号分行显示
+                    if (val && (val.cAppNo || val.cPlyNo)) {
+                    const appNo = val.cAppNo || '';
+                    const plyNo = val.cPlyNo || '';
+                    if (appNo && plyNo) {
+                        return `${appNo}\n${plyNo}`;
+                    } else {
+                        return appNo || plyNo;
+                    }
+                    }
+                    return '';
+                }
 			},
 			{
 				prop: "nTms",
@@ -1028,7 +1047,22 @@ function handleQuery(flag?: boolean) {
           const { code, data, msg } = res;
           if (200 === code) {
             pageresult.list = [];
-            pageresult.list = data.result;
+            // pageresult.list = data.result;
+            // pageresult.total = data.total;
+            if (data && data.result) {
+              const processedList = data.result.map((item: any) => {
+                // 创建合并字段，用于在申请单号/保单号列中显示
+                return {
+                  ...item,
+                  // 添加合并字段，用于显示申请单号和保单号
+                  combinedAppPlyNo: {
+                    cAppNo: item.cAppNo || '',
+                    cPlyNo: item.cPlyNo || ''
+                  }
+                };
+              });
+              pageresult.list = processedList;
+            }
             pageresult.total = data.total;
           } else {
             ElMessage.error(msg);

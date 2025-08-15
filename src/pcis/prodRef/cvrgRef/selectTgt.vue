@@ -136,11 +136,11 @@ onMounted(async () => {
     type: "primary",
     label: "确定",
     func: () => {
-      if (selectedRows.value.length === 0) {
-        ElMessage.warning("请先选择数据");
-        return;
-      }
-      props.method.getSelected(selectedRows.value);
+      // if (selectedRows.value.length === 0) {
+      //   ElMessage.warning("请先选择数据");
+      //   return;
+      // }
+        props.method.getSelected(selectedRows.value);
       },
     }),createFreeButtonBase({
     type: "default",

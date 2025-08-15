@@ -88,6 +88,9 @@ const tableconfig = reactive<AppTableConfig>(
           type: "danger",
           size: "large",
           icon: "Delete",
+          hideBtns: (row) => {
+            if (row.cIfMust == '1') return true;
+          },
           tableClick: (row) => {
             ElMessageBox.confirm("此操作将删除该特约, 是否继续?", "提示", {
               confirmButtonText: "确定",

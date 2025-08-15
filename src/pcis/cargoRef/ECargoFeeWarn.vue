@@ -52,6 +52,14 @@ onMounted(() => {
   console.log(3838, formconfig11);
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
+    console.log('1111',getValue('ECargoBase.nAmt'))
+    console.log('22222',getValue('ECargoBase.nPrm'))
+    if(!getValue('ECargoBase.nAmt')){
+      setFormItem('ECargoBase.AmtProp', {hidden: true})
+    }
+    if(!getValue('ECargoBase.nPrm')){
+      setFormItem('ECargoBase.PrmProp', {hidden: true})
+    }
     if(!getValue('ECargoBase.cWhInsExchCde')){
       setValue('ECargoBase.cWhInsExchCde','1')
     }

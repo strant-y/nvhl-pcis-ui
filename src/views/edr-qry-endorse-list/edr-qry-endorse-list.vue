@@ -911,10 +911,14 @@ const showDetails = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
         cGrpMrk: data.cGrpMrk,
         cDptCde: data.cDptCde,
         cDptCnm: data.cDptCnm,
+        cTermNme: data.cTermNme,
+        cTermNo: data.cTermNo,
+        // cProdNmeCn: data.cProdNmeCn,
+        cPolicySource: data.cPolicySource,
         pageType: "readonly",
     });
     router.push({
-        path: "/pcis/my-page",
+        path: "/pcisapp/myPage",
         query: {
             param: en,
         },
@@ -1001,7 +1005,7 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                         });
                         //预留跳转路径
                         router.push({
-                            path: "/pcis/my-page",
+                            path: "/pcisapp/myPage",
                             query: {
                                 param: en,
                             },
@@ -1029,7 +1033,7 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                         });
                         //预留跳转路径
                         router.push({
-                            path: "/pcis/my-page",
+                            path: "/pcisapp/myPage",
                             query: {
                                 param: en,
                             },
@@ -1059,7 +1063,7 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                         });
                         console.log(en);
                         router.push({
-                            path: "/pcis/my-page",
+                            path: "/pcisapp/myPage",
                             query: {
                                 param: en,
                             },

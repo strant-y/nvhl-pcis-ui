@@ -375,15 +375,41 @@
           />
         </div>
       </el-main>
-      <div class="right-btns">
-        <div class="btns-content" v-if="rightBtnList.length > 0">
-          <rt-button
-            v-for="(bth, idx) in rightBtnList"
-            :item="bth"
-            :key="idx"
-            :loading="bth.loading"
-          />
-        </div>
+      <div class="right-sidebar-trigger">
+        <el-popover
+            placement="left"
+            trigger="click"
+            :width="120"
+            popper-class="action-menu-popper"
+        >
+          <template #reference>
+            <el-button
+                circle
+                class="menu-trigger"
+            >
+              <img src="@/assets/icons/ExpandLeft.svg" alt="Expand Left" width="30" height="30" />
+            </el-button>
+          </template>
+          <div class="btns-content">
+            <el-button
+                v-for="(btn, idx) in rightBtnList"
+                :key="idx"
+                :icon="btn.icon"
+                @click="btn.func"
+                style="margin-bottom: 1px;"
+                class="flex-center"
+            >
+              <svg-icon
+                  v-if="btn.svgIcon"
+                  :icon-class="btn.svgIcon"
+
+                  :size="(btn.iconSize || '16') + 'px'"
+                  style="margin-right: 8px; transition: all 0.3s"
+              />
+              <span>{{ btn.label }}</span>
+            </el-button>
+          </div>
+        </el-popover>
       </div>
     </el-container>
   </div>
@@ -454,6 +480,8 @@ import { initMultiCodeList } from "@/api/code-list-service";
 import { forEach } from "lodash";
 import {scrollByDomId} from "@/utils/common";
 import { getAppPolicyList, qryEndorseList, delTmpPolicy, queryInsuredList, getInquiryPolicyList} from "@/api/query";
+import {encryptRouterParam} from "@/router";
+import SvgIcon from "@/components/SvgIcon/index.vue";
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -512,7 +540,9 @@ const templateDialog = defineAsyncComponent(
  * 锚点点击事件
  */
 const handleAnchorClick = (event, selector) => {
-  event.preventDefault();
+   if (event) {
+    event.preventDefault();
+  }
   // 先设置当前激活的锚点
   activeAnchor.value = selector.substring(1); // 去掉#号
   const target = document.querySelector(selector);
@@ -556,7 +586,10 @@ const props:any = defineProps({
   },
 });
 
-opertaor.setParam(props.param);
+onBeforeMount(() => {
+  // onMounted() 之前
+  opertaor.setParam(props.param);
+});
 
 // 当前加载的组件索引
 const currentIndex = ref(0);
@@ -881,7 +914,7 @@ const copyPolicyFun = () => {
         ...res.body
       }
       router.push({
-        path: "/pcis/my-page",
+        path: "/pcisapp/myPage",
         query: {
           param: JSON.stringify(param),
         },
@@ -992,7 +1025,8 @@ const basicRightBtn = [
     label: "保存模板",
     type: "primary",
     buttonColor: bottomBtnColor1,
-    icon: "Memo",
+    svgIcon: "template2",
+    iconSize: "20",
     func: () => {
       handleSaveTemplate()
     },
@@ -1001,7 +1035,8 @@ const basicRightBtn = [
     label: "复制出单",
     type: "primary",
     buttonColor: bottomBtnColor1,
-    icon: "CopyDocument",
+    svgIcon: "copy2",
+    iconSize: "25", // 设置图标大小为25px
     func: () => {
       copyPolicyFun();
     },
@@ -1010,7 +1045,8 @@ const basicRightBtn = [
     label: "额度明细",
     type: "primary",
     buttonColor: bottomBtnColor1,
-    icon: "Tickets",
+    svgIcon: "limit",
+    iconSize: "25",
     func: () => {
       openLimit();
     },
@@ -1485,7 +1521,8 @@ async function loadAfter() {
         label: "费用信息",
         type: "primary",
         id: "modFee",
-        icon: "Money",
+        svgIcon: "fee1", // 使用本地图标库
+        iconSize: "22", // 设置图标大小
         func: () => {
           //获取费用信息类型接口（缺少渠道，保费，当前表单提交校验待后续补充）
           const params = {};
@@ -1540,7 +1577,8 @@ async function loadAfter() {
         label: "任务痕迹",
         type: "primary",
         id: "taskVestige",
-        icon: "SetUp",
+        svgIcon: "track", // 使用本地图标库
+        iconSize: "20", // 设置图标大小
         func: () => {
           dzmodal
             .open(TaskListVestige, {
@@ -1557,7 +1595,8 @@ async function loadAfter() {
         label: "核保信息",
         type: "primary",
         id: "undrInfo",
-        icon: "DocumentChecked",
+        svgIcon: "Agree", // 使用本地图标库
+        iconSize: "25", // 设置图标大小
         func: () => {
           dzmodal
             .open(UndrOpnList, { type: "", CAppNo: props.param?.cAppNo })
@@ -2187,7 +2226,8 @@ async function loadAfter() {
       label: "历史赔案",
       type: "primary",
       buttonColor: bottomBtnColor1,
-      icon: "Histogram",
+      svgIcon: "histogram", // 使用本地图标库
+      iconSize: "25", // 设置图标大小
       func: () => {
         historyClaimcaseFun();
         // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
@@ -2729,6 +2769,28 @@ const submitToUndrFn = async () => {
         return; // 校验失败则中断后续流程
        }
   }
+  // 新增校验：比较标的中的学生总数与条款中各条目的学生数总和是否一致
+  const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue();
+  const cvrgList = opertaor.getTableRefByKey("cvrg")?.getFromValue();
+  if(props.param.cProdNo === '043010'){
+      if (tgtValue && cvrgList && cvrgList.length > 0) {
+      const nStudentsNumber = tgtValue["Tgt.nStudentsNumber"];
+      const hasStudentFields = cvrgList.some(item => 
+        item.hasOwnProperty('Term.nStudentCount') && item['Term.nStudentCount'] !== undefined
+      );
+      if (nStudentsNumber !== undefined && hasStudentFields) {
+        const totalStudentCount = cvrgList.reduce((sum, item) => {
+          const studentCount = item['Term.nStudentCount'];
+          return sum + (studentCount ? Number(studentCount) : 0);
+        }, 0);
+        if (Number(nStudentsNumber) !== totalStudentCount) {
+          ElMessage.error(`条款中学生总数(${totalStudentCount})与标的信息中的学生总数(${nStudentsNumber})不一致，请核对！`);
+          return;
+        }
+      }
+    }
+  }
+  
 	// 申请核保前判断是否灰黑名单
 	const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
 	const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
@@ -2924,8 +2986,8 @@ const submitToUndrFn = async () => {
                 if(undr['cDecision'] === '1' || undr['cDecision'] === '2'){
                   tagsViewStore.delView({"name": "my-page",
                     "title": "申请单录入",
-                    "path": "/pcis/my-page",
-                    "fullPath": "/pcis/my-page"}).then((res: any) => {
+                    "path": "/pcisapp/myPage",
+                    "fullPath": "/pcisapp/myPage"}).then((res: any) => {
                     router.replace({ path: "/dashboard" });
                   });
                 }
@@ -3153,7 +3215,7 @@ const savePlyInfo = async () => {
     //         sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
     //         const data = res.data?.result[0];
     //         router.replace({
-    //           path: "/pcis/my-page",
+    //           path: "/pcisapp/myPage",
     //           query: {
     //             param: JSON.stringify({
     //               ...data,
@@ -3170,7 +3232,7 @@ const savePlyInfo = async () => {
     //         sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
     //         const data = res.data?.result[0];
     //         router.replace({
-    //           path: "/pcis/my-page",
+    //           path: "/pcisapp/myPage",
     //           query: {
     //               param: JSON.stringify({
     //                   ...data,
@@ -3237,19 +3299,22 @@ const getPlyPolicyFun = () => {
   getAppPolicy(param).then((res: any) => {
     console.log("投保单明细", res);
     if (res["code"] == "200") {
-      const en = JSON.stringify({
-        cAppNo: res["res"]["composition"]["plyBase"][0]["Base.cAppNo"],
-        cAppTyp: res["res"]["composition"]["plyBase"][0]["Base.cAppTyp"],
-        cCiMrk: res["res"]["composition"]["plyBase"][0]["Base.cCiMrk"],
-        cProdNo: res["res"]["composition"]["plyBase"][0]["Base.cProdNo"],
-        cGrpMrk: res["res"]["composition"]["plyBase"][0]["Base.cGrpMrk"],
-        cDptCde: res["res"]["composition"]["plyBase"][0]["Base.cDptCde"],
-        pageType: "readonly",
-        showBtn: false,
-      });
-      const query = new URLSearchParams({ param: en });
-      const url =
-        window.location.origin + "/#/pcis/my-page?" + query.toString();
+      const params: any = {
+        query: {
+          param:  JSON.stringify({
+            cAppNo: res["res"]["composition"]["plyBase"][0]["Base.cAppNo"],
+            cAppTyp: res["res"]["composition"]["plyBase"][0]["Base.cAppTyp"],
+            cCiMrk: res["res"]["composition"]["plyBase"][0]["Base.cCiMrk"],
+            cProdNo: res["res"]["composition"]["plyBase"][0]["Base.cProdNo"],
+            cGrpMrk: res["res"]["composition"]["plyBase"][0]["Base.cGrpMrk"],
+            cDptCde: res["res"]["composition"]["plyBase"][0]["Base.cDptCde"],
+            pageType: "readonly",
+            showBtn: false,
+          })
+        }
+      };
+      encryptRouterParam(params);
+      const url = window.location.origin + "/#/pcis/my-page?param=" + params.query.param;
       window.open(url, "_blank");
     }
   });
@@ -3598,7 +3663,7 @@ const saveApplicationEdr = () => {
         //           data.cRsnCde = data['cEdrRsnBundleCde'];
         //       }
         //       router.replace({
-        //         path: "/pcis/my-page",
+        //         path: "/pcisapp/myPage",
         //         query: {
         //           param: JSON.stringify({
         //             ...data,
@@ -3760,7 +3825,7 @@ const saveEdrPlyInfo = async () => {
     //           data.cRsnCde = data['cEdrRsnBundleCde'];
     //       }
     //       router.replace({
-    //         path: "/pcis/my-page",
+    //         path: "/pcisapp/myPage",
     //         query: {
     //           param: JSON.stringify({
     //             ...data,
@@ -4009,8 +4074,8 @@ const submitEdrToUndrFun = async () => {
                 if(result['cDecision'] === '1' || result['cDecision'] === '2'){
                   tagsViewStore.delView({"name": "my-page",
                     "title": "申请单录入",
-                    "path": "/pcis/my-page",
-                    "fullPath": "/pcis/my-page"}).then((res: any) => {
+                    "path": "/pcisapp/myPage",
+                    "fullPath": "/pcisapp/myPage"}).then((res: any) => {
                     router.replace({ path: "/dashboard" });
                   });
                 }
@@ -4135,8 +4200,8 @@ const submitUnderwritingFn = async () => {
       if(res['cDecision'] === '1' || res['cDecision'] === '2'){
         tagsViewStore.delView({"name": "my-page",
           "title": "申请单录入",
-          "path": "/pcis/my-page",
-          "fullPath": "/pcis/my-page"}).then((res: any) => {
+          "path": "/pcisapp/myPage",
+          "fullPath": "/pcisapp/myPage"}).then((res: any) => {
           router.replace({ path: "/dashboard" });
         });
       }
@@ -4201,9 +4266,9 @@ const validateCiInfo = () => {
     NCiShare += parseFloat(item['Ci.nCiShare'] || 0);
   });
   
-  debugger
   // 主共保信息验证
-  if (chiefMrkM === 0 || chiefMrkS === 0) {
+  // if (chiefMrkM === 0 || chiefMrkS === 0) {
+  if ( chiefMrkS === 0) {
     ElMessage.error("主共方有且仅有一个！");
     return false;
   }
@@ -4889,83 +4954,72 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   padding: 10px 20px;
 }
 
-.right-btns {
-  padding: 0 3rem;
-  margin-top: 42px;
-  min-width: calc(150px + 6rem);
-  .btns-content {
-    background: #FFFFFF;
-    padding: 10px;
-    border-radius: 5px;
+.right-sidebar-trigger {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000;
+}
+.btns-content {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  .flex-center {
     display: flex;
-    flex-direction: column;
-    align-items: start;
-    width: 150px;
-    .el-button {
-      margin: 0 0 12px 0;
-      border: none;
-      background-color: transparent!important;
-      color: #333;
-      padding: 0;
-      :deep(.el-icon) {
-        width: 32px;
-        height: 32px;
-        padding: 6px;
-        border-radius: 2px;
-        margin-right: 10px!important;
-        svg {
-          width: 20px;
-          height: 20px;
-        }
-      }
-      &:last-child {
-        margin-bottom: 0;
-      }
-      &:nth-child(5n + 1) {
-        :deep(.el-icon) {
-          background-color: $btn-icon-bg-color-1;
-          svg {
-            color: $btn-icon-color-1;
-          }
-        }
-      }
-      &:nth-child(5n + 2) {
-        :deep(.el-icon) {
-          background-color: $btn-icon-bg-color-2;
-          svg {
-            color: $btn-icon-color-2;
-          }
-        }
-      }
-      &:nth-child(5n + 3) {
-        :deep(.el-icon) {
-          background-color: $btn-icon-bg-color-3;
-          svg {
-            color: $btn-icon-color-3;
-          }
-        }
-      }
-      &:nth-child(5n + 4) {
-        :deep(.el-icon) {
-          background-color: $btn-icon-bg-color-4;
-          svg {
-            color: $btn-icon-color-4;
-          }
-        }
-      }
-      &:nth-child(5n + 5) {
-        :deep(.el-icon) {
-          background-color: $btn-icon-bg-color-5;
-          svg {
-            color: $btn-icon-color-5;
-          }
-        }
-      }
-    }
+    align-items: center;
   }
 }
-</style>
-<style>
+
+.menu-trigger {
+  background-color: #fff;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+}
+
+.menu-trigger:hover {
+  transform: scale(1.1);
+}
+
+.action-menu-popper {
+  margin-right: 10px !important;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.action-menu-popper .el-button {
+  justify-content: flex-start;
+  padding: 10px 12px;
+  border-radius: 6px;
+  transition: all 0.3s;
+  border: none;
+}
+
+.action-menu-popper .el-button:hover {
+  background-color: #f5f7fa;
+  transform: translateX(4px);
+}
+
+.action-menu-popper .el-button.text {
+  color: #606266;
+}
+
+.action-menu-popper .el-button.text:hover {
+  color: #409eff;
+}
+
+.action-menu-popper .el-button .svg-icon,
+.action-menu-popper .el-button .el-icon {
+  transition: all 0.3s;
+}
+
+.action-menu-popper .el-button:hover .svg-icon,
+.action-menu-popper .el-button:hover .el-icon {
+  transform: scale(1.1);
+}
+
 .queryTermRateMessage {
   max-width: 80%;
   width: auto;

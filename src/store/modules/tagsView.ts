@@ -1,9 +1,12 @@
 import { getIfCompViewByName, getCompByName } from '@/typings/views-component'
 import { clearDataOpertaorByPageKey } from '@/store';
+import {descryptParameterToQuery} from "@/utils/common";
+import {RouteLocationNormalizedLoaded} from "vue-router";
+import {base64encoder} from "@/utils/encipher";
 
 export const useTagsViewStore = defineStore("tagsView", () => {
   const visitedViews = ref<TagView[]>([]);
-  const cachedViews = ref<string[]>([]);
+  const cachedViews = ref<TagView[]>([]);
   /**
    * 添加已访问视图到已访问视图列表中
    */
@@ -28,15 +31,14 @@ export const useTagsViewStore = defineStore("tagsView", () => {
    * 添加缓存视图到缓存视图列表中
    */
   function addCachedView(view: TagView) {
-    const viewName = view.name;
     // 如果缓存视图名称已经存在于缓存视图列表中，则不再添加
-    if (cachedViews.value.includes(viewName)) {
+    if (cachedViews.value.find(item => item.path === view.path)) {
       return;
     }
     // 如果视图需要缓存（keepAlive），则将其路由名称添加到缓存视图列表中
-    // if (view.keepAlive) {
-    //   cachedViews.value.push(viewName);
-    // }
+    if (view.keepAlive) {
+      cachedViews.value.push(view);
+    }
   }
 
   /**
@@ -44,21 +46,15 @@ export const useTagsViewStore = defineStore("tagsView", () => {
    */
   function delVisitedView(view: TagView) {
     return new Promise((resolve) => {
-      for (const [i, v] of visitedViews.value.entries()) {
-        // 找到与指定视图路径匹配的视图，在已访问视图列表中删除该视图
-        if (v.path === view.path) {
-          visitedViews.value = visitedViews.value.filter(item => item.path !== view.path);
-          break;
-        }
-      }
+      const index = visitedViews.value.findIndex(item => view.path === item.path);
+      index > -1 && visitedViews.value.splice(index, 1);
       resolve([...visitedViews.value]);
     });
   }
 
   function delCachedView(view: TagView) {
-    const viewName = view.name;
     return new Promise((resolve) => {
-      const index = cachedViews.value.indexOf(viewName);
+      const index = cachedViews.value.findIndex(item => view.path === item.path);
       index > -1 && cachedViews.value.splice(index, 1);
       resolve([...cachedViews.value]);
     });
@@ -76,7 +72,7 @@ export const useTagsViewStore = defineStore("tagsView", () => {
   function delOtherCachedViews(view: TagView) {
     const viewName = view.name as string;
     return new Promise((resolve) => {
-      const index = cachedViews.value.indexOf(viewName);
+      const index = cachedViews.value.findIndex(item => view.path === item.path);
       if (index > -1) {
         cachedViews.value = cachedViews.value.slice(index, index + 1);
       } else {
@@ -95,42 +91,77 @@ export const useTagsViewStore = defineStore("tagsView", () => {
       }
     }
   }
-
-  /**
-   * 清理冲突视图
-   * @param view 
-   * @returns 
-   */
-  function removeDuplicatesView(view: TagView) {
-    return new Promise((resolve) => { 
-      clearDataOpertaorByPageKey(view.name);
-      if(view.mode === '2' || (getIfCompViewByName(view.name) && !view.compKey)) {
-        const index = visitedViews.value.findIndex(item => item.path === view.path && item.compKey !== view.compKey);
-        if (index !== -1) {
-          visitedViews.value.splice(index, 1);
+  function updateViewParam(route: RouteLocationNormalizedLoaded) {
+    const data = descryptParameterToQuery(route.query);
+    for (let v of visitedViews.value) {
+      if (v.path === route.path) {
+        const view = {
+          query: data.JSONquery,
+          params: data.ParseParams,
         }
+        Object.assign(v, view);
+        break;
       }
-      resolve(true)
-    });
+    }
+    for (let v of cachedViews.value) {
+      if (v.path === route.path) {
+        const view = {
+          query: data.JSONquery,
+          params: data.ParseParams,
+        }
+        Object.assign(v, view);
+        break;
+      }
+    }
+  }
+
+  async function addTagView(route: RouteLocationNormalizedLoaded) {
+    const to = route;
+    if (to.meta.title) {
+      const data = descryptParameterToQuery(to.query);
+      let dynamicTitle: any = to.meta.title;
+      if (data.ParseParams && data.ParseParams.title) {
+        dynamicTitle = data.ParseParams.title;
+      } else if (to.query.title) {
+        dynamicTitle = to.query.title;
+      }
+      const ifCompView = getIfCompViewByName(to.name as string);
+      const view = {
+        name: to.name as string,
+        title: dynamicTitle,
+        path: to.path,
+        fullPath: to.fullPath,
+        affix: to.meta?.affix,
+        keepAlive: to.meta?.keepAlive || ifCompView,
+        hidden: to.meta.hidden,
+        query: data.JSONquery,
+        params: data.ParseParams,
+      };
+
+      if(view.keepAlive) {
+        clearDataOpertaorByPageKey(view.name);
+        await delView(view); // 清理冲突视图
+      }
+      addView(view);
+      moveToCurrentTag(to);
+    }
   }
 
   function addView(view: TagView) {
     let viewData: TagView = view;
-    const ifCompView = getIfCompViewByName(view.name);
-    view.mode = ifCompView ? '2' : '1';
-    if (!!ifCompView) {
+    if (view.keepAlive) {
       // 添加组件模式视图
       viewData = {
         ...view,
         ... {
           isActive: true,
-          compKey: `${view.path}_${Date.now()}`,
+          componentKey: base64encoder(view.path) + new Date().getTime(),
           component: getCompByName(view.name)
         }
       }
     }
     addVisitedView(viewData);
-    // addCachedView(viewData);
+    addCachedView(viewData);
   }
 
   function delView(view: TagView) {
@@ -239,12 +270,11 @@ export const useTagsViewStore = defineStore("tagsView", () => {
               path: route.path,
               fullPath: route.fullPath,
               affix: route.meta?.affix,
-              keepAlive: route.meta?.keepAlive,
+              keepAlive: tag.keepAlive,
               hidden: route.meta.hidden,
               component: tag.component,
               query: tag.query,
               params: tag.params,
-              mode: tag.mode,
             });
           }
         }
@@ -262,7 +292,8 @@ export const useTagsViewStore = defineStore("tagsView", () => {
     delOtherVisitedViews,
     delOtherCachedViews,
     updateVisitedView,
-    addView,
+    updateViewParam,
+    addTagView,
     delView,
     delOtherViews,
     delLeftViews,
@@ -271,6 +302,5 @@ export const useTagsViewStore = defineStore("tagsView", () => {
     delAllVisitedViews,
     delAllCachedViews,
     moveToCurrentTag,
-    removeDuplicatesView
   };
 });
