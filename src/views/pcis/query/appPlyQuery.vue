@@ -170,7 +170,7 @@ function handleQuery() {
 
 const openPlyDtl = (param: any) => {
   router.push({
-    path: "/pcisapp/myPage",
+    path: "/pcis/my-page",
     query: { param: JSON.stringify({...param, ...{pageType: "readonly"}}) }
   });
 }

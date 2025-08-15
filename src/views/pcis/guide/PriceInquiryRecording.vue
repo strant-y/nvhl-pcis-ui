@@ -308,7 +308,7 @@ function next() {
           (res: any) => {
             if (res.code == "200") {
               router.push({
-                path: "/pcisapp/myPage",
+                path: "/pcis/my-page",
                 query: {
                   param: JSON.stringify({ ...data, ...{ queryTyp: "orig" } }),
                   title: "询价单录入" // 直接设置新标题
@@ -322,7 +322,7 @@ function next() {
         );
       } else {
         router.push({
-          path: "/pcisapp/myPage",
+          path: "/pcis/my-page",
           query: {
             param: JSON.stringify({ ...data, ...{ pageType: "app", pageName: "priceInquiry" } }),
              title: "询价单录入" // 直接设置新标题

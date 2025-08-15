@@ -101,7 +101,7 @@ function resetQuery() {
 // 编辑
 function jumpPage(row: any) {
     router.push({
-        path: "/pcisapp/myPage",
+        path: "/pcis/my-page",
         query: {
           param: JSON.stringify({ ...row, ...{ pageType: "template", cPkId: row.cPkId } }),
         },

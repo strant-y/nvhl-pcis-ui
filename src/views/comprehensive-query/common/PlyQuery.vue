@@ -1132,7 +1132,7 @@ const tableObj = {
                     if (r) {
                         const data = row;
                         router.push({
-                            path: "/pcisapp/myPage",
+                            path: "/pcis/my-page",
                             query: {
                                 param: JSON.stringify({
                                     ...data,
