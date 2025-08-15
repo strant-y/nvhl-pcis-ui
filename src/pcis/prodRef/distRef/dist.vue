@@ -95,6 +95,32 @@ watch(
     }
 )
 
+watch(
+    () => opertaor.getTableRefs()['dist']?.getFromValue(),
+    (n, o) => {
+        console.log('监听数据条数',n)
+        // if (n) {
+        //   // 学生岗位 Dist.cJobType
+        //     if(params.cProdNo === '043010'){
+        //           formconfig11.value.fromSchema?.forEach(item=>{
+        //                   if(n == 1 && item.prop !=='Dist.nSeqNo'){
+        //                     item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+        //                   }else if(item.prop !=='Dist.nSeqNo' && item.prop !=='Dist.cJobType') {
+        //                     item['rules'] =[];
+        //                   }
+        //           })
+        //     }
+        // }
+    },
+    {
+        deep: true,
+        immediate: true
+    }
+)
+
+
+
+
 
 
 
@@ -521,6 +547,8 @@ const method = {
 		}
     selectDist(selData).then((res: any) => {
       if (res.code === 200) {
+
+
         pageresult.list = [];
         pageresult.total = res.data.total;
         pageresult.list = res.data.data.map((item, index) => {
@@ -538,6 +566,22 @@ const method = {
             ... data
           };
         });
+
+ 
+
+        console.log('清单数据',props.compKey,pageresult.list)
+    
+        // 040005学生人数（人） 地址清单信息人数 回填
+        if( props.compKey === 'AddressDist040005' ){
+             let peopleNumber: number | null = null;
+              pageresult.list.forEach((item:any)=>{
+                    peopleNumber+= item['Dist.nInsuredNumber'] 
+              })
+              console.log('人员',peopleNumber)
+          tgtRef.setValue('Tgt.nStudentsNumber',peopleNumber)
+        }
+
+
 
         if(tgtRef !== undefined){
           tgtRef.setValue("Tgt.nElevatorsNumber",res.data.total)
@@ -603,6 +647,8 @@ const method = {
                 }, item.countNumber);
             });
         }
+
+
       }
     });
   },

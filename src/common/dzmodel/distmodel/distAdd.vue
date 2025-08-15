@@ -268,6 +268,13 @@ onMounted(() => {
     if( route.params.param.cProdNo == '042003' && item.prop =='Dist.cPlanNo' ){
              item['rules'] = [];
     }
+
+    // 040002 证件号码 必填问题
+    if( route.params.param.cProdNo == '040002' && item.prop =='Dist.cIdentificationNumber'){
+         item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+    
+    }
+  
     // 方案号下拉值
     // if(item.prop == 'Dist.cPlanNo'){
     //   const termref = opertaor.getTableRefByKey("cvrg");

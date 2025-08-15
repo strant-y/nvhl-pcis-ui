@@ -405,7 +405,7 @@ const vehiclePlate = (options = {}) => {
   const { 
     message = "请输入正确的车牌号",
     normalMessage = "普通车牌号格式应为：省份简称+字母+5位数字/字母",
-    newEnergyMessage = "新能源车牌号格式应为：省份简称+字母+6位数字/字母",
+    newEnergyMessage = "请输入正确的车牌号",
     allowSpecial = false
   } = options;
   
@@ -429,7 +429,8 @@ const vehiclePlate = (options = {}) => {
       
       // 新能源车牌正则表达式
       const newEnergyPattern = new RegExp(
-        `^[${provinceChars}][A-HJ-NP-Z]([0-9]{5}[DF]|[DF][A-HJ-NP-Z0-9][0-9]{4})$`
+        // `^[${provinceChars}][A-HJ-NP-Z]([0-9]{5}[DF]|[DF][A-HJ-NP-Z0-9][0-9]{4})$`
+         `/^([京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]{1}[A-Z]{1}(([0-9]{5}[DF])|([DF]([A-HJ-NP-Z0-9])[0-9]{4})))|([京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]{1}[A-Z]{1}[A-HJ-NP-Z0-9]{4}[A-HJ-NP-Z0-9挂学警港澳]{1})$/`
       );
       
       // 验证逻辑

@@ -2719,7 +2719,7 @@ const submitToUndrFn = async () => {
     ElMessage.error("请先进行保费计算!");
     return;
   }
-debugger
+// debugger
   /**
    * 联共保判断
    */
@@ -3029,12 +3029,13 @@ const openLimit = () => {
  * 投保单保存
  * **/
 const savePlyInfo = async () => {
+  
   let saveFlag = false;
   const btn = getBtn("btn010102");
   btn.loading = true;
   const res = opertaor.getDataAll();
-  // // 点击保存之前的申请单号
-  // const beforeSaveCappNo = res["plyBase"]["Base.cAppNo"];
+ 
+  // 点击保存之前的申请单号 
   if(res['ci'] && res['ci'].length>0){
     res['ci'].forEach((item:any)=>{
       if(item['Ci.nCiShare']){
@@ -3043,18 +3044,20 @@ const savePlyInfo = async () => {
     })
   }
 
-
   let payList = res.payinfo;
-  // Base.nPrm
-  // payinfo
   if(payList && payList.length>0){
-      let numS =0;
-        payList.forEach((item) => {
-              numS+= item['Pay.nPayablePrm']
-          });
-      let formattedSum = Number(numS.toFixed(2));
-      if(formattedSum>res['base']['Base.nPrm']){
-        ElMessage.error('缴费计划“应收保费”之和大于整单保费！')
+      const toCent = (amount:any) => {
+        return Math.round(Number(amount) * 100); // 转为分并四舍五入
+      };
+      let totalCent = 0;
+      payList.forEach((item:any) => {
+        totalCent += toCent(item['Pay.nPayablePrm']);
+      });
+ 
+      const basePrmCent = toCent(res['base']['Base.nPrm']);
+
+       if(totalCent > basePrmCent){
+         ElMessage.error('缴费计划“应收保费”之和大于整单保费！')
          btn.loading = false;
         return false;
       }

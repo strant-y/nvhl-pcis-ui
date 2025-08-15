@@ -630,6 +630,8 @@ const method = {
         disabled: true,
       });
 
+      console.log('绿色----')
+
          // 是否绿色详情
       setFormItem("Applicant.cGreenIndustryList", {
         rules: null,
