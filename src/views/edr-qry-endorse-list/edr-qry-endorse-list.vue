@@ -911,6 +911,9 @@ const showDetails = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
         cGrpMrk: data.cGrpMrk,
         cDptCde: data.cDptCde,
         cDptCnm: data.cDptCnm,
+        cTermNme: data.cTermNme,
+        cTermNo: data.cTermNo,
+        // cProdNmeCn: data.cProdNmeCn,
         cPolicySource: data.cPolicySource,
         pageType: "readonly",
     });

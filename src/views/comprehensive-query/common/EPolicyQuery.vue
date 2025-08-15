@@ -327,7 +327,7 @@ const tableconfig = reactive<AppTableConfig>(
             {
                 prop: "policyInfo",
                 inputtype: "rtinput",
-                title: "保单",
+                title: "申请单号\n保单号",
                 minWidth: 180,
                 slotName: "policyInfo"
             },
@@ -783,5 +783,8 @@ const copyText = (text: any) => {
 
 :deep(.el-table__body .el-table__row .el-table__cell:first-child .cell) {
     white-space: break-spaces;
+}
+:deep(.el-table th:nth-child(2) .cell) {
+    white-space: pre-line;
 }
 </style>

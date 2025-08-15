@@ -114,7 +114,7 @@ const method = {
           'Ci.nPlyFeeRate': '0.00',
           'Ci.nPlyFee': '0.00',
           'Ci.nComm': '0.00',
-          'Ci.cSlsCde':"",
+          'Ci.cSlsId':"",
           "Ci.cBrkrCde":"",
           "Ci.cBrkSlsCde":"",
           'Ci.cChiefMrk': '',
@@ -128,7 +128,7 @@ const method = {
           'Ci.nPlyFeeRate': '0.00',
           'Ci.nPlyFee': '0.00',
           'Ci.nComm': '0.00',
-          'Ci.cSlsCde':"",
+          'Ci.cSlsId':"",
           "Ci.cBrkrCde":"",
           "Ci.cBrkSlsCde":"",
           'Ci.cChiefMrk': '',
@@ -267,7 +267,7 @@ const method = {
     if(!initFlag.value){
       if (oldSubDptCde !== value?.[0] || oldDptCde !== value?.[1]) {
         // 清空业务员相关信息
-        freeEditRef?.value?.setValueByRowKey("Ci.cSlsCde", rowId, "");
+        freeEditRef?.value?.setValueByRowKey("Ci.cSlsId", rowId, "");
         freeEditRef?.value?.setValueByRowKey("Ci.cSlsNme", rowId, "");
         freeEditRef?.value?.setValueByRowKey("Ci.cBrkrCde", rowId, "");
         freeEditRef?.value?.setValueByRowKey("Ci.cBrkSlsCde", rowId, "");
@@ -316,6 +316,12 @@ const method = {
             freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
           }
         }
+        if(cCiMrk["Base.cCiMrk"] == '3'){ 
+          if(rowData['Ci.cDptCde'] === param.cDptCde){ 
+            ElMessage.error("联保单出单方必须是主联单的分公司！");
+            freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
+          }
+        }
         // else if(cCiMrk['Base.cCiMrk'] == '2' || cCiMrk['Base.cCiMrk'] == '4'){
         //   if(rowData['Ci.cDptCde'] !== param.cDptCde){
         //     ElMessage.error("我方从共时，出单方不能是我司！")
@@ -355,8 +361,8 @@ const method = {
     if (!rowData || !rowId) return;
     const cCoinsurerCde = rowData["Ci.cCoinsurerCde"];
     // 主共标志只能选否的条件
-    // if (rowData['Ci.cDptCde'] !== param.cDptCde && cCiMrk["Base.cCiMrk"] == '5') {
-    if (cCiMrk["Base.cCiMrk"] == '5') {
+    if (rowData['Ci.cDptCde'] !== param.cDptCde && cCiMrk["Base.cCiMrk"] == '5') {
+    // if (cCiMrk["Base.cCiMrk"] == '5') {
       if (val === "1") {
         ElMessage.error("司内联保时出单方必须是主联单的分公司！");
         freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowId, "0");
@@ -589,8 +595,8 @@ const method = {
         },
         method: {
           getSelected: (params) => {
-            freeEditRef.value?.setRowFieldProp(rowId,"Ci.cSlsCde","loadData",[{ label: `${params.CSlsCde}${params.CSlsNme}`, value: params.CSlsCde }])
-            freeEditRef?.value?.setValueByRowKey("Ci.cSlsCde", rowId, params.CSlsCde);
+            freeEditRef.value?.setRowFieldProp(rowId,"Ci.cSlsId","loadData",[{ label: `${params.CSlsCde}${params.CSlsNme}`, value: params.CSlsCde }])
+            freeEditRef?.value?.setValueByRowKey("Ci.cSlsId", rowId, params.CSlsCde);
             freeEditRef?.value?.setValueByRowKey("Ci.cSlsNme", rowId, params.CSlsNme);
             dialogRef.value?.handleClose();
           },
@@ -664,8 +670,11 @@ const method = {
   },
 	// 联共保信息模板下载
 	downloadCiTemplate:() =>{
+    const baseMrk = opertaor.getTableRefByKey("plyBase")
+    const cBsnsTyp = baseMrk.getValue("Base.cBsnsTyp")
 		let param = {
       ...oldPageSchema.value,
+      isAgent:!cBsnsTyp || cBsnsTyp === "19001" ? '0' : '1'
     }
     if(route.params.param?.pageName === "priceInquiry") {
       param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
@@ -799,7 +808,6 @@ const updateMasterAgreementValues = () => {
  * 主共保标识、主联保标识、我司标识变化
  */
 const onChiefMrkChange = () => {
-  debugger;
   const rowData = freeEditRef.value?.getSelectRow();
   const rowId = rowData?._dataId;
   const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue();
@@ -826,6 +834,7 @@ const onChiefMrkChange = () => {
       switch (ciMrkValue) {
         case "3":
         case "1":
+        case "5":
           cChiefMrkVal = '1'; // 主共方
           break;
         default:
@@ -855,7 +864,7 @@ const onChiefMrkChange = () => {
 // 初始化联共保信息
 const initCiInfo = (data: any) => {
   const {cCiMrk} = data;
-  const cChiefMrk = ['1', '3',].includes(cCiMrk) ? '1' : '0';
+  const cChiefMrk = ['1', '3','5'].includes(cCiMrk) ? '1' : '0';
   const dataList = getFromValue();
   if(dataList.length > 0) {
     setFormValue([]);
@@ -882,7 +891,7 @@ const initCiInfo = (data: any) => {
       'Ci.cCoinsurerCde': '327001',
       "Ci.cCiSubComp": param.dptCde,
       'Ci.cDptCde': param.cDptCde,
-      'Ci.cSlsCde': cSlsId,
+      'Ci.cSlsId': cSlsId,
       'Ci.cBrkSlsCde': cBrkSlsCde,
       'dptCascader' : dptList,
     });
@@ -904,10 +913,10 @@ const valideRequired = ()=>{
           freeEditRef.value?.setRowFieldProp(rowData._dataId, 'Ci.nComm', 'disabled', true)
           // 直销业务：业务员必填
           freeEditRef.value?.setRowFieldProp(
-            rowData._dataId, "Ci.cSlsCde", "rules", [getRules("required", {})]
+            rowData._dataId, "Ci.cSlsId", "rules", [getRules("required", {})]
           );
           freeEditRef.value?.setRowFieldProp(
-            rowData._dataId, "Ci.cSlsCde", "disabled", false
+            rowData._dataId, "Ci.cSlsId", "disabled", false
           );
           // 直销业务：代理经纪人和代理业务员非必填且禁用
           freeEditRef.value?.setRowFieldProp(
@@ -940,25 +949,25 @@ const valideRequired = ()=>{
           );
           // 非直销业务：业务员非必填且禁用
           freeEditRef.value?.setRowFieldProp(
-            rowData._dataId, "Ci.cSlsCde", "rules", []
+            rowData._dataId, "Ci.cSlsId", "rules", []
           );
           freeEditRef.value?.setRowFieldProp(
-            rowData._dataId, "Ci.cSlsCde", "disabled", true
+            rowData._dataId, "Ci.cSlsId", "disabled", true
           );
           const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
           if (rowItem) {
-            rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
+            rowItem['Ci.cSlsId']['btnItems'].disabled = true;
           }
         }
         
         // 处理共保公司非永安（327001）的情况
         if(rowData['Ci.cCoinsurerCde'] !=='327001'){
           // 业务员、代理业务员、代理经纪人都禁用且非必填
-          freeEditRef.value?.setRowFieldProp(rowData._dataId, "Ci.cSlsCde", "rules", [])
+          freeEditRef.value?.setRowFieldProp(rowData._dataId, "Ci.cSlsId", "rules", [])
           freeEditRef.value?.setRowFieldProp(rowData._dataId, "Ci.cBrkSlsCde", "rules", [])
           freeEditRef.value?.setRowFieldProp(rowData._dataId, "Ci.cBrkrCde", "rules", [])
           freeEditRef.value?.setRowFieldProp(
-            rowData._dataId, "Ci.cSlsCde", "disabled", true
+            rowData._dataId, "Ci.cSlsId", "disabled", true
           );
           freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.cBrkSlsCde", "disabled", true
@@ -977,7 +986,7 @@ const valideRequired = ()=>{
           freeEditRef.value?.setRowFieldProp(rowData._dataId,"Ci.cPolicyNo","disabled",false)
           const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
           if (rowItem) {
-            rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
+            rowItem['Ci.cSlsId']['btnItems'].disabled = true;
             rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
             rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
           }
@@ -988,10 +997,10 @@ const valideRequired = ()=>{
           if (cBsnsTyp == '19001') {
             // 直销业务：业务员必填且可编辑
             freeEditRef.value?.setRowFieldProp(
-              rowData._dataId, "Ci.cSlsCde", "rules", [getRules("required", {})]
+              rowData._dataId, "Ci.cSlsId", "rules", [getRules("required", {})]
             );
             freeEditRef.value?.setRowFieldProp(
-              rowData._dataId, "Ci.cSlsCde", "disabled", false
+              rowData._dataId, "Ci.cSlsId", "disabled", false
             );
             // 代理经纪人和代理业务员非必填且禁用
             freeEditRef.value?.setRowFieldProp(
@@ -1008,7 +1017,7 @@ const valideRequired = ()=>{
             );
             const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
             if (rowItem) {
-              rowItem['Ci.cSlsCde']['btnItems'].disabled = false; // 放大镜按钮可编辑
+              rowItem['Ci.cSlsId']['btnItems'].disabled = false; // 放大镜按钮可编辑
               rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
               rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
             }
@@ -1028,14 +1037,14 @@ const valideRequired = ()=>{
             );
             // 业务员非必填且禁用
             freeEditRef.value?.setRowFieldProp(
-              rowData._dataId, "Ci.cSlsCde", "rules", []
+              rowData._dataId, "Ci.cSlsId", "rules", []
             );
             freeEditRef.value?.setRowFieldProp(
-              rowData._dataId, "Ci.cSlsCde", "disabled", true
+              rowData._dataId, "Ci.cSlsId", "disabled", true
             );
             const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
             if (rowItem) {
-              rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
+              rowItem['Ci.cSlsId']['btnItems'].disabled = true;
               rowItem['Ci.cBrkrCde']['btnItems'].disabled = false;
               rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = false;
             }
@@ -1064,7 +1073,7 @@ const valideRequired = ()=>{
         // if(param?.cAppTyp == 'A'){ //核保
         //   const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
         //   if (rowItem) {
-        //     rowItem['Ci.cSlsCde']['btnItems'].disabled = true;
+        //     rowItem['Ci.cSlsId']['btnItems'].disabled = true;
         //     rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
         //     rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
         //   }
@@ -1110,12 +1119,12 @@ const handleEdrAppNewSceneRules = () => {
       const tableList = getFromValue();
       tableList?.forEach((rowD:any) => {
         const rowItems = freeEditRef.value?.getRowAllItemRefById(rowD._dataId);
-        rowItems['Ci.cSlsCde']['btnItems'].disabled = true;
+        rowItems['Ci.cSlsId']['btnItems'].disabled = true;
         rowItems['Ci.cBrkrCde']['btnItems'].disabled = true;
         rowItems['Ci.cBrkSlsCde']['btnItems'].disabled = true;
       });
       formconfig1.fromSchema?.forEach((item) => {
-        if(item.prop == "Ci.cSlsCde"){
+        if(item.prop == "Ci.cSlsId"){
           item.disabled = true;
         }
         item.disabled = true;
@@ -1146,11 +1155,11 @@ const initcbusiner = (row:any) =>{
   const rowdata = getFromValue();
   if(rowdata.length >0){
     const rowId = rowdata[0]._dataId;
-    setValueByRowKey('Ci.cSlsCde',rowId, `${row.cSlsId}${row.cSlsNme}`)
-    setValueByRowKey('Ci.cSlsCde',rowId,row.cSlsId)
+    setValueByRowKey('Ci.cSlsId',rowId, `${row.cSlsId}${row.cSlsNme}`)
+    setValueByRowKey('Ci.cSlsId',rowId,row.cSlsId)
     setValueByRowKey('Ci.cSlsNme',rowId,row.cSlsNme)
     freeEditRef.value?.addCodeListMap({
-      code:'Ci.cSlsCde'+rowId,
+      code:'Ci.cSlsId'+rowId,
       list:row.loadData,
     })
   }
@@ -1227,18 +1236,18 @@ function setFormValue(value: any) {
   setTimeout(() => {
     const tableValue = getFromValue()
      tableValue.forEach(async elem => {
-      if(!!elem["Ci.cSlsCde"] && elem["Ci.cSlsCde"] !== ""){
+      if(!!elem["Ci.cSlsId"] && elem["Ci.cSlsId"] !== ""){
        const res = await codeListStore.queryCodeList({codeListName: "CSaleCde_List",
                   codeListParam: {
-                    CSlsCde: elem['Ci.cSlsCde'],
+                    CSlsCde: elem['Ci.cSlsId'],
                   },
                 },)
                 console.log("保费计算完毕",{
-        code:"Ci.cSlsCde"+elem['_dataId'],
+        code:"Ci.cSlsId"+elem['_dataId'],
         list:res
         })
         freeEditRef.value?.addCodeListMap({
-          code:"Ci.cSlsCde"+elem['_dataId'],
+          code:"Ci.cSlsId"+elem['_dataId'],
           list:res,
         })
       }else if(!!elem['Ci.cBrkSlsCde'] && elem['Ci.cBrkSlsCde'] !==""){
