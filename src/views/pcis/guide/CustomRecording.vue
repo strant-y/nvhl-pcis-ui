@@ -197,10 +197,9 @@
 					<el-row v-if="formconfig1.cRecordType == '9'">
 						<el-col :span="24">
 							<el-form-item
-                id="cInsuredNme"
+                                id="cInsuredNme"
 								label="被保人"
 								prop="cInsuredNme"
-								:rules="[getRules('required', {})]"
 							>
 								<el-input style="width: 500px" v-model="formconfig1.cInsuredNme" disabled />
 								<el-button

@@ -292,7 +292,6 @@ const tableconfig = reactive<AppTableConfig>(
 
 //新增and编辑
 const openEdit = (type: string, row) => {
-  console.log(111111, type, row)
   router.push({
     // path: '/plan-config/plan-info',
     path:'plan-info',

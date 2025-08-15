@@ -198,62 +198,65 @@ const idAnalysis = (id:string)=>{
          
           // clearValidate('Applicant.cCertfCde')  
 };
-
     // 防抖定时器
 let debounceTimer = <any>null ;
+
 //  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
 const checkUser = () => {
+      const fieldsToValidate = ['Applicant.cAppNme', 'Applicant.cClntMrk',"Applicant.cCertfCde","Applicant.cCertfCls"];
+      
+      // 自定义录单 方案配置 模版 进入 可以查询用户信息  
       if (param.pageType !== "app" &&  param.pageType !== "copy" && param.pageType !== "template" && param.cAppStatus !=='1') {
           return false;
         }
       if (debounceTimer) {
         clearTimeout(debounceTimer);
-      }
-
-        debounceTimer = setTimeout(() => {
-          // 自定义录单 方案配置 模版 进入 可以查询用户信息  
-    
-        const tabref = opertaor.getTableRefs();
-        const applicantValue = tabref["applicant"].getFromValue();
+      }     
+     const tabref = opertaor.getTableRefs();
+     const applicantValue = tabref["applicant"].getFromValue();
         //  只要4个有值 去请求客户信息
-        if (
-          applicantValue["Applicant.cAppNme"]&&
-          applicantValue["Applicant.cClntMrk"] !== null &&
-          applicantValue["Applicant.cCertfCde"] &&
-          applicantValue["Applicant.cCertfCls"]
-        ) {
-          const param = {
-            coustName: applicantValue["Applicant.cAppNme"],
-            coustMrk: applicantValue["Applicant.cClntMrk"],
-            coustType:applicantValue["Applicant.cCertfCls"],
-            coustCode: applicantValue["Applicant.cCertfCde"],
-            personnelType:"Applicant"
-          }
-          qryCustomer(param)
-            .then((res) => {
-              const { code, data, msg } = res;
-              if (200 === code) {
-                if(data){
-                  if(data && data.length > 0){
-                    Object.keys(data[0]).forEach((key) => { 
-                      if(data[0][key]){
-                        setValue(key, data[0][key]);
-                      }
-                    });
-                  }
-                  // tabref ['applicant'].setFormValue(data[0])
-                  let userId = getValue('Applicant.cCertfCde')
-                  idAnalysis(userId)
-                }
-              } else {
-              
-              }
-            })
-            .finally(() => {});
-        }
+     if (       applicantValue["Applicant.cAppNme"]&&
+       applicantValue["Applicant.cClntMrk"] !== null &&
+       applicantValue["Applicant.cCertfCde"] &&
+       applicantValue["Applicant.cCertfCls"]     ) {
 
-      }, 500); // 防抖延迟500ms
-  
+        applicantEditRef.value?.validateField(fieldsToValidate).then((isValid)=>{
+          if(isValid){
+             debounceTimer = setTimeout(() => {
+                 const param = {
+                    coustName: applicantValue["Applicant.cAppNme"],
+                    coustMrk: applicantValue["Applicant.cClntMrk"],
+                    coustType:applicantValue["Applicant.cCertfCls"],
+                    coustCode: applicantValue["Applicant.cCertfCde"],
+                    personnelType:"Applicant"
+                  }
+                  qryCustomer(param)
+                    .then((res) => {
+                      const { code, data, msg } = res;
+                      if (200 === code) {
+                        if(data){
+                          if(data && data.length > 0){
+                            Object.keys(data[0]).forEach((key) => { 
+                              if(data[0][key]){
+                                setValue(key, data[0][key]);
+                              }
+                            });
+                          }
+                          // tabref ['applicant'].setFormValue(data[0])
+                          let userId = getValue('Applicant.cCertfCde')
+                          idAnalysis(userId)
+                        }
+                      } else {
+                      
+                      }
+                    })
+                    .finally(() => {});
+              
+
+              }, 500); // 防抖延迟500ms
+          }
+         })
+       }
    };
  
 // 绑定方法
@@ -351,7 +354,6 @@ const method = {
 
        const tabref = opertaor.getTableRefs();
     const applicantValue = tabref["applicant"]?.getFromValue();
-    console.log(val,applicantValue)
     checkUser();
     // 清除报错信息
     clearValidate('Applicant.cCertfCde')  
@@ -452,7 +454,6 @@ const method = {
   },
   //投保人性质(0是法人 1是个人)
   InsureChange: (val) => {
-    console.log('vvvvvvv',val)
     const param = opertaor.getParam();
 
     if (val == "0") {
@@ -502,7 +503,6 @@ const method = {
         disabled: false,
       });
 
-          console.log('33',getValue('Applicant.cGreenIndustryCustomers'))
       // 绿色客户 如果为时就放开
       if(getValue('Applicant.cGreenIndustryCustomers') == '1'){
         setFormItem("Applicant.cGreenIndustryList", {
@@ -779,7 +779,6 @@ const method = {
 
   // 是否个体工商户
   cIsIndvduBizChange: (val: any) => {
-    console.log('触发了',val)
     if (val == "1") {
 
 			setFormItem("Applicant.cOccupCde", { rules: [getRules("required", {})]});
@@ -963,7 +962,6 @@ const method = {
   handleClose: (val) => {},
   // 是否绿色产业客户change
   ApplicantIsGreen: (val) => {
-    console.log(val)
     // 控制绿色产业细分列表是否必填
     if (val == "1") {
       setFormItem("Applicant.cGreenIndustryList", {
@@ -977,18 +975,24 @@ const method = {
     }
   },
   // 证件号码change
-  cCertfCdeChange: (val) => {
-
+  cCertfCdeChange: (val:any) => {
     const tabref = opertaor.getTableRefs();
     const cCertfCls = tabref["applicant"].getFromValue()["Applicant.cCertfCls"];
+
+
+
+
     if (cCertfCls == "120001") {
       if (val) {
         const certfCde = applicantEditRef.value?.getValue(
           "Applicant.cCertfCde"
         );
-        if (certfCde && certfCde.length === 18) {
-            // idAnalysis(val)
-        }
+        applicantEditRef.value?.validateField('Applicant.cCertfCde').then((isValid)=>{
+           
+            if(isValid){
+                idAnalysis(val)
+            }
+        })
       }
     }
 
@@ -1007,7 +1011,6 @@ const method = {
       const a =
         applicantEditRef?.value?.getValue("Applicant.cSuffixAddr") ||
         "";
-        console.log(a);
       applicantEditRef?.value?.setValue("Applicant.RegisterProp", ads);
       applicantEditRef?.value?.setValue("Applicant.cRegisterSuffixAddr", a);
     } else {
@@ -1044,7 +1047,6 @@ const method = {
   },
   // 单位性质
   cWorkDptChange:(val:any,lab:any)=>{
-      console.log('单位性质',val,lab)
       let cClntMrk = getValue('Applicant.cClntMrk');  // 投保人性质 
       if(cWorkDptList.includes(val) && cClntMrk =='0'){
           //实名认证方式
@@ -1140,7 +1142,6 @@ function setRegisterAdd() {
       const { code, data, msg } = res;
       if (code === 200) {
         const b = (data ? data["addStr"] : "") + a;
-        console.log(b);
         setAddressStr("Applicant.cRegisteredcapDre", b);
       }
     });
@@ -1162,6 +1163,8 @@ function setFormValue(value: any) {
 function validate() {
   return applicantEditRef?.value?.validate();
 }
+
+
 
 function setValue(key: string, value: any) {
   applicantEditRef?.value?.setValue(key, value);

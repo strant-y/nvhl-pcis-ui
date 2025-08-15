@@ -76,27 +76,29 @@ const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     // title: "特约信息",
     tableBtnType: "btn",
-    tableBtnWidth: 220,
+    tableBtnWidth: 160,
     tableBtnPosition: "right",
-    align: "left",
+    fixed: true,
     tableBtn: [
       createFreeButtonBase({
         id: "score",
         link: true,
         tooltip: "编辑", 
         type: "success",
-        size: "large",
+        size: "default",
         icon: "Edit",
         hideBtns: (row) => {
           // if (!row.cSpecialContent.includes("*")) return true;
            return row.cIfEdit !== '1';
         },
         tableClick: (row) => {
+            debugger
           if(originalData.value.length==0){
-              originalData.value =    deepClone(formData.value)
+              originalData.value  =    deepClone(formData.value)
           }
           let param = {};
           if(row['cIfMust'] !== '9') {
+            
             let rid = row.cSpecialCode|| row.cSpecialCode
             const f = originalData.value.find(f => rid === f.cSpecialCode);
             // cSpecialContent
@@ -109,14 +111,12 @@ const tableconfig = reactive<AppTableConfig>(
           if(row.editList && row.editList.length>0){
             param['editList'] = row.editList
           }
-          console.log('param',param)
+   debugger
           dzmodal.open(specEdit, { type: "view", data: param,
           callback: (res: any) => {
               if (res.type === "ok") {
                 // row.cSpecialContent = res.data.cSpecialContent
                 // row['editList']= res.data['editList']
-
-
 
                  let list = formData.value;
                  const index = list.findIndex(
@@ -138,7 +138,7 @@ const tableconfig = reactive<AppTableConfig>(
         link: true,
         tooltip: "删除",
         type: "danger",
-        size: "large",
+        size: "default",
         icon: "Delete",
         tableClick: (row) => {
 
@@ -258,7 +258,6 @@ const addData =()=>{
         isAdd = false;
       }
     })
-    console.log('数据ccc',formData.value)
     if(isAdd){
       obj =[...formData.value, { 
         addIndex: 1,
@@ -277,6 +276,11 @@ const addData =()=>{
 // 获取默认信息
 
 const refreshData = () => {
+  // && parparam.cAppStatus !=='1' 暂存的不处理  parparam.pageType !== "copy" &&  
+  // if (parparam.pageType !== "app" &&   parparam.pageType !== "template" ) {
+  //   console.log('不是新单子')
+  //   return false;
+  // }
    const param = opertaor.getParam();
   const cProdNo =param.cProdNo;
   const cDptCde =param.cDptCde || '';
@@ -288,20 +292,26 @@ const refreshData = () => {
     pageNum: 1,
     pageSize: 999,
   }).then((res) => {
-    if (res.data.result) {
+    if (res.data?.result) {
             let len = 0;
             let sel : any[] = [];
-            res.data.result.forEach((item: any,index:number) => {
-              if(item["cIfMust"] == "1"){
-                  item.index = len + 1;
-                  sel.push(item);
-                  len++;
+
+             if (parparam.pageType  == "app"   ) {
+                res.data.result.forEach((item: any,index:number) => {
+                  if(item["cIfMust"] == "1"){
+                      item.index = len + 1;
+                      sel.push(item);
+                      len++;
+                  }
+                });
+                originalData.value =    deepClone(sel)
+                formData.value = sel
+              }else{
+                 originalData.value =    deepClone(res.data.result)
               }
-            });
-            originalData.value =    deepClone(sel)
-            formData.value = sel
 
-
+            console.log('这是数据---1212',originalData.value)
+            console.log('这是数据---1213',formData.value)
 
     }
   });
@@ -319,16 +329,7 @@ onMounted(async () => {
   formData.value.forEach((item, index) => {
     item.index = index + 1;
   });
-
-  console.log('数据-=---',parparam)
-  if (!parparam.initFlag) {
-      refreshData();
-  }
-
-  setTimeout(()=>{
-    // setDisabledAll()
-     
-  })
+   refreshData();
 });
 // 组件卸载时移除事件监听（避免内存泄漏）
 onUnmounted(() => {
@@ -343,7 +344,6 @@ const method = {
   //获取特约按钮
   getSpecialAgree: () => {
     const param = opertaor.getParam();
-    console.log('数据---',param)
     dialog.value?.open(
       "prdFixSpec",
       {

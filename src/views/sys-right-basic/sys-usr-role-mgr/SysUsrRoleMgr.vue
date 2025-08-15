@@ -92,18 +92,14 @@ const loadNode = (node, resolve) => {
       })
     }
 
-    console.log('----------',resolve)
     resolve(dto);
   }).catch((error) => {
-    console.log('出错了', error);
     ElMessage.error('后台服务异常,请联系管理员');
   });
 };
 
 const handleNodeClick = (data) => {
   CDptCde.value = data.id
-  console.log('CDptCde.value', CDptCde.value);
-  
 };
 
 const cleanCheck = () => {

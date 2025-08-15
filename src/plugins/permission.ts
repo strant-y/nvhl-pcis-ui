@@ -3,16 +3,11 @@ import { useUserStore } from "@/store/modules/user";
 import { usePermissionStore } from "@/store/modules/permission";
 import NProgress from "@/utils/nprogress";
 import { codeListViewStore, useTagsViewStore } from "@/store";
-import { descryptParameter, encryptParameter } from "@/utils/encipher";
 import { descryptParameterToQuery } from '@/utils/common'
 
 export function setupPermission() {
   // 白名单路由
   const whiteList = ["/login"];
-  // 加密标志位
-  const isEncrypted = ref<Boolean>(false);
-
-  const tagsViewStore = useTagsViewStore();
 
   router.beforeEach(async (to, from, next) => {
     NProgress.start();
@@ -40,60 +35,7 @@ export function setupPermission() {
               next("/404");
             }
           } else {
-            // Encrypt route parameters 路由参数加密
-            const query = to.query;
-            if (!isEncrypted.value && to.query && Object.keys(to.query).length > 0) {
-              isEncrypted.value = true;
-              if (!!query.encrypted && query.encrypted === '1') { // 页面刷新
-                nextTick(() => {
-                  router.push({ path: to.fullPath, query: query });
-                });
-              } else {
-                for (const key in query) {
-                  if (Object.prototype.hasOwnProperty.call(query, key)) {
-                    if (!!query[key] && key !== 'encrypted') {
-                      to.query[key] = encryptParameter(query[key]);
-                    }
-                  }
-                }
-                if (Object.keys(query).length > 0) {
-                  query['encrypted'] = '1';
-                  next({ path: to.path, query: query });
-                }
-              }
-            } else {
-              isEncrypted.value = false;
-            
-              if (to.meta.title) {
-                const data = descryptParameterToQuery(query);
-                  let dynamicTitle = to.meta.title;
-                  if (data.ParseParams && data.ParseParams.title) {
-                    dynamicTitle = data.ParseParams.title;
-                  } else if (query.title) {
-                    dynamicTitle = query.title;
-                  }
-
-                const view = {
-                  name: to.name as string,
-                  // title: to.meta.title,
-                  title: dynamicTitle,
-                  path: to.path,
-                  fullPath: to.fullPath,
-                  affix: to.meta?.affix,
-                  keepAlive: to.meta?.keepAlive,
-                  hidden: to.meta.hidden,
-                  query: data.JSONquery,
-                  params: data.ParseParams,
-                  compKey: data.ParseParams?.compKey
-                }
-                const flag = await tagsViewStore.removeDuplicatesView(view);
-                if(flag) {
-                  tagsViewStore.addView(view);
-                  tagsViewStore.moveToCurrentTag(to);
-                }
-              }
-              next();
-            }
+            next();
           }
         } else {
           const permissionStore = usePermissionStore();
@@ -137,31 +79,30 @@ export function setupPermission() {
   });
 
   // 独立的标题设置函数
-const setPageTitle = (to) => {
-  let title = "";
-    console.log(1111,to.query)
-  // 1. 优先从query参数中获取动态标题
-  if (to.query && to.query.title) {
-    title = to.query.title;
-  } 
-  // 2. 其次使用路由配置中的meta.title
-  else if (to.meta && to.meta.title) {
-    title = to.meta.title;
-  } 
-  // 3. 使用默认标题
-  else {
-    title = "默认标题";
-  }
-  
-  // 设置浏览器标题
-  // document.title = title;
-  
-  // 如果需要更新标签页标题，在这里处理
-  const tagsViewStore = useTagsViewStore();
-  if (to.meta.title && tagsViewStore.currentTag && tagsViewStore.currentTag.path === to.path) {
-    tagsViewStore.updateTagTitle(to.path, title);
-  }
-};
+  const setPageTitle = (to) => {
+    let title = "";
+    // 1. 优先从query参数中获取动态标题
+    if (to.query && to.query.title) {
+      title = to.query.title;
+    }
+    // 2. 其次使用路由配置中的meta.title
+    else if (to.meta && to.meta.title) {
+      title = to.meta.title;
+    }
+    // 3. 使用默认标题
+    else {
+      title = "默认标题";
+    }
+
+    // 设置浏览器标题
+    // document.title = title;
+
+    // 如果需要更新标签页标题，在这里处理
+    const tagsViewStore = useTagsViewStore();
+    if (to.meta.title && tagsViewStore.currentTag && tagsViewStore.currentTag.path === to.path) {
+      tagsViewStore.updateTagTitle(to.path, title);
+    }
+  };
 
 
   router.afterEach((to) => {

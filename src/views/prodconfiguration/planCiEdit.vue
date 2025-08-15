@@ -202,9 +202,6 @@ const formconfig = reactive<AppFreeEditConfig>(
         clearable: true,
         title: "收款银行大类",
         func: (val: any) => {
-          // cBankRelTypFun: (val:any) => {
-          console.log(313, val)
-
           if (!val) {
             return false
           }
@@ -380,12 +377,7 @@ const formconfig = reactive<AppFreeEditConfig>(
 const handleSave = () => {
 
   const formData = freeEditRef.value?.getFromValue();
-  console.log('保存接口11', formData)
-
   freeEditRef.value?.validate().then((isValid) => {
-
-    console.log(isValid)
-
     if (isValid) {
       try {
         savePlanCiInfo(formData); // 调用保存接口
@@ -409,28 +401,7 @@ const handleCancel = () => {
 
 
 const ciSubCompOnChangeHandle = (value: string) => {
-  // if (this.data.type === 'select') {
-  //     return;
-  // }
-
-  console.log('数据-----', value)
-
-  // // 【共保子公司】
-  // const ciSubCompControl = this.freeEdit.controls['CCiSubComp'];
-  // ciSubCompControl.reset();
-  // const preParam = ciSubCompControl['param'];
-  // // 【本公司标志】
-  // const selfMrkControl = this.freeEdit.controls['CSelfMrk'];
-  // // 【主共标志】
-  // const chiefMrkControl = this.freeEdit.controls['CChiefMrk'];
-  // // 【出单标志】
-  // const issueMrkControl = this.freeEdit.controls['CIssueMrk'];
-  // // 【出单机构】
-  // const dptCdeControl = this.freeEdit.controls['CDptCde'];
-  // // 【主从联标识】
-  // const jiMrkControl = this.freeEdit.controls['CJiMrk'];
-
-  // // 若选择的是我司
+   // 若选择的是我司
   if ('327001' === value) {
 
     //  共保子公司 根据内容查询
@@ -465,32 +436,6 @@ const ciSubCompOnChangeHandle = (value: string) => {
       // readOnly: true,
       disabled: true,
     })
-
-
-
-    // setValue('cCiSubComp','其他')
-    //     // 【共保子公司】设置为 其他
-    //     ciSubCompControl['param'] = Object.assign(preParam, {'CParCde': 'other'});
-    //     ciSubCompControl.setValue('other_01');
-    //     // 【本公司标志】设置为 否
-    //     selfMrkControl.setValue('0');
-    //     // 【主共标志】设置为 否
-    //     chiefMrkControl.setValue('0');
-    //     // 【出单标志】设置为 否
-    //     issueMrkControl.setValue('0');
-    //     // 【出单机构】设置为 只读
-    //     dptCdeControl.clearValidators();
-    //     dptCdeControl.setValue(null);
-    //     dptCdeControl.readOnly = true;
-    //     this.freeConfig.setItemAttribute(dptCdeControl, 'readOnly', true);
-    //     dptCdeControl.markAsDirty();
-    //     dptCdeControl.updateValueAndValidity();
-    //     jiMrkControl.readOnly = true;
-    //     this.freeConfig.setItemAttribute(jiMrkControl, 'readOnly', true);
-    //     chiefMrkControl.readOnly = true;
-    //     this.freeConfig.setItemAttribute(chiefMrkControl, 'readOnly', true);
-    //     issueMrkControl.readOnly = true;
-    //     this.freeConfig.setItemAttribute(issueMrkControl, 'readOnly', true);
   }
 }
 

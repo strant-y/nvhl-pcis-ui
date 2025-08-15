@@ -75,8 +75,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               if (res.type === "ok" && res.body) {
                 // cReadOnly 是否可编辑 0 否 1 是
                 if(res.body.cReadOnly === "1") {
-                  setFormItem('cBckOp1', { disabled: false })
-                  setValue('cBckOp1', res.body.cExc)
+                  setFormItem('cIsExcluding', { disabled: false })
+                  setValue('cIsExcluding', res.body.cExc)
                 }
               }
             });
@@ -186,7 +186,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         itemWidth: 2,
       },
       {
-        prop: "cRiFacFbkOpn",
+        prop: "cRiFacFeeOpn",
         inputtype: "rtinput",
         type: "textarea",
         title: "临分反馈意见",
@@ -204,13 +204,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         disabled: true,
       },
       {
-        prop: "cBckOp1",
+        prop: "cIsExcluding",
         inputtype: "rtselect",
         title: "是否再保合约除外业务",
         rules: [{ type: "required" }],
         loadData: [
           { value: "1", label: "是" },
-          { value: "2", label: "否" },
+          { value: "0", label: "否" },
         ],
         disabled: true,
         func: (val: any) => {
@@ -356,29 +356,29 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         itemWidth: 2,
       },
       {
-        prop: "cRpt",
+        prop: "cIsTransaction",
         inputtype: "rtselect",
         title: "关联交易确认",
         rules: [{ type: "required" }],
          itemWidth: 1,
         loadData: [
           { value: "1", label: "是" },
-          { value: "2", label: "否" },
+          { value: "0", label: "否" },
         ],
         clearable: true,
         func:(val:any)=>{
             if(val ==='1'){
-                setFormItem("cRelateNo",{ hidden: false})
+                setFormItem("cRelationNo",{ hidden: false})
                 setFormItem("cUploadSign",{ hidden: false})
             }else{
-                setFormItem("cRelateNo",{ hidden: true})
+                setFormItem("cRelationNo",{ hidden: true})
                 setFormItem("cUploadSign",{ hidden: true})
             }
         }
       },
 
       {
-        prop: "cRelateNo",
+        prop: "cRelationNo",
         inputtype: "rtinput",
         title: "关联交易审批单编号",
         hidden: true,
@@ -392,7 +392,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
          hidden: true,
         keymap: {
           y: "1",
-          n: "2",
+          n: "0",
         },
       },
 
@@ -403,7 +403,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [{ type: "required" }],
         loadData: [
           { value: "1", label: "是" },
-          { value: "2", label: "否" },
+          { value: "0", label: "否" },
         ],
         clearable: true,
         func: (val:any) => {
@@ -531,8 +531,13 @@ watch(
         // 临分标识如果是1，则是否临分复选框设置勾选状态
         setValue("riFacMrk", props.pageData?.plyBase['Base.cRiFacMrk'] == "1" ? "1" : "0");
       }
+      // 反显临分意见
       if(props.pageData?.plyBase['Base.cRiFacOpn']) {
         setValue("riFacOpn", props.pageData?.plyBase['Base.cRiFacOpn']);
+      }
+      // 反显临分反馈意见
+      if(props.pageData?.plyBase['Base.cRiFacFeeOpn']) {
+        setValue("cRiFacFeeOpn", props.pageData?.plyBase['Base.cRiFacFeeOpn']);
       }
     }
   },
@@ -544,7 +549,7 @@ watch(
 onMounted(() => {
   nextTick(() => {
     console.log(cUndrMrkOptions)
-    setValue("cIsRiskExp", "2");
+    setValue("cIsRiskExp", "0");
     // Base.cRiFacMrk
     setValue("riFacMrk", "0")
     const param = {
@@ -557,6 +562,23 @@ onMounted(() => {
       param.cInquiryNo = params.cInquiryNo
     } else {
       param.cAppNo = params.cAppNo
+    }
+    // 如果不是关联交易，则关联交易显示否且不可编辑
+    if (
+      params.cRelateBusi &&
+      params.cEdrRsnBundleCde !== "s1" &&
+      params.cEdrRsnBundleCde !== "s2" &&
+      params.cEdrRsnBundleCde !== "c1"
+    ) {
+      setFormItem("cIsTransaction", {
+        disabled: false,
+      });
+      setValue("cIsTransaction", "")
+    } else {
+      setFormItem("cIsTransaction", {
+        disabled: true,
+      });
+      setValue("cIsTransaction", "0")
     }
     // 获取核保选项
     getCUndrMrkUrlFn(param);

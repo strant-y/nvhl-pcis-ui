@@ -52,6 +52,14 @@ onMounted(() => {
   console.log(3838, formconfig11);
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
+    console.log('1111',getValue('ECargoBase.nAmt'))
+    console.log('22222',getValue('ECargoBase.nPrm'))
+    if(!getValue('ECargoBase.nAmt')){
+      setFormItem('ECargoBase.AmtProp', {hidden: true})
+    }
+    if(!getValue('ECargoBase.nPrm')){
+      setFormItem('ECargoBase.PrmProp', {hidden: true})
+    }
     if(!getValue('ECargoBase.cWhInsExchCde')){
       setValue('ECargoBase.cWhInsExchCde','1')
     }
@@ -112,8 +120,9 @@ function handleFileChange() {
 // 绑定方法
 const method = {
   cPayWayChange:(val:any)=>{
-    const list:Array<string>= ["ECargoBase.nLowPrm","ECargoBase.nReceivedPrm","ECargoBase.cReceivedRmb","ECargoBase.nReceivedRate","ECargoBase.nRmbReceivedPrm"]
+    const list:Array<string>= ["ECargoBase.nLowPrm","ECargoBase.nReceivedPrmEx","ECargoBase.nReceivedPrm","ECargoBase.cReceivedRmb","ECargoBase.nReceivedRate","ECargoBase.nRmbReceivedPrm"]
     if(val !== '01'){
+      setFormItem('ECargoBase.nReceivedPrmEx',{rules: null })
       if(getValue('ECargoBase.nRmbAmt')){
         setValue('ECargoBase.nRecRemEstAmt',getValue('ECargoBase.nRmbAmt'))
       }
@@ -125,7 +134,6 @@ const method = {
           hidden: true,
         });
       })
-      setFormItem('ECargoBase.nReceivedPrmEx',{rules: null })
     }else {
       setFormItem('ECargoBase.nReceivedPrmEx',{ rules: [getRules("required", {})] })
       if(getValue('ECargoBase.nRmbAmt')){

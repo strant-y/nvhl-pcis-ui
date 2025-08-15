@@ -292,12 +292,12 @@ const method = {
 const handleQuery = () => {
   const param = opertaor.getParam();
   let app = "";
-  if (param.cOrgAppNo) {
+  if (opertaor.getDataAll()?.plyBase["Base.cAppNo"]) {
+    app = opertaor.getDataAll().plyBase["Base.cAppNo"];   
+  } else if(param.cOrgAppNo){
     app = param.cOrgAppNo;
-  } else if(opertaor.getDataAll().plyBase["Base.cAppNo"]){
-    app = opertaor.getDataAll().plyBase["Base.cAppNo"];
-  } else {
-    app = route.params.param?.cAppNo
+  } else if(param.pageType !== "copy") {
+    app = param.cAppNo
   }
   const queryParam = {
     cComponentTable: distCompKey.value,
@@ -330,8 +330,6 @@ const query = (param: any) => {
         };
       });
       
-      console.log('数据---',pageresult.list)
-       
       let cProdNo = route.params.param?.cProdNo;
       if (cProdNo == "040002") {
           const termref = opertaor.getTableRefByKey("cvrg");

@@ -9,7 +9,7 @@ import ApplicationQuerys from "@/views/comprehensive-query/pages/application-que
 /**
  * 需要缓存状态的页面 组件
  */
-const ViewsComponentsMap = {
+const ViewsComponentsMap: any = {
     'guide': markRaw(CustomRecording),
     'my-page':  markRaw(MyPage),
     'factorConfig':  markRaw(FactorConfig),

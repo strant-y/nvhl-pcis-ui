@@ -34,6 +34,9 @@ import { useRouter, useRoute } from 'vue-router';
 import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
 import dayjs from "dayjs";
 import {getAddressStr} from "@/api/query";
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
+
 const route = useRoute();
 const query = ref(route.query);
 const router = useRouter();
@@ -73,7 +76,6 @@ onMounted(async () => {
     exRules
   );
 
-  console.log('------------',props.pageSchema)
   
   for(let i = 0; formconfig11.fromSchema && i < formconfig11.fromSchema.length; i++){
     // 遍历groupList数组把函数赋值给fromSchema
@@ -91,6 +93,14 @@ onMounted(async () => {
   if(params.cProdNo === '045001'){
     setFormItem("Tgt.cInsuranceMethod", {typeCode: 'InsuranceMethod045001'});
   }
+// Tgt.cShippingType
+  // 运输方式  020011  020013 这两种产品 非必填
+  if(params.cProdNo === '020011' ||  params.cProdNo === '020013'){
+    setFormItem("Tgt.cShippingType", { rules: []});
+  }else{
+     setFormItem("Tgt.cShippingType", { rules: [getRules("required", {'trigger':'blur'})]});
+  }
+
   // 约定保期内服务次数正整数
   setFormItem("Tgt.nAgreeFrequency", {
     rules: [getRules("signlessInt", {})],
@@ -126,15 +136,60 @@ const tgtOtherMatterList:Array<string> = ["Tgt.cLicenseNumber","Tgt.cFrameNumber
 const tgtIsWaterMatterList:Array<string> = ["Tgt.cTowing","Tgt.cWholeShip","Tgt.cShipName","Tgt.cTransportVoyage","Tgt.nTotalTonnage","Tgt.nShipAge","Tgt.cTransportationName","Tgt.tConstructionYear","Tgt.nTransportationTotalTonnage","Tgt.cShipRegistration","Tgt.nTransportationShipAge","Tgt.cShipType","Tgt.cShipClassOne","Tgt.cShipClassTwo","Tgt.cShipClassThree","Tgt.cOldshipSurcharge"]
 const setIsRule = ()=>{
   if(getValue("Tgt.cTowing") === '1'){
-    setFormItem("Tgt.cShipType", {
-      typeCode: 'Ship_Type',
-      codeParam: { 'cMapCde': '1' },
-    });
+    // setFormItem("Tgt.cShipType", {
+    //   // typeCode: 'Ship_Type',
+    //   // codeParam: { remark: '1' },
+    //   // codeParam: { 'cMapCde': '1' },
+    //      loadData: [
+
+    //             {label: '半潜驳', value: '7', codeKind: 'codeKind'},
+    //             {label: '拖船', value: '8', codeKind: 'codeKind'}
+    //             ]  
+    // });
+ 
+        codeListStore
+          .queryCodeList(
+            {
+              codeListName: "Ship_Type",
+              codeListParam: {
+                remark: "1"
+              },
+            },
+          )
+          .then((res) => {
+            console.log(123123,res)
+            tgtEditRef.value?.addCodeListMap({
+              code: "Tgt.cShipType",
+              list: [
+
+                {label: '半潜驳', value: '7', codeKind: 'codeKind'},
+                {label: '拖船', value: '8', codeKind: 'codeKind'}
+                ]
+            })
+          });
+        
+
+    console.log('进来了？')
   }else {
-    setFormItem("Tgt.cShipType", {
-      typeCode: 'Ship_Type',
-      codeParam: { },
-    });
+    // setFormItem("Tgt.cShipType", {
+    //   typeCode: 'Ship_Type',
+    //   codeParam: { },
+    // });
+            codeListStore
+          .queryCodeList(
+            {
+              codeListName: "Ship_Type",
+              codeListParam: { }, 
+            },
+          )
+          .then((res) => {
+            
+            tgtEditRef.value?.addCodeListMap({
+              code: "Tgt.cShipType",
+              list:res
+            })
+          });
+        
   }
   if(getValue("Tgt.cTowing") === '1' || getValue("Tgt.cWholeShip") === '1'){
     tgtWaterMatterList.forEach(item =>{
@@ -281,7 +336,6 @@ const method = {
   },
   // 是否单项工程 
   getcIsSingleChange:(val:string)=>{
-    console.log(val)
     if(val=== '1'){
       // 工程总造价 （元）
       setFormItem('Tgt.nTotalCost', {
@@ -386,7 +440,6 @@ const method = {
         },{width: 45});
   },
   getcMemberLogoChange:(val:string)=>{
-    console.log('val',val)
     if(val=== '1'){
       setFormItem('Tgt.cBareboatLessee', {
         rules: [getRules("required", {})],
@@ -437,7 +490,9 @@ const method = {
   setValue("Tgt.cVehicleAge",calculateCarAge(val))
   },
   getcShippingMethodChange:(val:string)=>{
-    if(val === 'NV591001'){
+    console.log('val',val)
+    // if(val === 'NV591001'){
+    if(val === '03'){
       tgtIsWaterMatterList.forEach(item =>{
         setFormItem(item, {
           hidden: false,
@@ -460,7 +515,8 @@ const method = {
         });
       })
     }
-    if(val === 'NV591003'){
+    // if(val === 'NV591003'){
+    if(val === '05'){
       tgtOtherMatterList.forEach(item =>{
         setFormItem(item, {
           rules: [getRules("required", {})],
@@ -474,7 +530,9 @@ const method = {
       })
     }
   },
+
   getcShippingTypeChange:(val:string)=>{
+    console.log(val);
     if(val === '04'){
       setFormItem("Tgt.cRailwayMode", {
         rules: [getRules("required", {})],
@@ -498,14 +556,27 @@ const method = {
     }
  },
   getcTowingChange:(val:string)=>{
-    setIsRule()
+        setIsRule()
+    // if(val){
+    //   setFormItem('Tgt.cShipType',{
+    //     typeCode: 'Ship_Type',
+    //     codeParam: { 'remark': '1' },
+    //   })
+
+    // }else{
+    //        setFormItem('Tgt.cShipType',{
+    //     typeCode: 'Ship_Type',
+    //     codeParam: { 'remark': '0' },
+    //   })
+    // }
+
+
  },
   getcWholeShipChange:(val:string)=>{
      setIsRule()
   },
   // func demo
   func1: () => {
-    console.log(getRules);
   },
   //投保乘客座位总数改变事件
   changenTotalInsured: () => {
@@ -517,8 +588,6 @@ const method = {
   },
   //是否单项工程change事件
   cIsSingleFunc: (val) => {
-    console.log('123123',vals)
-
     if (val == '1') {
       let obj = {
         rules: [getRules("required", {})],
@@ -729,14 +798,10 @@ const method = {
     }
     if (tm < 0) {
       ElMessage.warning("竣工日期不能小于开工日期");
-      setFormValue({
-        "Tgt.tPlannedDate": null,
-      });
+      setValue("Tgt.tPlannedDate", null);
       return;
     }
-    setFormValue({
-      "Tgt.nContractDuration": tm,
-    })
+    setValue("Tgt.nContractDuration", tm);
 
   },
   // 计划竣工日期 
@@ -749,26 +814,19 @@ const method = {
     const tm = moment(v).diff(moment(start), "days");
     if (tm < 0) {
       ElMessage.warning("竣工日期不能小于开工日期");
-      setFormValue({
-        "Tgt.tPlannedCompletion": null,
-      });
+      setValue("Tgt.tPlannedCompletion", null);
       return;
     }
-    setFormValue({
-      "Tgt.nContractDuration": tm,
-    });
+    setValue("Tgt.nContractDuration", tm);
   },
 
   ShipClassOneChange:(val: any)=>{
-    console.log(val)
     clearValidate('Tgt.cShipClassThree');
     const param = opertaor.getParam();
     if(!param.initFlag){
       if(val=='01'){
-        setFormValue({
-          "Tgt.cShipClassTwo": null,
-          "Tgt.cShipClassThree": null,
-        });
+        setValue("Tgt.cShipClassTwo", null);
+        setValue("Tgt.cShipClassThree", null);
       }
     }
     if(val=='01'){ //rules: [getRules("required", {})]
@@ -779,27 +837,39 @@ const method = {
       setFormItem('Tgt.cShipClassTwo', {disabled:false,rules: [getRules("required", {})]});
     
     } 
-    if(val=='02'){
+    if(val=='02' || val=='03'){
       setFormItem('Tgt.cShipClassThree',{disabled:true,rules: null})
-      setFormItem('Tgt.cShipClassTwo', {codeParam:{classone:'level1'},typeCode:'Ship_Class_Level2'});
-            setFormValue({
-          
-          "Tgt.cShipClassThree": null,
+      let cShipClassTwo = getValue('Tgt.cShipClassTwo');
+        setValue("Tgt.cShipClassThree", null);
+        codeListStore
+        .queryCodeList(
+          {
+            codeListName: "Ship_Class_Level2",
+            codeListParam: {
+             classone: val=='02'?'level1' : 'level2'
+            },
+          },
+        )
+        .then((res) => {
+          tgtEditRef.value?.addCodeListMap({
+            code: "Tgt.cShipClassTwo",
+            list: res
+          })
+          if(res.length>0){
+            let delData = true;
+            res.forEach((item:any)=>{
+              if(item['value'] == cShipClassTwo){
+                  delData = false;
+              }
+            })
+            
+            // 判断是否有可以清空的数据
+            if(delData){
+              setValue('Tgt.cShipClassTwo',null)
+            }
+          }
         });
     }
-    if(val=='03'){
-      setFormItem('Tgt.cShipClassThree',{disabled:true,rules: null})
-      setFormItem('Tgt.cShipClassTwo', {codeParam:{classone:'level2'},typeCode:'Ship_Class_Level2',});
-
-      // Tgt.cShipClassTwo
-     
-      console.log('2222', getValue('Tgt.cShipClassTwo'))
-        setFormValue({
-          "Tgt.cShipClassThree": null,
-        });
-    }
-
- 
   },
   cShipClassTwoChange:(val:any)=>{
      clearValidate('Tgt.cShipClassThree');
@@ -808,9 +878,7 @@ const method = {
         
     }else if(val){
        setFormItem('Tgt.cShipClassThree',{disabled:true,rules:null})
-        setFormValue({
-          "Tgt.cShipClassThree": null,
-        });
+        setValue("Tgt.cShipClassThree", null);
     }
   },
   // 核定座位总数
@@ -988,7 +1056,6 @@ cIsinsuranceRegisteredChange:(val:any)=>{
 },
 // 投保行业
 getcInsuranceIndustryChange:(val:any)=>{
-    console.log('val-=--',val)
     if(val ==='8'){
        setFormItem('Tgt.cIndustryRemarks',{
           rules:[getRules("required", {})]
@@ -1075,12 +1142,10 @@ function singChange(obj) {
   setFormItem("Tgt.nTotalCost", obj) //工程总造价 （元）
   setFormItem("Tgt.nTotalDesign", obj) //设计总价（元）
   setFormItem("Tgt.cProjectAddress", obj) //工程地址
-  setFormValue({
-    'Tgt.cProjectName': '',
-    'Tgt.nTotalCost': '',
-    'Tgt.nTotalDesign': '',
-    'Tgt.cProjectAddress': '',
-  })
+  setValue('Tgt.cProjectName', '')
+  setValue('Tgt.nTotalCost', '')
+  setValue('Tgt.nTotalDesign', '')
+  setValue('Tgt.cProjectAddress', '')
 }
 
 function groupCheck() {

@@ -334,7 +334,6 @@ onMounted(async () => {
 // 绑定方法
 const method = {
   func1: () => {
-    console.log(getRules);
   },
 };
 
@@ -368,9 +367,6 @@ function handleQuery(flag?: boolean) {
 
       const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
       const s = freeEditRef.value?.getFromValue(); //获取表单数据
-      let ss = freeEditRef.value?.getValue('CBillTyp');
-      console.log('参数---',ss ,s)
-
       const param = Object.assign(
         {
           // sortField: 'name', // 涉及排序

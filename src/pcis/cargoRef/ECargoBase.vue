@@ -46,7 +46,7 @@ const productStore = useProductStore();
 const codeListStore = codeListViewStore();
 const opertaor = dataOpertaor();
 const subDptCde = ref(); //所属分公司
-
+const initFlag = computed(() => formPage.init);
 onMounted(() => {
   const formconfig11 = formInit(
       JSON.stringify(props.pageSchema),
@@ -76,9 +76,51 @@ function initComp() {
     }
   });
 }
+function getDaysBetweenDates(dateStr1, dateStr2) {
+  // 提取日期部分（忽略时间）
+  const extractDate = (str) => {
+    const datePart = str.split(' ')[0];
+    const [year, month, day] = datePart.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  };
+
+  // 转换为Date对象
+  const date1 = extractDate(dateStr1);
+  const date2 = extractDate(dateStr2);
+
+  // 计算时间差（毫秒）
+  const timeDiff = Math.abs(date2.getTime() - date1.getTime());
+
+  // 转换为天数
+  const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+
+  return daysDiff;
+}
 //给表单下拉项赋值
 // 绑定方法
 const method = {
+  tInsrncBgnTmChange:(val:any)=>{
+    if(getValue('ECargoBase.tInsrncBgnTm') && getValue('ECargoBase.tInsrncEndTm')){
+      if(new Date(getValue('ECargoBase.tInsrncBgnTm') ) > new Date(getValue('ECargoBase.tInsrncEndTm'))){
+        setValue('ECargoBase.tInsrncBgnTm','')
+        ElMessage.warning("协议开始时间不能晚于结束时间");
+        return
+      }else{
+        setValue( 'ECargoBase.cTmSysCde' ,getDaysBetweenDates(getValue('ECargoBase.tInsrncEndTm'),getValue('ECargoBase.tInsrncBgnTm')))
+      }
+    }
+  },
+  tInsrncEndTmChange:(val:any)=>{
+    if(getValue('ECargoBase.tInsrncBgnTm') && getValue('ECargoBase.tInsrncEndTm')){
+      if(new Date(getValue('ECargoBase.tInsrncBgnTm') ) > new Date(getValue('ECargoBase.tInsrncEndTm'))){
+        setValue('ECargoBase.tInsrncEndTm','')
+        ElMessage.warning("协议结束时间不能早于开始时间");
+        return
+      }else {
+        setValue( 'ECargoBase.cTmSysCde' ,getDaysBetweenDates(getValue('ECargoBase.tInsrncEndTm'),getValue('ECargoBase.tInsrncBgnTm')))
+      }
+    }
+  },
   // func demo
   funcquery: () => {},
 
@@ -229,7 +271,7 @@ const method = {
   businessSubFunc: (val) => {
     // 清除代理(经纪)人、代理业务员的值
     const p = opertaor.getParam();
-    if (!p.initFlag) {
+    if (!initFlag.value) {
       setValue("ECargoBase.cBrkrCde", "");
       setValue("ECargoBase.cBrkSlsCde", "");
     }
@@ -261,15 +303,12 @@ const method = {
               setValue("ECargoBase.cBrkrCde", params.CChaCde);
               setValue("ECargoBase.cAgtAgrNo", params.CAgtAgrNo);
 
-              console.log("回显----", params);
-
               dialog.value?.handleClose();
             },
           },
         },
         {
           isOk: (selectdata: any) => {
-            console.log("a", selectdata);
           },
         },
         { title: "代理查询", width: 85 }
@@ -380,7 +419,6 @@ const method = {
         },
         method: {
           getSelected: (params:any) => {
-            console.log('111Base.cSlsId',params)
             setFormValue({
               "ECargoBase.cSlsId": params.CSlsCde, //业务员员工号
               "ECargoBase.cSlsNme": params.CSlsNme, //业务员名称
@@ -454,8 +492,7 @@ const method = {
   },
   //项目类别大类change事件
   cPrjCtgTypChange: (val:any) => {
-    const p = opertaor.getParam();
-    if (!p.initFlag) {
+    if (!initFlag.value) {
       setValue("ECargoBase.cPrjCtgMidTyp", "");
       setValue("ECargoBase.cPrjCtgSubTyp", "");
     }
@@ -487,8 +524,7 @@ const method = {
   },
   //项目类别中类change事件
   cPrjCtgMidTypChange: (val:any) => {
-    const p = opertaor.getParam();
-    if (!p.initFlag) {
+    if (!initFlag.value) {
       setValue("ECargoBase.cPrjCtgSubTyp", "");
     }
     if (val) {

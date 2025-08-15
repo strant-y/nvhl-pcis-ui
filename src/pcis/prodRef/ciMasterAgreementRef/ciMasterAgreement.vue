@@ -57,7 +57,7 @@ watchEffect(() => {
           item.hidden = true; // 隐藏其他字段
         }
       });
-      } else if (cCiMrkValue === "5") {
+      } else if (cCiMrkValue === "5" || cCiMrkValue === "6") {
         formconfig1.fromSchema?.forEach((item) => {
           const prop = item.prop;
           if (
@@ -75,7 +75,7 @@ watchEffect(() => {
             item.hidden = true; // 隐藏其他字段
           }
         });
-      }else if(cCiMrkValue === "1" || cCiMrkValue ==="2" || cCiMrkValue ==="6"){
+      }else if(cCiMrkValue === "1" || cCiMrkValue ==="2"){
         formconfig1.fromSchema?.forEach((item)=>{
           item.hidden = false;
         })

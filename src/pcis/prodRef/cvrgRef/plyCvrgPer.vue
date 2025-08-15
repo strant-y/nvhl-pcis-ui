@@ -194,6 +194,7 @@ onMounted(async () => {
     formconfig11.titleBtns?.splice(deleteId,1);
   }
   Object.assign(cardconfig.value, formconfig11);
+  selectedRow.value = {}; // 初始化清除选中的缓存数据
   if (parparam.pageType === "app" && parparam.cRecordType != 4) {
     // 新建保单时,初始化条款信息
     const param = {
@@ -240,6 +241,10 @@ const method = {
     addTermData();
   },
   selectTgt: () => {
+    if(!selectedRow.value || !selectedRow.value.data) {
+      ElMessage.warning('请先选择一行条款数据!');
+      return;
+    }
     dialog.value?.open(
         selectTgtFix,
         {
@@ -248,12 +253,14 @@ const method = {
         },
         {
           getSelected(selectdata: any) {
-            if(selectdata) {
+            if(selectdata && selectdata.length > 0) {
               const ids = selectdata.map(item => item['Dist.nSeqNo']).join(',');
               setCargoSeq(ids);
-              tremTemplateRefs.value['m0'].dataFlash();
-              dialog.value?.handleClose()
+            }else {
+              setCargoSeq('');
             }
+            tremTemplateRefs.value['m0'].dataFlash();
+            dialog.value?.handleClose()
           }
         },
         {title: '选择货物',  width: 65 }
@@ -263,7 +270,6 @@ const method = {
 
 const edrItem = ref<[key: string, value: Array<any>] | any>({});
 function updateEdrItem(terms: any[]) {
-  console.log(parparam);
   if (
     parparam.pageType === "EDR_APP_NEW_SCENE" ||
     parparam.pageType === "EDR_APP_MODIFY_BOUNCED_SCENE" ||
@@ -312,7 +318,6 @@ function addTermData() {
     },
     {
       isOk: (selectdata: any) => {
-        console.log('-------------',selectdata)
         let plans: any[] = [];
         selectdata.forEach((item: any, index:number) => {
           let riskList: { [key: string]: any }[] = [];

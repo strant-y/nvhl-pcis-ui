@@ -160,6 +160,8 @@ interface dynamicFormMethod {
   resetFields: () => any;
   setDisabledAll: (isDisabled: boolean) => void;
   getFormBtn: () => any;
+  validateField: (fields: string | string[]) => any
+  // getFormBtn: () => any;
 }
 const dynamicForm = ref<dynamicFormMethod | null>(null);
 const superDynamicForm = ref<dynamicFormMethod | null>(null);
@@ -227,6 +229,24 @@ function validate() {
           idxParam.handleAnchorClick(undefined,`#${customMap.value?.domId}`)
         }
       }
+      resolve(valid);
+    });
+  });
+}
+
+// 根据参数 选择需要校验内容
+function validateField(fields:any) {
+  return new Promise((resolve) => {
+    dynamicForm.value?.validateField(fields).then((valid) => {
+      // 校验失败时的处理（与原有validate逻辑保持一致）
+      // if (!valid) {
+      //   const isScroll = useScrollDetection();
+      //   // 滚动到第一个错误字段位置（复用原有逻辑）
+      //   if (idxParam && idxParam.handleAnchorClick && customMap.value?.domId && !isScroll) {
+      //     idxParam.handleAnchorClick(undefined, `#${customMap.value?.domId}`);
+      //   }
+      // }
+      // 返回校验结果
       resolve(valid);
     });
   });
@@ -331,7 +351,8 @@ defineExpose({
   getCodeListMap,
   setCodeListMap,
   addCodeListMap,
-  addProvide
+  addProvide,
+  validateField
 });
 </script>
 

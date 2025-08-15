@@ -904,6 +904,10 @@ function split() {
   let NCiPrm = 0.0; ////当前险位全单的共保保费
   let NCiAmtVar = 0.0; //当前险位全单的共保保额变化量
   let NCiPrmVar = 0.0; //当前险位全单的共保保费变化量
+  let NCiNotaxPrm = 0.0; // 当前险位全单的共保不含税保费
+  let NCiNotaxPrmVar = 0.0; // 当前险位全单的共保不含税保费变化量
+  let NCiAddedTax = 0.0; // 当前险位全单的共保增值税
+  let NCiAddedTaxVar = 0.0; // 当前险位全单的共保增值税变化量
 
   if (
     CCiMrk == "1" ||
@@ -917,6 +921,10 @@ function split() {
     NCiPrm = freeEditRef1.value?.getValue("nCiPrm");
     NCiAmtVar = freeEditRef1.value?.getValue("nCiAmtVar");
     NCiPrmVar = freeEditRef1.value?.getValue("nCiPrmVar");
+    NCiNotaxPrm = freeEditRef1.value?.getValue("nCiNotaxPrm");
+    NCiNotaxPrmVar = freeEditRef1.value?.getValue("nCiNotaxPrmVar");
+    NCiAddedTax = freeEditRef1.value?.getValue("nCiAddedTax");
+    NCiAddedTaxVar = freeEditRef1.value?.getValue("nCiAddedTaxVar");
   }
   if (NAmt == "") {
     ElMessage.error("保额不能为空!");
@@ -942,6 +950,12 @@ function split() {
   let unTotalCiPrmVar = 0.0;
   let unTotalNotaxPrm = 0.0;
   let unTotalAddedTax = 0.0;
+  let unTotalNotaxPrmVar = 0.0;
+  let unTotalAddedTaxVar = 0.0;
+  let unTotalCiNotaxPrm = 0.0;
+  let unTotalCiAddedTax = 0.0;
+  let unTotalCiNotaxPrmVar = 0.0;
+  let unTotalCiAddedTaxVar = 0.0;
 
   for (var i = 0; i < arrData.length; i++) {
     // var status = arrData[i].getAttribute("status");
@@ -972,6 +986,14 @@ function split() {
     unTotalCiAmtVar = parseFloat(unTotalCiAmtVar) + parseFloat(oldCiAmtVar);
     var oldCiPrmVar = arrData[i].nCiPrmVar;
     unTotalCiPrmVar = parseFloat(unTotalCiPrmVar) + parseFloat(oldCiPrmVar);
+    const oldCiNotaxPrm = arrData[i].nCiNotaxPrm;
+    unTotalCiNotaxPrm = parseFloat(unTotalCiNotaxPrm) + parseFloat(oldCiNotaxPrm);
+    const oldCiAddedTax = arrData[i].nCiAddedTax;
+    unTotalCiAddedTax = parseFloat(unTotalCiAddedTax) + parseFloat(oldCiAddedTax);
+    var oldCiNotaxPrmVar = arrData[i].nCiAmtVar;
+    unTotalCiNotaxPrmVar = parseFloat(unTotalCiNotaxPrmVar) + parseFloat(oldCiNotaxPrmVar);
+    var oldCiAddedTaxVar = arrData[i].nCiAddedTaxVar;
+    unTotalCiAddedTaxVar = parseFloat(unTotalCiAddedTaxVar) + parseFloat(oldCiAddedTaxVar);
   }
 
   const allAmt = parseFloat(NAmt) + parseFloat(unTotalAmt); //所有记录的总保额
@@ -1084,6 +1106,28 @@ function split() {
     nRetAmt: 0.00,
     cRemark: '',
   }]
+  if (
+    CCiMrk == "1" ||
+    CCiMrk == "2" ||
+    CCiMrk == "3" ||
+    CCiMrk == "4" ||
+    CCiMrk == "5"
+  ) {
+    //共保
+    const remCiAmt = (parseFloat(totalCiAmt) - parseFloat(allCiAmt)).toFixed(2);//要拆分的共保保额
+    const remCiPrm = (parseFloat(totalCiPrm) - parseFloat(allCiPrm)).toFixed(2);//要拆分的共保保费
+    const remCiNotaxPrm = (parseFloat(totalCiNotaxPrm) - parseFloat(allCiNotaxPrm)).toFixed(2);//要拆分的共保不含税保费
+    const remCiAddedTax = (parseFloat(totalCiAddedTax) - parseFloat(allCiAddedTax)).toFixed(2);//要拆分的共保增值税
+
+    newRow[0].nCiAmt = remCiAmt;
+    newRow[0].nCiAmtVar = remCiAmt;
+    newRow[0].nCiPrm = remCiPrm;
+    newRow[0].nCiPrmVar = remCiPrm;
+    newRow[0].nCiNotaxPrm = remCiNotaxPrm;
+    newRow[0].nCiNotaxPrmVar = remCiNotaxPrm;
+    newRow[0].nCiAddedTax = remCiAddedTax;
+    newRow[0].nCiAddedTaxVar = remCiAddedTax;
+  }
   pageresult1.list = pageresult1.list.concat(newRow)
   const table = tableRef1.value;
   nextTick(() => {
@@ -1667,6 +1711,8 @@ function changePrm(nPrmVar: any, flag: any) {
     freeEditRef1.value?.setValue("nPrm", parseFloat(nPrmVar));
     // 共保业务(计算保费和总保费的比例，根据比例计算共保保费的拆分金额)
     let nCiPrm = 0;
+    let nCiNotaxPrm = 0;// 共保不含税保费
+    let nCiAddedTax = 0;// 共保增值税
     let nNotaxPrm = 0;// 不含税保费
     let nAddedTax = 0;// 增值税
 
@@ -1674,16 +1720,25 @@ function changePrm(nPrmVar: any, flag: any) {
     const totalNotaxPrm = freeEditRef.value?.getValue("nNotaxPrm") // 不含税保费
     const totalAddedTax = freeEditRef.value?.getValue("nAddedTax") // 增值税
     const nPrmRatio = parseFloat((parseFloat(nPrmVar) / parseFloat(totalPrm))) // 保费变化值与总保费的比例
-    nNotaxPrm = parseFloat((parseFloat(totalNotaxPrm) * nPrmRatio).toFixed(2)) // 计算后的不含税保费
-    nAddedTax = parseFloat((parseFloat(totalAddedTax) * nPrmRatio).toFixed(2)) // 计算后的增值税
+    nAddedTax = parseFloat(financial(parseFloat(totalAddedTax) * nPrmRatio)) // 计算后的增值税
+    nNotaxPrm = parseFloat(nPrmVar) - parseFloat(nAddedTax) // 计算后的不含税保费(保费 - 计算后的增值税)
     freeEditRef1.value?.setValue("nNotaxPrm", nNotaxPrm);
     freeEditRef1.value?.setValue("nNotaxPrmVar", nNotaxPrm);
     freeEditRef1.value?.setValue("nAddedTax", nAddedTax);
     freeEditRef1.value?.setValue("nAddedTaxVar", nAddedTax);
     if(params.cCiMrk !== "0") {
       const totalCiPrm = freeEditRef.value?.getValue("nCiPrm") // 共保保费
-      nCiPrm = parseFloat((parseFloat(totalCiPrm) * nPrmRatio).toFixed(2))
+      const totalCiNotaxPrm = freeEditRef.value?.getValue("nCiNotaxPrm") // 共保不含税保费
+      const totalCiAddedTax = freeEditRef.value?.getValue("nCiAddedTax") // 共保增值税
+      nCiPrm = parseFloat(financial(parseFloat(totalCiPrm) * nPrmRatio))
+      nCiAddedTax = parseFloat(financial(parseFloat(totalCiAddedTax) * nPrmRatio))
+      nCiNotaxPrm = parseFloat(nCiPrm) - parseFloat(nCiAddedTax)
       selectRow1.value.nCiPrm = nCiPrm;
+      selectRow1.value.nCiPrmVar = nCiPrm;
+      selectRow1.value.nCiAddedTax = nCiAddedTax;
+      selectRow1.value.nCiAddedTaxVar = nCiAddedTax;
+      selectRow1.value.nCiNotaxPrm = nCiNotaxPrm;
+      selectRow1.value.nCiNotaxPrmVar = nCiNotaxPrm;
     }
     pageresult1.list.forEach(item => {
       if(item.cPkId === selectRow1.value.cPkId) {
@@ -1695,6 +1750,11 @@ function changePrm(nPrmVar: any, flag: any) {
         item.nAddedTaxVar = nAddedTax;
         if(params.cCiMrk !== "0") {
           item.nCiPrm = nCiPrm
+          item.nCiPrmVar = parseFloat(nCiPrm);
+          item.nCiNotaxPrm = nCiNotaxPrm;
+          item.nCiNotaxPrmVar = nCiNotaxPrm;
+          item.nCiAddedTax = nCiAddedTax;
+          item.nCiAddedTaxVar = nCiAddedTax;
         }
       }
     })
@@ -1879,6 +1939,14 @@ function changePrm(nPrmVar: any, flag: any) {
     //     }
     //     setRowReadOnly();
   }
+}
+
+const financial = (num:any, digit = 2)=> {
+  if(Object.is(parseFloat(num), NaN)) {
+    return num;
+  }
+  num = parseFloat(num);
+  return (Math.round((num + Number.EPSILON) * Math.pow(10, digit)) / Math.pow(10, digit)).toFixed(digit);
 }
 </script>
 

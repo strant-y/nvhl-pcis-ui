@@ -876,22 +876,16 @@ const submit = () => {
 }
 
 onMounted(() => {
-  console.log('-----------------',props.goodsData == null ,props.goodsType)
   if (routeQryParams?.type == 'add') {
     nextTick(() => {
       freeEditRef.value?.setValue("cKindNo", routeQryParams?.rowData.cKindNo);
       freeEditRef.value?.setValue("cProdNo", routeQryParams?.rowData.cProdNo);
     });
   } else {
-    console.log('-----router=-=',routeQryParams)
     let param = {
       cPlanNo: props.goodsType=='goods'? props.goodsData.cPlanNo:  routeQryParams.rowData.cPlanNo
     };
 
-    console.log('param', param)
-    
-    // if( !props.type || props.type !== 'goods')
-    // const param = { 'cPlanNo': routeQryParams.rowData.cPlanNo }
     policyService.getPlanBase(param).then(result => {
       if (result['code'] === 200) {
         freeEditRef.value?.setFormValue(result.data.data)
@@ -899,7 +893,6 @@ onMounted(() => {
         // 根据公式计算弹框
         payinfo.value = result.data.data.cCalcFormula == 3 ? true : false;
         // payinfo.value = true
-        console.log(payinfo.value)
         if (payinfo.value) {
           initData();
         }

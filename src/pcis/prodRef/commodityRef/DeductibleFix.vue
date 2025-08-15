@@ -147,8 +147,6 @@ const returnData = () => {
   let selectedData = props.data.selectedData;
   let tempData = multipleTableRef.value.getSelectionRows();
   let newAddTable = Object.assign([],addTableData.value)
-  console.log('newAddTable',newAddTable)
-  
   if (newAddTable) {
     for (const item of newAddTable) {
       tempData.push(item);
@@ -161,9 +159,6 @@ const returnData = () => {
     );
     return matchedItem1 ? matchedItem1 : item2;
   });
-  console.log('addTableData,’', addTableData.value)
-  console.log('id----11', selectedData)
-  console.log('id----22', processedNewItems)
   props.method.getSelected(processedNewItems);
   close();
 };
@@ -196,8 +191,6 @@ function delAdd(row: any) {
       }
     }
   });
-  console.log('newAddList',newAddList)
-  console.log('addTableData',addTableData)
 
   // if(newAddList){
       // addTableData.length = 0; // 清空原有内容（保持响应式引用）
@@ -217,7 +210,6 @@ onMounted(() => {
             addTableData.value.push(item);
         });
     }
-    console.log('12addList',selectedData)
   
   refreshData();
 });

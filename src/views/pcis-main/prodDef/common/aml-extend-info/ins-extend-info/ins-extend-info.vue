@@ -354,30 +354,11 @@ const tableconfig = reactive<AppGridEditConfig>(
 				title: "证件类型",
 				rules: [getRules("required", {})], 
 			    func:(val:any)=>{
-					console.log('----',val)
 					if(val){
 						setFieldRules('cCerftCde',val, tableRef)
 						// setFieldRules('CCertfCde_A',val,freeEditRef1,formconfig1)
 				    }
-				// func:(val:any)=>{
-				// 	console.log('----',val)
-				// 	 if (val == "120001") {
-				// 		     setFormItem("cCerftCde", {
-				// 				rules: [getRules("required", {}), getRules("idCard", {
-				// 				})],
-				// 			});
-
-				// 	 }else  if (val == "110007") {
-				// 		// 统一社会信用代码
-				// 		setFormItem("cCerftCde", {
-				// 			rules: [getRules("required", {}),getRules("socialCode", {})],
-				// 		});
-				// 	 }else if(val =='120002'){
-				// 		// 护照 
-				// 		setFormItem("cCerftCde", {
-				// 			rules: [getRules("required", {}),getRules("passPort", {})],
-				// 		});
-				// 	 }
+		
 				}	
 			},
 			{

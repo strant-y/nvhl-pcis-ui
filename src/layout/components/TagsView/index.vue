@@ -96,17 +96,6 @@ const affixTags = ref<TagView[]>([]);
 const left = ref(0);
 const top = ref(0);
 
-// watch(
-//   route,
-//   () => {
-//     addTags();
-//     moveToCurrentTag();
-//   },
-//   {
-//     immediate: true, //初始化立即执行
-//   }
-// );
-
 const contentMenuVisible = ref(false); // 右键菜单是否显示
 watch(contentMenuVisible, (value) => {
   if (value) {
@@ -117,7 +106,11 @@ watch(contentMenuVisible, (value) => {
 });
 
 function toView(tag: TagView) {
-  router.push({ path: tag.path, query: {...tag.query, compKey: tag.compKey}})
+  if(tag.keepAlive) {
+    router.replace({ path: tag.path, query: tag.query})
+  }else {
+    router.push({ path: tag.path, query: tag.query})
+  }
 }
 
 /**
@@ -190,6 +183,7 @@ function isLastView() {
 }
 
 function refreshSelectedTag(view: TagView) {
+  return;
   tagsViewStore.delCachedView(view);
   const { fullPath } = view;
   nextTick(() => {
@@ -199,7 +193,7 @@ function refreshSelectedTag(view: TagView) {
 
 function toLastView(visitedViews: TagView[], view?: TagView) {
   const latestView = visitedViews.slice(-1)[0];
-  if(latestView.mode === '2') {
+  if(latestView.keepAlive) {
     toView(latestView);
   } else if (latestView && latestView.fullPath) {
     router.push(latestView.fullPath);
@@ -342,6 +336,9 @@ watch(
 );
 onMounted(() => {
   initTags();
+  nextTick(()=>{
+    tagsViewStore.addTagView(route)
+  })
 });
 </script>
 

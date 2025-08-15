@@ -460,7 +460,13 @@ function initData(data: any) {
       termTitleConf.value.cFactorTabType !== "grid" &&
       termTitleConf.value.cFactorTabType !== "table"
     ) {
-      termRef.value?.setFormValue(termdata.value, true);
+      // 页面初始化加载时，这里有时获取的termRef.value的值为null导致数据反显为空，所以用定时器实时判断termRef.value的值来设置数据
+      const interval = setInterval(() => {
+        if(termRef.value) {
+          termRef.value?.setFormValue(termdata.value, true);
+          clearInterval(interval)
+        }
+      }, 1000)
     }
   });
 }

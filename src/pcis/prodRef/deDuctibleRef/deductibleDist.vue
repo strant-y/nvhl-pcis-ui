@@ -74,7 +74,6 @@ onMounted(()=>{
 
   // },2000)
 
-  console.log('初始化--’',formData)
   setTimeout(()=>{
     if(formData.value.length>0){
             formData.value.forEach((item, index) => {
@@ -121,8 +120,7 @@ const tableconfig = reactive<AppTableConfig>(
           if(row.editList && row.editList.length>0){
             param['editList'] = row.editList
           }
-
-          console.log('ddd',param)
+          debugger
           dzmodal.open(deductibleFixEdit, { 
             type: "view", 
             data: param, 
@@ -186,7 +184,6 @@ const tableconfig = reactive<AppTableConfig>(
           if (row.nSeqNo == 1) return true;
         },
         tableClick: (row) => {
-          console.log('1112')
           moveUp(row.nSeqNo - 1);
         },
       }),
@@ -370,8 +367,6 @@ const method = {
               const aInB = a.filter(item => bkeys.has(item.cDeductibleClass));
               const bNotInA = b.filter(item => !akeys.has(item.cDeductibleClass));
               const merged = [...aInB, ...bNotInA];
-
-              console.log('分别是什么',akeys,bkeys,aInB,bNotInA,merged)
               return merged.map((item: any, index: number) => ({
                 ...item,
                 nSeqNo: index + 1

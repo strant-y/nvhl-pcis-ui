@@ -1,8 +1,8 @@
 <template>
   <div class="">
     <el-form ref="freeEditRef" :model="formconfig1">
-      <el-form-item :label="`${labelNm}列表`" prop="name">
-        <el-input
+      <el-form-item :label="`选中${labelNm}`" prop="name"  class="custom-form-item">
+        <!-- <el-input
           v-model="formconfig1.name"
           :placeholder="`请输入${labelNm}名称`"
           clearable=""
@@ -10,7 +10,7 @@
           <template #append>
             <el-button icon="Search" @click="handleQuery(true)" />
           </template>
-        </el-input>
+        </el-input> -->
       </el-form-item>
     </el-form>
 
@@ -246,5 +246,10 @@ function handleQuery(flag = true) {
 <style scoped>
 .tableRecordingInfo >>> .el-table__body tr.current-row > td.el-table__cell {
   background-color: #ffaaa64d;
+}
+/* 添加自定义表单项目样式 */
+.custom-form-item :deep(.el-form-item__label) {
+  font-size: 18px;          /* 字体变大 */
+  font-weight: bold;
 }
 </style>

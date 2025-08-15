@@ -1,4 +1,8 @@
-import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
+import {createRouter, createWebHashHistory, RouteLocationRaw, RouteRecordRaw} from "vue-router";
+import {encryptParameter} from "@/utils/encipher";
+import {useTagsViewStore} from "@/store";
+import {CommonConstants} from "@/constants/CommonConstants";
+import {descryptParameterToQuery} from "@/utils/common";
 
 export const Layout = () => import("@/layout/index.vue");
 
@@ -37,7 +41,7 @@ export const constantRoutes: RouteRecordRaw[] = [
           title: "dashboard",
           icon: "homepage",
           affix: true,
-          keepAlive: true,
+          keepAlive: false,
           alwaysShow: false,
         },
       },
@@ -65,6 +69,51 @@ const router = createRouter({
   scrollBehavior: () => ({ left: 0, top: 0 }),
 });
 
+// 保存push replace原始方法
+const originalPush = router.push;
+const originalReplace = router.replace;
+// 扩展 push 方法
+router.push = function (location: RouteLocationRaw) {
+  if(!location || Object.keys(location).length == 0 || location === '') {
+    return Promise.reject(new Error('Invalid route location'));
+  }
+  encryptRouterParam(location);
+  return originalPush.call(this, location).then(() => {
+    const tagsViewStore = useTagsViewStore();
+    tagsViewStore.addTagView(this.currentRoute.value)
+  }).catch(err => {
+    if (err.name !== 'NavigationDuplicated') {
+      // 可以在这里添加全局错误处理
+      console.error('路由跳转错误:', err)
+    }
+    return Promise.reject(err)
+  })
+};
+// 扩展 replace 方法
+router.replace = function (location: RouteLocationRaw) {
+  encryptRouterParam(location);
+  return originalReplace.call(this, location).then(() => {
+    const tagsViewStore = useTagsViewStore();
+    tagsViewStore.updateViewParam(this.currentRoute.value);
+  });
+};
+
+// 路由参数加密
+export function encryptRouterParam(location: RouteLocationRaw) {
+  if(typeof location === CommonConstants.TYPE_OF_STRING || !location.query) {
+    return;
+  }
+  if(!location.query.encrypted) {
+    location.query.encrypted = true;
+    for (const key in location.query) {
+      if (Object.prototype.hasOwnProperty.call(location.query, key)) {
+        if (!['encrypted'].includes(key) && location.query[key]) {
+          location.query[key] = encryptParameter(location.query[key]);
+        }
+      }
+    }
+  }
+}
 
 /**
  * 重置路由

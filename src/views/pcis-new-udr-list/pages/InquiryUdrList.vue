@@ -290,10 +290,9 @@
             inputtype: "rtSelectV2",
             title: "核保级别",
             showKey: [1, 2],
-            typeCode: "WEB_SYS_STA_DICT",
-            params: { cDptCde: user.value.companyId, cEmpCde: user.value.opCde },
+            typeCode: "undrClsList",
+            codeParam: { cDptCde: user.value.companyId, cEmpCde: user.value.opCde},
             clearable: true,
-            lodaData: undrClsListOptions,
         },
         {
             prop: "CAppNme",

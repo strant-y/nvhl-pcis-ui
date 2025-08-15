@@ -20,7 +20,11 @@ import {FormPage} from "@/views/protocolManagement/utils/form-page";
 import moment from "moment";
 const dialog = ref<DialogMethod | null>(null);
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
-
+import cargoApi from "@/api/cargo";
+import {ElMessage} from "element-plus";
+import {ref} from "vue";
+import {useValidator} from "@/typings/useValidator";
+const { getRules } = useValidator();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 
 const props = defineProps({
@@ -85,8 +89,12 @@ const formconfig1 = ref<AppFreeEditConfig>(
   })
 );
 const distContactList:Array<string> = ['DistECargo.PartProp','Tgt.cSuffixAddr','DistECargo.Prop','DistECargo.cSuffixAddr','DistECargo.JingyingProp','DistECargo.cDetailedAddress']
-
-onMounted(() => {
+const rateDetail = ref({
+  cExchCde: '1',
+  nAmtExch:[],
+  cPrmCur:[]
+})
+onMounted(async  () => {
   dataParams.value = formPage.getAllFormData();
 
   let newSchema = [];
@@ -109,6 +117,17 @@ onMounted(() => {
       item["func"] = bonusRatio;
     }
     if(['ECargoGoodsTgt.cPrmCur'].includes(item.prop)) {
+      item["typeCode"] = ''
+      const result:any =  await cargoApi.getRate({cEcAgrAppNo:props.data.cEcAgrAppNo})
+      if(result?.code == 200){
+        rateDetail.value = {...result.data.data[0].rateDetail}
+        nextTick(()=>{
+          item['loadData'] = rateDetail.value?.cPrmCur
+        })
+      }else{
+        ElMessage.error(result.msg);
+        return
+      }
       item["func"] = cAmtCurChange;
     }
 		// 运输信息-币种 添加change事件
@@ -133,6 +152,12 @@ onMounted(() => {
     }
     if(['ECargoInsuredDist.cIsSame'].includes(item.prop)) {
       item["func"] = isSameChange;
+    }
+    if(['ECargoInsuredDist.cClntMrk'].includes(item.prop)) {
+      item["func"] = cClntMrkFunc;
+    }
+    if(['ECargoInsuredDist.cIsIndvduBiz'].includes(item.prop)) {
+      item["func"] = cIsIndvduBizChange;
     }
     if(['ECargoInsuredDist.cRegisterAddress'].includes(item.prop)) {
       if(item.groupList.length>0){
@@ -201,6 +226,9 @@ onMounted(() => {
       setValue("ECargoGoodsTgt.cPrmCur","CNY");
     }
   }, 100);
+  setTimeout(() => {
+    setValue('ECargoGoodsTgt.cExchCde',rateDetail.value.cExchCde)
+  }, 100);
   console.log(' formconfig1.value', formconfig1.value)
 });
 const setcDetailedAddress = (prop:any,aftProp:any)=> {
@@ -262,7 +290,7 @@ const checkUser = () => {
               // 	if (data[0].hasOwnProperty(key)) {
               // 仅替换以 "Applicant." 开头的键
               // if (key.startsWith('Applicant.')) {
-              // 	const newKey = key.replace('Applicant.', 'ECargoApplicant.');
+              // 	const newKey = key.replace('Applicant.', 'ECargoInsuredDist.');
               // 	result[newKey] = data[0][key];
               // } else {
               // 	result[key] = data[0][key];
@@ -309,8 +337,67 @@ const funCheckUser = (val:any)=>{
   checkUser();
 }
 // 证件类型change
- const InsuredCCertfCls =(val) => {
+ const InsuredCCertfCls =(val:any) => {
   checkUser();
+   if (val == "120001") {
+
+     // setValue('ECargoInsuredDist.cCertfCde','')  //选身份证时清空
+     setFormItem("ECargoInsuredDist.cCertfCde", {
+       rules: [getRules("required", {}), getRules("idCard", {})],
+     });
+     setFormItem("ECargoInsuredDist.tCertfBgnDate", {
+       rules: [getRules("required", {})],
+     });
+
+     setFormItem("ECargoInsuredDist.tCertfEndDate", {
+       rules: [getRules("required", {})],
+     });
+
+     setValue("ECargoInsuredDist.cNation", "1"); // 国籍
+
+   } else if (val == "110002") {
+     setFormItem("ECargoInsuredDist.tCertfEndDate", {
+       rules: [getRules("required", {})],
+     });
+     //证件类型是“营业执照”，参加社会统筹标志变化为必填
+     // 参加社会统筹标志
+     setFormItem("ECargoInsuredDist.cParticiinsocTyp", {
+       rules: [getRules("required", {})],
+     });
+
+   } else if ( val == "110007") {
+     setFormItem("ECargoInsuredDist.tCertfBgnDate", {
+       rules: [getRules("required", {})],
+     });
+     setFormItem("ECargoInsuredDist.tCertfEndDate", {
+       rules: [getRules("required", {})],
+     });
+
+     // 统一社会信用代码校验
+     setFormItem("ECargoInsuredDist.cCertfCde", {
+       rules: [getRules("required", {}),getRules("socialCode", {})],
+     });
+
+     // 为法人  企业成立日期
+     setFormItem("ECargoInsuredDist.tEstablishingDate", {
+       rules: [getRules("required", {})],
+     });
+   } else if(val == "19"){
+     // 外国人证件号
+     setFormItem("ECargoInsuredDist.cCertfCde", {
+       rules: [getRules("required", {}),getRules("ariCard", {})],
+     });
+   } else {
+     setFormItem("ECargoInsuredDist.cCertfCde", {
+       rules: [getRules("required", {})],
+     });
+     setFormItem("ECargoInsuredDist.tCertfBgnDate", { rules: null });
+     setFormItem("ECargoInsuredDist.tCertfEndDate", { rules: null });
+     // 参加社会统筹标志
+     setFormItem("ECargoInsuredDist.cParticiinsocTyp", {
+       rules: null,
+     });
+   }
 }
 // 证件号码change
 const cCertfCdeChange =(val) => {
@@ -343,6 +430,68 @@ function setregistAdd() {
     setValue("ECargoInsuredDist.cClntAddr", a);
   }
 }
+const cIsIndvduBizChange = (val:any)=>{
+  if(val === '1'){
+    setFormItem('ECargoInsuredDist.cTrdCde',{ rules: [getRules("required", {})]})
+  }else{
+    setFormItem('ECargoInsuredDist.cTrdCde',{ rules: null})
+  }
+}
+ const cClntMrkFunc = (val:any)=>{
+    if(val === '1'){
+      setFormItem('ECargoInsuredDist.tBirthday',{disabled:true})
+      setFormItem('ECargoInsuredDist.nAge',{disabled:true})
+      setFormItem('ECargoInsuredDist.cSex',{disabled:true})
+      setFormItem('ECargoInsuredDist.cNation',{disabled:true})
+      codeListStore
+          .queryCodeList({
+            codeListName: "NATURAL_CERTIFICATE_CACHE",
+            codeListParam: {},
+          })
+          .then((res) => {
+            if (
+                !res.some((item) =>
+                    Object.values(item).includes(getValue("ECargoInsuredDist.cCertfCls"))
+                )
+            ) {
+              setValue("ECargoInsuredDist.cCertfCls", "");
+            }
+            setFormItem("ECargoInsuredDist.cCertfCls", {
+              loadData: [],
+            });
+            setFormItem("ECargoInsuredDist.cCertfCls", {
+              loadData: res,
+              rules: [getRules("required", {})],
+            });
+          });
+    }else{
+      codeListStore
+          .queryCodeList({
+            codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
+            codeListParam: {},
+          })
+          .then((res) => {
+            if (
+                !res.some((item) =>
+                    Object.values(item).includes(getValue("ECargoInsuredDist.cCertfCls"))
+                )
+            ) {
+              setValue("ECargoInsuredDist.cCertfCls", "");
+            }
+            setFormItem("ECargoInsuredDist.cCertfCls", {
+              loadData: [],
+            });
+            setFormItem("ECargoInsuredDist.cCertfCls", {
+              loadData: res,
+              rules: [getRules("required", {})],
+            });
+          });
+      setFormItem('ECargoInsuredDist.tBirthday',{disabled:false})
+      setFormItem('ECargoInsuredDist.nAge',{disabled:false})
+      setFormItem('ECargoInsuredDist.cSex',{disabled:false})
+      setFormItem('ECargoInsuredDist.cNation',{disabled:false})
+    }
+  }
 //注册地市是否同上
 const isSameChange = (val:any) => {
 	if (val == "1") {
@@ -372,21 +521,25 @@ function setRegisterAdd() {
 }
 //总保额币种下拉事件
 const cAmtCurChange = (val: any)=>{
-  if (val !== "CNY") {
-    codeListStore
-        .queryCodeList({
-          codeListName: "WEB_BAS_CHGRATE",
-          codeListParam: { value: val },
-        })
-        .then((res) => {
-          console.log("0000000", res);
-          setValue("ECargoGoodsTgt.nAmtExch", res[0].currency_rate);
-          setValue('ECargoGoodsTgt.nRmbLimit',Number(getValue('ECargoGoodsTgt.nInsuranceAmount'))*getValue('ECargoGoodsTgt.nAmtExch'))
-        });
-  } else {
-    setValue("ECargoGoodsTgt.nAmtExch", "1.000000");
-    setValue('ECargoGoodsTgt.nRmbLimit',Number(getValue('ECargoGoodsTgt.nInsuranceAmount')))
-  }
+  const foundItem:any = rateDetail.value.nAmtExch.find((item:any) => item.label === val);
+  setValue("ECargoGoodsTgt.nAmtExch", foundItem.value);
+  setValue('ECargoGoodsTgt.nRmbLimit',Number(getValue('ECargoGoodsTgt.nInsuranceAmount'))*getValue('ECargoGoodsTgt.nAmtExch'))
+  setValue('ECargoGoodsTgt.cExchCde',rateDetail.value.cExchCde)
+  // if (val !== "CNY") {
+  //   codeListStore
+  //       .queryCodeList({
+  //         codeListName: "WEB_BAS_CHGRATE",
+  //         codeListParam: { value: val },
+  //       })
+  //       .then((res) => {
+  //         console.log("0000000", res);
+  //         setValue("ECargoGoodsTgt.nAmtExch", res[0].currency_rate);
+  //         setValue('ECargoGoodsTgt.nRmbLimit',Number(getValue('ECargoGoodsTgt.nInsuranceAmount'))*getValue('ECargoGoodsTgt.nAmtExch'))
+  //       });
+  // } else {
+  //   setValue("ECargoGoodsTgt.nAmtExch", "1.000000");
+  //   setValue('ECargoGoodsTgt.nRmbLimit',Number(getValue('ECargoGoodsTgt.nInsuranceAmount')))
+  // }
 }
 // 运输信息币种change事件
 const cAmtCurChange1 = (val: any)=>{

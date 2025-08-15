@@ -91,16 +91,6 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         title: "国家英文名称",
       },
-        {
-        prop: "portEn",
-        inputtype: "rtinput",
-        title: "港口英文名称",
-         showExBtn: true,
-        btnItems: {
-          "icon": "Search",
-          "type": "primary"
-        },
-      },
       
     ],
     fromUi: createFromUiConfig({
@@ -227,11 +217,7 @@ function handleQuery(reset = true) {
   // const param = {...r,...s }
   const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  console.log(r,s)
   let param = Object.assign(s, r);
-
-  console.log('查询-----分页',param)
-
   selCountryPort(param)
     .then((res) => {
       const { code, data, msg, total } = res;

@@ -50,7 +50,7 @@ import { isValidDateFlag } from "@/typings/method-public";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const dialogVisible = ref(true);
 const props = defineProps(["data","callback"]);
-const rowData = ref(props.data);
+const rowData = ref(props.data); 
 const opertaor = dataOpertaor();
 //rowData当前行数据
 /**
@@ -72,7 +72,6 @@ onMounted(() => {
 // 使用正则表达式分割字符串，保留分隔符 ** 作为单独的数组项
 
 const cNmeCnArray = computed(() => rowData.value.cSpecialContent?.split(/(\*+)/) );
-// console.log(1212,cNmeCnArray)
 // const inputValues = ref<string[]>([]);
 const inputValues = ref( //item.match(/^\*+$/)
   // cNmeCnArray.value.map((item) => (item === "*" ? "*" : item))
@@ -156,6 +155,10 @@ function setEditList(target, source, placeholderPattern = /^\*+$/) {
 
 // 星号修改赋新值
 function newListValue(original, modified, placeholderPattern = /^\*+$/) {
+  // console.log('043002',original)
+  if(!original){
+    return false;
+  }
   const result = [];
   for (let i = 0; i < original.length; i++) {
     // 如果原始位置是占位符

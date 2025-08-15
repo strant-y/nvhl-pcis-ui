@@ -72,16 +72,11 @@ const props = defineProps({
     type: String
   }
 });
-// const 
 watch(
-    () => opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered'],
+    () => opertaor.getTableRefs()['tgt']?.getFromValue()?.['Tgt.cIsinsuranceRegistered'],
     (n, o) => {
-        // 自动刷新列表获取数据
-        // pageresult.list = []
-        // pageresult.total = 0
-        // 上面代码是仅用于本地调试
+ 
         if (n) {
-          console.log('投保值' ,n,o)
           // 学生岗位 Dist.cJobType
             if(params.cProdNo === '043010'){
                   formconfig11.value.fromSchema?.forEach(item=>{
@@ -194,26 +189,6 @@ const distSummaryRef = ref(); // 汇总组件对象
 const collectCompKey = ref(); // 汇总组件key
 const formconfig11 = ref<any>({});
 const oldPageSchema = ref<any>({});
-// 列表数据反显时，方案号的下拉选项渲染需要条款加载后根据条款获取，所以通过计算属性获取getPlanNo的值
-// 有值的时候再填充到方案号的loadData中
-const cvrg = computed(() => {
-  if(opertaor.getTableRefByKey("cvrg") && opertaor.getTableRefByKey("cvrg").getPlanNo) {
-    return opertaor.getTableRefByKey("cvrg")?.getPlanNo()
-  } else {
-    return "";
-  }
-})
-watch(cvrg, (val) => {
-  if(val && val.length > 0) {
-    tableconfig.value.fromSchema.forEach( r => {
-      // 方案号
-      if(r['prop'] == 'Dist.cPlanNo'){
-        r.typeCode = null;
-        r.loadData = val;
-      }
-    });
-  }
-});
 onMounted(async () => {
   // 初始化 cComponentTableValue
   cComponentTableValue = getCComponentTableValue();
@@ -227,29 +202,19 @@ onMounted(async () => {
   if(route.params.param?.cGrpMrk !== '1') {
     formconfig11.value.fromSchema = formconfig11.value.fromSchema.filter((item:any) => item.prop !== 'Dist.cRelatedInsured')
   }
-  if(params.cProdNo === '040003'){
-    formconfig11.value.fromSchema?.forEach(item=>{
-      if(item['prop'] ==='Dist.cProductType'){
-        item['typeCode'] = 'Product_Type040003';
-      }
-    })
-  }
-
-console.log('dist -----',formconfig11.value,)
-console.log('dist2 -----',formconfig11.value.fromSchema)
- 
-  // if(params.cProdNo === '043009'){
+  // if(params.cProdNo === '040003'){
   //   formconfig11.value.fromSchema?.forEach(item=>{
-  //     if(item['prop'] ==='Dist.cEmploymentAddress' && route.params.param?.cGrpMrk !== '1'){
-  //       item.isShow = false;
+  //     if(item['prop'] ==='Dist.cProductType'){
+  //       item['typeCode'] = 'Product_Type040003';
   //     }
   //   })
   // }
+
+
   Object.assign(formconfig1.value, formconfig11.value);
   cardconfig.value.title = formconfig1.value.title;
   if(formconfig1.value.distSchema&& formconfig1.value.distSchema.length > 0){
          formconfig1.value.distSchema.forEach((item:any)=>{
-            console.log(666,item)
             if(item['prop'] === 'cPlateNumber'){
                 item['rules'] = [getRules("vehiclePlate", {})];
             }
@@ -364,7 +329,6 @@ console.log('dist2 -----',formconfig11.value.fromSchema)
 // }  Tgt.nEngineeringCost nEngineeringCostChange
 
 function cardResetFn(){
-  console.log(cardRef.value?.getFromValue());
 	const tableEditRefs = cardRef.value;
 	const s = tableEditRefs?.getFromValue(); //获取表单数据
 	for (const k in s) {
@@ -514,12 +478,12 @@ const method = {
 		}
     const param = opertaor.getParam();
     let app = "";
-    if (opertaor.getDataAll().plyBase["Base.cAppNo"]) {
-      app = opertaor.getDataAll().plyBase["Base.cAppNo"];   
+    if (opertaor.getDataAll()?.plyBase["Base.cAppNo"]) {
+      app = opertaor.getDataAll().plyBase["Base.cAppNo"];
     } else if(param.cOrgAppNo){
       app = param.cOrgAppNo;
-    } else {
-      app = route.params.param?.cAppNo
+    } else if(param.pageType !== "copy") {
+      app = param.cAppNo
     }
     const selData = {
       cAppNo: "",
@@ -555,7 +519,6 @@ const method = {
 				selData.dist[addrValueKey] = selData.dist[inputGroupKey];
 			}
 		}
-		console.log('selDataselData', selData)
     selectDist(selData).then((res: any) => {
       if (res.code === 200) {
         pageresult.list = [];
@@ -613,7 +576,6 @@ const method = {
         }
         // 刷新条款表格
         const termref = opertaor.getTableRefByKey("cvrg");
-        console.log('termref22-----', toRaw(termref));
         const hasRel = res.data.hasRel;
         const hasPlan = res.data.hasPlan;
         const clauseValues = res.data.clauseValues;
@@ -746,7 +708,6 @@ const method = {
 				paramitem.dist[addrValueKey] = paramitem.dist[inputGroupKey];
 			}
 		}
-		console.log('paramitemparamitem', paramitem)
     policyService
         .exportDist(paramitem).then((res) => {
       if (res.size <= 0) {
@@ -894,7 +855,6 @@ const method = {
         };
 
         reader.onerror = (e) => {
-          console.error("文件读取失败", e);
           ElMessage.error("文件读取失败");
         };
 
@@ -976,7 +936,6 @@ const method = {
     } else {
       setAddressStr("Dist.cClntAddr", a);
     }
-    console.log("清单级联事件触发")
   },
   // 批量删除
   batchDelete() {

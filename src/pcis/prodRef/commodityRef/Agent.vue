@@ -393,22 +393,10 @@ function handleQuery() {
   const r = tableRef.value?.getPartnerPage(); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const c = { codeListName: "AGENCY_BUSINESS_LIST" };
-  // const c = { codeListName: "WEB_ORG_OPER_DPT_ALL" };
-  // const param = Object.assign(s, r,c,{
-  //   // "slsTyp": "020004",
-  //   // "type": "operAll",
-  // });
-  // let obj = { "CDptCde": "0237020008900",
-  //     "pagePos": 1,
-  //     "pageSize": 5,
-  //     "totalCount": 0}
   const param = Object.assign(c, {
     codeListParam: { ...r, ...s },
-
-    // parCde: s.cMidCde,
   });
 
-  console.log('参数', param)
   getPageList(param)
     .then((res) => {
       const { code, data, msg, totalCount } = res;
@@ -425,7 +413,6 @@ function handleQuery() {
 
 // 查询  渠道大类
 const queryCBsnsTyp = () => {
-  console.log('数据666',)
   let CDptCde = JSON.parse(sessionStorage.getItem("user")).companyId;
   const params = {
     CDptCde,
@@ -433,7 +420,6 @@ const queryCBsnsTyp = () => {
   };
   getBsnsTypList(params).then((res) => {
     const { code, data, msg } = res;
-    console.log(res)
     if (code === 200) {
       setFormItem("CBsnsTyp", {
         loadData: data
@@ -451,25 +437,13 @@ const queryChaTypeList = (val: any) => {
 
   getChaTypeList({ BsnsTyp: val, scene: '' }).then((res) => {
     const { code, data, msg } = res;
-    console.log(res)
     if (code === 200) {
       setFormItem("CChaType", {
         loadData: data
       });
-      // setValue("CChaType", props.data.cChaType);
     } else {
       ElMessage.error(msg);
     }
-    //   if (null != res && null != res["code"]) {
-    //     if (res["code"] === 200) {
-    //       const obj = {
-    //         loadData: res.data,
-    //       };
-    //       console.log("中类数据", obj);
-    //       setFormItem("CChaType", obj);
-    //       setValue("CChaType", props.data.data.cChaType);
-    //     }
-    //   }
   });
 }
 
@@ -487,33 +461,16 @@ const queryCChaSubtype = (val: any) => {
       setFormItem("CChaSubtype", {
         loadData: data
       });
-      // console.log('----',data,props.data.cChaSubType ==='1900202002'     )
-      // setValue("CChaSubtype", props.data.cChaSubtype);
-      // setTimeout(()=>{
-      //   setValue("CChaSubtype", props.data.cChaSubtype);
-      // },4000)
-
     } else {
       ElMessage.error(msg);
     }
 
-    // if (null != res && null != res["code"]) {
-    //   if (res["code"] === 200) {
-    //     const obj = {
-    //       loadData: res.data,
-    //     };
-    //     console.log("子类数据", res.data);
-    //     setFormItem("CChaSubtype", obj);
-    //     setValue("CChaSubtype", props.data.data.cChaSubtype);
-    //   }
-    // }
   });
 }
 
 
 
 onMounted(() => {
-  console.log('data----', props.data)
   queryCBsnsTyp();
   queryChaTypeList();
   queryCChaSubtype();

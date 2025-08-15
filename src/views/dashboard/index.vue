@@ -21,7 +21,7 @@
                 size="small"
               />
             </i>
-            热搜菜单:
+            <span class="hot-menu-label">快捷菜单:</span>
           </div>
           <div class="top-menu-list">
             <el-tag
@@ -110,6 +110,20 @@
                 </div>
               </div>
             </div>
+          </div>
+          <div>
+              <div class="code-box">
+                <div class="code-inner-box">
+                    <span class="title">移动端二维码：</span>
+                    <img class="code-img" src="@/assets/img/dashbord/QRCode.png" alt="">
+                </div>
+                <div class="code-inner-box">
+                    <span class="title">在线缺陷平台: </span>
+                    <div>
+                      <a :href="platformUrl" target="_blank" class="link">点击跳转</a>
+                    </div>
+                </div>
+              </div>
           </div>
           <!-- <div class="content-list-box">
             <div class="list-title">
@@ -250,7 +264,8 @@ const moreBtnItem = ref({
     toQuery(moreurl.value)
   }
 })
-const labelIcon = "/src/assets/img/9.svg"
+const labelIcon = "/src/assets/img/9.svg";
+const platformUrl = "https://yfpt-devops.yaic.com.cn:30011/plugin/Nq98Zt7s/3HjTkVPb/EXeviQzu/latest/modules/about-blank-Pv2J/index.html?orgUUID=Nq98Zt7s&teamUUID=3HjTkVPb&appID=EXeviQzu&origin=https%3A%2F%2Fyfpt-devops.yaic.com.cn%3A30011&formId=68633ed3e2156d0001578d68&projectId=Pi2GPKuRX7dZ4TCs&access_type=1";
 const ecahrtsRef = ref(null)
 let ecahrtsRefInstance: ECharts | null = null
 const ecahrtsRef1 = ref(null)
@@ -267,9 +282,9 @@ const isOperate = ref(false) //管理员 出单岗
 const isAudit = ref(false) //  核保岗
 const moreurl = ref('');
 const shortListData = ref(null)  // 第二模块tabl列表数据
-const headIcon = `/src/assets/images/${userStore.user.cCssStyle === '2' ? '0' : '1'}_.png`
-const shorMenuList = ref([])// 快捷菜单列表
-const cPayTypList = ref([])
+const headIcon = `/src/assets/images/${userStore.user.cCssStyle === '2' ? '0' : '1'}_.png`;
+const shorMenuList = ref([]);// 快捷菜单列表
+const cPayTypList = ref([]);
 
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -662,7 +677,7 @@ onMounted(() => {
   initRoles()
   getNoticeData()
   getShortMenuList()
-  getCpayTypList()
+  getCpayTypList();
 });
 
 const initRoles = () => {
@@ -1356,6 +1371,10 @@ window.addEventListener('resize', () => {
         font-weight: bold;
         .menu-label {
           display: flex;
+          align-items: center;
+          .hot-menu-label {
+            margin-left: 5px;
+          }
         }
         .top-menu-list {
           span {
@@ -1466,6 +1485,8 @@ window.addEventListener('resize', () => {
           }
         }
         .content-list-box {
+          height: 310px;
+          overflow-y: auto;
           .list-title {
             display: flex;
             justify-content: space-between;
@@ -1502,6 +1523,28 @@ window.addEventListener('resize', () => {
               }
             }
           }
+        }
+        .code-box {
+            height: 100px;
+            .code-inner-box {
+                display: flex;
+                align-items: center;   /* 垂直居中 */
+                justify-content: flex-start; /* 左对齐 */
+                gap: 16px;   /*间距*/
+                padding: 16px 14px;              
+                .code-img {
+                  width: 28%;
+                  height: 28%;
+                }
+                .link {
+                  color: #3a76c6;
+                  text-decoration: none;
+                  padding-left: 6px;
+                }
+                a:hover {
+                  text-decoration: underline;
+                }
+            }
         }
       }
     }

@@ -413,9 +413,7 @@ function setPopover(v: any, item: any) {
 async function validate() {
   const promise = await fromRef.value?.validate((valid, fields) => {
     if (valid) {
-      console.log("submit!");
     } else {
-      console.log("error submit!", fields);
     }
   });
   let fromListbl = promise;
@@ -429,6 +427,34 @@ async function validate() {
   }
   return fromListbl;
 }
+
+async function validateField(fields:any) {
+  // 1. 主表单指定字段校验
+  let mainFormValid = false;
+  // 使用主表单的validateField方法校验指定字段
+  await fromRef.value?.validateField(fields, (valid, invalidFields) => {
+    if (valid) {
+      mainFormValid = true;
+    } else {
+      mainFormValid = false;
+    }
+  });
+
+  // 2. 列表项校验（复用原有逻辑，与validate保持一致）
+  let listFormValid = true;
+  if (fromListRef.value) {
+    for (const ref in fromListRef.value) {
+      const exvali = await fromListRef.value[ref].tableExvalidate();
+      if (exvali != null) {
+        listFormValid = listFormValid && exvali;
+      }
+    }
+  }
+
+  // 3. 整体校验结果 = 主表单指定字段校验通过 + 列表项校验通过
+  return mainFormValid && listFormValid;
+}
+
 
 //只清空报错信息
 function clearValidate(key: string) {
@@ -639,6 +665,7 @@ defineExpose({
   resetFields,
   setDisabledAll,
   fromListRef,
+  validateField,
 });
 </script>
 

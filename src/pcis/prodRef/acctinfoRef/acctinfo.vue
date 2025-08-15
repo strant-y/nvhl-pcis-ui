@@ -35,7 +35,6 @@ let para: any[] = [];
 
 onMounted(() => {
   const routeData = route.params; // 获取路由参数
-  console.log("路由参数props.param1212", routeData);
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
     method,
@@ -125,11 +124,8 @@ const method = {
       const bankname = para[1]; // 银行名称
       const isdefault = para[2]; // 是否默认值
       const banktype = para[3]; // 银行大类
-      console.log(313, val); 
-      console.log(para,isdefault);
       // 1直连银行 开户行 省、市、对公对私必填   0是非直联，开户行 省、市、区/县、开户行、对公对私必填
       if (isdefault === "1") {
-        console.log('进来了111')
         setFormItem("Acctinfo.cBankPro", {
           disabled: false,
           rules: [getRules("required", {})],
@@ -196,7 +192,6 @@ const method = {
         setValue("Acctinfo.cBankAddr", null);
         const data = tgtobjEditRef.value?.getFromValue();
         const cBankCde = data["Acctinfo.cBankCde"];
-        console.log('cBankCde',cBankCde)
         if (cBankCde !== null && cBankCde !== "" && cBankCde !== undefined) {
           const arrayCBankCde = cBankCde.split("_");
           const codeCBankCde = arrayCBankCde[0];
@@ -299,28 +294,15 @@ const method = {
             },
           )
           .then((res) => {
-
-            console.log('111', res)
             tgtobjEditRef.value?.addCodeListMap({
               code: "Acctinfo.cBankArea",
               list: res
             })
-            // setFormItem("Acctinfo.cBankArea", {
-            //   disabled: false,
-            //   rules: [getRules("required", {})],
-            // });
           });
         }
   },
 
   cCityChange: (e: any) => {
-    console.log('112', e)
-    // setFormItem("Acctinfo.cBankCounty", {
-    //   typeCode: 'CBankCountyList',
-    //   codeParam: { areaname: e },
-    //   disabled: false,
-    //   rules: [getRules("required", {})],
-    // });
     if(e){
       codeListStore
       .queryCodeList(
@@ -344,15 +326,6 @@ const method = {
         }
   },
   cCountyChange: (val: any) => {
-    console.log(5556, para[3], val);
-
-    // setFormItem("Acctinfo.cBankCde", {
-    //   disabled: false,
-    //   typeCode: 'CBankCdeList',
-    //   // codeParam: { 'banktypecod': para[3], 'areacode': val },
-    //   codeParam: { banktypecod: para[3], areacode: val },
-    //   rules: [getRules("required", {})],
-    // });
      if(val && para[3]){
       codeListStore
         .queryCodeList(
@@ -368,10 +341,6 @@ const method = {
             code: "Acctinfo.cBankCde",
             list: res
           })
-          // setFormItem("Acctinfo.cBankCde", {
-          //   disabled: false,
-          //   rules: [getRules("required", {})],
-          // });
         });
       }
   },

@@ -14,7 +14,7 @@
           <div v-if="row.cInquiryNo" class="policy-number-row">
             <span>{{ row.cInquiryNo }}</span>
             <el-icon class="copy-icon" @click="copyText(row.cInquiryNo)">
-              <DocumentCopy />
+              <CopyDocument />
             </el-icon>
           </div>
         </div>
@@ -92,7 +92,8 @@ let addrowArr = [
 const cPard = ref(null);
 let cTermNoList = ref<any>([]);  // 条款数据
 let cTermNo = '';    // 条款编码
-
+let ESOriginalData = ref<any>([]);  // ES查询原始数据，转化成驼峰为适配操作列
+import { FIELD_MAP } from '@/constants/fieldMaps';
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -947,7 +948,7 @@ const tableObj = {
                 hideBtns: (row: any) => {
                     // 询价转投保按钮只在状态为"已出保单"时可见
                     if (
-                        row.cAppStatus == "5"
+                        row.cAppStatus == "5" && row.canConvert === "1"
                     ) {
                         return false;
                     } else {
@@ -977,55 +978,55 @@ const esSearchColumns = [
     fixed: "left",
    },
    {
-    prop: "c_ply_no",
+    prop: "cPlyNo",
     inputtype: "rtinput",
     title: "批单",
     minWidth: 180,
    },
    {
-    prop: "n_edr_prj_no",
+    prop: "nEdrPrjNo",
     inputtype: "rtinput",
     title: "批改序号",
     minWidth: 180,
    },
    {
-    prop: "c_nme_cn",
+    prop: "cNmeCn",
     inputtype: "rtinput",
     title: "产品名称",
     minWidth: 180,
    },
    {
-    prop: "c_insured_nme",
+    prop: "cInsuredNme",
     inputtype: "rtinput",
     title: "被保人名称",
     minWidth: 180,
    },
    {
-    prop: "c_insured_cde",
+    prop: "cInsuredCde",
     inputtype: "rtinput",
     title: "被保人证件号码",
     minWidth: 180,
    },
    {
-    prop: "c_mobile",
+    prop: "cMobile",
     inputtype: "rtinput",
     title: "手机号码",
     minWidth: 180,
    },
    {
-    prop: "c_clnt_addr",
+    prop: "cClntAddr",
     inputtype: "rtinput",
     title: "被保人地址",
     minWidth: 180,
    },
    {
-    prop: "c_app_nme",
+    prop: "cAppNme",
     inputtype: "rtinput",
     title: "投保人名称",
     minWidth: 180,
    },
    {
-    prop: "t_udr_tm",
+    prop: "tUdrTm",
     inputtype: "rtinput",
     title: "核保日期",
     minWidth: 180,
@@ -1037,7 +1038,7 @@ const esSearchColumns = [
     minWidth: 180,
    },
    {
-    prop: "c_app_status",
+    prop: "cAppStatus",
     inputtype: "rtselect",
     title: "保单状态",
     minWidth: 110,
@@ -1068,9 +1069,37 @@ const normalQueryColumns = [
     {
         prop: "cInquiryNo",
         inputtype: "rtinput",
-        title: "询价单",
+        title: "询价单号",
         minWidth: 180,
-        slotName: "cInquiryNo"
+        slotName: "cInquiryNo",
+        fixed: "left",
+    },
+    {
+      prop: "cAppStatus",
+      inputtype: "rtselect",
+      title: "状态",
+      minWidth: 100,
+      loadData: [
+        { label: "暂存", value: "1" },
+        { label: "已提核", value: "2" },
+        { label: "核保退回/撤回", value: "3" },
+        { label: "核保通过", value: "4" },
+        { label: "已出保单", value: "5" },
+        { label: "已做失效操作", value: "6" },
+        { label: "已提交未接收", value: "7" },
+        { label: "见费出单退回", value: "8" },
+      ],
+      hideBtns: (row: any) => {
+        if (
+            queryType.value == "2" ||
+            queryType.value == "3" ||
+            queryType.value == "4"
+        ) {
+          return false;
+        } else {
+          return true;
+        }
+      },
     },
     {
         prop: "cPlyNo",
@@ -1126,33 +1155,7 @@ const normalQueryColumns = [
         title: "保费",
         minWidth: 100,
     },
-    {
-        prop: "cAppStatus",
-        inputtype: "rtselect",
-        title: "状态",
-        minWidth: 100,
-        loadData: [
-            { label: "暂存", value: "1" },
-            { label: "已提核", value: "2" },
-            { label: "核保退回/撤回", value: "3" },
-            { label: "核保通过", value: "4" },
-            { label: "已出保单", value: "5" },
-            { label: "已做失效操作", value: "6" },
-            { label: "已提交未接收", value: "7" },
-            { label: "见费出单退回", value: "8" },
-        ],
-        hideBtns: (row: any) => {
-            if (
-                queryType.value == "2" ||
-                queryType.value == "3" ||
-                queryType.value == "4"
-            ) {
-                return false;
-            } else {
-                return true;
-            }
-        },
-    },
+
 ];
 
 let tableconfig = reactive<AppTableConfig>(
@@ -1282,13 +1285,28 @@ function esSearch(flag?: boolean) {
       .then((res) => {
         const { code, data, msg } = res;
         if (200 === code) {
+          let convertedData = [];
+          // ES查询原始数据，转化成驼峰为适配操作列
+          ESOriginalData.value = data.result;
+          convertedData = ESOriginalData.value.map(item => {
+            const newItem = {};
+             for (const key in item) {
+                if (FIELD_MAP[key]) {
+                   newItem[FIELD_MAP[key]] = item[key]; // 转换字段名
+                } else {
+                   newItem[key] = item[key]; // 部分保持原样
+                }
+            }
+            return newItem;
+          })
           pageresult.list = [];
-          pageresult.list = data.result;
-          pageresult.list = data.result.map(item => ({
+          pageresult.list = convertedData;
+
+          pageresult.list = convertedData.map(item => ({
             ...item,
             // 创建一个新字段合并两个值
-            policyInfo: `${item.c_app_no || ''}\n${item.c_ply_no || ''}`,
-            InsurancePeriod: `${item.t_insrnc_bgn_tm || ''}\n${item.t_insrnc_end_tm || ''}`,
+            policyInfo: `${item.cAppNo || ''}\n${item.cPlyNo || ''}`,
+            InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
           }));
           pageresult.total = data.total;
         } else {

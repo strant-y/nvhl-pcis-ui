@@ -616,7 +616,11 @@ const tableconfig = reactive<AppTableConfig>(
                                         ElMessage.success(msg);
                                         handleQuery();
                                     } else {
-                                        ElMessage.error(msg);
+                                        if(msg && msg.indexOf('申请单已进入再保流程，不允许进行‘见费出单退回’操作') > 0) {
+                                            ElMessage.info(msg);
+                                        } else {
+                                            ElMessage.error(msg);
+                                        }
                                     }
                                 })
                                 .finally(() => { });
@@ -825,7 +829,8 @@ const tableconfig = reactive<AppTableConfig>(
 				inputtype: "rtinput",
 				title: "申请单号",
         width: 200,
-        slotName: "cAppNo"
+        slotName: "cAppNo",
+        fixed: "left"
 			},
 			{
 				prop: "nTms",
