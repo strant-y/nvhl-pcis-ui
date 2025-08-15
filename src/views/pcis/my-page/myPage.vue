@@ -1866,6 +1866,7 @@ async function loadAfter() {
         if(ops.plyBase) {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+          ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
         }
         ops['plyBase']['Base.cPlyNo'] = ''
         if(ops['ci'] && ops['ci'].length>0){
@@ -2011,6 +2012,7 @@ async function loadAfter() {
         if(ops.plyBase) {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+          ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
         }
         if(ops['ci'] && ops['ci'].length>0){
           ops['ci'].forEach((item:any)=>{
@@ -2152,6 +2154,7 @@ async function loadAfter() {
         if(ops.plyBase) {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+          ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
         }
         ops['plyBase']['Base.cPlyNo'] = ''
         ops['plyBase']['Base.cAppStatus'] = ''
@@ -2837,6 +2840,14 @@ const submitToUndrFn = async () => {
   if(nPayAll !== nPrm ){
       ElMessage.warning('缴费计划“应收保费”不等于“总保费”请确认！')
       return false;
+  }
+  // 电梯责任保险 每部电梯累计赔偿限额小于每部电梯每人赔偿限额时校验
+  if(props.param?.cProdNo==='043001') {
+    const cvrgValue = opertaor.getTableRefByKey("cvrg").getFromValue()[0];
+    if(cvrgValue && cvrgValue['Term.nElevatorTotal'] && cvrgValue['Term.nElevatorPerson'] && parseFloat(cvrgValue['Term.nElevatorTotal']) < parseFloat(cvrgValue['Term.nElevatorPerson'])) {
+      ElMessage.warning('“每部电梯累计赔偿限额”不得小于“每部电梯每人赔偿限额”请确认！')
+      return false;
+    }
   }
  
 
