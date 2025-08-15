@@ -375,15 +375,41 @@
           />
         </div>
       </el-main>
-      <div class="right-btns">
-        <div class="btns-content" v-if="rightBtnList.length > 0">
-          <rt-button
-            v-for="(bth, idx) in rightBtnList"
-            :item="bth"
-            :key="idx"
-            :loading="bth.loading"
-          />
-        </div>
+      <div class="right-sidebar-trigger">
+        <el-popover
+            placement="left"
+            trigger="click"
+            :width="120"
+            popper-class="action-menu-popper"
+        >
+          <template #reference>
+            <el-button
+                circle
+                class="menu-trigger"
+            >
+              <img src="@/assets/icons/ExpandLeft.svg" alt="Expand Left" width="30" height="30" />
+            </el-button>
+          </template>
+          <div class="btns-content">
+            <el-button
+                v-for="(btn, idx) in rightBtnList"
+                :key="idx"
+                :icon="btn.icon"
+                @click="btn.func"
+                style="margin-bottom: 1px;"
+                class="flex-center"
+            >
+              <svg-icon
+                  v-if="btn.svgIcon"
+                  :icon-class="btn.svgIcon"
+
+                  :size="(btn.iconSize || '16') + 'px'"
+                  style="margin-right: 8px; transition: all 0.3s"
+              />
+              <span>{{ btn.label }}</span>
+            </el-button>
+          </div>
+        </el-popover>
       </div>
     </el-container>
   </div>
@@ -455,6 +481,7 @@ import { forEach } from "lodash";
 import {scrollByDomId} from "@/utils/common";
 import { getAppPolicyList, qryEndorseList, delTmpPolicy, queryInsuredList, getInquiryPolicyList} from "@/api/query";
 import {encryptRouterParam} from "@/router";
+import SvgIcon from "@/components/SvgIcon/index.vue";
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -998,7 +1025,8 @@ const basicRightBtn = [
     label: "保存模板",
     type: "primary",
     buttonColor: bottomBtnColor1,
-    icon: "Memo",
+    svgIcon: "template2",
+    iconSize: "20",
     func: () => {
       handleSaveTemplate()
     },
@@ -1007,7 +1035,8 @@ const basicRightBtn = [
     label: "复制出单",
     type: "primary",
     buttonColor: bottomBtnColor1,
-    icon: "CopyDocument",
+    svgIcon: "copy2",
+    iconSize: "25", // 设置图标大小为25px
     func: () => {
       copyPolicyFun();
     },
@@ -1016,7 +1045,8 @@ const basicRightBtn = [
     label: "额度明细",
     type: "primary",
     buttonColor: bottomBtnColor1,
-    icon: "Tickets",
+    svgIcon: "limit",
+    iconSize: "25",
     func: () => {
       openLimit();
     },
@@ -1491,7 +1521,8 @@ async function loadAfter() {
         label: "费用信息",
         type: "primary",
         id: "modFee",
-        icon: "Money",
+        svgIcon: "fee1", // 使用本地图标库
+        iconSize: "22", // 设置图标大小
         func: () => {
           //获取费用信息类型接口（缺少渠道，保费，当前表单提交校验待后续补充）
           const params = {};
@@ -1546,7 +1577,8 @@ async function loadAfter() {
         label: "任务痕迹",
         type: "primary",
         id: "taskVestige",
-        icon: "SetUp",
+        svgIcon: "track", // 使用本地图标库
+        iconSize: "20", // 设置图标大小
         func: () => {
           dzmodal
             .open(TaskListVestige, {
@@ -1563,7 +1595,8 @@ async function loadAfter() {
         label: "核保信息",
         type: "primary",
         id: "undrInfo",
-        icon: "DocumentChecked",
+        svgIcon: "Agree", // 使用本地图标库
+        iconSize: "25", // 设置图标大小
         func: () => {
           dzmodal
             .open(UndrOpnList, { type: "", CAppNo: props.param?.cAppNo })
@@ -1866,6 +1899,7 @@ async function loadAfter() {
         if(ops.plyBase) {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+          ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
         }
         ops['plyBase']['Base.cPlyNo'] = ''
         if(ops['ci'] && ops['ci'].length>0){
@@ -2011,6 +2045,7 @@ async function loadAfter() {
         if(ops.plyBase) {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+          ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
         }
         if(ops['ci'] && ops['ci'].length>0){
           ops['ci'].forEach((item:any)=>{
@@ -2152,6 +2187,7 @@ async function loadAfter() {
         if(ops.plyBase) {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+          ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
         }
         ops['plyBase']['Base.cPlyNo'] = ''
         ops['plyBase']['Base.cAppStatus'] = ''
@@ -2190,7 +2226,8 @@ async function loadAfter() {
       label: "历史赔案",
       type: "primary",
       buttonColor: bottomBtnColor1,
-      icon: "Histogram",
+      svgIcon: "histogram", // 使用本地图标库
+      iconSize: "25", // 设置图标大小
       func: () => {
         historyClaimcaseFun();
         // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
@@ -2837,6 +2874,14 @@ const submitToUndrFn = async () => {
   if(nPayAll !== nPrm ){
       ElMessage.warning('缴费计划“应收保费”不等于“总保费”请确认！')
       return false;
+  }
+  // 电梯责任保险 每部电梯累计赔偿限额小于每部电梯每人赔偿限额时校验
+  if(props.param?.cProdNo==='043001') {
+    const cvrgValue = opertaor.getTableRefByKey("cvrg").getFromValue()[0];
+    if(cvrgValue && cvrgValue['Term.nElevatorTotal'] && cvrgValue['Term.nElevatorPerson'] && parseFloat(cvrgValue['Term.nElevatorTotal']) < parseFloat(cvrgValue['Term.nElevatorPerson'])) {
+      ElMessage.warning('“每部电梯累计赔偿限额”不得小于“每部电梯每人赔偿限额”请确认！')
+      return false;
+    }
   }
  
 
@@ -4909,83 +4954,72 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   padding: 10px 20px;
 }
 
-.right-btns {
-  padding: 0 3rem;
-  margin-top: 42px;
-  min-width: calc(150px + 6rem);
-  .btns-content {
-    background: #FFFFFF;
-    padding: 10px;
-    border-radius: 5px;
+.right-sidebar-trigger {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000;
+}
+.btns-content {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  .flex-center {
     display: flex;
-    flex-direction: column;
-    align-items: start;
-    width: 150px;
-    .el-button {
-      margin: 0 0 12px 0;
-      border: none;
-      background-color: transparent!important;
-      color: #333;
-      padding: 0;
-      :deep(.el-icon) {
-        width: 32px;
-        height: 32px;
-        padding: 6px;
-        border-radius: 2px;
-        margin-right: 10px!important;
-        svg {
-          width: 20px;
-          height: 20px;
-        }
-      }
-      &:last-child {
-        margin-bottom: 0;
-      }
-      &:nth-child(5n + 1) {
-        :deep(.el-icon) {
-          background-color: $btn-icon-bg-color-1;
-          svg {
-            color: $btn-icon-color-1;
-          }
-        }
-      }
-      &:nth-child(5n + 2) {
-        :deep(.el-icon) {
-          background-color: $btn-icon-bg-color-2;
-          svg {
-            color: $btn-icon-color-2;
-          }
-        }
-      }
-      &:nth-child(5n + 3) {
-        :deep(.el-icon) {
-          background-color: $btn-icon-bg-color-3;
-          svg {
-            color: $btn-icon-color-3;
-          }
-        }
-      }
-      &:nth-child(5n + 4) {
-        :deep(.el-icon) {
-          background-color: $btn-icon-bg-color-4;
-          svg {
-            color: $btn-icon-color-4;
-          }
-        }
-      }
-      &:nth-child(5n + 5) {
-        :deep(.el-icon) {
-          background-color: $btn-icon-bg-color-5;
-          svg {
-            color: $btn-icon-color-5;
-          }
-        }
-      }
-    }
+    align-items: center;
   }
 }
-</style>
-<style>
+
+.menu-trigger {
+  background-color: #fff;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+}
+
+.menu-trigger:hover {
+  transform: scale(1.1);
+}
+
+.action-menu-popper {
+  margin-right: 10px !important;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.action-menu-popper .el-button {
+  justify-content: flex-start;
+  padding: 10px 12px;
+  border-radius: 6px;
+  transition: all 0.3s;
+  border: none;
+}
+
+.action-menu-popper .el-button:hover {
+  background-color: #f5f7fa;
+  transform: translateX(4px);
+}
+
+.action-menu-popper .el-button.text {
+  color: #606266;
+}
+
+.action-menu-popper .el-button.text:hover {
+  color: #409eff;
+}
+
+.action-menu-popper .el-button .svg-icon,
+.action-menu-popper .el-button .el-icon {
+  transition: all 0.3s;
+}
+
+.action-menu-popper .el-button:hover .svg-icon,
+.action-menu-popper .el-button:hover .el-icon {
+  transform: scale(1.1);
+}
+
 .queryTermRateMessage {
   max-width: 80%;
   width: auto;
