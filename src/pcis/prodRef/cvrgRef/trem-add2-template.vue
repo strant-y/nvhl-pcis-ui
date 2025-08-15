@@ -96,7 +96,7 @@ onMounted(() => {
       formcof.value.nMainRate.required = true;
     }
   }
-  if (param.cProdNo === "059002" || param.cProdNo === "059003") {
+  if (param.cProdNo === "059002" || param.cProdNo === "059003" || param.cProdNo === "043020") {
     formcof.value.nMainRate.suffix = "%";
   }
 });
