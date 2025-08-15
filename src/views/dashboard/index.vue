@@ -148,7 +148,7 @@
       <div class="bottom-box">
         <div class="title-box">
           <div class="title-line">
-            <span class="title">出单任务</span>
+            <span class="title">待办任务</span>
             <img class="icon" :src="labelIcon" alt="">
           </div>
           <rtButton :item="moreBtnItem" />
@@ -162,7 +162,7 @@
           </div>
           <div class="table">
             <app-table :key="currentTabName" :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
-            @row-click="(row) => toQuery2(row, tab)" />
+            @row-click="(row) => toQuery2(row, tab)" @pageChange="handlePageChange" />
           </div>
         </div>
       </div>
@@ -212,6 +212,7 @@ import {
     SCENE_PLY_UW_PROCESS,
     SCENE_PLY_UW_PROCESSBEARER,
 } from "@/constants/tab-constants";
+import dayjs from "dayjs";
 
 
 defineOptions({
@@ -699,7 +700,7 @@ const getData = (user: any, roles: any = []) => {
       // 核保
       if (res === 'ROLE_00000152') {
         tableconfig = reactive<AppTableConfig>(
-          createTableEditConfig(tableObj.saveObj)
+          createTableEditConfig(tableObj.unUdrObj)
         );
         moreurl.value = "/pcis-new-udr-list/PendUdrList"
         isAudit.value = true;
@@ -707,65 +708,70 @@ const getData = (user: any, roles: any = []) => {
       }
       roleCde = roleCde === '' ? res : `${roleCde},${res}`;
     });
-  const paramzc = {
-    pageNum: 1,
-    pageSize: 6,
-    udrType: 1,
-    CAppStatus: '1',
-    CurrentUser: user.opCde,
-    CurrentUserOrg: user.companyId,
-    TAppTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-    TAppTmStart: moment(new Date(Date.now())).subtract(7, 'day').format('YYYY-MM-DD HH:mm:ss'),
-  };
-  const paramhbzc = {
-    pageNum: 1,
-    pageSize: 6,
-    companyId: user.companyId,
-    orgCde: user.companyId,
-    roleCde: roleCde,
-    operId: user.opCde,
-    startBsTm1: moment(new Date(Date.now())).subtract(7, 'day').format('YYYY-MM-DD HH:mm:ss'),
-    endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-    inNextDpt: '1',
-    udrType: '0',
-  };
-  const paramdx = {
-    pageNum: 1,
-    pageSize: 6,
-    roleCde: roleCde,
-    operId: user.opCde,
-    startBsTm1: moment(new Date(Date.now())).subtract(7, 'day').format('YYYY-MM-DD HH:mm:ss'),
-    endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-    orgCde: user.companyId,
-    udrType: '4',
-    inNextDpt: '1',
-  };
-  const param = {
-    paramdx: paramdx,
-    paramhbzc: paramhbzc,
-    // paramdh: paramdh,
-    paramzc: paramzc,
-  };
-  console.log('首页参数', param)
-  pcisQueryService.getPolicyShortList(param).then((res: any) => {
-    
-    console.log('首页table数据', res)
-    if (res && res.code === 200) {
-      shortListData.value = res.data
-      console.log('岗位--', isOperate.value , isAudit.value)
-      // 管理员  出单岗
-      if (isOperate.value) {
-        pageresult.list = res.data.stagingList;
-        pageresult.total = res.data.stagingList.length;
-      }
-      //审核员  核保岗
-      if (isAudit.value) {
-        tabs.value = tab2;
-        pageresult.list = res.data.udrStagingList;
-        pageresult.total = res.data.udrStagingList.length;
-      }
+    // 核保岗
+    if(isAudit.value) {
+      getAuditTableData()
+    } else {
+      const paramzc = {
+        pageNum: 1,
+        pageSize: 6,
+        udrType: 1,
+        CAppStatus: '1',
+        CurrentUser: user.opCde,
+        CurrentUserOrg: user.companyId,
+        TAppTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+        TAppTmStart: moment(new Date(Date.now())).subtract(7, 'day').format('YYYY-MM-DD HH:mm:ss'),
+      };
+      const paramhbzc = {
+        pageNum: 1,
+        pageSize: 6,
+        companyId: user.companyId,
+        orgCde: user.companyId,
+        roleCde: roleCde,
+        operId: user.opCde,
+        startBsTm1: moment(new Date(Date.now())).subtract(7, 'day').format('YYYY-MM-DD HH:mm:ss'),
+        endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+        inNextDpt: '1',
+        udrType: '0',
+      };
+      const paramdx = {
+        pageNum: 1,
+        pageSize: 6,
+        roleCde: roleCde,
+        operId: user.opCde,
+        startBsTm1: moment(new Date(Date.now())).subtract(7, 'day').format('YYYY-MM-DD HH:mm:ss'),
+        endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+        orgCde: user.companyId,
+        udrType: '4',
+        inNextDpt: '1',
+      };
+      const param = {
+        paramdx: paramdx,
+        paramhbzc: paramhbzc,
+        // paramdh: paramdh,
+        paramzc: paramzc,
+      };
+      console.log('首页参数', param)
+      pcisQueryService.getPolicyShortList(param).then((res: any) => {
+        
+        console.log('首页table数据', res)
+        if (res && res.code === 200) {
+          shortListData.value = res.data
+          console.log('岗位--', isOperate.value , isAudit.value)
+          // 管理员  出单岗
+          if (isOperate.value) {
+            pageresult.list = res.data.stagingList;
+            pageresult.total = res.data.stagingList.length;
+          }
+          //审核员  核保岗
+          if (isAudit.value) {
+            tabs.value = tab2;
+            pageresult.list = res.data.udrStagingList;
+            pageresult.total = res.data.udrStagingList.length;
+          }
+        }
+      });
     }
-  });
 };
 
 const toChange = (url: string) => {
@@ -773,10 +779,11 @@ const toChange = (url: string) => {
 };
 
 //tabs切换
+let clickedTabData = {udrType: "0"};
 const handleTabClick = (tab: any) => {
   currentTabName.value = tab.props.label
   let url = ''
-  const clickedTabData = tabs.value.find(t => t.name === tab.props.label);
+  clickedTabData = tabs.value.find(t => t.name === tab.props.label);
   if (isOperate.value) {
     tableconfig = reactive<AppTableConfig>(
       createTableEditConfig(tableObj[clickedTabData.tableObj])
@@ -790,20 +797,7 @@ const handleTabClick = (tab: any) => {
     tableconfig = reactive<AppTableConfig>(
       createTableEditConfig(tableObj[clickedTabData.tableObj])
     )
-    nextTick(() => {
-      pageresult.list = shortListData.value[clickedTabData.refName] || []
-      pageresult.total = shortListData.value[clickedTabData.refName].length  || 0
-      });
-    // if (currentTabName.value == '暂存任务') {
-    //   console.log(668,tableObj,clickedTabData)
-    //   tableconfig = reactive<AppTableConfig>(
-    //     createTableEditConfig(tableObj[clickedTabData.tableObj])
-    //   )
-    // } else {
-    //   tableconfig = reactive<AppTableConfig>(
-    //     createTableEditConfig(tableObj[clickedTabData.tableObj])
-    //   )
-    // }
+    getAuditTableData()
   }
   tabs.value.forEach(item => {
     if (item.name === tab.props.label) {
@@ -812,6 +806,63 @@ const handleTabClick = (tab: any) => {
   })
   toChange(url);
 };
+// 核保岗获取待办列表数据
+const pageData = ref({
+  pageSize: 10,
+  pageNum: 1
+});
+function getAuditTableData() {
+  let getList = null;
+  const udrType = clickedTabData.udrType;
+  if(udrType === "3") {// 核保退回
+    const param = {
+      companyId: user.companyId,
+      roleCde: "ROLE_00000152",
+      operId: user.opCde,
+      inNextDpt: "",
+      udrType: "3",
+      orgCde: "",
+      CLoadSub: 1,
+      startBsTm1: dayjs().subtract(30, 'day').format("YYYY-MM-DD 00:00:00"),
+      endBsTm1: dayjs().format("YYYY-MM-DD 23:59:59"),
+      ...pageData.value
+    }
+    getList = pcisQueryService.getBackUdrList(param)
+  } else {
+    const param = {
+      companyId: user.companyId,
+      roleCde: "ROLE_00000152",
+      operId: user.opCde,
+      inNextDpt: "1",
+      udrType: udrType,
+      orgCde: user.companyId,
+      startBsTm1: dayjs().subtract(30, 'day').format("YYYY-MM-DD 00:00:00"),
+      endBsTm1: dayjs().format("YYYY-MM-DD 23:59:59"),
+      startCrtTm: dayjs().subtract(30, 'day').format("YYYY-MM-DD 00:00:00"),
+      tAppTmEnd: dayjs().format("YYYY-MM-DD 23:59:59"),
+      ...pageData.value
+    }
+    getList = pcisQueryService.getNewUdrList(param)
+  }
+  getList.then((res: any) => {
+    if (res && res.code === 200) {
+      pageresult.list = res.data || [];
+      pageresult.total = res.totalCount || 0;
+    } else {
+      ElMessage.error({ message: res.msg, duration: 3000 });
+    }
+  })
+  .catch((error: any) => {
+    ElMessage.error(error.msg);
+  });
+}
+// 待办列表页码点击事件
+function handlePageChange(data:any) {
+  pageData.value = data;
+  if (isAudit.value) {
+    getAuditTableData();
+  }
+}
 
 //点击更多按钮事件
 const toQuery = (url: string) => {
@@ -1013,34 +1064,11 @@ const toQuery2 = (data: any) => {
     }
   } else if (isAudit.value) { //核保员
     if (currentTabName.value === '暂存任务') {
-      // const param = Object.assign({
-      //   type: 'temp',
-      //   CurrentUser: user.opCde,
-      //   CurrentUserOrg: user.companyId,
-      //   objId: data['cAppNo'],
-      //   startCrtTm: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-      //   TAppTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-      //   startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-      //   endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-      // });
-      // sessionStorage.setItem(AppKey.query.pcis_query_newudrlist, param);
-      // router.push({ path: '/pcis-new-udr-list/PendUdrList' });
       handleClickStagingList(row);
-    } else if (currentTabName.value === "待修改任务") {
-      // const param = Object.assign({
-      //   type: 'edit',
-      //   CurrentUser: user.opCde,
-      //   CurrentUserOrg: user.companyId,
-      //   objId: data['cAppNo'],
-      //   startCrtTm: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-      //   TAppTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-      //   startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-      //   endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-      // });
-      // sessionStorage.setItem(AppKey.query.pcis_query_newudrlist, param);
-      // router.push({ path: '/pcis-new-udr-list/PendUdrList' });
-    } else if (currentTabName.value === '已核保任务') {
-      showDetails(row)
+    } else if (currentTabName.value === "待核保任务") {
+      handleClickStagingList(row);
+    } else if (currentTabName.value === '核保退回任务') {
+      updateUdrDetail(row)
     }
   }
 };
@@ -1154,7 +1182,7 @@ function getCpayTypList() {
     }
   );
 }
-
+// 待核保任务、暂存任务行点击
 function handleClickStagingList(row: any) {
   if (row.state === "0") {
     // 未接收
