@@ -2720,7 +2720,6 @@ const submitToUndrFn = async () => {
     ElMessage.error("请先进行保费计算!");
     return;
   }
-debugger
   /**
    * 联共保判断
    */
@@ -4199,7 +4198,6 @@ const validateCiInfo = () => {
     NCiShare += parseFloat(item['Ci.nCiShare'] || 0);
   });
   
-  debugger
   // 主共保信息验证
   // if (chiefMrkM === 0 || chiefMrkS === 0) {
   if ( chiefMrkS === 0) {
