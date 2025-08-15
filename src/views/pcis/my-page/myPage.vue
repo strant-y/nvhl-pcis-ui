@@ -2634,6 +2634,11 @@ const calcPremium = () => {
           }
         })
       }
+      if(ops['deductibleDist'] && ops['deductibleDist'].length > 0) {
+        ops['deductibleDist'].forEach((item:any, index:any)=>{
+          item.nSeqNo = index + 1;
+        })
+      }
 
       opertaor.setDataAll(ops);
 
