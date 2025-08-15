@@ -1860,6 +1860,7 @@ async function loadAfter() {
         if(ops.plyBase) {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+          ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
         }
         ops['plyBase']['Base.cPlyNo'] = ''
         if(ops['ci'] && ops['ci'].length>0){
@@ -2005,6 +2006,7 @@ async function loadAfter() {
         if(ops.plyBase) {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+          ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
         }
         if(ops['ci'] && ops['ci'].length>0){
           ops['ci'].forEach((item:any)=>{
@@ -2146,6 +2148,7 @@ async function loadAfter() {
         if(ops.plyBase) {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+          ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
         }
         ops['plyBase']['Base.cPlyNo'] = ''
         ops['plyBase']['Base.cAppStatus'] = ''
