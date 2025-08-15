@@ -195,7 +195,7 @@ const shortMenuDialog = defineAsyncComponent(() =>
 );
 import {getShortcutDataList, updateShortRoute} from "@/api/menu";
 import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
-const { hasReceived, getBaseInfoByAppNo } = NewUdrListService();
+const { hasReceived, getBaseInfoByAppNo, checkEdrPocly } = NewUdrListService();
 import {
   SCENE_PLY_APP_MODIFY_BOUNCED
 } from '@/constants/tab-constants';
@@ -1025,8 +1025,8 @@ const toQuery2 = (data: any) => {
       // });
       // sessionStorage.setItem(AppKey.query.pcis_query_newudrlist, param);
       // router.push({ path: '/pcis-new-udr-list/PendUdrList' });
-      updateUdrDetail(row)
-    } else if (currentTabName.value === '待修改任务') {
+      handleClickStagingList(row);
+    } else if (currentTabName.value === "待修改任务") {
       // const param = Object.assign({
       //   type: 'edit',
       //   CurrentUser: user.opCde,
@@ -1151,69 +1151,210 @@ function getCpayTypList() {
   }, error => {
       console.log('出错了', error);
       // ElMessage.error('后台服务异常,请联系管理员');
-  });
+    }
+  );
+}
+
+function handleClickStagingList(row: any) {
+  if (row.state === "0") {
+    // 未接收
+    const {
+      objId,
+      curtTask,
+      bsType,
+      prodNo,
+      cRelateBusi,
+      cEdrRsnBundleCde,
+      plyNo,
+      cTermNme,
+      cTermNo,
+    } = row;
+    // 关联交易业务，接收时给出提示
+    if (
+      cRelateBusi &&
+      cEdrRsnBundleCde !== "s1" &&
+      cEdrRsnBundleCde !== "s2" &&
+      cEdrRsnBundleCde !== "c1"
+    ) {
+      ElMessageBox.alert(
+        "该笔业务为关联交易业务，请检查是否已上传【关联交易审批单】！",
+        "提示",
+        {
+          confirmButtonText: "确认",
+        }
+      );
+    }
+
+    if (bsType === "P") {
+      // 方案不校验倒签
+      if ("000000" === prodNo) {
+        const param = {
+          taskId: curtTask,
+          user: user.value,
+        };
+        const flag = hasReceived(param);
+        flag.then((result) => {
+          if (200 !== result["code"]) {
+            ElMessage.error({ message: result.msg, duration: 3000 });
+          } else {
+            const data = {
+              CPlanNo: objId,
+              TaskId: curtTask,
+              scene: SCENE_PLAN_UW_PROCESS,
+              CProdNo: "000000",
+              cAppTyp: row.bsType,
+              cTermNme: row.cTermNme,
+              cTermNo: row.cTermNo,
+              cPolicySource: row.cPolicySource,
+              cRelateBusi: row.cRelateBusi,
+              cEdrRsnBundleCde: row.cEdrRsnBundleCde,
+            };
+            const en = JSON.stringify(data);
+            router.push({
+              path: "/pcis/my-page",
+              query: {
+                param: en,
+              },
+            });
+          }
+        });
+      } else {
+        handleReceived(row);
+      }
+    } else if (bsType === "E" && !!plyNo) {
+      checkEdrPocly({ CPlyNo: plyNo }).then(async (res) => {
+        if (!!res && !!res["code"]) {
+          if (res["code"] === 200 && res["msg"].indexOf("出险时间") > 0) {
+            const confirmRes = await ElMessageBox.confirm(
+              res.msg + "\n是否继续核保？",
+              "提示",
+              {
+                confirmButtonText: "确认",
+                cancelButtonText: "取消",
+                type: "info",
+              }
+            ).catch(() => false);
+            if (!confirmRes) {
+              return;
+            }
+          }
+          handleReceived(row);
+        }
+      });
+    } else {
+      handleReceived(row);
+    }
+  } else {
+    updateUdrDetail(row);
+  }
+}
+
+function handleReceived(row: any) {
+  const param = {
+    taskId: row.curtTask,
+    user: user,
+  };
+
+  hasReceived(param)
+    .then((result: any) => {
+      if (result.code !== 200) {
+        ElMessage.error({ message: result.msg, duration: 3000 });
+      } else {
+        if (row.bsType === "P") {
+          const en = JSON.stringify({
+            CPlanNo: row.objId,
+            TaskId: row.curtTask,
+            "Base.CProdNo": row.prodNo,
+            scene: SCENE_PLAN_UW_PROCESS,
+            cAppTyp: row.bsType,
+            cTermNo: row.cTermNo,
+            cTermNme: row.cTermNme,
+            cProdNmeCn: row.prodName,
+            cPolicySource: row.cPolicySource,
+            cRelateBusi: row.cRelateBusi,
+            cEdrRsnBundleCde: row.cEdrRsnBundleCde,
+          });
+          router.push({
+            path: "/pcis/my-page",
+            query: {
+              param: en,
+            },
+          });
+        } else {
+          // 详情
+          updateUdrDetail(row);
+        }
+      }
+    })
+    .catch((error: any) => {
+      console.log("出错了", error);
+      ElMessage.error({
+        message: "后台服务异常,请联系管理员",
+        duration: 3000,
+      });
+    });
 }
 
 function updateUdrDetail(row: any) {
   getBaseInfoByAppNo({ appNo: row.objId }).then((r: any) => {
-      if (r.code !== 200) {
-          ElMessage.error({ message: r.msg, duration: 6000 });
+    if (r.code !== 200) {
+      ElMessage.error({ message: r.msg, duration: 6000 });
+    } else {
+      if (row.bsType === "A") {
+        const en = JSON.stringify({
+          // scene: SCENE_PLY_UW_PROCESS,
+          cAppNo: row.objId,
+          taskId: row.curtTask,
+          cAppTyp: row.bsType,
+          cProdNo: row.prodNo,
+          cCiMrk: r.data.cCiMrk,
+          cGrpMrk: r.data.cGrpMrk,
+          cDptCde: r.data.cDptCde,
+          cDptCnm: row.uwDptName,
+          pageType: "PLY_UW_PROCESS_SCENE",
+          sysType: row.objExt,
+          plyNo: row.plyNo === "*" ? "" : row.plyNo,
+          cTermNo: row.cTermNo,
+          cTermNme: row.cTermNme,
+          cProdNmeCn: row.prodName,
+        });
+        router.push({
+          path: "/pcis/my-page",
+          query: {
+            param: en,
+          },
+        });
       } else {
-          if (row.bsType === "A") {
-              const en = JSON.stringify({
-                  // scene: SCENE_PLY_UW_PROCESS,
-                  cAppNo: row.objId,
-                  taskId: row.curtTask,
-                  cAppTyp: row.bsType,
-                  cProdNo: row.prodNo,
-                  cCiMrk: r.data.cCiMrk,
-                  cGrpMrk: r.data.cGrpMrk,
-                  cDptCde: r.data.cDptCde,
-                  cDptCnm:row.uwDptName,
-                  pageType: "PLY_UW_PROCESS_SCENE",
-                  sysType:row.objExt,
-                  plyNo: row.plyNo === "*" ? "" : row.plyNo,
-                  cTermNo:row.cTermNo,
-                  cTermNme:row.cTermNme,
-                  cProdNmeCn: row.prodName,
-              });
-              router.push({
-                  path: "/pcis/my-page",
-                  query: {
-                      param: en,
-                  },
-              });
-          } else {
-              const en = JSON.stringify({
-                  scene:
-                      r.data.cEdrRsnBundleCde === "BL"
-                          ? SCENE_PLY_UW_PROCESSBEARER
-                          : SCENE_PLY_UW_PROCESS,
-                  cAppNo: row.objId,
-                  taskId: row.curtTask,
-                  cAppTyp: row.bsType,
-                  cProdNo: row.prodNo,
-                  cCiMrk: r.data.cCiMrk,
-                  cRsnCde: r.data.cEdrRsnBundleCde,
-                  cEdrType: r.data.cEdrType,
-                  cGrpMrk: r.data.cGrpMrk,
-                  cDptCde: r.data.cDptCde,
-                  cDptCnm:row.uwDptName,
-                  pageType: "PLY_UW_PROCESS_SCENE",
-                  sysType: row.objExt,
-                  plyNo: row.plyNo,
-                  cTermNo:row.cTermNo,
-                  cTermNme:row.cTermNme,
-                  cProdNmeCn: row.prodName,
-              });
-              router.push({
-                  path: "/pcis/my-page",
-                  query: {
-                      param: en,
-                  },
-              });
-          }
+        const en = JSON.stringify({
+          scene:
+            r.data.cEdrRsnBundleCde === "BL"
+              ? SCENE_PLY_UW_PROCESSBEARER
+              : SCENE_PLY_UW_PROCESS,
+          cAppNo: row.objId,
+          taskId: row.curtTask,
+          cAppTyp: row.bsType,
+          cProdNo: row.prodNo,
+          cCiMrk: r.data.cCiMrk,
+          cRsnCde: r.data.cEdrRsnBundleCde,
+          cEdrType: r.data.cEdrType,
+          cGrpMrk: r.data.cGrpMrk,
+          cDptCde: r.data.cDptCde,
+          cDptCnm: row.uwDptName,
+          pageType: "PLY_UW_PROCESS_SCENE",
+          sysType: row.objExt,
+          plyNo: row.plyNo,
+          cTermNo: row.cTermNo,
+          cTermNme: row.cTermNme,
+          cProdNmeCn: row.prodName,
+        });
+        router.push({
+          path: "/pcis/my-page",
+          query: {
+            param: en,
+          },
+        });
       }
+    }
   });
 }
 
