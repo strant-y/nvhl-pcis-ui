@@ -1068,7 +1068,7 @@ const toQuery2 = (data: any) => {
     } else if (currentTabName.value === "待核保任务") {
       handleClickStagingList(row);
     } else if (currentTabName.value === '核保退回任务') {
-      updateUdrDetail(row)
+      showDetails(row)
     }
   }
 };
