@@ -914,7 +914,7 @@ const copyPolicyFun = () => {
         ...res.body
       }
       router.push({
-        path: "/pcisapp/myPage",
+        path: "/pcis/my-page",
         query: {
           param: JSON.stringify(param),
         },
@@ -2986,8 +2986,8 @@ const submitToUndrFn = async () => {
                 if(undr['cDecision'] === '1' || undr['cDecision'] === '2'){
                   tagsViewStore.delView({"name": "my-page",
                     "title": "申请单录入",
-                    "path": "/pcisapp/myPage",
-                    "fullPath": "/pcisapp/myPage"}).then((res: any) => {
+                    "path": "/pcis/my-page",
+                    "fullPath": "/pcis/my-page"}).then((res: any) => {
                     router.replace({ path: "/dashboard" });
                   });
                 }
@@ -3215,7 +3215,7 @@ const savePlyInfo = async () => {
     //         sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
     //         const data = res.data?.result[0];
     //         router.replace({
-    //           path: "/pcisapp/myPage",
+    //           path: "/pcis/my-page",
     //           query: {
     //             param: JSON.stringify({
     //               ...data,
@@ -3232,7 +3232,7 @@ const savePlyInfo = async () => {
     //         sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
     //         const data = res.data?.result[0];
     //         router.replace({
-    //           path: "/pcisapp/myPage",
+    //           path: "/pcis/my-page",
     //           query: {
     //               param: JSON.stringify({
     //                   ...data,
@@ -3663,7 +3663,7 @@ const saveApplicationEdr = () => {
         //           data.cRsnCde = data['cEdrRsnBundleCde'];
         //       }
         //       router.replace({
-        //         path: "/pcisapp/myPage",
+        //         path: "/pcis/my-page",
         //         query: {
         //           param: JSON.stringify({
         //             ...data,
@@ -3825,7 +3825,7 @@ const saveEdrPlyInfo = async () => {
     //           data.cRsnCde = data['cEdrRsnBundleCde'];
     //       }
     //       router.replace({
-    //         path: "/pcisapp/myPage",
+    //         path: "/pcis/my-page",
     //         query: {
     //           param: JSON.stringify({
     //             ...data,
@@ -4074,8 +4074,8 @@ const submitEdrToUndrFun = async () => {
                 if(result['cDecision'] === '1' || result['cDecision'] === '2'){
                   tagsViewStore.delView({"name": "my-page",
                     "title": "申请单录入",
-                    "path": "/pcisapp/myPage",
-                    "fullPath": "/pcisapp/myPage"}).then((res: any) => {
+                    "path": "/pcis/my-page",
+                    "fullPath": "/pcis/my-page"}).then((res: any) => {
                     router.replace({ path: "/dashboard" });
                   });
                 }
@@ -4200,8 +4200,8 @@ const submitUnderwritingFn = async () => {
       if(res['cDecision'] === '1' || res['cDecision'] === '2'){
         tagsViewStore.delView({"name": "my-page",
           "title": "申请单录入",
-          "path": "/pcisapp/myPage",
-          "fullPath": "/pcisapp/myPage"}).then((res: any) => {
+          "path": "/pcis/my-page",
+          "fullPath": "/pcis/my-page"}).then((res: any) => {
           router.replace({ path: "/dashboard" });
         });
       }
