@@ -5019,7 +5019,8 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 .action-menu-popper .el-button:hover .el-icon {
   transform: scale(1.1);
 }
-
+</style>
+<style>
 .queryTermRateMessage {
   max-width: 80%;
   width: auto;
