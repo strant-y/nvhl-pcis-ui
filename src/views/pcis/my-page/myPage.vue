@@ -2720,6 +2720,7 @@ const submitToUndrFn = async () => {
     ElMessage.error("请先进行保费计算!");
     return;
   }
+
   /**
    * 联共保判断
    */
@@ -2731,6 +2732,28 @@ const submitToUndrFn = async () => {
         return; // 校验失败则中断后续流程
        }
   }
+  // 新增校验：比较标的中的学生总数与条款中各条目的学生数总和是否一致
+  const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue();
+  const cvrgList = opertaor.getTableRefByKey("cvrg")?.getFromValue();
+  if(props.param.cProdNo === '043010'){
+      if (tgtValue && cvrgList && cvrgList.length > 0) {
+      const nStudentsNumber = tgtValue["Tgt.nStudentsNumber"];
+      const hasStudentFields = cvrgList.some(item => 
+        item.hasOwnProperty('Term.nStudentCount') && item['Term.nStudentCount'] !== undefined
+      );
+      if (nStudentsNumber !== undefined && hasStudentFields) {
+        const totalStudentCount = cvrgList.reduce((sum, item) => {
+          const studentCount = item['Term.nStudentCount'];
+          return sum + (studentCount ? Number(studentCount) : 0);
+        }, 0);
+        if (Number(nStudentsNumber) !== totalStudentCount) {
+          ElMessage.error(`条款中学生总数(${totalStudentCount})与标的信息中的学生总数(${nStudentsNumber})不一致，请核对！`);
+          return;
+        }
+      }
+    }
+  }
+  
 	// 申请核保前判断是否灰黑名单
 	const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
 	const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
