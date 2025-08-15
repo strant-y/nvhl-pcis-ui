@@ -691,7 +691,7 @@ const getData = (user: any, roles: any = []) => {
       // if (res === 'ROLE_00000196' || res === 'ROLE_00000324' || res === 'ROLE_00000001') {
       // 出岗  ROLE_00000008
       console.log(res,'权限编码')
-      if (res === 'ROLE_00000008') {
+      if (res === 'ROLE_00000008' || res === 'ROLE_00000563') {
         isOperate.value = true;
         tabs.value = tab1;
           moreurl.value = "/query/application-querys"
