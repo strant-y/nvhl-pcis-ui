@@ -1592,7 +1592,7 @@
                         cPolicySource: row.cPolicySource,
                     });
                     router.push({
-                        path: "/pcis/my-page",
+                        path: "/pcisapp/myPage",
                         query: {
                             param: en,
                         },
@@ -1622,7 +1622,7 @@
                         cPolicySource: row.cPolicySource,
                     });
                     router.push({
-                        path: "/pcis/my-page",
+                        path: "/pcisapp/myPage",
                         query: {
                             param: en,
                         },
@@ -1665,7 +1665,7 @@
                                 cPolicySource:row.cPolicySource,
                             });
                             router.push({
-                                path: "/pcis/my-page",
+                                path: "/pcisapp/myPage",
                                 query: {
                                     param: en,
                                 },
@@ -1747,7 +1747,7 @@
                         };
                         const en = JSON.stringify(data);
                         router.push({
-                            path: "/pcis/my-page",
+                            path: "/pcisapp/myPage",
                             query: {
                                 param: en,
                             },
@@ -1842,7 +1842,7 @@
                             cPolicySource: row.cPolicySource,
                         });
                         router.push({
-                            path: "/pcis/my-page",
+                            path: "/pcisapp/myPage",
                             query: {
                                 param: en,
                             },
@@ -1866,7 +1866,7 @@
                             cPolicySource: row.cPolicySource,
                         });
                         router.push({
-                            path: "/pcis/my-page",
+                            path: "/pcisapp/myPage",
                             query: {
                                 param: en,
                             },
@@ -1905,7 +1905,7 @@
             cPolicySource: row.cPolicySource,
         });
         router.push({
-            path: "/pcis/my-page",
+            path: "/pcisapp/myPage",
             query: {
                 param: en,
             },

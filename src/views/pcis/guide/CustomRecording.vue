@@ -508,7 +508,7 @@ function next() {
           (res: any) => {
             if (res.code == "200") {
               router.push({
-                path: "/pcis/my-page",
+                path: "/pcisapp/myPage",
                 query: {
                   param: JSON.stringify({ ...handleArray(res.res.composition.plyBase[0]), ...{ pageType: "orig" } }),
                 },
@@ -520,14 +520,14 @@ function next() {
         );
       } else if (formconfig1.value.cRecordType == 7) {// 模板出单
         router.push({
-          path: "/pcis/my-page",
+          path: "/pcisapp/myPage",
           query: {
             param: JSON.stringify({ ...data, ...{ pageType: "template", cPkId: formconfig1.value.cPkId } }),
           },
         });
       } else {
         router.push({
-          path: "/pcis/my-page",
+          path: "/pcisapp/myPage",
           query: {
             param: JSON.stringify({ ...data, ...{ pageType: "app" } }),
           },

@@ -871,7 +871,7 @@ const toQuery2 = (data: any) => {
         row.cRsnCde = data['cEdrRsnBundleCde'];
       }
       router.push({
-        path: "/pcis/my-page",
+        path: "/pcisapp/myPage",
         query: {
           param: JSON.stringify({
             ...row,
@@ -918,7 +918,7 @@ const toQuery2 = (data: any) => {
                     pageType:'PLY_APP_MODIFY_BOUNCED_SCENE'
                   });
                   router.push({
-                      path: "/pcis/my-page",
+                      path: "/pcisapp/myPage",
                       query: {
                           param: en,
                       },
@@ -940,7 +940,7 @@ const toQuery2 = (data: any) => {
                     pageType:'EDR_APP_MODIFY_BOUNCED_SCENE'
                   });
                     router.push({
-                        path: "/pcis/my-page",
+                        path: "/pcisapp/myPage",
                         query: {
                             param: en,
                         },
@@ -971,7 +971,7 @@ const toQuery2 = (data: any) => {
           const { code, res:data, msg } = res;
           if (200 === code) {
             router.push({
-              path: "/pcis/my-page",
+              path: "/pcisapp/myPage",
               query: {
                 param: JSON.stringify({ ...handleArray(data.composition.plyBase[0] ),...{cDptCnm:row.cDptCnm,cTermNme:row.cTermNme,cTermNo:row.cTermNo}, ...{ pageType: "orig" } }),
               },
@@ -1163,7 +1163,7 @@ function updateUdrDetail(row: any) {
                   cProdNmeCn: row.prodName,
               });
               router.push({
-                  path: "/pcis/my-page",
+                  path: "/pcisapp/myPage",
                   query: {
                       param: en,
                   },
@@ -1192,7 +1192,7 @@ function updateUdrDetail(row: any) {
                   cProdNmeCn: row.prodName,
               });
               router.push({
-                  path: "/pcis/my-page",
+                  path: "/pcisapp/myPage",
                   query: {
                       param: en,
                   },
@@ -1253,7 +1253,7 @@ function showDetails(row: any) {
                       cProdNmeCn: row.prodName,
                   });
                   router.push({
-                      path: "/pcis/my-page",
+                      path: "/pcisapp/myPage",
                       query: {
                           param: en,
                       },
@@ -1276,7 +1276,7 @@ function showDetails(row: any) {
                       cProdNmeCn: row.prodName,
                   });
                   router.push({
-                      path: "/pcis/my-page",
+                      path: "/pcisapp/myPage",
                       query: {
                           param: en,
                       },

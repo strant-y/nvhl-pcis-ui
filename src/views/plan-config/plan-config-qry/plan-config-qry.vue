@@ -300,7 +300,7 @@ const openEdit = (type: string, row) => {
   })
 
       // router.push({
-      //           path: "/pcis/my-page",
+      //           path: "/pcisapp/myPage",
       //           // query: {
       //           //   // param: JSON.stringify({ ...data, ...{ queryTyp: "orig" } }),
       //           //   title: "询价单录入" // 直接设置新标题
