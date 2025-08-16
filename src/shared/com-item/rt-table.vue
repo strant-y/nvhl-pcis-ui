@@ -66,9 +66,10 @@
                       <div
                           :style="{
                       width:
+                        // 显示组件尾部按钮 - table 组件不显示尾部按钮 、 非当前选中行不显示尾部按钮
                         formItems[props.row._dataId][i.prop].showExBtn &&
-                        formItems[props.row._dataId][i.prop].inputtype !==
-                          'rttable' // 显示组件尾部按钮 table 组件不显示尾部按钮
+                        formItems[props.row._dataId][i.prop].inputtype !== 'rttable' &&
+                        editIndex === props.row._dataId
                           ? (formItems[props.row._dataId][i.prop].btnWidth
                               ? 100 -
                                 formItems[props.row._dataId][i.prop].btnWidth
@@ -88,7 +89,7 @@
 
                       <!---       显示组件尾部按钮       --->
                       <template
-                          v-if="formItems[props.row._dataId][i.prop].showExBtn"
+                          v-if="formItems[props.row._dataId][i.prop].showExBtn && editIndex === props.row._dataId"
                       >
                         <rt-button
                             v-if="
