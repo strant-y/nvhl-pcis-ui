@@ -821,7 +821,7 @@ const tableconfig = reactive<AppTableConfig>(
                         cTermNme:row['cTermNme'],
                     });
                     router.push({
-                        path: "/pcisapp/myPage",
+                        path: "/pcis/my-page",
                         query: {
                             param: en,
                         },

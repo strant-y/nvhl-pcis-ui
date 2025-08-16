@@ -367,7 +367,7 @@ const getRenewal = (row:any)=>{
         const { code, res:data, msg } = res;
         if (200 === code) {
           router.push({
-            path: "/pcisapp/myPage",
+            path: "/pcis/my-page",
             query: {
               param: JSON.stringify({ ...handleArray(data.composition.plyBase[0] ),...{cDptCnm:row.cDptCnm,cTermNme:row.cTermNme,cTermNo:row.cTermNo}, ...{ pageType: "orig" } }),
             },

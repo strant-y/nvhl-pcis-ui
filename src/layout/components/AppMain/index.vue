@@ -38,9 +38,9 @@ const {
   visitedViews,  // 所有页面
   cachedViews,  // 缓存页面集合
 } = storeToRefs(tagsViewStore);
-const isRouteView = computed(() => !!visitedViews.value.find((v) => v.path === route.path && !v.keepAlive) );
+const isRouteView = computedEager(() => !!visitedViews.value.find((v) => v.path === route.path && !v.keepAlive) );
 // 缓存页面时 当前页面
-const currentView = computed(() => cachedViews.value.find(f => f.path === route.path));
+const currentView = computedEager(() => cachedViews.value.find(f => f.path === route.path));
 
 </script>
 

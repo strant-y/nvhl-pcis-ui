@@ -14,6 +14,9 @@ import { useProductStore } from "@/store/modules/prod";
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 const productStore = useProductStore();
+import { useRoute } from "vue-router";
+const route = useRoute();
+const param = route.params.param;
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -94,6 +97,14 @@ onMounted(() => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
+  console.log();
+  if(param?.pageType === "EDR_APP_NEW_SCENE" && (param?.cEdrType == '2' || param?.cEdrType == '3')){
+    setTimeout(() => {
+      formconfig1.fromSchema?.forEach((item) => {
+        item.disabled = true;
+      });
+    }, 1000);
+  }
 });
 
 // 绑定方法
