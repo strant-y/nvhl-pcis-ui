@@ -1,30 +1,18 @@
 <template>
   <section class="app-main">
-    <router-view v-if="isRouteView">
-      <template #default="{ Component, route }">
+    <router-view>
+      <template #default="{ Component }">
         <transition
           enter-active-class="animate__animated animate__fadeIn"
           mode="out-in"
           name="expand"
         >
-          <component :is="Component" :key="route.path"/>
+          <keep-alive :max="8" :include="cachedViews">
+            <component :is="Component" :key="tagView?.componentKey"/>
+          </keep-alive>
         </transition>
       </template>
     </router-view>
-    <transition
-        enter-active-class="animate__animated animate__fadeIn"
-        mode="out-in"
-        name="expand"
-    >
-      <keep-alive :max="6">
-        <component
-            v-if="currentView"
-            :is="currentView?.component"
-            :key="currentView.componentKey"
-            :param="currentView?.params?.param"
-        />
-      </keep-alive>
-    </transition>
   </section>
 </template>
 
@@ -33,15 +21,12 @@ import { useTagsViewStore } from "@/store";
 import { useRoute } from 'vue-router'
 const route = useRoute();
 
-const tagsViewStore = useTagsViewStore()
-const { 
-  visitedViews,  // 所有页面
-  cachedViews,  // 缓存页面集合
+const tagsViewStore = useTagsViewStore();
+const {
+  visitedViews, // 所有页面
+  cachedViews // 缓存页面集合
 } = storeToRefs(tagsViewStore);
-const isRouteView = computedEager(() => !!visitedViews.value.find((v) => v.path === route.path && !v.keepAlive) );
-// 缓存页面时 当前页面
-const currentView = computedEager(() => cachedViews.value.find(f => f.path === route.path));
-
+const tagView = computedEager(() => visitedViews.value.find((f: TagView) => f.path === route.path));
 </script>
 
 <style lang="scss" scoped>
