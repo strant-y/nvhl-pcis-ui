@@ -466,7 +466,14 @@ const faxNumber = () => {
   };
 };
 
-
+// 联系方式 手机或者固定电话
+  const contactInformation = () => {
+    return {
+      pattern: /^(1[3-9]\d{9}|0\d{2,3}-?\d{7,8}(-?\d{1,4})?)$/,
+      message: "请输入正确格式的联系方式",
+      trigger: "blur"
+    };
+  };
 /**
  * 全球法人识别编码（LEI）校验规则
  * @returns {Object} - 校验规则配置
@@ -768,7 +775,9 @@ const taxValidation = () => {
     if(type == 'taxValidation') {
       return taxValidation()
     }
-
+    if(type == 'contactInformation') {
+      return contactInformation()
+    }
   };
   const validorMap = {
     required: required,
