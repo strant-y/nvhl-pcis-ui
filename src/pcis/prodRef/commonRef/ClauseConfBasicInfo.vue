@@ -26,6 +26,7 @@ import {
 } from "@/api/prod";
 import { ref, reactive, onMounted } from "vue";
 import { useRoute } from "vue-router";
+const router = useRouter();
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { clear } from "console";
 import { dataParam } from "@/store/modules/dataParam";
@@ -119,7 +120,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "返回",
         func: () => {
-          router.push("/prodconfiguration/insuranceConfiguration");
+          router.push("/prodconfiguration/InsuranceConfiguration");
         },
       }),
     ],
@@ -178,7 +179,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", { change: true })],
       },
       {
-        prop: "termRateLower",
+        prop: "termRateUpper",
         inputtype: "rtnumber",
         title: "费率上限",
         precision: 8,
@@ -186,7 +187,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", { blur: true })],
       },
       {
-        prop: "termRateUpper",
+        prop: "termRateLower",
         inputtype: "rtnumber",
         title: "费率下限",
         precision: 8,

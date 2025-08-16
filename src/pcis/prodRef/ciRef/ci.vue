@@ -241,7 +241,7 @@ const method = {
       freeEditRef.value?.setValueByRowKey("Ci.cCiSubComp", rowId, subDptCde);
       freeEditRef.value?.setValueByRowKey("Ci.cDptCde", rowId, dptCde);
       // 校验
-      onChiefMrkChange();
+      // onChiefMrkChange();
       // 获取所有行数据
       const allRows = getFromValue();
       // 校验是否存在重复的 Ci.cCoinsurerCde, Ci.cCiSubComp, Ci.cDptCde 组合
@@ -322,19 +322,7 @@ const method = {
             freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
           }
         }
-        // else if(cCiMrk['Base.cCiMrk'] == '2' || cCiMrk['Base.cCiMrk'] == '4'){
-        //   if(rowData['Ci.cDptCde'] !== param.cDptCde){
-        //     ElMessage.error("我方从共时，出单方不能是我司！")
-        //     freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk",rowId,"")
-        //   }
-        // }
       }else{
-        // if(cCiMrk['Base.cCiMrk'] == '2' || cCiMrk['Base.cCiMrk'] == '4'){
-        //   if(rowData['Ci.cDptCde'] == param.cDptCde){
-        //     ElMessage.error("我方从共时，出单方不能是我司！")
-        //     freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk",rowId,"")
-        //   }
-        // }
         if(cCiMrk["Base.cCiMrk"] == '1' || cCiMrk["Base.cCiMrk"] == '5'){
           if(rowData['Ci.cDptCde'] !== param.cDptCde){
             ElMessage.error("联保单出单方必须是主联单的分公司！");
@@ -1074,17 +1062,6 @@ const valideRequired = ()=>{
           freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.nPlyFeeRate", "disabled", false );
         }
-        
-        // 核保状态下禁用相关字段
-        // if(param?.cAppTyp == 'A'){ //核保
-        //   const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
-        //   if (rowItem) {
-        //     rowItem['Ci.cSlsId']['btnItems'].disabled = true;
-        //     rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
-        //     rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
-        //   }
-        // }
-        
         // 特殊页面类型处理
         if (param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && cCiMrkValue =='5' && param.cRsnCde == "FZ") {
           formconfig1.fromSchema?.forEach((item) => {
