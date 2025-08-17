@@ -247,7 +247,6 @@ console.log('时间',v,baseBefore['Base.cTmSysCde'])
   },
   // 追溯起期
   tRunBgnTmFn: (v) => {
-
     const start = getValue("Base.tRunBgnTm");
     const end = getValue("Base.tRunEndTm");
     if (!end || !v) {
@@ -276,9 +275,7 @@ console.log('时间',v,baseBefore['Base.cTmSysCde'])
     if (!start || !v) {
       return;
     }
-
     const tm = moment(v).diff(moment(start), "days");
-
     const startTime = moment(v).diff(moment(start), "days");
     if (startTime < 0) {
       ElMessage.warning("追溯/日落止期不能小于追溯起期");
@@ -287,8 +284,7 @@ console.log('时间',v,baseBefore['Base.cTmSysCde'])
       });
       return;
     }
-
-        const traceTime = moment(tInsrncBgnTm).diff(moment(v), "seconds")
+    const traceTime = moment(tInsrncBgnTm).diff(moment(v), "seconds")
     //校验追溯时间
     if (traceTime < 0) {
       ElMessage.warning("追溯期的止期|须早于保险起期！");
@@ -298,16 +294,14 @@ console.log('时间',v,baseBefore['Base.cTmSysCde'])
       });
       return;
     }
-
-
-
     const formattedDate = moment(v).format('YYYY-MM-DD') + ' 23:59:59';
-
     setFormValue({
       "Base.nTracingDays": moment(formattedDate).add(1,'second').diff(moment(start), "days"),
       "Base.tRunEndTm": formattedDate, // 更新日期字段
     });
   },
+
+  //报告期起始日期
   reportBgnTmFn: (v: any) => {
     const start = getValue("Base.tReportBgnTm");
     const end = getValue("Base.tReportEndTm");
@@ -327,10 +321,11 @@ console.log('时间',v,baseBefore['Base.cTmSysCde'])
       "Base.nReportDays": tm,
     });
   },
-  // 延长报告期止期
+  // 报告期终止日期
   reportEndTmFn: (v: any) => {
     const start = getValue("Base.tReportBgnTm");
     const end = getValue("Base.tReportEndTm");
+    const tInsrncBgnTm = getValue('Base.tInsrncBgnTm');  // 保险起期
     if (!start || !v) {
       return;
     }
@@ -342,6 +337,18 @@ console.log('时间',v,baseBefore['Base.cTmSysCde'])
       });
       return;
     }
+
+    const traceTime = moment(tInsrncBgnTm).diff(moment(v), "seconds")
+     //校验追溯时间
+    if (traceTime < 0) {
+      ElMessage.warning("报告期终止日期|须早于保险起期！");
+      setFormValue({
+        "Base.nReportDays": null,
+        "Base.tReportEndTm":null
+      });
+      return;
+    }
+
     const formatReportEnd  =   moment(v).format("YYYY-MM-DD 23:59:59");
     setFormValue({
       "Base.nReportDays": moment(formatReportEnd).add(1,'second').diff(moment(start), "days"),

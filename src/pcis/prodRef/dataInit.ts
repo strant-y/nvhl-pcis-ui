@@ -1,11 +1,7 @@
 import moment from "moment";
 import dayjs from "dayjs";
 import { dataOpertaor } from "@/store";
-import { useRouter, useRoute } from "vue-router";
-const route = useRoute();
 
-// route.params?.param?.cProdNo;
-console.log(route, 333);
 
 export const getData = () => {
   const user = JSON.parse(sessionStorage.getItem("user"));

@@ -225,20 +225,21 @@ const formconfig1 = ref<AppFreeEditConfig>(
     ],
   })
 );
-
-
-// 确定 非空校验
-const isObjectValid = (obj:any) => {
+// 确定 非空校验：仅当所有属性都是空字符串时才拦截
+const isObjectValid = (obj: any) => {
   if (Array.isArray(obj)) {
-    return true; 
+    return true;
   }
 
   if (!obj || typeof obj !== 'object' || !Object.keys(obj).length) {
     return false;
   }
-  return Object.values(obj).every(v => 
-    v != null && (typeof v !== 'string' || v.trim() !== '')
-  );
+
+  const values = Object.values(obj).map(v => {
+    return typeof v === 'string' ? v.trim() : v;
+  });
+  const allEmpty = values.every(v => v == null || v === '');
+  return !allEmpty;
 };
 onMounted(() => {
   // console.log(333)   distAdd
