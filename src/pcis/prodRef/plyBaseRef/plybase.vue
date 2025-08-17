@@ -325,33 +325,19 @@ const method = {
     // 清除代代理业务员的值
     const p = opertaor.getParam();
     if (p.initFlag) {
-      const formData = getFromValue();
-      const param = {
-        CChaSubtype: formData['Base.cChaSubtype'],
-        CChaMrk: formData['Base.cChaMrk'],
-        CChaCde: formData['Base.cChaCde'],
-        CBsnsTyp: formData['Base.cBsnsTyp'],
-        CChaType: formData['Base.cChaType'],
-        CDptCde: formData['Base.cDptCde'],
-        CProdNo: formData['Base.cProdNo'],
-      };
-      // 获取数据
-      let codeType = ''
-      if (param.CChaSubtype === "030503") {
-        codeType = "PERSONAL_AGENCY_LIST"
-      } else if (param.CChaSubtype === "030504") {
-        codeType = "INDEPENDENT_GENERATION_LIST";
-      } else {
-        codeType = "AGENCY_BUSINESS_LIST";
-      }
-      codeListStore.queryCodeList({codeListName: codeType, codeListParam: param}).then((res) => {
-          setFormItem("Base.cBrkrCde", {
-            loadData: res.map(item => {
-              return { value: item.CChaCde, label: item.CChaCde + item.CChaNme }
-            }),
+      if(value && value != '') {
+        codeListStore.queryCodeList({
+          codeListName: 'WEB_CUS_CHA_BY_ID',
+          codeListParam: {
+            value: value,
+          }
+        }).then((res) => {
+          plyBaseEditRef.value?.addCodeListMap({
+            code: "Base.cBrkrCde",
+            list: res
           });
-        }
-      );
+        });
+      }
     }else {
       setValue("Base.cBrkSlsCde", "");
     }
@@ -384,8 +370,6 @@ const method = {
               });
               setValue("Base.cBrkrCde", params.CChaCde);
               setValue("Base.cAgtAgrNo", params.CAgtAgrNo);
-
-              console.log("回显----", params);
               const ciRef = opertaor.getTableRefs()['ci'];
               if (!!ciRef) {
                 ciRef.intiAgentBroker({
@@ -410,41 +394,20 @@ const method = {
     }
   },
   cBrkSlsCdeChange: (value: any) =>{
-    let cslstyp = "";
-    if (getValue("Base.cChaType") === "1900201") {
-      // 个人代理时
-      cslstyp = "020003";
-    } else if (
-        getValue("Base.cBsnsTyp") !== "19001" &&
-        getValue("Base.cChaType") !== "1900201"
-    ) {
-      // 非直销且非个人代理
-      cslstyp = "020004";
-    };
-    const param = {
-      CurrentUser: user.opCde,
-      CurrentUserOrg: user.companyId,
-      CDptCde: sessionData.value?.cDptCde,
-      cBsnsTyp: getValue("Base.cBsnsTyp"),
-      cChaType: getValue("Base.cChaType"),
-      cChaSubtype: getValue("Base.cChaSubtype"),
-      CSlsCde: value, //业务员员工号
-      CBrkrCde: getValue("Base.CBrkrCde"), //代理(经纪)人
-      CDptAttr: getValue("Base.CDptAttr"), //投保单业务归属部门的部门类型(angular上被hidden的,逻辑赋值angular：guide.component.ts【324行】)
-      CSlsTyp: cslstyp,
-      pageSize: 100
-    }
-    console.log('cBrkSlsCdeChange-param', param);
-    policyService.getWebOrgSelsList(param).then((res: any) => {
-      if (res && res["code"] === 200) {
-        console.log('cBrkSlsCdeChange-CSlsCde', res.data);
-        setFormItem("Base.cBrkSlsCde", {
-          loadData: res.data.result.map(item => {
-            return { value: item.CSlsCde, label: item.CSlsCde + item.CSlsNme}
-          })
+    const p = opertaor.getParam();
+    if (p.initFlag) {
+      if(value && value != '') {
+        codeListStore.queryCodeList({
+          codeListName: "WEB_ORG_SALES_BY_ID",
+          codeListParam: {value: value}
+        }).then((res) => {
+          plyBaseEditRef.value?.addCodeListMap({
+            code: "Base.cBrkSlsCde",
+            list: res,
+          });
         });
       }
-    });
+    }
   },
   //代理业务员icon事件
   agentSaleFuncA: () => {

@@ -1,4 +1,4 @@
-import { getIfCompViewByName, getCompByName } from '@/typings/views-component'
+import {getCompName} from '@/typings/views-component'
 import { clearDataOpertaorByPageKey } from '@/store';
 import {descryptParameterToQuery} from "@/utils/common";
 import {RouteLocationNormalizedLoaded} from "vue-router";
@@ -6,7 +6,7 @@ import {base64encoder} from "@/utils/encipher";
 
 export const useTagsViewStore = defineStore("tagsView", () => {
   const visitedViews = ref<TagView[]>([]);
-  const cachedViews = ref<TagView[]>([]);
+  const cachedViews = ref<string[]>([]);
   /**
    * 添加已访问视图到已访问视图列表中
    */
@@ -30,15 +30,13 @@ export const useTagsViewStore = defineStore("tagsView", () => {
   /**
    * 添加缓存视图到缓存视图列表中
    */
-  function addCachedView(view: TagView) {
+  function addCachedView(key: string) {
     // 如果缓存视图名称已经存在于缓存视图列表中，则不再添加
-    if (cachedViews.value.find(item => item.path === view.path)) {
+    if (cachedViews.value.includes(key)) {
       return;
     }
     // 如果视图需要缓存（keepAlive），则将其路由名称添加到缓存视图列表中
-    if (view.keepAlive) {
-      cachedViews.value.push(view);
-    }
+    cachedViews.value.push(key);
   }
 
   /**
@@ -54,7 +52,7 @@ export const useTagsViewStore = defineStore("tagsView", () => {
 
   function delCachedView(view: TagView) {
     return new Promise((resolve) => {
-      const index = cachedViews.value.findIndex(item => view.path === item.path);
+      const index = cachedViews.value.indexOf(view?.cachedKey);
       index > -1 && cachedViews.value.splice(index, 1);
       resolve([...cachedViews.value]);
     });
@@ -70,9 +68,9 @@ export const useTagsViewStore = defineStore("tagsView", () => {
   }
 
   function delOtherCachedViews(view: TagView) {
-    const viewName = view.name as string;
     return new Promise((resolve) => {
-      const index = cachedViews.value.findIndex(item => view.path === item.path);
+      const finView = visitedViews.value.find((item: TagView) => view.path === item.path);
+      const index = cachedViews.value.indexOf(finView?.cachedKey);
       if (index > -1) {
         cachedViews.value = cachedViews.value.slice(index, index + 1);
       } else {
@@ -97,17 +95,6 @@ export const useTagsViewStore = defineStore("tagsView", () => {
       if (v.path === route.path) {
         const view = {
           query: data.JSONquery,
-          params: data.ParseParams,
-        }
-        Object.assign(v, view);
-        break;
-      }
-    }
-    for (let v of cachedViews.value) {
-      if (v.path === route.path) {
-        const view = {
-          query: data.JSONquery,
-          params: data.ParseParams,
         }
         Object.assign(v, view);
         break;
@@ -125,47 +112,36 @@ export const useTagsViewStore = defineStore("tagsView", () => {
       } else if (to.query.title) {
         dynamicTitle = to.query.title;
       }
-      const ifCompView = getIfCompViewByName(to.name as string);
-      const view = {
+      const cachedKey = getCompName(to.name as string);
+      const view: TagView = {
         name: to.name as string,
         title: dynamicTitle,
         path: to.path,
         fullPath: to.fullPath,
         affix: to.meta?.affix,
-        keepAlive: to.meta?.keepAlive || ifCompView,
+        keepAlive: to.meta?.keepAlive || !!cachedKey,
         hidden: to.meta.hidden,
         query: data.JSONquery,
-        params: data.ParseParams,
+        cachedKey: cachedKey,
       };
-
-      if(view.keepAlive) {
-        clearDataOpertaorByPageKey(view.name);
-        await delView(view); // 清理冲突视图
-      }
+      await delView(view); // 清理冲突视图
       addView(view);
       moveToCurrentTag(to);
     }
   }
 
   function addView(view: TagView) {
-    let viewData: TagView = view;
+    const viewData = {...view, ...{componentKey: base64encoder(view.path) + new Date().getTime()}};
     if (view.keepAlive) {
-      // 添加组件模式视图
-      viewData = {
-        ...view,
-        ... {
-          isActive: true,
-          componentKey: base64encoder(view.path) + new Date().getTime(),
-          component: getCompByName(view.name)
-        }
-      }
+      // 缓存模式
+      addCachedView(view.cachedKey);
     }
     addVisitedView(viewData);
-    addCachedView(viewData);
   }
 
   function delView(view: TagView) {
-    return new Promise((resolve) => {
+    clearDataOpertaorByPageKey(view.name);
+    return new Promise(async (resolve) => {
       delVisitedView(view);
       delCachedView(view);
       resolve({
@@ -188,9 +164,7 @@ export const useTagsViewStore = defineStore("tagsView", () => {
 
   function delLeftViews(view: TagView) {
     return new Promise((resolve) => {
-      const currIndex = visitedViews.value.findIndex(
-        (v) => v.path === view.path
-      );
+      const currIndex = visitedViews.value.findIndex((v) => v.path === view.path);
       if (currIndex === -1) {
         return;
       }
@@ -198,8 +172,7 @@ export const useTagsViewStore = defineStore("tagsView", () => {
         if (index >= currIndex || item?.affix) {
           return true;
         }
-
-        const cacheIndex = cachedViews.value.indexOf(item.name);
+        const cacheIndex = cachedViews.value.indexOf(item.cachedKey);
         if (cacheIndex > -1) {
           cachedViews.value.splice(cacheIndex, 1);
         }
@@ -272,9 +245,9 @@ export const useTagsViewStore = defineStore("tagsView", () => {
               affix: route.meta?.affix,
               keepAlive: tag.keepAlive,
               hidden: route.meta.hidden,
-              component: tag.component,
               query: tag.query,
-              params: tag.params,
+              cachedKey: tag.cachedKey,
+              componentKey: tag.componentKey,
             });
           }
         }

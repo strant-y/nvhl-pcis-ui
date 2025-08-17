@@ -6,6 +6,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "vite serve --mode development",
+    "uat": "vite serve --mode uat",
     "build:dev": "vite build --mode development && vue-tsc --noEmit",
     "build:uat": "vite build --mode uat && vue-tsc --noEmit",
     "prepare": "husky install",
