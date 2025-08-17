@@ -227,6 +227,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           setFormItem("additionalInsuranceType", {
             hidden: val === "1" ? 0 : 1,
           });
+          // 当选择附加条款时，隐藏费率相关字段
+          const rateFields = ["termRateUpper", "termRateLower", "averageCostRate", "costRateUpper"];
+          rateFields.forEach(field => {
+            setFormItem(field, {
+              hidden: val === "1"
+            });
+          });
         },
       },
       {
