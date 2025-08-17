@@ -2762,8 +2762,7 @@ const submitToUndrFn = async () => {
     ElMessage.error("请先进行保费计算!");
     return;
   }
-
-  /**
+ /**
    * 联共保判断
    */
   const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk')
@@ -2795,11 +2794,15 @@ const submitToUndrFn = async () => {
       }
     }
   }
-  
+
+
+ 
+ 
+
 	// 申请核保前判断是否灰黑名单
 	const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
 	const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
-	console.log('param 路由---', props.param )
+ 
   let undrParam = {}
   if(props.param.pageName && props.param.pageName == "priceInquiry"){
       undrParam = {
@@ -2810,8 +2813,6 @@ const submitToUndrFn = async () => {
             cAppNo
       }
   }
-
-
 	const res: any = await isUndrClsBlackList(undrParam);
 	if(res.code == 200){
 		if(res.msg != '校验通过'){
@@ -2826,6 +2827,17 @@ const submitToUndrFn = async () => {
 		ElMessage.error({ message: res.msg, duration: 3000 });
 		return false;
 	}
+
+ // 040002 记名投保标志 选是  清单信息必须填  
+   if(props.param.cProdNo === '040002' && tgtValue['Tgt.cRegisteredLogo'] === '1'){
+      const resDist: any = await selectDist({  cComponentTable:"EmployeeDist" , isSummary: '1',cAppNo });
+      if(resDist['data']['total'] < 1){
+        	ElMessage.warning("记名投保标志“是” “雇员清单”未录入请确认！");  
+          return false;
+       }
+  }
+
+
 	// 风勘校验
  	if( props.param?.pageName === "priceInquiry" ){
 		// const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
@@ -3102,12 +3114,13 @@ const openLimit = () => {
  * 投保单保存
  * **/
 const savePlyInfo = async () => {
+  
   let saveFlag = false;
   const btn = getBtn("btn010102");
   btn.loading = true;
   const res = opertaor.getDataAll();
-  // // 点击保存之前的申请单号
-  // const beforeSaveCappNo = res["plyBase"]["Base.cAppNo"];
+ 
+  // 点击保存之前的申请单号 
   if(res['ci'] && res['ci'].length>0){
     res['ci'].forEach((item:any)=>{
       if(item['Ci.nCiShare']){
@@ -3116,18 +3129,20 @@ const savePlyInfo = async () => {
     })
   }
 
-
   let payList = res.payinfo;
-  // Base.nPrm
-  // payinfo
   if(payList && payList.length>0){
-      let numS =0;
-        payList.forEach((item) => {
-              numS+= item['Pay.nPayablePrm']
-          });
-      let formattedSum = Number(numS.toFixed(2));
-      if(formattedSum>res['base']['Base.nPrm']){
-        ElMessage.error('缴费计划“应收保费”之和大于整单保费！')
+      const toCent = (amount:any) => {
+        return Math.round(Number(amount) * 100); // 转为分并四舍五入
+      };
+      let totalCent = 0;
+      payList.forEach((item:any) => {
+        totalCent += toCent(item['Pay.nPayablePrm']);
+      });
+ 
+      const basePrmCent = toCent(res['base']['Base.nPrm']);
+
+       if(totalCent > basePrmCent){
+         ElMessage.error('缴费计划“应收保费”之和大于整单保费！')
          btn.loading = false;
         return false;
       }
