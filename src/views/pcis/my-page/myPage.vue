@@ -2634,6 +2634,11 @@ const calcPremium = () => {
           }
         })
       }
+      if(ops['deductibleDist'] && ops['deductibleDist'].length > 0) {
+        ops['deductibleDist'].forEach((item:any, index:any)=>{
+          item.nSeqNo = index + 1;
+        })
+      }
 
       opertaor.setDataAll(ops);
 
@@ -4202,7 +4207,7 @@ const submitUnderwritingFn = async () => {
           "title": "申请单录入",
           "path": "/pcis/my-page",
           "fullPath": "/pcis/my-page"}).then((res: any) => {
-          router.replace({ path: "/dashboard" });
+          router.replace({ path: "/pcis-new-udr-list/PendUdrList" });
         });
       }
       // opertaor.setDataAll(ops);
@@ -5019,7 +5024,8 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 .action-menu-popper .el-button:hover .el-icon {
   transform: scale(1.1);
 }
-
+</style>
+<style>
 .queryTermRateMessage {
   max-width: 80%;
   width: auto;
