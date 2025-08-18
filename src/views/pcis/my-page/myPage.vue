@@ -1751,6 +1751,7 @@ async function loadAfter() {
         const ops = clearCAppNo(opertaor.convertData(res));
         ops['plyBase']['Base.cRenewMrk'] = '1'
         ops['plyBase']['Base.cPlyNo'] = ''
+        ops['plyBase']['Base.cOprCde'] = user.userName // 录单人为当前用户
         ops['insrnc']['Base.tAppTm'] = moment(new Date(Date.now())).format(
             "YYYY-MM-DD HH:mm:ss"
         )
