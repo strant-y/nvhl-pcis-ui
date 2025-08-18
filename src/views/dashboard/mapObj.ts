@@ -280,6 +280,26 @@ export const tableObj = {
 			// 	}
       // }
     ]
+  },
+  // 核保员-核保通过任务
+  udrPassedObj: {
+    fromSchema: [
+      {
+        prop: "cAppNo",
+        inputtype: "rtinput",
+        title: "申请单号",
+      },
+      {
+        prop: "cDptCnm",
+        inputtype: "rtinput",
+        title: "出单机构",
+      },
+      {
+        prop: "cProdNmeCn",
+        inputtype: "rtinput",
+        title: "条款",
+      },
+    ]
   }
 }
 // 出岗 tab
@@ -330,5 +350,12 @@ export const tab2 = [{
   tableObj: "udrReturnObj",
   url: '/pcis-new-udr-list/PendUdrList',
   udrType: "3",
+},
+{
+  name: '核保通过任务',
+  refName: 'udrPassedList',
+  tableObj: "udrPassedObj",
+  url: '/pcis-new-udr-list/PendUdrList',
+  udrType: "4",
 }
 ]
