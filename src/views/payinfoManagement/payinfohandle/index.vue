@@ -819,6 +819,7 @@ const tableconfig = reactive<AppTableConfig>(
                         pageType: "readonly",
                         cTermNo:row['cTermNo'],
                         cTermNme:row['cTermNme'],
+                        cPolicySource:row['cPolicySource'],
                     });
                     router.push({
                         path: "/pcisapp/myPage",

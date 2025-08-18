@@ -261,7 +261,7 @@ onMounted(() => {
   if (param.type === "edit") {
     setTimeout(() => {
       handleQuery();
-    }, 300);
+    }, 2000);
   }
 });
 
