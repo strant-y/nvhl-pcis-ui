@@ -626,11 +626,11 @@ async function compareAppFee(saveFlag:any) {
     nPrm: String(params['nPrm']),  
     saveFlag:saveFlag,
     feeList: pageresult.list,
-    nUpdRateA:String(freeEditRef.value?.getValue("A1_value")),
-    nUpdRateB: String(freeEditRef.value?.getValue("B1_value")),
-    allFeeProp: String(freeEditRef.value?.getValue("nFeePropSum")),
-    allFee:String(freeEditRef.value?.getValue("nPrmSum")),
-    nRateA6: String(freeEditRef.value?.getValue("A6_value")),
+    nUpdRateA:String(freeEditRef.value?.getValue("A1_value") || ""),
+    nUpdRateB: String(freeEditRef.value?.getValue("B1_value") || ""),
+    allFeeProp: String(freeEditRef.value?.getValue("nFeePropSum") || ""),
+    allFee:String(freeEditRef.value?.getValue("nPrmSum") || ""),
+    nRateA6: String(freeEditRef.value?.getValue("A6_value") || ""),
   };
   await compareAppFeeInfo(paramStr)
     .then((res:any) => {
@@ -843,8 +843,10 @@ function findIlogC1(){
 /** 查询 */
 function handleQuery(flag?: boolean) {
   console.log("999999999", props.data);
+  const param = {...params}
+  delete param.nPrm
   //费用信息接口调用
-  getAppFeeInfoNewUrl(params)
+  getAppFeeInfoNewUrl(param)
     .then((res:any) => {
       if (res.code == 200) {
         let result = JSON.parse(res.data);

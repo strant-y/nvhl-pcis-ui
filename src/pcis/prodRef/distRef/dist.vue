@@ -94,12 +94,7 @@ watch(
         immediate: true
     }
 )
-
-
-
-
 const cardRef = ref<MyCardMethod | null>(null);
-
 const pageresult = reactive<Pageresult>({
   result: "",
   /** 数据列表 */
@@ -427,6 +422,11 @@ const method = {
       }
     });
   },
+  // 投保座位总数
+  nSeatCapacityChange:(val:any)=>{
+    console.log('111',val)
+  },
+
   //  042003 根据电梯条数反
   funcdistadd: () => {
     const alldata: any = opertaor.getDataAll();
@@ -465,6 +465,7 @@ const method = {
       }
     });
   },
+
 
   handleQuery: (queryParams: any = { pageNum: 1, pageSize: 10 }, isChange: boolean = false) => {
     distTableRef.value?.setPartnerPage(queryParams);
@@ -521,6 +522,8 @@ const method = {
 		}
     selectDist(selData).then((res: any) => {
       if (res.code === 200) {
+
+
         pageresult.list = [];
         pageresult.total = res.data.total;
         pageresult.list = res.data.data.map((item, index) => {
@@ -538,6 +541,26 @@ const method = {
             ... data
           };
         });
+        // 040005学生人数（人） 地址清单信息人数 回填
+        if( props.compKey === 'AddressDist040005' ){
+             let peopleNumber: number | null = null;
+              pageresult.list.forEach((item:any)=>{
+                    peopleNumber+= item['Dist.nInsuredNumber']  || 0
+              })
+          tgtRef.setValue('Tgt.nStudentsNumber',peopleNumber)
+        }
+
+        // 020001  货物数量 回填
+        if( props.compKey === 'CargoDist020001' ){
+             let nGoodsNum: number | null = null;
+              pageresult.list.forEach((item:any)=>{
+                    nGoodsNum+= item['Dist.nNum'] || 0
+              })
+          tgtRef.setValue('Tgt.nGoodsNum',nGoodsNum)
+        }
+
+
+
 
         if(tgtRef !== undefined){
           tgtRef.setValue("Tgt.nElevatorsNumber",res.data.total)
@@ -603,6 +626,8 @@ const method = {
                 }, item.countNumber);
             });
         }
+
+
       }
     });
   },

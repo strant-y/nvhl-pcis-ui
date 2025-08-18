@@ -45,17 +45,16 @@ declare global {
     icon?: string;
     /** 是否固定页签 */
     affix?: boolean;
-    /** 路由查询参数 */
-    query?: any;
     /** 是否开启缓存 */
     keepAlive?: boolean;
     /** 路由查询参数 */
-    params?: any;
-    /** 组件实例*/
-    component?: any;
+    query?: any;
     /** 是否显示*/
     hidden?: boolean;
+    /** 组件的key*/
     componentKey?: string;
+    /** 缓存组件的名称*/
+    cachedKey?: string;
   }
 
   /**

@@ -256,7 +256,7 @@ onMounted(async () => {
     activeName.value = "6";
   } else {
     setTimeout(() => {
-      freeEditRef.value[0].value[0].setValue("tIssueTm", [
+      freeEditRef.value[0]?.value[0]?.setValue("tIssueTm", [
         dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
       ]);

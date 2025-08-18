@@ -47,6 +47,7 @@ const codeListStore = codeListViewStore();
 const opertaor = dataOpertaor();
 const subDptCde = ref(); //所属分公司
 const initFlag = computed(() => formPage.init);
+const cIntroDptCnm = ref()
 onMounted(() => {
   const formconfig11 = formInit(
       JSON.stringify(props.pageSchema),
@@ -55,6 +56,7 @@ onMounted(() => {
   );
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
+    setFormItem('ECargoBase.cCiOprRel',{ rules: [getRules("contactInformation", {})] })
     initComp();
     // 查询承保机构所属分公司和项目类别大类数据
     getCheckCdeptByCdptCde();
@@ -99,6 +101,82 @@ function getDaysBetweenDates(dateStr1, dateStr2) {
 //给表单下拉项赋值
 // 绑定方法
 const method = {
+  //服务机构ICON事件
+  saleDptFunc: () => {
+    dzmodal.open(DepartmentTree, {}).then((res) => {
+      if (res.type === "ok") {
+        console.log("选中的回显", res);
+        if (res.body) {
+          const selectObj = res.body;
+          let obj = {
+            loadData: [
+              {
+                label: selectObj.name,
+                value: selectObj.id,
+              },
+            ],
+          };
+          setFormItem("ECargoBase.cIntroDptcde", obj);
+          setValue("ECargoBase.cIntroDptcde", selectObj.id);
+          cIntroDptCnm.value = selectObj.name
+        }
+      }
+    });
+  },
+  // 服务机构业务员ICON事件
+  dptSaleNoFunc: () => {
+    const cDptCde = getValue("ECargoBase.cIntroDptcde") || ''
+    const cDptCnm = cIntroDptCnm.value
+    dialog.value?.open(
+        "agentWorker",
+        {
+          type: "show",
+          data: {
+            // CDptCde: sessionData.value?.cDptCde,
+            cDptCde,
+            cDptCnm
+          },
+          method: {
+            getSelected: (params) => {
+              setFormValue({
+                "ECargoBase.cIntroSalecde": params.CSlsNme, //业务员员工号
+              });
+              codeListStore
+                  .queryCodeList(
+                      {
+                        codeListName: "CSaleCde_List",
+                        codeListParam: {
+                          CSlsCde: params["CSlsCde"],
+                        },
+                      },
+                      false,
+                      false
+                  )
+                  .then((res) => {
+                    console.log("业务员=-==", res);
+                    if (res && res.code == 200) {
+                      const codeValData = res.data;
+                      if (codeValData) {
+                        // 服务机构业务员下拉和显示的值
+                        setFormItem("ECargoBase.cIntroSalecde", {
+                          loadData: codeValData,
+                        });
+                        setValue("ECargoBase.cIntroSalecde", params.CSlsCde);
+                      }
+                    }
+                  });
+              dialog.value?.handleClose();
+            },
+          },
+        },
+        {
+          isOk: (selectdata: any) => {
+            console.log("a", selectdata);
+          },
+        },
+        { title: "业务员", width: 85 }
+    );
+  },
   tInsrncBgnTmChange:(val:any)=>{
     if(getValue('ECargoBase.tInsrncBgnTm') && getValue('ECargoBase.tInsrncEndTm')){
       if(new Date(getValue('ECargoBase.tInsrncBgnTm') ) > new Date(getValue('ECargoBase.tInsrncEndTm'))){

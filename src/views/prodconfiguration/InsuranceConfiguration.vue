@@ -222,12 +222,40 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cTermNo",
         inputtype: "rtinput",
-        title: "条款代码",
+        title: "条款编码",
       },
       {
         prop: "cNmeCn",
         inputtype: "rtinput",
         title: "条款名称",
+      },
+      {
+        prop: "cRegisteredNo",
+        inputtype: "rtinput",
+        title: "注册号",
+      },
+      {
+        prop: "cIsInternet",
+        inputtype: "rtinput",
+        title: "是否互联网",
+        loadData: [
+          { label: "是", value: "1" },
+          { label: "否", value: "0" },
+        ],
+      },
+      {
+        prop: "cIsGroup",
+        inputtype: "rtinput",
+        title: "是否团单",
+        loadData: [
+          { label: "是", value: "1" },
+          { label: "否", value: "0" },
+        ],
+      },
+      {
+        prop: "isDutyfree",
+        inputtype: "rtinput",
+        title: "是否免税",
       },
       {
         prop: "cRdrTyp",

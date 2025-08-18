@@ -241,7 +241,7 @@ const method = {
       freeEditRef.value?.setValueByRowKey("Ci.cCiSubComp", rowId, subDptCde);
       freeEditRef.value?.setValueByRowKey("Ci.cDptCde", rowId, dptCde);
       // 校验
-      onChiefMrkChange();
+      // onChiefMrkChange();
       // 获取所有行数据
       const allRows = getFromValue();
       // 校验是否存在重复的 Ci.cCoinsurerCde, Ci.cCiSubComp, Ci.cDptCde 组合
@@ -322,19 +322,7 @@ const method = {
             freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
           }
         }
-        // else if(cCiMrk['Base.cCiMrk'] == '2' || cCiMrk['Base.cCiMrk'] == '4'){
-        //   if(rowData['Ci.cDptCde'] !== param.cDptCde){
-        //     ElMessage.error("我方从共时，出单方不能是我司！")
-        //     freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk",rowId,"")
-        //   }
-        // }
       }else{
-        // if(cCiMrk['Base.cCiMrk'] == '2' || cCiMrk['Base.cCiMrk'] == '4'){
-        //   if(rowData['Ci.cDptCde'] == param.cDptCde){
-        //     ElMessage.error("我方从共时，出单方不能是我司！")
-        //     freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk",rowId,"")
-        //   }
-        // }
         if(cCiMrk["Base.cCiMrk"] == '1' || cCiMrk["Base.cCiMrk"] == '5'){
           if(rowData['Ci.cDptCde'] !== param.cDptCde){
             ElMessage.error("联保单出单方必须是主联单的分公司！");
@@ -870,16 +858,18 @@ const initCiInfo = (data: any) => {
     setFormValue([]);
   }
   nextTick(() => {
-    const cSlsId = opertaor.getTableRefByKey('plyBase').getValue('Base.cSlsId')
-    const cBrkSlsCde = opertaor.getTableRefByKey('plyBase').getValue('Base.cBrkSlsCde')
+    const plyBase = opertaor.getDataAll()['plyBase'];
+    const cSlsId = plyBase['Base.cSlsId'];
+    const cBrkSlsCde = plyBase['Base.cBrkSlsCde'];
+    const cBrkrCde = plyBase['Base.cBrkrCde'];
     // 联保机构、出单机构 转 级联组件初始化
     const dptList = [];
-      if(param['dptCde']) {
-        dptList.push(param['dptCde']);
-        if(param['cDptCde']) {
-          dptList.push(param['cDptCde']);
-        }
+    if(param['dptCde']) {
+      dptList.push(param['dptCde']);
+      if(param['cDptCde']) {
+        dptList.push(param['cDptCde']);
       }
+    }
     freeEditRef?.value?.addRowByData( {
       'Ci.nSeqNo': 1,
       'Ci.nCiShare': '100.00000000',
@@ -891,13 +881,17 @@ const initCiInfo = (data: any) => {
       'Ci.cCoinsurerCde': '327001',
       "Ci.cCiSubComp": param.dptCde,
       'Ci.cDptCde': param.cDptCde,
+      'Ci.cBrkrCde': cBrkrCde,
       'Ci.cSlsId': cSlsId,
       'Ci.cBrkSlsCde': cBrkSlsCde,
       'dptCascader' : dptList,
     });
     // 联保机构下拉选项查询
     ciJiDptOptionsQuery('327001', getFromValue()[0]);
-    onChiefMrkChange()
+    // 业务员加载
+    slsCodeListLoad(getFromValue()[0]);
+
+    onChiefMrkChange();
   });
 };
 
@@ -1068,17 +1062,6 @@ const valideRequired = ()=>{
           freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.nPlyFeeRate", "disabled", false );
         }
-        
-        // 核保状态下禁用相关字段
-        // if(param?.cAppTyp == 'A'){ //核保
-        //   const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
-        //   if (rowItem) {
-        //     rowItem['Ci.cSlsId']['btnItems'].disabled = true;
-        //     rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
-        //     rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
-        //   }
-        // }
-        
         // 特殊页面类型处理
         if (param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && cCiMrkValue =='5' && param.cRsnCde == "FZ") {
           formconfig1.fromSchema?.forEach((item) => {
@@ -1155,7 +1138,6 @@ const initcbusiner = (row:any) =>{
   const rowdata = getFromValue();
   if(rowdata.length >0){
     const rowId = rowdata[0]._dataId;
-    setValueByRowKey('Ci.cSlsId',rowId, `${row.cSlsId}${row.cSlsNme}`)
     setValueByRowKey('Ci.cSlsId',rowId,row.cSlsId)
     setValueByRowKey('Ci.cSlsNme',rowId,row.cSlsNme)
     freeEditRef.value?.addCodeListMap({
@@ -1170,12 +1152,10 @@ const initProxySales = (row:any)=>{
   console.log("代理业务员",row)
   if(rowData.length>0){
     const rowId = rowData[0]._dataId;
-    setValueByRowKey('Ci.cBrkSlsCde',rowId,`${row.cSlsId}${row.CSlsNme}`)
     setValueByRowKey('Ci.cBrkSlsCde',rowId,row.cSlsId)
-    setValueByRowKey('Ci.cSlsNme',rowId,row.CSlsNme)
     freeEditRef.value?.addCodeListMap({
       code:'Ci.cBrkSlsCde'+rowId,
-      list:row.loadData,
+      list: row.loadData,
     })
   }
 }
@@ -1184,7 +1164,7 @@ const intiAgentBroker = (row:any)=>{
   const rowData = getFromValue()
   if(rowData.length>0){
     const rowId = rowData[0]._dataId;
-    setValueByRowKey('Ci.cBrkrCde',rowId,`${row.CChaCde}${row.CChaNme}`);
+    setValueByRowKey('Ci.cBrkrCde',rowId,row.CChaCde);
     freeEditRef.value?.addCodeListMap({
       code:'Ci.cBrkrCde'+rowId,
       list:rowData.loadData,
@@ -1192,6 +1172,25 @@ const intiAgentBroker = (row:any)=>{
   }
 };
 
+/**
+ * 代理业务员、代理经纪人 下拉值加载
+ * @param row
+ */
+const slsCodeListLoad = (row: any) => {
+  const rowId = row['_dataId'];
+  const cSlsId = row['Ci.cSlsId'];
+  const cBrkSlsCde = row['Ci.cBrkSlsCde'];
+  const cBrkrCde = row['Ci.cBrkrCde'];
+  if(!!cSlsId && cSlsId !== ""){
+    setOptions("Ci.cSlsId", rowId, "CSaleCde_List", {CSlsCde: cSlsId});
+  }
+  if(!!cBrkSlsCde && cBrkSlsCde !==""){
+    setOptions("Ci.cBrkSlsCde", rowId, "WEB_ORG_SALES_BY_ID", {value: cBrkSlsCde});
+  }
+  if(!!cBrkrCde && cBrkrCde !==""){
+    setOptions("Ci.cBrkrCde", rowId, "WEB_CUS_CHA_BY_ID", {value: cBrkrCde});
+  }
+};
 
 // 联保机构下拉查询
 const ciJiDptOptionsQuery = async (val: string, row: any) => {
@@ -1236,40 +1235,8 @@ function setFormValue(value: any) {
   setTimeout(() => {
     const tableValue = getFromValue()
      tableValue.forEach(async elem => {
-      if(!!elem["Ci.cSlsId"] && elem["Ci.cSlsId"] !== ""){
-       const res = await codeListStore.queryCodeList({codeListName: "CSaleCde_List",
-                  codeListParam: {
-                    CSlsCde: elem['Ci.cSlsId'],
-                  },
-                },)
-                console.log("保费计算完毕",{
-        code:"Ci.cSlsId"+elem['_dataId'],
-        list:res
-        })
-        freeEditRef.value?.addCodeListMap({
-          code:"Ci.cSlsId"+elem['_dataId'],
-          list:res,
-        })
-      }else if(!!elem['Ci.cBrkSlsCde'] && elem['Ci.cBrkSlsCde'] !==""){
-        const cbRes = await codeListStore.queryCodeList(
-          {
-            codeListName:"AGENCY_BUSINESS_LIST",
-            codeListParam:{CDptCde:elem['Ci.cBrkSlsCde']}
-          },)
-          console.log("保费计算完毕",{
-            code:"Ci.cBrkSlsCde"+elem['_dataId'],
-            list:cbRes})
-        freeEditRef.value?.addCodeListMap({
-          code:"Ci.cBrkSlsCde"+elem['_dataId'],
-          list:cbRes,
-        })
-      }else if(!!elem['Ci.cBrkrCde'] && elem['Ci.cBrkrCde'] !==""){
-        // const cdeRes = await codeListStore.queryCodeList({codeListName:"AGENCY_BUSINESS_LIST",
-        //   codeListParam:{
-        //     CDptCde:elem['Ci.cBrkrCde'],
-        //   }
-        // })
-      }
+       // 业务员加载
+      slsCodeListLoad(elem);
       // 联保机构、出单机构 转 级联组件初始化
       if(elem['Ci.cCiSubComp']) {
         const dptList = [];
@@ -1280,7 +1247,7 @@ function setFormValue(value: any) {
         elem['dptCascader'] = dptList;
       }
     });
-  console.log('保费计算后',tableValue)
+    console.log('************ ci  setFormValue  -> ', tableValue)
     valideRequired()
   }, 500);
 }
