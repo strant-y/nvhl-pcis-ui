@@ -537,8 +537,9 @@ function getRowConfig(groupId: string, riskNo: string) {
         acc[key] = [];
       }
 
-      let colconfig = Object.assign({}, item);
+      let colconfig = Object.assign({}, JSON.parse(JSON.stringify(item)));
       colconfig["factorItem"] = getProp(item);
+      let cf = null;
       // 040002产品特殊处理，判断 cDeterminingMethod ,显示需要的列
       if (pageparam.cProdNo === "040002") {
         let deter = null;
@@ -550,10 +551,14 @@ function getRowConfig(groupId: string, riskNo: string) {
             if (
               colconfig["factorItem"]["prop"] !== "TermRisktgt.nPersonDeath"
             ) {
-              acc[key].push(colconfig);
+              cf = colconfig;
             }
           } else {
-            acc[key].push(colconfig);
+            cf = colconfig;
+          }
+          
+          if(cf && cf.cColTitle === '限额值'){
+            delete cf.factorItem.suffix ;
           }
         } else if (deter && deter === "0") {
           if (colconfig["cRiskNo"] === "040042") {
@@ -561,16 +566,19 @@ function getRowConfig(groupId: string, riskNo: string) {
               colconfig["factorItem"]["prop"] !== "TermRisktgt.nDeathLimit" &&
               colconfig["factorItem"]["prop"] !== "TermRisktgt.nDisabilityLimit"
             ) {
-              acc[key].push(colconfig);
+              cf = colconfig;
             }
           } else {
-            acc[key].push(colconfig);
+            cf = colconfig;
           }
         } else {
-          acc[key].push(colconfig);
+          cf = colconfig;
         }
       } else {
-        acc[key].push(colconfig);
+        cf = colconfig;
+      }
+      if(cf){
+        acc[key].push(cf);
       }
 
       return acc;
