@@ -90,6 +90,9 @@ export function formInit(
 
   if(newObj.fromSchema && newObj.fromSchema.length>0){
     newObj.fromSchema = newObj.fromSchema.map(item=>{
+      if(item.cShowLocation === '2' ){
+        item.hidden = true;
+      }
       if(item.inputtype === 'rtinputgroup' ){
         if(item.groupList && item.groupList.length>0){
           item.groupList = item.groupList.map(gitem=>{
