@@ -28,6 +28,16 @@
                 {{ cardConfig.title }}
               </el-tooltip>
             </el-col>
+            <!-- 控制cardConfig.showEdit状态的按钮 -->
+            <el-col :span="6" v-if="hasShowEditTrue">
+              <a class="toggle-edit-btn" @click="toggleShowEdit">
+                <el-icon>
+                  <View v-if="!cardConfig.showEdit" />
+                  <Hide v-else />
+                </el-icon>
+                <span class="toggle-text">{{ cardConfig.showEdit ? '隐藏查询条件' : '显示查询条件' }}</span>
+              </a>
+            </el-col>
             <el-col
               :span="18"
               style="text-align: right"
@@ -87,7 +97,10 @@
 import { createAppFreeEditConfig } from "../app-free-edit-config";
 import { createAppGridEditConfig } from "../app-grid-edit-config";
 import { CardConfig } from "./card-config";
+import { View, Hide } from '@element-plus/icons-vue'; // 导入更多图标
+
 const showMyfrom = ref(true);
+const hasShowEditTrue = ref(false); // 用于跟踪cardConfig.showEdit是否曾经为true
 
 const formconfig = ref(createAppGridEditConfig({}));
 
@@ -104,10 +117,20 @@ const props = defineProps({
   },
 });
 
+// 添加切换showEdit状态的方法
+function toggleShowEdit() {
+  if (props.cardConfig.showEdit !== undefined) {
+    props.cardConfig.showEdit = !props.cardConfig.showEdit;
+  }
+}
+
 watch(
   () => props.cardConfig,
-  (o, n) => {
-    showMyfrom.value = n?.showMyfrom ? n?.showMyfrom : true;
+  (newVal, oldVal) => {
+    // 当 cardConfig.showEdit 为 true 时，默认隐藏查询条件
+    if (newVal?.showEdit) {
+      hasShowEditTrue.value = true;
+    }
     initEditConfig();
   },
   { deep: true }
@@ -126,6 +149,15 @@ function getFromValue() {
 function setFormValue(value: any) {
   editRef?.value?.setFormValue(value);
 }
+onMounted(() => {
+  // 在组件挂载时检查cardConfig.showEdit是否为true
+  nextTick(() => {
+  if (props.cardConfig.showEdit === true) {
+    hasShowEditTrue.value = true;
+    props.cardConfig.showEdit = false;
+  }
+  })
+})
 
 defineExpose({
   getFromValue,
@@ -147,4 +179,76 @@ defineExpose({
 :deep(.mainTitle .el-card__header) {
   background: #d1e7f7;
 }
+
+/* 按钮样式 */
+.toggle-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 20px;
+  padding: 8px 18px;
+  border-radius: 4px; /* 常用较小圆角 */
+  color: #1a3e72; /* 深蓝色文字 */
+  background-color: #f8fafc; /* 非常浅的背景 */
+  border: 1px solid #cbd5e1; /* 精细的边框 */
+  font-family: 'Segoe UI', system-ui, sans-serif; /* 清晰字体 */
+  font-weight: 600; /* 稍重的字重 */
+  font-size: 13px; /* 较小字号 */
+  transition: all 0.2s ease;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+/* 悬停状态  */
+.toggle-edit-btn:hover {
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  color: #0f2a5a; /* 更深的蓝色 */
+}
+
+/* 激活状态  */
+.toggle-edit-btn:active {
+  background-color: #e2e8f0;
+  transform: scale(0.98);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* 图标样式  */
+.toggle-edit-btn .el-icon {
+  color: #2563eb; /* 主色图标 */
+  font-size: 14px; /* 稍小的图标 */
+  transition: transform 0.2s ease;
+}
+
+/* 聚焦状态  */
+.toggle-edit-btn:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 1px;
+}
+
+/* 文字样式 */
+.toggle-text {
+  letter-spacing: 0.3px;
+}
+
+
+.toggle-edit-btn::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.toggle-edit-btn:hover::after {
+  background: rgba(0, 0, 0, 0.1);
+  bottom: -3px;
+}
+
 </style>
