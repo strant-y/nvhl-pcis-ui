@@ -2828,13 +2828,25 @@ const submitToUndrFn = async () => {
 		return false;
 	}
 
- // 040002 记名投保标志 选是  清单信息必须填  
-   if(props.param.cProdNo === '040002' && tgtValue['Tgt.cRegisteredLogo'] === '1'){
-      const resDist: any = await selectDist({  cComponentTable:"EmployeeDist" , isSummary: '1',cAppNo });
-      if(resDist['data']['total'] < 1){
-        	ElMessage.warning("记名投保标志“是” “雇员清单”未录入请确认！");  
-          return false;
-       }
+  // 040002 记名投保标志 选是  清单信息必须填  
+  const distRequiredMap = {
+    "040002": { flagKey: 'Tgt.cRegisteredLogo', distName: '雇员清单', cComponentTable: 'EmployeeDist', flagName: '记名投保标志' },
+    "041007": { flagKey: 'Tgt.cIsRegistered', distName: '人员清单', cComponentTable: 'PersonnelDist', flagName: '被监护人是否记名' },
+    "049027": { flagKey: 'Tgt.cIsinsuranceRegistered', distName: '清单信息', cComponentTable: 'EducatorDist', flagName: '是否记名投保' },
+    "049020": { flagKey: 'Tgt.cIsRegistered', distName: '被监护人清单信息', cComponentTable: 'WardDist', flagName: '被监护人是否记名' },
+    "045001": { flagKey: 'Tgt.cRegisteredLogo', distName: '工程项目地址清单', cComponentTable: 'ProjectDist', flagName: '记名投保标志' },
+    "042003": { flagKey: 'Tgt.cIsinsuranceRegistered', distName: '人员清单信息', cComponentTable: 'EducatorDist', flagName: '是否记名投保' },
+    "043010": { flagKey: 'Tgt.cIsinsuranceRegistered', distName: '人员清单信息', cComponentTable: 'EducatorDist', flagName: '是否记名投保' },
+    "080011": { flagKey: 'Tgt.cRegisteredInsurance', distName: '清单信息', cComponentTable: 'PersonnelDist', flagName: '记名投保' },
+    "059003": { flagKey: 'Tgt.cIsinsuranceRegistered', distName: '清单信息', cComponentTable: 'EmployeeDist', flagName: '是否记名投保' },
+  }
+  const distItem = distRequiredMap[props.param.cProdNo];
+  if(distItem && tgtValue[distItem.flagKey] === '1') {
+    const resDist: any = await selectDist({  cComponentTable: distItem.cComponentTable , isSummary: '1',cAppNo });
+    if(resDist['data']['total'] < 1){
+      ElMessage.warning(`${distItem.flagName}选“是” “${distItem.distName}”未录入请确认！`);  
+      return false;
+    }
   }
 
 

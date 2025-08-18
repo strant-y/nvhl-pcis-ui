@@ -290,15 +290,15 @@ onMounted(() => {
 
 
 
-    if( route.params.param.cProdNo == '043010'){
-      if(item.prop =='Dist.cJobType'){
-        item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
-      }else if(   cIs == 1 && item.prop !=='Dist.nSeqNo'){
-           item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
-      }else{
-        item['rules'] = [];   
-      }
-    }
+    // if( route.params.param.cProdNo == '043010'){
+    //   if(item.prop =='Dist.cJobType'){
+    //     item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+    //   }else if(   cIs == 1 && item.prop !=='Dist.nSeqNo'){
+    //        item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+    //   }else{
+    //     item['rules'] = [];   
+    //   }
+    // }
 
  
     // if(cIs == 1 && item.prop !=='Dist.nSeqNo'){
