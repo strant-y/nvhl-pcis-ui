@@ -405,7 +405,7 @@ const vehiclePlate = (options = {}) => {
   const { 
     message = "请输入正确的车牌号",
     normalMessage = "普通车牌号格式应为：省份简称+字母+5位数字/字母",
-    newEnergyMessage = "新能源车牌号格式应为：省份简称+字母+6位数字/字母",
+    newEnergyMessage = "请输入正确的车牌号",
     allowSpecial = false
   } = options;
   
@@ -429,7 +429,8 @@ const vehiclePlate = (options = {}) => {
       
       // 新能源车牌正则表达式
       const newEnergyPattern = new RegExp(
-        `^[${provinceChars}][A-HJ-NP-Z]([0-9]{5}[DF]|[DF][A-HJ-NP-Z0-9][0-9]{4})$`
+        // `^[${provinceChars}][A-HJ-NP-Z]([0-9]{5}[DF]|[DF][A-HJ-NP-Z0-9][0-9]{4})$`
+         `/^([京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]{1}[A-Z]{1}(([0-9]{5}[DF])|([DF]([A-HJ-NP-Z0-9])[0-9]{4})))|([京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]{1}[A-Z]{1}[A-HJ-NP-Z0-9]{4}[A-HJ-NP-Z0-9挂学警港澳]{1})$/`
       );
       
       // 验证逻辑
@@ -466,7 +467,14 @@ const faxNumber = () => {
   };
 };
 
-
+// 联系方式 手机或者固定电话
+  const contactInformation = () => {
+    return {
+      pattern: /^(1[3-9]\d{9}|0\d{2,3}-?\d{7,8}(-?\d{1,4})?)$/,
+      message: "请输入正确格式的联系方式",
+      trigger: "blur"
+    };
+  };
 /**
  * 全球法人识别编码（LEI）校验规则
  * @returns {Object} - 校验规则配置
@@ -479,40 +487,11 @@ const leiCode = () => {
   };
 };
 
-// // 道路运输经营许可证验证规则
-// const roadTransportLicense = (options = {}) => {
-//   const { 
-//     message = "请输入正确的道路运输经营许可证号",
-//     formatMessage = "许可证格式应为：省份简称+地市代码+交运政许可+地市代码+字+行政区划代码+编号+号",
-//     lengthMessage = "许可证长度不符合规范"
-//   } = options;
-  
-//   return {
-//     validator: (rule, value, callback) => {
-//       if (!value) return callback(); // 空值校验由required规则处理
-//       const formattedValue = value.trim();
-//       const pattern = /^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼][A-Z]{1,2}交运政许可[A-Z]{1,2}字\d{12}号$/;
-      
-//       if (!pattern.test(formattedValue)) {
-//         return callback(new Error(formatMessage));
-//       }
-      
-//       // 长度验证（总长度通常为20-25位）
-//       if (formattedValue.length < 20 || formattedValue.length > 25) {
-//         return callback(new Error(lengthMessage));
-//       }
-//       // 行政区划代码验证（前6位应为有效行政区划代码）
-//       // 实际应用中可根据需要扩展更详细的验证
-//       callback(); // 验证通过
-//     },
-//     trigger: "blur"
-//   };
-// };
- // 宽松版道路运输经营许可证校验规则
+// 道路运输经营许可证校验规则
 const roadTransportLicense = (options = {}) => {
   const { 
     message = "请输入有效的道路运输经营许可证号",
-    lengthMessage = "许可证号长度应为10-30位"
+    lengthMessage = "许可证号长度应为1-100位" // 调整长度提示
   } = options;
   
   return {
@@ -520,22 +499,16 @@ const roadTransportLicense = (options = {}) => {
       if (!value) return callback(); // 空值由required处理
       const val = value.trim();
       
-      // 宽松校验：允许汉字、字母、数字及常见符号，包含"交运"或"运输"关键词
-      const pattern = /^[a-zA-Z0-9\u4e00-\u9fa5()（）-]+$/;
-      const hasKeyWord = /交运|运输|许可/.test(val);
+      // 仅允许字母、数字、汉字（移除了括号和连字符等符号）
+      const pattern = /^[a-zA-Z0-9\u4e00-\u9fa5]+$/;
       
       // 基本格式校验
       if (!pattern.test(val)) {
-        return callback(new Error(message + "（仅允许汉字、字母、数字及常见符号）"));
+        return callback(new Error(message + "（仅允许字母、数字、汉字）"));
       }
       
-      // 包含行业关键词
-      if (!hasKeyWord) {
-        return callback(new Error(message + "（应包含'交运'、'运输'或'许可'等关键词）"));
-      }
-      
-      // 长度校验
-      if (val.length < 10 || val.length > 30) {
+      // 长度校验（调整为1-100位）
+      if (val.length < 1 || val.length > 100) {
         return callback(new Error(lengthMessage));
       }
       
@@ -768,7 +741,9 @@ const taxValidation = () => {
     if(type == 'taxValidation') {
       return taxValidation()
     }
-
+    if(type == 'contactInformation') {
+      return contactInformation()
+    }
   };
   const validorMap = {
     required: required,

@@ -454,8 +454,8 @@ function logout() {
     lockScroll: false,
   }).then(() => {
     const href = window.location.href;
-    const code = href.slice(href.indexOf("?") + 1, href.indexOf("&")).split("=")[1];
-    if(code) {
+    const code = href.slice(href.indexOf("?") + 1, href.indexOf("&")).split("=");
+    if(code && code.length > 0 && code[0] === "code" && code[1]) {
       window.location.replace("http://sso.iam-test.yaic.com.cn/oidc/session/end")
     } else {
       userStore

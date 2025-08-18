@@ -2,25 +2,62 @@ import moment from "moment";
 import dayjs from "dayjs";
 import { dataOpertaor } from "@/store";
 
+
 export const getData = () => {
   const user = JSON.parse(sessionStorage.getItem("user"));
   const opertaor = dataOpertaor();
   const param = opertaor.getParam();
+  const productNo = param?.cProdNo;
+  // 个别产品的保险期限
+  const productTermMap = {
+    "020001": 120, // 出口海洋运输货物保险
+    "020002": 90, // 出口陆上运输货物保险
+    "020003": 90, // 出口航空货物运输保险
+    "020004": 45, // 邮包保险
+    "020005": 90, // 进口海洋运输货物保险
+    "020006": 90, // 进口陆上运输货物保险
+    "020007": 45, // 进口航空货物运输保险
+    "020009": 45, // 国内水路、陆路货物运输保险
+    "020011": 45, // 国内航空货物运输保险
+    "020013": 45, // 国内公路货物运输保险
+    "020014": 365, // 公路货物运输定额保险（固定365天）
+    "020016": 45, // 水路货物运输保险
+    "020017": 45, // 铁路货物运输保险
+    "020018": 365, // 国内公路货物运输定期保险（固定365天）
+  };
 
   const defultdata = () => {
     // 默认全量初始化数据
     //保单基本信息初始化
     const dataInit = {};
     dataInit["Base.tAppTm"] = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
-    dataInit["Base.tInsrncBgnTm"] = moment(
-      new Date(Date.now() + 1 * 1000 * 60 * 60 * 24)
-    ).format("YYYY-MM-DD 00:00:00");
-    dataInit["Base.tInsrncEndTm"] = dayjs().add(1,'year').format("YYYY-MM-DD 23:59:59");
-    const tm = moment(dataInit["Base.tInsrncEndTm"]).add(1, 'second').diff(
-      moment(dataInit["Base.tInsrncBgnTm"]),
-      "days"
-    );
+
+    const startDate = dayjs().add(1, "day").format("YYYY-MM-DD 00:00:00");
+    dataInit["Base.tInsrncBgnTm"] = startDate;
+    // dataInit["Base.tInsrncBgnTm"] = moment(new Date(Date.now() + 1 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00");
+    dataInit["Base.tInsrncEndTm"] = dayjs()
+      .add(1, "year")
+      .format("YYYY-MM-DD 23:59:59");
+
+    const startDayjs = dayjs(startDate);
+    let termDays;
+    if (productTermMap.hasOwnProperty(productNo)) {
+      // 特殊产品：使用固定天数
+      termDays = productTermMap[productNo];
+    } else {
+      // 非特殊产品：按1年计算（自动区分平闰年）
+      const endOfYear = startDayjs.add(1, "year").subtract(1, "second");
+      termDays = endOfYear.diff(startDayjs, "day"); // 动态得到365或366
+    }
+    const endDate = startDayjs
+      .add(termDays, "day")
+      .subtract(1, "second")
+      .format("YYYY-MM-DD HH:mm:ss");
+    dataInit["Base.tInsrncEndTm"] = endDate;
+
+    const tm = dayjs(endDate).add(1, "second").diff(startDayjs, "day");
     dataInit["Base.cTmSysCde"] = tm;
+
     dataInit["Base.cRenewMrk"] = "0";
     dataInit["Base.cIsNet"] = "0";
     dataInit["Base.cJuriCde"] =
@@ -56,7 +93,7 @@ export const getData = () => {
     dataInit["Base.cCiMrk"] = "0";
     dataInit["Base.cIntroDptcde"] = param.cDptCde;
     dataInit["Base.cCiMrk"] = param.cCiMrk || "0";
-    dataInit["Base.nPayNumber"] = '1'; //缴费期数
+    dataInit["Base.nPayNumber"] = "1"; //缴费期数
 
     dataInit["Applicant.cStkMrk"] = "0";
     dataInit["Applicant.cCustRiskRank"] = "925104";
@@ -78,8 +115,6 @@ export const getData = () => {
 
     // dataInit["EdrBase.cRatioTyp"] = "2";
 
-
- 
     return dataInit;
   };
 
@@ -89,8 +124,8 @@ export const getData = () => {
   if (param.cProdNo === "043009") {
     diy["Tgt.cInsuranceMethod"] = "613001";
   }
-  if(param.cProdNo === "040002"){
-    diy["Tgt.cDeterminingMethod"] = "0";//赔偿限额确定方式 页面初始化为直接限额制
+  if (param.cProdNo === "040002") {
+    diy["Tgt.cDeterminingMethod"] = "0"; //赔偿限额确定方式 页面初始化为直接限额制
   }
   const defultData = Object.assign(diy, di);
   return defultData;
@@ -105,16 +140,19 @@ export const getECargoData = () => {
     // 默认全量初始化数据
     //保单基本信息初始化
     const dataInit = {};
-    dataInit["ECargoBase.tAppTm"] = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
+    dataInit["ECargoBase.tAppTm"] = moment(new Date()).format(
+      "YYYY-MM-DD HH:mm:ss"
+    );
     dataInit["ECargoBase.tInsrncBgnTm"] = moment(
       new Date(Date.now() + 1 * 1000 * 60 * 60 * 24)
     ).format("YYYY-MM-DD 00:00:00");
-    dataInit["ECargoBase.tInsrncEndTm"] = dayjs().add(1,'year').format("YYYY-MM-DD 23:59:59");
-    
-    const tm = moment(dataInit["ECargoBase.tInsrncEndTm"]).add(1, 'second').diff(
-      moment(dataInit["ECargoBase.tInsrncBgnTm"]),
-      "days"
-    );
+    dataInit["ECargoBase.tInsrncEndTm"] = dayjs()
+      .add(1, "year")
+      .format("YYYY-MM-DD 23:59:59");
+
+    const tm = moment(dataInit["ECargoBase.tInsrncEndTm"])
+      .add(1, "second")
+      .diff(moment(dataInit["ECargoBase.tInsrncBgnTm"]), "days");
     dataInit["ECargoBase.cTmSysCde"] = tm;
     // tmDay.value = tm;
     dataInit["ECargoBase.cRenewMrk"] = "0";
@@ -153,7 +191,7 @@ export const getECargoData = () => {
     dataInit["ECargoBase.cCiMrk"] = "0";
     dataInit["ECargoBase.cIntroDptcde"] = param.cDptCde;
     dataInit["ECargoBase.cCiMrk"] = param.cCiMrk || "0";
-    dataInit["ECargoBase.nPayNumber"] = '1'; //缴费期数
+    dataInit["ECargoBase.nPayNumber"] = "1"; //缴费期数
 
     // dataInit["ECargoApplicant.cStkMrk"] = "0";
     // dataInit["ECargoApplicant.cCustRiskRank"] = "925104";

@@ -216,18 +216,54 @@ const tableconfig = reactive<AppTableConfig>(
     fromSchema: [
       {
         prop: "cKindNo",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "险类代码",
+        typeCode: "KIND_LIST_GRT",
+        codeParam: { cStatus: "1" },
       },
       {
         prop: "cTermNo",
         inputtype: "rtinput",
-        title: "条款代码",
+        title: "条款编码",
       },
       {
         prop: "cNmeCn",
         inputtype: "rtinput",
         title: "条款名称",
+        align: "left",
+
+      },
+      {
+        prop: "cRegisteredNo",
+        inputtype: "rtinput",
+        title: "注册号",
+      },
+      {
+        prop: "cIsInternet",
+        inputtype: "rtselect",
+        title: "是否互联网",
+        loadData: [
+          { label: "是", value: "1" },
+          { label: "否", value: "0" },
+        ],
+      },
+      {
+        prop: "cIsGroup",
+        inputtype: "rtselect",
+        title: "是否团单",
+        loadData: [
+          { label: "是", value: "1" },
+          { label: "否", value: "0" },
+        ],
+      },
+      {
+        prop: "isDutyfree",
+        inputtype: "rtselect",
+        title: "是否免税",
+        loadData: [
+          { label: "是", value: "1" },
+          { label: "否", value: "0" },
+        ],
       },
       {
         prop: "cRdrTyp",

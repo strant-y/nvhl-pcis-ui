@@ -225,20 +225,21 @@ const formconfig1 = ref<AppFreeEditConfig>(
     ],
   })
 );
-
-
-// 确定 非空校验
-const isObjectValid = (obj:any) => {
+// 确定 非空校验：仅当所有属性都是空字符串时才拦截
+const isObjectValid = (obj: any) => {
   if (Array.isArray(obj)) {
-    return true; 
+    return true;
   }
 
   if (!obj || typeof obj !== 'object' || !Object.keys(obj).length) {
     return false;
   }
-  return Object.values(obj).every(v => 
-    v != null && (typeof v !== 'string' || v.trim() !== '')
-  );
+
+  const values = Object.values(obj).map(v => {
+    return typeof v === 'string' ? v.trim() : v;
+  });
+  const allEmpty = values.every(v => v == null || v === '');
+  return !allEmpty;
 };
 onMounted(() => {
   // console.log(333)   distAdd
@@ -268,6 +269,13 @@ onMounted(() => {
     if( route.params.param.cProdNo == '042003' && item.prop =='Dist.cPlanNo' ){
              item['rules'] = [];
     }
+
+    // 040002 证件号码 必填问题
+    if( route.params.param.cProdNo == '040002' && item.prop =='Dist.cIdentificationNumber'){
+         item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+    
+    }
+  
     // 方案号下拉值
     // if(item.prop == 'Dist.cPlanNo'){
     //   const termref = opertaor.getTableRefByKey("cvrg");
@@ -435,6 +443,9 @@ const getDistoccupType = (val) => {
     const item = freeEditRef.value?.getFromSchemaItem('Dist.cOccupationalLevel')
     //给表单下拉项赋值
     item.itemConfig.loadData = res
+    if(res.length > 0 ){  // 职业等级,默认给个值
+      setValue('Dist.cOccupationalLevel', res[0].value);
+    }
   });
 }
 const cEquipmentTypesFunc = ()=>{

@@ -101,6 +101,20 @@ onMounted(async () => {
      setFormItem("Tgt.cShippingType", { rules: [getRules("required", {'trigger':'blur'})]});
   }
 
+  //  020001 起运港 必填其他非必填
+  if(params.cProdNo === '020001'){
+       setFormItem("Tgt.cDeparturePort", { rules: [getRules("required", {'trigger':'blur'})]});
+  }
+
+  // 040005 办学许可证号
+  if(params.cProdNo === '040005'){
+       setFormItem("Tgt.cLicenseNumber", { rules: []});
+  }else {
+      setFormItem("Tgt.cLicenseNumber", {
+    rules: [getRules("vehiclePlate", {})],
+  });
+  }
+
   // 约定保期内服务次数正整数
   setFormItem("Tgt.nAgreeFrequency", {
     rules: [getRules("signlessInt", {})],
@@ -112,9 +126,7 @@ onMounted(async () => {
   setFormItem("Tgt.cContactNumber", {
     rules: [getRules("phoneNo", {})],
   });
-  setFormItem("Tgt.cLicenseNumber", {
-    rules: [getRules("vehiclePlate", {})],
-  });
+
 });
 
 const wagesInfoModel = () => {
@@ -462,10 +474,18 @@ const method = {
       setFormItem('Tgt.cBareboatLessee', {
         rules: [getRules("required", {})],
       });
+      // Tgt.cBareboatLessee
+      setFormItem('Tgt.nHostPower', {
+        rules: [],
+      });
+      
       
     }else {
       setFormItem('Tgt.cBareboatLessee', {
         rules: null
+      });
+       setFormItem('Tgt.nHostPower', {
+        rules: [getRules("required", {})],
       });
     }
   },
@@ -549,6 +569,7 @@ const method = {
         readonly: '0',
       });
     }else {
+      // Tgt.cTransportTools
       setValue("Tgt.cTransportTools", '')
       setFormItem("Tgt.cTransportTools", {
         readonly: '1',

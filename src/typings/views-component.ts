@@ -1,31 +1,17 @@
-import CustomRecording from "@/views/pcis/guide/CustomRecording.vue";
-import MyPage from "@/views/pcis/my-page/myPage.vue";
-import FactorConfig from "@/views/prodconfiguration/factorConfig.vue";
-import ComponentConfig from "@/views/prodconfiguration/componentConfig.vue";
-import ApplicationQuerys from "@/views/comprehensive-query/pages/application-querys.vue";
-  
-
-
 /**
- * 需要缓存状态的页面 组件
+ * 缓存组件的name
  */
-const ViewsComponentsMap: any = {
-    'guide': markRaw(CustomRecording),
-    'my-page':  markRaw(MyPage),
-    'factorConfig':  markRaw(FactorConfig),
-    'component':  markRaw(ComponentConfig),
-    'application-querys':  markRaw(ApplicationQuerys),
+const ViewsCachedKeyMap : any = {
+    'guide': 'CustomRecording',
+    'my-page': 'myPage',
+    'factorConfig': 'factorConfig',
+    'component': 'componentConfig',
+    'application-querys': 'application-querys',
+    'price-inquiry-recording': 'PriceInquiryRecording',
+    // 'edr-qry-endorse-list': '',
 };
 
-function getCompByName(name: string): any {
-    return ViewsComponentsMap[name];
+export function getCompName(name: string): boolean {
+    return ViewsCachedKeyMap[name];
 }
 
-function getIfCompViewByName(name: string): boolean {
-    return name in ViewsComponentsMap;
-}
-
-export {
-    getCompByName,
-    getIfCompViewByName
-};

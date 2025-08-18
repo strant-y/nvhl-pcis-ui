@@ -546,7 +546,7 @@ function getRowConfig(groupId: string, riskNo: string) {
           deter = tgt.getValue("Tgt.cDeterminingMethod");
         }
         if (deter && deter === "1") {
-          if (colconfig["cRiskNo"] === "042225") {
+          if (colconfig["cRiskNo"] === "040042") {
             if (
               colconfig["factorItem"]["prop"] !== "TermRisktgt.nPersonDeath"
             ) {
@@ -556,7 +556,7 @@ function getRowConfig(groupId: string, riskNo: string) {
             acc[key].push(colconfig);
           }
         } else if (deter && deter === "0") {
-          if (colconfig["cRiskNo"] === "042225") {
+          if (colconfig["cRiskNo"] === "040042") {
             if (
               colconfig["factorItem"]["prop"] !== "TermRisktgt.nDeathLimit" &&
               colconfig["factorItem"]["prop"] !== "TermRisktgt.nDisabilityLimit"

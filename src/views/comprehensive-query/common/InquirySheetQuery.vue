@@ -839,7 +839,7 @@ const tableObj = {
                         const data = row;
                         data.cPolicySource = '6'
                         router.push({
-                            path: "/pcis/my-page",
+                            path: "/pcisapp/myPage",
                             query: {
                                 param: JSON.stringify({ ...data, ...{ pageType: "readonly", pageName: 'priceInquiry' } }),
                             },
@@ -874,7 +874,7 @@ const tableObj = {
                         r.cPolicySource = '6'
                         const data = row;
                         router.push({
-                            path: "/pcis/my-page",
+                            path: "/pcisapp/myPage",
                             query: {
                                 param: JSON.stringify({
                                     ...data,
@@ -958,7 +958,7 @@ const tableObj = {
                 tableClick: (row) => {
                     row.cPolicySource = '6'
                     router.push({
-                        path: "/pcis/my-page",
+                        path: "/pcisapp/myPage",
                         query: {
                             param: JSON.stringify({ ...row, ...{ pageType: "inquiryToApp" } }),
                         },
@@ -971,22 +971,16 @@ const tableObj = {
 // 定义两套列配置
 const esSearchColumns = [
    {
-    prop: "policyInfo",
+    prop: "cInquiryNo",
     inputtype: "rtinput",
-    title: "保单",
+    title: "询价单号",
     minWidth: 180,
     fixed: "left",
    },
    {
-    prop: "cPlyNo",
+    prop: "cAppNo",
     inputtype: "rtinput",
-    title: "批单",
-    minWidth: 180,
-   },
-   {
-    prop: "nEdrPrjNo",
-    inputtype: "rtinput",
-    title: "批改序号",
+    title: "申请单号",
     minWidth: 180,
    },
    {
@@ -1305,7 +1299,6 @@ function esSearch(flag?: boolean) {
           pageresult.list = convertedData.map(item => ({
             ...item,
             // 创建一个新字段合并两个值
-            policyInfo: `${item.cAppNo || ''}\n${item.cPlyNo || ''}`,
             InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
           }));
           pageresult.total = data.total;

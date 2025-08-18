@@ -2,7 +2,6 @@ import {createRouter, createWebHashHistory, RouteLocationRaw, RouteRecordRaw} fr
 import {encryptParameter} from "@/utils/encipher";
 import {useTagsViewStore} from "@/store";
 import {CommonConstants} from "@/constants/CommonConstants";
-import {descryptParameterToQuery} from "@/utils/common";
 
 export const Layout = () => import("@/layout/index.vue");
 
