@@ -131,6 +131,8 @@
 
 <script setup lang="ts">
 import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
+import { mutualExclusionClause } from "./mutualExclusionClause.ts";
+
 const tremTemplate = defineAsyncComponent(() => import("./trem-template.vue"));
 import { v4 as uuidv4 } from "uuid";
 
@@ -213,15 +215,20 @@ onMounted(async () => {
             });
           });
           let data: { [key: string]: any } = {
-            "Term.cClauseCode": item.cTermNo,
-            "Term.cRdrTyp": item.cRdrTyp,
-            "Term.cUniqueTermNo": item.cUniqueTermNo,
-            "Term.NSeqNo":1,
-            "Term.cPlanNo":'P1',
-            riskList: riskList,
+              "Term.cClauseCode": item.cTermNo,
+              "Term.cRdrTyp": item.cRdrTyp,
+              "Term.cUniqueTermNo": item.cUniqueTermNo,
+              "Term.NSeqNo":1,
+              "Term.cPlanNo":'P1',
           };
           if (item.cRdrTyp === "1") {
             data["Term.cClauseCategory"] = item.cClauseCategory;
+          }
+          if(item.cUniqueTermNo && mutualExclusionClause.value.includes(item.cUniqueTermNo)){
+            // 部分条款责任互斥,所以互斥条款,不再加载对应的责任信息
+            data.riskList = [];
+          }else{  
+            data.riskList = riskList;
           }
           // 数据初始化
           initTermData(item,data);

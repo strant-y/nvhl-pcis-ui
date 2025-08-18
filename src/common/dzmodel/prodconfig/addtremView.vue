@@ -127,11 +127,13 @@
 </template>
 
 <script setup lang="ts">
+import { ref, defineProps } from "vue";
 import { qryProdRelTermRiskList, qryRelTermList } from "@/api/prod";
 import { useValidator } from "@/typings/useValidator";
 import { tremMap } from "@/pcis/prodRef/cvrgRef/trem-map-config.ts"
+import { mutualExclusionClause } from "@/pcis/prodRef/cvrgRef/mutualExclusionClause.ts";
+
 const { getRules } = useValidator();
-import { ref, defineProps } from "vue";
 const emits = defineEmits(["handleClose"]);
 const isFree = ref(true);
 const isCopy = ref(false);
@@ -283,6 +285,37 @@ function setNode() {
 let ignoreCheckChange = false;
 
 function selectmainMethod(a: any, b: any, c: any) {
+  let mc = null;
+  if(b){  // 先判断选中的责任,是否挂在互斥条款下
+    data1.value.forEach((d: any) => {
+      d.children?.forEach((child: any) => {
+        if (child.id === a.id) {
+          mc = d;
+        }
+      });
+    });
+  }
+  if(mc && mutualExclusionClause.value.includes(mc.cUniqueTermNo)){  //对应主条款存在互斥条款
+    let addkey: any[] = [];
+    // 先全量获取已选中数据
+    const tree = mainRef.value?.getCheckedNodes(false, true);
+    tree.forEach((t: any) => {
+      if (addkey.indexOf(t.id) === -1) {  
+        addkey.push(t.id);
+      }
+    });
+    // 筛选出,所有互斥条款,并反选
+    data1.value.forEach((d: any) => {
+      if(d.cUniqueTermNo === mc.cUniqueTermNo){
+        d.children?.forEach((child: any) => {
+          if(child.id !== a.id){
+            addkey = addkey.filter((node: any) => child.id !== node );
+          }
+        });
+      }
+    });
+    mainRef.value?.setCheckedKeys(addkey, false);
+  }
   // 重新判断,如果勾选责任,自动勾选主条款,如果主条款被反选,自动取消对应责任反选
   let addMainKey: any[] = [];
   const tree = mainRef.value?.getCheckedNodes(false, true);
