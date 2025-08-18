@@ -1664,6 +1664,7 @@ function getValue(key: string) {
 defineExpose({
   setValue,
   getValue,
+  esSearch,
 });
 </script>
 

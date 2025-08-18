@@ -722,6 +722,11 @@ const tableconfig = reactive<AppTableConfig>(
                                 message='该单缴费类型错误，只能对在线支付的单进行在线缴费！ 【申请单号='+item['cAppNo']+'】'
                                 return;
                             }
+                            if(!item['cPaySequence']) {
+                                isOpen = true;
+                                message='请先获取支付号！ 【申请单号='+item['cAppNo']+'】'
+                                return;
+                            }
                              multipleSelection.value.forEach((itemT,j) => {
                                 // 校验多个单据币种是否相同
                                 if (item['cCurNo'] !== itemT['cCurNo']  ) {
