@@ -338,10 +338,15 @@ onMounted(() => {
         item["hidden"] = true;
       }
     }
-
-        // 身份证类型自动回填年龄
+     // 身份证类型自动回填年龄
     if(item.prop =='Dist.cIdentificationNumber'){
       item['func'] = (val: string) => {
+        // 针对040005产品，自动回填出生年月
+        if(route.params.param.cProdNo === '040005' && val && val.length === 18) {
+          const birthDateFromId = val.substring(6, 14);
+          const formattedBirthDate = `${birthDateFromId.substring(0, 4)}-${birthDateFromId.substring(4, 6)}-${birthDateFromId.substring(6, 8)}`;
+          setValue('Dist.tBirthDate', formattedBirthDate);
+        }
         if(val && val.length === 18 && getValue('Dist.cDocumentType') === '120001') {
           const age = calculateAgeFromIdCard(val);
           setValue('Dist.nAge', age);
