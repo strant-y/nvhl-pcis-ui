@@ -1083,7 +1083,7 @@ function handleSearch(val:any) {
       TIssueTmStart: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
       TIssueTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
     });
-    sessionStorage.setItem(AppKey.query.pcis_query_app, JSON.stringify(param));
+    sessionStorage.setItem(AppKey.query.pcis_query_search, JSON.stringify(param));
     router.push({ path: '/query/application-querys' });
   } else if (isAudit.value) { //核保员
     const param = Object.assign({
@@ -1096,7 +1096,7 @@ function handleSearch(val:any) {
       startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
       endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
     });
-    sessionStorage.setItem(AppKey.query.pcis_query_newudrlist, param);
+    sessionStorage.setItem(AppKey.query.pcis_query_newudrlist, JSON.stringify(param));
     router.push({ path: '/pcis-new-udr-list/PendUdrList' });
   }
 }

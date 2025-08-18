@@ -254,6 +254,21 @@ onMounted(async () => {
       sessionStorage.getItem(AppKey.query.pcis_query_returnudrlist)
     );
     activeName.value = "6";
+  } else if (sessionStorage.getItem(AppKey.query.pcis_query_search)) {
+    homeJumpData.value = JSON.parse(
+      sessionStorage.getItem(AppKey.query.pcis_query_search)
+    );
+    activeName.value = "3";
+    setTimeout(() => {
+      if (homeJumpData.value.hasOwnProperty("CAppNo")) {
+        //申请单号
+        freeEditRef.value[2].value[0].setValue(
+          "cQueryStr",
+          homeJumpData.value.CAppNo
+        );
+        freeEditRef.value[2].value[0].esSearch(true)
+      }
+    }, 500)
   } else {
     setTimeout(() => {
       freeEditRef.value[0]?.value[0]?.setValue("tIssueTm", [
@@ -270,6 +285,8 @@ onUnmounted(() => {
     sessionStorage.removeItem(AppKey.query.pcis_query_app);
   sessionStorage.getItem(AppKey.query.pcis_query_returnudrlist) &&
     sessionStorage.removeItem(AppKey.query.pcis_query_returnudrlist);
+  sessionStorage.getItem(AppKey.query.pcis_query_search) &&
+    sessionStorage.removeItem(AppKey.query.pcis_query_search);
 });
 
 // 绑定方法
