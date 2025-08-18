@@ -1748,10 +1748,13 @@ async function loadAfter() {
      
     }).then((res) => {
       if (res) {
+        const cPlyNo = res.res.composition.plyBase[0]['Base.cPlyNo']
         const ops = clearCAppNo(opertaor.convertData(res));
         ops['plyBase']['Base.cRenewMrk'] = '1'
         ops['plyBase']['Base.cPlyNo'] = ''
         ops['plyBase']['Base.cOprCde'] = user.userName // 录单人为当前用户
+        ops['plyBase']['Base.cOrigPlyNo'] = cPlyNo
+        ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
         ops['insrnc']['Base.tAppTm'] = moment(new Date(Date.now())).format(
             "YYYY-MM-DD HH:mm:ss"
         )
@@ -4691,7 +4694,7 @@ function replacecInquiryNo(res:any) {
 }
 
 // 复制出单和模板出单清空原有的申请单号
-const clearKeyMap = ["cPkId","cAppNo","tUpdTm","cEdrNo","cLatestMrk","nEdrPrjNo","tCrtTm"]
+const clearKeyMap = ["cPkId","cAppNo","tUpdTm","cEdrNo","cLatestMrk","nEdrPrjNo","tCrtTm","cPlyNo"]
 function clearCAppNo(res:any, mapList:any = clearKeyMap) {
   if(res instanceof Array) {
     res.forEach((item:any) => {
