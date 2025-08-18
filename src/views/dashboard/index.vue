@@ -828,6 +828,24 @@ function getAuditTableData() {
       ...pageData.value
     }
     getList = pcisQueryService.getBackUdrList(param)
+  } else if(udrType === "4") {
+    const param = {
+      sortField: "name",
+      bsType: "A",
+      CAppStatus: "4",
+      // CUdrCde: this.user.opCde, // 已核保查询去掉人员限制
+      sortOrder: null, // 存在问题_sortValue需要确认5个页面，每个tale具体哪些字段需要排序
+      CurrentUser: user.opCde,
+      CurrentUserOrg: user.companyId,
+      TAppTmStart: dayjs().subtract(30, 'day').format("YYYY-MM-DD 00:00:00"),
+      tAppTmEnd: dayjs().format("YYYY-MM-DD 23:59:59"),
+      CLoadSub: 1,
+      udrType: "4",
+      orgCde: user.companyId,
+      findPlan: true,
+      ...pageData.value
+    }
+    getList = pcisQueryService.getAppPolicyList(param)
   } else {
     const param = {
       companyId: user.companyId,
@@ -846,8 +864,13 @@ function getAuditTableData() {
   }
   getList.then((res: any) => {
     if (res && res.code === 200) {
-      pageresult.list = res.data || [];
-      pageresult.total = res.totalCount || 0;
+      if (udrType !== "4") {
+        pageresult.list = res.data || [];
+        pageresult.total = res.totalCount || 0;
+      } else {
+        pageresult.list = res.data.result || [];
+        pageresult.total = res.data.total || 0;
+      }
     } else {
       ElMessage.error({ message: res.msg, duration: 3000 });
     }
@@ -1067,7 +1090,7 @@ const toQuery2 = (data: any) => {
       handleClickStagingList(row);
     } else if (currentTabName.value === "待核保任务") {
       handleClickStagingList(row);
-    } else if (currentTabName.value === '核保退回任务') {
+    } else {
       showDetails(row)
     }
   }

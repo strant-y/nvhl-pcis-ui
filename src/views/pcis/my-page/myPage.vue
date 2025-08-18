@@ -1755,6 +1755,7 @@ async function loadAfter() {
         ops['plyBase']['Base.cOprCde'] = user.userName // 录单人为当前用户
         ops['plyBase']['Base.cOrigPlyNo'] = cPlyNo
         ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+        ops['plyBase']['Base.cAppStatus'] = ''
         ops['insrnc']['Base.tAppTm'] = moment(new Date(Date.now())).format(
             "YYYY-MM-DD HH:mm:ss"
         )
@@ -3742,8 +3743,8 @@ const getSurrenderPrecisFun = () => {
   const res = opertaor.getDataAll();
   res["user"] = user;
   res["EdrBase"] = edrbase.value?.getFromValue();
-  res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"] =
-    res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+  res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
+    res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   getSurrenderPrecis(res).then((res) => {
     btn.loading = false;
     if (res["code"] == "200") {

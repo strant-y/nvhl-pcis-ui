@@ -7,6 +7,7 @@ export class PcisQueryService {
     changeStatusUrl = 'notify/changeStatus'; 
     qryNewUdrListUrl = 'underwriting/query/newUdrList';
     queryBackUdrListUrl = 'underwriting/query/backUdrList';
+    qryAppPolicyUrl = 'policy/getAppPolicyList';
     
 
      /**
@@ -47,5 +48,12 @@ export class PcisQueryService {
      */
     getBackUdrList(ops: any) {
         return request.post(`${this.queryBackUdrListUrl}`, ops);
+    }
+    
+    /**
+     * 核保通过查询
+     */
+    getAppPolicyList(ops: any): AxiosPromise<any> {
+        return request.post(`${this.qryAppPolicyUrl}`, ops);
     }
 }
