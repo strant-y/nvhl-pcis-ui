@@ -443,6 +443,9 @@ const getDistoccupType = (val) => {
     const item = freeEditRef.value?.getFromSchemaItem('Dist.cOccupationalLevel')
     //给表单下拉项赋值
     item.itemConfig.loadData = res
+    if(res.length > 0 ){  // 职业等级,默认给个值
+      setValue('Dist.cOccupationalLevel', res[0].value);
+    }
   });
 }
 const cEquipmentTypesFunc = ()=>{
