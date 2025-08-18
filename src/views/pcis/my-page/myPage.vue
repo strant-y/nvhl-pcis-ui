@@ -3713,6 +3713,8 @@ const getSurrenderPrecisFun = () => {
   const res = opertaor.getDataAll();
   res["user"] = user;
   res["EdrBase"] = edrbase.value?.getFromValue();
+  res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"] =
+    res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   getSurrenderPrecis(res).then((res) => {
     btn.loading = false;
     if (res["code"] == "200") {
@@ -3757,6 +3759,8 @@ const submitEdrToUndrSurrender = async () => {
   res["taskId"] = props.param.taskId ? props.param.taskId : null;
   res["data"] = opertaor.getDataAll();
   res["data"]["EdrBase"] = edrbase.value?.getFromValue();
+  res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"] =
+    res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   
   submitEdrSurrender(res).then((res) => {
     btn.loading = false;
@@ -3887,6 +3891,14 @@ const generateEndorse = async () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
   res["EdrBase"] = edrbase.value?.getFromValue();
+  if (
+    res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
+    res["EdrBase"]["EdrBase.cEdrRsnDetail"] != "" &&
+    Array.isArray(res["EdrBase"]["EdrBase.cEdrRsnDetail"])
+  ) {
+    res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+  }
   if(res['ci'] && res['ci'].length>0){
     res['ci'].forEach((item:any)=>{
       if(item['Ci.nCiShare']){
