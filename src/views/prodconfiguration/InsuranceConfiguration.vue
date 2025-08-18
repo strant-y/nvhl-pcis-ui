@@ -218,33 +218,8 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cKindNo",
         inputtype: "rtselect",
         title: "险类代码",
-        loadData: [
-          {
-              label: "01 企业财产险",
-              value: "01"
-          },         
-          {              
-              label: "02 货物运输险",
-              value: "02"          },        
-          {   label: "04 责任险",
-              value: "04"          },        
-          {   label: "05 保证保险",
-              value: "05"          },         
-          {   label: "07 特殊风险保险",
-              value: "07"          },
-          {   label: "08 家庭财产险",
-              value: "08"          },         
-          {   label: "09 工程险",
-              value: "09"          },         
-          {   label: "11 船舶保险",
-              value: "11"          },        
-          {   label: "12 其他险",
-              value: "12"          },         
-          {   label: "13 信用保险",
-              value: "13"          },         
-          {   label: "16 农险",
-              value: "16"     }        
-        ],
+        typeCode: "KIND_LIST_GRT",
+        codeParam: { cStatus: "1" },
       },
       {
         prop: "cTermNo",
