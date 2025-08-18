@@ -282,7 +282,7 @@ const method = {
 
 <style scoped>
 .app-container {
-  padding: 6px 30px;
+  padding: 1px 5px;
 }
 /* /deep/ .el-form {
   padding: 5px 30px;

@@ -2,7 +2,7 @@
   <div class="searchbar">
     <el-card
         shadow="never"
-        :class="['table-container','table_header']"
+        :class="['table-container',tableConfig.titleBtns.length > 0 ? 'table_header_has-title-btns' : 'table_header']"
     >
       <template
         #header
@@ -311,6 +311,10 @@ defineExpose({
 }
 .table_header :deep(.el-card__header) {
   background-color: #e5f3fa;
-  padding: 15px 20px;
+  padding: 5px 20px;
+}
+
+.table_header_has-title-btns :deep(.el-card__header) {
+  padding: 10px 20px;
 }
 </style>
