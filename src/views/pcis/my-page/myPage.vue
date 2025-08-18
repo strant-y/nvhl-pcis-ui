@@ -1748,7 +1748,7 @@ async function loadAfter() {
      
     }).then((res) => {
       if (res) {
-        const ops = opertaor.convertData(res);
+        const ops = clearCAppNo(opertaor.convertData(res));
         ops['plyBase']['Base.cRenewMrk'] = '1'
         ops['plyBase']['Base.cPlyNo'] = ''
         ops['insrnc']['Base.tAppTm'] = moment(new Date(Date.now())).format(
@@ -1771,6 +1771,19 @@ async function loadAfter() {
               item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
             }
           })
+        }
+        // 从查询结果获取主条款编码和名称，在顶部反显
+        if(ops['cvrg'] && ops['cvrg'].length > 0 && !props.param?.cTermNo) {
+          router.replace({
+            path: "/pcis/my-page",
+            query: {
+              param: JSON.stringify({
+                ...route.params.param,
+                cTermNo: ops['cvrg'].find((i:any) => i['Term.cRdrTyp'] === "0")['Term.cClauseCode'],
+                cTermNme: ops['cvrg'].find((i:any) => i['Term.cRdrTyp'] === "0")['Term.cClauseName']
+              }),
+            },
+          });
         }
         opertaor.setDataAll(ops);
         // 获取原申请单号下的清单列表数据
@@ -3222,7 +3235,7 @@ const savePlyInfo = async () => {
 
 
     saveFlag = true;
-    if(props.param?.pageType === "inquiryToApp" && saveDistBatchFlag.value) {
+    if((props.param?.pageType === "inquiryToApp" || props.param?.pageType === "orig") && saveDistBatchFlag.value) {
       // 保存清单
       const appNo = plyBase["Base.cAppNo"];
       saveDist(appNo);
