@@ -389,7 +389,7 @@ const method = {
       }
    		// 是否个体工商户
       setFormItem("ECargoApplicant.cIsIndvduBiz", {rules: []});
-      setValue("ECargoApplicant.cIsIndvduBiz", "");
+      // setValue("ECargoApplicant.cIsIndvduBiz", "");
 
  
    

@@ -723,7 +723,7 @@ function dataInit() {
       } else {
         newKey = key;
       }
-      if (newKey === "cLiabCode") {
+      if (newKey === "cLiabCode" && v) {
         p["cRiskNo"] = v;
         queryKey += v;
       }
