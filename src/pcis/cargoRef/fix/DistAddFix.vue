@@ -48,7 +48,7 @@ const props = defineProps({
 
 const idxParam = inject('idxParam');
 const formPage: FormPage = idxParam?.formPage;
-
+const initFlag = computed(() => formPage.init);
 const codeListStore = codeListViewStore();
 
 const getCComponentTable = () => {
@@ -204,6 +204,22 @@ onMounted(async  () => {
   }
   formconfig1.value.fromSchema = newSchema;
   formconfig1.value.title = props.data.title;
+  if(props.data?.compKey &&  props.data?.compKey === 'AgreementDistInsured'){
+    formconfig1.value.titleBtns?.unshift( createFreeButtonBase({
+      type: "primary",
+      label: "同投保人",
+      func:  () => {
+        funccopyvalue()
+      },
+    }),)
+    formconfig1.value.titleBtns?.unshift( createFreeButtonBase({
+      type: "primary",
+      label: "客户重置",
+      func:  () => {
+        funcreset()
+      },
+    }),)
+  }
   if (props.data.title == "编辑") {
     setTimeout(() => {
       freeEditRef.value?.setFormValue(props.data.rowData);
@@ -231,6 +247,74 @@ onMounted(async  () => {
   }, 100);
   console.log(' formconfig1.value', formconfig1.value)
 });
+
+const funccopyvalue = () => {
+  const applicantValue = formPage.getFormDataById('AgreementApplicant')
+  let insuredValue: any = {};
+
+  // 同投保人时 客户信息需要禁用   客户名称 被保人性质 证件类型 证件号码  证件有效起 止期
+  setFormItem('ECargoInsuredDist.cInsuredNme',{
+    disabled:true
+  })
+  setFormItem('ECargoInsuredDist.cClntMrk',{
+    disabled:true
+  })
+  setFormItem('ECargoInsuredDist.cCertfCde',{
+    disabled:true
+  })
+  setFormItem('ECargoInsuredDist.cCertfCls',{
+    disabled:true
+  })
+  setFormItem('ECargoInsuredDist.tCertfBgnDate',{
+    disabled:true
+  })
+  setFormItem('ECargoInsuredDist.tCertfEndDate',{
+    disabled:true
+  })
+  setFormItem('ECargoInsuredDist.cLongendTyp',{
+    disabled:true
+  })
+  for (const k in applicantValue) {
+    if (k === "ECargoApplicant.cCertfCls") {
+      setTimeout(() => {
+        setValue("ECargoInsuredDist.cCertfCls", applicantValue[k]);
+      }, 0);
+    } else if (k === "ECargoApplicant.cAppCde") {
+      insuredValue["ECargoInsuredDist.cInsuredCde"] = applicantValue[k];
+    } else if (k === "ECargoApplicant.cAppNme") {
+      insuredValue["ECargoInsuredDist.cInsuredNme"] = applicantValue[k];
+    } else if (k.startsWith("ECargoApplicant")) {
+      const nk = k.replace("ECargoApplicant", "ECargoInsuredDist");
+      insuredValue[nk] = applicantValue[k];
+    }
+  }
+  setFormValue(insuredValue);
+}
+// 客户重置
+const funcreset = () => {
+  const ECargoInsuredDistValue = getFromValue();
+  for (const k in ECargoInsuredDistValue) {
+    // 反洗钱不清空
+    if (k !== "ECargoInsuredDist.cCustRiskRank") {
+      ECargoInsuredDistValue[k] = null;
+    }
+  }
+  if (!initFlag.value) {
+    setFormItem("ECargoInsuredDist.cAppNme", {
+      disabled: false,
+    });
+    setFormItem("ECargoInsuredDist.cClntMrk", {
+      disabled: false,
+    });
+    setFormItem("ECargoInsuredDist.cCertfCls", {
+      disabled: false,
+    });
+    setFormItem("ECargoInsuredDist.cCertfCde", {
+      disabled: false,
+    });
+  }
+  setFormValue(ECargoInsuredDistValue);
+}
 const setcDetailedAddress = (prop:any,aftProp:any)=> {
   const ads = freeEditRef?.value?.getValue(prop[0].prop);
   const a = freeEditRef?.value?.getValue(prop[1].prop) || "";
