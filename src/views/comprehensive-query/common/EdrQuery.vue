@@ -1053,7 +1053,7 @@ const tableObj = {
                     if (r) {
                         const data = row;
                         router.push({
-                            path: "/pcis/my-page",
+                            path: "/pcisapp/myPage",
                             query: {
                                 param: JSON.stringify({ ...data, ...{ pageType: "readonly" } }),
                             },
@@ -1089,7 +1089,7 @@ const tableObj = {
                             data.cRsnCde = row['cEdrRsnBundleCde'];
                         }
                         router.push({
-                            path: "/pcis/my-page",
+                            path: "/pcisapp/myPage",
                             query: {
                                 param: JSON.stringify({
                                     ...data,
@@ -1127,7 +1127,7 @@ const tableObj = {
                         const data = row;
                         console.log("0000000000000", data);
                         router.push({
-                            path: "/pcis/my-page",
+                            path: "/pcisapp/myPage",
                             query: {
                                 param: JSON.stringify({ ...data, ...{ pageType: "copy", cAppTyp: 'A' } }),
                             },

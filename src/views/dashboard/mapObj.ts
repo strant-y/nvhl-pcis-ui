@@ -202,8 +202,8 @@ export const tableObj = {
 			},
     ]
   },
-  //核保员-暂存任务
-  saveObj: {
+  //核保员-待核保任务
+  unUdrObj: {
     fromSchema: [
       {
         prop: "objId",
@@ -227,33 +227,8 @@ export const tableObj = {
       },
     ],
   },
-  //核保员-修改单
-  editObj: {
-    fromSchema: [
-      {
-        prop: "appCde",
-        inputtype: "rtinput",
-        title: "申请单号",
-      },
-      {
-        prop: "uwDptName",
-        inputtype: "rtinput",
-        title: "出单机构",
-      },
-      {
-        prop: "prodName",
-        inputtype: "rtinput",
-        title: "条款",
-      },
-      {
-        prop: "cAppStatus",
-        inputtype: "rtinput",
-        title: "状态",
-      }
-    ],
-  },
-  //核保员-已核保单
-  udrObj: {
+  //核保员-暂存任务
+  udrStagingObj: {
     fromSchema: [
       {
         prop: "objId",
@@ -270,15 +245,60 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "条款",
       },
+      // {
+      //   prop: "cAppStatus",
+      //   inputtype: "rtinput",
+      //   title: "状态",
+      // }
+    ],
+  },
+  //核保员-核保退回任务
+  udrReturnObj: {
+    fromSchema: [
       {
-        prop: "cAppStatus",
+        prop: "objId",
         inputtype: "rtinput",
-        title: "状态",
-				formatter: (val)=>{
-				  const result = statusList.find(item => item.value === val);
-				  return result ? result.label : val;
-				}
-      }
+        title: "申请单号",
+      },
+      {
+        prop: "uwDptName",
+        inputtype: "rtinput",
+        title: "出单机构",
+      },
+      {
+        prop: "prodName",
+        inputtype: "rtinput",
+        title: "条款",
+      },
+      // {
+      //   prop: "cAppStatus",
+      //   inputtype: "rtinput",
+      //   title: "状态",
+			// 	formatter: (val)=>{
+			// 	  const result = statusList.find(item => item.value === val);
+			// 	  return result ? result.label : val;
+			// 	}
+      // }
+    ]
+  },
+  // 核保员-核保通过任务
+  udrPassedObj: {
+    fromSchema: [
+      {
+        prop: "cAppNo",
+        inputtype: "rtinput",
+        title: "申请单号",
+      },
+      {
+        prop: "cDptCnm",
+        inputtype: "rtinput",
+        title: "出单机构",
+      },
+      {
+        prop: "cProdNmeCn",
+        inputtype: "rtinput",
+        title: "条款",
+      },
     ]
   }
 }
@@ -311,21 +331,31 @@ export const tab1 = [{
 
 // 核保tab
 export const tab2 = [{
+  name: '待核保任务',
+  refName: 'unUdrList',
+  tableObj: 'unUdrObj',
+  url: '/pcis-new-udr-list/PendUdrList',
+  udrType: "0",
+},
+{
   name: '暂存任务',
   refName: 'udrStagingList',
-  tableObj: 'saveObj',
+  tableObj: "udrStagingObj",
   url: '/pcis-new-udr-list/PendUdrList',
+  udrType: "1",
 },
 {
-  name: '待修改任务',
+  name: '核保退回任务',
   refName: 'udrReturnList',
-  tableObj: "editObj",
+  tableObj: "udrReturnObj",
   url: '/pcis-new-udr-list/PendUdrList',
+  udrType: "3",
 },
 {
-  name: '已核保任务',
-  refName: 'underwritingAlreadyList',
-  tableObj: "udrObj",
+  name: '核保通过任务',
+  refName: 'udrPassedList',
+  tableObj: "udrPassedObj",
   url: '/pcis-new-udr-list/PendUdrList',
+  udrType: "4",
 }
 ]

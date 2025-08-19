@@ -392,7 +392,7 @@ function showDetails(row: any) {
   // });
   const data = row;
   router.push({
-    path: "/pcis/my-page",
+    path: "/pcisapp/myPage",
     query: {
       param: JSON.stringify({ ...data, ...{ pageType: "edit" } }),
     },

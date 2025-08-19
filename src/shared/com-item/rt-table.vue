@@ -871,4 +871,7 @@ function isrequired(i: any) {
 :deep(.el-table td.el-table__cell div.cell) {
   white-space: normal;
 }
+:deep(.el-form-item--default .el-form-item__content) {
+  line-height: 20px;
+}
 </style>

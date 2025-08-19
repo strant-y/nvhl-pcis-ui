@@ -89,7 +89,7 @@ watchEffect(() => {
   background: #636363; /* 滑块悬停颜色 */
 }
 .el-message { 
-  top: 50% !important; /* 垂直居中 */
+  margin-top: calc(50vh - 15vh ) !important;
 }
 .el-message__content,.el-message__icon {
   font-size: 16px!important;

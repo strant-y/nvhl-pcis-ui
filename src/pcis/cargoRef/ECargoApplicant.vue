@@ -102,7 +102,7 @@ function setFormItem(key: any, obj: any) {
 // 绑定方法
 const method = {
   ApplicantIsGreen:(val:any)=>{
-    if(val === '1'){
+    if(val === '1' && !idxParam.readonly){
       setFormItem('ECargoApplicant.cGreenIndustryList',{rules: [getRules("required", {})],disabled: false })
     }else {
       setFormItem('ECargoApplicant.cGreenIndustryList',{rules: null,disabled: true })
@@ -344,7 +344,7 @@ const method = {
       });
 
       
-      if (!param.initFlag) {
+      if (!param.initFlag && !idxParam.readonly) {
         setFormItem("ECargoApplicant.cWorkDpt", {
         disabled: false,
       });
@@ -389,7 +389,7 @@ const method = {
       }
    		// 是否个体工商户
       setFormItem("ECargoApplicant.cIsIndvduBiz", {rules: []});
-      setValue("ECargoApplicant.cIsIndvduBiz", "");
+      // setValue("ECargoApplicant.cIsIndvduBiz", "");
 
  
    

@@ -272,12 +272,12 @@ const tableconfig = reactive<AppTableConfig>(
         title: "保费",
         minWidth: 180,
       },
-      {
-        prop: "nTax",
-        inputtype: "rtnumber",
-        title: "车船税",
-        minWidth: 180,
-      },
+      // {
+      //   prop: "nTax",
+      //   inputtype: "rtnumber",
+      //   title: "车船税",
+      //   minWidth: 180,
+      // },
       {
         prop: "nPayAmt",
         inputtype: "rtnumber",

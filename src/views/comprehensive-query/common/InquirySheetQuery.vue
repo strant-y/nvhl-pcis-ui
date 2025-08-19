@@ -839,7 +839,7 @@ const tableObj = {
                         const data = row;
                         data.cPolicySource = '6'
                         router.push({
-                            path: "/pcis/my-page",
+                            path: "/pcisapp/myPage",
                             query: {
                                 param: JSON.stringify({ ...data, ...{ pageType: "readonly", pageName: 'priceInquiry' } }),
                             },
@@ -874,7 +874,7 @@ const tableObj = {
                         r.cPolicySource = '6'
                         const data = row;
                         router.push({
-                            path: "/pcis/my-page",
+                            path: "/pcisapp/myPage",
                             query: {
                                 param: JSON.stringify({
                                     ...data,
@@ -958,7 +958,7 @@ const tableObj = {
                 tableClick: (row) => {
                     row.cPolicySource = '6'
                     router.push({
-                        path: "/pcis/my-page",
+                        path: "/pcisapp/myPage",
                         query: {
                             param: JSON.stringify({ ...row, ...{ pageType: "inquiryToApp" } }),
                         },

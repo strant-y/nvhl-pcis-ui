@@ -5,6 +5,9 @@ export class PcisQueryService {
     qryPolicyShortUrl = '/policy/getPolicyShortList';
     qryNotifyByReceiver = '/notify/getNotifyByReceiver';
     changeStatusUrl = 'notify/changeStatus'; 
+    qryNewUdrListUrl = 'underwriting/query/newUdrList';
+    queryBackUdrListUrl = 'underwriting/query/backUdrList';
+    qryAppPolicyUrl = 'policy/getAppPolicyList';
     
 
      /**
@@ -31,5 +34,26 @@ export class PcisQueryService {
     // 消息信息 顶部导航喇叭
     getNotifyByReceiver(ops){
         return request.post(`${this.qryNotifyByReceiver}`,ops)
+    }
+    
+    /**
+     * 待核保查询，暂存查询
+     */
+    getNewUdrList(ops: any) {
+        return request.post(`${this.qryNewUdrListUrl}`, ops);
+    }
+    
+    /**
+     * 核保退回查询
+     */
+    getBackUdrList(ops: any) {
+        return request.post(`${this.queryBackUdrListUrl}`, ops);
+    }
+    
+    /**
+     * 核保通过查询
+     */
+    getAppPolicyList(ops: any): AxiosPromise<any> {
+        return request.post(`${this.qryAppPolicyUrl}`, ops);
     }
 }

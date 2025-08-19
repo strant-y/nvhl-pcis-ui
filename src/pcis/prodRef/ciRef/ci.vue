@@ -241,7 +241,7 @@ const method = {
       freeEditRef.value?.setValueByRowKey("Ci.cCiSubComp", rowId, subDptCde);
       freeEditRef.value?.setValueByRowKey("Ci.cDptCde", rowId, dptCde);
       // 校验
-      // onChiefMrkChange();
+      onChiefMrkChange();
       // 获取所有行数据
       const allRows = getFromValue();
       // 校验是否存在重复的 Ci.cCoinsurerCde, Ci.cCiSubComp, Ci.cDptCde 组合
@@ -348,6 +348,7 @@ const method = {
     const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue()
     if (!rowData || !rowId) return;
     const cCoinsurerCde = rowData["Ci.cCoinsurerCde"];
+    const cCiSubComp = rowData['Ci.cCiSubComp'];
     // 主共标志只能选否的条件
     if (rowData['Ci.cDptCde'] !== param.cDptCde && cCiMrk["Base.cCiMrk"] == '5') {
     // if (cCiMrk["Base.cCiMrk"] == '5') {
@@ -385,7 +386,13 @@ const method = {
         freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowId, "");
         return;
       }
+      if((val === "0" && cCiSubComp === param.dptCde)){
+        ElMessage.error("我方主共时主共保方必须是我司！");
+        freeEditRef?.value?.setValueByRowKey('Ci.cChiefMrk',rowId,"")
+        return;
+      }
     }
+    
   },
   //联共保比例
   nCiShareChange:(val)=>{
@@ -739,7 +746,6 @@ const method = {
           console.error("文件读取失败", e);
           ElMessage.error("文件读取失败");
         };
-
         reader.readAsDataURL(file); // 启动读取
       }
     };
@@ -822,17 +828,17 @@ const onChiefMrkChange = () => {
       switch (ciMrkValue) {
         case "3":
         case "1":
-        case "5":
+        // case "5":
           cChiefMrkVal = '1'; // 主共方
           break;
         default:
           cChiefMrkVal = '0'; // 从共方
       }
     }else{
-      cChiefMrkVal = '0';
-      cJiMrkVal = '0';
-      cSelfMrkVal = '0';
-    }
+      cChiefMrkVal = '0'; // 非本分公司
+      cJiMrkVal = '0';    // 从联方
+      cSelfMrkVal = '0';  // 从共方
+    } 
   } else {
     switch (ciMrkValue) {
       case "2":
@@ -845,9 +851,9 @@ const onChiefMrkChange = () => {
     cJiMrkVal = '2'; // 外部公司
     cSelfMrkVal = '0'; // 非本分公司
   }
-    freeEditRef?.value?.setValueByRowKey("Ci.cSelfMrk", rowData._dataId, cSelfMrkVal );
-    freeEditRef?.value?.setValueByRowKey("Ci.cJiMrk", rowData._dataId, cJiMrkVal );
-    freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowData._dataId, cChiefMrkVal );
+    freeEditRef?.value?.setValueByRowKey("Ci.cSelfMrk", rowData._dataId, cSelfMrkVal );  // 本公司标识
+    freeEditRef?.value?.setValueByRowKey("Ci.cJiMrk", rowData._dataId, cJiMrkVal );   // 联保标识
+    freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowData._dataId, cChiefMrkVal );  // 共保标识
 };
 // 初始化联共保信息
 const initCiInfo = (data: any) => {

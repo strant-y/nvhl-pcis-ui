@@ -290,15 +290,15 @@ onMounted(() => {
 
 
 
-    if( route.params.param.cProdNo == '043010'){
-      if(item.prop =='Dist.cJobType'){
-        item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
-      }else if(   cIs == 1 && item.prop !=='Dist.nSeqNo'){
-           item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
-      }else{
-        item['rules'] = [];   
-      }
-    }
+    // if( route.params.param.cProdNo == '043010'){
+    //   if(item.prop =='Dist.cJobType'){
+    //     item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+    //   }else if(   cIs == 1 && item.prop !=='Dist.nSeqNo'){
+    //        item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+    //   }else{
+    //     item['rules'] = [];   
+    //   }
+    // }
 
  
     // if(cIs == 1 && item.prop !=='Dist.nSeqNo'){
@@ -338,10 +338,15 @@ onMounted(() => {
         item["hidden"] = true;
       }
     }
-
-        // 身份证类型自动回填年龄
+     // 身份证类型自动回填年龄
     if(item.prop =='Dist.cIdentificationNumber'){
       item['func'] = (val: string) => {
+        // 针对040005产品，自动回填出生年月
+        if(route.params.param.cProdNo === '040005' && val && val.length === 18) {
+          const birthDateFromId = val.substring(6, 14);
+          const formattedBirthDate = `${birthDateFromId.substring(0, 4)}-${birthDateFromId.substring(4, 6)}-${birthDateFromId.substring(6, 8)}`;
+          setValue('Dist.tBirthDate', formattedBirthDate);
+        }
         if(val && val.length === 18 && getValue('Dist.cDocumentType') === '120001') {
           const age = calculateAgeFromIdCard(val);
           setValue('Dist.nAge', age);
@@ -443,6 +448,9 @@ const getDistoccupType = (val) => {
     const item = freeEditRef.value?.getFromSchemaItem('Dist.cOccupationalLevel')
     //给表单下拉项赋值
     item.itemConfig.loadData = res
+    if(res.length > 0 ){  // 职业等级,默认给个值
+      setValue('Dist.cOccupationalLevel', res[0].value);
+    }
   });
 }
 const cEquipmentTypesFunc = ()=>{

@@ -27,6 +27,7 @@
         @visible-change="showOptions"
         @change="handleChange"
         style="min-width: 100px;"
+        :fit-input-width="false"
       >
         <template
           #label="{ label, value }"

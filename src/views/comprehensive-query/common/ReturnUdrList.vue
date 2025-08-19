@@ -414,7 +414,7 @@ function handleWorkFlow(row: any) {
                 pageType:'PLY_APP_MODIFY_BOUNCED_SCENE'
               });
               router.push({
-                  path: "/pcis/my-page",
+                  path: "/pcisapp/myPage",
                   query: {
                       param: en,
                   },
@@ -436,7 +436,7 @@ function handleWorkFlow(row: any) {
                 pageType:'EDR_APP_MODIFY_BOUNCED_SCENE'
               });
                 router.push({
-                    path: "/pcis/my-page",
+                    path: "/pcisapp/myPage",
                     query: {
                         param: en,
                     },

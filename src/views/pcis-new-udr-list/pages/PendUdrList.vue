@@ -1218,7 +1218,7 @@
             await nextTick();
             if (homeJumpData.type === "temp") {
                 //暂存任务
-                changeForm("2"); //展示form表单不同的栏位
+                changeForm("1"); //展示form表单不同的栏位
             } else if (homeJumpData.type === "edit") {
                 //核保退回任务
                 changeForm("4"); //展示form表单不同的栏位
@@ -1234,10 +1234,13 @@
                 homeJumpData.startBsTm1,
                 homeJumpData.endBsTm1,
             ]);
-            if (homeJumpData.hasOwnProperty("objId")) {
-                //申请单号
-                freeEditRef.value.setValue("objId", homeJumpData.objId);
-            }
+            setTimeout(() => {
+                if (homeJumpData.hasOwnProperty("objId")) {
+                    //申请单号
+                    freeEditRef.value.setValue("objId", homeJumpData.objId);
+                    handleQuery()
+                }
+            }, 500)
         }
         //首页跳转过来的逻辑 End
 
@@ -1594,7 +1597,7 @@
                         cEdrRsnBundleCde: row.cEdrRsnBundleCde,
                     });
                     router.push({
-                        path: "/pcis/my-page",
+                        path: "/pcisapp/myPage",
                         query: {
                             param: en,
                         },
@@ -1626,7 +1629,7 @@
                         cEdrRsnBundleCde: row.cEdrRsnBundleCde,
                     });
                     router.push({
-                        path: "/pcis/my-page",
+                        path: "/pcisapp/myPage",
                         query: {
                             param: en,
                         },
@@ -1671,7 +1674,7 @@
                                 cEdrRsnBundleCde: row.cEdrRsnBundleCde,
                             });
                             router.push({
-                                path: "/pcis/my-page",
+                                path: "/pcisapp/myPage",
                                 query: {
                                     param: en,
                                 },
@@ -1755,7 +1758,7 @@
                         };
                         const en = JSON.stringify(data);
                         router.push({
-                            path: "/pcis/my-page",
+                            path: "/pcisapp/myPage",
                             query: {
                                 param: en,
                             },
@@ -1850,7 +1853,7 @@
                             cPolicySource: row.cPolicySource,
                         });
                         router.push({
-                            path: "/pcis/my-page",
+                            path: "/pcisapp/myPage",
                             query: {
                                 param: en,
                             },
@@ -1874,7 +1877,7 @@
                             cPolicySource: row.cPolicySource,
                         });
                         router.push({
-                            path: "/pcis/my-page",
+                            path: "/pcisapp/myPage",
                             query: {
                                 param: en,
                             },
@@ -1913,7 +1916,7 @@
             cPolicySource: row.cPolicySource,
         });
         router.push({
-            path: "/pcis/my-page",
+            path: "/pcisapp/myPage",
             query: {
                 param: en,
             },

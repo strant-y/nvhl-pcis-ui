@@ -144,10 +144,10 @@ const tableconfig = reactive<AppTableConfig>(
     fromSchema: [
       {
         prop: "cKindNo",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "大类代码",
-        clearable: true,
-        rules: [getRules("required", {})],
+        typeCode: "KIND_LIST_GRT",
+        codeParam: { cStatus: "1" },
       },
       {
         prop: "cRiskNo",
