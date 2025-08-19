@@ -234,7 +234,7 @@
             ><span class="publicStyle">{{ nAmt.toLocaleString() }}</span
             >&nbsp;<span class="font-weight-500">元</span>&nbsp;|&nbsp;<span
               class="font-weight-500"
-              >保费为: </span
+              >保费: </span
             ><span class="publicStyle">{{ nPrm.toLocaleString() }}</span
             >&nbsp;<span class="font-weight-500">元</span>&nbsp;
 						<template v-if="props.param?.cRecordType === 9 || props.param.cPolicySource == 9">
