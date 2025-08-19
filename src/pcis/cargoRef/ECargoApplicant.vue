@@ -46,6 +46,7 @@ import moment from "moment/moment";
 const tCertfDate = ref<any[]>([]);
 const idxParam = inject('idxParam');
 const formPage = idxParam?.formPage;
+const initFlag = computed(() => formPage.init);
 const  cWorkDptList =['310','320','330','340','350','360']  // 单位性质带企业的ID
 onMounted(() => {
   const formconfig11 = formInit(
@@ -101,6 +102,31 @@ function setFormItem(key: any, obj: any) {
 
 // 绑定方法
 const method = {
+  // 客户重置
+  funcreset: () => {
+    const applicantValue = getFormValue();
+    for (const k in applicantValue) {
+      // 反洗钱不清空
+      if (k !== "ECargoApplicant.cCustRiskRank") {
+        applicantValue[k] = null;
+      }
+    }
+    if (!initFlag.value) {
+      setFormItem("ECargoApplicant.cAppNme", {
+        disabled: false,
+      });
+      setFormItem("ECargoApplicant.cClntMrk", {
+        disabled: false,
+      });
+      setFormItem("ECargoApplicant.cCertfCls", {
+        disabled: false,
+      });
+      setFormItem("ECargoApplicant.cCertfCde", {
+        disabled: false,
+      });
+    }
+    setFormValue(applicantValue);
+  },
   ApplicantIsGreen:(val:any)=>{
     if(val === '1' && !idxParam.readonly){
       setFormItem('ECargoApplicant.cGreenIndustryList',{rules: [getRules("required", {})],disabled: false })
@@ -148,8 +174,6 @@ const method = {
         ElMessage.error("请填写必填项");
       }
     });
-  },
-  funcreset: () => {
   },
   // 证件号码change
   cCertfCdeChange: (val) => {
