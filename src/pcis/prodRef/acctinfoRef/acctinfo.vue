@@ -207,7 +207,7 @@ const method = {
           {
             codeListName: "CBankCdeList",
             codeListParam: {
-              'banktypecod': para[3], 'areacode': val
+              'banktypecod': para[3], 'areacode': getValue('Acctinfo.cBankCounty') || ""
             },
           },
         )
