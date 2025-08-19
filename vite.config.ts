@@ -19,12 +19,12 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         return 'http://10.12.118.37:8081/' // DEV环境
       case 'uat':
         return 'http://10.12.18.114:9000/' // UAT环境
+      case 'verification':
+        return 'http://10.4.18.99:9082/' // verification发布
       case 'pre':
-        return 'http://10.12.18.114:9000/' // 预发布
-      case 'pre':
-        return 'http://10.12.18.114:9000/' // 预发布
-      case 'pre':
-        return 'http://10.12.18.114:9000/' // 预发布
+        return 'http://10.12.18.114:9079/' // pre发布
+      case 'prod':
+        return 'http://10.12.118.37:8081/' // prod发布
       default:
         return 'http://10.12.118.37:8081/' // 默认DEV
     }
