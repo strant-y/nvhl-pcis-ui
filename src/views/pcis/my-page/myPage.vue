@@ -562,7 +562,7 @@ const idxParam = {
   handleAnchorClick: handleAnchorClick,
 };
 provide('idxParam', idxParam);
-const opertaor = dataOpertaor(idxParam.opertaorId);
+const opertaor = dataOpertaor();
 opertaor.init();
 const underwrite = ref(null);
 const edrbase = ref(null);
