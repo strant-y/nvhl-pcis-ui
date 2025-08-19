@@ -3475,10 +3475,10 @@ const calcPremiumEdr = () => {
   }
 
   calcEdr(res).then((res) => {
-    let nPrmValue = res.res.composition.plyBase[0]["Base.nPrm"];
     btn.loading = false;
     console.log("批改计算", res);
     if (res["code"] == "200") {
+      let nPrmValue = res.res.composition.plyBase[0]["Base.nPrm"];
       const ops = opertaor.convertData(res);
       console.log("保费计算转换的数据", ops);
       ElMessage.success(
