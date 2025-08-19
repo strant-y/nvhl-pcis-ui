@@ -587,7 +587,7 @@ const method = {
           let obj = {
             loadData: [
               {
-                label: selectObj.name,
+                label:   +selectObj.id + "" +selectObj.name  ,
                 value: selectObj.id,
               },
             ],
@@ -600,13 +600,15 @@ const method = {
   },
   // 服务机构业务员ICON事件
   dptSaleNoFunc: () => {
+    console.log('获取服务--',getValue("Base.cIntroDptcde"))
+    let CDptCde =getValue("Base.cIntroDptcde")
     dialogRef.value?.open(
       "agentWorker",
       {
         type: "show",
         data: {
-          CDptCde: sessionData.value?.cDptCde,
-          // CDptCde: getValue("Base.CIntroDptcde"), //服务机构
+          // CDptCde: sessionData.value?.cDptCde,
+         CDptCde, //服务机构
         },
         method: {
           getSelected: (params) => {
