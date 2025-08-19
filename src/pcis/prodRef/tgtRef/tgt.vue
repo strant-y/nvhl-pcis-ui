@@ -148,17 +148,6 @@ const tgtOtherMatterList:Array<string> = ["Tgt.cLicenseNumber","Tgt.cFrameNumber
 const tgtIsWaterMatterList:Array<string> = ["Tgt.cTowing","Tgt.cWholeShip","Tgt.cShipName","Tgt.cTransportVoyage","Tgt.nTotalTonnage","Tgt.nShipAge","Tgt.cTransportationName","Tgt.tConstructionYear","Tgt.nTransportationTotalTonnage","Tgt.cShipRegistration","Tgt.nTransportationShipAge","Tgt.cShipType","Tgt.cShipClassOne","Tgt.cShipClassTwo","Tgt.cShipClassThree","Tgt.cOldshipSurcharge"]
 const setIsRule = ()=>{
   if(getValue("Tgt.cTowing") === '1'){
-    // setFormItem("Tgt.cShipType", {
-    //   // typeCode: 'Ship_Type',
-    //   // codeParam: { remark: '1' },
-    //   // codeParam: { 'cMapCde': '1' },
-    //      loadData: [
-
-    //             {label: '半潜驳', value: '7', codeKind: 'codeKind'},
-    //             {label: '拖船', value: '8', codeKind: 'codeKind'}
-    //             ]  
-    // });
- 
         codeListStore
           .queryCodeList(
             {
@@ -179,14 +168,7 @@ const setIsRule = ()=>{
                 ]
             })
           });
-        
-
-    console.log('进来了？')
   }else {
-    // setFormItem("Tgt.cShipType", {
-    //   typeCode: 'Ship_Type',
-    //   codeParam: { },
-    // });
             codeListStore
           .queryCodeList(
             {
@@ -279,17 +261,7 @@ const method = {
     dialog.value?.open('navigationAreaTips', null,
         null,{width: 50,title:'航行区域提示'});
   },
-  getcInsuranceIndustryChange:(val:string)=>{
-    if(val === '8'){
-      setFormItem('Tgt.cIndustryRemarks', {
-        rules: [getRules("required", {})],
-      });
-    }else{
-      setFormItem('Tgt.cIndustryRemarks', {
-        rules: null
-      });
-    }
-  },
+
   getcIsExcludingChange:()=>{
     dialog.value?.open('reinsuranceTips', null,
         null,{width: 45,title:'水险再保提示'});
@@ -578,25 +550,10 @@ const method = {
  },
   getcTowingChange:(val:string)=>{
         setIsRule()
-    // if(val){
-    //   setFormItem('Tgt.cShipType',{
-    //     typeCode: 'Ship_Type',
-    //     codeParam: { 'remark': '1' },
-    //   })
-
-    // }else{
-    //        setFormItem('Tgt.cShipType',{
-    //     typeCode: 'Ship_Type',
-    //     codeParam: { 'remark': '0' },
-    //   })
-    // }
-
-
  },
   getcWholeShipChange:(val:string)=>{
      setIsRule()
   },
-  // func demo
   func1: () => {
   },
   //投保乘客座位总数改变事件
@@ -904,13 +861,7 @@ const method = {
   },
   // 核定座位总数
   nSeatsNumberChange: (v) => {
-    // Tgt.nSeatsNumber 核定总数
-    // Tgt.nSeatCapacity 投保总数
-    // const start = getValue("Tgt.tPlannedDate");
-
-    // Tgt.P&I_CLUB
     const nSeatCapacity = getValue("Tgt.nSeatCapacity");
-
     if (v !== nSeatCapacity) {
       ElMessage.warning("核定座位总数和投保座位数总数不一致！");
     }
@@ -1121,7 +1072,64 @@ getAddressstr:(val:any, row: any, pitem: any) => {
     }
   })
   setAddressBykey(getv1,getv2,setv);
-}
+},
+// 工程起期
+tProjectStartChange:(v:any)=>{
+    const start = getValue("Tgt.tProjectStart");
+    const end = getValue("Tgt.tProjectEnd");
+    if (!end || !v) {
+      return;
+    }
+    // const tmDay = moment(end).diff(moment(start), "days");
+    const tm = moment(end).diff(moment(start), "seconds")
+    if (tm < 0) {
+      ElMessage.warning("“工程起期”不能小于“工程止期”");
+      setFormValue({
+        "Tgt.tProjectStart": null,
+      });
+      return;
+    }
+    setFormValue({
+      "Tgt.nContractDuration":   moment(end).diff(moment(start), "days"),
+    });
+},
+// 工程止期
+tProjectEndChange:(v:any)=>{
+    const start = getValue("Tgt.tProjectStart");
+    if (!start || !v) {
+      return;
+    }
+    const startTime = moment(v).diff(moment(start), "days");
+    if (startTime < 0) {
+      ElMessage.warning("“工程止期”不能小于“工程起期”");
+      setFormValue({
+        "Tgt.tProjectEnd": null,
+      });
+      return;
+    }
+    const formattedDate = moment(v).format('YYYY-MM-DD') + ' 23:59:59';
+    setFormValue({
+      "Tgt.nContractDuration": moment(formattedDate).diff(moment(start), "days"),
+      "Tgt.tProjectEnd": formattedDate, // 更新日期字段
+    });
+},
+
+// // 工程起期禁用
+// tProjectStartDis:(val:any)=>{
+// //  console.log('工程1',val)
+// },
+
+// 工程止期禁用
+tProjectEndDis:(date:any)=>{
+    const fs = tgtEditRef?.value?.getFromValue();
+    if (fs) {
+      const startDate = new Date(fs["Tgt.tProjectStart"])   // 开始时间   1
+      return  date.getTime() < startDate.getTime() 
+    }else{
+        return true;
+    }
+},
+
 };
 
 function setAddressBykey(getv1: any, getv2: any , setv: any) {
@@ -1181,7 +1189,7 @@ function groupCheck() {
     let subSidiary = null;
     if(plyBase){
       subSidiary = plyBase.getValue('Base.cDptCde');
-      subSidiary = subSidiary.substring(0,6);
+      subSidiary = subSidiary?.substring(0,6);
     }
 
     let h = true;

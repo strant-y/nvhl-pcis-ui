@@ -34,27 +34,22 @@ export const getData = () => {
 
     const startDate = dayjs().add(1, "day").format("YYYY-MM-DD 00:00:00");
     dataInit["Base.tInsrncBgnTm"] = startDate;
-    // dataInit["Base.tInsrncBgnTm"] = moment(new Date(Date.now() + 1 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00");
-    dataInit["Base.tInsrncEndTm"] = dayjs()
-      .add(1, "year")
-      .format("YYYY-MM-DD 23:59:59");
-
     const startDayjs = dayjs(startDate);
     let termDays;
+          // 特殊产品：使用固定天数
     if (productTermMap.hasOwnProperty(productNo)) {
-      // 特殊产品：使用固定天数
       termDays = productTermMap[productNo];
     } else {
       // 非特殊产品：按1年计算（自动区分平闰年）
-      const endOfYear = startDayjs.add(1, "year").subtract(1, "second");
+      const endOfYear = startDayjs.add(1, "year")
       termDays = endOfYear.diff(startDayjs, "day"); // 动态得到365或366
     }
     const endDate = startDayjs
       .add(termDays, "day")
       .subtract(1, "second")
       .format("YYYY-MM-DD HH:mm:ss");
-    dataInit["Base.tInsrncEndTm"] = endDate;
 
+    dataInit["Base.tInsrncEndTm"] = endDate;
     const tm = dayjs(endDate).add(1, "second").diff(startDayjs, "day");
     dataInit["Base.cTmSysCde"] = tm;
 
@@ -112,6 +107,7 @@ export const getData = () => {
     dataInit["Tgt.cInsuranceCurrency"] = "CNY";
     // “标的信息”中“车辆使用性质”默认值为营运
     dataInit["Tgt.cUsageNature"] = "364113098";
+    dataInit["Tgt.tCompletionYear"] = "6.36e+13";
 
     // dataInit["EdrBase.cRatioTyp"] = "2";
 

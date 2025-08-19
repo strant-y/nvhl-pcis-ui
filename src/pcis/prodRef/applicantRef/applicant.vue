@@ -157,22 +157,63 @@ onMounted(() => {
     setFormItem("Applicant.cCertfCde", {minWidth: '165px'});
    });
 });
-//给表单下拉项赋值
-function setFormItem(key: any, obj: any) {
-  if (obj && Object.keys(obj).length) {
-    formconfig1.fromSchema?.forEach((item) => {
-      if (item.prop === key) {
-        //控制尾部按钮的
-        if (item.btnItems && obj.btnItems) {
-          for (let key in obj.btnItems) {
-            item.btnItems[key] = obj.btnItems[key];
+// //给表单下拉项赋值
+// function setFormItem(key: any, obj: any) {
+//   if (obj && Object.keys(obj).length) {
+//     formconfig1.fromSchema?.forEach((item) => {
+//       if (item.prop === key) {
+//         //控制尾部按钮的
+//         if (item.btnItems && obj.btnItems) {
+//           for (let key in obj.btnItems) {
+//             item.btnItems[key] = obj.btnItems[key];
+//           }
+//         } else {
+//           Object.assign(item, obj);
+//         }
+//       }
+//     });
+//   }
+// }
+
+function recursiveSetFormItem(items: FormItem[], targetKey: string, obj: Record<string, any>) {
+  items.forEach((item) => {
+    // 1. 如果当前项是分组（含groupList），先递归处理子项
+    if (item.inputtype === 'rtinputgroup' && item.groupList && Array.isArray(item.groupList)) {
+      recursiveSetFormItem(item.groupList, targetKey, obj);
+    }
+
+    // 2. 匹配到目标prop，执行赋值
+    if (item.prop === targetKey) {
+      if (item.btnItems && obj.btnItems) {
+        Object.entries(obj.btnItems).forEach(([btnKey, value]) => {
+          if (item.btnItems!.hasOwnProperty(btnKey)) {
+            item.btnItems![btnKey] = value;
           }
-        } else {
-          Object.assign(item, obj);
-        }
+        });
       }
-    });
+
+      // 处理其他属性（包括rules必填规则）
+      const { btnItems: _, ...otherProps } = obj;
+      Object.assign(item, otherProps);
+      if (otherProps.rules) {
+        item.rules = otherProps.rules;
+      }
+    }
+  });
+}
+
+
+function setFormItem(key: string, obj: Record<string, any>): void {
+  if (!key || !obj || typeof obj !== 'object' || Object.keys(obj).length === 0) {
+    return;
   }
+
+  if (!formconfig1.fromSchema || !Array.isArray(formconfig1.fromSchema)) {
+    return;
+  }
+
+  // 调用递归方法处理所有项（包括嵌套的groupList）
+  recursiveSetFormItem(formconfig1.fromSchema, key, obj);
 }
 
 // 解析身份证
@@ -351,7 +392,7 @@ const method = {
   },
 
   cardTypeChange: (val) => {
-
+    console.log('证件2',val)
        const tabref = opertaor.getTableRefs();
     const applicantValue = tabref["applicant"]?.getFromValue();
     checkUser();
@@ -414,9 +455,9 @@ const method = {
       });
         //证件类型是“营业执照”，参加社会统筹标志变化为必填
         // 参加社会统筹标志
-        setFormItem("Applicant.cParticiinsocTyp", {
-          rules: [getRules("required", {})],
-        });
+        // setFormItem("Applicant.cParticiinsocTyp", {
+        //   rules: [getRules("required", {})],
+        // });
         
     } else if ( val == "110007") {   
       setFormItem("Applicant.tCertfBgnDate", {
@@ -447,9 +488,9 @@ const method = {
       setFormItem("Applicant.tCertfBgnDate", { rules: null });
       setFormItem("Applicant.tCertfEndDate", { rules: null });
       // 参加社会统筹标志
-      setFormItem("Applicant.cParticiinsocTyp", {
-        rules: null,
-      });
+      // setFormItem("Applicant.cParticiinsocTyp", {
+      //   rules: null,
+      // });
     }
   },
   //投保人性质(0是法人 1是个人)
@@ -480,9 +521,7 @@ const method = {
         rules: [getRules("required", {})],
       });
 
-      setFormItem("Applicant.cParticiinsocTyp", {
-        rules: [getRules("required", {})],
-      });
+ 
       setFormItem("Applicant.cCntrCertfCde", {
         rules: [getRules("required", {})],
       });
@@ -529,6 +568,11 @@ const method = {
       setFormItem("Applicant.cRegisteredcapDre", {
         rules: [getRules("required", {})],
       });
+
+       // 注册地址
+      setFormItem("Applicant.RegisterProp", {
+       rules: [getRules("required", {})],
+      });
  
       //实名认证方式
       let cWorkDpt = getValue('Applicant.cWorkDpt')
@@ -541,9 +585,7 @@ const method = {
             rules: [],
           });
       }
-   
- 
-   
+    
       let cMobile = getValue('Applicant.cMobile');  // 移动 
       let cTel = getValue('Applicant.cTel');  // 固定电话    
       if(!cMobile &&  !cTel ){
@@ -578,6 +620,10 @@ const method = {
         rules: [],
       });
 
+
+
+    
+      console.log('getFormconfig',getFormconfig())
 
            codeListStore
         .queryCodeList({
@@ -620,6 +666,9 @@ const method = {
       });
       //注册地址
       setFormItem("Applicant.cRegisteredcapDre", { rules: null });
+      setFormItem("Applicant.RegisterProp", {
+       rules: null,
+      });
       //是否个体工商户
       setFormItem("Applicant.cIsIndvduBiz", {
         disabled: false,

@@ -68,9 +68,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         ],
         fromSchema: [
             {
-                prop: "CDptCnm",
+                prop: "CDptCde",
                 inputtype: "rtinput",
-                title: "机构部门",
+                title: "机构部门1",
                 disabled: true,
             },
             {
@@ -162,22 +162,23 @@ function handleQuery(flag?: boolean) {
     const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
     const s = freeEditRef.value?.getFromValue(); //获取表单数据
     const param = Object.assign(s, r);
-    const params = Object.assign({
+    const params = Object.assign(param,{
         CurrentUser: user.opCde,
         CurrentUserOrg: user.companyId,
         CBsnsTyp: props.data.data['CBsnsTyp'],
-        CDptCde: routeParam.cDptCde || props.data.data['cDptCde'],
+        CDptCde: props.data.data['CDptCde']  || routeParam.cDptCde,
         CBrkrCde: props.data.data['CBrkrCde'],
         CSlsTyp: props.data.data['CSlsTyp'],
         CChaType: props.data.data['CChaType'],
         CDptAttr: props.data.data['CDptAttr'],
-        CSlsCde: props.data.data['CSlsCde'],
+        // CSlsCde: props.data.data['CSlsCde'],
         subSidiary: props.data.data['subSidiary'],
         leading: props.data.data['leading'],
 
-    }, param);
+    });
 
-    console.log('param', routeParam)
+    console.log('param',param, params)
+    console.log('param', props.data.data['CDptCde'])
     policyService.getWebOrgSelsList(params).then((res: any) => {
       if (res && res["code"] === 200) {
         const pageData = res.data;
@@ -191,9 +192,11 @@ function handleQuery(flag?: boolean) {
 
 onMounted(() => {
     console.log('param', props.data)
+    console.log('param', props.data)
     nextTick(() => {
         // setValue('CDptCde', props.data.data.CDptCde)
-        setValue('CDptCnm',routeParam.cDptCnm || props.data.data['cDptCnm'])
+        // setValue('CDptCnm',routeParam.cDptCnm || props.data.data['cDptCnm'])
+        setValue('CDptCde',  props.data.data['CDptCde'])
     })
   // 页面加载时触发一次查询
     handleQuery();
