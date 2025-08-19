@@ -107,12 +107,13 @@ const method = {
   bgnTmFn: (v) => {
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref?.["insrnc"].getFromValue();
-   const startDate = dayjs(v); // 新的开始时间（v是用户选择的开始时间）
+    const startDate = dayjs(v); // 新的开始时间（v是用户选择的开始时间）
     let endDate = baseBefore["Base.tInsrncEndTm"]  // 结束时间
-console.log('时间',v,baseBefore['Base.cTmSysCde'])
- let days = Number(baseBefore["Base.cTmSysCde"]); // 天数
+console.log('时间',v,endDate)
 
-  const isDaysEmpty = isNaN(days) || days <= 0;
+    let days = Number(baseBefore["Base.cTmSysCde"]); // 天数
+
+    const isDaysEmpty = isNaN(days) || days <= 0;
 
   // 计算新的结束时间
   let newEndDate;

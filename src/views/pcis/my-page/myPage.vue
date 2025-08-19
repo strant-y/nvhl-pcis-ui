@@ -2910,7 +2910,8 @@ const submitToUndrFn = async () => {
     }
 
   // 判断应收保费是否同保费相同
- 
+  let payList = res.payinfo;
+  console.log('缴费-',payList)
   let nPrm = opertaor.getTableRefByKey("base").getFromValue()['Base.nPrm'];
   let nPayablePrmData = opertaor.getTableRefByKey("payinfo").getFromValue()  // 缴费计划数据  
   let nPayAll = 0;
@@ -2922,6 +2923,28 @@ const submitToUndrFn = async () => {
       ElMessage.warning('缴费计划“应收保费”不等于“总保费”请确认！')
       return false;
   }
+
+
+
+   
+   if(payList && payList.length>0){
+      const toCent = (amount:any) => {
+        return Math.round(Number(amount) * 100); // 转为分并四舍五入
+      };
+      let totalCent = 0;
+      payList.forEach((item:any) => {
+        totalCent += toCent(item['Pay.nPayablePrm']);
+      });
+ 
+      const basePrmCent = toCent(res['base']['Base.nPrm']);
+
+       if(totalCent > basePrmCent){
+         ElMessage.error('缴费计划“应收保费”之和大于整单保费！')
+        return false;
+      }
+  }
+
+
   // 电梯责任保险 每部电梯累计赔偿限额小于每部电梯每人赔偿限额时校验
   if(props.param?.cProdNo==='043001') {
     const cvrgValue = opertaor.getTableRefByKey("cvrg").getFromValue()[0];
@@ -3209,6 +3232,7 @@ const savePlyInfo = async () => {
     return false;
   }
 
+  console.log('res保存参数',res)
   const resInfo: any = props.param?.pageName === "priceInquiry" ? await saveInquiry(res) : await saveAppPlyInfo(res);
   console.log("saveAppPlyInfo-res", resInfo);
   btn.loading = false;
