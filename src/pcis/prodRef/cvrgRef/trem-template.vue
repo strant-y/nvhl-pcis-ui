@@ -303,7 +303,7 @@
                                         ]
                                       )
                                     "
-                                    :style="{'justify-content': colinfo.cColTitle === '责任名称' ? 'right' : 'center'}"
+                                    :style="{'justify-content': colinfo.cColTitle === '责任名称' ? 'right' : 'center', 'min-width': colinfo.cColTitle === '免赔额' || colinfo.cColTitle === '免赔率' ? '100px' : 'auto'}"
                                   >
                                     <from-item
                                       v-model="

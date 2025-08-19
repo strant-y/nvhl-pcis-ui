@@ -18,6 +18,23 @@ const pathSrc = resolve(__dirname, "src");
 //  https://cn.vitejs.dev/config
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
   const env = loadEnv(mode, process.cwd());
+  const getProxyTarget = () => {
+  switch (mode) {
+    case 'development':
+      return 'http://10.12.18.165:9080/' // DEV环境
+    case 'uat':
+      return 'http://10.12.18.114:9080/' // UAT环境
+    case 'verification':
+      return 'http://10.4.18.99:9082/' // verification发布
+    case 'pre':
+      return 'http://10.12.18.114:9079/' // pre发布
+    case 'prod':
+      return 'http://10.12.18.165:9080/' // prod发布
+    default:
+      return 'http://10.12.18.165:9080/' // 默认DEV
+  }
+}
+
   return {
     resolve: {
       alias: {
@@ -47,11 +64,11 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         /**
          * 代理前缀为 /api 的请求 线上服务器
          */
-        [env.VITE_APP_BASE_API]: {
+        [env.VITE_APP_API_URL]: {
           changeOrigin: true,
           // 接口地址
-          target: env.VITE_APP_API_URL,
-          rewrite: (path) => path.replace(new RegExp("^" + env.VITE_APP_BASE_API), ""),
+          target: getProxyTarget(),
+          // rewrite: (path) => path.replace(new RegExp("^" + env.VITE_APP_BASE_API), ""),
         },
         /**
          * 代理前缀为 /localhost-api 的请求 本地服务器

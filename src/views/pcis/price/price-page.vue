@@ -459,7 +459,7 @@ import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service"
 import { useRouter, useRoute } from "vue-router";
 import { getData } from "@/pcis/prodRef/dataInit";
 
-import { iconMap } from './iconMap';
+import { iconMap } from '../my-page/iconMap';
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
 
@@ -533,7 +533,7 @@ const copyPlyModel = defineAsyncComponent(
 );
 // 保存模板
 const templateDialog = defineAsyncComponent(
-  () => import("./templateDialog.vue")
+  () => import("../my-page/templateDialog.vue")
 );
 
 /**
@@ -558,7 +558,7 @@ const handleAnchorClick = (event, selector) => {
 };
 
 const idxParam = {
-  opertaorId: 'my-page',
+  opertaorId: 'price-page',
   handleAnchorClick: handleAnchorClick,
 };
 provide('idxParam', idxParam);
@@ -2784,7 +2784,7 @@ const submitToUndrFn = async () => {
    * 联共保判断
    */
   const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk')
-  if ('1' === CiMrk  || '5' === CiMrk || '2' === CiMrk) {
+  if ('1' === CiMrk  || '5' === CiMrk) {
       const validCi = JointInsuranceCheck();
       // 如果联共保校验不通过，则不继续执行后续逻辑
        if (!validCi) {
@@ -2910,8 +2910,7 @@ const submitToUndrFn = async () => {
     }
 
   // 判断应收保费是否同保费相同
-  let payList = res.payinfo;
-  console.log('缴费-',payList)
+ 
   let nPrm = opertaor.getTableRefByKey("base").getFromValue()['Base.nPrm'];
   let nPayablePrmData = opertaor.getTableRefByKey("payinfo").getFromValue()  // 缴费计划数据  
   let nPayAll = 0;
@@ -2923,28 +2922,6 @@ const submitToUndrFn = async () => {
       ElMessage.warning('缴费计划“应收保费”不等于“总保费”请确认！')
       return false;
   }
-
-
-
-   
-   if(payList && payList.length>0){
-      const toCent = (amount:any) => {
-        return Math.round(Number(amount) * 100); // 转为分并四舍五入
-      };
-      let totalCent = 0;
-      payList.forEach((item:any) => {
-        totalCent += toCent(item['Pay.nPayablePrm']);
-      });
- 
-      const basePrmCent = toCent(res['base']['Base.nPrm']);
-
-       if(totalCent > basePrmCent){
-         ElMessage.error('缴费计划“应收保费”之和大于整单保费！')
-        return false;
-      }
-  }
-
-
   // 电梯责任保险 每部电梯累计赔偿限额小于每部电梯每人赔偿限额时校验
   if(props.param?.cProdNo==='043001') {
     const cvrgValue = opertaor.getTableRefByKey("cvrg").getFromValue()[0];
@@ -3232,7 +3209,6 @@ const savePlyInfo = async () => {
     return false;
   }
 
-  console.log('res保存参数',res)
   const resInfo: any = props.param?.pageName === "priceInquiry" ? await saveInquiry(res) : await saveAppPlyInfo(res);
   console.log("saveAppPlyInfo-res", resInfo);
   btn.loading = false;

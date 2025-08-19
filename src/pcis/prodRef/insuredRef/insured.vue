@@ -157,23 +157,62 @@ onMounted(() => {
   // 证件号码
   setFormItem("Insured.cCertfCde", {minWidth: '165px'});
 });             
-function setFormItem(key: any, obj: any) {
-  if (obj && Object.keys(obj).length) {
-    formconfig1.fromSchema?.forEach((item) => {
-      if (item.prop === key) {
-        //控制尾部按钮的
-        if (item.btnItems && obj.btnItems) {
-          for (let key in obj.btnItems) {
-            item.btnItems[key] = obj.btnItems[key];
+// function setFormItem(key: any, obj: any) {
+//   if (obj && Object.keys(obj).length) {
+//     formconfig1.fromSchema?.forEach((item) => {
+//       if (item.prop === key) {
+//         //控制尾部按钮的
+//         if (item.btnItems && obj.btnItems) {
+//           for (let key in obj.btnItems) {
+//             item.btnItems[key] = obj.btnItems[key];
+//           }
+//         } else {
+//           Object.assign(item, obj);
+//         }
+//       }
+//     });
+//   }
+// }
+function recursiveSetFormItem(items: FormItem[], targetKey: string, obj: Record<string, any>) {
+  items.forEach((item) => {
+    // 1. 如果当前项是分组（含groupList），先递归处理子项
+    if (item.inputtype === 'rtinputgroup' && item.groupList && Array.isArray(item.groupList)) {
+      recursiveSetFormItem(item.groupList, targetKey, obj);
+    }
+
+    // 2. 匹配到目标prop，执行赋值
+    if (item.prop === targetKey) {
+      if (item.btnItems && obj.btnItems) {
+        Object.entries(obj.btnItems).forEach(([btnKey, value]) => {
+          if (item.btnItems!.hasOwnProperty(btnKey)) {
+            item.btnItems![btnKey] = value;
           }
-        } else {
-          Object.assign(item, obj);
-        }
+        });
       }
-    });
-  }
+
+      // 处理其他属性（包括rules必填规则）
+      const { btnItems: _, ...otherProps } = obj;
+      Object.assign(item, otherProps);
+      if (otherProps.rules) {
+        item.rules = otherProps.rules;
+      }
+    }
+  });
 }
 
+
+function setFormItem(key: string, obj: Record<string, any>): void {
+  if (!key || !obj || typeof obj !== 'object' || Object.keys(obj).length === 0) {
+    return;
+  }
+
+  if (!formconfig1.fromSchema || !Array.isArray(formconfig1.fromSchema)) {
+    return;
+  }
+
+  // 调用递归方法处理所有项（包括嵌套的groupList）
+  recursiveSetFormItem(formconfig1.fromSchema, key, obj);
+}
 // 解析身份证
 const idAnalysis = (id:string)=>{
     const tabref = opertaor.getTableRefs();
@@ -434,6 +473,10 @@ const method = {
       setFormItem("Insured.cRegisteredcapDre", {
         rules: [getRules("required", {})],
       });
+      setFormItem("Insured.RegisterProp", {
+       rules: [getRules("required", {})],
+      });
+
       // 为法人 国民经济行业必填
       setFormItem("Insured.cTrdCde", {
         rules: [getRules("required", {})],
@@ -552,6 +595,9 @@ const method = {
 
       //注册地址
       setFormItem("Insured.cRegisteredcapDre", { rules: null });
+      setFormItem("Insured.RegisterProp", {
+       rules: null,
+      });
 
       // 是否绿色产业客户
       setFormItem("Insured.cGreenIndustryCustomers", {
@@ -879,6 +925,7 @@ const method = {
 
   //证件类型change
   InsuredCCertfCls: (val: any) => {
+    console.log('证件类型---',val)
     checkUser();
         // 清除报错信息
     clearValidate('Insured.cCertfCde')  
@@ -939,6 +986,7 @@ const method = {
       setFormItem("Insured.cCertfCde", {
         rules: [getRules("required", {}),getRules("passPort", {})],
       });
+    
     } else if (val == "110007") {
       setFormItem("Insured.tCertfBgnDate", {
         rules: [getRules("required", {})],
@@ -963,6 +1011,10 @@ const method = {
       setFormItem("Insured.cOrganizationCode", {
           disabled: true,
       });
+      // // 统一社会信用代码
+      // setFormItem("Insured.cParticiinsocTyp", {
+      //   rules: [getRules("required", {})],
+      // });
     } else if(val === '120002'){
       // 护照
       setFormItem("Insured.cCertfCde", {
@@ -981,9 +1033,9 @@ const method = {
       setFormItem("Insured.tCertfBgnDate", { rules: null });
       setFormItem("Insured.tCertfEndDate", { rules: null });
 
-      setFormItem("Insured.cParticiinsocTyp", {
-        rules: null,
-      });
+      // setFormItem("Insured.cParticiinsocTyp", {
+      //   rules: null,
+      // });
     }
   },
   emailChange: (val) => {

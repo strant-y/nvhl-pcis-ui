@@ -619,11 +619,8 @@ const method = {
         },
         method: {
           getSelected: (params) => {
-            console.log("00000",params)
-            // freeEditRef?.value?.setValueByRowKey("Ci.cBrkrCde", rowId, params.CChaCde);
             freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData",[{ label: `${params.CChaCde}${params.CChaNme}`, value: params.CChaCde }])
-            freeEditRef.value?.setRowFieldProp("Ci.cBrkrCde",rowId,params.CChaCde)
-            // freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBrkrCde","loadData",[])
+            setValueByRowKey("Ci.cBrkrCde", rowId, params.CChaCde)
             dialogRef.value?.handleClose();
           },
         },
