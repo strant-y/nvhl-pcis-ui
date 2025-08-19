@@ -2784,7 +2784,7 @@ const submitToUndrFn = async () => {
    * 联共保判断
    */
   const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk')
-  if ('1' === CiMrk  || '5' === CiMrk) {
+  if ('1' === CiMrk  || '5' === CiMrk || '2' === CiMrk) {
       const validCi = JointInsuranceCheck();
       // 如果联共保校验不通过，则不继续执行后续逻辑
        if (!validCi) {
