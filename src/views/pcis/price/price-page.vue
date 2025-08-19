@@ -558,7 +558,7 @@ const handleAnchorClick = (event, selector) => {
 };
 
 const idxParam = {
-  opertaorId: 'price-page',
+  opertaorId: 'my-page',
   handleAnchorClick: handleAnchorClick,
 };
 provide('idxParam', idxParam);
@@ -588,6 +588,7 @@ const props:any = defineProps({
 
 onBeforeMount(() => {
   // onMounted() 之前
+  console.log(props.param);
   opertaor.setParam(props.param);
 });
 
