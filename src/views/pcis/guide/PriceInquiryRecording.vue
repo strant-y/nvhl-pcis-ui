@@ -4,7 +4,7 @@
     <!-- <div class="el-card__header">
       <span class="el-card__header__title">{{ title }}</span>
     </div> -->
-    <div v-if="step == '0'">
+    <div>
       <el-form
         ref="freeEditRef"
         :model="formconfig1"
@@ -129,18 +129,13 @@
         </el-row>
       </el-form>
     </div>
-    <div v-if="step == '1'">内容</div>
     <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
       <rt-button
         :item="{
           type: 'primary',
-          label: step == '0' ? '下一步' : '上一步',
+          label: '下一步',
           func: () => {
-            if (step == '0') {
-              next();
-            } else {
-              step = '0';
-            }
+            next();
           },
         }"
       />
@@ -182,7 +177,6 @@ import {scrollByDomId} from "@/utils/common";
 
 const router = useRouter();
 const dialogVisible = ref(true);
-const step = ref("");
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
 const title = ref("自定义录单");
@@ -274,8 +268,6 @@ onMounted(async () => {
   handleQuery();
   loadOptions();
   nextTick(() => {
-    step.value = "0";
-
       if(isZGS.value) {
           getDptCdeList();
       }else {
@@ -339,18 +331,12 @@ function next() {
         })
       );
     }
-    step.value = step.value == "0" ? "1" : "0";
-    title.value = step.value == "0" ? "自定义录单" : "选择条款";
   }).catch((err: any) => {
     const ids = Object.keys(err);
     if(ids) {
       scrollByDomId( `#${ids[0]}`, "center")
     }
   });
-}
-// 上一步
-function prev() {
-  step.value = "0";
 }
 
 // 常用条款选中/反选
