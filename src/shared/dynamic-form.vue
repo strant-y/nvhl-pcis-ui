@@ -49,9 +49,10 @@
             </el-form-item>
             </template>
             <template v-else-if="item.inputtype === 'rtinputgroup'">
-              <el-form-item :required="checkRequired(item)">
+              <el-form-item :required="checkRequired(item)"
+                            :label-width=" maxLabelWidth + 'px'">
                 <template #label>
-                  <!-- <template v-if="item.title?.length > 8">
+                   <template v-if="item.title?.length > 8">
                     <el-tooltip
                       effect="dark"
                       :content="item.title"
@@ -60,9 +61,9 @@
                       {{ item.title.substring(0, 8) + "..." }}
                     </el-tooltip>
                   </template>
-                  <template v-else> -->
+                  <template v-else>
                     {{ item.title }}
-                  <!-- </template> -->
+                   </template>
                 </template>
                 <div
                   :style="{
@@ -99,9 +100,10 @@
                 :label-position="
                   item.inputtype === 'rttable' ? 'top' : undefined // table 组件,默认标题显示在top上
                 "
+                :label-width=" maxLabelWidth + 'px'"
               >
                 <template #label>
-                  <!-- <template v-if="item.title?.length > 8">
+                   <template v-if="item.title?.length > 8">
                     <el-tooltip
                       effect="dark"
                       :content="item.title"
@@ -110,9 +112,9 @@
                       {{ item.title.substring(0, 8) + "..." }}
                     </el-tooltip>
                   </template>
-                  <template v-else> -->
+                  <template v-else>
                     {{ item.title }}
-                  <!-- </template> -->
+                   </template>
                 </template>
                 <div :style="{width: ( item.propWidth ? item.propWidth : 100) + '%', display: 'flex' }">
                   <div
@@ -200,7 +202,7 @@
                 "
               >
                 <template v-if="item.inputtype === 'rtinputgroup'">
-                  <el-form-item :required="checkRequired(item)">
+                  <el-form-item :required="checkRequired(item)"  >
                     <template #label>
                       <!-- <template v-if="item.title?.length > 8">
                         <el-tooltip
@@ -247,20 +249,21 @@
                   <el-form-item
                     :rules="item.rules ? item.rules : undefined"
                     :prop="item.prop"
+                    :label-width=  "maxLabelWidth + 'px'"
                   >
                     <template #label>
-                      <!-- <template v-if="item.title?.length > 9">
+                      <template v-if="item.title?.length > 8">
                         <el-tooltip
                           effect="dark"
                           :content="item.title"
                           placement="top-start"
                         >
-                          {{ item.title.substring(0, 9) + "..." }}
+                          {{ item.title.substring(0, 8) + "..." }}
                         </el-tooltip>
                       </template>
-                      <template v-else> -->
+                      <template v-else>
                         {{ item.title }}
-                      <!-- </template> -->
+                       </template>
                     </template>
                     <div :style="{width: ( item.propWidth ? item.propWidth : 100) + '%', display: 'flex' }">
                       <div
@@ -305,6 +308,7 @@
 <script setup lang="ts">
 import { FormInstance } from "element-plus";
 import { AppGridEditMethod } from "./app-grid-edit-config";
+const maxLabelWidth = ref(150); // 默认值
 
 defineOptions({
   name: "DynamicForms",
