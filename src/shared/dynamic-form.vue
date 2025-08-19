@@ -202,7 +202,9 @@
                 "
               >
                 <template v-if="item.inputtype === 'rtinputgroup'">
-                  <el-form-item :required="checkRequired(item)"  >
+                  <el-form-item :required="checkRequired(item)"
+                                :label-width=" maxLabelWidth + 'px'"
+                  >
                     <template #label>
                       <!-- <template v-if="item.title?.length > 8">
                         <el-tooltip
