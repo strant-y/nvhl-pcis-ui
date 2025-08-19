@@ -28,45 +28,45 @@
                 {{ cardConfig.title }}
               </el-tooltip>
             </el-col>
-            <!-- 控制cardConfig.showEdit状态的按钮 -->
-            <el-col :span="6" v-if="hasShowEditTrue">
-              <a class="toggle-edit-btn" @click="toggleShowEdit">
+            <el-col
+              :span="18"
+              style="text-align: right"
+            >
+              <!-- 控制cardConfig.showEdit状态的按钮 -->
+              <template v-if="showMyfrom">
+                <a class="toggle-edit-btn" @click="toggleShowEdit" v-if="hasShowEditTrue">
                 <el-icon>
                   <View v-if="!cardConfig.showEdit" />
                   <Hide v-else />
                 </el-icon>
                 <span class="toggle-text">{{ cardConfig.showEdit ? '隐藏查询条件' : '显示查询条件' }}</span>
-              </a>
-            </el-col>
-            <el-col
-              :span="18"
-              style="text-align: right"
-              v-if="
-                (cardConfig.titleBtns && cardConfig.titleBtns.length > 0) ||
-                (cardConfig.showMyfromBtm ? cardConfig.showMyfromBtm : false)
-              "
-            >
-              <el-button-group>
-                <template
-                  v-for="(item, index) in cardConfig.titleBtns"
-                  :key="index"
+                </a>
+              </template>
+              <template
+              v-if=" (cardConfig.titleBtns && cardConfig.titleBtns.length > 0) ||
+                (cardConfig.showMyfromBtm ? cardConfig.showMyfromBtm : false)" >
+                <el-button-group>
+                  <template
+                    v-for="(item, index) in cardConfig.titleBtns"
+                    :key="index"
+                  >
+                  <template v-if="!item.hidden">
+                    <rt-button :item="item" />
+                  </template>
+                  </template>
+                </el-button-group>
+                <a
+                  style="margin-left: 20px"
+                  @click="showMyfrom = !showMyfrom"
+                  v-if="
+                    cardConfig.showMyfromBtm ? cardConfig.showMyfromBtm : false
+                  "
                 >
-                <template v-if="!item.hidden">
-                  <rt-button :item="item" />
-                </template>
-                </template>
-              </el-button-group>
-              <a
-                style="margin-left: 20px"
-                @click="showMyfrom = !showMyfrom"
-                v-if="
-                  cardConfig.showMyfromBtm ? cardConfig.showMyfromBtm : false
-                "
-              >
-                <el-icon v-if="!showMyfrom"><ArrowUpBold /></el-icon>
-                <el-icon v-if="showMyfrom"><ArrowDownBold /></el-icon>
-                {{ showMyfrom ? "点击折叠" : "点击展开" }}
-              </a>
+                  <el-icon v-if="!showMyfrom"><ArrowUpBold /></el-icon>
+                  <el-icon v-if="showMyfrom"><ArrowDownBold /></el-icon>
+                  {{ showMyfrom ? "点击折叠" : "点击展开" }}
+                </a>
+              </template>
             </el-col>
           </el-row>
         </template>
@@ -94,6 +94,7 @@
 </template>
 
 <script setup lang="ts">
+import { template } from "lodash";
 import { createAppFreeEditConfig } from "../app-free-edit-config";
 import { createAppGridEditConfig } from "../app-grid-edit-config";
 import { CardConfig } from "./card-config";
@@ -157,11 +158,20 @@ onMounted(() => {
     props.cardConfig.showEdit = false;
   }
   })
-})
+});
+// 外部切换组件隐藏显示:如果传参,直接按照参数进行设置,如果未传参,则自动反向设置
+function changeMyForm(value: any) {
+  if(value !== null && value !== undefined && typeof value === 'boolean'){
+    showMyfrom.value = value;
+  }else{
+    showMyfrom.value = !showMyfrom.value;
+  }
+}
 
 defineExpose({
   getFromValue,
-	setFormValue
+	setFormValue,
+  changeMyForm
 });
 
 </script>
