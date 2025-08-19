@@ -28,16 +28,6 @@
                 {{ cardConfig.title }}
               </el-tooltip>
             </el-col>
-            <!-- 控制cardConfig.showEdit状态的按钮 -->
-            <el-col :span="6" v-if="hasShowEditTrue">
-              <a class="toggle-edit-btn" @click="toggleShowEdit">
-                <el-icon>
-                  <View v-if="!cardConfig.showEdit" />
-                  <Hide v-else />
-                </el-icon>
-                <span class="toggle-text">{{ cardConfig.showEdit ? '隐藏查询条件' : '显示查询条件' }}</span>
-              </a>
-            </el-col>
             <el-col
               :span="18"
               style="text-align: right"
@@ -46,6 +36,16 @@
                 (cardConfig.showMyfromBtm ? cardConfig.showMyfromBtm : false)
               "
             >
+              <!-- 控制cardConfig.showEdit状态的按钮 -->
+              <template v-if="showMyfrom">
+                <a class="toggle-edit-btn" @click="toggleShowEdit" v-if="hasShowEditTrue">
+                <el-icon>
+                  <View v-if="!cardConfig.showEdit" />
+                  <Hide v-else />
+                </el-icon>
+                <span class="toggle-text">{{ cardConfig.showEdit ? '隐藏查询条件' : '显示查询条件' }}</span>
+                </a>
+              </template>
               <el-button-group>
                 <template
                   v-for="(item, index) in cardConfig.titleBtns"
@@ -157,11 +157,20 @@ onMounted(() => {
     props.cardConfig.showEdit = false;
   }
   })
-})
+});
+// 外部切换组件隐藏显示:如果传参,直接按照参数进行设置,如果未传参,则自动反向设置
+function changeMyForm(value: any) {
+  if(value !== null && value !== undefined && typeof value === 'boolean'){
+    showMyfrom.value = value;
+  }else{
+    showMyfrom.value = !showMyfrom.value;
+  }
+}
 
 defineExpose({
   getFromValue,
-	setFormValue
+	setFormValue,
+  changeMyForm
 });
 
 </script>

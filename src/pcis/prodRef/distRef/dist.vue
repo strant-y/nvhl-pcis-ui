@@ -184,6 +184,8 @@ const distSummaryRef = ref(); // 汇总组件对象
 const collectCompKey = ref(); // 汇总组件key
 const formconfig11 = ref<any>({});
 const oldPageSchema = ref<any>({});
+
+const hiddenPage = ref<Array>(['VehicleDist040002']); //初始化需要隐藏的组件
 onMounted(async () => {
   // 初始化 cComponentTableValue
   cComponentTableValue = getCComponentTableValue();
@@ -208,6 +210,11 @@ onMounted(async () => {
 
   Object.assign(formconfig1.value, formconfig11.value);
   cardconfig.value.title = formconfig1.value.title;
+  cardconfig.value.showMyfromBtm = formconfig1.value.showMyfromBtm;
+  if(hiddenPage.value.indexOf(props.compKey) > -1) {
+    cardRef.value.changeMyForm(false);  //初始化隐藏表单
+  }
+  console.log(cardconfig.value);
   if(formconfig1.value.distSchema&& formconfig1.value.distSchema.length > 0){
          formconfig1.value.distSchema.forEach((item:any)=>{
             if(item['prop'] === 'cPlateNumber'){
