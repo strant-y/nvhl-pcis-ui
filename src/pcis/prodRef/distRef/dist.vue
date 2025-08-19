@@ -719,7 +719,7 @@ const method = {
     }
 
 
-		if(paramitem.dist['Dist.ProjectDesignProp']) {
+		if(paramitem.dist?.['Dist.ProjectDesignProp']) {
 			paramitem.dist['Dist.cProjectAddress'] = paramitem.dist['Dist.ProjectDesignProp']
 		}
 
