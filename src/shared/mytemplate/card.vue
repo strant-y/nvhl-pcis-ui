@@ -31,10 +31,6 @@
             <el-col
               :span="18"
               style="text-align: right"
-              v-if="
-                (cardConfig.titleBtns && cardConfig.titleBtns.length > 0) ||
-                (cardConfig.showMyfromBtm ? cardConfig.showMyfromBtm : false)
-              "
             >
               <!-- 控制cardConfig.showEdit状态的按钮 -->
               <template v-if="showMyfrom">
@@ -46,27 +42,31 @@
                 <span class="toggle-text">{{ cardConfig.showEdit ? '隐藏查询条件' : '显示查询条件' }}</span>
                 </a>
               </template>
-              <el-button-group>
-                <template
-                  v-for="(item, index) in cardConfig.titleBtns"
-                  :key="index"
+              <template
+              v-if=" (cardConfig.titleBtns && cardConfig.titleBtns.length > 0) ||
+                (cardConfig.showMyfromBtm ? cardConfig.showMyfromBtm : false)" >
+                <el-button-group>
+                  <template
+                    v-for="(item, index) in cardConfig.titleBtns"
+                    :key="index"
+                  >
+                  <template v-if="!item.hidden">
+                    <rt-button :item="item" />
+                  </template>
+                  </template>
+                </el-button-group>
+                <a
+                  style="margin-left: 20px"
+                  @click="showMyfrom = !showMyfrom"
+                  v-if="
+                    cardConfig.showMyfromBtm ? cardConfig.showMyfromBtm : false
+                  "
                 >
-                <template v-if="!item.hidden">
-                  <rt-button :item="item" />
-                </template>
-                </template>
-              </el-button-group>
-              <a
-                style="margin-left: 20px"
-                @click="showMyfrom = !showMyfrom"
-                v-if="
-                  cardConfig.showMyfromBtm ? cardConfig.showMyfromBtm : false
-                "
-              >
-                <el-icon v-if="!showMyfrom"><ArrowUpBold /></el-icon>
-                <el-icon v-if="showMyfrom"><ArrowDownBold /></el-icon>
-                {{ showMyfrom ? "点击折叠" : "点击展开" }}
-              </a>
+                  <el-icon v-if="!showMyfrom"><ArrowUpBold /></el-icon>
+                  <el-icon v-if="showMyfrom"><ArrowDownBold /></el-icon>
+                  {{ showMyfrom ? "点击折叠" : "点击展开" }}
+                </a>
+              </template>
             </el-col>
           </el-row>
         </template>
@@ -94,6 +94,7 @@
 </template>
 
 <script setup lang="ts">
+import { template } from "lodash";
 import { createAppFreeEditConfig } from "../app-free-edit-config";
 import { createAppGridEditConfig } from "../app-grid-edit-config";
 import { CardConfig } from "./card-config";
