@@ -335,7 +335,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cIsExist",
         inputtype: "rtselect",
-        title: "条款文件是否存在",
+        title: "电子保单是否存在",
         typeCode: "WEB_SYS_STA_DICT",
         codeParam: { cParCde: "yes_no" },
         rules: [getRules("required", { change: true })],
@@ -488,11 +488,13 @@ watch(
 );
 
 onMounted(() => {
+  
   if (param.type === "edit") {
     handleQuery();
   } else {
     // 如果不是编辑模式，确保默认值生效
     freeEditRef.value?.setFormValue({ cSourceTyp: "9" });
+    freeEditRef?.value?.setFormValue({cIsExist:'0'})
   }
 });
 </script>

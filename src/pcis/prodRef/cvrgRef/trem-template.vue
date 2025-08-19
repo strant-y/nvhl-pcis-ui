@@ -23,7 +23,12 @@
                   <template v-else>
                     <el-tag type="warning"  style="margin-right: 8px;">{{ term.cNmeCn }}</el-tag>
                     <el-tooltip content="下载条款" placement="top">
-                      <rt-icon :item="{ icon: 'term' }" />
+                      <el-button
+                        type="text"
+                        @click="downloadTerm"
+                        style="margin-right: 5px"
+                      ><rt-icon :item="{ icon: 'term' }" />
+                    </el-button>
                     </el-tooltip>
                   </template>
                 </div>
@@ -357,7 +362,7 @@
 </template>
 
 <script setup lang="ts">
-import { getTRFactorJson } from "@/api/prod";
+import { getTRFactorJson,getPrdTermInfo } from "@/api/prod";
 import {
   AppFreeEditMethod,
   createAppFreeEditConfig,
@@ -369,6 +374,7 @@ import { useValidator } from "@/typings/useValidator";
 import { useRoute } from "vue-router";
 import { v4 as uuidv4 } from "uuid";
 import {CommonConstants} from "@/constants/CommonConstants";
+import { ITEM_RENDER_EVT } from "element-plus/es/components/virtual-list/src/defaults";
 const route = useRoute();
 const templateRef = ref();
 const opertaor = dataOpertaor();
@@ -665,11 +671,28 @@ function getTermData(){
 */
 function downloadTerm() {
   const clauseLink = termdata.value["Term.cClauseLink"];
-  if (!clauseLink) {
-    ElMessage.warning("条款链接为空，无法下载");
-    return;
-  }
-
+  const newparam = { cTermNo: termdata.value['Term.cClauseCode'], pageNum: 1, pageSize: 10 };
+  const cWebsite = getPrdTermInfo(newparam)
+    .then((res) => {
+      const { code, data, msg } = res;
+      if (200 === code) {
+        const cWebsite = data.cWebsite;
+        if (!cWebsite) {
+          ElMessage.warning("条款链接为空，无法下载");
+          return;
+        }
+        const link = document.createElement('a');
+        link.href = cWebsite;
+        link.target = '_blank'; 
+        link.download = ''; 
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        ElMessage.success("开始下载条款文档");
+      } else {
+        ElMessage.error(msg);
+      }
+    })
 }
 
 onMounted(async () => {
@@ -700,7 +723,7 @@ function dataInit() {
       } else {
         newKey = key;
       }
-      if (newKey === "cLiabCode") {
+      if (newKey === "cLiabCode" && v) {
         p["cRiskNo"] = v;
         queryKey += v;
       }
