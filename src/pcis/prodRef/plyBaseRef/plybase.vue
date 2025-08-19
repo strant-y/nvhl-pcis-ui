@@ -25,6 +25,10 @@ import DepartmentTree from "../commodityRef/DepartmentTree.vue";
 import { codeListViewStore, dataOpertaor, useProductStore } from "@/store";
 import {PolicyService} from "@/views/pcis-main/service/my-page/policy.service";
 const productStore = useProductStore();
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
+const route = useRoute();
+const query = ref(route.query);
+const params = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
 
 const codeListStore = codeListViewStore();
 const { getRules } = useValidator();
@@ -181,7 +185,7 @@ const method = {
   //联共保下拉change
   cCiMrkChange: (val:any) => {
     // 对于询价单场景，不执行联共保菜单显示和信息初始化
-  if (param.pageName === "priceInquiry") {
+  if (params.pageName === "priceInquiry") {
      setFormItem("Base.cRemark", { rules: [getRules("required", {})], });
   } else {
     setFormItem("Base.cRemark", { rules: [], });

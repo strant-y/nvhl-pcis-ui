@@ -30,6 +30,14 @@
                       ><rt-icon :item="{ icon: 'term' }" />
                     </el-button>
                     </el-tooltip>
+                    <el-tooltip content="预览条款" placement="top">
+                      <el-button
+                        type="text"
+                        @click="previewTerm"
+                        style="margin-right: 5px"
+                      ><rt-icon :item="{ icon: 'View' }" />
+                    </el-button>
+                    </el-tooltip>
                   </template>
                 </div>
               </el-col>
@@ -678,7 +686,7 @@ function downloadTerm() {
       if (200 === code) {
         const cWebsite = data.cWebsite;
         if (!cWebsite) {
-          ElMessage.warning("条款链接为空，无法下载");
+          ElMessage.warning("条款附件地址为空，请联系产品中心处理");
           return;
         }
         const link = document.createElement('a');
@@ -693,6 +701,47 @@ function downloadTerm() {
         ElMessage.error(msg);
       }
     })
+}
+/*
+条款预览
+*/
+function previewTerm() {
+  const newparam = { cTermNo: termdata.value['Term.cClauseCode'], pageNum: 1, pageSize: 10 };
+  
+  getPrdTermInfo(newparam).then((res) => {
+    const { code, data, msg } = res;
+    if (200 === code) {
+      const cWebsite = data.cWebsite;
+      if (!cWebsite) {
+        ElMessage.warning("条款链接为空，无法预览");
+        return;
+      }
+      
+      // 判断文件类型并进行相应预览
+      const fileExtension = getFileExtension(cWebsite).toLowerCase();
+      
+      if (fileExtension === 'pdf') {
+        // PDF文件使用浏览器内置查看器或新窗口打开
+        window.open(cWebsite, '_blank');
+      } else if (['doc', 'docx'].includes(fileExtension)) {
+        // Word文档可以使用Google Docs Viewer或Office Online预览
+        const previewUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(cWebsite)}`;
+        window.open(previewUrl, '_blank');
+      } else {
+        // 其他文件类型直接下载
+        ElMessage.info("该文件类型不支持在线预览，将直接下载");
+        const link = document.createElement('a');
+        link.href = cWebsite;
+        link.target = '_blank';
+        link.download = '';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } else {
+      ElMessage.error(msg);
+    }
+  });
 }
 
 onMounted(async () => {
