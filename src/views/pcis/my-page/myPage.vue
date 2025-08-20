@@ -3823,6 +3823,14 @@ const submitEdrToUndrSurrender = async () => {
     console.log("申请核保(退保、注销)", res);
     if (res["code"] == "200") {
       ElMessage.success(res.msg);
+      if(res['cDecision'] === '1' || res['cDecision'] === '2'){
+        tagsViewStore.delView({"name": "my-page",
+          "title": "申请单录入",
+          "path": "/pcisapp/myPage",
+          "fullPath": "/pcisapp/myPage"}).then((res: any) => {
+          router.replace({ path: "/dashboard" });
+        });
+      }
     } else {
       ElMessage.error(res.msg);
     }
