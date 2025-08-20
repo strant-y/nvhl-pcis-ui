@@ -2852,7 +2852,6 @@ const submitToUndrFn = async () => {
   if(distItem && tgtValue[distItem.flagKey] === '1') {
     const selectParam = {
       cComponentTable: distItem.cComponentTable,
-      isSummary: '1',
     }
     if(props.param?.pageName === "priceInquiry") {
       selectParam['cInquiryNo'] = cInquiryNumber
