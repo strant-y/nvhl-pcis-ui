@@ -3874,6 +3874,7 @@ const saveEdrPlyInfo = async () => {
     }
     opertaor.setDataAll(ops);
     const EdrBaseData = edrInfo["res"]["composition"]["EdrBase"][0];
+    EdrBaseData["EdrBase.cEdrRsnDetail"] = EdrBaseData["EdrBase.cEdrRsnDetail"].split(",")
     // res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
     //   res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"].split(
     //     ","
