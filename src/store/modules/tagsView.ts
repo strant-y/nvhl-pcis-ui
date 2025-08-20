@@ -1,21 +1,62 @@
 import {getCompName} from '@/typings/views-component'
-import { clearDataOpertaorByPageKey } from '@/store';
+import {clearDataOpertaorByPageKey} from '@/store';
 import {descryptParameterToQuery} from "@/utils/common";
 import {RouteLocationNormalizedLoaded} from "vue-router";
 import {base64encoder} from "@/utils/encipher";
+import {eventBus} from "@/utils/event-bus";
 
 export const useTagsViewStore = defineStore("tagsView", () => {
   const visitedViews = ref<TagView[]>([]);
   const cachedViews = ref<string[]>([]);
+  const selectedView = ref<TagView>();
+
+  async function addTagView(route: RouteLocationNormalizedLoaded) {
+    const to = route;
+    if (to.meta) {
+      const view = buildView(to);
+      if (view.keepAlive) {
+        await delView(view);
+        // 缓存模式
+        addCachedView(view.cachedKey);
+        addVisitedView(view);
+      }else {
+        clearDataOpertaorByPageKey(view.name);
+        addVisitedView(view);
+      }
+      moveToCurrentTag(to);
+    }
+  }
+
+  // 组建视图参数
+  function buildView(to: any): TagView {
+    const data = descryptParameterToQuery(to.query);
+    let dynamicTitle: any = to.meta.title;
+    if (data.ParseParams && data.ParseParams.title) {
+      dynamicTitle = data.ParseParams.title;
+    } else if (to.query.title) {
+      dynamicTitle = to.query.title;
+    }
+    const cachedKey = getCompName(to.name as string);
+    return {
+      name: to.name as string,
+      title: dynamicTitle,
+      path: to.path,
+      fullPath: to.fullPath,
+      affix: to.meta?.affix,
+      keepAlive: to.meta?.keepAlive || !!cachedKey,
+      hidden: to.meta.hidden,
+      query: data.JSONquery,
+      cachedKey: cachedKey,
+      componentKey: base64encoder(to.path) + new Date().getTime(),
+    };
+  }
+
   /**
    * 添加已访问视图到已访问视图列表中
    */
   function addVisitedView(view: TagView) {
     // 如果已经存在于已访问的视图列表中，则不再添加 只更新视图中的路由参数
-    // if (visitedViews.value.some((v) => v.path === view.path)) {
-    const index = visitedViews.value.findIndex(item => item.path === view.path);
-    if (index !== -1) {
-      // visitedViews.value[index] = view;
+    if (visitedViews.value.some((v) => v.path === view.path)) {
       return;
     }
     // 如果视图是固定的（affix），则在已访问的视图列表的开头添加
@@ -102,48 +143,11 @@ export const useTagsViewStore = defineStore("tagsView", () => {
     }
   }
 
-  async function addTagView(route: RouteLocationNormalizedLoaded) {
-    const to = route;
-    if (to.meta.title) {
-      const data = descryptParameterToQuery(to.query);
-      let dynamicTitle: any = to.meta.title;
-      if (data.ParseParams && data.ParseParams.title) {
-        dynamicTitle = data.ParseParams.title;
-      } else if (to.query.title) {
-        dynamicTitle = to.query.title;
-      }
-      const cachedKey = getCompName(to.name as string);
-      const view: TagView = {
-        name: to.name as string,
-        title: dynamicTitle,
-        path: to.path,
-        fullPath: to.fullPath,
-        affix: to.meta?.affix,
-        keepAlive: to.meta?.keepAlive || !!cachedKey,
-        hidden: to.meta.hidden,
-        query: data.JSONquery,
-        cachedKey: cachedKey,
-      };
-      await delView(view); // 清理冲突视图
-      addView(view);
-      moveToCurrentTag(to);
-    }
-  }
-
-  function addView(view: TagView) {
-    const viewData = {...view, ...{componentKey: base64encoder(view.path) + new Date().getTime()}};
-    if (view.keepAlive) {
-      // 缓存模式
-      addCachedView(view.cachedKey);
-    }
-    addVisitedView(viewData);
-  }
-
   function delView(view: TagView) {
-    clearDataOpertaorByPageKey(view.name);
     return new Promise(async (resolve) => {
-      delVisitedView(view);
+      clearDataOpertaorByPageKey(view.name);
       delCachedView(view);
+      delVisitedView(view);
       resolve({
         visitedViews: [...visitedViews.value],
         cachedViews: [...cachedViews.value],
@@ -255,9 +259,13 @@ export const useTagsViewStore = defineStore("tagsView", () => {
     });
   }
 
+  function back() {
+    eventBus.emit('closeSelectedTag', selectedView.value);
+  }
   return {
     visitedViews,
     cachedViews,
+    selectedView,
     addVisitedView,
     addCachedView,
     delVisitedView,
@@ -275,5 +283,6 @@ export const useTagsViewStore = defineStore("tagsView", () => {
     delAllVisitedViews,
     delAllCachedViews,
     moveToCurrentTag,
+    back
   };
 });
