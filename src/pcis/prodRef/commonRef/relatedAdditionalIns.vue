@@ -237,15 +237,22 @@ function setDisa() {
 }
 /** 查询 */
 function handleQuery(flag?: boolean) {
-  const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
-  if (tabref.getFromValue().cTermNo == null) {
+
+  let term = '';
+  console.log(param);
+  if(param.type === "edit"){
+    term = param.row.cTermNo;
+  }else{
+    term = tabref.getFromValue().cTermNo
+  }
+  if (!term || term === '') {
     ElMessage.error("请完善基本信息后在操作!");
     return;
   } else {
     const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
     const s = freeEditRef.value?.getFromValue(); //获取表单数据
     const termInfo = tabref.getFromValue();
-    const param = Object.assign(s, r, {cTermNo: termInfo['cTermNo']});
+    const param = Object.assign(s, r, {cTermNo: term});
     queryTermRelList(param)
       .then((res) => {
         const { code, data, msg } = res;
@@ -284,9 +291,7 @@ function getQueryList(flag?: boolean) {
 }
 onMounted(() => {
   if (param.type === "edit") {
-    setTimeout(() => {
-      handleQuery();
-    }, 300);
+    handleQuery();
   }
 });
 
