@@ -440,7 +440,7 @@ function getValue(key: string) {
   return freeEditRef?.value?.getValue(key);
 }
 function handleQuery() {
-  const newparam = { cPkId: param.cPkId, pageNum: 1, pageSize: 10 };
+  const newparam = { cPkId: param.row.cPkId, pageNum: 1, pageSize: 10 };
   getPrdTermInfo(newparam)
     .then((res) => {
       const { code, data, msg } = res;

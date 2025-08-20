@@ -97,6 +97,9 @@ export function formInit(
         item.expand = true;
         newObj.showExpand = true;
       }
+      if(item.cTableWidth){    //调整表格要素,宽度
+        item.width = Number(item.cTableWidth);
+      }
       if(item.inputtype === 'rtinputgroup' ){
         if(item.groupList && item.groupList.length>0){
           item.groupList = item.groupList.map(gitem=>{

@@ -331,6 +331,7 @@ const getEdrRsnItemFun = (
       const result = res["data"]["result"];
       console.log('edrList', result)
       formPage.value?.setUnDisabledByKeyList(result); // 根据list集合,放开需要的要素
+      console.log('kebianji',formPage.value)
       ElMessage.success(res.msg);
     } else {
       ElMessage.error(res.msg);
@@ -375,9 +376,9 @@ const submitEdrToUndrSurrender = async () => {
     ElMessage.warning(validateAll.msg);
     return;
   }
-  const f = await saveEdrPlyInfo(); // 提交核保,需要默认执行一次保存操作
+  const f = await saveApplicationEdr(); // 提交核保,需要默认执行一次保存操作
   if(f){
-    const btn = getBtn("btnSubmitEdr");
+    const btn = getBtn("btn010103");
     btn.loading = true;
     const res = {};
     const base = formPage.value?.getFormDataById('AgreementBase');
@@ -634,6 +635,7 @@ function query() {
               mainRef.value?.setxyedrbaseRefData({...EdrECargoBase,'EdrECargoBase.cEdrType':props.param?.cEdrType})
               mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnBundleCde",
               props.param["cRsnCde"]);
+            mainRef.value?.getxyedritemValue();
           }
           if (props.param.cEdrType != "1") {
             mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnDetail", [

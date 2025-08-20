@@ -494,7 +494,6 @@ const formUi = reactive<Record<string, any>>({});
  *  样式初始化,对于未设置的参数进行初始化
  * */
 function initUI() {
-  console.log(props.item);
   if (props.item.fromUi) {
     Object.keys(props.item.fromUi).forEach((key) => {
       if (key === "cols") {
@@ -523,7 +522,6 @@ function initUI() {
   if (!formUi["size"]) {
     formUi["size"] = "default";
   }
-  console.log(formUi);
 }
 
 /**
