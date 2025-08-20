@@ -482,6 +482,7 @@ import {scrollByDomId} from "@/utils/common";
 import { getAppPolicyList, qryEndorseList, delTmpPolicy, queryInsuredList, getInquiryPolicyList} from "@/api/query";
 import {encryptRouterParam} from "@/router";
 import SvgIcon from "@/components/SvgIcon/index.vue";
+import { distRequiredMap } from '../my-page/requiredDistMap';
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -2849,20 +2850,18 @@ const submitToUndrFn = async () => {
 	}
 
   // 040002 记名投保标志 选是  清单信息必须填  
-  const distRequiredMap = {
-    "040002": { flagKey: 'Tgt.cRegisteredLogo', distName: '雇员清单', cComponentTable: 'EmployeeDist', flagName: '记名投保标志' },
-    "041007": { flagKey: 'Tgt.cIsRegistered', distName: '人员清单', cComponentTable: 'PersonnelDist', flagName: '被监护人是否记名' },
-    "049027": { flagKey: 'Tgt.cIsinsuranceRegistered', distName: '清单信息', cComponentTable: 'EducatorDist', flagName: '是否记名投保' },
-    "049020": { flagKey: 'Tgt.cIsRegistered', distName: '被监护人清单信息', cComponentTable: 'WardDist', flagName: '被监护人是否记名' },
-    "045001": { flagKey: 'Tgt.cRegisteredLogo', distName: '工程项目地址清单', cComponentTable: 'ProjectDist', flagName: '记名投保标志' },
-    "042003": { flagKey: 'Tgt.cIsinsuranceRegistered', distName: '人员清单信息', cComponentTable: 'EducatorDist', flagName: '是否记名投保' },
-    "043010": { flagKey: 'Tgt.cIsinsuranceRegistered', distName: '人员清单信息', cComponentTable: 'EducatorDist', flagName: '是否记名投保' },
-    "080011": { flagKey: 'Tgt.cRegisteredInsurance', distName: '清单信息', cComponentTable: 'PersonnelDist', flagName: '记名投保' },
-    "059003": { flagKey: 'Tgt.cIsinsuranceRegistered', distName: '清单信息', cComponentTable: 'EmployeeDist', flagName: '是否记名投保' },
-  }
   const distItem = distRequiredMap[props.param.cProdNo];
   if(distItem && tgtValue[distItem.flagKey] === '1') {
-    const resDist: any = await selectDist({  cComponentTable: distItem.cComponentTable , isSummary: '1',cAppNo });
+    const selectParam = {
+      cComponentTable: distItem.cComponentTable,
+      isSummary: '1',
+    }
+    if(props.param?.pageName === "priceInquiry") {
+      selectParam['cInquiryNo'] = cInquiryNumber
+    } else {
+      selectParam['cAppNo'] = cAppNo
+    }
+    const resDist: any = await selectDist(selectParam);
     if(resDist['data']['total'] < 1){
       ElMessage.warning(`${distItem.flagName}选“是” “${distItem.distName}”未录入请确认！`);  
       return false;
@@ -4492,23 +4491,16 @@ function getEdrbaseValue(key:any) {
 
 function getOldProductResData() {
   // 043010 记名投保选“是”，人员清单导入未校验所有字段必填
-  if(opertaor.getDataAll()['tgt'] && opertaor.getDataAll()['tgt']['Tgt.cIsinsuranceRegistered'] === '1') {
+  const distItem = distRequiredMap[props.param.cProdNo];
+  const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue() || '';
+  if(distItem && tgtValue[distItem.flagKey] === '1') {
     const data = deepClone(oldProductResData.value);
-    data[0]['pageInfo'].forEach((item:any) => {
-      if(
-        item.pageCode === "EducatorDist043010" || 
-        item.pageCode === "DoctorDist049031" || 
-        item.pageCode === "EducatorDist042003" || 
-        item.pageCode === "EmployeeDist040007" || 
-        item.pageCode === "PersonnelDist040020" || 
-        item.pageCode === "PersonnelDist041001" || 
-        item.pageCode === "PersonnelDist049024"
-      ) {
-        item.pageSchema.fromSchema.forEach((item:any) => {
-          item.rules = [{type: 'required'}]
-        })
-      }
-    })
+    const dist = data[0]['pageInfo'].filter((item:any) => item.pageCode === distItem.distCode)[0]
+    if(dist && dist.pageSchema && dist.pageSchema.fromSchema) {
+      dist.pageSchema.fromSchema.forEach((item:any) => {
+        item.rules = [{type: 'required'}]
+      })
+    }
     return data;
   } else {
     return oldProductResData.value;
