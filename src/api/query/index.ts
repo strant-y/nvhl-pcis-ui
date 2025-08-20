@@ -336,3 +336,19 @@ export function queryEcargoRelevancePolicyDetails(queryParams: any): AxiosPromis
 export function queryTermRateLimit(queryParams: any): AxiosPromise<any> {
 	return post(`/policy/queryTermRateLimit`, queryParams);
 }
+
+/**
+* 获取变更列
+ * @param queryParams
+ */
+export function getCustomUserList(queryParams: any): AxiosPromise<any> {
+	return post(`/policy/getCustomUserList`, queryParams);
+}
+
+/**
+* 保存变更列
+ * @param queryParams
+ */
+export function CustomUserList(queryParams: any): AxiosPromise<any> {
+	return post(`/policy/CustomUserList`, queryParams);
+}

@@ -2235,7 +2235,8 @@ async function loadAfter() {
     createFreeButtonBase({
       label: "返回",
       func: () => {
-        history.back();
+        tagsViewStore.back();
+        // history.back();
       },
     }),
   

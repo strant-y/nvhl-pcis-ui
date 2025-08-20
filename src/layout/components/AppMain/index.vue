@@ -4,7 +4,6 @@
       <template #default="{ Component }">
         <transition
           enter-active-class="animate__animated animate__fadeIn"
-          mode="out-in"
           name="expand"
         >
           <keep-alive :max="8" :include="cachedViews">
@@ -24,9 +23,15 @@ const route = useRoute();
 const tagsViewStore = useTagsViewStore();
 const {
   visitedViews, // 所有页面
-  cachedViews // 缓存页面集合
+  cachedViews, // 缓存页面集合
+  selectedView // 当前选中的tag
 } = storeToRefs(tagsViewStore);
-const tagView = computedEager(() => visitedViews.value.find((f: TagView) => f.path === route.path));
+
+const tagView = computedEager(() => {
+  const view = visitedViews.value.find((f: TagView) => f.path === route.path)
+  selectedView.value = view;
+  return view;
+});
 </script>
 
 <style lang="scss" scoped>

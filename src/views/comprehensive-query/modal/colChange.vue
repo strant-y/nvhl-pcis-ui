@@ -26,6 +26,7 @@ import { yesOrNo, size, inputtype, typeMap, dateType } from "@/utils/utilKey";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { ref, defineProps, defineEmits, onMounted } from "vue";
 import { createFreeButtonBase } from "@/shared/button-config";
+import { CustomUserList } from "@/api/query";
 import {
   AppFreeEditConfig,
   AppFreeEditMethod,
@@ -38,37 +39,20 @@ import {
 } from "@/shared/app-table-config";
 
 const props = defineProps({
-  data: Object,
+  data: Array,  // 接收数组  原 data: Object,
   type: String,
 });
 const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
-import { v4 as uuidv4 } from "uuid";
-const departmentTree = defineAsyncComponent(
-  () => import("@/components/common/DepartmentTree.vue")
-);
-const jsonArrayEdit = defineAsyncComponent(
-  () => import("@/common/dzmodel/jsonArrayEdit.vue")
-);
 
-const showBtnConfig = ref(false);
 const dialogVisible = ref(true);
-const showView = ref(false);
 const dzmodal = useDzModal();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
-const freeLookRef = ref<AppFreeEditMethod | null>(null);
-const freeEditRefBtn = ref<AppFreeEditMethod | null>(null);
-const tableRef = ref<MyTableMethod | null>(null);
-const appTableShow = ref(false);
-
-const schemaMap = reactive<Record<string, any>>({
-  rtinputgroup: [],
-});
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    fromSchema: props.data as any [] || [],
+    fromSchema: props.data || [],
     showSuperior: true,
     superFromSchema: [],
   })
@@ -77,69 +61,54 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 onMounted(async () => {
   if (props.type === "edit" && props.data) {
     setTimeout(() => {
-      freeEditRef.value?.setFormValue(props.data);
+      freeEditRef.value?.setFormValue({
+        bsType: props.data[0].loadData
+          .filter((item: any) => item.checked)
+          .map((item: any) => item.value)
+      });
+      // 原 freeEditRef.value?.setFormValue(props.data);
     }, 50);
   }
 });
 
-// 绑定方法
-const method = {
-  func1: () => {
-    console.log(getRules);
-  },
-};
-
-// 绑定特殊验证器
-const exRules = {
-  byrtInput: (rule: any, value: any, callback: any) => {
-    const r = freeEditRef.value?.getFromValue();
-    if (r["name"]) {
-      callback();
-    } else {
-      callback("姓名");
-    }
-  },
-};
-
-/** 查询 */
+/** 保存 */
 function save() {
+  const formData = freeEditRef.value?.getFromValue();
+  console.log('formData.bsType', formData.bsType);
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
-      let s = freeEditRef.value?.getFromValue(); //获取表单数据
-      emits("ok", s["bsType"]);
-      dialogVisible.value = false;
-    } else {
-      ElMessage.error("请填写必填项");
+
+        const formData = freeEditRef.value?.getFromValue();
+        console.log('formData.bsType', formData.bsType);
+        emits("ok", { 
+            type: "ok", 
+            body: formData.bsType 
+        });
+        ElMessage.success("保存成功");
+        dialogVisible.value = false;
+
+        // const param = {
+        //     content: props.data,
+        //     type: '',
+        //     cCrtCde: JSON.parse(sessionStorage.getItem("user")).opCde,
+        // };
+        // console.log('保存时传参', param);
+        // CustomUserList(param)
+        // .then((res) => {
+        // const { code, data, msg } = res;
+        //     if (200 === code) {
+           
+        //     } else {
+        //         ElMessage.error(msg);
+        //     }
+        // })
+        // .finally(() => {});
+
     }
   });
 }
-
-/* 获取全量表单数据 */
-function getFrom() {
-  let s = freeEditRef.value?.getFromValue(); //获取表单数据
-  if (showBtnConfig.value) {
-    s["bsType"] = "1";
-  } else {
-    s["showExBtn"] = "0";
-  }
-  if (s) {
-    const param = Object.assign(s);
-    if (props.type === "edit") {
-      param["cPkId"] = props.data.cPkId;
-    }
-    if (freeEditRefBtn.value) {
-      let btnjson = freeEditRefBtn.value?.getFromValue();
-      btnjson.initid = uuidv4().replace(/-/g, "");
-      param["btn"] = btnjson;
-    }
-    if (tableRef.value) {
-      const tabjson = tableRef.value?.getFromValue();
-      let selectList = tabjson.filter((item: any) => item.isChecked === "1");
-      param["tabjson"] = selectList;
-    }
-    return param;
-  }
-}
 </script>
 
-<style scoped></style>
+
+     
+        
