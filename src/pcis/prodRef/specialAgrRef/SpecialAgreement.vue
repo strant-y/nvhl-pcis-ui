@@ -92,7 +92,6 @@ const tableconfig = reactive<AppTableConfig>(
            return row.cIfEdit !== '1';
         },
         tableClick: (row) => {
-            debugger
           if(originalData.value.length==0){
               originalData.value  =    deepClone(formData.value)
           }
@@ -111,7 +110,6 @@ const tableconfig = reactive<AppTableConfig>(
           if(row.editList && row.editList.length>0){
             param['editList'] = row.editList
           }
-   debugger
           dzmodal.open(specEdit, { type: "view", data: param,
           callback: (res: any) => {
               if (res.type === "ok") {
@@ -141,7 +139,6 @@ const tableconfig = reactive<AppTableConfig>(
         size: "default",
         icon: "Delete",
         tableClick: (row) => {
-
            ElMessageBox.confirm(
             "是否确认删除数据？",
             "提示",
@@ -154,7 +151,7 @@ const tableconfig = reactive<AppTableConfig>(
               const list = formData.value;
               const i = list.findIndex((item) => item.cSpecNo === row.cSpecNo);
               rttableFrom.value.delRow(row._dataId);
-              // if (i !== -1) list.splice(i, 1);
+  
               formData.value.forEach((item, index) => {
                 item.index = index + 1;
               });
@@ -295,8 +292,7 @@ const refreshData = () => {
     if (res.data?.result) {
             let len = 0;
             let sel : any[] = [];
-
-             if (parparam.pageType  == "app"   ) {
+             if (parparam.pageType  == "app") {
                 res.data.result.forEach((item: any,index:number) => {
                   if(item["cIfMust"] == "1"){
                       item.index = len + 1;
@@ -309,10 +305,7 @@ const refreshData = () => {
               }else{
                  originalData.value =    deepClone(res.data.result)
               }
-
-            console.log('这是数据---1212',originalData.value)
-            console.log('这是数据---1213',formData.value)
-
+            
     }
   });
 };
@@ -329,13 +322,34 @@ onMounted(async () => {
   formData.value.forEach((item, index) => {
     item.index = index + 1;
   });
-   refreshData();
+  refreshData();
 });
 // 组件卸载时移除事件监听（避免内存泄漏）
 onUnmounted(() => {
   eventBus.off('add-special', addData)
 })
 
+// 复制数据处理
+const mergeArrays = (oldArr, newArr, key, fields)=>{
+      // 1. 以新数组为基准构建新数组
+      return newArr.map(newItem => {
+        const newKey = newItem[key];
+        const oldItem = oldArr.find(item => item[key] == newKey);
+        if (oldItem) {
+          // 2. 左右都存在：左边数据为基础，用右边指定字段覆盖
+          const mergedItem = { ...oldItem };
+          fields.forEach(field => {
+            if (newItem.hasOwnProperty(field)) {
+              mergedItem[field] = newItem[field];
+            }
+          });
+          return mergedItem;
+        } else {
+          // 3. 右边独有：直接返回右边项
+          return { ...newItem };
+        }
+      });
+  }
 
 // 绑定方法
 const method = {
@@ -354,14 +368,17 @@ const method = {
       {
         getSelected(selectdata: any) {
             let len = formData.value.length;
-            let sel : any[] = [];
-            selectdata.forEach((item: any,index:number) => {
+            // let sel : any[] = [];
+            let sessionSpecialAgreement = JSON.parse(sessionStorage.getItem("getAppPolicyData"))?.['SpecialAgreement'] || [];
+            const result = mergeArrays(sessionSpecialAgreement, selectdata, 'cSpecialCode', ['cSpecialContent']);
+            result.forEach((item: any,index:number) => {
               item.index = index + 1;
-              sel.push(item);
+              // sel.push(item);
               len++;
             });
-            originalData.value =    deepClone(sel)
-            formData.value = sel
+          
+            originalData.value =deepClone(result)
+            formData.value = result
           },
       },
       { title: "添加特约", width: 85 }
@@ -423,23 +440,7 @@ const moveDown = (index) => {
     });
   }, 0);
 };
-/** 查询 */
-function handleQuery(flag?: boolean) {
-  // const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
-  // const param = Object.assign(r);
-  // getBasicKindList(param)
-  //   .then((res) => {
-  //     const { code, data, msg } = res;
-  //     if (200 === code) {
-  //       formData.value = [];
-  //       formData.value = data.result;
-  //       pageresult.total = data.total;
-  //     } else {
-  //       ElMessage.error(msg);
-  //     }
-  //   })
-  //   .finally(() => {});
-}
+
 function getFromValue() {
   return formData.value.map((item) => {
     const prefixedItem: { [key: string]: any } = {};
@@ -451,9 +452,7 @@ function getFromValue() {
     return prefixedItem;
   });
 }
-// function getFromValue() {
-//   return formData.value;
-// }
+
 function setFormValue(value: any) {
   if(value && value.length>0){
     let ind = 1;

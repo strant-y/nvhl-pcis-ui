@@ -470,9 +470,9 @@ const method = {
         rules: [getRules("required", {})],
       });
       //注册地址
-      setFormItem("Insured.cRegisteredcapDre", {
-        rules: [getRules("required", {})],
-      });
+      // setFormItem("Insured.cRegisteredcapDre", {
+      //   rules: [getRules("required", {})],
+      // });
       setFormItem("Insured.RegisterProp", {
        rules: [getRules("required", {})],
       });
@@ -594,7 +594,7 @@ const method = {
       setFormItem("Insured.cWorkDpt", { rules: null });
 
       //注册地址
-      setFormItem("Insured.cRegisteredcapDre", { rules: null });
+      // setFormItem("Insured.cRegisteredcapDre", { rules: null });
       setFormItem("Insured.RegisterProp", {
        rules: null,
       });
@@ -925,7 +925,6 @@ const method = {
 
   //证件类型change
   InsuredCCertfCls: (val: any) => {
-    console.log('证件类型---',val)
     checkUser();
         // 清除报错信息
     clearValidate('Insured.cCertfCde')  
@@ -1165,7 +1164,6 @@ const method = {
   },
     // 单位性质
   cWorkDptChange:(val:any)=>{
-      console.log('单位性质',val)
       let cClntMrk = getValue('Insured.cClntMrk');  // 投保人性质 
         //实名认证方式
       if(cWorkDptList.includes(val) && cClntMrk =='0'){
@@ -1328,7 +1326,6 @@ function handleFileChange(event: Event) {
               const value = result.find((item: any) => item.key === key).value;
               cardInfo[key] = value;
             });
-            console.log('身份证’，',cardInfo )
             if (cardInfo["id_number"])
               setValue("Insured.cCertfCde", cardInfo["id_number"]);
             

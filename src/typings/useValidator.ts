@@ -211,7 +211,6 @@ export const useValidator = () => {
         let S, M;
         let ereg;
         let idcard_array = value.split('');
-        console.log("idcard_array",idcard_array);
         // 地区检验
         if (AREA[parseInt(value.substr(0, 2), 10)] == null) {
           callback(new Error(ERRORS[4]));

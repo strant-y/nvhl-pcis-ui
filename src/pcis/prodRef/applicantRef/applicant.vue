@@ -392,7 +392,6 @@ const method = {
   },
 
   cardTypeChange: (val) => {
-    console.log('证件2',val)
        const tabref = opertaor.getTableRefs();
     const applicantValue = tabref["applicant"]?.getFromValue();
     checkUser();
@@ -565,9 +564,9 @@ const method = {
         rules: [getRules("required", {})],
       });
       //注册地址
-      setFormItem("Applicant.cRegisteredcapDre", {
-        rules: [getRules("required", {})],
-      });
+      // setFormItem("Applicant.cRegisteredcapDre", {
+      //   rules: [getRules("required", {})],
+      // });
 
        // 注册地址
       setFormItem("Applicant.RegisterProp", {
@@ -620,11 +619,6 @@ const method = {
         rules: [],
       });
 
-
-
-    
-      console.log('getFormconfig',getFormconfig())
-
            codeListStore
         .queryCodeList({
           codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
@@ -665,7 +659,7 @@ const method = {
         rules: null,
       });
       //注册地址
-      setFormItem("Applicant.cRegisteredcapDre", { rules: null });
+      // setFormItem("Applicant.cRegisteredcapDre", { rules: null });
       setFormItem("Applicant.RegisterProp", {
        rules: null,
       });
@@ -678,9 +672,6 @@ const method = {
         rules: null,
         disabled: true,
       });
-
-      console.log('绿色----')
-
          // 是否绿色详情
       setFormItem("Applicant.cGreenIndustryList", {
         rules: null,

@@ -189,7 +189,7 @@ export const dataOpertaor = (pageKey?: string) => {
                                                     f.btnItems.disabled = false;
                                                 }
                                                 else{
-                                                    console.log(f);
+                                                    // console.log(f);
                                                     f.disabled = false;
                                                 }
                                             }
