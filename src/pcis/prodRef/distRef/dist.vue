@@ -249,6 +249,7 @@ onMounted(async () => {
   }
   tableconfig.value.showEdit = true;
   tableconfig.value.showSelection = true;
+  tableconfig.value.fixed = true;
   tableconfig.value.showExpand = formconfig1.value.showExpand;
   formconfig1.value.fromSchema.forEach((e: any)=>{  // 隐藏不需要显示在表格内的数据
     if(e.cShowLocation === '0'){
