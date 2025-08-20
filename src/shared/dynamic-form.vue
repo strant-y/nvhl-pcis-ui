@@ -312,6 +312,21 @@ import { FormInstance } from "element-plus";
 import { AppGridEditMethod } from "./app-grid-edit-config";
 const maxLabelWidth = ref(150); // 默认值
 
+
+
+const updateLabelWidth = () => {
+  const screenWidth = window.innerWidth;
+  if (screenWidth < 768) {
+    // maxLabelWidth.value = "80px"; // 移动端窄屏
+  } else if(screenWidth > 1367 && screenWidth <= 1600) {  /*主流笔记本	1367px - 1600px*/
+     maxLabelWidth.value = "150"; // PC 端宽屏
+  }else if(screenWidth > 1601 && screenWidth <= 1920) { /*大屏笔记本/台式机*/
+    maxLabelWidth.value = "170"; // PC 端宽屏
+  }else if(screenWidth > 1921 && screenWidth <= 3840) {
+    maxLabelWidth.value = "200"; // PC 端宽屏
+  }
+};
+
 defineOptions({
   name: "DynamicForms",
   inheritAttrs: false,
@@ -658,7 +673,15 @@ watch(
   }
 );
 
-onMounted(() => {});
+onMounted(() => {
+  updateLabelWidth();
+  window.addEventListener("resize", updateLabelWidth);
+
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", updateLabelWidth);
+});
 
 defineExpose({
   getFromValue,

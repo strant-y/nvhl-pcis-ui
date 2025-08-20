@@ -2783,14 +2783,17 @@ const submitToUndrFn = async () => {
  /**
    * 联共保判断
    */
-  const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk')
-  if ('1' === CiMrk  || '5' === CiMrk || '2' === CiMrk) {
-      const validCi = JointInsuranceCheck();
-      // 如果联共保校验不通过，则不继续执行后续逻辑
-       if (!validCi) {
-        return; // 校验失败则中断后续流程
-       }
+  if(props.param.pageName !== "priceInquiry"){
+    const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk')
+    if ('1' === CiMrk  || '5' === CiMrk || '2' === CiMrk) {
+        const validCi = JointInsuranceCheck();
+        // 如果联共保校验不通过，则不继续执行后续逻辑
+        if (!validCi) {
+          return; // 校验失败则中断后续流程
+        }
+    }
   }
+  
   // 新增校验：比较标的中的学生总数与条款中各条目的学生数总和是否一致
   const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue();
   const cvrgList = opertaor.getTableRefByKey("cvrg")?.getFromValue();
@@ -3011,8 +3014,8 @@ const submitToUndrFn = async () => {
       //校验联共保信息
       const plyBasedata = opertaor.getTableRefByKey("plyBase").getFromValue();
 
-      
-      if(plyBasedata["Base.cCiMrk"] !== "0") {
+      debugger
+      if(plyBasedata["Base.cCiMrk"] !== "0" && props.param.pageName !== "priceInquiry") {
         const ciValue = opertaor.getTableRefByKey("ci")?.getFromValue() || '';
         const isCiValid = validateCiInfo();
         if (!isCiValid) {
