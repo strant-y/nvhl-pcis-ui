@@ -469,7 +469,7 @@ const method = {
       setFormItem("Insured.cParticiinsocTyp", {
         rules: [getRules("required", {})],
       });
-      //注册地址
+      // 注册地址
       // setFormItem("Insured.cRegisteredcapDre", {
       //   rules: [getRules("required", {})],
       // });
@@ -594,7 +594,7 @@ const method = {
       setFormItem("Insured.cWorkDpt", { rules: null });
 
       //注册地址
-      // setFormItem("Insured.cRegisteredcapDre", { rules: null });
+      setFormItem("Insured.cRegisteredcapDre", { rules: null });
       setFormItem("Insured.RegisterProp", {
        rules: null,
       });
