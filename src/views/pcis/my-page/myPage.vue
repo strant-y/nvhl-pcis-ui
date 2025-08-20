@@ -3785,6 +3785,10 @@ const getSurrenderPrecisFun = () => {
  * 批改单申请核保(退保、注销)
  */
 const submitEdrToUndrSurrender = async () => {
+  if(!edrbase.value?.getFromValue()["EdrBase.cAppNo"]) {
+    ElMessage.error("请先保存申请单")
+    return
+  }
     const isAcctValid = await validateAcctinfo();
     // 账户信息校验
   if (!isAcctValid) {
