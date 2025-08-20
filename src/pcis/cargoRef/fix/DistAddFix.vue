@@ -300,7 +300,7 @@ const funcreset = () => {
     }
   }
   if (!initFlag.value) {
-    setFormItem("ECargoInsuredDist.cAppNme", {
+    setFormItem("ECargoInsuredDist.cInsuredNme", {
       disabled: false,
     });
     setFormItem("ECargoInsuredDist.cClntMrk", {
@@ -312,6 +312,15 @@ const funcreset = () => {
     setFormItem("ECargoInsuredDist.cCertfCde", {
       disabled: false,
     });
+    setFormItem('ECargoInsuredDist.tCertfBgnDate',{
+      disabled:false
+    })
+    setFormItem('ECargoInsuredDist.tCertfEndDate',{
+      disabled:false
+    })
+    setFormItem('ECargoInsuredDist.cLongendTyp',{
+      disabled:false
+    })
   }
   setFormValue(ECargoInsuredDistValue);
 }
