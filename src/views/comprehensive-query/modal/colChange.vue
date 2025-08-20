@@ -39,7 +39,7 @@ import {
 } from "@/shared/app-table-config";
 
 const props = defineProps({
-  data: Array,  // 接收数组  原 data: Object,
+  data: Array,  // 接收数组
   type: String,
 });
 const { getRules } = useValidator();
@@ -66,7 +66,6 @@ onMounted(async () => {
           .filter((item: any) => item.checked)
           .map((item: any) => item.value)
       });
-      // 原 freeEditRef.value?.setFormValue(props.data);
     }, 50);
   }
 });
@@ -74,10 +73,8 @@ onMounted(async () => {
 /** 保存 */
 function save() {
   const formData = freeEditRef.value?.getFromValue();
-  console.log('formData.bsType', formData.bsType);
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
-
         const formData = freeEditRef.value?.getFromValue();
         console.log('formData.bsType', formData.bsType);
         emits("ok", { 
@@ -86,24 +83,6 @@ function save() {
         });
         ElMessage.success("保存成功");
         dialogVisible.value = false;
-
-        // const param = {
-        //     content: props.data,
-        //     type: '',
-        //     cCrtCde: JSON.parse(sessionStorage.getItem("user")).opCde,
-        // };
-        // console.log('保存时传参', param);
-        // CustomUserList(param)
-        // .then((res) => {
-        // const { code, data, msg } = res;
-        //     if (200 === code) {
-           
-        //     } else {
-        //         ElMessage.error(msg);
-        //     }
-        // })
-        // .finally(() => {});
-
     }
   });
 }
