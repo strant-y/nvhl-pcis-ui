@@ -3836,6 +3836,14 @@ const submitEdrToUndrSurrender = async () => {
     console.log("申请核保(退保、注销)", res);
     if (res["code"] == "200") {
       ElMessage.success(res.msg);
+      if(res['cDecision'] === '1' || res['cDecision'] === '2'){
+        tagsViewStore.delView({"name": "my-page",
+          "title": "申请单录入",
+          "path": "/pcisapp/myPage",
+          "fullPath": "/pcisapp/myPage"}).then((res: any) => {
+          router.replace({ path: "/dashboard" });
+        });
+      }
     } else {
       ElMessage.error(res.msg);
     }
@@ -3893,7 +3901,7 @@ const saveEdrPlyInfo = async () => {
     }
     opertaor.setDataAll(ops);
     const EdrBaseData = edrInfo["res"]["composition"]["EdrBase"][0];
-    EdrBaseData["EdrBase.cEdrRsnDetail"] = EdrBaseData["EdrBase.cEdrRsnDetail"].split(",")
+    EdrBaseData["EdrBase.cEdrRsnDetail"] = EdrBaseData["EdrBase.cEdrRsnDetail"] ? EdrBaseData["EdrBase.cEdrRsnDetail"].split(",") : ""
     // res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
     //   res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"].split(
     //     ","
