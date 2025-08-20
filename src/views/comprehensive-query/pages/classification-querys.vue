@@ -84,6 +84,8 @@ let cTermNoList = ref<any>([]);  // 条款数据
 let cTermNo = '';    // 条款编码
 
 let ESOriginalData = ref<any>([]);  // ES查询原始数据，转化成驼峰为适配操作列
+let userColumnConfig = ref<any[]>([]); // 保存用户自定义列配置
+let skipSetColumns = ref(false); // 新增标志位
 
 const props = defineProps({
   refreshData: {
@@ -257,8 +259,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         //               .open(colChange, { type: "edit", data: modalForm })
         //               .then((res) => {
         //                   if (res.type === "ok") {
-        //                     console.log('res',res);
-        //                     console.log('res.body',res.body);
         //                       // 处理用户选择的列
         //                       const propArr = [];
         //                       tableObj.notWaitObj.fromSchema.forEach((s: any) => {
@@ -323,99 +323,83 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         //               });
         //       },
         //   }),
-
-          // 变更列按钮点击事件
           createFreeButtonBase({
             label: "变更列",
             func: () => {
-                // debugger
-                const freeEditRefs = freeEditRef.value;
-                const formData = freeEditRefs.getFromValue();
-                const currentAppType = formData.cAppTyp; // 获取当前申请单类型
-                const isEsSearch = false; // 变更列只针对普通查询列
-                
-                // 根据申请单类型决定使用哪套列配置
-                let currentColumns;
-                if (currentAppType === "I") {
-                    // 询价 - 使用普通查询列配置
-                    currentColumns = normalQueryColumnsI;
+                const formData = freeEditRef.value.getFromValue();
+                const currentAppType = formData.cAppTyp || "A";
+
+                let modalData: any[] = [];
+
+                if (userColumnConfig.value.length) {
+                  modalData = userColumnConfig.value;
                 } else {
-                    // 投保/批改 - 使用普通查询列配置
-                    currentColumns = normalQueryColumnsAE;
+                  // 构造默认结构
+                  let allColumns: any[] = [];
+                  if (currentAppType === "I") {
+                    allColumns = normalQueryColumnsI;
+                  } else {
+                    allColumns = normalQueryColumnsAE;
+                  }
+
+                  // 转换列配置为变更列弹窗需要的格式
+                  modalData = [{
+                    prop: "bsType",
+                    inputtype: 'rtcheckboxgroup',
+                    title: "",
+                    itemWidth: 3,
+                    loadData: allColumns.map(col => ({
+                      label: col.title,
+                      value: col.prop,
+                      checked: tableObj.notWaitObj.fromSchema.some((c: any) => c.prop === col.prop)
+                    }))
+                  }];
                 }
-               
-                // 转换列配置为变更列弹窗需要的格式
-                const modalFormData = [
-                    {
+
+                dzmodal.open(colChange, { type: "edit", data: modalData })
+                .then(async (res) => {
+                    if (res.type === "ok") {
+                    const selectedProps = res.body.body; // 用户选中的列
+                    
+                    const newContent = [{
                         prop: "bsType",
-                        inputtype: "rtcheckboxgroup",
-                        title: "",
+                        inputtype: 'rtcheckboxgroup',
                         itemWidth: 3,
-                        loadData: currentColumns.map(col => ({
-                            label: col.title,
-                            value: col.prop,
-                            checked: tableObj.notWaitObj.fromSchema.some((c: any) => c.prop === col.prop)
+                        loadData: modalData[0].loadData.map((item: any) => ({
+                        ...item,
+                        checked: selectedProps.includes(item.value)
                         }))
-                    }
-                ];
-                console.log('modalFormData',modalFormData);
-                
-                dzmodal
-                    .open(colChange, { type: "edit", data: modalFormData  })
-                    .then((res) => {
-                        console.log('res',res);
-                        if (res.type === "ok") {
-                            const selectedProps = res.body.body; // 用户勾选的列 prop 数组
-                            console.log('selectedProps',selectedProps);
+                    }];
 
-                            // 根据申请单类型决定更新哪套列配置
-                            let newColumns;
-                            if (currentAppType === "I") { 
-                                // 询价 - 更新普通查询列配置
-                                newColumns = normalQueryColumnsI.filter(col => 
-                                selectedProps.includes(col.prop));
-                            } else {
-                                // 投保/批改 - 更新普通查询列配置
-                                newColumns = normalQueryColumnsAE.filter(col => 
-                                selectedProps.includes(col.prop));
-                            }
-                            console.log('newColumns', newColumns);
+                    // userColumnConfig.value = newContent;
+                    // applyUserColumns(newContent);
+                    // ElMessage.success("列配置已更新");
 
-                            // // 确保policyInfo列始终存在（如果是投保/批改）
-                            // if (currentAppType !== "I" && !selectedColumns.includes("policyInfo")) {
-                            //     const policyInfoCol = normalQueryColumnsAE.find(col => col.prop === "policyInfo");
-                            //     if (policyInfoCol) {
-                            //         newColumns.unshift(policyInfoCol);
-                            //     }
-                            // }
-                            
-                            // // 确保cInquiryNo列始终存在（如果是询价）
-                            // if (currentAppType === "I" && !selectedColumns.includes("cInquiryNo")) {
-                            //     const inquiryNoCol = normalQueryColumnsI.find(col => col.prop === "cInquiryNo");
-                            //     if (inquiryNoCol) {
-                            //         newColumns.unshift(inquiryNoCol);
-                            //     }
-                            // }
-                            
-                            // 更新表格列配置
-                            tableObj.notWaitObj.fromSchema = [...newColumns];
-                            
-                            // 重新设置表格配置以触发响应式更新
-                            Object.assign(tableconfig, {
-                                ...tableObj.notWaitObj,
-                                fromSchema: newColumns
-                            });
-                            
-                            // 保存当前选择的列到addrowArr
-                            addrowArr = [...selectedProps];
-                            
-                            // 重新查询数据
-                            handleQuery(true);
+                    // 保存到接口
+                    const saveParam = {
+                        content: newContent,
+                        type: currentAppType,
+                        cCrtCde: JSON.parse(sessionStorage.getItem("user")).opCde,
+                    };
 
+                    console.log('saveParam',saveParam);
+
+                    try {
+                        const saveRes = await CustomUserList(saveParam);
+                        if (saveRes.code === 200) {
+                          userColumnConfig.value = newContent;
+                          applyUserColumns(newContent);
+                          ElMessage.success("列配置已更新");
+                        } else {
+                          ElMessage.error(saveRes.msg || "保存失败");
                         }
-                    });
-            },
-          }),
+                    } catch (error) {
+                          ElMessage.error("保存失败");
+                    }
+                    }
+                });
+            }
+          })
       ],
       fromSchema: [
           {
@@ -933,7 +917,7 @@ const modalForm = [
             { label: "批单号", value: "cEdrNo" },
             { label: "批改序号", value: "c" },
             { label: "承保机构", value: "cDptCnm" },
-            // { label: "二级分公司", value: "cSecondDptCnm" },
+            { label: "二级分公司", value: "cSecondDptCnm" },
             { label: "产品", value: "cProdNmeCn" },
             { label: "条款", value: "cTermNme" },
             { label: "核保人", value: "cUdrNme" },
@@ -954,12 +938,12 @@ const tableCol = ref<Array<any>>([
     { title: "批单号", prop: "cEdrNo", inputtype: "rtinput", minWidth: 180 },
     { title: "批改序号", prop: "c", inputtype: "rtinput", minWidth: 180 },
     { title: "机构", prop: "cDptCnm", inputtype: "rtinput", minWidth: 180 },
-    // {
-    //     title: "二级分公司",
-    //     prop: "cSecondDptCnm",
-    //     inputtype: "rtinput",
-    //     minWidth: 180,
-    // },
+    {
+        title: "二级分公司",
+        prop: "cSecondDptCnm",
+        inputtype: "rtinput",
+        minWidth: 180,
+    },
     { title: "产品", prop: "cProdNmeCn", inputtype: "rtinput", minWidth: 180 },
     { title: "条款", prop: "cTermNme", inputtype: "rtinput", minWidth: 180 },
     { title: "核保人", prop: "cUdrNme", inputtype: "rtinput", minWidth: 180 },
@@ -1139,7 +1123,7 @@ const normalQueryColumnsAE = [
         prop: "cDptCnm",
         inputtype: "rtinput",
         title: "承保机构",
-        maxWidth: 180,
+        maxWidth: 280,
     },
     {
         prop: "cAppNme",
@@ -1147,12 +1131,12 @@ const normalQueryColumnsAE = [
         title: "投保人名称",
         minWidth: 180,
     },
-    // {
-    //     prop: "cSecondDptCnm",
-    //     inputtype: "rtinput",
-    //     title: "二级分公司",
-    //     minWidth: 150,
-    // },
+    {
+        prop: "cSecondDptCnm",
+        inputtype: "rtinput",
+        title: "二级分公司",
+        minWidth: 150,
+    },
     {
         prop: "cProdNmeCn",
         inputtype: "rtinput",
@@ -1172,7 +1156,7 @@ const normalQueryColumnsAE = [
         minWidth: 180,
     },
     {
-        prop: "cTermNo",
+        prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款",
         minWidth: 180,
@@ -1343,12 +1327,12 @@ const normalQueryColumnsI = [
         title: "机构",
         minWidth: 180,
     },
-    // {
-    //     prop: "cSecondDptCnm",
-    //     inputtype: "rtinput",
-    //     title: "二级分公司",
-    //     minWidth: 180,
-    // },
+    {
+        prop: "cSecondDptCnm",
+        inputtype: "rtinput",
+        title: "二级分公司",
+        minWidth: 180,
+    },
     {
         prop: "cProdNmeCn",
         inputtype: "rtinput",
@@ -1356,7 +1340,7 @@ const normalQueryColumnsI = [
         minWidth: 180,
     },
     {
-        prop: "cTermNo",
+        prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款",
         minWidth: 180,
@@ -1598,8 +1582,6 @@ let tableconfig = reactive<AppTableConfig>(
 tableconfig.fixed= true;
 
 onMounted(async () => {
-    // 初始设置为普通查询列
-    setTableColumns(false);
     formconfig1.fromSchema?.forEach((item) => {
         if (
             // item.prop === "tIssueTm"
@@ -1625,6 +1607,7 @@ onMounted(async () => {
         dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
     ]);
+    // 优先加载用户配置
     await initCustomUserList();
 });
 
@@ -1650,9 +1633,7 @@ const exRules = {
 function setTableColumns(isEsSearch: boolean) {
   const freeEditRefs = freeEditRef.value;
   const s = freeEditRefs.getFromValue(); //获取表单数据
-  console.log('s.cAppTyp', s.cAppTyp);
   let newColumns;
-  
   if (s.cAppTyp === "I") {
     // 询价
     newColumns = isEsSearch ? esSearchColumnsI : normalQueryColumnsI;
@@ -1672,11 +1653,16 @@ function setTableColumns(isEsSearch: boolean) {
 
 /** 查询 */
 function handleQuery(flag?: boolean) {
+  if (skipSetColumns.value) {
+    // 变更列后，不需要设置原始列
+    skipSetColumns.value = false; // 重置标志
+  } else {
+    // 只有在未点击变更列之前，设置原始列
+    setTableColumns(false); 
+  }
   const freeEditRefs = freeEditRef.value;
-  const s = freeEditRefs.getFromValue(); //获取表单数据
-  console.log('s.cAppTyp', s.cAppTyp);
-  
-  if (s.cAppTyp === "I") {
+  const s = freeEditRefs.getFromValue();
+  if (s.cAppTyp === "I") { // 询价
     handleInquiryQuery(flag);
   } else {
     handleNormalQuery(flag);
@@ -1685,9 +1671,6 @@ function handleQuery(flag?: boolean) {
 
 // 询价
 function handleInquiryQuery(flag?: boolean) {
-    // 设置查询的列配置
-    setTableColumns(false);
-
     const tableRefs = tableRef.value;
     const freeEditRefs = freeEditRef.value;
     const r = tableRefs.getPartnerPage(flag); //获取分页数据
@@ -1762,17 +1745,12 @@ function handleInquiryQuery(flag?: boolean) {
 }
 // 投保，批改
 function handleNormalQuery(flag?: boolean) {
-    // 设置查询的列配置
-    // setTableColumns(false);
-
     const tableRefs = tableRef.value;
     const freeEditRefs = freeEditRef.value;
     const r = tableRefs.getPartnerPage(flag); //获取分页数据
     const s = freeEditRefs.getFromValue(); //获取表单数据
     // 清空询价日期参数
     s.tInquiryTm = null;
-
-    console.log('s',s);
     if (s.cLoadSub == null) {
         s.cLoadSub = "1";
     }
@@ -2207,24 +2185,59 @@ const copyText = (text: any) => {
 };
 
 // 获取变更列初始化数据
-function initCustomUserList(){
+async function initCustomUserList(){
     const formData = freeEditRef.value?.getFromValue();
-    const currentAppType = formData.cAppTyp; // 获取当前申请单类型
+    const currentAppType = formData.cAppTyp || 'A'; // 获取当前申请单类型  默认投保
 
     let param = {
         type: currentAppType,
         cCrtCde: JSON.parse(sessionStorage.getItem("user")).opCde
     };
-    getCustomUserList(param)
-      .then((res) => {
-        const { code, data, msg } = res;
-        if (200 === code) {
-            console.log('变更列初始化数据', res);
+    try {
+        const res = await getCustomUserList(param);
+        if (res.code === 200 && res.data?.content[0].loadData.length) {
+          userColumnConfig.value = res.data.content[0].loadData;
+          applyUserColumns(userColumnConfig.value);
         } else {
-          ElMessage.error(msg);
+          // 使用默认列
+          setTableColumns(false);
         }
-      })
-      .finally(() => {});
+    } catch (error) {
+          ElMessage.error("获取用户列配置失败");
+          setTableColumns(false);
+    }
+}
+
+function applyUserColumns(content: any[]) {
+  const selectedProps = content
+    .filter((item: any) => item.checked)
+    .map((item: any) => item.value);
+
+  const formData = freeEditRef.value?.getFromValue();
+  const currentAppType = formData.cAppTyp || "A";
+
+  let allColumns: any[] = [];
+  if (currentAppType === "I") {
+    allColumns = normalQueryColumnsI;
+  } else {
+    allColumns = normalQueryColumnsAE;
+  }
+
+  const filteredColumns = allColumns.filter(col =>
+    selectedProps.includes(col.prop)
+  );
+
+  console.log('filteredColumns', filteredColumns);
+
+  tableObj.notWaitObj.fromSchema = filteredColumns;
+  Object.assign(tableconfig, {
+    ...tableObj.notWaitObj,
+    fromSchema: filteredColumns
+  });
+
+  // 查询
+  skipSetColumns.value = true;
+  handleQuery(true);
 }
 
 function setValue(key: string, value: any) {
