@@ -72,28 +72,28 @@ const props = defineProps({
     type: String
   }
 });
-watch(
-    () => opertaor.getTableRefs()['tgt']?.getFromValue()?.['Tgt.cIsinsuranceRegistered'],
-    (n, o) => {
+// watch(
+//     () => opertaor.getTableRefs()['tgt']?.getFromValue()?.['Tgt.cIsinsuranceRegistered'],
+//     (n, o) => {
  
-        if (n) {
-          // 学生岗位 Dist.cJobType
-            if(params.cProdNo === '043010'){
-                  formconfig11.value.fromSchema?.forEach(item=>{
-                          if(n == 1 && item.prop !=='Dist.nSeqNo'){
-                            item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
-                          }else if(item.prop !=='Dist.nSeqNo' && item.prop !=='Dist.cJobType') {
-                            item['rules'] =[];
-                          }
-                  })
-            }
-        }
-    },
-    {
-        deep: true,
-        immediate: true
-    }
-)
+//         if (n) {
+//           // 学生岗位 Dist.cJobType
+//             if(params.cProdNo === '043010'){
+//                   formconfig11.value.fromSchema?.forEach(item=>{
+//                           if(n == 1 && item.prop !=='Dist.nSeqNo'){
+//                             item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+//                           }else if(item.prop !=='Dist.nSeqNo' && item.prop !=='Dist.cJobType') {
+//                             item['rules'] =[];
+//                           }
+//                   })
+//             }
+//         }
+//     },
+//     {
+//         deep: true,
+//         immediate: true
+//     }
+// )
 const cardRef = ref<MyCardMethod | null>(null);
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -705,7 +705,6 @@ const method = {
       ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
       return;
     }
-    getFatherPageOldProductResData();
 		const s = cardRef.value?.getFromValue(); // 查询参数
 		// 经营地址只选择省市区不输入详细地址获取表单值会带有undefined，这里处理一下
 		for (let k in s) {
@@ -713,7 +712,7 @@ const method = {
 				s[k] = s[k].replace('undefined', '')
 			}
 		}
-    let paramitem  = Object.assign({...oldPageSchema.value}, {
+    let paramitem  = Object.assign({...getFatherPageOldProductResData()}, {
       cComponentTable: cComponentTableValue,
     },
 		{ dist: s });
@@ -774,7 +773,6 @@ const method = {
       ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
       return;
     }
-    getFatherPageOldProductResData();
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.xlsx, .xls, .xlsm'; // 支持的文件类型
@@ -793,7 +791,7 @@ const method = {
 
           // 构建参数并请求接口
           const params = {
-            ...oldPageSchema.value,
+            ...getFatherPageOldProductResData(),
             file: base64String, // ✅ 正确传入
             cComponentTable: cComponentTableValue,
           };
@@ -845,7 +843,6 @@ const method = {
       ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
       return;
     }
-    getFatherPageOldProductResData();
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.xlsx, .xls, .xlsm'; // 支持的文件类型
@@ -864,7 +861,7 @@ const method = {
 
           // 构建参数并请求接口
           const params = {
-						...oldPageSchema.value,
+						...getFatherPageOldProductResData(),
             file: base64String, // ✅ 正确传入
             cComponentTable: cComponentTableValue,
             cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
@@ -901,9 +898,8 @@ const method = {
   },
   //全量模板下载-模板下载
   downloadTemp: () => {
-    getFatherPageOldProductResData();
     const param = {
-      ...oldPageSchema.value,
+      ...getFatherPageOldProductResData(),
     }
     if(route.params.param?.pageName === "priceInquiry") {
       param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
@@ -930,9 +926,8 @@ const method = {
   },
   // 增量模板下载
   downloadIncrement: () => {
-    getFatherPageOldProductResData();
     const param = {
-      ...oldPageSchema.value,
+      ...getFatherPageOldProductResData(),
       cComponentTable: cComponentTableValue,
     }
     if(route.params.param?.pageName === "priceInquiry") {
@@ -1171,7 +1166,29 @@ function getFatherPageOldProductResData() {
       });
     }
   }
+  return oldPageSchema.value;
 }
+
+// 设置清单列表全部必填
+function setDistRequired(val:any) {
+  if(val === "1") {// 是否记名投保选是
+    formconfig11.value.fromSchema?.forEach((item:any)=>{
+      if(item.prop !=='Dist.nSeqNo'){
+        item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+      }
+    })
+  } else {
+    const fromSchema = getFatherPageOldProductResData().fromSchema;
+    formconfig11.value.fromSchema.forEach((item:any, index:any) => {
+      if(fromSchema[index]['rules']) {
+        item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+      } else {
+        item['rules'] = []
+      }
+    })
+  }
+}
+
 function getFormConfig() {
   return tableconfig.value;
 }
@@ -1185,7 +1202,8 @@ defineExpose({
   handleQuery,
   getTableData,
   setTableData,
-  getFormConfig
+  getFormConfig,
+  setDistRequired,
 });
 </script>
 
