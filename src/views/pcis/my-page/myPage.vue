@@ -2947,6 +2947,31 @@ const submitToUndrFn = async () => {
       }
   }
 
+  // 在保存前处理联共保总保费与总保费的差值（±0.01范围内）
+  const ciData = opertaor.getTableRefByKey("ci")?.getFromValue();
+  if (ciData && ciData.length > 0) {
+    // 计算联共保总保费
+    let totalCiPremium = 0;
+    ciData.forEach((item: any) => {
+      totalCiPremium += parseFloat(item['Ci.nCiPrm'] || 0);
+    });
+
+    // 获取总保费
+    const totalPremium = parseFloat(opertaor.getTableRefByKey("base").getFromValue()['Base.nPrm'] || 0);
+    
+    // 计算差值
+    const premiumDifference = totalPremium - totalCiPremium;
+    
+    // 如果差值在±0.01范围内，则调整最后一条联共保记录的保费
+    if (Math.abs(premiumDifference) <= 0.01 && premiumDifference !== 0) {
+      const lastIndex = ciData.length - 1;
+      const lastCiItem = ciData[lastIndex];
+      lastCiItem['Ci.nCiPrm'] = parseFloat(lastCiItem['Ci.nCiPrm'] || 0) + premiumDifference;
+      // 更新联共保信息
+      opertaor.getTableRefByKey("ci").setValueByRowKey("Ci.nCiPrm", lastCiItem._dataId, lastCiItem['Ci.nCiPrm'])
+    }
+  }
+
 
   // 电梯责任保险 每部电梯累计赔偿限额小于每部电梯每人赔偿限额时校验
   if(props.param?.cProdNo==='043001') {
