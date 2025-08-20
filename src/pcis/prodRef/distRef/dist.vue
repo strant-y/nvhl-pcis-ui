@@ -426,8 +426,12 @@ const method = {
         ElMessage.success("删除成功");
         const queryParams = distTableRef.value?.getPartnerPage(false);
         method.handleQuery(queryParams, true);
+      } else {
+        ElMessage.error(res.msg);
       }
-    });
+    }).catch((err:any) => {
+      ElMessage.error(err.msg);
+    })
   },
   // 投保座位总数
   nSeatCapacityChange:(val:any)=>{
@@ -1012,8 +1016,12 @@ const method = {
           ElMessage.success("删除成功");
           const queryParams = distTableRef.value?.getPartnerPage(false);
           method.handleQuery(queryParams, true);
+        } else {
+          ElMessage.error(res.msg);
         }
-      });
+      }).catch((err:any) => {
+        ElMessage.error(err.msg)
+      })
     });
   }
 };
