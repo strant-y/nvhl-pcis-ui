@@ -223,10 +223,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           }
         },
         disabledDate: (time: Date) => {
+          // 批改生效起期应该大于保险起期和当前日期
           if(opertaor.getTableRefs().insrnc && opertaor.getTableRefs().insrnc?.getFromValue()) {
             const beginTm = opertaor.getTableRefs().insrnc?.getFromValue()['Base.tInsrncBgnTm'];
             const endTm = opertaor.getTableRefs().insrnc?.getFromValue()['Base.tInsrncEndTm'];
-            return time.getTime() > new Date(endTm).getTime() || time.getTime() < new Date(beginTm).getTime()
+            const currentTm = new Date().getTime();
+            return time.getTime() > new Date(endTm).getTime() || time.getTime() < (new Date(beginTm).getTime() > currentTm ? new Date(beginTm).getTime() : currentTm)
           } else {
             return false;
           }
