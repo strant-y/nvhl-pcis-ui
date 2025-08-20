@@ -249,6 +249,7 @@ onMounted(async () => {
   }
   tableconfig.value.showEdit = true;
   tableconfig.value.showSelection = true;
+  tableconfig.value.showExpand = formconfig1.value.showExpand;
   formconfig1.value.fromSchema.forEach((e: any)=>{  // 隐藏不需要显示在表格内的数据
     if(e.cShowLocation === '0'){
       e.isShow = false
@@ -426,8 +427,12 @@ const method = {
         ElMessage.success("删除成功");
         const queryParams = distTableRef.value?.getPartnerPage(false);
         method.handleQuery(queryParams, true);
+      } else {
+        ElMessage.error(res.msg);
       }
-    });
+    }).catch((err:any) => {
+      ElMessage.error(err.msg);
+    })
   },
   // 投保座位总数
   nSeatCapacityChange:(val:any)=>{
@@ -726,7 +731,7 @@ const method = {
     }
 
 
-		if(paramitem.dist['Dist.ProjectDesignProp']) {
+		if(paramitem.dist?.['Dist.ProjectDesignProp']) {
 			paramitem.dist['Dist.cProjectAddress'] = paramitem.dist['Dist.ProjectDesignProp']
 		}
 
@@ -1012,8 +1017,12 @@ const method = {
           ElMessage.success("删除成功");
           const queryParams = distTableRef.value?.getPartnerPage(false);
           method.handleQuery(queryParams, true);
+        } else {
+          ElMessage.error(res.msg);
         }
-      });
+      }).catch((err:any) => {
+        ElMessage.error(err.msg)
+      })
     });
   }
 };

@@ -76,11 +76,10 @@ router.push = function (location: RouteLocationRaw) {
   if(!location || Object.keys(location).length == 0 || location === '') {
     return Promise.reject(new Error('Invalid route location'));
   }
-  encryptRouterParam(location);
-  return originalPush.call(this, location).then(() => {
-    const tagsViewStore = useTagsViewStore();
-    tagsViewStore.addTagView(this.currentRoute.value)
-  }).catch(err => {
+  const routeParams = formatLocation(location);
+  encryptRouterParam(routeParams);
+  sessionStorage.setItem('navType', 'push');
+  return originalPush.call(this, routeParams).catch(err => {
     if (err.name !== 'NavigationDuplicated') {
       // 可以在这里添加全局错误处理
       console.error('路由跳转错误:', err)
@@ -90,16 +89,28 @@ router.push = function (location: RouteLocationRaw) {
 };
 // 扩展 replace 方法
 router.replace = function (location: RouteLocationRaw) {
-  encryptRouterParam(location);
-  return originalReplace.call(this, location).then(() => {
+  const routeParams: any = formatLocation(location);
+  encryptRouterParam(routeParams);
+  sessionStorage.setItem('navType', 'replace');
+  return originalReplace.call(this, routeParams).then(() => {
     const tagsViewStore = useTagsViewStore();
     tagsViewStore.updateViewParam(this.currentRoute.value);
   });
 };
 
+const formatLocation = (param: any) => {
+  const location: RouteLocationRaw = {};
+  if(typeof param === CommonConstants.TYPE_OF_STRING) {
+    location.path = param;
+  }else {
+    Object.assign(location, param);
+  }
+  return location;
+};
+
 // 路由参数加密
 export function encryptRouterParam(location: RouteLocationRaw) {
-  if(typeof location === CommonConstants.TYPE_OF_STRING || !location.query) {
+  if(!location.query) {
     return;
   }
   if(!location.query.encrypted) {

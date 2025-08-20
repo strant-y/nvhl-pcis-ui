@@ -20,6 +20,14 @@ const typeMap = reactive<Record<string, Array<any>>>({
       label: "number",
       value: "number",
     },
+    {
+      label: "%",
+      value: "percent",
+    },
+    {
+      label: "‰",
+      value: "permill",
+    },
   ],
   rtradio: [
     {
@@ -105,6 +113,10 @@ const showLocation = [
   {
     label: "隐藏",
     value: "2",
+  },
+  {
+    label: "折叠栏",
+    value: "3",
   },
 ];
 const position = [

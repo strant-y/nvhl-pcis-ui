@@ -75,7 +75,7 @@
         :formatter="
           item.type === 'number'
             ? (value) => {
-                if (value == null) return '';
+                if (value === null || value === '' || value === undefined) return '';
                 let num = value.replace(/[^0-9.-]/g, '');
                 const parts = `${num}`.split('.');
                 const integerPart = parts[0].replace(
@@ -85,7 +85,11 @@
                 const decimalPart = parts.length > 1 ? `.${parts[1]}` : '';
                 return integerPart + decimalPart;
               }
-            : (value) => value
+            :(item.type === 'percent' || item.type === 'permill') ?(value) => { // 格式化,仅允许数字录入
+              if (value === null || value === '' || value === undefined) return '';
+              let num = value.replace(/[^0-9.-]/g, '');
+              return num;
+            }: (value) => value
         "
         :parser="
           item.type === 'number'
@@ -232,6 +236,10 @@ watch([() => props.modelValue], ([newModelValue]) => {
     }else{
       n = newModelValue + "";
     }
+  }else if (props.item.type === "percent") {
+    n = newModelValue ? Number(newModelValue) * 100 + "" : "";
+  }else if (props.item.type === "permill") {
+    n = newModelValue ? Number(newModelValue) * 1000 + "" : "";
   }else{
     n = newModelValue;
   }
@@ -261,7 +269,21 @@ function handleChange(val?: string | undefined | null) {
     }
     emits("valueChange", nv);
     emits("update:modelValue", nv);
-  } else {
+  } else if (props.item.type === "percent") {
+    nv = val ? Number(val) : null;
+    if(nv){
+      nv = nv / 100;
+    }
+    emits("valueChange", nv);
+    emits("update:modelValue", nv);
+  } else if (props.item.type === "permill") {
+    nv = val ? Number(val) : null;
+    if(nv){
+      nv = nv / 1000;
+    }
+    emits("valueChange", nv);
+    emits("update:modelValue", nv);
+  }else {
     emits("valueChange", val);
     emits("update:modelValue", val);
   }
@@ -270,10 +292,16 @@ function handleChange(val?: string | undefined | null) {
 
 onMounted(() => {
   if (props.item.type === "number") {
-      vInput.value = props.modelValue + "";
-    }else{
-      vInput.value = props.modelValue;
-    }
+    vInput.value = props.modelValue + "";
+  }else if (props.item.type === "percent") {
+    vInput.value = props.modelValue? Number(props.modelValue) * 100 + "" : "";
+  }else if (props.item.type === "permill") {
+    vInput.value = props.modelValue? Number(props.modelValue) * 1000 + "" : "";
+  }else{
+    vInput.value = props.modelValue;
+  }
+
+  
   
 });
 

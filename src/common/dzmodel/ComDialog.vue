@@ -4,6 +4,9 @@
     v-model="visible"
     @close="handleClose"
     :width="width + '%'"
+    :close-on-click-modal ="false"
+    :close-on-press-escape ="false"
+    :draggable ="true"
   >
     <component
       :is="contentComponent"

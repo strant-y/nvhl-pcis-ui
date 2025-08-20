@@ -49,9 +49,10 @@
             </el-form-item>
             </template>
             <template v-else-if="item.inputtype === 'rtinputgroup'">
-              <el-form-item :required="checkRequired(item)">
+              <el-form-item :required="checkRequired(item)"
+                            :label-width=" maxLabelWidth + 'px'">
                 <template #label>
-                  <!-- <template v-if="item.title?.length > 8">
+                   <template v-if="item.title?.length > 8">
                     <el-tooltip
                       effect="dark"
                       :content="item.title"
@@ -60,9 +61,9 @@
                       {{ item.title.substring(0, 8) + "..." }}
                     </el-tooltip>
                   </template>
-                  <template v-else> -->
+                  <template v-else>
                     {{ item.title }}
-                  <!-- </template> -->
+                   </template>
                 </template>
                 <div
                   :style="{
@@ -99,9 +100,10 @@
                 :label-position="
                   item.inputtype === 'rttable' ? 'top' : undefined // table 组件,默认标题显示在top上
                 "
+                :label-width=" maxLabelWidth + 'px'"
               >
                 <template #label>
-                  <!-- <template v-if="item.title?.length > 8">
+                   <template v-if="item.title?.length > 8">
                     <el-tooltip
                       effect="dark"
                       :content="item.title"
@@ -110,9 +112,9 @@
                       {{ item.title.substring(0, 8) + "..." }}
                     </el-tooltip>
                   </template>
-                  <template v-else> -->
+                  <template v-else>
                     {{ item.title }}
-                  <!-- </template> -->
+                   </template>
                 </template>
                 <div :style="{width: ( item.propWidth ? item.propWidth : 100) + '%', display: 'flex' }">
                   <div
@@ -200,7 +202,9 @@
                 "
               >
                 <template v-if="item.inputtype === 'rtinputgroup'">
-                  <el-form-item :required="checkRequired(item)">
+                  <el-form-item :required="checkRequired(item)"
+                                :label-width=" maxLabelWidth + 'px'"
+                  >
                     <template #label>
                       <!-- <template v-if="item.title?.length > 8">
                         <el-tooltip
@@ -247,20 +251,21 @@
                   <el-form-item
                     :rules="item.rules ? item.rules : undefined"
                     :prop="item.prop"
+                    :label-width=  "maxLabelWidth + 'px'"
                   >
                     <template #label>
-                      <!-- <template v-if="item.title?.length > 9">
+                      <template v-if="item.title?.length > 8">
                         <el-tooltip
                           effect="dark"
                           :content="item.title"
                           placement="top-start"
                         >
-                          {{ item.title.substring(0, 9) + "..." }}
+                          {{ item.title.substring(0, 8) + "..." }}
                         </el-tooltip>
                       </template>
-                      <template v-else> -->
+                      <template v-else>
                         {{ item.title }}
-                      <!-- </template> -->
+                       </template>
                     </template>
                     <div :style="{width: ( item.propWidth ? item.propWidth : 100) + '%', display: 'flex' }">
                       <div
@@ -305,6 +310,22 @@
 <script setup lang="ts">
 import { FormInstance } from "element-plus";
 import { AppGridEditMethod } from "./app-grid-edit-config";
+const maxLabelWidth = ref(150); // 默认值
+
+
+
+const updateLabelWidth = () => {
+  const screenWidth = window.innerWidth;
+  if (screenWidth < 768) {
+    // maxLabelWidth.value = "80px"; // 移动端窄屏
+  } else if(screenWidth > 1367 && screenWidth <= 1600) {  /*主流笔记本	1367px - 1600px*/
+     maxLabelWidth.value = "150"; // PC 端宽屏
+  }else if(screenWidth > 1601 && screenWidth <= 1920) { /*大屏笔记本/台式机*/
+    maxLabelWidth.value = "170"; // PC 端宽屏
+  }else if(screenWidth > 1921 && screenWidth <= 3840) {
+    maxLabelWidth.value = "200"; // PC 端宽屏
+  }
+};
 
 defineOptions({
   name: "DynamicForms",
@@ -652,7 +673,15 @@ watch(
   }
 );
 
-onMounted(() => {});
+onMounted(() => {
+  updateLabelWidth();
+  window.addEventListener("resize", updateLabelWidth);
+
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", updateLabelWidth);
+});
 
 defineExpose({
   getFromValue,

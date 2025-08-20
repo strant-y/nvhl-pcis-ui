@@ -25,6 +25,10 @@ import DepartmentTree from "../commodityRef/DepartmentTree.vue";
 import { codeListViewStore, dataOpertaor, useProductStore } from "@/store";
 import {PolicyService} from "@/views/pcis-main/service/my-page/policy.service";
 const productStore = useProductStore();
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
+const route = useRoute();
+const query = ref(route.query);
+const params = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
 
 const codeListStore = codeListViewStore();
 const { getRules } = useValidator();
@@ -141,11 +145,11 @@ onMounted(async () => {
     // 添加处理 Base.cCiMrk 值为 6 时显示"从联单"的逻辑
     
     // 询价录单 联共保业务暂时固定非共保业务，不允许选择联共保
-    if(param.pageName === "priceInquiry") {
-      setFormItem('Base.cCiMrk',{
-        disabled:  true
-      })
-    }
+    // if(param.pageName === "priceInquiry") {
+    //   setFormItem('Base.cCiMrk',{
+    //     disabled:  true
+    //   })
+    // }
   });
 });
 // 添加处理联共保标识显示逻辑的函数
@@ -179,6 +183,12 @@ const method = {
   },
   //联共保下拉change
   cCiMrkChange: (val:any) => {
+    // 对于询价单场景，不执行联共保菜单显示和信息初始化
+  if (params.pageName === "priceInquiry") {
+     setFormItem("Base.cRemark", { rules: [getRules("required", {})], });
+  } else {
+    setFormItem("Base.cRemark", { rules: [], });
+    // 非询价单场景保持原有逻辑
     productStore.setcCiMrk(val);
     if (!!val && !opertaor.getParam().initFlag) {
       const ciRef = opertaor.getTableRefs()['ci'];
@@ -188,6 +198,7 @@ const method = {
         });
       }
     }
+  }
 
     // 录单人联系方式
     if(val=='1'|| val=='2'||val=='5'){

@@ -3,7 +3,8 @@
  */
 const ViewsCachedKeyMap : any = {
     'guide': 'CustomRecording',
-    'my-page': 'myPage',
+    'pricePage': 'price-page',
+    'myPage': 'myPage',
     'factorConfig': 'factorConfig',
     'component': 'componentConfig',
     'application-querys': 'application-querys',
@@ -11,7 +12,7 @@ const ViewsCachedKeyMap : any = {
     // 'edr-qry-endorse-list': '',
 };
 
-export function getCompName(name: string): boolean {
+export function getCompName(name: string): string {
     return ViewsCachedKeyMap[name];
 }
 
