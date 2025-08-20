@@ -102,6 +102,13 @@ function setFormItem(key: any, obj: any) {
 
 // 绑定方法
 const method = {
+  cIsIndvduBizChange:(val:any)=>{
+    if(val === '1'){
+      setFormItem('ECargoApplicant.cTrdCde',{rules: [getRules("required", {})]})
+    }else {
+      setFormItem('ECargoApplicant.cTrdCde',{rules:null})
+    }
+  },
   // 客户重置
   funcreset: () => {
     const applicantValue = getFormValue();
