@@ -234,11 +234,11 @@
             ><span class="publicStyle">{{ nAmt.toLocaleString() }}</span
             >&nbsp;<span class="font-weight-500">元</span>&nbsp;|&nbsp;<span
               class="font-weight-500"
-              >保费为: </span
+              >保费: </span
             ><span class="publicStyle">{{ nPrm.toLocaleString() }}</span
             >&nbsp;<span class="font-weight-500">元</span>&nbsp;
 						<template v-if="props.param?.cRecordType === 9 || props.param.cPolicySource == 9">
-							|&nbsp;<span class="font-weight-500">剩余预收保费为: </span
+							|&nbsp;<span class="font-weight-500">剩余预收保费: </span
 							><span class="publicStyle">{{ nRecRemPrm.toLocaleString() }}</span
 							>&nbsp;<span class="font-weight-500">元</span>
 						</template>
@@ -562,7 +562,7 @@ const idxParam = {
   handleAnchorClick: handleAnchorClick,
 };
 provide('idxParam', idxParam);
-const opertaor = dataOpertaor(idxParam.opertaorId);
+const opertaor = dataOpertaor();
 opertaor.init();
 const underwrite = ref(null);
 const edrbase = ref(null);
