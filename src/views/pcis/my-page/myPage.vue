@@ -2916,24 +2916,9 @@ const submitToUndrFn = async () => {
     }
 
   // 判断应收保费是否同保费相同
-  let payList = res.payinfo;
-  console.log('缴费-',payList)
-  let nPrm = opertaor.getTableRefByKey("base").getFromValue()['Base.nPrm'];
-  let nPayablePrmData = opertaor.getTableRefByKey("payinfo").getFromValue()  // 缴费计划数据  
-  let nPayAll = 0;
-  nPayablePrmData.forEach((item:any)=>{
-        nPayAll+= item['Pay.nPayablePrm'] || 0
-  })
-  console.log('111',nPayAll,nPrm)
-  if(nPayAll !== nPrm ){
-      ElMessage.warning('缴费计划“应收保费”不等于“总保费”请确认！')
-      return false;
-  }
-
-
-
-   
+  let payList = opertaor.getTableRefByKey("payinfo").getFromValue();
    if(payList && payList.length>0){
+      let nPrm = opertaor.getTableRefByKey("base").getFromValue()['Base.nPrm'];
       const toCent = (amount:any) => {
         return Math.round(Number(amount) * 100); // 转为分并四舍五入
       };
@@ -2941,11 +2926,9 @@ const submitToUndrFn = async () => {
       payList.forEach((item:any) => {
         totalCent += toCent(item['Pay.nPayablePrm']);
       });
- 
-      const basePrmCent = toCent(res['base']['Base.nPrm']);
-
-       if(totalCent > basePrmCent){
-         ElMessage.error('缴费计划“应收保费”之和大于整单保费！')
+       const basePrmCent = toCent(nPrm);
+       if(totalCent !== basePrmCent){
+         ElMessage.error('缴费计划“应收保费”不等于“总保费”请确认！')
         return false;
       }
   }
@@ -3222,11 +3205,9 @@ const savePlyInfo = async () => {
       payList.forEach((item:any) => {
         totalCent += toCent(item['Pay.nPayablePrm']);
       });
- 
       const basePrmCent = toCent(res['base']['Base.nPrm']);
-
-       if(totalCent > basePrmCent){
-         ElMessage.error('缴费计划“应收保费”之和大于整单保费！')
+       if(totalCent !== basePrmCent){
+         ElMessage.error('缴费计划“应收保费”不等于“总保费”请确认！')
          btn.loading = false;
         return false;
       }
@@ -3967,13 +3948,13 @@ const saveEdrPlyInfo = async () => {
 const generateEndorse = async () => {
   const res = opertaor.getDataAll();
   console.log("生成批文",res, props.param);
-  if (props.param.cRsnCde !== 'FZ') {
-    const isAcctValid = await validateAcctinfo();
-    // 账户信息校验
-    if (!isAcctValid) {
-      return; 
-    }
-  }
+  // if (props.param.cRsnCde !== 'FZ') {
+  //   const isAcctValid = await validateAcctinfo();
+  //   // 账户信息校验
+  //   if (!isAcctValid) {
+  //     return; 
+  //   }
+  // }
   // 批改原因和清单相关的需要提示先保存一下
   if((props.param['cRsnCde'] === "ZQ" || props.param['cRsnCde'] === "JQ" || props.param['cRsnCde'] === "10") && saveEdrState.value === false) {
     ElMessage.error("请先保存申请单")
