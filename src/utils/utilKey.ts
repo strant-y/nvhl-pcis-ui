@@ -20,6 +20,14 @@ const typeMap = reactive<Record<string, Array<any>>>({
       label: "number",
       value: "number",
     },
+    {
+      label: "%",
+      value: "percent",
+    },
+    {
+      label: "‰",
+      value: "permill",
+    },
   ],
   rtradio: [
     {
