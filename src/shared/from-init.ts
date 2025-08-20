@@ -90,8 +90,12 @@ export function formInit(
 
   if(newObj.fromSchema && newObj.fromSchema.length>0){
     newObj.fromSchema = newObj.fromSchema.map(item=>{
-      if(item.cShowLocation === '2' ){
+      if(item.cShowLocation === '2' ){    //位置隐藏的设置
         item.hidden = true;
+      }
+      if(item.cShowLocation === '3' ){    //位置折叠的设置
+        item.expand = true;
+        newObj.showExpand = true;
       }
       if(item.inputtype === 'rtinputgroup' ){
         if(item.groupList && item.groupList.length>0){
@@ -146,5 +150,6 @@ export function formInit(
       return item;
     })
   }
+  console.log(newObj);
   return newObj;
 }

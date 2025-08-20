@@ -44,14 +44,16 @@
         :align="item.align ? item.align : 'center'"
       >
         <template #default="props">
+          
           <div style="margin: -5px 5px -5px 5px;background-color: rgba(228,204,164,0.2);">
+           
             <el-row :gutter="20">
               <template v-for="(i, index) in getfromSchema()" :key="index">
                 <el-col
                     :span="i.itemWidth ? i.itemWidth * formUi.span : formUi.span"
                     style="margin-top: 5px"
                     v-if = 'formItems[props.row._dataId][i.prop].hidden !== true'
-                    v-show="[undefined, '1'].includes(formItems[props.row._dataId][i.prop].cShowLocation)"
+                    v-show="formItems[props.row._dataId][i.prop].cShowLocation !== '2'"
                 >
                   <el-form-item
                       :prop="[props.$index, i.prop]"
@@ -62,7 +64,7 @@
                   "
                       style="margin-bottom: 18px"
                   >
-                    <div style="display: flex;">
+                    <div style="display: flex; width: 100%;">
                       <div
                           :style="{
                       width:
@@ -483,6 +485,7 @@ function isHidden(item: any) {
 
 function getfromSchema() {
   const expands = props.item.fromSchema.filter((s: any) => s.expand === true && s.isShow !== false );
+  console.log(expands);
   return expands;
 }
 const formUi = reactive<Record<string, any>>({});
@@ -491,6 +494,7 @@ const formUi = reactive<Record<string, any>>({});
  *  样式初始化,对于未设置的参数进行初始化
  * */
 function initUI() {
+  console.log(props.item);
   if (props.item.fromUi) {
     Object.keys(props.item.fromUi).forEach((key) => {
       if (key === "cols") {
@@ -519,6 +523,7 @@ function initUI() {
   if (!formUi["size"]) {
     formUi["size"] = "default";
   }
+  console.log(formUi);
 }
 
 /**
@@ -860,7 +865,7 @@ function isrequired(i: any) {
 
 <style scoped>
 ::v-deep .el-form-item__content {
-  display: block;
+  display: flex;
 }
 ::v-deep .el-form-item {
   margin-bottom: 0px !important; /* 使内容显示更近紧促 */

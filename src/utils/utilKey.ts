@@ -106,6 +106,10 @@ const showLocation = [
     label: "隐藏",
     value: "2",
   },
+  {
+    label: "折叠栏",
+    value: "3",
+  },
 ];
 const position = [
   {
