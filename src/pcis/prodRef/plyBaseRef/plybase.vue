@@ -157,7 +157,6 @@ const handleCiMrkDisplay = () => {
   setTimeout(() => {
     nextTick(() => {
       const ciMrkValue = getValue("Base.cCiMrk");
-      console.log("ciMrkValue",ciMrkValue);
       if (ciMrkValue === "6") {
         // 当值为6时，设置下拉选项显示为"从联单"
         setFormItem("Base.cCiMrk", {
@@ -582,7 +581,6 @@ const method = {
       },
       {
         isOk: (selectdata: any) => {
-          console.log("a", selectdata);
         },
       },
       { title: "业务员", width: 85 }
@@ -656,7 +654,6 @@ const method = {
       },
       {
         isOk: (selectdata: any) => {
-          console.log("a", selectdata);
         },
       },
       { title: "业务员", width: 85 }

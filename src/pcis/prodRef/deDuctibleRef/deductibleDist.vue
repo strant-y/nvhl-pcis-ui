@@ -66,14 +66,6 @@ onMounted(()=>{
     exRules
   );
   Object.assign(cardconfig.value, formconfig11);
-  // setTimeout(()=>{
-      // formData.value = [];
-      // formData.value.forEach((item, index) => {
-      //     item.nSeqNo = index + 1;
-      // });
-
-  // },2000)
-
   setTimeout(()=>{
     if(formData.value.length>0){
             formData.value.forEach((item, index) => {
@@ -342,6 +334,31 @@ const  deepClone =(obj:any)=> {
   return clone;
 }
 
+
+// 复制数据处理
+const mergeArrays = (oldArr, newArr, key, fields)=>{
+      // 1. 以新数组为基准构建新数组
+      return newArr.map(newItem => {
+        const newKey = newItem[key];
+        const oldItem = oldArr.find(item => item[key] == newKey);
+        if (oldItem) {
+          // 2. 左右都存在：左边数据为基础，用右边指定字段覆盖
+          const mergedItem = { ...oldItem };
+          fields.forEach(field => {
+            if (newItem.hasOwnProperty(field)) {
+              mergedItem[field] = newItem[field];
+            }
+          });
+          return mergedItem;
+        } else {
+          // 3. 右边独有：直接返回右边项
+          return { ...newItem };
+        }
+      });
+  }
+
+
+
 // 绑定方法
 const method = {
   // func demo
@@ -361,18 +378,22 @@ const method = {
         },
         { 
           getSelected(selectdata: any) {
-            const mergeAndNumberArraysPreserveOrder = (a: [], b: []): any[] => {
-              const akeys = new Set(a.map(item => item.cDeductibleClass));
-              const bkeys = new Set(b.map(item => item.cDeductibleClass));
-              const aInB = a.filter(item => bkeys.has(item.cDeductibleClass));
-              const bNotInA = b.filter(item => !akeys.has(item.cDeductibleClass));
-              const merged = [...aInB, ...bNotInA];
-              return merged.map((item: any, index: number) => ({
-                ...item,
-                nSeqNo: index + 1
-              }));
-            }
-            formData.value = mergeAndNumberArraysPreserveOrder(formData.value, selectdata); 
+              let sessionSpecialAgreement = JSON.parse(sessionStorage.getItem("getAppPolicyData"))?.['deductibleDist'] || [];
+              const result = mergeArrays(sessionSpecialAgreement, selectdata, 'cDeductibleClass', ['cDeductibleContent']);
+           
+              const mergeAndNumberArraysPreserveOrder = (a: [], b: []): any[] => {
+                const akeys = new Set(a.map(item => item.cDeductibleClass));
+                const bkeys = new Set(b.map(item => item.cDeductibleClass));
+                const aInB = a.filter(item => bkeys.has(item.cDeductibleClass));
+                const bNotInA = b.filter(item => !akeys.has(item.cDeductibleClass));
+                const merged = [...aInB, ...bNotInA];
+              
+                return merged.map((item: any, index: number) => ({
+                  ...item,
+                    nSeqNo: index + 1
+                  }));
+              }
+            formData.value = mergeAndNumberArraysPreserveOrder(result, selectdata); 
           },
         }, 
         { title: "添加免赔条件", width: 85 });

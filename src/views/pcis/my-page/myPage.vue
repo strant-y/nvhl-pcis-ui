@@ -2483,7 +2483,7 @@ const loadAppPlyInfo = async (CAppNo) => {
     console.log("投保单明细", res);
     if (res["code"] == "200") {
       const ops = opertaor.convertData(res);
-      console.log("转换的数据", ops);
+    console.log("转换的数据", ops);
       if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
         if (
@@ -2556,6 +2556,10 @@ const loadAppPlyInfo = async (CAppNo) => {
       pageData.value = ops;
       ElMessage.success(res.msg);
       opertaor.setDataAll(ops);
+
+      // 暂存数据
+      sessionStorage.setItem("getAppPolicyData", JSON.stringify(ops));
+     
     }
   }
 };
@@ -2945,6 +2949,31 @@ const submitToUndrFn = async () => {
          ElMessage.error('缴费计划“应收保费”之和大于整单保费！')
         return false;
       }
+  }
+
+  // 在保存前处理联共保总保费与总保费的差值（±0.01范围内）
+  const ciData = opertaor.getTableRefByKey("ci")?.getFromValue();
+  if (ciData && ciData.length > 0) {
+    // 计算联共保总保费
+    let totalCiPremium = 0;
+    ciData.forEach((item: any) => {
+      totalCiPremium += parseFloat(item['Ci.nCiPrm'] || 0);
+    });
+
+    // 获取总保费
+    const totalPremium = parseFloat(opertaor.getTableRefByKey("base").getFromValue()['Base.nPrm'] || 0);
+    
+    // 计算差值
+    const premiumDifference = totalPremium - totalCiPremium;
+    
+    // 如果差值在±0.01范围内，则调整最后一条联共保记录的保费
+    if (Math.abs(premiumDifference) <= 0.01 && premiumDifference !== 0) {
+      const lastIndex = ciData.length - 1;
+      const lastCiItem = ciData[lastIndex];
+      lastCiItem['Ci.nCiPrm'] = parseFloat(lastCiItem['Ci.nCiPrm'] || 0) + premiumDifference;
+      // 更新联共保信息
+      opertaor.getTableRefByKey("ci").setValueByRowKey("Ci.nCiPrm", lastCiItem._dataId, lastCiItem['Ci.nCiPrm'])
+    }
   }
 
 
@@ -3788,6 +3817,10 @@ const getSurrenderPrecisFun = () => {
  * 批改单申请核保(退保、注销)
  */
 const submitEdrToUndrSurrender = async () => {
+  if(!edrbase.value?.getFromValue()["EdrBase.cAppNo"]) {
+    ElMessage.error("请先保存申请单")
+    return
+  }
     const isAcctValid = await validateAcctinfo();
     // 账户信息校验
   if (!isAcctValid) {
@@ -3860,6 +3893,10 @@ const saveEdrPlyInfo = async () => {
       }
     })
   }
+
+  // console.log('333',opertaor.getDataAll())
+  //   btn.loading = false;
+  // return false;
   // 点击保存之前的申请单号
   const beforeSaveCappNo = res["EdrBase"]["EdrBase.cAppNo"];
   const edrInfo: any = await saveEdrAppPlyInfo(res)
@@ -3877,6 +3914,7 @@ const saveEdrPlyInfo = async () => {
     }
     opertaor.setDataAll(ops);
     const EdrBaseData = edrInfo["res"]["composition"]["EdrBase"][0];
+    EdrBaseData["EdrBase.cEdrRsnDetail"] = EdrBaseData["EdrBase.cEdrRsnDetail"].split(",")
     // res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
     //   res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"].split(
     //     ","

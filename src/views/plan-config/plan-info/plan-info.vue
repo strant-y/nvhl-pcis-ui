@@ -109,7 +109,6 @@ let payinfo = ref(false)
 watch(
   () => props.goodsData,
   (newVal,oldVal) => {
-    console.log('watch',newVal,oldVal,props.goodsType == 'goods');
     if (props.goodsType == 'goods') {
       // initPage();
       // againActiveTop(newVal as string);
@@ -123,8 +122,6 @@ watch(
 
 opertaor.setParam(routeQryParams?.rowData);
 onBeforeMount(() => {
-  console.log("routeQryParams", routeQryParams);
-  console.log("路由参数routeQryParams.rowData", routeQryParams?.rowData);
   if(routeQryParams?.rowData){
     initPage();
   }
@@ -135,9 +132,6 @@ onBeforeMount(() => {
  */
 const initPage = async () => {
   let param = {}
-
-  console.log('进来了====',props)
-
   if(props.type == 'goods'){
     param = {
       CProdNo: props.goodsData.cProdNo,
@@ -150,13 +144,9 @@ const initPage = async () => {
     }
   }
 
-  console.log('参数',param, props.goodsType,props.goodsData)
   const getProductRes = await getProductPage(param);
   // 页面初始化
   const formconfig21 = JSON.parse(getProductRes.data);
-
-  console.log('cccc1',getProductRes)
-  console.log('cccc',formconfig21)
   formconfig21[0].pageInfo = formconfig21[0].pageInfo.filter(item => item.pageKey == 'cvrg');
   opertaor.setTableConfig(formconfig21);
   renderComponents();
@@ -498,9 +488,7 @@ const formconfig3 = reactive<AppFreeEditConfig>(
           }
           payinfoEditRef?.value?.addRow();
           const val = getFromValue()
-          console.log('添加', val)
           val.forEach((key, index) => {
-            console.log(key)
             key['nSeqNo'] = index + 1;
             key['cPlanNo'] = cPlanNo
           });
@@ -516,8 +504,6 @@ const formconfig3 = reactive<AppFreeEditConfig>(
             return;
           }
           const editIndex = selData['_dataId']
-          console.log(selData)
-
           if (!selData["cPkId"] || !selData) {
             ElMessage.error(" 主键为空！请重新点击查询。");
             return;
@@ -534,7 +520,6 @@ const formconfig3 = reactive<AppFreeEditConfig>(
               };
               policyService.deleteFormulaById(param).then((res: any) => {
                 const { code, data, msg } = res;
-                console.log('删除', res)
                 // if (null != res && null != code) {
                 if (code === 200) {
 
@@ -634,7 +619,6 @@ const formconfig3 = reactive<AppFreeEditConfig>(
       "disabled": 1,
       rules: [getRules("required", {})],
       func: (v: any) => {
-        console.log(v)
       }
     }, {
 
@@ -711,11 +695,8 @@ const initData = () => {
     cPlanNo: cPlanNo
   };
 
-
-  console.log('init', param)
   policyService.getPlanCvrgFormulaInfo(param).then((res: any) => {
     const { code, data, msg } = res;
-    console.log('查询res', res)
     if (null != res && null != code) {
       if (code === 200) {
         if (data) {
@@ -748,21 +729,16 @@ const saveProdDataFun = async () => {
   }, { items: getFromValue() });
 
 
-  console.log('getFormData', param, getFromValue())
   policyService.savePlanCvrgFormula(param).then((res: any) => {
     const { code, data, msg } = res;
-    console.log(res)
     if (null != res && null != code) {
       if (code === 200) {
-
-        console.log(data);
         if (data.code === '1') { // 保存成功
           ElMessage.success("保存成功");
           let setData = data['data'];
           for(let i =0;i<setData.length;i++){
             setData[i].nSeqNo = i+1;
           }
-          console.log(11,setData)
 
           setFormValue(setData)
           // for (const i in data['data']) {
@@ -814,7 +790,6 @@ const save = () => {
   //调用保存接口
   const res = opertaor.getDataAll();
   res['cPlanNo'] = freeEditRef.value?.getValue("cPlanNo");
-  console.log(res)
   policyService.savePlanCvrg(res).then(result => {
     if (result['code'] === 200) {
       const ops = { cvrg: result.data.cvrg }
@@ -833,7 +808,6 @@ const saveAndSubmit = () => {
     res['cUndrStatus'] = '1';
     res['cUndrDesc'] = '提交审核';
     res['cType'] = 'PLAN';
-    console.log(res)
     policyService.addProcessUndr(res).then(result => {
       if (result['code'] === 200) {
         if (result['data']['code'] == '1') {
@@ -861,7 +835,6 @@ const submit = () => {
   res['cRelNo'] = freeEditRef.value?.getValue("cPlanNo");
   res['id'] = routeQryParams?.rowData.cPkId;
   res['cType'] = 'PLAN';
-  console.log(res)
   policyService.processApprove(res).then(result => {
     if (result['code'] === 200) {
       if (result['data']['code'] == '1') {

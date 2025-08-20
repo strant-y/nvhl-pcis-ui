@@ -109,12 +109,8 @@ const method = {
     const baseBefore = tabref?.["insrnc"].getFromValue();
     const startDate = dayjs(v); // 新的开始时间（v是用户选择的开始时间）
     let endDate = baseBefore["Base.tInsrncEndTm"]  // 结束时间
-console.log('时间',v,endDate)
-
     let days = Number(baseBefore["Base.cTmSysCde"]); // 天数
-
     const isDaysEmpty = isNaN(days) || days <= 0;
-
   // 计算新的结束时间
   let newEndDate;
   if (!isDaysEmpty) {
@@ -157,7 +153,6 @@ console.log('时间',v,endDate)
   },
   // 索赔基础名称change事件
   suopeiFunc: (val) => {
-    console.log(val)
     let cIsRetroSpect = getFromValue()['Base.cIsRetroSpect']      // 获取是否有追溯期/日期
     const p = opertaor.getParam();
     if (!p.initFlag) {
