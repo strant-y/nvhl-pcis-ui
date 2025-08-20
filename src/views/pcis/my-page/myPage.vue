@@ -2483,7 +2483,7 @@ const loadAppPlyInfo = async (CAppNo) => {
     console.log("投保单明细", res);
     if (res["code"] == "200") {
       const ops = opertaor.convertData(res);
-      console.log("转换的数据", ops);
+    console.log("转换的数据", ops);
       if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
         if (
@@ -2556,6 +2556,10 @@ const loadAppPlyInfo = async (CAppNo) => {
       pageData.value = ops;
       ElMessage.success(res.msg);
       opertaor.setDataAll(ops);
+
+      // 暂存数据
+      sessionStorage.setItem("getAppPolicyData", JSON.stringify(ops));
+     
     }
   }
 };
@@ -3889,6 +3893,10 @@ const saveEdrPlyInfo = async () => {
       }
     })
   }
+
+  // console.log('333',opertaor.getDataAll())
+  //   btn.loading = false;
+  // return false;
   // 点击保存之前的申请单号
   const beforeSaveCappNo = res["EdrBase"]["EdrBase.cAppNo"];
   const edrInfo: any = await saveEdrAppPlyInfo(res)
