@@ -3738,6 +3738,10 @@ const saveApplicationEdr = () => {
             "EdrBase.cEdrRsnDetail"
           ].split(",");
         edrbase.value?.setFormValue(EdrBaseData);
+        if(props.param.pageType === "EDR_APP_NEW_SCENE" && saveDistBatchFlag.value) {
+          // 复制保单清单信息到批单中
+          saveDist(EdrBaseData['EdrBase.cAppNo'], props.param?.cRsnCde)
+        }
         // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
         if(props.param.pageType === "EDR_APP_NEW_SCENE" && !beforeSaveCappNo && EdrBaseData["EdrBase.cAppNo"]) {
           getAppPolicyList({
