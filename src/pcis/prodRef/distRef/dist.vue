@@ -72,28 +72,6 @@ const props = defineProps({
     type: String
   }
 });
-// watch(
-//     () => opertaor.getTableRefs()['tgt']?.getFromValue()?.['Tgt.cIsinsuranceRegistered'],
-//     (n, o) => {
- 
-//         if (n) {
-//           // 学生岗位 Dist.cJobType
-//             if(params.cProdNo === '043010'){
-//                   formconfig11.value.fromSchema?.forEach(item=>{
-//                           if(n == 1 && item.prop !=='Dist.nSeqNo'){
-//                             item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
-//                           }else if(item.prop !=='Dist.nSeqNo' && item.prop !=='Dist.cJobType') {
-//                             item['rules'] =[];
-//                           }
-//                   })
-//             }
-//         }
-//     },
-//     {
-//         deep: true,
-//         immediate: true
-//     }
-// )
 const cardRef = ref<MyCardMethod | null>(null);
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -1171,26 +1149,6 @@ function getFatherPageOldProductResData() {
   return oldPageSchema.value;
 }
 
-// 设置清单列表全部必填
-function setDistRequired(val:any) {
-  if(val === "1") {// 是否记名投保选是
-    formconfig11.value.fromSchema?.forEach((item:any)=>{
-      if(item.prop !=='Dist.nSeqNo'){
-        item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
-      }
-    })
-  } else {
-    const fromSchema = getFatherPageOldProductResData().fromSchema;
-    formconfig11.value.fromSchema.forEach((item:any, index:any) => {
-      if(fromSchema[index]['rules']) {
-        item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
-      } else {
-        item['rules'] = []
-      }
-    })
-  }
-}
-
 function getFormConfig() {
   return tableconfig.value;
 }
@@ -1205,7 +1163,6 @@ defineExpose({
   getTableData,
   setTableData,
   getFormConfig,
-  setDistRequired,
 });
 </script>
 
