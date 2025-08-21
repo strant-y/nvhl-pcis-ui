@@ -1706,7 +1706,6 @@ function handleInquiryQuery(flag?: boolean) {
     s.tEdrAppTm = null;
     s.tIssueTm = null;
 
-    pageresult.list = [];
     if (
         (s["cAppNo"] == null || s["cAppNo"] == "") &&
         (s["cPlyNo"] == null || s["cPlyNo"] == "") &&
@@ -1777,7 +1776,6 @@ function handleNormalQuery(flag?: boolean) {
     if (s.cLoadSub == null) {
         s.cLoadSub = "1";
     }
-    pageresult.list = [];
     
     if (
         (s["cAppNo"] == null || s["cAppNo"] == "") &&
@@ -1888,7 +1886,6 @@ function esInquirySearch(flag?: boolean) {
     if (s.cLoadSub == null) {
         s.cLoadSub = "1";
     }
-    pageresult.list = [];
     if (
         (s["cAppNo"] == null || s["cAppNo"] == "") &&
         (s["cPlyNo"] == null || s["cPlyNo"] == "") &&
@@ -1989,7 +1986,6 @@ function esNormalSearch(flag?: boolean) {
   if (s.cLoadSub == null) {
     s.cLoadSub = "1";
   }
-  pageresult.list = [];
   if (
       (s["cAppNo"] == null || s["cAppNo"] == "") &&
       (s["cPlyNo"] == null || s["cPlyNo"] == "") &&

@@ -1302,7 +1302,6 @@ function esSearch(flag?: boolean) {
   if (s.cLoadSub == null) {
     s.cLoadSub = "1";
   }
-  pageresult.list = [];
   if (
       (s["cAppNo"] == null || s["cAppNo"] == "") &&
       (s["cPlyNo"] == null || s["cPlyNo"] == "") &&
