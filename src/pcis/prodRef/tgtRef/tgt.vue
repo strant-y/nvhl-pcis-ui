@@ -113,10 +113,14 @@ onMounted(async () => {
        setFormItem("Tgt.cLicenseNumber", { rules: []});
   }else {
       setFormItem("Tgt.cLicenseNumber", {
-    rules: [getRules("vehiclePlate", {})],
-  });
+        rules: [getRules("vehiclePlate", {})],
+      });
   }
 
+  // 车牌号校验
+  setFormItem("Tgt.cTransportLicenseNumber", {
+        rules: [getRules("vehiclePlate", {})],
+  });
   // 约定保期内服务次数正整数
   setFormItem("Tgt.nAgreeFrequency", {
     rules: [getRules("signlessInt", {})],
@@ -540,13 +544,13 @@ const method = {
   getcTransportChange:(val:string)=>{
     if(val === '1'){
       setFormItem("Tgt.cTransportTools", {
-        readonly: '0',
+        disabled:false
       });
     }else {
       // Tgt.cTransportTools
       setValue("Tgt.cTransportTools", '')
       setFormItem("Tgt.cTransportTools", {
-        readonly: '1',
+         disabled:true
       });
     }
  },
@@ -1027,7 +1031,6 @@ cIsinsuranceRegisteredChange:(val:any)=>{
           rules:[]
         })
     }
-    registeredChangeRequired(val)
 },
 // 投保行业
 getcInsuranceIndustryChange:(val:any)=>{
@@ -1134,27 +1137,7 @@ tProjectEndDis:(date:any)=>{
     }
 },
 
-// 被监护人是否记名
-getcIsRegisteredChange: (val: any) => {
-  registeredChangeRequired(val)
-},
-// 记名投保标志(045001)
-getcRegisteredLogoChange: (val: any) => {
-  registeredChangeRequired(val)
-},
-// 记名投保(080011)
-getcRegisteredInsuranceChange: (val: any) => {
-  registeredChangeRequired(val)
-},
 };
-
-// 是否记名选择后设置清单必填
-function registeredChangeRequired(val:any) {
-  const distItem = distRequiredMap[params.cProdNo]
-  if(distItem) {
-    opertaor.getTableRefByKey(distItem.distCode).setDistRequired(val)
-  }
-}
 
 function setAddressBykey(getv1: any, getv2: any , setv: any) {
    const a = tgtEditRef?.value?.getValue(getv1[0].prop);

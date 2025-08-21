@@ -41,6 +41,10 @@ import {
 const props = defineProps({
   data: Array,  // 接收数组
   type: String,
+  userSaved: {
+    type: Boolean,
+    default: false,
+  }
 });
 const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
@@ -57,15 +61,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     superFromSchema: [],
   })
 );
-
 onMounted(async () => {
   if (props.type === "edit" && props.data) {
     setTimeout(() => {
-      freeEditRef.value?.setFormValue({
-        bsType: props.data[0].loadData
-          .filter((item: any) => item.checked)
-          .map((item: any) => item.value)
-      });
+      let values = [];
+      if (props.userSaved) {
+        // 已保存过：回显用户配置
+        values = props.data[0].loadData
+                   .filter((item: any) => item.checked)
+                   .map((item: any) => item.value);
+      } else {
+        // 第一次：全部勾选
+        values = props.data[0].loadData.map((item: any) => item.value);
+      }
+      freeEditRef.value?.setFormValue({ bsType: values });
     }, 50);
   }
 });
@@ -81,7 +90,6 @@ function save() {
             type: "ok", 
             body: formData.bsType 
         });
-        ElMessage.success("保存成功");
         dialogVisible.value = false;
     }
   });

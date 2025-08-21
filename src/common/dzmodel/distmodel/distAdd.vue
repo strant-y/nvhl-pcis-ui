@@ -273,40 +273,10 @@ onMounted(() => {
     // 040002 证件号码 必填问题
     if( route.params.param.cProdNo == '040002' && item.prop =='Dist.cIdentificationNumber'){
          item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
-    
     }
-  
-    // 方案号下拉值
-    // if(item.prop == 'Dist.cPlanNo'){
-    //   const termref = opertaor.getTableRefByKey("cvrg");
-      
-    //   item.typeCode = null;
-    //   item.loadData = termref.getPlanNo();
-    // }
-
     if(item.prop =='Dist.cSchoolName'){
       item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
     }
-
-
-
-    // if( route.params.param.cProdNo == '043010'){
-    //   if(item.prop =='Dist.cJobType'){
-    //     item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
-    //   }else if(   cIs == 1 && item.prop !=='Dist.nSeqNo'){
-    //        item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
-    //   }else{
-    //     item['rules'] = [];   
-    //   }
-    // }
-
- 
-    // if(cIs == 1 && item.prop !=='Dist.nSeqNo'){
-      
-    // }else if(cIs == 0 && (item.prop !=='Dist.cSchoolName' && item.prop !=='Dist.cSchoolAddress')){
-    //   item['rules'] =[];
-      
-    // }
  
     if(item.cShowLocation === '1'){
       item["hidden"] = true;
@@ -352,12 +322,11 @@ onMounted(() => {
           setValue('Dist.nAge', age);
         }
       }
-      // if(cIs == 1){
-      //     item['rules'] = [getRules("idCard", {}),{ required: true, message: '该项为必填项', trigger: 'blur' }];
-      // }else{
-      //     item['rules'] = [getRules("idCard", {})];
-      // }
-    
+    }
+
+     // 针对040005产品 证件号码校验问题
+    if(route.params.param.cProdNo === '040005' &&item.prop =='Dist.cIdentificationNumber'){
+             item['rules'] = [getRules("idCard", {})];
     }
  
     // 040016 身份证必填
