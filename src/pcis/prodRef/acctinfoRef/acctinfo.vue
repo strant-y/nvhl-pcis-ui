@@ -67,7 +67,7 @@ onMounted(() => {
 
  
   let timer =  setInterval(()=>{
-        setValue('Acctinfo.cAcctNme', opertaor.getDataAll()['applicant']['Applicant.cAppNme'])
+        setValue('Acctinfo.cAcctNme', opertaor.getDataAll()['applicant']?.['Applicant.cAppNme'])
         let cAcctNme =  getValue('Acctinfo.cAcctNme')
         if (cAcctNme) {
           clearInterval(timer); //清除定时器

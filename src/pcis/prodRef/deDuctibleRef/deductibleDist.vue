@@ -112,7 +112,6 @@ const tableconfig = reactive<AppTableConfig>(
           if(row.editList && row.editList.length>0){
             param['editList'] = row.editList
           }
-          debugger
           dzmodal.open(deductibleFixEdit, { 
             type: "view", 
             data: param, 
