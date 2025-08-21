@@ -2997,7 +2997,7 @@ const submitToUndrFn = async () => {
       const plyBasedata = opertaor.getTableRefByKey("plyBase").getFromValue();
 
       
-      if(plyBasedata["Base.cCiMrk"] !== "0") {
+      if(plyBasedata["Base.cCiMrk"] !== "0" && props.param.pageName !== "priceInquiry") {
         const ciValue = opertaor.getTableRefByKey("ci")?.getFromValue() || '';
         const isCiValid = validateCiInfo();
         if (!isCiValid) {
