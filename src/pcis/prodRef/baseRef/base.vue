@@ -333,6 +333,7 @@ const method = {
   },
   // 总保费change事件
   nprmChange: (val: any) => {
+    console.log(1212,val);
     if (null != val) {
       const nprmRmbExch = getValue('Base.nPrmRmbExch');
       if (!!nprmRmbExch) {

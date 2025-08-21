@@ -113,10 +113,14 @@ onMounted(async () => {
        setFormItem("Tgt.cLicenseNumber", { rules: []});
   }else {
       setFormItem("Tgt.cLicenseNumber", {
-    rules: [getRules("vehiclePlate", {})],
-  });
+        rules: [getRules("vehiclePlate", {})],
+      });
   }
 
+  // 车牌号校验
+  setFormItem("Tgt.cTransportLicenseNumber", {
+        rules: [getRules("vehiclePlate", {})],
+  });
   // 约定保期内服务次数正整数
   setFormItem("Tgt.nAgreeFrequency", {
     rules: [getRules("signlessInt", {})],
@@ -540,13 +544,13 @@ const method = {
   getcTransportChange:(val:string)=>{
     if(val === '1'){
       setFormItem("Tgt.cTransportTools", {
-        readonly: '0',
+        disabled:false
       });
     }else {
       // Tgt.cTransportTools
       setValue("Tgt.cTransportTools", '')
       setFormItem("Tgt.cTransportTools", {
-        readonly: '1',
+         disabled:true
       });
     }
  },
