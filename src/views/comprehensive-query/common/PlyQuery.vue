@@ -868,7 +868,7 @@ const esSearchColumns = [
    {
     prop: "policyInfo",
     inputtype: "rtinput",
-    title: "申请单号\n保单号",
+    title: "申请单号/保单号",
     minWidth: 200,
     fixed: "left",
    },
@@ -968,7 +968,7 @@ const normalQueryColumns = [
     {
         prop: "policyInfo",
         inputtype: "rtinput",
-        title: "申请单号\n保单号",
+        title: "申请单号/保单号",
         minWidth: 180,
         fixed: "left",
         slotName: "policyInfo"
