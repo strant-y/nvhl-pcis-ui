@@ -28,16 +28,16 @@
 
       <!-- ES查询 投保人姓名，被保人姓名，被保人地址，产品名称高亮 -->
       <template #column-cAppNme="{ row }">
-        <span v-html="row.cAppNme || '-'"></span>
+        <span v-html="row.cAppNme || ''"></span>
       </template>
       <template #column-cInsuredNme="{ row }">
-        <span v-html="row.cInsuredNme || '-'"></span>
+        <span v-html="row.cInsuredNme || ''"></span>
       </template>
       <template #column-cClntAddr="{ row }">
-        <span v-html="row.cClntAddr || '-'"></span>
+        <span v-html="row.cClntAddr || ''"></span>
       </template>
       <template #column-cNmeCn="{ row }">
-        <span v-html="row.cNmeCn || '-'"></span>
+        <span v-html="row.cNmeCn || ''"></span>
       </template>
 
     </app-table>
