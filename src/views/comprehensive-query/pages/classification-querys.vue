@@ -291,8 +291,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     }))
                   }];
                 }
-
-                dzmodal.open(colChange, { type: "edit", data: modalData })
+                
+                dzmodal.open(colChange, { type: "edit", data: modalData, userSaved: userColumnConfig.value.length > 0 })
                 .then(async (res) => {
                     if (res.type === "ok") {
                     const selectedProps = res.body.body; // 用户选中的列
@@ -319,6 +319,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                         const saveRes = await CustomUserList(saveParam);
                         if (saveRes.code === 200) {
                           userColumnConfig.value = newContent;
+
                           applyUserColumns(newContent);
                           ElMessage.success("列配置已更新");
                         } else {
@@ -629,7 +630,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                             item.hidden = true; // 隐藏投保日期、批改申请日期、询价日期、询价单号
                         } else if (item.prop == "tIssueTm") {
                             item.hidden = false; // 显示签单日期
-                        }else if (item.prop == "cPlyNo") {
+                        }else if (item.prop == "cPlyNo" || item.prop == "cDataTyp") {
                             item.hidden = false;
                         } 
                     });
@@ -974,7 +975,7 @@ const esSearchColumnsAE = [
           return true;
         }
     },
-    },
+   },
 ];
 // 2. ES查询 - 询价列配置
 const esSearchColumnsI = [
@@ -2109,7 +2110,10 @@ async function initCustomUserList(){
     };
     try {
         const res = await getCustomUserList(param);
-        if (res.code === 200 && res.data?.content[0].loadData.length) {
+        console.log('res', res);
+        console.log('res.data.content',res.data.content);  // undefined
+        console.log('res.data.content[0].loadData',res.data.content[0].loadData); // 报错
+        if (res.code === 200 && res.data.content[0].loadData.length) {
           userColumnConfig.value = res.data.content[0].loadData;
           applyUserColumns(userColumnConfig.value);
         } else {
@@ -2117,15 +2121,18 @@ async function initCustomUserList(){
           setTableColumns(false);
         }
     } catch (error) {
-          ElMessage.error("获取用户列配置失败");
-          setTableColumns(false);
+        setTableColumns(false);
     }
 }
 
 function applyUserColumns(content: any[]) {
-  const selectedProps = content
+  let contentData = content? content[0].loadData: [];
+
+  const selectedProps = contentData
     .filter((item: any) => item.checked)
     .map((item: any) => item.value);
+
+  console.log('selectedProps', selectedProps);
 
   const formData = freeEditRef.value?.getFromValue();
   const currentAppType = formData.cAppTyp || "A";

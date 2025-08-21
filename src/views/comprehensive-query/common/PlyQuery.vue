@@ -1020,7 +1020,7 @@ const normalQueryColumns = [
         prop: "cDptCnm",
         inputtype: "rtinput",
         title: "承保机构",
-        maxWidth: 180,
+        minWidth: 180,
     },
     {
         prop: "cAppNme",
