@@ -2849,7 +2849,7 @@ const submitToUndrFn = async () => {
 		return false;
 	}
 
-  // 040002 记名投保标志 选是  清单信息必须填  
+  // 040002 记名投保标志 选是 校验清单必须录入
   const distItem = distRequiredMap[props.param.cProdNo];
   if(distItem && tgtValue[distItem.flagKey] === '1') {
     const selectParam = {
@@ -4540,21 +4540,7 @@ function getEdrbaseValue(key:any) {
 }
 
 function getOldProductResData() {
-  // 043010 记名投保选“是”，人员清单导入未校验所有字段必填
-  const distItem = distRequiredMap[props.param.cProdNo];
-  const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue() || '';
-  if(distItem && tgtValue[distItem.flagKey] === '1') {
-    const data = deepClone(oldProductResData.value);
-    const dist = data[0]['pageInfo'].filter((item:any) => item.pageCode === distItem.distCode)[0]
-    if(dist && dist.pageSchema && dist.pageSchema.fromSchema) {
-      dist.pageSchema.fromSchema.forEach((item:any) => {
-        item.rules = [{type: 'required'}]
-      })
-    }
-    return data;
-  } else {
-    return oldProductResData.value;
-  }
+  return oldProductResData.value;
 }
 
 // 保存模板
