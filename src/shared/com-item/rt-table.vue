@@ -29,6 +29,8 @@
       :summary-method="item.summaryMethod ? item.summaryMethod : null"
       :span-method="objectSpanMethod"
       @current-change="currentChange"
+      :cell-style="getCellStyle"
+      :header-cell-style="getCellStyle"
     >
       <!-- 其他列定义 -->
       <el-table-column
@@ -187,7 +189,6 @@
             v-if="!i.expand"
             :prop="i.prop"
             :label="i.title"
-            :width="i.width ? i.width : null"
             :fixed="i.fixed ? i.fixed : null"
             :align="item.align ? item.align : i.align ? i.align : 'center'"
             :min-width="getColumnWidth(i.title,i.prop,tableDatas,i.minWidth,i.width, i.maxWidth || item.maxWidth)"
@@ -359,6 +360,22 @@ const props = defineProps({
     required: false,
   },
 });
+
+/**
+ * 单元格样式
+ * @param row
+ */
+const getCellStyle = (row: Record<string, any>) => {
+  if(!props.item.editFlag) {
+    return {
+      padding: '3px'
+    }
+  }else {
+    return {
+      padding: '6px'
+    }
+  }
+};
 
 const indexMethod = (index: number) => {
   return index !== undefined ? index + 1 : 0;
@@ -767,11 +784,10 @@ function getselectionData() {
   }
 }
 
-function getColumnWidth(label, prop, tableData, itemMinWidth, itemWidth, itemMaxWidth = 800) {
+function getColumnWidth(label: string, prop: any, tableData: any[], itemMinWidth: number, itemWidth: number, itemMaxWidth: number = 800) {
   //label表头名称
   //prop对应的内容
   //tableData表格数据
- 
   const width = itemWidth || 0 // 列表属性宽度
   const minWidth = itemMinWidth || 80 // 最小宽度
   const padding = 10 // 列内边距
@@ -782,6 +798,11 @@ function getColumnWidth(label, prop, tableData, itemMinWidth, itemWidth, itemMax
     const textWidth = getTextWidth(value)
     return textWidth + padding
   })
+  if(itemWidth > 0) {
+    // 如果配置了列宽度且内容长度超出了配置的宽度就用配置的数据
+    const width2 = Math.max(...contentWidths)
+    return width2 > itemWidth ? itemWidth : width2;
+  }
   const maxWidth = Math.max(...contentWidths) > itemMaxWidth ? itemMaxWidth : Math.max(...contentWidths)
   return Math.max(minWidth, maxWidth, width)
 }
@@ -868,9 +889,11 @@ function isrequired(i: any) {
 ::v-deep .el-form-item {
   margin-bottom: 0px !important; /* 使内容显示更近紧促 */
 }
+/*
 :deep(.el-table .cell) {
   white-space: nowrap;
 }
+*/
 :deep(.el-table td.el-table__cell div.cell) {
   white-space: normal;
 }

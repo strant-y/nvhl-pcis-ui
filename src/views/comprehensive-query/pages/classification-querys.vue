@@ -28,16 +28,16 @@
 
       <!-- ES查询 投保人姓名，被保人姓名，被保人地址，产品名称高亮 -->
       <template #column-cAppNme="{ row }">
-        <span v-html="row.cAppNme || '-'"></span>
+        <span v-html="row.cAppNme || ''"></span>
       </template>
       <template #column-cInsuredNme="{ row }">
-        <span v-html="row.cInsuredNme || '-'"></span>
+        <span v-html="row.cInsuredNme || ''"></span>
       </template>
       <template #column-cClntAddr="{ row }">
-        <span v-html="row.cClntAddr || '-'"></span>
+        <span v-html="row.cClntAddr || ''"></span>
       </template>
       <template #column-cNmeCn="{ row }">
-        <span v-html="row.cNmeCn || '-'"></span>
+        <span v-html="row.cNmeCn || ''"></span>
       </template>
 
     </app-table>
@@ -87,7 +87,7 @@ const removeIds = ref([]); // 删除用户ID集合 用于批量删除
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
-import {getAppPolicyList, getInquiryPolicyList, qryEndorseList, delTmpPolicy, queryInsuredList, getCustomUserList, CustomUserList} from "@/api/query";
+import {getAppPolicyList, getInquiryPolicyList, qryEndorseList, delTmpPolicy, queryInsuredList, getCustomUserList, CustomUserList, qryPolicyNewList} from "@/api/query";
 // 变更列
 const colChange = defineAsyncComponent(() => import("../modal/colChange.vue"));
 const PrintView = defineAsyncComponent(() => import("../modal/PrintView.vue"));
@@ -259,85 +259,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   }
               },
           }),
-        //   createFreeButtonBase({
-        //       label: "变更列",
-        //       func: () => {
-        //          // modalForm 存储了所有可选的列及其勾选状态
-        //           modalForm[0].loadData.forEach((i: any) => {
-        //               tableObj.notWaitObj.fromSchema.forEach((s: any) => {
-        //                   if (i.value == s.prop) {
-        //                       i.checked = true;
-        //                   }
-        //               });
-        //           });
-        //           dzmodal
-        //               .open(colChange, { type: "edit", data: modalForm })
-        //               .then((res) => {
-        //                   if (res.type === "ok") {
-        //                       // 处理用户选择的列
-        //                       const propArr = [];
-        //                       tableObj.notWaitObj.fromSchema.forEach((s: any) => {
-        //                           propArr.push(s.prop);
-        //                       });
-        //                       const delrowArr = [];
-        //                       // 默认显示的列
-        //                       if (addrowArr.length === 0) {
-        //                           addrowArr = [...res.body];
-        //                       } else {
-        //                           // 找出被取消选择的列
-        //                           for (let i = addrowArr.length - 1; i >= 0; i--) {
-        //                               const element = addrowArr[i];
-        //                               if (!res.body.includes(element)) {
-        //                                   delrowArr.push(element);
-        //                                   addrowArr.splice(i, 1); // 从后往前删除，避免索引偏移
-        //                               }
-        //                           }
-        //                           addrowArr = [...new Set([...addrowArr, ...res.body])];
-
-        //                           // 更新勾选状态
-        //                           modalForm[0].loadData.forEach((i: any) => {
-        //                               delrowArr.forEach((s: any) => {
-        //                                   if (i.value == s) {
-        //                                       i.checked = false;
-        //                                   }
-        //                               });
-        //                           });
-        //                       }
-        //                       // 添加新选择的列 tableCol包含所有可选的列定义
-        //                       if (delrowArr.length == "0") {
-        //                           tableCol.value.map((item) => {
-        //                               res.body.forEach((e: any) => {
-        //                                   if (item.prop == e && propArr.indexOf(e) < 0) {
-        //                                       tableObj.notWaitObj.fromSchema.push(item);
-        //                                   }
-        //                               });
-        //                           });
-        //                       } else {
-        //                          // 移除被取消选择的列
-        //                           for (
-        //                               let i = tableObj.notWaitObj.fromSchema.length - 1;
-        //                               i >= 0;
-        //                               i--
-        //                           ) {
-        //                               const element = tableObj.notWaitObj.fromSchema[i].prop;
-        //                               if (delrowArr.includes(element)) {
-        //                                   tableObj.notWaitObj.fromSchema.splice(i, 1); // 从后往前删除，避免索引偏移
-        //                               }
-        //                           }
-        //                           // 添加新选择的列
-        //                           tableCol.value.map((item) => {
-        //                               res.body.forEach((e: any) => {
-        //                                   if (item.prop == e && propArr.indexOf(e) < 0) {
-        //                                       tableObj.notWaitObj.fromSchema.push(item);
-        //                                   }
-        //                               });
-        //                           });
-        //                       }
-        //                       handleQuery(true);
-        //                   }
-        //               });
-        //       },
-        //   }),
           createFreeButtonBase({
             label: "变更列",
             func: () => {
@@ -370,8 +291,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     }))
                   }];
                 }
-
-                dzmodal.open(colChange, { type: "edit", data: modalData })
+                
+                dzmodal.open(colChange, { type: "edit", data: modalData, userSaved: userColumnConfig.value.length > 0 })
                 .then(async (res) => {
                     if (res.type === "ok") {
                     const selectedProps = res.body.body; // 用户选中的列
@@ -386,10 +307,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                         }))
                     }];
 
-                    // userColumnConfig.value = newContent;
-                    // applyUserColumns(newContent);
-                    // ElMessage.success("列配置已更新");
-
                     // 保存到接口
                     const saveParam = {
                         content: newContent,
@@ -398,11 +315,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     };
 
                     console.log('saveParam',saveParam);
-
                     try {
                         const saveRes = await CustomUserList(saveParam);
                         if (saveRes.code === 200) {
                           userColumnConfig.value = newContent;
+
                           applyUserColumns(newContent);
                           ElMessage.success("列配置已更新");
                         } else {
@@ -427,7 +344,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               itemWidth: 2,
               showExBtn: true,
               btnItems: {
-                  // icon: "Search",
                   label: "搜索",
                   type: "primary",
                   func: () => {
@@ -488,12 +404,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               ],
               defaultValue: 1,
           },
-        //   {
-        //       prop: "cSecondDptCde",
-        //       inputtype: "rtselect",
-        //       title: "二级分公司",
-        //       clearable: true,
-        //   },
           {
               prop: "cDataTyp",
               inputtype: "rtselect",
@@ -616,7 +526,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               prop: "cAppStatus",
               inputtype: "rtselect",
               title: "状态",
-              // rules: [getRules("required", {})],
               clearable: true,
               loadData: [
                   { label: "暂存", value: "1" },
@@ -642,22 +551,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               clearable: true,
           },
           {
-            prop: "cInquiryNo",
-            inputtype: "rtinput",
-            title: "询价单号",
-            clearable: true,
-            hidden: true,
+              prop: "cInsuredNme",
+              inputtype: "rtinput",
+              title: "被保人名称",
+              clearable: true,
           },
           {
               prop: "cAppNme",
               inputtype: "rtinput",
               title: "投保人名称",
-              clearable: true,
-          },
-          {
-              prop: "cInsuredNme",
-              inputtype: "rtinput",
-              title: "被保人名称",
               clearable: true,
           },
           {
@@ -684,7 +586,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                               freeEditRef.value?.setValue("tAppTm", [startDate, endDate]);
                           } else if (item.prop == "tIssueTm" || item.prop == "tEdrAppTm" || item.prop == "tInquiryTm" || item.prop == "cInquiryNo") {
                               item.hidden = true;
-                          } else if (item.prop == "cPlyNo") {
+                          } else if (item.prop == "cPlyNo" || item.prop == "cDataTyp") {
                              item.hidden = false;
                           } 
                       });
@@ -700,8 +602,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                             freeEditRef.value?.setValue("tEdrAppTm", [startDate, endDate]);
                           } else if (item.prop == "tAppTm" || item.prop == "tIssueTm" || item.prop == "tInquiryTm" || item.prop == "cInquiryNo") {
                             item.hidden = true;
-                          } else if (item.prop == "cPlyNo") {
-                             item.hidden = false;
+                          } else if (item.prop == "cPlyNo" || item.prop == "cDataTyp") {
+                            item.hidden = false;
                           } 
                       });
                   } else if (val === "I") {
@@ -715,7 +617,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                             freeEditRef.value?.setValue("tInquiryTm", [startDate, endDate]);
                           } else if (item.prop == "cInquiryNo") {
                               item.hidden = false;
-                          } else if (item.prop == "tAppTm" || item.prop == "tIssueTm" || item.prop == "tEdrAppTm" ) {
+                          } else if (item.prop == "tAppTm" || item.prop == "tIssueTm" || item.prop == "tEdrAppTm" || item.prop == "cDataTyp" ) {
                               item.hidden = true;
                           } else if (item.prop == "cPlyNo") {
                               item.hidden = true;
@@ -728,12 +630,19 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                             item.hidden = true; // 隐藏投保日期、批改申请日期、询价日期、询价单号
                         } else if (item.prop == "tIssueTm") {
                             item.hidden = false; // 显示签单日期
-                        }else if (item.prop == "cPlyNo") {
+                        }else if (item.prop == "cPlyNo" || item.prop == "cDataTyp") {
                             item.hidden = false;
                         } 
                     });
                   }
               },
+          },
+          {
+            prop: "cInquiryNo",
+            inputtype: "rtinput",
+            title: "询价单号",
+            clearable: true,
+            hidden: true,
           },
           {
               prop: "tIssueTm",
@@ -772,17 +681,17 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               type: "datetimerange",
               hidden: true,
           },
-          {
-              prop: "seeBilling",
-              inputtype: "rtselect",
-              title: "是否见费出单",
-              minWidth: 180,
-              clearable: true,
-              loadData: [
-                  { label: "是", value: "1" },
-                  { label: "否", value: "0" },
-              ],
-          },
+        //   {
+        //       prop: "seeBilling",
+        //       inputtype: "rtselect",
+        //       title: "是否见费出单",
+        //       minWidth: 180,
+        //       clearable: true,
+        //       loadData: [
+        //           { label: "是", value: "1" },
+        //           { label: "否", value: "0" },
+        //       ],
+        //   },
           {
               prop: "CEmployeeName",
               inputtype: "rtinput",
@@ -790,13 +699,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               clearable: true,
               hidden: true,
           },
-          // {
-          //     prop: "cCntrNme",
-          //     inputtype: "rtinput",
-          //     title: "人员姓名",
-          //     clearable: true,
-          //     hidden: true,
-          // },
           {
               prop: "CIdentificationNumber",
               inputtype: "rtinput",
@@ -1073,9 +975,104 @@ const esSearchColumnsAE = [
           return true;
         }
     },
+   },
+];
+// 2. ES查询 - 询价列配置
+const esSearchColumnsI = [
+   {
+    prop: "cInquiryNo",
+    inputtype: "rtinput",
+    title: "询价单号",
+    minWidth: 180,
+    fixed: "left",
+   },
+   {
+    prop: "cAppNo",
+    inputtype: "rtinput",
+    title: "申请单号",
+    minWidth: 180,
+   },
+   {
+    prop: "cNmeCn",
+    inputtype: "rtinput",
+    title: "产品名称",
+    minWidth: 180,
+    slotName: "cNmeCn"
+   },
+   {
+    prop: "cInsuredNme",
+    inputtype: "rtinput",
+    title: "被保人名称",
+    minWidth: 180,
+    slotName: "cInsuredNme"
+   },
+   {
+    prop: "cInsuredCde",
+    inputtype: "rtinput",
+    title: "被保人证件号码",
+    minWidth: 180,
+   },
+   {
+    prop: "cMobile",
+    inputtype: "rtinput",
+    title: "手机号码",
+    minWidth: 180,
+   },
+   {
+    prop: "cClntAddr",
+    inputtype: "rtinput",
+    title: "被保人地址",
+    minWidth: 180,
+    slotName: "cClntAddr"
+   },
+   {
+    prop: "cAppNme",
+    inputtype: "rtinput",
+    title: "投保人名称",
+    minWidth: 180,
+    slotName: "cAppNme"
+   },
+   {
+    prop: "tUdrTm",
+    inputtype: "rtinput",
+    title: "核保日期",
+    minWidth: 180,
+   },
+   {
+    prop: "InsurancePeriod",
+    inputtype: "rtinput",
+    title: "保险期间",
+    minWidth: 180,
+   },
+   {
+    prop: "cAppStatus",
+    inputtype: "rtselect",
+    title: "保单状态",
+    minWidth: 120,
+    loadData: [
+        { label: "暂存", value: "1" },
+        { label: "已提核", value: "2" },
+        { label: "核保退回/撤回", value: "3" },
+        { label: "核保通过", value: "4" },
+        { label: "已出保单", value: "5" },
+        { label: "已做失效操作", value: "6" },
+        { label: "已提交未接收", value: "7" },
+        { label: "见费出单退回", value: "8" },
+    ],
+    hideBtns: (row: any) => {
+        if (
+            queryType.value == "2" ||
+            queryType.value == "3" ||
+            queryType.value == "4"
+        ) {
+          return false;
+        } else {
+          return true;
+        }
+    },
     },
 ];
-// 2. 普通查询 - 投保/批改列配置
+// 3. 普通查询 - 投保/批改列配置
 const normalQueryColumnsAE = [
     {
         prop: "policyInfo",
@@ -1206,101 +1203,6 @@ const normalQueryColumnsAE = [
         minWidth: 180,
     },
 ]
-// 3. ES查询 - 询价列配置
-const esSearchColumnsI = [
-   {
-    prop: "cInquiryNo",
-    inputtype: "rtinput",
-    title: "询价单号",
-    minWidth: 180,
-    fixed: "left",
-   },
-   {
-    prop: "cAppNo",
-    inputtype: "rtinput",
-    title: "申请单号",
-    minWidth: 180,
-   },
-   {
-    prop: "cNmeCn",
-    inputtype: "rtinput",
-    title: "产品名称",
-    minWidth: 180,
-    slotName: "cNmeCn"
-   },
-   {
-    prop: "cInsuredNme",
-    inputtype: "rtinput",
-    title: "被保人名称",
-    minWidth: 180,
-    slotName: "cInsuredNme"
-   },
-   {
-    prop: "cInsuredCde",
-    inputtype: "rtinput",
-    title: "被保人证件号码",
-    minWidth: 180,
-   },
-   {
-    prop: "cMobile",
-    inputtype: "rtinput",
-    title: "手机号码",
-    minWidth: 180,
-   },
-   {
-    prop: "cClntAddr",
-    inputtype: "rtinput",
-    title: "被保人地址",
-    minWidth: 180,
-    slotName: "cClntAddr"
-   },
-   {
-    prop: "cAppNme",
-    inputtype: "rtinput",
-    title: "投保人名称",
-    minWidth: 180,
-    slotName: "cAppNme"
-   },
-   {
-    prop: "tUdrTm",
-    inputtype: "rtinput",
-    title: "核保日期",
-    minWidth: 180,
-   },
-   {
-    prop: "InsurancePeriod",
-    inputtype: "rtinput",
-    title: "保险期间",
-    minWidth: 180,
-   },
-   {
-    prop: "cAppStatus",
-    inputtype: "rtselect",
-    title: "保单状态",
-    minWidth: 120,
-    loadData: [
-        { label: "暂存", value: "1" },
-        { label: "已提核", value: "2" },
-        { label: "核保退回/撤回", value: "3" },
-        { label: "核保通过", value: "4" },
-        { label: "已出保单", value: "5" },
-        { label: "已做失效操作", value: "6" },
-        { label: "已提交未接收", value: "7" },
-        { label: "见费出单退回", value: "8" },
-    ],
-    hideBtns: (row: any) => {
-        if (
-            queryType.value == "2" ||
-            queryType.value == "3" ||
-            queryType.value == "4"
-        ) {
-          return false;
-        } else {
-          return true;
-        }
-    },
-    },
-];
 // 4. 普通查询 - 询价列配置 
 const normalQueryColumnsI = [
     {
@@ -1607,7 +1509,7 @@ tableconfig.fixed= true;
 onMounted(async () => {
     formconfig1.fromSchema?.forEach((item) => {
         if (
-            // item.prop === "tIssueTm"
+        item.prop === "tInquiryTm" ||
         item.prop === "tAppTm" ||
         item.prop === "tEdrAppTm"
         ) {
@@ -1640,22 +1542,12 @@ const method = {
     console.log(getRules);
   },
 };
-
 // 绑定特殊验证器
-const exRules = {
-  byrtInput: (rule: any, value: any, callback: any) => {
-    const r = freeEditRef.value?.getFromValue();
-    if (r["name"]) {
-      callback();
-    } else {
-      callback("姓名");
-    }
-  },
-};
+const exRules = {};
 
 function setTableColumns(isEsSearch: boolean) {
   const freeEditRefs = freeEditRef.value;
-  const s = freeEditRefs.getFromValue(); //获取表单数据
+  const s = freeEditRefs?.getFromValue(); //获取表单数据
   let newColumns;
   if (s.cAppTyp === "I") {
     // 询价
@@ -1701,12 +1593,14 @@ function handleInquiryQuery(flag?: boolean) {
     if (s.cLoadSub == null) {
         s.cLoadSub = "1";
     }
+    pageresult.list = [];
     // 清空其他日期参数
     s.tAppTm = null;
     s.tEdrAppTm = null;
     s.tIssueTm = null;
+    // 删除列表类型
+    delete s.cDataTyp;
 
-    pageresult.list = [];
     if (
         (s["cAppNo"] == null || s["cAppNo"] == "") &&
         (s["cPlyNo"] == null || s["cPlyNo"] == "") &&
@@ -1753,7 +1647,7 @@ function handleInquiryQuery(flag?: boolean) {
     param["queryType"] = queryType.value;
     param["cTermNo"] = cTermNo;        // 条款编码
 
-    getInquiryPolicyList(param)
+    qryPolicyNewList(param)
         .then((res) => {
             const { code, data, msg } = res;
             if (200 === code) {
@@ -1778,7 +1672,6 @@ function handleNormalQuery(flag?: boolean) {
         s.cLoadSub = "1";
     }
     pageresult.list = [];
-    
     if (
         (s["cAppNo"] == null || s["cAppNo"] == "") &&
         (s["cPlyNo"] == null || s["cPlyNo"] == "") &&
@@ -1835,7 +1728,7 @@ function handleNormalQuery(flag?: boolean) {
     param["queryType"] = queryType.value;
     param["cTermNo"] = cTermNo;        // 条款编码
 
-    getAppPolicyList(param)
+    qryPolicyNewList(param)
         .then((res) => {
             const { code, data, msg } = res;
             if (200 === code) {
@@ -2084,7 +1977,6 @@ function esNormalSearch(flag?: boolean) {
 
 // 多选事件
 function handleSelectionChange(selection: any) {
-  console.log("selection", selection);
   removeIds.value = selection.map((item: any) => item.cPkId);
 }
 
@@ -2218,7 +2110,10 @@ async function initCustomUserList(){
     };
     try {
         const res = await getCustomUserList(param);
-        if (res.code === 200 && res.data?.content[0].loadData.length) {
+        console.log('res', res);
+        console.log('res.data.content',res.data.content);  // undefined
+        console.log('res.data.content[0].loadData',res.data.content[0].loadData); // 报错
+        if (res.code === 200 && res.data.content[0].loadData.length) {
           userColumnConfig.value = res.data.content[0].loadData;
           applyUserColumns(userColumnConfig.value);
         } else {
@@ -2226,15 +2121,18 @@ async function initCustomUserList(){
           setTableColumns(false);
         }
     } catch (error) {
-          ElMessage.error("获取用户列配置失败");
-          setTableColumns(false);
+        setTableColumns(false);
     }
 }
 
 function applyUserColumns(content: any[]) {
-  const selectedProps = content
+  let contentData = content? content[0].loadData: [];
+
+  const selectedProps = contentData
     .filter((item: any) => item.checked)
     .map((item: any) => item.value);
+
+  console.log('selectedProps', selectedProps);
 
   const formData = freeEditRef.value?.getFromValue();
   const currentAppType = formData.cAppTyp || "A";

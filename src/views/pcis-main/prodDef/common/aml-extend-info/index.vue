@@ -1,7 +1,9 @@
 <template>
   <el-dialog :close-on-click-modal="false"  v-model="dialogVisible"  @close="close" width="90%" title="反洗钱扩展信息">
-		<appExtendInfo  v-if="controlFlag=='1' || controlFlag == 3" ref="appExtendInfoRef"/>
-		<insExtendInfo  v-if="controlFlag=='2' || controlFlag == 3" ref="inextendRef"/>
+    <el-config-provider :locale="locale">
+      <appExtendInfo  v-if="controlFlag=='1' || controlFlag == 3" ref="appExtendInfoRef"/>
+      <insExtendInfo  v-if="controlFlag=='2' || controlFlag == 3" ref="inextendRef"/>
+    </el-config-provider>
 		<div style="margin-top: 20px" :style="{ textAlign: 'right' }">
         <rt-button
           :item="{
@@ -47,6 +49,9 @@ import {
 } from "@/shared/app-table-config";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const opertaor = dataOpertaor();
+import { useAppStore } from "@/store";
+const appStore = useAppStore();
+const locale = computed(() => appStore.locale);
 
 const props = defineProps({
   controlFlag:{
