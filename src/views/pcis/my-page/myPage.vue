@@ -2948,7 +2948,8 @@ const submitToUndrFn = async () => {
     const premiumDifference = totalPremium - totalCiPremium;
     
     // 如果差值在±0.01范围内，则调整最后一条联共保记录的保费
-    if (Math.abs(premiumDifference) <= 0.01 && premiumDifference !== 0) {
+    // if (Math.abs(premiumDifference) <= 0.01 && premiumDifference !== 0) {
+    if(premiumDifference !== 0) {
       const lastIndex = ciData.length - 1;
       const lastCiItem = ciData[lastIndex];
       lastCiItem['Ci.nCiPrm'] = parseFloat(lastCiItem['Ci.nCiPrm'] || 0) + premiumDifference;
@@ -3089,7 +3090,7 @@ const submitToUndrFn = async () => {
             } else {
 
               // 关联交易业务 时 股东客户改是  审批单号必填
-              if(undr.msg ==='该笔业务为关联交易业务，请上传【关联交易审批单】，并录入【关联交易审批单编号】！'){
+              if(undr.msg ==='该笔业务为关联交易业务，请录入【投保人关联交易审批单编号】！'){
                     const appTabref = opertaor.getTableRefs()["applicant"];
                     const insTabref = opertaor.getTableRefs()["insured"];
   
