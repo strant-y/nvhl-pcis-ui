@@ -156,31 +156,34 @@
       />
     </template>
   </template>
-  <span v-else>
+  <div class="width-100" v-else>
     <template v-if="item.type === 'icon'">
       <rt-icon :item="{ icon: vInput }" />
     </template>
     <template v-else>
-       <!-- 添加图标显示 -->
-    <el-icon v-if="item.prefixIcon" >
-      <component :is="renderIcon(item.prefixIcon)" />
-    </el-icon>
-       <span v-if="item.prefix">{{ item.prefix }}</span>
+      <!-- 添加图标显示 -->
+      <el-icon v-if="item.prefixIcon" >
+        <component :is="renderIcon(item.prefixIcon)" />
+      </el-icon>
+      <span v-if="item.prefix">{{ item.prefix }}</span>
+      <el-text class="mx-1" truncated @click="checkIfTruncated($event, vInput)">
         {{vInput !== 'undefined' ? vInput : ''}}
+      </el-text>
       <!-- 添加复制图标 -->
-    <el-icon
+      <el-icon
         v-if="item.showCopyIcon"
         style="margin-left: 5px; cursor: pointer; color: #409eff;"
         @click="copyToClipboard(vInput)"
-    >
-      <CopyDocument />
-    </el-icon>
+      >
+        <CopyDocument />
+      </el-icon>
     </template>
-  </span>
+  </div>
 </template>
 
 <script setup lang="ts">
 import * as ElementPlusIconsVue from "@element-plus/icons-vue";
+import {checkIfTruncated} from "@/utils/common";
 type IconNames = keyof typeof ElementPlusIconsVue;
 const props = defineProps({
   modelValue: {

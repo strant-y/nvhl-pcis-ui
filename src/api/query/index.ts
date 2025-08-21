@@ -352,3 +352,11 @@ export function getCustomUserList(queryParams: any): AxiosPromise<any> {
 export function CustomUserList(queryParams: any): AxiosPromise<any> {
 	return post(`/policy/CustomUserList`, queryParams);
 }
+
+/**
+* 查询（汇总）
+ * @param queryParams
+ */
+export function qryPolicyNewList(queryParams: any): AxiosPromise<any> {
+	return post(`/policy/qryPolicyNewList`, queryParams);
+}

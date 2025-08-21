@@ -1778,19 +1778,6 @@ async function loadAfter() {
             }
           })
         }
-        // 从查询结果获取主条款编码和名称，在顶部反显
-        if(ops['cvrg'] && ops['cvrg'].length > 0 && !props.param?.cTermNo) {
-          router.replace({
-            path: "/pcis/my-page",
-            query: {
-              param: JSON.stringify({
-                ...route.params.param,
-                cTermNo: ops['cvrg'].find((i:any) => i['Term.cRdrTyp'] === "0")['Term.cClauseCode'],
-                cTermNme: ops['cvrg'].find((i:any) => i['Term.cRdrTyp'] === "0")['Term.cClauseName']
-              }),
-            },
-          });
-        }
         opertaor.setDataAll(ops);
         // 获取原申请单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
@@ -2216,6 +2203,14 @@ async function loadAfter() {
               item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
             }
           })
+        }
+        // 投保人信息
+        if(ops.applicant) {
+          ops.applicant["Applicant.cCustRiskRank"] = "925104";
+        }
+        // 被保人信息
+        if(ops.insured) {
+          ops.insured["Insured.cCustRiskRank"] = "925104";
         }
         opertaor.setDataAll(ops);
         // 获取原申请单号下的清单列表数据
@@ -2854,12 +2849,11 @@ const submitToUndrFn = async () => {
 		return false;
 	}
 
-  // 040002 记名投保标志 选是  清单信息必须填  
+  // 040002 记名投保标志 选是 校验清单必须录入
   const distItem = distRequiredMap[props.param.cProdNo];
   if(distItem && tgtValue[distItem.flagKey] === '1') {
     const selectParam = {
       cComponentTable: distItem.cComponentTable,
-      isSummary: '1',
     }
     if(props.param?.pageName === "priceInquiry") {
       selectParam['cInquiryNo'] = cInquiryNumber
@@ -2949,7 +2943,8 @@ const submitToUndrFn = async () => {
     const premiumDifference = totalPremium - totalCiPremium;
     
     // 如果差值在±0.01范围内，则调整最后一条联共保记录的保费
-    if (Math.abs(premiumDifference) <= 0.01 && premiumDifference !== 0) {
+    // if (Math.abs(premiumDifference) <= 0.01 && premiumDifference !== 0) {
+    if(premiumDifference !== 0) {
       const lastIndex = ciData.length - 1;
       const lastCiItem = ciData[lastIndex];
       lastCiItem['Ci.nCiPrm'] = parseFloat(lastCiItem['Ci.nCiPrm'] || 0) + premiumDifference;
@@ -3090,7 +3085,7 @@ const submitToUndrFn = async () => {
             } else {
 
               // 关联交易业务 时 股东客户改是  审批单号必填
-              if(undr.msg ==='该笔业务为关联交易业务，请上传【关联交易审批单】，并录入【关联交易审批单编号】！'){
+              if(undr.msg ==='该笔业务为关联交易业务，请录入【投保人关联交易审批单编号】！'){
                     const appTabref = opertaor.getTableRefs()["applicant"];
                     const insTabref = opertaor.getTableRefs()["insured"];
   
@@ -3731,6 +3726,10 @@ const saveApplicationEdr = () => {
             "EdrBase.cEdrRsnDetail"
           ].split(",");
         edrbase.value?.setFormValue(EdrBaseData);
+        if(props.param.pageType === "EDR_APP_NEW_SCENE" && saveDistBatchFlag.value) {
+          // 复制保单清单信息到批单中
+          saveDist(EdrBaseData['EdrBase.cAppNo'], props.param?.cRsnCde)
+        }
         // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
         if(props.param.pageType === "EDR_APP_NEW_SCENE" && !beforeSaveCappNo && EdrBaseData["EdrBase.cAppNo"]) {
           getAppPolicyList({
@@ -3837,6 +3836,14 @@ const submitEdrToUndrSurrender = async () => {
     console.log("申请核保(退保、注销)", res);
     if (res["code"] == "200") {
       ElMessage.success(res.msg);
+      if(res['cDecision'] === '1' || res['cDecision'] === '2'){
+        tagsViewStore.delView({"name": "my-page",
+          "title": "申请单录入",
+          "path": "/pcisapp/myPage",
+          "fullPath": "/pcisapp/myPage"}).then((res: any) => {
+          router.replace({ path: "/dashboard" });
+        });
+      }
     } else {
       ElMessage.error(res.msg);
     }
@@ -3894,7 +3901,7 @@ const saveEdrPlyInfo = async () => {
     }
     opertaor.setDataAll(ops);
     const EdrBaseData = edrInfo["res"]["composition"]["EdrBase"][0];
-    EdrBaseData["EdrBase.cEdrRsnDetail"] = EdrBaseData["EdrBase.cEdrRsnDetail"].split(",")
+    EdrBaseData["EdrBase.cEdrRsnDetail"] = EdrBaseData["EdrBase.cEdrRsnDetail"] ? EdrBaseData["EdrBase.cEdrRsnDetail"].split(",") : ""
     // res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
     //   res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"].split(
     //     ","
@@ -4309,7 +4316,11 @@ const submitUnderwritingFn = async () => {
           "title": "申请单录入",
           "path": "/pcisapp/myPage",
           "fullPath": "/pcisapp/myPage"}).then((res: any) => {
-          router.replace({ path: "/pcis-new-udr-list/PendUdrList" });
+          if(props.param?.pageName === "priceInquiry") {
+            router.replace({ path: "/pcis-new-udr-list/InquiryUdrList" });
+          } else {
+            router.replace({ path: "/pcis-new-udr-list/PendUdrList" });
+          }
         });
       }
       // opertaor.setDataAll(ops);
@@ -4534,21 +4545,7 @@ function getEdrbaseValue(key:any) {
 }
 
 function getOldProductResData() {
-  // 043010 记名投保选“是”，人员清单导入未校验所有字段必填
-  const distItem = distRequiredMap[props.param.cProdNo];
-  const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue() || '';
-  if(distItem && tgtValue[distItem.flagKey] === '1') {
-    const data = deepClone(oldProductResData.value);
-    const dist = data[0]['pageInfo'].filter((item:any) => item.pageCode === distItem.distCode)[0]
-    if(dist && dist.pageSchema && dist.pageSchema.fromSchema) {
-      dist.pageSchema.fromSchema.forEach((item:any) => {
-        item.rules = [{type: 'required'}]
-      })
-    }
-    return data;
-  } else {
-    return oldProductResData.value;
-  }
+  return oldProductResData.value;
 }
 
 // 保存模板

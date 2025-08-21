@@ -37,8 +37,8 @@
       </el-cascader>
     </div>
   </el-tooltip>
-  <div v-if="props.showLabel">
-    <span>{{ displayText }}</span>
+  <div class="width-100" v-if="props.showLabel">
+     <el-text class="mx-1" truncated @click="checkIfTruncated($event, displayText)">{{ displayText }}</el-text>
   </div>
 </template>
 
@@ -46,6 +46,7 @@
 import { codeListViewStore } from "@/store";
 import { CascaderProps } from "element-plus";
 import {CommonConstants} from "@/constants/CommonConstants";
+import {checkIfTruncated} from "@/utils/common";
 
 const codeListStore = codeListViewStore();
 const props = defineProps({

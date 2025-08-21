@@ -8,7 +8,7 @@
       ref="tableRef"
       @page-change="handleQuery(false)"
     >
-			<!-- policyInfo 列的具名插槽 -->
+	  <!-- policyInfo 列的具名插槽 -->
       <template #column-policyInfo="{ row, column, index }">
         <div class="policy-info-cell">
           <div v-if="row.cAppNo" class="policy-number-row">
@@ -25,7 +25,23 @@
           </div>
         </div>
       </template>
-		</app-table>
+
+      
+      <!-- ES查询 投保人姓名，被保人姓名，被保人地址，产品名称高亮 -->
+      <template #column-cAppNme="{ row }">
+        <span v-html="row.cAppNme || ''"></span>
+      </template>
+      <template #column-cInsuredNme="{ row }">
+        <span v-html="row.cInsuredNme || ''"></span>
+      </template>
+      <template #column-cClntAddr="{ row }">
+        <span v-html="row.cClntAddr || ''"></span>
+      </template>
+      <template #column-cNmeCn="{ row }">
+        <span v-html="row.cNmeCn || ''"></span>
+      </template>
+
+	</app-table>
   </div>
 </template>
 
@@ -825,7 +841,7 @@ const esSearchColumns = [
     prop: "policyInfo",
     inputtype: "rtinput",
     title: "保单",
-    minWidth: 180,
+    minWidth: 200,
     fixed: "left",
    },
    {
@@ -845,12 +861,14 @@ const esSearchColumns = [
     inputtype: "rtinput",
     title: "产品名称",
     minWidth: 180,
+    slotName: "cNmeCn"
    },
    {
     prop: "cInsuredNme",
     inputtype: "rtinput",
     title: "被保人名称",
     minWidth: 180,
+    slotName: "cInsuredNme"
    },
    {
     prop: "cInsuredCde",
@@ -869,12 +887,14 @@ const esSearchColumns = [
     inputtype: "rtinput",
     title: "被保人地址",
     minWidth: 180,
+    slotName: "cClntAddr"
    },
    {
     prop: "cAppNme",
     inputtype: "rtinput",
     title: "投保人名称",
     minWidth: 180,
+    slotName: "cAppNme"
    },
    {
     prop: "tUdrTm",
@@ -892,7 +912,7 @@ const esSearchColumns = [
     prop: "cAppStatus",
     inputtype: "rtselect",
     title: "保单状态",
-    minWidth: 110,
+    minWidth: 120,
     loadData: [
         { label: "暂存", value: "1" },
         { label: "已提核", value: "2" },
@@ -1282,7 +1302,6 @@ function esSearch(flag?: boolean) {
   if (s.cLoadSub == null) {
     s.cLoadSub = "1";
   }
-  pageresult.list = [];
   if (
       (s["cAppNo"] == null || s["cAppNo"] == "") &&
       (s["cPlyNo"] == null || s["cPlyNo"] == "") &&
@@ -1384,7 +1403,6 @@ function handleQuery(flag?: boolean) {
     if (s.cLoadSub == null) {
         s.cLoadSub = "1";
     }
-    pageresult.list = [];
     if (
         (s["cAppNo"] == null || s["cAppNo"] == "") &&
         (s["cPlyNo"] == null || s["cPlyNo"] == "") &&

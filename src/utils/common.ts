@@ -1,6 +1,7 @@
 import Clipboard from "clipboard";
 import { descryptParameter, encryptParameter } from "@/utils/encipher";
 import {CommonConstants} from "@/constants/CommonConstants";
+import {Tooltip} from "@/common/dztooltip/tooltipOptions";
 
 /**
  * 复制功能
@@ -145,6 +146,50 @@ export function scrollByDomId(targetId: string, location: "center" | "end" | "ne
         behavior: 'smooth',
         block: location
       });
+    }
+  }
+}
+
+
+/**
+ * Tooltip提示
+ * @param event 点击的元素
+ * @param value 显示内容
+ * @param mouseleaveClose 离开当前元素自动关闭
+ */
+export function showTooltip(event: MouseEvent, value: any, mouseleaveClose: boolean = true) {
+  if (event && event.currentTarget) {
+    const res = Tooltip.show({
+      content: value,
+      duration: 5000,
+      showArrow: true,
+      effect: 'dark',
+      offset: 20
+    }, event);
+    if(mouseleaveClose) {
+      const closeListener = () => {
+        event.currentTarget?.removeEventListener('mouseleave', closeListener);
+        setTimeout(() => {
+          res.close();
+        }, 500)
+      };
+      event.currentTarget?.addEventListener('mouseleave', closeListener);
+    }
+    return res;
+  }
+  return {};
+}
+
+/**
+ * 判断内容是否超出
+ * @param event 点击的元素
+ * @param value 显示内容
+ */
+export function checkIfTruncated(event: MouseEvent, value: any) {
+  if (event && event.currentTarget) {
+    const element: any = event.currentTarget;
+    if(element.scrollWidth > element.clientWidth) {
+      showTooltip(event, value);
     }
   }
 }

@@ -185,11 +185,12 @@ const method = {
     freeEditRef.value?.setValueByRowKey("Ci.cDptCde", rowId, undefined);
     // 联保机构下拉选项查询
     ciJiDptOptionsQuery(val, row);
-
     if(!initFlag.value){
       if (plyBasedata["Base.cCiMrk"] === "5" && val !== "327001") {
-        freeEditRef?.value?.setValueByRowKey("Ci.cCoinsurerCde", rowId, "");
-        ElMessage.error("司内联保，不能录入除永安以外的其他公司！");
+        if(val !=''){
+          freeEditRef?.value?.setValueByRowKey("Ci.cCoinsurerCde", rowId, "");
+          ElMessage.error("司内联保，不能录入除永安以外的其他公司！");
+        }
         return false;
       }
       freeEditRef?.value?.setValueByRowKey("Ci.cCiSubComp", rowId, "");
@@ -256,7 +257,7 @@ const method = {
         ElMessage.error("已经存在相同的共保公司、分公司和出单机构组合！");
         // 回退当前行的出单机构值
         freeEditRef?.value?.setValueByRowKey("Ci.cDptCde", rowId, "");
-        freeEditRef?.value?.setValueByRowKey("dptCascader", rowId, [subDptCde]);
+        freeEditRef?.value?.setValueByRowKey("dptCascader", rowId, []);
         return;
       }
     } else {

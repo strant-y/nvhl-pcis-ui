@@ -2849,12 +2849,11 @@ const submitToUndrFn = async () => {
 		return false;
 	}
 
-  // 040002 记名投保标志 选是  清单信息必须填  
+  // 040002 记名投保标志 选是  校验清单必须录入  
   const distItem = distRequiredMap[props.param.cProdNo];
   if(distItem && tgtValue[distItem.flagKey] === '1') {
     const selectParam = {
       cComponentTable: distItem.cComponentTable,
-      isSummary: '1',
     }
     if(props.param?.pageName === "priceInquiry") {
       selectParam['cInquiryNo'] = cInquiryNumber
@@ -3273,7 +3272,7 @@ const savePlyInfo = async () => {
             sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
             const data = res.data?.result[0];
             router.replace({
-              path: "/pcis/my-page",
+              path: "/pcisapp/pricePage",
               query: {
                 param: JSON.stringify({
                   ...data,
@@ -4272,7 +4271,11 @@ const submitUnderwritingFn = async () => {
           "title": "申请单录入",
           "path": "/pcisapp/myPage",
           "fullPath": "/pcisapp/myPage"}).then((res: any) => {
-          router.replace({ path: "/pcis-new-udr-list/PendUdrList" });
+          if(props.param?.pageName === "priceInquiry") {
+            router.replace({ path: "/pcis-new-udr-list/InquiryUdrList" });
+          } else {
+            router.replace({ path: "/pcis-new-udr-list/PendUdrList" });
+          }
         });
       }
       // opertaor.setDataAll(ops);
@@ -4497,21 +4500,7 @@ function getEdrbaseValue(key:any) {
 }
 
 function getOldProductResData() {
-  // 043010 记名投保选“是”，人员清单导入未校验所有字段必填
-  const distItem = distRequiredMap[props.param.cProdNo];
-  const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue() || '';
-  if(distItem && tgtValue[distItem.flagKey] === '1') {
-    const data = deepClone(oldProductResData.value);
-    const dist = data[0]['pageInfo'].filter((item:any) => item.pageCode === distItem.distCode)[0]
-    if(dist && dist.pageSchema && dist.pageSchema.fromSchema) {
-      dist.pageSchema.fromSchema.forEach((item:any) => {
-        item.rules = [{type: 'required'}]
-      })
-    }
-    return data;
-  } else {
-    return oldProductResData.value;
-  }
+  return oldProductResData.value;
 }
 
 // 保存模板
