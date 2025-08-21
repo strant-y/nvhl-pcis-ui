@@ -1778,19 +1778,6 @@ async function loadAfter() {
             }
           })
         }
-        // 从查询结果获取主条款编码和名称，在顶部反显
-        if(ops['cvrg'] && ops['cvrg'].length > 0 && !props.param?.cTermNo) {
-          router.replace({
-            path: "/pcis/my-page",
-            query: {
-              param: JSON.stringify({
-                ...route.params.param,
-                cTermNo: ops['cvrg'].find((i:any) => i['Term.cRdrTyp'] === "0")['Term.cClauseCode'],
-                cTermNme: ops['cvrg'].find((i:any) => i['Term.cRdrTyp'] === "0")['Term.cClauseName']
-              }),
-            },
-          });
-        }
         opertaor.setDataAll(ops);
         // 获取原申请单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
