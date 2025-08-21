@@ -874,7 +874,7 @@ const tableObj = {
                         r.cPolicySource = '6'
                         const data = row;
                         router.push({
-                            path: "/pcisapp/myPage",
+                            path: "/pcisapp/pricePage",
                             query: {
                                 param: JSON.stringify({
                                     ...data,
