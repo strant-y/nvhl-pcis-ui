@@ -211,12 +211,12 @@
               }}</span
             >&nbsp;|&nbsp;<span class="font-weight-500">出单方式：</span
             ><span class="publicStyle">{{ getRecordTypeText(props.param.cPolicySource ?? props.param.cRecordType) }}</span>&nbsp;|
-            <span class="publicStyle">{{productStore.cCiMrk === '0' ? '非共保业务' 
-              : productStore.cCiMrk == '1' ? '外部共保我方主共_主联'
-              : productStore.cCiMrk == '2' ? '外部共保我方从共_主联'
-              : productStore.cCiMrk == '3' ? '外部共保我方主共_无联保'
-              : productStore.cCiMrk == '4' ? '外部共保我方从共_无联保'
-              : productStore.cCiMrk == '5' ? '司内联保_主联'
+            <span class="publicStyle">{{productStore.priceCiMrk === '0' ? '非共保业务' 
+              : productStore.priceCiMrk == '1' ? '外部共保我方主共_主联'
+              : productStore.priceCiMrk == '2' ? '外部共保我方从共_主联'
+              : productStore.priceCiMrk == '3' ? '外部共保我方主共_无联保'
+              : productStore.priceCiMrk == '4' ? '外部共保我方从共_无联保'
+              : productStore.priceCiMrk == '5' ? '司内联保_主联'
               : '联保单' }}</span> |
             <span class="publicStyle">{{
               props.param.cGrpMrk == "0" ? "个单" : "团单"

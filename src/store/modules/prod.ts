@@ -12,6 +12,7 @@ export const useProductStore = defineStore('product', () => {
     const cCiMrk = ref('0'); //联共保业务
     const nPrm = ref("0.00");
     const nAmt = ref("0.00");
+    const priceCiMrk = ref('0');
 
     const isCiJiMrk = computed(()=> cCiMrk.value !== '0');
 
@@ -28,6 +29,9 @@ export const useProductStore = defineStore('product', () => {
     }
     function setcCiMrk(newVal){
         cCiMrk.value = newVal
+    }
+    function setcPriceCiMrk(newVal){
+        priceCiMrk.value = newVal
     }
     function setnPrm(newVal) {
     nPrm.value = newVal;
@@ -63,5 +67,7 @@ export const useProductStore = defineStore('product', () => {
         nPrm,
         nAmt,
         cCiMrk,
+        priceCiMrk,
+        setcPriceCiMrk,
     }
 })
