@@ -4271,7 +4271,11 @@ const submitUnderwritingFn = async () => {
           "title": "申请单录入",
           "path": "/pcisapp/myPage",
           "fullPath": "/pcisapp/myPage"}).then((res: any) => {
-          router.replace({ path: "/pcis-new-udr-list/PendUdrList" });
+          if(props.param?.pageName === "priceInquiry") {
+            router.replace({ path: "/pcis-new-udr-list/InquiryUdrList" });
+          } else {
+            router.replace({ path: "/pcis-new-udr-list/PendUdrList" });
+          }
         });
       }
       // opertaor.setDataAll(ops);
