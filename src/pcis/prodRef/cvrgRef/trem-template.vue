@@ -894,20 +894,17 @@ function initTermsData(item: any) {
 
 /**条则标数据初始化判断 */
 function initTermRiskData(item: any){
-  if (pageparam.cProdNo === "040002" || pageparam.cProdNo === '043009') {
-    if(item.cPorpType != 'text'){
-      const faitem = factormap.value[item['cFactorId']];
-      if(faitem.prop === 'TermRisktgt.cDeductibleMethod'){
-        // 预留后期遇到了使用
-        // console.log(faitem);
-        // console.log(item);
-        // console.log(riskList.value);
-        // riskList.value[item['cRiskNo']][faitem.prop] = '01';
+  let r = false;
+  if(item.cPorpType != 'text'){
+    const faitem = factormap.value[item['cFactorId']];
+    if(faitem.prop === 'TermRisktgt.cDeductibleMethod'){    //免赔方式,默认均为绝对免赔
+      if(!riskList.value[item['cRiskNo']][faitem.prop]){
+        riskList.value[item['cRiskNo']][faitem.prop] = '01';
+        r = true;
       }
     }
   }
-
-  return false;
+  return r;
 }
 
 

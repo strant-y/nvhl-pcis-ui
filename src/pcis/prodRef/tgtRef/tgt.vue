@@ -1027,7 +1027,6 @@ cIsinsuranceRegisteredChange:(val:any)=>{
           rules:[]
         })
     }
-    registeredChangeRequired(val)
 },
 // 投保行业
 getcInsuranceIndustryChange:(val:any)=>{
@@ -1134,27 +1133,7 @@ tProjectEndDis:(date:any)=>{
     }
 },
 
-// 被监护人是否记名
-getcIsRegisteredChange: (val: any) => {
-  registeredChangeRequired(val)
-},
-// 记名投保标志(045001)
-getcRegisteredLogoChange: (val: any) => {
-  registeredChangeRequired(val)
-},
-// 记名投保(080011)
-getcRegisteredInsuranceChange: (val: any) => {
-  registeredChangeRequired(val)
-},
 };
-
-// 是否记名选择后设置清单必填
-function registeredChangeRequired(val:any) {
-  const distItem = distRequiredMap[params.cProdNo]
-  if(distItem) {
-    opertaor.getTableRefByKey(distItem.distCode).setDistRequired(val)
-  }
-}
 
 function setAddressBykey(getv1: any, getv2: any , setv: any) {
    const a = tgtEditRef?.value?.getValue(getv1[0].prop);
