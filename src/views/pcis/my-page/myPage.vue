@@ -2217,6 +2217,14 @@ async function loadAfter() {
             }
           })
         }
+        // 投保人信息
+        if(ops.applicant) {
+          ops.applicant["Applicant.cCustRiskRank"] = "925104";
+        }
+        // 被保人信息
+        if(ops.insured) {
+          ops.insured["Insured.cCustRiskRank"] = "925104";
+        }
         opertaor.setDataAll(ops);
         // 获取原申请单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
