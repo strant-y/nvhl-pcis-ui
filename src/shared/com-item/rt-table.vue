@@ -29,6 +29,8 @@
       :summary-method="item.summaryMethod ? item.summaryMethod : null"
       :span-method="objectSpanMethod"
       @current-change="currentChange"
+      :cell-style="getCellStyle"
+      :header-cell-style="getCellStyle"
     >
       <!-- 其他列定义 -->
       <el-table-column
@@ -359,6 +361,22 @@ const props = defineProps({
     required: false,
   },
 });
+
+/**
+ * 单元格样式
+ * @param row
+ */
+const getCellStyle = (row: Record<string, any>) => {
+  if(!props.item.editFlag) {
+    return {
+      padding: '3px'
+    }
+  }else {
+    return {
+      padding: '6px'
+    }
+  }
+};
 
 const indexMethod = (index: number) => {
   return index !== undefined ? index + 1 : 0;
@@ -868,9 +886,11 @@ function isrequired(i: any) {
 ::v-deep .el-form-item {
   margin-bottom: 0px !important; /* 使内容显示更近紧促 */
 }
+/*
 :deep(.el-table .cell) {
   white-space: nowrap;
 }
+*/
 :deep(.el-table td.el-table__cell div.cell) {
   white-space: normal;
 }

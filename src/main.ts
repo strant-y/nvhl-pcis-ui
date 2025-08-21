@@ -21,6 +21,7 @@ import popover from "./common/dzpopover/popover"; //弹出框组件引用
 import dzmodel from "./common/dzmodel/dzmodel";  //弹窗公共组件
 // import zhCn from 'element-plus/es/locale/lang/zh-cn';
 import './assets/iconfont/iconfont.css'
+import tooltipPlugin from './plugins/tooltip'
 
 const app = createApp(App);
 // 全局注册 自定义指令(directive)
@@ -40,4 +41,5 @@ app.use(shareds);
 app.use(prodRef);
 app.use(popover);
 app.use(cargoRef);
+app.use(tooltipPlugin);
 // app.use(zhCn);

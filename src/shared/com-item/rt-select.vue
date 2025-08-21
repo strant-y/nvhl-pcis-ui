@@ -70,7 +70,7 @@
       </el-select>
     </el-tooltip>
   </template>
-  <span v-else>
+  <div class="width-100" v-else>
     <template
       v-if="
         item.tag
@@ -91,13 +91,16 @@
       >
     </template>
     <template v-else>
-      {{ selectLabel }}
+      <el-text class="mx-1" truncated @click="checkIfTruncated($event, selectLabel)">
+        {{ selectLabel }}
+      </el-text>
     </template>
-  </span>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { codeListViewStore } from "@/store";
+import {checkIfTruncated} from "@/utils/common";
 const codeListStore = codeListViewStore();
 const codeListMap = inject<any>('codeListMap', {});
 const props = defineProps({
