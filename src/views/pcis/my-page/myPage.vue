@@ -1778,19 +1778,6 @@ async function loadAfter() {
             }
           })
         }
-        // 从查询结果获取主条款编码和名称，在顶部反显
-        if(ops['cvrg'] && ops['cvrg'].length > 0 && !props.param?.cTermNo) {
-          router.replace({
-            path: "/pcis/my-page",
-            query: {
-              param: JSON.stringify({
-                ...route.params.param,
-                cTermNo: ops['cvrg'].find((i:any) => i['Term.cRdrTyp'] === "0")['Term.cClauseCode'],
-                cTermNme: ops['cvrg'].find((i:any) => i['Term.cRdrTyp'] === "0")['Term.cClauseName']
-              }),
-            },
-          });
-        }
         opertaor.setDataAll(ops);
         // 获取原申请单号下的清单列表数据
         const distMap = formconfig1[0].pageInfo.filter((item:any) => {
@@ -2216,6 +2203,14 @@ async function loadAfter() {
               item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
             }
           })
+        }
+        // 投保人信息
+        if(ops.applicant) {
+          ops.applicant["Applicant.cCustRiskRank"] = "925104";
+        }
+        // 被保人信息
+        if(ops.insured) {
+          ops.insured["Insured.cCustRiskRank"] = "925104";
         }
         opertaor.setDataAll(ops);
         // 获取原申请单号下的清单列表数据
@@ -3731,6 +3726,10 @@ const saveApplicationEdr = () => {
             "EdrBase.cEdrRsnDetail"
           ].split(",");
         edrbase.value?.setFormValue(EdrBaseData);
+        if(props.param.pageType === "EDR_APP_NEW_SCENE" && saveDistBatchFlag.value) {
+          // 复制保单清单信息到批单中
+          saveDist(EdrBaseData['EdrBase.cAppNo'], props.param?.cRsnCde)
+        }
         // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
         if(props.param.pageType === "EDR_APP_NEW_SCENE" && !beforeSaveCappNo && EdrBaseData["EdrBase.cAppNo"]) {
           getAppPolicyList({
