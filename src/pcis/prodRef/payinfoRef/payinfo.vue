@@ -44,9 +44,6 @@ watch(
     if (newCCiMrk === oldCCiMrk && newNCiOwnPrm === oldNCiOwnPrm) {
       return; // 值没变，直接退出，不执行后续逻辑
     }
-    console.log('一开始',getFromValue())
-  //   const cCiMrk = data.plyBase?.['Base.cCiMrk'];
-  // const nCiOwnPrm = ['1', '2', '3','4'].includes(cCiMrk) ? data.ciMasterAgreement?.['Base.nCiOwnPrm'] : data.base?.['Base.nPrm'] 
     if(['1', '2', '3','4'].includes(newCCiMrk) && newCCiMrk !==oldCCiMrk){
           // setFormItem()
     }
@@ -102,7 +99,6 @@ const nPrmFun = ()=>{
                  modifiedArray[ splitCount-1]['Pay.nOwnPrm'] =   modifiedArray[ splitCount-1]['Pay.nOwnPrm']+differNum
                 }  
 
-                console.log('计算---',modifiedArray)
               setFormValue(modifiedArray )
 
 
@@ -125,7 +121,6 @@ const getOwnShare =()=>{
       } 
    })
   }
-    console.log('进来了--',ownShare)
   return ownShare;
 }
 

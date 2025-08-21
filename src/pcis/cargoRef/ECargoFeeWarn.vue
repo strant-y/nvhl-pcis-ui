@@ -163,6 +163,8 @@ const method = {
             if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') === '01'){
               setValue('ECargoBase.nWhPrmRmbExch',res[0].currency_rate)
               setValue('ECargoBase.cWhPrmCur',val)
+              setValue('ECargoBase.nWhAmtRmbExch',res[0].currency_rate)
+              setValue('ECargoBase.cWhAmtCur',val)
               setValue('ECargoBase.nRecRemPrm',getValue('ECargoBase.nRmbReceivedPrm')- (getValue('ECargoBase.nWhRmbPrm') || 0))
             }
           });
@@ -174,6 +176,8 @@ const method = {
       if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') === '01'){
         setValue('ECargoBase.nWhPrmRmbExch',"1.000000")
         setValue('ECargoBase.cWhPrmCur',val)
+        setValue('ECargoBase.nWhAmtRmbExch',"1.000000")
+        setValue('ECargoBase.cWhAmtCur',val)
         setValue('ECargoBase.nRecRemPrm',getValue('ECargoBase.nRmbReceivedPrm')- (getValue('ECargoBase.nWhRmbPrm') || 0))
       }
     }

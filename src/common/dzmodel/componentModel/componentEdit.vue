@@ -380,7 +380,7 @@ const pageresult = reactive<Pageresult>({
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     editFlag: true,
-    editList: ["cGroup", "cExpand", "cShowLocation"],
+    editList: ["cGroup", "cExpand", "cShowLocation","cTableWidth"],
     showEdit: true,
     formconfig: {
       fromSchema: [
@@ -458,6 +458,11 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtselect",
         title: "显示位置",
         loadData: showLocationList,
+      },
+      {
+        prop: "cTableWidth",
+        inputtype: "rtinput",
+        title: "要素宽度",
       },
     ],
   })

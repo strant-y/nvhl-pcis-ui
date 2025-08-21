@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { useProductStore } from "@/store";
+import { useProductStore, useTagsViewStore } from "@/store";
 
 type StoreCache = Map<string, ReturnType<typeof defineStore>>
 const dataOpertaorMap: StoreCache = new Map();
@@ -189,7 +189,7 @@ export const dataOpertaor = (pageKey?: string) => {
                                                     f.btnItems.disabled = false;
                                                 }
                                                 else{
-                                                    console.log(f);
+                                                    // console.log(f);
                                                     f.disabled = false;
                                                 }
                                             }
@@ -475,7 +475,6 @@ export function clearDataOpertaorByPageKey(pageKey: string) {
         const store = dataOpertaorMap.get(pageKey);
         store?.$dispose?.();
         dataOpertaorMap.delete(pageKey);
-        console.log('### 已清理dataOpertaor pageKey -> ', pageKey);
     }
 }
 
@@ -486,7 +485,9 @@ function storeFactory(
     storeId?: string,
     newStore?: ReturnType<typeof defineStore>
 ) {
-    const pageKey = storeId ? storeId : 'my-page';
+    const tagsViewStore = useTagsViewStore();
+    const { selectedView } = toRefs(tagsViewStore);
+    const pageKey = selectedView.value?.name;
     const storeRef = ref();
     if(!pageKey) {
         storeRef.value = {};

@@ -484,7 +484,7 @@ const method = {
       {
         type: "show",
         data: {
-          cDptCde: getValue("ECargoBase.cDptCde"),
+          CDptCde: getValue("ECargoBase.cDptCde"),
           cDptCnm: getValue("ECargoBase.cDptCnm"),
           cBsnsTyp: getValue("ECargoBase.cBsnsTyp"),
           cChaType: getValue("ECargoBase.cChaType"),

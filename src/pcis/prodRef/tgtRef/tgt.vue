@@ -36,6 +36,7 @@ import dayjs from "dayjs";
 import {getAddressStr} from "@/api/query";
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
+import { distRequiredMap } from '@/views/pcis/my-page/requiredDistMap';
 
 const route = useRoute();
 const query = ref(route.query);
@@ -101,9 +102,10 @@ onMounted(async () => {
      setFormItem("Tgt.cShippingType", { rules: [getRules("required", {'trigger':'blur'})]});
   }
 
-  //  020001 起运港 必填其他非必填
+  //  020001 起运港 目的港 必填其他非必填
   if(params.cProdNo === '020001'){
        setFormItem("Tgt.cDeparturePort", { rules: [getRules("required", {'trigger':'blur'})]});
+       setFormItem("Tgt.cDestinationPort", { rules: [getRules("required", {'trigger':'blur'})]});
   }
 
   // 040005 办学许可证号
@@ -1025,6 +1027,7 @@ cIsinsuranceRegisteredChange:(val:any)=>{
           rules:[]
         })
     }
+    registeredChangeRequired(val)
 },
 // 投保行业
 getcInsuranceIndustryChange:(val:any)=>{
@@ -1075,6 +1078,7 @@ getAddressstr:(val:any, row: any, pitem: any) => {
 },
 // 工程起期
 tProjectStartChange:(v:any)=>{
+  console.log(1112,v)
     const start = getValue("Tgt.tProjectStart");
     const end = getValue("Tgt.tProjectEnd");
     if (!end || !v) {
@@ -1090,7 +1094,7 @@ tProjectStartChange:(v:any)=>{
       return;
     }
     setFormValue({
-      "Tgt.nContractDuration":   moment(end).diff(moment(start), "days"),
+      "Tgt.nContractDuration":   moment(end).add(1,'second').diff(moment(start), "days"),
     });
 },
 // 工程止期
@@ -1109,7 +1113,7 @@ tProjectEndChange:(v:any)=>{
     }
     const formattedDate = moment(v).format('YYYY-MM-DD') + ' 23:59:59';
     setFormValue({
-      "Tgt.nContractDuration": moment(formattedDate).diff(moment(start), "days"),
+      "Tgt.nContractDuration": moment(formattedDate).add(1,'second').diff(moment(start), "days"),
       "Tgt.tProjectEnd": formattedDate, // 更新日期字段
     });
 },
@@ -1130,7 +1134,27 @@ tProjectEndDis:(date:any)=>{
     }
 },
 
+// 被监护人是否记名
+getcIsRegisteredChange: (val: any) => {
+  registeredChangeRequired(val)
+},
+// 记名投保标志(045001)
+getcRegisteredLogoChange: (val: any) => {
+  registeredChangeRequired(val)
+},
+// 记名投保(080011)
+getcRegisteredInsuranceChange: (val: any) => {
+  registeredChangeRequired(val)
+},
 };
+
+// 是否记名选择后设置清单必填
+function registeredChangeRequired(val:any) {
+  const distItem = distRequiredMap[params.cProdNo]
+  if(distItem) {
+    opertaor.getTableRefByKey(distItem.distCode).setDistRequired(val)
+  }
+}
 
 function setAddressBykey(getv1: any, getv2: any , setv: any) {
    const a = tgtEditRef?.value?.getValue(getv1[0].prop);

@@ -198,7 +198,7 @@ const tableconfig = reactive<AppTableConfig>(
             query: {
               param: JSON.stringify({
                 type: "edit",
-                cPkId: row.cPkId,
+                row: row,
               }),
             },
           });

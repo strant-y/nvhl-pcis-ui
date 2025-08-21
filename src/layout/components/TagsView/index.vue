@@ -70,6 +70,7 @@ import {
   useSettingsStore,
   useAppStore,
 } from "@/store";
+import {eventBus} from "@/utils/event-bus";
 
 const { proxy } = getCurrentInstance()!;
 const router = useRouter();
@@ -105,12 +106,13 @@ watch(contentMenuVisible, (value) => {
   }
 });
 
-function toView(tag: TagView) {
+async function toView(tag: TagView) {
   if(tag.keepAlive) {
-    router.replace({ path: tag.path, query: tag.query})
+    await router.replace({ path: tag.path, query: tag.query})
   }else {
-    router.push({ path: tag.path, query: tag.query})
+    await router.push({ path: tag.path, query: tag.query})
   }
+  return;
 }
 
 /**
@@ -191,30 +193,30 @@ function refreshSelectedTag(view: TagView) {
   });
 }
 
-function toLastView(visitedViews: TagView[], view?: TagView) {
-  const latestView = visitedViews.slice(-1)[0];
+const toLastView = async (visitedViews: TagView[], view?: TagView) => {
+  const latestView = visitedViews.slice(-2)[0];
   if(latestView.keepAlive) {
-    toView(latestView);
+    await toView(latestView);
   } else if (latestView && latestView.fullPath) {
-    router.push(latestView.fullPath);
+    await router.push(latestView.fullPath);
   } else {
     // now the default is to redirect to the home page if there is no tags-view,
     // you can adjust it according to your needs.
     if (view?.name === "Dashboard") {
       // to reload home page
-      router.replace({ path: "/redirect" + view.fullPath });
+      await router.replace({ path: "/redirect" + view.fullPath });
     } else {
-      router.push("/");
+      await router.push("/");
     }
   }
+  return;
 }
 
-function closeSelectedTag(view: TagView) {
-  tagsViewStore.delView(view).then((res: any) => {
-    if (isActive(view)) {
-      toLastView(res.visitedViews, view);
-    }
-  });
+async function closeSelectedTag(view: TagView) {
+  if (isActive(view)) {
+    await toLastView(visitedViews.value, view);
+  }
+  tagsViewStore.delView(view);
 }
 
 function closeLeftTags() {
@@ -334,10 +336,14 @@ watch(
     deep: true,
   }
 );
+
+eventBus.on('closeSelectedTag', (view: TagView) => {
+  closeSelectedTag(view);
+});
 onMounted(() => {
   initTags();
   nextTick(()=>{
-    tagsViewStore.addTagView(route)
+    // tagsViewStore.addTagView(route)
   })
 });
 </script>

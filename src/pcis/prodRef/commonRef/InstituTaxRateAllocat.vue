@@ -245,26 +245,35 @@ function setDisa() {
 }
 /** 查询 */
 function handleQuery(flag?: boolean) {
-  const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
-  const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(s, r, { cProdNo: tabref.getFromValue().cProdNo });
-  qryProdTaxRateInfoPage(param)
-    .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
-        pageresult.list = data.result;
-        pageresult.total = data.total;
-      } else {
-        ElMessage.error(msg);
-      }
-    })
-    .finally(() => {});
+  let prod = '';
+  if(param.editType === "edit"){
+    prod = param.prodNo;
+  }else{
+    prod = tabref.getFromValue().cProdNo;
+  }
+  if (!prod || prod === '') {
+    ElMessage.error("产品代码为空！请保存后操作");
+    return;
+  } else {
+    const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
+    const s = freeEditRef.value?.getFromValue(); //获取表单数据
+    const param = Object.assign(s, r, { cProdNo: prod });
+    qryProdTaxRateInfoPage(param)
+      .then((res) => {
+        const { code, data, msg } = res;
+        if (200 === code) {
+          pageresult.list = data.result;
+          pageresult.total = data.total;
+        } else {
+          ElMessage.error(msg);
+        }
+      })
+      .finally(() => {});
+  }
 }
 onMounted(() => {
   if (param.editType === "edit") {
-    setTimeout(() => {
-      handleQuery();
-    }, 600);
+    handleQuery();
   } else if (param.editType === "view") {
     setDisa();
     tableconfig.titleBtns.forEach((btn) => {

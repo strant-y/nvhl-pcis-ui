@@ -193,7 +193,7 @@ const tableconfig = reactive<AppTableConfig>(
                 }
               },
             },
-            { title: "新增组件" }
+            { title: "新增组件",draggable :false }
           );
         },
       }),
@@ -225,7 +225,7 @@ const tableconfig = reactive<AppTableConfig>(
                 }
               },
             },
-            { title: "编辑组件" }
+            { title: "编辑组件",draggable :false }
           );
         },
       }),

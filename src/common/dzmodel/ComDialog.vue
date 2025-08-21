@@ -6,7 +6,7 @@
     :width="width + '%'"
     :close-on-click-modal ="false"
     :close-on-press-escape ="false"
-    :draggable ="true"
+    :draggable ="draggable"
   >
     <component
       :is="contentComponent"
@@ -23,6 +23,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 const visible = ref(false);
+const draggable = ref(true);
 const title = ref("");
 const width = ref("90");
 const contentComponent = ref(null); //组件映射
@@ -51,6 +52,9 @@ const open = (c, d, m, t) => {
   }
   if (t?.width) {
     width.value = t.width;
+  }
+  if (t.draggable === false || t.draggable === '0') { //拖拽功能配置化,部分弹窗很大,不适合做拖拽
+    draggable.value = false;
   }
   componentKey.value += 1; // 改变 key 值以强制重新渲染
 };

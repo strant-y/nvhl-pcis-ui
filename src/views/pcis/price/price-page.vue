@@ -482,6 +482,7 @@ import {scrollByDomId} from "@/utils/common";
 import { getAppPolicyList, qryEndorseList, delTmpPolicy, queryInsuredList, getInquiryPolicyList} from "@/api/query";
 import {encryptRouterParam} from "@/router";
 import SvgIcon from "@/components/SvgIcon/index.vue";
+import { distRequiredMap } from '../my-page/requiredDistMap';
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -2235,7 +2236,8 @@ async function loadAfter() {
     createFreeButtonBase({
       label: "返回",
       func: () => {
-        history.back();
+        tagsViewStore.back();
+        // history.back();
       },
     }),
   
@@ -2848,20 +2850,18 @@ const submitToUndrFn = async () => {
 	}
 
   // 040002 记名投保标志 选是  清单信息必须填  
-  const distRequiredMap = {
-    "040002": { flagKey: 'Tgt.cRegisteredLogo', distName: '雇员清单', cComponentTable: 'EmployeeDist', flagName: '记名投保标志' },
-    "041007": { flagKey: 'Tgt.cIsRegistered', distName: '人员清单', cComponentTable: 'PersonnelDist', flagName: '被监护人是否记名' },
-    "049027": { flagKey: 'Tgt.cIsinsuranceRegistered', distName: '清单信息', cComponentTable: 'EducatorDist', flagName: '是否记名投保' },
-    "049020": { flagKey: 'Tgt.cIsRegistered', distName: '被监护人清单信息', cComponentTable: 'WardDist', flagName: '被监护人是否记名' },
-    "045001": { flagKey: 'Tgt.cRegisteredLogo', distName: '工程项目地址清单', cComponentTable: 'ProjectDist', flagName: '记名投保标志' },
-    "042003": { flagKey: 'Tgt.cIsinsuranceRegistered', distName: '人员清单信息', cComponentTable: 'EducatorDist', flagName: '是否记名投保' },
-    "043010": { flagKey: 'Tgt.cIsinsuranceRegistered', distName: '人员清单信息', cComponentTable: 'EducatorDist', flagName: '是否记名投保' },
-    "080011": { flagKey: 'Tgt.cRegisteredInsurance', distName: '清单信息', cComponentTable: 'PersonnelDist', flagName: '记名投保' },
-    "059003": { flagKey: 'Tgt.cIsinsuranceRegistered', distName: '清单信息', cComponentTable: 'EmployeeDist', flagName: '是否记名投保' },
-  }
   const distItem = distRequiredMap[props.param.cProdNo];
   if(distItem && tgtValue[distItem.flagKey] === '1') {
-    const resDist: any = await selectDist({  cComponentTable: distItem.cComponentTable , isSummary: '1',cAppNo });
+    const selectParam = {
+      cComponentTable: distItem.cComponentTable,
+      isSummary: '1',
+    }
+    if(props.param?.pageName === "priceInquiry") {
+      selectParam['cInquiryNo'] = cInquiryNumber
+    } else {
+      selectParam['cAppNo'] = cAppNo
+    }
+    const resDist: any = await selectDist(selectParam);
     if(resDist['data']['total'] < 1){
       ElMessage.warning(`${distItem.flagName}选“是” “${distItem.distName}”未录入请确认！`);  
       return false;
@@ -2911,18 +2911,25 @@ const submitToUndrFn = async () => {
     }
 
   // 判断应收保费是否同保费相同
- 
-  let nPrm = opertaor.getTableRefByKey("base").getFromValue()['Base.nPrm'];
-  let nPayablePrmData = opertaor.getTableRefByKey("payinfo").getFromValue()  // 缴费计划数据  
-  let nPayAll = 0;
-  nPayablePrmData.forEach((item:any)=>{
-        nPayAll+= item['Pay.nPayablePrm'] || 0
-  })
-  console.log('111',nPayAll,nPrm)
-  if(nPayAll !== nPrm ){
-      ElMessage.warning('缴费计划“应收保费”不等于“总保费”请确认！')
-      return false;
+  let payList = opertaor.getTableRefByKey("payinfo").getFromValue();
+   if(payList && payList.length>0){
+      let nPrm = opertaor.getTableRefByKey("base").getFromValue()['Base.nPrm'];
+      const toCent = (amount:any) => {
+        return Math.round(Number(amount) * 100); // 转为分并四舍五入
+      };
+      let totalCent = 0;
+      payList.forEach((item:any) => {
+        totalCent += toCent(item['Pay.nPayablePrm']);
+      });
+      const basePrmCent = toCent(nPrm);
+       if(totalCent !== basePrmCent){
+         ElMessage.error('缴费计划“应收保费”不等于“总保费”请确认！')
+        return false;
+      }
   }
+
+
+
   // 电梯责任保险 每部电梯累计赔偿限额小于每部电梯每人赔偿限额时校验
   if(props.param?.cProdNo==='043001') {
     const cvrgValue = opertaor.getTableRefByKey("cvrg").getFromValue()[0];
@@ -3172,8 +3179,8 @@ const savePlyInfo = async () => {
  
       const basePrmCent = toCent(res['base']['Base.nPrm']);
 
-       if(totalCent > basePrmCent){
-         ElMessage.error('缴费计划“应收保费”之和大于整单保费！')
+       if(totalCent !== basePrmCent){
+        ElMessage.error('缴费计划“应收保费”不等于“总保费”请确认！')
          btn.loading = false;
         return false;
       }
@@ -3266,7 +3273,7 @@ const savePlyInfo = async () => {
             sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
             const data = res.data?.result[0];
             router.replace({
-              path: "/pcis/my-page",
+              path: "/pcisapp/pricePage",
               query: {
                 param: JSON.stringify({
                   ...data,
@@ -3904,13 +3911,13 @@ const saveEdrPlyInfo = async () => {
 const generateEndorse = async () => {
   const res = opertaor.getDataAll();
   console.log("生成批文",res, props.param);
-  if (props.param.cRsnCde !== 'FZ') {
-    const isAcctValid = await validateAcctinfo();
-    // 账户信息校验
-    if (!isAcctValid) {
-      return; 
-    }
-  }
+  // if (props.param.cRsnCde !== 'FZ') {
+  //   const isAcctValid = await validateAcctinfo();
+  //   // 账户信息校验
+  //   if (!isAcctValid) {
+  //     return; 
+  //   }
+  // }
   // 批改原因和清单相关的需要提示先保存一下
   if((props.param['cRsnCde'] === "ZQ" || props.param['cRsnCde'] === "JQ" || props.param['cRsnCde'] === "10") && saveEdrState.value === false) {
     ElMessage.error("请先保存申请单")
@@ -4491,23 +4498,16 @@ function getEdrbaseValue(key:any) {
 
 function getOldProductResData() {
   // 043010 记名投保选“是”，人员清单导入未校验所有字段必填
-  if(opertaor.getDataAll()['tgt'] && opertaor.getDataAll()['tgt']['Tgt.cIsinsuranceRegistered'] === '1') {
+  const distItem = distRequiredMap[props.param.cProdNo];
+  const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue() || '';
+  if(distItem && tgtValue[distItem.flagKey] === '1') {
     const data = deepClone(oldProductResData.value);
-    data[0]['pageInfo'].forEach((item:any) => {
-      if(
-        item.pageCode === "EducatorDist043010" || 
-        item.pageCode === "DoctorDist049031" || 
-        item.pageCode === "EducatorDist042003" || 
-        item.pageCode === "EmployeeDist040007" || 
-        item.pageCode === "PersonnelDist040020" || 
-        item.pageCode === "PersonnelDist041001" || 
-        item.pageCode === "PersonnelDist049024"
-      ) {
-        item.pageSchema.fromSchema.forEach((item:any) => {
-          item.rules = [{type: 'required'}]
-        })
-      }
-    })
+    const dist = data[0]['pageInfo'].filter((item:any) => item.pageCode === distItem.distCode)[0]
+    if(dist && dist.pageSchema && dist.pageSchema.fromSchema) {
+      dist.pageSchema.fromSchema.forEach((item:any) => {
+        item.rules = [{type: 'required'}]
+      })
+    }
     return data;
   } else {
     return oldProductResData.value;

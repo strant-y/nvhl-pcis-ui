@@ -244,7 +244,6 @@ function loadAfter() {
 function setData(datas: any) {
   Object.keys(datas).forEach((k) => {
     const ref = opertaor.getTableRefByKey(k);
-    console.log(ref);
     ref.setFormValue(datas[k]);
   });
 }
