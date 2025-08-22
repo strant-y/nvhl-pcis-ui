@@ -588,35 +588,35 @@ const method = {
         if(idxParam && isChange) { // 保存清单表格在屏幕中间
           idxParam.handleAnchorClick(undefined, `#${props.compKey}`);
         }
-        // 刷新条款表格
-        const termref = opertaor.getTableRefByKey("cvrg");
-        const hasRel = res.data.hasRel;
-        const hasPlan = res.data.hasPlan;
-        const clauseValues = res.data.clauseValues;
+        // // 刷新条款表格
+        // const termref = opertaor.getTableRefByKey("cvrg");
+        // const hasRel = res.data.hasRel;
+        // const hasPlan = res.data.hasPlan;
+        // const clauseValues = res.data.clauseValues;
 
-        if(hasRel == false){
-            return;
-        }
-        if(clauseValues.length == 0){
-            return;
-        }
-        // 区分方案
-        if(hasPlan){
-            clauseValues.forEach(item => {
-                termref.setTermData({
-                    termNo: route.params.param.cTermNo,
-                    planNo: item.planNo,
-                    factorProp: item.field,
-                }, item.countNumber);
-            });
-        } else{
-            clauseValues.forEach(item => {
-                termref.setTermData({
-                    termNo: route.params.param.cTermNo,
-                    factorProp: item.field,
-                }, item.countNumber);
-            });
-        }
+        // if(hasRel == false){
+        //     return;
+        // }
+        // if(clauseValues.length == 0){
+        //     return;
+        // }
+        // // 区分方案
+        // if(hasPlan){
+        //     clauseValues.forEach(item => {
+        //         termref.setTermData({
+        //             termNo: route.params.param.cTermNo,
+        //             planNo: item.planNo,
+        //             factorProp: item.field,
+        //         }, item.countNumber);
+        //     });
+        // } else{
+        //     clauseValues.forEach(item => {
+        //         termref.setTermData({
+        //             termNo: route.params.param.cTermNo,
+        //             factorProp: item.field,
+        //         }, item.countNumber);
+        //     });
+        // }
 
 
       }
