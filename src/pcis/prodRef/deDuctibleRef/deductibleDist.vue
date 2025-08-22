@@ -335,7 +335,7 @@ const  deepClone =(obj:any)=> {
 
 
 // 复制数据处理
-const mergeArrays = (oldArr, newArr, key, fields)=>{
+const mergeArrays = (oldArr:any, newArr:any, key:any, fields:any)=>{
       // 1. 以新数组为基准构建新数组
       return newArr.map(newItem => {
         const newKey = newItem[key];
