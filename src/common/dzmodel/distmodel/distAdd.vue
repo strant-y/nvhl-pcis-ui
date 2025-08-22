@@ -395,6 +395,12 @@ onMounted(() => {
         data['func'] = getAddressstr;
       })
     }
+    // 根据条款获取方案号下拉选项
+    if(item.prop == 'Dist.cPlanNo'){
+      const termref = opertaor.getTableRefByKey("cvrg");
+      item.typeCode = null;
+      item.loadData = termref.getPlanNo();
+    }
     newSchema.push(item);
   }
 
