@@ -21,6 +21,7 @@ import {
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import {
+  copyDist,
   deleteDist,
 } from "@/api/prod";
 import {getAddressStr} from "@/api/query";
@@ -35,6 +36,7 @@ import {AppFreeEditMethod} from "@/shared/app-free-edit-config";
 import cargoApi from "@/api/cargo";
 import {saveAs} from "file-saver";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
+import {eventBus} from "@/utils/event-bus";
 const policyService = new PolicyService();
 const cargoDistAdd = defineAsyncComponent(
     () => import("@/pcis/cargoRef/fix/DistAddFix.vue")
@@ -66,6 +68,7 @@ const pageresult = reactive<Pageresult>({
   /** 总数 */
   total: 0,
 });
+const bizCurrency = ref()
 const applicantEditRef = ref<AppFreeEditMethod | null>(null);
 const distTableRef = ref<AppTableMethod | null>(null);
 const formconfig1 = ref<Record<string, any>>({});
@@ -86,6 +89,15 @@ const selectedRows = ref<any[]>([]);
 function handleSelectionChange(selection: any) {
   selectedRows.value = selection;
 }
+watch(
+    () => pageresult.list,
+    (newVal: any) => {
+      if (newVal) {
+        console.log('发生变化了。。。',newVal)
+        eventBus.emit('matterChange', newVal);
+      }
+    }
+);
 onMounted(async () => {
   formconfig11.value = formInit(
       // JSON.stringify({ ...props.pageSchema, fromSchema: processedFromSchema }),
@@ -115,7 +127,7 @@ onMounted(async () => {
   tableconfig.value.tableBtnType = "btn";
   tableconfig.value.tableBtnWidth = 150;
   tableconfig.value.tableBtnPosition = "right";
-  tableconfig.value.isPage = false; //先不分页
+  tableconfig.value.isPage = true; //先不分页
   if (formconfig11.value.editBtns && formconfig11.value.editBtns.length > 0) {
     let btns: any[] = [];
     btns = formconfig11.value.editBtns;
@@ -125,12 +137,39 @@ onMounted(async () => {
   }
   cComponentTableValue = getCComponentTableValue();
  nextTick(()=>{
+   eventBus.on('goodsChange', loadDatOne);
+   eventBus.on('goodsRefresh', goodsRefresh);
    const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
    if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo')){
      loadData()
    }
  })
 });
+const loadDatOne = (val:any)=>{
+  if(!val) return
+  const r = distTableRef.value?.getPartnerPage(true); //获取分页数据
+  let param = Object.assign({cComponentTable:'ECargoGoodsTgt',cEcAgrAppNo:val || ''}, r);
+  cargoApi.selectDistNew(param).then((res: any) => {
+    if(res.code === 200) {
+      pageresult.list = res.data.data
+      pageresult.total = res.data.total
+    }else {
+      ElMessage.success(res.msg);
+    }
+  })
+}
+const goodsRefresh = (val:any)=>{
+  console.log('goodsRefresh',val)
+  copyDist(val).then((res:any) => {
+    if(res && res.code === 200) {
+      loadDatOne(val.targetNo)
+    } else {
+      ElMessage.error(res.msg);
+    }
+  }).catch((err:any) => {
+    ElMessage.error(err.msg);
+  })
+}
 const loadData = (flag = true)=>{
     const r = distTableRef.value?.getPartnerPage(flag); //获取分页数据
     const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
@@ -190,6 +229,28 @@ async function filterFromSchema(obj:any) {
     return item;
   });
   return newObj;
+}
+const isBiz = (val:any)=>{
+  //协议费用
+  const AgreementFeeWarn = formPage?.getComponentRefById('AgreementCvrg')
+  const cvrgList:any = AgreementFeeWarn.getFormValue()
+  let result = { name:'',isOk:false}
+  cvrgList.forEach((item:any)=>{
+    if(item['ECargoTerm.cGoodsId']){
+      const goodList = item['ECargoTerm.cGoodsId'].split(',')
+      if(goodList.length > 0 && goodList.includes(val)){
+        result = { name:item['ECargoTerm.cPlanNo'],isOk:true}
+        return
+      }else{
+        result = {name:item['ECargoTerm.cPlanNo'],isOk:false}
+        return
+      }
+    }else {
+      result = {name:item['ECargoTerm.cPlanNo'],isOk:false}
+      return
+    }
+  })
+  return result
 }
 // 绑定方法
 const method = {
@@ -444,6 +505,7 @@ const method = {
       return;
     }
     const rowId = row._dataId;
+    bizCurrency.value = row
     dialog.value?.open(
         cargoDistAdd,
         {
@@ -456,6 +518,13 @@ const method = {
         },
         {
           isOk: (res: any) => {
+            if(res['ECargoGoodsTgt.cPrmCur'] != bizCurrency.value['ECargoGoodsTgt.cPrmCur']){
+              const result:any =  isBiz(res['ECargoGoodsTgt.cPkId'])
+              if(result.isOk){
+                ElMessage.warning(`该货物已经在条款所属组${result.name}中使用,请先更新条款`)
+                return
+              }
+            }
             saveTgt(res)
           },
         },
@@ -464,8 +533,9 @@ const method = {
   },
   // 删除
   delmethod: (row: any) => {
+    const result:any = isBiz(row['ECargoGoodsTgt.cPkId'])
 		ElMessageBox.confirm(
-        "是否确认删除当前数据？",
+       result.isOk ? `当前货物已经在条款所属组${result.name}中使用否确认删除当前数据？`:'是否确认删除当前数据？',
         "提示",
         {
           confirmButtonText: "确定",
@@ -486,35 +556,6 @@ const method = {
 				}
 			});
 		}).catch(()=>{})
-  },
-
-  // 同投保人按钮点击事件
-  applicantToInsured: () => {
-    const appInfo = formPage.getFormDataById('AgreementApplicant');
-    if(Object.keys(appInfo).length > 0) {
-      const f = pageresult.list.filter((item: any) =>
-          item['ECargoInsured.cCustomerName'] === appInfo['Applicant.cAppNme'] &&
-          item['ECargoInsured.cIdentificationNumber'] === appInfo['Applicant.cCertfCde']
-      );
-      if(f.length > 0) {
-        return;
-      }
-      setTableData([
-        ...pageresult.list,
-        ...[{
-          ...{
-            'ECargoInsured.nSeqNo': pageresult.list.length + 1,
-            'ECargoInsured.cCustomerName': appInfo['Applicant.cAppNme'],
-            'ECargoInsured.cIdentificationNumber': appInfo['Applicant.cCertfCde'],
-            'ECargoInsured.cDocumentType': appInfo['Applicant.cCertfCls'],
-            'ECargoInsured.cGender': appInfo['Applicant.cSex'],
-            'ECargoInsured.nAge': appInfo['Applicant.nAge'],
-          },
-        }]
-      ]);
-    } else {
-      ElMessage.warning('请先录入投保人信息！');
-    }
   },
 
   handleQuery: () => {
@@ -595,20 +636,7 @@ function setUnDisabledByKeyList(key: any) {
 }
 
 function setTableData(data: any) {
-  pageresult.list = data.map((item: any, index: any) => {
-    return {
-      ...item,
-      ...{
-        nSeqNo: index + 1,
-        tOpeningTime: item['ECargoDist.tOpeningTime']
-            ? moment(item['ECargoDist.tOpeningTime']).format("YYYY-MM-DD")
-            : null,
-        'ECargoDist.AllOccup': [
-          item['ECargoDist.cMajorCategories'], item['ECargoDist.cMediumClassification'], item['ECargoDist.cOccupationalSubcategory']
-        ],
-      }
-    };
-  });
+  pageresult.list = data
 }
 
 function validate() {
