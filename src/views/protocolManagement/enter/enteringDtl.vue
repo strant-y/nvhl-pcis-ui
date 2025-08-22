@@ -265,6 +265,11 @@ onBeforeMount(async () => {
   }
   if(['view','edit','audit','EDR_APP_NEW_SCENE'].includes(props.type)){
     nextTick(async ()=>{
+      const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn')
+        AgreementFeeWarn.setFormItem("ECargoBase.cPayWay",  {
+        typeCode: 'ECargo_Pay_Ways',
+        codeParam: { payway: 'all' }
+      })
       await query();
     })
   }
@@ -463,7 +468,6 @@ const getPlyPolicyFun = () => {
       const url =window.location.origin + "/#/protocolManagement/enteringDtl?" + query.toString();
        console.log('url',url)
       window.open(url, "_blank");
-
 };
 /**
  * 退保保存
