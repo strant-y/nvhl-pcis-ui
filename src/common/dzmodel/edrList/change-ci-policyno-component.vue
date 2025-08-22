@@ -115,7 +115,7 @@ const tableconfig = reactive<AppTableConfig>(
                 },
             },
             {
-                prop: "cSubDptCde",
+                prop: "cCiSubComp",
                 inputtype: "rtselect",
                 typeCode: "Comm_Code_LIST",
                 codeParam: { "CParCde": "subdpt" },
