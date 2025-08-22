@@ -12,6 +12,7 @@ import {useTagsViewStore} from "@/store";
 import {useRouter} from "vue-router";
 import { getECargoData } from "@/pcis/prodRef/dataInit";
 import {getEdrRsnItem} from "@/api/query/index"
+import {eventBus} from "@/utils/event-bus";
 const tagsViewStore = useTagsViewStore();
 const router = useRouter();
 const props = defineProps({
@@ -431,6 +432,10 @@ const submitEdrToUndrFun = async () => {
     ElMessage.warning(validateAll.msg);
     return;
   }
+  const isSuccess = premiumCalculation()
+  if(!isSuccess){
+    return  ElMessage.error('请先进行保费计算')
+  }
   const f = await saveEdrPlyInfo(); // 提交核保,需要默认执行一次保存操作
   if(f){
     const btn = getBtn("btnSubmitEdr");
@@ -554,6 +559,10 @@ const saveEdrPlyInfo = async () => {
     formPage.value?.setFormDataById('AgreementFeeWarn',{"ECargoBase.cEcAgrAppNo":EdrBaseData['ECargoBase.cEcAgrAppNo']})
     saveEdrFlag = true;
     cEcAgrAppNo.value = EdrBaseData['ECargoBase.cEcAgrAppNo']
+    if(cEcAgrAppNo.value){
+      const param:any =  idxParam.param
+      eventBus.emit('goodsRefresh', {cEcAgrAppNo:param.cEcAgrAppNo,targetNo:cEcAgrAppNo.value,cRsnCde:param.cRsnCde,});
+    }
   } else {
     ElMessage.error(edrInfo.msg);
   }
@@ -623,6 +632,7 @@ const getSurrenderPrecisFun = ()=>{
   });
 }
 function query() {
+  console.log('idxParam.param',idxParam.param)
   lastDataQuery();
   cargoApi.init({
     ...idxParam.param,
@@ -632,6 +642,9 @@ function query() {
       console.log('query-res',res)
       ElMessage.success('查询成功');
       cEcAgrAppNo.value = res["data"]["composition"]["AgreementBase"][0]['ECargoBase.cEcAgrAppNo'] || ''
+      if(cEcAgrAppNo.value){
+        eventBus.emit('goodsChange', cEcAgrAppNo.value);
+      }
       const pageInit = () => {
         if (props.type === 'EDR_APP_NEW_SCENE') {
           if (res["data"]["composition"]["AgreementEdrEcargoBase"]) {
@@ -669,6 +682,7 @@ function query() {
       }
       let dataForm:any ={...res.data.composition,AgreementBase:res.data.composition?.AgreementBase[0],AgreementApplicant:res.data.composition?.AgreementApplicant[0],AgreementFeeWarn:res.data.composition?.AgreementBase[0]}
       delete dataForm.AgreementEdrEcargoBase
+      delete dataForm.AgreementDistGoods
       if(props.type === 'EDR_APP_NEW_SCENE' && props.isActive === '0'){
         dataForm['AgreementBase']['ECargoBase.cEcAgrAppNo'] = ''
       }
