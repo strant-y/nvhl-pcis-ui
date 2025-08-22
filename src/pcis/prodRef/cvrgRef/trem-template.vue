@@ -458,7 +458,8 @@ function initData(data: any) {
   termdata.value = termData;
   if(termdata.value['Term.nSeatTotal']){
     const tgt = opertaor.getTableRefByKey("tgt");
-    tgt?.setValue('Tgt.nSeatCapacity',termdata.value['Term.nSeatTotal'])
+     console.log('触发13',termdata.value['Term.nSeatTotal'])
+    // tgt?.setValue('Tgt.nSeatCapacity',termdata.value['Term.nSeatTotal'])
   }
   // 缓存条款责任数据
   let riskData: { [key: string]: any } = {};
