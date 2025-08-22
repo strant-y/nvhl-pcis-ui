@@ -13,6 +13,10 @@ function getECargoPageView(queryParams: any): AxiosPromise<any> {
 function queryEcargoList(queryParams: any): AxiosPromise<any> {
     return post(`${PageBaseUrl}/queryEcargoList`, queryParams);
 }
+//协议删除
+function deleteEcargo(queryParams: any): AxiosPromise<any> {
+    return post(`${PageBaseUrl}/deleteEcargo`, queryParams);
+}
 //协议详情
 function queryEcargoDetails(queryParams: any): AxiosPromise<any> {
     return post(`${PageBaseUrl}/queryEcargoDetails`, queryParams);
@@ -94,6 +98,7 @@ function queryPlan(queryParams: any): AxiosPromise<any> {
     return post(`/codelist/query`, queryParams);
 }
 export default {
+    deleteEcargo,
     saveRate,
     queryPlan,
     getRate,
