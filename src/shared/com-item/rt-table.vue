@@ -11,6 +11,7 @@
       ref="tableRef"
       :data="tableDatas"
       style="width: 100%"
+      :default-sort="item.defaultSort"
       :border="item.border ? item.border : true"
       :fit="item.fit ? item.fit : true"
       :stripe="item.stripe === undefined ? true : item.stripe"
@@ -192,6 +193,7 @@
             :fixed="i.fixed ? i.fixed : null"
             :align="item.align ? item.align : i.align ? i.align : 'center'"
             :min-width="getColumnWidth(i.title,i.prop,tableDatas,i.minWidth,i.width, i.maxWidth || item.maxWidth)"
+            :sortable="i.sortable"
           >
             <template #header="header">
               <el-text

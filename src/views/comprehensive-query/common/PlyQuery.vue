@@ -42,6 +42,15 @@
         </el-tooltip>
       </template>
 
+      <template #column-nPrm="{ row, column, index }">
+          <span >¥ {{ row.nPrm }}</span>
+      </template>
+      <template #column-cSecondDptCnm="{ row, column, index }">
+        <span>
+          {{ row.cSecondDptCnm ? row.cSecondDptCnm.split('分公司')[0] : '' }}
+        </span>
+      </template>
+
       <!-- ES查询 投保人姓名，被保人姓名，被保人地址，产品名称高亮 -->
       <template #column-cAppNme="{ row }">
         <span v-html="row.cAppNme || ''"></span>
@@ -419,7 +428,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           {
               prop: "cSecondDptCde",
               inputtype: "rtselect",
-              title: "二级分公司",
+              title: "分公司",
               clearable: true,
           },
           {
@@ -827,7 +836,7 @@ const modalForm = [
             { label: "批单号", value: "cEdrNo" },
             { label: "批改序号", value: "c" },
             { label: "承保机构", value: "cDptCnm" },
-            { label: "二级分公司", value: "cSecondDptCnm" },
+            { label: "分公司", value: "cSecondDptCnm" },
             { label: "产品", value: "cProdNmeCn" },
             { label: "条款", value: "cTermNme" },
             { label: "核保人", value: "cUdrNme" },
@@ -849,7 +858,7 @@ const tableCol = ref<Array<any>>([
     { title: "批改序号", prop: "c", inputtype: "rtinput", minWidth: 180 },
     { title: "机构", prop: "cDptCnm", inputtype: "rtinput", minWidth: 180 },
     {
-        title: "二级分公司",
+        title: "分公司",
         prop: "cSecondDptCnm",
         inputtype: "rtinput",
         minWidth: 180,
@@ -1049,8 +1058,9 @@ const normalQueryColumns = [
     {
         prop: "cSecondDptCnm",
         inputtype: "rtinput",
-        title: "二级分公司",
-        minWidth: 150,
+        title: "分公司",
+        maxWidth: 100,
+        slotName: "cSecondDptCnm",
     },
     {
         prop: "cProdNmeCn",
@@ -1070,6 +1080,8 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "签单日期",
         minWidth: 180,
+        sortable: true,
+
     },
     {
         prop: "cTermNo",
@@ -1088,7 +1100,8 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "保费",
         minWidth: 100,
-        prefix: "¥ ",
+        sortable: true,
+        slotName: "nPrm"
     },
     {
         prop: "cUdrNme",
@@ -1108,7 +1121,9 @@ const tableObj = {
     // 查询单 投保单 保单 批单
     notWaitObj: {
         // 默认好像就2个不参与显示/隐藏
-        tableBtnType: "btn",
+      defaultSort: { prop: 'tIssueTm', order: 'descending' },
+
+      tableBtnType: "btn",
         tableBtnWidth: 200,
         tableBtnPosition: "right",
         tableBtn: [

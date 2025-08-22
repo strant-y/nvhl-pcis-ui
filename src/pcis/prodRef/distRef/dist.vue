@@ -360,7 +360,7 @@ const method = {
         {
           fromSchema: tableconfig.value.fromSchema,
           title: "编辑",
-          rowData: row,
+          rowData: {...row},
           tab: formconfig1.value.title,
           compKey: props.compKey,
           codeListMap: distTableRef.value?.getCodeListMap(),
