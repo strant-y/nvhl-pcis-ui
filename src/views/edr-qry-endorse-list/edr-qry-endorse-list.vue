@@ -5,6 +5,7 @@
             @page-change="handleQuery(false)" @row-click="handleRowClick" @row-dblclick="handleRowDoubleClick"
             @sort-change="sortChange" />
     </div>
+    <comDialog ref="dialog"></comDialog>
 </template>
 
 <script setup lang="ts">
@@ -13,7 +14,7 @@ import { useRouter, useRoute } from "vue-router";
 import moment from "moment";
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 import ChangeImageUploadModeComponent from "./change-image-upload-mode.vue";
-import changeCiPolicynoComponent from "./change-ci-policyno-component.vue";
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { PcisEdrQueryService } from "./service/pcis-edr-query-service";
 import { getListByCode } from "@/api/code-list-service";
 import { useUserStore } from "@/store/modules/user";
@@ -41,6 +42,8 @@ import {
     MyTableMethod,
 } from "@/shared/app-table-config";
 import { codeListViewStore } from "@/store";
+
+const dialog = ref<DialogMethod | null>(null);
 const codeListStore = codeListViewStore();
 const { getRules } = useValidator();
 const dzmodal = useDzModal();
@@ -1092,13 +1095,16 @@ const modifyImageUploadMode = (plyNo) => {
 };
 //联共保批改
 const ciCoopCorrect = (cAppNo, cPlyNo) => {
-    console.log(3333)
-    dzmodal
-        .open(changeCiPolicynoComponent, { cAppNo,cPlyNo})
-        .then((res) => {
-            if (res.type === "ok") {
-            }
-        });
+    console.log(3333);
+
+    dialog.value?.open('changeCiPolicynoComponent', 
+    { cAppNo,cPlyNo},{},{ title: "变更联共保保单编号", width: "95" })
+    // dzmodal
+    //     .open(changeCiPolicynoComponent, { cAppNo,cPlyNo})
+    //     .then((res) => {
+    //         if (res.type === "ok") {
+    //         }
+    //     });
 };
 const transferRsnDetail = (rsnDetail) => {
     let str = "";
