@@ -1,10 +1,6 @@
 <!-- 变更联共保保单编号 -->
 <template>
-    <el-dialog style="position: relative;" :close-on-click-modal="false" v-model="dialogVisible" @close="close"
-        width="90%" title="变更联共保保单编号">
-        <!-- <app-grid-edit v-model:gridEditConfig="tableconfig" ref="freeEditRef" /> -->
-        <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef" />
-    </el-dialog>
+    <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef" />
 </template>
 
 <script setup lang="ts">
@@ -23,28 +19,28 @@ import {
 import {
     creatCardConfig,
 } from "@/shared/mytemplate/card-config";
-import { PcisEdrQueryService } from "./service/pcis-edr-query-service";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { PcisEdrQueryService } from "../../../views/edr-qry-endorse-list/service/pcis-edr-query-service";
 import {
     AppTableConfig,
     AppTableMethod,
     createTableEditConfig,
 } from "@/shared/app-table-config";
-const opertaor = dataOpertaor();
-opertaor.init();
+
 const props = defineProps({
-    cAppNo: String,
-    cPlyNo: String,
+  data: {
+    type: Object,
+    default: () => ({}),
+  },
+  method: {
+    type: Object,
+    default: () => ({}),
+  },
 });
+
 const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
 import { conforms, forEach } from "lodash";
-const showBtnConfig = ref(false);
-const showView = ref(false);
 const freeEditRef = ref<AppGridEditMethod | null>(null);
-const appTableShow = ref(false);
-const dialogVisible = ref(true);
-
 const pcisEdrQueryService = new PcisEdrQueryService();
 
 const tableRef = ref<AppTableMethod | null>(null);
@@ -119,7 +115,7 @@ const tableconfig = reactive<AppTableConfig>(
                 },
             },
             {
-                prop: "cSubDptCde",
+                prop: "cCiSubComp",
                 inputtype: "rtselect",
                 typeCode: "Comm_Code_LIST",
                 codeParam: { "CParCde": "subdpt" },
@@ -165,8 +161,8 @@ onMounted(async () => {
 
 // 收益所有人table信息
 const getTableFun = async (isSave = false) => {
-    let cAppNo = props.cAppNo;  // 申请单号
-    let cPlyNo = props.cPlyNo;  // 保单号
+    let cAppNo = props.data.cAppNo;  // 申请单号
+    let cPlyNo = props.data.cPlyNo;  // 保单号
     let param = {
         cAppNo,
         cPlyNo
@@ -197,8 +193,8 @@ const getTableFun = async (isSave = false) => {
 // 保存
 const saveProdDataFun = () => {
     const user = JSON.parse(sessionStorage.getItem("user") || "{}");
-    let cAppNo = props.cAppNo;  // 申请单号
-    let cPlyNo = props.cPlyNo;  // 保单号
+    let cAppNo = props.data.cAppNo;  // 申请单号
+    let cPlyNo = props.data.cPlyNo;  // 保单号
     let listS = pageresult.list;
 
     listS.forEach((item) => {

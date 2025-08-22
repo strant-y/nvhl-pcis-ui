@@ -102,11 +102,11 @@ function handleSelectionChange(selection: any) {
 }
 function setSelected() {
   const lastSelected = props.data.selectedData;
-  if(lastSelected && lastSelected['ECargoTerm.nCargoSeq']) {
-    const nCargoSeqList = lastSelected['ECargoTerm.nCargoSeq'].split(",")
+  if(lastSelected && lastSelected['ECargoTerm.cGoodsId']) {
+    const nCargoSeqList = lastSelected['ECargoTerm.cGoodsId'].split(",")
     nCargoSeqList.forEach((item) => {
       pageresult.list.forEach((item2) => {
-        if (item === item2["ECargoGoodsTgt.nSeqNo"] + '') {
+        if (item === item2["ECargoGoodsTgt.cPkId"] + '') {
           item2["checked"] = true;
           distTableRef.value?.toggleRowSelection(item2,true)
         }
@@ -116,7 +116,7 @@ function setSelected() {
   const selectList = props.data.selectList;
   if(selectList) {
     pageresult.list.forEach((item2) => {
-      const f = selectList.find( f => f === item2["ECargoGoodsTgt.nSeqNo"]+'' );
+      const f = selectList.find( f => f === item2["ECargoGoodsTgt.cPkId"]+'' );
       item2["disabled"] = !!f;
       // debugger
       // distTableRef.value?.setValueByRowKey('disabled',item2._dataId,false)

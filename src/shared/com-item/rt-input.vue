@@ -165,7 +165,7 @@
       <el-icon v-if="item.prefixIcon" >
         <component :is="renderIcon(item.prefixIcon)" />
       </el-icon>
-      <span v-if="item.prefix">{{ item.prefix }}</span>
+      <span v-if="item.prefix" style="vertical-align: top;">{{ item.prefix }}</span>
       <el-text class="mx-1" truncated @click="checkIfTruncated($event, vInput)">
         {{vInput !== 'undefined' ? vInput : ''}}
       </el-text>

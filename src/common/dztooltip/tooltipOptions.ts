@@ -82,6 +82,7 @@ class TooltipManager {
     private static instance: TooltipManager
     private container: HTMLElement | null = null
     private currentTooltip: HTMLElement | null = null
+    private isHovered: boolean = false;
 
     private constructor() {
         injectStyles();
@@ -151,6 +152,18 @@ class TooltipManager {
         });
         tooltipElement.textContent = config.content;
 
+        // 鼠标悬浮提示框时不自动关闭
+        tooltipElement.addEventListener('mouseenter', event => {
+            this.isHovered = true;
+        });
+        // 鼠标离开提示框后自动关闭
+        tooltipElement.addEventListener('mouseleave', event => {
+            this.isHovered = false;
+            setTimeout(() => {
+                close();
+            }, 700)
+        });
+
         // 创建箭头
         if (config.showArrow !== false) {
             const arrowContainer = document.createElement('div');
@@ -204,8 +217,10 @@ class TooltipManager {
         this.currentTooltip = tooltipElement;
 
         const close = () => {
-            tooltipElement.remove();
-            this.currentTooltip = null;
+            if(!this.isHovered) {
+                tooltipElement.remove();
+                this.currentTooltip = null;
+            }
         };
 
         // 点击外部关闭

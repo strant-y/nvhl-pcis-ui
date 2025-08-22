@@ -15,6 +15,8 @@ import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
 import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
 import {CommonConstants} from "@/constants/CommonConstants";
+import {eventBus} from "@/utils/event-bus";
+import cargoApi from "@/api/cargo";
 const eCargoSelectTgtFix = defineAsyncComponent(
     () => import("./fix/SelectDistFix.vue")
 );
@@ -75,8 +77,10 @@ const handelCalculate = (row:any,selectData:any)=>{
       cvrgEditRef.value?.setFormSchema(row._dataId, "ECargoTerm.nOriginalRate", 'hidden', true)
 
     }
-    const nSeqNoJoin = selectData.map((item: any) => item['ECargoGoodsTgt.nSeqNo']).join(',')
+    const nSeqNoJoin = selectData.map((item: any) => item['ECargoGoodsTgt.cCodeNo']).join(',')
     cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nCargoSeq',row['_dataId'] , nSeqNoJoin)
+    const cGoodsIds = selectData.map((item: any) => item['ECargoGoodsTgt.cPkId']).join(',')
+    cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.cGoodsId',row['_dataId'] , cGoodsIds)
     const sum = selectData.reduce((total, current) => total + current['ECargoGoodsTgt.nInsuranceAmount'], 0);
     cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nInsuranceAmount',row['_dataId'] , sum)
     cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbAmount',row['_dataId'] , sum * row['ECargoTerm.nOriginalRate'])
@@ -86,11 +90,37 @@ const handelCalculate = (row:any,selectData:any)=>{
     }
   }
 }
+const handeReset = (row:any)=>{
+
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nInsuranceAmount',row['_dataId'] , '')
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nInsuranceFee',row['_dataId'] , '')
+
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbAmount',row['_dataId'] , '')
+
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.cFeeCurrency',row['_dataId'] , '')
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.cOriginalCurrency',row['_dataId'] , '')
+
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nFeeRate',row['_dataId'] , '')
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nOriginalRate',row['_dataId'] , '')
+
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nCargoSeq',row['_dataId'] , '')
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.cGoodsId',row['_dataId'] , '')
+
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbFee',row['_dataId'] , '')
+
+}
 onMounted(() => {
+  nextTick(()=>{
+    eventBus.on('matterChange', matterChange)
+  })
   const tableConfig = props.pageSchema;
   tableConfig.fromSchema.forEach((item: any) => {
     if(['ECargoTerm.cPlanNo'].includes(item.prop)) {
       item.disableColEdit = true;
+    }
+    if(['ECargoTerm.cGoodsId'].includes(item.prop)) {
+      item.disabled = true;
+      item.hidden = true;
     }
   });
   const formconfig11 = formInit(
@@ -140,7 +170,53 @@ onMounted(() => {
   Object.assign(formconfig1, formconfig11);
   addProvide(CommonConstants.FORM_DATA_KEY, 'ECargoTerm.cPkId')
 });
+const getMatterList = async ()=>{
+  let  result:any = []
+  const r = {
+    pageNum: 1,
+    pageSize: 9999
+  }; //获取分页数据
+  const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
+  let param = Object.assign({cComponentTable:'ECargoGoodsTgt',cEcAgrAppNo:agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''}, r);
+  const res:any  = await cargoApi.selectDistNew(param)
+  if(res.code === 200) {
+    if(res.data.data.length > 0 ){
+      result =  res.data.data
+    }
+  }
+  return result || []
+}
+const matterChange = async ()=>{
+  //获取条款列表
+  const cvrgList:any = getFormValue()
+  if(!Array.isArray(cvrgList)) return
+  if(cvrgList.length === 0) return
+  // 获取货物列表
+ const matterList:any =  await getMatterList()
 
+  // 遍历对象数组A
+  cvrgList.forEach((item:any) => {
+    // 获取ECargoTerm.cGoodsId属性
+    const cGoodsId = item['ECargoTerm.cGoodsId']
+    // 用逗号拆分字符串并去除空格
+    if(cGoodsId){
+      const ids = cGoodsId.split(',')
+      // 使用拆分后的ID数组过滤数组B
+      const goodList = matterList.filter((item:any) => {
+        // 将item.id转换为字符串进行比较
+        return ids.includes(item['ECargoGoodsTgt.cPkId']);
+      });
+      if(goodList.length > 0){
+        handelCalculate(item,goodList)
+      }else{
+        handeReset(item)
+      }
+      console.log('item',item)
+      console.log('goodList',goodList)
+    }
+  });
+  console.log('处理逻辑',matterList,cvrgList)
+}
 // 绑定方法
 const method = {
   cAmountCurrencyChange:(val:any,row:any)=>{
@@ -171,7 +247,7 @@ const method = {
     }
   },
   cFeeCurrencyChange:(val:any,row:any)=>{
-    console.log(val,row)
+    if(!val) return
     if (val !== "CNY") {
       codeListStore
           .queryCodeList({
@@ -229,7 +305,7 @@ const method = {
     // debugger
     const cvrgList = cvrgEditRef?.value?.getFromValue();
     const list = cvrgList.filter((f: any) => f._dataId != row._dataId);
-    const selectList = list.map((m: any) => m['ECargoTerm.nCargoSeq']).join(',').split(',');
+    const selectList = list.map((m: any) => m['ECargoTerm.cGoodsId']).join(',').split(',');
     dialog.value?.open(
         eCargoSelectTgtFix,
         {

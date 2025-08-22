@@ -57,6 +57,7 @@ onMounted(() => {
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
     setFormItem('ECargoBase.cCiOprRel',{ rules: [getRules("contactInformation", {})] })
+    setFormItem('ECargoBase.cCiMrk',{hidden:true})
     initComp();
     // 查询承保机构所属分公司和项目类别大类数据
     getCheckCdeptByCdptCde();

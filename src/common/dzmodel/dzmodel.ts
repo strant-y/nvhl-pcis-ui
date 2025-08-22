@@ -16,6 +16,7 @@ import querycustomerView from "./prodconfig/querycustomerView.vue";
 import termRiskGroupConfig from "./insuranceConInfo/termRiskGroupConfig.vue";
 import queryUtils from "./insuranceConInfo/queryUtils.vue";
 import relatedAdditionalInsModal from "./insuranceConInfo/relatedAdditionalInsModal.vue";
+import changeCiPolicynoComponent from "./edrList/change-ci-policyno-component.vue";
 
 import componentEdit from "./componentModel/componentEdit.vue";
 
@@ -42,6 +43,7 @@ const componentMap = {
     termFactorConfig:termFactorConfig,
     querycustomerView:querycustomerView,
     relatedAdditionalInsModal:relatedAdditionalInsModal,
+    changeCiPolicynoComponent:changeCiPolicynoComponent,
     queryUtils:queryUtils,
 
     buttonEdit:buttonEdit,
