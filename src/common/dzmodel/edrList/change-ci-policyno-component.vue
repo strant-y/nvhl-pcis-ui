@@ -193,8 +193,8 @@ const getTableFun = async (isSave = false) => {
 // 保存
 const saveProdDataFun = () => {
     const user = JSON.parse(sessionStorage.getItem("user") || "{}");
-    let cAppNo = props.cAppNo;  // 申请单号
-    let cPlyNo = props.cPlyNo;  // 保单号
+    let cAppNo = props.data.cAppNo;  // 申请单号
+    let cPlyNo = props.data.cPlyNo;  // 保单号
     let listS = pageresult.list;
 
     listS.forEach((item) => {
