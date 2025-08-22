@@ -174,6 +174,8 @@ import { getListByCode } from "@/api/code-list-service";
 import {useUserStore} from "@/store";
 import { listChrDepts } from "@/api/dept";
 import {scrollByDomId} from "@/utils/common";
+import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
+const policyService = new PolicyService();
 
 const router = useRouter();
 const dialogVisible = ref(true);
@@ -290,10 +292,16 @@ function selectedItem(value) {
 // 下一步
 function next() {
   // console.log(formconfig1.value);
-  freeEditRef.value?.validate().then((isValid: boolean) => {
+  freeEditRef.value?.validate().then(async (isValid: boolean) => {
     if (!isValid) {
       return false;
     } else {
+      // 点击下一步前校验，如果data为true则继续，否则阻断并提示
+      const queryProdDptCde:any = await policyService.queryProdDptCde({ cProdNo: formconfig1.value.cProdNo, cDptCde:  formconfig1.value.cDptCde})
+      if(queryProdDptCde.data !== true) {
+        ElMessage.error(queryProdDptCde.msg)
+        return
+      }
       const data = formconfig1.value;
       if (formconfig1.value.cRenewMrk == "1") {
         getPolicy({ cPlyNo: formconfig1.value.cPlyNo, queryTyp: "orig" }).then(

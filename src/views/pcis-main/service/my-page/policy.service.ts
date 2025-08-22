@@ -1655,6 +1655,14 @@ checkLibertyXJ(ops) {
     return request.post('reinsured/checkLibertyXJ', ops);
 }
 
+/**
+ * 出单下一步前校验接口
+ * @param param
+ */
+queryProdDptCde(ops) {
+    return request.post('/policy/queryProdDptCde', ops);
+}
+
 
 
 
