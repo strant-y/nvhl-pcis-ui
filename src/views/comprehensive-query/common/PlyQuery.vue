@@ -1070,6 +1070,8 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "签单日期",
         minWidth: 180,
+        sortable: true,
+
     },
     {
         prop: "cTermNo",
@@ -1108,7 +1110,9 @@ const tableObj = {
     // 查询单 投保单 保单 批单
     notWaitObj: {
         // 默认好像就2个不参与显示/隐藏
-        tableBtnType: "btn",
+      defaultSort: { prop: 'tIssueTm', order: 'descending' },
+
+      tableBtnType: "btn",
         tableBtnWidth: 200,
         tableBtnPosition: "right",
         tableBtn: [
