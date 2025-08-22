@@ -52,6 +52,7 @@ const dialog = ref<DialogMethod | null>(null);
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { set } from "lodash";
 import { validateIdCard } from "@/typings/method-public";
+import {calculateAgeFromIdCard} from "@/utils/common";
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -230,7 +231,7 @@ const idAnalysis = (id:string)=>{
           const birthday = `${birthYear}-${birthMonth.toString().padStart(2, "0")}-${birthDay.toString().padStart(2, "0")}`;
           const sexCode = parseInt(id.substring(16, 17), 10);
           const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
-          const age = new Date().getFullYear() - birthYear;
+          const age = calculateAgeFromIdCard(id);
 
           setValue("Applicant.cNation", "1"); // 国籍
           setValue("Applicant.tBirthday", birthday);
@@ -925,7 +926,7 @@ const method = {
   // 移动电话 切换
   mobileChange: (val) => {
     let cClntMrk =  getValue('Applicant.cClntMrk'); // 法人  1个人  0法人
- 
+        clearValidate('Applicant.cTel')  
     if (cClntMrk &&  val) {
       setFormItem("Applicant.cMobile", {
         rules: [getRules("required", {}), getRules("phoneNo", {})],
@@ -937,6 +938,7 @@ const method = {
   },
   // 固定电话
   cTelChange: (val) => {
+       clearValidate('Applicant.cMobile')  
     let cClntMrk =  getValue('Applicant.cClntMrk'); // 法人  1个人  0法人
     let cMobile = getValue('Applicant.cMobile');  // 移动 
 
@@ -1089,8 +1091,10 @@ const method = {
   },
   // 单位性质
   cWorkDptChange:(val:any,lab:any)=>{
-      let cClntMrk = getValue('Applicant.cClntMrk');  // 投保人性质 
+    console.log('单位性质',val)
+      let cClntMrk = getValue('Applicant.cClntMrk');  // 投保人性质  
       if(cWorkDptList.includes(val) && cClntMrk =='0'){
+        console.log('尽力')
           //实名认证方式
           setFormItem("Applicant.cRealnameAuthType", {
             rules: [getRules("required", {})],

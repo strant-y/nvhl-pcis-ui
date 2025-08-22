@@ -49,6 +49,7 @@ import { getAddressStr, qryCustomer } from "@/api/query";
 import { descryptParameter, encryptParameter } from "@/utils/encipher";
 import { useRouter, useRoute } from 'vue-router';
 import { validateIdCard } from "@/typings/method-public";
+import {calculateAgeFromIdCard} from "@/utils/common";
 const route = useRoute();
 const query = ref(route.query);
 const router = useRouter();
@@ -227,8 +228,8 @@ const idAnalysis = (id:string)=>{
           const birthday = `${birthYear}-${birthMonth.toString().padStart(2, "0")}-${birthDay.toString().padStart(2, "0")}`;
           const sexCode = parseInt(id.substring(16, 17), 10);
           const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
-          const age = new Date().getFullYear() - birthYear;
-
+          // const age = new Date().getFullYear() - birthYear;
+          const age = calculateAgeFromIdCard(id);
           setValue("Insured.cNation", "1"); // 国籍
           setValue("Insured.tBirthday", birthday);
           setValue("Insured.nAge", age);

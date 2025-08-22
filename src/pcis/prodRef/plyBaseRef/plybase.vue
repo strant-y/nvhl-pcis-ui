@@ -185,6 +185,7 @@ const method = {
   cCiMrkChange: (val:any) => {
     // 对于询价单场景，不执行联共保菜单显示和信息初始化
   if (params.pageName === "priceInquiry") {
+    productStore.setcPriceCiMrk(val)
      setFormItem("Base.cRemark", { rules: [getRules("required", {})], });
   } else {
     setFormItem("Base.cRemark", { rules: [], });

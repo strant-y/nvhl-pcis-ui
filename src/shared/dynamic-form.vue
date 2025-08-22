@@ -52,13 +52,13 @@
               <el-form-item :required="checkRequired(item)"
                             :label-width=" maxLabelWidth + 'px'">
                 <template #label>
-                   <template v-if="item.title?.length > 8">
+                   <template v-if="item.title?.length > 5">
                     <el-tooltip
                       effect="dark"
                       :content="item.title"
                       placement="top-start"
                     >
-                      {{ item.title.substring(0, 8) + "..." }}
+                      {{ item.title.substring(0, 5) + "..." }}
                     </el-tooltip>
                   </template>
                   <template v-else>
@@ -103,13 +103,13 @@
                 :label-width=" maxLabelWidth + 'px'"
               >
                 <template #label>
-                   <template v-if="item.title?.length > 8">
+                   <template v-if="item.title?.length > 7">
                     <el-tooltip
                       effect="dark"
                       :content="item.title"
                       placement="top-start"
                     >
-                      {{ item.title.substring(0, 8) + "..." }}
+                      {{ item.title.substring(0, 7) + "..." }}
                     </el-tooltip>
                   </template>
                   <template v-else>
@@ -254,13 +254,13 @@
                     :label-width=  "maxLabelWidth + 'px'"
                   >
                     <template #label>
-                      <template v-if="item.title?.length > 8">
+                      <template v-if="item.title?.length > 7">
                         <el-tooltip
                           effect="dark"
                           :content="item.title"
                           placement="top-start"
                         >
-                          {{ item.title.substring(0, 8) + "..." }}
+                          {{ item.title.substring(0, 7) + "..." }}
                         </el-tooltip>
                       </template>
                       <template v-else>
