@@ -483,6 +483,9 @@ import { getAppPolicyList, qryEndorseList, delTmpPolicy, queryInsuredList, getIn
 import {encryptRouterParam} from "@/router";
 import SvgIcon from "@/components/SvgIcon/index.vue";
 import { distRequiredMap } from './requiredDistMap';
+import { ElTable, ElTableColumn, ElIcon } from 'element-plus';
+import { Warning } from '@element-plus/icons-vue';
+
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -4823,38 +4826,67 @@ const queryTermRateLimitFun = (calcFun: any) => {
     if(r.code === 200) {
       calcFun()
     } else if(r.msg || r.message) {
-      const tableHtml = r.data.map((row:any) => {
-        return `<tr><td>${row.cPlanNo}</td>
-        <td>${row.cTermName}</td>
-        <td>${row.cRiskName}</td>
-        <td style="color:red;">${row.nRateVal}</td>
-        <td>${row.cRateRange}</td></tr>`;
-      }).join(''); // 将所有行合并成一个字符串
-      const htmlContent = `
-        <table border="1" class="messageBoxTable">
-          <thead>
-            <tr><th>方案号</th>
-            <th>条款</th
-            ><th>责任</th>
-            <th>费率</th>
-            <th>建议费率区间</th></tr>
-          </thead>
-          <tbody>
-            ${tableHtml}
-          </tbody>
-        </table>
-        <div>${r.msg || r.message}</div>
-      `;
-      ElMessageBox.confirm(htmlContent, "提示", {
-        dangerouslyUseHTMLString: true,
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-        lockScroll: false,
-        customClass: 'queryTermRateMessage'
-      }).then(() => {
-        calcFun()
-      })
+      const tableVNode = h(ElTable, {
+        data: r.data,
+        border: true,
+        style: { width: '100%', marginTop: '15px' }
+      }, {
+        default: () => [
+          h(ElTableColumn, {
+            prop: 'cPlanNo',
+            label: '方案号',
+            width: '80',
+            align: 'center',
+          }),
+          h(ElTableColumn, {
+            prop: 'cTermName',
+            width: '350',
+            label: '条款',
+            align: 'center',
+          }),
+          h(ElTableColumn, {
+            prop: 'cRiskName',
+            width: '300',
+            label: '责任',
+            align: 'center',
+          }),
+          h(ElTableColumn, {
+            prop: 'nRateVal',
+            width: '85',
+            label: '费率',
+            align: 'center',
+          }),
+          h(ElTableColumn, {
+            prop: 'cRateRange',
+            width: '160',
+            label: '建议费率区间',
+            align: 'center',
+          })
+        ]
+      });
+      ElMessageBox({
+        type: 'warning',
+        title: '提示',
+        message: h('div',
+            {style:{margin: '10px'}}, [
+              tableVNode,
+              h('p', { style: { marginTop: '10px', color: '#555' } },`${r.msg || r.message}`),
+            ],
+        ),
+        draggable: true,
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        showCancelButton: true,
+        customClass: 'my-message-box',
+        beforeClose: (action, instance, done) => {
+          if (action === 'confirm') { // 确认
+            calcFun();
+            done();
+          } else { // 取消
+            done();
+          }
+        }
+      });
     }
   }).catch((err:any) => {
     ElMessage.error(err)
@@ -5118,20 +5150,8 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 }
 </style>
 <style>
-.queryTermRateMessage {
-  max-width: 80%;
-  width: auto;
-}
-.queryTermRateMessage .el-message-box__message p {
-  overflow-x: auto;
-}
-.queryTermRateMessage .messageBoxTable {
-  text-align: center;
-  border-collapse: collapse;
-}
-.queryTermRateMessage .messageBoxTable td,.queryTermRateMessage .messageBoxTable th {
-  white-space: nowrap;
-  border: 1px solid #000000;
-  padding: 0 5px;
+.el-message-box.my-message-box {
+  width: auto !important;
+  max-width: 80% !important;
 }
 </style>
