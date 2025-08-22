@@ -490,6 +490,15 @@ export const NewUdrListService = () => {
     }
   }
 
+  // 保存风险单位-询价
+  const saveDataXJ = async (ops: any) => {
+    try {
+      return post('reinsured/saveDataXJ', ops);
+    } catch (error) {
+      return handleError(error);
+    }
+  }
+
   return {
     getNewUdrList,
     getBackUdrList,
@@ -536,5 +545,6 @@ export const NewUdrListService = () => {
     tryCountInFoRIXJ,
     queryComponentCodeListXJ,
     riskUnitQueryXJ,
+    saveDataXJ,
   };
 }
