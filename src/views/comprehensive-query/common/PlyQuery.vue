@@ -42,6 +42,10 @@
         </el-tooltip>
       </template>
 
+      <template #column-nPrm="{ row, column, index }">
+          <span >¥ {{ row.nPrm }}</span>
+      </template>
+
       <!-- ES查询 投保人姓名，被保人姓名，被保人地址，产品名称高亮 -->
       <template #column-cAppNme="{ row }">
         <span v-html="row.cAppNme || ''"></span>
@@ -1090,7 +1094,8 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "保费",
         minWidth: 100,
-        prefix: "¥ ",
+        sortable: true,
+        slotName: "nPrm"
     },
     {
         prop: "cUdrNme",

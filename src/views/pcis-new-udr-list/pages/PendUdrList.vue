@@ -8,7 +8,12 @@
             ref="tableRef"
             @selection-change="handleSelectionChange"
             @page-change="handleQuery(false)"
-    />
+    >
+
+        <template #column-nPrm="{ row, column, index }">
+          <span >¥ {{ row.nPrm }}</span>
+        </template>
+    </app-table>
   </div>
 </template>
 
@@ -565,7 +570,7 @@
             title: "保费",
             showKey: [1, 2, 3, 4],
             minWidth: 120,
-            prefix: "¥ ",
+            slotName: "nPrm"
         },
         {
             prop: "appCde",
