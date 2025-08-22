@@ -146,14 +146,14 @@ const uwBtn = [
   //
   //   },
   // }),
-  createFreeButtonBase({
-    label: "核保信息",
-    type: "primary",
-    id:"underwriting",
-    func: () => {
-
-    },
-  }),
+  // createFreeButtonBase({
+  //   label: "核保信息",
+  //   type: "primary",
+  //   id:"underwriting",
+  //   func: () => {
+  //
+  //   },
+  // }),
 ];
 /**
  * 一般批改按钮
@@ -197,14 +197,14 @@ const edrBtn = [
  * @type {FormButton[]}
  */
 const edrSurrenderBtn = [
-  createFreeButtonBase({
-    id: "btn010101",
-    label: "保费计算",
-    type: "primary",
-    func: () => {
-
-    },
-  }),
+  // createFreeButtonBase({
+  //   id: "btn010101",
+  //   label: "保费计算",
+  //   type: "primary",
+  //   func: () => {
+  //
+  //   },
+  // }),
   createFreeButtonBase({
     id: "btn010102",
     label: "保存",
@@ -651,18 +651,18 @@ function query() {
             const EdrECargoBase = res["data"]["composition"]["AgreementEdrEcargoBase"][0];
               mainRef.value?.setxyedrbaseRefData({...EdrECargoBase,'EdrECargoBase.cEdrType':props.param?.cEdrType})
               mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnBundleCde",
-              props.param["cRsnCde"]);
+              props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"]);
             mainRef.value?.getxyedritemValue();
           }
           if (props.param.cEdrType != "1") {
             mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnDetail", [
-              props.param["cRsnCde"],
+              props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"],
             ]);
           }
           if (props.param?.cEdrType == "1") {
             if (props.param["cRsnCde"] != "FZ") {
               mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnDetail", [
-                props.param["cRsnCde"],
+                props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"],
               ]);
             }
           }
@@ -671,8 +671,8 @@ function query() {
               getEdrRsnItemFun(
                   "029900",
                   props.param["cDptCde"],
-                  props.param["cRsnCde"],
-                  props.param["cRsnCde"],
+                  props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"],
+                  props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"],
                   props.param["cEdrType"],
                   "0"
               )
