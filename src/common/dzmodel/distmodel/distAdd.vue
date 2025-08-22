@@ -274,9 +274,9 @@ onMounted(() => {
     if( route.params.param.cProdNo == '040002' && item.prop =='Dist.cIdentificationNumber'){
          item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
     }
-    if(item.prop =='Dist.cSchoolName'){
-      item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
-    }
+    // if(item.prop =='Dist.cSchoolName'){
+    //   item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+    // }
  
     if(item.cShowLocation === '1'){
       item["hidden"] = true;

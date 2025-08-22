@@ -4074,6 +4074,19 @@ const submitEdrToUndrFun = async () => {
     ElMessage.warning("请填写批改信息中的必填项")
     return
   }
+  // 非涉费批改 投保人信息、被保人信息校验
+  if(props.param.cRsnCde === "FZ") {
+    const applicantValidate = await opertaor.getTableRefByKey('applicant')?.validate()
+    if(!applicantValidate) {
+      ElMessage.warning("请填写投保人信息中的必填项")
+      return
+    }
+    const insuredValidate = await opertaor.getTableRefByKey('insured')?.validate()
+    if(!insuredValidate) {
+      ElMessage.warning("请填写被保人信息中的必填项")
+      return
+    }
+  }
   // const rv = await opertaor.validateAll();
   // if (!rv) {
   //   return;
