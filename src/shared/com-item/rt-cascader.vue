@@ -266,7 +266,7 @@ function lazyLoadFun(node: any, resolve: Function) {
             });
           } else {
             res.forEach((e: any) => {
-              if(e.counts !== null || e.counts !==undefined || e.counts === 0){
+              if(e.counts !== null && e.counts !==undefined && e.counts === 0){
                 e.leaf = true;
               }else{
                 e.leaf = level >= (l && l.length > 0 ? l.length - 1 : 5);
