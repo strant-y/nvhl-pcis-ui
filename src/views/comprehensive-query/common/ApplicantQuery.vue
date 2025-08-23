@@ -852,7 +852,7 @@ const esSearchColumns = [
    {
     prop: "policyInfo",
     inputtype: "rtinput",
-    title: "保单",
+    title: "申请单号/保单号",
     minWidth: 180,
     fixed: "left",
     slotName: "policyInfo"
