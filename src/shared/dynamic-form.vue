@@ -591,7 +591,10 @@ function setFormValue(data: any, noupdate = false) {
   }
 }
 
-function formsDataUpdate() {
+function formsDataUpdate(item:any) {
+  if(item.rules){ // 如果有验证规则,则form表单验证一下值
+    fromRef.value?.validateField(item.prop);
+  }
   emits("formsDataUpdate", form);
 }
 
