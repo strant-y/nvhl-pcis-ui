@@ -43,7 +43,7 @@ function handleChange() {
   emits("click");
   if (!props.item.isBtn) {
     //如果是从btn透传上来的,则只执行btn上的方法,防止重复触发
-    props.item.func ? props.item.func() : null;
+    (props.item.func && typeof props.item.func === 'function' ) ? props.item.func() : null;
   }
 }
 const renderIcon = (iconName: string) => {
