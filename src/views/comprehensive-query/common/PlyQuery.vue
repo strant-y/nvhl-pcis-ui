@@ -887,8 +887,9 @@ const esSearchColumns = [
     prop: "policyInfo",
     inputtype: "rtinput",
     title: "申请单号/保单号",
-    minWidth: 200,
+    minWidth: 180,
     fixed: "left",
+    slotName: "policyInfo"
    },
    {
     prop: "cPlyNo",
@@ -954,7 +955,7 @@ const esSearchColumns = [
     inputtype: "rtinput",
     title: "保险期间",
     minWidth: 180,
-     slotName: "InsurancePeriod"
+    slotName: "InsurancePeriod"
    },
    {
     prop: "cAppStatus",
@@ -1077,7 +1078,7 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "保险期间",
         minWidth: 180,
-      slotName: "InsurancePeriod"
+        slotName: "InsurancePeriod"
     },
     {
         prop: "tIssueTm",
@@ -1451,7 +1452,6 @@ function esSearch(flag?: boolean) {
   const tIssueTmEnd =
       s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[1] : null;
 
-  // if (currentTabKey.value == "0") {
   const param = Object.assign(s, r);
   param["pageNo"] = param["pageNum"];
   param["tAppTmStart"] = tAppTmStart; // 添加投保开始时间
