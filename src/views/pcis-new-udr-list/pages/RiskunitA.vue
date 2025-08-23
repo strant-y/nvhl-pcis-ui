@@ -82,6 +82,7 @@ const {
   tryCountInFoRIXJ,
   queryComponentCodeListXJ,
   riskUnitQueryXJ,
+  saveDataXJ,
 } = NewUdrListService();
 import { descryptParameter } from "@/utils/encipher.ts";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
@@ -1576,7 +1577,7 @@ const handleBeforeClose = async (done:any) => {
   // 关闭弹框时如果保存过风险单位，需要调用再保保存险位接口，接口会返回标识
   if(saveFlag.value) {
     // 调用再保险位接口
-    const { saveFlag, data } = await saveDataInfo()
+    const { saveFlag, data } = await saveDataInfo() 
     if(!saveFlag) return
     emit('ok', {...data, tableList: pageresult1.list})
     done()
@@ -1591,7 +1592,7 @@ const saveDataInfo = async () => {
   const param = opertaor.getFatherPage().getSaveDataParams();
   param[0].plyRiskUnitCvrgObjList = pageresult1.list;
 
-  const resInfo: any = await saveData({param});
+  const resInfo: any = params.pageName === "priceInquiry" ? await saveDataXJ({param}) : await saveData({param});
   if (resInfo["code"] === "1") {
     saveFlag = true;
     data = resInfo["data"]

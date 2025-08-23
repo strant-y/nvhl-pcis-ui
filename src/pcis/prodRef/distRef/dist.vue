@@ -164,6 +164,26 @@ const formconfig11 = ref<any>({});
 const oldPageSchema = ref<any>({});
 
 const hiddenPage = ref<Array>(['VehicleDist040002']); //初始化需要隐藏的组件
+// 列表数据反显时，方案号的下拉选项渲染需要条款加载后根据条款获取，所以通过计算属性获取getPlanNo的值
+// 有值的时候再填充到方案号的loadData中
+const cvrg = computed(() => {
+  if(opertaor.getTableRefByKey("cvrg") && opertaor.getTableRefByKey("cvrg").getPlanNo) {
+    return opertaor.getTableRefByKey("cvrg")?.getPlanNo()
+  } else {
+    return [];
+  }
+})
+watch(cvrg, (val) => {
+  if(val && val.length > 0) {
+    formconfig11.value.fromSchema.forEach((r:any) => {
+      // 方案号
+      if(r['prop'] == 'Dist.cPlanNo'){
+        r.typeCode = null;
+        r.loadData = val;
+      }
+    });
+  }
+});
 onMounted(async () => {
   // 初始化 cComponentTableValue
   cComponentTableValue = getCComponentTableValue();
@@ -360,7 +380,7 @@ const method = {
         {
           fromSchema: tableconfig.value.fromSchema,
           title: "编辑",
-          rowData: row,
+          rowData: {...row},
           tab: formconfig1.value.title,
           compKey: props.compKey,
           codeListMap: distTableRef.value?.getCodeListMap(),
@@ -588,35 +608,35 @@ const method = {
         if(idxParam && isChange) { // 保存清单表格在屏幕中间
           idxParam.handleAnchorClick(undefined, `#${props.compKey}`);
         }
-        // 刷新条款表格
-        const termref = opertaor.getTableRefByKey("cvrg");
-        const hasRel = res.data.hasRel;
-        const hasPlan = res.data.hasPlan;
-        const clauseValues = res.data.clauseValues;
+        // // 刷新条款表格
+        // const termref = opertaor.getTableRefByKey("cvrg");
+        // const hasRel = res.data.hasRel;
+        // const hasPlan = res.data.hasPlan;
+        // const clauseValues = res.data.clauseValues;
 
-        if(hasRel == false){
-            return;
-        }
-        if(clauseValues.length == 0){
-            return;
-        }
-        // 区分方案
-        if(hasPlan){
-            clauseValues.forEach(item => {
-                termref.setTermData({
-                    termNo: route.params.param.cTermNo,
-                    planNo: item.planNo,
-                    factorProp: item.field,
-                }, item.countNumber);
-            });
-        } else{
-            clauseValues.forEach(item => {
-                termref.setTermData({
-                    termNo: route.params.param.cTermNo,
-                    factorProp: item.field,
-                }, item.countNumber);
-            });
-        }
+        // if(hasRel == false){
+        //     return;
+        // }
+        // if(clauseValues.length == 0){
+        //     return;
+        // }
+        // // 区分方案
+        // if(hasPlan){
+        //     clauseValues.forEach(item => {
+        //         termref.setTermData({
+        //             termNo: route.params.param.cTermNo,
+        //             planNo: item.planNo,
+        //             factorProp: item.field,
+        //         }, item.countNumber);
+        //     });
+        // } else{
+        //     clauseValues.forEach(item => {
+        //         termref.setTermData({
+        //             termNo: route.params.param.cTermNo,
+        //             factorProp: item.field,
+        //         }, item.countNumber);
+        //     });
+        // }
 
 
       }

@@ -690,7 +690,7 @@ const getNo = computed(() => {
   return edrbaseFlag.value ? edrbase.value?.getValue('EdrBase.cAppNo') : props.param?.pageName === "priceInquiry" ? opertaor.getTableRefByKey('plyBase')?.getValue('Base.cInquiryNo') || '暂无' : opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || '暂无'
 })
 // 储存原始组件配置信息
-const oldProductResData = ref({})
+const oldProductResData = ref([])
 
 onMounted(() => {
   console.log('param 路由---', props.param )
@@ -4074,6 +4074,19 @@ const submitEdrToUndrFun = async () => {
     ElMessage.warning("请填写批改信息中的必填项")
     return
   }
+  // 非涉费批改 投保人信息、被保人信息校验
+  if(props.param.cRsnCde === "FZ") {
+    const applicantValidate = await opertaor.getTableRefByKey('applicant')?.validate()
+    if(!applicantValidate) {
+      ElMessage.warning("请填写投保人信息中的必填项")
+      return
+    }
+    const insuredValidate = await opertaor.getTableRefByKey('insured')?.validate()
+    if(!insuredValidate) {
+      ElMessage.warning("请填写被保人信息中的必填项")
+      return
+    }
+  }
   // const rv = await opertaor.validateAll();
   // if (!rv) {
   //   return;
@@ -4548,6 +4561,19 @@ function getEdrbaseValue(key:any) {
 }
 
 function getOldProductResData() {
+  // 根据条款获取清单方案号下拉选项
+  oldProductResData.value[0]['pageInfo'].forEach((i:any) => {
+    if(i.pageKey === "dist") {
+      i.pageSchema.fromSchema.forEach((item:any) => {
+        // 方案号下拉值
+        if(item.prop == 'Dist.cPlanNo'){
+          const termref = opertaor.getTableRefByKey("cvrg");
+          item.typeCode = null;
+          item.loadData = termref.getPlanNo();
+        }
+      })
+    }
+  })
   return oldProductResData.value;
 }
 

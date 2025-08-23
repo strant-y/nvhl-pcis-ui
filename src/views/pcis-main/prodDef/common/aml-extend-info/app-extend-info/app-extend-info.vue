@@ -180,7 +180,8 @@ const tableconfig = reactive<AppGridEditConfig>(
 				prop: "tCerftEndTm",
 				inputtype: "rtdatepicker",
 				title: "证件有效止期",
-				rules: [getRules("required", {})]
+				rules: [getRules("required", {})],
+				
 			},
 			{
 				prop: "cCusAddr",
@@ -230,15 +231,27 @@ const formconfigData = {
 			prop: 'TCertfBgnTm_A',
 			title: '认证有效起期',
 			inputtype: "rtdatepicker",
-      clearable: true,
-      rules: [getRules("required", {})],
+			clearable: true,
+			rules: [getRules("required", {})],
+			disabledDate: (time: Date) => {
+					const disTime =freeEditRef1.value?.getValue('TCertfEndTm_A')
+					if(disTime){
+							return time.getTime() > new Date(disTime).getTime()
+					}
+			},
 		},
 		{
 			prop: 'TCertfEndTm_A',
 			title: '认证有效止期',
 			inputtype: "rtdatepicker",
-      clearable: true,
-      rules: [getRules("required", {})],
+			clearable: true,
+			rules: [getRules("required", {})],
+			disabledDate: (time: Date) => {
+					const disTime =freeEditRef1.value?.getValue('TCertfBgnTm_A')
+					if(disTime){
+						return time.getTime() < new Date(disTime).getTime()
+					}
+			},
 		}
 	]
 }
@@ -282,6 +295,13 @@ const formconfigData2 = {
 			inputtype: "rtdatepicker",
 			clearable: true,
 			rules: [getRules("required", {})],
+			disabledDate: (time: Date) => {
+					const disTime =freeEditRef2.value?.getValue('TCertfEndTm_B')
+					if(disTime){
+							return time.getTime() > new Date(disTime).getTime()
+					}
+			},
+			
 		},
 		{
 			prop: 'TCertfEndTm_B',
@@ -289,6 +309,12 @@ const formconfigData2 = {
 			inputtype: "rtdatepicker",
 			clearable: true,
 			rules: [getRules("required", {})],
+			disabledDate: (time: Date) => {
+			 	const disTime =freeEditRef2.value?.getValue('TCertfBgnTm_B')
+			 	if(disTime){
+			 			return time.getTime() < new Date(disTime).getTime()
+			 	}
+			},
 		}
 	]
 }
@@ -331,6 +357,12 @@ const formconfigData3 = {
 			inputtype: "rtdatepicker",
       clearable: true,
       rules: [getRules("required", {})],
+	  		disabledDate: (time: Date) => {
+					const disTime =freeEditRef3.value?.getValue('TCertfEndTm_C')
+					if(disTime){
+							return time.getTime() > new Date(disTime).getTime()
+					}
+			},
 		},
 		{
 			prop: 'TCertfEndTm_C',
@@ -338,6 +370,12 @@ const formconfigData3 = {
 			inputtype: "rtdatepicker",
 			clearable: true,
 			rules: [getRules("required", {})],
+				disabledDate: (time: Date) => {
+					const disTime =freeEditRef3.value?.getValue('TCertfBgnTm_C')
+					if(disTime){
+						return time.getTime() < new Date(disTime).getTime()
+					}
+			},
 		}
 	]
 }
@@ -382,14 +420,26 @@ const formconfigData4 = {
 			inputtype: "rtdatepicker",
 			rules: [getRules("required", {})],
 			clearable: true,
+			disabledDate: (time: Date) => {
+					const disTime =freeEditRef4.value?.getValue('TCertfEndTm_D')
+					if(disTime){
+							return time.getTime() > new Date(disTime).getTime()
+					}
+			},
 		},
 		{
 			prop: 'TCertfEndTm_D',
 			title: '认证有效止期',
 			inputtype: "rtdatepicker",
-      rules: [getRules("required", {})],
-      clearable: true,
-		}
+			rules: [getRules("required", {})],
+			clearable: true,
+			disabledDate: (time: Date) => {
+						const disTime =freeEditRef4.value?.getValue('TCertfBgnTm_D')
+						if(disTime){
+							return time.getTime() < new Date(disTime).getTime()
+						}
+				},
+			}
 	]
 }
 const formconfig1 = reactive<AppFreeEditConfig>(

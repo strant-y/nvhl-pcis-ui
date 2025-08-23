@@ -312,6 +312,20 @@ const tableconfig = reactive<AppTableConfig>(
           toDtl(row, 'edit');
         },
       }),
+      createFreeButtonBase({
+        id: "edit",
+        link: true,
+        type: "danger",
+        tooltip: "删除",
+        icon: "Delete",
+        size: "large",
+        tableClick: (row) => {
+          if(row.cEcAgrAppNo){
+            handelDet(row.cEcAgrAppNo)
+          }
+
+        },
+      }),
     ],
     fromSchema: [
 			{
@@ -431,7 +445,32 @@ function showMethodModal() {
       }
     });
 };
-
+const handelDet = (cEcAgrAppNo:any)=>{
+  ElMessageBox.confirm("此操作将删除该数据, 是否继续?", "提示", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning",
+  })
+      .then(() => {
+        // 删除逻辑
+        console.log("删除", cEcAgrAppNo);
+        // 可以在这里调用 API 删除数据
+        cargoApi.deleteEcargo({cEcAgrAppNo})
+            .then((res: any) => {
+              if (res && res.code === 200) {
+                handleQuery(true);
+              } else {
+                ElMessage.error(res.msg);
+              }
+            })
+            .catch((err: any) => {
+              ElMessage.error(err.msg);
+            });
+      })
+      .catch(() => {
+        // 取消删除
+      });
+}
 function toDtl(row: any, type: string, payWay: string ) {
   if(row.cAppTyp === 'E'){
     router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify(row), type: 'EDR_APP_NEW_SCENE',isActive:'1'}});

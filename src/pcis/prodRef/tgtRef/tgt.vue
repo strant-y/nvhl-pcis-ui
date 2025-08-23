@@ -116,6 +116,16 @@ onMounted(async () => {
         rules: [getRules("vehiclePlate", {})],
       });
   }
+  
+  //040008  040011  呼号必填
+  if(params.cProdNo === '040011'|| params.cProdNo === '040008'){
+     setFormItem("Tgt.cCallSign", { rules: [getRules("required", {'trigger':'blur'})]});
+  }
+
+   //110004、110003、040011、040008 主机功率(单位:千瓦(KW)) 非必填
+  if(params.cProdNo === '110004'|| params.cProdNo === '110003'|| params.cProdNo === '040011'|| params.cProdNo === '040008'){
+     setFormItem("Tgt.nHostPower", { rules: [getRules("required", {'trigger':'blur'})]});
+  }
 
   // 车牌号校验
   setFormItem("Tgt.cTransportLicenseNumber", {
@@ -564,10 +574,12 @@ const method = {
   },
   //投保乘客座位总数改变事件
   changenTotalInsured: () => {
+    console.log('触发11')
     setValue("Tgt.nSeatCapacity", Number(getValue("Tgt.nTotalInsured")) + Number(getValue("Tgt.nInsuredcompanySeats")))
   },
   //投保司乘人员座位总数改变事件
   changenInsuredcompanySeats: () => {
+     console.log('触发12')
     setValue("Tgt.nSeatCapacity", Number(getValue("Tgt.nTotalInsured")) + Number(getValue("Tgt.nInsuredcompanySeats")))
   },
   //是否单项工程change事件

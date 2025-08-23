@@ -94,7 +94,7 @@ const method = {
     // const cBsnsTyp = opertaor.getTableRefByKey("plyBase").getValue("Base.cBsnsTyp")
     const cCiMrkFlag = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
     const nCiAmt = parseFloat(productStore.nAmt)
-    if(nCiAmt =="0"){
+    if(param?.pageType !== "EDR_APP_NEW_SCENE" && nCiAmt =="0"){
       ElMessage.warning("总保额为0,请先进行保费计算!");
       return;
     }
@@ -929,6 +929,9 @@ const valideRequired = ()=>{
           freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.cBrkSlsCde", "disabled", true
           );
+          
+          // freeEditRef?.value?.setValueByRowKey("Ci.cBrkrCde", rowId, "");
+          // freeEditRef?.value?.setValueByRowKey("Ci.cBrkSlsCde", rowId, "");
           const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
           if (rowItem) {
             rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
@@ -937,6 +940,8 @@ const valideRequired = ()=>{
         }
         // 处理非直销业务（19002或19003）的情况
         else if(cBsnsTyp == '19002' || cBsnsTyp == '19003'){
+          // freeEditRef?.value?.setValueByRowKey("Ci.cSlsId", rowId, "");
+          // freeEditRef?.value?.setValueByRowKey("Ci.cSlsNme", rowId, "");
           freeEditRef.value?.setRowFieldProp(rowData._dataId, 'Ci.nComm', 'disabled', false)
           // 非直销业务：代理经纪人和代理业务员必填
           freeEditRef.value?.setRowFieldProp(

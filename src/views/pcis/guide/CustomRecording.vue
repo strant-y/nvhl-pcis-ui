@@ -497,10 +497,16 @@ const handleArray = (obj:any)=>{
 }
 function next() {
   // console.log(formconfig1.value);
-  freeEditRef.value?.validate().then((isValid: boolean) => {
+  freeEditRef.value?.validate().then(async (isValid: boolean) => {
     if (!isValid) {
       return false;
     } else {
+      // 点击下一步前校验，如果data为true则继续，否则阻断并提示
+      const queryProdDptCde:any = await policyService.queryProdDptCde({ cProdNo: formconfig1.value.cProdNo, cDptCde:  formconfig1.value.cDptCde})
+      if(queryProdDptCde.data !== true) {
+        ElMessage.error(queryProdDptCde.msg)
+        return
+      }
       const data = formconfig1.value;
       if (formconfig1.value.cRenewMrk == "1") {
         getPolicy({ cPlyNo: formconfig1.value.cPlyNo, queryTyp: "orig" }).then(

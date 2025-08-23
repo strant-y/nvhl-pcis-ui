@@ -269,14 +269,21 @@ onMounted(() => {
     if( route.params.param.cProdNo == '042003' && item.prop =='Dist.cPlanNo' ){
              item['rules'] = [];
     }
+    // 方案号下拉框内容根据条款赋值；
+    if(item.prop == 'Dist.cPlanNo'){
+      const termref = opertaor.getTableRefByKey("cvrg");
+      
+      item.typeCode = null;
+      item.loadData = termref.getPlanNo();
+    }
 
     // 040002 证件号码 必填问题
     if( route.params.param.cProdNo == '040002' && item.prop =='Dist.cIdentificationNumber'){
          item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
     }
-    if(item.prop =='Dist.cSchoolName'){
-      item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
-    }
+    // if(item.prop =='Dist.cSchoolName'){
+    //   item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
+    // }
  
     if(item.cShowLocation === '1'){
       item["hidden"] = true;
@@ -387,6 +394,12 @@ onMounted(() => {
       item.groupList.forEach((data:any) => {
         data['func'] = getAddressstr;
       })
+    }
+    // 根据条款获取方案号下拉选项
+    if(item.prop == 'Dist.cPlanNo'){
+      const termref = opertaor.getTableRefByKey("cvrg");
+      item.typeCode = null;
+      item.loadData = termref.getPlanNo();
     }
     newSchema.push(item);
   }

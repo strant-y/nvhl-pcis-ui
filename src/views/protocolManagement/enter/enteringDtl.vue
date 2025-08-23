@@ -12,6 +12,7 @@ import {useTagsViewStore} from "@/store";
 import {useRouter} from "vue-router";
 import { getECargoData } from "@/pcis/prodRef/dataInit";
 import {getEdrRsnItem} from "@/api/query/index"
+import {eventBus} from "@/utils/event-bus";
 const tagsViewStore = useTagsViewStore();
 const router = useRouter();
 const props = defineProps({
@@ -145,14 +146,14 @@ const uwBtn = [
   //
   //   },
   // }),
-  createFreeButtonBase({
-    label: "核保信息",
-    type: "primary",
-    id:"underwriting",
-    func: () => {
-
-    },
-  }),
+  // createFreeButtonBase({
+  //   label: "核保信息",
+  //   type: "primary",
+  //   id:"underwriting",
+  //   func: () => {
+  //
+  //   },
+  // }),
 ];
 /**
  * 一般批改按钮
@@ -196,14 +197,14 @@ const edrBtn = [
  * @type {FormButton[]}
  */
 const edrSurrenderBtn = [
-  createFreeButtonBase({
-    id: "btn010101",
-    label: "保费计算",
-    type: "primary",
-    func: () => {
-
-    },
-  }),
+  // createFreeButtonBase({
+  //   id: "btn010101",
+  //   label: "保费计算",
+  //   type: "primary",
+  //   func: () => {
+  //
+  //   },
+  // }),
   createFreeButtonBase({
     id: "btn010102",
     label: "保存",
@@ -265,6 +266,11 @@ onBeforeMount(async () => {
   }
   if(['view','edit','audit','EDR_APP_NEW_SCENE'].includes(props.type)){
     nextTick(async ()=>{
+      const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn')
+        AgreementFeeWarn.setFormItem("ECargoBase.cPayWay",  {
+        typeCode: 'ECargo_Pay_Ways',
+        codeParam: { payway: 'all' }
+      })
       await query();
     })
   }
@@ -426,6 +432,10 @@ const submitEdrToUndrFun = async () => {
     ElMessage.warning(validateAll.msg);
     return;
   }
+  const isSuccess = premiumCalculation()
+  if(!isSuccess){
+    return  ElMessage.error('请先进行保费计算')
+  }
   const f = await saveEdrPlyInfo(); // 提交核保,需要默认执行一次保存操作
   if(f){
     const btn = getBtn("btnSubmitEdr");
@@ -463,7 +473,6 @@ const getPlyPolicyFun = () => {
       const url =window.location.origin + "/#/protocolManagement/enteringDtl?" + query.toString();
        console.log('url',url)
       window.open(url, "_blank");
-
 };
 /**
  * 退保保存
@@ -550,6 +559,10 @@ const saveEdrPlyInfo = async () => {
     formPage.value?.setFormDataById('AgreementFeeWarn',{"ECargoBase.cEcAgrAppNo":EdrBaseData['ECargoBase.cEcAgrAppNo']})
     saveEdrFlag = true;
     cEcAgrAppNo.value = EdrBaseData['ECargoBase.cEcAgrAppNo']
+    if(cEcAgrAppNo.value){
+      const param:any =  idxParam.param
+      eventBus.emit('goodsRefresh', {cEcAgrAppNo:param.cEcAgrAppNo,targetNo:cEcAgrAppNo.value,cRsnCde:param.cRsnCde,});
+    }
   } else {
     ElMessage.error(edrInfo.msg);
   }
@@ -619,6 +632,7 @@ const getSurrenderPrecisFun = ()=>{
   });
 }
 function query() {
+  console.log('idxParam.param',idxParam.param)
   lastDataQuery();
   cargoApi.init({
     ...idxParam.param,
@@ -628,24 +642,27 @@ function query() {
       console.log('query-res',res)
       ElMessage.success('查询成功');
       cEcAgrAppNo.value = res["data"]["composition"]["AgreementBase"][0]['ECargoBase.cEcAgrAppNo'] || ''
+      if(cEcAgrAppNo.value){
+        eventBus.emit('goodsChange', cEcAgrAppNo.value);
+      }
       const pageInit = () => {
         if (props.type === 'EDR_APP_NEW_SCENE') {
           if (res["data"]["composition"]["AgreementEdrEcargoBase"]) {
             const EdrECargoBase = res["data"]["composition"]["AgreementEdrEcargoBase"][0];
               mainRef.value?.setxyedrbaseRefData({...EdrECargoBase,'EdrECargoBase.cEdrType':props.param?.cEdrType})
               mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnBundleCde",
-              props.param["cRsnCde"]);
+              props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"]);
             mainRef.value?.getxyedritemValue();
           }
           if (props.param.cEdrType != "1") {
             mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnDetail", [
-              props.param["cRsnCde"],
+              props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"],
             ]);
           }
           if (props.param?.cEdrType == "1") {
             if (props.param["cRsnCde"] != "FZ") {
               mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnDetail", [
-                props.param["cRsnCde"],
+                props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"],
               ]);
             }
           }
@@ -654,8 +671,8 @@ function query() {
               getEdrRsnItemFun(
                   "029900",
                   props.param["cDptCde"],
-                  props.param["cRsnCde"],
-                  props.param["cRsnCde"],
+                  props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"],
+                  props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"],
                   props.param["cEdrType"],
                   "0"
               )
@@ -665,6 +682,7 @@ function query() {
       }
       let dataForm:any ={...res.data.composition,AgreementBase:res.data.composition?.AgreementBase[0],AgreementApplicant:res.data.composition?.AgreementApplicant[0],AgreementFeeWarn:res.data.composition?.AgreementBase[0]}
       delete dataForm.AgreementEdrEcargoBase
+      delete dataForm.AgreementDistGoods
       if(props.type === 'EDR_APP_NEW_SCENE' && props.isActive === '0'){
         dataForm['AgreementBase']['ECargoBase.cEcAgrAppNo'] = ''
       }
