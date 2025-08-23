@@ -40,6 +40,7 @@ const undrOpnMap = {
     "此业务已经超出本级别核保权限，提交上级核保。" +
     "\n" +
     "初步审核意见如下：",
+  "6": "经过审核，同意承保该业务。",
 };
 const underwriteEditRef = ref<AppFreeEditMethod | null>(null);
 const user = JSON.parse(sessionStorage.getItem("user"));
