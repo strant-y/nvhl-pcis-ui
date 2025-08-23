@@ -97,14 +97,16 @@
                   freeEditConfig.endBtns && freeEditConfig.endBtns.length > 0
                 "
               >
-                <template
-                  v-for="(item, index) in freeEditConfig.endBtns"
-                  :key="index"
-                >
-                  <template v-if="!item.hidden">
-                    <rt-button :item="item" :ref="(res: any) => {btnMap[item?.id] = item}"/>
+                <el-button-group >
+                  <template
+                    v-for="(item, index) in freeEditConfig.endBtns"
+                    :key="index"
+                  >
+                    <template v-if="!item.hidden">
+                      <rt-button :item="item" :ref="(res: any) => {btnMap[item?.id] = item}"/>
+                    </template>
                   </template>
-                </template>
+                </el-button-group>
               </div>
             </div>
           </el-card>

@@ -225,15 +225,15 @@ onMounted(async () => {
       endBtnsPosition: "right",
       endBtns: [
         {
-          label: "查询",
-          type: "primary",
+          icon: "search2",
+          tooltip: "查询",
           func: () => {
-						handleQuery()
+			handleQuery()
           },
         },
         {
-          label: "重置",
-          type: "primary",
+          icon: "RefreshRight",
+          tooltip: "重置",
           func: () => {
             cardResetFn();
           },
