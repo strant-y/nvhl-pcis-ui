@@ -25,6 +25,16 @@
           </div>
         </div>
       </template>
+      <template #column-InsurancePeriod="{ row, column, index }">
+        <div class="policy-info-cell">
+          <div v-if="row.tInsrncBgnTm" class="policy-period-row">
+            <span>{{ row.tInsrncBgnTm }}</span>
+          </div>
+          <div v-if="row.tInsrncEndTm" class="policy-period-row">
+            <span>{{ row.tInsrncEndTm }}</span>
+          </div>
+        </div>
+      </template>
 
       <!-- ES查询 投保人姓名，被保人姓名，被保人地址，产品名称高亮 -->
       <template #column-cAppNme="{ row }">
@@ -845,6 +855,7 @@ const esSearchColumns = [
     title: "保单",
     minWidth: 180,
     fixed: "left",
+    slotName: "policyInfo"
    },
    {
     prop: "cPlyNo",
@@ -910,6 +921,7 @@ const esSearchColumns = [
     inputtype: "rtinput",
     title: "保险期间",
     minWidth: 180,
+    slotName: "InsurancePeriod"
    },
    {
     prop: "cAppStatus",
@@ -943,7 +955,7 @@ const normalQueryColumns = [
     {
         prop: "policyInfo",
         inputtype: "rtinput",
-        title: "申请单号\n保单号",
+        title: "申请单号/保单号",
         minWidth: 180,
         fixed: "left",
         slotName: "policyInfo"
@@ -1396,13 +1408,6 @@ function esSearch(flag?: boolean) {
           })
           pageresult.list = [];
           pageresult.list = convertedData;
-
-          pageresult.list = convertedData.map(item => ({
-            ...item,
-            // 创建一个新字段合并两个值
-            policyInfo: `${item.cAppNo || ''}\n${item.cPlyNo || ''}`,
-            InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
-          }));
           pageresult.total = data.total;
         } else {
           ElMessage.error(msg);
@@ -1480,11 +1485,6 @@ function handleQuery(flag?: boolean) {
             if (200 === code) {
                 pageresult.list = [];
                 pageresult.list = data.result;
-								pageresult.list = data.result.map(item => ({
-            			...item,
-            			// 创建一个新字段合并两个值
-            			policyInfo: `${item.cAppNo || ''}\n${item.cPlyNo || ''}`
-         				 }));
                 pageresult.total = data.total;
             } else {
                 ElMessage.error(msg);
