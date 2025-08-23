@@ -39,6 +39,9 @@
       <template #column-cNmeCn="{ row }">
         <span v-html="row.cNmeCn || ''"></span>
       </template>
+      <template #column-tUdrTm="{ row }">
+        <span v-html="row.tUdrTm || ''"></span>
+      </template>
 
 	</app-table>
   </div>
@@ -900,6 +903,7 @@ const esSearchColumns = [
     inputtype: "rtinput",
     title: "核保日期",
     minWidth: 180,
+    slotName: "tUdrTm"
    },
    {
     prop: "InsurancePeriod",
@@ -1231,6 +1235,7 @@ const tableObj = {
                 },
             }),
         ],
+        fromSchema:[]
     },
 };
 let tableconfig = reactive<AppTableConfig>(
