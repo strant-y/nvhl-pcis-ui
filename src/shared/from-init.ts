@@ -66,7 +66,7 @@ export function formInit(
       return fromUi;
     }
     // 方法绑定
-    if (key === "func"  || key === "disabledDate"|| key === "tableClick" || key === "onInit") {
+    if (key === "func"  || key === "disabledDate"|| key === "tableClick" || key === "onInit" || key === "notes") {
       const inputTypeList = ['rtinput', 'rtSelect', 'rtSelectV2', 'rtcheckbox', 'rtcascader'];
       // 给指定要素绑定默认初始化方法
       if(inputTypeList.includes(parent.inputtype) && !!parent.prop && !parent.onInit) {

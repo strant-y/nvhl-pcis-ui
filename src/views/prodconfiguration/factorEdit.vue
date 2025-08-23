@@ -1248,6 +1248,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtnumber",
         title: "占据列",
       },
+      {
+        prop: "notes",
+        inputtype: "rtinput",
+        title: "注释方法",
+      },
     ],
     superFromShow: "要素详情",
     superFromClose: "要素详情",
