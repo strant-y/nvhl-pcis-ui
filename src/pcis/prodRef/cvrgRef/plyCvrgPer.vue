@@ -378,7 +378,7 @@ function addTermData() {
 }
 
 function initTermData(item: any,data:any){
-  if(item.cUniqueTermNo === "00425000137"){
+  if(item.cUniqueTermNo === "00425000137" || item.cUniqueTermNo === "00425000134"){
     data["Term.nAdjustFactor"] = 100;
   }
 }
