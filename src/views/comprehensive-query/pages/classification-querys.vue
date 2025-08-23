@@ -25,6 +25,16 @@
           </div>
         </div>
       </template>
+      <template #column-InsurancePeriod="{ row, column, index }">
+        <div class="policy-info-cell">
+          <div v-if="row.tInsrncBgnTm" class="policy-period-row">
+            <span>{{ row.tInsrncBgnTm }}</span>
+          </div>
+          <div v-if="row.tInsrncEndTm" class="policy-period-row">
+            <span>{{ row.tInsrncEndTm }}</span>
+          </div>
+        </div>
+      </template>
 
       <!-- ES查询 投保人姓名，被保人姓名，被保人地址，产品名称高亮 -->
       <template #column-cAppNme="{ row }">
@@ -884,9 +894,10 @@ const esSearchColumnsAE = [
    {
     prop: "policyInfo",
     inputtype: "rtinput",
-    title: "保单",
+    title: "申请单号/保单号",
     minWidth: 200,
     fixed: "left",
+    slotName: "policyInfo"
    },
    {
     prop: "cPlyNo",
@@ -952,6 +963,7 @@ const esSearchColumnsAE = [
     inputtype: "rtinput",
     title: "保险期间",
     minWidth: 180,
+    slotName: "InsurancePeriod"
    },
    {
     prop: "cAppStatus",
@@ -1048,6 +1060,7 @@ const esSearchColumnsI = [
     inputtype: "rtinput",
     title: "保险期间",
     minWidth: 180,
+    slotName: "InsurancePeriod"
    },
    {
     prop: "cAppStatus",
@@ -1169,6 +1182,7 @@ const normalQueryColumnsAE = [
         inputtype: "rtinput",
         title: "保险期间",
         minWidth: 180,
+        slotName: "InsurancePeriod"
     },
     {
         prop: "tIssueTm",
@@ -1739,12 +1753,6 @@ function handleNormalQuery(flag?: boolean) {
             if (200 === code) {
                 pageresult.list = [];
                 pageresult.list = data.result;
-              pageresult.list = data.result.map(item => ({
-                ...item,
-                // 创建一个新字段合并两个值
-                policyInfo: `${item.cAppNo || ''}\n${item.cPlyNo || ''}`,
-                InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
-              }));
                 pageresult.total = data.total;
             } else {
                 ElMessage.error(msg);
@@ -1855,12 +1863,6 @@ function esInquirySearch(flag?: boolean) {
           })
           pageresult.list = [];
           pageresult.list = convertedData;
-
-          pageresult.list = convertedData.map(item => ({
-            ...item,
-            // 创建一个新字段合并两个值
-            InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
-          }));
           pageresult.total = data.total;
         } else {
           ElMessage.error(msg);
@@ -1965,13 +1967,6 @@ function esNormalSearch(flag?: boolean) {
           })
           pageresult.list = [];
           pageresult.list = convertedData;
-
-          pageresult.list = convertedData.map(item => ({
-            ...item,
-            // 创建一个新字段合并两个值
-            policyInfo: `${item.cAppNo || ''}\n${item.cPlyNo || ''}`,
-            InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
-          }));
           pageresult.total = data.total;
         } else {
           ElMessage.error(msg);

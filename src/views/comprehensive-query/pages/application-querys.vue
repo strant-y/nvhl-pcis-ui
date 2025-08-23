@@ -301,7 +301,7 @@ const method = {
 .app-container {
   padding: 1px 5px;
 }
-::v-deep .el-tabs__header {
+:deep(.el-tabs__header) {
   padding: 0px 12px;
 }
 </style>
