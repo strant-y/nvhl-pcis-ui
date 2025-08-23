@@ -114,6 +114,7 @@ let cTermNo = '';    // 条款编码
 let ESOriginalData = ref<any>([]);  // ES查询原始数据，转化成驼峰为适配操作列
 let userColumnConfig = ref<any[]>([]); // 保存用户自定义列配置
 let skipSetColumns = ref(false); // 新增标志位
+let colChangeCPkId = ref(''); // 变更列参数
 
 const props = defineProps({
   refreshData: {
@@ -277,11 +278,17 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             func: () => {
                 const formData = freeEditRef.value.getFromValue();
                 const currentAppType = formData.cAppTyp || "A";
-
+                // 转换列配置为变更列弹窗需要的格式
                 let modalData: any[] = [];
-
+                
                 if (userColumnConfig.value.length) {
-                  modalData = userColumnConfig.value;
+                  modalData = [{
+                    prop: "bsType",
+                    inputtype: 'rtcheckboxgroup',
+                    title: "",
+                    itemWidth: 3,
+                    loadData: userColumnConfig.value
+                  }];
                 } else {
                   // 构造默认结构
                   let allColumns: any[] = [];
@@ -290,8 +297,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   } else {
                     allColumns = normalQueryColumnsAE;
                   }
-
-                  // 转换列配置为变更列弹窗需要的格式
                   modalData = [{
                     prop: "bsType",
                     inputtype: 'rtcheckboxgroup',
@@ -322,18 +327,17 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 
                     // 保存到接口
                     const saveParam = {
+                        cPkId: colChangeCPkId.value? colChangeCPkId.value: null,
                         content: newContent,
                         type: currentAppType,
                         cCrtCde: JSON.parse(sessionStorage.getItem("user")).opCde,
                     };
-
-                    console.log('saveParam',saveParam);
                     try {
                         const saveRes = await CustomUserList(saveParam);
-                        if (saveRes.code === 200) {
-                          userColumnConfig.value = newContent;
+                        if (saveRes.code == 200) {
+                          userColumnConfig.value = saveRes.data.data.contents[0].loadData;
 
-                          applyUserColumns(newContent);
+                          applyUserColumns(userColumnConfig.value);
                           ElMessage.success("列配置已更新");
                         } else {
                           ElMessage.error(saveRes.msg || "保存失败");
@@ -2111,10 +2115,13 @@ async function initCustomUserList(){
     try {
         const res = await getCustomUserList(param);
         console.log('res', res);
-        console.log('res.data.content',res.data.content);  // undefined
-        console.log('res.data.content[0].loadData',res.data.content[0].loadData); // 报错
-        if (res.code === 200 && res.data.content[0].loadData.length) {
-          userColumnConfig.value = res.data.content[0].loadData;
+        console.log('res.data.content',res.data.data.contents);  
+        console.log('res.data.content[0].loadData', res.data.data.contents[0].loadData); 
+        colChangeCPkId.value = res.data.data?.cPkId;
+       
+        if (res.code === 200) {
+          let responseData = res.data?.data.contents[0].loadData;
+          userColumnConfig.value = responseData;
           applyUserColumns(userColumnConfig.value);
         } else {
           // 使用默认列
@@ -2126,7 +2133,7 @@ async function initCustomUserList(){
 }
 
 function applyUserColumns(content: any[]) {
-  let contentData = content? content[0].loadData: [];
+  let contentData = content.length? content: [];
 
   const selectedProps = contentData
     .filter((item: any) => item.checked)
