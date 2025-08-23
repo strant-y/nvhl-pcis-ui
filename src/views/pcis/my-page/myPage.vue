@@ -1110,6 +1110,13 @@ const edrBtn = [
  */
 const edrSurrenderBtn = [
   createFreeButtonBase({
+    label: "原保单查看",
+    type: "primary",
+    func: () => {
+      getPlyPolicyFun();
+    },
+  }),
+  createFreeButtonBase({
     id: "btn010101",
     label: "保费计算",
     type: "primary",
