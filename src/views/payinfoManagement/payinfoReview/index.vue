@@ -267,6 +267,12 @@ const tableconfig = reactive<AppTableConfig>(
         minWidth: 180,
       },
       {
+        prop: "cPlyNo",
+        inputtype: "rtinput",
+        title: "保单号",
+        minWidth: 180,
+      },
+      {
         prop: "nPrm",
         inputtype: "rtnumber",
         title: "保费",

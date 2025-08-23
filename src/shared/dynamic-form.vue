@@ -50,7 +50,9 @@
             </template>
             <template v-else-if="item.inputtype === 'rtinputgroup'">
               <el-form-item :required="checkRequired(item)"
-                            :label-width=" maxLabelWidth + 'px'">
+                            :label-width=" maxLabelWidth + 'px'"
+                            :for="item.notes ? '-' : undefined // 当存在 提示信息时，防止点击label触发默认选中逻辑 
+                            " >
                 <template #label>
                    <template v-if="item.title?.length > 5">
                     <el-tooltip
@@ -64,6 +66,7 @@
                   <template v-else>
                     {{ item.title }}
                    </template>
+                   <rt-icon v-if="item.notes" :item="{ icon:'QuestionFilled',func:item.notes }" />
                 </template>
                 <div
                   :style="{
@@ -97,6 +100,8 @@
               <el-form-item
                 :rules="item.rules ? item.rules : undefined"
                 :prop="item.prop"
+                :for="item.notes ? '-' : undefined // 当存在 提示信息时，防止点击label触发默认选中逻辑 
+                " 
                 :label-position="
                   item.inputtype === 'rttable' ? 'top' : undefined // table 组件,默认标题显示在top上
                 "
@@ -115,6 +120,7 @@
                   <template v-else>
                     {{ item.title }}
                    </template>
+                   <rt-icon v-if="item.notes" :item="{ icon:'QuestionFilled',func:item.notes }" />
                 </template>
                 <div :style="{width: ( item.propWidth ? item.propWidth : 100) + '%', display: 'flex' }">
                   <div
@@ -204,6 +210,8 @@
                 <template v-if="item.inputtype === 'rtinputgroup'">
                   <el-form-item :required="checkRequired(item)"
                                 :label-width=" maxLabelWidth + 'px'"
+                                :for="item.notes ? '-' : undefined // 当存在 提示信息时，防止点击label触发默认选中逻辑 
+                                " 
                   >
                     <template #label>
                       <!-- <template v-if="item.title?.length > 8">
@@ -217,6 +225,7 @@
                       </template>
                       <template v-else> -->
                         {{ item.title }}
+                        <rt-icon v-if="item.notes" :item="{ icon:'QuestionFilled',func:item.notes }" />
                       <!-- </template> -->
                     </template>
                     <div
@@ -251,6 +260,8 @@
                   <el-form-item
                     :rules="item.rules ? item.rules : undefined"
                     :prop="item.prop"
+                    :for="item.notes ? '-' : undefined // 当存在 提示信息时，防止点击label触发默认选中逻辑 
+                    " 
                     :label-width=  "maxLabelWidth + 'px'"
                   >
                     <template #label>
@@ -266,6 +277,7 @@
                       <template v-else>
                         {{ item.title }}
                        </template>
+                       <rt-icon v-if="item.notes" :item="{ icon:'QuestionFilled',func:item.notes }" />
                     </template>
                     <div :style="{width: ( item.propWidth ? item.propWidth : 100) + '%', display: 'flex' }">
                       <div

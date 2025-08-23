@@ -725,9 +725,35 @@ function previewTerm() {
         // PDF文件使用浏览器内置查看器或新窗口打开
         window.open(cWebsite, '_blank');
       } else if (['doc', 'docx'].includes(fileExtension)) {
-        // Word文档可以使用Google Docs Viewer或Office Online预览
-        const previewUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(cWebsite)}`;
-        window.open(previewUrl, '_blank');
+        fetch(cWebsite, { method: 'HEAD' })
+          .then(response => {
+            if (response.ok) {
+              // 使用微软Office Online预览Word文档
+              const previewUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(cWebsite)}&embedded=true`;
+              window.open(previewUrl, '_blank');
+            } else {
+              // 如果无法访问文件，则直接下载
+              ElMessage.info("无法在线预览文档，将直接下载");
+              const link = document.createElement('a');
+              link.href = cWebsite;
+              link.target = '_blank';
+              link.download = '';
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }
+          })
+          .catch(error => {
+            // 如果出现网络错误，也直接下载
+            ElMessage.info("无法在线预览文档，将直接下载");
+            const link = document.createElement('a');
+            link.href = cWebsite;
+            link.target = '_blank';
+            link.download = '';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          });
       } else {
         // 其他文件类型直接下载
         ElMessage.info("该文件类型不支持在线预览，将直接下载");
@@ -743,6 +769,53 @@ function previewTerm() {
       ElMessage.error(msg);
     }
   });
+}
+/**
+ * 获取文件扩展名
+ * @param url 文件链接
+ * @returns 文件扩展名
+ */
+function getFileExtension(url) {
+  if (!url) return '';
+  // 从URL中提取文件名
+  const filename = url.split('/').pop().split('?')[0].split('#')[0];
+  // 获取扩展名
+  const extension = filename.split('.').pop();
+  return extension || '';
+}
+function previewWordDocument(url) {
+  // 创建一个隐藏的iframe来测试预览服务
+  const testIframe = document.createElement('iframe');
+  testIframe.style.display = 'none';
+  
+  // 首先尝试Google Docs Viewer
+  const googleDocsUrl = `https://docs.google.com/gviewer?url=${encodeURIComponent(url)}&embedded=true`;
+  
+  // 设置超时时间
+  const timeout = setTimeout(() => {
+    // 超时则使用Microsoft Office Online
+    document.body.removeChild(testIframe);
+    const officeOnlineUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(url)}`;
+    window.open(officeOnlineUrl, '_blank');
+  }, 3000);
+  
+  testIframe.onload = function() {
+    clearTimeout(timeout);
+    document.body.removeChild(testIframe);
+    // Google Docs Viewer可用，使用它来预览
+    window.open(googleDocsUrl, '_blank');
+  };
+  
+  testIframe.onerror = function() {
+    clearTimeout(timeout);
+    document.body.removeChild(testIframe);
+    // Google Docs Viewer不可用，尝试使用Microsoft Office Online
+    const officeOnlineUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(url)}`;
+    window.open(officeOnlineUrl, '_blank');
+  };
+  
+  document.body.appendChild(testIframe);
+  testIframe.src = googleDocsUrl;
 }
 
 onMounted(async () => {
@@ -881,7 +954,7 @@ function initMethod(){
 function initTermsData(item: any) {
   if(item.prop === 'Term.cClaimInclude'){ //是否计入累计赔偿限额 默认选择否
     if(!termdata.value[item.prop]){
-      if(pageparam.cProdNo === "040003" ){
+      if(pageparam.cProdNo === "040003" || pageparam.cProdNo === "043002" ){
         termdata.value[item.prop] = '1';
       }else{
         termdata.value[item.prop] = '0';
