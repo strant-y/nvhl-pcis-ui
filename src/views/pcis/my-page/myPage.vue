@@ -473,7 +473,7 @@ const tagsViewStore = useTagsViewStore();
 const pageLoaded = ref(false);
 
 import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
-const { saveData } = NewUdrListService();
+const { saveData, removeReceived } = NewUdrListService();
 import {useUserStore} from "@/store";
 import { pa } from "element-plus/es/locale";
 import { initMultiCodeList } from "@/api/code-list-service";
@@ -1653,6 +1653,15 @@ async function loadAfter() {
         })
       )
     }
+    bthList.value.push(
+      createFreeButtonBase({
+        label: "解除接收",
+        type: "primary",
+        func: () => {
+          handleRemoveReceived();
+        },
+      }),
+    )
     //核保处理
     nextTick(() => {
       opertaor.setDisabledAll();
@@ -4892,6 +4901,30 @@ const queryTermRateLimitFun = (calcFun: any) => {
   }).catch((err:any) => {
     ElMessage.error(err)
   })
+}
+// 解除接收
+function handleRemoveReceived() {
+  const param = {
+    taskId: props.param.taskId,
+    user: user,
+  };
+  removeReceived(param).then((result: any) => {
+    if (result.code !== 200) {
+      ElMessage.error({ message: result.msg, duration: 3000 });
+    } else {
+      if (result.msg === "解除接收成功!") {
+        ElMessage.success({ message: result.msg, duration: 3000 });
+      } else {
+        ElMessage.warning({ message: result.msg, duration: 3000 });
+      }
+      tagsViewStore.back()
+    }
+  }).catch((error: any) => {
+    ElMessage.error({
+      message: error.msg,
+      duration: 3000,
+    });
+  });
 }
 </script>
 <style lang="scss" scoped>
