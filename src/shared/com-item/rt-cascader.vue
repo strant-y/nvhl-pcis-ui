@@ -430,5 +430,6 @@ defineExpose({
 <style lang="scss">
 .cascader_ {
   width: 100%;
+  vertical-align: top;
 }
 </style>

@@ -134,6 +134,7 @@
         borderColor: item.buttonColor,
         ...style,
       }"
+      :loading="item.loading"
       @click="handleChange"
     >
       <!-- 将isBtn透传,防止出现icon方法重复执行  -->

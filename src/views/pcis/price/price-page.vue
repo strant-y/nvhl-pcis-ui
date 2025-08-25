@@ -2764,6 +2764,21 @@ function getFKFunc() {
   // return true;
 }
 
+function checkShow(k:any){
+  let r = true;
+  if(k.pageKey !== 'acctinfo'){
+    if(['ciMasterAgreement',
+        'ci','ourCompanyCiShare',
+      ].includes(k.pageKey)){  // 联共保组件,通过isCiJiMrk 控制
+        r = isCiJiMrk.value;
+    }else if (k.pageKey === 'distSummary') {  //隐藏全部汇总清单组件
+      r = false;
+    }else{
+      r = acctinfoFlag.value;
+    }
+  }
+  return r;
+}
 
 /**
  * 投保申请核保
