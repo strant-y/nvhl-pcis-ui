@@ -166,7 +166,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     tIssueTm: [
                         dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
-                    ]
+                    ],
+                    tAppTm: [
+                        dayjs(new Date()).subtract(15, "days").format("YYYY-MM-DD 00:00:00"),
+                        moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+                    ],
+                    cDataTyp:"app"
                   })
               },
           }),
