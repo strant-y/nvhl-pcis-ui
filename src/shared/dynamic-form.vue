@@ -233,7 +233,7 @@
                         width: '100%',
                       }"
                     >
-                      <el-row :gutter="1" v-if="item.groupList.length > 0">
+                      <el-row :gutter="1" v-if="item.groupList.length > 0" style="align-items: flex-start;">
                         <el-col
                           :span="getspan(item, gitem)"
                           v-for="(gitem, index) in item.groupList"
