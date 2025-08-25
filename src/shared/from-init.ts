@@ -153,6 +153,5 @@ export function formInit(
       return item;
     })
   }
-  console.log(newObj);
   return newObj;
 }

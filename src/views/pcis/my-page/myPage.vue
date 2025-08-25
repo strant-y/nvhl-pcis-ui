@@ -357,12 +357,18 @@
               </el-tooltip>
             </div>
           </div>
-          <rt-button
-            v-for="(bth, idx) in bthList"
-            :item="bth"
-            :key="idx"
-            :loading="bth.loading"
-          />
+          <template v-for="(bth, idx) in bthList" 
+            :key="idx">
+            <template v-if="bth.isdivider">
+              <el-divider direction="vertical" />
+            </template>
+            <template v-else>
+              <rt-button
+                :item="bth"
+                :loading="bth.loading"
+              />
+            </template>
+          </template>
         </div>
       </el-main>
       <div class="right-sidebar-trigger">
@@ -448,9 +454,11 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 import { useRouter, useRoute } from "vue-router";
 import { getData } from "@/pcis/prodRef/dataInit";
-
 import { iconMap } from './iconMap';
+import { imageMethod } from './imageMethod';
+import { pageMethod } from './pageMethod';
 import { codeListViewStore } from "@/store";
+
 const codeListStore = codeListViewStore();
 
 const policyService = new PolicyService();
@@ -467,7 +475,6 @@ const { saveData, removeReceived } = NewUdrListService();
 import {useUserStore} from "@/store";
 import { pa } from "element-plus/es/locale";
 import { initMultiCodeList } from "@/api/code-list-service";
-import { forEach } from "lodash";
 import {scrollByDomId} from "@/utils/common";
 import { getAppPolicyList, qryEndorseList, delTmpPolicy, queryInsuredList, getInquiryPolicyList} from "@/api/query";
 import {encryptRouterParam} from "@/router";
@@ -2235,7 +2242,23 @@ async function loadAfter() {
     rightBtnList.value = basicRightBtn;
   }
 
+  let imageStr = '影像管理';
+  if(pageMethod.isReadOnlyScene()){
+    imageStr = '影像查看';
+  }
   bthList.value.push(
+    {isdivider: true},  //间隔符
+    createFreeButtonBase({
+      label: imageStr,
+      type: "success",
+      func: () => {
+       imageMethod.showImage();
+      },
+    }),
+  )
+
+  bthList.value.push(
+    {isdivider: true},  //间隔符
     createFreeButtonBase({
       label: "返回",
       func: () => {
