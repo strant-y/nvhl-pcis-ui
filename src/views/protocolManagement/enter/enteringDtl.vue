@@ -146,19 +146,27 @@ const uwBtn = [
   //
   //   },
   // }),
-  createFreeButtonBase({
-    label: "核保信息",
-    type: "primary",
-    id:"underwriting",
-    func: () => {
-
-    },
-  }),
+  // createFreeButtonBase({
+  //   label: "核保信息",
+  //   type: "primary",
+  //   id:"underwriting",
+  //   func: () => {
+  //
+  //   },
+  // }),
 ];
 /**
  * 一般批改按钮
  */
 const edrBtn = [
+  createFreeButtonBase({
+    label: "保费计算",
+    type: "primary",
+    id: "count",
+    func: () => {
+      premiumCalculation();
+    },
+  }),
   createFreeButtonBase({
     label: "原保单查看",
     type: "primary",
@@ -197,14 +205,14 @@ const edrBtn = [
  * @type {FormButton[]}
  */
 const edrSurrenderBtn = [
-  createFreeButtonBase({
-    id: "btn010101",
-    label: "保费计算",
-    type: "primary",
-    func: () => {
-
-    },
-  }),
+  // createFreeButtonBase({
+  //   id: "btn010101",
+  //   label: "保费计算",
+  //   type: "primary",
+  //   func: () => {
+  //
+  //   },
+  // }),
   createFreeButtonBase({
     id: "btn010102",
     label: "保存",
@@ -557,11 +565,16 @@ const saveEdrPlyInfo = async () => {
     const EdrBaseData = edrInfo["res"]["composition"]["ECargoBase"][0];
     formPage.value?.setFormDataById('AgreementBase',EdrBaseData)
     formPage.value?.setFormDataById('AgreementFeeWarn',{"ECargoBase.cEcAgrAppNo":EdrBaseData['ECargoBase.cEcAgrAppNo']})
+    //条款和特约
+    formPage.value?.setFormDataById('AgreementSpecial',edrInfo["res"]["composition"]["ECargoSpecialAgreement"])
+    formPage.value?.setFormDataById('AgreementCvrg',edrInfo["res"]["composition"]["ECargoTerm"])
+
     saveEdrFlag = true;
     cEcAgrAppNo.value = EdrBaseData['ECargoBase.cEcAgrAppNo']
     if(cEcAgrAppNo.value){
       const param:any =  idxParam.param
       eventBus.emit('goodsRefresh', {cEcAgrAppNo:param.cEcAgrAppNo,targetNo:cEcAgrAppNo.value,cRsnCde:param.cRsnCde,});
+      eventBus.emit('insuredRefresh', {cEcAgrAppNo:param.cEcAgrAppNo,targetNo:cEcAgrAppNo.value,cRsnCde:param.cRsnCde,});
     }
   } else {
     ElMessage.error(edrInfo.msg);
@@ -644,25 +657,28 @@ function query() {
       cEcAgrAppNo.value = res["data"]["composition"]["AgreementBase"][0]['ECargoBase.cEcAgrAppNo'] || ''
       if(cEcAgrAppNo.value){
         eventBus.emit('goodsChange', cEcAgrAppNo.value);
+        eventBus.on('insuredChange', cEcAgrAppNo.value);
       }
       const pageInit = () => {
         if (props.type === 'EDR_APP_NEW_SCENE') {
+          // 暂存数据
+          sessionStorage.setItem("queryEcargoDetails", JSON.stringify(res["data"]["composition"]));
           if (res["data"]["composition"]["AgreementEdrEcargoBase"]) {
             const EdrECargoBase = res["data"]["composition"]["AgreementEdrEcargoBase"][0];
               mainRef.value?.setxyedrbaseRefData({...EdrECargoBase,'EdrECargoBase.cEdrType':props.param?.cEdrType})
               mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnBundleCde",
-              props.param["cRsnCde"]);
+              props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"]);
             mainRef.value?.getxyedritemValue();
           }
           if (props.param.cEdrType != "1") {
             mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnDetail", [
-              props.param["cRsnCde"],
+              props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"],
             ]);
           }
           if (props.param?.cEdrType == "1") {
             if (props.param["cRsnCde"] != "FZ") {
               mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnDetail", [
-                props.param["cRsnCde"],
+                props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"],
               ]);
             }
           }
@@ -671,8 +687,8 @@ function query() {
               getEdrRsnItemFun(
                   "029900",
                   props.param["cDptCde"],
-                  props.param["cRsnCde"],
-                  props.param["cRsnCde"],
+                  props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"],
+                  props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"],
                   props.param["cEdrType"],
                   "0"
               )
@@ -683,6 +699,37 @@ function query() {
       let dataForm:any ={...res.data.composition,AgreementBase:res.data.composition?.AgreementBase[0],AgreementApplicant:res.data.composition?.AgreementApplicant[0],AgreementFeeWarn:res.data.composition?.AgreementBase[0]}
       delete dataForm.AgreementEdrEcargoBase
       delete dataForm.AgreementDistGoods
+      delete dataForm.AgreementDistInsured
+      delete dataForm.AgreementDistTransport
+      if(props.type === 'EDR_APP_NEW_SCENE'){
+        // 初始化时，将cPkId赋值给cRowId
+        Object.keys(dataForm).forEach((key) => {
+          if(key === 'AgreementSpecial' || key === 'AgreementCvrg'){
+            const v = dataForm[key];
+            const ls = [];
+            if(v && v instanceof Array){
+              for (const i in v) {
+                let nd = {};
+                const d = v[i];
+                Object.keys(d).forEach((ks)=>{
+                  if(ks && ks.endsWith("cPkId")){
+                    const newks = ks;
+                    const rowKs = ks.split(".")[0] + "." + "cRowId";
+                    nd[rowKs] = d[ks];
+                    nd[ks] = null;
+                  }else if(ks && ks.endsWith("cRowId")){
+                    // RowId上面已经操作了，下面不再进行操作
+                  }else{
+                    nd[ks] = d[ks];
+                  }
+                })
+                ls.push(nd);
+              }
+              dataForm[key] = ls;
+            }
+          }
+        })
+      }
       if(props.type === 'EDR_APP_NEW_SCENE' && props.isActive === '0'){
         dataForm['AgreementBase']['ECargoBase.cEcAgrAppNo'] = ''
       }

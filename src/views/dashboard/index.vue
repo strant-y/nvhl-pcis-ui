@@ -88,7 +88,8 @@
                <el-tag v-if="cOpgrpCnm">{{ cOpgrpCnm }}</el-tag>
             </div>
           </div>
-          <div class="content-list-box">
+          <!-- 暂时隐藏消息通知 -->
+          <!-- <div class="content-list-box">
             <div class="list-title">
               <div class="title-line">
                 <span class="title">消息通知</span>
@@ -117,7 +118,7 @@
                 <div style="font-size: 16px;text-align: center;margin-top: 50%;">暂无消息</div>
               </template>
             </div>
-          </div>
+          </div> -->
           <div>
               <div class="code-box">
                 <div class="code-inner-box">

@@ -19,6 +19,16 @@
           </div>
         </div>
       </template>
+      <template #column-InsurancePeriod="{ row, column, index }">
+        <div class="policy-info-cell">
+          <div v-if="row.tInsrncBgnTm" class="policy-period-row">
+            <span>{{ row.tInsrncBgnTm }}</span>
+          </div>
+          <div v-if="row.tInsrncEndTm" class="policy-period-row">
+            <span>{{ row.tInsrncEndTm }}</span>
+          </div>
+        </div>
+      </template>
       
       <!-- ES查询 投保人姓名，被保人姓名，被保人地址，产品名称高亮 -->
       <template #column-cAppNme="{ row }">
@@ -32,6 +42,9 @@
       </template>
       <template #column-cNmeCn="{ row }">
         <span v-html="row.cNmeCn || ''"></span>
+      </template>
+      <template #column-tUdrTm="{ row }">
+        <span v-html="row.tUdrTm || ''"></span>
       </template>
 
 	</app-table>
@@ -979,6 +992,7 @@ const tableObj = {
                 },
             }),
         ],
+        fromSchema:[]
     },
 };
 // 定义两套列配置
@@ -1041,12 +1055,14 @@ const esSearchColumns = [
     inputtype: "rtinput",
     title: "核保日期",
     minWidth: 180,
+    slotName: "tUdrTm"
    },
    {
     prop: "InsurancePeriod",
     inputtype: "rtinput",
     title: "保险期间",
     minWidth: 180,
+    slotName: "InsurancePeriod"
    },
    {
     prop: "cAppStatus",
@@ -1311,12 +1327,6 @@ function esSearch(flag?: boolean) {
           })
           pageresult.list = [];
           pageresult.list = convertedData;
-
-          pageresult.list = convertedData.map(item => ({
-            ...item,
-            // 创建一个新字段合并两个值
-            InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
-          }));
           pageresult.total = data.total;
         } else {
           ElMessage.error(msg);

@@ -15,18 +15,18 @@
             item.link
               ? typeof item.link === 'boolean'
                 ? item.link
-                : item.link === 1 || item.link === '1'
+              : item.link === 1 || item.link === '1'
                   ? true
-                  : false
+                : false
               : false
           "
           :circle="
             item.circle
               ? typeof item.circle === 'boolean'
                 ? item.circle
-                : item.circle === 1 || item.circle === '1'
+              : item.circle === 1 || item.circle === '1'
                   ? true
-                  : false
+                : false
               : false
           "
           :style="{
@@ -49,7 +49,60 @@
     </el-popover>
   </template>
   <template v-else>
+    <!-- 使用el-tooltip包装el-button以支持tooltip功能 -->
+    <el-tooltip 
+      v-if="item.tooltip" 
+      :content="item.tooltip" 
+      :placement="item.tooltipPosition || 'top'"
+      effect="light"
+    >
+      <el-button
+        ref="buttonRef"
+        :type="item.type"
+        :size="item.size"
+        :disabled="
+          item.disabled ||
+          (typeof item.disabled === 'function' ? item.disabled(row) : false)
+        "
+        :placeholder="item.placeholder"
+        :link="
+          item.link
+            ? typeof item.link === 'boolean'
+              ? item.link
+            : item.link === 1 || item.link === '1'
+                ? true
+              : false
+            : false
+        "
+        :circle="
+          item.circle
+            ? typeof item.circle === 'boolean'
+              ? item.circle
+            : item.circle === 1 || item.circle === '1'
+                ? true
+              : false
+            : false
+        "
+        :style="{
+          backgroundColor: item.buttonColor,
+          borderColor: item.buttonColor,
+          ...style,
+        }"
+        @click="handleChange"
+      >
+        <!-- 将isBtn透传,防止出现icon方法重复执行  -->
+        <rt-icon
+          :style="{ marginRight: item.label ? '5px' : null }"
+          v-if="item.icon"
+          :item="{ ...item, isBtn: true }"
+        />
+        {{ item.label }}</el-button
+      >
+    </el-tooltip>
+    
+    <!-- 原有的不带tooltip的按钮 -->
     <el-button
+      v-else
       ref="buttonRef"
       :type="item.type"
       :size="item.size"
@@ -62,18 +115,18 @@
         item.link
           ? typeof item.link === 'boolean'
             ? item.link
-            : item.link === 1 || item.link === '1'
+          : item.link === 1 || item.link === '1'
               ? true
-              : false
+            : false
           : false
       "
       :circle="
         item.circle
           ? typeof item.circle === 'boolean'
             ? item.circle
-            : item.circle === 1 || item.circle === '1'
+          : item.circle === 1 || item.circle === '1'
               ? true
-              : false
+            : false
           : false
       "
       :style="{
@@ -81,6 +134,7 @@
         borderColor: item.buttonColor,
         ...style,
       }"
+      :loading="item.loading"
       @click="handleChange"
     >
       <!-- 将isBtn透传,防止出现icon方法重复执行  -->

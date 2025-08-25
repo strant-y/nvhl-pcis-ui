@@ -902,4 +902,10 @@ function isrequired(i: any) {
 :deep(.el-form-item--default .el-form-item__content) {
   line-height: 20px;
 }
+:deep(.el-table__empty-block){
+  min-height: 30px !important;
+}
+:deep(.el-table__empty-text){
+  line-height: 30px !important;
+}
 </style>

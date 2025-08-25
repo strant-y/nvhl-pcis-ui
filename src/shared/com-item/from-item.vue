@@ -45,7 +45,7 @@ const customMap = inject<any>('customMap', {});
 const emits = defineEmits(["update:modelValue", "updateMethod"]); // 父组件监听事件，同步子组件值的变化给父组件
 function handleChange(val?: any) {
   emits("update:modelValue", val);
-  emits("updateMethod");
+  emits("updateMethod",props.item);
   compareValueChangeColor(val)
 }
 
@@ -56,6 +56,7 @@ watch([() => props.modelValue], ([newModelValue]) => {
   }
   props.item.func ? props.item.func(newModelValue, props.row, props.item) : null;
   compareValueChangeColor(newModelValue);
+  emits("updateMethod",props.item);
 });
 function tableExvalidate() {
   if (typeof itemRef.value?.tableExvalidate === "function") {

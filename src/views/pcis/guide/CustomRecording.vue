@@ -502,7 +502,13 @@ function next() {
       return false;
     } else {
       // 点击下一步前校验，如果data为true则继续，否则阻断并提示
-      const queryProdDptCde:any = await policyService.queryProdDptCde({ cProdNo: formconfig1.value.cProdNo, cDptCde:  formconfig1.value.cDptCde})
+      const queryProdDptCdeParam:any = { cDptCde:  formconfig1.value.cDptCde }
+      if(formconfig1.value.cRenewMrk === "1") {
+        queryProdDptCdeParam['cPlyNo'] = formconfig1.value.cPlyNo
+      } else {
+        queryProdDptCdeParam['cProdNo'] = formconfig1.value.cProdNo
+      }
+      const queryProdDptCde:any = await policyService.queryProdDptCde(queryProdDptCdeParam)
       if(queryProdDptCde.data !== true) {
         ElMessage.error(queryProdDptCde.msg)
         return

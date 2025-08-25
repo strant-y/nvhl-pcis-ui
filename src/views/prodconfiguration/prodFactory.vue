@@ -33,7 +33,7 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { getProFactoryList, changeStatus, auditSubmit } from "@/api/prod";
+import { getProFactoryList, changeStatus, auditSubmit, releaseAllPage } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "../../common/dzmodel/ComDialogConf";
 
@@ -69,6 +69,17 @@ const formconfig = reactive<AppFreeEditConfig>(
             cAuditStatus: "",
           });
           handleQuery();
+        },
+      }),
+      createFreeButtonBase({
+        type: "success",
+        label: "全产品组件更新",
+        func: async () => {
+          releaseAllPage({}).then((res) => {
+            if (res.code === 200) {
+              ElMessage.success('全量发布成功');
+            }
+          })
         },
       }),
     ],

@@ -34,13 +34,16 @@
             >
               <!-- 控制cardConfig.showEdit状态的按钮 -->
               <template v-if="showMyfrom">
-                <a class="toggle-edit-btn" @click="toggleShowEdit" v-if="hasShowEditTrue">
-                <el-icon>
-                  <View v-if="!cardConfig.showEdit" />
-                  <Hide v-else />
-                </el-icon>
-                <span class="toggle-text">{{ cardConfig.showEdit ? '隐藏查询条件' : '显示查询条件' }}</span>
-                </a>
+                <el-tooltip
+                    :content="cardConfig.showEdit ? '隐藏查询条件' : '显示查询条件'"
+                    placement="top"   effect="light">
+                  <a class="toggle-edit-btn" @click="toggleShowEdit" v-if="hasShowEditTrue">
+                  <el-icon>
+                    <View v-if="!cardConfig.showEdit" />
+                    <Hide v-else />
+                  </el-icon>
+                  </a>
+                </el-tooltip>
               </template>
               <template
               v-if=" (cardConfig.titleBtns && cardConfig.titleBtns.length > 0) ||

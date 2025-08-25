@@ -243,6 +243,15 @@ export function releasePage(queryParams: any): AxiosPromise<any> {
 }
 
 /**
+ * 
+ * @param queryParams 全量产品更新
+ * @returns 
+ */
+export function releaseAllPage(queryParams: any): AxiosPromise<any> {
+  return post(`/prod/releaseAllPage`, queryParams);
+}
+
+/**
  * savePage
  *
  * @param queryParams

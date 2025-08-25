@@ -164,6 +164,8 @@ const formconfig11 = ref<any>({});
 const oldPageSchema = ref<any>({});
 
 const hiddenPage = ref<Array>(['VehicleDist040002']); //初始化需要隐藏的组件
+const addedPlans = ref<string[]>([]);
+
 // 列表数据反显时，方案号的下拉选项渲染需要条款加载后根据条款获取，所以通过计算属性获取getPlanNo的值
 // 有值的时候再填充到方案号的loadData中
 const cvrg = computed(() => {
@@ -225,15 +227,15 @@ onMounted(async () => {
       endBtnsPosition: "right",
       endBtns: [
         {
-          label: "查询",
-          type: "primary",
+          icon: "search2",
+          tooltip: "查询",
           func: () => {
-						handleQuery()
+			handleQuery()
           },
         },
         {
-          label: "重置",
-          type: "primary",
+          icon: "RefreshRight",
+          tooltip: "重置",
           func: () => {
             cardResetFn();
           },
@@ -384,9 +386,13 @@ const method = {
           tab: formconfig1.value.title,
           compKey: props.compKey,
           codeListMap: distTableRef.value?.getCodeListMap(),
+          addedPlans: addedPlans.value, // 顺序数组
         },
         {
           isOk: (res: any) => {
+            if (res.addedPlan) {
+                addedPlans.value.push(res.addedPlan);
+            }
             const queryParams = distTableRef.value?.getPartnerPage(false);
             handleQuery: method.handleQuery(queryParams);
           },
@@ -462,9 +468,13 @@ const method = {
               tab: formconfig1.value.title,
               compKey: props.compKey,
               codeListMap: distTableRef.value?.getCodeListMap(),
+              addedPlans: addedPlans.value, // 顺序数组
             },
             {
               isOk: (res: any) => {
+                if (res.addedPlan) {
+                    addedPlans.value.push(res.addedPlan);
+                }
                 const queryParams = distTableRef.value?.getPartnerPage(false);
                 handleQuery: method.handleQuery(queryParams, true);
               },
@@ -675,9 +685,13 @@ const method = {
               tab: formconfig1.value.title,
               compKey: props.compKey,
               codeListMap: distTableRef.value?.getCodeListMap(),
+              addedPlans: addedPlans.value
             },
             {
               isOk: (res: any) => {
+                if (res.addedPlan) {
+                    addedPlans.value.push(res.addedPlan);
+                }
                 const queryParams = distTableRef.value?.getPartnerPage(false);
                 handleQuery: method.handleQuery(queryParams);
               },
