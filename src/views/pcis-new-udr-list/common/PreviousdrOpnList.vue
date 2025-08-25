@@ -241,6 +241,9 @@ function showDetails(cAppNo, cPlyNo, cProdNo, cKindNo, data) {
     cGrpMrk: data["cGrpMrk"],
     cDptCde: data["cDptCde"],
     cDptCnm: data["cDptCnm"],
+    cPolicySource: data["cPolicySource"],
+    cTermNo: data["cTermNo"],
+    cTermNme: data["cTermNme"],
     pageType: "readonly",
   };
   dzmodal
