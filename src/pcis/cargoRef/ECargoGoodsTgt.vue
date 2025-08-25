@@ -158,8 +158,13 @@ const loadDatOne = (val:any)=>{
     }
   })
 }
+function hasPropertyWithValue(arr, property) {
+  return Array.isArray(arr) && arr.some(obj =>
+      obj && obj.hasOwnProperty(property) && obj[property] != null
+  );
+}
 const goodsRefresh = (val:any)=>{
-  console.log('goodsRefresh',val)
+  if(hasPropertyWithValue(pageresult.list,'ECargoGoodsTgt.cRowId')) return
   copyDist(val).then((res:any) => {
     if(res && res.code === 200) {
       loadDatOne(val.targetNo)

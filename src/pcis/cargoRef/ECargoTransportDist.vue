@@ -21,6 +21,7 @@ import {
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import {
+  copyDist,
   deleteDist,
 } from "@/api/prod";
 import {getAddressStr} from "@/api/query";
@@ -35,6 +36,7 @@ import {AppFreeEditMethod} from "@/shared/app-free-edit-config";
 import {saveAs} from "file-saver";
 import cargoApi from "@/api/cargo";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
+import {eventBus} from "@/utils/event-bus";
 const policyService = new PolicyService();
 
 const cargoDistAdd = defineAsyncComponent(
@@ -131,7 +133,45 @@ onMounted(async () => {
   tableconfig.value.isPage = false;
   // 初始化 cComponentTableValue
   cComponentTableValue = getCComponentTableValue();
+  nextTick(()=>{
+    eventBus.on('transportChange', loadDatOne);
+    eventBus.on('transportRefresh', transportRefresh);
+    const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
+    if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo')){
+      loadData()
+    }
+  })
 });
+function hasPropertyWithValue(arr, property) {
+  return Array.isArray(arr) && arr.some(obj =>
+      obj && obj.hasOwnProperty(property) && obj[property] != null
+  );
+}
+const transportRefresh = (val:any)=>{
+  if(hasPropertyWithValue(pageresult.list,'ECargoTransportDist.cRowId')) return
+  copyDist(val).then((res:any) => {
+    if(res && res.code === 200) {
+      loadDatOne(val.targetNo)
+    } else {
+      ElMessage.error(res.msg);
+    }
+  }).catch((err:any) => {
+    ElMessage.error(err.msg);
+  })
+}
+const loadDatOne = (val:any)=>{
+  if(!val) return
+  const r = distTableRef.value?.getPartnerPage(true); //获取分页数据
+  let param = Object.assign({cComponentTable:'ECargoGoodsTgt',cEcAgrAppNo:val || ''}, r);
+  cargoApi.selectDistNew(param).then((res: any) => {
+    if(res.code === 200) {
+      pageresult.list = res.data.data
+      pageresult.total = res.data.total
+    }else {
+      ElMessage.success(res.msg);
+    }
+  })
+}
 const loadData = (flag = true)=>{
   const r = distTableRef.value?.getPartnerPage(flag); //获取分页数据
 	const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
