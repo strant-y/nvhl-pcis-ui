@@ -203,8 +203,10 @@ const formconfig1 = ref<AppFreeEditConfig>(
               if (res.code === 200) {
                 ElMessage.success(res.msg);
                 emits("handleClose");
+                const addedPlan = getValue('Dist.cPlanNo');
+
                 if(!!props.method.isOk && typeof props.method.isOk === 'function') {
-                  props.method.isOk(res);
+                  props.method.isOk({...res, addedPlan});
                 }
               } else {
                 ElMessage.error(res.msg);
@@ -268,13 +270,6 @@ onMounted(() => {
     }
     if( route.params.param.cProdNo == '042003' && item.prop =='Dist.cPlanNo' ){
              item['rules'] = [];
-    }
-    // 方案号下拉框内容根据条款赋值；
-    if(item.prop == 'Dist.cPlanNo'){
-      const termref = opertaor.getTableRefByKey("cvrg");
-      
-      item.typeCode = null;
-      item.loadData = termref.getPlanNo();
     }
 
     // 040002 证件号码 必填问题
@@ -395,16 +390,22 @@ onMounted(() => {
         data['func'] = getAddressstr;
       })
     }
-    // 根据条款获取方案号下拉选项
-    if(item.prop == 'Dist.cPlanNo'){
-      const termref = opertaor.getTableRefByKey("cvrg");
-      item.typeCode = null;
-      item.loadData = termref.getPlanNo();
+    if (item.prop === 'Dist.cPlanNo') {
+        const termref = opertaor.getTableRefByKey('cvrg');
+        const allPlans = termref.getPlanNo();   // 全部方案
+
+        // 取出父页面带来的已选方案
+        const added = props.data.addedPlans || [];
+        const nextIdx = added.length;           // 当前应该选第几个
+
+        item.typeCode = null;
+        item.loadData = allPlans.map((p: any, idx: number) => ({
+            ...p,
+            disabled: idx > nextIdx     // 未开始
+        }));
     }
     newSchema.push(item);
   }
-
-  console.log('最终实现表单',newSchema)
   formconfig1.value.fromSchema = newSchema;
   
   formconfig1.value.title = props.data.title;

@@ -238,6 +238,7 @@ function lazyLoadFun(node: any, resolve: Function) {
       codeListParam.kindNo = value.split('-')[1]
       if (props.row && props.row.cProdNo) {
         codeListParam.prodNo = props.row.cProdNo;
+        codeListParam.cTransMrk = props.row.cTransMrk;
       }
       if(codeListParam.rsnTyp == '2' || codeListParam.rsnTyp == '3'){
         codeListName = "EDR_RSN_LIST_CANCEL";
@@ -429,5 +430,6 @@ defineExpose({
 <style lang="scss">
 .cascader_ {
   width: 100%;
+  vertical-align: top;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <template v-if="!showLabel">
     <el-tooltip
-        :disabled="!changeContent && (!vInput || vInput === 'undefined' || vInput === '' || vInput === '0' || vInput === 'null')"
+        :disabled="!changeContent && (!vInput || vInput === 'undefined' || vInput === '' || vInput === '0' || vInput === 'null' || item.type === 'textarea')"
         placement="top"
     >
       <template #content>
