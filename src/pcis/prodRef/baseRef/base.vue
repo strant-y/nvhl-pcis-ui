@@ -178,7 +178,6 @@ const nPayNumberFun = (isAdd=false)=>{
 
 // 绑定方法
 const method = {
-  // func demo
   func1: () => {
   },
 
@@ -189,12 +188,13 @@ const method = {
   },
   //付费约定下拉事件
   cInstMrkChange(val: any) {
+    console.log('1212,',val)
     if(val=='5'){
       setFormItem("Base.nPayNumber", { disabled: false ,  max:12});
     }else if(val=='0'){
       setFormItem("Base.nPayNumber", { disabled: true, });
       setValue('Base.nPayNumber',1)
-      
+       nPayNumberFun(true);
     }
   },
   //争议处理选择事件
