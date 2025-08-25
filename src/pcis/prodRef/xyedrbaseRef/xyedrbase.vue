@@ -309,7 +309,7 @@ onMounted(() => {
             ZH: "ZH",
             FZ: "FZ",
         };
-        if(params.cRsnCde=='FZ'){
+        if(params.cRsnCde=='FZ' || params.cEdrRsnBundleCde =='FZ'){
             param["calcMrk"] = '0'
         }else{
           param["calcMrk"] = '1'

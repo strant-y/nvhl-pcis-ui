@@ -2799,7 +2799,14 @@ function checkShow(k:any){
 /**
  * 投保申请核保
  */
-const submitToUndrFn = async () => {  
+const submitToUndrFn = async () => {
+  // 协议出单剩余预收保费校验
+  if(props.param?.cRecordType === 9 || props.param.cPolicySource == 9){
+    if(Number(nRecRemPrm.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
+      ElMessage.error("协议剩余预收保费不足");
+      return;
+    }
+  }
  	if (needCalc.value) {
     ElMessage.error("请先进行保费计算!");
     return;
@@ -3796,6 +3803,13 @@ const getSurrenderPrecisFun = () => {
  * 批改单申请核保(退保、注销)
  */
 const submitEdrToUndrSurrender = async () => {
+  // 协议出单剩余预收保费校验
+  if(props.param?.cRecordType === 9 || props.param.cPolicySource == 9){
+    if(Number(nRecRemPrm.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
+      ElMessage.error("协议剩余预收保费不足");
+      return;
+    }
+  }
   if(!edrbase.value?.getFromValue()["EdrBase.cAppNo"]) {
     ElMessage.error("请先保存申请单")
     return
@@ -4052,7 +4066,13 @@ const generateEndorse = async () => {
  * 批单申请核保
  */
 const submitEdrToUndrFun = async () => {
-
+// 协议出单剩余预收保费校验
+  if(props.param?.cRecordType === 9 || props.param.cPolicySource == 9){
+    if(Number(nRecRemPrm.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
+      ElMessage.error("协议剩余预收保费不足");
+      return;
+    }
+  }
   const isAcctValid = await validateAcctinfo();
     // 账户信息校验
   if (!isAcctValid) {
