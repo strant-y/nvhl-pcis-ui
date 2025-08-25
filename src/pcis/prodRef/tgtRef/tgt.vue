@@ -14,8 +14,8 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useProductStore } from "@/store/modules/prod";
 import { rule } from "postcss";
 import { useValidator } from "@/typings/useValidator";
-import { syncDist, selectDist, checkAppBase } from "@/api/prod";
-
+import { syncDist ,selectDist,checkAppBase } from "@/api/prod";
+import { productListA,productListB,productListC } from "./productList";
 const wagesInfo = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/wages-info-model.vue")
 );
@@ -61,7 +61,7 @@ const props = defineProps({
     required: false,
   },
 });
-
+const whichType = ref('')
 const tgtEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));
@@ -125,12 +125,12 @@ onMounted(async () => {
   if (params.cProdNo === '040011' || params.cProdNo === '040008') {
     setFormItem("Tgt.cCallSign", { rules: [getRules("required", { 'trigger': 'blur' })] });
   }
-  
+
   // 主机功率(单位:千瓦(KW)) 非必填
   const nHostPowers = ['110004', '110003', '040011', '040008'];
   const iscHostRequired = nHostPowers.includes(params.cProdNo);
   setFormItem("Tgt.nHostPower", {
-    rules: iscHostRequired? []: [getRules("required", { trigger: 'blur' })] 
+    rules: iscHostRequired? []: [getRules("required", { trigger: 'blur' })]
   });
 
   //  运输工具名称
@@ -156,9 +156,24 @@ onMounted(async () => {
   setFormItem("Tgt.cContactNumber", {
     rules: [getRules("phoneNo", {})],
   });
-
+  selectType()
+  nextTick(()=>{
+    if(!getValue('Tgt.cDispatchDetail')){
+      setFormItem('Tgt.cDispatchDetail',{disabled:true})
+    }else {
+      setFormItem('Tgt.cDispatchDetail',{disabled:false})
+    }
+  })
 });
-
+const selectType = ()=>{
+  if(productListA.value.includes(params.cProdNo)){
+    whichType.value = 'A'
+  }else if(productListB.value.includes(params.cProdNo)){
+    whichType.value = 'B'
+  }else if(productListC.value.includes(params.cProdNo)){
+    whichType.value = 'C'
+  }
+}
 const wagesInfoModel = () => {
   let cRegisteredLogo = opertaor.getDataAll()['tgt']['Tgt.cRegisteredLogo'];  // 记名投保标志 是 获取清单汇总   否可以自己修改添加
   let cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];
@@ -476,7 +491,7 @@ const method = {
         const nHostPowers = ['110004', '110003', '040011', '040008'];
         const iscHostRequired = nHostPowers.includes(params.cProdNo);
         setFormItem("Tgt.nHostPower", {
-          rules: iscHostRequired? []: [getRules("required", { trigger: 'blur' })] 
+          rules: iscHostRequired? []: [getRules("required", { trigger: 'blur' })]
         });
       // setFormItem('Tgt.nHostPower', {
       //   rules: [getRules("required", {})],
@@ -574,7 +589,7 @@ const method = {
     setFormItem("Tgt.cTransportFrameNumber", {
       rules: val === '1' ? requiredRule : [],
     });
-   
+
 
 
     if (val === '1') {
@@ -955,13 +970,39 @@ const method = {
   },
   // 起运地国家 按钮
   cDispatchCountryFunc: () => {
-    dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
-
+    dzmodal.open(countryInfo, { type: "departure", data: { whichType:whichType.value } }).then((res: any) => {
       if (res.type === "ok") {
-        setValue("Tgt.cDispatchCountry", res.body.countryCn);
-        setValue("Tgt.cDispatchProvince", res.body.portCn);
-        setValue("Tgt.cDispatchDetail", res.body.countryCn + '/' + res.body.portCn);
-      };
+        setFormItem('Tgt.cDispatchDetail',{disabled:false})
+        setValue("Tgt.cDispatchCountry", res.body.cCountryCn);
+        setValue("Tgt.cDispatchProvince", res.body.cPortCn);
+        if(whichType.value === 'A'){
+          setValue("Tgt.cDispatchDetail", res.body.cPortCn+','+res.body.cCountryCn);
+        }else if(whichType.value === 'B'){
+          setValue("Tgt.cDispatchDetail", res.body.cCountryCn +','+ res.body.cPortCn);
+        }else if(whichType.value === 'C'){
+          if(res.body.cCountryEn !== 'CHINA'){
+            if(res.body.cType === '1'){
+              setValue("Tgt.cDispatchCountry", res.body.cCountryCn);
+              setValue("Tgt.cDispatchProvince", res.body.cCity);
+              setValue("Tgt.cDispatchDetail",res.body.cCity + ','+ res.body.cCountryCn );
+            }else{
+              setValue("Tgt.cDispatchCountry", res.body.cCountryCn);
+              setValue("Tgt.cDispatchProvince", res.body.cAirportCity);
+              setValue("Tgt.cDispatchDetail", res.body.cAirportCity +','+ res.body.cCountryCn );
+            }
+          }else{
+            if(res.body.cType === '1'){
+              setValue("Tgt.cDispatchCountry", res.body.cCountryCn);
+              setValue("Tgt.cDispatchProvince", res.body.cCity);
+              setValue("Tgt.cDispatchDetail",res.body.cCountryCn + ','+res.body.cCity);
+            }else{
+              setValue("Tgt.cDispatchCountry", res.body.cCountryCn);
+              setValue("Tgt.cDispatchProvince", res.body.cAirportCity);
+              setValue("Tgt.cDispatchDetail", res.body.cCountryCn +','+ res.body.cAirportCity);
+            }
+          }
+        }
+      }
     });
   },
   // 起运机场国家
@@ -1024,7 +1065,7 @@ const method = {
       setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("onlineTaxiLicense", {})] })  //证件号
 
     } else if (val === '3') {
-      //  网络预约出租汽车运输证 
+      //  网络预约出租汽车运输证
       setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("onlineTaxiTransportLicense", {})] })  //证件号
 
     }

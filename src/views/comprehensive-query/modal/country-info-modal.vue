@@ -53,7 +53,7 @@ const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "地点查询",
-    endBtnsPosition: "center",
+    endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
         type: "primary",
@@ -62,35 +62,35 @@ const formconfig = reactive<AppFreeEditConfig>(
           handleQuery();
         },
       }),
-      createFreeButtonBase({
-        type: "primary",
-        label: "新增",
-        func: () => {
-          addFunc();
-        },
-      }),
+      // createFreeButtonBase({
+      //   type: "primary",
+      //   label: "新增",
+      //   func: () => {
+      //     addFunc();
+      //   },
+      // }),
     ],
     fromSchema: [
       {
-        prop: "portCn",
-        inputtype: "rtinput",
-        title: "港口中文名称",
-      },
-      {
-        prop: "portEn",
-        inputtype: "rtinput",
-        title: "港口英文名称",
-      },
-      {
-        prop: "countryCn",
+        prop: "cCountryCn",
         inputtype: "rtinput",
         title: "国家中文名称",
       },
       {
-        prop: "countryEn",
+        prop: "cPortCn",
+        inputtype: "rtinput",
+        title: "港口中文名称",
+      },
+      {
+        prop: "cCountryEn",
         inputtype: "rtinput",
         title: "国家英文名称",
       },
+      {
+        prop: "cPortEn",
+        inputtype: "rtinput",
+        title: "港口英文名称",
+      }
       
     ],
     fromUi: createFromUiConfig({
@@ -120,27 +120,25 @@ const tableconfig = reactive<AppTableConfig>(
     isPage:'true',
     fromSchema: [
       {
-        prop: "countryCn",
+        prop: "cCountryCn",
         inputtype: "rtinput",
         title: "国家中文名称",
       },
       {
-        prop: "countryEn",
+        prop: "cCountryEn",
         inputtype: "rtinput",
         title: "国家英文名称",
       },
       {
-        prop: "portCn",
+        prop: "cPortCn",
         inputtype: "rtinput",
         title: "港口中文名称",
       },
       {
-        prop: "portEn",
+        prop: "cPortEn",
         inputtype: "rtinput",
         title: "港口英文名称",
-      },
-
-     
+      }
     ],
     rowDbClickFun(rowData) {
       dialogVisible.value = false;
@@ -233,6 +231,164 @@ function handleQuery(reset = true) {
 }
 
 onMounted(() => {
+  if(props.data?.whichType === 'A'){
+    formconfig.fromSchema = [
+      {
+        prop: "cCountryCn",
+        inputtype: "rtinput",
+        title: "国家中文名称",
+      },
+      {
+        prop: "cCountryEn",
+        inputtype: "rtinput",
+        title: "国家英文名称",
+      },
+      {
+        prop: "cPortCn",
+        inputtype: "rtinput",
+        title: "港口中文名称",
+      },
+      {
+        prop: "cPortEn",
+        inputtype: "rtinput",
+        title: "港口英文名称",
+      }
+
+    ]
+    tableconfig.fromSchema = [
+      {
+        prop: "cCountryCn",
+        inputtype: "rtinput",
+        title: "国家中文名称",
+      },
+      {
+        prop: "cCountryEn",
+        inputtype: "rtinput",
+        title: "国家英文名称",
+      },
+      {
+        prop: "cPortCn",
+        inputtype: "rtinput",
+        title: "港口中文名称",
+      },
+      {
+        prop: "cPortEn",
+        inputtype: "rtinput",
+        title: "港口英文名称",
+      }
+    ]
+  }else if(props.data?.whichType === 'B') {
+    formconfig.fromSchema = [
+      {
+        prop: "cCountryCn",
+        inputtype: "rtinput",
+        title: "国家中文名称",
+      },
+      {
+        prop: "cPortCn",
+        inputtype: "rtinput",
+        title: "港口中文名称",
+      },
+      {
+        prop: "cCountryEn",
+        inputtype: "rtinput",
+        title: "国家英文名称",
+      },
+      {
+        prop: "cPortEn",
+        inputtype: "rtinput",
+        title: "港口英文名称",
+      }
+    ]
+    tableconfig.fromSchema = [
+      {
+        prop: "cCountryCn",
+        inputtype: "rtinput",
+        title: "国家中文名称",
+      },
+      {
+        prop: "cPortCn",
+        inputtype: "rtinput",
+        title: "港口中文名称",
+      },
+      {
+        prop: "cCountryEn",
+        inputtype: "rtinput",
+        title: "国家英文名称",
+      },
+      {
+        prop: "cPortEn",
+        inputtype: "rtinput",
+        title: "港口英文名称",
+      }
+    ]
+
+  }else if(props.data?.whichType === 'C'){
+    formconfig.fromSchema = [
+      {
+        prop: "cCountryCn",
+        inputtype: "rtinput",
+        title: "国家中文名称",
+      },
+      {
+        prop: "cPortCn",
+        inputtype: "rtinput",
+        title: "港口中文名称",
+      },
+      {
+        prop: "cAirportCn",
+        inputtype: "rtinput",
+        title: "机场中文名称",
+      },
+      {
+        prop: "cCountryEn",
+        inputtype: "rtinput",
+        title: "国家英文名称",
+      },
+      {
+        prop: "cPortEn",
+        inputtype: "rtinput",
+        title: "港口英文名称",
+      },
+      {
+        prop: "cAirportEn",
+        inputtype: "rtinput",
+        title: "机场英文名称",
+      },
+    ]
+    tableconfig.fromSchema = [
+      {
+        prop: "cCountryCn",
+        inputtype: "rtinput",
+        title: "国家中文名称",
+      },
+      {
+        prop: "cPortCn",
+        inputtype: "rtinput",
+        title: "港口中文名称",
+      },
+      {
+        prop: "cAirportCn",
+        inputtype: "rtinput",
+        title: "机场中文名称",
+      },
+      {
+        prop: "cCountryEn",
+        inputtype: "rtinput",
+        title: "国家英文名称",
+      },
+      {
+        prop: "cPortEn",
+        inputtype: "rtinput",
+        title: "港口英文名称",
+      },
+      {
+        prop: "cAirportEn",
+        inputtype: "rtinput",
+        title: "机场英文名称",
+      },
+    ]
+  }
   nextTick(()=>{
 handleQuery()
   })
