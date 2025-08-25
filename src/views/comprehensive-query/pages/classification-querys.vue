@@ -171,7 +171,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                         dayjs(new Date()).subtract(15, "days").format("YYYY-MM-DD 00:00:00"),
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
                     ],
-                    cDataTyp:"app"
+                    cDataTyp:"app",
+                    cAppTyp:"A",
                   })
               },
           }),
@@ -184,14 +185,21 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               func: () => {
                   const freeEditRefs = freeEditRef.value;
                   const s = freeEditRefs.getFromValue(); //获取表单数据
+                  // 公共
+                  formconfig1.fromSchema?.forEach((item) => {
+                    if (
+                        item.prop === "cPrjCtgTyp" ||
+                        item.prop === "cPrjCtgMidTyp" ||
+                        item.prop === "cPrjCtgSubTyp"
+                    ) {
+                        item.hidden = false;
+                    }
+                  });
                   if (s["cKindNo"] == "09") {
                       formconfig1.fromSchema?.forEach((item) => {
                           if (
                               item.prop === "CProjectName" ||
-                              item.prop === "CDetailedAddress" ||
-                              item.prop === "cPrjCtgTyp" ||
-                              item.prop === "cPrjCtgMidTyp" ||
-                              item.prop === "cPrjCtgSubTyp"
+                              item.prop === "CDetailedAddress"
                           ) {
                               item.hidden = false;
                           }
@@ -202,10 +210,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   } else if (s["cKindNo"] == "08") {
                       formconfig1.fromSchema?.forEach((item) => {
                           if (
-                              item.prop === "CDetailedAddress" ||
-                              item.prop === "cPrjCtgTyp" ||
-                              item.prop === "cPrjCtgMidTyp" ||
-                              item.prop === "cPrjCtgSubTyp"
+                              item.prop === "CDetailedAddress"
                           ) {
                               item.hidden = false;
                           }
@@ -220,10 +225,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                                   item.prop === "CEmployeeName" ||
                                   item.prop === "CIdentificationNumber" ||
                                   item.prop === "CPlateNo" ||
-                                  item.prop === "CEngineNo" ||
-                                  item.prop === "cPrjCtgTyp" ||
-                                  item.prop === "cPrjCtgMidTyp" ||
-                                  item.prop === "cPrjCtgSubTyp"
+                                  item.prop === "CEngineNo"
                               ) {
                                   item.hidden = false;
                               }
@@ -239,10 +241,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                                   item.prop === "CProjectType" ||
                                   item.prop === "CProjectName" ||
                                   item.prop === "CDetailedAddress" ||
-                                  item.prop === "CIdentificationNumber" ||
-                                  item.prop === "cPrjCtgTyp" ||
-                                  item.prop === "cPrjCtgMidTyp" ||
-                                  item.prop === "cPrjCtgSubTyp"
+                                  item.prop === "CIdentificationNumber"
                               ) {
                                   item.hidden = false;
                               }
@@ -251,16 +250,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                               }
                               if (item.prop === "CDetailedAddress") {
                                   item.title = "经营地址";
-                              }
-                          });
-                      } else {
-                          formconfig1.fromSchema?.forEach((item) => {
-                              if (
-                                  item.prop === "cPrjCtgTyp" ||
-                                  item.prop === "cPrjCtgMidTyp" ||
-                                  item.prop === "cPrjCtgSubTyp"
-                              ) {
-                                  item.hidden = false;
                               }
                           });
                       }
@@ -446,7 +435,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               },
           },
           {
-              prop: "cAppNo",
+              prop: "prodCNmeCn",
               inputtype: "rtinput",
               title: "产品名称",
               clearable: true,
@@ -524,7 +513,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                               const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
                               const startDate = moment(new Date()).subtract(15, "days").format("YYYY-MM-DD 00:00:00");
                               freeEditRef.value?.setValue("tAppTm", [startDate, endDate]);
-                          } else if (item.prop == "tEdrAppTm" || item.prop == "tInquiryTm" || item.prop == "cInquiryNo") {
+                          } else if (item.prop == "tEdrAppTm" || item.prop == "tInquiryTm") {
                               item.hidden = true;
                           } else if (item.prop == "cPlyNo" || item.prop == "cDataTyp") {
                              item.hidden = false;
@@ -540,7 +529,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                             const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
                             const startDate = moment(new Date()).subtract(15, "days").format("YYYY-MM-DD 00:00:00");
                             freeEditRef.value?.setValue("tEdrAppTm", [startDate, endDate]);
-                          } else if (item.prop == "tAppTm" || item.prop == "tInquiryTm" || item.prop == "cInquiryNo") {
+                          } else if (item.prop == "tAppTm" || item.prop == "tInquiryTm") {
                             item.hidden = true;
                           } else if (item.prop == "cPlyNo" || item.prop == "cDataTyp") {
                             item.hidden = false;
@@ -555,18 +544,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                             const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
                             const startDate = moment(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00");
                             freeEditRef.value?.setValue("tInquiryTm", [startDate, endDate]);
-                          } else if (item.prop == "cInquiryNo") {
-                              item.hidden = false;
                           } else if (item.prop == "tAppTm" || item.prop == "tEdrAppTm" || item.prop == "cDataTyp" ) {
                               item.hidden = true;
                           } else if (item.prop == "cPlyNo") {
-                              item.hidden = true;
+                              item.hidden = false;
                           } 
                       });
                   } else if(!val) {
                     // 清空选中值
                     formconfig1.fromSchema?.forEach((item) => {
-                        if (item.prop === "tEdrAppTm" || item.prop === "tInquiryTm" || item.prop === "cInquiryNo") {
+                        if (item.prop === "tEdrAppTm" || item.prop === "tInquiryTm") {
                             item.hidden = true; //批改申请日期、询价日期、询价单号
                         } else if (item.prop == "tAppTm") {
                             item.hidden = false; // 默认显示投保日期
@@ -602,13 +589,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   { label: "已出单", value: "5" },
                   { label: "见费出单退回", value: "8" },
               ],
-          },
-          {
-            prop: "cInquiryNo",
-            inputtype: "rtinput",
-            title: "询价单号",
-            clearable: true,
-            hidden: true,
           },
           {
               prop: "tAppTm",
@@ -812,7 +792,7 @@ const esSearchColumnsAE = [
     minWidth: 180,
    },
    {
-    prop: "cNmeCn",
+    prop: "prodCNmeCn",
     inputtype: "rtinput",
     title: "产品名称",
     minWidth: 180,
@@ -907,7 +887,7 @@ const esSearchColumnsI = [
     minWidth: 180,
    },
    {
-    prop: "cNmeCn",
+    prop: "prodCNmeCn",
     inputtype: "rtinput",
     title: "产品名称",
     minWidth: 180,
@@ -1448,6 +1428,7 @@ onMounted(async () => {
         }
     });
     freeEditRef.value.setValue("cDataTyp","app") ; // 列表类型默认值 为全部保批单
+    freeEditRef.value.setValue("cAppTyp","A") ; // 任务类型默认值 为投保
     freeEditRef.value.setValue("cDptCde", JSON.parse(sessionStorage.getItem("user")).companyId);
     setFormItem("cDptCde", {
         loadData: [
