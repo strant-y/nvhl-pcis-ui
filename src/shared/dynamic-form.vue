@@ -553,13 +553,17 @@ function setFormValue(data: any, noupdate = false) {
             : key.cascaderprops;
         if (props && props.length > 0) {
           let cascd = [];
+          let hv = false;
           for (var i = 0; i < props.length; i++) {
             if (setdata[props[i]]) {
               cascd.push(setdata[props[i]]);
+              hv = true;
             }
             delete setdata[props[i]];
           }
-          setdata[key.prop] = cascd;
+          if(hv){ //如果有值,再设置,否则不予设置
+            setdata[key.prop] = cascd;
+          }
         }
       } else if (key.inputtype === "rtinputgroup") {
         if (key.groupList && key.groupList.length > 0) {
@@ -571,13 +575,17 @@ function setFormValue(data: any, noupdate = false) {
                   : gkey.cascaderprops;
               if (gprops && gprops.length > 0) {
                 let cascd = [];
+                let hv = false;
                 for (var i = 0; i < gprops.length; i++) {
                   if (setdata[gprops[i]]) {
                     cascd.push(setdata[gprops[i]]);
+                    hv = true;
                   }
                   delete setdata[gprops[i]];
                 }
-                setdata[gkey.prop] = cascd;
+                if(hv){
+                  setdata[gkey.prop] = cascd;
+                }
               }
             }
           });
@@ -593,6 +601,9 @@ function setFormValue(data: any, noupdate = false) {
 
 function formsDataUpdate(item:any) {
   if(item.rules){ // 如果有验证规则,则form表单验证一下值
+    if(item.prop === 'Applicant.ClntAddrProp'){
+      console.log(item);
+    }
     fromRef.value?.validateField(item.prop);
   }
   emits("formsDataUpdate", form);
