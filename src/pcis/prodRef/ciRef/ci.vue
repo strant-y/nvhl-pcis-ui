@@ -310,25 +310,43 @@ const method = {
         freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
         return;
       }
-      if (val === "0") {
-        if( cCiMrk["Base.cCiMrk"] == '5' ){
-          if(rowData['Ci.cDptCde'] == param.cDptCde){
-            ElMessage.error("联保单出单方必须是主联单的分公司！");
-            freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
-          }
+      // if (val === "0") {
+      //   if( cCiMrk["Base.cCiMrk"] == '5' ){
+      //     if(rowData['Ci.cDptCde'] == param.cDptCde){
+      //       ElMessage.error("联保单出单方必须是主联单的分公司！");
+      //       freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
+      //     }
+      //   }
+      //   if(cCiMrk["Base.cCiMrk"] == '3'){ 
+      //     if(rowData['Ci.cDptCde'] === param.cDptCde){ 
+      //       ElMessage.error("联保单出单方必须是主联单的分公司！");
+      //       freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
+      //     }
+      //   }
+      // }else{
+      //   if(cCiMrk["Base.cCiMrk"] == '1' || cCiMrk["Base.cCiMrk"] == '5'){
+      //     if(rowData['Ci.cDptCde'] !== param.cDptCde){
+      //       ElMessage.error("联保单出单方必须是主联单的分公司！");
+      //       freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
+      //     }
+      //   }
+      // }
+       // 根据不同的联共保类型进行校验
+      if (val === "1") {
+        // 选择"是"时的校验 - 出单方必须是主联单的分公司
+        if ((cCiMrk["Base.cCiMrk"] == '1' || cCiMrk["Base.cCiMrk"] == '5') 
+            && rowData['Ci.cDptCde'] !== param.cDptCde) {
+          ElMessage.error("联保单出单方必须是主联单的分公司！");
+          freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
+          return;
         }
-        if(cCiMrk["Base.cCiMrk"] == '3'){ 
-          if(rowData['Ci.cDptCde'] === param.cDptCde){ 
-            ElMessage.error("联保单出单方必须是主联单的分公司！");
-            freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
-          }
-        }
-      }else{
-        if(cCiMrk["Base.cCiMrk"] == '1' || cCiMrk["Base.cCiMrk"] == '5'){
-          if(rowData['Ci.cDptCde'] !== param.cDptCde){
-            ElMessage.error("联保单出单方必须是主联单的分公司！");
-            freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
-          }
+      } else if (val === "0") {
+        // 选择"否"时的校验 - 联保单出单方必须是主联单的分公司
+        if ((cCiMrk["Base.cCiMrk"] == '5' || cCiMrk["Base.cCiMrk"] == '3' || cCiMrk["Base.cCiMrk"] === '1') 
+            && rowData['Ci.cDptCde'] == param.cDptCde) {
+          ElMessage.error("联保单出单方必须是主联单的分公司！");
+          freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
+          return;
         }
       }
       allRows.forEach((item:any) => {
@@ -507,7 +525,7 @@ const method = {
   cBankRelTypChange:(val)=>{
     const rowDatas = freeEditRef.value?.getSelectRow();
     bankRelTypeArr = val.split('_')
-    freeEditRef.value?.setValueByRowKey("Ci.cBankAddr",rowDatas._dataId,bankRelTypeArr[1])
+    // freeEditRef.value?.setValueByRowKey("Ci.cBankAddr",rowDatas._dataId,bankRelTypeArr[1])
     freeEditRef.value?.setRowFieldProp(rowDatas._dataId, "Ci.cBankPro", "rules", [getRules("required", {})]);
     freeEditRef.value?.setRowFieldProp(rowDatas._dataId, "Ci.cBankArea", "rules", [getRules("required", {})]);
     freeEditRef.value?.setRowFieldProp(rowDatas._dataId,"Ci.cBankCnaps","disabled",true)
@@ -547,36 +565,38 @@ const method = {
   },
     // 开户行    CNAPS号 开户行地址
   cBankCdeChange: (val: any) => {
-    // if (val) {
-      // let backAddr = val.split('_');
-      // setValue('Ci.cBankCnaps', backAddr[0])
-      // setValue('Ci.cBankAddr', backAddr[1])
-    // }
-    const rowData = freeEditRef.value?.getSelectRow();
-    const rowId = rowData?._dataId;
-    dialogRef.value?.open(
-        "cBrkrCdeModal",
-        {
-          type: "show",
-          data: {
-            rowData:rowData,
-          },
-          method: {
-            getSelected: (params) => {
-              console.log("params",params)
-              freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBankCde","loadData",[{ label: params.label, value: params.value }])
-              freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBankCde",params.value)
-              dialogRef.value?.handleClose();
-            },
-          },
-        },
-        {
-          isOk: (selectdata: any) => {
-            console.log("a", selectdata);
-          },
-        },
-        { title: "银行信息", width: 85 }
-      );
+    if (val) {
+      const rowData = freeEditRef.value?.getSelectRow();
+      const rowId = rowData?._dataId;
+      let backAddr = val.split('_');
+      freeEditRef.value?.setValueByRowKey("Ci.cBankAddr",rowId,backAddr[1])
+      freeEditRef.value?.setValueByRowKey("Ci.cBankCnaps",rowId,backAddr[0])
+    }
+    // const rowData = freeEditRef.value?.getSelectRow();
+    // const rowId = rowData?._dataId;
+    // dialogRef.value?.open(
+    //     "cBrkrCdeModal",
+    //     {
+    //       type: "show",
+    //       data: {
+    //         rowData:rowData,
+    //       },
+    //       method: {
+    //         getSelected: (params) => {
+    //           console.log("params",params)
+    //           freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBankCde","loadData",[{ label: params.label, value: params.value }])
+    //           freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBankCde",params.value)
+    //           dialogRef.value?.handleClose();
+    //         },
+    //       },
+    //     },
+    //     {
+    //       isOk: (selectdata: any) => {
+    //         console.log("a", selectdata);
+    //       },
+    //     },
+    //     { title: "银行信息", width: 85 }
+    //   );
   },
   //业务员
   cSlsCdeChange:()=>{
@@ -929,9 +949,6 @@ const valideRequired = ()=>{
           freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.cBrkSlsCde", "disabled", true
           );
-          
-          // freeEditRef?.value?.setValueByRowKey("Ci.cBrkrCde", rowId, "");
-          // freeEditRef?.value?.setValueByRowKey("Ci.cBrkSlsCde", rowId, "");
           const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
           if (rowItem) {
             rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
@@ -940,8 +957,6 @@ const valideRequired = ()=>{
         }
         // 处理非直销业务（19002或19003）的情况
         else if(cBsnsTyp == '19002' || cBsnsTyp == '19003'){
-          // freeEditRef?.value?.setValueByRowKey("Ci.cSlsId", rowId, "");
-          // freeEditRef?.value?.setValueByRowKey("Ci.cSlsNme", rowId, "");
           freeEditRef.value?.setRowFieldProp(rowData._dataId, 'Ci.nComm', 'disabled', false)
           // 非直销业务：代理经纪人和代理业务员必填
           freeEditRef.value?.setRowFieldProp(

@@ -717,10 +717,9 @@ function previewTerm() {
         ElMessage.warning("条款链接为空，无法预览");
         return;
       }
-      
       // 判断文件类型并进行相应预览
       const fileExtension = getFileExtension(cWebsite).toLowerCase();
-      
+      console.log("0000000",fileExtension,cWebsite);
       if (fileExtension === 'pdf') {
         // PDF文件使用浏览器内置查看器或新窗口打开
         window.open(cWebsite, '_blank');

@@ -228,6 +228,10 @@ if (!value) return true
 
 onMounted(async () => {
   const param = props.data.data;
+  //添加条款只能查询一条主条款
+  if (param.isselectData && param.isselectData.length > 0) {
+    param['cTermNo'] = param.isselectData[0]["Term.cClauseCode"];
+  }
   qryProdRelTermRiskList(param).then((res: any) => {
     const { code, data, msg } = res;
     if (200 === code) {
