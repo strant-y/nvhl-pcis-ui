@@ -483,17 +483,22 @@ const method = {
         rules: [getRules("required", {})],
       });
 
-
-      let cWorkDpt = getValue('Insured.cWorkDpt')
-      if(cWorkDptList.includes(cWorkDpt)){
-          setFormItem("Insured.cRealnameAuthType", {
-            rules: [getRules("required", {})],
-          });
-      }else{
-          setFormItem("Insured.cRealnameAuthType", {
-            rules: [],
-          });
-      }
+      // 单位性质 --为企业做必填校验
+      const cWorkDpt =  getValue('Insured.cWorkDpt');
+      const isSpecialCase = cWorkDptList.includes(cWorkDpt);
+      const requiredRule = [getRules("required", {})];
+      //实名认证方式
+      setFormItem("Insured.cRealnameAuthType", {
+        rules: isSpecialCase ? requiredRule : []
+      });
+      // 法定代表人/责任人
+      setFormItem("Insured.cLegalRepresentative", {
+        rules: isSpecialCase ? requiredRule : []
+      });
+      // 企业成立日
+      setFormItem("Insured.tEstablishingDate", {
+         rules: isSpecialCase ? requiredRule : []
+      });
 
       // 移动电话
       let cMobile = getValue('Insured.cMobile');  // 移动 
@@ -616,19 +621,20 @@ const method = {
         rules: null,
       });
 
-      // 为法人  企业成立日期
-      setFormItem("Insured.tEstablishingDate", {
-        rules: null,
-      });
 
       //实名认证方式
       setFormItem("Insured.cRealnameAuthType", {
         rules: [],
       });
-      // setValue("Insured.cGreenIndustryCustomers", "");
-      // setValue('Insured.cGreenIndustryList','')
-      // setValue("Insured.cIsMicroEntpris", "");
-      // setValue("Insured.cCertfCls", "");
+      // 法定代表人/责任人
+      setFormItem("Insured.cLegalRepresentative", {
+        rules:[]
+      });
+       //企业成立日期
+      setFormItem("Insured.tEstablishingDate", {
+        rules:[],
+      });
+
       setFormItem("Insured.cCntrNme", { rules: null });
       setFormItem("Insured.cCntrCertfCde", { rules: null });
 
@@ -999,9 +1005,9 @@ const method = {
       });
 
       // 为法人  企业成立日期
-      setFormItem("Insured.tEstablishingDate", {
-        rules: [getRules("required", {})],
-      });
+      // setFormItem("Insured.tEstablishingDate", {
+      //   rules: [getRules("required", {})],
+      // });
 
       // 税务登记证号
       setFormItem("Insured.cTaxRegistrationNo", {
@@ -1163,29 +1169,39 @@ const method = {
     fileInputRef.value?.click();
     formconfig.value.fileInputType = "2";
   },
+
     // 单位性质
-  cWorkDptChange:(val:any)=>{
-      let cClntMrk = getValue('Insured.cClntMrk');  // 投保人性质 
-        //实名认证方式
-      if(cWorkDptList.includes(val) && cClntMrk =='0'){
-          setFormItem("Insured.cRealnameAuthType", {
-            rules: [getRules("required", {})],
-          });
-      }else{
-          setFormItem("Insured.cRealnameAuthType", {
-            rules: [],
-          });
-      }
-      if(val =='350'){
-        setFormItem("Insured.cGcidCode", {
-              rules: [getRules("required", {}),getRules("leiCode", {})],
-            });
-      }else if(val){
-        setFormItem("Insured.cGcidCode", {
-              rules: [getRules("leiCode", {})],
-            });
-      }
-  },
+ cWorkDptChange:(val: any) => {
+  console.log('单位性质变更为:', val);
+  const clientNature = getValue('Insured.cClntMrk');
+  const isSpecialCase = cWorkDptList.includes(val) && clientNature === '0';
+  const requiredRule = [getRules("required", {})];
+  //实名认证方式
+  setFormItem("Insured.cRealnameAuthType", {
+    rules: isSpecialCase ? requiredRule : []
+  });
+  // 法定代表人/责任人
+  setFormItem("Insured.cLegalRepresentative", {
+    rules: isSpecialCase ? requiredRule : []
+  });
+  // 企业成立日
+  setFormItem("Insured.tEstablishingDate", {
+    rules: isSpecialCase ? requiredRule : []
+  });
+ 
+
+  const leiCodeRule = [getRules("leiCode", {})];
+  if (val === '350') {
+    setFormItem("Insured.cGcidCode", {
+      rules: [...requiredRule, ...leiCodeRule]
+    });
+  } else if (val) {
+    setFormItem("Insured.cGcidCode", {
+      rules: leiCodeRule
+    });
+  }
+},
+
   // 办理人员证件种类
   cOperaterCertfTypChange:(val: any)=>{
   // 清除报错信息

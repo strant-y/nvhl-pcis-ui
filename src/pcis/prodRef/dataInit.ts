@@ -122,6 +122,14 @@ export const getData = () => {
   }
   if (param.cProdNo === "040002") {
     diy["Tgt.cDeterminingMethod"] = "0"; //赔偿限额确定方式 页面初始化为直接限额制
+    diy["Tgt.cRegisteredLogo"] = "0"; //记名投保标志
+    diy["Tgt.cIncludeHighrisk"] = "0"; //是否包含高风险
+    diy["Tgt.cInvolveHighaltitude"] = "0"; //是否涉及高空作
+    diy["Tgt.cInvolveAgelimit"] = "0"; //是否涉及超龄人
+  }
+
+  if (param.cProdNo === "020001" ||param.cProdNo === "020005" ) {
+    diy["Tgt.cRailwayIntermodal"] = "0"; //是否铁路联运
   }
   const defultData = Object.assign(diy, di);
   return defultData;

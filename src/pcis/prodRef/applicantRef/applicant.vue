@@ -417,8 +417,6 @@ const method = {
     }
 
     if (val == "120001") { 
-      
-      // setValue('Applicant.cCertfCde','')  //选身份证时清空
       setFormItem("Applicant.cCertfCde", {
         rules: [getRules("required", {}), getRules("idCard", {})],
       });
@@ -507,7 +505,7 @@ const method = {
       setFormItem("Applicant.cSex", {
         rules: null
       });
-      // Applicant.cWorkDpt
+ 
       productStore.setcClntMrk(val);
       // 办理人
       setFormItem("Applicant.cCntrNme", { rules: [getRules("required", {})] });
@@ -520,13 +518,9 @@ const method = {
       setFormItem("Applicant.cOperaterCertfCde", {
         rules: [getRules("required", {})],
       });
-
- 
       setFormItem("Applicant.cCntrCertfCde", {
         rules: [getRules("required", {})],
       });
-
-      
       if (!param.initFlag) {
         setFormItem("Applicant.cWorkDpt", {
         disabled: false,
@@ -573,19 +567,25 @@ const method = {
       setFormItem("Applicant.RegisterProp", {
        rules: [getRules("required", {})],
       });
- 
+  
+      // 单位性质 --为企业做必填校验
+      const cWorkDpt = getValue('Applicant.cWorkDpt')
+      const isSpecialCase = cWorkDptList.includes(cWorkDpt);
+      const requiredRule = [getRules("required", {})];
       //实名认证方式
-      let cWorkDpt = getValue('Applicant.cWorkDpt')
-      if(cWorkDptList.includes(cWorkDpt)){
-          setFormItem("Applicant.cRealnameAuthType", {
-            rules: [getRules("required", {})],
-          });
-      }else{
-          setFormItem("Applicant.cRealnameAuthType", {
-            rules: [],
-          });
-      }
-    
+      setFormItem("Applicant.cRealnameAuthType", {
+        rules: isSpecialCase ? requiredRule : []
+      });
+      // 法定代表人/责任人
+      setFormItem("Applicant.cLegalRepresentative", {
+        rules: isSpecialCase ? requiredRule : []
+      });
+      // 企业成立日
+      setFormItem("Applicant.tEstablishingDate", {
+         rules: isSpecialCase ? requiredRule : []
+      });
+
+ 
       let cMobile = getValue('Applicant.cMobile');  // 移动 
       let cTel = getValue('Applicant.cTel');  // 固定电话    
       if(!cMobile &&  !cTel ){
@@ -678,15 +678,11 @@ const method = {
         rules: null,
         disabled: true,
       });
-      // setValue("Applicant.cGreenIndustryCustomers", "");
-      // setValue("Applicant.cGreenIndustryList", "");
-
       // 为法人  企业成立日期
       setFormItem("Applicant.tEstablishingDate", {
         rules: null,
       });
  
-      // setValue("Applicant.cIsMicroEntpris", "");
       //是否分支机构
       if(!getValue('Applicant.cIsBranch')){
           setValue("Applicant.cIsBranch", "1");
@@ -717,11 +713,13 @@ const method = {
         rules: [],
       });
     }
-    
-
       //实名认证方式
       setFormItem("Applicant.cRealnameAuthType", {
         rules: [],
+      });
+      // 法定代表人/责任人
+      setFormItem("Applicant.cLegalRepresentative", {
+        rules:[]
       });
 
       // 个人 移动电话必填  
@@ -1089,32 +1087,38 @@ const method = {
     fileInputRef.value?.click();
     formconfig.value.fileInputType = "2";
   },
-  // 单位性质
-  cWorkDptChange:(val:any,lab:any)=>{
-    console.log('单位性质',val)
-      let cClntMrk = getValue('Applicant.cClntMrk');  // 投保人性质  
-      if(cWorkDptList.includes(val) && cClntMrk =='0'){
-        console.log('尽力')
-          //实名认证方式
-          setFormItem("Applicant.cRealnameAuthType", {
-            rules: [getRules("required", {})],
-          });
-      }else{
-          setFormItem("Applicant.cRealnameAuthType", {
-            rules: [],
-          });
-      }
 
-      if(val =='350'){
-        setFormItem("Applicant.cGcidCode", {
-          rules: [getRules("required", {}),getRules("leiCode", {})],
-        });
-      }else if(val){
-        setFormItem("Applicant.cGcidCode", {
-          rules: [getRules("leiCode", {})],
-        });
-      }
-  },
+  // 单位性质
+ cWorkDptChange:(val: any) => {
+  console.log('单位性质变更为:', val);
+  const clientNature = getValue('Applicant.cClntMrk');
+  const isSpecialCase = cWorkDptList.includes(val) && clientNature === '0';
+  const requiredRule = [getRules("required", {})];
+  //实名认证方式
+  setFormItem("Applicant.cRealnameAuthType", {
+    rules: isSpecialCase ? requiredRule : []
+  });
+  // 法定代表人/责任人
+  setFormItem("Applicant.cLegalRepresentative", {
+    rules: isSpecialCase ? requiredRule : []
+  });
+  // 企业成立日
+  setFormItem("Applicant.tEstablishingDate", {
+    rules: isSpecialCase ? requiredRule : []
+  });
+ 
+
+  const leiCodeRule = [getRules("leiCode", {})];
+  if (val === '350') {
+    setFormItem("Applicant.cGcidCode", {
+      rules: [...requiredRule, ...leiCodeRule]
+    });
+  } else if (val) {
+    setFormItem("Applicant.cGcidCode", {
+      rules: leiCodeRule
+    });
+  }
+},
    // 办理人员证件种类
   cOperaterCertfTypChange:(val: any)=>{
     // 清除报错信息

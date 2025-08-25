@@ -14,7 +14,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useProductStore } from "@/store/modules/prod";
 import { rule } from "postcss";
 import { useValidator } from "@/typings/useValidator";
-import { syncDist ,selectDist,checkAppBase } from "@/api/prod";
+import { syncDist, selectDist, checkAppBase } from "@/api/prod";
 
 const wagesInfo = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/wages-info-model.vue")
@@ -31,9 +31,9 @@ import moment from "moment";
 
 import { descryptParameter, encryptParameter } from "@/utils/encipher";
 import { useRouter, useRoute } from 'vue-router';
-import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import dayjs from "dayjs";
-import {getAddressStr} from "@/api/query";
+import { getAddressStr } from "@/api/query";
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
 import { distRequiredMap } from '@/views/pcis/my-page/requiredDistMap';
@@ -66,9 +66,9 @@ const tgtEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 
-const distContactList:Array<string> = ['Tgt.DispatchProp','Tgt.cDispatchAddress',"Tgt.DepartureAirportProp","Tgt.cDepartureAirportAddress",
-  "Tgt.TransitProp","Tgt.cTransitAddress","Tgt.DestinationAirportProp","Tgt.cDestinationAirportAddress",
-  "Tgt.DestinationProp","Tgt.cDestinationAddress"]
+const distContactList: Array<string> = ['Tgt.DispatchProp', 'Tgt.cDispatchAddress', "Tgt.DepartureAirportProp", "Tgt.cDepartureAirportAddress",
+  "Tgt.TransitProp", "Tgt.cTransitAddress", "Tgt.DestinationAirportProp", "Tgt.cDestinationAirportAddress",
+  "Tgt.DestinationProp", "Tgt.cDestinationAddress"]
 
 onMounted(async () => {
   const formconfig11 = formInit(
@@ -77,66 +77,76 @@ onMounted(async () => {
     exRules
   );
 
-  
-  for(let i = 0; formconfig11.fromSchema && i < formconfig11.fromSchema.length; i++){
+
+  for (let i = 0; formconfig11.fromSchema && i < formconfig11.fromSchema.length; i++) {
     // 遍历groupList数组把函数赋值给fromSchema
-    if (formconfig11.fromSchema[i]["groupList"] && formconfig11.fromSchema[i]["groupList"].length>0) {
-      formconfig11.fromSchema[i]["groupList"].forEach((data:any,index:number,arr:any) =>{
-        if(distContactList.includes(data.prop)){
-          formconfig11.fromSchema[i]["groupList"][index]['func'] = function (){
-            return setcDetailedAddress(arr,JSON.parse(JSON.stringify(formconfig11.fromSchema[i+1])))
+    if (formconfig11.fromSchema[i]["groupList"] && formconfig11.fromSchema[i]["groupList"].length > 0) {
+      formconfig11.fromSchema[i]["groupList"].forEach((data: any, index: number, arr: any) => {
+        if (distContactList.includes(data.prop)) {
+          formconfig11.fromSchema[i]["groupList"][index]['func'] = function () {
+            return setcDetailedAddress(arr, JSON.parse(JSON.stringify(formconfig11.fromSchema[i + 1])))
           }
         }
       })
     }
   }
   Object.assign(formconfig1, formconfig11);
-  if(params.cProdNo === '045001'){
-    setFormItem("Tgt.cInsuranceMethod", {typeCode: 'InsuranceMethod045001'});
+  if (params.cProdNo === '045001') {
+    setFormItem("Tgt.cInsuranceMethod", { typeCode: 'InsuranceMethod045001' });
   }
-// Tgt.cShippingType
+  // Tgt.cShippingType
   // 运输方式  020011  020013 这两种产品 非必填
-  if(params.cProdNo === '020011' ||  params.cProdNo === '020013'){
-    setFormItem("Tgt.cShippingType", { rules: []});
-  }else{
-     setFormItem("Tgt.cShippingType", { rules: [getRules("required", {'trigger':'blur'})]});
+  if (params.cProdNo === '020011' || params.cProdNo === '020013') {
+    setFormItem("Tgt.cShippingType", { rules: [] });
+  } else {
+    setFormItem("Tgt.cShippingType", { rules: [getRules("required", { 'trigger': 'blur' })] });
   }
 
   //  020001 起运港 目的港 必填其他非必填
-  if(params.cProdNo === '020001'){
-       setFormItem("Tgt.cDeparturePort", { rules: [getRules("required", {'trigger':'blur'})]});
-       setFormItem("Tgt.cDestinationPort", { rules: [getRules("required", {'trigger':'blur'})]});
+  if (params.cProdNo === '020001') {
+    setFormItem("Tgt.cDeparturePort", { rules: [getRules("required", { 'trigger': 'blur' })] });
+    setFormItem("Tgt.cDestinationPort", { rules: [getRules("required", { 'trigger': 'blur' })] });
   }
 
   // 040005 办学许可证号
-  if(params.cProdNo === '040005'){
-       setFormItem("Tgt.cLicenseNumber", { rules: []});
-  }else {
-      setFormItem("Tgt.cLicenseNumber", {
-        rules: [getRules("vehiclePlate", {})],
-      });
-  }
-  
-  //040008  040011  呼号必填
-  if(params.cProdNo === '040011'|| params.cProdNo === '040008'){
-     setFormItem("Tgt.cCallSign", { rules: [getRules("required", {'trigger':'blur'})]});
+  if (params.cProdNo === '040005') {
+    setFormItem("Tgt.cLicenseNumber", { rules: [] });
+  } else {
+    setFormItem("Tgt.cLicenseNumber", {
+      rules: [getRules("vehiclePlate", {})],
+    });
   }
 
-   //110004、110003、040011、040008 主机功率(单位:千瓦(KW)) 非必填
-  if(params.cProdNo === '110004'|| params.cProdNo === '110003'|| params.cProdNo === '040011'|| params.cProdNo === '040008'){
-     setFormItem("Tgt.nHostPower", { rules: [getRules("required", {'trigger':'blur'})]});
+  //040008  040011  呼号必填
+  if (params.cProdNo === '040011' || params.cProdNo === '040008') {
+    setFormItem("Tgt.cCallSign", { rules: [getRules("required", { 'trigger': 'blur' })] });
   }
+  
+  // 主机功率(单位:千瓦(KW)) 非必填
+  const nHostPowers = ['110004', '110003', '040011', '040008'];
+  const iscHostRequired = nHostPowers.includes(params.cProdNo);
+  setFormItem("Tgt.nHostPower", {
+    rules: iscHostRequired? []: [getRules("required", { trigger: 'blur' })] 
+  });
+
+  //  运输工具名称
+  const cTransportationNames = ['020003', '020011', '020013', '020019', '020021'];
+  const isNonRequired = cTransportationNames.includes(params.cProdNo);
+
+  setFormItem("Tgt.cTransportationName", {
+    rules: isNonRequired? []: [getRules("required", { trigger: 'blur' })]
+  });
 
   // 车牌号校验
   setFormItem("Tgt.cTransportLicenseNumber", {
-        rules: [getRules("vehiclePlate", {})],
+    rules: [getRules("vehiclePlate", {})],
   });
   // 约定保期内服务次数正整数
   setFormItem("Tgt.nAgreeFrequency", {
     rules: [getRules("signlessInt", {})],
   });
   setFormItem("Tgt.nCarsNumber", {
-    rules: [getRules("required", {'trigger':'blur'}),getRules("positiveNumber", {})],
+    rules: [getRules("required", { 'trigger': 'blur' }), getRules("positiveNumber", {})],
   });
 
   setFormItem("Tgt.cContactNumber", {
@@ -157,58 +167,58 @@ const wagesInfoModel = () => {
   });
 }
 //水运规则
-const tgtWaterMatterList:Array<string> = ["Tgt.cShipName","Tgt.cTransportVoyage","Tgt.cTransportationName","Tgt.tConstructionYear","Tgt.nTransportationTotalTonnage","Tgt.cShipRegistration","Tgt.nTransportationShipAge","Tgt.cShipType","Tgt.cShipClassOne","Tgt.cShipClassTwo","Tgt.cShipClassThree","Tgt.cOldshipSurcharge"]
+const tgtWaterMatterList: Array<string> = ["Tgt.cShipName", "Tgt.cTransportVoyage", "Tgt.cTransportationName", "Tgt.tConstructionYear", "Tgt.nTransportationTotalTonnage", "Tgt.cShipRegistration", "Tgt.nTransportationShipAge", "Tgt.cShipType", "Tgt.cShipClassOne", "Tgt.cShipClassTwo", "Tgt.cShipClassThree", "Tgt.cOldshipSurcharge"]
 //水运外其他规则
-const tgtOtherMatterList:Array<string> = ["Tgt.cLicenseNumber","Tgt.cFrameNumber","Tgt.cTransitMode"]
+const tgtOtherMatterList: Array<string> = ["Tgt.cLicenseNumber", "Tgt.cFrameNumber", "Tgt.cTransitMode"]
 //非水运隐藏
-const tgtIsWaterMatterList:Array<string> = ["Tgt.cTowing","Tgt.cWholeShip","Tgt.cShipName","Tgt.cTransportVoyage","Tgt.nTotalTonnage","Tgt.nShipAge","Tgt.cTransportationName","Tgt.tConstructionYear","Tgt.nTransportationTotalTonnage","Tgt.cShipRegistration","Tgt.nTransportationShipAge","Tgt.cShipType","Tgt.cShipClassOne","Tgt.cShipClassTwo","Tgt.cShipClassThree","Tgt.cOldshipSurcharge"]
-const setIsRule = ()=>{
-  if(getValue("Tgt.cTowing") === '1'){
-        codeListStore
-          .queryCodeList(
-            {
-              codeListName: "Ship_Type",
-              codeListParam: {
-                remark: "1"
-              },
-            },
-          )
-          .then((res) => {
-            console.log(123123,res)
-            tgtEditRef.value?.addCodeListMap({
-              code: "Tgt.cShipType",
-              list: [
+const tgtIsWaterMatterList: Array<string> = ["Tgt.cTowing", "Tgt.cWholeShip", "Tgt.cShipName", "Tgt.cTransportVoyage", "Tgt.nTotalTonnage", "Tgt.nShipAge", "Tgt.cTransportationName", "Tgt.tConstructionYear", "Tgt.nTransportationTotalTonnage", "Tgt.cShipRegistration", "Tgt.nTransportationShipAge", "Tgt.cShipType", "Tgt.cShipClassOne", "Tgt.cShipClassTwo", "Tgt.cShipClassThree", "Tgt.cOldshipSurcharge"]
+const setIsRule = () => {
+  if (getValue("Tgt.cTowing") === '1') {
+    codeListStore
+      .queryCodeList(
+        {
+          codeListName: "Ship_Type",
+          codeListParam: {
+            remark: "1"
+          },
+        },
+      )
+      .then((res) => {
+        console.log(123123, res)
+        tgtEditRef.value?.addCodeListMap({
+          code: "Tgt.cShipType",
+          list: [
 
-                {label: '半潜驳', value: '7', codeKind: 'codeKind'},
-                {label: '拖船', value: '8', codeKind: 'codeKind'}
-                ]
-            })
-          });
-  }else {
-            codeListStore
-          .queryCodeList(
-            {
-              codeListName: "Ship_Type",
-              codeListParam: { }, 
-            },
-          )
-          .then((res) => {
-            
-            tgtEditRef.value?.addCodeListMap({
-              code: "Tgt.cShipType",
-              list:res
-            })
-          });
-        
+            { label: '半潜驳', value: '7', codeKind: 'codeKind' },
+            { label: '拖船', value: '8', codeKind: 'codeKind' }
+          ]
+        })
+      });
+  } else {
+    codeListStore
+      .queryCodeList(
+        {
+          codeListName: "Ship_Type",
+          codeListParam: {},
+        },
+      )
+      .then((res) => {
+
+        tgtEditRef.value?.addCodeListMap({
+          code: "Tgt.cShipType",
+          list: res
+        })
+      });
+
   }
-  if(getValue("Tgt.cTowing") === '1' || getValue("Tgt.cWholeShip") === '1'){
-    tgtWaterMatterList.forEach(item =>{
+  if (getValue("Tgt.cTowing") === '1' || getValue("Tgt.cWholeShip") === '1') {
+    tgtWaterMatterList.forEach(item => {
       setFormItem(item, {
         rules: [getRules("required", {})],
       });
     })
-  }else if(getValue("Tgt.cTowing") === '0' || getValue("Tgt.cWholeShip") === '0'){
-    tgtWaterMatterList.forEach(item =>{
+  } else if (getValue("Tgt.cTowing") === '0' || getValue("Tgt.cWholeShip") === '0') {
+    tgtWaterMatterList.forEach(item => {
       setFormItem(item, {
         rules: null,
       });
@@ -216,10 +226,10 @@ const setIsRule = ()=>{
   }
 }
 
- const  funcdistadd=  () => {
+const funcdistadd = () => {
 
-  };
-function calculateCarAge(initialDateStr:any) {
+};
+function calculateCarAge(initialDateStr: any) {
   const initialDate = new Date(initialDateStr);
   const currentDate = new Date();
 
@@ -243,7 +253,7 @@ function calculateCarAge(initialDateStr:any) {
   return roundedAge < 0.5 ? 0.5 : roundedAge;
 }
 //计算两个日期年份差
-function calAgeDif(val1:any,val2:any) {
+function calAgeDif(val1: any, val2: any) {
   const date1 = new Date(val1);
   const date2 = new Date(val2);
 
@@ -254,9 +264,9 @@ function calAgeDif(val1:any,val2:any) {
 
   return Math.round(diffInYears)
 }
-const guaranteeMethodList = ['Tgt.cCollateralName','Tgt.cPledgeNumber','Tgt.cPledgeAddress','Tgt.cItemNumber','Tgt.nFaceValue','Tgt.cApplicationLine','Tgt.cBankApply','Tgt.cAcceptor','Tgt.cMaturityWeek','Tgt.cDueWeek','Tgt.tTicketStartingandending','Tgt.cConfirmingBank']
-const cMortgageList =['Tgt.cMortgageName','Tgt.cMortgageNumber','Tgt.cCollateralAddress']
-const setcDetailedAddress = (prop:any,aftProp:any)=> {
+const guaranteeMethodList = ['Tgt.cCollateralName', 'Tgt.cPledgeNumber', 'Tgt.cPledgeAddress', 'Tgt.cItemNumber', 'Tgt.nFaceValue', 'Tgt.cApplicationLine', 'Tgt.cBankApply', 'Tgt.cAcceptor', 'Tgt.cMaturityWeek', 'Tgt.cDueWeek', 'Tgt.tTicketStartingandending', 'Tgt.cConfirmingBank']
+const cMortgageList = ['Tgt.cMortgageName', 'Tgt.cMortgageNumber', 'Tgt.cCollateralAddress']
+const setcDetailedAddress = (prop: any, aftProp: any) => {
   const ads = getValue(prop[0].prop);
   const a = getValue(prop[1].prop) || "";
   if (ads) {
@@ -268,75 +278,75 @@ const setcDetailedAddress = (prop:any,aftProp:any)=> {
       }
     });
   } else {
-     setValue(aftProp.prop, a);
+    setValue(aftProp.prop, a);
   }
 };
 // 绑定方法
 const method = {
-  getcNavigationAreaChange:()=>{
+  getcNavigationAreaChange: () => {
     dialog.value?.open('navigationAreaTips', null,
-        null,{width: 50,title:'航行区域提示'});
+      null, { width: 50, title: '航行区域提示' });
   },
 
-  getcIsExcludingChange:()=>{
+  getcIsExcludingChange: () => {
     dialog.value?.open('reinsuranceTips', null,
-        null,{width: 45,title:'水险再保提示'});
+      null, { width: 45, title: '水险再保提示' });
   },
-  getcSanctionAreasChange:()=>{
+  getcSanctionAreasChange: () => {
     dialog.value?.open('detailsKnows', null,
-        null,{width: 45,title:'战争及罢工险核保限制和运输地国家限制'});
+      null, { width: 45, title: '战争及罢工险核保限制和运输地国家限制' });
   },
-  gettCompletionYearChange:(val:string)=>{
+  gettCompletionYearChange: (val: string) => {
     const currentYear = new Date().getFullYear();
-    setValue('Tgt.nShipAge',currentYear - Number(val))
+    setValue('Tgt.nShipAge', currentYear - Number(val))
   },
-  gettCompletionDateChange:(val:string)=>{
-    const insrnc = opertaor.getTableRefByKey( "insrnc").getFromValue()
-    setValue('Tgt.nServiceLife',calAgeDif(insrnc['Base.tAppTm'],val))
+  gettCompletionDateChange: (val: string) => {
+    const insrnc = opertaor.getTableRefByKey("insrnc").getFromValue()
+    setValue('Tgt.nServiceLife', calAgeDif(insrnc['Base.tAppTm'], val))
   },
-  getcGuaranteeMethodChange:(val:string)=>{
+  getcGuaranteeMethodChange: (val: string) => {
     //担保方式选择"质押贷款"时带出
-    if(val === 'B05Assure004'){
-      guaranteeMethodList.forEach(item=>{
+    if (val === 'B05Assure004') {
+      guaranteeMethodList.forEach(item => {
         setFormItem(item, {
           hidden: false,
         });
       })
-    }else{
-      guaranteeMethodList.forEach(item=>{
+    } else {
+      guaranteeMethodList.forEach(item => {
         setFormItem(item, {
           hidden: true,
         });
       })
     }
     // 担保方式选择"抵押贷款"时带出
-    if(val === 'B05Assure003'){
-      cMortgageList.forEach(item=>{
+    if (val === 'B05Assure003') {
+      cMortgageList.forEach(item => {
         setFormItem(item, {
           hidden: false,
         });
       })
-    }else{
-      cMortgageList.forEach(item=>{
+    } else {
+      cMortgageList.forEach(item => {
         setFormItem(item, {
           hidden: true,
         });
       })
     }
     // 担保方式选择"保证贷款 "时带出
-    if(val === 'B05Assure002'){
+    if (val === 'B05Assure002') {
       setFormItem('Tgt.cTypeName', {
         hidden: false,
       });
-    }else{
+    } else {
       setFormItem('Tgt.cTypeName', {
         hidden: true,
       });
     }
   },
   // 是否单项工程 
-  getcIsSingleChange:(val:string)=>{
-    if(val=== '1'){
+  getcIsSingleChange: (val: string) => {
+    if (val === '1') {
       // 工程总造价 （元）
       setFormItem('Tgt.nTotalCost', {
         rules: [getRules("required", {})],
@@ -351,32 +361,29 @@ const method = {
         rules: [getRules("required", {})],
       });
 
-       if(params.cProdNo==='042001'){
+      if (params.cProdNo === '042001') {
         formconfig1.fromUi.groupBy[1].hidden = false
-          setFormItem('Tgt.cProjectName', {
-             hidden: false,
-           rules: [getRules("required", {})],
-          });
-    
-          setFormItem('Tgt.nTotalCost', {
+        setFormItem('Tgt.cProjectName', {
           hidden: false,
-           rules: [getRules("required", {})],
-          });
-    
-          setFormItem('Tgt.nTotalDesign', {
+          rules: [getRules("required", {})],
+        });
+
+        setFormItem('Tgt.nTotalCost', {
           hidden: false,
-           rules: [getRules("required", {})],
-          });
-          setFormItem('Tgt.ProjectAddress', {
+          rules: [getRules("required", {})],
+        });
+
+        setFormItem('Tgt.nTotalDesign', {
           hidden: false,
-           rules: [getRules("required", {})],
-          });
+          rules: [getRules("required", {})],
+        });
+        setFormItem('Tgt.ProjectAddress', {
+          hidden: false,
+          rules: [getRules("required", {})],
+        });
       }
 
-    }else {
-
-      // Tgt.cProjectName
-
+    } else {
       setFormItem('Tgt.nTotalCost', {
         rules: null
       });
@@ -388,104 +395,99 @@ const method = {
       });
       setFormItem('Tgt.cSuffixAddr', {
         rules: null
-      }); 
+      });
 
-
-      if(params.cProdNo==='042001' && val=== '0'){
+      if (params.cProdNo === '042001' && val === '0') {
         formconfig1.fromUi.groupBy[1].hidden = true
-          setFormItem('Tgt.cProjectName', {
-             hidden: true,
-             rules: null
-          });
-    
-          setFormItem('Tgt.nTotalCost', {
-            hidden: true,
-            rules: null
-          });
-    
-          setFormItem('Tgt.nTotalDesign', {
-            hidden: true,
-            rules: null
-          });
-          setFormItem('Tgt.ProjectAddress', {
-            hidden: true,
-            rules: null
-          });
+        setFormItem('Tgt.cProjectName', {
+          hidden: true,
+          rules: null
+        });
+
+        setFormItem('Tgt.nTotalCost', {
+          hidden: true,
+          rules: null
+        });
+
+        setFormItem('Tgt.nTotalDesign', {
+          hidden: true,
+          rules: null
+        });
+        setFormItem('Tgt.ProjectAddress', {
+          hidden: true,
+          rules: null
+        });
       }
-      
- 
+
     }
-    
+
   },
-  getcTransportationToolsChange:(val:string)=>{
-    if(val=== '02'){
+  getcTransportationToolsChange: (val: string) => {
+    if (val === '02') {
       setFormItem('Tgt.cPlateNumber', {
         rules: [getRules("required", {})],
       });
-    }else {
+    } else {
       setFormItem('Tgt.cPlateNumber', {
         rules: null
       });
     }
   },
-  funccDetailsAccident:()=>{
+  funccDetailsAccident: () => {
     dialog.value?.open('detailsAccident', {
-          selectedData: getValue("Tgt.cFinanceCde"), //需要把自定义的过滤掉，只传过去从模板中选择的
+      selectedData: getValue("Tgt.cFinanceCde"), //需要把自定义的过滤掉，只传过去从模板中选择的
+    },
+      {
+        getSelected(selectdata: any) {
+          setValue("Tgt.cFinanceCde", selectdata.map(item => item.value).join(','))
+          setValue("Tgt.cDetailsAccident", selectdata.map((item, index) => `${index + 1}. ${item.label}`).join('\n'))
         },
-        {
-          getSelected(selectdata: any) {
-            setValue("Tgt.cFinanceCde",selectdata.map(item => item.value).join(','))
-            setValue("Tgt.cDetailsAccident",selectdata.map((item, index) => `${index + 1}. ${item.label}`).join('\n'))
-          },
-        },{width: 45});
+      }, { width: 45 });
   },
-  getcMemberLogoChange:(val:string)=>{
-    if(val=== '1'){
+  getcMemberLogoChange: (val: string) => {
+    if (val === '1') {
       setFormItem('Tgt.cBareboatLessee', {
         rules: [getRules("required", {})],
       });
-
-
-      setFormItem('Tgt.P&I_CLUB', {rules: [getRules("required", {})]})
-      // setFormItem('Tgt.cBareboatLessee', {
-      //   rules: [getRules("required", {})],
-      // });
-    }else {
+      setFormItem('Tgt.P&I_CLUB', { rules: [getRules("required", {})] })
+    } else {
       setFormItem('Tgt.cBareboatLessee', {
         rules: null
       });
-       setFormItem('Tgt.P&I_CLUB', {rules: []})
+      setFormItem('Tgt.P&I_CLUB', { rules: [] })
     }
   },
-  getcRentalLogoChange:(val:string)=>{
-    if(val=== '1'){
+  getcRentalLogoChange: (val: string) => {
+    if (val === '1') {
       setFormItem('Tgt.cBareboatLessee', {
         rules: [getRules("required", {})],
       });
-      // Tgt.cBareboatLessee
       setFormItem('Tgt.nHostPower', {
         rules: [],
       });
-      
-      
-    }else {
+    } else {
       setFormItem('Tgt.cBareboatLessee', {
         rules: null
       });
-       setFormItem('Tgt.nHostPower', {
-        rules: [getRules("required", {})],
-      });
+        const nHostPowers = ['110004', '110003', '040011', '040008'];
+        const iscHostRequired = nHostPowers.includes(params.cProdNo);
+        setFormItem("Tgt.nHostPower", {
+          rules: iscHostRequired? []: [getRules("required", { trigger: 'blur' })] 
+        });
+      // setFormItem('Tgt.nHostPower', {
+      //   rules: [getRules("required", {})],
+      // });
     }
   },
-  getcMortgageMarkChange:(val:string)=>{
-    if(val=== '1'){
+  getcMortgageMarkChange: (val: string) => {
+    if (val === '1') {
       setFormItem('Tgt.cShipMortgagee', {
         rules: [getRules("required", {})],
       });
       setFormItem('Tgt.nMortgageAmount', {
         rules: [getRules("required", {})],
       });
-    }else {
+    } else {
       setFormItem('Tgt.cShipMortgagee', {
         rules: null
       });
@@ -494,44 +496,44 @@ const method = {
       });
     }
   },
-  gettInitialDateChange:(val:string)=>{
-  setValue("Tgt.cVehicleAge",calculateCarAge(val))
+  gettInitialDateChange: (val: string) => {
+    setValue("Tgt.cVehicleAge", calculateCarAge(val))
   },
-  getcShippingMethodChange:(val:string)=>{
-    console.log('val',val)
+  getcShippingMethodChange: (val: string) => {
+    console.log('val', val)
     // if(val === 'NV591001'){
-    if(val === '03'){
-      tgtIsWaterMatterList.forEach(item =>{
+    if (val === '03') {
+      tgtIsWaterMatterList.forEach(item => {
         setFormItem(item, {
           hidden: false,
         });
       })
-      tgtOtherMatterList.forEach(item =>{
+      tgtOtherMatterList.forEach(item => {
         setFormItem(item, {
           hidden: true,
         });
       })
-    }else{
-      tgtIsWaterMatterList.forEach(item =>{
+    } else {
+      tgtIsWaterMatterList.forEach(item => {
         setFormItem(item, {
           hidden: true,
         });
       })
-      tgtOtherMatterList.forEach(item =>{
+      tgtOtherMatterList.forEach(item => {
         setFormItem(item, {
           hidden: false,
         });
       })
     }
     // if(val === 'NV591003'){
-    if(val === '05'){
-      tgtOtherMatterList.forEach(item =>{
+    if (val === '05') {
+      tgtOtherMatterList.forEach(item => {
         setFormItem(item, {
           rules: [getRules("required", {})],
         });
       })
-    }else {
-      tgtOtherMatterList.forEach(item =>{
+    } else {
+      tgtOtherMatterList.forEach(item => {
         setFormItem(item, {
           rules: null,
         });
@@ -539,36 +541,57 @@ const method = {
     }
   },
 
-  getcShippingTypeChange:(val:string)=>{
+  getcShippingTypeChange: (val: string) => {
     console.log(val);
-    if(val === '04'){
+    if (val === '04') {
       setFormItem("Tgt.cRailwayMode", {
         rules: [getRules("required", {})],
       });
-    }else{
+    } else {
       setFormItem("Tgt.cRailwayMode", {
         rules: [],
       });
     }
   },
-  getcTransportChange:(val:string)=>{
-    if(val === '1'){
+  getcTransportChange: (val: string) => {
+    const requiredRule = [getRules("required", {})];
+    setFormItem("Tgt.cTransportTools", {
+      rules: val === '1' ? requiredRule : [],
+    });
+    setFormItem("Tgt.cTransportLicenseNumber", {
+      rules: val === '1' ? requiredRule : [],
+    });
+    setFormItem("Tgt.cTransportBrandModelVehicle", {
+      rules: val === '1' ? requiredRule : [],
+    });
+    setFormItem("Tgt.cTransportEngineNumber", {
+      rules: val === '1' ? requiredRule : [],
+    });
+    setFormItem("Tgt.cTransportFrameNumber", {
+      rules: val === '1' ? requiredRule : [],
+    });
+   
+
+
+    if (val === '1') {
       setFormItem("Tgt.cTransportTools", {
-        disabled:false
+        disabled: false
       });
-    }else {
+
+
+    } else {
       // Tgt.cTransportTools
       setValue("Tgt.cTransportTools", '')
       setFormItem("Tgt.cTransportTools", {
-         disabled:true
+        disabled: true
       });
     }
- },
-  getcTowingChange:(val:string)=>{
-        setIsRule()
- },
-  getcWholeShipChange:(val:string)=>{
-     setIsRule()
+  },
+  getcTowingChange: (val: string) => {
+    setIsRule()
+  },
+  getcWholeShipChange: (val: string) => {
+    setIsRule()
   },
   func1: () => {
   },
@@ -579,7 +602,7 @@ const method = {
   },
   //投保司乘人员座位总数改变事件
   changenInsuredcompanySeats: () => {
-     console.log('触发12')
+    console.log('触发12')
     setValue("Tgt.nSeatCapacity", Number(getValue("Tgt.nTotalInsured")) + Number(getValue("Tgt.nInsuredcompanySeats")))
   },
   //是否单项工程change事件
@@ -627,13 +650,13 @@ const method = {
       cvrgref.showFlush();
     }
   },
-  cDeterminingChange: (val:any) => {
+  cDeterminingChange: (val: any) => {
     const cvrgref = opertaor.getTableRefByKey("cvrg");
     if (cvrgref.showFlush) {
       cvrgref.showFlush();
     }
     // 直接限额制 投保雇员年工资总额非必填
-    if(val === "0") {
+    if (val === "0") {
       setFormItem("Tgt.nTotalSalary", {
         rules: [],
       });
@@ -643,7 +666,7 @@ const method = {
       });
     }
   },
-  industryTypeChange:(val:any)=>{
+  industryTypeChange: (val: any) => {
     groupCheck();
   },
   wagesInfoBtn: () => {
@@ -651,7 +674,7 @@ const method = {
     let cRegisteredLogo = opertaor.getDataAll()['tgt']['Tgt.cRegisteredLogo'];  // 记名投保标志 是 获取清单汇总   否可以自己修改添加
     // let cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];   //申请单号
     let cAppNo = "";
-    if(route.params.param?.pageName === "priceInquiry") {
+    if (route.params.param?.pageName === "priceInquiry") {
       cAppNo = opertaor.getDataAll()['plyBase']['Base.cInquiryNo']
     } else if (opertaor.getDataAll()['applicant'] && opertaor.getDataAll()['applicant']['Applicant.cAppNo']) {
       cAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo']
@@ -674,12 +697,12 @@ const method = {
       const param = {
         cComponentTable: "EmployeeDist",
       }
-      if(route.params.param?.pageName === "priceInquiry") {
+      if (route.params.param?.pageName === "priceInquiry") {
         param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
       } else {
         param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
       }
-      if(route.params.param?.pageType && route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
+      if (route.params.param?.pageType && route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
         param['voType'] = "ply"
       }
       selectDist(param).then((res: any) => {
@@ -689,7 +712,7 @@ const method = {
             wagesInfoModel();
 
           } else {
-            ElMessage.error('雇员清单不能为空！'); 
+            ElMessage.error('雇员清单不能为空！');
           }
         }
 
@@ -697,27 +720,22 @@ const method = {
     } else {
       // wagesInfoModel();
       funcdistadd();
-
-        // const alldata: any = opertaor.getDataAll();
-    // let baseFlag = alldata['plyBase']["Base.cAppNo"];
-
- 
-    const param = {};
-    if(route.params.param?.pageName === "priceInquiry") {
-      param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
-    } else {
-      param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
-    }
-    checkAppBase(param).then((res: any) => {
-      if (res.code === 200) {
-        wagesInfoModel();
+      const param = {};
+      if (route.params.param?.pageName === "priceInquiry") {
+        param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
       } else {
-        ElMessage.error("请先保存申请单!");
+        param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
       }
-    });
+      checkAppBase(param).then((res: any) => {
+        if (res.code === 200) {
+          wagesInfoModel();
+        } else {
+          ElMessage.error("请先保存申请单!");
+        }
+      });
     }
   },
- // 工程造价
+  // 工程造价
   nEngineeringCostChange: (val) => {
     if (val) {
       setFormItem('Tgt.nLaborPrice', {
@@ -816,33 +834,33 @@ const method = {
     setValue("Tgt.nContractDuration", tm);
   },
 
-  ShipClassOneChange:(val: any)=>{
+  ShipClassOneChange: (val: any) => {
     clearValidate('Tgt.cShipClassThree');
     const param = opertaor.getParam();
-    if(!param.initFlag){
-      if(val=='01'){
+    if (!param.initFlag) {
+      if (val == '01') {
         setValue("Tgt.cShipClassTwo", null);
         setValue("Tgt.cShipClassThree", null);
       }
     }
-    if(val=='01'){ //rules: [getRules("required", {})]
-       setFormItem('Tgt.cShipClassTwo', {disabled:true,rules: null});
-       setFormItem('Tgt.cShipClassThree',{disabled:false,rules: [getRules("required", {})]})
-       
-    }else{
-      setFormItem('Tgt.cShipClassTwo', {disabled:false,rules: [getRules("required", {})]});
-    
-    } 
-    if(val=='02' || val=='03'){
-      setFormItem('Tgt.cShipClassThree',{disabled:true,rules: null})
+    if (val == '01') { //rules: [getRules("required", {})]
+      setFormItem('Tgt.cShipClassTwo', { disabled: true, rules: null });
+      setFormItem('Tgt.cShipClassThree', { disabled: false, rules: [getRules("required", {})] })
+
+    } else {
+      setFormItem('Tgt.cShipClassTwo', { disabled: false, rules: [getRules("required", {})] });
+
+    }
+    if (val == '02' || val == '03') {
+      setFormItem('Tgt.cShipClassThree', { disabled: true, rules: null })
       let cShipClassTwo = getValue('Tgt.cShipClassTwo');
-        setValue("Tgt.cShipClassThree", null);
-        codeListStore
+      setValue("Tgt.cShipClassThree", null);
+      codeListStore
         .queryCodeList(
           {
             codeListName: "Ship_Class_Level2",
             codeListParam: {
-             classone: val=='02'?'level1' : 'level2'
+              classone: val == '02' ? 'level1' : 'level2'
             },
           },
         )
@@ -851,30 +869,30 @@ const method = {
             code: "Tgt.cShipClassTwo",
             list: res
           })
-          if(res.length>0){
+          if (res.length > 0) {
             let delData = true;
-            res.forEach((item:any)=>{
-              if(item['value'] == cShipClassTwo){
-                  delData = false;
+            res.forEach((item: any) => {
+              if (item['value'] == cShipClassTwo) {
+                delData = false;
               }
             })
-            
+
             // 判断是否有可以清空的数据
-            if(delData){
-              setValue('Tgt.cShipClassTwo',null)
+            if (delData) {
+              setValue('Tgt.cShipClassTwo', null)
             }
           }
         });
     }
   },
-  cShipClassTwoChange:(val:any)=>{
-     clearValidate('Tgt.cShipClassThree');
-    if(val==='15'){
-        setFormItem('Tgt.cShipClassThree',{disabled:false,rules: [getRules("required", {})]})
-        
-    }else if(val){
-       setFormItem('Tgt.cShipClassThree',{disabled:true,rules:null})
-        setValue("Tgt.cShipClassThree", null);
+  cShipClassTwoChange: (val: any) => {
+    clearValidate('Tgt.cShipClassThree');
+    if (val === '15') {
+      setFormItem('Tgt.cShipClassThree', { disabled: false, rules: [getRules("required", {})] })
+
+    } else if (val) {
+      setFormItem('Tgt.cShipClassThree', { disabled: true, rules: null })
+      setValue("Tgt.cShipClassThree", null);
     }
   },
   // 核定座位总数
@@ -891,9 +909,9 @@ const method = {
 
       if (res.type === "ok") {
         // setFormItem('Tgt.nTotalSalary',
-        setValue("Tgt.cDeparturePortCountry",res.body.countryCn)
-        setValue("Tgt.cDeparturePortProvince",res.body.portCn)
-        setValue("Tgt.cDeparturePort",res.body.countryCn +'/'+  res.body.portCn)
+        setValue("Tgt.cDeparturePortCountry", res.body.countryCn)
+        setValue("Tgt.cDeparturePortProvince", res.body.portCn)
+        setValue("Tgt.cDeparturePort", res.body.countryCn + '/' + res.body.portCn)
       }
     });
   },
@@ -904,7 +922,7 @@ const method = {
       if (res.type === "ok") {
         setValue("Tgt.cTransitCountry", res.body.countryCn);
         setValue("Tgt.cTransitProvince", res.body.portCn);
-        setValue("Tgt.cTransitDetail", res.body.countryCn +'/'+ res.body.portCn);
+        setValue("Tgt.cTransitDetail", res.body.countryCn + '/' + res.body.portCn);
       };
     });
   },
@@ -915,7 +933,7 @@ const method = {
       if (res.type === "ok") {
         setValue("Tgt.cDestinationPortCountry", res.body.countryCn);
         setValue("Tgt.cDestinationPortProvince", res.body.portCn);
-        setValue("Tgt.cDestinationPort", res.body.countryCn +'/'+ res.body.portCn);
+        setValue("Tgt.cDestinationPort", res.body.countryCn + '/' + res.body.portCn);
       };
     });
 
@@ -927,7 +945,7 @@ const method = {
       if (res.type === "ok") {
         setValue("Tgt.cDestinationCountry", res.body.countryCn);
         setValue("Tgt.cDestinationProvince", res.body.portCn);
-        setValue("Tgt.cDestinationDetail", res.body.countryCn +'/'+ res.body.portCn);
+        setValue("Tgt.cDestinationDetail", res.body.countryCn + '/' + res.body.portCn);
       };
     });
   },
@@ -938,31 +956,31 @@ const method = {
       if (res.type === "ok") {
         setValue("Tgt.cDispatchCountry", res.body.countryCn);
         setValue("Tgt.cDispatchProvince", res.body.portCn);
-        setValue("Tgt.cDispatchDetail", res.body.countryCn +'/'+ res.body.portCn);
+        setValue("Tgt.cDispatchDetail", res.body.countryCn + '/' + res.body.portCn);
       };
     });
   },
   // 起运机场国家
-  cDepartureAirportCountryFunc:()=>{
-        dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
+  cDepartureAirportCountryFunc: () => {
+    dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
 
       if (res.type === "ok") {
         setValue("Tgt.cDepartureAirportCountry", res.body.countryCn);
         setValue("Tgt.cDepartureAirportProvince", res.body.portCn);
-        setValue("Tgt.cDepartureAirport", res.body.countryCn +'/'+ res.body.portCn);
+        setValue("Tgt.cDepartureAirport", res.body.countryCn + '/' + res.body.portCn);
       };
     });
 
   },
 
   // 目的地机场国家
-  cDestinationAirportCountryFunc:()=>{
-        dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
+  cDestinationAirportCountryFunc: () => {
+    dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
 
       if (res.type === "ok") {
         setValue("Tgt.cDestinationAirportCountry", res.body.countryCn);
         setValue("Tgt.cDestinationAirportProvince", res.body.portCn);
-        setValue("Tgt.cDestinationAirport", res.body.countryCn +'/'+ res.body.portCn);
+        setValue("Tgt.cDestinationAirport", res.body.countryCn + '/' + res.body.portCn);
       };
     });
 
@@ -973,127 +991,127 @@ const method = {
     dzmodal.open(surveyInfo, { type: "departure", data: {} }).then((res: any) => {
       if (res.type === "ok") {
 
-        setValue("Tgt.cCheckerCde",res.body.cSryDoc);   // 代理人
-        setValue("Tgt.cAddr",res.body.cAddr);   // 大洲
+        setValue("Tgt.cCheckerCde", res.body.cSryDoc);   // 代理人
+        setValue("Tgt.cAddr", res.body.cAddr);   // 大洲
         // setValue("Tgt.cCountry",res.body.id);  // ?国家
-        setValue("Tgt.cAraCde",res.body.cAraCde); // ?国家
+        setValue("Tgt.cAraCde", res.body.cAraCde); // ?国家
         setValue("Tgt.cCtyCnm", res.body.cCtyCnm);  // 城市
-        setValue("Tgt.cCode",  res.body.cSrvyCde);  // 城市
+        setValue("Tgt.cCode", res.body.cSrvyCde);  // 城市
       };
     });
   },
   // 建造完成年份
-  tCompletionYearChange:(val:any)=>{
-    if(val){
-        const currentYear = new Date().getFullYear();
-        const targetYear = new Date(val).getFullYear();
-        setValue('Tgt.nShipAge',currentYear - targetYear)
+  tCompletionYearChange: (val: any) => {
+    if (val) {
+      const currentYear = new Date().getFullYear();
+      const targetYear = new Date(val).getFullYear();
+      setValue('Tgt.nShipAge', currentYear - targetYear)
     }
   },
-    // 标的信息--证件类型
-  cCertificateTypeChange:(val:any)=>{
-      // 道路运输
-      if(val==='1'){
-// setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}),getRules("idCard", {})]})  //证件号
-        setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}),getRules("roadTransportLicense", {})]})  //证件号
-        
-      }else if(val==='2'){
-        //  网络预约出租汽车经营许可证
-        setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}),getRules("onlineTaxiLicense", {})]})  //证件号
+  // 标的信息--证件类型
+  cCertificateTypeChange: (val: any) => {
+    // 道路运输
+    if (val === '1') {
+      // setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}),getRules("idCard", {})]})  //证件号
+      setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("roadTransportLicense", {})] })  //证件号
 
-      }else if(val==='3'){
-          //  网络预约出租汽车运输证 
-           setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}),getRules("onlineTaxiTransportLicense", {})]})  //证件号
-    
-      }
-      
-      
+    } else if (val === '2') {
+      //  网络预约出租汽车经营许可证
+      setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("onlineTaxiLicense", {})] })  //证件号
+
+    } else if (val === '3') {
+      //  网络预约出租汽车运输证 
+      setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("onlineTaxiTransportLicense", {})] })  //证件号
+
+    }
+
+
   },
-    // 证件有效起期
-  tStartDateDisable:(date:any)=>{
-    const fs = tgtEditRef?.value?.getFromValue(); 
+  // 证件有效起期
+  tStartDateDisable: (date: any) => {
+    const fs = tgtEditRef?.value?.getFromValue();
     if (fs && JSON.stringify(fs) !== '{}') {
       const endDate = new Date(fs["Tgt.tEndDate"] || '')   // 结束时间 
       let minDate = dayjs(endDate).valueOf();
-      return   date.getTime() > minDate
-    }else{
-        return true;
+      return date.getTime() > minDate
+    } else {
+      return true;
     }
   },
   // 证件有效止期
-  tEndDateDisable:(date:any)=>{
+  tEndDateDisable: (date: any) => {
     const fs = tgtEditRef?.value?.getFromValue();
-    if (  fs && JSON.stringify(fs) !== '{}') {
+    if (fs && JSON.stringify(fs) !== '{}') {
       const startDate = new Date(fs["Tgt.tStartDate"] || '')   // 开始时间   
       let maxDate = dayjs(startDate).valueOf();
-        return   date.getTime() < maxDate
-    }else{
-        return true;
+      return date.getTime() < maxDate
+    } else {
+      return true;
     }
   },
 
-// 是否记名投保
-cIsinsuranceRegisteredChange:(val:any)=>{
-    if(val=='0'){
-        setFormItem('Tgt.cPracticeType',{
-          rules:[getRules("required", {})]
-        })
-    }else{
-        setFormItem('Tgt.cPracticeType',{
-          rules:[]
-        })
+  // 是否记名投保
+  cIsinsuranceRegisteredChange: (val: any) => {
+    if (val == '0') {
+      setFormItem('Tgt.cPracticeType', {
+        rules: [getRules("required", {})]
+      })
+    } else {
+      setFormItem('Tgt.cPracticeType', {
+        rules: []
+      })
     }
-},
-// 投保行业
-getcInsuranceIndustryChange:(val:any)=>{
-    if(val ==='8'){
-       setFormItem('Tgt.cIndustryRemarks',{
-          rules:[getRules("required", {})]
-       })
-    }else{
-        setFormItem('Tgt.cIndustryRemarks',{
-          rules:[]
-       })
+  },
+  // 投保行业
+  getcInsuranceIndustryChange: (val: any) => {
+    if (val === '8') {
+      setFormItem('Tgt.cIndustryRemarks', {
+        rules: [getRules("required", {})]
+      })
+    } else {
+      setFormItem('Tgt.cIndustryRemarks', {
+        rules: []
+      })
     }
-},
-// 工程地址级联change
-getPropChange:(val:any) => {
-  setregistAdd()
-},
-// 工程地址输入框change
-getcSuffixAddrChange:(val:any) => {
-  setregistAdd()
-},
+  },
+  // 工程地址级联change
+  getPropChange: (val: any) => {
+    setregistAdd()
+  },
+  // 工程地址输入框change
+  getcSuffixAddrChange: (val: any) => {
+    setregistAdd()
+  },
 
 
-getAddressstr:(val:any, row: any, pitem: any) => {
-  let getv1 = '';  //集联地址
-  let getv2 = '';  //字符串地址
-  let setv = '';  //需要设置的目标地址
+  getAddressstr: (val: any, row: any, pitem: any) => {
+    let getv1 = '';  //集联地址
+    let getv2 = '';  //字符串地址
+    let setv = '';  //需要设置的目标地址
 
-  let r = false;
-  formconfig1.fromSchema?.forEach((item: any) => { 
-    if(r){
-      setv = item;
-      r = false;
-    }
-    if(item.inputtype === 'rtinputgroup'){
-      for(let i = 0 ; i<item.groupList.length ; i++ ){
-        if(pitem.prop === item.groupList[i].prop){
-          r = true;
+    let r = false;
+    formconfig1.fromSchema?.forEach((item: any) => {
+      if (r) {
+        setv = item;
+        r = false;
+      }
+      if (item.inputtype === 'rtinputgroup') {
+        for (let i = 0; i < item.groupList.length; i++) {
+          if (pitem.prop === item.groupList[i].prop) {
+            r = true;
+          }
+        }
+        if (r) {
+          getv1 = item.groupList.filter((it: any) => it.inputtype === 'rtcascader');
+          getv2 = item.groupList.filter((it: any) => it.inputtype === 'rtinput');
         }
       }
-      if(r){
-        getv1 = item.groupList.filter((it: any)=> it.inputtype === 'rtcascader');
-        getv2 = item.groupList.filter((it: any)=> it.inputtype === 'rtinput');
-      }
-    }
-  })
-  setAddressBykey(getv1,getv2,setv);
-},
-// 工程起期
-tProjectStartChange:(v:any)=>{
-  console.log(1112,v)
+    })
+    setAddressBykey(getv1, getv2, setv);
+  },
+  // 工程起期
+  tProjectStartChange: (v: any) => {
+    console.log(1112, v)
     const start = getValue("Tgt.tProjectStart");
     const end = getValue("Tgt.tProjectEnd");
     if (!end || !v) {
@@ -1109,11 +1127,11 @@ tProjectStartChange:(v:any)=>{
       return;
     }
     setFormValue({
-      "Tgt.nContractDuration":   moment(end).add(1,'second').diff(moment(start), "days"),
+      "Tgt.nContractDuration": moment(end).add(1, 'second').diff(moment(start), "days"),
     });
-},
-// 工程止期
-tProjectEndChange:(v:any)=>{
+  },
+  // 工程止期
+  tProjectEndChange: (v: any) => {
     const start = getValue("Tgt.tProjectStart");
     if (!start || !v) {
       return;
@@ -1128,45 +1146,53 @@ tProjectEndChange:(v:any)=>{
     }
     const formattedDate = moment(v).format('YYYY-MM-DD') + ' 23:59:59';
     setFormValue({
-      "Tgt.nContractDuration": moment(formattedDate).add(1,'second').diff(moment(start), "days"),
+      "Tgt.nContractDuration": moment(formattedDate).add(1, 'second').diff(moment(start), "days"),
       "Tgt.tProjectEnd": formattedDate, // 更新日期字段
     });
-},
+  },
 
-// // 工程起期禁用
-// tProjectStartDis:(val:any)=>{
-// //  console.log('工程1',val)
-// },
+  // // 工程起期禁用
+  // tProjectStartDis:(val:any)=>{
+  // //  console.log('工程1',val)
+  // },
 
-// 工程止期禁用
-tProjectEndDis:(date:any)=>{
+  // 工程止期禁用
+  tProjectEndDis: (date: any) => {
     const fs = tgtEditRef?.value?.getFromValue();
     if (fs) {
       const startDate = new Date(fs["Tgt.tProjectStart"])   // 开始时间   1
-      return  date.getTime() < startDate.getTime() 
-    }else{
-        return true;
+      return date.getTime() < startDate.getTime()
+    } else {
+      return true;
     }
-},
+  },
+  // 是否铁路联运
+  cRailwayIntermodalChange: (val: any) => {
+    console.log('是否联运', val)
+    if (val === '1') {
+      setValue('Tgt.cRailwayMode', '2')
+    }
+
+  }
 
 };
 
-function setAddressBykey(getv1: any, getv2: any , setv: any) {
-   const a = tgtEditRef?.value?.getValue(getv1[0].prop);
-   const b = tgtEditRef?.value?.getValue(getv2[0].prop);
+function setAddressBykey(getv1: any, getv2: any, setv: any) {
+  const a = tgtEditRef?.value?.getValue(getv1[0].prop);
+  const b = tgtEditRef?.value?.getValue(getv2[0].prop);
 
-   const setS = setv.prop;
-   if (a) {
+  const setS = setv.prop;
+  if (a) {
     getAddressStr({ address: a }).then((res: any) => {
       const { code, data, msg } = res;
       if (code === 200) {
-        const c = (data ? data["addStr"] : "") + (b ? b: "");
+        const c = (data ? data["addStr"] : "") + (b ? b : "");
         setValue(setS, c);
       }
     });
-   }else{
+  } else {
     setValue(setS, b);
-   }
+  }
 };
 
 function setregistAdd() {
@@ -1198,31 +1224,31 @@ function singChange(obj) {
 
 function groupCheck() {
   if (params.cProdNo === '043009' || params.cProdNo === '045001'
-      ||params.cProdNo === '049035' || params.cProdNo === '049036'
-      ||params.cProdNo === '049037' || params.cProdNo === '049040'
-      ||params.cProdNo === '049041' 
-    ){
+    || params.cProdNo === '049035' || params.cProdNo === '049036'
+    || params.cProdNo === '049037' || params.cProdNo === '049040'
+    || params.cProdNo === '049041'
+  ) {
     const cInsuranceMethod = getValue("Tgt.cInsuranceMethod");
     const cIndustryType = getValue("Tgt.cIndustryType");
     const plyBase = opertaor.getTableRefByKey('plyBase');
     let subSidiary = null;
-    if(plyBase){
+    if (plyBase) {
       subSidiary = plyBase.getValue('Base.cDptCde');
-      subSidiary = subSidiary?.substring(0,6);
+      subSidiary = subSidiary?.substring(0, 6);
     }
 
     let h = true;
-    if(cIndustryType === '15' && (subSidiary === '024101' || subSidiary === '026201' || subSidiary === '024201'
-      || subSidiary === '023702' || subSidiary === '026401' )){
+    if (cIndustryType === '15' && (subSidiary === '024101' || subSidiary === '026201' || subSidiary === '024201'
+      || subSidiary === '023702' || subSidiary === '026401')) {
       h = false;
-    }else{
-      if(cInsuranceMethod !== '613001'){
+    } else {
+      if (cInsuranceMethod !== '613001') {
         h = false;
       }
     }
 
     formconfig1.fromUi.groupBy.forEach(item => {
-      if(item.id == 'group2'){
+      if (item.id == 'group2') {
         item.hidden = h;
       }
     });
@@ -1250,7 +1276,7 @@ function setValue(key: string, value: any) {
 function getValue(key: string) {
   return tgtEditRef?.value?.getValue(key);
 }
-function clearValidate(key=null) {
+function clearValidate(key = null) {
   tgtEditRef?.value?.clearValidate(key);
 }
 
@@ -1271,16 +1297,16 @@ function setFormItem(key: any, obj: any) {
     });
   }
 }
-const terms1 = ['00425000277','00425000278','00425000279','00425000282','00425000283'];
-const terms2 = ['00425000281','00425000280'];
-function change403009(v){
-  if(terms1.includes(v)){
+const terms1 = ['00425000277', '00425000278', '00425000279', '00425000282', '00425000283'];
+const terms2 = ['00425000281', '00425000280'];
+function change403009(v) {
+  if (terms1.includes(v)) {
     setValue("Tgt.cInsuranceMethod", "613001");
-    setFormItem("Tgt.cInsuranceMethod",{disabled:true});
+    setFormItem("Tgt.cInsuranceMethod", { disabled: true });
   }
-  if(terms2.includes(v)){
+  if (terms2.includes(v)) {
     setValue("Tgt.cInsuranceMethod", "613001");
-    setFormItem("Tgt.cInsuranceMethod",{disabled:true});
+    setFormItem("Tgt.cInsuranceMethod", { disabled: true });
   }
 }
 

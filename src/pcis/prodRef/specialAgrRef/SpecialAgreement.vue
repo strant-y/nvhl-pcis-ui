@@ -138,6 +138,10 @@ const tableconfig = reactive<AppTableConfig>(
         type: "danger",
         size: "default",
         icon: "Delete",
+         hideBtns: (row) => {
+          // if (!row.cSpecialContent.includes("*")) return true;
+           return row.cIfMust === '1';
+        },
         tableClick: (row) => {
            ElMessageBox.confirm(
             "是否确认删除数据？",
