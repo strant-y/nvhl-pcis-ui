@@ -9,12 +9,12 @@
       @page-change="handleQuery(false)"
     >
 	  <!-- policyInfo 列的具名插槽 -->
-      <template #column-cInquiryNo="{ row, column, index }">
+       <template #column-cInquiryNo="{ row, column, index }">
         <div class="policy-info-cell">
           <div v-if="row.cInquiryNo" class="policy-number-row">
-            <span>{{ row.cInquiryNo }}</span>
+            <span v-html="row.cInquiryNo"></span>
             <el-icon class="copy-icon" @click="copyText(row.cInquiryNo)">
-              <CopyDocument />
+              <DocumentCopy />
             </el-icon>
           </div>
         </div>
@@ -328,7 +328,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               inputtype: "rtinput",
               title: "查询条件",
               placeholder:
-                  "询价单号 保单号 产品名称",
+                  "询价单号 产品名称 条款名称 投/被保人名称 投/被保人证件号码",
               btnWidth: 10,
               itemWidth: 2,
               showExBtn: true,
@@ -394,12 +394,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               ],
               defaultValue: 1,
           },
-          {
-              prop: "cSecondDptCde",
-              inputtype: "rtselect",
-              title: "二级分公司",
-              clearable: true,
-          },
+        //   {
+        //       prop: "cSecondDptCde",
+        //       inputtype: "rtselect",
+        //       title: "二级分公司",
+        //       clearable: true,
+        //   },
         //   {
         //       prop: "cDataTyp",
         //       inputtype: "rtselect",
@@ -441,6 +441,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               },
               func: (val) => {
                   setValue("cProdNo","")
+                  cTermNo = "";      // 重置条款编码
                   cPard.value = val;
                   formconfig1.fromSchema?.forEach((item) => {
                       if (
@@ -499,8 +500,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                                     cTermNo =extractCode(ele['label'])
                                 }
                             });
-                        }
-                       
+                        } 
+                } else {
+                  cTermNo = "";
                 }
                 console.log('条款编码',cTermNo)
                 formconfig1.fromSchema?.forEach((item) => {
@@ -1003,6 +1005,7 @@ const esSearchColumns = [
     title: "询价单号",
     minWidth: 180,
     fixed: "left",
+    slotName: "cInquiryNo"
    },
    {
     prop: "cAppNo",
@@ -1153,7 +1156,7 @@ const normalQueryColumns = [
         minWidth: 180,
     },
     {
-        prop: "cTermNo",
+        prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款",
         minWidth: 180,

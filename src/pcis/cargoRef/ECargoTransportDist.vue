@@ -162,7 +162,7 @@ const transportRefresh = (val:any)=>{
 const loadDatOne = (val:any)=>{
   if(!val) return
   const r = distTableRef.value?.getPartnerPage(true); //获取分页数据
-  let param = Object.assign({cComponentTable:'ECargoGoodsTgt',cEcAgrAppNo:val || ''}, r);
+  let param = Object.assign({cComponentTable:'ECargoTransportDist',cEcAgrAppNo:val || ''}, r);
   cargoApi.selectDistNew(param).then((res: any) => {
     if(res.code === 200) {
       pageresult.list = res.data.data

@@ -12,13 +12,13 @@
       <template #column-policyInfo="{ row, column, index }">
         <div class="policy-info-cell">
           <div v-if="row.cAppNo" class="policy-number-row">
-            <span>{{ row.cAppNo }}</span>
+            <span v-html="row.cAppNo"></span>
             <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
               <DocumentCopy />
             </el-icon>
           </div>
           <div v-if="row.cPlyNo" class="policy-number-row">
-            <span>{{ row.cPlyNo }}</span>
+            <span v-html="row.cPlyNo"></span>
             <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
               <DocumentCopy />
             </el-icon>
@@ -337,7 +337,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               inputtype: "rtinput",
               title: "查询条件",
               placeholder:
-                  "申请单号 保单号 批单号 产品名称 被保人名称 被保人证件号码 手机号码 被保人地址 投保人名称",
+                  "投保/批改申请单号 保单号 批单号 产品名称 条款名称 投/被保人名称 投/被保人证件号码",
               btnWidth: 10,
               itemWidth: 2,
               showExBtn: true,
@@ -403,12 +403,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               ],
               defaultValue: 1,
           },
-          {
-              prop: "cSecondDptCde",
-              inputtype: "rtselect",
-              title: "二级分公司",
-              clearable: true,
-          },
+        //   {
+        //       prop: "cSecondDptCde",
+        //       inputtype: "rtselect",
+        //       title: "二级分公司",
+        //       clearable: true,
+        //   },
           {
               prop: "cDataTyp",
               inputtype: "rtselect",
@@ -451,6 +451,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               func: (val) => {
                   cPard.value = val;
                   setValue("cProdNo","")
+                  cTermNo = "";      // 重置条款编码
                   formconfig1.fromSchema?.forEach((item) => {
                       if (
                           item.prop === "CEmployeeName" ||
@@ -503,9 +504,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                                     cTermNo =extractCode(ele['label'])
                                 }
                             });
-                        }
-                       
+                        }   
+                } else {
+                    cTermNo = "";
                 }
+                
                 console.log('条款编码',cTermNo)
                 formconfig1.fromSchema?.forEach((item) => {
                     if (
@@ -999,9 +1002,9 @@ const normalQueryColumns = [
         minWidth: 180,
     },
     {
-        prop: "cTermNo",
+        prop: "cTermNme",
         inputtype: "rtinput",
-        title: "条款",
+        title: "条款名称",
         minWidth: 180,
     },
     {
