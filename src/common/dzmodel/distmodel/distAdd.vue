@@ -276,9 +276,12 @@ onMounted(() => {
     if( route.params.param.cProdNo == '040002' && item.prop =='Dist.cIdentificationNumber'){
          item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
     }
-    // if(item.prop =='Dist.cSchoolName'){
-    //   item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
-    // }
+
+    // 下面俩产品  出生年月 和 证号2选1   非必填
+    const isCProdNo = ['049020','041007'].includes(route.params.param.cProdNo);
+    if(isCProdNo  && item.prop =='Dist.cIdentificationNumber' ){
+          item['rules'] = [];
+    }
  
     if(item.cShowLocation === '1'){
       item["hidden"] = true;

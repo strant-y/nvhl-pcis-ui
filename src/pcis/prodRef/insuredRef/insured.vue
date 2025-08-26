@@ -50,6 +50,7 @@ import { descryptParameter, encryptParameter } from "@/utils/encipher";
 import { useRouter, useRoute } from 'vue-router';
 import { validateIdCard } from "@/typings/method-public";
 import {calculateAgeFromIdCard} from "@/utils/common";
+import{setCapitalRequiredRule} from "@/utils/InsuranceCoverageRules";
 const route = useRoute();
 const query = ref(route.query);
 const router = useRouter();
@@ -432,6 +433,7 @@ const method = {
     checkUser();
     // val  0法人 1个人
     if (val == "0") {
+       setCapitalRequiredRule(getValue,setFormItem,'Insured');
       setFormItem("Insured.tBirthday", {
         rules: null
       });
@@ -1170,9 +1172,19 @@ const method = {
     formconfig.value.fileInputType = "2";
   },
 
+    // 是否分支机构
+  cIsBranchChange:(val:any)=>{
+      if(val){
+        setCapitalRequiredRule(getValue,setFormItem,'Insured');
+      }
+       
+  },
+
     // 单位性质
  cWorkDptChange:(val: any) => {
   console.log('单位性质变更为:', val);
+  setCapitalRequiredRule(getValue,setFormItem,'Insured');
+
   const clientNature = getValue('Insured.cClntMrk');
   const isSpecialCase = cWorkDptList.includes(val) && clientNature === '0';
   const requiredRule = [getRules("required", {})];
