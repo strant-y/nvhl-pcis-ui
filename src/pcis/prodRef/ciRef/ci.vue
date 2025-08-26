@@ -488,7 +488,7 @@ const method = {
     if (isNaN(floatValue)) {
       ElMessage.warning("请输入有效的数字");
       // 重置为0
-      freeEditRef?.value?.setValueByRowKey("Ci.nPlyFeeRate", row._dataId, "0.000000");
+      freeEditRef?.value?.setValueByRowKey("Ci.nPlyFeeRate", row._dataId, "0.00");
       freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", row._dataId, "0.00");
       return;
     }
@@ -896,7 +896,7 @@ const initCiInfo = (data: any) => {
     }
     freeEditRef?.value?.addRowByData( {
       'Ci.nSeqNo': 1,
-      'Ci.nCiShare': '100.00000000',
+      'Ci.nCiShare': '100',
       'Ci.nPlyFeeRate': '0.00',
       'Ci.nPlyFee': '0.00',
       'Ci.nComm':'0.00',
