@@ -998,9 +998,9 @@ const normalQueryColumns = [
             minWidth: 180,
         },
         {
-            prop: "cTermNo",
+            prop: "cTermNme",
             inputtype: "rtinput",
-            title: "条款",
+            title: "条款名称",
             minWidth: 180,
         },
         {
