@@ -396,6 +396,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               },
               func: (val) => {
                   setValue("cProdNo","")
+                  cTermNo = "";      // 重置条款编码
                   cPard.value = val;
                   formconfig1.fromSchema?.forEach((item) => {
                       if (
@@ -450,14 +451,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                         if(cTermNoList.value.length>0){
                             cTermNoList.value.forEach((ele) => {
                                 if(ele['value']  === val){
-                                    cTermNo =extractCode(ele['label'])
+                                    cTermNo = extractCode(ele['label'])
                                 }
                             });
                         }
-                       
+                } else {
+                    cTermNo = "";
                 }
-                  console.log('条款编码',cTermNo)
-                  formconfig1.fromSchema?.forEach((item) => {
+                console.log('条款编码',cTermNo)
+                formconfig1.fromSchema?.forEach((item) => {
                       if (
                           item.prop === "CEmployeeName" ||
                           item.prop === "CIdentificationNumber" ||
@@ -473,7 +475,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                       ) {
                           item.hidden = true;
                       }
-                  });
+                });
               },
           },
           {

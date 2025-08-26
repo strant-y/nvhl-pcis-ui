@@ -441,6 +441,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               },
               func: (val) => {
                   setValue("cProdNo","")
+                  cTermNo = "";      // 重置条款编码
                   cPard.value = val;
                   formconfig1.fromSchema?.forEach((item) => {
                       if (
@@ -499,8 +500,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                                     cTermNo =extractCode(ele['label'])
                                 }
                             });
-                        }
-                       
+                        } 
+                } else {
+                  cTermNo = "";
                 }
                 console.log('条款编码',cTermNo)
                 formconfig1.fromSchema?.forEach((item) => {
