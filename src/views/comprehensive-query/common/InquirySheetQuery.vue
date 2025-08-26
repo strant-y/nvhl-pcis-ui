@@ -328,7 +328,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               inputtype: "rtinput",
               title: "查询条件",
               placeholder:
-                  "询价单号 产品名称",
+                  "询价单号 产品名称 条款名称 投/被保人名称 投/被保人证件号码",
               btnWidth: 10,
               itemWidth: 2,
               showExBtn: true,
