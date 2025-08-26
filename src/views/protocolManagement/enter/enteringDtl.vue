@@ -13,6 +13,8 @@ import {useRouter} from "vue-router";
 import { getECargoData } from "@/pcis/prodRef/dataInit";
 import {getEdrRsnItem} from "@/api/query/index"
 import {eventBus} from "@/utils/event-bus";
+import {ref} from "vue";
+import {copyDist} from "@/api/prod";
 const tagsViewStore = useTagsViewStore();
 const router = useRouter();
 const props = defineProps({
@@ -49,6 +51,7 @@ let idxParam = reactive({
 provide('idxParam', idxParam);
 const mainRef = ref(null);
 const bthList = ref<Array<FreeButtonBase>>([]);
+const saveDistBatchFlag = ref(false);
 //投保页面
 const basicBtn = [
   createFreeButtonBase({
@@ -571,11 +574,25 @@ const saveEdrPlyInfo = async () => {
 
     saveEdrFlag = true;
     cEcAgrAppNo.value = EdrBaseData['ECargoBase.cEcAgrAppNo']
-    if(cEcAgrAppNo.value){
+    if(cEcAgrAppNo.value && !saveDistBatchFlag.value){
       const param:any =  idxParam.param
-      eventBus.emit('goodsRefresh', {cEcAgrAppNo:param.cEcAgrAppNo,targetNo:cEcAgrAppNo.value,cRsnCde:param.cRsnCde,});
-      eventBus.emit('insuredRefresh', {cEcAgrAppNo:param.cEcAgrAppNo,targetNo:cEcAgrAppNo.value,cRsnCde:param.cRsnCde,});
+      const  val ={cEcAgrAppNo:param.cEcAgrAppNo,targetNo:cEcAgrAppNo.value,cRsnCde:param.cRsnCde,}
+      copyDist(val).then((res:any) => {
+        if(res && res.code === 200) {
+          console.log('copy成功')
+        } else {
+          ElMessage.error(res.msg);
+        }
+      }).catch((err:any) => {
+        ElMessage.error(err.msg);
+      })
     }
+    if(cEcAgrAppNo.value){
+      eventBus.emit('goodsChange', cEcAgrAppNo.value);
+      eventBus.emit('insuredChange', cEcAgrAppNo.value);
+      eventBus.emit('transportChange', cEcAgrAppNo.value);
+    }
+    saveDistBatchFlag.value = true
   } else {
     ElMessage.error(edrInfo.msg);
   }
@@ -657,7 +674,8 @@ function query() {
       cEcAgrAppNo.value = res["data"]["composition"]["AgreementBase"][0]['ECargoBase.cEcAgrAppNo'] || ''
       if(cEcAgrAppNo.value){
         eventBus.emit('goodsChange', cEcAgrAppNo.value);
-        eventBus.on('insuredChange', cEcAgrAppNo.value);
+        eventBus.emit('insuredChange', cEcAgrAppNo.value);
+        eventBus.emit('transportChange', cEcAgrAppNo.value);
       }
       const pageInit = () => {
         if (props.type === 'EDR_APP_NEW_SCENE') {
