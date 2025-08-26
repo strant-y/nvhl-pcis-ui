@@ -12,15 +12,15 @@
       <template #column-policyInfo="{ row, column, index }">
         <div class="policy-info-cell">
           <div v-if="row.cAppNo" class="policy-number-row">
-            <span>{{ row.cAppNo }}</span>
+            <span v-html="row.cAppNo"></span>
             <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
-              <CopyDocument />
+              <DocumentCopy />
             </el-icon>
           </div>
           <div v-if="row.cPlyNo" class="policy-number-row">
-            <span>{{ row.cPlyNo }}</span>
+            <span v-html="row.cPlyNo"></span>
             <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
-              <CopyDocument />
+              <DocumentCopy />
             </el-icon>
           </div>
         </div>

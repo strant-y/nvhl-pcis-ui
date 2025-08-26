@@ -9,12 +9,12 @@
       @page-change="handleQuery(false)"
     >
 	  <!-- policyInfo 列的具名插槽 -->
-      <template #column-cInquiryNo="{ row, column, index }">
+       <template #column-cInquiryNo="{ row, column, index }">
         <div class="policy-info-cell">
           <div v-if="row.cInquiryNo" class="policy-number-row">
-            <span>{{ row.cInquiryNo }}</span>
+            <span v-html="row.cInquiryNo"></span>
             <el-icon class="copy-icon" @click="copyText(row.cInquiryNo)">
-              <CopyDocument />
+              <DocumentCopy />
             </el-icon>
           </div>
         </div>
@@ -1003,6 +1003,7 @@ const esSearchColumns = [
     title: "询价单号",
     minWidth: 180,
     fixed: "left",
+    slotName: "cInquiryNo"
    },
    {
     prop: "cAppNo",
