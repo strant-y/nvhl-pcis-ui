@@ -328,7 +328,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               inputtype: "rtinput",
               title: "查询条件",
               placeholder:
-                  "询价单号 保单号 产品名称",
+                  "询价单号 产品名称",
               btnWidth: 10,
               itemWidth: 2,
               showExBtn: true,
@@ -394,12 +394,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               ],
               defaultValue: 1,
           },
-          {
-              prop: "cSecondDptCde",
-              inputtype: "rtselect",
-              title: "二级分公司",
-              clearable: true,
-          },
+        //   {
+        //       prop: "cSecondDptCde",
+        //       inputtype: "rtselect",
+        //       title: "二级分公司",
+        //       clearable: true,
+        //   },
         //   {
         //       prop: "cDataTyp",
         //       inputtype: "rtselect",

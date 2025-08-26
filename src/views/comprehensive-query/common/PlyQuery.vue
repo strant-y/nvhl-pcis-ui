@@ -362,7 +362,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               inputtype: "rtinput",
               title: "查询条件",
               placeholder:
-                  "申请单号 保单号 批单号 产品名称 被保人名称 被保人证件号码 手机号码 被保人地址 投保人名称",
+                  "询价/投保/批改申请单号 询价单号 保单号 批单号 产品名称 条款名称 投/被保人名称 投/被保人证件号码",
               btnWidth: 10,
               itemWidth: 2,
               showExBtn: true,
@@ -428,12 +428,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               ],
               defaultValue: 1,
           },
-          {
-              prop: "cSecondDptCde",
-              inputtype: "rtselect",
-              title: "分公司",
-              clearable: true,
-          },
+        //   {
+        //       prop: "cSecondDptCde",
+        //       inputtype: "rtselect",
+        //       title: "分公司",
+        //       clearable: true,
+        //   },
           {
               prop: "cDataTyp",
               inputtype: "rtselect",
