@@ -146,7 +146,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   const freeEditRefs = freeEditRef.value;
                   freeEditRefs.validate().then((isValid) => {
                       if (isValid) {
-                          handleQuery();
+                          handleQuery(false);
                       }
                   });
               },
@@ -259,20 +259,22 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           createFreeButtonBase({
             label: "变更列",
             func: async () => {
-                const formData = freeEditRef.value.getFromValue();
-                const currentAppType = formData.cAppTyp || "A";
+                // 1. 取用户已保存的勾选字段
+                const userCfg = await loadUserColumns();
+                const userChecked = userCfg? 
+                userCfg.filter(i => i.checked).map(i => i.value): normalQueryColumns.map(c => c.prop); // 没配置就默认全选原始列
+
 
                 // 构建弹窗所需格式，用缓存的数据
                 let modalData: any[] = [];
                 modalData = [{
-                prop: "bsType",
-                inputtype: 'rtcheckboxgroup',
-                title: "",
-                itemWidth: 3,
-                loadData: currentModalColumnCache.value
+                    prop: 'bsType',
+                    inputtype: 'rtcheckboxgroup',
+                    itemWidth: 3,
+                    loadData: buildAllCheckboxData(userChecked)
                 }];
     
-                dzmodal.open(colChange, { type: "edit", data: modalData, userSaved: userColumnConfig.value.length > 0 })
+                dzmodal.open(colChange, { type: "edit", data: modalData, userSaved: !!userCfg })
                 .then(async (res) => {
                     if (res.type === "ok") {
                     const selectedProps = res.body.body; // 用户选中的列
@@ -281,17 +283,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                         prop: "bsType",
                         inputtype: 'rtcheckboxgroup',
                         itemWidth: 3,
-                        loadData: modalData[0].loadData.map((item: any) => ({
-                        ...item,
-                        checked: selectedProps.includes(item.value)
-                        }))
+                        loadData: buildAllCheckboxData(props) //把完整数据写回
                     }];
-
                     // 保存到接口
                     const saveParam = {
                         cPkId: colChangeCPkId.value || null,
                         content: newContent,
-                        type: currentAppType,
+                        type: 'search',
                         cCrtCde: JSON.parse(sessionStorage.getItem("user")).opCde,
                     };
                     try {
@@ -299,7 +297,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                         if (saveRes.code == 200) {
                           userColumnConfig.value = saveRes.data.data.contents[0].loadData;
 
-                          applyUserColumns(userColumnConfig.value);
+                          applyCheckedColumns(selectedProps);     // 实时刷新表格
                           ElMessage.success("列配置已更新");
                         } else {
                           ElMessage.error(saveRes.msg || "保存失败");
@@ -326,7 +324,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   label: "搜索",
                   type: "primary",
                   func: () => {
-                    esSearch(true);
+                    handleQuery(true, true);
                   },
               },
           },
@@ -769,205 +767,8 @@ const pageresult = reactive<Pageresult>({
   total: 0,
 });
 
-// 1. ES查询 - 投保/批改列配置
-const esSearchColumnsAE = [
-   {
-    prop: "policyInfo",
-    inputtype: "rtinput",
-    title: "申请单号/保单号",
-    minWidth: 200,
-    fixed: "left",
-    slotName: "policyInfo"
-   },
-   {
-    prop: "cPlyNo",
-    inputtype: "rtinput",
-    title: "批单",
-    minWidth: 180,
-   },
-   {
-    prop: "nEdrPrjNo",
-    inputtype: "rtinput",
-    title: "批改序号",
-    minWidth: 180,
-   },
-   {
-    prop: "prodCNmeCn",
-    inputtype: "rtinput",
-    title: "产品名称",
-    minWidth: 180,
-    slotName: "cNmeCn"
-   },
-   {
-    prop: "cInsuredNme",
-    inputtype: "rtinput",
-    title: "被保人名称",
-    minWidth: 180,
-    slotName: "cInsuredNme"
-   },
-   {
-    prop: "cInsuredCde",
-    inputtype: "rtinput",
-    title: "被保人证件号码",
-    minWidth: 180,
-   },
-   {
-    prop: "cMobile",
-    inputtype: "rtinput",
-    title: "手机号码",
-    minWidth: 180,
-   },
-   {
-    prop: "cClntAddr",
-    inputtype: "rtinput",
-    title: "被保人地址",
-    minWidth: 180,
-    slotName: "cClntAddr"
-   },
-   {
-    prop: "cAppNme",
-    inputtype: "rtinput",
-    title: "投保人名称",
-    minWidth: 180,
-    slotName: "cAppNme"
-   },
-   {
-    prop: "tUdrTm",
-    inputtype: "rtinput",
-    title: "核保日期",
-    minWidth: 180,
-    slotName: "tUdrTm"
-   },
-   {
-    prop: "InsurancePeriod",
-    inputtype: "rtinput",
-    title: "保险期间",
-    minWidth: 180,
-    slotName: "InsurancePeriod"
-   },
-   {
-    prop: "cAppStatus",
-    inputtype: "rtselect",
-    title: "保单状态",
-    minWidth: 120,
-    loadData: [
-        { label: "暂存", value: "1" },
-        { label: "已提核", value: "2" },
-        { label: "核保退回/撤回", value: "3" },
-        { label: "已核待缴费", value: "4" },
-        { label: "已出单", value: "5" },
-        { label: "见费出单退回", value: "8" },
-    ],
-    hideBtns: (row: any) => {
-        if (
-            queryType.value == "2" ||
-            queryType.value == "3" ||
-            queryType.value == "4"
-        ) {
-          return false;
-        } else {
-          return true;
-        }
-    },
-   },
-];
-// 2. ES查询 - 询价列配置
-const esSearchColumnsI = [
-   {
-    prop: "cInquiryNo",
-    inputtype: "rtinput",
-    title: "询价单号",
-    minWidth: 180,
-    fixed: "left",
-   },
-   {
-    prop: "cAppNo",
-    inputtype: "rtinput",
-    title: "申请单号",
-    minWidth: 180,
-   },
-   {
-    prop: "prodCNmeCn",
-    inputtype: "rtinput",
-    title: "产品名称",
-    minWidth: 180,
-    slotName: "cNmeCn"
-   },
-   {
-    prop: "cInsuredNme",
-    inputtype: "rtinput",
-    title: "被保人名称",
-    minWidth: 180,
-    slotName: "cInsuredNme"
-   },
-   {
-    prop: "cInsuredCde",
-    inputtype: "rtinput",
-    title: "被保人证件号码",
-    minWidth: 180,
-   },
-   {
-    prop: "cMobile",
-    inputtype: "rtinput",
-    title: "手机号码",
-    minWidth: 180,
-   },
-   {
-    prop: "cClntAddr",
-    inputtype: "rtinput",
-    title: "被保人地址",
-    minWidth: 180,
-    slotName: "cClntAddr"
-   },
-   {
-    prop: "cAppNme",
-    inputtype: "rtinput",
-    title: "投保人名称",
-    minWidth: 180,
-    slotName: "cAppNme"
-   },
-   {
-    prop: "tUdrTm",
-    inputtype: "rtinput",
-    title: "核保日期",
-    minWidth: 180,
-    slotName: "tUdrTm"
-   },
-   {
-    prop: "InsurancePeriod",
-    inputtype: "rtinput",
-    title: "保险期间",
-    minWidth: 180,
-    slotName: "InsurancePeriod"
-   },
-   {
-    prop: "cAppStatus",
-    inputtype: "rtselect",
-    title: "保单状态",
-    minWidth: 120,
-    loadData: [
-        { label: "暂存", value: "1" },
-        { label: "已提核", value: "2" },
-        { label: "核保退回/撤回", value: "3" },
-        { label: "已核待缴费", value: "4" },
-        { label: "已出单", value: "5" },
-        { label: "见费出单退回", value: "8" },
-    ],
-    hideBtns: (row: any) => {
-        if (
-            queryType.value == "2" ||
-            queryType.value == "3" ||
-            queryType.value == "4"
-        ) {
-          return false;
-        } else {
-          return true;
-        }
-    },
-    },
-];
-// 3. 普通查询 - 投保/批改列配置
-const normalQueryColumnsAE = [
+// 原始列配置
+const normalQueryColumns = [
     {
         prop: "policyInfo",
         inputtype: "rtinput",
@@ -993,39 +794,14 @@ const normalQueryColumnsAE = [
     {
         prop: "cEdrNo",
         inputtype: "rtinput",
-        title: "批单号",
+        title: "批改申请单号/批单号",
         minWidth: 180,
     },
     {
-    prop: "nEdrPrjNo",
-    inputtype: "rtinput",
-    title: "批改次数",
-    maxWidth: 90,
-    },
-    {
-    prop: "cAppStatus",
-    inputtype: "rtselect",
-    title: "状态",
-    minWidth: 120,
-    loadData: [
-        { label: "暂存", value: "1" },
-        { label: "已提核", value: "2" },
-        { label: "核保退回/撤回", value: "3" },
-        { label: "已核待缴费", value: "4" },
-        { label: "已出单", value: "5" },
-        { label: "见费出单退回", value: "8" },
-    ],
-    hideBtns: (row: any) => {
-        if (
-            queryType.value == "2" ||
-            queryType.value == "3" ||
-            queryType.value == "4"
-        ) {
-        return false;
-        } else {
-        return true;
-        }
-    },
+        prop: "cSecondDptCnm",
+        inputtype: "rtinput",
+        title: "分公司",
+        minWidth: 150,
     },
     {
         prop: "cDptCnm",
@@ -1040,34 +816,21 @@ const normalQueryColumnsAE = [
         minWidth: 180,
     },
     {
-        prop: "cSecondDptCnm",
+        prop: "cAppNme",
         inputtype: "rtinput",
-        title: "二级分公司",
-        minWidth: 150,
+        title: "被保人名称",
+        minWidth: 180,
     },
     {
         prop: "cProdNmeCn",
         inputtype: "rtinput",
-        title: "产品",
-        minWidth: 180,
-    },
-    {
-        prop: "InsurancePeriod",
-        inputtype: "rtinput",
-        title: "保险期间",
-        minWidth: 180,
-        slotName: "InsurancePeriod"
-    },
-    {
-        prop: "tIssueTm",
-        inputtype: "rtinput",
-        title: "签单日期",
+        title: "产品名称",
         minWidth: 180,
     },
     {
         prop: "cTermNme",
         inputtype: "rtinput",
-        title: "条款",
+        title: "条款名称",
         minWidth: 180,
     },
     {
@@ -1084,108 +847,69 @@ const normalQueryColumnsAE = [
         prefix: "¥ ",
     },
     {
-        prop: "cUdrNme",
+        prop: "tIssueTm",
         inputtype: "rtinput",
-        title: "核保人",
+        title: "签单日期",
+        minWidth: 180,
+    },
+    {
+        prop: "InsurancePeriod",
+        inputtype: "rtinput",
+        title: "保险期间",
+        minWidth: 180,
+        slotName: "InsurancePeriod"
+    },
+    {
+        prop: "cAppStatus",
+        inputtype: "rtselect",
+        title: "任务状态",
+        minWidth: 120,
+        loadData: [
+            { label: "暂存", value: "1" },
+            { label: "已提核", value: "2" },
+            { label: "核保退回/撤回", value: "3" },
+            { label: "已核待缴费", value: "4" },
+            { label: "已出单", value: "5" },
+            { label: "见费出单退回", value: "8" },
+        ],
+        hideBtns: (row: any) => {
+            if (
+                queryType.value == "2" ||
+                queryType.value == "3" ||
+                queryType.value == "4"
+            ) {
+            return false;
+            } else {
+            return true;
+            }
+        },
+    },
+    {
+        prop: "nEdrPrjNo",
+        inputtype: "rtinput",
+        title: "批改序号",
         maxWidth: 120,
     },
     {
         prop: "tUdrTm",
         inputtype: "rtinput",
-        title: "核保通过日期",
+        title: "批改原因",
         minWidth: 180,
     },
+    // ===== 可勾选字段（默认未选中） =====
+    {  prop: 'tAppTm',
+       inputtype: "rtinput",
+       title: '申请日期',
+       minWidth: 180
+    }
 ]
-// 4. 普通查询 - 询价列配置 
-const normalQueryColumnsI = [
-    {
-        prop: "cInquiryNo",
-        inputtype: "rtinput",
-        title: "询价单号",
-        minWidth: 180,
-        slotName: "cInquiryNo",
-        fixed: "left",
-    },
-    {
-      prop: "cAppStatus",
-      inputtype: "rtselect",
-      title: "状态",
-      minWidth: 100,
-      loadData: [
-        { label: "暂存", value: "1" },
-        { label: "已提核", value: "2" },
-        { label: "核保退回/撤回", value: "3" },
-        { label: "已核待缴费", value: "4" },
-        { label: "已出单", value: "5" },
-        { label: "见费出单退回", value: "8" },
-      ],
-      hideBtns: (row: any) => {
-        if (
-            queryType.value == "2" ||
-            queryType.value == "3" ||
-            queryType.value == "4"
-        ) {
-          return false;
-        } else {
-          return true;
-        }
-      },
-    },
-    {
-        prop: "cPlyNo",
-        inputtype: "rtinput",
-        title: "保单",
-        minWidth: 200,
-    },
-    {
-        prop: "cDptCnm",
-        inputtype: "rtinput",
-        title: "机构",
-        minWidth: 180,
-    },
-    {
-        prop: "cSecondDptCnm",
-        inputtype: "rtinput",
-        title: "二级分公司",
-        minWidth: 180,
-    },
-    {
-        prop: "cProdNmeCn",
-        inputtype: "rtinput",
-        title: "产品",
-        minWidth: 180,
-    },
-    {
-        prop: "cTermNme",
-        inputtype: "rtinput",
-        title: "条款",
-        minWidth: 180,
-    },
-    {
-        prop: "cUdrNme",
-        inputtype: "rtinput",
-        title: "核保人",
-        minWidth: 180,
-    },
-    {
-        prop: "tUdrTm",
-        inputtype: "rtinput",
-        title: "核保通过日期",
-        minWidth: 180,
-    },
-    {
-        prop: "nAmt",
-        inputtype: "rtinput",
-        title: "保额",
-        minWidth: 100,
-    },
-    {
-        prop: "nPrm",
-        inputtype: "rtinput",
-        title: "保费",
-        minWidth: 100,
-    },
-
+// 扩展列（仅用于变更列弹窗，默认未勾选）
+const extendColumns = [
+  { prop: 'tAppTm', inputtype: "rtinput", title: '申请日期', minWidth: 180, optional: true },
+  { prop: 'tUnderwriteTm', inputtype: "rtinput", title: '核保日期', minWidth: 180, optional: true },
+  { prop: 'cProjectSub', inputtype: "rtinput", title: '项目子类', minWidth: 180, optional: true },
+  { prop: 'nAmtChange', inputtype: "rtinput", title: '保额变化量', minWidth: 180, optional: true },
+  { prop: 'nPrmChange', inputtype: "rtinput", title: '保费变化量', minWidth: 180, optional: true },
 ];
 
 const tableObj = {
@@ -1395,27 +1119,7 @@ const tableObj = {
 let tableconfig = reactive<AppTableConfig>(
   createTableEditConfig(tableObj.notWaitObj)
 );
-tableconfig.fixed= true;
-
-watch(
-  () => freeEditRef.value?.getFromValue()?.cAppTyp,
-  async (newType) => {
-    const appType = newType || 'A';
-
-    // 1. 更新表格列
-    const columns = await loadColumnsByType(appType);
-    userColumnConfig.value = columns;
-    applyUserColumns(columns);
-
-    // 2. 缓存数据给弹窗用
-    currentModalColumnCache.value = columns.map(col => ({
-      label: col.label,
-      value: col.value,
-      checked: col.checked
-    }));
-  },
-  { immediate: false }
-);
+tableconfig.fixed = true;
 
 onMounted(async () => {
     formconfig1.fromSchema?.forEach((item) => {
@@ -1450,7 +1154,16 @@ onMounted(async () => {
     ]);
 
     // 优先加载用户配置
-    await initCustomUserList();
+    const userCfg = await loadUserColumns();
+    let checkedProps = [];
+    if (userCfg) {
+        checkedProps = userCfg.filter(i => i.checked).map(i => i.value);
+        colChangeCPkId.value = userCfg.cPkId || '';
+    } else {
+        // 2. 没配置 -> 用默认列
+        checkedProps = normalQueryColumns.map(c => c.prop);
+    }
+    applyCheckedColumns(checkedProps);
 });
 
 // 绑定方法
@@ -1462,126 +1175,21 @@ const method = {
 // 绑定特殊验证器
 const exRules = {};
 
-function setTableColumns(isEsSearch: boolean) {
-  const freeEditRefs = freeEditRef.value;
-  const s = freeEditRefs?.getFromValue(); //获取表单数据
-  let newColumns;
-  if (s.cAppTyp === "I") {
-    // 询价
-    newColumns = isEsSearch ? esSearchColumnsI : normalQueryColumnsI;
-  } else {
-    // 投保/批改
-    newColumns = isEsSearch ? esSearchColumnsAE : normalQueryColumnsAE;
-  }
-  // 创建新的配置对象
-  const newConfig = {
-    ...tableObj.notWaitObj,
-    fromSchema: newColumns
-  };
-  
-  // 重新赋值触发响应式更新
-  Object.assign(tableconfig, newConfig);
-}
-
 /** 查询 */
-async function handleQuery(flag?: boolean) {
+async function handleQuery(flag?: boolean, isEs = false) {
   const freeEditRefs = freeEditRef.value;
   const s = freeEditRefs.getFromValue();
   const appType = s.cAppTyp || 'A';
-  console.log('userColumnConfig.value', userColumnConfig.value);
-
-  // 如果已经有列配置，直接复用
-  if (!userColumnConfig.value.length) {
-    const columns = await loadColumnsByType(appType);
-    userColumnConfig.value = columns;
-    applyUserColumns(columns);
-   }
 
   if (appType === 'I') {
-    handleInquiryQuery(flag);
+    await queryI(flag, isEs);
   } else {
-    handleNormalQuery(flag);
+    await queryAE(flag, isEs);
   }
 }
 
-// 询价
-function handleInquiryQuery(flag?: boolean) {
-    const tableRefs = tableRef.value;
-    const freeEditRefs = freeEditRef.value;
-    const r = tableRefs.getPartnerPage(flag); //获取分页数据
-    const s = freeEditRefs.getFromValue(); //获取表单数据
-    if (s.cLoadSub == null) {
-        s.cLoadSub = "1";
-    }
-    pageresult.list = [];
-    // 清空其他日期参数
-    s.tAppTm = null;
-    s.tEdrAppTm = null;
-    s.tIssueTm = null;
-    // 删除列表类型
-    delete s.cDataTyp;
-
-    if (
-        (s["cAppNo"] == null || s["cAppNo"] == "") &&
-        (s["cPlyNo"] == null || s["cPlyNo"] == "") &&
-        (s["cAppNme"] == null || s["cAppNme"] == "")
-    ) {
-        const startTemp =
-            s.tInquiryTm && s.tInquiryTm.length > 1 ? s.tInquiryTm[0] : null;
-        if (null == startTemp || undefined === startTemp) {
-            ElMessage.warning("询价日期不能为空");
-            return;
-        }
-        const start = dayjs(startTemp);
-        const endTemp = s.tInquiryTm && s.tInquiryTm.length > 1 ? s.tInquiryTm[1] : null;
-        if (null == endTemp || undefined === endTemp) {
-            ElMessage.warning("询价日期不能为空");
-            return;
-        }
-        const end = dayjs(endTemp);
-        if (end.isBefore(start)) {
-            ElMessage.warning("询价日期起期不能大于询价日期止期");
-            return;
-        }
-        if (end.diff(start, "year", true) > 2) {
-            ElMessage.warning("询价日期时间范围请控制在两年内");
-            return;
-        }
-    }
-    // 提取询价日期的开始时间和结束时间
-    const tInquiryTmStart = s.tInquiryTm && s.tInquiryTm.length > 1 ? s.tInquiryTm[0] : null;
-    const tInquiryTmEnd = s.tInquiryTm && s.tInquiryTm.length > 1 ? s.tInquiryTm[1] : null;
-
-    const param = Object.assign(s, r);
-    param["pageNo"] = param["pageNum"];
-    param["tInquiryTmStart"] = tInquiryTmStart; 
-    param["tInquiryTmEnd"] = tInquiryTmEnd; 
-      // 清空其他日期参数
-    param["tAppTmStart"] = null;
-    param["tAppTmEnd"] = null;
-    param["tEdrAppTmStart"] = null;
-    param["tEdrAppTmEnd"] = null;
-    param["tIssueTmStart"] = null;
-    param["tIssueTmEnd"] = null;
-
-    param["queryType"] = queryType.value;
-    param["cTermNo"] = cTermNo;        // 条款编码
-
-    qryPolicyNewList(param)
-        .then((res) => {
-            const { code, data, msg } = res;
-            if (200 === code) {
-                pageresult.list = [];
-                pageresult.list = data.result;
-                pageresult.total = data.total;
-            } else {
-                ElMessage.error(msg);
-            }
-        })
-        .finally(() => {});
-}
-// 投保，批改
-function handleNormalQuery(flag?: boolean) {
+// 投保/批改：普通 + ES 共用
+async function queryAE( flag?: boolean, isEs = false) {
     const tableRefs = tableRef.value;
     const freeEditRefs = freeEditRef.value;
     const r = tableRefs.getPartnerPage(flag); //获取分页数据
@@ -1641,14 +1249,50 @@ function handleNormalQuery(flag?: boolean) {
     param["tEdrAppTmEnd"] = tEdrAppTmEnd; // 添加批改结束时间
     param["tIssueTmStart"] = tIssueTmStart; // 添加签单开始时间
     param["tIssueTmEnd"] = tIssueTmEnd; // 添加签单结束时间
+    param["queryType"] = queryType.value;
+    param["cTermNo"] = cTermNo;        // 条款编码
     // 清空询价日期参数
     param["tInquiryTmStart"] = null;
     param["tInquiryTmEnd"] = null;
 
-    param["queryType"] = queryType.value;
-    param["cTermNo"] = cTermNo;        // 条款编码
-
-    qryPolicyNewList(param)
+    // ES 必须填查询关键字
+    if (isEs && !param.cQueryStr?.trim()) {
+        ElMessage.warning('查询条件不能为空');
+        return;
+    }
+    // ES 额外索引
+    if (isEs) {
+        param.IndexName = 'ply_insured_ik';
+        param.IndexType = 'ply_insured_info';
+    }
+    if (isEs) {
+      queryInsuredList(param)
+      .then((res) => {
+        const { code, data, msg } = res;
+        if (200 === code) {
+          let convertedData = [];
+          // ES查询原始数据，转化成驼峰为适配操作列
+          ESOriginalData.value = data.result;
+          convertedData = ESOriginalData.value.map(item => {
+            const newItem = {};
+             for (const key in item) {
+                if (FIELD_MAP[key]) {
+                   newItem[FIELD_MAP[key]] = item[key]; // 转换字段名
+                } else {
+                   newItem[key] = item[key]; // 部分保持原样
+                }
+            }
+            return newItem;
+          })
+          pageresult.list = [];
+          pageresult.list = convertedData;
+          pageresult.total = data.total;
+        } else {
+          ElMessage.error(msg);
+        }
+      })
+    }else{
+        qryPolicyNewList(param)
         .then((res) => {
             const { code, data, msg } = res;
             if (200 === code) {
@@ -1659,43 +1303,26 @@ function handleNormalQuery(flag?: boolean) {
                 ElMessage.error(msg);
             }
         })
-        .finally(() => {});
+    }
 }
 
-/** ES查询 */
-function esSearch(flag?: boolean) {
-  const freeEditRefs = freeEditRef.value;
-  const s = freeEditRefs.getFromValue();
-  
-  if (s.cAppTyp === "I") {
-    esInquirySearch(flag);
-  } else {
-    esNormalSearch(flag);
-  }
-}
-// 询价
-function esInquirySearch(flag?: boolean) {
+// 询价：普通 + ES 共用
+async function queryI(flag?: boolean, isEs = false) {
     const tableRefs = tableRef.value;
     const freeEditRefs = freeEditRef.value;
     const r = tableRefs.getPartnerPage(flag); //获取分页数据
     const s = freeEditRefs.getFromValue(); //获取表单数据
-
-    if (!s.cQueryStr || !s.cQueryStr.trim()) {
-        ElMessage.warning("查询条件不能为空");
-        return;
-    }
-    // 清空其他日期参数
-    s.tAppTm = null;
-    s.tEdrAppTm = null;
-    s.tIssueTm = null;
-
-    // ES搜索的列配置
-    setTableColumns(true);
-
     if (s.cLoadSub == null) {
         s.cLoadSub = "1";
     }
     pageresult.list = [];
+    // 清空其他日期参数
+    s.tAppTm = null;
+    s.tEdrAppTm = null;
+    s.tIssueTm = null;
+    // 删除列表类型
+    delete s.cDataTyp;
+
     if (
         (s["cAppNo"] == null || s["cAppNo"] == "") &&
         (s["cPlyNo"] == null || s["cPlyNo"] == "") &&
@@ -1723,7 +1350,7 @@ function esInquirySearch(flag?: boolean) {
             return;
         }
     }
-    // 提取投保日期的开始时间和结束时间
+    // 提取询价日期的开始时间和结束时间
     const tInquiryTmStart = s.tInquiryTm && s.tInquiryTm.length > 1 ? s.tInquiryTm[0] : null;
     const tInquiryTmEnd = s.tInquiryTm && s.tInquiryTm.length > 1 ? s.tInquiryTm[1] : null;
 
@@ -1733,10 +1360,7 @@ function esInquirySearch(flag?: boolean) {
     param["tInquiryTmEnd"] = tInquiryTmEnd; 
     param["queryType"] = queryType.value;
     param["cTermNo"] = cTermNo;        // 条款编码
-    param["IndexName"] = 'ply_inquiry_ik';        // es
-    param["IndexType"] = 'ply_inquiry_info';       // es
-
-    // 清空其他日期参数
+      // 清空其他日期参数
     param["tAppTmStart"] = null;
     param["tAppTmEnd"] = null;
     param["tEdrAppTmStart"] = null;
@@ -1744,7 +1368,18 @@ function esInquirySearch(flag?: boolean) {
     param["tIssueTmStart"] = null;
     param["tIssueTmEnd"] = null;
 
-    queryInsuredList(param)
+    // ES 必须填查询关键字
+    if (isEs && !param.cQueryStr?.trim()) {
+        ElMessage.warning('查询条件不能为空');
+        return;
+    }
+    // ES 额外索引
+    if (isEs) {
+        param.IndexName = 'ply_inquiry_ik';
+        param.IndexType = 'ply_inquiry_info';
+    }
+    if (isEs) {
+     queryInsuredList(param)
       .then((res) => {
         const { code, data, msg } = res;
         if (200 === code) {
@@ -1769,111 +1404,57 @@ function esInquirySearch(flag?: boolean) {
           ElMessage.error(msg);
         }
       })
-      .finally(() => {});
+    }else{
+      qryPolicyNewList(param)
+        .then((res) => {
+            const { code, data, msg } = res;
+            if (200 === code) {
+                pageresult.list = [];
+                pageresult.list = data.result;
+                pageresult.total = data.total;
+            } else {
+                ElMessage.error(msg);
+            }
+        })
+    }
 }
-// 投保，批改
-function esNormalSearch(flag?: boolean) {
-  const tableRefs = tableRef.value;
-  const freeEditRefs = freeEditRef.value;
-  const r = tableRefs.getPartnerPage(flag); //获取分页数据
-  const s = freeEditRefs.getFromValue(); //获取表单数据
-  // 清空询价日期参数
-  s.tInquiryTm = null;
 
-  if (!s.cQueryStr || !s.cQueryStr.trim()) {
-    ElMessage.warning("查询条件不能为空");
-    return;
-  }
-  // ES搜索的列配置
-  setTableColumns(true);
+// 把原始列 + 扩展列 合并成弹窗需要的数据
+function buildAllCheckboxData(userChecked: string[] = []) {
+  const all = [
+    ...normalQueryColumns.map(col => ({
+      label: col.title,
+      value: col.prop,
+      checked: !col.optional      // 原始列默认勾选
+    })),
+    ...extendColumns.map(col => ({
+      label: col.title,
+      value: col.prop,
+      checked: userChecked.includes(col.prop) // 扩展列以用户配置为准
+    }))
+  ];
+  return all;
+}
 
-  if (s.cLoadSub == null) {
-    s.cLoadSub = "1";
-  }
-  pageresult.list = [];
-  if (
-      (s["cAppNo"] == null || s["cAppNo"] == "") &&
-      (s["cPlyNo"] == null || s["cPlyNo"] == "") &&
-      (s["cAppNme"] == null || s["cAppNme"] == "")
-  ) {
-    const startTemp =
-        s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[0] : null;
-    if (null == startTemp || undefined === startTemp) {
-      ElMessage.warning("签单日期不能为空");
-      return;
+// 加载列配置
+async function loadUserColumns(){
+    let param = {
+        type: 'search',
+        cCrtCde: JSON.parse(sessionStorage.getItem("user")).opCde
+    };
+    
+    const res = await getCustomUserList(param);
+    console.log('res', res);
+    console.log('res.data.content',res.data.data.contents);  
+    console.log('res.data.content[0].loadData', res.data.data.contents[0].loadData); 
+    
+    if (res.code === 200) {
+        let responseData = res.data?.data.contents[0].loadData;
+        colChangeCPkId.value = res.data.data?.cPkId;
+        return res.data.data.contents[0].loadData;
+    } else {
+        return null; // 没配置
     }
-    const start = dayjs(startTemp);
-    const endTemp = s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[1] : null;
-    if (null == endTemp || undefined === endTemp) {
-      ElMessage.warning("签单日期不能为空");
-      return;
-    }
-    const end = dayjs(endTemp);
-    if (end.isBefore(start)) {
-      ElMessage.warning("签单日期起期不能大于签单日期止期");
-      return;
-    }
-    if (end.diff(start, "year", true) > 2) {
-      ElMessage.warning("签单日期时间范围请控制在两年内");
-      return;
-    }
-  }
-  // 提取投保日期的开始时间和结束时间
-  const tAppTmStart = s.tAppTm && s.tAppTm.length > 1 ? s.tAppTm[0] : null;
-  const tAppTmEnd = s.tAppTm && s.tAppTm.length > 1 ? s.tAppTm[1] : null;
-  // 提取批改申请日期的开始时间和结束时间
-  const tEdrAppTmStart =
-      s.tEdrAppTm && s.tEdrAppTm.length > 1 ? s.tEdrAppTm[0] : null;
-  const tEdrAppTmEnd =
-      s.tEdrAppTm && s.tEdrAppTm.length > 1 ? s.tEdrAppTm[1] : null;
-  // 提取签单日期的开始时间和结束时间
-  const tIssueTmStart =
-      s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[0] : null;
-  const tIssueTmEnd =
-      s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[1] : null;
-
-  const param = Object.assign(s, r);
-  param["pageNo"] = param["pageNum"];
-  param["tAppTmStart"] = tAppTmStart; // 添加投保开始时间
-  param["tAppTmEnd"] = tAppTmEnd; // 添加投保结束时间
-  param["tEdrAppTmStart"] = tEdrAppTmStart; // 添加批改开始时间
-  param["tEdrAppTmEnd"] = tEdrAppTmEnd; // 添加批改结束时间
-  param["tIssueTmStart"] = tIssueTmStart; // 添加签单开始时间
-  param["tIssueTmEnd"] = tIssueTmEnd; // 添加签单结束时间
-  param["queryType"] = queryType.value;
-  param["cTermNo"] = cTermNo;        // 条款编码
-  param["IndexName"] = 'ply_insured_ik';        // es
-  param["IndexType"] = 'ply_insured_info';       // es
-  // 清空询价日期参数
-  param["tInquiryTmStart"] = null;
-  param["tInquiryTmEnd"] = null;
-
-  queryInsuredList(param)
-      .then((res) => {
-        const { code, data, msg } = res;
-        if (200 === code) {
-          let convertedData = [];
-          // ES查询原始数据，转化成驼峰为适配操作列
-          ESOriginalData.value = data.result;
-          convertedData = ESOriginalData.value.map(item => {
-            const newItem = {};
-             for (const key in item) {
-                if (FIELD_MAP[key]) {
-                   newItem[FIELD_MAP[key]] = item[key]; // 转换字段名
-                } else {
-                   newItem[key] = item[key]; // 部分保持原样
-                }
-            }
-            return newItem;
-          })
-          pageresult.list = [];
-          pageresult.list = convertedData;
-          pageresult.total = data.total;
-        } else {
-          ElMessage.error(msg);
-        }
-      })
-      .finally(() => {});
 }
 
 // 多选事件
@@ -2000,101 +1581,13 @@ const copyText = (text: any) => {
   }
 };
 
-// 获取初始化加载列配置
-async function initCustomUserList(){
-    const formData = freeEditRef.value?.getFromValue();
-    const currentAppType = formData.cAppTyp || 'A'; // 获取当前任务类型  默认投保
-
-    let param = {
-        type: currentAppType,
-        cCrtCde: JSON.parse(sessionStorage.getItem("user")).opCde
-    };
-    try {
-        const res = await getCustomUserList(param);
-        console.log('res', res);
-        console.log('res.data.content',res.data.data.contents);  
-        console.log('res.data.content[0].loadData', res.data.data.contents[0].loadData); 
-       
-        if (res.code === 200) {
-          let responseData = res.data?.data.contents[0].loadData;
-          userColumnConfig.value = responseData;
-          colChangeCPkId.value = res.data.data?.cPkId;
-        } else {
-          // 使用默认列
-          userColumnConfig.value = getDefaultColumns(currentAppType);
-        }
-    } catch (error) {
-         userColumnConfig.value = getDefaultColumns(currentAppType);
-    }
-    applyUserColumns(userColumnConfig.value); // 只改列，不查询
-}
-
-function applyUserColumns(content: any[]) {
-  let contentData = content.length? content: [];
-
-  const selectedProps = contentData
-    .filter((item: any) => item.checked)
-    .map((item: any) => item.value);
-
-  console.log('selectedProps', selectedProps);
-
-  const formData = freeEditRef.value?.getFromValue();
-  const currentAppType = formData.cAppTyp || "A";
-
-  let allColumns: any[] = [];
-  if (currentAppType === "I") {
-    allColumns = normalQueryColumnsI;
-  } else {
-    allColumns = normalQueryColumnsAE;
-  }
-
-  const filteredColumns = allColumns.filter(col =>
-    selectedProps.includes(col.prop)
+// 根据选中字段过滤最终表头
+function applyCheckedColumns(props: string[]) {
+  const finalColumns = normalQueryColumns.filter(col =>
+    props.includes(col.prop)
   );
-
-  console.log('filteredColumns', filteredColumns);
-
-  tableObj.notWaitObj.fromSchema = filteredColumns;
-  Object.assign(tableconfig, {
-    ...tableObj.notWaitObj,
-    fromSchema: filteredColumns
-  });
-}
-
-// 根据任务类型加载用户配置或默认配置
-async function loadColumnsByType(appType:string): Promise<any[]> {
-  const param = {
-    type: appType || 'A', // 默认A/E
-    cCrtCde: JSON.parse(sessionStorage.getItem("user")).opCde
-  };
-
-  try {
-    const res = await getCustomUserList(param);
-    if (res.code === 200 && res.data?.data.contents?.[0]?.loadData?.length) {
-      return res.data.data.contents[0].loadData;
-    }
-  } catch (error) {
-    console.error('加载用户配置失败:', error);
-  }
-
-  // 使用默认配置
-  return getDefaultColumns(appType);
-}
-
-function getDefaultColumns(appType:string) {
-  if (appType === 'I') {
-    return normalQueryColumnsI.map(col => ({
-      label: col.title,
-      value: col.prop,
-      checked: true // 默认全选
-    }));
-  } else {
-    return normalQueryColumnsAE.map(col => ({
-      label: col.title,
-      value: col.prop,
-      checked: true // 默认全选
-    }));
-  }
+  tableObj.notWaitObj.fromSchema = finalColumns;
+  Object.assign(tableconfig, { ...tableObj.notWaitObj, fromSchema: finalColumns });
 }
 
 function setValue(key: string, value: any) {
