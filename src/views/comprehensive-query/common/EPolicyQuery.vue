@@ -223,7 +223,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             {
                 prop: 'CInsuredNme',
                 inputtype: 'rtinput',
-                title: '被保人姓名',
+                title: '被保人名称',
                 clearable: true
             },
             {
