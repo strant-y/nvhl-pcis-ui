@@ -273,6 +273,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     itemWidth: 3,
                     loadData: buildAllCheckboxData(userChecked)
                 }];
+
+                console.log('modalData',modalData);
     
                 dzmodal.open(colChange, { type: "edit", data: modalData, userSaved: !!userCfg })
                 .then(async (res) => {
@@ -283,17 +285,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                         prop: "bsType",
                         inputtype: 'rtcheckboxgroup',
                         itemWidth: 3,
-                        loadData: buildAllCheckboxData(props) //把完整数据写回
+                        loadData: buildAllCheckboxData(selectedProps) //把完整数据写回
                     }];
                     // 保存到接口
                     const saveParam = {
-                        cPkId: colChangeCPkId.value || null,
+                        // cPkId: colChangeCPkId.value || null,
+                        cPkId: null,
                         content: newContent,
                         type: 'search',
                         cCrtCde: JSON.parse(sessionStorage.getItem("user")).opCde,
                     };
+                    console.log('saveParam',saveParam);
                     try {
                         const saveRes = await CustomUserList(saveParam);
+                        console.log('saveRes',saveRes);
                         if (saveRes.code == 200) {
                           userColumnConfig.value = saveRes.data.data.contents[0].loadData;
 
@@ -792,7 +797,7 @@ const normalQueryColumns = [
         isShow:false
     },
     {
-        prop: "cEdrNo",
+        prop: "cPlyAppNo，",
         inputtype: "rtinput",
         title: "批改申请单号/批单号",
         minWidth: 180,
@@ -816,7 +821,7 @@ const normalQueryColumns = [
         minWidth: 180,
     },
     {
-        prop: "cAppNme",
+        prop: "cInsuredNme",
         inputtype: "rtinput",
         title: "被保人名称",
         minWidth: 180,
@@ -891,25 +896,27 @@ const normalQueryColumns = [
         maxWidth: 120,
     },
     {
-        prop: "tUdrTm",
+        prop: "cEdrRsnDetail",
         inputtype: "rtinput",
         title: "批改原因",
         minWidth: 180,
-    },
-    // ===== 可勾选字段（默认未选中） =====
-    {  prop: 'tAppTm',
-       inputtype: "rtinput",
-       title: '申请日期',
-       minWidth: 180
     }
 ]
+
 // 扩展列（仅用于变更列弹窗，默认未勾选）
 const extendColumns = [
-  { prop: 'tAppTm', inputtype: "rtinput", title: '申请日期', minWidth: 180, optional: true },
-  { prop: 'tUnderwriteTm', inputtype: "rtinput", title: '核保日期', minWidth: 180, optional: true },
-  { prop: 'cProjectSub', inputtype: "rtinput", title: '项目子类', minWidth: 180, optional: true },
-  { prop: 'nAmtChange', inputtype: "rtinput", title: '保额变化量', minWidth: 180, optional: true },
-  { prop: 'nPrmChange', inputtype: "rtinput", title: '保费变化量', minWidth: 180, optional: true },
+  { prop: 'cCiMrk', inputtype: "rtinput", title: '共保类型', minWidth: 180, optional: true },
+  { prop: 'tCrtTm', inputtype: "rtinput", title: '申请日期', minWidth: 180, optional: true },
+  { prop: 'tUdrTm', inputtype: "rtinput", title: '核保日期', minWidth: 180, optional: true },
+  { prop: 'cPrjCtgTyp', inputtype: "rtinput", title: '项目大类', minWidth: 180, optional: true },
+  { prop: 'cPrjCtgMidTyp', inputtype: "rtinput", title: '项目中类', minWidth: 180, optional: true },
+  { prop: 'cPrjCtgSubTyp', inputtype: "rtinput", title: '项目子类', minWidth: 180, optional: true },
+  { prop: 'nInsuranceVariation', inputtype: "rtinput", title: '保额变化量', minWidth: 180, optional: true },
+  { prop: 'nPremiumVariation', inputtype: "rtinput", title: '保费变化量', minWidth: 180, optional: true },
+  { prop: 'cOprCde', inputtype: "rtinput", title: '录单员', minWidth: 180, optional: true },
+  { prop: 'cUdrNme', inputtype: "rtinput", title: '核保人', minWidth: 180, optional: true },
+  { prop: 'cPrnNo', inputtype: "rtinput", title: '保批单印刷号', minWidth: 180, optional: true },
+  { prop: 'nAmtChange', inputtype: "rtinput", title: '保费发票号', minWidth: 180, optional: true },
 ];
 
 const tableObj = {
@@ -1160,9 +1167,10 @@ onMounted(async () => {
         checkedProps = userCfg.filter(i => i.checked).map(i => i.value);
         colChangeCPkId.value = userCfg.cPkId || '';
     } else {
-        // 2. 没配置 -> 用默认列
+        // 没配置 -> 用默认列
         checkedProps = normalQueryColumns.map(c => c.prop);
     }
+    console.log('checkedProps', checkedProps);
     applyCheckedColumns(checkedProps);
 });
 
@@ -1199,6 +1207,7 @@ async function queryAE( flag?: boolean, isEs = false) {
     if (s.cLoadSub == null) {
         s.cLoadSub = "1";
     }
+    console.log('s---------', s)
     pageresult.list = [];
     if (
         (s["cAppNo"] == null || s["cAppNo"] == "") &&
@@ -1433,6 +1442,7 @@ function buildAllCheckboxData(userChecked: string[] = []) {
       checked: userChecked.includes(col.prop) // 扩展列以用户配置为准
     }))
   ];
+  console.log('userChecked', userChecked);
   return all;
 }
 
@@ -1444,14 +1454,16 @@ async function loadUserColumns(){
     };
     
     const res = await getCustomUserList(param);
-    console.log('res', res);
-    console.log('res.data.content',res.data.data.contents);  
-    console.log('res.data.content[0].loadData', res.data.data.contents[0].loadData); 
+    // console.log('res', res);
+    // console.log('res.data.content',res.data.data.contents);  
+    // console.log('res.data.content[0].loadData', res.data.data.contents[0].loadData); 
     
     if (res.code === 200) {
-        let responseData = res.data?.data.contents[0].loadData;
-        colChangeCPkId.value = res.data.data?.cPkId;
-        return res.data.data.contents[0].loadData;
+        return null;
+        
+        // let responseData = res.data?.data?.contents?.[0].loadData;
+        // colChangeCPkId.value = res.data.data?.cPkId;
+        // return res.data.data.contents[0].loadData;
     } else {
         return null; // 没配置
     }
@@ -1586,8 +1598,16 @@ function applyCheckedColumns(props: string[]) {
   const finalColumns = normalQueryColumns.filter(col =>
     props.includes(col.prop)
   );
-  tableObj.notWaitObj.fromSchema = finalColumns;
-  Object.assign(tableconfig, { ...tableObj.notWaitObj, fromSchema: finalColumns });
+
+  const newConfig = {
+    ...tableObj.notWaitObj,
+    fromSchema: finalColumns
+  };
+  
+  // 重新赋值触发响应式更新
+  Object.assign(tableconfig, newConfig);
+
+  handleQuery(true);
 }
 
 function setValue(key: string, value: any) {
