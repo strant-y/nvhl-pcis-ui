@@ -94,7 +94,7 @@ watch(
     (newVal: any) => {
       if (newVal) {
         console.log('发生变化了。。。',newVal)
-        eventBus.emit('matterChange', newVal);
+        eventBus.emit('matterChange', nCargoSeq.value);
       }
     }
 );
@@ -145,7 +145,9 @@ onMounted(async () => {
    }
  })
 });
+const nCargoSeq = ref()
 const loadDatOne = (val:any)=>{
+  nCargoSeq.value = val
   if(!val) return
   const r = distTableRef.value?.getPartnerPage(true); //获取分页数据
   let param = Object.assign({cComponentTable:'ECargoGoodsTgt',cEcAgrAppNo:val || ''}, r);
@@ -164,6 +166,7 @@ function hasPropertyWithValue(arr, property) {
   );
 }
 const goodsRefresh = (val:any)=>{
+  nCargoSeq.value = val.cEcAgrAppNo
   if(hasPropertyWithValue(pageresult.list,'ECargoGoodsTgt.cRowId')) return
   copyDist(val).then((res:any) => {
     if(res && res.code === 200) {

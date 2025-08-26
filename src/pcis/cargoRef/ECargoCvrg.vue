@@ -170,14 +170,13 @@ onMounted(() => {
   Object.assign(formconfig1, formconfig11);
   addProvide(CommonConstants.FORM_DATA_KEY, 'ECargoTerm.cPkId')
 });
-const getMatterList = async ()=>{
+const getMatterList = async (val:any)=>{
   let  result:any = []
   const r = {
     pageNum: 1,
     pageSize: 9999
   }; //获取分页数据
-  const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
-  let param = Object.assign({cComponentTable:'ECargoGoodsTgt',cEcAgrAppNo:agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''}, r);
+  let param = Object.assign({cComponentTable:'ECargoGoodsTgt',cEcAgrAppNo:val || ''}, r);
   const res:any  = await cargoApi.selectDistNew(param)
   if(res.code === 200) {
     if(res.data.data.length > 0 ){
@@ -186,13 +185,14 @@ const getMatterList = async ()=>{
   }
   return result || []
 }
-const matterChange = async ()=>{
+const matterChange = async (val:any)=>{
   //获取条款列表
   const cvrgList:any = getFormValue()
   if(!Array.isArray(cvrgList)) return
   if(cvrgList.length === 0) return
   // 获取货物列表
- const matterList:any =  await getMatterList()
+  if (!val) return
+ const matterList:any =  await getMatterList(val)
 
   // 遍历对象数组A
   cvrgList.forEach((item:any) => {
@@ -202,9 +202,9 @@ const matterChange = async ()=>{
     if(cGoodsId){
       const ids = cGoodsId.split(',')
       // 使用拆分后的ID数组过滤数组B
-      const goodList = matterList.filter((item:any) => {
+      const goodList = matterList.filter((data:any) => {
         // 将item.id转换为字符串进行比较
-        return ids.includes(item['ECargoGoodsTgt.cPkId']);
+        return ids.includes(data['ECargoGoodsTgt.cPkId']);
       });
       if(goodList.length > 0){
         handelCalculate(item,goodList)
