@@ -892,7 +892,7 @@ const normalQueryColumns = [
         maxWidth: 120,
     },
     {
-        prop: "cEdrRsnDetail",
+        prop: "cRsnCde",  // CEdrRsnDetail 批改原因 
         inputtype: "rtinput",
         title: "批改原因",
         minWidth: 180,
@@ -1197,32 +1197,21 @@ async function queryAE( flag?: boolean, isEs = false) {
     const tableRefs = tableRef.value;
     const freeEditRefs = freeEditRef.value;
     const r = tableRefs.getPartnerPage(flag); //获取分页数据
-    const s = freeEditRefs.getFromValue(); //获取表单数据
-    // 清空询价日期参数
-    s.tInquiryTm = null;
+    const s = freeEditRefs.getFromValue(); //获取表单数据  
     if (s.cLoadSub == null) {
         s.cLoadSub = "1";
     }
-    console.log('s---------', s)
     pageresult.list = [];
     if (
         (s["cAppNo"] == null || s["cAppNo"] == "") &&
         (s["cPlyNo"] == null || s["cPlyNo"] == "") &&
         (s["cAppNme"] == null || s["cAppNme"] == "")
     ) {
-        const startTemp =
-            s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[0] : null;
-        if (null == startTemp || undefined === startTemp) {
-            ElMessage.warning("签单日期不能为空");
-            return;
-        }
+        const startTemp = s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[0] : null;
         const start = dayjs(startTemp);
         const endTemp = s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[1] : null;
-        if (null == endTemp || undefined === endTemp) {
-            ElMessage.warning("签单日期不能为空");
-            return;
-        }
         const end = dayjs(endTemp);
+
         if (end.isBefore(start)) {
             ElMessage.warning("签单日期起期不能大于签单日期止期");
             return;
@@ -1256,9 +1245,26 @@ async function queryAE( flag?: boolean, isEs = false) {
     param["tIssueTmEnd"] = tIssueTmEnd; // 添加签单结束时间
     param["queryType"] = queryType.value;
     param["cTermNo"] = cTermNo;        // 条款编码
+
     // 清空询价日期参数
+    param.tInquiryTm = null;
     param["tInquiryTmStart"] = null;
     param["tInquiryTmEnd"] = null;
+
+    if(s.cAppTyp == 'A'){
+      // 清空批改日期参数
+      param.tEdrAppTm = null;
+      param["tEdrAppTmStart"] = null;
+      param["tEdrAppTmEnd"] = null
+    }
+
+    if(s.cAppTyp == 'E'){
+      // 清空投保日期参数
+      param.tAppTm = null;
+      param["tAppTmStart"] = null;
+      param["tAppTmEnd"] = null
+    }
+    console.log('param1---------', param)
 
     // ES 必须填查询关键字
     if (isEs && !param.cQueryStr?.trim()) {
@@ -1336,26 +1342,26 @@ async function queryI(flag?: boolean, isEs = false) {
         const startTemp =
             s.tInquiryTm && s.tInquiryTm.length > 1 ? s.tInquiryTm[0] : null;
         if (null == startTemp || undefined === startTemp) {
-            ElMessage.warning("询价日期不能为空");
+            ElMessage.warning("申请日期不能为空");
             return;
         }
         const start = dayjs(startTemp);
         const endTemp = s.tInquiryTm && s.tInquiryTm.length > 1 ? s.tInquiryTm[1] : null;
         if (null == endTemp || undefined === endTemp) {
-            ElMessage.warning("询价日期不能为空");
+            ElMessage.warning("申请日期不能为空");
             return;
         }
         const end = dayjs(endTemp);
         if (end.isBefore(start)) {
-            ElMessage.warning("询价日期起期不能大于询价日期止期");
+            ElMessage.warning("申请日期起期不能大于申请日期止期");
             return;
         }
         if (end.diff(start, "year", true) > 2) {
-            ElMessage.warning("询价日期时间范围请控制在两年内");
+            ElMessage.warning("申请日期时间范围请控制在两年内");
             return;
         }
     }
-    // 提取询价日期的开始时间和结束时间
+    // 提取申请日期的开始时间和结束时间
     const tInquiryTmStart = s.tInquiryTm && s.tInquiryTm.length > 1 ? s.tInquiryTm[0] : null;
     const tInquiryTmEnd = s.tInquiryTm && s.tInquiryTm.length > 1 ? s.tInquiryTm[1] : null;
 
@@ -1383,6 +1389,8 @@ async function queryI(flag?: boolean, isEs = false) {
         param.IndexName = 'ply_inquiry_ik';
         param.IndexType = 'ply_inquiry_info';
     }
+     console.log('param2---------', param)
+
     if (isEs) {
      queryInsuredList(param)
       .then((res) => {
