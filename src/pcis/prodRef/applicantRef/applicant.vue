@@ -53,6 +53,7 @@ import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { set } from "lodash";
 import { validateIdCard } from "@/typings/method-public";
 import {calculateAgeFromIdCard} from "@/utils/common";
+import{setCapitalRequiredRule} from "@/utils/InsuranceCoverageRules";
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -496,6 +497,7 @@ const method = {
     const param = opertaor.getParam();
 
     if (val == "0") {
+       setCapitalRequiredRule(getValue,setFormItem,'Applicant');
       setFormItem("Applicant.tBirthday", {
         rules: null
       });
@@ -766,6 +768,7 @@ const method = {
     }
 
       checkUser();
+   
   },
   //大股东性质change事件
   funcShareholderNature: (val) => {
@@ -838,6 +841,13 @@ const method = {
       setFormItem("Applicant.cTrdCde", {btnItems:{disabled: false}});
       setFormItem("Applicant.cTrdCde", {rules: [getRules("required", {})]})
     }
+  },
+  // 是否分支机构
+  cIsBranchChange:(val:any)=>{
+      if(val){
+        setCapitalRequiredRule(getValue,setFormItem,'Applicant');
+      }
+       
   },
   funcNdustryCate: () => {
     const param = opertaor.getParam();
@@ -1094,6 +1104,8 @@ const method = {
   const clientNature = getValue('Applicant.cClntMrk');
   const isSpecialCase = cWorkDptList.includes(val) && clientNature === '0';
   const requiredRule = [getRules("required", {})];
+
+  setCapitalRequiredRule(getValue,setFormItem,'Applicant');
   //实名认证方式
   setFormItem("Applicant.cRealnameAuthType", {
     rules: isSpecialCase ? requiredRule : []

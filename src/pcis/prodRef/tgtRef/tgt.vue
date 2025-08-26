@@ -111,7 +111,11 @@ onMounted(async () => {
   // 040005 办学许可证号
   if (params.cProdNo === '040005') {
     setFormItem("Tgt.cLicenseNumber", { rules: [] });
-  } else {
+  } else if(params.cProdNo === '020013') {
+    setFormItem("Tgt.cLicenseNumber", {
+      rules: [getRules("required", { 'trigger': 'blur' }),getRules("vehiclePlate", {})],
+    });
+  }else{
     setFormItem("Tgt.cLicenseNumber", {
       rules: [getRules("vehiclePlate", {})],
     });

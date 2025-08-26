@@ -99,7 +99,7 @@ const formconfig = reactive<AppFreeEditConfig>(
          clearable: true,
         func: (row: any) => {
           if (row) {
-            setFormItem('cSrvyCde', {
+            setFormItem('cCtyCnm', {
               typeCode: "Country_City",
               codeParam: { cAddr: cAddrData, cAraCde: row }
             })
@@ -107,7 +107,8 @@ const formconfig = reactive<AppFreeEditConfig>(
         }
       },
       {
-        prop: "cSrvyCde",
+        // prop: "cSrvyCde",
+        prop: "cCtyCnm",
         inputtype: "rtselect",
         title: "城市",
          clearable: true,

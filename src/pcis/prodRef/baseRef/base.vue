@@ -194,7 +194,7 @@ const method = {
     }else if(val=='0'){
       setFormItem("Base.nPayNumber", { disabled: true, });
       setValue('Base.nPayNumber',1)
-       nPayNumberFun(true);
+      //  nPayNumberFun(true);
     }
   },
   //争议处理选择事件
