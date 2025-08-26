@@ -321,7 +321,7 @@ export const dataOpertaor = (pageKey?: string) => {
                                 grouplist.forEach(g => {
                                     const gprop = g['prop']; // 抽离需要的数据
                                     const gd = getDataByKey(gprop, data);
-                                    if (gd) {
+                                    if (gd == 0 || gd) {
                                         res1[k][gprop] = gd;
                                     }
                                 })
@@ -329,7 +329,7 @@ export const dataOpertaor = (pageKey?: string) => {
                         } else {
                             const prop = f['prop']; // 抽离需要的数据
                             const d = getDataByKey(prop, data);
-                            if (d) {
+                            if (d == 0 || d) {
                                 res1[k][prop] = d;
                             }
                         }
