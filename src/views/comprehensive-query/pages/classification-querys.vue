@@ -259,13 +259,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           createFreeButtonBase({
             label: "变更列",
             func: async () => {
-                // 1. 取用户已保存的勾选字段
+                // 取用户已保存的勾选字段
                 const userCfg = await loadUserColumns();
                 const userChecked = userCfg? 
                 userCfg.filter(i => i.checked).map(i => i.value): normalQueryColumns.map(c => c.prop); // 没配置就默认全选原始列
 
 
-                // 构建弹窗所需格式，用缓存的数据
+                // 构建弹窗所需格式
                 let modalData: any[] = [];
                 modalData = [{
                     prop: 'bsType',
@@ -273,37 +273,31 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     itemWidth: 3,
                     loadData: buildAllCheckboxData(userChecked)
                 }];
-
-                console.log('modalData',modalData);
-    
                 dzmodal.open(colChange, { type: "edit", data: modalData, userSaved: !!userCfg })
                 .then(async (res) => {
                     if (res.type === "ok") {
                     const selectedProps = res.body.body; // 用户选中的列
                     
-                    const newContent = [{
-                        prop: "bsType",
-                        inputtype: 'rtcheckboxgroup',
-                        itemWidth: 3,
-                        loadData: buildAllCheckboxData(selectedProps) //把完整数据写回
-                    }];
                     // 保存到接口
                     const saveParam = {
-                        // cPkId: colChangeCPkId.value || null,
-                        cPkId: null,
-                        content: newContent,
+                        cPkId: colChangeCPkId.value || null,
+                        content: [{
+                            prop: "bsType",
+                            inputtype: 'rtcheckboxgroup',
+                            itemWidth: 3,
+                            loadData: buildAllCheckboxData(selectedProps) //完整数据写回
+                        }],
                         type: 'search',
                         cCrtCde: JSON.parse(sessionStorage.getItem("user")).opCde,
                     };
                     console.log('saveParam',saveParam);
                     try {
                         const saveRes = await CustomUserList(saveParam);
-                        console.log('saveRes',saveRes);
                         if (saveRes.code == 200) {
-                          userColumnConfig.value = saveRes.data.data.contents[0].loadData;
-
-                          applyCheckedColumns(selectedProps);     // 实时刷新表格
                           ElMessage.success("列配置已更新");
+                          colChangeCPkId.value = saveRes.data.data.cPkId || '';
+                          userColumnConfig.value = saveRes.data.data.contents[0].loadData;
+                          applyCheckedColumns(selectedProps); // 更新表头
                         } else {
                           ElMessage.error(saveRes.msg || "保存失败");
                         }
@@ -1160,17 +1154,17 @@ onMounted(async () => {
         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
     ]);
 
-    // 优先加载用户配置
+    // 加载用户列配置
     const userCfg = await loadUserColumns();
     let checkedProps = [];
+
     if (userCfg) {
-        checkedProps = userCfg.filter(i => i.checked).map(i => i.value);
+        checkedProps = userCfg.filter((i: any) => i.checked).map((i: any) => i.value);
         colChangeCPkId.value = userCfg.cPkId || '';
     } else {
-        // 没配置 -> 用默认列
-        checkedProps = normalQueryColumns.map(c => c.prop);
+        checkedProps = normalQueryColumns.map(c => c.prop); // 默认列
     }
-    console.log('checkedProps', checkedProps);
+
     applyCheckedColumns(checkedProps);
 });
 
@@ -1430,43 +1424,34 @@ async function queryI(flag?: boolean, isEs = false) {
 
 // 把原始列 + 扩展列 合并成弹窗需要的数据
 function buildAllCheckboxData(userChecked: string[] = []) {
-  const all = [
-    ...normalQueryColumns.map(col => ({
-      label: col.title,
-      value: col.prop,
-      checked: !col.optional      // 原始列默认勾选
-    })),
-    ...extendColumns.map(col => ({
-      label: col.title,
-      value: col.prop,
-      checked: userChecked.includes(col.prop) // 扩展列以用户配置为准
-    }))
-  ];
-  console.log('userChecked', userChecked);
-  return all;
+    const all = [
+        ...normalQueryColumns.map(col => ({
+            label: col.title,
+            value: col.prop,
+            checked: true, // 原始列默认勾选
+        })),
+        ...extendColumns.map(col => ({
+            label: col.title,
+            value: col.prop,
+            checked: userChecked.includes(col.prop), // 扩展列根据用户配置
+        }))
+    ];
+    return all;
 }
 
 // 加载列配置
-async function loadUserColumns(){
-    let param = {
+async function loadUserColumns() {
+    const param = {
         type: 'search',
         cCrtCde: JSON.parse(sessionStorage.getItem("user")).opCde
     };
-    
     const res = await getCustomUserList(param);
-    // console.log('res', res);
-    // console.log('res.data.content',res.data.data.contents);  
-    // console.log('res.data.content[0].loadData', res.data.data.contents[0].loadData); 
-    
-    if (res.code === 200) {
-        return null;
-        
-        // let responseData = res.data?.data?.contents?.[0].loadData;
-        // colChangeCPkId.value = res.data.data?.cPkId;
-        // return res.data.data.contents[0].loadData;
-    } else {
-        return null; // 没配置
+
+    if (res.code === 200 && res.data?.data?.contents?.[0]?.loadData) {
+        colChangeCPkId.value = res.data.data.cPkId || '';
+        return res.data.data.contents[0].loadData; // 返回用户配置
     }
+    return null; // 无配置
 }
 
 // 多选事件
@@ -1595,19 +1580,17 @@ const copyText = (text: any) => {
 
 // 根据选中字段过滤最终表头
 function applyCheckedColumns(props: string[]) {
-  const finalColumns = normalQueryColumns.filter(col =>
-    props.includes(col.prop)
-  );
+    const finalColumns = [
+        ...normalQueryColumns.filter(col => props.includes(col.prop)),
+        ...extendColumns.filter(col => props.includes(col.prop))
+    ];
+    const newConfig = {
+        ...tableObj.notWaitObj,
+        fromSchema: finalColumns
+    };
 
-  const newConfig = {
-    ...tableObj.notWaitObj,
-    fromSchema: finalColumns
-  };
-  
-  // 重新赋值触发响应式更新
-  Object.assign(tableconfig, newConfig);
-
-  handleQuery(true);
+    Object.assign(tableconfig, newConfig);
+    handleQuery(true); // 刷新数据
 }
 
 function setValue(key: string, value: any) {
