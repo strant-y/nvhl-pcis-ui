@@ -9,22 +9,23 @@
       @page-change="handleQuery(false)"
     >
       <!-- policyInfo 列的具名插槽 -->
-      <template #column-policyInfo="{ row, column, index }">
+       <template #column-policyInfo="{ row, column, index }">
         <div class="policy-info-cell">
           <div v-if="row.cAppNo" class="policy-number-row">
-            <span>{{ row.cAppNo }}</span>
+            <span v-html="row.cAppNo"></span>
             <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
-              <CopyDocument />
+              <DocumentCopy />
             </el-icon>
           </div>
           <div v-if="row.cPlyNo" class="policy-number-row">
-            <span>{{ row.cPlyNo }}</span>
+            <span v-html="row.cPlyNo"></span>
             <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
-              <CopyDocument />
+              <DocumentCopy />
             </el-icon>
           </div>
         </div>
       </template>
+
       <template #column-InsurancePeriod="{ row, column, index }">
         <div class="policy-info-cell">
           <div v-if="row.tInsrncBgnTm" class="policy-period-row">
@@ -36,7 +37,7 @@
         </div>
       </template>
 
-      <!-- ES查询 投保人姓名，被保人姓名，被保人地址，产品名称高亮 -->
+      <!-- ES查询 查询条件高亮 -->
       <template #column-cAppNme="{ row }">
         <span v-html="row.cAppNme || ''"></span>
       </template>
@@ -52,7 +53,6 @@
       <template #column-tUdrTm="{ row }">
         <span v-html="row.tUdrTm || ''"></span>
       </template>
-
     </app-table>
   </div>
 </template>
@@ -791,7 +791,7 @@ const normalQueryColumns = [
         isShow:false
     },
     {
-        prop: "cPlyAppNo，",
+        prop: "cPlyAppNo",
         inputtype: "rtinput",
         title: "批改申请单号/批单号",
         minWidth: 180,
