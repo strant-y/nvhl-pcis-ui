@@ -574,25 +574,43 @@ const saveEdrPlyInfo = async () => {
 
     saveEdrFlag = true;
     cEcAgrAppNo.value = EdrBaseData['ECargoBase.cEcAgrAppNo']
-    if(cEcAgrAppNo.value && !saveDistBatchFlag.value){
+    if(cEcAgrAppNo.value && !saveDistBatchFlag.value && props.isActive === '0'){
       const param:any =  idxParam.param
       const  val ={cEcAgrAppNo:param.cEcAgrAppNo,targetNo:cEcAgrAppNo.value,cRsnCde:param.cRsnCde,}
-      copyDist(val).then((res:any) => {
-        if(res && res.code === 200) {
-          console.log('copy成功')
-        } else {
-          ElMessage.error(res.msg);
-        }
-      }).catch((err:any) => {
-        ElMessage.error(err.msg);
-      })
+      // copyDist(val).then((res:any) => {
+      //   if(res && res.code === 200) {
+      //     console.log('copy成功')
+      //   } else {
+      //     ElMessage.error(res.msg);
+      //   }
+      // }).catch((err:any) => {
+      //   ElMessage.error(err.msg);
+      // })
+     const result:any =  await copyDist(val)
+      if(result && result.code === 200) {
+        console.log('copy成功')
+       const dataRes:any = await cargoApi.init({
+          ...idxParam.param,
+         cEcAgrAppNo:cEcAgrAppNo.value,
+          ...{}
+        })
+          if(dataRes.code === 200) {
+            console.log('dataRes["data"]["composition"]["AgreementCvrg"]',dataRes["data"]["composition"]["AgreementCvrg"])
+            formPage.value?.setFormDataById('AgreementCvrg',dataRes["data"]["composition"]["AgreementCvrg"])
+          }
+        eventBus.emit('goodsChange', cEcAgrAppNo.value);
+        eventBus.emit('insuredChange', cEcAgrAppNo.value);
+        eventBus.emit('transportChange', cEcAgrAppNo.value);
+        saveDistBatchFlag.value = true
+      } else {
+        ElMessage.error(result.msg);
+      }
     }
-    if(cEcAgrAppNo.value){
-      eventBus.emit('goodsChange', cEcAgrAppNo.value);
-      eventBus.emit('insuredChange', cEcAgrAppNo.value);
-      eventBus.emit('transportChange', cEcAgrAppNo.value);
-    }
-    saveDistBatchFlag.value = true
+    // if(cEcAgrAppNo.value){
+    //   eventBus.emit('goodsChange', cEcAgrAppNo.value);
+    //   eventBus.emit('insuredChange', cEcAgrAppNo.value);
+    //   eventBus.emit('transportChange', cEcAgrAppNo.value);
+    // }
   } else {
     ElMessage.error(edrInfo.msg);
   }
