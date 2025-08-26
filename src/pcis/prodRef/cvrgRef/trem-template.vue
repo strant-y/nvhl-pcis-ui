@@ -952,15 +952,23 @@ function initMethod(){
  */
 function initTermsData(item: any) {
   if(item.prop === 'Term.cClaimInclude'){ //是否计入累计赔偿限额 默认选择否
-    if(!termdata.value[item.prop]){
+    if(termdata.value[item.prop] === null || termdata.value[item.prop] === undefined){
       if(pageparam.cProdNo === "040003" || pageparam.cProdNo === "043002" || pageparam.cProdNo === "040002" ){
         termdata.value[item.prop] = '1';
       }else{
         termdata.value[item.prop] = '0';
       }
-      
       return true;
     }
+  }
+
+  if(item.prop === 'Term.cLimitSame'){ //赔偿限额是否同主险 默认勾选
+    if(termdata.value[item.prop] === null || termdata.value[item.prop] === undefined){
+      if(pageparam.cProdNo === "043002"){
+        termdata.value[item.prop] = '1';
+      }
+    }
+
   }
   return false;
 }
@@ -971,7 +979,7 @@ function initTermRiskData(item: any){
   if(item.cPorpType != 'text'){
     const faitem = factormap.value[item['cFactorId']];
     if(faitem.prop === 'TermRisktgt.cDeductibleMethod'){    //免赔方式,默认均为绝对免赔
-      if(!riskList.value[item['cRiskNo']][faitem.prop]){
+      if(riskList.value[item['cRiskNo']][faitem.prop] === null || riskList.value[item['cRiskNo']][faitem.prop] === undefined){  // 为空时才赋值
         riskList.value[item['cRiskNo']][faitem.prop] = '01';
         r = true;
       }
