@@ -22,6 +22,7 @@ const route = useRoute();
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { saveDist } from "@/api/prod";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { codeListViewStore } from "@/store";
 import {getAddressStr} from "@/api/query";
@@ -39,6 +40,7 @@ const { getRules } = useValidator();
 const tableRef = ref<MyTableMethod | null>(null);
 const codeListStore = codeListViewStore();
 const params = opertaor.getParam();
+
 const props = defineProps({
   data: {
     type: Object,
