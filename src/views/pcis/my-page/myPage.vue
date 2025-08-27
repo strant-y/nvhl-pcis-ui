@@ -1183,7 +1183,6 @@ const initPage = async () => {
   //   cPlyNo: props.param.cPlyNo,
   //   queryTyp: props.param.queryTyp,
   // });
-  debugger
   if (props.param.pageType === "PLY_UW_PROCESS_SCENE") {
     underwriteFlag.value = true;
   } else {
