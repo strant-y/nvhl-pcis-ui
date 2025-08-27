@@ -14,6 +14,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const policyService = new PolicyService();
 const dzmodal = useDzModal();
 const RiskunitA = defineAsyncComponent(
