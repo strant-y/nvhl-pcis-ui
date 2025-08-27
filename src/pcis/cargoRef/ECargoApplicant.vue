@@ -136,7 +136,7 @@ const handelItemShow = (data:any)=>{
 const method = {
   cIsIndvduBizChange:(val:any)=>{
     if(val === '1'){
-      setFormItem('ECargoApplicant.cTrdCde',{rules: [getRules("required", {})]})
+      setFormItem('ECargoApplicant.cTrdCde',{hidden:false,rules: [getRules("required", {})]})
     }else {
       setFormItem('ECargoApplicant.cTrdCde',{rules:null})
     }
@@ -168,7 +168,7 @@ const method = {
   },
   ApplicantIsGreen:(val:any)=>{
     if(val === '1' && !idxParam.readonly){
-      setFormItem('ECargoApplicant.cGreenIndustryList',{rules: [getRules("required", {})],disabled: false })
+      setFormItem('ECargoApplicant.cGreenIndustryList',{hidden:false,rules: [getRules("required", {})],disabled: false })
     }else {
       setFormItem('ECargoApplicant.cGreenIndustryList',{rules: null,disabled: true })
     }
@@ -308,6 +308,7 @@ const method = {
             });
             setFormItem("ECargoApplicant.cShareholderCategory", {
               loadData: res,
+              hidden:false,
               rules: [getRules("required", {})],
             });
           });
@@ -330,6 +331,7 @@ const method = {
             });
             setFormItem("ECargoApplicant.cShareholderCategory", {
               loadData: res,
+              hidden:false,
               rules: [getRules("required", {})],
             });
           });
@@ -339,6 +341,7 @@ const method = {
     //ECargoApplicant.cClntMrk 投保人性质 ，ECargoApplicant.cIsBranch 分支机构  ECargoApplicant.cWorkDpt 企业单位性质
     if ( (getValue('ECargoApplicant.cClntMrk') && getValue('ECargoApplicant.cClntMrk') === '0') && (getValue('ECargoApplicant.cIsBranch') && getValue('ECargoApplicant.cIsBranch') === '0') && (getValue('ECargoApplicant.cWorkDpt') && ['310','320','330','340','350','360'].includes(getValue('ECargoApplicant.cWorkDpt')))){
       setFormItem("ECargoApplicant.nRegisteredCapital", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
     }else {
@@ -351,6 +354,7 @@ const method = {
     //ECargoApplicant.cClntMrk 投保人性质 ，ECargoApplicant.cIsBranch 分支机构  ECargoApplicant.cWorkDpt 企业单位性质
     if ( (getValue('ECargoApplicant.cClntMrk') && getValue('ECargoApplicant.cClntMrk') === '0') && (getValue('ECargoApplicant.cIsBranch') && getValue('ECargoApplicant.cIsBranch') === '0') && (getValue('ECargoApplicant.cWorkDpt') && ['310','320','330','340','350','360'].includes(getValue('ECargoApplicant.cWorkDpt')))){
       setFormItem("ECargoApplicant.nRegisteredCapital", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
     }else {
@@ -366,6 +370,7 @@ const method = {
     if (val == "0") {
       if ( (getValue('ECargoApplicant.cClntMrk') && getValue('ECargoApplicant.cClntMrk') === '0') && (getValue('ECargoApplicant.cIsBranch') && getValue('ECargoApplicant.cIsBranch') === '0') && (getValue('ECargoApplicant.cWorkDpt') && ['310','320','330','340','350','360'].includes(getValue('ECargoApplicant.cWorkDpt')))){
         setFormItem("ECargoApplicant.nRegisteredCapital", {
+          hidden:false,
           rules: [getRules("required", {})],
         });
       }else {
@@ -385,21 +390,26 @@ const method = {
       // ECargoApplicant.cWorkDpt
       productStore.setcClntMrk(val);
       // 办理人
-      setFormItem("ECargoApplicant.cCntrNme", { rules: [getRules("required", {})] });
+      setFormItem("ECargoApplicant.cCntrNme", { hidden:false,rules: [getRules("required", {})] });
       setFormItem("ECargoApplicant.tOperaterCertfEndTm", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
       setFormItem("ECargoApplicant.cOperaterCertfTyp", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
       setFormItem("ECargoApplicant.cOperaterCertfCde", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
 
       setFormItem("ECargoApplicant.cParticiinsocTyp", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
       setFormItem("ECargoApplicant.cCntrCertfCde", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
 
@@ -420,19 +430,23 @@ const method = {
       });
       }
       setFormItem("ECargoApplicant.cWorkDpt", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
       // 是否绿色产业客户
       setFormItem("ECargoApplicant.cGreenIndustryCustomers", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
 
       // 参加社会统筹标志
       setFormItem("ECargoApplicant.cParticiinsocTyp", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
       //注册地址
       setFormItem("ECargoApplicant.cRegisteredcapDre", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
  
@@ -440,6 +454,7 @@ const method = {
       let cWorkDpt = getValue('ECargoApplicant.cWorkDpt')
       if(cWorkDptList.includes(cWorkDpt)){
           setFormItem("ECargoApplicant.cRealnameAuthType", {
+            hidden:false,
             rules: [getRules("required", {})],
           });
       }else{
@@ -457,17 +472,19 @@ const method = {
       let cTel = getValue('ECargoApplicant.cTel');  // 固定电话    
       if(!cMobile &&  !cTel ){
          setFormItem("ECargoApplicant.cMobile", {
+           hidden:false,
           rules: [getRules("required", {}), getRules("phoneNo", {})],
         });
       }else  if(cMobile){
         setFormItem("ECargoApplicant.cTel", { rules: [getRules("phone", {})] });
-        setFormItem("ECargoApplicant.cMobile", { rules: [getRules("required", {}), getRules("phoneNo", {})]})
+        setFormItem("ECargoApplicant.cMobile", {hidden:false, rules: [getRules("required", {}), getRules("phoneNo", {})]})
       } else if(cTel){
-        setFormItem("ECargoApplicant.cTel", { rules: [getRules("required", {}),getRules("phone", {})] });
+        setFormItem("ECargoApplicant.cTel", { hidden:false,rules: [getRules("required", {}),getRules("phone", {})] });
         setFormItem("ECargoApplicant.cMobile", { rules: [ getRules("phoneNo", {})]})
       }
          // 为法人 国民经济行业必填
       setFormItem("ECargoApplicant.cTrdCde", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
 
@@ -500,16 +517,20 @@ const method = {
       });
       setFormItem("ECargoApplicant.cCertfCls", {
         loadData: res,
+        hidden:false,
         rules: [getRules("required", {})],
       });
     } else {
       setFormItem("ECargoApplicant.tBirthday", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
       setFormItem("ECargoApplicant.nAge", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
       setFormItem("ECargoApplicant.cSex", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
       setFormItem("ECargoApplicant.cWorkDpt", { rules: null });
@@ -566,7 +587,7 @@ const method = {
       cProdNo === "043005" ||
       cProdNo === "043011"
     ) {
-      setFormItem("ECargoApplicant.cTrdCde", { rules: [getRules("required", {})], });
+      setFormItem("ECargoApplicant.cTrdCde", {hidden:false, rules: [getRules("required", {})], });
       
     }else{
       setFormItem("ECargoApplicant.cTrdCde", {
@@ -582,21 +603,26 @@ const method = {
 
       // 个人 移动电话必填  
       setFormItem("ECargoApplicant.cMobile", {
+        hidden:false,
         rules: [ getRules("required", {}), getRules("phoneNo", {})],
       });
       setFormItem("ECargoApplicant.cTel", { rules: [getRules("phone", {})] });
       setFormItem("ECargoApplicant.cIsIndvduBiz", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
 
       // 性别 、年龄、生日个人必填
       setFormItem("ECargoApplicant.tBirthday", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
       setFormItem("ECargoApplicant.nAge", {
+        hidden:false,
       rules: [getRules("required", {})],
       });
       setFormItem("ECargoApplicant.cSex", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
 
@@ -617,6 +643,7 @@ const method = {
       });
       setFormItem("ECargoApplicant.cCertfCls", {
         loadData: res,
+        hidden:false,
         rules: [getRules("required", {})],
       })
     }
@@ -647,18 +674,20 @@ const method = {
         disabled: false,
       });
     }
-
     if (val == "120001") { 
       
       // setValue('ECargoApplicant.cCertfCde','')  //选身份证时清空
       setFormItem("ECargoApplicant.cCertfCde", {
+        hidden:false,
         rules: [getRules("required", {}), getRules("idCard", {})],
       });
       setFormItem("ECargoApplicant.tCertfBgnDate", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
 
       setFormItem("ECargoApplicant.tCertfEndDate", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
 
@@ -683,38 +712,46 @@ const method = {
       }
     } else if (val == "110002") {
       setFormItem("ECargoApplicant.tCertfEndDate", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
         //证件类型是“营业执照”，参加社会统筹标志变化为必填
         // 参加社会统筹标志
         setFormItem("ECargoApplicant.cParticiinsocTyp", {
+          hidden:false,
           rules: [getRules("required", {})],
         });
         
     } else if ( val == "110007") {   
       setFormItem("ECargoApplicant.tCertfBgnDate", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
       setFormItem("ECargoApplicant.tCertfEndDate", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
 
       // 统一社会信用代码校验
         setFormItem("ECargoApplicant.cCertfCde", {
+          hidden:false,
         rules: [getRules("required", {}),getRules("socialCode", {})],
       });
 
             // 为法人  企业成立日期
       setFormItem("ECargoApplicant.tEstablishingDate", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
     } else if(val == "19"){
       // 外国人证件号
       setFormItem("ECargoApplicant.cCertfCde", {
+        hidden:false,
         rules: [getRules("required", {}),getRules("ariCard", {})],
       });
     } else {
       setFormItem("ECargoApplicant.cCertfCde", {
+        hidden:false,
         rules: [getRules("required", {})],
       });
       setFormItem("ECargoApplicant.tCertfBgnDate", { rules: null });
