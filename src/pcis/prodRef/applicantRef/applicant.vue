@@ -497,7 +497,6 @@ const method = {
   //投保人性质(0是法人 1是个人)
   InsureChange: (val) => {
     const param = opertaor.getParam();
-
     if (val == "0") {
        setCapitalRequiredRule(getValue,setFormItem,'Applicant');
       setFormItem("Applicant.tBirthday", {
@@ -624,26 +623,21 @@ const method = {
         rules: [],
       });
 
-           codeListStore
+        codeListStore
         .queryCodeList({
           codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
           codeListParam: {},
         })
         .then((res) => {
-          if (
-            !res.some((item) =>
-              Object.values(item).includes(getValue("Applicant.cCertfCls"))
-            )
-          ) {
-            setValue("Applicant.cCertfCls", "");
+          if (!res.some((item) =>Object.values(item).includes(getValue("Applicant.cCertfCls")))){
+            // setValue("Applicant.cCertfCls", "");
           }
-          setFormItem("Applicant.cCertfCls", {
-            loadData: [],
-          });
-          setFormItem("Applicant.cCertfCls", {
-            loadData: res,
-            rules: [getRules("required", {})],
-          });
+      
+           applicantEditRef.value?.addCodeListMap({
+              code: "Applicant.cCertfCls",
+              list: res
+            })
+          setValue('Applicant.cCertfCls','110007')
         });
     } else {
       setFormItem("Applicant.tBirthday", {
@@ -757,15 +751,20 @@ const method = {
               Object.values(item).includes(getValue("Applicant.cCertfCls"))
             )
           ) {
-            setValue("Applicant.cCertfCls", "");
+            if(getValue('Applicant.cCertfCls')){
+                 setValue("Applicant.cCertfCls", "");
+            }
+           
           }
-          setFormItem("Applicant.cCertfCls", {
-            loadData: [],
-          });
-          setFormItem("Applicant.cCertfCls", {
-            loadData: res,
-            rules: [getRules("required", {})],
-          });
+
+          // setFormItem("Applicant.cCertfCls", {
+          //   loadData: res,
+          //   rules: [getRules("required", {})],
+          // });
+           applicantEditRef.value?.addCodeListMap({
+              code: "Applicant.cCertfCls",
+              list: res
+            })
         });
     }
 
@@ -1102,7 +1101,6 @@ const method = {
 
   // 单位性质
  cWorkDptChange:(val: any) => {
-  console.log('单位性质变更为:', val);
   const clientNature = getValue('Applicant.cClntMrk');
   const isSpecialCase = cWorkDptList.includes(val) && clientNature === '0';
   const requiredRule = [getRules("required", {})];
