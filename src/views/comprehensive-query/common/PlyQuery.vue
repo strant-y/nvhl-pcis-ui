@@ -496,7 +496,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   });
                   codeListStore
                     .queryCodeList({
-                        codeListName: "TERM_LIST_IN_GUIDE_NEW",
+                        codeListName: "TERM_LIST_IN_GUIDE_SEARCH",
                         codeListParam:{
                         cParCde: cPard.value,
                         cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,

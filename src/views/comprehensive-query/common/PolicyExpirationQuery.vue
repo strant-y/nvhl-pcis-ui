@@ -83,13 +83,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         func: () => {
           freeEditRef.value?.setFormValue({
             NExpirationDays: "3",
-            orgCde: user.value.companyId,
+            cDptCde: user.value.companyId,
             CLoadSub: 1,
             cKindNo: null,
             cProdNo: null,
             CPlyNo: null
           });
-          setFormItem("orgCde", {loadData: [{
+          setFormItem("cDptCde", {loadData: [{
             label: user.value.companyId+user.value.companyCnm,
             value: user.value.companyId,
           }]});
@@ -100,7 +100,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
     fromSchema: [
       {
-        prop: "orgCde",
+        prop: "cDptCde",
         inputtype: "rtselect",
         title: "核保机构",
         btnWidth: 10,
@@ -125,10 +125,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     ],
                   };
                   freeEditRef.value?.setValue(
-                      "orgCde",
+                      "cDptCde",
                       selectObj.id
                   );
-                  setFormItem("orgCde", obj);
+                  setFormItem("cDptCde", obj);
                 }
               });
           },
@@ -202,7 +202,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           cPard.value = val;
           codeListStore
             .queryCodeList({
-                codeListName: "TERM_LIST_IN_GUIDE_NEW",
+                codeListName: "TERM_LIST_IN_GUIDE_SEARCH",
                 codeListParam:{
                 cParCde: cPard.value,
                 cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
@@ -300,13 +300,13 @@ const tableconfig = reactive<AppTableConfig>(
 onMounted(async () => {
 	freeEditRef.value?.setFormValue({
 		NExpirationDays: "3",
-		orgCde: user.value.companyId,
+		cDptCde: user.value.companyId,
 		CLoadSub: 1,
 		cKindNo: null,
 		cProdNo: null,
 		CPlyNo: null
 	});
-	setFormItem("orgCde", {loadData: [{
+	setFormItem("cDptCde", {loadData: [{
 		label: user.value.companyId + user.value.companyCnm,
 		value: user.value.companyId,
 	}]});
