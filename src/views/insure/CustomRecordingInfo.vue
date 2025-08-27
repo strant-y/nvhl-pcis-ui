@@ -145,7 +145,6 @@ const tableconfig = reactive<AppTableConfig>(
   })
 );
 onMounted(async () => {
-  console.log("props.datas", props.termList);
   init();
 });
 

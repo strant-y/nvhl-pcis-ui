@@ -27,7 +27,9 @@ import { useValidator } from "@/typings/useValidator";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { descryptParameter, encryptParameter } from "@/utils/encipher";
-const opertaor = dataOpertaor();
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 import {
   AppTableConfig,
   AppTableMethod,

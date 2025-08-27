@@ -28,7 +28,9 @@ const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
 import { saveEdrFormulaRel } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const tabref = opertaor.getTableRefByKey("prodInfo");
 const props = defineProps<{
   data: Object;

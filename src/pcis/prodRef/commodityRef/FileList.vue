@@ -23,7 +23,9 @@ import { useValidator } from "@/typings/useValidator";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { getPlanBasePage } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 import {
   AppTableConfig,
   AppTableMethod,

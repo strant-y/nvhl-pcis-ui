@@ -473,6 +473,7 @@ import { getAppPolicyList, qryEndorseList, delTmpPolicy, queryInsuredList, getIn
 import {encryptRouterParam} from "@/router";
 import SvgIcon from "@/components/SvgIcon/index.vue";
 import { distRequiredMap } from '../my-page/requiredDistMap';
+import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -548,13 +549,14 @@ const handleAnchorClick = (event, selector) => {
   }
 };
 
-const idxParam = {
-  opertaorId: 'my-page',
+const idxParam: IdxParamProps = {
+  opertaorProps: { id: route.name },
   handleAnchorClick: handleAnchorClick,
 };
-provide('idxParam', idxParam);
-const opertaor = dataOpertaor();
+provide(idxParamKey, idxParam);
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 opertaor.init();
+
 const underwrite = ref(null);
 const edrbase = ref(null);
 const edritem = ref(null);
@@ -1311,7 +1313,7 @@ const dataInit:any = ref({});
 function renderComponents() {
   const interval = setInterval(() => {
 		if (props.param.pageType === "app") {
-			const idata = getData();
+			const idata = getData(opertaor);
 			dataInit.value = opertaor.mapSetData(idata);
 			// setTimeout(() => {
 			//   // 基本信息预加载，降低空窗期

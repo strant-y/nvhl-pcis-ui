@@ -193,6 +193,8 @@ import { prodTemple,prodAllPrm } from "./titleTemple";
 import { codeListViewStore } from "@/store";
 import { qryProdRelTermRiskList } from "@/api/prod";
 import { getEdrRsnTermItem } from "@/api/query";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
 const codeListStore = codeListViewStore();
 const disAbledFlag = ref(false);
 const codeListMap = ref<any>({});
@@ -219,7 +221,8 @@ watch(() => cAddTermNo.value, (val) => {
     }
   }
 })
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const parparam = opertaor.getParam();
 const terconfig = terConfig();
 terconfig.configInit(); // 条款配置数据初始化

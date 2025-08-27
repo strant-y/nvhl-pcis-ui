@@ -1,13 +1,13 @@
 <template>
   <section class="app-main">
     <router-view>
-      <template #default="{ Component }">
+      <template #default="{ Component, route }">
         <transition
           enter-active-class="animate__animated animate__fadeIn"
           name="expand"
         >
           <keep-alive :max="8" :include="cachedViews">
-            <component :is="Component" :key="tagView?.componentKey"/>
+            <component :is="Component" :key="route.query.componentKey"/>
           </keep-alive>
         </transition>
       </template>
@@ -29,7 +29,9 @@ const {
 
 const tagView = computedEager(() => {
   const view = visitedViews.value.find((f: TagView) => f.path === route.path)
-  selectedView.value = view;
+  if(view) {
+    selectedView.value = view;
+  }
   return view;
 });
 </script>

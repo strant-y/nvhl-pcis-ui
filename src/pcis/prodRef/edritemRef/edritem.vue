@@ -19,6 +19,8 @@ import {
     getedrcmpitembyedrappnoorcachekey
 } from "../../../api/query/index";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
 const props = defineProps({
   // data: {
   //     type: Object,
@@ -29,7 +31,8 @@ const props = defineProps({
   //     default: () => ({}),
   // },
 });
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const params=opertaor.getParam()
 const edritemEditRef = ref<AppTableMethod | null>(null);
 const pageresult = reactive<Pageresult>({

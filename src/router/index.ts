@@ -1,5 +1,5 @@
 import {createRouter, createWebHashHistory, RouteLocationRaw, RouteRecordRaw} from "vue-router";
-import {encryptParameter} from "@/utils/encipher";
+import {base64encoder, encryptParameter} from "@/utils/encipher";
 import {useTagsViewStore} from "@/store";
 import {CommonConstants} from "@/constants/CommonConstants";
 
@@ -72,14 +72,21 @@ const router = createRouter({
 const originalPush = router.push;
 const originalReplace = router.replace;
 // 扩展 push 方法
-router.push = function (location: RouteLocationRaw) {
+router.push = async function (location: RouteLocationRaw) {
   if(!location || Object.keys(location).length == 0 || location === '') {
     return Promise.reject(new Error('Invalid route location'));
   }
+  const tagsViewStore = useTagsViewStore();
   const routeParams = formatLocation(location);
+  await tagsViewStore.clearConflictingView(routeParams.path as string);
+  routeParams.query = {
+    ...routeParams.query,
+    ...{componentKey: base64encoder(routeParams.path) + new Date().getTime(),}
+  };
   encryptRouterParam(routeParams);
-  sessionStorage.setItem('navType', 'push');
-  return originalPush.call(this, routeParams).catch(err => {
+  return originalPush.call(this, routeParams).then(() => {
+    tagsViewStore.addTagView(this.currentRoute.value);
+  }).catch(err => {
     if (err.name !== 'NavigationDuplicated') {
       // 可以在这里添加全局错误处理
       console.error('路由跳转错误:', err)
@@ -90,10 +97,17 @@ router.push = function (location: RouteLocationRaw) {
 // 扩展 replace 方法
 router.replace = function (location: RouteLocationRaw) {
   const routeParams: any = formatLocation(location);
+  const tagsViewStore = useTagsViewStore();
+  const {visitedViews} = toRefs(tagsViewStore);
+  const view = visitedViews.value.find((item: TagView) => item.path === routeParams.path);
+  if(view && view.query) {
+    routeParams.query = {
+      ...routeParams.query,
+      ...{componentKey: view.query.componentKey}
+    };
+  }
   encryptRouterParam(routeParams);
-  sessionStorage.setItem('navType', 'replace');
   return originalReplace.call(this, routeParams).then(() => {
-    const tagsViewStore = useTagsViewStore();
     tagsViewStore.updateViewParam(this.currentRoute.value);
   });
 };
@@ -117,7 +131,7 @@ export function encryptRouterParam(location: RouteLocationRaw) {
     location.query.encrypted = true;
     for (const key in location.query) {
       if (Object.prototype.hasOwnProperty.call(location.query, key)) {
-        if (!['encrypted'].includes(key) && location.query[key]) {
+        if (!['encrypted', 'componentKey'].includes(key) && location.query[key]) {
           location.query[key] = encryptParameter(location.query[key]);
         }
       }

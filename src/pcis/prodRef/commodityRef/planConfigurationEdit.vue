@@ -38,9 +38,11 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
 const dzmodal = useDzModal();
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const tabref = opertaor.getTableRefByKey("commodityBasicInfo");
 const tabProref = opertaor.getTableRefByKey("productBasicInfo");
 const route = useRoute();

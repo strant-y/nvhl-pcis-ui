@@ -1,11 +1,9 @@
 import moment from "moment";
 import dayjs from "dayjs";
-import { dataOpertaor } from "@/store";
 
 
-export const getData = () => {
+export const getData = (opertaor: any) => {
   const user = JSON.parse(sessionStorage.getItem("user"));
-  const opertaor = dataOpertaor();
   const param = opertaor.getParam();
   const productNo = param?.cProdNo;
   // 个别产品的保险期限
@@ -135,10 +133,9 @@ export const getData = () => {
   return defultData;
 };
 
-export const getECargoData = () => {
+export const getECargoData = (idxParam: any) => {
   const user = JSON.parse(sessionStorage.getItem("user"));
-  const opertaor = dataOpertaor();
-  const param = opertaor.getParam();
+  const param = idxParam.param;
 
   const defultdata = () => {
     // 默认全量初始化数据

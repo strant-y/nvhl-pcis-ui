@@ -45,7 +45,7 @@ import moment from "moment";
 import { codeListViewStore } from "@/store";
 import { useProductStore } from "@/store/modules/prod";
 import { getAddressStr, qryCustomer } from "@/api/query";
-
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import { descryptParameter, encryptParameter } from "@/utils/encipher";
 import { useRouter, useRoute } from 'vue-router';
 import { validateIdCard } from "@/typings/method-public";
@@ -59,7 +59,8 @@ const param = JSON.parse(query.value?.param ? descryptParameter(query.value.para
 
 
 const productStore = useProductStore();
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const props = defineProps({
   pageSchema: {
     type: [Object],

@@ -20,8 +20,11 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useRoute } from "vue-router";
 import { dataParam } from "@/store/modules/dataParam";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
 const dataparam = dataParam();
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 
 const router = useRouter();
 const param = dataparam.getParam();

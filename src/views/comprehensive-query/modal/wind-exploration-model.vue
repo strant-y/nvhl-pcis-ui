@@ -31,7 +31,8 @@ import { getListByCode } from '@/api/code-list-service';
 import { ElConfigProvider } from 'element-plus';
 import zhCn from "element-plus/es/locale/lang/zh-cn";
 import moment from "moment";
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 
 const emits = defineEmits(["ok", "cancel"]);
 const pcisQueryService = new PcisQueryService();

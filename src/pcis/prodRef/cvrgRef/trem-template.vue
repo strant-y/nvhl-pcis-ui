@@ -383,9 +383,12 @@ import { useRoute } from "vue-router";
 import { v4 as uuidv4 } from "uuid";
 import {CommonConstants} from "@/constants/CommonConstants";
 import { ITEM_RENDER_EVT } from "element-plus/es/components/virtual-list/src/defaults";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
 const route = useRoute();
 const templateRef = ref();
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const pageparam = opertaor.getParam();
 const terconfig = terConfig();
 const { getRules } = useValidator();

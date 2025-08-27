@@ -24,6 +24,7 @@ import { getUnbindHealthNotify } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { dataParam } from "@/store/modules/dataParam";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const dzmodal = useDzModal();
 const RelatedHealthNoticModal = defineAsyncComponent(
   () => import("./RelatedHealthNoticModal.vue")
@@ -31,7 +32,8 @@ const RelatedHealthNoticModal = defineAsyncComponent(
 const AddHealthNoticeModal = defineAsyncComponent(
   () => import("./AddHealthNoticeModal.vue")
 );
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 import {
   AppTableConfig,
   AppTableMethod,

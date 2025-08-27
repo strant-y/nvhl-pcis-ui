@@ -20,7 +20,8 @@ import {
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 const clauseConfAdd = defineAsyncComponent(

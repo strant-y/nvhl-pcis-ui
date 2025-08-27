@@ -15,8 +15,6 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
 import { useValidator } from "@/typings/useValidator";
@@ -35,19 +33,12 @@ const props = defineProps({
 const applicantEditRef = ref<AppFreeEditMethod | null>(null);
 import { getAddressStr,qryCustomer } from "@/api/query";
 const formconfig1 = reactive(createAppFreeEditConfig({}));
-const formData = ref<any[]>([]);
-const cClntAddr = ref<any>(null);
-import { useRoute } from "vue-router";
-const route = useRoute();
 const fileInputRef = ref(null);
-const fileInputType = ref();
-import { readFile } from "@/api/file";
 import moment from "moment/moment";
-const tCertfDate = ref<any[]>([]);
-const idxParam = inject('idxParam');
+const idxParam = inject('idxParam', {});
 const formPage = idxParam?.formPage;
 const initFlag = computed(() => formPage.init);
-const  cWorkDptList =['310','320','330','340','350','360']  // 单位性质带企业的ID
+const cWorkDptList =['310','320','330','340','350','360']  // 单位性质带企业的ID
 onMounted(() => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
@@ -240,7 +231,6 @@ const method = {
     checkUser();
   },
   funcNdustryCate: () => {
-    // const param = opertaor.getParam();
     dialog.value?.open(
       "ndustryCateModal",
       {
@@ -261,7 +251,6 @@ const method = {
     );
   },
   cOccupCdeChange: () => {
-    // const param = opertaor.getParam();
     dialog.value?.open(
       "cOccupCdeModal",
       {
@@ -373,7 +362,6 @@ const method = {
 	//投保人性质(0是法人 1是个人)
   InsureChange: async (val:any) => {
     console.log('vvvvvvv',val)
-    const param = opertaor.getParam();
 
     if (val == "0") {
       if ( (getValue('ECargoApplicant.cClntMrk') && getValue('ECargoApplicant.cClntMrk') === '0') && (getValue('ECargoApplicant.cIsBranch') && getValue('ECargoApplicant.cIsBranch') === '0') && (getValue('ECargoApplicant.cWorkDpt') && ['310','320','330','340','350','360'].includes(getValue('ECargoApplicant.cWorkDpt')))){
@@ -416,7 +404,7 @@ const method = {
       });
 
       
-      if (!param.initFlag && !idxParam.readonly) {
+      if (!formPage.init && !idxParam.readonly) {
         setFormItem("ECargoApplicant.cWorkDpt", {
         disabled: false,
       });
@@ -644,9 +632,8 @@ const method = {
     // 清除报错信息
     clearValidate('ECargoApplicant.cCertfCde')  
       // freeEditRef.value?.clearValidate('phoneNo');
-    const param = opertaor.getParam();
 
-    if (!param.initFlag) {
+    if (!formPage.init) {
       setFormItem("ECargoApplicant.cNation", {
         disabled: false,
       });
@@ -680,7 +667,7 @@ const method = {
       // setValue("ECargoApplicant.nAge", null);
       // setValue("ECargoApplicant.cSex", null);
 
-      if (!param.initFlag) {
+      if (!formPage.init) {
         setFormItem("ECargoApplicant.cNation", {
           disabled: true,
         });

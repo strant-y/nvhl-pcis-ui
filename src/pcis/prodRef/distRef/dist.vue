@@ -24,7 +24,6 @@
 
 <script setup lang="ts">
 import {
-  AppGridEditMethod,
   createAppGridEditConfig,
 } from "@/shared/app-grid-edit-config";
 import {
@@ -37,9 +36,6 @@ import {
   checkAppBase,
   deleteDist,
   distMapCollectCompKey,
-  downloadDistTemplate,
-  syncDist,
-  exportDist
 } from "@/api/prod/index";
 import { getAddressStr } from "@/api/query";
 import { saveAs } from "file-saver";
@@ -53,14 +49,16 @@ import { CardConfig, creatCardConfig, MyCardMethod } from "@/shared/mytemplate/c
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { useRoute } from "vue-router";
-import { runInThisContext } from "vm";
 import { AppFreeEditMethod, createAppFreeEditConfig } from "@/shared/app-free-edit-config";
 import {eventBus} from "@/utils/event-bus";
 import { useValidator } from "@/typings/useValidator";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
 const { getRules } = useValidator();
 const route = useRoute();
 const dialog = ref<DialogMethod | null>(null);
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const params = opertaor.getParam(); 
 
 const props = defineProps({
@@ -85,7 +83,6 @@ const distTableRef = ref<AppTableMethod | null>(null);
 const cardconfig = ref<CardConfig>(creatCardConfig({}));
 const formconfig1 = ref<Record<string, any>>({});
 const tableconfig = ref<AppTableConfig>(createTableEditConfig());
-const idxParam = inject('idxParam');
 let fileBase: string;
 const titleInfo = ref<any>();
 // 声明全局变量

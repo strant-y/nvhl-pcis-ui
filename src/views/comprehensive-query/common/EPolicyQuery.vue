@@ -65,6 +65,10 @@ const props = defineProps({
 const sessionUser: any = sessionStorage.getItem('user')
 const btnList = ref<Array<FreeButtonBase>>([])
 const dialogRef = ref<DialogMethod | null>(null)
+let cTermNoList = ref<any>([]);  // 条款数据
+let cTermNo = '';    // 条款编码
+const cPard = ref(null);
+
 const buttonList = [
     createFreeButtonBase({
         label: '雇主责任险在保证明',
@@ -126,7 +130,13 @@ const buttonList = [
         }
     })
 ]
-btnList.value = buttonList
+btnList.value = buttonList;
+
+function extractCode(str:string) {
+  // 匹配 "P+数字" 或 "纯数字"
+  const pattern = /^(P\d+|\d+)/;
+  return str.match(pattern)?.[0] || "";
+}
 const formconfig1 = reactive<AppFreeEditConfig>(
     createAppFreeEditConfig({
         endBtnsPosition: 'right',
@@ -179,9 +189,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 }
             },
             {
-                prop: 'CProdNo',
+                prop: 'prodCNmeCn',
                 inputtype: 'rtselect',
-                title: '产品',
+                title: '产品名称',
                 itemWidth: 1,
                 rules: [getRules('required', {})],
                 typeCode: 'EPolicyProdList',
@@ -195,6 +205,99 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                         setFormItem('CTyp', { disabled: true })
                     }
                 }
+            },
+            {
+              prop: "cKindNo",
+              inputtype: "rtselect",
+              title: "产品大类",
+              itemWidth: 1,
+              rules: [{ type: "required" }],
+              typeCode: "KIND_LIST_GRT",
+              child: "cProdNo",
+              filterable: true,
+              clearable: true,
+              codeParam: {
+                  cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+                  cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+              },
+              func: (val) => {
+                  setValue("cProdNo","")
+                  cTermNo = "";      // 重置条款编码
+                  cPard.value = val;
+                  formconfig1.fromSchema?.forEach((item) => {
+                      if (
+                          item.prop === "CEmployeeName" ||
+                          item.prop === "CIdentificationNumber" ||
+                          item.prop === "CPlateNo" ||
+                          item.prop === "CEngineNo" ||
+                          item.prop === "CIndustryType" ||
+                          item.prop === "CProjectName" ||
+                          item.prop === "CDetailedAddress" ||
+                          item.prop === "CProjectType" ||
+                          item.prop === "cPrjCtgTyp" ||
+                          item.prop === "cPrjCtgMidTyp" ||
+                          item.prop === "cPrjCtgSubTyp"
+                      ) {
+                          item.hidden = true;
+                      }
+                  });
+                  codeListStore
+                    .queryCodeList({
+                        codeListName: "TERM_LIST_IN_GUIDE_SEARCH",
+                        codeListParam:{
+                        cParCde: cPard.value,
+                        cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+                        cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+                    },
+                    })
+                    .then((res) => {
+                        cTermNoList.value = res;
+                        setFormItem("cProdNo", {
+                            loadData: res,
+                        });
+                    });
+              },
+            },
+            {
+              prop: "cProdNo",
+              inputtype: "rtselect",
+              title: "条款",
+              itemWidth: 1,
+              rules: [{ type: "required" }],
+              filterable: true,
+              clearable: true,
+    
+              func: (val:any) => {
+
+                if(val){
+                        if(cTermNoList.value.length>0){
+                            cTermNoList.value.forEach((ele) => {
+                                if(ele['value']  === val){
+                                    cTermNo = extractCode(ele['label'])
+                                }
+                            });
+                        }  
+                } else {
+                    cTermNo = "";
+                }
+                  formconfig1.fromSchema?.forEach((item) => {
+                      if (
+                          item.prop === "CEmployeeName" ||
+                          item.prop === "CIdentificationNumber" ||
+                          item.prop === "CPlateNo" ||
+                          item.prop === "CEngineNo" ||
+                          item.prop === "CIndustryType" ||
+                          item.prop === "CProjectName" ||
+                          item.prop === "CDetailedAddress" ||
+                          item.prop === "CProjectType" ||
+                          item.prop === "cPrjCtgTyp" ||
+                          item.prop === "cPrjCtgMidTyp" ||
+                          item.prop === "cPrjCtgSubTyp"
+                      ) {
+                          item.hidden = true;
+                      }
+                  });
+              },
             },
             {
                 prop: 'CPlyNo',
@@ -500,6 +603,7 @@ function handleQuery(flag?: boolean) {
                 param['TIssueEndTm'] = s.TIssueTm[1]
                 delete param.TEdrAppTm
             }
+            param["cTermNo"] = cTermNo;        // 条款编码
             pcisQueryService
                 .getEpolicyPolicyList(param)
                 .then((res: any) => {
@@ -757,6 +861,19 @@ const copyText = (text: any) => {
         }
     }
 };
+
+function setValue(key: string, value: any) {
+    freeEditRef?.value?.setValue(key, value);
+}
+
+function getValue(key: string) {
+  return freeEditRef?.value?.getValue(key);
+}
+defineExpose({
+  setValue,
+  getValue
+});
+
 </script>
 
 <style scoped>

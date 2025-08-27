@@ -35,6 +35,8 @@ import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import dayjs from "dayjs";
 import { getAddressStr } from "@/api/query";
 import { codeListViewStore } from "@/store";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
 const codeListStore = codeListViewStore();
 import { distRequiredMap } from '@/views/pcis/my-page/requiredDistMap';
 
@@ -46,7 +48,8 @@ const param = JSON.parse(query.value?.param ? descryptParameter(query.value.para
 
 const dzmodal = useDzModal();
 const { getRules } = useValidator();
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const params = opertaor.getParam();
 const productStore = useProductStore()
 const dialog = ref<DialogMethod | null>(null);

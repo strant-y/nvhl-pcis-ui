@@ -27,9 +27,12 @@ import { ElMessage } from "element-plus";
 import { saveAssociationSpec } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useValidator } from "@/typings/useValidator";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
 const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const tabref = opertaor.getTableRefByKey("prodInfo");
 const props = defineProps<{
   data: Object;

@@ -12,7 +12,10 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import {
   checkAppBase,
 } from "@/api/prod/index";
-const opertaor = dataOpertaor();
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 
 const props = defineProps({
   pageSchema: {

@@ -28,7 +28,10 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 const emits = defineEmits(["ok", "cancel"]);
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
-const opertaor = dataOpertaor();
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const tabref = opertaor.getTableRefByKey("prodInfo");
 const props = defineProps<{
   data: Object;

@@ -153,9 +153,11 @@ import { codeListViewStore } from "@/store";
 import { qryProdRelTermRiskList } from "@/api/prod";
 import { getEdrRsnTermItem } from "@/api/query";
 import { terConfig } from "@/store/modules/term-config";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
 const codeListStore = codeListViewStore();
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const parparam = opertaor.getParam();
 const termConfig = terConfig();
 const {selectedRow} = storeToRefs(termConfig);

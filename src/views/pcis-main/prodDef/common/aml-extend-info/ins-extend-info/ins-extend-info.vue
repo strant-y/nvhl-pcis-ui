@@ -54,7 +54,10 @@ import { v4 as uuidv4 } from "uuid";
 const showBtnConfig = ref(false);
 const showView = ref(false);
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 opertaor.init();
 
 

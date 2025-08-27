@@ -89,7 +89,8 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { useFormLabelWidth } from "element-plus/es/components/form/src/utils";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { number } from "echarts";
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 opertaor.init();
 
 const dzmodal = useDzModal();

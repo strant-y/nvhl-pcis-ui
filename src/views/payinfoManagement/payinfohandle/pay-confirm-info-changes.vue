@@ -37,7 +37,8 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { PcisQueryService } from '../service/pcis-query-service';
 const pcisQueryService = new PcisQueryService();
 
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 opertaor.init();
 
 const props = defineProps({

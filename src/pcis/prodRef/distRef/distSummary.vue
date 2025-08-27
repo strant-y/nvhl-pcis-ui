@@ -34,9 +34,12 @@ import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { useRoute } from "vue-router";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
 const route = useRoute();
 const dialog = ref<DialogMethod | null>(null);
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const props = defineProps({
   pageSchema: {
     type: [Object],

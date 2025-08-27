@@ -20,11 +20,12 @@ const route = useRoute();
 import { ratio } from "@/api/prod"
 import dayjs from "dayjs";
 import { eventBus } from '@/utils/event-bus'
-
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const dialogRef = ref<DialogMethod | null>(null);
 const params = opertaor.getParam();
 const props = defineProps({

@@ -111,7 +111,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           cPard.value = val;
           codeListStore
               .queryCodeList({
-                  codeListName: "TERM_LIST_IN_GUIDE_NEW",
+                  codeListName: "TERM_LIST_IN_GUIDE_SEARCH",
                   codeListParam:{
                   cParCde: cPard.value,
                   cOperId: user.value.opCde,

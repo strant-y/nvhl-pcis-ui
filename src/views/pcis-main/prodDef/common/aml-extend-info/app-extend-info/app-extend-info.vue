@@ -47,8 +47,10 @@ import {
 
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 opertaor.init();
 
 const props = defineProps({

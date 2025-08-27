@@ -35,14 +35,15 @@ import {
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import { onMounted, reactive, ref } from "vue";
-
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import { useRoute } from "vue-router";
 
 const dzmodal = useDzModal();
 const AddInstituTaxRateModal = defineAsyncComponent(
   () => import("./AddInstituTaxRateModal.vue")
 );
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const dataparam = dataParam();
 const tabref = opertaor.getTableRefByKey("prodInfo");
 const param = dataparam.getParam();

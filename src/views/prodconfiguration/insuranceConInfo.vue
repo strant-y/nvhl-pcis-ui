@@ -63,7 +63,8 @@ const props = defineProps({
 
 const paramparam = dataParam();
 paramparam.setParam(props.param);
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const formconfig1 = opertaor.getTableConfig();
 
 opertaor.setTableConfig([
