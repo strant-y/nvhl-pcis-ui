@@ -429,10 +429,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               },
           },
           {
-              prop: "prodCNmeCn",
-              inputtype: "rtinput",
-              title: "产品名称",
-              clearable: true,
+             prop: "prodCNmeCn",
+             inputtype: "rtselect",
+             title: "产品名称",
+             typeCode: "PROD_LIST_GRT",
+             params: {
+                cParCde: "",
+                cOperId: user.value.opCde,
+                cDptCde: user.value.companyId,
+             },
+             clearable: true,
           },
           {
               prop: "cProdNo",
@@ -908,7 +914,7 @@ const extendColumns = [
   { prop: 'cOprCde', inputtype: "rtinput", title: '录单员', minWidth: 180, optional: true },
   { prop: 'cUdrNme', inputtype: "rtinput", title: '核保人', minWidth: 180, optional: true },
   { prop: 'cPrnNo', inputtype: "rtinput", title: '保批单印刷号', minWidth: 180, optional: true },
-  { prop: 'nAmtChange', inputtype: "rtinput", title: '保费发票号', minWidth: 180, optional: true },
+  { prop: 'InvoiceNum', inputtype: "rtinput", title: '保费发票号', minWidth: 180, optional: true },
 ];
 
 const tableObj = {
@@ -1195,6 +1201,8 @@ async function queryAE( flag?: boolean, isEs = false) {
         s.cLoadSub = "1";
     }
     pageresult.list = [];
+    // 清空多余参数
+    delete s.cProdNo;
     if (
         (s["cAppNo"] == null || s["cAppNo"] == "") &&
         (s["cPlyNo"] == null || s["cPlyNo"] == "") &&
@@ -1324,6 +1332,7 @@ async function queryI(flag?: boolean, isEs = false) {
     s.tIssueTm = null;
     // 删除列表类型
     delete s.cDataTyp;
+    delete s.cProdNo;
 
     if (
         (s["cAppNo"] == null || s["cAppNo"] == "") &&
@@ -1642,4 +1651,5 @@ defineExpose({
 /* :deep(.el-table th:nth-child(1) .cell) {
     white-space: pre-line;
 } */
+
 </style>
