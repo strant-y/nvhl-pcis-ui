@@ -989,9 +989,20 @@ const method = {
     dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
 
       if (res.type === "ok") {
-        setValue("Tgt.cTransitCountry", res.body.countryCn);
-        setValue("Tgt.cTransitProvince", res.body.portCn);
-        setValue("Tgt.cTransitDetail", res.body.countryCn + '/' + res.body.portCn);
+        // setValue("Tgt.cTransitCountry", res.body.countryCn);
+        // setValue("Tgt.cTransitProvince", res.body.portCn);
+        // setValue("Tgt.cTransitDetail", res.body.countryCn + '/' + res.body.portCn);
+
+        setFormItem('Tgt.cTransitDetail',{disabled:false})
+        if(res.body.cType === '1'){
+          setValue("Tgt.cTransitCountry", res.body.cCountryEn);
+          setValue("Tgt.cTransitProvince", res.body.cPortEn);
+          setValue("Tgt.cTransitDetail",res.body.cPortEn + ','+ res.body.cCountryEn );
+        }else{
+          setValue("Tgt.cTransitCountry", res.body.cCountryEn);
+          setValue("Tgt.cTransitProvince", res.body.cAirportEn);
+          setValue("Tgt.cTransitDetail", res.body.cAirportEn +','+ res.body.cCountryEn );
+        }
       };
     });
   },
