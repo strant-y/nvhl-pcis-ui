@@ -98,7 +98,48 @@ function setFormItem(key: any, obj: any) {
     });
   }
 }
+const handelItemShow = (data:any)=>{
+  console.log('dataformconfig1',data)
+  // 遍历主数组
+  data.forEach(item => {
+    // 情况1: 直接存在rules属性
+    if (item.rules && Array.isArray(item.rules)) {
+      const hasRequiredRule = item.rules.some(rule =>
+          rule.required === true
+      );
+      if (hasRequiredRule && item.prop) {
+        setFormItem(item.prop,{hidden:false})
+      }else {
+        setFormItem(item.prop,{hidden:true})
+      }
+    }else if (!item.rules && item.groupList && Array.isArray(item.groupList)) {
+      // debugger
+      // 情况2: 存在groupList属性
+      let hasRequiredInGroup = false;
 
+      // 遍历groupList中的每个元素
+      item.groupList.forEach(groupItem => {
+        if (groupItem.rules && Array.isArray(groupItem.rules)) {
+          const hasRequiredRule = groupItem.rules.some(rule =>
+              rule.required === true
+          );
+
+          if (hasRequiredRule) {
+            hasRequiredInGroup = true;
+          }
+        }
+      });
+      // 如果groupList中有任意一个元素满足条件，且外层对象有prop属性
+      if (hasRequiredInGroup && item.prop) {
+        setFormItem(item.prop,{hidden:false})
+      }else {
+        setFormItem(item.prop,{hidden:true})
+      }
+    }else {
+      setFormItem(item.prop,{hidden:true})
+    }
+  });
+}
 
 // 绑定方法
 const method = {
@@ -454,27 +495,25 @@ const method = {
       });
 
 
-           codeListStore
+        const res:any = await  codeListStore
         .queryCodeList({
           codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
           codeListParam: {},
         })
-        .then((res) => {
-          if (
-            !res.some((item) =>
+      if (
+          !res.some((item) =>
               Object.values(item).includes(getValue("ECargoApplicant.cCertfCls"))
-            )
-          ) {
-            setValue("ECargoApplicant.cCertfCls", "");
-          }
-          setFormItem("ECargoApplicant.cCertfCls", {
-            loadData: [],
-          });
-          setFormItem("ECargoApplicant.cCertfCls", {
-            loadData: res,
-            rules: [getRules("required", {})],
-          });
-        });
+          )
+      ) {
+        setValue("ECargoApplicant.cCertfCls", "");
+      }
+      setFormItem("ECargoApplicant.cCertfCls", {
+        loadData: [],
+      });
+      setFormItem("ECargoApplicant.cCertfCls", {
+        loadData: res,
+        rules: [getRules("required", {})],
+      });
     } else {
       setFormItem("ECargoApplicant.tBirthday", {
         rules: [getRules("required", {})],
@@ -573,29 +612,30 @@ const method = {
         rules: [getRules("required", {})],
       });
 
-      codeListStore
+      const res:any = await codeListStore
         .queryCodeList({
           codeListName: "NATURAL_CERTIFICATE_CACHE",
           codeListParam: {},
         })
-        .then((res) => {
-          if (
-            !res.some((item) =>
+      if (
+          !res.some((item) =>
               Object.values(item).includes(getValue("ECargoApplicant.cCertfCls"))
-            )
-          ) {
-            setValue("ECargoApplicant.cCertfCls", "");
-          }
-          setFormItem("ECargoApplicant.cCertfCls", {
-            loadData: [],
-          });
-          setFormItem("ECargoApplicant.cCertfCls", {
-            loadData: res,
-            rules: [getRules("required", {})],
-          });
-        });
+          )
+      ) {
+        setValue("ECargoApplicant.cCertfCls", "");
+      }
+      setFormItem("ECargoApplicant.cCertfCls", {
+        loadData: [],
+      });
+      setFormItem("ECargoApplicant.cCertfCls", {
+        loadData: res,
+        rules: [getRules("required", {})],
+      })
     }
-
+     //选择个人展示哪些字段，选择法人展示哪些，其他隐藏
+    if(val){
+      handelItemShow(formconfig1?.fromSchema)
+    }
       checkUser();
   },
 	// 证件类型
@@ -837,9 +877,6 @@ function setValue(key: string, value: any) {
 
 function getValue(key: string) {
   return applicantEditRef?.value?.getValue(key);
-}
-function getFormconfig() {
-  return formconfig1;
 }
 function handleFileChange(event: Event) {
   const fileInput = event.target as HTMLInputElement;

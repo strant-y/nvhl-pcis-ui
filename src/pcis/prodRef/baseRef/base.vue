@@ -68,7 +68,10 @@ onMounted(async () => {
   setFormItem("Base.cRatioTyp", { 
     disabled: isDisabled
   });
-
+  if(params?.cRecordType === 9 || params.cPolicySource == 9){
+    setFormItem('Base.cRatioTyp',{hidden:true})
+    setFormItem('Base.nRatioCoef',{hidden:true})
+  }
 });
 
 

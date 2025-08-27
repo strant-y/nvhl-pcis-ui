@@ -108,7 +108,7 @@ export const getData = () => {
     // “标的信息”中“车辆使用性质”默认值为营运
     dataInit["Tgt.cUsageNature"] = "364113098";
     dataInit["Tgt.tCompletionYear"] = "6.36e+13";
-
+    dataInit["Tgt.cPayCur"] = "CNY";
     // dataInit["EdrBase.cRatioTyp"] = "2";
 
     return dataInit;
