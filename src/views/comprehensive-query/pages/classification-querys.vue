@@ -587,7 +587,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   { label: "已提核", value: "2" },
                   { label: "核保退回/撤回", value: "3" },
                   { label: "已核待缴费", value: "4" },
-                //   { label: "已出单", value: "5" },
+                  { label: "已出单", value: "5" },
                   { label: "见费出单退回", value: "8" },
               ],
           },
@@ -872,7 +872,7 @@ const normalQueryColumns = [
             { label: "已提核", value: "2" },
             { label: "核保退回/撤回", value: "3" },
             { label: "已核待缴费", value: "4" },
-            // { label: "已出单", value: "5" },
+            { label: "已出单", value: "5" },
             { label: "见费出单退回", value: "8" },
         ],
         hideBtns: (row: any) => {
