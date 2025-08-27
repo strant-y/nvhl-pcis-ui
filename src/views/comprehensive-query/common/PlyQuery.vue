@@ -569,6 +569,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   { label: "已做失效操作", value: "6" },
                   { label: "已提交未接收", value: "7" },
                   { label: "见费出单退回", value: "8" },
+                  { label: "历史数据补全单", value: "9" },
               ],
           },
           {
@@ -973,6 +974,7 @@ const esSearchColumns = [
         { label: "已做失效操作", value: "6" },
         { label: "已提交未接收", value: "7" },
         { label: "见费出单退回", value: "8" },
+        { label: "历史数据补全单", value: "9" },
     ],
     hideBtns: (row: any) => {
         if (
@@ -1036,6 +1038,7 @@ const normalQueryColumns = [
         { label: "已做失效操作", value: "6" },
         { label: "已提交未接收", value: "7" },
         { label: "见费出单退回", value: "8" },
+        { label: "历史数据补全单", value: "9" },
     ],
     hideBtns: (row: any) => {
         if (
@@ -1179,7 +1182,8 @@ const tableObj = {
                     if (
                         row.cAppStatus == "1" ||
                         row.cAppStatus == "3" ||
-                        row.cAppStatus == "8"
+                        row.cAppStatus == "8" ||
+                        row.cTransMrk == '1'
                     ) {
                         return false;
                     } else {
