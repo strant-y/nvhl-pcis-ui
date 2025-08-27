@@ -604,6 +604,8 @@ function handleQuery(flag?: boolean) {
                 delete param.TEdrAppTm
             }
             param["cTermNo"] = cTermNo;        // 条款编码
+            param["cProdNo"] = param["prodCNmeCn"];   // 产品名称
+
             pcisQueryService
                 .getEpolicyPolicyList(param)
                 .then((res: any) => {
