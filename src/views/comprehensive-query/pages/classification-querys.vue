@@ -114,7 +114,9 @@ let cTermNo = '';    // 条款编码
 let ESOriginalData = ref<any>([]);  // ES查询原始数据，转化成驼峰为适配操作列
 let userColumnConfig = ref<any[]>([]); // 保存用户自定义列配置
 let colChangeCPkId = ref(''); // 变更列参数
-const currentModalColumnCache = ref<any[]>([]); // 用来缓存“下一次弹窗要用的列数据”
+
+// 用于缓存用户的完整勾选状态（包括原始列 + 扩展列）
+let userAllCheckedColumns = ref<string[]>([]);
 
 const props = defineProps({
   refreshData: {
@@ -125,7 +127,6 @@ const props = defineProps({
 const homeJumpData = ref({}); //接收首页的参数，用于查询条件回显
 const queryType = ref("1");
 import { FIELD_MAP } from '@/constants/fieldMaps';
-
 const cPard = ref(null);
 
 function extractCode(str:string) {
@@ -259,44 +260,39 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           createFreeButtonBase({
             label: "变更列",
             func: async () => {
-                // 取用户已保存的勾选字段
-                const userCfg = await loadUserColumns();
-                const userChecked = userCfg? 
-                userCfg.filter(i => i.checked).map(i => i.value): normalQueryColumns.map(c => c.prop); // 没配置就默认全选原始列
-
-
                 // 构建弹窗所需格式
                 let modalData: any[] = [];
                 modalData = [{
                     prop: 'bsType',
                     inputtype: 'rtcheckboxgroup',
                     itemWidth: 3,
-                    loadData: buildAllCheckboxData(userChecked)
+                    loadData: buildAllCheckboxData() // 完整勾选状态
                 }];
-                dzmodal.open(colChange, { type: "edit", data: modalData, userSaved: !!userCfg })
+
+                dzmodal.open(colChange, { type: "edit", data: modalData, userSaved: !!colChangeCPkId.value })
                 .then(async (res) => {
                     if (res.type === "ok") {
                     const selectedProps = res.body.body; // 用户选中的列
+                    userAllCheckedColumns.value = selectedProps; // 更新缓存
                     
                     // 保存到接口
                     const saveParam = {
                         cPkId: colChangeCPkId.value || null,
                         content: [{
-                            prop: "bsType",
+                            prop: 'bsType',
                             inputtype: 'rtcheckboxgroup',
-                            itemWidth: 3,
-                            loadData: buildAllCheckboxData(selectedProps) //完整数据写回
+                            loadData: buildAllCheckboxData() // 用最新状态保存
                         }],
                         type: 'search',
                         cCrtCde: JSON.parse(sessionStorage.getItem("user")).opCde,
                     };
-                    console.log('saveParam',saveParam);
+
                     try {
                         const saveRes = await CustomUserList(saveParam);
                         if (saveRes.code == 200) {
                           ElMessage.success("列配置已更新");
                           colChangeCPkId.value = saveRes.data.data.cPkId || '';
-                          userColumnConfig.value = saveRes.data.data.contents[0].loadData;
+                          
                           applyCheckedColumns(selectedProps); // 更新表头
                         } else {
                           ElMessage.error(saveRes.msg || "保存失败");
@@ -1017,7 +1013,6 @@ const tableObj = {
                     if (r) {
                         row.cPolicySource = '8'
                         const data = row;
-                        console.log("0000000000000", data);
                         router.push({
                             path: "/pcis/my-page",
                             query: {
@@ -1127,8 +1122,8 @@ tableconfig.fixed = true;
 onMounted(async () => {
     formconfig1.fromSchema?.forEach((item) => {
         if (
-        item.prop === "tInquiryTm" ||
-        item.prop === "tEdrAppTm"
+         item.prop === "tInquiryTm" ||
+         item.prop === "tEdrAppTm"
         ) {
             item.hidden = true; // 隐藏批改申请日期，询价投保日期，默认投保日期
             item.rules = []; // 清除必填规则
@@ -1161,12 +1156,10 @@ onMounted(async () => {
     let checkedProps = [];
 
     if (userCfg) {
-        checkedProps = userCfg.filter((i: any) => i.checked).map((i: any) => i.value);
-        colChangeCPkId.value = userCfg.cPkId || '';
+        checkedProps = userCfg; // 使用用户配置的字段名列表
     } else {
         checkedProps = normalQueryColumns.map(c => c.prop); // 默认列
     }
-
     applyCheckedColumns(checkedProps);
 });
 
@@ -1264,8 +1257,6 @@ async function queryAE( flag?: boolean, isEs = false) {
       param["tAppTmStart"] = null;
       param["tAppTmEnd"] = null
     }
-    console.log('param1---------', param)
-
     // ES 必须填查询关键字
     if (isEs && !param.cQueryStr?.trim()) {
         ElMessage.warning('查询条件不能为空');
@@ -1389,7 +1380,6 @@ async function queryI(flag?: boolean, isEs = false) {
         param.IndexName = 'ply_inquiry_ik';
         param.IndexType = 'ply_inquiry_info';
     }
-     console.log('param2---------', param)
 
     if (isEs) {
      queryInsuredList(param)
@@ -1433,17 +1423,17 @@ async function queryI(flag?: boolean, isEs = false) {
 }
 
 // 把原始列 + 扩展列 合并成弹窗需要的数据
-function buildAllCheckboxData(userChecked: string[] = []) {
+function buildAllCheckboxData() {
     const all = [
         ...normalQueryColumns.map(col => ({
             label: col.title,
             value: col.prop,
-            checked: true, // 原始列默认勾选
+            checked: userAllCheckedColumns.value.includes(col.prop),
         })),
         ...extendColumns.map(col => ({
             label: col.title,
             value: col.prop,
-            checked: userChecked.includes(col.prop), // 扩展列根据用户配置
+            checked: userAllCheckedColumns.value.includes(col.prop),
         }))
     ];
     return all;
@@ -1459,9 +1449,17 @@ async function loadUserColumns() {
 
     if (res.code === 200 && res.data?.data?.contents?.[0]?.loadData) {
         colChangeCPkId.value = res.data.data.cPkId || '';
-        return res.data.data.contents[0].loadData; // 返回用户配置
+        const userData = res.data.data.contents[0].loadData;
+        const checkedFields = userData.filter((i) => i.checked).map((i) => i.value);
+
+        userAllCheckedColumns.value = checkedFields; // 缓存完整勾选状态
+        return checkedFields;
     }
-    return null; // 无配置
+
+    // 无配置时，默认使用原始列
+    const defaultChecked = normalQueryColumns.map(c => c.prop);
+    userAllCheckedColumns.value = defaultChecked;
+    return defaultChecked;
 }
 
 // 多选事件
