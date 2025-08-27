@@ -49,7 +49,7 @@ const emit = defineEmits<{
 }>();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
-
+const cFlag = ref('1')
 const formconfig = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "地点查询",
@@ -216,7 +216,7 @@ function handleQuery(reset = true) {
   const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   let param = Object.assign(s, r);
-  selCountryPort(param)
+  selCountryPort({...param,cFlag:cFlag.value})
     .then((res) => {
       const { code, data, msg, total } = res;
       if (200 == code) {
@@ -232,6 +232,7 @@ function handleQuery(reset = true) {
 
 onMounted(() => {
   if(props.data?.whichType === 'A'){
+    cFlag.value = '1'
     formconfig.fromSchema = [
       {
         prop: "cCountryCn",
@@ -278,6 +279,7 @@ onMounted(() => {
       }
     ]
   }else if(props.data?.whichType === 'B') {
+    cFlag.value = '2'
     formconfig.fromSchema = [
       {
         prop: "cCountryCn",
@@ -285,9 +287,9 @@ onMounted(() => {
         title: "国家中文名称",
       },
       {
-        prop: "cPortCn",
+        prop: "cAirportCn",
         inputtype: "rtinput",
-        title: "港口中文名称",
+        title: "机场中文名称",
       },
       {
         prop: "cCountryEn",
@@ -295,10 +297,10 @@ onMounted(() => {
         title: "国家英文名称",
       },
       {
-        prop: "cPortEn",
+        prop: "cAirportEn",
         inputtype: "rtinput",
-        title: "港口英文名称",
-      }
+        title: "机场英文名称",
+      },
     ]
     tableconfig.fromSchema = [
       {
@@ -307,9 +309,9 @@ onMounted(() => {
         title: "国家中文名称",
       },
       {
-        prop: "cPortCn",
+        prop: "cAirportCn",
         inputtype: "rtinput",
-        title: "港口中文名称",
+        title: "机场中文名称",
       },
       {
         prop: "cCountryEn",
@@ -317,13 +319,14 @@ onMounted(() => {
         title: "国家英文名称",
       },
       {
-        prop: "cPortEn",
+        prop: "cAirportEn",
         inputtype: "rtinput",
-        title: "港口英文名称",
-      }
+        title: "机场英文名称",
+      },
     ]
 
   }else if(props.data?.whichType === 'C'){
+    cFlag.value = '3'
     formconfig.fromSchema = [
       {
         prop: "cCountryCn",

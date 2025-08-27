@@ -586,6 +586,7 @@ const props:any = defineProps({
 
 onBeforeMount(() => {
   // onMounted() 之前
+  nRecRemPrm.value = props.param?.nRecRemPrm
   opertaor.setParam(props.param);
 });
 
