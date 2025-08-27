@@ -1,10 +1,6 @@
-import { isEditScene } from "@/constants/tab-constants";
-import { dataOpertaor} from "@/store";
 
-
-export const pageMethod ={ 
-    isEditScene: function(){
-        const opertaor = dataOpertaor();
+export const pageMethod = {
+    isEditScene: function(opertaor: any){
         const param = opertaor.getParam();
         if(param.pageType === "TEMPORARY_DEPOSIT" || param.pageType === "EDR_APP_NEW_SCENE" || param.pageType === "PLY_UW_PROCESS_SCENE"
             || param.pageType === "PLY_UW_PROCESS_SCENE"
@@ -14,8 +10,7 @@ export const pageMethod ={
             return false;
         }
     },
-    isReadOnlyScene: function(){
-        const opertaor = dataOpertaor();
+    isReadOnlyScene: function(opertaor: any){
         const param = opertaor.getParam();
         if(param.pageType === "readonly" || param.pageType === "UW_READ_SCENE"){
             return true;
@@ -23,4 +18,4 @@ export const pageMethod ={
             return false;
         }
     }
-}
+};

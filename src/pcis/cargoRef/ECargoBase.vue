@@ -36,15 +36,11 @@ const baseEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 import { useRoute } from "vue-router";
 import {getBsnsTypList,getChaTypeList,getChaSubtypList,} from "@/api/code-list-service";
-const route = useRoute();
-const fileInputRef = ref(null);
 const idxParam = inject<any>('idxParam', {});
 const formPage = idxParam?.formPage;
 const param = idxParam?.param;
 const user = idxParam?.user;
-const productStore = useProductStore();
 const codeListStore = codeListViewStore();
-const opertaor = dataOpertaor();
 const subDptCde = ref(); //所属分公司
 const initFlag = computed(() => formPage.init);
 const cIntroDptCnm = ref()
@@ -349,7 +345,6 @@ const method = {
   //业务来源子类
   businessSubFunc: (val) => {
     // 清除代理(经纪)人、代理业务员的值
-    const p = opertaor.getParam();
     if (!initFlag.value) {
       setValue("ECargoBase.cBrkrCde", "");
       setValue("ECargoBase.cBrkSlsCde", "");
@@ -544,7 +539,7 @@ const method = {
                     setFormItem("ECargoBase.cIntroSalecde", {
                       loadData: codeValData,
                     });
-										const ciRef = opertaor.getTableRefs()['ci'];
+										const ciRef = formPage.getComponentRefById('AgreementCi');
                     if (!!ciRef) {
                       ciRef.initcbusiner({
                         cSlsId: params.CSlsCde, //业务员员工号

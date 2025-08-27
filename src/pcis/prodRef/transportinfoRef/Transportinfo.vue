@@ -9,7 +9,8 @@ import {dataOpertaor} from "@/store/modules/data-opertaor";
 import {useProductStore} from "@/store/modules/prod";
 import {useValidator} from "@/typings/useValidator";
 
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const { getRules } = useValidator();
 const productStore = useProductStore();
 const props = defineProps({

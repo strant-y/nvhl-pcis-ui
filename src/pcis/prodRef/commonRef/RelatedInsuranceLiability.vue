@@ -23,7 +23,9 @@ import { useValidator } from "@/typings/useValidator";
 import { getCvrgRiskRelList } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { dataParam } from "@/store/modules/dataParam";
-const opertaor = dataOpertaor();
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const dataparam = dataParam();
 const tabref = opertaor.getTableRefByKey("prodInfo");
 import {

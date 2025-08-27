@@ -23,6 +23,7 @@ import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import {
   AppTableConfig,
   AppTableMethod,
@@ -40,7 +41,8 @@ const RelatedAssoCorrPreCalculFormulaModal = defineAsyncComponent(
 const AddAssoCorrPreCalculFormulaModal = defineAsyncComponent(
   () => import("./AddAssoCorrPreCalculFormulaModal.vue")
 );
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const dataparam = dataParam();
 const tabref = opertaor.getTableRefByKey("prodInfo");
 const param = dataparam.getParam();

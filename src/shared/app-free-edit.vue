@@ -120,6 +120,7 @@
 import { AppFreeEditConfig, AppFreeEditMethod } from "./app-free-edit-config";
 import {ref} from "vue";
 import {useScrollDetection} from "@/utils/common";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 defineOptions({
   name: "AppFreeEdit",
   inheritAttrs: false,
@@ -135,7 +136,7 @@ const codeListMap = ref<any>({});
 const customMap = ref<any>({});
 provide('codeListMap', codeListMap.value);
 provide('customMap', customMap.value);
-const idxParam = inject('idxParam', {});
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const btnMap = ref({});
 const { freeEditConfig } = toRefs(props);
 const emits = defineEmits(["updateDatas"]); // 父组件监听事件，同步子组件值的变化给父组件

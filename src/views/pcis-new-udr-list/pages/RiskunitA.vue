@@ -86,7 +86,8 @@ const {
 } = NewUdrListService();
 import { descryptParameter } from "@/utils/encipher.ts";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
 const dzmodal = useDzModal();

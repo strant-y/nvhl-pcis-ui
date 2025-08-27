@@ -9,10 +9,10 @@ import {
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 import { codeListViewStore } from "@/store";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const codeListStore = codeListViewStore();
 
 const route = useRoute(); // 获取当前路由对象
@@ -26,6 +26,9 @@ const props = defineProps({
     required: false,
   },
 });
+
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 
 let cRsnDetailCde = ref(opertaor.getParam()?.cRsnDetailCde);
 const tgtobjEditRef = ref<AppFreeEditMethod | null>(null);

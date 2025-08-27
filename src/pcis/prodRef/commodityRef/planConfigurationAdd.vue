@@ -27,8 +27,10 @@ import {
 import { useRoute } from "vue-router";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const dzmodal = useDzModal();
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const tabref = opertaor.getTableRefByKey("commodityBasicInfo");
 const tabProref = opertaor.getTableRefByKey("productBasicInfo");
 import { descryptParameter, encryptParameter } from "@/utils/encipher";

@@ -16,9 +16,12 @@ import { formatDate } from "@/utils/date";
 import { transpileModule } from "typescript";
 import { policyRatio } from "@/api/query";
 import { useRoute } from "vue-router";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
 const route = useRoute();
 const { getRules } = useValidator();
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const props = defineProps({
   pageSchema: {
     type: [Object],

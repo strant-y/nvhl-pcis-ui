@@ -44,7 +44,8 @@ import {
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();

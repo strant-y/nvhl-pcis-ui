@@ -53,7 +53,7 @@ export function descryptParameterToQuery(query: any): any {
     if (Object.prototype.hasOwnProperty.call(query, key)) {
       if (!['encrypted'].includes(key) && query[key]) {
         let keyData = query[key];
-        if(typeof keyData === CommonConstants.TYPE_OF_STRING && keyData.length > 1) {
+        if(!['componentKey'].includes(key) && typeof keyData === CommonConstants.TYPE_OF_STRING && keyData.length > 1) {
           keyData = descryptParameter(query[key]);
         }
         if (!!keyData) {

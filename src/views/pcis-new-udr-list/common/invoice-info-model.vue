@@ -24,7 +24,8 @@ import { useValidator } from "@/typings/useValidator";
 
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { permission } from 'process';
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 opertaor.init();
 const props = defineProps({
   visible: {

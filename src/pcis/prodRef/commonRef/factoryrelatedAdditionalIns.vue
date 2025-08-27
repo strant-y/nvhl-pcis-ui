@@ -23,8 +23,10 @@ import { useValidator } from "@/typings/useValidator";
 import { qryProdRelCvrgList } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { dataParam } from "@/store/modules/dataParam";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const dataparam = dataParam();
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 import {
   AppTableConfig,
   AppTableMethod,

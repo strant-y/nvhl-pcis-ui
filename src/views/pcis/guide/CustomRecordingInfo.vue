@@ -188,7 +188,6 @@ const tableconfig = reactive<AppTableConfig>(
   })
 );
 onMounted(async () => {
-  console.log("props.datas", props.termList);
   init();
   labelNm.value = props.type === 2 ? "方案" : "条款";
 });

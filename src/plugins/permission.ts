@@ -35,13 +35,6 @@ export function setupPermission() {
               next("/404");
             }
           } else {
-            // 添加tagsView
-            const navType = sessionStorage.getItem('navType');
-            if(!navType || navType === 'push') {
-              const tagsViewStore = useTagsViewStore();
-              await tagsViewStore.addTagView(to);
-            }
-            sessionStorage.removeItem('navType');
             next();
           }
         } else {

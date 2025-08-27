@@ -27,7 +27,9 @@ import { ref, reactive, defineEmits, defineProps } from "vue";
 const emits = defineEmits(["ok", "cancel"]);
 import { saveCvrgRelTerm } from "@/api/prod"; // api接口
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 const tabref = opertaor.getTableRefByKey("inruranceTypeBasicInfo");

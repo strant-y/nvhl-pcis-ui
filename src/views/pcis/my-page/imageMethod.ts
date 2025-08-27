@@ -2,12 +2,11 @@ import { dataOpertaor } from "@/store";
 import { pageMethod } from "./pageMethod";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 import { checkAppBase } from "@/api/prod/index";
-const opertaor = dataOpertaor();
+
 const policyService = new PolicyService();
 export const imageMethod = {
-  showImage: function () {
+  showImage: function (opertaor: any) {
     const param = {};
-    const opertaor = dataOpertaor();
     const params = opertaor.getParam();
     const CEdrType = params.cEdrType;
     let ParamNo = null;
@@ -29,7 +28,7 @@ export const imageMethod = {
       return;
     }
 
-    if (pageMethod.isReadOnlyScene()) {
+    if (pageMethod.isReadOnlyScene(opertaor)) {
       let ParamNo = null;
       policyService
         .imageInfoShow({ ParamNo: ParamNo })

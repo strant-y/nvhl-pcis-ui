@@ -17,8 +17,11 @@ import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-lis
 import { codeListViewStore } from "@/store";
 import dayjs from "dayjs";
 import { debug } from "console";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
 const codeListStore = codeListViewStore();
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const { getRules } = useValidator();
 const props = defineProps({
   // param: {
