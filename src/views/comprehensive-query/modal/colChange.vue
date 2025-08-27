@@ -80,9 +80,14 @@ function save() {
     if (isValid) {
         const formData = freeEditRef.value?.getFromValue();
         console.log('formData.bsType', formData.bsType);
+
+        if(formData.bsType.length == 0){
+            ElMessage.warning("请至少选择一个表单要素!");
+            return;
+        }
         emits("ok", { 
             type: "ok", 
-            body: formData.bsType 
+            body: formData.bsType
         });
         dialogVisible.value = false;
     }
