@@ -48,10 +48,12 @@
 import { ref, watch, onMounted, computed } from "vue";
 import { isValidDateFlag } from "@/typings/method-public";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const dialogVisible = ref(true);
 const props = defineProps(["data","callback"]);
 const rowData = ref(props.data); 
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 //rowData当前行数据
 /**
  * 拿到特约内容字段，通过***分割为数组，然后在html部分直接循环该数组，

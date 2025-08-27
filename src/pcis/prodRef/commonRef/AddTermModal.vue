@@ -26,8 +26,10 @@ import { ref, reactive } from "vue";
 import { savePrdTermInfo } from "@/api/prod"; // api接口
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useValidator } from "@/typings/useValidator";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const { getRules } = useValidator();
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const tabref = opertaor.getTableRefByKey("inruranceTypeBasicInfo");
 const props = defineProps<{
   data: Object;

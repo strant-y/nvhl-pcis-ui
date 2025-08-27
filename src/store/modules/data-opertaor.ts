@@ -1,11 +1,17 @@
 import { defineStore } from "pinia";
 import { useProductStore, useTagsViewStore } from "@/store";
 
+interface OpertaorProps {
+    id: string;
+    type?: string;
+}
+
 type StoreCache = Map<string, ReturnType<typeof defineStore>>
 const dataOpertaorMap: StoreCache = new Map();
 
-export const dataOpertaor = (pageKey?: string) => {
-    return storeFactory(pageKey, defineStore(`dataOpertaor-${pageKey}`, () => {
+export const dataOpertaor = (props: OpertaorProps) => {
+    const {id, type} = props;
+    return storeFactory(id, defineStore(`dataOpertaor-${id}`, () => {
 
         const productStore = useProductStore();
         const tableConfig = reactive<Array<any>>([]);
@@ -321,7 +327,7 @@ export const dataOpertaor = (pageKey?: string) => {
                                 grouplist.forEach(g => {
                                     const gprop = g['prop']; // 抽离需要的数据
                                     const gd = getDataByKey(gprop, data);
-                                    if (gd) {
+                                    if (gd == 0 || gd) {
                                         res1[k][gprop] = gd;
                                     }
                                 })
@@ -329,7 +335,7 @@ export const dataOpertaor = (pageKey?: string) => {
                         } else {
                             const prop = f['prop']; // 抽离需要的数据
                             const d = getDataByKey(prop, data);
-                            if (d) {
+                            if (d == 0 || d) {
                                 res1[k][prop] = d;
                             }
                         }
@@ -485,9 +491,10 @@ function storeFactory(
     storeId?: string,
     newStore?: ReturnType<typeof defineStore>
 ) {
-    const tagsViewStore = useTagsViewStore();
-    const { selectedView } = toRefs(tagsViewStore);
-    const pageKey = selectedView.value?.name;
+    // const tagsViewStore = useTagsViewStore();
+    // const { selectedView } = toRefs(tagsViewStore);
+    // const pageKey = selectedView.value?.name;
+    const pageKey = storeId;
     const storeRef = ref();
     if(!pageKey) {
         storeRef.value = {};
@@ -499,3 +506,6 @@ function storeFactory(
     }
     return storeRef.value;
 }
+
+
+export type {OpertaorProps};

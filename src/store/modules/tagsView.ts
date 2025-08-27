@@ -15,14 +15,10 @@ export const useTagsViewStore = defineStore("tagsView", () => {
     if (to.meta) {
       const view = buildView(to);
       if (view.keepAlive) {
-        await delView(view);
         // 缓存模式
         addCachedView(view.cachedKey);
-        addVisitedView(view);
-      }else {
-        clearDataOpertaorByPageKey(view.name);
-        addVisitedView(view);
       }
+      addVisitedView(view);
       moveToCurrentTag(to);
     }
   }
@@ -47,7 +43,6 @@ export const useTagsViewStore = defineStore("tagsView", () => {
       hidden: to.meta.hidden,
       query: data.JSONquery,
       cachedKey: cachedKey,
-      componentKey: base64encoder(to.path) + new Date().getTime(),
     };
   }
 
@@ -80,23 +75,38 @@ export const useTagsViewStore = defineStore("tagsView", () => {
     cachedViews.value.push(key);
   }
 
-  /**
-   * 从已访问视图列表中删除指定的视图
-   */
+
+  /** 从已访问视图列表中删除指定的视图 */
   function delVisitedView(view: TagView) {
-    return new Promise((resolve) => {
-      const index = visitedViews.value.findIndex(item => view.path === item.path);
-      index > -1 && visitedViews.value.splice(index, 1);
-      resolve([...visitedViews.value]);
-    });
+    return new Promise<void>((resolve) => {
+      // 添加空值检查
+      if (!view) {
+        resolve()
+        return
+      }
+
+      const idx = visitedViews.value.findIndex((v) => v.path === view.path)
+      if(idx != -1) {
+        visitedViews.value.splice(idx, 1);
+      }
+      resolve()
+    })
   }
 
   function delCachedView(view: TagView) {
-    return new Promise((resolve) => {
-      const index = cachedViews.value.indexOf(view?.cachedKey);
-      index > -1 && cachedViews.value.splice(index, 1);
-      resolve([...cachedViews.value]);
-    });
+    return new Promise<void>((resolve) => {
+      // 添加空值检查
+      if (!view || !view.name) {
+        resolve()
+        return
+      }
+      // 安全地操作 cachedViews
+      const idx = cachedViews.value.findIndex(item => view.path === item.path)
+      if (idx != -1) {
+        cachedViews.value.splice(idx, 1)
+      }
+      resolve()
+    })
   }
 
   function delOtherVisitedViews(view: TagView) {
@@ -143,18 +153,6 @@ export const useTagsViewStore = defineStore("tagsView", () => {
     }
   }
 
-  function delView(view: TagView) {
-    return new Promise(async (resolve) => {
-      clearDataOpertaorByPageKey(view.name);
-      delCachedView(view);
-      delVisitedView(view);
-      resolve({
-        visitedViews: [...visitedViews.value],
-        cachedViews: [...cachedViews.value],
-      });
-    });
-  }
-
   function delOtherViews(view: TagView) {
     return new Promise((resolve) => {
       delOtherVisitedViews(view);
@@ -164,6 +162,28 @@ export const useTagsViewStore = defineStore("tagsView", () => {
         cachedViews: [...cachedViews.value],
       });
     });
+  }
+
+
+  async function delView(view: TagView) {
+    // 添加空值检查
+    if (!view) {
+      return {
+        visitedViews: [...visitedViews.value],
+        cachedViews: [...cachedViews.value],
+      }
+    }
+    try {
+      await delVisitedView(view);
+      await delCachedView(view);
+    } catch (error) {
+      console.error('删除视图时出错:', error)
+    }
+
+    return {
+      visitedViews: [...visitedViews.value],
+      cachedViews: [...cachedViews.value],
+    }
   }
 
   function delLeftViews(view: TagView) {
@@ -251,13 +271,22 @@ export const useTagsViewStore = defineStore("tagsView", () => {
               hidden: route.meta.hidden,
               query: tag.query,
               cachedKey: tag.cachedKey,
-              componentKey: tag.componentKey,
             });
           }
         }
       }
     });
   }
+
+  async function clearConflictingView(key: string) {
+    const view = visitedViews.value.find((v) => v.path === key || v.name === key);
+    if(view && view.path) {
+      await delView(view);
+      clearDataOpertaorByPageKey(view.name);
+    }
+    return;
+  }
+
 
   function back() {
     eventBus.emit('closeSelectedTag', selectedView.value);
@@ -283,6 +312,7 @@ export const useTagsViewStore = defineStore("tagsView", () => {
     delAllVisitedViews,
     delAllCachedViews,
     moveToCurrentTag,
+    clearConflictingView,
     back
   };
 });

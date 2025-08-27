@@ -22,8 +22,10 @@ import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { saveProdInfo } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const dialog = ref<DialogMethod | null>(null);
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 import {
   AppTableConfig,
   AppTableMethod,
@@ -47,7 +49,7 @@ const AddResponsibilityModal = defineAsyncComponent(
 const ResponsibilityModal = defineAsyncComponent(
   () => import("./ResponsibilityModal.vue")
 );
-
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { dataParam } from "@/store/modules/dataParam";
 const paramparam = dataParam();
@@ -142,7 +144,8 @@ const tableconfig = reactive<AppTableConfig>(
         type: "primary",
         label: "要素绑定",
         func: () => {
-          const opertaor = dataOpertaor();
+          const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
           const clauseConfBasicInfo = opertaor.getTableRefByKey(
             "clauseConfBasicInfo"
           );

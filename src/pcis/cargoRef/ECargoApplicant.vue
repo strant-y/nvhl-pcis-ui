@@ -15,8 +15,6 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
 import { useValidator } from "@/typings/useValidator";
@@ -35,19 +33,12 @@ const props = defineProps({
 const applicantEditRef = ref<AppFreeEditMethod | null>(null);
 import { getAddressStr,qryCustomer } from "@/api/query";
 const formconfig1 = reactive(createAppFreeEditConfig({}));
-const formData = ref<any[]>([]);
-const cClntAddr = ref<any>(null);
-import { useRoute } from "vue-router";
-const route = useRoute();
 const fileInputRef = ref(null);
-const fileInputType = ref();
-import { readFile } from "@/api/file";
 import moment from "moment/moment";
-const tCertfDate = ref<any[]>([]);
-const idxParam = inject('idxParam');
+const idxParam = inject('idxParam', {});
 const formPage = idxParam?.formPage;
 const initFlag = computed(() => formPage.init);
-const  cWorkDptList =['310','320','330','340','350','360']  // 单位性质带企业的ID
+const cWorkDptList =['310','320','330','340','350','360']  // 单位性质带企业的ID
 onMounted(() => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
@@ -98,7 +89,48 @@ function setFormItem(key: any, obj: any) {
     });
   }
 }
+const handelItemShow = (data:any)=>{
+  console.log('dataformconfig1',data)
+  // 遍历主数组
+  data.forEach(item => {
+    // 情况1: 直接存在rules属性
+    if (item.rules && Array.isArray(item.rules)) {
+      const hasRequiredRule = item.rules.some(rule =>
+          rule.required === true
+      );
+      if (hasRequiredRule && item.prop) {
+        setFormItem(item.prop,{hidden:false})
+      }else {
+        setFormItem(item.prop,{hidden:true})
+      }
+    }else if (!item.rules && item.groupList && Array.isArray(item.groupList)) {
+      // debugger
+      // 情况2: 存在groupList属性
+      let hasRequiredInGroup = false;
 
+      // 遍历groupList中的每个元素
+      item.groupList.forEach(groupItem => {
+        if (groupItem.rules && Array.isArray(groupItem.rules)) {
+          const hasRequiredRule = groupItem.rules.some(rule =>
+              rule.required === true
+          );
+
+          if (hasRequiredRule) {
+            hasRequiredInGroup = true;
+          }
+        }
+      });
+      // 如果groupList中有任意一个元素满足条件，且外层对象有prop属性
+      if (hasRequiredInGroup && item.prop) {
+        setFormItem(item.prop,{hidden:false})
+      }else {
+        setFormItem(item.prop,{hidden:true})
+      }
+    }else {
+      setFormItem(item.prop,{hidden:true})
+    }
+  });
+}
 
 // 绑定方法
 const method = {
@@ -199,7 +231,6 @@ const method = {
     checkUser();
   },
   funcNdustryCate: () => {
-    // const param = opertaor.getParam();
     dialog.value?.open(
       "ndustryCateModal",
       {
@@ -220,7 +251,6 @@ const method = {
     );
   },
   cOccupCdeChange: () => {
-    // const param = opertaor.getParam();
     dialog.value?.open(
       "cOccupCdeModal",
       {
@@ -332,7 +362,6 @@ const method = {
 	//投保人性质(0是法人 1是个人)
   InsureChange: async (val:any) => {
     console.log('vvvvvvv',val)
-    const param = opertaor.getParam();
 
     if (val == "0") {
       if ( (getValue('ECargoApplicant.cClntMrk') && getValue('ECargoApplicant.cClntMrk') === '0') && (getValue('ECargoApplicant.cIsBranch') && getValue('ECargoApplicant.cIsBranch') === '0') && (getValue('ECargoApplicant.cWorkDpt') && ['310','320','330','340','350','360'].includes(getValue('ECargoApplicant.cWorkDpt')))){
@@ -375,7 +404,7 @@ const method = {
       });
 
       
-      if (!param.initFlag && !idxParam.readonly) {
+      if (!formPage.init && !idxParam.readonly) {
         setFormItem("ECargoApplicant.cWorkDpt", {
         disabled: false,
       });
@@ -454,27 +483,25 @@ const method = {
       });
 
 
-           codeListStore
+        const res:any = await  codeListStore
         .queryCodeList({
           codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
           codeListParam: {},
         })
-        .then((res) => {
-          if (
-            !res.some((item) =>
+      if (
+          !res.some((item) =>
               Object.values(item).includes(getValue("ECargoApplicant.cCertfCls"))
-            )
-          ) {
-            setValue("ECargoApplicant.cCertfCls", "");
-          }
-          setFormItem("ECargoApplicant.cCertfCls", {
-            loadData: [],
-          });
-          setFormItem("ECargoApplicant.cCertfCls", {
-            loadData: res,
-            rules: [getRules("required", {})],
-          });
-        });
+          )
+      ) {
+        setValue("ECargoApplicant.cCertfCls", "");
+      }
+      setFormItem("ECargoApplicant.cCertfCls", {
+        loadData: [],
+      });
+      setFormItem("ECargoApplicant.cCertfCls", {
+        loadData: res,
+        rules: [getRules("required", {})],
+      });
     } else {
       setFormItem("ECargoApplicant.tBirthday", {
         rules: [getRules("required", {})],
@@ -573,29 +600,30 @@ const method = {
         rules: [getRules("required", {})],
       });
 
-      codeListStore
+      const res:any = await codeListStore
         .queryCodeList({
           codeListName: "NATURAL_CERTIFICATE_CACHE",
           codeListParam: {},
         })
-        .then((res) => {
-          if (
-            !res.some((item) =>
+      if (
+          !res.some((item) =>
               Object.values(item).includes(getValue("ECargoApplicant.cCertfCls"))
-            )
-          ) {
-            setValue("ECargoApplicant.cCertfCls", "");
-          }
-          setFormItem("ECargoApplicant.cCertfCls", {
-            loadData: [],
-          });
-          setFormItem("ECargoApplicant.cCertfCls", {
-            loadData: res,
-            rules: [getRules("required", {})],
-          });
-        });
+          )
+      ) {
+        setValue("ECargoApplicant.cCertfCls", "");
+      }
+      setFormItem("ECargoApplicant.cCertfCls", {
+        loadData: [],
+      });
+      setFormItem("ECargoApplicant.cCertfCls", {
+        loadData: res,
+        rules: [getRules("required", {})],
+      })
     }
-
+     //选择个人展示哪些字段，选择法人展示哪些，其他隐藏
+    if(val){
+      handelItemShow(formconfig1?.fromSchema)
+    }
       checkUser();
   },
 	// 证件类型
@@ -604,9 +632,8 @@ const method = {
     // 清除报错信息
     clearValidate('ECargoApplicant.cCertfCde')  
       // freeEditRef.value?.clearValidate('phoneNo');
-    const param = opertaor.getParam();
 
-    if (!param.initFlag) {
+    if (!formPage.init) {
       setFormItem("ECargoApplicant.cNation", {
         disabled: false,
       });
@@ -640,7 +667,7 @@ const method = {
       // setValue("ECargoApplicant.nAge", null);
       // setValue("ECargoApplicant.cSex", null);
 
-      if (!param.initFlag) {
+      if (!formPage.init) {
         setFormItem("ECargoApplicant.cNation", {
           disabled: true,
         });
@@ -837,9 +864,6 @@ function setValue(key: string, value: any) {
 
 function getValue(key: string) {
   return applicantEditRef?.value?.getValue(key);
-}
-function getFormconfig() {
-  return formconfig1;
 }
 function handleFileChange(event: Event) {
   const fileInput = event.target as HTMLInputElement;

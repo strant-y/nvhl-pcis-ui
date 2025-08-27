@@ -15,9 +15,11 @@ const { getRules } = useValidator();
 import { saveProdAudit, getProducts } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { dataParam } from "@/store/modules/dataParam";
-import { useRoute } from "vue-router";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
 const dataparam = dataParam();
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 
 const router = useRouter();
 const param = dataparam.getParam();

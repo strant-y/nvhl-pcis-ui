@@ -60,6 +60,10 @@ const tableRef = ref<AppTableMethod | null>(null);
 const TaskListVestige = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/TaskListVestige.vue")
 );
+
+let cTermNoList = ref<any>([]);  // 条款数据
+let cTermNo = '';    // 条款编码
+
 const props = defineProps({
   refreshData: {
     type: Boolean,
@@ -67,6 +71,12 @@ const props = defineProps({
   },
 });
 const cPard = ref(null);
+
+function extractCode(str:string) {
+  // 匹配 "P+数字" 或 "纯数字"
+  const pattern = /^(P\d+|\d+)/;
+  return str.match(pattern)?.[0] || "";
+}
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -83,13 +93,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         func: () => {
           freeEditRef.value?.setFormValue({
             NExpirationDays: "3",
-            orgCde: user.value.companyId,
-            CLoadSub: 1,
+            cDptCde: user.value.companyId,
+            cLoadSub: 1,
             cKindNo: null,
             cProdNo: null,
-            CPlyNo: null
+            cPlyNo: null
           });
-          setFormItem("orgCde", {loadData: [{
+          setFormItem("cDptCde", {loadData: [{
             label: user.value.companyId+user.value.companyCnm,
             value: user.value.companyId,
           }]});
@@ -100,7 +110,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
     fromSchema: [
       {
-        prop: "orgCde",
+        prop: "cDptCde",
         inputtype: "rtselect",
         title: "核保机构",
         btnWidth: 10,
@@ -125,10 +135,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     ],
                   };
                   freeEditRef.value?.setValue(
-                      "orgCde",
+                      "cDptCde",
                       selectObj.id
                   );
-                  setFormItem("orgCde", obj);
+                  setFormItem("cDptCde", obj);
                 }
               });
           },
@@ -141,7 +151,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         ]
       },
       {
-        prop: "CLoadSub",
+        prop: "cLoadSub",
         inputtype: "rtcheckbox",
         title: "包含下级机构",
         showKey: [5],
@@ -167,22 +177,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         //   }
         // }
       },
-      // {
-      //   prop: "CKindNo",
-      //   inputtype: "rtselect",
-      //   title: "产品大类",
-      //   typeCode: "KIND_LIST_GRT",
-      //   params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
-      //   clearable: true,
-      // },
-      // {
-      //   prop: "CProdNo",
-      //   inputtype: "rtselect",
-      //   title: "条款",
-      //   typeCode: "PROD_LIST_GRT",
-      //   params: { cParCde:'', cOperId: user.value.opCde, cDptCde: user.value.companyId },
-      //   clearable: true,
-      // },
       {
         prop: "cKindNo",
         inputtype: "rtselect",
@@ -194,15 +188,33 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         filterable: true,
         clearable: true,
         codeParam: {
-          cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
-          cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+            cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+            cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
         },
         func: (val) => {
-          setValue("cProdNo","")
-          cPard.value = val;
-          codeListStore
+            setValue("cProdNo","")
+            cTermNo = "";      // 重置条款编码
+            cPard.value = val;
+            formconfig1.fromSchema?.forEach((item) => {
+                if (
+                    item.prop === "CEmployeeName" ||
+                    item.prop === "CIdentificationNumber" ||
+                    item.prop === "CPlateNo" ||
+                    item.prop === "CEngineNo" ||
+                    item.prop === "CIndustryType" ||
+                    item.prop === "CProjectName" ||
+                    item.prop === "CDetailedAddress" ||
+                    item.prop === "CProjectType" ||
+                    item.prop === "cPrjCtgTyp" ||
+                    item.prop === "cPrjCtgMidTyp" ||
+                    item.prop === "cPrjCtgSubTyp"
+                ) {
+                    item.hidden = true;
+                }
+            });
+            codeListStore
             .queryCodeList({
-                codeListName: "TERM_LIST_IN_GUIDE_NEW",
+                codeListName: "TERM_LIST_IN_GUIDE_SEARCH",
                 codeListParam:{
                 cParCde: cPard.value,
                 cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
@@ -210,6 +222,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             },
             })
             .then((res) => {
+                cTermNoList.value = res;
                 setFormItem("cProdNo", {
                     loadData: res,
                 });
@@ -224,16 +237,39 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [{ type: "required" }],
         filterable: true,
         clearable: true,
-        // typeCode: "TERM_LIST_IN_GUIDE_NEW",
-        // codeParam: {
-        //   cParCde: cPard.value,
-        //   cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
-        //   cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
-        // },
-        func: (val) => {},
+        func: (val:any) => {
+        if(val){
+                if(cTermNoList.value.length>0){
+                    cTermNoList.value.forEach((ele) => {
+                        if(ele['value']  === val){
+                            cTermNo =extractCode(ele['label'])
+                        }
+                    });
+                }  
+        } else {
+            cTermNo = "";
+        }
+        formconfig1.fromSchema?.forEach((item) => {
+                if (
+                    item.prop === "CEmployeeName" ||
+                    item.prop === "CIdentificationNumber" ||
+                    item.prop === "CPlateNo" ||
+                    item.prop === "CEngineNo" ||
+                    item.prop === "CIndustryType" ||
+                    item.prop === "CProjectName" ||
+                    item.prop === "CDetailedAddress" ||
+                    item.prop === "CProjectType" ||
+                    item.prop === "cPrjCtgTyp" ||
+                    item.prop === "cPrjCtgMidTyp" ||
+                    item.prop === "cPrjCtgSubTyp"
+                ) {
+                    item.hidden = true;
+                }
+            });
+        },
       },
       {
-        prop: "CPlyNo",
+        prop: "cPlyNo",
         inputtype: "rtinput",
         title: "保单号",
         clearable: true,
@@ -300,13 +336,13 @@ const tableconfig = reactive<AppTableConfig>(
 onMounted(async () => {
 	freeEditRef.value?.setFormValue({
 		NExpirationDays: "3",
-		orgCde: user.value.companyId,
-		CLoadSub: 1,
+		cDptCde: user.value.companyId,
+		cLoadSub: 1,
 		cKindNo: null,
 		cProdNo: null,
-		CPlyNo: null
+		cPlyNo: null
 	});
-	setFormItem("orgCde", {loadData: [{
+	setFormItem("cDptCde", {loadData: [{
 		label: user.value.companyId + user.value.companyCnm,
 		value: user.value.companyId,
 	}]});
@@ -323,8 +359,8 @@ watch(
   () => props.refreshData,
   (n, o) => {
     // 自动刷新列表获取数据
-    pageresult.list = [{}, {}];
-    pageresult.total = 2;
+    // pageresult.list = [{}, {}];
+    // pageresult.total = 2;
     // 上面代码是仅用于本地调试
     if (n) {
       console.log(n, "保单到期查询");
@@ -363,6 +399,8 @@ function handleQuery(flag?: boolean) {
         s,
         r
       );
+      param["cTermNo"] = cTermNo;        // 条款编码
+      delete param.cProdNo;
       pcisQueryService
         .getExpirationPolicyList(param)
         .then((res) => {

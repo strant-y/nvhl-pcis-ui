@@ -35,7 +35,10 @@ const UpdateSpecialAgreement = defineAsyncComponent(
     () => import("./UpdateSpecialAgreement.vue")
 );
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const dataparam = dataParam();
 import {
   AppTableConfig,

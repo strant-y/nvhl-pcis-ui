@@ -11,7 +11,11 @@ import {
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { checkCdeptByCdptCde, getNmeByCde } from "@/api/prod/index";
-const opertaor = dataOpertaor();
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
 import { useRoute } from "vue-router";
@@ -488,7 +492,7 @@ const method = {
     if (isNaN(floatValue)) {
       ElMessage.warning("请输入有效的数字");
       // 重置为0
-      freeEditRef?.value?.setValueByRowKey("Ci.nPlyFeeRate", row._dataId, "0.000000");
+      freeEditRef?.value?.setValueByRowKey("Ci.nPlyFeeRate", row._dataId, "0.00");
       freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", row._dataId, "0.00");
       return;
     }
@@ -896,7 +900,7 @@ const initCiInfo = (data: any) => {
     }
     freeEditRef?.value?.addRowByData( {
       'Ci.nSeqNo': 1,
-      'Ci.nCiShare': '100.00000000',
+      'Ci.nCiShare': '100',
       'Ci.nPlyFeeRate': '0.00',
       'Ci.nPlyFee': '0.00',
       'Ci.nComm':'0.00',

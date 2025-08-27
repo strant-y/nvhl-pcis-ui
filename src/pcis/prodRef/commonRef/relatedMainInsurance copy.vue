@@ -22,11 +22,14 @@ import { useValidator } from "@/typings/useValidator";
 import { qryProdRelCvrgList, unAssociationCvrg } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
 const dzmodal = useDzModal();
 const MaininsuranceModal = defineAsyncComponent(
   () => import("./MaininsuranceModal.vue")
 );
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 import {
   AppTableConfig,
   AppTableMethod,

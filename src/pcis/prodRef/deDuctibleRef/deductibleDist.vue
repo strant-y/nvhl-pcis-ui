@@ -19,11 +19,13 @@ import {
   createTableEditConfig,
   MyTableMethod,
 } from "@/shared/app-table-config";
-
 import { useDzModal } from "@/common/dzmodel/DzModalService";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
 const dzmodal = useDzModal();
 const route = useRoute();
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 import {
   AppGridEditMethod,
   createAppGridEditConfig,

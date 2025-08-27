@@ -415,9 +415,8 @@
 import { onMounted, onUnmounted, ref } from 'vue';
 import { debounce } from 'lodash-es';
 import { createFreeButtonBase, FreeButtonBase } from "@/shared/button-config";
-import { getProductPage, getRenewalAppPolicy, distMapCollectCompKey } from "../../../api/prod/index";
+import { getProductPage, distMapCollectCompKey } from "../../../api/prod/index";
 import {
-  getAppPlyInfoByAppNo,
   saveAppPlyInfo,
   generatelSingleNo,
   appCalc,
@@ -445,10 +444,10 @@ import {
   queryTermRateLimit,
 	queryEcargoRelevancePolicyDetails
 } from "../../../api/query/index";
-import { checkFeeWindowType, selectDist, saveDistBatch, getReleaseInquiryPage, copyDist } from "@/api/prod";
+import { checkFeeWindowType, selectDist, getReleaseInquiryPage, copyDist } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
 import moment from "moment";
-import {numAdd, numComparison, numMulti, numSubp, tool_fix} from "@/utils/Math";
+import {numAdd} from "@/utils/Math";
 import dayjs from "dayjs";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
@@ -472,16 +471,13 @@ const pageLoaded = ref(false);
 
 import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
 const { saveData, removeReceived } = NewUdrListService();
-import {useUserStore} from "@/store";
-import { pa } from "element-plus/es/locale";
 import { initMultiCodeList } from "@/api/code-list-service";
-import {scrollByDomId} from "@/utils/common";
-import { getAppPolicyList, qryEndorseList, delTmpPolicy, queryInsuredList, getInquiryPolicyList} from "@/api/query";
+import { getAppPolicyList, getInquiryPolicyList} from "@/api/query";
 import {encryptRouterParam} from "@/router";
 import SvgIcon from "@/components/SvgIcon/index.vue";
 import { distRequiredMap } from './requiredDistMap';
-import { ElTable, ElTableColumn, ElIcon } from 'element-plus';
-import { Warning } from '@element-plus/icons-vue';
+import { ElTable, ElTableColumn } from 'element-plus';
+import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
 
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
@@ -558,12 +554,13 @@ const handleAnchorClick = (event, selector) => {
   }
 };
 
-const idxParam = {
-  opertaorId: 'my-page',
+const idxParam: IdxParamProps = {
+  opertaorProps: { id: route.name },
   handleAnchorClick: handleAnchorClick,
 };
-provide('idxParam', idxParam);
-const opertaor = dataOpertaor();
+provide(idxParamKey, idxParam);
+const opertaor = dataOpertaor(idxParam.opertaorProps);
+
 opertaor.init();
 const underwrite = ref(null);
 const edrbase = ref(null);
@@ -757,7 +754,7 @@ const highlightFirstVisibleAnchor = () => {
 };
 
 // 移除滚动监听
-onUnmounted(() => {
+onBeforeUnmount(() => {
   const mainContent = document.querySelector('.main-content');
   if (mainContent) {
     mainContent.removeEventListener('scroll', handleScroll);
@@ -1327,7 +1324,7 @@ const dataInit:any = ref({});
 function renderComponents() {
   const interval = setInterval(() => {
 		if (props.param.pageType === "app") {
-			const idata = getData();
+			const idata = getData(opertaor);
 			dataInit.value = opertaor.mapSetData(idata);
 			// setTimeout(() => {
 			//   // 基本信息预加载，降低空窗期
@@ -2243,7 +2240,7 @@ async function loadAfter() {
   }
 
   let imageStr = '影像管理';
-  if(pageMethod.isReadOnlyScene()){
+  if(pageMethod.isReadOnlyScene(opertaor)){
     imageStr = '影像查看';
   }
   bthList.value.push(
@@ -2252,7 +2249,7 @@ async function loadAfter() {
       label: imageStr,
       type: "success",
       func: () => {
-       imageMethod.showImage();
+       imageMethod.showImage(opertaor);
       },
     }),
   )

@@ -24,7 +24,8 @@ import { saveProdInfo } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "../../common/dzmodel/ComDialogConf";
 
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
 

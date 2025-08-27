@@ -106,13 +106,12 @@ watch(contentMenuVisible, (value) => {
   }
 });
 
-async function toView(tag: TagView) {
+function toView(tag: TagView) {
   if(tag.keepAlive) {
-    await router.replace({ path: tag.path, query: tag.query})
+    router.replace({ path: tag.path, query: tag.query})
   }else {
-    await router.push({ path: tag.path, query: tag.query})
+    router.push({ path: tag.path, query: tag.query})
   }
-  return;
 }
 
 /**
@@ -193,30 +192,30 @@ function refreshSelectedTag(view: TagView) {
   });
 }
 
-const toLastView = async (visitedViews: TagView[], view?: TagView) => {
-  const latestView = visitedViews.slice(-2)[0];
+const toLastView = (visitedViews: TagView[], view?: TagView) => {
+  const latestView = visitedViews.slice(-1)[0];
   if(latestView.keepAlive) {
-    await toView(latestView);
+    toView(latestView);
   } else if (latestView && latestView.fullPath) {
-    await router.push(latestView.fullPath);
+    router.push(latestView.fullPath);
   } else {
     // now the default is to redirect to the home page if there is no tags-view,
     // you can adjust it according to your needs.
     if (view?.name === "Dashboard") {
       // to reload home page
-      await router.replace({ path: "/redirect" + view.fullPath });
+      router.replace({ path: "/redirect" + view.fullPath });
     } else {
-      await router.push("/");
+      router.push("/");
     }
   }
-  return;
 }
 
 async function closeSelectedTag(view: TagView) {
-  if (isActive(view)) {
-    await toLastView(visitedViews.value, view);
-  }
-  tagsViewStore.delView(view);
+  tagsViewStore.delView(view).then(() => {
+    if (isActive(view)) {
+      toLastView(visitedViews.value, view);
+    }
+  });
 }
 
 function closeLeftTags() {
@@ -343,7 +342,7 @@ eventBus.on('closeSelectedTag', (view: TagView) => {
 onMounted(() => {
   initTags();
   nextTick(()=>{
-    // tagsViewStore.addTagView(route)
+    tagsViewStore.addTagView(route)
   })
 });
 </script>

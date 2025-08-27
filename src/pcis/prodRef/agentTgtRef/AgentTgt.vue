@@ -9,12 +9,14 @@ import {dataOpertaor} from "@/store/modules/data-opertaor";
 import {useProductStore} from "@/store/modules/prod";
 import {useValidator} from "@/typings/useValidator";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const dzmodal = useDzModal();
 const surveyInfo = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/survey-info-modal.vue")
 );
 
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const { getRules } = useValidator();
 const productStore = useProductStore();
 const props = defineProps({

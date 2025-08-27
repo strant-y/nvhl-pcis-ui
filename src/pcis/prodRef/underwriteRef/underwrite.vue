@@ -19,7 +19,8 @@ const dzmodal = useDzModal();
 const RiskunitA = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/pages/RiskunitA.vue")
 );
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const { getRules } = useValidator();
 const props = defineProps({
   // param: {

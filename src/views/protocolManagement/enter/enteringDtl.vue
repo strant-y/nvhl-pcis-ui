@@ -286,7 +286,7 @@ onBeforeMount(async () => {
     })
   }
 	if (props.type === "add") {
-    const idata = getECargoData();
+    const idata = getECargoData(idxParam);
         nextTick(()=>{
 			formPage.value?.setFormDataById('AgreementBase',idata);
             // 新增选择预付

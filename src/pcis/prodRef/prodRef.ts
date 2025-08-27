@@ -8,6 +8,7 @@ import insrncRef from "./insrncRef/insrnc.vue";
 import tgtobjRef from "./tgtobjRef/tgtobj.vue";
 import payinfoRef from "./payinfoRef/payinfo.vue";
 import acctinfoRef from "./acctinfoRef/acctinfo.vue";
+import accidentPrevRef from "./accidentPrevRef/accidentPrev.vue";
 
 import ciMasterAgreementRef from "./ciMasterAgreementRef/ciMasterAgreement.vue";
 import ourCompanyCiShareRef from "./ourCompanyCiShareRef/ourCompanyCiShare.vue";
@@ -92,6 +93,7 @@ const componentMap = {
   baseRef: baseRef,
   applicantRef: applicantRef,
   tgtRef: tgtRef,
+  accidentPrevRef:accidentPrevRef,
   cvrgRef: cvrgRef,
   webPlyCvrg04: plyCvrg04Ref,
   webPlyCvrgPer:plyCvrgPer,

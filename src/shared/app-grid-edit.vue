@@ -83,6 +83,7 @@
 <script setup lang="ts">
 import { AppGridEditConfig, AppGridEditMethod } from "./app-grid-edit-config";
 import {ref} from "vue";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 defineOptions({
   name: "AppGridEdit",
   inheritAttrs: false,
@@ -99,7 +100,7 @@ const codeListMap = ref<any>({});
 const customMap = ref<any>({});
 provide('codeListMap', codeListMap.value);
 provide('customMap', customMap.value);
-const idxParam = inject('idxParam', {});
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const btnMap = ref({});
 const { gridEditConfig } = toRefs(props);
 

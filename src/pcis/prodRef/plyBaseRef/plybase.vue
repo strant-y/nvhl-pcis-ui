@@ -26,6 +26,8 @@ import { codeListViewStore, dataOpertaor, useProductStore } from "@/store";
 import {PolicyService} from "@/views/pcis-main/service/my-page/policy.service";
 const productStore = useProductStore();
 import { descryptParameter, encryptParameter } from "@/utils/encipher";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
 const route = useRoute();
 const query = ref(route.query);
 const params = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
@@ -35,7 +37,8 @@ const { getRules } = useValidator();
 const dzmodal = useDzModal();
 const dialogRef = ref<DialogMethod | null>(null);
 
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const param = opertaor.getParam();
 const policyService = new PolicyService();
 const sessionData = ref(null);

@@ -86,7 +86,8 @@ const {
 } = NewUdrListService();
 import { descryptParameter } from "@/utils/encipher.ts";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
 const dzmodal = useDzModal();
@@ -969,32 +970,32 @@ function split() {
     unTotalNotaxPrm = parseFloat(unTotalNotaxPrm) + parseFloat(oldNotaxPrm);
     const oldAddedTax = arrData[i].nAddedTax;
     unTotalAddedTax = parseFloat(unTotalAddedTax) + parseFloat(oldAddedTax);
-  }
 
-  if (
-    CCiMrk == "1" ||
-    CCiMrk == "2" ||
-    CCiMrk == "3" ||
-    CCiMrk == "4" ||
-    CCiMrk == "5"
-  ) {
-    //共保
-    var oldCiAmt = arrData[i].nCiAmt;
-    unTotalCiAmt = parseFloat(unTotalCiAmt) + parseFloat(oldCiAmt);
-    var oldCiPrm = arrData[i].nCiPrm;
-    unTotalCiPrm = parseFloat(unTotalCiPrm) + parseFloat(oldCiPrm);
-    var oldCiAmtVar = arrData[i].nCiAmtVar;
-    unTotalCiAmtVar = parseFloat(unTotalCiAmtVar) + parseFloat(oldCiAmtVar);
-    var oldCiPrmVar = arrData[i].nCiPrmVar;
-    unTotalCiPrmVar = parseFloat(unTotalCiPrmVar) + parseFloat(oldCiPrmVar);
-    const oldCiNotaxPrm = arrData[i].nCiNotaxPrm;
-    unTotalCiNotaxPrm = parseFloat(unTotalCiNotaxPrm) + parseFloat(oldCiNotaxPrm);
-    const oldCiAddedTax = arrData[i].nCiAddedTax;
-    unTotalCiAddedTax = parseFloat(unTotalCiAddedTax) + parseFloat(oldCiAddedTax);
-    var oldCiNotaxPrmVar = arrData[i].nCiAmtVar;
-    unTotalCiNotaxPrmVar = parseFloat(unTotalCiNotaxPrmVar) + parseFloat(oldCiNotaxPrmVar);
-    var oldCiAddedTaxVar = arrData[i].nCiAddedTaxVar;
-    unTotalCiAddedTaxVar = parseFloat(unTotalCiAddedTaxVar) + parseFloat(oldCiAddedTaxVar);
+    if (
+      CCiMrk == "1" ||
+      CCiMrk == "2" ||
+      CCiMrk == "3" ||
+      CCiMrk == "4" ||
+      CCiMrk == "5"
+    ) {
+      //共保
+      var oldCiAmt = arrData[i].nCiAmt;
+      unTotalCiAmt = parseFloat(unTotalCiAmt) + parseFloat(oldCiAmt);
+      var oldCiPrm = arrData[i].nCiPrm;
+      unTotalCiPrm = parseFloat(unTotalCiPrm) + parseFloat(oldCiPrm);
+      var oldCiAmtVar = arrData[i].nCiAmtVar;
+      unTotalCiAmtVar = parseFloat(unTotalCiAmtVar) + parseFloat(oldCiAmtVar);
+      var oldCiPrmVar = arrData[i].nCiPrmVar;
+      unTotalCiPrmVar = parseFloat(unTotalCiPrmVar) + parseFloat(oldCiPrmVar);
+      const oldCiNotaxPrm = arrData[i].nCiNotaxPrm;
+      unTotalCiNotaxPrm = parseFloat(unTotalCiNotaxPrm) + parseFloat(oldCiNotaxPrm);
+      const oldCiAddedTax = arrData[i].nCiAddedTax;
+      unTotalCiAddedTax = parseFloat(unTotalCiAddedTax) + parseFloat(oldCiAddedTax);
+      var oldCiNotaxPrmVar = arrData[i].nCiAmtVar;
+      unTotalCiNotaxPrmVar = parseFloat(unTotalCiNotaxPrmVar) + parseFloat(oldCiNotaxPrmVar);
+      var oldCiAddedTaxVar = arrData[i].nCiAddedTaxVar;
+      unTotalCiAddedTaxVar = parseFloat(unTotalCiAddedTaxVar) + parseFloat(oldCiAddedTaxVar);
+    }
   }
 
   const allAmt = parseFloat(NAmt) + parseFloat(unTotalAmt); //所有记录的总保额

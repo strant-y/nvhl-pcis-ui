@@ -29,7 +29,8 @@ import { createFreeButtonBase } from "@/shared/button-config";
 const policyService = new PolicyService();
 
 
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 
 const pageresult = reactive<Pageresult>({
   result: "",

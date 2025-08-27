@@ -22,7 +22,8 @@ import { getBsnsTypList, getChaTypeList, getChaSubtypList, getPageList } from "@
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
 const policyService = new PolicyService();
-const opertaor = dataOpertaor();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const { getRules } = useValidator();
 import { useRoute } from "vue-router";
 const route = useRoute();

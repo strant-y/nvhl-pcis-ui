@@ -48,7 +48,10 @@ import {
   MyTableMethod,
 } from "@/shared/app-table-config";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 import { useAppStore } from "@/store";
 const appStore = useAppStore();
 const locale = computed(() => appStore.locale);

@@ -63,19 +63,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 );
 onMounted(async () => {
   if (props.type === "edit" && props.data) {
-    setTimeout(() => {
-      let values = [];
-      if (props.userSaved) {
-        // 已保存过：回显用户配置
-        values = props.data[0].loadData
-                   .filter((item: any) => item.checked)
-                   .map((item: any) => item.value);
-      } else {
-        // 第一次：全部勾选
-        values = props.data[0].loadData.map((item: any) => item.value);
-      }
-      freeEditRef.value?.setFormValue({ bsType: values });
-    }, 50);
+      setTimeout(() => {
+          const values = props.data[0].loadData
+                .filter((item: any) => item.checked)
+                .map((item: any) => item.value);
+
+            freeEditRef.value?.setFormValue({ bsType: values });
+      }, 50);
   }
 });
 
@@ -86,9 +80,14 @@ function save() {
     if (isValid) {
         const formData = freeEditRef.value?.getFromValue();
         console.log('formData.bsType', formData.bsType);
+
+        if(formData.bsType.length == 0){
+            ElMessage.warning("请至少选择一个表单要素!");
+            return;
+        }
         emits("ok", { 
             type: "ok", 
-            body: formData.bsType 
+            body: formData.bsType
         });
         dialogVisible.value = false;
     }

@@ -12,6 +12,7 @@ export const iconMap = {
   'payinfo': 'icon-hepei',
   'image': 'icon-yingxiangxinxi',
   'tgt': 'icon-jiwangpeian',
+  'accidentPrev': 'icon-jiwangpeian',
   'ciMasterAgreement': 'icon-yishoubaodan',
   'ci': 'icon-zaibaoxinxi',
   'ourCompanyCiShare': 'icon-lishiyijian',

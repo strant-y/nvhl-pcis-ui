@@ -299,7 +299,7 @@ const funcreset = () => {
       ECargoInsuredDistValue[k] = null;
     }
   }
-  if (!initFlag.value) {
+  // if (!initFlag.value) {
     setFormItem("ECargoInsuredDist.cInsuredNme", {
       disabled: false,
     });
@@ -321,7 +321,7 @@ const funcreset = () => {
     setFormItem('ECargoInsuredDist.cLongendTyp',{
       disabled:false
     })
-  }
+  // }
   setFormValue(ECargoInsuredDistValue);
 }
 const setcDetailedAddress = (prop:any,aftProp:any)=> {
