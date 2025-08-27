@@ -2633,7 +2633,7 @@ const loadAppPlyInfo = async (CAppNo) => {
       pageData.value = ops;
       ElMessage.success(res.msg);
       opertaor.setDataAll(ops);
-
+      console.log('缓存的数据6666',ops)
       // 暂存数据
       sessionStorage.setItem("getAppPolicyData", JSON.stringify(ops));
      
@@ -3967,7 +3967,7 @@ const saveEdrPlyInfo = async () => {
     })
   }
 
-  // console.log('333',opertaor.getDataAll())
+  console.log('333',opertaor.getDataAll())
   //   btn.loading = false;
   // return false;
   // 点击保存之前的申请单号
@@ -4029,6 +4029,8 @@ const saveEdrPlyInfo = async () => {
       })
     }
 
+       console.log('保存数据555',ops)
+      sessionStorage.setItem("getAppPolicyData", JSON.stringify(ops));
   } else {
     ElMessage.error(edrInfo.msg);
   }
