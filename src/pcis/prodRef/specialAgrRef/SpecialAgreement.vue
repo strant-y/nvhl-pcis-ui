@@ -335,10 +335,30 @@ onUnmounted(() => {
 
 // 复制数据处理
 const mergeArrays = (oldArr, newArr, key, fields)=>{
+        const isSameItem = (oldItem, newItem,key) => {
+          if (key != null && key !== undefined && key !== '') {
+            const oldValue = oldItem[key];
+            const newValue = newItem[key];
+            if (oldValue != null && oldValue !== "" && newValue != null && newValue !== "") {
+              return oldValue == newValue;
+            }
+          }
+
+          if (oldItem.cPkId != null && oldItem.cPkId !== undefined &&  oldItem.cPkId !== '' &&
+              newItem.cPkId != null && newItem.cPkId !== undefined && newItem.cPkId !== '') {
+            return oldItem.cPkId == newItem.cPkId;
+          }
+
+          if (oldItem.cRowId != null && oldItem.cRowId !== undefined && oldItem.cRowId !== '' && 
+              newItem.cRowId != null && newItem.cRowId !== undefined && newItem.cRowId !== '') {
+            return oldItem.cRowId == newItem.cRowId;
+          }
+          return false;
+        };
+
       // 1. 以新数组为基准构建新数组
       return newArr.map(newItem => {
-        const newKey = newItem[key];
-        const oldItem = oldArr.find(item => item[key] == newKey);
+        const oldItem = oldArr.find(item => isSameItem(item, newItem,key));
         if (oldItem) {
           // 2. 左右都存在：左边数据为基础，用右边指定字段覆盖
           const mergedItem = { ...oldItem };
@@ -354,6 +374,7 @@ const mergeArrays = (oldArr, newArr, key, fields)=>{
         }
       });
   }
+
 
 // 绑定方法
 const method = {
@@ -372,15 +393,14 @@ const method = {
       {
         getSelected(selectdata: any) {
             let len = formData.value.length;
-            // let sel : any[] = [];
             let sessionSpecialAgreement = JSON.parse(sessionStorage.getItem("getAppPolicyData"))?.['SpecialAgreement'] || [];
             const result = mergeArrays(sessionSpecialAgreement, selectdata, 'cSpecialCode', ['cSpecialContent']);
             result.forEach((item: any,index:number) => {
               item.index = index + 1;
-              // sel.push(item);
               len++;
             });
           
+            console.log('新数据保存用---',result)
             originalData.value =deepClone(result)
             formData.value = result
           },

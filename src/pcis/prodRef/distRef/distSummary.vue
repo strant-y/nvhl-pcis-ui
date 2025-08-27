@@ -341,7 +341,7 @@ const query = (param: any) => {
             const value = Number(item['DistSummary.nInsuredHeadcount'] ?? 0);
             return sum + (isNaN(value) ? 0 : value);
           }, 0);
-          console.log('countNumber',countNumber)
+          // console.log('countNumber',countNumber)
           termref?.setTermData({
             termNo:'00425000091',
             planNo:'P1',

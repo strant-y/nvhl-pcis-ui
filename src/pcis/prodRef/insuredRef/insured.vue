@@ -151,11 +151,11 @@ onMounted(() => {
   setFormItem("Insured.cBuslicenceNo", {rules: [getRules("businessLicense", {})]});
   
   // 组织机构代码
-  setFormItem("Insured.cOrganizationCode", {rules: [getRules("socialCode", {})]});
+  // setFormItem("Insured.cOrganizationCode", {rules: [getRules("socialCode", {})]});
   // 经常居住地校验
   setFormItem("Insured.cHabitualResidence", {rules: [getRules("valiAddress", {})]});
   // 税务登记号
-  setFormItem("Insured.cTaxRegistrationNo", {rules: [getRules("taxValidation", {})]});
+  // setFormItem("Insured.cTaxRegistrationNo", {rules: [getRules("taxValidation", {})]});
   // 证件号码
   setFormItem("Insured.cCertfCde", {minWidth: '165px'});
 });             
@@ -539,15 +539,20 @@ const method = {
               Object.values(item).includes(getValue("Insured.cCertfCls"))
             )
           ) {
-            setValue("Insured.cCertfCls", "");
+            // setValue("Insured.cCertfCls", "");
           }
-          setFormItem("Insured.cCertfCls", {
-            loadData: [],
-          });
-          setFormItem("Insured.cCertfCls", {
-            loadData: res,
-            rules: [getRules("required", {})],
-          });
+          insuredEditRef.value?.addCodeListMap({
+              code: "Insured.cCertfCls",
+              list: res
+            })
+          setValue('Insured.cCertfCls','110007')
+          // setFormItem("Insured.cCertfCls", {
+          //   loadData: [],
+          // });
+          // setFormItem("Insured.cCertfCls", {
+          //   loadData: res,
+          //   rules: [getRules("required", {})],
+          // });
         });
 
       setFormItem("Insured.cWorkDpt", {
@@ -695,15 +700,15 @@ const method = {
               Object.values(item).includes(getValue("Insured.cCertfCls"))
             )
           ) {
-            setValue("Insured.cCertfCls", "");
+             if(getValue('Insured.cCertfCls')){
+                setValue("Insured.cCertfCls", "");
+             }
           }
-          setFormItem("Insured.cCertfCls", {
-            loadData: [],
-          });
-          setFormItem("Insured.cCertfCls", {
-            loadData: res,
-            rules: [getRules("required", {})],
-          });
+          insuredEditRef.value?.addCodeListMap({
+              code: "Insured.cCertfCls",
+              list: res
+            })
+     
         });
       // // 处理办理人  隐藏  
       // setFormItem("Insured.cCntrNme", {
@@ -951,6 +956,13 @@ const method = {
       setFormItem("Insured.cSex", {
         disabled: false,
       });
+           setFormItem("Insured.cTaxRegistrationNo", {
+          disabled: false,
+      });
+      // 组织机构代码
+      setFormItem("Insured.cOrganizationCode", {
+          disabled: false,
+      });
     }
 
     if (val == "120001") {
@@ -1012,13 +1024,18 @@ const method = {
       // });
 
       // 税务登记证号
-      setFormItem("Insured.cTaxRegistrationNo", {
-          disabled: true,
-      });
+      // setFormItem("Insured.cTaxRegistrationNo", {
+      //     disabled: true,
+      // });
       // 组织机构代码
       setFormItem("Insured.cOrganizationCode", {
           disabled: true,
       });
+      // let cCertfCde =  getValue('Insured.cCertfCde');
+      // if(cCertfCde){
+      //   setValue('Insured.cTaxRegistrationNo',cCertfCde)
+      //   setValue('Insured.cOrganizationCode',cCertfCde)
+      // }
       // // 统一社会信用代码
       // setFormItem("Insured.cParticiinsocTyp", {
       //   rules: [getRules("required", {})],
@@ -1044,6 +1061,31 @@ const method = {
       // setFormItem("Insured.cParticiinsocTyp", {
       //   rules: null,
       // });
+    }
+  },
+    // 证件号码 change
+  cCertfCdeChange: (val:any) => {
+    const param = opertaor.getParam();
+    if (param.initFlag) {
+      return ;
+    }
+    checkUser();
+    const tabref = opertaor.getTableRefs();
+
+    const cCertfCls = tabref["insured"].getFromValue()["Insured.cCertfCls"];
+
+    if (cCertfCls == "120001") {
+      if (val) {
+        const certfCde = tabref["insured"].getFromValue()["Insured.cCertfCde"];
+          insuredEditRef.value?.validateField('Insured.cCertfCde').then((isValid)=>{
+            if(isValid){
+                idAnalysis(val)
+            }
+          })
+      }
+    }else if(cCertfCls =='110007'){
+      setValue('Insured.cTaxRegistrationNo',val)
+      setValue('Insured.cOrganizationCode',val)
     }
   },
   emailChange: (val) => {
@@ -1100,27 +1142,7 @@ const method = {
         setFormItem("Insured.cCounty", objData);
       });
   },
-  // 证件号码 change
-  cCertfCdeChange: (val) => {
-    checkUser();
-    const tabref = opertaor.getTableRefs();
 
-    const cCertfCls = tabref["insured"].getFromValue()["Insured.cCertfCls"];
-
-    if (cCertfCls == "120001") {
-      if (val) {
-        const certfCde = tabref["insured"].getFromValue()["Insured.cCertfCde"];
-          insuredEditRef.value?.validateField('Insured.cCertfCde').then((isValid)=>{
-            if(isValid){
-                idAnalysis(val)
-            }
-          })
-      }
-    }else if(cCertfCls =='110007'){
-      setValue('Insured.cTaxRegistrationNo',val)
-      setValue('Insured.cOrganizationCode',val)
-    }
-  },
 
   //注册地市是否同上
   isSameChange: (val) => {
@@ -1182,7 +1204,6 @@ const method = {
 
     // 单位性质
  cWorkDptChange:(val: any) => {
-  console.log('单位性质变更为:', val);
   setCapitalRequiredRule(getValue,setFormItem,'Insured');
 
   const clientNature = getValue('Insured.cClntMrk');
