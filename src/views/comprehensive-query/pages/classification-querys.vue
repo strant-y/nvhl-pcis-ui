@@ -129,6 +129,14 @@ const queryType = ref("1");
 import { FIELD_MAP } from '@/constants/fieldMaps';
 const cPard = ref(null);
 
+
+watch(() => {
+  const freeEditRefs = freeEditRef.value;
+  return freeEditRefs?.getFromValue()?.cAppTyp;
+}, (newVal) => {
+  updatePolicyInfoTitle(newVal);
+}, { immediate: false });
+
 function extractCode(str:string) {
   // 匹配 "P+数字" 或 "纯数字"
   const pattern = /^(P\d+|\d+)/;
@@ -779,20 +787,6 @@ const normalQueryColumns = [
         fixed: "left",
         slotName: "policyInfo"
     },
-    // {
-    //     prop: "cAppNo",
-    //     inputtype: "rtinput",
-    //     title: "申请单号",
-    //     minWidth: 180,
-    //     isShow:false
-    // },
-    // {
-    //     prop: "cPlyNo",
-    //     inputtype: "rtinput",
-    //     title: "保单号",
-    //     minWidth: 180,
-    //     isShow:false
-    // },
     {
         prop: "cEdrNo",
         inputtype: "rtinput",
@@ -1435,16 +1429,20 @@ async function queryI(flag?: boolean, isEs = false) {
 
 // 把原始列 + 扩展列 合并成弹窗需要的数据
 function buildAllCheckboxData() {
+    // 获取当前表格的实际列配置
+    const currentColumns = tableconfig.fromSchema || [];
+    const currentProps = currentColumns.map(col => col.prop);
+
     const all = [
         ...normalQueryColumns.map(col => ({
             label: col.title,
             value: col.prop,
-            checked: userAllCheckedColumns.value.includes(col.prop),
+            checked: currentProps.includes(col.prop) || userAllCheckedColumns.value.includes(col.prop),
         })),
         ...extendColumns.map(col => ({
             label: col.title,
             value: col.prop,
-            checked: userAllCheckedColumns.value.includes(col.prop),
+            checked: currentProps.includes(col.prop) || userAllCheckedColumns.value.includes(col.prop),
         }))
     ];
     return all;
@@ -1471,6 +1469,18 @@ async function loadUserColumns() {
     const defaultChecked = normalQueryColumns.map(c => c.prop);
     userAllCheckedColumns.value = defaultChecked;
     return defaultChecked;
+}
+
+// 更新表格第一列标题
+function updatePolicyInfoTitle(cAppTyp: string) {
+  const targetColumn = tableconfig.fromSchema?.find(col => col.prop == 'policyInfo');
+  if (targetColumn) {
+    if (cAppTyp === 'I') {
+      targetColumn.title = '询价申请单号/询价单号';
+    } else {
+      targetColumn.title = '申请单号/保单号';
+    }
+  }
 }
 
 // 多选事件
@@ -1603,6 +1613,18 @@ function applyCheckedColumns(props: string[]) {
         ...normalQueryColumns.filter(col => props.includes(col.prop)),
         ...extendColumns.filter(col => props.includes(col.prop))
     ];
+
+    // 更新第一列标题
+    const policyInfoCol = finalColumns.find(col => col.prop === 'policyInfo');
+    if (policyInfoCol) {
+      const currentAppType = freeEditRef.value?.getFromValue()?.cAppTyp;
+      if (currentAppType === 'I') {
+        policyInfoCol.title = '询价申请单号/询价单号';
+      } else {
+        policyInfoCol.title = '申请单号/保单号';
+      }
+    }
+    
     const newConfig = {
         ...tableObj.notWaitObj,
         fromSchema: finalColumns
