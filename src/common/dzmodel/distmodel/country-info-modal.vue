@@ -143,7 +143,7 @@ const tableconfig = reactive<AppTableConfig>(
       dialogVisible.value = false;
       // emit("ok", rowData);
         if(!!props.method.isOk && typeof props.method.isOk === 'function') {
-          props.method.isOk(rowData);
+          props.method.isOk({...rowData,isCN:freeEditRef.value?.getValue('isCN'),isEG:freeEditRef.value?.getValue('isEG')});
           emits("handleClose");
         }
     },
@@ -252,9 +252,31 @@ onMounted(() => {
         title: "港口中文名称",
       },
       {
+        prop: "isCN",
+        inputtype: "rtcheckbox",
+        title: "中文",
+        hidden:true,
+        func: (val) => {
+          if(val){
+            freeEditRef.value?.setValue('isEG',false)
+          }
+        },
+      },
+      {
         prop: "cPortEn",
         inputtype: "rtinput",
         title: "港口英文名称",
+      },
+      {
+        prop: "isEG",
+        inputtype: "rtcheckbox",
+        title: "英文",
+        hidden:true,
+        func: (val) => {
+          if(val){
+            freeEditRef.value?.setValue('isCN',false)
+          }
+        }
       }
 
     ]
@@ -289,19 +311,41 @@ onMounted(() => {
         title: "国家中文名称",
       },
       {
-        prop: "cPortCn",
-        inputtype: "rtinput",
-        title: "港口中文名称",
-      },
-      {
         prop: "cCountryEn",
         inputtype: "rtinput",
         title: "国家英文名称",
       },
       {
-        prop: "cPortEn",
+        prop: "cAirportCn",
         inputtype: "rtinput",
-        title: "港口英文名称",
+        title: "机场中文名称",
+      },
+      {
+        prop: "isCN",
+        inputtype: "rtcheckbox",
+        title: "中文",
+        hidden:true,
+        func: (val) => {
+          if(val){
+            freeEditRef.value?.setValue('isEG',false)
+          }
+        },
+      },
+      {
+        prop: "cAirportEn",
+        inputtype: "rtinput",
+        title: "机场英文名称",
+      },
+      {
+        prop: "isEG",
+        inputtype: "rtcheckbox",
+        title: "英文",
+        hidden:true,
+        func: (val) => {
+          if(val){
+            freeEditRef.value?.setValue('isCN',false)
+          }
+        }
       }
     ]
     tableconfig.fromSchema = [
@@ -360,6 +404,28 @@ onMounted(() => {
         inputtype: "rtinput",
         title: "机场英文名称",
       },
+      {
+        prop: "isCN",
+        inputtype: "rtcheckbox",
+        title: "中文",
+        hidden:true,
+        func: (val) => {
+          if(val){
+            freeEditRef.value?.setValue('isEG',false)
+          }
+        },
+      },
+      {
+        prop: "isEG",
+        inputtype: "rtcheckbox",
+        title: "英文",
+        hidden:true,
+        func: (val) => {
+          if(val){
+            freeEditRef.value?.setValue('isCN',false)
+          }
+        }
+      }
     ]
     tableconfig.fromSchema = [
       {
@@ -395,6 +461,10 @@ onMounted(() => {
     ]
   }
   nextTick(()=>{
+    setTimeout(()=>{
+      freeEditRef.value?.setValue('isCN',true)
+      freeEditRef.value?.setValue('isEG',false)
+    },100)
 handleQuery()
   })
     

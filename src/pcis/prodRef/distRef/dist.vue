@@ -183,6 +183,15 @@ watch(cvrg, (val) => {
     });
   }
 });
+watch(
+    () => pageresult.list,
+    (newVal: any) => {
+      if (newVal) {
+        console.log('发生变化了。。。',newVal)
+        eventBus.emit('goodsMxChange', newVal);
+      }
+    }
+);
 onMounted(async () => {
   // 初始化 cComponentTableValue
   cComponentTableValue = getCComponentTableValue();
