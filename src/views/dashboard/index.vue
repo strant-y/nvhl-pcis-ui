@@ -36,6 +36,124 @@
           </div>
         </div>
       </div>
+      <div class="bottom-box">
+        <div class="title-box">
+          <div class="title-line">
+            <span class="title">工作台</span>
+            <img class="icon" :src="labelIcon" alt="" />
+          </div>
+          <rtButton :item="moreBtnItem" />
+        </div>
+        <div class="table-box">
+          <div class="tabs-box">
+            <el-tabs @tab-click="handleTabClick">
+              <el-tab-pane
+                v-for="tab in tabs"
+                :key="tab.name"
+                :label="tab.name"
+              >
+              </el-tab-pane>
+            </el-tabs>
+          </div>
+          <div :class="['table', clickedTabData.refName]">
+            <app-table
+              :key="currentTabName"
+              :tableConfig="tableconfig"
+              v-model:pageresult="pageresult"
+              ref="tableRef"
+              @pageChange="handlePageChange"
+            >
+              <template #column-cInquiryNoInfo="{ row, column, index }">
+                <div class="policy-info-cell" v-if="row.baseType === '询价'">
+                  <div v-if="row.cAppNo" class="policy-number-row">
+                    <span v-html="row.cAppNo"></span>
+                    <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
+                      <DocumentCopy />
+                    </el-icon>
+                  </div>
+                  <div v-if="row.cInquiryNoInfo" class="policy-number-row">
+                    <span
+                      v-html="row.cInquiryNo"
+                      class="primmaryColor"
+                      @dblclick="toQuery2(row)"
+                    ></span>
+                    <el-icon
+                      class="copy-icon"
+                      @click="copyText(row.cInquiryNo)"
+                    >
+                      <DocumentCopy />
+                    </el-icon>
+                  </div>
+                </div>
+              </template>
+              <template #column-cPlyNoInfo="{ row, column, index }">
+                <div class="policy-info-cell" v-if="row.baseType === '投保'">
+                  <div v-if="row.cAppNo" class="policy-number-row">
+                    <span
+                      v-html="row.cAppNo"
+                      class="primmaryColor"
+                      @dblclick="toQuery2(row)"
+                    ></span>
+                    <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
+                      <DocumentCopy />
+                    </el-icon>
+                  </div>
+                  <div v-if="row.cPlyNo" class="policy-number-row">
+                    <span v-html="row.cPlyNo"></span>
+                    <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
+                      <DocumentCopy />
+                    </el-icon>
+                  </div>
+                </div>
+              </template>
+              <template #column-cEdrNoInfo="{ row, column, index }">
+                <div class="policy-info-cell" v-if="row.baseType === '批改'">
+                  <div v-if="row.cAppNo" class="policy-number-row">
+                    <span
+                      v-html="row.cAppNo"
+                      class="primmaryColor"
+                      @dblclick="toQuery2(row)"
+                    ></span>
+                    <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
+                      <DocumentCopy />
+                    </el-icon>
+                  </div>
+                  <div v-if="row.cEdrNo" class="policy-number-row">
+                    <span v-html="row.cEdrNo"></span>
+                    <el-icon class="copy-icon" @click="copyText(row.cEdrNo)">
+                      <DocumentCopy />
+                    </el-icon>
+                  </div>
+                </div>
+              </template>
+              <template #column-cAppNoInfo="{ row, column, index }">
+                <div class="policy-info-cell">
+                  <div class="policy-number-row">
+                    <span
+                      v-html="row.cAppNo"
+                      :class="row.baseType !== '询价' ? 'primmaryColor' : ''"
+                      @dblclick="row.baseType !== '询价' ? toQuery2(row) : ()=>{}"
+                    ></span>
+                    <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
+                      <DocumentCopy />
+                    </el-icon>
+                  </div>
+                  <div class="policy-number-row" v-if="row.baseType === '询价'">
+                    <span
+                      v-html="row.cInquiryNo"
+                      class="primmaryColor"
+                      @dblclick="toQuery2(row)"
+                    ></span>
+                    <el-icon class="copy-icon" @click="copyText(row.cInquiryNo)">
+                      <DocumentCopy />
+                    </el-icon>
+                  </div>
+                </div>
+              </template>
+            </app-table>
+          </div>
+        </div>
+      </div>
       <div class="center-box">
         <div class="center-content1">
           <div class="title-box">
@@ -153,27 +271,6 @@
           </div> -->
         </div>
       </div>
-      <div class="bottom-box">
-        <div class="title-box">
-          <div class="title-line">
-            <span class="title">待办任务</span>
-            <img class="icon" :src="labelIcon" alt="">
-          </div>
-          <rtButton :item="moreBtnItem" />
-        </div>
-        <div class="table-box">
-          <div class="tabs-box">
-            <el-tabs @tab-click="handleTabClick">
-              <el-tab-pane v-for="tab in tabs" :key="tab.name" :label="tab.name">
-              </el-tab-pane>
-            </el-tabs>
-          </div>
-          <div class="table">
-            <app-table :key="currentTabName" :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
-            @row-click="(row) => toQuery2(row, tab)" @pageChange="handlePageChange" />
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -203,25 +300,37 @@ const shortMenuDialog = defineAsyncComponent(() =>
 );
 import {getShortcutDataList, updateShortRoute} from "@/api/menu";
 import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
-const { hasReceived, getBaseInfoByAppNo, checkEdrPocly } = NewUdrListService();
+const {
+  hasReceived,
+  getBaseInfoByAppNo,
+  checkEdrPocly,
+  getBackUdrList,
+  getNewUdrList,
+  getInquiryNewUdrList,
+  backInquiryUdrList,
+} = NewUdrListService();
+import { SCENE_PLY_APP_MODIFY_BOUNCED } from "@/constants/tab-constants";
 import {
-  SCENE_PLY_APP_MODIFY_BOUNCED
-} from '@/constants/tab-constants';
-import {deleteFactorBykey, exportRenewalInsurance, findRenewalInsurance, getBasicKindList, getPolicy} from "@/api/prod";
-import { getListByCode } from '@/api/code-list-service';
+  deleteFactorBykey,
+  exportRenewalInsurance,
+  findRenewalInsurance,
+  getBasicKindList,
+  getPolicy,
+} from "@/api/prod";
+import { getListByCode } from "@/api/code-list-service";
 import {
-    SCENE_EDR_APP_MODIFY_UNSUBMIT,
-    SCENE_PLAN_READ,
-    SCENE_PLY_APP_MODIFY_UNSUBMIT,
-    SCENE_PLY_APP_READ,
-    SCENE_PLY_APP_READBEARER,
-    SCENE_TEMPORARY_DEPOSITBEARER,
-    SCENE_PLAN_UW_PROCESS,
-    SCENE_PLY_UW_PROCESS,
-    SCENE_PLY_UW_PROCESSBEARER,
+  SCENE_EDR_APP_MODIFY_UNSUBMIT,
+  SCENE_PLAN_READ,
+  SCENE_PLY_APP_MODIFY_UNSUBMIT,
+  SCENE_PLY_APP_READ,
+  SCENE_PLY_APP_READBEARER,
+  SCENE_TEMPORARY_DEPOSITBEARER,
+  SCENE_PLAN_UW_PROCESS,
+  SCENE_PLY_UW_PROCESS,
+  SCENE_PLY_UW_PROCESSBEARER,
 } from "@/constants/tab-constants";
 import dayjs from "dayjs";
-
+import { getAppPolicyList, getInquiryPolicyList } from "@/api/query";
 
 defineOptions({
   name: "Dashboard",
@@ -301,6 +410,17 @@ const pageresult = reactive<Pageresult>({
   list: [],
   /** 总数 */
   total: 0,
+});
+// 申请单号、保单号增加双击事件
+Object.keys(tableObj).forEach((i: any) => {
+  tableObj[i].fromSchema = tableObj[i].fromSchema.map((item: any) => {
+    if (item.prop === "cAppNo" || item.prop === "cPlyNo") {
+      item.dblFunc = (val: any, row: any) => {
+        toQuery2(row);
+      };
+    }
+    return item;
+  });
 });
 let tableconfig = reactive<AppTableConfig>(
   createTableEditConfig(tableObj.notWaitObj)
@@ -694,92 +814,34 @@ const initRoles = () => {
   getData(user, roles)
 };
 const getData = (user: any, roles: any = []) => {
-  let roleCde = '';
+  let roleCde = "";
   if (roles)
     roles.forEach((res: any) => {
       // if (res === 'ROLE_00000196' || res === 'ROLE_00000324' || res === 'ROLE_00000001') {
       // 出岗  ROLE_00000008
-      console.log(res,'权限编码')
-      if (res === 'ROLE_00000008' || res === 'ROLE_00000563') {
+      console.log(res, "权限编码");
+      if (res === "ROLE_00000008" || res === "ROLE_00000563") {
         isOperate.value = true;
         tabs.value = tab1;
-          moreurl.value = "/query/application-querys"
+        moreurl.value = "/query/application-querys";
       }
       // 核保
-      if (res === 'ROLE_00000152') {
+      if (res === "ROLE_00000152") {
         tableconfig = reactive<AppTableConfig>(
           createTableEditConfig(tableObj.unUdrObj)
         );
-        moreurl.value = "/pcis-new-udr-list/PendUdrList"
+        moreurl.value = "/pcis-new-udr-list/PendUdrList";
         isAudit.value = true;
         tabs.value = tab2;
       }
-      roleCde = roleCde === '' ? res : `${roleCde},${res}`;
+      roleCde = roleCde === "" ? res : `${roleCde},${res}`;
     });
-    // 核保岗
-    if(isAudit.value) {
-      getAuditTableData()
-    } else {
-      const paramzc = {
-        pageNum: 1,
-        pageSize: 6,
-        udrType: 1,
-        CAppStatus: '1',
-        CurrentUser: user.opCde,
-        CurrentUserOrg: user.companyId,
-        TAppTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-        TAppTmStart: moment(new Date(Date.now())).subtract(7, 'day').format('YYYY-MM-DD HH:mm:ss'),
-      };
-      const paramhbzc = {
-        pageNum: 1,
-        pageSize: 6,
-        companyId: user.companyId,
-        orgCde: user.companyId,
-        roleCde: roleCde,
-        operId: user.opCde,
-        startBsTm1: moment(new Date(Date.now())).subtract(7, 'day').format('YYYY-MM-DD HH:mm:ss'),
-        endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-        inNextDpt: '1',
-        udrType: '0',
-      };
-      const paramdx = {
-        pageNum: 1,
-        pageSize: 6,
-        roleCde: roleCde,
-        operId: user.opCde,
-        startBsTm1: moment(new Date(Date.now())).subtract(7, 'day').format('YYYY-MM-DD HH:mm:ss'),
-        endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-        orgCde: user.companyId,
-        udrType: '4',
-        inNextDpt: '1',
-      };
-      const param = {
-        paramdx: paramdx,
-        paramhbzc: paramhbzc,
-        // paramdh: paramdh,
-        paramzc: paramzc,
-      };
-      console.log('首页参数', param)
-      pcisQueryService.getPolicyShortList(param).then((res: any) => {
-        
-        console.log('首页table数据', res)
-        if (res && res.code === 200) {
-          shortListData.value = res.data
-          console.log('岗位--', isOperate.value , isAudit.value)
-          // 管理员  出单岗
-          if (isOperate.value) {
-            pageresult.list = res.data.stagingList;
-            pageresult.total = res.data.stagingList.length;
-          }
-          //审核员  核保岗
-          if (isAudit.value) {
-            tabs.value = tab2;
-            pageresult.list = res.data.udrStagingList;
-            pageresult.total = res.data.udrStagingList.length;
-          }
-        }
-      });
-    }
+  // 核保岗
+  if (isAudit.value) {
+    getAuditTableData();
+  } else {
+    getIssueTableData();
+  }
 };
 
 const toChange = (url: string) => {
@@ -787,305 +849,360 @@ const toChange = (url: string) => {
 };
 
 //tabs切换
-let clickedTabData = {udrType: "0"};
+let clickedTabData = ref({ udrType: "0", refName: "stagingList" });
 const handleTabClick = (tab: any) => {
-  currentTabName.value = tab.props.label
-  let url = ''
-  clickedTabData = tabs.value.find(t => t.name === tab.props.label);
+  currentTabName.value = tab.props.label;
+  let url = "";
+  clickedTabData.value = tabs.value.find((t) => t.name === tab.props.label);
+  pageData.value.pageNum = 1;
   if (isOperate.value) {
     tableconfig = reactive<AppTableConfig>(
-      createTableEditConfig(tableObj[clickedTabData.tableObj])
-    )
-    nextTick(() => {
-      pageresult.list = shortListData.value[clickedTabData.refName] || []
-      pageresult.total = shortListData.value[clickedTabData.refName].length  || 0
-    });
+      createTableEditConfig(tableObj[clickedTabData.value.tableObj])
+    );
+    getIssueTableData();
   }
   if (isAudit.value) {
     tableconfig = reactive<AppTableConfig>(
-      createTableEditConfig(tableObj[clickedTabData.tableObj])
-    )
-    getAuditTableData()
+      createTableEditConfig(tableObj[clickedTabData.value.tableObj])
+    );
+    getAuditTableData();
   }
-  tabs.value.forEach(item => {
+  tabs.value.forEach((item) => {
     if (item.name === tab.props.label) {
-      url = item.url
+      url = item.url;
     }
-  })
+  });
   toChange(url);
 };
 // 核保岗获取待办列表数据
 const pageData = ref({
   pageSize: 10,
-  pageNum: 1
+  pageNum: 1,
 });
 function getAuditTableData() {
   let getList = null;
-  const udrType = clickedTabData.udrType;
-  if(udrType === "3") {// 核保退回
-    const param = {
-      companyId: user.companyId,
-      roleCde: "ROLE_00000152",
-      operId: user.opCde,
-      inNextDpt: "",
-      udrType: "3",
-      orgCde: "",
-      CLoadSub: 1,
-      startBsTm1: dayjs().subtract(30, 'day').format("YYYY-MM-DD 00:00:00"),
-      endBsTm1: dayjs().format("YYYY-MM-DD 23:59:59"),
-      ...pageData.value
-    }
-    getList = pcisQueryService.getBackUdrList(param)
-  } else if(udrType === "4") {
-    const param = {
-      sortField: "name",
-      bsType: "A",
-      CAppStatus: "4",
-      // CUdrCde: this.user.opCde, // 已核保查询去掉人员限制
-      sortOrder: null, // 存在问题_sortValue需要确认5个页面，每个tale具体哪些字段需要排序
-      CurrentUser: user.opCde,
-      CurrentUserOrg: user.companyId,
-      TAppTmStart: dayjs().subtract(30, 'day').format("YYYY-MM-DD 00:00:00"),
-      tAppTmEnd: dayjs().format("YYYY-MM-DD 23:59:59"),
-      CLoadSub: 1,
-      udrType: "4",
-      orgCde: user.companyId,
-      findPlan: true,
-      ...pageData.value
-    }
-    getList = pcisQueryService.getAppPolicyList(param)
+  const udrType = clickedTabData.value.udrType;
+  if (udrType === "3") {
+    // 核保退回
+    getList = pcisQueryService.getReturnedTask(pageData.value);
+  } else if (udrType === "4") {
+    // 核保通过
+    getList = pcisQueryService.getApprovedTask(pageData.value);
+  } else if (udrType === "1") {
+    // 暂存任务
+    const param = {};
+    getList = pcisQueryService.getDraftTask(pageData.value);
   } else {
-    const param = {
-      companyId: user.companyId,
-      roleCde: "ROLE_00000152",
-      operId: user.opCde,
-      inNextDpt: "1",
-      udrType: udrType,
-      orgCde: user.companyId,
-      startBsTm1: dayjs().subtract(30, 'day').format("YYYY-MM-DD 00:00:00"),
-      endBsTm1: dayjs().format("YYYY-MM-DD 23:59:59"),
-      startCrtTm: dayjs().subtract(30, 'day').format("YYYY-MM-DD 00:00:00"),
-      tAppTmEnd: dayjs().format("YYYY-MM-DD 23:59:59"),
-      ...pageData.value
-    }
-    getList = pcisQueryService.getNewUdrList(param)
+    getList = pcisQueryService.getNewUdrList(pageData.value);
   }
-  getList.then((res: any) => {
-    if (res && res.code === 200) {
-      if (udrType !== "4") {
+  getList
+    .then((res: any) => {
+      if (res && res.code === 200) {
         pageresult.list = res.data || [];
-        pageresult.total = res.totalCount || 0;
+        pageresult.total = res.total || 0;
       } else {
-        pageresult.list = res.data.result || [];
-        pageresult.total = res.data.total || 0;
+        ElMessage.error({ message: res.msg, duration: 3000 });
       }
-    } else {
-      ElMessage.error({ message: res.msg, duration: 3000 });
-    }
-  })
-  .catch((error: any) => {
-    ElMessage.error(error.msg);
-  });
+    })
+    .catch((error: any) => {
+      ElMessage.error(error.msg);
+    });
 }
 // 待办列表页码点击事件
-function handlePageChange(data:any) {
+function handlePageChange(data: any) {
   pageData.value = data;
   if (isAudit.value) {
     getAuditTableData();
   }
+  if (isOperate.value) {
+    getIssueTableData();
+  }
+}
+// 出单岗获取列表数据
+function getIssueTableData() {
+  let getList = null;
+  const refNm = clickedTabData.value.refName;
+  if (refNm === "stagingList") {
+    getList = pcisQueryService.selectDraftTask(pageData.value);
+  } else if (refNm === "submittedList") {
+    getList = pcisQueryService.selectSubmittedTask(pageData.value);
+  } else if (refNm === "reviseList") {
+    getList = pcisQueryService.selectPendingModificationTask(pageData.value);
+  } else if (refNm === "pendingPaymentList") {
+    getList = pcisQueryService.selectPendingPaymentTask(pageData.value);
+  } else if (refNm === "renewalList") {
+    getList = pcisQueryService.selectPendingRenewalTask(pageData.value);
+  }
+  getList
+    ?.then((res: any) => {
+      if (res && res.code === 200) {
+        pageresult.list = res.data || [];
+        pageresult.total = res.total || 0;
+      } else {
+        ElMessage.error({ message: res.msg, duration: 3000 });
+      }
+    })
+    .catch((error: any) => {
+      ElMessage.error(error.msg);
+    });
 }
 
 //点击更多按钮事件
 const toQuery = (url: string) => {
-  if (isOperate.value) { //出单员
+  if (isOperate.value) {
+    //出单员
     //暂存任务 （综合查询-投保单）、待修改任务 （综合查询-待修改单查询）
-    if (url === '/query/application-querys') {
+    if (url === "/query/application-querys") {
       let param = {
         CurrentUser: user.opCde,
         CurrentUserOrg: user.companyId,
-        CAppStatus: '1',
-        TIssueTmStart: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-        TIssueTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+        CAppStatus: "1",
+        TIssueTmStart: moment(new Date(Date.now()))
+          .subtract(6, "day")
+          .format("YYYY-MM-DD HH:mm:ss"),
+        TIssueTmEnd: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
       };
-      if (currentTabName.value == '待修改任务') {
+      if (currentTabName.value == "待修改任务") {
         param = Object.assign({
           CurrentUser: user.opCde,
           CurrentUserOrg: user.companyId,
-          startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-          endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+          startBsTm1: moment(new Date(Date.now()))
+            .subtract(6, "day")
+            .format("YYYY-MM-DD HH:mm:ss"),
+          endBsTm1: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
         });
-        sessionStorage.setItem(AppKey.query.pcis_query_returnudrlist, JSON.stringify(param));
+        sessionStorage.setItem(
+          AppKey.query.pcis_query_returnudrlist,
+          JSON.stringify(param)
+        );
       } else {
-        sessionStorage.setItem(AppKey.query.pcis_query_app, JSON.stringify(param));
+        sessionStorage.setItem(
+          AppKey.query.pcis_query_app,
+          JSON.stringify(param)
+        );
       }
       router.push({ path: url });
-    } else if (url === '/RenewalManagement/renewal-management') { //待续保 （续保管理）
+    } else if (url === "/RenewalManagement/renewal-management") {
+      //待续保 （续保管理）
       const param = Object.assign({
         CurrentUser: user.opCde,
         CurrentUserOrg: user.companyId,
-        startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-        endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+        startBsTm1: moment(new Date(Date.now()))
+          .subtract(6, "day")
+          .format("YYYY-MM-DD HH:mm:ss"),
+        endBsTm1: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
       });
-      sessionStorage.setItem('renewPolicy', JSON.stringify(param));
+      sessionStorage.setItem("renewPolicy", JSON.stringify(param));
       router.push({ path: url });
     }
   } else if (isAudit.value) {
-    if (url === '/pcis-new-udr-list/PendUdrList') { //核保员 （核保任务查询）
+    if (url === "/pcis-new-udr-list/PendUdrList") {
+      //核保员 （核保任务查询）
       let param = Object.assign({
         CurrentUser: user.opCde,
         CurrentUserOrg: user.companyId,
-        startCrtTm: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-        TAppTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-        startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-        endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+        startCrtTm: moment(new Date(Date.now()))
+          .subtract(6, "day")
+          .format("YYYY-MM-DD HH:mm:ss"),
+        TAppTmEnd: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
+        startBsTm1: moment(new Date(Date.now()))
+          .subtract(6, "day")
+          .format("YYYY-MM-DD HH:mm:ss"),
+        endBsTm1: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
       });
-      if (currentTabName.value == '暂存任务') {
-        param.type = 'temp'
+      if (currentTabName.value == "暂存任务") {
+        param.type = "temp";
       } else {
-        param.type = 'edit'
+        param.type = "edit";
       }
-      sessionStorage.setItem(AppKey.query.pcis_query_newudrlist, JSON.stringify(param));
+      sessionStorage.setItem(
+        AppKey.query.pcis_query_newudrlist,
+        JSON.stringify(param)
+      );
       router.push({ path: url });
     }
   }
 };
 //table的row-click事件
 const toQuery2 = (data: any) => {
-  const row = {...data}
-  console.log('toQuery2', data)
-  if (isOperate.value) { //出单员
-    if (currentTabName.value === '暂存任务') {
-      // const param = Object.assign({
-      //   CurrentUser: user.opCde,
-      //   CurrentUserOrg: user.companyId,
-      //   CAppNo: data['cAppNo'],
-      //   TIssueTmStart: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-      //   TIssueTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-      // });
-      // sessionStorage.setItem(AppKey.query.pcis_query_app, JSON.stringify(param));
-      // router.push({ path: '/query/application-querys' });
-      if(data['cEdrRsnBundleCde']){
-        row.cRsnCde = data['cEdrRsnBundleCde'];
-      }
-      router.push({
-        path: "/pcisapp/myPage",
-        query: {
-          param: JSON.stringify({
-            ...row,
-            ...{ pageType: "TEMPORARY_DEPOSIT" },
-          }),
-        },
-      });
-    } else if (currentTabName.value === '待修改任务') {
-      // const param = Object.assign({
-      //   CurrentUser: user.opCde,
-      //   CurrentUserOrg: user.companyId,
-      //   objId: data['cAppNo'],
-      //   startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-      //   endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-      // });
-      // sessionStorage.setItem(AppKey.query.pcis_query_returnudrlist, JSON.stringify(param));
-      // router.push({ path: '/query/application-querys' });
-      const { objId, curtTask, state, prodNo, bsType } = row;
-      const param = {
-        taskId: curtTask,
-        user: user,
-      };
-      hasReceived(param).then((result: any) => {
-        if (result.code !== 200) {
-          ElMessage.error({ message: result.msg, duration: 6000 });
-        } else {
-          if (result.msg === '成功') {
-            getBaseInfoByAppNo({ appNo: objId }).then((r:any) => {
-              if(r.code !== 200) {
-                ElMessage.error({ message: r.msg, duration: 6000 });
-              }else{
-                if(bsType === 'A') {
-                  const en = JSON.stringify({
-                    scene: SCENE_PLY_APP_MODIFY_BOUNCED,
-                    cAppNo: objId,
-                    cProdNo: prodNo,
-                    taskId: curtTask,
-                    cAppTyp: bsType,
-                    cCiMrk: r.data.cCiMrk,
-                    cGrpMrk: r.data.cGrpMrk,
-                    cDptCde: r.data.cDptCde,
-                    cDptCnm:row.uwDptName,
-                    isPlan: r.data.cCardPlanNo ? 'Y' : null,
-                    pageType:'PLY_APP_MODIFY_BOUNCED_SCENE'
-                  });
-                  router.push({
-                      path: "/pcisapp/myPage",
-                      query: {
-                          param: en,
-                      },
-                  });
-                }else{
-                  const en = JSON.stringify({
-                    // scene: SCENE_EDR_APP_MODIFY_BOUNCED,
-                    cAppNo: objId,
-                    cProdNo: prodNo,
-                    taskId: curtTask,
-                    cAppTyp: bsType,
-                    cCiMrk: r.data.cCiMrk,
-                    cRsnCde: r.data.cEdrRsnBundleCde,
-                    cEdrType: r.data.cEdrType,
-                    cGrpMrk: r.data.cGrpMrk,
-                    cDptCde: r.data.cDptCde,
-                    cDptCnm:row.uwDptName,
-                    isPlan: r.data.cCardPlanNo ? 'Y' : null,
-                    pageType:'EDR_APP_MODIFY_BOUNCED_SCENE'
-                  });
-                    router.push({
-                        path: "/pcisapp/myPage",
-                        query: {
-                            param: en,
-                        },
-                    });
-                }
-              }
-            })
-          } else {
-            ElMessage.warning({ message: result.msg, duration: 6000 });
+  const row = { ...data };
+  if (isOperate.value) {
+    //出单员
+    if (currentTabName.value === "暂存任务") {
+      if (data.baseType === "投保") {
+        const queryParam = {
+          pageSize: 10,
+          pageNum: 1,
+          cLoadSub: "1",
+          cDataTyp: "app",
+          queryType: "1",
+          cAppNo: data.cAppNo,
+        };
+        getAppPolicyList(queryParam).then((res: any) => {
+          if (res.data?.result && res.data?.result.length > 0) {
+            const data = res.data?.result[0];
+            router.push({
+              path: "/pcisapp/myPage",
+              query: {
+                param: JSON.stringify({
+                  ...data,
+                  ...{ pageType: "TEMPORARY_DEPOSIT" },
+                }),
+              },
+            });
           }
+        });
+      } else if (data.baseType === "询价") {
+        const queryParam = {
+          pageSize: 10,
+          pageNum: 1,
+          cLoadSub: "1",
+          cDataTyp: "app",
+          queryType: "1",
+          cInquiryNo: data.cInquiryNo,
+          tAppTmStart: dayjs()
+            .subtract(3, "month")
+            .format("YYYY-MM-DD 00:00:00"),
+          tAppTmEnd: dayjs().format("YYYY-MM-DD 23:59:59"),
+        };
+        getInquiryPolicyList(queryParam).then((res: any) => {
+          if (res.data?.result && res.data?.result.length > 0) {
+            const data = res.data?.result[0];
+            router.push({
+              path: "/pcis/pricePage",
+              query: {
+                param: JSON.stringify({
+                  ...data,
+                  ...{
+                    pageType: "TEMPORARY_DEPOSIT",
+                    pageName: "priceInquiry",
+                  },
+                }),
+              },
+            });
+          }
+        });
+      } else if (data.baseType === "批改") {
+        getAppPolicyList({
+          cAppNo: data.cAppNo,
+          pageSize: 10,
+          pageNum: 1,
+          cLoadSub: "1",
+          cDataTyp: "app",
+          queryType: "1",
+        }).then((res: any) => {
+          if (res.data?.result && res.data?.result.length > 0) {
+            const data = res.data?.result[0];
+            if (data["cEdrRsnBundleCde"]) {
+              data.cRsnCde = data["cEdrRsnBundleCde"];
+            }
+            router.push({
+              path: "/pcisapp/myPage",
+              query: {
+                param: JSON.stringify({
+                  ...data,
+                  ...{ pageType: "TEMPORARY_DEPOSIT" },
+                }),
+              },
+            });
+          }
+        });
+      }
+    } else if (currentTabName.value === "已提交任务") {
+      if (row.baseType !== "询价") {
+        const requestParam = {
+          pageSize: 10,
+          pageNum: 1,
+          cLoadSub: "1",
+          cDataTyp: "app",
+          queryType: "1",
+          cInquiryNo: data.cInquiryNo,
+          tAppTmStart: dayjs()
+            .subtract(3, "month")
+            .format("YYYY-MM-DD 00:00:00"),
+          tAppTmEnd: dayjs().format("YYYY-MM-DD 23:59:59"),
+        };
+        getInquiryPolicyList(requestParam).then((res: any) => {
+          if (res.data && res.data.length > 0) {
+            const data = res.data?.result[0];
+            showDetails(data, row.baseType);
+          }
+        });
+      } else {
+        getAppPolicyList({
+          cAppNo: data.cAppNo,
+          pageSize: 10,
+          pageNum: 1,
+          cLoadSub: "1",
+          queryType: "1",
+          cDataTyp: "app",
+        }).then((res: any) => {
+          if (res.data?.result && res.data?.result.length > 0) {
+            const data = res.data?.result[0];
+            router.push({
+              path: "/pcisapp/pcisappView",
+              query: {
+                param: JSON.stringify({ ...data, ...{ pageType: "readonly" } }),
+              },
+            });
+          }
+        });
+      }
+    } else if (currentTabName.value === "待修改任务") {
+      const queryParam = {
+        pageSize: 10,
+        pageNum: 1,
+        cLoadSub: "1",
+        cDataTyp: "app",
+        queryType: "1",
+        cAppNo: data.cAppNo,
+      };
+      getAppPolicyList(queryParam).then((res: any) => {
+        if (res.data?.result && res.data?.result.length > 0) {
+          const data = res.data?.result[0];
+          router.push({
+            path: "/pcisapp/myPage",
+            query: {
+              param: JSON.stringify({
+                ...data,
+                ...{ pageType: "TEMPORARY_DEPOSIT" },
+              }),
+            },
+          });
         }
-      }).catch((error: any) => {
-        console.log('出错了', error);
-        ElMessage.error({ message: '后台服务异常,请联系管理员', duration: 3000 });
       });
-    } else if (currentTabName.value === '待续保') {
-      // const param = Object.assign({
-      //   CurrentUser: user.opCde,
-      //   CurrentUserOrg: user.companyId,
-      //   objId: data['cAppNo'],
-      //   startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-      //   endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-      // });
-      // sessionStorage.setItem('renewPolicy', JSON.stringify(param));
-      // router.push({ path: '/RenewalManagement/renewal-management' });
-      getPolicy({cPlyNo:row.cPlyNo,queryTyp: "orig"})
-        .then((res:any) => {
-          const { code, res:data, msg } = res;
+    } else if (currentTabName.value === "待续保") {
+      getPolicy({ cPlyNo: row.cPlyNo, queryTyp: "orig" })
+        .then((res: any) => {
+          const { code, res: data, msg } = res;
           if (200 === code) {
             router.push({
               path: "/pcisapp/myPage",
               query: {
-                param: JSON.stringify({ ...handleArray(data.composition.plyBase[0] ),...{cDptCnm:row.cDptCnm,cTermNme:row.cTermNme,cTermNo:row.cTermNo}, ...{ pageType: "orig" } }),
+                param: JSON.stringify({
+                  ...handleArray(data.composition.plyBase[0]),
+                  ...{
+                    cDptCnm: row.cDptCnm,
+                    cTermNme: row.cTermNme,
+                    cTermNo: row.cTermNo,
+                  },
+                  ...{ pageType: "orig" },
+                }),
               },
             });
             sessionStorage.setItem(
-                "toMyPageData",
-                JSON.stringify({
-                  ...JSON.parse(sessionStorage.getItem("toMyPageData")),
-                  ...{ pageType: "orig" },
-                })
+              "toMyPageData",
+              JSON.stringify({
+                ...JSON.parse(sessionStorage.getItem("toMyPageData")),
+                ...{ pageType: "orig" },
+              })
             );
           } else {
             ElMessage.error(msg);
           }
         })
         .finally(() => {});
-    } else if(currentTabName.value === "待缴费") {
+    } else if (currentTabName.value === "待缴费") {
       router.push({
         path: "/payinfoManagement/payinfohandle",
         query: {
@@ -1093,115 +1210,285 @@ const toQuery2 = (data: any) => {
         },
       });
     }
-  } else if (isAudit.value) { //核保员
-    if (currentTabName.value === '暂存任务') {
-      handleClickStagingList(row);
+  } else if (isAudit.value) {
+    //核保员
+    if (currentTabName.value === "暂存任务") {
+      if (row.baseType === "询价") {
+        const requestParam = {
+          pageSize: 10,
+          pageNum: 1,
+          companyId: "0200000000000",
+          operId: user.opCde,
+          inNextDpt: "1",
+          udrType: "1",
+          orgCde: "0200000000000",
+          objId: row.cInquiryNo,
+          roleCde: "ROLE_00000152",
+        };
+        getInquiryNewUdrList(requestParam).then((res: any) => {
+          if (res.data && res.data.length > 0) {
+            const data = res.data[0];
+            handleClickStagingList(data);
+          }
+        });
+      } else {
+        const requestParam = {
+          pageSize: 10,
+          pageNum: 1,
+          companyId: "0200000000000",
+          operId: user.opCde,
+          inNextDpt: "1",
+          udrType: "1",
+          orgCde: "0200000000000",
+          objId: row.cAppNo,
+          roleCde: "ROLE_00000152",
+        };
+        getNewUdrList(requestParam).then((res: any) => {
+          if (res.data && res.data.length > 0) {
+            const data = res.data[0];
+            handleClickStagingList(data);
+          }
+        });
+      }
     } else if (currentTabName.value === "待核保任务") {
-      handleClickStagingList(row);
+      if (row.baseType === "询价") {
+        const requestParam = {
+          pageSize: 10,
+          pageNum: 1,
+          companyId: "0200000000000",
+          operId: user.opCde,
+          inNextDpt: "1",
+          udrType: "0",
+          orgCde: "0200000000000",
+          objId: row.cInquiryNo,
+          roleCde: "ROLE_00000152",
+        };
+        getInquiryNewUdrList(requestParam).then((res: any) => {
+          if (res.data && res.data.length > 0) {
+            const data = res.data[0];
+            handleClickStagingList(data);
+          }
+        });
+      } else {
+        const requestParam = {
+          pageSize: 10,
+          pageNum: 1,
+          companyId: "0200000000000",
+          operId: user.opCde,
+          inNextDpt: "1",
+          udrType: "0",
+          orgCde: "0200000000000",
+          objId: row.cAppNo,
+          roleCde: "ROLE_00000152",
+        };
+        getNewUdrList(requestParam).then((res: any) => {
+          if (res.data && res.data.length > 0) {
+            const data = res.data[0];
+            handleClickStagingList(data);
+          }
+        });
+      }
+    } else if (currentTabName.value === "核保退回任务") {
+      if (row.baseType === "询价") {
+        const requestParam = {
+          pageSize: 10,
+          pageNum: 1,
+          companyId: "0200000000000",
+          operId: user.opCde,
+          udrType: "3",
+          objId: row.cInquiryNo,
+          roleCde: "ROLE_00000152",
+          isInquiry: "1",
+        };
+        backInquiryUdrList(requestParam).then((res: any) => {
+          if (res.data && res.data.length > 0) {
+            const data = res.data[0];
+            showDetails(data, row.baseType);
+          }
+        });
+      } else {
+        const requestParam = {
+          pageSize: 10,
+          pageNum: 1,
+          companyId: "0200000000000",
+          operId: user.opCde,
+          udrType: "3",
+          objId: row.cAppNo,
+          roleCde: "ROLE_00000152",
+          CLoadSub: 1,
+        };
+        getBackUdrList(requestParam).then((res: any) => {
+          if (res.data && res.data.length > 0) {
+            const data = res.data[0];
+            showDetails(data);
+          }
+        });
+      }
     } else {
-      showDetails(row)
+      if (row.baseType !== "询价") {
+        const requestParam = {
+          pageSize: 10,
+          pageNum: 1,
+          cLoadSub: "1",
+          cDataTyp: "app",
+          queryType: "1",
+          cInquiryNo: data.cInquiryNo,
+          tAppTmStart: dayjs()
+            .subtract(3, "month")
+            .format("YYYY-MM-DD 00:00:00"),
+          tAppTmEnd: dayjs().format("YYYY-MM-DD 23:59:59"),
+        };
+        getInquiryPolicyList(requestParam).then((res: any) => {
+          if (res.data && res.data.length > 0) {
+            const data = res.data?.result[0];
+            showDetails(data, row.baseType);
+          }
+        });
+      } else {
+        const requestParam = {
+          pageSize: 10,
+          pageNum: 1,
+          objId: data.cAppNo,
+          udrType: "4",
+          CAppStatus: "4",
+          bsType: "A",
+          CLoadSub: "1",
+          sortField: "name",
+          TAppTmStart: "2025-07-28 00:00:00",
+          tAppTmEnd: "2025-08-27 00:00:00",
+          sortOrder: null,
+          orgCde: "0200000000000",
+          CurrentUser: user.opCde,
+          CurrentUserOrg: "0200000000000",
+          findPlan: true,
+        };
+        getAppPolicyList(requestParam).then((res: any) => {
+          if (res.data && res.data.length > 0) {
+            const data = res.data?.result[0];
+            showDetails(data);
+          }
+        });
+      }
     }
   }
 };
 
 // 输入框查询
-function handleSearch(val:any) {
-  if (isOperate.value) { //出单员
+function handleSearch(val: any) {
+  if (isOperate.value) {
+    //出单员
     const param = Object.assign({
       CurrentUser: user.opCde,
       CurrentUserOrg: user.companyId,
       CAppNo: val,
-      TIssueTmStart: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-      TIssueTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+      TIssueTmStart: moment(new Date(Date.now()))
+        .subtract(6, "day")
+        .format("YYYY-MM-DD HH:mm:ss"),
+      TIssueTmEnd: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
     });
-    sessionStorage.setItem(AppKey.query.pcis_query_search, JSON.stringify(param));
-    router.push({ path: '/query/application-querys' });
-  } else if (isAudit.value) { //核保员
+    sessionStorage.setItem(
+      AppKey.query.pcis_query_search,
+      JSON.stringify(param)
+    );
+    router.push({ path: "/query/application-querys" });
+  } else if (isAudit.value) {
+    //核保员
     const param = Object.assign({
-      type: 'temp',
+      type: "temp",
       CurrentUser: user.opCde,
       CurrentUserOrg: user.companyId,
       objId: val,
-      startCrtTm: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-      TAppTmEnd: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
-      startBsTm1: moment(new Date(Date.now())).subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'),
-      endBsTm1: moment(new Date(Date.now())).format('YYYY-MM-DD HH:mm:ss'),
+      startCrtTm: moment(new Date(Date.now()))
+        .subtract(6, "day")
+        .format("YYYY-MM-DD HH:mm:ss"),
+      TAppTmEnd: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
+      startBsTm1: moment(new Date(Date.now()))
+        .subtract(6, "day")
+        .format("YYYY-MM-DD HH:mm:ss"),
+      endBsTm1: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
     });
-    sessionStorage.setItem(AppKey.query.pcis_query_newudrlist, JSON.stringify(param));
-    router.push({ path: '/pcis-new-udr-list/PendUdrList' });
+    sessionStorage.setItem(
+      AppKey.query.pcis_query_newudrlist,
+      JSON.stringify(param)
+    );
+    router.push({ path: "/pcis-new-udr-list/PendUdrList" });
   }
 }
 
 // 编辑快捷菜单
 function openShortcutEdit() {
-  dzmodal.open(shortMenuDialog, { type: "", data: shortcutDataList.value }).then((res:any) => {
-    if (res.type === "ok") {
-      shorMenuList.value = res.body
-    } 
-  });
+  dzmodal
+    .open(shortMenuDialog, { type: "", data: shortcutDataList.value })
+    .then((res: any) => {
+      if (res.type === "ok") {
+        shorMenuList.value = res.body;
+      }
+    });
 }
 
 // 获取消息通知数据
-const noticeList = ref([])
+const noticeList = ref([]);
 function getNoticeData() {
   let param = {
     CReceiver: user.opCde,
-    CState: '0',
-    CType: '0',
-    limit: 10
-  }
+    CState: "0",
+    CType: "0",
+    limit: 10,
+  };
   pcisQueryService.getNotifyByReceiver(param).then((res: any) => {
-    console.log('消息数据', res)
-    if (res.code === 200 && res.data.code === '1') {
-      noticeList.value = res.data.result
+    console.log("消息数据", res);
+    if (res.code === 200 && res.data.code === "1") {
+      noticeList.value = res.data.result;
     }
-  })
+  });
 }
 
 // 获取热搜菜单
-const shortcutDataList = ref([])
-const tagType = ["primary", "success", "info", "warning", "danger"];// 标签类型
+const shortcutDataList = ref([]);
+const tagType = ["primary", "success", "info", "warning", "danger"]; // 标签类型
 function getShortMenuList() {
-  getShortcutDataList().then((res:any) => {
-    if(res.code == 200){
+  getShortcutDataList().then((res: any) => {
+    if (res.code == 200) {
       shortcutDataList.value = res.data;
       shorMenuList.value = [];
-      res.data.forEach((d:any, i:boolean) => {
-        if(d.select && shorMenuList.value.length < 5){
+      res.data.forEach((d: any, i: boolean) => {
+        if (d.select && shorMenuList.value.length < 5) {
           shorMenuList.value.push({
             name: d.label,
             type: tagType[(i % 5) + 1],
-            url: d.url
+            url: d.url,
           });
         }
-      })
+      });
     }
-  })
+  });
 }
 
-const handleArray = (obj:any)=>{
+const handleArray = (obj: any) => {
   // 创建一个新的对象，并移除"Base."前缀
   let newObj = {};
   for (let key in obj) {
     if (obj.hasOwnProperty(key)) {
       // 通过字符串操作去掉前缀
-      let newKey = key.replace('Base.', '');
+      let newKey = key.replace("Base.", "");
       newObj[newKey] = obj[key];
     }
   }
-  return newObj
-}
+  return newObj;
+};
 
 function getCpayTypList() {
-  getListByCode('WEB_BAS_CODELIST', {
-      'cParCde': 'shoufeifangshi',
-      'cIsValid': '1'
-  }).then(res => {
-    if (!!res && !!res['data']) {
-      cPayTypList.value = res['data'];
-    }
-  }, error => {
-      console.log('出错了', error);
+  getListByCode("WEB_BAS_CODELIST", {
+    cParCde: "shoufeifangshi",
+    cIsValid: "1",
+  }).then(
+    (res) => {
+      if (!!res && !!res["data"]) {
+        cPayTypList.value = res["data"];
+      }
+    },
+    (error) => {
+      console.log("出错了", error);
       // ElMessage.error('后台服务异常,请联系管理员');
     }
   );
@@ -1410,100 +1697,159 @@ function updateUdrDetail(row: any) {
   });
 }
 
-function showDetails(row: any) {
-  let cAppTyp= row.bsType? row.bsType: row.cAppTyp;
+function showDetails(row: any, type?: any) {
+  let cAppTyp = row.bsType ? row.bsType : row.cAppTyp;
   if (cAppTyp === "P") {
-      if (row.cProdNo === "000000") {
-          const param = {
-              CPlanNo: row.cAppNo,
-              CPlanMrk: row.cPlanMrk,
-              scene: SCENE_PLAN_READ,
-          };
-          const en = JSON.stringify(param);
-          router.push({
-              path: "/index/pcis-combination/configPlan/combination-main",
-              query: { data: en },
-          });
-      } else {
-          const en = JSON.stringify({
-              CPlanNo: row.cAppNo,
-              // 'Base.CProdNo': plan['PrdProdPlan.CProdNo'],
-              // 'Base.CGrpMrk': plan['PrdProdPlan.CGrpMrk'],
-              CPlanMrk: row.cPlanMrk,
-              "Base.CProdNo": row.cProdNo,
-              "Base.CGrpMrk": row.cGrpMrk,
-              scene: SCENE_PLAN_READ,
-          });
-          router.push({
-              path: "/index/sys-right-basic/configPlan/detail",
-              query: { data: en },
-          });
-      }
-  } else {
-      getBaseInfoByAppNo({ appNo: row.objId ? row.objId : row.cAppNo }).then((r: any) => {
-          if (r.code !== 200) {
-              ElMessage.error({ message: r.msg, duration: 6000 });
-          } else {
-              if (cAppTyp === "A") {
-                  const en = JSON.stringify({
-                      // scene: SCENE_PLY_UW_PROCESS,
-                      cAppNo: row.objId ? row.objId : row.cAppNo,
-                      taskId: row.curtTask,
-                      cAppTyp: row.bsType? row.bsType: row.cAppTyp,
-                      cProdNo: row.prodNo? row.prodNo: row.cProdNo,
-                      cCiMrk: r.data.cCiMrk,
-                      cGrpMrk: r.data.cGrpMrk,
-                      cDptCde: r.data.cDptCde,
-                      cDptCnm:row.uwDptName?row.uwDptName:row.cDptCnm,
-                      pageType: "UW_READ_SCENE",
-                      cTermNme:row.cTermNme,
-                      cTermNo:row.cTermNo,
-                      cProdNmeCn: row.prodName,
-                  });
-                  router.push({
-                      path: "/pcisapp/myPage",
-                      query: {
-                          param: en,
-                      },
-                  });
-              } else {
-                  const en = JSON.stringify({
-                      cAppNo: row.objId ? row.objId : row.cAppNo,
-                      taskId: row.curtTask,
-                      cAppTyp: row.bsType? row.bsType: row.cAppTyp,
-                      cProdNo: row.prodNo? row.prodNo: row.cProdNo,
-                      cCiMrk: r.data.cCiMrk,
-                      cRsnCde: r.data.cEdrRsnBundleCde,
-                      cEdrType: r.data.cEdrType,
-                      cGrpMrk: r.data.cGrpMrk,
-                      cDptCde: r.data.cDptCde,
-                      cDptCnm:row.uwDptName?row.uwDptName:row.cDptCnm,
-                      pageType: "UW_READ_SCENE",
-                      cTermNme:row.cTermNme,
-                      cTermNo:row.cTermNo,
-                      cProdNmeCn: row.prodName,
-                  });
-                  router.push({
-                      path: "/pcisapp/myPage",
-                      query: {
-                          param: en,
-                      },
-                  });
-              }
-          }
+    if (row.cProdNo === "000000") {
+      const param = {
+        CPlanNo: row.cAppNo,
+        CPlanMrk: row.cPlanMrk,
+        scene: SCENE_PLAN_READ,
+      };
+      const en = JSON.stringify(param);
+      router.push({
+        path: "/index/pcis-combination/configPlan/combination-main",
+        query: { data: en },
       });
+    } else {
+      const en = JSON.stringify({
+        CPlanNo: row.cAppNo,
+        // 'Base.CProdNo': plan['PrdProdPlan.CProdNo'],
+        // 'Base.CGrpMrk': plan['PrdProdPlan.CGrpMrk'],
+        CPlanMrk: row.cPlanMrk,
+        "Base.CProdNo": row.cProdNo,
+        "Base.CGrpMrk": row.cGrpMrk,
+        scene: SCENE_PLAN_READ,
+      });
+      router.push({
+        path: "/index/sys-right-basic/configPlan/detail",
+        query: { data: en },
+      });
+    }
+  } else {
+    const param:any = {};
+    if(type === "询价") {
+      param['cInquiryNo'] = row.objId ? row.objId : row.cInquiryNo
+    } else {
+      param['cAppNo'] = row.objId ? row.objId : row.cAppNo
+    }
+    getBaseInfoByAppNo(param).then(
+      (r: any) => {
+        if (r.code !== 200) {
+          ElMessage.error({ message: r.msg, duration: 6000 });
+        } else {
+          if (cAppTyp === "A") {
+            const p:any = {
+              taskId: row.curtTask,
+              cAppTyp: row.bsType ? row.bsType : row.cAppTyp,
+              cProdNo: row.prodNo ? row.prodNo : row.cProdNo,
+              cCiMrk: r.data.cCiMrk,
+              cGrpMrk: r.data.cGrpMrk,
+              cDptCde: r.data.cDptCde,
+              cDptCnm: row.uwDptName ? row.uwDptName : row.cDptCnm,
+              pageType: "UW_READ_SCENE",
+              cTermNme: row.cTermNme,
+              cTermNo: row.cTermNo,
+              cProdNmeCn: row.prodName,
+              cPolicySource: row.cPolicySource,
+            }
+            if(type === "询价") {
+              p['cInquiryNo'] = row.objId ? row.objId : row.cInquiryNo
+              p['pageName'] = 'priceInquiry'
+            } else {
+              param['cAppNo'] = row.objId ? row.objId : row.cAppNo
+            }
+            const en = JSON.stringify(p);
+            router.push({
+              path: type === "询价" ? "/pcisapp/pricePage" : "/pcisapp/myPage",
+              query: {
+                param: en,
+              },
+            });
+          } else {
+            const p:any = {
+              taskId: row.curtTask,
+              cAppTyp: row.bsType ? row.bsType : row.cAppTyp,
+              cProdNo: row.prodNo ? row.prodNo : row.cProdNo,
+              cCiMrk: r.data.cCiMrk,
+              cRsnCde: r.data.cEdrRsnBundleCde,
+              cEdrType: r.data.cEdrType,
+              cGrpMrk: r.data.cGrpMrk,
+              cDptCde: r.data.cDptCde,
+              cDptCnm: row.uwDptName ? row.uwDptName : row.cDptCnm,
+              pageType: "UW_READ_SCENE",
+              cTermNme: row.cTermNme,
+              cTermNo: row.cTermNo,
+              cProdNmeCn: row.prodName,
+              cPolicySource: row.cPolicySource,
+            }
+            if(type === "询价") {
+              p['cInquiryNo'] = row.objId ? row.objId : row.cInquiryNo
+              p['pageName'] = 'priceInquiry'
+            } else {
+              param['cAppNo'] = row.objId ? row.objId : row.cAppNo
+            }
+            const en = JSON.stringify(p);
+            router.push({
+              path: type === "询价" ? "/pcisapp/pricePage" : "/pcisapp/myPage",
+              query: {
+                param: en,
+              },
+            });
+          }
+        }
+      }
+    );
   }
 }
 
+// 添加 copyText 方法
+const copyText = (text: any) => {
+  if (!text) {
+    ElMessage.warning("没有可复制的内容");
+    return;
+  }
+
+  // 检查 navigator.clipboard 是否存在
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(
+      () => {
+        ElMessage.success("复制成功");
+      },
+      () => {
+        ElMessage.error("复制失败");
+      }
+    );
+  } else {
+    // 使用 document.execCommand('copy') 方法作为备选方案
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      const result = document.execCommand("copy");
+      if (result) {
+        ElMessage.success("复制成功");
+      } else {
+        ElMessage.error("复制失败");
+      }
+    } catch (err) {
+      ElMessage.error("复制失败，请稍后再试");
+    } finally {
+      document.body.removeChild(textarea); // 清理创建的 textarea 元素
+    }
+  }
+};
+
 // 窗口大小变化时重置图表
-window.addEventListener('resize', () => {
-  if(ecahrtsRefInstance) {
-    ecahrtsRefInstance.resize()
+window.addEventListener("resize", () => {
+  if (ecahrtsRefInstance) {
+    ecahrtsRefInstance.resize();
   }
-  if(ecahrtsRefInstance1) {
-    ecahrtsRefInstance1.resize()
+  if (ecahrtsRefInstance1) {
+    ecahrtsRefInstance1.resize();
   }
-})
+});
 </script>
 
 <style lang="scss" scoped>
@@ -1516,7 +1862,7 @@ window.addEventListener('resize', () => {
     width: 100%;
     height: 100%;
     background-color: #fff;
-    background-image: url('@/assets/img/home_bg.png');
+    background-image: url("@/assets/img/home_bg.png");
     background-size: 100% 24.06667rem;
     background-position: top;
     background-repeat: no-repeat;
@@ -1532,11 +1878,11 @@ window.addEventListener('resize', () => {
         font-size: 2rem;
         font-weight: 600;
         color: #333;
-        margin-bottom: .6rem;
+        margin-bottom: 0.6rem;
       }
 
       .top-title2 {
-        font-size: .8rem;
+        font-size: 0.8rem;
         color: #333;
         margin-bottom: 1.5rem;
       }
@@ -1546,7 +1892,7 @@ window.addEventListener('resize', () => {
         height: 2.5rem;
         display: flex;
         align-items: center;
-        background: #FFFFFF;
+        background: #ffffff;
 
         :deep(.el-input__wrapper) {
           box-shadow: none;
@@ -1584,13 +1930,13 @@ window.addEventListener('resize', () => {
     .center-box {
       width: 100%;
       display: flex;
-      margin-bottom: 1.5rem;
+      // margin-bottom: 1.5rem;
       justify-content: space-between;
 
       .center-content1 {
         width: 75%;
         background: #fff;
-        box-shadow: 0 0 .4rem #0000001a;
+        box-shadow: 0 0 0.4rem #0000001a;
         border-radius: 5px;
         padding: 1rem 1.5rem;
         display: flex;
@@ -1655,7 +2001,7 @@ window.addEventListener('resize', () => {
       .center-content2 {
         width: 24%;
         background: #fff;
-        box-shadow: 0 0 .4rem #0000001a;
+        box-shadow: 0 0 0.4rem #0000001a;
         border-radius: 5px;
         padding: 1rem;
         display: flex;
@@ -1722,37 +2068,38 @@ window.addEventListener('resize', () => {
           }
         }
         .code-box {
-            height: 100px;
-            .code-inner-box {
-                display: flex;
-                align-items: center;   /* 垂直居中 */
-                justify-content: flex-start; /* 左对齐 */
-                gap: 16px;   /*间距*/
-                padding: 16px 14px;              
-                .code-img {
-                  width: 28%;
-                  height: 28%;
-                }
-                .link {
-                  color: #3a76c6;
-                  text-decoration: none;
-                  padding-left: 6px;
-                }
-                a:hover {
-                  text-decoration: underline;
-                }
+          height: 100px;
+          .code-inner-box {
+            display: flex;
+            align-items: center; /* 垂直居中 */
+            justify-content: flex-start; /* 左对齐 */
+            gap: 16px; /*间距*/
+            padding: 16px 14px;
+            .code-img {
+              width: 28%;
+              height: 28%;
             }
+            .link {
+              color: #3a76c6;
+              text-decoration: none;
+              padding-left: 6px;
+            }
+            a:hover {
+              text-decoration: underline;
+            }
+          }
         }
       }
     }
     .bottom-box {
       width: 100%;
       background: #fff;
-      box-shadow: 0 0 .4rem #0000001a;
+      box-shadow: 0 0 0.4rem #0000001a;
       border-radius: 5px;
       padding: 2rem;
       display: flex;
       flex-direction: column;
+      margin-bottom: 1.5rem;
       .title-box {
         display: flex;
         justify-content: space-between;
@@ -1784,14 +2131,13 @@ window.addEventListener('resize', () => {
   display: flex;
   justify-content: center;
   text-align: center;
-  align-items: center
+  align-items: center;
 }
-
 
 /* 首页banner部分 */
 .subbanner {
   padding: 0 16px;
-  background: url('@/assets/img/bannerbg.jpg') no-repeat;
+  background: url("@/assets/img/bannerbg.jpg") no-repeat;
   background-size: cover;
   background-position: center;
   width: 100%;
@@ -1833,7 +2179,42 @@ window.addEventListener('resize', () => {
   right: var(--el-card-padding);
 }
 
-:deep(.el-table__body .el-table__row td:nth-child(1)) {
+.copy-icon {
+  margin-left: 5px;
+  cursor: pointer;
+  color: #409eff;
+}
+
+.policy-info-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.policy-number-row {
+  display: flex;
+  align-items: center;
+}
+
+.policy-number-row span {
+  flex: 1;
+}
+
+.primmaryColor {
+  color: var(--el-color-primary);
+  cursor: pointer;
+}
+
+:deep(.stagingList .el-table__body .el-table__row td:nth-child(2) .el-text),
+:deep(.submittedList .el-table__body .el-table__row td:nth-child(2) .el-text),
+:deep(.reviseList .el-table__body .el-table__row td:nth-child(2) .el-text),
+:deep(
+  .pendingPaymentList .el-table__body .el-table__row td:nth-child(1) .el-text
+),
+:deep(.renewalList .el-table__body .el-table__row td:nth-child(1) .el-text),
+:deep(.unUdrList .el-table__body .el-table__row td:nth-child(2) .el-text),
+:deep(.udrStagingList .el-table__body .el-table__row td:nth-child(2) .el-text),
+:deep(.udrReturnList .el-table__body .el-table__row td:nth-child(2) .el-text) {
   color: var(--el-color-primary);
   cursor: pointer;
 }
