@@ -348,7 +348,18 @@ onMounted(() => {
     if(item.prop =='Dist.cDocumentType'){
       item['func'] =  cDocumentTypeChange;
     }
-
+    if(item.prop =='Dist.cInvoiceCur'){
+      item['func'] =  InvoiceCurrencyChange;
+    }
+    if(item.prop =='Dist.nAdditiveCoefficient'){
+      item['func'] =  nAdditiveCoefficientChange;
+    }
+    if(item.prop =='Dist.nInvoiceValue'){
+      item['func'] =  nInvoiceValueChange;
+    }
+    if(item.prop =='Dist.cPrmCur'){
+      item['func'] =  InsurancecurrencyChange;
+    }
     // if(item.prop =='Dist.HouseAreaProp'){
     //   item?.groupList.forEach(data => {
     //     data.rules = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
@@ -441,6 +452,82 @@ const getDistoccupType = (val) => {
       setValue('Dist.cOccupationalLevel', res[0].value);
     }
   });
+}
+const nInvoiceValueChange = (val:any)=>{
+  const bonusRatioData =  getValue('Dist.nAdditiveCoefficient')
+  const goodsValueData = getValue('Dist.nInvoiceValue')
+  const nInvoiceExch = getValue('Dist.nInvoiceExch')
+  if(nInvoiceExch && goodsValueData){
+    setValue('Dist.nRmbAmount',Number(getValue('Dist.nInvoiceValue'))*getValue('Dist.nInvoiceExch'))
+  }
+  if(bonusRatioData && goodsValueData){
+    setValue('Dist.nInsuranceAmount',goodsValueData * (1 + bonusRatioData/100))
+  }
+  if(getValue('Dist.nInsuranceAmount')){
+    setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount'))*getValue('Dist.nAmtExch'))
+  }
+}
+const nAdditiveCoefficientChange = (val:any)=>{
+  const bonusRatioData =  getValue('Dist.nAdditiveCoefficient')
+  const goodsValueData = getValue('Dist.nInvoiceValue')
+  if(bonusRatioData && goodsValueData){
+    setValue('Dist.nInsuranceAmount',goodsValueData * (1 + bonusRatioData/100))
+  }
+  if(getValue('Dist.nInsuranceAmount')){
+    setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount'))*getValue('Dist.nAmtExch'))
+  }
+}
+const InvoiceCurrencyChange = (val:any)=>{
+  console.log('发票金额币种')
+  if (val !== "CNY") {
+    codeListStore
+        .queryCodeList({
+          codeListName: "WEB_BAS_CHGRATE",
+          codeListParam: { value: val },
+        })
+        .then((res) => {
+          console.log("0000000", res);
+          setValue('Dist.cPrmCur',val)
+          setValue("Dist.nAmtExch", res[0].currency_rate);
+          setValue("Dist.nInvoiceExch", res[0].currency_rate);
+          setValue('Dist.nRmbAmount',Number(getValue('Dist.nInvoiceValue'))*getValue('Dist.nInvoiceExch'))
+          const bonusRatioData =  getValue('Dist.nAdditiveCoefficient')
+          const goodsValueData = getValue('Dist.nInvoiceValue')
+          if(bonusRatioData && goodsValueData){
+            setValue('Dist.nInsuranceAmount',goodsValueData * (1 + bonusRatioData/100))
+            setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount'))*getValue('Dist.nAmtExch'))
+          }
+        });
+  } else {
+    setValue('Dist.cPrmCur',val)
+    setValue("Dist.nAmtExch", "1.000000");
+    setValue("Dist.nInvoiceExch", "1.000000");
+    setValue('Dist.nRmbAmount',Number(getValue('Dist.nInvoiceValue')))
+    const bonusRatioData =  getValue('Dist.nAdditiveCoefficient')
+    const goodsValueData = getValue('Dist.nInvoiceValue')
+    if(bonusRatioData && goodsValueData){
+      setValue('Dist.nInsuranceAmount',goodsValueData * (1 + bonusRatioData/100))
+      setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount'))*getValue('Dist.nAmtExch'))
+    }
+  }
+}
+const InsurancecurrencyChange = (val:any)=>{
+  console.log('保险金额币种')
+  if (val !== "CNY") {
+    codeListStore
+        .queryCodeList({
+          codeListName: "WEB_BAS_CHGRATE",
+          codeListParam: { value: val },
+        })
+        .then((res) => {
+          console.log("0000000", res);
+          setValue("Dist.nAmtExch", res[0].currency_rate);
+          setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount'))*getValue('Dist.nAmtExch'))
+        });
+  } else {
+    setValue("Dist.nAmtExch", "1.000000");
+    setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount')))
+  }
 }
 const cEquipmentTypesFunc = ()=>{
   dialog.value?.open(
