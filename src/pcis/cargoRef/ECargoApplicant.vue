@@ -35,8 +35,10 @@ import { getAddressStr,qryCustomer } from "@/api/query";
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 const fileInputRef = ref(null);
 import moment from "moment/moment";
-const idxParam = inject('idxParam', {});
+import {idxParamKey, useIdxParam} from "@/views/pcis/support/useIdxParam";
+const idxParam = inject(idxParamKey, useIdxParam());
 const formPage = idxParam?.formPage;
+const param = idxParam.param;
 const initFlag = computed(() => formPage.init);
 const cWorkDptList =['310','320','330','340','350','360']  // 单位性质带企业的ID
 onMounted(() => {
