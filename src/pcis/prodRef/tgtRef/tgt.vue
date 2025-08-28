@@ -19,9 +19,6 @@ import { productListA,productListB,productListC } from "./productList";
 const wagesInfo = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/wages-info-model.vue")
 );
-const countryInfo = defineAsyncComponent(
-  () => import("@/views/comprehensive-query/modal/country-info-modal.vue")
-);
 const surveyInfo = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/survey-info-modal.vue")
 );
