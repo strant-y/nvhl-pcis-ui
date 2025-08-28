@@ -687,8 +687,7 @@ const method = {
         //     planNo:'P1',
         //     factorProp: 'Term.nSeatTotal',
         //   },123);   
-     
-      // }
+        // }
     
   },
 
