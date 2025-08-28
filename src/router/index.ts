@@ -78,10 +78,10 @@ router.push = async function (location: RouteLocationRaw) {
   }
   const tagsViewStore = useTagsViewStore();
   const routeParams = formatLocation(location);
-  await tagsViewStore.clearConflictingView(routeParams.path as string);
+  await tagsViewStore.clearConflictingView(routeParams.path);
   routeParams.query = {
     ...routeParams.query,
-    ...{componentKey: base64encoder(routeParams.path) + new Date().getTime(),}
+    ...{componentKey: base64encoder(`page-key-${new Date().getTime()}`),}
   };
   encryptRouterParam(routeParams);
   return originalPush.call(this, routeParams).then(() => {

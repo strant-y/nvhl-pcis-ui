@@ -61,6 +61,8 @@ const props = defineProps({
 });
 const route = useRoute();
 
+const paramparam = dataParam();
+paramparam.setParam(props.param);
 const idxParam: IdxParamProps = {
   opertaorProps: { id: route.name },
   // handleAnchorClick: handleAnchorClick,
