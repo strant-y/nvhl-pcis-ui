@@ -444,7 +444,7 @@ import {
   queryTermRateLimit,
 	queryEcargoRelevancePolicyDetails
 } from "../../../api/query/index";
-import { checkFeeWindowType, selectDist, getReleaseInquiryPage, copyDist } from "@/api/prod";
+import { checkFeeWindowType, selectDist, getReleaseInquiryPage, copyDist, checkoutn } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
 import moment from "moment";
 import {numAdd} from "@/utils/Math";
@@ -4341,6 +4341,15 @@ const submitUnderwritingFn = async () => {
 
   if(props.param?.pageName === "priceInquiry") {
     res["inquiryNo"] = props.param.cInquiryNo;
+  }
+  // 投保单核保同意提交前校验是否需要划分风险单位
+  if(res.cUndrMrk === "A" && props.param.pageName !== "priceInquiry" && props.param.cAppTyp !== "E") {
+    const checkoutnInfo:any = await checkoutn({ cAppNo: props.param.cAppNo });
+    if(checkoutnInfo?.code !== "1") {
+      ElMessage.error(checkoutnInfo.message);
+      btn.loading = false;
+      return
+    }
   }
   if(res.cUndrMrk === "A" && props.param?.cProdNo.slice(0,2) !== "04") {//核保选项为同意时(04产品核保同意直接走核保提交接口)
     const deductibleDist = opertaor.getTableRefByKey("deductibleDist")?.getTableData();
