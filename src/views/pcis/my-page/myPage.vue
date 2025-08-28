@@ -344,8 +344,8 @@
         </div>
         <div class="bottom-items">
           <!--新增的申请单号显示和复制按钮-->
-          <div style="margin-right: 5px; width: 100%; display: flex; justify-content: flex-end; align-items: center;" v-if="pageLoaded">
-            <div style="display: flex; align-items: center; background: #fff; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap;">
+          <div style="margin-right: auto; display: flex; align-items: center;" v-if="pageLoaded">
+            <div style="display: flex; align-items: center; background: #fff; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap; padding: 5px 10px;">
               {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "申请单号:" }}
               <span id="policyNumber" style="margin-left: 5px; margin-right: 5px; font-weight: bold;">
               {{ getNo }}
