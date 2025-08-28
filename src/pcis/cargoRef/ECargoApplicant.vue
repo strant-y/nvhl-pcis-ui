@@ -581,21 +581,21 @@ const method = {
 
 
       // 国民行业分类  
-      const cProdNo = param.cProdNo;
-      if (
-      cProdNo === "040001" ||
-      cProdNo === "042002" ||
-      cProdNo === "043004" ||
-      cProdNo === "043005" ||
-      cProdNo === "043011"
-    ) {
-      setFormItem("ECargoApplicant.cTrdCde", {hidden:false, rules: [getRules("required", {})], });
-      
-    }else{
-      setFormItem("ECargoApplicant.cTrdCde", {
-        rules: [],
-      });
-    }
+    //   const cProdNo = param.cProdNo;
+    //   if (
+    //   cProdNo === "040001" ||
+    //   cProdNo === "042002" ||
+    //   cProdNo === "043004" ||
+    //   cProdNo === "043005" ||
+    //   cProdNo === "043011"
+    // ) {
+    //   setFormItem("ECargoApplicant.cTrdCde", {hidden:false, rules: [getRules("required", {})], });
+    //
+    // }else{
+    //   setFormItem("ECargoApplicant.cTrdCde", {
+    //     rules: [],
+    //   });
+    // }
     
 
       //实名认证方式
