@@ -17,23 +17,10 @@
 
 <script setup lang="ts">
 import { useTagsViewStore } from "@/store";
-import { useRoute } from 'vue-router'
-const route = useRoute();
-
 const tagsViewStore = useTagsViewStore();
 const {
-  visitedViews, // 所有页面
   cachedViews, // 缓存页面集合
-  selectedView // 当前选中的tag
 } = storeToRefs(tagsViewStore);
-
-const tagView = computedEager(() => {
-  const view = visitedViews.value.find((f: TagView) => f.path === route.path)
-  if(view) {
-    selectedView.value = view;
-  }
-  return view;
-});
 </script>
 
 <style lang="scss" scoped>

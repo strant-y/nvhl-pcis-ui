@@ -968,7 +968,7 @@ const method = {
 
   // 起运港国家 弹框
   countryFun: () => {
-    dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
+    dzmodal.open(countryInfo, { type: "departure", data: {whichType:whichType.value } }).then((res: any) => {
       if (res.type === "ok") {
         // setFormItem('Tgt.nTotalSalary',
         // setValue("Tgt.cDeparturePortCountry",res.body.countryCn)
@@ -989,7 +989,7 @@ const method = {
   },
   // 中转地国家 按钮
   cTransitCountryFun: () => {
-    dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
+    dzmodal.open(countryInfo, { type: "departure", data: {whichType:whichType.value } }).then((res: any) => {
 
       if (res.type === "ok") {
         // setValue("Tgt.cTransitCountry", res.body.countryCn);
@@ -1011,7 +1011,7 @@ const method = {
   },
   // 目的港国家 按钮
   cDestinationPortCountryFun: () => {
-    dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
+    dzmodal.open(countryInfo, { type: "departure", data: {whichType:whichType.value } }).then((res: any) => {
 
       if (res.type === "ok") {
         // setValue("Tgt.cDestinationPortCountry", res.body.countryCn);
@@ -1034,7 +1034,7 @@ const method = {
   },
   // // 起运港国家 按钮
   cDestinationCountryFunc: () => {
-    dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
+    dzmodal.open(countryInfo, { type: "departure", data: {whichType:whichType.value } }).then((res: any) => {
 
       if (res.type === "ok") {
         // setValue("Tgt.cDestinationCountry", res.body.countryCn);
@@ -1081,7 +1081,7 @@ const method = {
   },
   // 起运机场国家
   cDepartureAirportCountryFunc: () => {
-    dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
+    dzmodal.open(countryInfo, { type: "departure", data: {whichType:whichType.value } }).then((res: any) => {
 
       if (res.type === "ok") {
         if(getValue('Tgt.cDispatchCountry') && getValue('Tgt.cDispatchCountry') !== res.body.cCountryEn){
@@ -1109,7 +1109,7 @@ const method = {
 
   // 目的地机场国家
   cDestinationAirportCountryFunc: () => {
-    dzmodal.open(countryInfo, { type: "departure", data: {} }).then((res: any) => {
+    dzmodal.open(countryInfo, { type: "departure", data: {whichType:whichType.value } }).then((res: any) => {
 
       if (res.type === "ok") {
         // setValue("Tgt.cDestinationAirportCountry", res.body.countryCn);

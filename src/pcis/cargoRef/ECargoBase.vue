@@ -36,6 +36,9 @@ const baseEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 import { useRoute } from "vue-router";
 import {getBsnsTypList,getChaTypeList,getChaSubtypList,} from "@/api/code-list-service";
+import dayjs from "dayjs";
+const route = useRoute();
+const fileInputRef = ref(null);
 const idxParam = inject<any>('idxParam', {});
 const formPage = idxParam?.formPage;
 const param = idxParam?.param;
@@ -181,7 +184,24 @@ const method = {
         ElMessage.warning("协议开始时间不能晚于结束时间");
         return
       }else{
-        setValue( 'ECargoBase.cTmSysCde' ,getDaysBetweenDates(getValue('ECargoBase.tInsrncEndTm'),getValue('ECargoBase.tInsrncBgnTm')))
+        const startDate = dayjs(getValue('ECargoBase.tInsrncBgnTm')); // 新的开始时间（v是用户选择的开始时间）
+        let endDate = getValue('ECargoBase.tInsrncEndTm')  // 结束时间
+        let days = Number(getValue('ECargoBase.cTmSysCde')); // 天数
+        const isDaysEmpty = isNaN(days) || days <= 0;
+        // 计算新的结束时间
+        let newEndDate;
+        if (!isDaysEmpty) {
+          newEndDate = startDate.add(days, 'day').subtract(1, 'second').format("YYYY-MM-DD HH:mm:ss");
+          days = dayjs(newEndDate).add(1, 'second').diff(startDate, 'day');
+        } else if (!endDate) {
+          newEndDate = startDate.add(1, 'year').subtract(1, 'second').format("YYYY-MM-DD HH:mm:ss");
+          days = dayjs(newEndDate).add(1, 'second').diff(startDate, 'day');
+        } else {
+          newEndDate = dayjs(endDate).subtract(1, 'second').format("YYYY-MM-DD HH:mm:ss");
+          days = dayjs(newEndDate).add(1, 'second').diff(startDate, 'day');
+        }
+        setValue('ECargoBase.tInsrncEndTm',newEndDate)
+        setValue( 'ECargoBase.cTmSysCde' ,days)
       }
     }
   },
@@ -192,7 +212,24 @@ const method = {
         ElMessage.warning("协议结束时间不能早于开始时间");
         return
       }else {
-        setValue( 'ECargoBase.cTmSysCde' ,getDaysBetweenDates(getValue('ECargoBase.tInsrncEndTm'),getValue('ECargoBase.tInsrncBgnTm')))
+        const startDate = dayjs(getValue('ECargoBase.tInsrncBgnTm')); // 新的开始时间（v是用户选择的开始时间）
+        let endDate = getValue('ECargoBase.tInsrncEndTm')  // 结束时间
+        let days = Number(getValue('ECargoBase.cTmSysCde')); // 天数
+        const isDaysEmpty = isNaN(days) || days <= 0;
+        // 计算新的结束时间
+        let newEndDate;
+        if (!isDaysEmpty) {
+          newEndDate = startDate.add(days, 'day').subtract(1, 'second').format("YYYY-MM-DD HH:mm:ss");
+          days = dayjs(newEndDate).add(1, 'second').diff(startDate, 'day');
+        } else if (!endDate) {
+          newEndDate = startDate.add(1, 'year').subtract(1, 'second').format("YYYY-MM-DD HH:mm:ss");
+          days = dayjs(newEndDate).add(1, 'second').diff(startDate, 'day');
+        } else {
+          newEndDate = dayjs(endDate).subtract(1, 'second').format("YYYY-MM-DD HH:mm:ss");
+          days = dayjs(newEndDate).add(1, 'second').diff(startDate, 'day');
+        }
+        setValue('ECargoBase.tInsrncEndTm',newEndDate)
+        setValue( 'ECargoBase.cTmSysCde' ,days)
       }
     }
   },

@@ -88,6 +88,7 @@ const tCertfDate = ref<any[]>([]);
 const  cWorkDptList =['310','320','330','340','350','360']  // 单位性质带企业的ID
 const maindialogVisible = ref(false) // ocr识别弹框打开
 const resetLogo =ref<any>(false);   // 重置标识
+const params = computed(() => opertaor.getParam())
 
 onMounted(() => {
   const formconfig11 = formInit(
@@ -649,7 +650,7 @@ const method = {
       setFormItem("Insured.cCntrCertfCde", { rules: null });
 
       // 为法人 国民经济行业必填
-     const cProdNo = route.params.param?.cProdNo;
+      const cProdNo = route.params.param?.cProdNo;
       if (
         cProdNo === "040001" ||
         cProdNo === "042002" ||
@@ -1439,15 +1440,15 @@ function handleFileChange(event: Event) {
             );
             if (cardInfo["period_of_validity"]["value"]) {
               tCertfDate.value =
-                cardInfo["period_of_validity"]["value"].split("-");
+                cardInfo["period_of_validity"]["value"].split("-")?.map((item:any) => (item.replaceAll(".", "-")));
               setValue("Insured.cLongendTyp", "0");
               setValue(
                 "Insured.tCertfBgnDate",
-                cardInfo["period_of_validity"]["value"].split("-")[0] || null
+                cardInfo["period_of_validity"]["value"].split("-")[0]?.replaceAll(".", "-") || null
               );
               setValue(
                 "Insured.tCertfEndDate",
-                cardInfo["period_of_validity"]["value"].split("-")[1] || null
+                cardInfo["period_of_validity"]["value"].split("-")[1]?.replaceAll(".", "-") || null
               );
             }
             setValue("Insured.cCertfCls", "19");

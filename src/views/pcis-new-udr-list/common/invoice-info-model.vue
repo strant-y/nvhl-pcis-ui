@@ -9,10 +9,6 @@
 import { defineComponent, ref, reactive, onMounted } from 'vue';
 import { ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElButton, ElMessage } from 'element-plus';
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
-// import { DataOperator } from '@/utils/data-operator';
-import { APPLICANT, INSURED } from '@/constants/tab-constants';
-import { getListByCode } from '@/api/code-list-service';
-
 import {
   AppFreeEditConfig,
   AppFreeEditMethod,
@@ -23,10 +19,17 @@ import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-import { permission } from 'process';
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
+import {useRoute} from "vue-router";
+
+const route = useRoute();
+const idxParam: IdxParamProps = {
+  opertaorProps: { id: route.name },
+};
+provide(idxParamKey, idxParam);
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 opertaor.init();
+
 const props = defineProps({
   visible: {
       type: Boolean,

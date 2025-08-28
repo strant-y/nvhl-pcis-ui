@@ -20,9 +20,6 @@ import {
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { qryProdEdrRsnList } from "@/api/prod";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 const edrRsnEdit = defineAsyncComponent(() => import("./edrRsnEdit.vue"));
@@ -33,14 +30,11 @@ import {
 } from "@/shared/app-table-config";
 import { useRoute } from "vue-router";
 import { ref, reactive, onMounted } from "vue";
-import { qryProdTermList, changeProdEdrRsnStatus } from "@/api/prod";
-import { inputtype } from "@/utils/utilKey";
-import { descryptParameter, encryptParameter } from "@/utils/encipher";
+import { changeProdEdrRsnStatus } from "@/api/prod";
+import { descryptParameter } from "@/utils/encipher";
 const route = useRoute();
 const query = ref(route.query);
 const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
-
-const { getRules } = useValidator();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);

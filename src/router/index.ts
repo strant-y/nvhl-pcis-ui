@@ -76,26 +76,18 @@ router.push = async function (location: RouteLocationRaw) {
   if(!location || Object.keys(location).length == 0 || location === '') {
     return Promise.reject(new Error('Invalid route location'));
   }
-  const tagsViewStore = useTagsViewStore();
+  sessionStorage.setItem('switchType', 'push');
   const routeParams = formatLocation(location);
-  await tagsViewStore.clearConflictingView(routeParams.path as string);
   routeParams.query = {
     ...routeParams.query,
-    ...{componentKey: base64encoder(routeParams.path) + new Date().getTime(),}
+    ...{componentKey: base64encoder(`page-key-${new Date().getTime()}`),}
   };
   encryptRouterParam(routeParams);
-  return originalPush.call(this, routeParams).then(() => {
-    tagsViewStore.addTagView(this.currentRoute.value);
-  }).catch(err => {
-    if (err.name !== 'NavigationDuplicated') {
-      // 可以在这里添加全局错误处理
-      console.error('路由跳转错误:', err)
-    }
-    return Promise.reject(err)
-  })
+  return originalPush(routeParams);
 };
 // 扩展 replace 方法
 router.replace = function (location: RouteLocationRaw) {
+  sessionStorage.setItem('switchType', 'replace');
   const routeParams: any = formatLocation(location);
   const tagsViewStore = useTagsViewStore();
   const {visitedViews} = toRefs(tagsViewStore);
@@ -107,9 +99,7 @@ router.replace = function (location: RouteLocationRaw) {
     };
   }
   encryptRouterParam(routeParams);
-  return originalReplace.call(this, routeParams).then(() => {
-    tagsViewStore.updateViewParam(this.currentRoute.value);
-  });
+  return originalReplace(routeParams);
 };
 
 const formatLocation = (param: any) => {

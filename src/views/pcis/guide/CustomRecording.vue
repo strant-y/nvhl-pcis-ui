@@ -452,6 +452,9 @@ const getCDptCdeList = (data: any)=> {
                 value: item.cDptCde,
                 label: item.cDptCnm,
             }));
+          // 清空已选择的承保机构
+          formconfig1.value.cDptCde = "";
+          formconfig1.value.cDptCnm = "";
         }
         cDptCdeLoading.value = false;
     }).catch(err => console.error(err));

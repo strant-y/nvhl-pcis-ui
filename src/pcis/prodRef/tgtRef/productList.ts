@@ -1,6 +1,6 @@
 // 港口
 const productListA  = ref<string[]>(
-    ['020001','020002','020002','020009']
+    ['020001','020002','020005','020009']
 );
 //机场
 const productListB  = ref<string[]>(

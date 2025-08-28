@@ -48,24 +48,29 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute } from "vue-router";
-import { getProdInfos } from "@/api/prod";
 import { dataParam } from "@/store/modules/dataParam";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { ref, onMounted } from "vue";
-
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import {useRoute} from "vue-router";
 
 const props = defineProps({
   param: {
     type: Object,
   },
 });
+const route = useRoute();
 
 const paramparam = dataParam();
 paramparam.setParam(props.param);
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const idxParam: IdxParamProps = {
+  opertaorProps: { id: route.name },
+  // handleAnchorClick: handleAnchorClick,
+};
+provide(idxParamKey, idxParam);
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const formconfig1 = opertaor.getTableConfig();
+
 
 opertaor.setTableConfig([
   {

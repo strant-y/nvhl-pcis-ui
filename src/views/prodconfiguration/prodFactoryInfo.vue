@@ -63,11 +63,18 @@
 
 <script setup lang="ts">
 import { getProdInfos, getInquiryPage } from "@/api/prod";
-import { useRoute } from "vue-router";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { dataParam } from "@/store/modules/dataParam";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import { useRoute } from "vue-router";
+
+const route = useRoute();
 const dataparam = dataParam();
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const idxParam: IdxParamProps = {
+  opertaorProps: { id: route.name },
+  // handleAnchorClick: handleAnchorClick,
+};
+provide(idxParamKey, idxParam);
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 opertaor.init();
 

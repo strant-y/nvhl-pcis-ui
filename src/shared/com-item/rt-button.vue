@@ -1,17 +1,18 @@
 <template>
-  <template v-if="item.popover">
-    <el-popover
-      :visible="visible"
-      :width="item.popoverWidth ? item.popoverWidth : 200"
-      :placement="item.position ? item.position : 'bottom'"
-    >
-      <template #reference>
-        <el-button
-          ref="buttonRef"
-          :type="item.type"
-          :size="item.size"
-          :placeholder="item.placeholder"
-          :link="
+  <template v-if="item">
+    <template v-if="item.popover">
+      <el-popover
+          :visible="visible"
+          :width="item.popoverWidth ? item.popoverWidth : 200"
+          :placement="item.position ? item.position : 'bottom'"
+      >
+        <template #reference>
+          <el-button
+              ref="buttonRef"
+              :type="item.type"
+              :size="item.size"
+              :placeholder="item.placeholder"
+              :link="
             item.link
               ? typeof item.link === 'boolean'
                 ? item.link
@@ -20,7 +21,7 @@
                 : false
               : false
           "
-          :circle="
+              :circle="
             item.circle
               ? typeof item.circle === 'boolean'
                 ? item.circle
@@ -29,43 +30,43 @@
                 : false
               : false
           "
-          :style="{
+              :style="{
             backgroundColor: item.buttonColor,
             borderColor: item.buttonColor,
             ...style,
           }"
-          @click="visible = !visible"
-        >
-          <!-- 将isBtn透传,防止出现icon方法重复执行  -->
-          <rt-icon v-if="item.icon" :item="{ ...item, isBtn: true }" />
-          {{ item.label }}</el-button
-        >
-      </template>
-      <component
-        :is="item.popover"
-        :param="item"
-        @closepopover="closepopover"
-      />
-    </el-popover>
-  </template>
-  <template v-else>
-    <!-- 使用el-tooltip包装el-button以支持tooltip功能 -->
-    <el-tooltip 
-      v-if="item.tooltip" 
-      :content="item.tooltip" 
-      :placement="item.tooltipPosition || 'top'"
-      effect="light"
-    >
-      <el-button
-        ref="buttonRef"
-        :type="item.type"
-        :size="item.size"
-        :disabled="
+              @click="visible = !visible"
+          >
+            <!-- 将isBtn透传,防止出现icon方法重复执行  -->
+            <rt-icon v-if="item.icon" :item="{ ...item, isBtn: true }" />
+            {{ item.label }}</el-button
+          >
+        </template>
+        <component
+            :is="item.popover"
+            :param="item"
+            @closepopover="closepopover"
+        />
+      </el-popover>
+    </template>
+    <template v-else>
+      <!-- 使用el-tooltip包装el-button以支持tooltip功能 -->
+      <el-tooltip
+          v-if="item.tooltip"
+          :content="item.tooltip"
+          :placement="item.tooltipPosition || 'top'"
+          effect="light"
+      >
+        <el-button
+            ref="buttonRef"
+            :type="item.type"
+            :size="item.size"
+            :disabled="
           item.disabled ||
           (typeof item.disabled === 'function' ? item.disabled(row) : false)
         "
-        :placeholder="item.placeholder"
-        :link="
+            :placeholder="item.placeholder"
+            :link="
           item.link
             ? typeof item.link === 'boolean'
               ? item.link
@@ -74,7 +75,7 @@
               : false
             : false
         "
-        :circle="
+            :circle="
           item.circle
             ? typeof item.circle === 'boolean'
               ? item.circle
@@ -83,35 +84,35 @@
               : false
             : false
         "
-        :style="{
+            :style="{
           backgroundColor: item.buttonColor,
           borderColor: item.buttonColor,
           ...style,
         }"
-        @click="handleChange"
-      >
-        <!-- 将isBtn透传,防止出现icon方法重复执行  -->
-        <rt-icon
-          :style="{ marginRight: item.label ? '5px' : null }"
-          v-if="item.icon"
-          :item="{ ...item, isBtn: true }"
-        />
-        {{ item.label }}</el-button
-      >
-    </el-tooltip>
-    
-    <!-- 原有的不带tooltip的按钮 -->
-    <el-button
-      v-else
-      ref="buttonRef"
-      :type="item.type"
-      :size="item.size"
-      :disabled="
+            @click="handleChange"
+        >
+          <!-- 将isBtn透传,防止出现icon方法重复执行  -->
+          <rt-icon
+              :style="{ marginRight: item.label ? '5px' : null }"
+              v-if="item.icon"
+              :item="{ ...item, isBtn: true }"
+          />
+          {{ item.label }}</el-button
+        >
+      </el-tooltip>
+
+      <!-- 原有的不带tooltip的按钮 -->
+      <el-button
+          v-else
+          ref="buttonRef"
+          :type="item.type"
+          :size="item.size"
+          :disabled="
         item.disabled ||
         (typeof item.disabled === 'function' ? item.disabled(row) : false)
       "
-      :placeholder="item.placeholder"
-      :link="
+          :placeholder="item.placeholder"
+          :link="
         item.link
           ? typeof item.link === 'boolean'
             ? item.link
@@ -120,7 +121,7 @@
             : false
           : false
       "
-      :circle="
+          :circle="
         item.circle
           ? typeof item.circle === 'boolean'
             ? item.circle
@@ -129,22 +130,23 @@
             : false
           : false
       "
-      :style="{
+          :style="{
         backgroundColor: item.buttonColor,
         borderColor: item.buttonColor,
         ...style,
       }"
-      :loading="item.loading"
-      @click="handleChange"
-    >
-      <!-- 将isBtn透传,防止出现icon方法重复执行  -->
-      <rt-icon
-        :style="{ marginRight: item.label ? '5px' : null }"
-        v-if="item.icon"
-        :item="{ ...item, isBtn: true }"
-      />
-      {{ item.label }}</el-button
-    >
+          :loading="item.loading"
+          @click="handleChange"
+      >
+        <!-- 将isBtn透传,防止出现icon方法重复执行  -->
+        <rt-icon
+            :style="{ marginRight: item.label ? '5px' : null }"
+            v-if="item.icon"
+            :item="{ ...item, isBtn: true }"
+        />
+        {{ item.label }}</el-button
+      >
+    </template>
   </template>
 </template>
 
@@ -187,6 +189,11 @@ function handleChange() {
 function getConfig() {
   return props.item
 }
+onBeforeMount(() => {
+  if(!props.item) {
+    console.warn('!!! props.item is undefined');
+  }
+})
 defineExpose({
   getConfig
 })

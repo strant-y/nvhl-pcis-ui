@@ -291,7 +291,7 @@
                 :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
                 :pageSchema="k.pageSchema"
                 :compKey="k.pageCode"
-           
+
               />
             </div>
           </template>
@@ -344,8 +344,8 @@
         </div>
         <div class="bottom-items">
           <!--新增的申请单号显示和复制按钮-->
-          <div style="margin-right: 5px; width: 100%; display: flex; justify-content: flex-end; align-items: center;" v-if="pageLoaded">
-            <div style="display: flex; align-items: center; background: #fff; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap;">
+          <div style="margin-right: auto; display: flex; align-items: center;" v-if="pageLoaded">
+            <div style="display: flex; align-items: center; background: #fff; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap; padding: 5px 10px;">
               {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "申请单号:" }}
               <span id="policyNumber" style="margin-left: 5px; margin-right: 5px; font-weight: bold;">
               {{ getNo }}
@@ -586,6 +586,7 @@ const props:any = defineProps({
 
 onBeforeMount(() => {
   // onMounted() 之前
+  nRecRemPrm.value = props.param?.nRecRemPrm
   opertaor.setParam(props.param);
 });
 
@@ -1183,7 +1184,6 @@ const initPage = async () => {
   //   cPlyNo: props.param.cPlyNo,
   //   queryTyp: props.param.queryTyp,
   // });
-
   if (props.param.pageType === "PLY_UW_PROCESS_SCENE") {
     underwriteFlag.value = true;
   } else {
@@ -1430,7 +1430,7 @@ async function loadAfter() {
     nextTick(() => {
       opertaor.setDataAll(dataInit.value);
     });
-  } else if (props.param.pageType === "TEMPORARY_DEPOSIT") {
+  } else if (props.param.pageType === "TEMPORARY_DEPOSIT" && props.param.cTransMrk !='1') {
     // 暂存单
     const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
     await loadAppPlyInfo(cAppNo);
@@ -1663,7 +1663,7 @@ async function loadAfter() {
     nextTick(() => {
       opertaor.setDisabledAll();
     });
-  } else if (props.param.pageType === "EDR_APP_NEW_SCENE" || props.param.pageType === "TEMPORARY_DEPOSIT" ) {
+  } else if (props.param.pageType === "EDR_APP_NEW_SCENE" || (props.param.pageType === "TEMPORARY_DEPOSIT" && props.param.cTransMrk !=='1') ) {
     // 批改申请-新增
     const cAppNo = props.param.cAppNo;
     await loadAppPlyInfo(cAppNo);
@@ -2237,6 +2237,58 @@ async function loadAfter() {
     })
     bthList.value = basicBtn;
     rightBtnList.value = basicRightBtn;
+  } else if(props.param?.cTransMrk === '1' && props.param?.pageType == 'TEMPORARY_DEPOSIT'){ //历史数据补全
+    const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
+    await loadAppPlyInfo(cAppNo);
+    if (props.param.cAppTyp == "E") {
+      if (props.param.cEdrType == "1") {
+        bthList.value = edrBtn;
+        nextTick(() => {
+          opertaor.setDisabledAll();
+          getEdrRsnItemFun(
+            props.param["cProdNo"],
+            props.param["cDptCde"],
+            props.param["cEdrRsnBundleCde"],
+            props.param["cEdrRsnBundleCde"],
+            props.param["cEdrType"],
+            props.param["cGrpMrk"]
+          );
+
+          // 用于处理 账户信息
+          let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
+          if(acctinfoInfo){
+              acctinfoInfo.setDisabledAll(false);  
+              acctinfoInfo.setFormItem('Acctinfo.cAcctNme',{
+                disabled: true
+              })
+              acctinfoInfo.setFormItem('Acctinfo.cBankCnaps',{
+                disabled: true
+              })
+          }  
+        });
+        edritem.value?.handleQuery();
+      } else {
+        bthList.value = edrSurrenderBtn;
+      }
+    } else if (props.param.cAppTyp == "A") {
+      bthList.value = basicBtn;
+      rightBtnList.value = basicRightBtn;
+			if(props.param?.pageName === "priceInquiry") {
+				bthList.value.push(
+					createFreeButtonBase({
+						label: "发起风勘",
+						type: "primary",
+						func: () => {
+							if (getNo.value == '暂无') {
+								ElMessage.error('询价单号为空,请保存后操作!');
+								return false;
+							}
+							startWindExploration(); 
+						},
+					}),
+				)
+			}
+    }
   }
 
   let imageStr = '影像管理';
@@ -3046,7 +3098,7 @@ const submitToUndrFn = async () => {
       //校验联共保信息
       const plyBasedata = opertaor.getTableRefByKey("plyBase").getFromValue();
 
-      debugger
+      
       if(plyBasedata["Base.cCiMrk"] !== "0" && props.param.pageName !== "priceInquiry") {
         const ciValue = opertaor.getTableRefByKey("ci")?.getFromValue() || '';
         const isCiValid = validateCiInfo();
