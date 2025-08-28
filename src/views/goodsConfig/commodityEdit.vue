@@ -72,22 +72,17 @@
 </template>
 
 <script setup lang="ts">
-import { getProdInfos, saveProInfo, saveCommodityBase, commodityBaseOperatorCheck, saveRule, addProcessUndr, getCommodityBase, processApprove, getProcessInfo, getEdrNmeByCde } from "@/api/prod";
+import {  saveCommodityBase, commodityBaseOperatorCheck, saveRule, addProcessUndr, getCommodityBase, processApprove, getProcessInfo, getEdrNmeByCde } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
-
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
-opertaor.init();
+import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
 
 import { useProductStore } from "@/store";
-import { descryptParameter, encryptParameter } from "@/utils/encipher";
+import { descryptParameter } from "@/utils/encipher";
 const productStore = useProductStore();
 const { iscAffiliatedMrk } = storeToRefs(productStore);
 import { useRouter, useRoute } from 'vue-router';
 const route = useRoute();
 const query = ref(route.query);
-
 const router = useRouter();
 let isShowTest = ref(false)  // 用来控制显示审核信息模块
 let TestData = ref({});  // 审核状态 返回数据 
@@ -95,6 +90,14 @@ let isShowReview = ref(false)  // 用来控制显示审核信息模块
 let ProcessData = ref({});  // 审核状态 返回数据 
 console.log(1,query.value?.param)
 console.log(2,descryptParameter(query.value?.param))
+
+const idxParam: IdxParamProps = {
+  opertaorProps: { id: route.name },
+  // handleAnchorClick: handleAnchorClick,
+};
+provide(idxParamKey, idxParam);
+const opertaor = dataOpertaor(idxParam.opertaorProps);
+opertaor.init();
 const queryParam = JSON.parse(   query.value?.param ?  descryptParameter(query.value.param) : "{}");
 const formconfig1 = opertaor.getTableConfig();
 
