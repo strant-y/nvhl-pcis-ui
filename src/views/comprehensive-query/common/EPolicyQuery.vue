@@ -189,7 +189,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 }
             },
             {
-                prop: 'prodCNmeCn',
+                prop: 'CProdNo',
                 inputtype: 'rtselect',
                 title: '产品名称',
                 itemWidth: 1,
@@ -604,7 +604,7 @@ function handleQuery(flag?: boolean) {
                 delete param.TEdrAppTm
             }
             param["cTermNo"] = cTermNo;        // 条款编码
-            param["cProdNo"] = param["prodCNmeCn"];   // 产品名称
+            delete param.cProdNo;
 
             pcisQueryService
                 .getEpolicyPolicyList(param)

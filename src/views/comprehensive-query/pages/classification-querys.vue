@@ -429,18 +429,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               },
           },
           {
-             prop: "prodCNmeCn",
-             inputtype: "rtselect",
-             title: "产品名称",
-             typeCode: "PROD_LIST_GRT",
-             params: {
-                cParCde: "",
-                cOperId: user.value.opCde,
-                cDptCde: user.value.companyId,
-             },
-             clearable: true,
-          },
-          {
               prop: "cProdNo",
               inputtype: "rtselect",
               title: "条款名称",
@@ -481,6 +469,18 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               },
           },
           {
+             prop: "prodCNmeCn",
+             inputtype: "rtselect",
+             title: "产品名称",
+             typeCode: "PROD_LIST_GRT",
+             params: {
+                cParCde: "",
+                cOperId: user.value.opCde,
+                cDptCde: user.value.companyId,
+             },
+             clearable: true,
+          },
+          {
               prop: "cAppNo",
               inputtype: "rtinput",
               title: "询价/投保/批改申请单号",
@@ -497,7 +497,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               inputtype: "rtselect",
               title: "任务类型",
               minWidth: 180,
-              clearable: true,
               loadData: [
                   { label: "投保", value: "A" },
                   { label: "批改", value: "E" },
@@ -795,9 +794,9 @@ const normalQueryColumns = [
         isShow:false
     },
     {
-        prop: "cPlyAppNo",
+        prop: "cEdrNo",
         inputtype: "rtinput",
-        title: "批改申请单号/批单号",
+        title: "批单号",
         minWidth: 180,
     },
     {
@@ -873,6 +872,8 @@ const normalQueryColumns = [
             { label: "核保退回/撤回", value: "3" },
             { label: "已核待缴费", value: "4" },
             { label: "已出单", value: "5" },
+            { label: "已做失效操作", value: "6" },
+            { label: "已提交未接收", value: "7" },
             { label: "见费出单退回", value: "8" },
         ],
         hideBtns: (row: any) => {
