@@ -11,20 +11,39 @@
       <!-- policyInfo 列的具名插槽 -->
        <template #column-policyInfo="{ row, column, index }">
         <div class="policy-info-cell">
-          <div v-if="row.cAppNo" class="policy-number-row">
+          <!-- 投保/批改-->
+          <template v-if="cAppType !== 'I'">
+            <div v-if="row.cAppNo" class="policy-number-row">
             <span v-html="row.cAppNo"></span>
-            <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
-              <DocumentCopy />
-            </el-icon>
-          </div>
-          <div v-if="row.cPlyNo" class="policy-number-row">
-            <span v-html="row.cPlyNo"></span>
-            <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
-              <DocumentCopy />
-            </el-icon>
-          </div>
+                <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
+                    <DocumentCopy />
+                </el-icon>
+            </div>
+            <div v-if="row.cPlyNo" class="policy-number-row">
+                <span v-html="row.cPlyNo"></span>
+                <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
+                   <DocumentCopy />
+                </el-icon>
+            </div>
+          </template>
+          <!-- 询价 -->
+          <template v-else>
+            <div v-if="row.cAppNo" class="policy-number-row">
+                <span v-html="row.cAppNo"></span>
+                <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
+                    <DocumentCopy />
+                </el-icon>
+            </div>
+            <div v-if="row.cInquiryNo" class="policy-number-row">
+                <span v-html="row.cInquiryNo"></span>
+                <el-icon class="copy-icon" @click="copyText(row.cInquiryNo)">
+                   <DocumentCopy />
+                </el-icon>
+            </div>
+            </template>
         </div>
       </template>
+
       <template #column-InsurancePeriod="{ row, column, index }">
         <div class="policy-info-cell">
           <div v-if="row.tInsrncBgnTm" class="policy-period-row">
@@ -152,6 +171,7 @@ const props = defineProps({
 });
 const homeJumpData = ref({}); //接收首页的参数，用于查询条件回显
 const queryType = ref("1");
+const cAppType = ref("A");
 import { FIELD_MAP } from '@/constants/fieldMaps';
 const cPard = ref(null);
 
@@ -1216,6 +1236,7 @@ async function handleQuery(flag?: boolean, isEs = false) {
   const freeEditRefs = freeEditRef.value;
   const s = freeEditRefs.getFromValue();
   const appType = s.cAppTyp || 'A';
+  cAppType.value = appType;
 
   if (appType === 'I') {
     await queryI(flag, isEs);
@@ -1511,6 +1532,8 @@ async function loadUserColumns() {
 // 更新表格第一列标题
 function updatePolicyInfoTitle(cAppTyp: string) {
   const targetColumn = tableconfig.fromSchema?.find(col => col.prop == 'policyInfo');
+  cAppType.value = cAppTyp;
+
   if (targetColumn) {
     if (cAppTyp === 'I') {
       targetColumn.title = '询价申请单号/询价单号';

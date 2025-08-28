@@ -289,6 +289,7 @@ function setNode() {
 let ignoreCheckChange = false;
 
 function selectmainMethod(a: any, b: any, c: any) {
+  const param = props.data.data;
   let mc = null;
   if(b){  // 先判断选中的责任,是否挂在互斥条款下
     data1.value.forEach((d: any) => {
@@ -299,7 +300,7 @@ function selectmainMethod(a: any, b: any, c: any) {
       });
     });
   }
-  if(mc && mutualExclusionClause.value.includes(mc.cUniqueTermNo)){  //对应主条款存在互斥条款
+  if(mc && mutualExclusionClause.value.includes(mc.cUniqueTermNo) && param.type !== 'ECargo'){  //对应主条款存在互斥条款
     let addkey: any[] = [];
     // 先全量获取已选中数据
     const tree = mainRef.value?.getCheckedNodes(false, true);

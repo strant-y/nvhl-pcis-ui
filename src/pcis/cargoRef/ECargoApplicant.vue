@@ -23,6 +23,8 @@ import { useProductStore } from "@/store/modules/prod";
 const productStore = useProductStore();
 const dialog = ref<DialogMethod | null>(null);
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
+import {calculateAgeFromIdCard} from "@/utils/common";
+
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -581,21 +583,21 @@ const method = {
 
 
       // 国民行业分类  
-      const cProdNo = param.cProdNo;
-      if (
-      cProdNo === "040001" ||
-      cProdNo === "042002" ||
-      cProdNo === "043004" ||
-      cProdNo === "043005" ||
-      cProdNo === "043011"
-    ) {
-      setFormItem("ECargoApplicant.cTrdCde", {hidden:false, rules: [getRules("required", {})], });
-      
-    }else{
-      setFormItem("ECargoApplicant.cTrdCde", {
-        rules: [],
-      });
-    }
+    //   const cProdNo = param.cProdNo;
+    //   if (
+    //   cProdNo === "040001" ||
+    //   cProdNo === "042002" ||
+    //   cProdNo === "043004" ||
+    //   cProdNo === "043005" ||
+    //   cProdNo === "043011"
+    // ) {
+    //   setFormItem("ECargoApplicant.cTrdCde", {hidden:false, rules: [getRules("required", {})], });
+    //
+    // }else{
+    //   setFormItem("ECargoApplicant.cTrdCde", {
+    //     rules: [],
+    //   });
+    // }
     
 
       //实名认证方式
@@ -836,7 +838,7 @@ const idAnalysis = (id:string)=>{
           const birthday = `${birthYear}-${birthMonth.toString().padStart(2, "0")}-${birthDay.toString().padStart(2, "0")}`;
           const sexCode = parseInt(id.substring(16, 17), 10);
           const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
-          const age = new Date().getFullYear() - birthYear;
+          const age = calculateAgeFromIdCard(id);
 
           setValue("ECargoApplicant.cNation", "1"); // 国籍
           setValue("ECargoApplicant.tBirthday", birthday);

@@ -17,6 +17,7 @@ import termRiskGroupConfig from "./insuranceConInfo/termRiskGroupConfig.vue";
 import queryUtils from "./insuranceConInfo/queryUtils.vue";
 import relatedAdditionalInsModal from "./insuranceConInfo/relatedAdditionalInsModal.vue";
 import changeCiPolicynoComponent from "./edrList/change-ci-policyno-component.vue";
+import countryInfoModal from "./distmodel/country-info-modal.vue";
 
 import componentEdit from "./componentModel/componentEdit.vue";
 
@@ -33,6 +34,7 @@ const componentMap = {
     distFactorMap:DistFactorMap,
 
     distAdd: distAdd,
+    countryInfoModal:countryInfoModal,
 
 	
   

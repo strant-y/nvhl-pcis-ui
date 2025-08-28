@@ -436,10 +436,7 @@ const method = {
       ElMessage.error(err.msg);
     })
   },
-  // 投保座位总数
-  nSeatCapacityChange:(val:any)=>{
-    console.log('111',val)
-  },
+
 
   //  042003 根据电梯条数反
   funcdistadd: () => {
