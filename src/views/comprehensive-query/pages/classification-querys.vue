@@ -775,24 +775,24 @@ const normalQueryColumns = [
         prop: "policyInfo",
         inputtype: "rtinput",
         title: "申请单号/保单号",
-        minWidth: 180,
+        minWidth: 250,
         fixed: "left",
         slotName: "policyInfo"
     },
-    {
-        prop: "cAppNo",
-        inputtype: "rtinput",
-        title: "申请单号",
-        minWidth: 180,
-        isShow:false
-    },
-    {
-        prop: "cPlyNo",
-        inputtype: "rtinput",
-        title: "保单号",
-        minWidth: 180,
-        isShow:false
-    },
+    // {
+    //     prop: "cAppNo",
+    //     inputtype: "rtinput",
+    //     title: "申请单号",
+    //     minWidth: 180,
+    //     isShow:false
+    // },
+    // {
+    //     prop: "cPlyNo",
+    //     inputtype: "rtinput",
+    //     title: "保单号",
+    //     minWidth: 180,
+    //     isShow:false
+    // },
     {
         prop: "cEdrNo",
         inputtype: "rtinput",
@@ -895,10 +895,11 @@ const normalQueryColumns = [
         maxWidth: 120,
     },
     {
-        prop: "cRsnCde",  // CEdrRsnDetail 批改原因 
-        inputtype: "rtinput",
-        title: "批改原因",
+        prop: "cRsnCde",
+        inputtype: "rtselect",
+        title: " 批改原因",
         minWidth: 180,
+        typeCode: "EDR_RSN_LIST_KIND",
     }
 ]
 
