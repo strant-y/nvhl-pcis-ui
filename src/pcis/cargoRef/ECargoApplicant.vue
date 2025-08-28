@@ -35,8 +35,10 @@ import { getAddressStr,qryCustomer } from "@/api/query";
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 const fileInputRef = ref(null);
 import moment from "moment/moment";
-const idxParam = inject('idxParam', {});
+import {idxParamKey, useIdxParam} from "@/views/pcis/support/useIdxParam";
+const idxParam = inject(idxParamKey, useIdxParam());
 const formPage = idxParam?.formPage;
+const param = idxParam.param;
 const initFlag = computed(() => formPage.init);
 const cWorkDptList =['310','320','330','340','350','360']  // 单位性质带企业的ID
 onMounted(() => {
@@ -579,21 +581,21 @@ const method = {
 
 
       // 国民行业分类  
-      const cProdNo = param.cProdNo;
-      if (
-      cProdNo === "040001" ||
-      cProdNo === "042002" ||
-      cProdNo === "043004" ||
-      cProdNo === "043005" ||
-      cProdNo === "043011"
-    ) {
-      setFormItem("ECargoApplicant.cTrdCde", {hidden:false, rules: [getRules("required", {})], });
-      
-    }else{
-      setFormItem("ECargoApplicant.cTrdCde", {
-        rules: [],
-      });
-    }
+    //   const cProdNo = param.cProdNo;
+    //   if (
+    //   cProdNo === "040001" ||
+    //   cProdNo === "042002" ||
+    //   cProdNo === "043004" ||
+    //   cProdNo === "043005" ||
+    //   cProdNo === "043011"
+    // ) {
+    //   setFormItem("ECargoApplicant.cTrdCde", {hidden:false, rules: [getRules("required", {})], });
+    //
+    // }else{
+    //   setFormItem("ECargoApplicant.cTrdCde", {
+    //     rules: [],
+    //   });
+    // }
     
 
       //实名认证方式

@@ -87,6 +87,7 @@ const user = JSON.parse(sessionStorage.getItem("user"));
 const tCertfDate = ref<any[]>([]);
 const  cWorkDptList =['310','320','330','340','350','360']  // 单位性质带企业的ID
 const maindialogVisible = ref(false) // ocr识别弹框打开
+const resetLogo =ref<any>(false);   // 重置标识
 const params = computed(() => opertaor.getParam())
 
 onMounted(() => {
@@ -248,10 +249,11 @@ let debounceTimer = null;
 const checkUser = () => {
     const fieldsToValidate = ['Insured.cInsuredNme', 'Insured.cClntMrk',"Insured.cCertfCde","Insured.cCertfCls"];
       // 自定义录单 方案配置 模版 进入 可以查询用户信息  
-      if (param.pageType !== "app" &&  param.pageType !== "copy" && param.pageType !== "template" && param.cAppStatus !=='1') {
+        console.log('!resetLogo',!resetLogo.value,param)
+      if (  !resetLogo.value && (param.pageType !== "app" &&  param.pageType !== "copy" && param.pageType !== "template" && param.cAppStatus !=='1')) {
         return false;
       }
-  
+
       if (debounceTimer) {
         clearTimeout(debounceTimer);
       }   
@@ -835,7 +837,8 @@ const method = {
         disabled:false
       })
     }
-
+    console.log('重置触发了')
+     resetLogo.value = true;
     tCertfDate.value = [];
     tabref["insured"].setFormValue(InsuredValue);
   },

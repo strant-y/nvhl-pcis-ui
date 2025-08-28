@@ -291,7 +291,7 @@
                 :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
                 :pageSchema="k.pageSchema"
                 :compKey="k.pageCode"
-           
+
               />
             </div>
           </template>
@@ -3901,6 +3901,7 @@ const saveEdrPlyInfo = async () => {
         }
       })
     }
+      sessionStorage.setItem("getAppPolicyData", JSON.stringify(ops));
 
   } else {
     ElMessage.error(edrInfo.msg);

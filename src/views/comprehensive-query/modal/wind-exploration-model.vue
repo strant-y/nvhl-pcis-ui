@@ -25,14 +25,11 @@ import {
 } from "@/shared/app-table-config";
 import { PcisQueryService } from "@/views/payinfoManagement/service/pcis-query-service";
 import { defineEmits, onMounted } from "vue";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { getListByCode } from '@/api/code-list-service';
 // 引入 ConfigProvider 组件
 import { ElConfigProvider } from 'element-plus';
 import zhCn from "element-plus/es/locale/lang/zh-cn";
 import moment from "moment";
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
 
 const emits = defineEmits(["ok", "cancel"]);
 const pcisQueryService = new PcisQueryService();

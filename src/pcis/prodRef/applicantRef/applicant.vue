@@ -86,6 +86,7 @@ import { readFile } from "@/api/file";
 const tCertfDate = ref<any[]>([]);
 const  cWorkDptList =['310','320','330','340','350','360']  // 单位性质带企业的ID
 const maindialogVisible = ref(false) // ocr识别弹框打开
+const resetLogo =ref<any>(false);   // 重置标识
 
 onMounted(() => {
   const formconfig11 = formInit(
@@ -246,12 +247,13 @@ const idAnalysis = (id:string)=>{
     // 防抖定时器
 let debounceTimer = <any>null ;
 
+
 //  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
 const checkUser = () => {
       const fieldsToValidate = ['Applicant.cAppNme', 'Applicant.cClntMrk',"Applicant.cCertfCde","Applicant.cCertfCls"];
       
       // 自定义录单 方案配置 模版 进入 可以查询用户信息  
-      if (param.pageType !== "app" &&  param.pageType !== "copy" && param.pageType !== "template" && param.cAppStatus !=='1') {
+      if ( !resetLogo.value &&  (param.pageType !== "app" &&  param.pageType !== "copy" && param.pageType !== "template" && param.cAppStatus !=='1') ) {
           return false;
         }
       if (debounceTimer) {
@@ -390,7 +392,7 @@ const method = {
         disabled: false,
       });
     }
-
+    resetLogo.value = true;
     tCertfDate.value = [];
     tabref["applicant"].setFormValue(applicantValue);
   },

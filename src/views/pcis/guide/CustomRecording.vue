@@ -452,6 +452,9 @@ const getCDptCdeList = (data: any)=> {
                 value: item.cDptCde,
                 label: item.cDptCnm,
             }));
+          // 清空已选择的承保机构
+          formconfig1.value.cDptCde = "";
+          formconfig1.value.cDptCnm = "";
         }
         cDptCdeLoading.value = false;
     }).catch(err => console.error(err));
@@ -751,7 +754,12 @@ function getProtocolNumber (){
     .open(protocolNumberInfo, { type: "Issuer", data: {} })
     .then((res: any) => {
       if (res.type === "ok") {
-				const selectedTerm = res.body;
+        const selectedTerm = res.body;
+        // nRecRemPrm 剩余保费   nRecRemEstAmt 剩余保额
+        if(selectedTerm.nRecRemPrm <= 0 || selectedTerm.nRecRemEstAmt <= 0 ){
+          ElMessage.warning("该协议剩余预收保费不足,请重新选择协议！");
+          return false
+        }
         formconfig1.value.cEcAgrNo = selectedTerm.cEcAgrNo; // 协议号
         formconfig1.value.dptCde = selectedTerm.cDptRelCde; // 分公司编码
         formconfig1.value.cDptCnm = selectedTerm.cDptCnm; // 机构名称

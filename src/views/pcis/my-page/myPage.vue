@@ -228,10 +228,15 @@
             ><span class="publicStyle">{{ nPrm.toLocaleString() }}</span
             >&nbsp;<span class="font-weight-500">元</span>&nbsp;
 						<template v-if="props.param?.cRecordType === 9 || props.param.cPolicySource == 9">
-							|&nbsp;<span class="font-weight-500">剩余预收保费: </span
+							|&nbsp;<span class="font-weight-500">协议剩余预收保费: </span
 							><span class="publicStyle">{{ nRecRemPrm.toLocaleString() }}</span
 							>&nbsp;<span class="font-weight-500">元</span>
 						</template>
+            <template v-if="props.param?.cRecordType === 9 || props.param.cPolicySource == 9">
+              |&nbsp;<span class="font-weight-500">协议剩余保额: </span
+            ><span class="publicStyle">{{ nRecRemEstAmt.toLocaleString() }}</span
+            >&nbsp;<span class="font-weight-500">元</span>
+            </template>
           </div>
         </div>
         <div class="main-content" @scroll="handleScroll">
@@ -291,7 +296,7 @@
                 :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
                 :pageSchema="k.pageSchema"
                 :compKey="k.pageCode"
-           
+
               />
             </div>
           </template>
@@ -586,7 +591,8 @@ const props:any = defineProps({
 
 onBeforeMount(() => {
   // onMounted() 之前
-  nRecRemPrm.value = props.param?.nRecRemPrm
+  nRecRemPrm.value = props.param?.nRecRemPrm || "0.00"
+  nRecRemEstAmt.value = props.param?.nRecRemEstAmt || "0.00"
   opertaor.setParam(props.param);
 });
 
@@ -610,7 +616,9 @@ const userString = sessionStorage.getItem("user");
 const user = userString ? JSON.parse(userString) : {};
 const nAmt = ref("0.00");
 const nPrm = ref("0.00");
+// nRecRemPrm 剩余保费 nRecRemEstAmt 剩余保额
 const nRecRemPrm = ref("0.00");
+const nRecRemEstAmt = ref("0.00");
 const tmDay = ref(0);
 const dzmodal = useDzModal();
 const cacheKey = ref();
@@ -1420,8 +1428,9 @@ async function loadAfter() {
 							}
 						});
 					}
-					nRecRemPrm.value = res.data.policyApplication.nRecRemPrm 
-				}
+					nRecRemPrm.value = res.data.policyApplication.nRecRemPrm
+          nRecRemEstAmt.value = res.data.policyApplication.nRecRemEstAmt
+        }
 			} else {
 				ElMessage.error({ message: res.msg, duration: 3000 });
 				return false;
@@ -2874,7 +2883,7 @@ function checkShow(k:any){
 const submitToUndrFn = async () => {
   // 协议出单剩余预收保费校验
   if(props.param?.cRecordType === 9 || props.param.cPolicySource == 9){
-    if(Number(nRecRemPrm.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
+    if(Number(nRecRemPrm.value) <= 0 || Number(nRecRemEstAmt.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
       ElMessage.error("协议剩余预收保费不足");
       return;
     }
@@ -3879,7 +3888,7 @@ const getSurrenderPrecisFun = () => {
 const submitEdrToUndrSurrender = async () => {
   // 协议出单剩余预收保费校验
   if(props.param?.cRecordType === 9 || props.param.cPolicySource == 9){
-    if(Number(nRecRemPrm.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
+    if(Number(nRecRemPrm.value) <= 0 || Number(nRecRemEstAmt.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
       ElMessage.error("协议剩余预收保费不足");
       return;
     }
@@ -4142,7 +4151,7 @@ const generateEndorse = async () => {
 const submitEdrToUndrFun = async () => {
 // 协议出单剩余预收保费校验
   if(props.param?.cRecordType === 9 || props.param.cPolicySource == 9){
-    if(Number(nRecRemPrm.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
+    if(Number(nRecRemPrm.value) <= 0 || Number(nRecRemEstAmt.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
       ElMessage.error("协议剩余预收保费不足");
       return;
     }
