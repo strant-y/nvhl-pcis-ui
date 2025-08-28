@@ -27,7 +27,7 @@ import cargoApi from "@/api/cargo";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 import { createFreeButtonBase } from "@/shared/button-config";
 const policyService = new PolicyService();
-
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
