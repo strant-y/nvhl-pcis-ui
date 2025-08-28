@@ -23,12 +23,7 @@ import {
 import { getPageList } from "@/api/prod";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
 import { codeListViewStore } from "@/store";
-import { rsaEncoder } from "@/utils/encipher";
 const codeListStore = codeListViewStore();
 const { getRules } = useValidator();
 const props = defineProps({

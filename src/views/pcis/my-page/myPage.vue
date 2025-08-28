@@ -228,10 +228,15 @@
             ><span class="publicStyle">{{ nPrm.toLocaleString() }}</span
             >&nbsp;<span class="font-weight-500">元</span>&nbsp;
 						<template v-if="props.param?.cRecordType === 9 || props.param.cPolicySource == 9">
-							|&nbsp;<span class="font-weight-500">剩余预收保费: </span
+							|&nbsp;<span class="font-weight-500">协议剩余预收保费: </span
 							><span class="publicStyle">{{ nRecRemPrm.toLocaleString() }}</span
 							>&nbsp;<span class="font-weight-500">元</span>
 						</template>
+            <template v-if="props.param?.cRecordType === 9 || props.param.cPolicySource == 9">
+              |&nbsp;<span class="font-weight-500">协议剩余保额: </span
+            ><span class="publicStyle">{{ nRecRemEstAmt.toLocaleString() }}</span
+            >&nbsp;<span class="font-weight-500">元</span>
+            </template>
           </div>
         </div>
         <div class="main-content" @scroll="handleScroll">
@@ -444,7 +449,7 @@ import {
   queryTermRateLimit,
 	queryEcargoRelevancePolicyDetails
 } from "../../../api/query/index";
-import { checkFeeWindowType, selectDist, getReleaseInquiryPage, copyDist } from "@/api/prod";
+import { checkFeeWindowType, selectDist, getReleaseInquiryPage, copyDist, checkoutn } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
 import moment from "moment";
 import {numAdd} from "@/utils/Math";
@@ -586,7 +591,8 @@ const props:any = defineProps({
 
 onBeforeMount(() => {
   // onMounted() 之前
-  nRecRemPrm.value = props.param?.nRecRemPrm
+  nRecRemPrm.value = props.param?.nRecRemPrm || "0.00"
+  nRecRemEstAmt.value = props.param?.nRecRemEstAmt || "0.00"
   opertaor.setParam(props.param);
 });
 
@@ -610,7 +616,9 @@ const userString = sessionStorage.getItem("user");
 const user = userString ? JSON.parse(userString) : {};
 const nAmt = ref("0.00");
 const nPrm = ref("0.00");
+// nRecRemPrm 剩余保费 nRecRemEstAmt 剩余保额
 const nRecRemPrm = ref("0.00");
+const nRecRemEstAmt = ref("0.00");
 const tmDay = ref(0);
 const dzmodal = useDzModal();
 const cacheKey = ref();
@@ -1420,8 +1428,9 @@ async function loadAfter() {
 							}
 						});
 					}
-					nRecRemPrm.value = res.data.policyApplication.nRecRemPrm 
-				}
+					nRecRemPrm.value = res.data.policyApplication.nRecRemPrm
+          nRecRemEstAmt.value = res.data.policyApplication.nRecRemEstAmt
+        }
 			} else {
 				ElMessage.error({ message: res.msg, duration: 3000 });
 				return false;
@@ -2208,6 +2217,7 @@ async function loadAfter() {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
+          ops.plyBase['Base.cAgriMrk'] = "2"// 涉农标志设置默认值
         }
         ops['plyBase']['Base.cPlyNo'] = ''
         ops['plyBase']['Base.cAppStatus'] = ''
@@ -2876,7 +2886,7 @@ const submitToUndrFn = async () => {
 
   // 协议出单剩余预收保费校验
   if(props.param?.cRecordType === 9 || props.param.cPolicySource == 9){
-    if(Number(nRecRemPrm.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
+    if(Number(nRecRemPrm.value) <= 0 || Number(nRecRemEstAmt.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
       ElMessage.error("协议剩余预收保费不足");
       return;
     }
@@ -3902,7 +3912,7 @@ const getSurrenderPrecisFun = () => {
 const submitEdrToUndrSurrender = async () => {
   // 协议出单剩余预收保费校验
   if(props.param?.cRecordType === 9 || props.param.cPolicySource == 9){
-    if(Number(nRecRemPrm.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
+    if(Number(nRecRemPrm.value) <= 0 || Number(nRecRemEstAmt.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
       ElMessage.error("协议剩余预收保费不足");
       return;
     }
@@ -4165,7 +4175,7 @@ const generateEndorse = async () => {
 const submitEdrToUndrFun = async () => {
 // 协议出单剩余预收保费校验
   if(props.param?.cRecordType === 9 || props.param.cPolicySource == 9){
-    if(Number(nRecRemPrm.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
+    if(Number(nRecRemPrm.value) <= 0 || Number(nRecRemEstAmt.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
       ElMessage.error("协议剩余预收保费不足");
       return;
     }
@@ -4364,6 +4374,15 @@ const submitUnderwritingFn = async () => {
 
   if(props.param?.pageName === "priceInquiry") {
     res["inquiryNo"] = props.param.cInquiryNo;
+  }
+  // 投保单核保同意提交前校验是否需要划分风险单位
+  if(res.cUndrMrk === "A" && props.param.pageName !== "priceInquiry" && props.param.cAppTyp !== "E") {
+    const checkoutnInfo:any = await checkoutn({ cAppNo: props.param.cAppNo });
+    if(checkoutnInfo?.code !== "1") {
+      ElMessage.error(checkoutnInfo.message);
+      btn.loading = false;
+      return
+    }
   }
   if(res.cUndrMrk === "A" && props.param?.cProdNo.slice(0,2) !== "04") {//核保选项为同意时(04产品核保同意直接走核保提交接口)
     const deductibleDist = opertaor.getTableRefByKey("deductibleDist")?.getTableData();

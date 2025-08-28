@@ -1562,3 +1562,12 @@ export function getDpt(queryParams: any): AxiosPromise<any> {
   return post(`/policy/getDpt`, queryParams);
 }
 
+/**
+ * 核保提交前校验是否需要划分风险单位
+ *
+ * @param queryParams
+ */
+export function checkoutn(queryParams: any): AxiosPromise<any> {
+  return post(`/reinsured/checkoutn`, queryParams);
+}
+
