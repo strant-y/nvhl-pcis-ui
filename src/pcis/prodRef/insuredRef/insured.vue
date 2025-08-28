@@ -1436,15 +1436,15 @@ function handleFileChange(event: Event) {
             );
             if (cardInfo["period_of_validity"]["value"]) {
               tCertfDate.value =
-                cardInfo["period_of_validity"]["value"].split("-");
+                cardInfo["period_of_validity"]["value"].split("-")?.map((item:any) => (item.replaceAll(".", "-")));
               setValue("Insured.cLongendTyp", "0");
               setValue(
                 "Insured.tCertfBgnDate",
-                cardInfo["period_of_validity"]["value"].split("-")[0] || null
+                cardInfo["period_of_validity"]["value"].split("-")[0]?.replaceAll(".", "-") || null
               );
               setValue(
                 "Insured.tCertfEndDate",
-                cardInfo["period_of_validity"]["value"].split("-")[1] || null
+                cardInfo["period_of_validity"]["value"].split("-")[1]?.replaceAll(".", "-") || null
               );
             }
             setValue("Insured.cCertfCls", "19");
