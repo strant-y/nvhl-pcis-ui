@@ -5,7 +5,7 @@ export class PcisQueryService {
     qryPolicyShortUrl = '/policy/getPolicyShortList';
     qryNotifyByReceiver = '/notify/getNotifyByReceiver';
     changeStatusUrl = 'notify/changeStatus'; 
-    qryNewUdrListUrl = 'underwriting/query/newUdrList';
+    qryNewUdrListUrl = 'task/getPendingTask';
     queryBackUdrListUrl = 'underwriting/query/backUdrList';
     qryAppPolicyUrl = 'policy/getAppPolicyList';
     
@@ -37,23 +37,65 @@ export class PcisQueryService {
     }
     
     /**
-     * 待核保查询，暂存查询
+     * 待核保查询-核保岗
      */
     getNewUdrList(ops: any) {
         return request.post(`${this.qryNewUdrListUrl}`, ops);
     }
-    
+
     /**
-     * 核保退回查询
+     * 暂存查询-核保岗
      */
-    getBackUdrList(ops: any) {
-        return request.post(`${this.queryBackUdrListUrl}`, ops);
+    getDraftTask(ops: any) {
+        return request.post(`task/getDraftTask`, ops);
     }
     
     /**
-     * 核保通过查询
+     * 核保退回查询-核保岗
      */
-    getAppPolicyList(ops: any): AxiosPromise<any> {
-        return request.post(`${this.qryAppPolicyUrl}`, ops);
+    getReturnedTask(ops: any) {
+        return request.post(`task/getReturnedTask`, ops);
+    }
+    
+    /**
+     * 核保通过查询-核保岗
+     */
+    getApprovedTask(ops: any): AxiosPromise<any> {
+        return request.post(`task/getApprovedTask`, ops);
+    }
+
+    /**
+     * 暂存任务-出单岗
+     */
+    selectDraftTask(ops: any) {
+        return request.post(`task/selectDraftTask`, ops);
+    }
+
+    /**
+     * 已提交任务-出单岗
+     */
+    selectSubmittedTask(ops: any) {
+        return request.post(`task/selectSubmittedTask`, ops);
+    }
+
+    /**
+     * 待修改任务-出单岗
+     */
+    selectPendingModificationTask(ops: any) {
+        return request.post(`task/selectPendingModificationTask`, ops);
+    }
+
+    /**
+     * 待缴费任务-出单岗
+     */
+    selectPendingPaymentTask(ops: any) {
+        return request.post(`task/selectPendingPaymentTask`, ops);
+    }
+
+    /**
+     * 待续保任务-出单岗
+     */
+    selectPendingRenewalTask(ops: any) {
+        return request.post(`task/selectPendingRenewalTask`, ops);
     }
 }
