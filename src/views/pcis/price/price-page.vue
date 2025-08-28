@@ -3901,6 +3901,7 @@ const saveEdrPlyInfo = async () => {
         }
       })
     }
+      sessionStorage.setItem("getAppPolicyData", JSON.stringify(ops));
 
   } else {
     ElMessage.error(edrInfo.msg);
