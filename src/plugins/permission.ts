@@ -2,7 +2,7 @@ import router from "@/router";
 import { useUserStore } from "@/store/modules/user";
 import { usePermissionStore } from "@/store/modules/permission";
 import NProgress from "@/utils/nprogress";
-import { codeListViewStore, useTagsViewStore } from "@/store";
+import {clearDataOpertaorByPageKey, codeListViewStore, useTagsViewStore} from "@/store";
 import { descryptParameterToQuery } from '@/utils/common'
 
 export function setupPermission() {
@@ -35,6 +35,10 @@ export function setupPermission() {
               next("/404");
             }
           } else {
+            const switchType = sessionStorage.getItem('switchType');
+            if(!switchType || switchType === 'push') {
+              clearDataOpertaorByPageKey(to.name);
+            }
             next();
           }
         } else {
@@ -112,6 +116,7 @@ export function setupPermission() {
       to.query = JMquery
       to.params = ParseParams
     }
+    sessionStorage.removeItem('switchType');
     NProgress.done();
   });
 

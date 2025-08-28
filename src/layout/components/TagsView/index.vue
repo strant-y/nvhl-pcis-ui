@@ -106,6 +106,10 @@ watch(contentMenuVisible, (value) => {
   }
 });
 
+watch(route, (newRoute) => {
+  tagsViewStore.addTagView(newRoute)
+});
+
 function toView(tag: TagView) {
   if(tag.keepAlive) {
     router.replace({ path: tag.path, query: tag.query})
@@ -194,10 +198,8 @@ function refreshSelectedTag(view: TagView) {
 
 const toLastView = (visitedViews: TagView[], view?: TagView) => {
   const latestView = visitedViews.slice(-1)[0];
-  if(latestView.keepAlive) {
+  if(latestView && latestView.path) {
     toView(latestView);
-  } else if (latestView && latestView.fullPath) {
-    router.push(latestView.fullPath);
   } else {
     // now the default is to redirect to the home page if there is no tags-view,
     // you can adjust it according to your needs.
@@ -341,7 +343,7 @@ eventBus.on('closeSelectedTag', (view: TagView) => {
 });
 onMounted(() => {
   initTags();
-  nextTick(()=>{
+  nextTick(() => {
     tagsViewStore.addTagView(route)
   })
 });
