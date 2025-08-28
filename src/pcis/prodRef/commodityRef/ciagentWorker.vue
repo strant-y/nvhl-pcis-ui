@@ -18,13 +18,9 @@ import {
 } from "@/shared/app-table-config";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
-import { getBsnsTypList, getChaTypeList, getChaSubtypList, getPageList } from "@/api/code-list-service";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
+
 const policyService = new PolicyService();
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
-const { getRules } = useValidator();
 import { useRoute } from "vue-router";
 const route = useRoute();
 const routeParam = route.params.param;
