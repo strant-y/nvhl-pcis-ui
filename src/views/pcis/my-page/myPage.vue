@@ -2207,6 +2207,7 @@ async function loadAfter() {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
+          ops.plyBase['Base.cAgriMrk'] = "2"// 涉农标志设置默认值
         }
         ops['plyBase']['Base.cPlyNo'] = ''
         ops['plyBase']['Base.cAppStatus'] = ''
