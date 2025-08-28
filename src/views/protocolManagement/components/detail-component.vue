@@ -117,6 +117,7 @@
           />
         </div>
           <template v-for="(pageConfig, v) in formPage.config" :key="v">
+
             <div
                 class="card_"
                 v-for="(k, i) in pageConfig?.pageInfo"
@@ -124,6 +125,7 @@
                 :id="k.pageCode"
                 v-show="showComponent(k.pageKey, k.pageCode)"
             >
+                <!-- {{  k.pageCode}}   ||     {{ k.pageKey }} -->
               <component
                 :ref="(res: any) => {
                   formPage.setComponentRef(k.pageCode, res);

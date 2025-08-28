@@ -65,7 +65,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             {
                 prop: "CDptCde",
                 inputtype: "rtinput",
-                title: "机构部门1",
+                title: "机构部门",
                 disabled: true,
             },
             {

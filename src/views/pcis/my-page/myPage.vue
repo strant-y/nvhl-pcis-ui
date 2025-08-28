@@ -1990,6 +1990,7 @@ async function loadAfter() {
     );
   } else if (props.param?.pageType === "template") {
     policyService.getTemplate(props.param?.cPkId).then((res:any) => {
+      console.log('模版的数据',res)
       if (res["code"] == "200") {
         ElMessage.success('模板加载完成');
         const cTplCtnt = res['res'].cTplCtnt;
@@ -2849,6 +2850,7 @@ function checkShow(k:any){
  * 投保申请核保
  */
 const submitToUndrFn = async () => {
+
   // 协议出单剩余预收保费校验
   if(props.param?.cRecordType === 9 || props.param.cPolicySource == 9){
     if(Number(nRecRemPrm.value) <= 0 || Number(nRecRemEstAmt.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
@@ -3006,8 +3008,29 @@ const submitToUndrFn = async () => {
         return false;
       }
   }
-  adjustCiPremiumDifference()
 
+      // 缴费计划 付款人代码 名称为空处理
+    if(payList.length>0){
+       const applicantRef = opertaor.getTableRefByKey("applicant");
+        let setArr =  payList.map(item => {
+        const cPayorCde = (item['Pay.cPayorCde'] == null || item['Pay.cPayorCde'] === '' || item['Pay.cPayorCde'] === undefined)
+          ? applicantRef.getValue('Applicant.cAppCde')||''
+          : item['Pay.cPayorCde'];
+
+        const cPayorNme = ( item['Pay.cPayorNme'] == null ||  item['Pay.cPayorNme'] === ''|| item['Pay.cPayorCde'] === undefined)
+          ? applicantRef.getValue('Applicant.cAppNme')||''
+          :  item['Pay.cPayorNme'] ;
+        return {
+          ...item,
+          'Pay.cPayorCde':cPayorCde,
+          "Pay.cPayorNme" :cPayorNme
+           
+        };
+      });
+      opertaor.getTableRefByKey("payinfo").setFormValue(setArr); 
+    }
+
+  adjustCiPremiumDifference()
 
   // 电梯责任保险 每部电梯累计赔偿限额小于每部电梯每人赔偿限额时校验
   if(props.param?.cProdNo==='043001') {

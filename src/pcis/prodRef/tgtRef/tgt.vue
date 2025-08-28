@@ -665,6 +665,32 @@ const method = {
     console.log('触发12')
     setValue("Tgt.nSeatCapacity", Number(getValue("Tgt.nTotalInsured")) + Number(getValue("Tgt.nInsuredcompanySeats")))
   },
+
+  // 投保座位总数
+  nSeatCapacityChange:(val:any)=>{ 
+    // Term.nSeatTotal  Tgt.nTotalInsured  Term.nSeatTotal
+    console.log('val')
+        // //  if (cProdNo == "040002") {
+        //   const termref = opertaor.getTableRefByKey("cvrg");
+        // console.log('termref',termref)
+        // console.log('termref',termref.getFromValue())
+        //   interface Item {
+        //     nInsuredHeadcount?: number | null | string;
+        //   }
+        //   // const countNumber: number = (pageresult.list as Item[]).reduce((sum, item) => {
+        //   //   const value = Number(item['DistSummary.nInsuredHeadcount'] ?? 0);
+        //   //   return sum + (isNaN(value) ? 0 : value);
+        //   // }, 0);
+        //   // console.log('countNumber',countNumber)
+        //   termref?.setTermData({
+        //     termNo:'0420011602',
+        //     planNo:'P1',
+        //     factorProp: 'Term.nSeatTotal',
+        //   },123);   
+        // }
+    
+  },
+
   //是否单项工程change事件
   cIsSingleFunc: (val) => {
     if (val == '1') {
