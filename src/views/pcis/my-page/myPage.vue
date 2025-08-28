@@ -1439,41 +1439,11 @@ async function loadAfter() {
     nextTick(() => {
       opertaor.setDataAll(dataInit.value);
     });
-  } else if (props.param.pageType === "TEMPORARY_DEPOSIT" && props.param.cTransMrk !='1') {
+  } else if (props.param.pageType === "TEMPORARY_DEPOSIT" && props.param.cTransMrk !='1' && props.param.cAppTyp !== 'E') {
     // 暂存单
     const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
     await loadAppPlyInfo(cAppNo);
-    if (props.param.cAppTyp == "E") {
-      if (props.param.cEdrType == "1") {
-        bthList.value = edrBtn;
-        nextTick(() => {
-          opertaor.setDisabledAll();
-          getEdrRsnItemFun(
-            props.param["cProdNo"],
-            props.param["cDptCde"],
-            props.param["cEdrRsnBundleCde"],
-            props.param["cEdrRsnBundleCde"],
-            props.param["cEdrType"],
-            props.param["cGrpMrk"]
-          );
-
-          // 用于处理 账户信息
-          let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
-          if(acctinfoInfo){
-              acctinfoInfo.setDisabledAll(false);  
-              acctinfoInfo.setFormItem('Acctinfo.cAcctNme',{
-                disabled: true
-              })
-              acctinfoInfo.setFormItem('Acctinfo.cBankCnaps',{
-                disabled: true
-              })
-          }  
-        });
-        edritem.value?.handleQuery();
-      } else {
-        bthList.value = edrSurrenderBtn;
-      }
-    } else if (props.param.cAppTyp == "A") {
+    if (props.param.cAppTyp == "A") {
       bthList.value = basicBtn;
       rightBtnList.value = basicRightBtn;
 			if(props.param?.pageName === "priceInquiry") {
@@ -1492,9 +1462,6 @@ async function loadAfter() {
 				)
 			}
     }
-
-     
-
 
   } else if (props.param.pageType === "PLY_APP_MODIFY_BOUNCED_SCENE") {
     // 投保单核保退回
@@ -1676,8 +1643,8 @@ async function loadAfter() {
     // 批改申请-新增
     const cAppNo = props.param.cAppNo;
     await loadAppPlyInfo(cAppNo);
-    if (props.param.cEdrType == "1") {
-      if (props.param["cRsnCde"] != "FZ") {
+    if (props.param.cEdrType === "1") {
+      if (props.param["cRsnCde"] !== "FZ") {
         edrbase.value?.setValue("EdrBase.cEdrRsnDetail", [
           props.param["cRsnCde"],
         ]);
