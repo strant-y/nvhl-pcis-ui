@@ -61,7 +61,7 @@ const gridconfig = reactive<AppGridEditConfig>(
         type: "primary",
         func: function () {
           const prodInfo = opertaor?.getTableRefByKey("prodInfo");
-          const prodInfoData = prodInfo.getFromValue();
+          const prodInfoData = prodInfo?.getFromValue();
           const pages = gridEditRef.value?.getTableValue();
           if(pages.filter((item:any) => !item.cGrpMrk || !item.cPageNme).length > 0) {
             ElMessage.error("请先完善列表数据");
@@ -85,7 +85,7 @@ const gridconfig = reactive<AppGridEditConfig>(
         type: "primary",
         func: function () {
           const prodInfo = opertaor?.getTableRefByKey("prodInfo");
-          const prodInfoData = prodInfo.getFromValue();
+          const prodInfoData = prodInfo?.getFromValue();
           const r = gridEditRef.value?.getSelectRow();
           if (!r) {
             ElMessage.error("请选择一行数据");
@@ -108,7 +108,7 @@ const gridconfig = reactive<AppGridEditConfig>(
         type: "primary",
         func: function () {
           const prodInfo = opertaor?.getTableRefByKey("prodInfo");
-          const prodInfoData = prodInfo.getFromValue();
+          const prodInfoData = prodInfo?.getFromValue();
           const r = gridEditRef.value?.getSelectRow();
           if (!r) {
             ElMessage.error("请选择一行数据");

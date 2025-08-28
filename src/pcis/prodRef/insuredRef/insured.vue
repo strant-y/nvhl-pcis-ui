@@ -1029,9 +1029,9 @@ const method = {
       // });
 
       // 税务登记证号
-      // setFormItem("Insured.cTaxRegistrationNo", {
-      //     disabled: true,
-      // });
+      setFormItem("Insured.cTaxRegistrationNo", {
+          disabled: true,
+      });
       // 组织机构代码
       setFormItem("Insured.cOrganizationCode", {
           disabled: true,
