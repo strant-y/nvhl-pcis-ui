@@ -2462,12 +2462,15 @@ const saveDist = (appNo:any, cRsnCde?:any) => {
 const loadAppPlyInfo = async (CAppNo) => {
   const param = {
     scene: props.param.pageType,
+    cTransMrk:props.param.cTransMrk,
   };
-  if ("EDR_APP_NEW_SCENE" === props.param.pageType) {
+  if ("EDR_APP_NEW_SCENE" === props.param.pageType && props.param.cTransMrk != '1') {
     param["CPlyNo"] = CAppNo;
   } else if (props.param.pageName === "priceInquiry") {
     param["cInquiryNo"] = CAppNo;
-  }else{
+  } else if(props.param.cTransMrk === '1'){
+    param['CPlyNo'] = props.param.cPlyNo;
+  } else{
      param["cAppNo"] = CAppNo;
   }
   if(props.param?.cPkId) {// 查询模板明细
@@ -2560,6 +2563,10 @@ const loadAppPlyInfo = async (CAppNo) => {
     console.log("投保单明细", res);
     if (res["code"] == "200") {
       const ops = opertaor.convertData(res);
+      // 新增逻辑：如果是历史数据补全单，将Base.cAppNo设置为空
+      if (props.param.cTransMrk === '1' && ops.plyBase) {
+        ops.plyBase['Base.cAppNo'] = '';
+      }
     console.log("转换的数据", ops);
       if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
@@ -3316,7 +3323,11 @@ const savePlyInfo = async () => {
     btn.loading = false;
     return false;
   }
-
+  // 判断是否为历史补全保单 (cTransMrk === '1')
+  if (props.param.cTransMrk === '1') {
+    // 调用批单保存方法
+    return await saveEdrPlyInfo();
+  }
   console.log('res保存参数',res)
   const resInfo: any = props.param?.pageName === "priceInquiry" ? await saveInquiry(res) : await saveAppPlyInfo(res);
   console.log("saveAppPlyInfo-res", resInfo);
@@ -3943,36 +3954,58 @@ const submitEdrToUndrSurrender = async () => {
 const saveEdrState = ref(false);
 const saveEdrPlyInfo = async () => {
   let saveEdrFlag = false;
-  const btn = getBtn("saveEdr");
-  btn.loading = true;
-  const res = opertaor.getDataAll();
-  const dataALl = opertaor.getDataAll();
-  res["user"] = user;
-  res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
-  res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
-  res["EdrBase"] = edrbase.value?.getFromValue();
-  if (
-    res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
-    res["EdrBase"]["EdrBase.cEdrRsnDetail"] != "" &&
-    Array.isArray(res["EdrBase"]["EdrBase.cEdrRsnDetail"])
-  ) {
-    res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
-      res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
-  }
-  if(res['ci'] && res['ci'].length>0){
-    res['ci'].forEach((item:any)=>{
-      if(item['Ci.nCiShare']){
-        item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
-      }
-    })
-  }
-
-  console.log('333',opertaor.getDataAll())
-  //   btn.loading = false;
-  // return false;
-  // 点击保存之前的申请单号
-  const beforeSaveCappNo = res["EdrBase"]["EdrBase.cAppNo"];
-  const edrInfo: any = await saveEdrAppPlyInfo(res)
+  debugger
+  if(props.param.cTransMrk === '1'){
+    const res = opertaor.getDataAll();
+    const resParam = Object.assign(res,{'cTransMrk':'1'})
+    // const edrInfo: any = await saveEdrAppPlyInfo(resParam)
+    res["user"] = user;
+    res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
+    res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
+    // res["EdrBase"] = edrbase.value?.getFromValue();
+    // const beforeSaveCappNo = res["EdrBase"]["EdrBase.cAppNo"];
+    // if (
+    //   res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
+    //   res["EdrBase"]["EdrBase.cEdrRsnDetail"] != "" &&
+    //   Array.isArray(res["EdrBase"]["EdrBase.cEdrRsnDetail"])
+    // ) {
+    //   res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
+    //     res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+    // }
+    if(res['ci'] && res['ci'].length>0){
+      res['ci'].forEach((item:any)=>{
+        if(item['Ci.nCiShare']){
+          item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
+        }
+      })
+    }
+    const edrInfo: any = await saveEdrAppPlyInfo(resParam)
+  }else{
+    const btn = getBtn("saveEdr");
+    btn.loading = true;
+    const res = opertaor.getDataAll();
+    const dataALl = opertaor.getDataAll();
+    res["user"] = user;
+    res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
+    res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
+    res["EdrBase"] = edrbase.value?.getFromValue();
+    if (
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"] != "" &&
+      Array.isArray(res["EdrBase"]["EdrBase.cEdrRsnDetail"])
+    ) {
+      res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
+        res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+    }
+    if(res['ci'] && res['ci'].length>0){
+      res['ci'].forEach((item:any)=>{
+        if(item['Ci.nCiShare']){
+          item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
+        }
+      })
+    }
+    const beforeSaveCappNo = res["EdrBase"]["EdrBase.cAppNo"];
+      const edrInfo: any = await saveEdrAppPlyInfo(res)
   btn.loading = false;
   if(edrInfo["code"] == "200") {
     const ops = opertaor.convertData(edrInfo);
@@ -4028,12 +4061,20 @@ const saveEdrPlyInfo = async () => {
         }
       })
     }
-
        console.log('保存数据555',ops)
       sessionStorage.setItem("getAppPolicyData", JSON.stringify(ops));
   } else {
     ElMessage.error(edrInfo.msg);
   }
+  }
+  
+
+  console.log('333',opertaor.getDataAll())
+  //   btn.loading = false;
+  // return false;
+  // 点击保存之前的申请单号
+  
+
 
   return saveEdrFlag;
 };

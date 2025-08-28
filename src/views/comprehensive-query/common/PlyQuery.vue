@@ -569,7 +569,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   { label: "已做失效操作", value: "6" },
                   { label: "已提交未接收", value: "7" },
                   { label: "见费出单退回", value: "8" },
-                  { label: "历史数据补全单", value: "9" },
+                //   { label: "历史数据补全单", value: "9" },
               ],
           },
           {
@@ -686,6 +686,17 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               prop: "seeBilling",
               inputtype: "rtselect",
               title: "是否见费出单",
+              minWidth: 180,
+              clearable: true,
+              loadData: [
+                  { label: "是", value: "1" },
+                  { label: "否", value: "0" },
+              ],
+          },
+          {
+              prop: "cTransMrk",
+              inputtype: "rtselect",
+              title: "是否历史数据补全单",
               minWidth: 180,
               clearable: true,
               loadData: [
@@ -974,7 +985,7 @@ const esSearchColumns = [
         { label: "已做失效操作", value: "6" },
         { label: "已提交未接收", value: "7" },
         { label: "见费出单退回", value: "8" },
-        { label: "历史数据补全单", value: "9" },
+        // { label: "历史数据补全单", value: "9" },
     ],
     hideBtns: (row: any) => {
         if (
@@ -1038,7 +1049,7 @@ const normalQueryColumns = [
         { label: "已做失效操作", value: "6" },
         { label: "已提交未接收", value: "7" },
         { label: "见费出单退回", value: "8" },
-        { label: "历史数据补全单", value: "9" },
+        // { label: "历史数据补全单", value: "9" },
     ],
     hideBtns: (row: any) => {
         if (
