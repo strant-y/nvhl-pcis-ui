@@ -411,9 +411,10 @@ onMounted(() => {
         const termref = opertaor.getTableRefByKey('cvrg');
         const allPlans = termref.getPlanNo();   // 全部方案
 
-        // 取出父页面带来的已选方案
-        const added = props.data.addedPlans || [];
-        const nextIdx = added.length;           // 当前应该选第几个
+        // 从父页面表格中获取已添加的方案
+        const distTableRef = opertaor.getTableRefByKey(props.data.compKey);
+        const added = distTableRef?.getTableData()?.map(row => row['Dist.cPlanNo']).filter(Boolean) || [];
+        const nextIdx = added.length;  // 当前应该选第几个
 
         item.typeCode = null;
         item.loadData = allPlans.map((p: any, idx: number) => ({
