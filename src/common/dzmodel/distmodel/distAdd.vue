@@ -427,6 +427,7 @@ onMounted(() => {
   
   formconfig1.value.title = props.data.title;
   if (props.data.title == "编辑") {
+    setFormItem("Dist.nSeqNo", { disabled: true });
     setTimeout(() => {
       freeEditRef.value?.setFormValue(props.data.rowData);
     }, 100);
