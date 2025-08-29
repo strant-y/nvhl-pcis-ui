@@ -3520,6 +3520,13 @@ const calcPremiumEdr = () => {
         } else {
           nInsuranceAmount.push(item['Term.nInsuranceAmount'] || item['Term.nAccidentLimit'] || 0)
         }
+      } else if(props.param.cProdNo === "040011") {
+        // 040011 Term.limitUsageFlag值为"1"取每次事故赔偿限额，值为"0"取累计赔偿限额
+        if(item['Term.limitUsageFlag'] === "1") {
+          nInsuranceAmount.push(item['Term.nAccidentLimit'] || 0)
+        } else if(item['Term.limitUsageFlag'] === "0") {
+          nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
+        }
       } else {
         nInsuranceAmount.push(item['Term.nInsuranceAmount'] || item['Term.nAccidentLimit'] || 0)
       }
