@@ -183,6 +183,15 @@ watch(cvrg, (val) => {
     });
   }
 });
+watch(
+    () => pageresult.list,
+    (newVal: any) => {
+      if (newVal) {
+        console.log('发生变化了。。。',newVal)
+        eventBus.emit('goodsMxChange', newVal);
+      }
+    }
+);
 onMounted(async () => {
   // 初始化 cComponentTableValue
   cComponentTableValue = getCComponentTableValue();
@@ -436,10 +445,7 @@ const method = {
       ElMessage.error(err.msg);
     })
   },
-  // 投保座位总数
-  nSeatCapacityChange:(val:any)=>{
-    console.log('111',val)
-  },
+
 
   //  042003 根据电梯条数反
   funcdistadd: () => {

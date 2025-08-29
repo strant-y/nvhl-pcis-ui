@@ -76,6 +76,7 @@ import {
   createAppGridEditConfig,
 } from "@/shared/app-grid-edit-config";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import {dataParam} from "@/store/modules/dataParam";
 const { getRules } = useValidator();
 const dzmodal = useDzModal();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
@@ -97,7 +98,13 @@ const reviewInfoRef = ref(null);
 const policyService = new PolicyService();
 // 当前加载的组件索引
 const currentIndex = ref(0);
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+
+const route = useRoute();
+const idxParam: IdxParamProps = {
+  opertaorProps: { id: route.name },
+  // handleAnchorClick: handleAnchorClick,
+};
+provide(idxParamKey, idxParam);
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const formconfig2 = opertaor.getTableConfig();
 const payinfoEditRef = ref<AppGridEditMethod | null>(null);

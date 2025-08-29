@@ -11,28 +11,46 @@
       <!-- policyInfo 列的具名插槽 -->
        <template #column-policyInfo="{ row, column, index }">
         <div class="policy-info-cell">
-          <div v-if="row.cAppNo" class="policy-number-row">
+          <!-- 投保/批改-->
+          <template v-if="cAppType !== 'I'">
+            <div v-if="row.cAppNo" class="policy-number-row">
             <span v-html="row.cAppNo"></span>
-            <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
-              <DocumentCopy />
-            </el-icon>
-          </div>
-          <div v-if="row.cPlyNo" class="policy-number-row">
-            <span v-html="row.cPlyNo"></span>
-            <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
-              <DocumentCopy />
-            </el-icon>
-          </div>
+                <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
+                    <DocumentCopy />
+                </el-icon>
+            </div>
+            <div v-if="row.cPlyNo" class="policy-number-row">
+                <span v-html="row.cPlyNo"></span>
+                <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
+                   <DocumentCopy />
+                </el-icon>
+            </div>
+          </template>
+          <!-- 询价 -->
+          <template v-else>
+            <div v-if="row.cAppNo" class="policy-number-row">
+                <span v-html="row.cAppNo"></span>
+                <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
+                    <DocumentCopy />
+                </el-icon>
+            </div>
+            <div v-if="row.cInquiryNo" class="policy-number-row">
+                <span v-html="row.cInquiryNo"></span>
+                <el-icon class="copy-icon" @click="copyText(row.cInquiryNo)">
+                   <DocumentCopy />
+                </el-icon>
+            </div>
+            </template>
         </div>
       </template>
 
       <template #column-InsurancePeriod="{ row, column, index }">
         <div class="policy-info-cell">
           <div v-if="row.tInsrncBgnTm" class="policy-period-row">
-            <span>{{ row.tInsrncBgnTm }}</span>
+            <span v-html="row.tInsrncBgnTm"></span>
           </div>
           <div v-if="row.tInsrncEndTm" class="policy-period-row">
-            <span>{{ row.tInsrncEndTm }}</span>
+            <span v-html="row.tInsrncEndTm"></span>
           </div>
         </div>
       </template>
@@ -52,6 +70,33 @@
       </template>
       <template #column-tUdrTm="{ row }">
         <span v-html="row.tUdrTm || ''"></span>
+      </template>
+      <template #column-tIssueTm="{ row }">
+        <span v-html="row.tIssueTm || ''"></span>
+      </template>
+      <template #column-nEdrPrjNo="{ row }">
+        <span v-html="row.nEdrPrjNo || ''"></span>
+      </template>
+      <template #column-cDptCnm="{ row }">
+        <span v-html="row.cDptCnm || ''"></span>
+      </template>
+      <template #column-cProdNmeCn="{ row }">
+        <span v-html="row.cProdNmeCn || ''"></span>
+      </template>
+      <template #column-cSecondDptCnm="{ row }">
+        <span v-html="row.cSecondDptCnm || ''"></span>
+      </template>
+      <template #column-cTermNme="{ row }">
+        <span v-html="row.cTermNme || ''"></span>
+      </template>
+      <template #column-nAmt="{ row }">
+        <span v-html="row.nAmt || ''"></span>
+      </template>
+      <template #column-nPrm="{ row }">
+        <span v-html="row.nPrm || ''"></span>
+      </template>
+      <template #column-cUdrNme="{ row }">
+        <span v-html="row.cUdrNme || ''"></span>
       </template>
     </app-table>
   </div>
@@ -126,8 +171,16 @@ const props = defineProps({
 });
 const homeJumpData = ref({}); //接收首页的参数，用于查询条件回显
 const queryType = ref("1");
+const cAppType = ref("A");
 import { FIELD_MAP } from '@/constants/fieldMaps';
 const cPard = ref(null);
+
+watch(() => {
+  const freeEditRefs = freeEditRef.value;
+  return freeEditRefs?.getFromValue()?.cAppTyp;
+}, (newVal) => {
+  updatePolicyInfoTitle(newVal);
+}, { immediate: false });
 
 function extractCode(str:string) {
   // 匹配 "P+数字" 或 "纯数字"
@@ -429,18 +482,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               },
           },
           {
-             prop: "prodCNmeCn",
-             inputtype: "rtselect",
-             title: "产品名称",
-             typeCode: "PROD_LIST_GRT",
-             params: {
-                cParCde: "",
-                cOperId: user.value.opCde,
-                cDptCde: user.value.companyId,
-             },
-             clearable: true,
-          },
-          {
               prop: "cProdNo",
               inputtype: "rtselect",
               title: "条款名称",
@@ -481,6 +522,18 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               },
           },
           {
+             prop: "prodCNmeCn",
+             inputtype: "rtselect",
+             title: "产品名称",
+             typeCode: "PROD_LIST_GRT",
+             params: {
+                cParCde: "",
+                cOperId: user.value.opCde,
+                cDptCde: user.value.companyId,
+             },
+             clearable: true,
+          },
+          {
               prop: "cAppNo",
               inputtype: "rtinput",
               title: "询价/投保/批改申请单号",
@@ -497,7 +550,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               inputtype: "rtselect",
               title: "任务类型",
               minWidth: 180,
-              clearable: true,
               loadData: [
                   { label: "投保", value: "A" },
                   { label: "批改", value: "E" },
@@ -776,28 +828,14 @@ const normalQueryColumns = [
         prop: "policyInfo",
         inputtype: "rtinput",
         title: "申请单号/保单号",
-        minWidth: 180,
+        minWidth: 250,
         fixed: "left",
         slotName: "policyInfo"
     },
     {
-        prop: "cAppNo",
+        prop: "cEdrNo",
         inputtype: "rtinput",
-        title: "申请单号",
-        minWidth: 180,
-        isShow:false
-    },
-    {
-        prop: "cPlyNo",
-        inputtype: "rtinput",
-        title: "保单号",
-        minWidth: 180,
-        isShow:false
-    },
-    {
-        prop: "cPlyAppNo",
-        inputtype: "rtinput",
-        title: "批改申请单号/批单号",
+        title: "批单号",
         minWidth: 180,
     },
     {
@@ -805,42 +843,49 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "分公司",
         minWidth: 150,
+        slotName: "cSecondDptCnm"
     },
     {
         prop: "cDptCnm",
         inputtype: "rtinput",
         title: "承保机构",
         maxWidth: 280,
+        slotName: "cDptCnm"
     },
     {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
         minWidth: 180,
+        slotName: "cAppNme"
     },
     {
         prop: "cInsuredNme",
         inputtype: "rtinput",
         title: "被保人名称",
         minWidth: 180,
+        slotName: "cInsuredNme"
     },
     {
         prop: "cProdNmeCn",
         inputtype: "rtinput",
         title: "产品名称",
         minWidth: 180,
+        slotName: "cProdNmeCn"
     },
     {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
         minWidth: 180,
+        slotName: "cTermNme"
     },
     {
         prop: "nAmt",
         inputtype: "rtinput",
         title: "保额",
         minWidth: 100,
+        slotName: "nAmt"
     },
     {
         prop: "nPrm",
@@ -848,12 +893,15 @@ const normalQueryColumns = [
         title: "保费",
         minWidth: 100,
         prefix: "¥ ",
+        slotName: "nPrm"
     },
     {
         prop: "tIssueTm",
         inputtype: "rtinput",
         title: "签单日期",
         minWidth: 180,
+        sortable: true,
+        slotName: "tIssueTm"
     },
     {
         prop: "InsurancePeriod",
@@ -873,6 +921,8 @@ const normalQueryColumns = [
             { label: "核保退回/撤回", value: "3" },
             { label: "已核待缴费", value: "4" },
             { label: "已出单", value: "5" },
+            { label: "已做失效操作", value: "6" },
+            { label: "已提交未接收", value: "7" },
             { label: "见费出单退回", value: "8" },
         ],
         hideBtns: (row: any) => {
@@ -892,27 +942,28 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "批改序号",
         maxWidth: 120,
+        slotName: "nEdrPrjNo"
     },
     {
-        prop: "cRsnCde",  // CEdrRsnDetail 批改原因 
-        inputtype: "rtinput",
-        title: "批改原因",
+        prop: "cRsnCde",
+        inputtype: "rtselect",
+        title: " 批改原因",
         minWidth: 180,
+        typeCode: "EDR_RSN_LIST_KIND",
     }
 ]
-
 // 扩展列（仅用于变更列弹窗，默认未勾选）
 const extendColumns = [
   { prop: 'cCiMrk', inputtype: "rtinput", title: '共保类型', minWidth: 180, optional: true },
-  { prop: 'tCrtTm', inputtype: "rtinput", title: '申请日期', minWidth: 180, optional: true },
-  { prop: 'tUdrTm', inputtype: "rtinput", title: '核保日期', minWidth: 180, optional: true },
+  { prop: 'tCrtTm', inputtype: "rtinput", title: '申请日期', minWidth: 180, optional: true, sortable: true},
+  { prop: 'tUdrTm', inputtype: "rtinput", title: '核保日期', minWidth: 160, optional: true, sortable: true, slotName: "tUdrTm" },
   { prop: 'cPrjCtgTyp', inputtype: "rtinput", title: '项目大类', minWidth: 180, optional: true },
   { prop: 'cPrjCtgMidTyp', inputtype: "rtinput", title: '项目中类', minWidth: 180, optional: true },
   { prop: 'cPrjCtgSubTyp', inputtype: "rtinput", title: '项目子类', minWidth: 180, optional: true },
   { prop: 'nInsuranceVariation', inputtype: "rtinput", title: '保额变化量', minWidth: 180, optional: true },
   { prop: 'nPremiumVariation', inputtype: "rtinput", title: '保费变化量', minWidth: 180, optional: true },
   { prop: 'cOprCde', inputtype: "rtinput", title: '录单员', minWidth: 180, optional: true },
-  { prop: 'cUdrNme', inputtype: "rtinput", title: '核保人', minWidth: 180, optional: true },
+  { prop: 'cUdrNme', inputtype: "rtinput", title: '核保人', minWidth: 180, optional: true, slotName: "cUdrNme"},
   { prop: 'cPrnNo', inputtype: "rtinput", title: '保批单印刷号', minWidth: 180, optional: true },
   { prop: 'InvoiceNum', inputtype: "rtinput", title: '保费发票号', minWidth: 180, optional: true },
 ];
@@ -920,7 +971,9 @@ const extendColumns = [
 const tableObj = {
     // 查询单 投保单 保单 批单
     notWaitObj: {
-        // 默认好像就2个不参与显示/隐藏
+        defaultSort: { prop: 'tIssueTm', order: 'descending' },
+        defaultSort: { prop: 'tCrtTm', order: 'descending' },
+        defaultSort: { prop: 'tUdrTm', order: 'descending' },
         tableBtnType: "btn",
         tableBtnWidth: 200,
         tableBtnPosition: "right",
@@ -1183,6 +1236,7 @@ async function handleQuery(flag?: boolean, isEs = false) {
   const freeEditRefs = freeEditRef.value;
   const s = freeEditRefs.getFromValue();
   const appType = s.cAppTyp || 'A';
+  cAppType.value = appType;
 
   if (appType === 'I') {
     await queryI(flag, isEs);
@@ -1433,16 +1487,20 @@ async function queryI(flag?: boolean, isEs = false) {
 
 // 把原始列 + 扩展列 合并成弹窗需要的数据
 function buildAllCheckboxData() {
+    // 获取当前表格的实际列配置
+    const currentColumns = tableconfig.fromSchema || [];
+    const currentProps = currentColumns.map(col => col.prop);
+
     const all = [
         ...normalQueryColumns.map(col => ({
             label: col.title,
             value: col.prop,
-            checked: userAllCheckedColumns.value.includes(col.prop),
+            checked: currentProps.includes(col.prop) || userAllCheckedColumns.value.includes(col.prop),
         })),
         ...extendColumns.map(col => ({
             label: col.title,
             value: col.prop,
-            checked: userAllCheckedColumns.value.includes(col.prop),
+            checked: currentProps.includes(col.prop) || userAllCheckedColumns.value.includes(col.prop),
         }))
     ];
     return all;
@@ -1469,6 +1527,20 @@ async function loadUserColumns() {
     const defaultChecked = normalQueryColumns.map(c => c.prop);
     userAllCheckedColumns.value = defaultChecked;
     return defaultChecked;
+}
+
+// 更新表格第一列标题
+function updatePolicyInfoTitle(cAppTyp: string) {
+  const targetColumn = tableconfig.fromSchema?.find(col => col.prop == 'policyInfo');
+  cAppType.value = cAppTyp;
+
+  if (targetColumn) {
+    if (cAppTyp === 'I') {
+      targetColumn.title = '询价申请单号/询价单号';
+    } else {
+      targetColumn.title = '申请单号/保单号';
+    }
+  }
 }
 
 // 多选事件
@@ -1601,6 +1673,18 @@ function applyCheckedColumns(props: string[]) {
         ...normalQueryColumns.filter(col => props.includes(col.prop)),
         ...extendColumns.filter(col => props.includes(col.prop))
     ];
+
+    // 更新第一列标题
+    const policyInfoCol = finalColumns.find(col => col.prop === 'policyInfo');
+    if (policyInfoCol) {
+      const currentAppType = freeEditRef.value?.getFromValue()?.cAppTyp;
+      if (currentAppType === 'I') {
+        policyInfoCol.title = '询价申请单号/询价单号';
+      } else {
+        policyInfoCol.title = '申请单号/保单号';
+      }
+    }
+    
     const newConfig = {
         ...tableObj.notWaitObj,
         fromSchema: finalColumns

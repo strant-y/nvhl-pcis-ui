@@ -19,9 +19,6 @@ import { productListA,productListB,productListC } from "./productList";
 const wagesInfo = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/wages-info-model.vue")
 );
-const countryInfo = defineAsyncComponent(
-  () => import("@/views/comprehensive-query/modal/country-info-modal.vue")
-);
 const surveyInfo = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/survey-info-modal.vue")
 );
@@ -39,7 +36,7 @@ import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useI
 
 const codeListStore = codeListViewStore();
 import { distRequiredMap } from '@/views/pcis/my-page/requiredDistMap';
-
+import {eventBus} from "@/utils/event-bus";
 const route = useRoute();
 const query = ref(route.query);
 const router = useRouter();
@@ -161,6 +158,7 @@ onMounted(async () => {
   });
   selectType()
   nextTick(()=>{
+    eventBus.on('goodsMxChange', handelGoodsMx);
     if(!getValue('Tgt.cDispatchDetail')){
       setFormItem('Tgt.cDispatchDetail',{disabled:true})
     }else {
@@ -183,6 +181,28 @@ onMounted(async () => {
     }
   })
 });
+const handelGoodsMx = (val:any)=>{
+  console.log(val)
+  if(val.length > 0 ){
+    setValue('Tgt.cGoodsNo',val.map(obj => obj['Dist.cGoodsNo']).join(','))
+    setValue('Tgt.nGoodsNum',val.reduce((sum, obj) => sum + (obj['Dist.nNum'] || 0), 0))
+    setValue('Tgt.nInvoicceValue',val.reduce((sum, obj) => sum + (obj['Dist.nInvoiceValue'] || 0), 0))
+    setValue('Tgt.nAdditiveCoefficient',val[0]['Dist.nAdditiveCoefficient'])
+    setValue('Tgt.cTradeNum',val[0]['Dist.cTradeNum'])
+    setValue('Tgt.cInvoiceNum',val[0]['Dist.cInvoiceNum'])
+    // setValue('Tgt.cLadingNum',val[0]['Dist.cInvoiceNum'])
+    setValue('Tgt.cCreditNum',val[0]['Dist.cLetterNum'])
+  }else {
+    setValue('Tgt.cGoodsNo','')
+    setValue('Tgt.nGoodsNum','')
+    setValue('Tgt.nInvoicceValue','')
+    setValue('Tgt.nAdditiveCoefficient','')
+    setValue('Tgt.cTradeNum','')
+    setValue('Tgt.cInvoiceNum','')
+    // setValue('Tgt.cLadingNum',val[0]['Dist.cInvoiceNum'])
+    setValue('Tgt.cCreditNum','')
+  }
+}
 const selectType = ()=>{
   if(productListA.value.includes(params.cProdNo)){
     whichType.value = 'A'
@@ -668,6 +688,32 @@ const method = {
     console.log('触发12')
     setValue("Tgt.nSeatCapacity", Number(getValue("Tgt.nTotalInsured")) + Number(getValue("Tgt.nInsuredcompanySeats")))
   },
+
+  // 投保座位总数
+  nSeatCapacityChange:(val:any)=>{ 
+    // Term.nSeatTotal  Tgt.nTotalInsured  Term.nSeatTotal
+    console.log('val')
+        // //  if (cProdNo == "040002") {
+        //   const termref = opertaor.getTableRefByKey("cvrg");
+        // console.log('termref',termref)
+        // console.log('termref',termref.getFromValue())
+        //   interface Item {
+        //     nInsuredHeadcount?: number | null | string;
+        //   }
+        //   // const countNumber: number = (pageresult.list as Item[]).reduce((sum, item) => {
+        //   //   const value = Number(item['DistSummary.nInsuredHeadcount'] ?? 0);
+        //   //   return sum + (isNaN(value) ? 0 : value);
+        //   // }, 0);
+        //   // console.log('countNumber',countNumber)
+        //   termref?.setTermData({
+        //     termNo:'0420011602',
+        //     planNo:'P1',
+        //     factorProp: 'Term.nSeatTotal',
+        //   },123);   
+        // }
+    
+  },
+
   //是否单项工程change事件
   cIsSingleFunc: (val) => {
     if (val == '1') {
@@ -968,171 +1014,294 @@ const method = {
 
   // 起运港国家 弹框
   countryFun: () => {
-    dzmodal.open(countryInfo, { type: "departure", data: {whichType:whichType.value } }).then((res: any) => {
-      if (res.type === "ok") {
-        // setFormItem('Tgt.nTotalSalary',
-        // setValue("Tgt.cDeparturePortCountry",res.body.countryCn)
-        // setValue("Tgt.cDeparturePortProvince",res.body.portCn)
-        // setValue("Tgt.cDeparturePort",res.body.countryCn +'/'+  res.body.portCn)
-        setFormItem('Tgt.cDeparturePort',{disabled:false})
-        if(res.body.cType === '1'){
-          setValue("Tgt.cDeparturePortCountry", res.body.cCountryEn);
-          setValue("Tgt.cDeparturePortProvince", res.body.cPortEn);
-          setValue("Tgt.cDeparturePort",res.body.cPortEn + ','+ res.body.cCountryEn );
-        }else{
-          setValue("Tgt.cDeparturePortCountry", res.body.cCountryEn);
-          setValue("Tgt.cDeparturePortProvince", res.body.cAirportEn);
-          setValue("Tgt.cDeparturePort", res.body.cAirportEn +','+ res.body.cCountryEn );
-        }
-      }
-    });
+    dialog.value?.open(
+        "countryInfoModal",
+        { type: "departure", data: {whichType:whichType.value } },
+        {
+          isOk: (res: any) => {
+            setFormItem('Tgt.cDeparturePort',{disabled:false})
+            if(res.cType === '1'){
+              if(res.isCN){
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cDeparturePortCountry", res.cCountryCn);
+                  setValue("Tgt.cDeparturePortProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
+                  setValue("Tgt.cDeparturePort",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                }else {
+                  setValue("Tgt.cDeparturePortCountry", res.cCountryCn);
+                  setValue("Tgt.cDeparturePortProvince", res.cCity);
+                  setValue("Tgt.cDeparturePort",res.cCity + ',' + res.cCountryCn);
+                }
+              }
+            }else{
+              if(res.isCN){
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cDeparturePortCountry", res.cCountryCn);
+                  setValue("Tgt.cDeparturePortProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
+                  setValue("Tgt.cDeparturePort",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                }else {
+                  setValue("Tgt.cDeparturePortCountry", res.cCountryCn);
+                  setValue("Tgt.cDeparturePortProvince", res.cAirportCity);
+                  setValue("Tgt.cDeparturePort",res.cAirportCity + ',' + res.cCountryCn);
+                }
+              }
+            }
+          },
+        },
+        { width: "80" }
+    );
   },
   // 中转地国家 按钮
   cTransitCountryFun: () => {
-    dzmodal.open(countryInfo, { type: "departure", data: {whichType:whichType.value } }).then((res: any) => {
-
-      if (res.type === "ok") {
-        // setValue("Tgt.cTransitCountry", res.body.countryCn);
-        // setValue("Tgt.cTransitProvince", res.body.portCn);
-        // setValue("Tgt.cTransitDetail", res.body.countryCn + '/' + res.body.portCn);
-
-        setFormItem('Tgt.cTransitDetail',{disabled:false})
-        if(res.body.cType === '1'){
-          setValue("Tgt.cTransitCountry", res.body.cCountryEn);
-          setValue("Tgt.cTransitProvince", res.body.cPortEn);
-          setValue("Tgt.cTransitDetail",res.body.cPortEn + ','+ res.body.cCountryEn );
-        }else{
-          setValue("Tgt.cTransitCountry", res.body.cCountryEn);
-          setValue("Tgt.cTransitProvince", res.body.cAirportEn);
-          setValue("Tgt.cTransitDetail", res.body.cAirportEn +','+ res.body.cCountryEn );
-        }
-      };
-    });
+    dialog.value?.open(
+        "countryInfoModal",
+        { type: "departure", data: {whichType:whichType.value } },
+        {
+          isOk: (res: any) => {
+            setFormItem('Tgt.cTransitDetail',{disabled:false})
+            if(res.cType === '1'){
+              if(res.isCN){
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cTransitCountry", res.cCountryCn);
+                  setValue("Tgt.cTransitProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
+                  setValue("Tgt.cTransitDetail",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                }else {
+                  setValue("Tgt.cTransitCountry", res.cCountryCn);
+                  setValue("Tgt.cTransitProvince", res.cCity);
+                  setValue("Tgt.cTransitDetail",res.cCity + ',' + res.cCountryCn);
+                }
+              }
+            }else{
+              if(res.isCN){
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cTransitCountry", res.cCountryCn);
+                  setValue("Tgt.cTransitProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
+                  setValue("Tgt.cTransitDetail",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                }else {
+                  setValue("Tgt.cTransitCountry", res.cCountryCn);
+                  setValue("Tgt.cTransitProvince", res.cAirportCity);
+                  setValue("Tgt.cTransitDetail",res.cAirportCity + ',' + res.cCountryCn);
+                }
+              }
+            }
+          },
+        },
+        { width: "80" }
+    );
   },
   // 目的港国家 按钮
   cDestinationPortCountryFun: () => {
-    dzmodal.open(countryInfo, { type: "departure", data: {whichType:whichType.value } }).then((res: any) => {
-
-      if (res.type === "ok") {
-        // setValue("Tgt.cDestinationPortCountry", res.body.countryCn);
-        // setValue("Tgt.cDestinationPortProvince", res.body.portCn);
-        // setValue("Tgt.cDestinationPort", res.body.countryCn +'/'+ res.body.portCn);
-
-        setFormItem('Tgt.cDestinationPort',{disabled:false})
-        if(res.body.cType === '1'){
-          setValue("Tgt.cDestinationPortCountry", res.body.cCountryEn);
-          setValue("Tgt.cDestinationPortProvince", res.body.cPortEn);
-          setValue("Tgt.cDestinationPort",res.body.cPortEn + ','+ res.body.cCountryEn );
-        }else{
-          setValue("Tgt.cDestinationPortCountry", res.body.cCountryEn);
-          setValue("Tgt.cDestinationPortProvince", res.body.cAirportEn);
-          setValue("Tgt.cDestinationPort", res.body.cAirportEn +','+ res.body.cCountryEn );
-        }
-      };
-    });
-
+    dialog.value?.open(
+        "countryInfoModal",
+        { type: "departure", data: {whichType:whichType.value } },
+        {
+          isOk: (res: any) => {
+            setFormItem('Tgt.cDestinationPort',{disabled:false})
+            if(res.cType === '1'){
+              if(res.isCN){
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cDestinationPortCountry", res.cCountryCn);
+                  setValue("Tgt.cDestinationPortProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
+                  setValue("Tgt.cDestinationPort",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                }else {
+                  setValue("Tgt.cDestinationPortCountry", res.cCountryCn);
+                  setValue("Tgt.cDestinationPortProvince", res.cCity);
+                  setValue("Tgt.cDestinationPort",res.cCity + ',' + res.cCountryCn);
+                }
+              }
+            }else{
+              if(res.isCN){
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cDestinationPortCountry", res.cCountryCn);
+                  setValue("Tgt.cDestinationPortProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
+                  setValue("Tgt.cDestinationPort",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                }else {
+                  setValue("Tgt.cDestinationPortCountry", res.cCountryCn);
+                  setValue("Tgt.cDestinationPortProvince", res.cAirportCity);
+                  setValue("Tgt.cDestinationPort",res.cAirportCity + ',' + res.cCountryCn);
+                }
+              }
+            }
+          },
+        },
+        { width: "80" }
+    );
   },
   // // 起运港国家 按钮
   cDestinationCountryFunc: () => {
-    dzmodal.open(countryInfo, { type: "departure", data: {whichType:whichType.value } }).then((res: any) => {
-
-      if (res.type === "ok") {
-        // setValue("Tgt.cDestinationCountry", res.body.countryCn);
-        // setValue("Tgt.cDestinationProvince", res.body.portCn);
-        // setValue("Tgt.cDestinationDetail", res.body.countryCn +'/'+ res.body.portCn);
-        //
-        if(getValue('Tgt.cDestinationAirportCountry') && getValue('Tgt.cDestinationAirportCountry') !== res.body.cCountryEn){
-          ElMessage.error('目的地国家和目的地机场国家要求一致')
-          return
-        }
-        setFormItem('Tgt.cDestinationDetail',{disabled:false})
-        if(res.body.cType === '1'){
-          setValue("Tgt.cDestinationCountry", res.body.cCountryEn);
-          setValue("Tgt.cDestinationProvince", res.body.cPortEn);
-          setValue("Tgt.cDestinationDetail",res.body.cPortEn + ','+ res.body.cCountryEn );
-        }else{
-          setValue("Tgt.cDestinationCountry", res.body.cCountryEn);
-          setValue("Tgt.cDestinationProvince", res.body.cAirportEn);
-          setValue("Tgt.cDestinationDetail", res.body.cAirportEn +','+ res.body.cCountryEn );
-        }
-      };
-    });
+    dialog.value?.open(
+        "countryInfoModal",
+        { type: "departure", data: {whichType:whichType.value } },
+        {
+          isOk: (res: any) => {
+            if(getValue('Tgt.cDestinationAirportCountry') && getValue('Tgt.cDestinationAirportCountry') != res.cCountryCn){
+              ElMessage.error('目的地国家和目的地机场国家要求一致')
+              return
+            }
+            setFormItem('Tgt.cDestinationDetail',{disabled:false})
+            if(res.cType === '1'){
+              if(res.isCN){
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cDestinationCountry", res.cCountryCn);
+                  setValue("Tgt.cDestinationProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
+                  setValue("Tgt.cDestinationDetail",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                }else {
+                  setValue("Tgt.cDestinationCountry", res.cCountryCn);
+                  setValue("Tgt.cDestinationProvince", res.cCity);
+                  setValue("Tgt.cDestinationDetail",res.cCity + ',' + res.cCountryCn);
+                }
+              }
+            }else{
+              if(res.isCN){
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cDestinationCountry", res.cCountryCn);
+                  setValue("Tgt.cDestinationProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
+                  setValue("Tgt.cDestinationDetail",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                }else {
+                  setValue("Tgt.cDestinationCountry", res.cCountryCn);
+                  setValue("Tgt.cDestinationProvince", res.cAirportCity);
+                  setValue("Tgt.cDestinationDetail",res.cAirportCity + ',' + res.cCountryCn);
+                }
+              }
+            }
+          },
+        },
+        { width: "80" }
+    );
   },
   // 起运地国家 按钮
   cDispatchCountryFunc: () => {
-    dzmodal.open(countryInfo, { type: "departure", data: { whichType:whichType.value } }).then((res: any) => {
-      if (res.type === "ok") {
-        if(getValue('Tgt.cDepartureAirportCountry') && getValue('Tgt.cDepartureAirportCountry') !== res.body.cCountryEn){
-          ElMessage.error('起运地国家和起运机场国家要求一致')
-          return
-        }
-        setFormItem('Tgt.cDispatchDetail',{disabled:false})
-            if(res.body.cType === '1'){
-              setValue("Tgt.cDispatchCountry", res.body.cCountryEn);
-              setValue("Tgt.cDispatchProvince", res.body.cPortEn);
-              setValue("Tgt.cDispatchDetail",res.body.cPortEn + ','+ res.body.cCountryEn );
-            }else{
-              setValue("Tgt.cDispatchCountry", res.body.cCountryEn);
-              setValue("Tgt.cDispatchProvince", res.body.cAirportEn);
-              setValue("Tgt.cDispatchDetail", res.body.cAirportEn +','+ res.body.cCountryEn );
+    dialog.value?.open(
+        "countryInfoModal",
+        { type: "departure", data: {whichType:whichType.value } },
+        {
+          isOk: (res: any) => {
+            if(getValue('Tgt.cDepartureAirportCountry') && getValue('Tgt.cDepartureAirportCountry') != res.cCountryCn){
+              ElMessage.error('起运地国家和起运机场国家要求一致')
+              return
             }
-      }
-    });
+            setFormItem('Tgt.cDispatchDetail',{disabled:false})
+            if(res.cType === '1'){
+              if(res.isCN){
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cDispatchCountry", res.cCountryCn);
+                  setValue("Tgt.cDispatchProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
+                  setValue("Tgt.cDispatchDetail",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                }else {
+                  setValue("Tgt.cDispatchCountry", res.cCountryCn);
+                  setValue("Tgt.cDispatchProvince", res.cCity);
+                  setValue("Tgt.cDispatchDetail",res.cCity + ',' + res.cCountryCn);
+                }
+              }
+              // else {
+              //   setValue("Tgt.cDispatchCountry", res.cCountryEn);
+              //   setValue("Tgt.cDispatchProvince", res.cPortEn);
+              //   setValue("Tgt.cDispatchDetail",res.cPortEn + ','+ res.cCountryEn );
+              // }
+            }else{
+              if(res.isCN){
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cDispatchCountry", res.cCountryCn);
+                  setValue("Tgt.cDispatchProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
+                  setValue("Tgt.cDispatchDetail",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                }else {
+                  setValue("Tgt.cDispatchCountry", res.cCountryCn);
+                  setValue("Tgt.cDispatchProvince", res.cAirportCity);
+                  setValue("Tgt.cDispatchDetail",res.cAirportCity + ',' + res.cCountryCn);
+                }
+              }
+              // setValue("Tgt.cDispatchCountry", res.cCountryEn);
+              // setValue("Tgt.cDispatchProvince", res.cAirportEn);
+              // setValue("Tgt.cDispatchDetail", res.cAirportEn +','+ res.cCountryEn );
+            }
+          },
+        },
+        { width: "80" }
+    );
   },
   // 起运机场国家
   cDepartureAirportCountryFunc: () => {
-    dzmodal.open(countryInfo, { type: "departure", data: {whichType:whichType.value } }).then((res: any) => {
-
-      if (res.type === "ok") {
-        if(getValue('Tgt.cDispatchCountry') && getValue('Tgt.cDispatchCountry') !== res.body.cCountryEn){
-          ElMessage.error('起运地国家和起运机场国家要求一致')
-          return
-        }
-        // setValue("Tgt.cDepartureAirportCountry", res.body.countryCn);
-        // setValue("Tgt.cDepartureAirportProvince", res.body.portCn);
-        // setValue("Tgt.cDepartureAirport", res.body.countryCn +'/'+ res.body.portCn);
-
-        setFormItem('Tgt.cDepartureAirport',{disabled:false})
-        if(res.body.cType === '1'){
-          setValue("Tgt.cDepartureAirportCountry", res.body.cCountryEn);
-          setValue("Tgt.cDepartureAirportProvince", res.body.cPortEn);
-          setValue("Tgt.cDepartureAirport",res.body.cPortEn + ','+ res.body.cCountryEn );
-        }else{
-          setValue("Tgt.cDepartureAirportCountry", res.body.cCountryEn);
-          setValue("Tgt.cDepartureAirportProvince", res.body.cAirportEn);
-          setValue("Tgt.cDepartureAirport", res.body.cAirportEn +','+ res.body.cCountryEn );
-        }
-      };
-    });
-
+    dialog.value?.open(
+        "countryInfoModal",
+        { type: "departure", data: {whichType:whichType.value } },
+        {
+          isOk: (res: any) => {
+            if(getValue('Tgt.cDispatchCountry') && getValue('Tgt.cDispatchCountry') != res.cCountryCn){
+              ElMessage.error('起运地国家和起运机场国家要求一致')
+              return
+            }
+            setFormItem('Tgt.cDepartureAirport',{disabled:false})
+            if(res.cType === '1'){
+              if(res.isCN){
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cDepartureAirportCountry", res.cCountryCn);
+                  setValue("Tgt.cDepartureAirportProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
+                  setValue("Tgt.cDepartureAirport",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                }else {
+                  setValue("Tgt.cDepartureAirportCountry", res.cCountryCn);
+                  setValue("Tgt.cDepartureAirportProvince", res.cCity);
+                  setValue("Tgt.cDepartureAirport",res.cCity + ',' + res.cCountryCn);
+                }
+              }
+            }else{
+              if(res.isCN){
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cDepartureAirportCountry", res.cCountryCn);
+                  setValue("Tgt.cDepartureAirportProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
+                  setValue("Tgt.cDepartureAirport",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                }else {
+                  setValue("Tgt.cDepartureAirportCountry", res.cCountryCn);
+                  setValue("Tgt.cDepartureAirportProvince", res.cAirportCity);
+                  setValue("Tgt.cDepartureAirport",res.cAirportCity + ',' + res.cCountryCn);
+                }
+              }
+            }
+          },
+        },
+        { width: "80" }
+    );
   },
 
   // 目的地机场国家
   cDestinationAirportCountryFunc: () => {
-    dzmodal.open(countryInfo, { type: "departure", data: {whichType:whichType.value } }).then((res: any) => {
-
-      if (res.type === "ok") {
-        // setValue("Tgt.cDestinationAirportCountry", res.body.countryCn);
-        // setValue("Tgt.cDestinationAirportProvince", res.body.portCn);
-        // setValue("Tgt.cDestinationAirport", res.body.countryCn +'/'+ res.body.portCn);
-
-        if(getValue('Tgt.cDestinationCountry') && getValue('Tgt.cDestinationCountry') !== res.body.cCountryEn){
-          ElMessage.error('目的地国家和目的地机场国家要求一致')
-          return
-        }
-        setFormItem('Tgt.cDestinationDetail',{disabled:false})
-        if(res.body.cType === '1'){
-          setValue("Tgt.cDestinationAirportCountry", res.body.cCountryEn);
-          setValue("Tgt.cDestinationAirportProvince", res.body.cPortEn);
-          setValue("Tgt.cDestinationAirport",res.body.cPortEn + ','+ res.body.cCountryEn );
-        }else{
-          setValue("Tgt.cDestinationAirportCountry", res.body.cCountryEn);
-          setValue("Tgt.cDestinationAirportProvince", res.body.cAirportEn);
-          setValue("Tgt.cDestinationAirport", res.body.cAirportEn +','+ res.body.cCountryEn );
-        }
-      };
-    });
-
+    dialog.value?.open(
+        "countryInfoModal",
+        { type: "departure", data: {whichType:whichType.value } },
+        {
+          isOk: (res: any) => {
+            if(getValue('Tgt.cDestinationCountry') && getValue('Tgt.cDestinationCountry') != res.cCountryCn){
+              ElMessage.error('目的地国家和目的地机场国家要求一致')
+              return
+            }
+            setFormItem('Tgt.cDestinationDetail',{disabled:false})
+            if(res.cType === '1'){
+              if(res.isCN){
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cDestinationAirportCountry", res.cCountryCn);
+                  setValue("Tgt.cDestinationAirportProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
+                  setValue("Tgt.cDestinationAirport",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                }else {
+                  setValue("Tgt.cDestinationAirportCountry", res.cCountryCn);
+                  setValue("Tgt.cDestinationAirportProvince", res.cCity);
+                  setValue("Tgt.cDestinationAirport",res.cCity + ',' + res.cCountryCn);
+                }
+              }
+            }else{
+              if(res.isCN){
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cDestinationAirportCountry", res.cCountryCn);
+                  setValue("Tgt.cDestinationAirportProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
+                  setValue("Tgt.cDestinationAirport",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                }else {
+                  setValue("Tgt.cDestinationAirportCountry", res.cCountryCn);
+                  setValue("Tgt.cDestinationAirportProvince", res.cAirportCity);
+                  setValue("Tgt.cDestinationAirport",res.cAirportCity + ',' + res.cCountryCn);
+                }
+              }
+            }
+          },
+        },
+        { width: "80" }
+    );
   },
 
   //  检验代理人  按钮

@@ -20,14 +20,7 @@ import {
 } from "@/shared/app-free-edit-config";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
-import { saveProdInfo } from "@/api/prod";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "../../common/dzmodel/ComDialogConf";
-
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
-import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
 
 import {
   AppTableConfig,
@@ -37,8 +30,7 @@ import {
 import { useRoute } from "vue-router";
 import { ref, reactive, onMounted } from "vue";
 import { qryProdEdrRsnItemList, delProdEdrRsnItem } from "@/api/prod";
-import { inputtype } from "@/utils/utilKey";
-import { descryptParameter, encryptParameter } from "@/utils/encipher";
+import { descryptParameter } from "@/utils/encipher";
 const route = useRoute();
 const query = ref(route.query);
 const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
@@ -51,9 +43,7 @@ const { getRules } = useValidator();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 const dialog = ref<DialogMethod | null>(null);
-const cPard = ref(null);
 
-const selectedKindNo = ref<string | null>(null);
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "批改项配置",

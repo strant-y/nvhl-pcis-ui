@@ -56,7 +56,7 @@ const gridconfig = reactive<AppGridEditConfig>(
         type: "primary",
         func: function () {
           const prodInfo = opertaor?.getTableRefByKey("prodInfo");
-          const prodInfoData = prodInfo.getFromValue();
+          const prodInfoData = prodInfo?.getFromValue();
           const pages = gridEditRef.value?.getTableValue();
           const params = Object.assign(prodInfoData, { pages: pages });
           saveProdPages(params)
@@ -76,7 +76,7 @@ const gridconfig = reactive<AppGridEditConfig>(
         type: "primary",
         func: function () {
           const prodInfo = opertaor?.getTableRefByKey("prodInfo");
-          const prodInfoData = prodInfo.getFromValue();
+          const prodInfoData = prodInfo?.getFromValue();
           const r = gridEditRef.value?.getSelectRow();
           if (!r) {
             ElMessage.error("请选择一行数据");
@@ -98,7 +98,7 @@ const gridconfig = reactive<AppGridEditConfig>(
         type: "primary",
         func: function () {
           const prodInfo = opertaor?.getTableRefByKey("prodInfo");
-          const prodInfoData = prodInfo.getFromValue();
+          const prodInfoData = prodInfo?.getFromValue();
           const r = gridEditRef.value?.getSelectRow();
           if (!r) {
             ElMessage.error("请选择一行数据");

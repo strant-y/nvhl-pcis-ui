@@ -10,7 +10,6 @@
 
 <script setup lang="ts">
 import { useValidator } from "@/typings/useValidator";
-import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { ref, defineProps, defineEmits, onMounted } from "vue";
 import { createFreeButtonBase } from "@/shared/button-config";
 
@@ -18,13 +17,7 @@ import {
     AppGridEditConfig,
     AppGridEditMethod,
     createAppGridEditConfig,
-    createGridFromUiConfig,
 } from "@/shared/app-grid-edit-config";
-import {
-    AppFreeEditConfig,
-    AppFreeEditMethod,
-    createAppFreeEditConfig,
-} from "@/shared/app-free-edit-config";
 import {
     creatCardConfig,
 } from "@/shared/mytemplate/card-config";
@@ -33,9 +26,14 @@ import {
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const route = useRoute();
+const idxParam: IdxParamProps = {
+  opertaorProps: { id: route.name },
+};
+provide(idxParamKey, idxParam);
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 opertaor.init();
+
 
 const props = defineProps({
     data: Object,
@@ -45,6 +43,8 @@ const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
 import { v4 as uuidv4 } from "uuid";
 import { conforms, forEach } from "lodash";
+import {useRoute} from "vue-router";
+import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
 const showBtnConfig = ref(false);
 const showView = ref(false);
 

@@ -51,8 +51,6 @@ declare global {
     query?: any;
     /** 是否显示*/
     hidden?: boolean;
-    /** 组件的key*/
-    componentKey?: string;
     /** 缓存组件的名称*/
     cachedKey?: string;
   }

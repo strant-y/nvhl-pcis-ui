@@ -79,7 +79,7 @@ export function qryEndorseList(queryParams: any): AxiosPromise<any> {
  */
 export function getAppPolicy(queryParams: any): AxiosPromise<any> {
     let url = '';
-    if (!!queryParams['scene'] && 'EDR_APP_NEW_SCENE' === queryParams['scene']) {
+    if ((!!queryParams['scene'] && 'EDR_APP_NEW_SCENE' === queryParams['scene']) || queryParams['cTransMrk'] === '1' ) {
         url = `/policy/getPolicy`;
     } else {
         url = `/policy/getAppPolicy`;

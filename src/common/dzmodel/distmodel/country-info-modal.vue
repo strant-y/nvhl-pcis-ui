@@ -1,17 +1,9 @@
 <!-- 地点查询 弹框 -->
 
 <template>
-  <el-dialog v-model="dialogVisible" title="" width="80%" @update:model-value="handleVisibleUpdate">
-    <app-free-edit v-model:freeEditConfig="formconfig" ref="freeEditRef" />
+  <app-free-edit v-model:freeEditConfig="formconfig" ref="freeEditRef" />
     <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
       @page-change="handleQuery(false)" @selection-change="handleSelectionChange" />
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="handleCancel">取消</el-button>
-        <!-- <el-button type="primary" @click="handleSave">保存</el-button> -->
-      </span>
-    </template>
-  </el-dialog>
 </template>
 
 <script setup lang="ts">
@@ -39,17 +31,24 @@ import { ref, reactive } from "vue";
 import { saveRiskInfo, getPageList, selCountryPort, addCountryPort } from "@/api/prod";
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
-const props = defineProps<{
-  visible: boolean;
-  data: object
-}>();
-
-const emit = defineEmits<{
-  (e: "ok", data: Object): void;
-}>();
-
-const freeEditRef = ref<AppFreeEditMethod | null>(null);
+const props = defineProps({
+  data: {
+    type: Object,
+    default: () => ({}),
+  },
+  method: {
+    type: Object,
+    default: () => ({}),
+  },
+  rowData: {
+    type: Object,
+    default: () => ({}),
+  },
+});
+const emits = defineEmits(["handleClose"]);
 const cFlag = ref('1')
+const freeEditRef = ref<AppFreeEditMethod | null>(null);
+
 const formconfig = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "地点查询",
@@ -142,8 +141,11 @@ const tableconfig = reactive<AppTableConfig>(
     ],
     rowDbClickFun(rowData) {
       dialogVisible.value = false;
-      emit("ok", rowData);
-
+      // emit("ok", rowData);
+        if(!!props.method.isOk && typeof props.method.isOk === 'function') {
+          props.method.isOk({...rowData,isCN:freeEditRef.value?.getValue('isCN'),isEG:freeEditRef.value?.getValue('isEG')});
+          emits("handleClose");
+        }
     },
   })
 );
@@ -231,7 +233,7 @@ function handleQuery(reset = true) {
 }
 
 onMounted(() => {
-  if(props.data?.whichType === 'A'){
+  if(props.data.data?.whichType === 'A'){
     cFlag.value = '1'
     formconfig.fromSchema = [
       {
@@ -250,9 +252,31 @@ onMounted(() => {
         title: "港口中文名称",
       },
       {
+        prop: "isCN",
+        inputtype: "rtcheckbox",
+        title: "中文",
+        hidden:true,
+        func: (val) => {
+          if(val){
+            freeEditRef.value?.setValue('isEG',false)
+          }
+        },
+      },
+      {
         prop: "cPortEn",
         inputtype: "rtinput",
         title: "港口英文名称",
+      },
+      {
+        prop: "isEG",
+        inputtype: "rtcheckbox",
+        title: "英文",
+        hidden:true,
+        func: (val) => {
+          if(val){
+            freeEditRef.value?.setValue('isCN',false)
+          }
+        }
       }
 
     ]
@@ -278,7 +302,7 @@ onMounted(() => {
         title: "港口英文名称",
       }
     ]
-  }else if(props.data?.whichType === 'B') {
+  }else if(props.data.data?.whichType === 'B') {
     cFlag.value = '2'
     formconfig.fromSchema = [
       {
@@ -287,20 +311,42 @@ onMounted(() => {
         title: "国家中文名称",
       },
       {
+        prop: "cCountryEn",
+        inputtype: "rtinput",
+        title: "国家英文名称",
+      },
+      {
         prop: "cAirportCn",
         inputtype: "rtinput",
         title: "机场中文名称",
       },
       {
-        prop: "cCountryEn",
-        inputtype: "rtinput",
-        title: "国家英文名称",
+        prop: "isCN",
+        inputtype: "rtcheckbox",
+        title: "中文",
+        hidden:true,
+        func: (val) => {
+          if(val){
+            freeEditRef.value?.setValue('isEG',false)
+          }
+        },
       },
       {
         prop: "cAirportEn",
         inputtype: "rtinput",
         title: "机场英文名称",
       },
+      {
+        prop: "isEG",
+        inputtype: "rtcheckbox",
+        title: "英文",
+        hidden:true,
+        func: (val) => {
+          if(val){
+            freeEditRef.value?.setValue('isCN',false)
+          }
+        }
+      }
     ]
     tableconfig.fromSchema = [
       {
@@ -325,7 +371,7 @@ onMounted(() => {
       },
     ]
 
-  }else if(props.data?.whichType === 'C'){
+  }else if(props.data.data?.whichType === 'C'){
     cFlag.value = '3'
     formconfig.fromSchema = [
       {
@@ -358,6 +404,28 @@ onMounted(() => {
         inputtype: "rtinput",
         title: "机场英文名称",
       },
+      {
+        prop: "isCN",
+        inputtype: "rtcheckbox",
+        title: "中文",
+        hidden:true,
+        func: (val) => {
+          if(val){
+            freeEditRef.value?.setValue('isEG',false)
+          }
+        },
+      },
+      {
+        prop: "isEG",
+        inputtype: "rtcheckbox",
+        title: "英文",
+        hidden:true,
+        func: (val) => {
+          if(val){
+            freeEditRef.value?.setValue('isCN',false)
+          }
+        }
+      }
     ]
     tableconfig.fromSchema = [
       {
@@ -393,6 +461,10 @@ onMounted(() => {
     ]
   }
   nextTick(()=>{
+    setTimeout(()=>{
+      freeEditRef.value?.setValue('isCN',true)
+      freeEditRef.value?.setValue('isEG',false)
+    },100)
 handleQuery()
   })
     

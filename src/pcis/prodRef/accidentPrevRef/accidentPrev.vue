@@ -65,26 +65,26 @@ const method = {
 // 绑定特殊验证器
 const exRules = {};
 function getFromValue() {
-  return tgtEditRef?.value?.getFromValue();
+  return accidentPrevEditRef?.value?.getFromValue();
 }
 
 function setFormValue(value: any) {
-  tgtEditRef?.value?.setFormValue(value);
+  accidentPrevEditRef?.value?.setFormValue(value);
 }
 
 function validate() {
-  return tgtEditRef?.value?.validate();
+  return accidentPrevEditRef?.value?.validate();
 }
 
 function setValue(key: string, value: any) {
-  tgtEditRef?.value?.setValue(key, value);
+  accidentPrevEditRef?.value?.setValue(key, value);
 }
 
 function getValue(key: string) {
-  return tgtEditRef?.value?.getValue(key);
+  return accidentPrevEditRef?.value?.getValue(key);
 }
 function clearValidate(key = null) {
-  tgtEditRef?.value?.clearValidate(key);
+  accidentPrevEditRef?.value?.clearValidate(key);
 }
 
 //给表单下拉项赋值

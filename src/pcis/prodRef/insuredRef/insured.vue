@@ -54,7 +54,7 @@ import{setCapitalRequiredRule} from "@/utils/InsuranceCoverageRules";
 const route = useRoute();
 const query = ref(route.query);
 const router = useRouter();
-const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
+const routeParam = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
 
 
 
@@ -87,6 +87,7 @@ const user = JSON.parse(sessionStorage.getItem("user"));
 const tCertfDate = ref<any[]>([]);
 const  cWorkDptList =['310','320','330','340','350','360']  // 单位性质带企业的ID
 const maindialogVisible = ref(false) // ocr识别弹框打开
+const resetLogo =ref<any>(false);   // 重置标识
 
 onMounted(() => {
   const formconfig11 = formInit(
@@ -104,7 +105,7 @@ onMounted(() => {
     // });
   });
   //【国民经济行业分类】初始化必填，只有法人时才必填，现在个人也是必填了（老系统需求：040001/042002/043004/043005/043011五款产品不区分法人个人投保，国民经济行业分类都必填，其他产品只有法人才必填）
-  const cProdNo = route.params.param?.cProdNo;
+  const cProdNo = opertaor.getParam()?.cProdNo;
   if (
     cProdNo === "040001" ||
     cProdNo === "042002" ||
@@ -247,10 +248,11 @@ let debounceTimer = null;
 const checkUser = () => {
     const fieldsToValidate = ['Insured.cInsuredNme', 'Insured.cClntMrk',"Insured.cCertfCde","Insured.cCertfCls"];
       // 自定义录单 方案配置 模版 进入 可以查询用户信息  
-      if (param.pageType !== "app" &&  param.pageType !== "copy" && param.pageType !== "template" && param.cAppStatus !=='1') {
+        console.log('!resetLogo',!resetLogo.value,routeParam)
+      if (  !resetLogo.value && (routeParam.pageType !== "app" &&  routeParam.pageType !== "copy" && routeParam.pageType !== "template" && routeParam.cAppStatus !=='1')) {
         return false;
       }
-  
+
       if (debounceTimer) {
         clearTimeout(debounceTimer);
       }   
@@ -647,7 +649,7 @@ const method = {
       setFormItem("Insured.cCntrCertfCde", { rules: null });
 
       // 为法人 国民经济行业必填
-     const cProdNo = route.params.param?.cProdNo;
+      const cProdNo = param?.cProdNo;
       if (
         cProdNo === "040001" ||
         cProdNo === "042002" ||
@@ -834,7 +836,8 @@ const method = {
         disabled:false
       })
     }
-
+    console.log('重置触发了')
+     resetLogo.value = true;
     tCertfDate.value = [];
     tabref["insured"].setFormValue(InsuredValue);
   },
@@ -1025,9 +1028,9 @@ const method = {
       // });
 
       // 税务登记证号
-      // setFormItem("Insured.cTaxRegistrationNo", {
-      //     disabled: true,
-      // });
+      setFormItem("Insured.cTaxRegistrationNo", {
+          disabled: true,
+      });
       // 组织机构代码
       setFormItem("Insured.cOrganizationCode", {
           disabled: true,

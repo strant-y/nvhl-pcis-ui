@@ -33,13 +33,8 @@ const user = ref(userStore.user);
 
 
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
-import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { PcisQueryService } from '../service/pcis-query-service';
 const pcisQueryService = new PcisQueryService();
-
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
-opertaor.init();
 
 const props = defineProps({
     data: Object,
@@ -49,9 +44,12 @@ const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
 import { v4 as uuidv4 } from "uuid";
 import { conforms, forEach } from "lodash";
+import {useRoute} from "vue-router";
+import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
 const showBtnConfig = ref(false);
 const showView = ref(false);
 
+const route = useRoute();
 
 const freeEditRef = ref<AppGridEditMethod | null>(null);
 const appTableShow = ref(false);

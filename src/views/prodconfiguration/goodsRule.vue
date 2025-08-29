@@ -36,10 +36,6 @@ import {
 } from "@/shared/app-free-edit-config";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
-import { saveProdInfo } from "@/api/prod";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { SysOperatorMgrService } from '@/views/sys-right-basic/service/sys-operator-mgr.service';
 const dzmodal = useDzModal();
@@ -56,8 +52,7 @@ import {
   getOrgDptTreeNodeById,
   delProdRuleById,
 } from "@/api/prod";
-import { inputtype } from "@/utils/utilKey";
-import { descryptParameter, encryptParameter } from "@/utils/encipher";
+import { descryptParameter } from "@/utils/encipher";
 const sysOperatorMgrService = new SysOperatorMgrService();
 const route = useRoute();
 const query = ref(route.query);
@@ -69,7 +64,6 @@ const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 const treeNodeId = ref("");
 import { useUserStore } from "@/store/modules/user";
-const userStore = useUserStore();
 const user = ref<any>({});
 
 const formconfig1 = reactive<AppFreeEditConfig>(
