@@ -233,7 +233,7 @@ function handleQuery(reset = true) {
 }
 
 onMounted(() => {
-  if(props.data?.whichType === 'A'){
+  if(props.data.data?.whichType === 'A'){
     cFlag.value = '1'
     formconfig.fromSchema = [
       {
@@ -302,7 +302,7 @@ onMounted(() => {
         title: "港口英文名称",
       }
     ]
-  }else if(props.data?.whichType === 'B') {
+  }else if(props.data.data?.whichType === 'B') {
     cFlag.value = '2'
     formconfig.fromSchema = [
       {
@@ -355,9 +355,9 @@ onMounted(() => {
         title: "国家中文名称",
       },
       {
-        prop: "cPortCn",
+        prop: "cAirportCn",
         inputtype: "rtinput",
-        title: "港口中文名称",
+        title: "机场中文名称",
       },
       {
         prop: "cCountryEn",
@@ -365,13 +365,13 @@ onMounted(() => {
         title: "国家英文名称",
       },
       {
-        prop: "cPortEn",
+        prop: "cAirportEn",
         inputtype: "rtinput",
-        title: "港口英文名称",
-      }
+        title: "机场英文名称",
+      },
     ]
 
-  }else if(props.data?.whichType === 'C'){
+  }else if(props.data.data?.whichType === 'C'){
     cFlag.value = '3'
     formconfig.fromSchema = [
       {
