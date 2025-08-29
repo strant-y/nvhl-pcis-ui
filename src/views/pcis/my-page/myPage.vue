@@ -1784,6 +1784,8 @@ async function loadAfter() {
         label: "保存模板",
         type: "primary",
         buttonColor: bottomBtnColor1,
+        svgIcon: "template2",
+        iconSize: "20",
         func: () => {
           handleSaveTemplate()
         },
@@ -1792,6 +1794,8 @@ async function loadAfter() {
         label: "复制出单",
         type: "primary",
         buttonColor: bottomBtnColor1,
+        svgIcon: "copy2",
+        iconSize: "25", // 设置图标大小为25px
         func: () => {
           copyPolicyFun();
         },
@@ -1841,6 +1845,8 @@ async function loadAfter() {
         label: "额度明细",
         type: "primary",
         buttonColor: bottomBtnColor1,
+        svgIcon: "limit",
+        iconSize: "25",
         func: () => {
           openLimit();
         },
@@ -1964,7 +1970,8 @@ async function loadAfter() {
         label: "保存模板",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        icon: "Memo",
+        svgIcon: "template2",
+        iconSize: "20",
         func: () => {
           handleSaveTemplate()
         },
@@ -1973,7 +1980,8 @@ async function loadAfter() {
         label: "复制出单",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        icon: "CopyDocument",
+        svgIcon: "copy2",
+        iconSize: "25", // 设置图标大小为25px
         func: () => {
           copyPolicyFun();
         },
@@ -1982,7 +1990,8 @@ async function loadAfter() {
         label: "额度明细",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        icon: "Tickets",
+        svgIcon: "limit",
+        iconSize: "25",
         func: () => {
           openLimit();
         },
@@ -2112,7 +2121,8 @@ async function loadAfter() {
         label: "保存模板",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        icon: "Memo",
+        svgIcon: "template2",
+        iconSize: "20",
         func: () => {
           handleSaveTemplate()
         },
@@ -2121,7 +2131,8 @@ async function loadAfter() {
         label: "复制出单",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        icon: "CopyDocument",
+        svgIcon: "copy2",
+        iconSize: "25", // 设置图标大小为25px
         func: () => {
           copyPolicyFun();
         },
@@ -2130,7 +2141,8 @@ async function loadAfter() {
         label: "额度明细",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        icon: "Tickets",
+        svgIcon: "limit",
+        iconSize: "25",
         func: () => {
           openLimit();
         },
