@@ -308,6 +308,7 @@ const {
   getNewUdrList,
   getInquiryNewUdrList,
   backInquiryUdrList,
+  getBaseInfoByInquiryNo,
 } = NewUdrListService();
 import { SCENE_PLY_APP_MODIFY_BOUNCED } from "@/constants/tab-constants";
 import {
@@ -395,7 +396,7 @@ const user = userStore.user;
 const roles = user.roles;
 const userItem = JSON.parse(sessionStorage.getItem("user") || '{}');
 const cOpgrpCnm = userItem.roles && userItem.roles[0] ? userItem.roles[0].cOpgrpCnm : "";
-const currentTabName = ref('暂存任务') //tabs默认值
+const currentTabName = ref('') //tabs默认值
 const isOperate = ref(false) //管理员 出单岗
 const isAudit = ref(false) //  核保岗
 const moreurl = ref('');
@@ -414,7 +415,7 @@ const pageresult = reactive<Pageresult>({
 // 申请单号、保单号增加双击事件
 Object.keys(tableObj).forEach((i: any) => {
   tableObj[i].fromSchema = tableObj[i].fromSchema.map((item: any) => {
-    if (item.prop === "cAppNo" || item.prop === "cPlyNo") {
+    if ((i === "waitObj" || i === "waitPayObj") && (item.prop === "cAppNo" || item.prop === "cPlyNo")) {
       item.dblFunc = (val: any, row: any) => {
         toQuery2(row);
       };
@@ -839,8 +840,10 @@ const getData = (user: any, roles: any = []) => {
   // 核保岗
   if (isAudit.value) {
     getAuditTableData();
+    currentTabName.value = tabs.value[0].name;
   } else {
     getIssueTableData();
+    currentTabName.value = tabs.value[0].name;
   }
 };
 
@@ -1228,7 +1231,7 @@ const toQuery2 = (data: any) => {
         getInquiryNewUdrList(requestParam).then((res: any) => {
           if (res.data && res.data.length > 0) {
             const data = res.data[0];
-            handleClickStagingList(data);
+            handleClickStagingList(data, "1", "询价");
           }
         });
       } else {
@@ -1246,7 +1249,7 @@ const toQuery2 = (data: any) => {
         getNewUdrList(requestParam).then((res: any) => {
           if (res.data && res.data.length > 0) {
             const data = res.data[0];
-            handleClickStagingList(data);
+            handleClickStagingList(data, "1");
           }
         });
       }
@@ -1266,7 +1269,7 @@ const toQuery2 = (data: any) => {
         getInquiryNewUdrList(requestParam).then((res: any) => {
           if (res.data && res.data.length > 0) {
             const data = res.data[0];
-            handleClickStagingList(data);
+            handleClickStagingList(data, "0", "询价");
           }
         });
       } else {
@@ -1284,7 +1287,7 @@ const toQuery2 = (data: any) => {
         getNewUdrList(requestParam).then((res: any) => {
           if (res.data && res.data.length > 0) {
             const data = res.data[0];
-            handleClickStagingList(data);
+            handleClickStagingList(data, "0");
           }
         });
       }
@@ -1339,7 +1342,7 @@ const toQuery2 = (data: any) => {
           tAppTmEnd: dayjs().format("YYYY-MM-DD 23:59:59"),
         };
         getInquiryPolicyList(requestParam).then((res: any) => {
-          if (res.data && res.data.length > 0) {
+          if (res.data && res.data?.result.length > 0) {
             const data = res.data?.result[0];
             showDetails(data, row.baseType);
           }
@@ -1363,7 +1366,7 @@ const toQuery2 = (data: any) => {
           findPlan: true,
         };
         getAppPolicyList(requestParam).then((res: any) => {
-          if (res.data && res.data.length > 0) {
+          if (res.data && res.data?.result.length > 0) {
             const data = res.data?.result[0];
             showDetails(data);
           }
@@ -1494,8 +1497,8 @@ function getCpayTypList() {
   );
 }
 // 待核保任务、暂存任务行点击
-function handleClickStagingList(row: any) {
-  if (row.state === "0") {
+function handleClickStagingList(row: any, state?: string, baseType?: string) {
+  if (state === "0") {
     // 未接收
     const {
       objId,
@@ -1529,7 +1532,7 @@ function handleClickStagingList(row: any) {
       if ("000000" === prodNo) {
         const param = {
           taskId: curtTask,
-          user: user.value,
+          user: user,
         };
         const flag = hasReceived(param);
         flag.then((result) => {
@@ -1558,7 +1561,7 @@ function handleClickStagingList(row: any) {
           }
         });
       } else {
-        handleReceived(row);
+        handleReceived(row, baseType);
       }
     } else if (bsType === "E" && !!plyNo) {
       checkEdrPocly({ CPlyNo: plyNo }).then(async (res) => {
@@ -1577,18 +1580,18 @@ function handleClickStagingList(row: any) {
               return;
             }
           }
-          handleReceived(row);
+          handleReceived(row, baseType);
         }
       });
     } else {
-      handleReceived(row);
+      handleReceived(row, baseType);
     }
   } else {
-    updateUdrDetail(row);
+    updateUdrDetail(row, baseType);
   }
 }
 
-function handleReceived(row: any) {
+function handleReceived(row: any, baseType?: string) {
   const param = {
     taskId: row.curtTask,
     user: user,
@@ -1621,7 +1624,7 @@ function handleReceived(row: any) {
           });
         } else {
           // 详情
-          updateUdrDetail(row);
+          updateUdrDetail(row, baseType);
         }
       }
     })
@@ -1634,35 +1637,64 @@ function handleReceived(row: any) {
     });
 }
 
-function updateUdrDetail(row: any) {
-  getBaseInfoByAppNo({ appNo: row.objId }).then((r: any) => {
+function updateUdrDetail(row: any, baseType?: string) {
+  const getBaseInfo = baseType === "询价" ? getBaseInfoByInquiryNo({inquiryNo: row.objId}) : getBaseInfoByAppNo({ appNo: row.objId })
+  getBaseInfo.then((r: any) => {
     if (r.code !== 200) {
       ElMessage.error({ message: r.msg, duration: 6000 });
     } else {
       if (row.bsType === "A") {
-        const en = JSON.stringify({
-          // scene: SCENE_PLY_UW_PROCESS,
-          cAppNo: row.objId,
-          taskId: row.curtTask,
-          cAppTyp: row.bsType,
-          cProdNo: row.prodNo,
-          cCiMrk: r.data.cCiMrk,
-          cGrpMrk: r.data.cGrpMrk,
-          cDptCde: r.data.cDptCde,
-          cDptCnm: row.uwDptName,
-          pageType: "PLY_UW_PROCESS_SCENE",
-          sysType: row.objExt,
-          plyNo: row.plyNo === "*" ? "" : row.plyNo,
-          cTermNo: row.cTermNo,
-          cTermNme: row.cTermNme,
-          cProdNmeCn: row.prodName,
-        });
-        router.push({
-          path: "/pcisapp/myPage",
-          query: {
-            param: en,
-          },
-        });
+        if(baseType === "询价") {
+          const en = JSON.stringify({
+            // scene: SCENE_PLY_UW_PROCESS,
+            cAppNo: row.cAppNo,
+            cInquiryNo: row.objId,
+            taskId: row.curtTask,
+            cAppTyp: row.bsType,
+            cProdNo: row.prodNo,
+            cCiMrk: r.data.cCiMrk,
+            cGrpMrk: r.data.cGrpMrk,
+            cDptCde: r.data.cDptCde,
+            cDptCnm: row.uwDptName,
+            pageType: "PLY_UW_PROCESS_SCENE",
+            sysType: row.objExt,
+            plyNo: row.plyNo === "*" ? "" : row.plyNo,
+            cTermNo: row.cTermNo,
+            cTermNme: row.cTermNme,
+            cProdNmeCn: row.prodName,
+            pageName: 'priceInquiry'
+          });
+          router.push({
+            path: "/pcisapp/pricePage",
+            query: {
+              param: en,
+            },
+          });
+        } else {
+          const en = JSON.stringify({
+            // scene: SCENE_PLY_UW_PROCESS,
+            cAppNo: row.objId,
+            taskId: row.curtTask,
+            cAppTyp: row.bsType,
+            cProdNo: row.prodNo,
+            cCiMrk: r.data.cCiMrk,
+            cGrpMrk: r.data.cGrpMrk,
+            cDptCde: r.data.cDptCde,
+            cDptCnm: row.uwDptName,
+            pageType: "PLY_UW_PROCESS_SCENE",
+            sysType: row.objExt,
+            plyNo: row.plyNo === "*" ? "" : row.plyNo,
+            cTermNo: row.cTermNo,
+            cTermNme: row.cTermNme,
+            cProdNmeCn: row.prodName,
+          });
+          router.push({
+            path: "/pcisapp/myPage",
+            query: {
+              param: en,
+            },
+          });
+        }
       } else {
         const en = JSON.stringify({
           scene:
@@ -1727,13 +1759,8 @@ function showDetails(row: any, type?: any) {
       });
     }
   } else {
-    const param:any = {};
-    if(type === "询价") {
-      param['cInquiryNo'] = row.objId ? row.objId : row.cInquiryNo
-    } else {
-      param['cAppNo'] = row.objId ? row.objId : row.cAppNo
-    }
-    getBaseInfoByAppNo(param).then(
+    const getBaseInfo = type === "询价" ? getBaseInfoByInquiryNo({inquiryNo: row.objId || row.cInquiryNo}) : getBaseInfoByAppNo({ appNo: row.objId || row.cAppNo})
+    getBaseInfo.then(
       (r: any) => {
         if (r.code !== 200) {
           ElMessage.error({ message: r.msg, duration: 6000 });
@@ -1757,7 +1784,7 @@ function showDetails(row: any, type?: any) {
               p['cInquiryNo'] = row.objId ? row.objId : row.cInquiryNo
               p['pageName'] = 'priceInquiry'
             } else {
-              param['cAppNo'] = row.objId ? row.objId : row.cAppNo
+              p['cAppNo'] = row.objId ? row.objId : row.cAppNo
             }
             const en = JSON.stringify(p);
             router.push({
@@ -1787,7 +1814,7 @@ function showDetails(row: any, type?: any) {
               p['cInquiryNo'] = row.objId ? row.objId : row.cInquiryNo
               p['pageName'] = 'priceInquiry'
             } else {
-              param['cAppNo'] = row.objId ? row.objId : row.cAppNo
+              p['cAppNo'] = row.objId ? row.objId : row.cAppNo
             }
             const en = JSON.stringify(p);
             router.push({
