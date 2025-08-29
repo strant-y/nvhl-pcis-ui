@@ -1069,7 +1069,7 @@ const toQuery2 = (data: any) => {
           if (res.data?.result && res.data?.result.length > 0) {
             const data = res.data?.result[0];
             router.push({
-              path: "/pcis/pricePage",
+              path: "/pcisapp/pricePage",
               query: {
                 param: JSON.stringify({
                   ...data,
@@ -1550,7 +1550,7 @@ function handleClickStagingList(row: any) {
             };
             const en = JSON.stringify(data);
             router.push({
-              path: "/pcis/my-page",
+              path: "/pcisapp/myPage",
               query: {
                 param: en,
               },
@@ -1614,7 +1614,7 @@ function handleReceived(row: any) {
             cEdrRsnBundleCde: row.cEdrRsnBundleCde,
           });
           router.push({
-            path: "/pcis/my-page",
+            path: "/pcisapp/myPage",
             query: {
               param: en,
             },
@@ -1658,7 +1658,7 @@ function updateUdrDetail(row: any) {
           cProdNmeCn: row.prodName,
         });
         router.push({
-          path: "/pcis/my-page",
+          path: "/pcisapp/myPage",
           query: {
             param: en,
           },
