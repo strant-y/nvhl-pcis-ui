@@ -93,7 +93,6 @@ function handleSelectionChange(selection: any) {
 }
 const formconfig11 = ref<any>({});
 onMounted(async () => {
-  console.log("props.compKey", props.compKey)
   formconfig11.value = formInit(
       // JSON.stringify({ ...props.pageSchema, fromSchema: processedFromSchema }),
       JSON.stringify({...props.pageSchema}),
@@ -526,12 +525,10 @@ const method = {
             }
           }).catch((error) => {
             ElMessage.error("导入出错，请检查文件格式或内容");
-            console.error("导入错误：", error);
           });
         };
 
         reader.onerror = (e) => {
-          console.error("文件读取失败", e);
           ElMessage.error("文件读取失败");
         };
 

@@ -997,8 +997,11 @@ const basicBtn = [
     type: "warning",
     id: "btn010103",
     func: () => {
-      
-      submitToUndrFn();
+      if(props.param?.cTransMrk === "1"){
+        submitEdrToUndrFun();
+      }else{
+        submitToUndrFn();
+      }
     },
   }),
   createFreeButtonBase({
@@ -2558,6 +2561,7 @@ const loadAppPlyInfo = async (CAppNo) => {
         ops.plyBase['Base.cAppNo'] = '';
       }
     console.log("转换的数据", ops);
+    if(props.param.cTransMrk === '1'){
       if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
         if (
@@ -2613,6 +2617,8 @@ const loadAppPlyInfo = async (CAppNo) => {
         }
         edrbase.value?.setFormValue(EdrBaseData);
       }
+    }
+      
       // 展示保费和保额金额
       if (ops["base"]["Base.nPrm"] && ops["base"]["Base.nPrm"] > 0) {
         nPrm.value = ops["base"]["Base.nPrm"];
@@ -2865,11 +2871,41 @@ function checkShow(k:any){
   return r;
 }
 
+// 检查缴费计划时间是否超出保险区间
+const checkPayPlanValidity = () => {
+  const payPlanList = opertaor.getTableRefByKey("payinfo").getFromValue();
+  const insuranceStart = opertaor.getTableRefByKey("insrnc")?.getValue('Base.tInsrncBgnTm');
+  const insuranceEnd = opertaor.getTableRefByKey("insrnc")?.getValue('Base.tInsrncEndTm');
+
+  // 日期转换函数
+  const toDate = d => {
+    if (d == null || (typeof d === 'string' && !d.trim())) return new Date(NaN);
+    if (typeof d === 'number') return d >= -2208988800000 && d <= 4102444800000 ? new Date(d) : new Date(NaN);
+    const date = new Date(d);
+    return !isNaN(date.getTime()) ? date : new Date(Number(d) || NaN);
+  };
+
+  //校验保险区间有效性
+  const [insStartDate, insEndDate] = [toDate(insuranceStart), toDate(insuranceEnd)];
+  if (isNaN(insStartDate.getTime()) || isNaN(insEndDate.getTime()) || insStartDate > insEndDate) {
+    console.error("保险起期/止期格式无效或逻辑错误");
+    return false;
+  }
+
+  // 遍历检查
+  return payPlanList.some(plan => {
+    const [payStart, payEnd] = [toDate(plan['Pay.tPayBgnTm'] || ""), toDate(plan['Pay.tPayEndTm'] || "")];
+    const isInvalid = isNaN(payStart.getTime()) || isNaN(payEnd.getTime());
+    return isInvalid || payStart < insStartDate || payEnd > insEndDate;
+  });
+};
+
+
 /**
  * 投保申请核保
  */
 const submitToUndrFn = async () => {
-
+ 
   // 协议出单剩余预收保费校验
   if(props.param?.cRecordType === 9 || props.param.cPolicySource == 9){
     if(Number(nRecRemPrm.value) <= 0 || Number(nRecRemEstAmt.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
@@ -2898,7 +2934,7 @@ const submitToUndrFn = async () => {
   // 新增校验：比较标的中的学生总数与条款中各条目的学生数总和是否一致
   const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue();
   const cvrgList = opertaor.getTableRefByKey("cvrg")?.getFromValue();
-  if(props.param.cProdNo === '043010'){
+  if(props.param.cProdNo === '043010' ){
       if (tgtValue && cvrgList && cvrgList.length > 0) {
       const nStudentsNumber = tgtValue["Tgt.nStudentsNumber"];
       const hasStudentFields = cvrgList.some(item => 
@@ -2917,10 +2953,7 @@ const submitToUndrFn = async () => {
     }
   }
 
-
  
- 
-
 	// 申请核保前判断是否灰黑名单
 	const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
 	const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
@@ -3028,8 +3061,8 @@ const submitToUndrFn = async () => {
       }
   }
 
-      // 缴费计划 付款人代码 名称为空处理
-    if(payList.length>0){
+  // 缴费计划 付款人代码 名称为空处理
+  if(payList && payList.length>0){
        const applicantRef = opertaor.getTableRefByKey("applicant");
         let setArr =  payList.map(item => {
         const cPayorCde = (item['Pay.cPayorCde'] == null || item['Pay.cPayorCde'] === '' || item['Pay.cPayorCde'] === undefined)
@@ -3047,7 +3080,13 @@ const submitToUndrFn = async () => {
         };
       });
       opertaor.getTableRefByKey("payinfo").setFormValue(setArr); 
-    }
+  }
+
+  // 校验 缴费计划时间超出保险起止期  重置成一条
+  if(checkPayPlanValidity()){
+      opertaor.getTableRefByKey("base").setValue('Base.cInstMrk','0')
+  }
+  
 
   adjustCiPremiumDifference()
 
@@ -3273,12 +3312,12 @@ const openLimit = () => {
  * 投保单保存
  * **/
 const savePlyInfo = async () => {
-  
-  let saveFlag = false;
-  const btn = getBtn("btn010102");
-  btn.loading = true;
+  // if(props.param.cTransMrk !== '1'){
+    let saveFlag = false;
+    const btn = getBtn("btn010102");
+    btn.loading = true;
+  // }
   const res = opertaor.getDataAll();
- 
   // 点击保存之前的申请单号 
   if(res['ci'] && res['ci'].length>0){
     res['ci'].forEach((item:any)=>{
@@ -3497,7 +3536,6 @@ const getPlyPolicyFun = () => {
       };
       encryptRouterParam(params);
       const url = window.location.origin + "/#/pcis/my-page?param=" + params.query.param;
-      console.log("99999",params.query.param)
       window.open(url, "_blank");
     }
   });
@@ -3978,7 +4016,6 @@ const submitEdrToUndrSurrender = async () => {
 const saveEdrState = ref(false);
 const saveEdrPlyInfo = async () => {
   let saveEdrFlag = false;
-  debugger
   if(props.param.cTransMrk === '1'){
     const res = opertaor.getDataAll();
     const resParam = Object.assign(res,{'cTransMrk':'1'})
@@ -3986,6 +4023,8 @@ const saveEdrPlyInfo = async () => {
     res["user"] = user;
     res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
     res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
+    res["plyBase"]["Base.cEdrRsnBundleCde"] = "99"
+    res["plyBase"]["Base.cEdrType"] = '1'
     // res["EdrBase"] = edrbase.value?.getFromValue();
     // const beforeSaveCappNo = res["EdrBase"]["EdrBase.cAppNo"];
     // if (
@@ -4004,6 +4043,63 @@ const saveEdrPlyInfo = async () => {
       })
     }
     const edrInfo: any = await saveEdrAppPlyInfo(resParam)
+    // const btn = getBtn("saveEdr");
+    // btn.loading = false;
+    if(edrInfo["code"] == "200") {
+      const ops = opertaor.convertData(edrInfo);
+      console.log("转换的数据", ops);
+      ElMessage.success(edrInfo.msg);
+      if(ops['ci'] && ops['ci'].length>0){
+        ops['ci'].forEach((item:any)=>{
+          if(item['Ci.nCiShare']){
+            item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
+          }
+        })
+      }
+      opertaor.setDataAll(ops);
+      const EdrBaseData = edrInfo["res"]["composition"]["EdrBase"][0];
+      EdrBaseData["EdrBase.cEdrRsnDetail"] = EdrBaseData["EdrBase.cEdrRsnDetail"] ? EdrBaseData["EdrBase.cEdrRsnDetail"].split(",") : ""
+      edrbase.value?.setFormValue(EdrBaseData);
+      saveEdrFlag = true;
+      saveEdrState.value = true;
+      if(props.param.pageType === "EDR_APP_NEW_SCENE" && saveDistBatchFlag.value) {
+        // 复制保单清单信息到批单中
+        saveDist(EdrBaseData['EdrBase.cAppNo'], props.param?.cRsnCde)
+      }
+      // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
+      if(props.param.pageType === "EDR_APP_NEW_SCENE" && !beforeSaveCappNo && EdrBaseData["EdrBase.cAppNo"]) {
+        getAppPolicyList({
+          cAppNo: EdrBaseData["EdrBase.cAppNo"],
+          pageSize: 10,
+          pageNum: 1,
+          cDptCde: opertaor.getDataAll().plyBase["Base.cDptCde"],
+          cLoadSub: "1",
+          cDataTyp: "app",
+          queryType: "1"
+        }).then((res:any) => {
+          if(res.data?.result && res.data?.result.length > 0) {
+            const data = res.data?.result[0];
+            sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
+            if(data['cEdrRsnBundleCde']){
+                data.cRsnCde = data['cEdrRsnBundleCde'];
+            }
+            router.replace({
+              path: "/pcisapp/myPage",
+              query: {
+                param: JSON.stringify({
+                  ...data,
+                  ...{ pageType: "TEMPORARY_DEPOSIT" },
+                }),
+              },
+            });
+          }
+        })
+      }
+        console.log('保存数据555',ops)
+        sessionStorage.setItem("getAppPolicyData", JSON.stringify(ops));
+    } else {
+      ElMessage.error(edrInfo.msg);
+    }
   }else{
     const btn = getBtn("saveEdr");
     btn.loading = true;
@@ -4029,77 +4125,72 @@ const saveEdrPlyInfo = async () => {
       })
     }
     const beforeSaveCappNo = res["EdrBase"]["EdrBase.cAppNo"];
-      const edrInfo: any = await saveEdrAppPlyInfo(res)
-  btn.loading = false;
-  if(edrInfo["code"] == "200") {
-    const ops = opertaor.convertData(edrInfo);
-    console.log("转换的数据", ops);
-    ElMessage.success(edrInfo.msg);
-    if(ops['ci'] && ops['ci'].length>0){
-      ops['ci'].forEach((item:any)=>{
-        if(item['Ci.nCiShare']){
-          item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
-        }
-      })
-    }
-    opertaor.setDataAll(ops);
-    const EdrBaseData = edrInfo["res"]["composition"]["EdrBase"][0];
-    EdrBaseData["EdrBase.cEdrRsnDetail"] = EdrBaseData["EdrBase.cEdrRsnDetail"] ? EdrBaseData["EdrBase.cEdrRsnDetail"].split(",") : ""
-    // res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
-    //   res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"].split(
-    //     ","
-    //   );    //影响二次批改报错,先注释掉待调整
-    edrbase.value?.setFormValue(EdrBaseData);
-    saveEdrFlag = true;
-    saveEdrState.value = true;
-    if(props.param.pageType === "EDR_APP_NEW_SCENE" && saveDistBatchFlag.value) {
-      // 复制保单清单信息到批单中
-      saveDist(EdrBaseData['EdrBase.cAppNo'], props.param?.cRsnCde)
-    }
-    // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
-    if(props.param.pageType === "EDR_APP_NEW_SCENE" && !beforeSaveCappNo && EdrBaseData["EdrBase.cAppNo"]) {
-      getAppPolicyList({
-        cAppNo: EdrBaseData["EdrBase.cAppNo"],
-        pageSize: 10,
-        pageNum: 1,
-        cDptCde: opertaor.getDataAll().plyBase["Base.cDptCde"],
-        cLoadSub: "1",
-        cDataTyp: "app",
-        queryType: "1"
-      }).then((res:any) => {
-        if(res.data?.result && res.data?.result.length > 0) {
-          const data = res.data?.result[0];
-          sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
-          if(data['cEdrRsnBundleCde']){
-              data.cRsnCde = data['cEdrRsnBundleCde'];
+    const edrInfo: any = await saveEdrAppPlyInfo(res)
+    btn.loading = false;
+    if(edrInfo["code"] == "200") {
+      const ops = opertaor.convertData(edrInfo);
+      console.log("转换的数据", ops);
+      ElMessage.success(edrInfo.msg);
+      if(ops['ci'] && ops['ci'].length>0){
+        ops['ci'].forEach((item:any)=>{
+          if(item['Ci.nCiShare']){
+            item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
           }
-          router.replace({
-            path: "/pcisapp/myPage",
-            query: {
-              param: JSON.stringify({
-                ...data,
-                ...{ pageType: "TEMPORARY_DEPOSIT" },
-              }),
-            },
-          });
-        }
-      })
+        })
+      }
+      opertaor.setDataAll(ops);
+      const EdrBaseData = edrInfo["res"]["composition"]["EdrBase"][0];
+      EdrBaseData["EdrBase.cEdrRsnDetail"] = EdrBaseData["EdrBase.cEdrRsnDetail"] ? EdrBaseData["EdrBase.cEdrRsnDetail"].split(",") : ""
+      // res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
+      //   res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"].split(
+      //     ","
+      //   );    //影响二次批改报错,先注释掉待调整
+      edrbase.value?.setFormValue(EdrBaseData);
+      saveEdrFlag = true;
+      saveEdrState.value = true;
+      if(props.param.pageType === "EDR_APP_NEW_SCENE" && saveDistBatchFlag.value) {
+        // 复制保单清单信息到批单中
+        saveDist(EdrBaseData['EdrBase.cAppNo'], props.param?.cRsnCde)
+      }
+      // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
+      if(props.param.pageType === "EDR_APP_NEW_SCENE" && !beforeSaveCappNo && EdrBaseData["EdrBase.cAppNo"]) {
+        getAppPolicyList({
+          cAppNo: EdrBaseData["EdrBase.cAppNo"],
+          pageSize: 10,
+          pageNum: 1,
+          cDptCde: opertaor.getDataAll().plyBase["Base.cDptCde"],
+          cLoadSub: "1",
+          cDataTyp: "app",
+          queryType: "1"
+        }).then((res:any) => {
+          if(res.data?.result && res.data?.result.length > 0) {
+            const data = res.data?.result[0];
+            sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
+            if(data['cEdrRsnBundleCde']){
+                data.cRsnCde = data['cEdrRsnBundleCde'];
+            }
+            router.replace({
+              path: "/pcisapp/myPage",
+              query: {
+                param: JSON.stringify({
+                  ...data,
+                  ...{ pageType: "TEMPORARY_DEPOSIT" },
+                }),
+              },
+            });
+          }
+        })
+      }
+        console.log('保存数据555',ops)
+        sessionStorage.setItem("getAppPolicyData", JSON.stringify(ops));
+    } else {
+      ElMessage.error(edrInfo.msg);
     }
-       console.log('保存数据555',ops)
-      sessionStorage.setItem("getAppPolicyData", JSON.stringify(ops));
-  } else {
-    ElMessage.error(edrInfo.msg);
   }
-  }
-  
-
   console.log('333',opertaor.getDataAll())
   //   btn.loading = false;
   // return false;
   // 点击保存之前的申请单号
-  
-
-
   return saveEdrFlag;
 };
 /**
@@ -4217,7 +4308,7 @@ const submitEdrToUndrFun = async () => {
   if (!isAcctValid) {
     return; 
   }
-  if (needCalc.value) {
+  if (needCalc.value && props.param.cTransMrk !== "1") {
     ElMessage.error("请先进行保费计算!");
     return;
   }
@@ -4226,9 +4317,11 @@ const submitEdrToUndrFun = async () => {
     return;
   }
   const edrBaseValidate = await edrbase.value?.validate();
-  if(!edrBaseValidate) {
-    ElMessage.warning("请填写批改信息中的必填项")
-    return
+  if(props.param.cTransMrk !== "1"){
+     if(!edrBaseValidate) {
+      ElMessage.warning("请填写批改信息中的必填项")
+      return
+    }
   }
   // 非涉费批改 投保人信息、被保人信息校验
   if(props.param.cRsnCde === "FZ") {
@@ -4259,10 +4352,12 @@ const submitEdrToUndrFun = async () => {
   //     ElMessage.warning("请填写账户信息中的必填项")
   //     return
   //   }
-  adjustCiPremiumDifference();
-  if (!checkNAmt()) return;
-  const f = await saveEdrPlyInfo(); // 提交核保,需要默认执行一次保存操作
-  if (f) {
+if(props.param.cTransMrk !== "1"){
+    adjustCiPremiumDifference();
+    if (!checkNAmt()) return;
+    const f = await saveEdrPlyInfo();
+    // 提交核保,需要默认执行一次保存操作
+  if (f && props.param.cTransMrk !== "1") {
     // const s = await saveDataInfo()
     // if(!s) return;
     const btn = getBtn("btnSubmitEdr");
@@ -4387,6 +4482,35 @@ const submitEdrToUndrFun = async () => {
       }
     },500)
   }
+}else {
+    const res = {};
+    const base = opertaor.getTableRefByKey("plyBase").getFromValue();
+    res["user"] = user;
+    res["appNo"] = base["Base.cAppNo"];
+    res["plyNo"] = base["Base.cPlyNo"];
+    res["cTransMrk"] = props.param.cTransMrk;
+    res["taskId"] = props.param.taskId ? props.param.taskId : null;
+    submitEdrToUndr(res).then((result) => {
+        // btn.loading = false;
+        console.log("批改申请核保", result);
+        // ElMessage.success(res.msg);
+        // history.back();
+        if (result["code"] == "200") {
+          ElMessage.success(result.msg);
+          btn.disabled = true;
+          if(result['cDecision'] === '1' || result['cDecision'] === '2'){
+            tagsViewStore.delView({"name": "my-page",
+              "title": "申请单录入",
+              "path": "/pcisapp/myPage",
+              "fullPath": "/pcisapp/myPage"}).then((res: any) => {
+              router.replace({ path: "/dashboard" });
+            });
+          }
+        } else {
+          ElMessage.error(result.msg);
+        }
+      });
+  }
 };
 /**
  * 核保信息 提交
@@ -4490,7 +4614,8 @@ const submitUnderwritingFn = async () => {
     submitUnder = submitUnderwrite(res);
   } else if (props.param?.cAppTyp === "A") {
     submitUnder = submitUnderwriting(res);
-  } else if (props.param?.cAppTyp === "E") submitUnder = submitUnderwritingEdr(res);
+  } else if (props.param?.cAppTyp === "E") 
+  submitUnder = submitUnderwritingEdr(res);
 
   submitUnder?.then((res:any) => {
     console.log("submitUnderwriting-res", res);

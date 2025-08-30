@@ -322,7 +322,6 @@ onBeforeMount(async () => {
 });
 
 onMounted(() => {
-  console.log(idxParam.readonly);
 });
 /**
  * 获取批改项
@@ -556,13 +555,6 @@ const saveEdrPlyInfo = async () => {
   let saveEdrFlag = false;
   const btn = getBtn("saveEdr");
 
-  // const validateAll = await formPage.value?.validateAll();
-  // console.log('validateAll', validateAll);
-  // if(!validateAll.flag) {
-  //   ElMessage.warning(validateAll.msg);
-  //   return;
-  // }
-
   btn.loading = true;
   const res = formPage.value?.getAllFormData();
   res["user"] = user;
@@ -576,6 +568,7 @@ const saveEdrPlyInfo = async () => {
     res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"] =
         res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"].join();
   }
+  console.log('参数',res)
   const edrInfo: any = await cargoApi.saveEdrEcargo({
     ...res,
     AgreementDistGoods:null,
@@ -585,9 +578,16 @@ const saveEdrPlyInfo = async () => {
     ...{user},
     sence:'save'
   })
+  // debugger
   btn.loading = false;
   if(edrInfo["code"] == "200") {
     ElMessage.success(edrInfo.msg);
+    console.log('返回的数据',edrInfo)
+    // let dataForm:any ={...edrInfo.res.composition,AgreementBase:edrInfo.res.composition?.AgreementBase[0],AgreementApplicant:edrInfo.res.composition?.AgreementApplicant[0],AgreementFeeWarn:edrInfo.res.composition?.AgreementBase[0]}
+    // delete dataForm.AgreementEdrEcargoBase
+    // delete dataForm.AgreementDistGoods
+    // delete dataForm.AgreementDistInsured
+    // delete dataForm.AgreementDistTransport
     const EdrBaseData = edrInfo["res"]["composition"]["ECargoBase"][0];
     formPage.value?.setFormDataById('AgreementBase',EdrBaseData)
     formPage.value?.setFormDataById('AgreementFeeWarn',{"ECargoBase.cEcAgrAppNo":EdrBaseData['ECargoBase.cEcAgrAppNo']})
@@ -597,6 +597,9 @@ const saveEdrPlyInfo = async () => {
 
     saveEdrFlag = true;
     cEcAgrAppNo.value = EdrBaseData['ECargoBase.cEcAgrAppNo']
+        console.log('保存缓存的数据',edrInfo["res"]["composition"]["ECargoSpecialAgreement"])
+   sessionStorage.setItem("AgreementSpecial", JSON.stringify(edrInfo["res"]["composition"]["ECargoSpecialAgreement"]));
+    
     if(cEcAgrAppNo.value && !saveDistBatchFlag.value && props.isActive === '0'){
       const param:any =  idxParam.param
       const  val ={cEcAgrAppNo:param.cEcAgrAppNo,targetNo:cEcAgrAppNo.value,cRsnCde:param.cRsnCde,}
@@ -629,11 +632,7 @@ const saveEdrPlyInfo = async () => {
         ElMessage.error(result.msg);
       }
     }
-    // if(cEcAgrAppNo.value){
-    //   eventBus.emit('goodsChange', cEcAgrAppNo.value);
-    //   eventBus.emit('insuredChange', cEcAgrAppNo.value);
-    //   eventBus.emit('transportChange', cEcAgrAppNo.value);
-    // }
+   
   } else {
     ElMessage.error(edrInfo.msg);
   }
@@ -653,7 +652,6 @@ const generateEndorse = () => {
   res["EdrEcargoBase"] = mainRef.value?.getxyedrbaseRefValue();
   res["EdrEcargoBase"]['EdrECargoBase.cProdNo'] = '029900';
   res["EdrEcargoBase"]['EdrECargoBase.cEdrType'] = props.param?.cEdrType
-  console.log(res);
   cargoApi.getEcargoEndorseChange(res).then((res) => {
     btn.loading = false;
     if (res["code"] == "200") {
@@ -683,7 +681,6 @@ const getSurrenderPrecisFun = ()=>{
   res["EdrEcargoBase"] = mainRef.value?.getxyedrbaseRefValue();
   res["EdrEcargoBase"]['EdrECargoBase.cProdNo'] = '029900';
   res["EdrEcargoBase"]['EdrECargoBase.cEdrType'] = props.param?.cEdrType
-  console.log(res);
   cargoApi.getEcargoEndorseChange(res).then((res) => {
     btn.loading = false;
     if (res["code"] == "200") {
@@ -720,8 +717,7 @@ function query() {
       }
       const pageInit = () => {
         if (props.type === 'EDR_APP_NEW_SCENE') {
-          // 暂存数据
-          sessionStorage.setItem("queryEcargoDetails", JSON.stringify(res["data"]["composition"]));
+         
           if (res["data"]["composition"]["AgreementEdrEcargoBase"]) {
             const EdrECargoBase = res["data"]["composition"]["AgreementEdrEcargoBase"][0];
               mainRef.value?.setxyedrbaseRefData({...EdrECargoBase,'EdrECargoBase.cEdrType':props.param?.cEdrType})
@@ -797,6 +793,11 @@ function query() {
           pageInit()
         }
       });
+
+
+       // 暂存数据
+       console.log('缓存的数据',dataForm['AgreementSpecial'])
+        sessionStorage.setItem("AgreementSpecial", JSON.stringify(dataForm['AgreementSpecial']));
     }else {
       ElMessage.error(res.msg);
     }
@@ -818,7 +819,6 @@ function lastDataQuery() {
     cargoApi.queryEcargoDetailsLast({
       ...idxParam.param,
     }).then((res: any) => {
-      console.log('lastDataQuery-res', res)
       if(res.code === 200) {
         const dataForm:any ={...res.data.composition,AgreementBase:res.data.composition?.AgreementBase[0],AgreementApplicant:res.data.composition?.AgreementApplicant[0],AgreementFeeWarn:res.data.composition?.AgreementBase[0]}
         formPage.value?.setAllCompPrimevalData(dataForm)

@@ -312,8 +312,15 @@ const checkUser = () => {
 const method = {
   func: () => { },
   func1: () => { },
-  funCheckUser: () => {
-    checkUser(); // 根据名称  被保人性质 证件类型 证件号码查询用户信息
+  // 客户名称
+  funCheckUser: (val:any) => {
+
+    if(val){
+      // 去除首位空格
+      setValue("Insured.cInsuredNme",val.trim())
+
+      checkUser(); // 根据名称  被保人性质 证件类型 证件号码查询用户信息
+    }
   },
   funccopyvalue: () => {
     const tabref = opertaor.getTableRefByKey("applicant");

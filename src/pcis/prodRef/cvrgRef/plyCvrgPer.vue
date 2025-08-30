@@ -585,17 +585,15 @@ const getRowId = () :string => {
 };
 
 function setTermData(param: any, value: any){
-
   const prop: string = param.factorProp;
   const termNo: string = param.termNo;
   const riskNo: string = param.riskNo;
-
   Object.keys(formData.value).forEach((item) => {
     formData.value[item].forEach((d: any) => {
-      
       if(d['Term.cUniqueTermNo'] === termNo){
         if(!prop.startsWith('TermRisktgt')){
           d[prop] = value;
+        
         }
         if (d.riskList && d.riskList.length > 0) {
           d.riskList.forEach((r: any)=>{
@@ -610,7 +608,6 @@ function setTermData(param: any, value: any){
   });
   showFlush();
 }
-
 const faters = ref({
   getndisAbleConfig: getndisAbleConfig,
   setTermData:setTermData

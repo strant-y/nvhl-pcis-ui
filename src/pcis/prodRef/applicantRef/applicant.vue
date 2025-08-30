@@ -353,9 +353,13 @@ const method = {
       { title: "选择客户信息", width: 70 }
     );
   },
-  // 客户姓名
-  funCheckUser:()=>{
-    checkUser();
+  // 客户姓名 
+  funCheckUser:(val:any)=>{
+    if(val){
+      setValue("Applicant.cAppNme",val.trim())// 去除首位空格
+      
+      checkUser();
+    }
   },
   funcconfirm: () => {
     applicantEditRef.value?.validate().then((isValid) => {
