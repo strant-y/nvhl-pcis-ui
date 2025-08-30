@@ -28,11 +28,12 @@
               :faters="faters"
               @delete="
                 (r) => {
-                  if(formData['m'].length === 1){
+                  if(formData['m'].length === 1 && parparam.cTransMrk !== '1'){
                     ElMessage.error('仅剩1条主条款时,不能删除!');
                     return ;
+                  }else{
+                    deleteData(index,r);
                   }
-                  deleteData(r);
                 }
               "
               :ref="
