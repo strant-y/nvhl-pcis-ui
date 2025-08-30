@@ -34,7 +34,7 @@
       </el-input-number>
     </el-tooltip>
   </template>
-  <span v-else>
+  <span v-else style="width: 100%;">
     {{
       (item.prefix ? item.prefix : "") +
       (vInput ? vInput : "") +

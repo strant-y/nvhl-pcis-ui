@@ -1101,7 +1101,7 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "签单日期",
         minWidth: 180,
-        sortable: true,
+        // sortable: true,
 
     },
     {
@@ -1121,7 +1121,7 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "保费",
         minWidth: 100,
-        sortable: true,
+        // sortable: true,
         slotName: "nPrm"
     },
     {
