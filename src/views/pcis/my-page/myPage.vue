@@ -2561,7 +2561,7 @@ const loadAppPlyInfo = async (CAppNo) => {
         ops.plyBase['Base.cAppNo'] = '';
       }
     console.log("转换的数据", ops);
-    if(props.param.cTransMrk === '1'){
+    if(props.param.cTransMrk !== '1'){
       if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
         if (
