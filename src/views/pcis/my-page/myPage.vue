@@ -3928,6 +3928,11 @@ const submitEdrToUndrSurrender = async () => {
     ElMessage.error("请先进行保费计算!");
     return;
   }
+  // 校验生成批文
+  if(!edrbase.value?.getValue("EdrBase.cEdrCtnt")) {
+    ElMessage.warning("请先生成批文!")
+    return
+  }
   // 调用再保险位接口
   // const s = await saveDataInfo()
   // if(!s) return;
@@ -4237,6 +4242,11 @@ const submitEdrToUndrFun = async () => {
       ElMessage.warning("请填写被保人信息中的必填项")
       return
     }
+  }
+  // 校验生成批文
+  if(!edrbase.value?.getValue("EdrBase.cEdrCtnt")) {
+    ElMessage.warning("请先生成批文!")
+    return
   }
   // const rv = await opertaor.validateAll();
   // if (!rv) {
