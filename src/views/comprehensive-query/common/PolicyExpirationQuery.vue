@@ -165,17 +165,18 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "NExpirationDays",
         inputtype: "rtnumber",
         step: 1,
-        max: 7,
+        // max: 7,
         min: 0,
         defaultValue: 3,
         title: "保单到期剩余天数",
         rules: [getRules("required", {})],
         clearable: true,
-        // func:(val)=>{
-        //   if(val <= 8){
-        //     console.log("9999999999",val)
-        //   }
-        // }
+        func:(val:any)=>{
+          if(val > 7){
+            ElMessage.warning("保单到期剩余天数不能大于7天");
+            setValue("NExpirationDays", 7);
+          }
+        }
       },
       {
         prop: "cKindNo",
