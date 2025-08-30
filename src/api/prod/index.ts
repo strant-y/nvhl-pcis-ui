@@ -1264,6 +1264,10 @@ export function selectDist(queryParams: any): AxiosPromise<any> {
 export function distMapCollectCompKey(queryParams: any): AxiosPromise<any> {
   return post(`/proddef/getDistSummaryComponentKeyByDistComponentKeyAndProdNo`, queryParams);
 }
+//删除清单校验
+export function deleteDistCheck(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/deleteDistCheck`, queryParams);
+}
 //删除清单
 export function deleteDist(queryParams: any): AxiosPromise<any> {
   return post(`/policy/deleteDist`, queryParams);
