@@ -2767,6 +2767,36 @@ function getFKFunc() {
 }
 
 
+// 检查缴费计划时间是否超出保险区间
+const checkPayPlanValidity = () => {
+  const payPlanList = opertaor.getTableRefByKey("payinfo").getFromValue();
+  const insuranceStart = opertaor.getTableRefByKey("insrnc")?.getValue('Base.tInsrncBgnTm');
+  const insuranceEnd = opertaor.getTableRefByKey("insrnc")?.getValue('Base.tInsrncEndTm');
+
+  // 日期转换函数
+  const toDate = d => {
+    if (d == null || (typeof d === 'string' && !d.trim())) return new Date(NaN);
+    if (typeof d === 'number') return d >= -2208988800000 && d <= 4102444800000 ? new Date(d) : new Date(NaN);
+    const date = new Date(d);
+    return !isNaN(date.getTime()) ? date : new Date(Number(d) || NaN);
+  };
+
+  //校验保险区间有效性
+  const [insStartDate, insEndDate] = [toDate(insuranceStart), toDate(insuranceEnd)];
+  if (isNaN(insStartDate.getTime()) || isNaN(insEndDate.getTime()) || insStartDate > insEndDate) {
+    console.error("保险起期/止期格式无效或逻辑错误");
+    return false;
+  }
+
+  // 遍历检查
+  return payPlanList.some(plan => {
+    const [payStart, payEnd] = [toDate(plan['Pay.tPayBgnTm'] || ""), toDate(plan['Pay.tPayEndTm'] || "")];
+    const isInvalid = isNaN(payStart.getTime()) || isNaN(payEnd.getTime());
+    return isInvalid || payStart < insStartDate || payEnd > insEndDate;
+  });
+};
+
+
 /**
  * 投保申请核保
  */
@@ -2913,6 +2943,32 @@ const submitToUndrFn = async () => {
          ElMessage.error('缴费计划“应收保费”不等于“总保费”请确认！')
         return false;
       }
+  }
+
+    // 缴费计划 付款人代码 名称为空处理
+  if(payList && payList.length>0){
+       const applicantRef = opertaor.getTableRefByKey("applicant");
+        let setArr =  payList.map(item => {
+        const cPayorCde = (item['Pay.cPayorCde'] == null || item['Pay.cPayorCde'] === '' || item['Pay.cPayorCde'] === undefined)
+          ? applicantRef.getValue('Applicant.cAppCde')||''
+          : item['Pay.cPayorCde'];
+
+        const cPayorNme = ( item['Pay.cPayorNme'] == null ||  item['Pay.cPayorNme'] === ''|| item['Pay.cPayorCde'] === undefined)
+          ? applicantRef.getValue('Applicant.cAppNme')||''
+          :  item['Pay.cPayorNme'] ;
+        return {
+          ...item,
+          'Pay.cPayorCde':cPayorCde,
+          "Pay.cPayorNme" :cPayorNme
+           
+        };
+      });
+      opertaor.getTableRefByKey("payinfo").setFormValue(setArr); 
+  }
+
+    // 校验 缴费计划时间超出保险起止期  重置成一条
+  if(checkPayPlanValidity()){
+      opertaor.getTableRefByKey("base").setValue('Base.cInstMrk','0')
   }
 
 

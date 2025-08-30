@@ -30,7 +30,6 @@ const formconfig1 = reactive(createAppGridEditConfig({}));
 const initFlag = computed(() => formPage.init);
 
 onMounted(async () => {
-  console.log('99999',props.pageSchema)
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
     method,
@@ -56,7 +55,6 @@ onMounted(async () => {
 // 绑定方法
 const method = {
   addCiRow: () => {
-    console.log("ciAdd",param);
     const cCiMrkFlag = formPage.getFormDataById("AgreementBase")['ECargoBase.cCiMrk'];
     const val = getFormValue();
     const totalCiShare = val.reduce((sum, row) => sum + parseFloat(row['Ci.nCiShare'] || 0), 0);
@@ -217,7 +215,6 @@ const method = {
   },
   //出单机构下拉事件
   cDptCdeChange:(val)=>{
-    console.log("出单机构下拉事件",val);
     const rowData = freeEditRef.value?.getSelectRow();
     if (!rowData || !initFlag.value) return;
     const rowId = rowData._dataId;
@@ -422,7 +419,6 @@ const method = {
         },
         {
           isOk: (selectdata: any) => {
-            console.log("a", selectdata);
           },
         },
         { title: "代理查询", width: 85 }
@@ -450,7 +446,6 @@ const method = {
       },
       {
         isOk: (selectdata: any) => {
-          console.log("a", selectdata);
         },
       },
       { title: "业务员", width: 85 }
@@ -477,7 +472,6 @@ const method = {
       },
       {
         isOk: (selectdata: any) => {
-          console.log("a", selectdata);
         },
       },
       { title: "业务员", width: 85 }

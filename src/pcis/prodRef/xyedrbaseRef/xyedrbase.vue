@@ -137,7 +137,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         func: (v:any) => {
           if(v){
             // debugger
-            console.log(v,params)
           }
         },
       },

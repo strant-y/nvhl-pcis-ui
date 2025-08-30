@@ -49,11 +49,8 @@ onMounted(() => {
       method,
       getRules
   );
-  console.log(3838, formconfig11);
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
-    console.log('1111',getValue('ECargoBase.nAmt'))
-    console.log('22222',getValue('ECargoBase.nPrm'))
     if(!getValue('ECargoBase.nAmt')){
       setFormItem('ECargoBase.AmtProp', {hidden: true})
     }
@@ -187,7 +184,6 @@ const method = {
       setValue('ECargoBase.nRmbReceivedPrm',val * getValue('ECargoBase.nReceivedRate'))
       // 协议剩余预收保费（人民币）
       if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') === '01'){
-        console.log('val',val * getValue('ECargoBase.nReceivedRate'))
         setValue('ECargoBase.nRecRemPrm',getValue('ECargoBase.nRmbReceivedPrm')- (getValue('ECargoBase.nWhRmbPrm') || 0))
       }
     }

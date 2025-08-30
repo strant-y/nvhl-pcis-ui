@@ -377,7 +377,6 @@ const checkUser = () => {
           const { code, data, msg } = res;
           if (200 === code) {
             if(data){
-              console.log('客户数据', data)
               const result:any = {};
               // for (const key in data[0]) {
               // 	if (data[0].hasOwnProperty(key)) {

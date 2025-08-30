@@ -278,7 +278,7 @@
                   : true
               "
             >
-          <!-- {{ k.pageKey }} || {{ k.pageCode }} -->
+          {{ k.pageKey }} || {{ k.pageCode }}
               <component
                 v-if="currentIndex >= i"
                 :ref="
@@ -2859,11 +2859,41 @@ function checkShow(k:any){
   return r;
 }
 
+// 检查缴费计划时间是否超出保险区间
+const checkPayPlanValidity = () => {
+  const payPlanList = opertaor.getTableRefByKey("payinfo").getFromValue();
+  const insuranceStart = opertaor.getTableRefByKey("insrnc")?.getValue('Base.tInsrncBgnTm');
+  const insuranceEnd = opertaor.getTableRefByKey("insrnc")?.getValue('Base.tInsrncEndTm');
+
+  // 日期转换函数
+  const toDate = d => {
+    if (d == null || (typeof d === 'string' && !d.trim())) return new Date(NaN);
+    if (typeof d === 'number') return d >= -2208988800000 && d <= 4102444800000 ? new Date(d) : new Date(NaN);
+    const date = new Date(d);
+    return !isNaN(date.getTime()) ? date : new Date(Number(d) || NaN);
+  };
+
+  //校验保险区间有效性
+  const [insStartDate, insEndDate] = [toDate(insuranceStart), toDate(insuranceEnd)];
+  if (isNaN(insStartDate.getTime()) || isNaN(insEndDate.getTime()) || insStartDate > insEndDate) {
+    console.error("保险起期/止期格式无效或逻辑错误");
+    return false;
+  }
+
+  // 遍历检查
+  return payPlanList.some(plan => {
+    const [payStart, payEnd] = [toDate(plan['Pay.tPayBgnTm'] || ""), toDate(plan['Pay.tPayEndTm'] || "")];
+    const isInvalid = isNaN(payStart.getTime()) || isNaN(payEnd.getTime());
+    return isInvalid || payStart < insStartDate || payEnd > insEndDate;
+  });
+};
+
+
 /**
  * 投保申请核保
  */
 const submitToUndrFn = async () => {
-
+ 
   // 协议出单剩余预收保费校验
   if(props.param?.cRecordType === 9 || props.param.cPolicySource == 9){
     if(Number(nRecRemPrm.value) <= 0 || Number(nRecRemEstAmt.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
@@ -2892,7 +2922,7 @@ const submitToUndrFn = async () => {
   // 新增校验：比较标的中的学生总数与条款中各条目的学生数总和是否一致
   const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue();
   const cvrgList = opertaor.getTableRefByKey("cvrg")?.getFromValue();
-  if(props.param.cProdNo === '043010'){
+  if(props.param.cProdNo === '043010' ){
       if (tgtValue && cvrgList && cvrgList.length > 0) {
       const nStudentsNumber = tgtValue["Tgt.nStudentsNumber"];
       const hasStudentFields = cvrgList.some(item => 
@@ -2911,10 +2941,7 @@ const submitToUndrFn = async () => {
     }
   }
 
-
  
- 
-
 	// 申请核保前判断是否灰黑名单
 	const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
 	const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
@@ -3022,8 +3049,8 @@ const submitToUndrFn = async () => {
       }
   }
 
-      // 缴费计划 付款人代码 名称为空处理
-    if(payList.length>0){
+  // 缴费计划 付款人代码 名称为空处理
+  if(payList && payList.length>0){
        const applicantRef = opertaor.getTableRefByKey("applicant");
         let setArr =  payList.map(item => {
         const cPayorCde = (item['Pay.cPayorCde'] == null || item['Pay.cPayorCde'] === '' || item['Pay.cPayorCde'] === undefined)
@@ -3041,7 +3068,13 @@ const submitToUndrFn = async () => {
         };
       });
       opertaor.getTableRefByKey("payinfo").setFormValue(setArr); 
-    }
+  }
+
+  // 校验 缴费计划时间超出保险起止期  重置成一条
+  if(checkPayPlanValidity()){
+      opertaor.getTableRefByKey("base").setValue('Base.cInstMrk','0')
+  }
+  
 
   adjustCiPremiumDifference()
 
@@ -3491,7 +3524,6 @@ const getPlyPolicyFun = () => {
       };
       encryptRouterParam(params);
       const url = window.location.origin + "/#/pcis/my-page?param=" + params.query.param;
-      console.log("99999",params.query.param)
       window.open(url, "_blank");
     }
   });
