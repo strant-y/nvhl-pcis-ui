@@ -105,7 +105,6 @@ export class FormPage {
         if (comp) {
             comp.setFormValue(formData)
         } else {
-            console.error('Could not find componentRef for id ' + id)
         }
     }
 
@@ -221,7 +220,6 @@ export class FormPage {
                 }
             }
         } catch (e) {
-            console.error(e)
         }
     }
 
@@ -238,7 +236,6 @@ export class FormPage {
                 if (comp) {
                     comp.setFormValue(AllData[key]);
                 } else {
-                    console.error('Could not find componentRef for id ' + key)
                 }
             }
             if (callback && callback.success && typeof callback.success === CommonConstants.TYPE_OF_FUNCTION) {
@@ -311,7 +308,6 @@ export class FormPage {
                                 conf.fromSchema.forEach(f => {
                                     if (f.prop === item) {
                                         if (f.inputtype === CommonConstants.RT_ITEM_TYPE_INPUTGROUP) {
-                                            console.log(f.inputtype);
                                             f.groupList.forEach((gkey: any) => {
                                                 gkey.disabled = false;
                                             });
@@ -335,26 +331,21 @@ export class FormPage {
                             if(comp.setUnDisabledByKeyList) {
                                 comp.setUnDisabledByKeyList(item);
                             }else {
-                                console.warn(key,' comp setUnDisabledByKeyList function is not defined');
                             }
                         }else {
                             if(comp.getFormBtn) {
                                 const formBtn = comp.getFormBtn();
-                                console.log('formBtn ', key, formBtn);
                                 if (formBtn && formBtn[item]) {
                                     formBtn[item].hidden = false;
                                 }
                             }else if([CommonConstants.FORM_EDIT_TYPE_FREE].includes(conf.fromType)) {
-                                console.warn(key,' comp getFormBtn function is not defined');
                             }
                             if(comp.getTableBtn) {
                                 const tableBtn = comp.getTableBtn();
-                                console.log('tableBtn ', key, tableBtn);
                                 if (tableBtn && tableBtn[item]) {
                                     tableBtn[item].hidden = false;
                                 }
                             }else if([CommonConstants.FORM_EDIT_TYPE_TABLE].includes(conf.fromType)){
-                                console.warn(key,' comp getTableBtn function is not defined');
                             }
                         }
                     }

@@ -236,8 +236,9 @@ const idAnalysis = (id:string)=>{
           const sexCode = parseInt(id.substring(16, 17), 10);
           const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
           const age = calculateAgeFromIdCard(id);
-
-          setValue("Applicant.cNation", "1"); // 国籍
+          if(!getValue("Applicant.cNation")) {
+            setValue("Applicant.cNation", "1"); // 国籍
+          }
           setValue("Applicant.tBirthday", birthday);
           setValue("Applicant.nAge", age);
           setValue("Applicant.cSex", sex);
@@ -352,9 +353,13 @@ const method = {
       { title: "选择客户信息", width: 70 }
     );
   },
-  // 客户姓名
-  funCheckUser:()=>{
-    checkUser();
+  // 客户姓名 
+  funCheckUser:(val:any)=>{
+    if(val){
+      setValue("Applicant.cAppNme",val.trim())// 去除首位空格
+      
+      checkUser();
+    }
   },
   funcconfirm: () => {
     applicantEditRef.value?.validate().then((isValid) => {
@@ -432,7 +437,6 @@ const method = {
       setFormItem("Applicant.tCertfEndDate", {
         rules: [getRules("required", {})],
       });
-
       setValue("Applicant.cNation", "1"); // 国籍
       // setValue("Applicant.tBirthday", null);
       // setValue("Applicant.nAge", null);
@@ -1335,6 +1339,10 @@ function handleFileChange(event: Event) {
             }
             setValue("Applicant.cCertfCls", "19");
             setValue("Applicant.cClntMrk", "1");
+            const getCacheCodeLis = codeListStore.getCacheCodeListByCode('AREA_COUNTRY_CACHE{"cType":"0"}');
+            const countryNm = cardInfo["nationality"].value?.split("/")[0] || null;
+            const countryId = getCacheCodeLis?.find((item:any) => item.label === countryNm)?.value || null;
+            setValue("Applicant.cNation", countryId);
           } else if (formconfig.value.fileInputType === "3"){
 						// 营业执照
             const result = res.data.result.item_list;

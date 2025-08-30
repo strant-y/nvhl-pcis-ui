@@ -103,9 +103,10 @@ const nPayNumberFun = (isAdd=false)=>{
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["base"].getFromValue();
     const baseData = opertaor.getDataAll()['base']['needCalc'];
+    const payinfoRef =  opertaor.getTableRefByKey("payinfo").getFromValue();
     console.log('opertaor',baseData,opertaor.getDataAll(),baseBefore)
 
-    if (!baseData) {
+    if (!baseData && payinfoRef.length <1) {
       ElMessage.error("请先进行保费计算!");
       return false
     }
@@ -197,12 +198,20 @@ const method = {
   //付费约定下拉事件
   cInstMrkChange(val: any) {
     console.log('1212,',val)
+   const param = opertaor.getParam();
+   if (param.initFlag) {
+      return ;
+    }
     if(val=='5'){
       setFormItem("Base.nPayNumber", { disabled: false ,  max:12});
     }else if(val=='0'){
       setFormItem("Base.nPayNumber", { disabled: true, });
       setValue('Base.nPayNumber',1)
-      //  nPayNumberFun(true);
+
+ 
+
+    
+       nPayNumberFun(true);
     }
   },
   //争议处理选择事件

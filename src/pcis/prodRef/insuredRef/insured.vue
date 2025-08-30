@@ -233,7 +233,9 @@ const idAnalysis = (id:string)=>{
           const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
           // const age = new Date().getFullYear() - birthYear;
           const age = calculateAgeFromIdCard(id);
-          setValue("Insured.cNation", "1"); // 国籍
+          if(!getValue("Insured.cNation")) {
+            setValue("Insured.cNation", "1"); // 国籍
+          }
           setValue("Insured.tBirthday", birthday);
           setValue("Insured.nAge", age);
           setValue("Insured.cSex", sex);
@@ -310,8 +312,15 @@ const checkUser = () => {
 const method = {
   func: () => { },
   func1: () => { },
-  funCheckUser: () => {
-    checkUser(); // 根据名称  被保人性质 证件类型 证件号码查询用户信息
+  // 客户名称
+  funCheckUser: (val:any) => {
+
+    if(val){
+      // 去除首位空格
+      setValue("Insured.cInsuredNme",val.trim())
+
+      checkUser(); // 根据名称  被保人性质 证件类型 证件号码查询用户信息
+    }
   },
   funccopyvalue: () => {
     const tabref = opertaor.getTableRefByKey("applicant");
@@ -1452,6 +1461,10 @@ function handleFileChange(event: Event) {
             }
             setValue("Insured.cCertfCls", "19");
             setValue("Insured.cClntMrk", "1");
+            const getCacheCodeLis = codeListStore.getCacheCodeListByCode('AREA_COUNTRY_CACHE{"cType":"0"}');
+            const countryNm = cardInfo["nationality"].value?.split("/")[0] || null;
+            const countryId = getCacheCodeLis?.find((item:any) => item.label === countryNm)?.value || null;
+            setValue("Insured.cNation", countryId);
           }
 					if (formconfig.value.fileInputType === "3"){
 						// 营业执照

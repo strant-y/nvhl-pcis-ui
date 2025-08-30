@@ -93,7 +93,6 @@ function handleQuery(flag?: boolean) {
   }else{
       param = Object.assign({pageNo:r['pageNum'],CurrentUser:user.opCde,CurrentUserOrg:user.companyId,appNo:params.cEcAgrAppNo}, r);
   }
-  console.log(param)
   getedrcmpitembyedrappnoorcachekey(param)
       .then((res) => {
           const { code, data, msg } = res;

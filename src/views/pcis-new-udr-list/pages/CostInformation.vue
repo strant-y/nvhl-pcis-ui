@@ -843,7 +843,6 @@ function findIlogC1(){
 
 /** 查询 */
 function handleQuery(flag?: boolean) {
-  console.log("999999999", props.data);
   const param = {...params}
   delete param.nPrm
   //费用信息接口调用
@@ -851,7 +850,6 @@ function handleQuery(flag?: boolean) {
     .then((res:any) => {
       if (res.code == 200) {
         let result = JSON.parse(res.data);
-        console.log("000000", result);
         pageresult.list = [];
         pageresult.list = result.FeeInfoList;
         pageresult.total = result.FeeInfoList.length;

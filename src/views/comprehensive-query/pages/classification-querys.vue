@@ -1220,6 +1220,19 @@ onMounted(async () => {
         checkedProps = normalQueryColumns.map(c => c.prop); // 默认列
     }
     applyCheckedColumns(checkedProps);
+    // 首页跳转过来查询条件赋值并查询
+    if (sessionStorage.getItem(AppKey.query.pcis_query_search)) {
+        setValue("cQueryStr", JSON.parse(
+            sessionStorage.getItem(AppKey.query.pcis_query_search)
+        ).CAppNo)
+        handleQuery(true, true);
+    }
+});
+
+onUnmounted(() => {
+  //组件销毁，清除sessionStorage数据
+  sessionStorage.getItem(AppKey.query.pcis_query_search) &&
+    sessionStorage.removeItem(AppKey.query.pcis_query_search);
 });
 
 // 绑定方法
