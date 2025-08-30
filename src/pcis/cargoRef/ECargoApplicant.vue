@@ -49,7 +49,6 @@ onMounted(() => {
     method,
     getRules
   );
-  console.log(3838, formconfig11);
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
     //是否小微企业，默认非必填、只读
@@ -94,7 +93,6 @@ function setFormItem(key: any, obj: any) {
   }
 }
 const handelItemShow = (data:any)=>{
-  console.log('dataformconfig1',data)
   // 遍历主数组
   data.forEach(item => {
     // 情况1: 直接存在rules属性
@@ -221,7 +219,6 @@ const method = {
   // 证件号码change
   cCertfCdeChange: (val) => {
     const cCertfCls = formPage.getFormDataById("AgreementApplicant")["ECargoApplicant.cCertfCls"];
-    console.log(cCertfCls,"cCertfCls")
     if (cCertfCls == "120001") {
       if (val) {
         const certfCde = applicantEditRef.value?.getValue(
@@ -369,8 +366,6 @@ const method = {
   },
 	//投保人性质(0是法人 1是个人)
   InsureChange: async (val:any) => {
-    console.log('vvvvvvv',val)
-
     if (val == "0") {
       if ( (getValue('ECargoApplicant.cClntMrk') && getValue('ECargoApplicant.cClntMrk') === '0') && (getValue('ECargoApplicant.cIsBranch') && getValue('ECargoApplicant.cIsBranch') === '0') && (getValue('ECargoApplicant.cWorkDpt') && ['310','320','330','340','350','360'].includes(getValue('ECargoApplicant.cWorkDpt')))){
         setFormItem("ECargoApplicant.nRegisteredCapital", {
@@ -796,7 +791,6 @@ if (
       const { code, data, msg } = res;
       if (200 === code) {
         if(data){
-          console.log('客户数据', data)
 					const result:any = {};
   				// for (const key in data[0]) {
 					// 	if (data[0].hasOwnProperty(key)) {
@@ -871,7 +865,6 @@ function setRegisterAdd() {
       const { code, data, msg } = res;
       if (code === 200) {
         const b = (data ? data["addStr"] : "") + a;
-        console.log(b);
         setAddressStr("ECargoApplicant.cRegisteredcapDre", b);
       }
     });
