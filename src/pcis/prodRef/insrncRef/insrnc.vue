@@ -299,62 +299,76 @@ const method = {
       "Base.tRunEndTm": formattedDate, // 更新日期字段
     });
   },
+// 报告期起始日期处理
+reportBgnTmFn: (v: any) => {
+  const start = getValue("Base.tReportBgnTm");
+  const end = getValue("Base.tReportEndTm");
+  const insEnd = getValue("Base.tInsrncEndTm"); // 保险止期
+  if (!v) return;
 
-  //报告期起始日期
-  reportBgnTmFn: (v: any) => {
-    const start = getValue("Base.tReportBgnTm");
-    const end = getValue("Base.tReportEndTm");
-    if (!end || !v) {
-      return;
-    }
-    const tm = moment(end).add(1,'second').diff(moment(v), "days");
-    if (tm < 0) {
-      ElMessage.warning("终止日期不能小于起始日期");
-      setFormValue({
-        "Base.tReportBgnTm": null,
-        "Base.nTracingDays":null
-      });
-      return;
-    }
+  // 报告期起始日期必须大于保险止期
+  if (insEnd && moment(v).isSameOrBefore(moment(insEnd))) {
+    ElMessage.warning("报告期起始日期必须大于保险止期");
     setFormValue({
-      "Base.nReportDays": tm,
+      "Base.tReportBgnTm": null,
+      "Base.nReportDays": null
     });
-  },
-  // 报告期终止日期
+    return;
+  }
+
+  // 终止日期不能小于起始日期（保留原有逻辑）
+  if (end && moment(end).isBefore(moment(v))) {
+    ElMessage.warning("报告终止日期不能小于起始日期");
+    setFormValue({
+      "Base.tReportEndTm": null,
+      "Base.nReportDays": null
+    });
+    return;
+  }
+
+  //计算报告天数（若终止日期已存在）
+  if (end) {
+    const days = moment(end).add(1, 'second').diff(moment(v), "days");
+    setFormValue({ "Base.nReportDays": days });
+  }
+},
+
+  // 报告期终止日期处理
   reportEndTmFn: (v: any) => {
     const start = getValue("Base.tReportBgnTm");
-    const end = getValue("Base.tReportEndTm");
-    const tInsrncBgnTm = getValue('Base.tInsrncBgnTm');  // 保险起期
-    if (!start || !v) {
-      return;
-    }
-    const tm = moment(end).add(1,'second').diff(moment(start), "days");
-    if (tm < 0) {
-      ElMessage.warning("终止日期不能小于起始日期");
+    const insEnd = getValue("Base.tInsrncEndTm"); // 保险止期
+    if (!v || !start) return;
+
+    // 先校验起始日期是否合规（必须大于保险止期）
+    if (insEnd && moment(start).isSameOrBefore(moment(insEnd))) {
+      ElMessage.warning("报告期起始日期必须大于保险止期，请先修正起始日期");
       setFormValue({
         "Base.tReportEndTm": null,
+        "Base.nReportDays": null
       });
       return;
     }
 
-    const traceTime = moment(tInsrncBgnTm).diff(moment(v), "seconds")
-     //校验追溯时间
-    if (traceTime < 0) {
-      ElMessage.warning("报告期终止日期|须早于保险起期！");
+
+    //校验：终止日期不能小于起始日期（保留原有逻辑）
+    if (moment(v).isBefore(moment(start))) {
+      ElMessage.warning("报告终止日期不能小于起始日期");
       setFormValue({
-        "Base.nReportDays": null,
-        "Base.tReportEndTm":null
+        "Base.tReportEndTm": null,
+        "Base.nReportDays": null
       });
       return;
     }
 
-    const formatReportEnd  =   moment(v).format("YYYY-MM-DD 23:59:59");
+    // 格式化终止日期并计算天数
+    const formatEnd = moment(v).format("YYYY-MM-DD 23:59:59");
+    const days = moment(formatEnd).add(1, 'second').diff(moment(start), "days");
     setFormValue({
-      "Base.nReportDays": moment(formatReportEnd).add(1,'second').diff(moment(start), "days"),
-      "Base.tReportEndTm": formatReportEnd,
+      "Base.tReportEndTm": formatEnd,
+      "Base.nReportDays": days
     });
   },
-};
+ };
 
 // 绑定特殊验证器
 const exRules = {};
