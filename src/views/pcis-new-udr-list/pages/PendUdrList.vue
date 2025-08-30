@@ -723,6 +723,7 @@
             showKey: [1],
             type: "info",
             size: "large",
+            iconSize:"25",
             icon: "Message",
             tableClick: (row) => {
                 //待核保任务 接收
@@ -736,6 +737,7 @@
             showKey: [2],
             type: "success",
             size: "large",
+            iconSize:"25",
             icon: "Edit",
             tableClick: (row) => {
                 if (udrTypeValue.value == "2") updateUdr(row);
@@ -748,6 +750,7 @@
             showKey: [2],
             type: "info",
             size: "large",
+            iconSize:"25",
             icon: "Release",
             tableClick: (row) => {
                 handleWorkFlow(row, "removeReceived");
@@ -761,6 +764,7 @@
             type: "danger",
             size: "large",
             icon: "RefreshLeft",
+            iconSize:"23",
             tableClick: (row) => {
                 // showDetails(row)
                 const res = {};
@@ -800,6 +804,7 @@
             showKey: [3,4],
             type: "primary",
             size: "default",
+            iconSize:"25",
             icon: "View",
             tableClick: (row) => {
                 showDetails(row);
@@ -813,6 +818,7 @@
             type: "danger",
             size: "default",
             icon: "Refresh",
+            iconSize:"25",
             tableClick: (row) => {
                 let data;
                 if (udrTypeValue.value == "3"||udrTypeValue.value == "4") {
@@ -875,6 +881,7 @@
             type: "danger",
             size: "large",
             icon: "View",
+            iconSize:"25",
             tableClick: (row) => {
                 showDetails(row);
             },
@@ -883,6 +890,7 @@
             id: "score",
             link: true,
             tooltip: "承保流程",
+            iconSize:"25",
             hideBtns: (row: any) => {
                 if (row.cAppStatus == 1 || row.cAppStatus == 3 || row.cAppStatus == 8)
                     return false;

@@ -661,6 +661,7 @@
             type: "info",
             size: "large",
             icon: "Message",
+            iconSize:"25",
             tableClick: (row) => {
                 //待核保任务 接收
                 handle_hasReceived(row);
@@ -674,6 +675,7 @@
             type: "success",
             size: "large",
             icon: "Edit",
+            iconSize:"25",
             tableClick: (row) => {
                 if (udrTypeValue.value == "2") updateUdr(row);
             },
@@ -686,6 +688,7 @@
             type: "info",
             size: "large",
             icon: "Message",
+            iconSize:"25",
             tableClick: (row) => {
                 handleWorkFlow(row, "removeReceived");
             },
@@ -698,6 +701,7 @@
             type: "danger",
             size: "large",
             icon: "RefreshLeft",
+            iconSize:"25",
             tableClick: (row) => {
                 // showDetails(row)
                 const res = {};
@@ -738,6 +742,7 @@
             type: "danger",
             size: "large",
             icon: "View",
+            iconSize:"25",
             tableClick: (row) => {
                 showDetails(row);
             },
@@ -750,6 +755,7 @@
             type: "danger",
             size: "large",
             icon: "Refresh",
+            iconSize:"25",
             tableClick: (row) => {
                 let data;
                 if (udrTypeValue.value == "3"||udrTypeValue.value == "4") {
@@ -812,6 +818,7 @@
             type: "danger",
             size: "large",
             icon: "View",
+            iconSize:"25",
             tableClick: (row) => {
                 showDetails(row);
             },
@@ -827,6 +834,7 @@
             type: "danger",
             size: "large",
             icon: "Refresh",
+            iconSize:"25",
             tableClick: (row) => {
                 let data;
                 if (udrTypeValue.value == "3") {

@@ -66,7 +66,7 @@ onMounted(() => {
     if(!getValue('ECargoBase.cPayWay')){
       setValue('ECargoBase.cPayWay','01')
     }
-    const list:Array<string>= ["ECargoBase.nAmtRmbExch","ECargoBase.cInsExchCde", "ECargoBase.nPrmRmbExch","ECargoBase.cPremExchCde",'ECargoBase.nWhPrmRmbExch','ECargoBase.nWhAmtRmbExch']
+    const list:Array<string>= ["ECargoBase.nRecRemPrmVar","ECargoBase.nRecRemEstAmtVar","ECargoBase.nAmtRmbExch","ECargoBase.cInsExchCde", "ECargoBase.nPrmRmbExch","ECargoBase.cPremExchCde",'ECargoBase.nWhPrmRmbExch','ECargoBase.nWhAmtRmbExch']
      list.forEach(item =>{
        setFormItem(item, {
          hidden: true,

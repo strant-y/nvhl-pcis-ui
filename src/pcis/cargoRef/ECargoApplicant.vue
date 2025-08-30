@@ -412,7 +412,7 @@ const method = {
         rules: [getRules("required", {})],
       });
 
-      
+
       if (!formPage.init && !idxParam.readonly) {
         setFormItem("ECargoApplicant.cWorkDpt", {
         disabled: false,
@@ -424,9 +424,9 @@ const method = {
       //   disabled: true,
       // });
       // 是否绿色产业客户
-      setFormItem("ECargoApplicant.cGreenIndustryCustomers", {
-        disabled: false,
-      });
+      // setFormItem("ECargoApplicant.cGreenIndustryCustomers", {
+      //   disabled: false,
+      // });
       }
       setFormItem("ECargoApplicant.cWorkDpt", {
         hidden:false,
@@ -434,6 +434,7 @@ const method = {
       });
       // 是否绿色产业客户
       setFormItem("ECargoApplicant.cGreenIndustryCustomers", {
+        disabled: false,
         hidden:false,
         rules: [getRules("required", {})],
       });
@@ -649,6 +650,19 @@ const method = {
      //选择个人展示哪些字段，选择法人展示哪些，其他隐藏
     if(val){
       handelItemShow(formconfig1?.fromSchema)
+    }
+    if(val == '0'){
+      setFormItem("ECargoApplicant.cIsSame", {
+        hidden:false,
+      });
+      setFormItem("ECargoApplicant.Address", {
+        hidden:false,
+        rules: [getRules("required", {})],
+      });
+    }else {
+      setFormItem("ECargoApplicant.Address", {
+        hidden:true,
+      });
     }
       checkUser();
   },
