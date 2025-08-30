@@ -261,7 +261,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "批改原因",
         typeCode: "EDR_RSN_LIST_NEW",
-        codeParam: {kindNo:params["cProdNo"].slice(0, 2), prodNo: params["cProdNo"] ,rsnTyp: params["cEdrType"],isGrp:params["cGrpMrk"] === "1" ? "1" : null,isPer: params["CGrpMrk"] === "1" ? "1" : null,calcMrk:params["cGrpMrk"]},
+        codeParam: {kindNo:params["cProdNo"]?.slice(0, 2), prodNo: params["cProdNo"] ,rsnTyp: params["cEdrType"],isGrp:params["cGrpMrk"] === "1" ? "1" : null,isPer: params["CGrpMrk"] === "1" ? "1" : null,calcMrk:params["cGrpMrk"]},
         rules: [getRules("required", {})],
         clearable: true,
         disabled: true,

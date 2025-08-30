@@ -360,6 +360,9 @@ onMounted(() => {
     if(item.prop =='Dist.cPrmCur'){
       item['func'] =  InsurancecurrencyChange;
     }
+    if(item.prop =='Dist.nInsuranceAmount'){
+      item['func'] =  nInsuranceAmountChange;
+    }
     // if(item.prop =='Dist.HouseAreaProp'){
     //   item?.groupList.forEach(data => {
     //     data.rules = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
@@ -411,9 +414,10 @@ onMounted(() => {
         const termref = opertaor.getTableRefByKey('cvrg');
         const allPlans = termref.getPlanNo();   // 全部方案
 
-        // 取出父页面带来的已选方案
-        const added = props.data.addedPlans || [];
-        const nextIdx = added.length;           // 当前应该选第几个
+        // 从父页面表格中获取已添加的方案
+        const distTableRef = opertaor.getTableRefByKey(props.data.compKey);
+        const added = distTableRef?.getTableData()?.map(row => row['Dist.cPlanNo']).filter(Boolean) || [];
+        const nextIdx = added.length;  // 当前应该选第几个
 
         item.typeCode = null;
         item.loadData = allPlans.map((p: any, idx: number) => ({
@@ -427,12 +431,14 @@ onMounted(() => {
   
   formconfig1.value.title = props.data.title;
   if (props.data.title == "编辑") {
+    setFormItem("Dist.nSeqNo", { disabled: true });
     setTimeout(() => {
       freeEditRef.value?.setFormValue(props.data.rowData);
     }, 100);
   } else {
   }
   nextTick(() => {
+    handelnInsuranceAmountList()
     // 同步dist组件中的codeListMap到表单中
     freeEditRef.value?.setCodeListMap(props.data.codeListMap);
   })
@@ -453,6 +459,20 @@ const getDistoccupType = (val) => {
     }
   });
 }
+// 020009 020011 020013 020016 保险金额根据发票金额带出，可修改 必填
+// 020001、020002、020003、020004、020005、020006、020017 保险金额根据发票金额公式计算，不可修改，置灰 必填
+const  isShownInsuranceAmount = ref(false)
+const nInsuranceAmountListA = ['020009', '020011', '020013', '020016']
+const nInsuranceAmountListB = ['020001','020002','020003','020004','020005','020006','020017']
+const handelnInsuranceAmountList = ()=>{
+  if(nInsuranceAmountListA.includes(params?.cProdNo)){
+    isShownInsuranceAmount.value = true
+    setFormItem('Dist.nInsuranceAmount',{disabled:false})
+  }else if(nInsuranceAmountListB.includes(params?.cProdNo)){
+    isShownInsuranceAmount.value = false
+    setFormItem('Dist.nInsuranceAmount',{disabled:true})
+  }
+}
 const nInvoiceValueChange = (val:any)=>{
   const bonusRatioData =  getValue('Dist.nAdditiveCoefficient')
   const goodsValueData = getValue('Dist.nInvoiceValue')
@@ -460,20 +480,16 @@ const nInvoiceValueChange = (val:any)=>{
   if(nInvoiceExch && goodsValueData){
     setValue('Dist.nRmbAmount',Number(getValue('Dist.nInvoiceValue'))*getValue('Dist.nInvoiceExch'))
   }
-  if(bonusRatioData && goodsValueData){
+  if(bonusRatioData && goodsValueData && !isShownInsuranceAmount.value){
     setValue('Dist.nInsuranceAmount',goodsValueData * (1 + bonusRatioData/100))
-  }
-  if(getValue('Dist.nInsuranceAmount')){
     setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount'))*getValue('Dist.nAmtExch'))
   }
 }
 const nAdditiveCoefficientChange = (val:any)=>{
   const bonusRatioData =  getValue('Dist.nAdditiveCoefficient')
   const goodsValueData = getValue('Dist.nInvoiceValue')
-  if(bonusRatioData && goodsValueData){
+  if(bonusRatioData && goodsValueData && !isShownInsuranceAmount.value){
     setValue('Dist.nInsuranceAmount',goodsValueData * (1 + bonusRatioData/100))
-  }
-  if(getValue('Dist.nInsuranceAmount')){
     setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount'))*getValue('Dist.nAmtExch'))
   }
 }
@@ -493,7 +509,7 @@ const InvoiceCurrencyChange = (val:any)=>{
           setValue('Dist.nRmbAmount',Number(getValue('Dist.nInvoiceValue'))*getValue('Dist.nInvoiceExch'))
           const bonusRatioData =  getValue('Dist.nAdditiveCoefficient')
           const goodsValueData = getValue('Dist.nInvoiceValue')
-          if(bonusRatioData && goodsValueData){
+          if(bonusRatioData && goodsValueData && !isShownInsuranceAmount.value){
             setValue('Dist.nInsuranceAmount',goodsValueData * (1 + bonusRatioData/100))
             setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount'))*getValue('Dist.nAmtExch'))
           }
@@ -505,10 +521,15 @@ const InvoiceCurrencyChange = (val:any)=>{
     setValue('Dist.nRmbAmount',Number(getValue('Dist.nInvoiceValue')))
     const bonusRatioData =  getValue('Dist.nAdditiveCoefficient')
     const goodsValueData = getValue('Dist.nInvoiceValue')
-    if(bonusRatioData && goodsValueData){
+    if(bonusRatioData && goodsValueData && !isShownInsuranceAmount.value){
       setValue('Dist.nInsuranceAmount',goodsValueData * (1 + bonusRatioData/100))
       setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount'))*getValue('Dist.nAmtExch'))
     }
+  }
+}
+const nInsuranceAmountChange = (val:any)=>{
+  if(val){
+    setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount'))*getValue('Dist.nAmtExch'))
   }
 }
 const InsurancecurrencyChange = (val:any)=>{
