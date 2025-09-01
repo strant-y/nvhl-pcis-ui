@@ -4338,7 +4338,7 @@ const submitEdrToUndrFun = async () => {
     }
   }
   // 校验生成批文
-  if(!edrbase.value?.getValue("EdrBase.cEdrCtnt")) {
+  if(!edrbase.value?.getValue("EdrBase.cEdrCtnt") && props.param.cTransMrk !== "1") {
     ElMessage.warning("请先生成批文!")
     return
   }
