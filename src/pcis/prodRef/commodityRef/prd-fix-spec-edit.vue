@@ -50,9 +50,9 @@ import { isValidDateFlag } from "@/typings/method-public";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const dialogVisible = ref(true);
-const props = defineProps(["data","callback"]);
-const rowData = ref(props.data); 
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const props = defineProps(["data","callback","idxParam"]);
+const rowData = ref(props.data);
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam(props.idxParam));
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 //rowData当前行数据
 /**
@@ -61,7 +61,6 @@ const opertaor = dataOpertaor(idxParam.opertaorProps);
  *
  *
  */
-console.log("rowData", rowData);
 onMounted(() => {
   // console.log("cNmeCnArray", cNmeCnArray.value);
 

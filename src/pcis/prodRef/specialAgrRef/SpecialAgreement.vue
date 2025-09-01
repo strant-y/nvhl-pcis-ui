@@ -113,8 +113,11 @@ const tableconfig = reactive<AppTableConfig>(
           if(row.editList && row.editList.length>0){
             param['editList'] = row.editList
           }
-          dzmodal.open(specEdit, { type: "view", data: param,
-          callback: (res: any) => {
+          dzmodal.open(specEdit, {
+            type: "view",
+            data: param,
+            idxParam: idxParam,
+            callback: (res: any) => {
               if (res.type === "ok") {
                 // row.cSpecialContent = res.data.cSpecialContent
                 // row['editList']= res.data['editList']
