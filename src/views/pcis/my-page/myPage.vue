@@ -3139,10 +3139,12 @@ const submitToUndrFn = async () => {
                     dangerouslyUseHTMLString: true,
                     type: 'warning'
                 });
+                btn.loading = false;
                 return false;
             }
         } else {
             ElMessage.error({ message: blackRes.msg, duration: 3000 });
+            btn.loading = false;
             return false;
         }
 
