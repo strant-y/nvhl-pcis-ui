@@ -50,10 +50,10 @@ import { isValidDateFlag } from "@/typings/method-public";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const dialogVisible = ref(true);
-const props = defineProps(["data","callback"]);
-const rowData = ref(props.data); 
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const    = dataOpertaor(idxParam.opertaorProps);
+const props = defineProps(["data","callback","idxParam"]);
+const rowData = ref(props.data);
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam(props.idxParam));
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 //rowData当前行数据
 /**
  * 拿到特约内容字段，通过***分割为数组，然后在html部分直接循环该数组，
@@ -61,7 +61,6 @@ const    = dataOpertaor(idxParam.opertaorProps);
  *
  *
  */
-console.log("rowData", rowData);
 onMounted(() => {
   console.log(111,idxParam)
   // console.log(1112,idxParam)

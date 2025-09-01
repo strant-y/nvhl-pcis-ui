@@ -35,11 +35,12 @@
                           })
                         }
                       })
-                      if(cancount <= 1){
+                      if(cancount <= 1 && parparam.cTransMrk !== '1'){
                         ElMessage.error('仅剩1个方案时,不能删除!');
                         return;
+                      }else{
+                        deletePlan(k);
                       }
-                      deletePlan(k);
                     }"
                     :item="btnItem.delPlan"
                   />
@@ -62,11 +63,12 @@
                     :disabled-flag="disAbledFlag"
                     @delete="
                       (r) => {
-                        if(planData[k]['m'].length === 1){
+                        if(planData[k]['m'].length === 1 && parparam.cTransMrk !== '1'){
                           ElMessage.error('仅剩1条主条款时,不能删除!');
                           return ;
+                        }else{ 
+                          deleteData(k, r);
                         }
-                        deleteData(k, r);
                       }
                     "
                     :faters="faters"

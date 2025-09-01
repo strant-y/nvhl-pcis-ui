@@ -225,7 +225,9 @@ const idAnalysis = (id: string) => {
   const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
   // const age = new Date().getFullYear() - birthYear;
   const age = calculateAgeFromIdCard(id);
-  setValue("Insured.cNation", "1"); // 国籍
+  if (!getValue("Insured.cNation")) {
+    setValue("Insured.cNation", "1"); // 国籍
+  }
   setValue("Insured.tBirthday", birthday);
   setValue("Insured.nAge", age);
   setValue("Insured.cSex", sex);
@@ -298,7 +300,7 @@ const checkUser = () => {
 };
 
 let isCoypBtn = ref<any>(false);    // 用来处理 同步被保人 清空问题
- 
+
 // 绑定方法
 const method = {
   func: () => { },
@@ -314,68 +316,68 @@ const method = {
     }
   },
   funccopyvalue: () => {
- 
-   isCoypBtn.value = true; // 存储令牌
+
+    isCoypBtn.value = true; // 存储令牌
 
     try {
 
-        const tabref = opertaor.getTableRefByKey("applicant");
-        const applicantValue = tabref.getFromValue();
-        const applicantCodeListMap = tabref?.getCodeListMap();
-        if (applicantCodeListMap) {
-          insuredEditRef.value?.addCodeListMap({
-            code: 'Insured.cOccupCde',
-            list: applicantCodeListMap['Applicant.cOccupCde']
-          });
-        }
+      const tabref = opertaor.getTableRefByKey("applicant");
+      const applicantValue = tabref.getFromValue();
+      const applicantCodeListMap = tabref?.getCodeListMap();
+      if (applicantCodeListMap) {
+        insuredEditRef.value?.addCodeListMap({
+          code: 'Insured.cOccupCde',
+          list: applicantCodeListMap['Applicant.cOccupCde']
+        });
+      }
 
-        let insuredValue: any = {};
+      let insuredValue: any = {};
 
-        // 同投保人时 客户信息需要禁用   客户名称 被保人性质 证件类型 证件号码  证件有效起 止期
-        // insuredValue["Insured.cInsuredNme"] &&
-        // insuredValue["Insured.cClntMrk"] !== null &&
-        // insuredValue["Insured.cCertfCde"] &&
-        // insuredValue["Insured.cCertfCls"]
-        setFormItem('Insured.cInsuredNme', {
-          disabled: true
-        })
-        setFormItem('Insured.cClntMrk', {
-          disabled: true
-        })
-        setFormItem('Insured.cCertfCde', {
-          disabled: true
-        })
-        setFormItem('Insured.cCertfCls', {
-          disabled: true
-        })
-        setFormItem('Insured.tCertfBgnDate', {
-          disabled: true
-        })
-        setFormItem('Insured.tCertfEndDate', {
-          disabled: true
-        })
-        setFormItem('Insured.cLongendTyp', {
-          disabled: true
-        })
-        for (const k in applicantValue) {
-          if (k === "Applicant.cCertfCls") {
-            setTimeout(() => {
-              setValue("Insured.cCertfCls", applicantValue[k]);
-            }, 0);
-          } else if (k === "Applicant.cAppCde") {
-            insuredValue["Insured.cInsuredCde"] = applicantValue[k];
-          } else if (k === "Applicant.cAppNme") {
-            insuredValue["Insured.cInsuredNme"] = applicantValue[k];
-          } else if (k.startsWith("Applicant")) {
-            const nk = k.replace("Applicant", "Insured");
-            insuredValue[nk] = applicantValue[k];
-          }
+      // 同投保人时 客户信息需要禁用   客户名称 被保人性质 证件类型 证件号码  证件有效起 止期
+      // insuredValue["Insured.cInsuredNme"] &&
+      // insuredValue["Insured.cClntMrk"] !== null &&
+      // insuredValue["Insured.cCertfCde"] &&
+      // insuredValue["Insured.cCertfCls"]
+      setFormItem('Insured.cInsuredNme', {
+        disabled: true
+      })
+      setFormItem('Insured.cClntMrk', {
+        disabled: true
+      })
+      setFormItem('Insured.cCertfCde', {
+        disabled: true
+      })
+      setFormItem('Insured.cCertfCls', {
+        disabled: true
+      })
+      setFormItem('Insured.tCertfBgnDate', {
+        disabled: true
+      })
+      setFormItem('Insured.tCertfEndDate', {
+        disabled: true
+      })
+      setFormItem('Insured.cLongendTyp', {
+        disabled: true
+      })
+      for (const k in applicantValue) {
+        if (k === "Applicant.cCertfCls") {
+          setTimeout(() => {
+            setValue("Insured.cCertfCls", applicantValue[k]);
+          }, 0);
+        } else if (k === "Applicant.cAppCde") {
+          insuredValue["Insured.cInsuredCde"] = applicantValue[k];
+        } else if (k === "Applicant.cAppNme") {
+          insuredValue["Insured.cInsuredNme"] = applicantValue[k];
+        } else if (k.startsWith("Applicant")) {
+          const nk = k.replace("Applicant", "Insured");
+          insuredValue[nk] = applicantValue[k];
         }
-        setFormValue(insuredValue);
+      }
+      setFormValue(insuredValue);
     } finally {
-        setTimeout(()=>{
-            isCoypBtn.value = false;
-        },1000)
+      setTimeout(() => {
+        isCoypBtn.value = false;
+      }, 1000)
     }
   },
   funcquery: () => {
@@ -1421,6 +1423,10 @@ function handleFileChange(event: Event) {
             }
             setValue("Insured.cCertfCls", "19");
             setValue("Insured.cClntMrk", "1");
+            const getCacheCodeLis = codeListStore.getCacheCodeListByCode('AREA_COUNTRY_CACHE{"cType":"0"}');
+            const countryNm = cardInfo["nationality"].value?.split("/")[0] || null;
+            const countryId = getCacheCodeLis?.find((item: any) => item.label === countryNm)?.value || null;
+            setValue("Insured.cNation", countryId);
           }
           if (formconfig.value.fileInputType === "3") {
             // 营业执照

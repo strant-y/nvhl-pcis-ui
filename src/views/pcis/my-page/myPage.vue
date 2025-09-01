@@ -445,6 +445,7 @@ import {
   submitUnderwrite,
   getInquiryPolicy,
 	getisAllDone,
+    checkDistTerm,
 	isUndrClsBlackList,
   queryTermRateLimit,
 	queryEcargoRelevancePolicyDetails
@@ -1787,6 +1788,8 @@ async function loadAfter() {
         label: "保存模板",
         type: "primary",
         buttonColor: bottomBtnColor1,
+        svgIcon: "template2",
+        iconSize: "20",
         func: () => {
           handleSaveTemplate()
         },
@@ -1795,6 +1798,8 @@ async function loadAfter() {
         label: "复制出单",
         type: "primary",
         buttonColor: bottomBtnColor1,
+        svgIcon: "copy2",
+        iconSize: "25", // 设置图标大小为25px
         func: () => {
           copyPolicyFun();
         },
@@ -1844,6 +1849,8 @@ async function loadAfter() {
         label: "额度明细",
         type: "primary",
         buttonColor: bottomBtnColor1,
+        svgIcon: "limit",
+        iconSize: "25",
         func: () => {
           openLimit();
         },
@@ -1967,7 +1974,8 @@ async function loadAfter() {
         label: "保存模板",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        icon: "Memo",
+        svgIcon: "template2",
+        iconSize: "20",
         func: () => {
           handleSaveTemplate()
         },
@@ -1976,7 +1984,8 @@ async function loadAfter() {
         label: "复制出单",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        icon: "CopyDocument",
+        svgIcon: "copy2",
+        iconSize: "25", // 设置图标大小为25px
         func: () => {
           copyPolicyFun();
         },
@@ -1985,7 +1994,8 @@ async function loadAfter() {
         label: "额度明细",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        icon: "Tickets",
+        svgIcon: "limit",
+        iconSize: "25",
         func: () => {
           openLimit();
         },
@@ -2115,7 +2125,8 @@ async function loadAfter() {
         label: "保存模板",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        icon: "Memo",
+        svgIcon: "template2",
+        iconSize: "20",
         func: () => {
           handleSaveTemplate()
         },
@@ -2124,7 +2135,8 @@ async function loadAfter() {
         label: "复制出单",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        icon: "CopyDocument",
+        svgIcon: "copy2",
+        iconSize: "25", // 设置图标大小为25px
         func: () => {
           copyPolicyFun();
         },
@@ -2133,7 +2145,8 @@ async function loadAfter() {
         label: "额度明细",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        icon: "Tickets",
+        svgIcon: "limit",
+        iconSize: "25",
         func: () => {
           openLimit();
         },
@@ -2549,7 +2562,7 @@ const loadAppPlyInfo = async (CAppNo) => {
         ops.plyBase['Base.cAppNo'] = '';
       }
     console.log("转换的数据", ops);
-    if(props.param.cTransMrk === '1'){
+    if(props.param.cTransMrk !== '1'){
       if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
         if (
@@ -2909,7 +2922,6 @@ const checkStudentValidity  =  async() => {
  * 投保申请核保
  */
 const submitToUndrFn = async () => {
- 
   // 协议出单剩余预收保费校验
   if(props.param?.cRecordType === 9 || props.param.cPolicySource == 9){
     if(Number(nRecRemPrm.value) <= 0 || Number(nRecRemEstAmt.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
@@ -2917,7 +2929,7 @@ const submitToUndrFn = async () => {
       return;
     }
   }
- 	if (needCalc.value) {
+  if (needCalc.value) {
     ElMessage.error("请先进行保费计算!");
     return;
   }
@@ -2956,37 +2968,6 @@ const submitToUndrFn = async () => {
       }
     }
   }
-
- 
-	// 申请核保前判断是否灰黑名单
-	const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
-	const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
- 
-  let undrParam = {}
-  if(props.param.pageName && props.param.pageName == "priceInquiry"){
-      undrParam = {
-            cInquiryNumber
-      }
-  }else{
-      undrParam = {
-            cAppNo
-      }
-  }
-	const res: any = await isUndrClsBlackList(undrParam);
-	if(res.code == 200){
-		if(res.msg != '校验通过'){
-			ElMessage({
-				message: res.msg.replace(/\n/g, '<br>'),
-				dangerouslyUseHTMLString: true,
-				type: 'warning'
-			});
-			return false;
-		}
-	} else {
-		ElMessage.error({ message: res.msg, duration: 3000 });
-		return false;
-	}
-
   // 040002 记名投保标志 选是 校验清单必须录入
   const distItem = distRequiredMap[props.param.cProdNo];
   if(distItem && tgtValue[distItem.flagKey] === '1') {
@@ -3033,10 +3014,10 @@ const submitToUndrFn = async () => {
 			return false;
 		}
  	}
-  if (!baseValite()) {
-    return;
-  }
-  if (!checkNAmt()) return;
+    if (!baseValite()) {
+        return;
+    }
+    if (!checkNAmt()) return;
 
    //  042001  是否单项工程逻辑
    if(props.param?.cProdNo==='042001'){
@@ -3112,7 +3093,6 @@ const submitToUndrFn = async () => {
       opertaor.getTableRefByKey("base").setValue('Base.cInstMrk','0')
   }
   
-
   adjustCiPremiumDifference()
 
   // 电梯责任保险 每部电梯累计赔偿限额小于每部电梯每人赔偿限额时校验
@@ -3124,8 +3104,6 @@ const submitToUndrFn = async () => {
     }
   }
  
-
-
   const f = await savePlyInfo(); // 提交核保,需要默认执行一次保存操作
   if (f) {
     const btn = getBtn("btn010103");
@@ -3136,6 +3114,7 @@ const submitToUndrFn = async () => {
       if (!rv) {
         return;
       }
+
       // 调用再保险位接口
       // const s = await saveDataInfo()
       // if(!s) return;
@@ -3178,10 +3157,43 @@ const submitToUndrFn = async () => {
         btn.loading = false;
         return;
       }
+
+       // 申请核保前判断是否灰黑名单
+        const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
+        const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
+    
+        let undrParam = {}
+        if(props.param.pageName && props.param.pageName == "priceInquiry"){
+            undrParam = { cInquiryNumber }
+        }else{
+            undrParam = { cAppNo }
+        }
+        const blackRes: any = await isUndrClsBlackList(undrParam);
+        if(blackRes.code == 200){
+            if(blackRes.msg != '校验通过'){
+                ElMessage({
+                    message: blackRes.msg.replace(/\n/g, '<br>'),
+                    dangerouslyUseHTMLString: true,
+                    type: 'warning'
+                });
+                btn.loading = false;
+                return false;
+            }
+        } else {
+            ElMessage.error({ message: blackRes.msg, duration: 3000 });
+            btn.loading = false;
+            return false;
+        }
+
+      // 校验清单与条款方案是否一致
+      const DistOK = await validateDistConsistency();
+      if (!DistOK) { // 未通过阻断
+        btn.loading = false;
+        return;
+      };   
       //校验联共保信息
       const plyBasedata = opertaor.getTableRefByKey("plyBase").getFromValue();
 
-      
       if(plyBasedata["Base.cCiMrk"] !== "0" && props.param.pageName !== "priceInquiry") {
         const ciValue = opertaor.getTableRefByKey("ci")?.getFromValue() || '';
         const isCiValid = validateCiInfo();
@@ -3991,6 +4003,11 @@ const submitEdrToUndrSurrender = async () => {
     ElMessage.error("请先进行保费计算!");
     return;
   }
+  // 校验生成批文
+  if(!edrbase.value?.getValue("EdrBase.cEdrCtnt")) {
+    ElMessage.warning("请先生成批文!")
+    return
+  }
   // 调用再保险位接口
   // const s = await saveDataInfo()
   // if(!s) return;
@@ -4356,6 +4373,11 @@ const submitEdrToUndrFun = async () => {
       return
     }
   }
+  // 校验生成批文
+  if(!edrbase.value?.getValue("EdrBase.cEdrCtnt") && props.param.cTransMrk !== "1") {
+    ElMessage.warning("请先生成批文!")
+    return
+  }
   // const rv = await opertaor.validateAll();
   // if (!rv) {
   //   return;
@@ -4370,9 +4392,16 @@ const submitEdrToUndrFun = async () => {
 if(props.param.cTransMrk !== "1"){
     adjustCiPremiumDifference();
     if (!checkNAmt()) return;
-    const f = await saveEdrPlyInfo();
+    const f = await saveEdrPlyInfo(); 
     // 提交核保,需要默认执行一次保存操作
   if (f && props.param.cTransMrk !== "1") {
+    
+    // 校验清单与条款方案是否一致
+    const DistOK = await validateDistConsistency();
+    if (!DistOK) {
+        btn.loading = false;
+        return;
+    };  
     // const s = await saveDataInfo()
     // if(!s) return;
     const btn = getBtn("btnSubmitEdr");
@@ -4687,6 +4716,45 @@ const adjustCiPremiumDifference = () => {
     }
   }
 };
+
+/**
+ * 校验清单与条款方案是否一致
+ * @returns {Promise<boolean>}  true: 校验通过；false: 校验未通过（弹错）
+ */
+const validateDistConsistency = async () => {
+      // 获取所有清单配置 
+      const distMap = formconfig1[0].pageInfo.filter(
+        (item: any) => item.pageKey === 'dist'
+      );
+      if (!distMap.length) {
+        ElMessage.error('未找到清单配置项');
+        return;
+      }
+      const distParam = {
+        cClauseCode: props.param?.cTermNo, // 条款编码
+        cProdNo: props.param?.cProdNo,     // 产品号
+        cComponentTable: distMap.map((item: any) => item.pageCode)
+      };
+
+      if (props.param?.pageName === 'priceInquiry') {
+        distParam['cInquiryNo'] = opertaor.getTableRefByKey('plyBase')?.getValue('Base.cInquiryNo');
+      } else {
+        distParam['cAppNo'] = opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo');
+      }
+      const distRes: any = await checkDistTerm(distParam);
+
+      if (distRes.code == 200 && distRes.data == true) {
+        return true;          // 通过
+      }
+      if (distRes.code == 200 && distRes.data == false) {
+         ElMessage.error(distRes.msg);
+      } else {
+         ElMessage.error(distRes.msg || '清单校验异常');
+      }
+      return false;
+};
+
+
 /**
  * 投保申请核保时校验联共保信息
  */

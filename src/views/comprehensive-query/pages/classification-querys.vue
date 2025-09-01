@@ -59,6 +59,9 @@
       <template #column-cAppNme="{ row }">
         <span v-html="row.cAppNme || ''"></span>
       </template>
+      <template #column-cEdrNo="{ row }">
+        <span v-html="row.cEdrNo || ''"></span>
+      </template>
       <template #column-cInsuredNme="{ row }">
         <span v-html="row.cInsuredNme || ''"></span>
       </template>
@@ -522,7 +525,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               },
           },
           {
-             prop: "cProdNmeCn",
+             prop: "prodCNmeCn",
              inputtype: "rtselect",
              title: "产品名称",
              typeCode: "PROD_LIST_GRT",
@@ -837,6 +840,7 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "批单号",
         minWidth: 180,
+        slotName: "cEdrNo"
     },
     {
         prop: "cSecondDptCnm",
@@ -1220,6 +1224,19 @@ onMounted(async () => {
         checkedProps = normalQueryColumns.map(c => c.prop); // 默认列
     }
     applyCheckedColumns(checkedProps);
+    // 首页跳转过来查询条件赋值并查询
+    if (sessionStorage.getItem(AppKey.query.pcis_query_search)) {
+        setValue("cQueryStr", JSON.parse(
+            sessionStorage.getItem(AppKey.query.pcis_query_search)
+        ).CAppNo)
+        handleQuery(true, true);
+    }
+});
+
+onUnmounted(() => {
+  //组件销毁，清除sessionStorage数据
+  sessionStorage.getItem(AppKey.query.pcis_query_search) &&
+    sessionStorage.removeItem(AppKey.query.pcis_query_search);
 });
 
 // 绑定方法

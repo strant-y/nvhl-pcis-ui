@@ -521,6 +521,11 @@ function next() {
         getPolicy({ cPlyNo: formconfig1.value.cPlyNo, queryTyp: "orig" }).then(
           (res: any) => {
             if (res.code == "200") {
+              // 续保保单的承保机构必须与选择的承保机构一致
+              if(res.res.composition.plyBase[0]?.['Base.cDptCde'] !== formconfig1.value.cDptCde) {
+                ElMessage.warning("续保保单的承保机构编码【"+ res.res.composition.plyBase[0]?.['Base.cDptCde'] +"】与当前选择的承保机构不符，请重新选择！");
+                return
+              }
               router.push({
                 path: "/pcisapp/myPage",
                 query: {

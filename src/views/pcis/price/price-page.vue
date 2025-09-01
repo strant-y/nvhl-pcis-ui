@@ -435,6 +435,7 @@ import {
   submitUnderwrite,
   getInquiryPolicy,
 	getisAllDone,
+    checkDistTerm,
 	isUndrClsBlackList,
   queryTermRateLimit,
 	queryEcargoRelevancePolicyDetails
@@ -2859,35 +2860,8 @@ const submitToUndrFn = async () => {
       }
     }
   }
-
-	// 申请核保前判断是否灰黑名单
-	const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
-	const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
- 
-  let undrParam = {}
-  if(props.param.pageName && props.param.pageName == "priceInquiry"){
-      undrParam = {
-            cInquiryNumber
-      }
-  }else{
-      undrParam = {
-            cAppNo
-      }
-  }
-	const res: any = await isUndrClsBlackList(undrParam);
-	if(res.code == 200){
-		if(res.msg != '校验通过'){
-			ElMessage({
-				message: res.msg.replace(/\n/g, '<br>'),
-				dangerouslyUseHTMLString: true,
-				type: 'warning'
-			});
-			return false;
-		}
-	} else {
-		ElMessage.error({ message: res.msg, duration: 3000 });
-		return false;
-	}
+  const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
+  const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
 
   // 040002 记名投保标志 选是  校验清单必须录入  
   const distItem = distRequiredMap[props.param.cProdNo];
@@ -3078,6 +3052,40 @@ const submitToUndrFn = async () => {
         btn.loading = false;
         return;
       }
+
+       // 申请核保前判断是否灰黑名单
+        const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
+        const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
+    
+        let undrParam = {}
+        if(props.param.pageName && props.param.pageName == "priceInquiry"){
+            undrParam = { cInquiryNumber }
+        }else{
+            undrParam = { cAppNo }
+        }
+        const blackRes: any = await isUndrClsBlackList(undrParam);
+        if(blackRes.code == 200){
+            if(blackRes.msg != '校验通过'){
+                ElMessage({
+                    message: blackRes.msg.replace(/\n/g, '<br>'),
+                    dangerouslyUseHTMLString: true,
+                    type: 'warning'
+                });
+                btn.loading = false;
+                return false;
+            }
+        } else {
+            ElMessage.error({ message: blackRes.msg, duration: 3000 });
+            btn.loading = false;
+            return false;
+        }
+
+      // 校验清单与条款方案是否一致
+      const DistOK = await validateDistConsistency();
+      if (!DistOK) { // 未通过阻断
+        btn.loading = false;
+        return;
+      }; 
       //校验联共保信息
       const plyBasedata = opertaor.getTableRefByKey("plyBase").getFromValue();
 
@@ -4148,6 +4156,14 @@ const submitEdrToUndrFun = async () => {
     // if(!s) return;
     const btn = getBtn("btnSubmitEdr");
     btn.loading = true;
+
+    // 校验清单与条款方案是否一致
+    const DistOK = await validateDistConsistency();
+    if (!DistOK) {
+        btn.loading = false;
+        return;
+    };  
+
     const res = {};
     const base = opertaor.getTableRefByKey("plyBase").getFromValue();
     res["user"] = user;
@@ -4389,6 +4405,43 @@ const submitUnderwritingFn = async () => {
     // ElMessage.success(res.msg);
     // history.back();
   });
+};
+
+/**
+ * 校验清单与条款方案是否一致
+ * @returns {Promise<boolean>}  true: 校验通过；false: 校验未通过（弹错）
+ */
+const validateDistConsistency = async () => {
+      // 获取所有清单配置 
+      const distMap = formconfig1[0].pageInfo.filter(
+        (item: any) => item.pageKey === 'dist'
+      );
+      if (!distMap.length) {
+        ElMessage.error('未找到清单配置项');
+        return;
+      }
+      const distParam = {
+        cClauseCode: props.param?.cTermNo, // 条款编码
+        cProdNo: props.param?.cProdNo,     // 产品号
+        cComponentTable: distMap.map((item: any) => item.pageCode)
+      };
+
+      if (props.param?.pageName === 'priceInquiry') {
+        distParam['cInquiryNo'] = opertaor.getTableRefByKey('plyBase')?.getValue('Base.cInquiryNo');
+      } else {
+        distParam['cAppNo'] = opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo');
+      }
+      const distRes: any = await checkDistTerm(distParam);
+
+      if (distRes.code == 200 && distRes.data == true) {
+        return true;          // 通过
+      }
+      if (distRes.code == 200 && distRes.data == false) {
+         ElMessage.error(distRes.msg);
+      } else {
+         ElMessage.error(distRes.msg || '清单校验异常');
+      }
+      return false;
 };
 /**
  * 投保申请核保时校验联共保信息

@@ -703,6 +703,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   { label: "是", value: "1" },
                   { label: "否", value: "0" },
               ],
+              func:(val)=>{
+                if(val ==='1'){
+                    freeEditRef.value?.setValue('cDataTyp','ply')
+                }else{
+                    freeEditRef.value?.setValue('cDataTyp','app')
+                }
+              }
           },
           {
               prop: "CEmployeeName",
@@ -1101,7 +1108,7 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "签单日期",
         minWidth: 180,
-        sortable: true,
+        // sortable: true,
 
     },
     {
@@ -1121,7 +1128,7 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "保费",
         minWidth: 100,
-        sortable: true,
+        // sortable: true,
         slotName: "nPrm"
     },
     {

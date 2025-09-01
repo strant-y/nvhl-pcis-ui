@@ -403,10 +403,6 @@ const method = {
         rules: [getRules("required", {})],
       });
 
-      setFormItem("ECargoApplicant.cParticiinsocTyp", {
-        hidden:false,
-        rules: [getRules("required", {})],
-      });
       setFormItem("ECargoApplicant.cCntrCertfCde", {
         hidden:false,
         rules: [getRules("required", {})],
@@ -438,7 +434,6 @@ const method = {
         hidden:false,
         rules: [getRules("required", {})],
       });
-
       // 参加社会统筹标志
       setFormItem("ECargoApplicant.cParticiinsocTyp", {
         hidden:false,
@@ -770,9 +765,9 @@ const method = {
       setFormItem("ECargoApplicant.tCertfBgnDate", { rules: null });
       setFormItem("ECargoApplicant.tCertfEndDate", { rules: null });
       // 参加社会统筹标志
-      setFormItem("ECargoApplicant.cParticiinsocTyp", {
-        rules: null,
-      });
+      // setFormItem("ECargoApplicant.cParticiinsocTyp", {
+      //   rules: null,
+      // });
     }
   },
 };

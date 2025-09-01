@@ -223,8 +223,10 @@ const idAnalysis = (id: string) => {
   const sexCode = parseInt(id.substring(16, 17), 10);
   const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
   const age = calculateAgeFromIdCard(id);
+  if (!getValue("Applicant.cNation")) {
+    setValue("Applicant.cNation", "1"); // 国籍
+  }
 
-  setValue("Applicant.cNation", "1"); // 国籍
   setValue("Applicant.tBirthday", birthday);
   setValue("Applicant.nAge", age);
   setValue("Applicant.cSex", sex);
@@ -391,16 +393,16 @@ const method = {
   cardTypeChange: (val: any) => {
     console.log('证件类型', val, getValue('Applicant.cCertfCls'))
 
-     const param = opertaor.getParam();
-     const isInit = param.initFlag; // 是否是初始化状态
-     if (isInit) return false;
-     
-     const personFields = ['cNation', 'tBirthday', 'nAge', 'cSex'];
-     personFields.forEach(field => {
-       setFormItem(`Applicant.${field}`, { disabled: false });
-     });
+    const param = opertaor.getParam();
+    const isInit = param.initFlag; // 是否是初始化状态
+    if (isInit) return false;
 
- 
+    const personFields = ['cNation', 'tBirthday', 'nAge', 'cSex'];
+    personFields.forEach(field => {
+      setFormItem(`Applicant.${field}`, { disabled: false });
+    });
+
+
     checkUser();   // 调用客户信息接口
     clearValidate('Applicant.cCertfCde')  // 清除报错信息
 
@@ -415,7 +417,6 @@ const method = {
       setFormItem("Applicant.tCertfEndDate", {
         rules: [getRules("required", {})],
       });
-
       setValue("Applicant.cNation", "1"); // 国籍
 
       personFields.forEach(field => {
@@ -1304,8 +1305,12 @@ function handleFileChange(event: Event) {
             }
             setValue("Applicant.cCertfCls", "19");
             setValue("Applicant.cClntMrk", "1");
-          } else if (formconfig.value.fileInputType === "3") {
-            // 营业执照
+            const getCacheCodeLis = codeListStore.getCacheCodeListByCode('AREA_COUNTRY_CACHE{"cType":"0"}');
+            const countryNm = cardInfo["nationality"].value?.split("/")[0] || null;
+            const countryId = getCacheCodeLis?.find((item:any) => item.label === countryNm)?.value || null;
+            setValue("Applicant.cNation", countryId);
+          } else if (formconfig.value.fileInputType === "3"){
+						// 营业执照
             const result = res.data.result.item_list;
             const keys = result.map((item: any) => item.key);
             let cardInfo: any = {};

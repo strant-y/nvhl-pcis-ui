@@ -416,8 +416,10 @@ onMounted(() => {
 
         // 从父页面表格中获取已添加的方案
         const distTableRef = opertaor.getTableRefByKey(props.data.compKey);
-        const added = distTableRef?.getTableData()?.map(row => row['Dist.cPlanNo']).filter(Boolean) || [];
-        const nextIdx = added.length;  // 当前应该选第几个
+        const added = distTableRef?.getTableData()?.map(row => row['Dist.cPlanNo']) || [];
+        // 去重
+        const uniqueAdded = [...new Set(added)]; 
+        const nextIdx = uniqueAdded.length;  // 如：已添加[P1,P2],那么nextIdx = 2，第3个高亮，第4个置灰(3>2)
 
         item.typeCode = null;
         item.loadData = allPlans.map((p: any, idx: number) => ({

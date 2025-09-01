@@ -213,6 +213,11 @@ const tableconfig = reactive<AppTableConfig>(
         fixed: "left",
 				slotName: "policyInfo"
 			},
+      {
+        prop: "cEcAgrEdrNo",
+        inputtype: "rtinput",
+        title: "批单号",
+      },
 			{
         prop: "cEcAgrAppNo",
         inputtype: "rtinput",

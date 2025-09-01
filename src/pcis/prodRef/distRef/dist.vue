@@ -34,6 +34,7 @@ import {
 import {
   selectDist,
   checkAppBase,
+  deleteDistCheck,
   deleteDist,
   distMapCollectCompKey,
 } from "@/api/prod/index";
@@ -408,14 +409,14 @@ const method = {
     }
     
   },
-  delmethod: (row: any) => {
+  async delmethod(row: any) {
     let cappNo = '';
-    
+
     // 判断有无批改类型参数，有则是批单
-    if(route.params.param?.cEdrType) {
-			const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+    if (route.params.param?.cEdrType) {
+      const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       cappNo = edrbase['EdrBase.cAppNo'];
-    } else if(route.params.param?.pageName === "priceInquiry") {
+    } else if (route.params.param?.pageName === "priceInquiry") {
       cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
     } else {
       cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
@@ -428,22 +429,36 @@ const method = {
       cComponentTable: cComponentTableValue,
       cPkId: [row['Dist.cPkId']],
     }
-    if(route.params.param?.pageName === "priceInquiry") {
+    if (route.params.param?.pageName === "priceInquiry") {
       param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
     } else {
       param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
     }
-    deleteDist(param).then((res: any) => {
-      if (res.code === 200) {
-        ElMessage.success("删除成功");
-        const queryParams = distTableRef.value?.getPartnerPage(false);
-        method.handleQuery(queryParams, true);
-      } else {
-        ElMessage.error(res.msg);
-      }
-    }).catch((err:any) => {
-      ElMessage.error(err.msg);
-    })
+
+    const res = await deleteDistCheck(param);
+    const checkMsg = res.code === 500 ? res.msg : "是否确认删除选中的数据？";
+
+    ElMessageBox.confirm(
+        checkMsg,
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+    ).then(() => {
+      deleteDist(param).then((res: any) => {
+        if (res.code === 200) {
+          ElMessage.success("删除成功");
+          const queryParams = distTableRef.value?.getPartnerPage(false);
+          method.handleQuery(queryParams, true);
+        } else {
+          ElMessage.error(res.msg);
+        }
+      }).catch((err: any) => {
+        ElMessage.error(err.msg);
+      })
+    });
   },
 
 
@@ -985,7 +1000,7 @@ const method = {
     }
   },
   // 批量删除
-  batchDelete() {
+  async batchDelete() {
     let cappNo = '';
     // 判断有无批改类型参数，有则是批单
     if(route.params.param?.cEdrType) {
@@ -1004,24 +1019,28 @@ const method = {
       ElMessage.warning("请先选择要删除的数据");
       return;
     }
+    const param = {
+      cComponentTable: cComponentTableValue,
+      cPkId: selectedRows.value.map((row: any) => row['Dist.cPkId']),
+    }
+    if (route.params.param?.pageName === "priceInquiry") {
+      param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    } else {
+      param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+    }
+
+    const res = await deleteDistCheck(param);
+    const checkMsg = res.code === 500 ? res.msg : "是否确认删除选中的数据？";
+
     ElMessageBox.confirm(
-      "是否确认删除选中的数据？",
-      "提示",
-      {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      }
+        checkMsg,
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
     ).then(() => {
-      const param = {
-        cComponentTable: cComponentTableValue,
-        cPkId: selectedRows.value.map((row: any) => row['Dist.cPkId']),
-      }
-      if(route.params.param?.pageName === "priceInquiry") {
-        param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
-      } else {
-        param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
-      }
       deleteDist(param).then(async(res: any) => {
         if (res.code === 200) {
           ElMessage.success("删除成功");

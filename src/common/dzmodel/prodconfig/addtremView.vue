@@ -400,9 +400,17 @@ function selectMainTerm(isselect = true) {
       if (200 === code) {
         data2.value = data;
         data2.value.forEach((item: any) => {
+          // 00425000166 00425000169附加条款不可用，设置为不可选择
+          if(item.cTermNo === "00425000166" || item.cTermNo === "00425000169") {
+            item.disabled = true;
+          }
           const cClauseCategory = item.cClauseCategory ? cClauseCategoryMap[item.cClauseCategory] : "";
           item.label = cClauseCategory ? item.label + '_' + cClauseCategory : item.label;
           selectAdditionNodes.value.forEach(v=>{
+            // 如果选中数据中有00425000169 00425000169，则移除
+            if(v.cTermNo === "00425000166" || v.cTermNo === "00425000169") {
+              selectAdditionNodes.value.splice(selectAdditionNodes.value.indexOf(v), 1)
+            }
             if(v.cRowId && v.cTermNo === item.cTermNo){
               item.disabled = props.data.data.type !== 'ECargo';
               item.children?.forEach((i: any) => {

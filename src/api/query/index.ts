@@ -314,6 +314,14 @@ export function getisAllDone(queryParams: any): AxiosPromise<any> {
 }
 
 /**
+ * 询价/录单-申请核保前校验，判断清单与条款方案是否一致
+ * @param queryParams
+ */
+export function checkDistTerm(queryParams: any): AxiosPromise<any> {
+	return post(`/policy/checkDistTerm`, queryParams);
+}
+
+/**
  * 询价/录单-申请核保根据单号判断是否灰黑名单
  * @param queryParams
  */

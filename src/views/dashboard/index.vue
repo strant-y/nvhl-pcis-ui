@@ -348,7 +348,7 @@ const searchItem = {
   prefixIcon: "Search"
 }
 const searchBtnItem = {
-  label: "投保单查询",
+  label: "查询",
   type: "primary",
   func: () => {
     handleSearch(searchValue.value);
@@ -1393,7 +1393,7 @@ function handleSearch(val: any) {
       AppKey.query.pcis_query_search,
       JSON.stringify(param)
     );
-    router.push({ path: "/query/application-querys" });
+    router.push({ path: "/query/classification-querys" });
   } else if (isAudit.value) {
     //核保员
     const param = Object.assign({

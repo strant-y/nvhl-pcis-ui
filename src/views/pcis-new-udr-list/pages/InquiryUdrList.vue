@@ -101,10 +101,10 @@
     
     // 默认核保机构
     let loadOrgCde = ref([
-        {
-            label: "永安保险总公司",
-            value: "0200000000000",
-        },
+      {
+        label: user.value.companyCnm,
+        value: user.value.companyId,
+      },
     ]);
     watch(() => freeEditRef.value?.getValue("tm1"), (newVal,old) => {
       
