@@ -4717,9 +4717,9 @@ const validateDistConsistency = async () => {
         return true;          // 通过
       }
       if (distRes.code == 200 && distRes.data == false) {
-         ElMessage.error(msg);
+         ElMessage.error(distRes.msg);
       } else {
-         ElMessage.error(msg || '清单校验异常');
+         ElMessage.error(distRes.msg || '清单校验异常');
       }
       return false;
 };
