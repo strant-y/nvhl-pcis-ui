@@ -431,8 +431,8 @@ const method = {
         return;
       }
       // 保留8位小数
-      const limitedValue = floatValue.toFixed(8);
-      freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, limitedValue);
+      // const limitedValue = floatValue.toFixed(8);
+      // freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, limitedValue);
     } else {
       // 如果输入为空或其他非数字情况
       if (val === "" || val === null || val === undefined) {
