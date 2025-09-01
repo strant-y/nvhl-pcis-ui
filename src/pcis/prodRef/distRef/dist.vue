@@ -512,10 +512,9 @@ const method = {
     }
     const selData = {
       cAppNo: "",
-			cProdNo: route.params.param.cProdNo,
 			cComponentTable: cComponentTableValue,
-            cClauseCode: route.params.param.cTermNo, //条款编码  
-            cProdNo: route.params.param.cProdNo,  //产品号
+            cClauseCode: route.params.param?.cTermNo, //条款编码  
+            cProdNo: route.params.param?.cProdNo,  //产品号
 			...formconfig1.value,
 			...queryParams
     };
