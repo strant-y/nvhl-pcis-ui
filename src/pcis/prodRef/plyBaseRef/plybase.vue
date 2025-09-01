@@ -698,6 +698,7 @@ const method = {
     if (!p.initFlag) {
       setValue("Base.cPrjCtgMidTyp", "");
       setValue("Base.cPrjCtgSubTyp", "");
+     
     }
     if (val) {
       // Base.cPrjCtgMidTyp
@@ -719,6 +720,8 @@ const method = {
             });
           }
         });
+    }else{
+       setFormItem("Base.cPrjCtgMidTyp", { rules: null });
     }
   },
   //项目类别中类change事件

@@ -2856,6 +2856,8 @@ function getFKFunc() {
   // return true;
 }
 
+ 
+
 function checkShow(k:any){
   let r = true;
   if(k.pageKey !== 'acctinfo'){
@@ -2901,7 +2903,21 @@ const checkPayPlanValidity = () => {
   });
 };
 
-
+// 校验 地址清单总数 和 学生人数（人）
+const checkStudentValidity  =  async() => {
+        const nStudentsNumber = opertaor.getTableRefByKey("tgt")?.getFromValue()['Tgt.nStudentsNumber']  || 0;  //学生人数
+        let selData = {
+          cComponentTable: 'AddressDist',
+          cAppNo: props.param?.cAppNo,
+        }
+        const selectDistRes: any = await selectDist(selData);
+        const totalStudentCount = selectDistRes['data']['data'].reduce((sum, item) => {
+            const studentCount = item['Dist.nInsuredNumber'];
+             return sum + (studentCount ? Number(studentCount) : 0);
+        }, 0);
+        return nStudentsNumber !== totalStudentCount;  
+       
+}
 /**
  * 投保申请核保
  */
@@ -2969,6 +2985,18 @@ const submitToUndrFn = async () => {
       return false;
     }
   }
+// 043013   校验营业场所地址清
+    if(props.param.cProdNo === '043013') {
+    const selectParam = {
+      cComponentTable: 'PollutionDist',
+      cAppNo: cAppNo
+    }
+    const resDist: any = await selectDist(selectParam);
+    if(resDist['data']['total'] <= 0){
+      ElMessage.warning('营业场所地址清单至少有一条数据!');  
+      return false;
+    }
+  }
 
 
 	// 风勘校验
@@ -3010,6 +3038,15 @@ const submitToUndrFn = async () => {
         ElMessage.error("投保座位总数 = 投保乘客座位总数+投保司乘人员座位总数，请核对");
         return;
       }
+    }
+
+     //040005 校验 地址清单总数 和 学生人数（人）
+   if(props.param.cProdNo ==='040005'){
+        const isUnEqual = await checkStudentValidity();
+        if(isUnEqual){
+            ElMessage.error(`地址清单信息中“投保学生总数”与标的信息中“学生人数（人）”不一致，请核对！`);
+            return false;
+        }
     }
 
   // 判断应收保费是否同保费相同

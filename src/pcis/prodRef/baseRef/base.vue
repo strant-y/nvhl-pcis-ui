@@ -130,13 +130,15 @@ const nPayNumberFun = (isAdd=false)=>{
       const data = opertaor.getDataAll();
       
       let nCiShare = Number(getOwnShare()) || 100 ;
-      const totalAmount = Number(data['base']['Base.nPrm']);  
-      const splitCount =Number(data.base?.['Base.nPayNumber']) 
+      const totalAmount = Number(data['base']['Base.nPrm'])  || 0;
+      const splitCount =Number(data.base?.['Base.nPayNumber']) || 0; 
    
       const totalCent = Math.round(totalAmount * 100);
       const result = ref<number[]>([]);
       const quotient = Math.floor(totalCent / splitCount) ;
       const remainder = totalCent % splitCount;
+      // const validSplitCount = Math.max(0, Math.min(Number.MAX_SAFE_INTEGER, Math.floor(Number(splitCount) || 0)));
+      // result.value = Array(validSplitCount).fill(quotient);
       result.value = Array(splitCount).fill(quotient);
       if (remainder > 0) {
         result.value[splitCount-1] += remainder;
@@ -324,7 +326,7 @@ const method = {
   cRatioTypChange:(val:any)=>{
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["insrnc"].getFromValue();
-    let prodNo = route.params.param.cProdNo;
+    let prodNo = route.params.param?.cProdNo;
     let param = {
       bgnTm: baseBefore["Base.tInsrncBgnTm"],
       endTm: baseBefore["Base.tInsrncEndTm"],
