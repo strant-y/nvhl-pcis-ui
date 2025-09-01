@@ -346,12 +346,12 @@ function getFromValue() {
 function setFormValue(value: any) {
   const val = {
     ...value,
-    "EdrBase.nBefEdrAmt": value["EdrBase.nBefEdrAmt"].toLocaleString(),
-    "EdrBase.nAmt": value["EdrBase.nAmt"].toLocaleString(),
-    "EdrBase.nAmtVar": value["EdrBase.nAmtVar"].toLocaleString(),
-    "EdrBase.nBefEdrPrm": value["EdrBase.nBefEdrPrm"].toLocaleString(),
-    "EdrBase.nPrm": value["EdrBase.nPrm"].toLocaleString(),
-    "EdrBase.nPrmVar": value["EdrBase.nPrmVar"].toLocaleString(),
+    "EdrBase.nBefEdrAmt": value["EdrBase.nBefEdrAmt"]?.toLocaleString(),
+    "EdrBase.nAmt": value["EdrBase.nAmt"]?.toLocaleString(),
+    "EdrBase.nAmtVar": value["EdrBase.nAmtVar"]?.toLocaleString(),
+    "EdrBase.nBefEdrPrm": value["EdrBase.nBefEdrPrm"]?.toLocaleString(),
+    "EdrBase.nPrm": value["EdrBase.nPrm"]?.toLocaleString(),
+    "EdrBase.nPrmVar": value["EdrBase.nPrmVar"]?.toLocaleString(),
   }
   edrbaseEditRef?.value?.setFormValue(val);
 }
