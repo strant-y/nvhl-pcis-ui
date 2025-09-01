@@ -408,14 +408,14 @@ const submitEdrToUndrSurrender = async () => {
     btn.loading = false;
     if(edrInfo["code"] == "200"){
       ElMessage.success(edrInfo.msg);
-      if(edrInfo['cDecision'] === '1' || edrInfo['cDecision'] === '2'){
+      // if(edrInfo['cDecision'] === '1' || edrInfo['cDecision'] === '2'){
         tagsViewStore.delView({"name": "enteringDtl",
-          "title": "录入明细",
+          "title": "协议审核",
           "path": "/protocolManagement/enteringDtl",
           "fullPath": "/protocolManagement/enteringDtl"}).then((res: any) => {
-          router.replace({ path: "/protocolManagement/protocolCorrection" });
+          router.replace({ path: "/protocolManagement/protocolReview" });
         });
-      }
+      // }
     }else {
       ElMessage.error(edrInfo.msg);
     }
@@ -462,14 +462,14 @@ const submitEdrToUndrFun = async () => {
     btn.loading = false;
     if(edrInfo["code"] == "200"){
       ElMessage.success(edrInfo.msg);
-      if(edrInfo['cDecision'] === '1' || edrInfo['cDecision'] === '2'){
+      // if(edrInfo['cDecision'] === '1' || edrInfo['cDecision'] === '2'){
         tagsViewStore.delView({"name": "enteringDtl",
-          "title": "录入明细",
+          "title": "协议审核",
           "path": "/protocolManagement/enteringDtl",
           "fullPath": "/protocolManagement/enteringDtl"}).then((res: any) => {
-          router.replace({ path: "/protocolManagement/protocolCorrection" });
+          router.replace({ path: "/protocolManagement/protocolReview" });
         });
-      }
+      // }
     }else {
       ElMessage.error(edrInfo.msg);
     }
