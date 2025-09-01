@@ -2838,6 +2838,9 @@ const submitToUndrFn = async () => {
       }
     }
   }
+  const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
+  const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
+
   // 040002 记名投保标志 选是  校验清单必须录入  
   const distItem = distRequiredMap[props.param.cProdNo];
   if(distItem && tgtValue[distItem.flagKey] === '1') {
