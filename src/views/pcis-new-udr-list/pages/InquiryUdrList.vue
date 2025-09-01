@@ -1265,7 +1265,6 @@
 
     /** 查询 */
     function refreshData(flag?: boolean) {
-      debugger
         const date1 = freeEditRef.value?.getValue("tm1"); //询价日期
         const date2 = freeEditRef.value?.getValue("tm2"); //提核日期
         const objId = freeEditRef.value?.getValue("objId"); //申请单号
@@ -1349,7 +1348,6 @@
         delete params.tm2;
         const querys = Object.assign(params, r);
         const requestParam = cloneDeep(querys);
-        debugger
         requestParam.udrType = String(requestParam.udrType - 1);
         let udrData;
         if (udrType !== "5") {
