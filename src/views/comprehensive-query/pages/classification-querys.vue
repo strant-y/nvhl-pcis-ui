@@ -59,6 +59,9 @@
       <template #column-cAppNme="{ row }">
         <span v-html="row.cAppNme || ''"></span>
       </template>
+      <template #column-cEdrNo="{ row }">
+        <span v-html="row.cEdrNo || ''"></span>
+      </template>
       <template #column-cInsuredNme="{ row }">
         <span v-html="row.cInsuredNme || ''"></span>
       </template>
@@ -837,6 +840,7 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "批单号",
         minWidth: 180,
+        slotName: "cEdrNo"
     },
     {
         prop: "cSecondDptCnm",
