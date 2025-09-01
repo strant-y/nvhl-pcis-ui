@@ -522,7 +522,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               },
           },
           {
-             prop: "cProdNmeCn",
+             prop: "prodCNmeCn",
              inputtype: "rtselect",
              title: "产品名称",
              typeCode: "PROD_LIST_GRT",

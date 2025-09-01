@@ -3151,10 +3151,10 @@ const submitToUndrFn = async () => {
         return;
       }
       // 校验清单与条款方案是否一致
-      const DistOK = await validateDistConsistency();
-      if (!DistOK) { // 未通过阻断
-        return;
-      };   
+    //   const DistOK = await validateDistConsistency();
+    //   if (!DistOK) { // 未通过阻断
+    //     return;
+    //   };   
       //校验联共保信息
       const plyBasedata = opertaor.getTableRefByKey("plyBase").getFromValue();
 
@@ -4361,10 +4361,10 @@ if(props.param.cTransMrk !== "1"){
   if (f && props.param.cTransMrk !== "1") {
     
     // 校验清单与条款方案是否一致
-    const DistOK = await validateDistConsistency();
-    if (!DistOK) { // 未通过阻断
-      return;
-    };  
+    // const DistOK = await validateDistConsistency();
+    // if (!DistOK) { // 未通过阻断
+    //   return;
+    // };  
     // const s = await saveDataInfo()
     // if(!s) return;
     const btn = getBtn("btnSubmitEdr");
