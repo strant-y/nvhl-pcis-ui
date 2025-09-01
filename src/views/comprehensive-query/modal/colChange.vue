@@ -1,6 +1,6 @@
 <template>
   <el-dialog v-model="dialogVisible" width="90%" title="变更列">
-    <div>
+    <div class="colContainer">
       <app-free-edit
         v-model:freeEditConfig="formconfig1"
         ref="freeEditRef"
@@ -95,6 +95,9 @@ function save() {
 }
 </script>
 
-
-     
+<style scoped>
+.colContainer :deep(.el-form-item__label) {
+  width: 60px !important;
+}
+</style>     
         
