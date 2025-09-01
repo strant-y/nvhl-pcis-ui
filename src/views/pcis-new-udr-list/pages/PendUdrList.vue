@@ -1146,6 +1146,7 @@
                     ]);
                 }
                  if (udrTypeValue.value == "4") {
+                   freeEditRef.value?.setValue("inNextDpt", "1");
                    setFormItem("orgCde", {
                      loadData:  loadOrgCde.value
                    });
