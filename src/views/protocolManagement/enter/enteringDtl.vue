@@ -868,7 +868,7 @@ const premiumCalculation = ()=>{
         }
         AgreementFeeWarn.setFormItem('ECargoBase.PrmProp',{hidden: true})
       }
-      if(isAllAValuesSame(AgreementCvrg,'ECargoTerm.cAmountCurrency')){
+      if(isAllAValuesSame(AgreementCvrg,'ECargoTerm.cOriginalCurrency')){
         AgreementFeeWarn.setFormItem('ECargoBase.AmtProp',{hidden: false})
         AgreementFeeWarn.setValue('ECargoBase.cAmtCur',AgreementCvrg[0]['ECargoTerm.cAmountCurrency'])
         const sum = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nInsuranceAmount'], 0);
@@ -896,7 +896,7 @@ const premiumCalculation = ()=>{
       //退保和注销做逻辑处理 ECargoBase.nRecRemEstAmt --协议剩余实收（预估）保额（人民币）  ECargoBase.nRecRemPrm ---协议剩余预收保费（人民币）
       // nRecRemPrmVar剩余保费变化   nRecRemEstAmtVar剩余保额变化
       // cEdrType 注销 2 退保 3 pageType ---EDR_APP_NEW_SCENE
-      if((props.param?.cEdrType == '2' || props.param?.cEdrType == '3') && props.param?.pageType == 'EDR_APP_NEW_SCENE'){
+      if((props.param?.cEdrType == '2' || props.param?.cEdrType == '3') && (props.param?.pageType == 'EDR_APP_NEW_SCENE' || props?.type == 'EDR_APP_NEW_SCENE')){
         AgreementFeeWarn.setValue('ECargoBase.nRecRemPrmVar', AgreementFeeWarn.getValue('ECargoBase.nRecRemPrm') * -1)
         AgreementFeeWarn.setValue('ECargoBase.nRecRemEstAmtVar',AgreementFeeWarn.getValue('ECargoBase.nRecRemEstAmt') * -1)
 
