@@ -87,6 +87,7 @@ const prodOptions = ref<any>([]);
 const treeNodes = ref<any>([]);
 let cTermNoList = ref<any>([]);  // 条款数据
 let cTermNo = '';    // 条款编码
+const cPard = ref(null);
 
 // 截取条款请求
 function extractCode(str:string) {
@@ -174,103 +175,58 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 defaultValue: 1,
             },
             {
-                prop: "cKindNo",
-                inputtype: "rtSelectV2",
-                title: "产品大类",
-                clearable: true,
-                typeCode: "KIND_LIST_GRT",
-                params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
-                func: (val: any) => {
-                    //根据产品大类再次请求条款接口
-                    // codeListStore
-                    //     .queryCodeList(
-                    //         {
-                    //             codeListName: "PROD_LIST",
-                    //             codeListParam: {
-                    //                 cParCde: val,
-                    //                 cOperId: user.value.opCde,
-                    //                 cDptCde: user.value.companyId,
-                    //             },
-                    //         },
-                    //         false,
-                    //         false
-                    //     )
-                    //     .then((res) => {
-                    //         if (res && res.code == 200) {
-                    //             const codeValData = res.data;
-                    //             if (codeValData) {
-                    //                 //清空条款显示值，重置条款下拉值
-                    //                 freeEditRef.value?.setValue("prodNo", "");
-                    //                 setFormItem("prodNo", {
-                    //                     loadData: codeValData,
-                    //                 });
-                    //             }
-                    //         }
-                    //     });
-                    // freeEditRef.value?.setValue("prodNo", []); // 清空条款
-                    if(val){
-                        console.log(11,val)
-                        // freeEditRef.value?.setValue('cProdNo',[]);
-                        // setFormItem('cProdNo',{
-                        //     typeCode: "TERM_LIST_IN_GUIDE_NEW",
-                        //     codeParam: {
-                        //         cParCde: val,
-                        //         // cOperId: user.value.opCde,
-                        //         // cDptCde: user.value.companyId,
-                        //     },
-                        // })
-                           codeListStore
-                            .queryCodeList({
-                                codeListName: "TERM_LIST_IN_GUIDE_NEW",
-                                codeListParam:{
-                                cParCde: val,
-                                cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
-                                cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
-                            },
-                            })
-                            .then((res) => {
-                                cTermNoList.value = res;
-                                setFormItem("cProdNo", {
-                                    loadData: res,
-                                });
-                            });
-
-                    }else{
-                         console.log(2,val)
-                        freeEditRef.value?.setValue('cProdNo',[]);
-                            setFormItem("cProdNo", {
-                                typeCode: "",
-                                codeParam: {},
-                                loadData: [],
+              prop: "cKindNo",
+              inputtype: "rtselect",
+              title: "产品大类",
+              typeCode: "KIND_LIST_GRT",
+              child: "cProdNo",
+              filterable: true,
+              clearable: true,
+              codeParam: {
+                  cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+                  cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+              },
+              func: (val) => {
+                  setValue("cProdNo","")
+                  cTermNo = "";      // 重置条款编码
+                  cPard.value = val;
+                  codeListStore
+                    .queryCodeList({
+                        codeListName: "TERM_LIST_IN_GUIDE_SEARCH",
+                        codeListParam:{
+                        cParCde: cPard.value,
+                        cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+                        cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+                    },
+                    })
+                    .then((res) => {
+                        cTermNoList.value = res;
+                        setFormItem("cProdNo", {
+                            loadData: res,
                         });
-                    }
-                 
-                },
+                    });
+              },
             },
             {
-                prop: "cProdNo",
-                inputtype: "rtselect",
-                title: "条款",
-                clearable: true,
-                func:(val:any)=>{
-                    
-                    if(val){
-                            if(cTermNoList.value.length>0){
-                                cTermNoList.value.forEach((ele) => {
-                                    if(ele['value']  === val){
-                                        cTermNo =extractCode(ele['label'])
-                                    }
-                                });
-                            }
-                        
-                    }
+              prop: "cProdNo",
+              inputtype: "rtselect",
+              title: "条款名称",
+              itemWidth: 1,
+              filterable: true,
+              clearable: true,
+              func: (val:any) => {
+                if(val){
+                        if(cTermNoList.value.length>0){
+                            cTermNoList.value.forEach((ele) => {
+                                if(ele['value']  === val){
+                                    cTermNo = extractCode(ele['label'])
+                                }
+                            });
+                        }
+                } else {
+                    cTermNo = "";
                 }
-                // typeCode: "TERM_LIST_IN_GUIDE_NEW",
-                // params: {
-                //     cParCde: "",
-                //     cOperId: user.value.opCde,
-                //     cDptCde: user.value.companyId,
-                // },
+              },
             },
             {
                 prop: "cInsuredNme",
@@ -1154,6 +1110,17 @@ watch(dialogVisible, (newValue) => {
         dialogComponent.value = null;
         dialogData.value = {};
     }
+});
+function setValue(key: string, value: any) {
+    freeEditRef?.value?.setValue(key, value);
+}
+
+function getValue(key: string) {
+  return freeEditRef?.value?.getValue(key);
+}
+defineExpose({
+  setValue,
+  getValue,
 });
 </script>
 
