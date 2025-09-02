@@ -1352,6 +1352,7 @@
         let udrData;
         if (udrType !== "5") {
             if (udrType === "4") {
+              requestParam.orgCde = user.value.companyId;
                 udrData = backInquiryUdrList(requestParam);
             } else {
                 udrData = getInquiryNewUdrList(requestParam);
