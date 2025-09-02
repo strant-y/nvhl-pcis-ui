@@ -625,6 +625,9 @@ const method = {
     setFormItem("Tgt.cTransportTools", {
       rules: val === '1' ? requiredRule : [],
     });
+    if(val !== '1'){
+      clearValidate('Tgt.cTransportTools')
+    }
     setFormItem("Tgt.cTransportLicenseNumber", {
       rules: val === '1' ? requiredRule : [],
     });
