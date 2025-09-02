@@ -51,7 +51,7 @@
 import { dataParam } from "@/store/modules/dataParam";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { ref, onMounted } from "vue";
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
 import {useRoute} from "vue-router";
 
 const props = defineProps({
