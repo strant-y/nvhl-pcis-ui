@@ -1261,22 +1261,12 @@
                     handleQuery()
                 }
             }, 500)
+        } else {
+            setTimeout(() => {
+                handleQuery()
+            }, 500)
         }
         //首页跳转过来的逻辑 End
-
-        // handleQuery(true);
-        // 下面是测试数据
-        // pageresult.list = [
-        //   { CAppNo: 1, cAppStatus: 1, },
-        //   { CAppNo: 2, cAppStatus: 2, },
-        //   { CAppNo: 3, cAppStatus: 3, },
-        //   { CAppNo: 4, cAppStatus: 4 },
-        //   { CAppNo: 5, cAppStatus: 5, },
-        //   { CAppNo: 6, cAppStatus: 6, },
-        //   { CAppNo: 7, cAppStatus: 7, },
-        //   { CAppNo: 8, cAppStatus: 8, },
-        // ];
-        // pageresult.total = 1;
     });
 
     onUnmounted(() => {

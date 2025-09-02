@@ -36,6 +36,7 @@ const props = defineProps({
 const emits = defineEmits(["handleClose"]);
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useValidator } from "@/typings/useValidator";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const freeEditRef = ref<AppFreeEditMethod | null>(null);

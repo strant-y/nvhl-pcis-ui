@@ -160,6 +160,11 @@ let addrowArr = [
     "tUdrTm",
 ];
 const cPard = ref(null);
+function extractCode(str:string) {
+  // 匹配 "P+数字" 或 "纯数字"
+  const pattern = /^(P\d+|\d+)/;
+  return str.match(pattern)?.[0] || "";
+}
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
