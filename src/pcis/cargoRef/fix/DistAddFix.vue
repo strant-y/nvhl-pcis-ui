@@ -540,10 +540,10 @@ const cIsIndvduBizChange = (val:any)=>{
       setFormItem("ECargoInsuredDist.cCntrNme", {
         rules: null,
       });
-      setFormItem('ECargoInsuredDist.tBirthday',{disabled:true})
-      setFormItem('ECargoInsuredDist.nAge',{disabled:true})
-      setFormItem('ECargoInsuredDist.cSex',{disabled:true})
-      setFormItem('ECargoInsuredDist.cNation',{disabled:true})
+      // setFormItem('ECargoInsuredDist.tBirthday',{disabled:true})
+      // setFormItem('ECargoInsuredDist.nAge',{disabled:true})
+      // setFormItem('ECargoInsuredDist.cSex',{disabled:true})
+      // setFormItem('ECargoInsuredDist.cNation',{disabled:true})
       codeListStore
           .queryCodeList({
             codeListName: "NATURAL_CERTIFICATE_CACHE",
@@ -596,10 +596,10 @@ const cIsIndvduBizChange = (val:any)=>{
       setFormItem("ECargoInsuredDist.cCntrNme", {
         rules: [getRules("required", {})],
       });
-      setFormItem('ECargoInsuredDist.tBirthday',{disabled:false})
-      setFormItem('ECargoInsuredDist.nAge',{disabled:false})
-      setFormItem('ECargoInsuredDist.cSex',{disabled:false})
-      setFormItem('ECargoInsuredDist.cNation',{disabled:false})
+      // setFormItem('ECargoInsuredDist.tBirthday',{disabled:false})
+      // setFormItem('ECargoInsuredDist.nAge',{disabled:false})
+      // setFormItem('ECargoInsuredDist.cSex',{disabled:false})
+      // setFormItem('ECargoInsuredDist.cNation',{disabled:false})
     }
   }
 //注册地市是否同上
