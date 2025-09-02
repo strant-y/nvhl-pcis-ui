@@ -1421,6 +1421,7 @@ async function loadAfter() {
 					dataInit.value.insured = res.data.policyApplication?.composition?.insured[0] || {};
 					dataInit.value.applicant = res.data.policyApplication?.composition?.applicant[0] || {};
 					dataInit.value.cvrg = res.data.policyApplication?.composition?.cvrg || {};
+          dataInit.value.plyBase = res.data.policyApplication?.composition?.plyBase[0] || {};
 					dataInit.value.plyBase["Base.cNeedfeeFlag"] = props.param.cNeedfeeFlag
 					dataInit.value.plyBase["Base.cEcAgrNo"] = props.param.cEcAgrNo
 					let plyBase = opertaor.getTableRefByKey('plyBase')

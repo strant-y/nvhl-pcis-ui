@@ -531,6 +531,15 @@ const cIsIndvduBizChange = (val:any)=>{
 }
  const cClntMrkFunc = (val:any)=>{
     if(val === '1'){
+      setFormItem("ECargoInsuredDist.cIsIndvduBiz", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("ECargoApplicant.cWorkDpt", {
+        rules: null,
+      });
+      setFormItem("ECargoInsuredDist.cCntrNme", {
+        rules: null,
+      });
       setFormItem('ECargoInsuredDist.tBirthday',{disabled:true})
       setFormItem('ECargoInsuredDist.nAge',{disabled:true})
       setFormItem('ECargoInsuredDist.cSex',{disabled:true})
@@ -578,6 +587,15 @@ const cIsIndvduBizChange = (val:any)=>{
               rules: [getRules("required", {})],
             });
           });
+      setFormItem("ECargoInsuredDist.cIsIndvduBiz", {
+        rules:null,
+      });
+      setFormItem("ECargoApplicant.cWorkDpt", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("ECargoInsuredDist.cCntrNme", {
+        rules: [getRules("required", {})],
+      });
       setFormItem('ECargoInsuredDist.tBirthday',{disabled:false})
       setFormItem('ECargoInsuredDist.nAge',{disabled:false})
       setFormItem('ECargoInsuredDist.cSex',{disabled:false})
