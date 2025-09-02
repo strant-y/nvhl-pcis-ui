@@ -24,9 +24,6 @@ import {
   getChaSubtypList,
   getPageList,
 } from "@/api/code-list-service";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
 const { getRules } = useValidator();
 const props = defineProps({
   data: {

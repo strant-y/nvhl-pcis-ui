@@ -3129,15 +3129,7 @@ const submitToUndrFn = async () => {
         res["cInquiryNo"] = base["Base.cInquiryNo"];
       } else {
         res["appNo"] = base["Base.cAppNo"];
-      }
-
-      // 询价单申请核保参数
-      if(props.param?.pageName === "priceInquiry") {
-        res["taskId"] = 0;
-        res["openPolicy"] = null;
-        res["cInquiryNo"] = base["Base.cInquiryNo"];
-      } else {
-        res["appNo"] = base["Base.cAppNo"];
+        res['taskId'] = props.param.taskId;
       }
 
 

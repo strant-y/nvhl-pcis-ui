@@ -1,11 +1,5 @@
 <template>
-  <el-dialog
-    v-model="dialogVisible"
-    title="关联责任"
-    width="80%"
-    @update:model-value="handleVisibleUpdate"
-  >
-    <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
+  <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
     <app-table
       :tableConfig="tableConfig"
       v-model:pageresult="pageresult"
@@ -13,13 +7,6 @@
       @page-change="handleQuery(false)"
       @selection-change="handleSelectionChange"
     />
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="handleCancel">取消</el-button>
-        <el-button type="primary" @click="handleConfirm">确认</el-button>
-      </span>
-    </template>
-  </el-dialog>
 </template>
 
 <script setup lang="ts">
@@ -37,7 +24,6 @@ import {
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import { ref, reactive, defineEmits, defineProps } from "vue";
-const emits = defineEmits(["ok", "cancel"]);
 import { ElMessage } from "element-plus";
 import {
   query,
@@ -49,10 +35,17 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
-const props = defineProps<{
-  visible: boolean;
-}>();
-const dialogVisible = ref(true);
+const emits = defineEmits(["handleClose"]);
+const props = defineProps({
+  data: {
+    type: Object,
+    default: () => ({}),
+  },
+  method: {
+    type: Object,
+    default: () => ({}),
+  },
+});
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
@@ -112,6 +105,7 @@ const pageresult = reactive<Pageresult>({
 const tableConfig = reactive<AppTableConfig>(
   createTableEditConfig({
     showSelection: true,
+    editList:['cIsCommon'],
     fromSchema: [
       {
         prop: "cKindNo",
@@ -133,7 +127,32 @@ const tableConfig = reactive<AppTableConfig>(
         title: "英文名称",
         inputtype: "rtinput",
       },
+      {
+        prop: "cIsCommon",
+        title: "公共信息",
+        inputtype: "rtswitch",
+        keymap:{
+          y:'1',
+          n:'0'
+        }
+      },
     ],
+    endBtns:[
+      createFreeButtonBase({
+        type: "primary",
+        label: "保存",
+        func: () => {
+          handleConfirm();
+        },
+      }),
+      createFreeButtonBase({
+        type: "info",
+        label: "取消",
+        func: () => {
+          emits("handleClose");
+        },
+      }),
+    ]
   })
 );
 
@@ -173,27 +192,26 @@ const handleConfirm = () => {
     return item;
   });
   const paramData = { cTermNo: cTermNo, rel: newArr };
-  saveTermRiskRel(paramData)
-    .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
-        emits("ok", {});
-        ElMessage.success("保存成功");
-        dialogVisible.value = false;
-      } else {
-        ElMessage.error(msg);
-      }
-    })
-    .finally(() => {});
+  console.log(paramData); 
+  // saveTermRiskRel(paramData)
+  //   .then((res) => {
+  //     const { code, data, msg } = res;
+  //     if (200 === code) {
+  //       emits("ok", {});
+  //       ElMessage.success("保存成功");
+  //       emits("handleClose");
+  //     } else {
+  //       ElMessage.error(msg);
+  //     }
+  //   })
+  //   .finally(() => {});
 };
 onMounted(() => {
   setTimeout(() => {
     handleQuery();
   }, 100);
 });
-const handleCancel = () => {
-  dialogVisible.value = false;
-};
+
 </script>
 
 <style scoped>
