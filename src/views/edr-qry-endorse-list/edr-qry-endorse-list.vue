@@ -3,7 +3,25 @@
         <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
         <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
             @page-change="handleQuery(false)" @row-click="handleRowClick" @row-dblclick="handleRowDoubleClick"
-            @sort-change="sortChange" />
+            @sort-change="sortChange" >
+            <!-- policyInfo 列的具名插槽 -->
+            <template #column-policyInfo="{ row, column, index }">
+                <div class="policy-info-cell">
+                <div v-if="row.cAppNo" class="policy-number-row">
+                    <span>{{row.cAppNo}}</span>
+                    <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
+                        <DocumentCopy />
+                    </el-icon>
+                </div>
+                <div v-if="row.cPlyNo" class="policy-number-row">
+                    <span>{{row.cPlyNo}}</span>
+                    <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
+                        <DocumentCopy />
+                    </el-icon>
+                </div>
+                </div>
+           </template>
+      	</app-table>
     </div>
     <comDialog ref="dialog"></comDialog>
 </template>
@@ -18,6 +36,7 @@ import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { PcisEdrQueryService } from "./service/pcis-edr-query-service";
 import { getListByCode } from "@/api/code-list-service";
 import { useUserStore } from "@/store/modules/user";
+import { DocumentCopy } from "@element-plus/icons-vue";
 import { AppKey } from "@/constants/api";
 import { getProdEnableList } from "@/api/prod/";
 import {
@@ -348,10 +367,11 @@ const tableconfig = reactive<AppTableConfig>(
         ],
         fromSchema: [
             {
-                prop: "cAppNoAndPlyNo",
+                prop: "policyInfo",
                 inputtype: "rtinput",
-                title: "申请单号",
-                width: 220
+                title: "申请单号/保单号",
+                width: 220,
+                slotName: "policyInfo"
             },
             // {
             //     prop: "cPlyNo",
@@ -510,11 +530,6 @@ const refreshData = (reset = true) => {
                                 { label: '退保', value: `3-${item.cProdNo.slice(0,2)}` },
                             ],
                         });
-                        if(item.cPlyNo) {
-                            item.cAppNoAndPlyNo = `${item.cAppNo || ''}\n${item.cPlyNo || ''}`
-                        } else {
-                            item.cAppNoAndPlyNo = item.cAppNo || ''
-                        }
                     });
                     pageresult.list = pageData.result;
                    
@@ -963,6 +978,8 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                             cTermNo: selected.value["cTermNo"],
                             cProdNmeCn: selected.value["cProdNmeCn"],
                             cPolicySource: selected.value["cPolicySource"],
+                            nRecRemEstAmt:data?.nRecRemEstAmt || 0,
+                            nRecRemPrm:data?.nRecRemPrm || 0,
                         });
                         //预留跳转路径
                         router.push({
@@ -991,6 +1008,8 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                             cTermNo: selected.value["cTermNo"],
                             cProdNmeCn: selected.value["cProdNmeCn"],
                             cPolicySource: selected.value["cPolicySource"],
+                          nRecRemEstAmt:data?.nRecRemEstAmt || 0,
+                          nRecRemPrm:data?.nRecRemPrm || 0,
                         });
                         //预留跳转路径
                         router.push({
@@ -1021,6 +1040,8 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                             tInsrncBgnTm: selected.value["tInsrncBgnTm"],
                             tInsrncEndTm: selected.value["tInsrncEndTm"],
                             cPolicySource: selected.value["cPolicySource"],
+                          nRecRemEstAmt:data?.nRecRemEstAmt || 0,
+                          nRecRemPrm:data?.nRecRemPrm || 0,
                         });
                         console.log(en);
                         router.push({
@@ -1111,6 +1132,45 @@ watch(dialogVisible, (newValue) => {
         dialogData.value = {};
     }
 });
+
+// 添加 copyText 方法
+const copyText = (text: any) => {
+  if (!text) {
+    ElMessage.warning('没有可复制的内容');
+    return;
+  }
+
+  // 检查 navigator.clipboard 是否存在
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(
+        () => {
+          ElMessage.success('复制成功');
+        },
+        () => {
+          ElMessage.error('复制失败');
+        }
+    );
+  } else {
+    // 使用 document.execCommand('copy') 方法作为备选方案
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      const result = document.execCommand('copy');
+      if (result) {
+        ElMessage.success('复制成功');
+      } else {
+        ElMessage.error('复制失败');
+      }
+    } catch (err) {
+      ElMessage.error('复制失败，请稍后再试');
+    } finally {
+      document.body.removeChild(textarea); // 清理创建的 textarea 元素
+    }
+  }
+};
+
 function setValue(key: string, value: any) {
     freeEditRef?.value?.setValue(key, value);
 }
@@ -1128,7 +1188,6 @@ defineExpose({
 .actived {
     background: #a6dbed;
 }
-
 .fc-table-icons {
     i {
         margin-right: 10px;
@@ -1137,5 +1196,28 @@ defineExpose({
 }
 :deep(.el-table__body .el-table__row .el-table__cell:first-child .cell) {
     white-space: break-spaces;
+}
+.copy-icon {
+  margin-left: 5px;
+  cursor: pointer;
+  color: #409eff;
+}
+
+.policy-info-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.policy-number-row {
+  display: flex;
+  align-items: center;
+}
+
+.policy-number-row span {
+  flex: 1;
+}
+:deep(.el-table th:nth-child(1) .cell) {
+    white-space: pre-line;
 }
 </style>

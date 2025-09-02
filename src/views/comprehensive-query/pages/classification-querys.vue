@@ -191,6 +191,15 @@ function extractCode(str:string) {
   return str.match(pattern)?.[0] || "";
 }
 
+const allCAppStatus = [
+  {label: "暂存", value: "1"},
+  {label: "已提核", value: "2"},
+  {label: "核保退回/撤回", value: "3"},
+  {label: "已核待缴费", value: "4"},
+  {label: "已出单", value: "5"},
+  {label: "见费出单退回", value: "8"},
+]
+
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -225,7 +234,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
                     ],
                     tAppTm: [
-                        dayjs(new Date()).subtract(15, "days").format("YYYY-MM-DD 00:00:00"),
+                        dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
                     ],
                     cDataTyp:"app",
@@ -565,15 +574,17 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                           if (item.prop === "tAppTm") {
                               item.hidden = false; // 显示投保日期
                               item.rules = [getRules("required", {})]; // 设置必填规则
-                              // 设置默认值为最近15天
+                              // 设置默认值为最近3个月
                               const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
-                              const startDate = moment(new Date()).subtract(15, "days").format("YYYY-MM-DD 00:00:00");
+                              const startDate = moment(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00");
                               freeEditRef.value?.setValue("tAppTm", [startDate, endDate]);
                           } else if (item.prop == "tEdrAppTm" || item.prop == "tInquiryTm") {
                               item.hidden = true;
                           } else if (item.prop == "cPlyNo" || item.prop == "cDataTyp") {
                              item.hidden = false;
-                          } 
+                          } else if (item.prop === "cAppStatus") {
+                            item.loadData = allCAppStatus;
+                          }
                       });
                   } else if (val === "E") {
                       // 批改
@@ -581,22 +592,24 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                           if (item.prop === "tEdrAppTm") {
                               item.hidden = false; // 显示批改申请日期
                               item.rules = [getRules("required", {})]; // 设置必填规则
-                            // 设置默认值为最近15天
+                            // 设置默认值为最近3个月
                             const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
-                            const startDate = moment(new Date()).subtract(15, "days").format("YYYY-MM-DD 00:00:00");
+                            const startDate = moment(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00");
                             freeEditRef.value?.setValue("tEdrAppTm", [startDate, endDate]);
                           } else if (item.prop == "tAppTm" || item.prop == "tInquiryTm") {
                             item.hidden = true;
                           } else if (item.prop == "cPlyNo" || item.prop == "cDataTyp") {
                             item.hidden = false;
-                          } 
+                          } else if (item.prop === "cAppStatus") {
+                            item.loadData = allCAppStatus;
+                          }
                       });
                   } else if (val === "I") {
                       // 询价
                       formconfig1.fromSchema?.forEach((item) => {
                           if (item.prop === "tInquiryTm") {
                               item.hidden = false; // 显示询价日期，询价单号
-                            // 设置默认值为最近15天
+                            // 设置默认值为最近3个月
                             const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
                             const startDate = moment(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00");
                             freeEditRef.value?.setValue("tInquiryTm", [startDate, endDate]);
@@ -604,7 +617,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                               item.hidden = true;
                           } else if (item.prop == "cPlyNo") {
                               item.hidden = false;
-                          } 
+                          } else if (item.prop === "cAppStatus") {
+                            item.loadData = allCAppStatus.filter(o => o.value !== "4");
+                          }
                       });
                   } else if(!val) {
                     // 清空选中值
@@ -1210,7 +1225,7 @@ onMounted(async () => {
     ]);
     // 申请日期默认展示投保日期
     freeEditRef.value.setValue("tAppTm", [
-        dayjs(new Date()).subtract(15, "days").format("YYYY-MM-DD 00:00:00"),
+        dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
     ]);
 

@@ -35,9 +35,12 @@
           </div>
         </div>
       </template>
-      <!-- ES查询 投保人姓名，被保人姓名，被保人地址，产品名称高亮 -->
+       <!-- ES查询 查询条件高亮 -->
       <template #column-cAppNme="{ row }">
         <span v-html="row.cAppNme || ''"></span>
+      </template>
+      <template #column-cEdrNo="{ row }">
+        <span v-html="row.cEdrNo || ''"></span>
       </template>
       <template #column-cInsuredNme="{ row }">
         <span v-html="row.cInsuredNme || ''"></span>
@@ -50,6 +53,33 @@
       </template>
       <template #column-tUdrTm="{ row }">
         <span v-html="row.tUdrTm || ''"></span>
+      </template>
+      <template #column-tIssueTm="{ row }">
+        <span v-html="row.tIssueTm || ''"></span>
+      </template>
+      <template #column-nEdrPrjNo="{ row }">
+        <span v-html="row.nEdrPrjNo || ''"></span>
+      </template>
+      <template #column-cDptCnm="{ row }">
+        <span v-html="row.cDptCnm || ''"></span>
+      </template>
+      <template #column-cProdNmeCn="{ row }">
+        <span v-html="row.cProdNmeCn || ''"></span>
+      </template>
+      <template #column-cSecondDptCnm="{ row }">
+        <span v-html="row.cSecondDptCnm || ''"></span>
+      </template>
+      <template #column-cTermNme="{ row }">
+        <span v-html="row.cTermNme || ''"></span>
+      </template>
+      <template #column-nAmt="{ row }">
+        <span v-html="row.nAmt || ''"></span>
+      </template>
+      <template #column-nPrm="{ row }">
+        <span v-html="row.nPrm || ''"></span>
+      </template>
+      <template #column-cUdrNme="{ row }">
+        <span v-html="row.cUdrNme || ''"></span>
       </template>
 
 	</app-table>
@@ -130,6 +160,11 @@ let addrowArr = [
     "tUdrTm",
 ];
 const cPard = ref(null);
+function extractCode(str:string) {
+  // 匹配 "P+数字" 或 "纯数字"
+  const pattern = /^(P\d+|\d+)/;
+  return str.match(pattern)?.[0] || "";
+}
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -859,16 +894,18 @@ const esSearchColumns = [
     slotName: "policyInfo"
    },
    {
-    prop: "cPlyNo",
+    prop: "cEdrNo",
     inputtype: "rtinput",
     title: "批单",
     minWidth: 180,
+    slotName: "cEdrNo"
    },
    {
     prop: "nEdrPrjNo",
     inputtype: "rtinput",
     title: "批改序号",
     minWidth: 180,
+    slotName: "nEdrPrjNo"
    },
    {
     prop: "cNmeCn",

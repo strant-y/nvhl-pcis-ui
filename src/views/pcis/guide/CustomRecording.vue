@@ -762,7 +762,7 @@ function getProtocolNumber (){
         const selectedTerm = res.body;
         // nRecRemPrm 剩余保费   nRecRemEstAmt 剩余保额
         if(selectedTerm.nRecRemPrm <= 0 || selectedTerm.nRecRemEstAmt <= 0 ){
-          ElMessage.warning("该协议剩余预收保费不足,请重新选择协议！");
+          ElMessage.warning("该协议剩余预收保额不足,请重新选择协议！");
           return false
         }
         formconfig1.value.cEcAgrNo = selectedTerm.cEcAgrNo; // 协议号

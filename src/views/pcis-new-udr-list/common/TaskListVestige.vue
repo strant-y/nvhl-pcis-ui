@@ -85,13 +85,17 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "任务类型",
         minWidth: 100,
-        formatter: (val: any) => {
+        formatter: (val: any) => { 
           if (val === '0') {
             return "新任务";
           } else if (val === '8') {
-            return "任务上报";
+            return "上报任务";
           }else if (val === '7') {
-            return "任务退回";
+            return "重做任务";
+          } else if(val === '1') {
+            return "退回任务";
+          } else if(val === '2') {
+            return "撤回任务";
           } else {
             return val;
           }

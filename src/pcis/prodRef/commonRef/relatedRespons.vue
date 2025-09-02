@@ -42,12 +42,8 @@ import {
 
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
-const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
 const AddResponsibilityModal = defineAsyncComponent(
   () => import("./AddResponsibilityModal.vue")
-);
-const ResponsibilityModal = defineAsyncComponent(
-  () => import("./ResponsibilityModal.vue")
 );
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
@@ -107,17 +103,32 @@ const tableconfig = reactive<AppTableConfig>(
         label: "关联责任",
         type: "success",
         func: function () {
-          if (tabref.getFromValue().cTermNo == null) {
+          const clauseConfBasicInfo = opertaor.getTableRefByKey(
+            "clauseConfBasicInfo"
+          );
+          if (clauseConfBasicInfo.getFromValue().cTermNo == null) {
             ElMessage.error("请完善基本信息!");
             return;
           } else {
-            dzmodal
-              .open(ResponsibilityModal, { type: "add", data: {} })
-              .then((res) => {
-                if (res.type === "ok") {
-                  handleQuery();
-                }
-              });
+            // dzmodal
+            //   .open(ResponsibilityModal, { type: "add", data: {} })
+            //   .then((res) => {
+            //     if (res.type === "ok") {
+            //       handleQuery();
+            //     }
+            //   });
+            dialog.value?.open(
+            "responsibilityModal",
+            {
+              type: "add", data: {},
+            },
+            {
+              isOk: () => {
+                handleQuery();
+              },
+            },
+            { title: "关联责任", width: 80 }
+          );
           }
         },
       }),
@@ -126,7 +137,10 @@ const tableconfig = reactive<AppTableConfig>(
         label: "增加责任",
         type: "success",
         func: function () {
-          if (tabref.getFromValue().cTermNo == null) {
+          const clauseConfBasicInfo = opertaor.getTableRefByKey(
+            "clauseConfBasicInfo"
+          );
+          if (clauseConfBasicInfo.getFromValue().cTermNo == null) {
             ElMessage.error("请完善基本信息!");
             return;
           } else {
@@ -144,8 +158,6 @@ const tableconfig = reactive<AppTableConfig>(
         type: "primary",
         label: "要素绑定",
         func: () => {
-          const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
           const clauseConfBasicInfo = opertaor.getTableRefByKey(
             "clauseConfBasicInfo"
           );

@@ -1330,7 +1330,7 @@
                 {
                     sortField: "name",
                     bsType: "A",
-                    CAppStatus: "4",
+                    CAppStatus: "5",
                     // CUdrCde: this.user.opCde, // 已核保查询去掉人员限制
                     sortOrder: null, // 存在问题_sortValue需要确认5个页面，每个tale具体哪些字段需要排序
                     CurrentUser: user.value.opCde,
@@ -1352,6 +1352,7 @@
         let udrData;
         if (udrType !== "5") {
             if (udrType === "4") {
+              requestParam.orgCde = user.value.companyId;
                 udrData = backInquiryUdrList(requestParam);
             } else {
                 udrData = getInquiryNewUdrList(requestParam);

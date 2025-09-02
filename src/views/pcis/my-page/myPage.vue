@@ -700,18 +700,18 @@ onMounted(() => {
   console.log('param 路由---', props.param )
     initPage().then(() => {
       nextTick(() => {
-      const mainContent = document.querySelector('.main-content');
-      if (mainContent) {
-        nextTick(() => {
-          setTimeout(highlightFirstVisibleAnchor, 300);
-        });
-        mainContent.addEventListener('scroll', handleScroll);
-        // 初始触发一次
-          setTimeout(() => {
-            handleScroll();
-          }, 500); // 延迟确保所有组件已加载
-      }
-  }); // 延迟执行以确保DOM元素已经渲染
+        const mainContent = document.querySelector('.main-content');
+        if (mainContent) {
+          nextTick(() => {
+            setTimeout(highlightFirstVisibleAnchor, 300);
+          });
+          mainContent.addEventListener('scroll', handleScroll);
+          // 初始触发一次
+            setTimeout(() => {
+              handleScroll();
+            }, 500); // 延迟确保所有组件已加载
+        }
+      }); // 延迟执行以确保DOM元素已经渲染
     });
 });
 
@@ -1421,6 +1421,7 @@ async function loadAfter() {
 					dataInit.value.insured = res.data.policyApplication?.composition?.insured[0] || {};
 					dataInit.value.applicant = res.data.policyApplication?.composition?.applicant[0] || {};
 					dataInit.value.cvrg = res.data.policyApplication?.composition?.cvrg || {};
+          dataInit.value.plyBase = res.data.policyApplication?.composition?.plyBase[0] || {};
 					dataInit.value.plyBase["Base.cNeedfeeFlag"] = props.param.cNeedfeeFlag
 					dataInit.value.plyBase["Base.cEcAgrNo"] = props.param.cEcAgrNo
 					let plyBase = opertaor.getTableRefByKey('plyBase')
@@ -2201,6 +2202,7 @@ async function loadAfter() {
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
           ops.plyBase['Base.cAgriMrk'] = "2"// 涉农标志设置默认值
+          ops.plyBase['Base.cNeedfeeFlag'] = "1"// 是否见费出单设置默认值
         }
         ops['plyBase']['Base.cPlyNo'] = ''
         ops['plyBase']['Base.cAppStatus'] = ''
@@ -2968,6 +2970,10 @@ const submitToUndrFn = async () => {
       }
     }
   }
+   // 定义cInquiryNumber 和 cAppNo；
+   const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
+   const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
+
   // 040002 记名投保标志 选是 校验清单必须录入
   const distItem = distRequiredMap[props.param.cProdNo];
   if(distItem && tgtValue[distItem.flagKey] === '1') {
@@ -2989,7 +2995,7 @@ const submitToUndrFn = async () => {
     if(props.param.cProdNo === '043013') {
     const selectParam = {
       cComponentTable: 'PollutionDist',
-      cAppNo: cAppNo
+      cAppNo: cAppNo,
     }
     const resDist: any = await selectDist(selectParam);
     if(resDist['data']['total'] <= 0){
@@ -2997,7 +3003,6 @@ const submitToUndrFn = async () => {
       return false;
     }
   }
-
 
 	// 风勘校验
  	if( props.param?.pageName === "priceInquiry" ){
@@ -3129,15 +3134,7 @@ const submitToUndrFn = async () => {
         res["cInquiryNo"] = base["Base.cInquiryNo"];
       } else {
         res["appNo"] = base["Base.cAppNo"];
-      }
-
-      // 询价单申请核保参数
-      if(props.param?.pageName === "priceInquiry") {
-        res["taskId"] = 0;
-        res["openPolicy"] = null;
-        res["cInquiryNo"] = base["Base.cInquiryNo"];
-      } else {
-        res["appNo"] = base["Base.cAppNo"];
+        res['taskId'] = props.param.taskId;
       }
 
 
@@ -4727,8 +4724,7 @@ const validateDistConsistency = async () => {
         (item: any) => item.pageKey === 'dist'
       );
       if (!distMap.length) {
-        ElMessage.error('未找到清单配置项');
-        return;
+        return true;
       }
       const distParam = {
         cClauseCode: props.param?.cTermNo, // 条款编码
@@ -4746,8 +4742,23 @@ const validateDistConsistency = async () => {
       if (distRes.code == 200 && distRes.data == true) {
         return true;          // 通过
       }
+      // 构造提示语换行展示
       if (distRes.code == 200 && distRes.data == false) {
-         ElMessage.error(distRes.msg);
+        const safeMsg = (distRes.msg || '清单校验异常')
+        .replace(/\n/g, '<br>')
+        .replace(/·/g, '<br>·');   // 每个 · 独占一行
+
+        // 超出就滚动展示
+        const scrollMsg = `
+            <div style="max-height: 35vh; overflow-y: auto;">
+                ${safeMsg}
+            </div>
+        `;
+        ElMessageBox.alert(scrollMsg, "提示", {
+            confirmButtonText: "确定",
+            dangerouslyUseHTMLString: true,
+            type: "warning"
+        })
       } else {
          ElMessage.error(distRes.msg || '清单校验异常');
       }
