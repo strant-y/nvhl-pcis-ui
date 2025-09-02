@@ -19,6 +19,8 @@ import relatedAdditionalInsModal from "./insuranceConInfo/relatedAdditionalInsMo
 import changeCiPolicynoComponent from "./edrList/change-ci-policyno-component.vue";
 import countryInfoModal from "./distmodel/country-info-modal.vue";
 
+import responsibilityModal from "./termconfigs/responsibilityModal.vue";
+
 import componentEdit from "./componentModel/componentEdit.vue";
 
 import edrItemEdit from "./edrItemEdit/edrItemEdit.vue";
@@ -35,6 +37,8 @@ const componentMap = {
 
     distAdd: distAdd,
     countryInfoModal:countryInfoModal,
+
+    responsibilityModal:responsibilityModal,
 
 	
   
