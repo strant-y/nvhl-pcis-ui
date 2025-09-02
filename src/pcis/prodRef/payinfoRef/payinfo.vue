@@ -65,7 +65,6 @@ const nPrmFun = () => {
     let nCiShare = Number(getOwnShare()) || 100;
     const totalAmount = Number(data['base']['Base.nPrm']);
     const splitCount = Number(data.base?.['Base.nPayNumber'])
-    debugger
     const totalCent = Math.round(totalAmount * 100);
     const result = ref<number[]>([]);
     const quotient = Math.floor(totalCent / splitCount);
