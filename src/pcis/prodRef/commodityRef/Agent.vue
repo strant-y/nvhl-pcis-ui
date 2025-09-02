@@ -49,7 +49,8 @@ import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 const props = defineProps<{
   visible: boolean;
-  data: object
+  data: object,
+  cProdNo:String,
 }>();
 
 const emit = defineEmits<{
@@ -79,6 +80,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         prop: "CDptCde",
         // inputtype: "rtselect",
         inputtype: "rtinput",
+        disabled:true,
         title: "机构代码",
       },
       {
@@ -390,13 +392,17 @@ const tableconfig = reactive<AppTableConfig>(
 
 /** 查询 */
 function handleQuery() {
+ // 请先保存商品信息
   const r = tableRef.value?.getPartnerPage(); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const c = { codeListName: "AGENCY_BUSINESS_LIST" };
-  const param = Object.assign(c, {
-    codeListParam: { ...r, ...s },
-  });
 
+  console.log('prps',props.cProdNo)
+  const param = Object.assign(c, {
+    codeListParam: { ...r, ...s ,cProdNo: props.cProdNo},
+  });
+  console.log(111,param)
+  console.log(222,getFromValue())
   getPageList(param)
     .then((res) => {
       const { code, data, msg, totalCount } = res;
@@ -471,6 +477,8 @@ const queryCChaSubtype = (val: any) => {
 
 
 onMounted(() => {
+
+
   queryCBsnsTyp();
   queryChaTypeList();
   queryCChaSubtype();
@@ -478,7 +486,9 @@ onMounted(() => {
   // setValue("CBsnsTyp", props.data.cBsnsTyp)
   // setValue("CChaType", props.data.cChaType)
   // setValue("CChaSubType", props.data.cChaSubType)
-
+  nextTick(()=>{
+      setValue('CDptCde',props.data?.cDptCde)
+  })
 
 });
 
