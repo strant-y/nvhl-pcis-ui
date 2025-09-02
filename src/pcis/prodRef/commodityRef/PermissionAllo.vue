@@ -218,7 +218,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
       },
       {
-        prop: "cSlsGroup",
+        // prop: "cSlsGroup",
+        prop: "cSlsId",
         inputtype: "rtselect",
         title: " 业务员/产险专员",
         btnWidth: 10,
@@ -239,7 +240,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               console.log('业务员',res)
               if (res.type === "ok") {
                 const selectObj = res.body;
-                setFormItem("cSlsGroup", {
+                setFormItem("cSlsId", {
                   loadData: [
                     {
                       label: selectObj.CSlsCde + selectObj.CSlsNme,
@@ -249,7 +250,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 });
 
                 freeEditRef.value.setValue(
-                  "cSlsGroup",
+                  "cSlsId",
                   selectObj.CSlsCde
                 );
 
@@ -270,9 +271,21 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           icon: "Search",
           type: "primary",
           func: () => {
-            // const ck = freeEditRef.value?.getValue("componentGroup");
+            // const tabref = opertaor.getTableRefByKey("commodityBasicInfo");  // 基本信息
+            // 请先保存商品信息
+              let cProdNo= tabref.getValue('cProdNo')
+              console.log(cProdNo)
+              if(!cProdNo){
+                ElMessage.warning('请先保存商品信息！')
+                return false;
+              }
+              let cDptCde = getValue('cDptCde');
+              if(!cDptCde){
+                ElMessage.warning('出单机构不能为空！')
+                return false;
+              }
             
-            dzmodal.open(agent, { cProdNo: '', type: "sales", data: getFromValue() }).then((res) => {
+            dzmodal.open(agent, { cProdNo:cProdNo, type: "sales", data: getFromValue() }).then((res) => {
           
               if (res.type === "ok") {
                 const selectObj = res.body;

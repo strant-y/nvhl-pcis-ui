@@ -277,7 +277,8 @@ function handleQuery() {
         getNmeByCde(dataS.cDptCde, "cDptCde", "permissionAllo")
         tabref3.setValue('cDptCde', dataS.cDptCde);
         tabref3.setValue('cOperId', dataS.cOperId);
-        tabref3.setValue('cSlsGroup', dataS.cSlsGroup);
+        // tabref3.setValue('cSlsGroup', dataS.cSlsGroup);
+        tabref3.setValue('cSlsId', dataS.cSlsId);
         tabref3.setValue('cBrkrCde', dataS.cBrkrCde);
         tabref3.setValue('cAgtAgrNo', dataS.cAgtAgrNo);
         tabref3.setValue('nPropFeeRate', dataS.nPropFeeRate);
