@@ -138,8 +138,12 @@ const handelItemShow = (data:any)=>{
 const method = {
   cIsIndvduBizChange:(val:any)=>{
     if(val === '1'){
+      setFormItem("ECargoApplicant.cOccupCde", { btnItems: { disabled: false } });
+      setFormItem("ECargoApplicant.cOccupCde", { hidden:false, rules: [getRules("required", {})] });
       setFormItem('ECargoApplicant.cTrdCde',{hidden:false,rules: [getRules("required", {})]})
     }else {
+      setFormItem("ECargoApplicant.cOccupCde", { rules: [] });
+      setFormItem("ECargoApplicant.cOccupCde", { btnItems: { disabled: true } });
       setFormItem('ECargoApplicant.cTrdCde',{rules:null})
     }
   },
