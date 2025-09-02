@@ -700,18 +700,18 @@ onMounted(() => {
   console.log('param 路由---', props.param )
     initPage().then(() => {
       nextTick(() => {
-      const mainContent = document.querySelector('.main-content');
-      if (mainContent) {
-        nextTick(() => {
-          setTimeout(highlightFirstVisibleAnchor, 300);
-        });
-        mainContent.addEventListener('scroll', handleScroll);
-        // 初始触发一次
-          setTimeout(() => {
-            handleScroll();
-          }, 500); // 延迟确保所有组件已加载
-      }
-  }); // 延迟执行以确保DOM元素已经渲染
+        const mainContent = document.querySelector('.main-content');
+        if (mainContent) {
+          nextTick(() => {
+            setTimeout(highlightFirstVisibleAnchor, 300);
+          });
+          mainContent.addEventListener('scroll', handleScroll);
+          // 初始触发一次
+            setTimeout(() => {
+              handleScroll();
+            }, 500); // 延迟确保所有组件已加载
+        }
+      }); // 延迟执行以确保DOM元素已经渲染
     });
 });
 
@@ -2977,7 +2977,7 @@ const submitToUndrFn = async () => {
     if(props.param?.pageName === "priceInquiry") {
       selectParam['cInquiryNo'] = cInquiryNumber
     } else {
-      selectParam['cAppNo'] = cAppNo
+      selectParam['cAppNo'] = props.param?.cAppNo
     }
     const resDist: any = await selectDist(selectParam);
     if(resDist['data']['total'] < 1){
@@ -2989,7 +2989,7 @@ const submitToUndrFn = async () => {
     if(props.param.cProdNo === '043013') {
     const selectParam = {
       cComponentTable: 'PollutionDist',
-      cAppNo: cAppNo
+      cAppNo: props.param?.cAppNo,
     }
     const resDist: any = await selectDist(selectParam);
     if(resDist['data']['total'] <= 0){
