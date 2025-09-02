@@ -4417,8 +4417,7 @@ const validateDistConsistency = async () => {
         (item: any) => item.pageKey === 'dist'
       );
       if (!distMap.length) {
-        ElMessage.error('未找到清单配置项');
-        return;
+        return true;
       }
       const distParam = {
         cClauseCode: props.param?.cTermNo, // 条款编码
