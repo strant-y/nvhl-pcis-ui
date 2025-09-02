@@ -191,6 +191,15 @@ function extractCode(str:string) {
   return str.match(pattern)?.[0] || "";
 }
 
+const allCAppStatus = [
+  {label: "暂存", value: "1"},
+  {label: "已提核", value: "2"},
+  {label: "核保退回/撤回", value: "3"},
+  {label: "已核待缴费", value: "4"},
+  {label: "已出单", value: "5"},
+  {label: "见费出单退回", value: "8"},
+]
+
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -573,7 +582,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                               item.hidden = true;
                           } else if (item.prop == "cPlyNo" || item.prop == "cDataTyp") {
                              item.hidden = false;
-                          } 
+                          } else if (item.prop === "cAppStatus") {
+                            item.loadData = allCAppStatus;
+                          }
                       });
                   } else if (val === "E") {
                       // 批改
@@ -589,7 +600,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                             item.hidden = true;
                           } else if (item.prop == "cPlyNo" || item.prop == "cDataTyp") {
                             item.hidden = false;
-                          } 
+                          } else if (item.prop === "cAppStatus") {
+                            item.loadData = allCAppStatus;
+                          }
                       });
                   } else if (val === "I") {
                       // 询价
@@ -604,7 +617,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                               item.hidden = true;
                           } else if (item.prop == "cPlyNo") {
                               item.hidden = false;
-                          } 
+                          } else if (item.prop === "cAppStatus") {
+                            item.loadData = allCAppStatus.filter(o => o.value !== "4");
+                          }
                       });
                   } else if(!val) {
                     // 清空选中值
