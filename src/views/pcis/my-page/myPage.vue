@@ -700,18 +700,18 @@ onMounted(() => {
   console.log('param 路由---', props.param )
     initPage().then(() => {
       nextTick(() => {
-      const mainContent = document.querySelector('.main-content');
-      if (mainContent) {
-        nextTick(() => {
-          setTimeout(highlightFirstVisibleAnchor, 300);
-        });
-        mainContent.addEventListener('scroll', handleScroll);
-        // 初始触发一次
-          setTimeout(() => {
-            handleScroll();
-          }, 500); // 延迟确保所有组件已加载
-      }
-  }); // 延迟执行以确保DOM元素已经渲染
+        const mainContent = document.querySelector('.main-content');
+        if (mainContent) {
+          nextTick(() => {
+            setTimeout(highlightFirstVisibleAnchor, 300);
+          });
+          mainContent.addEventListener('scroll', handleScroll);
+          // 初始触发一次
+            setTimeout(() => {
+              handleScroll();
+            }, 500); // 延迟确保所有组件已加载
+        }
+      }); // 延迟执行以确保DOM元素已经渲染
     });
 });
 
@@ -2201,6 +2201,7 @@ async function loadAfter() {
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
           ops.plyBase['Base.cAgriMrk'] = "2"// 涉农标志设置默认值
+          ops.plyBase['Base.cNeedfeeFlag'] = "1"// 是否见费出单设置默认值
         }
         ops['plyBase']['Base.cPlyNo'] = ''
         ops['plyBase']['Base.cAppStatus'] = ''
@@ -2977,7 +2978,7 @@ const submitToUndrFn = async () => {
     if(props.param?.pageName === "priceInquiry") {
       selectParam['cInquiryNo'] = cInquiryNumber
     } else {
-      selectParam['cAppNo'] = cAppNo
+      selectParam['cAppNo'] = props.param?.cAppNo
     }
     const resDist: any = await selectDist(selectParam);
     if(resDist['data']['total'] < 1){
@@ -2989,7 +2990,7 @@ const submitToUndrFn = async () => {
     if(props.param.cProdNo === '043013') {
     const selectParam = {
       cComponentTable: 'PollutionDist',
-      cAppNo: cAppNo
+      cAppNo: props.param?.cAppNo,
     }
     const resDist: any = await selectDist(selectParam);
     if(resDist['data']['total'] <= 0){
