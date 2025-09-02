@@ -2969,6 +2969,10 @@ const submitToUndrFn = async () => {
       }
     }
   }
+   // 定义cInquiryNumber 和 cAppNo；
+   const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
+   const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
+
   // 040002 记名投保标志 选是 校验清单必须录入
   const distItem = distRequiredMap[props.param.cProdNo];
   if(distItem && tgtValue[distItem.flagKey] === '1') {
@@ -2978,7 +2982,7 @@ const submitToUndrFn = async () => {
     if(props.param?.pageName === "priceInquiry") {
       selectParam['cInquiryNo'] = cInquiryNumber
     } else {
-      selectParam['cAppNo'] = props.param?.cAppNo
+      selectParam['cAppNo'] = cAppNo
     }
     const resDist: any = await selectDist(selectParam);
     if(resDist['data']['total'] < 1){
@@ -2990,7 +2994,7 @@ const submitToUndrFn = async () => {
     if(props.param.cProdNo === '043013') {
     const selectParam = {
       cComponentTable: 'PollutionDist',
-      cAppNo: props.param?.cAppNo,
+      cAppNo: cAppNo,
     }
     const resDist: any = await selectDist(selectParam);
     if(resDist['data']['total'] <= 0){
@@ -2998,7 +3002,6 @@ const submitToUndrFn = async () => {
       return false;
     }
   }
-
 
 	// 风勘校验
  	if( props.param?.pageName === "priceInquiry" ){
