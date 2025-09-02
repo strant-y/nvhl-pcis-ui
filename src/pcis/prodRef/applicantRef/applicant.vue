@@ -1,31 +1,18 @@
 <template>
   <app-free-edit :freeEditConfig="formconfig1" ref="applicantEditRef" />
   <comDialog ref="dialog"></comDialog>
-  <input
-    type="file"
-    ref="fileInputRef"
-    style="display: none"
-    @change="handleFileChange"
-  />
-	<el-dialog v-model="maindialogVisible" title="OCR识别">
-    <el-form
-        :model="formconfig"
-        label-width="180px"
-        :inline="true"
-      >
-				<el-form-item
-					label="OCR识别类型"
-					prop="fileInputType"
-					:rules="[getRules('required', {})]"
-				>
-					<el-radio-group v-model="formconfig.fileInputType">
-						<el-radio value="1">身份证</el-radio>
-						<el-radio value="2">外国人永久居留身份证</el-radio>
-						<el-radio value="3">营业执照</el-radio>
-					</el-radio-group>
-				</el-form-item>
-		</el-form>
-		<template #footer>
+  <input type="file" ref="fileInputRef" style="display: none" @change="handleFileChange" />
+  <el-dialog v-model="maindialogVisible" title="OCR识别">
+    <el-form :model="formconfig" label-width="180px" :inline="true">
+      <el-form-item label="OCR识别类型" prop="fileInputType" :rules="[getRules('required', {})]">
+        <el-radio-group v-model="formconfig.fileInputType">
+          <el-radio value="1">身份证</el-radio>
+          <el-radio value="2">外国人永久居留身份证</el-radio>
+          <el-radio value="3">营业执照</el-radio>
+        </el-radio-group>
+      </el-form-item>
+    </el-form>
+    <template #footer>
       <div class="dialog-footer">
         <el-button @click="cancel">取消</el-button>
         <el-button type="primary" @click="ok">确认</el-button>
@@ -52,8 +39,8 @@ const dialog = ref<DialogMethod | null>(null);
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { set } from "lodash";
 import { validateIdCard } from "@/typings/method-public";
-import {calculateAgeFromIdCard} from "@/utils/common";
-import{setCapitalRequiredRule} from "@/utils/InsuranceCoverageRules";
+import { calculateAgeFromIdCard } from "@/utils/common";
+import { setCapitalRequiredRule } from "@/utils/InsuranceCoverageRules";
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -68,8 +55,8 @@ const props = defineProps({
 const applicantEditRef = ref<AppFreeEditMethod | null>(null);
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { getDefaultCompilerOptions } from "typescript";
-import { getAddressStr,qryCustomer } from "@/api/query";
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import { getAddressStr, qryCustomer } from "@/api/query";
+import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
@@ -78,15 +65,15 @@ const cClntAddr = ref<any>(null);
 import { useRoute } from "vue-router";
 const route = useRoute();
 const param = opertaor.getParam();
-const fileInputRef:any = ref(null);
+const fileInputRef: any = ref(null);
 const formconfig = ref({
   fileInputType: "1"
 });
 import { readFile } from "@/api/file";
 const tCertfDate = ref<any[]>([]);
-const  cWorkDptList =['310','320','330','340','350','360']  // 单位性质带企业的ID
+const cWorkDptList = ['310', '320', '330', '340', '350', '360']  // 单位性质带企业的ID
 const maindialogVisible = ref(false) // ocr识别弹框打开
-const resetLogo =ref<any>(false);   // 重置标识
+const resetLogo = ref<any>(false);   // 重置标识
 
 onMounted(() => {
   const formconfig11 = formInit(
@@ -111,7 +98,7 @@ onMounted(() => {
       cProdNo === "043011"
     ) {
       setFormItem("Applicant.cTrdCde", { rules: [getRules("required", {})], });
-      
+
     }
     if (!cProdNo.startsWith("05")) {
       setFormItem("Applicant.cShareholderName", { hidden: true, rules: null });
@@ -124,7 +111,7 @@ onMounted(() => {
         hidden: true,
         rules: null,
       });
-    }else{
+    } else {
       setFormItem("Applicant.cShareholderName", { rules: [getRules("required", {})] });
       setFormItem("Applicant.cShareholderCode", { rules: [getRules("required", {})] });
       setFormItem("Applicant.cShareholderNature", { rules: [getRules("required", {})] });
@@ -133,7 +120,7 @@ onMounted(() => {
 
     // 处理邮编
     setFormItem("Applicant.cZipCde", {
-        'maxlength':6,
+      'maxlength': 6,
       rules: [
         getRules("signlessInt", {}),
         getRules("specifyLength", { len: 6 }),
@@ -146,21 +133,21 @@ onMounted(() => {
     // 传真校验
     setFormItem("Applicant.cFax", { rules: [getRules("faxNumber", {})] });
 
-    
-    if(param.cProdNo === '043009'){
-      setFormItem("Applicant.cAgencyReason",{hidden: true});
-      setFormItem("Applicant.cLegalRepresentative",{hidden: true});
-      setFormItem("Applicant.cEnterpriseTel",{hidden: true});
+
+    if (param.cProdNo === '043009') {
+      setFormItem("Applicant.cAgencyReason", { hidden: true });
+      setFormItem("Applicant.cLegalRepresentative", { hidden: true });
+      setFormItem("Applicant.cEnterpriseTel", { hidden: true });
     }
-    
-    setFormItem("Applicant.cGcidCode", {rules: [getRules("leiCode", {})]});
+
+    setFormItem("Applicant.cGcidCode", { rules: [getRules("leiCode", {})] });
     // 关联交易审批单编号
-    setFormItem("Applicant.cRelateNo", {rules: [getRules("txnApprovalNo", {})]});
+    setFormItem("Applicant.cRelateNo", { rules: [getRules("txnApprovalNo", {})] });
     // 经常居住地校验
-    setFormItem("Applicant.cHabitualResidence", {rules: [getRules("valiAddress", {})]});
+    setFormItem("Applicant.cHabitualResidence", { rules: [getRules("valiAddress", {})] });
     // 证件号码
-    setFormItem("Applicant.cCertfCde", {minWidth: '165px'});
-   });
+    setFormItem("Applicant.cCertfCde", { minWidth: '165px' });
+  });
 });
 // //给表单下拉项赋值
 // function setFormItem(key: any, obj: any) {
@@ -222,91 +209,92 @@ function setFormItem(key: string, obj: Record<string, any>): void {
 }
 
 // 解析身份证
-const idAnalysis = (id:string)=>{
-      const tabref = opertaor.getTableRefs();
-      const applicantValue = tabref["applicant"].getFromValue();
+const idAnalysis = (id: string) => {
+  const tabref = opertaor.getTableRefs();
+  const applicantValue = tabref["applicant"].getFromValue();
 
-      if (  !validateIdCard(id)  || (applicantValue["Applicant.cCertfCls"] !=='120001' && applicantValue["Applicant.cCertfCls"] !=='19')) {
-        return false
-      }
-          const birthYear = parseInt(id.substring(6, 10), 10);
-          const birthMonth = parseInt(id.substring(10, 12), 10);
-          const birthDay = parseInt(id.substring(12, 14), 10);
-          const birthday = `${birthYear}-${birthMonth.toString().padStart(2, "0")}-${birthDay.toString().padStart(2, "0")}`;
-          const sexCode = parseInt(id.substring(16, 17), 10);
-          const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
-          const age = calculateAgeFromIdCard(id);
-          if(!getValue("Applicant.cNation")) {
-            setValue("Applicant.cNation", "1"); // 国籍
-          }
-          setValue("Applicant.tBirthday", birthday);
-          setValue("Applicant.nAge", age);
-          setValue("Applicant.cSex", sex);
-         
-          // clearValidate('Applicant.cCertfCde')  
+  if (!validateIdCard(id) || (applicantValue["Applicant.cCertfCls"] !== '120001' && applicantValue["Applicant.cCertfCls"] !== '19')) {
+    return false
+  }
+  const birthYear = parseInt(id.substring(6, 10), 10);
+  const birthMonth = parseInt(id.substring(10, 12), 10);
+  const birthDay = parseInt(id.substring(12, 14), 10);
+  const birthday = `${birthYear}-${birthMonth.toString().padStart(2, "0")}-${birthDay.toString().padStart(2, "0")}`;
+  const sexCode = parseInt(id.substring(16, 17), 10);
+  const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
+  const age = calculateAgeFromIdCard(id);
+  if (!getValue("Applicant.cNation")) {
+    setValue("Applicant.cNation", "1"); // 国籍
+  }
+
+  setValue("Applicant.tBirthday", birthday);
+  setValue("Applicant.nAge", age);
+  setValue("Applicant.cSex", sex);
+
+  // clearValidate('Applicant.cCertfCde')  
 };
-    // 防抖定时器
-let debounceTimer = <any>null ;
+// 防抖定时器
+let debounceTimer = <any>null;
 
 
 //  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
 const checkUser = () => {
-      const fieldsToValidate = ['Applicant.cAppNme', 'Applicant.cClntMrk',"Applicant.cCertfCde","Applicant.cCertfCls"];
-      
-      // 自定义录单 方案配置 模版 进入 可以查询用户信息  
-      if ( !resetLogo.value &&  (param.pageType !== "app" &&  param.pageType !== "copy" && param.pageType !== "template" && param.cAppStatus !=='1') ) {
-          return false;
-        }
-      if (debounceTimer) {
-        clearTimeout(debounceTimer);
-      }     
-     const tabref = opertaor.getTableRefs();
-     const applicantValue = tabref["applicant"].getFromValue();
-        //  只要4个有值 去请求客户信息
-     if (       applicantValue["Applicant.cAppNme"]&&
-       applicantValue["Applicant.cClntMrk"] !== null &&
-       applicantValue["Applicant.cCertfCde"] &&
-       applicantValue["Applicant.cCertfCls"]     ) {
+  const fieldsToValidate = ['Applicant.cAppNme', 'Applicant.cClntMrk', "Applicant.cCertfCde", "Applicant.cCertfCls"];
 
-        applicantEditRef.value?.validateField(fieldsToValidate).then((isValid)=>{
-          if(isValid){
-             debounceTimer = setTimeout(() => {
-                 const param = {
-                    coustName: applicantValue["Applicant.cAppNme"],
-                    coustMrk: applicantValue["Applicant.cClntMrk"],
-                    coustType:applicantValue["Applicant.cCertfCls"],
-                    coustCode: applicantValue["Applicant.cCertfCde"],
-                    personnelType:"Applicant"
-                  }
-                  qryCustomer(param)
-                    .then((res) => {
-                      const { code, data, msg } = res;
-                      if (200 === code) {
-                        if(data){
-                          if(data && data.length > 0){
-                            Object.keys(data[0]).forEach((key) => { 
-                              if(data[0][key]){
-                                setValue(key, data[0][key]);
-                              }
-                            });
-                          }
-                          // tabref ['applicant'].setFormValue(data[0])
-                          let userId = getValue('Applicant.cCertfCde')
-                          idAnalysis(userId)
-                        }
-                      } else {
-                      
-                      }
-                    })
-                    .finally(() => {});
-              
+  // 自定义录单 方案配置 模版 进入 可以查询用户信息  
+  if (!resetLogo.value && (param.pageType !== "app" && param.pageType !== "copy" && param.pageType !== "template" && param.cAppStatus !== '1')) {
+    return false;
+  }
+  if (debounceTimer) {
+    clearTimeout(debounceTimer);
+  }
+  const tabref = opertaor.getTableRefs();
+  const applicantValue = tabref["applicant"].getFromValue();
+  //  只要4个有值 去请求客户信息
+  if (applicantValue["Applicant.cAppNme"] &&
+    applicantValue["Applicant.cClntMrk"] !== null &&
+    applicantValue["Applicant.cCertfCde"] &&
+    applicantValue["Applicant.cCertfCls"]) {
 
-              }, 500); // 防抖延迟500ms
+    applicantEditRef.value?.validateField(fieldsToValidate).then((isValid) => {
+      if (isValid) {
+        debounceTimer = setTimeout(() => {
+          const param = {
+            coustName: applicantValue["Applicant.cAppNme"],
+            coustMrk: applicantValue["Applicant.cClntMrk"],
+            coustType: applicantValue["Applicant.cCertfCls"],
+            coustCode: applicantValue["Applicant.cCertfCde"],
+            personnelType: "Applicant"
           }
-         })
-       }
-   };
- 
+          qryCustomer(param)
+            .then((res) => {
+              const { code, data, msg } = res;
+              if (200 === code) {
+                if (data) {
+                  if (data && data.length > 0) {
+                    Object.keys(data[0]).forEach((key) => {
+                      if (data[0][key]) {
+                        setValue(key, data[0][key]);
+                      }
+                    });
+                  }
+                  // tabref ['applicant'].setFormValue(data[0])
+                  let userId = getValue('Applicant.cCertfCde')
+                  idAnalysis(userId)
+                }
+              } else {
+
+              }
+            })
+            .finally(() => { });
+
+
+        }, 500); // 防抖延迟500ms
+      }
+    })
+  }
+};
+
 // 绑定方法
 const method = {
   // func demo
@@ -354,10 +342,10 @@ const method = {
     );
   },
   // 客户姓名 
-  funCheckUser:(val:any)=>{
-    if(val){
-      setValue("Applicant.cAppNme",val.trim())// 去除首位空格
-      
+  funCheckUser: (val: any) => {
+    if (val) {
+      setValue("Applicant.cAppNme", val.trim())// 去除首位空格
+
       checkUser();
     }
   },
@@ -401,32 +389,24 @@ const method = {
     tCertfDate.value = [];
     tabref["applicant"].setFormValue(applicantValue);
   },
+  // 证件类型
+  cardTypeChange: (val: any) => {
+    console.log('证件类型', val, getValue('Applicant.cCertfCls'))
 
-  cardTypeChange: (val) => {
-       const tabref = opertaor.getTableRefs();
-    const applicantValue = tabref["applicant"]?.getFromValue();
-    checkUser();
-    // 清除报错信息
-    clearValidate('Applicant.cCertfCde')  
-      // freeEditRef.value?.clearValidate('phoneNo');
     const param = opertaor.getParam();
+    const isInit = param.initFlag; // 是否是初始化状态
+    if (isInit) return false;
 
-    if (!param.initFlag) {
-      setFormItem("Applicant.cNation", {
-        disabled: false,
-      });
-      setFormItem("Applicant.tBirthday", {
-        disabled: false,
-      });
-      setFormItem("Applicant.nAge", {
-        disabled: false,
-      });
-      setFormItem("Applicant.cSex", {
-        disabled: false,
-      });
-    }
+    const personFields = ['cNation', 'tBirthday', 'nAge', 'cSex'];
+    personFields.forEach(field => {
+      setFormItem(`Applicant.${field}`, { disabled: false });
+    });
 
-    if (val == "120001") { 
+
+    checkUser();   // 调用客户信息接口
+    clearValidate('Applicant.cCertfCde')  // 清除报错信息
+
+    if (val == "120001") {
       setFormItem("Applicant.cCertfCde", {
         rules: [getRules("required", {}), getRules("idCard", {})],
       });
@@ -438,35 +418,16 @@ const method = {
         rules: [getRules("required", {})],
       });
       setValue("Applicant.cNation", "1"); // 国籍
-      // setValue("Applicant.tBirthday", null);
-      // setValue("Applicant.nAge", null);
-      // setValue("Applicant.cSex", null);
 
-      if (!param.initFlag) {
-        setFormItem("Applicant.cNation", {
-          disabled: true,
-        });
-        setFormItem("Applicant.tBirthday", {
-          disabled: true,
-        });
-        setFormItem("Applicant.nAge", {
-          disabled: true,
-        });
-        setFormItem("Applicant.cSex", {
-          disabled: true,
-        });
-      }
+      personFields.forEach(field => {
+        setFormItem(`Applicant.${field}`, { disabled: true });
+      });
+
     } else if (val == "110002") {
       setFormItem("Applicant.tCertfEndDate", {
         rules: [getRules("required", {})],
       });
-        //证件类型是“营业执照”，参加社会统筹标志变化为必填
-        // 参加社会统筹标志
-        // setFormItem("Applicant.cParticiinsocTyp", {
-        //   rules: [getRules("required", {})],
-        // });
-        
-    } else if ( val == "110007") {   
+    } else if (val == "110007") {
       setFormItem("Applicant.tCertfBgnDate", {
         rules: [getRules("required", {})],
       });
@@ -475,18 +436,18 @@ const method = {
       });
 
       // 统一社会信用代码校验
-        setFormItem("Applicant.cCertfCde", {
-        rules: [getRules("required", {}),getRules("socialCode", {})],
+      setFormItem("Applicant.cCertfCde", {
+        rules: [getRules("required", {}), getRules("socialCode", {})],
       });
 
-            // 为法人  企业成立日期
+      // 为法人  企业成立日期
       setFormItem("Applicant.tEstablishingDate", {
         rules: [getRules("required", {})],
       });
-    } else if(val == "19"){
+    } else if (val == "19") {
       // 外国人证件号
       setFormItem("Applicant.cCertfCde", {
-        rules: [getRules("required", {}),getRules("ariCard", {})],
+        rules: [getRules("required", {}), getRules("ariCard", {})],
       });
     } else {
       setFormItem("Applicant.cCertfCde", {
@@ -494,17 +455,22 @@ const method = {
       });
       setFormItem("Applicant.tCertfBgnDate", { rules: null });
       setFormItem("Applicant.tCertfEndDate", { rules: null });
-      // 参加社会统筹标志
-      // setFormItem("Applicant.cParticiinsocTyp", {
-      //   rules: null,
-      // });
+    }
+
+    // 切换清空
+    if (val) {
+      setValue("Applicant.tBirthday", null);
+      setValue("Applicant.nAge", null);
+      // setValue("Applicant.cSex", null);
+      setValue('Applicant.cCertfCde', null);
+      console.log(11)
     }
   },
   //投保人性质(0是法人 1是个人)
   InsureChange: (val) => {
     const param = opertaor.getParam();
     if (val == "0") {
-       setCapitalRequiredRule(getValue,setFormItem,'Applicant');
+      setCapitalRequiredRule(getValue, setFormItem, 'Applicant');
       setFormItem("Applicant.tBirthday", {
         rules: null
       });
@@ -514,7 +480,7 @@ const method = {
       setFormItem("Applicant.cSex", {
         rules: null
       });
- 
+
       productStore.setcClntMrk(val);
       // 办理人
       setFormItem("Applicant.cCntrNme", { rules: [getRules("required", {})] });
@@ -532,26 +498,26 @@ const method = {
       });
       if (!param.initFlag) {
         setFormItem("Applicant.cWorkDpt", {
-        disabled: false,
-      });
-      setFormItem("Applicant.cIsMicroEntpris", {
-        disabled: false,
-      });
-      setFormItem("Applicant.cIsIndvduBiz", {
-        disabled: true,
-      });
-      // 是否绿色产业客户
-      setFormItem("Applicant.cGreenIndustryCustomers", {
-        disabled: false,
-      });
+          disabled: false,
+        });
+        setFormItem("Applicant.cIsMicroEntpris", {
+          disabled: false,
+        });
+        setFormItem("Applicant.cIsIndvduBiz", {
+          disabled: true,
+        });
+        // 是否绿色产业客户
+        setFormItem("Applicant.cGreenIndustryCustomers", {
+          disabled: false,
+        });
 
-      // 绿色客户 如果为时就放开
-      if(getValue('Applicant.cGreenIndustryCustomers') == '1'){
-        setFormItem("Applicant.cGreenIndustryList", {
+        // 绿色客户 如果为时就放开
+        if (getValue('Applicant.cGreenIndustryCustomers') == '1') {
+          setFormItem("Applicant.cGreenIndustryList", {
             rules: [getRules("required", {})],
             disabled: false,
-         });
-      }
+          });
+        }
       }
       setFormItem("Applicant.cWorkDpt", {
         rules: [getRules("required", {})],
@@ -562,7 +528,7 @@ const method = {
       setFormItem("Applicant.cGreenIndustryCustomers", {
         rules: [getRules("required", {})],
       });
-  
+
       // 参加社会统筹标志
       setFormItem("Applicant.cParticiinsocTyp", {
         rules: [getRules("required", {})],
@@ -572,11 +538,11 @@ const method = {
       //   rules: [getRules("required", {})],
       // });
 
-       // 注册地址
+      // 注册地址
       setFormItem("Applicant.RegisterProp", {
-       rules: [getRules("required", {})],
+        rules: [getRules("required", {})],
       });
-  
+
       // 单位性质 --为企业做必填校验
       const cWorkDpt = getValue('Applicant.cWorkDpt')
       const isSpecialCase = cWorkDptList.includes(cWorkDpt);
@@ -591,29 +557,29 @@ const method = {
       });
       // 企业成立日
       setFormItem("Applicant.tEstablishingDate", {
-         rules: isSpecialCase ? requiredRule : []
+        rules: isSpecialCase ? requiredRule : []
       });
 
- 
+
       let cMobile = getValue('Applicant.cMobile');  // 移动 
       let cTel = getValue('Applicant.cTel');  // 固定电话    
-      if(!cMobile &&  !cTel ){
-         setFormItem("Applicant.cMobile", {
+      if (!cMobile && !cTel) {
+        setFormItem("Applicant.cMobile", {
           rules: [getRules("required", {}), getRules("phoneNo", {})],
         });
-      }else  if(cMobile){
+      } else if (cMobile) {
         setFormItem("Applicant.cTel", { rules: [getRules("phone", {})] });
-        setFormItem("Applicant.cMobile", { rules: [getRules("required", {}), getRules("phoneNo", {})]})
-      } else if(cTel){
-        setFormItem("Applicant.cTel", { rules: [getRules("required", {}),getRules("phone", {})] });
-        setFormItem("Applicant.cMobile", { rules: [ getRules("phoneNo", {})]})
+        setFormItem("Applicant.cMobile", { rules: [getRules("required", {}), getRules("phoneNo", {})] })
+      } else if (cTel) {
+        setFormItem("Applicant.cTel", { rules: [getRules("required", {}), getRules("phone", {})] });
+        setFormItem("Applicant.cMobile", { rules: [getRules("phoneNo", {})] })
       }
 
       // 是否个体工商户
       setFormItem("Applicant.cIsIndvduBiz", {
         rules: [],
       });
-         // 为法人 国民经济行业必填
+      // 为法人 国民经济行业必填
       setFormItem("Applicant.cTrdCde", {
         rules: [getRules("required", {})],
       });
@@ -623,27 +589,27 @@ const method = {
         rules: [],
       });
       setFormItem("Applicant.nAge", {
-      rules: [],
+        rules: [],
       });
       setFormItem("Applicant.cSex", {
         rules: [],
       });
 
-        codeListStore
+      codeListStore
         .queryCodeList({
           codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
           codeListParam: {},
         })
         .then((res) => {
-          if (!res.some((item) =>Object.values(item).includes(getValue("Applicant.cCertfCls")))){
+          if (!res.some((item) => Object.values(item).includes(getValue("Applicant.cCertfCls")))) {
             // setValue("Applicant.cCertfCls", "");
           }
-      
-           applicantEditRef.value?.addCodeListMap({
-              code: "Applicant.cCertfCls",
-              list: res
-            })
-          setValue('Applicant.cCertfCls','110007')
+
+          applicantEditRef.value?.addCodeListMap({
+            code: "Applicant.cCertfCls",
+            list: res
+          })
+          setValue('Applicant.cCertfCls', '110007')
         });
     } else {
       setFormItem("Applicant.tBirthday", {
@@ -666,7 +632,7 @@ const method = {
       //注册地址
       // setFormItem("Applicant.cRegisteredcapDre", { rules: null });
       setFormItem("Applicant.RegisterProp", {
-       rules: null,
+        rules: null,
       });
       //是否个体工商户
       setFormItem("Applicant.cIsIndvduBiz", {
@@ -677,7 +643,7 @@ const method = {
         rules: null,
         disabled: true,
       });
-         // 是否绿色详情
+      // 是否绿色详情
       setFormItem("Applicant.cGreenIndustryList", {
         rules: null,
         disabled: true,
@@ -686,12 +652,12 @@ const method = {
       setFormItem("Applicant.tEstablishingDate", {
         rules: null,
       });
- 
+
       //是否分支机构
-      if(!getValue('Applicant.cIsBranch')){
-          setValue("Applicant.cIsBranch", "1");
+      if (!getValue('Applicant.cIsBranch')) {
+        setValue("Applicant.cIsBranch", "1");
       }
-    
+
 
       setFormItem("Applicant.cCntrNme", { rules: null });
       setFormItem("Applicant.tOperaterCertfEndTm", { rules: null });
@@ -704,31 +670,31 @@ const method = {
       // 国民行业分类  
       const cProdNo = param.cProdNo;
       if (
-      cProdNo === "040001" ||
-      cProdNo === "042002" ||
-      cProdNo === "043004" ||
-      cProdNo === "043005" ||
-      cProdNo === "043011"
-    ) {
-      setFormItem("Applicant.cTrdCde", { rules: [getRules("required", {})], });
-      
-    }else{
-      setFormItem("Applicant.cTrdCde", {
-        rules: [],
-      });
-    }
+        cProdNo === "040001" ||
+        cProdNo === "042002" ||
+        cProdNo === "043004" ||
+        cProdNo === "043005" ||
+        cProdNo === "043011"
+      ) {
+        setFormItem("Applicant.cTrdCde", { rules: [getRules("required", {})], });
+
+      } else {
+        setFormItem("Applicant.cTrdCde", {
+          rules: [],
+        });
+      }
       //实名认证方式
       setFormItem("Applicant.cRealnameAuthType", {
         rules: [],
       });
       // 法定代表人/责任人
       setFormItem("Applicant.cLegalRepresentative", {
-        rules:[]
+        rules: []
       });
 
       // 个人 移动电话必填  
       setFormItem("Applicant.cMobile", {
-        rules: [ getRules("required", {}), getRules("phoneNo", {})],
+        rules: [getRules("required", {}), getRules("phoneNo", {})],
       });
       setFormItem("Applicant.cTel", { rules: [getRules("phone", {})] });
       setFormItem("Applicant.cIsIndvduBiz", {
@@ -740,7 +706,7 @@ const method = {
         rules: [getRules("required", {})],
       });
       setFormItem("Applicant.nAge", {
-      rules: [getRules("required", {})],
+        rules: [getRules("required", {})],
       });
       setFormItem("Applicant.cSex", {
         rules: [getRules("required", {})],
@@ -757,25 +723,25 @@ const method = {
               Object.values(item).includes(getValue("Applicant.cCertfCls"))
             )
           ) {
-            if(getValue('Applicant.cCertfCls')){
-                 setValue("Applicant.cCertfCls", "");
+            if (getValue('Applicant.cCertfCls')) {
+              setValue("Applicant.cCertfCls", "");
             }
-           
+
           }
 
           // setFormItem("Applicant.cCertfCls", {
           //   loadData: res,
           //   rules: [getRules("required", {})],
           // });
-           applicantEditRef.value?.addCodeListMap({
-              code: "Applicant.cCertfCls",
-              list: res
-            })
+          applicantEditRef.value?.addCodeListMap({
+            code: "Applicant.cCertfCls",
+            list: res
+          })
         });
     }
 
-      checkUser();
-   
+    checkUser();
+
   },
   //大股东性质change事件
   funcShareholderNature: (val) => {
@@ -832,29 +798,29 @@ const method = {
   cIsIndvduBizChange: (val: any) => {
     if (val == "1") {
 
-			setFormItem("Applicant.cOccupCde", { rules: [getRules("required", {})]});
-			setFormItem("Applicant.cOccupCde", {btnItems:{disabled: false}});
-      setFormItem("Applicant.cTrdCde", {rules: [getRules("required", {})]});
-      setFormItem("Applicant.cTrdCde", {btnItems:{disabled: false}});
-    } else if(val == "0") {
-      setFormItem("Applicant.cOccupCde", {rules: []});
-      setFormItem("Applicant.cTrdCde", {rules: []});
-			setFormItem("Applicant.cOccupCde", { btnItems:{disabled: true}});
-      setFormItem("Applicant.cTrdCde", {btnItems:{disabled: true}});
+      setFormItem("Applicant.cOccupCde", { rules: [getRules("required", {})] });
+      setFormItem("Applicant.cOccupCde", { btnItems: { disabled: false } });
+      setFormItem("Applicant.cTrdCde", { rules: [getRules("required", {})] });
+      setFormItem("Applicant.cTrdCde", { btnItems: { disabled: false } });
+    } else if (val == "0") {
+      setFormItem("Applicant.cOccupCde", { rules: [] });
+      setFormItem("Applicant.cTrdCde", { rules: [] });
+      setFormItem("Applicant.cOccupCde", { btnItems: { disabled: true } });
+      setFormItem("Applicant.cTrdCde", { btnItems: { disabled: true } });
       setValue("Applicant.cOccupCde", null);
       setValue("Applicant.cTrdCde", null);
-    }else{
-      setFormItem("Applicant.cOccupCde", {btnItems:{disabled: false}});
-      setFormItem("Applicant.cTrdCde", {btnItems:{disabled: false}});
-      setFormItem("Applicant.cTrdCde", {rules: [getRules("required", {})]})
+    } else {
+      setFormItem("Applicant.cOccupCde", { btnItems: { disabled: false } });
+      setFormItem("Applicant.cTrdCde", { btnItems: { disabled: false } });
+      setFormItem("Applicant.cTrdCde", { rules: [getRules("required", {})] })
     }
   },
   // 是否分支机构
-  cIsBranchChange:(val:any)=>{
-      if(val){
-        setCapitalRequiredRule(getValue,setFormItem,'Applicant');
-      }
-       
+  cIsBranchChange: (val: any) => {
+    if (val) {
+      setCapitalRequiredRule(getValue, setFormItem, 'Applicant');
+    }
+
   },
   funcNdustryCate: () => {
     const param = opertaor.getParam();
@@ -867,7 +833,7 @@ const method = {
             setFormItem("Applicant.cTrdCde", {
               loadData: [{ label: data.cnm, value: data.cde }],
             });
-           // setValue("Applicant.cTrdCde", data.cnm);
+            // setValue("Applicant.cTrdCde", data.cnm);
             setValue("Applicant.cTrdCde", data.cde);
             dialog.value?.handleClose();
           },
@@ -895,21 +861,21 @@ const method = {
         },
       },
       {
-        isOk: (selectdata: any) => {},
+        isOk: (selectdata: any) => { },
       },
       { title: "职业", width: 85 }
     );
   },
 
   // 证件有效期长期标识
-  tCertMrkChecked: (val:any) => {
+  tCertMrkChecked: (val: any) => {
     const param = opertaor.getParam();
     if (val == "1") {
       setValue(
         "Applicant.tCertfEndDate",
         moment(new Date("2099-12-31")).format("YYYY-MM-DD HH:mm:ss")
       );
-        setFormItem("Applicant.tCertfEndDate", { disabled: true });
+      setFormItem("Applicant.tCertfEndDate", { disabled: true });
 
       // let cCertfCls = getValue('Applicant.cCertfCls');  // 证件类型   110007  120001
       // if(cCertfCls ==="120001" || cCertfCls ==="110008=7"){
@@ -921,12 +887,12 @@ const method = {
       // }
 
     } else {
-      if(tCertfDate.value.length>0){
+      if (tCertfDate.value.length > 0) {
         setValue("Applicant.tCertfBgnDate", tCertfDate.value[0] || "");
         setValue("Applicant.tCertfEndDate", tCertfDate.value[1] || "");
       }
-        setFormItem("Applicant.tCertfEndDate", { disabled: false });
-      
+      setFormItem("Applicant.tCertfEndDate", { disabled: false });
+
       // let cCertfCls = getValue('Applicant.cCertfCls');  // 证件类型   110007  120001
       // if(cCertfCls ==="120001" || cCertfCls ==="110008=7"){
       //     setFormItem("Applicant.tCertfBgnDate", {     rules: [getRules("required", {})],});
@@ -940,24 +906,24 @@ const method = {
   },
   // 移动电话 切换
   mobileChange: (val) => {
-    let cClntMrk =  getValue('Applicant.cClntMrk'); // 法人  1个人  0法人
-        clearValidate('Applicant.cTel')  
-    if (cClntMrk &&  val) {
+    let cClntMrk = getValue('Applicant.cClntMrk'); // 法人  1个人  0法人
+    clearValidate('Applicant.cTel')
+    if (cClntMrk && val) {
       setFormItem("Applicant.cMobile", {
         rules: [getRules("required", {}), getRules("phoneNo", {})],
       });
       setFormItem("Applicant.cTel", { rules: [getRules("phone", {})] });
     }
 
-    setValue('Applicant.cEnterpriseTel',val)
+    setValue('Applicant.cEnterpriseTel', val)
   },
   // 固定电话
   cTelChange: (val) => {
-       clearValidate('Applicant.cMobile')  
-    let cClntMrk =  getValue('Applicant.cClntMrk'); // 法人  1个人  0法人
+    clearValidate('Applicant.cMobile')
+    let cClntMrk = getValue('Applicant.cClntMrk'); // 法人  1个人  0法人
     let cMobile = getValue('Applicant.cMobile');  // 移动 
 
-    if (cClntMrk =='0' && val && !cMobile) {
+    if (cClntMrk == '0' && val && !cMobile) {
       setFormItem("Applicant.cTel", {
         rules: [getRules("phone", {}), getRules("required", {})],
       });
@@ -1018,7 +984,7 @@ const method = {
         setFormItem("Applicant.cCounty", objData);
       });
   },
-  handleClose: (val) => {},
+  handleClose: (val) => { },
   // 是否绿色产业客户change
   ApplicantIsGreen: (val) => {
     // 控制绿色产业细分列表是否必填
@@ -1029,12 +995,12 @@ const method = {
       });
     } else {
       setFormItem("Applicant.cGreenIndustryList", { rules: [] });
-      setFormItem("Applicant.cGreenIndustryList", { disabled: true   });
-      setValue('Applicant.cGreenIndustryList','')
+      setFormItem("Applicant.cGreenIndustryList", { disabled: true });
+      setValue('Applicant.cGreenIndustryList', '')
     }
   },
   // 证件号码change
-  cCertfCdeChange: (val:any) => {
+  cCertfCdeChange: (val: any) => {
     const tabref = opertaor.getTableRefs();
     const cCertfCls = tabref["applicant"].getFromValue()["Applicant.cCertfCls"];
 
@@ -1046,11 +1012,11 @@ const method = {
         const certfCde = applicantEditRef.value?.getValue(
           "Applicant.cCertfCde"
         );
-        applicantEditRef.value?.validateField('Applicant.cCertfCde').then((isValid)=>{
-           
-            if(isValid){
-                idAnalysis(val)
-            }
+        applicantEditRef.value?.validateField('Applicant.cCertfCde').then((isValid) => {
+
+          if (isValid) {
+            idAnalysis(val)
+          }
         })
       }
     }
@@ -1062,9 +1028,9 @@ const method = {
   isSameChange: (val) => {
     const param = opertaor.getParam();
     if (param.initFlag) {
-      return ;
+      return;
     }
-    
+
     if (val == "1") {
       const ads = applicantEditRef?.value?.getValue("Applicant.ClntAddrProp");
       const a =
@@ -1075,7 +1041,7 @@ const method = {
     } else {
     }
   },
-  
+
   //常住地址
   getCountry: (val: any) => {
     setregistAdd();
@@ -1084,7 +1050,7 @@ const method = {
   getcSuffixAddr: (val: any) => {
     setregistAdd();
   },
-  
+
   //常住地址
   getAllProp: (val: any) => {
     setRegisterAdd();
@@ -1095,7 +1061,7 @@ const method = {
   },
   // 读取身份证
   readIdCard: (val: any) => {
-		maindialogVisible.value = true
+    maindialogVisible.value = true
     // fileInputRef.value?.click();
     // formconfig.value.fileInputType = "1";
   },
@@ -1106,82 +1072,82 @@ const method = {
   },
 
   // 单位性质
- cWorkDptChange:(val: any) => {
-  const clientNature = getValue('Applicant.cClntMrk');
-  const isSpecialCase = cWorkDptList.includes(val) && clientNature === '0';
-  const requiredRule = [getRules("required", {})];
+  cWorkDptChange: (val: any) => {
+    const clientNature = getValue('Applicant.cClntMrk');
+    const isSpecialCase = cWorkDptList.includes(val) && clientNature === '0';
+    const requiredRule = [getRules("required", {})];
 
-  setCapitalRequiredRule(getValue,setFormItem,'Applicant');
-  //实名认证方式
-  setFormItem("Applicant.cRealnameAuthType", {
-    rules: isSpecialCase ? requiredRule : []
-  });
-  // 法定代表人/责任人
-  setFormItem("Applicant.cLegalRepresentative", {
-    rules: isSpecialCase ? requiredRule : []
-  });
-  // 企业成立日
-  setFormItem("Applicant.tEstablishingDate", {
-    rules: isSpecialCase ? requiredRule : []
-  });
- 
+    setCapitalRequiredRule(getValue, setFormItem, 'Applicant');
+    //实名认证方式
+    setFormItem("Applicant.cRealnameAuthType", {
+      rules: isSpecialCase ? requiredRule : []
+    });
+    // 法定代表人/责任人
+    setFormItem("Applicant.cLegalRepresentative", {
+      rules: isSpecialCase ? requiredRule : []
+    });
+    // 企业成立日
+    setFormItem("Applicant.tEstablishingDate", {
+      rules: isSpecialCase ? requiredRule : []
+    });
 
-  const leiCodeRule = [getRules("leiCode", {})];
-  if (val === '350') {
-    setFormItem("Applicant.cGcidCode", {
-      rules: [...requiredRule, ...leiCodeRule]
-    });
-  } else if (val) {
-    setFormItem("Applicant.cGcidCode", {
-      rules: leiCodeRule
-    });
-  }
-},
-   // 办理人员证件种类
-  cOperaterCertfTypChange:(val: any)=>{
-    // 清除报错信息
-    clearValidate('Applicant.cOperaterCertfCde')  
-    let cClntMrk = getValue('Applicant.cClntMrk');  // 投保人性质 
-    let baseRules:any[]= [];
-    type RuleType = "orgCode" | "socialCode" | "idCard" | "passPort" | "ariCard" | "required";
-      const ruleMap: Record<string, RuleType> = {
-        "110001": "orgCode",
-        "110007": "socialCode",
-        "120001": "idCard",
-        "120002": "passPort",
-        "19": "ariCard",
-      };
-      baseRules = ruleMap[val] ? [getRules(ruleMap[val])] : [];
-      if (cClntMrk == '0') {
-        baseRules = [getRules("required", {}), ...baseRules]
-      }
-      
-      setFormItem("Applicant.cOperaterCertfCde", {
-        rules:baseRules,
+
+    const leiCodeRule = [getRules("leiCode", {})];
+    if (val === '350') {
+      setFormItem("Applicant.cGcidCode", {
+        rules: [...requiredRule, ...leiCodeRule]
       });
+    } else if (val) {
+      setFormItem("Applicant.cGcidCode", {
+        rules: leiCodeRule
+      });
+    }
+  },
+  // 办理人员证件种类
+  cOperaterCertfTypChange: (val: any) => {
+    // 清除报错信息
+    clearValidate('Applicant.cOperaterCertfCde')
+    let cClntMrk = getValue('Applicant.cClntMrk');  // 投保人性质 
+    let baseRules: any[] = [];
+    type RuleType = "orgCode" | "socialCode" | "idCard" | "passPort" | "ariCard" | "required";
+    const ruleMap: Record<string, RuleType> = {
+      "110001": "orgCode",
+      "110007": "socialCode",
+      "120001": "idCard",
+      "120002": "passPort",
+      "19": "ariCard",
+    };
+    baseRules = ruleMap[val] ? [getRules(ruleMap[val])] : [];
+    if (cClntMrk == '0') {
+      baseRules = [getRules("required", {}), ...baseRules]
+    }
+
+    setFormItem("Applicant.cOperaterCertfCde", {
+      rules: baseRules,
+    });
   },
   // 证件有效起期
-  tCertfBgnDateDisable:(date:any)=>{
+  tCertfBgnDateDisable: (date: any) => {
     const fs = applicantEditRef.value?.getFromValue();
     if (fs && JSON.stringify(fs) !== '{}') {
 
       const endDate = new Date(fs["Applicant.tCertfEndDate"] || '')   // 结束时间 
       let minDate = dayjs(endDate).valueOf();
-      return   date.getTime() > minDate
-    }else{
-        return true;
+      return date.getTime() > minDate
+    } else {
+      return true;
     }
 
   },
   // 证件有效止期
-  tCertfEndDateDisable:(date:any)=>{
+  tCertfEndDateDisable: (date: any) => {
     const fs = applicantEditRef?.value?.getFromValue();
     if (fs && JSON.stringify(fs) !== '{}') {
-      const startDate = new Date(fs["Applicant.tCertfBgnDate"]|| '')   // 开始时间   
+      const startDate = new Date(fs["Applicant.tCertfBgnDate"] || '')   // 开始时间   
       let maxDate = dayjs(startDate).valueOf();
-        return   date.getTime() < maxDate
-    }else{
-        return true;
+      return date.getTime() < maxDate
+    } else {
+      return true;
     }
   }
 };
@@ -1261,7 +1227,7 @@ function handleFileChange(event: Event) {
             // 身份证
             const result = res.data.result.item_list;
             const keys = result.map((item: any) => item.key);
-            let cardInfo:any = {};
+            let cardInfo: any = {};
             keys.forEach((key: any) => {
               const value = result.find((item: any) => item.key === key).value;
               cardInfo[key] = value;
@@ -1326,7 +1292,7 @@ function handleFileChange(event: Event) {
             );
             if (cardInfo["period_of_validity"]["value"]) {
               tCertfDate.value =
-                cardInfo["period_of_validity"]["value"].split("-")?.map((item:any) => (item.replaceAll(".", "-")));
+                cardInfo["period_of_validity"]["value"].split("-")?.map((item: any) => (item.replaceAll(".", "-")));
               setValue("Applicant.cLongendTyp", "0");
               setValue(
                 "Applicant.tCertfBgnDate",
@@ -1347,12 +1313,12 @@ function handleFileChange(event: Event) {
 						// 营业执照
             const result = res.data.result.item_list;
             const keys = result.map((item: any) => item.key);
-						let cardInfo:any = {};
+            let cardInfo: any = {};
             keys.forEach((key: any) => {
               const value = result.find((item: any) => item.key === key).value;
               cardInfo[key] = value;
             });
-						if (cardInfo["BizLicenseCreditCode"])
+            if (cardInfo["BizLicenseCreditCode"])
               setValue("Applicant.cCertfCde", cardInfo["BizLicenseCreditCode"]); // 证件号码
             if (cardInfo["BizLicenseCompanyName"])
               setValue("Applicant.cAppNme", cardInfo["BizLicenseCompanyName"]); // 客户名称
@@ -1374,39 +1340,39 @@ function handleFileChange(event: Event) {
             }
             setValue("Applicant.cCertfCls", "110007"); // 证件类型
             setValue("Applicant.cClntMrk", "0"); // 投保人性质
-					}
-           checkUser();
-					 formconfig.value.fileInputType = ""
+          }
+          checkUser();
+          formconfig.value.fileInputType = ""
         }
       })
       .catch((err) => {
-				formconfig.value.fileInputType = ""
+        formconfig.value.fileInputType = ""
         ElMessage.error(err);
       });
     fileInputRef.value.value = ""; // 清空文件输入框的值
   }
 }
 
-function clearValidate(key=null) {
+function clearValidate(key = null) {
   applicantEditRef?.value?.clearValidate(key);
 }
 
 // OCR识别弹框确认
-function ok(){
-	if(formconfig.value.fileInputType == ""){
-		ElMessage.warning("请先选择OCR识别类型");
-		return false
-	}
-	maindialogVisible.value = false
-	fileInputRef.value?.click();
+function ok() {
+  if (formconfig.value.fileInputType == "") {
+    ElMessage.warning("请先选择OCR识别类型");
+    return false
+  }
+  maindialogVisible.value = false
+  fileInputRef.value?.click();
 }
 
 // OCR识别弹框取消
-function cancel(){
-	formconfig.value.fileInputType = ""
-	maindialogVisible.value = false
+function cancel() {
+  formconfig.value.fileInputType = ""
+  maindialogVisible.value = false
 }
-function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+function addProvide<T>(key: InjectionKey<T> | string, value: T) {
   applicantEditRef?.value?.addProvide(key, value);
 }
 function getCodeListMap() {

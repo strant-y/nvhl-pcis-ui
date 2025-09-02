@@ -703,6 +703,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   { label: "是", value: "1" },
                   { label: "否", value: "0" },
               ],
+              func:(val)=>{
+                if(val ==='1'){
+                    freeEditRef.value?.setValue('cDataTyp','ply')
+                }else{
+                    freeEditRef.value?.setValue('cDataTyp','app')
+                }
+              }
           },
           {
               prop: "CEmployeeName",

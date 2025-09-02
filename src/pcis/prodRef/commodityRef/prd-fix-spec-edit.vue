@@ -62,6 +62,8 @@ const opertaor = dataOpertaor(idxParam.opertaorProps);
  *
  */
 onMounted(() => {
+  console.log(111,idxParam)
+  // console.log(1112,idxParam)
   // console.log("cNmeCnArray", cNmeCnArray.value);
 
     if(rowData.value.editList){

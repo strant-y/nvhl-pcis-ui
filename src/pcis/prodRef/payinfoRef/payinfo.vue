@@ -3,10 +3,10 @@
 </template>
 
 <script setup lang="ts">
-import { formInit } from "@/shared/from-init"; 
+import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useRoute } from "vue-router";
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
 
 const route = useRoute();
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
@@ -31,12 +31,12 @@ const props = defineProps({
 const payinfoEditRef = ref<AppGridEditMethod | null>(null);
 const formconfig1 = reactive(createAppGridEditConfig({}));
 // Base.cCiMrk  联共保 字段   0 5非共保    1 2 主联   3 4 无联保  
-  // Base.nCiOwnPrm   我司保费
+// Base.nCiOwnPrm   我司保费
 
 const watchSource = computed(() => {
   const data = opertaor.getDataAll();
   const cCiMrk = data.plyBase?.['Base.cCiMrk'];
-  const nCiOwnPrm = ['1', '2', '3','4'].includes(cCiMrk) ? data.ciMasterAgreement?.['Base.nCiOwnPrm'] : data.base?.['Base.nPrm'];
+  const nCiOwnPrm = ['1', '2', '3', '4'].includes(cCiMrk) ? data.ciMasterAgreement?.['Base.nCiOwnPrm'] : data.base?.['Base.nPrm'];
   // 返回“值类型”组合（而非新对象），避免引用变化导致的误触发
   return [cCiMrk, nCiOwnPrm];
 });
@@ -47,10 +47,10 @@ watch(
     if (newCCiMrk === oldCCiMrk && newNCiOwnPrm === oldNCiOwnPrm) {
       return; // 值没变，直接退出，不执行后续逻辑
     }
-    if(['1', '2', '3','4'].includes(newCCiMrk) && newCCiMrk !==oldCCiMrk){
-          // setFormItem()
+    if (['1', '2', '3', '4'].includes(newCCiMrk) && newCCiMrk !== oldCCiMrk) {
+      // setFormItem()
     }
-    nextTick(()=>{
+    nextTick(() => {
       nPrmFun();
     })
   },
@@ -58,71 +58,68 @@ watch(
 );
 
 // 我司保费变化后进行处理
-const nPrmFun = ()=>{
-    if(getFromValue()?.length > 0){
-            const data = opertaor.getDataAll();
-            // 比例
-            let nCiShare = Number(getOwnShare()) || 100 ;
-            const totalAmount = Number(data['base']['Base.nPrm']);  
-            const splitCount =Number(data.base?.['Base.nPayNumber']) 
+const nPrmFun = () => {
+  if (getFromValue()?.length > 0) {
+    const data = opertaor.getDataAll();
+    // 比例
+    let nCiShare = Number(getOwnShare()) || 100;
+    const totalAmount = Number(data['base']['Base.nPrm']);
+    const splitCount = Number(data.base?.['Base.nPayNumber'])
+    debugger
+    const totalCent = Math.round(totalAmount * 100);
+    const result = ref<number[]>([]);
+    const quotient = Math.floor(totalCent / splitCount);
+    const remainder = totalCent % splitCount;
+    result.value = Array(splitCount).fill(quotient);
+    if (remainder > 0) {
+      result.value[0] += remainder;
+    }
 
-            const totalCent = Math.round(totalAmount * 100);
-            const result = ref<number[]>([]);
-            const quotient = Math.floor(totalCent / splitCount) ;
-            const remainder = totalCent % splitCount;
-            result.value = Array(splitCount).fill(quotient);
-            if (remainder > 0) {
-              result.value[0] += remainder;
-            }
+    result.value = result.value.map(cent => parseFloat((cent / 100).toFixed(8)));
+    const formArray = getFromValue();
+    const limitLength = Number(data['base']['Base.nPayNumber']) || 0; // 示例: 3
+    const modifiedArray = formArray.map((item: any, index: any) => {
+      // 超出限制长度的元素：直接返回原对象（不修改）
+      if (index >= limitLength) {
+        return item;
+      }
+      return {
+        ...item, // 保留原有其他属性
+        "Pay.nOwnPrm": item['Pay.nPayablePrm'] ? parseFloat((item['Pay.nPayablePrm'] * (nCiShare / 100)).toFixed(8)) : 0,
+      };
+    });
 
-           result.value = result.value.map(cent => parseFloat((cent / 100 ).toFixed(8)));
-          const formArray = getFromValue(); 
-          const limitLength = Number(data['base']['Base.nPayNumber']) || 0; // 示例: 3
-          const modifiedArray = formArray.map((item:any, index:any) => {
-                // 超出限制长度的元素：直接返回原对象（不修改）
-                  if (index >= limitLength) {
-                    return item;
-                  }
-                  return {
-                    ...item, // 保留原有其他属性
-                     "Pay.nOwnPrm": item['Pay.nPayablePrm']?  parseFloat((item['Pay.nPayablePrm'] * (nCiShare/100) ).toFixed(8)):0,
-                  };
-                });
-                  
-              const cCiMrk =  ['0', '5'].includes(data.plyBase?.['Base.cCiMrk']);  // 是否   联共保
-             if(!cCiMrk){
-              let num = modifiedArray.reduce((sum, item)=>{
-                const amount = Number(item['Pay.nOwnPrm']) || 0;
-                return  sum+amount
-              }, 0)
-        
-              const nCiOwnPrm =  data.ciMasterAgreement?.['Base.nCiOwnPrm']   // 联共保 我司保费
-              let differNum =   nCiOwnPrm - num // 差额
- 
-                 modifiedArray[ splitCount-1]['Pay.nOwnPrm'] =   modifiedArray[ splitCount-1]['Pay.nOwnPrm']+differNum
-                }  
+    const cCiMrk = ['0', '5'].includes(data.plyBase?.['Base.cCiMrk']);  // 是否   联共保
+    if (!cCiMrk) {
+      let num = modifiedArray.reduce((sum, item) => {
+        const amount = Number(item['Pay.nOwnPrm']) || 0;
+        return sum + amount
+      }, 0)
 
-              setFormValue(modifiedArray )
+      const nCiOwnPrm = data.ciMasterAgreement?.['Base.nCiOwnPrm']   // 联共保 我司保费
+      let differNum = nCiOwnPrm - num || 0// 差额
 
+      modifiedArray[splitCount - 1]['Pay.nOwnPrm'] = modifiedArray[splitCount - 1]['Pay.nOwnPrm'] + differNum
+    }
 
-
-    } 
+    setFormValue(modifiedArray)
+  }
 }
 
 // 获取我司比例
-const getOwnShare =()=>{
-   
-   let ownShare = 0;
-   const data = opertaor.getDataAll();
-   let ciArr = data['ci']
+const getOwnShare = () => {
+
+  let ownShare = 0;
+  const data = opertaor.getDataAll();
+  let ciArr = data['ci']
   //  const cCiMrk = data.plyBase?.['Base.cCiMrk'];
-  if(ciArr && ciArr.length>0){
-    ciArr.forEach((item:any)=>{
+  if (ciArr && ciArr.length > 0) {
+    ciArr.forEach((item: any) => {
       const CDptMrk = item['Ci.cCoinsurerCde']
-      if(!!CDptMrk && CDptMrk ==="327001"){
-        ownShare = numAdd(ownShare,item['Ci.nCiShare'])
-      } 
-   })
+      if (!!CDptMrk && CDptMrk === "327001") {
+        ownShare = numAdd(ownShare, item['Ci.nCiShare'])
+      }
+    })
   }
   return ownShare;
 }
@@ -147,36 +144,36 @@ const method = {
     const applicantBefore = tabref["applicant"].getFromValue();
     const insrncBefore = tabref["insrnc"].getFromValue();
     const val = getFromValue()
-    if(baseBefore['Base.cInstMrk'] ==='0' && val.length === 1){
+    if (baseBefore['Base.cInstMrk'] === '0' && val.length === 1) {
       ElMessage.error('付费约定为一次交清，只能录入一条！');
       return false;
     }
-    if(val.length>=12){
+    if (val.length >= 12) {
       ElMessage.error('“缴费计划”不能超过12期！');
       return false;
     }
 
-    
+
 
 
     payinfoEditRef?.value?.addRow();
     if (val) {
       let obj = {
-          'Pay.nTms': val.length,
-          'Pay.cPayorCde':applicantBefore['Applicant.cAppCde'] || null,
-          'Pay.cPayorNme': applicantBefore['Applicant.cAppNme'] || null,
-          'Pay.tPayBgnTm': insrncBefore['Base.tInsrncBgnTm'],
-          'Pay.tPayEndTm':insrncBefore['Base.tInsrncEndTm'],
-          'Pay.nOwnPrm': baseBefore['Base.nPrm'],
+        'Pay.nTms': val.length,
+        'Pay.cPayorCde': applicantBefore['Applicant.cAppCde'] || null,
+        'Pay.cPayorNme': applicantBefore['Applicant.cAppNme'] || null,
+        'Pay.tPayBgnTm': insrncBefore['Base.tInsrncBgnTm'],
+        'Pay.tPayEndTm': insrncBefore['Base.tInsrncEndTm'],
+        'Pay.nOwnPrm': baseBefore['Base.nPrm'],
       }
-     val[val.length -1] = {...val[val.length -1],...obj}
-    //   val.forEach((key, index) => {
-    //     key['Pay.nTms'] = index + 1
-    //     key['Pay.cPayorCde'] =applicantBefore['Applicant.cAppCde'] || null ;
-    //     key['Pay.cPayorNme'] = applicantBefore['Applicant.cAppNme'] || null;
-    //     key['Pay.tPayBgnTm'] = insrncBefore['Base.tInsrncBgnTm'];
-    //     key['Pay.tPayEndTm'] = insrncBefore['Base.tInsrncEndTm'];
-    //     // key['Pay.nOwnPrm'] = baseBefore['Base.nPrm'];
+      val[val.length - 1] = { ...val[val.length - 1], ...obj }
+      //   val.forEach((key, index) => {
+      //     key['Pay.nTms'] = index + 1
+      //     key['Pay.cPayorCde'] =applicantBefore['Applicant.cAppCde'] || null ;
+      //     key['Pay.cPayorNme'] = applicantBefore['Applicant.cAppNme'] || null;
+      //     key['Pay.tPayBgnTm'] = insrncBefore['Base.tInsrncBgnTm'];
+      //     key['Pay.tPayEndTm'] = insrncBefore['Base.tInsrncEndTm'];
+      //     // key['Pay.nOwnPrm'] = baseBefore['Base.nPrm'];
       // });
     }
 
@@ -193,30 +190,30 @@ const method = {
     const val = getFromValue()
     val.forEach((key, index) => {
       key['Pay.nTms'] = index + 1;
-      
-   
+
+
 
     });
   },
   // 缴费计划
-  nPayablePrmFun:(val:any)=>{
- 
+  nPayablePrmFun: (val: any) => {
+
     const data = opertaor.getDataAll();
-    const cCiMrk =  ['0', '5'].includes(data.plyBase?.['Base.cCiMrk']);  // 是否   联共保
-    let nCiShare = Number(getOwnShare()) || 100 ;
+    const cCiMrk = ['0', '5'].includes(data.plyBase?.['Base.cCiMrk']);  // 是否   联共保
+    let nCiShare = Number(getOwnShare()) || 100;
     let num = 0;
-    getFromValue().forEach((item:any) =>{
-              item['Pay.nPayablePrm'] =  item['Pay.nPayablePrm'] || 0;
-              item['Pay.nOwnPrm']  = item['Pay.nPayablePrm']?  parseFloat((item['Pay.nPayablePrm'] * (nCiShare/100) ).toFixed(8)):0
-              num  +=item['Pay.nOwnPrm'] 
-              //  "Pay.nOwnPrm": item['Pay.nPayablePrm']?  parseFloat((item['Pay.nPayablePrm'] * (nCiShare/100) ).toFixed(2)):0,
+    getFromValue().forEach((item: any) => {
+      item['Pay.nPayablePrm'] = item['Pay.nPayablePrm'] || 0;
+      item['Pay.nOwnPrm'] = item['Pay.nPayablePrm'] ? parseFloat((item['Pay.nPayablePrm'] * (nCiShare / 100)).toFixed(8)) : 0
+      num += item['Pay.nOwnPrm']
+      //  "Pay.nOwnPrm": item['Pay.nPayablePrm']?  parseFloat((item['Pay.nPayablePrm'] * (nCiShare/100) ).toFixed(2)):0,
     })
-  console.log('差额',getFromValue()[ getFromValue().length-1])
-     if(!cCiMrk){
-       const nCiOwnPrm =  data.ciMasterAgreement?.['Base.nCiOwnPrm']   // 联共保 我司保费
-       let differNum =   nCiOwnPrm - num // 差额
-           getFromValue()[ getFromValue().length-1]['Pay.nOwnPrm'] =   getFromValue()[getFromValue().length-1]['Pay.nOwnPrm']+differNum
-        }  
+    console.log('差额', getFromValue()[getFromValue().length - 1])
+    if (!cCiMrk) {
+      const nCiOwnPrm = data.ciMasterAgreement?.['Base.nCiOwnPrm']   // 联共保 我司保费
+      let differNum = nCiOwnPrm - num // 差额
+      getFromValue()[getFromValue().length - 1]['Pay.nOwnPrm'] = getFromValue()[getFromValue().length - 1]['Pay.nOwnPrm'] + differNum
+    }
   }
   // Pay.nPayablePrm
   //缴费止期控制
@@ -264,7 +261,7 @@ function setFormItem(key: any, obj: any) {
     });
   }
 }
-function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+function addProvide<T>(key: InjectionKey<T> | string, value: T) {
   payinfoEditRef?.value?.addProvide(key, value);
 }
 defineExpose({
