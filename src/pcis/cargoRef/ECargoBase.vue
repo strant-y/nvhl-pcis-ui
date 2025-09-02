@@ -251,7 +251,7 @@ const method = {
   },
   getcDptCde:(val:any)=>{
     dzmodal
-        .open(DepartmentTree, { type: "Issuer", data: {} })
+        .open(DepartmentTree, { type: "Issuer", data: {} ,isXY:true})
         .then((res:any) => {
           if (res.body) {
             const selectObj = res.body;

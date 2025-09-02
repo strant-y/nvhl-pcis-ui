@@ -500,17 +500,7 @@ const method = {
       });
     }
   },
-  funccDetailsAccident: () => {
-    dialog.value?.open('detailsAccident', {
-      selectedData: getValue("Tgt.cFinanceCde"), //需要把自定义的过滤掉，只传过去从模板中选择的
-    },
-      {
-        getSelected(selectdata: any) {
-          setValue("Tgt.cFinanceCde", selectdata.map(item => item.value).join(','))
-          setValue("Tgt.cDetailsAccident", selectdata.map((item, index) => `${index + 1}. ${item.label}`).join('\n'))
-        },
-      }, { width: 45 });
-  },
+
   getcMemberLogoChange: (val: string) => {
     if (val === '1') {
       setFormItem('Tgt.cBareboatLessee', {
@@ -625,6 +615,9 @@ const method = {
     setFormItem("Tgt.cTransportTools", {
       rules: val === '1' ? requiredRule : [],
     });
+    if(val !== '1'){
+      clearValidate('Tgt.cTransportTools')
+    }
     setFormItem("Tgt.cTransportLicenseNumber", {
       rules: val === '1' ? requiredRule : [],
     });
@@ -679,19 +672,11 @@ const method = {
   func1: () => {
   },
   //投保乘客座位总数改变事件
-  changenTotalInsured: () => {
+  changenTotalInsured: (val:any) => {
     console.log('触发11')
-    setValue("Tgt.nSeatCapacity", Number(getValue("Tgt.nTotalInsured")) + Number(getValue("Tgt.nInsuredcompanySeats")))
-  },
-  //投保司乘人员座位总数改变事件
-  changenInsuredcompanySeats: () => {
-    console.log('触发12')
-    setValue("Tgt.nSeatCapacity", Number(getValue("Tgt.nTotalInsured")) + Number(getValue("Tgt.nInsuredcompanySeats")))
-  },
-
-  // 投保座位总数
-  nSeatCapacityChange:(val:any)=>{ 
-        if(val || val==0){
+       if(val || val==0){
+         setValue("Tgt.nSeatCapacity", Number(getValue("Tgt.nTotalInsured")) + Number(getValue("Tgt.nInsuredcompanySeats")))
+          
          const termref = opertaor.getTableRefByKey("cvrg");
           interface Item {
             nInsuredHeadcount?: number | null | string;
@@ -704,6 +689,17 @@ const method = {
             factorProp: 'Term.nSeatTotal',
           },val);  
         }
+  
+  },
+  //投保司乘人员座位总数改变事件
+  changenInsuredcompanySeats: () => {
+    console.log('触发12')
+    setValue("Tgt.nSeatCapacity", Number(getValue("Tgt.nTotalInsured")) + Number(getValue("Tgt.nInsuredcompanySeats")))
+  },
+
+  // 投保座位总数
+  nSeatCapacityChange:(val:any)=>{ 
+   
   },
 
   //是否单项工程change事件

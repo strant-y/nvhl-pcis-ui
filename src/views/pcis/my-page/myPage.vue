@@ -4736,8 +4736,23 @@ const validateDistConsistency = async () => {
       if (distRes.code == 200 && distRes.data == true) {
         return true;          // 通过
       }
+      // 构造提示语换行展示
       if (distRes.code == 200 && distRes.data == false) {
-         ElMessage.error(distRes.msg);
+        const safeMsg = (distRes.msg || '清单校验异常')
+        .replace(/\n/g, '<br>')
+        .replace(/·/g, '<br>·');   // 每个 · 独占一行
+
+        // 超出就滚动展示
+        const scrollMsg = `
+            <div style="max-height: 35vh; overflow-y: auto;">
+                ${safeMsg}
+            </div>
+        `;
+        ElMessageBox.alert(scrollMsg, "提示", {
+            confirmButtonText: "确定",
+            dangerouslyUseHTMLString: true,
+            type: "warning"
+        })
       } else {
          ElMessage.error(distRes.msg || '清单校验异常');
       }
