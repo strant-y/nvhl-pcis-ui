@@ -148,7 +148,7 @@ onMounted(async () => {
   loadTree(props.data.type);
   if(props.data.type === 1) {
     labelNm.value = "条款"
-  }else if(props.data.type === 2) {
+  }else if(props.data.type === 5) {
     labelNm.value = "方案"
   }else if(props.data.type === 10) {
     labelNm.value = "产品"
@@ -194,7 +194,7 @@ function loadTree(type: number) {
   const param = {
     name: formconfig1.value.name,
     level: 2,
-    type: type == 2 ? 2 : 1
+    type: type == 5 ? 2 : 1
   };
   getProdEnableList(param).then((res: any) => {
     if (res.code === 200) {
@@ -204,7 +204,7 @@ function loadTree(type: number) {
           ...child,
           list: child.list.map((grandChild: any) => ({
             ...grandChild,
-            isPlan: props.data.type === 2,
+            isPlan: props.data.type === 5,
           }))
         })),
       }));
@@ -235,7 +235,7 @@ const onEvent = (data: any, node: any) => {
     return;
   }
   if ([1, 2,5,7].includes(props.data.type) && data.list.length == 0) {
-    if(props.data.type === 2 && !data.isPlan) {
+    if(props.data.type === 5 && !data.isPlan) {
       listShow.value = true;
       datas.value = [];
       return

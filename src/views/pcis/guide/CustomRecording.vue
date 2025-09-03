@@ -767,7 +767,7 @@ function handleRecordTypeChange(val:any) {
   formconfig1.value.cGrpMrk = "0";
   formconfig1.value.cRenewMrk = "0";
   if (val == "5") {
-    loadOptions(5);
+    loadOptions(2);
     labelNm.value = "方案";
     formconfig1.value.cIsPlan = '1';
   } else if (val == "1") {
@@ -775,7 +775,7 @@ function handleRecordTypeChange(val:any) {
     labelNm.value = "条款";
     formconfig1.value.cIsPlan = '0';
   } else {
-    loadOptions(7);
+    loadOptions(1);
     labelNm.value = "条款";
     formconfig1.value.cIsPlan = '0';
   }
