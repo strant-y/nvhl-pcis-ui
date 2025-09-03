@@ -147,7 +147,7 @@ const tableconfig = reactive<AppTableConfig>(
 
 onMounted(async () => {
   loadTree(props.data.type);
-  labelNm.value = props.data.type === 2 ? "方案" : "条款";
+  labelNm.value = props.data.type === 5 ? "方案" : "条款";
 });
 
 watch(
@@ -189,7 +189,7 @@ function loadTree(type: number) {
   const param = {
     name: formconfig1.value.name,
     level: 2,
-    type: type == 2 ? 2 : 1
+    type: type == 5 ? 2 : 1
   };
   getProdEnableList(param).then((res: any) => {
     if (res.code === 200) {
@@ -199,7 +199,7 @@ function loadTree(type: number) {
           ...child,
           list: child.list.map((grandChild: any) => ({
             ...grandChild,
-            isPlan: props.data.type === 2,
+            isPlan: props.data.type === 5,
           }))
         })),
       }))
@@ -220,7 +220,7 @@ const selectedNode = ref<any>(null);
 const onEvent = (data: any, node: any) => {
   // listShow.value = false;
   if (data.list.length == 0) {
-    if(props.data.type === 2 && !data.isPlan) {
+    if(props.data.type === 5 && !data.isPlan) {
       listShow.value = true;
       datas.value = [];
       return
