@@ -63,8 +63,11 @@ import { PcisQueryService } from "@/views/payinfoManagement/service/pcis-query-s
 import { defineEmits, onMounted } from "vue";
 
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
+
+const props = defineProps({
+  idxParam: Object
+});
+const opertaor = dataOpertaor(props.idxParam?.opertaorProps);
 
 const emits = defineEmits(["ok", "cancel"]);
 const pcisQueryService = new PcisQueryService();

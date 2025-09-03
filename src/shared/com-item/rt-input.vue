@@ -275,14 +275,14 @@ function handleChange(val?: string | undefined | null) {
   } else if (props.item.type === "percent") {
     nv = val ? Number(val) : null;
     if(nv){
-      nv = nv / 100;
+      nv = (nv / 100).toFixed(3);
     }
     emits("valueChange", nv);
     emits("update:modelValue", nv);
   } else if (props.item.type === "permill") {
     nv = val ? Number(val) : null;
     if(nv){
-      nv = nv / 1000;
+      nv = (nv / 1000).toFixed(3);
     }
     emits("valueChange", nv);
     emits("update:modelValue", nv);

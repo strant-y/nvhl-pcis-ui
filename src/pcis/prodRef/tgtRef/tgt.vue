@@ -945,8 +945,9 @@ const method = {
       setFormItem('Tgt.cShipClassThree', { disabled: false, rules: [getRules("required", {})] })
 
     } else {
-      setFormItem('Tgt.cShipClassTwo', { disabled: false, rules: [getRules("required", {})] });
-
+      if(val){
+        setFormItem('Tgt.cShipClassTwo', { disabled: false, rules: [getRules("required", {})] });
+      }
     }
     if (val == '02' || val == '03') {
       setFormItem('Tgt.cShipClassThree', { disabled: true, rules: null })

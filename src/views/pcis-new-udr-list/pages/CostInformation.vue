@@ -89,9 +89,6 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { useFormLabelWidth } from "element-plus/es/components/form/src/utils";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { number } from "echarts";
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
-opertaor.init();
 
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
@@ -101,7 +98,10 @@ const dialogVisible = ref(true);
 const props = defineProps({
   data: Object,
   type: String,
+  idxParam: Object
 });
+const opertaor = dataOpertaor(props.idxParam?.opertaorProps);
+opertaor.init();
 const userInfo = JSON.parse(sessionStorage.getItem("user") || '{}');
 const DPT = userInfo.companyId?.substring(0,6);
 const dptTyp = ref("0"); // 0其他  1总共 2二级机构

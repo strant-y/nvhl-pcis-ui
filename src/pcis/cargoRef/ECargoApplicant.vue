@@ -34,6 +34,7 @@ const props = defineProps({
 
 const applicantEditRef = ref<AppFreeEditMethod | null>(null);
 import { getAddressStr,qryCustomer } from "@/api/query";
+import dayjs from "dayjs";
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 const fileInputRef = ref(null);
 import moment from "moment/moment";
@@ -136,6 +137,30 @@ const handelItemShow = (data:any)=>{
 
 // 绑定方法
 const method = {
+  // 证件有效起期
+  tCertfBgnDateDisable: (date: any) => {
+    const fs = getFormValue();
+    if (fs && JSON.stringify(fs) !== '{}') {
+
+      const endDate = new Date(fs["ECargoApplicant.tCertfEndDate"] || '')   // 结束时间
+      let minDate = dayjs(endDate).valueOf();
+      return date.getTime() > minDate
+    } else {
+      return true;
+    }
+
+  },
+  // 证件有效止期
+  tCertfEndDateDisable: (date: any) => {
+    const fs = getFormValue();
+    if (fs && JSON.stringify(fs) !== '{}') {
+      const startDate = new Date(fs["ECargoApplicant.tCertfBgnDate"] || '')   // 开始时间
+      let maxDate = dayjs(startDate).valueOf();
+      return date.getTime() < maxDate
+    } else {
+      return true;
+    }
+  },
   cIsIndvduBizChange:(val:any)=>{
     if(val === '1'){
       setFormItem("ECargoApplicant.cOccupCde", { btnItems: { disabled: false } });
@@ -686,8 +711,11 @@ const method = {
         disabled: false,
       });
     }
-    if (val == "120001") { 
-      
+    if (val == "120001") {
+      setFormItem("ECargoApplicant.cLongendTyp", {
+        hidden:false,
+        rules: null,
+      });
       // setValue('ECargoApplicant.cCertfCde','')  //选身份证时清空
       setFormItem("ECargoApplicant.cCertfCde", {
         hidden:false,
