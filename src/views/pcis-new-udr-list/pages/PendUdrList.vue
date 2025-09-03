@@ -101,6 +101,16 @@
     const udrTypeValue = ref<string>(); // 单据状态 值
     const undrClsListOptions = ref<Array<any>>([]); // 核保级别 下拉数据
     const selectData = ref([]); // 删除用户ID集合 用于批量删除
+
+    let cTermNoList = ref<any>([]);  // 条款数据
+    let cTermNo = '';    // 条款编码
+    const cPard = ref(null);
+
+    function extractCode(str:string) {
+      // 匹配 "P+数字" 或 "纯数字"
+      const pattern = /^(P\d+|\d+)/;
+      return str.match(pattern)?.[0] || "";
+    }
     
     // 默认核保机构
     let loadOrgCde = ref([
@@ -245,62 +255,60 @@
         //   ],
         // },
         {
-            prop: "CProdCatCde",
-            inputtype: "rtSelectV2",
-            title: "产品大类",
-            showKey: [1, 2, 3, 4, 5],
-            typeCode: "KIND_LIST_GRT",
-            params: { cOperId: user.value.opCde, cDptCde: user.value.companyId },
-            clearable: true,
-            //  multiple:1,
-            func: (val: any) => {
-                //根据产品大类再次请求条款接口
-                codeListStore
-                    .queryCodeList(
-                        {
-                            codeListName: "PROD_LIST",
-                            codeListParam: {
-                                cParCde: val,
-                                cOperId: user.value.opCde,
-                                cDptCde: user.value.companyId,
-                            },
-                        },
-                        false,
-                        false
-                    )
+              prop: "CProdCatCde",
+              inputtype: "rtselect",
+              title: "产品大类",
+              typeCode: "KIND_LIST_GRT",
+              showKey: [1, 2, 3, 4, 5],
+              child: "prodNo",
+              filterable: true,
+              clearable: true,
+              codeParam: {
+                  cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+                  cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+              },
+              func: (val) => {
+                  setValue("prodNo","")   // 清空条款
+                  setValue("undrClsCde","") // 清空核保级别
+                  cTermNo = "";      // 重置条款编码
+                  cPard.value = val;
+                  codeListStore
+                    .queryCodeList({
+                        codeListName: "TERM_LIST_IN_GUIDE_SEARCH",
+                        codeListParam:{
+                        cParCde: cPard.value,
+                        cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+                        cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+                    },
+                    })
                     .then((res) => {
-                        if (res && res.code == 200) {
-                            const codeValData = res.data;
-                            if (codeValData) {
-                                //清空条款显示值，重置条款下拉值
-                                freeEditRef.value?.setValue("prodNo", "");
-                                setFormItem("prodNo", {
-                                    loadData: codeValData,
-                                });
-                            }
-                        }
+                        cTermNoList.value = res;
+                        setFormItem("prodNo", {
+                            loadData: res,
+                        });
                     });
-                freeEditRef.value?.setValue("prodNo", ""); // 清空条款
-                freeEditRef.value?.setValue("undrClsCde", ""); // 清空核保级别
-                // loadUndrClsListOptions(val[val.length - 1]); // 加载核保级别列表
-                // getListByCode('undrClsList', { cDptCde: user.value.companyId, cEmpCde: user.value.opCde, cProdNo });
-                // undrClsListOptions.value = response.map(item => ({ value: item.value, label: item.label }));
-            },
+              },
         },
         {
-            prop: "prodNo",
-            inputtype: "rtSelectV2",
-            title: "条款",
-            showKey: [1, 2, 3, 4, 5],
-            typeCode: "TERM_LIST_IN_GUIDE_NEW",
-            // multiple:1,
-            params: {
-                cParCde: "",
-                cOperId: user.value.opCde,
-                cDptCde: user.value.companyId,
-            },
-            labelWidth: 200,
-            clearable: true,
+              prop: "prodNo",
+              inputtype: "rtselect",
+              title: "条款",
+              showKey: [1, 2, 3, 4, 5],
+              filterable: true,
+              clearable: true,
+              func: (val:any) => {
+                if(val){
+                        if(cTermNoList.value.length>0){
+                            cTermNoList.value.forEach((ele) => {
+                                if(ele['value']  === val){
+                                    cTermNo = extractCode(ele['label'])
+                                }
+                            });
+                        }  
+                } else {
+                    cTermNo = "";
+                }
+              },
         },
         {
             prop: "undrClsCde",
@@ -1971,6 +1979,16 @@
             });
         }
     }
+    function setValue(key: string, value: any) {
+        freeEditRef?.value?.setValue(key, value);
+    }
+    function getValue(key: string) {
+       return freeEditRef?.value?.getValue(key);
+    }
+    defineExpose({
+        setValue,
+        getValue,
+    });
 </script>
 
 <style scoped></style>
