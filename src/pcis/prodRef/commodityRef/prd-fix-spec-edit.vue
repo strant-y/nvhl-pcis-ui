@@ -23,7 +23,7 @@
         >
          <!-- type="number" -->
           <el-input
-           
+            maxlength="9"
             v-if="item.match(/^\*+$/)"
             v-model="inputValues[index]"
             @input="updateCNmeCn(index, $event)" 

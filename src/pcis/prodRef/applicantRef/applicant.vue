@@ -473,14 +473,11 @@ const method = {
         // 2. 循环赋值 null + 清除对应字段的校验错误
         fieldsToClear.forEach (field => {
         setValue (field, null);
-        // 清除该字段的校验错误（关键：避免必填校验触发报错） 
+        // 清除该字段的校验错误 
         setTimeout (() => {
           clearValidate (field);
           }, 10);
-    
         });
-      
-
     }
   },
   //投保人性质(0是法人 1是个人)
