@@ -58,9 +58,9 @@ onMounted(async () => {
   setValue("Base.nAmtRmbExch", "1.000000");
   setValue("Base.nPrmRmbExch", "1.000000");
   // 隐藏短期费率类型
-  setFormItem("Base.cRatioTyp", { 
-    hidden: true
-  });
+  // setFormItem("Base.cRatioTyp", { 
+  //   hidden: true
+  // });
 
    // 短期费率类型,以下产品只支持按日的短期费率类型
   const disabledProducts = [
@@ -70,9 +70,9 @@ onMounted(async () => {
   ];
   
   const isDisabled = disabledProducts.includes(params.cProdNo);
-  setFormItem("Base.cRatioTyp", { 
-    disabled: isDisabled
-  });
+  // setFormItem("Base.cRatioTyp", { 
+  //   disabled: isDisabled
+  // });
   if(params?.cRecordType === 9 || params.cPolicySource == 9){
     setFormItem('Base.cRatioTyp',{hidden:true})
     setFormItem('Base.nRatioCoef',{hidden:true})
