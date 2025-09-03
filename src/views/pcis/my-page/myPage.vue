@@ -484,6 +484,7 @@ import SvgIcon from "@/components/SvgIcon/index.vue";
 import { distRequiredMap } from './requiredDistMap';
 import { ElTable, ElTableColumn } from 'element-plus';
 import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
+import { checkPayPlanValidity } from '@/utils/orderEntryValidator';
 
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
@@ -2832,7 +2833,6 @@ const setCiInfo = (base: any) => {
 
 // 风勘校验方法
 function getFKFunc() {
-  
  const param = {
     scene: "EDR_APP_NEW_SCENE",
     CPlyNo: opertaor.getTableRefByKey("plyBase").getValue("Base.cPlyNo"),
@@ -2841,13 +2841,6 @@ function getFKFunc() {
     console.log("投保单明细", res.code);
     ElMessage.error("风勘未结束，不允许询价提核！");
     return false;
-    // if(res.code ==500){
-    //    return true;
-    // }else{
-
-    // }
-    
-     
   });
   // return true;
 }
@@ -2869,35 +2862,6 @@ function checkShow(k:any){
   }
   return r;
 }
-
-// 检查缴费计划时间是否超出保险区间
-const checkPayPlanValidity = () => {
-  const payPlanList = opertaor.getTableRefByKey("payinfo").getFromValue();
-  const insuranceStart = opertaor.getTableRefByKey("insrnc")?.getValue('Base.tInsrncBgnTm');
-  const insuranceEnd = opertaor.getTableRefByKey("insrnc")?.getValue('Base.tInsrncEndTm');
-
-  // 日期转换函数
-  const toDate = d => {
-    if (d == null || (typeof d === 'string' && !d.trim())) return new Date(NaN);
-    if (typeof d === 'number') return d >= -2208988800000 && d <= 4102444800000 ? new Date(d) : new Date(NaN);
-    const date = new Date(d);
-    return !isNaN(date.getTime()) ? date : new Date(Number(d) || NaN);
-  };
-
-  //校验保险区间有效性
-  const [insStartDate, insEndDate] = [toDate(insuranceStart), toDate(insuranceEnd)];
-  if (isNaN(insStartDate.getTime()) || isNaN(insEndDate.getTime()) || insStartDate > insEndDate) {
-    console.error("保险起期/止期格式无效或逻辑错误");
-    return false;
-  }
-
-  // 遍历检查
-  return payPlanList.some(plan => {
-    const [payStart, payEnd] = [toDate(plan['Pay.tPayBgnTm'] || ""), toDate(plan['Pay.tPayEndTm'] || "")];
-    const isInvalid = isNaN(payStart.getTime()) || isNaN(payEnd.getTime());
-    return isInvalid || payStart < insStartDate || payEnd > insEndDate;
-  });
-};
 
 // 校验 地址清单总数 和 学生人数（人）
 const checkStudentValidity  =  async() => {
@@ -3087,8 +3051,9 @@ const submitToUndrFn = async () => {
       opertaor.getTableRefByKey("payinfo").setFormValue(setArr); 
   }
 
-  // 校验 缴费计划时间超出保险起止期  重置成一条
-  if(checkPayPlanValidity()){
+  // 校验 缴费计划时间超出保险起止期 时间格式有误等 重置成一条
+  const hasInvalidPlan = checkPayPlanValidity({ opertaor });
+  if(hasInvalidPlan){
       opertaor.getTableRefByKey("base").setValue('Base.cInstMrk','0')
   }
   

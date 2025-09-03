@@ -1032,10 +1032,13 @@ const method = {
 
     // 切换清空
     if (!isCoypBtn.value && val) {
-      setValue("Insured.tBirthday", null);
-      setValue("Insured.nAge", null);
-      // setValue("Insured.cSex", null);
-      setValue('Insured.cCertfCde', null);
+        const fieldsToClear = [ "Insured.tBirthday", "Insured.nAge", "Insured.cCertfCde" ];
+         fieldsToClear.forEach (field => {
+          setValue (field, null);
+            setTimeout (() => {
+            clearValidate (field);
+            }, 10);
+        });
     }
   },
   // 证件号码 change
