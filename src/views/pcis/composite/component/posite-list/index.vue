@@ -1,0 +1,167 @@
+<template>
+  <app-grid-edit  ref="gridEditRef" :gridEditConfig="formconfig"/>
+</template>
+<script setup lang="ts">
+import {AppGridEditMethod, createAppGridEditConfig} from "@/shared/app-grid-edit-config";
+import {createFreeButtonBase} from "@/shared/button-config";
+import {CompositePageView} from "@/views/pcis/support/composite.types";
+import {codeListViewStore} from "@/store";
+import {ref} from "vue";
+
+const props = defineProps({
+  prodList: {
+    type: Array,
+  }
+});
+
+const codeListStore = codeListViewStore();
+const emit = defineEmits(['update:prodList', 'prodListChange']);
+const gridEditRef = ref<AppGridEditMethod | null>();
+const pageView = inject("pageView", ref(new CompositePageView()));
+
+const formconfig = ref(createAppGridEditConfig({
+  title: '产品信息',
+  editFlag: true, //是否可以编辑
+  titleBtns: [
+    createFreeButtonBase({
+      id: 'add',
+      type: "primary",
+      label: "新增",
+      func: () => {
+        gridEditRef.value?.addRow();
+      },
+    }),
+    createFreeButtonBase({
+      id: 'del',
+      type: "primary",
+      label: "删除",
+      func: () => {
+        const selRow = gridEditRef.value?.getSelectRow();
+        if(selRow) {
+          gridEditRef.value?.delRow(selRow['_dataId']);
+          if(!!selRow['cProdNo'] && selRow['cProdNo'] !== '') {
+            emit('update:prodList', gridEditRef.value?.getFromValue())
+            emit('prodListChange', gridEditRef.value?.getFromValue())
+          }
+        }
+      },
+    }),
+  ],
+  fromSchema: [
+    {
+      prop: 'cPositeNo',
+      inputtype: 'rtinput',
+      title: '组合申请单号',
+      disabled: true,
+      width: 100
+    },
+    {
+      prop: 'cAppNo',
+      inputtype: 'rtinput',
+      title: '申请单号',
+      disabled: true,
+      width: 100
+    },
+    {
+      prop: 'cPlyNo',
+      inputtype: 'rtinput',
+      title: '保单号',
+      disabled: true,
+      width: 100
+    },
+    {
+      prop: "cKindNo",
+      inputtype: "rtselect",
+      title: "产品大类",
+      typeCode: "Query_Kind_List",
+      codeParam: {},
+      width: 80,
+      func: async (value: string, rowData: any) => {
+        const list = await codeListStore.queryCodeList({
+          codeListName: 'PROD_LIST',
+          codeListParam: {"cParCde": value},
+        });
+        gridEditRef.value?.addCodeListMap({
+          code: 'cProdNo' + rowData['_dataId'],
+          list:list
+        });
+      }
+    },
+    {
+      prop: "cProdNo",
+      inputtype: "rtselect",
+      title: "产品",
+      typeCode: "PROD_LIST",
+      codeParam: {},
+      func: async (value: string, rowData: any) => {
+        if(value) {
+          const list = gridEditRef.value?.getFromValue();
+          const rows = list.filter(f => f['cProdNo'] === value);
+          if (rows && rows.length > 1) {
+            ElMessage.warning('该产品已存在，请重新选择');
+            rowData['cProdNo'] = undefined;
+            return;
+          }
+          await setProdNme(rowData, value);
+          emit('update:prodList',);
+          emit('prodListChange', gridEditRef.value?.getFromValue());
+        }
+      },
+      onInit: (options: any) => {
+        const {value, rowData} = options;
+        setProdNme(rowData, value);
+      },
+    },
+    {
+      prop: "cGrpMrk",
+      inputtype: "rtselect",
+      title: "团个单标识",
+      loadData: [
+        {
+          label: "个单",
+          value: "1",
+        },
+        {
+          label: "团单",
+          value: "0",
+        },
+        {
+          label: "家庭单",
+          value: "0",
+        },
+      ],
+      defaultValue: "1",
+    },
+  ]
+}));
+
+const setProdNme = async (rowData: any, cProdNo: string) => {
+  const cKindNo = rowData['cKindNo'];
+  if(rowData) {
+    const list = await codeListStore.queryCodeList({
+      codeListName: 'PROD_LIST',
+      codeListParam: {"cParCde": cKindNo},
+    });
+    const item = list.find((item: any) => item.value === cProdNo);
+    if(item) {
+      gridEditRef.value?.setValueByRowKey('cProdNme', rowData['_dataId'], item.label?.substring(7, item.label?.length - 1));
+    }
+  }
+};
+
+onMounted(() => {
+  console.log('props.prodList', props.prodList)
+  if(props.prodList) {
+    gridEditRef.value?.setFormValue(props.prodList);
+  }
+});
+
+watch(() => props.prodList, (newVal) => {
+  if(newVal) {
+    gridEditRef.value?.setFormValue(newVal);
+  }
+});
+</script>
+<style scoped>
+
+</style>

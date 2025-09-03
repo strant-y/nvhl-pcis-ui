@@ -87,6 +87,14 @@ import  specialCateModal  from "./commodityRef/specialCateModal.vue";
 import AgentTgtRef from "./agentTgtRef/AgentTgt.vue"
 import TransportinfoRef from "./transportinfoRef/Transportinfo.vue";
 
+/** 组合出单公共组件 **/
+import positeBase from "../../views/pcis/composite/component/posite-common/posite-base.vue";
+import positeApplicant from "../../views/pcis/composite/component/posite-common/posite-applicant.vue";
+import positeInsured from "../../views/pcis/composite/component/posite-common/posite-insured.vue";
+import positePlybase from "../../views/pcis/composite/component/posite-common/posite-plybase.vue";
+import positeCi from "../../views/pcis/composite/component/posite-common/posite-ci.vue";
+/** **/
+
 /**用于动态组件的映射生成 */
 const componentMap = {
   commonRef: commonRef,
@@ -173,6 +181,13 @@ const componentMap = {
   specialCateModal:specialCateModal,
   AgentTgtRef:AgentTgtRef,
   TransportinfoRef:TransportinfoRef,
+
+  positeBase: positeBase,
+  positeApplicant: positeApplicant,
+  positeInsured: positeInsured,
+  positePlybase: positePlybase,
+  positeCi: positeCi,
+
 };
 
 const install = (Vue) => {
