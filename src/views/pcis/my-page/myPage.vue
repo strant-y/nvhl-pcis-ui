@@ -4823,7 +4823,7 @@ const validateCiInfo = () => {
     return false;
   }
   // 共保比例总和验证
-  if (Math.abs(NCiShare - 100) > 0.000001) { // 使用容差比较
+  if (Math.abs(NCiShare.toFixed(0) - 1) > 0.000001) { // 使用容差比较
     ElMessage.error("共保比例和应为100!");
     return false;
   }

@@ -151,7 +151,7 @@ const method = {
     }
     // 设置新行的 Ci.nCiShare 为剩余比例
     const newRowId = dataList[dataList.length - 1]?._dataId;
-    if (newRowId && parseFloat(remaining) > 0) {
+    if (newRowId && Number(remaining) > 0) {
       freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", newRowId, remaining);
     }
     updateMasterAgreementValues()
@@ -419,11 +419,10 @@ const method = {
   },
   //联共保比例
   nCiShareChange:(val)=>{
-    debugger;
     const rowDatas = freeEditRef.value?.getSelectRow();
     const rowId = rowDatas?._dataId;
     // 校验输入是否合法
-    const floatValue = parseFloat(val);
+    const floatValue = Number(val);
     if (!isNaN(floatValue) && isFinite(floatValue)) {
       // 修改范围为1-100之间
       if (floatValue < 0 || floatValue > 1) {
@@ -448,14 +447,14 @@ const method = {
     const allRows = getFromValue();
     const totalOther = allRows
       .filter(row => row._dataId !== rowId)
-      .reduce((sum, row) => sum + parseFloat(row["Ci.nCiShare"] || 0), 0);
+      .reduce((sum, row) => sum + Number(row["Ci.nCiShare"] || 0), 0);
       // if(totalOther >= 100){
       //   ElMessage.error("联共保比例不能大于100");
       //   freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, "");
       //   return;
       // }
     // 如果当前值 + 其他行 >= 100，则限制当前行最大值为 100 - 其他行总和
-    if (parseFloat(val) + totalOther > 1) {
+    if (Number(val) + totalOther > 1) {
       const maxVal = 1 - totalOther;
       freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, maxVal);
       return;
@@ -480,7 +479,7 @@ const method = {
     // onChiefMrkChange()
     //根据新的联共保保费和出单费比例重新计算出单费用
     const updatedRowData = freeEditRef.value?.getSelectRow();
-    const nPlyFeeRate = parseFloat(updatedRowData["Ci.nPlyFeeRate"] || 0);
+    const nPlyFeeRate = parseFloat(updatedRowData["Ci.nPlyFeeRate"] || '0');
     const nCiPrm = parseFloat(updatedRowData["Ci.nCiPrm"] || 0);
     const nPlyFee = nPlyFeeRate * nCiPrm;
     freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", updatedRowData._dataId, nPlyFee.toFixed(2));
@@ -505,7 +504,7 @@ const method = {
     // 限制出单费比例范围（0-100）
     if (floatValue < 0 || floatValue > 1) {
       ElMessage.warning("出单费比例应在0-100之间");
-      freeEditRef?.value?.setValueByRowKey("Ci.nPlyFeeRate", row._dataId, "");
+      freeEditRef?.value?.setValueByRowKey("Ci.nPlyFeeRate", row._dataId, "0.00");
       freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", row._dataId, "0.00");
       return;
     }
