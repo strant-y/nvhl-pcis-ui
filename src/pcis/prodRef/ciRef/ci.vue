@@ -427,7 +427,7 @@ const method = {
     if (!isNaN(floatValue) && isFinite(floatValue)) {
       // 修改范围为1-100之间
       if (floatValue < 0 || floatValue > 1) {
-        ElMessage.warning("联共保比例必须大于等于0且小于等于1");
+        ElMessage.warning("联共保比例必须大于等于1且小于等于100");
         freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, "");
         return;
       }
