@@ -400,6 +400,9 @@ onMounted(() => {
     if(params.cRsnCde === "FZ") {
       setFormItem("EdrBase.edrFormula", { hidden: true })
     }
+    if(params.cRsnCde === "47") {
+      setFormItem("EdrBase.edrFormula", { disabled: true })
+    }
     setFormItem("EdrBase.cDptCde", {
         loadData: [
             { value: params.cDptCde, label: `${params.cDptCde} ${params.cDptCnm}` },
