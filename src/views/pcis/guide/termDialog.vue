@@ -5,7 +5,7 @@
       <el-col :span="12" class="col-md-12">
         <el-card :bordered="false" class="index-blk">
           <div
-            style="
+              style="
               height: 20rem;
               width: 100%;
               overflow: scroll;
@@ -13,20 +13,24 @@
             "
           >
             <el-input
-              v-model="filterText"
-              style="width: 500px"
-              :placeholder="`请输入${labelNm}名称`"
+                v-model="filterText"
+                style="width: 500px"
+                :placeholder="`请输入${labelNm}名称`"
             />
             <el-tree
-              ref="treeRef"
-              class="custom-re-tree"
-              :data="nodes"
-              :props="defaultProps"
-              @current-change="getCurrentNode"
-              :show-line="true"
-              :highlight-current="true"
-              :filter-node-method="filterNode"
-              @node-click="onEvent"
+                ref="treeRef"
+                class="custom-re-tree"
+                :data="nodes"
+                :props="defaultProps"
+                @current-change="getCurrentNode"
+                @check="checkChange"
+                node-key="searchKey"
+                :default-checked-keys="defaultCheckedKeys"
+                :show-line="true"
+                :highlight-current="true"
+                :filter-node-method="filterNode"
+                :show-checkbox="props.data.type === 10"
+                @node-click="onEvent"
             >
               <template #default="{ node, data }">
                 <span>
@@ -40,19 +44,19 @@
       </el-col>
       <el-col :span="12" class="col-md-12">
         <CustomRecordingInfo
-          v-if="listShow"
-          :datas="datas"
-          :pNode="pNode"
-          :termList="props.termList"
-          :type="props.data.type"
-          :voType="props.data.voType"
-          @updateTerm="updateTermlist"
+            v-if="listShow"
+            :datas="datas"
+            :pNode="pNode"
+            :termList="props.termList"
+            :type="props.data.type"
+            :voType="props.data.voType"
+            @updateTerm="updateTermlist"
         />
       </el-col>
     </el-row>
     <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
       <rt-button
-        :item="{
+          :item="{
           type: 'primary',
           label: '确认',
           func: () => {
@@ -69,30 +73,15 @@ import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 const filterText = ref("");
 import { ref } from "vue";
-import {
-  AppFreeEditConfig,
-  AppFreeEditMethod,
-  createAppFreeEditConfig,
-} from "@/shared/app-free-edit-config";
 
-const freeEditRef = ref<AppFreeEditMethod | null>(null);
-import { createFreeButtonBase } from "@/shared/button-config";
-import { yesOrNo, size, inputtype } from "@/utils/utilKey";
 import {
   AppTableConfig,
-  AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { getBasicKindList } from "@/api/prod";
-import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { getProdEnableList } from "./custom-recording.service";
-import { terConfig } from "@/store/modules/term-config";
 const emits = defineEmits(["ok", "cancel"]);
-const dzmodal = useDzModal();
-const tableRef = ref<AppTableMethod | null>(null);
 const dialogVisible = ref(true);
 const treeRef = ref<InstanceType<typeof ElTree>>();
-const termList = ref<any>([]);
 const formconfig1 = ref({
   name: "",
 });
@@ -101,15 +90,21 @@ const labelNm = ref("条款")
 const nodes = ref<Array<any>>([]);
 const defaultProps = {
   children: "list",
-  isLeaf: "leaf",
   label: "value",
+  isLeaf: (data: any) => !data.list || data.list.length === 0, // 判断是否叶子节点
+  disabled: (data: any) => !(!data.list || data.list.length === 0), // 最后一级才支持选择
 };
 const datas = ref<any>([]);
 const pNode = ref<any>([]);
 const listShow = ref(false);
 const CustomRecordingInfo = defineAsyncComponent(
-  () => import("./CustomRecordingInfo.vue")
+    () => import("./CustomRecordingInfo.vue")
 );
+// 初始化默认选中的数据
+const defaultCheckedKeys = computed(() => {
+  const keys = props.selectedList?.map((item: any) => item.searchKey);
+  return keys;
+});
 const props = defineProps({
   data: {
     type: Object,
@@ -118,6 +113,10 @@ const props = defineProps({
   termList: {
     type: Array,
     required: true,
+  },
+  selectedList: {
+    type: Array,
+    required: false,
   },
 });
 
@@ -130,30 +129,36 @@ const pageresult = reactive<Pageresult>({
 });
 
 const tableconfig = reactive<AppTableConfig>(
-  createTableEditConfig({
-    isPage: false,
-    showSelection: true,
-    maxHeight: 350,
-    fromSchema: [
-      {
-        prop: "cNmeCn",
-        inputtype: "rtinput",
-        title: "选择项",
-        minWidth: 180,
-      },
-    ],
-  })
+    createTableEditConfig({
+      isPage: false,
+      showSelection: true,
+      maxHeight: 350,
+      fromSchema: [
+        {
+          prop: "cNmeCn",
+          inputtype: "rtinput",
+          title: "选择项",
+          minWidth: 180,
+        },
+      ],
+    })
 );
 
 onMounted(async () => {
   loadTree(props.data.type);
-  labelNm.value = props.data.type === 2 ? "方案" : "条款";
+  if(props.data.type === 1) {
+    labelNm.value = "条款"
+  }else if(props.data.type === 2) {
+    labelNm.value = "方案"
+  }else if(props.data.type === 10) {
+    labelNm.value = "产品"
+  }
 });
 
 watch(
-  () => props.data,
-  (newTableConfig) => {},
-  { deep: true }
+    () => props.data,
+    (newTableConfig) => {},
+    { deep: true }
 );
 
 watch(filterText, (val) => {
@@ -193,7 +198,7 @@ function loadTree(type: number) {
   };
   getProdEnableList(param).then((res: any) => {
     if (res.code === 200) {
-      var nodesData = res.data.map((item: any) => ({
+      const nodesData = res.data.map((item: any) => ({
         ...item,
         list: item.list.map((child: any) => ({
           ...child,
@@ -202,15 +207,23 @@ function loadTree(type: number) {
             isPlan: props.data.type === 2,
           }))
         })),
-      }))
-      addSearchKey(nodesData)
+      }));
+      addSearchKey(nodesData);
       nodes.value = nodesData;
+      nextTick(() => {
+        if(props.selectedList && props.selectedList.length > 0) {
+          checkChange();
+        }
+      });
     } else {
       ElMessage.error(res.msg);
     }
   });
 }
 const getCurrentNode = (data: any) => {
+  if(props.data.type === 10) {
+    return;
+  }
   if (data.list.length !== 0) {
     listShow.value = true;
     datas.value = [];
@@ -218,8 +231,10 @@ const getCurrentNode = (data: any) => {
 };
 const selectedNode = ref<any>(null);
 const onEvent = (data: any, node: any) => {
-  // listShow.value = false;
-  if (data.list.length == 0) {
+  if(props.data.type === 10) {
+    return;
+  }
+  if ([1, 2].includes(props.data.type) && data.list.length == 0) {
     if(props.data.type === 2 && !data.isPlan) {
       listShow.value = true;
       datas.value = [];
@@ -235,11 +250,19 @@ const onEvent = (data: any, node: any) => {
   }
 };
 
+function checkChange(data: any) {
+  const list = treeRef.value?.getCheckedNodes(true, false);
+  listShow.value = true;
+  datas.value = list;
+}
+
 // 保存
 function confirm() {
   dialogVisible.value = false;
-  if(selectedNode.value && selectedNode.value !== null) {
+  if([1, 2].includes(props.data.type) && selectedNode.value) {
     emits("ok", selectedNode.value);
+  }else if(props.data.type === 10 && datas.value) {
+    emits("ok", datas.value);
   }
 }
 function updateTermlist() {
@@ -247,8 +270,17 @@ function updateTermlist() {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .custom-re-tree >>> .el-tree-node.is-current > .el-tree-node__content {
   background-color: #ffaaa64d;
+}
+/* 核心样式：只在最后一级（叶子节点）显示复选框 */
+::v-deep .custom-re-tree {
+  .el-tree-node .el-checkbox .is-disabled {
+    display: none !important;
+  }
+  .el-tree-node .el-checkbox {
+    margin-right: -10px !important;
+  }
 }
 </style>

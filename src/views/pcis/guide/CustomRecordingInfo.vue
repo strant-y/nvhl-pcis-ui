@@ -189,7 +189,7 @@ const tableconfig = reactive<AppTableConfig>(
 );
 onMounted(async () => {
   init();
-  labelNm.value = props.type === 2 ? "方案" : "条款";
+  labelNm.value = props.type === 2 ? "方案" : props.type === 10 ? "产品" : "条款";
 });
 
 watch(
@@ -207,7 +207,7 @@ function init() {
 
   checkedIcon.value = "rgb(170, 170, 170)";
   props.termList.forEach((item: any, index: any) => {
-    if(props.type === 2) {
+    if (props.type === 2) {
       if (datas.value.length && item.planNo == datas.value[0].code) {
         checkedIcon.value = "rgb(250, 219, 20)";
       }
