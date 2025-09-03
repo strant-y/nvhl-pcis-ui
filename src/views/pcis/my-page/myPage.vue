@@ -2367,7 +2367,7 @@ function addOneYear(a:any) {
 // 获取清单数据并填充到列表
 const getDistData = (appNo:any, item: any) => {
   const selData = {
-    cComponentTable: item.pageCode.slice(0, -6),
+    cComponentTable: item.pageCode.replace(/\d+/g, ''),
     // cAppNo: appNo,
   };
   if(props.param?.pageType === "inquiryToApp" || props.param?.pageName === "priceInquiry") {

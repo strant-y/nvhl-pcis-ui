@@ -51,7 +51,8 @@ export function descryptParameterToQuery(query: any): any {
   if(Object.keys(query).length === 0) return data;
   for (const key in query) {
     if (Object.prototype.hasOwnProperty.call(query, key)) {
-      if (!['encrypted'].includes(key) && query[key]) {
+      // 页签切换后路由参数会变成加密状态，所以添加或情况判断再次解密保证页面读取prop.param正常
+      if ((!['encrypted'].includes(key) && query[key]) || (key === 'encrypted' && query[key] && typeof query['param'] !== 'object')) {
         let keyData = query[key];
         if(!['componentKey'].includes(key) && typeof keyData === CommonConstants.TYPE_OF_STRING && keyData.length > 1) {
           keyData = descryptParameter(query[key]);
