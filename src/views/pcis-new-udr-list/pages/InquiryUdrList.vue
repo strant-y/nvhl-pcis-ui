@@ -1073,21 +1073,27 @@
                     ]);
                 }
 
-                if (udrTypeValue.value == "5") {
-                    freeEditRef.value?.setValue("CLoadSub", 1);
-                      setFormItem("orgCde", {
-                        loadData:  loadOrgCde.value
-                    });
-                    freeEditRef.value?.setValue(
-                        'orgCde',  loadOrgCde.value[0]['value'],
-                    );
-                        freeEditRef.value?.setValue("tm1", [
-                        moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
-                            "YYYY-MM-DD 00:00:00"
-                        ),
-                        moment(new Date()).format("YYYY-MM-DD 23:59:59"),
-                    ]);
-                }
+              if (udrTypeValue.value == "5") {
+                freeEditRef.value?.setValue("CLoadSub", 1);
+                setFormItem("orgCde", {
+                  loadData: loadOrgCde.value
+                });
+                freeEditRef.value?.setValue(
+                    'orgCde', loadOrgCde.value[0]['value'],
+                );
+                setFormItem("cDptCde", {
+                  loadData: loadOrgCde.value
+                });
+                freeEditRef.value?.setValue(
+                    'cDptCde', loadOrgCde.value[0]['value'],
+                );
+                freeEditRef.value?.setValue("tm1", [
+                  moment(new Date(Date.now() - 30 * 1000 * 60 * 60 * 24)).format(
+                      "YYYY-MM-DD 00:00:00"
+                  ),
+                  moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+                ]);
+              }
             }
         });
     };
