@@ -234,7 +234,7 @@ const onEvent = (data: any, node: any) => {
   if(props.data.type === 10) {
     return;
   }
-  if ([1, 2].includes(props.data.type) && data.list.length == 0) {
+  if ([1, 2,5,7].includes(props.data.type) && data.list.length == 0) {
     if(props.data.type === 2 && !data.isPlan) {
       listShow.value = true;
       datas.value = [];
@@ -259,7 +259,7 @@ function checkChange(data: any) {
 // 保存
 function confirm() {
   dialogVisible.value = false;
-  if([1, 2].includes(props.data.type) && selectedNode.value) {
+  if([1, 2,5,7].includes(props.data.type) && selectedNode.value) {
     emits("ok", selectedNode.value);
   }else if(props.data.type === 10 && datas.value) {
     emits("ok", datas.value);
