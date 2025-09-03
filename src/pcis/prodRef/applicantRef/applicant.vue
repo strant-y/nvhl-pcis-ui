@@ -474,12 +474,15 @@ const method = {
       setFormItem("Applicant.tBirthday", {
         rules: null
       });
+      clearValidate('Applicant.tBirthday')
       setFormItem("Applicant.nAge", {
         rules: null
       });
+      clearValidate('Applicant.nAge')
       setFormItem("Applicant.cSex", {
         rules: null
       });
+      clearValidate('Applicant.cSex')
 
       productStore.setcClntMrk(val);
       // 办理人
