@@ -95,11 +95,13 @@ const tableconfig = reactive<AppTableConfig>(
            return row.cIfEdit !== '1';
         },
         tableClick: (row) => {
+          console.log('param',row)
           if(originalData.value.length==0){
               originalData.value  =    deepClone(formData.value)
           }
+          debugger;
           let param = {};
-          if(row['cIfMust'] !== '9') {
+          if(row['cIfMust'] !== '9' && row['cIfFix'] !== '0') {
             
             let rid = row.cSpecialCode|| row.cSpecialCode
             const f = originalData.value.find(f => rid === f.cSpecialCode);
@@ -113,6 +115,7 @@ const tableconfig = reactive<AppTableConfig>(
           if(row.editList && row.editList.length>0){
             param['editList'] = row.editList
           }
+          console.log('param',param)
           dzmodal.open(specEdit, {
             type: "view",
             data: param,
@@ -341,6 +344,14 @@ onUnmounted(() => {
 
 // 复制数据处理
 const mergeArrays = (oldArr, newArr, key, fields)=>{
+        if (!Array.isArray(oldArr) || oldArr.length === 0) {
+          return newArr.map(item => ({ ...item }));
+        }
+
+        // 边界处理：如果新数组为空，返回空数组（或根据业务返回旧数组）
+        if (!Array.isArray(newArr) || newArr.length === 0) {
+          return [];
+        }
         const isSameItem = (oldItem, newItem,key) => {
           if (key != null && key !== undefined && key !== '') {
             const oldValue = oldItem[key];
@@ -400,6 +411,8 @@ const method = {
         getSelected(selectdata: any) {
             let len = formData.value.length;
             let sessionSpecialAgreement = JSON.parse(sessionStorage.getItem("getAppPolicyData"))?.['SpecialAgreement'] || [];
+            console.log('缓存问题',sessionSpecialAgreement )
+            console.log('缓存问题2selectdata',selectdata )
             const result = mergeArrays(sessionSpecialAgreement, selectdata, 'cSpecialCode', ['cSpecialContent']);
             result.forEach((item: any,index:number) => {
               item.index = index + 1;

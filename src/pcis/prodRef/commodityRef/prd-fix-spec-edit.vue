@@ -1,7 +1,7 @@
 <template>
   <el-dialog v-model="dialogVisible" title="编辑特约" width="80%">
     <!-- 特别约定代码 -->
-    <div class="form-item">
+    <div class="form-item" v-if="rowData.cSpecialCode">
       <span>特别约定代码：</span>
       <span>{{ rowData.cSpecialCode }}</span>
     </div>
@@ -14,8 +14,9 @@
     <!-- 约定内容 -->
     <div class="form-item">
       <span>约定内容:</span>
-      <div class="content-container">
+      <div class="content-container"  v-if="cIfFix !=='0'">
         <div
+         
           v-for="(item, index) in cNmeCnArray"
           :key="index"
           class="content-item"
@@ -31,6 +32,16 @@
           ></el-input>
           <span v-else>{{ item }}</span>
         </div>
+
+      
+        
+      </div>
+
+      <div class="content-container"  v-else-if="cIfFix =='0'">
+          <el-input
+            v-model="textarea"
+            type="textarea"
+          ></el-input>
       </div>
     </div>
     <template #footer>
@@ -54,22 +65,23 @@ const props = defineProps(["data","callback","idxParam"]);
 const rowData = ref(props.data);
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam(props.idxParam));
 const opertaor = dataOpertaor(idxParam.opertaorProps);
-//rowData当前行数据
-/**
- * 拿到特约内容字段，通过***分割为数组，然后在html部分直接循环该数组，
- * 如果数组项为***则特换为input输入框，等用户输入完成后，再把数组join合并为实际的特约内容，回显到特约组件
- *
- *
- */
+let  cIfFix = ref(null);
+ 
+const textarea = ref('')
+
 onMounted(() => {
   console.log(111,idxParam)
-  // console.log(1112,idxParam)
-  // console.log("cNmeCnArray", cNmeCnArray.value);
-
+  console.log(111,rowData.value)
+  console.log(111,cNmeCnArray.value)
+    if( rowData.value.cIfFix === '0'){
+      
+    }
+    cIfFix.value  = rowData.value.cIfFix
+    textarea.value =  rowData.value['cSpecialContent']
     if(rowData.value.editList){
-      // inputValues.value  = setEditList(inputValues.value,rowData.value.editList)
          inputValues.value  = setEditList( cNmeCnArray.value,rowData.value.editList)
     }
+
 });
 
 // 使用正则表达式分割字符串，保留分隔符 ** 作为单独的数组项
@@ -86,13 +98,11 @@ const updateCNmeCn = (index: number, value: string) => {
 };
 const handleCancel = () => {
   dialogVisible.value = false;
+
+
 };
 const handleSave = () => {
   rowData.value.editList = newListValue(cNmeCnArray.value,inputValues.value)
-  // rowData.value.cSpecialContent =inputValues.value.join("");
-  // const parts = cNmeCnArray.value.map((item, idx) =>
-  //   item.match(/^\*+$/) ? inputValues.value[idx] : item
-  // );
 	// 本保单启运日期为：**年**月**日。
 	if(rowData.value.cSpecialCode == "34201709"){
 		if(rowData.value.editList[0] != "" && rowData.value.editList[1] != "" && rowData.value.editList[2] != ""){
@@ -122,7 +132,7 @@ const handleSave = () => {
 		}
 	}
   dialogVisible.value = false;
-  rowData.value.cSpecialContent = joinWithAsterisks(inputValues.value) 
+  rowData.value.cSpecialContent = cIfFix.value=='0'? textarea.value : joinWithAsterisks(inputValues.value) 
   // rowData.value.cSpecialContent = parts.join("");
   console.log("提交的数据:", rowData.value);
   props.callback({type: 'ok', data: rowData.value});

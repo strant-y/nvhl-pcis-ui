@@ -459,11 +459,28 @@ const method = {
 
     // 切换清空
     if (val) {
-      setValue("Applicant.tBirthday", null);
-      setValue("Applicant.nAge", null);
-      // setValue("Applicant.cSex", null);
-      setValue('Applicant.cCertfCde', null);
-      console.log(11)
+      // setValue("Applicant.tBirthday", null);
+      // setValue("Applicant.nAge", null);
+      // setValue('Applicant.cCertfCde', null);
+
+      // nextTick(()=>{
+      //         clearValidate('Applicant.tBirthday')  // 清除报错信息
+      // clearValidate('Applicant.nAge')  // 清除报错信息
+      // clearValidate('Applicant.cCertfCde')  // 清除报错信息
+      // })
+
+      const fieldsToClear = [ "Applicant.tBirthday", "Applicant.nAge", "Applicant.cCertfCde" ];
+        // 2. 循环赋值 null + 清除对应字段的校验错误
+        fieldsToClear.forEach (field => {
+        setValue (field, null);
+        // 清除该字段的校验错误（关键：避免必填校验触发报错） 
+        setTimeout (() => {
+          clearValidate (field);
+          }, 10);
+    
+        });
+      
+
     }
   },
   //投保人性质(0是法人 1是个人)
@@ -1003,10 +1020,6 @@ const method = {
   cCertfCdeChange: (val: any) => {
     const tabref = opertaor.getTableRefs();
     const cCertfCls = tabref["applicant"].getFromValue()["Applicant.cCertfCls"];
-
-
-
-
     if (cCertfCls == "120001") {
       if (val) {
         const certfCde = applicantEditRef.value?.getValue(
