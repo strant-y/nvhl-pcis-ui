@@ -893,7 +893,7 @@ const startWindExploration = ()=>{
 // 风勘查询
 const getWindExploration = ()=>{
     dzmodal
-    .open(windExplorationInfo, { type: "Issuer", data: {...opertaor.getDataAll()} })
+    .open(windExplorationInfo, { type: "Issuer", data: {...opertaor.getDataAll()}, idxParam: idxParam })
     .then((res: any) => {
       if (res.type === "ok") {
       }
