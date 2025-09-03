@@ -8,4 +8,13 @@ interface AnchorItem {
     children: AnchorItem[]; // 可选属性，必须确保使用前初始化
 }
 
-export type {AnchorItem}
+interface GroupForm {
+    groupId: string;
+    pageInfo: any[];
+    params: any;
+    showGroupId: boolean;
+    [key: string]: any;
+}
+
+
+export type {AnchorItem, GroupForm}

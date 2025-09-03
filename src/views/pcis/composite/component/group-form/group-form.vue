@@ -26,7 +26,7 @@
 </template>
 <script setup lang="ts">
 
-import {CompositePageView, GroupForm} from "@/views/pcis/support/composite.types";
+import {CompositePageView} from "@/views/pcis/support/composite.types";
 import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
 import {dataOpertaor} from "@/store";
 import {lowercaseKeys} from "@/utils/common";

@@ -21,7 +21,7 @@
           </div>
         </template>
         <div v-show="anchor.expanded && !!isChildren(anchor)">
-          <anchor
+          <anchor-child
             v-for="(child, idx) in anchor.children"
             :anchorItem="child"
             :activeId="activeId"
@@ -33,7 +33,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import anchor from './anchorItem.vue'
+import anchorChild from './anchorItem.vue'
 import {defineProps} from "vue";
 import type {AnchorItem} from "@/views/pcis/composite/component";
 import { throttle } from 'lodash-es';

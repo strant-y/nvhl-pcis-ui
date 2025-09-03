@@ -1,15 +1,7 @@
 import {getProductPage} from "@/api/prod";
-import {AnchorItem} from "@/views/pcis/composite/component";
+import {AnchorItem, GroupForm} from "@/views/pcis/composite/component";
 import {CommonConstants} from "@/constants/CommonConstants";
 import {dataOpertaor} from "@/store";
-
-interface GroupForm {
-    groupId: string;
-    pageInfo: any[];
-    params: any;
-    showGroupId: boolean;
-    [key: string]: any;
-}
 
 /**
  * 公共分组ID

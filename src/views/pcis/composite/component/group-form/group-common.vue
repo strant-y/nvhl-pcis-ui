@@ -29,7 +29,7 @@
 </template>
 <script setup lang="ts">
 
-import {CommonComponentMap, CompositePageView, GroupForm} from "@/views/pcis/support/composite.types";
+import {CommonComponentMap, CompositePageView} from "@/views/pcis/support/composite.types";
 import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
 import {dataOpertaor} from "@/store";
 import {ref} from "vue";

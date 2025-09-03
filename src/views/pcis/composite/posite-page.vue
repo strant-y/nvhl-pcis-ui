@@ -2,7 +2,7 @@
   <div class="main-content" v-loading="loading">
     <div class="left_content">
       <div class="_anchor" style="overflow: auto">
-        <anchor-comp :anchor-list="pageView.anchorConfig" @collapse-change="activeChange"/>
+        <anchor-collapse :anchor-list="pageView.anchorConfig" @collapse-change="activeChange"/>
       </div>
     </div>
     <div class="center_content">
@@ -94,7 +94,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import anchorComp from './component/anchor/anchor.vue';
+import anchorCollapse from './component/anchor/anchor.vue';
 import type { AnchorItem } from './component';
 import {useDzModal} from "@/common/dzmodel/DzModalService";
 import {
@@ -227,6 +227,8 @@ const pageBuildAfter = (config: any) => {
   } else if (pageType === POSITE_PAGE_TYPE_READ) {
 
   }
+  console.error('### info anchorConfig', anchorConfig);
+  console.error('### info pageConfig', pageConfig);
   return {
     anchorConfig: anchorConfig,
     pageConfig: pageConfig,
