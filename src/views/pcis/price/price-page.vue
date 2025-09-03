@@ -440,7 +440,7 @@ import {
   queryTermRateLimit,
 	queryEcargoRelevancePolicyDetails
 } from "../../../api/query/index";
-import { checkFeeWindowType, selectDist, saveDistBatch, getReleaseInquiryPage, copyDist } from "@/api/prod";
+import { checkFeeWindowType, selectDist, saveDistBatch, getReleaseInquiryPage, copyDist, checkDistForSubmit } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
 import moment from "moment";
 import {numAdd, numComparison, numMulti, numSubp, tool_fix} from "@/utils/Math";
@@ -475,6 +475,7 @@ import {encryptRouterParam} from "@/router";
 import SvgIcon from "@/components/SvgIcon/index.vue";
 import { distRequiredMap } from '../my-page/requiredDistMap';
 import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
+import { ElTable, ElTableColumn } from 'element-plus';
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -2862,24 +2863,6 @@ const submitToUndrFn = async () => {
   }
   const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
   const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
-
-  // 040002 记名投保标志 选是  校验清单必须录入  
-  const distItem = distRequiredMap[props.param.cProdNo];
-  if(distItem && tgtValue[distItem.flagKey] === '1') {
-    const selectParam = {
-      cComponentTable: distItem.cComponentTable,
-    }
-    if(props.param?.pageName === "priceInquiry") {
-      selectParam['cInquiryNo'] = cInquiryNumber
-    } else {
-      selectParam['cAppNo'] = cAppNo
-    }
-    const resDist: any = await selectDist(selectParam);
-    if(resDist['data']['total'] < 1){
-      ElMessage.warning(`${distItem.flagName}选“是” “${distItem.distName}”未录入请确认！`);  
-      return false;
-    }
-  }
   // 043013 校验营业场所
   if(props.param.cProdNo === '043013') {
     const selectParam = {
@@ -3010,6 +2993,14 @@ const submitToUndrFn = async () => {
       if (!rv) {
         return;
       }
+      // 调用接口校验清单录入
+      const checkDistParam = { cInquiryNo: opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo") };
+      const checkDistInfo:any = await checkDistForSubmit(checkDistParam);
+      if(checkDistInfo?.code !== 200) {
+        ElMessage.error(checkDistInfo?.msg);
+        return;
+      }
+
       // 调用再保险位接口
       // const s = await saveDataInfo()
       // if(!s) return;
@@ -4948,38 +4939,67 @@ const queryTermRateLimitFun = (calcFun: any) => {
     if(r.code === 200) {
       calcFun()
     } else if(r.msg || r.message) {
-      const tableHtml = r.data.map((row:any) => {
-        return `<tr><td>${row.cPlanNo}</td>
-        <td>${row.cTermName}</td>
-        <td>${row.cRiskName}</td>
-        <td style="color:red;">${row.nRateVal}</td>
-        <td>${row.cRateRange}</td></tr>`;
-      }).join(''); // 将所有行合并成一个字符串
-      const htmlContent = `
-        <table border="1" class="messageBoxTable">
-          <thead>
-            <tr><th>方案号</th>
-            <th>条款</th
-            ><th>责任</th>
-            <th>费率</th>
-            <th>建议费率区间</th></tr>
-          </thead>
-          <tbody>
-            ${tableHtml}
-          </tbody>
-        </table>
-        <div>${r.msg || r.message}</div>
-      `;
-      ElMessageBox.confirm(htmlContent, "提示", {
-        dangerouslyUseHTMLString: true,
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-        lockScroll: false,
-        customClass: 'queryTermRateMessage'
-      }).then(() => {
-        calcFun()
-      })
+      const tableVNode = h(ElTable, {
+        data: r.data,
+        border: true,
+        style: { width: '100%', marginTop: '15px' }
+      }, {
+        default: () => [
+          h(ElTableColumn, {
+            prop: 'cPlanNo',
+            label: '方案号',
+            width: '80',
+            align: 'center',
+          }),
+          h(ElTableColumn, {
+            prop: 'cTermName',
+            width: '350',
+            label: '条款',
+            align: 'center',
+          }),
+          h(ElTableColumn, {
+            prop: 'cRiskName',
+            width: '300',
+            label: '责任',
+            align: 'center',
+          }),
+          h(ElTableColumn, {
+            prop: 'nRateVal',
+            width: '85',
+            label: '费率',
+            align: 'center',
+          }),
+          h(ElTableColumn, {
+            prop: 'cRateRange',
+            width: '160',
+            label: '建议费率区间',
+            align: 'center',
+          })
+        ]
+      });
+      ElMessageBox({
+        type: 'warning',
+        title: '提示',
+        message: h('div',
+            {style:{margin: '10px'}}, [
+              tableVNode,
+              h('p', { style: { marginTop: '10px', color: '#555' } },`${r.msg || r.message}`),
+            ],
+        ),
+        draggable: true,
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        showCancelButton: true,
+        customClass: 'my-message-box',
+        beforeClose: (action, instance, done) => {
+          if (action === 'confirm') { // 确认
+            calcFun();
+            done();
+          } else { // 取消
+            done();
+          }
+        }
+      });
     }
   }).catch((err:any) => {
     ElMessage.error(err)
@@ -5258,5 +5278,9 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   white-space: nowrap;
   border: 1px solid #000000;
   padding: 0 5px;
+}
+.el-message-box.my-message-box {
+  width: auto !important;
+  max-width: 80% !important;
 }
 </style>

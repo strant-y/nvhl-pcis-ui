@@ -450,7 +450,7 @@ import {
   queryTermRateLimit,
 	queryEcargoRelevancePolicyDetails
 } from "../../../api/query/index";
-import { checkFeeWindowType, selectDist, getReleaseInquiryPage, copyDist, checkoutn } from "@/api/prod";
+import { checkFeeWindowType, selectDist, getReleaseInquiryPage, copyDist, checkoutn, checkDistForSubmit } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
 import moment from "moment";
 import {numAdd} from "@/utils/Math";
@@ -886,7 +886,7 @@ const setCusBenefitInfo = () => {
  */
 const historyClaimcaseFun = () => {
   dzmodal
-    .open(historyClaimcaseModel, { type: "Issuer", data: {} })
+    .open(historyClaimcaseModel, { type: "Issuer", data: {}, idxParam: idxParam })
     .then((res: any) => {
       if (res.type === "ok") {
       }
@@ -1524,7 +1524,7 @@ async function loadAfter() {
             }
           });
           dzmodal
-            .open(CostInformation, { type: "Issuer", data: {...props.param, nPrm: nPrm.value} })
+            .open(CostInformation, { type: "Issuer", data: {...props.param, nPrm: nPrm.value}, idxParam: idxParam })
             .then((res: any) => {
               if (res.type === "ok") {
               }
@@ -2969,22 +2969,22 @@ const submitToUndrFn = async () => {
    const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
 
   // 040002 记名投保标志 选是 校验清单必须录入
-  const distItem = distRequiredMap[props.param.cProdNo];
-  if(distItem && tgtValue[distItem.flagKey] === '1') {
-    const selectParam = {
-      cComponentTable: distItem.cComponentTable,
-    }
-    if(props.param?.pageName === "priceInquiry") {
-      selectParam['cInquiryNo'] = cInquiryNumber
-    } else {
-      selectParam['cAppNo'] = cAppNo
-    }
-    const resDist: any = await selectDist(selectParam);
-    if(resDist['data']['total'] < 1){
-      ElMessage.warning(`${distItem.flagName}选“是” “${distItem.distName}”未录入请确认！`);  
-      return false;
-    }
-  }
+  // const distItem = distRequiredMap[props.param.cProdNo];
+  // if(distItem && tgtValue[distItem.flagKey] === '1') {
+  //   const selectParam = {
+  //     cComponentTable: distItem.cComponentTable,
+  //   }
+  //   if(props.param?.pageName === "priceInquiry") {
+  //     selectParam['cInquiryNo'] = cInquiryNumber
+  //   } else {
+  //     selectParam['cAppNo'] = cAppNo
+  //   }
+  //   const resDist: any = await selectDist(selectParam);
+  //   if(resDist['data']['total'] < 1){
+  //     ElMessage.warning(`${distItem.flagName}选“是” “${distItem.distName}”未录入请确认！`);  
+  //     return false;
+  //   }
+  // }
 // 043013   校验营业场所地址清
     if(props.param.cProdNo === '043013') {
     const selectParam = {
@@ -3111,6 +3111,13 @@ const submitToUndrFn = async () => {
     nextTick(async () => {
       const rv = await opertaor.validateAll();
       if (!rv) {
+        return;
+      }
+      // 调用接口校验清单录入
+      const checkDistParam = props.param?.pageName === "priceInquiry" ? { cInquiryNo: opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo") } : { cAppNo: opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo") };
+      const checkDistInfo:any = await checkDistForSubmit(checkDistParam);
+      if(checkDistInfo?.code !== 200) {
+        ElMessage.error(checkDistInfo?.msg);
         return;
       }
 
@@ -3571,7 +3578,7 @@ const getPlyPolicyFun = () => {
 /**
  *批改单保费计算
  ***/
-const calcPremiumEdr = () => {
+const calcPremiumEdr = async () => {
     const res = opertaor.getDataAll();
     const dataAll = opertaor.getDataAll();
     const edrbaseData = edrbase.value?.getFromValue();
@@ -3631,6 +3638,13 @@ const calcPremiumEdr = () => {
   if(props.param?.cRsnCde === '07'  && totalNum < originalnAmt ){
        ElMessage.warning("批改原因为“增加保额”，累计赔偿限额不能小于原有“保额”！");
     return false;
+  }
+  // 调用接口校验清单录入
+  const checkDistParam = { cAppNo: res.plyBase["Base.cAppNo"] };
+  const checkDistInfo:any = await checkDistForSubmit(checkDistParam);
+  if(checkDistInfo?.code !== 200) {
+    ElMessage.error(checkDistInfo?.msg);
+    return;
   }
  
   const btn = getBtn("btnCalEdr");
