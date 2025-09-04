@@ -2938,7 +2938,9 @@ const submitToUndrFn = async () => {
       // 校验 缴费计划时间超出保险起止期  重置成一条
     const hasInvalidPlan = checkPayPlanValidity({ opertaor });
     if(hasInvalidPlan){
-       opertaor.getTableRefByKey("base").nPayNumberFun();
+      //  opertaor.getTableRefByKey("base").nPayNumberFun();
+            ElMessage.warning('缴费计划-存在无效项（格式错误、超出保险区间或期数重叠），请检查！');
+            return false;
     }
     
 
