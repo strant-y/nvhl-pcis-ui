@@ -499,6 +499,33 @@ export const NewUdrListService = () => {
     }
   }
 
+  /**
+   * 出单任务处理-查询
+   *
+   * @param queryParams
+   */
+  const selectTask = async (queryParams: any): AxiosPromise<any> => {
+    return post(`/task/work/selectTask`, queryParams);
+  }
+  
+  /**
+   * 核保任务查询
+   *
+   * @param queryParams
+   */
+  const getAppTask = async (queryParams: any): AxiosPromise<any> => {
+    return post(`/task/getAppTask`, queryParams);
+  }
+  
+  /**
+   * 询价任务查询
+   *
+   * @param queryParams
+   */
+  const getInquiryTask = async (queryParams: any): AxiosPromise<any> => {
+    return post(`/task/getInquiryTask`, queryParams);
+  }
+
   return {
     getNewUdrList,
     getBackUdrList,
@@ -546,5 +573,8 @@ export const NewUdrListService = () => {
     queryComponentCodeListXJ,
     riskUnitQueryXJ,
     saveDataXJ,
+    selectTask,
+    getAppTask,
+    getInquiryTask,
   };
 }

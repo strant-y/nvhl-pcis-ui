@@ -1613,6 +1613,8 @@
                         cPolicySource: row.cPolicySource,
                         cRelateBusi: row.cRelateBusi,
                         cEdrRsnBundleCde: row.cEdrRsnBundleCde,
+                        nRecRemEstAmt:row?.nRecRemEstAmt || 0,
+                        nRecRemPrm:row?.nRecRemPrm || 0,
                     });
                     router.push({
                         path: "/pcisapp/myPage",
@@ -1645,6 +1647,8 @@
                         cPolicySource: row.cPolicySource,
                         cRelateBusi: row.cRelateBusi,
                         cEdrRsnBundleCde: row.cEdrRsnBundleCde,
+                      nRecRemEstAmt:row?.nRecRemEstAmt || 0,
+                      nRecRemPrm:row?.nRecRemPrm || 0,
                     });
                     router.push({
                         path: "/pcisapp/myPage",
@@ -1690,6 +1694,8 @@
                                 cPolicySource:row.cPolicySource,
                                 cRelateBusi: row.cRelateBusi,
                                 cEdrRsnBundleCde: row.cEdrRsnBundleCde,
+                              nRecRemEstAmt:row?.nRecRemEstAmt || 0,
+                              nRecRemPrm:row?.nRecRemPrm || 0,
                             });
                             router.push({
                                 path: "/pcisapp/myPage",
@@ -1773,6 +1779,8 @@
                             cPolicySource:row.cPolicySource,
                             cRelateBusi: row.cRelateBusi,
                             cEdrRsnBundleCde: row.cEdrRsnBundleCde,
+                          nRecRemEstAmt:row?.nRecRemEstAmt || 0,
+                          nRecRemPrm:row?.nRecRemPrm || 0,
                         };
                         const en = JSON.stringify(data);
                         router.push({
@@ -1869,6 +1877,8 @@
                             cTermNo:row.cTermNo,
                             cProdNmeCn: row.prodName,
                             cPolicySource: row.cPolicySource,
+                          nRecRemEstAmt:row?.nRecRemEstAmt || 0,
+                          nRecRemPrm:row?.nRecRemPrm || 0,
                         });
                         router.push({
                             path: "/pcisapp/myPage",
@@ -1893,6 +1903,8 @@
                             cTermNo:row.cTermNo,
                             cProdNmeCn: row.prodName,
                             cPolicySource: row.cPolicySource,
+                          nRecRemEstAmt:row?.nRecRemEstAmt || 0,
+                          nRecRemPrm:row?.nRecRemPrm || 0,
                         });
                         router.push({
                             path: "/pcisapp/myPage",
@@ -1932,6 +1944,8 @@
             pageType: "PLY_UW_PROCESS_SCENE",
             cProdNmeCn: row.prodName,
             cPolicySource: row.cPolicySource,
+          nRecRemEstAmt:row?.nRecRemEstAmt || 0,
+          nRecRemPrm:row?.nRecRemPrm || 0,
         });
         router.push({
             path: "/pcisapp/myPage",

@@ -906,7 +906,7 @@ const startWindExploration = ()=>{
 // 风勘查询
 const getWindExploration = ()=>{
     dzmodal
-    .open(windExplorationInfo, { type: "Issuer", data: {...opertaor.getDataAll()} })
+    .open(windExplorationInfo, { type: "Issuer", data: {...opertaor.getDataAll()}, idxParam: idxParam })
     .then((res: any) => {
       if (res.type === "ok") {
       }
@@ -1415,7 +1415,8 @@ async function loadAfter() {
 				if(!!res.data.policyApplication?.composition){
 					dataInit.value.insured = res.data.policyApplication?.composition?.insured[0] || {};
 					dataInit.value.applicant = res.data.policyApplication?.composition?.applicant[0] || {};
-					dataInit.value.cvrg = res.data.policyApplication?.composition?.cvrg || {};
+					// dataInit.value.cvrg = res.data.policyApplication?.composition?.cvrg || {};
+          dataInit.value.SpecialAgreement = res.data.policyApplication?.composition?.SpecialAgreement || {};
           dataInit.value.plyBase = res.data.policyApplication?.composition?.plyBase[0] || {};
 					dataInit.value.plyBase["Base.cNeedfeeFlag"] = props.param.cNeedfeeFlag
 					dataInit.value.plyBase["Base.cEcAgrNo"] = props.param.cEcAgrNo

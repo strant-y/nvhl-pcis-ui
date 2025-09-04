@@ -449,12 +449,15 @@ const method = {
       setFormItem("Insured.tBirthday", {
         rules: null
       });
+      clearValidate('Insured.tBirthday')
       setFormItem("Insured.nAge", {
         rules: null
       });
+      clearValidate('Insured.nAge')
       setFormItem("Insured.cSex", {
         rules: null
       });
+      clearValidate('Insured.cSex')
       // setValue("Insured.cCertfCls", "");
       setFormItem("Insured.cCntrNme", { rules: [getRules("required", {})] });
       setFormItem("Insured.cCntrCertfCde", {
