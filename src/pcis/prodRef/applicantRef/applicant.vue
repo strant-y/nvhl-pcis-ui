@@ -40,7 +40,7 @@ import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { set } from "lodash";
 import { validateIdCard } from "@/typings/method-public";
 import { calculateAgeFromIdCard } from "@/utils/common";
-import { setCapitalRequiredRule } from "@/utils/InsuranceCoverageRules";
+import { setCapitalRequiredRule, disablePastDates } from "@/utils/InsuranceCoverageRules";
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -57,6 +57,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { getDefaultCompilerOptions } from "typescript";
 import { getAddressStr, qryCustomer } from "@/api/query";
 import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
+
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
@@ -391,21 +392,35 @@ const method = {
   },
   // 证件类型
   cardTypeChange: (val: any) => {
-    console.log('证件类型', val, getValue('Applicant.cCertfCls'))
-
     const param = opertaor.getParam();
     const isInit = param.initFlag; // 是否是初始化状态
-    if (isInit) return false;
+
+
+    if (isInit) {
+      if (val === "120001") {
+        setFormItem("Applicant.tCertfBgnDate", {
+          rules: [getRules("required", {})],
+        });
+        setFormItem("Applicant.tCertfEndDate", {
+          rules: [getRules("required", {})],
+        });
+      }
+      return; 
+    }
 
     const personFields = ['cNation', 'tBirthday', 'nAge', 'cSex'];
     personFields.forEach(field => {
       setFormItem(`Applicant.${field}`, { disabled: false });
     });
 
-
     checkUser();   // 调用客户信息接口
     clearValidate('Applicant.cCertfCde')  // 清除报错信息
 
+    setFormItem("Applicant.tCertfBgnDate", { rules: null });
+    setFormItem("Applicant.tCertfEndDate", { rules: null });
+    setFormItem("Applicant.tEstablishingDate", { rules: null });
+
+ 
     if (val == "120001") {
       setFormItem("Applicant.cCertfCde", {
         rules: [getRules("required", {}), getRules("idCard", {})],
@@ -420,7 +435,7 @@ const method = {
       setValue("Applicant.cNation", "1"); // 国籍
 
       personFields.forEach(field => {
-        setFormItem(`Applicant.${field}`, { disabled: true });
+         setFormItem(`Applicant.${field}`, { disabled: true });
       });
 
     } else if (val == "110002") {
@@ -453,31 +468,19 @@ const method = {
       setFormItem("Applicant.cCertfCde", {
         rules: [getRules("required", {})],
       });
-      setFormItem("Applicant.tCertfBgnDate", { rules: null });
-      setFormItem("Applicant.tCertfEndDate", { rules: null });
     }
 
     // 切换清空
     if (val) {
-      // setValue("Applicant.tBirthday", null);
-      // setValue("Applicant.nAge", null);
-      // setValue('Applicant.cCertfCde', null);
-
-      // nextTick(()=>{
-      //         clearValidate('Applicant.tBirthday')  // 清除报错信息
-      // clearValidate('Applicant.nAge')  // 清除报错信息
-      // clearValidate('Applicant.cCertfCde')  // 清除报错信息
-      // })
-
-      const fieldsToClear = [ "Applicant.tBirthday", "Applicant.nAge", "Applicant.cCertfCde" ];
-        // 2. 循环赋值 null + 清除对应字段的校验错误
-        fieldsToClear.forEach (field => {
-        setValue (field, null);
+      const fieldsToClear = ["Applicant.tBirthday", "Applicant.nAge", "Applicant.cCertfCde"];
+      // 2. 循环赋值 null + 清除对应字段的校验错误
+      fieldsToClear.forEach(field => {
+        setValue(field, null);
         // 清除该字段的校验错误 
-        setTimeout (() => {
-          clearValidate (field);
-          }, 10);
-        });
+        setTimeout(() => {
+          clearValidate(field);
+        }, 10);
+      });
     }
   },
   //投保人性质(0是法人 1是个人)
@@ -1162,6 +1165,11 @@ const method = {
     } else {
       return true;
     }
+  },
+
+  // 办理人证件有效止期 小于当前时间
+  tOEndTmDisable: (date: any) => {
+    return disablePastDates(date);
   }
 };
 
@@ -1320,10 +1328,10 @@ function handleFileChange(event: Event) {
             setValue("Applicant.cClntMrk", "1");
             const getCacheCodeLis = codeListStore.getCacheCodeListByCode('AREA_COUNTRY_CACHE{"cType":"0"}');
             const countryNm = cardInfo["nationality"].value?.split("/")[0] || null;
-            const countryId = getCacheCodeLis?.find((item:any) => item.label === countryNm)?.value || null;
+            const countryId = getCacheCodeLis?.find((item: any) => item.label === countryNm)?.value || null;
             setValue("Applicant.cNation", countryId);
-          } else if (formconfig.value.fileInputType === "3"){
-						// 营业执照
+          } else if (formconfig.value.fileInputType === "3") {
+            // 营业执照
             const result = res.data.result.item_list;
             const keys = result.map((item: any) => item.key);
             let cardInfo: any = {};

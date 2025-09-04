@@ -81,7 +81,7 @@ onMounted(async () => {
     } else {
       setFormItem("Base.cCiOprRel", {
         readonly: false,
-        rules: [getRules("phoneNo", {})],
+        rules: [getRules("contactPhone", {})],
       });
     }
 
@@ -206,10 +206,9 @@ const method = {
 
     // 录单人联系方式
     if(val=='1'|| val=='2'||val=='5'){
-      // Base.cCiOprRel
-          setFormItem("Base.cCiOprRel", { hidden: false, rules: [getRules("required", {}),getRules("phoneNo", {})] }); 
+          setFormItem("Base.cCiOprRel", { hidden: false, rules: [getRules("required", {}),getRules("contactPhone", {})] }); 
     }else{
-           setFormItem("Base.cCiOprRel", { hidden: true, rules: [getRules("phoneNo", {})] });
+           setFormItem("Base.cCiOprRel", { hidden: true, rules: [getRules("contactPhone", {})] });
     }
 
   },
