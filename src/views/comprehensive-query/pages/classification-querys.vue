@@ -148,7 +148,7 @@ const removeIds = ref([]); // 删除用户ID集合 用于批量删除
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
-import {getAppPolicyList, getInquiryPolicyList, qryEndorseList, delTmpPolicy, queryInsuredList, getCustomUserList, CustomUserList, qryPolicyNewList} from "@/api/query";
+import {getAppPolicyList, getInquiryPolicyList, qryEndorseList, delTmpPolicy, queryInsuredList, getCustomUserList, CustomUserList, qryPolicyNewList, searchFileDown} from "@/api/query";
 // 变更列
 const colChange = defineAsyncComponent(() => import("../modal/colChange.vue"));
 const PrintView = defineAsyncComponent(() => import("../modal/PrintView.vue"));
@@ -244,7 +244,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           }),
           createFreeButtonBase({
               label: "导出",
-              func: () => {},
+              func: async () => {
+                  const freeEditRefs = freeEditRef.value;
+                  freeEditRefs.validate().then((isValid) => {
+                      if (isValid) {
+                          exportFileList(false);
+                      }
+                  });
+              },
           }),
           createFreeButtonBase({
               label: "展开",
@@ -984,7 +991,7 @@ const extendColumns = [
   { prop: 'cOprCde', inputtype: "rtinput", title: '录单员', minWidth: 180, optional: true },
   { prop: 'cUdrNme', inputtype: "rtinput", title: '核保人', minWidth: 180, optional: true, slotName: "cUdrNme"},
   { prop: 'cPrnNo', inputtype: "rtinput", title: '保批单印刷号', minWidth: 180, optional: true },
-  { prop: 'InvoiceNum', inputtype: "rtinput", title: '保费发票号', minWidth: 180, optional: true },
+  { prop: 'invoiceNum', inputtype: "rtinput", title: '保费发票号', minWidth: 180, optional: true },
 ];
 
 const tableObj = {
@@ -1016,14 +1023,14 @@ const tableObj = {
                     }
                 },
                 tableClick: async (row) => {
-                    console.log(row);
                     const r = await row;
+
                     if (r) {
                         const data = row;
                         router.push({
                             path: "/pcis/my-page",
                             query: {
-                                param: JSON.stringify({ ...data, ...{ pageType: "readonly" } }),
+                                param: JSON.stringify({ ...data, ...{ pageType: "readonly", pageName: !!row["taskTyp"] && ("I" == row["taskTyp"] ) ? "priceInquiry": "" } }),
                             },
                         });
                     } else {
@@ -1059,7 +1066,7 @@ const tableObj = {
                             query: {
                                 param: JSON.stringify({
                                     ...data,
-                                    ...{ pageType: "TEMPORARY_DEPOSIT" },
+                                    ...{ pageType: "TEMPORARY_DEPOSIT", pageName: !!row["taskTyp"] && ("I" == row["taskTyp"] ) ? "priceInquiry": ""  },
                                 }),
                             },
                         });
@@ -1516,6 +1523,13 @@ async function queryI(flag?: boolean, isEs = false) {
         })
     }
 }
+
+// 导出
+async function exportFileList(flag?: boolean, isEs = false) {
+
+}
+
+
 
 // 把原始列 + 扩展列 合并成弹窗需要的数据
 function buildAllCheckboxData() {
