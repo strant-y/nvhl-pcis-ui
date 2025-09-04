@@ -302,6 +302,8 @@ const method = {
           setFormItem("ECargoBase.cBrkrCde", {...obj,disabled:0}); //代理(经纪)人
           setFormItem("ECargoBase.cBrkSlsCde", obj); //代理业务员
           setFormItem("ECargoBase.cAgtAgrNo", { rules: [getRules("required", {})] }); //代理合作协议
+          setFormItem("ECargoBase.cBrkrCde", { rules: [getRules("required", {})] }); //代理合作协议
+          setFormItem("ECargoBase.cBrkSlsCde", { rules: [getRules("required", {})] }); //代理业务员
         } else {
           const obj = {
             rules: [],
@@ -312,7 +314,8 @@ const method = {
           };
           setFormItem("ECargoBase.cBrkrCde", obj); //代理(经纪)人
           setFormItem("ECargoBase.cBrkSlsCde", obj); //代理业务员
-
+          setFormItem("ECargoBase.cBrkrCde", { rules: null }); //代理合作协议
+          setFormItem("ECargoBase.cBrkSlsCde", { rules: null }); //代理业务员
           setFormItem("ECargoBase.cAgtAgrNo", { rules: null }); //代理合作协议
           if (!formPage.init) {
             setValue("ECargoBase.cBrkrCde", "");
