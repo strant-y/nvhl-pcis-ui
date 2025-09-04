@@ -386,6 +386,10 @@ export function getTRFactorJson(queryParams: any): AxiosPromise<any> {
   return post(`/cvrgdef/getTRFactorJson`, queryParams);
 }
 
+export function qryProdTermCf(queryParams: any): AxiosPromise<any> {
+  return post(`/proddef/qryProdTermCf`, queryParams);
+}
+
 export function qryProdRelTermRiskList(queryParams: any): AxiosPromise<any> {
   return post(`/proddef/qryProdRelTermRiskList`, queryParams);
 }

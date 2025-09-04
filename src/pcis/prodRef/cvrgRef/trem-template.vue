@@ -2,7 +2,7 @@
   <div>
     <el-form ref="templateRef" :model="termdata" :inline-message="true">
       <el-card class="cvrg-info">
-        <template #header>
+        <template #header v-if="showHeader">
           <div class="cvrg-hearder">
             <el-row style="margin-top: 5px;">
               <el-col :span="10">
@@ -77,7 +77,7 @@
         </template>
 
         <div v-show="showData">
-          <template v-if ="termFactormap.length">
+          <template v-if ="termFactormap.length && showTerm">
             <template v-if="termTitleConf.cFactorTabType === 'grid'">
               <table style="width: 100%">
                 <thead>
@@ -406,6 +406,14 @@ const props = defineProps({
   },
   rowIndex: {
     type: [Number, String],
+  },
+  showHeader: {
+    type: Boolean,
+    default: true,
+  },
+  showTerm: {
+    type: Boolean,
+    default: true,
   },
 });
 
@@ -956,11 +964,7 @@ function initMethod(){
 function initTermsData(item: any) {
   if(item.prop === 'Term.cClaimInclude'){ //是否计入累计赔偿限额 默认选择否
     if(termdata.value[item.prop] === null || termdata.value[item.prop] === undefined){
-      if(pageparam.cProdNo === "040003" || pageparam.cProdNo === "043002" || pageparam.cProdNo === "040002" ){
-        termdata.value[item.prop] = '1';
-      }else{
-        termdata.value[item.prop] = '0';
-      }
+      termdata.value[item.prop] = '1';
       return true;
     }
   }
