@@ -485,6 +485,8 @@ const nInvoiceValueChange = (val:any)=>{
   if(bonusRatioData && goodsValueData && !isShownInsuranceAmount.value){
     setValue('Dist.nInsuranceAmount',goodsValueData * (1 + bonusRatioData/100))
     setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount'))*getValue('Dist.nAmtExch'))
+  }else {
+    setValue('Dist.nInsuranceAmount',val)
   }
 }
 const nAdditiveCoefficientChange = (val:any)=>{
