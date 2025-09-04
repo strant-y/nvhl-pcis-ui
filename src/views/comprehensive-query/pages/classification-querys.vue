@@ -460,7 +460,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               itemWidth: 1,
               rules: [{ type: "required" }],
               typeCode: "KIND_LIST_GRT",
-              child: "cProdNo",
+              child: "prodCNmeCn",
               filterable: true,
               clearable: true,
               codeParam: {
@@ -468,7 +468,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
               },
               func: (val) => {
-                  setValue("cProdNo","")
+                  setValue("prodCNmeCn","")
                   cTermNo = "";      // 重置条款编码
                   cPard.value = val;
                   formconfig1.fromSchema?.forEach((item) => {
@@ -490,9 +490,53 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   });
                   codeListStore
                     .queryCodeList({
-                        codeListName: "TERM_LIST_IN_GUIDE_SEARCH",
+                        codeListName: "PROD_LIST_GRT",
                         codeListParam:{
                         cParCde: cPard.value,
+                        cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+                        cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+                    },
+                    })
+                    .then((res) => {
+                        cTermNoList.value = res;
+                        setFormItem("prodCNmeCn", {
+                            loadData: res,
+                        });
+                    });
+              },
+          },
+          {
+             prop: "prodCNmeCn",
+             inputtype: "rtselect",
+             title: "产品名称",
+             clearable: true,
+             child: "cProdNo",
+             filterable: true,
+             func: (val) => {
+                  setValue("cProdNo","")
+                  cTermNo = "";      // 重置条款编码
+                  formconfig1.fromSchema?.forEach((item) => {
+                      if (
+                          item.prop === "CEmployeeName" ||
+                          item.prop === "CIdentificationNumber" ||
+                          item.prop === "CPlateNo" ||
+                          item.prop === "CEngineNo" ||
+                          item.prop === "CIndustryType" ||
+                          item.prop === "CProjectName" ||
+                          item.prop === "CDetailedAddress" ||
+                          item.prop === "CProjectType" ||
+                          item.prop === "cPrjCtgTyp" ||
+                          item.prop === "cPrjCtgMidTyp" ||
+                          item.prop === "cPrjCtgSubTyp"
+                      ) {
+                          item.hidden = true;
+                      }
+                  });
+                  codeListStore
+                    .queryCodeList({
+                        codeListName: "TERM_LIST_IN_GUIDE_SEARCH",
+                        codeListParam:{
+                        value: val,
                         cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
                         cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
                     },
@@ -544,18 +588,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                       }
                 });
               },
-          },
-          {
-             prop: "prodCNmeCn",
-             inputtype: "rtselect",
-             title: "产品名称",
-             typeCode: "PROD_LIST_GRT",
-             params: {
-                cParCde: "",
-                cOperId: user.value.opCde,
-                cDptCde: user.value.companyId,
-             },
-             clearable: true,
           },
           {
               prop: "cAppNo",
