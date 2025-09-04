@@ -598,6 +598,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                             item.loadData = allCAppStatus;
                           }
                       });
+                      handleQuery(true);
                   } else if (val === "E") {
                       // 批改
                       formconfig1.fromSchema?.forEach((item) => {
@@ -616,6 +617,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                             item.loadData = allCAppStatus;
                           }
                       });
+                      handleQuery(true);
                   } else if (val === "I") {
                       // 询价
                       formconfig1.fromSchema?.forEach((item) => {
@@ -633,6 +635,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                             item.loadData = allCAppStatus.filter(o => o.value !== "4");
                           }
                       });
+                       handleQuery(true);
                   } else if(!val) {
                     // 清空选中值
                     formconfig1.fromSchema?.forEach((item) => {
@@ -644,6 +647,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                             item.hidden = false;
                         } 
                     });
+                     handleQuery(true);
                   }
               },
           },

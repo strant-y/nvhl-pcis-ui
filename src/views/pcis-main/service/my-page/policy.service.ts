@@ -470,7 +470,6 @@ export class PolicyService {
 
     searchFileDown(data) {
         return request.post(`/excel/searchFileDown `, data, {
-            params: data,
             responseType: 'blob'
         });
     }
