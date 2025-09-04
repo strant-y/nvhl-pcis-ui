@@ -477,14 +477,14 @@ const method = {
             //   "ECargoBase.cBrkrDptcde": params.CDptCde, //代理业务员机构代码
             // });
 
-            // setFormItem("ECargoBase.cBrkSlsCde", {
-						// 	loadData: [
-						// 		{
-						// 			value:  params["CSlsCde"],
-						// 			label:params["CSlsCde"] + params['CSlsNme'],
-						// 		},
-						// 	],
-						// });
+            setFormItem("ECargoBase.cBrkSlsCde", {
+							loadData: [
+								{
+									value:  params["CSlsCde"],
+									label:params["CSlsCde"] + params['CSlsNme'],
+								},
+							],
+						});
           	setValue("ECargoBase.cBrkSlsCde", params.CSlsCde);
             dialog.value?.handleClose();
           },
