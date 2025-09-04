@@ -1042,7 +1042,7 @@ const tableObj = {
         defaultSort: { prop: 'tCrtTm', order: 'descending' },
         defaultSort: { prop: 'tUdrTm', order: 'descending' },
         tableBtnType: "btn",
-        tableBtnWidth: 200,
+        tableBtnWidth: 240,
         tableBtnPosition: "right",
         tableBtn: [
             createFreeButtonBase({
@@ -1233,6 +1233,33 @@ const tableObj = {
                     .then((res:any) => {
 
                     })
+                },
+            }),
+            createFreeButtonBase({
+                id: "score",
+                link: true,
+                tooltip: "询价转投保",
+                type: "primary",
+                size: "large",
+                icon: "Right",
+                hideBtns: (row: any) => {
+                    // 询价转投保按钮只在状态为"已出保单"时可见
+                    if (
+                        row.cAppStatus == "5" && row.canConvert === "1"
+                    ) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                },
+                tableClick: (row) => {
+                    row.cPolicySource = '6'
+                    router.push({
+                        path: "/pcisapp/myPage",
+                        query: {
+                            param: JSON.stringify({ ...row, ...{ pageType: "inquiryToApp" } }),
+                        },
+                    });
                 },
             }),
         ],
