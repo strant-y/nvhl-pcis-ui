@@ -324,6 +324,7 @@ function addTermData() {
       data: {
         cProdNo: param.cProdNo,
         isselectData: iss,
+        cEcAgrNo:param?.cEcAgrNo || ''
       },
     },
     {

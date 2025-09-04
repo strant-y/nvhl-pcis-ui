@@ -58,9 +58,9 @@ onMounted(async () => {
   setValue("Base.nAmtRmbExch", "1.000000");
   setValue("Base.nPrmRmbExch", "1.000000");
   // 隐藏短期费率类型
-  setFormItem("Base.cRatioTyp", { 
-    hidden: true
-  });
+  // setFormItem("Base.cRatioTyp", { 
+  //   hidden: true
+  // });
 
    // 短期费率类型,以下产品只支持按日的短期费率类型
   const disabledProducts = [
@@ -70,9 +70,9 @@ onMounted(async () => {
   ];
   
   const isDisabled = disabledProducts.includes(params.cProdNo);
-  setFormItem("Base.cRatioTyp", { 
-    disabled: isDisabled
-  });
+  // setFormItem("Base.cRatioTyp", { 
+  //   disabled: isDisabled
+  // });
   if(params?.cRecordType === 9 || params.cPolicySource == 9){
     setFormItem('Base.cRatioTyp',{hidden:true})
     setFormItem('Base.nRatioCoef',{hidden:true})
@@ -260,8 +260,10 @@ const method = {
   },
   //保额汇率标识change事件
   cInsExchCdeChange(val: any) {
+    console.log(1122,val)
     if (val == "0") {// 协议汇率
       setFormItem("Base.nAmtRmbExch", { disabled: false });
+      //           Base.nAmtRmbExch
     } else {// 实时汇率
       setFormItem("Base.nAmtRmbExch", { disabled: true });
       // setValue("Base.nAmtRmbExch", "1.000000");
@@ -369,6 +371,7 @@ const method = {
   },
   // 总保额(累计赔偿限额)汇率change事件
   nAmtRmbExchChange: (val: any) => {
+    console.log('111',val)
     if (!!val) {
       const namt = getValue('Base.nAmt');
       if (!!namt) {
@@ -412,22 +415,59 @@ function getValue(key: string) {
   return baseEditRef?.value?.getValue(key);
 }
 
-//给表单赋值
-function setFormItem(key: any, obj: any) {
-  if (obj && Object.keys(obj).length) {
-    formconfig1.fromSchema?.forEach((item) => {
-      if (item.prop === key) {
-        //控制尾部按钮的
-        if (item.btnItems && obj.btnItems) {
-          for (let key in obj.btnItems) {
-            item.btnItems[key] = obj.btnItems[key];
+// //给表单赋值
+// function setFormItem(key: any, obj: any) {
+//   if (obj && Object.keys(obj).length) {
+//     formconfig1.fromSchema?.forEach((item) => {
+//       if (item.prop === key) {
+//         //控制尾部按钮的
+//         if (item.btnItems && obj.btnItems) {
+//           for (let key in obj.btnItems) {
+//             item.btnItems[key] = obj.btnItems[key];
+//           }
+//         }else{
+//           Object.assign(item, obj);
+//         }
+//       }
+//     });
+//   }
+// }
+
+function recursiveSetFormItem(items: FormItem[], targetKey: string, obj: Record<string, any>) {
+  items.forEach((item) => {
+    // 1. 如果当前项是分组（含groupList），先递归处理子项
+    if (item.inputtype === 'rtinputgroup' && item.groupList && Array.isArray(item.groupList)) {
+      recursiveSetFormItem(item.groupList, targetKey, obj);
+    }
+    if (item.prop === targetKey) {
+      if (item.btnItems && obj.btnItems) {
+        Object.entries(obj.btnItems).forEach(([btnKey, value]) => {
+          if (item.btnItems!.hasOwnProperty(btnKey)) {
+            item.btnItems![btnKey] = value;
           }
-        }else{
-          Object.assign(item, obj);
-        }
+        });
       }
-    });
+      const { btnItems: _, ...otherProps } = obj;
+      Object.assign(item, otherProps);
+      if (otherProps.rules) {
+        item.rules = otherProps.rules;
+      }
+    }
+  });
+}
+
+
+function setFormItem(key: string, obj: Record<string, any>): void {
+  if (!key || !obj || typeof obj !== 'object' || Object.keys(obj).length === 0) {
+    return;
   }
+
+  if (!formconfig1.fromSchema || !Array.isArray(formconfig1.fromSchema)) {
+    return;
+  }
+
+  // 调用递归方法处理所有项（包括嵌套的groupList）
+  recursiveSetFormItem(formconfig1.fromSchema, key, obj);
 }
 
 function getFormconfig(){

@@ -111,7 +111,7 @@ const tableconfig = reactive<AppTableConfig>(
             checkedIcon.value === "rgb(170, 170, 170)"
               ? "rgb(250, 219, 20)"
               : "rgb(170, 170, 170)";
-          const isPlan = props.type === 2 ? "1" : "0";
+          const isPlan = props.type === 5 ? "1" : "0";
           qryUserCommonTerm({
             pageNum: 1,
             pageSize: 9999,
@@ -126,7 +126,7 @@ const tableconfig = reactive<AppTableConfig>(
                 return false;
               }else{
                 if (checkedIcon.value === "rgb(250, 219, 20)") {
-                  const params = props.type === 2 ? {
+                  const params = props.type === 5 ? {
                     planNo: row.code,
                     planCnm: row.value,
                     prodCnm: props.pNode.parent.data.value,
@@ -150,7 +150,7 @@ const tableconfig = reactive<AppTableConfig>(
                   }
                 });
               } else {
-                const param = props.type === 2 ? {
+                const param = props.type === 5 ? {
                   planNo: row.code,
                   isPlan: isPlan,
                   voType: props.voType,
@@ -189,7 +189,7 @@ const tableconfig = reactive<AppTableConfig>(
 );
 onMounted(async () => {
   init();
-  labelNm.value = props.type === 2 ? "方案" : "条款";
+  labelNm.value = props.type === 5 ? "方案" : props.type === 10 ? "产品" : "条款";
 });
 
 watch(
@@ -207,7 +207,7 @@ function init() {
 
   checkedIcon.value = "rgb(170, 170, 170)";
   props.termList.forEach((item: any, index: any) => {
-    if(props.type === 2) {
+    if (props.type === 5) {
       if (datas.value.length && item.planNo == datas.value[0].code) {
         checkedIcon.value = "rgb(250, 219, 20)";
       }

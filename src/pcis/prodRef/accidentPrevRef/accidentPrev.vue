@@ -60,6 +60,17 @@ const method = {
   
   func1: () => {
   },
+  funccDetailsAccident: () => { 
+    dialog.value?.open('detailsAccident', {
+      selectedData: getValue("Tgt.cFinanceCde"), //需要把自定义的过滤掉，只传过去从模板中选择的
+    },
+      {
+        getSelected(selectdata: any) {
+          setValue("Tgt.cFinanceCde", selectdata.map(item => item.value).join(','))
+          setValue("Tgt.cDetailsAccident", selectdata.map((item, index) => `${index + 1}. ${item.label}`).join('\n'))
+        },
+      }, { width: 45 });
+  },
 };
 
 // 绑定特殊验证器

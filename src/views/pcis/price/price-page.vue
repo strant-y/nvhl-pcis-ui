@@ -440,7 +440,7 @@ import {
   queryTermRateLimit,
 	queryEcargoRelevancePolicyDetails
 } from "../../../api/query/index";
-import { checkFeeWindowType, selectDist, saveDistBatch, getReleaseInquiryPage, copyDist } from "@/api/prod";
+import { checkFeeWindowType, selectDist, saveDistBatch, getReleaseInquiryPage, copyDist, checkDistForSubmit } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
 import moment from "moment";
 import {numAdd, numComparison, numMulti, numSubp, tool_fix} from "@/utils/Math";
@@ -475,6 +475,8 @@ import {encryptRouterParam} from "@/router";
 import SvgIcon from "@/components/SvgIcon/index.vue";
 import { distRequiredMap } from '../my-page/requiredDistMap';
 import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
+import { checkPayPlanValidity } from '@/utils/orderEntryValidator';
+import { ElTable, ElTableColumn } from 'element-plus';
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -528,6 +530,7 @@ const copyPlyModel = defineAsyncComponent(
 const templateDialog = defineAsyncComponent(
   () => import("../my-page/templateDialog.vue")
 );
+
 
 /**
  * 锚点点击事件
@@ -681,7 +684,7 @@ const getNo = computed(() => {
   return edrbaseFlag.value ? edrbase.value?.getValue('EdrBase.cAppNo') : props.param?.pageName === "priceInquiry" ? opertaor.getTableRefByKey('plyBase')?.getValue('Base.cInquiryNo') || '暂无' : opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || '暂无'
 })
 // 储存原始组件配置信息
-const oldProductResData = ref({})
+const oldProductResData = ref([])
 
 onMounted(() => {
   console.log('param 路由---', props.param )
@@ -892,7 +895,7 @@ const startWindExploration = ()=>{
 // 风勘查询
 const getWindExploration = ()=>{
     dzmodal
-    .open(windExplorationInfo, { type: "Issuer", data: {...opertaor.getDataAll()} })
+    .open(windExplorationInfo, { type: "Issuer", data: {...opertaor.getDataAll()}, idxParam: idxParam })
     .then((res: any) => {
       if (res.type === "ok") {
       }
@@ -2296,7 +2299,7 @@ function addOneYear(a:any) {
 // 获取清单数据并填充到列表
 const getDistData = (appNo:any, item: any) => {
   const selData = {
-    cComponentTable: item.pageCode.slice(0, -6),
+    cComponentTable: item.pageCode.replace(/\d+/g, ''),
     // cAppNo: appNo,
   };
   if(props.param?.pageType === "inquiryToApp" || props.param?.pageName === "priceInquiry") {
@@ -2767,37 +2770,6 @@ function getFKFunc() {
   // return true;
 }
 
-
-// 检查缴费计划时间是否超出保险区间
-const checkPayPlanValidity = () => {
-  const payPlanList = opertaor.getTableRefByKey("payinfo").getFromValue();
-  const insuranceStart = opertaor.getTableRefByKey("insrnc")?.getValue('Base.tInsrncBgnTm');
-  const insuranceEnd = opertaor.getTableRefByKey("insrnc")?.getValue('Base.tInsrncEndTm');
-
-  // 日期转换函数
-  const toDate = d => {
-    if (d == null || (typeof d === 'string' && !d.trim())) return new Date(NaN);
-    if (typeof d === 'number') return d >= -2208988800000 && d <= 4102444800000 ? new Date(d) : new Date(NaN);
-    const date = new Date(d);
-    return !isNaN(date.getTime()) ? date : new Date(Number(d) || NaN);
-  };
-
-  //校验保险区间有效性
-  const [insStartDate, insEndDate] = [toDate(insuranceStart), toDate(insuranceEnd)];
-  if (isNaN(insStartDate.getTime()) || isNaN(insEndDate.getTime()) || insStartDate > insEndDate) {
-    console.error("保险起期/止期格式无效或逻辑错误");
-    return false;
-  }
-
-  // 遍历检查
-  return payPlanList.some(plan => {
-    const [payStart, payEnd] = [toDate(plan['Pay.tPayBgnTm'] || ""), toDate(plan['Pay.tPayEndTm'] || "")];
-    const isInvalid = isNaN(payStart.getTime()) || isNaN(payEnd.getTime());
-    return isInvalid || payStart < insStartDate || payEnd > insEndDate;
-  });
-};
-
-
 // 校验 地址清单总数 和 学生人数（人）
 const checkStudentValidity  =  async() => {
         const nStudentsNumber = opertaor.getTableRefByKey("tgt")?.getFromValue()['Tgt.nStudentsNumber']  || 0;  //学生人数
@@ -2820,9 +2792,8 @@ const checkStudentValidity  =  async() => {
  */
 const submitToUndrFn = async () => {  
  
- 
 
- 
+
 
  	if (needCalc.value) {
     ElMessage.error("请先进行保费计算!");
@@ -2862,24 +2833,6 @@ const submitToUndrFn = async () => {
   }
   const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
   const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
-
-  // 040002 记名投保标志 选是  校验清单必须录入  
-  const distItem = distRequiredMap[props.param.cProdNo];
-  if(distItem && tgtValue[distItem.flagKey] === '1') {
-    const selectParam = {
-      cComponentTable: distItem.cComponentTable,
-    }
-    if(props.param?.pageName === "priceInquiry") {
-      selectParam['cInquiryNo'] = cInquiryNumber
-    } else {
-      selectParam['cAppNo'] = cAppNo
-    }
-    const resDist: any = await selectDist(selectParam);
-    if(resDist['data']['total'] < 1){
-      ElMessage.warning(`${distItem.flagName}选“是” “${distItem.distName}”未录入请确认！`);  
-      return false;
-    }
-  }
   // 043013 校验营业场所
   if(props.param.cProdNo === '043013') {
     const selectParam = {
@@ -2982,12 +2935,12 @@ const submitToUndrFn = async () => {
       opertaor.getTableRefByKey("payinfo").setFormValue(setArr); 
   }
 
-    // 校验 缴费计划时间超出保险起止期  重置成一条
-  if(checkPayPlanValidity()){
-      opertaor.getTableRefByKey("base").setValue('Base.cInstMrk','0')
-  }
-
-
+      // 校验 缴费计划时间超出保险起止期  重置成一条
+    const hasInvalidPlan = checkPayPlanValidity({ opertaor });
+    if(hasInvalidPlan){
+       opertaor.getTableRefByKey("base").nPayNumberFun();
+    }
+    
 
   // 电梯责任保险 每部电梯累计赔偿限额小于每部电梯每人赔偿限额时校验
   if(props.param?.cProdNo==='043001') {
@@ -3010,6 +2963,14 @@ const submitToUndrFn = async () => {
       if (!rv) {
         return;
       }
+      // 调用接口校验清单录入
+      const checkDistParam = { cInquiryNo: opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo") };
+      const checkDistInfo:any = await checkDistForSubmit(checkDistParam);
+      if(checkDistInfo?.code !== 200) {
+        ElMessage.error(checkDistInfo?.msg);
+        return;
+      }
+
       // 调用再保险位接口
       // const s = await saveDataInfo()
       // if(!s) return;
@@ -4417,8 +4378,7 @@ const validateDistConsistency = async () => {
         (item: any) => item.pageKey === 'dist'
       );
       if (!distMap.length) {
-        ElMessage.error('未找到清单配置项');
-        return;
+        return true;
       }
       const distParam = {
         cClauseCode: props.param?.cTermNo, // 条款编码
@@ -4436,8 +4396,23 @@ const validateDistConsistency = async () => {
       if (distRes.code == 200 && distRes.data == true) {
         return true;          // 通过
       }
+      // 构造提示语换行展示
       if (distRes.code == 200 && distRes.data == false) {
-         ElMessage.error(distRes.msg);
+        const safeMsg = (distRes.msg || '清单校验异常')
+        .replace(/\n/g, '<br>')
+        .replace(/·/g, '<br>·');   // 每个 · 独占一行
+
+        // 超出就滚动展示
+        const scrollMsg = `
+            <div style="max-height: 35vh; overflow-y: auto;">
+                ${safeMsg}
+            </div>
+        `;
+        ElMessageBox.alert(scrollMsg, "提示", {
+            confirmButtonText: "确定",
+            dangerouslyUseHTMLString: true,
+            type: "warning"
+        })
       } else {
          ElMessage.error(distRes.msg || '清单校验异常');
       }
@@ -4656,6 +4631,19 @@ function getEdrbaseValue(key:any) {
 }
 
 function getOldProductResData() {
+  // 根据条款获取清单方案号下拉选项
+  oldProductResData.value[0]['pageInfo'].forEach((i:any) => {
+    if(i.pageKey === "dist") {
+      i.pageSchema.fromSchema.forEach((item:any) => {
+        // 方案号下拉值
+        if(item.prop == 'Dist.cPlanNo'){
+          const termref = opertaor.getTableRefByKey("cvrg");
+          item.typeCode = null;
+          item.loadData = termref.getPlanNo();
+        }
+      })
+    }
+  })
   return oldProductResData.value;
 }
 
@@ -4934,38 +4922,67 @@ const queryTermRateLimitFun = (calcFun: any) => {
     if(r.code === 200) {
       calcFun()
     } else if(r.msg || r.message) {
-      const tableHtml = r.data.map((row:any) => {
-        return `<tr><td>${row.cPlanNo}</td>
-        <td>${row.cTermName}</td>
-        <td>${row.cRiskName}</td>
-        <td style="color:red;">${row.nRateVal}</td>
-        <td>${row.cRateRange}</td></tr>`;
-      }).join(''); // 将所有行合并成一个字符串
-      const htmlContent = `
-        <table border="1" class="messageBoxTable">
-          <thead>
-            <tr><th>方案号</th>
-            <th>条款</th
-            ><th>责任</th>
-            <th>费率</th>
-            <th>建议费率区间</th></tr>
-          </thead>
-          <tbody>
-            ${tableHtml}
-          </tbody>
-        </table>
-        <div>${r.msg || r.message}</div>
-      `;
-      ElMessageBox.confirm(htmlContent, "提示", {
-        dangerouslyUseHTMLString: true,
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-        lockScroll: false,
-        customClass: 'queryTermRateMessage'
-      }).then(() => {
-        calcFun()
-      })
+      const tableVNode = h(ElTable, {
+        data: r.data,
+        border: true,
+        style: { width: '100%', marginTop: '15px' }
+      }, {
+        default: () => [
+          h(ElTableColumn, {
+            prop: 'cPlanNo',
+            label: '方案号',
+            width: '80',
+            align: 'center',
+          }),
+          h(ElTableColumn, {
+            prop: 'cTermName',
+            width: '350',
+            label: '条款',
+            align: 'center',
+          }),
+          h(ElTableColumn, {
+            prop: 'cRiskName',
+            width: '300',
+            label: '责任',
+            align: 'center',
+          }),
+          h(ElTableColumn, {
+            prop: 'nRateVal',
+            width: '85',
+            label: '费率',
+            align: 'center',
+          }),
+          h(ElTableColumn, {
+            prop: 'cRateRange',
+            width: '160',
+            label: '建议费率区间',
+            align: 'center',
+          })
+        ]
+      });
+      ElMessageBox({
+        type: 'warning',
+        title: '提示',
+        message: h('div',
+            {style:{margin: '10px'}}, [
+              tableVNode,
+              h('p', { style: { marginTop: '10px', color: '#555' } },`${r.msg || r.message}`),
+            ],
+        ),
+        draggable: true,
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        showCancelButton: true,
+        customClass: 'my-message-box',
+        beforeClose: (action, instance, done) => {
+          if (action === 'confirm') { // 确认
+            calcFun();
+            done();
+          } else { // 取消
+            done();
+          }
+        }
+      });
     }
   }).catch((err:any) => {
     ElMessage.error(err)
@@ -5244,5 +5261,9 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   white-space: nowrap;
   border: 1px solid #000000;
   padding: 0 5px;
+}
+.el-message-box.my-message-box {
+  width: auto !important;
+  max-width: 80% !important;
 }
 </style>

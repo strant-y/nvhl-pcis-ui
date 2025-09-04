@@ -24,6 +24,7 @@
             <el-radio :value="5">方案录单</el-radio>
             <el-radio :value="7">模板出单</el-radio>
             <el-radio :value="9">协议出单</el-radio>
+            <el-radio :value="10">组合出单</el-radio>
           </el-radio-group>
         </el-form-item>
 				<el-form-item
@@ -241,69 +242,97 @@
 						</h4>
 					</el-tooltip>
 					<el-row v-if="formconfig1.cRenewMrk !== '1'">
-						<el-col :span="24">
-							<div>
-								<VueDraggable
-									class="eachCon"
-									v-model="termList"
-									:animation="150"
-									@update="updateOptionAll"
-								>
-									<el-card
-										v-for="(item, index) in termList"
-										:key="index"
-										:class="item.checked ? 'checked eachItems' : 'eachItems'"
-										shadow="hover"
-										@click="handleClick(item, index)"
-									>
-										<p class="titles">
-											<el-icon size="20" style="vertical-align: middle"
-												><Fold
-											/></el-icon>
-											<span :title="item.prodCnm" class="">
+            <el-col :span="24" v-if="formconfig1.cRecordType != 10">
+              <div>
+                <VueDraggable
+                    class="eachCon"
+                    v-model="termList"
+                    :animation="150"
+                    @update="updateOptionAll"
+                >
+                  <el-card
+                      v-for="(item, index) in termList"
+                      :key="index"
+                      :class="item.checked ? 'checked eachItems' : 'eachItems'"
+                      shadow="hover"
+                      @click="handleClick(item, index)"
+                  >
+                    <p class="titles">
+                      <el-icon size="20" style="vertical-align: middle"
+                      ><Fold
+                      /></el-icon>
+                      <span :title="item.prodCnm" class="">
 												{{ item.prodCnm }}
 											</span>
-											<el-icon
-												:size="25"
-												style="color: rgb(250, 219, 20)"
-												@click.stop="handleStarClick(item)"
-												><StarFilled
-											/></el-icon>
-										</p>
-										<p class="txt" v-if="formconfig1.cRecordType == 1 || formconfig1.cRecordType == 7">{{ item.termNo }} - {{ item.termCnm }}</p>
-										<p class="txt" v-else>{{ item.planNo }} - {{ item.planCnm }}</p>
-									</el-card>
-								</VueDraggable>
-							</div>
-						</el-col>
-						<el-col :span="24">
-							<el-form-item
-								:label="`${labelNm}名称`"
-								prop="cTermNme"
-								:rules="[getRules('required', {})]"
-							>
-								<el-select
-									style="width: 500px"
-									v-model="formconfig1.cTermNme"
-									placeholder="请选择"
-									@change="handleChange"
-									@clear="handleClear"
-									clearable
-									:disabled="true"
-								>
-									<el-option
-										v-for="item in options"
-										:label="item.cNmeCn"
-										:value="item.cTermNo"
-									/>
-								</el-select>
-								<el-button
-									@click="showModal"
-									icon="Search"
-									type="primary"
-								></el-button>
-							</el-form-item>
-						</el-col>
+                      <el-icon
+                          :size="25"
+                          style="color: rgb(250, 219, 20)"
+                          @click.stop="handleStarClick(item)"
+                      ><StarFilled
+                      /></el-icon>
+                    </p>
+                    <p class="txt" v-if="formconfig1.cRecordType == 1 || formconfig1.cRecordType == 7">{{ item.termNo }} - {{ item.termCnm }}</p>
+                    <p class="txt" v-else>{{ item.planNo }} - {{ item.planCnm }}</p>
+                  </el-card>
+                </VueDraggable>
+              </div>
+            </el-col>
+            <el-col :span="24" v-if="formconfig1.cRecordType === 10">
+              <el-form-item
+                  :label="`${labelNm}名称`"
+                  prop="cProdList"
+                  :rules="[getRules('required', {})]"
+              >
+                <el-select
+                    style="width: 500px"
+                    v-model="formconfig1.cProdList"
+                    placeholder="请选择"
+                    @clear="handleClear"
+                    multiple
+                    clearable
+                    :disabled="true"
+                >
+                  <el-option
+                      v-for="item in prodList"
+                      :label="item.label"
+                      :value="item.value"
+                  />
+                </el-select>
+                <el-button
+                    @click="selectProdList"
+                    icon="Search"
+                    type="primary"
+                ></el-button>
+              </el-form-item>
+            </el-col>
+            <el-col :span="24" v-else>
+              <el-form-item
+                  :label="`${labelNm}名称`"
+                  prop="cTermNme"
+                  :rules="[getRules('required', {})]"
+              >
+                <el-select
+                    style="width: 500px"
+                    v-model="formconfig1.cTermNme"
+                    placeholder="请选择"
+                    @change="handleChange"
+                    @clear="handleClear"
+                    clearable
+                    :disabled="true"
+                >
+                  <el-option
+                      v-for="item in options"
+                      :label="item.cNmeCn"
+                      :value="item.cTermNo"
+                  />
+                </el-select>
+                <el-button
+                    @click="showModal"
+                    icon="Search"
+                    type="primary"
+                ></el-button>
+              </el-form-item>
+            </el-col>
 					</el-row>
 				</template>
 
@@ -355,6 +384,7 @@ import {useUserStore} from "@/store";
 import { listChrDepts } from "@/api/dept";
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
 import {scrollByDomId} from "@/utils/common";
+import {POSITE_PAGE_TYPE_APP} from "@/views/pcis/support/composite.types";
 const policyService = new PolicyService();
 
 const router = useRouter();
@@ -365,6 +395,7 @@ const tableRef = ref<AppTableMethod | null>(null);
 const title = ref("自定义录单");
 // 条款名称列表
 const options = ref<any>([]);
+const prodList = ref<any>([]);
 // 常用条款列表
 const termList = ref<any>([]);
 // 条款树
@@ -398,6 +429,8 @@ const formconfig1:any = ref({
 	cInsuredCde: '', // 被保人编码
 	cInsuredNme: '', // 被保人名称
 	cNeedfeeFlag: '', // 是否见费出单
+  cProdList: [], // 产品编码列表
+  cProdDtlList: [], // 产品明细列表
 });
 const selectTreeItem = ref({});
 const labelNm = ref("条款")
@@ -453,8 +486,8 @@ const getCDptCdeList = (data: any)=> {
                 label: item.cDptCnm,
             }));
           // 清空已选择的承保机构
-          formconfig1.value.cDptCde = "";
-          formconfig1.value.cDptCnm = "";
+          // formconfig1.value.cDptCde = "";
+          // formconfig1.value.cDptCnm = "";
         }
         cDptCdeLoading.value = false;
     }).catch(err => console.error(err));
@@ -504,6 +537,16 @@ function next() {
     if (!isValid) {
       return false;
     } else {
+      if(formconfig1.value.cRecordType === 10) {
+        console.log('formconfig1.value', formconfig1.value)
+        router.push({
+          path: "/pcisapp/posite-page",
+          query: {
+            param: JSON.stringify({ ...formconfig1.value, ...{ pageType: POSITE_PAGE_TYPE_APP } }),
+          },
+        });
+        return;
+      }
       // 点击下一步前校验，如果data为true则继续，否则阻断并提示
       const queryProdDptCdeParam:any = { cDptCde:  formconfig1.value.cDptCde }
       if(formconfig1.value.cRenewMrk === "1") {
@@ -678,6 +721,42 @@ function showModal() {
       }
     });
 }
+
+
+function selectProdList() {
+  dzmodal.open(termDialog, {
+    type: "Issuer",
+    data: { updateQuery, type: formconfig1.value.cRecordType, voType: "app", },
+    termList: termList.value,selectedList: formconfig1.value.cProdDtlList
+  }).then((res: any) => {
+    if (res.type === "ok") {
+      const selectedTerm = res.body;
+      console.log('res', res);
+      prodList.value = selectedTerm.map((item: any) => {
+        const datas = item.searchKey.split('_');
+        return {
+          value: datas[3].substring(0, 6),
+          label: datas[3].substring(6),
+        };
+      });
+      formconfig1.value.cProdList = selectedTerm.map((item: any) => {
+        const datas = item.searchKey.split('_');
+        return datas[3].substring(0, 6)
+      });
+      formconfig1.value.cProdDtlList = selectedTerm.map((item: any) => {
+        const datas = item.searchKey.split('_');
+        return {
+          cProdNo: datas[3].substring(0, 6),
+          cProdNme: datas[3].substring(6),
+          cTermNo: item.code,
+          cGrpMrk: formconfig1.value.cGrpMrk,
+          searchKey: item.searchKey
+        };
+      });
+    }
+  });
+}
+
 function updateQuery() {
   handleQuery();
 }
@@ -688,7 +767,7 @@ function handleRecordTypeChange(val:any) {
   formconfig1.value.cGrpMrk = "0";
   formconfig1.value.cRenewMrk = "0";
   if (val == "5") {
-    loadOptions(5);
+    loadOptions(2);
     labelNm.value = "方案";
     formconfig1.value.cIsPlan = '1';
   } else if (val == "1") {
@@ -696,7 +775,7 @@ function handleRecordTypeChange(val:any) {
     labelNm.value = "条款";
     formconfig1.value.cIsPlan = '0';
   } else {
-    loadOptions(7);
+    loadOptions(1);
     labelNm.value = "条款";
     formconfig1.value.cIsPlan = '0';
   }
@@ -762,7 +841,7 @@ function getProtocolNumber (){
         const selectedTerm = res.body;
         // nRecRemPrm 剩余保费   nRecRemEstAmt 剩余保额
         if(selectedTerm.nRecRemPrm <= 0 || selectedTerm.nRecRemEstAmt <= 0 ){
-          ElMessage.warning("该协议剩余预收保费不足,请重新选择协议！");
+          ElMessage.warning("该协议剩余预收保额不足,请重新选择协议！");
           return false
         }
         formconfig1.value.cEcAgrNo = selectedTerm.cEcAgrNo; // 协议号

@@ -104,12 +104,12 @@ const method = {
     }
     const totalCiShare = dataList.reduce((sum, row) => sum + parseFloat(row['Ci.nCiShare'] || 0), 0);
     // 判断总和是否等于 1
-    if (totalCiShare >= 100) {
+    if (totalCiShare >= 1) {
       ElMessage.warning("共保总保额已被全部分完!不能新增");
       return;
     }
     // 新增行前计算剩余比例
-    const remaining = (100 - totalCiShare).toFixed(8);
+    const remaining = (1 - totalCiShare).toFixed(8);
     const cChiefMrk = ['1', '3','5'].includes(cCiMrkFlag) ? '1' : '0';
     // const cSlsCde = opertaor.getTableRefByKey('plyBase').getValue('Base.cSlsId')
     if(dataList.length == 0){
@@ -151,7 +151,7 @@ const method = {
     }
     // 设置新行的 Ci.nCiShare 为剩余比例
     const newRowId = dataList[dataList.length - 1]?._dataId;
-    if (newRowId && parseFloat(remaining) > 0) {
+    if (newRowId && Number(remaining) > 0) {
       freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", newRowId, remaining);
     }
     updateMasterAgreementValues()
@@ -422,10 +422,10 @@ const method = {
     const rowDatas = freeEditRef.value?.getSelectRow();
     const rowId = rowDatas?._dataId;
     // 校验输入是否合法
-    const floatValue = parseFloat(val);
+    const floatValue = Number(val);
     if (!isNaN(floatValue) && isFinite(floatValue)) {
       // 修改范围为1-100之间
-      if (floatValue < 1 || floatValue > 100) {
+      if (floatValue < 0 || floatValue > 1) {
         ElMessage.warning("联共保比例必须大于等于1且小于等于100");
         freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, "");
         return;
@@ -447,15 +447,20 @@ const method = {
     const allRows = getFromValue();
     const totalOther = allRows
       .filter(row => row._dataId !== rowId)
-      .reduce((sum, row) => sum + parseFloat(row["Ci.nCiShare"] || 0), 0);
+      .reduce((sum, row) => sum + Number(row["Ci.nCiShare"] || 0), 0);
+      // if(totalOther >= 100){
+      //   ElMessage.error("联共保比例不能大于100");
+      //   freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, "");
+      //   return;
+      // }
     // 如果当前值 + 其他行 >= 100，则限制当前行最大值为 100 - 其他行总和
-    if (parseFloat(val) + totalOther > 100) {
-      const maxVal = (100 - totalOther).toFixed(8);
+    if (Number(val) + totalOther > 1) {
+      const maxVal = 1 - totalOther;
       freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, maxVal);
       return;
     }
-    const cCiMrk = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
-    if (cCiMrk === "2" || cCiMrk === "4") {
+    // const cCiMrk = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
+    // if (cCiMrk === "2" || cCiMrk === "4") {
       // updateMasterAgreementValues();
       // const allData =  getFromValue();
       // for (let i = 1; i < allData.length; i++) {
@@ -469,14 +474,14 @@ const method = {
       //     break;
       //   }
       // }
-    }
+    // }
     updateMasterAgreementValues();
     // onChiefMrkChange()
     //根据新的联共保保费和出单费比例重新计算出单费用
     const updatedRowData = freeEditRef.value?.getSelectRow();
-    const nPlyFeeRate = parseFloat(updatedRowData["Ci.nPlyFeeRate"] || 0);
+    const nPlyFeeRate = parseFloat(updatedRowData["Ci.nPlyFeeRate"] || '0');
     const nCiPrm = parseFloat(updatedRowData["Ci.nCiPrm"] || 0);
-    const nPlyFee = nPlyFeeRate/100 * nCiPrm;
+    const nPlyFee = nPlyFeeRate * nCiPrm;
     freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", updatedRowData._dataId, nPlyFee.toFixed(2));
   },
   //出单费比例
@@ -497,15 +502,15 @@ const method = {
       return;
     }
     // 限制出单费比例范围（0-100）
-    if (floatValue < 0 || floatValue > 100) {
+    if (floatValue < 0 || floatValue > 1) {
       ElMessage.warning("出单费比例应在0-100之间");
-      freeEditRef?.value?.setValueByRowKey("Ci.nPlyFeeRate", row._dataId, "");
+      freeEditRef?.value?.setValueByRowKey("Ci.nPlyFeeRate", row._dataId, "0.00");
       freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", row._dataId, "0.00");
       return;
     }
     // 根据新的出单费比例和共保保费计算出单费用
     const nCiPrm = parseFloat(row["Ci.nCiPrm"] || 0);
-    const nPlyFee = (floatValue / 100) * nCiPrm;
+    const nPlyFee = floatValue  * nCiPrm;
     // 出单费用保留2位小数
     freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", row._dataId, nPlyFee.toFixed(2));
   },
@@ -782,9 +787,9 @@ const updateMasterAgreementValues = () => {
   const res = opertaor.getDataAll();
   allRows.forEach(row => {
     if (row["Ci.cCoinsurerCde"] === "327001") {
-      const share = parseFloat(row["Ci.nCiShare"])/100 || 0;
-      const nAmt = res["base"]["Base.nAmt"] ? parseFloat(res["base"]["Base.nAmt"]) : 0;
-      const nPrm = res["base"]["Base.nPrm"] ? parseFloat(res["base"]["Base.nPrm"]) : 0;
+      const share = Number(row["Ci.nCiShare"]) || 0;
+      const nAmt = res["base"]["Base.nAmt"] ? Number(res["base"]["Base.nAmt"]) : 0;
+      const nPrm = res["base"]["Base.nPrm"] ? Number(res["base"]["Base.nPrm"]) : 0;
       const ciAmt = share * nAmt;
       const ciPrm = share * nPrm;
       // 更新当前行的 Ci.nCiAmt 和 Ci.nCiPrm
@@ -797,9 +802,9 @@ const updateMasterAgreementValues = () => {
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm", totalPrm.toFixed(2)); //联保总保费
     }else{
       // 非永安保险公司：仅更新该行的 Ci.nCiAmt 和 Ci.nCiPrm，不参与总和计算
-      const share = parseFloat(row["Ci.nCiShare"])/100 || 0;
-      const nAmt = res["base"]["Base.nAmt"] ? parseFloat(res["base"]["Base.nAmt"]) : 0;
-      const nPrm = res["base"]["Base.nPrm"] ? parseFloat(res["base"]["Base.nPrm"]) : 0;
+      const share = Number(row["Ci.nCiShare"]) || 0;
+      const nAmt = res["base"]["Base.nAmt"] ? Number(res["base"]["Base.nAmt"]) : 0;
+      const nPrm = res["base"]["Base.nPrm"] ? Number(res["base"]["Base.nPrm"]) : 0;
 
       const ciAmt = share * nAmt;
       const ciPrm = share * nPrm;
@@ -900,7 +905,7 @@ const initCiInfo = (data: any) => {
     }
     freeEditRef?.value?.addRowByData( {
       'Ci.nSeqNo': 1,
-      'Ci.nCiShare': '100',
+      'Ci.nCiShare': '1',
       'Ci.nPlyFeeRate': '0.00',
       'Ci.nPlyFee': '0.00',
       'Ci.nComm':'0.00',

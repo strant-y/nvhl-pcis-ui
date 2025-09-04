@@ -1,4 +1,4 @@
-<template>
+<template >
   <app-grid-edit :gridEditConfig="formconfig1" ref="payinfoEditRef" />
 </template>
 
@@ -65,7 +65,6 @@ const nPrmFun = () => {
     let nCiShare = Number(getOwnShare()) || 100;
     const totalAmount = Number(data['base']['Base.nPrm']);
     const splitCount = Number(data.base?.['Base.nPayNumber'])
-    debugger
     const totalCent = Math.round(totalAmount * 100);
     const result = ref<number[]>([]);
     const quotient = Math.floor(totalCent / splitCount);
@@ -276,4 +275,13 @@ defineExpose({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+  ::v-deep .el-table td.el-table__cell div {
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+  }
+
+
+</style>

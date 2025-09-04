@@ -233,7 +233,7 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "bsTm1",
-        inputtype: "rtdatepicker",
+        inputtype: "rtinput",
         title: "投保日期",
       },
       {
@@ -249,7 +249,7 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "crtTm",
-        inputtype: "rtdatepicker",
+        inputtype: "rtinput",
         title: "提交时间",
       },
       {

@@ -10,6 +10,7 @@ const ViewsCachedKeyMap : any = {
     'application-querys': 'application-querys',
     'price-inquiry-recording': 'PriceInquiryRecording',
     // 'edr-qry-endorse-list': '',
+    'posite-page': 'posite-page',
 };
 
 export function getCompName(name: string): string {

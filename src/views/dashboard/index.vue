@@ -128,13 +128,13 @@
               </template>
               <template #column-cAppNoInfo="{ row, column, index }">
                 <div class="policy-info-cell">
-                  <div class="policy-number-row">
+                  <div class="policy-number-row" style="height: 23px;">
                     <span
                       v-html="row.cAppNo"
                       :class="row.baseType !== '询价' ? 'primmaryColor' : ''"
                       @dblclick="row.baseType !== '询价' ? toQuery2(row) : ()=>{}"
                     ></span>
-                    <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
+                    <el-icon class="copy-icon" @click="copyText(row.cAppNo)" v-if="row.cAppNo">
                       <DocumentCopy />
                     </el-icon>
                   </div>
@@ -1220,7 +1220,7 @@ const toQuery2 = (data: any) => {
         const requestParam = {
           pageSize: 10,
           pageNum: 1,
-          companyId: "0200000000000",
+          companyId: user.companyId,
           operId: user.opCde,
           inNextDpt: "1",
           udrType: "1",
@@ -1238,7 +1238,7 @@ const toQuery2 = (data: any) => {
         const requestParam = {
           pageSize: 10,
           pageNum: 1,
-          companyId: "0200000000000",
+          companyId: user.companyId,
           operId: user.opCde,
           inNextDpt: "1",
           udrType: "1",
@@ -1258,7 +1258,7 @@ const toQuery2 = (data: any) => {
         const requestParam = {
           pageSize: 10,
           pageNum: 1,
-          companyId: "0200000000000",
+          companyId: user.companyId,
           operId: user.opCde,
           inNextDpt: "1",
           udrType: "0",
@@ -1276,7 +1276,7 @@ const toQuery2 = (data: any) => {
         const requestParam = {
           pageSize: 10,
           pageNum: 1,
-          companyId: "0200000000000",
+          companyId: user.companyId,
           operId: user.opCde,
           inNextDpt: "1",
           udrType: "0",
@@ -1296,7 +1296,7 @@ const toQuery2 = (data: any) => {
         const requestParam = {
           pageSize: 10,
           pageNum: 1,
-          companyId: "0200000000000",
+          companyId: user.companyId,
           operId: user.opCde,
           udrType: "3",
           objId: row.cInquiryNo,
@@ -1313,7 +1313,7 @@ const toQuery2 = (data: any) => {
         const requestParam = {
           pageSize: 10,
           pageNum: 1,
-          companyId: "0200000000000",
+          companyId: user.companyId,
           operId: user.opCde,
           udrType: "3",
           objId: row.cAppNo,
@@ -1353,16 +1353,16 @@ const toQuery2 = (data: any) => {
           pageNum: 1,
           objId: data.cAppNo,
           udrType: "4",
-          CAppStatus: "4",
+          CAppStatus: "5",
           bsType: "A",
           CLoadSub: "1",
           sortField: "name",
           TAppTmStart: "2025-07-28 00:00:00",
           tAppTmEnd: "2025-08-27 00:00:00",
           sortOrder: null,
-          orgCde: "0200000000000",
+          orgCde: user.companyId,
           CurrentUser: user.opCde,
-          CurrentUserOrg: "0200000000000",
+          CurrentUserOrg: user.companyId,
           findPlan: true,
         };
         getAppPolicyList(requestParam).then((res: any) => {

@@ -86,8 +86,6 @@ const {
 } = NewUdrListService();
 import { descryptParameter } from "@/utils/encipher.ts";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
 const dzmodal = useDzModal();
@@ -121,7 +119,11 @@ const props = defineProps({
   param: {
     type: [Object],
   },
+  idxParam: {
+    type: Object
+  }
 });
+const opertaor = dataOpertaor(props.idxParam?.opertaorProps);
 
 const formconfig = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({

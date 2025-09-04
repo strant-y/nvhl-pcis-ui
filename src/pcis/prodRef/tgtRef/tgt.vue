@@ -190,7 +190,8 @@ const handelGoodsMx = (val:any)=>{
     setValue('Tgt.nAdditiveCoefficient',val[0]['Dist.nAdditiveCoefficient'])
     setValue('Tgt.cTradeNum',val[0]['Dist.cTradeNum'])
     setValue('Tgt.cInvoiceNum',val[0]['Dist.cInvoiceNum'])
-    // setValue('Tgt.cLadingNum',val[0]['Dist.cInvoiceNum'])
+    setValue('Tgt.cLadingNum',val[0]['Dist.cBillNum'])
+    setValue('Tgt.cWaybillNumber',val[0]['Dist.cBillNum'])
     setValue('Tgt.cCreditNum',val[0]['Dist.cLetterNum'])
   }else {
     setValue('Tgt.cGoodsNo','')
@@ -199,8 +200,9 @@ const handelGoodsMx = (val:any)=>{
     setValue('Tgt.nAdditiveCoefficient','')
     setValue('Tgt.cTradeNum','')
     setValue('Tgt.cInvoiceNum','')
-    // setValue('Tgt.cLadingNum',val[0]['Dist.cInvoiceNum'])
+    setValue('Tgt.cLadingNum','')
     setValue('Tgt.cCreditNum','')
+    setValue('Tgt.cWaybillNumber','')
   }
 }
 const selectType = ()=>{
@@ -500,17 +502,7 @@ const method = {
       });
     }
   },
-  funccDetailsAccident: () => {
-    dialog.value?.open('detailsAccident', {
-      selectedData: getValue("Tgt.cFinanceCde"), //需要把自定义的过滤掉，只传过去从模板中选择的
-    },
-      {
-        getSelected(selectdata: any) {
-          setValue("Tgt.cFinanceCde", selectdata.map(item => item.value).join(','))
-          setValue("Tgt.cDetailsAccident", selectdata.map((item, index) => `${index + 1}. ${item.label}`).join('\n'))
-        },
-      }, { width: 45 });
-  },
+
   getcMemberLogoChange: (val: string) => {
     if (val === '1') {
       setFormItem('Tgt.cBareboatLessee', {
@@ -625,6 +617,9 @@ const method = {
     setFormItem("Tgt.cTransportTools", {
       rules: val === '1' ? requiredRule : [],
     });
+    if(val !== '1'){
+      clearValidate('Tgt.cTransportTools')
+    }
     setFormItem("Tgt.cTransportLicenseNumber", {
       rules: val === '1' ? requiredRule : [],
     });
@@ -679,19 +674,11 @@ const method = {
   func1: () => {
   },
   //投保乘客座位总数改变事件
-  changenTotalInsured: () => {
+  changenTotalInsured: (val:any) => {
     console.log('触发11')
-    setValue("Tgt.nSeatCapacity", Number(getValue("Tgt.nTotalInsured")) + Number(getValue("Tgt.nInsuredcompanySeats")))
-  },
-  //投保司乘人员座位总数改变事件
-  changenInsuredcompanySeats: () => {
-    console.log('触发12')
-    setValue("Tgt.nSeatCapacity", Number(getValue("Tgt.nTotalInsured")) + Number(getValue("Tgt.nInsuredcompanySeats")))
-  },
-
-  // 投保座位总数
-  nSeatCapacityChange:(val:any)=>{ 
-        if(val || val==0){
+       if(val || val==0){
+         setValue("Tgt.nSeatCapacity", Number(getValue("Tgt.nTotalInsured")) + Number(getValue("Tgt.nInsuredcompanySeats")))
+          
          const termref = opertaor.getTableRefByKey("cvrg");
           interface Item {
             nInsuredHeadcount?: number | null | string;
@@ -704,6 +691,17 @@ const method = {
             factorProp: 'Term.nSeatTotal',
           },val);  
         }
+  
+  },
+  //投保司乘人员座位总数改变事件
+  changenInsuredcompanySeats: () => {
+    console.log('触发12')
+    setValue("Tgt.nSeatCapacity", Number(getValue("Tgt.nTotalInsured")) + Number(getValue("Tgt.nInsuredcompanySeats")))
+  },
+
+  // 投保座位总数
+  nSeatCapacityChange:(val:any)=>{ 
+   
   },
 
   //是否单项工程change事件
@@ -949,8 +947,9 @@ const method = {
       setFormItem('Tgt.cShipClassThree', { disabled: false, rules: [getRules("required", {})] })
 
     } else {
-      setFormItem('Tgt.cShipClassTwo', { disabled: false, rules: [getRules("required", {})] });
-
+      if(val){
+        setFormItem('Tgt.cShipClassTwo', { disabled: false, rules: [getRules("required", {})] });
+      }
     }
     if (val == '02' || val == '03') {
       setFormItem('Tgt.cShipClassThree', { disabled: true, rules: null })
@@ -1321,20 +1320,18 @@ const method = {
   // 标的信息--证件类型
   cCertificateTypeChange: (val: any) => {
     // 道路运输
-    if (val === '1') {
-      // setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}),getRules("idCard", {})]})  //证件号
+    // if (val === '1') {
+    //   setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("roadTransportLicense", {})] })  //证件号
+    // } else if (val === '2') {
+    //   //  网络预约出租汽车经营许可证
+    //   setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("onlineTaxiLicense", {})] })  //证件号
+    // } else if (val === '3') {
+    //   //  网络预约出租汽车运输证
+    //   setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("onlineTaxiTransportLicense", {})] })  //证件号
+    // }
+    if(val){
       setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("roadTransportLicense", {})] })  //证件号
-
-    } else if (val === '2') {
-      //  网络预约出租汽车经营许可证
-      setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("onlineTaxiLicense", {})] })  //证件号
-
-    } else if (val === '3') {
-      //  网络预约出租汽车运输证
-      setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("onlineTaxiTransportLicense", {})] })  //证件号
-
     }
-
 
   },
   // 证件有效起期

@@ -7,6 +7,7 @@
         <rt-button :item="{
           type: 'primary',
           label: '审核通过',
+          disabled: btnDisabled,
           func: () => {
             passInfo();
           },
@@ -15,6 +16,7 @@
         <rt-button :item="{
           type: 'primary',
           label: '支票退回',
+          disabled: btnDisabled,
           func: () => {
             backInfo();
           },
@@ -80,6 +82,7 @@ const freeLookRef = ref<AppFreeEditMethod | null>(null);
 const freeEditRefBtn = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<MyTableMethod | null>(null);
 const appTableShow = ref(false);
+const btnDisabled = ref(false); // 按钮禁用
 
 function fromUpdata(newData: any) {
   const jsonObj = getFrom();
@@ -405,6 +408,7 @@ function loadPayConfirmInfo(param) {
 
 // 支票通过
 function passInfo() {
+  btnDisabled.value = true; // 按钮禁用
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
       const s = freeEditRef.value?.getFromValue(); //获取表单数据
@@ -421,6 +425,7 @@ function passInfo() {
             });
             emits("ok", {});
           }
+          btnDisabled.value = false;
         })
         .catch((error: any) => {
           console.log("出错了", error);
@@ -428,14 +433,17 @@ function passInfo() {
             message: "后台服务异常,请联系管理员",
             duration: 3000,
           });
+          btnDisabled.value = false;
         });
     } else {
       ElMessage.error("请填写必填项");
+      btnDisabled.value = false;
     }
   });
 }
 // 支票回退
 function backInfo() {
+  btnDisabled.value = true; // 按钮禁用
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
       const s = freeEditRef.value?.getFromValue(); //获取表单数据
@@ -449,6 +457,7 @@ function backInfo() {
             ElMessage.success({ message: "支票退回成功", duration: 3000 });
             emits("ok", {});
           }
+          btnDisabled.value = false;
         })
         .catch((error: any) => {
           console.log("出错了", error);
@@ -456,9 +465,11 @@ function backInfo() {
             message: "后台服务异常,请联系管理员",
             duration: 3000,
           });
+          btnDisabled.value = false;
         });
     } else {
       ElMessage.error("请填写必填项");
+      btnDisabled.value = false;
     }
   });
 }

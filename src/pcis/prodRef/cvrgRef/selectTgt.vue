@@ -1,5 +1,9 @@
 <template>
   <div>
+    <div v-if="sumData" style="margin:10px;font-size:20px;">
+      <span>总保险金额:</span>
+      <span style="color: red;margin-left:10px">{{ sumData }}</span>
+    </div>
     <app-table
         :tableConfig="tableconfig"
         v-model:pageresult="pageresult"
@@ -47,7 +51,7 @@ const tableconfig = ref<AppTableConfig>(createTableEditConfig());
 let fileBase: string;
 // 声明全局变量
 let cComponentTableValue: string;
-
+const sumData = computed(() => selectedRows.value.reduce((sum, item) => sum + item['Dist.nInsuranceAmount'], 0) );
 const props = defineProps({
   data: {
     type: Object,
