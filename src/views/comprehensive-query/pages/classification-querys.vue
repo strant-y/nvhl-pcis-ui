@@ -147,8 +147,9 @@ const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
 const removeIds = ref([]); // 删除用户ID集合 用于批量删除
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
+import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
-import {getAppPolicyList, getInquiryPolicyList, qryEndorseList, delTmpPolicy, queryInsuredList, getCustomUserList, CustomUserList, qryPolicyNewList, searchFileDown} from "@/api/query";
+import {getAppPolicyList, getInquiryPolicyList, qryEndorseList, delTmpPolicy, queryInsuredList, getCustomUserList, CustomUserList, qryPolicyNewList} from "@/api/query";
 // 变更列
 const colChange = defineAsyncComponent(() => import("../modal/colChange.vue"));
 const PrintView = defineAsyncComponent(() => import("../modal/PrintView.vue"));
@@ -156,12 +157,15 @@ const PrintView = defineAsyncComponent(() => import("../modal/PrintView.vue"));
 const TaskListVestige = defineAsyncComponent(
     () => import("@/views/pcis-new-udr-list/common/TaskListVestige.vue")
 );
+const policyService = new PolicyService();
+
 let cTermNoList = ref<any>([]);  // 条款数据
 let cTermNo = '';    // 条款编码
-
 let ESOriginalData = ref<any>([]);  // ES查询原始数据，转化成驼峰为适配操作列
 let userColumnConfig = ref<any[]>([]); // 保存用户自定义列配置
 let colChangeCPkId = ref(''); // 变更列参数
+
+let isESAndNormalQuery = ref('0'); // 是否es查询 1 不是0 默认否
 
 // 用于缓存用户的完整勾选状态（包括原始列 + 扩展列）
 let userAllCheckedColumns = ref<string[]>([]);
@@ -176,6 +180,7 @@ const homeJumpData = ref({}); //接收首页的参数，用于查询条件回显
 const queryType = ref("1");
 const cAppType = ref("A");
 import { FIELD_MAP } from '@/constants/fieldMaps';
+import {saveAs} from "file-saver";
 const cPard = ref(null);
 
 watch(() => {
@@ -1276,6 +1281,7 @@ async function handleQuery(flag?: boolean, isEs = false) {
   const s = freeEditRefs.getFromValue();
   const appType = s.cAppTyp || 'A';
   cAppType.value = appType;
+  isESAndNormalQuery.value = isEs ? '1':'0';
 
   if (appType === 'I') {
     await queryI(flag, isEs);
@@ -1525,11 +1531,210 @@ async function queryI(flag?: boolean, isEs = false) {
 }
 
 // 导出
-async function exportFileList(flag?: boolean, isEs = false) {
+async function exportFileList(flag?: boolean) {
+  const freeEditRefs = freeEditRef.value;
+  const s = freeEditRefs.getFromValue();
+  const appType = s.cAppTyp || 'A';
+  cAppType.value = appType;
 
+  if (appType === 'I') {
+    await exportI(flag, isESAndNormalQuery.value);
+  } else {
+    await exportAE(flag, isESAndNormalQuery.value);
+  }
 }
 
+// 投保/批改 导出
+async function exportAE( flag?: boolean, isEs) {
+    const tableRefs = tableRef.value;
+    const freeEditRefs = freeEditRef.value;
+    const r = tableRefs.getPartnerPage(flag); //获取分页数据
+    const s = freeEditRefs.getFromValue(); //获取表单数据  
+    if (s.cLoadSub == null) {
+        s.cLoadSub = "1";
+    }
+    pageresult.list = [];
+    // 清空多余参数
+    delete s.cProdNo;
+    if (
+        (s["cAppNo"] == null || s["cAppNo"] == "") &&
+        (s["cPlyNo"] == null || s["cPlyNo"] == "") &&
+        (s["cAppNme"] == null || s["cAppNme"] == "")
+    ) {
+        const startTemp = s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[0] : null;
+        const start = dayjs(startTemp);
+        const endTemp = s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[1] : null;
+        const end = dayjs(endTemp);
 
+        if (end.isBefore(start)) {
+            ElMessage.warning("签单日期起期不能大于签单日期止期");
+            return;
+        }
+        if (end.diff(start, "year", true) > 2) {
+            ElMessage.warning("签单日期时间范围请控制在两年内");
+            return;
+        }
+    }
+    // 提取投保日期的开始时间和结束时间
+    const tAppTmStart = s.tAppTm && s.tAppTm.length > 1 ? s.tAppTm[0] : null;
+    const tAppTmEnd = s.tAppTm && s.tAppTm.length > 1 ? s.tAppTm[1] : null;
+    // 提取批改申请日期的开始时间和结束时间
+    const tEdrAppTmStart =
+        s.tEdrAppTm && s.tEdrAppTm.length > 1 ? s.tEdrAppTm[0] : null;
+    const tEdrAppTmEnd =
+        s.tEdrAppTm && s.tEdrAppTm.length > 1 ? s.tEdrAppTm[1] : null;
+    // 提取签单日期的开始时间和结束时间
+    const tIssueTmStart =
+        s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[0] : null;
+    const tIssueTmEnd =
+        s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[1] : null;
+
+    const param = Object.assign(s, r);
+    param["pageNo"] = param["pageNum"];
+    param["tAppTmStart"] = tAppTmStart; // 添加投保开始时间
+    param["tAppTmEnd"] = tAppTmEnd; // 添加投保结束时间
+    param["tEdrAppTmStart"] = tEdrAppTmStart; // 添加批改开始时间
+    param["tEdrAppTmEnd"] = tEdrAppTmEnd; // 添加批改结束时间
+    param["tIssueTmStart"] = tIssueTmStart; // 添加签单开始时间
+    param["tIssueTmEnd"] = tIssueTmEnd; // 添加签单结束时间
+    param["queryType"] = queryType.value;
+    param["cTermNo"] = cTermNo;        // 条款编码
+
+    param["type"] = 'search';
+    param["cCrtCde"] = JSON.parse(sessionStorage.getItem("user")).opCde;
+    param["ises"] = isEs;
+
+    // 清空询价日期参数
+    param.tInquiryTm = null;
+    param["tInquiryTmStart"] = null;
+    param["tInquiryTmEnd"] = null;
+    
+    if(s.cAppTyp == 'A'){
+      // 清空批改日期参数
+      param.tEdrAppTm = null;
+      param["tEdrAppTmStart"] = null;
+      param["tEdrAppTmEnd"] = null
+    }
+
+    if(s.cAppTyp == 'E'){
+      // 清空投保日期参数
+      param.tAppTm = null;
+      param["tAppTmStart"] = null;
+      param["tAppTmEnd"] = null
+    }
+    // ES 必须填查询关键字
+    if (Boolean(parseInt(isEs)) && !param.cQueryStr?.trim()) {
+        ElMessage.warning('查询条件不能为空');
+        return;
+    }
+    // ES 额外索引
+    if (Boolean(parseInt(isEs))) {
+        param.IndexName = 'ply_insured_ik';
+        param.IndexType = 'ply_insured_info';
+    }
+    policyService.searchFileDown(param).then((res: any) => {
+        if (res.size <= 0) {
+            ElMessage.error({ message: '下载出错', duration: 3000 });
+            return;
+        }
+        const fileName = `查询信息.xls`;
+        const blob = new Blob([res.data], { type: 'application/vnd.ms-excel' });
+        saveAs(blob, fileName);
+    }).catch((err: any) => {
+        ElMessage.error({ message: err, duration: 3000 });
+    });
+}
+
+// 询价 导出
+async function exportI(flag?: boolean, isEs = false) {
+    const tableRefs = tableRef.value;
+    const freeEditRefs = freeEditRef.value;
+    const r = tableRefs.getPartnerPage(flag); //获取分页数据
+    const s = freeEditRefs.getFromValue(); //获取表单数据
+    if (s.cLoadSub == null) {
+        s.cLoadSub = "1";
+    }
+    pageresult.list = [];
+    // 清空其他日期参数
+    s.tAppTm = null;
+    s.tEdrAppTm = null;
+    s.tIssueTm = null;
+    // 删除列表类型
+    delete s.cDataTyp;
+    delete s.cProdNo;
+
+    if (
+        (s["cAppNo"] == null || s["cAppNo"] == "") &&
+        (s["cPlyNo"] == null || s["cPlyNo"] == "") &&
+        (s["cAppNme"] == null || s["cAppNme"] == "")
+    ) {
+        const startTemp =
+            s.tInquiryTm && s.tInquiryTm.length > 1 ? s.tInquiryTm[0] : null;
+        if (null == startTemp || undefined === startTemp) {
+            ElMessage.warning("申请日期不能为空");
+            return;
+        }
+        const start = dayjs(startTemp);
+        const endTemp = s.tInquiryTm && s.tInquiryTm.length > 1 ? s.tInquiryTm[1] : null;
+        if (null == endTemp || undefined === endTemp) {
+            ElMessage.warning("申请日期不能为空");
+            return;
+        }
+        const end = dayjs(endTemp);
+        if (end.isBefore(start)) {
+            ElMessage.warning("申请日期起期不能大于申请日期止期");
+            return;
+        }
+        if (end.diff(start, "year", true) > 2) {
+            ElMessage.warning("申请日期时间范围请控制在两年内");
+            return;
+        }
+    }
+    // 提取申请日期的开始时间和结束时间
+    const tInquiryTmStart = s.tInquiryTm && s.tInquiryTm.length > 1 ? s.tInquiryTm[0] : null;
+    const tInquiryTmEnd = s.tInquiryTm && s.tInquiryTm.length > 1 ? s.tInquiryTm[1] : null;
+
+    const param = Object.assign(s, r);
+    param["pageNo"] = param["pageNum"];
+    param["tInquiryTmStart"] = tInquiryTmStart; 
+    param["tInquiryTmEnd"] = tInquiryTmEnd; 
+    param["queryType"] = queryType.value;
+    param["cTermNo"] = cTermNo;        // 条款编码
+    param["type"] = 'search';
+    param["cCrtCde"] = JSON.parse(sessionStorage.getItem("user")).opCde;
+    param["ises"] = isEs;
+
+    // 清空其他日期参数
+    param["tAppTmStart"] = null;
+    param["tAppTmEnd"] = null;
+    param["tEdrAppTmStart"] = null;
+    param["tEdrAppTmEnd"] = null;
+    param["tIssueTmStart"] = null;
+    param["tIssueTmEnd"] = null;
+    
+    // ES 必须填查询关键字
+    if (Boolean(parseInt(isEs)) && !param.cQueryStr?.trim()) {
+        ElMessage.warning('查询条件不能为空');
+        return;
+    }
+    // ES 额外索引
+    if (Boolean(parseInt(isEs))) {
+        param.IndexName = 'ply_inquiry_ik';
+        param.IndexType = 'ply_inquiry_info';
+    }
+
+    policyService.searchFileDown(param).then((res: any) => {
+        if (res.size <= 0) {
+            ElMessage.error({ message: '下载出错', duration: 3000 });
+            return;
+        }
+        const fileName = `查询信息.xls`;
+        const blob = new Blob([res.data], { type: 'application/vnd.ms-excel' });
+        saveAs(blob, fileName);
+    }).catch((err: any) => {
+        ElMessage.error({ message: err, duration: 3000 });
+    });
+}
 
 // 把原始列 + 扩展列 合并成弹窗需要的数据
 function buildAllCheckboxData() {

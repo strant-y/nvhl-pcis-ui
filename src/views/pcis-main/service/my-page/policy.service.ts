@@ -468,6 +468,13 @@ export class PolicyService {
         });
     }
 
+    searchFileDown(data) {
+        return request.post(`/excel/searchFileDown `, data, {
+            params: data,
+            responseType: 'blob'
+        });
+    }
+
     ieQueryFileDown(data) {
         return request.post(`/excel/ieQueryFileDown`, data, {
             params: data,

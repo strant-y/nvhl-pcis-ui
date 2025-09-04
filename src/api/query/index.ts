@@ -58,14 +58,6 @@ export function getAppPolicyList(queryParams: any): AxiosPromise<any> {
 }
 
 /**
- * 投保单导出
- * @param queryParams
- */
-export function searchFileDown(queryParams: any): AxiosPromise<any> {
-    return post(`/excel/searchFileDown`, queryParams);
-}
-
-/**
  * es查询
  * @param queryParams
  */
