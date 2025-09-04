@@ -86,6 +86,7 @@ import navigationAreaTips from "./commodityRef/NavigationAreaTips.vue" //航行�
 import  specialCateModal  from "./commodityRef/specialCateModal.vue";
 import AgentTgtRef from "./agentTgtRef/AgentTgt.vue"
 import TransportinfoRef from "./transportinfoRef/Transportinfo.vue";
+import PlyTermCommonRef from "./cvrgRef/plyTermCommon.vue";
 
 /**用于动态组件的映射生成 */
 const componentMap = {
@@ -97,6 +98,7 @@ const componentMap = {
   cvrgRef: cvrgRef,
   webPlyCvrg04: plyCvrg04Ref,
   webPlyCvrgPer:plyCvrgPer,
+  webPlyTermCommonRef:PlyTermCommonRef,
   plyCvrgCross:plyCvrgCross,
   plyCvrgPlanCross:plyCvrgPlanCross,
   plyBaseRef: plybaseRef,
