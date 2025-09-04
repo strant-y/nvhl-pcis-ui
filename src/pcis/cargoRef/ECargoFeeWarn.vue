@@ -192,7 +192,7 @@ const method = {
     if(val && getValue('ECargoBase.nWhAmtRmbExch')){
       setValue('ECargoBase.nWhRmbAmt',val * getValue('ECargoBase.nWhAmtRmbExch'))
       if(getValue('ECargoBase.nRmbAmt')){
-         setValue('ECargoBase.nRecRemEstAmt',getValue('ECargoBase.nRmbAmt') - getValue('ECargoBase.nWhRmbAmt') )
+         setValue('ECargoBase.nRecRemEstAmt',getValue('ECargoBase.nRmbAmt') - (getValue('ECargoBase.nWhRmbAmt') || 0) )
       }
     }
   },
@@ -207,7 +207,7 @@ const method = {
             setValue('ECargoBase.nWhAmtRmbExch',res[0].currency_rate)
             setValue('ECargoBase.nWhRmbAmt',getValue('ECargoBase.nWhAmt') * res[0].currency_rate)
             if(getValue('ECargoBase.nRmbAmt')){
-              setValue('ECargoBase.nRecRemEstAmt',getValue('ECargoBase.nRmbAmt') - getValue('ECargoBase.nWhRmbAmt') )
+              setValue('ECargoBase.nRecRemEstAmt',getValue('ECargoBase.nRmbAmt') - (getValue('ECargoBase.nWhRmbAmt') || 0) )
             }
             if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') === '01'){
               setValue('ECargoBase.nWhAmtRmbExch',res[0].currency_rate)
@@ -218,7 +218,7 @@ const method = {
       setValue('ECargoBase.nWhAmtRmbExch',"1.000000")
       setValue('ECargoBase.nWhRmbAmt',getValue('ECargoBase.nWhAmt') * 1)
       if(getValue('ECargoBase.nRmbAmt')){
-        setValue('ECargoBase.nRecRemEstAmt',getValue('ECargoBase.nRmbAmt') - getValue('ECargoBase.nWhRmbAmt') )
+        setValue('ECargoBase.nRecRemEstAmt',getValue('ECargoBase.nRmbAmt') - (getValue('ECargoBase.nWhRmbAmt') || 0) )
       }
       if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') === '01'){
         setValue('ECargoBase.nWhAmtRmbExch','1.000000')
@@ -230,7 +230,7 @@ const method = {
     if(val && getValue('ECargoBase.nWhAmt')){
       setValue('ECargoBase.nWhRmbAmt',val * getValue('ECargoBase.nWhAmt'))
       if(getValue('ECargoBase.nRmbAmt')){
-        setValue('ECargoBase.nRecRemEstAmt',getValue('ECargoBase.nRmbAmt') - getValue('ECargoBase.nWhRmbAmt') )
+        setValue('ECargoBase.nRecRemEstAmt',getValue('ECargoBase.nRmbAmt') - (getValue('ECargoBase.nWhRmbAmt') || 0) )
       }
     }
   },

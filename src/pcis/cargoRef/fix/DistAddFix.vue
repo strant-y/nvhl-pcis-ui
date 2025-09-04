@@ -24,6 +24,7 @@ import cargoApi from "@/api/cargo";
 import {ElMessage} from "element-plus";
 import {ref} from "vue";
 import {useValidator} from "@/typings/useValidator";
+import dayjs from "dayjs";
 const { getRules } = useValidator();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 
@@ -115,6 +116,12 @@ onMounted(async  () => {
     }
     if(['ECargoGoodsTgt.nAdditiveRatio'].includes(item.prop)) {
       item["func"] = bonusRatio;
+    }
+    if(['ECargoInsuredDist.tCertfBgnDate'].includes(item.prop)) {
+      item["disabledDate"] = tCertfBgnDateDisable;
+    }
+    if(['ECargoInsuredDist.tCertfEndDate'].includes(item.prop)) {
+      item["disabledDate"] = tCertfEndDateDisable;
     }
     if(['ECargoGoodsTgt.cPrmCur'].includes(item.prop)) {
       item["typeCode"] = ''
@@ -447,6 +454,19 @@ const funCheckUser = (val:any)=>{
 
      setValue("ECargoInsuredDist.cNation", "1"); // 国籍
 
+     setFormItem("ECargoInsuredDist.tBirthday", {
+       disabled: true,
+     });
+     setFormItem("ECargoInsuredDist.nAge", {
+       disabled: true,
+     });
+     setFormItem("ECargoInsuredDist.cSex", {
+       disabled: true,
+     });
+     setFormItem("ECargoInsuredDist.cNation", {
+       disabled: true,
+     });
+
    } else if (val == "110002") {
      setFormItem("ECargoInsuredDist.tCertfEndDate", {
        rules: [getRules("required", {})],
@@ -456,7 +476,18 @@ const funCheckUser = (val:any)=>{
      setFormItem("ECargoInsuredDist.cParticiinsocTyp", {
        rules: [getRules("required", {})],
      });
-
+     setFormItem("ECargoInsuredDist.tBirthday", {
+       disabled: false,
+     });
+     setFormItem("ECargoInsuredDist.nAge", {
+       disabled: false,
+     });
+     setFormItem("ECargoInsuredDist.cSex", {
+       disabled: false,
+     });
+     setFormItem("ECargoInsuredDist.cNation", {
+       disabled: false,
+     });
    } else if ( val == "110007") {
      setFormItem("ECargoInsuredDist.tCertfBgnDate", {
        rules: [getRules("required", {})],
@@ -474,10 +505,40 @@ const funCheckUser = (val:any)=>{
      setFormItem("ECargoInsuredDist.tEstablishingDate", {
        rules: [getRules("required", {})],
      });
+     setFormItem("ECargoInsuredDist.cParticiinsocTyp", {
+       rules: [getRules("required", {})],
+     });
+     setFormItem("ECargoInsuredDist.tBirthday", {
+       disabled: false,
+     });
+     setFormItem("ECargoInsuredDist.nAge", {
+       disabled: false,
+     });
+     setFormItem("ECargoInsuredDist.cSex", {
+       disabled: false,
+     });
+     setFormItem("ECargoInsuredDist.cNation", {
+       disabled: false,
+     });
    } else if(val == "19"){
      // 外国人证件号
      setFormItem("ECargoInsuredDist.cCertfCde", {
        rules: [getRules("required", {}),getRules("ariCard", {})],
+     });
+     setFormItem("ECargoInsuredDist.cParticiinsocTyp", {
+       rules: [getRules("required", {})],
+     });
+     setFormItem("ECargoInsuredDist.tBirthday", {
+       disabled: false,
+     });
+     setFormItem("ECargoInsuredDist.nAge", {
+       disabled: false,
+     });
+     setFormItem("ECargoInsuredDist.cSex", {
+       disabled: false,
+     });
+     setFormItem("ECargoInsuredDist.cNation", {
+       disabled: false,
      });
    } else {
      setFormItem("ECargoInsuredDist.cCertfCde", {
@@ -488,6 +549,21 @@ const funCheckUser = (val:any)=>{
      // 参加社会统筹标志
      setFormItem("ECargoInsuredDist.cParticiinsocTyp", {
        rules: null,
+     });
+     setFormItem("ECargoInsuredDist.cParticiinsocTyp", {
+       rules: [getRules("required", {})],
+     });
+     setFormItem("ECargoInsuredDist.tBirthday", {
+       disabled: false,
+     });
+     setFormItem("ECargoInsuredDist.nAge", {
+       disabled: false,
+     });
+     setFormItem("ECargoInsuredDist.cSex", {
+       disabled: false,
+     });
+     setFormItem("ECargoInsuredDist.cNation", {
+       disabled: false,
      });
    }
 }
@@ -531,10 +607,25 @@ const cIsIndvduBizChange = (val:any)=>{
 }
  const cClntMrkFunc = (val:any)=>{
     if(val === '1'){
-      setFormItem('ECargoInsuredDist.tBirthday',{disabled:true})
-      setFormItem('ECargoInsuredDist.nAge',{disabled:true})
-      setFormItem('ECargoInsuredDist.cSex',{disabled:true})
-      setFormItem('ECargoInsuredDist.cNation',{disabled:true})
+      setFormItem("ECargoInsuredDist.tBirthday", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("ECargoInsuredDist.cSex", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("ECargoInsuredDist.cIsIndvduBiz", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("ECargoApplicant.cWorkDpt", {
+        rules: null,
+      });
+      setFormItem("ECargoInsuredDist.cCntrNme", {
+        rules: null,
+      });
+      // setFormItem('ECargoInsuredDist.tBirthday',{disabled:true})
+      // setFormItem('ECargoInsuredDist.nAge',{disabled:true})
+      // setFormItem('ECargoInsuredDist.cSex',{disabled:true})
+      // setFormItem('ECargoInsuredDist.cNation',{disabled:true})
       codeListStore
           .queryCodeList({
             codeListName: "NATURAL_CERTIFICATE_CACHE",
@@ -578,10 +669,25 @@ const cIsIndvduBizChange = (val:any)=>{
               rules: [getRules("required", {})],
             });
           });
-      setFormItem('ECargoInsuredDist.tBirthday',{disabled:false})
-      setFormItem('ECargoInsuredDist.nAge',{disabled:false})
-      setFormItem('ECargoInsuredDist.cSex',{disabled:false})
-      setFormItem('ECargoInsuredDist.cNation',{disabled:false})
+      setFormItem("ECargoInsuredDist.cIsIndvduBiz", {
+        rules:null,
+      });
+      setFormItem("ECargoApplicant.cWorkDpt", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("ECargoInsuredDist.cCntrNme", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("ECargoInsuredDist.tBirthday", {
+        rules: null,
+      });
+      setFormItem("ECargoInsuredDist.cSex", {
+        rules: null,
+      });
+      // setFormItem('ECargoInsuredDist.tBirthday',{disabled:false})
+      // setFormItem('ECargoInsuredDist.nAge',{disabled:false})
+      // setFormItem('ECargoInsuredDist.cSex',{disabled:false})
+      // setFormItem('ECargoInsuredDist.cNation',{disabled:false})
     }
   }
 //注册地市是否同上
@@ -660,7 +766,30 @@ const nTransportLimitchange = (val:any)=>{
     setValue('ECargoTransportDist.nRmbLimit',Number(goodsValueData * val))
   }
 }
+// 证件有效起期
+const tCertfBgnDateDisable= (date: any) => {
+  const fs = getFromValue();
+  if (fs && JSON.stringify(fs) !== '{}') {
 
+    const endDate = new Date(fs["ECargoInsuredDist.tCertfEndDate"] || '')   // 结束时间
+    let minDate = dayjs(endDate).valueOf();
+    return date.getTime() > minDate
+  } else {
+    return true;
+  }
+
+}
+    // 证件有效止期
+const tCertfEndDateDisable = (date: any) => {
+  const fs = getFromValue();
+  if (fs && JSON.stringify(fs) !== '{}') {
+    const startDate = new Date(fs["ECargoInsuredDist.tCertfBgnDate"] || '')   // 开始时间
+    let maxDate = dayjs(startDate).valueOf();
+    return date.getTime() < maxDate
+  } else {
+    return true;
+  }
+}
 const bonusRatio = (val:any)=>{
   const bonusRatioData =  getValue('ECargoGoodsTgt.nAdditiveRatio')
   const goodsValueData = getValue('ECargoGoodsTgt.nGoodsValue')

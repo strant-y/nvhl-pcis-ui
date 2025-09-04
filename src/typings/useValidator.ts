@@ -490,8 +490,8 @@ const leiCode = () => {
 // 道路运输经营许可证校验规则
 const roadTransportLicense = (options = {}) => {
   const { 
-    message = "请输入有效的道路运输经营许可证号",
-    lengthMessage = "许可证号长度应为1-100位" // 调整长度提示
+    message = "请输入有效的证件号",
+    lengthMessage = "证件号长度应为1-100位" // 调整长度提示
   } = options;
   
   return {

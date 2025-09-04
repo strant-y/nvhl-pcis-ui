@@ -60,7 +60,7 @@
       </div>
     </el-tooltip>
   </template>
-  <span v-else>
+  <span v-else style="width: 100%">
     {{ vInputShow() }}
   </span>
 </template>

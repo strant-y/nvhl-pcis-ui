@@ -1575,3 +1575,12 @@ export function checkoutn(queryParams: any): AxiosPromise<any> {
   return post(`/reinsured/checkoutn`, queryParams);
 }
 
+/**
+ * 申请核保校验清单必填
+ *
+ * @param queryParams
+ */
+export function checkDistForSubmit(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/checkDistForSubmit`, queryParams);
+}
+

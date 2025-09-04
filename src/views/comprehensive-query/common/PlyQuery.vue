@@ -28,17 +28,17 @@
       <template #column-InsurancePeriod="{ row, column, index }">
         <div class="policy-info-cell">
           <div v-if="row.tInsrncBgnTm" class="policy-period-row">
-            <span>{{ row.tInsrncBgnTm }}</span>
+            <span v-html="row.tInsrncBgnTm"></span>
           </div>
           <div v-if="row.tInsrncEndTm" class="policy-period-row">
-            <span>{{ row.tInsrncEndTm }}</span>
+            <span v-html="row.tInsrncEndTm"></span>
           </div>
         </div>
       </template>
       <template #column-cDptCnm="{ row, column, index }">
 <!--       默认只展示7个汉字，超出部分用...代替，鼠标放上去可展示全部 -->
         <el-tooltip :content="row.cDptCnm" placement="top">
-          <span class="ellipsis-text">{{ row.cDptCnm }}</span>
+          <span class="ellipsis-text" v-html="row.cDptCnm || ''"></span>
         </el-tooltip>
       </template>
 
@@ -51,9 +51,12 @@
         </span>
       </template>
 
-      <!-- ES查询 投保人姓名，被保人姓名，被保人地址，产品名称高亮 -->
+       <!-- ES查询 查询条件高亮 -->
       <template #column-cAppNme="{ row }">
         <span v-html="row.cAppNme || ''"></span>
+      </template>
+      <template #column-cEdrNo="{ row }">
+        <span v-html="row.cEdrNo || ''"></span>
       </template>
       <template #column-cInsuredNme="{ row }">
         <span v-html="row.cInsuredNme || ''"></span>
@@ -67,7 +70,24 @@
       <template #column-tUdrTm="{ row }">
         <span v-html="row.tUdrTm || ''"></span>
       </template>
-
+      <template #column-tIssueTm="{ row }">
+        <span v-html="row.tIssueTm || ''"></span>
+      </template>
+      <template #column-nEdrPrjNo="{ row }">
+        <span v-html="row.nEdrPrjNo || ''"></span>
+      </template>
+      <template #column-cProdNmeCn="{ row }">
+        <span v-html="row.cProdNmeCn || ''"></span>
+      </template>
+      <template #column-cTermNme="{ row }">
+        <span v-html="row.cTermNme || ''"></span>
+      </template>
+      <template #column-nAmt="{ row }">
+        <span v-html="row.nAmt || ''"></span>
+      </template>
+      <template #column-cUdrNme="{ row }">
+        <span v-html="row.cUdrNme || ''"></span>
+      </template>
     </app-table>
   </div>
 </template>
@@ -902,6 +922,7 @@ const tableCol = ref<Array<any>>([
     { title: "项目子类", prop: "m", inputtype: "rtinput", minWidth: 180 },
     { title: "询价单号", prop: "n", inputtype: "rtinput", minWidth: 180 },
 ]);
+
 // 定义两套列配置
 const esSearchColumns = [
    {
@@ -913,16 +934,18 @@ const esSearchColumns = [
     slotName: "policyInfo"
    },
    {
-    prop: "cPlyNo",
+    prop: "cEdrNo",
     inputtype: "rtinput",
     title: "批单",
     minWidth: 180,
+    slotName: "cEdrNo"
    },
    {
     prop: "nEdrPrjNo",
     inputtype: "rtinput",
     title: "批改序号",
     minWidth: 180,
+    slotName: "nEdrPrjNo"
    },
    {
     prop: "cNmeCn",
@@ -1021,7 +1044,7 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "申请单号",
         minWidth: 180,
-        isShow:false
+        isShow: false
     },
     {
         prop: "cPlyNo",
@@ -1034,7 +1057,7 @@ const normalQueryColumns = [
         prop: "cEdrNo",
         inputtype: "rtinput",
         title: "批单号",
-        minWidth: 180,
+        minWidth: 180
     },
     {
     prop: "nEdrPrjNo",

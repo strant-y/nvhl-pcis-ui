@@ -64,6 +64,12 @@ const defaultProps = {
   label: "name",
   isLeaf: "leaf",
 };
+const props = defineProps({
+  isXY: {
+    type: Boolean,
+    default: false,
+  }
+});
 const emits = defineEmits(["ok"]);
 const filterNode = (value: string, data: Tree) => {
   if (!value) return true;
@@ -105,43 +111,88 @@ const handleSearch = ()=>{
             ElMessage.warning('查询条件不得少于五个字符！');
             return;
       }
-      try {
-        // 调用搜索接口
-        const params = {
-         SCDptCnm: filterText.value.trim(),
-         CDptCde:"0200000000000"
-        };
+      if(props.isXY){
+        try {
+          // 调用搜索接口
+          const params = {
+            SCDptCnm: filterText.value.trim(),
+            CDptCde:"0200000000000",
+            signDptMrk:"1",
+            dptCls:"2"
+          };
 
-   
-       codeListStore
-      .queryCodeList(
-        {
-          codeListName: "CDptCde_List_base",
-          codeListParam: params ,
-        },
-      )
-      .then((res) => {
-       const searchResultNode = {
-              id: 'search',
-              name: `搜索结果（${res.length}个）`,
-              leaf: false,
-              children: res.map(item => ({
-                id: item.id,
-                name: item.name,
-                leaf: !item.hasChildren,
-                children: [],
-                expanded: true // 确保搜索结果节点展开
-              })),
-              expanded: true // 确保根节点展开
-            };
-            
-            _nodes.value = [searchResultNode];
-      });
-      } catch (error) {
-        ElMessage.error('搜索失败，请稍后再试');
-   
-      } finally {
+
+          codeListStore
+              .queryCodeList(
+                  {
+                    codeListName: "CDptCde_List_base",
+                    codeListParam: params ,
+                  },
+              )
+              .then((res) => {
+                const searchResultNode = {
+                  id: 'search',
+                  name: `搜索结果（${res.length}个）`,
+                  leaf: false,
+                  children: res.map(item => ({
+                    id: item.id,
+                    name: item.name,
+                    leaf: !item.hasChildren,
+                    children: [],
+                    expanded: true, // 确保搜索结果节点展开
+                    cSignDptMrk:'1'
+                  })),
+                  expanded: true,// 确保根节点展开
+                  cSignDptMrk:'1'
+                };
+
+                _nodes.value = [searchResultNode];
+              });
+        } catch (error) {
+          ElMessage.error('搜索失败，请稍后再试');
+
+        } finally {
+        }
+      }else {
+        try {
+          // 调用搜索接口
+          const params = {
+            SCDptCnm: filterText.value.trim(),
+            CDptCde:"0200000000000"
+          };
+
+
+          codeListStore
+              .queryCodeList(
+                  {
+                    codeListName: "CDptCde_List_base",
+                    codeListParam: params ,
+                  },
+              )
+              .then((res) => {
+                const searchResultNode = {
+                  id: 'search',
+                  name: `搜索结果（${res.length}个）`,
+                  leaf: false,
+                  children: res.map(item => ({
+                    id: item.id,
+                    name: item.name,
+                    leaf: !item.hasChildren,
+                    children: [],
+                    expanded: true // 确保搜索结果节点展开
+                  })),
+                  expanded: true // 确保根节点展开
+                };
+
+                _nodes.value = [searchResultNode];
+              });
+        } catch (error) {
+          ElMessage.error('搜索失败，请稍后再试');
+
+        } finally {
+        }
       }
+
  
 }
 

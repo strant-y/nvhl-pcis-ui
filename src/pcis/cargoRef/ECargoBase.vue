@@ -251,7 +251,7 @@ const method = {
   },
   getcDptCde:(val:any)=>{
     dzmodal
-        .open(DepartmentTree, { type: "Issuer", data: {} })
+        .open(DepartmentTree, { type: "Issuer", data: {} ,isXY:true})
         .then((res:any) => {
           if (res.body) {
             const selectObj = res.body;
@@ -302,6 +302,8 @@ const method = {
           setFormItem("ECargoBase.cBrkrCde", {...obj,disabled:0}); //代理(经纪)人
           setFormItem("ECargoBase.cBrkSlsCde", obj); //代理业务员
           setFormItem("ECargoBase.cAgtAgrNo", { rules: [getRules("required", {})] }); //代理合作协议
+          setFormItem("ECargoBase.cBrkrCde", { rules: [getRules("required", {})] }); //代理合作协议
+          setFormItem("ECargoBase.cBrkSlsCde", { rules: [getRules("required", {})] }); //代理业务员
         } else {
           const obj = {
             rules: [],
@@ -312,7 +314,8 @@ const method = {
           };
           setFormItem("ECargoBase.cBrkrCde", obj); //代理(经纪)人
           setFormItem("ECargoBase.cBrkSlsCde", obj); //代理业务员
-
+          setFormItem("ECargoBase.cBrkrCde", { rules: null }); //代理合作协议
+          setFormItem("ECargoBase.cBrkSlsCde", { rules: null }); //代理业务员
           setFormItem("ECargoBase.cAgtAgrNo", { rules: null }); //代理合作协议
           if (!formPage.init) {
             setValue("ECargoBase.cBrkrCde", "");
@@ -455,7 +458,7 @@ const method = {
       {
         type: "show",
         data: {
-          cDptCde: getValue("ECargoBase.cDptCde"),
+          CDptCde: getValue("ECargoBase.cDptCde"),
           cDptCnm: getValue("ECargoBase.cDptCnm"),
           cBsnsTyp: getValue("ECargoBase.cBsnsTyp"),
           cChaType: getValue("ECargoBase.cChaType"),
@@ -474,14 +477,14 @@ const method = {
             //   "ECargoBase.cBrkrDptcde": params.CDptCde, //代理业务员机构代码
             // });
 
-            // setFormItem("ECargoBase.cBrkSlsCde", {
-						// 	loadData: [
-						// 		{
-						// 			value:  params["CSlsCde"],
-						// 			label:params["CSlsCde"] + params['CSlsNme'],
-						// 		},
-						// 	],
-						// });
+            setFormItem("ECargoBase.cBrkSlsCde", {
+							loadData: [
+								{
+									value:  params["CSlsCde"],
+									label:params["CSlsCde"] + params['CSlsNme'],
+								},
+							],
+						});
           	setValue("ECargoBase.cBrkSlsCde", params.CSlsCde);
             dialog.value?.handleClose();
           },

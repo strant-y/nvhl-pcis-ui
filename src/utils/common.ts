@@ -51,7 +51,8 @@ export function descryptParameterToQuery(query: any): any {
   if(Object.keys(query).length === 0) return data;
   for (const key in query) {
     if (Object.prototype.hasOwnProperty.call(query, key)) {
-      if (!['encrypted'].includes(key) && query[key]) {
+      // 页签切换后路由参数会变成加密状态，所以添加或情况判断再次解密保证页面读取prop.param正常
+      if ((!['encrypted'].includes(key) && query[key]) || (key === 'encrypted' && query[key] && typeof query['param'] !== 'object')) {
         let keyData = query[key];
         if(!['componentKey'].includes(key) && typeof keyData === CommonConstants.TYPE_OF_STRING && keyData.length > 1) {
           keyData = descryptParameter(query[key]);
@@ -144,7 +145,7 @@ export function scrollByDomId(targetId: string, location: "center" | "end" | "ne
     if (targetElement) {
       targetElement.scrollIntoView({
         behavior: 'smooth',
-        block: location
+        block: location,
       });
     }
   }
@@ -192,4 +193,23 @@ export function checkIfTruncated(event: MouseEvent, value: any) {
       showTooltip(event, value);
     }
   }
+}
+
+
+// 将对象的属性首字母转换为小写
+export function lowercaseKeys<T extends object>(
+    obj: T
+): { [K in keyof T as Uncapitalize<string & K>]: T[K] } {
+  // 创建一个新的对象
+  const newObj = {} as { [K in keyof T as Uncapitalize<string & K>]: T[K] };
+  // 遍历原始对象的属性
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      // 将属性名的首字母转换为小写，并赋值
+      const newKey = (key.charAt(0).toLowerCase() +
+          key.slice(1)) as Uncapitalize<string & K>;
+      newObj[newKey] = obj[key];
+    }
+  }
+  return newObj;
 }

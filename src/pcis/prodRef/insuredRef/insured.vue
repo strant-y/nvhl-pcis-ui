@@ -449,12 +449,15 @@ const method = {
       setFormItem("Insured.tBirthday", {
         rules: null
       });
+      clearValidate('Insured.tBirthday')
       setFormItem("Insured.nAge", {
         rules: null
       });
+      clearValidate('Insured.nAge')
       setFormItem("Insured.cSex", {
         rules: null
       });
+      clearValidate('Insured.cSex')
       // setValue("Insured.cCertfCls", "");
       setFormItem("Insured.cCntrNme", { rules: [getRules("required", {})] });
       setFormItem("Insured.cCntrCertfCde", {
@@ -1032,10 +1035,13 @@ const method = {
 
     // 切换清空
     if (!isCoypBtn.value && val) {
-      setValue("Insured.tBirthday", null);
-      setValue("Insured.nAge", null);
-      // setValue("Insured.cSex", null);
-      setValue('Insured.cCertfCde', null);
+        const fieldsToClear = [ "Insured.tBirthday", "Insured.nAge", "Insured.cCertfCde" ];
+         fieldsToClear.forEach (field => {
+          setValue (field, null);
+            setTimeout (() => {
+            clearValidate (field);
+            }, 10);
+        });
     }
   },
   // 证件号码 change

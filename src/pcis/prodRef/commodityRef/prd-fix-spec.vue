@@ -158,7 +158,7 @@ function add() {
     addIndex: addTableData.length + 1, //序号
     cSpecialCode: "",
     cSpecialContent: "",
-    cIfEdit: "0", //是否可修改
+    cIfEdit: "1", //是否可修改
     cIfMust: "2", //是否必选
     cIfFix: "0", //是否固定特约，查寻特约模板接口查出来的1，自定义添加的为0
   });
@@ -167,6 +167,7 @@ function add() {
 //点击确定按钮时把选中的数据派发给父组件
 const returnData = () => {
   let selectedData = props.data.selectedData;
+
   let tempData = multipleTableRef.value.getSelectionRows();
   if(addTableData) {
     for (const item of addTableData) {
@@ -174,13 +175,26 @@ const returnData = () => {
     }
   }
 
-  const processedNewItems = tempData.map(item2 => {
-  const matchedItem1 = selectedData.find(item1 => 
-        item1.cIfEdit === '1' && item1.cSpecialCode === item2.cSpecialCode
-  );
-  return matchedItem1 ? matchedItem1 : item2;
-});
+//   const processedNewItems = tempData.map(item2 => {
+//       const matchedItem1 = selectedData.find(item1 => 
+//             item1.cIfEdit === '1' && item1.cSpecialCode === item2.cSpecialCode
+//       );
+//       return matchedItem1 ? matchedItem1 : item2;
+//     });
+// debugger
 
+const processedNewItems = tempData.map(item2 => {
+  const matchedItem1 = selectedData.find(item1 => {
+    if (item1.cIfEdit !== '1') return false;
+    const [code1, code2] = [item1.cSpecialCode, item2.cSpecialCode];
+    // 非空code优先匹配，否则用addIndex（排除空值匹配）
+    return code1 && code2 && code1 !== '' && code2 !== '' 
+      ? code1 === code2 
+      : item1.addIndex && item2.addIndex && item1.addIndex === item2.addIndex;
+  });
+  return matchedItem1 || item2;
+});
+ 
 const oldFenqiItem = selectedData.find(item => item.cSpecialCode === 'fenqi01');
 const result = oldFenqiItem 
   ? [...processedNewItems, oldFenqiItem]  // 包含fenqi01
