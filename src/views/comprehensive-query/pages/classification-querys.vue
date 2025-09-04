@@ -1325,6 +1325,65 @@ async function queryAE( flag?: boolean, isEs = false) {
             return;
         }
     }
+
+    if (
+        (s["cAppNo"] == null || s["cAppNo"] == "") &&
+        (s["cPlyNo"] == null || s["cPlyNo"] == "") &&
+        (s["cAppNme"] == null || s["cAppNme"] == "") && 
+        (s["cAppTyp"] == 'A')
+    ) {
+        const startTemp =
+            s.tAppTm && s.tAppTm.length > 1 ? s.tAppTm[0] : null;
+        if (null == startTemp || undefined === startTemp) {
+            ElMessage.warning("申请日期不能为空");
+            return;
+        }
+        const start = dayjs(startTemp);
+        const endTemp = s.tAppTm && s.tAppTm.length > 1 ? s.tAppTm[1] : null;
+        if (null == endTemp || undefined === endTemp) {
+            ElMessage.warning("申请日期不能为空");
+            return;
+        }
+        const end = dayjs(endTemp);
+        if (end.isBefore(start)) {
+            ElMessage.warning("申请日期起期不能大于申请日期止期");
+            return;
+        }
+        if (end.diff(start, "year", true) > 2) {
+            ElMessage.warning("申请日期时间范围请控制在两年内");
+            return;
+        }
+    }
+
+    if (
+        (s["cAppNo"] == null || s["cAppNo"] == "") &&
+        (s["cPlyNo"] == null || s["cPlyNo"] == "") &&
+        (s["cAppNme"] == null || s["cAppNme"] == "")&& 
+        (s["cAppTyp"] == 'E')
+    ) {
+        const startTemp =
+            s.tEdrAppTm && s.tEdrAppTm.length > 1 ? s.tEdrAppTm[0] : null;
+        if (null == startTemp || undefined === startTemp) {
+            ElMessage.warning("申请日期不能为空");
+            return;
+        }
+        const start = dayjs(startTemp);
+        const endTemp = s.tEdrAppTm && s.tEdrAppTm.length > 1 ? s.tEdrAppTm[1] : null;
+        if (null == endTemp || undefined === endTemp) {
+            ElMessage.warning("申请日期不能为空");
+            return;
+        }
+        const end = dayjs(endTemp);
+        if (end.isBefore(start)) {
+            ElMessage.warning("申请日期起期不能大于申请日期止期");
+            return;
+        }
+        if (end.diff(start, "year", true) > 2) {
+            ElMessage.warning("申请日期时间范围请控制在两年内");
+            return;
+        }
+    }
+
     // 提取投保日期的开始时间和结束时间
     const tAppTmStart = s.tAppTm && s.tAppTm.length > 1 ? s.tAppTm[0] : null;
     const tAppTmEnd = s.tAppTm && s.tAppTm.length > 1 ? s.tAppTm[1] : null;
