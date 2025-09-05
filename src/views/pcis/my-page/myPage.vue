@@ -3495,13 +3495,27 @@ const getEdrRsnItemFun = (
     CEdrType: cEdrType,
     CGrpMrk: cGrpMrk,
   };
+  const applicant = opertaor.getTableRefByKey("applicant").getFromValue();
+  const insured = opertaor.getTableRefByKey("insured").getFromValue();
   getEdrRsnItem(res).then((res: any) => {
     if (res["code"] == "200") {
       const result = res["data"]["result"];
       const edrList: any[] = [];
       result.forEach((key: any) => {
         if (key["cOperTyp"] === "M") {
-          edrList.push(key["cEdrItem"]);
+          if(key['cEdrItem'] === 'Applicant.tCertfEndDate') {
+          // 投保人证件有效期长期标识选中的话，证件有效期止期不可编辑
+            if(applicant?.['Applicant.cLongendTyp'] !== '1') {
+              edrList.push(key["cEdrItem"]);
+            }
+          } else if(key['cEdrItem'] === 'Insured.tCertfEndDate') {
+          // 投被人证件有效期长期标识选中的话，证件有效期止期不可编辑
+            if(insured?.['Insured.cLongendTyp'] !== '1') {
+              edrList.push(key["cEdrItem"]);
+            }
+          } else {
+            edrList.push(key["cEdrItem"]);
+          }
         } else if (key["cOperTyp"] === "B") {
           edrList.push("Btn_" + key["cEdrItem"]);
         }
