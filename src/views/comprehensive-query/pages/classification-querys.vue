@@ -1021,7 +1021,7 @@ const tableObj = {
                     if (r) {
                         const data = row;
                         router.push({
-                            path: "/pcis/my-page",
+                            path: "/pcisapp/myPage",
                             query: {
                                 param: JSON.stringify({ ...data, ...{ pageType: "readonly" } }),
                             },
@@ -1055,7 +1055,7 @@ const tableObj = {
                     if (r) {
                         const data = row;
                         router.push({
-                            path: "/pcis/my-page",
+                            path: "/pcisapp/myPage",
                             query: {
                                 param: JSON.stringify({
                                     ...data,
@@ -1092,7 +1092,7 @@ const tableObj = {
                         row.cPolicySource = '8'
                         const data = row;
                         router.push({
-                            path: "/pcis/my-page",
+                            path: "/pcisapp/myPage",
                             query: {
                                 param: JSON.stringify({ ...data, ...{ pageType: "copy", cAppTyp: 'A' } }),
                             },
