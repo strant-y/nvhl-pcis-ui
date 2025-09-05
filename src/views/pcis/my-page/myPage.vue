@@ -584,6 +584,7 @@ const historyClaRef = ref(null);
 const sliceSide = ref([]);
 const bottomBtnColor1 = "#3498DB";
 const parseData = ref({})
+const edrBaseDatas = ref({})
 
 const props:any = defineProps({
   param: {
@@ -1080,10 +1081,13 @@ const edrBtn = [
     type: "primary",
     id: "btnCalEdr",
     func: () => {
+      debugger
       // calcPremiumEdr();
       // 批改原因是否是费率变更
       if(props.param.cRsnCde === '45') {
         queryTermRateLimitFun(calcPremiumEdr)
+      }else if(props.param.cRsnCde === '99'){
+        queryTermRateLimitFun(calcPremium)
       } else {
         calcPremiumEdr();
       }
@@ -1229,6 +1233,10 @@ const initPage = async () => {
   ) {
     //退保不显示产品组件信息
     acctinfoFlag.value = false;
+  }
+  if(props.param.cRsnCde === '99'){
+    edrbaseFlag.value = false
+    edritemFlag.value = false;
   }
   // 页面初始化
   const formconfig11 = JSON.parse(getProductRes.data);
@@ -2484,7 +2492,8 @@ const loadAppPlyInfo = async (CAppNo) => {
               "EdrBase.cEdrRsnDetail"
             ].split(",");
         }
-        console.log("EdrBaseData", EdrBaseData);
+        edrBaseDatas.value =  EdrBaseData
+        console.log("edrBaseDatas",edrBaseDatas.value)
         if ("EDR_APP_NEW_SCENE" === props.param.pageType) {
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"] = "2";
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrType"] =
@@ -2575,6 +2584,8 @@ const loadAppPlyInfo = async (CAppNo) => {
             ].split(",");
         }
         console.log("EdrBaseData", EdrBaseData);
+        edrBaseDatas.value = EdrBaseData
+        console.log("edrBaseDatas",edrBaseDatas.value)
         if ("EDR_APP_NEW_SCENE" === props.param.pageType) {
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"] = "2";
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrType"] =
@@ -2674,8 +2685,12 @@ function baseValite(){
  * 投保保费计算
  */
 const calcPremium = () => {
-  const btn = getBtn("btn010101");
-  btn.loading = true;
+  if(props.param.cRsnCde !== '99'){
+    const btn = getBtn("btn010101");
+    btn.loading = true;
+  }else{
+
+  }
   const res = opertaor.getDataAll();
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
@@ -2713,7 +2728,9 @@ const calcPremium = () => {
   }
   const appCalcFun = props.param?.pageName === "priceInquiry" ? calculatePremium(res) : appCalc(res);
   appCalcFun.then((res: any) => {
-    btn.loading = false;
+    if(props.param.cRsnCde !== '99'){
+       btn.loading = false;
+    }
     console.log("appCalc-res", res);
     if (res["code"] == "200") {
       const ops: any = opertaor.convertData(res);
@@ -4027,6 +4044,10 @@ const submitEdrToUndrSurrender = async () => {
 const saveEdrState = ref(false);
 const saveEdrPlyInfo = async () => {
   let saveEdrFlag = false;
+  const btn = getBtn("saveEdr");
+  if (btn) {
+    btn.loading = true;
+  }
   if(props.param.cTransMrk === '1'){
     const res = opertaor.getDataAll();
     const resParam = Object.assign(res,{'cTransMrk':'1'})
@@ -4054,12 +4075,14 @@ const saveEdrPlyInfo = async () => {
     //   })
     // }
     const edrInfo: any = await saveEdrAppPlyInfo(resParam)
-    // const btn = getBtn("saveEdr");
-    // btn.loading = false;
+    
     if(edrInfo["code"] == "200") {
       const ops = opertaor.convertData(edrInfo);
       console.log("转换的数据", ops);
       ElMessage.success(edrInfo.msg);
+      if (btn) {
+        btn.loading = false;
+      }
       // if(ops['ci'] && ops['ci'].length>0){
       //   ops['ci'].forEach((item:any)=>{
       //     if(item['Ci.nCiShare']){
@@ -4112,6 +4135,7 @@ const saveEdrPlyInfo = async () => {
       ElMessage.error(edrInfo.msg);
     }
   }else{
+    debugger
     const btn = getBtn("saveEdr");
     btn.loading = true;
     const res = opertaor.getDataAll();
@@ -4119,15 +4143,22 @@ const saveEdrPlyInfo = async () => {
     res["user"] = user;
     res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
     res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
-    res["EdrBase"] = edrbase.value?.getFromValue();
-    if (
-      res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
-      res["EdrBase"]["EdrBase.cEdrRsnDetail"] != "" &&
-      Array.isArray(res["EdrBase"]["EdrBase.cEdrRsnDetail"])
-    ) {
-      res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
-        res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+    if(props.param.cRsnCde === '99'){
+      if (!res.EdrBase) {
+        res.EdrBase = [];
+      }
+      res.EdrBase.push(edrBaseDatas._value);
+    }else{
+      if (
+        res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
+        res["EdrBase"]["EdrBase.cEdrRsnDetail"] != "" &&
+        Array.isArray(res["EdrBase"]["EdrBase.cEdrRsnDetail"])
+      ) {
+        res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
+          res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+      }
     }
+    
     // if(res['ci'] && res['ci'].length>0){
     //   res['ci'].forEach((item:any)=>{
     //     if(item['Ci.nCiShare']){
