@@ -442,7 +442,7 @@ onMounted(() => {
   initCDptCde();
 });
 
-const confirm = () => {
+const confirm = async () => {
   if (!displayData.value) {
     ElMessage.warning("请选择一条记录");
     return;
@@ -454,6 +454,18 @@ const confirm = () => {
     if (selectedCiMrk.value !== props.data['plyBase']["Base.cCiMrk"]) {
       ElMessage.error("源保单和新单的共保方式不同, 不允许复制");
       return;
+    }
+    // 点击下一步前校验，如果data为true则继续，否则阻断并提示
+    const queryProdDptCdeParam:any = { cDptCde:  user.value.companyId }
+    if(selected.value[0].cRenewMrk === "1") {
+        queryProdDptCdeParam['cPlyNo'] = selected.value[0].cPlyNo
+    } else {
+        queryProdDptCdeParam['cProdNo'] = selected.value[0].cProdNo
+    }
+    const queryProdDptCde:any = await policyService.queryProdDptCde(queryProdDptCdeParam)
+    if(queryProdDptCde.data !== true) {
+        ElMessage.error(queryProdDptCde.msg)
+        return
     }
     dialogVisible.value = false;
     //关闭模态框并传递数据
