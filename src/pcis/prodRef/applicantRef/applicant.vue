@@ -394,24 +394,14 @@ const method = {
   cardTypeChange: (val: any) => {
     const param = opertaor.getParam();
     const isInit = param.initFlag; // 是否是初始化状态
-
-
-    if (isInit) {
-      if (val === "120001") {
-        setFormItem("Applicant.tCertfBgnDate", {
-          rules: [getRules("required", {})],
-        });
-        setFormItem("Applicant.tCertfEndDate", {
-          rules: [getRules("required", {})],
-        });
-      }
-      return; 
-    }
-
-    const personFields = ['cNation', 'tBirthday', 'nAge', 'cSex'];
+    console.log(33322,val,isInit)
+        const personFields = ['cNation', 'tBirthday', 'nAge', 'cSex'];
     personFields.forEach(field => {
       setFormItem(`Applicant.${field}`, { disabled: false });
     });
+
+
+
 
     checkUser();   // 调用客户信息接口
     clearValidate('Applicant.cCertfCde')  // 清除报错信息
@@ -470,6 +460,16 @@ const method = {
       });
     }
 
+    
+    if (isInit) return; 
+      // if (val === "120001") {
+      //   setFormItem("Applicant.tCertfBgnDate", {
+      //     rules: [getRules("required", {})],
+      //   });
+      //   setFormItem("Applicant.tCertfEndDate", {
+      //     rules: [getRules("required", {})],
+      //   });
+      // }
     // 切换清空
     if (val) {
       const fieldsToClear = ["Applicant.tBirthday", "Applicant.nAge", "Applicant.cCertfCde"];

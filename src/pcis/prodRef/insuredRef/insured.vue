@@ -957,17 +957,17 @@ const method = {
     const param = opertaor.getParam();
     const isInit = param.initFlag; // 是否是初始化状态
 
-    if (isInit) {
-      if (val === "120001") {
-        setFormItem("Insured.tCertfBgnDate", {
-          rules: [getRules("required", {})],
-        });
-        setFormItem("Insured.tCertfEndDate", {
-          rules: [getRules("required", {})],
-        });
-      }
-      return;
-    }
+    // if (isInit) {
+    //   if (val === "120001") {
+    //     setFormItem("Insured.tCertfBgnDate", {
+    //       rules: [getRules("required", {})],
+    //     });
+    //     setFormItem("Insured.tCertfEndDate", {
+    //       rules: [getRules("required", {})],
+    //     });
+    //   }
+    //   return;
+    // }
 
 
 
@@ -1047,6 +1047,8 @@ const method = {
       });
     }
 
+    // 回显不执行下方操作
+     if (isInit) return; 
 
     // 切换清空
     if (!isCoypBtn.value && val) {
@@ -1061,28 +1063,30 @@ const method = {
   },
   // 证件号码 change
   cCertfCdeChange: (val: any) => {
-    const param = opertaor.getParam();
-    if (param.initFlag) {
-      return;
-    }
-    checkUser();
-    const tabref = opertaor.getTableRefs();
-
-    const cCertfCls = tabref["insured"].getFromValue()["Insured.cCertfCls"];
-
-    if (cCertfCls == "120001") {
-      if (val) {
-        const certfCde = tabref["insured"].getFromValue()["Insured.cCertfCde"];
-        insuredEditRef.value?.validateField('Insured.cCertfCde').then((isValid) => {
-          if (isValid) {
-            idAnalysis(val)
-          }
-        })
-      }
-    } else if (cCertfCls == '110007') {
-      setValue('Insured.cTaxRegistrationNo', val)
-      setValue('Insured.cOrganizationCode', val)
-    }
+      setTimeout(()=>{
+            
+            const param = opertaor.getParam();
+            if (param.initFlag) {
+              return;
+            }
+            checkUser();
+            const tabref = opertaor.getTableRefs();
+            const cCertfCls = tabref["insured"].getFromValue()["Insured.cCertfCls"];
+            if (cCertfCls == "120001") {
+              if (val) {
+                const certfCde = tabref["insured"].getFromValue()["Insured.cCertfCde"];
+                insuredEditRef.value?.validateField('Insured.cCertfCde').then((isValid) => {
+                  if (isValid) {
+                    idAnalysis(val)
+                  }
+                })
+              }
+            } else if (cCertfCls == '110007') {
+              setValue('Insured.cTaxRegistrationNo', val)
+              setValue('Insured.cOrganizationCode', val)
+            }
+        
+        },10)
   },
   emailChange: (val) => {
     if (val) {
