@@ -1,0 +1,844 @@
+<template>
+  <div class="app-container">
+    <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
+    <app-table
+      :tableConfig="tableconfig"
+      v-model:pageresult="pageresult"
+      ref="tableRef"
+      @selection-change="handleSelectionChange"
+      @page-change="handleQuery(false)"
+    >
+      <template #column-cInquiryNo="{ row, column, index }">
+        <div v-if="row.baseType === '询价'">
+          <div class="policy-number-row">
+            <span v-html="row.cAppNo"></span>
+            <el-icon
+              class="copy-icon"
+              @click="copyText(row.cAppNo)"
+              v-if="row.cAppNo"
+            >
+              <DocumentCopy />
+            </el-icon>
+          </div>
+          <div class="policy-number-row">
+            <span v-html="row.cInquiryNo" class="primmaryColor"></span>
+            <el-icon class="copy-icon" @click="copyText(row.cInquiryNo)">
+              <DocumentCopy />
+            </el-icon>
+          </div>
+        </div>
+      </template>
+      <template #column-cPlyNo="{ row, column, index }">
+        <div v-if="row.baseType === '投保'">
+          <div class="policy-number-row">
+            <span v-html="row.cAppNo"></span>
+            <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
+              <DocumentCopy />
+            </el-icon>
+          </div>
+          <div class="policy-number-row">
+            <span v-html="row.cPlyNo" class="primmaryColor"></span>
+            <el-icon
+              class="copy-icon"
+              @click="copyText(row.cPlyNo)"
+              v-if="row.cPlyNo"
+            >
+              <DocumentCopy />
+            </el-icon>
+          </div>
+        </div>
+      </template>
+      <template #column-cEdrNo="{ row, column, index }">
+        <div v-if="row.baseType === '批改'">
+          <div class="policy-number-row">
+            <span v-html="row.cAppNo"></span>
+            <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
+              <DocumentCopy />
+            </el-icon>
+          </div>
+          <div class="policy-number-row">
+            <span v-html="row.cEdrNo" class="primmaryColor"></span>
+            <el-icon
+              class="copy-icon"
+              @click="copyText(row.cEdrNo)"
+              v-if="row.cEdrNo"
+            >
+              <DocumentCopy />
+            </el-icon>
+          </div>
+        </div>
+      </template>
+    </app-table>
+  </div>
+</template>
+
+<script setup lang="ts">
+import {
+  AppFreeEditConfig,
+  AppFreeEditMethod,
+  createAppFreeEditConfig,
+} from "@/shared/app-free-edit-config";
+import {
+  AppTableConfig,
+  AppTableMethod,
+  createTableEditConfig,
+} from "@/shared/app-table-config";
+import { createFreeButtonBase } from "@/shared/button-config";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
+import { useValidator } from "@/typings/useValidator";
+import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
+import { getProdEnableList } from "@/api/prod";
+import dayjs from "dayjs";
+import { selectTask } from "./service";
+import { useRouter, useRoute } from "vue-router";
+const router = useRouter();
+import { delTmpPolicy, delInquiryPolicy } from "@/api/query";
+import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
+import { min } from "lodash";
+const { withdraw } = NewUdrListService();
+import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
+const policyService = new PolicyService();
+
+const freeEditRef = ref<AppFreeEditMethod | null>(null);
+const tableRef = ref<AppTableMethod | null>(null);
+const dzmodal = useDzModal();
+const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+const { getRules } = useValidator();
+
+const kindData: any = computed(() => {
+  return prodTotalDatas.value.map((item: any) => ({
+    label: item.code + " " + item.value,
+    value: item.code,
+    list: item.list,
+  }));
+});
+const cProdData = ref([]);
+const taskStatusOptions = [
+  { label: "暂存", value: "1" },
+  { label: "已提核", value: "2" },
+  { label: "核保退回/撤回", value: "3" },
+  { label: "已核待缴费", value: "4" },
+  { label: "已出单", value: "5" },
+  // { label: "已做失效操作", value: "6" },
+  // { label: "已提交未接收", value: "7" },
+  { label: "见费出单退回", value: "8" },
+];
+const formconfig1 = reactive<AppFreeEditConfig>(
+  createAppFreeEditConfig({
+    title: "出单任务处理",
+    endBtnsPosition: "right",
+    endBtns: [
+      createFreeButtonBase({
+        type: "primary",
+        label: "查询",
+        func: async () => {
+          freeEditRef.value?.validate().then((isValid: boolean) => {
+            if (isValid) {
+              handleQuery();
+            } else {
+              ElMessage.error("请填写必填项");
+            }
+          });
+        },
+      }),
+      createFreeButtonBase({
+        label: "重置",
+        icon: "RefreshRight",
+        func: () => {
+          freeEditRef.value?.setFormValue({
+            cClntMrk: "",
+            cAppNme: "",
+            cCertfCls: "",
+            cCertfCde: "",
+          });
+          handleQuery();
+        },
+      }),
+    ],
+    fromSchema: [
+      {
+        prop: "cDptCde",
+        inputtype: "rtselect",
+        title: "机构部门",
+        btnWidth: 10,
+        itemWidth: 2,
+        showExBtn: true,
+        rules: [getRules("required", {})],
+        btnItems: {
+          icon: "Search",
+          type: "primary",
+          func: () => {
+            dzmodal
+              .open(DepartmentTree, { type: "Issuer", data: {} })
+              .then((res: any) => {
+                if (res.body) {
+                  const selectObj = res.body;
+                  let obj = {
+                    loadData: [
+                      {
+                        label: selectObj.name,
+                        value: selectObj.id,
+                      },
+                    ],
+                  };
+                  console.log(freeEditRef.value);
+                  freeEditRef.value?.setValue("cDptCde", selectObj.id);
+                  setFormItem("cDptCde", {
+                    loadData: [
+                      {
+                        label: `${selectObj.id}${selectObj.name}`,
+                        value: selectObj.id,
+                      },
+                    ],
+                  });
+                }
+              });
+          },
+        },
+      },
+      {
+        prop: "cLoadSub",
+        inputtype: "rtradio",
+        title: "包含下级机构",
+        loadData: [
+          { label: "是", value: 1 },
+          { label: "否", value: 0 },
+        ],
+        defaultValue: 1,
+      },
+      {
+        prop: "baseType",
+        inputtype: "rtselect",
+        title: "任务类型",
+        clearable: true,
+        multiple: true,
+        loadData: [
+          { label: "询价", value: "询价" },
+          { label: "投保", value: "投保" },
+          { label: "批改", value: "批改" },
+        ],
+      },
+      {
+        prop: "taskStatus",
+        inputtype: "rtselect",
+        title: "任务状态",
+        clearable: true,
+        loadData: taskStatusOptions,
+      },
+      {
+        prop: "cKindNo",
+        inputtype: "rtselect",
+        title: "产品大类",
+        itemWidth: 1,
+        filterable: true,
+        clearable: true,
+        multiple: true,
+        loadData: kindData,
+        func: (val: any) => {
+          if (val && val.length > 0) {
+            let options: any = [];
+            kindData.value.forEach((item: any) => {
+              if (val.includes(item.value)) {
+                const list = item.list.map((item: any) => ({
+                  label: item.code + " " + item.value,
+                  value: item.code,
+                  list: item.list,
+                }));
+                options = options.concat(list);
+              }
+            });
+            cProdData.value = options;
+            setFormItem("cProdNo", { loadData: options });
+          } else {
+            setFormItem("cProdNo", { loadData: [] });
+          }
+        },
+      },
+      {
+        prop: "cProdNo",
+        inputtype: "rtselect",
+        title: "产品名称",
+        itemWidth: 1,
+        filterable: true,
+        clearable: true,
+        multiple: true,
+        func: (val: any) => {
+          if (val && val.length > 0) {
+            let options: any = [];
+            cProdData.value.forEach((item: any) => {
+              if (val.includes(item.value)) {
+                const list = item.list.map((item: any) => ({
+                  label: item.code + " " + item.value,
+                  value: item.code,
+                  list: item.list,
+                }));
+                options = options.concat(list);
+              }
+            });
+            setFormItem("cTermNo", { loadData: options });
+          } else {
+            setFormItem("cTermNo", { loadData: [] });
+          }
+        },
+      },
+      {
+        prop: "cTermNo",
+        inputtype: "rtselect",
+        title: "条款",
+        itemWidth: 1,
+        filterable: true,
+        clearable: true,
+        multiple: true,
+      },
+      {
+        prop: "cAppNo",
+        inputtype: "rtinput",
+        title: "询价/投保/批改申请单号",
+        clearable: true,
+      },
+      {
+        prop: "cPlyNo",
+        inputtype: "rtinput",
+        title: "询价单号/保单号/批单号",
+        clearable: true,
+      },
+      {
+        prop: "cAppNme",
+        inputtype: "rtinput",
+        title: "投保人名称",
+        clearable: true,
+      },
+      {
+        prop: "cInsuredNme",
+        inputtype: "rtinput",
+        title: "被保人名称",
+        clearable: true,
+      },
+      {
+        prop: "tAppTm",
+        inputtype: "rtdatepicker",
+        title: "申请日期",
+        format: "YYYY-MM-DD HH:mm:ss",
+        valueFormat: "YYYY-MM-DD HH:mm:ss",
+        clearable: true,
+        type: "datetimerange",
+      },
+      {
+        prop: "tIssueTm",
+        inputtype: "rtdatepicker",
+        title: "签单日期",
+        format: "YYYY-MM-DD HH:mm:ss",
+        valueFormat: "YYYY-MM-DD HH:mm:ss",
+        clearable: true,
+        type: "datetimerange",
+      },
+    ],
+  })
+);
+const tableconfig = reactive<AppTableConfig>(
+  createTableEditConfig({
+    editList: ["cStatus"],
+    tableBtnType: "btn",
+    tableBtnWidth: 220,
+    tableBtnPosition: "right",
+    fixed: true,
+    tableBtn: [
+      createFreeButtonBase({
+        id: "score",
+        link: true,
+        tooltip: "编辑",
+        type: "success",
+        size: "large",
+        icon: "Edit",
+        hideBtns: (row: any) => {
+          if (
+            row.taskStatus == "1" ||
+            row.taskStatus == "3" ||
+            row.taskStatus == "8"
+          ) {
+            return false;
+          } else {
+            return true;
+          }
+        },
+        tableClick: async (row) => {
+          if (row.baseType === "询价") {
+            const data = row;
+            router.push({
+              path: "/pcisapp/pricePage",
+              query: {
+                param: JSON.stringify({
+                  ...data,
+                  ...{
+                    pageType: "TEMPORARY_DEPOSIT",
+                    pageName: "priceInquiry",
+                  },
+                }),
+              },
+            });
+          } else {
+            const data = row;
+            if (row["cEdrRsnBundleCde"]) {
+              data.cRsnCde = row["cEdrRsnBundleCde"];
+            }
+            router.push({
+              path: "/pcisapp/myPage",
+              query: {
+                param: JSON.stringify({
+                  ...data,
+                  ...{ pageType: "TEMPORARY_DEPOSIT" },
+                }),
+              },
+            });
+          }
+        },
+      }),
+      createFreeButtonBase({
+        id: "score",
+        link: true,
+        tooltip: "删除",
+        type: "danger",
+        size: "large",
+        icon: "Delete",
+        hideBtns: (row: any) => {
+          if (row.taskStatus == "1") {
+            return false;
+          } else {
+            return true;
+          }
+        },
+        tableClick: (row) => {
+          ElMessageBox.confirm("确认删除数据?", "警告", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+          }).then(async function () {
+            // 删除时除了暂存单，其他要调险位删除接口，如果返回失败要阻断
+            if (row.cAppStatus !== "1") {
+              const param = {
+                cDocTyp: row.cAppTyp, // 单证类型 A 保单 E 批单
+                cAppNo: row.cAppNo, // 申请单号
+                cPlyNo: row.plyNo, // 保单号
+                nEdrPrjNo: row.nEdrPrjNo, // 批改序号
+              };
+              const delRisk =
+                row.baseType === "询价"
+                  ? await policyService.delRiskXJ(param)
+                  : await policyService.delRisk(param);
+              if (delRisk && delRisk.code !== 200) {
+                ElMessage.error(delRisk.msg);
+                return;
+              }
+            }
+            const delResult =
+              row.baseType === "询价"
+                ? delInquiryPolicy({ cInquiryNo: row.cInquiryNo })
+                : delTmpPolicy({ cAppNo: row.cAppNo });
+            delResult.then((res: any) => {
+              if (null != res && null != res["code"]) {
+                if (res["code"] === 200) {
+                  ElMessage.success({ message: res.msg, duration: 3000 });
+                  handleQuery();
+                } else {
+                  ElMessage.error({ message: res.msg, duration: 3000 });
+                }
+              }
+            });
+          });
+        },
+      }),
+      createFreeButtonBase({
+        id: "score",
+        link: true,
+        tooltip: "撤回",
+        type: "danger",
+        size: "large",
+        icon: "return",
+        hideBtns: (row: any) => {
+          if (row.taskStatus == "2") {
+            return false;
+          } else {
+            return true;
+          }
+        },
+        tableClick: (row) => {
+          const { cAppNo, curtTask } = row;
+          const param = {
+            taskId: curtTask,
+            appNo: cAppNo,
+            user: user,
+          };
+          withdraw(param)
+            .then((result: any) => {
+              if (result.code !== 200) {
+                ElMessage.error({ message: result.msg, duration: 3000 });
+              } else {
+                if (result.msg === "撤回成功!") {
+                  ElMessage.success({ message: result.msg, duration: 6000 });
+                } else {
+                  ElMessage.warning({ message: result.msg, duration: 6000 });
+                }
+                handleQuery();
+              }
+            })
+            .catch((error: any) => {
+              ElMessage.error({ message: error.msg, duration: 3000 });
+            });
+        },
+      }),
+      createFreeButtonBase({
+        id: "score",
+        link: true,
+        tooltip: "询价转投保",
+        type: "primary",
+        size: "large",
+        icon: "Right",
+        hideBtns: (row: any) => {
+          // 询价转投保按钮只在状态为"已出保单"时可见
+          if (
+            row.taskStatus == "5" &&
+            row.canConvert === "1" &&
+            row.baseType === "询价"
+          ) {
+            return false;
+          } else {
+            return true;
+          }
+        },
+        tableClick: (row) => {
+          row.cPolicySource = "6";
+          router.push({
+            path: "/pcisapp/myPage",
+            query: {
+              param: JSON.stringify({
+                ...row,
+                ...{ pageType: "inquiryToApp" },
+              }),
+            },
+          });
+        },
+      }),
+      createFreeButtonBase({
+        id: "score",
+        link: true,
+        tooltip: "查看",
+        type: "danger",
+        size: "large",
+        icon: "View",
+        hideBtns: (row: any) => {
+          if (row.taskStatus === "4" || row.taskStatus === "5") {
+            return false;
+          } else {
+            return true;
+          }
+        },
+        tableClick: async (row) => {
+          const r = await row;
+          if (r) {
+            const data = row;
+            router.push({
+              path: "/pcisapp/pcisappView",
+              query: {
+                param:
+                  row.baseType === "询价"
+                    ? JSON.stringify({
+                        ...data,
+                        ...{ pageType: "readonly", pageName: "priceInquiry" },
+                      })
+                    : JSON.stringify({ ...data, ...{ pageType: "readonly" } }),
+              },
+            });
+          } else {
+            ElMessage.warning("请检查表单！");
+          }
+        },
+      }),
+      createFreeButtonBase({
+        id: "copy",
+        link: true,
+        iconColor: "#02D05F",
+        tooltip: "复制",
+        size: "large",
+        icon: "DocumentCopy",
+        hideBtns: (row: any) => {
+          if (row.baseType !== "询价") {
+            return false;
+          } else {
+            return true;
+          }
+        },
+        tableClick: async (row) => {
+          const r = await row;
+          if (r) {
+            // 校验出单机构是否复合复制单的机构要求
+            const queryProdDptCdeParam: any = { cDptCde: user.value.companyId };
+            if (row.cRenewMrk === "1") {
+              queryProdDptCdeParam["cPlyNo"] = row.cPlyNo;
+            } else {
+              queryProdDptCdeParam["cProdNo"] = row.cProdNo;
+            }
+            const queryProdDptCde: any =
+              await policyService.queryProdDptCde(queryProdDptCdeParam);
+            if (queryProdDptCde.data !== true) {
+              ElMessage.error(queryProdDptCde.msg);
+              return;
+            }
+            row.cPolicySource = "8";
+            const data = row;
+            router.push({
+              path: "/pcisapp/myPage",
+              query: {
+                param: JSON.stringify({
+                  ...data,
+                  ...{ pageType: "copy", cAppTyp: "A" },
+                }),
+              },
+            });
+          }
+        },
+      }),
+    ],
+    fromSchema: [
+      {
+        prop: "baseType",
+        inputtype: "rtinput",
+        title: "任务类型",
+      },
+      {
+        prop: "cInquiryNo",
+        inputtype: "rtinput",
+        title: "申请单号/询价单号",
+        slotName: "cInquiryNo",
+        minWidth: 230,
+      },
+      {
+        prop: "cPlyNo",
+        inputtype: "rtinput",
+        title: "申请单号/保单号",
+        slotName: "cPlyNo",
+        minWidth: 230,
+      },
+      {
+        prop: "cEdrNo",
+        inputtype: "rtselect",
+        title: "批改申请单号/批单号",
+        slotName: "cEdrNo",
+        minWidth: 230,
+      },
+      {
+        prop: "cRsnCdeText",
+        inputtype: "rtinput",
+        title: "批改原因",
+      },
+      {
+        prop: "cTermNme",
+        inputtype: "rtinput",
+        title: "条款名称",
+      },
+      {
+        prop: "tAppTm",
+        inputtype: "rtinput",
+        title: "申请日期",
+      },
+      {
+        prop: "cAppNme",
+        inputtype: "rtinput",
+        title: "投保人名称",
+      },
+      {
+        prop: "cInsuredNme",
+        inputtype: "rtinput",
+        title: "被保人名称",
+      },
+      {
+        prop: "tInsrncBgnTm",
+        inputtype: "rtinput",
+        title: "保险期间",
+        minWidth: 305,
+        formatter: (val: any, row: any) => {
+          return val + " - " + row.tInsrncEndTm;
+        },
+      },
+      {
+        prop: "nPrm",
+        inputtype: "rtinput",
+        title: "保费",
+      },
+      {
+        prop: "nPrmVar",
+        inputtype: "rtinput",
+        title: "保费变化量",
+      },
+      {
+        prop: "CZipCde",
+        inputtype: "rtinput",
+        title: "核保日期",
+      },
+      {
+        prop: "CZipCde",
+        inputtype: "rtinput",
+        title: "核保人",
+      },
+      {
+        prop: "taskStatus",
+        inputtype: "rtselect",
+        title: "任务状态",
+        loadData: taskStatusOptions,
+      },
+    ],
+  })
+);
+
+const pageresult = reactive<Pageresult>({
+  result: "",
+  /** 数据列表 */
+  list: [],
+  /** 总数 */
+  total: 0,
+});
+
+const prodTotalDatas = ref([]);
+onBeforeMount(() => {
+  getProdEnableList({ level: 2, type: 1 }).then((res: any) => {
+    if (res.data && res.data.length > 0) {
+      prodTotalDatas.value = res.data;
+    }
+  });
+});
+
+onMounted(() => {
+  setFormItem("cDptCde", {
+    loadData: [
+      {
+        label: user.companyId + user.companyCnm,
+        value: user.companyId,
+      },
+    ],
+  });
+  freeEditRef.value?.setFormValue({
+    cLoadSub: 1,
+    cDptCde: user.companyId,
+    tAppTm: [
+      dayjs().subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
+      dayjs().format("YYYY-MM-DD 23:59:59"),
+    ],
+  });
+});
+
+// 校验表单查询
+function handleQuery(flag = true) {
+  freeEditRef.value?.validate().then((isValid: boolean) => {
+    if (isValid) {
+      refreshData(flag);
+    } else {
+      ElMessage.error("请填写必填项");
+    }
+  });
+}
+
+// 查询
+function refreshData(flag?: boolean) {
+  const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
+  const s = freeEditRef.value?.getFromValue(); //获取表单数据
+  const param = {
+    ...r,
+    ...s,
+  };
+  selectTask(param)
+    .then((res: any) => {
+      if (res.code === 200) {
+        pageresult.list = res.data || [];
+        pageresult.total = res.total || 0;
+      } else {
+        ElMessage.error({ message: res.msg, duration: 3000 });
+      }
+    })
+    .catch((err: any) => {
+      ElMessage.error({ message: err.msg, duration: 3000 });
+    });
+}
+
+// 添加 copyText 方法
+const copyText = (text: any) => {
+  if (!text) {
+    ElMessage.warning("没有可复制的内容");
+    return;
+  }
+
+  // 检查 navigator.clipboard 是否存在
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(
+      () => {
+        ElMessage.success("复制成功");
+      },
+      () => {
+        ElMessage.error("复制失败");
+      }
+    );
+  } else {
+    // 使用 document.execCommand('copy') 方法作为备选方案
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      const result = document.execCommand("copy");
+      if (result) {
+        ElMessage.success("复制成功");
+      } else {
+        ElMessage.error("复制失败");
+      }
+    } catch (err) {
+      ElMessage.error("复制失败，请稍后再试");
+    } finally {
+      document.body.removeChild(textarea); // 清理创建的 textarea 元素
+    }
+  }
+};
+
+//给表单下拉项赋值
+function setFormItem(key: any, obj: any) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.btnItems && obj.btnItems) {
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
+          }
+        } else {
+          Object.assign(item, obj);
+        }
+      }
+    });
+  }
+}
+</script>
+<style lang="scss" scoped>
+.copy-icon {
+  margin-left: 5px;
+  cursor: pointer;
+  color: #409eff;
+}
+
+.policy-info-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.policy-number-row {
+  display: flex;
+  align-items: center;
+  height: 23px;
+}
+
+.policy-number-row span {
+  flex: 1;
+}
+
+.primmaryColor {
+  color: var(--el-color-primary);
+  cursor: pointer;
+}
+</style>
