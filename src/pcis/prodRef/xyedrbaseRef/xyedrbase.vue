@@ -103,14 +103,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         title: "原保费",
         disabled:true,
-        suffix: "元"
+        // suffix: "元"
       },
       {
         prop: "EdrECargoBase.nPrm",
         inputtype: "rtinput",
         title: "现保费",
         disabled:true,
-        suffix: "元"
+        // suffix: "元"
       },
       {
         prop: "EdrECargoBase.nPrmVar",
@@ -118,7 +118,29 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         min:-999999999999,
         title: "保费变化",
         disabled:true,
-        suffix: "元"
+        // suffix: "元"
+      },
+      {
+        prop: "EdrECargoBase.nBefEdrAmt",
+        inputtype: "rtinput",
+        title: "原保额",
+        disabled:true,
+        // suffix: "元"
+      },
+      {
+        prop: "EdrECargoBase.nAmt",
+        inputtype: "rtinput",
+        title: "现保额",
+        disabled:true,
+        // suffix: "元"
+      },
+      {
+        prop: "EdrECargoBase.nAmtVar",
+        inputtype: "rtinput",
+        min:-999999999999,
+        title: "保额变化",
+        disabled:true,
+        // suffix: "元"
       },
       {
         prop: "EdrECargoBase.tEdrAppTm",
@@ -231,12 +253,12 @@ function getFromValue() {
 function setFormValue(value: any) {
   const val = {
     ...value,
-    "EdrECargoBase.nBefEdrAmt": value["EdrECargoBase.nBefEdrAmt"]?.toLocaleString(),
-    "EdrECargoBase.nAmt": value["EdrECargoBase.nAmt"]?.toLocaleString(),
-    "EdrECargoBase.nAmtVar": value["EdrECargoBase.nAmtVar"]?.toLocaleString(),
-    "EdrECargoBase.nBefEdrPrm": value["EdrECargoBase.nBefEdrPrm"]?.toLocaleString(),
-    "EdrECargoBase.nPrm": value["EdrECargoBase.nPrm"]?.toLocaleString(),
-    "EdrECargoBase.nPrmVar": value["EdrECargoBase.nPrmVar"]?.toLocaleString(),
+    "EdrECargoBase.nBefEdrAmt": value["EdrECargoBase.nBefEdrAmt"],
+    "EdrECargoBase.nAmt": value["EdrECargoBase.nAmt"],
+    "EdrECargoBase.nAmtVar": value["EdrECargoBase.nAmtVar"],
+    "EdrECargoBase.nBefEdrPrm": value["EdrECargoBase.nBefEdrPrm"],
+    "EdrECargoBase.nPrm": value["EdrECargoBase.nPrm"],
+    "EdrECargoBase.nPrmVar": value["EdrECargoBase.nPrmVar"],
   }
   edrbaseEditRef?.value?.setFormValue(val);
 }

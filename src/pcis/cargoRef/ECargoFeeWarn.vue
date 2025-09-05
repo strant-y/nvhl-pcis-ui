@@ -51,12 +51,6 @@ onMounted(() => {
   );
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
-    if(!getValue('ECargoBase.nAmt')){
-      setFormItem('ECargoBase.AmtProp', {hidden: true})
-    }
-    if(!getValue('ECargoBase.nPrm')){
-      setFormItem('ECargoBase.PrmProp', {hidden: true})
-    }
     if(!getValue('ECargoBase.cWhInsExchCde')){
       setValue('ECargoBase.cWhInsExchCde','1')
     }
@@ -179,7 +173,15 @@ const method = {
       }
     }
   },
-  nReceivedPrmChange:(val:any)=>{
+  nReceivedPrmChange:(val:any,data:any)=>{
+     const nReceivedPrm =  sessionStorage.getItem("nReceivedPrm") ? JSON.parse(sessionStorage.getItem("nReceivedPrm") || '') : ''
+    // props.type === 'EDR_APP_NEW_SCENE'
+    if(nReceivedPrm['ECargoBase.nReceivedPrm'] && param?.cEdrType && param?.cEdrType == '1'){
+     if(nReceivedPrm['ECargoBase.nReceivedPrm'] > val){
+       ElMessage.error("预收保费不能小于原保费!");
+       return
+     }
+    }
     if(val && getValue('ECargoBase.nReceivedRate')){
       setValue('ECargoBase.nRmbReceivedPrm',val * getValue('ECargoBase.nReceivedRate'))
       // 协议剩余预收保费（人民币）
@@ -301,7 +303,14 @@ const method = {
   // func demo
 
 }
-
+const setItemShow = ()=>{
+  if(!getValue('ECargoBase.nAmt')){
+    setFormItem('ECargoBase.AmtProp', {hidden: true})
+  }
+  if(!getValue('ECargoBase.nPrm')){
+    setFormItem('ECargoBase.PrmProp', {hidden: true})
+  }
+}
 //给表单下拉项赋值
 function setFormItem(key: any, obj: any) {
   if (obj && Object.keys(obj).length) {
@@ -362,7 +371,8 @@ defineExpose({
   getValue,
   getFormConfig,
   getFormBtn,
-  setDisabledAll
+  setDisabledAll,
+  setItemShow
 });
 </script>
 

@@ -156,7 +156,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
         loadData: [
           {
-						label: "0200000000000永安保险公总司",
+						label: "0200000000000永安保险总公司",
 						value: "0200000000000",
 					},
         ]
