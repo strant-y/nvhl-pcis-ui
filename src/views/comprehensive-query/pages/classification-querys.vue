@@ -150,8 +150,6 @@ const tableRef = ref<AppTableMethod | null>(null);
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 import {getAppPolicyList, getInquiryPolicyList, qryEndorseList, delTmpPolicy, queryInsuredList, getCustomUserList, CustomUserList, qryPolicyNewList} from "@/api/query";
-import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
-const policyService = new PolicyService();
 // 变更列
 const colChange = defineAsyncComponent(() => import("../modal/colChange.vue"));
 const PrintView = defineAsyncComponent(() => import("../modal/PrintView.vue"));
