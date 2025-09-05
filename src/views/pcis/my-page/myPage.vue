@@ -4558,7 +4558,7 @@ const submitUnderwritingFn = async () => {
   if(res.cUndrMrk === "A" && props.param.cPolicySource === "6") {
     const checkoutnInfo:any = await checkoutn({ cAppNo: props.param.cAppNo });
     if(checkoutnInfo?.code !== "1") {
-      ElMessage.error(checkoutnInfo.message);
+      ElMessage.warning(checkoutnInfo.message);
       btn.loading = false;
       return
     }
