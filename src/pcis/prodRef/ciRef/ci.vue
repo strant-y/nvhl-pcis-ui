@@ -214,6 +214,18 @@ const method = {
         return;
       }
     }
+    const allRowTable = getFromValue();
+      const isDouble = allRowTable.some((row: any) => {
+        return row._dataId !== rowId &&
+            row["Ci.cCoinsurerCde"] === rowData["Ci.cCoinsurerCde"] && 
+            row["Ci.cCoinsurerCde"] !=='327001'
+      });
+      if(isDouble)
+      {
+        ElMessage.error("已经存在相同的共保公司！");
+        freeEditRef.value?.setValueByRowKey("Ci.cCoinsurerCde", rowId, "");
+        return;
+      }  
     valideRequired();
     updateMasterAgreementValues()
   },
@@ -264,10 +276,11 @@ const method = {
         freeEditRef?.value?.setValueByRowKey("dptCascader", rowId, []);
         return;
       }
-    } else {
-      freeEditRef.value?.setValueByRowKey("Ci.cCiSubComp", rowId, undefined);
-      freeEditRef.value?.setValueByRowKey("Ci.cDptCde", rowId, undefined);
-    }
+      } else {
+        freeEditRef.value?.setValueByRowKey("Ci.cCiSubComp", rowId, undefined);
+        freeEditRef.value?.setValueByRowKey("Ci.cDptCde", rowId, undefined);
+      }
+        
     // 如果级联选择器的值发生变化（分公司或出单机构任意一个发生变化），则清空当前行的业务员信息
     if(!initFlag.value){
       if (oldSubDptCde !== value?.[0] || oldDptCde !== value?.[1]) {
