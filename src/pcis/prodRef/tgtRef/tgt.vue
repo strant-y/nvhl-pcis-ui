@@ -190,7 +190,8 @@ const handelGoodsMx = (val:any)=>{
     setValue('Tgt.nAdditiveCoefficient',val[0]['Dist.nAdditiveCoefficient'])
     setValue('Tgt.cTradeNum',val[0]['Dist.cTradeNum'])
     setValue('Tgt.cInvoiceNum',val[0]['Dist.cInvoiceNum'])
-    // setValue('Tgt.cLadingNum',val[0]['Dist.cInvoiceNum'])
+    setValue('Tgt.cLadingNum',val[0]['Dist.cBillNum'])
+    setValue('Tgt.cWaybillNumber',val[0]['Dist.cBillNum'])
     setValue('Tgt.cCreditNum',val[0]['Dist.cLetterNum'])
   }else {
     setValue('Tgt.cGoodsNo','')
@@ -199,8 +200,9 @@ const handelGoodsMx = (val:any)=>{
     setValue('Tgt.nAdditiveCoefficient','')
     setValue('Tgt.cTradeNum','')
     setValue('Tgt.cInvoiceNum','')
-    // setValue('Tgt.cLadingNum',val[0]['Dist.cInvoiceNum'])
+    setValue('Tgt.cLadingNum','')
     setValue('Tgt.cCreditNum','')
+    setValue('Tgt.cWaybillNumber','')
   }
 }
 const selectType = ()=>{
@@ -1318,20 +1320,18 @@ const method = {
   // 标的信息--证件类型
   cCertificateTypeChange: (val: any) => {
     // 道路运输
-    if (val === '1') {
-      // setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}),getRules("idCard", {})]})  //证件号
+    // if (val === '1') {
+    //   setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("roadTransportLicense", {})] })  //证件号
+    // } else if (val === '2') {
+    //   //  网络预约出租汽车经营许可证
+    //   setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("onlineTaxiLicense", {})] })  //证件号
+    // } else if (val === '3') {
+    //   //  网络预约出租汽车运输证
+    //   setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("onlineTaxiTransportLicense", {})] })  //证件号
+    // }
+    if(val){
       setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("roadTransportLicense", {})] })  //证件号
-
-    } else if (val === '2') {
-      //  网络预约出租汽车经营许可证
-      setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("onlineTaxiLicense", {})] })  //证件号
-
-    } else if (val === '3') {
-      //  网络预约出租汽车运输证
-      setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("onlineTaxiTransportLicense", {})] })  //证件号
-
     }
-
 
   },
   // 证件有效起期

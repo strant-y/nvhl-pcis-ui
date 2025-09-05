@@ -215,7 +215,8 @@ const initDptTreeList = () => {
             name: res["data"]["name"],
             leaf: false,
             expanded: true,
-            children: [] // 确保有 children 属性用于存放子节点
+            children: [], // 确保有 children 属性用于存放子节点
+            cSignDptMrk:data?.cSignDptMrk || ''
           };
           
           _nodes.value.push(rootNode);

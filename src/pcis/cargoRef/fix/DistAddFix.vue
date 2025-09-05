@@ -793,7 +793,7 @@ const tCertfEndDateDisable = (date: any) => {
 const bonusRatio = (val:any)=>{
   const bonusRatioData =  getValue('ECargoGoodsTgt.nAdditiveRatio')
   const goodsValueData = getValue('ECargoGoodsTgt.nGoodsValue')
- if(bonusRatioData && goodsValueData){
+ if( goodsValueData){
     setValue('ECargoGoodsTgt.nInsuranceAmount',goodsValueData * (1 + bonusRatioData/100))
  }
   if(getValue('ECargoGoodsTgt.nInsuranceAmount')){
@@ -803,7 +803,7 @@ const bonusRatio = (val:any)=>{
 const goodsValue = (val:any)=>{
   const bonusRatioData =  getValue('ECargoGoodsTgt.nAdditiveRatio')
   const goodsValueData = getValue('ECargoGoodsTgt.nGoodsValue')
-  if(bonusRatioData && goodsValueData){
+  if(goodsValueData){
     setValue('ECargoGoodsTgt.nInsuranceAmount',goodsValueData * (1 + bonusRatioData/100))
   }
   if(getValue('ECargoGoodsTgt.nInsuranceAmount')){

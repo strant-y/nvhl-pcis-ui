@@ -196,11 +196,8 @@ const method = {
   },
   //付费约定下拉事件
   cInstMrkChange(val: any) {
-    console.log('1212,',val)
    const param = opertaor.getParam();
-   if (param.initFlag) {
-      return ;
-    }
+
     if(val=='5'){
       setFormItem("Base.nPayNumber", { disabled: false ,  max:12});
     }else if(val=='0'){
@@ -208,8 +205,9 @@ const method = {
       setValue('Base.nPayNumber',1)
 
  
-
-    
+    if (param.initFlag) {
+      return ;
+    }
        nPayNumberFun(true);
     }
   },

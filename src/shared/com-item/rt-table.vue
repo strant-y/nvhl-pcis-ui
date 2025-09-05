@@ -309,7 +309,7 @@
                 v-if="
                   index !== item.tableBtn.length - 1 &&
                   !btn.hideBtns?.(scope.row) &&
-                  index != 0
+                  item.tableBtn.length > 1
                 "
               >
                 <el-divider direction="vertical" />

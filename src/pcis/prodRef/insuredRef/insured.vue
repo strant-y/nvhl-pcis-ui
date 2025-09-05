@@ -42,7 +42,7 @@ import { descryptParameter, encryptParameter } from "@/utils/encipher";
 import { useRouter, useRoute } from 'vue-router';
 import { validateIdCard } from "@/typings/method-public";
 import { calculateAgeFromIdCard } from "@/utils/common";
-import { setCapitalRequiredRule } from "@/utils/InsuranceCoverageRules";
+import { setCapitalRequiredRule, disablePastDates } from "@/utils/InsuranceCoverageRules";
 const route = useRoute();
 const query = ref(route.query);
 const router = useRouter();
@@ -956,7 +956,21 @@ const method = {
   InsuredCCertfCls: (val: any) => {
     const param = opertaor.getParam();
     const isInit = param.initFlag; // 是否是初始化状态
-    if (isInit) return false;
+
+    if (isInit) {
+      if (val === "120001") {
+        setFormItem("Insured.tCertfBgnDate", {
+          rules: [getRules("required", {})],
+        });
+        setFormItem("Insured.tCertfEndDate", {
+          rules: [getRules("required", {})],
+        });
+      }
+      return;
+    }
+
+
+
     const personFields = ['cNation', 'tBirthday', 'nAge', 'cSex'];
     personFields.forEach(field => {
       setFormItem(`Insured.${field}`, { disabled: false });
@@ -964,6 +978,10 @@ const method = {
 
     checkUser();      // 调用客户信息接口
     clearValidate('Insured.cCertfCde')    // 清除报错信息
+
+    setFormItem("Insured.tCertfBgnDate", { rules: null });
+    setFormItem("Insured.tCertfEndDate", { rules: null });
+    setFormItem("Insured.tEstablishingDate", { rules: null });
 
     if (val == "120001") {
       setFormItem("Insured.cCertfCde", {
@@ -1027,18 +1045,18 @@ const method = {
       setFormItem("Insured.cCertfCde", {
         rules: [getRules("required", {})],
       });
-      setFormItem("Insured.tCertfBgnDate", { rules: null });
-      setFormItem("Insured.tCertfEndDate", { rules: null });
-
     }
 
 
     // 切换清空
     if (!isCoypBtn.value && val) {
-      setValue("Insured.tBirthday", null);
-      setValue("Insured.nAge", null);
-      // setValue("Insured.cSex", null);
-      setValue('Insured.cCertfCde', null);
+      const fieldsToClear = ["Insured.tBirthday", "Insured.nAge", "Insured.cCertfCde"];
+      fieldsToClear.forEach(field => {
+        setValue(field, null);
+        setTimeout(() => {
+          clearValidate(field);
+        }, 10);
+      });
     }
   },
   // 证件号码 change
@@ -1261,6 +1279,10 @@ const method = {
     } else {
       return true;
     }
+  },
+  // 办理人证件有效止期 小于当前时间
+  tOEndTmDisable: (date: any) => {
+    return disablePastDates(date);
   }
 };
 

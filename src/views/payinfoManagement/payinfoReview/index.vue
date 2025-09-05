@@ -7,7 +7,35 @@
       v-model:pageresult="pageresult"
       ref="tableRef"
       @page-change="handleQuery(false)"
-    />
+    >
+    <!-- policyInfo 列的具名插槽 -->
+      <template #column-policyInfo="{ row, column, index }">
+        <div class="policy-info-cell">
+          <div v-if="row.cAppNo" class="policy-number-row">
+            <span v-html="row.cAppNo"></span>
+            <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
+              <DocumentCopy />
+            </el-icon>
+          </div>
+          <!-- <div v-if="row.cPlyNo" class="policy-number-row">
+            <span v-html="row.cPlyNo"></span>
+            <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
+              <DocumentCopy />
+            </el-icon>
+          </div> -->
+        </div>
+      </template>
+      <template #column-InsurancePeriod="{ row, column, index }">
+        <div class="policy-info-cell">
+          <div v-if="row.tInsrncBgnTm" class="policy-period-row">
+            <span v-html="row.tInsrncBgnTm"></span>
+          </div>
+          <div v-if="row.tInsrncEndTm" class="policy-period-row">
+            <span v-html="row.tInsrncEndTm"></span>
+          </div>
+        </div>
+      </template>
+  </app-table>
   </div>
 </template>
 
@@ -15,7 +43,7 @@
 import { useUserStore } from "@/store";
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
-
+import { DocumentCopy } from "@element-plus/icons-vue";
 import { ref } from "vue";
 import {
   AppFreeEditConfig,
@@ -230,6 +258,15 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         size: "large",
         icon: "Edit",
+        // hideBtns: (row: any) => {
+        //     if (
+        //         row.cPlyNo === "" || row.cPlyNo === null
+        //     ) {
+        //         return false;
+        //     } else {
+        //         return true;
+        //     }
+        // },
         tableClick: (row) => {
           dzmodal
             .open(detail, { type: "edit", data: { cUniqueNo: row.cUniqueNo } })
@@ -244,32 +281,25 @@ const tableconfig = reactive<AppTableConfig>(
 
     fromSchema: [
       {
+        prop: "policyInfo",
+        inputtype: "rtinput",
+        title: "申请单号",
+        minWidth: 180,
+        fixed: "left",
+        slotName: "policyInfo"
+      },
+      {
         prop: "cPayTyp",
         inputtype: "rtselect",
         title: "缴费类型",
         minWidth: 180,
-        fixed: "left",
         typeCode: "CHARGE_TYPE_CACHE",
         param: { cCde: ["2", "3", "5", "99"] },
-        // formatter: (val) => {
-        //   const CStatusList = [
-        //     { value: "2", label: "支票缴费" },
-        //     { value: "5", label: "转账" },
-        //   ];
-        //   const result = CStatusList.find((item) => item.value === val);
-        //   return result ? result.label : val;
-        // },
       },
       {
         prop: "cChqueNo",
         inputtype: "rtinput",
         title: "交易号",
-        minWidth: 180,
-      },
-      {
-        prop: "cPlyNo",
-        inputtype: "rtinput",
-        title: "保单号",
         minWidth: 180,
       },
       {
@@ -342,7 +372,43 @@ const method = {
   func1: () => {
   },
 };
+// 添加 copyText 方法
+const copyText = (text: any) => {
+  if (!text) {
+    ElMessage.warning('没有可复制的内容');
+    return;
+  }
 
+  // 检查 navigator.clipboard 是否存在
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(
+        () => {
+          ElMessage.success('复制成功');
+        },
+        () => {
+          ElMessage.error('复制失败');
+        }
+    );
+  } else {
+    // 使用 document.execCommand('copy') 方法作为备选方案
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      const result = document.execCommand('copy');
+      if (result) {
+        ElMessage.success('复制成功');
+      } else {
+        ElMessage.error('复制失败');
+      }
+    } catch (err) {
+      ElMessage.error('复制失败，请稍后再试');
+    } finally {
+      document.body.removeChild(textarea); // 清理创建的 textarea 元素
+    }
+  }
+};
 // 绑定特殊验证器
 const exRules = {
   byrtInput: (rule: any, value: any, callback: any) => {
@@ -419,4 +485,10 @@ function setFormItem(key: any, obj: any) {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.copy-icon {
+  margin-left: 5px;
+  cursor: pointer;
+  color: #409eff;
+}
+</style>

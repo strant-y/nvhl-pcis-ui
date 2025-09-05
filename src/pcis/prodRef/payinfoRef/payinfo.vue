@@ -1,4 +1,4 @@
-<template>
+<template >
   <app-grid-edit :gridEditConfig="formconfig1" ref="payinfoEditRef" />
 </template>
 
@@ -275,4 +275,13 @@ defineExpose({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+  ::v-deep .el-table td.el-table__cell div {
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+  }
+
+
+</style>
