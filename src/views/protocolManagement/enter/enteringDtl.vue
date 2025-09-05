@@ -716,6 +716,9 @@ function query() {
         eventBus.emit('transportChange', cEcAgrAppNo.value);
       }
       const pageInit = () => {
+        //协议费用
+        const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn');
+        AgreementFeeWarn.setItemShow()
         if (props.type === 'EDR_APP_NEW_SCENE') {
          
           if (res["data"]["composition"]["AgreementEdrEcargoBase"]) {
@@ -731,6 +734,7 @@ function query() {
             ]);
           }
           if (props.param?.cEdrType == "1") {
+            sessionStorage.setItem("nReceivedPrm", JSON.stringify(res["data"]["composition"]["AgreementBase"][0]));
             if (props.param["cRsnCde"] != "FZ") {
               mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnDetail", [
                 props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"],
@@ -835,6 +839,8 @@ function isAllAValuesSame(arr:any,key:any) {
   return arr.every(obj => obj[key] === firstValue);
 }
 const premiumCalculation = ()=>{
+  let isBer = false
+  let isBef = false
   let isSuccess = false
   try {
     const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
@@ -845,6 +851,7 @@ const premiumCalculation = ()=>{
     const AgreementCvrg = allFromData['AgreementCvrg']
     if(AgreementCvrg.length > 0){
       if(isAllAValuesSame(AgreementCvrg,'ECargoTerm.cFeeCurrency')){
+        isBef = true
         AgreementFeeWarn.setFormItem('ECargoBase.PrmProp',{hidden: false})
         AgreementFeeWarn.setValue('ECargoBase.cPrmCur',AgreementCvrg[0]['ECargoTerm.cFeeCurrency'])
         const sum = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nInsuranceFee'], 0);
@@ -859,6 +866,7 @@ const premiumCalculation = ()=>{
           AgreementFeeWarn.setValue('ECargoBase.nRecRemPrm',sum1 - (AgreementFeeWarn.getValue('ECargoBase.nWhRmbPrm') || 0))
         }
       }else{
+        isBef = false
         const sum1 = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nRmbFee'], 0);
         //折人民币预估保费
         AgreementFeeWarn.setValue('ECargoBase.nRmbPrm',sum1)
@@ -869,8 +877,9 @@ const premiumCalculation = ()=>{
         AgreementFeeWarn.setFormItem('ECargoBase.PrmProp',{hidden: true})
       }
       if(isAllAValuesSame(AgreementCvrg,'ECargoTerm.cOriginalCurrency')){
+        isBer = true
         AgreementFeeWarn.setFormItem('ECargoBase.AmtProp',{hidden: false})
-        AgreementFeeWarn.setValue('ECargoBase.cAmtCur',AgreementCvrg[0]['ECargoTerm.cAmountCurrency'])
+        AgreementFeeWarn.setValue('ECargoBase.cAmtCur',AgreementCvrg[0]['ECargoTerm.cOriginalCurrency'])
         const sum = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nInsuranceAmount'], 0);
         AgreementFeeWarn.setValue('ECargoBase.nAmt',sum)
         const sum1 = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nRmbAmount'], 0);
@@ -883,9 +892,10 @@ const premiumCalculation = ()=>{
         }
         if(AgreementFeeWarn.getValue('ECargoBase.cPayWay') && AgreementFeeWarn.getValue('ECargoBase.cPayWay') !== '01'){
           AgreementFeeWarn.setValue('ECargoBase.nWhPrmRmbExch',AgreementCvrg[0]['ECargoTerm.nOriginalRate'])
-          AgreementFeeWarn.setValue('ECargoBase.cWhPrmCur',AgreementCvrg[0]['ECargoTerm.cAmountCurrency'])
+          AgreementFeeWarn.setValue('ECargoBase.cWhPrmCur',AgreementCvrg[0]['ECargoTerm.cOriginalCurrency'])
         }
       }else{
+        isBer = false
         const sum1 = AgreementCvrg.reduce((total, current) => total + current['ECargoTerm.nRmbAmount'], 0);
         // 折人民币预估保额
         AgreementFeeWarn.setValue('ECargoBase.nRmbAmt',sum1)
@@ -903,6 +913,31 @@ const premiumCalculation = ()=>{
         AgreementFeeWarn.setValue('ECargoBase.nRecRemEstAmt', 0)
         AgreementFeeWarn.setValue('ECargoBase.nRecRemPrm',0)
         console.log(11111,AgreementFeeWarn.getFormValue())
+      }
+      if(props.param?.cEdrType == '1' && (props.param?.pageType == 'EDR_APP_NEW_SCENE' || props?.type == 'EDR_APP_NEW_SCENE')){
+        const pgxx = mainRef.value?.getxyedrbaseRefValue()
+        if(isBef){
+          const xbf =  AgreementFeeWarn.getValue('ECargoBase.nPrm') || 0
+          let bfbhl = xbf - (pgxx['EdrECargoBase.nBefEdrPrm']*1 || 0)
+          mainRef.value?.setxyedrbaseRefValue('EdrECargoBase.nPrm',xbf)
+          mainRef.value?.setxyedrbaseRefValue('EdrECargoBase.nPrmVar',bfbhl)
+        }else{
+          const xbf =  AgreementFeeWarn.getValue('ECargoBase.nRmbPrm') || 0
+          let bfbhl = xbf - (pgxx['EdrECargoBase.nBefEdrPrm']*1 || 0)
+          mainRef.value?.setxyedrbaseRefValue('EdrECargoBase.nPrm',xbf)
+          mainRef.value?.setxyedrbaseRefValue('EdrECargoBase.nPrmVar',bfbhl)
+        }
+        if(isBer){
+          const xbf =  AgreementFeeWarn.getValue('ECargoBase.nAmt') || 0
+          let bfbhl = xbf - (pgxx['EdrECargoBase.nBefEdrAmt']*1 || 0)
+          mainRef.value?.setxyedrbaseRefValue('EdrECargoBase.nAmt',xbf)
+          mainRef.value?.setxyedrbaseRefValue('EdrECargoBase.nAmtVar',bfbhl)
+        }else{
+          const xbf =  AgreementFeeWarn.getValue('ECargoBase.nRmbAmt') || 0
+          let bfbhl = xbf - (pgxx['EdrECargoBase.nBefEdrAmt']*1 || 0)
+          mainRef.value?.setxyedrbaseRefValue('EdrECargoBase.nAmt',xbf)
+          mainRef.value?.setxyedrbaseRefValue('EdrECargoBase.nAmtVar',bfbhl)
+        }
       }
       ElMessage.success('保费计算成功')
     }else {

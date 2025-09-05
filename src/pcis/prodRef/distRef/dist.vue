@@ -163,7 +163,7 @@ const oldPageSchema = ref<any>({});
 
 const hiddenPage = ref<Array>(['VehicleDist040002']); //初始化需要隐藏的组件
 const addedPlans = ref<string[]>([]);
-
+const isQuery = ref(false)
 // 列表数据反显时，方案号的下拉选项渲染需要条款加载后根据条款获取，所以通过计算属性获取getPlanNo的值
 // 有值的时候再填充到方案号的loadData中
 const cvrg = computed(() => {
@@ -189,6 +189,7 @@ watch(
     (newVal: any) => {
       if (newVal) {
         console.log('发生变化了。。。',newVal)
+        if(isQuery.value) return
         eventBus.emit('goodsMxChange', newVal);
       }
     }
@@ -340,6 +341,7 @@ onMounted(async () => {
 // }  Tgt.nEngineeringCost nEngineeringCostChange
 
 function cardResetFn(){
+  isQuery.value = false
 	const tableEditRefs = cardRef.value;
 	const s = tableEditRefs?.getFromValue(); //获取表单数据
 	for (const k in s) {
@@ -1175,6 +1177,7 @@ function setTableData(data: any, total:any) {
 }
 
 function handleQuery() {
+  isQuery.value = true
   const queryParams = distTableRef.value?.getPartnerPage(true);
   method.handleQuery(queryParams);
 }
