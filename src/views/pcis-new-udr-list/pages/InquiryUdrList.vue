@@ -474,6 +474,9 @@
             tableBtnFixed: "right",
             tableBtn: ref<any>([]),
             fromSchema: ref<any>([]),
+            rowDbClickFun: (row:any) => {
+                handleDblClick(row);
+            }
         },
     };
     // 根据切换下拉数据显示/隐藏对应列
@@ -1860,6 +1863,12 @@
                 }
             });
         });
+    }
+
+    function handleDblClick(row: any) {
+        if(row.state === "0") {
+            handle_hasReceived(row);
+        }
     }
 
     //给表单下拉项赋值
