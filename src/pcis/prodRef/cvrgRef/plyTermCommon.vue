@@ -528,12 +528,9 @@ async function refushData(datas: any) {
   });
   // 强制刷新组件,对数据进行更新
   formData.value = {};
-  console.log("清了");
   setTimeout(() => {
     formData.value = pd;
-    console.log("回填了");
     nextTick(() => {
-      console.log("刷新吧");
       showFlush();
     });
   }, 50);
@@ -559,9 +556,9 @@ async function refushAndData(datas: any) {
   console.log(planDataCommon.value);
   // setTimeout(() => {
 
-  //   nextTick(() => {
-  //     showFlush();
-  //   });
+  nextTick(() => {
+    showFlush();
+  });
   // }, 50);
 }
 
@@ -635,7 +632,9 @@ function setFormValue(value: any) {
   });
   refushData(plandata);
   refushAndData(comData);
-  updateEdrItem(terms);
+  nextTick(() => {
+    updateEdrItem(terms);
+  });
 }
 
 async function validate() {
@@ -656,7 +655,9 @@ function showFlush() {
       tremTemplateRefs.value[item].dataFlash();
     }
   });
-  termcommonRef.value.showFlush();
+  if (termcommonRef.value.showFlush) {
+    termcommonRef.value.showFlush();
+  }
   updateBtn();
 }
 

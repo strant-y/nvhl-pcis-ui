@@ -5,7 +5,7 @@
       :key="index"
       :rowIndex="i['Term.cPlanNo']"
       v-model="planData['m'][index]"
-      :disabled-flag="disAbledFlag"
+      :disabled-flag="disableflg"
       @delete="
         (r) => {
           deleteData(r);
@@ -27,7 +27,7 @@
         :key="index"
         :rowIndex="i['Term.cPlanNo']"
         v-model="planData['a1'][index]"
-        :disabled-flag="disAbledFlag"
+        :disabled-flag="disableflg"
         @delete="
           (r) => {
             deleteData(r);
@@ -45,7 +45,7 @@
   <template v-if="planData['a2'] && planData['a2'].length > 0">
     <tremAddTemplate2
       :planData="planData['a2']"
-      :disabled-flag="disAbledFlag"
+      :disabled-flag="disableflg"
       @delete="
         (r) => {
           deleteData(k, r);
@@ -61,7 +61,7 @@
   <template v-if="planData['a3'] && planData['a3'].length > 0">
     <tremAddTemplate3
       :planData="planData['a3']"
-      :disabled-flag="disAbledFlag"
+      :disabled-flag="disableflg"
       @delete="
         (r) => {
           deleteData(k, r);
@@ -105,6 +105,7 @@ const opertaor = dataOpertaor(idxParam.opertaorProps);
 const parparam = opertaor.getParam();
 const planData = ref<{ [key: string]: { [key: string]: any } }>({}); //私有数据
 const tremTemplateRefs = ref<any>({});
+const disableflg = toRef(props,'disabledFlag');
 const tremTemplate = defineAsyncComponent(() => import("./trem-template.vue"));
 const tremAddTemplate2 = defineAsyncComponent(
   () => import("./trem-add2-template.vue")
@@ -169,7 +170,6 @@ function deleteTermByNo(t: any) {
 }
 
 function showFlush() {
-  console.log(tremTemplateRefs);
   Object.keys(tremTemplateRefs.value).forEach((item: any) => {
     if (tremTemplateRefs.value[item]) {
       tremTemplateRefs.value[item].dataFlash();
@@ -186,12 +186,14 @@ watch(
   () => props.modelValue,
   (newv, oldv) => {
     planData.value = newv;
+    nextTick(()=>{
+      showFlush();
+    })
   },
   { deep: true }
 );
-
 defineExpose({
-    showFlush
+  showFlush,
 });
 </script>
 

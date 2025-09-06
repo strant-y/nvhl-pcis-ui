@@ -412,10 +412,6 @@ const props = defineProps({
   rowIndex: {
     type: [Number, String],
   },
-  showHeader: {
-    type: Boolean,
-    default: true,
-  },
   showConf: {
     type: Object,
     default:() =>({}),
