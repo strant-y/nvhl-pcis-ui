@@ -51,6 +51,10 @@ import { log } from "console";
 import { saveAs } from 'file-saver';
 import { DocumentCopy } from "@element-plus/icons-vue";
 import { useRoute, useRouter, RouteRecordRaw } from "vue-router";
+
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
+
 const pcisQueryService = new PcisQueryService();
 const policyService = new PolicyService();
 const dzmodal = useDzModal();
@@ -91,6 +95,17 @@ const payConfirmInfoChanges = defineAsyncComponent(() => import("./pay-confirm-i
 const payConfirmInfoRegister = defineAsyncComponent(() => import("./pay-confirm-info-register.vue"));
 const payConfirmInfoDetailRead = defineAsyncComponent(() => import("./pay-confirm-info-detail-read.vue"));
 const tableRef = ref<AppTableMethod | null>(null);
+let cTermNoList = ref<any>([]);  // 条款数据
+let cTermNo = '';    // 条款编码
+
+
+function extractCode(str:string) {
+  // 匹配 "P+数字" 或 "纯数字"
+  const pattern = /^(P\d+|\d+)/;
+  return str.match(pattern)?.[0] || "";
+}
+
+
 const formconfig1 = reactive<AppFreeEditConfig>(
 	createAppFreeEditConfig({
 		title: "缴费信息查询",
@@ -259,30 +274,69 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 			},
 			{
 				prop: "CKindNo",
-				inputtype: "rtselect",
+				inputtype: "rtselect", 
 				title: "产品大类",
 				typeCode: "KIND_LIST_GRT",
                 clearable: true,
 				params: {'cOperId': user.value['opCde'], 'cDptCde': user.value['companyId']},
                 func: (val: any) => {
-                    // 更新产品下拉选
-                    setFormItem("CProdNo", {
-                        codeParam: {
-                            cParCde: val,
-                            cOperId: user.value?.opCde,
-                            cDptCde: user.value?.companyId,
-                        },
+                    // // 更新产品下拉选
+                    // setFormItem("CProdNo", {
+                    //     codeParam: {
+                    //         cParCde: val,
+                    //         cOperId: user.value?.opCde,
+                    //         cDptCde: user.value?.companyId,
+                    //     },
+                    // });
+                    // freeEditRef.value?.setValue("CProdNo", null);
+                        freeEditRef.value?.setValue("CProdNo","")
+                        cTermNo = "";      // 重置条款编码
+                        // cPard.value = val;
+                       codeListStore
+                    .queryCodeList({
+                        codeListName: "TERM_LIST_IN_GUIDE_SEARCH",
+                        codeListParam:{
+                        cParCde: val,
+                        cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+                        cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+                    },
+                    })
+                    .then((res) => {
+                        cTermNoList.value = res;
+                        setFormItem("CProdNo", {
+                            loadData: res,
+                        });
                     });
-                    freeEditRef.value?.setValue("CProdNo", null);
+
                 },
 			},
 			{
 				prop: "CProdNo",
 				inputtype: "rtselect",
 				title: "条款",
-				typeCode: "TERM_LIST_IN_GUIDE_NEW",
+				// typeCode: "TERM_LIST_IN_GUIDE_NEW",
+                // clearable: true,
+				// params: {'cParCde': '', 'cOperId': user.value['opCde'], 'cDptCde': user.value['companyId']},
+                     
+              itemWidth: 1,
+              rules: [{ type: "required" }],
+              filterable: true,
                 clearable: true,
-				params: {'cParCde': '', 'cOperId': user.value['opCde'], 'cDptCde': user.value['companyId']},
+                    func: (val:any) => {
+
+                    if(val){
+                            if(cTermNoList.value.length>0){
+                                cTermNoList.value.forEach((ele) => {
+                                    if(ele['value']  === val){
+                                        cTermNo =extractCode(ele['label'])
+                                    }
+                                });
+                            }  
+                    } else {
+                        cTermNo = "";
+                    }
+                    
+                }
 			},
 			{
 				prop: "CAppNmeInvest",
@@ -1045,8 +1099,11 @@ function handleQuery(flag?: boolean) {
         _allow_anonymous: true,
         CurrentUser: user.value['opCde'],
         CurrentUserOrg: user.value['companyId'],
+        cTermNo : cTermNo,   // 条款编码
         //codeListMap: this.codeListMap
       });
+
+
       console.log(param)
       pcisQueryService.getPayConfirmInfoList(param)
         .then((res) => {
