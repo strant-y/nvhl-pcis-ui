@@ -284,7 +284,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "policyInfo",
         inputtype: "rtinput",
         title: "申请单号",
-        minWidth: 180,
+        minWidth: 200,
         fixed: "left",
         slotName: "policyInfo"
       },
