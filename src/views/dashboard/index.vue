@@ -138,13 +138,13 @@
                       <DocumentCopy />
                     </el-icon>
                   </div>
-                  <div class="policy-number-row" v-if="row.baseType === '询价'">
+                  <div class="policy-number-row" style="height: 23px;">
                     <span
                       v-html="row.cInquiryNo"
                       class="primmaryColor"
                       @dblclick="toQuery2(row)"
                     ></span>
-                    <el-icon class="copy-icon" @click="copyText(row.cInquiryNo)">
+                    <el-icon class="copy-icon" @click="copyText(row.cInquiryNo)" v-if="row.cInquiryNo">
                       <DocumentCopy />
                     </el-icon>
                   </div>

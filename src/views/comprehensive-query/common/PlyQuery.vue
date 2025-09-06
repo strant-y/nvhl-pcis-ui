@@ -136,6 +136,8 @@ const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 import {getAppPolicyList, qryEndorseList, delTmpPolicy, queryInsuredList} from "@/api/query";
+import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
+const policyService = new PolicyService();
 // 变更列
 const colChange = defineAsyncComponent(() => import("../modal/colChange.vue"));
 const PrintView = defineAsyncComponent(() => import("../modal/PrintView.vue"));
@@ -1271,6 +1273,18 @@ const tableObj = {
                     console.log(row);
                     const r = await row;
                     if (r) {
+                        // 校验出单机构是否复合复制单的机构要求
+                        const queryProdDptCdeParam:any = { cDptCde:  user.value.companyId }
+                        if(row.cRenewMrk === "1") {
+                            queryProdDptCdeParam['cPlyNo'] = row.cPlyNo
+                        } else {
+                            queryProdDptCdeParam['cProdNo'] = row.cProdNo
+                        }
+                        const queryProdDptCde:any = await policyService.queryProdDptCde(queryProdDptCdeParam)
+                        if(queryProdDptCde.data !== true) {
+                            ElMessage.error(queryProdDptCde.msg)
+                            return
+                        }
                         row.cPolicySource = '8'
                         const data = row;
                         console.log("0000000000000", data);
