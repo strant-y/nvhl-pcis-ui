@@ -6,7 +6,7 @@
       :tableConfig="tableconfig"
       v-model:pageresult="pageresult"
       ref="tableRef"
-      @page-change="handleQuery(false)"
+      @page-change="handleQuery(false, isESBool)"
     >
       <!-- policyInfo 列的具名插槽 -->
        <template #column-policyInfo="{ row, column, index }">
@@ -165,7 +165,8 @@ let ESOriginalData = ref<any>([]);  // ES查询原始数据，转化成驼峰为
 let userColumnConfig = ref<any[]>([]); // 保存用户自定义列配置
 let colChangeCPkId = ref(''); // 变更列参数
 
-let isESAndNormalQuery = ref('0'); // 是否es查询 1 不是0 默认否
+let isESCode = ref('0'); // 是否es查询 1 不是0 默认否
+let isESBool = ref(false); // 是否es查询布尔
 
 // 用于缓存用户的完整勾选状态（包括原始列 + 扩展列）
 let userAllCheckedColumns = ref<string[]>([]);
@@ -1356,7 +1357,8 @@ async function handleQuery(flag?: boolean, isEs = false) {
   const s = freeEditRefs.getFromValue();
   const appType = s.cAppTyp || 'A';
   cAppType.value = appType;
-  isESAndNormalQuery.value = isEs ? '1':'0';
+  isESCode.value = isEs ? '1':'0'; // 记录是否是ES查询
+  isESBool.value = isESCode.value == '1'? true: false;
 
   if (appType === 'I') {
     await queryI(flag, isEs);
@@ -1504,11 +1506,11 @@ async function queryAE( flag?: boolean, isEs = false) {
         return;
     }
     // ES 额外索引
-    if (isEs) {
+    if (isESBool.value) {
         param.IndexName = 'ply_insured_ik';
         param.IndexType = 'ply_insured_info';
     }
-    if (isEs) {
+    if (isESBool.value) {
       queryInsuredList(param)
       .then((res) => {
         const { code, data, msg } = res;
@@ -1618,12 +1620,12 @@ async function queryI(flag?: boolean, isEs = false) {
         return;
     }
     // ES 额外索引
-    if (isEs) {
+    if (isESBool.value) {
         param.IndexName = 'ply_inquiry_ik';
         param.IndexType = 'ply_inquiry_info';
     }
 
-    if (isEs) {
+    if (isESBool.value) {
      queryInsuredList(param)
       .then((res) => {
         const { code, data, msg } = res;
@@ -1672,9 +1674,9 @@ async function exportFileList(flag?: boolean) {
   cAppType.value = appType;
 
   if (appType === 'I') {
-    await exportI(flag, isESAndNormalQuery.value);
+    await exportI(flag, isESCode.value);
   } else {
-    await exportAE(flag, isESAndNormalQuery.value);
+    await exportAE(flag, isESCode.value);
   }
 }
 
@@ -1757,12 +1759,12 @@ async function exportAE( flag?: boolean, isEs) {
       param["tAppTmEnd"] = null
     }
     // ES 必须填查询关键字
-    if (Boolean(parseInt(isEs)) && !param.cQueryStr?.trim()) {
+    if (isESBool.value && !param.cQueryStr?.trim()) {
         ElMessage.warning('查询条件不能为空');
         return;
     }
     // ES 额外索引
-    if (Boolean(parseInt(isEs))) {
+    if (isESBool.value) {
         param.IndexName = 'ply_insured_ik';
         param.IndexType = 'ply_insured_info';
     }
@@ -1847,12 +1849,12 @@ async function exportI(flag?: boolean, isEs = false) {
     param["tIssueTmEnd"] = null;
     
     // ES 必须填查询关键字
-    if (Boolean(parseInt(isEs)) && !param.cQueryStr?.trim()) {
+    if (isESBool.value && !param.cQueryStr?.trim()) {
         ElMessage.warning('查询条件不能为空');
         return;
     }
     // ES 额外索引
-    if (Boolean(parseInt(isEs))) {
+    if (isESBool.value) {
         param.IndexName = 'ply_inquiry_ik';
         param.IndexType = 'ply_inquiry_info';
     }
