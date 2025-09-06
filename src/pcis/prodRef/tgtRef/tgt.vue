@@ -711,7 +711,7 @@ const method = {
                termref?.setTermData({
                  termNo: term['Term.cUniqueTermNo'],
                  planNo: term['Term.cPlanNo'],
-                 factorProp: 'Term.nSeatTotal',
+                 factorProp: 'Term.nInsuredcompanySeats',
               }, val);
             }
         }
