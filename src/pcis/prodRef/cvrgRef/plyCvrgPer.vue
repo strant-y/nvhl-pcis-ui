@@ -16,6 +16,7 @@
           <myCard
             :cardConfig="{
               title: '主条款信息',
+              titleClass: 'mainTitle',
               showInTitle: true,
             }"
           >
@@ -221,7 +222,7 @@ onMounted(async () => {
               "Term.cClauseCode": item.cTermNo,
               "Term.cRdrTyp": item.cRdrTyp,
               "Term.cUniqueTermNo": item.cUniqueTermNo,
-              "Term.NSeqNo":1,
+              "Term.nSeqNo":1,
               "Term.cPlanNo":'P1',
           };
           if (item.cRdrTyp === "1") {
@@ -362,7 +363,7 @@ function addTermData() {
               "Term.cClauseCode": item.cTermNo,
               "Term.cRdrTyp": item.cRdrTyp,
               "Term.cUniqueTermNo": item.cUniqueTermNo,
-              "Term.NSeqNo": index+1,
+              "Term.nSeqNo": index+1,
               "Term.cPlanNo":'P1',
             };
           }

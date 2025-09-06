@@ -2,7 +2,7 @@
   <div>
     <el-form ref="templateRef" :model="termdata" :inline-message="true">
       <el-card class="cvrg-info">
-        <template #header v-if="showHeader">
+        <template #header v-if="effectiveShowConf.showHeader">
           <div class="cvrg-hearder">
             <el-row style="margin-top: 5px;">
               <el-col :span="10">
@@ -12,9 +12,14 @@
                     <el-icon v-if="showData"><ArrowDownBold /></el-icon>
                   </a>
 
-                  <el-tag :type="term.cRdrTyp === '0' ? 'danger' : 'success'">{{
+                  <template v-if="effectiveShowConf.showPlanNo">
+                    {{termdata['Term.cPlanNo']}}方案
+                  </template>
+                  <template v-else>
+                    <el-tag :type="term.cRdrTyp === '0' ? 'danger' : 'success'">{{
                     term.cRdrTyp === "0" ? "主" : "附加"
                   }}</el-tag>
+                  </template>
                   <template v-if="termdata['Term.cCancelMrk'] === '1'">
                     <el-badge value="退" class="item">
                       <el-tag type="warning">{{ term.cNmeCn }}</el-tag>
@@ -77,7 +82,7 @@
         </template>
 
         <div v-show="showData">
-          <template v-if ="termFactormap.length && showTerm">
+          <template v-if ="termFactormap.length && effectiveShowConf.showTerm">
             <template v-if="termTitleConf.cFactorTabType === 'grid'">
               <table style="width: 100%">
                 <thead>
@@ -411,10 +416,18 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
-  showTerm: {
-    type: Boolean,
-    default: true,
+  showConf: {
+    type: Object,
+    default:() =>({}),
   },
+});
+
+const effectiveShowConf = computed(() => {
+  return {
+    showHeader: props.showConf?.showHeader ?? props.showHeader ?? true,
+    showTerm: props.showConf?.showTerm ?? props.showTerm ?? true,
+    showPlanNo:props.showConf?.showPlanNo ?? props.showPlanNo ?? false,
+  };
 });
 
 const emit = defineEmits(["update:modelValue", "delete"]);

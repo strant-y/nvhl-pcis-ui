@@ -106,7 +106,7 @@ const componentMap = {
   cvrgRef: cvrgRef,
   webPlyCvrg04: plyCvrg04Ref,
   webPlyCvrgPer:plyCvrgPer,
-  webPlyTermCommonRef:PlyTermCommonRef,
+  webPlyTermCommon:PlyTermCommonRef,
   plyCvrgCross:plyCvrgCross,
   plyCvrgPlanCross:plyCvrgPlanCross,
   plyBaseRef: plybaseRef,

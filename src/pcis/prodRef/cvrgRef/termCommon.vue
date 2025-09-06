@@ -12,8 +12,7 @@
         }
       "
       :faters="faters"
-      :showHeader="false"
-      :showTerm="false"
+      :showConf="{ showHeader: false, showTerm: false }"
       :ref="
         (res) => {
           tremTemplateRefs['m' + index] = res;
@@ -96,7 +95,11 @@ const props = defineProps({
 });
 
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import {
+  idxParamKey,
+  IdxParamProps,
+  useIdxParam,
+} from "@/views/pcis/support/useIdxParam";
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const parparam = opertaor.getParam();
@@ -142,13 +145,16 @@ function deleteTermByNo(t: any) {
     let deleindex: any = null;
     for (const i in planData.value[item]) {
       if (planData.value[item][i]["Term.cClauseCode"] === t) {
-
         // 批改的情况下，标记该单为删除状态
-        if (parparam.cEdrType && planData.value[item][i]['Term.cRowId'] ) {
-          if(planData.value[item][i]['Term.cRdrTyp'] !== '0' && planData.value[item][i]['Term.cClauseCategory'] !== '1'){ // 规范类，限制类，退保状态只标记
-            planData.value[item][i]['Term.cCancelMrk'] = '1';
-          }else{
-            tremTemplateRefs.value[item+i].setCancel();
+        if (parparam.cEdrType && planData.value[item][i]["Term.cRowId"]) {
+          if (
+            planData.value[item][i]["Term.cRdrTyp"] !== "0" &&
+            planData.value[item][i]["Term.cClauseCategory"] !== "1"
+          ) {
+            // 规范类，限制类，退保状态只标记
+            planData.value[item][i]["Term.cCancelMrk"] = "1";
+          } else {
+            tremTemplateRefs.value[item + i].setCancel();
           }
         } else {
           deleindex = i;
@@ -160,6 +166,16 @@ function deleteTermByNo(t: any) {
       }
     }
   });
+}
+
+function showFlush() {
+  console.log(tremTemplateRefs);
+  Object.keys(tremTemplateRefs.value).forEach((item: any) => {
+    if (tremTemplateRefs.value[item]) {
+      tremTemplateRefs.value[item].dataFlash();
+    }
+  });
+  // updateBtn();
 }
 
 onMounted(() => {
@@ -174,7 +190,9 @@ watch(
   { deep: true }
 );
 
-defineExpose({});
+defineExpose({
+    showFlush
+});
 </script>
 
 <style lang="css" scoped></style>

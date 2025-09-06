@@ -52,6 +52,7 @@
                 <myCard
                   :cardConfig="{
                     title: '主条款信息',
+                    titleClass: 'mainTitle',
                     showInTitle: true,
                   }"
                 >
