@@ -4737,7 +4737,10 @@ const validateDistConsistency = async () => {
       const distParam = {
         cClauseCode: props.param?.cTermNo, // 条款编码
         cProdNo: props.param?.cProdNo,     // 产品号
-        cComponentTable: distMap.map((item: any) => item.pageCode)
+        cComponentTable: [
+            ...distMap.map((item: any) => item.pageCode),
+            'tgt'
+        ]
       };
 
       if (props.param?.pageName === 'priceInquiry') {
@@ -4748,6 +4751,7 @@ const validateDistConsistency = async () => {
       const distRes: any = await checkDistTerm(distParam);
 
       if (distRes.code == 200 && distRes.data == true) {
+        ElMessage.error(distRes.msg);
         return true;          // 通过
       }
       // 构造提示语换行展示
