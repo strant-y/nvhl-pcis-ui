@@ -29,7 +29,7 @@ export const imageMethod = {
     }
 
     if (pageMethod.isReadOnlyScene(opertaor)) {
-      let ParamNo = null;
+      // let ParamNo = null;
       policyService
         .imageInfoShow({ ParamNo: ParamNo })
         .then((res: any) => {

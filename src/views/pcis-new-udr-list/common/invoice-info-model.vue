@@ -229,47 +229,107 @@ const handleInvoiceTypeChange = (value: any) => {
 // 保存按钮
 const saveTaxInfo = () => {
     // console.log('参数',freeEditRef.value?.getFromValue())
-  let operAppDatas = opertaor.getDataAll()['applicant'];  // 投保人数据
-  let operDatas = opertaor.getDataAll()['insured'];  // 被保人数据
+  // let operAppDatas = opertaor.getDataAll()['applicant'];  // 投保人数据
+  // let operDatas = opertaor.getDataAll()['insured'];  // 被保人数据
 
-  let formData  = freeEditRef.value?.getFromValue();
-  freeEditRef.value?.validate().then((isValid) => {
+  // let formData  = freeEditRef.value?.getFromValue();
+  // freeEditRef.value?.validate().then((isValid) => {
+  //   if (!isValid) {
+  //     ElMessage.warning('请补全信息');
+  //     return;
+  //   }
+  //       // 提取相关变量（根据实际场景替换获取方式）
+  //   const applicantCCustomerType = operAppDatas['Applicant.cClntMrk'];  // 客户类型
+  //   const insuredCCustomerType = operDatas['Insured.cClntMrk'];
+  //   const applicantCertfCls = operAppDatas['Applicant.cCertfCls'];  // 证件类型
+  //   const insuredCertfCls = operDatas['Insured.cCertfCls'];
+  //   const applicantCertfCde = operAppDatas['Applicant.cCertfCde'];  // 证件号码
+  //   const insuredCertfCde = operDatas['Insured.cCertfCde'];
+
+
+  //   // 假设当前待判断的字段值（根据实际场景替换来源）
+  //   const currentCustomerType = formData['CCustomerType']; // 例如表单中选择的客户类型
+  //   const currentCertfCls = formData['CCertfCls'];// 例如表单中输入的证件类型
+  //   const currentCertfCde = formData['CCertfCde'];// 例如表单中输入的证件号码
+   
+
+  //   // 拆解条件：三个子条件的 "或" 关系
+  //   const condition3 = currentCustomerType !== applicantCCustomerType && currentCustomerType !== insuredCCustomerType; // 客户类型不等于投保人性质且不等于被保人性质
+  //   const condition1 = currentCertfCls !== applicantCertfCls && currentCertfCls !== insuredCertfCls; // 证件类型不等于投保人且不等于被保人
+  //   const condition2 = currentCertfCde !== applicantCertfCde && currentCertfCde !== insuredCertfCde; // 证件号码不等于投保人且不等于被保人
+
+  //   // 总条件：满足任一子条件
+  //   const shouldSetValue = condition1 || condition2 || condition3;
+  //   console.log('判断信息，',currentCustomerType,currentCertfCls,currentCertfCde)
+  //   console.log('判断信息，',condition3,condition1,condition2,operDatas)
+
+  //   // 根据条件执行设置值操作
+  //   if (shouldSetValue) {
+  //     ElMessage.info("发票信息与客户信息不一致，请点击 '同被保人' 或 '同投保人' 按钮 ！")
+  //     return  false;
+  //     // freeEditRef.value?.setValue('CCertfCls', operAppDatas['Applicant.cCertfCls']);
+  //     // freeEditRef.value?.setValue('CCertfCde', operAppDatas['Applicant.cCertfCde']);
+  //   }
+
+    // 安全获取数据源（避免undefined报错）
+  const { applicant = {}, insured = {} } = opertaor.getDataAll() || {};
+  const formData = freeEditRef.value?.getFromValue() || {};
+  const ccimrk = opertaor.getTableRefByKey("plyBase")?.getValue("Base.cCiMrk");
+  console.log('ccimrk‘',ccimrk)
+  // 表单验证
+  freeEditRef.value?.validate().then(isValid => {
     if (!isValid) {
       ElMessage.warning('请补全信息');
       return;
     }
-        // 提取相关变量（根据实际场景替换获取方式）
-    const applicantCCustomerType = operAppDatas['Applicant.cClntMrk'];  // 客户类型
-    const insuredCCustomerType = operDatas['Insured.cClntMrk'];
-    const applicantCertfCls = operAppDatas['Applicant.cCertfCls'];  // 证件类型
-    const insuredCertfCls = operDatas['Insured.cCertfCls'];
-    const applicantCertfCde = operAppDatas['Applicant.cCertfCde'];  // 证件号码
-    const insuredCertfCde = operDatas['Insured.cCertfCde'];
 
+    // 工具函数：统一处理空值（转为空字符串并去空格）
+    const normalizeValue = (value) => {
+      return value == null ? '' : String(value).trim();
+    };
 
-    // 假设当前待判断的字段值（根据实际场景替换来源）
-    const currentCustomerType = formData['CCustomerType']; // 例如表单中选择的客户类型
-    const currentCertfCls = formData['CCertfCls'];// 例如表单中输入的证件类型
-    const currentCertfCde = formData['CCertfCde'];// 例如表单中输入的证件号码
-   
+    // 提取并标准化数据（投保人/被保人信息）
+    const baseInfo = {
+      applicant: {
+        customerType: normalizeValue(applicant['Applicant.cClntMrk']),
+        certType: normalizeValue(applicant['Applicant.cCertfCls']),
+        certNo: normalizeValue(applicant['Applicant.cCertfCde'])
+      },
+      insured: {
+        customerType: normalizeValue(insured['Insured.cClntMrk']),
+        certType: normalizeValue(insured['Insured.cCertfCls']),
+        certNo: normalizeValue(insured['Insured.cCertfCde'])
+      }
+    };
 
-    // 拆解条件：三个子条件的 "或" 关系
-    const condition3 = currentCustomerType !== applicantCCustomerType && currentCustomerType !== insuredCCustomerType; // 客户类型不等于投保人性质且不等于被保人性质
-    const condition1 = currentCertfCls !== applicantCertfCls && currentCertfCls !== insuredCertfCls; // 证件类型不等于投保人且不等于被保人
-    const condition2 = currentCertfCde !== applicantCertfCde && currentCertfCde !== insuredCertfCde; // 证件号码不等于投保人且不等于被保人
+    // 提取并标准化当前表单数据
+    const currentInfo = {
+      customerType: normalizeValue(formData['CCustomerType']),
+      certType: normalizeValue(formData['CCertfCls']),
+      certNo: normalizeValue(formData['CCertfCde'])
+    };
 
-    // 总条件：满足任一子条件
-    const shouldSetValue = condition1 || condition2 || condition3;
-    console.log('判断信息，',currentCustomerType,currentCertfCls,currentCertfCde)
-    console.log('判断信息，',condition3,condition1,condition2,operDatas)
+    const isInconsistent = (currentVal, applicantVal, insuredVal) => {
+      return currentVal && currentVal !== applicantVal && currentVal !== insuredVal;
+    };
 
-    // 根据条件执行设置值操作
-    if (shouldSetValue) {
-      ElMessage.info("发票信息与客户信息不一致，请点击 '同被保人' 或 '同投保人' 按钮 ！")
-      return  false;
-      // freeEditRef.value?.setValue('CCertfCls', operAppDatas['Applicant.cCertfCls']);
-      // freeEditRef.value?.setValue('CCertfCde', operAppDatas['Applicant.cCertfCde']);
+    // 批量判断三个字段的一致性
+    const hasInconsistency = [
+      isInconsistent(currentInfo.customerType, baseInfo.applicant.customerType, baseInfo.insured.customerType),
+      isInconsistent(currentInfo.certType, baseInfo.applicant.certType, baseInfo.insured.certType),
+      isInconsistent(currentInfo.certNo, baseInfo.applicant.certNo, baseInfo.insured.certNo)
+    ].some(Boolean); // 任一不一致则返回true
+
+    // 不一致提示
+    console.log(!(ccimrk == '2' || ccimrk == '4'),hasInconsistency)
+    if ( !(ccimrk == '2' || ccimrk == '4') && hasInconsistency) {
+      ElMessage.info("发票信息与客户信息不一致，请点击 '同被保人' 或 '同投保人' 按钮 ！");
+      return;
     }
+    //  if(CIsFlag == "true" && !(ccimrk == '2' || ccimrk == '4')
+    //   && ((CCertfCde !== insCCertfCde && CCertfCde !== appCCertfCde) 
+    //  || (CCustomerNm !== insCInsuredNme && CCustomerNm !== appCAppNme)
+    //  || (CCertfCls !== insCCertfCls && CCertfCls !== appCCertfCls)))
     
     policyService.saveTaxInfo(formData).then((response) => {
       if (response.code === 200) {

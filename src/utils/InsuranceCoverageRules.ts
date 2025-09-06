@@ -30,6 +30,29 @@ export const setCapitalRequiredRule = (getValue, setFormItem, prefix) => {
     });
 };
 
+
+
+
+/**
+ * 公共时间控件禁用方法：禁止选择小于当前时间的日期
+ * @param date - 待检查的日期
+ * @returns boolean - true表示禁用（不可选），false表示可选
+ */
+export const disablePastDates = (date: Date): boolean => {
+  // 处理无效日期
+  if (!(date instanceof Date) || isNaN(date.getTime())) {
+    return true;
+  }
+
+  // 获取当前时间（精确到当天0点，忽略时分秒）
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // 日期小于当前时间则禁用
+  return date.getTime() < today.getTime();
+};
+
+
  
 export default {
   setCapitalRequiredRule,

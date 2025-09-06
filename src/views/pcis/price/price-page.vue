@@ -2938,7 +2938,9 @@ const submitToUndrFn = async () => {
       // 校验 缴费计划时间超出保险起止期  重置成一条
     const hasInvalidPlan = checkPayPlanValidity({ opertaor });
     if(hasInvalidPlan){
-       opertaor.getTableRefByKey("base").nPayNumberFun();
+      //  opertaor.getTableRefByKey("base").nPayNumberFun();
+            ElMessage.warning('缴费计划-存在无效项（格式错误、超出保险区间或期数重叠），请检查！');
+            return false;
     }
     
 
@@ -4383,7 +4385,10 @@ const validateDistConsistency = async () => {
       const distParam = {
         cClauseCode: props.param?.cTermNo, // 条款编码
         cProdNo: props.param?.cProdNo,     // 产品号
-        cComponentTable: distMap.map((item: any) => item.pageCode)
+        cComponentTable: [
+            ...distMap.map((item: any) => item.pageCode),
+            'tgt'
+        ]
       };
 
       if (props.param?.pageName === 'priceInquiry') {
@@ -4394,6 +4399,7 @@ const validateDistConsistency = async () => {
       const distRes: any = await checkDistTerm(distParam);
 
       if (distRes.code == 200 && distRes.data == true) {
+        ElMessage.error(distRes.msg);
         return true;          // 通过
       }
       // 构造提示语换行展示

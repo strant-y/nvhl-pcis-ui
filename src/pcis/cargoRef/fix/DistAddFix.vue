@@ -141,7 +141,7 @@ onMounted(async  () => {
     if(['ECargoTransportDist.cCurrency'].includes(item.prop)) {
       item["func"] = cAmtCurChange1;
     }
-		// 运输信息-航次运输限额 添加change事件
+		// 运输信息-航次运输限额 添加change事件 
     if(['ECargoTransportDist.nTransportLimit'].includes(item.prop)) {
       item["func"] = nTransportLimitchange
     }
@@ -178,6 +178,15 @@ onMounted(async  () => {
         item.groupList[1]["func"] = getcRegisterSuffixAddr
       }
     }
+
+    //  if(['ECargoInsuredDist.cClntMrk'].includes(item.prop)){
+       
+    //  item["func"] = cardTypeChange;
+       
+    // }
+
+// 
+
 		if(['ECargoInsuredDist.cOccupCde'].includes(item.prop)) {
       item["btnItems"]["func"] = cOccupCdeChange;
       item["btnItems"]["disabled"] = false;
@@ -437,7 +446,9 @@ const funCheckUser = (val:any)=>{
 }
 // 证件类型change
  const InsuredCCertfCls =(val:any) => {
-  checkUser();
+ 
+    checkUser();
+      clearValidate('ECargoInsuredDist.cCertfCde')  // 清除报错信息
    if (val == "120001") {
 
      // setValue('ECargoInsuredDist.cCertfCde','')  //选身份证时清空
@@ -472,10 +483,6 @@ const funCheckUser = (val:any)=>{
        rules: [getRules("required", {})],
      });
      //证件类型是“营业执照”，参加社会统筹标志变化为必填
-     // 参加社会统筹标志
-     setFormItem("ECargoInsuredDist.cParticiinsocTyp", {
-       rules: [getRules("required", {})],
-     });
      setFormItem("ECargoInsuredDist.tBirthday", {
        disabled: false,
      });
@@ -505,9 +512,7 @@ const funCheckUser = (val:any)=>{
      setFormItem("ECargoInsuredDist.tEstablishingDate", {
        rules: [getRules("required", {})],
      });
-     setFormItem("ECargoInsuredDist.cParticiinsocTyp", {
-       rules: [getRules("required", {})],
-     });
+ 
      setFormItem("ECargoInsuredDist.tBirthday", {
        disabled: false,
      });
@@ -525,9 +530,7 @@ const funCheckUser = (val:any)=>{
      setFormItem("ECargoInsuredDist.cCertfCde", {
        rules: [getRules("required", {}),getRules("ariCard", {})],
      });
-     setFormItem("ECargoInsuredDist.cParticiinsocTyp", {
-       rules: [getRules("required", {})],
-     });
+
      setFormItem("ECargoInsuredDist.tBirthday", {
        disabled: false,
      });
@@ -546,13 +549,7 @@ const funCheckUser = (val:any)=>{
      });
      setFormItem("ECargoInsuredDist.tCertfBgnDate", { rules: null });
      setFormItem("ECargoInsuredDist.tCertfEndDate", { rules: null });
-     // 参加社会统筹标志
-     setFormItem("ECargoInsuredDist.cParticiinsocTyp", {
-       rules: null,
-     });
-     setFormItem("ECargoInsuredDist.cParticiinsocTyp", {
-       rules: [getRules("required", {})],
-     });
+
      setFormItem("ECargoInsuredDist.tBirthday", {
        disabled: false,
      });
@@ -606,6 +603,7 @@ const cIsIndvduBizChange = (val:any)=>{
   }
 }
  const cClntMrkFunc = (val:any)=>{
+  console.log(val)
     if(val === '1'){
       setFormItem("ECargoInsuredDist.tBirthday", {
         rules: [getRules("required", {})],
@@ -622,6 +620,10 @@ const cIsIndvduBizChange = (val:any)=>{
       setFormItem("ECargoInsuredDist.cCntrNme", {
         rules: null,
       });
+       setFormItem("ECargoInsuredDist.cParticiinsocTyp", {
+       rules:  null
+     });
+
       // setFormItem('ECargoInsuredDist.tBirthday',{disabled:true})
       // setFormItem('ECargoInsuredDist.nAge',{disabled:true})
       // setFormItem('ECargoInsuredDist.cSex',{disabled:true})
@@ -684,6 +686,10 @@ const cIsIndvduBizChange = (val:any)=>{
       setFormItem("ECargoInsuredDist.cSex", {
         rules: null,
       });
+              setFormItem("ECargoInsuredDist.cParticiinsocTyp", {
+       rules: [getRules("required", {})],
+     });
+      
       // setFormItem('ECargoInsuredDist.tBirthday',{disabled:false})
       // setFormItem('ECargoInsuredDist.nAge',{disabled:false})
       // setFormItem('ECargoInsuredDist.cSex',{disabled:false})
@@ -758,7 +764,7 @@ const cAmtCurChange1 = (val: any)=>{
     setValue("ECargoTransportDist.nAmtExch", "1.000000");
     setValue('ECargoTransportDist.nRmbLimit', Number(getValue('ECargoTransportDist.nTransportLimit')))
   }
-}
+} 
 // 运输信息航次运输限额change事件
 const nTransportLimitchange = (val:any)=>{
   const goodsValueData = getValue('ECargoTransportDist.nAmtExch')
@@ -793,7 +799,7 @@ const tCertfEndDateDisable = (date: any) => {
 const bonusRatio = (val:any)=>{
   const bonusRatioData =  getValue('ECargoGoodsTgt.nAdditiveRatio')
   const goodsValueData = getValue('ECargoGoodsTgt.nGoodsValue')
- if(bonusRatioData && goodsValueData){
+ if( goodsValueData){
     setValue('ECargoGoodsTgt.nInsuranceAmount',goodsValueData * (1 + bonusRatioData/100))
  }
   if(getValue('ECargoGoodsTgt.nInsuranceAmount')){
@@ -803,7 +809,7 @@ const bonusRatio = (val:any)=>{
 const goodsValue = (val:any)=>{
   const bonusRatioData =  getValue('ECargoGoodsTgt.nAdditiveRatio')
   const goodsValueData = getValue('ECargoGoodsTgt.nGoodsValue')
-  if(bonusRatioData && goodsValueData){
+  if(goodsValueData){
     setValue('ECargoGoodsTgt.nInsuranceAmount',goodsValueData * (1 + bonusRatioData/100))
   }
   if(getValue('ECargoGoodsTgt.nInsuranceAmount')){
@@ -901,6 +907,9 @@ function setValue(key: string, value: any) {
 function getValue(key: string) {
   return freeEditRef?.value?.getValue(key);
 }
+function clearValidate(key = null) {
+  freeEditRef?.value?.clearValidate(key);
+}
 
 defineExpose({
   getFromValue,
@@ -908,6 +917,7 @@ defineExpose({
   validate,
   setValue,
   getValue,
+  clearValidate,
 });
 </script>
 

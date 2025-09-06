@@ -584,6 +584,7 @@ const historyClaRef = ref(null);
 const sliceSide = ref([]);
 const bottomBtnColor1 = "#3498DB";
 const parseData = ref({})
+const edrBaseDatas = ref({})
 
 const props:any = defineProps({
   param: {
@@ -1080,10 +1081,13 @@ const edrBtn = [
     type: "primary",
     id: "btnCalEdr",
     func: () => {
+      debugger
       // calcPremiumEdr();
       // 批改原因是否是费率变更
       if(props.param.cRsnCde === '45') {
         queryTermRateLimitFun(calcPremiumEdr)
+      }else if(props.param.cRsnCde === '99'){
+        queryTermRateLimitFun(calcPremium)
       } else {
         calcPremiumEdr();
       }
@@ -1229,6 +1233,10 @@ const initPage = async () => {
   ) {
     //退保不显示产品组件信息
     acctinfoFlag.value = false;
+  }
+  if(props.param.cRsnCde === '99'){
+    edrbaseFlag.value = false
+    edritemFlag.value = false;
   }
   // 页面初始化
   const formconfig11 = JSON.parse(getProductRes.data);
@@ -2490,7 +2498,8 @@ const loadAppPlyInfo = async (CAppNo) => {
               "EdrBase.cEdrRsnDetail"
             ].split(",");
         }
-        console.log("EdrBaseData", EdrBaseData);
+        edrBaseDatas.value =  EdrBaseData
+        console.log("edrBaseDatas",edrBaseDatas.value)
         if ("EDR_APP_NEW_SCENE" === props.param.pageType) {
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"] = "2";
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrType"] =
@@ -2581,6 +2590,8 @@ const loadAppPlyInfo = async (CAppNo) => {
             ].split(",");
         }
         console.log("EdrBaseData", EdrBaseData);
+        edrBaseDatas.value = EdrBaseData
+        console.log("edrBaseDatas",edrBaseDatas.value)
         if ("EDR_APP_NEW_SCENE" === props.param.pageType) {
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"] = "2";
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrType"] =
@@ -2680,8 +2691,12 @@ function baseValite(){
  * 投保保费计算
  */
 const calcPremium = () => {
-  const btn = getBtn("btn010101");
-  btn.loading = true;
+  if(props.param.cRsnCde !== '99'){
+    const btn = getBtn("btn010101");
+    btn.loading = true;
+  }else{
+
+  }
   const res = opertaor.getDataAll();
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
@@ -2719,7 +2734,9 @@ const calcPremium = () => {
   }
   const appCalcFun = props.param?.pageName === "priceInquiry" ? calculatePremium(res) : appCalc(res);
   appCalcFun.then((res: any) => {
-    btn.loading = false;
+    if(props.param.cRsnCde !== '99'){
+       btn.loading = false;
+    }
     console.log("appCalc-res", res);
     if (res["code"] == "200") {
       const ops: any = opertaor.convertData(res);
@@ -3058,10 +3075,13 @@ const submitToUndrFn = async () => {
       opertaor.getTableRefByKey("payinfo").setFormValue(setArr); 
   }
 
-  // 校验 缴费计划时间超出保险起止期 时间格式有误等 重置成一条
+    // 校验 缴费计划时间超出保险起止期 时间格式有误等 重置成一条
   const hasInvalidPlan = checkPayPlanValidity({ opertaor });
-  if(hasInvalidPlan){
-      opertaor.getTableRefByKey("base").setValue('Base.cInstMrk','0')
+  if(hasInvalidPlan){  // 缴费区间超出保险区间  缴费起期 > 缴费止期
+      //  ElMessage.warning('请注意，缴费计划-缴费区间不能超出保险区间, 并且每期缴费起期 > 缴费止期！缴费期限不能重叠！')
+      ElMessage.warning('缴费计划-存在无效项（格式错误、超出保险区间或期数重叠），请检查！');
+      // opertaor.getTableRefByKey("base").setValue('Base.cInstMrk','0')
+      return false;
   }
   
   adjustCiPremiumDifference()
@@ -3498,13 +3518,27 @@ const getEdrRsnItemFun = (
     CEdrType: cEdrType,
     CGrpMrk: cGrpMrk,
   };
+  const applicant = opertaor.getTableRefByKey("applicant").getFromValue();
+  const insured = opertaor.getTableRefByKey("insured").getFromValue();
   getEdrRsnItem(res).then((res: any) => {
     if (res["code"] == "200") {
       const result = res["data"]["result"];
       const edrList: any[] = [];
       result.forEach((key: any) => {
         if (key["cOperTyp"] === "M") {
-          edrList.push(key["cEdrItem"]);
+          if(key['cEdrItem'] === 'Applicant.tCertfEndDate') {
+          // 投保人证件有效期长期标识选中的话，证件有效期止期不可编辑
+            if(applicant?.['Applicant.cLongendTyp'] !== '1') {
+              edrList.push(key["cEdrItem"]);
+            }
+          } else if(key['cEdrItem'] === 'Insured.tCertfEndDate') {
+          // 投被人证件有效期长期标识选中的话，证件有效期止期不可编辑
+            if(insured?.['Insured.cLongendTyp'] !== '1') {
+              edrList.push(key["cEdrItem"]);
+            }
+          } else {
+            edrList.push(key["cEdrItem"]);
+          }
         } else if (key["cOperTyp"] === "B") {
           edrList.push("Btn_" + key["cEdrItem"]);
         }
@@ -4030,6 +4064,10 @@ const submitEdrToUndrSurrender = async () => {
 const saveEdrState = ref(false);
 const saveEdrPlyInfo = async () => {
   let saveEdrFlag = false;
+  const btn = getBtn("saveEdr");
+  if (btn) {
+    btn.loading = true;
+  }
   if(props.param.cTransMrk === '1'){
     const res = opertaor.getDataAll();
     const resParam = Object.assign(res,{'cTransMrk':'1'})
@@ -4057,12 +4095,14 @@ const saveEdrPlyInfo = async () => {
     //   })
     // }
     const edrInfo: any = await saveEdrAppPlyInfo(resParam)
-    // const btn = getBtn("saveEdr");
-    // btn.loading = false;
+    
     if(edrInfo["code"] == "200") {
       const ops = opertaor.convertData(edrInfo);
       console.log("转换的数据", ops);
       ElMessage.success(edrInfo.msg);
+      if (btn) {
+        btn.loading = false;
+      }
       // if(ops['ci'] && ops['ci'].length>0){
       //   ops['ci'].forEach((item:any)=>{
       //     if(item['Ci.nCiShare']){
@@ -4115,6 +4155,7 @@ const saveEdrPlyInfo = async () => {
       ElMessage.error(edrInfo.msg);
     }
   }else{
+    debugger
     const btn = getBtn("saveEdr");
     btn.loading = true;
     const res = opertaor.getDataAll();
@@ -4122,15 +4163,22 @@ const saveEdrPlyInfo = async () => {
     res["user"] = user;
     res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
     res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
-    res["EdrBase"] = edrbase.value?.getFromValue();
-    if (
-      res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
-      res["EdrBase"]["EdrBase.cEdrRsnDetail"] != "" &&
-      Array.isArray(res["EdrBase"]["EdrBase.cEdrRsnDetail"])
-    ) {
-      res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
-        res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+    if(props.param.cRsnCde === '99'){
+      if (!res.EdrBase) {
+        res.EdrBase = [];
+      }
+      res.EdrBase.push(edrBaseDatas._value);
+    }else{
+      if (
+        res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
+        res["EdrBase"]["EdrBase.cEdrRsnDetail"] != "" &&
+        Array.isArray(res["EdrBase"]["EdrBase.cEdrRsnDetail"])
+      ) {
+        res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
+          res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+      }
     }
+    
     // if(res['ci'] && res['ci'].length>0){
     //   res['ci'].forEach((item:any)=>{
     //     if(item['Ci.nCiShare']){
@@ -4557,11 +4605,11 @@ const submitUnderwritingFn = async () => {
   if(props.param?.pageName === "priceInquiry") {
     res["inquiryNo"] = props.param.cInquiryNo;
   }
-  // 投保单核保同意提交前校验是否需要划分风险单位
-  if(res.cUndrMrk === "A" && props.param.pageName !== "priceInquiry" && props.param.cAppTyp !== "E") {
+  // 投保单核保同意提交前校验是否需要划分风险单位(只判断询价转投保)
+  if(res.cUndrMrk === "A" && props.param.cPolicySource === "6") {
     const checkoutnInfo:any = await checkoutn({ cAppNo: props.param.cAppNo });
     if(checkoutnInfo?.code !== "1") {
-      ElMessage.error(checkoutnInfo.message);
+      ElMessage.warning(checkoutnInfo.message);
       btn.loading = false;
       return
     }
@@ -4709,7 +4757,10 @@ const validateDistConsistency = async () => {
       const distParam = {
         cClauseCode: props.param?.cTermNo, // 条款编码
         cProdNo: props.param?.cProdNo,     // 产品号
-        cComponentTable: distMap.map((item: any) => item.pageCode)
+        cComponentTable: [
+            ...distMap.map((item: any) => item.pageCode),
+            'tgt'
+        ]
       };
 
       if (props.param?.pageName === 'priceInquiry') {
@@ -4720,6 +4771,7 @@ const validateDistConsistency = async () => {
       const distRes: any = await checkDistTerm(distParam);
 
       if (distRes.code == 200 && distRes.data == true) {
+        ElMessage.error(distRes.msg);
         return true;          // 通过
       }
       // 构造提示语换行展示

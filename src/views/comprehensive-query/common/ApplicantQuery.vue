@@ -1204,6 +1204,18 @@ const tableObj = {
                     console.log(row);
                     const r = await row;
                     if (r) {
+                        // 校验出单机构是否复合复制单的机构要求
+                        const queryProdDptCdeParam:any = { cDptCde:  user.value.companyId }
+                        if(row.cRenewMrk === "1") {
+                            queryProdDptCdeParam['cPlyNo'] = row.cPlyNo
+                        } else {
+                            queryProdDptCdeParam['cProdNo'] = row.cProdNo
+                        }
+                        const queryProdDptCde:any = await policyService.queryProdDptCde(queryProdDptCdeParam)
+                        if(queryProdDptCde.data !== true) {
+                            ElMessage.error(queryProdDptCde.msg)
+                            return
+                        }
                         row.cPolicySource = '8'
                         const data = row;
                         router.push({

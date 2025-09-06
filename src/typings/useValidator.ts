@@ -82,6 +82,15 @@ export const useValidator = () => {
     };
   };
 
+   // 手机号或固定电话二选一正则
+const contactPhone = () => {
+  return {
+    pattern: /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$|^\d{3,4}-\d{7,8}(-\d{1,4})?$/,
+    message: "请输入正确的手机号或固定电话",
+    trigger: "blur"
+  };
+};
+
   /**
   * 邮箱的验证规则
   *
@@ -662,6 +671,9 @@ const taxValidation = () => {
     }
     if (type === "phoneNo") {
       return phoneNo();
+    }
+    if (type === "contactPhone") {
+      return contactPhone();
     }
     if (type === "email") {
       return email();
