@@ -145,11 +145,28 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         label: "重置",
         icon: "RefreshRight",
         func: () => {
+          setFormItem("cDptCde", {
+            loadData: [
+              {
+                label: user.companyId + user.companyCnm,
+                value: user.companyId,
+              },
+            ],
+          });
           freeEditRef.value?.setFormValue({
-            cClntMrk: "",
+            baseType: null,
             cAppNme: "",
-            cCertfCls: "",
-            cCertfCde: "",
+            cDptCde: user.companyId,
+            cLoadSub: 1,
+            cKindNo: null,
+            cAppNo: "",
+            cPlyNo: "",
+            cInsuredNme: "",
+            tAppTm: [
+              dayjs().subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
+              dayjs().format("YYYY-MM-DD 23:59:59"),
+            ],
+            tIssueTm: [],
           });
           handleQuery();
         },
@@ -249,8 +266,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             });
             cProdData.value = options;
             setFormItem("cProdNo", { loadData: options });
+            freeEditRef.value?.setValue("cProdNo", null);
           } else {
             setFormItem("cProdNo", { loadData: [] });
+            freeEditRef.value?.setValue("cProdNo", null);
           }
         },
       },
@@ -276,8 +295,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               }
             });
             setFormItem("cTermNo", { loadData: options });
+            freeEditRef.value?.setValue("cTermNo", null);
           } else {
             setFormItem("cTermNo", { loadData: [] });
+            freeEditRef.value?.setValue("cTermNo", null);
           }
         },
       },
@@ -571,7 +592,7 @@ const tableconfig = reactive<AppTableConfig>(
           const r = await row;
           if (r) {
             // 校验出单机构是否复合复制单的机构要求
-            const queryProdDptCdeParam: any = { cDptCde: user.value.companyId };
+            const queryProdDptCdeParam: any = { cDptCde: user.companyId };
             if (row.cRenewMrk === "1") {
               queryProdDptCdeParam["cPlyNo"] = row.cPlyNo;
             } else {
@@ -670,12 +691,12 @@ const tableconfig = reactive<AppTableConfig>(
         title: "保费变化量",
       },
       {
-        prop: "CZipCde",
+        prop: "tUdrTm",
         inputtype: "rtinput",
         title: "核保日期",
       },
       {
-        prop: "CZipCde",
+        prop: "cUdrCnm",
         inputtype: "rtinput",
         title: "核保人",
       },
