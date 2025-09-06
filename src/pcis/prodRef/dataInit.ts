@@ -86,7 +86,7 @@ export const getData = (opertaor: any) => {
     dataInit["Base.cCiMrk"] = "0";
     dataInit["Base.cIntroDptcde"] = param.cDptCde;
     dataInit["Base.cCiMrk"] = param.cCiMrk || "0";
-    dataInit["Base.nPayNumber"] = "1"; //缴费期数
+    dataInit["Base.nPayNum"] = "1"; //缴费期数
 
     dataInit["Applicant.cStkMrk"] = "0";
     dataInit["Applicant.cCustRiskRank"] = "925104";
@@ -191,7 +191,7 @@ export const getECargoData = (idxParam: any) => {
     dataInit["ECargoBase.cCiMrk"] = "0";
     dataInit["ECargoBase.cIntroDptcde"] = param.cDptCde;
     dataInit["ECargoBase.cCiMrk"] = param.cCiMrk || "0";
-    dataInit["ECargoBase.nPayNumber"] = "1"; //缴费期数
+    dataInit["ECargoBase.nPayNum"] = "1"; //缴费期数
 
     // dataInit["ECargoApplicant.cStkMrk"] = "0";
     // dataInit["ECargoApplicant.cCustRiskRank"] = "925104";

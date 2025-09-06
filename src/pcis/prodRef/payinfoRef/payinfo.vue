@@ -64,7 +64,7 @@ const nPrmFun = () => {
     // 比例
     let nCiShare = Number(getOwnShare()) || 100;
     const totalAmount = Number(data['base']['Base.nPrm']);
-    const splitCount = Number(data.base?.['Base.nPayNumber'])
+    const splitCount = Number(data.base?.['Base.nPayNum'])
     const totalCent = Math.round(totalAmount * 100);
     const result = ref<number[]>([]);
     const quotient = Math.floor(totalCent / splitCount);
@@ -76,7 +76,7 @@ const nPrmFun = () => {
 
     result.value = result.value.map(cent => parseFloat((cent / 100).toFixed(8)));
     const formArray = getFromValue();
-    const limitLength = Number(data['base']['Base.nPayNumber']) || 0; // 示例: 3
+    const limitLength = Number(data['base']['Base.nPayNum']) || 0; // 示例: 3
     const modifiedArray = formArray.map((item: any, index: any) => {
       // 超出限制长度的元素：直接返回原对象（不修改）
       if (index >= limitLength) {

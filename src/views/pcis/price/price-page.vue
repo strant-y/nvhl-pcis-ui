@@ -3559,7 +3559,7 @@ const calcPremiumEdr = () => {
         //  缴费期数   + 批改次数
 
         // Base.nPayNumber
-        let infoLength = dataAll['base']['Base.nPayNumber']+res['res']['composition']["EdrBase"][0]['EdrBase.nEdrPrjNo'];
+        let infoLength = dataAll['base']['Base.nPayNum']+res['res']['composition']["EdrBase"][0]['EdrBase.nEdrPrjNo'];
         if(currentPayList.length >=infoLength){
           currentPayList.pop();
         }
