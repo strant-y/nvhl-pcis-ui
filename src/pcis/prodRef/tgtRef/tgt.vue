@@ -680,23 +680,42 @@ const method = {
          setValue("Tgt.nSeatCapacity", Number(getValue("Tgt.nTotalInsured")) + Number(getValue("Tgt.nInsuredcompanySeats")))
           
          const termref = opertaor.getTableRefByKey("cvrg");
+         const termrefList = termref.getFromValue();
+
           interface Item {
             nInsuredHeadcount?: number | null | string;
           }
- 
-          termref?.setTermData({
-            // termNo:'0420011602',
-            termNo:'00425000085',  // 这个不是条款 需要 去方法里面打印看具体数据ID
-            planNo:'P1',
-            factorProp: 'Term.nSeatTotal',
-          },val);  
+          if(termrefList.length){
+            termref?.setTermData({
+                termNo: termrefList[0]?.['Term.cUniqueTermNo'],  // 这个不是条款 需要 去方法里面打印看具体数据ID
+                planNo: termrefList[0]?.['Term.cPlanNo'],
+                factorProp: 'Term.nSeatTotal',
+            }, val); 
+          }
         }
-  
   },
+
   //投保司乘人员座位总数改变事件
-  changenInsuredcompanySeats: () => {
+  changenInsuredcompanySeats: (val:any) => {
     console.log('触发12')
-    setValue("Tgt.nSeatCapacity", Number(getValue("Tgt.nTotalInsured")) + Number(getValue("Tgt.nInsuredcompanySeats")))
+
+    if(val || val == 0){
+        setValue("Tgt.nSeatCapacity", Number(getValue("Tgt.nTotalInsured")) + Number(getValue("Tgt.nInsuredcompanySeats")))
+        const termref = opertaor.getTableRefByKey("cvrg");
+        const terms = termref.getFromValue();
+        console.log('terms', terms);
+
+        for (let i = 0; i < terms.length; i++) {
+            const term = terms[i];
+            if ( term['Term.cRdrTyp'] == '1' && term['Term.cClauseCategory']  == '1') { // 判断是附加条款
+               termref?.setTermData({
+                 termNo: term['Term.cUniqueTermNo'],
+                 planNo: term['Term.cPlanNo'],
+                 factorProp: 'Term.nSeatTotal',
+              }, val);
+            }
+        }
+    }
   },
 
   // 投保座位总数
