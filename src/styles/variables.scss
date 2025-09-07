@@ -12,13 +12,13 @@
   // 只读状态字体颜色调整
   --el-disabled-text-color: #777;
 
-  --menu-background: var(--el-color-primary);
-  --menu-active-text: #FFFFFF;
-  --menu-hover:  #ffffff1a;
+  --menu-background: #FFFFFF;
+  --menu-active-text: #3a76c6;
+  --menu-hover:  #3a76c6;
   // --sidebar-logo-background: #f0f5f9;
-  --el-text-color: #FFFFFF !important;
+  --el-text-color: #333333 !important;
   // --menu-active-bg-color: rgba(229, 224, 224, 0.45);
-  --menu-text: #FFFFFF;
+  --menu-text: #000000;
   --el-card-header-bg-color: rgba(245, 250, 255, 0.86);
 }
 
@@ -110,12 +110,15 @@ $sidebar-logo-background: var(--sidebar-logo-background); // 侧边栏 Logo 背�
 
 .el-menu-item:hover {
   background-color: var(--menu-hover) !important;
+  color: #FFFFFF!important;
 }
 .el-sub-menu__title:hover {
-    background-color: var(--menu-hover);
+  background-color: var(--menu-hover);
+  color: #FFFFFF;
 }
 .el-menu-item.is-active {
-  background-color: var(--menu-active-bg-color) !important;
+  background-color: var(--menu-hover) !important;
+  color: #FFFFFF;
 }
 
 $sidebar-width: 210px; // 侧边栏宽度

@@ -192,6 +192,7 @@
         <!-- </el-affix> -->
       </el-aside>
       <el-main class="main-container">
+        <slot></slot>
         <div class="main-header">
           <div class="tp" style="background: #ebedfc">
             <span class="font-weight-500">条款：</span
@@ -347,34 +348,6 @@
           </div>
           <el-backtop :target="'.main-content'" :right="100" :bottom="150" />
         </div>
-        <div class="bottom-items">
-          <!--新增的申请单号显示和复制按钮-->
-          <div style="margin-right: auto; display: flex; align-items: center;" v-if="pageLoaded">
-            <div style="display: flex; align-items: center; background: #fff; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap; padding: 5px 10px;">
-              {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "申请单号:" }}
-              <span id="policyNumber" style="margin-left: 5px; margin-right: 5px; font-weight: bold;">
-              {{ getNo }}
-              </span>
-              <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '申请单号'}`" placement="top">
-                <el-button @click="copyPolicyNumber" circle size="small" style="color: red;margin-right: 0;">
-                  <rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />
-                </el-button>
-              </el-tooltip>
-            </div>
-          </div>
-          <template v-for="(bth, idx) in bthList" 
-            :key="idx">
-            <template v-if="bth.isdivider">
-              <el-divider direction="vertical" />
-            </template>
-            <template v-else>
-              <rt-button
-                :item="bth"
-                :loading="bth.loading"
-              />
-            </template>
-          </template>
-        </div>
       </el-main>
       <div class="right-sidebar-trigger">
         <el-popover
@@ -413,6 +386,34 @@
         </el-popover>
       </div>
     </el-container>
+    <div class="bottom-items">
+      <!--新增的申请单号显示和复制按钮-->
+      <div style="margin-right: auto; display: flex; align-items: center;" v-if="pageLoaded">
+        <div style="display: flex; align-items: center; background: #fff; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap; padding: 5px 10px;">
+          {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "申请单号:" }}
+          <span id="policyNumber" style="margin-left: 5px; margin-right: 5px; font-weight: bold;">
+          {{ getNo }}
+          </span>
+          <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '申请单号'}`" placement="top">
+            <el-button @click="copyPolicyNumber" circle size="small" style="color: red;margin-right: 0;">
+              <rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />
+            </el-button>
+          </el-tooltip>
+        </div>
+      </div>
+      <template v-for="(bth, idx) in bthList" 
+        :key="idx">
+        <!-- <template v-if="bth.isdivider">
+          <el-divider direction="vertical" />
+        </template>
+        <template v-else> -->
+          <rt-button
+            :item="bth"
+            :loading="bth.loading"
+          />
+        <!-- </template> -->
+      </template>
+    </div>
   </div>
 </template>
 
@@ -554,7 +555,7 @@ const handleAnchorClick = (event, selector) => {
     const mainContent = document.querySelector('.main-content');
     if (mainContent) {
       mainContent.scrollTo({
-        top: target.offsetTop - 45, // 减去一些偏移量
+        top: target.offsetTop - 160, // 减去一些偏移量
         behavior: 'smooth'
       });
     }
@@ -2296,7 +2297,7 @@ async function loadAfter() {
     imageStr = '影像查看';
   }
   bthList.value.push(
-    {isdivider: true},  //间隔符
+    // {isdivider: true},  //间隔符
     createFreeButtonBase({
       label: imageStr,
       type: "success",
@@ -2307,7 +2308,7 @@ async function loadAfter() {
   )
 
   bthList.value.push(
-    {isdivider: true},  //间隔符
+    // {isdivider: true},  //间隔符
     createFreeButtonBase({
       label: "返回",
       func: () => {
@@ -5428,7 +5429,8 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   flex-direction: column;
 }
 :deep(.el-main) {
-  padding: 10px 10px 10px 10px;
+  // padding: 10px 10px 10px 10px;
+  padding: 0px;
 }
 .publicStyle {
   color: red;
@@ -5454,31 +5456,36 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   flex: 1;
   // width: 130px;
   :deep(.el-anchor__list) {
-    padding: 20px 10px;
+    padding: 0;
   } 
   .el-anchor__item {
-    margin-bottom: 20px;
-    padding-left: 0;
-    opacity: .6;
+    margin-top: 10px;
+    padding-left: 16px;
+    padding-right: 22px;
     &.isActive,&:hover {
-      opacity: 1;
-      // background: #ffffff1a;
+      background: linear-gradient( 180deg, rgba(58, 118, 198, .1) 0%, rgba(57, 117, 198, .1) 100%);
+      :deep(a) {
+        color: var(--el-color-primary);
+        .iconfont {
+          color: var(--el-color-primary);
+        }
+      }
     }
     :deep(a) {
       display: flex;
       flex-direction: row;
       align-items: center;
-      color: #FFFFFF;
+      color: #595959;
       padding: 0;
+      height: 40px;
       .el-icon {
         font-size: 3rem!important;
         margin: 0 0 10px 0;
       }
       .iconfont {
-        font-size: 1.2rem;
-        color: #FFF;
-        margin-right: 5px;
-        min-width: 24px;
+        font-size: 1rem;
+        color: #595959;
+        margin-right: 8px;
         text-align: center;
       }
       .icon-title {
@@ -5492,20 +5499,20 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 }
 
 // 高亮图标和标题文字
-:deep(.el-anchor__item.is-active) ,
-:deep(.el-anchor__item.isActive) {
-  opacity: 1 !important;
-}
+// :deep(.el-anchor__item.is-active) ,
+// :deep(.el-anchor__item.isActive) {
+//   opacity: 1 !important;
+// }
 
-:deep(.el-anchor__item.is-active a .iconfont),
-:deep(.el-anchor__item.isActive a .iconfont) {
-  color: #ffa940 !important; /* 橙色 */
-}
+// :deep(.el-anchor__item.is-active a .iconfont),
+// :deep(.el-anchor__item.isActive a .iconfont) {
+//   color: #ffa940 !important; /* 橙色 */
+// }
 
-:deep(.el-anchor__item.is-active a .icon-title),
-:deep(.el-anchor__item.isActive a .icon-title) {
-  color: #ffa940 !important; /* 橙色 */
-}
+// :deep(.el-anchor__item.is-active a .icon-title),
+// :deep(.el-anchor__item.isActive a .icon-title) {
+//   color: #ffa940 !important; /* 橙色 */
+// }
 
 .toggle-button {
   position: absolute;
@@ -5516,7 +5523,8 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 }
 
 .toggle-nav-button {
-  background: rgba(255, 255, 255, 0.2) !important;
+  // background: rgba(255, 255, 255, 0.2) !important;
+  background: var(--el-color-primary);
   border: none !important;
   color: white !important;
   width: 32px;
@@ -5526,7 +5534,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 }
 
 .toggle-nav-button:hover {
-  background: rgba(255, 255, 255, 0.3) !important;
+  // background: rgba(255, 255, 255, 0.3) !important;
 }
 
 .toggle-nav-button :deep(.el-icon) {
@@ -5536,7 +5544,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 
 .el-aside {
   width: auto;
-  background: var(--el-color-primary);
+  background: #FFFFFF;
   position: relative;
   transition: width 0.3s ease;
 }
@@ -5551,12 +5559,13 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-top: -10px;
+    margin-top: 12px;
   }
   .main-content {
     flex: 1;
     overflow: hidden;
     overflow-y: auto;
+    margin: 12px 20px;
   }
 }
 :deep(.el-card__header) {

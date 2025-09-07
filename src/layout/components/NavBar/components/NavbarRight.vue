@@ -535,7 +535,7 @@ const switchTab = (tab) => {
   }
 
   .el-select__placeholder,.el-select__caret {
-    color: #FFFFFF;
+    color: #333333;
   }
 }
 

@@ -5,7 +5,7 @@
     :collapse="false"
     :background-color="variables['menu-background']"
     :text-color="variables['menu-text']"
-    :active-text-color="variables['menu-active-text']"
+    :active-color="variables['menu-active-text']"
     :unique-opened="false"
     :collapse-transition="false"
     :mode="layout === 'top' ? 'horizontal' : 'vertical'"
@@ -64,3 +64,9 @@ function resolvePath(routePath: string) {
   return fullPath;
 }
 </script>
+<style lang="scss" scoped>
+:deep(.el-sub-menu.is-active .el-sub-menu__title) {
+  color: #FFFFFF;
+  background: var(--el-color-primary);
+}
+</style>

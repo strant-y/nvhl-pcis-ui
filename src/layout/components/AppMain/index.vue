@@ -7,7 +7,9 @@
           name="expand"
         >
           <keep-alive :max="8" :include="cachedViews">
-            <component :is="Component" :key="route.query.componentKey"/>
+            <component :is="Component" :key="route.query.componentKey">
+              <slot></slot>
+            </component>
           </keep-alive>
         </transition>
       </template>
@@ -33,7 +35,8 @@ const {
 }
 
 .hasTagsView .app-main {
-  min-height: calc(100vh - $navbar-height - $tags-view-height);
+  // min-height: calc(100vh - $navbar-height - $tags-view-height);
+  min-height: calc(100vh - $navbar-height);
 }
 
 .fixed-header + .app-main {
@@ -43,7 +46,8 @@ const {
 
 .hasTagsView .fixed-header + .app-main {
   min-height: 100vh;
-  padding-top: $navbar-height + $tags-view-height;
+  // padding-top: $navbar-height + $tags-view-height;
+  padding-top: $navbar-height;
 }
 
 .layout-mix,
