@@ -4163,6 +4163,7 @@ const saveEdrPlyInfo = async () => {
       }
       res.EdrBase.push(edrBaseDatas._value);
     }else{
+      res["EdrBase"] = edrbase.value?.getFromValue();
       if (
         res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
         res["EdrBase"]["EdrBase.cEdrRsnDetail"] != "" &&

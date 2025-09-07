@@ -345,11 +345,11 @@ const query = (param: any) => {
             return sum + (isNaN(value) ? 0 : value);
           }, 0);
           // console.log('countNumber',countNumber)
-          termref?.setTermData({
-            termNo:'00425000091',
-            planNo:'P1',
-            factorProp: 'Term.nInsuredCount',
-          },countNumber);   
+          // termref?.setTermData({
+          //   termNo:'00425000091',
+          //   planNo:'P1',
+          //   factorProp: 'Term.nInsuredCount',
+          // },countNumber);   
      
       }
     }
