@@ -170,6 +170,7 @@ let isESBool = ref(false); // 是否es查询布尔
 
 // 用于缓存用户的完整勾选状态（包括原始列 + 扩展列）
 let userAllCheckedColumns = ref<string[]>([]);
+let isJumpingFromHome = ref(false); // 是否正在处理首页跳转
 
 const props = defineProps({
   refreshData: {
@@ -631,7 +632,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                             item.loadData = allCAppStatus;
                           }
                       });
-                      handleQuery(true);
+                      if (!isJumpingFromHome.value) {
+                        handleQuery(true);
+                      }
                   } else if (val === "E") {
                       // 批改
                       formconfig1.fromSchema?.forEach((item) => {
@@ -1286,6 +1289,11 @@ let tableconfig = reactive<AppTableConfig>(
 tableconfig.fixed = true;
 
 onMounted(async () => {
+    // 检测首页跳转并加锁
+    const hasJumpData = sessionStorage.getItem(AppKey.query.pcis_query_search);
+    if (hasJumpData) {
+        isJumpingFromHome.value = true;
+    }
     formconfig1.fromSchema?.forEach((item) => {
         if (
          item.prop === "tInquiryTm" ||
@@ -1327,19 +1335,11 @@ onMounted(async () => {
         checkedProps = normalQueryColumns.map(c => c.prop); // 默认列
     }
     applyCheckedColumns(checkedProps);
-    // 首页跳转过来查询条件赋值并查询
-    if (sessionStorage.getItem(AppKey.query.pcis_query_search)) {
-        setValue("cQueryStr", JSON.parse(
-            sessionStorage.getItem(AppKey.query.pcis_query_search)
-        ).CAppNo)
-        handleQuery(true, true);
-    }
 });
 
 onUnmounted(() => {
   //组件销毁，清除sessionStorage数据
-  sessionStorage.getItem(AppKey.query.pcis_query_search) &&
-    sessionStorage.removeItem(AppKey.query.pcis_query_search);
+  sessionStorage.getItem(AppKey.query.pcis_query_search) && sessionStorage.removeItem(AppKey.query.pcis_query_search);
 });
 
 // 绑定方法
@@ -2055,7 +2055,7 @@ const copyText = (text: any) => {
 };
 
 // 根据选中字段过滤最终表头
-function applyCheckedColumns(props: string[]) {
+async function applyCheckedColumns(props: string[]) {
     const finalColumns = [
         ...normalQueryColumns.filter(col => props.includes(col.prop)),
         ...extendColumns.filter(col => props.includes(col.prop))
@@ -2078,7 +2078,17 @@ function applyCheckedColumns(props: string[]) {
     };
 
     Object.assign(tableconfig, newConfig);
-    handleQuery(true); // 刷新数据
+    
+    // 首页跳转过来查询条件赋值并查询
+    const hasJumpData = sessionStorage.getItem(AppKey.query.pcis_query_search);
+    if (hasJumpData) {
+        setValue("cQueryStr", JSON.parse(hasJumpData).CAppNo);
+        await handleQuery(true, true);
+        isJumpingFromHome.value = false;
+        sessionStorage.removeItem(AppKey.query.pcis_query_search);
+    }else{
+        await handleQuery(true);
+    }
 }
 
 function setValue(key: string, value: any) {

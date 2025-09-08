@@ -111,11 +111,11 @@ const nPayNumberFun = (isAdd=false)=>{
       return false
     }
 
-    if (Number(getValue("Base.nPayNumber"))>12) {
+    if (Number(getValue("Base.nPayNum"))>12) {
       ElMessage.warning("拆分最多为12期！");
       return false
     }
-    if(getValue("Base.nPayNumber")!=''){
+    if(getValue("Base.nPayNum")!=''){
         let cinstmrk = getValue('Base.cInstMrk');
       if(specialAdd  && isAdd && cinstmrk =='5'){
         ElMessage.warning("分期付费业务，需在特别约定中增加及时缴纳保费的提示信息");
@@ -131,7 +131,7 @@ const nPayNumberFun = (isAdd=false)=>{
       
       let nCiShare = Number(getOwnShare()) || 100 ;
       const totalAmount = Number(data['base']['Base.nPrm'])  || 0;
-      const splitCount =Number(data.base?.['Base.nPayNumber']) || 0; 
+      const splitCount =Number(data.base?.['Base.nPayNum']) || 0;
    
       const totalCent = Math.round(totalAmount * 100);
       const result = ref<number[]>([]);
@@ -150,7 +150,7 @@ const nPayNumberFun = (isAdd=false)=>{
       // item['Pay.nPayablePrm']?  parseFloat((item['Pay.nPayablePrm'] * (nCiShare/100) ).toFixed(8)):0,
       let val= {}
       let valArr=[]
-      for (let i = 0; i < Number(getValue("Base.nPayNumber")); i++) {
+      for (let i = 0; i < Number(getValue("Base.nPayNum")); i++) {
         let BgnTmDate = new Date(opertaor.getTableRefs()["insrnc"].getValue("Base.tInsrncBgnTm"))   // 开始时间
         let startDate = new Date(BgnTmDate); 
         let endDate = new Date(BgnTmDate)
@@ -205,10 +205,10 @@ const method = {
       return ;
     }
     if(val=='5'){
-      setFormItem("Base.nPayNumber", { disabled: false ,  max:12});
+      setFormItem("Base.nPayNum", { disabled: false ,  max:12});
     }else if(val=='0'){
-      setFormItem("Base.nPayNumber", { disabled: true, });
-      setValue('Base.nPayNumber',1)
+      setFormItem("Base.nPayNum", { disabled: true, });
+      setValue('Base.nPayNum',1)
 
  
 
