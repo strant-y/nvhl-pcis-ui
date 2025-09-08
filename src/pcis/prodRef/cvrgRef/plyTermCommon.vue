@@ -667,8 +667,7 @@ function getPlanNo() {
   let  plans = [];
   if(formData.value['m'] && formData.value['m'].length > 0){
     formData.value['m'].forEach(e => {
-      let d = {};
-      d[e['Term.cPlanNo']] = e['Term.cPlanNo'];
+      let d = {label:e['Term.cPlanNo'],value:e['Term.cPlanNo']};
       plans.push(d);
     })
   }
