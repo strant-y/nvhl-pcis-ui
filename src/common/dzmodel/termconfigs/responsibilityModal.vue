@@ -192,19 +192,18 @@ const handleConfirm = () => {
     return item;
   });
   const paramData = { cTermNo: cTermNo, rel: newArr };
-  console.log(paramData); 
-  // saveTermRiskRel(paramData)
-  //   .then((res) => {
-  //     const { code, data, msg } = res;
-  //     if (200 === code) {
-  //       emits("ok", {});
-  //       ElMessage.success("保存成功");
-  //       emits("handleClose");
-  //     } else {
-  //       ElMessage.error(msg);
-  //     }
-  //   })
-  //   .finally(() => {});
+  saveTermRiskRel(paramData)
+    .then((res) => {
+      const { code, data, msg } = res;
+      if (200 === code) {
+        emits("ok", {});
+        ElMessage.success("保存成功");
+        emits("handleClose");
+      } else {
+        ElMessage.error(msg);
+      }
+    })
+    .finally(() => {});
 };
 onMounted(() => {
   setTimeout(() => {

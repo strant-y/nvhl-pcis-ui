@@ -4773,7 +4773,7 @@ const validateDistConsistency = async () => {
       const distRes: any = await checkDistTerm(distParam);
 
       if (distRes.code == 200 && distRes.data == true) {
-        ElMessage.error(distRes.msg);
+        ElMessage.success(distRes.msg);
         return true;          // 通过
       }
       // 构造提示语换行展示
